@@ -226,7 +226,7 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
   assert.equal(state.lastError, undefined, "so there is no 복구됨 notice");
   assert.equal(state.paused, fixture.save.paused);
   assert.ok(before.grooveVault > 0 && before.bestCombo > 0, "and it names the hand's share, and counts a combo of pushes, as that build did");
-  assert.deepEqual(state.dynamics, { ...upgradeRunRecord(before), veteran: false, story: false, logic: { ...LOGIC_INITIAL } }, "the table record is the save's under the names this build reads, plus the marks that say it is a plain run at the table and a logic streak not yet begun");
+  assert.deepEqual(state.dynamics, { ...upgradeRunRecord(before), veteran: false, story: false, weekRule: null, logic: { ...LOGIC_INITIAL } }, "the table record is the save's under the names this build reads, plus the marks that say it is a plain run at the table, under no week's rule, and a logic streak not yet begun");
   assert.deepEqual([state.dynamics.handVault, "bestCombo" in state.dynamics], [before.grooveVault, false]);
   const run = normalizeRunState(state.dynamics);
   assert.deepEqual(serializeRunState(run), state.dynamics, "and it is written back the same");

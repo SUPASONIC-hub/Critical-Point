@@ -74,7 +74,8 @@ test("the introduction is read against the briefing's clock, a line counted as a
   }
   // The page that counts them is the page that prints them.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
-  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.node, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\)\]\)/);
+  // And the week's rule (이번 주의 규칙), whose panel the page prints too.
+  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.node, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules\]\)/);
   assert.match(briefing, /const intro = getBriefingIntro\(node, nodeId, run\);/);
 });
 
@@ -82,7 +83,9 @@ test("the introduction is written straight after the speaker, and the breach pan
   // The order the panels are written in is the order a phone stacks them and
   // a screen reader reads them; the grid places them in the same order by line.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
-  const order = ["gx-panel-splash", "gx-panel-speaker", 'data-testid="unlock-intro"', "gx-panel-story", "gx-panel-file", 'data-testid="carried-rules"', 'data-testid="protocol-breach"'].map((mark) => briefing.indexOf(mark));
+  const order = ["gx-panel-splash", "gx-panel-speaker", 'data-testid="unlock-intro"', "gx-panel-story", "gx-panel-file", 'data-testid="carried-rules"', 'data-testid="protocol-breach"', "{weekRulePanel}"].map((mark) => briefing.indexOf(mark));
+  // The week's rule is last, in a chunk of its own (WeekRulePanel.jsx).
+  assert.match(readFileSync("src/gauntlet/WeekRulePanel.jsx", "utf8"), /data-testid="week-rule-panel"/);
   assert.ok(order.every((index) => index > 0));
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
   const rows = [...briefing.matchAll(/style=\{at\("(\d+) \/ /g)].map((match) => Number(match[1]));

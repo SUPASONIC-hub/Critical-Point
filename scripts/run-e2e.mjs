@@ -107,6 +107,7 @@ const DEFAULT_SPECS = [
   "tests/season-telemetry.spec.js",
   "tests/table-keys.spec.js",
   "tests/visual-regression.spec.js",
+  "tests/weekly-rule.spec.js",
 ];
 
 // The specs the production build can run: everything tagged @prod, which
@@ -391,7 +392,9 @@ function holdOutput(stream) {
 // telemetry, ranking and board tests would write to the production database.
 // The dev server reads .env files at start, and an empty variable in the
 // environment takes precedence over them.
-const serverEnv = { VITE_SUPABASE_URL: "", VITE_SUPABASE_ANON_KEY: "", VITE_ENABLE_DEBUG_TOOLS: "" };
+// The week's rule is held on a week without one (src/state/weeklyClock.js), so
+// the screens the specs read and the baselines do not change on an event week.
+const serverEnv = { VITE_SUPABASE_URL: "", VITE_SUPABASE_ANON_KEY: "", VITE_ENABLE_DEBUG_TOOLS: "", VITE_WEEKLY_RULE_CLOCK: "2026-01-07T12:00:00+09:00" };
 
 const server = usePreview
   ? spawnCommand("npx", ["vite", "preview", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: ["ignore", "pipe", "pipe"], env: serverEnv })

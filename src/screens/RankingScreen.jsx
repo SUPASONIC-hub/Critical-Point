@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
 import { getLeaderboardStatusCopy } from "../ranking.js";
+import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { reloadLeaderboard } from "../state/useLeaderboard.js";
 
 export function RankingScreen({
@@ -65,6 +66,8 @@ export function RankingScreen({
             )}
           </section>
           <section className="ranking-table-panel" aria-label="플레이어 랭킹">
+            {/* 이번 주의 규칙: the ordinary board and the week's, in a week with a rule. */}
+            <WeeklyRuleNotice view="boards" />
             <div className="ranking-table-heading">
               <div>
                 <span lang="en">SEASON 1 / BEST RUN</span>

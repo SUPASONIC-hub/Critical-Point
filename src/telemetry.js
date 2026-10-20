@@ -291,11 +291,17 @@ export async function fetchBoardPosts(limit = 50) {
  * recent rows, which a flood of fresh ones could fill. `run_tag` is the short
  * run label; the full run id and the session code are not public.
  */
-export async function fetchLeaderboard(limit = 100) {
+//
+// `week` picks the board: null is the ordinary ranking (`week=is.null`), a
+// week key ("2026-W46") that week's rule's own (`week=eq.2026-W46`). The server
+// writes the week on a season's row from when it received the run's first case
+// row (이번 주의 규칙; supabase/migrations/*_weekly_rule_event.sql).
+export async function fetchLeaderboard(limit = 100, week = null) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 
   const query = new URLSearchParams({
-    select: "run_tag,player_name,case_id,case_title,completed_at,summary,score",
+    select: "run_tag,player_name,case_id,case_title,completed_at,summary,score,week",
+    week: typeof week === "string" && week ? `eq.${week}` : "is.null",
     order: "score.desc.nullslast,completed_at.asc",
     limit: String(limit),
   });

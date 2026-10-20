@@ -27,3 +27,15 @@ function opensCase(node, nodeId) {
 export function getBriefingIntro(node, nodeId, run, staged = STAGED) {
   return opensCase(node, nodeId) ? getUnlockIntro(node.caseId, run, staged) : NO_INTRO;
 }
+
+/**
+ * The id of 이번 주의 규칙 the season was started under, for a panel of its
+ * own on every case's opening page (결정 28 (1): its own kicker, not a line
+ * among the unlocks); null on the case's later pages and in a story case,
+ * which deals no week's rule (`getTableSchema`). The id only: the panel's
+ * chunk reads the rule (WeekRulePanel.jsx), so this file, which is the
+ * PlayScreen chunk's, does not import the catalogue.
+ */
+export function getBriefingWeekRuleId(node, nodeId, run) {
+  return (opensCase(node, nodeId) && run?.story !== true && run?.weekRule) || null;
+}

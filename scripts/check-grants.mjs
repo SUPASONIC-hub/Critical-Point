@@ -9,6 +9,7 @@ import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } fro
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
+import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 
 /**
@@ -26,7 +27,7 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  * So this replays every migration into an in-process Postgres (PGlite) set up
  * the way a project is after that date: the API roles exist and can use the
  * schema, functions and sequences keep their default grants, and tables get
- * none. Then it asserts six things.
+ * none. Then it asserts seven things.
  *
  *   1. Rules that hold for any table, so a new one cannot slip through: RLS is
  *      on, service_role can read and write it, and every policy aimed at anon
@@ -54,6 +55,10 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *      function it was: each part is run by nobody but the service role, the
  *      triggers are wired as before, and one row for every refusal, sent to
  *      both definitions, is refused or stored the same way by each.
+ *   7. This week's rule (20261021000000): the server's calendar and week are
+ *      the client's, a season ranks on the board of the week its first case
+ *      row arrived in when every row names that week's rule, and one whose
+ *      rows disagree, or name a rule that week does not have, is refused.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -1242,8 +1247,8 @@ withHeaders(null);
   const result = await allowed(
     "read the ranking the way the client does",
     "anon",
-    `select run_tag, player_name, case_id, case_title, completed_at, summary, score
-     from public.public_rankings order by score desc nulls last, completed_at asc limit 100`,
+    `select run_tag, player_name, case_id, case_title, completed_at, summary, score, week
+     from public.public_rankings where week is null order by score desc nulls last, completed_at asc limit 100`,
   );
   const rows = result?.rows ?? [];
   check(rows.length === 2, `the ranking shows ${rows.length} rows; expected the two accepted runs (the '1' one normalised to true).`);
@@ -1251,6 +1256,7 @@ withHeaders(null);
   check(rows.every((row) => !("runId" in row.summary)), "a ranking summary still carries the full runId.");
   check(rows.every((row) => /^[A-Z0-9]{1,8}$/.test(row.run_tag)), "run_tag is not the short tag the ranking prints.");
   check(rows.every((row) => row.case_title === "SEASON 01 COMPLETE"), "a ranking row's title is not the constant.");
+  check(rows.every((row) => row.week === null), "a season played without a rule is not on the ordinary board (week is null).");
 }
 await refused("read a ranking row's full run_id", "anon", `select run_id from public.playtest_sessions`);
 await refused("read a ranking row's session_code", "anon", `select session_code from public.public_rankings`, /^42(501|703) /);
@@ -1454,6 +1460,165 @@ if (!SUSPICION_MARKS) {
   // The seeded rows go, so everything after this sees the two ranked runs.
   await db.query(`delete from public.playtest_sessions where run_id like 'run-cutoffs-%'`);
   check((await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final'`))?.n === 2, "the cut-point check left ranking rows behind.");
+}
+
+// ---- this week's rule (20261021000000_weekly_rule_event.sql)
+//
+// A season stamps the rule of the week it began in on every case row
+// (`dynamics.weekRule`, createRunSummary), and the server, not the device,
+// says which week that was: the week of the first case row it received (D1,
+// 결정 29, strict). Every run below is whole, watched and well spaced, like
+// run-ranked-1, so what its case rows say about the week is all there is to
+// take or refuse. The server's calendar is set for the weeks these runs were
+// played in -- they are played now, whatever week that is -- and put back to
+// the client's at the end, and the runs are taken out again, so the board and
+// everything after it see the two ordinary runs ranked above.
+{
+  const WEEK_MIGRATION = "20261021000000_weekly_rule_event.sql";
+  if (!files.includes(WEEK_MIGRATION)) failures.push(`supabase/migrations/${WEEK_MIGRATION} is gone; this week's rule was checked against nothing.`);
+  const calendarRows = async () => (await db.query(`select week, rule_id from public.weekly_rules order by week`)).rows.map(({ week, rule_id }) => [week, rule_id]);
+  const clientCalendar = WEEKLY_RULES.map(({ week, id }) => [week, id]).sort(([a], [b]) => a.localeCompare(b));
+  const serverCalendar = await calendarRows();
+  check(JSON.stringify(serverCalendar) === JSON.stringify(clientCalendar), `the server's weekly_rules holds ${JSON.stringify(serverCalendar)}; the client's calendar (src/gauntlet/weeklyCalendar.js) is ${JSON.stringify(clientCalendar)}.`);
+
+  // The server's week is the client's, on the edges that matter: Monday 00:00
+  // KST (Sunday 15:00 UTC), and 2026's fifty-third week into 2027.
+  for (const at of [
+    "2026-11-08T14:59:59.999Z", "2026-11-08T15:00:00Z", "2026-11-15T14:59:59Z",
+    "2026-12-27T15:00:00Z", "2026-12-31T15:00:00Z", "2027-01-03T14:59:59Z", "2027-01-03T15:00:00Z",
+    "2025-12-28T14:59:59Z", "2025-12-28T15:00:00Z",
+  ]) {
+    const server = (await one(`select public.kst_iso_week($1::timestamptz) as week`, [at]))?.week;
+    check(server === isoWeekKey(Date.parse(at)), `at ${at} the server reads week ${server} and the client ${isoWeekKey(Date.parse(at))}; the two have to name one week.`);
+  }
+  for (const [label, sql] of [
+    ["read the server's calendar", `select * from public.weekly_rules`],
+    ["change the server's calendar", `insert into public.weekly_rules (week, rule_id) values ('2026-W47', 'near-wall')`],
+    ["ask which week a run is in", `select public.ranking_run_week('run-ranked-1')`],
+  ]) {
+    await refused(label, "anon", sql);
+    await refused(label, "authenticated", sql);
+  }
+
+  withHeaders({ "x-forwarded-for": "198.51.100.23" });
+  const [EVENT, OTHER] = Object.keys(WEEK_RULE_CATALOGUE);
+  const rankingRow = (runId) => one(`select summary->>'week' as week from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]);
+  const setWeek = (week, ruleId) =>
+    db.query(`insert into public.weekly_rules (week, rule_id) values ($1, $2) on conflict (week) do update set rule_id = excluded.rule_id`, [week, ruleId]);
+  /** The KST week of the run's first case row. */
+  const firstWeek = async (runId) =>
+    (await one(`select public.kst_iso_week(min(completed_at)) as week from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`, [runId]))?.week;
+  let n = 60;
+  /** A season whose case rows carry `ruleOf(caseId)` as their stamp. */
+  const weekRun = async (runId, ruleOf, { session = sessionId(n++) } = {}) => {
+    await playRun(runId, { session, dynamicsOf: (caseId, dynamics) => ({ ...dynamics, weekRule: ruleOf(caseId) }) });
+    return session;
+  };
+  const refusedWeekRun = async (label, runId, session, pattern) => {
+    await postRefused(label, "playtest_sessions", seasonPayload({ session, runId }), pattern);
+    check(!(await rankingRow(runId)), `${runId} has a ranking row after the refusal to ${label}.`);
+  };
+  const CHANGED = /^P0001 week rule changed within the run$/;
+  const NOT_THE_WEEK = /^P0001 week rule does not match the week the run began$/;
+
+  // The season the client builds stamps its rule on every row.
+  check(Object.hasOwn(createRunSummary(RUN_INITIAL_STATE), "weekRule"), "the run summary the client builds has no weekRule; the server would read every season as the ordinary table's.");
+  check(createRunSummary({ ...RUN_INITIAL_STATE, weekRule: EVENT }).weekRule === EVENT, "the run summary does not carry the season's rule.");
+
+  // Taken: every row says the rule, and the server's calendar has it for the week the first row came in.
+  const takenSession = await weekRun("run-week-taken", () => EVENT);
+  const week = await firstWeek("run-week-taken");
+  await setWeek(week, EVENT);
+  await post("rank a season played under this week's rule", "playtest_sessions", seasonPayload({ session: takenSession, runId: "run-week-taken" }));
+  const taken = await rankingRow("run-week-taken");
+  check(taken?.week === week, `a season played under ${week}'s rule ranked with week ${JSON.stringify(taken?.week)}; the server writes the week it judged.`);
+  check((await rankingRow("run-ranked-1"))?.week === null, "an ordinary season's ranking row carries a week.");
+
+  // Taken, across a week's end (D3): the season keeps the rule of the week it
+  // began in, and ranks on that week's board though its last rows came after.
+  const acrossSession = await weekRun("run-week-across", () => EVENT);
+  await db.query(
+    `update public.playtest_sessions set completed_at = completed_at - interval '7 days'
+      where id = (select id from public.playtest_sessions where run_id = 'run-week-across' order by completed_at, id limit 1)`,
+  );
+  const weekBefore = await firstWeek("run-week-across");
+  check(weekBefore !== week, `the season moved a week back still began in ${weekBefore}.`);
+  await setWeek(weekBefore, EVENT);
+  await post("rank a season begun under last week's rule and ended this week", "playtest_sessions", seasonPayload({ session: acrossSession, runId: "run-week-across" }));
+  const across = await rankingRow("run-week-across");
+  check(across?.week === weekBefore, `a season begun in ${weekBefore} ranked in ${JSON.stringify(across?.week)}; it belongs to the week it began in.`);
+
+  // Refused: rows that do not all say the same (D3: the stamp is the season's, set once).
+  const early = CASE_SEQUENCE.slice(0, 10);
+  const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+  await refusedWeekRun("rank a season begun without the rule and finished under it", "run-week-mixed", await weekRun("run-week-mixed", (caseId) => (early.includes(caseId) ? null : EVENT)), CHANGED);
+  await refusedWeekRun("rank a season whose rows name two rules", "run-week-two", await weekRun("run-week-two", (caseId) => (early.includes(caseId) ? OTHER : EVENT)), CHANGED);
+  await refusedWeekRun("rank a season with one row under the rule", "run-week-one", await weekRun("run-week-one", (caseId) => (caseId === middle ? EVENT : null)), CHANGED);
+
+  // Refused: a rule the server's calendar does not have for the week the first row came in (D1).
+  await refusedWeekRun("rank a season under another rule than the week's", "run-week-other", await weekRun("run-week-other", () => OTHER), NOT_THE_WEEK);
+  await refusedWeekRun("rank a season under a rule no calendar has", "run-week-unknown", await weekRun("run-week-unknown", () => "made-up-rule"), NOT_THE_WEEK);
+  // A device clock set to an event week, or a season begun offline and sent a
+  // week late (결정 29: strict, no grace): the rule is right, the week is not.
+  const driftSession = await weekRun("run-week-drift", () => EVENT);
+  await db.query(`update public.playtest_sessions set completed_at = completed_at - interval '14 days' where run_id = 'run-week-drift'`);
+  const driftWeek = await firstWeek("run-week-drift");
+  check(driftWeek !== week && driftWeek !== weekBefore, `the season moved two weeks back began in ${driftWeek}, a week the check has a rule for.`);
+  await db.query(`delete from public.weekly_rules where week = $1`, [driftWeek]);
+  await refusedWeekRun("rank a season stamped with a rule in a week that has none", "run-week-drift", driftSession, NOT_THE_WEEK);
+
+  // Refused at the row: a stamp that is not a rule id the client writes.
+  const stampOf = (weekRule) => ({
+    ...casePayload({ session: sessionId(59), runId: "run-week-stamp", caseId: "case01" }),
+    dynamics: { ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4, weekRule },
+  });
+  await postRefused("send a case row whose weekRule is a number", "playtest_sessions", stampOf(46), /^23514 .*playtest_sessions_dynamics_shape/);
+  await postRefused(`send a case row whose weekRule is longer than ${WEEK_RULE_ID_MAX}`, "playtest_sessions", stampOf("x".repeat(WEEK_RULE_ID_MAX + 1)), /^23514 .*playtest_sessions_dynamics_shape/);
+  await post(`send a case row whose weekRule is ${WEEK_RULE_ID_MAX} long`, "playtest_sessions", stampOf("x".repeat(WEEK_RULE_ID_MAX)));
+
+  // One device, two a day, whichever board (결정 30): an ordinary season and an event one, and the third is refused.
+  const shared = sessionId(n++);
+  await weekRun("run-week-limit-1", () => null, { session: shared });
+  await post("rank an ordinary season from the device", "playtest_sessions", seasonPayload({ session: shared, runId: "run-week-limit-1" }));
+  await weekRun("run-week-limit-2", () => EVENT, { session: shared });
+  await setWeek(await firstWeek("run-week-limit-2"), EVENT);
+  await post("rank an event season from the same device", "playtest_sessions", seasonPayload({ session: shared, runId: "run-week-limit-2" }));
+  await weekRun("run-week-limit-3", () => EVENT, { session: shared });
+  await setWeek(await firstWeek("run-week-limit-3"), EVENT);
+  await postRefused("rank a third season from one device in a day, on the event's board", "playtest_sessions", seasonPayload({ session: shared, runId: "run-week-limit-3" }), /^PT429 .*limit reached/);
+
+  // The two boards, read the way the client reads them (fetchLeaderboard).
+  const boardRows = async (filter, params = []) =>
+    (await allowed(`read the ranking where ${filter}`, "anon",
+      `select run_tag, player_name, case_id, case_title, completed_at, summary, score, week from public.public_rankings
+        where ${filter} order by score desc nulls last, completed_at asc limit 100`, params))?.rows ?? [];
+  const ordinary = await boardRows("week is null");
+  check(ordinary.length === 3 && ordinary.every((row) => row.week === null && !("week" in row.summary)),
+    `the ordinary board shows ${ordinary.length} rows (${JSON.stringify(ordinary.map((row) => row.week))}); expected the three seasons played without a rule.`);
+  const eventBoard = await boardRows("week = $1", [week]);
+  check(eventBoard.length === 2 && eventBoard.every((row) => row.week === week && row.summary?.week === week),
+    `the board of ${week} shows ${JSON.stringify(eventBoard.map((row) => row.week))}; expected its two seasons and only those.`);
+  check((await boardRows("week = $1", [weekBefore])).length === 1, `the board of ${weekBefore} does not show the one season that began in it.`);
+
+  // The hold rate's cut points read the ordinary board only (결정 30): the
+  // event seasons carry a hold rate too, and are not counted.
+  const cut = (await allowed("read the cut points beside an event week", "anon", `select public.logic_hold_cutoffs() as c`))?.rows[0]?.c;
+  check(cut?.n === ordinary.length, `the hold rate's cut points counted ${cut?.n} seasons; the ordinary board has ${ordinary.length}, and an event week's seasons are not among them.`);
+
+  // What the client's queue makes of the two refusals: let go, and not read as a run missing a case.
+  const seasonItem = { type: "case", payload: { case_id: "season-final" } };
+  for (const serverMessage of ["week rule changed within the run", "week rule does not match the week the run began"]) {
+    const refusal = { status: 400, serverMessage };
+    check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads "${serverMessage}" as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
+    check(!isUnrankableRefusal(seasonItem, refusal), `the client's queue reads "${serverMessage}" as a run missing a case row.`);
+  }
+
+  withHeaders(null);
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-week-%'`);
+  await db.query(`delete from public.weekly_rules`);
+  for (const [calendarWeek, ruleId] of clientCalendar) await setWeek(calendarWeek, ruleId);
+  check(JSON.stringify(await calendarRows()) === JSON.stringify(clientCalendar), "the weekly rule's check did not put the server's calendar back.");
+  check((await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final'`))?.n === 2, "the weekly rule's check left ranking rows behind.");
 }
 
 // ---- the board
@@ -1710,6 +1875,7 @@ const UPDATE_PROBE = {
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
   scene_bust_stats: "windows = windows",
+  weekly_rules: "rule_id = rule_id",
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a

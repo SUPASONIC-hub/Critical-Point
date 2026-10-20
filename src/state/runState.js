@@ -3,8 +3,11 @@ import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../gameConstants.js";
 import { makeEmptyScores } from "../gameLogic.js";
 import { normalizeRunState, RUN_INITIAL_STATE, serializeRunState } from "../gauntlet/gauntletEngine.js";
+import { normalizeWeekRuleId, pickSeasonWeekRule } from "../gauntlet/weeklyRules.js";
 import { getAccessibility } from "./accessibilitySettings.js";
 import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
+import { weeklyRuleNow } from "./weeklyClock.js";
+import { weekRuleTurnedDown } from "./weeklyRuleChoice.js";
 
 /**
  * The run, defined once.
@@ -47,7 +50,10 @@ const emptyCognition = () => makeEmptyScores(cognitionLabels);
  * (`veteran`) and story mode (`story`, the comfort setting as it stood at the
  * start). The engine's own opening table when it has neither.
  */
-const openingTable = (veteran, story) => (veteran || story ? { ...RUN_INITIAL_STATE, veteran, story } : RUN_INITIAL_STATE);
+const openingTable = (veteran, story, weekRule = null) => {
+  const week = story ? null : normalizeWeekRuleId(weekRule);
+  return veteran || story || week ? { ...RUN_INITIAL_STATE, veteran, story, weekRule: week } : RUN_INITIAL_STATE;
+};
 
 export const RUN_FIELDS = {
   runId: {
@@ -259,7 +265,13 @@ export const RUN_FIELDS = {
     // story mark -- the table is the engine's, and the engine is not in the
     // entry chunk -- so the opening table is made here, as the device's
     // setting stands. Any table the save does hold keeps the mark it has.
-    load: (saved) => (saved?.dynamics === null ? openingTable(false, getAccessibility().storyMode) : normalizeRunState(saved?.dynamics)),
+    // The week's rule is stamped here for the same reason (D2: on by default,
+    // unless this device turned it down on the start screen, 결정 27).
+    load: (saved) => {
+      if (saved?.dynamics !== null) return normalizeRunState(saved?.dynamics);
+      const story = getAccessibility().storyMode;
+      return openingTable(false, story, pickSeasonWeekRule(weeklyRuleNow(), { story, declined: weekRuleTurnedDown() }));
+    },
     fresh: () => RUN_INITIAL_STATE,
     // A run begun with NEW GAME+ is marked: its table has every rule from the
     // first window, where a plain start turns them on case by case
@@ -267,7 +279,10 @@ export const RUN_FIELDS = {
     // The story mark is the caller's reading of the comfort setting. The
     // season's first case is played from here without being opened, so this is
     // where it gets its mark; every later case gets its own as it opens.
-    newGame: (event) => openingTable(event.veteran === true, event.story === true),
+    // The week's rule is the caller's too (createRunLifecycle.startGame): the
+    // week the season starts in, unless the player turned it down. Kept to the
+    // season's end, across a week's end (D3).
+    newGame: (event) => openingTable(event.veteran === true, event.story === true, event.weekRule),
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),
