@@ -1,4 +1,3 @@
-import { HEAT_DEBT_GAUGE } from "./tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice } from "./weeklyRules.js";
 
 /**
@@ -9,7 +8,7 @@ import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice }
  * close cold, case after case, and pay nothing. The audit counts that hand:
  *
  * - a cash pushed at least once and closed below `AUDIT_HEAT` adds one;
- * - a cash at `HEAT_DEBT_GAUGE` or more takes `AUDIT_RELIEF` off, never below 0;
+ * - a cash at `AUDIT_RELIEF_HEAT` (HEAT DEBT's 60) or more takes `AUDIT_RELIEF` off, never below 0;
  * - a bust, a window left, the clock, SCOUT, LOCK and the heartbeat move
  *   nothing (B3 decision 2; B4, B6 and B7 stay out).
  *
@@ -30,7 +29,19 @@ import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice }
  * never in story mode or a practice case (decision 9). The engine's default
  * rules are "everything", so a `rules.has("audit")` would have switched it on
  * in every measurement at once; the week's stamp keeps those lines still.
+ *
+ * The file is a chunk of its own (AUDIT_RISK in vite.config.js), with the
+ * table's words for it: the engine's chunk, the table's and the runtime's
+ * each import it, and it imports nothing from any of them, so none of their
+ * budgets carries it.
  */
+
+/**
+ * HEAT DEBT's heat (`HEAT_DEBT_GAUGE`, tableRules.js), where a cash takes the
+ * audit down. Written here and not imported: tableRules.js is in the engine's
+ * chunk, which imports this one. A unit test holds the two equal.
+ */
+export const AUDIT_RELIEF_HEAT = 60;
 
 /** Whether this table counts the audit. */
 export function isAuditOn(run) {
@@ -45,7 +56,7 @@ export function isAuditOn(run) {
 export function auditStep({ busted = false, gauge = 0, pushes = 0 } = {}) {
   if (busted) return 0;
   const heat = Math.round(Number(gauge) || 0);
-  if (heat >= HEAT_DEBT_GAUGE) return -AUDIT_RELIEF;
+  if (heat >= AUDIT_RELIEF_HEAT) return -AUDIT_RELIEF;
   return (Number(pushes) || 0) > 0 && heat < AUDIT_HEAT ? 1 : 0;
 }
 
@@ -76,3 +87,49 @@ export function judgeAudit({ count, secured, hand }) {
     handLost: caught ? Math.floor(Math.max(0, hand) / AUDIT_SHARE) : 0,
   };
 }
+
+/**
+ * One window's settling, for `resolveWindow`: null on a table without the
+ * audit; else the count after this window (`count` is the case's before it)
+ * and, when the window closes a case that pays (`closed`), the judgement.
+ */
+export function settleAudit({ run, count, busted, gauge, pushes, closed, secured, hand }) {
+  if (!isAuditOn(run)) return null;
+  const after = addAudit(count, auditStep({ busted, gauge, pushes }));
+  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand }) : { caught: false, lost: 0, handLost: 0 }) };
+}
+
+/**
+ * The audit between the window `before` was dealt and the one `after` is, or
+ * null, for the table's voice (tableVoice.js): as `findBank`, only the very
+ * next window, and only on a table that counts it (`after.audit`, the
+ * meters' reading) when the count moved.
+ */
+export function findAudit(before, after) {
+  if (!before || !after.audit || after.windowIndex !== before.windowIndex + 1) return null;
+  if (after.audit.count === before.audit?.count) return null;
+  return { windowIndex: after.windowIndex, text: describeAudit(after.audit) };
+}
+
+/**
+ * The HUD's reading, or null on a table without the audit: where it stands,
+ * what a cash right now would make it, and whether the next +1 fills it.
+ * The stage draws it as one token on the run signal line, in the bank's ember
+ * (`gx-at-risk`) one short of the limit; `spoken` is the reading for the 확정
+ * button's description.
+ */
+export function readAudit(run, count, win) {
+  if (!isAuditOn(run)) return null;
+  const now = Math.max(0, Math.trunc(Number(count) || 0));
+  const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes });
+  const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
+  return { ...reading, spoken: describeAuditIfCash(reading) };
+}
+
+/** The cash button's description: what this cash does to the audit. 초안. */
+export const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
+  ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;
+
+/** What the voice says when a table opens on an audit that moved (B3). 초안. */
+export const describeAudit = ({ count, limit }) =>
+  `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;

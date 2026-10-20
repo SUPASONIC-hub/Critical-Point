@@ -1,6 +1,5 @@
 import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
-import { addAudit, auditStep, isAuditOn } from "./auditRisk.js";
-import { AUDIT_LIMIT } from "./weeklyRules.js";
+import { readAudit } from "./auditRisk.js";
 
 /**
  * The 현재 위험 cell's line, and the voice's after the heat (`describePush`).
@@ -56,20 +55,3 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit =
     audit: readAudit(run, audit, win),
   };
 }
-
-/**
- * The HUD's reading, or null on a table without the audit: where it stands,
- * what a cash right now would make it, and whether the next +1 fills it.
- * `spoken` is that for the 확정 button's description.
- */
-export function readAudit(run, count, win) {
-  if (!isAuditOn(run)) return null;
-  const now = Math.max(0, Math.trunc(Number(count) || 0));
-  const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes });
-  const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
-  return { ...reading, spoken: describeAuditIfCash(reading) };
-}
-
-/** The cash button's description: what this cash does to the audit. 초안. */
-export const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
-  ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;

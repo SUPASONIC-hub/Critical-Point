@@ -70,7 +70,19 @@ const budgets = [
   // (WeekRulePanel, below); what stays is the two imports, the weeklyRules
   // import the bundler hoists, and the line that asks whether the page opens
   // a case. Main measured 34,274 that day, after #198, #205 and #209.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_373 },
+  // 34,300 -> 34,332 gzip on 2026-10-20, measured 34,328 plus the 4 bytes of
+  // hash noise: 이번 주의 규칙's briefing panel. It took the chunk to 34,395;
+  // the panel and the catalogue lookup went to a chunk of their own
+  // (WeekRulePanel, below), which left the two imports and the line that asks
+  // whether the page opens a case, 28 bytes over.
+  // 34,332 -> 34,572 gzip on 2026-10-20, measured 34,568 plus the 4 bytes of
+  // hash noise: B3's audit on the table (the run signal's 감사 n/N token, the
+  // 확정 button's description, the voice's once-a-window line). It took the
+  // chunk to 34,880; the audit's count, its judgement, its reading and its
+  // words went to a chunk of their own (auditRisk, below), which left the
+  // stage's token and description, the voice's hook and the import, 236
+  // bytes over. The raw budget does not move (103,924).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_613 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -150,7 +162,9 @@ const budgets = [
   // gained one more `import "./weeklyRules-<hash>.js"` (이번 주의 규칙 has a
   // chunk of its own, below). The raw budget does not move.
   // 4,209 -> 4,210 on 2026-10-20: 4,204-4,210 over eight builds, the hashes'.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_210 },
+  // 4,209 -> 4,228 gzip on 2026-10-20, measured 4,224 plus 4, for the same
+  // reason: one more `import "./auditRisk-<hash>.js"` (B3's audit, below).
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_229 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -202,12 +216,18 @@ const budgets = [
   // lost its first sentence; the HUD's and the voice's words are in the
   // table's own chunk (tableMeters.js, tableVoice.js).
   // Rebased on main (2026-10-21): main's 1,142 plus B3's 411 bytes.
+  // audit's own chunk (auditRisk, below).
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_570, maxGzip: 976 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
+  // count, its judgement, the table's reading and its words, out of the
+  // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
+  // on 2026-10-20. 1,680 / 938 measured, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_680, maxGzip: 942 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -293,7 +313,9 @@ function checkBudget(file, budget) {
 // 8,828 / 3,183 -> 8,862 / 3,200 on 2026-10-20, measured 8,862 / 3,196 on main
 // after #209 (3,188-3,196 on the day's three mains; main itself 8,754 / 3,146)
 // plus 4: the same three more file names in a longer list.
-const WORKER_BUDGET = { maxBytes: 8_862, maxGzip: 3_200 };
+// 8,828 / 3,183 -> 8,860 / 3,196 on 2026-10-20, measured 8,860 / 3,192 (gzip
+// plus 4): one more file, B3's audit (auditRisk).
+const WORKER_BUDGET = { maxBytes: 8_894, maxGzip: 3_213 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

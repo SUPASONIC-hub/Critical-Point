@@ -185,8 +185,11 @@ const BUDGETS = {
   // `useTableKeys` and its forecast derivations to `tableReadout`. Measured 917.
   // 930 -> 830 on 2026-10-06: ratcheted to what it measures (809); the hand,
   // the notices and the timing had moved out since.
+  // 830 -> 833 on 2026-10-20, measured: B3's audit token on the run signal,
+  // its prop and the 확정 button's description (830 before; the token's
+  // comment went to auditRisk.js's readAudit).
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 830,
+    lines: 833,
     longestLine: 250,
     importedNames: 68,
     hooks: {},

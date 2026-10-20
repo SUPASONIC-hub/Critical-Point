@@ -37,7 +37,7 @@ import {
   STRIKE_WAKE_CHIPS,
 } from "./tableRules.js";
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
-import { addAudit, auditStep, isAuditOn, judgeAudit } from "./auditRisk.js";
+import { settleAudit } from "./auditRisk.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -1497,14 +1497,10 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // A practice run closes a case the table has already been paid for: nothing
   // moves to the vault, and the next case is dealt what the season held before.
   const practice = caseClosed ? current.practice : null;
-  // AUDIT, on a week that has it: this window's step, and on the close the
-  // part of the vault's share and the hand's that the audit takes.
-  const auditOn = isAuditOn(current);
-  const auditAfter = auditOn ? addAudit(audit, auditStep({ busted: outcome === "bust", gauge, pushes: window?.pushes })) : 0;
-  const audited = auditOn && caseClosed && !practice
-    ? judgeAudit({ count: auditAfter, secured: runPotAfter, hand: runHandAfter })
-    : { caught: false, lost: 0, handLost: 0 };
-  const secured = caseClosed && !practice ? runPotAfter - audited.lost : 0;
+  // AUDIT, on a week that has it (auditRisk.js): null, or this window's step
+  // and on the close the part of the vault's share and the hand's it takes.
+  const audited = settleAudit({ run: current, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter });
+  const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
   const nextSchema = buildNextSchema({
@@ -1550,7 +1546,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     secured,
     // Only on a table that counts it: the audit after this window, and on the
     // close whether it took its part and how much (`secured` is after it).
-    ...(auditOn ? { audit: { count: auditAfter, caught: audited.caught, lost: audited.lost } } : {}),
+    ...(audited ? { audit: { count: audited.count, caught: audited.caught, lost: audited.lost } } : {}),
     fracturedAxis: current.schema.fracturedAxis,
     fractureRate: current.schema.fractureRate,
     nextMutations,
@@ -1610,7 +1606,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     focusHits: current.focusHits + verdict.focus.hits,
     stanceMastery,
     runHand: caseClosed ? 0 : runHandAfter,
-    handVault: current.handVault + (caseClosed ? runHandAfter - audited.handLost : 0),
+    handVault: current.handVault + (caseClosed ? runHandAfter - (audited?.handLost ?? 0) : 0),
     logic: streak.logic,
     relics,
     relicOffer,

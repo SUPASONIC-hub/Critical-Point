@@ -493,7 +493,6 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>연속</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {/* AUDIT on a week that counts it (B3): one token, the bank's ember one short of the limit. */}
               {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>감사</small> <b>{audit.count}/{audit.limit}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>

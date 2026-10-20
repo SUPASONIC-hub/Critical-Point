@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { addAudit, auditStep, countAudit, isAuditOn, judgeAudit } from "../../src/gauntlet/auditRisk.js";
+import { addAudit, AUDIT_RELIEF_HEAT, auditStep, countAudit, findAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
 import { normalizeRunState, openCaseRun, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
-import { readAudit, readTableMeters } from "../../src/gauntlet/tableMeters.js";
-import { findAudit } from "../../src/gauntlet/tableVoice.js";
+import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, getWeekRule, pickSeasonWeekRule, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
 
@@ -151,4 +151,12 @@ test("the voice says the audit once, as the next table opens on a count that mov
 test("judgeAudit cuts the vault's share and the hand's by the same part", () => {
   assert.deepEqual(judgeAudit({ count: AUDIT_LIMIT, secured: 1003, hand: 401 }), { caught: true, lost: Math.floor(1003 / AUDIT_SHARE), handLost: Math.floor(401 / AUDIT_SHARE) });
   assert.deepEqual(judgeAudit({ count: AUDIT_LIMIT - 1, secured: 1003, hand: 401 }), { caught: false, lost: 0, handLost: 0 });
+});
+
+test("the audit's own chunk imports nothing from the engine's: its relief heat is HEAT DEBT's, written twice and held equal", () => {
+  assert.equal(AUDIT_RELIEF_HEAT, HEAT_DEBT_GAUGE);
+  const source = readFileSync("src/gauntlet/auditRisk.js", "utf8");
+  const imports = [...source.matchAll(/from "([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(imports, ["./weeklyRules.js"], "auditRisk.js imports only the week's numbers");
+  assert.match(readFileSync("vite.config.js", "utf8"), /const AUDIT_RISK = "src\/gauntlet\/auditRisk\.js"/);
 });

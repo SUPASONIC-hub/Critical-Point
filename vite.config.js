@@ -364,6 +364,17 @@ const SCENE_TRACES = "src/state/useSceneBustRates.js";
  */
 const WEEK_RULE_PANEL = "src/gauntlet/WeekRulePanel.jsx";
 
+/**
+ * The audit (B3, src/gauntlet/auditRisk.js): its count, its judgement and the
+ * table's words for it. The engine's chunk, the table's and the runtime's all
+ * import it, so left alone it is written into the engine's chunk, which it took
+ * past its gzip budget on 2026-10-20 (14,417 of 14,200), and its words into the
+ * table's (PlayScreen 34,880 of 34,332). It gets a file the way the table's
+ * sound does; it imports only the week's numbers (weeklyRules), never the
+ * engine's chunk, so the two do not import each other.
+ */
+const AUDIT_RISK = "src/gauntlet/auditRisk.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -397,6 +408,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(WEEK_RULE_PANEL),
         name: "WeekRulePanel",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(AUDIT_RISK),
+        name: "auditRisk",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },

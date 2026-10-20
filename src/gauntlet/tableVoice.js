@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { formatNumber } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
-import { AUDIT_SHARE } from "./weeklyRules.js";
+import { findAudit } from "./auditRisk.js";
 
 /**
  * What the table says aloud, in one polite region (E3, table-voice).
@@ -60,10 +60,6 @@ export const describeStanceCarry = ({ focus, carry }) => `충전 ${Math.round(fo
 export const describeScout = ({ wallMin, wallMax }) => `조회했다. 벽은 ${wallMin}에서 ${wallMax} 사이 어딘가`;
 
 export const describeBank = ({ runPot, vault }) => `판돈 ${formatNumber(runPot)} · 금고 ${formatNumber(vault)}`;
-
-/** What the voice says when a table opens on an audit that moved (B3). 초안. */
-export const describeAudit = ({ count, limit }) =>
-  `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;
 
 /** The rule the staked cash would carry for its stance, or null while the charge does not count. */
 export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutation) => STANCE_CARRY_IDS.has(mutation.id)) ?? null;
@@ -124,17 +120,6 @@ export function findBank(before, after) {
   if (!before || after.windowIndex !== before.windowIndex + 1) return null;
   if (after.runPot <= before.runPot && after.vault <= before.vault) return null;
   return { windowIndex: after.windowIndex, text: describeBank(after) };
-}
-
-/**
- * The audit between the window `before` was dealt and the one `after` is, or
- * null: as `findBank`, only the very next window, and only on a table that
- * counts it (`after.audit`, the meters' reading) when the count moved.
- */
-export function findAudit(before, after) {
-  if (!before || !after.audit || after.windowIndex !== before.windowIndex + 1) return null;
-  if (after.audit.count === before.audit?.count) return null;
-  return { windowIndex: after.windowIndex, text: describeAudit(after.audit) };
 }
 
 /**
