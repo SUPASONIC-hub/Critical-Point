@@ -16,24 +16,6 @@ export function getOperatorReveal({ origin = "courier", completedCases = [] } = 
   return { level: 2, title: "OPERATOR FILE / OPENED", text: "당신은 사건을 처리하는 사람인 동시에, 어떤 사건을 기록할지 정해온 설계자였습니다." };
 }
 
-// Kept here, not in playerLanguage.js, which ships in the intro chunk: only the
-// report reads a count this way.
-/**
- * A count read the native Korean way, as it sits in front of a counter:
- * 한 건, 20명, 마흔아홉 사건. Past 99 it is written in digits, as a person would.
- */
-const NATIVE_UNITS = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"];
-const NATIVE_TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"];
-
-export function nativeKoreanCount(count = 0) {
-  const value = Math.trunc(Number(count) || 0);
-  if (value <= 0 || value > 99) return String(value);
-  const tens = Math.floor(value / 10);
-  const units = value % 10;
-  if (value === 20) return "스무";
-  return `${NATIVE_TENS[tens]}${NATIVE_UNITS[units]}`;
-}
-
 /**
  * What the season left behind, months after the last night.
  *
@@ -63,7 +45,7 @@ export function getEndingEpilogue(endingId = "open-question") {
     "quiet-cover":
       "위험 곡선은 끝까지 평평했습니다. 무너진 것도 드러난 것도 없고, '인사평가_보조지표' 폴더는 다시 잠겼습니다. 당신이 열지 않은 문 뒤의 기록은 그대로 있습니다.",
     collapse:
-      `${nativeKoreanCount(NUMBERED_CASES)} 사건 가운데 여러 건이 정상화되지 못한 채 닫혔습니다. 강태민이 잃는 것 칸에 적은 야간 수당, 권도현이 서명의 값에 더한 가족 학자금 지원처럼, 회사가 버틸 때 사람들 몫으로 붙어 있던 것부터 거둬졌습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다.`,
+      `${NUMBERED_CASES}개 사건 가운데 여러 건이 정상화되지 못한 채 닫혔습니다. 강태민이 잃는 것 칸에 적은 야간 수당, 권도현이 서명의 값에 더한 가족 학자금 지원처럼, 회사가 버틸 때 사람들 몫으로 붙어 있던 것부터 거둬졌습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다.`,
   };
   return (
     epilogues[endingId] ||
