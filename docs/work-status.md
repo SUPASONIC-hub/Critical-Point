@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-20 (the state of `main` at `6cd7f87`; what changed and when is in `git log`)
+Last updated: 2026-10-20 (the state of `main` at `6cd7f87`, and #199 at `43e7ed1`; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -109,10 +109,12 @@ Still open, on purpose:
 - Two numbers no longer sit under the words they were set for:
   `f_archive_seal`'s effect was written for a label about gathering evidence,
   and 사건 23's market card keeps the `risk` its old label inferred.
-- Three pull requests are open: #199 (this week's rule, F7; to merge on the
-  morning of 2026-10-21), and two drafts that are measurements, not to merge:
-  #201 (B3, the audit risk of a device-shaped weekly rule; its decisions are
-  recorded) and #208 (B2, the visible chain risk; decisions pending).
+- This week's rule (#199, F7) merged on the evening of 2026-10-20 at `43e7ed1`
+  (migration 20261021000000; the ranking reads one board at a time by `week`).
+  Two drafts are measurements, not to merge alone: #201 (B3, the audit risk of
+  a device-shaped weekly rule) and #208 (B2, the visible chain risk); all their
+  decisions are recorded, and they go live together in one pull request
+  (RULES_MARK 3, one ranking reset) after the maker's own plays.
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
