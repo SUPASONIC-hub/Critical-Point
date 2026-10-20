@@ -20,7 +20,7 @@ export function getOperatorReveal({ origin = "courier", completedCases = [] } = 
 // report reads a count this way.
 /**
  * A count read the native Korean way, as it sits in front of a counter:
- * 한 건, 스무 명, 마흔아홉 사건. Past 99 it is written in digits, as a person would.
+ * 한 건, 20명, 마흔아홉 사건. Past 99 it is written in digits, as a person would.
  */
 const NATIVE_UNITS = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"];
 const NATIVE_TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"];
@@ -53,7 +53,7 @@ export function getEndingEpilogue(endingId = "open-question") {
     "evidence-reform":
       "보호 명부와 감사 로그가 하나의 절차로 묶였습니다. 이민서는 자기 기록의 열람 권한을 가진 첫 번째 직원이 됐고, 돌봄 배차의 가중치표에는 '조용한 이용자' 항목이 새로 생겼습니다. 다음 사건은 이제 공개된 예외가 아니라 아직 숨어 있는 예외에서 시작됩니다.",
     "human-record":
-      "당신이 다시 짠 판들이 그대로 보관소에 남았습니다. 현장 사람들은 그 기록을 읽고 자기 이름을 되찾는 작업을 이어가고, 플로우온에서 잘린 야간조 열여덟 명 중 아홉 명이 자기 사건 파일을 열람했습니다. 다음 참가자의 첫 단서는 정답이 아니라 당신이 바꿔 놓은 판입니다.",
+      "당신이 다시 짠 판들이 그대로 보관소에 남았습니다. 현장 사람들은 그 기록을 읽고 자기 이름을 되찾는 작업을 이어가고, 플로우온에서 잘린 야간조 18명 중 9명이 자기 사건 파일을 열람했습니다. 다음 참가자의 첫 단서는 정답이 아니라 당신이 바꿔 놓은 판입니다.",
     "profitable-silence":
       "장부는 살아남았습니다. 플로우온은 인수되지 않았고 온새의 서비스도 끊기지 않았지만, 어느 회의실에서도 같은 질문이 다시 나오지 않습니다. 트리거랩의 다음 참가자는 당신의 로그를 '가장 효율적인 침묵'이라는 이름의 표본으로 받습니다.",
     "cold-justice":
