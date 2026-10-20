@@ -9,6 +9,8 @@
  * stream per `createSeasonBot`, in the order it always drew, and the case
  * players draw from nothing but their seeds (`handUnit`).
  */
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE } from "../../src/gauntlet/weeklyRules.js";
+import { AUDIT_VALUE_SETS } from "./audit-values.mjs";
 import {
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
@@ -143,6 +145,21 @@ const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label
  * the stamp and every line these players print stays where it was.
  */
 export const AUDIT_WEEK = process.env.AUDIT_WEEK === "1";
+/**
+ * AUDIT_VALUES=A|B|C plays the audit week on one of the design's three value
+ * sets (audit-values.mjs, which must be loaded first with `node --import`);
+ * left out, the numbers weeklyRules.js ships (B). The set played is checked,
+ * not assumed.
+ */
+export const AUDIT_VALUES = (() => {
+  const played = { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE };
+  const asked = process.env.AUDIT_VALUES;
+  if (asked && Object.entries(AUDIT_VALUE_SETS[asked] ?? {}).some(([name, value]) => played[name] !== value)) {
+    throw new Error(`AUDIT_VALUES=${asked} needs the numbers rewritten as weeklyRules.js loads: node --import ./scripts/sim/audit-values.mjs ...`);
+  }
+  const name = Object.entries(AUDIT_VALUE_SETS).find(([, set]) => Object.entries(set).every(([key, value]) => played[key] === value))?.[0] ?? "?";
+  return `${name} (${AUDIT_HEAT}/${AUDIT_LIMIT}/-${AUDIT_RELIEF}/1:${AUDIT_SHARE})`;
+})();
 const auditStamp = (story) => (AUDIT_WEEK && !story ? { weekRule: "audit" } : {});
 
 /**
@@ -554,7 +571,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       }
       win = scoutWindow(win, decide.scout, rules);
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
-        if (!decide(win, run)) break;
+        // `audit` is the case's audit so far, for a hand that reads it (AUDIT_WEEK).
+        if (!decide(win, run, audit)) break;
         win = reduceWindow(win, { type: "PUSH" }, rules);
         win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
       }

@@ -16,9 +16,10 @@ import {
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
+import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/weeklyRules.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_WEEK, createCaseBot, handUnit, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_WEEK, createCaseBot, handUnit, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -271,11 +272,23 @@ for (const row of rows) {
     `${row.label.padEnd(16)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${row.meanWindows}`,
   );
 }
-// AUDIT_WEEK=1 only (B3's test week): how many closes the audit took its part of, and the share of what those rows moved to the vault it took.
+// AUDIT_WEEK=1 only (B3's test week): how many closes the audit took its part
+// of, and the share of what those rows moved to the vault it took. Then the
+// hand that reads it (B3 design 3-3): the same blind targets, except that when
+// one more mark would fill the audit it pushes on to AUDIT_HEAT, where a cash
+// adds nothing. If reading it does not lose less, the audit is a tax and not
+// a decision.
 if (AUDIT_WEEK) {
   const auditShare = (row) => `${row.label} caught ${row.seen.audits} lost ${((row.seen.auditLost / Math.max(1, row.seen.auditSecured)) * 100).toFixed(1)}%`;
+  console.log(`audit week       values ${AUDIT_VALUES}`);
   console.log(`audit week       ${[...fixed, ...heartbeat, oracle].map(auditShare).join("; ")}`);
   console.log(`audit week       best blind ${bestOfRows(fixed).label}, best heartbeat ${bestOfRows(heartbeat).label}`);
+  const reading = [20, 30, 40, 50].map((target) => {
+    const blind = fixed.find((row) => row.label === `heat ${target}`);
+    const reads = measure(`reads, heat ${target}`, (win, _run, audit) => win.gauge < (audit + 1 >= AUDIT_LIMIT ? Math.max(target, AUDIT_HEAT) : target));
+    return `heat ${target} ${blind.meanVault} (caught ${blind.seen.audits}) -> reads ${reads.meanVault} (caught ${reads.seen.audits}, bust ${(reads.bustRate * 100).toFixed(1)}%)`;
+  });
+  console.log(`audit week       reading the audit: ${reading.join("; ")}`);
 }
 const offerShare = (type) => ((SCENES.filter((offers) => offers.some((offer) => offer.type === type)).length / SCENES.length) * 100).toFixed(0);
 console.log(
