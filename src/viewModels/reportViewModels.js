@@ -145,8 +145,8 @@ export function createAchievementBadges({ challengeClearCount, currentChallengeS
 }
 
 /** The most decisions each end of `getDecisionPace` reads, and the fewest that make a comparison. */
-export const DECISION_PACE_SIZE = 10;
-export const DECISION_PACE_MIN = 3;
+const DECISION_PACE_SIZE = 10;
+const DECISION_PACE_MIN = 3;
 
 /**
  * How fast the first decisions of a log were made against the last: the same

@@ -31,7 +31,7 @@ function isNodeValidForCase(caseId, nodeId) {
   return Boolean(nodeOrders[caseId]?.includes(nodeId) || CASE_RESULT_NODES[caseId] === nodeId);
 }
 
-export function repairSavedRoute(state) {
+function repairSavedRoute(state) {
   if (!state || typeof state !== "object" || Array.isArray(state)) return null;
   const currentCase = isKnownCaseId(state.currentCase) ? state.currentCase : SEASON_ENTRY_CASE;
   const nodeId = isNodeValidForCase(currentCase, state.nodeId) ? state.nodeId : CASE_START_NODES[currentCase];

@@ -33,7 +33,7 @@ import { getClockCall } from "./tableReadout.js";
  * turn is replaced by a newer one of the same kind, so three quick pushes are
  * heard as the first and the last, and the same sentence is not said twice.
  */
-export const VOICE_GAP_MS = 1500;
+const VOICE_GAP_MS = 1500;
 
 /** The rules a cash carries into the next board when the stance's charge is held (`applyFocusCarry`). */
 const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);

@@ -635,7 +635,7 @@ export function getRemainingSeconds(window) {
  * The seconds run as they always do; it is the heat each second adds that
  * grows. The table prints it beside the bank (`describeClockHeat`).
  */
-export const CLOCK_HEAT_PER_PUSH = 0.12;
+const CLOCK_HEAT_PER_PUSH = 0.12;
 
 export function getClockHeatRate(pushes) {
   return 1 + Math.max(0, Number(pushes) || 0) * CLOCK_HEAT_PER_PUSH;
