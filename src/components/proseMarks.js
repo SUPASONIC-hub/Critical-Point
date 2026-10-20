@@ -25,7 +25,10 @@
 const UNIT = "(?:%p|%|퍼센트|포인트|영업일|개월|시간|년|월|일|시|분|초|억|만|천|조|원|명|곳|건|개|배|층|주|번|차례|쪽|살|위|등|점|호|bp)";
 const NUMBER = String.raw`(?<![\w.,])(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:-\d+)*`;
 const FIGURE = new RegExp(`${NUMBER}${UNIT}*`, "g");
-const GLOSS = /([가-힣A-Za-z0-9·]+)(\([^()\n\u2029]*[가-힣][^()\n\u2029]*\))/g;
+// U+001F joins a captioned scene's lines (proseCaptions); a gloss never crosses it.
+// It is a control character so the font check never counts it as printed.
+// eslint-disable-next-line no-control-regex
+const GLOSS = /([가-힣A-Za-z0-9·]+)(\([^()\n\u001f]*[가-힣][^()\n\u001f]*\))/g;
 // A date or time reads as one figure across the space: 11월 1일, 7시 40분.
 const DATE_HEAD = /(?:^| )\d+(?:년|월|일|시)$/;
 const DATE_TAIL = /^\d+(?:월|일|시|분|초)$/;
@@ -101,8 +104,8 @@ export function markProse(text = "") {
 export function markLines(lines = []) {
   const result = lines.map(() => []);
   let line = 0;
-  for (const segment of markProse(lines.join("\u2029"))) {
-    const pieces = segment.text.split("\u2029");
+  for (const segment of markProse(lines.join("\u001f"))) {
+    const pieces = segment.text.split("\u001f");
     pieces.forEach((piece, index) => {
       if (index > 0) line += 1;
       if (piece) result[line].push({ text: piece, marks: segment.marks });
