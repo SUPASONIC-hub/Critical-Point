@@ -15,6 +15,7 @@
     "src/featurePack.js": 91,
     "src/gameConstants.js": 100,
     "src/gameLogic.js": 99,
+    "src/gauntlet/auditRisk.js": 100,
     "src/gauntlet/fxVariables.js": 100,
     "src/gauntlet/gauntletEngine.js": 99,
     "src/gauntlet/holdConfirm.js": 98,

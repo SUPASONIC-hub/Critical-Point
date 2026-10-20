@@ -1,3 +1,4 @@
+import { describeAuditLedger } from "./auditRisk.js";
 import { createGauntletLedger } from "./gauntletEngine.js";
 import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
@@ -7,7 +8,8 @@ import { objectParticle } from "../playerLanguage.js";
 /**
  * The case's table record: what went into the vault, what the walls took, and
  * the hottest pot cashed. Rebuilt from the log, which is what a resumed save
- * restores.
+ * restores. On an audit week (B3) the sentence under it gains one more, how
+ * many marks the case closed with (auditRisk.js).
  */
 export function GauntletLedger({ log = [], summary = null }) {
   const ledger = createGauntletLedger(log);
@@ -19,6 +21,7 @@ export function GauntletLedger({ log = [], summary = null }) {
     : ledger.cashes > 0
       ? "한 번도 벽에 닿지 않았다. 더 밀 수 있었는지는 벽만 안다."
       : "아직 테이블에 앉지 않았다.";
+  const audit = describeAuditLedger(log, summary?.weekRule);
   return (
     <section className="pressure-ledger" aria-label="테이블 장부">
       <div className="panel-title-row">
@@ -57,7 +60,7 @@ export function GauntletLedger({ log = [], summary = null }) {
           <small>번 판돈 {formatNumber(ledger.potBanked)}</small>
         </article>
       </div>
-      <p className="pressure-ledger-note">{note}</p>
+      <p className="pressure-ledger-note">{audit ? `${note} ${audit}` : note}</p>
       {relics.length > 0 && (
         <p className="pressure-ledger-relics" data-testid="ledger-relics">
           <span>장착한 도구</span>

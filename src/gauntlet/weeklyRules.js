@@ -49,7 +49,10 @@ export const NEAR_WALL_SHIFT = 4;
  * and closed below `AUDIT_HEAT` adds one to the case's audit, a cash at
  * HEAT DEBT's heat or more takes `AUDIT_RELIEF` off it. When the case closes
  * with `AUDIT_LIMIT` or more, one part in `AUDIT_SHARE` of what it moves to
- * the vault is lost. B, the design's starting values. Here, beside the other
+ * the vault is lost. Set B of the design's three (40 / 4 / -2 / one in four),
+ * decided by the user on 2026-10-20 after the A/B/C measurement of PR #201:
+ * A never caught a season bot, C broke a check:pressure assertion and caught
+ * the hand that watches the wall. Here, beside the other
  * week's numbers, while it is a week's device: imported from tableRules.js
  * this chunk took the whole of that module (check:bundle, 2026-10-19); it
  * moves there when it becomes a rule of the table.

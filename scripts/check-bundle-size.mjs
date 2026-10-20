@@ -226,8 +226,13 @@ const budgets = [
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
-  // on 2026-10-20. 1,680 / 938 measured, the gzip plus 4.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_680, maxGzip: 942 },
+  // on 2026-10-20. 1,680 / 938 measured, the gzip plus 4. 1,917 / 1,044 the
+  // same day with the table record's audit sentence (describeAuditLedger,
+  // user's choice 1): it went here because the result screen's chunk, where
+  // the record is drawn, had 157 gzip bytes left and took it to 14,422 of
+  // 14,400 even written as a file of its own, and that budget does not go up.
+  // Raised by what it measured, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_917, maxGzip: 1_048 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];

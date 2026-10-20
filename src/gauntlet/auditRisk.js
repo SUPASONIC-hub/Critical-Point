@@ -133,3 +133,22 @@ export const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
 /** What the voice says when a table opens on an audit that moved (B3). 초안. */
 export const describeAudit = ({ count, limit }) =>
   `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;
+
+/**
+ * The table record's audit sentence (GauntletLedger.jsx), or null: one more
+ * sentence after the record's, never a seventh cell, so the grid and its CSS
+ * stay as they are (user, 2026-10-20, the PR's first question, choice 1).
+ * Rebuilt from what the record has, as the rest of it is: the count off the
+ * case's log (what the close judged) and the case summary's week. A story
+ * case and a replayed one count nothing, as `isAuditOn` says; the log tells
+ * which by an entry's `assistStory` or the replay's closing `firstRecord`.
+ * A full audit adds 적발; what it took is the result window's vault line.
+ * The system's words, no 반재욱 line (user, 2026-10-20, second question, 3).
+ * Here and not in the result screen's chunk, which has no room and whose
+ * budget does not go up (check-bundle-size.mjs).
+ */
+export function describeAuditLedger(log, weekRule) {
+  if (!log.some((entry) => entry?.threshold) || !isAuditOn({ weekRule, story: log.some((entry) => entry?.assistStory), practice: log.some((entry) => entry?.threshold?.firstRecord) })) return null;
+  const count = countAudit(log);
+  return `감사 ${count}/${AUDIT_LIMIT}칸으로 닫혔다.${count < AUDIT_LIMIT ? "" : " 적발."}`;
+}

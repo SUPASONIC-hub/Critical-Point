@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { addAudit, AUDIT_RELIEF_HEAT, auditStep, countAudit, findAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
+import { addAudit, AUDIT_RELIEF_HEAT, auditStep, countAudit, describeAuditLedger, findAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
 import { normalizeRunState, openCaseRun, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
 import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
@@ -185,4 +185,31 @@ test("a development build plays an audit week on ?week=audit; a release and node
   assert.match(calendarSource, /DEV_WEEK_RULE =\s+typeof __CP_DEBUG_BUILD__ !== "undefined" && __CP_DEBUG_BUILD__\s+\?/, "the switch is behind the constant the bundler folds to false in a release");
   assert.match(readFileSync("src/telemetry.js", "utf8"), /telemetryEnabled = Boolean\(SUPABASE_URL && SUPABASE_ANON_KEY\) && !DEV_WEEK_RULE;/, "a forced week sends nothing to the server");
   assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /'added:"dev"'\]/, "check:bundle fails a release that carries it");
+});
+
+test("the audit's numbers are set B, decided on 2026-10-20: 40 / 4 / -2 / one in four", () => {
+  assert.deepEqual([AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE], [40, 4, 2, 4]);
+});
+
+test("the table record says, in one line under its sentence, how many marks the case closed with", () => {
+  const caught = playCase(auditRun(), [cash(20), cash(25), cash(30), cash(35)]);
+  assert.equal(caught.verdict.audit.caught, true);
+  assert.equal(describeAuditLedger(caught.log, "audit"), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`);
+  const clear = playCase(auditRun(), [cash(20), cash(70), cash(30)]);
+  assert.equal(clear.verdict.audit.count, 1);
+  assert.equal(describeAuditLedger(clear.log, "audit"), `감사 1/${AUDIT_LIMIT}칸으로 닫혔다.`, "the count the close judged, read off the same log");
+
+  assert.equal(describeAuditLedger(caught.log, null), null, "a week without the audit has no line");
+  assert.equal(describeAuditLedger(caught.log, "near-wall"), null);
+  assert.equal(describeAuditLedger([], "audit"), null, "nor a case with no window");
+  assert.equal(describeAuditLedger([{ nodeId: "intro" }], "audit"), null);
+  const story = caught.log.map((entry) => ({ ...entry, assistStory: true }));
+  assert.equal(describeAuditLedger(story, "audit"), null, "story mode counts nothing");
+  const replay = caught.log.map((entry, index) => (index === caught.log.length - 1 ? { threshold: { ...entry.threshold, firstRecord: { busts: 0 } } } : entry));
+  assert.equal(describeAuditLedger(replay, "audit"), null, "nor does a replayed case");
+
+  const ledger = readFileSync("src/gauntlet/GauntletLedger.jsx", "utf8");
+  assert.match(ledger, /describeAuditLedger\(log, summary\?\.weekRule\)/, "the record reads the case summary's week");
+  assert.match(ledger, /<p className="pressure-ledger-note">\{audit \? `\$\{note\} \$\{audit\}` : note\}<\/p>/, "inside the sentence's paragraph, not a seventh cell");
+  assert.equal((ledger.match(/<article>/g) ?? []).length, 6, "the grid keeps its six cells");
 });
