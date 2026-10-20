@@ -6,7 +6,8 @@ import { addAudit, AUDIT_RELIEF_HEAT, auditStep, countAudit, findAudit, isAuditO
 import { normalizeRunState, openCaseRun, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
 import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, getWeekRule, pickSeasonWeekRule, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
+import { DEV_WEEK_RULE, devWeekEntry } from "../../src/gauntlet/weeklyCalendar.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, getWeekRule, isoWeekKey, pickSeasonWeekRule, WEEKLY_RULES, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
 
 const card = { id: "a", label: "a", effect: { capital: 9, trust: -12 }, next: "x" };
 const cash = (gauge, pushes = 2) => ({ status: "cashed", cause: "cash", gauge, wall: 95, pushes, seed: `audit:${gauge}:${pushes}` });
@@ -159,4 +160,29 @@ test("the audit's own chunk imports nothing from the engine's: its relief heat i
   const imports = [...source.matchAll(/from "([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(imports, ["./weeklyRules.js"], "auditRisk.js imports only the week's numbers");
   assert.match(readFileSync("vite.config.js", "utf8"), /const AUDIT_RISK = "src\/gauntlet\/auditRisk\.js"/);
+});
+
+test("a development build plays an audit week on ?week=audit; a release and node never do", () => {
+  const now = Date.parse("2026-10-20T12:00:00+09:00");
+  const forced = devWeekEntry({ debugBuild: true, search: "?debug=1&week=audit", now });
+  assert.deepEqual(forced, { week: isoWeekKey(now), id: "audit", added: "dev" });
+  const calendar = [forced, ...WEEKLY_RULES];
+  const stamp = pickSeasonWeekRule(now, { calendar });
+  assert.equal(stamp, "audit");
+  assert.equal(isAuditOn(normalizeRunState({ weekRule: stamp })), true, "the season it starts counts the audit");
+  assert.equal(pickSeasonWeekRule(now, { calendar, declined: true }), null, "the start screen's box still turns it down");
+  assert.equal(pickSeasonWeekRule(now, { calendar, story: true }), null, "and story mode never has it");
+  assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar }), null, "only this week");
+
+  assert.equal(devWeekEntry({ debugBuild: false, search: "?week=audit", now }), null, "a release build has no switch");
+  assert.equal(devWeekEntry({ debugBuild: true, search: "?debug=1", now }), null);
+  assert.equal(devWeekEntry({ debugBuild: true, search: "?week=%3Cscript%3E", now }), null);
+  assert.equal(pickSeasonWeekRule(now, { calendar: [devWeekEntry({ debugBuild: true, search: "?week=no-such-rule", now }), ...WEEKLY_RULES] }), null, "an id the catalogue lacks is no rule");
+
+  assert.equal(DEV_WEEK_RULE, null, "node has no build constant and no switch");
+  assert.ok(WEEKLY_RULES.every((entry) => entry.added !== "dev"));
+  const calendarSource = readFileSync("src/gauntlet/weeklyCalendar.js", "utf8");
+  assert.match(calendarSource, /DEV_WEEK_RULE =\s+typeof __CP_DEBUG_BUILD__ !== "undefined" && __CP_DEBUG_BUILD__\s+\?/, "the switch is behind the constant the bundler folds to false in a release");
+  assert.match(readFileSync("src/telemetry.js", "utf8"), /telemetryEnabled = Boolean\(SUPABASE_URL && SUPABASE_ANON_KEY\) && !DEV_WEEK_RULE;/, "a forced week sends nothing to the server");
+  assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /'added:"dev"'\]/, "check:bundle fails a release that carries it");
 });

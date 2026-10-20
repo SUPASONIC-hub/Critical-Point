@@ -14,9 +14,42 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * `WEEKLY_NOTICE_DAYS` before its week. 초안: the first week is a placeholder
  * for the choice in the report.
  */
-export const WEEKLY_RULES = Object.freeze([
+const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
 ]);
+
+/**
+ * A development build's switch, so a rule can be played before any week has
+ * it (B3: the audit is judged by simulation and by the maker's own plays, with
+ * no test week). On the dev server, or a build that asked for the debug tools,
+ * `?week=audit` makes the catalogue's `audit` this week's rule: the start
+ * screen has its line and its box, and a season started then carries the
+ * stamp in its save, so a reload without the query plays on under it. Any id
+ * of the catalogue works; one that is not there is no rule (getWeekRule).
+ * The week is the device's: a build whose weekly clock is pinned (the e2e
+ * builds, state/weeklyClock.js) reads another week, and the switch does
+ * nothing there.
+ *
+ * A release has no switch: `__CP_DEBUG_BUILD__` is false there and the bundler
+ * drops the branch. A session with it on sends nothing to the server
+ * (telemetry.js), so a forced week never reaches a ranking. Node, which runs
+ * the tests and the bots, has no constant and no switch.
+ */
+export function devWeekEntry({ debugBuild = false, search = "", now = Date.now() } = {}) {
+  if (!debugBuild) return null;
+  const id = new URLSearchParams(search ?? "").get("week");
+  const week = isoWeekKey(now);
+  return id && /^[a-z][a-z-]{0,31}$/.test(id) && week ? Object.freeze({ week, id, added: "dev" }) : null;
+}
+
+/** This session's forced week (`devWeekEntry`), or null: always null in a release. */
+export const DEV_WEEK_RULE =
+  typeof __CP_DEBUG_BUILD__ !== "undefined" && __CP_DEBUG_BUILD__
+    ? devWeekEntry({ debugBuild: true, search: globalThis.location?.search, now: Date.now() })
+    : null;
+
+/** The calendar every reader reads: the merged weeks, behind a forced one. */
+export const WEEKLY_RULES = DEV_WEEK_RULE ? Object.freeze([DEV_WEEK_RULE, ...MERGED_WEEKS]) : MERGED_WEEKS;
 
 /** The ISO week a moment falls in, in Korean time: "2026-W53". */
 export function isoWeekKey(ms) {

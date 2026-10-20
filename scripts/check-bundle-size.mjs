@@ -238,8 +238,11 @@ const budgets = [
  * for it (`debugBuild`, src/appConfig.js). It used to ship switched off, and a
  * `VITE_ENABLE_DEBUG_TOOLS=true` left in the build environment would have
  * switched it on for every visitor with every check green.
+ *
+ * The dev switch that forces this week's rule (`?week=`, weeklyCalendar.js)
+ * is held the same way: its entry is the only place `added:"dev"` is written.
  */
-const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP"];
+const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP", 'added:"dev"'];
 
 /**
  * The cold path: every byte a first visit on a phone waits on before the intro
