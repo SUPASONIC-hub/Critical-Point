@@ -37,8 +37,11 @@ function toMs(value) {
 }
 
 // Vite replaces `import.meta.env` in every build and in the dev server; node leaves it undefined.
+// Only the one key is read off it: a build writes `import.meta.env` whole as an
+// object literal in each module that names it bare (every VITE_ variable, 250
+// bytes in the e2e build), and the entry chunk already carries two.
 const NODE_ENV = Object.freeze({ VITE_WEEKLY_RULE_CLOCK: E2E_WEEKLY_RULE_CLOCK });
-const viteEnv = () => import.meta.env ?? NODE_ENV;
+const viteEnv = () => (import.meta.env ? { VITE_WEEKLY_RULE_CLOCK: import.meta.env.VITE_WEEKLY_RULE_CLOCK } : NODE_ENV);
 
 /** The pinned time a test build reads, or null in a build that reads the device. */
 export function pinnedWeeklyClock(env = viteEnv()) {
