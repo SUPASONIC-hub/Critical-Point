@@ -15,7 +15,7 @@ const PACE_REFUSAL = /rate limit exceeded|limit reached|daily ceiling|at least 3
 const NOT_YET_REFUSAL = /requires every case of the run|implausibly short/;
 const MISSING_CASE_REFUSAL = /requires every case of the run/;
 // A season with a case closed before the table paid the logic streak (20261011010000),
-// or before the table of 2026-10-1X (20261015020000; TODO(rules)).
+// or before the table of 2026-10-20 (20261020010000).
 const BEAT_TABLE_REFUSAL = /beat-table runs are not ranked|older-table runs are not ranked/;
 
 /**

@@ -1,11 +1,14 @@
--- DRAFT, ships only with the day-ten rules, in the same pull request. The mark
+-- Ships with the day-ten rules, in the same pull request (drafted 2026-10-15 as
+-- 20261015020000, re-dated on the merge day to follow 20261020000000). The mark
 -- key `tableRules` (RULES_MARK_KEY in src/gauntlet/gauntletEngine.js) and the
 -- message 'older-table runs are not ranked' are the ones chosen on 2026-10-15.
--- Before it ships:
---   * TODO(rules): say in section 1 which rules changed.
 --
--- 2026-10-1X. TODO(rules): the table changed what it pays (the client of
--- 2026-10-1X). Three things follow here, as in 20261011010000.
+-- 2026-10-20. The table changed what it pays (the client of 2026-10-20, the
+-- day-ten table): a burn of 8 breaks the next board (10 before), the logic
+-- streak pays up to x1.6 and LOCK has its own cap of x1.5 under it, a hand holds
+-- five tools, the wall's lowest place is 56, HUMAN RECORD asks for every case's
+-- record, and from prologue 03 a window can be scouted once (SCOUT, 3 seconds).
+-- Three things follow here, as in 20261011010000.
 --
 -- 1. The ranking starts over. A season's score was earned at the table, and a
 --    score from the table before this one does not compare with one from

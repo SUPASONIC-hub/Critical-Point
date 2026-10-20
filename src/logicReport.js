@@ -85,8 +85,8 @@ export function readStanding(data, value) {
 
 /**
  * Whether the season has a case closed at an older table: before the table
- * paid the logic streak, or before the table of 2026-10-1X (TODO(rules)),
- * whose mark is `RULES_MARK_KEY` in the same run summary (20261015020000).
+ * paid the logic streak, or before the table of 2026-10-20 (the day-ten table),
+ * whose mark is `RULES_MARK_KEY` in the same run summary (20261020010000).
  * The name stays `hasBeatTableCase` so its callers and `beatSeason` keep theirs.
  *
  * Whether the season has a case closed before the table paid the logic streak.

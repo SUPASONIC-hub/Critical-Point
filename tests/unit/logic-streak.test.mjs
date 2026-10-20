@@ -418,7 +418,7 @@ test("the mark of a case closed at the logic table is the streak in its run summ
   // A case of the builds between, composed from that one: the same summary as the beat table wrote it, without the two keys.
   const { logicStreak: _streak, bestLogic: _best, ...beatSummary } = paid.caseResults.prologue02.gauntlet;
   const between = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: beatSummary } } };
-  // The first build that paid the streak is itself an older table since 2026-10-1X (TODO(rules)): it has no `tableRules`.
+  // The first build that paid the streak is itself an older table since 2026-10-20 (the day-ten table): it has no `tableRules`.
   const marked = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 2 } } } };
   for (const [save, expected] of [[board, true], [paid, true], [between, true], [marked, false]]) {
     assert.equal(hasBeatTableCase(save.caseResults), expected);

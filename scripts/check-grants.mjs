@@ -47,7 +47,7 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *   4. The limits themselves: each hourly and daily budget is driven to its
  *      edge, because a limit nobody has run is a number in a comment.
  *   5. What a migration that deletes leaves behind. The ranking reset of
- *      2026-10-15 (the day-ten table, 20261015020000) is replayed over a
+ *      2026-10-15 (the day-ten table, 20261020010000) is replayed over a
  *      database with a row in every table, and every row but the ranking
  *      rows has to come out of it as it went in.
  *   6. That the telemetry trigger function in parts (20261014000000) is the
@@ -74,7 +74,7 @@ await db.exec(`
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `);
 
-// The newest ranking reset (20261015020000, the day-ten table; the one of
+// The newest ranking reset (20261020010000, the day-ten table; the one of
 // 2026-10-11 before it was held to the same seed) deletes rows, and a delete is
 // judged by what it leaves. So the database it meets here is not empty: just
 // before that file is replayed, every table gets a row, and `playtest_sessions` gets a run's
@@ -82,7 +82,7 @@ await db.exec(`
 // does not (no score), since the reset takes both. The tables are read before
 // and after, and the seeded rows are taken out again, so the rest of this
 // check runs on the database it always had.
-const RANKING_RESET = "20261015020000_rules_day10_ranking_reset.sql";
+const RANKING_RESET = "20261020010000_rules_day10_ranking_reset.sql";
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -119,7 +119,7 @@ async function seedBeforeRankingReset() {
     await session({ runId: `${RESET_SEED}-run-2`, burstScore: 64 }, "final", beatTable);
     await session({ runId: `${RESET_SEED}-run-2`, seasonComplete: true }, "season-final");
     // A stored case row the new constraint would refuse, were it sent today:
-    // the table's mark, present and not a number (20261015020000).
+    // the table's mark, present and not a number (20261020010000).
     await session({ runId: `${RESET_SEED}-run-3`, burstScore: 50 }, "case02", { ...beatTable, tableRules: "two" });
     await db.query(`insert into public.playtest_feedback (session_id, session_code, case_id, feedback) values ($1, 'RESETSEED', 'case01', '{"clarity": 4}')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
@@ -184,7 +184,7 @@ for (const file of files) {
   }
 }
 
-// What the ranking reset removed, and what it left (20261015020000).
+// What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
   if (rankingBeforeReset.n !== 2 || rankingBeforeReset.shown !== 1) {
     failures.push(`the ranking reset met ${rankingBeforeReset.n} ranking rows, ${rankingBeforeReset.shown} of them shown; the check seeds two, one shown and one not.`);
@@ -953,7 +953,7 @@ withHeaders(null);
       await postRefused(`send a case row with ${key} as ${kind}`, "playtest_sessions", withDynamics({ [key]: value }), /^23514 .*playtest_sessions_dynamics_shape/);
     }
   }
-  // The table's mark (20261015020000): a number when it is there, and a row without it is taken.
+  // The table's mark (20261020010000): a number when it is there, and a row without it is taken.
   await post(`send a case row without ${RULES_MARK_KEY}`, "playtest_sessions", withDynamics({}, [RULES_MARK_KEY]));
   await post(`send a case row with ${RULES_MARK_KEY} as a number`, "playtest_sessions", withDynamics({ [RULES_MARK_KEY]: RULES_MARK }));
   for (const [kind, value] of [["a string", String(RULES_MARK)], ["null", null], ["an object", { value: RULES_MARK }], ["an array", [RULES_MARK]], ["a boolean", true]]) {
@@ -1161,10 +1161,11 @@ withHeaders({ "x-forwarded-for": "198.51.100.21" });
 }
 withHeaders(null);
 
-// ---- a season from the table before 2026-10-1X stays out (20261015020000)
+// ---- a season from the table before 2026-10-20 stays out (20261020010000)
 //
-// TODO(rules): name the table. The key is RULES_MARK_KEY (gauntletEngine.js)
-// and the message below is the migration's.
+// The day-ten table (fracture 8, LOGIC_CAP x1.6 and LOCK_CAP x1.5, five tool
+// slots, SCOUT). The key is RULES_MARK_KEY (gauntletEngine.js) and the message
+// below is the migration's.
 // The same four runs as the beat-table block above, one table later: each is
 // whole, watched and well spaced, and what its case rows carry in `dynamics`
 // is all there is to refuse.

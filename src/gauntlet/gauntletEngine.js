@@ -1761,9 +1761,9 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of 2026-10-1X (TODO(rules)): every
+ * The mark of a case closed at the table of 2026-10-20 (the day-ten table): every
  * run summary carries it, so every case row carries it as `dynamics`, and the
- * server ranks no season with a case row without it (20261015020000; the
+ * server ranks no season with a case row without it (20261020010000; the
  * reset of 20261011010000 read `logicStreak` the same way). Raise the number,
  * never reuse it, when the table changes again. The migration,
  * telemetryBatch.js and check-grants.mjs name it too.

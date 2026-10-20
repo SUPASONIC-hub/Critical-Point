@@ -207,7 +207,7 @@ test("a season with a case from before the logic table is on no ranking, and its
   const windowless = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: { logicStreak: 0, tableRules: 2 } } };
   assert.equal(hasBeatTableCase(windowless), false);
   assert.equal(getRankedLogicHold(windowless), 92);
-  // TODO(rules): one case closed at the logic table before 2026-10-1X: the streak's mark and not the table's (20261015020000).
+  // One case closed at the logic table before 2026-10-20: the streak's mark and not the table's (20261020010000).
   for (const [label, gauntlet] of [["no table mark", { logicStreak: 4 }], ["an older table mark", { logicStreak: 4, tableRules: 1 }], ["a table mark that is no number", { logicStreak: 4, tableRules: "2" }]]) {
     const season = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet } };
     assert.equal(hasBeatTableCase(season), true, label);
