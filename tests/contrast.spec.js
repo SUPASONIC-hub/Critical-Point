@@ -374,7 +374,8 @@ test("the intro stays readable over its picture on a tablet", async ({ page }) =
   const measured = await expectReadable(page, "intro");
   expect(measured, "the copy over the key visual was measured").toBeGreaterThan(0);
   const marked = await page.evaluate(() => (window.__contrastPainted ?? []).filter(({ el }) => el.matches(".wordmark-reading i, .intro-hero-copy > p")).length);
-  expect(marked, "the reading line and the premise are two of the lines read from the pixels").toBe(2);
+  // The English question under the title (GameWordmark) is a `.intro-hero-copy > p` too.
+  expect(marked, "the reading line, the English question and the premise are three of the lines read from the pixels").toBe(3);
 });
 
 test("the table and decision reveal stay readable", async ({ page }) => {
