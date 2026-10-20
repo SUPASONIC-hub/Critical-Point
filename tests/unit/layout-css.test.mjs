@@ -295,7 +295,11 @@ test("a three-line place caption ends inside the briefing's cropped band", () =>
   // in 6px of padding and a 2px border: 74.9px. The band is 88px with a 3px border.
   const caption = 2 * 13 * 1.55 + 12 * 1.55 + 2 * 6 + 2 * 2;
   assert.ok(top + caption <= 88 - 2 * 3, `the caption ends at ${top + caption}px of 82`);
-  assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid[^}]*font-size: 0\.875rem;[^}]*line-height: 1\.55;/);
-  assert.match(briefing, /\.gx-caption-place \{[^}]*padding: 6px 10px;/);
+  // The story's captions read larger and looser (2026-10-20); the place
+  // caption keeps the 1.55 this sum was measured in, and sizes its own two lines.
+  assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid/);
+  assert.match(briefing, /\.gx-caption-place \{[^}]*padding: 6px 10px;[^}]*line-height: 1\.55;/);
+  assert.match(briefing, /\.gx-caption-place b \{\s*font-size: 0\.8125rem;/);
+  assert.match(briefing, /\.gx-caption-place span \{[^}]*font-size: 0\.75rem;/);
   assert.match(briefing, /\.gx-panel \{[^}]*border: 3px solid/);
 });

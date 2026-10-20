@@ -181,9 +181,9 @@
   background: var(--c-cream);
   border: 2px solid var(--c-black);
   box-shadow: 3px 3px 0 var(--c-black);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
-  line-height: 1.55;
+  line-height: 1.7;
 }
 
 .gx-caption-place {
@@ -195,6 +195,7 @@
   max-width: 72%;
   padding: 6px 10px;
   background: var(--c-amber);
+  line-height: 1.55;
   transform: rotate(-1.5deg);
 }
 

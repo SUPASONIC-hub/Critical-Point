@@ -1483,8 +1483,8 @@
   background: var(--ui-surface-2);
   border-left: 2px solid var(--c-sky-77);
   border-radius: var(--ui-radius-xs);
-  font-size: 0.8125rem;
-  line-height: 1.55;
+  font-size: 0.875rem;
+  line-height: 1.7;
 }
 .decision-scene .thought-line {
   color: var(--c-sky-86);

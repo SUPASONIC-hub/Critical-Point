@@ -5,6 +5,7 @@ import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.j
 import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
+import { Prose } from "./Prose.jsx";
 import { SceneMinutes } from "./SceneMinutes.jsx";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
 // so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
@@ -268,7 +269,7 @@ export function DecisionReveal({ view }) {
             <div>
               <span>숨은 단서 발견</span>
               <strong>{decisionReveal.clue.title}</strong>
-              <p>{decisionReveal.clue.text}</p>
+              <p><Prose text={decisionReveal.clue.text} /></p>
             </div>
           </div>
         )}
