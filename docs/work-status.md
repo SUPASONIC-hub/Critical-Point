@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-19 (the state of `main` at `8531b88`; what changed and when is in `git log`)
+Last updated: 2026-10-20 (the state of `main` at `41464a4`; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -76,12 +76,12 @@ list of the files it touched.
   text integrity is guarded by `npm run check:text`, not by terminal inspection.
 - The Supabase schema is deployed through CLI migrations in
   `supabase/migrations/`, never by pasting SQL into the dashboard editor.
-- Visual baselines were last recorded on 2026-10-19 (the phone intro, #188)
-  and 2026-10-16 (the other five: both play screens and the desktop intro
-  with #160, both result screens with #154), all in the Playwright 1.62.1
-  container. #181 moved the library and the container to 1.64.1 without
-  recording them again, and the comparison passes on main at `8531b88` in the
-  1.64.1 container (priority 19 says how to record them again).
+- Visual baselines were last recorded on 2026-10-20 (both intro pictures
+  with #203, the English question under the title; both play screens with
+  #190, SCOUT's band button), in the Playwright 1.64.1 container, and
+  2026-10-16 (both result screens, #154) in 1.62.1. The comparison passes on
+  main at `41464a4` in the 1.64.1 container (priority 19 says how to record
+  them again).
 - Every case is a pack, the finale included, and every card a pack writes is
   one object carrying its label, effect, voice line and reply (priority 74).
   A generated card may also name its way of thinking (priority 12); 95 do.
@@ -109,12 +109,10 @@ Still open, on purpose:
 - Two numbers no longer sit under the words they were set for:
   `f_archive_seal`'s effect was written for a label about gathering evidence,
   and 사건 23's market card keeps the `risk` its old label inferred.
-- Six pull requests are open, all drafts: #183 (server checks, phase 1: mark
-  suspicious ranking seasons, refuse nothing), #190 (day 10's rules, combo
-  cap, five tool slots and ranking reset v9; not to merge, needs a rebase),
-  #196 (the goodwill a collapse takes back, copy only), #197 and #198 (scene
-  bust rates, server and client halves) and #199 (this week's rule, F7; not to
-  merge, for after day 10).
+- Three pull requests are left as drafts: #198 (scene bust rates, the
+  client half; its server half, #197, is in), #199 (this week's rule, F7; for
+  after day 10) and #201 (B3, the audit risk of a device-shaped weekly rule;
+  a measurement, not to merge).
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
@@ -158,8 +156,10 @@ Still open, on purpose:
    three view-bag sizes (80 / 28 / 108 fields against 80 / 28 / 110; a screen
    takes its callbacks from `actions` and its renderers from `renderers`, and
    the view carries no second copy of either). The stage
-   (`src/gauntlet/GauntletStage.jsx`) is 808
-   lines and 67 imported names against 830 / 68; the hand, the table's
+   (`src/gauntlet/GauntletStage.jsx`) is 830
+   lines and 68 imported names against 830 / 68, with no room left after
+   day 10's SCOUT (#190 drew its band button in `TableNotices.jsx`'s
+   `ScoutBand` and read the band from `readTableMeters` to fit); the hand, the table's
    notices, the frame variables and their clock, the table's numbers, its
    voice and the held 확정 are their own modules (`GauntletHand.jsx`,
    `TableNotices.jsx`, `fxVariables.js`, `tableRules.js`, `tableVoice.js`,
@@ -210,9 +210,9 @@ Still open, on purpose:
    to fit a rule. Each budget came down that day by exactly the comment lines
    and bytes its sheet held, so no sheet gained room, and a comment costs
    nothing from here on. Room since has been made, not granted: #110 and #180
-   wrote repeated declaration blocks once under a grouped selector, and on
-   `8531b88` `play.css` is 1 byte under its 55,420 and `responsive.css` 4
-   under its 7,967. `comfort.css` is last on purpose, so a tie on specificity
+   wrote repeated declaration blocks once under a grouped selector, and so
+   did #190 for SCOUT's rules (55,688 to 55,404); on `41464a4` `play.css` is
+   7 bytes under its 55,420 and `responsive.css` 4 under its 7,967. `comfort.css` is last on purpose, so a tie on specificity
    goes to the player's setting (priority 87). A `transition` never lists
    `box-shadow`, and `check-css-tokens.mjs` allows five hard-coded hex colours,
    the five there are. Type is sized in rem (16px root), so the reader's own
@@ -901,7 +901,7 @@ Still open, on purpose:
 70. When the season's length changes, reset both rankings: a migration deletes
     the `season-final` rows (per-case telemetry stays) and the local board moves
     to a new `critical-point-local-ranking-vN` key that retires the old ones
-    (v8 today). The 2026-09-28 migration also deleted every season row the new
+    (v9 today). The 2026-09-28 migration also deleted every season row the new
     server rules would have refused, so the public ranking starts over when it
     is pushed. The table changing what it pays is the same occasion: on
     2026-10-11 both were reset once more (v8, and
@@ -910,7 +910,17 @@ Still open, on purpose:
     migration makes the server refuse a `season-final` row for a run with any
     case row whose `dynamics` has no numeric `logicStreak`, since deleting a
     ranking row also deletes what said the run was already ranked; a season
-    begun before 2026-10-10 therefore never ranks.
+    begun before 2026-10-10 therefore never ranks. Day 10's table did it again
+    on 2026-10-20 (v9, `20261020010000_rules_day10_ranking_reset.sql`), and
+    the mark it asks of every case row is `tableRules` in `dynamics`
+    (`RULES_MARK_KEY`). The suspicion marks (`20261020000000`, #183) went in
+    just before it, so every row ranked since carries them: a `season-final`
+    row is never refused for its score, the bounds it fails are written to
+    `suspicion`, which anon cannot read, and `ranking_hides_marked()`, the
+    switch that would hide marked rows, is off. The scene bust rates' server
+    half (`20261020020000`, #197) keeps a snapshot, `scene_bust_stats`, that
+    pg_cron rebuilds hourly and only `scene_bust_rates()` reads, answering
+    for scenes past 50 windows and 50 runs.
     `check:grants` replays that migration over a seeded database and fails if
     it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
@@ -1056,7 +1066,7 @@ Still open, on purpose:
     (1,000 a day for everyone). Telemetry has a byte budget as well as a row
     count: 32 MB a day for one address, charged by a trigger of its own that
     fires after the validator, and 200 MB a day for everyone. There
-    are 42 migrations and eight tables. `check:grants` also fails on a
+    are 45 migrations and eight tables. `check:grants` also fails on a
     SECURITY DEFINER function that does not pin `search_path` and on a view
     without `security_invoker`. The Migration Drift workflow compares the
     live project's migration history with `supabase/migrations/` once a day
@@ -1091,7 +1101,9 @@ Still open, on purpose:
     `vite.config.js`), which took PlayScreen to 97,898 / 32,131. `tableAudio`
     is held at 6,700 / 2,205 (6,676 / 2,166 measured; #185 moved it by what
     the heartbeat's tension steps measured, and its gzip by the few bytes the
-    entry chunk's hashed name moves it in every build). Trim and split first;
+    entry chunk's hashed name moves it in every build). On `41464a4`, with
+    day 10's table in, PlayScreen is 103,095 / 34,233 (67 bytes of gzip
+    left) and `tableAudio` 6,700 / 2,195, at its raw number. Trim and split first;
     a number moves only by what is still measured short. Every chunk the
     build emits has a budget, and a chunk without one fails. The ones that
     rose on 2026-10-06, each with its note beside the number: a case chunk,
@@ -1296,17 +1308,20 @@ Still open, on purpose:
     - Not verified: iOS Safari and an installed copy on a phone. The checks
       run Chromium only; Playwright WebKit skips the offline spec.
 90. The next change to the shape of a save raises `SAVE_SCHEMA_VERSION`
-    (`src/appConfig.js`) from 2 to 3. There has been one step so far:
+    (`src/appConfig.js`) from 3 to 4. There have been two steps:
     `migrateSavedState` lifts a save marked 1, or not marked, to 2 by giving
     it `runId`, `discoveredClues`, `pendingTelemetry`, `caseResults`,
-    `playtestFeedback` and `dynamics`. Every change since was made under the
+    `playtestFeedback` and `dynamics`, and a save marked 2 to 3 by writing
+    out `scouted` on a put-down window (day 10's SCOUT, #190, 2026-10-20),
+    one step at a time. Between the two, every change was made under the
     same 2 -- keys added and filled in on load (priority 85), five keys
-    dropped (the note under `SAVE_STATE_KEYS`) -- so the number does not say
-    which build wrote a save. The change that raises it adds the 2-to-3 step
+    dropped (the note under `SAVE_STATE_KEYS`) -- so 2 does not say which
+    build wrote a save. The change that raises it again adds the 3-to-4 step
     to `migrateSavedState`, which answers null for any pair of versions it
     has no step for, and a fixture written by the build before it
-    (`tests/unit/fixtures/saves/`, priority 85). A build still at 2 does not
-    read a save marked 3: it keeps the text under
+    (`tests/unit/fixtures/saves/`, `v3-current.json` today, priority 85). A
+    build still at 3 does not read a save marked 4 (a build at 2 did not
+    read 3): it keeps the text under
     `critical-point-unreadable-save-v1` and deletes nothing. The same constant
     is written into the play-log export and into every case summary's
     `schemaVersion`, which `ranking_public_summary` publishes.
