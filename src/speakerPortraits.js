@@ -12,19 +12,21 @@ const SPEAKER_PORTRAITS = {
   "도윤하": "/portrait-do-yunha.webp",
   "오진우": "/portrait-oh-jinwoo.webp",
   "에코": "/portrait-echo.webp",
-  // Painted next, most lines first. A line is switched on in the same commit
-  // that adds its file under public/ (scripts/build-portrait.mjs). These are not
+  // Added after them, most lines first (every speaker with eight lines or more
+  // has one since 2026-10-20). A line goes in with its file under public/
+  // (scripts/build-portrait.mjs); docs/portrait-credits.md says where each
+  // picture came from. These are not
   // warmed by the service worker -- only the five above are -- so each is
   // fetched when its speaker first appears; a file that does not arrive is
   // drawn as the silhouette (SpeakerPortrait).
   "이민서": "/portrait-lee-minseo.webp",
   "강태민": "/portrait-kang-taemin.webp",
-  // "권도현": "/portrait-kwon-dohyeon.webp",
+  "권도현": "/portrait-kwon-dohyeon.webp",
   "문가을": "/portrait-moon-gaeul.webp",
   "나준혁": "/portrait-na-junhyeok.webp",
-  // "백아린": "/portrait-baek-arin.webp",
-  // "윤상혁": "/portrait-yoon-sanghyeok.webp",
-  // "문하준": "/portrait-moon-hajun.webp",
+  "백아린": "/portrait-baek-arin.webp",
+  "윤상혁": "/portrait-yoon-sanghyeok.webp",
+  "문하준": "/portrait-moon-hajun.webp",
   "서하린": "/portrait-seo-harin.webp",
   "류세아": "/portrait-ryu-sea.webp",
   "임경수": "/portrait-lim-gyeongsu.webp",
@@ -32,6 +34,7 @@ const SPEAKER_PORTRAITS = {
   "임소율": "/portrait-lim-soyul.webp",
   "윤서진": "/portrait-yoon-seojin.webp",
   "한지우": "/portrait-han-jiwoo.webp",
+  "나은호": "/portrait-na-eunho.webp",
 };
 
 /** The portrait's path for a speaker, or null for one not painted yet. */
