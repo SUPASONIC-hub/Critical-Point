@@ -1,6 +1,5 @@
 import { CASE_START_NODES } from "../gameCases.js";
 import { getUnlockIntro, STAGED } from "./tableUnlocks.js";
-import { getWeekRule } from "./weeklyRules.js";
 
 /**
  * What the briefing asks of the unlock ladder (`tableUnlocks`). The stage asks
@@ -30,11 +29,13 @@ export function getBriefingIntro(node, nodeId, run, staged = STAGED) {
 }
 
 /**
- * 이번 주의 규칙 the season was started under, for a panel of its own on every
- * case's opening page (결정 28 (1): its own kicker, not a line among the
- * unlocks); null on the case's later pages and in a story case, which deals
- * no week's rule (`getTableSchema`).
+ * The id of 이번 주의 규칙 the season was started under, for a panel of its
+ * own on every case's opening page (결정 28 (1): its own kicker, not a line
+ * among the unlocks); null on the case's later pages and in a story case,
+ * which deals no week's rule (`getTableSchema`). The id only: the panel's
+ * chunk reads the rule (WeekRulePanel.jsx), so this file, which is the
+ * PlayScreen chunk's, does not import the catalogue.
  */
-export function getBriefingWeekRule(node, nodeId, run) {
-  return opensCase(node, nodeId) && run?.story !== true ? getWeekRule(run?.weekRule) : null;
+export function getBriefingWeekRuleId(node, nodeId, run) {
+  return (opensCase(node, nodeId) && run?.story !== true && run?.weekRule) || null;
 }

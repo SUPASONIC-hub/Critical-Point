@@ -53,7 +53,12 @@ const budgets = [
   // for what only a tooltip said, and frame-loop variables that no longer
   // restyle the whole table. Measured 103,738 / 34,105. It is not on the first
   // paint: the chunk loads after the player has started a run.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_300 },
+  // 34,300 -> 34,332 gzip on 2026-10-20, measured 34,328 plus the 4 bytes of
+  // hash noise: 이번 주의 규칙's briefing panel. It took the chunk to 34,395;
+  // the panel and the catalogue lookup went to a chunk of their own
+  // (WeekRulePanel, below), which left the two imports and the line that asks
+  // whether the page opens a case, 28 bytes over.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_332 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -169,6 +174,10 @@ const budgets = [
   // (1,141 / 715 and 1,662 / 909), the gzip with the 4 bytes of hash noise.
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_141, maxGzip: 719 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
+  // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
+  // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
+  // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -249,7 +258,9 @@ function checkBudget(file, budget) {
 // 8,780 / 3,150 -> 8,792 / 3,171 on 2026-10-19, measured 8,792 / 3,167 (gzip
 // plus the 4 bytes of hash noise): the list names two more files, the chunks
 // 이번 주의 규칙 was split into above; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 8_792, maxGzip: 3_171 };
+// 8,792 / 3,171 -> 8,828 / 3,183 on 2026-10-20, measured 8,828 / 3,179 (gzip
+// plus 4): one more file, the week's rule's briefing panel (WeekRulePanel).
+const WORKER_BUDGET = { maxBytes: 8_828, maxGzip: 3_183 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

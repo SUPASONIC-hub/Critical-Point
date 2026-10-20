@@ -25,7 +25,7 @@ const {
   weekStartMs,
 } = await import("../../src/gauntlet/weeklyRules.js");
 const { setWeekRuleTurnedDown, WEEK_RULE_OFF_STORAGE_KEY, weekRuleTurnedDown } = await import("../../src/state/weeklyRuleChoice.js");
-const { getBriefingIntro, getBriefingWeekRule } = await import("../../src/gauntlet/tableStaging.js");
+const { getBriefingIntro, getBriefingWeekRuleId } = await import("../../src/gauntlet/tableStaging.js");
 const { localRowRule } = await import("../../src/state/useLeaderboard.js");
 const { weekHasNews } = await import("../../src/gauntlet/weeklyCalendar.js");
 const { CASE_START_NODES } = await import("../../src/gameCases.js");
@@ -269,10 +269,15 @@ test("the briefing gives the rule a panel of its own on a case's opening page, n
   const nodeId = CASE_START_NODES[caseId];
   const node = { caseId };
   const run = { weekRule: EVENT.id };
-  assert.equal(getBriefingWeekRule(node, nodeId, run)?.id, EVENT.id);
-  assert.equal(getBriefingWeekRule(node, `${nodeId}-later`, run), null, "a case's later pages");
-  assert.equal(getBriefingWeekRule(node, nodeId, { ...run, story: true }), null, "a story case deals none");
-  assert.equal(getBriefingWeekRule(node, nodeId, {}), null);
+  assert.equal(getBriefingWeekRuleId(node, nodeId, run), EVENT.id);
+  assert.equal(getBriefingWeekRuleId(node, `${nodeId}-later`, run), null, "a case's later pages");
+  assert.equal(getBriefingWeekRuleId(node, nodeId, { ...run, story: true }), null, "a story case deals none");
+  assert.equal(getBriefingWeekRuleId(node, nodeId, {}), null);
+  // The panel's chunk reads the rule; the PlayScreen chunk's staging file does not import the catalogue.
+  assert.doesNotMatch(read("src/gauntlet/tableStaging.js"), /weeklyRules/);
+  const panel = read("src/gauntlet/WeekRulePanel.jsx");
+  assert.match(panel, /getWeekRule\(id\)/);
+  assert.match(read("vite.config.js"), /WEEK_RULE_PANEL = "src\/gauntlet\/WeekRulePanel\.jsx"/);
   assert.deepEqual(getBriefingIntro(node, nodeId, run, true), getBriefingIntro(node, nodeId, {}, true), "the unlock lines are the same with or without a rule");
 });
 

@@ -5,7 +5,8 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
-import { getBriefingIntro, getBriefingWeekRule } from "./tableStaging.js";
+import { getBriefingIntro, getBriefingWeekRuleId } from "./tableStaging.js";
+import { useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
@@ -144,11 +145,7 @@ export function SceneBriefing({
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same clock.
-  const weekRuleId = getBriefingWeekRule(node, nodeId, run)?.id ?? null;
-  const weekRules = useMemo(() => {
-    const rule = getBriefingWeekRule(node, nodeId, { weekRule: weekRuleId });
-    return rule ? [rule] : [];
-  }, [node, nodeId, weekRuleId]);
+  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run));
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
   // same way. `mutations` is exactly the two lists printed below.
@@ -320,14 +317,8 @@ export function SceneBriefing({
           )}
         </div>
 
-        {/* Under the page's grid, so it takes none of its rows; `gridArea`
-            undoes the breach panel's named area, which the page has not. */}
-        {weekRules.length > 0 && (
-          <div className="gx-panel gx-panel-breach gx-carry" data-testid="week-rule-panel" style={{ gridArea: "auto" }}>
-            <p className="gx-breach-kicker">이번 주의 규칙 · 이 시즌이 끝날 때까지</p>
-            <RuleRows rules={weekRules} resourceMeta={resourceMeta} />
-          </div>
-        )}
+        {/* Under the page's grid, so it takes none of its rows. */}
+        {weekRulePanel}
 
         <footer className="gx-comic-actions">
           <p className="gx-comic-hint">

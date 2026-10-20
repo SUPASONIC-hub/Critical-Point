@@ -355,6 +355,15 @@ const TABLE_AUDIO = "src/gauntlet/gauntletAudio.js";
  */
 const SCENE_TRACES = "src/state/useSceneBustRates.js";
 
+/**
+ * 이번 주의 규칙's panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx).
+ * Only the briefing imports it, so left alone it is written into the
+ * PlayScreen chunk, which it took past its gzip budget on 2026-10-20 (34,395
+ * of 34,300). It gets a file the way the table's sound does, and is fetched
+ * with the table the same way, so the page draws it no later.
+ */
+const WEEK_RULE_PANEL = "src/gauntlet/WeekRulePanel.jsx";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -382,6 +391,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(SCENE_TRACES),
         name: "sceneTraces",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(WEEK_RULE_PANEL),
+        name: "WeekRulePanel",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },
