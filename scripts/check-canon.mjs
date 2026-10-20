@@ -171,8 +171,11 @@ export const CANON = [
   {
     id: "dissent-pages",
     fact: "the dissent is eleven pages, 첨부 7",
-    files: SEASON,
-    find: /의견서(?:는| 최대)? (열\S*?|\d+) ?[장쪽]|(열\S*?|\d+) ?[장쪽]짜리 (?:반대 의견|문서가 일곱 번째)|첨부 7(?:'|의 쪽수:),? (\d+)쪽|(?:빠진|사라진) (\S+) 쪽|그 (\S+) 쪽을 쓴 사람/g,
+    // Not prologue 04: its 「빠진 18쪽」 is another document (a 22-page manual
+    // handed out as 4). The last two branches take a count written in digits
+    // or attached to 쪽 since #209 wrote counts of ten or more in digits.
+    files: seasonBut("prologue04"),
+    find: /의견서(?:는| 최대)? (열\S*?|\d+) ?[장쪽]|(열\S*?|\d+) ?[장쪽]짜리 (?:반대 의견|문서가 일곱 번째)|첨부 7(?:'|의 쪽수:),? (\d+)쪽|(?:빠진|사라진) ([가-힣\d]+?) ?쪽|(?<![가-힣\d])(?:그 )?([가-힣\d]+?) ?쪽을 쓴 사람/g,
     allow: ["열한", "11"],
   },
   {
