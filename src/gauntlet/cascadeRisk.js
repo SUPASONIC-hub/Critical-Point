@@ -163,6 +163,17 @@ export function readWalk({ board, pending }) {
   return { ...reading, said: fresh || reading.atRisk ? describeLinks(reading) : "" };
 }
 
+/**
+ * The reveal's line on a window whose cash makes a link (the engine's
+ * `verdict.link`), or null: a card that burned `LINK_BURN` or more, cashed on
+ * a board BLACKOUT did not deal, on a table that counts links. `burn` is the
+ * card's (`getCardBurn`), which is what the card showed. 초안.
+ */
+export const describeLinkMade = (run, { cashed, burn }) =>
+  isCascadeOn(run) && cashed && !run.schema?.mutations?.includes("blackout") && Math.abs(burn?.value ?? 0) >= LINK_BURN
+    ? `${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 안에 한 판의 벽이 ${LINK_WALL} 가까워진다.`
+    : null;
+
 /** "다음 판" or "2~4판 안", for a range in boards from the one on the table. */
 export const describeRange = ([low, high]) => (high === 1 ? "다음 판" : low === high ? `${low}판 뒤` : `${low}~${high}판 안`);
 

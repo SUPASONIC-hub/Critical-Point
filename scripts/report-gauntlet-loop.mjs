@@ -18,7 +18,7 @@ import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gaunt
 import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { createCaseBot, handUnit, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
+import { CASCADE_WEEK, createCaseBot, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -126,7 +126,9 @@ const SEASON_CASES = CASE_SEQUENCE.length;
 // The two players are `scripts/sim/season-bot.mjs`: `playCase` stakes the
 // simulated card above, `playHandCase` the relic hand's three cards (`HAND`
 // there; the hand is described with the relic rows below).
-const { playCase, playHandCase } = createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor });
+const { playCase: playSimCase, playHandCase } = createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor });
+// The case player `measure` plays; B2's rows below swap in the heavy card's for a while.
+let playCase = playSimCase;
 
 function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false) {
   const paid = { cashed: 0, bonus: 0, capped: 0, best: 0 };
@@ -687,6 +689,7 @@ assert.ok(
  * given to it, so what is compared is the streak, not the wild card's chips
  * (`check-endings.mjs --report` plays the card itself).
  */
+const perCentOf = (part, whole) => ((100 * part) / Math.max(1, whole)).toFixed(1);
 const perCent = (part, whole, digits = 1) => ((100 * part) / Math.max(1, whole)).toFixed(digits);
 const isWild = (offer) => offer.chips === 0 && offer.type === "reframing";
 const WILD_HANDS = {
@@ -800,6 +803,57 @@ for (const [name, relics] of toolSets) {
   console.log(
     `measured tools ${name.padEnd(22)} blind ${String(blind.meanVault).padStart(6)}  heartbeat ${String(listen.meanVault).padStart(6)} (x${liftOf({ listen }).toFixed(3)} of none, ${(kept * 100).toFixed(0)}% of the whole lift; none ${relicBaseline.listen.meanVault}, all ${everyTool.listen.meanVault})  ${relics.join("+")}`,
   );
+}
+
+/**
+ * B2's links (CASCADE_WEEK=1 only, B2 design 3-1; the switch and the values
+ * are cascade-values.mjs's). Every row above stakes the one simulated card,
+ * whose largest cost is 4, so no row above makes a link and none of them may
+ * move: that is asserted first. Then a heavy card, the tool hand's `fast`
+ * (legitimacy -12, so every cash makes a link), plays the same policies with
+ * the links off and on, on the same seeds: what CASCADE costs each hand, how
+ * often its boards bust, and how many links the case's close lets lapse. The
+ * order the table promises -- blind under the heartbeat under a look under
+ * the wall seen -- has to hold with links on, and busting to skip must still
+ * not be a shortcut.
+ */
+if (CASCADE_WEEK) {
+  const lightRows = [...fixed, ...heartbeat, ...scoutRows, oracle, skipper];
+  assert.equal(lightRows.reduce((sum, row) => sum + row.seen.linksMade, 0), 0, "the simulated card burns 4 at most, so no row above makes a link");
+  const heavy = { ...card, id: "sim-heavy", effect: { ...card.effect, legitimacy: -12 } };
+  const heavyBots = {
+    off: createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card: heavy, sceneFor, links: false }).playCase,
+    on: createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card: heavy, sceneFor, links: true }).playCase,
+  };
+  const heavyPolicies = [
+    ...[30, 40, 50, 60].map((target) => [`heat ${target}`, (win) => win.gauge < target]),
+    ...[100, 110, 120, 130].map((threshold) => [`heartbeat < ${threshold}`, (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < threshold]),
+    ...[0, 3, 6].map((margin) => [`scout, margin ${margin}`, Object.assign((win) => win.gauge + win.schema.stepMax - margin < getWindowBand(win).wallMin, { scout: true })]),
+    ["sees the wall", (win) => win.gauge + win.schema.stepMax < win.wall],
+    ["bust to skip", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true)],
+  ];
+  const heavyRows = heavyPolicies.map(([label, decide]) => {
+    const pair = {};
+    for (const side of ["off", "on"]) {
+      playCase = heavyBots[side];
+      pair[side] = measure(`heavy ${label}`, decide);
+    }
+    playCase = playSimCase;
+    return { label, ...pair };
+  });
+  console.log(`cascade          values ${LINK_VALUES}; no row above made a link (largest cost 4)`);
+  for (const { label, off, on } of heavyRows) {
+    const seen = on.seen;
+    console.log(
+      `cascade          heavy ${label.padEnd(18)} vault ${String(off.meanVault).padStart(6)} -> ${String(on.meanVault).padStart(6)} (${perCentOf(off.meanVault - on.meanVault, off.meanVault)}% lost)  bust ${(off.bustRate * 100).toFixed(1)}% -> ${(on.bustRate * 100).toFixed(1)}%  CASCADE boards ${seen.cascadeBoards} (bust ${perCentOf(seen.cascadeBusts, seen.cascadeBoards)}%)  links made ${seen.linksMade}, came back ${seen.linksLanded}, lapsed ${seen.linksLapsed} (${perCentOf(seen.linksLapsed, seen.linksMade)}%)`,
+    );
+  }
+  const onRow = (label) => heavyRows.find((row) => row.label === label).on;
+  const family = (prefix) => bestOfRows(heavyRows.filter((row) => row.label.startsWith(prefix)).map((row) => row.on));
+  const [blind, listen, look, sees] = [family("heat "), family("heartbeat"), family("scout"), onRow("sees the wall")];
+  console.log(`cascade          with links on: blind ${blind.meanVault} (${blind.label}) < heartbeat ${listen.meanVault} (${listen.label}) < scout ${look.meanVault} (${look.label}) < sees ${sees.meanVault}; bust to skip ${onRow("bust to skip").meanVault}`);
+  assert.ok(blind.meanVault < listen.meanVault && listen.meanVault < look.meanVault && look.meanVault < sees.meanVault, "with links on, information still pays in the table's order");
+  assert.ok(onRow("bust to skip").meanVault < blind.meanVault * 0.25, "with links on, busting to skip is still no shortcut");
 }
 
 console.log(

@@ -59,6 +59,8 @@ test("the switch ships off: no table counts links, and the engine deals none una
   assert.equal(readLinks(normalizeRunState({}), log, "run-1"), null);
   assert.equal(isLinkDue(normalizeRunState({}), log, "run-1"), false);
   assert.ok(log.every((entry) => !entry.environmentMode.includes("cascade")));
+  const { verdict } = resolveWindow({ run: openCaseRun(normalizeRunState({})), window: cash("z"), card: heavy });
+  assert.equal(verdict.link, null, "no reveal line for a link");
 });
 
 test("B's numbers: the burn FRACTURE reads, two to four boards, BLACKOUT's wall", () => {

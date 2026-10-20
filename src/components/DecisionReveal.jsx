@@ -31,6 +31,8 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
     ["판정 원인", cause],
     ["열기 기록", heatLine],
     ...(logicLine ? [["논리 콤보", logicLine]] : []),
+    // B2: this cash made a link (cascadeRisk.js), when the table counts them.
+    ...(verdict.link ? [["연결", verdict.link]] : []),
     ...(verdict.relicProcs?.length
       ? [["도구 발동", verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
       : []),

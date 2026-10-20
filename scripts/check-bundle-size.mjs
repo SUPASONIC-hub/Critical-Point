@@ -202,9 +202,10 @@ const budgets = [
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. With the
-  // switch off (`CASCADE_ON`) the build drops the walk, so 285 / 281 measured
-  // is CASCADE's words and numbers; the rule switch re-measures it.
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 285, maxGzip: 285 },
+  // switch off (`CASCADE_ON`) the build drops the walk, so 322 / 302 measured
+  // (the gzip plus 4) is CASCADE's words and numbers and the reveal's line;
+  // the rule switch re-measures it.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 322, maxGzip: 306 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];

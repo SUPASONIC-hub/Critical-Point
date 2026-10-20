@@ -37,7 +37,7 @@ import {
   STRIKE_WAKE_CHIPS,
 } from "./tableRules.js";
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
-import { CASCADE_MUTATION, LINK_WALL } from "./cascadeRisk.js";
+import { CASCADE_MUTATION, describeLinkMade, LINK_WALL } from "./cascadeRisk.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -1554,6 +1554,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     fracturedAxis: current.schema.fracturedAxis,
     fractureRate: current.schema.fractureRate,
     nextMutations,
+    // B2, on a table that counts links: the reveal's line when this cash made one.
+    link: describeLinkMade(current, { cashed: outcome === "cash", burn }),
     relicProcs,
     relicOffer,
     // Carried on the closing entry of a replayed case, where the summary's
