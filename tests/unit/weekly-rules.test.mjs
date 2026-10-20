@@ -236,11 +236,10 @@ test("시작 reads the weekly clock once; turning it down or a later week change
 });
 
 test("the server's week table says what the calendar says", () => {
-  // The draft migration lists the weeks as `('2026-W46', 'near-wall')`. When
-  // it is renamed to .sql this test reads the real file; check:grants should
-  // hold the same against the table PGlite builds.
-  const draft = read("supabase/migrations/20261019010000_weekly_rule_event.sql.draft");
-  const listed = [...draft.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => ({ week, id }));
+  // The migration lists the weeks as `('2026-W46', 'near-wall')`;
+  // check:grants holds the table PGlite builds from it to the same.
+  const migration = read("supabase/migrations/20261021000000_weekly_rule_event.sql");
+  const listed = [...migration.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => ({ week, id }));
   assert.deepEqual(listed, WEEKLY_RULES.map(({ week, id }) => ({ week, id })));
 });
 

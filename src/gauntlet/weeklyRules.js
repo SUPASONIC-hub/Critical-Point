@@ -6,7 +6,7 @@
  * stamped on the table at `newGame` (state/runState.js) and nothing here is
  * read again for that season. The ranking does not trust the stamp's week; the
  * server reads the week off the time it received the run's first case row
- * (`supabase/migrations/*_weekly_rule_event.sql.draft`), and its table of weeks
+ * (`supabase/migrations/*_weekly_rule_event.sql`), and its table of weeks
  * has to say the same as `WEEKLY_RULES`.
  *
  * Only the numbers `normalizeSchema` clamps may move (D4): the wall, the

@@ -1,13 +1,14 @@
--- DRAFT (.sql.draft: check:grants, the migration-drift test and the Supabase
--- CLI do not read it). Ships after the validator in parts (20261014000000),
--- the ranking marks (20261015010000), the day-ten rules (20261015020000) and
--- the scene bust rates (20261019000000), in the pull request that adds the
--- calendar (src/gauntlet/weeklyRules.js). Rename to .sql only then: merging a
--- .sql to main applies it to the production database within a minute, and
--- the client of that pull request reads `public_rankings.week`, so the two go
--- together or the ranking screen's request fails.
+-- Drafted 2026-10-16 on branch weekly-rules as a .sql.draft (last named
+-- 20261019010000) and re-dated 2026-10-20 to sort after every migration it
+-- follows: on main the validator in parts (20261014000000) and the ranking's
+-- suspicion marks (20261020000000), and the two pull requests that go in
+-- before this one, the day-ten rules (#190, 20261020010000) and the scene bust
+-- rates (#197, 20261020020000). Merging it to main applies it to the
+-- production database within a minute, and the client of the same pull
+-- request reads `public_rankings.week`, so the two go together or the ranking
+-- screen's request fails. scripts/check-grants.mjs plays the weeks' cases
+-- against it (the block "this week's rule").
 --
--- 2026-10-16, renamed 2026-10-19 to sort after every migration it follows.
 -- 이번 주의 규칙: one rule for one ISO week (Korean time), a ranking of its
 -- own for it, and the ordinary ranking untouched.
 --
@@ -47,7 +48,7 @@
 --
 -- 5. `dynamics` gains the stamp's line: optional, a string of at most 32
 --    characters when present (WEEK_RULE_ID_MAX), or null. Every other line is
---    the one 20261015020000 wrote. NOT VALID, dropped first, as before.
+--    the one 20261020010000 wrote. NOT VALID, dropped first, as before.
 --
 -- 6. The week is judged strictly (결정 29 (1)): the week of the first case
 --    row the server received, exactly, with no grace after Monday 00:00.
@@ -227,8 +228,8 @@ grant execute on function public.logic_hold_cutoffs() to anon, service_role;
 alter table public.playtest_sessions
   drop constraint if exists playtest_sessions_dynamics_shape;
 
--- TODO(before .sql): restate the constraint exactly as the last migration
--- before this one left it; this is 20261015020000's, plus the `weekRule` line.
+-- The constraint as 20261020010000 (the day-ten rules) left it, line for
+-- line, plus the `weekRule` line. #197 (20261020020000) does not touch it.
 alter table public.playtest_sessions
   add constraint playtest_sessions_dynamics_shape
   check (
