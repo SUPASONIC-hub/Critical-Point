@@ -1191,6 +1191,10 @@ summary:focus-visible {
 .weekly-rule-notice p:not(:last-child) {
   margin-bottom: 8px;
 }
+/* The box's whole line is its target: 44px tall on a phone, as the ranking's tabs are. */
+.weekly-rule-notice label {
+  min-height: 44px;
+}
 .start-panel,
 .start-priority,
 .prestart-briefing,
