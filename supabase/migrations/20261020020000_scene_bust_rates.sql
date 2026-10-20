@@ -1,3 +1,7 @@
+-- Drafted 2026-10-19 as 20261019000000 and re-dated 2026-10-20 to follow
+-- every migration before it: the suspicion marks (20261020000000) on main and
+-- the day-ten ranking reset (20261020010000), which merges first.
+--
 -- Improvement notes D3. `check-grants.mjs` lists `scene_bust_rates` in
 -- CLIENT_FUNCTIONS.anon and `scene_bust_stats` in UPDATE_PROBE.
 --
