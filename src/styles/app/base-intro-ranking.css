@@ -631,17 +631,16 @@ summary:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  mix-blend-mode: screen;
 }
 .wordmark-line::before {
   color: rgb(217 255 98 / 0.85);
   transform: translate3d(-0.018em, 0.012em, 0);
-  mix-blend-mode: screen;
   animation: wordmark-drift-a 5.2s steps(2, end) infinite;
 }
 .wordmark-line::after {
   color: rgb(88 214 255 / 0.72);
   transform: translate3d(0.018em, -0.012em, 0);
-  mix-blend-mode: screen;
   animation: wordmark-drift-b 6.7s steps(2, end) infinite;
 }
 .wordmark-line-accent {
@@ -671,6 +670,12 @@ summary:focus-visible {
   letter-spacing: -0.01em;
   line-height: 1.3;
   text-transform: none;
+}
+/* The English question under the title (GameWordmark). */
+.intro-hero-copy > .wordmark-sub {
+  margin-top: 12px;
+  font-style: italic;
+  font-weight: 600;
 }
 .wordmark-reading i {
   color: var(--ui-text-3);
