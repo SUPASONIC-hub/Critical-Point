@@ -342,6 +342,19 @@ const CASE_COPY = "src/caseCopy.js";
  */
 const TABLE_AUDIO = "src/gauntlet/gauntletAudio.js";
 
+/**
+ * The other players' wall rate on the scene page (improvement notes D3):
+ * src/state/useSceneBustRates.js, which asks `scene_bust_rates()` once per
+ * page load, and src/sceneTraces.js, which words the answer. Only the scene
+ * page imports them, so left alone they are written into the PlayScreen
+ * chunk; they get a file the same way tableAudio does, so that chunk does not
+ * grow for a line that waits on the network anyway. The table's chunk imports
+ * it statically, so it is fetched with the table and the line appears exactly
+ * when it did. Its imports, React and callSupabaseRpc, are the entry chunk's
+ * and the vendor chunk's.
+ */
+const SCENE_TRACES = "src/state/useSceneBustRates.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -363,6 +376,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(TABLE_AUDIO),
         name: "tableAudio",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(SCENE_TRACES),
+        name: "sceneTraces",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },
