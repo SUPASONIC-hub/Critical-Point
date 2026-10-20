@@ -48,7 +48,7 @@ const runOf = (item) => (item?.type === "case" ? item?.payload?.run_id ?? null :
  * only once every case row of its run has landed, so it goes after them, and
  * it is held -- not sent, not dropped -- while one of them is still queued.
  */
-export function planTelemetryBatch(items) {
+function planTelemetryBatch(items) {
   const batch = Array.isArray(items) ? items : [];
   return [...batch.filter((item) => !isSeasonRow(item)), ...batch.filter(isSeasonRow)];
 }

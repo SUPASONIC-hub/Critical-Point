@@ -27,7 +27,7 @@ function paint() {
   if (document.title !== next) document.title = next;
 }
 
-export function dropTabTitle(slot) {
+function dropTabTitle(slot) {
   if (claims.delete(slot)) paint();
 }
 
