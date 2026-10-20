@@ -39,6 +39,18 @@ import {
 } from "./tableRules.js";
 
 export const RELIC_OFFER_SIZE = 3;
+/**
+ * How many relics a season carries at once. Twelve with no cap meant a season
+ * that never passed held every relic open to it by case 15, and three of them
+ * (INSURANCE, KINETIC GRIP, STETHOSCOPE) made 70% of what all twelve were
+ * worth (day 10, item 6). With five, a draft that finds the slots full takes
+ * the new relic only by putting one down, in the same answer.
+ *
+ * A season saved before the cap that already carries more keeps them: the cap
+ * is checked when a relic is taken, never when a save is read, so such a run
+ * still has to put one down to take another.
+ */
+export const RELIC_SLOTS = 5;
 /** The logic streak that unlocks ENCORE: the streak at which the pot's bonus is full. */
 const ENCORE_UNLOCK_COMBO = 8;
 /** The pot the wall has to take from you before INSURANCE is on the table. */
@@ -159,7 +171,10 @@ export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
 /** Relics every season can draft without unlocking anything. */
 export const DEFAULT_RELIC_POOL = Object.freeze(RELIC_IDS.filter((id) => !RELICS[id].unlock));
 
-/** Known ids, each once, in the order given. */
+/**
+ * Known ids, each once, in the order given. The default limit is every relic,
+ * not `RELIC_SLOTS`: a season saved before the cap is read as it was saved.
+ */
 export function normalizeRelicIds(value, limit = RELIC_IDS.length) {
   if (!Array.isArray(value)) return [];
   const seen = new Set();

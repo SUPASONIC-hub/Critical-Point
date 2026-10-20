@@ -44,6 +44,7 @@ import {
   getHeartbeatBpm,
   getSealedCardId,
   getTableSchema,
+  getWindowBand,
   HAND_CAP,
   openCaseRun,
   reduceWindow,
@@ -52,6 +53,7 @@ import {
   STANCE_CHARGE,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../../src/gauntlet/logicStreak.js";
+import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { LOCK_PRESS_SECONDS } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
@@ -61,6 +63,50 @@ import { createChoiceReaders } from "../../src/state/useDecision.js";
 // ---------------------------------------------------------------------------
 // The season player (check-endings.mjs).
 // ---------------------------------------------------------------------------
+
+/**
+ * The tools a full hand puts down first, weakest first (day 11, item 6). The
+ * first three are the ones `check:pressure` measured adding nothing alone
+ * (SPLINT, LOCKPICK, GLASS LENS, in the order the day-10 plan named them);
+ * the rest follow that report's "measured tools one at a time" from the
+ * least lift to the most, so INSURANCE is the last to go (measured
+ * 2026-10-16 at the day-ten table, the streak to x1.6: HIGH ROLLER -1.8%,
+ * STEADY ANCHOR +0.1, COLD BLOOD +1.4, ENCORE +1.7, METRONOME +2.8, HEAT SINK
+ * +3.4, STETHOSCOPE +4.0, KINETIC GRIP +5.4, INSURANCE +8.7). HIGH ROLLER
+ * measures below the first three; it follows them because the plan named
+ * those three. ENCORE now measures above COLD BLOOD (it was +1.3 under the
+ * x1.5 cap) and is still put down first: the order is the one measured at
+ * x1.5, kept so the swap's measures stay comparable.
+ */
+export const RELIC_DROP_ORDER = Object.freeze([
+  "splint",
+  "lockpick",
+  "glassLens",
+  "highRoller",
+  "steadyAnchor",
+  "encore",
+  "coldBlood",
+  "metronome",
+  "heatSink",
+  "stethoscope",
+  "kineticGrip",
+  "insurance",
+]);
+
+/**
+ * A draft answered against the slots. Under `RELIC_SLOTS` the taken tool goes
+ * in; with them full the weakest of the held tools and the taken one is put
+ * down -- the taken one itself means a pass (`tools.weakest`, when the tool
+ * table has its own reading of weak, picks instead). `tools.swapped` hears which, so
+ * the tool table counts what was kept, not what was reached for.
+ */
+export function takeIntoSlots(run, taken, tools = null) {
+  if (!taken || run.relics.length < RELIC_SLOTS) return equipRelic(run, taken);
+  const rank = (id) => RELIC_DROP_ORDER.indexOf(id);
+  const weakest = tools?.weakest?.([...run.relics, taken]) ?? [...run.relics, taken].reduce((low, id) => (rank(id) < rank(low) ? id : low));
+  tools?.swapped?.(taken, weakest);
+  return weakest === taken ? equipRelic(run, null) : equipRelic(run, taken, weakest);
+}
 
 /** How a card reads to a player who values these axes. Costs are negative. */
 export const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
@@ -83,6 +129,9 @@ export const ARCHETYPES = {
   "min-risk": { minRisk: true, noise: 1 },
 };
 export const POPULATION = ["random", "random", "procedure", "money", "balanced", "min-risk", "people-first", "spend-people"];
+
+/** How far past the scouted band's near end a scouting hand lets the next step reach. */
+const SCOUT_EDGE = 3;
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label: key }]));
@@ -155,10 +204,20 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       while (hand.walks && win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
     }
     const target = policy.heat + (random() - 0.5) * 10;
+    // SCOUT (B1): the player who reads the heartbeat also takes the one look
+    // the table sells, and pushes while the next step stays under the band it
+    // drew -- past that, on the heartbeat, never past the band's far end. No
+    // draw from the stream: without the rule the season is the season before it.
+    const scouts = policy.listens && rules.has("scout");
+    if (scouts) win = scoutWindow(win, true, rules);
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
-      const keepGoing = policy.listens
-        ? getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm
-        : win.gauge < target;
+      const band = scouts ? getWindowBand(win) : null;
+      const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
+      const keepGoing = band
+        ? win.gauge + win.schema.stepMax - SCOUT_EDGE < band.wallMin || (hears && win.gauge + win.schema.stepMax < band.wallMax)
+        : policy.listens
+          ? hears
+          : win.gauge < target;
       if (!keepGoing) break;
       win = reduceWindow(win, { type: "PUSH" }, rules);
       win = reduceWindow(win, { type: "TICK", delta: 0.7 }, rules);
@@ -179,6 +238,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * for every season before them: it settles a window against a codex as the
    * runtime does, takes the draft its own way and may play the tool hand. Left
    * out, the draft is the five tools that need no unlock, one taken at random.
+   * Either way a full hand swaps (`takeIntoSlots`); five tools from a pool of
+   * five never fill past the slots, so the seasons before the tool table never do.
    */
   function playSeason(seasonIndex, archetype, story = false, watch = null, tools = null) {
     const policy = makePolicy(archetype);
@@ -316,7 +377,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           };
           caseResults[caseId] = summary;
           casePeaks.push(summary.peakRiskPressure);
-          if (run.relicOffer.length) run = equipRelic(run, tools ? tools.draft(run) : pick(run.relicOffer));
+          if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
           if (caseId === "final") final = { resources, log };
         }
         nodeId = nextNode;
@@ -403,6 +464,22 @@ export const HAND_LOCKS = 0.5;
 export const STANCES = ["strike", "steady", "strike", "steady", "expose"];
 
 /**
+ * SCOUT as a hand plays it (B1): the look, before the first push. `scout` is
+ * the decide function's own mark (`decide.scout`): `true` presses SCOUT as the
+ * table does, and `{ seconds }` is a sweep's candidate price, paid on the clock
+ * the same way (the band's reach is the decide function's to read, through
+ * `getWindowBand`). A case without the rule looks at nothing.
+ */
+export function scoutWindow(win, scout, rules = ALL_RULES) {
+  if (!scout || win.status !== "live") return win;
+  if (scout === true || !Number.isFinite(scout.seconds)) return reduceWindow(win, { type: "SCOUT" }, rules);
+  if (!rules.has("scout") || win.scouted) return win;
+  let spent = { ...win, scouted: true };
+  for (let left = scout.seconds; left > 0 && spent.status === "live"; left -= 1) spent = reduceWindow(spent, { type: "TICK", delta: Math.min(1, left) }, rules);
+  return spent;
+}
+
+/**
  * The two case players, for a case `windowsPerCase` windows long. `card` is
  * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
  * windowIndex)` the scene whose types a typed hand picks from.
@@ -450,6 +527,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
           if (!lock.idle) win = pressed;
         }
       }
+      win = scoutWindow(win, decide.scout, rules);
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
         if (!decide(win, run)) break;
         win = reduceWindow(win, { type: "PUSH" }, rules);

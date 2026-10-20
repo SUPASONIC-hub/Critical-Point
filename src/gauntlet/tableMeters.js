@@ -1,4 +1,4 @@
-import { GAUGE_MAX, getCardChips, getFocusBonus, getHeartbeatBpm, getMultiplier, getRemainingSeconds } from "./gauntletEngine.js";
+import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
 
 /**
  * The 현재 위험 cell's line, and the voice's after the heat (`describePush`).
@@ -25,10 +25,15 @@ export function describeDanger({ gauge, nextHigh, wallMin }) {
  * The heartbeat hears the window's tell wall -- the real wall plus its seeded
  * error -- never the wall itself (`getHeartbeatBpm`). The clock reads the
  * window's own board (`win.schema`), as `getRemainingSeconds` always has.
+ * `belowRelief` is whether one press of the stance would cool less than its
+ * relief: STEADY's relief comes off the heat there is (`FOCUS` clamps at 0).
+ * `band` is the wall band the window draws: the board's, or the narrower one
+ * SCOUT bought (`getWindowBand`); the danger line reads its low edge.
  */
 export function readTableMeters({ win, schema, selectedCard }) {
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
+  const band = getWindowBand(win);
   return {
     selectedChips: selectedCard ? getCardChips(selectedCard, schema) : 0,
     multiplier: getMultiplier(win.gauge),
@@ -39,6 +44,8 @@ export function readTableMeters({ win, schema, selectedCard }) {
     nextHigh,
     nextMultiplierLow: getMultiplier(nextLow),
     nextMultiplierHigh: getMultiplier(nextHigh),
-    dangerLine: describeDanger({ gauge: win.gauge, nextHigh, wallMin: schema.wallMin }),
+    dangerLine: describeDanger({ gauge: win.gauge, nextHigh, wallMin: band.wallMin }),
+    belowRelief: win.gauge < getFocusModeProfile(win.focusMode).relief,
+    band,
   };
 }

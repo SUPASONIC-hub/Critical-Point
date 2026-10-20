@@ -16,7 +16,7 @@ import {
   TRANSITION_TIMEOUT_MS,
   waitForEntrance,
 } from "./helpers/gameFlow.js";
-import { openBrokenBoard } from "./helpers/layout.js";
+import { FIVE_RELICS, openBrokenBoard } from "./helpers/layout.js";
 import { seedSave } from "./helpers/seededSave.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
@@ -100,7 +100,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   // The button says what a press costs, to the eye and to a screen reader.
   const lock = page.getByTestId("commit-focus");
   await expect(lock.locator("small")).toHaveText("0 · −1.5초");
-  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 콤보와 합쳐 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
+  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 LOCK으로 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
   await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
   // Any moment is as good as another: the press is not timed.
@@ -126,6 +126,44 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await page.keyboard.press("q");
   await page.keyboard.press("q");
   await expect(page.locator(".gx-focus-modes button.mode-strike")).toHaveAttribute("aria-pressed", "true");
+});
+
+/**
+ * SCOUT (B1), pressed as a player presses it: R, with the focus on the band
+ * button the way a pointer or Tab leaves it. The look is spent once a window,
+ * and the spent button stays where it was, aria-disabled, so the focus is not
+ * dropped to the page (decision 11).
+ */
+test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds, and the spent button keeps the focus", async ({ page }) => {
+  await openTable(page);
+  await page.keyboard.press("1");
+  const scout = page.getByTestId("commit-scout");
+  // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price.
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 시간 3초$/);
+  await expect(scout).toHaveAttribute("aria-disabled", "false");
+  const bandOf = async () => (await scout.textContent()).match(/벽 (\d+)–(\d+)/).slice(1).map(Number);
+  const [low, high] = await bandOf();
+  await scout.focus();
+  const before = await clockOf(page);
+  await page.keyboard.press("r");
+  await expect(scout).toContainText("조회함");
+  await expect(scout).toHaveAttribute("aria-disabled", "true");
+  await expect(scout, "the spent button keeps the focus it had").toBeFocused();
+  const [min, max] = await bandOf();
+  expect(max - min, "the look narrows the band to 2 x SCOUT_REACH").toBeLessThanOrEqual(20);
+  expect(min).toBeGreaterThanOrEqual(low);
+  expect(max).toBeLessThanOrEqual(high);
+  expect(await clockOf(page), "the look costs three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+
+  // Once a window: neither R nor the button spends it again.
+  const after = await clockOf(page);
+  await page.keyboard.press("r");
+  // force: Playwright counts aria-disabled as not enabled, and the click is the point here.
+  await scout.click({ force: true });
+  expect(await clockOf(page), "a spent look costs nothing").toBeGreaterThan(after - 3);
+  expect(await bandOf()).toEqual([min, max]);
+  await expect(scout).toBeFocused();
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 });
 
 test("the letters work on a Hangul layout", { tag: "@once" }, async ({ page }) => {
@@ -502,6 +540,43 @@ test("the relic draft keeps focus inside it, and Enter takes the focused relic",
 });
 
 /**
+ * The relic slots: with five tools held, taking one is a swap. The pick opens
+ * the swap step and takes nothing, Escape goes back to the offer, a number
+ * picks again, and the tool clicked there is the one that leaves the save.
+ */
+test("with five tools held, a draft pick asks which to put down, Escape goes back, and the tool put down leaves the save", async ({ page }) => {
+  await openBrokenBoard(page, "case01", "c1_aftershock", { relics: [...FIVE_RELICS] });
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
+  await page.locator(".next-case-panel button").click();
+  const draft = page.getByTestId("relic-draft");
+  await expect(draft).toBeVisible();
+  const options = draft.getByTestId("relic-option");
+  const drops = draft.getByTestId("relic-drop");
+  const taken = await options.first().getAttribute("data-relic");
+  expect(FIVE_RELICS, "the offer holds no tool already carried").not.toContain(taken);
+
+  await options.first().click();
+  await expect(drops).toHaveCount(FIVE_RELICS.length);
+  await expect(drops.first(), "the swap step takes the focus").toBeFocused();
+  await expect(draft.locator(".gx-draft-kicker")).toContainText("도구 칸 가득");
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics, "nothing is taken before a tool is put down").toEqual([...FIVE_RELICS]);
+
+  await page.keyboard.press("Escape");
+  await expect(drops).toHaveCount(0);
+  await expect(options.first()).toHaveAttribute("data-relic", taken);
+  await page.keyboard.press("1");
+  await expect(drops).toHaveCount(FIVE_RELICS.length);
+  const dropped = await drops.nth(1).getAttribute("data-relic");
+  await drops.nth(1).click();
+  await expect(draft).toHaveCount(0);
+  const kept = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics;
+  expect([...kept].sort()).toEqual([...FIVE_RELICS.filter((id) => id !== dropped), taken].sort());
+});
+
+/**
  * The staged table (src/gauntlet/tableUnlocks.js): the five prologues turn the
  * rules on in steps, and a rule that is not on yet is not drawn and its key is
  * not the table's. Each step is opened by the debug jump, on a plain run. What
@@ -516,7 +591,7 @@ const NEW_PROTOCOL = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니
 const STAGED_STEPS = [
   { caseId: "prologue01", on: { logic: false, lock: false, stance: false, chain: false }, lines: 2, kicker: FIRST_TABLE },
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
-  { caseId: "prologue03", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
+  { caseId: "prologue03", on: NO_LOCK, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "prologue05", on: WHOLE, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },

@@ -5,9 +5,9 @@ import { PGlite } from "@electric-sql/pglite";
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
 import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
-import { classifyTelemetryFailure, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
+import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
-import { createRunSummary, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 
@@ -47,8 +47,9 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *   4. The limits themselves: each hourly and daily budget is driven to its
  *      edge, because a limit nobody has run is a number in a comment.
  *   5. What a migration that deletes leaves behind. The ranking reset of
- *      2026-10-11 is replayed over a database with a row in every table, and
- *      every row but the ranking rows has to come out of it as it went in.
+ *      2026-10-15 (the day-ten table, 20261020010000) is replayed over a
+ *      database with a row in every table, and every row but the ranking
+ *      rows has to come out of it as it went in.
  *   6. That the telemetry trigger function in parts (20261014000000) is the
  *      function it was: each part is run by nobody but the service role, the
  *      triggers are wired as before, and one row for every refusal, sent to
@@ -73,14 +74,15 @@ await db.exec(`
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `);
 
-// The ranking reset of 2026-10-11 deletes rows, and a delete is judged by what
-// it leaves. So the database it meets here is not empty: just before that file
-// is replayed, every table gets a row, and `playtest_sessions` gets a run's
+// The newest ranking reset (20261020010000, the day-ten table; the one of
+// 2026-10-11 before it was held to the same seed) deletes rows, and a delete is
+// judged by what it leaves. So the database it meets here is not empty: just
+// before that file is replayed, every table gets a row, and `playtest_sessions` gets a run's
 // case rows and two ranking rows -- one the public ranking shows and one it
 // does not (no score), since the reset takes both. The tables are read before
 // and after, and the seeded rows are taken out again, so the rest of this
 // check runs on the database it always had.
-const RANKING_RESET = "20261011010000_logic_table_ranking_reset.sql";
+const RANKING_RESET = "20261020010000_rules_day10_ranking_reset.sql";
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -116,8 +118,9 @@ async function seedBeforeRankingReset() {
     // A ranking row the public ranking does not show: it has no score.
     await session({ runId: `${RESET_SEED}-run-2`, burstScore: 64 }, "final", beatTable);
     await session({ runId: `${RESET_SEED}-run-2`, seasonComplete: true }, "season-final");
-    // A stored case row the new constraint would refuse, were it sent today.
-    await session({ runId: `${RESET_SEED}-run-3`, burstScore: 50 }, "case02", { ...beatTable, handVault: "forty" });
+    // A stored case row the new constraint would refuse, were it sent today:
+    // the table's mark, present and not a number (20261020010000).
+    await session({ runId: `${RESET_SEED}-run-3`, burstScore: 50 }, "case02", { ...beatTable, tableRules: "two" });
     await db.query(`insert into public.playtest_feedback (session_id, session_code, case_id, feedback) values ($1, 'RESETSEED', 'case01', '{"clarity": 4}')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ($1, 'case01', 'n1', '{}')`, [`${RESET_SEED}-session`]);
@@ -181,7 +184,7 @@ for (const file of files) {
   }
 }
 
-// What the ranking reset removed, and what it left (20261011010000).
+// What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
   if (rankingBeforeReset.n !== 2 || rankingBeforeReset.shown !== 1) {
     failures.push(`the ranking reset met ${rankingBeforeReset.n} ranking rows, ${rankingBeforeReset.shown} of them shown; the check seeds two, one shown and one not.`);
@@ -206,10 +209,10 @@ if (beforeReset && afterReset) {
   // The run's own case rows are among what stayed, the `final` one with them,
   // and so is a stored row the new constraint would refuse: NOT VALID re-reads nothing.
   const kept = (await db.query(
-    `select run_id, case_id, dynamics->>'handVault' as hand from public.playtest_sessions where session_id = $1 order by run_id, case_id`,
+    `select run_id, case_id, dynamics->>'tableRules' as hand from public.playtest_sessions where session_id = $1 order by run_id, case_id`,
     [`${RESET_SEED}-session`],
   )).rows.map((row) => `${row.run_id.slice(RESET_SEED.length + 1)}:${row.case_id}${row.hand ? `:${row.hand}` : ""}`);
-  if (JSON.stringify(kept) !== JSON.stringify(["run-1:case01", "run-1:final", "run-2:final", "run-3:case02:forty"])) {
+  if (JSON.stringify(kept) !== JSON.stringify(["run-1:case01", "run-1:final", "run-2:final", "run-3:case02:two"])) {
     failures.push(`after the ranking reset the seeded runs hold ${JSON.stringify(kept)}; expected their case rows and no ranking row.`);
   }
   const removed = await removeRankingResetSeed();
@@ -217,6 +220,26 @@ if (beforeReset && afterReset) {
   const left = await readEverythingButRanking();
   const stray = Object.entries(left).filter(([, rows]) => rows.some((row) => row.includes(RESET_SEED))).map(([name]) => name);
   if (stray.length) failures.push(`the ranking-reset seed is still in public.${stray.join(", public.")}; everything after this would run beside it.`);
+}
+
+// The reset restates one part of the trigger function, not the function:
+// 20261014000000 split `validate_telemetry_insert`, and a change of table
+// restates `ranking_check_run_marks` alone. The last file to write the
+// function out whole is WHOLE_VALIDATOR; the comparison of the function in
+// parts with the whole one reads it from there, not from RANKING_RESET.
+const WHOLE_VALIDATOR = "20261011010000_logic_table_ranking_reset.sql";
+{
+  const restates = (file, name) =>
+    files.includes(file) && new RegExp(`^create or replace function public\\.${name}\\(`, "m").test(readFileSync(path.join(MIGRATIONS, file), "utf8"));
+  if (!restates(WHOLE_VALIDATOR, "validate_telemetry_insert")) {
+    failures.push(`supabase/migrations/${WHOLE_VALIDATOR} no longer writes validate_telemetry_insert out whole; the function in parts would be compared with nothing.`);
+  }
+  if (restates(RANKING_RESET, "validate_telemetry_insert")) {
+    failures.push(`supabase/migrations/${RANKING_RESET} restates validate_telemetry_insert; since 20261014000000 a change of table restates ranking_check_run_marks alone.`);
+  }
+  if (!restates(RANKING_RESET, "ranking_check_run_marks")) {
+    failures.push(`supabase/migrations/${RANKING_RESET} does not restate ranking_check_run_marks; the older-table refusal is in no function the trigger calls.`);
+  }
 }
 
 // ------------------------------------------------------------------ 1. rules
@@ -500,14 +523,14 @@ function decisionEntry(caseId, index, { story = false } = {}) {
     challenge: { title: "책임의 순서", matched: true, riskDelta: -2 },
     tactical: { read: "압박이 한쪽으로 쏠린다", advice: "속도를 늦춘다" },
     // The hand's line under a logged decision (useChoiceCommit's `describeHand`).
-    handLine: { label: "LOGIC STREAK", text: "논리 콤보 12 · 판돈 ×1.50 · +14" },
+    handLine: { label: "LOGIC STREAK", text: "논리 콤보 12 · 판돈 ×1.60 · +14" },
     clueReward: null,
     threshold: {
       state: "cash", busted: false, cause: "cashed", forced: false, gauge: 63, wall: 88, pushes: 3,
       rewardMultiplier: 1.4, potMultiplier: 1.8, pot: 42, lostPot: 0,
       focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
       // The logic streak's line (gauntletEngine's `verdict.logic`); the case summary's `logicRecord` is built from it.
-      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.5, pot: 14 },
+      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.6, pot: 14 },
     },
     environmentMode: "stable",
     assistTime: 1.5,
@@ -930,6 +953,12 @@ withHeaders(null);
       await postRefused(`send a case row with ${key} as ${kind}`, "playtest_sessions", withDynamics({ [key]: value }), /^23514 .*playtest_sessions_dynamics_shape/);
     }
   }
+  // The table's mark (20261020010000): a number when it is there, and a row without it is taken.
+  await post(`send a case row without ${RULES_MARK_KEY}`, "playtest_sessions", withDynamics({}, [RULES_MARK_KEY]));
+  await post(`send a case row with ${RULES_MARK_KEY} as a number`, "playtest_sessions", withDynamics({ [RULES_MARK_KEY]: RULES_MARK }));
+  for (const [kind, value] of [["a string", String(RULES_MARK)], ["null", null], ["an object", { value: RULES_MARK }], ["an array", [RULES_MARK]], ["a boolean", true]]) {
+    await postRefused(`send a case row with ${RULES_MARK_KEY} as ${kind}`, "playtest_sessions", withDynamics({ [RULES_MARK_KEY]: value }), /^23514 .*playtest_sessions_dynamics_shape/);
+  }
   const shape = await one(`select convalidated as validated from pg_constraint where conname = 'playtest_sessions_dynamics_shape' and conrelid = 'public.playtest_sessions'::regclass`);
   check(shape?.validated === false, "playtest_sessions_dynamics_shape is validated: adding it re-read every stored row, and a row written under an older shape would have stopped the migration.");
 }
@@ -1129,6 +1158,82 @@ withHeaders({ "x-forwarded-for": "198.51.100.21" });
   const refusal = { status: 400, serverMessage: "beat-table runs are not ranked" };
   check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads the beat-table refusal as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
   check(!isUnrankableRefusal({ type: "case", payload: { case_id: "season-final" } }, refusal), "the client's queue reads the beat-table refusal as a run missing a case row.");
+}
+withHeaders(null);
+
+// ---- a season from the table before 2026-10-20 stays out (20261020010000)
+//
+// The day-ten table (fracture 8, LOGIC_CAP x1.6 and LOCK_CAP x1.5, five tool
+// slots, SCOUT). The key is RULES_MARK_KEY (gauntletEngine.js) and the message
+// below is the migration's.
+// The same four runs as the beat-table block above, one table later: each is
+// whole, watched and well spaced, and what its case rows carry in `dynamics`
+// is all there is to refuse.
+withHeaders({ "x-forwarded-for": "198.51.100.22" });
+{
+  const OLDER_MESSAGE = "older-table runs are not ranked";
+  const OLDER_REFUSAL = new RegExp(`^P0001 ${OLDER_MESSAGE}$`);
+  /** The run summary a build of the table before sent as `dynamics`: this one's, without the mark. */
+  const olderTableDynamics = ({ [RULES_MARK_KEY]: _mark, ...rest }) => rest;
+  const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
+  const marked = (runId) => one(
+    `select (count(*) filter (where jsonb_typeof(dynamics->'${RULES_MARK_KEY}') = 'number' and (dynamics->>'${RULES_MARK_KEY}')::numeric >= ${RULES_MARK}))::int as mark, count(*)::int as n
+       from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,
+    [runId],
+  );
+  const refusedRun = async (label, runId, session, expected, pattern = OLDER_REFUSAL) => {
+    const rows = await marked(runId);
+    check(rows?.n === CASE_SEQUENCE.length && rows?.mark === expected, `${runId}'s case rows did not land as sent: ${rows?.mark} of ${rows?.n} carry ${RULES_MARK_KEY}, expected ${expected} of ${CASE_SEQUENCE.length}.`);
+    await postRefused(label, "playtest_sessions", seasonPayload({ session, runId }), pattern);
+    check((await rankingRows(runId)) === 0, `${runId} has a ranking row; a season with a case from the table before must have none.`);
+  };
+
+  // The run that ranked carries the mark on every case row, from the run summary the client builds.
+  check(createRunSummary(RUN_INITIAL_STATE)[RULES_MARK_KEY] === RULES_MARK, `the run summary the client builds has no ${RULES_MARK_KEY} of ${RULES_MARK}; every season would be refused as one from the table before.`);
+  const ranked = await marked("run-ranked-1");
+  check(
+    ranked?.mark === CASE_SEQUENCE.length && (await rankingRows("run-ranked-1")) === 1,
+    `run-ranked-1 has ${await rankingRows("run-ranked-1")} ranking rows with ${ranked?.mark} of ${ranked?.n} case rows carrying ${RULES_MARK_KEY}; the run that ranks is the one with all of them.`,
+  );
+
+  // A season finished at the table before, as the reset leaves it: ranked once, its ranking row deleted.
+  await playRun("run-older-1", { session: sessionId(50), dynamicsOf: (_caseId, dynamics) => olderTableDynamics(dynamics) });
+  await db.query(`update public.playtest_sessions set completed_at = completed_at - interval '3 days' where run_id = 'run-older-1'`);
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    await db.query(
+      `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary)
+       values ($1, 'run-older-1', 'OLDER', 'season-final', 'SEASON 01 COMPLETE', '{"seasonComplete": true, "burstScore": 88, "rank": "A"}')`,
+      [sessionId(50)],
+    );
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  check((await rankingRows("run-older-1")) === 1, "the older-table run's old ranking row was not put in place.");
+  await post("send the ranking row of a ranked older-table run again before the reset", "playtest_sessions", seasonPayload({ session: sessionId(50), runId: "run-older-1" }));
+  await db.query(`delete from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-older-1'`);
+  await refusedRun("rank a season finished at the table before again after the reset", "run-older-1", sessionId(50), 0);
+
+  // Begun at the table before and finished at this one: the first ten cases are the old build's.
+  const early = CASE_SEQUENCE.slice(0, 10);
+  await playRun("run-older-2", { session: sessionId(51), dynamicsOf: (caseId, dynamics) => (early.includes(caseId) ? olderTableDynamics(dynamics) : dynamics) });
+  await refusedRun("rank a season begun at the table before and finished at this one", "run-older-2", sessionId(51), CASE_SEQUENCE.length - 10);
+
+  // One case row whose mark is a number below this table's: a smaller number is an older table.
+  const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+  await playRun("run-older-3", { session: sessionId(52), dynamicsOf: (caseId, dynamics) => (caseId === middle ? { ...dynamics, [RULES_MARK_KEY]: RULES_MARK - 1 } : dynamics) });
+  await refusedRun("rank a season with one case row that carries an older mark", "run-older-3", sessionId(52), CASE_SEQUENCE.length - 1);
+
+  // Both a beat-table season and one from the table before: the beat check stands first, so it is told that.
+  await playRun("run-older-beat", { session: sessionId(53), dynamicsOf: (_caseId, dynamics) => olderTableDynamics(beatTableDynamics(dynamics)) });
+  await refusedRun("rank a beat-table season with no table mark", "run-older-beat", sessionId(53), 0, /^P0001 beat-table runs are not ranked$/);
+
+  // What the client's queue makes of the refusal: dropped, and told as a season that will not rank.
+  const refusal = { status: 400, serverMessage: OLDER_MESSAGE };
+  const seasonItem = { type: "case", payload: { case_id: "season-final" } };
+  check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads the older-table refusal as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
+  check(!isUnrankableRefusal(seasonItem, refusal), "the client's queue reads the older-table refusal as a run missing a case row.");
+  check(isBeatTableRefusal(seasonItem, refusal), "the client's queue does not tell the older-table refusal as a season that will not rank (BEAT_TABLE_REFUSAL in src/state/telemetryBatch.js).");
 }
 withHeaders(null);
 
@@ -1765,11 +1870,11 @@ const VALIDATOR_PARTS = {
 {
   const definitionIn = (file) =>
     readFileSync(path.join(MIGRATIONS, file), "utf8").match(/^create or replace function public\.validate_telemetry_insert\(\)[\s\S]*?^\$\$;/m)?.[0] ?? null;
-  const whole = files.includes(RANKING_RESET) ? definitionIn(RANKING_RESET) : null;
+  const whole = files.includes(WHOLE_VALIDATOR) ? definitionIn(WHOLE_VALIDATOR) : null;
   const installed = async () =>
     one(`select p.prosrc as source, pg_get_functiondef(p.oid) as definition from pg_proc p where p.oid = 'public.validate_telemetry_insert()'::regprocedure`);
   const before = await installed();
-  check(whole !== null, `could not read validate_telemetry_insert out of supabase/migrations/${RANKING_RESET}; the function in parts was compared with nothing.`);
+  check(whole !== null, `could not read validate_telemetry_insert out of supabase/migrations/${WHOLE_VALIDATOR}; the function in parts was compared with nothing.`);
 
   const address = "198.51.100.90";
   const headers = { "x-forwarded-for": address };

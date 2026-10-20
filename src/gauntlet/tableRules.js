@@ -38,13 +38,25 @@ export const STEADY_LINE_COOL = 8;
 export const STEADY_LINE_SECONDS = 4;
 export const STEADY_LINE_WALL = 3;
 
-/** What each step of the streak adds to the pot, and where that stops: x1.5 at a streak of 8. */
+/**
+ * What each step of the streak adds to the pot, and where that stops: x1.6 at
+ * a streak of 10. Until 2026-10-16 it stopped at x1.5 (a streak of 8), 6.4
+ * points of heat where the smallest push is 7.
+ */
 export const LOGIC_RATE = 0.0625;
-export const LOGIC_CAP = 0.5;
+export const LOGIC_CAP = 0.6;
 /** A type held this many windows in a row starts to grow the streak. */
 export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */
 export const LOCK_PRESS_SECONDS = 1.5;
+/**
+ * SCOUT (B1, 11일차 초안): what one look at the wall costs on the table clock,
+ * once a window, and how far the band it draws reaches -- a band
+ * `2 * SCOUT_REACH` wide that holds the wall at a seeded place inside it, cut
+ * to the board's own band. Measured in check:pressure ("scout" rows).
+ */
+export const SCOUT_SECONDS = 3;
+export const SCOUT_REACH = 10;
 
 /** METRONOME: how many windows after the pressure rose a change of type still counts as a switch. */
 export const METRONOME_REACH = 2;

@@ -16,7 +16,7 @@
  * Pushing, cashing, the wall and the heartbeat are the table itself and are
  * not listed: no step is without them.
  */
-import { HAND_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
+import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -32,8 +32,10 @@ export const STAGED = true;
  * the LOCK press, in the STRIKE stance until `stance` lets the player choose
  * one -- and with the choice come the boards a stance carries forward (STRIKE
  * WAKE, STEADY LINE, EXPOSED HAND) and the season's mastery of it. `relics`
- * is the draft a closed case offers. The other seven are the next-table
- * mutations, under the ids the engine's `MUTATIONS` catalogue uses.
+ * is the draft a closed case offers. `scout` is SCOUT, the one look a window
+ * that narrows the drawn band around the wall for table clock (B1, 11일차
+ * 초안). The other seven are the next-table mutations, under the ids the
+ * engine's `MUTATIONS` catalogue uses.
  */
 export const TABLE_RULES = Object.freeze([
   "logic",
@@ -47,6 +49,7 @@ export const TABLE_RULES = Object.freeze([
   "lock",
   "stance",
   "relics",
+  "scout",
 ]);
 
 /**
@@ -152,11 +155,16 @@ const STEPS = [
   },
   {
     caseId: "prologue03",
-    adds: ["coldFeet", "heatDebt"],
-    storyIntro: [],
+    adds: ["coldFeet", "heatDebt", "scout"],
+    // SCOUT is the hand's own, so a story run is told it (B1 초안). The 3초 and
+    // the 20 are SCOUT_SECONDS and 2 * SCOUT_REACH (tableRules.js): this module
+    // imports only the two LOCK numbers, so they are written out and move with
+    // the constants.
+    storyIntro: [2],
     intro: [
       "한 번도 밀지 않고 확정하면 다음 판에서 가장 비싼 카드가 봉인됩니다.",
       "열기 60 이상에서 확정하면 다음 판은 열기를 안고 시작하고 시간이 줄어듭니다.",
+      "조회를 누르면 시간 3초를 쓰고 벽 구간이 20칸 폭으로 좁혀집니다. 판마다 한 번이고, 벽이 그 한가운데 있다는 뜻은 아닙니다.",
     ],
   },
   {
@@ -166,22 +174,26 @@ const STEPS = [
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
       "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
-      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 콤보와 합쳐 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
+      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 LOCK으로 1.5배까지(콤보로는 1.6배까지) 오릅니다. 누를 때마다 시간이 줄어듭니다.",
     ],
   },
   {
     caseId: "prologue05",
     adds: ["stance", "relics"],
-    // What a charge does once the stake multiplier is at its cap (`HAND_CAP`):
-    // nothing to this hand's, and the stance's carry if it reached
-    // `STANCE_CHARGE` (`applyFocusCarry`). STEADY's relief is taken off the
-    // heat there is, so on a cold board before the first push it cools nothing.
-    // A story run is told no promise about the next board, so not the second.
-    storyIntro: [0, 2],
+    // The second line is the relic slots (RELIC_OFFER_SIZE and RELIC_SLOTS in
+    // relics.js, written out like SCOUT's numbers). The third is what a charge
+    // does once LOCK is at its own cap (`LOCK_CAP`): nothing to this hand's
+    // multiplier, and the stance's carry if it reached `STANCE_CHARGE`
+    // (`applyFocusCarry`). STEADY's relief is taken off the heat there is, so
+    // on a cold board before the first push it cools nothing: said in the
+    // first line's brackets, as the README says it, so the four things fit
+    // the phone's first screen in three lines (table-keys, 390x664). A story
+    // run is told no promise about the next board, so not the third.
+    storyIntro: [0, 1],
     intro: [
-      "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘, EXPOSE는 자원입니다.",
-      `칩 배율이 ${HAND_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
-      "STEADY는 데워진 열기만 식힙니다. 한 번 민 뒤에 충전하십시오.",
+      "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘(민 뒤에만), EXPOSE는 자원입니다.",
+      "사건이 닫힐 때마다 도구 3개 중 하나를 고릅니다. 도구는 5개까지 들고, 다 차면 하나를 내려놓고 바꿉니다.",
+      `칩 배율이 ${LOCK_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
     ],
   },
 ];

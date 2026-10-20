@@ -1,0 +1,142 @@
+{
+  "era": "v2, the last build before SCOUT -- a 프롤로그 02 run put down mid-window, its window carrying no `scouted`",
+  "writtenBy": "persist() in src/state/useAppPersistence.js and serializeRunState() in src/gauntlet/gauntletEngine.js at d9dc11b (rules-day10, 2026-10-15)",
+  "save": {
+    "saveSchemaVersion": 2,
+    "runId": "run-current-0001",
+    "playerName": "분석관",
+    "playStyle": "instinct",
+    "openingLegacy": null,
+    "dataConsent": false,
+    "started": false,
+    "currentCase": "prologue02",
+    "completedCases": [
+      "prologue01"
+    ],
+    "discoveredClues": [],
+    "caseResults": {},
+    "playtestFeedback": {},
+    "nodeId": "p2_start",
+    "resources": {
+      "time": 70,
+      "capital": 100,
+      "trust": 54,
+      "legitimacy": 50,
+      "humanCost": 0,
+      "fatigue": 12
+    },
+    "log": [],
+    "triggers": {
+      "protection": 0,
+      "injustice": 0,
+      "revenge": 0,
+      "responsibility": 0,
+      "competition": 0,
+      "reward": 0,
+      "curiosity": 0,
+      "order": 0,
+      "trust": 0,
+      "affection": 0,
+      "recognition": 0,
+      "fear": 0,
+      "system": 0,
+      "helplessness": 0,
+      "selfAwareness": 0,
+      "manipulation": 0,
+      "choice": 0
+    },
+    "cognition": {
+      "persistence": 0,
+      "inference": 0,
+      "reframing": 0,
+      "risk": 0
+    },
+    "echo": "2023년 4월 12일.",
+    "nodeEnteredAt": 1758960000000,
+    "pendingTelemetry": [],
+    "dynamics": {
+      "windowIndex": 9,
+      "practiceWindows": 0,
+      "runPot": 0,
+      "vault": 4120,
+      "streak": 0,
+      "busts": 1,
+      "cashes": 8,
+      "bestMultiplier": 4.2,
+      "lastOutcome": "cash",
+      "lastGauge": 33,
+      "openSeed": null,
+      "openCardId": null,
+      "suspended": {
+        "seed": "run-current-0001:9:p2_start",
+        "windowIndex": 9,
+        "window": {
+          "gauge": 20,
+          "pushes": 2,
+          "lastStep": 0,
+          "elapsed": 0,
+          "groove": 0,
+          "focus": 0,
+          "focusCombo": 0,
+          "maxFocusCombo": 0,
+          "focusHits": 0,
+          "selectedId": "p2_start_speed_team",
+          "focusMode": "strike"
+        }
+      },
+      "bestFocusCombo": 2,
+      "focusHits": 3,
+      "stanceMastery": {
+        "strike": 1,
+        "steady": 0,
+        "expose": 0
+      },
+      "runHand": 0,
+      "handVault": 260,
+      "logic": {
+        "streak": 0,
+        "best": 0,
+        "type": null,
+        "held": 0,
+        "heat": 0,
+        "rose": false,
+        "reach": 0
+      },
+      "relics": [],
+      "relicOffer": [],
+      "insuranceSpent": false,
+      "practice": null,
+      "veteran": false,
+      "story": false,
+      "schema": {
+        "seconds": 45,
+        "wallMin": 56,
+        "wallMax": 92,
+        "stepMin": 7,
+        "stepMax": 15,
+        "creep": 0.5,
+        "startGauge": 0,
+        "chipsScale": 1,
+        "faceDown": false,
+        "sedated": false,
+        "sealHighest": false,
+        "fracturedAxis": null,
+        "fractureRate": 1.5,
+        "sealBreak": 30,
+        "mutations": [],
+        "relics": []
+      }
+    },
+    "paused": true,
+    "savedAt": "2026-09-27T08:00:00.000Z"
+  },
+  "expect": {
+    "currentCase": "prologue02",
+    "nodeId": "p2_start",
+    "logLength": 0,
+    "repaired": false,
+    "windowIndex": 9,
+    "vault": 4120,
+    "suspended": true
+  }
+}

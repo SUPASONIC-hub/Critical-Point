@@ -1,7 +1,7 @@
 import { clamp, isResourceGain } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
 import { advanceLogic, getHeatTier, getLogicBonus, getLogicType, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
-import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE } from "./relics.js";
+import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE, RELIC_SLOTS } from "./relics.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -24,6 +24,8 @@ import {
   LOGIC_CAP,
   OVERCLOCK_CHIPS,
   OVERCLOCK_STREAK,
+  SCOUT_REACH,
+  SCOUT_SECONDS,
   SEAL_BREAK_GAUGE,
   SILENCE_SECONDS,
   SPLINT_RATE,
@@ -349,9 +351,11 @@ export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8
  * No press is graded. The one number left from the table that graded them
  * (until 2026-10-10) is the `groove` a window put down in that build still
  * holds: it is paid as it was shown (`getHandBonus`), each of its points
- * adding this much, up to x1.5. No window earns one now.
+ * adding this much, up to x1.5 (the hand's cap when it was shown, kept when
+ * the streak's cap rose on 2026-10-16). No window earns one now.
  */
 const GROOVE_RATE = 0.03;
+const GROOVE_CEILING = 0.5;
 export const FOCUS_MAX = 100;
 const FOCUS_GAIN = 13;
 export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
@@ -363,7 +367,7 @@ const FOCUS_MODE_PROFILES = Object.freeze({
 });
 
 function getGrooveBonus(groove) {
-  return round2(1 + Math.min(LOGIC_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
+  return round2(1 + Math.min(GROOVE_CEILING, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
 }
 
 function normalizeFocusMode(value) {
@@ -394,8 +398,15 @@ export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } =
  * listening policy and nearly twice a player who could see the wall. The
  * stances still differ in how fast they reach the cap, in what they do to the
  * card's resources, and in the board they carry forward.
+ *
+ * On 2026-10-16 the streak's cap rose past one push (x1.5 was 6.4 points of
+ * heat, the smallest push 7) and LOCK's did not: LOCK lifts the pot to
+ * `LOCK_CAP` and no further, so a streak at or past it is paid the streak and
+ * LOCK adds nothing. Measured with LOCK under the streak's cap, a hand that
+ * locked with no streak banked more than a player who sees the wall.
  */
 export const HAND_CAP = 1 + LOGIC_CAP;
+export const LOCK_CAP = 1.5;
 
 /**
  * `streak` is the logic streak the pot is paid on: the streak after this
@@ -405,7 +416,8 @@ export const HAND_CAP = 1 + LOGIC_CAP;
  * none.
  */
 export function getHandBonus(groove, focus, mode = "strike", streak = 0) {
-  return round2(Math.min(HAND_CAP, Math.max(getLogicBonus(streak), getGrooveBonus(groove)) * getFocusBonus(focus, mode).pot));
+  const logic = Math.max(getLogicBonus(streak), getGrooveBonus(groove));
+  return round2(Math.min(HAND_CAP, Math.max(logic, Math.min(LOCK_CAP, logic * getFocusBonus(focus, mode).pot))));
 }
 
 export function getFocusBonus(focus, mode = "strike") {
@@ -507,6 +519,8 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     // the intro between leaving a window and cashing it, and the ranking's
     // "played with a slower clock" mark used to read the setting at the cash.
     timeScale: 1,
+    // SCOUT has been spent on this window (`getWindowBand`): once a window.
+    scouted: false,
   };
   // A window the player put down on purpose -- saved and left, or hid the tab --
   // picks up exactly where it stood. The wall and the tell are dealt from the
@@ -545,6 +559,8 @@ function normalizeSuspendedWindow(value, windowIndex) {
   }
   window.selectedId = typeof source.selectedId === "string" ? source.selectedId.slice(0, 200) : null;
   window.focusMode = normalizeFocusMode(source.focusMode);
+  // The look is kept, never the band it drew: that is dealt from the seed again.
+  window.scouted = source.scouted === true;
   return { seed: value.seed.slice(0, 200), windowIndex, window };
 }
 
@@ -567,6 +583,7 @@ function resumeWindow(window, resume) {
   restored.timeScale = normalizeTimeScale(restored.timeScale);
   restored.selectedId = typeof resume.selectedId === "string" ? resume.selectedId : null;
   restored.focusMode = normalizeFocusMode(resume.focusMode);
+  restored.scouted = resume.scouted === true;
   return restored;
 }
 
@@ -649,6 +666,21 @@ function advanceClock(window, delta) {
   return { ...window, elapsed, gauge };
 }
 
+/**
+ * The band a window draws: the board's, and once SCOUT has been spent on it a
+ * band `2 * SCOUT_REACH` wide that holds the wall, cut to the board's. Where
+ * the wall sits inside it is dealt from the seed, so the look narrows the risk
+ * without printing the wall: the middle of the band is not the wall.
+ */
+export function getWindowBand(window, reach = SCOUT_REACH) {
+  const { wallMin, wallMax } = window.schema;
+  if (window.scouted !== true) return { wallMin, wallMax, scouted: false };
+  // `reach` is the constant everywhere but the balance scripts' sweeps.
+  const span = reach * 2;
+  const low = window.wall - Math.floor(seededUnit(`scout:${window.seed}`) * (span + 1));
+  return { wallMin: clamp(low, wallMin, wallMax), wallMax: clamp(low + span, wallMin, wallMax), scouted: true };
+}
+
 export function reduceWindow(window, event = {}, rules = ALL_RULES) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
@@ -678,6 +710,12 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
         focusHits: (Number(window.focusHits) || 0) + 1,
         gauge: clamp(window.gauge - scored.focusRelief, 0, GAUGE_MAX),
       }, LOCK_PRESS_SECONDS);
+    }
+    case "SCOUT": {
+      // One look a window, paid in clock like a LOCK press: no heat of its own,
+      // but the clock creeps heat while it is spent.
+      if (window.scouted === true || !rules.has("scout")) return window;
+      return advanceClock({ ...window, scouted: true }, SCOUT_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to
@@ -1053,15 +1091,47 @@ export function drawRelicOffer(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
     .map((entry) => entry.id);
 }
 
+const NO_STANCE_RULES = Object.freeze({ has: (id) => id !== "stance" });
+
+/**
+ * The board on the table dealt again without one relic. `applyRelics` only
+ * adds, so the board is laid again the way it was laid -- the REBOOT board a
+ * closed case deals, or the base board `openCaseRun` lays -- and kept only if
+ * laying it with every relic it carries gives back the board on the table.
+ * Whether the case has `stance` is read off the same test (the board is the
+ * only place it is written). A board that cannot be laid again keeps what it
+ * was dealt, and the relic put down is gone from the next board on.
+ */
+function redealWithout(schema, relics, run) {
+  const windowIndex = getEscalationWindow(run);
+  const want = JSON.stringify(schema);
+  for (const base of [{ ...BASE_SCHEMA, mutations: ["reboot"] }, BASE_SCHEMA]) {
+    for (const rules of [ALL_RULES, NO_STANCE_RULES]) {
+      const laid = applySeasonEscalation(applyStanceMastery(base, run.stanceMastery, rules), windowIndex);
+      if (JSON.stringify(applyRelics(laid, schema.relics)) === want) return applyRelics(laid, relics);
+    }
+  }
+  return schema;
+}
+
 /**
  * Takes (or passes on) the relic a closed case offered. The board on the table
  * is re-dealt with it at once; a pass clears the offer and changes nothing else.
+ *
+ * With `RELIC_SLOTS` full, taking one is a swap: `dropId` names the relic put
+ * down, in the same call, so no half-made swap is ever saved and the save's
+ * shape does not change. A take with the slots full and nothing put down
+ * changes nothing -- the offer stays, and the draft asks what to put down. The
+ * relic put down goes where it stood, and the board is dealt without it.
  */
-export function equipRelic(run, relicId = null) {
+export function equipRelic(run, relicId = null, dropId = null) {
   const current = normalizeRunState(run);
   const picked = relicId && current.relicOffer.includes(relicId) ? relicId : null;
-  const relics = picked ? [...current.relics, picked] : current.relics;
-  return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(current.schema, relics) });
+  const dropped = picked && current.relics.length >= RELIC_SLOTS && current.relics.includes(dropId) ? dropId : null;
+  if (picked && current.relics.length >= RELIC_SLOTS && !dropped) return current;
+  const relics = !picked ? current.relics : dropped ? current.relics.map((id) => (id === dropped ? picked : id)) : [...current.relics, picked];
+  const board = dropped ? redealWithout(current.schema, relics, current) : current.schema;
+  return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(board, relics) });
 }
 
 /** What a practice run borrowed, handed back. */
@@ -1129,7 +1199,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
 
 /** Builds the next board from what just happened. */
 /** A burn smaller than this is a scratch, not a fracture. */
-export const FRACTURE_MIN_BURN = 10;
+export const FRACTURE_MIN_BURN = 8;
 
 function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}, rules = ALL_RULES) {
   if (!rules.has("stance") || !earnedStance(focusMode, focusCharge, focusHits, outcome)) return schema;
@@ -1690,6 +1760,17 @@ export function createTableRecord(log = []) {
   return first ? { ...createGauntletLedger([]), ...first } : createGauntletLedger(log);
 }
 
+/**
+ * The mark of a case closed at the table of 2026-10-20 (the day-ten table): every
+ * run summary carries it, so every case row carries it as `dynamics`, and the
+ * server ranks no season with a case row without it (20261020010000; the
+ * reset of 20261011010000 read `logicStreak` the same way). Raise the number,
+ * never reuse it, when the table changes again. The migration,
+ * telemetryBatch.js and check-grants.mjs name it too.
+ */
+export const RULES_MARK_KEY = "tableRules";
+export const RULES_MARK = 2;
+
 export function createRunSummary(run) {
   const state = normalizeRunState(run);
   return {
@@ -1710,5 +1791,6 @@ export function createRunSummary(run) {
     handVault: state.handVault,
     relics: [...state.relics],
     mutations: [...state.schema.mutations],
+    [RULES_MARK_KEY]: RULES_MARK,
   };
 }

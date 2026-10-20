@@ -13,7 +13,7 @@ globalThis.localStorage = createStorage();
 
 const voice = await import("../../src/gauntlet/tableVoice.js");
 const { CLOCK_OPENED_CALL } = await import("../../src/gauntlet/tableReadout.js");
-const { HOLD_ARMED_CALL, describePush, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { HOLD_ARMED_CALL, describePush, describeScout, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
 
 const STRIKE_WAKE = { id: "strikeWake", label: "STRIKE WAKE", title: "다음 판이 더 두껍게 깨어난다" };
 const STEADY_LINE = { id: "steadyLine", label: "STEADY LINE", title: "다음 판이 식은 채 열린다" };
@@ -75,6 +75,17 @@ test("an armed 확정 is said through the table's voice, once, and ahead of anyt
   assert.equal(facts().hold, "", "a table no press armed says nothing of it");
   const queue = queueCalls([{ kind: "clock", text: "10초 남았다" }], [{ kind: "hold", text: HOLD_ARMED_CALL }]);
   assert.deepEqual(queue.map((call) => call.kind), ["hold", "clock"], "it lapses in three seconds, so it goes first");
+});
+
+test("a look is said once, through the voice, as the band it bought", () => {
+  const looked = (band) => readTableFacts({ win: tableWindow(), live: true, dangerLine: "", cashMutations: [], clock: { remaining: 30, elapsed: 10 }, band });
+  const board = { wallMin: 60, wallMax: 98, scouted: false };
+  const scouted = { wallMin: 70, wallMax: 90, scouted: true };
+  assert.equal(describeScout(scouted), "조회했다. 벽은 70에서 90 사이 어딘가");
+  assert.deepEqual(listTableCalls(looked(board), looked(scouted)), [{ kind: "scout", text: describeScout(scouted) }]);
+  assert.deepEqual(listTableCalls(looked(scouted), looked(scouted)), [], "a spent look is not news");
+  assert.equal(looked(board).scout, "", "the board's own band is not a look");
+  assert.equal(facts().scout, "", "a table with no band handed over says nothing of it");
 });
 
 test("a call waiting its turn is replaced by a newer one of its kind, and the clock goes first", () => {

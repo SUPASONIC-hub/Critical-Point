@@ -129,7 +129,7 @@ const SEASON_RECORD_SENT =
 const SEASON_RECORD_NOT_SENT =
   "데이터 제공 동의가 꺼져 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 전송되지 않고 온라인 랭킹에도 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.";
 const SEASON_RECORD_BEAT_TABLE =
-  "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.";
+  "지금 판 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.";
 
 export function getSeasonRecordNotice({ nextCaseId, telemetryEnabled, dataConsent, beatSeason }) {
   if (nextCaseId !== "final" || !telemetryEnabled) return null;

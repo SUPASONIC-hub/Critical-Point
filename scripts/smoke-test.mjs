@@ -91,7 +91,7 @@ test("error logs should use a separate storage namespace", () => {
   assert.equal(ERROR_LOG_STORAGE_KEY, "trigger-prototype-error-log-v1", "error logs should use a separate storage namespace");
 });
 test("save schema version should match exported log format", () => {
-  assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
+  assert.equal(SAVE_SCHEMA_VERSION, 3, "save schema version should match exported log format");
 });
 test("recovery slots should keep their own schema version", () => {
   assert.equal(RECOVERY_SLOT_SCHEMA_VERSION, 1, "recovery slots should keep their own schema version");
@@ -239,7 +239,7 @@ test("v1 saves should migrate into the current schema", () => {
   assert.deepEqual(
     migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] }),
     {
-      saveSchemaVersion: 2,
+      saveSchemaVersion: 3,
       currentCase: "case01",
       nodeId: "start",
       completedCases: [],

@@ -5,6 +5,7 @@ import { RelicIcon } from "./RelicDraft.jsx";
 import { formatMultiplier, formatNumber, getTabNotices, getTypeName, getTypeParts } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicType } from "./logicStreak.js";
+import { SCOUT_SECONDS } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 
@@ -109,6 +110,7 @@ export function TableNotices({ equipped, tab, voice, slam, onReload, onClaim, on
           <RelicIcon id={equipped.id} size={18} />
           <span>장착</span>
           <b lang="en">{RELICS[equipped.id].label}</b>
+          {equipped.dropped && <span>· {RELICS[equipped.dropped].name} 내려놓음</span>}
         </div>
       )}
       {lost && <LostToTab onReload={onReload} />}
@@ -162,6 +164,23 @@ export function RelicChips({ relics, pulse }) {
         </b>
       ))}
     </span>
+  );
+}
+
+/**
+ * The wall band in the gauge's read row, and SCOUT on it. SCOUT sits on the
+ * band it narrows: no fourth button in the dock at 360px. Spent, the button
+ * stays where it was, aria-disabled, so a focus on it is not dropped to the
+ * page. Before the case has SCOUT the band is the plain label the meter
+ * already reads out.
+ */
+export function ScoutBand({ band, canScout, onScout, shortcut }) {
+  if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">벽 {band.wallMin}–{band.wallMax}</span>;
+  return (
+    <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
+      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : `벽 ${band.wallMin}–${band.wallMax} · 조회, 시간 ${SCOUT_SECONDS}초`}>
+      벽 {band.wallMin}–{band.wallMax} · {band.scouted ? "조회함" : "조회"}
+    </button>
   );
 }
 

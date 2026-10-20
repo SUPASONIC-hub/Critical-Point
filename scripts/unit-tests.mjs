@@ -35,6 +35,7 @@ import {
   isSaveAheadOf,
   carryTableRecordIntoRestore,
   HAND_CAP,
+  LOCK_CAP,
   scoreFocus,
   applyRelics,
   drawRelicOffer,
@@ -50,6 +51,7 @@ import {
   normalizeRelicIds,
   RELIC_IDS,
   RELIC_OFFER_SIZE,
+  RELIC_SLOTS,
   RELICS,
   STANCE_RELIC_UNLOCK_COUNT,
 } from "../src/gauntlet/relics.js";
@@ -216,7 +218,7 @@ test("the table never prints the odds of the next push", async () => {
 
 const migrated = migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] });
 test("old saves should migrate to the current schema", () => {
-  assert.equal(migrated.saveSchemaVersion, 2, "old saves should migrate to the current schema");
+  assert.equal(migrated.saveSchemaVersion, 3, "old saves should migrate to the current schema");
 });
 test("save migration should add a telemetry queue", () => {
   assert.deepEqual(migrated.pendingTelemetry, [], "save migration should add a telemetry queue");
@@ -943,7 +945,7 @@ test("a LOCK press charges what a GOOD one did, cools as its stance does and cos
 test("the streak pays the pot from the third card of a type, and the heat multiplier is the heat's alone", () => {
   let run = RUN_INITIAL_STATE;
   const paid = [];
-  for (let index = 0; index < 11; index += 1) {
+  for (let index = 0; index < 12; index += 1) {
     const { verdict, nextRun } = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk") });
     paid.push(verdict.logic.bonus);
     assert.equal(verdict.pot, Math.round(verdict.chips * verdict.multiplier * verdict.logic.bonus));
@@ -951,25 +953,26 @@ test("the streak pays the pot from the third card of a type, and the heat multip
     run = nextRun;
   }
   assert.deepEqual(paid.slice(0, 4), [1, 1, 1.06, 1.13], "two cards build, the third pays");
-  assert.equal(paid.at(-1), HAND_CAP, "and it stops at the hand's cap, a streak of 8");
-  assert.equal(run.runHand, run.runPot - 11 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
+  assert.equal(paid.at(-1), HAND_CAP, "and it stops at the hand's cap, a streak of 10");
+  assert.equal(run.runHand, run.runPot - 12 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
   const broke = resolveWindow({ run, window: cashedAt(20), card: typed("b", "inference") });
   assert.deepEqual([broke.verdict.logic.move, broke.verdict.logic.bonus, broke.nextRun.logic.streak], ["break", 1, 0]);
   const bust = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
-  assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runHand, bust.nextRun.logic.best], [0, 0, 9], "a bust takes the streak with the pot, and the record stays");
+  assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runHand, bust.nextRun.logic.best], [0, 0, 10], "a bust takes the streak with the pot, and the record stays");
   const closed = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk"), caseClosed: true });
   assert.equal(closed.nextRun.handVault, run.runHand + closed.verdict.logic.pot, "a closed case moves the hand's share into the vault with the pot");
   assert.deepEqual(normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(closed.nextRun)))), closed.nextRun, "the streak survives a save");
 });
 
-test("LOCK and the streak are paid under one cap", () => {
-  const run = normalizeRunState({ logic: { streak: 7, best: 7, type: "risk", held: 9 } });
+test("LOCK and the streak are paid under one cap, LOCK's share under its own", () => {
+  const run = normalizeRunState({ logic: { streak: 9, best: 9, type: "risk", held: 11 } });
   const locked = resolveWindow({ run, window: cashedAt(20, { focus: 100, focusMode: "strike", focusHits: 5 }), card: typed("a", "risk") }).verdict;
   assert.equal(locked.logic.bonus, HAND_CAP, "the streak alone is at the cap");
   assert.equal(locked.focus.potMultiplier, 1, "so a full LOCK adds nothing to this pot");
   assert.equal(locked.pot, Math.round(locked.chips * locked.multiplier * HAND_CAP));
   const bare = resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20, { focus: 100, focusMode: "strike", focusHits: 5 }), card: typed("a", "risk") }).verdict;
-  assert.equal(bare.pot, locked.pot, "and a full LOCK with no streak reaches the same cap");
+  assert.equal(bare.pot, Math.round(bare.chips * bare.multiplier * LOCK_CAP), "and a full LOCK with no streak stops at its own cap, under the streak's");
+  assert.ok(bare.pot < locked.pot);
 });
 
 test("the ledger reads the streak and still reads a log written before it paid; the ending's door is the streak's alone", () => {
@@ -1042,6 +1045,13 @@ test("the finale answers: burning every record closes the endings made of record
   assert.equal(withFinale("f_after_witness"), "open-oversight");
   assert.equal(withFinale("f_after_control"), "open-oversight");
   assert.equal(withFinale("f_after_burn"), "quiet-cover", "no record survives the burn to build oversight on");
+});
+
+test("HUMAN RECORD asks for the season's whole record, not only the wild card", () => {
+  const reframed = { ...seasonAtTheBar, seasonReframeRoutes: 44 };
+  const clues = (length) => Array.from({ length }, (_, index) => ({ id: `c${index}` }));
+  assert.equal(getEndingVariant({ ...reframed, discoveredClues: clues(55) }).id, "human-record", "a reframed season that opened every record");
+  assert.notEqual(getEndingVariant({ ...reframed, discoveredClues: clues(54) }).id, "human-record", "one record short, the reframe rate alone does not close it");
 });
 
 test("the season's standing is the mean of what its cases closed on", () => {
@@ -1226,6 +1236,33 @@ test("a closed case drafts three relics it cannot reroll, and equipping takes on
   assert.deepEqual([passed.relics, passed.relicOffer], [[], []]);
   const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(picked))));
   assert.deepEqual(roundTrip, picked, "relics survive a save");
+});
+
+test("a draft with the slots full takes a relic only by putting one down, in one answer", () => {
+  const carried = ["metronome", "coldBlood", "heatSink", "highRoller", "splint"];
+  assert.equal(carried.length, RELIC_SLOTS);
+  const settled = resolveWindow({
+    run: normalizeRunState({ relics: carried, schema: applyRelics(BASE_SCHEMA, carried) }),
+    window: { status: "cashed", gauge: 20, pushes: 2, seed: "case01:9" },
+    card: card("a", { capital: 9 }),
+    caseClosed: true,
+    offerRelics: true,
+    relicPool: [...carried, "lockpick", "encore", "insurance"],
+  }).nextRun;
+  const opened = openCaseRun(settled);
+  const [take] = opened.relicOffer;
+  assert.deepEqual(equipRelic(opened, take), opened, "full and nothing put down: the offer stays");
+  assert.deepEqual(equipRelic(opened, take, "lockpick"), opened, "only a carried relic can be put down");
+  const swapped = equipRelic(opened, take, "highRoller");
+  assert.deepEqual(swapped.relics, carried.map((id) => (id === "highRoller" ? take : id)), "the new relic takes the slot it freed");
+  assert.deepEqual(swapped.relicOffer, []);
+  assert.ok(!swapped.schema.relics.includes("highRoller"), "the board on the table is dealt without it");
+  assert.ok(swapped.schema.wallMin > opened.schema.wallMin, "HIGH ROLLER's closer wall goes with it");
+  assert.deepEqual(equipRelic(opened, null).relics, carried, "a pass keeps all five");
+  const old = normalizeRunState({ ...opened, relics: [...carried, "lockpick"] });
+  assert.equal(old.relics.length, RELIC_SLOTS + 1, "a season saved before the cap keeps what it carries");
+  assert.deepEqual(equipRelic(old, old.relicOffer[0]), old);
+  assert.equal(equipRelic(old, old.relicOffer[0], "splint").relics.length, RELIC_SLOTS + 1, "and swaps, never grows");
 });
 
 test("a window is re-dealt by a relic only while nobody has touched it", () => {

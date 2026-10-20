@@ -25,7 +25,8 @@ function writeRelicCodex(codex) {
 /**
  * The table's season-level systems, in one place: settling a closed window
  * against the run, recording the feats that unlock relics, and equipping the
- * relic a closed case drafted.
+ * relic a closed case drafted -- with the slots full, in the same call that
+ * puts one down (`equip(run, relicId, dropId)`, `RELIC_SLOTS`).
  *
  * The codex is the one piece of table state that outlives a season, so it has
  * its own storage key rather than a field in the save: resetting a run keeps

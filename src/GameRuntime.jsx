@@ -644,10 +644,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     window.location.reload();
   }
 
-  /** The relic a closed case drafted, or null to pass. The board on the table is re-dealt with it. */
-  function pickRelic(relicId = null) {
+  /** The relic a closed case drafted (and, slots full, the one put down), or null to pass. The board is re-dealt with it. */
+  function pickRelic(relicId = null, dropId = null) {
     if (staleSave) return;
-    const pickedRun = relicTable.equip(gauntletRun, relicId);
+    const pickedRun = relicTable.equip(gauntletRun, relicId, dropId);
     applyRun({ gauntletRun: pickedRun });
   }
 

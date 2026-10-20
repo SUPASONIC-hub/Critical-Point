@@ -11,7 +11,7 @@ import {
   GAUGE_MAX,
   REFRAME_CARD_ID,
   getHandBonus,
-  HAND_CAP,
+  LOCK_CAP,
   lockpickOpensSeal,
   readRoomCards,
   scoreFocus,
@@ -31,7 +31,7 @@ import { listOfferedTypes } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
-import { LogicLine, RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
+import { LogicLine, RelicChips, ScoutBand, TableGlossary, TableNotices } from "./TableNotices.jsx";
 import {
   playBustCue,
   playCashCue,
@@ -108,6 +108,8 @@ export function GauntletStage({
   // A closed case's draft takes the breach's place: REBOOT is what it replaces.
   const draftPending = relicOffer.length > 0 && Boolean(onPickRelic) && !abandoned;
   const [equipped, setEquipped] = useState(null);
+  // The offered relic waiting for a slot: with the slots full, taking one asks what to put down.
+  const [swapFor, setSwapFor] = useState(null);
   const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
@@ -158,7 +160,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band,
   } = readTableMeters({ win, schema, selectedCard });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -191,7 +193,7 @@ export function GauntletStage({
   const lockPot = handBonus / earnedBonus;
   // At the cap a press adds nothing more to this hand's multiplier; what a
   // charge still pays is the resources and, with a stance, the next board.
-  const lockCapped = handBonus >= HAND_CAP;
+  const lockCapped = handBonus >= LOCK_CAP;
   const livePot = Math.round(selectedChips * multiplier * handBonus);
   const nextPotLow = Math.round(selectedChips * nextMultiplierLow * handBonus);
   const nextPotHigh = Math.round(selectedChips * nextMultiplierHigh * handBonus);
@@ -202,6 +204,10 @@ export function GauntletStage({
   const lockOn = rules.has("lock");
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
+  const scoutOn = rules.has("scout");
+  const canScout = scoutOn && live && !paused && !locked && !win.scouted;
+  // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
+  const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const handBlocked = !live || isAdvancing || !tableOpen;
   // The folded briefing on the table draws its own copy of the plate; nothing
@@ -226,8 +232,10 @@ export function GauntletStage({
 
   // A stake or a push is written to the save before anything can be won or lost
   // in this window, with the card staked. Reading alone is not a touch, so a
-  // save and exit taken before the bet is placed resumes a fresh window.
-  const touched = win.pushes > 0 || Boolean(win.selectedId);
+  // save and exit taken before the bet is placed resumes a fresh window. A
+  // look is a touch: otherwise F5 hands back the clock SCOUT cost and the band
+  // stays in the player's head.
+  const touched = win.pushes > 0 || Boolean(win.selectedId) || win.scouted === true;
   const touchedCardId = selectedCard && !reframeSelected ? selectedCard.id : null;
   useEffect(() => {
     if (!touched || abandoned || win.status !== "live") return;
@@ -316,15 +324,23 @@ export function GauntletStage({
    * Takes a drafted relic, or passes with null. The window on the table has not
    * been touched -- the draft holds the clock -- so it is re-dealt at once under
    * the rules the relic bends, from the same pure function the runtime saves.
+   * With the slots full the engine takes nothing until a relic is put down
+   * (`dropId`), so the first answer only opens the swap step.
    */
-  function pickRelic(relicId) {
+  function pickRelic(relicId, dropId = null) {
     if (!draftOpen) return;
     if (relicId) {
-      dispatch({ type: "REDEAL", schema: getTableSchema(equipRelic(run, relicId)) });
+      const next = equipRelic(run, relicId, dropId);
+      if (next.relicOffer.length) {
+        setSwapFor(relicId);
+        return;
+      }
+      dispatch({ type: "REDEAL", schema: getTableSchema(next) });
       playRelicEquipCue();
-      setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1 }));
+      setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1, dropped: dropId }));
     }
-    onPickRelic(relicId);
+    setSwapFor(null);
+    onPickRelic(relicId, dropId);
   }
 
   function pulseRelic(id) {
@@ -387,6 +403,12 @@ export function GauntletStage({
     setFlash({ amount: 0.38 });
   }
 
+  function scout() {
+    if (!canScout || draftOpen) return;
+    playTargetLockCue();
+    dispatch({ type: "SCOUT" });
+  }
+
   function cash() {
     if (!canCash) return;
     dispatch({ type: "CASH", locked: sealedLock });
@@ -402,14 +424,15 @@ export function GauntletStage({
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
     select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null,
-    cycleFocusMode: stanceOn ? cycleFocusMode : null,
-    cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable,
+    cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
+    cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null),
+    briefingOpen, tableOpen, openTable,
   });
 
-  const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
-  const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
+  const bandLeft = (band.wallMin / GAUGE_MAX) * 100;
+  const bandWidth = ((band.wallMax - band.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
-  const heatTier = win.status === "bust" ? "bust" : win.gauge >= schema.wallMin ? "critical" : win.gauge >= schema.wallMin - schema.stepMax ? "hot" : "cold";
+  const heatTier = win.status === "bust" ? "bust" : win.gauge >= band.wallMin ? "critical" : win.gauge >= band.wallMin - schema.stepMax ? "hot" : "cold";
   // The tab says what the table shows (tabTitle.js): never the hidden wall. A
   // bust stays on it until the next table opens; the briefing leaves it be.
   const busted = win.status === "bust" && win.cause !== "abandon";
@@ -533,7 +556,7 @@ export function GauntletStage({
             aria-valuemin={0}
             aria-valuemax={GAUGE_MAX}
             aria-valuenow={Math.round(win.gauge)}
-            aria-valuetext={`열기 ${Math.round(win.gauge)}, 벽은 ${schema.wallMin}에서 ${schema.wallMax} 사이 어딘가`}
+            aria-valuetext={`열기 ${Math.round(win.gauge)}, ${band.scouted ? "조회한 " : ""}벽은 ${band.wallMin}에서 ${band.wallMax} 사이 어딘가`}
           >
             <span className="gx-gauge-band" style={{ left: `${bandLeft}%`, width: `${bandWidth}%` }} />
             {live && (
@@ -559,9 +582,7 @@ export function GauntletStage({
             <span aria-hidden="true">
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <span className="gx-band-label" aria-hidden="true">
-              벽 {schema.wallMin}–{schema.wallMax}
-            </span>
+            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}
@@ -641,7 +662,7 @@ export function GauntletStage({
             <span>현재 위험</span>
             <b>{dangerLine}</b>
             <small>
-              벽 {schema.wallMin}–{schema.wallMax} · 심박 <span className="gx-situation-bpm">{schema.sedated ? "교란" : bpm}</span>
+              벽 {band.wallMin}–{band.wallMax} · 심박 <span className="gx-situation-bpm">{schema.sedated ? "교란" : bpm}</span>
             </small>
           </article>
           <article className="gx-situation-card">
@@ -666,7 +687,7 @@ export function GauntletStage({
           {/* A key's piece ends on its separator, so the whole line is cut into the text it always was. A touch screen wide enough to show the line has no key to name, and gets none. */}
           <small>
             {letterKeys ? (
-              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> LOCK · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
+              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> LOCK · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}{scoutOn && <><kbd>R</kbd> 조회 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
             ) : drawn && (
               <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
             )}
@@ -729,8 +750,9 @@ export function GauntletStage({
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
           aria-label={`LOCK ${Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
-          aria-describedby="gx-focus-detail"
+          aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
+          {steadyCold && <span id="gx-steady-cold" className="sr-only">열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라</span>}
           <Crosshair size={18} aria-hidden="true" />
           {/* The space keeps LOCK and the charge two words to whoever reads the
               text; in the flex row a space between items is not drawn. */}
@@ -741,7 +763,7 @@ export function GauntletStage({
               112px in a button with 82px of room at 390px (74px at 360px). */}
           <small>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
-            지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${HAND_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 콤보와 합쳐 ${HAND_CAP}배까지만 오른다`}
+            지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${LOCK_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 LOCK으로 ${LOCK_CAP}배까지만 오른다`}
             {stanceOn && `. ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치른다`}
           </span>
         </button>
@@ -765,7 +787,7 @@ export function GauntletStage({
       </div>
 
       {draftOpen && (
-        <RelicDraft offer={relicOffer} owned={relics} onPick={pickRelic} onSkip={() => pickRelic(null)} />
+        <RelicDraft offer={relicOffer} owned={relics} swapFor={swapFor} onPick={pickRelic} onBack={() => setSwapFor(null)} onSkip={() => pickRelic(null)} />
       )}
 
       {briefingOpen && (
@@ -793,7 +815,7 @@ export function GauntletStage({
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

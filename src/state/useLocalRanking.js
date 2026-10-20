@@ -12,8 +12,10 @@ import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConf
 // shorter one. v8 is the same season scored by the logic streak: until
 // 2026-10-10 the hand's share of a pot came from timing a push to the
 // heartbeat, and a score from that table does not compare with one from this.
+// v9 is the same season at the table of 2026-10-20 (the day-ten table: fracture 8,
+// the x1.6 streak and x1.5 LOCK caps, five tool slots, SCOUT), whose score does not compare with one from the table before it.
 // Retired keys are never read and are removed on first load.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v8";
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v9";
 const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v1",
   "critical-point-local-ranking-v2",
@@ -22,6 +24,7 @@ const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v5",
   "critical-point-local-ranking-v6",
   "critical-point-local-ranking-v7",
+  "critical-point-local-ranking-v8",
 ];
 
 export function parseLocalRankingRows(rawValue) {

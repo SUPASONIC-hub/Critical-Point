@@ -74,7 +74,7 @@ const story = normalizeRunState({ story: true });
 
 test("the rules a story run plays without are the seven next-table rules, and no other", () => {
   assert.deepEqual(sorted(STORY_OFF_RULES), SEVEN);
-  assert.deepEqual(sorted(STORY_RULES), ["lock", "logic", "relics", "stance"]);
+  assert.deepEqual(sorted(STORY_RULES), ["lock", "logic", "relics", "scout", "stance"]);
   assert.deepEqual(sorted([...STORY_RULES, ...STORY_OFF_RULES]), sorted(TABLE_RULES), "what is kept and what is taken are the whole table");
   // Every mutation the seven own is one a story board must not carry; the stances' are kept.
   for (const [mutation, rule] of Object.entries(MUTATION_RULES)) {
@@ -86,9 +86,9 @@ test("a story run's rules are its case's own, less the seven: on every step, und
   const expected = {
     prologue01: [],
     prologue02: ["logic"],
-    prologue03: ["logic"],
-    prologue04: ["lock", "logic"],
-    prologue05: ["lock", "logic", "relics", "stance"],
+    prologue03: ["logic", "scout"],
+    prologue04: ["lock", "logic", "scout"],
+    prologue05: ["lock", "logic", "relics", "scout", "stance"],
   };
   for (const caseId of PROLOGUES) {
     const base = rulesFor(caseId, { staged: true });
@@ -140,10 +140,11 @@ test("a story run is introduced only to the rules it plays under", () => {
   assert.deepEqual(told("prologue01"), [one.intro[0]], "the table itself is explained as ever, without the skipped scene a story bust does not cost");
   assert.deepEqual(told("prologue02"), [two.intro[0]], "the logic streak, and not the wall's three rules");
   assert.match(told("prologue02")[0], /논리 콤보/);
-  assert.deepEqual(told("prologue03"), [], "COLD FEET and HEAT DEBT are both off, so there is nothing to say");
+  assert.deepEqual(told("prologue03"), [three.intro[2]], "SCOUT is the hand's own; COLD FEET and HEAT DEBT are both off");
+  assert.match(told("prologue03")[0], /조회/);
   assert.deepEqual(told("prologue04"), [four.intro[2]], "LOCK, and neither FRACTURE nor OVERCLOCK");
   assert.match(told("prologue04")[0], /LOCK을 누르면 .* 누를 때마다 시간이 줄어듭니다/);
-  assert.deepEqual(told("prologue05"), [five.intro[0], five.intro[2]], "the stances are kept, and not the line on what a charge pays on the next board");
+  assert.deepEqual(told("prologue05"), [five.intro[0], five.intro[1]], "the stances (with STEADY's cold board) and the relic slots are kept, and not the line on what a charge pays on the next board");
   // No line a story run is told is new: each is one the step already says.
   for (const step of UNLOCK_LADDER) {
     for (const line of step.storyIntro) assert.ok(step.intro.includes(line), `${step.caseId}: "${line}"`);
@@ -156,7 +157,7 @@ test("a story run is introduced only to the rules it plays under", () => {
     assert.equal(getUnlockKicker(step.caseId), step.kicker);
   }
   assert.deepEqual(introFor("case01", { staged: true, story: true }), []);
-  assert.deepEqual(three.storyIntro, []);
+  assert.deepEqual(three.storyIntro, [three.intro[2]]);
   // The briefing asks through the same door, on the scene the case opens on.
   for (const step of UNLOCK_LADDER) {
     const first = CASE_START_NODES[step.caseId];

@@ -6,6 +6,7 @@ import {
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
+  getWindowBand,
   HAND_CAP,
   openCaseRun,
   reduceWindow,
@@ -13,11 +14,11 @@ import {
   STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { DEFAULT_RELIC_POOL, RELIC_IDS, RELICS } from "../src/gauntlet/relics.js";
+import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { createCaseBot, handUnit, newSeen } from "./sim/season-bot.mjs";
+import { createCaseBot, handUnit, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -186,6 +187,14 @@ const heartbeat = [80, 90, 100, 110, 120, 130, 140, 150, 160].map((threshold) =>
 const oracle = measure("sees the wall", (win) => win.gauge + win.schema.stepMax < win.wall);
 // Blows up every window it can to reach the end of the case sooner, and plays the
 // last window (which a skip can never jump over) the way the best blind policy does.
+// SCOUT (B1): the one look a window, bought with table clock, then pushes
+// while the next step stays this far past the near end of the band it drew.
+// It is information, so it must sit between the heartbeat and the wall seen.
+const scoutRows = [0, 3, 6, 9].map((margin) =>
+  measure(`scout, margin ${margin}`, Object.assign((win) => win.gauge + win.schema.stepMax - margin < getWindowBand(win).wallMin, { scout: true })),
+);
+/** The most a scouting hand may bank, as a share of a hand that sees the wall. */
+const SCOUT_SEES_CAP = 0.8;
 const skipper = measure("bust to skip", (win) =>
   win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true,
 );
@@ -256,7 +265,7 @@ const lockReport = FOCUS_MODES.map((mode) => ({
 }));
 const swapped = locking("steady lock, cashed as strike", listening, { mode: "steady", cashAs: "strike" });
 
-const rows = [...fixed, ...heartbeat, oracle, skipper, ...lockReport.flatMap((row) => [row.blind, row.listen, row.sees]), swapped];
+const rows = [...fixed, ...heartbeat, ...scoutRows, oracle, skipper, ...lockReport.flatMap((row) => [row.blind, row.listen, row.sees]), swapped];
 for (const row of rows) {
   console.log(
     `${row.label.padEnd(16)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${row.meanWindows}`,
@@ -283,6 +292,15 @@ assert.ok(
   bestHeartbeat.meanVault < oracle.meanVault * 0.6,
   `the heartbeat must not be an answer key: best ${bestHeartbeat.meanVault} against a wall-seeing ${oracle.meanVault}`,
 );
+const bestScout = bestOfRows(scoutRows);
+console.log(
+  `scout            blind ${bestFixed.meanVault} < heartbeat ${bestHeartbeat.meanVault} < scout ${bestScout.meanVault} (${bestScout.label}, bust ${(bestScout.bustRate * 100).toFixed(1)}%) < sees ${oracle.meanVault}  (scout/sees ${(bestScout.meanVault / oracle.meanVault).toFixed(3)}, heartbeat/sees ${(bestHeartbeat.meanVault / oracle.meanVault).toFixed(3)})`,
+);
+assert.ok(bestScout.meanVault > bestHeartbeat.meanVault, `a look at the wall should be worth more than the heartbeat: ${bestScout.meanVault} against ${bestHeartbeat.meanVault}`);
+assert.ok(
+  bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,
+  `SCOUT must not be an answer key: ${bestScout.meanVault} against a wall-seeing ${oracle.meanVault}`,
+);
 assert.ok(skipper.meanWindows < WINDOWS_PER_CASE, "busting on purpose does shorten a case");
 assert.ok(
   skipper.meanVault < bestFixed.meanVault * 0.25,
@@ -298,7 +316,10 @@ for (const row of logicRows) {
     `${row.label}: the streak must pay less than listening does: the type is the spice, reading the table is the game`,
   );
 }
-assert.ok(holder.meanBonus >= 1.28 && holder.meanBonus <= 1.4, `a hand that holds a type should be paid about what the beat paid a good hand (1.28 to 1.40): ${holder.meanBonus}`);
+// The band's top was 1.40 while the streak's cap was x1.5 (the hand measured
+// 1.376); the cap rose to x1.6 on 2026-10-16 so that it is worth more than one
+// push, and the same hand measured 1.429.
+assert.ok(holder.meanBonus >= 1.28 && holder.meanBonus <= 1.45, `a hand that holds a type should be paid about what the beat paid a good hand, and a little more since the cap rose past one push (1.28 to 1.45): ${holder.meanBonus}`);
 assert.ok(randomType.meanBonus <= 1.1, `a hand that picks a type at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
 assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a type should pay");
 /**
@@ -753,10 +774,13 @@ for (const row of [bestFixed, fixed.find((entry) => entry.label === "heat 60"), 
  * relic rows above play each tool alone and all twelve at once; a cap asks
  * about the sets between. The same hand on the same cases holds the five
  * tools that need no unlock (a first season), the seven a feat unlocks, and
- * the builds a cap of 3, 5 or 8 slots would leave a player who keeps the
+ * the builds a cap of 3 or 5 slots would leave a player who keeps the
  * tools that lift best play most when held alone (the rows above, so the
  * order is read, not written here). "Of the whole lift" is the share of what
- * all twelve add to listening play that the set keeps.
+ * all twelve add to listening play that the set keeps. Since day 11 the table
+ * holds `RELIC_SLOTS` (5) and a full hand swaps; "the swap keeps" is the five
+ * the season bot's swap ends with once everything is unlocked
+ * (`RELIC_DROP_ORDER`, written there and not read from here).
  */
 const liftOf = (row) => row.listen.meanVault / relicBaseline.listen.meanVault;
 const everyTool = relicReport[relicReport.length - 1];
@@ -765,7 +789,8 @@ console.log(`measured tools one at a time, by what it adds to listening play: ${
 const toolSets = [
   ["the 5 from the start", DEFAULT_RELIC_POOL],
   [`the ${RELIC_IDS.length - DEFAULT_RELIC_POOL.length} a feat unlocks`, RELIC_IDS.filter((id) => RELICS[id].unlock)],
-  ...[3, 5, 8].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
+  ...[3, 5].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
+  ["the swap keeps", RELIC_DROP_ORDER.slice(-RELIC_SLOTS)],
   ...[3, 5].map((slots) => [`worst ${slots} alone`, ranked.slice(-slots).map((row) => row.name)]),
 ];
 for (const [name, relics] of toolSets) {

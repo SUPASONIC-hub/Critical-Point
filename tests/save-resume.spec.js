@@ -169,6 +169,10 @@ test("a reload keeps a live table on the same wall", async ({ page }) => {
   expect(settled.pushes).toBe(pushes);
 });
 
+// The story wall on the band label, which is SCOUT's button from 프롤로그 03 on:
+// its text goes on " · 조회" (or " · 조회함").
+const STORY_BAND = /^벽 88–98(?: · |$)/;
+
 // 스토리 모드 is read when a case opens and written on the run, so what is on
 // the table does not change with the switch. A story case put down mid-table,
 // the switch turned off on the intro, the page loaded again: the table comes
@@ -187,7 +191,7 @@ test("a story case put down mid-table is still a story case after the setting is
   await startDebugNode(page, "case01", "c1_aftershock", { navigate: false, resetStorage: false });
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
   const band = page.locator(".gx-band-label");
-  await expect(band).toHaveText("벽 88–98");
+  await expect(band).toHaveText(STORY_BAND);
   await stakeAndPush(page);
   await page.getByRole("button", { name: "저장 후 나가기" }).click();
   const before = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
@@ -212,7 +216,7 @@ test("a story case put down mid-table is still a story case after the setting is
   const stage = page.getByTestId("gauntlet-stage");
   await expect(stage).toHaveAttribute("data-status", "live");
   await expect(page.locator(".gx-card.selected")).toHaveCount(1);
-  await expect(band).toHaveText("벽 88–98");
+  await expect(band).toHaveText(STORY_BAND);
   const resumed = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(resumed.dynamics.story).toBe(true);
   expect(resumed.dynamics.windowIndex).toBe(before.dynamics.windowIndex);

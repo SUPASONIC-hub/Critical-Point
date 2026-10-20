@@ -3,6 +3,7 @@ import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { CASE_RESULT_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
+import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels } from "../src/playerLanguage.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
@@ -567,7 +568,8 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   const stage = page.getByTestId("gauntlet-stage");
   await expect(stage).toHaveAttribute("data-status", "live");
   await expect(stage).not.toHaveClass(/is-face-down/);
-  await expect(page.locator(".gx-band-label")).toHaveText("벽 88–98");
+  // The band label is SCOUT's button here, its text followed by " · 조회".
+  await expect(page.locator(".gx-band-label")).toHaveText(/^벽 88–98(?: · |$)/);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(skipped);
 });
 
@@ -783,7 +785,7 @@ function expectRowsDrawnByKind(rows) {
 
 /**
  * Two scenes of a case in a row that each deal a plain card costing less than
- * FRACTURE asks for (10 of one resource): cashed, neither breaks the next
+ * FRACTURE asks for (FRACTURE_MIN_BURN of one resource): cashed, neither breaks the next
  * board, so two hot cashes on them leave OVERCLOCK alone in the list.
  */
 function findCoolWalk(caseId = "case01") {
@@ -797,7 +799,7 @@ function findCoolWalk(caseId = "case01") {
         nodes[choice.next] &&
         // Neither card closes the case: a closed case deals REBOOT and nothing else.
         !results.has(choice.next) &&
-        Object.entries(choice.effect ?? {}).every(([key, value]) => value === 0 || isResourceGain(key, value) || Math.abs(value) < 10),
+        Object.entries(choice.effect ?? {}).every(([key, value]) => value === 0 || isResourceGain(key, value) || Math.abs(value) < FRACTURE_MIN_BURN),
     );
   for (const firstId of nodeOrders[caseId]) {
     const first = cool(nodes[firstId]);

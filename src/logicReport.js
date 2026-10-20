@@ -1,4 +1,5 @@
 import { getSeasonLogic } from "./gameLogic.js";
+import { RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { directionParticle, easyCognitionLabels } from "./playerLanguage.js";
 
 /**
@@ -83,6 +84,11 @@ export function readStanding(data, value) {
 }
 
 /**
+ * Whether the season has a case closed at an older table: before the table
+ * paid the logic streak, or before the table of 2026-10-20 (the day-ten table),
+ * whose mark is `RULES_MARK_KEY` in the same run summary (20261020010000).
+ * The name stays `hasBeatTableCase` so its callers and `beatSeason` keep theirs.
+ *
  * Whether the season has a case closed before the table paid the logic streak.
  * The mark is the server's own (20261011010000): a numeric `logicStreak` in
  * the run summary a closed case keeps as `gauntlet`, which is what its row was
@@ -95,7 +101,11 @@ export function readStanding(data, value) {
  * close's row, so that season is told only when the server refuses it.
  */
 export function hasBeatTableCase(caseResults = {}) {
-  return Object.values(caseResults ?? {}).some((result) => typeof result?.gauntlet?.logicStreak !== "number");
+  return Object.values(caseResults ?? {}).some((result) => {
+    const summary = result?.gauntlet;
+    const mark = summary?.[RULES_MARK_KEY];
+    return typeof summary?.logicStreak !== "number" || !(typeof mark === "number" && mark >= RULES_MARK);
+  });
 }
 
 /**

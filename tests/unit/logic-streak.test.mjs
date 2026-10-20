@@ -23,7 +23,7 @@ const { nodes } = await import("../../src/gameData.js");
 const { createCaseSummary, createLogicRecord, getRiskPressure, getSeasonLogic, REFRAME_COGNITION } = await import("../../src/gameLogic.js");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  BASE_SCHEMA, carryTableRecordIntoRestore, createRunSummary, createTableRecord, createWindow, getFocusBonus, getHandBonus, HAND_CAP, normalizeRunState,
+  BASE_SCHEMA, carryTableRecordIntoRestore, createRunSummary, createTableRecord, createWindow, getFocusBonus, getHandBonus, HAND_CAP, LOCK_CAP, normalizeRunState,
   createOpenSeed, openCaseRun, reduceWindow, resolveWindow, RUN_INITIAL_STATE, scoreFocus, serializeRunState, splitOpenSeed, STANCE_CHARGE, suspendWindow, upgradeRunRecord, VERDICT_CAUSES,
 } = engine;
 const { advanceLogic, getHeatTier, getLogicBonus, getLogicType, listOfferedTypes, LOGIC_INITIAL, normalizeLogic } = await import("../../src/gauntlet/logicStreak.js");
@@ -72,7 +72,7 @@ test("the build ships the streak, and it is what the hand is paid on", () => {
   assert.deepEqual(RUN_INITIAL_STATE.logic, { streak: 0, best: 0, type: null, held: 0, heat: 0, rose: false, reach: 0 });
   assert.equal(RUN_INITIAL_STATE.logic, LOGIC_INITIAL);
   assert.ok(Object.isFrozen(LOGIC_INITIAL));
-  assert.deepEqual([LOGIC_RATE, LOGIC_CAP, LOGIC_HOLD, LOCK_PRESS_SECONDS, METRONOME_REACH], [0.0625, 0.5, 3, 1.5, 2]);
+  assert.deepEqual([LOGIC_RATE, LOGIC_CAP, LOGIC_HOLD, LOCK_PRESS_SECONDS, METRONOME_REACH], [0.0625, 0.6, 3, 1.5, 2]);
   const tableRules = readFileSync(new URL("../../src/gauntlet/tableRules.js", import.meta.url), "utf8");
   assert.equal(/export const LOGIC\b/.test(tableRules), false, "the switch went with the beat it switched to");
   for (const gone of ["judgeBeat", "scoreBeat", "getGoodWindowMs", "getGrooveBonus", "SLIP_SECONDS", "FEVER_BONUS", "COMBO_POINT_CAP", "GROOVE_CAP"]) {
@@ -388,7 +388,9 @@ for (const name of readdirSync(SAVES).filter((file) => file.endsWith(".json")).s
         if (old in fixture.save.dynamics) assert.equal(state.dynamics[name], fixture.save.dynamics[old], name);
       }
       for (const gone of ["beatCombo", "bestCombo", "runGroove", "grooveVault", "focusPerfects", "focusMisses"]) assert.equal(gone in state.dynamics, false, gone);
-      if (fixture.save.dynamics.suspended) assert.deepEqual(state.dynamics.suspended, upgradeRunRecord(fixture.save.dynamics).suspended);
+      // The 2 -> 3 step writes out that no SCOUT was spent on a window put down before it (appConfig's `migrateSavedState`).
+      const suspended = upgradeRunRecord(fixture.save.dynamics).suspended;
+      if (suspended) assert.deepEqual(state.dynamics.suspended, suspended.window ? { ...suspended, window: { ...suspended.window, scouted: false } } : suspended);
     }
     // Loaded, saved and loaded again, it is the same save and still not a repair.
     const again = load(JSON.parse(JSON.stringify({ ...state, lastError: undefined, paused: false })));
@@ -416,7 +418,9 @@ test("the mark of a case closed at the logic table is the streak in its run summ
   // A case of the builds between, composed from that one: the same summary as the beat table wrote it, without the two keys.
   const { logicStreak: _streak, bestLogic: _best, ...beatSummary } = paid.caseResults.prologue02.gauntlet;
   const between = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: beatSummary } } };
-  for (const [save, expected] of [[board, true], [paid, false], [between, true]]) {
+  // The first build that paid the streak is itself an older table since 2026-10-20 (the day-ten table): it has no `tableRules`.
+  const marked = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 2 } } } };
+  for (const [save, expected] of [[board, true], [paid, true], [between, true], [marked, false]]) {
     assert.equal(hasBeatTableCase(save.caseResults), expected);
     const { state, valid } = load(save);
     assert.equal(valid, true);
@@ -455,7 +459,7 @@ test("a save with a window put down before 2026-10-10 resumes with no repair, ho
   assert.deepEqual([valid, repaired], [true, false], "no 복구됨 notice");
   assert.equal(state.lastError, undefined);
   const { beatCombo: _combo, maxCombo: _longest, beatHits: _hits, perfects: _perfects, slips: _slips, focusPerfects: _locked, focusMisses: _jammed, ...held } = window;
-  assert.deepEqual(state.dynamics.suspended.window, held, "the window is written back with its progress and its groove, without the counts nothing reads");
+  assert.deepEqual(state.dynamics.suspended.window, { ...held, scouted: false }, "the window is written back with its progress and its groove, without the counts nothing reads");
   assert.deepEqual([state.dynamics.runHand, state.dynamics.handVault], [0, 260], "the hand's share is carried under its new names");
   for (const key of ["beatCombo", "bestCombo", "runGroove", "grooveVault", "focusPerfects", "focusMisses"]) assert.equal(key in state.dynamics, false, key);
   assert.equal(load(JSON.parse(JSON.stringify(state))).repaired, false, "and the save it is written back as loads clean");
@@ -694,7 +698,7 @@ test("the run summary a telemetry row carries has the streak and the hand's shar
   assert.deepEqual([summary.logicStreak, summary.bestLogic], [5, 12]);
   assert.equal(summary.handVault, 120);
   // The server asks for none of the keys left out: it types `beatCombo`, `bestCombo` and `grooveVault` only when a row has them.
-  assert.deepEqual(Object.keys(summary), ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastOutcome", "lastGauge", "logicStreak", "bestLogic", "bestFocusCombo", "focusHits", "stanceMastery", "handVault", "relics", "mutations"]);
+  assert.deepEqual(Object.keys(summary), ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastOutcome", "lastGauge", "logicStreak", "bestLogic", "bestFocusCombo", "focusHits", "stanceMastery", "handVault", "relics", "mutations", "tableRules"]);
   assert.deepEqual([createRunSummary({}).logicStreak, createRunSummary({}).bestLogic], [0, 0]);
 });
 
@@ -809,14 +813,15 @@ test("the finale's summary carries the season's numbers, and a season without re
 
 /* --------------------------------------------------------- what it pays */
 
-test("the streak pays 1 + min(0.5, streak x 0.0625) and the hand is capped as it was", () => {
-  assert.deepEqual([0, 1, 4, 8, 9, 40].map(getLogicBonus), [1, 1.0625, 1.25, 1.5, 1.5, 1.5]);
+test("the streak pays 1 + min(0.6, streak x 0.0625), and LOCK lifts the hand only to its own cap", () => {
+  assert.deepEqual([0, 1, 4, 8, 9, 10, 40].map(getLogicBonus), [1, 1.0625, 1.25, 1.5, 1.5625, 1.6, 1.6]);
   assert.deepEqual([-2, null, undefined, "x"].map(getLogicBonus), [1, 1, 1, 1]);
-  assert.equal(HAND_CAP, 1.5);
+  assert.deepEqual([HAND_CAP, LOCK_CAP], [1.6, 1.5]);
   for (let streak = 0; streak <= 12; streak += 1) {
     for (const mode of ["strike", "steady", "expose"]) {
       for (const focus of [0, 35, 70, 100]) {
-        const expected = Math.round(Math.min(HAND_CAP, getLogicBonus(streak) * getFocusBonus(focus, mode).pot) * 100) / 100;
+        const logic = getLogicBonus(streak);
+        const expected = Math.round(Math.min(HAND_CAP, Math.max(logic, Math.min(LOCK_CAP, logic * getFocusBonus(focus, mode).pot))) * 100) / 100;
         assert.equal(getHandBonus(0, focus, mode, streak), expected, `streak ${streak}, ${mode} at ${focus}`);
         assert.ok(getHandBonus(0, focus, mode, streak) <= HAND_CAP);
       }
@@ -843,7 +848,7 @@ test("the pot is paid on the streak the card made", () => {
   // A card that ends the streak is paid as a bare one, and a bust pays nothing.
   assert.equal(resolveWindow({ run, window, card: card("inference"), offered: ["risk", "inference"] }).verdict.pot, base);
   assert.equal(resolveWindow({ run, window: closed(44, "bust"), card: card("risk") }).verdict.pot, 0);
-  // At a streak of 8 and past it the pot is at the cap, with or without a full LOCK.
+  // At a streak of 10 and past it the pot is at the cap, with or without a full LOCK.
   const capped = normalizeRunState({ ...run, logic: { ...run.logic, streak: 30, best: 30 } });
   assert.equal(resolveWindow({ run: capped, window, card: card("risk") }).verdict.pot, Math.round(base * HAND_CAP));
   const locked = resolveWindow({ run: capped, window: { ...window, focus: 100, focusHits: 5 }, card: card("risk") });
