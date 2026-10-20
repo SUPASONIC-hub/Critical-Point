@@ -71,6 +71,7 @@ const TAB_TITLES = {
 export function GauntletStage({
   seed,
   run,
+  links = null,
   cards,
   reframeChoice,
   resources,
@@ -492,6 +493,7 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>연속</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>연결</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
@@ -691,6 +693,7 @@ export function GauntletStage({
           visibleEffects={visibleEffects}
           hiddenEffectCount={hiddenEffectCount}
           fractureAxis={fractureAxis}
+          linkBurn={schema.mutations.includes("blackout") ? null : links?.burn}
           moveOf={logic?.moveOf}
           onSelect={select}
         />
@@ -798,7 +801,7 @@ export function GauntletStage({
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

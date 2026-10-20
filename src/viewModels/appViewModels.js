@@ -113,9 +113,10 @@ export const viewGroups = {
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId", "sceneChallenge"],
     gauntlet: [
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
-      "decisionRevealOpen", "staleSave",
+      "decisionRevealOpen", "staleSave", "linkReading",
     ],
-    status: ["resources", "resourceMeta", "progress", "routeIndex", "routeLength"],
+    // The debug overlay's path, one string since 2026-10-20 (it was two numbers), so B2's links fit the budget (as B3, #201).
+    status: ["resources", "resourceMeta", "progress", "routePath"],
     debug: ["debugToolsEnabled", "fallbackCaseId", "silentFailureCount"],
   },
 };

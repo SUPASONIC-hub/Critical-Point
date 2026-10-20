@@ -23,6 +23,7 @@ import {
 import { getBranchDetourBypass, nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
+import { isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
@@ -281,6 +282,8 @@ export function useChoiceCommit(context) {
       caseClosed,
       offerRelics: currentCase !== "final",
       ...getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed }),
+      // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
+      cascade: isLinkDue(gauntletRun, log, runId),
     });
     const busted = verdict.outcome === "bust";
 

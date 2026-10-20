@@ -18,6 +18,8 @@ import { getClockCall } from "./tableReadout.js";
  * - when a cash has banked the hand into the case pot, or a closed case has
  *   moved that pot to the vault: what is at stake now and what is safe, once,
  *   as the next window's table opens (the slam said the cash's own +N);
+ * - on a table that counts B2's links, the line its reading carries for the
+ *   board that opens (`said`, cascadeRisk.js: a new link, or one due next);
  * - the clock at ten and at five seconds, and a table the reading clock opened;
  * - that a first press armed 확정 and a second one seals it (useHoldConfirm);
  * - what a look (SCOUT) bought: the narrower band, once, as the button is spent.
@@ -43,7 +45,7 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * before the push's and the stance's: a listener out of time has the least of
  * it to lose.
  */
-const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, stance: 3, scout: 4, push: 5 });
+const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, links: 3, stance: 4, scout: 5, push: 6 });
 
 /** What the voice says when a first press has armed 확정 (hold-to-seal). */
 export const HOLD_ARMED_CALL = "한 번 더 누르면 확정된다";
@@ -126,7 +128,7 @@ export function findBank(before, after) {
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
-export function useTableVoice({ speaking, run, ...table }) {
+export function useTableVoice({ speaking, run, links, ...table }) {
   const facts = readTableFacts(table);
   const [said, setSaid] = useState("");
   const factsRef = useRef(null);
@@ -134,15 +136,18 @@ export function useTableVoice({ speaking, run, ...table }) {
   const lastAtRef = useRef(0);
   const timerRef = useRef(null);
   const bankRef = useRef(null);
+  const linksRef = useRef(null);
+  const linkLine = links?.said;
 
-  // Once a window: the bank since the last table, kept until it can be said.
+  // Once a window: the bank (and the links' line) since the last table, kept until it can be said.
   // `??=` because a development mount runs this twice, and the second run
   // finds the pot already heard.
   useEffect(() => {
     const dealt = { windowIndex: run.windowIndex, runPot: run.runPot, vault: run.vault };
     bankRef.current ??= findBank(heard, dealt);
+    linksRef.current ??= linkLine && heard?.windowIndex + 1 === dealt.windowIndex ? linkLine : null;
     heard = dealt;
-  }, [run.windowIndex, run.runPot, run.vault]);
+  }, [run.windowIndex, run.runPot, run.vault, linkLine]);
 
   useEffect(() => {
     const before = factsRef.current;
@@ -159,6 +164,10 @@ export function useTableVoice({ speaking, run, ...table }) {
     if (bankRef.current) {
       calls.push({ kind: "bank", text: bankRef.current.text });
       bankRef.current = null;
+    }
+    if (linksRef.current) {
+      calls.push({ kind: "links", text: linksRef.current });
+      linksRef.current = null;
     }
     if (!calls.length) return;
     queueRef.current = queueCalls(queueRef.current, calls);

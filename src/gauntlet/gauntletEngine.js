@@ -37,6 +37,7 @@ import {
   STRIKE_WAKE_CHIPS,
 } from "./tableRules.js";
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
+import { CASCADE_MUTATION, LINK_WALL } from "./cascadeRisk.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -944,7 +945,7 @@ export function serializeRunState(value) {
  * red PROTOCOL BREACH panel, its alarm and its glitch said "your last decision
  * broke this board" for all fourteen, so a player who had charged a stance,
  * chained two hot cashes or closed a case was told off for it at the next
- * table. The six marked here keep that treatment (`isPenaltyMutation`); the
+ * table. The six marked here, and CASCADE (B2), keep that treatment (`isPenaltyMutation`); the
  * rest are told as rules the board carries.
  */
 export const MUTATIONS = Object.freeze({
@@ -1019,6 +1020,8 @@ export const MUTATIONS = Object.freeze({
     title: "시즌이 버티는 법을 익혔다",
     text: "STEADY LOCK을 거듭 충전한 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
   },
+  // B2, on a table that counts links only (cascadeRisk.js).
+  cascade: CASCADE_MUTATION,
   exposeMastery: {
     label: "EXPOSE MASTERY",
     title: "시즌이 판을 읽는 법을 익혔다",
@@ -1340,7 +1343,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * whatever the rules say -- they are held, not dealt -- and so is the season's
  * lean. With every rule, which is the default, this is the board it always was.
  */
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES }) {
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false }) {
   if (caseClosed) return applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
@@ -1377,6 +1380,13 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
       schema.chipsScale *= COLD_FEET_CHIPS;
       schema.mutations.push("coldFeet");
     }
+  }
+  // CASCADE (B2): a link made boards ago comes back on this one; never with
+  // BLACKOUT, whose wall already moved (the caller's link waits a board).
+  if (cascade && !schema.mutations.includes("blackout")) {
+    schema.wallMin -= LINK_WALL;
+    schema.wallMax -= LINK_WALL;
+    schema.mutations.push("cascade");
   }
   if (burnAxis && rules.has("fracture")) {
     schema.fracturedAxis = burnAxis;
@@ -1429,8 +1439,12 @@ function readWindowUnder(window, rules) {
  * The logic streak is settled here on every window (`advanceLogic`): `forced`
  * says the room played the card, `offered` is the types the scene had on the
  * table. The pot is paid on the streak as this window's card left it.
+ *
+ * `cascade` says a link is due on the board this window deals (cascadeRisk.js,
+ * `isLinkDue` over the case's log, false on a table without links). It is
+ * dealt unless the case closes here or the board is a BLACKOUT one.
  */
-export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, cascade = false }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -1510,6 +1524,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     stanceMastery: practice?.stanceMastery ?? stanceMastery,
     windowIndex: getEscalationWindow(current) + (current.practice ? 0 : 1),
     rules: caseClosed ? nextRules : rules,
+    cascade,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [

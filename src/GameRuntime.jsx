@@ -262,6 +262,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     endingQuietLine,
     gameplayStats,
     gauntletSeed,
+    linkReading,
     narrativeSpine,
     observationLedger,
     observerPattern,
@@ -281,6 +282,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     node,
     currentCase,
     clueCount,
+    gauntletRun,
+    runId,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
   });
@@ -924,8 +927,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge,
     gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
-    fixedChoices, clueCount, casesOpened, reframeChoice,
-    resources, resourceMeta, progress, routeIndex, routeLength,
+    fixedChoices, clueCount, casesOpened, reframeChoice, linkReading,
+    resources, resourceMeta, progress, routePath: `${Math.max(0, routeIndex) + 1}/${routeLength}`,
     debugToolsEnabled, fallbackCaseId, silentFailureCount,
   });
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
