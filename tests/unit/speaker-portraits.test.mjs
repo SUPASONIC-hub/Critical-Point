@@ -11,7 +11,7 @@ import { getSpeakerPortrait } from "../../src/speakerPortraits.js";
  */
 
 test("a painted speaker's portrait is a file under public/", () => {
-  for (const name of ["한서윤", "반재욱", "도윤하", "오진우", "에코", "이민서", "한지우"]) {
+  for (const name of ["한서윤", "반재욱", "도윤하", "오진우", "에코", "이민서", "한지우", "권도현", "백아린", "윤상혁", "문하준", "나은호"]) {
     const src = getSpeakerPortrait(name);
     assert.match(src, /^\/portrait-[a-z0-9-]+\.webp$/, name);
     assert.ok(existsSync(`public${src}`), `${name}: public${src} ships`);
@@ -19,7 +19,7 @@ test("a painted speaker's portrait is a file under public/", () => {
 });
 
 test("a speaker not painted yet, or no speaker at all, has no portrait", () => {
-  assert.equal(getSpeakerPortrait("권도현"), null, "a line still commented out is not switched on");
+  assert.equal(getSpeakerPortrait("탁예린"), null, "a speaker of a few lines keeps the silhouette");
   assert.equal(getSpeakerPortrait("장부에 없는 사람"), null);
   assert.equal(getSpeakerPortrait(undefined), null);
 });
