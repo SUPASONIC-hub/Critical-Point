@@ -1,8 +1,5 @@
--- DRAFT (2026-10-14, branch ranking-marks), not to merge yet. Named as a
--- migration (20261015010000) so `npm run check:grants` replays it with the
--- rest; the Supabase CLI would apply it on merge as well, so before it merges
--- it takes a timestamp after every migration on main at the time (and after
--- 20261014000000 if telemetry-validator-parts lands first).
+-- Drafted 2026-10-14 on branch ranking-marks as 20261015010000 and re-dated
+-- 2026-10-20 to follow every migration on main (last 20261014000000).
 --
 -- Server checks, phase 1: mark, don't refuse.
 --
@@ -107,7 +104,7 @@
 alter table public.playtest_sessions add column if not exists suspicion text[];
 
 comment on column public.playtest_sessions.suspicion is
-  'Ranking rows only: the checks the row failed (20261015010000). NULL = not checked, {} = passed. Never refused for; not readable by anon.';
+  'Ranking rows only: the checks the row failed (20261020000000). NULL = not checked, {} = passed. Never refused for; not readable by anon.';
 
 -- The letter and the tier a score earns, as getGameplayStats writes them.
 -- check-grants holds both to the client's source.
