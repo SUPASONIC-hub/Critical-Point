@@ -175,7 +175,7 @@ export function DecisionReveal({ view }) {
             )}
             <p className="gx-reveal-bank">
               {decisionReveal.caseClosed && verdict.audit?.caught ? (
-                // AUDIT (B3): the line says what the audit took of the case's share. 초안.
+                // AUDIT (B3): the line says what the audit took of the case's share, in the system's words (no 반재욱 line: user, 2026-10-20).
                 <>
                   <Vault size={14} aria-hidden="true" /> 감사 적발: 금고로 갈 <b>{formatNumber(verdict.secured + verdict.audit.lost)}</b> 중{" "}
                   <b>{formatNumber(verdict.audit.lost)}</b> 환수 · 금고 <b>{formatNumber(decisionReveal.vault)}</b>
