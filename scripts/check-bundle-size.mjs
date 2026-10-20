@@ -42,7 +42,13 @@ const budgets = [
   // 60,400 -> 61,300 gzip on 2026-10-07, measured 60,666: the shell's start
   // save tied to the run's fields, the roadmap card that resumes or asks, the
   // board and ranking states, and the worker's second warm-up.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_800, maxGzip: 61_300 },
+  // 169,800 -> 169,999 bytes on 2026-10-20, measured 169,999 in the e2e build
+  // CI checks (169,863 in a release): 이번 주의 규칙's calendar, clock and
+  // device key, the start screen's and the ranking's fetch of its views, and
+  // the ranking's board switch, after the words went to chunks of their own
+  // and the clock stopped writing a third copy of import.meta.env (158). Main
+  // measured 167,694 that day. Raw sizes carry no hash noise.
+  { pattern: /^index-.*\.js$/, maxBytes: 169_999, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -53,12 +59,13 @@ const budgets = [
   // for what only a tooltip said, and frame-loop variables that no longer
   // restyle the whole table. Measured 103,738 / 34,105. It is not on the first
   // paint: the chunk loads after the player has started a run.
-  // 34,300 -> 34,332 gzip on 2026-10-20, measured 34,328 plus the 4 bytes of
-  // hash noise: 이번 주의 규칙's briefing panel. It took the chunk to 34,395;
-  // the panel and the catalogue lookup went to a chunk of their own
-  // (WeekRulePanel, below), which left the two imports and the line that asks
-  // whether the page opens a case, 28 bytes over.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_332 },
+  // 34,300 -> 34,368 gzip on 2026-10-20, measured 34,364 plus the 4 bytes of
+  // hash noise (34,363-34,367 over eight builds): 이번 주의 규칙's briefing
+  // panel. The panel and the catalogue lookup went to a chunk of their own
+  // (WeekRulePanel, below); what stays is the two imports, the weeklyRules
+  // import the bundler hoists, and the line that asks whether the page opens
+  // a case. Main measured 34,272 that day, after #198 and #205.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_368 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -77,7 +84,12 @@ const budgets = [
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
   // declarations that never won a cascade were cut and extensions.css retired.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_300 },
+  // 35,300 -> 35,363 gzip on 2026-10-20, measured 35,363 (the same in every
+  // build): 이번 주의 규칙's notice, which shares the previous participant's
+  // card rule, and the ranking's two board tabs. Main measured 35,264 that
+  // day; grouping the pressed tab with a rule of the same declarations made
+  // it 5 bytes larger, not smaller.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -132,7 +144,8 @@ const budgets = [
   // noise the tableAudio line allows: the chunk's own code did not change, it
   // gained one more `import "./weeklyRules-<hash>.js"` (이번 주의 규칙 has a
   // chunk of its own, below). The raw budget does not move.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_209 },
+  // 4,209 -> 4,210 on 2026-10-20: 4,204-4,210 over eight builds, the hashes'.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_210 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -172,7 +185,9 @@ const budgets = [
   // only in a week the calendar has (WeeklyRuleNotice.jsx). The entry keeps
   // the calendar, the clock and the device's choice. Each at what it measured
   // (1,141 / 715 and 1,662 / 909), the gzip with the 4 bytes of hash noise.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_141, maxGzip: 719 },
+  // weeklyRules 1,141 -> 1,142 on 2026-10-20: HEAVY FRACTURE's "1.75배로"
+  // (check:text) is one UTF-8 byte longer than "×1.75로".
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_142, maxGzip: 719 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
@@ -260,7 +275,10 @@ function checkBudget(file, budget) {
 // 이번 주의 규칙 was split into above; the worker's code did not change.
 // 8,792 / 3,171 -> 8,828 / 3,183 on 2026-10-20, measured 8,828 / 3,179 (gzip
 // plus 4): one more file, the week's rule's briefing panel (WeekRulePanel).
-const WORKER_BUDGET = { maxBytes: 8_828, maxGzip: 3_183 };
+// 8,828 / 3,183 -> 8,862 / 3,194 on 2026-10-20 on main after #198 and #205,
+// measured 8,862 / 3,188-3,194 over eight builds (main: 8,754 / 3,140): the
+// same three more file names in a longer list.
+const WORKER_BUDGET = { maxBytes: 8_862, maxGzip: 3_194 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
