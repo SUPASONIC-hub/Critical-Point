@@ -359,6 +359,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
   function playSeason(seasonIndex, archetype, story = false, watch = null, tools = null) {
     const policy = makePolicy(archetype);
     const caseResults = {};
+    // Each closed case's decision log, as its case row carries it (the chain checker's tests).
+    const caseLogs = {};
     let discoveredClues = [];
     let run = normalizeStart(story);
     let final = null;
@@ -510,6 +512,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             outcomeNodeId: nodeId,
           };
           caseResults[caseId] = summary;
+          caseLogs[caseId] = log;
           casePeaks.push(summary.peakRiskPressure);
           if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
           if (caseId === "final") final = { resources, log };
@@ -519,7 +522,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     }
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), relics: run.relics, audits, links };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, logic: getSeasonLogic(caseResults), relics: run.relics, audits, links };
   }
 
   /**
