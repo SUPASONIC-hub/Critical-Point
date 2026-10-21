@@ -28,6 +28,7 @@ import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
+import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
@@ -385,6 +386,10 @@ export function useChoiceCommit(context) {
       resourcesBefore: resources,
       resourcesAfter: finalResources,
     };
+    // The window again from its presses, for the server checks (windowTrail.js):
+    // none for a window walked away from or resumed from a save without a trail.
+    const replay = recordClosedWindow(closedWindow);
+    if (replay) entryBase.replay = replay;
     const entry = { ...entryBase, observerTag: getObserverTag(entryBase) };
 
     const nextLog = [...log, entry];

@@ -564,6 +564,10 @@ function normalizeSuspendedWindow(value, windowIndex) {
   window.focusMode = normalizeFocusMode(source.focusMode);
   // The look is kept, never the band it drew: that is dealt from the seed again.
   window.scouted = source.scouted === true;
+  // The presses so far, so the trail goes on after the resume (windowTrail.js);
+  // without them the window leaves no replay record. A trail edited in the
+  // save is the server checker's to find, not this one's.
+  if (Array.isArray(source.trail) && source.trail.length <= 200) window.trail = source.trail;
   return { seed: value.seed.slice(0, 200), windowIndex, window };
 }
 

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { getAccessibility } from "../state/accessibilitySettings.js";
-import { createWindow, getTableClockScale, reduceWindow } from "./gauntletEngine.js";
+import { getTableClockScale } from "./gauntletEngine.js";
 import { getTableRules } from "./tableUnlocks.js";
+import { openTraced, reduceTraced } from "./windowTrail.js";
 
 /** Ticks are batched to ten a second: the reducer is exact, the screen does not need sixty renders. */
 const TICK_BATCH_SECONDS = 0.1;
@@ -20,13 +21,18 @@ const TICK_BATCH_SECONDS = 0.1;
  * (`tableUnlocks`), and the reducer is handed them: a press for a rule the
  * case does not have yet is ignored there, whether or not the stage drew it.
  * Left out, the window has every rule.
+ *
+ * The window carries the trail of presses the reducer applied (`trail`,
+ * windowTrail.js), so it reaches the save when the window is put down and the
+ * runtime when it closes. A window resumed from a save takes the trail the
+ * save kept (none from an older save, and then it leaves no replay record).
  */
 export function useGauntletWindow({ schema, seed, paused, abandoned = false, closedAs = null, resume = null, caseId, run }) {
   const rules = getTableRules(caseId, run);
   // One function per set of rules, and the sets are constants: its identity
   // changes only if the window's rules do.
-  const reduce = useCallback((window_, event) => reduceWindow(window_, event, rules), [rules]);
-  const [window_, dispatch] = useReducer(reduce, { schema, seed, abandoned, closedAs, resume }, createWindow);
+  const reduce = useCallback((window_, event) => reduceTraced(window_, event, rules), [rules]);
+  const [window_, dispatch] = useReducer(reduce, { schema, seed, abandoned, closedAs, resume }, openTraced);
   const live = window_.status === "live";
   // The run's story mark is set when its case opens, so it is one value for as
   // long as this window is on the table.

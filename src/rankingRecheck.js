@@ -32,8 +32,9 @@
  * and `window-off-replay`. A row played under other table rules than this
  * engine's (`dynamics.tableRules`) is not checked (answer 8).
  *
- * The page does not write replay records yet (that waits for rules-mark-3),
- * so on today's rows the window check reports every window as unrecorded.
+ * The page writes the record on every window from this build on
+ * (gauntlet/windowTrail.js); a row from an older build, or a window resumed
+ * from a save that kept no trail, reports its windows as unrecorded.
  */
 import { nodes } from "./gameData.js";
 import { getGameplayStats, getRiskPressure } from "./gameLogic.js";

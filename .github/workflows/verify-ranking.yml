@@ -1,24 +1,22 @@
 name: Verify Ranking
 
-# F1 phase 2 (서버검증-설계안.md, the 10-21 answers): once a day, read the top
-# ranked runs off the live database and work each one out again off the page
+# F1 phase 2 (서버검증-설계안.md, the 10-21 answers): read the top ranked runs
+# off the live database and work each one out again off the page
 # (scripts/verify-ranking-rows.mjs: the score from the decision log, every
 # window that carries a replay record, a sealed card cashed below its seal, a
 # response time off the window clock). The report goes to the run's Job
-# Summary, each run named by its public tag only.
+# Summary, each run named by its public tag only. Read only: the rows go to a
+# file in the runner that is never printed and is removed at the end.
 #
-# DRAFT. For now it runs only by hand and only prints the read it will make.
-# The key is the test week's way (.github/workflows/test-week.yml on the
-# rules-mark-3 branch, not on main yet): no new secret, the query goes through
-# the Management API with the SUPABASE_ACCESS_TOKEN Migration Drift uses
-# (`supabase db query --linked`, one SELECT that the unit test holds to
-# nothing else). Once that PR is on main:
-#   1. Uncomment the steps marked TODO(test-week) below.
-#   2. Add the schedule (after the test week's 23:40 KST read), e.g.
-#        schedule:
-#          - cron: "55 14 * * *"
-#   3. Writing the marks (ranking_set_recheck_marks, the 10-21 answer 6) waits
-#      for that migration to leave its .sql.draft, and is a later step here.
+# The key is the test week's way (test-week.yml): no new secret, the query
+# goes through the Management API with the SUPABASE_ACCESS_TOKEN Migration
+# Drift uses (`supabase db query --linked`, one SELECT that the unit test
+# holds to nothing else). Without the token the run says so and reads nothing.
+#
+# By hand only for now. A daily schedule comes once a first run has been read
+# (e.g. `cron: "55 14 * * *"`, after the test week's 23:40 KST read), and
+# writing the marks (ranking_set_recheck_marks, the 10-21 answer 6) waits for
+# that migration to leave its .sql.draft.
 
 on:
   workflow_dispatch:
@@ -45,46 +43,50 @@ jobs:
       RANKING_LIMIT: ${{ inputs.limit || '20' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: See whether an access token is configured
+        id: token
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Explain the skipped read
+        if: steps.token.outputs.configured != 'true'
+        run: |
+          echo "::warning title=The ranking was not read::SUPABASE_ACCESS_TOKEN is not configured, so this run asked the database nothing."
       - uses: ./.github/actions/setup
+        if: steps.token.outputs.configured == 'true'
         with:
           browser: none
-      - name: Show the read this job will make
+      # The rows stay in rows.json. What the CLI said on failure is put
+      # through Migration Drift's redaction before it reaches this public log.
+      - name: Read the ranked runs
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/verify-ranking-rows.mjs --sql --limit="$RANKING_LIMIT" > ranking.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f ranking.sql > rows.json 2> query.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure rows.json query.err
+            exit 1
+          fi
+          echo "Read $(node -e 'const r = JSON.parse(require("fs").readFileSync("rows.json", "utf8")); console.log((r.rows ?? r).length)') rows."
+      - name: Write the report
+        if: steps.token.outputs.configured == 'true'
         shell: bash
         run: |
           {
-            echo "### The checker's read (not run yet: the token step is a TODO)"
-            echo '```sql'
-            node scripts/verify-ranking-rows.mjs --sql --limit="$RANKING_LIMIT"
+            echo "### Ranked runs worked out again (top $RANKING_LIMIT)"
+            echo '```'
+            node scripts/verify-ranking-rows.mjs rows.json --redact
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      # TODO(test-week): the two steps below, as test-week.yml reads the live data.
-      #
-      # - name: See whether an access token is configured
-      #   id: token
-      #   shell: bash
-      #   env:
-      #     SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      #   run: |
-      #     if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
-      # - name: Read the ranked runs
-      #   if: steps.token.outputs.configured == 'true'
-      #   shell: bash
-      #   env:
-      #     SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      #     SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-      #   run: |
-      #     set +e -uo pipefail
-      #     node scripts/verify-ranking-rows.mjs --sql --limit="$RANKING_LIMIT" > ranking.sql || exit 1
-      #     npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f ranking.sql > rows.json 2> query.err
-      #     code=$?
-      #     if [ "$code" -ne 0 ]; then
-      #       echo "supabase db query exited $code:"
-      #       node scripts/check-migration-drift.mjs --say-failure rows.json query.err
-      #       exit 1
-      #     fi
-      # - name: Write the report
-      #   if: steps.token.outputs.configured == 'true'
-      #   run: node scripts/verify-ranking-rows.mjs rows.json --redact >> "$GITHUB_STEP_SUMMARY"
       - name: Remove the rows
         if: always()
         run: rm -f rows.json query.err ranking.sql

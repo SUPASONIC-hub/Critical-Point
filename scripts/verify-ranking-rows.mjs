@@ -36,6 +36,7 @@ import { fileURLToPath } from "node:url";
 import { recheckRun } from "../src/rankingRecheck.js";
 
 const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
+const JSON_COLUMNS = ["summary", "decision_log", "resources", "dynamics"];
 
 /**
  * The read for `supabase db query`: one SELECT and nothing else -- the top
@@ -83,7 +84,9 @@ export function readRows(text) {
   const parsed = JSON.parse(text);
   const rows = Array.isArray(parsed) ? parsed : parsed?.rows;
   if (!Array.isArray(rows)) throw new TypeError("The file holds no array of rows (an array, or { rows: [...] }).");
-  return rows;
+  // A client that writes a jsonb column out as text is read the same.
+  const parseText = (value) => (typeof value === "string" ? JSON.parse(value) : value);
+  return rows.map((row) => (row && typeof row === "object" ? { ...row, ...Object.fromEntries(JSON_COLUMNS.filter((key) => key in row).map((key) => [key, parseText(row[key])])) } : row));
 }
 
 /**

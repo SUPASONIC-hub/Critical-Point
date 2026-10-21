@@ -33,6 +33,7 @@
     "src/gauntlet/weeklyCalendar.js": 100,
     "src/gauntlet/weeklyRules.js": 100,
     "src/gauntlet/windowReplay.js": 100,
+    "src/gauntlet/windowTrail.js": 100,
     "src/judgementHabit.js": 100,
     "src/logicReport.js": 100,
     "src/playerLanguage.js": 100,
