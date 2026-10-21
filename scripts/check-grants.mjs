@@ -11,6 +11,7 @@ import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from 
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
+import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 
 /**
  * Data API grants guardrail.
@@ -58,7 +59,9 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *   7. This week's rule (20261021000000): the server's calendar and week are
  *      the client's, a season ranks on the board of the week its first case
  *      row arrived in when every row names that week's rule, and one whose
- *      rows disagree, or name a rule that week does not have, is refused.
+ *      rows disagree, or name a rule that week does not have, is refused. The
+ *      test week's report (report-test-week.mjs) runs its one SELECT here and
+ *      counts the seasons with the rule, without it and their devices.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -1611,6 +1614,43 @@ if (!SUSPICION_MARKS) {
     const refusal = { status: 400, serverMessage };
     check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads "${serverMessage}" as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
     check(!isUnrankableRefusal(seasonItem, refusal), `the client's queue reads "${serverMessage}" as a run missing a case row.`);
+  }
+
+  // The test week's report (scripts/report-test-week.mjs, .github/workflows/test-week.yml)
+  // runs its one SELECT over the seasons of a week long past, so the runs
+  // above are not in it: three under the rule from two devices, one without it
+  // (the box turned it down), one in story mode and one under another rule.
+  {
+    const REPORT_WEEK = "2026-W30";
+    const reportRuns = [
+      ["run-week-report-on-1", EVENT, sessionId(n), false],
+      ["run-week-report-on-2", EVENT, sessionId(n), false],
+      ["run-week-report-on-3", EVENT, sessionId(n + 1), false],
+      ["run-week-report-off", null, sessionId(n + 1), false],
+      ["run-week-report-story", null, sessionId(n + 2), true],
+      ["run-week-report-other", OTHER, sessionId(n + 3), false],
+    ];
+    n += 4;
+    let minute = 0;
+    for (const [runId, rule, session, story] of reportRuns) {
+      for (const caseId of CASE_SEQUENCE.slice(0, 2)) {
+        const payload = casePayload({ session, runId, caseId, story });
+        payload.dynamics = { ...payload.dynamics, weekRule: rule };
+        const { sql, params } = postgrestInsert("playtest_sessions", payload);
+        await db.query(sql, params);
+      }
+      await db.query(
+        `update public.playtest_sessions set completed_at = '2026-07-22T03:00:00Z'::timestamptz + ($2::int + (id % 2)) * interval '1 minute' where run_id = $1`,
+        [runId, (minute += 5)],
+      );
+    }
+    const reportRows = (await allowed("run the test week's report", "service_role", testWeekQuery(REPORT_WEEK, EVENT)))?.rows ?? [];
+    const report = readTestWeek(reportRows);
+    check(
+      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6,
+      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows })}; expected 3 seasons under the rule from 2 devices, 1 without it, story mode and another rule left out.`,
+    );
+    check(reportRows.every((row) => !Object.values(row).some((value) => typeof value === "string" && value.startsWith("grants-check-session-"))), "the test week's report fetched a device's session id.");
   }
 
   withHeaders(null);

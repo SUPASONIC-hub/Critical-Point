@@ -39,18 +39,37 @@ if (!/^[a-z][a-z0-9-]{0,31}$/.test(RULE) || !getWeekRule(RULE)) throw new Error(
 /**
  * One read-only statement: the case rows (and the season-final row) of every
  * run that stamped the rule and sent its first case row in the week, with
- * only the decision log's fields this report reads.
+ * only the decision log's fields this report reads; and one bare row for each
+ * season of the week that did not take the rule, story mode left out.
+ *
+ * A season that turned the rule down (the box on the start screen, #199) is
+ * not marked as such: the client stamps no `weekRule` (pickSeasonWeekRule
+ * returns null), so its rows look like the ordinary table's. A season of a
+ * client older than the rule, or one begun the week before and first sent in
+ * this one, looks the same, and is counted with them. Story mode stamps no
+ * rule either, and is told apart by the `assistStory` its decision log
+ * carries. A season's device is the smallest session id among its case rows,
+ * and only its rank among the week's devices leaves the database.
  */
-export const QUERY = `with runs as (
-  select s.run_id
+export function testWeekQuery(week = WEEK, rule = RULE) {
+  return `with runs as (
+  select s.run_id,
+         max(s.dynamics->>'weekRule') is not null as rule_on,
+         coalesce(bool_or(s.decision_log @> '[{"assistStory": true}]'::jsonb), false) as story,
+         min(s.session_id) as session_id
     from public.playtest_sessions s
    where s.run_id is not null
      and s.case_id <> 'season-final'
-     and s.dynamics->>'weekRule' = '${RULE}'
+     and coalesce(s.dynamics->>'weekRule', '') in ('', '${rule}')
    group by s.run_id
-  having public.kst_iso_week(min(s.completed_at)) = '${WEEK}'
+  having public.kst_iso_week(min(s.completed_at)) = '${week}'
+),
+seasons as (
+  select r.run_id, r.rule_on, dense_rank() over (order by r.session_id) as device
+    from runs r
+   where r.rule_on or not r.story
 )
-select s.run_id, s.case_id,
+select c.run_id, coalesce(s.case_id, 'turned-down') as case_id, c.device,
        s.summary->>'endingVariant' as ending,
        s.summary->'gauntlet'->'vault' as vault,
        s.summary->>'week' as ranked_week,
@@ -60,9 +79,12 @@ select s.run_id, s.case_id,
                  'assistStory', e->'assistStory')), '[]'::jsonb)
           from jsonb_array_elements(case when jsonb_typeof(s.decision_log) = 'array' then s.decision_log else '[]'::jsonb end) as e
          where jsonb_typeof(e) = 'object') as log
-  from public.playtest_sessions s
-  join runs using (run_id)
- order by s.run_id, s.completed_at, s.id`;
+  from seasons c
+  left join public.playtest_sessions s on c.rule_on and s.run_id = c.run_id
+ order by c.run_id, s.completed_at, s.id`;
+}
+
+export const QUERY = testWeekQuery();
 
 const pct = (part, whole) => (whole > 0 ? `${((part / whole) * 100).toFixed(1)}%` : "—");
 const per = (part, whole) => (whole > 0 ? (part / whole).toFixed(2) : "—");
@@ -71,12 +93,22 @@ const modes = (entry) => String(entry?.environmentMode ?? "").split("+");
 /** The week's numbers, from the rows the query returned. */
 export function readTestWeek(rows) {
   const runs = new Map();
+  const devicesOn = new Set();
+  const devicesOff = new Set();
+  let turnedDown = 0;
   for (const row of rows) {
+    if (row.case_id === "turned-down") {
+      turnedDown += 1;
+      devicesOff.add(row.device);
+      continue;
+    }
+    devicesOn.add(row.device);
     if (!runs.has(row.run_id)) runs.set(row.run_id, []);
     runs.get(row.run_id).push(row);
   }
   const t = {
-    seasons: runs.size, finished: 0, ranked: 0, caseRows: 0, endings: 0, collapse: 0,
+    seasons: runs.size, turnedDown, devicesOn: devicesOn.size, devicesOff: devicesOff.size,
+    devices: new Set([...devicesOn, ...devicesOff]).size, finished: 0, ranked: 0, caseRows: 0, endings: 0, collapse: 0,
     judged: 0, caught: 0, caughtSeasons: 0, nearLimit: 0, nearLimitClear: 0, vaultMoved: 0, vaultLost: 0,
     boards: 0, busts: 0, cascadeBoards: 0, cascadeBusts: 0, made: 0, cascadeCashHeat: 0, cascadeCashes: 0, plainCashHeat: 0, plainCashes: 0,
   };
@@ -157,6 +189,8 @@ export function describeTestWeek(t) {
     "| 구분 | 지표 | 이번 주 | 시뮬레이션(참고) |",
     "|---|---|---|---|",
     `| 시즌 | 시작한 시즌 / 사건 행 | ${t.seasons} / ${t.caseRows} | |`,
+    `| 시즌 | 같은 주에 시작해 규칙 없이 친 시즌(규칙을 끔·옛 화면, 이야기 모드 제외) | ${t.turnedDown} (${pct(t.turnedDown, t.seasons + t.turnedDown)}) | |`,
+    `| 시즌 | 서로 다른 기기: 규칙 켬 / 규칙 없음 / 모두 | ${t.devicesOn} / ${t.devicesOff} / ${t.devices} | |`,
     `| 시즌 | 끝난 시즌 / 이 주 랭킹에 오른 시즌 | ${t.finished} / ${t.ranked} | |`,
     `| 감사 | 판정한 사건 닫힘 / 적발 | ${t.judged} / ${t.caught} (${pct(t.caught, t.judged)}) | |`,
     `| 감사 | 시즌당 적발 / 적발이 있었던 시즌 | ${per(t.caught, t.seasons)} / ${t.caughtSeasons} (${pct(t.caughtSeasons, t.seasons)}) | 1.75 / 13% (B, 감사만, 시즌 봇) |`,
