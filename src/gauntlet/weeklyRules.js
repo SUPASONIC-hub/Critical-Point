@@ -43,9 +43,8 @@ export const HEAVY_FRACTURE_RATE = 1.75;
 export const WEEK_RULE_CATALOGUE = Object.freeze({
   "near-wall": Object.freeze({
     label: "NEAR WALL",
-    // 초안 문구.
     title: "벽이 가깝다",
-    text: `이번 주는 벽이 ${NEAR_WALL_SHIFT} 가까이 선다. 같은 열기로 더 빨리 벽에 닿는다.`,
+    text: `이번 주는 벽 띠가 열기 ${NEAR_WALL_SHIFT}만큼 앞당겨 선다. 같은 열기로 더 빨리 벽에 닿는다.`,
     schema: Object.freeze({ wallShift: -NEAR_WALL_SHIFT }),
   }),
   "heavy-fracture": Object.freeze({

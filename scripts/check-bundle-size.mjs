@@ -51,7 +51,9 @@ const budgets = [
   // 169,930 -> 169,935 the same evening, measured 169,935: the case summary that
   // ships with the shell says 사라진 열한 쪽 again, not 11쪽 (+5 bytes), so the
   // dissent's length does not read as a page number beside 14쪽 and 26쪽.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_935, maxGzip: 61_300 },
+  // 169,935 -> 169,938 on 2026-10-21, measured 169,938: the origin's story
+  // under DISSENT is titled 반대 의견서를 쓴 밤, the button's own word (+3).
+  { pattern: /^index-.*\.js$/, maxBytes: 169_938, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -190,7 +192,9 @@ const budgets = [
   // (1,141 / 715 and 1,662 / 909), the gzip with the 4 bytes of hash noise.
   // weeklyRules 1,141 -> 1,142 on 2026-10-20: HEAVY FRACTURE's "1.75배로"
   // (check:text) is one UTF-8 byte longer than "×1.75로".
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_142, maxGzip: 719 },
+  // 1,142 / 719 -> 1,159 / 738 on 2026-10-21, measured 1,159 / 734: NEAR WALL
+  // says what the 4 is, 벽 띠가 열기 4만큼 앞당겨 선다 (+17).
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_159, maxGzip: 738 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
