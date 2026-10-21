@@ -44,21 +44,26 @@ export const VERDICT_NAMES = Object.freeze({
 });
 
 /**
- * DRAFT (결정 13 (1)): the four lines are to be chosen by numbered question
- * and run through check:canon, check:dialogue and check:plain-language before
- * they are shown. Seal and collapse are the design's drafts; reform and expose
- * are written in the same voice -- the TriggerLab experiment's record speaking
- * to the next session, not time wound back (the season opens three years
- * earlier, docs/canon.md). The open verdict keeps `OPENING_ECHO`.
+ * The line each ruling's season is followed by (NEWGAMEPLUS 문구 질문 1-7,
+ * user's answer of 2026-10-21: all (1)). Two sentences each, as
+ * `OPENING_ECHO` is: what became of the last season's record, then what this
+ * one will watch. "지난 시즌", the name every other NEW GAME+ line uses, not
+ * "세션", which the screen already spends on the session code. No "이 방":
+ * the line stands over 프롤로그 01, a bank office in 2022, before the lab
+ * existed (docs/canon.md). The seal's season came back under another name,
+ * which is the cost its verdict names (endingCopy.js); the collapse is said in
+ * its ending's own words, true through either of its two doors
+ * (seasonStanding.js). The open verdict, and a device that cannot know its
+ * verdict, keep `OPENING_ECHO`.
  */
 const OPENING_ECHOES = Object.freeze({
-  ending_seal: "지난 세션의 기록은 봉인된 채 이 방에 들어왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.",
-  ending_reform: "지난 세션의 기록은 사용 규칙이 되어 이 방에 남았습니다. 이번에는 그 규칙이 버티는지 보겠습니다.",
-  ending_expose: "지난 세션의 기록은 이미 바깥에 나가 있습니다. 이번에는 무엇을 먼저 지킬지 보겠습니다.",
-  collapse: "지난 세션은 사람 피해의 선을 넘고 닫혔습니다. 그 기록이 이번 첫 질문 옆에 놓여 있습니다.",
+  ending_seal: "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.",
+  ending_reform: "지난 시즌의 기록은 사용 규칙의 기준표가 되었습니다. 이번에는 그 감시가 얼마나 버티는지 보겠습니다.",
+  ending_expose: "지난 시즌의 기록은 이미 바깥에 나가 있습니다. 이번에는 무엇을 먼저 지킬지 보겠습니다.",
+  collapse: "지난 시즌은 사람이 치른 값을 감당하지 못하고 멈췄습니다. 보존된 그 기록이 이번 첫 질문 옆에 놓여 있습니다.",
 });
 
-const EMPTY_RECORD = Object.freeze({ seasons: 0, countedRuns: Object.freeze([]), last: null });
+const EMPTY_RECORD = Object.freeze({ seasons: 0, countedRuns: Object.freeze([]), last: null, previous: null });
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -95,7 +100,7 @@ export function normalizeSeasonRecord(value) {
   const countedRuns = Array.isArray(record.countedRuns)
     ? record.countedRuns.filter((runId) => typeof runId === "string" && runId).slice(-COUNTED_RUNS_KEPT)
     : [];
-  return { seasons, countedRuns, last: normalizeLast(record.last) };
+  return { seasons, countedRuns, last: normalizeLast(record.last), previous: normalizeLast(record.previous) };
 }
 
 /**
@@ -108,6 +113,12 @@ export function normalizeSeasonRecord(value) {
  * A run is counted once: a replayed finale changes how the last season ended
  * but is not another season. Anything that is not a closed finale returns the
  * record as it was.
+ *
+ * `previous` is how the season before this run's ended: the `last` a new run
+ * finds, kept through its replayed finales. The finale's comparison line
+ * reads it -- the record is written before the result is drawn, so `last` is
+ * already this season's by then, and compared with itself every ending was
+ * "the same ending" (#220 review, 10-21).
  */
 export function recordFinishedSeason(record, { runId, finalSummary, finalChoiceId } = {}) {
   const current = normalizeSeasonRecord(record);
@@ -126,7 +137,24 @@ export function recordFinishedSeason(record, { runId, finalSummary, finalChoiceI
     seasons: counted ? current.seasons : current.seasons + 1,
     countedRuns: counted ? current.countedRuns : [...current.countedRuns, runId].slice(-COUNTED_RUNS_KEPT),
     last,
+    previous: counted ? current.previous : current.last,
   };
+}
+
+/**
+ * Which season a run is: the record's count when the run has already been
+ * counted (its finale closed), one more when it has not. The continue card
+ * reads this: `getSeasonCarry().round` is the season about to start, and a
+ * second season whose finale had closed was shown as the third (#220 review,
+ * 10-21). A device with the NEW GAME+ memory and no record counts that season
+ * as one. 1 before any season has finished.
+ */
+export function getSeasonRound(record, runId, memory = null) {
+  const current = normalizeSeasonRecord(record);
+  const finished = current.seasons > 0 ? current.seasons : isPlainObject(memory) && isPlainObject(memory.final) ? 1 : 0;
+  const counted =
+    typeof runId === "string" && runId !== "" && (current.countedRuns.includes(runId) || (current.seasons === 0 && finished === 1 && memory.final.runId === runId));
+  return counted ? finished : finished + 1;
 }
 
 /**

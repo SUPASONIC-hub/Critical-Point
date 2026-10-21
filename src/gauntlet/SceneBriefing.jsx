@@ -128,6 +128,7 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  echo,
   run,
   tableSeconds,
   cards,
@@ -144,8 +145,10 @@ export function SceneBriefing({
   const intro = getBriefingIntro(node, nodeId, run);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
-  // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same clock.
-  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run));
+  // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
+  // clock; above it, on a NEW GAME+ season's first page, the line the season
+  // carried (`echo`, newGamePlusCarry.js). Both are drawn by WeekRulePanel.jsx.
+  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run), echo);
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
   // same way. `mutations` is exactly the two lists printed below.
