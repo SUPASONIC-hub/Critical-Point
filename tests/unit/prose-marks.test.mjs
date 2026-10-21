@@ -25,6 +25,13 @@ test("a date, a time and money in two words read as one figure", () => {
   assert.equal(show(markProse("18영업일 2009년, 대출번호 2023-0412.")), "[num:18영업일] [num:2009년], 대출번호 [num:2023-0412].");
 });
 
+test("lines, pages and letters carry their unit: 1,740줄, 3페이지, 23통", () => {
+  assert.equal(
+    show(markProse("1,740줄 중 200줄 남짓, 서명란이 빈 3페이지를 펼치고 편지 23통에 답합니다.")),
+    "[num:1,740줄] 중 [num:200줄] 남짓, 서명란이 빈 [num:3페이지]를 펼치고 편지 [num:23통]에 답합니다.",
+  );
+});
+
 test("an aside after a space, an apostrophe and a number inside a word stay plain", () => {
   assert.equal(show(markProse("KD은행 (대출 잔액 310억)")), "KD은행 (대출 잔액 [num:310억])");
   assert.equal(show(markProse("the analyst's file, x1.00, KD2")), "the analyst's file, x1.00, KD2");

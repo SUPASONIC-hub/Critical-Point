@@ -22,7 +22,7 @@
  * is also carried by the words themselves -- quotes, digits, parentheses.
  */
 
-const UNIT = "(?:%p|%|퍼센트|포인트|영업일|개월|시간|년|월|일|시|분|초|억|만|천|조|원|명|곳|건|개|배|층|주|번|차례|쪽|살|위|등|점|호|bp)";
+const UNIT = "(?:%p|%|퍼센트|포인트|영업일|개월|시간|년|월|일|시|분|초|억|만|천|조|원|명|곳|건|개|배|층|주|번|차례|쪽|줄|페이지|통|살|위|등|점|호|bp)";
 const NUMBER = String.raw`(?<![\w.,])(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:-\d+)*`;
 const FIGURE = new RegExp(`${NUMBER}${UNIT}*`, "g");
 // U+001F joins a captioned scene's lines (proseCaptions); a gloss never crosses it.
