@@ -146,11 +146,11 @@ export function readAudit(run, count, win) {
  * The cash button's description: what this cash does to the audit (on a
  * CASCADE board a cold cash leaves it as it is; the week's line says why). 초안.
  */
-export const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
+const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
   ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;
 
 /** What the voice says when a table opens on an audit that moved (B3). 초안. */
-export const describeAudit = ({ count, limit }) =>
+const describeAudit = ({ count, limit }) =>
   `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;
 
 /**

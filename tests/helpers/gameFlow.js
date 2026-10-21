@@ -164,21 +164,6 @@ export async function confirmHeldCash(page, label = "confirm the held 확정") {
 }
 
 /**
- * Holds 확정 down with the pointer for `ms`, for a test of the hold itself:
- * the line fills, and the table cashes before the pointer comes up.
- */
-export async function holdToConfirm(page, ms = 900) {
-  const cash = page.getByTestId("commit-confirm");
-  await expect(cash).toBeEnabled({ timeout: ACTION_TIMEOUT_MS });
-  const box = await cash.boundingBox();
-  if (!box) throw new Error("확정 has no box to hold");
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.waitForTimeout(ms);
-  await page.mouse.up();
-}
-
-/**
  * Opens 자세히 on the reveal that is up, for a test that reads the whole sheet
  * (the ledger, the pot's sum). From 사건 01 on the reveal is short and those are
  * behind the button; in a prologue there is no button and this does nothing.

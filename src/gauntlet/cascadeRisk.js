@@ -236,4 +236,4 @@ export const describeLinkMade = (run, { cashed, burn }) =>
 export const describeRange = ([low, high]) => (high === 1 ? "다음 판" : low === high ? `${low}판 뒤` : `${low}~${high}판 안`);
 
 /** What the voice says of the links (B2 2-8). 초안. */
-export const describeLinks = ({ live, nearest }) => `연결 ${live}. 가장 이른 것은 ${describeRange(nearest)}, 그 판의 벽이 ${LINK_WALL} 가까워진다`;
+const describeLinks = ({ live, nearest }) => `연결 ${live}. 가장 이른 것은 ${describeRange(nearest)}, 그 판의 벽이 ${LINK_WALL} 가까워진다`;

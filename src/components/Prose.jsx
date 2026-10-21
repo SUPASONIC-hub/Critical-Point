@@ -6,7 +6,7 @@ import { markLines, markProse } from "./proseMarks.js";
  * and their punctuation are the string's own, so a screen reader reads what it
  * read before; base-intro-ranking.css draws the marks.
  */
-export function Marked({ segments }) {
+function Marked({ segments }) {
   return segments.map((segment, index) =>
     segment.marks.length ? (
       <span key={index} className={segment.marks.map((mark) => `pr-${mark}`).join(" ")}>
