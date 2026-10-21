@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import { parse as parseYaml } from "yaml";
@@ -20,7 +21,7 @@ const WINDOWS_SEPARATOR = /\\/g;
 // priority the icons' chunk carried React's core) and both before the
 // catch-all `vendor` sees them.
 const VENDOR_GROUPS = [
-  { name: "react-vendor", test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/, priority: 35 },
+  { name: "react-vendor", test: (id) => id.startsWith(REACT_ESM) || REACT_PACKAGE.test(id), priority: 35 },
   { name: "icons-vendor", test: /[\\/]node_modules[\\/]lucide-react[\\/]/, priority: 30 },
   { name: "vendor", test: /[\\/]node_modules[\\/]/, priority: 20 },
 ];
@@ -36,6 +37,52 @@ const VENDOR_GROUPS = [
 // preloaded by the page. The lowest priority: the vendor groups and the
 // chunks of their own (below) are taken first.
 const ENTRY_GROUP = { name: "index", tags: ["$initial"], test: (id) => !/[\\/]node_modules[\\/]/.test(id), priority: 10 };
+
+/**
+ * React as ES modules, in the release build.
+ *
+ * React ships CommonJS. Rollup turned each of its packages into named exports,
+ * so a screen called `jsx(...)` as a local name (`e(...)` once minified).
+ * Rolldown hands a chunk outside React's the whole `module.exports` instead,
+ * and every call went through it: `(0,t.jsx)(...)`, nine bytes more each, and
+ * 934 of them in the PlayScreen chunk alone, which took it 3,308 raw bytes
+ * over its budget on 2026-10-21 (the entry chunk 1,740, the report's 754).
+ *
+ * So each React entry the app imports is given a small ES module that reads
+ * the CommonJS exports once and exports them by name. It sits in the React
+ * chunk (VENDOR_GROUPS), so the other chunks import plain names from it, as
+ * they did under Rollup. Only the build: the dev server pre-bundles React its
+ * own way.
+ */
+//
+// What is left of Rolldown's own is its runtime helpers (`\0rolldown/runtime.js`:
+// the CommonJS wrapper and the namespace objects the app's dynamic imports
+// return), which come out as a file of their own, `rolldown-runtime`. No
+// `codeSplitting` group is offered that module, so it cannot be put in React's
+// chunk from here (tried on 2026-10-21).
+const REACT_ESM = "\0react-esm:";
+const REACT_PACKAGE = /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/;
+const REACT_ENTRIES = ["react", "react/jsx-runtime", "react-dom", "react-dom/client"];
+const requireFromRoot = createRequire(import.meta.url);
+
+function reactAsEsm() {
+  return {
+    name: "react-as-esm",
+    apply: "build",
+    enforce: "pre",
+    resolveId(source, importer) {
+      // React's own packages require each other as they always have.
+      if (!REACT_ENTRIES.includes(source) || !importer || importer.startsWith(REACT_ESM) || REACT_PACKAGE.test(importer)) return null;
+      return REACT_ESM + source;
+    },
+    load(id) {
+      if (!id.startsWith(REACT_ESM)) return null;
+      const entry = id.slice(REACT_ESM.length);
+      const names = Object.keys(requireFromRoot(entry)).filter((name) => /^[A-Za-z_$][\w$]*$/.test(name) && name !== "default");
+      return `import m from ${JSON.stringify(entry)};\nexport const { ${names.join(", ")} } = m;\nexport default m;\n`;
+    },
+  };
+}
 
 const CRITICAL_CSS_FILE = "src/styles/critical.generated.css";
 
@@ -489,7 +536,7 @@ function ownChunkGroups() {
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
+  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
