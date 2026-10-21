@@ -105,12 +105,13 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     rules: Object.freeze(["cascade"]),
   }),
   // The test week of 2026-W44 (user, 2026-10-21): both devices at once, told
-  // in the two weeks' own lines, so the ranking of that week is the one table
-  // B3 and B2 will be judged on.
+  // in the two weeks' own lines and one that ties them: a cash on a CASCADE
+  // board is not counted by the audit (B2 decision 10, auditRisk.js), so the
+  // ranking of that week is the one table B3 and B2 will be judged on.
   "audit-cascade": Object.freeze({
     label: "AUDIT & CASCADE",
     title: "감사와 연쇄",
-    text: `이번 주는 감사와 연쇄가 함께 선다. ${AUDIT_LINE} ${CASCADE_LINE}`,
+    text: `이번 주는 감사와 연쇄가 함께 선다. ${AUDIT_LINE} ${CASCADE_LINE} CASCADE 판의 확정은 감사에 세지 않는다.`,
     rules: Object.freeze(["audit", "cascade"]),
   }),
 });

@@ -256,7 +256,10 @@ const budgets = [
   // devices and lines, and W44's rule, which says the two lines again behind
   // one sentence of its own (they are written once and shared, 232 raw bytes
   // less than written out). Measured 2,051 / 1,156, the gzip plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_051, maxGzip: 1_160 },
+  // 2,051 / 1,160 -> 2,104 / 1,179 on 2026-10-21: W44's line says that a
+  // cash on a CASCADE board is not counted by the audit (B2 decision 10).
+  // Measured 2,104 / 1,175, the gzip plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_104, maxGzip: 1_179 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
@@ -271,7 +274,11 @@ const budgets = [
   // the record is drawn, had 157 gzip bytes left and took it to 14,422 of
   // 14,400 even written as a file of its own, and that budget does not go up.
   // Raised by what it measured, the gzip plus 4.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_917, maxGzip: 1_048 },
+  // 1,917 / 1,048 -> 2,078 / 1,128 on 2026-10-21: a cash on a CASCADE board
+  // adds nothing (B2 decision 10), read off the board on the table by the
+  // settlement and the 확정 preview and off the log's `environmentMode` by
+  // the count. Measured 2,078 / 1,124, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_078, maxGzip: 1_128 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on

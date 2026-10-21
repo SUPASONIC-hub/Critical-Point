@@ -10,7 +10,11 @@ import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice }
  * - a cash pushed at least once and closed below `AUDIT_HEAT` adds one;
  * - a cash at `AUDIT_RELIEF_HEAT` (HEAT DEBT's 60) or more takes `AUDIT_RELIEF` off, never below 0;
  * - a bust, a window left, the clock, SCOUT, LOCK and the heartbeat move
- *   nothing (B3 decision 2; B4, B6 and B7 stay out).
+ *   nothing (B3 decision 2; B4, B6 and B7 stay out);
+ * - a cash on a board B2's CASCADE dealt adds nothing: the link already pulled
+ *   that wall closer, and closing low is the right call there, so one close is
+ *   not punished twice (B2 decision 10, user 2026-10-19). Its relief stays,
+ *   since relief is no penalty. Only a week with both devices deals CASCADE.
  *
  * It reads only the heat the meter shows and the pushes, never the wall, so
  * the table can say before a cash what that cash will do to it.
@@ -53,22 +57,34 @@ export function isAuditOn(run) {
  * is rounded as the verdict and the log round it, so the log, the engine and
  * the table's preview agree on a cash at 39.6.
  */
-export function auditStep({ busted = false, gauge = 0, pushes = 0 } = {}) {
+export function auditStep({ busted = false, gauge = 0, pushes = 0, cascade = false } = {}) {
   if (busted) return 0;
   const heat = Math.round(Number(gauge) || 0);
   if (heat >= AUDIT_RELIEF_HEAT) return -AUDIT_RELIEF;
-  return (Number(pushes) || 0) > 0 && heat < AUDIT_HEAT ? 1 : 0;
+  return !cascade && (Number(pushes) || 0) > 0 && heat < AUDIT_HEAT ? 1 : 0;
 }
+
+/** Whether a board (a run's `schema`) was dealt CASCADE, whose cash the audit does not count. */
+export const isCascadeBoard = (schema) => Boolean(schema?.mutations?.includes("cascade"));
 
 export const addAudit = (count, step) => Math.max(0, (Number(count) || 0) + step);
 
-/** The audit a case's decision log stands at. An entry with no window (no `threshold`) counts nothing. */
+/**
+ * The audit a case's decision log stands at. An entry with no window (no
+ * `threshold`) counts nothing. As cascadeRisk.js's `walkLinks` reads it, a
+ * window's board was dealt by the window before it (its `environmentMode`);
+ * the case's first board has none before it and is REBOOT's, which never
+ * carries CASCADE (a carried link is due from board 1), so it always counts.
+ */
 export function countAudit(log = []) {
   let count = 0;
+  let cascade = false;
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
-    count = addAudit(count, auditStep({ busted: threshold.busted === true || threshold.state === "bust", gauge: threshold.gauge, pushes: threshold.pushes }));
+    count = addAudit(count, auditStep({ busted: threshold.busted === true || threshold.state === "bust", gauge: threshold.gauge, pushes: threshold.pushes, cascade }));
+    // No other board rule's id has "cascade" in it.
+    cascade = String(entry.environmentMode).includes("cascade");
   }
   return count;
 }
@@ -95,7 +111,7 @@ export function judgeAudit({ count, secured, hand }) {
  */
 export function settleAudit({ run, count, busted, gauge, pushes, closed, secured, hand }) {
   if (!isAuditOn(run)) return null;
-  const after = addAudit(count, auditStep({ busted, gauge, pushes }));
+  const after = addAudit(count, auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }));
   return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 
@@ -121,12 +137,15 @@ export function findAudit(before, after) {
 export function readAudit(run, count, win) {
   if (!isAuditOn(run)) return null;
   const now = Math.max(0, Math.trunc(Number(count) || 0));
-  const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes });
+  const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
   const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
   return { ...reading, spoken: describeAuditIfCash(reading) };
 }
 
-/** The cash button's description: what this cash does to the audit. 초안. */
+/**
+ * The cash button's description: what this cash does to the audit (on a
+ * CASCADE board a cold cash leaves it as it is; the week's line says why). 초안.
+ */
 export const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
   ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;
 

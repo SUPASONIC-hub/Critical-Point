@@ -151,7 +151,7 @@ export function readTestWeek(rows) {
           const heat = Math.round(Number(threshold.gauge) || 0);
           if (cascade) { t.cascadeCashHeat += heat; t.cascadeCashes += 1; } else { t.plainCashHeat += heat; t.plainCashes += 1; }
         }
-        running = addAudit(running, auditStep({ busted: bust, gauge: threshold.gauge, pushes: threshold.pushes }));
+        running = addAudit(running, auditStep({ busted: bust, gauge: threshold.gauge, pushes: threshold.pushes, cascade }));
         if (running >= AUDIT_LIMIT - 1 && running < AUDIT_LIMIT) reached = true;
         dealtBy = modes(entry);
       }
