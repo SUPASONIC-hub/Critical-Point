@@ -365,6 +365,15 @@ const SCENE_TRACES = "src/state/useSceneBustRates.js";
 const WEEK_RULE_PANEL = "src/gauntlet/WeekRulePanel.jsx";
 
 /**
+ * The office's noise at the table's edge (개선 포인트 A5,
+ * src/gauntlet/EdgeNotice.jsx): its words, its timing and its inline style.
+ * Only TableNotices imports it, so left alone it is written into the
+ * PlayScreen chunk, which had 4 gzip bytes left on 2026-10-21. It gets a file
+ * the way the week's panel does and is fetched with the table.
+ */
+const EDGE_NOTICE = "src/gauntlet/EdgeNotice.jsx";
+
+/**
  * The audit (B3, src/gauntlet/auditRisk.js): its count, its judgement and the
  * table's words for it. The engine's chunk, the table's and the runtime's all
  * import it, so left alone it is written into the engine's chunk, which it took
@@ -418,6 +427,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(WEEK_RULE_PANEL),
         name: "WeekRulePanel",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(EDGE_NOTICE),
+        name: "EdgeNotice",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
       this.emitFile({

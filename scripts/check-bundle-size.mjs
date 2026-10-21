@@ -57,7 +57,10 @@ const budgets = [
   // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
   // and one more dependency index (3). Folding the dev switch's leftovers
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_300 },
+  // 61,300 -> 61,377 gzip on 2026-10-21 (A5, draft), measured 61,373 plus 4
+  // (main 0df240a measured 169,594 / 61,278): the comfort panel's switch for
+  // the edge notices, its label and its line (+188 raw, inside the raw budget).
+  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_377 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -106,7 +109,12 @@ const budgets = [
   // #242 and #248) measured 34,807 in CI's e2e build and failed Verify, so
   // #254 did not deploy; each PR had passed on its own base. The gzip plus 4.
   // #249 builds the same chunk byte for byte.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_705, maxGzip: 34_811 },
+  // 104,705 / 34,805 -> 104,771 / 34,843 on 2026-10-21 (A5, draft): measured
+  // 104,771 / 34,839, the gzip plus 4, on main 0df240a's 104,705 / 34,801.
+  // What stays here of the edge notices is the import and the one element in
+  // TableNotices; their words, timing and inline style are EdgeNotice's
+  // (below), and play.css took no rule.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_771, maxGzip: 34_843 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -274,6 +282,11 @@ const budgets = [
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // The office's noise at the table's edge (개선 포인트 A5,
+  // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
+  // own from the start and fetched with the table. Its style is inline, so no
+  // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 1_794, maxGzip: 1_198 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
@@ -389,7 +402,9 @@ function checkBudget(file, budget) {
 // 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
 // 8,894 / 3,217 -> 8,928 / 3,231 on 2026-10-21, the test week: both risks'
 // files in the list, measured 8,928 / 3,227 plus 4.
-const WORKER_BUDGET = { maxBytes: 8_928, maxGzip: 3_231 };
+// 8,928 / 3,231 -> 8,961 / 3,244 on 2026-10-21 (A5, draft), measured 8,961 /
+// 3,240 plus 4 (main 8,928 / 3,222): one more file, EdgeNotice.
+const WORKER_BUDGET = { maxBytes: 8_961, maxGzip: 3_244 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

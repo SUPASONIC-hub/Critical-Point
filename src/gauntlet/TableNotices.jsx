@@ -8,6 +8,7 @@ import { getLogicType } from "./logicStreak.js";
 import { SCOUT_SECONDS } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
+import { EdgeNotice } from "./EdgeNotice.jsx";
 
 /** This tab's table stopped because another tab has the window. */
 function LostToTab({ onReload }) {
@@ -105,6 +106,7 @@ export function TableNotices({ equipped, tab, voice, slam, onReload, onClaim, on
       {/* The table's one voice (tableVoice.js): the push, the stance, the bank and the clock.
           Silent to the eye, and on the page before it has anything to say. */}
       <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
+      <EdgeNotice voice={voice} />
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
           <RelicIcon id={equipped.id} size={18} />

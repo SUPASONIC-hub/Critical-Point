@@ -190,7 +190,7 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   const start = panel.indexOf("const TOGGLES = [");
   const list = panel.slice(start, panel.indexOf("\n];", start));
   const keys = [...list.matchAll(/key: "(\w+)"/g)].map((match) => match[1]);
-  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "calmEffects", "letterKeys", "stillIntro"]);
+  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
   for (const key of keys) assert.equal(typeof settings.DEFAULT_ACCESSIBILITY[key], "boolean", `${key} is a switch`);
   assert.match(list, /label: "스토리 모드"/);
   // What the switch says it does, each clause being something the engine does
@@ -303,4 +303,20 @@ test("the intro and the origin profiles carry nothing the page cannot print", as
   assert.doesNotMatch(params.slice(params.indexOf("export function createIntroViewModel({"), params.indexOf("}) {", params.indexOf("export function createIntroViewModel({"))), /setSaveStatus/);
   const shell = source("AppContent.jsx");
   assert.doesNotMatch(shell.slice(shell.indexOf("const introView = createIntroViewModel({"), shell.indexOf("return <IntroScreen view={introView} />")), /^\s*setSaveStatus,$/m);
+});
+
+test("the edge notices are on until turned off, and say no number aloud or on screen", () => {
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.edgeNotices, true);
+  assert.equal(settings.normalizeAccessibility({ edgeNotices: false }).edgeNotices, false);
+  assert.equal(settings.normalizeAccessibility({ edgeNotices: "off" }).edgeNotices, true);
+  const notice = source("gauntlet/EdgeNotice.jsx");
+  // Noise, not a reading: kept out of the table's one polite region, and off the pointer's way.
+  assert.match(notice, /aria-hidden="true"/);
+  assert.match(notice, /pointerEvents: "none"/);
+  assert.doesNotMatch(notice, /role="(?:status|alert)"|aria-live/);
+  const words = notice.slice(notice.indexOf("export const EDGE_NOTICES"), notice.indexOf("]);", notice.indexOf("export const EDGE_NOTICES")));
+  for (const [, line] of words.matchAll(/"([^"]*[가-힣][^"]*)"/g)) assert.doesNotMatch(line, /\d/, `"${line}" carries no number`);
+  // Reduced motion and the calm switch both stop the slide.
+  assert.match(notice, /prefers-reduced-motion: reduce/);
+  assert.match(notice, /data-calm-effects/);
 });
