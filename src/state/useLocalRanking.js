@@ -14,8 +14,11 @@ import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConf
 // heartbeat, and a score from that table does not compare with one from this.
 // v9 is the same season at the table of 2026-10-20 (the day-ten table: fracture 8,
 // the x1.6 streak and x1.5 LOCK caps, five tool slots, SCOUT), whose score does not compare with one from the table before it.
+// v10 is the same season at RULES_MARK 3: B3's audit and B2's links are rules of the table from
+// 프롤로그 04 (played first as 2026-W44's test week), and a vault the audit took a part of, or a
+// board CASCADE pulled the wall of, does not compare with one from the table before.
 // Retired keys are never read and are removed on first load.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v9";
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v10";
 const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v1",
   "critical-point-local-ranking-v2",
@@ -25,6 +28,7 @@ const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v6",
   "critical-point-local-ranking-v7",
   "critical-point-local-ranking-v8",
+  "critical-point-local-ranking-v9",
 ];
 
 export function parseLocalRankingRows(rawValue) {

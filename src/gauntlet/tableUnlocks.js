@@ -17,6 +17,8 @@
  * not listed: no step is without them.
  */
 import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_SHARE } from "./auditRisk.js";
+import { LINK_BURN, LINK_WALL } from "./cascadeRisk.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -35,7 +37,9 @@ export const STAGED = true;
  * is the draft a closed case offers. `scout` is SCOUT, the one look a window
  * that narrows the drawn band around the wall for table clock (B1, 11일차
  * 초안). The other seven are the next-table mutations, under the ids the
- * engine's `MUTATIONS` catalogue uses.
+ * engine's `MUTATIONS` catalogue uses. `audit` is B3's audit (auditRisk.js)
+ * and `cascade` B2's links (cascadeRisk.js), rules of the table since
+ * RULES_MARK 3; before that they were 2026-W44's test week.
  */
 export const TABLE_RULES = Object.freeze([
   "logic",
@@ -50,6 +54,8 @@ export const TABLE_RULES = Object.freeze([
   "stance",
   "relics",
   "scout",
+  "audit",
+  "cascade",
 ]);
 
 /**
@@ -64,6 +70,7 @@ export const MUTATION_RULES = Object.freeze({
   overclock: "overclock",
   coldFeet: "coldFeet",
   fracture: "fracture",
+  cascade: "cascade",
   strikeWake: "stance",
   steadyLine: "stance",
   exposedHand: "stance",
@@ -91,14 +98,16 @@ export const ALL_RULES = freezeSet(TABLE_RULES);
 
 /**
  * The rules a story run plays without (스토리 모드, the comfort setting): the
- * seven ways a decision breaks the next board. A table that is there to be read
- * past does not hand a mistake on to the scene after it. The streak, LOCK, the
- * stances and the relics stay -- they are the hand's own, and nothing they do
- * is dealt to a player who did not ask for it.
+ * seven ways a decision breaks the next board, and the audit and the links
+ * (B3 and B2 decision 13), which hand a close on to the case's end and to a
+ * board later. A table that is there to be read past does not hand a mistake
+ * on to the scene after it. The streak, LOCK, the stances and the relics stay
+ * -- they are the hand's own, and nothing they do is dealt to a player who did
+ * not ask for it.
  */
-export const STORY_OFF_RULES = Object.freeze(["blackout", "aftershock", "silence", "coldFeet", "heatDebt", "fracture", "overclock"]);
+export const STORY_OFF_RULES = Object.freeze(["blackout", "aftershock", "silence", "coldFeet", "heatDebt", "fracture", "overclock", "audit", "cascade"]);
 
-/** A set of rules as a story run plays it: the same set, less the seven. */
+/** A set of rules as a story run plays it: the same set, less those nine. */
 function withoutStoryOff(rules) {
   return freezeSet([...rules].filter((rule) => !STORY_OFF_RULES.includes(rule)));
 }
@@ -169,12 +178,23 @@ const STEPS = [
   },
   {
     caseId: "prologue04",
-    adds: ["fracture", "overclock", "lock"],
+    // The audit and the links open with FRACTURE (B3 and B2, question 3 (1)
+    // of the rule switch, user 2026-10-20): the links read the burn FRACTURE
+    // reads, and a cash on a board they deal is not audited, so the two are
+    // told together, one line each (초안), short enough that the five lines
+    // stay on a phone's first screen with the question (table-keys, 390x664).
+    // How many boards on is the reveal's line when a link is made
+    // (`describeLinkMade`, 2~4판), and that a CASCADE board's cash is not
+    // audited is the 확정 button's (`describeAuditIfCash`). Their numbers are auditRisk.js's and cascadeRisk.js's.
+    // A story run has neither, so it is told only LOCK.
+    adds: ["fracture", "overclock", "lock", "audit", "cascade"],
     storyIntro: [2],
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
       "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
       "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 LOCK으로 1.5배까지(콤보로는 1.6배까지) 오릅니다. 누를 때마다 시간이 줄어듭니다.",
+      `열기 ${AUDIT_HEAT} 미만 확정이 쌓여 감사 ${AUDIT_LIMIT}칸이 차면 금고 몫의 ${AUDIT_SHARE}분의 1을 잃습니다.`,
+      `${LINK_BURN} 이상 태운 카드는 몇 판 뒤 벽을 ${LINK_WALL} 당깁니다.`,
     ],
   },
   {

@@ -1,5 +1,4 @@
 import { isResourceGain } from "../gameConstants.js";
-import { weekRuleHasDevice } from "./weeklyRules.js";
 
 /**
  * CASCADE (B2, B2-연쇄위험-설계안.md): a heavy card comes back.
@@ -32,20 +31,19 @@ import { weekRuleHasDevice } from "./weeklyRules.js";
  * `linksOut`, written by the closing commit (`carryLinksOut`), and `linksIn`,
  * what the case opened with (`openCaseRun`). SAVE_SCHEMA_VERSION 4.
  *
- * On in a season whose week's rule is `cascade` (weeklyRules.js,
- * `weekRuleHasDevice`), which no week of the calendar is; a development
- * build forces it with `?week=cascade` (weeklyCalendar.js). The measurements
- * stamp it on their runs (CASCADE_WEEK=1, season-bot.mjs) and play the value
- * sets through scripts/sim/cascade-values.mjs.
- * At the rule switch (RULES_MARK 3, one PR with B3) the numbers move to
- * tableRules.js.
+ * A rule of the table since RULES_MARK 3 (one PR and one ranking reset with
+ * B3's audit): on in a case whose rules have `cascade` (tableUnlocks.js: from
+ * 프롤로그 04, and from the first case under NEW GAME+), never in story mode
+ * or a practice case. Before that it was 2026-W44's test week, a device that
+ * week's rule switched on. Its numbers are below, not in tableRules.js (the
+ * engine's chunk; imported from there, the build gave that module a chunk of
+ * its own, check:bundle 2026-10-21); the measurements play the value sets
+ * through scripts/sim/cascade-values.mjs.
  *
  * The file is a chunk of its own (CASCADE_RISK in vite.config.js), as the
- * table's sound is: the engine's chunk and the table's import it, and it
- * imports nothing from either (only the week's rules, a chunk of their own,
- * as auditRisk.js does), so neither budget carries it. That is why the
- * draw below is written out and not `seededUnit` (a unit test holds the two
- * equal).
+ * table's sound is: the engine's chunk and the table's import it, and it does
+ * not import the engine, so the draw below is written out and not
+ * `seededUnit` (a unit test holds the two equal).
  */
 
 /** A cash whose card burned this much of one resource makes a link (B: FRACTURE_MIN_BURN). */
@@ -72,9 +70,9 @@ export const CASCADE_MUTATION = Object.freeze({
   text: `몇 판 전 크게 태운 카드의 연결. 이번 판은 벽이 ${LINK_WALL} 가까워진다.`,
 });
 
-/** Whether this table counts links: a `cascade` week's season, never in story mode or a practice case (decision 13). */
-export function isCascadeOn(run) {
-  return Boolean(run) && run.story !== true && !run.practice && weekRuleHasDevice(run.weekRule, "cascade");
+/** Whether this table counts links: the case's `rules` have `cascade`; never in story mode or a practice case (decision 13). */
+export function isCascadeOn(run, rules) {
+  return Boolean(run) && run.story !== true && !run.practice && Boolean(rules?.has?.("cascade"));
 }
 
 /**
@@ -183,8 +181,8 @@ export function carryLinks({ carried = [] } = {}) {
  * nothing on (`last`). Any other commit, or a table without links, is left as
  * the engine settled it.
  */
-export function carryLinksOut(nextRun, { run, log, runId, caseClosed, last = false }) {
-  if (!caseClosed || !isCascadeOn(run)) return nextRun;
+export function carryLinksOut(nextRun, { run, rules, log, runId, caseClosed, last = false }) {
+  if (!caseClosed || !isCascadeOn(run, rules)) return nextRun;
   return { ...nextRun, linksOut: last ? [] : carryLinks(walkLinks(log, runId, run.linksIn)).links };
 }
 
@@ -193,7 +191,7 @@ export function carryLinksOut(nextRun, { run, log, runId, caseClosed, last = fal
  * link's. False on a table without links. The engine adds what this cannot
  * know before the window settles: not on a BLACKOUT board, not on REBOOT.
  */
-export const isLinkDue = (run, log, runId) => isCascadeOn(run) && isDueNext(walkLinks(log, runId, run.linksIn));
+export const isLinkDue = (run, log, runId, rules) => isCascadeOn(run, rules) && isDueNext(walkLinks(log, runId, run.linksIn));
 
 /** Whether a walk's next board is a link's. */
 export const isDueNext = ({ board, pending }) => pending.some((link) => link.due === board + 1);
@@ -205,7 +203,7 @@ export const isDueNext = ({ board, pending }) => pending.some((link) => link.due
  * `LINK_SPAN_MAX` after the board that made it, narrowing as boards pass --
  * not the drawn board, which is never shown.
  */
-export const readLinks = (run, log, runId) => (isCascadeOn(run) ? readWalk(walkLinks(log, runId, run.linksIn)) : null);
+export const readLinks = (run, log, runId, rules) => (isCascadeOn(run, rules) ? readWalk(walkLinks(log, runId, run.linksIn)) : null);
 
 /** `readLinks` on any table: a walk's reading. */
 export function readWalk({ board, pending }) {
@@ -227,8 +225,8 @@ export function readWalk({ board, pending }) {
  * a board BLACKOUT did not deal, on a table that counts links. `burn` is the
  * card's (`getCardBurn`), which is what the card showed. 초안.
  */
-export const describeLinkMade = (run, { cashed, burn }) =>
-  isCascadeOn(run) && cashed && !run.schema?.mutations?.includes("blackout") && Math.abs(burn?.value ?? 0) >= LINK_BURN
+export const describeLinkMade = (run, { cashed, burn }, rules) =>
+  isCascadeOn(run, rules) && cashed && !run.schema?.mutations?.includes("blackout") && Math.abs(burn?.value ?? 0) >= LINK_BURN
     ? `${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 안에 한 판의 벽이 ${LINK_WALL} 가까워진다.`
     : null;
 

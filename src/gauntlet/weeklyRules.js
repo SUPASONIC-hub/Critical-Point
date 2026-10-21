@@ -16,7 +16,8 @@
  * One exception, by name: a rule may switch on a device the table does not
  * otherwise have (`rules`), from `WEEK_RULE_DEVICES` and nothing else (B3
  * decision 8, widened to two by B2 decision 11). There is no general frame;
- * the engine asks `weekRuleHasDevice` for the one it means.
+ * the engine asks `weekRuleHasDevice` for the one it means. Since RULES_MARK 3
+ * the list is empty: the two devices it held are rules of the table.
  *
  * A leaf module, like tableRules.js: pure functions of a time in milliseconds.
  * What "now" is lives in state/weeklyClock.js, so a test can hold it still.
@@ -37,30 +38,16 @@ export const WEEKLY_NOTICE_DAYS = 7;
 export const WEEK_RULE_ID_MAX = 32;
 
 /**
- * The devices a week may switch on: B3's AUDIT (auditRisk.js) and B2's
- * CASCADE (cascadeRisk.js). A device a rule names outside this list is not on.
+ * The devices a week may switch on. B3's AUDIT and B2's CASCADE were the two
+ * (B3 decision 8, widened by B2 decision 11) until RULES_MARK 3 made them
+ * rules of the table (tableUnlocks.js); the list is kept, empty, for the next
+ * device a week tries out first (the rule switch's question 2, user
+ * 2026-10-20). A device a rule names outside it is not on.
  */
-export const WEEK_RULE_DEVICES = Object.freeze(["audit", "cascade"]);
+export const WEEK_RULE_DEVICES = Object.freeze([]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
-/**
- * AUDIT (B3, the `audit` device, auditRisk.js): a cash pushed at least once
- * and closed below `AUDIT_HEAT` adds one to the case's audit, a cash at
- * HEAT DEBT's heat or more takes `AUDIT_RELIEF` off it. When the case closes
- * with `AUDIT_LIMIT` or more, one part in `AUDIT_SHARE` of what it moves to
- * the vault is lost. Set B of the design's three (40 / 4 / -2 / one in four),
- * decided by the user on 2026-10-20 after the A/B/C measurement of PR #201:
- * A never caught a season bot, C broke a check:pressure assertion and caught
- * the hand that watches the wall. Here, beside the other
- * week's numbers, while it is a week's device: imported from tableRules.js
- * this chunk took the whole of that module (check:bundle, 2026-10-19); it
- * moves there when it becomes a rule of the table.
- */
-export const AUDIT_HEAT = 40;
-export const AUDIT_LIMIT = 4;
-export const AUDIT_RELIEF = 2;
-export const AUDIT_SHARE = 4;
 /** HEAVY FRACTURE: what FRACTURE bills the cracked axis that week. */
 const HEAVY_FRACTURE_RATE = 1.75;
 /**
@@ -72,10 +59,6 @@ const HEAVY_FRACTURE_RATE = 1.75;
  */
 export const SHORT_CLOCK_SECONDS = 8;
 export const SHORT_CLOCK_CHIPS = 1.25;
-
-/** The audit's line and the links', each week's that has the device. */
-const AUDIT_LINE = `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`;
-const CASCADE_LINE = "한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다.";
 
 /**
  * The rules a week can carry, by id. `schema` is relative for the wall
@@ -110,33 +93,18 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     world: "이번 주 이사회는 보고 시간을 줄이고 보고서 값을 올렸다.",
     schema: Object.freeze({ secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS }),
   }),
-  // B3's test week: a device; no number on the board moves.
-  "audit": Object.freeze({
-    label: "AUDIT WEEK",
-    // 초안 문구 (B3 decision 11 asks for the line by number).
-    title: "감사 주간",
-    text: AUDIT_LINE,
-    rules: Object.freeze(["audit"]),
-  }),
-  // B2's test week: a device; no number on the board moves. Its numbers are
-  // cascadeRisk.js's, written out because that chunk imports this one (a
-  // unit test holds the line to them). In no week of the calendar; a
-  // development build plays it with `?week=cascade` (weeklyCalendar.js).
-  "cascade": Object.freeze({
-    label: "CASCADE WEEK",
-    // 초안 문구.
-    title: "연쇄 주간",
-    text: CASCADE_LINE,
-    rules: Object.freeze(["cascade"]),
-  }),
-  // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22): both devices at once, told
-  // in the two weeks' own lines and one that ties them: a cash on a CASCADE
-  // board is not counted by the audit (B2 decision 10, auditRisk.js), so the
-  // ranking of that week is the one table B3 and B2 will be judged on.
+  // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22,
+  // 11-16 to 11-22): both devices at once, which RULES_MARK 3 then made rules
+  // of the table from 프롤로그 04. A week gone by, kept because the calendar
+  // and the server's weekly_rules name it and a season begun in it carries the
+  // stamp; its line is the one that week showed, numbers written out
+  // (auditRisk.js and cascadeRisk.js have them now), and `rules` is what it
+  // switched on, which nothing switches any more (`WEEK_RULE_DEVICES` is
+  // empty; the table record reads it, auditRisk.js).
   "audit-cascade": Object.freeze({
     label: "AUDIT & CASCADE",
     title: "감사와 연쇄",
-    text: `이번 주는 감사와 연쇄가 함께 선다. ${AUDIT_LINE} ${CASCADE_LINE} CASCADE 판의 확정은 감사에 세지 않는다.`,
+    text: "이번 주는 감사와 연쇄가 함께 선다. 한 번 이상 밀고 열기 40 미만에서 확정하면 감사 +1. 4칸이 찬 채 사건이 닫히면 금고로 갈 몫의 4분의 1을 잃는다. 한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다. CASCADE 판의 확정은 감사에 세지 않는다.",
     rules: Object.freeze(["audit", "cascade"]),
   }),
 });

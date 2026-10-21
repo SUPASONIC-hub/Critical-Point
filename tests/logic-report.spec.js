@@ -55,7 +55,7 @@ test.beforeEach(async ({ page }) => {
  */
 function closedCase(caseId, logicRecord, extra = {}) {
   const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
-  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 2 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 3 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
   return { ...summary, ...(logicRecord ? atLogicTable : {}), ...extra };
 }
 

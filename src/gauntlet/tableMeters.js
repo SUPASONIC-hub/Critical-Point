@@ -34,11 +34,12 @@ export function describeDanger({ gauge, nextHigh, wallMin }) {
  * `band` is the wall band the window draws: the board's, or the narrower one
  * SCOUT bought (`getWindowBand`); the danger line reads its low edge.
  *
- * `audit` is the case's audit off its log; on a week that counts it the
- * reading says where it stands and what a cash now would make it (B3:
- * the heat and the pushes, never the wall), and is null on every other table.
+ * `audit` is the case's audit off its log, or null in a case whose rules do
+ * not count it (useRunReadout asks); the reading says where it stands and
+ * what a cash now would make it (B3: the heat and the pushes, never the
+ * wall), and is null on every other table.
  */
-export function readTableMeters({ win, schema, selectedCard, run = null, audit = 0 }) {
+export function readTableMeters({ win, schema, selectedCard, run = null, audit }) {
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);
