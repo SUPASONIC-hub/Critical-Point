@@ -5,7 +5,7 @@
  * the score from the decision log, every window that carries a replay record,
  * a sealed card cashed below its seal, and a response time off the window
  * clock. It prints the marks it would add to each ranking row
- * (`score-off-log`, `window-off-replay`) and why. It writes nothing anywhere.
+ * (`score-off-log`, `window-off-replay`) and why. It writes nothing itself.
  *
  *   node scripts/verify-ranking-rows.mjs rows.json [--json]
  *       rows.json is an array of playtest_sessions rows (or `{ "rows": [...] }`),
@@ -22,6 +22,11 @@
  *       SUPABASE_SERVICE_ROLE_KEY from the environment. The case rows are not
  *       public (anon reads only public_rankings, which has no decision log), so
  *       this needs the service key, which is not on this machine.
+ *
+ *   node scripts/verify-ranking-rows.mjs rows.json --marks-sql
+ *       prints the one statement that writes each checked run's marks
+ *       (ranking_set_recheck_marks), for the CI job to run the same way;
+ *       nothing when no run was checked. It names run ids: never printed in CI.
  *
  * --redact names each run by its public tag (`run_tag`, what the ranking
  * shows) instead of its run id, for a log anyone can read (the CI job).
@@ -135,6 +140,24 @@ export function formatReport(results, { redact = false } = {}) {
   return lines;
 }
 
+/**
+ * The write that states each checked run's marks (ranking_set_recheck_marks,
+ * 20261021020000): one statement, every checked run with the marks it earned,
+ * none included, so a run that no longer earns a mark loses it. A run not
+ * checked (other table rules) is left as it is. Null when there is nothing to write.
+ */
+export function marksSql(results) {
+  const checked = results.filter((result) => result.status === "checked" && typeof result.runId === "string" && result.runId);
+  if (!checked.length) return null;
+  const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
+  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.map(quote).join(", ")}]::text[])`).join(",\n       ");
+  return [
+    "select count(*) filter (where marks is not null) as marked_rows",
+    "  from (select public.ranking_set_recheck_marks(r.run_id, r.marks) as marks",
+    `          from (values ${values}) as r(run_id, marks)) as written;`,
+  ].join("\n");
+}
+
 async function main(argv) {
   const json = argv.includes("--json");
   const limit = Number(argv.find((arg) => arg.startsWith("--limit="))?.slice(8)) || 20;
@@ -156,6 +179,11 @@ async function main(argv) {
     return 1;
   }
   const results = verifyRows(rows);
+  if (argv.includes("--marks-sql")) {
+    const sql = marksSql(results);
+    if (sql) console.log(sql);
+    return 0;
+  }
   console.log(json ? JSON.stringify(results, null, 2) : formatReport(results, { redact: argv.includes("--redact") }).join("\n"));
   return 0;
 }
