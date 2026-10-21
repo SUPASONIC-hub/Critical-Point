@@ -46,8 +46,8 @@
 | 변유진 | `portrait-byeon-yujin.webp` | https://www.pexels.com/photo/8761675/ | Pavel Danilyuk (https://www.pexels.com/@pavel-danilyuk/) | [Pexels License](https://www.pexels.com/license/) |
 | 곽민재 | `portrait-kwak-minjae.webp` | https://www.pexels.com/photo/smiling-man-in-springtime-seoul-temple-setting-31752178/ | Theodore Nguyen (https://www.pexels.com/@thejourneyofframes/) | [Pexels License](https://www.pexels.com/license/) |
 | 백다온 | `portrait-baek-daon.webp` | https://unsplash.com/photos/OFSQ6bHjFjs | Hà Nguyễn (https://unsplash.com/@lavinhha) | [Unsplash License](https://unsplash.com/license) |
-| 진서우 | `portrait-jin-seou.webp` | https://www.pexels.com/photo/a-woman-sitting-at-the-table-7845073/ | RDNE Stock project (https://www.pexels.com/@rdne/) | [Pexels License](https://www.pexels.com/license/) |
-| 하도율 | `portrait-ha-doyul.webp` | https://www.pexels.com/photo/a-man-in-black-suit-jacket-8584505/ | Joon Tae Kim (https://www.pexels.com/@joon-tae-kim-72545476/) | [Pexels License](https://www.pexels.com/license/) |
+| 진서우 | `portrait-jin-seou.webp` | https://www.pexels.com/photo/a-smiling-woman-siting-behind-a-desk-7845155/ | RDNE Stock project (https://www.pexels.com/@rdne/) | [Pexels License](https://www.pexels.com/license/) |
+| 하도율 | `portrait-ha-doyul.webp` | https://www.pexels.com/photo/portrait-of-man-standing-in-black-suit-26524772/ | Pro5 vn (https://www.pexels.com/@pro5-vn-1368185933/) | [Pexels License](https://www.pexels.com/license/) |
 | 연지안 | `portrait-yeon-jian.webp` | https://www.pexels.com/photo/a-nurse-in-a-white-apron-15641096/ | Tran Nhu Tuan (https://www.pexels.com/@kooldark/) | [Pexels License](https://www.pexels.com/license/) |
 | 진태윤 | `portrait-jin-taeyun.webp` | https://www.pexels.com/photo/man-leaning-on-wall-450214/ | Royal Anwar (https://www.pexels.com/@royalanwar/) | [Pexels License](https://www.pexels.com/license/) |
 | 하예솔 | `portrait-ha-yesol.webp` | https://www.pexels.com/photo/a-smiling-woman-wearing-an-apron-6223005/ | Antonius Ferret (https://www.pexels.com/@antonius-ferret/) | [Pexels License](https://www.pexels.com/license/) |
@@ -61,7 +61,8 @@
 Unsplash 사진은 "Free to use under the Unsplash License"입니다. 스물두 명 모두 악역이 아니라서 실제 사람의 사진을 썼습니다
 (Pexels 라이선스의 "Identifiable people may not appear in a bad light or in a way that is offensive."에 걸리지 않는 역).
 cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 장까지), 같은 사진가의 사진이 여러 장이어도 모델은 모두 다른 사람입니다.
-Joon Tae Kim의 하도율 사진은 처음 백다온 몫으로 고른 같은 사진가의 사진과 얼굴이 같아 보여, 백다온은 Hà Nguyễn의 사진으로 바꿨습니다.
+백다온 몫으로 고른 Joon Tae Kim의 사진은 하도율 몫의 같은 사진가 사진과 얼굴이 같아 보여 Hà Nguyễn의 사진으로 바꿨고,
+하도율과 진서우는 처음 고른 사진이 눈을 내리깔거나 고개를 숙여 얼굴이 어두웠기 때문에 카메라를 보는 다른 사진으로 바꿨습니다.
 선재윤과 하예솔은 처음 고른 사진과 같은 촬영의 다른 컷(손이 얼굴에 닿지 않은 것, 얼굴이 보이는 것)을 썼습니다.
 
 ## 실존하지 않는 사람의 생성 사진 세 장
