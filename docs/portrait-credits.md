@@ -1,15 +1,15 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장과 10월 20일에 더한 다섯 장, 10월 21일에 더한 스물두 장의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 마흔두 장의 출처입니다.
 처음 다섯 장(한서윤, 반재욱, 도윤하, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 
-## 사진에서 만든 서른네 장
+## 사진에서 만든 쉰네 장
 
-사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 고은비부터 남지형까지는 10월 21일).
+사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지와 고은비부터 남지형까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
 
-- Unsplash License: https://unsplash.com/license
-- Pexels License: https://www.pexels.com/license/
+- Unsplash License: https://unsplash.com/license (사진 페이지 문구: "Free to use under the Unsplash License")
+- Pexels License: https://www.pexels.com/license/ ("All photos and videos on Pexels are free to use.")
 
 사진 속 사람은 게임의 인물이 아니고, 인물의 생김새를 빌려 온 모델일 뿐입니다.
 
@@ -31,6 +31,26 @@
 | 한지우 | `portrait-han-jiwoo.webp` | https://www.pexels.com/photo/close-up-shot-of-a-woman-in-white-long-sleeves-holding-a-white-paper-and-pen-7706975/ | Alena Darmel (https://www.pexels.com/@a-darmel/) | [Pexels License](https://www.pexels.com/license/) |
 | 나은호 | `portrait-na-eunho.webp` | https://www.pexels.com/photo/man-wearing-a-suit-and-tie-18165006/ | Lil K (https://www.pexels.com/@lil-k-706180881/) | [Pexels License](https://www.pexels.com/license/) |
 | 권도현 | `portrait-kwon-dohyeon.webp` | https://www.pexels.com/photo/portrait-of-businessman-17049766/ | Tran Nhu Tuan (https://www.pexels.com/@kooldark/) | [Pexels License](https://www.pexels.com/license/) |
+| 선우진 | `portrait-seon-ujin.webp` | https://www.pexels.com/photo/a-man-wearing-a-white-cardigan-8586791/ | Joon Tae Kim (https://www.pexels.com/@joon-tae-kim-72545476/) | [Pexels License](https://www.pexels.com/license/) |
+| 탁예린 | `portrait-tak-yerin.webp` | https://www.pexels.com/photo/portrait-of-a-woman-smiling-8101981/ | Mikhail Nilov (https://www.pexels.com/@mikhail-nilov/) | [Pexels License](https://www.pexels.com/license/) |
+| 차지원 | `portrait-cha-jiwon.webp` | https://www.pexels.com/photo/a-woman-wearing-a-beige-blazer-7643884/ | MART PRODUCTION (https://www.pexels.com/@mart-production/) | [Pexels License](https://www.pexels.com/license/) |
+| 채이안 | `portrait-chae-ian.webp` | https://www.pexels.com/photo/portrait-of-a-businessman-giving-a-thumbs-up-16370549/ | Wasin Pirom (https://www.pexels.com/@wasinpirom/) | [Pexels License](https://www.pexels.com/license/) |
+| 남궁솔 | `portrait-namgung-sol.webp` | https://www.pexels.com/photo/close-up-photo-of-woman-smiling-11563145/ | yi lu (https://www.pexels.com/@luyi/) | [Pexels License](https://www.pexels.com/license/) |
+| 최서진 | `portrait-choi-seojin.webp` | https://www.pexels.com/photo/portrait-of-a-woman-wearing-an-office-smart-casual-attire-7163348/ | Antoni Shkraba (https://www.pexels.com/@shkrabaanthony/) | [Pexels License](https://www.pexels.com/license/) |
+| 채윤슬 | `portrait-chae-yunseul.webp` | https://www.pexels.com/photo/a-happy-woman-sitting-at-her-work-desk-8546757/ | Karola G (https://www.pexels.com/@karola-g/) | [Pexels License](https://www.pexels.com/license/) |
+| 표세린 | `portrait-pyo-serin.webp` | https://www.pexels.com/photo/portrait-of-social-worker-in-white-shirt-9870145/ | Ron Lach (https://www.pexels.com/@ron-lach/) | [Pexels License](https://www.pexels.com/license/) |
+| 지강현 | `portrait-ji-ganghyeon.webp` | https://www.pexels.com/photo/man-in-yellow-crew-neck-t-shirt-pointing-a-finger-4584538/ | Ketut Subiyanto (https://www.pexels.com/@ketut-subiyanto/) | [Pexels License](https://www.pexels.com/license/) |
+| 민도현 | `portrait-min-dohyeon.webp` | https://www.pexels.com/photo/a-man-in-a-gray-sweatshirt-taking-a-selfie-7972551/ | George Pak (https://www.pexels.com/@george-pak/) | [Pexels License](https://www.pexels.com/license/) |
+| 민하랑 | `portrait-min-harang.webp` | https://unsplash.com/photos/pIgl1dni3dQ | Vitaly Gariev (https://unsplash.com/@silverkblack) | [Unsplash License](https://unsplash.com/license) |
+| 정해린 | `portrait-jeong-haerin.webp` | https://unsplash.com/photos/woman-in-black-shirt-smiling-OuxJHYeUYpk | panitan punpuang (https://unsplash.com/@panitan) | [Unsplash License](https://unsplash.com/license) |
+| 이정숙 | `portrait-lee-jeongsuk.webp` | https://www.pexels.com/photo/woman-smiling-at-the-camera-6787568/ | Marcus Aurelius (https://www.pexels.com/@marcus-aurelius/) | [Pexels License](https://www.pexels.com/license/) |
+| 유하온 | `portrait-yoo-haon.webp` | https://www.pexels.com/photo/smiling-woman-holding-chair-bars-25322747/ | Quý Nguyễn (https://www.pexels.com/@chupanhchandung/) | [Pexels License](https://www.pexels.com/license/) |
+| 정태오 | `portrait-jeong-taeo.webp` | https://www.pexels.com/photo/portrait-of-a-man-in-a-fur-coat-6244521/ | 宇峰 吳 (https://www.pexels.com/@fungfung852/) | [Pexels License](https://www.pexels.com/license/) |
+| 연하진 | `portrait-yeon-hajin.webp` | https://www.pexels.com/photo/a-woman-working-in-the-call-center-8204315/ | Kampus Production (https://www.pexels.com/@kampus/) | [Pexels License](https://www.pexels.com/license/) |
+| 마서윤 | `portrait-ma-seoyun.webp` | https://www.pexels.com/photo/a-woman-holding-a-laptop-8511892/ | Artem Podrez (https://www.pexels.com/@artempodrez/) | [Pexels License](https://www.pexels.com/license/) |
+| 여다인 | `portrait-yeo-dain.webp` | https://unsplash.com/photos/6D3z73t5XiA | Jack H. Park (https://unsplash.com/@jack_park) | [Unsplash License](https://unsplash.com/license) |
+| 임재윤 | `portrait-lim-jaeyun.webp` | https://www.pexels.com/photo/black-and-white-photography-of-a-man-posing-in-a-suit-21044807/ | HONG SON (https://www.pexels.com/@hson/) | [Pexels License](https://www.pexels.com/license/) |
+| 신영란 | `portrait-shin-yeongran.webp` | https://www.pexels.com/photo/a-woman-is-serving-food-to-customers-in-a-restaurant-27993176/ | Paul Bill (https://www.pexels.com/@hoffman11/) | [Pexels License](https://www.pexels.com/license/) |
 | 고은비 | `portrait-go-eunbi.webp` | https://www.pexels.com/photo/9730345/ | cottonbro studio (https://www.pexels.com/@cottonbro/) | [Pexels License](https://www.pexels.com/license/) |
 | 주은채 | `portrait-joo-eunchae.webp` | https://www.pexels.com/photo/13557308/ | Ramon Karolan (https://www.pexels.com/@ramonkaphotography/) | [Pexels License](https://www.pexels.com/license/) |
 | 배수경 | `portrait-bae-sugyeong.webp` | https://www.pexels.com/photo/40090548/ | Esma Yıkılmaz İpek (https://www.pexels.com/@esma-yikilmaz-i-pek-558317910/) | [Pexels License](https://www.pexels.com/license/) |
@@ -54,7 +74,10 @@
 | 채도훈 | `portrait-chae-dohun.webp` | https://unsplash.com/photos/older-man-in-pink-plaid-shirt-5FPdgshYQ60 | tommao wang (https://unsplash.com/@tommaomaoer) | [Unsplash License](https://unsplash.com/license) |
 | 남지형 | `portrait-nam-jihyeong.webp` | https://www.pexels.com/photo/asian-man-wearing-shirt-and-vest-5757086/ | 卓 周 | [Pexels License](https://www.pexels.com/license/) |
 
-같은 사진가의 사진이 두 장씩 있지만(Vitaly Gariev, cottonbro studio) 모델은 서로 다른 사람입니다.
+같은 사진가의 사진이 여러 장 있지만(Vitaly Gariev, Mikhail Nilov, cottonbro studio 세 장씩) 모델은 서로 다른 사람입니다.
+10월 21일의 스무 장은 얼굴을 가운데 두고, 사진에 함께 찍힌 손과 물건, 글자는 잘라 냈습니다(채이안의 엄지, 지강현의 손가락, 유하온이 잡은 의자, 신영란 앞으로 뻗은 손님의 팔 등).
+선우진부터 신영란까지 스무 명도 악역이나 미성년이 아니라서 실제 사람의 사진을 썼습니다. 처음 고른 사진에서 넷을 바꿨습니다.
+남궁솔은 사진 속 사람이 50대로 보여(본문은 30대), 표세린은 한지우와 같은 모델이라서, 최서진과 신영란은 눈을 감거나 옆을 보고 고개를 숙여 얼굴이 남지 않아서입니다.
 
 고은비부터 남지형까지 스물두 장은 2026년 10월 21일에 내려받아 같은 보정을 했습니다. 손, 손에 든 카드, 명찰 글자는 자르는 범위 밖에 두었습니다.
 라이선스는 내려받을 때 사진 페이지에 적힌 대로입니다. Pexels 사진은 License 칸이 "Free"이고 라이선스 페이지의 문구는 "All photos and videos on Pexels are free to use.",
