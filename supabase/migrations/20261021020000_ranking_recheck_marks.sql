@@ -1,9 +1,8 @@
--- DRAFT (2026-10-21, branch f1-stage2). A .sql.draft is read by neither
--- check:grants, the migration-drift test nor the Supabase CLI. Renamed to
--- .sql -- re-dated after every migration then on main -- it reaches the
--- production database within a minute of the merge, so that happens only in
--- the PR that also brings the CI job that calls it (서버검증-설계안.md, the
--- 10-21 answers 5 and 6), with check:grants cases written first.
+-- Written 2026-10-21 on branch f1-stage2 (draft PR #216), first as a
+-- .sql.draft and renamed once its check:grants cases passed. Merging it applies
+-- it to the production database within a minute, before the client deploys;
+-- that waits for the user after 11-02 (서버검증-설계안.md, the 10-21 answers 5
+-- and 6), together with the CI job that calls it (verify-ranking.yml).
 --
 -- Server checks, phase 2: the checker's marks.
 --
@@ -34,14 +33,14 @@
 -- function runs as the table's owner; update is granted to service_role alone
 -- (20260927000000), anon holds column grants for insert and select.
 --
--- check:grants applies this draft after every migration and holds it to its
+-- check:grants replays it with every migration and holds it to its
 -- cases (scripts/check-grants.mjs, "the checker's marks"): anon and
 -- authenticated cannot call it; the trigger's marks survive; a call states the
 -- two marks whole; an unknown mark or null is refused; a run with no ranking
 -- row answers null; another run and the run's case rows are left alone.
 --
--- Dated after the test week's 20261021010000; re-date it after whatever is
--- last on main when it is renamed.
+-- Dated after the last migration on main of 2026-10-21 (20261021010000, the
+-- test week); re-date it after whatever is last on main when it merges.
 
 create or replace function public.ranking_set_recheck_marks(p_run_id text, p_marks text[])
 returns text[]

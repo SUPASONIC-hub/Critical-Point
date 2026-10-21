@@ -13,7 +13,7 @@ import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from 
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
-import { rankingRowsSql } from "./verify-ranking-rows.mjs";
+import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
 
 /**
  * Data API grants guardrail.
@@ -67,8 +67,8 @@ import { rankingRowsSql } from "./verify-ranking-rows.mjs";
  *      weekly drop-off report (report-funnel.mjs) runs its one SELECT too.
  *   8. The checker's marks (F1 phase 2, *_ranking_recheck_marks): only the
  *      service role may set them; a call states the two recheck marks whole,
- *      keeps the insert trigger's and touches no other row. Applied from its
- *      .sql.draft after every migration until it is renamed.
+ *      keeps the insert trigger's and touches no other row; the checker's
+ *      own read (verify-ranking-rows --sql) runs on the replayed schema.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -199,24 +199,9 @@ for (const file of files) {
   }
 }
 
-// The checker's marks (F1 phase 2, `*_ranking_recheck_marks.sql`). While the
-// migration is still a `.sql.draft` -- which the CLI does not read, so the
-// live database does not have it -- it is applied here after every migration,
-// so its function meets every rule below and its own cases before it is
-// renamed and reaches the live database within a minute of a merge. Once it is
-// a `.sql` the loop above has applied it like any other.
-const RECHECK_MARKS_SQL = files.some((file) => file.endsWith("_ranking_recheck_marks.sql"));
-const RECHECK_MARKS_DRAFT = readdirSync(MIGRATIONS).find((file) => file.endsWith("_ranking_recheck_marks.sql.draft")) ?? null;
-if (RECHECK_MARKS_SQL && RECHECK_MARKS_DRAFT) failures.push(`supabase/migrations/${RECHECK_MARKS_DRAFT} is still there beside its .sql; take the draft out.`);
-if (!RECHECK_MARKS_SQL && RECHECK_MARKS_DRAFT) {
-  try {
-    await db.exec(readFileSync(path.join(MIGRATIONS, RECHECK_MARKS_DRAFT), "utf8"));
-  } catch (error) {
-    console.error(`supabase/migrations/${RECHECK_MARKS_DRAFT} does not apply after every migration: ${error.message}`);
-    process.exit(1);
-  }
-}
-const RECHECK_MARKS = RECHECK_MARKS_SQL || Boolean(RECHECK_MARKS_DRAFT);
+// The checker's marks (F1 phase 2, `*_ranking_recheck_marks.sql`): the cases
+// below run once the migration is among the files.
+const RECHECK_MARKS = files.some((file) => file.endsWith("_ranking_recheck_marks.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -1384,7 +1369,7 @@ if (!SUSPICION_MARKS) {
   await db.query(`delete from public.playtest_sessions where run_id like 'run-marks-%'`);
 }
 
-// ---- the checker's marks (*_ranking_recheck_marks.sql, a draft until the CI job ships)
+// ---- the checker's marks (*_ranking_recheck_marks.sql)
 //
 // scripts/verify-ranking-rows.mjs names at most two marks for a ranking run;
 // ranking_set_recheck_marks writes them into the suspicion column beside the
@@ -1392,7 +1377,7 @@ if (!SUSPICION_MARKS) {
 // the run's two recheck marks whole and keeps every other mark, and it touches
 // the run's ranking row and nothing else.
 if (!RECHECK_MARKS || !SUSPICION_MARKS) {
-  console.log("Checker marks: skipped, no *_ranking_recheck_marks migration or draft (or the suspicion marks are still a draft).");
+  failures.push("supabase/migrations/*_ranking_recheck_marks.sql is gone, or the suspicion marks are; the checker's marks were checked against nothing.");
 } else {
   const call = (runId, marks) => `select public.ranking_set_recheck_marks('${runId}', ${marks === null ? "null" : `array[${marks.map((mark) => `'${mark}'`).join(", ")}]::text[]`}) as marks`;
   await refused("set a ranking row's checker marks", "anon", call("run-recheck-1", ["score-off-log"]));
@@ -1434,6 +1419,18 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(none && none.marks === null, `a run with no ranking row answered ${JSON.stringify(none)}; expected null.`);
   check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "setting one run's checker marks changed another run's.");
   check((await marksOf("run-recheck-1", "final")) === null, "setting a run's checker marks marked its case row; only the ranking row is marked.");
+  // The checker's write (verify-ranking-rows --marks-sql), as the CI job runs
+  // it over the Management API: one statement for every checked run, an empty
+  // list for a run that earns nothing, and a run not checked left out.
+  const write = marksSql([
+    { status: "checked", runId: "run-recheck-1", marks: ["score-off-log"] },
+    { status: "checked", runId: "run-recheck-2", marks: [] },
+    { status: "unverified", runId: "run-recheck-none", marks: [] },
+  ]);
+  const wrote = (await one(write))?.marked_rows;
+  check(Number(wrote) === 2, `the checker's write marked ${wrote} ranking rows; expected the two checked runs.`);
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "the checker's write took a trigger's mark from a run that earned none of its own.");
   // The checker's own read (verify-ranking-rows --sql) runs on this schema and
   // brings each ranked run whole: here the top one, every row of it.
   const read = (await allowed("run the checker's read", "service_role", rankingRowsSql({ limit: 1 })))?.rows ?? [];

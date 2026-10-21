@@ -4,7 +4,7 @@ import test from "node:test";
 import { BASE_SCHEMA, createWindow, normalizeSchema, RULES_MARK, SEAL_BREAK_GAUGE } from "../../src/gauntlet/gauntletEngine.js";
 import { isSealedCash, isTimeOffClock, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
-import { fetchRunRows, formatReport, groupByRun, rankingRowsSql, readRows, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
+import { fetchRunRows, formatReport, groupByRun, marksSql, rankingRowsSql, readRows, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
 import { createWindowRecorder, thresholdOfVerdict } from "./helpers/windowRecorder.mjs";
 
 /**
@@ -183,4 +183,20 @@ test("rows whose jsonb columns came out as text are read as the objects they are
   const read = readRows(JSON.stringify({ rows: asText }));
   assert.deepEqual(read, rows);
   assert.deepEqual(verifyRows(read).map((result) => result.marks), [[]]);
+});
+
+test("the CI write states every checked run's marks in one statement, quoted, and leaves unchecked runs out", () => {
+  const sql = marksSql([
+    { status: "checked", runId: "run-a", marks: ["score-off-log", "window-off-replay"] },
+    { status: "checked", runId: "run-'b", marks: [] },
+    { status: "unverified", runId: "run-c", marks: [] },
+  ]);
+  assert.equal(sql.indexOf(";"), sql.length - 1);
+  assert.match(sql, /\('run-a', array\['score-off-log', 'window-off-replay'\]::text\[\]\)/);
+  assert.match(sql, /\('run-''b', array\[\]::text\[\]\)/);
+  assert.doesNotMatch(sql, /run-c/);
+  assert.doesNotMatch(sql, /\b(insert|update|delete|truncate|alter|drop|create|grant)\b/i);
+  assert.equal(marksSql([{ status: "unverified", runId: "run-c", marks: [] }]), null);
+  // Built from a real report: the honest run is written with no marks.
+  assert.match(marksSql(verifyRows(seasonRows("run-real"))), /\('run-real', array\[\]::text\[\]\)/);
 });
