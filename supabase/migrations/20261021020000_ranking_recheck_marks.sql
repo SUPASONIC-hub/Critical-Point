@@ -7,7 +7,7 @@
 -- Server checks, phase 2: the checker's marks.
 --
 -- scripts/verify-ranking-rows.mjs works a ranking run out again off the page
--- (src/rankingRecheck.js) and names at most three marks for its ranking row:
+-- (src/rankingRecheck.js) and names at most four marks for its ranking row:
 --
 --   score-off-log       the final case's summary does not hold the score
 --                       its own decision log earns, or the ranking row's
@@ -19,13 +19,18 @@
 --                       not the one the page deals at that place (a wall picked).
 --   window-no-replay    a window left no record in a run whose build writes
 --                       them (from the run's first recorded case on).
+--   chain-off-log       one case's closing state does not lead into the next
+--                       case's opening (src/chainRecheck.js, draft #228; F1
+--                       phase 3, S5 of 서버검증-설계안.md, question 3 (1)).
+--                       Allowed here before the chain check is wired in; until
+--                       verify-ranking-rows names it, nothing sets it.
 --
 -- They go into the `suspicion` column of 20261020000000 beside the insert
 -- trigger's marks: a mark, never a refusal, and the ranking shows marked rows
 -- unless `ranking_hide_marked` is set (decision 2 (1)). Only the service role
 -- may call this; the checker holds that key in CI, never the page.
 --
--- Each call states the run's recheck marks whole: the three marks above are
+-- Each call states the run's recheck marks whole: the four marks above are
 -- replaced by `p_marks` and every other mark is kept, so a run checked again
 -- after a fix to the checker loses a mark it no longer earns.
 --
@@ -66,7 +71,7 @@ security definer
 set search_path = public
 as $$
 declare
-  v_recheck constant text[] := array['score-off-log', 'window-no-replay', 'window-off-replay'];
+  v_recheck constant text[] := array['chain-off-log', 'score-off-log', 'window-no-replay', 'window-off-replay'];
   v_marks text[];
 begin
   if p_marks is null or not (p_marks <@ v_recheck) then

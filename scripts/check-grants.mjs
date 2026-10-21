@@ -13,6 +13,7 @@ import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from 
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
+import { CHAIN_MARK } from "../src/rankingRecheck.js";
 
 /**
  * Data API grants guardrail.
@@ -1413,6 +1414,12 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   await setMarks("state both checker marks", ["window-off-replay", "score-off-log"], ["score-off-log", "time-over-gap", "window-off-replay"]);
   await setMarks("drop a checker mark the run no longer earns", ["window-off-replay"], ["time-over-gap", "window-off-replay"]);
   await setMarks("clear the checker marks, keeping the trigger's", [], ["time-over-gap"]);
+  // The chain check's mark (F1 phase 3, S5) is the checker's too: set beside
+  // the others, and dropped like them when a call no longer states it.
+  await setMarks("add the chain check's mark", [CHAIN_MARK, "score-off-log"], [CHAIN_MARK, "score-off-log", "time-over-gap"]);
+  await setMarks("drop the chain check's mark", ["score-off-log"], ["score-off-log", "time-over-gap"]);
+  await setMarks("clear the checker marks again", [], ["time-over-gap"]);
+  await raises("set a chain mark under another name", "service_role", call("run-recheck-1", ["chain-off-logs"]), [], /^22023 /);
   await raises("set a mark the checker does not own", "service_role", call("run-recheck-1", ["rank-off-score"]), [], /^22023 /);
   await raises("set marks from null", "service_role", call("run-recheck-1", null), [], /^22023 /);
   check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap"]), "a refused call changed the ranking row's marks.");

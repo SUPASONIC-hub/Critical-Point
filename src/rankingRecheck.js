@@ -195,6 +195,15 @@ export function isCurrentTable(row) {
 export const RECHECK_MARKS = Object.freeze(["score-off-log", "window-off-replay", "window-no-replay"]);
 
 /**
+ * The chain check's mark (F1 phase 3, S5): one case's closing state does not
+ * lead into the next case's opening. ranking_set_recheck_marks allows it
+ * beside RECHECK_MARKS; nothing here names it yet.
+ * TODO(#228): src/chainRecheck.js exports the same string as CHAIN_MARK; once
+ * #228 merges, import it from there and drop this copy.
+ */
+export const CHAIN_MARK = "chain-off-log";
+
+/**
  * One run read together: its case rows (`case_id` a case) and its ranking row
  * (`season-final`, whose summary the server copied from the `final` case
  * row). Returns the marks for the ranking row and what led to them, case by
