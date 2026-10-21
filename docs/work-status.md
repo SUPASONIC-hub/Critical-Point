@@ -960,7 +960,8 @@ Still open, on purpose:
     (`src/speakerPortraits.js`, sources in `docs/portrait-credits.md`), and a
     new speaker gets one too: no one is left as the silhouette. Villains and
     minors get a generated picture of someone who does not exist, chosen to
-    look ordinary rather than sinister; everyone else a free stock photo given
+    look ordinary rather than sinister (Hannah Arendt's banality of
+    evil: the harm in this story is done by ordinary people signing papers); everyone else a free stock photo given
     the same grade. `SpeakerPortrait` draws a back-lit silhouette tinted from
     the name, with the initial, only when a file does not arrive.
 73. A case is written to a bible that requires anger, laughter, sorrow and joy,
