@@ -32,6 +32,7 @@ import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
+import { findFinalChoiceEntry } from "../verdictBranch.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
@@ -131,7 +132,8 @@ export function useChoiceCommit(context) {
       appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
-    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary });
+    // With the answer to its last question, which the season record counts the ruling by.
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null });
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
