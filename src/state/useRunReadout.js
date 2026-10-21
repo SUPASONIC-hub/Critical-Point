@@ -88,6 +88,8 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const auditCount = useMemo(() => countAudit(log), [log]);
   // B2's links off the case's log (cascadeRisk.js): null on a table without them.
   const linkReading = useMemo(() => readLinks(gauntletRun, log, runId), [gauntletRun, log, runId]);
+  // The two as one field of the play view, which has room for one (check:runtime-budget).
+  const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading }), [auditCount, linkReading]);
   // The trace is session storage, not state, and only the debug overlay prints
   // it, so only a debug build reads it on render.
   const silentFailureCount = debugTools
@@ -105,8 +107,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
     unopenedClueCount,
     unopenedRecordCount: unopenedClueCount + logReadout.unopenedBranchCount,
     gauntletSeed,
-    auditCount,
-    linkReading,
+    tableRisk,
     silentFailureCount,
   };
 }
