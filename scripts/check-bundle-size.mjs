@@ -53,11 +53,11 @@ const budgets = [
   // dissent's length does not read as a page number beside 14쪽 and 26쪽.
   // 169,935 -> 169,938 on 2026-10-21, measured 169,938: the origin's story
   // under DISSENT is titled 반대 의견서를 쓴 밤, the button's own word (+3).
-  // 169,935 -> 169,977 on 2026-10-21 (B3 on main, the e2e build CI checks): the
+  // 169,938 -> 169,980 on 2026-10-21 (B3 on main e8584c3, the e2e build CI checks): the
   // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
   // and one more dependency index (3). Folding the dev switch's leftovers
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_938, maxGzip: 61_300 },
+  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -222,9 +222,10 @@ const budgets = [
   // pulled that whole module into this chunk (2,033 / 1,246), and the line
   // lost its first sentence; the HUD's and the voice's words are in the
   // table's own chunk (tableMeters.js, tableVoice.js).
-  // Rebased on main (2026-10-21): main's 1,142 plus B3's 411 bytes.
+  // Rebased on main e8584c3 (2026-10-21): main's 1,159 (#212) plus B3's 411,
+  // measured 1,570 / 969 in the e2e build, the gzip plus 4.
   // audit's own chunk (auditRisk, below).
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_570, maxGzip: 976 },
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_570, maxGzip: 973 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
