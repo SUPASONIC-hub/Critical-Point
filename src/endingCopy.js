@@ -8,6 +8,8 @@
  * screen keeps only what depends on this run -- which entry to read.
  */
 
+import { getVerdictKey } from "./verdictBranch.js";
+
 export const observationLabels = { compliance: "순응", defiance: "거부", opacity: "은폐", sacrifice: "희생" };
 
 const choiceVerdicts = {
@@ -39,21 +41,9 @@ const failureVerdict = {
 };
 
 /**
- * The endings each final choice's verdict can stand beside. The verdict and
- * the epilogue are read from two things -- the last card and the season's
- * ruling -- and ten pairs said opposite things: 폭로 printed "외부로 넘어가고"
- * above a QUIET COVER epilogue that says nothing came out.
- */
-const VERDICT_ENDINGS = {
-  ending_seal: ["quiet-cover", "cold-justice", "field-pact", "open-question"],
-  ending_reform: ["open-oversight", "evidence-reform", "human-record", "cold-justice", "field-pact", "open-question"],
-  ending_expose: ["evidence-reform", "human-record", "field-pact", "open-question"],
-};
-
-/**
  * The ruling the ending sequence reads out: the collapse when the run failed,
  * the verdict of the final choice when it made one of the three and the ending
- * agrees with it (VERDICT_ENDINGS), and otherwise the open verdict, written
+ * agrees with it (`getVerdictKey`, verdictBranch.js), and otherwise the open verdict, written
  * from the ending variant the run reached.
  *
  * A run always has both things the open verdict is written from: the ruling
@@ -64,10 +54,10 @@ const VERDICT_ENDINGS = {
  * holds the two facts.
  */
 export function getFinalVerdict({ endingVariant, finalChoiceId, endingSceneChoice }) {
-  if (endingVariant.failure) return failureVerdict;
-  const agrees = VERDICT_ENDINGS[finalChoiceId]?.includes(endingVariant.id);
+  const verdict = getVerdictKey({ endingVariant, finalChoiceId });
+  if (verdict === "collapse") return failureVerdict;
   return (
-    (agrees ? choiceVerdicts[finalChoiceId] : null) ?? {
+    choiceVerdicts[verdict] ?? {
       title: endingVariant.title,
       ruling: endingVariant.text,
       execution: `${endingSceneChoice}.`,

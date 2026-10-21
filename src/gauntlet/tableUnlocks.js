@@ -287,3 +287,21 @@ export function getUnlockKicker(caseId) {
 export function isTableTaught(caseId, run, staged = STAGED) {
   return findStep(caseId, { veteran: run?.veteran === true, staged }) === null;
 }
+
+/**
+ * Whether a run begun with NEW GAME+ (`veteran`) plays this case under a
+ * different table from a plain run's: the case's step turns on fewer rules
+ * than the whole table. Asked of the step, not of a case number, so the answer
+ * moves with the ladder -- today 프롤로그 01 to 04; 프롤로그 05 already plays
+ * under everything, and so does every case after it.
+ *
+ * The server reads the same cases off a case row's `newGamePlus` mark and its
+ * `case_id` (NEWGAMEPLUS 10-21 답 1), to keep these windows out of a scene's
+ * bust rate; `VETERAN_TABLE_CASES` is that list, and a unit test holds the two
+ * together. With the switch off nothing differs.
+ */
+export function differsForVeteran(caseId, staged = STAGED) {
+  return rulesFor(caseId, { staged }).size < rulesFor(caseId, { veteran: true, staged }).size;
+}
+
+export const VETERAN_TABLE_CASES = Object.freeze(UNLOCK_LADDER.map((step) => step.caseId).filter((caseId) => differsForVeteran(caseId)));
