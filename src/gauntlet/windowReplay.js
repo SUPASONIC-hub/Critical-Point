@@ -10,17 +10,10 @@
  * them in other slices of time lands on the same gauge, give or take the last
  * bits of a float.
  *
- * Three parts, all pure and free of the page, so the same module runs in the
- * unit tests, in a Node script and in a server function:
+ * The page writes the trail and the record (windowTrail.js, re-exported here);
+ * this is the other half, pure and free of the page, for the unit tests and
+ * the checker (scripts/verify-ranking-rows.mjs). The app does not import it.
  *
- *   appendWindowEvent   what a press adds to the window's trail, written as
- *                       the reducer applies it. A press the reducer ignored
- *                       (a LOCK without the rule, a CASH on a sealed card, a
- *                       press after the window closed) is not written, and
- *                       neither are TICK and REDEAL: the time between presses
- *                       is the next press's clock, and a re-dealt board is the
- *                       board the window closed on.
- *   createWindowRecord  the closed window and its trail as one small record.
  *   replayWindow        the record played again under a case's rules, and
  *   compareReplay       what it closed on, set beside what the decision log
  *                       says it closed on (`threshold`).
@@ -28,25 +21,12 @@
  * What a replay proves is that the log could have come out of the rules. It
  * does not prove the player could not see the wall (the seed is on the page):
  * the design's 4th and 5th ways in stay outside any replay.
- *
- * Nothing in the app imports this yet. How the record rides on a decision log
- * entry, and at what precision, is still to be decided (the design's 10-21
- * check, questions 1 to 3).
  */
-import { BASE_SCHEMA, createWindow, getClockHeatRate, normalizeSchema, reduceWindow } from "./gauntletEngine.js";
+import { createWindow, getClockHeatRate, reduceWindow } from "./gauntletEngine.js";
+import { EVENT_CODES, MAX_TRAIL, WINDOW_RECORD_VERSION } from "./windowTrail.js";
 
-/** The record's own version, for a replay of a record written by an older build. */
-export const WINDOW_RECORD_VERSION = 1;
+export { appendWindowEvent, compactSchema, createWindowRecord, WINDOW_RECORD_VERSION } from "./windowTrail.js";
 
-/** One letter a press. TICK and REDEAL are not written (see above). */
-const EVENT_CODES = Object.freeze({
-  SELECT: "S",
-  PUSH: "P",
-  FOCUS: "F",
-  SET_FOCUS_MODE: "M",
-  SCOUT: "L",
-  CASH: "C",
-});
 const EVENT_TYPES = Object.freeze(Object.fromEntries(Object.entries(EVENT_CODES).map(([type, code]) => [code, type])));
 
 /**
@@ -62,61 +42,13 @@ const EVENT_TYPES = Object.freeze(Object.fromEntries(Object.entries(EVENT_CODES)
 export const REPLAY_GAUGE_TOLERANCE = 0.05;
 /** How far back a press's clock may sit from the replay's, before the record is read as rewound. */
 const CLOCK_SLACK = 0.01;
-/** A window is 60 seconds at the most (normalizeSchema): a record with more steps than that is not one. */
-const MAX_EVENTS = 200;
-
-function roundTo(value, digits, round = Math.round) {
-  if (digits === null || digits === undefined) return value;
-  const scale = 10 ** digits;
-  return round(value * scale) / scale;
-}
-
-/**
- * The trail after one event. `before` and `after` are the window either side
- * of the reducer; the trail is returned as it was when the event changed
- * nothing, or is not one that is written. `digits` rounds the clock (null:
- * as the float stands).
- */
-export function appendWindowEvent(trail, before, event, after, { digits = null } = {}) {
-  if (!before || before === after || before.status !== "live") return trail;
-  const code = EVENT_CODES[event?.type];
-  if (!code) return trail;
-  const at = roundTo(before.elapsed, digits);
-  if (event.type === "SELECT") return [...trail, [at, code, typeof event.id === "string" ? event.id : null]];
-  if (event.type === "SET_FOCUS_MODE") return [...trail, [at, code, String(event.mode)]];
-  return [...trail, [at, code]];
-}
-
-/** The board as it differs from BASE_SCHEMA: a plain board is `{}`. */
-export function compactSchema(schema) {
-  const normalized = normalizeSchema(schema);
-  const compact = {};
-  for (const [key, value] of Object.entries(normalized)) {
-    if (JSON.stringify(value) !== JSON.stringify(BASE_SCHEMA[key])) compact[key] = value;
-  }
-  return compact;
-}
-
-/** A closed window and the trail that closed it, as the decision log would carry them. */
-export function createWindowRecord(window, trail, { digits = null } = {}) {
-  return {
-    v: WINDOW_RECORD_VERSION,
-    seed: String(window.seed),
-    schema: compactSchema(window.schema),
-    events: trail,
-    // Rounded up: the clock a window closed on by heat or time has passed the
-    // moment it closed, and a clock rounded down could stop the replay short of it.
-    end: roundTo(window.elapsed, digits, Math.ceil),
-  };
-}
-
 /** Why a record cannot be replayed, or null. Read before anything is dealt from it. */
 export function readRecordProblem(record) {
   if (!record || typeof record !== "object") return "no-record";
   if (record.v !== WINDOW_RECORD_VERSION) return "unknown-version";
   if (typeof record.seed !== "string" || !record.seed) return "no-seed";
   if (!record.schema || typeof record.schema !== "object" || Array.isArray(record.schema)) return "no-board";
-  if (!Array.isArray(record.events) || record.events.length > MAX_EVENTS) return "bad-events";
+  if (!Array.isArray(record.events) || record.events.length > MAX_TRAIL) return "bad-events";
   if (!Number.isFinite(record.end) || record.end < 0) return "bad-end";
   for (const event of record.events) {
     if (!Array.isArray(event) || !Number.isFinite(event[0]) || event[0] < 0 || !EVENT_TYPES[event[1]]) return "bad-events";

@@ -57,7 +57,9 @@ const budgets = [
   // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
   // and one more dependency index (3). Folding the dev switch's leftovers
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_300 },
+  // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
+  // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
+  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -106,7 +108,13 @@ const budgets = [
   // #242 and #248) measured 34,807 in CI's e2e build and failed Verify, so
   // #254 did not deploy; each PR had passed on its own base. The gzip plus 4.
   // #249 builds the same chunk byte for byte.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_705, maxGzip: 34_811 },
+  // 104,705 / 34,805 -> 104,745 / 34,822 on 2026-10-21 (F1 phase 2, #216,
+  // draft): measured 104,745 / 34,818 in the e2e build, the gzip plus 4 (main
+  // about 34,801). The table writes each press into the window's replay
+  // trail; the trail's code went to its own chunk (windowTrail, below) and
+  // the trail rides on the window, so what is left here is the import and two
+  // calls. Kept beside the window first, it measured 34,927, then 34,849.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -181,7 +189,10 @@ const budgets = [
   // 14,230 -> 14,338 gzip on 2026-10-21, the test week (B3 and B2 merged):
   // measured 14,334 plus 4. The settlement takes the audit's count and judges
   // it (settleAudit, in its own chunk) beside the links' CASCADE.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_338 },
+  // 14,338 -> 14,367 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
+  // 14,363 plus 4: a window put down keeps its replay trail in the save
+  // (normalizeSuspendedWindow), so the trail goes on after the resume.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_367 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -199,7 +210,9 @@ const budgets = [
   // (main 4,207): one more `import "./cascadeRisk-<hash>.js"`; its code did not change.
   // 8,690 / 4,229 -> 8,711 / 4,246 on 2026-10-21, the test week: both
   // imports, auditRisk's and cascadeRisk's, measured 8,711 / 4,242 plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_711, maxGzip: 4_246 },
+  // 8,711 / 4,246 -> 8,745 / 4,261 on 2026-10-21 (F1 phase 2, #216, draft),
+  // measured 8,745 / 4,257 plus 4: one more import, the replay trail's chunk.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_745, maxGzip: 4_261 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -295,6 +308,11 @@ const budgets = [
   // the reading and the links a case's close carries over are all here:
   // 2,790 / 1,669 measured, the gzip plus 4.
   { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
+  // The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js,
+  // WINDOW_TRAIL in vite.config.js): the presses the table writes, the record
+  // the runtime puts on the decision log entry. 1,376 / 771 measured on
+  // 2026-10-21, the gzip plus 4.
+  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_376, maxGzip: 775 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -389,7 +407,9 @@ function checkBudget(file, budget) {
 // 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
 // 8,894 / 3,217 -> 8,928 / 3,231 on 2026-10-21, the test week: both risks'
 // files in the list, measured 8,928 / 3,227 plus 4.
-const WORKER_BUDGET = { maxBytes: 8_928, maxGzip: 3_231 };
+// 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
+// measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
+const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

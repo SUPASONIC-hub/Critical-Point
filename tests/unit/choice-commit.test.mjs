@@ -579,3 +579,42 @@ test("a season with a case from before the logic table is not sent to the public
     assert.equal(did.seasonFinals.length, 1, which);
   }
 });
+
+// The replay record (F1 phase 2, gauntlet/windowTrail.js): the table hands the
+// closed window over with its trail, and the entry carries what the server's
+// checker plays again -- and it plays back to the very threshold logged.
+test("a window handed over with its trail leaves a replay record the checker plays back to the logged threshold", async () => {
+  const { appendWindowEvent } = await import("../../src/gauntlet/windowTrail.js");
+  const { recheckCaseWindows } = await import("../../src/rankingRecheck.js");
+  const played = (seed, presses) => {
+    let window = createWindow({ schema: BASE_SCHEMA, seed });
+    let trail = [];
+    for (const event of presses) {
+      const next = reduceWindow(window, event);
+      trail = appendWindowEvent(trail, window, event, next);
+      window = next;
+    }
+    return { ...window, trail };
+  };
+  const tick = { type: "TICK", delta: 0.137 };
+  const cashed = played("unit-replay", [{ type: "SELECT", id: "a" }, ...Array(9).fill(tick), { type: "PUSH" }, ...Array(12).fill(tick), { type: "PUSH" }, tick, { type: "CASH" }]);
+  assert.equal(cashed.status, "cashed");
+  assert.ok(cashed.trail.every(([at]) => Number.isInteger(at * 1000)), "the clock is written to the thousandth");
+
+  const { context, did } = sceneContext("p1_start");
+  mount(context).choose(context.node.choices[0], cashed);
+  const [entry] = did.patches[0].log;
+  assert.deepEqual(entry.replay.events.map(([, code]) => code), ["S", "P", "P", "C"]);
+  assert.equal(entry.replay.seed, "unit-replay");
+  const row = { case_id: "prologue01", summary: {}, decision_log: [entry] };
+  assert.deepEqual(recheckCaseWindows(row).counts, { match: 1, mismatch: 0, unreplayable: 0, abandoned: 0, unrecorded: 0 });
+  const forged = { ...row, decision_log: [{ ...entry, threshold: { ...entry.threshold, pushes: 1 } }] };
+  assert.equal(recheckCaseWindows(forged).counts.mismatch, 1);
+
+  // No record: a window without a trail (resumed from a save that kept none), or one walked away from.
+  for (const [window, which] of [[{ ...cashed, trail: null }, "no trail"], [{ ...createWindow({ schema: BASE_SCHEMA, seed: "unit-left", abandoned: true }), trail: [] }, "abandoned"]]) {
+    const scene = sceneContext("p1_start");
+    mount(scene.context).choose(scene.context.node.choices[0], window);
+    assert.equal(scene.did.patches[0].log[0].replay, undefined, which);
+  }
+});

@@ -176,3 +176,11 @@ test("the CI read is one SELECT and nothing else, and the public log names runs 
   assert.match(redacted, /^CP-7Q2X {2}score/m);
   assert.match(redacted, /^run 2 {2}score/m);
 });
+
+test("rows whose jsonb columns came out as text are read as the objects they are", () => {
+  const rows = seasonRows("run-text");
+  const asText = rows.map((row) => ({ ...row, summary: JSON.stringify(row.summary), decision_log: JSON.stringify(row.decision_log), dynamics: JSON.stringify(row.dynamics) }));
+  const read = readRows(JSON.stringify({ rows: asText }));
+  assert.deepEqual(read, rows);
+  assert.deepEqual(verifyRows(read).map((result) => result.marks), [[]]);
+});
