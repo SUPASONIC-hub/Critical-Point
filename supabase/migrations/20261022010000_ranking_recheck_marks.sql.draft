@@ -27,11 +27,21 @@
 -- replaced by `p_marks` and every other mark is kept, so a run checked again
 -- after a fix to the checker loses a mark it no longer earns.
 --
--- Before this leaves draft: confirm no update trigger or policy on
--- playtest_sessions refuses this update (the table is written by insert
--- elsewhere), and add check:grants cases: anon and authenticated cannot call
--- it; an unknown mark is refused; the insert trigger's marks survive; an empty
--- p_marks clears only the recheck marks; a run with no ranking row returns null.
+-- Nothing refuses the update (checked 2026-10-21 against every migration):
+-- the three triggers on playtest_sessions fire before insert only
+-- (validate_playtest_session_insert, zz_charge_address_bytes,
+-- zm_mark_season_suspicion), RLS is on but not forced, and a SECURITY DEFINER
+-- function runs as the table's owner; update is granted to service_role alone
+-- (20260927000000), anon holds column grants for insert and select.
+--
+-- check:grants applies this draft after every migration and holds it to its
+-- cases (scripts/check-grants.mjs, "the checker's marks"): anon and
+-- authenticated cannot call it; the trigger's marks survive; a call states the
+-- two marks whole; an unknown mark or null is refused; a run with no ranking
+-- row answers null; another run and the run's case rows are left alone.
+--
+-- Dated after the test week's 20261021010000; re-date it after whatever is
+-- last on main when it is renamed.
 
 create or replace function public.ranking_set_recheck_marks(p_run_id text, p_marks text[])
 returns text[]

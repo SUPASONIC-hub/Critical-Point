@@ -4,7 +4,7 @@ import test from "node:test";
 import { BASE_SCHEMA, createWindow, normalizeSchema, RULES_MARK, SEAL_BREAK_GAUGE } from "../../src/gauntlet/gauntletEngine.js";
 import { isSealedCash, isTimeOffClock, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
-import { fetchRunRows, formatReport, groupByRun, readRows, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
+import { fetchRunRows, formatReport, groupByRun, rankingRowsSql, readRows, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
 import { createWindowRecorder, thresholdOfVerdict } from "./helpers/windowRecorder.mjs";
 
 /**
@@ -158,3 +158,21 @@ test("the remote read is GET only, with the service key, and says when there is 
   assert.deepEqual(await fetchRunRows({ url: "https://x", key: "k", fetchFn: async () => ({ ok: true, json: async () => [] }) }), []);
 });
 
+
+test("the CI read is one SELECT and nothing else, and the public log names runs by their tag", () => {
+  const sql = rankingRowsSql({ limit: 7 });
+  // One statement: a single semicolon, at the end.
+  assert.equal(sql.indexOf(";"), sql.length - 1);
+  assert.match(sql, /^with top_runs as \(/);
+  assert.match(sql, /order by score desc limit 7\n/);
+  assert.doesNotMatch(sql, /\b(insert|update|delete|truncate|alter|drop|create|grant|call|do)\b/i);
+  assert.match(rankingRowsSql({ limit: 1e9 }), /limit 500\n/);
+  assert.match(rankingRowsSql({ limit: "x" }), /limit 20\n/);
+  const rows = seasonRows("secret-run-id");
+  rows[1].run_tag = "CP-7Q2X";
+  const results = [...verifyRows(rows), ...verifyRows(seasonRows("other-secret"))];
+  const redacted = formatReport(results, { redact: true }).join("\n");
+  assert.doesNotMatch(redacted, /secret/);
+  assert.match(redacted, /^CP-7Q2X {2}score/m);
+  assert.match(redacted, /^run 2 {2}score/m);
+});
