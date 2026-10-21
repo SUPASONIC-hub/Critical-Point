@@ -73,3 +73,12 @@ export const KINETIC_GRIP_CHIPS = 1.08;
 export const STEADY_ANCHOR_COOL = 4;
 export const STEADY_ANCHOR_SECONDS = 2;
 export const GLASS_LENS_SEAL = 8;
+
+/*
+ * AUDIT's and CASCADE's numbers (B3 and B2, rules of the table since
+ * RULES_MARK 3) are not here but in auditRisk.js and cascadeRisk.js, each in
+ * its own chunk: imported from this module, the build split this one into a
+ * chunk of its own beside the engine's and every budget around it went over
+ * (check:bundle, 2026-10-21; the rule switch's question 5 measured). The
+ * engine, the ladder's lines (tableUnlocks.js) and the bots read them there.
+ */

@@ -101,7 +101,16 @@ await db.exec(`
 // does not (no score), since the reset takes both. The tables are read before
 // and after, and the seeded rows are taken out again, so the rest of this
 // check runs on the database it always had.
-const RANKING_RESET = "20261020010000_rules_day10_ranking_reset.sql";
+// The newest ranking reset is the one judged: RULES_MARK 3's
+// (`*_rules_mark3_ranking_reset.sql`, drafted 2026-10-21) once it is a `.sql`,
+// the day-ten table's until then. While it is a `.sql.draft` nothing replays
+// it, the server still asks for the day-ten mark (2) and the older-table
+// checks below ask for that one, and say so.
+const DAY_TEN_RESET = "20261020010000_rules_day10_ranking_reset.sql";
+const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark3_ranking_reset.sql")) ?? null;
+const RANKING_RESET = MARK3_RESET ?? DAY_TEN_RESET;
+/** The table mark the replayed server asks of every case row of a ranked season. */
+const SERVER_MARK = MARK3_RESET ? RULES_MARK : 2;
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -138,8 +147,9 @@ async function seedBeforeRankingReset() {
     await session({ runId: `${RESET_SEED}-run-2`, burstScore: 64 }, "final", beatTable);
     await session({ runId: `${RESET_SEED}-run-2`, seasonComplete: true }, "season-final");
     // A stored case row the new constraint would refuse, were it sent today:
-    // the table's mark, present and not a number (20261020010000).
-    await session({ runId: `${RESET_SEED}-run-3`, burstScore: 50 }, "case02", { ...beatTable, tableRules: "two" });
+    // the table's mark, present and not a number (20261020010000). Only
+    // before the day-ten reset: from there on the constraint stops it here too.
+    if (RANKING_RESET === DAY_TEN_RESET) await session({ runId: `${RESET_SEED}-run-3`, burstScore: 50 }, "case02", { ...beatTable, tableRules: "two" });
     await db.query(`insert into public.playtest_feedback (session_id, session_code, case_id, feedback) values ($1, 'RESETSEED', 'case01', '{"clarity": 4}')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ($1, 'case01', 'n1', '{}')`, [`${RESET_SEED}-session`]);
@@ -147,6 +157,8 @@ async function seedBeforeRankingReset() {
     await db.query(`insert into public.cloud_saves (code_hash, saved_at, payload) values ($1, now(), '{"save": {}}')`, [RESET_SEED]);
     await db.query(`insert into public.telemetry_rate_limits (actor_key, request_count) values ($1, 7)`, [RESET_SEED]);
     await db.query(`insert into public.private_settings (name, value) values ($1, 'kept')`, [RESET_SEED]);
+    // The scene snapshot exists from 20261020020000, after the day-ten reset.
+    if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`insert into public.scene_bust_stats (case_id, node_id, windows, busts, runs) values ($1, 'n1', 1, 0, 1)`, [RESET_SEED]);
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -166,6 +178,8 @@ async function removeRankingResetSeed() {
   ]) {
     removed += (await db.query(`delete from public.${table} where ${column} = $1`, [value])).affectedRows ?? 0;
   }
+  // Not counted: a later migration's rebuild of the snapshot may have taken it already.
+  if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_bust_stats where case_id = $1`, [RESET_SEED]);
   return removed;
 }
 let beforeReset = null;
@@ -235,11 +249,12 @@ if (beforeReset && afterReset) {
     `select run_id, case_id, dynamics->>'tableRules' as hand from public.playtest_sessions where session_id = $1 order by run_id, case_id`,
     [`${RESET_SEED}-session`],
   )).rows.map((row) => `${row.run_id.slice(RESET_SEED.length + 1)}:${row.case_id}${row.hand ? `:${row.hand}` : ""}`);
-  if (JSON.stringify(kept) !== JSON.stringify(["run-1:case01", "run-1:final", "run-2:final", "run-3:case02:two"])) {
+  const dayTen = RANKING_RESET === DAY_TEN_RESET;
+  if (JSON.stringify(kept) !== JSON.stringify(["run-1:case01", "run-1:final", "run-2:final", ...(dayTen ? ["run-3:case02:two"] : [])])) {
     failures.push(`after the ranking reset the seeded runs hold ${JSON.stringify(kept)}; expected their case rows and no ranking row.`);
   }
   const removed = await removeRankingResetSeed();
-  if (removed !== 11) failures.push(`the ranking-reset seed took ${removed} rows out again; it put in 13 and the reset deletes 2.`);
+  if (removed !== (dayTen ? 11 : 10)) failures.push(`the ranking-reset seed took ${removed} rows out again; it put in ${dayTen ? 13 : 12} and the reset deletes 2.`);
   const left = await readEverythingButRanking();
   const stray = Object.entries(left).filter(([, rows]) => rows.some((row) => row.includes(RESET_SEED))).map(([name]) => name);
   if (stray.length) failures.push(`the ranking-reset seed is still in public.${stray.join(", public.")}; everything after this would run beside it.`);
@@ -1275,8 +1290,9 @@ withHeaders({ "x-forwarded-for": "198.51.100.22" });
   /** The run summary a build of the table before sent as `dynamics`: this one's, without the mark. */
   const olderTableDynamics = ({ [RULES_MARK_KEY]: _mark, ...rest }) => rest;
   const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
+  if (!MARK3_RESET) console.log(`Older-table checks: against the day-ten mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_rules_mark3_ranking_reset.sql.draft).`);
   const marked = (runId) => one(
-    `select (count(*) filter (where jsonb_typeof(dynamics->'${RULES_MARK_KEY}') = 'number' and (dynamics->>'${RULES_MARK_KEY}')::numeric >= ${RULES_MARK}))::int as mark, count(*)::int as n
+    `select (count(*) filter (where jsonb_typeof(dynamics->'${RULES_MARK_KEY}') = 'number' and (dynamics->>'${RULES_MARK_KEY}')::numeric >= ${SERVER_MARK}))::int as mark, count(*)::int as n
        from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,
     [runId],
   );
@@ -1289,6 +1305,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.22" });
 
   // The run that ranked carries the mark on every case row, from the run summary the client builds.
   check(createRunSummary(RUN_INITIAL_STATE)[RULES_MARK_KEY] === RULES_MARK, `the run summary the client builds has no ${RULES_MARK_KEY} of ${RULES_MARK}; every season would be refused as one from the table before.`);
+  check(RULES_MARK >= SERVER_MARK, `the client marks its case rows ${RULES_MARK} and the server asks for ${SERVER_MARK}; every season would be refused.`);
   const ranked = await marked("run-ranked-1");
   check(
     ranked?.mark === CASE_SEQUENCE.length && (await rankingRows("run-ranked-1")) === 1,
@@ -1320,7 +1337,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.22" });
 
   // One case row whose mark is a number below this table's: a smaller number is an older table.
   const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
-  await playRun("run-older-3", { session: sessionId(52), dynamicsOf: (caseId, dynamics) => (caseId === middle ? { ...dynamics, [RULES_MARK_KEY]: RULES_MARK - 1 } : dynamics) });
+  await playRun("run-older-3", { session: sessionId(52), dynamicsOf: (caseId, dynamics) => (caseId === middle ? { ...dynamics, [RULES_MARK_KEY]: SERVER_MARK - 1 } : dynamics) });
   await refusedRun("rank a season with one case row that carries an older mark", "run-older-3", sessionId(52), CASE_SEQUENCE.length - 1);
 
   // Both a beat-table season and one from the table before: the beat check stands first, so it is told that.
@@ -2173,6 +2190,41 @@ await refused("rebuild the scene snapshot", "anon", `select public.refresh_scene
 await refused("read the choice snapshot directly", "anon", `select * from public.scene_choice_stats`);
 await allowed("read the scene choice rates", "anon", `select public.scene_choice_rates()`);
 await refused("rebuild the choice snapshot", "anon", `select public.refresh_scene_choice_stats()`);
+
+// The scene wall rate leaves out a NEW GAME+ season's first four prologues,
+// played under every rule (20261102010000): told by the case row's summary
+// (`newGamePlus: true`) and its case. Rows put in place as stored rows, the
+// snapshot rebuilt, read, and the rows taken out and the snapshot rebuilt again.
+{
+  const SCENE_SEED = "grants-check-scene";
+  const NG_SCENE = "ngplus_scene";
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    for (const [index, caseId, summary] of [
+      [1, "prologue01", { newGamePlus: true }],
+      [2, "prologue01", {}],
+      [3, "prologue04", { newGamePlus: true }],
+      [4, "prologue05", { newGamePlus: true }],
+      [5, "case01", { newGamePlus: true }],
+    ]) {
+      await db.query(
+        `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
+         values ($1, $2, 'SCENESEED', $3, 'seed', $4::jsonb, $5::jsonb)`,
+        [`${SCENE_SEED}-${index}`, `${SCENE_SEED}-run-${index}`, caseId, JSON.stringify(summary), JSON.stringify([{ nodeId: NG_SCENE, threshold: { state: "bust" } }])],
+      );
+    }
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  await db.query(`select public.refresh_scene_bust_stats()`);
+  const counted = (await db.query(`select case_id, windows from public.scene_bust_stats where node_id = $1 order by case_id`, [NG_SCENE])).rows.map(({ case_id, windows }) => `${case_id}:${windows}`);
+  check(
+    JSON.stringify(counted) === JSON.stringify(["case01:1", "prologue01:1", "prologue05:1"]),
+    `the scene snapshot counted ${JSON.stringify(counted)}; a NEW GAME+ season's prologue 01 to 04 are left out, its prologue 05 and later and an ordinary season's prologue 01 are not.`,
+  );
+  await db.query(`delete from public.playtest_sessions where session_code = 'SCENESEED'`);
+  await db.query(`select public.refresh_scene_bust_stats()`);
+}
 await refused("read the address salt", "anon", `select * from public.private_settings`);
 await refused("read a private setting through its helper", "anon", `select public.private_setting_int('telemetry_daily_bytes', 0)`);
 await refused("hash an address", "anon", `select public.hash_client_address('203.0.113.9')`);

@@ -137,6 +137,12 @@ Still open, on purpose:
   and 사건 23's market card keeps the `risk` its old label inferred.
 - This week's rule (#199, F7) merged on the evening of 2026-10-20 at `43e7ed1`
   (migration 20261021000000; the ranking reads one board at a time by `week`).
+  B3's audit and B2's links were 2026-W44's test week (#219, #223) and are
+  rules of the table from 프롤로그 04 since RULES_MARK 3 (one ranking reset,
+  v10): `audit` and `cascade` in `tableUnlocks.js`, off in story mode and in a
+  replayed case; the week's devices (`WEEK_RULE_DEVICES`) are empty, and
+  W44's catalogue entry stays as a week gone by. The bots play both wherever
+  a case's rules have them (`AUDIT=0` / `CASCADE=0` turn one off).
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
@@ -1096,7 +1102,7 @@ Still open, on purpose:
 70. When the season's length changes, reset both rankings: a migration deletes
     the `season-final` rows (per-case telemetry stays) and the local board moves
     to a new `critical-point-local-ranking-vN` key that retires the old ones
-    (v9 today). The 2026-09-28 migration also deleted every season row the new
+    (v10 today). The 2026-09-28 migration also deleted every season row the new
     server rules would have refused, so the public ranking starts over when it
     is pushed. The table changing what it pays is the same occasion: on
     2026-10-11 both were reset once more (v8, and
@@ -1108,7 +1114,11 @@ Still open, on purpose:
     begun before 2026-10-10 therefore never ranks. Day 10's table did it again
     on 2026-10-20 (v9, `20261020010000_rules_day10_ranking_reset.sql`), and
     the mark it asks of every case row is `tableRules` in `dynamics`
-    (`RULES_MARK_KEY`). The suspicion marks (`20261020000000`, #183) went in
+    (`RULES_MARK_KEY`). RULES_MARK 3 (B3's audit and B2's links as rules of
+    the table from 프롤로그 04, played first as 2026-W44's test week) resets
+    them once more (v10, `*_rules_mark3_ranking_reset.sql`, which asks for a
+    mark of 3; drafted as `.sql.draft` and made a `.sql` only on the merge
+    day, after the user is asked). The suspicion marks (`20261020000000`, #183) went in
     just before it, so every row ranked since carries them: a `season-final`
     row is never refused for its score, the bounds it fails are written to
     `suspicion`, which anon cannot read, and `ranking_hides_marked()`, the

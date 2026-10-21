@@ -130,6 +130,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
   const route = routeChoice(state, { choice, window: windowState });
   const baseEffect = route.reframe ? REFRAME_EFFECT : choice.effect;
   const cognitiveEffect = route.reframe ? REFRAME_COGNITION : choice.cognition;
+  const settlementRules = getSettlementRules({ caseId, run, caseClosed: route.caseClosed });
   const settlement = {
     run,
     window: windowState,
@@ -140,11 +141,11 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     offered: getOfferedTypes(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
     caseClosed: route.caseClosed,
     offerRelics: caseId !== "final",
-    // The case's audit so far, read off its log (auditRisk.js); the engine reads it only on a week that has it.
+    // The case's audit so far, read off its log (auditRisk.js); the engine reads it only in a case whose rules have it.
     audit: countAudit(log),
-    ...getSettlementRules({ caseId, run, caseClosed: route.caseClosed }),
+    ...settlementRules,
     // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
-    cascade: isLinkDue(run, log, runId),
+    cascade: isLinkDue(run, log, runId, settlementRules.rules),
   };
   const { verdict, nextRun: settledRun, unlockedRelics } = settle ? settle(settlement) : settleAgainstCodex(settlement, unlocked);
   const gauntletEffect = applyGauntletEffect(baseEffect, {
@@ -157,6 +158,8 @@ export function settleChoice(state, { choice, window = null, forced = false, set
   return {
     ...route,
     window: windowState,
+    // The rules the case plays under (`getSettlementRules`), for the hand-off at the close.
+    rules: settlementRules.rules,
     baseEffect,
     cognitiveEffect,
     verdict,
@@ -169,9 +172,10 @@ export function settleChoice(state, { choice, window = null, forced = false, set
 
 /**
  * B2: the run after a decision, with what a closing case hands the next one
- * off its whole log (`carryLinksOut`, cascadeRisk.js). `nextLog` is the case's
- * log with this decision's entry on it.
+ * off its whole log (`carryLinksOut`, cascadeRisk.js), under the rules the
+ * case played under (`settled.rules`). `nextLog` is the case's log with this
+ * decision's entry on it.
  */
 export function carryChoiceLinks(settled, { run, nextLog, runId, caseId }) {
-  return carryLinksOut(settled.settledRun, { run, log: nextLog, runId, caseClosed: settled.caseClosed, last: caseId === "final" });
+  return carryLinksOut(settled.settledRun, { run, rules: settled.rules, log: nextLog, runId, caseClosed: settled.caseClosed, last: caseId === "final" });
 }
