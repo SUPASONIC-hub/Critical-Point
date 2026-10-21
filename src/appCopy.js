@@ -1,9 +1,9 @@
 import {
-  AlertTriangle,
-  BarChart3,
   BriefcaseBusiness,
+  ChartColumn,
   Clock3,
   Shield,
+  TriangleAlert,
   Users,
 } from "lucide-react";
 import { easyResourceLabels } from "./playerLanguage.js";
@@ -30,8 +30,8 @@ export const resourceMeta = {
   capital: { label: easyResourceLabels.capital, suffix: "", icon: BriefcaseBusiness },
   trust: { label: easyResourceLabels.trust, suffix: "", icon: Users },
   legitimacy: { label: easyResourceLabels.legitimacy, suffix: "", icon: Shield },
-  humanCost: { label: easyResourceLabels.humanCost, suffix: "", icon: AlertTriangle },
-  fatigue: { label: easyResourceLabels.fatigue, suffix: "", icon: BarChart3 },
+  humanCost: { label: easyResourceLabels.humanCost, suffix: "", icon: TriangleAlert },
+  fatigue: { label: easyResourceLabels.fatigue, suffix: "", icon: ChartColumn },
 };
 
 // `payoff` is when the stance fits, not what it pays. The pick is the player's

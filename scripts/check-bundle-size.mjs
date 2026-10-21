@@ -153,7 +153,11 @@ const budgets = [
   // plus 5%: the same day's other changes are what they have to hold.
   // The lucide icons the screens import, tree-shaken. 13,711 / 4,900, with the
   // icons the board's states and the recovery controls added.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 14_400, maxGzip: 5_150 },
+  // 14,400 / 5,150 -> 17,600 / 6,150 on 2026-10-21 with lucide-react 1.60,
+  // measured 17,595 / 6,139 and raised by the shortfall only: the same 49
+  // icons, no unused import to drop, but 1.x adds a provider context, alias
+  // class names and a name/size record per icon to the shared code.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_600, maxGzip: 6_150 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
