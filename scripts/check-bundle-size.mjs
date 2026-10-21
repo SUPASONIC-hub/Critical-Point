@@ -53,6 +53,10 @@ const budgets = [
   // dissent's length does not read as a page number beside 14쪽 and 26쪽.
   // 169,935 -> 169,938 on 2026-10-21, measured 169,938: the origin's story
   // under DISSENT is titled 반대 의견서를 쓴 밤, the button's own word (+3).
+  // 169,935 -> 169,977 on 2026-10-21 (B3 on main, the e2e build CI checks): the
+  // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
+  // and one more dependency index (3). Folding the dev switch's leftovers
+  // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   { pattern: /^index-.*\.js$/, maxBytes: 169_938, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
@@ -82,7 +86,10 @@ const budgets = [
   // words went to a chunk of their own (auditRisk, below), which left the
   // stage's token and description, the voice's hook and the import, 236
   // bytes over. The raw budget does not move (103,924).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_613 },
+  // 34,373 -> 34,615 on 2026-10-21, B3 rebased on main's 34,373 (#199):
+  // measured 34,611 in the e2e build plus the 4 bytes of hash noise, the same
+  // 240 bytes the audit took on the day-ten base.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_615 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -323,7 +330,7 @@ function checkBudget(file, budget) {
 // plus 4: the same three more file names in a longer list.
 // 8,828 / 3,183 -> 8,860 / 3,196 on 2026-10-20, measured 8,860 / 3,192 (gzip
 // plus 4): one more file, B3's audit (auditRisk).
-const WORKER_BUDGET = { maxBytes: 8_894, maxGzip: 3_213 };
+const WORKER_BUDGET = { maxBytes: 8_894, maxGzip: 3_217 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
