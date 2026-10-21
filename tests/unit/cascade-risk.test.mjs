@@ -225,11 +225,11 @@ test("the range a carried link is told with goes on from the last case's", () =>
 });
 
 test("at most LINK_CARRY_MAX are carried, the newest; the older lapse", () => {
-  assert.equal(LINK_CARRY_MAX, 3);
+  assert.equal(LINK_CARRY_MAX, 1, "1 since 2026-10-21 (3 took collapse to 23.0%)");
   const carried = [{ from: -5, due: 1 }, { from: -1, due: 3 }, { from: -4, due: 1 }, { from: -2, due: 2 }, { from: -3, due: 1 }];
   const { links, capped } = carryLinks({ carried });
-  assert.deepEqual(links, [{ from: -3, due: 1 }, { from: -2, due: 2 }, { from: -1, due: 3 }]);
-  assert.equal(capped, 2);
+  assert.deepEqual(links, [{ from: -1, due: 3 }]);
+  assert.equal(capped, 4);
   assert.deepEqual(carryLinks({ carried: [] }), { links: [], capped: 0 });
 });
 

@@ -29,9 +29,12 @@ export const LINK_VALUE_SETS = Object.freeze({
  * a LINK_VALUES without this file fails instead of measuring B.
  */
 const asked = process.env.LINK_VALUES;
-if (asked) {
-  const set = LINK_VALUE_SETS[asked];
-  if (!set) throw new Error(`LINK_VALUES=${asked}: one of ${Object.keys(LINK_VALUE_SETS).join(", ")}`);
+// The carry's cap (decision 6 (2)), re-measured on 2026-10-21:
+// LINK_CARRY_MAX=3 plays the carry as it was measured first (1 since 2026-10-21).
+const carry = Object.fromEntries(["LINK_CARRY_MAX"].filter((name) => process.env[name]).map((name) => [name, Number(process.env[name])]));
+if (asked || Object.keys(carry).length) {
+  const set = { ...(asked ? LINK_VALUE_SETS[asked] : null), ...carry };
+  if (asked && !LINK_VALUE_SETS[asked]) throw new Error(`LINK_VALUES=${asked}: one of ${Object.keys(LINK_VALUE_SETS).join(", ")}`);
   registerHooks({
     load(url, context, nextLoad) {
       const result = nextLoad(url, context);

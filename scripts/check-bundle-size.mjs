@@ -206,7 +206,10 @@ const budgets = [
   // (check:text) is one UTF-8 byte longer than "×1.75로".
   // 1,142 / 719 -> 1,159 / 738 on 2026-10-21, measured 1,159 / 734: NEAR WALL
   // says what the 4 is, 벽 띠가 열기 4만큼 앞당겨 선다 (+17).
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_159, maxGzip: 738 },
+  // 1,159 / 738 -> 1,560 / 966 on 2026-10-21 (B2, #208, draft), measured
+  // 1,560 / 962: the cascade week (B2's test week, a device), its line, the
+  // list of devices a week may switch on and the check that reads it.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_560, maxGzip: 966 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on

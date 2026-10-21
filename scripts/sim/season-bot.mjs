@@ -9,7 +9,7 @@
  * stream per `createSeasonBot`, in the order it always drew, and the case
  * players draw from nothing but their seeds (`handUnit`).
  */
-import { carryLinks, getEffectBurn, isLinkDue, LINK_BURN, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
+import { carryLinks, getEffectBurn, isLinkDue, LINK_BURN, LINK_CARRY_MAX, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
 import { LINK_VALUE_SETS } from "./cascade-values.mjs";
 import {
   CASE_RESULT_NODES,
@@ -151,7 +151,10 @@ export const LINK_VALUES = (() => {
   if (CASCADE_WEEK && Object.entries(LINK_VALUE_SETS[asked] ?? {}).some(([name, value]) => played[name] !== value)) {
     throw new Error(`CASCADE_WEEK=1 LINK_VALUES=${asked} needs the numbers rewritten as cascadeRisk.js loads: node --import ./scripts/sim/cascade-values.mjs ...`);
   }
-  return `${asked} (${LINK_BURN}/${LINK_SPAN_MIN}~${LINK_SPAN_MAX}/${LINK_WALL})`;
+  for (const [name, value] of [["LINK_CARRY_MAX", LINK_CARRY_MAX]]) {
+    if (process.env[name] && Number(process.env[name]) !== value) throw new Error(`${name}=${process.env[name]} needs cascade-values.mjs loaded first: node --import ./scripts/sim/cascade-values.mjs ...`);
+  }
+  return `${asked} (${LINK_BURN}/${LINK_SPAN_MIN}~${LINK_SPAN_MAX}/${LINK_WALL}, carry ${LINK_CARRY_MAX})`;
 })();
 /** The week's stamp a season or a case of the measurements opens with (CASCADE_WEEK). */
 const linkStamp = (story) => (CASCADE_WEEK && !story ? { weekRule: "cascade" } : {});
@@ -165,7 +168,8 @@ const LINK_AVOID = 40;
  * one CASCADE board took off the heavy card at heat 50 on 2026-10-20, in
  * chips before the multiplier (check:pressure).
  */
-export const CHIP_MARGIN = 10;
+// CHIP_MARGIN=<n> in the environment plays the hand on another margin (5, 10 and 15 measured on 2026-10-21).
+export const CHIP_MARGIN = Number(process.env.CHIP_MARGIN) || 10;
 /** A case's links off a log of settled windows, as `useChoiceCommit` logs them. */
 const linkEntry = (nodeId, choice, verdict, effect) => ({
   nodeId,

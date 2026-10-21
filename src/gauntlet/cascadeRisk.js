@@ -55,8 +55,14 @@ export const LINK_SPAN_MIN = 2;
 export const LINK_SPAN_MAX = 4;
 /** How much closer CASCADE pulls the board's wall band (B: BLACKOUT_WALL_SHIFT). */
 export const LINK_WALL = 6;
-/** How many links a closed case hands the next one; the oldest beyond it lapse (decision 6 (2)). */
-export const LINK_CARRY_MAX = 3;
+/**
+ * How many links a closed case hands the next one; the older beyond it lapse
+ * (decision 6 (2)). 1 since 2026-10-21: with 3, collapse rose to 23.0% and a
+ * look lost 29.8% to CASCADE; with 1, 21.0% and 24.2%, and 20.6% of the links
+ * made lapse. Pulling a carried link's wall 4 instead of 6 kept collapse at
+ * 20.7% but a look still lost 28.3% (B2-측정-20261021.md).
+ */
+export const LINK_CARRY_MAX = 1;
 
 /** The next-board rule a link deals. 초안; the briefing and the reveal print it. */
 export const CASCADE_MUTATION = Object.freeze({
