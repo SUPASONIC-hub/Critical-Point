@@ -93,6 +93,8 @@ export function getSeasonGoals() {
   ];
 }
 
+const VETERAN_TABLE_LINE = "NEW\u00a0GAME+는 프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.";
+
 /**
  * The start screen's NEW GAME+ panel (NEWGAMEPLUS 문구 질문 9-10, all (1)):
  * the season number from the second season on, and how the last finished
@@ -114,7 +116,10 @@ export function getPastRunMemory(memory = {}, record = null, runId = null) {
   const [caseId] = entries.at(-1) ?? [];
   return {
     round,
-    text: line ?? `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.`,
+    // What a NEW GAME+ table is, said as a fact (문구 질문 17, user's answer of
+    // 2026-10-21 evening): measured beside a plain season it collapses as often
+    // (22.8% / 22.0%) and banks a little more, so "harder" is not said.
+    text: `${line ?? `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.`} ${VETERAN_TABLE_LINE}`,
   };
 }
 
