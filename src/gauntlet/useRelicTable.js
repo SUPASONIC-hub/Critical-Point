@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
-import { equipRelic, resolveWindow } from "./gauntletEngine.js";
-import { getRelicPool, getRelicUnlocks, normalizeRelicIds } from "./relics.js";
+import { settleAgainstCodex } from "../state/settleChoice.js";
+import { equipRelic } from "./gauntletEngine.js";
+import { normalizeRelicIds } from "./relics.js";
 
 const RELIC_CODEX_STORAGE_KEY = "critical-point-relic-codex-v1";
 
@@ -40,20 +41,11 @@ function writeRelicCodex(codex) {
  * that was known -- so a page opened from a replay link, or a tab another tab
  * had moved past, unlocked relics for good from a decision nobody kept.
  *
- * `settlement.rules` is what the case plays under (`tableUnlocks`; every rule
- * when it is left out). A feat is only counted in a case that has `relics`:
- * before that the table has not said there is such a thing, and the reveal
- * would announce a tool for a draft the player has never seen. The feat can
- * be proved again later.
+ * The settling itself is `settleAgainstCodex` (state/settleChoice.js, with
+ * the rest of a decision's settlement, so a server check can run it without
+ * React); exported here as well for the callers that read it here.
  */
-export function settleAgainstCodex({ offerRelics = false, ...settlement }, unlocked = []) {
-  const settled = resolveWindow(settlement);
-  const unlockedRelics = settlement.rules?.has("relics") === false ? [] : getRelicUnlocks(settled, unlocked);
-  const drafted = settlement.caseClosed && offerRelics
-    ? resolveWindow({ ...settlement, offerRelics: true, relicPool: getRelicPool([...unlocked, ...unlockedRelics]) })
-    : settled;
-  return { ...drafted, unlockedRelics };
-}
+export { settleAgainstCodex };
 
 /** The codex with these feats added, or the same codex when it already holds them. */
 export function addToRelicCodex(codex, unlockedRelics = []) {
