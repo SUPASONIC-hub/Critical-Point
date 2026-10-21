@@ -17,7 +17,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
   const {
     common: { AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge },
-    gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave, auditCount },
+    gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave, auditCount, linkReading },
     status: { resources, resourceMeta, progress, routePath },
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount },
   } = view;
@@ -56,6 +56,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
         seed={gauntletSeed}
         run={gauntletRun}
         auditCount={auditCount}
+        links={linkReading}
         cards={fixedChoices}
         reframeChoice={reframeChoice}
         resources={resources}

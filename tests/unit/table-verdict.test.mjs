@@ -120,6 +120,7 @@ const MUTATION_KINDS = {
   heatDebt: "penalty",
   coldFeet: "penalty",
   fracture: "penalty",
+  cascade: "penalty",
   overclock: "carry",
   strikeWake: "carry",
   steadyLine: "carry",

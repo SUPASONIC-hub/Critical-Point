@@ -20,15 +20,15 @@ const MERGED_WEEKS = Object.freeze([
 
 /**
  * A development build's switch, so a rule can be played before any week has
- * it (B3: the audit is judged by simulation and by the maker's own plays, with
- * no test week). On the dev server, or a build that asked for the debug tools,
- * `?week=audit` makes the catalogue's `audit` this week's rule: the start
- * screen has its line and its box, and a season started then carries the
- * stamp in its save, so a reload without the query plays on under it. Any id
- * of the catalogue works; one that is not there is no rule (getWeekRule).
- * The week is the device's: a build whose weekly clock is pinned (the e2e
- * builds, state/weeklyClock.js) reads another week, and the switch does
- * nothing there.
+ * it (B3's audit and B2's links were judged by simulation and the maker's
+ * own plays before their test week). On the dev server, or a build that asked
+ * for the debug tools, `?week=audit` or `?week=cascade` makes that catalogue
+ * entry this week's rule: the start screen has its line and its box, and a
+ * season started then carries the stamp in its save, so a reload without the
+ * query plays on under it. Any id of the catalogue works; one that is not
+ * there is no rule (getWeekRule). The week is the device's: a build whose
+ * weekly clock is pinned (the e2e builds, state/weeklyClock.js) reads another
+ * week, and the switch does nothing there.
  *
  * A release has no switch: `__CP_DEBUG_BUILD__` is false there and the bundler
  * drops the branch. A session with it on sends nothing to the server

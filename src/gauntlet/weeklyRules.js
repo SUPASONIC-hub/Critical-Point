@@ -37,8 +37,8 @@ export const WEEKLY_NOTICE_DAYS = 7;
 export const WEEK_RULE_ID_MAX = 32;
 
 /**
- * The devices a week may switch on: AUDIT (B3, auditRisk.js) and, when it is
- * built, B2's CASCADE. A device a rule names outside this list is not on.
+ * The devices a week may switch on: B3's AUDIT (auditRisk.js) and B2's
+ * CASCADE (cascadeRisk.js). A device a rule names outside this list is not on.
  */
 export const WEEK_RULE_DEVICES = Object.freeze(["audit", "cascade"]);
 
@@ -88,6 +88,17 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     title: "감사 주간",
     text: `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`,
     rules: Object.freeze(["audit"]),
+  }),
+  // B2's test week: a device; no number on the board moves. Its numbers are
+  // cascadeRisk.js's, written out because that chunk imports this one (a
+  // unit test holds the line to them). In no week of the calendar; a
+  // development build plays it with `?week=cascade` (weeklyCalendar.js).
+  "cascade": Object.freeze({
+    label: "CASCADE WEEK",
+    // 초안 문구.
+    title: "연쇄 주간",
+    text: "한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다.",
+    rules: Object.freeze(["cascade"]),
   }),
 });
 

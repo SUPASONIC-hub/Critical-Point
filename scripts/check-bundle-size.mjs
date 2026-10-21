@@ -89,6 +89,12 @@ const budgets = [
   // 34,373 -> 34,615 on 2026-10-21, B3 rebased on main's 34,373 (#199):
   // measured 34,611 in the e2e build plus the 4 bytes of hash noise, the same
   // 240 bytes the audit took on the day-ten base.
+  // 34,373 -> 34,591 gzip on 2026-10-21 (B2, #208, draft), measured 34,587
+  // plus 4 on main 732ef05 (main 34,369): the run signal's 연결 n token, the
+  // card's " · 연결" mark, the voice's once-a-board line and the closing
+  // commit's call that hands the links on. The walk, the reading, the words
+  // and the carrying are in cascadeRisk (below); #208 measured the same
+  // +207 on 2026-10-20 with the links switched off. The raw budget does not move.
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_615 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
@@ -157,7 +163,11 @@ const budgets = [
   // board and the settlement each ask which rules the case plays under, for
   // the prologues' staged unlocks. The list of steps and its copy are kept
   // out of this chunk; they load with the runtime.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_200 },
+  // 14,200 -> 14,230 gzip on 2026-10-21 (B2, #208, draft), measured 14,226
+  // plus 4 (main 14,050): CASCADE on the next board, the reveal's link line,
+  // and the table's two lists of links (linksIn, linksOut) kept, handed to a
+  // replay and back and opened on; their reading is cascadeRisk's.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_230 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -171,6 +181,8 @@ const budgets = [
   // 4,209 -> 4,210 on 2026-10-20: 4,204-4,210 over eight builds, the hashes'.
   // 4,209 -> 4,228 gzip on 2026-10-20, measured 4,224 plus 4, for the same
   // reason: one more `import "./auditRisk-<hash>.js"` (B3's audit, below).
+  // 4,210 -> 4,228 on 2026-10-21 (B2, #208, draft), measured 4,224 plus 4
+  // (main 4,207): one more `import "./cascadeRisk-<hash>.js"`; its code did not change.
   { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_229 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
@@ -225,6 +237,9 @@ const budgets = [
   // Rebased on main e8584c3 (2026-10-21): main's 1,159 (#212) plus B3's 411,
   // measured 1,570 / 969 in the e2e build, the gzip plus 4.
   // audit's own chunk (auditRisk, below).
+  // 1,159 / 738 -> 1,560 / 966 on 2026-10-21 (B2, #208, draft), measured
+  // 1,560 / 962: the cascade week (B2's test week, a device), its line, the
+  // list of devices a week may switch on and the check that reads it.
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_570, maxGzip: 973 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
@@ -241,6 +256,13 @@ const budgets = [
   // 14,400 even written as a file of its own, and that budget does not go up.
   // Raised by what it measured, the gzip plus 4.
   { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_917, maxGzip: 1_048 },
+  // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
+  // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
+  // while a constant switched it off and the build dropped the walk; on
+  // 2026-10-21 it is switched by the season's week (`cascade`), so the walk,
+  // the reading and the links a case's close carries over are all here:
+  // 2,790 / 1,669 measured, the gzip plus 4.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -331,6 +353,8 @@ function checkBudget(file, budget) {
 // plus 4: the same three more file names in a longer list.
 // 8,828 / 3,183 -> 8,860 / 3,196 on 2026-10-20, measured 8,860 / 3,192 (gzip
 // plus 4): one more file, B3's audit (auditRisk).
+// 8,862 / 3,200 -> 8,896 / 3,215 on 2026-10-21 (B2, #208, draft), measured
+// 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
 const WORKER_BUDGET = { maxBytes: 8_894, maxGzip: 3_217 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));

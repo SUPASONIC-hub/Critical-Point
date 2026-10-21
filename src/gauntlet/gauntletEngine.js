@@ -38,6 +38,7 @@ import {
 } from "./tableRules.js";
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
+import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -819,6 +820,11 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // 이번 주의 규칙 the season was started under (gauntlet/weeklyRules.js), or
   // null. Stamped once at the season's start and carried to its end (D3).
   weekRule: null,
+  // B2's links across a case's close (cascadeRisk.js, SAVE_SCHEMA_VERSION 4):
+  // those the case on the table opened with, and those its close hands the
+  // next real case. Empty on a table without links.
+  linksIn: [],
+  linksOut: [],
   schema: BASE_SCHEMA,
 });
 
@@ -880,6 +886,8 @@ function normalizePractice(value) {
     relicOffer: normalizeRelicIds(value.relicOffer, RELIC_OFFER_SIZE),
     stanceMastery: normalizeStanceMastery(value.stanceMastery),
     bestMultiplier: clamp(Number(value.bestMultiplier) || 1, 1, 512),
+    // The links the next real case is owed (B2), held while a closed case is played again.
+    linksOut: normalizeLinks(value.linksOut),
     // A replay opened before the streak existed holds none to hand back.
     ...(value.logic ? { logic: normalizeLogic(value.logic) } : null),
     record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.filter((key) => key in source).map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
@@ -918,6 +926,8 @@ export function normalizeRunState(value) {
   run.veteran = source.veteran === true;
   run.story = source.story === true;
   run.weekRule = normalizeWeekRuleId(source.weekRule);
+  run.linksIn = normalizeLinks(source.linksIn);
+  run.linksOut = normalizeLinks(source.linksOut);
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -945,7 +955,7 @@ export function serializeRunState(value) {
  * red PROTOCOL BREACH panel, its alarm and its glitch said "your last decision
  * broke this board" for all fourteen, so a player who had charged a stance,
  * chained two hot cashes or closed a case was told off for it at the next
- * table. The six marked here keep that treatment (`isPenaltyMutation`); the
+ * table. The six marked here, and CASCADE (B2), keep that treatment (`isPenaltyMutation`); the
  * rest are told as rules the board carries.
  */
 export const MUTATIONS = Object.freeze({
@@ -1020,6 +1030,8 @@ export const MUTATIONS = Object.freeze({
     title: "시즌이 버티는 법을 익혔다",
     text: "STEADY LOCK을 거듭 충전한 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
   },
+  // B2, on a table that counts links only (cascadeRisk.js).
+  cascade: CASCADE_MUTATION,
   exposeMastery: {
     label: "EXPOSE MASTERY",
     title: "시즌이 판을 읽는 법을 익혔다",
@@ -1208,11 +1220,16 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
         stanceMastery: current.stanceMastery,
         bestMultiplier: current.bestMultiplier,
         logic: current.logic,
+        linksOut: current.linksOut,
         record: replayOf.pushRecord ?? null,
       }
     : null;
   return normalizeRunState({
     ...current,
+    // B2: a real case opens on the links the last one handed on; a replay on
+    // none (it holds them above), and a story case lets them lapse.
+    linksIn: practice || current.story ? [] : current.linksOut,
+    linksOut: [],
     runPot: 0,
     runHand: 0,
     insuranceSpent: false,
@@ -1341,7 +1358,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * whatever the rules say -- they are held, not dealt -- and so is the season's
  * lean. With every rule, which is the default, this is the board it always was.
  */
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES }) {
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false }) {
   if (caseClosed) return applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
@@ -1378,6 +1395,13 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
       schema.chipsScale *= COLD_FEET_CHIPS;
       schema.mutations.push("coldFeet");
     }
+  }
+  // CASCADE (B2): a link made boards ago comes back on this one; never with
+  // BLACKOUT, whose wall already moved (the caller's link waits a board).
+  if (cascade && !schema.mutations.includes("blackout")) {
+    schema.wallMin -= LINK_WALL;
+    schema.wallMax -= LINK_WALL;
+    schema.mutations.push("cascade");
   }
   if (burnAxis && rules.has("fracture")) {
     schema.fracturedAxis = burnAxis;
@@ -1434,8 +1458,12 @@ function readWindowUnder(window, rules) {
  * `audit` is the case's audit before this window (`countAudit` over the
  * case's log): read only on a table that counts it (auditRisk.js), which
  * judges it on the window that closes the case.
+ *
+ * `cascade` says a link is due on the board this window deals (cascadeRisk.js,
+ * `isLinkDue` over the case's log, false on a table without links). It is
+ * dealt unless the case closes here or the board is a BLACKOUT one.
  */
-export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0 }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -1518,6 +1546,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     stanceMastery: practice?.stanceMastery ?? stanceMastery,
     windowIndex: getEscalationWindow(current) + (current.practice ? 0 : 1),
     rules: caseClosed ? nextRules : rules,
+    cascade,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
@@ -1550,6 +1579,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     fracturedAxis: current.schema.fracturedAxis,
     fractureRate: current.schema.fractureRate,
     nextMutations,
+    // B2, on a table that counts links: the reveal's line when this cash made one.
+    link: describeLinkMade(current, { cashed: outcome === "cash", burn }),
     relicProcs,
     relicOffer,
     // Carried on the closing entry of a replayed case, where the summary's
@@ -1592,6 +1623,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     veteran: current.veteran,
     story: current.story,
     weekRule: current.weekRule,
+    // The closing commit writes what the case hands on (cascadeRisk.js `carryLinksOut`).
+    linksIn: current.linksIn,
+    linksOut: current.linksOut,
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,

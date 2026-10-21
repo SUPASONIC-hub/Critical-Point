@@ -113,9 +113,9 @@ export const viewGroups = {
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId", "sceneChallenge"],
     gauntlet: [
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
-      "decisionRevealOpen", "staleSave", "auditCount",
+      "decisionRevealOpen", "staleSave", "auditCount", "linkReading",
     ],
-    // The debug overlay's path, one string since 2026-10-19 (it was two numbers), so the audit count fits the budget.
+    // The debug overlay's path, one string since 2026-10-19 (it was two numbers), so B3's audit and B2's links fit the budget.
     status: ["resources", "resourceMeta", "progress", "routePath"],
     debug: ["debugToolsEnabled", "fallbackCaseId", "silentFailureCount"],
   },

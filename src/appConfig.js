@@ -66,7 +66,9 @@ export const debugToolsEnabled =
 export const SAVE_SLOT_MAX_ITEMS = 5;
 // 3 since B1 (11일차): a put-down window carries `scouted`, whether SCOUT was
 // spent on it (gauntletEngine's `getWindowBand`). See `migrateSavedState`.
-export const SAVE_SCHEMA_VERSION = 3;
+// 4 since B2: the table carries `linksIn`/`linksOut`, the links a case's close
+// hands the next case (gauntlet/cascadeRisk.js).
+export const SAVE_SCHEMA_VERSION = 4;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
 export const PLAYER_NAME_MAX_LENGTH = 24;
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
@@ -131,7 +133,7 @@ export function normalizeSavedText(value, maxLength = 0) {
 }
 
 export function normalizeFeedback(value) {
-  const feedback = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const feedback = isPlainObject(value) ? value : {};
   return {
     clarity: normalizeSavedText(feedback.clarity),
     difficulty: normalizeSavedText(feedback.difficulty),
@@ -140,12 +142,15 @@ export function normalizeFeedback(value) {
   };
 }
 
+/** A record: an object that is not an array (or null). */
+const isPlainObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
 export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSION) {
   if (!state || typeof state !== "object" || Array.isArray(state)) return null;
   const sourceVersion = Number(state.saveSchemaVersion ?? 1);
   if (sourceVersion > targetSchemaVersion) return null;
   if (sourceVersion === targetSchemaVersion) return state;
-  // One step at a time, so a v1 save reaches v3 through v2.
+  // One step at a time, so a v1 save reaches v4 through v2 and v3.
   const stepped = migrateOneStep(state, sourceVersion);
   return stepped ? migrateSavedState(stepped, targetSchemaVersion) : null;
 }
@@ -161,9 +166,22 @@ function migrateSuspendedScout(dynamics) {
   return { ...dynamics, suspended: { ...dynamics.suspended, window: { ...window, scouted: window.scouted === true } } };
 }
 
+/**
+ * 3 -> 4: a table from before B2's links carried none across a case's close.
+ * The engine reads missing lists as empty already (`normalizeRunState`); the
+ * step writes them out so a v4 save always says it, a replay's held list too.
+ */
+function migrateCarriedLinks(dynamics) {
+  return isPlainObject(dynamics) ? { ...dynamics, linksIn: [], linksOut: [], ...(isPlainObject(dynamics.practice) && { practice: { ...dynamics.practice, linksOut: [] } }) } : dynamics;
+}
+
 function migrateOneStep(state, sourceVersion) {
+  if (sourceVersion === 3) {
+    return { ...state, saveSchemaVersion: 4, dynamics: migrateCarriedLinks(state.dynamics) };
+  }
+
   if (sourceVersion === 2) {
-    const dynamics = state.dynamics && typeof state.dynamics === "object" && !Array.isArray(state.dynamics) ? migrateSuspendedScout(state.dynamics) : state.dynamics;
+    const dynamics = isPlainObject(state.dynamics) ? migrateSuspendedScout(state.dynamics) : state.dynamics;
     return { ...state, saveSchemaVersion: 3, dynamics };
   }
 
@@ -174,9 +192,9 @@ function migrateOneStep(state, sourceVersion) {
       runId: typeof state.runId === "string" ? state.runId : "",
       discoveredClues: Array.isArray(state.discoveredClues) ? state.discoveredClues : [],
       pendingTelemetry: Array.isArray(state.pendingTelemetry) ? state.pendingTelemetry : [],
-      caseResults: state.caseResults && typeof state.caseResults === "object" && !Array.isArray(state.caseResults) ? state.caseResults : {},
-      playtestFeedback: state.playtestFeedback && typeof state.playtestFeedback === "object" && !Array.isArray(state.playtestFeedback) ? state.playtestFeedback : {},
-      dynamics: state.dynamics && typeof state.dynamics === "object" && !Array.isArray(state.dynamics) ? state.dynamics : null,
+      caseResults: isPlainObject(state.caseResults) ? state.caseResults : {},
+      playtestFeedback: isPlainObject(state.playtestFeedback) ? state.playtestFeedback : {},
+      dynamics: isPlainObject(state.dynamics) ? state.dynamics : null,
     };
   }
 
@@ -323,7 +341,7 @@ export function backUpUnreadableSave(raw) {
 export function readNewGamePlusMemory() {
   try {
     const memory = JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}"));
-    return memory && typeof memory === "object" && !Array.isArray(memory) ? memory : {};
+    return isPlainObject(memory) ? memory : {};
   } catch {
     return {};
   }
@@ -561,10 +579,10 @@ export function createSafeErrorContext(saved = {}, source = "runtime") {
 
 function normalizeErrorLogEntry(entry) {
   if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
-  const context = entry.context && typeof entry.context === "object" && !Array.isArray(entry.context)
+  const context = isPlainObject(entry.context)
     ? entry.context
     : {};
-  const error = entry.error && typeof entry.error === "object" && !Array.isArray(entry.error)
+  const error = isPlainObject(entry.error)
     ? entry.error
     : {};
   return {
@@ -651,7 +669,6 @@ export function parseRecoverySlots(raw, schemaVersion = RECOVERY_SLOT_SCHEMA_VER
   }
 }
 
-const isPlainObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
 /**
  * A recovery slot is the save as it stood, so restoring one is exact. It used
@@ -678,15 +695,15 @@ export function createRecoverySnapshot(snapshot) {
     nodeId: typeof snapshot.nodeId === "string" ? snapshot.nodeId : "unknown",
     completedCases: Array.isArray(snapshot.completedCases) ? snapshot.completedCases : [],
     discoveredClues: Array.isArray(snapshot.discoveredClues) ? snapshot.discoveredClues : [],
-    caseResults: snapshot.caseResults && typeof snapshot.caseResults === "object" && !Array.isArray(snapshot.caseResults) ? snapshot.caseResults : {},
+    caseResults: isPlainObject(snapshot.caseResults) ? snapshot.caseResults : {},
     playtestFeedback: {},
-    resources: snapshot.resources && typeof snapshot.resources === "object" && !Array.isArray(snapshot.resources) ? snapshot.resources : {},
-    triggers: snapshot.triggers && typeof snapshot.triggers === "object" && !Array.isArray(snapshot.triggers) ? snapshot.triggers : {},
-    cognition: snapshot.cognition && typeof snapshot.cognition === "object" && !Array.isArray(snapshot.cognition) ? snapshot.cognition : {},
+    resources: isPlainObject(snapshot.resources) ? snapshot.resources : {},
+    triggers: isPlainObject(snapshot.triggers) ? snapshot.triggers : {},
+    cognition: isPlainObject(snapshot.cognition) ? snapshot.cognition : {},
     echo: normalizeSavedText(snapshot.echo, 900),
     log: Array.isArray(snapshot.log) ? snapshot.log.filter(isPlainObject) : [],
     pendingTelemetry: [],
-    dynamics: snapshot.dynamics && typeof snapshot.dynamics === "object" && !Array.isArray(snapshot.dynamics) ? snapshot.dynamics : null,
+    dynamics: isPlainObject(snapshot.dynamics) ? snapshot.dynamics : null,
     nodeEnteredAt: Number.isFinite(snapshot.nodeEnteredAt) ? snapshot.nodeEnteredAt : Date.now(),
     savedAt: typeof snapshot.savedAt === "string" ? snapshot.savedAt : new Date().toISOString(),
     lastError: snapshot.lastError ?? null,

@@ -375,6 +375,16 @@ const WEEK_RULE_PANEL = "src/gauntlet/WeekRulePanel.jsx";
  */
 const AUDIT_RISK = "src/gauntlet/auditRisk.js";
 
+/**
+ * B2's links (src/gauntlet/cascadeRisk.js): the walk over the case's log, the
+ * table's reading, the voice's line and CASCADE's words. The engine's chunk,
+ * the table's and the runtime's all import it, so left alone it is written
+ * into one of theirs, and it took the PlayScreen chunk to 34,495 of 34,300
+ * gzip on 2026-10-20. It gets a file the way the table's sound does; it
+ * imports only gameConstants.js, never the engine's chunk.
+ */
+const CASCADE_RISK = "src/gauntlet/cascadeRisk.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -414,6 +424,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(AUDIT_RISK),
         name: "auditRisk",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(CASCADE_RISK),
+        name: "cascadeRisk",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },

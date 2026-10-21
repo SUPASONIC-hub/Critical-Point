@@ -142,7 +142,9 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
   }
 });
 
+// B2's CASCADE is switched by the run (cascadeRisk.js `isCascadeOn`), not by a
+// case's rules, until the rule switch (RULES_MARK 3) gives it a step of the ladder.
 test("every next-table mutation but REBOOT belongs to a rule", () => {
-  assert.deepEqual(Object.keys(MUTATION_RULES).sort(), Object.keys(MUTATIONS).filter((id) => id !== "reboot").sort());
+  assert.deepEqual(Object.keys(MUTATION_RULES).sort(), Object.keys(MUTATIONS).filter((id) => id !== "reboot" && id !== "cascade").sort());
   for (const [mutation, rule] of Object.entries(MUTATION_RULES)) assert.ok(ALL_RULES.has(rule), `${mutation} -> ${rule}`);
 });
