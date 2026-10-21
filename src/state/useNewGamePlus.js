@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, readNewGamePlusMemory, readStoredValue, writeStoredValue } from "../appConfig.js";
-import { getSeasonCarry, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY } from "./newGamePlusCarry.js";
+import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY } from "./newGamePlusCarry.js";
+import { readSeasonRecord } from "./seasonRecord.js";
 
 /**
  * What a finished season leaves for the next one: whether NEW GAME+ is open,
@@ -48,11 +49,14 @@ export function readSeasonCarry() {
   return getSeasonCarry(readStoredValue(SEASON_RECORD_KEY, null), readNewGamePlusMemory());
 }
 
-export function useNewGamePlus(saved) {
+export function useNewGamePlus(saved, runId = null) {
   const [unlocked, setUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
   const [memory, setMemory] = useState(readNewGamePlusMemory);
+  // The season record as this tab last wrote or read it: the intro's memory
+  // panel and continue card, and the finale's comparison line, read it.
+  const [seasonRecord, setSeasonRecord] = useState(readSeasonRecord);
 
   function rememberSeason(caseResults) {
     const season = storeSeasonMemory(caseResults);
@@ -75,10 +79,19 @@ export function useNewGamePlus(saved) {
     setUnlocked(true);
     writeStoredValue(NEW_GAME_PLUS_KEY, "true");
     rememberSeason(finishedSeason);
-    if (finishedSeason) storeSeasonRecord(finishedSeason, finale);
+    if (finishedSeason) setSeasonRecord(storeSeasonRecord(finishedSeason, finale));
   }
 
-  // `readSeasonCarry` is handed out with the rest, so the runtime reads what
-  // NEW GAME+ carries without one more import of its own (check:runtime-budget).
-  return { newGamePlusUnlocked: unlocked, newGamePlusMemory: memory, unlockNewGamePlus: unlock, rememberSeason, readSeasonCarry };
+  // `readSeasonCarry` and the comparison line are handed out with the rest, so
+  // the runtime reads what NEW GAME+ carries without imports of its own
+  // (check:runtime-budget). The line is this run's (`runId`), or null.
+  return {
+    newGamePlusUnlocked: unlocked,
+    newGamePlusMemory: memory,
+    unlockNewGamePlus: unlock,
+    rememberSeason,
+    readSeasonCarry,
+    seasonRecord,
+    seasonComparison: getSeasonComparison(seasonRecord, runId),
+  };
 }

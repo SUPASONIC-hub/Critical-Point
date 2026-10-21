@@ -63,7 +63,7 @@ test("a run is counted once, however often its finale closes, and the last rulin
   assert.deepEqual(record, { seasons: 0, countedRuns: [], last: null, previous: null });
   record = recordFinishedSeason(record, { runId: "run-a", finalSummary: finale(ending("human-record")), finalChoiceId: "ending_reform" });
   assert.equal(record.seasons, 1);
-  assert.deepEqual(record.last, { runId: "run-a", endingId: "human-record", endingLabel: "HUMAN RECORD", verdict: "ending_reform", verdictName: "개혁", tableRules: 2 });
+  assert.deepEqual(record.last, { runId: "run-a", endingId: "human-record", endingLabel: "HUMAN RECORD", verdict: "ending_reform", verdictName: "개혁", tableRules: 2, line: "지난 시즌: 개혁 · HUMAN RECORD. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." });
   // The finale played again in the same run, to another ending.
   record = recordFinishedSeason(record, { runId: "run-a", finalSummary: finale(collapse), finalChoiceId: "ending_reform" });
   assert.equal(record.seasons, 1, "a replayed finale is not another season");
@@ -196,4 +196,45 @@ test("the carried line is shown on a NEW GAME+ season's first page, and nowhere 
   assert.equal(getSeasonOpening({ ...first, caseResults: { prologue01: {} } }), null, "a replayed 프롤로그 01 opens on its own line");
   assert.equal(getSeasonOpening({ ...first, echo: "  " }), null);
   assert.equal(getSeasonOpening({ ...first, gauntletRun: null }), null);
+});
+
+test("the start screen's panel names the last season's ending, and its season number on the head and the continue card", async () => {
+  const { getPastRunMemory, getPlayStyleUnlocks } = await import("../../src/advancedSystems.js");
+  const record = (verdict, label, extra = {}) => recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending(label.toLowerCase().replace(" ", "-"), extra)), finalChoiceId: verdict });
+  const reform = getPastRunMemory({}, record("ending_reform", "HUMAN RECORD"), "run-b");
+    assert.equal(reform.round, 2);
+  assert.equal(reform.text, "지난 시즌: 개혁 · HUMAN RECORD. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.");
+  const fallen = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(collapse) });
+  assert.equal(getPastRunMemory({}, fallen, null).text, "지난 시즌: SYSTEM COLLAPSE. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.");
+  const open = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending("profitable-silence")), finalChoiceId: "ending_seal" });
+  assert.equal(getPastRunMemory({}, open, null).text, "지난 시즌: PROFITABLE SILENCE.", "an open verdict: the ending alone, no promise");
+  // The finished run itself, reopened from its save: still its own season, not the next.
+  assert.equal(getPastRunMemory({}, record("ending_reform", "HUMAN RECORD"), "run-a").round, 1);
+  // A memory from before the record keeps the old line (the entry chunk reads only the record's stored line), and is the second season.
+  const memory = { case01: { outcomeChoiceId: "c1" }, final: { outcomeChoiceId: "f_after_burn", runId: "old", endingVariant: { id: "quiet-cover", label: "QUIET COVER", failure: false } } };
+  assert.match(getPastRunMemory(memory, null, "new").text, /^이전 기록에서 CASE /);
+  assert.equal(getPastRunMemory(memory, null, "new").round, 2);
+  // As stored: the panel reads the raw record, not a normalized one.
+  assert.equal(getPastRunMemory({}, JSON.parse(JSON.stringify(record("ending_expose", "FIELD PACT"))), "run-b").text, "지난 시즌: 폭로 · FIELD PACT. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.");
+  // A memory with no ending in it keeps the old line.
+  assert.match(getPastRunMemory({ case01: { outcomeChoiceId: "c1" } }).text, /^이전 기록에서 CASE 01/);
+  assert.equal(getPastRunMemory({}, null, null), null);
+  assert.equal(getPlayStyleUnlocks("instinct", true).newGamePlus, "지난 시즌의 결말을 이 화면에서 다시 볼 수 있습니다");
+});
+
+test("the finale's comparison line sets this season's ending beside the one before", async () => {
+  const { getSeasonComparison } = await import("../../src/state/newGamePlusCarry.js");
+  const first = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending("quiet-cover"), 2), finalChoiceId: "ending_seal" });
+  assert.equal(getSeasonComparison(first, "run-a"), null, "a first season has nothing to compare with");
+  const other = recordFinishedSeason(first, { runId: "run-b", finalSummary: finale({ id: "human-record", label: "HUMAN RECORD" }, 2) });
+  assert.equal(getSeasonComparison(other, "run-b"), "지난 시즌 QUIET COVER · 이번 시즌 HUMAN RECORD");
+  assert.equal(getSeasonComparison(other, "run-c"), null, "only on the run whose finale was counted last");
+  const same = recordFinishedSeason(first, { runId: "run-b", finalSummary: finale(ending("quiet-cover"), 2) });
+  assert.equal(getSeasonComparison(same, "run-b"), "지난 시즌과 같은 결말 QUIET COVER에 다시 닿았습니다.");
+  const newRules = recordFinishedSeason(first, { runId: "run-b", finalSummary: finale({ id: "human-record", label: "HUMAN RECORD" }, 3) });
+  assert.equal(getSeasonComparison(newRules, "run-b"), "지난 시즌 QUIET COVER · 이번 시즌 HUMAN RECORD · 판 규칙이 바뀐 뒤의 첫 시즌");
+  const sameNewRules = recordFinishedSeason(first, { runId: "run-b", finalSummary: finale(ending("quiet-cover"), 3) });
+  assert.equal(getSeasonComparison(sameNewRules, "run-b"), "지난 시즌과 같은 결말 QUIET COVER에 다시 닿았습니다 · 판 규칙이 바뀐 뒤의 첫 시즌");
+  const unknownRules = recordFinishedSeason(first, { runId: "run-b", finalSummary: { endingVariant: { id: "human-record", label: "HUMAN RECORD" } } });
+  assert.equal(getSeasonComparison(unknownRules, "run-b"), "지난 시즌 QUIET COVER · 이번 시즌 HUMAN RECORD", "no rules mark, no claim that they changed");
 });

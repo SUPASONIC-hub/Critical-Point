@@ -102,6 +102,9 @@ function normalizeEntry(input = {}) {
     // The run played a case in story mode. Such a season is never posted, so
     // this is true only on this device's own rows.
     assistStory: summary.assistStory === true,
+    // The run was begun with NEW GAME+ (newGamePlusMark). The public summary
+    // does not publish the key, so this too is true only on this device's rows.
+    newGamePlus: summary.newGamePlus === true,
     reflectionScore,
     pressureAdaptScore,
     cognitionScore: toCount(summary.cognitionScore),

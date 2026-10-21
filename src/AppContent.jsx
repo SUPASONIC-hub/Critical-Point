@@ -17,6 +17,7 @@ import {
   isSavedStateShapeValid,
   parseCurrentSavedState,
   readNewGamePlusMemory,
+  readStoredSeasonRecord,
   readStoredValue,
   readUnreadableSave,
   removeStoredValue,
@@ -165,6 +166,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const [initialStartState, setInitialStartState] = useState(null);
   const { showRanking, showBoard, setShowRanking, setShowBoard } = useOverlayScreens();
   const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
+  const newGamePlusRecord = useMemo(() => readStoredSeasonRecord(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   // The box starts ticked on a device with no save. Where there is a save,
@@ -355,6 +357,8 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     // Read once: it is every case summary of a finished season, and this
     // object is rebuilt on each keystroke in the name field.
     newGamePlusMemory,
+    seasonRecord: newGamePlusRecord,
+    runId: saved?.runId ?? null,
     nextParticipantMessage: readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""),
     startGame,
     startCase,

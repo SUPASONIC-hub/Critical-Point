@@ -132,7 +132,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = setters;
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const relicTable = useRelicTable();
-  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry } = useNewGamePlus(saved);
+  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry, seasonRecord, seasonComparison } = useNewGamePlus(saved, runId);
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus(currentCase);
   const [saveStatus, setSaveStatus] = useState("");
@@ -887,7 +887,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     playerName, setPlayerName, playStyle, setPlayStyle, dataConsent, setDataConsent,
     operatorOrigin, setOperatorOrigin, sessionCode, isOnline,
     hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase, nodeId,
-    newGamePlusUnlocked, newGamePlusMemory, nextParticipantMessage,
+    newGamePlusUnlocked, newGamePlusMemory, seasonRecord, runId, nextParticipantMessage,
     startGame: lifecycle.startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame: lifecycle.resumeSavedGame, persist, setShowRanking,
     setShowBoard,
     setSaveStatus, pendingTelemetry, setPendingTelemetry: replacePendingTelemetry, setTelemetryStatus,
@@ -904,7 +904,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const resultView = createResultViewModel(report, {
     AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, playerName, activeCaseMeta, renderSceneLines, renderSceneMinutes,
     endingStep, endingTwistIndex, advanceEndingStep, endingQuietReady, endingQuietLine, skipEndingQuietHold,
-    unopenedRecordCount, unopenedClueCount, unopenedBranchCount, operatorReveal,
+    unopenedRecordCount, unopenedClueCount, unopenedBranchCount, operatorReveal, seasonComparison,
     nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage,
     caseResults, decisionFingerprint, observationLedger, observerPattern, triggers, momentumTier, momentumScore,
     formatRiskDelta, counterfactualReport, achievementProgress, balanceSignals, log, clueCount,

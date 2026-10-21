@@ -8,6 +8,7 @@
 import { caseDisplayCode } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
+import { getSeasonRound } from "./appConfig.js";
 
 const HARM = easyResourceLabels.humanCost;
 const percent = (share) => Math.round(share * 100);
@@ -67,7 +68,7 @@ export function getPlayStyleUnlocks(playStyle = "instinct", newGamePlus = false)
     mediator: { label: "MEDIATE", unlock: "대화로 압박을 낮추겠다는 다짐" },
   };
   const base = styles[playStyle] ?? styles.instinct;
-  return { ...base, newGamePlus: newGamePlus ? "지난 시즌의 마지막 선택을 이 화면에서 다시 볼 수 있습니다" : "최종 기록을 완료하면 NEW GAME+ 해금" };
+  return { ...base, newGamePlus: newGamePlus ? "지난 시즌의 결말을 이 화면에서 다시 볼 수 있습니다" : "최종 기록을 완료하면 NEW GAME+ 해금" };
 }
 
 // The steps described the decision board the gauntlet table replaced on
@@ -92,11 +93,29 @@ export function getSeasonGoals() {
   ];
 }
 
-export function getPastRunMemory(memory = {}) {
+/**
+ * The start screen's NEW GAME+ panel (NEWGAMEPLUS 문구 질문 9-10, all (1)):
+ * the season number from the second season on, and how the last finished
+ * season ended. The sentence is written when the season is counted
+ * (newGamePlusCarry.getMemoryLine) and kept in the record's `last.line`, so
+ * the entry chunk, which had no room, carries neither the sentence's rules nor
+ * the record's reader: it reads the stored line and the season number
+ * (`getSeasonRound`, appConfig.js). `round` is the saved run's season number,
+ * which the continue card prints too; the intro view has no room for a field
+ * of its own; the panel's head is written in IntroScreen, with its English
+ * name marked as English. A device with only the NEW GAME+ memory keeps the
+ * old line.
+ */
+export function getPastRunMemory(memory = {}, record = null, runId = null) {
   const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
-  if (entries.length === 0) return null;
-  const [caseId] = entries.at(-1);
-  return { label: "PAST RUN MEMORY", text: `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
+  const line = typeof record?.last?.line === "string" ? record.last.line : null;
+  if (entries.length === 0 && !line) return null;
+  const round = getSeasonRound(record, runId, memory);
+  const [caseId] = entries.at(-1) ?? [];
+  return {
+    round,
+    text: line ?? `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.`,
+  };
 }
 
 export function getOriginPrologue(origin = "courier") {

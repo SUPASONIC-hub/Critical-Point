@@ -15,33 +15,14 @@
  * with every other.
  *
  * Everything here is a pure function of what it is handed. Writing the key,
- * the run's `echo` and the screens are the next pieces; until then nothing in
- * the game imports this file.
+ * the run's `echo` and the screens read it; the record's own shape and the
+ * season number, which the entry chunk's intro reads, are in seasonRecord.js.
  */
 import { OPENING_ECHO } from "./openingState.js";
+import { countRun, isPlainObject, normalizeLast, normalizeSeasonRecord, VERDICT_NAMES } from "./seasonRecord.js";
 import { getVerdictKey } from "../verdictBranch.js";
 
-/** The device key: outside the save, kept by a reset, like the NEW GAME+ memory. */
-export const SEASON_RECORD_KEY = "critical-point-season-record-v1";
-
-/**
- * How many runs the record remembers having counted. A finale is closed again
- * whenever it is replayed (`onSeasonFinal`), and only the run it belongs to
- * can replay it, so a handful is plenty.
- */
-const COUNTED_RUNS_KEPT = 8;
-
-/**
- * The ruling's short name, which the intro shows. Written into the record so
- * the entry chunk never needs the verdict table to read it.
- */
-export const VERDICT_NAMES = Object.freeze({
-  ending_seal: "봉인",
-  ending_reform: "개혁",
-  ending_expose: "폭로",
-  collapse: "붕괴",
-  open: "열린 판결",
-});
+export { getSeasonRound, normalizeSeasonRecord, SEASON_RECORD_KEY, VERDICT_NAMES } from "./seasonRecord.js";
 
 /**
  * The line each ruling's season is followed by (NEWGAMEPLUS 문구 질문 1-7,
@@ -62,46 +43,6 @@ const OPENING_ECHOES = Object.freeze({
   ending_expose: "지난 시즌의 기록은 이미 바깥에 나가 있습니다. 이번에는 무엇을 먼저 지킬지 보겠습니다.",
   collapse: "지난 시즌은 사람이 치른 값을 감당하지 못하고 멈췄습니다. 보존된 그 기록이 이번 첫 질문 옆에 놓여 있습니다.",
 });
-
-const EMPTY_RECORD = Object.freeze({ seasons: 0, countedRuns: Object.freeze([]), last: null, previous: null });
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
-
-function normalizeLast(value) {
-  if (!isPlainObject(value) || typeof value.endingId !== "string" || !value.endingId) return null;
-  const verdict = Object.hasOwn(VERDICT_NAMES, value.verdict ?? "") ? value.verdict : null;
-  return {
-    runId: typeof value.runId === "string" ? value.runId : null,
-    endingId: value.endingId,
-    endingLabel: typeof value.endingLabel === "string" ? value.endingLabel : "",
-    verdict,
-    verdictName: verdict ? VERDICT_NAMES[verdict] : null,
-    tableRules: Number.isInteger(value.tableRules) ? value.tableRules : null,
-  };
-}
-
-/**
- * The record as stored, or as a string read from storage, made safe to read:
- * an unreadable or missing record is an empty one.
- */
-export function normalizeSeasonRecord(value) {
-  let record = value;
-  if (typeof record === "string") {
-    try {
-      record = JSON.parse(record);
-    } catch {
-      record = null;
-    }
-  }
-  if (!isPlainObject(record)) return EMPTY_RECORD;
-  const seasons = Number.isInteger(record.seasons) && record.seasons > 0 ? record.seasons : 0;
-  const countedRuns = Array.isArray(record.countedRuns)
-    ? record.countedRuns.filter((runId) => typeof runId === "string" && runId).slice(-COUNTED_RUNS_KEPT)
-    : [];
-  return { seasons, countedRuns, last: normalizeLast(record.last), previous: normalizeLast(record.previous) };
-}
 
 /**
  * The record after a finale has closed. `finalSummary` is the finale's case
@@ -131,30 +72,15 @@ export function recordFinishedSeason(record, { runId, finalSummary, finalChoiceI
     endingLabel: endingVariant.label,
     verdict,
     tableRules: finalSummary?.gauntlet?.tableRules,
+    line: getMemoryLine({ endingLabel: endingVariant.label, verdict }),
   });
   const counted = current.countedRuns.includes(runId);
   return {
     seasons: counted ? current.seasons : current.seasons + 1,
-    countedRuns: counted ? current.countedRuns : [...current.countedRuns, runId].slice(-COUNTED_RUNS_KEPT),
+    countedRuns: counted ? current.countedRuns : countRun(current.countedRuns, runId),
     last,
     previous: counted ? current.previous : current.last,
   };
-}
-
-/**
- * Which season a run is: the record's count when the run has already been
- * counted (its finale closed), one more when it has not. The continue card
- * reads this: `getSeasonCarry().round` is the season about to start, and a
- * second season whose finale had closed was shown as the third (#220 review,
- * 10-21). A device with the NEW GAME+ memory and no record counts that season
- * as one. 1 before any season has finished.
- */
-export function getSeasonRound(record, runId, memory = null) {
-  const current = normalizeSeasonRecord(record);
-  const finished = current.seasons > 0 ? current.seasons : isPlainObject(memory) && isPlainObject(memory.final) ? 1 : 0;
-  const counted =
-    typeof runId === "string" && runId !== "" && (current.countedRuns.includes(runId) || (current.seasons === 0 && finished === 1 && memory.final.runId === runId));
-  return counted ? finished : finished + 1;
 }
 
 /**
@@ -180,6 +106,40 @@ export function getSeasonCarry(record, memory = null) {
     tableRules: finalSummary.gauntlet?.tableRules,
   });
   return { round: Math.max(current.seasons, 1) + 1, ...last, echo: getOpeningEcho(last.verdict) };
+}
+
+/**
+ * How the start screen's NEW GAME+ panel names a finished season
+ * (NEWGAMEPLUS 문구 질문 10, all (1)), written into the record when the season
+ * is counted (advancedSystems.getPastRunMemory reads it). The verdict is
+ * named only for the three the result screen names (봉인·개혁·폭로); a
+ * collapse is its ending's own name, and an open verdict the ending alone,
+ * with no promise of a line, since that season opens on the plain one. The
+ * second sentence is conditional because the plain start, on the same screen,
+ * carries nothing. NEW GAME+ is held together (a no-break space): with
+ * `keep-all` the phone broke the line between NEW and GAME+.
+ */
+export function getMemoryLine({ endingLabel, verdict }) {
+  const named = verdict && verdict !== "collapse" && verdict !== "open" ? `${VERDICT_NAMES[verdict]} · ` : "";
+  return `지난 시즌: ${named}${endingLabel}.${verdict && verdict !== "open" ? " NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." : ""}`;
+}
+
+/**
+ * The finale's comparison line (NEWGAMEPLUS 문구 질문 13, all (1)), or null:
+ * only on the run whose finale the record last counted, and only when there
+ * is a season before it (`previous`). A different ending names both; the same
+ * one says it was reached again; a season under other table rules than the
+ * one before (`tableRules`, both known) says it is the first since they
+ * changed, at the end of the same line.
+ */
+export function getSeasonComparison(record, runId) {
+  const { last, previous } = normalizeSeasonRecord(record);
+  if (!last || !previous || typeof runId !== "string" || last.runId !== runId) return null;
+  const line =
+    last.endingId === previous.endingId ? `지난 시즌과 같은 결말 ${last.endingLabel}에 다시 닿았습니다` : `지난 시즌 ${previous.endingLabel} · 이번 시즌 ${last.endingLabel}`;
+  const rulesChanged = last.tableRules !== null && previous.tableRules !== null && last.tableRules !== previous.tableRules;
+  if (rulesChanged) return `${line} · 판 규칙이 바뀐 뒤의 첫 시즌`;
+  return last.endingId === previous.endingId ? `${line}.` : line;
 }
 
 /** The line under a NEW GAME+ season's first scene: the last ruling's, or the opening line. */

@@ -88,6 +88,9 @@ export function createIntroViewModel({
   nodeId,
   newGamePlusUnlocked,
   newGamePlusMemory,
+  // The season record (state/seasonRecord.js) and the saved run's id: the memory panel's season number.
+  seasonRecord = null,
+  runId = null,
   nextParticipantMessage,
   // What the intro can do.
   startGame,
@@ -185,7 +188,7 @@ export function createIntroViewModel({
     originPrologue: getOriginPrologue(operatorOrigin),
     tutorialSteps: getTutorialSteps(),
     playStyleUnlocks: getPlayStyleUnlocks(playStyle, newGamePlusUnlocked),
-    pastRunMemory: getPastRunMemory(newGamePlusMemory),
+    pastRunMemory: getPastRunMemory(newGamePlusMemory, seasonRecord, runId),
     seasonGoals: getSeasonGoals(),
 
     node: supplied("node"),
