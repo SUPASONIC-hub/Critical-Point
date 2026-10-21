@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-20 (the state of `main` at `6cd7f87`, and #199 at `43e7ed1`; what changed and when is in `git log`)
+Last updated: 2026-10-21 (the state of `main` at `0df240a`, #223; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -111,10 +111,33 @@ Still open, on purpose:
   and 사건 23's market card keeps the `risk` its old label inferred.
 - This week's rule (#199, F7) merged on the evening of 2026-10-20 at `43e7ed1`
   (migration 20261021000000; the ranking reads one board at a time by `week`).
-  Two drafts are measurements, not to merge alone: #201 (B3, the audit risk of
-  a device-shaped weekly rule) and #208 (B2, the visible chain risk); all their
-  decisions are recorded, and they go live together in one pull request
-  (RULES_MARK 3, one ranking reset) after the maker's own plays.
+- The audit risk (#201, B3) and the visible chain risk (#208, B2) change
+  course on 2026-10-21: instead of no test week (2026-10-19), they go live as
+  weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
+  on the live site, without a ranking reset. That pull request (#219,
+  #201 and #208 together, migration 20261021010000) merged on 2026-10-21 at
+  `e4ddff5`; the `Test Week` workflow reads the week's seasons once a day
+  (#222 adds the seasons that turned the rule down and the device count). B2
+  decision 10, a cash on a CASCADE board is not counted by the audit, was
+  missing from #219 and went in with #223 at `0df240a`. No table code merges
+  during W44. B2 was measured again on
+  2026-10-21: links left when a case closes carry into the next case's first
+  tables with `LINK_CARRY_MAX` 1 (collapse 21.0%, scout margin 6 loss 24.2%,
+  every criterion met), and the season bot's chip-reading hand keeps
+  `CHIP_MARGIN` 10 (4 of 7 archetypes at or above plain, short of 5; left to
+  play feedback). RULES_MARK 3 and the ranking reset are decided after W44's
+  data, in a later pull request.
+- NEW GAME+ carry-over (checked 2026-10-21, three answers all option 1): the
+  scene BUST rates leave out NEW GAME+ rows by the case summary's
+  `newGamePlus` and `case_id`, through a redefinition of
+  `refresh_scene_bust_stats` in the rules-mark-3 migration; the NEW GAME+ work
+  branches the day after rules-mark-3 merges and merges before W46 (11-09).
+- Server checks, phase 2 (F1, draft #216, eight answers all option 1): a
+  read-only `npm run verify:ranking` rechecks a run's score from its decision
+  log and marks `score-off-log` / `window-off-replay` in the `suspicion`
+  column through a service_role-only function (still a `.sql.draft`); rows
+  with other table rules are "not checked". The client's replay log follows
+  rules-mark-3 in its own pull request, before W46.
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
@@ -938,9 +961,14 @@ Still open, on purpose:
     film grain: flashes in rooms the public watches, rays by day under open sky,
     lightning at night under pressure, and season layers read off the clock.
     With motion reduced the flashes, lightning, steam and glitch are not shown.
-    A speaker without a painted portrait is drawn by `SpeakerPortrait` -- a
-    back-lit silhouette tinted from the name, with the initial -- never a stock
-    photo.
+    Since 2026-10-21 every speaker (87) has a portrait
+    (`src/speakerPortraits.js`, sources in `docs/portrait-credits.md`), and a
+    new speaker gets one too: no one is left as the silhouette. Villains and
+    minors get a generated picture of someone who does not exist, chosen to
+    look ordinary rather than sinister (Hannah Arendt's banality of
+    evil: the harm in this story is done by ordinary people signing papers); everyone else a free stock photo given
+    the same grade. `SpeakerPortrait` draws a back-lit silhouette tinted from
+    the name, with the initial, only when a file does not arrive.
 73. A case is written to a bible that requires anger, laughter, sorrow and joy,
     and is checked by the pack validator before it is wired in -- that is
     `check:graph`, which validates each pack's shape. Parallel authors get
