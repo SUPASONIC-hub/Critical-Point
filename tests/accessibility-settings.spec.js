@@ -215,12 +215,24 @@ test("the reading clock can start held, and waits", async ({ page }) => {
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
 });
 
+/**
+ * The page's clock moved by `ms` in quarter-second jumps, one frame each.
+ * `runFor` calls every 16 ms frame on the way, each followed by a turn of the
+ * real event loop, and on the dev server on a loaded desktop a minute of it
+ * took 22-28 seconds of a 60-second test. The table's frame loop counts at
+ * most a quarter second a frame (useGauntletWindow.js), so a clock that runs
+ * still spends every one of the `ms`.
+ */
+async function moveClockByFrames(page, ms) {
+  for (let moved = 0; moved < ms; moved += 250) await page.clock.fastForward(250);
+}
+
 /** The seconds the table's clock shows, and how many it loses over ten seconds of the page's time. */
-async function clockLossOverTenSeconds(page) {
+async function clockLossOverTenSeconds(page, move = (ms) => page.clock.runFor(ms)) {
   const clock = page.locator(".gx-clock b");
   await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
   const before = Number(await clock.textContent());
-  await page.clock.runFor(10_000);
+  await move(10_000);
   return before - Number(await clock.textContent());
 }
 
@@ -263,7 +275,7 @@ test("the play header opens the comfort settings over a held clock, and 2배 rea
 
   // A minute of the page's time, and a card key: the table has neither.
   const held = await clock.textContent();
-  await page.clock.runFor(60_000);
+  await moveClockByFrames(page, 60_000);
   await page.keyboard.press("1");
   await expect(clock).toHaveText(held ?? "");
   await expect(stage).toHaveAttribute("data-status", "live");
@@ -277,7 +289,7 @@ test("the play header opens the comfort settings over a held clock, and 2배 rea
   await expect(dialog).toHaveCount(0);
   await expect(opener).toBeFocused();
 
-  const assisted = await clockLossOverTenSeconds(page);
+  const assisted = await clockLossOverTenSeconds(page, (ms) => moveClockByFrames(page, ms));
   expect(assisted, "ten seconds cost about five on the window that was already open").toBeGreaterThanOrEqual(4);
   expect(assisted).toBeLessThanOrEqual(6);
 });
