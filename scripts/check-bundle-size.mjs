@@ -71,9 +71,11 @@ const budgets = [
   // -> 170,288 / 61,540 the same day, measured 170,288 / 61,536: the ranking
   // rows read the NEW GAME+ mark (src/ranking.js, which the shell's board
   // takes), +31 / +10.
+  // -> 170,409 / 61,597 the same evening, measured 170,409 / 61,593: the
+  // panel's last sentence on what a NEW GAME+ table is (문구 질문 17).
   // Stacked on #216 on 2026-10-23: the two deltas summed, measured again
   // with the whole branch (below).
-  { pattern: /^index-.*\.js$/, maxBytes: 170_288, maxGzip: 61_548 },
+  { pattern: /^index-.*\.js$/, maxBytes: 170_409, maxGzip: 61_605 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
