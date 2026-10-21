@@ -32,6 +32,18 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
 }
 
 /**
+ * The line a NEW GAME+ season opens on (newGamePlusCarry.js), on the season's
+ * first page only: a run begun with NEW GAME+, in 프롤로그 01, with nothing
+ * answered and no case closed. The run's `echo` moves on with the first
+ * answer, and a replayed 프롤로그 01 opens on its own line, so neither is
+ * shown under the NEW GAME+ kicker. Null everywhere else.
+ */
+export function getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo }) {
+  const first = gauntletRun?.veteran === true && currentCase === "prologue01" && (log?.length ?? 0) === 0 && Object.keys(caseResults ?? {}).length === 0;
+  return first && typeof echo === "string" && echo.trim() ? echo : null;
+}
+
+/**
  * What the run reads as, derived once per change rather than once per render.
  *
  * Every one of these is a pure function of the log and a few resources, and
@@ -39,20 +51,26 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, echo, seedBase, debugTools }) {
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
+  // It rides on the spine, which the play view already carries, so the view
+  // takes no new field (check:runtime-budget).
+  const opening = getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo });
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
-    return buildNarrativeSpine({
-      caseObjective: caseObjectives[currentCase],
-      node,
-      log,
-      triggerLabels,
-      riskTier,
-      suspenseState,
-    });
-  }, [currentCase, log, node, riskPressure, riskTier]);
+    return {
+      ...buildNarrativeSpine({
+        caseObjective: caseObjectives[currentCase],
+        node,
+        log,
+        triggerLabels,
+        riskTier,
+        suspenseState,
+      }),
+      opening,
+    };
+  }, [currentCase, log, node, opening, riskPressure, riskTier]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
     const unopenedBranchCount = getCaseBranchNodes().reduce(

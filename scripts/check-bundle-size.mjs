@@ -114,7 +114,15 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 104,705 / 34,805 -> 104,733 / 34,832 on 2026-10-21, measured 104,733 /
+  // 34,828 in the e2e build, the gzip plus 4: the line a NEW GAME+ season
+  // opens on (newGamePlusCarry.js), drawn on 프롤로그 01's first page. Its
+  // panel and the condition it is shown under are elsewhere (WeekRulePanel,
+  // below, and useRunReadout in the runtime's chunk); what stays is the one
+  // string handed from the play screen through the table to the page.
+  // Stacked on #216 (above) on 2026-10-23: the two deltas summed, measured
+  // again with the whole branch (below).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_849 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -296,7 +304,10 @@ const budgets = [
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // 801 / 515 -> 1,271 / 648 on 2026-10-21, measured 1,271 / 644, the gzip
+  // plus 4: the NEW GAME+ line's panel on the same page, above the week's
+  // rule, kept out of the PlayScreen chunk the same way.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's

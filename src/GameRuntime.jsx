@@ -284,6 +284,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     clueCount,
     gauntletRun,
     runId,
+    echo: run.echo,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
   });

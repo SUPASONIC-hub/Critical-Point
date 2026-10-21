@@ -8,6 +8,7 @@ import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import {
   getOpeningEcho,
   getSeasonCarry,
+  getSeasonRound,
   newGamePlusMark,
   normalizeSeasonRecord,
   recordFinishedSeason,
@@ -15,6 +16,7 @@ import {
   VERDICT_NAMES,
 } from "../../src/state/newGamePlusCarry.js";
 import { OPENING_ECHO } from "../../src/state/openingState.js";
+import { getSeasonOpening } from "../../src/state/useRunReadout.js";
 import { findFinalChoiceEntry, getVerdictKey, VERDICT_ENDINGS } from "../../src/verdictBranch.js";
 
 /**
@@ -58,7 +60,7 @@ test("the finale's verdict choice is the last answer to its last question, not t
 
 test("a run is counted once, however often its finale closes, and the last ruling is the latest", () => {
   let record = normalizeSeasonRecord(null);
-  assert.deepEqual(record, { seasons: 0, countedRuns: [], last: null });
+  assert.deepEqual(record, { seasons: 0, countedRuns: [], last: null, previous: null });
   record = recordFinishedSeason(record, { runId: "run-a", finalSummary: finale(ending("human-record")), finalChoiceId: "ending_reform" });
   assert.equal(record.seasons, 1);
   assert.deepEqual(record.last, { runId: "run-a", endingId: "human-record", endingLabel: "HUMAN RECORD", verdict: "ending_reform", verdictName: "개혁", tableRules: 2 });
@@ -116,8 +118,11 @@ test("four rulings have a line of their own; the open verdict and anything else 
   assert.equal(new Set(lines).size, 4);
   for (const line of lines) {
     assert.notEqual(line, OPENING_ECHO);
-    // Close to OPENING_ECHO's length, so the line keeps to three lines at 360px.
-    assert.ok(line.length <= OPENING_ECHO.length + 12, `${line.length}: ${line}`);
+    // Two sentences, as OPENING_ECHO is, and within three lines on a phone (문구 질문 1: 49-62).
+    assert.equal(line.split(". ").length, 2, line);
+    assert.ok(line.length <= 62, `${line.length}: ${line}`);
+    assert.match(line, /^지난 시즌/, "the last season is a season, not a session (문구 질문 2)");
+    assert.doesNotMatch(line, /이 방/, "프롤로그 01 is a bank office, before the lab existed");
     assert.doesNotMatch(line, /\d{2}/, "numbers of 10 and over are written as digits (#209); none is needed here");
   }
   for (const other of ["open", null, undefined, "toString", "ending_unknown"]) assert.equal(getOpeningEcho(other), OPENING_ECHO);
@@ -149,4 +154,46 @@ test("the ending ids the record keeps are the ruling's own", () => {
   const record = recordFinishedSeason(null, { runId: "run-a", finalSummary: { endingVariant: variant } });
   assert.equal(record.last.endingId, variant.id);
   assert.equal(record.last.tableRules, null);
+});
+
+test("the season before survives this season's finale, for the comparison line", () => {
+  let record = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending("quiet-cover")), finalChoiceId: "ending_seal" });
+  assert.equal(record.previous, null, "a first season has nothing before it");
+  record = recordFinishedSeason(record, { runId: "run-b", finalSummary: finale(ending("human-record"), 3), finalChoiceId: "ending_reform" });
+  assert.equal(record.last.endingId, "human-record");
+  assert.equal(record.previous.endingId, "quiet-cover", "the finale's result still has the season before to compare with");
+  assert.equal(record.previous.tableRules, 2);
+  // Replaying run-b's finale keeps the season before as it was.
+  record = recordFinishedSeason(record, { runId: "run-b", finalSummary: finale(collapse, 3), finalChoiceId: "ending_reform" });
+  assert.equal(record.previous.endingId, "quiet-cover");
+  assert.equal(record.last.endingId, "collapse");
+  assert.deepEqual(normalizeSeasonRecord(JSON.stringify(record)), record);
+});
+
+test("a run's season number does not move when its own finale closes", () => {
+  assert.equal(getSeasonRound(null, "run-a"), 1);
+  const first = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending("quiet-cover")) });
+  assert.equal(getSeasonRound(first, "run-a"), 1, "the first season, closed, is still the first");
+  assert.equal(getSeasonRound(first, "run-b"), 2, "the season after it is the second");
+  const second = recordFinishedSeason(first, { runId: "run-b", finalSummary: finale(ending("field-pact")) });
+  assert.equal(getSeasonRound(second, "run-b"), 2, "the second season's finale closed: still 2회차, not 3회차");
+  assert.equal(getSeasonRound(second, "run-c"), 3);
+  assert.equal(getSeasonRound(second, null), 3);
+  // A device with the memory and no record.
+  const memory = { final: { runId: "old", endingVariant: ending("cold-justice") } };
+  assert.equal(getSeasonRound(null, "old", memory), 1);
+  assert.equal(getSeasonRound(null, "new", memory), 2);
+});
+
+test("the carried line is shown on a NEW GAME+ season's first page, and nowhere else", () => {
+  const echo = getOpeningEcho("ending_expose");
+  const first = { gauntletRun: { veteran: true }, currentCase: "prologue01", log: [], caseResults: {}, echo };
+  assert.equal(getSeasonOpening(first), echo);
+  assert.equal(getSeasonOpening({ ...first, echo: OPENING_ECHO }), OPENING_ECHO, "an open verdict's season still has its NEW GAME+ line");
+  assert.equal(getSeasonOpening({ ...first, gauntletRun: { veteran: false } }), null, "a plain season has none");
+  assert.equal(getSeasonOpening({ ...first, currentCase: "prologue02" }), null);
+  assert.equal(getSeasonOpening({ ...first, log: [{ nodeId: "p1_start" }] }), null, "after the first answer the run's echo is that answer's");
+  assert.equal(getSeasonOpening({ ...first, caseResults: { prologue01: {} } }), null, "a replayed 프롤로그 01 opens on its own line");
+  assert.equal(getSeasonOpening({ ...first, echo: "  " }), null);
+  assert.equal(getSeasonOpening({ ...first, gauntletRun: null }), null);
 });

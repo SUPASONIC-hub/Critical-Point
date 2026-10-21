@@ -131,7 +131,7 @@ test("a new game begun with NEW GAME+", async () => {
 
 // What NEW GAME+ carries is the story, not the table (NEWGAMEPLUS 설계안 3절):
 // the line the season opens on, chosen from how the last one ended.
-const CARRIED_ECHO = "지난 세션의 기록은 봉인된 채 이 방에 들어왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.";
+const CARRIED_ECHO = "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.";
 
 test("a NEW GAME+ that carries a line opens the season on it", async () => {
   const harness = await createRunHarness({ saved: pausedRun(), operatorOrigin: "public" });
