@@ -242,8 +242,11 @@ export const AUDIT_VALUES = (() => {
  * and the relic draft), so every draw keeps its place in it. `staged` plays
  * each case under the rules `tableUnlocks` deals it. `archetypes` is this
  * bot's own table of players, a copy of ARCHETYPES the script may add hands to.
+ * `reduce` is the window reducer the player presses through: the engine's,
+ * or one that also writes each window's replay trail (the server-check tests,
+ * tests/unit/helpers/windowRecorder.mjs). It draws nothing either way.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES } }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow }) {
   let seed = start;
   function random() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -304,19 +307,19 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
   function playWindow(policy, run, windowSeed, rules, hand = null) {
     // The run's own board, and for a story run the same board with its far wall.
     let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
-    win = reduceWindow(win, { type: "SELECT", id: "card" }, rules);
+    win = reduce(win, { type: "SELECT", id: "card" }, rules);
     // Reading the card and the band before the first press. Creep starts after
     // the grace, so a slow hand is already paying heat.
     for (let second = 0; second < Math.floor(policy.think) && win.status === "live"; second += 1) {
-      win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+      win = reduce(win, { type: "TICK", delta: 1 }, rules);
     }
     // `hand` is the tool hand measured at the end of check-endings.mjs, and null for
     // every season before it: a stance, charged or not, and a window now and
     // then left to run out its clock.
     if (hand) {
-      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: hand.mode }, rules);
-      for (let lock = 0; hand.locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) win = reduceWindow(win, { type: "FOCUS" }, rules);
-      while (hand.walks && win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+      win = reduce(win, { type: "SET_FOCUS_MODE", mode: hand.mode }, rules);
+      for (let lock = 0; hand.locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) win = reduce(win, { type: "FOCUS" }, rules);
+      while (hand.walks && win.status === "live") win = reduce(win, { type: "TICK", delta: 1 }, rules);
     }
     const target = policy.heat + (random() - 0.5) * 10;
     // SCOUT (B1): the player who reads the heartbeat also takes the one look
@@ -324,7 +327,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // drew -- past that, on the heartbeat, never past the band's far end. No
     // draw from the stream: without the rule the season is the season before it.
     const scouts = policy.listens && rules.has("scout");
-    if (scouts) win = scoutWindow(win, true, rules);
+    if (scouts) win = scoutWindow(win, true, rules, reduce);
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
       const band = scouts ? getWindowBand(win) : null;
       const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
@@ -334,10 +337,10 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           ? hears
           : win.gauge < target;
       if (!keepGoing) break;
-      win = reduceWindow(win, { type: "PUSH" }, rules);
-      win = reduceWindow(win, { type: "TICK", delta: 0.7 }, rules);
+      win = reduce(win, { type: "PUSH" }, rules);
+      win = reduce(win, { type: "TICK", delta: 0.7 }, rules);
     }
-    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
+    if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
     return win;
   }
 
@@ -619,21 +622,22 @@ const STANCES = ["strike", "steady", "strike", "steady", "expose"];
  * the same way (the band's reach is the decide function's to read, through
  * `getWindowBand`). A case without the rule looks at nothing.
  */
-export function scoutWindow(win, scout, rules = ALL_RULES) {
+export function scoutWindow(win, scout, rules = ALL_RULES, reduce = reduceWindow) {
   if (!scout || win.status !== "live") return win;
-  if (scout === true || !Number.isFinite(scout.seconds)) return reduceWindow(win, { type: "SCOUT" }, rules);
+  if (scout === true || !Number.isFinite(scout.seconds)) return reduce(win, { type: "SCOUT" }, rules);
   if (!rules.has("scout") || win.scouted) return win;
   let spent = { ...win, scouted: true };
-  for (let left = scout.seconds; left > 0 && spent.status === "live"; left -= 1) spent = reduceWindow(spent, { type: "TICK", delta: Math.min(1, left) }, rules);
+  for (let left = scout.seconds; left > 0 && spent.status === "live"; left -= 1) spent = reduce(spent, { type: "TICK", delta: Math.min(1, left) }, rules);
   return spent;
 }
 
 /**
  * The two case players, for a case `windowsPerCase` windows long. `card` is
  * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
- * windowIndex)` the scene whose types a typed hand picks from.
+ * windowIndex)` the scene whose types a typed hand picks from. `reduce` is
+ * the window reducer, as for `createSeasonBot` (and `scoutWindow` takes it too).
  */
-export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor, links = true, carry = 0 }) {
+export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor, links = true, carry = 0, reduce = reduceWindow }) {
   // B2 decision 6 (2), on a bot made with `carry` (a season's length in
   // cases): a case hands its links to the next case index of the same
   // season, and the season's last lets them lapse.
@@ -675,28 +679,28 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       const offers = pickType ? sceneFor(caseIndex, windowIndex) : null;
       const staked = pickType ? { ...card, cognition: { [pickType(offers, run.logic, seed)]: 1 } } : card;
       let win = createWindow({ schema: getTableSchema(run), seed });
-      win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
+      win = reduce(win, { type: "SELECT", id: card.id }, rules);
       if (lock) {
-        win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, rules);
+        win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, rules);
         let charge = win;
         for (let press = 0; press < 8 && win.status === "live" && charge.focus < FOCUS_MAX; press += 1) {
-          const pressed = reduceWindow(charge, { type: "FOCUS" }, rules);
+          const pressed = reduce(charge, { type: "FOCUS" }, rules);
           // `idle` is the hand a LOCK is compared with like for like: it lets
           // the same clock run and does not press (a tick carries a second at most).
-          if (lock.idle && pressed !== charge) for (const delta of [1, LOCK_PRESS_SECONDS - 1]) win = reduceWindow(win, { type: "TICK", delta }, rules);
+          if (lock.idle && pressed !== charge) for (const delta of [1, LOCK_PRESS_SECONDS - 1]) win = reduce(win, { type: "TICK", delta }, rules);
           charge = pressed;
           if (!lock.idle) win = pressed;
         }
       }
-      win = scoutWindow(win, decide.scout, rules);
+      win = scoutWindow(win, decide.scout, rules, reduce);
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
         // `audit` is the case's audit so far, for a hand that reads it (AUDIT_WEEK).
         if (!decide(win, run, audit)) break;
-        win = reduceWindow(win, { type: "PUSH" }, rules);
-        win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
+        win = reduce(win, { type: "PUSH" }, rules);
+        win = reduce(win, { type: "TICK", delta: 0.6 }, rules);
       }
-      if (lock?.cashAs && win.status === "live") win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
-      if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
+      if (lock?.cashAs && win.status === "live") win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
+      if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
       const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun) });
       audit = verdict.audit?.count ?? 0;
@@ -781,20 +785,20 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       const held = HAND.findIndex((candidate) => getLogicType(candidate) === run.logic.type);
       const wanted = HAND[(Math.max(0, held) + (handUnit(`${seed}:card`) < HAND_WANDER ? 1 : 0)) % HAND.length];
       const card = HAND.find((candidate) => candidate.id === sealedId) ?? wanted;
-      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] }, rules);
-      win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
+      win = reduce(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] }, rules);
+      win = reduce(win, { type: "SELECT", id: card.id }, rules);
       // Four or five presses charge a stance; three, when a press was graded, used
       // to. A charged stance fills the hand's cap by itself, so a hand that locked
       // every window would be paid nothing by its streak and the two relics that
       // bend the streak could not move a number: it locks one window in two.
       const locks = handUnit(`${seed}:lock`) < HAND_LOCKS;
       for (let lock = 0; locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) {
-        win = reduceWindow(win, { type: "FOCUS" }, rules);
+        win = reduce(win, { type: "FOCUS" }, rules);
       }
       const mood = handUnit(`${seed}:mood`);
       if (mood < 0.04) {
         // Walked away from the table: the clock runs out.
-        while (win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+        while (win.status === "live") win = reduce(win, { type: "TICK", delta: 1 }, rules);
       }
       const sealed = card.id === sealedId;
       // One window in eight is cashed cold, as early as the table allows: COLD
@@ -805,10 +809,10 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
         const mustOpen = sealed && win.gauge < win.schema.sealBreak;
         if (!mustOpen && (cold || !decide(win, run))) break;
-        win = reduceWindow(win, { type: "PUSH" }, rules);
-        win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
+        win = reduce(win, { type: "PUSH" }, rules);
+        win = reduce(win, { type: "TICK", delta: 0.6 }, rules);
       }
-      if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
+      if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
       const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed, rules });
       if (verdict.outcome === "bust" && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
