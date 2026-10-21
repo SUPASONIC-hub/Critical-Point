@@ -70,6 +70,7 @@
     "src/state/runLifecycle.js": 100,
     "src/state/runState.js": 100,
     "src/state/runStorageReset.js": 82,
+    "src/state/seasonRecord.js": 100,
     "src/state/savedRunScope.js": 100,
     "src/state/savedState.js": 85,
     "src/state/sceneFocus.js": 100,

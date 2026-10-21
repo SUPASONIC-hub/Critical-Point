@@ -59,7 +59,21 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
+  // 169,980 / 61,300 -> 170,257 / 61,530 on 2026-10-21, measured 170,257 /
+  // 61,526 in the e2e build, the gzip plus 4: NEW GAME+ on the start screen
+  // (the memory panel's season number and last ending, the continue card's
+  // · N회차). Cut first: the panel's sentence is written into the season record
+  // when the season is counted (newGamePlusCarry.getMemoryLine, the runtime's
+  // chunk), so the entry reads a stored line and the season number
+  // (appConfig.getSeasonRound) and carries neither the sentence's rules nor
+  // the record's reader (state/seasonRecord.js); that took the addition from
+  // 1,082 / 428 to the 663 / 244 over main's 169,594 / 61,282 left here.
+  // -> 170,288 / 61,540 the same day, measured 170,288 / 61,536: the ranking
+  // rows read the NEW GAME+ mark (src/ranking.js, which the shell's board
+  // takes), +31 / +10.
+  // Stacked on #216 on 2026-10-23: the two deltas summed, measured again
+  // with the whole branch (below).
+  { pattern: /^index-.*\.js$/, maxBytes: 170_288, maxGzip: 61_548 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -120,9 +134,11 @@ const budgets = [
   // panel and the condition it is shown under are elsewhere (WeekRulePanel,
   // below, and useRunReadout in the runtime's chunk); what stays is the one
   // string handed from the play screen through the table to the page.
+  // 34,832 -> 34,838 the same day: the chunk's imports name hashed files,
+  // and the start screen's change above moved its gzip to 34,833-34,834.
   // Stacked on #216 (above) on 2026-10-23: the two deltas summed, measured
   // again with the whole branch (below).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_849 },
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_855 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -183,7 +199,9 @@ const budgets = [
   // the rows arrive, and `lang` on the English labels.
   // -> 4,800 / 2,100 on 2026-10-07, measured 4,567 / 2,001 plus 5%: a list
   // with spoken ranks, and a retry when the rows did not come.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_800, maxGzip: 2_100 },
+  // 4,800 -> 4,858 raw on 2026-10-21, measured: the NEW GAME+ tag on this
+  // device's own rows (the gzip, 2,080, stays under its budget).
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_858, maxGzip: 2_100 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the

@@ -7,6 +7,8 @@ export const SAVE_SLOT_STORAGE_KEY = "trigger-prototype-save-slots-v1";
 export const RECOVERY_CENTER_STORAGE_KEY = "trigger-prototype-recovery-center-v1";
 export const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
 export const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
+// The NEW GAME+ season record (state/seasonRecord.js): outside the save, kept by a reset.
+export const SEASON_RECORD_KEY = "critical-point-season-record-v1";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 // The random id telemetry rows carry for this device (telemetry.getSessionId).
@@ -345,6 +347,35 @@ export function readNewGamePlusMemory() {
   } catch {
     return {};
   }
+}
+
+/**
+ * The season record as stored, or null. The start screen reads only two
+ * things of it, here, so the entry chunk does not take the record's whole
+ * reader (state/seasonRecord.js normalizes it for everything else).
+ */
+export function readStoredSeasonRecord() {
+  try {
+    const record = JSON.parse(readStoredValue(SEASON_RECORD_KEY, "null"));
+    return isPlainObject(record) ? record : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Which season a run is: the record's count when the run has already been
+ * counted (its finale closed), one more when it has not. The continue card
+ * reads this: the season about to start is one more than the count, and a
+ * second season whose finale had closed was shown as the third (#220 review,
+ * 10-21). A device with the NEW GAME+ memory and no record counts that season
+ * as one. 1 before any season has finished.
+ */
+export function getSeasonRound(record, runId, memory = null) {
+  const counts = Number.isInteger(record?.seasons) && record.seasons > 0;
+  const finished = counts ? record.seasons : isPlainObject(memory?.final) ? 1 : 0;
+  const counted = Boolean(runId) && (counts ? Array.isArray(record.countedRuns) && record.countedRuns.includes(runId) : finished === 1 && memory.final.runId === runId);
+  return counted ? finished : finished + 1;
 }
 
 export function hasRecoverySlots() {
