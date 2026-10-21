@@ -11,13 +11,20 @@
  *       rows.json is an array of playtest_sessions rows (or `{ "rows": [...] }`),
  *       as the Supabase table editor or SQL editor exports them: `run_id`,
  *       `case_id`, `summary`, `decision_log`, `resources`, `dynamics`.
+ *   node scripts/verify-ranking-rows.mjs --sql [--limit=20]
+ *       prints the one read-only SELECT that fetches the top `limit` ranked
+ *       runs with all their rows, for `supabase db query --linked` (the
+ *       Management API, with the SUPABASE_ACCESS_TOKEN Migration Drift uses:
+ *       the way the test week reads the live data, and the CI job's way,
+ *       .github/workflows/verify-ranking.yml). Its JSON output is a rows.json.
  *   node scripts/verify-ranking-rows.mjs --remote [--limit=20] [--json]
- *       reads the top `limit` ranking rows and their runs from the project,
- *       GET only, with SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from the
- *       environment. The case rows are not public (anon reads only
- *       public_rankings, which has no decision log), so this needs the service
- *       key; it is not on this machine, and the CI job that will hold it is the
- *       answer-6 step that comes with the marking migration.
+ *       the same read by REST, GET only, with SUPABASE_URL and
+ *       SUPABASE_SERVICE_ROLE_KEY from the environment. The case rows are not
+ *       public (anon reads only public_rankings, which has no decision log), so
+ *       this needs the service key, which is not on this machine.
+ *
+ * --redact names each run by its public tag (`run_tag`, what the ranking
+ * shows) instead of its run id, for a log anyone can read (the CI job).
  *
  * Exit code: 0 when the report printed, whatever it found; 1 when the input
  * could not be read.
@@ -28,7 +35,26 @@ import { fileURLToPath } from "node:url";
 
 import { recheckRun } from "../src/rankingRecheck.js";
 
-const SELECT = "run_id,case_id,summary,decision_log,resources,dynamics,completed_at";
+const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
+
+/**
+ * The read for `supabase db query`: one SELECT and nothing else -- the top
+ * `limit` ranked runs (by the ranking's own score) and every row of each.
+ */
+export function rankingRowsSql({ limit = 20 } = {}) {
+  const top = Math.min(500, Math.max(1, Math.trunc(Number(limit)) || 20));
+  return [
+    "with top_runs as (",
+    "  select run_id from public.playtest_sessions",
+    "   where case_id = 'season-final' and score is not null and run_id is not null",
+    `   order by score desc limit ${top}`,
+    ")",
+    `select ${SELECT.split(",").join(", ")}`,
+    "  from public.playtest_sessions",
+    " where run_id in (select run_id from top_runs)",
+    " order by run_id, case_id;",
+  ].join("\n");
+}
 
 /** The rows grouped by run, in the order each run first appears. Rows without a run cannot be ranked and are left out. */
 export function groupByRun(rows) {
@@ -47,7 +73,7 @@ export function verifyRows(rows) {
   for (const [runId, runRows] of groupByRun(rows)) {
     const ranking = runRows.find((row) => row.case_id === "season-final");
     if (!ranking) continue;
-    results.push({ runId, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheckRun(runRows) });
+    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheckRun(runRows) });
   }
   return results;
 }
@@ -80,12 +106,13 @@ export async function fetchRunRows({ url, key, limit = 20, fetchFn = globalThis.
   return get(`select=${SELECT}&run_id=in.(${encodeURIComponent(list)})`);
 }
 
-/** The report as lines, one run a block. */
-export function formatReport(results) {
+/** The report as lines, one run a block. `redact` names a run by its public tag, or its place. */
+export function formatReport(results, { redact = false } = {}) {
   if (!results.length) return ["No ranked run among the rows (none has a season-final row)."];
   const lines = [];
-  for (const result of results) {
-    const head = `${result.runId}  score ${result.score ?? "?"}  ${result.caseRows} case rows`;
+  for (const [place, result] of results.entries()) {
+    const name = redact ? (result.runTag ?? `run ${place + 1}`) : result.runId;
+    const head = `${name}  score ${result.score ?? "?"}  ${result.caseRows} case rows`;
     if (result.status === "unverified") {
       lines.push(`${head}  not checked: played under other table rules than this engine's`);
       continue;
@@ -107,10 +134,14 @@ export function formatReport(results) {
 
 async function main(argv) {
   const json = argv.includes("--json");
+  const limit = Number(argv.find((arg) => arg.startsWith("--limit="))?.slice(8)) || 20;
+  if (argv.includes("--sql")) {
+    console.log(rankingRowsSql({ limit }));
+    return 0;
+  }
   let rows;
   try {
     if (argv.includes("--remote")) {
-      const limit = Number(argv.find((arg) => arg.startsWith("--limit="))?.slice(8)) || 20;
       rows = await fetchRunRows({ url: process.env.SUPABASE_URL, key: process.env.SUPABASE_SERVICE_ROLE_KEY, limit });
     } else {
       const file = argv.find((arg) => !arg.startsWith("--"));
@@ -122,7 +153,7 @@ async function main(argv) {
     return 1;
   }
   const results = verifyRows(rows);
-  console.log(json ? JSON.stringify(results, null, 2) : formatReport(results).join("\n"));
+  console.log(json ? JSON.stringify(results, null, 2) : formatReport(results, { redact: argv.includes("--redact") }).join("\n"));
   return 0;
 }
 
