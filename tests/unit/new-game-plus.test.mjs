@@ -31,3 +31,23 @@ test("the season is kept when its finale closes, and a later half season does no
   assert.equal(storeSeasonMemory(null), null);
   assert.deepEqual(JSON.parse(globalThis.localStorage.getItem(NEW_GAME_PLUS_MEMORY_KEY)), finished);
 });
+
+test("a closed finale is counted into the season record once per run, and the reset leaves the record", async () => {
+  const { storeSeasonRecord, readSeasonCarry } = await import("../../src/state/useNewGamePlus.js");
+  const { SEASON_RECORD_KEY, getOpeningEcho } = await import("../../src/state/newGamePlusCarry.js");
+  const { RESET_STORAGE_KEYS } = await import("../../src/state/runStorageReset.js");
+  globalThis.localStorage.removeItem(SEASON_RECORD_KEY);
+  const season = (runId, endingVariant) => ({ case01: {}, final: { runId, endingVariant, gauntlet: { tableRules: 3 } } });
+  const quiet = { id: "quiet-cover", label: "QUIET COVER", failure: false };
+  // Half a season, or a press of NEW GAME+ with nothing, counts nothing.
+  assert.equal(storeSeasonRecord({ case01: {} }).seasons, 0);
+  assert.equal(globalThis.localStorage.getItem(SEASON_RECORD_KEY), null, "nothing is written for it");
+  assert.equal(storeSeasonRecord(season("run-a", quiet), { finalChoiceId: "ending_seal" }).seasons, 1);
+  assert.equal(storeSeasonRecord(season("run-a", quiet), { finalChoiceId: "ending_seal" }).seasons, 1, "the finale replayed is the same season");
+  assert.deepEqual(JSON.parse(globalThis.localStorage.getItem(SEASON_RECORD_KEY)).last.verdict, "ending_seal");
+  const carry = readSeasonCarry();
+  assert.equal(carry.round, 2);
+  assert.equal(carry.echo, getOpeningEcho("ending_seal"));
+  assert.ok(!RESET_STORAGE_KEYS.includes(SEASON_RECORD_KEY), "초기화 keeps the season record, as it keeps the NEW GAME+ memory");
+  globalThis.localStorage.removeItem(SEASON_RECORD_KEY);
+});

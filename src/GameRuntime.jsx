@@ -132,7 +132,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = setters;
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const relicTable = useRelicTable();
-  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason } = useNewGamePlus(saved);
+  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry } = useNewGamePlus(saved);
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus(currentCase);
   const [saveStatus, setSaveStatus] = useState("");
@@ -604,7 +604,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // What NEW GAME+ is: the season again, with the last one's record on the
     // intro. The line used to promise hidden authority and extra clues.
     setSaveStatus("NEW GAME+로 시작합니다. 지난 시즌의 기록은 시작 화면에 남아 있습니다.");
-    lifecycle.startGame({ veteran: true });
+    // The season opens on a line answering how the last one ended (newGamePlusCarry.js).
+    lifecycle.startGame({ veteran: true, echo: readSeasonCarry()?.echo ?? null });
   }
   /**
    * A case opened from the result page, by button or by key. Opening the one
