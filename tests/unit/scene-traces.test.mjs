@@ -104,6 +104,6 @@ test("the scene page reaches the line only through the hook module, which has a 
   assert.doesNotMatch(briefing, /sceneTraces\.js/, "a direct import would pull the wording into PlayScreen");
   const config = readFileSync("vite.config.js", "utf8");
   assert.match(config, /const SCENE_TRACES = "src\/state\/useSceneBustRates\.js";/);
-  assert.match(config, /id: path\.resolve\(SCENE_TRACES\),\s+name: "sceneTraces",/);
+  assert.match(config, /\{ name: "sceneTraces", files: \[SCENE_TRACES, "src\/sceneTraces\.js"\] \}/);
   assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /pattern: \/\^sceneTraces-/);
 });

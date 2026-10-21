@@ -491,7 +491,7 @@ const budgets = [
   // it out took the entry chunk from 169,332 / 61,055 to 162,396 / 58,367 on
   // 2026-10-11. It is a file of its own, loaded beside the runtime, because
   // the runtime's chunk had 667 gzip bytes left and this is 2,600 inside it
-  // (runtimeSystemsChunk in vite.config.js). 7,103 / 3,633, plus 5%.
+  // (OWN_CHUNKS in vite.config.js). 7,103 / 3,633, plus 5%.
   { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 7_460, maxGzip: 3_815 },
   // The season's copy between and around cases (src/caseCopy.js): the
   // next-case teasers and interludes, chapter rules, rank legacy lines and
