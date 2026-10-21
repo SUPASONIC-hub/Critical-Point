@@ -1189,3 +1189,52 @@ test("the short reveal fits a small phone without scrolling, and the whole sheet
   await expect(page.getByTestId("decision-next")).toBeInViewport({ ratio: 1 });
   await expect(page.getByTestId("reveal-details")).toBeInViewport();
 });
+
+/**
+ * The office's noise at the table's edge (개선 포인트 A5, EdgeNotice.jsx): a
+ * third press brings a message from upstairs, at the edge, silent to a
+ * screen reader, over no number and under no pointer; the comfort panel's
+ * switch keeps it away.
+ */
+async function pushTimes(page, times) {
+  const stage = page.getByTestId("gauntlet-stage");
+  for (let press = 0; press < times; press += 1) {
+    const gauge = await stage.getAttribute("data-gauge");
+    await page.getByTestId("commit-push").click();
+    await expect(stage).not.toHaveAttribute("data-gauge", gauge);
+  }
+}
+
+test("a third push brings an edge notice that covers no number, and the switch turns it off", async ({ page }) => {
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ tableTime: 2 }) });
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice").first().click();
+  await pushTimes(page, 2);
+  const notice = page.getByTestId("edge-notice");
+  await expect(notice).toHaveCount(0);
+  await pushTimes(page, 1);
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("메신저 · 위층");
+  await expect(notice).toHaveAttribute("aria-hidden", "true");
+  expect(await notice.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
+  expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
+  const overlaps = await notice.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button";
+    return [...document.querySelectorAll(numbers)]
+      .filter((other) => {
+        const b = other.getBoundingClientRect();
+        return b.width > 0 && box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top;
+      })
+      .map((other) => other.className || other.dataset.testid);
+  });
+  expect(overlaps, "the notice covers none of the table's numbers").toEqual([]);
+  await expect(page.getByTestId("table-voice")).not.toContainText("위층");
+
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ tableTime: 2, edgeNotices: false }) });
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice").first().click();
+  await pushTimes(page, 3);
+  await page.waitForTimeout(400);
+  await expect(notice).toHaveCount(0);
+});

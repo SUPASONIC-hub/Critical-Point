@@ -19,6 +19,9 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    (WCAG 2.1.4). Space, Enter and Escape stay.
  *   stillIntro       the intro's ticker, drifting art and blinking wordmark
  *                    stop (WCAG 2.2.2).
+ *   edgeNotices      the office's noise at the table's edge (EdgeNotice.jsx,
+ *                    개선 포인트 A5): a message and a mail as a hand is pushed
+ *                    on. On unless turned off; it never covers a number.
  *   storyMode        스토리 모드: the table steps back so the story can be read.
  *                    The wall stands far off, no decision breaks the next
  *                    board, the table clock runs at least twice as slow and a
@@ -38,13 +41,14 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   letterKeys: true,
   stillIntro: false,
   storyMode: false,
+  edgeNotices: true,
 });
 
 export function normalizeAccessibility(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
-  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
+  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);

@@ -297,6 +297,11 @@ const budgets = [
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // The office's noise at the table's edge (개선 포인트 A5,
+  // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
+  // own from the start and fetched with the table. Its style is inline, so no
+  // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 1_794, maxGzip: 1_198 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
