@@ -27,9 +27,9 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-import { addAudit, auditStep, countAudit } from "../src/gauntlet/auditRisk.js";
+import { addAudit, AUDIT_LIMIT, auditStep, countAudit } from "../src/gauntlet/auditRisk.js";
 import { walkLinks } from "../src/gauntlet/cascadeRisk.js";
-import { AUDIT_LIMIT, getWeekRule } from "../src/gauntlet/weeklyRules.js";
+import { getWeekRule } from "../src/gauntlet/weeklyRules.js";
 
 const WEEK = process.env.TEST_WEEK || "2026-W44";
 const RULE = process.env.TEST_WEEK_RULE || "audit-cascade";

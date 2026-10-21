@@ -62,7 +62,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       </summary>
       {open && (
       <div className="report-archive-body">
-    <GauntletLedger log={log} summary={caseResults?.[currentCase]?.gauntlet} />
+    <GauntletLedger log={log} summary={caseResults?.[currentCase]?.gauntlet} caseId={currentCase} />
     {/* Most panels below are drawn without asking whether their record is
         there: the runtime derives each one for every run, three goals and
         three comparisons included (useCaseSystems.js, useResultReport.js and

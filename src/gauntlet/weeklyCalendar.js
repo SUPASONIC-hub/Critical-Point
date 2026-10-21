@@ -15,11 +15,12 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * it has one. 초안: the first week is a placeholder for the choice in the
  * report.
  *
- * 2026-W44 is B3's and B2's test week, both devices together (user,
- * 2026-10-21): merged on the Wednesday before it, so it is announced five days
- * ahead (`notice: 5`), from the moment it is merged (the start screen's
- * "다음 주의 규칙" reads the week after this one). Listed after W46 so the
- * first entry, which the tests and the e2e play as "the event", stays W46.
+ * 2026-W44 was B3's and B2's test week, both devices together (user,
+ * 2026-10-21): merged on the Wednesday before it, so it was announced five
+ * days ahead (`notice: 5`). Since RULES_MARK 3 the two are rules of the table
+ * and the week is one gone by, kept as the server's weekly_rules keeps it.
+ * Listed after W46 so the first entry, which the tests and the e2e play as
+ * "the event", stays W46.
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
@@ -30,8 +31,8 @@ const MERGED_WEEKS = Object.freeze([
  * A development build's switch, so a rule can be played before any week has
  * it (B3's audit and B2's links were judged by simulation and the maker's
  * own plays before their test week). On the dev server, or a build that asked
- * for the debug tools, `?week=audit` or `?week=cascade` makes that catalogue
- * entry this week's rule: the start screen has its line and its box, and a
+ * for the debug tools, `?week=near-wall` (any catalogue id) makes that
+ * catalogue entry this week's rule: the start screen has its line and its box, and a
  * season started then carries the stamp in its save, so a reload without the
  * query plays on under it. Any id of the catalogue works; one that is not
  * there is no rule (getWeekRule). The week is the device's: a build whose

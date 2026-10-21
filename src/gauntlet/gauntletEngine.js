@@ -1456,7 +1456,7 @@ function readWindowUnder(window, rules) {
  * table. The pot is paid on the streak as this window's card left it.
  *
  * `audit` is the case's audit before this window (`countAudit` over the
- * case's log): read only on a table that counts it (auditRisk.js), which
+ * case's log): read only in a case whose `rules` have it (auditRisk.js), which
  * judges it on the window that closes the case.
  *
  * `cascade` says a link is due on the board this window deals (cascadeRisk.js,
@@ -1525,9 +1525,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // A practice run closes a case the table has already been paid for: nothing
   // moves to the vault, and the next case is dealt what the season held before.
   const practice = caseClosed ? current.practice : null;
-  // AUDIT, on a week that has it (auditRisk.js): null, or this window's step
+  // AUDIT, in a case whose rules have it (auditRisk.js): null, or this window's step
   // and on the close the part of the vault's share and the hand's it takes.
-  const audited = settleAudit({ run: current, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter });
+  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter });
   const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
@@ -1580,7 +1580,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     fractureRate: current.schema.fractureRate,
     nextMutations,
     // B2, on a table that counts links: the reveal's line when this cash made one.
-    link: describeLinkMade(current, { cashed: outcome === "cash", burn }),
+    link: describeLinkMade(current, { cashed: outcome === "cash", burn }, rules),
     relicProcs,
     relicOffer,
     // Carried on the closing entry of a replayed case, where the summary's
@@ -1833,15 +1833,17 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of 2026-10-20 (the day-ten table): every
- * run summary carries it, so every case row carries it as `dynamics`, and the
- * server ranks no season with a case row without it (20261020010000; the
+ * The mark of a case closed at the table of RULES_MARK 3 (B3's audit and B2's
+ * links as rules of the table, from 프롤로그 04; 2 was the day-ten table of
+ * 2026-10-20): every run summary carries it, so every case row carries it as
+ * `dynamics`, and the server ranks no season with a case row below it
+ * (*_rules_mark3_ranking_reset.sql; 20261020010000 asked for 2, and the
  * reset of 20261011010000 read `logicStreak` the same way). Raise the number,
  * never reuse it, when the table changes again. The migration,
  * telemetryBatch.js and check-grants.mjs name it too.
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 2;
+export const RULES_MARK = 3;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

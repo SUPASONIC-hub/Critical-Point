@@ -4,7 +4,7 @@ import { getEndingVariant, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -145,9 +145,9 @@ let doorCouldMove = 0;
 // wild-card hands; it reads the seasons and draws nothing.
 const funnelRows = [];
 const dump = [];
-// AUDIT_WEEK=1 only (B3's test week, season-bot.mjs): the closes the audit took its part of, over the population.
+// the audit on (AUDIT=0 turns it off) (B3's test week, season-bot.mjs): the closes the audit took its part of, over the population.
 const auditTally = { seasons: 0, caught: 0, lost: 0, secured: 0 };
-// CASCADE_WEEK=1 only (B2, season-bot.mjs): the population's links, and what its seasons banked and bust.
+// the links on (CASCADE=0 turns them off) (B2, season-bot.mjs): the population's links, and what its seasons banked and bust.
 const linkTally = { ...newLinkTally(), seasons: 0, vault: 0, windows: 0, seasonBusts: 0 };
 const addLinks = (tally, season) => {
   for (const key of Object.keys(season.links)) tally[key] = key === "openingBoards" ? Math.max(tally[key], season.links[key]) : tally[key] + season.links[key];
@@ -251,7 +251,7 @@ if (reportMode) {
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
 /**
- * B2's links, measured (CASCADE_WEEK=1 only; the design's 3-2 and 3-3). The
+ * B2's links, measured (the links on (CASCADE=0 turns them off); the design's 3-2 and 3-3). The
  * population's line, then the hands that read the card's link mark: each
  * archetype plays the same seasons three times on the same seeds, as itself,
  * keeping clear of a card that makes a link (season-bot.mjs `avoidsLinks`),
@@ -260,10 +260,10 @@ console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
  * to CASCADE, B2 is a tax, not a decision (design 6, risk 1). The links a case
  * closes on go to the next case (decision 6 (2)). Nothing here is asserted.
  */
-if (CASCADE_WEEK) {
+if (CASCADE_ON) {
   const boardBusts = (tally) => `${((tally.busts / Math.max(1, tally.boards)) * 100).toFixed(1)}%`;
   const describe = (tally, seasons) => `per season made ${(tally.made / seasons).toFixed(2)}, came back ${(tally.landed / seasons).toFixed(2)} (${(tally.landedIn / seasons).toFixed(2)} carried in), carried ${(tally.carriedOut / seasons).toFixed(2)}, lapsed at the season's end ${(tally.lapsed / seasons).toFixed(2)} and at the cap ${(tally.capped / seasons).toFixed(2)} (${(((tally.lapsed + tally.capped) / Math.max(1, tally.made)) * 100).toFixed(1)}% of made); at most ${tally.openingBoards} of a case's first two boards CASCADE; CASCADE boards ${tally.boards} in ${tally.seasons} of ${seasons} seasons, bust on them ${boardBusts(tally)} (every board ${((tally.seasonBusts / Math.max(1, tally.windows)) * 100).toFixed(1)}%); final vault ${Math.round(tally.vault / seasons)} a season`;
-  console.log(`CASCADE (measured, CASCADE_WEEK=1, values ${LINK_VALUES}, chip margin ${CHIP_MARGIN}): ${describe(linkTally, SEASONS)}`);
+  console.log(`CASCADE (measured, values ${LINK_VALUES}, chip margin ${CHIP_MARGIN}): ${describe(linkTally, SEASONS)}`);
   const PAIRED = Number(process.env.ENDING_LINK_SEASONS) || 40;
   const reads = createSeasonBot({ seed: 20261020, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[name, base], [`${name}+reads`, { ...base, avoidsLinks: true }], [`${name}+chips`, { ...base, avoidsLinks: true, readsChips: true }]])) });
   for (const archetype of [...new Set(POPULATION)]) {
@@ -295,7 +295,7 @@ const fiveNumbers = (values) => `${Math.min(...values)}/${band(values)}/${Math.m
 const byHand = (samplesByHand) => Object.entries(samplesByHand).map(([name, values]) => `${name} ${fiveNumbers(values)}`).join(", ");
 console.log(`Logic streak (season best, min/p10/p50/p90/max: all ${fiveNumbers(Object.values(logicBest).flat())}; ${byHand(logicBest)}; hold rate: all ${fiveNumbers(Object.values(logicHold).flat())}; ${byHand(logicHold)})`);
 console.log(`Slack door (a season's best streak of ${LOGIC_SLACK_STREAK} or more): open in ${doorOpen} of ${SEASONS} seasons (${((doorOpen / SEASONS) * 100).toFixed(1)}%); ${doorMoved} of them close on a different ending than they would with the door shut`);
-if (AUDIT_WEEK) console.log(`Audit (measured, AUDIT_WEEK=1, values ${AUDIT_VALUES}): ${auditTally.caught} closes caught in ${auditTally.seasons} of ${SEASONS} seasons (${(auditTally.caught / SEASONS).toFixed(2)} a season), ${((auditTally.lost / Math.max(1, auditTally.secured)) * 100).toFixed(1)}% of what the closes moved to the vault`);
+if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTally.caught} closes caught in ${auditTally.seasons} of ${SEASONS} seasons (${(auditTally.caught / SEASONS).toFixed(2)} a season), ${((auditTally.lost / Math.max(1, auditTally.secured)) * 100).toFixed(1)}% of what the closes moved to the vault`);
 
 /**
  * The same season in story mode.

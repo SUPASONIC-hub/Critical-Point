@@ -177,7 +177,12 @@ const budgets = [
   // 14,230 -> 14,338 gzip on 2026-10-21, the test week (B3 and B2 merged):
   // measured 14,334 plus 4. The settlement takes the audit's count and judges
   // it (settleAudit, in its own chunk) beside the links' CASCADE.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_338 },
+  // 14,338 -> 14,343 gzip on 2026-10-21 (RULES_MARK 3, draft for 11-02):
+  // measured 14,339 plus 4. The settlement hands the case's rules to the
+  // audit and the links (settleAudit, describeLinkMade), which ask them and
+  // not the week's stamp; their numbers stayed in their own chunks, since
+  // imported from tableRules.js that module became a chunk of its own.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_343 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -259,7 +264,10 @@ const budgets = [
   // 2,051 / 1,160 -> 2,104 / 1,179 on 2026-10-21: W44's line says that a
   // cash on a CASCADE board is not counted by the audit (B2 decision 10).
   // Measured 2,104 / 1,175, the gzip plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_104, maxGzip: 1_179 },
+  // 2,104 / 1,179 -> 1,725 / 1,048 on 2026-10-21 (RULES_MARK 3): the audit's
+  // numbers and the audit and cascade weeks left it; W44's line stays, written
+  // out. Measured 1,725 / 1,044, the gzip plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_725, maxGzip: 1_048 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
@@ -278,7 +286,10 @@ const budgets = [
   // adds nothing (B2 decision 10), read off the board on the table by the
   // settlement and the 확정 preview and off the log's `environmentMode` by
   // the count. Measured 2,078 / 1,124, the gzip plus 4.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_078, maxGzip: 1_128 },
+  // 2,078 / 1,128 -> 2,018 / 1,104 on 2026-10-21 (RULES_MARK 3): its numbers
+  // came here from weeklyRules, and it imports nothing now (the table record
+  // no longer reads the week). Measured 2,018 / 1,100, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_018, maxGzip: 1_104 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on

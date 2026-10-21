@@ -272,6 +272,7 @@ export function useChoiceCommit(context) {
     const blackoutSkip = windowState.status === "bust" && !assistStory ? getBlackoutSkip(plannedNode, branchContext) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
+    const settlementRules = getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed });
     const { verdict, nextRun: settledRun, unlockedRelics } = relicTable.settle({
       run: gauntletRun,
       window: windowState,
@@ -282,11 +283,11 @@ export function useChoiceCommit(context) {
       offered: getOfferedTypes(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
       caseClosed,
       offerRelics: currentCase !== "final",
-      // The case's audit so far, read off its log (auditRisk.js); the engine reads it only on a week that has it.
+      // The case's audit so far, read off its log (auditRisk.js); the engine reads it only in a case whose rules have it.
       audit: countAudit(log),
-      ...getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed }),
+      ...settlementRules,
       // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
-      cascade: isLinkDue(gauntletRun, log, runId),
+      cascade: isLinkDue(gauntletRun, log, runId, settlementRules.rules),
     });
     const busted = verdict.outcome === "bust";
 
@@ -389,7 +390,7 @@ export function useChoiceCommit(context) {
 
     const nextLog = [...log, entry];
     // B2: what a closing case hands the next one, off its whole log (cascadeRisk.js).
-    const nextRun = carryLinksOut(settledRun, { run: gauntletRun, log: nextLog, runId, caseClosed, last: currentCase === "final" });
+    const nextRun = carryLinksOut(settledRun, { run: gauntletRun, rules: settlementRules.rules, log: nextLog, runId, caseClosed, last: currentCase === "final" });
     const nextEcho = reframeTarget
       ? `${entry.echo} 다음 장면은 당신이 다시 짠 판을 기준으로 이어집니다.`
       : entry.echo;

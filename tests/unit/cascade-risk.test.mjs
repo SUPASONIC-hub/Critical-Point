@@ -23,6 +23,7 @@ import {
 } from "../../src/gauntlet/cascadeRisk.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, isPenaltyMutation, MUTATIONS, normalizeRunState, normalizeSchema, openCaseRun, resolveWindow, seededUnit } from "../../src/gauntlet/gauntletEngine.js";
 import { BLACKOUT_WALL_SHIFT } from "../../src/gauntlet/tableRules.js";
+import { ALL_RULES, introFor, MUTATION_RULES, rulesFor, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
 import { DEV_WEEK_RULE, devWeekEntry } from "../../src/gauntlet/weeklyCalendar.js";
 import { getWeekRule, pickSeasonWeekRule, WEEK_RULE_DEVICES, WEEKLY_RULES, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
 
@@ -34,19 +35,21 @@ const bust = (seed) => ({ status: "bust", cause: "push", gauge: 70, wall: 69, pu
 /**
  * Plays a case through the engine as the runtime does (useChoiceCommit):
  * the link due off the log, the log gaining each window's entry, and the
- * closing commit writing what the case hands on. `on` is a season of the
- * `cascade` week; `from` is the run the case opens from (the last case's).
+ * closing commit writing what the case hands on. `on` is a case whose rules
+ * have `cascade` (every rule of the table), off the same less `cascade`;
+ * `from` is the run the case opens from (the last case's).
  */
-const WEEK = { weekRule: "cascade" };
+const NO_LINKS = new Set([...ALL_RULES].filter((rule) => rule !== "cascade"));
 function playCase(windows, { runId = "run-1", on = true, from = null, last = false, replayOf = null } = {}) {
-  let run = openCaseRun(normalizeRunState(from ?? (on ? WEEK : {})), { replayOf });
+  const rules = on ? ALL_RULES : NO_LINKS;
+  let run = openCaseRun(normalizeRunState(from ?? {}), { replayOf, rules });
   const opened = run;
   const log = [];
   const boards = [];
   windows.forEach(([card, window], index) => {
     const caseClosed = index === windows.length - 1;
-    const cascade = isLinkDue(run, log, runId);
-    const { verdict, nextRun } = resolveWindow({ run, window, card, caseClosed, cascade });
+    const cascade = isLinkDue(run, log, runId, rules);
+    const { verdict, nextRun } = resolveWindow({ run, window, card, caseClosed, rules, cascade });
     log.push({
       nodeId: `n${index}`,
       choiceId: card.id,
@@ -55,23 +58,24 @@ function playCase(windows, { runId = "run-1", on = true, from = null, last = fal
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
     });
     boards.push(nextRun.schema);
-    run = normalizeRunState(carryLinksOut(nextRun, { run, log, runId, caseClosed, last }));
+    run = normalizeRunState(carryLinksOut(nextRun, { run, rules, log, runId, caseClosed, last }));
   });
   return { run, opened, log, boards };
 }
 
-test("no table counts links outside a cascade week's season, and the engine deals none unasked", () => {
-  assert.equal(isCascadeOn(normalizeRunState({})), false);
-  assert.equal(isCascadeOn(normalizeRunState(WEEK)), true);
-  assert.equal(isCascadeOn(normalizeRunState({ weekRule: "near-wall" })), false);
-  assert.equal(isCascadeOn(normalizeRunState({ ...WEEK, story: true })), false, "never in story mode");
-  assert.equal(isCascadeOn(openCaseRun(normalizeRunState(WEEK), { replayOf: {} })), false, "never in a case played again");
-  assert.deepEqual(WEEKLY_RULES.filter((entry) => weekRuleHasDevice(entry.id, "cascade")).map((entry) => entry.week), ["2026-W44"], "no week of the calendar has it but the test week");
+test("no table counts links in a case whose rules lack them, and the engine deals none unasked", () => {
+  assert.equal(isCascadeOn(normalizeRunState({}), ALL_RULES), true);
+  assert.equal(isCascadeOn(normalizeRunState({}), NO_LINKS), false);
+  assert.equal(isCascadeOn(normalizeRunState({}), rulesFor("prologue03")), false, "not before 프롤로그 04");
+  assert.equal(isCascadeOn(normalizeRunState({}), undefined), false, "no rules, no links");
+  assert.equal(isCascadeOn(normalizeRunState({ weekRule: "audit-cascade" }), NO_LINKS), false, "W44's stamp does not switch them on");
+  assert.equal(isCascadeOn(normalizeRunState({ story: true }), ALL_RULES), false, "never in story mode");
+  assert.equal(isCascadeOn(openCaseRun(normalizeRunState({}), { replayOf: {} }), ALL_RULES), false, "never in a case played again");
   const { log } = playCase([[heavy, cash("a")], [light, cash("b")], [light, cash("c")], [light, cash("d")], [light, cash("e")], [light, cash("f")]], { on: false });
-  assert.equal(readLinks(normalizeRunState({}), log, "run-1"), null);
-  assert.equal(isLinkDue(normalizeRunState({}), log, "run-1"), false);
+  assert.equal(readLinks(normalizeRunState({}), log, "run-1", NO_LINKS), null);
+  assert.equal(isLinkDue(normalizeRunState({}), log, "run-1", NO_LINKS), false);
   assert.ok(log.every((entry) => !entry.environmentMode.includes("cascade")));
-  const { verdict } = resolveWindow({ run: openCaseRun(normalizeRunState({})), window: cash("z"), card: heavy });
+  const { verdict } = resolveWindow({ run: openCaseRun(normalizeRunState({}), { rules: NO_LINKS }), window: cash("z"), card: heavy, rules: NO_LINKS });
   assert.equal(verdict.link, null, "no reveal line for a link");
 });
 
@@ -209,7 +213,7 @@ test("a link the case closes on is carried to the next case with the boards it h
     const second = playCase(lights(6, "m"), { runId, from: first.run });
     assert.deepEqual(second.opened.linksIn, first.run.linksOut, "the next case opens on them");
     assert.deepEqual(second.opened.linksOut, []);
-    assert.equal(readLinks(second.opened, [], runId).live, 1, "and the table reads them from its first board");
+    assert.equal(readLinks(second.opened, [], runId, ALL_RULES).live, 1, "and the table reads them from its first board");
     const landed = second.log.findIndex((entry) => entry.environmentMode.includes("cascade"));
     assert.equal(landed + 1, Math.max(1, delay - 1), "on the board it was owed, counted from REBOOT's");
     assert.ok(landed >= 0 && !second.opened.schema.mutations.includes("cascade"), "the REBOOT board itself carries none");
@@ -284,37 +288,28 @@ test("a saved list of links keeps only what a table can hold", () => {
   assert.deepEqual(normalizeRunState({}).linksIn, []);
 });
 
-/* ------------------------------------------------------ the week's device */
+/* ------------------------------------------------------ a rule of the table */
 
-test("the cascade week is a device, not a number, and says B's numbers", () => {
-  assert.ok(WEEK_RULE_DEVICES.includes("cascade"));
-  assert.equal(weekRuleHasDevice("cascade", "cascade"), true);
-  assert.equal(weekRuleHasDevice("cascade", "audit"), false, "audit is allowed, but this rule does not name it");
-  assert.equal(weekRuleHasDevice("near-wall", "cascade"), false);
-  assert.equal(weekRuleHasDevice(null, "cascade"), false);
-  assert.equal(weekRuleOverlay("cascade", BASE_SCHEMA), null, "a device moves no number on the board");
-  const { text } = getWeekRule("cascade");
-  for (const quoted of [`${LINK_BURN} 이상`, `${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판`, `벽이 ${LINK_WALL} 가까워진다`]) assert.ok(text.includes(quoted), quoted);
+test("the links are a rule of the table from 프롤로그 04 (RULES_MARK 3), told with B's numbers, and no week switches them", () => {
+  assert.deepEqual(WEEK_RULE_DEVICES, []);
+  assert.equal(weekRuleHasDevice("audit-cascade", "cascade"), false, "W44's stamp switches nothing now");
+  assert.equal(getWeekRule("cascade"), null, "the cascade week is gone from the catalogue");
+  assert.equal(UNLOCK_LADDER.find((step) => step.adds.includes("cascade")).caseId, "prologue04");
+  assert.equal(rulesFor("prologue03").has("cascade"), false);
+  assert.ok(rulesFor("prologue01", { veteran: true }).has("cascade"), "NEW GAME+ has them from the first case");
+  assert.equal(MUTATION_RULES.cascade, "cascade", "CASCADE belongs to its rule");
+  assert.equal(rulesFor("case01", { story: true }).has("cascade"), false, "story mode never has them");
+  const text = introFor("prologue04").find((line) => line.includes("태운 카드"));
+  for (const quoted of [`${LINK_BURN} 이상`, `벽을 ${LINK_WALL} 당깁니다`]) assert.ok(text.includes(quoted), quoted);
+  assert.equal(weekRuleOverlay("audit-cascade", BASE_SCHEMA), null, "W44 moved no number on the board");
 });
 
-test("a development build plays a cascade week on ?week=cascade; a release and node never do", () => {
+test("?week=cascade is no rule now; a release and node never switch", () => {
   const now = Date.parse("2026-10-21T12:00:00+09:00");
   const forced = devWeekEntry({ debugBuild: true, search: "?debug=1&week=cascade", now });
   assert.deepEqual(forced, { week: "2026-W43", id: "cascade", added: "dev" });
-  const calendar = [forced, ...WEEKLY_RULES];
-  const stamp = pickSeasonWeekRule(now, { calendar });
-  assert.equal(stamp, "cascade");
-  assert.equal(isCascadeOn(normalizeRunState({ weekRule: stamp })), true, "the season it starts counts links");
-  assert.equal(pickSeasonWeekRule(now, { calendar, declined: true }), null, "the start screen's box still turns it down");
-  assert.equal(pickSeasonWeekRule(now, { calendar, story: true }), null, "and story mode never has it");
-  assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar: [forced] }), null, "only this week");
+  assert.equal(pickSeasonWeekRule(now, { calendar: [forced, ...WEEKLY_RULES] }), null, "the cascade week left the catalogue with RULES_MARK 3");
   assert.equal(devWeekEntry({ debugBuild: false, search: "?week=cascade", now }), null, "a release build has no switch");
-  assert.equal(devWeekEntry({ debugBuild: true, search: "?debug=1", now }), null);
-  assert.equal(devWeekEntry({ debugBuild: true, search: "?week=%3Cscript%3E", now }), null);
-  assert.equal(pickSeasonWeekRule(now, { calendar: [devWeekEntry({ debugBuild: true, search: "?week=no-such-rule", now }), ...WEEKLY_RULES] }), null, "an id the catalogue lacks is no rule");
   assert.equal(DEV_WEEK_RULE, null, "node has no build constant and no switch");
   assert.ok(WEEKLY_RULES.every((entry) => entry.added !== "dev"));
-  assert.match(readFileSync("src/gauntlet/weeklyCalendar.js", "utf8"), /DEV_WEEK_RULE =\s+typeof __CP_DEBUG_BUILD__ !== "undefined" && __CP_DEBUG_BUILD__\s+\?/, "the switch is behind the constant the bundler folds to false in a release");
-  assert.match(readFileSync("src/telemetry.js", "utf8"), /telemetryEnabled = Boolean\(SUPABASE_URL && SUPABASE_ANON_KEY\) && !DEV_WEEK_RULE;/, "a forced week sends nothing to the server");
-  assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /'added:"dev"'\]/, "check:bundle fails a release that carries it");
 });

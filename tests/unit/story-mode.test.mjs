@@ -66,13 +66,14 @@ after(restoreGlobals);
  */
 
 const PROLOGUES = UNLOCK_LADDER.map((step) => step.caseId);
-const SEVEN = ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "overclock", "silence"];
+// The seven next-table rules, and since RULES_MARK 3 the audit and the links (B3 and B2 decision 13).
+const SEVEN = ["aftershock", "audit", "blackout", "cascade", "coldFeet", "fracture", "heatDebt", "overclock", "silence"];
 const sorted = (values) => [...values].sort();
 const lessSeven = (rules) => sorted([...rules].filter((rule) => !SEVEN.includes(rule)));
 const card = { id: "a", label: "a", effect: { capital: 9, trust: -12 }, next: "x" };
 const story = normalizeRunState({ story: true });
 
-test("the rules a story run plays without are the seven next-table rules, and no other", () => {
+test("the rules a story run plays without are the seven next-table rules, the audit and the links, and no other", () => {
   assert.deepEqual(sorted(STORY_OFF_RULES), SEVEN);
   assert.deepEqual(sorted(STORY_RULES), ["lock", "logic", "relics", "scout", "stance"]);
   assert.deepEqual(sorted([...STORY_RULES, ...STORY_OFF_RULES]), sorted(TABLE_RULES), "what is kept and what is taken are the whole table");

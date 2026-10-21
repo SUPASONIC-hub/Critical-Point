@@ -8,10 +8,10 @@ import { objectParticle } from "../playerLanguage.js";
 /**
  * The case's table record: what went into the vault, what the walls took, and
  * the hottest pot cashed. Rebuilt from the log, which is what a resumed save
- * restores. On an audit week (B3) the sentence under it gains one more, how
- * many marks the case closed with (auditRisk.js).
+ * restores. In a case that counts the audit (B3) the sentence under it gains
+ * one more, how many marks the case closed with (auditRisk.js).
  */
-export function GauntletLedger({ log = [], summary = null }) {
+export function GauntletLedger({ log = [], summary = null, caseId = null }) {
   const ledger = createGauntletLedger(log);
   const vault = Number(summary?.vault) || 0;
   const relics = normalizeRelicIds(summary?.relics);
@@ -21,7 +21,7 @@ export function GauntletLedger({ log = [], summary = null }) {
     : ledger.cashes > 0
       ? "한 번도 벽에 닿지 않았다. 더 밀 수 있었는지는 벽만 안다."
       : "아직 테이블에 앉지 않았다.";
-  const audit = describeAuditLedger(log, summary?.weekRule);
+  const audit = describeAuditLedger(log, summary, caseId);
   return (
     <section className="pressure-ledger" aria-label="테이블 장부">
       <div className="panel-title-row">
