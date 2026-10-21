@@ -820,7 +820,7 @@ npm run dev
 npm run verify:static   # 브라우저 없는 검사 27개를 병렬로 (~1분)
 npm run verify:quick    # + 프로덕션 빌드, 번들 예산, 빌드 위 런타임 스모크와 @prod e2e, 성능 예산
 npm run verify          # + 기본 e2e
-npm run test:coverage   # 단위·스모크 테스트 커버리지 (로직 모듈 합계 줄 94%·함수 94%·분기 87%, 모듈마다 하한)
+npm run test:coverage   # 단위·스모크 테스트 커버리지 (로직 모듈 합계 줄 95%·함수 94%·분기 89%, 모듈마다 하한)
 npm run check:types     # jsconfig.json에 올린 순수 모듈만 tsc로 검사
 npm run test:e2e:season # 시즌 전체를 끊지 않고 한 번에 걷기 (주간 Full Coverage가 도는 것)
 ```
