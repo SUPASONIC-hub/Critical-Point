@@ -91,6 +91,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -120,7 +122,7 @@
       "pendingTelemetryRef": []
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-1",
       "playerName": "새 분석관",
       "playStyle": "mediate",
@@ -209,6 +211,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -340,6 +344,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -369,7 +375,7 @@
       "pendingTelemetryRef": []
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-1",
       "playerName": "분석관",
       "playStyle": "instinct",
@@ -458,6 +464,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -589,6 +597,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -632,7 +642,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-1",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -728,6 +738,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -859,6 +871,8 @@
         "veteran": true,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -902,7 +916,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-1",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -998,6 +1012,8 @@
         "veteran": true,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1159,6 +1175,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1205,7 +1223,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -1331,6 +1349,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1491,6 +1511,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1537,7 +1559,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -1663,6 +1685,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1822,6 +1846,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1868,7 +1894,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -1994,6 +2020,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2153,6 +2181,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2199,7 +2229,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -2325,6 +2355,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2484,6 +2516,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2530,7 +2564,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -2656,6 +2690,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2815,6 +2851,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2861,7 +2899,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -2987,6 +3025,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3146,6 +3186,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3189,7 +3231,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -3315,6 +3357,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3445,6 +3489,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3474,7 +3520,7 @@
       "pendingTelemetryRef": []
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-0",
       "playerName": "분석관",
       "playStyle": "instinct",
@@ -3563,6 +3609,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3748,6 +3796,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3794,7 +3844,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -3927,6 +3977,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4087,6 +4139,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4133,7 +4187,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -4241,6 +4295,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4439,6 +4495,7 @@
             "expose": 0
           },
           "bestMultiplier": 1,
+          "linksOut": [],
           "logic": {
             "streak": 0,
             "best": 0,
@@ -4453,6 +4510,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4499,7 +4558,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -4645,6 +4704,7 @@
             "expose": 0
           },
           "bestMultiplier": 1,
+          "linksOut": [],
           "logic": {
             "streak": 0,
             "best": 0,
@@ -4659,6 +4719,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4833,6 +4895,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4879,7 +4943,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-1",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -5001,6 +5065,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5173,6 +5239,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5349,6 +5417,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5378,7 +5448,7 @@
       "pendingTelemetryRef": []
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-1",
       "playerName": "",
       "playStyle": "instinct",
@@ -5477,6 +5547,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5653,6 +5725,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5699,7 +5773,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -5825,6 +5899,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5954,6 +6030,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -6127,6 +6205,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -6175,7 +6255,7 @@
       ]
     },
     "saved": {
-      "saveSchemaVersion": 3,
+      "saveSchemaVersion": 4,
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
@@ -6301,6 +6381,8 @@
         "veteran": false,
         "story": false,
         "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
         "schema": {
           "seconds": 45,
           "wallMin": 56,

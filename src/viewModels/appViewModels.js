@@ -113,9 +113,11 @@ export const viewGroups = {
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId", "sceneChallenge"],
     gauntlet: [
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
-      "decisionRevealOpen", "staleSave",
+      "decisionRevealOpen", "staleSave", "tableRisk",
     ],
-    status: ["resources", "resourceMeta", "progress", "routeIndex", "routeLength"],
+    // The debug overlay's path, one string since 2026-10-19 (it was two numbers), so B3's audit fit the budget;
+    // the audit and B2's links are one field (`tableRisk`, useRunReadout.js) since the two met on 2026-10-21.
+    status: ["resources", "resourceMeta", "progress", "routePath"],
     debug: ["debugToolsEnabled", "fallbackCaseId", "silentFailureCount"],
   },
 };

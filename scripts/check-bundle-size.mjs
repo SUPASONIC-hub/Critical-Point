@@ -53,7 +53,11 @@ const budgets = [
   // dissent's length does not read as a page number beside 14쪽 and 26쪽.
   // 169,935 -> 169,938 on 2026-10-21, measured 169,938: the origin's story
   // under DISSENT is titled 반대 의견서를 쓴 밤, the button's own word (+3).
-  { pattern: /^index-.*\.js$/, maxBytes: 169_938, maxGzip: 61_300 },
+  // 169,938 -> 169,980 on 2026-10-21 (B3 on main e8584c3, the e2e build CI checks): the
+  // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
+  // and one more dependency index (3). Folding the dev switch's leftovers
+  // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
+  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -70,7 +74,35 @@ const budgets = [
   // (WeekRulePanel, below); what stays is the two imports, the weeklyRules
   // import the bundler hoists, and the line that asks whether the page opens
   // a case. Main measured 34,274 that day, after #198, #205 and #209.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_373 },
+  // 34,300 -> 34,332 gzip on 2026-10-20, measured 34,328 plus the 4 bytes of
+  // hash noise: 이번 주의 규칙's briefing panel. It took the chunk to 34,395;
+  // the panel and the catalogue lookup went to a chunk of their own
+  // (WeekRulePanel, below), which left the two imports and the line that asks
+  // whether the page opens a case, 28 bytes over.
+  // 34,332 -> 34,572 gzip on 2026-10-20, measured 34,568 plus the 4 bytes of
+  // hash noise: B3's audit on the table (the run signal's 감사 n/N token, the
+  // 확정 button's description, the voice's once-a-window line). It took the
+  // chunk to 34,880; the audit's count, its judgement, its reading and its
+  // words went to a chunk of their own (auditRisk, below), which left the
+  // stage's token and description, the voice's hook and the import, 236
+  // bytes over. The raw budget does not move (103,924).
+  // 34,373 -> 34,615 on 2026-10-21, B3 rebased on main's 34,373 (#199):
+  // measured 34,611 in the e2e build plus the 4 bytes of hash noise, the same
+  // 240 bytes the audit took on the day-ten base.
+  // 34,373 -> 34,591 gzip on 2026-10-21 (B2, #208, draft), measured 34,587
+  // plus 4 on main 732ef05 (main 34,369): the run signal's 연결 n token, the
+  // card's " · 연결" mark, the voice's once-a-board line and the closing
+  // commit's call that hands the links on. The walk, the reading, the words
+  // and the carrying are in cascadeRisk (below); #208 measured the same
+  // +207 on 2026-10-20 with the links switched off. The raw budget does not move.
+  // 104,200 / 34,615 -> 104,705 / 34,805 on 2026-10-21, the test week of
+  // W44 (B3 and B2 merged, both above): measured 104,705 / 34,801 in the e2e
+  // build, the gzip plus 4. The two risks' tokens, descriptions and voice hooks
+  // together are 433 gzip bytes over main's 34,373, 19 under the two PRs'
+  // sums; their play-view fields were folded into one (`tableRisk`) first.
+  // The raw budget, which neither PR moved alone, goes up by the 505 the two
+  // take together.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_705, maxGzip: 34_805 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -138,7 +170,14 @@ const budgets = [
   // board and the settlement each ask which rules the case plays under, for
   // the prologues' staged unlocks. The list of steps and its copy are kept
   // out of this chunk; they load with the runtime.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_200 },
+  // 14,200 -> 14,230 gzip on 2026-10-21 (B2, #208, draft), measured 14,226
+  // plus 4 (main 14,050): CASCADE on the next board, the reveal's link line,
+  // and the table's two lists of links (linksIn, linksOut) kept, handed to a
+  // replay and back and opened on; their reading is cascadeRisk's.
+  // 14,230 -> 14,338 gzip on 2026-10-21, the test week (B3 and B2 merged):
+  // measured 14,334 plus 4. The settlement takes the audit's count and judges
+  // it (settleAudit, in its own chunk) beside the links' CASCADE.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_338 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -150,7 +189,13 @@ const budgets = [
   // gained one more `import "./weeklyRules-<hash>.js"` (이번 주의 규칙 has a
   // chunk of its own, below). The raw budget does not move.
   // 4,209 -> 4,210 on 2026-10-20: 4,204-4,210 over eight builds, the hashes'.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_210 },
+  // 4,209 -> 4,228 gzip on 2026-10-20, measured 4,224 plus 4, for the same
+  // reason: one more `import "./auditRisk-<hash>.js"` (B3's audit, below).
+  // 4,210 -> 4,228 on 2026-10-21 (B2, #208, draft), measured 4,224 plus 4
+  // (main 4,207): one more `import "./cascadeRisk-<hash>.js"`; its code did not change.
+  // 8,690 / 4,229 -> 8,711 / 4,246 on 2026-10-21, the test week: both
+  // imports, auditRisk's and cascadeRisk's, measured 8,711 / 4,242 plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_711, maxGzip: 4_246 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -194,12 +239,46 @@ const budgets = [
   // (check:text) is one UTF-8 byte longer than "×1.75로".
   // 1,142 / 719 -> 1,159 / 738 on 2026-10-21, measured 1,159 / 734: NEAR WALL
   // says what the 4 is, 벽 띠가 열기 4만큼 앞당겨 선다 (+17).
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_159, maxGzip: 738 },
+  // 1,141 / 719 -> 1,552 / 957 on 2026-10-19, measured 1,552 / 953 plus the
+  // hash noise: B3's AUDIT is a week's device, so its entry, its line, its
+  // four numbers, the allowlist of devices and the check that reads it live
+  // here. Cut first: its numbers were imported from tableRules.js, which
+  // pulled that whole module into this chunk (2,033 / 1,246), and the line
+  // lost its first sentence; the HUD's and the voice's words are in the
+  // table's own chunk (tableMeters.js, tableVoice.js).
+  // Rebased on main e8584c3 (2026-10-21): main's 1,159 (#212) plus B3's 411,
+  // measured 1,570 / 969 in the e2e build, the gzip plus 4.
+  // audit's own chunk (auditRisk, below).
+  // 1,159 / 738 -> 1,560 / 966 on 2026-10-21 (B2, #208, draft), measured
+  // 1,560 / 962: the cascade week (B2's test week, a device), its line, the
+  // list of devices a week may switch on and the check that reads it.
+  // 1,570 / 973 -> 2,051 / 1,160 on 2026-10-21, the test week: both weeks'
+  // devices and lines, and W44's rule, which says the two lines again behind
+  // one sentence of its own (they are written once and shared, 232 raw bytes
+  // less than written out). Measured 2,051 / 1,156, the gzip plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_051, maxGzip: 1_160 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
+  // count, its judgement, the table's reading and its words, out of the
+  // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
+  // on 2026-10-20. 1,680 / 938 measured, the gzip plus 4. 1,917 / 1,044 the
+  // same day with the table record's audit sentence (describeAuditLedger,
+  // user's choice 1): it went here because the result screen's chunk, where
+  // the record is drawn, had 157 gzip bytes left and took it to 14,422 of
+  // 14,400 even written as a file of its own, and that budget does not go up.
+  // Raised by what it measured, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_917, maxGzip: 1_048 },
+  // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
+  // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
+  // while a constant switched it off and the build dropped the walk; on
+  // 2026-10-21 it is switched by the season's week (`cascade`), so the walk,
+  // the reading and the links a case's close carries over are all here:
+  // 2,790 / 1,669 measured, the gzip plus 4.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -210,8 +289,11 @@ const budgets = [
  * for it (`debugBuild`, src/appConfig.js). It used to ship switched off, and a
  * `VITE_ENABLE_DEBUG_TOOLS=true` left in the build environment would have
  * switched it on for every visitor with every check green.
+ *
+ * The dev switch that forces this week's rule (`?week=`, weeklyCalendar.js)
+ * is held the same way: its entry is the only place `added:"dev"` is written.
  */
-const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP"];
+const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP", 'added:"dev"'];
 
 /**
  * The cold path: every byte a first visit on a phone waits on before the intro
@@ -285,7 +367,13 @@ function checkBudget(file, budget) {
 // 8,828 / 3,183 -> 8,862 / 3,200 on 2026-10-20, measured 8,862 / 3,196 on main
 // after #209 (3,188-3,196 on the day's three mains; main itself 8,754 / 3,146)
 // plus 4: the same three more file names in a longer list.
-const WORKER_BUDGET = { maxBytes: 8_862, maxGzip: 3_200 };
+// 8,828 / 3,183 -> 8,860 / 3,196 on 2026-10-20, measured 8,860 / 3,192 (gzip
+// plus 4): one more file, B3's audit (auditRisk).
+// 8,862 / 3,200 -> 8,896 / 3,215 on 2026-10-21 (B2, #208, draft), measured
+// 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
+// 8,894 / 3,217 -> 8,928 / 3,231 on 2026-10-21, the test week: both risks'
+// files in the list, measured 8,928 / 3,227 plus 4.
+const WORKER_BUDGET = { maxBytes: 8_928, maxGzip: 3_231 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

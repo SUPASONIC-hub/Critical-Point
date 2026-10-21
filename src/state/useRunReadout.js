@@ -16,6 +16,8 @@ import {
   getSuspenseState,
 } from "../gameLogic.js";
 import { getJudgementHabit } from "../judgementHabit.js";
+import { countAudit } from "../gauntlet/auditRisk.js";
+import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTraceEvents } from "./trace.js";
 
 /**
@@ -37,7 +39,7 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, seedBase, debugTools }) {
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const narrativeSpine = useMemo(() => {
@@ -82,6 +84,12 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const gauntletSeed = useMemo(() => (seedBase ? dealGauntletSeed(seedBase) : null), [seedBase]);
+  // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
+  const auditCount = useMemo(() => countAudit(log), [log]);
+  // B2's links off the case's log (cascadeRisk.js): null on a table without them.
+  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId), [gauntletRun, log, runId]);
+  // The two as one field of the play view, which has room for one (check:runtime-budget).
+  const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading }), [auditCount, linkReading]);
   // The trace is session storage, not state, and only the debug overlay prints
   // it, so only a debug build reads it on render.
   const silentFailureCount = debugTools
@@ -99,6 +107,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
     unopenedClueCount,
     unopenedRecordCount: unopenedClueCount + logReadout.unopenedBranchCount,
     gauntletSeed,
+    tableRisk,
     silentFailureCount,
   };
 }

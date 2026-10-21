@@ -73,6 +73,7 @@ export function GauntletHand({
   visibleEffects,
   hiddenEffectCount,
   fractureAxis,
+  linkBurn = null,
   moveOf,
   onSelect,
 }) {
@@ -116,6 +117,8 @@ export function GauntletHand({
                 <b className="gx-card-burn">
                   {burn ? `${labelOf(burn.key)} ${burn.value > 0 ? "+" : ""}${burn.value}` : "소모 없음"}
                   {burn?.fractured && <Zap size={11} aria-hidden="true" />}
+                  {/* B2: cashed, this card makes a link (cascadeRisk.js). Words, so the button's name reads what it shows. */}
+                  {linkBurn && Math.abs(burn?.value ?? 0) >= linkBurn ? " · 연결" : null}
                 </b>
                 {/* A board rule that touches every card is a badge in the stats
                     row, not a line of its own on every card: on an overclocked

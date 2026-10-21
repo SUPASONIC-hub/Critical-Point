@@ -31,6 +31,8 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
     ["판정 원인", cause],
     ["열기 기록", heatLine],
     ...(logicLine ? [["논리 콤보", logicLine]] : []),
+    // B2: this cash made a link (cascadeRisk.js), when the table counts them.
+    ...(verdict.link ? [["연결", verdict.link]] : []),
     ...(verdict.relicProcs?.length
       ? [["도구 발동", verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
       : []),
@@ -174,7 +176,13 @@ export function DecisionReveal({ view }) {
               </p>
             )}
             <p className="gx-reveal-bank">
-              {decisionReveal.caseClosed ? (
+              {decisionReveal.caseClosed && verdict.audit?.caught ? (
+                // AUDIT (B3): the line says what the audit took of the case's share, in the system's words (no 반재욱 line: user, 2026-10-20).
+                <>
+                  <Vault size={14} aria-hidden="true" /> 감사 적발: 금고로 갈 <b>{formatNumber(verdict.secured + verdict.audit.lost)}</b> 중{" "}
+                  <b>{formatNumber(verdict.audit.lost)}</b> 환수 · 금고 <b>{formatNumber(decisionReveal.vault)}</b>
+                </>
+              ) : decisionReveal.caseClosed ? (
                 <>
                   <Vault size={14} aria-hidden="true" /> 금고로 이동 <b>{formatNumber(verdict.secured)}</b> · 금고{" "}
                   <b>{formatNumber(decisionReveal.vault)}</b>

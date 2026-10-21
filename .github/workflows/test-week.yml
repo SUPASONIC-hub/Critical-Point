@@ -1,0 +1,89 @@
+name: Test Week
+
+# 2026-W44 is B3's and B2's test week: the audit and the links on one table
+# (`audit-cascade`, src/gauntlet/weeklyCalendar.js). Once a day this reads that
+# week's seasons off the live database and writes what they did to the run's
+# Job Summary, in the names the simulation measured them by
+# (scripts/report-test-week.mjs). Read only, aggregates only: the rows it
+# fetches go to a file in the runner that is never printed, and the summary
+# carries no run id, device or name.
+#
+# No new secret. The query goes through the Management API with the same
+# SUPABASE_ACCESS_TOKEN Migration Drift uses (`supabase db query --linked`, a
+# single SELECT that the report's unit test holds to one read-only statement).
+# Without the token the run says so in a warning and reads nothing. A later
+# reader of the live data (F1's verify:ranking) can take the same two steps.
+
+on:
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "The week to read (a key of the calendar)"
+        required: false
+        default: "2026-W44"
+      rule:
+        description: "Its rule id"
+        required: false
+        default: "audit-cascade"
+  schedule:
+    # 23:40 KST: the day's seasons are in, and the week's last run is Sunday's.
+    - cron: "40 14 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Not a secret: it is the host name in the site's own connect-src.
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+      TEST_WEEK: ${{ inputs.week || '2026-W44' }}
+      TEST_WEEK_RULE: ${{ inputs.rule || 'audit-cascade' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: See whether an access token is configured
+        id: token
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Explain the skipped read
+        if: steps.token.outputs.configured != 'true'
+        run: |
+          echo "::warning title=The test week was not read::SUPABASE_ACCESS_TOKEN is not configured, so this run asked the database nothing."
+      - uses: ./.github/actions/setup
+        if: steps.token.outputs.configured == 'true'
+        with:
+          browser: none
+      # The rows stay in rows.json. What the CLI said on failure is put
+      # through Migration Drift's redaction before it reaches this public log.
+      - name: Read the week's seasons
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/report-test-week.mjs --sql > test-week.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f test-week.sql > rows.json 2> query.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure rows.json query.err
+            exit 1
+          fi
+          echo "Read $(node -e 'const r = JSON.parse(require("fs").readFileSync("rows.json", "utf8")); console.log((r.rows ?? r).length)') rows."
+      - name: Write the summary
+        if: steps.token.outputs.configured == 'true'
+        run: node scripts/report-test-week.mjs rows.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove the rows
+        if: always()
+        run: rm -f rows.json query.err
