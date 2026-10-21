@@ -11,7 +11,7 @@ import { getSpeakerPortrait } from "../../src/speakerPortraits.js";
  */
 
 test("a painted speaker's portrait is a file under public/", () => {
-  for (const name of ["한서윤", "반재욱", "도윤하", "오진우", "에코", "이민서", "한지우", "권도현", "백아린", "윤상혁", "문하준", "나은호", "고은비", "주은채", "선재윤", "백다온", "하도율", "남지형", "선우진", "탁예린", "남궁솔", "표세린", "신영란"]) {
+  for (const name of ["한서윤", "반재욱", "도윤하", "오진우", "에코", "이민서", "한지우", "권도현", "백아린", "윤상혁", "문하준", "나은호", "고은비", "주은채", "선재윤", "백다온", "하도율", "남지형", "선우진", "탁예린", "남궁솔", "표세린", "신영란", "서도경", "배승호", "여민규", "반서아", "김 반장", "권태호"]) {
     const src = getSpeakerPortrait(name);
     assert.match(src, /^\/portrait-[a-z0-9-]+\.webp$/, name);
     assert.ok(existsSync(`public${src}`), `${name}: public${src} ships`);
