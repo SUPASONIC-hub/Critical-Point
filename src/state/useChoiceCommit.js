@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 
 import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION } from "../appConfig.js";
-import { CASE_RESULT_NODES, CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
+import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
 import {
   applyEffect,
   buildSceneBeat,
@@ -17,24 +17,19 @@ import {
   getRiskPressure,
   getSuspenseEvent,
   getWindowResponseTime,
-  REFRAME_COGNITION,
-  REFRAME_EFFECT,
 } from "../gameLogic.js";
-import { getBranchDetourBypass, nodes } from "../gameData.js";
+import { nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
-import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
-import { countAudit } from "../gauntlet/auditRisk.js";
-import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
-import { listOfferedTypes } from "../gauntlet/logicStreak.js";
+import { BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
-import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
+import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
-import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
+import { carryChoiceLinks, settleChoice } from "./settleChoice.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
@@ -74,35 +69,9 @@ function describeHand(verdict) {
   return null;
 }
 
-/**
- * The rules a window is settled under (gauntlet/tableUnlocks.js): the ones its
- * case plays under, and the ones the board it deals will be played under.
- * Those are the same until the window that closes the case. The board dealt
- * there, and the relic draft offered with it, are the next case's opening, so
- * they follow the next case's rules: 프롤로그 05 has the draft, which makes the
- * offer at the close of 프롤로그 04 the first one.
- *
- * A replay closes onto whichever case the player opens next, which is not
- * known here, and it hands back what the run held before it -- so its closing
- * board is dealt under everything.
- */
-export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED) {
-  const rules = getTableRules(caseId, run, staged);
-  if (!caseClosed) return { rules, nextRules: rules };
-  const nextCaseId = run?.practice ? null : CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1];
-  return { rules, nextRules: getTableRules(nextCaseId, run, staged) };
-}
-
-/**
- * The types of card a scene has on the table, for the logic streak: a hand
- * that leaves its type because no card of that type was there keeps its streak
- * (`advanceLogic` in gauntlet/logicStreak.js). The scene's own cards, the wild one among
- * them, less any the player's standing has not opened -- a card that cannot be
- * played is not an offer.
- */
-export function getOfferedTypes(node, standing) {
-  return listOfferedTypes(node?.choices, (card) => getAuthorityGate(card, standing).unlocked);
-}
+// Moved to settleChoice.js (F1 phase 3, S2), where a server check can import
+// them without React; exported here as well for the callers that read them here.
+export { getOfferedTypes, getSettlementRules } from "./settleChoice.js";
 
 /**
  * Committing a decision: the table's verdict prices the card, the log gains
@@ -251,52 +220,17 @@ export function useChoiceCommit(context) {
     const assistTime = Math.max(Number(windowState.timeScale) || 1, getTableClockScale(gauntletRun, getAccessibility().tableTime));
     // The case on the table was opened in story mode (gauntletEngine's `story`).
     const assistStory = gauntletRun?.story === true;
-    const reframe = choice.type === "reframe";
-    // A reframe that busts is still a reframe the player paid for, but it does
-    // not open a door: the wall took the window before the new board was laid.
-    const reframeOpenedRoute = reframe && windowState.status === "cashed";
-    const reframeTarget = reframeOpenedRoute && currentCaseReframeCount === 0
-      ? getReframeTarget(currentCase, resolvedNodeId)
-      : null;
-    const baseEffect = reframe ? REFRAME_EFFECT : choice.effect;
-    const cognitiveEffect = reframe ? REFRAME_COGNITION : choice.cognition;
+    // The route, the table's verdict and the card's priced effect (settleChoice.js, outside React).
+    const settled = settleChoice(
+      { caseId: currentCase, nodeId: resolvedNodeId, node, resources, log, caseResults, run: gauntletRun, runId, reframeCount: currentCaseReframeCount, clueCount, casesOpened },
+      { choice, window: windowState, forced, settle: relicTable.settle },
+    );
+    const {
+      reframe, reframeOpenedRoute, reframeTarget, blackoutSkip, nextNode, caseClosed,
+      baseEffect, cognitiveEffect, verdict, busted, unlockedRelics, gauntletEffect,
+    } = settled;
     const { challengeMatch, tacticalRead, riskDelta } = readers.getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
 
-    const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(currentCase) - 1];
-    const branchContext = {
-      resources,
-      previousOutcomeChoiceId: previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : undefined,
-    };
-    const branchBypass = getBranchDetourBypass(choice, branchContext);
-    const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-    const blackoutSkip = windowState.status === "bust" && !assistStory ? getBlackoutSkip(plannedNode, branchContext) : null;
-    const nextNode = blackoutSkip?.nodeId ?? plannedNode;
-    const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
-    const { verdict, nextRun: settledRun, unlockedRelics } = relicTable.settle({
-      run: gauntletRun,
-      window: windowState,
-      card: choice,
-      // For the logic streak: whether the room played this card, and what the
-      // scene had on the table.
-      forced,
-      offered: getOfferedTypes(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
-      caseClosed,
-      offerRelics: currentCase !== "final",
-      // The case's audit so far, read off its log (auditRisk.js); the engine reads it only on a week that has it.
-      audit: countAudit(log),
-      ...getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed }),
-      // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
-      cascade: isLinkDue(gauntletRun, log, runId),
-    });
-    const busted = verdict.outcome === "bust";
-
-    const gauntletEffect = applyGauntletEffect(baseEffect, {
-      outcome: verdict.outcome,
-      gauge: verdict.gauge,
-      fracturedAxis: verdict.fracturedAxis,
-      fractureRate: verdict.fractureRate,
-      focusMultiplier: verdict.focus?.resourceMultiplier,
-    });
     const clue = busted ? null : readers.getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute);
     const clueReward = clue
       ? { label: "EVIDENCE BONUS", text: "숨은 단서를 확보했다.", effect: { legitimacy: 2, fatigue: -1 } }
@@ -389,7 +323,7 @@ export function useChoiceCommit(context) {
 
     const nextLog = [...log, entry];
     // B2: what a closing case hands the next one, off its whole log (cascadeRisk.js).
-    const nextRun = carryLinksOut(settledRun, { run: gauntletRun, log: nextLog, runId, caseClosed, last: currentCase === "final" });
+    const nextRun = carryChoiceLinks(settled, { run: gauntletRun, nextLog, runId, caseId: currentCase });
     const nextEcho = reframeTarget
       ? `${entry.echo} 다음 장면은 당신이 다시 짠 판을 기준으로 이어집니다.`
       : entry.echo;

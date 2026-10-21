@@ -28,6 +28,7 @@ const { resourceMeta } = await import("../../src/appCopy.js");
 const { createSceneChallenge } = await import("../../src/viewModels/sceneViewModels.js");
 const { validateTelemetryItem } = await import("../../src/state/payloadSchemas.js");
 const { useChoiceCommit } = await import("../../src/state/useChoiceCommit.js");
+const { carryChoiceLinks, settleChoice } = await import("../../src/state/settleChoice.js");
 
 /** The error log this device keeps, as the recovery screen reads it. */
 const getLocalErrorLog = () => parseErrorLog(browser.storage.getItem(ERROR_LOG_STORAGE_KEY))?.entries ?? [];
@@ -578,4 +579,60 @@ test("a season with a case from before the logic table is not sent to the public
     assert.deepEqual(did.rankingRows.map((row) => row.case_id), ["final", "season-final"], which);
     assert.equal(did.seasonFinals.length, 1, which);
   }
+});
+
+// F1 phase 3, S2: the commit's settlement is settleChoice.js, which a server
+// check runs in node. A whole case on the audit and chain week, cashes, busts,
+// a cash at the edge and a card the clock staked: at every press the hook moved
+// the run to the scene, the verdict, the priced effect and the run the pure
+// function gives for the same state.
+test("the commit settles as settleChoice does, press by press, through a case on the audit and chain week", () => {
+  let state = null;
+  let presses = 0;
+  for (let step = 0; step < 40; step += 1) {
+    const { context, did } = sceneContext(state?.nodeId ?? "p1_start", state ? {
+      resources: state.resources, triggers: state.triggers, cognition: state.cognition, log: state.log,
+      gauntletRun: state.gauntletRun, discoveredClues: state.discoveredClues, clueCount: state.discoveredClues.length,
+    } : {});
+    if (!state) context.gauntletRun = { ...context.gauntletRun, weekRule: "audit-cascade" };
+    const card = context.node.choices[step % context.node.choices.length];
+    const window = step % 4 === 3 ? closedWindow("bust", `unit-settle-${step}`) : closedWindow("cash", `unit-settle-${step}`);
+    const forced = step % 5 === 4;
+    const pure = settleChoice(
+      { caseId: context.currentCase, nodeId: context.resolvedNodeId, node: context.node, resources: context.resources, log: context.log, caseResults: context.caseResults, run: context.gauntletRun, runId: context.runId, reframeCount: 0, clueCount: context.clueCount, casesOpened: context.casesOpened, unlocked: [] },
+      { choice: card, window, forced },
+    );
+    mount(context).choose(card, window, forced);
+    const [patch] = did.patches;
+    if (!patch) continue;
+    presses += 1;
+    const entry = patch.log.at(-1);
+    assert.equal(patch.nodeId, pure.nextNode);
+    assert.deepEqual(patch.decisionReveal.verdict, pure.verdict);
+    assert.deepEqual(entry.riskRewardEffect, pure.gauntletEffect);
+    assert.deepEqual(patch.gauntletRun, carryChoiceLinks(pure, { run: context.gauntletRun, nextLog: patch.log, runId: context.runId, caseId: context.currentCase }));
+    if (patch.decisionReveal.caseClosed) break;
+    state = { ...patch };
+  }
+  assert.ok(presses >= 5, `the case was played (${presses} presses)`);
+});
+
+test("a season ranking row storage would not take is said and logged, and the season still closes", () => {
+  const finaleId = Object.keys(nodes).find((id) => nodes[id].caseId === "final" && nodes[id].choices?.some((choice) => choice.next === CASE_RESULT_NODES.final));
+  const earlier = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
+  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 2 } }]));
+  const { context, did } = sceneContext(finaleId, {
+    completedCases: earlier,
+    caseResults,
+    appendLocalRankingRow: (row) => {
+      did.rankingRows.push(row);
+      return { rows: did.rankingRows, saved: row.case_id !== "season-final" };
+    },
+  });
+  const card = context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final);
+  mount(context).choose(card, closedWindow("cash"));
+
+  assert.equal(did.patches[0].completedCases.length, CASE_SEQUENCE.length);
+  assert.ok(did.saveStatus.includes("Season ranking save failed: browser storage is unavailable."));
+  assert.match(JSON.stringify(getLocalErrorLog()), /Season ranking save failed/);
 });
