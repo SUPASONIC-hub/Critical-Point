@@ -172,7 +172,7 @@ test("a development build plays an audit week on ?week=audit; a release and node
   assert.equal(isAuditOn(normalizeRunState({ weekRule: stamp })), true, "the season it starts counts the audit");
   assert.equal(pickSeasonWeekRule(now, { calendar, declined: true }), null, "the start screen's box still turns it down");
   assert.equal(pickSeasonWeekRule(now, { calendar, story: true }), null, "and story mode never has it");
-  assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar }), null, "only this week");
+  assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar: [forced] }), null, "only this week");
 
   assert.equal(devWeekEntry({ debugBuild: false, search: "?week=audit", now }), null, "a release build has no switch");
   assert.equal(devWeekEntry({ debugBuild: true, search: "?debug=1", now }), null);

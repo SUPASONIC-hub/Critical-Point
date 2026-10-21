@@ -66,7 +66,7 @@ test("no table counts links outside a cascade week's season, and the engine deal
   assert.equal(isCascadeOn(normalizeRunState({ weekRule: "near-wall" })), false);
   assert.equal(isCascadeOn(normalizeRunState({ ...WEEK, story: true })), false, "never in story mode");
   assert.equal(isCascadeOn(openCaseRun(normalizeRunState(WEEK), { replayOf: {} })), false, "never in a case played again");
-  assert.ok(WEEKLY_RULES.every((entry) => !weekRuleHasDevice(entry.id, "cascade")), "no week of the calendar has it");
+  assert.deepEqual(WEEKLY_RULES.filter((entry) => weekRuleHasDevice(entry.id, "cascade")).map((entry) => entry.week), ["2026-W44"], "no week of the calendar has it but the test week");
   const { log } = playCase([[heavy, cash("a")], [light, cash("b")], [light, cash("c")], [light, cash("d")], [light, cash("e")], [light, cash("f")]], { on: false });
   assert.equal(readLinks(normalizeRunState({}), log, "run-1"), null);
   assert.equal(isLinkDue(normalizeRunState({}), log, "run-1"), false);
@@ -307,7 +307,7 @@ test("a development build plays a cascade week on ?week=cascade; a release and n
   assert.equal(isCascadeOn(normalizeRunState({ weekRule: stamp })), true, "the season it starts counts links");
   assert.equal(pickSeasonWeekRule(now, { calendar, declined: true }), null, "the start screen's box still turns it down");
   assert.equal(pickSeasonWeekRule(now, { calendar, story: true }), null, "and story mode never has it");
-  assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar }), null, "only this week");
+  assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar: [forced] }), null, "only this week");
   assert.equal(devWeekEntry({ debugBuild: false, search: "?week=cascade", now }), null, "a release build has no switch");
   assert.equal(devWeekEntry({ debugBuild: true, search: "?debug=1", now }), null);
   assert.equal(devWeekEntry({ debugBuild: true, search: "?week=%3Cscript%3E", now }), null);

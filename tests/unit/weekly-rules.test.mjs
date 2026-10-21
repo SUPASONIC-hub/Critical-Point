@@ -20,6 +20,7 @@ const {
   WEEK_RULE_DEVICES,
   WEEK_RULE_ID_MAX,
   weekRuleAt,
+  weekRuleHasDevice,
   weekRuleOverlay,
   WEEKLY_NOTICE_DAYS,
   WEEKLY_RULES,
@@ -100,7 +101,10 @@ test("the calendar names known rules, one per week, announced a week ahead", () 
     assert.ok(!weeks.has(entry.week), `${entry.week} has one rule`);
     weeks.add(entry.week);
     const announced = kst(`${entry.added}T00:00:00`);
-    assert.ok(weekStartMs(entry.week) - announced >= WEEKLY_NOTICE_DAYS * DAY, `${entry.week} was added ${WEEKLY_NOTICE_DAYS} days before it starts`);
+    // A shorter notice is the entry's own and said there: only W44, the test week (user, 2026-10-21).
+    const notice = entry.notice ?? WEEKLY_NOTICE_DAYS;
+    if (entry.notice !== undefined) assert.deepEqual([entry.week, notice], ["2026-W44", 5], `${entry.week}'s notice of ${notice} days is not one the user chose`);
+    assert.ok(weekStartMs(entry.week) - announced >= notice * DAY, `${entry.week} was added ${notice} days before it starts`);
   }
   for (const [id, rule] of Object.entries(WEEK_RULE_CATALOGUE)) {
     assert.ok(id.length <= WEEK_RULE_ID_MAX, id);
@@ -240,11 +244,13 @@ test("시작 reads the weekly clock once; turning it down or a later week change
 });
 
 test("the server's week table says what the calendar says", () => {
-  // The migration lists the weeks as `('2026-W46', 'near-wall')`;
-  // check:grants holds the table PGlite builds from it to the same.
-  const migration = read("supabase/migrations/20261021000000_weekly_rule_event.sql");
-  const listed = [...migration.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => ({ week, id }));
-  assert.deepEqual(listed, WEEKLY_RULES.map(({ week, id }) => ({ week, id })));
+  // The migrations list the weeks as `('2026-W46', 'near-wall')`, one file
+  // after another (W44, the test week, came in a file of its own);
+  // check:grants holds the table PGlite builds from them to the same.
+  const byWeek = (a, b) => a.week.localeCompare(b.week);
+  const listed = ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql"]
+    .flatMap((name) => [...read(`supabase/migrations/${name}`).matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => ({ week, id })));
+  assert.deepEqual(listed.sort(byWeek), WEEKLY_RULES.map(({ week, id }) => ({ week, id })).sort(byWeek));
 });
 
 test("the start screen's box turns the rule down on this device, for both starts (결정 27)", async () => {
@@ -293,15 +299,33 @@ test("this device's records are split by the rule they were played under", () =>
 });
 
 test("the start screen fetches the rule's words only in a week with something to say", () => {
+  // Asked of the first event alone: W44, the test week, falls in the "two weeks before".
   const start = weekStartMs(EVENT.week);
-  assert.equal(weekHasNews(start - 7 * DAY + 60_000), true, "the week before: the notice");
-  assert.equal(weekHasNews(start + DAY), true, "the week itself");
-  assert.equal(weekHasNews(start - 8 * DAY), false, "two weeks before");
-  assert.equal(weekHasNews(start + 7 * DAY), false, "the week after");
+  assert.equal(weekHasNews(start - 7 * DAY + 60_000, [EVENT]), true, "the week before: the notice");
+  assert.equal(weekHasNews(start + DAY, [EVENT]), true, "the week itself");
+  assert.equal(weekHasNews(start - 8 * DAY, [EVENT]), false, "two weeks before");
+  assert.equal(weekHasNews(start + 7 * DAY, [EVENT]), false, "the week after");
   assert.equal(weekHasNews(Date.parse(E2E_WEEKLY_RULE_CLOCK)), false, "never in a test build");
   // The entry chunk asks the calendar, not the catalogue.
   const stub = read("src/components/WeeklyRuleNotice.jsx");
   assert.ok(stub.includes(`from "../gauntlet/weeklyCalendar.js"`));
   assert.ok(!stub.includes("weeklyRules.js"));
   assert.doesNotMatch(read("src/gauntlet/weeklyCalendar.js"), /^import /m, "a leaf");
+});
+
+test("2026-W44, the test week, switches on the audit and the links together, and is told from the day it was merged", () => {
+  const entry = WEEKLY_RULES.find((item) => item.week === "2026-W44");
+  assert.equal(entry?.id, "audit-cascade");
+  assert.deepEqual([...getWeekRule(entry.id).rules], ["audit", "cascade"]);
+  for (const device of ["audit", "cascade"]) assert.equal(weekRuleHasDevice(entry.id, device), true, device);
+  assert.equal(getWeekRule(entry.id).schema, undefined, "no number on the board moves");
+  // Merged on Wednesday 2026-10-21: the start screen's notice ("다음 주의 규칙") from then on, the rule itself from Monday.
+  const merged = kst(`${entry.added}T12:00:00`);
+  assert.equal(nextWeekRuleAt(merged)?.id, "audit-cascade");
+  assert.equal(weekHasNews(merged), true);
+  assert.equal(weekRuleAt(merged), null, "W43 itself has no rule");
+  assert.equal(weekRuleAt(weekStartMs("2026-W44"))?.id, "audit-cascade");
+  assert.equal(weekRuleAt(weekStartMs("2026-W45")), null, "the week between the two events has none");
+  assert.equal(pickSeasonWeekRule(weekStartMs("2026-W44") + DAY), "audit-cascade");
+  assert.equal(pickSeasonWeekRule(weekStartMs("2026-W44") + DAY, { story: true }), null, "story mode is outside every ranking");
 });

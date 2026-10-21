@@ -11,11 +11,19 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
 /**
  * The calendar. `added` is the day the entry was merged (KST), which is the day
  * it was announced; the unit test fails an entry added fewer than
- * `WEEKLY_NOTICE_DAYS` before its week. 초안: the first week is a placeholder
- * for the choice in the report.
+ * `WEEKLY_NOTICE_DAYS` before its week, or than its own `notice` in days when
+ * it has one. 초안: the first week is a placeholder for the choice in the
+ * report.
+ *
+ * 2026-W44 is B3's and B2's test week, both devices together (user,
+ * 2026-10-21): merged on the Wednesday before it, so it is announced five days
+ * ahead (`notice: 5`), from the moment it is merged (the start screen's
+ * "다음 주의 규칙" reads the week after this one). Listed after W46 so the
+ * first entry, which the tests and the e2e play as "the event", stays W46.
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
+  Object.freeze({ week: "2026-W44", id: "audit-cascade", added: "2026-10-21", notice: 5 }),
 ]);
 
 /**

@@ -64,6 +64,10 @@ export const AUDIT_SHARE = 4;
 /** HEAVY FRACTURE: what FRACTURE bills the cracked axis that week. */
 export const HEAVY_FRACTURE_RATE = 1.75;
 
+/** The audit's line and the links', each week's that has the device. */
+const AUDIT_LINE = `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`;
+const CASCADE_LINE = "한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다.";
+
 /**
  * The rules a week can carry, by id. `schema` is relative for the wall
  * (`wallShift`, negative = closer) and absolute for the rest.
@@ -86,7 +90,7 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     label: "AUDIT WEEK",
     // 초안 문구 (B3 decision 11 asks for the line by number).
     title: "감사 주간",
-    text: `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`,
+    text: AUDIT_LINE,
     rules: Object.freeze(["audit"]),
   }),
   // B2's test week: a device; no number on the board moves. Its numbers are
@@ -97,8 +101,17 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     label: "CASCADE WEEK",
     // 초안 문구.
     title: "연쇄 주간",
-    text: "한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다.",
+    text: CASCADE_LINE,
     rules: Object.freeze(["cascade"]),
+  }),
+  // The test week of 2026-W44 (user, 2026-10-21): both devices at once, told
+  // in the two weeks' own lines, so the ranking of that week is the one table
+  // B3 and B2 will be judged on.
+  "audit-cascade": Object.freeze({
+    label: "AUDIT & CASCADE",
+    title: "감사와 연쇄",
+    text: `이번 주는 감사와 연쇄가 함께 선다. ${AUDIT_LINE} ${CASCADE_LINE}`,
+    rules: Object.freeze(["audit", "cascade"]),
   }),
 });
 
