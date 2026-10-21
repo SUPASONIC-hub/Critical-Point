@@ -36,6 +36,27 @@ const SPEAKER_PORTRAITS = {
   "윤서진": "/portrait-yoon-seojin.webp",
   "한지우": "/portrait-han-jiwoo.webp",
   "나은호": "/portrait-na-eunho.webp",
+  // B1 (2026-10-21): twenty speakers of three to seven scenes, from photos, most scenes first.
+  "선우진": "/portrait-seon-ujin.webp",
+  "탁예린": "/portrait-tak-yerin.webp",
+  "차지원": "/portrait-cha-jiwon.webp",
+  "채이안": "/portrait-chae-ian.webp",
+  "남궁솔": "/portrait-namgung-sol.webp",
+  "최서진": "/portrait-choi-seojin.webp",
+  "채윤슬": "/portrait-chae-yunseul.webp",
+  "표세린": "/portrait-pyo-serin.webp",
+  "지강현": "/portrait-ji-ganghyeon.webp",
+  "민도현": "/portrait-min-dohyeon.webp",
+  "민하랑": "/portrait-min-harang.webp",
+  "정해린": "/portrait-jeong-haerin.webp",
+  "이정숙": "/portrait-lee-jeongsuk.webp",
+  "유하온": "/portrait-yoo-haon.webp",
+  "정태오": "/portrait-jeong-taeo.webp",
+  "연하진": "/portrait-yeon-hajin.webp",
+  "마서윤": "/portrait-ma-seoyun.webp",
+  "여다인": "/portrait-yeo-dain.webp",
+  "임재윤": "/portrait-lim-jaeyun.webp",
+  "신영란": "/portrait-shin-yeongran.webp",
   // B2 (2026-10-21): speakers of one to three scenes, most scenes first.
   "고은비": "/portrait-go-eunbi.webp",
   "주은채": "/portrait-joo-eunchae.webp",
@@ -59,6 +80,35 @@ const SPEAKER_PORTRAITS = {
   "하예솔": "/portrait-ha-yesol.webp",
   "채도훈": "/portrait-chae-dohun.webp",
   "남지형": "/portrait-nam-jihyeong.webp",
+  // B3 (2026-10-21): the speakers first listed for generated pictures, most
+  // scenes first. Villains keep a generated face of someone who does not
+  // exist; 배승호, 연태준, 은시온, 여민규 and 배성준 turned out not to be
+  // villains and are photos.
+  "서도경": "/portrait-seo-dogyeong.webp",
+  "조현석": "/portrait-jo-hyeonseok.webp",
+  "도하람": "/portrait-do-haram.webp",
+  "연태준": "/portrait-yeon-taejun.webp",
+  "배승호": "/portrait-bae-seungho.webp",
+  "이서준": "/portrait-lee-seojun.webp",
+  "반서아": "/portrait-ban-seoa.webp",
+  "은시온": "/portrait-eun-sion.webp",
+  "여민규": "/portrait-yeo-mingyu.webp",
+  "신이안": "/portrait-shin-ian.webp",
+  "석재우": "/portrait-seok-jaeu.webp",
+  "연서준": "/portrait-yeon-seojun.webp",
+  "진세라": "/portrait-jin-sera.webp",
+  "염태호": "/portrait-yeom-taeho.webp",
+  "도건우": "/portrait-do-geonu.webp",
+  "배성준": "/portrait-bae-seongjun.webp",
+  // B4 (2026-10-21): speakers of one scene whose first photo was weak.
+  "하은경": "/portrait-ha-eungyeong.webp",
+  "송하율": "/portrait-song-hayul.webp",
+  "하정희": "/portrait-ha-jeonghui.webp",
+  "김 반장": "/portrait-kim-banjang.webp",
+  "문성호": "/portrait-moon-seongho.webp",
+  "은재하": "/portrait-eun-jaeha.webp",
+  "이하경": "/portrait-lee-hagyeong.webp",
+  "권태호": "/portrait-kwon-taeho.webp",
 };
 
 /** The portrait's path for a speaker, or null for one not painted yet. */
