@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-21 (the state of `main` at `e4ddff5`, #219; what changed and when is in `git log`)
+Last updated: 2026-10-21 (the state of `main` at `0df240a`, #223; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -116,7 +116,11 @@ Still open, on purpose:
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
   on the live site, without a ranking reset. That pull request (#219,
   #201 and #208 together, migration 20261021010000) merged on 2026-10-21 at
-  `e4ddff5`; the `Test Week` workflow reads the week's seasons once a day. B2 was measured again on
+  `e4ddff5`; the `Test Week` workflow reads the week's seasons once a day
+  (#222 adds the seasons that turned the rule down and the device count). B2
+  decision 10, a cash on a CASCADE board is not counted by the audit, was
+  missing from #219 and went in with #223 at `0df240a`. No table code merges
+  during W44. B2 was measured again on
   2026-10-21: links left when a case closes carry into the next case's first
   tables with `LINK_CARRY_MAX` 1 (collapse 21.0%, scout margin 6 loss 24.2%,
   every criterion met), and the season bot's chip-reading hand keeps
