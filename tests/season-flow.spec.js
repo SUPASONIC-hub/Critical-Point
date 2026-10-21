@@ -450,6 +450,8 @@ test("NEW GAME+ names the last season on the intro and opens the next one on its
   const memory = page.locator(".past-run-memory");
   await expect(memory).toContainText("PAST RUN MEMORY · 2회차");
   await expect(memory).toContainText("지난 시즌: 봉인 · QUIET COVER.");
+  // What a NEW GAME+ table is, as a fact (문구 질문 17): no claim that it is harder.
+  await expect(memory).toContainText("프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.");
   await expect(memory.locator('[lang="en"]')).toHaveText("PAST RUN MEMORY");
 
   await page.getByRole("button", { name: "NEW GAME+ 시작" }).click();

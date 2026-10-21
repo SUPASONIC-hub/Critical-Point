@@ -201,21 +201,23 @@ test("the carried line is shown on a NEW GAME+ season's first page, and nowhere 
 test("the start screen's panel names the last season's ending, and its season number on the head and the continue card", async () => {
   const { getPastRunMemory, getPlayStyleUnlocks } = await import("../../src/advancedSystems.js");
   const record = (verdict, label, extra = {}) => recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending(label.toLowerCase().replace(" ", "-"), extra)), finalChoiceId: verdict });
+  // Every panel ends on what a NEW GAME+ table is (문구 질문 17, 2026-10-21 evening): a fact, not "harder".
+  const TABLE_LINE = " NEW\u00a0GAME+는 프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.";
   const reform = getPastRunMemory({}, record("ending_reform", "HUMAN RECORD"), "run-b");
     assert.equal(reform.round, 2);
-  assert.equal(reform.text, "지난 시즌: 개혁 · HUMAN RECORD. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.");
+  assert.equal(reform.text, "지난 시즌: 개혁 · HUMAN RECORD. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." + TABLE_LINE);
   const fallen = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(collapse) });
-  assert.equal(getPastRunMemory({}, fallen, null).text, "지난 시즌: SYSTEM COLLAPSE. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.");
+  assert.equal(getPastRunMemory({}, fallen, null).text, "지난 시즌: SYSTEM COLLAPSE. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." + TABLE_LINE);
   const open = recordFinishedSeason(null, { runId: "run-a", finalSummary: finale(ending("profitable-silence")), finalChoiceId: "ending_seal" });
-  assert.equal(getPastRunMemory({}, open, null).text, "지난 시즌: PROFITABLE SILENCE.", "an open verdict: the ending alone, no promise");
+  assert.equal(getPastRunMemory({}, open, null).text, "지난 시즌: PROFITABLE SILENCE." + TABLE_LINE, "an open verdict: the ending alone, no promise");
   // The finished run itself, reopened from its save: still its own season, not the next.
   assert.equal(getPastRunMemory({}, record("ending_reform", "HUMAN RECORD"), "run-a").round, 1);
   // A memory from before the record keeps the old line (the entry chunk reads only the record's stored line), and is the second season.
   const memory = { case01: { outcomeChoiceId: "c1" }, final: { outcomeChoiceId: "f_after_burn", runId: "old", endingVariant: { id: "quiet-cover", label: "QUIET COVER", failure: false } } };
-  assert.match(getPastRunMemory(memory, null, "new").text, /^이전 기록에서 CASE /);
+  assert.match(getPastRunMemory(memory, null, "new").text, /^이전 기록에서 CASE .+ 도구도 더 일찍 받습니다\.$/);
   assert.equal(getPastRunMemory(memory, null, "new").round, 2);
   // As stored: the panel reads the raw record, not a normalized one.
-  assert.equal(getPastRunMemory({}, JSON.parse(JSON.stringify(record("ending_expose", "FIELD PACT"))), "run-b").text, "지난 시즌: 폭로 · FIELD PACT. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.");
+  assert.equal(getPastRunMemory({}, JSON.parse(JSON.stringify(record("ending_expose", "FIELD PACT"))), "run-b").text, "지난 시즌: 폭로 · FIELD PACT. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." + TABLE_LINE);
   // A memory with no ending in it keeps the old line.
   assert.match(getPastRunMemory({ case01: { outcomeChoiceId: "c1" } }).text, /^이전 기록에서 CASE 01/);
   assert.equal(getPastRunMemory({}, null, null), null);
