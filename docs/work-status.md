@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-21 (the state of `main` at `8a535e2`, #215; what changed and when is in `git log`)
+Last updated: 2026-10-21 (the state of `main` at `e4ddff5`, #219; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -114,8 +114,9 @@ Still open, on purpose:
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
-  on the live site, without a ranking reset. That pull request (`rules-mark-3`,
-  #201 and #208 together) is in preparation. B2 was measured again on
+  on the live site, without a ranking reset. That pull request (#219,
+  #201 and #208 together, migration 20261021010000) merged on 2026-10-21 at
+  `e4ddff5`; the `Test Week` workflow reads the week's seasons once a day. B2 was measured again on
   2026-10-21: links left when a case closes carry into the next case's first
   tables with `LINK_CARRY_MAX` 1 (collapse 21.0%, scout margin 6 loss 24.2%,
   every criterion met), and the season bot's chip-reading hand keeps
