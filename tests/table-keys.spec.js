@@ -592,8 +592,8 @@ const STAGED_STEPS = [
   { caseId: "prologue01", on: { logic: false, lock: false, stance: false, chain: false }, lines: 2, kicker: FIRST_TABLE },
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue03", on: NO_LOCK, lines: 3, kicker: NEW_PROTOCOL },
-  // Five lines since RULES_MARK 3: the audit and the links open here with FRACTURE.
-  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 5, kicker: NEW_PROTOCOL },
+  // Four lines since RULES_MARK 3: the audit and the links open here with FRACTURE, told in one.
+  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 4, kicker: NEW_PROTOCOL },
   { caseId: "prologue05", on: WHOLE, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },
 ];

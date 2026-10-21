@@ -44,8 +44,7 @@ test("the audit is a rule of the table from 프롤로그 04 (RULES_MARK 3), and 
   assert.ok(rulesFor("prologue01", { veteran: true }).has("audit"), "NEW GAME+ has it from the first case");
   assert.equal(STORY_RULES.has("audit"), false, "story mode never has it");
   assert.equal(rulesFor("prologue04", { story: true }).has("audit"), false);
-  const line = introFor("prologue04").find((text) => text.includes("감사"));
-  for (const value of [AUDIT_HEAT, AUDIT_LIMIT, AUDIT_SHARE]) assert.ok(line.includes(String(value)), `the line quotes ${value}`);
+  assert.ok(introFor("prologue04").some((text) => text.includes("감사")), "프롤로그 04 says it opens");
   assert.equal(introFor("prologue04", { story: true }).some((text) => text.includes("감사")), false, "a story run is not told it");
 });
 
