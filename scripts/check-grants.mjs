@@ -1382,6 +1382,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   const call = (runId, marks) => `select public.ranking_set_recheck_marks('${runId}', ${marks === null ? "null" : `array[${marks.map((mark) => `'${mark}'`).join(", ")}]::text[]`}) as marks`;
   await refused("set a ranking row's checker marks", "anon", call("run-recheck-1", ["score-off-log"]));
   await refused("set a ranking row's checker marks", "authenticated", call("run-recheck-1", ["score-off-log"]));
+  // When the checker last replayed a run is not the client's to read or write.
+  await refused("read when a ranking row was rechecked", "anon", `select rechecked_at from public.playtest_sessions`);
+  await postRefused("send a case row already rechecked", "playtest_sessions", { ...casePayload({ session: sessionId(38), runId: "run-recheck-self", caseId: "case01" }), rechecked_at: "2026-10-21T00:00:00Z" }, /^42501 /);
 
   // Rows put in place with the insert triggers off for these statements only:
   // two ranked runs, one already marked by the trigger, and the first run's final case row.
@@ -1424,12 +1427,22 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // list for a run that earns nothing, and a run not checked left out.
   const write = marksSql([
     { status: "checked", runId: "run-recheck-1", marks: ["score-off-log"] },
-    { status: "checked", runId: "run-recheck-2", marks: [] },
+    { status: "unrecorded", runId: "run-recheck-2", marks: [] },
     { status: "unverified", runId: "run-recheck-none", marks: [] },
   ]);
   const wrote = (await one(write))?.marked_rows;
   check(Number(wrote) === 2, `the checker's write marked ${wrote} ranking rows; expected the two checked runs.`);
   check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  // Checked and clean is told from not checked: the time is set only for the
+  // run replayed whole, and a call that does not say so clears it.
+  const recheckedAt = async (runId) => (await one(`select rechecked_at from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.rechecked_at ?? null;
+  check((await recheckedAt("run-recheck-1")) !== null, "the checker's write did not mark run-recheck-1, replayed whole, as rechecked.");
+  check((await recheckedAt("run-recheck-2")) === null, "a run with no replay record was marked as rechecked.");
+  await allowed("state marks without a replay", "service_role", call("run-recheck-1", ["score-off-log"]));
+  check((await recheckedAt("run-recheck-1")) === null, "a call that did not replay the run left its rechecked time standing.");
+  await allowed("mark a window with no replay record", "service_role", call("run-recheck-1", ["window-no-replay"]));
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap", "window-no-replay"]), `window-no-replay left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  check((await one(`select count(*)::int as n from public.playtest_sessions where rechecked_at is not null and case_id <> 'season-final'`))?.n === 0, "a case row carries a rechecked time; only ranking rows are rechecked.");
   check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "the checker's write took a trigger's mark from a run that earned none of its own.");
   // The checker's own read (verify-ranking-rows --sql) runs on this schema and
   // brings each ranked run whole: here the top one, every row of it.

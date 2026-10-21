@@ -1432,11 +1432,18 @@ Still open, on purpose:
     replays every recorded window under the case's rules (`newGamePlus` and
     `assistStory` in the summary say which), and checks a sealed card cashed
     below its seal and a response time off the window clock
-    (`src/rankingRecheck.js`). A run under other `tableRules` is not checked.
+    (`src/rankingRecheck.js`), and that each seed is the one the page deals
+    at that place (`run_id:windowIndex:nodeId`, a `~n` re-deal counted, not
+    marked). From a run's first recorded case on, a window without a record
+    is marked `window-no-replay`; a run with no record anywhere is
+    `unrecorded` (scores read, not replayed). A run under other `tableRules`
+    is not checked.
     `--marks-sql` writes the result through
     `ranking_set_recheck_marks` (`20261021020000`, service role only): the
-    run's `score-off-log` and `window-off-replay` are stated whole beside the
-    insert trigger's marks, and nothing is refused or hidden for them.
+    run's `score-off-log`, `window-off-replay` and `window-no-replay` are
+    stated whole beside the insert trigger's marks, nothing is refused or
+    hidden for them, and `rechecked_at` is set only for a run replayed whole,
+    so checked-and-clean is told from never checked.
     `.github/workflows/verify-ranking.yml` runs both once a day and by hand;
     its header says the merge waits for the user (after 11-02), since the
     migration reaches the live database within a minute of it. What a replay

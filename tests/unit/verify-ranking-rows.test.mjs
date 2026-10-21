@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { BASE_SCHEMA, createWindow, normalizeSchema, RULES_MARK, SEAL_BREAK_GAUGE } from "../../src/gauntlet/gauntletEngine.js";
-import { isSealedCash, isTimeOffClock, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
+import { isSealedCash, isTimeOffClock, readSeed, recheckCaseWindows, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
+import { openTraced, recordClosedWindow, reduceTraced } from "../../src/gauntlet/windowTrail.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
 import { fetchRunRows, formatReport, groupByRun, marksSql, rankingRowsSql, readRows, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
 import { createWindowRecorder, thresholdOfVerdict } from "./helpers/windowRecorder.mjs";
@@ -188,15 +189,70 @@ test("rows whose jsonb columns came out as text are read as the objects they are
 test("the CI write states every checked run's marks in one statement, quoted, and leaves unchecked runs out", () => {
   const sql = marksSql([
     { status: "checked", runId: "run-a", marks: ["score-off-log", "window-off-replay"] },
-    { status: "checked", runId: "run-'b", marks: [] },
+    { status: "unrecorded", runId: "run-'b", marks: [] },
     { status: "unverified", runId: "run-c", marks: [] },
   ]);
   assert.equal(sql.indexOf(";"), sql.length - 1);
-  assert.match(sql, /\('run-a', array\['score-off-log', 'window-off-replay'\]::text\[\]\)/);
-  assert.match(sql, /\('run-''b', array\[\]::text\[\]\)/);
+  assert.match(sql, /\('run-a', array\['score-off-log', 'window-off-replay'\]::text\[\], true\)/);
+  assert.match(sql, /\('run-''b', array\[\]::text\[\], false\)/);
   assert.doesNotMatch(sql, /run-c/);
   assert.doesNotMatch(sql, /\b(insert|update|delete|truncate|alter|drop|create|grant)\b/i);
   assert.equal(marksSql([{ status: "unverified", runId: "run-c", marks: [] }]), null);
   // Built from a real report: the honest run is written with no marks.
-  assert.match(marksSql(verifyRows(seasonRows("run-real"))), /\('run-real', array\[\]::text\[\]\)/);
+  assert.match(marksSql(verifyRows(seasonRows("run-real"))), /\('run-real', array\[\]::text\[\], true\)/);
+});
+
+/**
+ * A case row as the page writes it now: windows dealt from the seeds the page
+ * deals (`run_id:windowIndex:nodeId`), each with its replay record, and the
+ * run's window count after the case in `dynamics`.
+ */
+function dealtRow({ runId = "run-s", caseId = "prologue01", first = 10, seeds = null, nodeIds = ["p1_start", "p1_start", "p1_start"] } = {}) {
+  const decisionLog = nodeIds.map((nodeId, place) => {
+    const seed = seeds?.[place] ?? `${runId}:${first + place}:${nodeId}`;
+    let window = reduceTraced(openTraced({ seed }), { type: "SELECT", id: "a" });
+    for (let tick = 0; tick < 6; tick += 1) window = reduceTraced(window, { type: "TICK", delta: 0.21 });
+    window = reduceTraced(reduceTraced(window, { type: "PUSH" }), { type: "CASH" });
+    const threshold = { busted: false, cause: "cash", gauge: Math.round(window.gauge), wall: window.wall, pushes: window.pushes, forced: false };
+    return { nodeId, choiceId: "unit-card", responseTimeSec: Math.max(1, Math.round(window.elapsed)), threshold, [WINDOW_RECORD_KEY]: recordClosedWindow(window) };
+  });
+  return { run_id: runId, case_id: caseId, summary: {}, decision_log: decisionLog, dynamics: { tableRules: RULES_MARK, windowIndex: first + nodeIds.length } };
+}
+
+test("a window's seed is the one the page deals at its place in the run, a re-deal tail aside", () => {
+  assert.equal(readSeed("run-s:3:p1_start", { runId: "run-s", windowIndex: 3, nodeId: "p1_start" }), "base");
+  assert.equal(readSeed("run-s:3:p1_start~2", { runId: "run-s", windowIndex: 3, nodeId: "p1_start" }), "tail");
+  for (const seed of ["run-s:3:p1_start~0", "run-s:3:p1_start~50", "run-s:3:p1_startx", "run-s:4:p1_start", "other:3:p1_start", null]) {
+    assert.equal(readSeed(seed, { runId: "run-s", windowIndex: 3, nodeId: "p1_start" }), "off", String(seed));
+  }
+  const honest = recheckCaseWindows(dealtRow());
+  assert.deepEqual([honest.counts.match, honest.seedTails, honest.findings], [3, 0, []]);
+  const redealt = recheckCaseWindows(dealtRow({ seeds: [null, "run-s:11:p1_start~1", null] }));
+  assert.deepEqual([redealt.counts.match, redealt.seedTails], [3, 1]);
+  // A seed picked for its wall replays to its threshold, and still does not pass.
+  const picked = recheckCaseWindows(dealtRow({ seeds: [null, "run-s:11:p1_start-easy", null] }));
+  assert.deepEqual(picked.findings, [{ index: 1, status: "mismatch", differs: ["seed"], problem: null }]);
+  // The place is read from the case's window count: one off, and every seed is.
+  const shifted = { ...dealtRow(), dynamics: { tableRules: RULES_MARK, windowIndex: 14 } };
+  assert.equal(recheckCaseWindows(shifted).counts.mismatch, 3);
+});
+
+test("a run whose build writes records is marked for a window that has none; an older build's run is told apart", () => {
+  const ranking = (runId) => ({ run_id: runId, case_id: "season-final", summary: {}, dynamics: { tableRules: RULES_MARK } });
+  const strip = (row, places) => ({ ...row, decision_log: row.decision_log.map((entry, place) => (places.includes(place) ? { ...entry, [WINDOW_RECORD_KEY]: undefined } : entry)) });
+  const first = dealtRow({ caseId: "prologue01", first: 0 });
+  const second = dealtRow({ caseId: "prologue02", first: 3 });
+  const marksOf = (rows) => recheckRun(rows).marks.filter((mark) => mark !== "score-off-log");
+  assert.deepEqual(marksOf([first, second, ranking("run-s")]), []);
+  // A record left out of the later case, or out of one window of the first.
+  assert.deepEqual(marksOf([first, strip(second, [2]), ranking("run-s")]), ["window-no-replay"]);
+  assert.deepEqual(marksOf([strip(first, [1]), second, ranking("run-s")]), ["window-no-replay"]);
+  // Begun on an older build: its first case has no record at all, and is not marked.
+  assert.deepEqual(marksOf([strip(first, [0, 1, 2]), second, ranking("run-s")]), []);
+  // No record anywhere: not marked, and not checked either.
+  const old = recheckRun([strip(first, [0, 1, 2]), strip(second, [0, 1, 2]), ranking("run-s")]);
+  assert.equal(old.status, "unrecorded");
+  assert.deepEqual(old.marks.filter((mark) => mark !== "score-off-log"), []);
+  assert.match(formatReport([{ runId: "run-s", score: 1, caseRows: 2, ...old }]).join("\n"), /not replayed/);
+  assert.match(marksSql([{ runId: "run-s", ...old }]), /'run-s', array\[.*\]::text\[\], false\)/);
 });

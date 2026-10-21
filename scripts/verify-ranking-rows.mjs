@@ -125,36 +125,42 @@ export function formatReport(results, { redact = false } = {}) {
       lines.push(`${head}  not checked: played under other table rules than this engine's`);
       continue;
     }
-    lines.push(`${head}  ${result.marks.length ? `marks: ${result.marks.join(", ")}` : "no marks"}`);
+    if (result.status === "unrecorded") lines.push(`${head}  not replayed: no window carries a record (a build before the record); scores read`);
+    lines.push(`${result.status === "unrecorded" ? "  scores:" : head}  ${result.marks.length ? `marks: ${result.marks.join(", ")}` : "no marks"}`);
     if (result.rankingDiffers.length) lines.push(`  ranking row differs from the final case row: ${result.rankingDiffers.join(", ")}`);
     let unrecorded = 0;
+    let seedTails = 0;
     for (const entry of result.cases) {
       unrecorded += entry.windows.counts.unrecorded;
+      seedTails += entry.windows.seedTails ?? 0;
       if (entry.score.status !== "match") lines.push(`  ${entry.caseId}: score ${entry.score.status}${entry.score.differs.length ? ` (${entry.score.differs.join(", ")})` : ""}`);
       for (const finding of entry.windows.findings) {
         lines.push(`  ${entry.caseId} #${finding.index}: window ${finding.status} ${[...finding.differs, finding.problem].filter(Boolean).join(", ")}`);
       }
     }
-    if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record (written by a build before the record)`);
+    if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record`);
+    if (seedTails) lines.push(`  ${seedTails} windows were dealt again (a seed with a ~n tail: a rolled-back save, or a wall shopped for)`);
   }
   return lines;
 }
 
 /**
- * The write that states each checked run's marks (ranking_set_recheck_marks,
- * 20261021020000): one statement, every checked run with the marks it earned,
- * none included, so a run that no longer earns a mark loses it. A run not
- * checked (other table rules) is left as it is. Null when there is nothing to write.
+ * The write that states each run's marks (ranking_set_recheck_marks,
+ * 20261021020000): one statement, every run read with the marks it earned,
+ * none included, so a run that no longer earns a mark loses it, and whether it
+ * was replayed whole (`checked`: its `rechecked_at` is set; `unrecorded`: its
+ * scores were read but it is not "checked", so the time is cleared). A run
+ * under other table rules is left as it is. Null when there is nothing to write.
  */
 export function marksSql(results) {
-  const checked = results.filter((result) => result.status === "checked" && typeof result.runId === "string" && result.runId);
+  const checked = results.filter((result) => (result.status === "checked" || result.status === "unrecorded") && typeof result.runId === "string" && result.runId);
   if (!checked.length) return null;
   const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
-  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.map(quote).join(", ")}]::text[])`).join(",\n       ");
+  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.map(quote).join(", ")}]::text[], ${result.status === "checked"})`).join(",\n       ");
   return [
     "select count(*) filter (where marks is not null) as marked_rows",
-    "  from (select public.ranking_set_recheck_marks(r.run_id, r.marks) as marks",
-    `          from (values ${values}) as r(run_id, marks)) as written;`,
+    "  from (select public.ranking_set_recheck_marks(r.run_id, r.marks, r.replayed) as marks",
+    `          from (values ${values}) as r(run_id, marks, replayed)) as written;`,
   ].join("\n");
 }
 
