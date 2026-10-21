@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { addAudit, AUDIT_RELIEF_HEAT, auditStep, countAudit, describeAuditLedger, findAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
+import { isLinkDue } from "../../src/gauntlet/cascadeRisk.js";
 import { normalizeRunState, openCaseRun, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
 import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
@@ -212,4 +213,86 @@ test("the table record says, in one line under its sentence, how many marks the 
   assert.match(ledger, /describeAuditLedger\(log, summary\?\.weekRule\)/, "the record reads the case summary's week");
   assert.match(ledger, /<p className="pressure-ledger-note">\{audit \? `\$\{note\} \$\{audit\}` : note\}<\/p>/, "inside the sentence's paragraph, not a seventh cell");
   assert.equal((ledger.match(/<article>/g) ?? []).length, 6, "the grid keeps its six cells");
+});
+
+// B2 decision 10 (user, 2026-10-19): a cash on a CASCADE board is not counted.
+// The log's way: a window's board was dealt by the window before it.
+const bothRun = (extra = {}) => normalizeRunState({ weekRule: "audit-cascade", ...extra });
+const onCascade = (run) => normalizeRunState({ ...run, schema: { ...run.schema, mutations: [...run.schema.mutations, "cascade"] } });
+
+/** Plays windows as the runtime does, `cascadeAt` the indexes whose board CASCADE deals; the log keeps each `environmentMode`. */
+function playLinked(run, windows, cascadeAt = []) {
+  let current = openCaseRun(run);
+  const log = [];
+  let verdict = null;
+  windows.forEach((window, index) => {
+    const caseClosed = index === windows.length - 1;
+    const audit = countAudit(log);
+    ({ verdict, nextRun: current } = resolveWindow({ run: current, window, card, caseClosed, audit, cascade: cascadeAt.includes(index + 1) }));
+    log.push({ threshold: { busted: verdict.outcome === "bust", gauge: verdict.gauge, pushes: verdict.pushes }, environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable" });
+    assert.equal(countAudit(log), verdict.audit?.count ?? 0, `the log and the engine agree after window ${index}`);
+  });
+  return { run: current, verdict, log };
+}
+
+test("a cash on a CASCADE board adds nothing to the audit; its relief stays", () => {
+  assert.equal(auditStep({ gauge: AUDIT_HEAT - 10, pushes: 2, cascade: true }), 0);
+  assert.equal(auditStep({ gauge: HEAT_DEBT_GAUGE, pushes: 2, cascade: true }), -AUDIT_RELIEF, "relief is no penalty");
+  assert.equal(auditStep({ gauge: 20, pushes: 2, busted: true, cascade: true }), 0);
+
+  // The engine reads the board on the table.
+  const cold = cash(AUDIT_HEAT - 10);
+  assert.equal(resolveWindow({ run: bothRun(), window: cold, card, audit: 2 }).verdict.audit.count, 3, "a plain board counts it");
+  assert.equal(resolveWindow({ run: onCascade(bothRun()), window: cold, card, audit: 2 }).verdict.audit.count, 2, "a CASCADE board does not");
+  assert.equal(resolveWindow({ run: onCascade(bothRun()), window: cash(HEAT_DEBT_GAUGE + 2, 4), card, audit: 3 }).verdict.audit.count, 3 - AUDIT_RELIEF);
+  const closing = resolveWindow({ run: onCascade(openCaseRun(bothRun())), window: cold, card, caseClosed: true, audit: AUDIT_LIMIT - 1 }).verdict.audit;
+  assert.equal(closing.caught, false, "a CASCADE close one short of the limit is not caught");
+
+  // The 확정 button's preview says 0 there.
+  const win = { gauge: 31, pushes: 1 };
+  const reading = readAudit(onCascade(bothRun()), 2, win);
+  assert.equal(reading.ifCash, 0);
+  assert.equal(reading.afterCash, 2);
+  assert.equal(reading.spoken, `지금 확정해도 감사 2/${AUDIT_LIMIT} 그대로`);
+  assert.equal(readAudit(bothRun(), 2, win).ifCash, 1);
+  assert.match(getWeekRule("audit-cascade").text, /CASCADE 판의 확정은 감사에 세지 않는다\.$/, "the week's line says why");
+});
+
+test("the log counts a window by the board the window before it dealt: the engine, the HUD and the ledger agree", () => {
+  const cold = (gauge) => cash(gauge);
+  // Board 0 is REBOOT's, boards 2 and 3 are CASCADE's: four cold cashes, two counted.
+  const linked = playLinked(bothRun(), [cold(20), cold(25), cold(30), cold(35)], [2, 3]);
+  assert.equal(linked.verdict.audit.count, 2);
+  assert.equal(linked.verdict.audit.caught, false, "without the exemption this close was caught");
+  assert.equal(describeAuditLedger(linked.log, "audit-cascade"), `감사 2/${AUDIT_LIMIT}칸으로 닫혔다.`);
+  const plain = playLinked(bothRun(), [cold(20), cold(25), cold(30), cold(35)]);
+  assert.equal(plain.verdict.audit.count, AUDIT_LIMIT, "a plain board still counts");
+  assert.equal(plain.verdict.audit.caught, true);
+
+  // Board 0 always counts: nothing before it in the log, and REBOOT carries no CASCADE.
+  assert.equal(countAudit([{ threshold: { gauge: 30, pushes: 1 }, environmentMode: "cascade" }]), 1);
+  // A link carried in is due from board 1: the REBOOT board's window deals it.
+  assert.equal(countAudit([
+    { threshold: { gauge: 30, pushes: 1 }, environmentMode: "cascade" },
+    { nodeId: "no window" },
+    { threshold: { gauge: 30, pushes: 1 }, environmentMode: "fracture" },
+    { threshold: { gauge: 30, pushes: 1 }, environmentMode: "stable" },
+  ]), 2, "board 1 is exempt, the entry with no window passes nothing on, board 2 counts");
+  // What dealt the CASCADE board decides, not the window's own entry.
+  assert.equal(countAudit([
+    { threshold: { gauge: 70, pushes: 3 }, environmentMode: "blackout+cascade" },
+    { threshold: { gauge: 30, pushes: 1 }, environmentMode: "cascade" },
+  ]), 0);
+});
+
+test("a week with the audit alone deals no CASCADE, so it counts as it did", () => {
+  const heavy = { id: "h", label: "h", effect: { capital: 9, trust: -12 }, next: "x" };
+  const entry = (index) => ({ nodeId: `n${index}`, choiceId: "h", riskRewardEffect: heavy.effect, threshold: { gauge: 30, pushes: 1 }, environmentMode: "stable" });
+  const log = Array.from({ length: 6 }, (_, index) => entry(index));
+  const dues = (weekRule) => log.map((_, index) => isLinkDue(normalizeRunState({ weekRule }), log.slice(0, index + 1), "run-x"));
+  assert.ok(dues("audit-cascade").includes(true), "with both, a heavy card's link comes due");
+  assert.ok(dues("audit").every((due) => due === false), "with the audit alone, never");
+  const alone = playLinked(auditRun(), [cash(20), cash(25), cash(30), cash(35)]);
+  assert.equal(alone.verdict.audit.count, AUDIT_LIMIT);
+  assert.equal(alone.verdict.audit.caught, true);
 });
