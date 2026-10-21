@@ -28,7 +28,10 @@ const budgets = [
   // 3,200,014 bytes / 935,327 gzip on 2026-09-27, with all fifty-five cases in
   // it; 524,788 / 167,683 on 2026-09-29, when each case became a chunk of its
   // own (scripts/vite-season-data.mjs).
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 551_000, maxGzip: 176_100 },
+  // -> 452,171 / 144,949 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 452,171 / 144,945 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (454,682 / 146,568 on the same commit).
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 452_171, maxGzip: 144_949 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -387,7 +390,10 @@ const budgets = [
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
   // React and the scheduler. 221,715 / 68,975. It moves only with a React bump.
-  { pattern: /^react-vendor-.*\.js$/, maxBytes: 232_800, maxGzip: 72_400 },
+  // -> 220,606 / 68,323 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 220,606 / 68,319 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (221,715 / 68,974 on the same commit).
+  { pattern: /^react-vendor-.*\.js$/, maxBytes: 220_606, maxGzip: 68_323 },
   // The four budgets below were first written against the tree before the
   // 2026-09-28 fix pass and are set here against the tree after it, measured
   // plus 5%: the same day's other changes are what they have to hold.
@@ -398,11 +404,18 @@ const budgets = [
   // icons, no unused import to drop, but 1.x adds a provider context, alias
   // class names and a name/size record per icon to the shared code.
   { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_600, maxGzip: 6_150 },
+  // Vite 8 (#225, 다음에 실측): -> 13,212 / 4,662 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 13,212 / 4,658 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (13,919 / 4,967 on the same commit).
+  // That was measured on the main of 2026-10-21, before what is above; re-measure on this base, then lower: { pattern: /^icons-vendor-.*\.js$/, maxBytes: 13_212, maxGzip: 4_662 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
   // descriptions rather than part of each field's name.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 6_040, maxGzip: 2_490 },
+  // -> 5,502 / 2,359 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 5,502 / 2,355 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (5,748 / 2,370 on the same commit).
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_502, maxGzip: 2_359 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -425,7 +438,10 @@ const budgets = [
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
-  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_090, maxGzip: 2_100 },
+  // -> 4,468 / 1,896 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 4,468 / 1,892 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (4,820 / 1,964 on the same commit).
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 4_468, maxGzip: 1_896 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
   // 35,720 / 13,520 -> 37,870 / 14,200 on 2026-10-09, measured 36,063 /
@@ -448,6 +464,10 @@ const budgets = [
   // 14,757 -> 14,761 gzip on 2026-10-24 (f1-s7 on efba1927): measured 14,757,
   // at the ceiling, plus 4; the chunk's imports name hashed files that change under it.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_578, maxGzip: 14_761 },
+  // Vite 8 (#225, 다음에 실측): -> 35,399 / 13,279 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 35,399 / 13,275 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (37,136 / 14,333 on the same commit).
+  // That was measured on the main of 2026-10-21, before what is above; re-measure on this base, then lower: { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 35_399, maxGzip: 13_279 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -492,7 +512,10 @@ const budgets = [
   // 2026-10-11. It is a file of its own, loaded beside the runtime, because
   // the runtime's chunk had 667 gzip bytes left and this is 2,600 inside it
   // (OWN_CHUNKS in vite.config.js). 7,103 / 3,633, plus 5%.
-  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 7_460, maxGzip: 3_815 },
+  // -> 6,994 / 3,548 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 6,994 / 3,544 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (7,084 / 3,621 on the same commit).
+  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 6_994, maxGzip: 3_548 },
   // The season's copy between and around cases (src/caseCopy.js): the
   // next-case teasers and interludes, chapter rules, rank legacy lines and
   // 에코's opening lines. It was in the runtime's chunk, which had 255 gzip
@@ -501,13 +524,19 @@ const budgets = [
   // vite.config.js), so nothing loads later than it did. Taking it out left the
   // runtime's ceiling where it was, for the changes that were waiting on it.
   // 108,233 / 34,828, plus 5%.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 113_650, maxGzip: 36_570 },
+  // -> 108,190 / 34,757 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 108,190 / 34,753 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (108,206 / 34,759 on the same commit).
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 108_190, maxGzip: 34_757 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
   // (TABLE_AUDIO in vite.config.js), so nothing loads later than it did.
   // Taking it out took PlayScreen to 97,898 / 32,131. 6,676 / 2,166 measured.
-  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_700, maxGzip: 2_205 },
+  // -> 6,512 / 2,129 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 6,512 / 2,125 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (6,700 / 2,198 on the same commit).
+  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_512, maxGzip: 2_129 },
   // The other players' wall rate on the scene page (improvement notes D3):
   // src/state/useSceneBustRates.js and src/sceneTraces.js. Written into the
   // PlayScreen chunk they added about 945 / 441 bytes to it on 2026-10-19,
@@ -635,7 +664,10 @@ const budgets = [
   // adds nothing (B2 decision 10), read off the board on the table by the
   // settlement and the 확정 preview and off the log's `environmentMode` by
   // the count. Measured 2,078 / 1,124, the gzip plus 4.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_078, maxGzip: 1_128 },
+  // -> 1,927 / 1,053 on 2026-10-21, Vite 8 (#225, the user's choice 1):
+  // measured 1,927 / 1,049 in the e2e build, the gzip plus 4. Rolldown and
+  // Oxc write it smaller than Rollup and esbuild did (2,078 / 1,124 on the same commit).
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_927, maxGzip: 1_053 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -671,6 +703,12 @@ const budgets = [
   { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_077 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
+  // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
+  // read through and the namespace objects the app's dynamic imports return.
+  // No codeSplitting group is offered the module, so it is a file of its own
+  // that the page preloads (vite.config.js says more). Measured 726 / 429 on
+  // 2026-10-21, the gzip plus 4 (the user's choice 1).
+  { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
 /**
