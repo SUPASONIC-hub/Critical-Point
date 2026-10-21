@@ -1421,7 +1421,7 @@ own floor in `scripts/coverage-floors.json`, and lists the modules no test
 loads. Every test process writes its own coverage record, so the records are
 merged line by line, function by function and branch by branch; keeping the
 last one made a module's number depend on which process finished last. The
-merged totals are held at 94% of lines, 94% of functions and 87% of branches:
+merged totals are held at 95% of lines, 94% of functions and 89% of branches:
 the branch floor was lowered from 83 to 72 once, only because the union counts
 branches that only some processes report, and has risen since. Every floor is
 a ratchet: `--update` rewrites the file from the measurement and refuses to
