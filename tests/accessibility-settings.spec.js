@@ -210,7 +210,14 @@ test("the reading clock can start held, and waits", async ({ page }) => {
   // The page's own clock, moved by hand and past this page's reading time
   // (52 seconds): two and a half seconds of the wall clock proved a held
   // clock no better than a slow one.
-  await page.clock.runFor(60_000);
+  //
+  // In quarter-second jumps, one frame each, rather than `runFor(60_000)`:
+  // that called every 16 ms frame of the minute, 3,750 of them, each followed
+  // by a turn of the real event loop, and on the dev server on a desktop the
+  // minute took 42 seconds of the test's 60. The page's loop counts at most a
+  // quarter second a frame (SceneBriefing.jsx), so 240 jumps still spend the
+  // whole minute on a clock that runs, and open the table.
+  for (let moved = 0; moved < 60_000; moved += 250) await page.clock.fastForward(250);
   await expect(timer).toHaveText(before ?? "");
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
 });
