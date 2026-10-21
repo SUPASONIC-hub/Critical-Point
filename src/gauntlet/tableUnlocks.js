@@ -17,8 +17,6 @@
  * not listed: no step is without them.
  */
 import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_SHARE } from "./auditRisk.js";
-import { LINK_BURN, LINK_WALL } from "./cascadeRisk.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -181,20 +179,21 @@ const STEPS = [
     // The audit and the links open with FRACTURE (B3 and B2, question 3 (1)
     // of the rule switch, user 2026-10-20): the links read the burn FRACTURE
     // reads, and a cash on a board they deal is not audited, so the two are
-    // told together, one line each (초안), short enough that the five lines
-    // stay on a phone's first screen with the question (table-keys, 390x664).
-    // How many boards on is the reveal's line when a link is made
-    // (`describeLinkMade`, 2~4판), and that a CASCADE board's cash is not
-    // audited is the 확정 button's (`describeAuditIfCash`). Their numbers are auditRisk.js's and cascadeRisk.js's.
+    // told together (초안). One short line and not one each: with a line each,
+    // even cut to a row or two, the panel ran past the docked footer on a
+    // phone's first screen (table-keys at 390x844 and 390x664, 2026-10-21).
+    // Their numbers are told where they act: the signal line's tokens, the
+    // 확정 button's audit preview (`describeAuditIfCash`, which also says a
+    // CASCADE board's cash leaves it as it is) and the reveal's line when a
+    // link is made (`describeLinkMade`).
     // A story run has neither, so it is told only LOCK.
     adds: ["fracture", "overclock", "lock", "audit", "cascade"],
     storyIntro: [2],
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
       "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
-      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 LOCK으로 1.5배까지(콤보로는 1.6배까지) 오릅니다. 누를 때마다 시간이 줄어듭니다.",
-      `열기 ${AUDIT_HEAT} 미만 확정이 쌓여 감사 ${AUDIT_LIMIT}칸이 차면 금고 몫의 ${AUDIT_SHARE}분의 1을 잃습니다.`,
-      `${LINK_BURN} 이상 태운 카드는 몇 판 뒤 벽을 ${LINK_WALL} 당깁니다.`,
+      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
+      "이번 사건부터 감사와 연결이 판에 붙습니다.",
     ],
   },
   {
