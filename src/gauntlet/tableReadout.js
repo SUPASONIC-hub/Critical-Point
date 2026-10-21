@@ -51,21 +51,6 @@ export function describeNextTable(nextMutations = [], busted = false) {
     : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
 }
 
-/**
- * The clues the run held when the case just closed opened, and holds now, as
- * a row of the result's 사건 전 → 후 line. Nothing new is recorded for it: the
- * log is emptied when a case opens (`RUN_FIELDS.log`) and every entry that
- * found a clue carries it (`entry.clue`), so the count before is the count now
- * less the case's own finds. An entry rebuilt from a replay seed holds no clue,
- * so such a case reads as finding none. A log with no entries lists nothing.
- */
-export function describeCaseClues(log = [], clueCount = 0) {
-  if (!log.length) return [];
-  const after = Number(clueCount) || 0;
-  const before = Math.max(0, after - log.filter((entry) => entry?.clue).length);
-  return [{ key: "clues", text: `단서 ${before} → ${after}개`, gain: before === after ? null : true }];
-}
-
 const VERDICT_CAUSE_COPY = Object.freeze({
   cash: "직접 확정했다",
   push: "한 번 더 밀었다",
