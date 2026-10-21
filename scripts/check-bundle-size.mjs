@@ -70,7 +70,13 @@ const budgets = [
   // (WeekRulePanel, below); what stays is the two imports, the weeklyRules
   // import the bundler hoists, and the line that asks whether the page opens
   // a case. Main measured 34,274 that day, after #198, #205 and #209.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_373 },
+  // 34,373 -> 34,591 gzip on 2026-10-21 (B2, #208, draft), measured 34,587
+  // plus 4 on main 732ef05 (main 34,369): the run signal's 연결 n token, the
+  // card's " · 연결" mark, the voice's once-a-board line and the closing
+  // commit's call that hands the links on. The walk, the reading, the words
+  // and the carrying are in cascadeRisk (below); #208 measured the same
+  // +207 on 2026-10-20 with the links switched off. The raw budget does not move.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_591 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -138,7 +144,11 @@ const budgets = [
   // board and the settlement each ask which rules the case plays under, for
   // the prologues' staged unlocks. The list of steps and its copy are kept
   // out of this chunk; they load with the runtime.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_200 },
+  // 14,200 -> 14,230 gzip on 2026-10-21 (B2, #208, draft), measured 14,226
+  // plus 4 (main 14,050): CASCADE on the next board, the reveal's link line,
+  // and the table's two lists of links (linksIn, linksOut) kept, handed to a
+  // replay and back and opened on; their reading is cascadeRisk's.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_230 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -150,7 +160,9 @@ const budgets = [
   // gained one more `import "./weeklyRules-<hash>.js"` (이번 주의 규칙 has a
   // chunk of its own, below). The raw budget does not move.
   // 4,209 -> 4,210 on 2026-10-20: 4,204-4,210 over eight builds, the hashes'.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_210 },
+  // 4,210 -> 4,228 on 2026-10-21 (B2, #208, draft), measured 4,224 plus 4
+  // (main 4,207): one more `import "./cascadeRisk-<hash>.js"`; its code did not change.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_228 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -201,11 +213,12 @@ const budgets = [
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
-  // out of the PlayScreen, engine and runtime chunks on 2026-10-20. With the
-  // switch off (`CASCADE_ON`) the build drops the walk, so 322 / 302 measured
-  // (the gzip plus 4) is CASCADE's words and numbers and the reveal's line;
-  // the rule switch re-measures it.
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 322, maxGzip: 306 },
+  // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
+  // while a constant switched it off and the build dropped the walk; on
+  // 2026-10-21 it is switched by the season's week (`cascade`), so the walk,
+  // the reading and the links a case's close carries over are all here:
+  // 2,790 / 1,669 measured, the gzip plus 4.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -216,8 +229,11 @@ const budgets = [
  * for it (`debugBuild`, src/appConfig.js). It used to ship switched off, and a
  * `VITE_ENABLE_DEBUG_TOOLS=true` left in the build environment would have
  * switched it on for every visitor with every check green.
+ *
+ * The dev switch that forces this week's rule (`?week=`, weeklyCalendar.js)
+ * is held the same way: its entry is the only place `added:"dev"` is written.
  */
-const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP"];
+const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP", 'added:"dev"'];
 
 /**
  * The cold path: every byte a first visit on a phone waits on before the intro
@@ -291,7 +307,9 @@ function checkBudget(file, budget) {
 // 8,828 / 3,183 -> 8,862 / 3,200 on 2026-10-20, measured 8,862 / 3,196 on main
 // after #209 (3,188-3,196 on the day's three mains; main itself 8,754 / 3,146)
 // plus 4: the same three more file names in a longer list.
-const WORKER_BUDGET = { maxBytes: 8_862, maxGzip: 3_200 };
+// 8,862 / 3,200 -> 8,896 / 3,215 on 2026-10-21 (B2, #208, draft), measured
+// 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
+const WORKER_BUDGET = { maxBytes: 8_896, maxGzip: 3_215 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

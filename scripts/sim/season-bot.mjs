@@ -9,7 +9,7 @@
  * stream per `createSeasonBot`, in the order it always drew, and the case
  * players draw from nothing but their seeds (`handUnit`).
  */
-import { CASCADE_ON, getEffectBurn, isLinkDue, LINK_BURN, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
+import { carryLinks, getEffectBurn, isLinkDue, LINK_BURN, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
 import { LINK_VALUE_SETS } from "./cascade-values.mjs";
 import {
   CASE_RESULT_NODES,
@@ -43,6 +43,7 @@ import {
   createWindow,
   equipRelic,
   FOCUS_MAX,
+  getCardChips,
   getHeartbeatBpm,
   getSealedCardId,
   getTableSchema,
@@ -136,24 +137,35 @@ export const POPULATION = ["random", "random", "procedure", "money", "balanced",
 const SCOUT_EDGE = 3;
 
 /**
- * CASCADE_WEEK=1 plays every season and case that is not a story one with
- * B2's links on (cascadeRisk.js, switched by cascade-values.mjs, which must be
- * loaded first with `node --import`), and LINK_VALUES=A|B|C picks the
- * design's value set (B when left out). The switch and the numbers played
- * are checked, not assumed. Left out, no table counts links and every line
- * these players print stays where it was.
+ * CASCADE_WEEK=1 plays every season and case that is not a story one under
+ * B2's test week (the run carries `weekRule: "cascade"`, cascadeRisk.js), and
+ * LINK_VALUES=A|B|C picks the design's value set (B when left out; A and C
+ * need cascade-values.mjs loaded first with `node --import`). The numbers
+ * played are checked, not assumed. Left out, no run carries the week and
+ * every line these players print stays where it was.
  */
 export const CASCADE_WEEK = process.env.CASCADE_WEEK === "1";
 export const LINK_VALUES = (() => {
   const played = { LINK_BURN, LINK_SPAN_MIN, LINK_SPAN_MAX, LINK_WALL };
   const asked = process.env.LINK_VALUES || "B";
-  if (CASCADE_WEEK !== CASCADE_ON || (CASCADE_WEEK && Object.entries(LINK_VALUE_SETS[asked] ?? {}).some(([name, value]) => played[name] !== value))) {
-    throw new Error(`CASCADE_WEEK=1 LINK_VALUES=${asked} needs the switch and the numbers rewritten as cascadeRisk.js loads: node --import ./scripts/sim/cascade-values.mjs ...`);
+  if (CASCADE_WEEK && Object.entries(LINK_VALUE_SETS[asked] ?? {}).some(([name, value]) => played[name] !== value)) {
+    throw new Error(`CASCADE_WEEK=1 LINK_VALUES=${asked} needs the numbers rewritten as cascadeRisk.js loads: node --import ./scripts/sim/cascade-values.mjs ...`);
   }
   return `${asked} (${LINK_BURN}/${LINK_SPAN_MIN}~${LINK_SPAN_MAX}/${LINK_WALL})`;
 })();
+/** The week's stamp a season or a case of the measurements opens with (CASCADE_WEEK). */
+const linkStamp = (story) => (CASCADE_WEEK && !story ? { weekRule: "cascade" } : {});
 /** How much less a hand that reads the card's link mark likes a card that makes one (B2 design 3-3). */
 const LINK_AVOID = 40;
+/**
+ * The hand that reads the chips too (B2 decision 3 (1), `readsChips`): it
+ * keeps clear of a card that makes a link unless that card's chips are more
+ * than this over the best card in the hand that makes none -- the pot it
+ * would give up by keeping clear is worth the board CASCADE costs. About what
+ * one CASCADE board took off the heavy card at heat 50 on 2026-10-20, in
+ * chips before the multiplier (check:pressure).
+ */
+export const CHIP_MARGIN = 10;
 /** A case's links off a log of settled windows, as `useChoiceCommit` logs them. */
 const linkEntry = (nodeId, choice, verdict, effect) => ({
   nodeId,
@@ -163,10 +175,23 @@ const linkEntry = (nodeId, choice, verdict, effect) => ({
   environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
 });
 /** What a season's or a case's links did: made, came back, lapsed, the boards CASCADE dealt and those that bust. */
-export const newLinkTally = () => ({ made: 0, landed: 0, lapsed: 0, boards: 0, busts: 0 });
-function tallyLinks(tally, log, runId) {
-  const walked = walkLinks(log, runId);
-  for (const key of ["made", "landed", "lapsed"]) tally[key] += walked[key];
+export const newLinkTally = () => ({ made: 0, landed: 0, landedIn: 0, carriedOut: 0, capped: 0, lapsed: 0, boards: 0, busts: 0, openingBoards: 0, cases: 0 });
+/**
+ * A closed case's links into the tally, and the table it hands on: carried to
+ * the next case (at most LINK_CARRY_MAX), or lapsed on the season's last case.
+ * `opening` is how many of the case's first two boards after REBOOT carried CASCADE.
+ */
+function closeCaseLinks(tally, run, log, runId, last) {
+  const walked = walkLinks(log, runId, run.linksIn);
+  const { links, capped } = carryLinks(walked);
+  for (const key of ["made", "landed", "landedIn"]) tally[key] += walked[key];
+  tally.capped += capped;
+  tally.cases += 1;
+  if (last) tally.lapsed += links.length;
+  else tally.carriedOut += links.length;
+  const opening = log.slice(0, 2).filter((entry) => String(entry.environmentMode).split("+").includes("cascade")).length;
+  tally.openingBoards = Math.max(tally.openingBoards, opening);
+  return last ? [] : links;
 }
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
@@ -207,14 +232,25 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     };
   }
 
-  function scoreCard(policy, choice, resources) {
+  /**
+   * `hand` is the cards on the table and the board, for a hand that reads the
+   * chips (`readsChips`); no other hand reads it.
+   */
+  function scoreCard(policy, choice, resources, hand = null) {
     const effect = choice.effect ?? {};
     let score;
     if (policy.minRisk) score = -getRiskPressure(applyEffect(resources, effect));
     else score = RESOURCE_KEYS.reduce((sum, key) => sum + (policy.values[key] ?? 0) * worth(key, effect[key] ?? 0), 0);
-    // B2: a hand that reads the card's link mark (" · 연결") and keeps clear of it.
-    if (policy.avoidsLinks && CASCADE_WEEK && getEffectBurn(effect) >= LINK_BURN) score -= LINK_AVOID;
+    // B2: a hand that reads the card's link mark (" · 연결") and keeps clear of
+    // it -- unless it reads the chips as well and this card's are worth the board.
+    if (policy.avoidsLinks && CASCADE_WEEK && getEffectBurn(effect) >= LINK_BURN && !(policy.readsChips && hand && worthItsLink(choice, hand))) score -= LINK_AVOID;
     return score + (random() - 0.5) * policy.noise * 4;
+  }
+
+  /** Whether a card that makes a link has chips more than CHIP_MARGIN over the best one in the hand that makes none. */
+  function worthItsLink(choice, { cards, schema }) {
+    const plain = cards.filter((card) => getEffectBurn(card.effect) < LINK_BURN).map((card) => getCardChips(card, schema));
+    return getCardChips(choice, schema) - Math.max(0, ...plain) > CHIP_MARGIN;
   }
 
   function mergeEffects(...effects) {
@@ -342,7 +378,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           : takeReframe
           ? reframeChoice
           : fixed.reduce((best, candidate) => {
-            const score = scoreCard(policy, candidate, resources);
+            const score = scoreCard(policy, candidate, resources, { cards: fixed, schema: run.schema });
             return !best || score > best.score ? { choice: candidate, score } : best;
           }, null).choice;
 
@@ -414,8 +450,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         }];
         resources = resourcesAfter;
         if (CASCADE_WEEK) linkLog = [...linkLog, linkEntry(nodeId, choice, verdict, gauntletEffect)];
-        if (caseClosed && CASCADE_WEEK) tallyLinks(links, linkLog, linkRun);
-        run = nextRun;
+        // What the closing commit writes (cascadeRisk.js `carryLinksOut`): the links this case hands on.
+        run = caseClosed && CASCADE_WEEK && !run.story ? { ...nextRun, linksOut: closeCaseLinks(links, run, linkLog, linkRun, caseId === "final") } : nextRun;
         if (caseClosed) {
           const summary = {
             ...createCaseSummary(triggers, cognition, log, { resources }),
@@ -450,7 +486,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
   }
 
   function normalizeStart(story = false) {
-    return { ...RUN_INITIAL_STATE, story };
+    return { ...RUN_INITIAL_STATE, story, ...linkStamp(story) };
   }
 
   return { random, pick, reseed, archetypes, makePolicy, scoreCard, playWindow, playSeason, pickByType };
@@ -477,7 +513,7 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, linksMade: 0, linksLanded: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0 });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0 });
 function see(seen, verdict) {
   const count = (map, key) => {
     map[key] = (map[key] ?? 0) + 1;
@@ -532,7 +568,11 @@ export function scoutWindow(win, scout, rules = ALL_RULES) {
  * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
  * windowIndex)` the scene whose types a typed hand picks from.
  */
-export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor, links = true }) {
+export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor, links = true, carry = 0 }) {
+  // B2 decision 6 (2), on a bot made with `carry` (a season's length in
+  // cases): a case hands its links to the next case index of the same
+  // season, and the season's last lets them lapse.
+  let carried = { caseIndex: -1, links: [] };
   /**
    * `pickType` gives the simulated card a type for the window (`LOGIC_HANDS`
    * in report-gauntlet-loop.mjs), which puts the logic streak in play; `logic` is the streak the case
@@ -547,7 +587,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
    * pass, as everywhere here.
    */
   function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, rules = ALL_RULES, story = false) {
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}) }, { rules });
+    const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), ...(links ? linkStamp(false) : {}), linksOut }, { rules });
     const paid = { cashed: 0, bonus: 0, capped: 0 };
     let busts = 0;
     let midCaseBusts = 0;
@@ -558,6 +599,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
     // B2, CASCADE_WEEK only and on a bot made with `links`: the case's links off its own log.
     const linkLog = [];
     const linkRun = `case:${caseIndex}`;
+    const opened = run;
     for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
       played += 1;
       // The run's own board for every run but a story one, whose wall stands far.
@@ -618,10 +660,15 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       run = nextRun;
     }
     if (links && CASCADE_WEEK) {
-      const walked = walkLinks(linkLog, linkRun);
+      const walked = walkLinks(linkLog, linkRun, opened.linksIn);
+      const handed = carryLinks(walked);
+      const last = !carry || (caseIndex + 1) % carry === 0;
       seen.linksMade += walked.made;
       seen.linksLanded += walked.landed;
-      seen.linksLapsed += walked.lapsed;
+      seen.linksLandedIn += walked.landedIn;
+      seen.linksCarried += last ? 0 : handed.links.length;
+      seen.linksLapsed += handed.capped + (last ? handed.links.length : 0);
+      carried = { caseIndex, links: last ? [] : handed.links };
     }
     return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen };
   }

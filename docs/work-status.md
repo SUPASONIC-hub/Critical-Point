@@ -1315,21 +1315,27 @@ Still open, on purpose:
     - Not verified: iOS Safari and an installed copy on a phone. The checks
       run Chromium only; Playwright WebKit skips the offline spec.
 90. The next change to the shape of a save raises `SAVE_SCHEMA_VERSION`
-    (`src/appConfig.js`) from 3 to 4. There have been two steps:
+    (`src/appConfig.js`) from 4 to 5. There have been three steps:
     `migrateSavedState` lifts a save marked 1, or not marked, to 2 by giving
     it `runId`, `discoveredClues`, `pendingTelemetry`, `caseResults`,
-    `playtestFeedback` and `dynamics`, and a save marked 2 to 3 by writing
+    `playtestFeedback` and `dynamics`, a save marked 2 to 3 by writing
     out `scouted` on a put-down window (day 10's SCOUT, #190, 2026-10-20),
-    one step at a time. Between the two, every change was made under the
+    and a save marked 3 to 4 by writing out B2's `linksIn` and `linksOut`
+    on the table (and `linksOut` on a replay's held record), empty, the
+    links a case's close hands the next case (#208, with the rule switch),
+    one step at a time. Between the first two, every change was made under the
     same 2 -- keys added and filled in on load (priority 85), five keys
     dropped (the note under `SAVE_STATE_KEYS`) -- so 2 does not say which
-    build wrote a save. The change that raises it again adds the 3-to-4 step
+    build wrote a save. The change that raises it again adds the 4-to-5 step
     to `migrateSavedState`, which answers null for any pair of versions it
     has no step for, and a fixture written by the build before it
-    (`tests/unit/fixtures/saves/`, `v3-current.json` today, priority 85). A
+    (`tests/unit/fixtures/saves/`, `v4-current.json` today, with
+    `v3-current.json` and `v3-pre-cascade.json` kept as eras, priority 85). A
     build still at 3 does not read a save marked 4 (a build at 2 did not
     read 3): it keeps the text under
-    `critical-point-unreadable-save-v1` and deletes nothing. The same constant
+    `critical-point-unreadable-save-v1` and deletes nothing, so a deploy
+    rolled back past the rule switch leaves a player who played on it at the
+    start screen with the save kept, not resumed. The same constant
     is written into the play-log export and into every case summary's
     `schemaVersion`, which `ranking_public_summary` publishes.
 91. The rank line of the `LOGIC HOLD` panel is read whatever the research

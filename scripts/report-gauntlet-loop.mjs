@@ -806,13 +806,14 @@ for (const [name, relics] of toolSets) {
 }
 
 /**
- * B2's links (CASCADE_WEEK=1 only, B2 design 3-1; the switch and the values
- * are cascade-values.mjs's). Every row above stakes the one simulated card,
+ * B2's links (CASCADE_WEEK=1 only, B2 design 3-1; the runs carry the `cascade`
+ * week, the values are cascade-values.mjs's). Every row above stakes the one simulated card,
  * whose largest cost is 4, so no row above makes a link and none of them may
  * move: that is asserted first. Then a heavy card, the tool hand's `fast`
  * (legitimacy -12, so every cash makes a link), plays the same policies with
  * the links off and on, on the same seeds: what CASCADE costs each hand, how
- * often its boards bust, and how many links the case's close lets lapse. The
+ * often its boards bust, and how many links a case hands the next case of its
+ * season (decision 6 (2)) or lets lapse, at the cap or the season's end. The
  * order the table promises -- blind under the heartbeat under a look under
  * the wall seen -- has to hold with links on, and busting to skip must still
  * not be a shortcut.
@@ -823,7 +824,7 @@ if (CASCADE_WEEK) {
   const heavy = { ...card, id: "sim-heavy", effect: { ...card.effect, legitimacy: -12 } };
   const heavyBots = {
     off: createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card: heavy, sceneFor, links: false }).playCase,
-    on: createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card: heavy, sceneFor, links: true }).playCase,
+    on: createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card: heavy, sceneFor, links: true, carry: SEASON_CASES }).playCase,
   };
   const heavyPolicies = [
     ...[30, 40, 50, 60].map((target) => [`heat ${target}`, (win) => win.gauge < target]),
@@ -845,7 +846,7 @@ if (CASCADE_WEEK) {
   for (const { label, off, on } of heavyRows) {
     const seen = on.seen;
     console.log(
-      `cascade          heavy ${label.padEnd(18)} vault ${String(off.meanVault).padStart(6)} -> ${String(on.meanVault).padStart(6)} (${perCentOf(off.meanVault - on.meanVault, off.meanVault)}% lost)  bust ${(off.bustRate * 100).toFixed(1)}% -> ${(on.bustRate * 100).toFixed(1)}%  CASCADE boards ${seen.cascadeBoards} (bust ${perCentOf(seen.cascadeBusts, seen.cascadeBoards)}%)  links made ${seen.linksMade}, came back ${seen.linksLanded}, lapsed ${seen.linksLapsed} (${perCentOf(seen.linksLapsed, seen.linksMade)}%)`,
+      `cascade          heavy ${label.padEnd(18)} vault ${String(off.meanVault).padStart(6)} -> ${String(on.meanVault).padStart(6)} (${perCentOf(off.meanVault - on.meanVault, off.meanVault)}% lost)  bust ${(off.bustRate * 100).toFixed(1)}% -> ${(on.bustRate * 100).toFixed(1)}%  CASCADE boards ${seen.cascadeBoards} (bust ${perCentOf(seen.cascadeBusts, seen.cascadeBoards)}%)  links made ${seen.linksMade}, came back ${seen.linksLanded} (${seen.linksLandedIn} carried in), carried ${seen.linksCarried}, lapsed ${seen.linksLapsed} (${perCentOf(seen.linksLapsed, seen.linksMade)}%)`,
     );
   }
   const onRow = (label) => heavyRows.find((row) => row.label === label).on;

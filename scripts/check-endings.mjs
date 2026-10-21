@@ -4,7 +4,7 @@ import { getEndingVariant, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { CASCADE_WEEK, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION } from "./sim/season-bot.mjs";
+import { CASCADE_WEEK, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -148,7 +148,7 @@ const dump = [];
 // CASCADE_WEEK=1 only (B2, season-bot.mjs): the population's links, and what its seasons banked and bust.
 const linkTally = { ...newLinkTally(), seasons: 0, vault: 0, windows: 0, seasonBusts: 0 };
 const addLinks = (tally, season) => {
-  for (const key of Object.keys(season.links)) tally[key] += season.links[key];
+  for (const key of Object.keys(season.links)) tally[key] = key === "openingBoards" ? Math.max(tally[key], season.links[key]) : tally[key] + season.links[key];
   if (season.links.boards > 0) tally.seasons += 1;
   tally.vault += season.caseResults.final?.gauntlet?.vault ?? 0;
   tally.windows += season.windows;
@@ -248,33 +248,39 @@ if (reportMode) {
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
 /**
  * B2's links, measured (CASCADE_WEEK=1 only; the design's 3-2 and 3-3). The
- * population's line, then the hand that reads the card's link mark: each
- * archetype plays the same seasons twice on the same seeds, once as itself and
- * once keeping clear of a card that makes a link (season-bot.mjs `avoidsLinks`).
- * If reading the mark does not lose less to CASCADE, B2 is a tax, not a
- * decision (design 6, risk 1). Nothing here is asserted.
+ * population's line, then the hands that read the card's link mark: each
+ * archetype plays the same seasons three times on the same seeds, as itself,
+ * keeping clear of a card that makes a link (season-bot.mjs `avoidsLinks`),
+ * and keeping clear unless the card's chips are worth the board
+ * (`readsChips`, B2 decision 3 (1)). If reading the mark does not lose less
+ * to CASCADE, B2 is a tax, not a decision (design 6, risk 1). The links a case
+ * closes on go to the next case (decision 6 (2)). Nothing here is asserted.
  */
 if (CASCADE_WEEK) {
   const boardBusts = (tally) => `${((tally.busts / Math.max(1, tally.boards)) * 100).toFixed(1)}%`;
-  const describe = (tally, seasons) => `per season made ${(tally.made / seasons).toFixed(2)}, came back ${(tally.landed / seasons).toFixed(2)}, lapsed ${(tally.lapsed / seasons).toFixed(2)} (${((tally.lapsed / Math.max(1, tally.made)) * 100).toFixed(1)}% of made); CASCADE boards ${tally.boards} in ${tally.seasons} of ${seasons} seasons, bust on them ${boardBusts(tally)} (every board ${((tally.seasonBusts / Math.max(1, tally.windows)) * 100).toFixed(1)}%); final vault ${Math.round(tally.vault / seasons)} a season`;
-  console.log(`CASCADE (measured, CASCADE_WEEK=1, values ${LINK_VALUES}): ${describe(linkTally, SEASONS)}`);
+  const describe = (tally, seasons) => `per season made ${(tally.made / seasons).toFixed(2)}, came back ${(tally.landed / seasons).toFixed(2)} (${(tally.landedIn / seasons).toFixed(2)} carried in), carried ${(tally.carriedOut / seasons).toFixed(2)}, lapsed at the season's end ${(tally.lapsed / seasons).toFixed(2)} and at the cap ${(tally.capped / seasons).toFixed(2)} (${(((tally.lapsed + tally.capped) / Math.max(1, tally.made)) * 100).toFixed(1)}% of made); at most ${tally.openingBoards} of a case's first two boards CASCADE; CASCADE boards ${tally.boards} in ${tally.seasons} of ${seasons} seasons, bust on them ${boardBusts(tally)} (every board ${((tally.seasonBusts / Math.max(1, tally.windows)) * 100).toFixed(1)}%); final vault ${Math.round(tally.vault / seasons)} a season`;
+  console.log(`CASCADE (measured, CASCADE_WEEK=1, values ${LINK_VALUES}, chip margin ${CHIP_MARGIN}): ${describe(linkTally, SEASONS)}`);
   const PAIRED = Number(process.env.ENDING_LINK_SEASONS) || 40;
-  const reads = createSeasonBot({ seed: 20261020, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[name, base], [`${name}+reads`, { ...base, avoidsLinks: true }]])) });
+  const reads = createSeasonBot({ seed: 20261020, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[name, base], [`${name}+reads`, { ...base, avoidsLinks: true }], [`${name}+chips`, { ...base, avoidsLinks: true, readsChips: true }]])) });
   for (const archetype of [...new Set(POPULATION)]) {
-    const sides = { plays: { ...newLinkTally(), seasons: 0, vault: 0, windows: 0, seasonBusts: 0 }, reads: { ...newLinkTally(), seasons: 0, vault: 0, windows: 0, seasonBusts: 0 } };
+    const side = () => ({ ...newLinkTally(), seasons: 0, vault: 0, windows: 0, seasonBusts: 0 });
+    const sides = { plays: side(), reads: side(), chips: side() };
     let moved = 0;
+    let movedChips = 0;
     for (let index = 0; index < PAIRED; index += 1) {
       const endings = [];
-      for (const [side, name] of [["plays", archetype], ["reads", `${archetype}+reads`]]) {
+      for (const [side, name] of [["plays", archetype], ["reads", `${archetype}+reads`], ["chips", `${archetype}+chips`]]) {
         reads.reseed((20261020 + Math.imul(index + 1, 2654435761)) >>> 0);
         const season = reads.playSeason(`links:${index}`, name);
         addLinks(sides[side], season);
         endings.push(season.ending.id);
       }
       if (endings[0] !== endings[1]) moved += 1;
+      if (endings[0] !== endings[2]) movedChips += 1;
     }
     console.log(`CASCADE (measured) ${archetype.padEnd(13)} plays: ${describe(sides.plays, PAIRED)}`);
     console.log(`CASCADE (measured) ${archetype.padEnd(13)} reads the mark: ${describe(sides.reads, PAIRED)}; ending differs in ${moved} of ${PAIRED}`);
+    console.log(`CASCADE (measured) ${archetype.padEnd(13)} reads the chips: ${describe(sides.chips, PAIRED)}; ending differs in ${movedChips} of ${PAIRED}`);
   }
 }
 

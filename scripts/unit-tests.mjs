@@ -218,7 +218,7 @@ test("the table never prints the odds of the next push", async () => {
 
 const migrated = migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] });
 test("old saves should migrate to the current schema", () => {
-  assert.equal(migrated.saveSchemaVersion, 3, "old saves should migrate to the current schema");
+  assert.equal(migrated.saveSchemaVersion, 4, "old saves should migrate to the current schema");
 });
 test("save migration should add a telemetry queue", () => {
   assert.deepEqual(migrated.pendingTelemetry, [], "save migration should add a telemetry queue");

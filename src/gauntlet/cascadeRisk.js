@@ -1,4 +1,5 @@
 import { isResourceGain } from "../gameConstants.js";
+import { weekRuleHasDevice } from "./weeklyRules.js";
 
 /**
  * CASCADE (B2, B2-연쇄위험-설계안.md): a heavy card comes back.
@@ -15,31 +16,38 @@ import { isResourceGain } from "../gameConstants.js";
  *   and B7 stay out). The range is shown and narrows as boards pass;
  * - that board is dealt CASCADE: its wall band `LINK_WALL` closer, told
  *   before it opens like every next-board rule (decision 4);
- * - one CASCADE a board; a link due on a BLACKOUT board waits one more, and
- *   the links a case leaves when it closes lapse (decisions 5 and 6).
+ * - one CASCADE a board; a link due on a BLACKOUT board waits one more
+ *   (decision 5);
+ * - the links a case leaves when it closes are carried to the next case's
+ *   first boards with the boards they had left (decision 6, changed by the
+ *   user on 2026-10-20: they used to lapse, 68% of those made). At most
+ *   `LINK_CARRY_MAX` go, the newest; the rest lapse, and so do the season's
+ *   last case's and those a story case opens on.
  *
- * Where it lives (decision 9): nowhere new. The case's decision log holds
- * every window's outcome, the effect its card had and the rules the next
- * board was dealt (`environmentMode`), and it is fresh when a case opens, so
- * `walkLinks(log, runId)` is the state and the save keeps its shape.
+ * Where it lives (decision 9): the case's decision log holds every window's
+ * outcome, the effect its card had and the rules the next board was dealt
+ * (`environmentMode`), and it is fresh when a case opens, so
+ * `walkLinks(log, runId, run.linksIn)` is the state. What crosses a case's
+ * close cannot be read off a log that is gone, so the table carries it:
+ * `linksOut`, written by the closing commit (`carryLinksOut`), and `linksIn`,
+ * what the case opened with (`openCaseRun`). SAVE_SCHEMA_VERSION 4.
  *
- * Off by default. `CASCADE_ON` is the switch the measurements turn (with the
- * values, scripts/sim/cascade-values.mjs); the game ships it false.
- * TODO after #199 (weekly rules): replace `CASCADE_ON` in `isCascadeOn` with
- * `weekRuleHasDevice(run.weekRule, "cascade")`, add the catalogue's
- * `cascade` week (decision 11) and the dev switch `?week=cascade`.
- * At the rule switch (RULES_MARK 3, one PR with B3) the four numbers move to
+ * On in a season whose week's rule is `cascade` (weeklyRules.js,
+ * `weekRuleHasDevice`), which no week of the calendar is; a development
+ * build forces it with `?week=cascade` (weeklyCalendar.js). The measurements
+ * stamp it on their runs (CASCADE_WEEK=1, season-bot.mjs) and play the value
+ * sets through scripts/sim/cascade-values.mjs.
+ * At the rule switch (RULES_MARK 3, one PR with B3) the numbers move to
  * tableRules.js.
  *
  * The file is a chunk of its own (CASCADE_RISK in vite.config.js), as the
  * table's sound is: the engine's chunk and the table's import it, and it
- * imports nothing from either, so neither budget carries it. That is why the
+ * imports nothing from either (only the week's rules, a chunk of their own,
+ * as auditRisk.js does), so neither budget carries it. That is why the
  * draw below is written out and not `seededUnit` (a unit test holds the two
  * equal).
  */
 
-/** The measurements' switch; false in the game until the week's rule carries it. */
-export const CASCADE_ON = false;
 /** A cash whose card burned this much of one resource makes a link (B: FRACTURE_MIN_BURN). */
 export const LINK_BURN = 8;
 /** The boards after the one that made it, of which one is the link's. */
@@ -47,6 +55,8 @@ export const LINK_SPAN_MIN = 2;
 export const LINK_SPAN_MAX = 4;
 /** How much closer CASCADE pulls the board's wall band (B: BLACKOUT_WALL_SHIFT). */
 export const LINK_WALL = 6;
+/** How many links a closed case hands the next one; the oldest beyond it lapse (decision 6 (2)). */
+export const LINK_CARRY_MAX = 3;
 
 /** The next-board rule a link deals. 초안; the briefing and the reveal print it. */
 export const CASCADE_MUTATION = Object.freeze({
@@ -56,9 +66,23 @@ export const CASCADE_MUTATION = Object.freeze({
   text: `몇 판 전 크게 태운 카드의 연결. 이번 판은 벽이 ${LINK_WALL} 가까워진다.`,
 });
 
-/** Whether this table counts links. Never in story mode or a practice case (decision 13). */
+/** Whether this table counts links: a `cascade` week's season, never in story mode or a practice case (decision 13). */
 export function isCascadeOn(run) {
-  return CASCADE_ON && Boolean(run) && run.story !== true && !run.practice;
+  return Boolean(run) && run.story !== true && !run.practice && weekRuleHasDevice(run.weekRule, "cascade");
+}
+
+/**
+ * A saved list of links (`linksIn`, `linksOut`): each `{ from, due }` in the
+ * boards of the case that receives it, `from` at most 0 (made before it
+ * opened), `due` from 1 (never the REBOOT board) to `LINK_SPAN_MAX`; at most
+ * `LINK_CARRY_MAX`, the newest. Anything else is dropped.
+ */
+export function normalizeLinks(value) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((link) => link && Number.isInteger(link.from) && Number.isInteger(link.due) && link.from <= 0 && link.due >= 1 && link.due <= LINK_SPAN_MAX)
+    .map(({ from, due }) => ({ from: Math.max(from, -99), due }))
+    .slice(-LINK_CARRY_MAX);
 }
 
 /** `seededUnit` (gauntletEngine.js), written out so this chunk does not import the engine's. */
@@ -90,17 +114,21 @@ const modesOf = (entry) => String(entry?.environmentMode ?? "").split("+");
 
 /**
  * The case's links off its log. Each entry with a window is one board; board
- * `p` was dealt by entry `p - 1`'s `environmentMode`. Returns the board the
- * table is on now (`board`), the links still out (`pending`, each with the
- * board it was made on and the one it is due), and what came back (`landed`)
- * and lapsed. A link due on a board that did not carry CASCADE -- a BLACKOUT
- * one, or one that already carried another -- waits a board.
+ * `p` was dealt by entry `p - 1`'s `environmentMode`. `linksIn` is what the
+ * case opened with (`run.linksIn`), already in its boards. Returns the board
+ * the table is on now (`board`), the links still out (`pending`, each with the
+ * board it was made on and the one it is due), what came back (`landed`, of
+ * which `landedIn` were carried in) and, once the case has closed, what it
+ * hands on (`carried`, in the next case's boards, before the cap). A link
+ * due on a board that did not carry CASCADE -- a BLACKOUT one, or one that
+ * already carried another -- waits a board.
  */
-export function walkLinks(log = [], runId = "") {
-  let pending = [];
+export function walkLinks(log = [], runId = "", linksIn = []) {
+  let pending = normalizeLinks(linksIn);
   let made = 0;
   let landed = 0;
-  let lapsed = 0;
+  let landedIn = 0;
+  let carried = [];
   let board = 0;
   let dealtBy = [];
   for (const entry of log) {
@@ -114,20 +142,44 @@ export function walkLinks(log = [], runId = "") {
     dealtBy = modesOf(entry);
     board += 1;
     if (dealtBy.includes("reboot")) {
-      lapsed += pending.length;
+      // The closed case's board count is the next case's board 0, its REBOOT
+      // board, which carries no CASCADE: what is due there waits for board 1.
+      carried = pending.map((link) => ({ from: link.from - board, due: Math.max(1, link.due - board) }));
       pending = [];
       continue;
     }
     if (dealtBy.includes("cascade")) {
       const first = pending.reduce((best, link, index) => (link.due <= board && (best < 0 || link.due < pending[best].due) ? index : best), -1);
       if (first >= 0) {
+        if (pending[first].from < 0) landedIn += 1;
         pending = pending.filter((_, index) => index !== first);
         landed += 1;
       }
     }
     pending = pending.map((link) => (link.due <= board ? { ...link, due: board + 1 } : link));
   }
-  return { board, pending, made, landed, lapsed };
+  return { board, pending, made, landed, landedIn, carried };
+}
+
+/**
+ * What a closed case hands the next one: the newest `LINK_CARRY_MAX` of the
+ * walk's `carried`, and how many older ones lapsed under the cap.
+ */
+export function carryLinks({ carried = [] } = {}) {
+  const newest = [...carried].sort((a, b) => a.from - b.from || a.due - b.due).slice(-LINK_CARRY_MAX);
+  return { links: normalizeLinks(newest), capped: carried.length - newest.length };
+}
+
+/**
+ * The closing commit's table (useChoiceCommit; the bots do the same): on a
+ * table that counts links, `linksOut` is what the case hands on, read off the
+ * case's whole log with its closing entry. The season's last case hands
+ * nothing on (`last`). Any other commit, or a table without links, is left as
+ * the engine settled it.
+ */
+export function carryLinksOut(nextRun, { run, log, runId, caseClosed, last = false }) {
+  if (!caseClosed || !isCascadeOn(run)) return nextRun;
+  return { ...nextRun, linksOut: last ? [] : carryLinks(walkLinks(log, runId, run.linksIn)).links };
 }
 
 /**
@@ -135,7 +187,7 @@ export function walkLinks(log = [], runId = "") {
  * link's. False on a table without links. The engine adds what this cannot
  * know before the window settles: not on a BLACKOUT board, not on REBOOT.
  */
-export const isLinkDue = (run, log, runId) => isCascadeOn(run) && isDueNext(walkLinks(log, runId));
+export const isLinkDue = (run, log, runId) => isCascadeOn(run) && isDueNext(walkLinks(log, runId, run.linksIn));
 
 /** Whether a walk's next board is a link's. */
 export const isDueNext = ({ board, pending }) => pending.some((link) => link.due === board + 1);
@@ -147,7 +199,7 @@ export const isDueNext = ({ board, pending }) => pending.some((link) => link.due
  * `LINK_SPAN_MAX` after the board that made it, narrowing as boards pass --
  * not the drawn board, which is never shown.
  */
-export const readLinks = (run, log, runId) => (isCascadeOn(run) ? readWalk(walkLinks(log, runId)) : null);
+export const readLinks = (run, log, runId) => (isCascadeOn(run) ? readWalk(walkLinks(log, runId, run.linksIn)) : null);
 
 /** `readLinks` on any table: a walk's reading. */
 export function readWalk({ board, pending }) {

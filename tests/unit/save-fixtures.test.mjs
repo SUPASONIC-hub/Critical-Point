@@ -39,7 +39,7 @@ function load(save) {
 test("every era of save has a fixture", () => {
   assert.deepEqual(
     fixtures.map((fixture) => fixture.name),
-    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-hand-names.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-scout.json", "v2-pre-unlocks.json", "v3-current.json"],
+    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-hand-names.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-scout.json", "v2-pre-unlocks.json", "v3-current.json", "v3-pre-cascade.json", "v4-current.json"],
   );
 });
 
@@ -67,15 +67,31 @@ for (const fixture of fixtures) {
   });
 }
 
-// v2-current.json was the save this build wrote until SAVE_SCHEMA_VERSION 3 (SCOUT); it is an era now.
+// v2-current.json was the save this build wrote until SAVE_SCHEMA_VERSION 3
+// (SCOUT), and v3-current.json until 4 (B2's links); they are eras now.
 test("the save this build writes is not called repaired", () => {
-  const current = fixtures.find((fixture) => fixture.name === "v3-current.json");
+  const current = fixtures.find((fixture) => fixture.name === "v4-current.json");
   assert.equal(current.save.saveSchemaVersion, SAVE_SCHEMA_VERSION, "the fixture is this build's own");
   const { parsed, state, repaired } = load(current.save);
   assert.deepEqual(parsed, current.save, "nothing to migrate");
   assert.equal(repaired, false);
   assert.equal(state.lastError, undefined, "no recovery notice on an ordinary resume");
   assert.deepEqual(state.dynamics, serializeRunState(current.save.dynamics), "and its table record is unchanged");
+  assert.deepEqual(normalizeRunState(state.dynamics).linksIn, current.save.dynamics.linksIn, "with the link the case opened on");
+});
+
+test("a v3 save reaches v4 carrying no links, a replay's held list too, and keeps the rest", () => {
+  for (const name of ["v3-current.json", "v3-pre-cascade.json"]) {
+    const fixture = fixtures.find((entry) => entry.name === name);
+    const { parsed, repaired } = load(fixture.save);
+    assert.equal(repaired, false, name);
+    assert.deepEqual([parsed.dynamics.linksIn, parsed.dynamics.linksOut], [[], []], name);
+    if (fixture.save.dynamics.practice) assert.deepEqual(parsed.dynamics.practice.linksOut, [], name);
+    const { linksIn: _in, linksOut: _out, practice, ...rest } = parsed.dynamics;
+    const { practice: savedPractice, ...savedRest } = fixture.save.dynamics;
+    assert.deepEqual(rest, savedRest, name);
+    if (savedPractice) assert.deepEqual({ ...practice, linksOut: undefined }, { ...savedPractice, linksOut: undefined }, name);
+  }
 });
 
 /**
@@ -101,9 +117,11 @@ test("a save from the table that graded a press loads without a notice, under th
   }
   // Everything else the record held is as it was saved.
   const { beatCombo: _a, bestCombo: _b, focusPerfects: _c, focusMisses: _d, runGroove, grooveVault: _e, suspended, practice, ...rest } = saved;
-  // `weekRule` came after this save (이번 주의 규칙): it reads as none.
-  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, ...kept } = run;
+  // `weekRule` came after this save (이번 주의 규칙): it reads as none, and so
+  // do B2's links (the 3 -> 4 step).
+  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, ...kept } = run;
   assert.equal(weekRule, null);
+  assert.deepEqual([linksIn, linksOut], [[], []]);
   assert.deepEqual(kept, rest);
   assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [practice.logic, practice.vault, practice.record.grooveBanked]);
   assert.deepEqual(run.logic, saved.logic, "the streak is the save's");

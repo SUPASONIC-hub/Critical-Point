@@ -1,4 +1,5 @@
 import { BOARD_WRITER_ID_KEY, readStoredValue, SESSION_ID_STORAGE_KEY, writeStoredValue } from "./appConfig.js";
+import { DEV_WEEK_RULE } from "./gauntlet/weeklyCalendar.js";
 
 /** @type {Partial<ImportMetaEnv>} */
 const viteEnv = import.meta.env ?? {};
@@ -17,7 +18,9 @@ function publishTelemetryStats() {
   telemetryStatsListeners.forEach((listener) => listener());
 }
 
-export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+// Off in a development session that forced this week's rule (`?week=`,
+// weeklyCalendar.js): its seasons are the maker's tests, not the ranking's.
+export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY) && !DEV_WEEK_RULE;
 
 /**
  * One request under one deadline, body included. The answer comes back with

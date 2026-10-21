@@ -49,13 +49,13 @@ test("a window put down after a look comes back with it, and the band is dealt a
 });
 
 test("a v2 save reaches v3 with its put-down window marked as not looked at", () => {
-  assert.equal(SAVE_SCHEMA_VERSION, 3);
   const v2 = { saveSchemaVersion: 2, dynamics: { suspended: { seed: "s", windowIndex: 1, window: { gauge: 10 } } } };
-  const v3 = migrateSavedState(v2);
+  const v3 = migrateSavedState(v2, 3);
   assert.equal(v3.saveSchemaVersion, 3);
   assert.equal(v3.dynamics.suspended.window.scouted, false);
-  assert.equal(migrateSavedState({ saveSchemaVersion: 1 }).saveSchemaVersion, 3, "a v1 save steps through v2");
-  assert.equal(migrateSavedState({ saveSchemaVersion: 4 }), null, "a save from a newer build is not read");
+  assert.equal(migrateSavedState(v2).dynamics.suspended.window.scouted, false, "and keeps the mark on its way to this build's version");
+  assert.equal(migrateSavedState({ saveSchemaVersion: 1 }, 3).saveSchemaVersion, 3, "a v1 save steps through v2");
+  assert.equal(migrateSavedState({ saveSchemaVersion: SAVE_SCHEMA_VERSION + 1 }), null, "a save from a newer build is not read");
 });
 
 test("the stage reads the band it draws off the meters, and SCOUT's button is ScoutBand's", () => {

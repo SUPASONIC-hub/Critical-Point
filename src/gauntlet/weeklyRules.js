@@ -13,6 +13,11 @@
  * FRACTURE bill, the seal, the clock, the chips. A rule is laid over the board
  * where the story wall is (`getTableSchema`), never written into it.
  *
+ * One exception, by name: a rule may switch on a device the table does not
+ * otherwise have (`rules`), from `WEEK_RULE_DEVICES` and nothing else (B3
+ * decision 8, widened to two by B2 decision 11). There is no general frame;
+ * the engine asks `weekRuleHasDevice` for the one it means.
+ *
  * A leaf module, like tableRules.js: pure functions of a time in milliseconds.
  * What "now" is lives in state/weeklyClock.js, so a test can hold it still.
  *
@@ -30,6 +35,12 @@ export { isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs };
 export const WEEKLY_NOTICE_DAYS = 7;
 /** A rule id is stored on the run and checked by the server: at most this long. */
 export const WEEK_RULE_ID_MAX = 32;
+
+/**
+ * The devices a week may switch on: B2's CASCADE (cascadeRisk.js) and, when
+ * it is built, B3's AUDIT. A device a rule names outside this list is not on.
+ */
+export const WEEK_RULE_DEVICES = Object.freeze(["audit", "cascade"]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
@@ -52,6 +63,17 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     title: "균열이 깊다",
     text: `이번 주는 FRACTURE가 금 간 자원을 ${HEAVY_FRACTURE_RATE}배로 청구한다.`,
     schema: Object.freeze({ fractureRate: HEAVY_FRACTURE_RATE }),
+  }),
+  // B2's test week: a device; no number on the board moves. Its numbers are
+  // cascadeRisk.js's, written out because that chunk imports this one (a
+  // unit test holds the line to them). In no week of the calendar; a
+  // development build plays it with `?week=cascade` (weeklyCalendar.js).
+  "cascade": Object.freeze({
+    label: "CASCADE WEEK",
+    // 초안 문구.
+    title: "연쇄 주간",
+    text: "한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다.",
+    rules: Object.freeze(["cascade"]),
   }),
 });
 
@@ -94,7 +116,7 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, calend
  */
 export function weekRuleOverlay(id, schema) {
   const rule = getWeekRule(id);
-  if (!rule || !schema) return null;
+  if (!rule?.schema || !schema) return null;
   const overlay = {};
   for (const [key, value] of Object.entries(rule.schema)) {
     if (key === "wallShift") {
@@ -105,4 +127,9 @@ export function weekRuleOverlay(id, schema) {
     }
   }
   return overlay;
+}
+
+/** Whether the rule `id` switches on `device`, which has to be one `WEEK_RULE_DEVICES` allows. */
+export function weekRuleHasDevice(id, device) {
+  return WEEK_RULE_DEVICES.includes(device) && Boolean(getWeekRule(id)?.rules?.includes(device));
 }

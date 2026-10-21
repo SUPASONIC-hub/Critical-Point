@@ -23,7 +23,7 @@ import {
 import { getBranchDetourBypass, nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
-import { isLinkDue } from "../gauntlet/cascadeRisk.js";
+import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
@@ -271,7 +271,7 @@ export function useChoiceCommit(context) {
     const blackoutSkip = windowState.status === "bust" && !assistStory ? getBlackoutSkip(plannedNode, branchContext) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
-    const { verdict, nextRun, unlockedRelics } = relicTable.settle({
+    const { verdict, nextRun: settledRun, unlockedRelics } = relicTable.settle({
       run: gauntletRun,
       window: windowState,
       card: choice,
@@ -385,6 +385,8 @@ export function useChoiceCommit(context) {
     const entry = { ...entryBase, observerTag: getObserverTag(entryBase) };
 
     const nextLog = [...log, entry];
+    // B2: what a closing case hands the next one, off its whole log (cascadeRisk.js).
+    const nextRun = carryLinksOut(settledRun, { run: gauntletRun, log: nextLog, runId, caseClosed, last: currentCase === "final" });
     const nextEcho = reframeTarget
       ? `${entry.echo} 다음 장면은 당신이 다시 짠 판을 기준으로 이어집니다.`
       : entry.echo;

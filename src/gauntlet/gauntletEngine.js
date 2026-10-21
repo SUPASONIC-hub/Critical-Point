@@ -37,7 +37,7 @@ import {
   STRIKE_WAKE_CHIPS,
 } from "./tableRules.js";
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
-import { CASCADE_MUTATION, describeLinkMade, LINK_WALL } from "./cascadeRisk.js";
+import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -819,6 +819,11 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // 이번 주의 규칙 the season was started under (gauntlet/weeklyRules.js), or
   // null. Stamped once at the season's start and carried to its end (D3).
   weekRule: null,
+  // B2's links across a case's close (cascadeRisk.js, SAVE_SCHEMA_VERSION 4):
+  // those the case on the table opened with, and those its close hands the
+  // next real case. Empty on a table without links.
+  linksIn: [],
+  linksOut: [],
   schema: BASE_SCHEMA,
 });
 
@@ -880,6 +885,8 @@ function normalizePractice(value) {
     relicOffer: normalizeRelicIds(value.relicOffer, RELIC_OFFER_SIZE),
     stanceMastery: normalizeStanceMastery(value.stanceMastery),
     bestMultiplier: clamp(Number(value.bestMultiplier) || 1, 1, 512),
+    // The links the next real case is owed (B2), held while a closed case is played again.
+    linksOut: normalizeLinks(value.linksOut),
     // A replay opened before the streak existed holds none to hand back.
     ...(value.logic ? { logic: normalizeLogic(value.logic) } : null),
     record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.filter((key) => key in source).map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
@@ -918,6 +925,8 @@ export function normalizeRunState(value) {
   run.veteran = source.veteran === true;
   run.story = source.story === true;
   run.weekRule = normalizeWeekRuleId(source.weekRule);
+  run.linksIn = normalizeLinks(source.linksIn);
+  run.linksOut = normalizeLinks(source.linksOut);
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -1210,11 +1219,16 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
         stanceMastery: current.stanceMastery,
         bestMultiplier: current.bestMultiplier,
         logic: current.logic,
+        linksOut: current.linksOut,
         record: replayOf.pushRecord ?? null,
       }
     : null;
   return normalizeRunState({
     ...current,
+    // B2: a real case opens on the links the last one handed on; a replay on
+    // none (it holds them above), and a story case lets them lapse.
+    linksIn: practice || current.story ? [] : current.linksOut,
+    linksOut: [],
     runPot: 0,
     runHand: 0,
     insuranceSpent: false,
@@ -1598,6 +1612,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     veteran: current.veteran,
     story: current.story,
     weekRule: current.weekRule,
+    // The closing commit writes what the case hands on (cascadeRisk.js `carryLinksOut`).
+    linksIn: current.linksIn,
+    linksOut: current.linksOut,
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
