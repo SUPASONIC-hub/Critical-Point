@@ -13,9 +13,10 @@ const SPEAKER_PORTRAITS = {
   "오진우": "/portrait-oh-jinwoo.webp",
   "에코": "/portrait-echo.webp",
   // Added after them, most lines first (every speaker with eight lines or more
-  // has one since 2026-10-20). A line goes in with its file under public/
-  // (scripts/build-portrait.mjs); docs/portrait-credits.md says where each
-  // picture came from. These are not
+  // has one since 2026-10-20; from 2026-10-21 the speakers of fewer scenes
+  // follow in batches, each in its own block at the end). A line goes in with
+  // its file under public/ (scripts/build-portrait.mjs);
+  // docs/portrait-credits.md says where each picture came from. These are not
   // warmed by the service worker -- only the five above are -- so each is
   // fetched when its speaker first appears; a file that does not arrive is
   // drawn as the silhouette (SpeakerPortrait).
@@ -35,6 +36,29 @@ const SPEAKER_PORTRAITS = {
   "윤서진": "/portrait-yoon-seojin.webp",
   "한지우": "/portrait-han-jiwoo.webp",
   "나은호": "/portrait-na-eunho.webp",
+  // B2 (2026-10-21): speakers of one to three scenes, most scenes first.
+  "고은비": "/portrait-go-eunbi.webp",
+  "주은채": "/portrait-joo-eunchae.webp",
+  "배수경": "/portrait-bae-sugyeong.webp",
+  "오상철": "/portrait-oh-sangcheol.webp",
+  "구태형": "/portrait-koo-taehyeong.webp",
+  "허윤경": "/portrait-heo-yungyeong.webp",
+  "서하윤": "/portrait-seo-hayun.webp",
+  "석문호": "/portrait-seok-munho.webp",
+  "선재윤": "/portrait-seon-jaeyun.webp",
+  "주하온": "/portrait-joo-haon.webp",
+  "은채원": "/portrait-eun-chaewon.webp",
+  "연시우": "/portrait-yeon-siu.webp",
+  "변유진": "/portrait-byeon-yujin.webp",
+  "곽민재": "/portrait-kwak-minjae.webp",
+  "백다온": "/portrait-baek-daon.webp",
+  "진서우": "/portrait-jin-seou.webp",
+  "하도율": "/portrait-ha-doyul.webp",
+  "연지안": "/portrait-yeon-jian.webp",
+  "진태윤": "/portrait-jin-taeyun.webp",
+  "하예솔": "/portrait-ha-yesol.webp",
+  "채도훈": "/portrait-chae-dohun.webp",
+  "남지형": "/portrait-nam-jihyeong.webp",
 };
 
 /** The portrait's path for a speaker, or null for one not painted yet. */

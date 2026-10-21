@@ -1,11 +1,11 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장과 10월 20일에 더한 다섯 장의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장과 10월 20일에 더한 다섯 장, 10월 21일에 더한 스물두 장의 출처입니다.
 처음 다섯 장(한서윤, 반재욱, 도윤하, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 
-## 사진에서 만든 열두 장
+## 사진에서 만든 서른네 장
 
-사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일).
+사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 고은비부터 남지형까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
 
 - Unsplash License: https://unsplash.com/license
@@ -31,8 +31,38 @@
 | 한지우 | `portrait-han-jiwoo.webp` | https://www.pexels.com/photo/close-up-shot-of-a-woman-in-white-long-sleeves-holding-a-white-paper-and-pen-7706975/ | Alena Darmel (https://www.pexels.com/@a-darmel/) | [Pexels License](https://www.pexels.com/license/) |
 | 나은호 | `portrait-na-eunho.webp` | https://www.pexels.com/photo/man-wearing-a-suit-and-tie-18165006/ | Lil K (https://www.pexels.com/@lil-k-706180881/) | [Pexels License](https://www.pexels.com/license/) |
 | 권도현 | `portrait-kwon-dohyeon.webp` | https://www.pexels.com/photo/portrait-of-businessman-17049766/ | Tran Nhu Tuan (https://www.pexels.com/@kooldark/) | [Pexels License](https://www.pexels.com/license/) |
+| 고은비 | `portrait-go-eunbi.webp` | https://www.pexels.com/photo/9730345/ | cottonbro studio (https://www.pexels.com/@cottonbro/) | [Pexels License](https://www.pexels.com/license/) |
+| 주은채 | `portrait-joo-eunchae.webp` | https://www.pexels.com/photo/13557308/ | Ramon Karolan (https://www.pexels.com/@ramonkaphotography/) | [Pexels License](https://www.pexels.com/license/) |
+| 배수경 | `portrait-bae-sugyeong.webp` | https://www.pexels.com/photo/40090548/ | Esma Yıkılmaz İpek (https://www.pexels.com/@esma-yikilmaz-i-pek-558317910/) | [Pexels License](https://www.pexels.com/license/) |
+| 오상철 | `portrait-oh-sangcheol.webp` | https://www.pexels.com/photo/man-in-black-suit-jacket-10031556/ | Hải Anh (https://www.pexels.com/@h-i-anh-127251498/) | [Pexels License](https://www.pexels.com/license/) |
+| 구태형 | `portrait-koo-taehyeong.webp` | https://www.pexels.com/photo/industrial-worker-in-helmet-19544217/ | Hoang NC (https://www.pexels.com/@hoang-nc-483165236/) | [Pexels License](https://www.pexels.com/license/) |
+| 허윤경 | `portrait-heo-yungyeong.webp` | https://www.pexels.com/photo/38660512/ | dongling huang (https://www.pexels.com/@dongling-huang-2147814100/) | [Pexels License](https://www.pexels.com/license/) |
+| 서하윤 | `portrait-seo-hayun.webp` | https://unsplash.com/photos/wiT97vt49Y4 | ki Zhang (https://unsplash.com/@2879686ki) | [Unsplash License](https://unsplash.com/license) |
+| 석문호 | `portrait-seok-munho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-senior-man-outdoors-32975143/ | HONG SON (https://www.pexels.com/@hson/) | [Pexels License](https://www.pexels.com/license/) |
+| 선재윤 | `portrait-seon-jaeyun.webp` | https://unsplash.com/photos/DutoKkqXFBE | Ky Nang (https://unsplash.com/@kynang2710) | [Unsplash License](https://unsplash.com/license) |
+| 주하온 | `portrait-joo-haon.webp` | https://unsplash.com/photos/WC7KIHo13Fc | Juan Encalada (https://unsplash.com/@juanencalada) | [Unsplash License](https://unsplash.com/license) |
+| 은채원 | `portrait-eun-chaewon.webp` | https://www.pexels.com/photo/portrait-of-an-elegantly-dressed-woman-6990687/ | 거열 박 (https://www.pexels.com/@geoyul/) | [Pexels License](https://www.pexels.com/license/) |
+| 연시우 | `portrait-yeon-siu.webp` | https://www.pexels.com/photo/man-in-beige-long-sleeves-looking-away-7681953/ | Mikhail Nilov (https://www.pexels.com/@mikhail-nilov/) | [Pexels License](https://www.pexels.com/license/) |
+| 변유진 | `portrait-byeon-yujin.webp` | https://www.pexels.com/photo/8761675/ | Pavel Danilyuk (https://www.pexels.com/@pavel-danilyuk/) | [Pexels License](https://www.pexels.com/license/) |
+| 곽민재 | `portrait-kwak-minjae.webp` | https://www.pexels.com/photo/smiling-man-in-springtime-seoul-temple-setting-31752178/ | Theodore Nguyen (https://www.pexels.com/@thejourneyofframes/) | [Pexels License](https://www.pexels.com/license/) |
+| 백다온 | `portrait-baek-daon.webp` | https://unsplash.com/photos/OFSQ6bHjFjs | Hà Nguyễn (https://unsplash.com/@lavinhha) | [Unsplash License](https://unsplash.com/license) |
+| 진서우 | `portrait-jin-seou.webp` | https://www.pexels.com/photo/a-woman-sitting-at-the-table-7845073/ | RDNE Stock project (https://www.pexels.com/@rdne/) | [Pexels License](https://www.pexels.com/license/) |
+| 하도율 | `portrait-ha-doyul.webp` | https://www.pexels.com/photo/a-man-in-black-suit-jacket-8584505/ | Joon Tae Kim (https://www.pexels.com/@joon-tae-kim-72545476/) | [Pexels License](https://www.pexels.com/license/) |
+| 연지안 | `portrait-yeon-jian.webp` | https://www.pexels.com/photo/a-nurse-in-a-white-apron-15641096/ | Tran Nhu Tuan (https://www.pexels.com/@kooldark/) | [Pexels License](https://www.pexels.com/license/) |
+| 진태윤 | `portrait-jin-taeyun.webp` | https://www.pexels.com/photo/man-leaning-on-wall-450214/ | Royal Anwar (https://www.pexels.com/@royalanwar/) | [Pexels License](https://www.pexels.com/license/) |
+| 하예솔 | `portrait-ha-yesol.webp` | https://www.pexels.com/photo/a-smiling-woman-wearing-an-apron-6223005/ | Antonius Ferret (https://www.pexels.com/@antonius-ferret/) | [Pexels License](https://www.pexels.com/license/) |
+| 채도훈 | `portrait-chae-dohun.webp` | https://unsplash.com/photos/older-man-in-pink-plaid-shirt-5FPdgshYQ60 | tommao wang (https://unsplash.com/@tommaomaoer) | [Unsplash License](https://unsplash.com/license) |
+| 남지형 | `portrait-nam-jihyeong.webp` | https://www.pexels.com/photo/asian-man-wearing-shirt-and-vest-5757086/ | 卓 周 | [Pexels License](https://www.pexels.com/license/) |
 
 같은 사진가의 사진이 두 장씩 있지만(Vitaly Gariev, cottonbro studio) 모델은 서로 다른 사람입니다.
+
+고은비부터 남지형까지 스물두 장은 2026년 10월 21일에 내려받아 같은 보정을 했습니다. 손, 손에 든 카드, 명찰 글자는 자르는 범위 밖에 두었습니다.
+라이선스는 내려받을 때 사진 페이지에 적힌 대로입니다. Pexels 사진은 License 칸이 "Free"이고 라이선스 페이지의 문구는 "All photos and videos on Pexels are free to use.",
+Unsplash 사진은 "Free to use under the Unsplash License"입니다. 스물두 명 모두 악역이 아니라서 실제 사람의 사진을 썼습니다
+(Pexels 라이선스의 "Identifiable people may not appear in a bad light or in a way that is offensive."에 걸리지 않는 역).
+cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 장까지), 같은 사진가의 사진이 여러 장이어도 모델은 모두 다른 사람입니다.
+Joon Tae Kim의 하도율 사진은 처음 백다온 몫으로 고른 같은 사진가의 사진과 얼굴이 같아 보여, 백다온은 Hà Nguyễn의 사진으로 바꿨습니다.
+선재윤과 하예솔은 처음 고른 사진과 같은 촬영의 다른 컷(손이 얼굴에 닿지 않은 것, 얼굴이 보이는 것)을 썼습니다.
 
 ## 실존하지 않는 사람의 생성 사진 세 장
 
@@ -53,4 +83,4 @@
 
 ## 초상이 없는 인물
 
-대사가 일곱 장면 이하인 인물(탁예린, 선우진 등)은 실루엣으로 그려집니다(`src/components/SpeakerPortrait.jsx`).
+초상이 아직 없는 인물은 실루엣으로 그려집니다(`src/components/SpeakerPortrait.jsx`).
