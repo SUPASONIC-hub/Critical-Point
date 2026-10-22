@@ -71,8 +71,8 @@ export function pickEdgeNotice(pushes, n = 0, caseId) {
 const STILL = "(prefers-reduced-motion: reduce)";
 let shown = 0;
 
-/** `voice` is the table voice's facts (TableNotices): its presses, its case, and whether the table is running. */
-export function EdgeNotice({ voice }) {
+/** `voice` is the table voice's facts (TableNotices): its presses, and whether the table is running; `caseId` picks the act. */
+export function EdgeNotice({ voice, caseId }) {
   const pushes = voice.win.pushes;
   const live = voice.speaking;
   const { edgeNotices } = useAccessibility();
@@ -84,7 +84,7 @@ export function EdgeNotice({ voice }) {
   // and a new window (no presses yet) takes the last one's down.
   if (seen !== pushes) {
     setSeen(pushes);
-    const next = pickEdgeNotice(pushes, shown, voice.caseId);
+    const next = pickEdgeNotice(pushes, shown, caseId);
     if (next || pushes === 0) setNotice(next);
   }
 
