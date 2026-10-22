@@ -309,3 +309,12 @@ test("a phone draws the room behind the briefing's title, and its panel is the r
   assert.match(briefing, /\.gx-caption-place span \{[^}]*font-size: 0\.75rem;/);
   assert.match(briefing, /\.gx-panel \{[^}]*border: 3px solid/);
 });
+
+test("the intro's board button glints twice and then rests (D-15)", () => {
+  const intro = sheet("base-intro-ranking");
+  const pill = intro.match(/\.intro \.top-actions \.intro-board-button \{[^}]*\}/)?.[0] ?? "";
+  const sweep = intro.match(/\.intro \.top-actions \.intro-board-button::after \{[^}]*\}/)?.[0] ?? "";
+  assert.match(pill, /animation: board-glow [^;]* 2;/);
+  assert.match(sweep, /animation: board-shine [^;]* 2;/);
+  assert.doesNotMatch(pill + sweep, /infinite/);
+});
