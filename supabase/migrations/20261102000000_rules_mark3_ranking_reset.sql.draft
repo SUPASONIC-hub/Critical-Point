@@ -41,6 +41,12 @@
 --    definition (20261021000000's) is left as it is, and the save's version 4
 --    and the links it carries never reach the server.
 --
+-- 4. The season's score changes with this table's ranking, in a file of its
+--    own: 20261102020000_season_score_case_mean (a draft too, the user's
+--    answer of 2026-10-22, Q7 (1)) makes the published score the mean of the
+--    run's case scores. It is renamed with this one and sorts after it, so
+--    the emptied ranking takes its first row on the mean.
+--
 -- The part first, so the ranking is never empty and unguarded. `create or
 -- replace` keeps the part's grants, and they are restated anyway; every
 -- attribute is set again, since `create or replace` drops one left out.

@@ -1,0 +1,127 @@
+-- DRAFT (2026-10-22), kept as `.sql.draft` so nothing applies it, beside
+-- RULES_MARK 3's ranking reset (20261102000000, also a draft) in the same
+-- pull request. On the merge day both are renamed to `.sql` and re-dated to
+-- follow the last migration on main, this one after the reset, so the
+-- emptied ranking takes its first row under this definition. Applied without
+-- the reset it would rank new seasons on one score beside rows ranked on
+-- another; applied before the client that writes the mean deploys, it is
+-- still right: the server makes the score from the case rows, whatever the
+-- client sent (below).
+--
+-- The season's score is the mean of its cases' scores (the user, 2026-10-22,
+-- Q7 (1)). It was the finale's own `burstScore`: every case starts its log
+-- anew (`openCase: FRESH`, runState.js), so the finale's score is made from
+-- that case's eight or so decisions, and a bot season of 314 windows was
+-- ranked on 8 of them.
+--
+-- Why the server makes it. `ranking_run_summary` has never read the ranking
+-- request's score: what is published is the server's copy of the run's
+-- `final` case row (20261014000000, "read from the run's own last case, not
+-- from the request"; check:grants sends a forged 100 and expects the final
+-- row's 88). So a client that sends the mean changes nothing on the public
+-- board unless this part reads it off the run's rows too. And it can: the
+-- ranking takes a run only when every case of the season has a row
+-- (`ranking_check_run`), one row a run and case (`telemetry_case_is_replay`
+-- drops a case played again, so the row is the case's first close).
+--
+-- What changes, in `ranking_run_summary` only (one of the nine parts of
+-- 20261014000000; every other line is the one 20261021000000 wrote, word for
+-- word, the week included):
+--
+--   1. The final case row is read and checked as before: a score that is not
+--      a number from 0 to 100 is 'invalid season ranking score', a letter not
+--      in S/A/B/C 'invalid season ranking rank', in that order. Those
+--      refusals are the ones they were.
+--   2. Every case row of the season's cases is then held to the same score
+--      check, through `ranking_public_summary` as the final one is; one that
+--      fails it is 'invalid season ranking score' too.
+--   3. `burstScore` and `momentumScore` become the mean of those rows'
+--      `burstScore`, rounded to a whole number (`round(numeric)`: half away
+--      from zero, which for these numbers, never negative, is the client's
+--      `Math.round`), and `rank` and `momentumTier` the letter and tier that
+--      number earns (`ranking_rank_for`, `ranking_tier_for`, 20261020000000,
+--      which check:grants holds to gameLogic.js). The `score` column reads
+--      `burstScore`, so the board sorts on the mean.
+--   4. Every other key -- the finale's parts, its reframes and response time,
+--      the season's logic numbers, the ending -- is the final row's, as before.
+--
+-- The client's copy is `getSeasonScore` (gameLogic.js): the same mean of the
+-- same cases, with a replayed case counted at its first close
+-- (`firstBurstScore`), as this counts the row the server kept. The local
+-- ranking's season row and the request's summary carry it.
+--
+-- What it does to the suspicion marks (20261020000000): `rank-off-score`,
+-- `tier-off-score`, `score-twins-differ` and `score-not-whole` read the
+-- published summary, which this now writes consistently, so a ranking row no
+-- longer earns them; `part-out-of-range`, `time-over-gap` and
+-- `wall-out-of-range` read what they read before. check:grants expects that
+-- once this is a `.sql`.
+--
+-- `create or replace` keeps the part's grants; they are restated anyway, as
+-- 20261021000000 restated them, and every attribute is set again.
+
+create or replace function public.ranking_run_summary(p_run_id text, p_session_id text)
+returns jsonb
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  v_final_summary jsonb;
+  v_score_text text;
+  v_week text;
+  v_cases integer;
+  v_scored integer;
+  v_mean numeric;
+begin
+  select s.summary into v_final_summary
+    from public.playtest_sessions s
+   where s.run_id = p_run_id and s.case_id = 'final' and s.session_id = p_session_id
+   limit 1;
+  v_final_summary := public.ranking_public_summary(v_final_summary);
+  v_score_text := v_final_summary->>'burstScore';
+  if v_score_text is null or v_score_text !~ '^[0-9]{1,3}([.][0-9]{1,6})?$' or v_score_text::numeric > 100 then
+    raise exception 'invalid season ranking score';
+  end if;
+  if coalesce(v_final_summary->>'rank', '') not in ('S', 'A', 'B', 'C') then
+    raise exception 'invalid season ranking rank';
+  end if;
+  -- The season's score: the mean of its case rows' scores. Each score is
+  -- tested before it is cast, inside one CASE, since SQL does not promise
+  -- the order of an `and`.
+  select count(*)::integer,
+         count(c.score)::integer,
+         round(avg(c.score))
+    into v_cases, v_scored, v_mean
+    from (
+      select case
+               when t.score_text ~ '^[0-9]{1,3}([.][0-9]{1,6})?$' then
+                 case when t.score_text::numeric <= 100 then t.score_text::numeric end
+             end as score
+        from (
+          select public.ranking_public_summary(s.summary)->>'burstScore' as score_text
+            from public.playtest_sessions s
+           where s.run_id = p_run_id
+             and s.case_id = any(public.season_case_ids())
+        ) t
+    ) c;
+  if v_cases < cardinality(public.season_case_ids()) or v_scored < v_cases or v_mean is null then
+    raise exception 'invalid season ranking score';
+  end if;
+  v_final_summary := v_final_summary || jsonb_build_object(
+    'burstScore', v_mean,
+    'momentumScore', v_mean,
+    'rank', public.ranking_rank_for(v_mean),
+    'momentumTier', public.ranking_tier_for(v_mean)
+  );
+  v_week := public.ranking_run_week(p_run_id);
+  if v_week is not null then
+    v_final_summary := v_final_summary || jsonb_build_object('week', v_week);
+  end if;
+  return v_final_summary;
+end;
+$$;
+
+-- The grants as 20261014000000:358,367 wrote them.
+revoke all on function public.ranking_run_summary(text, text) from public, anon, authenticated;
+grant execute on function public.ranking_run_summary(text, text) to service_role;

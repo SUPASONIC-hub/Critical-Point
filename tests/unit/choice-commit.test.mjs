@@ -18,7 +18,7 @@ const { createElement } = await import("react");
 const { renderToStaticMarkup } = await import("react-dom/server");
 const { CASE_RESULT_NODES, CASE_SEQUENCE, seasonCasesBase } = await import("../../src/gameCases.js");
 const { nodes, reframeRouteNodes } = await import("../../src/gameData.js");
-const { getRiskPressure, REFRAME_EFFECT } = await import("../../src/gameLogic.js");
+const { getRiskPressure, getSeasonScore, REFRAME_EFFECT } = await import("../../src/gameLogic.js");
 const { BASE_SCHEMA, BUST_EFFECT, createWindow, reduceWindow } = await import("../../src/gauntlet/gauntletEngine.js");
 const { addToRelicCodex, settleAgainstCodex } = await import("../../src/gauntlet/useRelicTable.js");
 const { ERROR_LOG_STORAGE_KEY, parseErrorLog, SETTLED_WINDOWS_STORAGE_KEY } = await import("../../src/appConfig.js");
@@ -404,6 +404,51 @@ test("the finale closes the season: NEW GAME+ is told, and a ranking row waits b
   assert.deepEqual(did.queued.map((item) => item.id), [`case-${did.queued[0].payload.event_id}`, "season-final-run-unit"]);
   assert.equal(did.queued[1].label, "SEASON 01 COMPLETE");
   assert.deepEqual(validateTelemetryItem(did.queued[1]), []);
+});
+
+test("the season row is ranked on the mean of its cases' scores, and the finale's own row keeps the finale's (사용자 10-22 Q7 (1))", () => {
+  const finaleId = Object.keys(nodes).find((id) => nodes[id].caseId === "final" && nodes[id].choices?.some((choice) => choice.next === CASE_RESULT_NODES.final));
+  const earlier = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
+  // A season far from its finale: the first half closed on 95, the rest on 30,
+  // and one case played again after closing on 95, whose replay scored 10.
+  const scoreOf = (index) => (index < earlier.length / 2 ? 95 : 30);
+  const caseResults = Object.fromEntries(earlier.map((caseId, index) => [caseId, { burstScore: scoreOf(index), rank: "B", gauntlet: { logicStreak: 0, tableRules: 3 } }]));
+  caseResults[earlier[0]] = { ...caseResults[earlier[0]], burstScore: 10, firstBurstScore: 95 };
+  const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
+  mount(context).choose(context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final), closedWindow("cash"));
+
+  const finale = did.patches[0].caseResults.final;
+  const firstScores = earlier.map((_, index) => scoreOf(index));
+  const mean = Math.round([...firstScores, finale.burstScore].reduce((total, score) => total + score, 0) / CASE_SEQUENCE.length);
+  assert.notEqual(mean, finale.burstScore, "the fixture's finale is not already the season's mean");
+
+  const [caseRow, seasonRow] = did.rankingRows;
+  assert.equal(caseRow.summary.burstScore, finale.burstScore, "the finale's case row keeps its own score");
+  assert.equal(seasonRow.case_id, "season-final");
+  assert.equal(seasonRow.summary.burstScore, mean, "the replay counts the score it first closed on");
+  assert.equal(seasonRow.summary.momentumScore, mean);
+  assert.deepEqual(
+    { rank: seasonRow.summary.rank, tier: seasonRow.summary.momentumTier },
+    { rank: mean >= 88 ? "S" : mean >= 72 ? "A" : mean >= 52 ? "B" : "C", tier: mean >= 78 ? "BURST" : mean >= 58 ? "FLOW" : mean >= 36 ? "READY" : "BUILDING" },
+  );
+  const sent = did.queued.find((item) => item.id === "season-final-run-unit");
+  assert.equal(sent.payload.summary.burstScore, mean, "and so is the ranking row that goes to the server");
+  assert.equal(did.queued[0].payload.summary.burstScore, finale.burstScore, "while the finale's case row goes with its own");
+});
+
+test("the season score: a mean rounded half up, first closes, the season's cases only", () => {
+  assert.deepEqual(getSeasonScore({}), {});
+  assert.deepEqual(getSeasonScore({ [CASE_SEQUENCE[0]]: { burstScore: 60 }, [CASE_SEQUENCE[1]]: { burstScore: 61 } }), { momentumScore: 61, burstScore: 61, momentumTier: "FLOW", rank: "B" });
+  assert.equal(getSeasonScore({ [CASE_SEQUENCE[0]]: { burstScore: 90, firstBurstScore: 50 }, [CASE_SEQUENCE[1]]: { burstScore: 70 } }).burstScore, 60);
+  assert.equal(getSeasonScore({ [CASE_SEQUENCE[0]]: { burstScore: 88 }, "season-final": { burstScore: 0 }, other: { burstScore: 0 }, [CASE_SEQUENCE[1]]: { rank: "C" } }).burstScore, 88);
+});
+
+test("a case played again keeps the score of its first close beside the replay's own", () => {
+  const { context, did } = sceneContext("p1_aftershock", { completedCases: ["prologue01"], caseResults: { prologue01: { burstScore: 73, rank: "A" } } });
+  mount(context).choose(context.node.choices[1], closedWindow("cash", "replay-score"));
+  const replayed = did.patches[0].caseResults.prologue01;
+  assert.equal(replayed.firstBurstScore, 73);
+  assert.equal(Number.isFinite(replayed.burstScore), true);
 });
 
 test("a finale closed without consent sends no ranking row either: the run cannot rank", () => {

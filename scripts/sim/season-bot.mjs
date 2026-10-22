@@ -33,6 +33,7 @@ import {
   getGameplayStats,
   getRiskPressure,
   getSeasonLogic,
+  getSeasonScore,
   getSeasonStrain,
   makeEmptyScores,
   REFRAME_COGNITION,
@@ -511,9 +512,11 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         nodeId = nextNode;
       }
     }
+    // `score`: what the ranking would publish for the season, the mean of its
+    // cases' burst scores (getSeasonScore), where it used to take the finale's.
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), relics: run.relics, audits, links };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, audits, links };
   }
 
   /**
