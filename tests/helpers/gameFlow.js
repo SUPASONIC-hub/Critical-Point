@@ -144,23 +144,57 @@ export async function cashStakedCard(page) {
   // disabled button, which waited out the whole test and failed as "Test
   // timeout exceeded" with no word about the table.
   await expect(cash, "the cash button never enabled: no card is staked, or the seal did not open in eight pushes").toBeEnabled({ timeout: 5_000 });
-  await clickElement(cash, "cash the staked card");
+  // The scene that closes the case holds its 확정 (data-hold is there); the
+  // rest cash on a click. Which one is fixed by the scene, so it is read
+  // before the press rather than guessed from what the press did.
+  if ((await cash.getAttribute("data-hold")) === null) {
+    await clickElement(cash, "cash the staked card");
+    return;
+  }
   await confirmHeldCash(page, "cash the staked card");
 }
 
 /**
  * The case's last choice is confirmed by a hold or a second press
- * (src/gauntlet/holdConfirm.js): a click there only arms 확정, and the button
- * says so with `data-hold="armed"`. The second press is the fallback a player
- * who cannot hold uses, so taking it here walks the same path they do. Read
- * off the page rather than the locator: on every other scene the reveal has
- * already covered the table, and there is no attribute to wait for.
+ * (src/gauntlet/holdConfirm.js). This takes the hold: the pointer goes down on
+ * 확정 and stays down until the scene has moved on, and only then comes up.
+ *
+ * It used to take the second press -- a click to arm, a click to confirm --
+ * and that raced the renderer. Under load the gap between the two clicks
+ * outran SECOND_PRESS_MS (3s), so the second one armed again; or the first
+ * click's own press and release were more than HOLD_MS (800ms) apart, so it
+ * confirmed as a hold and the helper failed with "the first press did not arm
+ * 확정" (season-flow's case31-case37, 2026-10-22). A hold has no window to
+ * miss: held longer than 800ms it still confirms, and nothing in between
+ * waits on actionability. The second press keeps its own unit tests
+ * (holdConfirm.test.mjs) and the player's path is the same machine.
+ *
+ * Done means the button is gone or what follows it is up -- the reveal, the
+ * result page, the ending -- not a phase read off the button: confirmed and
+ * never pressed both read `idle`.
  */
-export async function confirmHeldCash(page, label = "confirm the held 확정") {
-  const readHold = () => page.evaluate(() => document.querySelector("[data-testid='commit-confirm']")?.dataset.hold ?? null);
-  if ((await readHold()) === null) return;
-  await expect.poll(readHold, { message: `${label}: the first press did not arm 확정`, timeout: 2_000 }).toBe("armed");
-  await clickElement(page.getByTestId("commit-confirm"), `${label} (second press)`);
+export async function confirmHeldCash(page, label = "hold 확정") {
+  const cash = page.getByTestId("commit-confirm");
+  if ((await cash.count()) === 0 || (await cash.getAttribute("data-hold")) === null) return;
+  try {
+    await cash.hover({ timeout: ACTION_TIMEOUT_MS });
+  } catch (error) {
+    throw new Error(`${label} hover failed: ${String(error).split("\n")[0]}`, { cause: error });
+  }
+  await page.mouse.down();
+  try {
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () => !document.querySelector("[data-testid='commit-confirm']") || Boolean(document.querySelector(".decision-reveal, .result-page, .ending-reveal")),
+          ),
+        { message: `${label}: holding 확정 did not confirm`, timeout: TRANSITION_TIMEOUT_MS },
+      )
+      .toBe(true);
+  } finally {
+    await page.mouse.up();
+  }
 }
 
 /**
