@@ -921,14 +921,6 @@
    and 60, placed inline). Borders, a light one beside a dark one: the pair
    shows on the dark track and on the lit fill alike, and a border is still
    drawn in forced colours where a background is not. */
-/* C-9: the audit's 40 and the band a cash moves it neither way in, to 60. */
-.gx-gauge-audit {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: rgb(156 203 180 / 0.14);
-  border-left: 2px solid var(--c-green-70);
-}
-
 .gx-gauge-mark {
   position: absolute;
   inset: 0 auto 55% 0;

@@ -53,6 +53,8 @@ import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
+// C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
+const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
 // Drafts (개선 포인트 A3). A cold table leaves the tab as index.html has it.
 const TAB_TITLES = {
   hot: () => "▲ 밀면 벽 사정권",
@@ -397,8 +399,7 @@ export function GauntletStage({
     setImpact({ amount: 0.28 });
   }
 
-  // 안전선까지 (C-5): the pushes no wall can stop, pressed at once as the same PUSH events (tableMeters.js).
-  function pushToSafe() {
+  function pushToSafe() { // 안전선까지 (C-5): the pushes no wall can stop, at once, as the same PUSH events (tableAfterword.js readSafeLine).
     if (locked || draftOpen || !canPush || !safe.pushes) return;
     for (let n = 0; n < safe.pushes; n += 1) dispatch({ type: "PUSH" });
     if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, safe.gauge)) pulseRelic("lockpick");
@@ -585,8 +586,7 @@ export function GauntletStage({
             {logic && GAUGE_MARKS.map((at) => (
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
-            {/* C-9: the audit's 40 and the band up to HEAT DEBT's 60, on a table that counts it. */}
-            {auditBand && <span className="gx-gauge-audit" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%` }} />}
+            {auditBand && <span className="gx-gauge-band" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%`, ...AUDIT_BAND_LOOK }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
