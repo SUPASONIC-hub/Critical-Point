@@ -132,7 +132,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = setters;
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const relicTable = useRelicTable();
-  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry, seasonRecord, seasonComparison } = useNewGamePlus(saved, runId);
+  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry, seasonRecord, seasonComparison, secondSeason } = useNewGamePlus(
+    saved, runId, gauntletRun?.veteran === true,
+  );
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus(currentCase);
   const [saveStatus, setSaveStatus] = useState("");
@@ -285,6 +287,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     gauntletRun,
     runId,
     echo: run.echo,
+    secondSeason,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
   });
@@ -790,6 +793,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
     riskTier,
     runId,
+    secondSeason,
     tabScreen: !started ? "intro" : isResult ? "result" : "play",
     triggers,
   });

@@ -77,7 +77,11 @@ const budgets = [
   // d486f4e (#216, above): measured 170,436 / 61,612 in the e2e build, the
   // gzip plus 4. The raw 27 over #220 alone is the windowTrail preload entry
   // #216's raw budget had room for.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_436, maxGzip: 61_616 },
+  // -> 170,445 / 61,624 (second-season, draft, rebased on that NEW GAME+):
+  // the runtime now reads the season number (appConfig.getSeasonRound) for the
+  // second season's lines and card, and the entry exports it under one more
+  // name; the +9 / +8 it took over the old NEW GAME+, carried over.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_445, maxGzip: 61_624 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -320,7 +324,10 @@ const budgets = [
   // 801 / 515 -> 1,271 / 648 on 2026-10-21, measured 1,271 / 644, the gzip
   // plus 4: the NEW GAME+ line's panel on the same page, above the week's
   // rule, kept out of the PlayScreen chunk the same way.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
+  // 1,271 / 648 -> 1,442 / 722 on 2026-10-22 (second-season, draft), measured
+  // 1,442 / 718 plus 4: a NEW GAME+ case's first page also carries the grey
+  // line on how the last season closed it (secondSeason.getCaseRecall).
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_442, maxGzip: 722 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's

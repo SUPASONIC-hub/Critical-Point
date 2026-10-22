@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, readNewGamePlusMemory, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY } from "./newGamePlusCarry.js";
 import { readSeasonRecord } from "./seasonRecord.js";
+import { createSecondSeason } from "./secondSeason.js";
 
 /**
  * What a finished season leaves for the next one: whether NEW GAME+ is open,
@@ -49,7 +50,7 @@ export function readSeasonCarry() {
   return getSeasonCarry(readStoredValue(SEASON_RECORD_KEY, null), readNewGamePlusMemory());
 }
 
-export function useNewGamePlus(saved, runId = null) {
+export function useNewGamePlus(saved, runId = null, veteran = false) {
   const [unlocked, setUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
@@ -57,6 +58,9 @@ export function useNewGamePlus(saved, runId = null) {
   // The season record as this tab last wrote or read it: the intro's memory
   // panel and continue card, and the finale's comparison line, read it.
   const [seasonRecord, setSeasonRecord] = useState(readSeasonRecord);
+  // What the second season shows of the one before it (secondSeason.js):
+  // the season number, and for a NEW GAME+ run the last season's cases and ruling.
+  const secondSeason = useMemo(() => createSecondSeason({ record: seasonRecord, memory, runId, veteran }), [seasonRecord, memory, runId, veteran]);
 
   function rememberSeason(caseResults) {
     const season = storeSeasonMemory(caseResults);
@@ -93,5 +97,6 @@ export function useNewGamePlus(saved, runId = null) {
     readSeasonCarry,
     seasonRecord,
     seasonComparison: getSeasonComparison(seasonRecord, runId),
+    secondSeason,
   };
 }

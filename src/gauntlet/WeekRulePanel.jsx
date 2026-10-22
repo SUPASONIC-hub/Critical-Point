@@ -20,24 +20,34 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
  * The rule as a list of one for the reading clock, and the panel that prints
  * it (null without a rule), both kept while the id is the same.
  *
- * `echo` is the line a NEW GAME+ season opens on (newGamePlusCarry.js), given
- * only on that season's first page (useRunReadout): a panel of its own above
- * the week's, under a `NEW GAME+` kicker, counted on the same clock. It is
- * here rather than in SceneBriefing for the same reason the week's rule is:
- * the PlayScreen chunk had 4 bytes left (scripts/check-bundle-size.mjs).
+ * `page` is what a NEW GAME+ season's case opens on (useRunReadout,
+ * secondSeason.js), or null: `echo`, the line under a `NEW GAME+` kicker --
+ * the season's on 프롤로그 01, the last ruling's on four cases -- and
+ * `recall`, a grey line on how the last season closed this case. Both are
+ * above the week's panel and on the same clock. They are here rather than in
+ * SceneBriefing for the same reason the week's rule is: the PlayScreen chunk
+ * had 4 bytes left (scripts/check-bundle-size.mjs).
  */
-export function useWeekRulePanel(id, echo = null) {
+export function useWeekRulePanel(id, page = null) {
+  const echo = page?.echo ?? null;
+  const recall = page?.recall ?? null;
   return useMemo(() => {
     const rule = getWeekRule(id);
-    if (!rule && !echo) return NO_PANEL;
+    if (!rule && !echo && !recall) return NO_PANEL;
     return [
-      [...(echo ? [{ text: echo }] : []), ...(rule ? [rule] : [])],
+      [...[echo, recall].filter(Boolean).map((text) => ({ text })), ...(rule ? [rule] : [])],
       <>
+        {recall && (
+          // The case file's grey lead (play.css), so it needs no CSS of its own.
+          <p className="gx-brief-lead" data-testid="season-recall" style={{ margin: 0 }}>
+            {recall}
+          </p>
+        )}
         {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
         {rule && <WeekRulePanel key="week-rule" rules={[rule]} />}
       </>,
     ];
-  }, [id, echo]);
+  }, [id, echo, recall]);
 }
 
 /** The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own. */

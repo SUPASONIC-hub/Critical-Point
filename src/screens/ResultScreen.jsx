@@ -211,7 +211,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </div>
             <div>
               <h2>{caseOutcome.title}</h2>
-              <p>{caseOutcome.text}</p>
+              <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}
               <p className={`season-standing ${view.seasonStanding.level}`} data-testid="season-standing"><b>{view.seasonStanding.mark} {view.seasonStanding.label}</b> {view.seasonStanding.text}</p>
             </div>
           </section>
