@@ -53,7 +53,7 @@ const prologue02Nodes = {
       },
       {
         id: "p2_start_scope",
-        label: "이 건의 심사 기준이 통상과 같은지 문서로 확인해 달라고 한다",
+        label: "심사 기준이 통상과 같은지 문서로 확인받는다",
         effect: { legitimacy: 11, trust: -2, time: -5, humanCost: 2, fatigue: 3 },
         voice: "나중에 말이 달라지지 않게, 이 건의 심사 기준이 통상과 같은지 문서로 확인해 달라고 한다.",
         echo: "요청하면 답이 다음 날 옵니다. 한 줄입니다. '그룹 성장 전략 과제 대상 -- 심사 기준은 통상과 동일함.' 무엇이 다른지는 끝내 적혀 있지 않습니다.",
@@ -146,7 +146,7 @@ const prologue02Nodes = {
       },
       {
         id: "p2_model_rebuild",
-        label: "월별 원자료로 계산 과정을 처음부터 다시 세워 문서로 남긴다",
+        label: "월별 원자료로 계산을 다시 세워 문서로 남긴다",
         effect: { legitimacy: 13, trust: 2, time: -7, humanCost: 3, fatigue: 5 },
         voice: "누가 다시 세워도 184.2%가 나오게, 월별 원자료로 계산 과정을 처음부터 다시 세워 문서로 남긴다.",
         echo: "다시 세우면 계산 과정이 여섯 장이 됩니다. 여섯 장 어디에도 '조작'이라는 단어를 쓸 근거는 없습니다.",
@@ -154,7 +154,7 @@ const prologue02Nodes = {
       },
       {
         id: "p2_model_report",
-        label: "보고치 179.6%를 그대로 쓰고 차이만 각주로 달아 둔다",
+        label: "보고치 179.6%를 쓰고 차이는 각주로 단다",
         effect: { capital: 8, time: 6, legitimacy: -6, trust: -2, humanCost: 4, fatigue: -3 },
         voice: "회계법인 의견서와 맞설 근거가 아직 없다며, 보고치 179.6%를 그대로 쓰고 차이만 각주로 달아 둔다.",
         echo: "각주로 달면 의견서가 두 장 짧아집니다. 읽는 사람은 본문을 읽고, 각주는 나중에 찾는 사람만 읽습니다.",
@@ -244,7 +244,7 @@ const prologue02Nodes = {
       },
       {
         id: "p2_final_margin",
-        label: "0.4%포인트 하나만 본문에 남기고 나머지는 전부 별첨으로 내린다",
+        label: "0.4%포인트만 본문에 두고 나머지는 별첨한다",
         effect: { capital: 10, time: 6, legitimacy: 3, trust: -4, humanCost: 5, fatigue: -3 },
         voice: "한 시간으로 끝까지 지킬 수 있는 건 숫자 하나라며, 0.4%포인트 하나만 본문에 남기고 나머지는 전부 별첨으로 내린다.",
         echo: "0.4%포인트만 남기면 본문은 두 장이 됩니다. 나머지 아홉 장은 별첨으로 밀립니다. 두 장짜리 본문은 반려당해도 아무도 놀라지 않습니다.",
@@ -290,7 +290,7 @@ export const prologue02 = {
         },
         {
           id: "p2_after_shared",
-          label: "오늘 접수하고 사흘 동안 동료들의 서명을 모아 연명부로 붙인다",
+          label: "사흘간 동료 서명을 모아 연명부로 붙인다",
           effect: { trust: 12, legitimacy: 6, humanCost: -5, time: -8, capital: -5, fatigue: 7 },
           voice: "한 사람 이름으로는 돌려보내기 쉽다며, 오늘 접수하고 사흘 동안 동료들의 서명을 모아 연명부로 붙인다.",
           echo: "접수 시각은 4월 19일 오전 10시 12분입니다. 연명부는 금요일까지 갑니다. 셋 중 둘이 목요일 밤에 이름을 빼겠다고 전화합니다. 한 사람은 아이가 아프고, 한 사람은 이유를 말하지 않습니다. 금요일 아침 서명란에는 그래도 네 이름이 다 있습니다.",
@@ -418,7 +418,7 @@ export const prologue02 = {
           echo: "다 설명하면 도윤하가 한참 말이 없다가 묻습니다. '그럼 저는 이걸 팔면 안 되는 거예요?' 당신은 그 질문에 답할 권한이 없습니다.",
         },
         {
-          label: "지점 교육 자료가 설명을 빠뜨렸다는 점을 문서로 지적한다",
+          label: "교육 자료가 설명을 빠뜨린 점을 문서로 지적한다",
           effect: { legitimacy: 10, trust: 3, time: -5, capital: -3, fatigue: 3 },
           voice: "도윤하 한 사람만 알고 끝나지 않게, 지점 교육 자료가 설명을 빠뜨렸다는 점을 문서로 지적한다.",
           echo: "지적하면 교육 자료가 한 주 늦게 다시 내려옵니다. 설명은 두 줄 늘고, 판매 목표는 그대로입니다.",
@@ -505,7 +505,7 @@ export const prologue02 = {
       choices: [
         {
           id: "p2_branch_supplier_a",
-          label: "아직 결정되지 않았다고 사실대로 말하고 서명을 미루라고 한다",
+          label: "아직 결정 전이라고 말하고 서명을 미루게 한다",
           effect: { trust: 13, humanCost: -6, capital: -5, time: -5, fatigue: 5 },
           voice: "내일 오전에 서명해 버리기 전에, 아직 결정되지 않았다고 사실대로 말하고 서명을 미루라고 한다.",
           echo: "말하면 문성호가 웃음을 거둡니다. '그럼 저희는 어떻게 해요? 기계는 벌써 왔는데요.' 미루라는 말에는 뒤가 없습니다.",
@@ -514,7 +514,7 @@ export const prologue02 = {
         },
         {
           id: "p2_branch_supplier_b",
-          label: "납품 계약과 설비 대출 서류를 받아 실사 자료에 함께 넣는다",
+          label: "납품 계약과 설비 대출 서류를 실사 자료에 넣는다",
           effect: { legitimacy: 12, trust: 4, time: -6, humanCost: 2, fatigue: 4 },
           voice: "이 공장도 310억에 걸려 있다는 것이 남게, 납품 계약과 설비 대출 서류를 받아 실사 자료에 함께 넣는다.",
           echo: "받아 오면 실사 자료가 두 배가 됩니다. 협력사 서류가 은행 심사에 들어간 건 이 팀에서 처음입니다.",
@@ -542,7 +542,7 @@ export const prologue02 = {
       choices: [
         {
           id: "p2_branch_supplier_follow_a",
-          label: "떡은 받지 않고 이 계약이 무엇에 걸려 있는지 부부에게 다 말한다",
+          label: "떡은 사양하고 이 계약이 걸린 곳을 부부에게 말한다",
           effect: { trust: 14, humanCost: -5, capital: -5, time: -5, fatigue: 6 },
           voice: "은행이 된다고 하면 되는 줄 아는 사람들이라며, 떡은 받지 않고 이 계약이 무엇에 걸려 있는지 부부에게 다 말한다.",
           echo: "다 말하면 문가을이 떡 봉지를 도로 가져갑니다. 그리고 한참 뒤에 다시 하나를 내밉니다. '그래도 이건 드세요. 오늘 만든 거라 내일이면 굳어요.'",
@@ -551,7 +551,7 @@ export const prologue02 = {
         },
         {
           id: "p2_branch_supplier_follow_b",
-          label: "두 사람의 말을 진술로 받아 적어 실사 자료 맨 앞에 붙인다",
+          label: "두 사람의 진술을 적어 실사 자료 맨 앞에 붙인다",
           effect: { legitimacy: 13, trust: 5, time: -6, humanCost: 2, fatigue: 5 },
           voice: "잘 모른다는 그 말이 묻히지 않게, 두 사람의 말을 진술로 받아 적어 실사 자료 맨 앞에 붙인다.",
           echo: "진술을 받으면 문성호가 자기 이름을 두 번 씁니다. 한 번은 틀려서, 한 번은 똑바로. 그 종이가 3년 뒤 유일한 기록이 됩니다.",
@@ -617,7 +617,7 @@ export const prologue02 = {
     finalChoices: [
       {
         id: "a",
-        label: "여유가 1%포인트 아래면 조항 자체를 못 쓰게 하자고 제안한다",
+        label: "여유 1%포인트 아래면 조항을 못 쓰게 하자고 한다",
         effect: { legitimacy: 14, trust: 5, capital: -7, humanCost: -3, time: -2, fatigue: 7 },
         voice: "그 회사 사정이 아니라 은행 사정이라며, 여유가 1%포인트 아래면 조항 자체를 못 쓰게 하자고 제안한다.",
         echo: "기준이 생기면 다음 계약부터 조항이 막힙니다. 이번 계약은 아직 기준보다 먼저 만들어졌습니다.",
@@ -685,8 +685,8 @@ export const prologue02 = {
   memoryPlan: {
     systemNext: "p2_route_system",
     evidenceNext: "p2_evidence_turn",
-    systemLabel: "지난가을 보관실에서 새로 짠 판을 제7조 초안 옆에 펴 본다",
-    evidenceLabel: "빈 승인자 칸을 제7조 초안 옆에 놓고 누가 요청했는지 읽는다",
+    systemLabel: "보관실에서 새로 짠 판을 제7조 초안 옆에 펴 본다",
+    evidenceLabel: "빈 승인자 칸을 제7조 초안 옆에 놓고 읽는다",
     systemEcho: "펴 보면 두 장의 생김새가 닮았습니다. 가을에는 말로만 보고한 오차가 묶여 있었고, 이번 선반에는 토씨까지 같은 조항이 묶여 있습니다.",
     evidenceEcho: "빈 승인자 칸을 제7조 초안에 대면 회람 확인란이 나옵니다. 이번에는 칸이 비어 있지 않고, 맨 끝 줄이 낯익습니다.",
   },
@@ -716,7 +716,7 @@ export const prologue02 = {
       echo: "먼저 말하면 한서윤이 웃지 않고 답합니다. '저도 그렇게 불린 적 있어요. 12년 전에요.' 그리고 더 설명하지 않습니다.",
     },
     p2_start_speed: {
-      label: "열흘로 줄어든 일정이 무엇을 못 보게 하는지 팀장에게 짚어 준다",
+      label: "열흘 일정이 무엇을 못 보게 하는지 팀장에게 짚는다",
       effect: { legitimacy: 11, trust: 5, humanCost: 3, time: -4, fatigue: 5 },
       cognition: { persistence: 2 },
       voice: "대접이라는 말에 묻히기 전에, 열흘로 줄어든 일정이 무엇을 못 보게 하는지 팀장에게 짚어 준다.",

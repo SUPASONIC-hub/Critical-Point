@@ -45,7 +45,7 @@ const prologue05Nodes = {
     choices: [
       {
         id: "p5_start_ask",
-        label: "사유 칸이 왜 비었는지 남지형이 곤란하지 않을 만큼만 묻는다",
+        label: "남지형이 곤란하지 않을 만큼만 사유를 묻는다",
         effect: { trust: 11, humanCost: -4, time: -6, capital: -2, fatigue: 4 },
         voice: "이 종이를 만든 사람은 그가 아닐 것이어서, 사유 칸이 왜 비었는지 남지형이 곤란하지 않을 만큼만 묻는다.",
         echo: "묻자 남지형이 볼펜을 내려놓습니다. '저도 못 봤습니다. 원안이 이미 이렇게 내려왔어요.' 그 말은 사유가 없다는 뜻이 아니라, 사유를 적은 종이가 따로 있다는 뜻입니다.",
@@ -94,7 +94,7 @@ const prologue05Nodes = {
     choices: [
       {
         id: "p5_notice_talk",
-        label: "오진우에게 그 하루 동안 무슨 일이 있었는지 끝까지 듣는다",
+        label: "오진우에게 그 하루의 일을 끝까지 듣는다",
         effect: { trust: 12, humanCost: -4, time: -6, capital: -2, fatigue: 4 },
         voice: "이제야 꺼낸 말을 끊을 수 없어서, 오진우에게 그 하루 동안 무슨 일이 있었는지 끝까지 듣는다.",
         echo: "끝까지 들으면 오진우가 그 하루를 분 단위로 말합니다. 의견서를 들고 팀장실 앞까지 두 번 갔고, 두 번 다 돌아섰습니다.",
@@ -155,7 +155,7 @@ const prologue05Nodes = {
       },
       {
         id: "p5_basement_desk",
-        label: "빈 창가 자리를 잡고 단말부터 켜서 접근 권한을 확인한다",
+        label: "창가 자리에서 단말부터 켜 접근 권한을 확인한다",
         effect: { capital: 8, time: 5, legitimacy: -4, trust: -2, humanCost: 3, fatigue: -2 },
         voice: "무엇을 볼 수 있는 자리인지부터 알아야 한다며, 빈 창가 자리를 잡고 단말부터 켜서 접근 권한을 확인한다.",
         echo: "단말은 켜집니다. 열람 권한은 30년치 전부, 쓰기 권한은 0건입니다. 여기서는 보는 것만 허락됩니다.",
@@ -192,7 +192,7 @@ const prologue05Nodes = {
       },
       {
         id: "p5_echo_terms",
-        label: "이 대답이 어디에 남는지부터 확인하고 조건을 붙여 답한다",
+        label: "대답이 어디에 남는지 확인하고 조건을 붙인다",
         effect: { legitimacy: 12, trust: 2, time: -6, humanCost: 2, fatigue: 4 },
         voice: "기록이 사람을 어떻게 옮기는지 이미 겪어서, 이 대답이 어디에 남는지부터 확인하고 조건을 붙여 답한다.",
         echo: "조건을 붙이면 화면에 한 줄이 뜹니다. '저장 위치를 알려 드릴 권한이 저에게 없습니다. 그래도 당신이 물었다는 사실은 남습니다.'",
@@ -200,7 +200,7 @@ const prologue05Nodes = {
       },
       {
         id: "p5_echo_test",
-        label: "대답 대신 2023-0412를 지금 다시 계산해 보라고 시킨다",
+        label: "2023-0412를 다시 계산해 보라고 한다",
         effect: { capital: 9, time: 4, legitimacy: -4, trust: -3, humanCost: 3, fatigue: -2 },
         voice: "묻는 쪽부터 믿을 만한지 봐야 한다며, 대답 대신 2023-0412를 지금 다시 계산해 보라고 시킨다.",
         echo: "계산하라고 하면 4초 만에 답이 나옵니다. '179.6%는 제7조 기준선 아래입니다. 계약은 유효합니다. 당신의 반대는 틀리지 않았고, 동시에 아무 효력이 없습니다.'",
@@ -245,7 +245,7 @@ const prologue05Nodes = {
       },
       {
         id: "p5_final_alone",
-        label: "빈 봉투만 꺼내 놓고 아무것도 들고 오지 않았다고 말한다",
+        label: "빈 봉투만 꺼내 놓고 들고 온 게 없다고 한다",
         effect: { capital: 10, time: 6, legitimacy: 3, trust: -5, humanCost: 4, fatigue: -3 },
         voice: "첫날부터 지난 일을 펼치고 싶지 않아서, 빈 봉투만 꺼내 놓고 아무것도 들고 오지 않았다고 말한다.",
         echo: "빈 봉투를 놓으면 아무도 웃지 않습니다. 변유진이 그 봉투를 책상 가운데에 그대로 둡니다. '그럼 여기 채우면 되겠네요.'",
@@ -291,7 +291,7 @@ export const prologue05 = {
         },
         {
           id: "p5_after_record",
-          label: "사본과 날짜 메모를 B2의 그 상자 옆에 함께 넣어 둔다",
+          label: "사본과 날짜 메모를 B2 상자 옆에 넣어 둔다",
           effect: { legitimacy: 13, trust: 3, time: -5, capital: -2, fatigue: 4 },
           voice: "목록에서 빠진 상자를 혼자 두지 않으려고, 사본과 날짜 메모를 B2의 그 상자 옆에 함께 넣어 둔다.",
           echo: "넣어 두면 사본 묶음이 그 상자 옆에 섭니다. 끈은 묶인 채이고, 목록에는 여전히 그 번호가 없습니다.",
@@ -322,7 +322,7 @@ export const prologue05 = {
       memo: ["윤상혁이 그린 네모 4개 -- 마지막 칸은 공란", "서류철 표지 안쪽 서명란: 비어 있음", "'좌천이 아니라 배치'", "면담 시간 6분"],
       choices: [
         {
-          label: "마지막 빈 네모에 무엇이 들어가는지 그 자리에서 되묻는다",
+          label: "마지막 빈 네모에 무엇이 들어가는지 되묻는다",
           effect: { trust: 9, legitimacy: 3, humanCost: -3, time: -4, capital: -2, fatigue: 4 },
           voice: "3년을 걸 칸이라면 알고 가야 한다며, 마지막 빈 네모에 무엇이 들어가는지 그 자리에서 되묻는다.",
           echo: "되물으면 윤상혁이 처음으로 웃습니다. '자네가 채울 칸을 내가 먼저 말해 주면, 그건 자네 칸이 아니지.'",
@@ -505,7 +505,7 @@ export const prologue05 = {
       choices: [
         {
           id: "p5_branch_archive_a",
-          label: "상자를 열지 않고 임경수에게 끝까지 지켜 달라고 부탁한다",
+          label: "상자는 열지 않고 임경수에게 지켜 달라고 한다",
           effect: { trust: 12, humanCost: -4, time: -4, capital: -1, fatigue: 5 },
           voice: "풀면 표가 나는 매듭을 믿기로 하고, 상자를 열지 않고 임경수에게 끝까지 지켜 달라고 부탁한다.",
           echo: "부탁하면 임경수가 상자 위에 손바닥을 올립니다. '지키는 건 내가 제일 잘하는 거야. 다만 내 정년이 열한 달이네.'",
@@ -514,7 +514,7 @@ export const prologue05 = {
         },
         {
           id: "p5_branch_archive_b",
-          label: "상자 번호와 매듭 상태를 반출 목록에 공식으로 적어 둔다",
+          label: "상자 번호와 매듭 상태를 반출 목록에 적는다",
           effect: { legitimacy: 11, trust: 4, time: -5, humanCost: 2, fatigue: 3 },
           voice: "누가 풀었는지 나중에 따질 수 있게, 상자 번호와 매듭 상태를 반출 목록에 공식으로 적어 둔다.",
           echo: "목록에 적으면 상자 번호와 매듭 모양이 함께 기록됩니다. 그 기록은 3년 뒤 이 상자가 목록에서 빠져 있다는 증거가 됩니다.",
@@ -617,7 +617,7 @@ export const prologue05 = {
     finalChoices: [
       {
         id: "a",
-        label: "사유 칸이 비면 인사 통지가 성립하지 않게 하는 규칙을 제안한다",
+        label: "사유 칸이 비면 인사 통지를 무효로 하자고 한다",
         effect: { legitimacy: 13, trust: 6, capital: -7, humanCost: -4, time: -1, fatigue: 7 },
         voice: "다음 사람은 이유를 알고 옮겨지도록, 사유 칸이 비면 인사 통지가 성립하지 않게 하는 규칙을 제안한다.",
         echo: "규칙이 생기면 다음 통지서는 사유를 기다립니다. 당신의 통지서는 규칙보다 일주일 먼저 만들어졌습니다.",
@@ -625,7 +625,7 @@ export const prologue05 = {
       },
       {
         id: "b",
-        label: "규칙은 두고 내 통지서의 사유 칸만 채워 달라고 요구한다",
+        label: "규칙은 두고 내 통지서 사유 칸만 채워 달라고 한다",
         effect: { capital: 7, time: 6, trust: -5, legitimacy: -6, humanCost: 4, fatigue: -4 },
         voice: "199장을 다 지고 갈 수는 없다며, 규칙은 두고 내 통지서의 사유 칸만 채워 달라고 요구한다.",
         echo: "당신 칸은 채워질 수 있습니다. 나머지 199장에는 오늘도 아무것도 적혀 있지 않습니다.",
@@ -685,7 +685,7 @@ export const prologue05 = {
   memoryPlan: {
     systemNext: "p5_route_system",
     evidenceNext: "p5_evidence_turn",
-    systemLabel: "상담실에서 새로 짠 판이 이번 통지서에도 옮겨졌는지 본다",
+    systemLabel: "새로 짠 판이 이번 통지서에도 옮겨졌는지 본다",
     evidenceLabel: "대본을 만든 계정을 통지서 원안에서도 찾아본다",
     systemEcho: "통지서에는 옮겨진 것이 없습니다. 사유 칸도 제안자 칸도 비어 있습니다. 그 빈칸을 읽은 1번 단말이 30년치 통지서를 한꺼번에 엽니다.",
     evidenceEcho: "대본이 만들어진 시각을 통지서 원안에 대면 날짜가 하나 더 나옵니다. 점검이 끝난 날보다 여섯 주 이릅니다.",
@@ -709,14 +709,14 @@ export const prologue05 = {
       echo: "답장을 보내면 그가 1분 만에 읽습니다. '거기 어디예요? 지도에 안 나와요.' 지도에 나오지 않는 건물이 맞습니다.",
     },
     p5_start_report: {
-      label: "5월 접수 번호가 왜 첨부 목록에 있는지 공식으로 묻는다",
+      label: "5월 접수 번호가 왜 첨부에 있는지 공식으로 묻는다",
       effect: { legitimacy: 12, trust: -1, capital: -4, time: -6, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "두 달 만의 회신이 이 종이인지 알아야 한다며, 5월 접수 번호가 왜 첨부 목록에 있는지 공식으로 묻는다.",
       echo: "공식으로 물으면 답이 사흘 뒤에 옵니다. '참고 자료로 첨부된 것이며 사유와 무관합니다.' 사유 칸은 여전히 비어 있습니다.",
     },
     p5_start_quiet: {
-      label: "짐작이 안 된다고 솔직히 말하고 사유를 처음부터 요청한다",
+      label: "짐작이 안 된다고 말하고 사유를 처음부터 묻는다",
       effect: { trust: 11, legitimacy: 5, humanCost: 3, time: -5, fatigue: 5 },
       cognition: { persistence: 2 },
       voice: "아는 척해서 얻을 것이 없다며, 짐작이 안 된다고 솔직히 말하고 사유를 처음부터 요청한다.",

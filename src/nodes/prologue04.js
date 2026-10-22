@@ -97,7 +97,7 @@ const prologue04Nodes = {
     choices: [
       {
         id: "p4_window_stop",
-        label: "다음 손님이 서명하기 전에 끼어들어 설명서 12쪽을 같이 읽는다",
+        label: "서명 전에 끼어들어 설명서 12쪽을 같이 읽는다",
         effect: { trust: 12, humanCost: -5, capital: -3, time: -5, fatigue: 5 },
         voice: "서명하고 나면 늦는다며, 다음 손님이 서명하기 전에 끼어들어 설명서 12쪽을 같이 읽는다.",
         echo: "끼어들면 다음 손님이 펜을 내려놓고 '다음에 올게요' 하고 갑니다. 도윤하는 화를 내지 않고 당신을 봅니다.",
@@ -105,7 +105,7 @@ const prologue04Nodes = {
       },
       {
         id: "p4_window_script",
-        label: "대본과 설명서를 나란히 놓고 다른 문장을 한 줄씩 적는다",
+        label: "대본과 설명서가 다른 문장을 한 줄씩 적는다",
         effect: { legitimacy: 11, trust: 4, time: -6, humanCost: 3, fatigue: 4 },
         voice: "사람이 아니라 문장을 따지기로 하고, 대본과 설명서를 나란히 놓고 다른 문장을 한 줄씩 적는다.",
         echo: "나란히 놓으면 다른 문장이 11개 나옵니다. 그중 두 개는 뜻이 정반대입니다.",
@@ -142,7 +142,7 @@ const prologue04Nodes = {
     choices: [
       {
         id: "p4_quota_erase",
-        label: "목표를 못 채운 창구 이름부터 지워 달라고 지점장에게 말한다",
+        label: "지점장에게 미달 창구 이름부터 지워 달라고 한다",
         effect: { trust: 11, humanCost: -5, legitimacy: -2, capital: -3, time: -4, fatigue: 4 },
         voice: "지난달부터 남아 있는 이름이 먼저 눈에 밟혀서, 목표를 못 채운 창구 이름부터 지워 달라고 지점장에게 말한다.",
         echo: "지워 달라고 하면 배승호가 마커를 듭니다. 그리고 '지우면 다음 달에 다시 적힙니다'라고 합니다.",
@@ -187,7 +187,7 @@ const prologue04Nodes = {
     choices: [
       {
         id: "p4_visit_read",
-        label: "평상에 앉아 설명서 22쪽을 처음부터 끝까지 읽어 드린다",
+        label: "평상에 앉아 설명서 22쪽을 끝까지 읽어 드린다",
         effect: { trust: 12, humanCost: -5, capital: -3, time: -7, fatigue: 6 },
         voice: "무엇에 서명했는지는 본인이 알아야 한다며, 평상에 앉아 설명서 22쪽을 처음부터 끝까지 읽어 드린다.",
         echo: "22쪽을 다 읽는 데 40분이 걸립니다. 신영란이 다 듣고 나서 '그럼 그 총각은 이걸 알았대요?'라고 묻습니다.",
@@ -195,7 +195,7 @@ const prologue04Nodes = {
       },
       {
         id: "p4_visit_record",
-        label: "4월 28일 판매가 어떻게 이뤄졌는지 확인해 점검 기록에 남긴다",
+        label: "4월 28일 판매 과정을 확인해 점검 기록에 남긴다",
         effect: { legitimacy: 12, trust: 3, time: -6, humanCost: 3, fatigue: 4 },
         voice: "착한 사람이 팔았다는 말로 끝나지 않게, 4월 28일 판매가 어떻게 이뤄졌는지 확인해 점검 기록에 남긴다.",
         echo: "기록이 남으면 4월 28일은 날짜가 됩니다. 그 날짜에 창구에 앉아 있던 사람 이름도 같이 남습니다.",
@@ -203,7 +203,7 @@ const prologue04Nodes = {
       },
       {
         id: "p4_visit_leave",
-        label: "아직 손해가 난 것은 아니라며 점검 대상에서 빼고 돌아선다",
+        label: "손해는 아직이라며 점검 대상에서 빼고 돌아선다",
         effect: { capital: 8, time: 6, legitimacy: -3, trust: -5, humanCost: 4, fatigue: -3 },
         voice: "괜한 걱정부터 안겨 드릴 수는 없어서, 아직 손해가 난 것은 아니라며 점검 대상에서 빼고 돌아선다.",
         echo: "빼고 돌아서면 오늘은 아무 일도 없습니다. 신영란은 2년 뒤에 보증금을 올려 줄 생각을 계속합니다.",
@@ -232,7 +232,7 @@ const prologue04Nodes = {
     choices: [
       {
         id: "p4_final_tell",
-        label: "지금 여기서 도윤하에게 이 상품이 무엇인지 그대로 말해 준다",
+        label: "도윤하에게 이 상품이 무엇인지 그대로 말한다",
         effect: { trust: 13, humanCost: -5, legitimacy: -4, capital: -4, time: -4, fatigue: 6 },
         voice: "괜찮다고 말한 사람이 가장 먼저 알아야 한다며, 지금 여기서 도윤하에게 이 상품이 무엇인지 그대로 말해 준다.",
         echo: "말해 주면 도윤하가 한참 서 있습니다. 그리고 수첩을 펴서 31개 이름을 다시 셉니다.",
@@ -285,7 +285,7 @@ export const prologue04 = {
       choices: [
         {
           id: "p4_after_warn",
-          label: "도윤하를 따로 불러 그가 판 것이 어떻게 끝날 수 있는지 직접 말해 준다",
+          label: "도윤하를 따로 불러 판 상품의 끝을 말해 준다",
           effect: { trust: 13, humanCost: -6, legitimacy: -5, capital: -4, time: -3, fatigue: 4 },
           voice: "사진 한 장으로 닫을 5월이 아니어서, 도윤하를 따로 불러 그가 판 것이 어떻게 끝날 수 있는지 직접 말해 준다.",
           echo: "따로 부르면 도윤하가 한참 대답이 없습니다. 그 밤에 그는 손님 이름을 적어 둔 수첩을 들고 골목을 두 시간 걷습니다. 기록에는 아무것도 남지 않습니다.",
@@ -294,7 +294,7 @@ export const prologue04 = {
         },
         {
           id: "p4_after_report",
-          label: "창구 판매 방식을 팀을 건너 정식 보고로 올려 절차를 밟게 한다",
+          label: "창구 판매 방식을 팀을 건너 정식 보고한다",
           effect: { legitimacy: 14, trust: -5, capital: -5, time: -5, humanCost: 6, fatigue: 5 },
           voice: "손해가 나기 전에 움직여야 한다며, 창구 판매 방식을 팀을 건너 정식 보고로 올려 절차를 밟게 한다.",
           echo: "보고가 올라가면 다음 주에 강서지점 여섯 명이 먼저 불려 갑니다. 대본을 만든 층에서는 아무도 불려 가지 않습니다.",
@@ -479,7 +479,7 @@ export const prologue04 = {
           echo: "말하면 신영란이 평상에 오래 앉아 있습니다. 그리고 '그 총각은 몰랐겠죠'라고 두 번 말합니다.",
         },
         {
-          label: "지금 답할 수 없다며 확인해서 서면으로 알려 주겠다고 한다",
+          label: "지금은 확인해서 서면으로 알려 주겠다고 한다",
           effect: { legitimacy: 9, trust: 3, time: -5, humanCost: 2, capital: -2, fatigue: 3 },
           voice: "어림짐작으로 답할 돈이 아니어서, 지금 답할 수 없다며 확인해서 서면으로 알려 주겠다고 한다.",
           echo: "서면으로 하겠다고 하면 그가 고개를 끄덕입니다. 종이로 받는 걸 그는 더 믿습니다.",
@@ -517,7 +517,7 @@ export const prologue04 = {
         },
         {
           id: "p4_branch_drawer_b",
-          label: "메모가 붙은 31명이 어떤 상품을 들었는지 한 줄씩 대조한다",
+          label: "메모 붙은 31명의 가입 상품을 한 줄씩 대조한다",
           effect: { legitimacy: 11, trust: 3, time: -5, humanCost: 3, fatigue: 4 },
           voice: "이름 옆 한 줄이 무엇과 맞바뀌었는지 보려고, 메모가 붙은 31명이 어떤 상품을 들었는지 한 줄씩 대조한다.",
           echo: "대조하면 31명 중 24명이 같은 상품입니다. 메모의 날짜와 만기가 겹치는 사람이 아홉 명입니다.",
@@ -601,7 +601,7 @@ export const prologue04 = {
         },
         {
           id: "p4_route_system_call",
-          label: "가장 많이 판 창구 10곳에 먼저 전화를 걸어 사실을 알린다",
+          label: "가장 많이 판 창구 10곳에 먼저 전화로 알린다",
           effect: { trust: 11, legitimacy: 4, humanCost: -5, capital: -5, time: -7, fatigue: 6 },
           voice: "판 사람들이 가장 늦게 알게 되지 않게, 가장 많이 판 창구 10곳에 먼저 전화를 걸어 사실을 알린다.",
           echo: "10곳에 걸면 여섯 곳이 받습니다. 세 곳은 '저희도 이상하다고 생각했어요'라고 합니다.",
@@ -688,8 +688,8 @@ export const prologue04 = {
   memoryPlan: {
     systemNext: "p4_route_system",
     evidenceNext: "p4_evidence_turn",
-    systemLabel: "맨 아래 칸에서 새로 짠 판을 창구 응대 대본 옆에 놓아 본다",
-    evidenceLabel: "반려 시각을 3분 대본에 대어 누가 언제 만들었는지 본다",
+    systemLabel: "새로 짠 판을 창구 응대 대본 옆에 놓아 본다",
+    evidenceLabel: "반려 시각을 3분 대본에 대어 만든 사람을 본다",
     systemEcho: "놓아 보면 대본에는 돌려보낼 의견을 적는 칸이 처음부터 없습니다. 오진우가 보낸 전국 판매 기록에도 같은 자리가 비어 있습니다.",
     evidenceEcho: "반려 시각을 대본에 대면 작성 기록이 열립니다. 의견서가 돌아온 그날 오후에 팔 문장은 이미 골라져 있었습니다.",
   },
@@ -705,21 +705,21 @@ export const prologue04 = {
   },
   openingSignatures: {
     p4_start_appeal: {
-      label: "기각 통지를 들고 온 김에 창구 사람들에게 사정부터 말한다",
+      label: "기각 통지를 든 채 창구 사람들에게 사정부터 말한다",
       effect: { trust: 12, humanCost: -3, capital: -3, time: -5, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "본점에서 밀려 내려온 처지를 숨기지 않기로 하고, 기각 통지를 들고 온 김에 창구 사람들에게 사정부터 말한다.",
       echo: "말하면 창구 여섯 명이 잠깐 조용해집니다. 도윤하가 제일 먼저 '그럼 저희가 뭘 도와드리면 돼요?'라고 묻습니다.",
     },
     p4_start_copy: {
-      label: "가방 속 사본과 오늘 볼 판매 기록을 같은 파일에 넣기로 한다",
+      label: "가방 속 사본과 판매 기록을 한 파일에 넣는다",
       effect: { legitimacy: 12, trust: -1, capital: -4, time: -6, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "쓴 것과 팔린 것은 한 줄기라며, 가방 속 사본과 오늘 볼 판매 기록을 같은 파일에 넣기로 한다.",
       echo: "한 파일이 되면 반대 의견과 판매 실적이 나란히 놓입니다. 날짜가 여드레 차이라는 것이 첫 장에 보입니다.",
     },
     p4_start_accept: {
-      label: "이 점검을 왜 나에게 맡겼는지 한서윤에게 전화를 걸어 묻는다",
+      label: "이 점검을 왜 내게 맡겼는지 한서윤에게 묻는다",
       effect: { trust: 11, legitimacy: 5, humanCost: 3, time: -4, fatigue: 5 },
       cognition: { persistence: 2 },
       voice: "벌이 아니라면 까닭이 있을 것이어서, 이 점검을 왜 나에게 맡겼는지 한서윤에게 전화를 걸어 묻는다.",

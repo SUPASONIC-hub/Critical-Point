@@ -24,7 +24,8 @@
  *
  * The ceiling is a ratchet. `MAX_LABEL` is the length a label may reach, and
  * `OVER_CEILING` is how many were already longer on the day the check was
- * written (2026-10-13). Those are story to shorten by its author, not a script
+ * written (2026-10-13: 725), taken down as labels are shortened (2026-10-22:
+ * 626, when every prologue label went to 22-28). Those are story to shorten by its author, not a script
  * to fix, so the count is held as a ceiling that only comes down: the check
  * fails when the count rises -- a new label over `MAX_LABEL`, or an old one
  * grown past it -- and prints every label over it, longest first.
@@ -52,7 +53,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameData.js";
 
 const MAX_LABEL = 30;
-const OVER_CEILING = 725;
+const OVER_CEILING = 626;
 const LONGEST_LABEL = 40;
 
 const MAX_TEXT = 420;

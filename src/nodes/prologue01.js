@@ -49,7 +49,7 @@ const prologue01Nodes = {
     choices: [
       {
         id: "p1_start_source",
-        label: "강서지점 담당자에게 직접 전화해 숫자를 탓하지 않고 먼저 묻는다",
+        label: "강서지점 담당자에게 탓하지 않고 먼저 묻는다",
         effect: { trust: 10, humanCost: -3, time: -6, capital: -2, fatigue: 4 },
         voice: "서류보다 만든 사람 말이 먼저라며, 강서지점 담당자에게 전화해 탓하지 않고 묻는다.",
         echo: "전화를 받은 담당자가 '저도 그 칸이 늘 걸렸어요'라고 합니다. 원자료는 오후에 옵니다. 대신 오늘 초안은 못 끝냅니다.",
@@ -58,7 +58,7 @@ const prologue01Nodes = {
       },
       {
         id: "p1_start_note",
-        label: "합계가 4,000만 원 어긋난다는 사실을 검토 기록에 먼저 적어 둔다",
+        label: "4,000만 원 차이를 검토 기록에 먼저 적어 둔다",
         effect: { legitimacy: 11, trust: -2, time: -5, humanCost: 2, fatigue: 3 },
         voice: "잊히기 전에 남겨야 한다며, 합계가 4,000만 원 어긋난다는 사실부터 검토 기록에 적는다.",
         echo: "기록에 적히면 숫자는 사라지지 않습니다. 같은 기록을 오진우도 열 수 있고, 그는 그 줄을 보는 즉시 일정을 계산합니다.",
@@ -67,7 +67,7 @@ const prologue01Nodes = {
       },
       {
         id: "p1_start_draft",
-        label: "요약표 숫자대로 초안을 끝내고 어긋난 합계는 뒤로 미룬다",
+        label: "요약표대로 초안을 끝내고 합계는 뒤로 미룬다",
         effect: { capital: 8, time: 6, legitimacy: -5, trust: 2, humanCost: 3, fatigue: -2 },
         voice: "목요일 승인이 먼저라며, 요약표 숫자대로 초안을 끝내고 어긋난 합계는 뒤로 미룬다.",
         echo: "초안은 한 시간 만에 끝납니다. 4,000만 원짜리 한 줄은 연필 점이 찍힌 채 그대로 남습니다.",
@@ -106,7 +106,7 @@ const prologue01Nodes = {
       },
       {
         id: "p1_counter_request",
-        label: "지점 대출 담당에게 요약표 대신 원장 사본을 정식으로 요청한다",
+        label: "요약표 대신 원장 사본을 정식으로 요청한다",
         effect: { legitimacy: 11, trust: 4, time: -6, humanCost: 3, fatigue: 4 },
         voice: "요약표로는 판단할 수 없다며, 지점 대출 담당에게 원장 사본을 정식으로 요청한다.",
         echo: "정식 요청은 접수됩니다. 접수된 순간 이 건은 '지점에서 조용히 끝나는 건'이 아니게 됩니다.",
@@ -151,7 +151,7 @@ const prologue01Nodes = {
       },
       {
         id: "p1_mentor_ask",
-        label: "18영업일을 줄일 방법이 있는지 절차부터 같이 확인하자고 한다",
+        label: "18영업일을 줄일 절차부터 같이 확인하자고 한다",
         effect: { legitimacy: 10, trust: 3, time: -5, capital: -1, humanCost: 2, fatigue: 3 },
         voice: "늦는 것과 틀리는 것 말고 길이 하나 더 있을 거라며, 18영업일을 줄일 절차부터 같이 확인하자고 한다.",
         echo: "절차를 확인하면 18영업일은 12일까지 줄어듭니다. 11월 1일에는 여전히 닿지 않습니다.",
@@ -188,7 +188,7 @@ const prologue01Nodes = {
     choices: [
       {
         id: "p1_review_people",
-        label: "평가표를 덮기 전에 온새포장 11명 이야기를 먼저 꺼낸다",
+        label: "평가표보다 온새포장 11명 이야기를 먼저 꺼낸다",
         effect: { trust: 11, humanCost: -4, legitimacy: -2, capital: -3, time: -3, fatigue: 5 },
         voice: "제 점수보다 급한 일이 있다며, 평가표를 덮기 전에 온새포장 11명 이야기를 먼저 꺼낸다.",
         echo: "11명 이야기를 꺼내면 윤상혁이 서류철에서 손을 뗍니다. 그리고 묻습니다. '그 11명 이름을 자네가 다 아나?'",
@@ -241,7 +241,7 @@ const prologue01Nodes = {
       },
       {
         id: "p1_final_write",
-        label: "4,000만 원과 184.7%를 의견란에 수치 그대로 적는다",
+        label: "4,000만 원과 184.7%를 의견란에 적는다",
         effect: { legitimacy: 13, trust: 4, capital: -5, time: -6, humanCost: 3, fatigue: 5 },
         voice: "찾은 숫자는 찾은 자리에 남겨야 한다며, 4,000만 원과 184.7%를 의견란에 그대로 적는다.",
         echo: "수치 그대로 적으면 커서가 다음 칸으로 넘어갑니다. 의견란은 내일 아침 8시 52분 최종 확인 때까지 열려 있고, 이대로 닫히면 이 건은 아홉 시에 못 나갑니다.",
@@ -286,7 +286,7 @@ export const prologue01 = {
       choices: [
         {
           id: "p1_after_credit",
-          label: "오진우 대리 이름으로 의견을 올리고 대신 그에게 빚 하나를 지운다",
+          label: "오진우 대리 이름으로 올리고 빚 하나를 지운다",
           effect: { trust: 10, capital: 6, legitimacy: -5, humanCost: 3, fatigue: 3 },
           voice: "이 건은 아홉 시에 나가야 한다며, 오진우 대리 이름으로 의견을 올리고 대신 그에게 빚 하나를 지운다.",
           echo: "오진우가 잠깐 당신을 봅니다. '이건 내가 갚는다.' 그가 화이트보드에 그려 둔 점수판의 오른쪽 칸, 당신 이름 아래에 처음으로 1을 적습니다.",
@@ -355,10 +355,9 @@ export const prologue01 = {
       memo: ["화이트보드 점수판 -- 오진우 1 / 당신 0", "수습 평가 항목 5개 중 실제 배점은 속도", "점수판은 지우지 않기로 함", "승인 서류 발송까지 35시간"],
       choices: [
         {
-          label: "점수판에 내 이름 대신 온새포장 직원 11명을 적어 달라고 한다",
+          label: "점수판에 내 이름 대신 직원 11명을 적자고 한다",
           effect: { trust: 10, legitimacy: 3, humanCost: -4, time: -4, capital: -3, fatigue: 5 },
-          cognition: { persistence: 1 },
-          voice: "이기고 지는 건 우리가 아니라며, 점수판에 내 이름 대신 온새포장 직원 11명을 적어 달라고 한다.",
+          voice: "이기고 지는 건 우리가 아니라며, 점수판에 내 이름 대신 온새포장 직원 11명을 적자고 한다.",
           echo: "오진우가 마커를 다시 뽑습니다. 11칸을 그리다 말고 '이러면 점수판이 아니잖아'라고 합니다. 그래도 지우지는 않습니다.",
         },
         {
@@ -422,7 +421,7 @@ export const prologue01 = {
           echo: "들으면 40분이 걸립니다. 그가 끈을 풀었다 다시 묶는 동안 이야기는 2011년까지 거슬러 올라갑니다.",
         },
         {
-          label: "회의록에 없는 그 반대 의견을 지금이라도 기록해 달라고 한다",
+          label: "그 반대 의견을 지금이라도 기록해 달라고 한다",
           effect: { legitimacy: 9, trust: 3, time: -4, capital: -3, fatigue: 2 },
           voice: "이름이 안 남으면 없던 일이 된다며, 그 반대 의견을 지금이라도 기록으로 만들어 달라고 청한다.",
           echo: "청하면 임경수가 웃습니다. '지금 만들면 그건 기록이 아니라 뒷말이야.' 그래도 종이 한 장을 뭉치 뒤에 끼워 둡니다.",
@@ -445,13 +444,13 @@ export const prologue01 = {
       memo: ["정해린 문자 01:04 -- '틀린 걸로는 안 남게'", "11월 납품 일정표 사진 -- '11/1 08:00'"],
       choices: [
         {
-          label: "늦어도 괜찮다는 그 말을 오늘 안에 직접 확인해 주겠다고 답한다",
+          label: "그 말을 오늘 안에 직접 확인해 주겠다고 답한다",
           effect: { trust: 10, humanCost: -3, time: -3, capital: -2, fatigue: 4 },
           voice: "새벽에 보낸 말을 혼자 두지 않겠다며, 늦어도 괜찮다는 그 말을 오늘 안에 직접 확인해 주겠다고 답한다.",
           echo: "답하면 정해린이 새벽 두 시에 '고맙습니다' 한 줄을 보냅니다. 그 약속의 기한은 오늘 하루입니다.",
         },
         {
-          label: "지금 서류가 어디까지 와 있는지 있는 그대로 적어 보낸다",
+          label: "서류가 어디까지 왔는지 그대로 적어 보낸다",
           effect: { legitimacy: 8, trust: 3, time: -5, humanCost: 2, capital: -1, fatigue: 3 },
           voice: "위로보다 사실이 필요한 사람이라며, 서류가 지금 어디까지 와 있는지 있는 그대로 적어 보낸다.",
           echo: "그대로 적어 보내면 문장이 아홉 줄이 됩니다. 마지막 줄은 '아직 아무것도 정해지지 않았습니다'입니다.",
@@ -480,7 +479,7 @@ export const prologue01 = {
           echo: "달라고 하면 그가 복사기를 다시 켭니다. 사본이 두 장이 되는 건 13년 만에 처음입니다.",
         },
         {
-          label: "'하루 늦은 이유'가 남는 칸이 서식에 필요하다고 말한다",
+          label: "'하루 늦은 이유' 칸이 서식에 필요하다고 한다",
           effect: { legitimacy: 8, trust: 4, humanCost: 2, time: -4, fatigue: 2 },
           voice: "오상철 지점장 같은 사람이 또 나오지 않게, '하루 늦은 이유'가 남는 칸이 서식에 필요하다고 말한다.",
           echo: "말하면 오진우가 한참 있다가 '그 칸이 있었으면 아버지는 뭐라고 썼을까'라고 되묻습니다. 답은 둘 다 모릅니다.",
@@ -519,7 +518,7 @@ export const prologue01 = {
         },
         {
           id: "p1_branch_ledger_b",
-          label: "원장 7월 칸을 사진으로 남기고 정식 자료로 받겠다고 한다",
+          label: "원장 7월 칸을 찍고 정식 자료로 받겠다고 한다",
           effect: { legitimacy: 11, trust: 3, time: -6, humanCost: 2, fatigue: 4 },
           voice: "본 것은 남겨야 한다며, 원장 7월 칸을 사진으로 찍고 정식 자료로 받겠다고 한다.",
           echo: "사진은 남습니다. 정식 자료로 받으면 그 순간부터 본점이 이 건을 들여다볼 근거가 생깁니다.",
@@ -547,7 +546,7 @@ export const prologue01 = {
       choices: [
         {
           id: "p1_branch_ledger_follow_a",
-          label: "숨긴 것이 아니라는 문장을 정해린의 말 그대로 받아 둔다",
+          label: "숨긴 게 아니라는 정해린의 말을 그대로 받아 둔다",
           effect: { trust: 13, legitimacy: 4, humanCost: -5, capital: -4, time: -4, fatigue: 6 },
           voice: "이 말은 다듬으면 안 된다며, 숨긴 것이 아니라는 문장을 정해린의 말 그대로 받아 둔다.",
           echo: "말 그대로 받아 두면 문장은 두 줄입니다. 그 두 줄이 나중에 '숨겼다'는 말을 막을 수 있는 유일한 종이가 됩니다.",
@@ -622,7 +621,7 @@ export const prologue01 = {
     finalChoices: [
       {
         id: "a",
-        label: "요약표만으로는 지점 한도 판단을 못 하게 하는 규칙을 제안한다",
+        label: "요약표만으로는 한도 판단을 못 하게 하자고 한다",
         effect: { legitimacy: 13, trust: 6, capital: -6, humanCost: -3, time: -2, fatigue: 7 },
         voice: "같은 오차가 또 말로 끝나지 않게, 요약표만으로는 지점 한도 판단을 못 하게 하자고 제안한다.",
         echo: "규칙이 생기면 다음 서류부터는 원장이 따라옵니다. 이번 서류는 규칙보다 하루 먼저 내려갑니다.",
@@ -638,7 +637,7 @@ export const prologue01 = {
       },
       {
         id: "c",
-        label: "오차를 찾아낸 사람 이름을 적는 칸을 심사 서식에 만들자고 한다",
+        label: "오차를 찾은 사람 이름 칸을 서식에 만들자고 한다",
         effect: { legitimacy: 8, trust: 9, capital: -5, time: -6, humanCost: 3, fatigue: 8 },
         voice: "찾은 사람이 남아야 다음에도 찾는다며, 오차를 찾아낸 사람 이름 칸을 심사 서식에 만들자고 한다.",
         echo: "칸이 생기면 찾은 사람의 이름이 남습니다. 남는 순간부터 그 이름은 책임자 이름이기도 합니다.",
@@ -691,7 +690,7 @@ export const prologue01 = {
     routeNext: "p1_branch_ledger",
     systemNext: "p1_route_system",
     evidenceNext: "p1_evidence_turn",
-    routeLabel: "지난주에 본 지점 서류의 빈칸부터 정해린 대표에게 다시 확인한다",
+    routeLabel: "지점 서류의 빈칸부터 정해린 대표에게 다시 묻는다",
     systemLabel: "새로 짠 판의 조건이 양식 개정 요청에도 남았는지 본다",
     evidenceLabel: "쥐고 있는 단서로 요약표 양식의 승인자를 찾는다",
   },

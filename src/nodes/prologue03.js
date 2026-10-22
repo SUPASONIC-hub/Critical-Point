@@ -53,7 +53,7 @@ const prologue03Nodes = {
     choices: [
       {
         id: "p3_start_ask",
-        label: "한서윤 과장에게 마지막 장까지 읽어 달라고 직접 부탁한다",
+        label: "한서윤 과장에게 마지막 장까지 읽어 달라고 한다",
         effect: { trust: 11, humanCost: -4, time: -6, capital: -2, fatigue: 4 },
         voice: "첨부로 붙은 채로는 회의에서 안 읽힐 테니, 한서윤 과장에게 마지막 장까지 읽어 달라고 직접 부탁한다.",
         echo: "부탁하면 한서윤이 '읽었습니다'라고 답합니다. 그리고 몇 쪽을 읽었는지는 말하지 않습니다.",
@@ -62,7 +62,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_start_rule",
-        label: "첨부를 본문 안건으로 올리는 절차를 규정에서 찾아 서면으로 요청한다",
+        label: "첨부를 본문 안건으로 올려 달라고 서면 요청한다",
         effect: { legitimacy: 11, trust: -2, time: -6, humanCost: 2, fatigue: 3 },
         voice: "누구의 호의에도 기대지 않게, 첨부를 본문 안건으로 올리는 절차를 규정에서 찾아 서면으로 요청한다.",
         echo: "규정에는 절차가 있습니다. 부속 문서를 본문으로 올리려면 담당 과장의 검토 의견이 먼저 붙어야 합니다.",
@@ -71,7 +71,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_start_desk",
-        label: "회의 시작 전에 위원 아홉 명 자리마다 한 장짜리 요약을 놓아 둔다",
+        label: "위원 아홉 명 자리마다 한 장 요약을 놓아 둔다",
         effect: { capital: 8, time: 5, legitimacy: -5, trust: 2, humanCost: 3, fatigue: -1 },
         voice: "첨부까지 넘겨 볼 시간은 없을 테니, 회의 시작 전에 위원 아홉 명 자리마다 한 장짜리 요약을 놓아 둔다.",
         echo: "요약은 아홉 자리에 다 놓입니다. 개회 직전에 진행 담당자가 일곱 장을 걷어 갑니다. 회의 자료가 아니라는 이유입니다.",
@@ -110,7 +110,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_committee_record",
-        label: "첨부 7이 반려된 사실을 회의 기록에 남겨 달라고 그 자리에서 요청한다",
+        label: "첨부 7 반려를 회의 기록에 남겨 달라고 한다",
         effect: { legitimacy: 11, trust: 5, time: -6, humanCost: 3, fatigue: 5 },
         voice: "없던 문서가 되지 않게, 첨부 7이 반려된 사실을 회의 기록에 남겨 달라고 그 자리에서 요청한다.",
         echo: "요청하면 진행 담당자가 위원장을 봅니다. 진세라가 3초 뒤에 '적어 두세요'라고 합니다. 그 3초 동안 아무도 움직이지 않습니다.",
@@ -118,7 +118,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_committee_stand",
-        label: "배석 자리에서 손을 들어 3분만 달라고 위원장에게 말한다",
+        label: "손을 들어 위원장에게 3분만 달라고 한다",
         effect: { capital: 7, time: 5, legitimacy: 2, trust: -2, humanCost: 3, fatigue: -3 },
         voice: "다음 안건으로 넘어가면 끝이라며, 배석 자리에서 손을 들어 3분만 달라고 위원장에게 말한다.",
         echo: "손을 들면 회의실이 조용해집니다. 진세라가 '배석자 발언은 위원 요청이 있을 때만'이라고 하고, 아무도 요청하지 않습니다.",
@@ -163,7 +163,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_corridor_push",
-        label: "일곱 명 이야기는 접어 두고 숫자 이야기만 하자고 밀어붙인다",
+        label: "일곱 명 이야기는 접고 숫자만 말하자고 민다",
         effect: { capital: 8, time: 4, legitimacy: -4, trust: -3, humanCost: 3, fatigue: -2 },
         voice: "사정을 듣다 보면 숫자가 묻힌다며, 일곱 명 이야기는 접어 두고 숫자 이야기만 하자고 밀어붙인다.",
         echo: "숫자 이야기만 하자고 하면 한서윤이 고개를 끄덕입니다. 그리고 숫자로만 대답합니다. 11쪽 중 그가 읽은 쪽은 한 쪽입니다.",
@@ -200,7 +200,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_archive_register",
-        label: "뒷장까지 포함한 원본을 정식 보존 목록에 올려 달라고 요청한다",
+        label: "뒷장까지 든 원본을 보존 목록에 올려 달라고 한다",
         effect: { legitimacy: 12, trust: 3, time: -6, humanCost: 3, fatigue: 4 },
         voice: "누가 찾아도 끈 안에 있게, 뒷장까지 포함한 원본을 정식 보존 목록에 올려 달라고 요청한다.",
         echo: "정식 목록에 올리면 원본은 보호됩니다. 대신 심사팀장 검토 의견 칸의 지우개 자국도 함께 목록에 오릅니다.",
@@ -208,7 +208,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_archive_copy",
-        label: "복사기가 꺼지기 전에 뒷장까지 복사해 오늘 밤 들고 나간다",
+        label: "복사기가 꺼지기 전 뒷장까지 복사해 들고 나간다",
         effect: { capital: 9, time: 4, legitimacy: -5, trust: -2, humanCost: 3, fatigue: -2 },
         voice: "연필 한 줄은 지우면 그만이라며, 복사기가 꺼지기 전에 뒷장까지 복사해 오늘 밤 들고 나간다.",
         echo: "복사는 6분 만에 끝납니다. 복사기는 사용 기록을 남기고, 그 기록은 다음 날 아침 관리 부서로 넘어갑니다.",
@@ -237,7 +237,7 @@ const prologue03Nodes = {
     choices: [
       {
         id: "p3_final_team",
-        label: "심사실 일곱 명에게 오늘 있었던 일을 먼저 그대로 말한다",
+        label: "심사실 일곱 명에게 오늘 일을 먼저 말한다",
         effect: { trust: 12, legitimacy: 5, humanCost: -5, capital: -6, time: -5, fatigue: 6 },
         voice: "같은 방 사람들이 남의 입으로 듣기 전에, 심사실 일곱 명에게 오늘 있었던 일을 먼저 그대로 말한다.",
         echo: "말하기로 하면 이미 퇴근한 사람들에게까지 오늘 일을 그대로 적어 보냅니다. 일곱 명 중 넷은 끝까지 읽고 답을 보내고, 셋은 읽음 표시만 남깁니다.",
@@ -245,7 +245,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_final_reason",
-        label: "밤을 새워 재심 신청서와 반려 사유 요구서를 문서로 만든다",
+        label: "밤새 재심 신청서와 사유 요구서를 만든다",
         effect: { legitimacy: 13, trust: 3, capital: -5, time: -7, humanCost: 3, fatigue: 6 },
         voice: "비어 있는 반박 칸부터 채워야 한다며, 밤을 새워 재심 신청서와 반려 사유 요구서를 문서로 만든다.",
         echo: "문서는 새벽 네 시에 끝납니다. 반박란은 끝내 비어 있습니다. 반려 사유를 아직 아무도 주지 않았기 때문입니다.",
@@ -253,7 +253,7 @@ const prologue03Nodes = {
       },
       {
         id: "p3_final_alone",
-        label: "아무에게도 말하지 않고 내일 아침 혼자 8층으로 올라가기로 한다",
+        label: "아무에게도 말하지 않고 혼자 8층에 올라간다",
         effect: { capital: 10, time: 6, legitimacy: 3, trust: -5, humanCost: 4, fatigue: -2 },
         voice: "누구도 같이 다치지 않게, 아무에게도 말하지 않고 내일 아침 혼자 8층으로 올라가기로 한다.",
         echo: "혼자 가기로 하면 오진우가 종이컵 두 개를 겹쳐 버리고 먼저 나갑니다. 나가면서 불을 끄지 않습니다.",
@@ -299,7 +299,7 @@ export const prologue03 = {
         },
         {
           id: "p3_after_copy",
-          label: "재심은 걸지 않고 반려된 의견서의 사본을 한 부 따로 남겨 둔다",
+          label: "재심 대신 반려된 의견서 사본을 따로 남긴다",
           effect: { capital: 9, legitimacy: 5, trust: -3, time: 3, humanCost: 3, fatigue: 2 },
           voice: "그의 이름을 사유란에 올리지 않고도 오늘이 남게, 재심은 걸지 않고 반려된 의견서의 사본을 한 부 따로 남겨 둔다.",
           echo: "사본을 남기면 오늘은 아무 일도 일어나지 않습니다. 아무 일도 일어나지 않는 것이 이 선택의 값입니다.",
@@ -330,13 +330,13 @@ export const prologue03 = {
       memo: ["의사록 초안 -- 안건 4번: '부속 의견 없음'", "위원장 권한: 개회 전 부속 문서 열람 요청", "진세라: 오늘 그 요청을 하지 않았음", "기록 확정까지 18시간"],
       choices: [
         {
-          label: "'부속 의견 없음' 여섯 글자를 고쳐 달라고 부행장에게 직접 말한다",
+          label: "'부속 의견 없음'을 고쳐 달라고 부행장에게 말한다",
           effect: { trust: 10, legitimacy: 4, humanCost: -4, time: -4, capital: -3, fatigue: 4 },
           voice: "반려했다는 말이 의견이 없었다는 말은 아니어서, '부속 의견 없음' 여섯 글자를 고쳐 달라고 부행장에게 직접 말한다.",
           echo: "말하면 진세라가 펜을 다시 듭니다. 그리고 여섯 글자를 그대로 둔 채 그 옆에 물음표를 하나 그립니다.",
         },
         {
-          label: "반려된 첨부 7이 있었다고 기록에 각주로 남겨 달라고 한다",
+          label: "반려된 첨부 7을 기록에 각주로 남겨 달라고 한다",
           effect: { legitimacy: 9, trust: 3, time: -5, humanCost: 3, fatigue: 3 },
           voice: "여섯 글자는 못 고쳐도 흔적은 남게, 반려된 첨부 7이 있었다는 사실을 기록에 각주로 남겨 달라고 요청한다.",
           echo: "각주가 붙으면 첨부 7은 '없던 것'에서 '반려된 것'이 됩니다. 반려한 사람의 이름도 그 각주에 함께 들어갑니다.",
@@ -610,7 +610,7 @@ export const prologue03 = {
         },
         {
           id: "p3_route_system_find",
-          label: "본점을 떠난 26명을 찾아 그때 무슨 일이 있었는지 듣는다",
+          label: "본점을 떠난 26명을 찾아가 그때 일을 듣는다",
           effect: { trust: 10, legitimacy: 4, humanCost: -5, capital: -4, time: -6, fatigue: 6 },
           voice: "숫자보다 그 사람들 말이 먼저라며, 본점을 떠난 26명을 찾아 그때 무슨 일이 있었는지 듣는다.",
           echo: "찾아가면 26명 중 9명이 만나 줍니다. 그중 둘은 자기 의견서가 아직 어딘가에 있다는 것을 오늘 처음 압니다.",
@@ -629,7 +629,7 @@ export const prologue03 = {
     finalChoices: [
       {
         id: "a",
-        label: "부속 반대 의견은 반드시 본회의에서 읽게 하는 규칙을 제안한다",
+        label: "부속 반대 의견은 본회의에서 읽게 하자고 한다",
         effect: { legitimacy: 13, trust: 6, capital: -7, humanCost: -4, time: -1, fatigue: 7 },
         voice: "다음 의견서가 또 끈에 묶이지 않게, 부속 반대 의견은 반드시 본회의에서 읽게 하는 규칙을 제안한다.",
         echo: "규칙이 생기면 다음 부속 의견은 읽힙니다. 읽힌 뒤에 승인되는 일도 그대로 남습니다.",
@@ -697,8 +697,8 @@ export const prologue03 = {
   memoryPlan: {
     systemNext: "p3_route_system",
     evidenceNext: "p3_evidence_turn",
-    systemLabel: "선반 사이에서 새로 짠 판이 지난 10년 묶음에도 있었는지 찾아본다",
-    evidenceLabel: "제7조 회람 명단을 들고 반려가 몇 시에 눌렸는지 확인한다",
+    systemLabel: "새로 짠 판이 지난 10년 묶음에도 있었는지 찾는다",
+    evidenceLabel: "제7조 회람 명단에서 반려 시각을 확인한다",
     systemEcho: "찾아보면 있습니다. 같은 조항을 센 사람은 당신이 처음이지만, 돌려보낸 의견서를 묶어 둔 끈은 맨 아래 칸에 서른네 개입니다.",
     evidenceEcho: "회람 확인란의 사번들을 반려 기록에 대면 시각 하나가 나옵니다. 개회보다 이르고, 11쪽을 읽기에는 짧습니다.",
   },
@@ -714,7 +714,7 @@ export const prologue03 = {
   },
   openingSignatures: {
     p3_start_alone: {
-      label: "이름이 하나뿐인 문서를 그대로 들고 8층에 먼저 올라간다",
+      label: "이름 하나뿐인 문서를 들고 8층에 먼저 올라간다",
       effect: { trust: 4, legitimacy: 11, capital: -4, time: -5, humanCost: 3, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "이름 하나가 약점이 아님을 보이려고, 이름이 하나뿐인 문서를 그대로 들고 8층에 먼저 올라간다.",
@@ -728,7 +728,7 @@ export const prologue03 = {
       echo: "모이면 셋 다 같은 말을 합니다. '이름은 안 뺄게요.' 그리고 셋 다 누가 전화했는지는 말하지 않습니다.",
     },
     p3_start_soften: {
-      label: "제목부터 '반대 의견'으로 되돌려 달라고 오늘 아침에 요청한다",
+      label: "제목부터 '반대 의견'으로 되돌려 달라고 한다",
       effect: { legitimacy: 12, trust: -1, capital: -4, time: -6, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "안 걸린 문서는 안 읽힌다는 말이 맞다며, 제목부터 '반대 의견'으로 되돌려 달라고 오늘 아침에 요청한다.",
