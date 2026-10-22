@@ -46,6 +46,9 @@ export const CHUNK_RELOAD_SESSION_KEY = "critical-point-chunk-reload-v1";
 // The player's comfort settings: table time, the reading clock, flashes,
 // single-key shortcuts, the intro's motion (src/state/accessibilitySettings.js).
 export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
+// The glossed words this save has already shown explained, so the page folds
+// their brackets from then on (src/components/seenGlosses.js). 초기화 clears it.
+export const SEEN_GLOSSES_KEY = "critical-point-seen-glosses-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited
