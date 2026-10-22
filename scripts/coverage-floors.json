@@ -59,6 +59,7 @@
     "src/sceneTraces.js": 100,
     "src/seasonRules.js": 100,
     "src/seasonRuntime.js": 100,
+    "src/seasonScore.js": 100,
     "src/seasonStanding.js": 100,
     "src/serviceWorker/register.js": 100,
     "src/serviceWorker/worker.js": 99,
