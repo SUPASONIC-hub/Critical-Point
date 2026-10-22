@@ -27,6 +27,7 @@ import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
+import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../gauntlet/tableAfterword.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
@@ -369,6 +370,9 @@ export function useChoiceCommit(context) {
         ...(verdict.firstRecord ? { firstRecord: verdict.firstRecord } : {}),
         focus: verdict.focus,
         logic: verdict.logic,
+        // The same board played bare by the player and by a hand that sees the
+        // wall (tableAfterword.js, C-12): shown when the case closes, never scored.
+        read: readWindowAgainstSeer(windowState, verdict.chips),
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       // The table clock ran this many times slower (the comfort setting); the
@@ -493,6 +497,11 @@ export function useChoiceCommit(context) {
         nextTitle: nodes[nextNode]?.title ?? "결과 화면",
         nextNode,
         unlockedRelics,
+        // Display only (tableAfterword.js): the push not made or the wall the
+        // heartbeat heard (C-11), and on the close the case against a hand that
+        // sees the wall (C-12).
+        afterword: describeAfterword(windowState),
+        caseRead: caseClosed ? describeCaseRead(nextLog) : null,
       },
     });
     // Everything that leaves this tab's own state waits for the save to say

@@ -143,6 +143,12 @@ export function DecisionReveal({ view }) {
           {busted && <Skull size={34} aria-hidden="true" />}
           <h2>{headline}</h2>
           <p>{subline}</p>
+          {/* What the seed still says about this window, and on the close the
+              case against a hand that sees the wall (tableAfterword.js). Plain
+              text in the sheet, nothing that moves and no voice of its own:
+              the slam is the one announcement. */}
+          {decisionReveal.afterword && <p data-testid="reveal-afterword">{decisionReveal.afterword}</p>}
+          {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>
 
         {decisionReveal.short && (
