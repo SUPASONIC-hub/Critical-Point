@@ -18,6 +18,7 @@ import {
 import { getJudgementHabit } from "../judgementHabit.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
+import { getTableReaction } from "../gauntlet/tableAfterword.js";
 import { getTraceEvents } from "./trace.js";
 
 /**
@@ -44,14 +45,18 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
-    return buildNarrativeSpine({
-      caseObjective: caseObjectives[currentCase],
-      node,
-      log,
-      triggerLabels,
-      riskTier,
-      suspenseState,
-    });
+    return {
+      ...buildNarrativeSpine({
+        caseObjective: caseObjectives[currentCase],
+        node,
+        log,
+        triggerLabels,
+        riskTier,
+        suspenseState,
+      }),
+      // The speaker's line about the last table at the head of the scene (C-13, tableAfterword.js).
+      reaction: getTableReaction(log, node?.title),
+    };
   }, [currentCase, log, node, riskPressure, riskTier]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));

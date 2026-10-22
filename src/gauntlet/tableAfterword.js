@@ -1,4 +1,5 @@
 import { drawStep, GAUGE_MAX, getMultiplier, normalizeSchema } from "./gauntletEngine.js";
+import { tableReactions } from "../caseCopy.js";
 import { formatNumber } from "../gameConstants.js";
 import { perCaseVault } from "../ranking.js";
 
@@ -84,6 +85,31 @@ export function readCaseRead(log = []) {
 export function describeCaseRead(log) {
   const percent = readCaseRead(log);
   return percent === null ? null : `이번 사건: 벽을 본 사람의 ${percent}%만큼 벌었습니다.`;
+}
+
+/**
+ * C-13: the heat the last window closed on, as the next scene's speaker
+ * hears it -- BUST, 60 and over (HEAT DEBT's), 40 to 59 (the audit's band)
+ * and under 40.
+ */
+export function getHeatStage(threshold) {
+  if (!threshold) return null;
+  if (threshold.busted) return "bust";
+  const gauge = Number(threshold.gauge) || 0;
+  return gauge >= 60 ? "hot" : gauge >= 40 ? "mid" : "low";
+}
+
+/**
+ * The line at the head of the next scene, or null on a case's first scene
+ * (the log is fresh when a case opens). Picked by the scene, so a reload
+ * reads the same line.
+ */
+export function getTableReaction(log = [], nodeId = "") {
+  const lines = tableReactions[getHeatStage(log.at(-1)?.threshold)];
+  if (!lines) return null;
+  let hash = 0;
+  for (const char of String(nodeId)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return lines[hash % lines.length];
 }
 
 /**

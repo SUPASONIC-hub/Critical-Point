@@ -128,6 +128,7 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  reaction = null,
   run,
   tableSeconds,
   cards,
@@ -286,6 +287,8 @@ export function SceneBriefing({
           )}
 
           <div className="gx-panel gx-panel-story" style={at("3 / 1")}>
+            {/* The speaker on the last table, before the scene (C-13): a line of the runtime's, picked by its heat. */}
+            {reaction && <p className="gx-caption gx-caption-lead" data-testid="table-reaction">{node.speaker}: “{reaction}”</p>}
             {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
             <ProseCaptions text={node.text} />
           </div>
