@@ -1194,7 +1194,8 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
 
   await expect(page.locator(".ending-step-3")).toBeVisible();
   await expect(page.locator(".result-page.final-report-locked")).toHaveCount(0);
-  await expect(page.locator(".result-hero h1")).toBeFocused();
+  // The ending's title, first on the report since 2026-10-22 (D-10); the profile and rank follow the story.
+  await expect(page.locator(".result-page > .outcome-panel h2")).toBeFocused();
   // The sequence's own region: the result card's buttons bring a second one.
   await expect(page.locator(".ending-sequence > [role='status']")).toContainText("기록이 열렸습니다");
   await expect

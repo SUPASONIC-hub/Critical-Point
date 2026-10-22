@@ -8,6 +8,7 @@ import {
   getAverageResponseTime,
   getCaseOutcome,
   getCounterfactualReport,
+  getDiscoveryClue,
   getDecisionFingerprint,
   getDecisionLedger,
   getGameplayStats,
@@ -57,7 +58,9 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, discoveredClues = [], gauntletRun, runId, seedBase, debugTools }) {
+  // A case's report counts the doors of that case (D-10); the finale's, the season's.
+  const caseScoped = currentCase !== "final";
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const narrativeSpine = useMemo(() => {
@@ -79,7 +82,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   }, [caseResults, currentCase, log, node, riskPressure, riskTier]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
-    const unopenedBranchCount = getCaseBranchNodes().reduce(
+    const unopenedBranchCount = getCaseBranchNodes().filter((branch) => !caseScoped || branch.caseId === currentCase).reduce(
       (total, branch) => total + branch.nextIds.filter((nodeId) => !visitedNodeIds.has(nodeId)).length,
       0,
     );
@@ -94,7 +97,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
       currentAverageResponseTime: getAverageResponseTime(log),
       reframeEntries: log.filter((entry) => entry.reframeOpenedRoute),
     };
-  }, [log]);
+  }, [caseScoped, currentCase, log]);
   const gameplayStats = useMemo(() => getGameplayStats(log, riskPressure), [log, riskPressure]);
   const decisionLedger = useMemo(() => getDecisionLedger(log, resources), [log, resources]);
   // The season's 판단 습관 rides on the fingerprint because the fingerprint is
@@ -107,6 +110,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   );
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
+  // The case's own clue, when it is a case's report and the clue is still shut.
+  const caseClue = caseScoped ? getDiscoveryClue({ currentCase, challengeMatch: true, riskDelta: 2, logLength: 1 }) : null;
+  const caseClueShut = caseClue && !discoveredClues.some((found) => (found?.id ?? found) === caseClue.id) ? 1 : 0;
   const gauntletSeed = useMemo(() => (seedBase ? dealGauntletSeed(seedBase) : null), [seedBase]);
   // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
   const auditCount = useMemo(() => countAudit(log), [log]);
@@ -129,7 +135,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
     decisionLedger,
     decisionFingerprint,
     unopenedClueCount,
-    unopenedRecordCount: unopenedClueCount + logReadout.unopenedBranchCount,
+    unopenedRecordCount: (caseScoped ? caseClueShut : unopenedClueCount) + logReadout.unopenedBranchCount,
     gauntletSeed,
     tableRisk,
     silentFailureCount,
