@@ -255,7 +255,9 @@ const fileBudgets = {
   // from under a notch on either side.
   // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
   // (31 lines and 2222 bytes of them that day), the room unchanged.
-  "briefing.css": { lines: 674, bytes: 13078 },
+  // 674 / 13078 -> 681 / 13293 on 2026-10-22 (story-copy-1, Q8 (1)), measured: the
+  // case's opening voice under the title and the title strip's third row.
+  "briefing.css": { lines: 681, bytes: 13293 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
