@@ -64,7 +64,7 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
       }
     : null;
   const echo = previousOutcome
-    ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
+    ? `${introEcho} 지난 사건: '${previousOutcome.title}'`
     : introEcho;
   // The origin bonus is the run's opening hand, so it belongs to the season's
   // first case -- which is the 프롤로그 now, not 사건 01.
