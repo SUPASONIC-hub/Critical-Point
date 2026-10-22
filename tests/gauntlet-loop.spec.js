@@ -1214,7 +1214,7 @@ test("a third push brings an edge notice that covers no number, and the switch t
   await expect(notice).toHaveCount(0);
   await pushTimes(page, 1);
   await expect(notice).toBeVisible();
-  await expect(notice).toContainText("메신저 · 위층");
+  await expect(notice).toContainText("메신저 · 한서윤");
   await expect(notice).toHaveAttribute("aria-hidden", "true");
   expect(await notice.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
   expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
@@ -1229,7 +1229,7 @@ test("a third push brings an edge notice that covers no number, and the switch t
       .map((other) => other.className || other.dataset.testid);
   });
   expect(overlaps, "the notice covers none of the table's numbers").toEqual([]);
-  await expect(page.getByTestId("table-voice")).not.toContainText("위층");
+  await expect(page.getByTestId("table-voice")).not.toContainText("메신저");
 
   await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ tableTime: 2, edgeNotices: false }) });
   await openTable(page, "case01", "c1_aftershock");
