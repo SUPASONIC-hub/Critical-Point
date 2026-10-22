@@ -400,6 +400,9 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
   `choices: {}`, `system`(경로 장면과 마지막 장면의 글, `routeChoices` 셋, `finalTitle`·`finalText`·
   `finalMemo`), `finalChoices` 셋(`id`는 `"a"`, `"b"`, `"c"`). 마지막 장면의 글을 비우면 시즌 공용 장면으로
   닫히는데, 지금은 검사가 그것을 실패로 봅니다.
+  경로 장면 본문의 첫 문장은 "A할지 고르는 대신 B하자 C가 N건을 엽니다" 한 문장으로 몰지 않습니다. 시즌의 숨은
+  경로 54개가 모두 이 틀(평균 87자)이었습니다. 행동(무엇을 묻거나 하는지) → 누가 움직이는지 → 무엇이 열리는지를
+  짧은 문장 셋으로 나누고, 사건마다 동사와 리듬을 바꿉니다.
 - **단서 반전(`evidencePlan`)**: `sourceRoutes`에 적은 장면마다 "단서를 연다" 카드(`entryLabel`)가 붙고,
   그 카드는 `requiredAuthority` 권한이 있어야 열립니다. `entryVoice`, `entryEcho`, `entryEffect`, 장면 글,
   카드 셋을 씁니다.
