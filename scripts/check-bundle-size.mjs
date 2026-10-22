@@ -81,7 +81,10 @@ const budgets = [
   // the runtime now reads the season number (appConfig.getSeasonRound) for the
   // second season's lines and card, and the entry exports it under one more
   // name; the +9 / +8 it took over the old NEW GAME+, carried over.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_445, maxGzip: 61_624 },
+  // -> 170,478 / 61,634 the same day: E-5, the season's row title handed to
+  // seasonViewModels (`title`) instead of the fixed SEASON 01 COMPLETE, from
+  // the runtime's secondSeason.rowTitle (+33 / +10 over the old NEW GAME+).
+  { pattern: /^index-.*\.js$/, maxBytes: 170_478, maxGzip: 61_634 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -247,7 +250,10 @@ const budgets = [
   // imports, auditRisk's and cascadeRisk's, measured 8,711 / 4,242 plus 4.
   // 8,711 / 4,246 -> 8,745 / 4,261 on 2026-10-21 (F1 phase 2, #216, draft),
   // measured 8,745 / 4,257 plus 4: one more import, the replay trail's chunk.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_745, maxGzip: 4_261 },
+  // 8,745 / 4,261 -> 8,801 / 4,285 (second-season, draft): E-5, the card's
+  // corner and the shared line's tail are strings the result side hands in
+  // (secondSeason.getSeasonCard), +56 / +24 as measured over the old base.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_801, maxGzip: 4_285 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
