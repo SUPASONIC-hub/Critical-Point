@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { BANNED, RETIRED_PHRASES, findBannedWords, findRetiredPhrases } from "../../scripts/plain-language-rules.mjs";
+import { BANNED, GLOSSARY, RETIRED_PHRASES, STANDARD_GLOSS, findBannedWords, findGlosses, findRetiredPhrases } from "../../scripts/plain-language-rules.mjs";
 
 test("every retired free-text phrase is refused wherever it sits in a sentence", () => {
   for (const phrase of Object.keys(RETIRED_PHRASES)) {
@@ -95,5 +95,21 @@ test("a term is explained on every route to the scene that says it, not just som
     assert.match(said, /case\/term pairs are read unexplained on some route, over the \d+ allowed/);
   } finally {
     opening[field] = written;
+  }
+});
+
+test("a gloss is read only from a parenthesis right after the term", () => {
+  assert.deepEqual(findGlosses("첫 의원이 자문료(조언값이라며  내보낸 돈)를 묻습니다.", "자문료"), [{ gloss: "조언값이라며 내보낸 돈", index: 6 }]);
+  assert.deepEqual(findGlosses("자문료 (조언값이라며 받은 돈)", "자문료").map((entry) => entry.gloss), ["조언값이라며 받은 돈"]);
+  // A longer word explains itself, not the term inside it.
+  assert.deepEqual(findGlosses("발령서(새 근무지로 옮기라는 인사 명령서)", "발령"), []);
+  assert.deepEqual(findGlosses("대기발령(맡은 일 없이 다음 자리를 기다리게 하는 인사 조치)", "발령"), []);
+  assert.deepEqual(findGlosses("자문료는 그대로입니다.", "자문료"), []);
+});
+
+test("every standard gloss belongs to a glossary term and is a non-empty wording", () => {
+  for (const [term, gloss] of Object.entries(STANDARD_GLOSS)) {
+    assert.ok(GLOSSARY.includes(term), term);
+    assert.ok(gloss.trim() && !/[()]/.test(gloss), `${term}: ${gloss}`);
   }
 });
