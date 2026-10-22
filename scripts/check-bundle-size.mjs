@@ -113,8 +113,9 @@ const budgets = [
   // 104,771 / 34,839, the gzip plus 4, on main 0df240a's 104,705 / 34,801.
   // What stays here of the edge notices is the import and the one element in
   // TableNotices; their words, timing and inline style are EdgeNotice's
-  // (below), and play.css took no rule.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_771, maxGzip: 34_843 },
+  // (below), and play.css took no rule. 104,771 -> 104,792 on 2026-10-22
+  // (B-15): the table hands the notice its case (`caseId` in the voice's facts).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_792, maxGzip: 34_843 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -285,8 +286,11 @@ const budgets = [
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
-  // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 1_794, maxGzip: 1_198 },
+  // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4;
+  // 3,777 / 2,163 on 2026-10-22, when the two senders became nine acts' pairs
+  // (B-15: eighteen senders, thirty-six lines) and the act is read off
+  // CASE_SEQUENCE.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_777, maxGzip: 2_167 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
