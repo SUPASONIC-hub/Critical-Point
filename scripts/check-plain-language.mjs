@@ -24,6 +24,14 @@
  *    (`unexplainedUses`). What that rule found on its first day is held as a
  *    ceiling that only comes down (`BARE_ON_A_ROUTE`).
  *
+ * 3. A term is explained the same way every time. The season explained 자문료
+ *    nine ways and 실사 in two meanings, because each case wrote its own
+ *    parenthesis. `STANDARD_GLOSS` names the one wording per term, and every
+ *    parenthesis that says something else is a warning, not a failure: the copy
+ *    is rewritten after the W44 freeze. Their number is held as a ceiling that
+ *    only comes down (`OFF_STANDARD_CEILING`), so a new case writes the
+ *    standard wording. `--glosses` lists every one.
+ *
  * Only narration is checked -- a scene's lead and body -- because that is where
  * a sentence has room for a parenthesis. Choice labels and memo lines are short
  * by design and lean on the narration above them.
@@ -32,7 +40,7 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, CASE_START_NODES, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
 import { UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
-import { BANNED, GLOSSARY, RETIRED_PHRASES, findBannedWords, findRetiredPhrases } from "./plain-language-rules.mjs";
+import { BANNED, GLOSSARY, RETIRED_PHRASES, STANDARD_GLOSS, findBannedWords, findGlosses, findRetiredPhrases } from "./plain-language-rules.mjs";
 
 // Every case file is copy, so the list reads the folder rather than naming each
 // case: a new case was once added and its file left off this list.
@@ -199,6 +207,39 @@ if (bareOnARoute.size > BARE_ON_A_ROUTE.size) {
 }
 if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) console.log(describeBare(pair));
 
+/**
+ * Every parenthesis that explains a term differently from its standard
+ * wording. Counted on 2026-10-22: 830 parentheses explain a term right after
+ * it, 71 terms are explained more than one way, and 195 of the parentheses say
+ * something other than the standard. They are warnings until the copy is
+ * rewritten (from 11-02); the count only comes down.
+ */
+const OFF_STANDARD_CEILING = 195;
+for (const term of Object.keys(STANDARD_GLOSS)) {
+  if (!GLOSSARY.includes(term)) failures.push(`STANDARD_GLOSS explains "${term}", which is not in GLOSSARY`);
+}
+const offStandard = [];
+const variedTerms = new Set();
+for (const term of GLOSSARY) {
+  const uses = [];
+  for (const id of Object.keys(nodes).sort()) {
+    for (const { gloss } of findGlosses(narration(nodes[id]), term)) uses.push({ id, caseId: nodes[id].caseId, gloss });
+  }
+  if (!uses.length) continue;
+  const counts = new Map();
+  for (const { gloss } of uses) counts.set(gloss, (counts.get(gloss) ?? 0) + 1);
+  if (counts.size > 1) variedTerms.add(term);
+  const standard = STANDARD_GLOSS[term] ?? [...counts].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length || a[0].localeCompare(b[0]))[0][0];
+  for (const use of uses) if (use.gloss !== standard) offStandard.push({ ...use, term, standard, named: term in STANDARD_GLOSS });
+}
+const describeGloss = ({ id, caseId, term, gloss, standard, named }) =>
+  `${id} (${caseId}): ${term}(${gloss}) -- the standard is ${term}(${standard})${named ? "" : ", the wording used most; give it a STANDARD_GLOSS entry"}`;
+if (process.argv.includes("--glosses")) for (const use of offStandard) console.log(describeGloss(use));
+if (offStandard.length > OFF_STANDARD_CEILING) {
+  for (const use of offStandard) failures.push(describeGloss(use));
+  failures.push(`${offStandard.length} parentheses explain a term other than its standard way, over the ${OFF_STANDARD_CEILING} allowed: write the STANDARD_GLOSS wording in the new one`);
+}
+
 assert.deepEqual(failures, [], failures.join("\n"));
 console.log(
   `Plain-language check passed (${Object.keys(BANNED).length} banned words, ${Object.keys(RETIRED_PHRASES).length} retired phrases, ${GLOSSARY.length} glossary terms across ${CASE_SEQUENCE.length} cases; ` +
@@ -206,3 +247,10 @@ console.log(
 );
 const settled = [...BARE_ON_A_ROUTE].filter((pair) => !bareOnARoute.has(pair));
 if (settled.length) console.log(`Explained on every route now; take them off BARE_ON_A_ROUTE: ${settled.join(", ")}.`);
+if (offStandard.length) {
+  const byTerm = new Map();
+  for (const { term } of offStandard) byTerm.set(term, (byTerm.get(term) ?? 0) + 1);
+  const most = [...byTerm].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([term, count]) => `${term} ${count}`).join(", ");
+  console.log(`warning: ${offStandard.length} of the ${OFF_STANDARD_CEILING} allowed parentheses explain a term other than its STANDARD_GLOSS way (${variedTerms.size} terms explained more than one way; most: ${most}); --glosses lists them.`);
+}
+if (offStandard.length < OFF_STANDARD_CEILING) console.log(`Fewer parentheses are off the standard now; take OFF_STANDARD_CEILING down to ${offStandard.length}.`);

@@ -1,5 +1,5 @@
 /**
- * Card-label length check.
+ * Card-label and scene-text length check.
  *
  * A card's label is read on a phone in a card about 165px wide, where
  * `play.css` gives it three lines of 13px type before it is cut
@@ -33,8 +33,20 @@
  * an old one when another was shortened in the same change; `--list` prints
  * them all to read.
  *
+ * A scene's body (`text`) is held the same way (A-13 of the 2026-10-22
+ * review). It is the narration a phone reads in the briefing boxes, and
+ * nothing counted it: the longest, case 45's `c45_stories`, was 702
+ * characters, and the reading clock grows with every one of them. It is
+ * counted like a label. `MAX_TEXT` is 420 characters; `TEXT_OVER_CEILING` is
+ * how many scenes were longer on 2026-10-22 and `LONGEST_TEXT` the longest,
+ * both ratchets that only come down. The `lead` above the body is not
+ * counted: it is one line, written to be read first. The check lives here,
+ * not in a script of its own, because it is the same count and the same
+ * ratchet over the same graph.
+ *
  *   node scripts/check-card-labels.mjs          the check
  *   node scripts/check-card-labels.mjs --list   every label over MAX_LABEL
+ *   node scripts/check-card-labels.mjs --texts  every scene body over MAX_TEXT
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameData.js";
@@ -42,6 +54,10 @@ import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameDa
 const MAX_LABEL = 30;
 const OVER_CEILING = 725;
 const LONGEST_LABEL = 40;
+
+const MAX_TEXT = 420;
+const TEXT_OVER_CEILING = 133;
+const LONGEST_TEXT = 702;
 
 // The lengths the distribution is reported at; MAX_LABEL is one of them.
 const MARKS = [24, 28, 30, 32, 36];
@@ -91,6 +107,33 @@ function writtenAt(card) {
   return card.where;
 }
 
+// --- scene bodies ------------------------------------------------------------
+
+const texts = Object.entries(nodes)
+  .map(([sceneId, scene]) => ({ sceneId, caseId: scene.caseId, kind: scene.kind, text: scene.text, length: labelLength(scene.text) }))
+  .sort((a, b) => b.length - a.length || a.sceneId.localeCompare(b.sceneId));
+if (texts.length === 0) failures.push("the scene graph has no scene; no body was measured");
+const longTexts = texts.filter((entry) => entry.length > MAX_TEXT);
+
+/** `file:line` where the body is written, found by its opening words. */
+function textWrittenAt(entry) {
+  const opening = String(entry.text ?? "").slice(0, 24);
+  for (const { file, text } of sources) {
+    const index = opening ? text.indexOf(opening) : -1;
+    if (index >= 0) return `${file}:${text.slice(0, index).split("\n").length}`;
+  }
+  return entry.sceneId;
+}
+const describeText = (entry) => `${textWrittenAt(entry)}: ${entry.length} characters, ${entry.length - MAX_TEXT} over ${MAX_TEXT} (${entry.caseId}, ${entry.kind} ${entry.sceneId})`;
+if (process.argv.includes("--texts")) for (const entry of longTexts) console.log(describeText(entry));
+if (longTexts.length > TEXT_OVER_CEILING) {
+  for (const entry of longTexts) failures.push(describeText(entry));
+  failures.push(`${longTexts.length} scene bodies are longer than ${MAX_TEXT} characters, over the ${TEXT_OVER_CEILING} allowed: split the new one or move a line to its memo (the list above is longest first)`);
+}
+if ((texts[0]?.length ?? 0) > LONGEST_TEXT) {
+  for (const entry of longTexts.filter((item) => item.length > LONGEST_TEXT)) failures.push(`${textWrittenAt(entry)}: ${entry.length} characters, longer than the longest scene body allowed (${LONGEST_TEXT}) (${entry.sceneId})`);
+}
+
 // --- the distribution --------------------------------------------------------
 
 const lengths = cards.map((card) => card.length).sort((a, b) => a - b);
@@ -136,4 +179,7 @@ if (failures.length) {
   );
   if (over.length < OVER_CEILING) console.log(`Fewer labels are over ${MAX_LABEL} now; take OVER_CEILING down to ${over.length}.`);
   if (lengths.at(-1) < LONGEST_LABEL) console.log(`The longest label is shorter now; take LONGEST_LABEL down to ${lengths.at(-1)}.`);
+  console.log(`Scene bodies: ${longTexts.length} of the ${TEXT_OVER_CEILING} allowed of ${texts.length.toLocaleString("en-US")} are longer than ${MAX_TEXT} characters, the longest ${texts[0]?.length} of the ${LONGEST_TEXT} allowed.`);
+  if (longTexts.length < TEXT_OVER_CEILING) console.log(`Fewer scene bodies are over ${MAX_TEXT} now; take TEXT_OVER_CEILING down to ${longTexts.length}.`);
+  if ((texts[0]?.length ?? 0) < LONGEST_TEXT) console.log(`The longest scene body is shorter now; take LONGEST_TEXT down to ${texts[0]?.length}.`);
 }
