@@ -298,6 +298,54 @@ console.log(`Slack door (a season's best streak of ${LOGIC_SLACK_STREAK} or more
 if (AUDIT_WEEK) console.log(`Audit (measured, AUDIT_WEEK=1, values ${AUDIT_VALUES}): ${auditTally.caught} closes caught in ${auditTally.seasons} of ${SEASONS} seasons (${(auditTally.caught / SEASONS).toFixed(2)} a season), ${((auditTally.lost / Math.max(1, auditTally.secured)) * 100).toFixed(1)}% of what the closes moved to the vault`);
 
 /**
+ * What the collapse share is made of, and how much of an ending the table's
+ * skill moves (measured, not asserted, 2026-10-22: improvement notes C-8, for
+ * the 11-02 verdict's 연5). Two lines, after every line above, on a bot of
+ * their own, so no season above and no floor moves.
+ *
+ * The first is the population's collapse share by archetype: the season-wide
+ * share is mostly how many of the population's slots spend people or chase
+ * money, not how hard the table is.
+ *
+ * The second plays each slot of the population twice on the same seed: once
+ * blind (cashes at its heat, `board: "blind"`), once listening to the
+ * heartbeat (`board: "listens"`, which looks with SCOUT on the cases that
+ * have it). Same archetype, same values, same draws -- only the table differs,
+ * so the cards it picks stay the same until a cash or a bust sends the two
+ * seasons to different scenes or resources. The share of pairs whose ending
+ * differs is how much of an ending the table's skill decides.
+ */
+{
+  const archetypeNames = [...new Set(POPULATION)];
+  const collapseOf = (name) => `${name} ${(share(byArchetype[name], "collapse", archetypeTotal(name)) * 100).toFixed(1)}%`;
+  console.log(`Collapse by archetype (measured, the ${SEASONS} seasons above, ${POPULATION.length} population slots, random in 2): ${archetypeNames.map(collapseOf).join(", ")}; all ${(share(counts, "collapse", SEASONS) * 100).toFixed(1)}%`);
+  const BOARD_PAIRS = Number(process.env.ENDING_BOARD_SEASONS) || POPULATION.length * 40;
+  const boards = createSeasonBot({ seed: 20261022, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[`${name}+blind`, { ...base, board: "blind" }], [`${name}+listens`, { ...base, board: "listens" }]])) });
+  const tally = () => ({ pairs: 0, moved: 0, collapseMoved: 0, blindCollapse: 0, listensCollapse: 0, blindBusts: 0, listensBusts: 0 });
+  const total = tally();
+  const byName = Object.fromEntries(archetypeNames.map((name) => [name, tally()]));
+  for (let index = 0; index < BOARD_PAIRS; index += 1) {
+    const archetype = POPULATION[index % POPULATION.length];
+    const [blind, listens] = ["blind", "listens"].map((side) => {
+      boards.reseed((20261022 + Math.imul(index + 1, 2654435761)) >>> 0);
+      return boards.playSeason(`board:${index}`, `${archetype}+${side}`);
+    });
+    for (const row of [total, byName[archetype]]) {
+      row.pairs += 1;
+      if (blind.ending.id !== listens.ending.id) row.moved += 1;
+      if ((blind.ending.id === "collapse") !== (listens.ending.id === "collapse")) row.collapseMoved += 1;
+      if (blind.ending.id === "collapse") row.blindCollapse += 1;
+      if (listens.ending.id === "collapse") row.listensCollapse += 1;
+      row.blindBusts += blind.strain.seasonBusts;
+      row.listensBusts += listens.strain.seasonBusts;
+    }
+  }
+  const per = (part, whole) => ((100 * part) / Math.max(1, whole)).toFixed(1);
+  const describe = (row) => `ending differs in ${row.moved} of ${row.pairs} (${per(row.moved, row.pairs)}%), collapse on one side only ${row.collapseMoved} (${per(row.collapseMoved, row.pairs)}%), collapse blind ${per(row.blindCollapse, row.pairs)}% / heartbeat ${per(row.listensCollapse, row.pairs)}%, busts a season ${(row.blindBusts / Math.max(1, row.pairs)).toFixed(1)} / ${(row.listensBusts / Math.max(1, row.pairs)).toFixed(1)}`;
+  console.log(`Board skill moves the ending (measured, ${BOARD_PAIRS} population slots each played blind and on the heartbeat on one seed): ${describe(total)}; ${archetypeNames.map((name) => `${name}: ${describe(byName[name])}`).join("; ")}`);
+}
+
+/**
  * The same season in story mode.
  *
  * Story mode changes what the ending reads of the table and nothing of what it

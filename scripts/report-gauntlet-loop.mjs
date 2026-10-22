@@ -792,6 +792,19 @@ for (const row of [bestFixed, fixed.find((entry) => entry.label === "heat 60"), 
 }
 
 /**
+ * Whether a bust calls the next one (measured, not asserted, 2026-10-22:
+ * improvement notes C-14). The board played right after a bust in the same
+ * case is dealt BLACKOUT (face down) and AFTERSHOCK (a hot start) wherever the
+ * rules have them; its bust rate is set beside the boards that followed no
+ * bust, policy by policy. CASCADE boards are B2's (CASCADE_WEEK=1), measured
+ * with the heavy card at the end of this file.
+ */
+const chainOf = (seen) => `after a bust ${perCentOf(seen.afterBustBusts, seen.afterBustBoards)}% of ${seen.afterBustBoards} (BLACKOUT+AFTERSHOCK ${perCentOf(seen.afterShockBusts, seen.afterShockBoards)}% of ${seen.afterShockBoards}), after none ${perCentOf(seen.freshBusts, seen.freshBoards)}% of ${seen.freshBoards}`;
+for (const row of [...["heat 40", "heat 50", "heat 60"].map((label) => fixed.find((entry) => entry.label === label)), bestHeartbeatSoFar, heartbeat.find((entry) => entry.label === "heartbeat < 120"), bestScout, oracle]) {
+  console.log(`measured chain ${row.label.padEnd(16)} bust ${chainOf(row.seen)}`);
+}
+
+/**
  * Tools together (2026-10-13, the plan's question of a cap on tools). The
  * relic rows above play each tool alone and all twelve at once; a cap asks
  * about the sets between. The same hand on the same cases holds the five
@@ -867,6 +880,11 @@ if (CASCADE_WEEK) {
     console.log(
       `cascade          heavy ${label.padEnd(18)} vault ${String(off.meanVault).padStart(6)} -> ${String(on.meanVault).padStart(6)} (${perCentOf(off.meanVault - on.meanVault, off.meanVault)}% lost)  bust ${(off.bustRate * 100).toFixed(1)}% -> ${(on.bustRate * 100).toFixed(1)}%  CASCADE boards ${seen.cascadeBoards} (bust ${perCentOf(seen.cascadeBusts, seen.cascadeBoards)}%)  links made ${seen.linksMade}, came back ${seen.linksLanded} (${seen.linksLandedIn} carried in), carried ${seen.linksCarried}, lapsed ${seen.linksLapsed} (${perCentOf(seen.linksLapsed, seen.linksMade)}%)`,
     );
+  }
+  // The bust chain on the heavy card with links on (C-14): CASCADE boards after a bust and after none.
+  for (const { label, on } of heavyRows) {
+    const seen = on.seen;
+    console.log(`cascade chain    heavy ${label.padEnd(18)} bust ${chainOf(seen)}; CASCADE boards after a bust ${perCentOf(seen.afterCascadeBusts, seen.afterCascadeBoards)}% of ${seen.afterCascadeBoards}, after none ${perCentOf(seen.cascadeFreshBusts, seen.cascadeFreshBoards)}% of ${seen.cascadeFreshBoards}`);
   }
   const onRow = (label) => heavyRows.find((row) => row.label === label).on;
   const family = (prefix) => bestOfRows(heavyRows.filter((row) => row.label.startsWith(prefix)).map((row) => row.on));
