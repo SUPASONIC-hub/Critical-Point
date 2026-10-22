@@ -1,4 +1,6 @@
 import { drawStep, GAUGE_MAX, getMultiplier, normalizeSchema } from "./gauntletEngine.js";
+import { formatNumber } from "../gameConstants.js";
+import { perCaseVault } from "../ranking.js";
 
 /**
  * What a closed window can still say about itself (improvement notes
@@ -82,4 +84,15 @@ export function readCaseRead(log = []) {
 export function describeCaseRead(log) {
   const percent = readCaseRead(log);
   return percent === null ? null : `이번 사건: 벽을 본 사람의 ${percent}%만큼 벌었습니다.`;
+}
+
+/**
+ * C-1 (3): the result card's 사건당 금고 line, made here and handed to the card
+ * whole (its chunk has no bytes for the words): the finale's vault over the
+ * cases the season closed, as the ranking row reads it. Empty without one.
+ */
+export function describeVaultPerCase(caseResults = {}) {
+  const results = caseResults && typeof caseResults === "object" ? caseResults : {};
+  const perCase = perCaseVault({ gauntlet: results.final?.gauntlet, completedCaseCount: Object.keys(results).length });
+  return perCase === null ? "" : `사건당 금고 ${formatNumber(perCase)}`;
 }
