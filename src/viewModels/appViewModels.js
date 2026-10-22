@@ -43,7 +43,7 @@ export const viewGroups = {
       "hasResumableSave", "node", "formatSaveTime", "lastSavedAt", "log", "progress", "playerName",
       "PLAYER_NAME_MAX_LENGTH", "setPlayerName", "limitText", "startGame", "resumeSavedGame",
       "activePlayStyle", "playStyleOptions", "playStyle", "setPlayStyle", "persist", "newGamePlusUnlocked",
-      "startNewGamePlus",
+      "startNewGamePlus", "storyRecap",
     ],
     telemetry: [
       "dataConsent", "setDataConsent", "pendingTelemetry", "setTelemetryStatus", "telemetryEnabled",

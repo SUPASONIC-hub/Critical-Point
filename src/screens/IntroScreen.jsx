@@ -105,7 +105,7 @@ export function IntroScreen({ view, renderers = {} }) {
     start: {
       playStyleOptions, playStyle, setPlayStyle, persist, hasResumableSave, node, formatSaveTime,
       lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText,
-      startGame, resumeSavedGame, activePlayStyle, newGamePlusUnlocked, startNewGamePlus,
+      startGame, resumeSavedGame, activePlayStyle, newGamePlusUnlocked, startNewGamePlus, storyRecap,
     },
     telemetry: {
       dataConsent, setDataConsent, pendingTelemetry, setTelemetryStatus, telemetryEnabled, isOnline,
@@ -226,6 +226,15 @@ export function IntroScreen({ view, renderers = {} }) {
           {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록
           {progress === null ? "" : ` · 진행률 ${progress}%`}
         </small>
+        {/* 지난 이야기: the last case's ending and what this one is about, or
+            the line the last decision left (introViewModel's getStoryRecap).
+            A div, so the card's own grid rule lays it out and no style is added. */}
+        {storyRecap.length > 0 && (
+          <div data-testid="resume-recap">
+            <span>지난 이야기</span>
+            {storyRecap.map((line) => <small key={line}>{line}</small>)}
+          </div>
+        )}
       </div>
       <button
         type="button"

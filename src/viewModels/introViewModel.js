@@ -62,6 +62,19 @@ export function createCompletedCaseResultList(caseResults = {}) {
     .map((caseItem) => ({ ...caseItem, result: normalizeCaseSummary(caseResults[caseItem.id]) }));
 }
 
+/**
+ * 「지난 이야기」 on the resume card (improvement notes D-9 = B-6(1)): the
+ * last case's ending title, then what this case is about -- the premise the
+ * last case's close announced, or, once this case has a decision, the line
+ * that decision left. Read from the save alone (`openingLegacy`, written when
+ * the case opened, and the log), so the shell draws it without the case copy.
+ */
+export function getStoryRecap({ openingLegacy, log = [] }) {
+  const ending = openingLegacy?.continuity?.title;
+  const echo = [...log].reverse().find((entry) => typeof entry?.echo === "string" && entry.echo)?.echo;
+  return [ending && `「${ending}」`, echo ?? openingLegacy?.premise].filter((line) => typeof line === "string" && line);
+}
+
 export function createIntroViewModel({
   // The music component. It is the one React piece in the bag, and it stays an
   // argument so this module holds no JSX and can be exercised from Node.
@@ -86,6 +99,8 @@ export function createIntroViewModel({
   currentCase,
   // The scene the save stands on. Only whether it is a report is read here.
   nodeId,
+  // What the case opened with (state/caseRoutes.js), for the resume card's recap.
+  openingLegacy = null,
   newGamePlusUnlocked,
   newGamePlusMemory,
   nextParticipantMessage,
@@ -146,6 +161,7 @@ export function createIntroViewModel({
     persist,
     newGamePlusUnlocked,
     startNewGamePlus,
+    storyRecap: getStoryRecap({ openingLegacy, log }),
 
     dataConsent,
     setDataConsent,
