@@ -263,7 +263,11 @@ const fileBudgets = {
   // screen did (22 lines and 425 bytes).
   // 652 / 12653 -> 653 / 12696 the same day (D-7), measured: the line from
   // the scene before, over the briefing's first box.
-  "briefing.css": { lines: 653, bytes: 12696 },
+  // 653 / 12696 -> 676 / 13060 the same day (D-13), measured: a phone draws
+  // the room behind the page's title, its panel keeps the room's name and
+  // clock, and the speaker's face is 96px. Two lines over the 674 the sheet
+  // held before D-3, 18 bytes under its 13078.
+  "briefing.css": { lines: 676, bytes: 13060 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

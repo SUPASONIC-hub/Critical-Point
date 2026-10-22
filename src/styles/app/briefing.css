@@ -126,6 +126,11 @@
   background: var(--ui-surface-2);
 }
 
+/* The room behind the title is a phone's (D-13); a wider page draws it in its panel. */
+.gx-comic-top > .gx-plate-backdrop {
+  display: none;
+}
+
 /* Panels ---------------------------------------------------------------------- */
 .gx-comic-grid {
   display: grid;
@@ -610,23 +615,44 @@
     max-width: 6.5em;
   }
 
+  /* The room is drawn behind the page's title, not in a band of its own
+     (2026-10-22, D-13): the band was 88px of the first screen, given to the
+     story now. What stays of the panel is the room's name and clock. */
+  .gx-comic-top {
+    position: relative;
+    z-index: 0;
+  }
+
+  .gx-comic-top > .gx-plate-backdrop {
+    display: block;
+    height: 100%;
+    opacity: 0.5;
+  }
+
   .gx-panel-splash {
-    flex-shrink: 1;
-    min-height: 5.5rem;
+    min-height: 0;
+    clip-path: none;
   }
 
-  /* A caption of three lines is 74.9px, and the band at its shortest has
-     82px inside its border. */
-  .gx-caption-place {
-    top: 4px;
-  }
-
+  .gx-panel-splash > .gx-plate,
   .gx-sfx {
-    font-size: 1.75rem;
+    display: none;
   }
 
+  .gx-caption-place {
+    position: relative;
+    inset: auto;
+    max-width: none;
+    transform: none;
+  }
+
+  /* A face a reader can recognise, and a name that reads as one. */
   .gx-panel-speaker {
-    grid-template-columns: 76px 1fr;
+    grid-template-columns: 96px 1fr;
+  }
+
+  .gx-speaker-tag b {
+    font-size: 1.375rem;
   }
 
   .gx-comic-hint {

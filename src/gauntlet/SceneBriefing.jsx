@@ -233,6 +233,8 @@ export function SceneBriefing({
         onKeyDown={trapTab}
       >
         <header className="gx-comic-top">
+          {/* A phone's picture of the room, behind the title (D-13); briefing.css shows it there only. */}
+          <ScenePlate node={node} nodeId={nodeId} variant="backdrop" />
           <p className="gx-comic-kicker" lang="en">{node.phase}</p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
           <button

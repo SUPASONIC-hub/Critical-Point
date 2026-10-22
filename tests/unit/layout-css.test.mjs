@@ -288,18 +288,21 @@ test("the result page's brand pill keeps clear of two music icons, not of two la
   assert.match(phone, /padding: 0 9px;/, "the icons are still the size this was measured against");
 });
 
-test("a three-line place caption ends inside the briefing's cropped band", () => {
+test("a phone draws the room behind the briefing's title, and its panel is the room's name and clock (D-13)", () => {
   const briefing = sheet("briefing");
   const phone = briefing.slice(briefing.indexOf("@media (max-width: 700px)"));
-  const top = Number(phone.match(/\n {2}\.gx-caption-place \{\s*top: (\d+)px;\s*\}/)?.[1]);
-  assert.ok(Number.isFinite(top), "the phone places the caption itself");
-  assert.match(phone, /\.gx-panel-splash \{\s*flex-shrink: 1;\s*min-height: 5\.5rem;\s*\}/);
-  // Two lines of the room at 13px and one of the clock at 12px, both 1.55 tall,
-  // in 6px of padding and a 2px border: 74.9px. The band is 88px with a 3px border.
-  const caption = 2 * 13 * 1.55 + 12 * 1.55 + 2 * 6 + 2 * 2;
-  assert.ok(top + caption <= 88 - 2 * 3, `the caption ends at ${top + caption}px of 82`);
-  // The story's captions read larger and looser (2026-10-20); the place
-  // caption keeps the 1.55 this sum was measured in, and sizes its own two lines.
+  assert.match(briefing, /\n\.gx-comic-top > \.gx-plate-backdrop \{\s*display: none;\s*\}/, "a wider page draws it in its panel");
+  assert.match(phone, /\.gx-comic-top \{\s*position: relative;\s*z-index: 0;\s*\}/, "the title is the drawing's stacking context");
+  assert.match(phone, /\.gx-comic-top > \.gx-plate-backdrop \{\s*display: block;\s*height: 100%;/);
+  assert.match(phone, /\.gx-panel-splash > \.gx-plate,\s*\.gx-sfx \{\s*display: none;\s*\}/);
+  assert.match(phone, /\.gx-caption-place \{\s*position: relative;\s*inset: auto;/, "the caption is in the flow, above the halftone");
+  // A face a reader can recognise at 96px, and the name larger beside it.
+  assert.match(phone, /\.gx-panel-speaker \{\s*grid-template-columns: 96px 1fr;\s*\}/);
+  assert.match(phone, /\.gx-speaker-tag b \{\s*font-size: 1\.375rem;\s*\}/);
+  const jsx = readFileSync(new globalThis.URL("../../src/gauntlet/SceneBriefing.jsx", import.meta.url), "utf8");
+  const header = jsx.slice(jsx.indexOf('<header className="gx-comic-top">'), jsx.indexOf("</header>"));
+  assert.match(header, /<ScenePlate node=\{node\} nodeId=\{nodeId\} variant="backdrop" \/>/);
+  // The place caption keeps the sizes it always had.
   assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid/);
   assert.match(briefing, /\.gx-caption-place \{[^}]*padding: 6px 10px;[^}]*line-height: 1\.55;/);
   assert.match(briefing, /\.gx-caption-place b \{\s*font-size: 0\.8125rem;/);

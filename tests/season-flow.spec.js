@@ -840,9 +840,9 @@ test.describe("a phone on its side", () => {
 // The briefing on a phone held upright. Its page is longer than the screen on
 // every scene, and the room's drawing used to keep its whole height at the top
 // of it: on a 360x740 phone the story began under the docked footer, so the
-// first screen was a picture and no words. The picture is what gives way now
-// (briefing.css): cropped to a band while the page is longer than the screen,
-// whole when it is not.
+// first screen was a picture and no words. The picture gave way to a band, and
+// since 2026-10-22 (D-13) it is drawn behind the page's title instead: what is
+// left of its panel is the room's name and clock.
 const measureBriefing = (page) =>
   page.evaluate(() => {
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
@@ -855,6 +855,11 @@ const measureBriefing = (page) =>
     return {
       pictureHeight: Math.round(box(".gx-panel-splash").height),
       drawingHeight: Math.round(box(".gx-panel-splash .gx-plate").height),
+      backdrop: (() => {
+        const drawn = box(".gx-comic-top > .gx-plate-backdrop");
+        const title = box(".gx-comic-top");
+        return { height: Math.round(drawn.height), inside: drawn.top >= title.top - 1 && drawn.bottom <= title.bottom + 1 };
+      })(),
       storyTop: Math.round(box(".gx-panel-story .gx-caption").top),
       lastPanelBottom: Math.round(Math.max(...panels)),
       dockTop: Math.round(dock.getBoundingClientRect().top),
@@ -888,8 +893,10 @@ test.describe("a phone held upright", () => {
       const openButton = page.getByTestId("open-table");
       const atTop = await measureBriefing(page);
       expect(atTop.scrolls, "the page is longer than the screen, and scrolls").toBe(true);
-      expect(atTop.pictureHeight, "the picture is cropped to a band").toBeLessThanOrEqual(atTop.drawingHeight - 30);
-      expect(atTop.pictureHeight, "and is still a picture").toBeGreaterThanOrEqual(80);
+      expect(atTop.drawingHeight, "the room is not drawn in a band of its own").toBe(0);
+      expect(atTop.backdrop.height, "it is drawn behind the title").toBeGreaterThan(40);
+      expect(atTop.backdrop.inside, "and no further down than the title goes").toBe(true);
+      expect(atTop.pictureHeight, "its panel is the room's name and clock").toBeLessThanOrEqual(100);
       expect(atTop.storyTop, "the story begins above the docked footer").toBeLessThan(atTop.dockTop);
       expect(atTop.openBottom, "판 열기 is on screen before any scrolling").toBeLessThanOrEqual(size.height);
       expect(await pointerLandsOn(openButton), "판 열기 is not covered").toBe(true);
@@ -910,12 +917,16 @@ test.describe("a phone held upright", () => {
   }
 
   test("a briefing that fits its screen keeps the whole picture", async ({ page }) => {
-    // The shortest story in the season, on a narrow window tall enough for it.
-    await page.setViewportSize({ width: 700, height: 1400 });
+    // The shortest story in the season, on a window one pixel wider than a
+    // phone: the room is drawn whole in its panel there (a phone draws it
+    // behind the title, D-13).
+    await page.setViewportSize({ width: 701, height: 1400 });
     await openHeldBriefing(page, "case08", "c8_clerks_reaction");
     const fits = await measureBriefing(page);
     expect(fits.scrolls, "the page fits the screen").toBe(false);
+    expect(fits.drawingHeight, "the drawing is in its panel").toBeGreaterThan(80);
     expect(fits.pictureHeight, "the drawing is shown whole").toBeGreaterThanOrEqual(fits.drawingHeight);
+    expect(fits.backdrop.height, "and not behind the title as well").toBe(0);
     expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1400);
   });
 
