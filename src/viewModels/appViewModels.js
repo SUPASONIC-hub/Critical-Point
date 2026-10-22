@@ -40,10 +40,10 @@ export const viewGroups = {
       "activeCaseMeta", "nextParticipantMessage", "triggerLabels",
     ],
     start: [
-      "hasResumableSave", "node", "formatSaveTime", "lastSavedAt", "log", "progress", "playerName",
+      "hasResumableSave", "node", "formatSaveTime", "lastSavedAt", "savedStory", "progress", "playerName",
       "PLAYER_NAME_MAX_LENGTH", "setPlayerName", "limitText", "startGame", "resumeSavedGame",
       "activePlayStyle", "playStyleOptions", "playStyle", "setPlayStyle", "persist", "newGamePlusUnlocked",
-      "startNewGamePlus", "storyRecap",
+      "startNewGamePlus",
     ],
     telemetry: [
       "dataConsent", "setDataConsent", "pendingTelemetry", "setTelemetryStatus", "telemetryEnabled",

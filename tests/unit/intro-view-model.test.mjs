@@ -163,7 +163,7 @@ test("the resume card's recap is the last case's ending and this case's premise,
   const { nextCaseSignals } = await import("../../src/caseCopy.js");
   const { getCaseOutcome } = await import("../../src/gameLogic.js");
   const { getStoryRecap } = await import("../../src/viewModels/introViewModel.js");
-  assert.deepEqual(intro().start.storyRecap, [], "a first run has no story to recall");
+  assert.deepEqual(intro().start.savedStory, { decisions: 0, recap: [] }, "a first run has no story to recall");
   // The opening of the second case writes the premise beside the outcome it carries.
   const outcomeChoiceId = "p1_after_record";
   const { openingLegacy } = describeCaseOpening(SECOND, { caseResults: { [FIRST]: { rank: "B", outcomeChoiceId } }, operatorOrigin: "courier" });
@@ -173,11 +173,11 @@ test("the resume card's recap is the last case's ending and this case's premise,
   assert.equal(ending, "의견란에 내 이름으로 4,000만 원을 적었다");
   // Saved as JSON and read back by the shell.
   const saved = JSON.parse(JSON.stringify(openingLegacy));
-  assert.deepEqual(intro({ openingLegacy: saved }).start.storyRecap, [`「${ending}」`, nextCaseSignals[FIRST].premise]);
+  assert.deepEqual(intro({ openingLegacy: saved }).start.savedStory.recap, [`「${ending}」`, nextCaseSignals[FIRST].premise]);
   // Once the case has a decision, the line it left takes the premise's place.
   const log = [{ echo: "첫 줄" }, { isSystemEvent: true }, { echo: "마지막 줄" }, { echo: "" }];
   assert.deepEqual(getStoryRecap({ openingLegacy: saved, log }), [`「${ending}」`, "마지막 줄"]);
   assert.deepEqual(getStoryRecap({ openingLegacy: null, log }), ["마지막 줄"], "the first case recalls its own last line");
   // The view schema carries it on both intros.
-  assert.deepEqual(intro({ openingLegacy: saved, runtime: runtimeFields() }).start.storyRecap, intro({ openingLegacy: saved }).start.storyRecap);
+  assert.deepEqual(intro({ openingLegacy: saved, runtime: runtimeFields() }).start.savedStory, intro({ openingLegacy: saved }).start.savedStory);
 });

@@ -147,7 +147,8 @@ export function createIntroViewModel({
     hasResumableSave,
     formatSaveTime,
     lastSavedAt,
-    log,
+    // The save's decision count and its 지난 이야기, one field: the bag is at its budget (check:runtime-budget).
+    savedStory: { decisions: log.length, recap: getStoryRecap({ openingLegacy, log }) },
     playerName,
     PLAYER_NAME_MAX_LENGTH,
     setPlayerName,
@@ -161,7 +162,6 @@ export function createIntroViewModel({
     persist,
     newGamePlusUnlocked,
     startNewGamePlus,
-    storyRecap: getStoryRecap({ openingLegacy, log }),
 
     dataConsent,
     setDataConsent,
