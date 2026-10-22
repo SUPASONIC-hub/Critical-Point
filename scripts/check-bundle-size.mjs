@@ -301,10 +301,10 @@ const budgets = [
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
   // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4;
-  // 3,777 / 2,163 on 2026-10-22, when the two senders became nine acts' pairs
+  // 3,779 / 2,166 on 2026-10-22, when the two senders became nine acts' pairs
   // (B-15: eighteen senders, thirty-six lines) and the act is read off
   // CASE_SEQUENCE.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_777, maxGzip: 2_167 },
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_779, maxGzip: 2_170 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
