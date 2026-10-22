@@ -737,7 +737,7 @@ export function GauntletStage({
           aria-keyshortcuts={keys("E")}
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
-          aria-label={`LOCK ${Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
+          aria-label={`LOCK ${lockCapped ? "상한 도달" : Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
           aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
           {steadyCold && <span id="gx-steady-cold" className="sr-only">열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라</span>}
@@ -749,7 +749,8 @@ export function GauntletStage({
               The stance is not named here: the HUD's signal beside the streak
               prints it with the same charge, and with it the line was 94 to
               112px in a button with 82px of room at 390px (74px at 360px). */}
-          <small>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
+          {/* At the cap the press still charges the resources, the stance and STEADY's cooling, so it still costs the clock (C-6): the price stays in the name. */}
+          <small>{lockCapped ? "상한 도달" : <>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</>}</small>
           <span id="gx-focus-detail" className="sr-only">
             지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${LOCK_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 LOCK으로 ${LOCK_CAP}배까지만 오른다`}
             {stanceOn && `. ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치른다`}
