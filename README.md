@@ -942,6 +942,8 @@ npx supabase migration list --linked --output-format json > list.json
 node scripts/check-migration-drift.mjs --from list.json
 ```
 
+같은 토큰으로 `Funnel` 워크플로(`.github/workflows/funnel.yml`)가 매주 일요일 22:10(KST)에 운영 DB를 SELECT 하나로 읽기만 하고, 런이 어디서 멈추는지(프롤로그 01~05, 사건 01·08·18·36, 피날레), 행 사이 쉼의 중앙값·P90, 완주에 걸린 날, 끝낸 뒤 새 런을 연 비율, NEW GAME+ 런의 퍼널을 Job Summary에 집계로만 적습니다(`scripts/report-funnel.mjs`, 데이터 수집에 동의한 기기만 잡힘). 바로 보려면 `gh workflow run Funnel`(`-f since=2026-10-26`처럼 첫 행 날짜로 좁힘).
+
 텔레메트리 보관 기간은 `public.purge_old_telemetry(interval)`이 관리합니다. 텔레메트리 세 테이블,
 게시판, `free_text_analyses`, 오래된 온라인 저장, 요청 제한 카운터까지 일곱 테이블을 비우고, 30일보다
 짧은 기간은 거부하며 기본값은 180일입니다. `pg_cron`이 있는 프로젝트에서는 마이그레이션이 매일 한 번

@@ -11,6 +11,7 @@ import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from 
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
+import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 
 /**
@@ -61,7 +62,8 @@ import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
  *      row arrived in when every row names that week's rule, and one whose
  *      rows disagree, or name a rule that week does not have, is refused. The
  *      test week's report (report-test-week.mjs) runs its one SELECT here and
- *      counts the seasons with the rule, without it and their devices.
+ *      counts the seasons with the rule, without it and their devices; the
+ *      weekly drop-off report (report-funnel.mjs) runs its one SELECT too.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -1651,6 +1653,43 @@ if (!SUSPICION_MARKS) {
       `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows })}; expected 3 seasons under the rule from 2 devices, 1 without it, story mode and another rule left out.`,
     );
     check(reportRows.every((row) => !Object.values(row).some((value) => typeof value === "string" && value.startsWith("grants-check-session-"))), "the test week's report fetched a device's session id.");
+  }
+
+  // The weekly drop-off report (scripts/report-funnel.mjs, .github/workflows/funnel.yml)
+  // runs its one SELECT over the runs begun after a day no other row reaches:
+  // two runs from one device (the second marked NEW GAME+) and one from
+  // another that came back two days later.
+  {
+    const SINCE_DAY = "2030-01-01";
+    const funnelRuns = [
+      ["run-week-funnel-1", sessionId(n), 3, 0, false, 0],
+      ["run-week-funnel-2", sessionId(n), 1, 3, true, 0],
+      ["run-week-funnel-3", sessionId(n + 1), 2, 1, false, 2],
+    ];
+    n += 2;
+    for (const [runId, session, cases, startDay, newGamePlus, breakDays] of funnelRuns) {
+      for (const caseId of CASE_SEQUENCE.slice(0, cases)) {
+        const payload = casePayload({ session, runId, caseId });
+        if (newGamePlus) payload.summary = { ...payload.summary, newGamePlus: true };
+        const { sql, params } = postgrestInsert("playtest_sessions", payload);
+        await db.query(sql, params);
+      }
+      await db.query(
+        `update public.playtest_sessions p
+            set completed_at = $2::timestamptz + $3::int * interval '1 day'
+                             + (o.k - 1) * interval '10 minutes' + (case when o.k > 1 then $4::int else 0 end) * interval '1 day'
+           from (select id, row_number() over (order by id) as k from public.playtest_sessions where run_id = $1) o
+          where p.id = o.id`,
+        [runId, `${SINCE_DAY}T03:00:00Z`, startDay, breakDays],
+      );
+    }
+    const funnelRows = (await allowed("run the drop-off report", "service_role", funnelQuery(SINCE_DAY)))?.rows ?? [];
+    const funnel = readFunnel(funnelRows, Date.parse(`${SINCE_DAY}T00:00:00Z`) / 1000 + 10 * 86400);
+    check(
+      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3,
+      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run and one break among three gaps.`,
+    );
+    check(funnelRows.every((row) => !JSON.stringify(row).includes("grants-check-session-") && !JSON.stringify(row).includes("run-week-funnel")), "the drop-off report fetched a run or device id.");
   }
 
   withHeaders(null);
