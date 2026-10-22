@@ -162,7 +162,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -397,6 +397,15 @@ export function GauntletStage({
     setImpact({ amount: 0.28 });
   }
 
+  // 안전선까지 (C-5): the pushes no wall can stop, pressed at once as the same PUSH events (tableMeters.js).
+  function pushToSafe() {
+    if (locked || draftOpen || !canPush || !safe.pushes) return;
+    for (let n = 0; n < safe.pushes; n += 1) dispatch({ type: "PUSH" });
+    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, safe.gauge)) pulseRelic("lockpick");
+    playPushCue(win.pushes + safe.pushes, Math.min(1, win.gauge / 90));
+    setImpact({ amount: 0.28 });
+  }
+
   function focus() {
     if (!canFocus) return;
     dispatch({ type: "FOCUS" });
@@ -425,7 +434,7 @@ export function GauntletStage({
 
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
-    select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null,
+    select, focus: lockOn ? focus : null, push, safe: pushToSafe, cash, cashHold: holdsCash && canCash ? cashHold : null,
     cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
     cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null),
     briefingOpen, tableOpen, openTable,
@@ -576,6 +585,8 @@ export function GauntletStage({
             {logic && GAUGE_MARKS.map((at) => (
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
+            {/* C-9: the audit's 40 and the band up to HEAT DEBT's 60, on a table that counts it. */}
+            {auditBand && <span className="gx-gauge-audit" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%` }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
@@ -587,6 +598,8 @@ export function GauntletStage({
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
             <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
+            {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
+              aria-label={`안전선까지 밀기 ${safe.pushes}번, 열기 ${Math.round(safe.gauge)}까지`}>안전선 ×{safe.pushes}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}

@@ -220,6 +220,8 @@ export function handleTableKey(event, current, walked = false) {
   if (letter === "e" && current.focus) take(() => current.focus(event));
   else if (letter === "q" && current.cycleFocusMode) take(() => current.cycleFocusMode());
   else if (letter === "r" && current.scout) take(() => current.scout());
+  // 안전선까지 (C-5): the pushes no wall can stop, as one press.
+  else if (letter === "s" && current.safe) take(() => current.safe());
   else if (key === " " || letter === "w") take(() => current.push(event));
   else if (key === "Enter") take(() => current.cash());
   else {
