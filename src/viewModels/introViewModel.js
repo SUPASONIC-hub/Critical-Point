@@ -70,9 +70,9 @@ export function createCompletedCaseResultList(caseResults = {}) {
  * the case opened, and the log), so the shell draws it without the case copy.
  */
 export function getStoryRecap({ openingLegacy, log = [] }) {
-  const ending = openingLegacy?.continuity?.title;
-  const echo = [...log].reverse().find((entry) => typeof entry?.echo === "string" && entry.echo)?.echo;
-  return [ending && `「${ending}」`, echo ?? openingLegacy?.premise].filter((line) => typeof line === "string" && line);
+  // Short on purpose: this is in the entry chunk, which has no room (check:bundle).
+  const echo = [...log].reverse().find((entry) => entry?.echo)?.echo;
+  return [openingLegacy?.continuity?.title, echo ?? openingLegacy?.premise].filter(Boolean);
 }
 
 export function createIntroViewModel({
