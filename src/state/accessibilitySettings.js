@@ -28,8 +28,15 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    season that used it carries `assistStory` and is kept off
  *                    the public ranking. It is set in one place: the first
  *                    switch of the intro's comfort panel.
+ *   storyScale       이야기 글 크기 (2026-10-22, D-5): the story's prose -- the
+ *                    briefing page, the reveal's beat, a case's ending and the
+ *                    interlude -- this many times larger (1, 1.125, 1.25). The
+ *                    table is left at its size: its height is budgeted to the
+ *                    pixel. Carried on <html> as `data-story-scale` and the
+ *                    factor as `--story` (comfort.css).
  */
 export const TABLE_TIME_SCALES = Object.freeze([1, 1.5, 2]);
+export const STORY_SCALES = Object.freeze([1, 1.125, 1.25]);
 
 export const DEFAULT_ACCESSIBILITY = Object.freeze({
   tableTime: 1,
@@ -38,12 +45,14 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   letterKeys: true,
   stillIntro: false,
   storyMode: false,
+  storyScale: 1,
 });
 
 export function normalizeAccessibility(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
+  if (STORY_SCALES.includes(source.storyScale)) settings.storyScale = source.storyScale;
   for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
@@ -66,11 +75,13 @@ export function getAccessibility() {
   return current;
 }
 
-/** The document carries the two settings CSS answers to, as the OS preference does. */
+/** The document carries the three settings CSS answers to, as the OS preference does. */
 export function applyAccessibilityToDocument(settings = getAccessibility(), root = globalThis.document?.documentElement) {
   if (!root) return;
   root.toggleAttribute("data-calm-effects", settings.calmEffects);
   root.toggleAttribute("data-still-intro", settings.stillIntro);
+  root.toggleAttribute("data-story-scale", settings.storyScale > 1);
+  root.style?.setProperty("--story", String(settings.storyScale));
 }
 
 export function setAccessibility(patch) {

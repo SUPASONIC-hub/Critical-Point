@@ -311,7 +311,10 @@ const fileBudgets = {
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
-  "comfort.css": { lines: 124, bytes: 2691 },
+  // 124 / 2691 -> 133 / 3047 on 2026-10-22 (D-5), measured: 이야기 글 크기,
+  // the story's prose at 1.125 or 1.25 times its size. Paid for by D-3 the
+  // same day, which took briefing.css down 22 lines and 425 bytes.
+  "comfort.css": { lines: 133, bytes: 3047 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

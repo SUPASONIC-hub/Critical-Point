@@ -134,3 +134,23 @@
 :root[data-still-intro] .wordmark-line::after {
   display: none;
 }
+
+/* 이야기 글 크기 (D-5): the story's prose at 1.125 or 1.25 times its size --
+   the briefing page, the reveal's beat, a case's ending (and the profile
+   above it, which shares its panel rule) and the interlude.
+   The table is not touched: its height is budgeted to the pixel. The factor
+   is --story, written on <html> beside the attribute (accessibilitySettings). */
+[data-story-scale] .gx-panel-story .gx-caption,
+[data-story-scale] .outcome-panel p {
+  font-size: calc(0.9375rem * var(--story));
+}
+[data-story-scale] .gx-balloon {
+  font-size: calc(1rem * var(--story));
+}
+[data-story-scale] .gx-panel-file li {
+  font-size: calc(0.8125rem * var(--story));
+}
+[data-story-scale] .decision-reveal-beat p,
+[data-story-scale] .interlude-panel p {
+  font-size: calc(0.875rem * var(--story));
+}
