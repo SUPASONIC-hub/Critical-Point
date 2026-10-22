@@ -23,7 +23,9 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
 export function useWeekRulePanel(id) {
   return useMemo(() => {
     const rule = getWeekRule(id);
-    return rule ? [[rule], <WeekRulePanel key="week-rule" rules={[rule]} />] : NO_PANEL;
+    // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
+    const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;
+    return rule ? [[read], <WeekRulePanel key="week-rule" rules={[rule]} />] : NO_PANEL;
   }, [id]);
 }
 
@@ -41,6 +43,7 @@ function WeekRulePanel({ rules }) {
           <li key={rule.id} className={`gx-mutation mut-${rule.id}`}>
             <b lang="en">{rule.label}</b>
             <strong>{rule.title}</strong>
+            {rule.world && <small>{rule.world}</small>}
             <small>{rule.text}</small>
           </li>
         ))}

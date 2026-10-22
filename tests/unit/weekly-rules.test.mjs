@@ -16,6 +16,8 @@ const {
   normalizeWeekRuleId,
   NEAR_WALL_SHIFT,
   pickSeasonWeekRule,
+  SHORT_CLOCK_CHIPS,
+  SHORT_CLOCK_SECONDS,
   WEEK_RULE_CATALOGUE,
   WEEK_RULE_DEVICES,
   WEEK_RULE_ID_MAX,
@@ -128,7 +130,7 @@ test("the calendar names known rules, one per week, announced a week ahead", () 
     assert.match(id, /^[a-z][a-z0-9-]*$/);
     for (const key of ["label", "title", "text"]) assert.ok(typeof rule[key] === "string" && rule[key].length > 0, `${id}.${key}`);
     for (const key of Object.keys(rule.schema ?? {})) {
-      assert.ok(["wallShift", "seconds", "chipsScale", "fractureRate", "sealBreak"].includes(key), `${id} moves only a number normalizeSchema clamps (D4): ${key}`);
+      assert.ok(["wallShift", "secondsShift", "chipsFactor", "seconds", "chipsScale", "fractureRate", "sealBreak"].includes(key), `${id} moves only a number normalizeSchema clamps (D4): ${key}`);
     }
     // Or switches on a device, by name, from the allowlist (B3 decision 8, B2 decision 11).
     for (const device of rule.rules ?? []) assert.ok(WEEK_RULE_DEVICES.includes(device), `${id} switches on only an allowed device: ${device}`);
@@ -203,6 +205,55 @@ test("the rule is laid over the board at the deal, clamped, and never written in
   }
   assert.deepEqual(weekRuleOverlay("heavy-fracture", BASE_SCHEMA), { fractureRate: WEEK_RULE_CATALOGUE["heavy-fracture"].schema.fractureRate });
   assert.equal(weekRuleOverlay("made-up", BASE_SCHEMA), null);
+});
+
+/** The event weeks' rules once B3 and B2 are rules of the table (P1): three, each with its line in the story (E-9). */
+const EVENT_RULES = ["near-wall", "heavy-fracture", "short-clock"];
+
+test("SHORT CLOCK moves the board's own clock and chips, on top of what relics and marks did, clamped (E-9 (c))", () => {
+  const rule = WEEK_RULE_CATALOGUE["short-clock"];
+  assert.deepEqual(rule.schema, { secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS });
+  assert.match(rule.text, new RegExp(`${SHORT_CLOCK_SECONDS}초 짧고`));
+  assert.match(rule.text, new RegExp(`${SHORT_CLOCK_CHIPS}배`));
+  const board = getTableSchema(normalizeRunState({ weekRule: "short-clock" }));
+  assert.equal(board.seconds, BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS);
+  assert.equal(board.chipsScale, BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS);
+  assert.equal(board.wallMin, BASE_SCHEMA.wallMin, "the wall stays where the board has it");
+  // A board a relic already moved keeps that move under the rule.
+  const moved = normalizeSchema({ seconds: 51, chipsScale: 1.5 });
+  const dealt = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "short-clock", schema: moved });
+  assert.equal(dealt.seconds, 51 - SHORT_CLOCK_SECONDS);
+  assert.equal(dealt.chipsScale, 1.5 * SHORT_CLOCK_CHIPS);
+  // And the clamp holds at the short end and the rich end.
+  const edge = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "short-clock", schema: normalizeSchema({ seconds: 14, chipsScale: 3.9 }) });
+  assert.deepEqual([edge.seconds, edge.chipsScale], [12, 4]);
+  assert.deepEqual(weekRuleOverlay("short-clock", BASE_SCHEMA), { seconds: BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS, chipsScale: BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS });
+});
+
+test("the calendar books W47 to 2027-W03 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
+  const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W47");
+  assert.deepEqual(booked.map(({ week, id }) => [week, id]), [
+    ["2026-W48", "heavy-fracture"],
+    ["2026-W50", "short-clock"],
+    ["2026-W52", "near-wall"],
+    ["2027-W01", "heavy-fracture"],
+    ["2027-W03", "short-clock"],
+  ]);
+  // One week in two: two weeks from one start to the next, across 2026's W53.
+  for (let i = 1; i < booked.length; i += 1) assert.equal(weekStartMs(booked[i].week) - weekStartMs(booked[i - 1].week), 14 * DAY, booked[i].week);
+  assert.equal(weekRuleAt(weekStartMs("2026-W47")), null, "W47 is kept open for a second test week (P5)");
+  assert.equal(weekRuleAt(weekStartMs("2026-W53")), null);
+  for (const id of EVENT_RULES) {
+    const rule = getWeekRule(id);
+    assert.ok(typeof rule.world === "string" && rule.world.length > 0 && rule.world.length <= 40, `${id} has one short line in the story`);
+    assert.ok(!rule.rules, `${id} is an event rule: it moves numbers, it switches on no device`);
+    assert.ok(booked.some((entry) => entry.id === id), `${id} has a week`);
+  }
+  // The briefing's panel prints the line, and its reading clock counts it.
+  const panel = read("src/gauntlet/WeekRulePanel.jsx");
+  assert.match(panel, /rule\.world &&/);
+  assert.match(panel, /text: `\$\{rule\.world\} \$\{rule\.text\}`/);
+  assert.match(read("src/components/WeeklyRuleViews.jsx"), /current\.world/);
 });
 
 test("a story case deals the story wall and no week's rule", () => {
@@ -332,7 +383,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261102040000_weekly_rule_calendar_w47_w03.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);
