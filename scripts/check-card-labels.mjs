@@ -62,7 +62,7 @@ const LONGEST_TEXT = 702;
 // The lengths the distribution is reported at; MAX_LABEL is one of them.
 const MARKS = [24, 28, 30, 32, 36];
 
-export const labelLength = (label) => [...String(label ?? "").trim().replace(/\s+/g, " ")].length;
+const labelLength = (label) => [...String(label ?? "").trim().replace(/\s+/g, " ")].length;
 
 /** What kind of card carries the label, by how it reaches the hand. */
 function kindOf(scene, choice) {
