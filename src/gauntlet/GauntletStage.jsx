@@ -51,6 +51,7 @@ import { ComfortDialog, useComfortDialogOpen } from "../components/ComfortDialog
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
+import { noteBriefing } from "../state/readingTally.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // Drafts (개선 포인트 A3). A cold table leaves the tab as index.html has it.
@@ -136,6 +137,8 @@ export function GauntletStage({
    * comes back to the briefing instead of inheriting the last one's state.
    */
   const [openedSeed, setOpenedSeed] = useState(null);
+  // The briefing's reading, which it writes and openTable notes (D-11, state/readingTally.js).
+  const readingRef = useRef(null);
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
@@ -355,6 +358,8 @@ export function GauntletStage({
     if (!briefingOpen) return;
     const card = cards.find((item) => item.id === cardId);
     if (card && !isCardOpen(card)) return;
+    // D-11: the page that just closed, as the case row will count it.
+    noteBriefing({ caseId: scene.node.caseId, byClock, ...readingRef.current });
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
@@ -797,6 +802,7 @@ export function GauntletStage({
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}
+          reading={readingRef}
         />
       )}
 

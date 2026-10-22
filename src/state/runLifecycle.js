@@ -25,6 +25,7 @@ import { appendTraceEvent } from "./trace.js";
 import { leaveReplaySession } from "./useAppPersistence.js";
 import { weeklyRuleNow as weeklyRuleNowDefault } from "./weeklyClock.js";
 import { weekRuleChoice } from "./weeklyRuleChoice.js";
+import { clearReadingTally } from "./readingTally.js";
 
 // The last sentence is what keeps the one before it true: the online copy is
 // not replaced by the next run until the player says so (cloudSave.js).
@@ -90,6 +91,8 @@ export function createRunLifecycle({
       now: nowMs(),
     });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
+    // A new season reads from nothing: what the last one's open case had read is not this one's (D-11).
+    clearReadingTally();
     // Written over whatever another tab held: a new run is this tab's own.
     applyRun(patch, { force: true });
   }

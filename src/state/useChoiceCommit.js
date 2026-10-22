@@ -39,6 +39,7 @@ import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
+import { takeReadingTally } from "./readingTally.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -132,6 +133,8 @@ export function useChoiceCommit(context) {
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
     if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary });
+    // Taken whether or not the row is sent, so the next case starts its own count.
+    const reading = takeReadingTally();
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
@@ -168,7 +171,8 @@ export function useChoiceCommit(context) {
         triggers: nextTriggers,
         cognition: nextCognition,
         decision_log: nextLog,
-        dynamics: { ...createRunSummary(nextRun), responseTimeSec },
+        // D-11 + E-4(b): how the case was read (state/readingTally.js).
+        dynamics: { ...createRunSummary(nextRun), responseTimeSec, ...reading },
       };
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,

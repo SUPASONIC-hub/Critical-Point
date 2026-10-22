@@ -7,6 +7,7 @@ import { CASE_SEQUENCE } from "../src/gameCases.js";
 import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
 import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
+import { noteBriefing, noteRevealDetails, takeReadingTally } from "../src/state/readingTally.js";
 import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
@@ -942,6 +943,30 @@ withHeaders(null);
   const filler = (count) => Array.from({ length: count }, (_, index) => RELIC_IDS[index] ?? `relic${index}`);
   await post(`send a case row with ${SERVER_RELIC_LIMIT} relics`, "playtest_sessions", withRelics("run-relics-2", "case09", filler(SERVER_RELIC_LIMIT)));
   await postRefused(`send a case row with ${SERVER_RELIC_LIMIT + 1} relics`, "playtest_sessions", withRelics("run-relics-3", "case09", filler(SERVER_RELIC_LIMIT + 1)), /^23514 /);
+}
+
+// How the case was read (D-11 + E-4(b), state/readingTally.js): five numbers
+// beside responseTimeSec in `dynamics`. The server lists no keys there, so no
+// migration: the row is taken with them, as the builder makes them, at the
+// size of a run holding every relic and a page count past any case's; and a
+// client from before them is taken as it was (every other check here).
+{
+  // The tally keeps to sessionStorage, which node has not: a store of its own for the block.
+  const kept = new Map();
+  globalThis.sessionStorage ??= { getItem: (key) => kept.get(key) ?? null, setItem: (key, value) => kept.set(key, String(value)), removeItem: (key) => kept.delete(key) };
+  for (let page = 0; page < 70; page += 1) noteBriefing({ caseId: "case09", seconds: 600 + page / 10, byClock: true, held: true });
+  for (let open = 0; open < 999; open += 1) noteRevealDetails();
+  const reading = takeReadingTally();
+  check(
+    ["readBriefings", "readAutoOpened", "readHeld", "readSecMedian", "revealDetailsOpened"].every((key) => typeof reading[key] === "number"),
+    `the reading tally the case row carries is ${JSON.stringify(reading)}; five numbers.`,
+  );
+  const payload = casePayload({ session: sessionId(1), runId: "run-reading-1", caseId: "case09" });
+  const dynamics = { ...createRunSummary({ ...RUN_INITIAL_STATE, relics: [...RELIC_IDS] }), responseTimeSec: 7.4, ...reading };
+  check(Buffer.byteLength(JSON.stringify(dynamics)) <= 2048, `dynamics with the reading tally is ${Buffer.byteLength(JSON.stringify(dynamics))} bytes; the server takes 2,048.`);
+  await post("send a case row with the reading tally", "playtest_sessions", { ...payload, dynamics });
+  const stored = await one(`select dynamics from public.playtest_sessions where run_id = 'run-reading-1'`);
+  check(stored?.dynamics?.readHeld === reading.readHeld && stored?.dynamics?.readSecMedian === reading.readSecMedian, "the stored row lost the reading tally.");
 }
 
 // The hand's keys in `dynamics` (20261011010000): the logic streak's two and
