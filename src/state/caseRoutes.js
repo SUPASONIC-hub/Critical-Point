@@ -107,13 +107,16 @@ export function getReframeTarget(caseId, fromNodeId) {
  * And in any run, a scene marked `attended` (its scene context says so; the
  * finale's two decisions are, the 33rd floor and the last choice in B2) is
  * not played without the analyst either: the run lands on it.
+ *
+ * The skip carries the scene's place, so the reveal says where the scene went
+ * on without the analyst -- a 빈소 or a 펜션, not always a 회의실 (B-13).
  */
 export function getBlackoutSkip(fromNodeId, branchContext) {
   const skippedNode = nodes[fromNodeId];
   if (!skippedNode || skippedNode.attended || RESULT_NODE_IDS.has(fromNodeId)) return null;
   const onward = getUnattendedNext(skippedNode, branchContext);
   if (!onward || !nodes[onward] || RESULT_NODE_IDS.has(onward)) return null;
-  return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
+  return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title, skippedPlace: skippedNode.place ?? null };
 }
 
 /**

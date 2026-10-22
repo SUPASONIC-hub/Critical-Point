@@ -22,6 +22,15 @@ export const FX_VARIABLES = Object.freeze(Object.keys(FX_READERS));
 export const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
 
 /**
+ * The cases where the season rests (B-13): 사건 42 the night off at 경포, 45
+ * the funeral, 47 the 추석 kitchen. Their tables are quiet -- GauntletFx plays
+ * them as the comfort setting does, without the heartbeat or the drone -- and
+ * are otherwise the same tables: no rule reads this.
+ */
+export const QUIET_TABLE_CASES = Object.freeze(["case42", "case45", "case47"]);
+export const isQuietTable = (caseId) => QUIET_TABLE_CASES.includes(caseId);
+
+/**
  * What the two settings that turn the body down do to a frame: the OS's
  * reduced motion, and the comfort setting (`calmEffects`), which is wider.
  * The frame loop (GauntletFx.jsx) writes what these return, so what the
