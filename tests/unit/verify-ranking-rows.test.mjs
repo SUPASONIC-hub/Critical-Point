@@ -357,3 +357,35 @@ test("the CLI lists runs, writes one run's read at a time, and reads the per-run
     rmdirSync(dir);
   }
 });
+
+test("a whole season dealt the page's seeds is checked case by case with no mark, seeds and chain included", () => {
+  // The bot deals `run_id:windowIndex:nodeId`, as GameRuntime's seedBase does, so
+  // S1 reads every window's place back from each case's dynamics.windowIndex.
+  const runId = "run-dealt";
+  const recorder = createWindowRecorder({ digits: 3 });
+  const verdicts = [];
+  const bot = createSeasonBot({ seed: 1000, staged: STAGED, reduce: recorder.reduce, windowSeed: ({ windowIndex, nodeId }) => `${runId}:${windowIndex}:${nodeId}` });
+  const season = bot.playSeason(0, "balanced", false, ({ verdict }) => verdicts.push(verdict));
+  const total = CASE_SEQUENCE.reduce((sum, caseId) => sum + season.caseLogs[caseId].length, 0);
+  let at = recorder.closed.length - total;
+  let settled = verdicts.length - total;
+  const rows = CASE_SEQUENCE.map((caseId) => ({
+    run_id: runId,
+    case_id: caseId,
+    summary: season.caseResults[caseId],
+    decision_log: season.caseLogs[caseId].map((entry) => ({ ...entry, threshold: { ...entry.threshold, ...thresholdOfVerdict(verdicts[settled++]) }, [WINDOW_RECORD_KEY]: recorder.closed[at++].record })),
+    resources: null,
+    dynamics: season.caseResults[caseId].gauntlet,
+  }));
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
+  const [result] = verifyRows(rows);
+  assert.equal(result.status, "checked");
+  assert.deepEqual(result.marks, []);
+  assert.equal(result.cases.reduce((sum, entry) => sum + entry.windows.counts.match, 0), total);
+  assert.equal(result.chain.status, "linked");
+  // A case's window count moved by one: its seeds are no longer the ones dealt at those places.
+  const shifted = structuredClone(rows);
+  shifted[10].dynamics.windowIndex += 1;
+  shifted[11].dynamics.windowIndex += 1;
+  assert.ok(verifyRows(shifted)[0].marks.includes("window-off-replay"));
+});
