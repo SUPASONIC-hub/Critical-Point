@@ -20,7 +20,7 @@ import {
 } from "../gameLogic.js";
 import { nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
-import { BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
+import { BUST_EFFECT, createCaseClose, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
@@ -33,7 +33,7 @@ import { getAccessibility } from "./accessibilitySettings.js";
 import { carryChoiceLinks, settleChoice } from "./settleChoice.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
-import { validateTelemetryItem } from "./payloadSchemas.js";
+import { fitCaseDynamics, validateTelemetryItem } from "./payloadSchemas.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -137,7 +137,9 @@ export function useChoiceCommit(context) {
         triggers: nextTriggers,
         cognition: nextCognition,
         decision_log: nextLog,
-        dynamics: { ...createRunSummary(nextRun), responseTimeSec },
+        // With the close's links and draft and the case's opening snapshot
+        // (createCaseClose, F1 phase 3, S3), for the server's chain check.
+        dynamics: fitCaseDynamics({ ...createRunSummary(nextRun), ...createCaseClose(nextRun), responseTimeSec }),
       };
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,

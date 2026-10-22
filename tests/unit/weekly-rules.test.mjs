@@ -215,8 +215,10 @@ test("newGame stamps the rule the caller read; story mode and a direct jump stam
   const before = initialRunState(null, { runId: "run-ctx", operatorOrigin: "lab", sessionId: "session-ctx", now: 1_000, openRecovery: false });
   assert.equal(runTransition(before, { type: "newGame", ...base, weekRule: "near-wall" }).gauntletRun.weekRule, "near-wall");
   assert.equal(runTransition(before, { type: "newGame", ...base, weekRule: "near-wall", story: true }).gauntletRun.weekRule, null);
-  assert.equal(runTransition(before, { type: "newGame", ...base, weekRule: "made-up" }).gauntletRun, RUN_INITIAL_STATE);
-  assert.equal(runTransition(before, { type: "newGame", ...base }).gauntletRun, RUN_INITIAL_STATE, "no rule, the opening table as it always was");
+  // The opening table, with the first case's opening snapshot (S3).
+  const table = (event) => ({ ...runTransition(before, { type: "newGame", ...base, ...event }).gauntletRun, open: null });
+  assert.deepEqual(table({ weekRule: "made-up" }), RUN_INITIAL_STATE);
+  assert.deepEqual(table({}), RUN_INITIAL_STATE, "no rule, the opening table as it always was");
   assert.equal(runTransition(before, { type: "jumpToNode", ...base, caseId: "case01", nodeId: "n", completedCases: [], echo: "" }).gauntletRun.weekRule, null);
 });
 
@@ -240,7 +242,7 @@ test("시작 reads the weekly clock once; turning it down or a later week change
   delete globalThis.__weeklyRuleClock;
   const plain = await createRunHarness();
   plain.act("startGame");
-  assert.deepEqual(plain.run.gauntletRun, structuredClone(RUN_INITIAL_STATE));
+  assert.deepEqual({ ...plain.run.gauntletRun, open: null }, structuredClone(RUN_INITIAL_STATE));
 });
 
 test("the server's week table says what the calendar says", () => {

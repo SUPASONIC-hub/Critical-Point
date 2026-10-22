@@ -59,7 +59,9 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
+  // +398 / +229 on 2026-10-22 (F1 phase 3, S3, draft): the case row's dynamics
+  // check and fit (payloadSchemas.js) and the opening snapshot stamped on a new game.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_378, maxGzip: 61_537 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -110,7 +112,8 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // +2 on 2026-10-22 (S3, draft): the case and its hand handed to openCaseRun.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_747, maxGzip: 34_822 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -188,7 +191,9 @@ const budgets = [
   // 14,338 -> 14,367 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 14,363 plus 4: a window put down keeps its replay trail in the save
   // (normalizeSuspendedWindow), so the trail goes on after the resume.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_367 },
+  // +708 / +390 on 2026-10-22 (F1 phase 3, S3, draft): the case-open snapshot
+  // (createCaseOpen, normalizeCaseOpen, stampCaseOpen, createCaseClose).
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_578, maxGzip: 14_757 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in

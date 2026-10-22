@@ -123,10 +123,13 @@ test("a new game begun with NEW GAME+", async () => {
   pin("newGame/new-game-plus", harness);
   assert.equal(harness.run.gauntletRun.veteran, true);
   assert.equal(harness.saved().dynamics.veteran, true);
-  const { veteran: _mark, ...unmarked } = harness.saved().dynamics;
-  const { veteran: plainMark, ...plainStart } = pinned["newGame/over-a-run"]?.saved.dynamics ?? recorded["newGame/over-a-run"].saved.dynamics;
+  const { veteran: _mark, open: markedOpen, ...unmarked } = harness.saved().dynamics;
+  const { veteran: plainMark, open: plainOpen, ...plainStart } = pinned["newGame/over-a-run"]?.saved.dynamics ?? recorded["newGame/over-a-run"].saved.dynamics;
   assert.equal(plainMark, false);
   assert.deepEqual(plain(unmarked), plainStart, "nothing else about the table differs");
+  // The opening snapshot (S3) carries the mark too, and nothing else differs in it.
+  assert.equal(markedOpen.veteran, true);
+  assert.deepEqual(plain({ ...markedOpen, veteran: false }), plainOpen);
 });
 
 test("the start button's click event is a plain start", async () => {

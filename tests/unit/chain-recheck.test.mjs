@@ -3,12 +3,14 @@ import { test } from "node:test";
 
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { CHAIN_MARK, recheckCaseGap, recheckCaseLinks, recheckChain, UNCHECKED } from "../../src/chainRecheck.js";
+import { RELIC_IDS } from "../../src/gauntlet/relics.js";
 import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
 
 /**
  * A run's case rows as the server stores them, made by the season bot: one
- * row per closed case, its `dynamics` the run summary the close wrote and its
+ * row per closed case, its `dynamics` what the close wrote (the run summary,
+ * the close's links and draft, and the case's opening snapshot, S3) and its
  * `decision_log` the case's log. Fixed seeds, so the rows are the same on
  * every run of the test.
  */
@@ -18,7 +20,7 @@ function seasonRows(seed, archetype) {
   return CASE_SEQUENCE.map((caseId) => ({
     run_id: `bot-${seed}`,
     case_id: caseId,
-    dynamics: season.caseResults[caseId].gauntlet,
+    dynamics: season.caseDynamics[caseId],
     decision_log: season.caseLogs[caseId],
   }));
 }
@@ -34,8 +36,11 @@ test("an honest season chains with no mark, and says what it did not check", () 
     assert.deepEqual(report.marks, []);
     assert.equal(report.cases.length, CASE_SEQUENCE.length);
     assert.equal(report.unchecked.links, 0);
-    // What waits for S2 and S3 is counted on every case, never passed.
+    // What waits for S2, and what the opening snapshot cannot answer, is counted on every case, never passed.
     for (const field of [...UNCHECKED.inside, ...UNCHECKED.between]) assert.equal(report.unchecked.fields[field], CASE_SEQUENCE.length, field);
+    // Every row carries its opening snapshot, so none of the opening is left unchecked.
+    for (const field of [...UNCHECKED.open, "reopened", "practice", "links", "relics"]) assert.equal(report.unchecked.fields[field], undefined, field);
+    assert.ok(rows.every((row) => row.dynamics.open?.caseId === row.case_id));
   }
 });
 
@@ -100,11 +105,100 @@ test("practice windows between two cases are not a break", () => {
   const rows = copy(honest[0]);
   // A closed case played again: windows, a bust and a cash with no row of their own.
   for (const row of rows.slice(12)) {
-    row.dynamics.windowIndex += 3;
-    row.dynamics.busts += 1;
-    row.dynamics.cashes += 2;
+    for (const counts of [row.dynamics, row.dynamics.open]) {
+      counts.windowIndex += 3;
+      counts.practiceWindows += 3;
+      counts.busts += 1;
+      counts.cashes += 2;
+    }
   }
-  assert.deepEqual(recheckChain(rows).marks, []);
+  const report = recheckChain(rows);
+  assert.deepEqual(report.marks, []);
+  assert.equal(report.unchecked.fields.reopened, undefined, "a replay hands its table back, so the opening is still read whole");
+});
+
+test("a case left half way and opened again: the opening is read for what cannot move, the rest is not checked", () => {
+  const rows = copy(honest[0]);
+  // Three windows of a first try at case 12, which leave no row, before it was opened again.
+  for (const row of rows.slice(12)) {
+    for (const counts of [row.dynamics, row.dynamics.open]) counts.windowIndex += 3;
+  }
+  rows[12].dynamics.open.logic = { ...rows[12].dynamics.open.logic, streak: rows[12].dynamics.open.logic.streak + 2 };
+  let report = recheckChain(rows);
+  assert.deepEqual(report.marks, []);
+  assert.equal(report.unchecked.fields.reopened, 1);
+  // The vault does not move without a close, first try or not.
+  rows[12].dynamics.open.vault += 50;
+  report = recheckChain(rows);
+  assert.deepEqual(report.marks, [CHAIN_MARK]);
+  assert.ok(report.breaks.some((found) => found.field === "open.vault" && found.case === rows[12].case_id));
+});
+
+test("an opening edited away from the close before it is marked, with where (S3)", () => {
+  const offered = honest.flatMap((rows) => rows.map((row, index) => ({ rows, index }))).find(({ rows, index }) => index > 0 && rows[index - 1].dynamics.relicOffer.length > 0);
+  const notOffered = (rows, index) => RELIC_IDS.find((id) => !rows[index - 1].dynamics.relics.includes(id) && !rows[index - 1].dynamics.relicOffer.includes(id) && !rows[index].dynamics.open.relics.includes(id));
+  const edits = {
+    "open.vault": (rows) => { rows[20].dynamics.open.vault += 100; },
+    "open.handVault": (rows) => { rows[20].dynamics.open.handVault += 1; rows[20].dynamics.open.vault += 1; },
+    "open.stanceMastery": (rows) => { rows[25].dynamics.open.stanceMastery.strike += 1; },
+    "open.logic": (rows) => { rows[30].dynamics.open.logic.best += 5; },
+    "open.linksIn": (rows) => { rows[18].dynamics.open.linksIn = [{ from: 0, due: 2 }]; },
+    "open.windowIndex": (rows) => { rows[22].dynamics.open.windowIndex = rows[21].dynamics.windowIndex - 1; },
+    "open.caseId": (rows) => { rows[9].dynamics.open.caseId = rows[8].case_id; },
+    "open.veteran": (rows) => { rows[14].dynamics.open.veteran = true; },
+    "resourcesBefore": (rows) => { rows[16].dynamics.open.resources = { ...rows[16].dynamics.open.resources, capital: rows[16].dynamics.open.resources.capital + 30 }; },
+  };
+  for (const [field, edit] of Object.entries(edits)) {
+    const rows = copy(honest[0]);
+    edit(rows);
+    const report = recheckChain(rows);
+    assert.deepEqual(report.marks, [CHAIN_MARK], field);
+    assert.ok(report.breaks.some((found) => found.field === field), `${field}: ${JSON.stringify(report.breaks)}`);
+  }
+  // A tool that was neither held nor offered at the close.
+  assert.ok(offered, "the bot seasons take a draft");
+  const rows = copy(offered.rows);
+  const stranger = notOffered(rows, offered.index);
+  assert.ok(stranger);
+  rows[offered.index].dynamics.open.relics = [...rows[offered.index].dynamics.open.relics, stranger];
+  assert.ok(recheckChain(rows).breaks.some((found) => found.field === "open.relics"));
+});
+
+test("the season's first case opens empty", () => {
+  for (const [field, edit] of Object.entries({
+    "open.vault": (open) => { open.vault = 40; },
+    "open.relics": (open) => { open.relics = [RELIC_IDS[0]]; },
+    "open.busts": (open) => { open.busts = 1; },
+    "open.logic": (open) => { open.logic.best = 3; },
+  })) {
+    const rows = copy(honest[1]);
+    edit(rows[0].dynamics.open);
+    const report = recheckChain(rows);
+    assert.deepEqual(report.marks, [CHAIN_MARK], field);
+    assert.ok(report.breaks.some((found) => found.field === field && found.case === CASE_SEQUENCE[0]), field);
+  }
+});
+
+test("rows from a build before the snapshot leave the opening not checked, never marked", () => {
+  const rows = copy(honest[2]);
+  for (const row of rows) {
+    delete row.dynamics.open;
+    delete row.dynamics.linksOut;
+    delete row.dynamics.relicOffer;
+    delete row.dynamics.practiceWindows;
+  }
+  const report = recheckChain(rows);
+  assert.deepEqual(report.marks, []);
+  for (const field of UNCHECKED.open) assert.equal(report.unchecked.fields[field], CASE_SEQUENCE.length, field);
+  // A close from before the snapshot, followed by a case with one: what the close cannot say is not checked.
+  const mixed = copy(honest[2]);
+  const index = mixed.findIndex((row, at) => at > 0 && row.dynamics.open.relics.some((id) => !mixed[at - 1].dynamics.relics.includes(id)));
+  if (index > 0) {
+    delete mixed[index - 1].dynamics.relicOffer;
+    const found = recheckChain(mixed);
+    assert.deepEqual(found.marks, []);
+    assert.equal(found.unchecked.fields.relics, 1);
+  }
 });
 
 test("a row that cannot be read is counted as not checked, never passed or marked", () => {
@@ -116,4 +210,26 @@ test("a row that cannot be read is counted as not checked, never passed or marke
   assert.deepEqual(report.marks, []);
   assert.equal(report.unchecked.fields.handVault, 2, "the link into it and the link out of it");
   assert.deepEqual(recheckChain([]), { status: "unchecked", marks: [], breaks: [], cases: [], unchecked: { cases: 0, links: 0, fields: {} } });
+});
+
+test("what the snapshot or the close cannot say is counted, not marked", () => {
+  const unchecked = (edit) => {
+    const rows = copy(honest[0]);
+    edit(rows);
+    const report = recheckChain(rows);
+    assert.deepEqual(report.marks, [], JSON.stringify(report.breaks));
+    return report.unchecked.fields;
+  };
+  // A first close sent from a replay is the replay's table.
+  assert.equal(unchecked((rows) => { rows[6].dynamics.open.practice = true; }).practice, 1);
+  // A close from before `linksOut`.
+  assert.equal(unchecked((rows) => { delete rows[6].dynamics.linksOut; }).links, 1);
+  // The season's first case left half way and opened again.
+  assert.equal(unchecked((rows) => { for (const row of rows) for (const counts of [row.dynamics, row.dynamics.open]) counts.windowIndex += 2; }).reopened, 1);
+  // A close without its window count cannot say what lay between.
+  assert.equal(unchecked((rows) => { delete rows[6].dynamics.windowIndex; }).reopened, 1);
+  // A snapshot with no list of tools is a break.
+  const rows = copy(honest[0]);
+  rows[6].dynamics.open.relics = null;
+  assert.ok(recheckChain(rows).breaks.some((found) => found.field === "open.relics"));
 });

@@ -389,14 +389,17 @@ test("a new game takes the setting as it stands, with or without NEW GAME+", asy
   off.act("startGame");
   assert.equal(off.run.gauntletRun.story, false);
   assert.equal(off.saved().dynamics.story, false);
-  assert.deepEqual(off.run.gauntletRun, structuredClone(RUN_INITIAL_STATE), "the opening table, as it always was");
+  // The opening table, as it always was, with the first case's opening snapshot (S3).
+  assert.deepEqual({ ...off.run.gauntletRun, open: null }, structuredClone(RUN_INITIAL_STATE), "the opening table, as it always was");
+  assert.equal(off.run.gauntletRun.open.story, false);
 
   const on = await harnessWith(true);
   on.act("startGame");
   assert.equal(on.run.currentCase, CASE_SEQUENCE[0], "the season's first case is on the table straight from the start, with no case opened");
   assert.equal(on.run.gauntletRun.story, true);
   assert.equal(on.saved().dynamics.story, true);
-  assert.deepEqual({ ...on.run.gauntletRun, story: false }, structuredClone(RUN_INITIAL_STATE), "nothing else about the table differs");
+  assert.deepEqual({ ...on.run.gauntletRun, story: false, open: null }, structuredClone(RUN_INITIAL_STATE), "nothing else about the table differs");
+  assert.equal(on.run.gauntletRun.open.story, true, "and the opening snapshot says so");
 
   const plus = await harnessWith(true);
   plus.act("startGame", { veteran: true });
@@ -409,12 +412,13 @@ test("a run started from the pre-start shell has no table yet, and its opening t
   assert.equal(shell.dynamics, null, "the shell cannot write a table: the engine is not in its chunk");
 
   const off = await harnessWith(false, { saved: shell });
-  assert.deepEqual(off.run.gauntletRun, structuredClone(RUN_INITIAL_STATE));
+  assert.deepEqual({ ...off.run.gauntletRun, open: null }, structuredClone(RUN_INITIAL_STATE));
+  assert.equal(off.run.gauntletRun.open.caseId, CASE_SEQUENCE[0]);
 
   const on = await harnessWith(true, { saved: shell });
   assert.equal(on.run.currentCase, CASE_SEQUENCE[0]);
   assert.equal(on.run.gauntletRun.story, true);
-  assert.deepEqual({ ...on.run.gauntletRun, story: false }, structuredClone(RUN_INITIAL_STATE));
+  assert.deepEqual({ ...on.run.gauntletRun, story: false, open: null }, structuredClone(RUN_INITIAL_STATE));
 
   // A save that holds a table keeps the mark that table has, whatever the device says now.
   const held = { ...shell, dynamics: serializeRunState({ ...RUN_INITIAL_STATE, windowIndex: 2 }) };

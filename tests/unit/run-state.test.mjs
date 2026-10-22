@@ -130,7 +130,9 @@ test("what the four transitions are for", () => {
   const jumped = transition(before, EVENTS.jumpToNode);
   assert.deepEqual([jumped.runId, jumped.currentCase, jumped.nodeId], ["run-jump", "case05", "c5_voice"]);
   assert.deepEqual(jumped.completedCases, ["prologue01"]);
-  assert.deepEqual(jumped.gauntletRun, RUN_INITIAL_STATE);
+  // The opening table, with the snapshot of the case jumped into (S3).
+  assert.deepEqual({ ...jumped.gauntletRun, open: null }, RUN_INITIAL_STATE);
+  assert.equal(jumped.gauntletRun.open.caseId, "case05");
 
   const wiped = transition(before, EVENTS.reset);
   assert.deepEqual(

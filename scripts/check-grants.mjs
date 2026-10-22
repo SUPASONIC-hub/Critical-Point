@@ -7,7 +7,8 @@ import { CASE_SEQUENCE } from "../src/gameCases.js";
 import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
 import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
-import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { createCaseClose, createRunSummary, normalizeCaseOpen, openCaseRun, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { LINK_CARRY_MAX, LINK_SPAN_MAX } from "../src/gauntlet/cascadeRisk.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
@@ -627,8 +628,14 @@ function casePayload({ session, runId, caseId, completedAt = new Date().toISOStr
     triggers,
     cognition,
     decision_log: log,
-    dynamics: { ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4 },
+    // With the close's links and draft and the case's opening snapshot (F1 phase 3, S3).
+    dynamics: caseDynamics(openCaseRun(RUN_INITIAL_STATE, { caseId, resources: initialResources })),
   };
+}
+
+/** A case row's `dynamics` as useChoiceCommit builds it from the run at the close. */
+function caseDynamics(run) {
+  return { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec: 7.4 };
 }
 
 /** The shared builder the runtime calls for the ranking row. */
@@ -912,8 +919,8 @@ withHeaders(null);
     oversize("run-size-4", "case08", { summary: { note: "x".repeat(5000) } }), /too large/);
   await postRefused("send 2 KB of triggers", "playtest_sessions",
     oversize("run-size-5", "case08", { triggers: { note: "x".repeat(2000) } }), /too large/);
-  await postRefused("send 3 KB of dynamics", "playtest_sessions",
-    oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(3000) } }), /too large/);
+  await postRefused("send 7 KB of dynamics", "playtest_sessions",
+    oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(7000) } }), /too large/);
   await postRefused("send a 200 KB row", "playtest_sessions",
     oversize("run-size-7", "case08", { decision_log: Array.from({ length: 30 }, () => ({ echo: "x".repeat(7000) })) }), /too large/);
 }
@@ -980,6 +987,51 @@ withHeaders(null);
   }
   const shape = await one(`select convalidated as validated from pg_constraint where conname = 'playtest_sessions_dynamics_shape' and conrelid = 'public.playtest_sessions'::regclass`);
   check(shape?.validated === false, "playtest_sessions_dynamics_shape is validated: adding it re-read every stored row, and a row written under an older shape would have stopped the migration.");
+}
+
+// The case-open snapshot (20261102030000; F1 phase 3, S3): a case row's
+// `dynamics` carries the case's opening (`open`), the close's links
+// (`linksOut`) and draft (`relicOffer`) and the practice count, each optional
+// and each typed, in up to 6,144 bytes. The largest a run can make is sent as
+// the client builds it (tests/unit/case-open.test.mjs measures the same).
+{
+  let openRun = 0;
+  const withDynamics = (dynamics) => ({ ...casePayload({ session: sessionId(1), runId: `run-open-${++openRun}`, caseId: "case09" }), dynamics });
+  const honest = casePayload({ session: sessionId(1), runId: "run-open-0", caseId: "case09" });
+  check(honest.dynamics.open?.caseId === "case09" && Array.isArray(honest.dynamics.linksOut), "the case row this check sends carries no opening snapshot; casePayload is not the row useChoiceCommit builds.");
+  await post("send a case row with its opening snapshot", "playtest_sessions", honest);
+  const relics = [...RELIC_IDS];
+  const longest = openCaseRun(
+    {
+      ...RUN_INITIAL_STATE,
+      windowIndex: 99999, practiceWindows: 99999, vault: 9999999, handVault: 9999999, busts: 99999, cashes: 99999, relics,
+      weekRule: "w".repeat(WEEK_RULE_ID_MAX),
+      linksIn: Array.from({ length: LINK_CARRY_MAX }, () => ({ from: -99, due: LINK_SPAN_MAX })),
+      logic: { streak: 9999, best: 9999, type: "reframing", held: 9999, heat: 3, rose: true, reach: 9 },
+      stanceMastery: { strike: 99, steady: 99, expose: 99 },
+    },
+    { caseId: "case09", resources: { time: -99999.5, capital: -99999.5, trust: -99999.5, legitimacy: -99999.5, humanCost: -99999.5, fatigue: -99999.5 } },
+  );
+  const mutations = Array.from({ length: 8 }, () => "heatDebtOverclock");
+  const largest = {
+    ...caseDynamics({ ...longest, linksOut: longest.linksIn, schema: { ...longest.schema, mutations } }),
+    relicOffer: relics.slice(0, 3),
+    open: normalizeCaseOpen({ ...longest.open, relicOffer: relics.slice(0, 3), schema: { ...longest.open.schema, mutations, fracturedAxis: "legitimacy" } }),
+  };
+  await post("send a case row with the largest dynamics a run can make", "playtest_sessions", withDynamics(largest));
+  await post("send a case row with 5 KB of dynamics", "playtest_sessions", withDynamics({ ...honest.dynamics, open: { ...honest.dynamics.open, note: "x".repeat(4400) } }));
+  await post("send a case row from a build before the snapshot", "playtest_sessions", withDynamics({ ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4 }));
+  await post("send a case row whose opening snapshot is null", "playtest_sessions", withDynamics({ ...honest.dynamics, open: null }));
+  for (const [what, patch] of [
+    ["an opening snapshot that is an array", { open: [] }],
+    ["an opening snapshot with no case", { open: { vault: 0 } }],
+    ["an opening snapshot whose case is a number", { open: { caseId: 9 } }],
+    ["linksOut as an object", { linksOut: { from: 0, due: 2 } }],
+    ["relicOffer as a string", { relicOffer: "lockpick" }],
+    ["practiceWindows as a string", { practiceWindows: "3" }],
+  ]) {
+    await postRefused(`send a case row with ${what}`, "playtest_sessions", withDynamics({ ...honest.dynamics, ...patch }), /^23514 .*playtest_sessions_dynamics_shape/);
+  }
 }
 
 // ---- the ranking
@@ -2270,7 +2322,7 @@ const VALIDATOR_PARTS = {
     ["a case row with 2 KB of resources", FIELD, "playtest_sessions", sessionRow({ resources: { note: "x".repeat(2000) } })],
     ["a case row with 2 KB of triggers", FIELD, "playtest_sessions", sessionRow({ triggers: { note: "x".repeat(2000) } })],
     ["a case row with 2 KB of cognition", FIELD, "playtest_sessions", sessionRow({ cognition: { note: "x".repeat(2000) } })],
-    ["a case row with 3 KB of dynamics", FIELD, "playtest_sessions", sessionRow({ dynamics: { note: "x".repeat(3000) } })],
+    ["a case row with 7 KB of dynamics", FIELD, "playtest_sessions", sessionRow({ dynamics: { note: "x".repeat(7000) } })],
     ["a case row with a 9 KB decision entry", P("decision log entry too large"), "playtest_sessions", sessionRow({ decision_log: [{ echo: "x".repeat(9000) }] })],
     ["a case row", STORED, "playtest_sessions", sessionRow()],
     ["a case row from a request with no address", STORED, "playtest_sessions", sessionRow(), { headers: null }],
