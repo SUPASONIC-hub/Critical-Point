@@ -137,8 +137,13 @@ export function GauntletStage({
    * comes back to the briefing instead of inheriting the last one's state.
    */
   const [openedSeed, setOpenedSeed] = useState(null);
-  // The briefing's reading, which it writes and openTable notes (D-11, state/readingTally.js).
+  // The briefing's reading, which it reports and openTable notes (D-11, state/readingTally.js).
   const readingRef = useRef(null);
+  const trackReading = (seconds, held) => {
+    const page = (readingRef.current ??= { seconds: 0, held: false });
+    page.seconds += seconds;
+    if (held) page.held = true;
+  };
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
@@ -360,6 +365,7 @@ export function GauntletStage({
     if (card && !isCardOpen(card)) return;
     // D-11: the page that just closed, as the case row will count it.
     noteBriefing({ caseId: scene.node.caseId, byClock, ...readingRef.current });
+    readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
@@ -802,7 +808,7 @@ export function GauntletStage({
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}
-          reading={readingRef}
+          reading={trackReading}
         />
       )}
 

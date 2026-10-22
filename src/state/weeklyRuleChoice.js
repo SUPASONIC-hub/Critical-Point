@@ -35,7 +35,7 @@ export const SEASON_RECORD_STORAGE_KEY = "critical-point-season-record-v1";
 
 /** How many seasons this device has finished: the record's count, or 1 for NEW GAME+ without one, or 0. */
 export function finishedSeasons() {
-  let record = null;
+  let record;
   try {
     record = JSON.parse(readStoredValue(SEASON_RECORD_STORAGE_KEY, "null"));
   } catch {

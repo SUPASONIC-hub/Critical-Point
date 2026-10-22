@@ -169,9 +169,13 @@ export function SceneBriefing({
 
   // D-11: how long this page is up (visible) and whether it was ever held, for
   // the stage to note when the table opens, by whatever key or button.
+  const readingRef = useRef(reading);
   useEffect(() => {
-    if (reading) reading.current = { seconds: 0, held: heldRef.current };
-  }, [reading]);
+    readingRef.current = reading;
+  });
+  useEffect(() => {
+    readingRef.current?.(0, heldRef.current);
+  }, []);
 
   useEffect(() => {
     let frame = 0;
@@ -181,7 +185,7 @@ export function SceneBriefing({
       const now = monotonicNow();
       const step = document.hidden ? 0 : Math.min(0.25, (now - last) / 1000);
       if (!heldRef.current) spent += step;
-      if (reading?.current) reading.current.seconds += step;
+      readingRef.current?.(step, false);
       last = now;
       const remaining = Math.max(0, readSeconds - spent);
       timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));
@@ -200,7 +204,7 @@ export function SceneBriefing({
 
   function toggleHold() {
     heldRef.current = !heldRef.current;
-    if (heldRef.current && reading?.current) reading.current.held = true;
+    if (heldRef.current) readingRef.current?.(0, true);
     setHeld(heldRef.current);
   }
 
