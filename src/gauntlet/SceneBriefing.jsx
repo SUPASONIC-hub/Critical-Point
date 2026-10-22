@@ -14,6 +14,7 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { Prose, ProseCaptions, ProseItems } from "../components/Prose.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
+import { warmCasePortraits } from "../speakerPortraits.js";
 import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
 import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
@@ -177,6 +178,10 @@ export function SceneBriefing({
   useEffect(() => {
     onOpenRef.current = onOpen;
   });
+
+  // Every face of the case, fetched as its first page opens (D-14): not on
+  // the intro, where they would race the first paint.
+  useEffect(() => warmCasePortraits(node.caseId), [node.caseId]);
 
   useEffect(() => {
     let frame = 0;
