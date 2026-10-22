@@ -484,7 +484,8 @@ export function useChoiceCommit(context) {
         // archive. The reframe card has no line of its own (the default echo),
         // and a line written for a card that was confirmed is not what came of
         // a bust or of a card the clock staked: those keep the sentence made
-        // from the effect.
+        // from the effect, the beat's last, which the reveal shows under the
+        // verdict on every sheet (DecisionReveal.jsx).
         echo: reframe || busted || forced ? null : entry.echo,
         effect: finalEffect,
         clue,

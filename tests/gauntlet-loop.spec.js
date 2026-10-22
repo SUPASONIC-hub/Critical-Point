@@ -1140,6 +1140,11 @@ test("past the prologues the reveal is short; 자세히 opens the whole sheet fr
   await expect(sheet.locator(".decision-reveal-stakes")).toBeVisible();
   await expect(ledger).toHaveCount(0);
   await expect(sheet.locator(".gx-reveal-pot, .decision-reveal-choice")).toHaveCount(0);
+  // The story line is straight under the verdict, above the bill (D-1).
+  const storyBox = await sheet.getByTestId("reveal-story").boundingBox();
+  const stakesBox = await sheet.locator(".decision-reveal-stakes").boundingBox();
+  expect(storyBox.y, "the story line is above the bill").toBeLessThan(stakesBox.y);
+  await expect(sheet.getByTestId("reveal-story")).not.toBeEmpty();
 
   // Focus opens on the way on, as it always did; Tab stays inside, between the two buttons.
   await expect(next).toBeFocused();
@@ -1178,6 +1183,19 @@ test("past the prologues the reveal is short; 자세히 opens the whole sheet fr
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.decisionReveal).toBeUndefined();
   expect(JSON.stringify(saved)).not.toContain("detailsOpen");
+});
+
+test("a bust on the short sheet still says one sentence of the story, under the verdict", async ({ page }) => {
+  // The card's own line is not what came of a bust (useChoiceCommit.js), and
+  // the short sheet said nothing of the story at all until 2026-10-22 (D-1).
+  await openTable(page, "case01", "start");
+  await dismissProtocolBreach(page);
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  await bustStakedCard(page);
+  await expect(page.getByTestId("reveal-details")).toHaveAttribute("aria-expanded", "false");
+  const story = page.locator(".decision-reveal").getByTestId("reveal-story");
+  await expect(story).toBeVisible();
+  await expect(story).not.toBeEmpty();
 });
 
 test("a prologue keeps the whole sheet and has no 자세히: it is still teaching", async ({ page }) => {
