@@ -108,6 +108,9 @@ test("a gloss is read only from a parenthesis right after the term", () => {
   // 인수 실사 is a glossary term of its own, so its parenthesis is not 실사's.
   assert.deepEqual(findGlosses("인수 실사(사기 전에 장부와 서류를 샅샅이 확인하는 일)", "실사"), []);
   assert.deepEqual(findGlosses("인수 실사(사기 전에 장부와 서류를 샅샅이 확인하는 일)", "인수 실사").length, 1);
+  // So is 증거 보전 신청, which keeps evidence, not property.
+  assert.deepEqual(findGlosses("법원에 증거 보전 신청(증거가 없어지지 않게 법원이 미리 확보해 두는 절차)을", "보전 신청"), []);
+  assert.deepEqual(findGlosses("법원에 증거 보전 신청(증거가 없어지지 않게 법원이 미리 확보해 두는 절차)을", "증거 보전 신청").map((entry) => entry.gloss), ["증거가 없어지지 않게 법원이 미리 확보해 두는 절차"]);
 });
 
 test("every standard gloss belongs to a glossary term and is a non-empty wording", () => {

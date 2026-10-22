@@ -213,13 +213,13 @@ if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) con
  * it, 71 terms are explained more than one way, and 195 of the parentheses say
  * something other than the standard. They are warnings, and the count only
  * comes down: the copy rewrite of the same day (prose-polish) wrote the
- * standard wording into 168 of them and left 26 -- 21 in the prologues, which
- * another branch was rewriting, and five where the standard wording would say
- * the wrong thing in that scene (증거 보전 is not 보전 신청 of property, a
- * 시행사 of a PF that is not 재개발, a 비밀유지 서약서 signed at work, 필적
- * 감정 that dates the ink).
+ * standard wording into 168 of them, and the four where the standard would
+ * have said the wrong thing were settled the same day (증거 보전 신청 became a
+ * term of its own; 시행사 and 비밀유지 서약서 got a wording that fits every
+ * scene; 필적 감정's sentence was reworded). The 22 left are in the prologues,
+ * which another branch was rewriting.
  */
-const OFF_STANDARD_CEILING = 26;
+const OFF_STANDARD_CEILING = 22;
 for (const term of Object.keys(STANDARD_GLOSS)) {
   if (!GLOSSARY.includes(term)) failures.push(`STANDARD_GLOSS explains "${term}", which is not in GLOSSARY`);
 }
