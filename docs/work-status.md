@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-21 (the state of `main` at `0df240a`, #223; what changed and when is in `git log`)
+Last updated: 2026-10-22 (the state of `main` at `4149ccd`, #239; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -132,6 +132,24 @@ Still open, on purpose:
   `scripts/report-funnel.mjs`) and writes how far runs got, the breaks
   between rows, days to finish, new runs after a finale and the NEW GAME+
   funnel to its Job Summary, aggregates only, consenting devices only.
+  Its first run, dispatched by hand on 2026-10-22, passed.
+- 2026-10-22: four pull requests merged before W44 (#232 the second stopped
+  clock e2e, #236 the drop-off report, #237 one gloss per term and the scene
+  text ceiling, #239 measurement only); production runs `4149ccd`. Everything
+  that changes the table or the screens waits as a draft for the 2026-11-02
+  ruling: the rules-mark-3 pull request (#224), server checks phase 2 (#216)
+  and every slice of phase 3, S1-S7 (#227, #228, #233, #234, #235, #240),
+  NEW GAME+ (#220), lucide 1.x (#218), Vite 8 (#225), the edge notice that
+  can be turned off (#226), and the play-and-immersion work on the story,
+  screens and table (#238 endings and the finale, #241 the first ten
+  minutes, #242 the cards of 사건 01-10, #243 the voices that open a case).
+- What #239 measured (2026-10-22): a hand that plays the table well cuts
+  BUST to about a third, but moves the collapse ending by only about 4
+  points; collapse is decided by which cards a season picks -- the `money`
+  archetype collapses in 76% of seasons, `spend-people` in 85%, the other
+  five in 0-3%. The season ranking's score is read off the finale case row
+  alone; it becomes the mean over the season's cases together with the
+  rules-mark-3 change, not before.
 - NEW GAME+ carry-over (checked 2026-10-21, three answers all option 1): the
   scene BUST rates leave out NEW GAME+ rows by the case summary's
   `newGamePlus` and `case_id`, through a redefinition of
@@ -1020,7 +1038,11 @@ Still open, on purpose:
     way of thinking changes; after the 2026-10-06 audit (thirteen effect
     corrections, ninety explicit cognitions, the lead-card outcome) collapse
     reads 23% and every other ending sits between about 4% and 19%, field pact
-    and human record the largest. The ruling reads season
+    and human record the largest. Since 2026-10-22 (#239) it also reports,
+    without failing on them, the collapse rate per archetype and how often a
+    season's ending changes when the same seed is played blind and by the
+    heartbeat; `check:pressure` adds the BUST rate on the table right after a
+    BUST against the rest. The ruling reads season
     means and rates: clue gates are rates of cases played; standing gates read
     the mean of each case's closing resources (`finalResources` in the case
     summary, alongside `reframeRouteCount` and `peopleFirstCount`); the
