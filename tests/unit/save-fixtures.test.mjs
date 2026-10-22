@@ -119,8 +119,10 @@ test("a save from the table that graded a press loads without a notice, under th
   const { beatCombo: _a, bestCombo: _b, focusPerfects: _c, focusMisses: _d, runGroove, grooveVault: _e, suspended, practice, ...rest } = saved;
   // `weekRule` came after this save (이번 주의 규칙): it reads as none, and so
   // do B2's links (the 3 -> 4 step).
-  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, ...kept } = run;
+  // So does the case's opening snapshot (S3): none for a case opened before it.
+  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, open, ...kept } = run;
   assert.equal(weekRule, null);
+  assert.equal(open, null);
   assert.deepEqual([linksIn, linksOut], [[], []]);
   assert.deepEqual(kept, rest);
   assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [practice.logic, practice.vault, practice.record.grooveBanked]);

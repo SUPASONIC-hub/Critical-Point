@@ -41,6 +41,7 @@ import {
 import {
   applyGauntletEffect,
   BUST_EFFECT,
+  createCaseClose,
   createRunSummary,
   createWindow,
   equipRelic,
@@ -364,6 +365,9 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     const caseResults = {};
     // Each closed case's decision log, as its case row carries it (the chain checker's tests).
     const caseLogs = {};
+    // Each closed case's `dynamics` as its case row carries it: the run summary,
+    // the close's links and draft, and the case's opening snapshot (useChoiceCommit, S3).
+    const caseDynamics = {};
     let discoveredClues = [];
     let run = normalizeStart(story);
     let final = null;
@@ -389,7 +393,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       // rules, and on the window that closes it the next case's.
       const rules = getTableRules(caseId, run, staged);
       const nextCaseRules = getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged);
-      run = openCaseRun(run, { rules });
+      run = openCaseRun(run, { rules, caseId, resources });
       let audit = 0;
       // B2, CASCADE_WEEK only: the case's links off its own log (cascadeRisk.js).
       let linkLog = [];
@@ -516,6 +520,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           };
           caseResults[caseId] = summary;
           caseLogs[caseId] = log;
+          caseDynamics[caseId] = { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec };
           casePeaks.push(summary.peakRiskPressure);
           if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
           if (caseId === "final") final = { resources, log };
@@ -525,7 +530,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     }
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, logic: getSeasonLogic(caseResults), relics: run.relics, audits, links };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), relics: run.relics, audits, links };
   }
 
   /**

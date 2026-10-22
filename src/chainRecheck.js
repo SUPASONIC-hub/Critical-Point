@@ -26,10 +26,26 @@
  *                   and `handVault` never down (a practice run restores them,
  *                   the audit takes from what is being secured, not from the
  *                   vault), and the table mark and the week stamp the same.
- *                   The opening state itself (relics, stance mastery, links,
- *                   the logic streak, LOCK's carry, the opening resources, a
- *                   NEW GAME+ start being empty) waits for the opening
- *                   snapshot, `dynamics.open` (S3, question 8 (1)).
+ *   the opening     the snapshot each case row carries as `dynamics.open`
+ *                   (S3, question 8 (1); gauntletEngine's `createCaseOpen`)
+ *                   against the close before it, "닫힘 = 다음 열림": the vault
+ *                   and its hand share the same, the window count not behind
+ *                   the close and at least the case's decisions behind its
+ *                   own close, every tool one the close held or was offering
+ *                   (`relicOffer`), NEW GAME+ the same as the case before's;
+ *                   when no window but practice lay between (a replay hands
+ *                   all of it back), the stance mastery, the logic streak and
+ *                   the links (`linksIn` = the close's `linksOut`, none in
+ *                   story mode) the same as well. The season's first case
+ *                   opens empty: no vault, tools or links, and with no window
+ *                   played no busts, cashes, mastery or streak. The opening
+ *                   resources are its first decision's `resourcesBefore`.
+ *                   Still not checked: the board it opened on (LOCK's carry,
+ *                   `focusCarry`, needs the settlement, S2) and the opening
+ *                   route's resources against the case before's result
+ *                   (`openingRoute`, describeCaseOpening). A row from a build
+ *                   before the snapshot counts all of the opening as not
+ *                   checked (UNCHECKED.open).
  *
  * A gap in the rows (a case not delivered, or past retention) breaks no link:
  * the two sides of it are counted as not checked.
@@ -63,10 +79,10 @@ export const UNCHECKED = Object.freeze({
   // (countAudit/settleAudit) on the vault. Import the engine's functions, never
   // copies, so the 11-02 verdict's rules follow (question 6 (1)).
   inside: Object.freeze(["board", "scene", "resourcesAfter", "audit", "cascade"]),
-  // TODO(S3): read `dynamics.open` on the next case's row and compare it with
-  // the case before's close; on prologue01 of a NEW GAME+ run, that it opens
-  // empty (no links, tools, vault or log) and veteran.
-  between: Object.freeze(["relics", "stanceMastery", "links", "logic", "focusCarry", "openingResources", "newGamePlusStart"]),
+  // What the opening snapshot (S3) still cannot answer, on every link.
+  between: Object.freeze(["focusCarry", "openingRoute"]),
+  // What a row without the snapshot (a build before S3) leaves unchecked.
+  open: Object.freeze(["open", "relics", "stanceMastery", "links", "logic", "openingResources", "newGamePlusStart"]),
 });
 
 const isObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -86,6 +102,11 @@ export function recheckCaseLinks(row) {
   if (!log) return { status: "unchecked", breaks: [], unchecked: ["log"] };
   const breaks = [];
   const unchecked = [...UNCHECKED.inside];
+  // The case opened on the hand its first decision started from (S3).
+  const opening = row?.dynamics?.open?.resources;
+  if (isObject(opening) && isObject(log[0]?.resourcesBefore) && !sameResources(opening, log[0].resourcesBefore)) {
+    breaks.push({ entry: 0, field: "resourcesBefore", expected: opening, found: log[0].resourcesBefore });
+  }
   log.forEach((entry, index) => {
     if (!isObject(entry)) {
       breaks.push({ entry: index, field: "entry" });
@@ -104,6 +125,79 @@ export function recheckCaseLinks(row) {
 }
 
 const loggedBusts = (log) => log.filter((entry) => entry?.threshold?.busted === true).length;
+
+const sameList = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+const STANCES = ["strike", "steady", "expose"];
+
+/**
+ * The opening snapshot of `after` (S3) against the close of `before`, or
+ * against an empty start when `before` is null. Pushes onto `breaks` and
+ * `unchecked`; a field the close does not carry (a build before it) leaves
+ * its comparison not checked rather than broken.
+ */
+function recheckOpening(before, after, snapshot, breaks, unchecked) {
+  const log = after.decision_log;
+  const caseClose = numberOf(after.dynamics.windowIndex);
+  if (snapshot.caseId !== after.case_id) breaks.push({ field: "open.caseId", expected: after.case_id, found: snapshot.caseId });
+  if (caseClose !== null && numberOf(snapshot.windowIndex) !== null && caseClose - snapshot.windowIndex < log.length) {
+    breaks.push({ field: "open.windowIndex", expected: `${caseClose - log.length} or less`, found: snapshot.windowIndex });
+  }
+  // A first close sent from a replay is the replay's table: not read as the season's.
+  if (snapshot.practice === true) {
+    unchecked.push("practice");
+    return;
+  }
+  const relics = Array.isArray(snapshot.relics) ? snapshot.relics : null;
+  const links = Array.isArray(snapshot.linksIn) ? snapshot.linksIn : null;
+  if (!before) {
+    for (const key of ["vault", "handVault"]) {
+      if (snapshot[key] !== 0) breaks.push({ field: `open.${key}`, expected: 0, found: snapshot[key] ?? null });
+    }
+    if (!relics || relics.length) breaks.push({ field: "open.relics", expected: [], found: snapshot.relics ?? null });
+    if (!links || links.length) breaks.push({ field: "open.linksIn", expected: [], found: snapshot.linksIn ?? null });
+    // Left half way and opened again: the windows of the first try moved these.
+    if (snapshot.windowIndex !== 0) {
+      unchecked.push("reopened");
+      return;
+    }
+    for (const key of ["busts", "cashes"]) {
+      if (snapshot[key] !== 0) breaks.push({ field: `open.${key}`, expected: 0, found: snapshot[key] ?? null });
+    }
+    if (!STANCES.every((mode) => snapshot.stanceMastery?.[mode] === 0)) breaks.push({ field: "open.stanceMastery", expected: "none", found: snapshot.stanceMastery ?? null });
+    if (snapshot.logic?.streak !== 0 || snapshot.logic?.best !== 0) breaks.push({ field: "open.logic", expected: "none", found: snapshot.logic ?? null });
+    return;
+  }
+  const close = before.dynamics;
+  for (const key of ["vault", "handVault"]) {
+    if (numberOf(close[key]) !== null && snapshot[key] !== close[key]) breaks.push({ field: `open.${key}`, expected: close[key], found: snapshot[key] ?? null });
+  }
+  const between = numberOf(close.windowIndex) === null || numberOf(snapshot.windowIndex) === null ? null : snapshot.windowIndex - close.windowIndex;
+  if (between !== null && between < 0) breaks.push({ field: "open.windowIndex", expected: `${close.windowIndex} or more`, found: snapshot.windowIndex });
+  const held = new Set([...(Array.isArray(close.relics) ? close.relics : []), ...(Array.isArray(close.relicOffer) ? close.relicOffer : [])]);
+  if (!relics) breaks.push({ field: "open.relics", expected: "a list", found: snapshot.relics ?? null });
+  else if (relics.some((id) => !held.has(id))) {
+    // A close from a build before `relicOffer` cannot say what was offered.
+    if (Array.isArray(close.relicOffer)) breaks.push({ field: "open.relics", expected: [...held], found: relics });
+    else unchecked.push("relics");
+  }
+  const veteran = close.open?.veteran;
+  if (typeof veteran === "boolean" && snapshot.veteran !== veteran) breaks.push({ field: "open.veteran", expected: veteran, found: snapshot.veteran ?? null });
+  // Only practice between the two (a replay hands its table back), or nothing.
+  const practiceBetween = numberOf(close.practiceWindows) === null || numberOf(snapshot.practiceWindows) === null ? null : snapshot.practiceWindows - close.practiceWindows;
+  if (between === null || (between !== 0 && practiceBetween !== between)) {
+    unchecked.push("reopened");
+    return;
+  }
+  if (!STANCES.every((mode) => snapshot.stanceMastery?.[mode] === close.stanceMastery?.[mode])) breaks.push({ field: "open.stanceMastery", expected: close.stanceMastery ?? null, found: snapshot.stanceMastery ?? null });
+  if (numberOf(close.logicStreak) !== null && (snapshot.logic?.streak !== close.logicStreak || snapshot.logic?.best !== close.bestLogic)) {
+    breaks.push({ field: "open.logic", expected: { streak: close.logicStreak, best: close.bestLogic }, found: snapshot.logic ?? null });
+  }
+  if (!Array.isArray(close.linksOut)) unchecked.push("links");
+  else {
+    const expected = snapshot.story === true ? [] : close.linksOut;
+    if (!links || !sameList(links, expected)) breaks.push({ field: "open.linksIn", expected, found: snapshot.linksIn ?? null });
+  }
+}
 
 /**
  * The link from the case `before` closed on to the case `after`, both rows as
@@ -137,6 +231,8 @@ export function recheckCaseGap(before, after) {
       if ((close[key] ?? null) !== (open[key] ?? null)) breaks.push({ field: key, expected: close[key] ?? null, found: open[key] ?? null });
     }
   }
+  if (isObject(open.open)) recheckOpening(before, after, open.open, breaks, unchecked);
+  else unchecked.push(...UNCHECKED.open);
   return { status: breaks.length ? "broken" : "linked", breaks, unchecked };
 }
 

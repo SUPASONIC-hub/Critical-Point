@@ -67,8 +67,11 @@ test("the table record the shell leaves empty is read as the one the runtime wri
   // The engine is not in the entry chunk, so the shell writes the format's
   // "no table yet" and the runtime's load makes the opening table of it.
   assert.equal(shell.dynamics, null);
-  assert.deepEqual(RUN_FIELDS.gauntletRun.load(shell), RUN_INITIAL_STATE);
-  assert.deepEqual(serializeRunState(shell.dynamics), runtime.save.dynamics);
+  // With the season's first case's opening snapshot (S3) on the hand the shell dealt.
+  const loaded = RUN_FIELDS.gauntletRun.load(shell);
+  assert.deepEqual({ ...loaded, open: null }, RUN_INITIAL_STATE);
+  assert.equal(loaded.open.caseId, "prologue01");
+  assert.deepEqual(serializeRunState(loaded), runtime.save.dynamics);
 });
 
 test("the run loaded from the shell's save is the run the runtime's new game leaves", () => {

@@ -2,7 +2,7 @@ import { normalizeSavedText, SAVE_SCHEMA_VERSION, SAVE_STATE_KEYS } from "../app
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../gameConstants.js";
 import { makeEmptyScores } from "../gameLogic.js";
-import { normalizeRunState, RUN_INITIAL_STATE, serializeRunState } from "../gauntlet/gauntletEngine.js";
+import { normalizeRunState, RUN_INITIAL_STATE, serializeRunState, stampCaseOpen } from "../gauntlet/gauntletEngine.js";
 import { normalizeWeekRuleId, pickSeasonWeekRule } from "../gauntlet/weeklyRules.js";
 import { getAccessibility } from "./accessibilitySettings.js";
 import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
@@ -271,10 +271,13 @@ export const RUN_FIELDS = {
     // The week's rule is stamped here for the same reason (D2: on by default,
     // unless this device turned it down on the start screen, 결정 27; off for a
     // device's first season unless it was taken up there, E-8).
+    // The opening snapshot (S3) is stamped on that table too, with the case
+    // and the hand the shell's save holds.
     load: (saved) => {
       if (saved?.dynamics !== null) return normalizeRunState(saved?.dynamics);
       const story = getAccessibility().storyMode;
-      return openingTable(false, story, pickSeasonWeekRule(weeklyRuleNow(), { ...weekRuleChoice(), story }));
+      const table = openingTable(false, story, pickSeasonWeekRule(weeklyRuleNow(), { ...weekRuleChoice(), story }));
+      return stampCaseOpen(table, { caseId: saved?.currentCase ?? SEASON_ENTRY_CASE, resources: saved?.resources ?? initialResources });
     },
     fresh: () => RUN_INITIAL_STATE,
     // A run begun with NEW GAME+ is marked: its table has every rule from the
@@ -286,11 +289,13 @@ export const RUN_FIELDS = {
     // The week's rule is the caller's too (createRunLifecycle.startGame): the
     // week the season starts in, unless the player turned it down. Kept to the
     // season's end, across a week's end (D3).
-    newGame: (event) => openingTable(event.veteran === true, event.story === true, event.weekRule),
+    // The season's first case opens here, so its opening snapshot (S3) is
+    // stamped here, on the hand the `resources` row deals it.
+    newGame: (event, run) => stampCaseOpen(openingTable(event.veteran === true, event.story === true, event.weekRule), { caseId: SEASON_ENTRY_CASE, resources: createOpeningResources(run.operatorOrigin) }),
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),
-    jumpToNode: (event) => openingTable(false, event.story === true),
+    jumpToNode: (event) => stampCaseOpen(openingTable(false, event.story === true), { caseId: event.caseId, resources: initialResources }),
     reset: FRESH,
   },
   // The queue the telemetry sender empties. The save holds it; the sender's
