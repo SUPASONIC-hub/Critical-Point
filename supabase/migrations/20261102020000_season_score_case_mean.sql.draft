@@ -40,12 +40,12 @@
 --      from zero, which for these numbers, never negative, is the client's
 --      `Math.round`), and `rank` and `momentumTier` the letter and tier that
 --      number earns (`ranking_rank_for`, `ranking_tier_for`, 20261020000000,
---      which check:grants holds to gameLogic.js). The `score` column reads
+--      which check:grants holds to seasonScore.js's `scoreMarks`). The `score` column reads
 --      `burstScore`, so the board sorts on the mean.
 --   4. Every other key -- the finale's parts, its reframes and response time,
 --      the season's logic numbers, the ending -- is the final row's, as before.
 --
--- The client's copy is `getSeasonScore` (gameLogic.js): the same mean of the
+-- The client's copy is `getSeasonScore` (src/seasonScore.js): the same mean of the
 -- same cases, with a replayed case counted at its first close
 -- (`firstBurstScore`), as this counts the row the server kept. The local
 -- ranking's season row and the request's summary carry it.

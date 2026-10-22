@@ -33,12 +33,12 @@ import {
   getGameplayStats,
   getRiskPressure,
   getSeasonLogic,
-  getSeasonScore,
   getSeasonStrain,
   makeEmptyScores,
   REFRAME_COGNITION,
   REFRAME_EFFECT,
 } from "../../src/gameLogic.js";
+import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
   BUST_EFFECT,
