@@ -156,6 +156,9 @@ export function drawResultCard(ctx, model, theme) {
     write(`${model.logicHold}${RESULT_CARD_LABELS.points}`, scoreLeft, LOGIC_BASELINE, { weight: HEAVY, size: 26, maxWidth: CONTENT_WIDTH / 2 });
   }
 
+  // 4b. 사건당 금고 on the same line, right-aligned (C-1 (3)); worded outside this chunk.
+  if (model.vaultLine) write(model.vaultLine, RIGHT, LOGIC_BASELINE, { size: 26, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 });
+
   // 5. Three cells: the best table of the season, its rank, and the league.
   const cellWidth = (CONTENT_WIDTH - CELL_GAP * 2) / 3;
   const inner = cellWidth - CELL_PADDING * 2;

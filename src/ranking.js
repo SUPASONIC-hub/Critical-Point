@@ -52,6 +52,18 @@ function readScore(row, summary) {
   return Number.isFinite(burst) ? burst : toScore(summary.momentumScore);
 }
 
+/**
+ * 사건당 금고 (improvement notes 2026-10-22, C-1 (3)): the season's vault over
+ * the cases it closed, off a season row's summary (`gauntlet.vault`, and
+ * `completedCaseCount`). Shown beside the score, never sorted on or scored;
+ * null for a row that does not carry both.
+ */
+export function perCaseVault(summary) {
+  const vault = Number(summary?.gauntlet?.vault);
+  const cases = Number(summary?.completedCaseCount);
+  return vault >= 0 && cases > 0 ? Math.round(vault / cases) : null;
+}
+
 function normalizeEntry(input = {}) {
   const row = isPlainObject(input) ? input : {};
   const summary = parseSummary(row.summary);
@@ -114,6 +126,7 @@ function normalizeEntry(input = {}) {
     // device's rows and the id the server publishes on its own; a case row
     // carries the season's standing at that case, so only a season row counts.
     collapsed: seasonComplete && (summary.endingVariant?.id ?? summary.endingVariant) === "collapse",
+    vaultPerCase: perCaseVault(summary),
     summary,
   };
 }

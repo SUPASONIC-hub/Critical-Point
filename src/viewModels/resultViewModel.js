@@ -24,6 +24,7 @@ import { easyCognitionLabels } from "../playerLanguage.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { getEndingEpilogue } from "../featurePack.js";
 import { getEndingSceneProfile, getEndingVisualClass, getFailureObjectives } from "../runtimeSystems.js";
+import { describeVaultPerCase } from "../gauntlet/tableAfterword.js";
 import { createResultView } from "./appViewModels.js";
 
 export function createResultViewModel(report, {
@@ -200,6 +201,7 @@ export function createResultViewModel(report, {
     logicReport,
     caseChange,
     seasonStanding,
+    vaultLine: describeVaultPerCase(caseResults),
 
     sessionCode,
     telemetryStatus,

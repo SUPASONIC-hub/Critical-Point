@@ -432,7 +432,8 @@ test("the report screen hands the card four things, and the ending passes them o
   assert.ok(literal, `an object written out where it is handed over, not a view: ${handed[0].trim()}`);
   assert.deepEqual(
     literal.split(", ").map((field) => field.split(":")[0]),
-    ["fingerprint", "endingVariant", "endingName", "caseResults"],
+    // 사건당 금고 (C-1 (3), 2026-10-22) comes worded, a string and no record.
+    ["fingerprint", "endingVariant", "endingName", "caseResults", "vaultLine"],
   );
   assert.doesNotMatch(literal, pattern);
   assert.doesNotMatch(literal, /\.\.\./, "nothing is spread into it");
@@ -441,8 +442,8 @@ test("the report screen hands the card four things, and the ending passes them o
   // phrase, nothing that says who played.
   assert.deepEqual(
     literal.match(/\bview\b[\w?.]*/g),
-    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults"],
-    "of the view, only these three",
+    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults", "view.score.vaultLine"],
+    "of the view, only these four (the last a worded vault, C-1 (3))",
   );
 
   const ending = readFileSync(new URL("../../src/components/EndingSequence.jsx", import.meta.url), "utf8");

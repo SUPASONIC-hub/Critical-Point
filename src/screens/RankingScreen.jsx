@@ -116,6 +116,8 @@ export function RankingScreen({
                       <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
                       <span>평균 {entry.averageResponseTime}초</span>
                       <span>판 다시 짜기 {entry.reframeCount}</span>
+                      {/* C-1 (3): shown, never sorted on (ranking.js perCaseVault). */}
+                      {entry.vaultPerCase !== null && <span data-testid="ranking-vault">사건당 금고 {entry.vaultPerCase.toLocaleString("en-US")}</span>}
                       {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
                       {entry.assistStory && <span className="ranking-assist">스토리 모드</span>}
                       {entry.collapsed && <span className="ranking-assist">붕괴한 시즌</span>}

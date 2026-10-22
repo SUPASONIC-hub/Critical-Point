@@ -115,7 +115,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults }}
+            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
