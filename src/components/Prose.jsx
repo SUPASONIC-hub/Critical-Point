@@ -1,4 +1,4 @@
-import { markLines, markProse } from "./proseMarks.js";
+import { captionGroups, markLines, markProse } from "./proseMarks.js";
 
 /**
  * Scene prose with its reading marks (proseMarks.js): speech, figures and
@@ -32,17 +32,14 @@ export function ProseItems({ items }) {
 }
 
 /**
- * Narration as a strip of caption boxes, one sentence to a box (the briefing
- * page). The sentences are marked as one paragraph, so speech that runs across
- * a sentence break is speech in both boxes. It lives beside the marks rather
- * than in the briefing so the table's chunk carries only the call.
+ * Narration as a strip of caption boxes, two or three sentences to a box (the
+ * briefing page; `captionGroups` says where a box breaks). The boxes are
+ * marked as one paragraph, so speech that runs across a break is speech in
+ * both boxes. It lives beside the marks rather than in the briefing so the
+ * table's chunk carries only the call.
  */
 export function ProseCaptions({ text = "" }) {
-  const sentences = text
-    .split(/(?<=[.!?])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
-  return markLines(sentences).map((segments, index) => (
+  return markLines(captionGroups(text)).map((segments, index) => (
     <p key={index} className="gx-caption">
       <Marked segments={segments} />
     </p>

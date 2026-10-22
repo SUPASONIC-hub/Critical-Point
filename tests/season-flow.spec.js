@@ -847,7 +847,7 @@ const measureBriefing = (page) =>
   page.evaluate(() => {
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
     const sheet = document.querySelector(".gx-comic-page");
-    // Short phones (briefing.css, up to 46.25em) dock 판 열기 alone: the footer is
+    // Phones (briefing.css, every one since 2026-10-22) dock 판 열기 alone: the footer is
     // display: contents and has no box of its own, so there the dock is the button.
     const actions = document.querySelector(".gx-comic-actions");
     const dock = getComputedStyle(actions).display === "contents" ? document.querySelector("[data-testid='open-table']") : actions;

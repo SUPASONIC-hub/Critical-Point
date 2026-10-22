@@ -845,7 +845,9 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
   test.setTimeout(420_000);
   await holdReadingClock(page);
   const SCREENS = [
-    { name: "360x740", size: { width: 360, height: 740 } },
+    // Every phone docks 판 열기 alone since 2026-10-22 (D-3), so a 740px one
+    // has the panel and the question on its first screen too.
+    { name: "360x740", size: { width: 360, height: 740 }, firstScreen: true },
     // What Safari leaves of an iPhone 14 with its bars drawn. The docked cards
     // were 217 to 265px of it, the introduction showed 12 to 36px above them
     // and the story began under them. Only 판 열기 is docked there now

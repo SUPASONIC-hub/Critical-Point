@@ -219,18 +219,21 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
  * Written from arithmetic on 2026-10-13, not yet measured: at 360x740 the
  * docked cards started at 493px and the first briefing's introduction ended at
  * 555px. With 판 열기 alone docked (56px, 8px off the bottom) the dock starts
- * at 676px.
+ * at 676px. From 2026-10-22 (D-3) every phone docks 판 열기 alone: at 390x844
+ * the docked cards covered about 250px of the story.
  */
-test("a 740px phone docks 판 열기 alone under the briefing, as a 664px one does", () => {
+test("every phone docks 판 열기 alone under the briefing, and the cards follow the story", () => {
   const briefing = sheet("briefing");
   const query = briefing.match(/@media ([^{]*)\{\s*\.gx-comic-actions \{\s*display: contents;\s*\}/)?.[1] ?? "";
-  const tallest = Number(query.match(/\(max-width: 700px\) and \(max-height: ([\d.]+)em\)/)?.[1]);
-  assert.ok(tallest * 16 >= 740, `${query.trim()}: 360x740 is ${740 / 16}em tall at 16px type`);
-  assert.ok(tallest * 16 < 839, "a 412x839 or 390x844 phone keeps its cards docked");
   assert.match(query, /\(max-height: 35em\),/, "any screen that short, whatever its width");
+  assert.match(query, /\(max-width: 700px\)\s*$/, "and every phone upright, whatever its height");
   const open = briefing.slice(briefing.indexOf(query)).match(/\.gx-open-table \{[^}]*\}/)?.[0] ?? "";
   assert.match(open, /position: sticky;\s*bottom: 8px;/);
   assert.match(briefing, /\n\.gx-open-table \{[^}]*min-height: 56px;/, "740 - 8 - 56 = 676px, and the panel ends at 555px");
+  // The story is one straight column of boxes: no zigzag, no tilt, no slanted lead.
+  assert.doesNotMatch(briefing, /\.gx-panel-story \.gx-caption:nth-child/);
+  assert.doesNotMatch(briefing.match(/\.gx-caption-lead \{[^}]*\}/)?.[0] ?? "", /italic/);
+  assert.match(briefing, /\n\.gx-caption \{[^}]*font-weight: 500;/);
 });
 
 test("an intro drawer opened by its link stops below the music pills", () => {

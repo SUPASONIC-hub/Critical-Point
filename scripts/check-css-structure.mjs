@@ -255,7 +255,11 @@ const fileBudgets = {
   // from under a notch on either side.
   // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
   // (31 lines and 2222 bytes of them that day), the room unchanged.
-  "briefing.css": { lines: 674, bytes: 13078 },
+  // 674 / 13078 -> 652 / 12653 on 2026-10-22 (D-3), measured 646 / 12596,
+  // the room unchanged: the story's zigzag and tilt, the slanted lead, and
+  // the phone's docked footer, which every phone now lays out as the short
+  // screen did (22 lines and 425 bytes).
+  "briefing.css": { lines: 652, bytes: 12653 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
