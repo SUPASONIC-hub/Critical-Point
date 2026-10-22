@@ -787,6 +787,7 @@ export function GauntletStage({
           portrait={scene.speakerPortrait}
           speakerRole={scene.speakerRole}
           question={scene.question}
+          opening={scene.opening}
           run={run}
           tableSeconds={schema.seconds}
           cards={cards}

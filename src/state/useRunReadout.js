@@ -39,20 +39,27 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, seedBase, debugTools, echo = "" }) {
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
+  // `opening` is the run's line under the scene (`run.echo`): the case's opening
+  // voice until the first card is played (caseIntroEchoes). It rides on the
+  // spine because the play view has no room for a field of its own
+  // (check:runtime-budget); the briefing shows it on a case's first page only.
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
-    return buildNarrativeSpine({
-      caseObjective: caseObjectives[currentCase],
-      node,
-      log,
-      triggerLabels,
-      riskTier,
-      suspenseState,
-    });
-  }, [currentCase, log, node, riskPressure, riskTier]);
+    return {
+      ...buildNarrativeSpine({
+        caseObjective: caseObjectives[currentCase],
+        node,
+        log,
+        triggerLabels,
+        riskTier,
+        suspenseState,
+      }),
+      opening: echo,
+    };
+  }, [currentCase, echo, log, node, riskPressure, riskTier]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
     const unopenedBranchCount = getCaseBranchNodes().reduce(
