@@ -1005,8 +1005,10 @@ test("프롤로그 01-02 open with the reading clock held until it has asked, an
     await expect(page.getByTestId("reading-timer"), `${caseId}`).toHaveAttribute("aria-checked", String(held));
   }
   // Answered once, the setting decides every page: asked and left to the clock, 01 runs too.
-  await page.evaluate((key) => localStorage.setItem(key, JSON.stringify({ readingClockAsked: true })), ACCESSIBILITY_SETTINGS_KEY);
-  await startDebugNode(page, "prologue01", "p1_start", { openTable: false, resetStorage: false });
+  // Seeded on every load, not written into this page: kept storage resumed the
+  // run on 프롤로그 03 and the debug picker was never drawn.
+  await page.addInitScript((key) => localStorage.setItem(key, JSON.stringify({ readingClockAsked: true })), ACCESSIBILITY_SETTINGS_KEY);
+  await startDebugNode(page, "prologue01", "p1_start", { openTable: false });
   await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "false");
 });
 
