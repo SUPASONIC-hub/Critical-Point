@@ -1292,6 +1292,18 @@ export const farCallbacks = {
     },
     fallback: "수습 마지막 날 아침의 의견란이 잠깐 떠오릅니다. 4,000만 원을 누구 이름으로 남길지 고르던 아침입니다.",
   },
+  // 프롤로그 05: what the analyst kept of what they brought, the first night
+  // at the lab. 사건 49: the night before going up to the 33rd floor.
+  c49_aftershock: {
+    fromCase: "prologue05",
+    after: "마커 뚜껑을 닫습니다.",
+    lines: {
+      p5_after_hold: "당신 지갑 안쪽에는 트리거랩 첫날 밤 4층 벽에 붙였던 이름 목록이 접혀 있습니다. 네 귀퉁이에 테이프 자국이 남아 있습니다.",
+      p5_after_record: "트리거랩 첫날 밤 B2의 그 상자 옆에 세워 둔 사본 묶음이 떠오릅니다. 그날 적은 날짜 넷은 이제 보지 않고도 읽습니다.",
+      p5_after_alone: "트리거랩 첫날 밤 비우고 시작한 가방이 오늘은 발치에서 묵직합니다.",
+    },
+    fallback: "당신은 발치의 가방을 한 번 끌어당깁니다. 트리거랩 첫날 4층에 들고 들어갔던 그 가방입니다.",
+  },
 };
 
 /** The line a far callback prints for this run: the card's, or the fallback. */
