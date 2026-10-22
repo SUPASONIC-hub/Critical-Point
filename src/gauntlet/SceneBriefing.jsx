@@ -14,7 +14,8 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { Prose, ProseCaptions, ProseItems } from "../components/Prose.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
-import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
+import { useShortcutHints } from "../state/accessibilitySettings.js";
+import { ReadingClockAsk, readingClockStart } from "./ReadingClockAsk.jsx";
 import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
@@ -154,8 +155,12 @@ export function SceneBriefing({
     [node, question, mutations, intro, weekRules],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
-  // Held from the start when the player asked for a reading clock that waits.
-  const [held, setHeld] = useState(() => getAccessibility().holdReadingClock);
+  // Held from the start when the player asked for a reading clock that waits,
+  // and on 프롤로그 01-02 until the page has asked once (ReadingClockAsk.jsx).
+  const [start] = useState(() => readingClockStart(node.caseId));
+  const [held, setHeld] = useState(start.held);
+  const [asking, setAsking] = useState(false);
+  const askRef = useRef(start.ask);
   const heldRef = useRef(held);
   const onOpenRef = useRef(onOpen);
   const dialogRef = useRef(null);
@@ -178,7 +183,13 @@ export function SceneBriefing({
       timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));
       // Whole seconds are all the page prints; an unchanged value skips the render.
       setShown(Math.ceil(remaining));
-      if (remaining <= 0) {
+      if (remaining <= 0 && askRef.current) {
+        // The first time the clock would open a table, it stops and asks.
+        askRef.current = false;
+        heldRef.current = true;
+        setHeld(true);
+        setAsking(true);
+      } else if (remaining <= 0) {
         // Opened by the clock, not by the player: the table says so aloud.
         onOpenRef.current(null, true);
         return;
@@ -319,6 +330,15 @@ export function SceneBriefing({
 
         {/* Under the page's grid, so it takes none of its rows. */}
         {weekRulePanel}
+
+        {asking && (
+          <ReadingClockAsk
+            onAnswer={(hold) => {
+              setAsking(false);
+              if (!hold) onOpen(null, true);
+            }}
+          />
+        )}
 
         <footer className="gx-comic-actions">
           <p className="gx-comic-hint">

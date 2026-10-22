@@ -12,6 +12,12 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    A run that used it carries `assistTime` into its case
  *                    summaries and its ranking row says so.
  *   holdReadingClock the briefing page's reading clock starts held, not counting.
+ *   readingClockAsked whether the page has asked, once, if the player would
+ *                    rather open every table themselves (gauntlet/
+ *                    ReadingClockAsk.jsx). Until it has, 프롤로그 01-02 start
+ *                    held and the first page the clock would open asks
+ *                    instead. Not a switch of the comfort panel: the answer is
+ *                    holdReadingClock.
  *   calmEffects      the red vignette, the bust flash and the shake, turned down
  *                    whatever the operating system says (it already follows
  *                    prefers-reduced-motion).
@@ -34,6 +40,7 @@ export const TABLE_TIME_SCALES = Object.freeze([1, 1.5, 2]);
 export const DEFAULT_ACCESSIBILITY = Object.freeze({
   tableTime: 1,
   holdReadingClock: false,
+  readingClockAsked: false,
   calmEffects: false,
   letterKeys: true,
   stillIntro: false,
@@ -44,7 +51,7 @@ export function normalizeAccessibility(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
-  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
+  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);

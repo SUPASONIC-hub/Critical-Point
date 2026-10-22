@@ -975,7 +975,9 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(page.locator(".choices .choice.selected").getByTestId("card-label")).toHaveText(label);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
 
-  // Left alone, a page runs out and the table opens with nothing staked.
+  // Left alone, a page runs out. The first time the clock would open a table
+  // it asks once whether to open them by hand from now on (ReadingClockAsk.jsx);
+  // left to the clock, the table opens with nothing staked.
   await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   const reading = Number(await page.getByTestId("reading-timer").locator("b").textContent());
@@ -983,9 +985,29 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await page.clock.runFor((reading - 2) * 1000);
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   await page.clock.runFor(4_000);
+  const ask = page.getByTestId("reading-clock-ask");
+  await expect(ask).toContainText("다 읽고 직접 열기로 바꿀까요?");
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByTestId("reading-clock-hold")).toBeFocused();
+  // The table's clock has not moved while the page asked.
+  await expect(page.locator(".gx-clock b")).toHaveText("45");
+  await page.getByTestId("reading-clock-keep").click();
   await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
   await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
+  const settings = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), ACCESSIBILITY_SETTINGS_KEY);
+  expect(settings, "asked once, and the clock still opens tables").toMatchObject({ readingClockAsked: true, holdReadingClock: false });
+});
+
+test("프롤로그 01-02 open with the reading clock held until it has asked, and 03 on runs", async ({ page }) => {
+  for (const [caseId, nodeId, held] of [["prologue01", "p1_start", true], ["prologue02", "p2_start", true], ["prologue03", "p3_start", false]]) {
+    await startDebugNode(page, caseId, nodeId, { openTable: false });
+    await expect(page.getByTestId("reading-timer"), `${caseId}`).toHaveAttribute("aria-checked", String(held));
+  }
+  // Answered once, the setting decides every page: asked and left to the clock, 01 runs too.
+  await page.evaluate((key) => localStorage.setItem(key, JSON.stringify({ readingClockAsked: true })), ACCESSIBILITY_SETTINGS_KEY);
+  await startDebugNode(page, "prologue01", "p1_start", { openTable: false, resetStorage: false });
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "false");
 });
 
 /**

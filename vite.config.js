@@ -365,6 +365,14 @@ const SCENE_TRACES = "src/state/useSceneBustRates.js";
 const WEEK_RULE_PANEL = "src/gauntlet/WeekRulePanel.jsx";
 
 /**
+ * The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx, 2026-10-22):
+ * whether the player would rather open every table themselves. Only the
+ * briefing imports it, and it gets a file the way WeekRulePanel does, so the
+ * PlayScreen chunk does not grow for a panel most pages never draw.
+ */
+const READING_CLOCK_ASK = "src/gauntlet/ReadingClockAsk.jsx";
+
+/**
  * The audit (B3, src/gauntlet/auditRisk.js): its count, its judgement and the
  * table's words for it. The engine's chunk, the table's and the runtime's all
  * import it, so left alone it is written into the engine's chunk, which it took
@@ -428,6 +436,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(WEEK_RULE_PANEL),
         name: "WeekRulePanel",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(READING_CLOCK_ASK),
+        name: "ReadingClockAsk",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
       this.emitFile({

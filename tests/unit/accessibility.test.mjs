@@ -304,3 +304,23 @@ test("the intro and the origin profiles carry nothing the page cannot print", as
   const shell = source("AppContent.jsx");
   assert.doesNotMatch(shell.slice(shell.indexOf("const introView = createIntroViewModel({"), shell.indexOf("return <IntroScreen view={introView} />")), /^\s*setSaveStatus,$/m);
 });
+
+test("the reading clock asks once: 프롤로그 01-02 start held until it has, and the answer is the comfort switch", () => {
+  // A-11 = D-4 (user's choice 1, 2026-10-22). The flag is kept, not a switch of the panel.
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.readingClockAsked, false);
+  assert.equal(settings.normalizeAccessibility({ readingClockAsked: "yes" }).readingClockAsked, false);
+  assert.equal(settings.normalizeAccessibility({ readingClockAsked: true }).readingClockAsked, true);
+  const ask = source("gauntlet/ReadingClockAsk.jsx");
+  assert.match(ask, /const READ_FIRST_CASES = new Set\(\["prologue01", "prologue02"\]\);/);
+  assert.match(ask, /const ask = !holdReadingClock && !readingClockAsked;/);
+  assert.match(ask, /held: holdReadingClock \|\| \(ask && READ_FIRST_CASES\.has\(caseId\)\)/);
+  assert.match(ask, /다 읽고 직접 열기로 바꿀까요\?/);
+  assert.match(ask, /\{ readingClockAsked: true, holdReadingClock: true \} : \{ readingClockAsked: true \}/);
+  // The briefing asks where the clock would open the table, and only once.
+  const briefing = source("gauntlet/SceneBriefing.jsx");
+  assert.match(briefing, /if \(remaining <= 0 && askRef\.current\) \{\s*\/\/[^\n]*\s*askRef\.current = false;/);
+  // Reading time is not in the score: nothing outside the page reads its seconds.
+  for (const file of ["gauntlet/GauntletStage.jsx", "gameLogic.js", "ranking.js", "state/useChoiceCommit.js"]) {
+    assert.doesNotMatch(source(file), /getReadingSeconds|readingClockAsked/, `${file} reads the reading clock`);
+  }
+});

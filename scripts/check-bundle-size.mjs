@@ -297,6 +297,10 @@ const budgets = [
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
+  // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
+  // and the first page the clock would open asks instead (A-11 = D-4).
+  { pattern: /^ReadingClockAsk-.*\.js$/, maxBytes: 1_400, maxGzip: 900 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
