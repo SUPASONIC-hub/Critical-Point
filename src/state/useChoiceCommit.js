@@ -13,7 +13,6 @@ import {
   getObserverTag,
   getOutcomeChoiceId,
   getSeasonLogic,
-  getSeasonScore,
   getSeasonStrain,
   getRiskPressure,
   getSuspenseEvent,
@@ -31,6 +30,7 @@ import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
+import { getSeasonScore } from "../seasonScore.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";

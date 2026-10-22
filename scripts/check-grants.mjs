@@ -4,7 +4,8 @@ import { PGlite } from "@electric-sql/pglite";
 
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
-import { createCaseSummary, getEndingVariant, getSeasonScore } from "../src/gameLogic.js";
+import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { getSeasonScore } from "../src/seasonScore.js";
 import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
@@ -1312,12 +1313,13 @@ await allowed("read telemetry health", "anon", `select * from public.telemetry_h
 if (!SUSPICION_MARKS) {
   console.log("Suspicion marks: skipped, the migration is still a draft (supabase/migrations/*_ranking_suspicion_marks.sql.draft).");
 } else {
-  // The thresholds are written twice, once in gameLogic.js and once in SQL.
-  const logicSource = readFileSync(path.join(root, "src", "gameLogic.js"), "utf8");
+  // The thresholds are written twice, once in src/seasonScore.js and once in SQL.
+  // scoreMarks (src/seasonScore.js) marks a case's score and the season's.
+  const logicSource = readFileSync(path.join(root, "src", "seasonScore.js"), "utf8");
   const rankLine = logicSource.match(/rank: momentumScore >= (\d+) \? "S" : momentumScore >= (\d+) \? "A" : momentumScore >= (\d+) \? "B" : "C"/);
   const tierLine = logicSource.match(/momentumTier: momentumScore >= (\d+) \? "BURST" : momentumScore >= (\d+) \? "FLOW" : momentumScore >= (\d+) \? "READY" : "BUILDING"/);
   if (!rankLine || !tierLine) {
-    failures.push("could not read the rank and tier thresholds from src/gameLogic.js (getGameplayStats); the marks' copies can no longer be held to them.");
+    failures.push("could not read the rank and tier thresholds from src/seasonScore.js (scoreMarks); the marks' copies can no longer be held to them.");
   } else {
     const [s, a, b] = rankLine.slice(1).map(Number);
     const [burst, flow, ready] = tierLine.slice(1).map(Number);
@@ -1326,7 +1328,7 @@ if (!SUSPICION_MARKS) {
     );
     const off = rows.filter(({ n, rank, tier }) =>
       rank !== (n >= s ? "S" : n >= a ? "A" : n >= b ? "B" : "C") || tier !== (n >= burst ? "BURST" : n >= flow ? "FLOW" : n >= ready ? "READY" : "BUILDING"));
-    check(off.length === 0, `ranking_rank_for / ranking_tier_for disagree with gameLogic.js at ${off.map(({ n }) => n).join(", ")}; bring the migration's thresholds in step.`);
+    check(off.length === 0, `ranking_rank_for / ranking_tier_for disagree with seasonScore.js at ${off.map(({ n }) => n).join(", ")}; bring the migration's thresholds in step.`);
   }
 
   withHeaders({ "x-forwarded-for": "198.51.100.22" });
