@@ -13,7 +13,7 @@ import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from 
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
-import { CHAIN_MARK } from "../src/rankingRecheck.js";
+import { CHAIN_MARK } from "../src/chainRecheck.js";
 
 /**
  * Data API grants guardrail.
