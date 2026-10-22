@@ -99,8 +99,17 @@ function RuleRows({ rules, resourceMeta }) {
  * Then the case facts. Every scene has carried a `memo` since the graph was
  * written and none of them ever reached the DOM, so the briefing explained the
  * table and never the situation the cards are answering.
+ *
+ * Then the case so far and who is in it (`trail` is the case's log; D-8):
+ * CaseCast, a chunk fetched the first time the fold opens. A fetch that fails
+ * -- offline before it was ever kept -- leaves the fold as it was.
  */
-export function CaseFileStory({ node, nodeId, open, standing }) {
+export function CaseFileStory({ node, nodeId, open, standing, trail }) {
+  const [cast, setCast] = useState(null);
+  useEffect(() => {
+    if (open && !cast) import("./CaseCast.jsx").then((module) => setCast(() => module.CaseCast), () => {});
+  }, [open, cast]);
+  const CaseCast = open ? cast : null;
   return (
     <>
       <p data-testid="brief-standing">{describeStanding(...standing)}</p>
@@ -118,6 +127,7 @@ export function CaseFileStory({ node, nodeId, open, standing }) {
           <ProseItems items={node.memo} />
         </ul>
       )}
+      {CaseCast && <CaseCast node={node} trail={trail} />}
     </>
   );
 }

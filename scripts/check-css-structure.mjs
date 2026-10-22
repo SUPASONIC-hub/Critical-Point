@@ -227,7 +227,9 @@ const fileBudgets = {
   // recovery.css beside the debug jump panel, which is what it is.
   // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
   // (115 lines and 8280 bytes of them that day), the room unchanged.
-  "play.css": { lines: 2925, bytes: 55420 },
+  // 55420 -> 55572 bytes on 2026-10-22 (D-8), measured 2861 / 55572: the
+  // case file's cast cards and its list of the case's scenes so far.
+  "play.css": { lines: 2925, bytes: 55572 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

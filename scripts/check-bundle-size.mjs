@@ -295,6 +295,12 @@ const budgets = [
   // the reading and the links a case's close carries over are all here:
   // 2,790 / 1,669 measured, the gzip plus 4.
   { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
+  // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
+  // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
+  // time the table's case file opens (SceneBriefing's CaseFileStory), because
+  // the PlayScreen chunk had no room for it. Measured with the e2e build, the
+  // gzip plus the 4 bytes of hash noise.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 3_000, maxGzip: 1_500 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
