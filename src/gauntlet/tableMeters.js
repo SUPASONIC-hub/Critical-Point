@@ -1,5 +1,24 @@
-import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
+import { drawStep, GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
 import { readAudit } from "./auditRisk.js";
+import { HEAT_DEBT_GAUGE } from "./tableRules.js";
+import { AUDIT_HEAT } from "./weeklyRules.js";
+
+/**
+ * 안전선까지 (improvement notes 2026-10-22, C-5): the pushes in a row that
+ * cannot reach the wall whatever it is -- each one starts with the largest
+ * step still under the band's low edge -- and the heat they leave. The steps
+ * are the ones `PUSH` deals from the seed, so pressing them one by one lands
+ * on the same window (tests/unit/table-readouts.test.mjs). No rule moves.
+ */
+export function readSafeLine(win, wallMin) {
+  let gauge = win.gauge;
+  let pushes = 0;
+  while (win.status === "live" && gauge + win.schema.stepMax < wallMin) {
+    pushes += 1;
+    gauge += drawStep(win.schema, win.seed, win.pushes + pushes);
+  }
+  return { pushes, gauge };
+}
 
 /**
  * The 현재 위험 cell's line, and the voice's after the heat (`describePush`).
@@ -39,6 +58,7 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit =
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);
+  const reading = readAudit(run, audit, win);
   return {
     selectedChips: selectedCard ? getCardChips(selectedCard, schema) : 0,
     multiplier: getMultiplier(win.gauge),
@@ -52,6 +72,10 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit =
     dangerLine: describeDanger({ gauge: win.gauge, nextHigh, wallMin: band.wallMin }),
     belowRelief: win.gauge < getFocusModeProfile(win.focusMode).relief,
     band,
-    audit: readAudit(run, audit, win),
+    audit: reading,
+    safe: readSafeLine(win, band.wallMin),
+    // C-9: on a table that counts the audit, its line (40) and the band a cash
+    // moves it neither way in, up to HEAT DEBT's 60.
+    auditBand: reading ? [AUDIT_HEAT, HEAT_DEBT_GAUGE] : null,
   };
 }
