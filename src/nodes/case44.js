@@ -70,7 +70,7 @@ const case44Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "회사가 임원을 용서한 재판을 센다",
         type: "reframe",
         next: "c44_lottery",
       },
@@ -116,7 +116,7 @@ const case44Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "회사가 임원을 용서한 재판을 센다",
         type: "reframe",
       },
     ],
@@ -161,7 +161,7 @@ const case44Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "회사가 임원을 용서한 재판을 센다",
         type: "reframe",
       },
     ],
@@ -206,7 +206,7 @@ const case44Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "회사가 임원을 용서한 재판을 센다",
         type: "reframe",
       },
     ],

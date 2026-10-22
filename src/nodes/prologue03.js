@@ -80,7 +80,7 @@ const prologue03Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "부속으로 묻힌 반대 의견서를 세어 본다",
         type: "reframe",
         next: "p3_committee",
       },
@@ -126,7 +126,7 @@ const prologue03Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "부속으로 묻힌 반대 의견서를 세어 본다",
         type: "reframe",
       },
     ],
@@ -171,7 +171,7 @@ const prologue03Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "부속으로 묻힌 반대 의견서를 세어 본다",
         type: "reframe",
       },
     ],
@@ -216,7 +216,7 @@ const prologue03Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "부속으로 묻힌 반대 의견서를 세어 본다",
         type: "reframe",
       },
     ],

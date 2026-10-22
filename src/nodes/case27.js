@@ -66,7 +66,7 @@ const case27Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 줄이 섰던 조합들의 끝을 묻는다",
         type: "reframe",
         next: "c27_queue",
       },
@@ -112,7 +112,7 @@ const case27Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 줄이 섰던 조합들의 끝을 묻는다",
         type: "reframe",
       },
     ],
@@ -157,7 +157,7 @@ const case27Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 줄이 섰던 조합들의 끝을 묻는다",
         type: "reframe",
       },
     ],
@@ -202,7 +202,7 @@ const case27Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 줄이 섰던 조합들의 끝을 묻는다",
         type: "reframe",
       },
     ],

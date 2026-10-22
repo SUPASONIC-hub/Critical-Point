@@ -70,7 +70,7 @@ const case35Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절의 이유를 세 번 거듭 묻는다",
         type: "reframe",
         next: "c35_sandbag",
       },
@@ -116,7 +116,7 @@ const case35Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절의 이유를 세 번 거듭 묻는다",
         type: "reframe",
       },
     ],
@@ -161,7 +161,7 @@ const case35Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절의 이유를 세 번 거듭 묻는다",
         type: "reframe",
       },
     ],
@@ -206,7 +206,7 @@ const case35Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절의 이유를 세 번 거듭 묻는다",
         type: "reframe",
       },
     ],

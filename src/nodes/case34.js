@@ -75,7 +75,7 @@ const case34Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "지워진 반대 의견이 한 건뿐인지 찾아본다",
         type: "reframe",
         next: "c34_study",
       },
@@ -121,7 +121,7 @@ const case34Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "지워진 반대 의견이 한 건뿐인지 찾아본다",
         type: "reframe",
       },
     ],
@@ -166,7 +166,7 @@ const case34Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "지워진 반대 의견이 한 건뿐인지 찾아본다",
         type: "reframe",
       },
     ],
@@ -211,7 +211,7 @@ const case34Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "지워진 반대 의견이 한 건뿐인지 찾아본다",
         type: "reframe",
       },
     ],

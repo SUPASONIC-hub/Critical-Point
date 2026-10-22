@@ -79,7 +79,7 @@ const case49Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "빈칸이 누구 이름으로 채워졌는지 모은다",
         type: "reframe",
         next: "c49_market",
       },
@@ -125,7 +125,7 @@ const case49Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "빈칸이 누구 이름으로 채워졌는지 모은다",
         type: "reframe",
       },
     ],
@@ -170,7 +170,7 @@ const case49Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "빈칸이 누구 이름으로 채워졌는지 모은다",
         type: "reframe",
       },
     ],
@@ -215,7 +215,7 @@ const case49Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "빈칸이 누구 이름으로 채워졌는지 모은다",
         type: "reframe",
       },
     ],

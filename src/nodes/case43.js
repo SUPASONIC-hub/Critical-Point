@@ -69,7 +69,7 @@ const case43Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이사회가 해임을 어디에 써 왔는지 묻는다",
         type: "reframe",
         next: "c43_ledger",
       },
@@ -115,7 +115,7 @@ const case43Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이사회가 해임을 어디에 써 왔는지 묻는다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case43Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이사회가 해임을 어디에 써 왔는지 묻는다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case43Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이사회가 해임을 어디에 써 왔는지 묻는다",
         type: "reframe",
       },
     ],

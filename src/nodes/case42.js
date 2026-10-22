@@ -66,7 +66,7 @@ const case42Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "점수를 끌어내린 항목을 하나씩 대라고 한다",
         type: "reframe",
         next: "c42_pension",
       },
@@ -112,7 +112,7 @@ const case42Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "점수를 끌어내린 항목을 하나씩 대라고 한다",
         type: "reframe",
       },
     ],
@@ -157,7 +157,7 @@ const case42Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "점수를 끌어내린 항목을 하나씩 대라고 한다",
         type: "reframe",
       },
     ],
@@ -202,7 +202,7 @@ const case42Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "점수를 끌어내린 항목을 하나씩 대라고 한다",
         type: "reframe",
       },
     ],

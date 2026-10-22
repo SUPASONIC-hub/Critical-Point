@@ -70,7 +70,7 @@ const case28Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절 통화가 왜 3분에 끝나는지 잰다",
         type: "reframe",
         next: "c28_headset",
       },
@@ -116,7 +116,7 @@ const case28Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절 통화가 왜 3분에 끝나는지 잰다",
         type: "reframe",
       },
     ],
@@ -161,7 +161,7 @@ const case28Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절 통화가 왜 3분에 끝나는지 잰다",
         type: "reframe",
       },
     ],
@@ -206,7 +206,7 @@ const case28Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "거절 통화가 왜 3분에 끝나는지 잰다",
         type: "reframe",
       },
     ],

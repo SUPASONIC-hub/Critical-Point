@@ -139,7 +139,7 @@ const case03Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "점수를 무엇으로 매기는지부터 묻는다",
         type: "reframe",
       },
     ],

@@ -69,7 +69,7 @@ const case26Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장한 대출들이 어떻게 끝났는지 늘어놓는다",
         type: "reframe",
         next: "c26_crane",
       },
@@ -115,7 +115,7 @@ const case26Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장한 대출들이 어떻게 끝났는지 늘어놓는다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case26Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장한 대출들이 어떻게 끝났는지 늘어놓는다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case26Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장한 대출들이 어떻게 끝났는지 늘어놓는다",
         type: "reframe",
       },
     ],

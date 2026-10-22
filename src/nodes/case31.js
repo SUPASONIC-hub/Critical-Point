@@ -67,7 +67,7 @@ const case31Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장을 승인한 계정부터 하나씩 불러낸다",
         type: "reframe",
         next: "c31_archive",
       },
@@ -113,7 +113,7 @@ const case31Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장을 승인한 계정부터 하나씩 불러낸다",
         type: "reframe",
       },
     ],
@@ -158,7 +158,7 @@ const case31Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장을 승인한 계정부터 하나씩 불러낸다",
         type: "reframe",
       },
     ],
@@ -203,7 +203,7 @@ const case31Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "연장을 승인한 계정부터 하나씩 불러낸다",
         type: "reframe",
       },
     ],

@@ -71,7 +71,7 @@ const case37Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이 파일이 어디에 쓰이는지부터 캐묻는다",
         type: "reframe",
         next: "c37_takedown",
       },
@@ -117,7 +117,7 @@ const case37Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이 파일이 어디에 쓰이는지부터 캐묻는다",
         type: "reframe",
       },
     ],
@@ -162,7 +162,7 @@ const case37Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이 파일이 어디에 쓰이는지부터 캐묻는다",
         type: "reframe",
       },
     ],
@@ -207,7 +207,7 @@ const case37Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이 파일이 어디에 쓰이는지부터 캐묻는다",
         type: "reframe",
       },
     ],

@@ -66,7 +66,7 @@ const case12Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 조건이 붙은 배상안을 전부 불러온다",
         type: "reframe",
         next: "c12_mediation",
       },
@@ -112,7 +112,7 @@ const case12Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 조건이 붙은 배상안을 전부 불러온다",
         type: "reframe",
       },
     ],
@@ -157,7 +157,7 @@ const case12Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 조건이 붙은 배상안을 전부 불러온다",
         type: "reframe",
       },
     ],
@@ -202,7 +202,7 @@ const case12Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 조건이 붙은 배상안을 전부 불러온다",
         type: "reframe",
       },
     ],

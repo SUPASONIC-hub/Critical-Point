@@ -65,7 +65,7 @@ const case11Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "답이 어떻게 미뤄져 왔는지 묻는다",
         type: "reframe",
         next: "c11_script",
       },
@@ -111,7 +111,7 @@ const case11Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "답이 어떻게 미뤄져 왔는지 묻는다",
         type: "reframe",
       },
     ],
@@ -156,7 +156,7 @@ const case11Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "답이 어떻게 미뤄져 왔는지 묻는다",
         type: "reframe",
       },
     ],
@@ -201,7 +201,7 @@ const case11Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "답이 어떻게 미뤄져 왔는지 묻는다",
         type: "reframe",
       },
     ],

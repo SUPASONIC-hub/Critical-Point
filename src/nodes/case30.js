@@ -68,7 +68,7 @@ const case30Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹의 데이터 계약을 몽땅 꺼낸다",
         type: "reframe",
         next: "c30_bookstore",
       },
@@ -114,7 +114,7 @@ const case30Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹의 데이터 계약을 몽땅 꺼낸다",
         type: "reframe",
       },
     ],
@@ -159,7 +159,7 @@ const case30Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹의 데이터 계약을 몽땅 꺼낸다",
         type: "reframe",
       },
     ],
@@ -204,7 +204,7 @@ const case30Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹의 데이터 계약을 몽땅 꺼낸다",
         type: "reframe",
       },
     ],

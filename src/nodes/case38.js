@@ -69,7 +69,7 @@ const case38Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "나뉜 재판들이 어떻게 끝났는지 묻는다",
         type: "reframe",
         next: "c38_gallery",
       },
@@ -115,7 +115,7 @@ const case38Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "나뉜 재판들이 어떻게 끝났는지 묻는다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case38Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "나뉜 재판들이 어떻게 끝났는지 묻는다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case38Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "나뉜 재판들이 어떻게 끝났는지 묻는다",
         type: "reframe",
       },
     ],

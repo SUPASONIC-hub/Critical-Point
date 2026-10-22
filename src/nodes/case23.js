@@ -71,7 +71,7 @@ const case23Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "주주의 말이 어떻게 남았는지 묻는다",
         type: "reframe",
         next: "c23_proxy",
       },
@@ -117,7 +117,7 @@ const case23Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "주주의 말이 어떻게 남았는지 묻는다",
         type: "reframe",
       },
     ],
@@ -162,7 +162,7 @@ const case23Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "주주의 말이 어떻게 남았는지 묻는다",
         type: "reframe",
       },
     ],
@@ -207,7 +207,7 @@ const case23Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "주주의 말이 어떻게 남았는지 묻는다",
         type: "reframe",
       },
     ],

@@ -72,7 +72,7 @@ const case46Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "폐기를 승인한 사람부터 찾는다",
         type: "reframe",
         next: "c46_cage",
       },
@@ -118,7 +118,7 @@ const case46Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "폐기를 승인한 사람부터 찾는다",
         type: "reframe",
       },
     ],
@@ -163,7 +163,7 @@ const case46Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "폐기를 승인한 사람부터 찾는다",
         type: "reframe",
       },
     ],
@@ -208,7 +208,7 @@ const case46Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "폐기를 승인한 사람부터 찾는다",
         type: "reframe",
       },
     ],

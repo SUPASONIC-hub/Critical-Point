@@ -61,7 +61,7 @@ const case07Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 발령이 몇 건인지 묻는다",
         type: "reframe",
         next: "c7_ledger",
       },
@@ -107,7 +107,7 @@ const case07Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 발령이 몇 건인지 묻는다",
         type: "reframe",
       },
     ],
@@ -152,7 +152,7 @@ const case07Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 발령이 몇 건인지 묻는다",
         type: "reframe",
       },
     ],
@@ -197,7 +197,7 @@ const case07Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 발령이 몇 건인지 묻는다",
         type: "reframe",
       },
     ],

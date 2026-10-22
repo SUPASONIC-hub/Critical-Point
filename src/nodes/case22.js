@@ -66,7 +66,7 @@ const case22Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 거절한 까닭을 끝까지 되묻는다",
         type: "reframe",
         next: "c22_counter",
       },
@@ -112,7 +112,7 @@ const case22Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 거절한 까닭을 끝까지 되묻는다",
         type: "reframe",
       },
     ],
@@ -157,7 +157,7 @@ const case22Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 거절한 까닭을 끝까지 되묻는다",
         type: "reframe",
       },
     ],
@@ -202,7 +202,7 @@ const case22Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 거절한 까닭을 끝까지 되묻는다",
         type: "reframe",
       },
     ],

@@ -69,7 +69,7 @@ const case15Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'개인 실수'가 누구 이름으로 닫혔는지 센다",
         type: "reframe",
         next: "c15_form",
       },
@@ -115,7 +115,7 @@ const case15Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'개인 실수'가 누구 이름으로 닫혔는지 센다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case15Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'개인 실수'가 누구 이름으로 닫혔는지 센다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case15Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'개인 실수'가 누구 이름으로 닫혔는지 센다",
         type: "reframe",
       },
     ],

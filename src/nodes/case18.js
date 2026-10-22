@@ -67,7 +67,7 @@ const case18Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제안서의 첨부 파일부터 열어 달라고 한다",
         type: "reframe",
         next: "c18_lounge",
       },
@@ -113,7 +113,7 @@ const case18Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제안서의 첨부 파일부터 열어 달라고 한다",
         type: "reframe",
       },
     ],
@@ -158,7 +158,7 @@ const case18Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제안서의 첨부 파일부터 열어 달라고 한다",
         type: "reframe",
       },
     ],
@@ -203,7 +203,7 @@ const case18Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제안서의 첨부 파일부터 열어 달라고 한다",
         type: "reframe",
       },
     ],

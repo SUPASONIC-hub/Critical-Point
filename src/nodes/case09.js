@@ -61,7 +61,7 @@ const case09Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "아무도 세지 않은 비용을 옆에 놓는다",
         type: "reframe",
         next: "c9_ledger",
       },
@@ -107,7 +107,7 @@ const case09Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "아무도 세지 않은 비용을 옆에 놓는다",
         type: "reframe",
       },
     ],
@@ -152,7 +152,7 @@ const case09Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "아무도 세지 않은 비용을 옆에 놓는다",
         type: "reframe",
       },
     ],
@@ -197,7 +197,7 @@ const case09Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "아무도 세지 않은 비용을 옆에 놓는다",
         type: "reframe",
       },
     ],

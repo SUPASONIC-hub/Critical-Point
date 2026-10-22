@@ -76,7 +76,7 @@ const prologue01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 오차가 전에 어떻게 끝났는지 묻는다",
         type: "reframe",
         next: "p1_counter",
       },
@@ -122,7 +122,7 @@ const prologue01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 오차가 전에 어떻게 끝났는지 묻는다",
         type: "reframe",
       },
     ],
@@ -167,7 +167,7 @@ const prologue01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 오차가 전에 어떻게 끝났는지 묻는다",
         type: "reframe",
       },
     ],
@@ -212,7 +212,7 @@ const prologue01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 오차가 전에 어떻게 끝났는지 묻는다",
         type: "reframe",
       },
     ],

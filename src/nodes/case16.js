@@ -68,7 +68,7 @@ const case16Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "계약이 끝난 사람들의 1년 뒤를 표에 넣는다",
         type: "reframe",
         next: "c16_duel",
       },
@@ -114,7 +114,7 @@ const case16Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "계약이 끝난 사람들의 1년 뒤를 표에 넣는다",
         type: "reframe",
       },
     ],
@@ -159,7 +159,7 @@ const case16Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "계약이 끝난 사람들의 1년 뒤를 표에 넣는다",
         type: "reframe",
       },
     ],
@@ -204,7 +204,7 @@ const case16Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "계약이 끝난 사람들의 1년 뒤를 표에 넣는다",
         type: "reframe",
       },
     ],

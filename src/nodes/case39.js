@@ -68,7 +68,7 @@ const case39Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "잘려 나간 장면들의 내력을 묻는다",
         type: "reframe",
         next: "c39_cut",
       },
@@ -114,7 +114,7 @@ const case39Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "잘려 나간 장면들의 내력을 묻는다",
         type: "reframe",
       },
     ],
@@ -159,7 +159,7 @@ const case39Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "잘려 나간 장면들의 내력을 묻는다",
         type: "reframe",
       },
     ],
@@ -204,7 +204,7 @@ const case39Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "잘려 나간 장면들의 내력을 묻는다",
         type: "reframe",
       },
     ],

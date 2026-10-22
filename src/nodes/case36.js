@@ -69,7 +69,7 @@ const case36Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 사고를 닫아 온 연표를 세운다",
         type: "reframe",
         next: "c36_garden",
       },
@@ -115,7 +115,7 @@ const case36Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 사고를 닫아 온 연표를 세운다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case36Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 사고를 닫아 온 연표를 세운다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case36Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 사고를 닫아 온 연표를 세운다",
         type: "reframe",
       },
     ],

@@ -65,7 +65,7 @@ const case24Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'성과 없음'이 몇 번 쓰였는지 헤아린다",
         type: "reframe",
         next: "c24_desks",
       },
@@ -111,7 +111,7 @@ const case24Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'성과 없음'이 몇 번 쓰였는지 헤아린다",
         type: "reframe",
       },
     ],
@@ -156,7 +156,7 @@ const case24Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'성과 없음'이 몇 번 쓰였는지 헤아린다",
         type: "reframe",
       },
     ],
@@ -201,7 +201,7 @@ const case24Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "'성과 없음'이 몇 번 쓰였는지 헤아린다",
         type: "reframe",
       },
     ],

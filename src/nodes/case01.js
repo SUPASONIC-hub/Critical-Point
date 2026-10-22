@@ -97,7 +97,7 @@ const case01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "세 안건을 한 표에 올리자고 한다",
         type: "reframe",
       },
     ],
@@ -142,7 +142,7 @@ const case01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "세 안건을 한 표에 올리자고 한다",
         type: "reframe",
       },
     ],
@@ -187,7 +187,7 @@ const case01Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "세 안건을 한 표에 올리자고 한다",
         type: "reframe",
       },
     ],

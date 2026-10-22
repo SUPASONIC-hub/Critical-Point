@@ -67,7 +67,7 @@ const case25Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "문제 된 임원들이 어디로 갔는지 찾는다",
         type: "reframe",
         next: "c25_notice",
       },
@@ -113,7 +113,7 @@ const case25Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "문제 된 임원들이 어디로 갔는지 찾는다",
         type: "reframe",
       },
     ],
@@ -158,7 +158,7 @@ const case25Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "문제 된 임원들이 어디로 갔는지 찾는다",
         type: "reframe",
       },
     ],
@@ -203,7 +203,7 @@ const case25Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "문제 된 임원들이 어디로 갔는지 찾는다",
         type: "reframe",
       },
     ],

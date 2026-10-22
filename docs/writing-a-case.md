@@ -101,7 +101,7 @@ const case50Nodes = {
         cognition: { persistence: 2 },
       },
       // 사람 쪽·절차 쪽·속도 쪽이 하나씩 되도록 카드 둘 더
-      { id: "reframe", label: "다른 방법을 제안한다", type: "reframe", next: "c50_market" },
+      { id: "reframe", label: "같은 일이 전에 어떻게 끝났는지 묻는다", type: "reframe", next: "c50_market" },
     ],
   },
   // c50_market ... 결정 장면 c50_final까지, 본 장면은 모두 다섯
@@ -231,12 +231,14 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
 - 라벨을 고쳐서 읽기를 유도하지 마십시오. 라벨은 플레이어가 읽는 글입니다. 생각 방식은 결말 판정에 들어갑니다.
 
 **판을 다시 짠다 카드** — 본 장면은 마지막에 이 카드를 둡니다. 생각 방식과 효과는 게임이 정하므로 쓰지
-않습니다.
+않습니다(`REFRAME_COGNITION`; 라벨을 읽지 않으니 `cognition`도 쓰지 않습니다). 라벨은 그 사건의 숨은 경로가
+실제로 하는 일을 20자 안팎 한 줄로 씁니다. 한때 204장이 모두 "다른 방법을 제안한다"여서 무엇이 열리는지
+알 수 없었습니다. 예: "이런 오차가 전에 어떻게 끝났는지 묻는다", "연장된 대출들이 어떻게 끝났는지 늘어놓는다".
 
 ```js
 {
   id: "reframe",
-  label: "다른 방법을 제안한다",
+  label: "같은 일이 전에 어떻게 끝났는지 묻는다", // 숨은 경로가 하는 일
   type: "reframe",
 }
 ```
@@ -297,7 +299,7 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 조건이 붙은 배상안을 전부 불러온다",
         type: "reframe",
         next: "c12_mediation",
       },

@@ -66,7 +66,7 @@ const case21Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 판단의 근거를 보여 달라고 한다",
         type: "reframe",
         next: "c21_inn",
       },
@@ -112,7 +112,7 @@ const case21Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 판단의 근거를 보여 달라고 한다",
         type: "reframe",
       },
     ],
@@ -157,7 +157,7 @@ const case21Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 판단의 근거를 보여 달라고 한다",
         type: "reframe",
       },
     ],
@@ -202,7 +202,7 @@ const case21Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "노아에게 판단의 근거를 보여 달라고 한다",
         type: "reframe",
       },
     ],

@@ -52,7 +52,7 @@ const case06Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "두 사람의 조건을 나란히 놓는다",
         type: "reframe",
         next: "c6_desk",
       },
@@ -98,7 +98,7 @@ const case06Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "두 사람의 조건을 나란히 놓는다",
         type: "reframe",
       },
     ],

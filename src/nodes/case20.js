@@ -69,7 +69,7 @@ const case20Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "교체 승인서를 에코에게 직접 읽힌다",
         type: "reframe",
         next: "c20_server",
       },
@@ -115,7 +115,7 @@ const case20Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "교체 승인서를 에코에게 직접 읽힌다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case20Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "교체 승인서를 에코에게 직접 읽힌다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case20Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "교체 승인서를 에코에게 직접 읽힌다",
         type: "reframe",
       },
     ],

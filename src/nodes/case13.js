@@ -66,7 +66,7 @@ const case13Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "사고 뒤 세운 위원회들의 끝을 나란히 세운다",
         type: "reframe",
         next: "c13_studio",
       },
@@ -112,7 +112,7 @@ const case13Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "사고 뒤 세운 위원회들의 끝을 나란히 세운다",
         type: "reframe",
       },
     ],
@@ -157,7 +157,7 @@ const case13Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "사고 뒤 세운 위원회들의 끝을 나란히 세운다",
         type: "reframe",
       },
     ],
@@ -202,7 +202,7 @@ const case13Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "사고 뒤 세운 위원회들의 끝을 나란히 세운다",
         type: "reframe",
       },
     ],

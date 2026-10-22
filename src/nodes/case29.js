@@ -67,7 +67,7 @@ const case29Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 묶어 판 거래를 전부 펼친다",
         type: "reframe",
         next: "c29_marina",
       },
@@ -113,7 +113,7 @@ const case29Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 묶어 판 거래를 전부 펼친다",
         type: "reframe",
       },
     ],
@@ -158,7 +158,7 @@ const case29Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 묶어 판 거래를 전부 펼친다",
         type: "reframe",
       },
     ],
@@ -203,7 +203,7 @@ const case29Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "그룹이 묶어 판 거래를 전부 펼친다",
         type: "reframe",
       },
     ],

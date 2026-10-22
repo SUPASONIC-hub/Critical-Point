@@ -50,7 +50,7 @@ const case05Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "누가 먼저 밀렸는지부터 따진다",
         type: "reframe",
         next: "c5_map",
       },
@@ -141,7 +141,7 @@ const case05Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "누가 먼저 밀렸는지부터 따진다",
         type: "reframe",
       },
     ],

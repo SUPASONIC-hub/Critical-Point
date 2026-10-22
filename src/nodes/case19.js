@@ -67,7 +67,7 @@ const case19Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "철거일이 왜 당겨졌는지 거슬러 올라간다",
         type: "reframe",
         next: "c19_shelves",
       },
@@ -113,7 +113,7 @@ const case19Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "철거일이 왜 당겨졌는지 거슬러 올라간다",
         type: "reframe",
       },
     ],
@@ -158,7 +158,7 @@ const case19Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "철거일이 왜 당겨졌는지 거슬러 올라간다",
         type: "reframe",
       },
     ],
@@ -203,7 +203,7 @@ const case19Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "철거일이 왜 당겨졌는지 거슬러 올라간다",
         type: "reframe",
       },
     ],

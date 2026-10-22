@@ -68,7 +68,7 @@ const case40Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떨어진 사람들이 누구였는지 들여다본다",
         type: "reframe",
         next: "c40_demo",
       },
@@ -114,7 +114,7 @@ const case40Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떨어진 사람들이 누구였는지 들여다본다",
         type: "reframe",
       },
     ],
@@ -159,7 +159,7 @@ const case40Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떨어진 사람들이 누구였는지 들여다본다",
         type: "reframe",
       },
     ],
@@ -204,7 +204,7 @@ const case40Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떨어진 사람들이 누구였는지 들여다본다",
         type: "reframe",
       },
     ],

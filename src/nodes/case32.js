@@ -71,7 +71,7 @@ const case32Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 수사가 누구를 재판에 넘겼는지 센다",
         type: "reframe",
         next: "c32_boxes",
       },
@@ -117,7 +117,7 @@ const case32Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 수사가 누구를 재판에 넘겼는지 센다",
         type: "reframe",
       },
     ],
@@ -162,7 +162,7 @@ const case32Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 수사가 누구를 재판에 넘겼는지 센다",
         type: "reframe",
       },
     ],
@@ -207,7 +207,7 @@ const case32Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "이런 수사가 누구를 재판에 넘겼는지 센다",
         type: "reframe",
       },
     ],

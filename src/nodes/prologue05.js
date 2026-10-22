@@ -72,7 +72,7 @@ const prologue05Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 통지서가 몇 장인지 묻는다",
         type: "reframe",
         next: "p5_notice",
       },
@@ -118,7 +118,7 @@ const prologue05Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 통지서가 몇 장인지 묻는다",
         type: "reframe",
       },
     ],
@@ -163,7 +163,7 @@ const prologue05Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 통지서가 몇 장인지 묻는다",
         type: "reframe",
       },
     ],
@@ -208,7 +208,7 @@ const prologue05Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 모양의 통지서가 몇 장인지 묻는다",
         type: "reframe",
       },
     ],

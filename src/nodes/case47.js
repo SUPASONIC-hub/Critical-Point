@@ -68,7 +68,7 @@ const case47Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "서류 없는 사람을 넣은 배상 기준을 찾는다",
         type: "reframe",
         next: "c47_steam",
       },
@@ -114,7 +114,7 @@ const case47Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "서류 없는 사람을 넣은 배상 기준을 찾는다",
         type: "reframe",
       },
     ],
@@ -159,7 +159,7 @@ const case47Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "서류 없는 사람을 넣은 배상 기준을 찾는다",
         type: "reframe",
       },
     ],
@@ -204,7 +204,7 @@ const case47Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "서류 없는 사람을 넣은 배상 기준을 찾는다",
         type: "reframe",
       },
     ],

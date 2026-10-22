@@ -71,7 +71,7 @@ const prologue02Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제7조가 다른 계약에 몇 번 들어갔는지 묻는다",
         type: "reframe",
         next: "p2_site",
       },
@@ -117,7 +117,7 @@ const prologue02Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제7조가 다른 계약에 몇 번 들어갔는지 묻는다",
         type: "reframe",
       },
     ],
@@ -162,7 +162,7 @@ const prologue02Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제7조가 다른 계약에 몇 번 들어갔는지 묻는다",
         type: "reframe",
       },
     ],
@@ -207,7 +207,7 @@ const prologue02Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "제7조가 다른 계약에 몇 번 들어갔는지 묻는다",
         type: "reframe",
       },
     ],

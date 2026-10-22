@@ -48,7 +48,7 @@ const case04Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "어디까지 넘어도 되는지부터 정하자고 한다",
         type: "reframe",
         next: "c4_offer",
       },
@@ -139,7 +139,7 @@ const case04Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "어디까지 넘어도 되는지부터 정하자고 한다",
         type: "reframe",
       },
     ],

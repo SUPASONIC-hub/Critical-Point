@@ -71,7 +71,7 @@ const case17Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "감사가 누구를 징계해 왔는지 가른다",
         type: "reframe",
         next: "c17_truck",
       },
@@ -117,7 +117,7 @@ const case17Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "감사가 누구를 징계해 왔는지 가른다",
         type: "reframe",
       },
     ],
@@ -162,7 +162,7 @@ const case17Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "감사가 누구를 징계해 왔는지 가른다",
         type: "reframe",
       },
     ],
@@ -207,7 +207,7 @@ const case17Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "감사가 누구를 징계해 왔는지 가른다",
         type: "reframe",
       },
     ],

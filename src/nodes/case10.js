@@ -67,7 +67,7 @@ const case10Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 일을 하던 사람들이 얼마나 버텼는지 묻는다",
         type: "reframe",
         next: "c10_locker",
       },
@@ -113,7 +113,7 @@ const case10Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 일을 하던 사람들이 얼마나 버텼는지 묻는다",
         type: "reframe",
       },
     ],
@@ -158,7 +158,7 @@ const case10Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 일을 하던 사람들이 얼마나 버텼는지 묻는다",
         type: "reframe",
       },
     ],
@@ -203,7 +203,7 @@ const case10Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 일을 하던 사람들이 얼마나 버텼는지 묻는다",
         type: "reframe",
       },
     ],

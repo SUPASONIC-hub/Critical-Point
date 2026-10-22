@@ -60,7 +60,7 @@ const case08Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 주소를 쓴 회사를 더 찾는다",
         type: "reframe",
         next: "c8_trail",
       },
@@ -106,7 +106,7 @@ const case08Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 주소를 쓴 회사를 더 찾는다",
         type: "reframe",
       },
     ],
@@ -151,7 +151,7 @@ const case08Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 주소를 쓴 회사를 더 찾는다",
         type: "reframe",
       },
     ],
@@ -196,7 +196,7 @@ const case08Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "같은 주소를 쓴 회사를 더 찾는다",
         type: "reframe",
       },
     ],

@@ -69,7 +69,7 @@ const case33Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "앞서 신고한 사람들의 석 달을 불러 모은다",
         type: "reframe",
         next: "c33_room",
       },
@@ -115,7 +115,7 @@ const case33Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "앞서 신고한 사람들의 석 달을 불러 모은다",
         type: "reframe",
       },
     ],
@@ -160,7 +160,7 @@ const case33Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "앞서 신고한 사람들의 석 달을 불러 모은다",
         type: "reframe",
       },
     ],
@@ -205,7 +205,7 @@ const case33Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "앞서 신고한 사람들의 석 달을 불러 모은다",
         type: "reframe",
       },
     ],

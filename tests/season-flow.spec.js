@@ -638,7 +638,7 @@ test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => 
   await page.goto("/?debug=1");
   await startDebugNodeFromHelper(page, "case01", "payday", { navigate: false, resetStorage: false, expectGameShell: false, openTable: false });
   // The guide sends the player to "'판을 다시 짠다' 카드", and this scene's card
-  // is labelled 다른 방법을 제안한다: the name is on it, in the briefing's list
+  // is labelled 세 안건을 한 표에 올리자고 한다: the name is on it, in the briefing's list
   // and on the table, and the English "WILD" that stood for it is gone.
   const listed = page.getByTestId("scene-briefing").getByTestId("briefing-card").last();
   await expect(listed.getByTestId("wild-name")).toHaveText("판을 다시 짠다");

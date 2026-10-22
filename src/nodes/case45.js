@@ -71,7 +71,7 @@ const case45Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떠난 사람의 종이를 언제 불러 갔는지 모은다",
         type: "reframe",
         next: "c45_wreath",
       },
@@ -117,7 +117,7 @@ const case45Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떠난 사람의 종이를 언제 불러 갔는지 모은다",
         type: "reframe",
       },
     ],
@@ -162,7 +162,7 @@ const case45Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떠난 사람의 종이를 언제 불러 갔는지 모은다",
         type: "reframe",
       },
     ],
@@ -207,7 +207,7 @@ const case45Nodes = {
       },
       {
         id: "reframe",
-        label: "다른 방법을 제안한다",
+        label: "떠난 사람의 종이를 언제 불러 갔는지 모은다",
         type: "reframe",
       },
     ],
