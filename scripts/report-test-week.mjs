@@ -1,7 +1,8 @@
 /**
  * The test week, read off the live database (.github/workflows/test-week.yml).
  *
- * 2026-W44 plays B3's audit and B2's links on one table (`audit-cascade`,
+ * 2026-W47 (11-16 to 11-22; W44 until 2026-10-22) plays B3's audit and B2's
+ * links on one table (`audit-cascade`,
  * src/gauntlet/weeklyCalendar.js). This prints what that week's seasons did,
  * in the names the measurements used (B3-측정, B2-측정: 시즌당 적발, 금고로 갈
  * 몫, CASCADE 판 BUST, 붕괴 결말), as a Markdown table for the run's Job
@@ -31,7 +32,7 @@ import { addAudit, auditStep, countAudit } from "../src/gauntlet/auditRisk.js";
 import { walkLinks } from "../src/gauntlet/cascadeRisk.js";
 import { AUDIT_LIMIT, getWeekRule } from "../src/gauntlet/weeklyRules.js";
 
-const WEEK = process.env.TEST_WEEK || "2026-W44";
+const WEEK = process.env.TEST_WEEK || "2026-W47";
 const RULE = process.env.TEST_WEEK_RULE || "audit-cascade";
 if (!/^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$/.test(WEEK)) throw new Error(`TEST_WEEK=${WEEK} is not a week key`);
 if (!/^[a-z][a-z0-9-]{0,31}$/.test(RULE) || !getWeekRule(RULE)) throw new Error(`TEST_WEEK_RULE=${RULE} is not a rule of the catalogue`);

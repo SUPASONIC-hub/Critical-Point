@@ -18,7 +18,7 @@ test("the test week's report reads the audit and the links the way the game sett
     { run_id: "secret-run-a", case_id: "case01", device: 1, vault: 900, log: quiet },
     { run_id: "secret-run-a", case_id: "case02", device: 1, vault: 1500, log: nearly },
     { run_id: "secret-run-a", case_id: "final", device: 1, vault: 2000, ending: "collapse", log: heavy },
-    { run_id: "secret-run-a", case_id: "season-final", device: 1, ranked_week: "2026-W44", log: [] },
+    { run_id: "secret-run-a", case_id: "season-final", device: 1, ranked_week: "2026-W47", log: [] },
     { run_id: "secret-run-b", case_id: "case01", device: 2, vault: 100, log: [{ ...board("cash", 30, 1), assistStory: true }] },
     // Seasons of the week without the rule come back as one bare row each.
     { run_id: "secret-run-c", case_id: "turned-down", device: 2, ending: null, vault: null, log: [] },
@@ -52,12 +52,25 @@ test("the query is one read-only statement", () => {
   assert.match(QUERY, /^with runs as \(/);
   assert.doesNotMatch(QUERY, /\b(insert|update|delete|drop|alter|create|grant|truncate)\b|;/i);
   assert.match(QUERY, /'audit-cascade'/);
-  assert.match(QUERY, /'2026-W44'/);
-  assert.equal(QUERY, testWeekQuery("2026-W44", "audit-cascade"));
+  assert.match(QUERY, /'2026-W47'/);
+  assert.equal(QUERY, testWeekQuery("2026-W47", "audit-cascade"));
 });
 
 test("the query sends no device id out of the database, only its rank among the week's", () => {
   const selected = QUERY.slice(QUERY.lastIndexOf("\nselect "));
   assert.doesNotMatch(selected, /session_id|session_code/);
   assert.match(QUERY, /dense_rank\(\) over \(order by r\.session_id\) as device/);
+});
+
+test("the workflow and the script read the calendar's test week by default (W47 since 2026-10-22), and only its rows", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { WEEKLY_RULES } = await import("../../src/gauntlet/weeklyRules.js");
+  const tests = WEEKLY_RULES.filter((entry) => entry.id === "audit-cascade").map((entry) => entry.week);
+  assert.deepEqual(tests, ["2026-W47"]);
+  assert.equal(QUERY, testWeekQuery(tests[0], "audit-cascade"));
+  const workflow = readFileSync(new URL("../../.github/workflows/test-week.yml", import.meta.url), "utf8");
+  assert.equal([...workflow.matchAll(/\d{4}-W\d{2}/g)].map(([week]) => week).filter((week) => week !== tests[0]).length, 0, "the workflow names no other week");
+  // A day outside the week: the query keeps only runs whose first row came in that week, so it reads nothing.
+  assert.match(QUERY, /having public\.kst_iso_week\(min\(s\.completed_at\)\) = '2026-W47'/);
+  assert.match(describeTestWeek(readTestWeek([])), /시작한 시즌 \/ 사건 행 \| 0 \/ 0/);
 });

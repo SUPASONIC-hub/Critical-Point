@@ -104,7 +104,7 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     text: CASCADE_LINE,
     rules: Object.freeze(["cascade"]),
   }),
-  // The test week of 2026-W44 (user, 2026-10-21): both devices at once, told
+  // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22): both devices at once, told
   // in the two weeks' own lines and one that ties them: a cash on a CASCADE
   // board is not counted by the audit (B2 decision 10, auditRisk.js), so the
   // ranking of that week is the one table B3 and B2 will be judged on.
@@ -137,6 +137,31 @@ export function weekRuleAt(ms, calendar = WEEKLY_RULES) {
 /** The rule of the week after the one at `ms`, for the notice "다음 주의 규칙". */
 export function nextWeekRuleAt(ms, calendar = WEEKLY_RULES) {
   return Number.isFinite(Number(ms)) ? weekRuleAt(Number(ms) + 7 * DAY_MS, calendar) : null;
+}
+
+/**
+ * The start screen's line at `ms` (WeeklyRuleViews.jsx): this week's rule,
+ * with the next week's after it when both have one, or the next week's as
+ * notice, or null.
+ */
+export function weeklyRuleLine(now, calendar = WEEKLY_RULES) {
+  const current = weekRuleAt(now, calendar);
+  const next = nextWeekRuleAt(now, calendar);
+  if (current) {
+    // Two rules in a row (W46, then W47): the notice rides on this week's line,
+    // so the next week is still told a week ahead.
+    const after = next ? ` 다음 주의 규칙은 ${next.label}(${next.title}), 다음 월요일 0시부터.` : "";
+    return {
+      tone: "current",
+      kicker: "이번 주의 규칙",
+      label: current.label,
+      text: `${current.text} 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다.${after}`,
+    };
+  }
+  if (next) {
+    return { tone: "next", kicker: "다음 주의 규칙", label: next.label, text: `${next.title}. 월요일 0시부터.` };
+  }
+  return null;
 }
 
 /**
