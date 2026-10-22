@@ -13,7 +13,10 @@
  * annex hires 윤상혁 as the buyer's "Asia advisor" for three years, paid to the
  * very mailbox, and the price was cut by exactly what the seat costs. The
  * analyst's risk opinion is the last condition precedent: this time the empty
- * signature box has the dissent-writer's name printed under it.
+ * signature box has the dissent-writer's name printed under it. The evidence
+ * turn ends on the trail's first good news instead of one more name: in April
+ * 2억 6천 left the mailbox for 문가을's victims' group, after eleven return
+ * requests 반재욱 sent to the Singapore bank and never mentioned.
  *
  * Anger at a collection plan that calls the most reliable payers the first to
  * phone; laughter at a hawker centre where 오진우 loses to a level-five chili
@@ -644,12 +647,12 @@ export const case29 = {
     sourceRoutes: ["c29_marina", "c29_hawker", "c29_hotel", "c29_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "매각가 협상 이력을 단서 순서대로 다시 넘기며, 값이 깎인 자리마다 그 돈이 어디로 가는지 쫓아간다.",
-    entryEcho: "깎인 금액을 쫓아가면 가격표의 빈자리가 사람 이름 하나와 같은 크기입니다.",
+    entryEcho: "깎인 금액을 쫓아가자 같은 우편함에서 거꾸로 나온 돈이 하나 보입니다.",
     entryLabel: "매각가가 정해진 협상 이력을 회차별로 거슬러 읽는다",
     title: "36억의 자리",
     speaker: "반재욱",
-    text: "단서를 협상 회차 순으로 놓자 숫자 하나가 제자리를 찾습니다. 매각가는 마지막 협상에서 1,346억에서 1,310억으로 36억이 깎였습니다. 부속서(계약서 뒤에 붙는 추가 약속 문서) C는 윤상혁을 매수자의 자문역(실무 책임 없이 조언만 하는 자리)으로 앉히고 해마다 12억씩 3년, 합계 36억을 줍니다. 목포 출장지 모텔에서 화상으로 들어온 반재욱이 수첩을 넘깁니다. 'KD캐피탈이 덜 받은 돈이 그대로 윤 대표의 3년 치 보수가 됩니다. 그게 배임(맡은 일을 어기고 회사에 손해를 끼치는 죄)입니다.' 그가 한 줄을 더 적습니다. '받는 곳은 해온의 자문료(조언해 준 값이라며 받은 돈)가 마지막으로 들어간 싱가포르의 그 회사고요. 그때 흘러간 돈과 앞으로 흘러갈 돈이 같은 주소를 씁니다.'",
-    memo: ["마지막 협상에서 깎인 매각가: 36억", "부속서 C 자문 보수 합계: 36억", "지급처 = 해온 11억 4천의 수신처"],
+    text: "단서를 협상 회차 순으로 놓자 숫자 하나가 제자리를 찾습니다. 매각가는 마지막 협상에서 1,346억에서 1,310억으로 36억이 깎였습니다. 부속서(계약서 뒤에 붙는 추가 약속 문서) C는 윤상혁에게 해마다 12억씩 3년, 합계 36억을 줍니다. 받는 곳은 해온의 11억 4천이 들어간 그 우편함 회사입니다. 목포 출장지 모텔에서 화상으로 들어온 반재욱이 그 회사의 계좌 내역을 띄웁니다. 4월에 2억 6천이 빠져나갔습니다. 받은 계좌는 망원시장 피해자 모임, 예금주는 문가을입니다. 보낸 메모는 '해온 반환분' 다섯 글자입니다. 반재욱이 수첩을 덮습니다. '석 달 동안 싱가포르 은행에 반환 요청서를 열한 번 보냈습니다. 받을 곳은 피해자 모임으로 적었고요. 될 줄 몰라서 아무한테도 말 안 했습니다.'",
+    memo: ["마지막 협상에서 깎인 매각가: 36억", "부속서 C 자문 보수 합계: 36억", "지급처 = 해온 11억 4천의 수신처", "4월 우편함 회사 → 망원시장 피해자 모임: 2억 6천"],
     triggers: ["injustice", "system", "order"],
     entryEffect: { legitimacy: 4, trust: 4, time: -5, fatigue: 4 },
     choices: [
