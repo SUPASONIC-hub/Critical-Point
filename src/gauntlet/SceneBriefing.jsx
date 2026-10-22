@@ -192,8 +192,10 @@ export function SceneBriefing({
         heldRef.current = true;
         setHeld(true);
         setAsking(true);
-      } else if (remaining <= 0) {
+      } else if (remaining <= 0 && !heldRef.current) {
         // Opened by the clock, not by the player: the table says so aloud.
+        // While the question is open the clock is held, so it waits for the
+        // answer instead of opening the table on the very next frame.
         onOpenRef.current(null, true);
         return;
       }
