@@ -204,8 +204,12 @@ export function formatChain(chain) {
   if (unchecked.links) notChecked.push(`${unchecked.links} links (a gap in the rows, or the counters missing)`);
   const settled = unchecked.fields[UNCHECKED.inside[0]] ?? 0;
   if (settled) notChecked.push(`the settlement of ${settled} cases`);
-  const opened = unchecked.fields[UNCHECKED.between[0]] ?? 0;
+  // A row from a build before the snapshot (UNCHECKED.open); the board and the
+  // route a case opened on wait for the settlement (UNCHECKED.between, S2).
+  const opened = unchecked.fields[UNCHECKED.open[0]] ?? 0;
   if (opened) notChecked.push(`the opening state of ${opened} cases (no opening snapshot)`);
+  const carried = unchecked.fields[UNCHECKED.between[0]] ?? 0;
+  if (carried) notChecked.push(`the board and route ${carried} cases opened on`);
   if (notChecked.length) lines.push(`  chain not checked: ${notChecked.join("; ")}`);
   return lines;
 }

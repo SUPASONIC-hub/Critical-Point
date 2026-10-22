@@ -280,9 +280,10 @@ test("a run whose build writes records is marked for a window that has none; an 
  * case's), and the ranking row. No replay record: the scores are worked out
  * again and the chain is read.
  */
-function chainedRows(runId = "run-chain", seed = 20261021) {
+function chainedRows(runId = "run-chain", seed = 20261021, { open = false } = {}) {
   const season = createSeasonBot({ seed, staged: STAGED }).playSeason(0, "balanced");
-  const rows = CASE_SEQUENCE.map((caseId) => ({ run_id: runId, case_id: caseId, summary: season.caseResults[caseId], decision_log: season.caseLogs[caseId], resources: null, dynamics: season.caseResults[caseId].gauntlet }));
+  // `open`: each row's dynamics as the page writes it since S3, the opening snapshot included.
+  const rows = CASE_SEQUENCE.map((caseId) => ({ run_id: runId, case_id: caseId, summary: season.caseResults[caseId], decision_log: season.caseLogs[caseId], resources: null, dynamics: open ? season.caseDynamics[caseId] : season.caseResults[caseId].gauntlet }));
   rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
   return rows;
 }
@@ -327,7 +328,7 @@ test("the report says where the chain broke and what it did not check", () => {
   // Not replayed: the scores' line shows the scores' marks, the chain's line the chain's.
   assert.match(report, /\n {2}scores: {2}no marks\n/);
   assert.match(report, new RegExp(`chain break: ${rows[19].case_id} -> ${rows[20].case_id} vault \\(expected "\\+0 or more", found -1\\)`));
-  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the settlement of 54 cases; the opening state of 53 cases \(no opening snapshot\)/);
+  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the settlement of 54 cases; the opening state of 53 cases \(no opening snapshot\); the board and route 53 cases opened on$/m);
   assert.deepEqual(formatChain({ status: "unchecked", marks: [], breaks: [], cases: [], unchecked: { cases: 0, links: 0, fields: {} } }), ["  chain: not checked (no case row to chain)"]);
   const many = formatChain({ status: "broken", marks: [CHAIN_MARK], breaks: Array.from({ length: 12 }, () => ({ case: "case01", field: "case", found: "twice" })), cases: [], unchecked: { cases: 1, links: 0, fields: {} } });
   assert.equal(many[1], '  chain break: case01 case ("twice")');
@@ -375,14 +376,29 @@ test("a whole season dealt the page's seeds is checked case by case with no mark
     summary: season.caseResults[caseId],
     decision_log: season.caseLogs[caseId].map((entry) => ({ ...entry, threshold: { ...entry.threshold, ...thresholdOfVerdict(verdicts[settled++]) }, [WINDOW_RECORD_KEY]: recorder.closed[at++].record })),
     resources: null,
-    dynamics: season.caseResults[caseId].gauntlet,
+    // As the page writes it since S3: the run summary, the close, and the opening snapshot.
+    dynamics: season.caseDynamics[caseId],
   }));
-  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
   const [result] = verifyRows(rows);
   assert.equal(result.status, "checked");
   assert.deepEqual(result.marks, []);
   assert.equal(result.cases.reduce((sum, entry) => sum + entry.windows.counts.match, 0), total);
   assert.equal(result.chain.status, "linked");
+  // Every link read, its opening against the close before it (S3): nothing left as "no snapshot".
+  assert.equal(result.chain.unchecked.links, 0);
+  assert.equal(result.chain.unchecked.fields.open, undefined);
+  assert.equal(result.chain.unchecked.fields.reopened, undefined);
+  assert.doesNotMatch(formatChain(result.chain).join("\n"), /no opening snapshot/);
+  // One case's opening edited (a vault carried in that the close before did not hold):
+  // the chain marks it, and the mark goes in the run's one tuple with phase 2's none.
+  const opened = structuredClone(rows);
+  opened[12].dynamics.open.vault += 5;
+  const [marked] = verifyRows(opened);
+  assert.equal(marked.status, "checked");
+  assert.deepEqual(marked.marks, [CHAIN_MARK]);
+  assert.ok(marked.chain.breaks.some((found) => found.case === CASE_SEQUENCE[12] && found.field === "open.vault"));
+  assert.match(marksSql([marked]), /\('run-dealt', array\['chain-off-log'\]::text\[\], true\)/);
   // A case's window count moved by one: its seeds are no longer the ones dealt at those places.
   const shifted = structuredClone(rows);
   shifted[10].dynamics.windowIndex += 1;
