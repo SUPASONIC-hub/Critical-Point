@@ -490,6 +490,7 @@ export function useChoiceCommit(context) {
         clue,
         skippedTitle: blackoutSkip?.skippedTitle ?? null,
         skippedNodeId: blackoutSkip?.skippedNodeId ?? null,
+        skippedPlace: blackoutSkip?.skippedPlace ?? null,
         nextTitle: nodes[nextNode]?.title ?? "결과 화면",
         nextNode,
         unlockedRelics,
