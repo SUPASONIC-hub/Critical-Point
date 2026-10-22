@@ -982,7 +982,7 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
-    copy, and requires every glossary term (189) to carry a plain explanation
+    copy, and requires every glossary term (190) to carry a plain explanation
     at the first place a player can read it in each case -- per opening, since
     a case can be entered on any of them. Only narration (lead and body) is
     checked. A term matches at a word start only. Add a term to the glossary

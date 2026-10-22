@@ -155,6 +155,7 @@ export const GLOSSARY = [
   "내용증명",
   "문서제출명령",
   "실사",
+  "인수 실사",
   "마니또",
   "시행사",
   "공정표",
@@ -316,6 +317,9 @@ export const STANDARD_GLOSS = {
   "녹취": "상담 내용을 녹음해 남긴 것",
   "풀필먼트센터": "주문받은 물건을 보관하고 포장해 내보내는 물류 창고",
   "실사": "현장에 직접 가서 확인하는 일",
+  // Case 18's 실사 is reading a company's books before buying it, so it became
+  // a term of its own on 2026-10-22 (decision 17'): 실사 is the site visit.
+  "인수 실사": "사기 전에 장부와 서류를 샅샅이 확인하는 일",
   "이관": "기록을 다른 곳에 넘겨 맡기는 것",
   "조직 적합도": "사람이 회사에 얼마나 잘 맞을지 매긴 점수",
   "정보 주체": "기록의 주인인 사람",
@@ -380,9 +384,14 @@ const normalizeGloss = (gloss) => gloss.trim().replace(/\s+/g, " ");
  * right after it: 자문료(조언값이라며 내보낸 돈), with one space allowed before
  * the parenthesis. A parenthesis behind a longer word -- 발령서(…), 참고인석(…)
  * -- explains that word, not the term, and is not read; neither is a term met
- * inside another word (우선순위 is not 선순위).
+ * inside another word (우선순위 is not 선순위), nor one that ends a longer
+ * glossary term (인수 실사 is not 실사).
  */
 export function findGlosses(text, term) {
   const pattern = new RegExp(`(^|[^가-힣])${term} ?[(]([^()]*)[)]`, "g");
-  return [...String(text).matchAll(pattern)].map((match) => ({ gloss: normalizeGloss(match[2]), index: match.index + match[1].length }));
+  // 인수 실사(…) explains 인수 실사, a glossary term of its own, not 실사.
+  const heads = GLOSSARY.filter((other) => other !== term && other.endsWith(` ${term}`)).map((other) => other.slice(0, -term.length));
+  return [...String(text).matchAll(pattern)]
+    .map((match) => ({ gloss: normalizeGloss(match[2]), index: match.index + match[1].length }))
+    .filter(({ index }) => !heads.some((head) => String(text).slice(0, index).endsWith(head)));
 }

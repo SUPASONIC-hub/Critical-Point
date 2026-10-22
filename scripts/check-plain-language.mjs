@@ -211,10 +211,15 @@ if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) con
  * Every parenthesis that explains a term differently from its standard
  * wording. Counted on 2026-10-22: 830 parentheses explain a term right after
  * it, 71 terms are explained more than one way, and 195 of the parentheses say
- * something other than the standard. They are warnings until the copy is
- * rewritten (from 11-02); the count only comes down.
+ * something other than the standard. They are warnings, and the count only
+ * comes down: the copy rewrite of the same day (prose-polish) wrote the
+ * standard wording into 168 of them and left 26 -- 21 in the prologues, which
+ * another branch was rewriting, and five where the standard wording would say
+ * the wrong thing in that scene (증거 보전 is not 보전 신청 of property, a
+ * 시행사 of a PF that is not 재개발, a 비밀유지 서약서 signed at work, 필적
+ * 감정 that dates the ink).
  */
-const OFF_STANDARD_CEILING = 195;
+const OFF_STANDARD_CEILING = 26;
 for (const term of Object.keys(STANDARD_GLOSS)) {
   if (!GLOSSARY.includes(term)) failures.push(`STANDARD_GLOSS explains "${term}", which is not in GLOSSARY`);
 }
