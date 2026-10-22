@@ -127,6 +127,11 @@ Still open, on purpose:
   `CHIP_MARGIN` 10 (4 of 7 archetypes at or above plain, short of 5; left to
   play feedback). RULES_MARK 3 and the ranking reset are decided after W44's
   data, in a later pull request.
+- Drop-off report (E-4(a), 2026-10-22): the `Funnel` workflow reads every
+  run's case rows once a week (Sunday 22:10 KST, one read-only SELECT,
+  `scripts/report-funnel.mjs`) and writes how far runs got, the breaks
+  between rows, days to finish, new runs after a finale and the NEW GAME+
+  funnel to its Job Summary, aggregates only, consenting devices only.
 - NEW GAME+ carry-over (checked 2026-10-21, three answers all option 1): the
   scene BUST rates leave out NEW GAME+ rows by the case summary's
   `newGamePlus` and `case_id`, through a redefinition of
