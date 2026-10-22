@@ -1265,6 +1265,62 @@ export function getNextCaseSignal(caseId, log) {
 }
 
 /**
+ * Far callbacks: a scene late in the season that says one line about a choice
+ * made dozens of cases earlier. Every other carry-over in the season reaches
+ * one case ahead (the opening routes, the outcome tables); these reach across.
+ *
+ * Each reads the outcome card of an earlier case off the save's `caseResults`
+ * (`outcomeChoiceId`), the one record of a case that outlives it -- the run's
+ * log is cleared when the next case opens. The line goes into the scene's text
+ * right after `after`, so the reading clock counts it like the rest of the
+ * scene. A save with no result for that case (one from before the case was
+ * played, another device, a replayed graph) or a card the table does not name
+ * gets `fallback`, a sentence that holds on every route.
+ *
+ * Nothing new is saved: the save format stays as it is.
+ */
+export const farCallbacks = {
+  // 프롤로그 01: whose name the 40 million went on, the morning probation ended.
+  // 사건 48: the first committee where every member signs by name.
+  c48_final: {
+    fromCase: "prologue01",
+    after: "오늘은 당신 다음에 쓰겠습니다.'",
+    lines: {
+      p1_after_record: "수습 마지막 날 아침에도 당신은 의견란의 4,000만 원 밑에 당신 이름을 적었습니다. 그때는 반대를 적을 칸이 따로 없었습니다.",
+      p1_after_credit: "수습 마지막 날 아침, 당신이 찾은 4,000만 원은 오진우 대리의 이름으로 올라갔습니다. 오늘 이 칸에는 빌려 쓸 이름이 없습니다.",
+      p1_after_speed: "수습 마지막 날 아침, 당신은 4,000만 원을 말로만 알리고 서류를 그대로 내려보냈습니다. 오늘은 말로 넘길 수 있는 칸이 없습니다.",
+    },
+    fallback: "수습 마지막 날 아침의 의견란이 잠깐 떠오릅니다. 4,000만 원을 누구 이름으로 남길지 고르던 아침입니다.",
+  },
+};
+
+/** The line a far callback prints for this run: the card's, or the fallback. */
+export function resolveFarCallbackLine(callback, caseResults = {}) {
+  if (!callback) return "";
+  const choiceId = caseResults?.[callback.fromCase]?.outcomeChoiceId;
+  return (typeof choiceId === "string" && callback.lines[choiceId]) || callback.fallback;
+}
+
+const calledBackScenes = new Map();
+
+/**
+ * The scene as this run reads it: the graph's own object for a scene with no
+ * far callback, and for one with a callback a copy whose text carries the
+ * line. Kept per text, so the runtime's memos see one object per render.
+ */
+export function withFarCallback(nodeId, node, caseResults) {
+  const callback = farCallbacks[nodeId];
+  if (!callback || typeof node?.text !== "string" || !node.text.includes(callback.after)) return node;
+  const line = resolveFarCallbackLine(callback, caseResults);
+  const key = `${nodeId}\n${line}`;
+  if (!calledBackScenes.has(key)) {
+    const text = node.text.replace(callback.after, `${callback.after} ${line}`);
+    calledBackScenes.set(key, { ...node, text });
+  }
+  return calledBackScenes.get(key);
+}
+
+/**
  * What 에코 says as a case opens. It lived in `GameRuntime` as a ternary chain
  * that stopped at 사건 06, so 사건 07 opened on 사건 01's line. A table keyed by
  * case cannot fall behind the season the same way without a missing key showing.
