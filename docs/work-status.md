@@ -142,7 +142,15 @@ Still open, on purpose:
   v10): `audit` and `cascade` in `tableUnlocks.js`, off in story mode and in a
   replayed case; the week's devices (`WEEK_RULE_DEVICES`) are empty, and
   W44's catalogue entry stays as a week gone by. The bots play both wherever
-  a case's rules have them (`AUDIT=0` / `CASCADE=0` turn one off).
+  a case's rules have them (`AUDIT=0` / `CASCADE=0` turn one off). With the
+  same reset the season's ranking score becomes the mean of its cases' burst
+  scores (the user, 2026-10-22, Q7 (1)), where it was the finale's own, made
+  from that case's eight or so decisions: `getSeasonScore` on the client (a
+  replayed case counts its first close, `firstBurstScore`), and the server's
+  `ranking_run_summary` recomputes it from the run's case rows
+  (`20261102020000_season_score_case_mean.sql.draft`, made a `.sql` with the
+  reset). Over 200 bot seasons the finale's score ran 32 to 80 (p50 60) and
+  the mean runs 45 to 71 (p50 59); no bot season reaches A (72) on the mean.
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
