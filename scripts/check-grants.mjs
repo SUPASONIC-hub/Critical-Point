@@ -4,7 +4,7 @@ import { PGlite } from "@electric-sql/pglite";
 
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
-import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { createCaseSummary, getEndingVariant, getSeasonScore } from "../src/gameLogic.js";
 import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { noteBriefing, noteRevealDetails, takeReadingTally } from "../src/state/readingTally.js";
@@ -199,6 +199,12 @@ if (!files.includes(RANKING_RESET)) failures.push(`supabase/migrations/${RANKING
 // and from then on they must pass; while it is still a `.sql.draft` they are
 // skipped and said to be.
 const SUSPICION_MARKS = files.some((file) => file.endsWith("_ranking_suspicion_marks.sql"));
+// The season's score as the mean of its cases' (`*_season_score_case_mean.sql`,
+// drafted 2026-10-22 beside RULES_MARK 3's reset). Once it is a `.sql` the
+// ranking checks below expect the mean and its letters where they expected
+// the finale's, and the block "the season score is the mean of its cases"
+// runs; while it is a `.sql.draft` they expect the finale's and say so.
+const SEASON_MEAN = files.some((file) => file.endsWith("_season_score_case_mean.sql"));
 for (const file of files) {
   if (file === RANKING_RESET) {
     await seedBeforeRankingReset();
@@ -1079,6 +1085,11 @@ withHeaders(null);
 
 // ---- the ranking
 
+/** A run's stored case rows' summaries, by case id: what getSeasonScore reads on the client. */
+const caseSummariesOf = async (runId) =>
+  Object.fromEntries(
+    (await db.query(`select case_id, summary from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`, [runId])).rows.map(({ case_id, summary }) => [case_id, summary]),
+  );
 const rankedSession = sessionId(10);
 /** Dates a run's case rows as if it had been played: the first two hours ago, one every `stepSeconds` after it. */
 const spreadRun = (runId, stepSeconds = 60) =>
@@ -1132,7 +1143,16 @@ await postRefused("rank the run from a device that did not play its final case",
   await post("rank a run the server watched being played", "playtest_sessions", forged);
   const row = await one(`select case_title, summary, score from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-ranked-1'`);
   check(row?.case_title === "SEASON 01 COMPLETE", `a ranking row kept the client's title (${row?.case_title}).`);
-  check(Number(row?.score) === 88 && row?.summary?.rank === "A", `a ranking row took its score from the request (${row?.score}, ${row?.summary?.rank}), not from the run's final case.`);
+  if (SEASON_MEAN) {
+    // The run's mean, as the client's getSeasonScore makes it from the same rows.
+    const expected = getSeasonScore(await caseSummariesOf("run-ranked-1"));
+    check(
+      Number(row?.score) === expected.burstScore && row?.summary?.rank === expected.rank && row?.summary?.momentumTier === expected.momentumTier,
+      `a ranking row did not take the mean of the run's case scores: ${row?.score} ${row?.summary?.rank} ${row?.summary?.momentumTier}, expected ${JSON.stringify(expected)}.`,
+    );
+  } else {
+    check(Number(row?.score) === 88 && row?.summary?.rank === "A", `a ranking row took its score from the request (${row?.score}, ${row?.summary?.rank}), not from the run's final case.`);
+  }
   check(!("note" in (row?.summary ?? {})) && !("trigger" in (row?.summary ?? {})), "a ranking summary published a key that is not on the whitelist.");
   // The season's two logic numbers ride on the final case row's summary, and
   // the whitelist publishes them from there (20261011000000). The per-case
@@ -1417,10 +1437,14 @@ if (!SUSPICION_MARKS) {
     );
   };
 
+  // With the season's score the mean of its cases', the server writes the
+  // score, its twin, its letter and its tier itself, so the four marks that
+  // read them no longer fall on a ranking row, whatever the finale said.
+  const offScore = (marks) => (SEASON_MEAN ? [] : marks);
   await markedRun("an honest season", "run-marks-honest", []);
-  await markedRun("a season whose rank is not the letter its score earns", "run-marks-rank", ["rank-off-score"], { finalSummary: { ...honest, rank: "A" } });
-  await markedRun("a season whose tier is not the one its score earns", "run-marks-tier", ["tier-off-score"], { finalSummary: { ...honest, momentumTier: "READY" } });
-  await markedRun("a season with a broken, two-faced score", "run-marks-score", ["score-twins-differ", "score-not-whole"], { finalSummary: { ...honest, burstScore: 99.5 } });
+  await markedRun("a season whose rank is not the letter its score earns", "run-marks-rank", offScore(["rank-off-score"]), { finalSummary: { ...honest, rank: "A" } });
+  await markedRun("a season whose tier is not the one its score earns", "run-marks-tier", offScore(["tier-off-score"]), { finalSummary: { ...honest, momentumTier: "READY" } });
+  await markedRun("a season with a broken, two-faced score", "run-marks-score", offScore(["score-twins-differ", "score-not-whole"]), { finalSummary: { ...honest, burstScore: 99.5 } });
   await markedRun("a season with a part above 100", "run-marks-part", ["part-out-of-range"], { finalSummary: { ...honest, consistencyScore: 140 } });
   // 54 gaps of 20 seconds is 18 minutes, past the validator's fifteen; the
   // decisions of those cases claim 40 (6 of 7.4 seconds a case).
@@ -1436,7 +1460,7 @@ if (!SUSPICION_MARKS) {
   // The fixture's own finale (88 ranked "A") is one the marks catch. It sets
   // burstScore and rank only, so momentumScore and momentumTier stay the case
   // summary's own, and those are caught too.
-  const fixtureMarks = ["rank-off-score", "score-twins-differ", "tier-off-score"];
+  const fixtureMarks = offScore(["rank-off-score", "score-twins-differ", "tier-off-score"]);
   check(JSON.stringify([...((await marksOf("run-ranked-1")) ?? [])].sort()) === JSON.stringify(fixtureMarks), `run-ranked-1 (88 ranked "A") carries ${JSON.stringify(await marksOf("run-ranked-1"))}, expected ${JSON.stringify(fixtureMarks)}.`);
   check(
     (await one(`select count(*)::int as n from public.playtest_sessions where case_id <> 'season-final' and suspicion is not null`))?.n === 0,
@@ -1561,6 +1585,52 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
     `the checker's read of the top ranked run brought ${read.length} rows of ${JSON.stringify([...new Set(read.map((row) => row.run_id))])}; expected the ${runRows} rows of ${topRun?.run_id}.`,
   );
   await db.query(`delete from public.playtest_sessions where run_id like 'run-recheck-%'`);
+}
+
+// ---- the season score is the mean of its cases (*_season_score_case_mean, a draft until RULES_MARK 3's merge day)
+//
+// The ranking publishes the mean of the run's case scores, made by the server
+// from the rows it kept, and the client's getSeasonScore makes the same
+// number from the same summaries. A case row whose score is not a number
+// from 0 to 100 keeps the season off the ranking, as the finale's always did.
+// The runs are taken out again, so the hold-rate pool below is the one it was.
+if (!SEASON_MEAN) {
+  console.log("Season score: the finale's own, as before; the mean of the cases is still a draft (supabase/migrations/*_season_score_case_mean.sql.draft).");
+} else {
+  withHeaders({ "x-forwarded-for": "198.51.100.23" });
+  const scoreCases = (runId, ids, assignment) =>
+    db.query(`update public.playtest_sessions set summary = summary || $3::jsonb where run_id = $1 and case_id = any($2::text[])`, [runId, ids, JSON.stringify(assignment)]);
+  const earlier = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
+  {
+    // Far from its finale: half the season closed on 95, the rest on 30, the finale on 88.
+    const runId = "run-mean-1";
+    await playRun(runId, { session: sessionId(80) });
+    await scoreCases(runId, earlier.slice(0, earlier.length / 2), { burstScore: 95, momentumScore: 95 });
+    await scoreCases(runId, earlier.slice(earlier.length / 2), { burstScore: 30, momentumScore: 30 });
+    await post("rank a season whose cases scored far from its finale", "playtest_sessions", seasonPayload({ session: sessionId(80), runId }));
+    const expected = getSeasonScore(await caseSummariesOf(runId));
+    const row = await one(`select score, summary from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]);
+    check(expected.burstScore !== 88, `the season-mean fixture's mean is the finale's own score (${expected.burstScore}); it proves nothing.`);
+    check(
+      Number(row?.score) === expected.burstScore &&
+        row?.summary?.burstScore === expected.burstScore &&
+        row?.summary?.momentumScore === expected.burstScore &&
+        row?.summary?.rank === expected.rank &&
+        row?.summary?.momentumTier === expected.momentumTier,
+      `a season ranked on ${JSON.stringify([row?.score, row?.summary?.burstScore, row?.summary?.momentumScore, row?.summary?.rank, row?.summary?.momentumTier])}; its cases' mean is ${JSON.stringify(expected)}.`,
+    );
+    const finaleRow = await one(`select summary from public.playtest_sessions where case_id = 'final' and run_id = $1`, [runId]);
+    check(finaleRow?.summary?.burstScore === 88, `the finale's own case row lost its score: ${finaleRow?.summary?.burstScore}.`);
+  }
+  {
+    // A case in the middle of the season with a score that is text.
+    const runId = "run-mean-2";
+    await playRun(runId, { session: sessionId(81) });
+    await scoreCases(runId, [earlier[Math.floor(earlier.length / 2)]], { burstScore: "95" });
+    await postRefused("rank a season with a case whose score is text", "playtest_sessions", seasonPayload({ session: sessionId(81), runId }), /^P0001 invalid season ranking score$/);
+  }
+  withHeaders(null);
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-mean-%'`);
 }
 
 // ---- the hold rate's cut points (20261011000000)
@@ -2590,9 +2660,24 @@ const VALIDATOR_PARTS = {
       comparedWith !== null && comparedWith !== before.source && !comparedWith.includes("public.telemetry_check_envelope("),
       `the function 20261011010000 wrote out whole was not the one the second pass ran; the function in parts was compared with itself.`,
     );
+    // The one rule a part has changed since: with the season's score the mean
+    // of its cases' (*_season_score_case_mean), a stored ranking row's score,
+    // its twin, its letter, its tier and the marks that read them are the
+    // part's own and not the whole function's, so they are left out of the
+    // comparison. So is the global byte ceiling's counter: it charged the row
+    // as sent and is given back the row as stored, and the two stored rows
+    // differ by those keys' bytes. Every other key of the row, and every other
+    // counter, the address's bytes among them, still has to match.
+    const seasonScoreAside = (outcome, [, , table, payload]) => {
+      if (!SEASON_MEAN || table !== "playtest_sessions" || payload?.case_id !== "season-final" || !outcome?.stored) return outcome;
+      const row = JSON.parse(outcome.stored);
+      const summary = Object.fromEntries(Object.entries(row.summary ?? {}).filter(([key]) => !["burstScore", "momentumScore", "rank", "momentumTier"].includes(key)));
+      const counters = outcome.counters === null ? null : JSON.stringify(JSON.parse(outcome.counters).filter(([key]) => key !== "global:telemetry-bytes"));
+      return { ...outcome, stored: JSON.stringify({ ...row, summary, score: null, suspicion: null }), counters };
+    };
     probes.forEach(([label, expected], index) => {
-      const now = inParts[index];
-      const then = asWhole?.[index] ?? null;
+      const now = seasonScoreAside(inParts[index], probes[index]);
+      const then = seasonScoreAside(asWhole?.[index] ?? null, probes[index]);
       const said = now.setupFailed ? `could not be set up (${now.setupFailed})` : now.refused ? `was refused: ${now.refused}` : now.stored ? "was stored" : "was dropped";
       const asExpected =
         expected === STORED ? Boolean(now.stored) && !now.refused && !now.setupFailed
