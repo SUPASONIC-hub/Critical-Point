@@ -14,7 +14,6 @@ import {
   getObserverTag,
   getOutcomeChoiceId,
   getSeasonLogic,
-  getSeasonScore,
   getSeasonStrain,
   getRiskPressure,
   getSuspenseEvent,
@@ -29,6 +28,7 @@ import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
+import { getSeasonScore } from "../seasonScore.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { findFinalChoiceEntry } from "../verdictBranch.js";
 import { newGamePlusMark } from "./newGamePlusCarry.js";
