@@ -497,6 +497,8 @@ export function useChoiceCommit(context) {
         nextTitle: nodes[nextNode]?.title ?? "결과 화면",
         nextNode,
         unlockedRelics,
+        // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
+        scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
       },
     });
     // Everything that leaves this tab's own state waits for the save to say

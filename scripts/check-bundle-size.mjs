@@ -255,6 +255,11 @@ const budgets = [
   // 1,054 / 652 measured, plus the 4 bytes tableAudio was given for the
   // hashed file names it imports.
   { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_058, maxGzip: 656 },
+  // The other players' card share under the decision reveal (E-6, 2026-10-22):
+  // src/state/useSceneChoiceRates.js and src/sceneChoices.js, the frame of
+  // sceneTraces above (SCENE_CHOICES in vite.config.js). 1,216 / 724
+  // measured, plus 4 each for the hashed names.
+  { pattern: /^sceneChoices-.*\.js$/, maxBytes: 1_220, maxGzip: 728 },
   // 이번 주의 규칙 (2026-10-19), split off the entry chunk so the entry stays
   // under its budget: the rules and their words (src/gauntlet/weeklyRules.js),
   // shared by the runtime, the engine and the views below, and the start
@@ -286,17 +291,26 @@ const budgets = [
   // 2,051 / 1,160 -> 2,104 / 1,179 on 2026-10-21: W44's line says that a
   // cash on a CASCADE board is not counted by the audit (B2 decision 10).
   // Measured 2,104 / 1,175, the gzip plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_104, maxGzip: 1_179 },
+  // 2,104 / 1,179 -> 2,704 / 1,450 for ops-measure (2026-10-23), measured
+  // 2,704 / 1,446 plus 4: E-9's SHORT CLOCK (its entry, its two numbers, the
+  // overlay's relative clock and chips) and each event rule's line in the
+  // story.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_704, maxGzip: 1_450 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
   // weeklyRules chunk above stays as it was). Measured 1,796 / 962, the gzip
   // plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_796, maxGzip: 966 },
+  // 1,796 / 966 -> 1,921 / 1,022 for ops-measure (2026-10-23), measured
+  // 1,921 / 1,018 plus 4: E-8's line and box for a first season and E-9's
+  // line in the story before the rule.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_921, maxGzip: 1_022 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // 801 / 515 -> 897 / 562 for the ops-measure draft (2026-10-22), measured
+  // 897 / 558 plus 4: E-9's line in the story, printed and read by the clock.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 897, maxGzip: 562 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's

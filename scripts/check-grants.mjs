@@ -341,7 +341,7 @@ for (const { tablename, policyname, cmd, roles } of policies) {
 const CLIENT_FUNCTIONS = {
   anon: [
     "delete_cloud_save", "get_cloud_save", "is_season_case_id", "logic_hold_cutoffs", "peek_cloud_save", "put_cloud_save",
-    "scene_bust_rates",
+    "scene_bust_rates", "scene_choice_rates",
     // The ranking policy calls it as anon: whether marked rows are hidden.
     ...(SUSPICION_MARKS ? ["ranking_hides_marked"] : []),
   ],
@@ -2082,6 +2082,7 @@ const UPDATE_PROBE = {
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
   scene_bust_stats: "windows = windows",
+  scene_choice_stats: "picks = picks",
   weekly_rules: "rule_id = rule_id",
 };
 // The list is typed out because each table needs an assignment of its own, and
@@ -2111,6 +2112,9 @@ await refused("read rate limits", "anon", `select * from public.telemetry_rate_l
 await refused("read the scene snapshot directly", "anon", `select * from public.scene_bust_stats`);
 await allowed("read the scene wall rates", "anon", `select public.scene_bust_rates()`);
 await refused("rebuild the scene snapshot", "anon", `select public.refresh_scene_bust_stats()`);
+await refused("read the choice snapshot directly", "anon", `select * from public.scene_choice_stats`);
+await allowed("read the scene choice rates", "anon", `select public.scene_choice_rates()`);
+await refused("rebuild the choice snapshot", "anon", `select public.refresh_scene_choice_stats()`);
 await refused("read the address salt", "anon", `select * from public.private_settings`);
 await refused("read a private setting through its helper", "anon", `select public.private_setting_int('telemetry_daily_bytes', 0)`);
 await refused("hash an address", "anon", `select public.hash_client_address('203.0.113.9')`);
@@ -2499,6 +2503,48 @@ const VALIDATOR_PARTS = {
     );
     check(left?.cases === CASE_SEQUENCE.length && left?.ranked === 0, `the probes left ${RUN} with ${left?.cases} case rows and ${left?.ranked} ranking rows; each was to be rolled back.`);
   }
+}
+
+// ---- E-6: the share of a scene's runs that staked each card (20261102050000)
+//
+// Rows put in place as stored ones (the trigger off, as the beat-table run's
+// are): sixty runs through one scene, thirty on one card, twenty-four on
+// another, six on a third, and windows that must not count -- a card the room
+// played, a ranking row's log, a row with no run. A second scene has 49 runs,
+// one under the floor, and is absent from the answer.
+{
+  const CHOICE_CASE = "case01";
+  const entry = (nodeId, choiceId, { forced = false, state = "cash" } = {}) => ({ nodeId, choiceId, threshold: { state, forced } });
+  const store = async (runId, caseId, log, { run = true } = {}) =>
+    db.query(
+      `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
+       values ($1, $2, 'CHOI', $3, 'E-6', '{}', $4::jsonb)`,
+      [sessionId(97), run ? runId : null, caseId, JSON.stringify(log)],
+    );
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    for (let n = 0; n < 60; n += 1) {
+      const card = n < 30 ? "card_a" : n < 54 ? "card_b" : "card_c";
+      await store(`run-choice-${n}`, CHOICE_CASE, [entry("e6_scene", card, { state: n % 5 === 0 ? "bust" : "cash" }), ...(n < 49 ? [entry("e6_thin", "card_a")] : [])]);
+    }
+    await store("run-choice-forced", CHOICE_CASE, Array.from({ length: 40 }, () => entry("e6_scene", "card_c", { forced: true })));
+    await store("run-choice-final", "season-final", Array.from({ length: 40 }, () => entry("e6_scene", "card_c")));
+    await store("run-choice-none", CHOICE_CASE, [entry("e6_scene", "card_c")], { run: false });
+    await store("run-choice-odd", CHOICE_CASE, [entry("e6_scene", "Card C"), entry("e6_scene", "card_c", { state: "open" })]);
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  await allowed("rebuild the choice snapshot", "service_role", `select public.refresh_scene_choice_stats()`);
+  const answer = (await allowed("read the scene choice rates as the page does", "anon", `select public.scene_choice_rates() as rates`))?.rows[0]?.rates ?? {};
+  const scene = answer?.[CHOICE_CASE]?.e6_scene;
+  check(
+    JSON.stringify(scene) === JSON.stringify([60, { card_a: 50, card_b: 40, card_c: 10 }]),
+    `the scene of sixty runs answers ${JSON.stringify(scene)}; sixty windows, 50 / 40 / 10 percent, and none of the room's, the ranking row's, the runless row's or the unreadable entries.`,
+  );
+  check(!answer?.[CHOICE_CASE]?.e6_thin, `a scene of 49 runs is in the answer: ${JSON.stringify(answer?.[CHOICE_CASE]?.e6_thin)}.`);
+  check(/'29 18 \* \* \*'/.test(readFileSync(path.join(MIGRATIONS, "20261102050000_scene_choice_rates.sql"), "utf8")), "the choice snapshot is rebuilt once a day (free plan): the cron line changed.");
+  await db.query(`delete from public.playtest_sessions where session_id = $1`, [sessionId(97)]);
+  await allowed("rebuild the choice snapshot after the rows are gone", "service_role", `select public.refresh_scene_choice_stats()`);
 }
 
 // ---- retention runs as the service role and reaches every table
