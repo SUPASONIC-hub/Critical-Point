@@ -373,6 +373,14 @@
   background: var(--c-amber);
 }
 
+/* The line from the scene before (D-7), quieter than the boxes it leads. */
+.gx-bridge {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
 /* The case file: facts pinned to a board. */
 .gx-panel-file {
   grid-area: file;

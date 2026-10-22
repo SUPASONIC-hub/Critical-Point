@@ -128,6 +128,7 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  bridge = null,
   run,
   tableSeconds,
   cards,
@@ -148,10 +149,11 @@ export function SceneBriefing({
   const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run));
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
-  // same way. `mutations` is exactly the two lists printed below.
+  // same way. `mutations` is exactly the two lists printed below. The line
+  // from the scene before (`bridge`, D-7) is read on it too.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
-    [node, question, mutations, intro, weekRules],
+    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }]),
+    [node, question, mutations, intro, weekRules, bridge],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits.
@@ -286,6 +288,8 @@ export function SceneBriefing({
           )}
 
           <div className="gx-panel gx-panel-story" style={at("3 / 1")}>
+            {/* Where the last scene left off (D-7): its echo, or the ending of the case before. */}
+            {bridge && <p className="gx-bridge" data-testid="scene-bridge">{bridge}</p>}
             {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
             <ProseCaptions text={node.text} />
           </div>

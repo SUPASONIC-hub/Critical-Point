@@ -696,9 +696,11 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
       question: text(".gx-balloon"),
       memo: [text(".gx-panel-file li")],
       intro: text("[data-testid='unlock-intro'] li"),
+      // The line from the scene before (D-7), when the page has one.
+      bridge: text("[data-testid='scene-bridge']"),
     };
   });
-  const withIntro = getReadingSeconds(printed, [{ text: printed.intro }]);
+  const withIntro = getReadingSeconds(printed, [{ text: printed.intro }, { text: printed.bridge }]);
   expect(withIntro, "the lines add reading time on this page").toBeGreaterThan(getReadingSeconds(printed));
   await expect(page.getByTestId("reading-timer").locator("b")).toHaveText(String(withIntro));
 
