@@ -194,14 +194,17 @@ export function isCurrentTable(row) {
  */
 export const RECHECK_MARKS = Object.freeze(["score-off-log", "window-off-replay", "window-no-replay"]);
 
-/**
- * The chain check's mark (F1 phase 3, S5): one case's closing state does not
- * lead into the next case's opening. ranking_set_recheck_marks allows it
- * beside RECHECK_MARKS; nothing here names it yet.
- * TODO(#228): src/chainRecheck.js exports the same string as CHAIN_MARK; once
- * #228 merges, import it from there and drop this copy.
+/*
+ * The chain check's mark (F1 phase 3, S5), `chain-off-log`, is CHAIN_MARK in
+ * src/chainRecheck.js (S4), its one home. ranking_set_recheck_marks allows it
+ * beside RECHECK_MARKS.
+ *
+ * That function states the four checker marks of a run whole: a checker mark
+ * left out of p_marks is taken off the row. So the chain's result must go in
+ * the same call as this checker's (recheckRun's marks plus recheckChain's), in
+ * the same run of verify-ranking-rows.mjs; a separate call would wipe the
+ * other's marks. Wiring recheckChain into that run is S6, not done here.
  */
-export const CHAIN_MARK = "chain-off-log";
 
 /**
  * One run read together: its case rows (`case_id` a case) and its ranking row

@@ -15,7 +15,7 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
-import { CHAIN_MARK } from "../src/rankingRecheck.js";
+import { CHAIN_MARK } from "../src/chainRecheck.js";
 
 /**
  * Data API grants guardrail.

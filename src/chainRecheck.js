@@ -37,7 +37,11 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 
-/** The one mark the chain adds to a ranking row (question 3 (1)). */
+/**
+ * The one mark the chain adds to a ranking row (question 3 (1)); its only
+ * home (rankingRecheck.js points here, check:grants imports it). It goes to
+ * ranking_set_recheck_marks with the phase 2 marks in the same call (S6).
+ */
 export const CHAIN_MARK = "chain-off-log";
 
 /** The six resources a decision moves (resourcesBefore / resourcesAfter). */
