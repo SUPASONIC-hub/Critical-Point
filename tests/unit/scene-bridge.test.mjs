@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { getSceneBridge } from "../../src/state/useRunReadout.js";
+import { getSceneBridge } from "../../src/viewModels/sceneBridge.js";
 import { getCaseOutcome } from "../../src/gameLogic.js";
 import { getReadingSeconds } from "../../src/gauntlet/gauntletEngine.js";
 

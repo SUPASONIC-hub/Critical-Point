@@ -1,12 +1,11 @@
 import { useMemo } from "react";
 
 import { readSettledWindowSeeds } from "../appConfig.js";
-import { CASE_SEQUENCE, caseObjectives, getCaseBranchNodes, nodes, triggerLabels } from "../gameData.js";
+import { caseObjectives, getCaseBranchNodes, nodes, triggerLabels } from "../gameData.js";
 import {
   buildNarrativeSpine,
   getAllDiscoveryClueIds,
   getAverageResponseTime,
-  getCaseOutcome,
   getCounterfactualReport,
   getDiscoveryClue,
   getDecisionFingerprint,
@@ -21,23 +20,7 @@ import { getJudgementHabit } from "../judgementHabit.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTraceEvents } from "./trace.js";
-
-/**
- * The one line that carries the story over from the scene before (improvement
- * notes D-7, 2026-10-22), printed above the briefing's first box and counted
- * on its reading clock: the echo of the case's last decision, or -- on a
- * case's first scene -- the title of the ending the case before it closed on.
- * Null when there is neither: the season's first scene, or a case reached
- * without its predecessor closed (a jump, a replay link).
- */
-export function getSceneBridge({ log = [], caseResults = {}, currentCase = "" } = {}) {
-  const echo = log.at(-1)?.echo;
-  if (echo) return `지난 장면에서 — ${echo}`;
-  if (log.length > 0) return null;
-  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(currentCase) - 1];
-  const choiceId = previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : null;
-  return choiceId ? `지난 사건에서 — ${getCaseOutcome({ caseId: previousCaseId, choiceId }).title}` : null;
-}
+import { getSceneBridge } from "../viewModels/sceneBridge.js";
 
 /**
  * A window already settled under this seed -- a rolled-back save brought it
