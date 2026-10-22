@@ -13,7 +13,7 @@ export function getOperatorReveal({ origin = "courier", completedCases = [] } = 
   // The origin is a key (`courier`); the profile holds what it is called.
   const who = getOperatorProfile(origin).title;
   if (count < 4) return { level: 1, title: "OPERATOR FILE / PARTIAL", text: `${who}${subjectParticle(who)} 단순 관찰자가 아니라 기준을 설계한 인물이었다는 흔적이 남습니다.` };
-  return { level: 2, title: "OPERATOR FILE / OPENED", text: "당신은 사건을 처리하는 사람인 동시에, 어떤 사건을 기록할지 정해온 설계자였습니다." };
+  return { level: 2, title: "OPERATOR FILE / OPENED", text: "당신은 사건을 처리하는 사람인 동시에, 자동 추천이 고른 다음 사건에 '추천대로'를 눌러 온 사람 가운데 하나였습니다. 승인자 칸은 늘 비어 있었습니다." };
 }
 
 /**
