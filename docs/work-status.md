@@ -1392,9 +1392,11 @@ Still open, on purpose:
     differs from `BASE_SCHEMA`, presses, end clock). A walked-away window, a
     window resumed from a save without a trail and a trail past 200 presses
     leave none; the save version did not move for it (absence means no
-    record). `scripts/verify-ranking-rows.mjs` reads the top ranked runs with
-    one SELECT (`--sql`, the test week's `supabase db query --linked` with
-    `SUPABASE_ACCESS_TOKEN`), recomputes each case's score from its log,
+    record). `scripts/verify-ranking-rows.mjs` reads the top ranked runs
+    (the test week's `supabase db query --linked` with
+    `SUPABASE_ACCESS_TOKEN`; since F1 phase 3 S6 split: `--runs-sql` lists
+    the runs, then `--run-sql` reads one run per query, so no answer holds
+    more than one run's rows), recomputes each case's score from its log,
     replays every recorded window under the case's rules (`newGamePlus` and
     `assistStory` in the summary say which), and checks a sealed card cashed
     below its seal and a response time off the window clock
@@ -1403,11 +1405,15 @@ Still open, on purpose:
     marked). From a run's first recorded case on, a window without a record
     is marked `window-no-replay`; a run with no record anywhere is
     `unrecorded` (scores read, not replayed). A run under other `tableRules`
-    is not checked.
+    is not checked. Phase 3 (S6) chains each run too (`src/chainRecheck.js`:
+    resources from decision to decision, the run's counters from case to
+    case; the settlement and a case with no opening snapshot counted as not
+    checked) and marks a break `chain-off-log`.
     `--marks-sql` writes the result through
     `ranking_set_recheck_marks` (`20261021020000`, service role only): the
-    run's `score-off-log`, `window-off-replay` and `window-no-replay` are
-    stated whole beside the insert trigger's marks, nothing is refused or
+    run's `score-off-log`, `window-off-replay`, `window-no-replay` and
+    `chain-off-log` are stated whole, in one call per run from one run of
+    the checker, beside the insert trigger's marks, nothing is refused or
     hidden for them, and `rechecked_at` is set only for a run replayed whole,
     so checked-and-clean is told from never checked.
     `.github/workflows/verify-ranking.yml` runs both once a day and by hand;

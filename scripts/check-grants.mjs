@@ -12,7 +12,7 @@ import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
-import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
+import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
 
 /**
@@ -67,7 +67,8 @@ import { CHAIN_MARK } from "../src/chainRecheck.js";
  *   8. The checker's marks (F1 phase 2, *_ranking_recheck_marks): only the
  *      service role may set them; a call states the two recheck marks whole,
  *      keeps the insert trigger's and touches no other row; the checker's
- *      own read (verify-ranking-rows --sql) runs on the replayed schema.
+ *      own read (verify-ranking-rows --runs-sql, then --run-sql for each run)
+ *      runs on the replayed schema.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -1429,15 +1430,17 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check((await marksOf("run-recheck-1", "final")) === null, "setting a run's checker marks marked its case row; only the ranking row is marked.");
   // The checker's write (verify-ranking-rows --marks-sql), as the CI job runs
   // it over the Management API: one statement for every checked run, an empty
-  // list for a run that earns nothing, and a run not checked left out.
+  // list for a run that earns nothing, and a run not checked left out. The
+  // chain's mark rides in the same tuple as phase 2's (S6), so neither wipes
+  // the other.
   const write = marksSql([
-    { status: "checked", runId: "run-recheck-1", marks: ["score-off-log"] },
+    { status: "checked", runId: "run-recheck-1", marks: ["score-off-log", CHAIN_MARK] },
     { status: "unrecorded", runId: "run-recheck-2", marks: [] },
     { status: "unverified", runId: "run-recheck-none", marks: [] },
   ]);
   const wrote = (await one(write))?.marked_rows;
   check(Number(wrote) === 2, `the checker's write marked ${wrote} ranking rows; expected the two checked runs.`);
-  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify([CHAIN_MARK, "score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
   // Checked and clean is told from not checked: the time is set only for the
   // run replayed whole, and a call that does not say so clears it.
   const recheckedAt = async (runId) => (await one(`select rechecked_at from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.rechecked_at ?? null;
@@ -1449,10 +1452,13 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap", "window-no-replay"]), `window-no-replay left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
   check((await one(`select count(*)::int as n from public.playtest_sessions where rechecked_at is not null and case_id <> 'season-final'`))?.n === 0, "a case row carries a rechecked time; only ranking rows are rechecked.");
   check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "the checker's write took a trigger's mark from a run that earned none of its own.");
-  // The checker's own read (verify-ranking-rows --sql) runs on this schema and
-  // brings each ranked run whole: here the top one, every row of it.
-  const read = (await allowed("run the checker's read", "service_role", rankingRowsSql({ limit: 1 })))?.rows ?? [];
+  // The checker's own read runs on this schema, in its two halves as the CI
+  // job runs them (verify-ranking-rows --runs-sql, then --run-sql per run):
+  // the list names the top ranked run, and that run's read brings it whole.
   const topRun = await one(`select run_id from public.playtest_sessions where case_id = 'season-final' and score is not null order by score desc limit 1`);
+  const listed = (await allowed("list the checker's runs", "service_role", rankingRunsSql({ limit: 1 })))?.rows ?? [];
+  check(listed.length === 1 && listed[0].run_id === topRun?.run_id && Object.keys(listed[0]).join() === "run_id", `the checker's run list answered ${JSON.stringify(listed)}; expected the top ranked run's id alone.`);
+  const read = (await allowed("run the checker's read", "service_role", runRowsSql(listed[0]?.run_id ?? "none")))?.rows ?? [];
   const runRows = (await one(`select count(*)::int as n from public.playtest_sessions where run_id = $1`, [topRun?.run_id]))?.n;
   check(
     read.length > 1 && read.length === runRows && read.every((row) => row.run_id === topRun.run_id && "decision_log" in row && "run_tag" in row) && read.some((row) => row.case_id === "season-final"),
