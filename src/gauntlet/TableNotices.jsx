@@ -98,7 +98,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
 }
 
 /** Everything that lands over the table: what it says aloud, the relic just taken, a table lost to or held by another tab, the verdict. */
-export function TableNotices({ equipped, tab, voice, slam, onReload, onClaim, onLeave }) {
+export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onClaim, onLeave }) {
   const { lost, held } = getTabNotices(tab);
   const said = useTableVoice(voice);
   return (
@@ -106,7 +106,7 @@ export function TableNotices({ equipped, tab, voice, slam, onReload, onClaim, on
       {/* The table's one voice (tableVoice.js): the push, the stance, the bank and the clock.
           Silent to the eye, and on the page before it has anything to say. */}
       <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
-      <EdgeNotice voice={voice} />
+      <EdgeNotice voice={voice} caseId={caseId} />
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
           <RelicIcon id={equipped.id} size={18} />
