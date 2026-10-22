@@ -262,7 +262,10 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       // Heat the table cashes at. A player who reads the heartbeat is modelled
       // separately, with the tell the stage shows.
       heat: pick([35, 42, 48, 52, 56, 60]),
-      listens: random() < 0.4,
+      // `board` on the archetype fixes how it plays the table ("blind" or
+      // "listens", check-endings.mjs's paired seasons); the draw is still made,
+      // so every draw after it keeps its place in the stream.
+      listens: ((drawn) => (base.board ? base.board === "listens" : drawn))(random() < 0.4),
       bpm: pick([95, 100, 105, 110]),
       reframe: pick([0, 0.15, 0.35, 0.6]),
       think: 2 + random() * 10,
@@ -560,7 +563,16 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0 });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
+/**
+ * The bust chain (improvement notes C-14, 2026-10-22): boards played right
+ * after a bust in the same case, against the rest. `afterBust*` is every such
+ * board, `afterShock*` those of them dealt BLACKOUT and AFTERSHOCK together,
+ * `afterCascade*` the CASCADE boards among them, and `cascadeFresh*` the
+ * CASCADE boards that followed no bust. `fresh*` is every board that followed
+ * no bust (a case's first board included).
+ */
+const newChainSeen = () => ({ afterBustBoards: 0, afterBustBusts: 0, afterShockBoards: 0, afterShockBusts: 0, afterCascadeBoards: 0, afterCascadeBusts: 0, cascadeFreshBoards: 0, cascadeFreshBusts: 0, freshBoards: 0, freshBusts: 0 });
 function see(seen, verdict) {
   const count = (map, key) => {
     map[key] = (map[key] ?? 0) + 1;
@@ -654,6 +666,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
     const linkLog = [];
     const linkRun = `case:${caseIndex}`;
     const opened = run;
+    // Whether the window played before this one, in this case, bust (the bust chain, `newChainSeen`).
+    let afterBust = false;
     for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
       played += 1;
       // The run's own board for every run but a story one, whose wall stands far.
@@ -690,6 +704,31 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       if (run.schema.mutations.includes("cascade")) {
         seen.cascadeBoards += 1;
         if (verdict.outcome === "bust") seen.cascadeBusts += 1;
+      }
+      {
+        const bust = verdict.outcome === "bust" ? 1 : 0;
+        const dealt = run.schema.mutations;
+        const cascade = dealt.includes("cascade");
+        if (afterBust) {
+          seen.afterBustBoards += 1;
+          seen.afterBustBusts += bust;
+          if (dealt.includes("blackout") && dealt.includes("aftershock")) {
+            seen.afterShockBoards += 1;
+            seen.afterShockBusts += bust;
+          }
+          if (cascade) {
+            seen.afterCascadeBoards += 1;
+            seen.afterCascadeBusts += bust;
+          }
+        } else {
+          seen.freshBoards += 1;
+          seen.freshBusts += bust;
+          if (cascade) {
+            seen.cascadeFreshBoards += 1;
+            seen.cascadeFreshBusts += bust;
+          }
+        }
+        afterBust = bust === 1;
       }
       if (links && CASCADE_WEEK) linkLog.push(linkEntry(`n${windowIndex}`, staked, verdict, staked.effect));
       if (verdict.outcome === "cash") {
