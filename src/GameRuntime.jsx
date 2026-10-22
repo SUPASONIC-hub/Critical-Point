@@ -286,6 +286,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     runId,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
+    echo: run.echo,
   });
   const currentCaseReframeCount = reframeEntries.filter(
     (entry) => entry.caseId === fallbackCaseId,

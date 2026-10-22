@@ -5,7 +5,7 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
-import { getBriefingIntro, getBriefingWeekRuleId } from "./tableStaging.js";
+import { getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
 import { useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
@@ -128,6 +128,7 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  opening,
   run,
   tableSeconds,
   cards,
@@ -142,6 +143,10 @@ export function SceneBriefing({
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
+  // The case's opening voice, on its first page only, read after the title and
+  // on the reading clock (Q8 (1)). In the place reading-layout gives its
+  // 「지난 장면에서 —」 line, which this stands in for on that page.
+  const openingLine = getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same clock.
@@ -150,8 +155,8 @@ export function SceneBriefing({
   // the scene, so all three are on its clock, a sentence of any counted the
   // same way. `mutations` is exactly the two lists printed below.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
-    [node, question, mutations, intro, weekRules],
+    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: openingLine }]),
+    [node, question, mutations, intro, weekRules, openingLine],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits.
@@ -220,9 +225,10 @@ export function SceneBriefing({
         tabIndex={-1}
         onKeyDown={trapTab}
       >
-        <header className="gx-comic-top">
+        <header className={`gx-comic-top${openingLine ? " has-opening" : ""}`}>
           <p className="gx-comic-kicker" lang="en">{node.phase}</p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
+          {openingLine && <p className="gx-comic-opening" data-testid="briefing-opening">{openingLine}</p>}
           <button
             type="button"
             ref={timerRef}

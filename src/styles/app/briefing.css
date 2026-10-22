@@ -54,6 +54,22 @@
   align-items: end;
 }
 
+.gx-comic-top.has-opening {
+  grid-template-areas:
+    "kicker timer"
+    "title timer"
+    "opening opening";
+}
+
+/* The case's opening voice, one small line under the title (Q8 (1)). */
+.gx-comic-opening {
+  grid-area: opening;
+  margin: 6px 0 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
 .gx-comic-kicker {
   grid-area: kicker;
   margin: 0;

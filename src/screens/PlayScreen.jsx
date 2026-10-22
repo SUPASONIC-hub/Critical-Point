@@ -73,7 +73,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
           node, nodeId: resolvedNodeId,
           speakerPortrait,
           speakerRole: speakerProfile.role,
-          question: narrativeSpine.question, challenge: sceneChallenge.title,
+          question: narrativeSpine.question, challenge: sceneChallenge.title, opening: narrativeSpine.opening,
         }}
       />
       {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
