@@ -46,7 +46,7 @@ const case35Nodes = {
         label: "모래주머니를 싣고 망원시장으로 나선다",
         effect: { trust: 11, humanCost: -5, time: -5, capital: -3, fatigue: 6 },
         voice: "서류는 물을 막지 못한다며, 모래주머니를 싣고 망원시장으로 나선다.",
-        echo: "트렁크에 모래주머니 20개를 싣고 나서면, 올림픽대로는 이미 통제 중입니다. 마지막 1km는 걸어서 갑니다.",
+        echo: "트렁크에 모래주머니 20개를 싣고 나서자, 올림픽대로는 이미 통제 중입니다. 마지막 1km는 걸어서 갑니다.",
         next: "c35_sandbag",
         cognition: { persistence: 2 },
       },
@@ -619,7 +619,7 @@ export const case35 = {
         label: "재해 대출 거절에는 원인을 거슬러 묻는 칸을 반드시 넣게 한다",
         effect: { legitimacy: 12, trust: 7, capital: -6, humanCost: -4, fatigue: 7 },
         voice: "같은 답으로 돌아오지 못하게, 재해 대출 거절에는 원인을 거슬러 묻는 칸을 반드시 넣게 한다.",
-        echo: "칸이 생기면 노아는 네 번째 질문에서 멈춥니다. 멈춘 자리에서 사람이 답을 써야 합니다.",
+        echo: "칸이 생기자 노아는 네 번째 질문에서 멈춥니다. 멈춘 자리에서 사람이 답을 써야 합니다.",
         cognition: { reframing: 3 },
       },
       {
