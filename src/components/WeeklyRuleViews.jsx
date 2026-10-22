@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { weekRuleAt, weeklyRuleLine } from "../gauntlet/weeklyRules.js";
+import { weeklyRuleLine } from "../gauntlet/weeklyRuleLine.js";
+import { weekRuleAt } from "../gauntlet/weeklyRules.js";
 import { selectLeaderboardWeek, useLeaderboardWeek } from "../state/useLeaderboard.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
 
@@ -10,7 +11,7 @@ import { weeklyRuleNow } from "../state/weeklyClock.js";
  */
 
 /**
- * The start screen's line (weeklyRules.js's weeklyRuleLine): this week's
+ * The start screen's line (gauntlet/weeklyRuleLine.js): this week's
  * rule, with the next week's after it when both have one, or the next week's
  * as notice, or nothing. Read off the weekly clock, which every test build
  * holds on a week without either (state/weeklyClock.js), so the intro the baselines

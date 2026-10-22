@@ -13,7 +13,6 @@ const {
   getWeekRule,
   isoWeekKey,
   nextWeekRuleAt,
-  weeklyRuleLine,
   normalizeWeekRuleId,
   NEAR_WALL_SHIFT,
   pickSeasonWeekRule,
@@ -31,6 +30,7 @@ const { setWeekRuleTurnedDown, WEEK_RULE_OFF_STORAGE_KEY, weekRuleTurnedDown } =
 const { getBriefingIntro, getBriefingWeekRuleId } = await import("../../src/gauntlet/tableStaging.js");
 const { localRowRule } = await import("../../src/state/useLeaderboard.js");
 const { weekHasNews } = await import("../../src/gauntlet/weeklyCalendar.js");
+const { weeklyRuleLine } = await import("../../src/gauntlet/weeklyRuleLine.js");
 const { CASE_START_NODES } = await import("../../src/gameCases.js");
 const { E2E_WEEKLY_RULE_CLOCK, pinnedWeeklyClock, weeklyRuleNow } = await import("../../src/state/weeklyClock.js");
 const {
