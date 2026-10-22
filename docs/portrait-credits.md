@@ -3,9 +3,12 @@
 `public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장의 출처입니다.
 처음 다섯 장(한서윤, 반재욱, 도윤하, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 
+2026년 10월 22일, 한 사건에만 나오는 인물 여덟의 이름을 핵심 인물과 닮지 않게 바꾸면서(B-8) 그 초상 파일 이름도 새 이름으로 바꿨습니다. 사진과 출처는 그대로입니다:
+서하윤 → 황혜원, 마서윤 → 홍예담, 민도현 → 안기범, 연태준 → 공병만, 주하온 → 엄동균, 신이안 → 봉영훈, 이서준 → 이찬빈, 염태호 → 편종구.
+
 ## 사진에서 만든 예순일곱 장
 
-사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 연태준부터 권태호까지는 10월 21일).
+사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 공병만부터 권태호까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
 
 - Unsplash License: https://unsplash.com/license (사진 페이지 문구: "Free to use under the Unsplash License")
@@ -40,14 +43,14 @@
 | 채윤슬 | `portrait-chae-yunseul.webp` | https://www.pexels.com/photo/a-happy-woman-sitting-at-her-work-desk-8546757/ | Karola G (https://www.pexels.com/@karola-g/) | [Pexels License](https://www.pexels.com/license/) |
 | 표세린 | `portrait-pyo-serin.webp` | https://www.pexels.com/photo/portrait-of-social-worker-in-white-shirt-9870145/ | Ron Lach (https://www.pexels.com/@ron-lach/) | [Pexels License](https://www.pexels.com/license/) |
 | 지강현 | `portrait-ji-ganghyeon.webp` | https://www.pexels.com/photo/man-in-yellow-crew-neck-t-shirt-pointing-a-finger-4584538/ | Ketut Subiyanto (https://www.pexels.com/@ketut-subiyanto/) | [Pexels License](https://www.pexels.com/license/) |
-| 민도현 | `portrait-min-dohyeon.webp` | https://www.pexels.com/photo/a-man-in-a-gray-sweatshirt-taking-a-selfie-7972551/ | George Pak (https://www.pexels.com/@george-pak/) | [Pexels License](https://www.pexels.com/license/) |
+| 안기범 | `portrait-an-gibeom.webp` | https://www.pexels.com/photo/a-man-in-a-gray-sweatshirt-taking-a-selfie-7972551/ | George Pak (https://www.pexels.com/@george-pak/) | [Pexels License](https://www.pexels.com/license/) |
 | 민하랑 | `portrait-min-harang.webp` | https://unsplash.com/photos/pIgl1dni3dQ | Vitaly Gariev (https://unsplash.com/@silverkblack) | [Unsplash License](https://unsplash.com/license) |
 | 정해린 | `portrait-jeong-haerin.webp` | https://unsplash.com/photos/woman-in-black-shirt-smiling-OuxJHYeUYpk | panitan punpuang (https://unsplash.com/@panitan) | [Unsplash License](https://unsplash.com/license) |
 | 이정숙 | `portrait-lee-jeongsuk.webp` | https://www.pexels.com/photo/woman-smiling-at-the-camera-6787568/ | Marcus Aurelius (https://www.pexels.com/@marcus-aurelius/) | [Pexels License](https://www.pexels.com/license/) |
 | 유하온 | `portrait-yoo-haon.webp` | https://www.pexels.com/photo/smiling-woman-holding-chair-bars-25322747/ | Quý Nguyễn (https://www.pexels.com/@chupanhchandung/) | [Pexels License](https://www.pexels.com/license/) |
 | 정태오 | `portrait-jeong-taeo.webp` | https://www.pexels.com/photo/portrait-of-a-man-in-a-fur-coat-6244521/ | 宇峰 吳 (https://www.pexels.com/@fungfung852/) | [Pexels License](https://www.pexels.com/license/) |
 | 연하진 | `portrait-yeon-hajin.webp` | https://www.pexels.com/photo/a-woman-working-in-the-call-center-8204315/ | Kampus Production (https://www.pexels.com/@kampus/) | [Pexels License](https://www.pexels.com/license/) |
-| 마서윤 | `portrait-ma-seoyun.webp` | https://www.pexels.com/photo/a-woman-holding-a-laptop-8511892/ | Artem Podrez (https://www.pexels.com/@artempodrez/) | [Pexels License](https://www.pexels.com/license/) |
+| 홍예담 | `portrait-hong-yedam.webp` | https://www.pexels.com/photo/a-woman-holding-a-laptop-8511892/ | Artem Podrez (https://www.pexels.com/@artempodrez/) | [Pexels License](https://www.pexels.com/license/) |
 | 여다인 | `portrait-yeo-dain.webp` | https://unsplash.com/photos/6D3z73t5XiA | Jack H. Park (https://unsplash.com/@jack_park) | [Unsplash License](https://unsplash.com/license) |
 | 임재윤 | `portrait-lim-jaeyun.webp` | https://www.pexels.com/photo/black-and-white-photography-of-a-man-posing-in-a-suit-21044807/ | HONG SON (https://www.pexels.com/@hson/) | [Pexels License](https://www.pexels.com/license/) |
 | 신영란 | `portrait-shin-yeongran.webp` | https://www.pexels.com/photo/a-woman-is-serving-food-to-customers-in-a-restaurant-27993176/ | Paul Bill (https://www.pexels.com/@hoffman11/) | [Pexels License](https://www.pexels.com/license/) |
@@ -57,10 +60,10 @@
 | 오상철 | `portrait-oh-sangcheol.webp` | https://www.pexels.com/photo/man-in-black-suit-jacket-10031556/ | Hải Anh (https://www.pexels.com/@h-i-anh-127251498/) | [Pexels License](https://www.pexels.com/license/) |
 | 구태형 | `portrait-koo-taehyeong.webp` | https://www.pexels.com/photo/industrial-worker-in-helmet-19544217/ | Hoang NC (https://www.pexels.com/@hoang-nc-483165236/) | [Pexels License](https://www.pexels.com/license/) |
 | 허윤경 | `portrait-heo-yungyeong.webp` | https://www.pexels.com/photo/38660512/ | dongling huang (https://www.pexels.com/@dongling-huang-2147814100/) | [Pexels License](https://www.pexels.com/license/) |
-| 서하윤 | `portrait-seo-hayun.webp` | https://unsplash.com/photos/wiT97vt49Y4 | ki Zhang (https://unsplash.com/@2879686ki) | [Unsplash License](https://unsplash.com/license) |
+| 황혜원 | `portrait-hwang-hyewon.webp` | https://unsplash.com/photos/wiT97vt49Y4 | ki Zhang (https://unsplash.com/@2879686ki) | [Unsplash License](https://unsplash.com/license) |
 | 석문호 | `portrait-seok-munho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-senior-man-outdoors-32975143/ | HONG SON (https://www.pexels.com/@hson/) | [Pexels License](https://www.pexels.com/license/) |
 | 선재윤 | `portrait-seon-jaeyun.webp` | https://unsplash.com/photos/DutoKkqXFBE | Ky Nang (https://unsplash.com/@kynang2710) | [Unsplash License](https://unsplash.com/license) |
-| 주하온 | `portrait-joo-haon.webp` | https://unsplash.com/photos/WC7KIHo13Fc | Juan Encalada (https://unsplash.com/@juanencalada) | [Unsplash License](https://unsplash.com/license) |
+| 엄동균 | `portrait-eom-donggyun.webp` | https://unsplash.com/photos/WC7KIHo13Fc | Juan Encalada (https://unsplash.com/@juanencalada) | [Unsplash License](https://unsplash.com/license) |
 | 은채원 | `portrait-eun-chaewon.webp` | https://www.pexels.com/photo/portrait-of-an-elegantly-dressed-woman-6990687/ | 거열 박 (https://www.pexels.com/@geoyul/) | [Pexels License](https://www.pexels.com/license/) |
 | 연시우 | `portrait-yeon-siu.webp` | https://www.pexels.com/photo/man-in-beige-long-sleeves-looking-away-7681953/ | Mikhail Nilov (https://www.pexels.com/@mikhail-nilov/) | [Pexels License](https://www.pexels.com/license/) |
 | 변유진 | `portrait-byeon-yujin.webp` | https://www.pexels.com/photo/8761675/ | Pavel Danilyuk (https://www.pexels.com/@pavel-danilyuk/) | [Pexels License](https://www.pexels.com/license/) |
@@ -73,7 +76,7 @@
 | 하예솔 | `portrait-ha-yesol.webp` | https://www.pexels.com/photo/a-smiling-woman-wearing-an-apron-6223005/ | Antonius Ferret (https://www.pexels.com/@antonius-ferret/) | [Pexels License](https://www.pexels.com/license/) |
 | 채도훈 | `portrait-chae-dohun.webp` | https://unsplash.com/photos/older-man-in-pink-plaid-shirt-5FPdgshYQ60 | tommao wang (https://unsplash.com/@tommaomaoer) | [Unsplash License](https://unsplash.com/license) |
 | 남지형 | `portrait-nam-jihyeong.webp` | https://www.pexels.com/photo/asian-man-wearing-shirt-and-vest-5757086/ | 卓 周 | [Pexels License](https://www.pexels.com/license/) |
-| 연태준 | `portrait-yeon-taejun.webp` | https://www.pexels.com/photo/smiling-middle-aged-man-relaxing-indoors-34973556/ | Sóc Năng Động (https://www.pexels.com/@soc-nang-d-ng-2150345854/) | [Pexels License](https://www.pexels.com/license/) |
+| 공병만 | `portrait-gong-byeongman.webp` | https://www.pexels.com/photo/smiling-middle-aged-man-relaxing-indoors-34973556/ | Sóc Năng Động (https://www.pexels.com/@soc-nang-d-ng-2150345854/) | [Pexels License](https://www.pexels.com/license/) |
 | 배승호 | `portrait-bae-seungho.webp` | https://www.pexels.com/photo/portrait-of-man-in-suit-19193501/ | Broaden Legal (https://www.pexels.com/@broaden-legal-806272564/) | [Pexels License](https://www.pexels.com/license/) |
 | 은시온 | `portrait-eun-sion.webp` | https://www.pexels.com/photo/confident-businesswoman-in-professional-attire-29995622/ | Tran Nhu Tuan (https://www.pexels.com/@kooldark/) | [Pexels License](https://www.pexels.com/license/) |
 | 여민규 | `portrait-yeo-mingyu.webp` | https://www.pexels.com/photo/smiling-man-inn-gray-suit-26068375/ | Hào Nguyễn (https://www.pexels.com/@hao-nguy-n-1272397696/) | [Pexels License](https://www.pexels.com/license/) |
@@ -101,8 +104,8 @@ cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 �
 하도율과 진서우는 처음 고른 사진이 눈을 내리깔거나 고개를 숙여 얼굴이 어두웠기 때문에 카메라를 보는 다른 사진으로 바꿨습니다.
 선재윤과 하예솔은 처음 고른 사진과 같은 촬영의 다른 컷(손이 얼굴에 닿지 않은 것, 얼굴이 보이는 것)을 썼습니다.
 
-연태준부터 권태호까지 열세 장도 2026년 10월 21일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다.
-연태준(11년 전 12분을 잘라 낸 테이프를 버리지 못한 책임 프로듀서, case39.js:723), 배승호(본점 목표를 "받아서 여섯으로 나눴을 뿐"인 지점장, prologue04.js:730),
+공병만부터 권태호까지 열세 장도 2026년 10월 21일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다.
+공병만(11년 전 12분을 잘라 낸 테이프를 버리지 못한 책임 프로듀서, case39.js:723), 배승호(본점 목표를 "받아서 여섯으로 나눴을 뿐"인 지점장, prologue04.js:730),
 은시온(프로필이 "악당이 아니라"고 적은 광고영업 차장, case39.js:743), 여민규(회장 문장을 대신 쓰면서 "이번 문장만은 제 것이 아니었으면" 하는 비서실장, case36.js:349),
 배성준(매출 시점을 당긴 사실을 숨기지 않고 "늘 솔직하게 말하는" 재무책임자, prologue02.js:350, :743)은 처음에 생성 사진 몫으로 분류됐지만,
 장면을 읽어 보니 악역이 아니라 타협한 사람이라 실제 사람의 사진을 썼습니다. 권태호도 장면에서 정직하게 그려지는 창업주라 사진입니다.
@@ -121,8 +124,8 @@ Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 
 
 서도경부터 도건우까지 열한 장은 2026년 10월 21일에 Pixabay에서 내려받았습니다. 모두 페이지에 "AI generated" 표시가 있고,
 라이선스 문구는 "Free for use under the Pixabay Content License"입니다. 50대 동아시아 사람의 생성 사진은 찾기 어려워
-진세라·조현석·도하람·염태호·연서준은 설정보다 젊어 보이는 얼굴입니다(받아들이기로 함). 한 업로더의 사진이 비슷한 얼굴로 보이지 않게
-TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 염태호)만 쓰고, 다른 업로더도 한 사람에 세 장까지입니다
+진세라·조현석·도하람·편종구·연서준은 설정보다 젊어 보이는 얼굴입니다(받아들이기로 함). 한 업로더의 사진이 비슷한 얼굴로 보이지 않게
+TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종구)만 쓰고, 다른 업로더도 한 사람에 세 장까지입니다
 (kalsstockmedia는 윤상혁·서도경·연서준, RibhavAgrawal은 도하람·도건우).
 서도경은 처음 고른 태권도복 차림의 굳은 얼굴 대신 평범한 표정의 노인 사진으로 바꿨습니다.
 
@@ -134,13 +137,13 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 염태
 | 서도경 | `portrait-seo-dogyeong.webp` | https://pixabay.com/illustrations/ai-generated-man-senior-citizen-8571542/ (kalsstockmedia, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 결정을 남의 이름으로 내려보내고 사건을 윤상혁 한 사람으로 닫으려는 회장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 조현석 | `portrait-jo-hyeonseok.webp` | https://pixabay.com/illustrations/ai-generated-man-suit-business-8521475/ (u_gisunp5lyh, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 부실 채권을 사들여 받아 내는 쪽이고 윤상혁의 다음 자리를 계약서에 붙인 사모펀드 파트너라 실제 사람의 얼굴을 쓰지 않음 |
 | 도하람 | `portrait-do-haram.webp` | https://pixabay.com/illustrations/ai-generated-woman-model-suit-8998469/ (RibhavAgrawal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 612명 해고 부속서가 붙은 영입을 거래로 다루는 전략본부장이라 실제 사람의 얼굴을 쓰지 않음 |
-| 이서준 | `portrait-lee-seojun.webp` | https://pixabay.com/illustrations/ai-generated-asian-man-fashion-8957765/ (AwesomePhotography, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 고3 수험생, 미성년자라 실제 아이의 사진을 쓰지 않음(그림처럼 보이던 첫 후보 대신 사진처럼 보이는 생성 사진) |
+| 이찬빈 | `portrait-lee-chanbin.webp` | https://pixabay.com/illustrations/ai-generated-asian-man-fashion-8957765/ (AwesomePhotography, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 고3 수험생, 미성년자라 실제 아이의 사진을 쓰지 않음(그림처럼 보이던 첫 후보 대신 사진처럼 보이는 생성 사진) |
 | 반서아 | `portrait-ban-seoa.webp` | https://pixabay.com/illustrations/ai-generated-asian-girl-smile-8926142/ (Aristal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 초등학교 4학년, 미성년자라 실제 아이의 사진을 쓰지 않음 |
-| 신이안 | `portrait-shin-ian.webp` | https://pixabay.com/illustrations/man-blue-shirt-finger-on-lips-8733191/ (alanajordan, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 가짜 피해자를 세운 광고를 찍는 감독이라 실제 사람의 얼굴을 쓰지 않음 |
+| 봉영훈 | `portrait-bong-yeonghun.webp` | https://pixabay.com/illustrations/man-blue-shirt-finger-on-lips-8733191/ (alanajordan, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 가짜 피해자를 세운 광고를 찍는 감독이라 실제 사람의 얼굴을 쓰지 않음 |
 | 석재우 | `portrait-seok-jaeu.webp` | https://pixabay.com/illustrations/ai-generated-business-man-8051239/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 윤상혁 곁에서 서류를 '정리본'으로 바꾸는 비서실장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 연서준 | `portrait-yeon-seojun.webp` | https://pixabay.com/illustrations/ai-generated-asian-man-young-8644544/ (kalsstockmedia, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 피해자의 말을 '감정'이라 부르며 증인의 망설임 기록으로 반대신문하는 피고 측 대리인이라 실제 사람의 얼굴을 쓰지 않음 |
 | 진세라 | `portrait-jin-sera.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8054606/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 규정 뒤에 숨어 책임을 피하는 부행장이라 실제 사람의 얼굴을 쓰지 않음 |
-| 염태호 | `portrait-yeom-taeho.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8053382/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 신고자에게 합의를 압박하는 법무팀장이라 실제 사람의 얼굴을 쓰지 않음 |
+| 편종구 | `portrait-pyeon-jonggu.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8053382/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 신고자에게 합의를 압박하는 법무팀장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 도건우 | `portrait-do-geonu.webp` | https://pixabay.com/illustrations/handsome-happy-smile-white-shirt-8988318/ (RibhavAgrawal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 기록을 지워 주는 값으로 증언을 가져가는 위기대응 TF 팀장이라 실제 사람의 얼굴을 쓰지 않음 |
 
 ## 직접 그린 한 장
