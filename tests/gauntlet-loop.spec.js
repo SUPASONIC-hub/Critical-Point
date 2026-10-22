@@ -510,6 +510,27 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
 });
 
+// The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
+// wall can stop at once, the reveal says what one more push would have done,
+// and the next scene's page opens on its speaker's line about that table.
+test("안전선 pushes to the safe line at once, the reveal says what one more push would have done, and the next speaker answers the table", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  const stage = page.getByTestId("gauntlet-stage");
+  const safe = page.getByTestId("commit-safe");
+  await expect(safe).toHaveAccessibleName(/^안전선까지 밀기 \d+번, 열기 \d+까지$/);
+  const [, pushes, heat] = (await safe.getAttribute("aria-label")).match(/(\d+)번, 열기 (\d+)까지/);
+  expect(Number(pushes)).toBeGreaterThan(0);
+  await safe.click();
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect.poll(async () => Number(await stage.getAttribute("data-gauge"))).toBeGreaterThanOrEqual(Number(heat));
+  await expect(safe, "the button is for the first press only").toHaveCount(0);
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("reveal-afterword")).toHaveText(/^한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
+  await page.getByTestId("decision-next").click();
+  await expect(page.getByTestId("table-reaction")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+});
+
 // 스토리 모드: the wall is far, and hitting it still costs the pot -- but the
 // room does not move on without the analyst, and the next board is not broken.
 // The same card on the same scene, busted at the table and then in story
