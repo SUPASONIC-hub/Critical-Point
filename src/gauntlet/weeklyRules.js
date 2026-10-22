@@ -143,9 +143,15 @@ export function nextWeekRuleAt(ms, calendar = WEEKLY_RULES) {
  * The id a season takes when it starts: the week's rule unless the player
  * turned it down (D2) or the season is played in story mode, which is outside
  * every ranking already.
+ *
+ * A device's first season (`firstSeason`, no season finished yet) takes it
+ * only when the player asked for it (`takenUp`, E-8, 결정 Q6 b (1)): the
+ * event is for the analyst who came back. From the second season on it is on
+ * unless turned down, as before (state/weeklyRuleChoice.js reads the device).
  */
-export function pickSeasonWeekRule(ms, { declined = false, story = false, calendar = WEEKLY_RULES } = {}) {
-  if (declined === true || story === true) return null;
+export function pickSeasonWeekRule(ms, { declined = false, story = false, firstSeason = false, takenUp = false, calendar = WEEKLY_RULES } = {}) {
+  if (story === true) return null;
+  if (firstSeason === true ? takenUp !== true : declined === true) return null;
   return weekRuleAt(ms, calendar)?.id ?? null;
 }
 

@@ -26,7 +26,19 @@ const {
   WEEKLY_RULES,
   weekStartMs,
 } = await import("../../src/gauntlet/weeklyRules.js");
-const { setWeekRuleTurnedDown, WEEK_RULE_OFF_STORAGE_KEY, weekRuleTurnedDown } = await import("../../src/state/weeklyRuleChoice.js");
+const {
+  finishedSeasons,
+  isFirstSeason,
+  SEASON_RECORD_STORAGE_KEY,
+  setWeekRuleTakenUp,
+  setWeekRuleTurnedDown,
+  WEEK_RULE_OFF_STORAGE_KEY,
+  WEEK_RULE_ON_STORAGE_KEY,
+  weekRuleChoice,
+  weekRuleTakenUp,
+  weekRuleTurnedDown,
+} = await import("../../src/state/weeklyRuleChoice.js");
+const { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } = await import("../../src/appConfig.js");
 const { getBriefingIntro, getBriefingWeekRuleId } = await import("../../src/gauntlet/tableStaging.js");
 const { localRowRule } = await import("../../src/state/useLeaderboard.js");
 const { weekHasNews } = await import("../../src/gauntlet/weeklyCalendar.js");
@@ -50,9 +62,13 @@ const DAY = 24 * 60 * 60 * 1000;
 const read = (path) => readFileSync(fileURLToPath(new URL(`../../${path}`, import.meta.url)), "utf8");
 const EVENT = WEEKLY_RULES[0];
 
+/** A device that has finished a season: the week's rule is on by default there (E-8). */
+const RETURNING = Object.freeze({ [NEW_GAME_PLUS_KEY]: "true" });
+
 afterEach(() => {
   delete globalThis.__weeklyRuleClock;
   setWeekRuleTurnedDown(false);
+  setWeekRuleTakenUp(false);
 });
 
 test("a week turns at Monday 00:00 in Korea, which is Sunday 15:00 UTC", () => {
@@ -224,7 +240,7 @@ test("newGame stamps the rule the caller read; story mode and a direct jump stam
 
 test("시작 reads the weekly clock once; turning it down or a later week changes nothing about that season", async () => {
   globalThis.__weeklyRuleClock = weekStartMs(EVENT.week) + 60_000;
-  const during = await createRunHarness();
+  const during = await createRunHarness({ storage: RETURNING });
   during.act("startGame");
   assert.equal(during.run.gauntletRun.weekRule, EVENT.id);
   assert.equal(during.saved().dynamics.weekRule, EVENT.id);
@@ -235,14 +251,78 @@ test("시작 reads the weekly clock once; turning it down or a later week change
   assert.equal(during.saved().dynamics.weekRule, EVENT.id);
 
   globalThis.__weeklyRuleClock = weekStartMs(EVENT.week) + 60_000;
-  const declined = await createRunHarness();
+  const declined = await createRunHarness({ storage: RETURNING });
   declined.act("startGame", { declineWeekRule: true });
   assert.equal(declined.run.gauntletRun.weekRule, null);
 
   delete globalThis.__weeklyRuleClock;
-  const plain = await createRunHarness();
+  const plain = await createRunHarness({ storage: RETURNING });
   plain.act("startGame");
   assert.deepEqual(plain.run.gauntletRun, structuredClone(RUN_INITIAL_STATE));
+});
+
+test("a device's first season starts without the week's rule unless it is taken up; the second starts with it (E-8)", async () => {
+  const during = weekStartMs(EVENT.week) + DAY;
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true }), null, "the first season, off by default");
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true, takenUp: true }), EVENT.id, "taken up on the start screen");
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true, declined: true, takenUp: true }), EVENT.id, "the returning box does not reach a first season");
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true, takenUp: true, story: true }), null);
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: false, takenUp: false }), EVENT.id, "a later season, on as before");
+  assert.equal(pickSeasonWeekRule(during - 7 * DAY, { firstSeason: true, takenUp: true }), null, "no week, no rule");
+
+  globalThis.__weeklyRuleClock = during;
+  const fresh = await createRunHarness();
+  assert.equal(isFirstSeason(), true);
+  fresh.act("startGame");
+  assert.equal(fresh.run.gauntletRun.weekRule ?? null, null, "a fresh device's 시작");
+  assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule ?? null, null, "and the shell's");
+
+  const takenUp = await createRunHarness({ storage: { [WEEK_RULE_ON_STORAGE_KEY]: "1" } });
+  assert.equal(weekRuleTakenUp(), true);
+  takenUp.act("startGame");
+  assert.equal(takenUp.run.gauntletRun.weekRule, EVENT.id);
+  assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule, EVENT.id);
+
+  // NEW GAME+ is never a first season, whatever the storage says.
+  const veteran = await createRunHarness();
+  veteran.act("startGame", { veteran: true });
+  assert.equal(veteran.run.gauntletRun.weekRule, EVENT.id);
+
+  for (const storage of [RETURNING, { [NEW_GAME_PLUS_MEMORY_KEY]: JSON.stringify({ final: { runId: "r" } }) }, { [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 2 }) }]) {
+    const back = await createRunHarness({ storage });
+    assert.equal(isFirstSeason(), false, JSON.stringify(storage));
+    back.act("startGame");
+    assert.equal(back.run.gauntletRun.weekRule, EVENT.id, `a device that finished a season: ${JSON.stringify(storage)}`);
+  }
+});
+
+test("the season count reads the NEW GAME+ record, and before it the unlock or the finale's memory", async () => {
+  await createRunHarness();
+  assert.equal(finishedSeasons(), 0);
+  assert.deepEqual(weekRuleChoice(), { declined: false, firstSeason: true, takenUp: false });
+  for (const [storage, seasons] of [
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 3 }) }, 3],
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 0 }) }, 0],
+    [{ [SEASON_RECORD_STORAGE_KEY]: "not json" }, 0],
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 1.5 }) }, 0],
+    [{ [NEW_GAME_PLUS_KEY]: "false" }, 0],
+    [{ [NEW_GAME_PLUS_KEY]: "true" }, 1],
+    [{ [NEW_GAME_PLUS_MEMORY_KEY]: JSON.stringify({ case01: {} }) }, 0],
+    [{ [NEW_GAME_PLUS_MEMORY_KEY]: JSON.stringify({ final: {} }) }, 1],
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 4 }), [NEW_GAME_PLUS_KEY]: "true" }, 4],
+  ]) {
+    await createRunHarness({ storage });
+    assert.equal(finishedSeasons(), seasons, JSON.stringify(storage));
+  }
+  // The start screen says whom the week is for, and its box takes it up (the e2e plays both).
+  const views = read("src/components/WeeklyRuleViews.jsx");
+  assert.match(views, /돌아온 분석관을 위한 이번 주의 규칙/);
+  assert.match(views, /이번 주의 규칙으로 시작/);
+  assert.match(read("src/components/WeeklyRuleNotice.jsx"), /first \? setWeekRuleTakenUp : setWeekRuleTurnedDown/);
+  assert.equal(setWeekRuleTakenUp(true), true);
+  assert.equal(localStorage.getItem(WEEK_RULE_ON_STORAGE_KEY), "1");
+  setWeekRuleTakenUp(false);
+  assert.equal(localStorage.getItem(WEEK_RULE_ON_STORAGE_KEY), null);
 });
 
 test("the server's week table says what the calendar says", () => {
@@ -263,6 +343,7 @@ test("the server's week table says what the calendar says", () => {
 
 test("the start screen's box turns the rule down on this device, for both starts (결정 27)", async () => {
   globalThis.__weeklyRuleClock = weekStartMs(EVENT.week) + 60_000;
+  await createRunHarness({ storage: RETURNING });
   assert.equal(weekRuleTurnedDown(), false);
   assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule, EVENT.id, "the shell's 시작, on by default");
 
@@ -270,14 +351,14 @@ test("the start screen's box turns the rule down on this device, for both starts
   assert.equal(localStorage.getItem(WEEK_RULE_OFF_STORAGE_KEY), "1");
   assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule ?? null, null, "the shell's 시작 reads the key");
   // The harness starts on a storage of its own: the key is put in it.
-  const runtime = await createRunHarness({ storage: { [WEEK_RULE_OFF_STORAGE_KEY]: "1" } });
+  const runtime = await createRunHarness({ storage: { ...RETURNING, [WEEK_RULE_OFF_STORAGE_KEY]: "1" } });
   runtime.act("startGame");
   assert.equal(runtime.run.gauntletRun.weekRule, null, "and so does the runtime's");
   assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: { weekRule: EVENT.id } }).weekRule, EVENT.id, "a season already started keeps its rule");
 
   setWeekRuleTurnedDown(false);
   assert.equal(localStorage.getItem(WEEK_RULE_OFF_STORAGE_KEY), null);
-  const again = await createRunHarness();
+  const again = await createRunHarness({ storage: RETURNING });
   again.act("startGame");
   assert.equal(again.run.gauntletRun.weekRule, EVENT.id);
 });
