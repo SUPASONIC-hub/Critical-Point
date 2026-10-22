@@ -228,6 +228,16 @@ async function walkSeason(page, from, to) {
  * is the uninterrupted walk below, which runs weekly.
  */
 const WALK_SEGMENT_CASES = 7;
+/**
+ * The budget a case gets, the same for every segment. A case is ~25 seconds on
+ * CI, but on a loaded desktop (three workers beside other runs) it took 70 to
+ * 90: at 90 a case, case10-case16 ran out on 3 of 3 runs of 2026-10-22 on
+ * main, as it entered case17. 120 leaves a third over the slowest case seen.
+ * It is a ceiling, not a cost: a segment that walks at CI's pace still takes
+ * its three minutes, and verify-season's two segments a shard stay well
+ * inside the job's 20.
+ */
+const WALK_CASE_BUDGET_MS = 120_000;
 
 test.describe("season walk in segments", () => {
   test.describe.configure({ mode: "parallel" });
@@ -239,7 +249,7 @@ test.describe("season walk in segments", () => {
     const to = Math.min(from + WALK_SEGMENT_CASES, CASE_SEQUENCE.length);
     const last = to === CASE_SEQUENCE.length ? "the ending" : CASE_SEQUENCE[to];
     test(`${CASE_SEQUENCE[from]} through ${CASE_SEQUENCE[to - 1]} hands over to ${last}`, { tag: "@season-segment" }, async ({ page }) => {
-      test.setTimeout((to - from) * 90_000);
+      test.setTimeout((to - from) * WALK_CASE_BUDGET_MS);
       await walkSeason(page, from, to);
     });
   }
