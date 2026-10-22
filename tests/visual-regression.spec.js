@@ -403,11 +403,12 @@ test("intro fits a phone reading budget", { tag: "@prod" }, async ({ page }) => 
  * player meets the story. Its reading clock starts held so nothing opens the
  * table under the capture. The page scrolls inside itself, so the budget is
  * its own scroll height in screens, not the document's: ratchet it down,
- * never up.
+ * never up. Measured 2026-10-22 on this branch: 2.61 screens at 360x740 and
+ * 2.17 at 390x844, rounded up.
  */
 const BRIEFING_PHONES = [
-  { name: "360x740", width: 360, height: 740, screens: 4 },
-  { name: "390x844", width: 390, height: 844, screens: 4 },
+  { name: "360x740", width: 360, height: 740, screens: 2.65 },
+  { name: "390x844", width: 390, height: 844, screens: 2.2 },
 ];
 
 async function openFirstBriefing(page, viewport) {
