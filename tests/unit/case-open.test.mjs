@@ -24,6 +24,8 @@ import { WEEK_RULE_ID_MAX } from "../../src/gauntlet/weeklyRules.js";
 import { CASE_DYNAMICS_MAX_BYTES, fitCaseDynamics, validateCaseDynamics, validateSavedStatePayload, validateTelemetryItem } from "../../src/state/payloadSchemas.js";
 import { initialRunState, runTransition, toSavePayload } from "../../src/state/runState.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
+// The server's cap and its ruler, shared with the e2e specs that read a played row (S7).
+import { jsonbText, SERVER_DYNAMICS_BYTES } from "../helpers/caseRows.js";
 
 /**
  * F1 phase 3, S3 (서버검증-설계안.md, question 8 (1)): the case-open snapshot,
@@ -31,15 +33,7 @@ import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
  * case's row as `dynamics.open` with the close's `linksOut` and draft.
  */
 
-/** The server's cap on `dynamics`, as jsonb text (20261102030000). */
-const SERVER_DYNAMICS_BYTES = 6144;
 const bytes = (text) => Buffer.byteLength(text, "utf8");
-/** `value` as Postgres prints jsonb: `": "` after a key and `", "` between items. */
-function jsonbText(value) {
-  if (Array.isArray(value)) return `[${value.map(jsonbText).join(", ")}]`;
-  if (value && typeof value === "object") return `{${Object.entries(value).filter(([, item]) => item !== undefined).map(([key, item]) => `${JSON.stringify(key)}: ${jsonbText(item)}`).join(", ")}}`;
-  return JSON.stringify(value);
-}
 /** The `dynamics` a case row carries at a close (useChoiceCommit). */
 const rowDynamics = (run) => fitCaseDynamics({ ...createRunSummary(run), ...createCaseClose(run), responseTimeSec: 12.4 });
 

@@ -17,6 +17,7 @@ import {
   openIntroDrawer,
   resumeSavedRun,
   startDebugNode as startDebugNodeFromHelper,
+  startFirstRun,
   cashStakedCard,
   dismissProtocolBreach,
   TRANSITION_TIMEOUT_MS,
@@ -1695,4 +1696,26 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect
     .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v9") || "[]").length))
     .toBeGreaterThan(0);
+});
+
+// F1 phase 3, S7: 시작 on the intro opens the season's first case, and with it
+// the first opening snapshot (S3) -- whether the pre-start shell writes the
+// save (stamped when the runtime loads it) or the runtime does (newGame). It
+// opens empty, on the hand the save deals, and the first decision starts from
+// that hand: the server's chain check reads the season's start off these.
+test("시작 stamps the first case's opening snapshot, empty, on the hand the first decision starts from", { tag: "@once" }, async ({ page }) => {
+  await page.goto("/");
+  await startFirstRun(page);
+  const readSave = () => readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  await expect.poll(async () => (await readSave())?.dynamics?.open?.caseId ?? null, { timeout: TRANSITION_TIMEOUT_MS }).toBe(CASE_SEQUENCE[0]);
+  const started = await readSave();
+  const opened = started.dynamics.open;
+  expect(opened).toMatchObject({ caseId: CASE_SEQUENCE[0], windowIndex: 0, practiceWindows: 0, vault: 0, handVault: 0, busts: 0, cashes: 0, relics: [], linksIn: [], practice: false });
+  expect(opened.resources, "the snapshot holds the hand the season opens on").toEqual(started.resources);
+
+  await chooseFirstAvailableChoice(page);
+  await expect.poll(async () => (await readSave()).log.length, { timeout: TRANSITION_TIMEOUT_MS }).toBe(1);
+  const played = await readSave();
+  expect(played.log[0].resourcesBefore, "the first decision starts from the snapshot's hand").toEqual(opened.resources);
+  expect(played.dynamics.open, "and the run still holds the opening it was stamped with").toEqual(opened);
 });

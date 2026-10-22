@@ -9,6 +9,9 @@
 import { expect, test } from "./helpers/network.js";
 import { completeCurrentCase, openIntroDrawer } from "./helpers/gameFlow.js";
 import { startDebugNode } from "./helpers/seasonFlow.js";
+import { collectPostedRows, jsonbBytes, SERVER_DYNAMICS_BYTES } from "./helpers/caseRows.js";
+import { recheckCaseGap, recheckCaseLinks } from "../src/chainRecheck.js";
+import { verifyRows } from "../scripts/verify-ranking-rows.mjs";
 
 test("pending telemetry retries after a failed Supabase response", { tag: "@once" }, async ({ page }) => {
   let requestCount = 0;
@@ -267,4 +270,57 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   });
   expect(savedAfterFailureCallback.queued, "the row that failed is still waiting").toBeGreaterThan(0);
   expect(savedBeforeFailureCallback.currentCase).toBe("final");
+});
+
+// F1 phase 3, S7: the season's last two case rows as the server's chain check
+// reads them. Each carries its opening snapshot (`dynamics.open`, S3) and what
+// its close hands on (`linksOut`, the draft, the practice count); the finale,
+// opened from the case before's report, opens on what that case closed on.
+// The ranking row is the one it always was: the server copies its scores from
+// the finale's row, and it carries no `dynamics`.
+test("a season's case rows carry their opening snapshot and what they hand on, and the ranking row is as it was", { tag: "@once" }, async ({ page }) => {
+  test.setTimeout(120_000);
+  const posted = await collectPostedRows(page, "https://e2e.supabase.co");
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case49", "c49_aftershock");
+  await completeCurrentCase(page);
+  await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
+  await completeCurrentCase(page);
+  await expect(page.locator(".ending-sequence")).toBeVisible();
+  await expect.poll(() => posted.map((row) => row.case_id), { timeout: 20_000 }).toEqual(expect.arrayContaining(["case49", "final", "season-final"]));
+
+  const [before, finale] = ["case49", "final"].map((caseId) => posted.find((row) => row.case_id === caseId));
+  for (const row of [before, finale]) {
+    expect(row.dynamics.open?.caseId, `${row.case_id} carries its opening snapshot`).toBe(row.case_id);
+    expect(Array.isArray(row.dynamics.linksOut), `${row.case_id} carries its links out`).toBe(true);
+    expect(Array.isArray(row.dynamics.relicOffer)).toBe(true);
+    expect(typeof row.dynamics.practiceWindows).toBe("number");
+    expect(jsonbBytes(row.dynamics), `${row.case_id}'s dynamics as jsonb text`).toBeLessThanOrEqual(SERVER_DYNAMICS_BYTES);
+    expect(recheckCaseLinks(row), `${row.case_id}'s decisions chain from its opening hand`).toMatchObject({ status: "linked", breaks: [] });
+  }
+  // The finale opened from case49's report: its opening is that close.
+  expect(recheckCaseGap(before, finale), "the finale opens on what case49 closed on").toMatchObject({ status: "linked", breaks: [] });
+  expect(finale.dynamics.open.vault).toBe(before.dynamics.vault);
+  expect(finale.dynamics.open.linksIn).toEqual(before.dynamics.linksOut);
+
+  const season = posted.find((row) => row.case_id === "season-final");
+  expect(Object.keys(season), "the ranking row carries no dynamics").not.toContain("dynamics");
+  expect(season.summary.seasonComplete).toBe(true);
+
+  // The rows as the page wrote them, through the server check's own reader
+  // (verify-ranking-rows): every window replayed from its record and its seed
+  // read at its place in the run (S1, the page's `run_id:windowIndex:nodeId`),
+  // the scores worked out again, the two cases chained. The rows before case49
+  // were never played here, so the run's start is not read (a gap), not passed.
+  const [result] = verifyRows(posted);
+  const windows = before.decision_log.length + finale.decision_log.length;
+  expect(result.status, "every window carries its replay record").toBe("checked");
+  expect(result.marks).toEqual([]);
+  expect(result.cases.reduce((sum, entry) => sum + entry.windows.counts.match, 0), "each window replays to what the log says").toBe(windows);
+  expect(result.cases.every((entry) => entry.windows.findings.length === 0), "no window's seed is off its place").toBe(true);
+  expect(result.chain).toMatchObject({ status: "linked", breaks: [] });
 });

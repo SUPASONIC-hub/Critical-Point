@@ -1513,8 +1513,17 @@ Still open, on purpose:
     `unrecorded` (scores read, not replayed). A run under other `tableRules`
     is not checked. Phase 3 (S6) chains each run too (`src/chainRecheck.js`:
     resources from decision to decision, the run's counters from case to
-    case; the settlement and a case with no opening snapshot counted as not
-    checked) and marks a break `chain-off-log`.
+    case, and since S3 each case's opening snapshot against the close before
+    it; the settlement and a case with no opening snapshot counted as not
+    checked) and marks a break `chain-off-log`. The snapshot is stamped
+    when a case opens (`createCaseOpen`), kept through a save, and sent on the
+    case row as `dynamics.open` with the close's `linksOut`, draft and
+    practice count; `20261102030000` raises the server's cap on a case row's
+    `dynamics` to 6,144 bytes of jsonb text for it (an honest row measures at
+    most 1.5 KB). S7's browser tests pin a played row's size, the snapshot
+    surviving a save and resume, the season's case rows (the ranking row
+    unchanged) and the first case's snapshot after 시작, and read the rows a
+    page posted through the checker (seeds, replays and chain, no mark).
     `--marks-sql` writes the result through
     `ranking_set_recheck_marks` (`20261023000000`, service role only): the
     run's `score-off-log`, `window-off-replay`, `window-no-replay` and
