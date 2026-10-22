@@ -245,8 +245,12 @@ export const AUDIT_VALUES = (() => {
  * `reduce` is the window reducer the player presses through: the engine's,
  * or one that also writes each window's replay trail (the server-check tests,
  * tests/unit/helpers/windowRecorder.mjs). It draws nothing either way.
+ * `windowSeed` names each window's seed; the default is the bot's own
+ * (`season:<season>:<window>`, what the balance reports were measured on).
+ * The server-check tests pass the page's (`run_id:windowIndex:nodeId`,
+ * GameRuntime's seedBase), so the seed check (S1) reads them as dealt.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}` }) {
   let seed = start;
   function random() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -428,7 +432,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             return !best || score > best.score ? { choice: candidate, score } : best;
           }, null).choice;
 
-        const window = playWindow(policy, run, `season:${seasonIndex}:${run.windowIndex}`, rules, tools?.hand ? tools.dealHand() : null);
+        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null);
         windows += 1;
         const responseTimeSec = Math.max(1, Math.round(window.elapsed));
         const reframe = choice.type === "reframe";
