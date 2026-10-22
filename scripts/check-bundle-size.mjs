@@ -57,7 +57,12 @@ const budgets = [
   // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
   // and one more dependency index (3). Folding the dev switch's leftovers
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_300 },
+  // 169,980 / 61,300 -> 170,397 / 61,529 on 2026-10-22 (reading-layout,
+  // draft), measured 170,397 / 61,525 plus 4 in the e2e build: 이야기 글 크기
+  // (the setting, its attribute and factor), the seen-glosses key a reset
+  // clears, and the shell's share of the briefing's new reading. Not yet cut
+  // back: to be taken out before this merges after W44.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_397, maxGzip: 61_529 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -130,7 +135,11 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
+  // 35,363 -> 35,473 gzip on 2026-10-22 (reading-layout, draft), measured:
+  // D-3 cut the briefing's zigzag and docked footer (raw down), and D-5, D-7,
+  // D-8, D-13 and B-7 added the story's sizes, the bridge, the cast, the
+  // phone's backdrop and the folded gloss.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_473 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -300,7 +309,7 @@ const budgets = [
   // time the table's case file opens (SceneBriefing's CaseFileStory), because
   // the PlayScreen chunk had no room for it. Measured with the e2e build, the
   // gzip plus the 4 bytes of hash noise.
-  { pattern: /^CaseCast-.*\.js$/, maxBytes: 3_000, maxGzip: 1_500 },
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_120, maxGzip: 1_111 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -395,7 +404,9 @@ function checkBudget(file, budget) {
 // 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
 // 8,894 / 3,217 -> 8,928 / 3,231 on 2026-10-21, the test week: both risks'
 // files in the list, measured 8,928 / 3,227 plus 4.
-const WORKER_BUDGET = { maxBytes: 8_928, maxGzip: 3_231 };
+// 8,928 / 3,231 -> 8,959 / 3,240 on 2026-10-22 (reading-layout, draft),
+// measured 8,959 / 3,236 plus 4: one more file in the list, CaseCast.
+const WORKER_BUDGET = { maxBytes: 8_959, maxGzip: 3_240 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
