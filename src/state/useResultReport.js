@@ -23,7 +23,8 @@ import { createAchievementBadges, createEndingProfile, createScoreBreakdown, cre
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { describeCaseChange } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
-import { getCaseComparison } from "./secondSeason.js";
+import { getCaseComparison, getSeasonCard } from "./secondSeason.js";
+import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
@@ -123,6 +124,7 @@ export function useResultReport({
   runId,
   secondSeason = null,
   tabScreen,
+  weekRule = null,
   triggers,
 }) {
   const telemetryStats = useSyncExternalStore(subscribeTelemetryStats, getTelemetryStats, getTelemetryStats);
@@ -241,6 +243,8 @@ export function useResultReport({
       pending: pendingTelemetry.length,
     }),
     caseOutcome,
+    // E-5: the season's number on the result card and its shared line (secondSeason.js).
+    seasonCard: getSeasonCard({ secondSeason, endingLabel: endingVariant.label, weekRuleLabel: getWeekRule(weekRule)?.label }),
     endingProfile: createEndingProfile({ finalEndingEntry }),
   };
 }

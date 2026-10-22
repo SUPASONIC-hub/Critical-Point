@@ -136,8 +136,36 @@ export function isCaseFirstPage(log, currentCase) {
  */
 export function createSecondSeason({ record = null, memory = null, runId = null, veteran = false } = {}) {
   const round = getSeasonRound(normalizeSeasonRecord(record), runId, memory);
-  if (veteran !== true) return { round, veteran: false, results: null, past: null };
-  return { round, veteran: true, results: pastSeasonResults(memory, runId), past: pastSeasonEnding(record, runId, memory) };
+  // How the season before ended, for any run's card (E-5); the story lines read it only on NEW GAME+.
+  const before = pastSeasonEnding(record, runId, memory);
+  // The season's row title (seasonViewModels.js, whose chunk is the entry's).
+  const rowTitle = `${seasonLabel(round)} COMPLETE`;
+  if (veteran !== true) return { round, rowTitle, before, veteran: false, results: null, past: null };
+  return { round, rowTitle, before, veteran: true, results: pastSeasonResults(memory, runId), past: before };
+}
+
+/** 「SEASON 02」: the season's number as the card and the telemetry label print it. */
+export function seasonLabel(round) {
+  return `SEASON ${String(Number.isInteger(round) && round > 0 ? round : 1).padStart(2, "0")}`;
+}
+
+/**
+ * E-5: what the result card and its shared line say of the season's number,
+ * made here so the card's chunk prints strings it is handed (it had about 40
+ * gzip bytes left). `season` is the card's corner, `share` what follows the
+ * shared line: 「2회차 · 지난 시즌 X → 이번 Y · 이번 주의 규칙 NAME.」, each
+ * part only when it is known, or an empty string. It starts on a space,
+ * so the card's chunk appends it as it is.
+ */
+export function getSeasonCard({ secondSeason, endingLabel = "", weekRuleLabel = "" } = {}) {
+  const round = secondSeason?.round ?? 1;
+  const pastLabel = secondSeason?.before?.endingLabel;
+  const parts = [
+    round > 1 ? `${round}회차` : "",
+    round > 1 && pastLabel && endingLabel ? `지난 시즌 ${pastLabel} → 이번 ${endingLabel}` : "",
+    weekRuleLabel ? `이번 주의 규칙 ${weekRuleLabel}` : "",
+  ].filter(Boolean);
+  return { season: `${seasonLabel(round)} · FINAL RECORD`, share: parts.length ? ` ${parts.join(" · ")}.` : "" };
 }
 
 /**

@@ -93,7 +93,7 @@ export function EndingSequence({
       {/* On the page from the first step, so what it comes to say is news. */}
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
       <div className="ending-sequence-header">
-        <span lang="en">SEASON 01 / FINAL RECORD</span>
+        <span lang="en">{card.season}</span>
         <strong>시즌 완료</strong>
       </div>
       {endingStep === 0 && (

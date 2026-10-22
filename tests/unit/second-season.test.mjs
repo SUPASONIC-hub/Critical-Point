@@ -68,7 +68,7 @@ test("the memory is the season before only while this run's finale has not writt
 
 test("only a NEW GAME+ run is handed the season before; every run is handed its number", () => {
   const plain = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: false });
-  assert.deepEqual(plain, { round: 2, veteran: false, results: null, past: null });
+  assert.deepEqual({ ...plain, before: plain.before.verdict }, { round: 2, rowTitle: "SEASON 02 COMPLETE", before: "ending_seal", veteran: false, results: null, past: null });
   const carried = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: true });
   assert.equal(carried.round, 2);
   assert.equal(carried.results, MEMORY);
@@ -111,4 +111,32 @@ test("the ruling's lines are on real cases, one for each ruling that carries a l
   }
   assert.equal(getCaseEcho("case48", "open"), null);
   assert.equal(getCaseEcho("case47", "ending_seal"), null);
+});
+
+test("E-5: the card and its shared line carry the season's number, the ending before and the week's rule", async () => {
+  const { buildResultCardModel, buildShareText, RESULT_CARD_LABELS } = await import("../../src/resultCardModel.js");
+  const { seasonLabel, getSeasonCard } = await import("../../src/state/secondSeason.js");
+  assert.equal(seasonLabel(2), "SEASON 02");
+  assert.equal(seasonLabel(undefined), "SEASON 01");
+  assert.equal(seasonLabel(12), "SEASON 12");
+  const second = createSecondSeason({ record: RECORD, memory: null, runId: "second-run" });
+  assert.deepEqual(getSeasonCard({ secondSeason: second, endingLabel: "HUMAN RECORD", weekRuleLabel: "NEAR WALL" }), {
+    season: "SEASON 02 · FINAL RECORD",
+    share: " 2회차 · 지난 시즌 QUIET COVER → 이번 HUMAN RECORD · 이번 주의 규칙 NEAR WALL.",
+  });
+  assert.deepEqual(getSeasonCard({ secondSeason: createSecondSeason(), endingLabel: "HUMAN RECORD" }), { season: RESULT_CARD_LABELS.season, share: "" });
+  const card = getSeasonCard({ secondSeason: second, endingLabel: "HUMAN RECORD" });
+  const model = buildResultCardModel({ ...card, endingName: "x" });
+  assert.equal(model.season, "SEASON 02 · FINAL RECORD");
+  assert.match(buildShareText(model, "https://a.example"), /랭크\. 2회차 · 지난 시즌 QUIET COVER → 이번 HUMAN RECORD\. https:\/\/a\.example\/$/);
+  // A card handed nothing keeps the first season's words.
+  assert.equal(buildResultCardModel({}).season, RESULT_CARD_LABELS.season);
+  assert.ok(!buildShareText(buildResultCardModel({})).includes("회차"));
+});
+
+test("E-5: the season's row is titled by its number", async () => {
+  const { createSeasonLeaderboardRow, createSeasonTelemetryPayload } = await import("../../src/viewModels/seasonViewModels.js");
+  assert.equal(createSeasonLeaderboardRow({ caseSummary: {}, title: createSecondSeason({ record: { ...RECORD, seasons: 2 } }).rowTitle }).case_title, "SEASON 03 COMPLETE");
+  assert.equal(createSeasonLeaderboardRow({ caseSummary: {} }).case_title, "SEASON 01 COMPLETE");
+  assert.equal(createSeasonTelemetryPayload({ caseSummary: {}, title: "SEASON 02 COMPLETE" }).case_title, "SEASON 02 COMPLETE");
 });
