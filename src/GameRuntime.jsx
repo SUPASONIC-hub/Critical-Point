@@ -78,7 +78,7 @@ import { useRuntimeErrorCapture } from "./state/useRuntimeErrorCapture.js";
 import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { createRunLifecycle } from "./state/runLifecycle.js";
 import { resourceMeta } from "./appCopy.js";
-import { getNextCaseSignal, withFarCallback } from "./caseCopy.js";
+import { getNextCaseSignal } from "./caseCopy.js";
 import { createPlayView } from "./viewModels/appViewModels.js";
 import { createResultViewModel } from "./viewModels/resultViewModel.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
@@ -203,8 +203,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     ...Object.values(caseOpeningRoutes[fallbackCaseId] ?? {}),
   ]);
   const isOpeningNode = branchOpeningNodeIds.has(resolvedNodeId);
-  // A late scene may carry one line about a choice made many cases earlier (caseCopy.farCallbacks).
-  const node = withFarCallback(resolvedNodeId, nodes[resolvedNodeId] ?? nodes[SEASON_ENTRY_NODE], caseResults);
+  const node = nodes[resolvedNodeId] ?? nodes[SEASON_ENTRY_NODE];
   const isResult = Object.values(CASE_RESULT_NODES).includes(nodeId);
   const {
     endingStep,
@@ -931,7 +930,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     fixedChoices, clueCount, casesOpened, reframeChoice, tableRisk,
     resources, resourceMeta, progress, routePath: `${Math.max(0, routeIndex) + 1}/${routeLength}`,
     debugToolsEnabled, fallbackCaseId, silentFailureCount,
-  });
+  }, {}, caseResults);
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
   const playActions = {
     saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic,

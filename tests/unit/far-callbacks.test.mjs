@@ -4,6 +4,7 @@ import { test } from "node:test";
 import { farCallbacks, resolveFarCallbackLine, withFarCallback } from "../../src/caseCopy.js";
 import { caseAftermathNodeId, nodes } from "../../src/gameData.js";
 import { getReadingSeconds } from "../../src/gauntlet/gauntletEngine.js";
+import { createPlayView, viewGroups } from "../../src/viewModels/appViewModels.js";
 
 /**
  * Far callbacks (src/caseCopy.js): a late scene that says one line about the
@@ -58,4 +59,14 @@ for (const [nodeId, callback] of Object.entries(farCallbacks)) {
 test("a scene with no far callback comes back as the graph's own object", () => {
   const scene = nodes.c48_start;
   assert.equal(withFarCallback("c48_start", scene, results("prologue01", "p1_after_record")), scene);
+});
+
+test("the play view hands the screen the scene with its far callback", () => {
+  // Every field the play contract asks for, so the view builds; only the scene matters here.
+  const bag = (nodeId) => ({ ...Object.fromEntries(Object.values(viewGroups.play).flat().map((field) => [field, null])), node: nodes[nodeId], resolvedNodeId: nodeId });
+  const view = createPlayView(bag("c48_final"), {}, results("prologue01", "p1_after_credit"));
+  assert.ok(view.node.text.includes(farCallbacks.c48_final.lines.p1_after_credit));
+  assert.ok(!("caseResults" in view), "case results are not part of the view");
+  const plain = createPlayView(bag("c48_start"));
+  assert.equal(plain.node, nodes.c48_start);
 });
