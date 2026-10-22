@@ -301,7 +301,7 @@ Still open, on purpose:
    it rather than comparing to zero -- `humanCost` and `fatigue` read backwards
    otherwise. Sort with `byEffectWeight` before naming a resource in a sentence.
    A resource is named with its canonical label from `easyResourceLabels` in
-   `src/playerLanguage.js` -- 남은 시간, 현금, 믿음, 공정함, 사람 피해, 지침 --
+   `src/playerLanguage.js` -- 남은 시간, 현금, 믿음, 공정함, 사람 피해, 피로 --
    the words the chips print, never a synonym. Those six are the only
    resources: `applyEffect` (`src/riskLogic.js`) moves only the keys of
    `initialResources`, and only by a finite number, so a misspelt key cannot

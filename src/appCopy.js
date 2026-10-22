@@ -74,7 +74,7 @@ export const playGuideItems = [
   },
   {
     title: "상태 변화",
-    text: "선택 뒤에 달라지는 시간, 현금, 믿음, 공정함, 사람 피해, 지침을 보여줍니다.",
+    text: "선택 뒤에 달라지는 시간, 현금, 믿음, 공정함, 사람 피해, 피로를 보여줍니다.",
   },
   // This entry was "반응 버튼", a control no screen has, and the guide said
   // nothing of the wall or the pulse that points at it.

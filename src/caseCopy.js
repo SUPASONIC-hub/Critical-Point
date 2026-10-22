@@ -314,7 +314,7 @@ export const legacyProfiles = {
   C: {
     label: "OPEN WOUND",
     title: "지난 판단의 균열이 아직 닫히지 않았습니다.",
-    text: "압박을 낮추지 못한 흔적이 다음 사건의 첫 질문이 됩니다. 공정함과 지침이 불리하게 출발합니다.",
+    text: "압박을 낮추지 못한 흔적이 다음 사건의 첫 질문이 됩니다. 공정함과 피로가 불리하게 출발합니다.",
     effect: { legitimacy: -2, fatigue: 4 },
   },
 };
