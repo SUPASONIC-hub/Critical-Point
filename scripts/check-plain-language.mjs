@@ -214,7 +214,7 @@ if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) con
  * something other than the standard. They are warnings until the copy is
  * rewritten (from 11-02); the count only comes down.
  */
-const OFF_STANDARD_CEILING = 195;
+const OFF_STANDARD_CEILING = 193;
 for (const term of Object.keys(STANDARD_GLOSS)) {
   if (!GLOSSARY.includes(term)) failures.push(`STANDARD_GLOSS explains "${term}", which is not in GLOSSARY`);
 }
