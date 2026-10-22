@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createServer } from "node:net";
 import path from "node:path";
@@ -177,8 +178,16 @@ if (has("--list")) {
 
 if (has("--docker")) {
   // The working tree is mounted as it is; node_modules is not, because the
-  // host's native binaries (esbuild, rollup) are the wrong platform inside the
-  // container. A named volume keeps the Linux install between runs.
+  // host's native binaries (rolldown, lightningcss, esbuild) are the wrong
+  // platform inside the container. A named volume keeps the Linux install
+  // between runs. The volume is named after the lockfile: a worktree on other
+  // dependencies (Vite 7 on main, Vite 8 on its branch) gets a volume of its
+  // own, so two checkouts never install over each other's tree, and switching
+  // back finds its install still there.
+  const lockHash = createHash("sha256")
+    .update(readFileSync(path.join(root, "package-lock.json")))
+    .digest("hex")
+    .slice(0, 12);
   const inner = ["node", "scripts/run-e2e.mjs", ...argv.filter((arg) => arg !== "--docker")]
     .map((arg) => `'${arg.replace(/'/g, "'\\''")}'`)
     .join(" ");
@@ -193,7 +202,7 @@ if (has("--docker")) {
       "-v",
       `${root}:/work`,
       "-v",
-      "critical-point-e2e-node-modules:/work/node_modules",
+      `critical-point-e2e-node-modules-${lockHash}:/work/node_modules`,
       "-w",
       "/work",
       PLAYWRIGHT_IMAGE,
