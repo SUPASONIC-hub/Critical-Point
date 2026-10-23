@@ -113,7 +113,8 @@ test("a case's portraits are kept as its first page opens, so none is a silhouet
   await expect(page.locator(".intro")).toBeVisible();
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, { timeout: 30_000 });
   await resumeSavedRun(page);
-  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: 30_000 });
+  // A paused save resumes on the table of its scene, past the briefing; the case is open either way.
+  await expect(page.getByRole("region", { name: "임계점 테이블" })).toBeVisible({ timeout: 30_000 });
   await expect
     .poll(
       () =>
