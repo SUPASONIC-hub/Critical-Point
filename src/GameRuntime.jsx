@@ -79,7 +79,7 @@ import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { createRunLifecycle } from "./state/runLifecycle.js";
 import { resourceMeta } from "./appCopy.js";
 import { getNextCaseSignal } from "./caseCopy.js";
-import { createPlayView } from "./viewModels/appViewModels.js";
+import { createPlayView } from "./viewModels/playViewModel.js";
 import { createResultViewModel } from "./viewModels/resultViewModel.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";

@@ -10,6 +10,7 @@ import {
   getDramaticChoiceLabel,
   getEcho,
   getEndingVariant,
+  getFinalSceneChoiceId,
   getObserverTag,
   getOutcomeChoiceId,
   getSeasonLogic,
@@ -58,7 +59,10 @@ let cloudConflictSaid = false;
 export function toRowSummary(caseSummary) {
   const ending = caseSummary?.endingVariant;
   const id = typeof ending === "string" ? ending : ending?.id;
-  return { ...caseSummary, endingVariant: typeof id === "string" ? id : null };
+  // `finalChoiceId` stays in the save: the row's decision log already carries
+  // that card, so the server's summary stays the shape it was.
+  const { finalChoiceId: _finalChoiceId, ...rowSummary } = caseSummary ?? {};
+  return { ...rowSummary, endingVariant: typeof id === "string" ? id : null };
 }
 
 /**
@@ -412,6 +416,7 @@ export function useChoiceCommit(context) {
         schemaVersion: SAVE_SCHEMA_VERSION,
         replayOf: caseResults[currentCase],
       });
+      const finalChoiceId = getFinalSceneChoiceId(nextLog, entry.nodeId);
       const caseSummary = {
         ...caseSummaryDraft,
         endingVariant: getEndingVariant({
@@ -424,6 +429,10 @@ export function useChoiceCommit(context) {
         runId,
         outcomeChoiceId: getOutcomeChoiceId(entry.choiceId, node),
         outcomeNodeId: entry.nodeId,
+        // The card of the last scene before the outcome, for a far callback
+        // that reads it cases later (farCallbacks.js). Absent when the
+        // log has none; a save from before the field has none either.
+        ...(finalChoiceId ? { finalChoiceId } : {}),
         completedAt: new Date().toISOString(),
       };
       // A case played again keeps the table record of its first close, and the

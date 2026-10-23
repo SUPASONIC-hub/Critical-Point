@@ -236,8 +236,13 @@ function normalizeSavedCaseSummaryShape(summary) {
   const tuple = (value, fallback) => (
     Array.isArray(value) && typeof value[0] === "string" && Number.isFinite(value[1]) ? value : fallback
   );
+  // The last scene's card (`finalChoiceId`, useChoiceCommit) is optional: a
+  // save from before it has none and stays as it is, and a value that is not
+  // an id is dropped, so a far callback reads its fallback line.
+  const { finalChoiceId, ...rest } = summary;
   return {
-    ...summary,
+    ...rest,
+    ...(typeof finalChoiceId === "string" && finalChoiceId ? { finalChoiceId } : {}),
     schemaVersion: Number.isFinite(summary.schemaVersion) ? summary.schemaVersion : SAVE_SCHEMA_VERSION,
     primary: tuple(summary.primary, ["responsibility", 0]),
     secondary: tuple(summary.secondary, ["protection", 0]),
