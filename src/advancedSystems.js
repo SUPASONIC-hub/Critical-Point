@@ -117,8 +117,10 @@ export function getPastRunMemory(memory = {}, record = null, runId = null) {
   return {
     round,
     // What a NEW GAME+ table is, said as a fact (문구 질문 17, user's answer of
-    // 2026-10-21 evening): measured beside a plain season it collapses as often
-    // (22.8% / 22.0%) and banks a little more, so "harder" is not said.
+    // 2026-10-21 evening), so "harder" is not said. Measured on the rules
+    // that ship (RULES_MARK 2, 2026-10-23; `check-endings --report` and
+    // `--whole`, 600 seasons): collapse 23.3% beside 20.7%, busts 11.0% of
+    // windows beside 10.1%. The preview on RULES_MARK 3 had 22.8% / 22.0%.
     text: `${line ?? `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.`} ${VETERAN_TABLE_LINE}`,
   };
 }

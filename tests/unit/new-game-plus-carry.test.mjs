@@ -8,6 +8,7 @@ import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import {
   getOpeningEcho,
   getSeasonCarry,
+  getSeasonOpening,
   getSeasonRound,
   newGamePlusMark,
   normalizeSeasonRecord,
@@ -16,7 +17,6 @@ import {
   VERDICT_NAMES,
 } from "../../src/state/newGamePlusCarry.js";
 import { OPENING_ECHO } from "../../src/state/openingState.js";
-import { getSeasonOpening } from "../../src/state/useRunReadout.js";
 import { findFinalChoiceEntry, getVerdictKey, VERDICT_ENDINGS } from "../../src/verdictBranch.js";
 
 /**
@@ -35,7 +35,7 @@ test("the verdict is judged once: the report's ruling and the carried verdict re
     for (const finalChoiceId of [...Object.keys(VERDICT_ENDINGS), "f_choice_adaptive_reframe", undefined]) {
       const key = getVerdictKey({ endingVariant, finalChoiceId });
       const printed = getFinalVerdict({ endingVariant, finalChoiceId, endingSceneChoice: "x" });
-      if (key === "collapse") assert.equal(printed.title, "트리거랩의 운영은 붕괴합니다.");
+      if (key === "collapse") assert.equal(printed.title, "이 시즌은 무너졌습니다.");
       else if (key === "open") assert.equal(printed.title, endingVariant.title, `${endingVariant.id} / ${finalChoiceId} is the open verdict`);
       else assert.notEqual(printed.title, endingVariant.title, `${endingVariant.id} / ${finalChoiceId} prints ${key}`);
     }

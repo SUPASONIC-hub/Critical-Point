@@ -161,3 +161,16 @@ export function getOpeningEcho(verdict) {
 export function newGamePlusMark(run) {
   return run?.veteran === true ? { newGamePlus: true } : {};
 }
+
+/**
+ * The line a NEW GAME+ season opens on, on the season's
+ * first page only: a run begun with NEW GAME+, in 프롤로그 01, with nothing
+ * answered and no case closed. The run's `echo` moves on with the first
+ * answer, and a replayed 프롤로그 01 opens on its own line, so neither is
+ * shown under the NEW GAME+ kicker. Null everywhere else. useRunReadout puts
+ * it on the play spine; it lives here so its test does not load the hook.
+ */
+export function getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo }) {
+  const first = gauntletRun?.veteran === true && currentCase === "prologue01" && (log?.length ?? 0) === 0 && Object.keys(caseResults ?? {}).length === 0;
+  return first && typeof echo === "string" && echo.trim() ? echo : null;
+}
