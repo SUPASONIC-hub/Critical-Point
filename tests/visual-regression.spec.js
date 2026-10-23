@@ -7,6 +7,25 @@ import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 
 test.use({ colorScheme: "light" });
 
+// The table deals every window from `${runId}:${windowIndex}:${node}`
+// (src/GameRuntime.jsx:289), and the run id is a fresh crypto.randomUUID()
+// (src/appConfig.js:824). Everything the seed draws is therefore new on every
+// run -- above all the 안전선 ×N chip (data-testid="commit-safe",
+// src/gauntlet/GauntletStage.jsx:613), whose count is how many seeded steps fit
+// under the wall band (tableAfterword.js readSafeLine). Its text, its width and
+// whether it renders at all moved ~40px of the play capture between two CI runs
+// of the same commit. Pinning the id pins the deal, so the baseline records one
+// table the comparison can always reproduce. Every randomUUID() in the page
+// returns it; the other callers (tab token, telemetry and board event ids) are
+// one-tab, never-sent ids in this capture.
+const PINNED_RUN_UUID = "00000000-0000-4000-8000-000000000000";
+
+async function pinRunSeed(page) {
+  await page.addInitScript((uuid) => {
+    Object.defineProperty(globalThis.crypto, "randomUUID", { configurable: true, value: () => uuid });
+  }, PINNED_RUN_UUID);
+}
+
 async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
   // Pretendard is shipped as ~90 dynamic subsets with `font-display: swap`, so a
   // screen paints first in fallback metrics and relays itself when the subset
@@ -209,6 +228,7 @@ test("case play desktop visual baseline @visual", async ({ page }, testInfo) => 
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
   });
+  await pinRunSeed(page);
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await stabilizeVisualPage(page);
@@ -227,6 +247,7 @@ test("case play mobile visual baseline @visual", async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
   });
+  await pinRunSeed(page);
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await stabilizeVisualPage(page);

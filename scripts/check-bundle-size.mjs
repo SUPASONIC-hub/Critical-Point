@@ -270,7 +270,9 @@ const budgets = [
   // gzip plus 4: the entries above were each measured on its own base.
   // -> 107,537 / 35,935 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측: measured
   // 107,537 / 35,931 in the e2e build (the larger of two builds), the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_537, maxGzip: 35_935 },
+  // -> 107,563 / 35,944 the same day with 묶음 B's 1999ec42 + 2bc9694a merged (edge
+  // notice, 안전선 button name): measured 107,563 / 35,940, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_563, maxGzip: 35_944 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -346,7 +348,9 @@ const budgets = [
   // gzip plus 4: the entries above were each measured on its own base.
   // -> 35,701 gzip on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측: measured
   // 35,697 in the e2e build (the larger of two builds), the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_701 },
+  // -> 35,725 the same day with 묶음 B's 1999ec42 merged (the gauge's reading on
+  // one line on a phone on its side): measured 35,721, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_725 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -567,8 +571,10 @@ const budgets = [
   // title to just above the action bar. -> 3,970 / 2,289 the same day,
   // measured 3,970 / 2,285, the gzip plus 4: the bar's top is read when the
   // notice is drawn (its buttons wrap with the font; at a fixed 96px the
-  // notice covered 밀기 in CI).
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_970, maxGzip: 2_289 },
+  // notice covered 밀기 in CI). -> 4,133 / 2,368 the same day, measured
+  // 4,133 / 2,364, the gzip plus 4: the bar is watched while the notice is up,
+  // and the notice slides in from the left edge, not up over the bar.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 4_133, maxGzip: 2_368 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).

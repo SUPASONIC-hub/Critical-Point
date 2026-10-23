@@ -324,7 +324,9 @@ const fileBudgets = {
   // music controls, the table, the dock and the reveal together.
   // 445 / 10500 -> 406 / 7967 on 2026-10-13: comments no longer counted
   // (39 lines and 2533 bytes of them that day), the room unchanged.
-  "responsive.css": { lines: 406, bytes: 7967 },
+  // 406 / 7967 -> 414 / 8085 on 2026-10-23, measured: the gauge's reading
+  // kept to one line on a phone on its side once 안전선 ×N joined it.
+  "responsive.css": { lines: 414, bytes: 8085 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about

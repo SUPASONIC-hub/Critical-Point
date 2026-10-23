@@ -518,7 +518,7 @@ test("안전선 pushes to the safe line at once, the reveal says what one more p
   await page.locator(".choices .choice").first().click();
   const stage = page.getByTestId("gauntlet-stage");
   const safe = page.getByTestId("commit-safe");
-  await expect(safe).toHaveAccessibleName(/^안전선까지 밀기 \d+번, 열기 \d+까지$/);
+  await expect(safe).toHaveAccessibleName(/^안전선 ×\d+, 안전선까지 밀기 \d+번, 열기 \d+까지$/);
   const [, pushes, heat] = (await safe.getAttribute("aria-label")).match(/(\d+)번, 열기 (\d+)까지/);
   expect(Number(pushes)).toBeGreaterThan(0);
   await safe.click();
