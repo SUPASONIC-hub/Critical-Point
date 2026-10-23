@@ -227,7 +227,10 @@ const fileBudgets = {
   // recovery.css beside the debug jump panel, which is what it is.
   // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
   // (115 lines and 8280 bytes of them that day), the room unchanged.
-  "play.css": { lines: 2925, bytes: 55420 },
+  // 2925 / 55420 -> 2925 / 55551 on 2026-10-23, measured: the reveal's
+  // 「당신의 판단」 tag in place of the voice's quotes (A-10), one rule the
+  // briefing's question box shares.
+  "play.css": { lines: 2925, bytes: 55551 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -255,7 +258,11 @@ const fileBudgets = {
   // from under a notch on either side.
   // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
   // (31 lines and 2222 bytes of them that day), the room unchanged.
-  "briefing.css": { lines: 674, bytes: 13078 },
+  // 674 / 13078 -> 697 / 13630 on 2026-10-23, measured: the speaker's own
+  // line in the balloon, the question in a box with no tail (「당신의 판단」),
+  // a lead told as a caption and the name chip on the speaker's speech (A-2).
+  // The tail and the lead's box share one rule.
+  "briefing.css": { lines: 697, bytes: 13630 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

@@ -72,6 +72,16 @@
   line-height: 1.45;
 }
 
+/* 당신의 판단: whose decision the line is, in place of the quotes (A-10), and
+   the name of the briefing's question box (A-2). */
+.decision-reveal-choice > span,
+.gx-judgment b {
+  display: block;
+  color: var(--ui-text-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .decision-reveal-beat {
   display: grid;
   gap: 8px;

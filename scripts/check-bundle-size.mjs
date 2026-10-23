@@ -143,7 +143,13 @@ const budgets = [
   // 104,745 / 34,822 -> 104,773 / 34,856 on 2026-10-23, NEW GAME+ (#220)
   // rebased on main d486f4e (#216, above): measured 104,773 / 34,852 in the
   // e2e build, the gzip plus 4. The raw is #216's plus #220's 28 exactly.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_856 },
+  // 104,773 / 34,856 -> 105,138 / 34,982 on 2026-10-23 (A-2·A-10, on #220):
+  // the briefing's question in its own box (「당신의 판단」), the speaker's
+  // line in the balloon and the name chip on the speaker's speech, and the
+  // reveal's tag in place of the voice's quotes. Measured 105,138 / 34,978 in
+  // the e2e build, the gzip plus 4. Which speech is the speaker's went to its
+  // own chunk (speakerLine, below): written here it measured 106,104 / 35,438.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_138, maxGzip: 34_982 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -167,7 +173,12 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
+  // 35,363 -> 35,473 gzip on 2026-10-23, measured 35,469 (the gzip plus 4):
+  // the briefing's 「당신의 판단」 box, the balloon beside the portrait, a
+  // lead told as a caption, the name chip, and the reveal's tag (A-2, A-10).
+  // The box's name shares the reveal tag's rule, and the lead's box the
+  // balloon's tail rule.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_473 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -347,6 +358,11 @@ const budgets = [
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
   // 2026-10-21, the gzip plus 4.
   { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_376, maxGzip: 775 },
+  // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
+  // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
+  // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
+  // 1,203 / 693 measured, the gzip plus 4.
+  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_203, maxGzip: 697 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -443,7 +459,9 @@ function checkBudget(file, budget) {
 // files in the list, measured 8,928 / 3,227 plus 4.
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
-const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
+// 8,962 / 3,248 -> 8,996 / 3,261 on 2026-10-23 (A-2, on #220), measured
+// 8,996 / 3,257 plus 4: one more file, the briefing balloon's speakerLine.
+const WORKER_BUDGET = { maxBytes: 8_996, maxGzip: 3_261 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

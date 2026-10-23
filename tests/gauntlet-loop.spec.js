@@ -959,6 +959,7 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(briefing).toBeVisible();
   await expect(briefing.getByRole("dialog")).toBeVisible();
   await expect(briefing.locator(".gx-balloon")).not.toBeEmpty();
+  await expect(briefing.getByTestId("briefing-question")).toContainText("당신의 판단");
   await expect(briefing.locator(".gx-panel-file li")).toHaveCount(4);
   const timer = page.getByTestId("reading-timer");
   const first = Number(await timer.locator("b").textContent());

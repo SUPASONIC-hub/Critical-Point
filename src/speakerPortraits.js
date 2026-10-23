@@ -111,6 +111,9 @@ const SPEAKER_PORTRAITS = {
   "권태호": "/portrait-kwon-taeho.webp",
 };
 
+/** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */
+export const SPEAKER_NAMES = Object.keys(SPEAKER_PORTRAITS);
+
 /** The portrait's path for a speaker, or null for one not painted yet. */
 export function getSpeakerPortrait(speaker) {
   return SPEAKER_PORTRAITS[speaker] ?? null;
