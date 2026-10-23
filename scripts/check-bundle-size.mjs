@@ -59,7 +59,10 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
+  // 61,308 -> 61,395 gzip on 2026-10-23 (A5, #226, draft, on main 2c7b535),
+  // measured 61,391 plus 4: the comfort panel's switch for the edge notices,
+  // its label and its line (raw stays inside the raw budget).
+  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_395 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -114,7 +117,12 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 104,745 / 34,822 -> 104,850 / 34,865 on 2026-10-23 (A5 and B-15, #226,
+  // draft, on main 2c7b535): measured 104,850 / 34,861, the gzip plus 4. What
+  // stays here of the edge notices is the import, the one element in
+  // TableNotices and its `caseId` prop; their words, timing and inline style
+  // are EdgeNotice's (below), and play.css took no rule.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_850, maxGzip: 34_865 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -427,7 +435,9 @@ function checkBudget(file, budget) {
 // files in the list, measured 8,928 / 3,227 plus 4.
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
-const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
+// 8,962 / 3,248 -> 8,995 / 3,263 on 2026-10-23 (A5, #226, draft, on main
+// 2c7b535), measured 8,995 / 3,259 plus 4: one more file, EdgeNotice.
+const WORKER_BUDGET = { maxBytes: 8_995, maxGzip: 3_263 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
