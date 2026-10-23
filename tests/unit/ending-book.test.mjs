@@ -38,7 +38,7 @@ test("a counted season adds its ending and ruling, and a replayed finale adds to
   const first = close(null, "run-a", "human-record", "ending_reform");
   assert.deepEqual(first.endingsSeen, ["human-record"]);
   assert.deepEqual(first.verdictsSeen, ["ending_reform"]);
-  assert.match(first.endingBook.head, /^결말 1\/9 · 판결 1\/3\. 다음 시즌에 닿을 수 있는 결말은 공개와 개입입니다\. 사건 기록의 90% 이상을 열고 /, "the first ending not seen, in the book's order");
+  assert.match(first.endingBook.head, /^결말 1\/9 · 판결 1\/3\. 다음 시즌에 노려 볼 결말은 공개와 개입입니다\. 사건 기록의 90% 이상을 열고 /, "the first ending not seen, in the book's order");
   assert.equal(first.endingBook.hints.length, 7 + 2, "seven more endings and two rulings");
   assert.ok(!first.endingBook.hints.some((hint) => hint.startsWith("공개와 개입")), "the next line is not hinted twice");
 
@@ -61,13 +61,13 @@ test("a counted season adds its ending and ruling, and a replayed finale adds to
 test("the next line never aims at the collapse, and turns to a ruling once every other ending is seen", () => {
   const all = BOOK_ENDINGS.filter((id) => id !== "collapse");
   const book = getEndingBook({ seasons: 9, endingsSeen: all, verdictsSeen: ["ending_seal"] });
-  assert.match(book.head, /^결말 8\/9 · 판결 1\/3\. 다음 시즌에 내릴 수 있는 판결은 개혁입니다\. 피날레의 마지막 질문에서 그 길을 고르고, 결말이 공개와 개입 · 증거와 개혁 · /);
+  assert.match(book.head, /^결말 8\/9 · 판결 1\/3\. 다음 시즌에 노려 볼 판결은 개혁입니다\. 피날레 「그 칸을 닫는 방법」에서 규칙을 붙이는 길을 고르고, 결말이 공개와 개입 · 증거와 개혁 · /);
   assert.equal(book.hints.length, 2, "the collapse and 폭로");
   assert.ok(book.hints.some((hint) => hint.startsWith("압박과 붕괴: 사건마다 남긴 사람 피해가 평균 20 이상")));
   assert.ok(book.hints.some((hint) => hint.startsWith("판결 폭로: ")));
   const done = getEndingBook({ seasons: 12, endingsSeen: BOOK_ENDINGS, verdictsSeen: BOOK_VERDICTS });
   assert.deepEqual(done, { head: "결말 9/9 · 판결 3/3.", hints: [] });
-  assert.equal(getEndingBook({ seasons: 1, endingsSeen: ["no-such-ending"], verdictsSeen: ["open"] }).head, "결말 0/9 · 판결 0/3. 다음 시즌에 닿을 수 있는 결말은 공개와 개입입니다. 사건 기록의 90% 이상을 열고 믿음과 공정함을 함께 높게 지킨 시즌이 닿습니다.");
+  assert.equal(getEndingBook({ seasons: 1, endingsSeen: ["no-such-ending"], verdictsSeen: ["open"] }).head, "결말 0/9 · 판결 0/3. 다음 시즌에 노려 볼 결말은 공개와 개입입니다. 사건 기록의 90% 이상을 열고 믿음과 공정함을 함께 높게 지킨 시즌이 닿습니다.");
 });
 
 test("a record kept before the book reads as having seen its last two endings, and keeps its shape", () => {

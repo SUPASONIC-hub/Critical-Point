@@ -144,6 +144,8 @@ const budgets = [
   // record (state/endingBook.js), so the entry carries none of the copy, only
   // the panel's <details> and getPastRunMemory's `book`. Cut first: a count
   // line, a next line and a fold head of their own came to +348 / +128.
+  // -> 173,198 / 62,549 with the user's wording (10-23, all (1)), 4 gzip
+  // under the draft as on second-season (measured there 170,881 / 61,768).
   { pattern: /^index-.*\.js$/, maxBytes: 173_921, maxGzip: 62_777 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
