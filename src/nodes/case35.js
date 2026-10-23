@@ -20,7 +20,10 @@
  * weight from 2020, when flooded businesses closed -- because every bank then
  * refused them. The evidence turn finds who asked for that weight: the
  * analyst's own department, a week before the analyst arrived, with the
- * approval line left blank.
+ * approval line left blank. The turn is who tried to stop it: the line's edit
+ * history shows the 대리 at the next desk typed a dissent there that was
+ * erased four minutes later, and attached the data-sharing agreement so that
+ * someone would find it.
  *
  * The case closes on the market steaming rice cakes for everyone who bailed
  * water, and on a text from the chairman's office inviting the analyst to
@@ -646,21 +649,21 @@ export const case35 = {
     sourceRoutes: ["c35_sandbag", "c35_lathe", "c35_noah", "c35_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "노아의 판단 기록을 단서와 시각 순으로 맞물려, 수해 심사 기준이 누구의 요청으로 들어왔는지 캐낸다.",
-    entryEcho: "시각을 맞물리면 그 기준을 누가 넣었는지 나옵니다. 그 부서 이름은 당신 명함에도 찍혀 있습니다.",
+    entryEcho: "시각을 맞물리자 그 기준을 누가 넣었는지 나옵니다. 누가 막으려 했는지도 함께 나옵니다.",
     entryLabel: "노아가 수해 대출을 어떤 기준으로 보는지 판단 기록을 연다",
-    title: "승인란이 빈 요청서",
+    title: "4분 동안의 반대",
     speaker: "이민서",
-    text: "단서를 거절 시각 순으로 늘어놓자 노아에 '재해 노출' 가중치(어떤 조건을 얼마나 무겁게 따질지 정한 값)를 넣어 달라는 요청서가 열립니다. 요청 부서는 KD캐피탈 위험관리부, 당신이 지금 앉아 있는 부서입니다. 요청일은 당신이 이 부서로 오기 한 주 전이고, 승인란은 비어 있습니다. 첨부 문서도 하나 있습니다. KD손해보험의 호우 피해 접수 명단을 6분마다 노아에 넘긴다는 데이터 공유 약정입니다. 이민서가 명단 첫 줄을 가리킵니다. '보험금을 청구한 사람이 대출에서 거절돼요. 피해를 신고한 순서대로요. 끝까지정밀은 새벽 2시 14분에 신고했고, 2시 20분에 점수가 떨어졌어요.'",
-    memo: ["요청 부서: KD캐피탈 위험관리부 -- 승인란 빈칸", "요청일: 당신이 부서에 오기 한 주 전", "보험 피해 접수 명단 → 노아, 6분마다 전송"],
+    text: "단서를 거절 시각 순으로 늘어놓자 노아에 '재해 노출' 가중치(어떤 조건을 얼마나 무겁게 따질지 정한 값)를 넣어 달라는 요청서가 열립니다. 요청 부서는 KD캐피탈 위험관리부, 요청일은 당신이 이 부서로 오기 한 주 전입니다. 승인란은 비어 있습니다. 이민서가 그 칸의 편집 기록을 엽니다. 처음부터 빈칸은 아니었습니다. 누군가 '반대. 피해를 신고한 사람부터 떨어집니다.'라고 적었고, 4분 뒤 그 줄이 지워졌습니다. 적은 사람은 당신 옆자리 대리입니다. 넉 달 가까이 아침마다 당신에게 먼저 인사한 사람입니다. 이민서가 첨부 문서를 가리킵니다. KD손해보험의 호우 피해 접수 명단을 6분마다 노아에 넘긴다는 약정입니다. '이걸 붙여 둔 것도 그 대리예요. 줄이 지워진 다음에요. 누가 찾으라고요.'",
+    memo: ["요청 부서: KD캐피탈 위험관리부 -- 승인란 빈칸", "요청일: 당신이 부서에 오기 한 주 전", "승인란 편집 기록: 옆자리 대리의 '반대', 4분 뒤 삭제", "보험 피해 접수 명단 → 노아, 6분마다 전송"],
     triggers: ["injustice", "system", "selfAwareness"],
     entryEffect: { legitimacy: 5, trust: 4, time: -4, fatigue: 4 },
     choices: [
       {
         id: "c35_evidence_turn_reveal",
-        label: "내 부서의 이름이 적힌 요청서를 그대로 공개한다",
+        label: "지워진 반대까지 요청서를 그대로 공개한다",
         effect: { legitimacy: 13, trust: 5, capital: -6, time: -6, fatigue: 6 },
-        voice: "내가 오기 전 일이어도 숨기면 내 일이 된다며, 내 부서의 이름이 적힌 요청서를 그대로 공개한다.",
-        echo: "당신 부서 이름이 기사 첫 줄에 오릅니다. 위험관리부 동료들이 다음 날 아침 당신 자리를 지나며 인사를 하지 않습니다.",
+        voice: "내가 오기 전 일이어도 숨기면 내 일이 된다며, 지워진 반대까지 요청서를 그대로 공개한다.",
+        echo: "요청서와 지워진 한 줄이 함께 기사에 오릅니다. 다음 날 아침 위험관리부 동료들은 당신 자리를 지나며 인사를 하지 않습니다. 옆자리 대리만 여느 때처럼 먼저 인사합니다.",
         cognition: { inference: 2, persistence: 1 },
       },
       {
@@ -668,7 +671,7 @@ export const case35 = {
         label: "요청서는 조용히 철회시키고 공개는 미룬다",
         effect: { capital: 8, time: 5, trust: -5, legitimacy: -4, humanCost: 5, fatigue: -3 },
         voice: "명단이 넘어가는 것부터 멈춰야 한다며, 요청서는 조용히 철회시키고 공개는 미룬다.",
-        echo: "요청서는 소리 없이 철회됩니다. 가중치는 내려가지만, 누가 그것을 넣었는지는 아무도 모르게 됩니다.",
+        echo: "요청서는 소리 없이 철회됩니다. 가중치는 내려갑니다. 누가 넣었는지도, 누가 막으려 했는지도 함께 묻힙니다.",
         cognition: { risk: 2 },
       },
       {
@@ -687,7 +690,7 @@ export const case35 = {
     systemLabel: "데이터센터의 판처럼 노아에게도 이유의 이유를 끝까지 묻는다",
     evidenceLabel: "'보관 X'의 날짜를 노아의 수해 심사 기록에 대 본다",
     systemEcho: "끝까지 물으면 노아의 답이 한 바퀴를 돕니다. 세 번째 질문에서 처음으로 1초 넘게 걸립니다.",
-    evidenceEcho: "출력 기록을 심사 기록에 겹치면 기준을 넣어 달라고 한 부서가 읽힙니다. 지금 당신이 앉아 있는 부서이고, 요청일에 당신은 아직 거기 없었습니다.",
+    evidenceEcho: "출력 기록을 심사 기록에 겹치자 기준을 넣어 달라고 한 부서가 읽힙니다. 같은 요청서의 승인란에서 지워진 한 줄도 함께 읽힙니다.",
   },
   openingRoutes: {
     c34_after_warm: "c35_start_warm",
@@ -841,7 +844,7 @@ export const case35 = {
     c35_evidence_turn: {
       place: "KD캐피탈 위험관리부 · 자료실",
       clock: "7월 18일 · 장마 · 07:00",
-      question: "재해 가중치를 요청한 곳은 당신의 부서였습니다. 이 요청서를 어떻게 쓰겠습니까?",
+      question: "빈 승인란에 반대를 적고 단서를 붙여 둔 사람이 옆자리에 있었습니다. 이 요청서를 어떻게 쓰겠습니까?",
     },
     c35_final: {
       place: "망원시장 상인회 사무실 · 회의실",
