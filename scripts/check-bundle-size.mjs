@@ -131,7 +131,9 @@ const budgets = [
   // gzip plus 4: the entries above were each measured on its own base.
   // 62,405 -> 62,411 gzip on 2026-10-23: batch B with batch A's notice fix
   // (d2e31d0a) merged in measured 62,407, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_411 },
+  // -> 173,001 / 62,486 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측: measured
+  // 173,001 / 62,482 in the e2e build (the larger of two builds), the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_001, maxGzip: 62_486 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -266,7 +268,9 @@ const budgets = [
   // [batch-c] 묶음 B (#277):
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_129, maxGzip: 35_731 }, // TODO-MEASURE
+  // -> 107,537 / 35,935 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측: measured
+  // 107,537 / 35,931 in the e2e build (the larger of two builds), the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_537, maxGzip: 35_935 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -340,7 +344,9 @@ const budgets = [
   // [batch-c] 묶음 B (#277):
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_556 }, // TODO-MEASURE
+  // -> 35,701 gzip on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측: measured
+  // 35,697 in the e2e build (the larger of two builds), the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_701 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -440,7 +446,9 @@ const budgets = [
   // [batch-c] 묶음 B (#277):
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_888, maxGzip: 4_307 }, // TODO-MEASURE
+  // -> 8,944 / 4,338 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측: measured
+  // 8,944 / 4,334 in the e2e build (the larger of two builds), the gzip plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_944, maxGzip: 4_338 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -735,7 +743,9 @@ function checkBudget(file, budget) {
 // [batch-c] 묶음 B (#277):
 // 9,099 / 3,309 on 2026-10-23, batch B on batch A, measured 9,099 / 3,305
 // plus 4: CaseCast and batch A's three files all in the list.
-const WORKER_BUDGET = { maxBytes: 9_099, maxGzip: 3_309 }; // TODO-MEASURE
+// -> 9,133 / 3,323 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측:
+// measured 9,133 / 3,319, the gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 9_133, maxGzip: 3_323 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
