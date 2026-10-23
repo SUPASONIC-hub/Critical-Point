@@ -229,7 +229,9 @@ const fileBudgets = {
   // (115 lines and 8280 bytes of them that day), the room unchanged.
   // 55420 -> 55572 bytes on 2026-10-22 (D-8), measured 2861 / 55572: the
   // case file's cast cards and its list of the case's scenes so far.
-  "play.css": { lines: 2925, bytes: 55572 },
+  // 55572 -> 55616 bytes on 2026-10-23 in batch B, measured: the reveal's
+  // afterword keeping its verdict on one line, and the table readouts (C-13).
+  "play.css": { lines: 2925, bytes: 55616 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -267,10 +269,11 @@ const fileBudgets = {
   // the room behind the page's title, its panel keeps the room's name and
   // clock, and the speaker's face is 96px. Two lines over the 674 the sheet
   // held before D-3, 18 bytes under its 13078.
-  "briefing.css": { lines: 676, bytes: 13060 },
-  // 674 / 13078 -> 681 / 13293 on 2026-10-22 (story-copy-1, Q8 (1)), measured: the
-  // case's opening voice under the title and the title strip's third row.
-  "briefing.css": { lines: 681, bytes: 13293 },
+  // story-copy-1 (Q8 (1)) took it 674 / 13078 -> 681 / 13293 on its own base:
+  // the case's opening voice under the title and the title strip's third row.
+  // 696 / 13379 on 2026-10-23 in batch B, measured with both and with the
+  // speaker's line on the last table (C-13) in a box of its own.
+  "briefing.css": { lines: 696, bytes: 13379 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

@@ -59,7 +59,6 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
   // 169,980 / 61,300 -> 170,343 / 61,512 on 2026-10-23 (reading-layout on
   // main c08be0e), measured 170,343 / 61,508 plus 4 in the e2e build: 이야기
   // 글 크기 (D-5), its row in the comfort panel and the setting with its
@@ -69,7 +68,10 @@ const budgets = [
   // shell 91 gzip bytes for a 519-byte file and a longer worker list, and was
   // put back; one component for both rows of radios came out 44 gzip bytes
   // longer than the two copies.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_343, maxGzip: 61_512 },
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_441, maxGzip: 61_556 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -124,7 +126,6 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
   // 104,705 / 34,811 -> 104,943 / 34,891 on 2026-10-23 (reading-layout on
   // main c08be0e), measured 104,943 / 34,887 plus 4: the briefing's line
   // from the scene before (D-7), the room's picture behind the phone's title
@@ -133,7 +134,6 @@ const budgets = [
   // sixteen files, and the warming of the case's portraits (D-14) moved to the
   // runtime (CaseCastFold.jsx, useRunReadout.js), and the cast's import takes
   // no preload list (vite.config.js).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_943, maxGzip: 34_891 },
   // 104,745 / 34,822 -> 105,832 / 35,227 on 2026-10-23 (table-readouts, #246,
   // draft), measured 105,832 / 35,223 in the e2e build on main d486f4e with
   // the branch, the gzip plus 4: 안전선까지 (C-5: its button, its S key and the
@@ -144,7 +144,6 @@ const budgets = [
   // the reveal's afterword, the case's read and the reaction lines are the
   // runtime's (tableAfterword.js, caseCopy). The branch's earlier raise was
   // dropped first; this is only what main's budget lacks.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_832, maxGzip: 35_227 },
   // 104,745 / 34,822 -> 105,205 / 35,038 on 2026-10-23 (story-copy-1, #243,
   // draft), measured 105,205 / 35,034 in the e2e build on main d486f4e with
   // the branch, the gzip plus 4: the LOST SCENE line naming the skipped
@@ -152,7 +151,10 @@ const budgets = [
   // GauntletFx, the reveal's notices in 합니다체 and the case's opening voice
   // back on its first briefing (Q8 (1)). The branch's earlier raises were
   // dropped first; this is only what main's budget lacks.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_205, maxGzip: 35_038 },
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 106_566, maxGzip: 35_484 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -172,17 +174,18 @@ const budgets = [
   // measured 14,557 in CI's e2e build and failed Verify, so #216 did not
   // deploy; #216 had been measured before #238 merged. #218 (lucide 1.60,
   // TriangleAlert for AlertTriangle) measures 14,558 on top. The gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_562 },
   // 14,543 -> 14,572 gzip on 2026-10-23 (table-readouts, #246, draft):
   // measured 45,637 / 14,568 in the e2e build on main d486f4e with the branch,
   // the gzip plus 4; the report hands the card 사건당 금고 (score.vaultLine,
   // C-1 (3)). The raw ceiling stays.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_572 },
   // 14,543 -> 14,565 gzip on 2026-10-23 (story-copy-1, #243, draft): measured
   // 45,609 / 14,561 in the e2e build on main d486f4e with the branch, the gzip
   // plus 4; the copy the report shares with the cases (A-14 피로, A-15 names
   // and titles, A-16 합니다체). The raw ceiling stays.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_565 },
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_578 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -196,12 +199,14 @@ const budgets = [
   // D-3 cut the briefing's zigzag and docked footer (raw down), and D-5, D-7,
   // D-8, D-13 and B-7 added the story's sizes, the bridge, the cast, the
   // phone's backdrop and the folded gloss.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_473 },
   // 35,363 -> 35,408 gzip on 2026-10-23 (story-copy-1, #243, draft), measured
   // 191,964 / 35,404 in the e2e build on main d486f4e with the branch, the
   // gzip plus 4: the case's opening voice under the briefing's title and the
   // title strip's third row (Q8 (1)).
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_408 },
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_543 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -394,7 +399,10 @@ const budgets = [
   // the e2e build, the gzip plus the 4 bytes of hash noise: 2,120 / 1,111 on
   // 2026-10-22, 1,983 / 1,042 on 2026-10-23 once the table handed it its
   // SpeakerPortrait instead of the chunk importing it.
-  { pattern: /^CaseCast-.*\.js$/, maxBytes: 1_983, maxGzip: 1_042 },
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_017, maxGzip: 1_060 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -491,7 +499,9 @@ function checkBudget(file, budget) {
 // files in the list, measured 8,928 / 3,227 plus 4.
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
-const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
+// 8,993 / 3,261 on 2026-10-23 in batch B, measured 8,993 / 3,257 plus 4:
+// the replay trail's chunk and CaseCast both in the list.
+const WORKER_BUDGET = { maxBytes: 8_993, maxGzip: 3_261 };
 // 8,928 / 3,231 -> 8,959 / 3,240 on 2026-10-22 (reading-layout, draft),
 // measured 8,959 / 3,236 plus 4: one more file in the list, CaseCast.
 try {

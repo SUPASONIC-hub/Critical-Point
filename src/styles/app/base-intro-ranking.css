@@ -206,7 +206,7 @@ summary:focus-visible {
   box-shadow: 0 6px 24px rgb(217 255 98 / 0.26);
 }
 .music-toggle span {
-  max-width: 3.625rem;
+  max-width: 6rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
