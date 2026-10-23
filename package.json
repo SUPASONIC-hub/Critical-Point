@@ -63,6 +63,7 @@
     "test:visual": "node scripts/run-e2e.mjs --grep @visual tests/visual-regression.spec.js --project=chromium",
     "test:visual:docker": "node scripts/run-e2e.mjs --docker --grep @visual tests/visual-regression.spec.js --project=chromium",
     "verify:static": "node scripts/verify-static.mjs",
+    "verify:ranking": "node scripts/verify-ranking-rows.mjs",
     "verify:quick": "npm run verify:static && npm run check:specs && npm run build:e2e && npm run check:bundle && npm run check:deploy:offline && npm run test:runtime && npm run test:e2e:preview && npm run test:performance",
     "verify:e2e": "npm run test:e2e",
     "verify": "npm run verify:quick && npm run verify:e2e",

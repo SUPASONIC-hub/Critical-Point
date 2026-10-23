@@ -1,0 +1,128 @@
+name: Verify Ranking
+
+# !! BEFORE MERGING: ask the user (after 11-02). Merging turns on a daily job
+# !! that writes marks into the live ranking rows, and the migration it calls
+# !! (20261023000000_ranking_recheck_marks.sql) reaches the live database within
+# !! a minute of the merge. Draft PR #216; 서버검증-설계안.md, the 10-21 answers.
+
+# F1 phase 2 (서버검증-설계안.md, the 10-21 answers): read the top ranked runs
+# off the live database and work each one out again off the page
+# (scripts/verify-ranking-rows.mjs: the score from the decision log, every
+# window that carries a replay record, a sealed card cashed below its seal, a
+# response time off the window clock). The report goes to the run's Job
+# Summary, each run named by its public tag only. The rows go to a file in the
+# runner that is never printed and is removed at the end.
+#
+# Then it writes what it found: one statement (verify-ranking-rows --marks-sql)
+# calls ranking_set_recheck_marks for every run it checked, with the marks the
+# run earned and none for a run that earned none, so a mark the run no longer
+# earns is taken off. The marks sit in `suspicion` beside the insert trigger's;
+# nothing is refused or hidden for them (decision 2 (1)). A run played under
+# other table rules is not checked and not written.
+#
+# The key is the test week's way (test-week.yml): no new secret, the query
+# goes through the Management API with the SUPABASE_ACCESS_TOKEN Migration
+# Drift uses (`supabase db query --linked`, one SELECT that the unit test
+# holds to nothing else). Without the token the run says so and reads nothing.
+#
+# Once a day at 23:55 KST, after the test week's 23:40 read, and by hand. A
+# run by hand can leave the marks unwritten (`write`: false) to read only.
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "How many of the top ranked runs to read"
+        required: false
+        default: "20"
+      write:
+        description: "Write the marks into the ranking rows (false: read only)"
+        required: false
+        default: "true"
+  schedule:
+    - cron: "55 14 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Not a secret: it is the host name in the site's own connect-src.
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+      RANKING_LIMIT: ${{ inputs.limit || '20' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: See whether an access token is configured
+        id: token
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Explain the skipped read
+        if: steps.token.outputs.configured != 'true'
+        run: |
+          echo "::warning title=The ranking was not read::SUPABASE_ACCESS_TOKEN is not configured, so this run asked the database nothing."
+      - uses: ./.github/actions/setup
+        if: steps.token.outputs.configured == 'true'
+        with:
+          browser: none
+      # The rows stay in rows.json. What the CLI said on failure is put
+      # through Migration Drift's redaction before it reaches this public log.
+      - name: Read the ranked runs
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/verify-ranking-rows.mjs --sql --limit="$RANKING_LIMIT" > ranking.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f ranking.sql > rows.json 2> query.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure rows.json query.err
+            exit 1
+          fi
+          echo "Read $(node -e 'const r = JSON.parse(require("fs").readFileSync("rows.json", "utf8")); console.log((r.rows ?? r).length)') rows."
+      - name: Write the report
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        run: |
+          {
+            echo "### Ranked runs worked out again (top $RANKING_LIMIT)"
+            echo '```'
+            node scripts/verify-ranking-rows.mjs rows.json --redact
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      # The statement names run ids, so it is never printed; what the CLI said
+      # on failure goes through the same redaction as the read.
+      - name: Write the marks
+        if: steps.token.outputs.configured == 'true' && (github.event_name == 'schedule' || inputs.write != 'false')
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/verify-ranking-rows.mjs rows.json --marks-sql > marks.sql || exit 1
+          if [ ! -s marks.sql ]; then echo "No checked run to write."; exit 0; fi
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f marks.sql > marked.json 2> write.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure marked.json write.err
+            exit 1
+          fi
+          echo "Marked $(node -e 'const r = JSON.parse(require("fs").readFileSync("marked.json", "utf8")); console.log((r.rows ?? r)[0]?.marked_rows ?? 0)') ranking rows." | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Remove the rows
+        if: always()
+        run: rm -f rows.json query.err ranking.sql marks.sql marked.json write.err

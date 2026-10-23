@@ -1416,6 +1416,39 @@ Still open, on purpose:
     unticked box stops the telemetry rows -- case, season, feedback and error
     rows -- and does not stop this read. A build with no backend asks
     nothing.
+92. A ranked season can be worked out again off the page (server checks,
+    phase 2, #216). Every press the table applies is written with its window
+    clock to the thousandth into the window's trail
+    (`src/gauntlet/windowTrail.js`, a chunk of its own), the trail rides on
+    the window -- into the save when the window is put down
+    (`normalizeSuspendedWindow`), into the runtime when it closes -- and the
+    decision log entry carries the record as `replay` (seed, board as it
+    differs from `BASE_SCHEMA`, presses, end clock). A walked-away window, a
+    window resumed from a save without a trail and a trail past 200 presses
+    leave none; the save version did not move for it (absence means no
+    record). `scripts/verify-ranking-rows.mjs` reads the top ranked runs with
+    one SELECT (`--sql`, the test week's `supabase db query --linked` with
+    `SUPABASE_ACCESS_TOKEN`), recomputes each case's score from its log,
+    replays every recorded window under the case's rules (`newGamePlus` and
+    `assistStory` in the summary say which), and checks a sealed card cashed
+    below its seal and a response time off the window clock
+    (`src/rankingRecheck.js`), and that each seed is the one the page deals
+    at that place (`run_id:windowIndex:nodeId`, a `~n` re-deal counted, not
+    marked). From a run's first recorded case on, a window without a record
+    is marked `window-no-replay`; a run with no record anywhere is
+    `unrecorded` (scores read, not replayed). A run under other `tableRules`
+    is not checked.
+    `--marks-sql` writes the result through
+    `ranking_set_recheck_marks` (`20261023000000`, service role only): the
+    run's `score-off-log`, `window-off-replay` and `window-no-replay` are
+    stated whole beside the insert trigger's marks, nothing is refused or
+    hidden for them, and `rechecked_at` is set only for a run replayed whole,
+    so checked-and-clean is told from never checked.
+    `.github/workflows/verify-ranking.yml` runs both once a day and by hand;
+    its header says the merge waits for the user (after 11-02), since the
+    migration reaches the live database within a minute of it. What a replay
+    cannot prove: that the player did not read the wall or choose the moment
+    of a press.
 
 ## Verification Commands
 

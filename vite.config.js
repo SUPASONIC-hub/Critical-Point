@@ -385,6 +385,16 @@ const AUDIT_RISK = "src/gauntlet/auditRisk.js";
  */
 const CASCADE_RISK = "src/gauntlet/cascadeRisk.js";
 
+/**
+ * The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js): the
+ * presses the table writes as it goes, and the record the runtime puts on the
+ * decision log entry. The table's chunk and the runtime's both import it, and
+ * the table's (PlayScreen) had four gzip bytes left on 2026-10-21. It gets a
+ * file the way the table's sound does; it imports only the engine's chunk,
+ * which never imports it back.
+ */
+const WINDOW_TRAIL = "src/gauntlet/windowTrail.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -430,6 +440,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(CASCADE_RISK),
         name: "cascadeRisk",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(WINDOW_TRAIL),
+        name: "windowTrail",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },

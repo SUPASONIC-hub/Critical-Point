@@ -13,6 +13,8 @@ import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from 
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
+import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
+import { CHAIN_MARK } from "../src/rankingRecheck.js";
 
 /**
  * Data API grants guardrail.
@@ -29,7 +31,7 @@ import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
  * So this replays every migration into an in-process Postgres (PGlite) set up
  * the way a project is after that date: the API roles exist and can use the
  * schema, functions and sequences keep their default grants, and tables get
- * none. Then it asserts seven things.
+ * none. Then it asserts eight things.
  *
  *   1. Rules that hold for any table, so a new one cannot slip through: RLS is
  *      on, service_role can read and write it, and every policy aimed at anon
@@ -64,6 +66,10 @@ import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
  *      test week's report (report-test-week.mjs) runs its one SELECT here and
  *      counts the seasons with the rule, without it and their devices; the
  *      weekly drop-off report (report-funnel.mjs) runs its one SELECT too.
+ *   8. The checker's marks (F1 phase 2, *_ranking_recheck_marks): only the
+ *      service role may set them; a call states the two recheck marks whole,
+ *      keeps the insert trigger's and touches no other row; the checker's
+ *      own read (verify-ranking-rows --sql) runs on the replayed schema.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -193,6 +199,10 @@ for (const file of files) {
     rankingAfterReset = await countRanking();
   }
 }
+
+// The checker's marks (F1 phase 2, `*_ranking_recheck_marks.sql`): the cases
+// below run once the migration is among the files.
+const RECHECK_MARKS = files.some((file) => file.endsWith("_ranking_recheck_marks.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -1358,6 +1368,99 @@ if (!SUSPICION_MARKS) {
 
   withHeaders(null);
   await db.query(`delete from public.playtest_sessions where run_id like 'run-marks-%'`);
+}
+
+// ---- the checker's marks (*_ranking_recheck_marks.sql)
+//
+// scripts/verify-ranking-rows.mjs names at most two marks for a ranking run;
+// ranking_set_recheck_marks writes them into the suspicion column beside the
+// insert trigger's. Nobody but the service role may call it. Each call states
+// the run's two recheck marks whole and keeps every other mark, and it touches
+// the run's ranking row and nothing else.
+if (!RECHECK_MARKS || !SUSPICION_MARKS) {
+  failures.push("supabase/migrations/*_ranking_recheck_marks.sql is gone, or the suspicion marks are; the checker's marks were checked against nothing.");
+} else {
+  const call = (runId, marks) => `select public.ranking_set_recheck_marks('${runId}', ${marks === null ? "null" : `array[${marks.map((mark) => `'${mark}'`).join(", ")}]::text[]`}) as marks`;
+  await refused("set a ranking row's checker marks", "anon", call("run-recheck-1", ["score-off-log"]));
+  await refused("set a ranking row's checker marks", "authenticated", call("run-recheck-1", ["score-off-log"]));
+  // When the checker last replayed a run is not the client's to read or write.
+  await refused("read when a ranking row was rechecked", "anon", `select rechecked_at from public.playtest_sessions`);
+  await postRefused("send a case row already rechecked", "playtest_sessions", { ...casePayload({ session: sessionId(38), runId: "run-recheck-self", caseId: "case01" }), rechecked_at: "2026-10-21T00:00:00Z" }, /^42501 /);
+
+  // Rows put in place with the insert triggers off for these statements only:
+  // two ranked runs, one already marked by the trigger, and the first run's final case row.
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    for (const [runId, caseId, suspicion] of [
+      ["run-recheck-1", "season-final", ["time-over-gap"]],
+      ["run-recheck-1", "final", null],
+      ["run-recheck-2", "season-final", ["rank-off-score"]],
+    ]) {
+      await db.query(
+        `insert into public.playtest_sessions (session_id, run_id, session_code, player_name, case_id, case_title, summary, suspicion)
+         values ('grants-check-recheck', $1, 'RECHECK', '익명 분석관', $2, 'SEASON 01 COMPLETE', '{"seasonComplete": true, "burstScore": 70, "rank": "B"}'::jsonb, $3)`,
+        [runId, caseId, suspicion],
+      );
+    }
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  const marksOf = async (runId, caseId = "season-final") =>
+    (await one(`select suspicion from public.playtest_sessions where run_id = $1 and case_id = $2`, [runId, caseId]))?.suspicion ?? null;
+  const setMarks = async (label, marks, expected) => {
+    const answer = (await allowed(label, "service_role", call("run-recheck-1", marks)))?.rows[0]?.marks ?? null;
+    const stored = await marksOf("run-recheck-1");
+    check(JSON.stringify(answer) === JSON.stringify(expected) && JSON.stringify(stored) === JSON.stringify(expected), `${label}: answered ${JSON.stringify(answer)}, stored ${JSON.stringify(stored)}, expected ${JSON.stringify(expected)}.`);
+  };
+  await setMarks("add score-off-log beside the trigger's mark", ["score-off-log"], ["score-off-log", "time-over-gap"]);
+  await setMarks("state both checker marks", ["window-off-replay", "score-off-log"], ["score-off-log", "time-over-gap", "window-off-replay"]);
+  await setMarks("drop a checker mark the run no longer earns", ["window-off-replay"], ["time-over-gap", "window-off-replay"]);
+  await setMarks("clear the checker marks, keeping the trigger's", [], ["time-over-gap"]);
+  // The chain check's mark (F1 phase 3, S5) is the checker's too: set beside
+  // the others, and dropped like them when a call no longer states it.
+  await setMarks("add the chain check's mark", [CHAIN_MARK, "score-off-log"], [CHAIN_MARK, "score-off-log", "time-over-gap"]);
+  await setMarks("drop the chain check's mark", ["score-off-log"], ["score-off-log", "time-over-gap"]);
+  await setMarks("clear the checker marks again", [], ["time-over-gap"]);
+  await raises("set a chain mark under another name", "service_role", call("run-recheck-1", ["chain-off-logs"]), [], /^22023 /);
+  await raises("set a mark the checker does not own", "service_role", call("run-recheck-1", ["rank-off-score"]), [], /^22023 /);
+  await raises("set marks from null", "service_role", call("run-recheck-1", null), [], /^22023 /);
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap"]), "a refused call changed the ranking row's marks.");
+  const none = (await allowed("set marks on a run with no ranking row", "service_role", call("run-recheck-none", ["score-off-log"])))?.rows[0];
+  check(none && none.marks === null, `a run with no ranking row answered ${JSON.stringify(none)}; expected null.`);
+  check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "setting one run's checker marks changed another run's.");
+  check((await marksOf("run-recheck-1", "final")) === null, "setting a run's checker marks marked its case row; only the ranking row is marked.");
+  // The checker's write (verify-ranking-rows --marks-sql), as the CI job runs
+  // it over the Management API: one statement for every checked run, an empty
+  // list for a run that earns nothing, and a run not checked left out.
+  const write = marksSql([
+    { status: "checked", runId: "run-recheck-1", marks: ["score-off-log"] },
+    { status: "unrecorded", runId: "run-recheck-2", marks: [] },
+    { status: "unverified", runId: "run-recheck-none", marks: [] },
+  ]);
+  const wrote = (await one(write))?.marked_rows;
+  check(Number(wrote) === 2, `the checker's write marked ${wrote} ranking rows; expected the two checked runs.`);
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  // Checked and clean is told from not checked: the time is set only for the
+  // run replayed whole, and a call that does not say so clears it.
+  const recheckedAt = async (runId) => (await one(`select rechecked_at from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.rechecked_at ?? null;
+  check((await recheckedAt("run-recheck-1")) !== null, "the checker's write did not mark run-recheck-1, replayed whole, as rechecked.");
+  check((await recheckedAt("run-recheck-2")) === null, "a run with no replay record was marked as rechecked.");
+  await allowed("state marks without a replay", "service_role", call("run-recheck-1", ["score-off-log"]));
+  check((await recheckedAt("run-recheck-1")) === null, "a call that did not replay the run left its rechecked time standing.");
+  await allowed("mark a window with no replay record", "service_role", call("run-recheck-1", ["window-no-replay"]));
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap", "window-no-replay"]), `window-no-replay left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  check((await one(`select count(*)::int as n from public.playtest_sessions where rechecked_at is not null and case_id <> 'season-final'`))?.n === 0, "a case row carries a rechecked time; only ranking rows are rechecked.");
+  check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "the checker's write took a trigger's mark from a run that earned none of its own.");
+  // The checker's own read (verify-ranking-rows --sql) runs on this schema and
+  // brings each ranked run whole: here the top one, every row of it.
+  const read = (await allowed("run the checker's read", "service_role", rankingRowsSql({ limit: 1 })))?.rows ?? [];
+  const topRun = await one(`select run_id from public.playtest_sessions where case_id = 'season-final' and score is not null order by score desc limit 1`);
+  const runRows = (await one(`select count(*)::int as n from public.playtest_sessions where run_id = $1`, [topRun?.run_id]))?.n;
+  check(
+    read.length > 1 && read.length === runRows && read.every((row) => row.run_id === topRun.run_id && "decision_log" in row && "run_tag" in row) && read.some((row) => row.case_id === "season-final"),
+    `the checker's read of the top ranked run brought ${read.length} rows of ${JSON.stringify([...new Set(read.map((row) => row.run_id))])}; expected the ${runRows} rows of ${topRun?.run_id}.`,
+  );
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-recheck-%'`);
 }
 
 // ---- the hold rate's cut points (20261011000000)
