@@ -1455,8 +1455,8 @@ Still open, on purpose:
     hidden for them, and `rechecked_at` is set only for a run replayed whole,
     so checked-and-clean is told from never checked.
     `.github/workflows/verify-ranking.yml` runs both once a day and by hand;
-    its header says the merge waits for the user (after 11-02), since the
-    migration reaches the live database within a minute of it. What a replay
+    it went live with #216 (merged 2026-10-23), whose migration reached the
+    live database within a minute of the merge. What a replay
     cannot prove: that the player did not read the wall or choose the moment
     of a press.
 

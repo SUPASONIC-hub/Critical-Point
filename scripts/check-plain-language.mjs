@@ -28,7 +28,7 @@
  *    nine ways and 실사 in two meanings, because each case wrote its own
  *    parenthesis. `STANDARD_GLOSS` names the one wording per term, and every
  *    parenthesis that says something else is a warning, not a failure: the copy
- *    is rewritten after the W44 freeze. Their number is held as a ceiling that
+ *    is rewritten in its own pull request. Their number is held as a ceiling that
  *    only comes down (`OFF_STANDARD_CEILING`), so a new case writes the
  *    standard wording. `--glosses` lists every one.
  *
