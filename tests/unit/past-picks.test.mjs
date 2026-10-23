@@ -195,7 +195,7 @@ test("a closed finale writes its season's picks; pressing NEW GAME+ or half a se
   assert.equal(storeSeasonPicks({ final: {} }, { log: [] }).runId, null);
   // Written in unlock, next to the read scenes, from the finale's log.
   const source = readFileSync("src/state/useNewGamePlus.js", "utf8");
-  assert.match(source, /const seen = storeSeasonScenes\(finishedSeason, finale\);\s*if \(seen\) setSeenRecord\(seen\);\s*storeSeasonPicks\(finishedSeason, finale\);/);
+  assert.match(source, /const seen = storeSeasonScenes\(finishedSeason, finale\);\s*if \(seen\) setSeenRecord\(seen\);\s*const picks = storeSeasonPicks\(finishedSeason, finale\);\s*if \(picks\) setPicksRecord\(picks\);/);
 });
 
 test("the picks never reach the judgement: the log is left as it was, and only useNewGamePlus imports the module", () => {

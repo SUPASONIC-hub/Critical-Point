@@ -11,6 +11,7 @@ import {
   getCaseComparison,
   getCaseEcho,
   getCaseRecall,
+  getScenePick,
   getSeasonPage,
   isCaseFirstPage,
   pastSeasonEnding,
@@ -70,7 +71,7 @@ test("the memory is the season before only while this run's finale has not writt
 
 test("only a NEW GAME+ run is handed the season before; every run is handed its number", () => {
   const plain = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: false });
-  assert.deepEqual({ ...plain, before: plain.before.verdict }, { round: 2, rowTitle: "SEASON 02 COMPLETE", before: "ending_seal", veteran: false, results: null, past: null, seen: null });
+  assert.deepEqual({ ...plain, before: plain.before.verdict }, { round: 2, rowTitle: "SEASON 02 COMPLETE", before: "ending_seal", veteran: false, results: null, past: null, seen: null, picks: null });
   const carried = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: true });
   assert.equal(carried.round, 2);
   assert.equal(carried.results, MEMORY);
@@ -167,4 +168,58 @@ test("E-1: a NEW GAME+ page says whether a season before read its scene", () => 
   assert.equal(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: false, read: null }), null);
   const plain = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: false });
   assert.equal(getSeasonPage({ secondSeason: plain, currentCase: "case10", firstPage: false, read: true }), null);
+});
+
+// B-14(1) 「지난 시즌의 당신」: the card the season before picked, on the page of a NEW GAME+ run alone.
+test("B-14(1): a NEW GAME+ page names the card the season before picked, and nothing else changes", async () => {
+  const picks = new Map([["c10_open", "c10_card"]]);
+  const veteran = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: true, picks });
+  assert.equal(veteran.picks, picks);
+  assert.equal(createSecondSeason({ veteran: true, picks: [["c10_open", "c10_card"]] }).picks, null, "only a Map is carried");
+  assert.equal(createSecondSeason({ veteran: true, picks: new Map() }).picks, null, "a device that kept nothing marks nothing");
+  assert.equal(createSecondSeason({ veteran: false, picks }).picks, null, "a plain season marks nothing");
+  assert.equal(createSecondSeason().picks, null);
+
+  assert.equal(getScenePick(veteran, "c10_open"), "c10_card");
+  assert.equal(getScenePick(veteran, "c10_other"), null);
+  assert.equal(getScenePick(veteran, null), null);
+  assert.equal(getScenePick({ ...veteran, veteran: false }, "c10_open"), null);
+  assert.equal(getScenePick({ veteran: true, picks: new Map([["c10_open", ""]]) }, "c10_open"), null);
+  assert.equal(getScenePick(null, "c10_open"), null);
+
+  // A page with no read and no line still carries the pick; one with both carries both.
+  assert.deepEqual(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: false, picked: "c10_card" }), { echo: null, recall: null, picked: "c10_card" });
+  assert.deepEqual(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: true, read: true, picked: "c10_card" }), {
+    echo: null,
+    recall: getCaseRecall(MEMORY, "case10"),
+    read: true,
+    picked: "c10_card",
+  });
+  assert.equal(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: false, picked: "" }), null);
+  assert.equal(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: false, picked: null }), null);
+  const plain = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: false });
+  assert.equal(getSeasonPage({ secondSeason: plain, currentCase: "case10", firstPage: false, picked: "c10_card" }), null);
+
+  // 설계 ③(c): what the reading clock reads of the page -- its lines and the read -- is the same with the pick and without.
+  for (const [firstPage, read] of [[true, true], [true, false], [false, true], [true, null]]) {
+    const without = getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage, read }) ?? {};
+    const marked = getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage, read, picked: "c10_card" });
+    assert.deepEqual([marked.echo ?? null, marked.recall ?? null, marked.read], [without.echo ?? null, without.recall ?? null, without.read]);
+  }
+});
+
+test("B-14(1): the pick reaches the page through the run's readout, and the clock's lists never read it", async () => {
+  const { readFileSync } = await import("node:fs");
+  const readout = readFileSync("src/state/useRunReadout.js", "utf8");
+  assert.match(readout, /const picked = getScenePick\(secondSeason, nodeId\);/);
+  assert.match(readout, /getSeasonPage\(\{ secondSeason, currentCase, firstPage, opening: seasonLine, read, picked \}\)/);
+  assert.match(readFileSync("src/state/useNewGamePlus.js", "utf8"), /picks: picksBefore\(picksRecord, runId, veteran\),/);
+  // The briefing's clock counts what useWeekRulePanel and useSceneFold hand it (SceneBriefing's getReadingSeconds); neither reads the pick.
+  const panel = readFileSync("src/gauntlet/WeekRulePanel.jsx", "utf8");
+  for (const name of ["useWeekRulePanel", "useSceneFold"]) {
+    const body = panel.slice(panel.indexOf(`export function ${name}(`)).split(/\r?\n}\r?\n/)[0];
+    assert.ok(body.length > 0, name);
+    assert.doesNotMatch(body, /picked|picks/, name);
+  }
+  assert.doesNotMatch(readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8"), /getReadingSeconds\([^)]*picked/);
 });

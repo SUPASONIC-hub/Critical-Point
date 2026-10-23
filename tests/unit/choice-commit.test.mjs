@@ -693,3 +693,28 @@ test("a season ranking row storage would not take is said and logged, and the se
   assert.ok(did.saveStatus.includes("Season ranking save failed: browser storage is unavailable."));
   assert.match(JSON.stringify(getLocalErrorLog()), /Season ranking save failed/);
 });
+
+// B-14(1) 「지난 시즌의 당신」 (설계 ③(a)): the season before's picks ride on
+// the page, never on the commit. The same press with them and without writes
+// the same log entry, case summary and ranking row, to the byte.
+test("the season before's picks change nothing the commit writes", async (t) => {
+  const { createSecondSeason, getScenePick } = await import("../../src/state/secondSeason.js");
+  t.mock.timers.enable({ apis: ["Date"], now: 1_760_000_100_000 });
+  const press = (secondSeason) => {
+    browser.storage.removeItem(SETTLED_WINDOWS_STORAGE_KEY);
+    const base = sceneContext("p1_aftershock");
+    const { context, did } = sceneContext("p1_aftershock", { gauntletRun: { ...base.context.gauntletRun, veteran: true }, secondSeason });
+    mount(context).choose(context.node.choices[1], closedWindow("cash", "unit-past-pick"));
+    assert.equal(did.patches.length, 1);
+    const [patch] = did.patches;
+    return { log: patch.log, summary: patch.caseResults.prologue01, rows: did.rankingRows, cognition: patch.cognition, resources: patch.resources };
+  };
+  const picked = nodes.p1_aftershock.choices[1].id;
+  const marked = createSecondSeason({ veteran: true, picks: new Map([["p1_aftershock", picked]]) });
+  assert.equal(getScenePick(marked, "p1_aftershock"), picked, "the page would mark the very card pressed");
+  const without = press(createSecondSeason({ veteran: true }));
+  const withPicks = press(marked);
+  assert.deepEqual(withPicks, without);
+  assert.equal(JSON.stringify(withPicks), JSON.stringify(without));
+  for (const entry of withPicks.log) assert.equal(Object.keys(entry).some((key) => /pick|past/i.test(key)), false);
+});

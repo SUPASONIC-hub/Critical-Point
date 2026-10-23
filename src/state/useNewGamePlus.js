@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, readNewGamePlusMemory, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY, withEndingBook } from "./newGamePlusCarry.js";
-import { storePastPicks } from "./pastPicks.js";
+import { pastPicks, readPastPicksRecord, storePastPicks } from "./pastPicks.js";
 import { createSecondSeason } from "./secondSeason.js";
 import { pastSeenScenes, readSeenRecord, storeSeenScenes } from "./seenScenes.js";
 
@@ -81,8 +81,7 @@ export function storeSeasonScenes(finishedSeason, { log = null } = {}) {
  * Writes a finished season's picks over the last season's (pastPicks.js,
  * B-14(1) 「지난 시즌의 당신」): the card picked last in each scene of the
  * finale's `log`. Returns the record as it now stands, or null when there is
- * no closed finale or log. Nothing reads it back yet; the board's mark is the
- * next step.
+ * no closed finale or log. A NEW GAME+ run reads it back (`picksBefore`).
  */
 export function storeSeasonPicks(finishedSeason, { log = null } = {}) {
   const final = seasonToRemember(finishedSeason)?.final;
@@ -92,6 +91,11 @@ export function storeSeasonPicks(finishedSeason, { log = null } = {}) {
 /** What a run folds: for a NEW GAME+ run, the scenes the seasons before it read; otherwise null. */
 export function seenBefore(seenRecord, runId, veteran) {
   return veteran === true ? pastSeenScenes(seenRecord, runId) : null;
+}
+
+/** What a run marks (B-14(1)): for a NEW GAME+ run, the cards the season before it picked; otherwise null. */
+export function picksBefore(picksRecord, runId, veteran) {
+  return veteran === true ? pastPicks(picksRecord, runId) : null;
 }
 
 export function useNewGamePlus(saved, runId = null, veteran = false) {
@@ -107,9 +111,19 @@ export function useNewGamePlus(saved, runId = null, veteran = false) {
   // the season number, and for a NEW GAME+ run the last season's cases and ruling.
   // The scenes the seasons before read (seenScenes.js, E-1), which a NEW GAME+ run folds.
   const [seenRecord, setSeenRecord] = useState(readSeenRecord);
+  // The cards the season before picked (pastPicks.js, B-14(1)), which a NEW GAME+ run marks.
+  const [picksRecord, setPicksRecord] = useState(readPastPicksRecord);
   const secondSeason = useMemo(
-    () => createSecondSeason({ record: seasonRecord, memory, runId, veteran, seen: seenBefore(seenRecord, runId, veteran) }),
-    [seasonRecord, memory, runId, veteran, seenRecord],
+    () =>
+      createSecondSeason({
+        record: seasonRecord,
+        memory,
+        runId,
+        veteran,
+        seen: seenBefore(seenRecord, runId, veteran),
+        picks: picksBefore(picksRecord, runId, veteran),
+      }),
+    [seasonRecord, memory, runId, veteran, seenRecord, picksRecord],
   );
 
   function rememberSeason(caseResults) {
@@ -138,7 +152,8 @@ export function useNewGamePlus(saved, runId = null, veteran = false) {
     if (finishedSeason) setSeasonRecord(storeSeasonRecord(finishedSeason, finale));
     const seen = storeSeasonScenes(finishedSeason, finale);
     if (seen) setSeenRecord(seen);
-    storeSeasonPicks(finishedSeason, finale);
+    const picks = storeSeasonPicks(finishedSeason, finale);
+    if (picks) setPicksRecord(picks);
   }
 
   // `readSeasonCarry` and the comparison line are handed out with the rest, so
