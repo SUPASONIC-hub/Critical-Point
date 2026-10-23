@@ -494,7 +494,6 @@ function checkBudget(file, budget) {
 const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
 // 8,928 / 3,231 -> 8,959 / 3,240 on 2026-10-22 (reading-layout, draft),
 // measured 8,959 / 3,236 plus 4: one more file in the list, CaseCast.
-const WORKER_BUDGET = { maxBytes: 8_959, maxGzip: 3_240 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
