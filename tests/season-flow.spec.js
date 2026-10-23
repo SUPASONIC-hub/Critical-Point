@@ -1217,7 +1217,9 @@ test.describe("a phone held upright", () => {
         for (const top of asLanded ? [false, true] : [true]) {
           if (top) await page.evaluate(() => window.scrollTo(0, 0));
           const under = await textUnderMusic(page);
-          expect(under.buttons, `${screen} @ ${size.width}x${size.height}: a music button is on the screen`).toBeGreaterThan(0);
+          // Off the table the pills scroll with the page (문제 3 (1)): a screen
+          // that lands scrolled down may have left them above it.
+          if (top || screen === "table") expect(under.buttons, `${screen} @ ${size.width}x${size.height}: a music button is on the screen`).toBeGreaterThan(0);
           covered.push(...under.found.map((line) => `${screen} @ ${size.width}x${size.height}${top ? "" : ", as it lands"}: ${line}`));
         }
       }
