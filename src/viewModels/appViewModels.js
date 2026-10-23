@@ -163,6 +163,11 @@ export function createResultView(baseView, extras = {}) {
   return createScreenView("result", baseView, extras);
 }
 
+/**
+ * The play view as the bag has it. The runtime builds its view with the far
+ * callback in the scene (playViewModel.js), which keeps that table out of this
+ * module: the intro's view reads it, so it is in the first-paint chunk.
+ */
 export function createPlayView(baseView, extras = {}) {
   return createScreenView("play", baseView, extras);
 }
