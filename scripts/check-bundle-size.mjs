@@ -109,7 +109,9 @@ const budgets = [
   // e2e build, the gzip plus 4; the four additions above, together.
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_405 },
+  // 62,405 -> 62,411 gzip on 2026-10-23: batch B with batch A's notice fix
+  // (d2e31d0a) merged in measured 62,407, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_411 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -537,7 +539,9 @@ const budgets = [
   // were each measured on its own branch's base.
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_072 },
+  // 1,072 -> 1,077 gzip on 2026-10-23: batch B with batch A's fixes merged
+  // measured 1,073 (hash names only), the gzip plus 4.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_077 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
