@@ -21,7 +21,8 @@ export function weeklyRuleLine(now, calendar = WEEKLY_RULES, { first = false } =
       tone: "current",
       kicker: first ? "돌아온 분석관을 위한 이번 주의 규칙" : "이번 주의 규칙",
       label: current.label,
-      text: `${world}${current.text} 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다.${first ? " 첫 시즌은 평소 규칙으로 시작한다." : ""}${after}`,
+      // A first season is not played under the rule, so it is not told it keeps it to the end.
+      text: `${world}${current.text}${first ? " 첫 시즌은 평소 규칙으로 시작한다." : " 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다."}${after}`,
     };
   }
   if (next) {

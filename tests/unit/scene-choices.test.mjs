@@ -75,6 +75,8 @@ test("the reveal reaches the line only through the hook module, which has a chun
   assert.match(reveal, /import \{ useSceneChoiceLine \} from "\.\.\/state\/useSceneChoiceRates\.js";/);
   assert.doesNotMatch(reveal, /sceneChoices\.js/, "a direct import would pull the wording into PlayScreen");
   assert.match(reveal, /data-testid="choice-share"/);
+  // Information, not a warning: not the relic notice's bar.
+  assert.match(reveal, /className="gx-reveal-share" data-testid="choice-share"/);
   const config = readFileSync("vite.config.js", "utf8");
   assert.match(config, /const SCENE_CHOICES = "src\/state\/useSceneChoiceRates\.js";/);
   assert.match(config, /id: path\.resolve\(SCENE_CHOICES\),\s+name: "sceneChoices",/);

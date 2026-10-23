@@ -227,7 +227,10 @@ const fileBudgets = {
   // recovery.css beside the debug jump panel, which is what it is.
   // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
   // (115 lines and 8280 bytes of them that day), the room unchanged.
-  "play.css": { lines: 2925, bytes: 55420 },
+  // 55420 -> 55522 bytes on 2026-10-23, 10-23 묶음 A 합친 상태 실측: E-6's
+  // share line under the reveal took a plain rule of its own (.gx-reveal-share)
+  // in place of the relic notice's warning bar.
+  "play.css": { lines: 2925, bytes: 55522 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

@@ -295,7 +295,7 @@ export function DecisionReveal({ view }) {
         )}
 
         {choiceShare && (
-          <p className="gx-reveal-draft" data-testid="choice-share">
+          <p className="gx-reveal-share" data-testid="choice-share">
             {choiceShare}
           </p>
         )}

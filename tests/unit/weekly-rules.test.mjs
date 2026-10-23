@@ -369,7 +369,12 @@ test("the season count reads the NEW GAME+ record, and before it the unlock or t
   const first = weeklyRuleLine(weekStartMs(EVENT.week) + DAY, undefined, { first: true });
   assert.equal(first.kicker, "돌아온 분석관을 위한 이번 주의 규칙");
   assert.match(first.text, / 첫 시즌은 평소 규칙으로 시작한다\./);
-  assert.equal(weeklyRuleLine(weekStartMs(EVENT.week) + DAY).kicker, "이번 주의 규칙");
+  // Not also told the season keeps the rule to the end: it starts without it.
+  assert.doesNotMatch(first.text, /끝까지 이 규칙으로/);
+  const returning = weeklyRuleLine(weekStartMs(EVENT.week) + DAY);
+  assert.equal(returning.kicker, "이번 주의 규칙");
+  assert.match(returning.text, / 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다\./);
+  assert.doesNotMatch(returning.text, /첫 시즌/);
   const views = read("src/components/WeeklyRuleViews.jsx");
   assert.match(views, /weeklyRuleLine\(now, undefined, \{ first \}\)/);
   assert.match(views, /이번 주의 규칙으로 시작/);
