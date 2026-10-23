@@ -129,7 +129,9 @@ const budgets = [
   // [batch-c] 묶음 B (#277):
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_405 }, // TODO-MEASURE
+  // 62,405 -> 62,411 gzip on 2026-10-23: batch B with batch A's notice fix
+  // (d2e31d0a) merged in measured 62,407, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_411 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -554,10 +556,11 @@ const budgets = [
   // CASE_SEQUENCE.
   // -> 3,786 / 2,180 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (measured
   // 3,786 / 2,176, the gzip plus 4): the notice moved from over the scene's
-  // title to just above the action bar.
-  // -> 3,786 / 2,182 on 2026-10-23, 10-23 묶음 C 합친 상태 실측: measured
-  // 3,786 / 2,178 in the e2e build, the gzip plus 4 (its code did not change).
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_786, maxGzip: 2_182 },
+  // title to just above the action bar. -> 3,970 / 2,289 the same day,
+  // measured 3,970 / 2,285, the gzip plus 4: the bar's top is read when the
+  // notice is drawn (its buttons wrap with the font; at a fixed 96px the
+  // notice covered 밀기 in CI).
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_970, maxGzip: 2_289 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -609,7 +612,9 @@ const budgets = [
   // were each measured on its own branch's base.
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_072 }, // TODO-MEASURE
+  // 1,072 -> 1,077 gzip on 2026-10-23: batch B with batch A's fixes merged
+  // measured 1,073 (hash names only), the gzip plus 4.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_077 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
