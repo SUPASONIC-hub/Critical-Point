@@ -102,7 +102,11 @@ const budgets = [
   // sums; their play-view fields were folded into one (`tableRisk`) first.
   // The raw budget, which neither PR moved alone, goes up by the 505 the two
   // take together.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_705, maxGzip: 34_805 },
+  // 34,805 -> 34,811 gzip on 2026-10-23: main at 5133eaf (#254 on top of
+  // #242 and #248) measured 34,807 in CI's e2e build and failed Verify, so
+  // #254 did not deploy; each PR had passed on its own base. The gzip plus 4.
+  // #249 builds the same chunk byte for byte.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_705, maxGzip: 34_811 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
