@@ -272,7 +272,9 @@ const budgets = [
   // 107,537 / 35,931 in the e2e build (the larger of two builds), the gzip plus 4.
   // -> 107,563 / 35,944 the same day with 묶음 B's 1999ec42 + 2bc9694a merged (edge
   // notice, 안전선 button name): measured 107,563 / 35,940, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_563, maxGzip: 35_944 },
+  // -> 107,602 / 35,960 that evening (운영 확인 고칠 점 4: the C-13 box's 직전 판
+  // line): measured 107,602 / 35,956 (the larger of two builds), the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_602, maxGzip: 35_960 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -350,7 +352,8 @@ const budgets = [
   // 35,697 in the e2e build (the larger of two builds), the gzip plus 4.
   // -> 35,725 the same day with 묶음 B's 1999ec42 merged (the gauge's reading on
   // one line on a phone on its side): measured 35,721, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_725 },
+  // -> 35,741 that evening with the C-13 box's 직전 판 line: measured 35,737, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_741 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.

@@ -122,16 +122,32 @@ export function getHeatStage(threshold) {
 }
 
 /**
- * The line at the head of the next scene, or null on a case's first scene
- * (the log is fresh when a case opens). Picked by the scene, so a reload
- * reads the same line.
+ * What the reaction is about, above it (2026-10-23 evening, fix 4): the line
+ * alone was read as said of this scene, not of the table before it. The
+ * pushes, the heat and the wall the window closed on, as the reveal printed.
+ */
+export function describeLastTable(threshold) {
+  const pushes = Number(threshold?.pushes) || 0;
+  const gauge = Math.floor(Number(threshold?.gauge) || 0);
+  const wall = Number(threshold?.wall) || 0;
+  const tail = wall ? ` (벽 ${wall})` : "";
+  // A bust the clock made (its creep, or the time running out) is no push's.
+  if (threshold?.busted) return `직전 판 · ${threshold.cause === "push" ? `${pushes}번째 밀기에서` : `${pushes}번 밀고`} BUST${tail}`;
+  return pushes ? `직전 판 · ${pushes}번 밀고 열기 ${gauge}에서 확정${tail}` : `직전 판 · 밀지 않고 확정${tail}`;
+}
+
+/**
+ * The line at the head of the next scene with what it is about
+ * ({ recap, line }), or null on a case's first scene (the log is fresh when
+ * a case opens). Picked by the scene, so a reload reads the same line.
  */
 export function getTableReaction(log = [], nodeId = "") {
-  const lines = tableReactions[getHeatStage(log.at(-1)?.threshold)];
+  const threshold = log.at(-1)?.threshold;
+  const lines = tableReactions[getHeatStage(threshold)];
   if (!lines) return null;
   let hash = 0;
   for (const char of String(nodeId)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return lines[hash % lines.length];
+  return { recap: describeLastTable(threshold), line: lines[hash % lines.length] };
 }
 
 /**

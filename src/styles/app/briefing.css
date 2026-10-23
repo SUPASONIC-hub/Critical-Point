@@ -442,6 +442,13 @@
   box-shadow: none;
 }
 
+/* What the line is about, on a line of its own above it. */
+.gx-caption-reaction small {
+  display: block;
+  color: var(--c-ink-muted);
+  font-size: 0.75rem;
+}
+
 /* The line from the scene before (D-7), quieter than the boxes it leads. */
 .gx-bridge {
   margin: 0;
