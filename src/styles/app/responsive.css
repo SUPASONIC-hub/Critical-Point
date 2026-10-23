@@ -77,6 +77,12 @@
   .music-controls span {
     display: none;
   }
+  /* Off the table the pills scroll away with the page instead of riding over
+     the cards and the ending under them (운영화면 문제 3, 2026-10-24 (1)); the
+     table keeps them fixed, its head leaves their corner clear. */
+  .shell:not(.gauntlet-shell) .music-controls {
+    position: absolute;
+  }
   .result-page .topbar,
   .ranking-page .topbar,
   .board-page .topbar {

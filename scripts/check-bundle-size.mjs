@@ -353,7 +353,9 @@ const budgets = [
   // -> 35,725 the same day with 묶음 B's 1999ec42 merged (the gauge's reading on
   // one line on a phone on its side): measured 35,721, the gzip plus 4.
   // -> 35,752 that evening with the C-13 box's 직전 판 line and the balloon's tail under its words: measured 35,748, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_752 },
+  // -> 35,769 on 2026-10-24 with the music pills scrolling off the table on a phone
+  // (운영화면 문제 3 (1)): measured 35,765, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_769 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
