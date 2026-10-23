@@ -99,12 +99,11 @@ export function ProseCaptions({ text = "", who, whoAt = [] }) {
   const groups = captionGroups(text);
   const lines = markLines(groups);
   const seen = useSeenGlosses(text, lines);
-  let first = 0;
-  const spans = groups.map((group) => {
-    const span = [first, first + group.split(/(?<=[.!?])\s+/).length];
-    first = span[1];
-    return span;
-  });
+  // Each box's first sentence and the one after its last, as whoAt counts them.
+  const spans = groups.reduce((list, group) => {
+    const start = list.at(-1)?.[1] ?? 0;
+    return [...list, [start, start + group.split(/(?<=[.!?])\s+/).length]];
+  }, []);
   return lines.map((segments, index) => (
     <p key={index} className="gx-caption" data-who={who && whoAt.some((at) => at >= spans[index][0] && at < spans[index][1]) ? who : undefined}>
       <Marked segments={segments} seen={seen} />

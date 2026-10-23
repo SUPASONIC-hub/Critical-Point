@@ -13,7 +13,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
       skipEndingQuietHold, endingSceneProfile,
     },
     score: {
-      decisionFingerprint, observationLedger, observerPattern, triggerLabels, result,
+      decisionFingerprint, decisionFingerprint: fingerprint, observationLedger, observerPattern, triggerLabels, result,
       caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp,
       counterfactualReport, routeTimeline,
     },
@@ -115,7 +115,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share }}
+            card={{ fingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -231,7 +231,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
               <p>{endingVariant.text}</p>
-              <small>{endingVariant.failure ? view.endingCause.toll : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>{view.seasonComparison && <small data-testid="season-comparison">{view.seasonComparison}</small>}
+              <small>{endingVariant.failure ? view.endingCause.toll : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>{view.seasonCard.comparison && <small data-testid="season-comparison">{view.seasonCard.comparison}</small>}
             </section>
           )}
           {currentCase === "final" && (

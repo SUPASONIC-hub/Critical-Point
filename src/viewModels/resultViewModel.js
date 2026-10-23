@@ -171,8 +171,8 @@ export function createResultViewModel(report, {
     endingPreview,
     aftermath,
     operatorReveal,
-    seasonComparison,
-    seasonCard,
+    // The finale's comparison line rides with the season's card strings: one field of the bag (check:runtime-budget).
+    seasonCard: { ...seasonCard, comparison: seasonComparison },
 
     result,
     caseOutcome,
