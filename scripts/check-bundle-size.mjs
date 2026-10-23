@@ -128,7 +128,13 @@ const budgets = [
   // back on 2026-10-11 for that run, inside this ceiling. The ceiling stays where
   // it was: measured plus 5% would be 46,583 / 14,680, above it, and a budget
   // here does not go up.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_543 },
+  // 14,400 -> 14,543 gzip on 2026-10-22 (#238, the eight epilogues and four
+  // verdicts rewritten: measured 14,539 plus 4). 14,543 -> 14,562 on
+  // 2026-10-23: main at d486f4e (#216's replay record on top of #238)
+  // measured 14,557 in CI's e2e build and failed Verify, so #216 did not
+  // deploy; #216 had been measured before #238 merged. #218 (lucide 1.60,
+  // TriangleAlert for AlertTriangle) measures 14,558 on top. The gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_562 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -153,7 +159,11 @@ const budgets = [
   // plus 5%: the same day's other changes are what they have to hold.
   // The lucide icons the screens import, tree-shaken. 13,711 / 4,900, with the
   // icons the board's states and the recovery controls added.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 14_400, maxGzip: 5_150 },
+  // 14,400 / 5,150 -> 17,600 / 6,150 on 2026-10-21 with lucide-react 1.60,
+  // measured 17,595 / 6,139 and raised by the shortfall only: the same 49
+  // icons, no unused import to drop, but 1.x adds a provider context, alias
+  // class names and a name/size record per icon to the shared code.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_600, maxGzip: 6_150 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as

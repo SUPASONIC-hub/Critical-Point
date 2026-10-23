@@ -1,5 +1,5 @@
 import { useState, useSyncExternalStore } from "react";
-import { CloudDownload, CloudUpload, Copy, Trash2 } from "lucide-react";
+import { CloudDownload, CloudUpload, Copy, Trash } from "lucide-react";
 
 import {
   applyCloudSave,
@@ -193,7 +193,7 @@ export function CloudSavePanelBody() {
           )}
           {!enabled && code && (
             <button type="button" className="ghost cloud-save-now" onClick={removeRemote} disabled={busy} data-testid="cloud-save-delete">
-              <Trash2 size={15} aria-hidden="true" />
+              <Trash size={15} aria-hidden="true" />
               온라인에 올린 기록 지우기
             </button>
           )}

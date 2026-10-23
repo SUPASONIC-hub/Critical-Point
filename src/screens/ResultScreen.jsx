@@ -1,4 +1,4 @@
-import { AlertTriangle, ChevronRight, Download, FileText, Link2, RefreshCcw, Trophy } from "lucide-react";
+import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleAlert, Trophy } from "lucide-react";
 import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import * as endingCopy from "../endingCopy.js";
@@ -147,7 +147,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   aria-controls={showErrorLog ? "error-log-panel" : undefined}
                   onClick={() => setShowErrorLog(true)}
                 >
-                  <AlertTriangle size={16} />
+                  <TriangleAlert size={16} />
                   에러 로그
                 </button>
               )}
