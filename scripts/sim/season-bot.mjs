@@ -161,7 +161,7 @@ export const LINK_VALUES = (() => {
 /**
  * The week's stamp a season or a case of the measurements opens with: AUDIT_WEEK
  * and CASCADE_WEEK together play the test week that has both (`audit-cascade`,
- * 2026-W44), either alone its own week. `cascade` false leaves the links out
+ * 2026-W47), either alone its own week. `cascade` false leaves the links out
  * (a case player that does not carry them).
  */
 const weekStamp = (story, cascade = true) => {

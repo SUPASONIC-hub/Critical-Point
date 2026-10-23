@@ -15,15 +15,18 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * it has one. 초안: the first week is a placeholder for the choice in the
  * report.
  *
- * 2026-W44 is B3's and B2's test week, both devices together (user,
- * 2026-10-21): merged on the Wednesday before it, so it is announced five days
- * ahead (`notice: 5`), from the moment it is merged (the start screen's
- * "다음 주의 규칙" reads the week after this one). Listed after W46 so the
- * first entry, which the tests and the e2e play as "the event", stays W46.
+ * 2026-W47 (11-16 to 11-22) is B3's and B2's test week, both devices
+ * together. It was W44 (user, 2026-10-21, told five days ahead); on
+ * 2026-10-22 the user moved it three weeks on, so the improvements waiting in
+ * drafts are live first and the test is played on top of them. W44 is an
+ * ordinary week again. Moved, it keeps the ordinary notice: the start screen
+ * says it from W46 (11-09), beside W46's own rule (WeeklyRuleViews.jsx).
+ * Listed after W46 so the first entry, which the tests and the e2e play as
+ * "the event", stays W46.
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
-  Object.freeze({ week: "2026-W44", id: "audit-cascade", added: "2026-10-21", notice: 5 }),
+  Object.freeze({ week: "2026-W47", id: "audit-cascade", added: "2026-10-22" }),
 ]);
 
 /**

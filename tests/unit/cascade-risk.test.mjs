@@ -66,7 +66,7 @@ test("no table counts links outside a cascade week's season, and the engine deal
   assert.equal(isCascadeOn(normalizeRunState({ weekRule: "near-wall" })), false);
   assert.equal(isCascadeOn(normalizeRunState({ ...WEEK, story: true })), false, "never in story mode");
   assert.equal(isCascadeOn(openCaseRun(normalizeRunState(WEEK), { replayOf: {} })), false, "never in a case played again");
-  assert.deepEqual(WEEKLY_RULES.filter((entry) => weekRuleHasDevice(entry.id, "cascade")).map((entry) => entry.week), ["2026-W44"], "no week of the calendar has it but the test week");
+  assert.deepEqual(WEEKLY_RULES.filter((entry) => weekRuleHasDevice(entry.id, "cascade")).map((entry) => entry.week), ["2026-W47"], "no week of the calendar has it but the test week");
   const { log } = playCase([[heavy, cash("a")], [light, cash("b")], [light, cash("c")], [light, cash("d")], [light, cash("e")], [light, cash("f")]], { on: false });
   assert.equal(readLinks(normalizeRunState({}), log, "run-1"), null);
   assert.equal(isLinkDue(normalizeRunState({}), log, "run-1"), false);

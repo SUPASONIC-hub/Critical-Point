@@ -1,6 +1,7 @@
 name: Test Week
 
-# 2026-W44 is B3's and B2's test week: the audit and the links on one table
+# 2026-W47 (11-16 to 11-22; moved from W44 on 2026-10-22) is B3's and B2's
+# test week: the audit and the links on one table
 # (`audit-cascade`, src/gauntlet/weeklyCalendar.js). Once a day this reads that
 # week's seasons off the live database and writes what they did to the run's
 # Job Summary, in the names the simulation measured them by
@@ -20,7 +21,7 @@ on:
       week:
         description: "The week to read (a key of the calendar)"
         required: false
-        default: "2026-W44"
+        default: "2026-W47"
       rule:
         description: "Its rule id"
         required: false
@@ -43,7 +44,7 @@ jobs:
     env:
       # Not a secret: it is the host name in the site's own connect-src.
       SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
-      TEST_WEEK: ${{ inputs.week || '2026-W44' }}
+      TEST_WEEK: ${{ inputs.week || '2026-W47' }}
       TEST_WEEK_RULE: ${{ inputs.rule || 'audit-cascade' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

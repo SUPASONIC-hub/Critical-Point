@@ -117,6 +117,24 @@ test("weekly rule notice: the week before says what is coming, and deals nothing
   expect((await saveAndLeave(page))?.weekRule).toBeNull();
 });
 
+test("weekly rule moved (10-22): W44 is an ordinary week, and W46 tells of W47 on its own line", async ({ page }) => {
+  test.setTimeout(60_000);
+  // Wednesday of W44 (2026-10-28): no rule, and no notice either (W45 has none).
+  await setWeeklyClock(page, weekStartMs("2026-W44") + 2 * DAY + 3 * 60 * 60 * 1000);
+  await page.goto("/");
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  await expect(page.getByTestId("weekly-rule-line")).toHaveCount(0);
+  await expect(page.getByTestId("weekly-rule-off")).toHaveCount(0);
+
+  // The event week, W46: its own rule, and the test week after it.
+  await page.evaluate(() => localStorage.clear());
+  await setWeeklyClock(page, IN_EVENT_WEEK);
+  await page.goto("/");
+  const line = page.getByTestId("weekly-rule-line");
+  await expect(line).toContainText("NEAR WALL");
+  await expect(line).toContainText("다음 주의 규칙은 AUDIT & CASCADE");
+});
+
 test("weekly rule ranking: two boards in an event week, each asked of the server by its week", async ({ page }) => {
   const asked = [];
   const row = (tag, score, week) => ({

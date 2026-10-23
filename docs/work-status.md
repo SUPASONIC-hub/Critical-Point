@@ -125,8 +125,15 @@ Still open, on purpose:
   tables with `LINK_CARRY_MAX` 1 (collapse 21.0%, scout margin 6 loss 24.2%,
   every criterion met), and the season bot's chip-reading hand keeps
   `CHIP_MARGIN` 10 (4 of 7 archetypes at or above plain, short of 5; left to
-  play feedback). RULES_MARK 3 and the ranking reset are decided after W44's
-  data, in a later pull request.
+  play feedback). RULES_MARK 3 and the ranking reset are decided after the
+  test week's data, in a later pull request.
+- 2026-10-22: the user moved the test week from W44 to 2026-W47 (11-16 to
+  11-22), so the drafts' improvements are live first and the test is played
+  on top of them; W44 is an ordinary week and W46's near wall stays. The
+  client's calendar, migration 20261022010000 (W44's row out, W47's in), the
+  `Test Week` workflow's default week and the README move together; W47 is
+  told on W46's own start line, the ordinary week's notice. The ruling moves
+  to 2026-11-23.
 - Drop-off report (E-4(a), 2026-10-22): the `Funnel` workflow reads every
   run's case rows once a week (Sunday 22:10 KST, one read-only SELECT,
   `scripts/report-funnel.mjs`) and writes how far runs got, the breaks

@@ -260,7 +260,12 @@ const budgets = [
   // cash on a CASCADE board is not counted by the audit (B2 decision 10).
   // Measured 2,104 / 1,175, the gzip plus 4.
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_104, maxGzip: 1_179 },
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
+  // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
+  // moved to W47 right after W46's NEAR WALL: this week's line says the next
+  // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
+  // weeklyRules chunk above stays as it was). Measured 1,796 / 962, the gzip
+  // plus 4.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_796, maxGzip: 966 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.

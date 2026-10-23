@@ -104,7 +104,7 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     text: CASCADE_LINE,
     rules: Object.freeze(["cascade"]),
   }),
-  // The test week of 2026-W44 (user, 2026-10-21): both devices at once, told
+  // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22): both devices at once, told
   // in the two weeks' own lines and one that ties them: a cash on a CASCADE
   // board is not counted by the audit (B2 decision 10, auditRisk.js), so the
   // ranking of that week is the one table B3 and B2 will be judged on.

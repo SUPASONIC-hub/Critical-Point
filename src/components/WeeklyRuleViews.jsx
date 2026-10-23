@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { nextWeekRuleAt, weekRuleAt } from "../gauntlet/weeklyRules.js";
+import { weeklyRuleLine } from "../gauntlet/weeklyRuleLine.js";
+import { weekRuleAt } from "../gauntlet/weeklyRules.js";
 import { selectLeaderboardWeek, useLeaderboardWeek } from "../state/useLeaderboard.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
 
@@ -10,29 +11,17 @@ import { weeklyRuleNow } from "../state/weeklyClock.js";
  */
 
 /**
- * The start screen's line: this week's rule, or the next week's as notice,
- * or nothing. Read off the weekly clock, which every test build holds on a
- * week without either (state/weeklyClock.js), so the intro the baselines
+ * The start screen's line (gauntlet/weeklyRuleLine.js): this week's
+ * rule, with the next week's after it when both have one, or the next week's
+ * as notice, or nothing. Read off the weekly clock, which every test build
+ * holds on a week without either (state/weeklyClock.js), so the intro the baselines
  * recorded has no such line.
  *
  * A season started this week keeps the rule to its end, and its
  * ranking is the week's own (설계안 2-2, 2-3).
  */
 export function getWeeklyRuleLine(now = weeklyRuleNow()) {
-  const current = weekRuleAt(now);
-  if (current) {
-    return {
-      tone: "current",
-      kicker: "이번 주의 규칙",
-      label: current.label,
-      text: `${current.text} 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다.`,
-    };
-  }
-  const next = nextWeekRuleAt(now);
-  if (next) {
-    return { tone: "next", kicker: "다음 주의 규칙", label: next.label, text: `${next.title}. 월요일 0시부터.` };
-  }
-  return null;
+  return weeklyRuleLine(now);
 }
 
 /**

@@ -31,6 +31,7 @@
     "src/gauntlet/useRelicTable.js": 73,
     "src/gauntlet/useTableKeys.js": 93,
     "src/gauntlet/weeklyCalendar.js": 100,
+    "src/gauntlet/weeklyRuleLine.js": 100,
     "src/gauntlet/weeklyRules.js": 100,
     "src/judgementHabit.js": 100,
     "src/logicReport.js": 100,
