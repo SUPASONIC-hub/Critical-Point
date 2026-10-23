@@ -64,7 +64,9 @@ const budgets = [
   // resume card's 지난 이야기 (D-9; the view field folded into `savedStory`,
   // its code cut to two lines first) and the reading clock's asked-once flag
   // in the comfort settings (A-11). The question itself is a chunk of its own.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_097, maxGzip: 61_486 },
+  // On main's 61,308 (#216) this came to 170,124 / 61,480 on 2026-10-23,
+  // rebased on 2c7b535: 170,124 / 61,484.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_124, maxGzip: 61_484 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -124,7 +126,9 @@ const budgets = [
   // held-until-asked start and the reveal's story line under the verdict
   // (A-11, D-1), after the question's panel went to ReadingClockAsk and the
   // introduction panel left the grid's row arithmetic (D-6).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_815, maxGzip: 34_876 },
+  // On main's 104,745 / 34,822 (#216) this came to 104,827 / 34,871 on
+  // 2026-10-23, rebased on 2c7b535: 104,827 / 34,875.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_827, maxGzip: 34_875 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -437,7 +441,9 @@ function checkBudget(file, budget) {
 // 8,928 / 3,231 -> 8,966 / 3,246 on 2026-10-22 (story-first10, #241, draft):
 // one more file, the reading clock's question (ReadingClockAsk), measured
 // 8,966 / 3,242 plus 4.
-const WORKER_BUDGET = { maxBytes: 9_000, maxGzip: 3_263 };
+// On main's 8,962 / 3,248 (#216, the trail's chunk) both files together
+// measured 9,000 / 3,258 on 2026-10-23, rebased on 2c7b535: 9,000 / 3,262.
+const WORKER_BUDGET = { maxBytes: 9_000, maxGzip: 3_262 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
