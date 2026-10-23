@@ -36,7 +36,7 @@ const finalCaseNodes = {
         label: "내 로그가 사건 설계에 어떻게 쓰였는지 추적한다",
         effect: { time: -10, legitimacy: 9, humanCost: 2, fatigue: 4 },
         voice: "내가 남긴 기록이 어디로 갔는지부터 따라간다.",
-        echo: "당신의 경로를 따라가면 설계가 보입니다. 그 경로를 따라간 기록도 함께 남습니다.",
+        echo: "당신의 경로를 따라가니 설계가 보입니다. 그 경로를 따라간 기록도 함께 남습니다.",
         cognition: { inference: 3, persistence: 1 },
       },
       {
@@ -98,7 +98,7 @@ const finalCaseNodes = {
         label: "기록을 봉인해 악용될 문부터 닫자고 한다",
         effect: { time: -12, legitimacy: 3, humanCost: -4, fatigue: 4 },
         voice: "쓸 수 있는 도구를 내려놓더라도, 악용될 문을 닫자고 한다.",
-        echo: "기록을 봉인하면 악용 가능성은 줄어듭니다. 동시에 이 지식으로 해결할 수 있는 사건들도 닫힙니다.",
+        echo: "기록을 봉인하자 악용 가능성은 줄어듭니다. 동시에 이 지식으로 해결할 수 있는 사건들도 닫힙니다.",
         cognition: { risk: 2, persistence: 1 },
       },
       {
@@ -183,7 +183,7 @@ const finalCaseNodes = {
         label: "서명란을 내 이름 하나로 닫고 폴더를 봉인한다",
         effect: { legitimacy: 6, trust: -4, humanCost: 5, fatigue: 2 },
         voice: "더는 아무도 이 칸을 쓰지 못하게, 내 이름 하나로 닫고 폴더를 봉인한다.",
-        echo: "봉인하면 B2 단말은 오늘 밤 멈춥니다. 제주의 선우진이 돌려 달라던 기록도 같은 상자에 잠깁니다.",
+        echo: "봉인하자 B2 단말은 오늘 밤 멈춥니다. 제주의 선우진이 돌려 달라던 기록도 같은 상자에 잠깁니다.",
         cognition: { risk: 2 },
       },
       {
@@ -191,7 +191,7 @@ const finalCaseNodes = {
         label: "비운 사람을 모두 적고 칸을 비울 수 없게 한다",
         effect: { trust: 9, legitimacy: 6, humanCost: -5, fatigue: 4 },
         voice: "이름이 칸 밖으로 넘치면 칸을 넓히면 된다며, 비운 사람을 모두 적고 규칙을 붙인다.",
-        echo: "규칙을 붙이면 서식 7호의 관리자 칸은 비워 둘 수 없게 됩니다. 그 칸에 처음 들어갈 이름은 아직 아무도 정하지 않았습니다.",
+        echo: "규칙을 붙이자 서식 7호의 관리자 칸은 비워 둘 수 없게 됩니다. 그 칸에 처음 들어갈 이름은 아직 아무도 정하지 않았습니다.",
         cognition: { reframing: 3 },
       },
       {
@@ -199,7 +199,7 @@ const finalCaseNodes = {
         label: "칸이 있는 서식째 밖으로 넘긴다",
         effect: { legitimacy: 8, trust: 3, fatigue: 5 },
         voice: "이 칸을 안에서 닫을 수 없다며, 서식 7호를 통째로 반재욱의 봉투에 넣는다.",
-        echo: "넘기면 반재욱이 봉투를 봉합니다. 13명의 이름은 기자들이 먼저 읽습니다.",
+        echo: "넘기자 반재욱이 봉투를 봉합니다. 13명의 이름은 기자들이 먼저 읽습니다.",
         cognition: { persistence: 2, risk: 1 },
       },
       {
@@ -252,7 +252,7 @@ export const finalCase = {
           label: "모든 데이터를 태워 누구도 다시 이용하지 못하게 한다",
           effect: { legitimacy: 8, trust: -6, humanCost: 4, fatigue: 5 },
           voice: "누구도 다시 이용하지 못하도록, 모든 데이터를 태운다.",
-          echo: "태우면 악용은 끝납니다. 피해를 증명할 유일한 자료도 같은 불에 들어갑니다.",
+          echo: "태우자 악용은 끝납니다. 피해를 증명할 유일한 자료도 같은 불에 들어갑니다.",
           next: "final_result",
           cognition: { risk: 2 },
         },
@@ -274,7 +274,7 @@ export const finalCase = {
           label: "선우진과 1기 세 사람에게 복제된 문장부터 알린다",
           effect: { trust: 9, legitimacy: 6, capital: -4, time: -6, fatigue: 6 },
           voice: "자기 말이 어디에 놓였는지는 본인이 먼저 알아야 한다며, 선우진과 1기 세 사람에게 복제된 문장부터 알린다.",
-          echo: "먼저 알리면 실험은 흔들리고, 네 사람은 열람본에 없던 장을 처음 갖게 됩니다.",
+          echo: "먼저 알리자 실험은 흔들리고, 네 사람은 열람본에 없던 장을 처음 갖게 됩니다.",
         },
         {
           label: "복제된 문장을 모두 증거로 수집한다",
@@ -316,7 +316,7 @@ export const finalCase = {
           label: "실험 데이터 전부를 폐기 대기열에 올린다",
           effect: { humanCost: -7, legitimacy: -7, trust: -5, capital: -8, time: 5, fatigue: -4 },
           voice: "남아 있는 한 다시 쓰인다며, 실험 데이터 전부를 폐기 대기열에 올린다.",
-          echo: "대기열이 실행되면 피해는 멈추고, 무엇이 있었는지 증명할 방법도 함께 지워집니다.",
+          echo: "대기열이 실행되자 피해는 멈추고, 무엇이 있었는지 증명할 방법도 함께 지워집니다.",
         },
         {
           label: "실험을 이어가되 나를 다음 참가자로 등록한다",
@@ -378,7 +378,7 @@ export const finalCase = {
           effect: { legitimacy: 6, humanCost: -5, trust: -4, capital: -5, fatigue: 8 },
           cognition: { risk: 1 },
           voice: "날이 새기 전에 끝내야 한다며, 내가 혼자 버튼을 누른다.",
-          echo: "혼자 누르면 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.",
+          echo: "혼자 누르자 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.",
         },
         {
           label: "버튼을 숨기고 시스템을 지켜본다",
@@ -408,7 +408,7 @@ export const finalCase = {
           label: "빈칸을 참가자들에게 공개한다",
           effect: { legitimacy: 9, trust: 6, time: -7, capital: -5 },
           voice: "혼자 알고 있기를 그만두고, 그 빈칸을 참가자들에게 공개한다.",
-          echo: "공개하면 실험의 대상이 실험을 읽게 됩니다. 그 순간부터 당신의 기록도 그들의 자료입니다.",
+          echo: "공개하자 실험의 대상이 실험을 읽게 됩니다. 그 순간부터 당신의 기록도 그들의 자료입니다.",
           next: "f_branch_witness_follow",
           cognition: { inference: 2 },
         },
@@ -426,7 +426,7 @@ export const finalCase = {
           label: "기록의 결론만 믿고 넘어간다",
           effect: { time: 6, trust: -7, humanCost: 4, fatigue: -3 },
           voice: "더 파고들지 않기로 하고, 기록의 결론만 믿고 넘어간다.",
-          echo: "결론만 받아들이면 오늘은 끝납니다. 빈칸을 남긴 사람은 당신이 그럴 것을 이미 계산했습니다.",
+          echo: "결론만 받아들이자 오늘은 끝납니다. 빈칸을 남긴 사람은 당신이 그럴 것을 이미 계산했습니다.",
           next: "f_branch_witness_follow",
           cognition: { risk: 2 },
         },
@@ -445,7 +445,7 @@ export const finalCase = {
           label: "모든 참가자에게 열람 권한을 준다",
           effect: { legitimacy: 8, trust: 7, time: -6, capital: -5, fatigue: 3 },
           voice: "열람을 독점하지 않겠다는 듯, 모든 참가자에게 권한을 연다.",
-          echo: "모두가 읽으면 은폐는 불가능해집니다. 동시에 누구도 맥락 없이 읽는 것을 막을 수 없습니다.",
+          echo: "모두가 읽으니 은폐는 불가능해집니다. 동시에 누구도 맥락 없이 읽는 것을 막을 수 없습니다.",
           cognition: { reframing: 1 },
         },
         {
@@ -491,7 +491,7 @@ export const finalCase = {
             label: "내 로그가 바꾼 질문을 모두 공개한다",
             effect: { legitimacy: 10, trust: 5, capital: -3, time: -7, fatigue: 8 },
             voice: "내 로그가 무엇을 바꿨는지 숨기지 않고, 전부 열어 놓는다.",
-            echo: "공개하면 모든 사건의 전제가 흔들립니다. 흔들려야 다시 세울 수 있습니다.",
+            echo: "공개하자 모든 사건의 전제가 흔들립니다. 흔들려야 다시 세울 수 있습니다.",
             cognition: { inference: 2, persistence: 1 },
           },
           {
@@ -520,7 +520,7 @@ export const finalCase = {
             label: "내 로그가 바꾼 질문을 전부 목록으로 공개한다",
             effect: { legitimacy: 9, trust: 5, capital: -4, time: -6, humanCost: -4, fatigue: 7 },
             voice: "내가 바꾼 질문의 목록을 한 장으로 만들어 공개한다.",
-            echo: "목록이 나오면 지나온 사건들이 다시 읽힙니다.",
+            echo: "목록이 나오자 지나온 사건들이 다시 읽힙니다.",
             cognition: { persistence: 2 },
           },
           {
@@ -528,7 +528,7 @@ export const finalCase = {
             label: "복제된 선택지를 원래 참가자에게 돌려주고 삭제 권한까지 넘긴다",
             effect: { trust: 10, legitimacy: 7, capital: -6, humanCost: -5, fatigue: 8 },
             voice: "돌려주는 데서 멈추지 않고, 지울 권한까지 함께 넘긴다.",
-            echo: "삭제 권한이 넘어가면 증거도 함께 사라질 수 있습니다. 그것도 그들의 선택입니다.",
+            echo: "삭제 권한이 넘어가자 증거도 함께 사라질 수 있습니다. 그것도 그들의 선택입니다.",
             cognition: { reframing: 3 },
           },
           {
@@ -536,7 +536,7 @@ export const finalCase = {
             label: "내 로그를 포함한 모든 원본을 다음 참가자에게 넘긴다",
             effect: { legitimacy: 20, trust: 7, humanCost: 3, time: -6, fatigue: 8 },
             voice: "내 질문이 이미 남에게 쓰였으니, 내 로그를 포함한 모든 원본을 다음 참가자에게 넘긴다.",
-            echo: "전부를 넘기면 당신은 판단에서 빠지고, 판단할 사람이 생깁니다.",
+            echo: "전부를 넘기자 당신은 판단에서 빠지고, 판단할 사람이 생깁니다.",
             cognition: { risk: 1, inference: 1 },
           },
         ],
@@ -666,7 +666,7 @@ export const finalCase = {
             label: "실험 구조와 사용 기록을 전부 공개 기록으로 넘긴다",
             effect: { legitimacy: 19, trust: 6, humanCost: 4, time: -5, fatigue: 8 },
             voice: "판단을 남기지 않겠다는 듯, 구조와 사용 기록을 전부 공개 기록으로 넘긴다.",
-            echo: "전부 공개되면 도구는 통제되지 않습니다. 대신 숨겨지지도 않습니다.",
+            echo: "전부 공개되자 도구는 통제되지 않습니다. 대신 숨겨지지도 않습니다.",
             cognition: { risk: 1, inference: 1 },
           },
         ],
@@ -688,7 +688,7 @@ export const finalCase = {
           label: "내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다",
           effect: { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 },
           voice: "다음 참가자가 무엇을 받는지 알아야 해서, 내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다.",
-          echo: "읽고 나면 다음 참가자의 화면을 모른 척할 수 없습니다.",
+          echo: "읽고 나니 다음 참가자의 화면을 모른 척할 수 없습니다.",
           cognition: { inference: 2, persistence: 1 },
         },
         {
@@ -715,7 +715,7 @@ export const finalCase = {
         label: "내가 다시 짠 판이 다음 선택지가 되지 못하게 막는다",
         effect: { legitimacy: 8, trust: 4, capital: -5, time: -6, humanCost: -5, fatigue: 7 },
         voice: "내 판단이 남의 질문이 되는 것을 막겠다고, 복제를 끊는다.",
-        echo: "끊으면 다음 참가자는 자유로워지고, 무엇이 있었는지도 모릅니다.",
+        echo: "끊자 다음 참가자는 자유로워지고, 무엇이 있었는지도 모릅니다.",
         cognition: { persistence: 2 },
       },
       {
@@ -723,7 +723,7 @@ export const finalCase = {
         label: "다시 짠 판은 남기되 바꿀 수 있는 빈칸을 붙인다",
         effect: { trust: 9, legitimacy: 7, capital: -6, fatigue: 8 },
         voice: "다음 사람은 아직 아무것도 고르지 않았으니, 다시 짠 판은 남기되 바꿀 수 있는 빈칸을 붙인다.",
-        echo: "빈칸이 있으면 복제는 상속이 됩니다. 지우는 것보다 오래 남습니다.",
+        echo: "빈칸이 있으니 복제는 상속이 됩니다. 지우는 것보다 오래 남습니다.",
         cognition: { reframing: 3 },
       },
       {
@@ -773,7 +773,7 @@ export const finalCase = {
         label: "내 선택 문장까지 포함해 실험 원본을 폐기 대기열에 올린다",
         effect: { legitimacy: 11, trust: 5, capital: -8, time: -8, humanCost: -4, fatigue: 9 },
         voice: "내 판단 양식을 다음 사람에게 물려주지 않으려고, 내 선택 문장까지 포함해 실험 원본을 폐기 대기열에 올린다.",
-        echo: "대기열이 실행되면 폐기는 악용을 끝내고, 무슨 일이 있었는지도 함께 끝냅니다.",
+        echo: "대기열이 실행되자 폐기는 악용을 끝내고, 무슨 일이 있었는지도 함께 끝냅니다.",
         cognition: { persistence: 2 },
       },
       {
@@ -789,7 +789,7 @@ export const finalCase = {
         label: "모든 원본과 선택 복제 규칙을 공개한다",
         effect: { legitimacy: 13, trust: -4, capital: -7, humanCost: 5, time: -4, fatigue: 7 },
         voice: "복제 규칙까지 포함해, 원본 전부를 밖에 연다.",
-        echo: "규칙이 공개되면 실험은 끝나고, 참가자들의 이름도 함께 열립니다.",
+        echo: "규칙이 공개되자 실험은 끝나고, 참가자들의 이름도 함께 열립니다.",
         cognition: { risk: 1, inference: 2 },
       },
     ],
@@ -823,7 +823,7 @@ export const finalCase = {
       cognition: { persistence: 2 },
       next: "f_route_map",
       voice: "그 밤을 함께한 사람들이 먼저 알아야 한다며, 골목의 밤이 적힌 이 파일부터 동료들에게 공개한다.",
-      echo: "공개하면 골목의 23명이 자기 칸의 '결속 유지 능력 상'을 봅니다. 그 칸은 다음 실험의 교재로도 쓰입니다.",
+      echo: "공개하자 골목의 23명이 자기 칸의 '결속 유지 능력 상'을 봅니다. 그 칸은 다음 실험의 교재로도 쓰입니다.",
     },
     f_start_system: {
       label: "내가 묶은 공개 원칙을 이 폴더 자신에게 먼저 적용하라고 요구한다",
@@ -831,7 +831,7 @@ export const finalCase = {
       cognition: { reframing: 2 },
       next: "f_route_contain",
       voice: "남에게 요구한 원칙이면 여기서도 지켜져야 한다며, 내가 묶은 공개 원칙을 이 폴더 자신에게 먼저 적용하라고 요구한다.",
-      echo: "같은 원칙을 설계자에게 들이대면 실험의 전제가 드러납니다. 관리자 칸의 점이 끝내 답하지 않으면, 그 침묵이 증거가 됩니다.",
+      echo: "같은 원칙을 설계자에게 들이대자 실험의 전제가 드러납니다. 관리자 칸의 점이 끝내 답하지 않으면, 그 침묵이 증거가 됩니다.",
     },
     f_start_name: {
       label: "연필로 적힌 내 이름과 이 파일을 동료들에게 먼저 알린다",
@@ -839,7 +839,7 @@ export const finalCase = {
       cognition: { reframing: 2 },
       next: "f_route_expose",
       voice: "혼자 올라온 걸음을 혼자 끝내지 않으려고, 연필로 적힌 내 이름과 이 파일을 동료들에게 먼저 알린다.",
-      echo: "먼저 알리면 골목의 사람들이 한 시간을 법니다. 그 시간에 여의도 로비로 올지 말지는 그들이 정합니다. 절차상으로는 유출입니다.",
+      echo: "먼저 알리자 골목의 사람들이 한 시간을 법니다. 그 시간에 여의도 로비로 올지 말지는 그들이 정합니다. 절차상으로는 유출입니다.",
     },
   },
   // The line and reply a start card has in one opening alone. A card without
@@ -855,7 +855,7 @@ export const finalCase = {
     },
     f_start_owner_contain: {
       voice: "열쇠를 건넨 사람이 이 파일도 알았는지 들어야 해서, 한서윤에게 먼저 내부 설명을 요구한다.",
-      echo: "안에서 먼저 물으면 관계는 지켜집니다. 답을 기다리는 동안에도 골목의 23명은 계속 적힙니다.",
+      echo: "안에서 먼저 묻자 관계는 지켜집니다. 답을 기다리는 동안에도 골목의 23명은 계속 적힙니다.",
     },
     f_start_system_map: {
       voice: "방금 묶은 폴더의 목차가 관찰 자료 1번이 됐으니, 내 로그가 사건 설계에 어떻게 쓰였는지 추적한다.",
@@ -863,7 +863,7 @@ export const finalCase = {
     },
     f_start_system_expose: {
       voice: "공개 버튼 앞까지 모아 둔 기록이 있으니, 이 폴더까지 얹어 즉시 외부 공개를 준비한다.",
-      echo: "공개하면 '기록 안에서 멈춤'이라는 분류는 틀린 말이 됩니다. 마흔아홉 사건의 사람들도 그 폴더에 실려 함께 나갑니다.",
+      echo: "공개하자 '기록 안에서 멈춤'이라는 분류는 틀린 말이 됩니다. 마흔아홉 사건의 사람들도 그 폴더에 실려 함께 나갑니다.",
     },
     f_start_system_contain: {
       voice: "내 폴더가 왜 관찰 자료가 됐는지 기록으로 남기려고, 한서윤에게 내부 설명을 요구한다.",
@@ -875,11 +875,11 @@ export const finalCase = {
     },
     f_start_name_expose: {
       voice: "연필로 적힌 이름이 굳기 전에 밖에서 먼저 알도록, 즉시 외부 공개를 준비한다.",
-      echo: "공개하면 연필로 적힌 이름은 굳지 못합니다. 대신 '압박 시 즉시 상향 대응'이라는 줄에 사례가 하나 더 붙습니다.",
+      echo: "공개하자 연필로 적힌 이름은 굳지 못합니다. 대신 '압박 시 즉시 상향 대응'이라는 줄에 사례가 하나 더 붙습니다.",
     },
     f_start_name_contain: {
       voice: "혼자 달려와 놓고 또 혼자 정하지 않으려고, 먼저 한서윤에게 내부 설명을 요구한다.",
-      echo: "안에서 먼저 물으면 쪽지가 말한 한 시간이 설명을 듣는 데 쓰입니다. 연필로 적힌 이름은 그동안 지워지지 않습니다.",
+      echo: "안에서 먼저 묻자 쪽지가 말한 한 시간이 설명을 듣는 데 쓰입니다. 연필로 적힌 이름은 그동안 지워지지 않습니다.",
     },
   },
   setting: { place: "트리거랩 기록 보관소 B2", clock: "마지막 밤" },
