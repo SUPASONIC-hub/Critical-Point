@@ -2505,7 +2505,7 @@ const VALIDATOR_PARTS = {
   }
 }
 
-// ---- E-6: the share of a scene's runs that staked each card (20261102050000)
+// ---- E-6: the share of a scene's runs that staked each card (20261027010000)
 //
 // Rows put in place as stored ones (the trigger off, as the beat-table run's
 // are): sixty runs through one scene, thirty on one card, twenty-four on
@@ -2542,7 +2542,7 @@ const VALIDATOR_PARTS = {
     `the scene of sixty runs answers ${JSON.stringify(scene)}; sixty windows, 50 / 40 / 10 percent, and none of the room's, the ranking row's, the runless row's or the unreadable entries.`,
   );
   check(!answer?.[CHOICE_CASE]?.e6_thin, `a scene of 49 runs is in the answer: ${JSON.stringify(answer?.[CHOICE_CASE]?.e6_thin)}.`);
-  check(/'29 18 \* \* \*'/.test(readFileSync(path.join(MIGRATIONS, "20261102050000_scene_choice_rates.sql"), "utf8")), "the choice snapshot is rebuilt once a day (free plan): the cron line changed.");
+  check(/'29 18 \* \* \*'/.test(readFileSync(path.join(MIGRATIONS, "20261027010000_scene_choice_rates.sql"), "utf8")), "the choice snapshot is rebuilt once a day (free plan): the cron line changed.");
   await db.query(`delete from public.playtest_sessions where session_id = $1`, [sessionId(97)]);
   await allowed("rebuild the choice snapshot after the rows are gone", "service_role", `select public.refresh_scene_choice_stats()`);
 }

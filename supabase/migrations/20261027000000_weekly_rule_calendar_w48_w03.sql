@@ -1,8 +1,9 @@
--- E-9 (a): the weekly calendar booked from 2026-W47 to 2027-W03 in one
+-- E-9 (a): the weekly calendar booked from 2026-W48 to 2027-W03 in one
 -- merge, one week in two an event week (사용자 확인 후보). Five more rows in
 -- the server's copy of the calendar, the client's MERGED_WEEKS
--- (src/gauntlet/weeklyCalendar.js); nothing else changes. W47 stays open for
--- a second test week should the 11-02 ruling ask for one.
+-- (src/gauntlet/weeklyCalendar.js); nothing else changes. W47 (11-16 to
+-- 11-22) is the audit and links' test week (20261022010000) and is not
+-- touched: this calendar begins the week after it.
 --
 --   2026-W48 (11-23 ~ 11-29)  heavy-fracture
 --   2026-W50 (12-07 ~ 12-13)  short-clock     (new: clock -8 s, chips x1.25)
@@ -10,8 +11,9 @@
 --   2027-W01 (01-04 ~ 01-10)  heavy-fracture  (2026 has a W53, 12-28 ~ 01-03)
 --   2027-W03 (01-18 ~ 01-24)  short-clock
 --
--- Dated after 11-02 (W44's code freeze; 20261102000000-030000 are other
--- drafts'). Merging applies it within a minute, before the client that knows
+-- Dated the day it is planned to merge, 2026-10-27, after the test week's
+-- move (20261022010000) and the recheck marks (20261023000000). Merging
+-- applies it within a minute, before the client that knows
 -- `short-clock` is deployed; in those minutes no season can carry that stamp
 -- (the deployed catalogue drops an id it does not know) and none of these
 -- weeks has begun, so no run is judged by it. Merge at least seven days

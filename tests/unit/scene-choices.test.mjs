@@ -81,5 +81,5 @@ test("the reveal reaches the line only through the hook module, which has a chun
   assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /pattern: \/\^sceneChoices-/);
   assert.match(readFileSync("src/state/useChoiceCommit.js", "utf8"), /scene: forced \? null : \{ caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice\.id \}/);
   // Once a day, the free plan's compute (D3's wall rate is hourly).
-  assert.match(readFileSync("supabase/migrations/20261102050000_scene_choice_rates.sql", "utf8"), /cron\.schedule\('refresh-scene-choice-stats', '29 18 \* \* \*'/);
+  assert.match(readFileSync("supabase/migrations/20261027010000_scene_choice_rates.sql", "utf8"), /cron\.schedule\('refresh-scene-choice-stats', '29 18 \* \* \*'/);
 });

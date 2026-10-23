@@ -230,8 +230,8 @@ test("SHORT CLOCK moves the board's own clock and chips, on top of what relics a
   assert.deepEqual(weekRuleOverlay("short-clock", BASE_SCHEMA), { seconds: BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS, chipsScale: BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS });
 });
 
-test("the calendar books W47 to 2027-W03 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
-  const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W47");
+test("the calendar books W48 to 2027-W03 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
+  const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W48");
   assert.deepEqual(booked.map(({ week, id }) => [week, id]), [
     ["2026-W48", "heavy-fracture"],
     ["2026-W50", "short-clock"],
@@ -241,7 +241,7 @@ test("the calendar books W47 to 2027-W03 one week in two, the three event rules 
   ]);
   // One week in two: two weeks from one start to the next, across 2026's W53.
   for (let i = 1; i < booked.length; i += 1) assert.equal(weekStartMs(booked[i].week) - weekStartMs(booked[i - 1].week), 14 * DAY, booked[i].week);
-  assert.equal(weekRuleAt(weekStartMs("2026-W47")), null, "W47 is kept open for a second test week (P5)");
+  assert.equal(weekRuleAt(weekStartMs("2026-W47"))?.id, "audit-cascade", "W47 is the audit and links' test week, before the booked weeks");
   assert.equal(weekRuleAt(weekStartMs("2026-W53")), null);
   for (const id of EVENT_RULES) {
     const rule = getWeekRule(id);
@@ -253,7 +253,7 @@ test("the calendar books W47 to 2027-W03 one week in two, the three event rules 
   const panel = read("src/gauntlet/WeekRulePanel.jsx");
   assert.match(panel, /rule\.world &&/);
   assert.match(panel, /text: `\$\{rule\.world\} \$\{rule\.text\}`/);
-  assert.match(read("src/components/WeeklyRuleViews.jsx"), /current\.world/);
+  assert.match(read("src/gauntlet/weeklyRuleLine.js"), /current\.world/);
 });
 
 test("a story case deals the story wall and no week's rule", () => {
@@ -366,8 +366,12 @@ test("the season count reads the NEW GAME+ record, and before it the unlock or t
     assert.equal(finishedSeasons(), seasons, JSON.stringify(storage));
   }
   // The start screen says whom the week is for, and its box takes it up (the e2e plays both).
+  const first = weeklyRuleLine(weekStartMs(EVENT.week) + DAY, undefined, { first: true });
+  assert.equal(first.kicker, "돌아온 분석관을 위한 이번 주의 규칙");
+  assert.match(first.text, / 첫 시즌은 평소 규칙으로 시작한다\./);
+  assert.equal(weeklyRuleLine(weekStartMs(EVENT.week) + DAY).kicker, "이번 주의 규칙");
   const views = read("src/components/WeeklyRuleViews.jsx");
-  assert.match(views, /돌아온 분석관을 위한 이번 주의 규칙/);
+  assert.match(views, /weeklyRuleLine\(now, undefined, \{ first \}\)/);
   assert.match(views, /이번 주의 규칙으로 시작/);
   assert.match(read("src/components/WeeklyRuleNotice.jsx"), /first \? setWeekRuleTakenUp : setWeekRuleTurnedDown/);
   assert.equal(setWeekRuleTakenUp(true), true);
@@ -383,7 +387,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261102040000_weekly_rule_calendar_w47_w03.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261027000000_weekly_rule_calendar_w48_w03.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);
@@ -464,7 +468,7 @@ test("2026-W47, the test week, switches on the audit and the links together, and
   assert.equal(WEEKLY_RULES.find((item) => item.week === "2026-W44"), undefined);
   assert.equal(pickSeasonWeekRule(weekStartMs("2026-W47") + DAY), "audit-cascade");
   assert.equal(pickSeasonWeekRule(weekStartMs("2026-W47") + DAY, { story: true }), null, "story mode is outside every ranking");
-  assert.equal(weekRuleAt(weekStartMs("2026-W48")), null, "the week after has none");
+  assert.equal(weekRuleAt(weekStartMs("2026-W48"))?.id, "heavy-fracture", "the week after is the first booked one (E-9)");
   // Told from W46's Monday, the ordinary week's notice, on W46's own line.
   assert.equal(nextWeekRuleAt(weekStartMs("2026-W46"))?.id, "audit-cascade");
   assert.equal(nextWeekRuleAt(weekStartMs("2026-W46") - 1)?.id, "near-wall", "W45 tells of W46");
@@ -472,7 +476,7 @@ test("2026-W47, the test week, switches on the audit and the links together, and
   assert.equal(line.tone, "current");
   assert.equal(line.label, "NEAR WALL");
   assert.match(line.text, /다음 주의 규칙은 AUDIT & CASCADE\(감사와 연쇄\), 다음 월요일 0시부터\.$/);
-  assert.match(weeklyRuleLine(weekStartMs("2026-W47") + DAY).text, /순위는 따로 쌓인다\.$/, "W47's own line tells of nothing after it");
+  assert.match(weeklyRuleLine(weekStartMs("2026-W47") + DAY).text, /다음 주의 규칙은 HEAVY FRACTURE\(.+\), 다음 월요일 0시부터\.$/, "W47's own line tells of W48's");
 });
 
 test("10-22 to 11-01 (W43, W44): no rule this week and no notice of the next, until W45 tells of W46", () => {
