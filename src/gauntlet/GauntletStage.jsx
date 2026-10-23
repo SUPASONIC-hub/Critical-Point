@@ -611,7 +611,7 @@ export function GauntletStage({
             </span>
             <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
-              aria-label={`안전선까지 밀기 ${safe.pushes}번, 열기 ${Math.round(safe.gauge)}까지`}>안전선 ×{safe.pushes}</button>}
+              aria-label={`안전선 ×${safe.pushes}, 안전선까지 밀기 ${safe.pushes}번, 열기 ${Math.round(safe.gauge)}까지`}>안전선 ×{safe.pushes}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}

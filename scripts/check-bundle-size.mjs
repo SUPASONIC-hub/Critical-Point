@@ -230,7 +230,9 @@ const budgets = [
   // build, the gzip plus 4.
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_129, maxGzip: 35_731 },
+  // The 안전선 button's name now opens with its visible words (axe
+  // label-content-name-mismatch), 2026-10-23: 107,155 / 35,729 measured, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_155, maxGzip: 35_733 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
