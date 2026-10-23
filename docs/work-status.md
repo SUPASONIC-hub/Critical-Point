@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-22 (the state of `main` at `4149ccd`, #239; what changed and when is in `git log`)
+Last updated: 2026-10-23 (the state of `main` at `71f7ad2`, after the day's combined pull requests; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -159,6 +159,67 @@ Still open, on purpose:
   can be turned off (#226), and the play-and-immersion work on the story,
   screens and table (#238 endings and the finale, #241 the first ten
   minutes, #242 the cards of 사건 01-10, #243 the voices that open a case).
+  Later that evening three more merged once the test week had moved: #245
+  (the season-flow walk's per-case budget and a real long press to confirm),
+  #248 (a line toward the 33rd floor at the end of 사건 13-18 and 25-29) and
+  #242; production ran `aa9bd05`.
+- 2026-10-23: with W44 an ordinary week, the drafts held for the 11-02
+  ruling started going in. Five merged by midday: #254 (the test week to
+  W47, migration 20261022010000), #249 (ten exports nothing imports, and the
+  play screen's gzip budget 34,805 -> 34,811), #238 (the eight epilogues and
+  four verdicts rewritten for the 55-case world, six lines that contradicted
+  the canon resolved), #216 (server checks phase 2, item 92; migration
+  20261023000000, the `Verify Ranking` workflow daily at 23:55 KST) and #218
+  (lucide-react 0.577 -> 1.60, the result screen's gzip budget 14,543 ->
+  14,562). Twice that morning `Verify` on `main` went red on a bundle budget
+  that each pull request had met on its own base (#254 on top of #242 and
+  #248: play screen 34,807; #216 on top of #238: result screen 14,557), so
+  those commits did not deploy until #249 and #218 raised the budgets by the
+  measured shortfall. The rule since: just before a merge, the branch is
+  put on the current `main` and its budgets are measured again; a branch
+  behind `main` is not merged as it stands. Production ran `2c7b535`
+  (#218) at midday; #270 (Node 24.20.0 -> 24.22.1, a security release)
+  followed at `5adcbb5`.
+- 2026-10-23, afternoon: at 14:40 the user changed the day's rule to "deploy
+  as much of the day's work as can go live by 18:50". Instead of one draft
+  every fifteen minutes, the ready drafts were merged into three combined
+  pull requests, each put on the current `main` and measured once as a whole
+  (budgets, static checks, e2e) before it merged:
+  - Bundle A, #276: NEW GAME+ (#220), the edge notice that can be turned off
+    (#226, now just above the action bar), the echoes of 사건 01-10 (#262),
+    the first ten minutes (#241), the prologue echoes (#251) and operations
+    measurement (#256: the first-season weekly rule, the calendar W48 to
+    2027-W03 with the new SHORT CLOCK rule, the reading tally and the share
+    of players who picked the same card; migrations 20261023010000 and
+    20261023020000, renumbered to today). During W47 the start screen also
+    names next week's HEAVY FRACTURE.
+  - Bundle B, #277 (merged inside bundle C): the reading layout (#247), prose polish (#250), the first
+    lines of 사건 01-49 as scenes rather than dates (#264, #265, #269, #271,
+    #273, #275), 사건 01's authority (#266: a due diligence the main
+    creditor bank asked for, ending in a recommendation; the decisions belong
+    to 플로우온's CEO, board and lenders), the echoes of 사건 11-49 and the
+    finale (#255, #258, #259, #260, #263), reversals in 사건 29 and 35
+    (#252), far callbacks (#257), table readouts (#246), the voices that open
+    a case (#243), and small fixes: the "one more push" line hidden on a
+    board with no push, the reply line's class, the music button's label
+    width, and the reading clock's ceiling 95 -> 94 seconds.
+  - Bundle C, #279 (A and B inside it; merged 18:23, live 18:46): the second season's folded scenes (#261) and
+    the briefing's speech bubbles as the speaker's own lines with the
+    question in a "your judgement" box (#272).
+  Merged that day: 7 pull requests (#254, #249, #238, #216, #218, #270, #279,
+  the last carrying 26). That night #280 fixed four things the production check
+  found (the balloon's tail over the first letter on Android Chrome, 「펀드 한
+  구좌」, 도윤하's portrait to match the text, a 직전 판 line on the last-table
+  reaction), then cleanup #268, #281 (off the table the music pills scroll with
+  the page on a phone) and these docs. Production runs `71f7ad2`.
+- Drafts still open on 2026-10-23: F1 phase 3 (#233, #240), the ending
+  collection (#274), Vite 8 (#225), and two designs not yet built (e3, and
+  B-14 "you, last season", seven answers all option 1, built the next day).
+  The rules-mark-3 pull request (#224: RULES_MARK 3, the season score as a
+  mean over its cases with the change of view counted over the whole season,
+  ranking reset v10) and personal bests (#253) go out in one deploy on
+  2026-11-30, the start of W49, after the W47 ruling on 11-23 (not in the
+  middle of W48's HEAVY FRACTURE week).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -169,14 +230,15 @@ Still open, on purpose:
 - NEW GAME+ carry-over (checked 2026-10-21, three answers all option 1): the
   scene BUST rates leave out NEW GAME+ rows by the case summary's
   `newGamePlus` and `case_id`, through a redefinition of
-  `refresh_scene_bust_stats` in the rules-mark-3 migration; the NEW GAME+ work
-  branches the day after rules-mark-3 merges and merges before W46 (11-09).
-- Server checks, phase 2 (F1, draft #216, eight answers all option 1): a
-  read-only `npm run verify:ranking` rechecks a run's score from its decision
-  log and marks `score-off-log` / `window-off-replay` in the `suspicion`
-  column through a service_role-only function (still a `.sql.draft`); rows
-  with other table rules are "not checked". The client's replay log follows
-  rules-mark-3 in its own pull request, before W46.
+  `refresh_scene_bust_stats` in the rules-mark-3 migration. The NEW GAME+ work
+  itself (#220) went out ahead of rules-mark-3, in bundle A on 2026-10-23.
+- Server checks, phase 2 (F1, #216, eight answers all option 1) merged on
+  2026-10-23 (item 92): `npm run verify:ranking` rechecks a run's score from
+  its decision log and replays its recorded windows, and the daily `Verify
+  Ranking` workflow marks `score-off-log` / `window-off-replay` /
+  `window-no-replay` in the `suspicion` column through the service-role-only
+  `ranking_set_recheck_marks` (migration 20261023000000); rows with other
+  table rules are "not checked". Phase 3 (S1-S7) stays in drafts.
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
