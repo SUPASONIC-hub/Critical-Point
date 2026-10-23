@@ -137,7 +137,14 @@ const budgets = [
   // check and fit (payloadSchemas.js) and the opening snapshot stamped on a new game.
   // -> 173,724 / 62,701 on 2026-10-24 (#240 f1-s7 on f1-stage3 efba1927, main
   // 5ea63bf under it): measured 173,724 / 62,697 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 173_724, maxGzip: 62_701 },
+  // -> 173,921 / 62,777 on 2026-10-24 (e3-endings moved onto main 90247c0, provisional:
+  // main + the E-3 measured share +197 / +76; remeasured below), E-3 결말
+  // 도감 on the memory panel, a fold whose head (「결말 3/9 · 판결 2/3.」 and
+  // the next season's ending) and hints the runtime writes into the season
+  // record (state/endingBook.js), so the entry carries none of the copy, only
+  // the panel's <details> and getPastRunMemory's `book`. Cut first: a count
+  // line, a next line and a fold head of their own came to +348 / +128.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_921, maxGzip: 62_777 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and

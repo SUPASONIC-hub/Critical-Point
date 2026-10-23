@@ -60,7 +60,7 @@ test("the finale's verdict choice is the last answer to its last question, not t
 
 test("a run is counted once, however often its finale closes, and the last ruling is the latest", () => {
   let record = normalizeSeasonRecord(null);
-  assert.deepEqual(record, { seasons: 0, countedRuns: [], last: null, previous: null });
+  assert.deepEqual(record, { seasons: 0, countedRuns: [], last: null, previous: null, endingsSeen: [], verdictsSeen: [], endingBook: null });
   record = recordFinishedSeason(record, { runId: "run-a", finalSummary: finale(ending("human-record")), finalChoiceId: "ending_reform" });
   assert.equal(record.seasons, 1);
   assert.deepEqual(record.last, { runId: "run-a", endingId: "human-record", endingLabel: "HUMAN RECORD", verdict: "ending_reform", verdictName: "개혁", tableRules: 2, line: "지난 시즌: 개혁 · HUMAN RECORD. NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." });

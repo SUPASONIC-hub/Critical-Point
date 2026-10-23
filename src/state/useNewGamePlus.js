@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, readNewGamePlusMemory, readStoredValue, writeStoredValue } from "../appConfig.js";
-import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY } from "./newGamePlusCarry.js";
-import { readSeasonRecord } from "./seasonRecord.js";
+import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY, withEndingBook } from "./newGamePlusCarry.js";
 import { createSecondSeason } from "./secondSeason.js";
 import { pastSeenScenes, readSeenRecord, storeSeenScenes } from "./seenScenes.js";
 
@@ -43,6 +42,22 @@ export function storeSeasonRecord(finishedSeason, { finalChoiceId = null } = {})
 }
 
 /**
+ * The record as this device has it, with its 결말 도감 lines (endingBook.js)
+ * written back when they are missing or were written by older copy: a record
+ * kept before the book, or before a line changed, shows the book on the next
+ * start screen. A device with no counted season writes nothing.
+ */
+export function refreshSeasonRecord() {
+  const stored = readStoredValue(SEASON_RECORD_KEY, null);
+  const record = normalizeSeasonRecord(stored);
+  if (record.seasons === 0) return record;
+  const refreshed = withEndingBook(record);
+  const written = JSON.stringify(refreshed);
+  if (written !== stored) writeStoredValue(SEASON_RECORD_KEY, written);
+  return refreshed;
+}
+
+/**
  * What the season about to start is handed (`getSeasonCarry`), read from
  * storage at the press: the record, or the NEW GAME+ memory of a device that
  * finished a season before the record was kept. Null before any season ended.
@@ -72,8 +87,9 @@ export function useNewGamePlus(saved, runId = null, veteran = false) {
   );
   const [memory, setMemory] = useState(readNewGamePlusMemory);
   // The season record as this tab last wrote or read it: the intro's memory
-  // panel and continue card, and the finale's comparison line, read it.
-  const [seasonRecord, setSeasonRecord] = useState(readSeasonRecord);
+  // panel and continue card, and the finale's comparison line, read it. Read
+  // once per mount, writing the book's lines back when they are stale.
+  const [seasonRecord, setSeasonRecord] = useState(refreshSeasonRecord);
   // What the second season shows of the one before it (secondSeason.js):
   // the season number, and for a NEW GAME+ run the last season's cases and ruling.
   // The scenes the seasons before read (seenScenes.js, E-1), which a NEW GAME+ run folds.

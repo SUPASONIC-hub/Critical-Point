@@ -470,6 +470,13 @@ export function IntroScreen({ view, renderers = {} }) {
                 {pastRunMemory.round > 1 ? ` · ${pastRunMemory.round}회차` : ""}
               </span>
               <p>{pastRunMemory.text}</p>
+              {/* 결말 도감 (E-3): lines the runtime wrote into the season record. */}
+              {pastRunMemory.book && (
+                <details>
+                  <summary>{pastRunMemory.book.head}</summary>
+                  {pastRunMemory.book.hints.map((hint) => <p key={hint}>{hint}</p>)}
+                </details>
+              )}
             </section>
           )}
           {/* Pre-start prose folds behind closed native <details>. The element

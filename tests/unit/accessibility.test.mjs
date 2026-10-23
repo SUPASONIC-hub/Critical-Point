@@ -296,7 +296,7 @@ test("the intro and the origin profiles carry nothing the page cannot print", as
     }
   }
   // The past-run note is a label and a sentence; the intro prints those two.
-  assert.deepEqual(Object.keys(getPastRunMemory({ case01: { outcomeChoiceId: "c1_public" } })), ["round", "text"]);
+  assert.deepEqual(Object.keys(getPastRunMemory({ case01: { outcomeChoiceId: "c1_public" } })), ["round", "book", "text"]);
   assert.equal(getPastRunMemory({}), null);
   // The shell hands the view model nothing it does not take.
   const params = source("viewModels/introViewModel.js");

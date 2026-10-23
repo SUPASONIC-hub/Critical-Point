@@ -58,7 +58,7 @@ test("the season record is read safely from storage, raw for the start screen an
   for (const broken of ["{", "[1]", "7", "null"]) {
     globalThis.localStorage.setItem(SEASON_RECORD_KEY, broken);
     assert.equal(readStoredSeasonRecord(), null, broken);
-    assert.deepEqual(readSeasonRecord(), { seasons: 0, countedRuns: [], last: null, previous: null }, broken);
+    assert.deepEqual(readSeasonRecord(), { seasons: 0, countedRuns: [], last: null, previous: null, endingsSeen: [], verdictsSeen: [], endingBook: null }, broken);
     assert.equal(getSeasonRound(readStoredSeasonRecord(), "run-a"), 1);
   }
   globalThis.localStorage.setItem(SEASON_RECORD_KEY, JSON.stringify({ seasons: 2, countedRuns: ["run-a", "run-b"] }));

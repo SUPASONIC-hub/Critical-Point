@@ -1,9 +1,10 @@
 /**
- * The season record (NEW GAME+): how many seasons this device finished and how
- * the last two ended, in a device key of its own outside the save, made safe
- * to read. The start screen reads only the season number and the last ending
- * (appConfig.js, advancedSystems.getPastRunMemory), so this reader stays out
- * of the entry chunk; newGamePlusCarry.js writes the record and picks the line.
+ * The season record (NEW GAME+): how many seasons this device finished, how
+ * the last two ended, and which endings and rulings it has seen (E-3 결말 도감,
+ * endingBook.js), in a device key of its own outside the save, made safe to
+ * read. The start screen reads only the season number, the last ending and the
+ * book's stored lines (appConfig.js, advancedSystems.getPastRunMemory), so this
+ * reader stays out of the entry chunk; newGamePlusCarry.js writes the record.
  */
 import { getSeasonRound, readStoredSeasonRecord, SEASON_RECORD_KEY } from "../appConfig.js";
 
@@ -29,7 +30,19 @@ export const VERDICT_NAMES = Object.freeze({
   open: "열린 판결",
 });
 
-const EMPTY_RECORD = Object.freeze({ seasons: 0, countedRuns: Object.freeze([]), last: null, previous: null });
+const EMPTY_RECORD = Object.freeze({
+  seasons: 0,
+  countedRuns: Object.freeze([]),
+  last: null,
+  previous: null,
+  endingsSeen: Object.freeze([]),
+  verdictsSeen: Object.freeze([]),
+  endingBook: null,
+});
+
+/** How many ids a seen list keeps: the book has nine endings and five verdict keys. */
+const SEEN_KEPT = 16;
+const BOOK_HINTS_KEPT = 16;
 
 export function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -52,6 +65,23 @@ export function normalizeLast(value) {
 }
 
 /**
+ * A seen list (E-3 결말 도감) made safe to read, with the endings `last` and
+ * `previous` name added: a record written before the lists existed has seen
+ * at least those two (endingBook.js).
+ */
+function normalizeSeen(value, also) {
+  const listed = Array.isArray(value) ? value.filter((id) => typeof id === "string" && id) : [];
+  return [...new Set([...listed, ...also.filter(Boolean)])].slice(0, SEEN_KEPT);
+}
+
+/** The book's stored lines (endingBook.getEndingBook), or null for anything that is not them. */
+export function normalizeEndingBook(value) {
+  if (!isPlainObject(value) || typeof value.head !== "string" || !value.head) return null;
+  const hints = Array.isArray(value.hints) ? value.hints.filter((line) => typeof line === "string" && line).slice(0, BOOK_HINTS_KEPT) : [];
+  return { head: value.head, hints };
+}
+
+/**
  * The record as stored, or as a string read from storage, made safe to read:
  * an unreadable or missing record is an empty one.
  */
@@ -69,7 +99,17 @@ export function normalizeSeasonRecord(value) {
   const countedRuns = Array.isArray(record.countedRuns)
     ? record.countedRuns.filter((runId) => typeof runId === "string" && runId).slice(-COUNTED_RUNS_KEPT)
     : [];
-  return { seasons, countedRuns, last: normalizeLast(record.last), previous: normalizeLast(record.previous) };
+  const last = normalizeLast(record.last);
+  const previous = normalizeLast(record.previous);
+  return {
+    seasons,
+    countedRuns,
+    last,
+    previous,
+    endingsSeen: normalizeSeen(record.endingsSeen, [last?.endingId, previous?.endingId]),
+    verdictsSeen: normalizeSeen(record.verdictsSeen, [last?.verdict, previous?.verdict]).filter((verdict) => Object.hasOwn(VERDICT_NAMES, verdict)),
+    endingBook: normalizeEndingBook(record.endingBook),
+  };
 }
 
 /** Appends a run to the counted list, keeping the last few. */
