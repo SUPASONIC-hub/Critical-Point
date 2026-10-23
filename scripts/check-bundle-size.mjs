@@ -73,9 +73,11 @@ const budgets = [
   // takes), +31 / +10.
   // -> 170,409 / 61,597 the same evening, measured 170,409 / 61,593: the
   // panel's last sentence on what a NEW GAME+ table is (문구 질문 17).
-  // Stacked on #216 on 2026-10-23: the two deltas summed, measured again
-  // with the whole branch (below).
-  { pattern: /^index-.*\.js$/, maxBytes: 170_409, maxGzip: 61_605 },
+  // -> 170,436 / 61,616 on 2026-10-23, NEW GAME+ (#220) rebased on main
+  // d486f4e (#216, above): measured 170,436 / 61,612 in the e2e build, the
+  // gzip plus 4. The raw 27 over #220 alone is the windowTrail preload entry
+  // #216's raw budget had room for.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_436, maxGzip: 61_616 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -138,9 +140,10 @@ const budgets = [
   // string handed from the play screen through the table to the page.
   // 34,832 -> 34,838 the same day: the chunk's imports name hashed files,
   // and the start screen's change above moved its gzip to 34,833-34,834.
-  // Stacked on #216 (above) on 2026-10-23: the two deltas summed, measured
-  // again with the whole branch (below).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_855 },
+  // 104,745 / 34,822 -> 104,773 / 34,856 on 2026-10-23, NEW GAME+ (#220)
+  // rebased on main d486f4e (#216, above): measured 104,773 / 34,852 in the
+  // e2e build, the gzip plus 4. The raw is #216's plus #220's 28 exactly.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_856 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
