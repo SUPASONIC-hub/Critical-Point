@@ -1373,6 +1373,14 @@
   background: repeating-linear-gradient(135deg, var(--c-gx-felt-card) 0 10px, var(--ui-surface-1) 10px 20px);
 }
 
+/* The stripes say sealed; the row of badges reads on a plain ground over
+   them, so 숫자·믿음·남은 시간 do not look struck through (2026-10-24). */
+.gauntlet-stage .gx-card.is-sealed .gx-card-stats {
+  justify-self: start;
+  background: var(--ui-surface-1);
+  border-radius: var(--radius-pill);
+}
+
 .gauntlet-stage .gx-card.locked-choice {
   border-style: dashed;
 }
