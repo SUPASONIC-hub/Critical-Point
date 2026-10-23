@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-23 (the state of `main` at `⏳`, after the day's combined pull requests; what changed and when is in `git log`)
+Last updated: 2026-10-23 (the state of `main` at `71f7ad2`, after the day's combined pull requests; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -193,7 +193,7 @@ Still open, on purpose:
     of players who picked the same card; migrations 20261023010000 and
     20261023020000, renumbered to today). During W47 the start screen also
     names next week's HEAVY FRACTURE.
-  - Bundle B, #⏳: the reading layout (#247), prose polish (#250), the first
+  - Bundle B, #277 (merged inside bundle C): the reading layout (#247), prose polish (#250), the first
     lines of 사건 01-49 as scenes rather than dates (#264, #265, #269, #271,
     #273, #275), 사건 01's authority (#266: a due diligence the main
     creditor bank asked for, ending in a recommendation; the decisions belong
@@ -203,10 +203,15 @@ Still open, on purpose:
     a case (#243), and small fixes: the "one more push" line hidden on a
     board with no push, the reply line's class, the music button's label
     width, and the reading clock's ceiling 95 -> 94 seconds.
-  - Bundle C, if it makes it: the second season's folded scenes (#261) and
+  - Bundle C, #279 (A and B inside it; merged 18:23, live 18:46): the second season's folded scenes (#261) and
     the briefing's speech bubbles as the speaker's own lines with the
     question in a "your judgement" box (#272).
-  Merged that day: ⏳ pull requests; production runs `⏳`.
+  Merged that day: 7 pull requests (#254, #249, #238, #216, #218, #270, #279,
+  the last carrying 26). That night #280 fixed four things the production check
+  found (the balloon's tail over the first letter on Android Chrome, 「펀드 한
+  구좌」, 도윤하's portrait to match the text, a 직전 판 line on the last-table
+  reaction), then cleanup #268, #281 (off the table the music pills scroll with
+  the page on a phone) and these docs. Production runs `71f7ad2`.
 - Drafts still open on 2026-10-23: F1 phase 3 (#233, #240), the ending
   collection (#274), Vite 8 (#225), and two designs not yet built (e3, and
   B-14 "you, last season", seven answers all option 1, built the next day).
