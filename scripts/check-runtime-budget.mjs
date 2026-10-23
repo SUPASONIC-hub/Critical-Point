@@ -188,8 +188,11 @@ const BUDGETS = {
   // 830 -> 833 on 2026-10-20, measured: B3's audit token on the run signal,
   // its prop and the 확정 button's description (830 before; the token's
   // comment went to auditRisk.js's readAudit).
+  // 833 -> 834 on 2026-10-23 (batch B), measured: the briefing's three lines
+  // from before the scene -- bridge (D-7), reaction (C-13), opening (Q8 (1)) --
+  // handed on, one line, with the table readouts' rows.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 833,
+    lines: 834,
     longestLine: 250,
     importedNames: 68,
     hooks: {},
