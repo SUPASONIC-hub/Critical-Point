@@ -27,18 +27,17 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * 2026-W48 to 2027-W03 (E-9 (a), 사용자 확인 후보): booked in one merge after
  * the test week, one week in two an event week (W48, W50, W52, 2027-W01,
  * 2027-W03; 2026 has a W53), the three event rules in turn. The `added` day
- * is the day the pull request is merged; written as the planned day
- * (2026-10-27), and to be set to the real one if it moves (by 11-16, so W48
- * keeps its seven days).
+ * is the day the pull request is merged: 2026-10-23 (moved up from the
+ * planned 10-27 by the user's choice, 10-23); W48 keeps its seven days.
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
   Object.freeze({ week: "2026-W47", id: "audit-cascade", added: "2026-10-22" }),
-  Object.freeze({ week: "2026-W48", id: "heavy-fracture", added: "2026-10-27" }),
-  Object.freeze({ week: "2026-W50", id: "short-clock", added: "2026-10-27" }),
-  Object.freeze({ week: "2026-W52", id: "near-wall", added: "2026-10-27" }),
-  Object.freeze({ week: "2027-W01", id: "heavy-fracture", added: "2026-10-27" }),
-  Object.freeze({ week: "2027-W03", id: "short-clock", added: "2026-10-27" }),
+  Object.freeze({ week: "2026-W48", id: "heavy-fracture", added: "2026-10-23" }),
+  Object.freeze({ week: "2026-W50", id: "short-clock", added: "2026-10-23" }),
+  Object.freeze({ week: "2026-W52", id: "near-wall", added: "2026-10-23" }),
+  Object.freeze({ week: "2027-W01", id: "heavy-fracture", added: "2026-10-23" }),
+  Object.freeze({ week: "2027-W03", id: "short-clock", added: "2026-10-23" }),
 ]);
 
 /**

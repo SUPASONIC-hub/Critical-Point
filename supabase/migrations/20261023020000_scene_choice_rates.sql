@@ -5,8 +5,9 @@
 -- stored row is touched. `check-grants.mjs` lists `scene_choice_rates` in
 -- CLIENT_FUNCTIONS.anon and `scene_choice_stats` in UPDATE_PROBE.
 --
--- Dated the day it is planned to merge, 2026-10-27, right after this
--- branch's calendar (20261027000000). Merging applies it within a minute;
+-- Dated the day it is merged, 2026-10-23 (renumbered from 20261027 by the
+-- user's choice, 10-23), right after this
+-- branch's calendar (20261023010000). Merging applies it within a minute;
 -- the client that reads it comes with the deploy after, and until a scene
 -- has fifty runs nothing is printed anyway.
 --

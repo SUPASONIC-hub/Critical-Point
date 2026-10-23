@@ -387,7 +387,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261027000000_weekly_rule_calendar_w48_w03.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);

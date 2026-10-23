@@ -11,7 +11,8 @@
 --   2027-W01 (01-04 ~ 01-10)  heavy-fracture  (2026 has a W53, 12-28 ~ 01-03)
 --   2027-W03 (01-18 ~ 01-24)  short-clock
 --
--- Dated the day it is planned to merge, 2026-10-27, after the test week's
+-- Dated the day it is merged, 2026-10-23 (renumbered from 20261027 by the
+-- user's choice, 10-23), after the test week's
 -- move (20261022010000) and the recheck marks (20261023000000). Merging
 -- applies it within a minute, before the client that knows
 -- `short-clock` is deployed; in those minutes no season can carry that stamp
