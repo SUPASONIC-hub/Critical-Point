@@ -289,6 +289,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     runId,
     echo: run.echo,
     secondSeason,
+    nodeId: resolvedNodeId,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
   });

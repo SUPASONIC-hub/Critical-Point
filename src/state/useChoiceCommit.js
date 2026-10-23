@@ -134,7 +134,7 @@ export function useChoiceCommit(context) {
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
     // With the answer to its last question, which the season record counts the ruling by.
-    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null });
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null, log: nextLog });
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;

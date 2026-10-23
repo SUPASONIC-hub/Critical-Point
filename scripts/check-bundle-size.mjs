@@ -85,7 +85,11 @@ const budgets = [
   // seasonViewModels (`title`) instead of the fixed SEASON 01 COMPLETE, from
   // the runtime's secondSeason.rowTitle. Both measured together on 2026-10-23
   // in the e2e build: 170,478 / 61,626, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_478, maxGzip: 61_630 },
+  // -> 170,684 / 61,701 the same day (second-season, draft), measured
+  // 170,684 / 61,697 plus 4: E-1, the comfort panel's switch 읽은 장면 접기
+  // (AccessibilityPanel.jsx) and its setting (accessibilitySettings.js), both
+  // the shell's. The switch's sentence was cut to one line first.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_684, maxGzip: 61_701 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -151,7 +155,10 @@ const budgets = [
   // 104,745 / 34,822 -> 104,773 / 34,856 on 2026-10-23, NEW GAME+ (#220)
   // rebased on main d486f4e (#216, above): measured 104,773 / 34,852 in the
   // e2e build, the gzip plus 4. The raw is #216's plus #220's 28 exactly.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_856 },
+  // -> 104,825 / 34,884 the same day (second-season, draft), measured
+  // 104,825 / 34,880 plus 4: E-1, the briefing prints and times the scene as
+  // told (`told`, `unfold`, `newMark`); the fold itself is WeekRulePanel's.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_825, maxGzip: 34_884 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -334,7 +341,11 @@ const budgets = [
   // 1,271 / 648 -> 1,442 / 722 on 2026-10-22 (second-season, draft), measured
   // 1,442 / 718 plus 4: a NEW GAME+ case's first page also carries the grey
   // line on how the last season closed it (secondSeason.getCaseRecall).
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_442, maxGzip: 722 },
+  // 1,442 / 722 -> 1,838 / 916 on 2026-10-23 (second-season, draft), measured
+  // 1,838 / 912 plus 4: E-1, a NEW GAME+ scene read the season before opens
+  // folded and one none read is marked NEW (useSceneFold), kept out of the
+  // PlayScreen chunk the same way.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_838, maxGzip: 916 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's

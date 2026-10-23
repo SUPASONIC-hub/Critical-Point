@@ -134,14 +134,15 @@ export function isCaseFirstPage(log, currentCase) {
  * memory or the run (useNewGamePlus): the season number, and for a run begun
  * with NEW GAME+ (`veteran`) the season before it.
  */
-export function createSecondSeason({ record = null, memory = null, runId = null, veteran = false } = {}) {
+export function createSecondSeason({ record = null, memory = null, runId = null, veteran = false, seen = null } = {}) {
   const round = getSeasonRound(normalizeSeasonRecord(record), runId, memory);
   // How the season before ended, for any run's card (E-5); the story lines read it only on NEW GAME+.
   const before = pastSeasonEnding(record, runId, memory);
   // The season's row title (seasonViewModels.js, whose chunk is the entry's).
   const rowTitle = `${seasonLabel(round)} COMPLETE`;
-  if (veteran !== true) return { round, rowTitle, before, veteran: false, results: null, past: null };
-  return { round, rowTitle, before, veteran: true, results: pastSeasonResults(memory, runId), past: before };
+  if (veteran !== true) return { round, rowTitle, before, veteran: false, results: null, past: null, seen: null };
+  // `seen`: the scenes the seasons before read (seenScenes.pastSeenScenes, E-1), a Set or null.
+  return { round, rowTitle, before, veteran: true, results: pastSeasonResults(memory, runId), past: before, seen: seen instanceof Set ? seen : null };
 }
 
 /** 「SEASON 02」: the season's number as the card and the telemetry label print it. */
@@ -174,9 +175,21 @@ export function getSeasonCard({ secondSeason, endingLabel = "", weekRuleLabel = 
  * B-14(2) line -- and `recall`, the grey line of E-2. `firstPage` is
  * `isCaseFirstPage`'s answer.
  */
-export function getSeasonPage({ secondSeason, currentCase, firstPage, opening = null }) {
+function getSeasonLines({ secondSeason, currentCase, firstPage, opening }) {
   if (!secondSeason?.veteran || !firstPage) return opening ? { echo: opening, recall: null } : null;
   const echo = opening ?? getCaseEcho(currentCase, secondSeason.past?.verdict);
   const recall = getCaseRecall(secondSeason.results, currentCase);
   return echo || recall ? { echo, recall } : null;
+}
+
+/**
+ * What a NEW GAME+ season's page carries: the first page's lines, and on any
+ * page `read` (E-1, seenScenes.getSceneRead) -- true for a scene a season
+ * before read, which the briefing folds, false for one none did, which it
+ * marks NEW. Null when there is neither.
+ */
+export function getSeasonPage({ secondSeason, currentCase, firstPage, opening = null, read = null }) {
+  const lines = getSeasonLines({ secondSeason, currentCase, firstPage, opening });
+  if (typeof read !== "boolean" || !secondSeason?.veteran) return lines;
+  return { echo: null, recall: null, ...lines, read };
 }

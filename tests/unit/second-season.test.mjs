@@ -68,7 +68,7 @@ test("the memory is the season before only while this run's finale has not writt
 
 test("only a NEW GAME+ run is handed the season before; every run is handed its number", () => {
   const plain = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: false });
-  assert.deepEqual({ ...plain, before: plain.before.verdict }, { round: 2, rowTitle: "SEASON 02 COMPLETE", before: "ending_seal", veteran: false, results: null, past: null });
+  assert.deepEqual({ ...plain, before: plain.before.verdict }, { round: 2, rowTitle: "SEASON 02 COMPLETE", before: "ending_seal", veteran: false, results: null, past: null, seen: null });
   const carried = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: true });
   assert.equal(carried.round, 2);
   assert.equal(carried.results, MEMORY);
@@ -139,4 +139,22 @@ test("E-5: the season's row is titled by its number", async () => {
   assert.equal(createSeasonLeaderboardRow({ caseSummary: {}, title: createSecondSeason({ record: { ...RECORD, seasons: 2 } }).rowTitle }).case_title, "SEASON 03 COMPLETE");
   assert.equal(createSeasonLeaderboardRow({ caseSummary: {} }).case_title, "SEASON 01 COMPLETE");
   assert.equal(createSeasonTelemetryPayload({ caseSummary: {}, title: "SEASON 02 COMPLETE" }).case_title, "SEASON 02 COMPLETE");
+});
+
+test("E-1: a NEW GAME+ page says whether a season before read its scene", () => {
+  const seen = new Set(["c10_open"]);
+  const veteran = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: true, seen });
+  assert.equal(veteran.seen, seen);
+  assert.equal(createSecondSeason({ veteran: true, seen: ["c10_open"] }).seen, null, "only a Set is carried");
+  assert.equal(createSecondSeason({ veteran: false, seen }).seen, null, "a plain season folds nothing");
+  // Any page: the scene's read alone, the first page's lines beside it.
+  assert.deepEqual(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: false, read: true }), { echo: null, recall: null, read: true });
+  assert.deepEqual(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: true, read: false }), {
+    echo: null,
+    recall: getCaseRecall(MEMORY, "case10"),
+    read: false,
+  });
+  assert.equal(getSeasonPage({ secondSeason: veteran, currentCase: "case10", firstPage: false, read: null }), null);
+  const plain = createSecondSeason({ record: RECORD, memory: MEMORY, runId: "second-run", veteran: false });
+  assert.equal(getSeasonPage({ secondSeason: plain, currentCase: "case10", firstPage: false, read: true }), null);
 });

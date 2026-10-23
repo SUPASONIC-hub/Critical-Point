@@ -75,7 +75,8 @@ test("the introduction is read against the briefing's clock, a line counted as a
   // The page that counts them is the page that prints them.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
   // And the week's rule (이번 주의 규칙), whose panel the page prints too.
-  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.node, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules\]\)/);
+  // A scene folded on a NEW GAME+ season (E-1) is counted as it is shown, `told`.
+  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.told, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules\]\)/);
   assert.match(briefing, /const intro = getBriefingIntro\(node, nodeId, run\);/);
 });
 

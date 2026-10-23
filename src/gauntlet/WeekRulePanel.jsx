@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { getWeekRule } from "./weeklyRules.js";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 /**
  * 이번 주의 규칙 on a case's opening page: a panel of its own under the page's
@@ -48,6 +49,30 @@ export function useWeekRulePanel(id, page = null) {
       </>,
     ];
   }, [id, echo, recall]);
+}
+
+/**
+ * E-1 (state/seenScenes.js): on a NEW GAME+ season, `page.read` is true for a
+ * scene a season before read and false for one none did. A read scene opens
+ * with its story and file folded -- the speaker and the question stay --
+ * unless the player turned 읽은 장면 접기 off (accessibilitySettings.js); the
+ * briefing's clock counts what is shown, and unfolding starts it again on
+ * the whole page. Returns the scene as told, the button that unfolds it (or
+ * null) and the kicker's NEW mark (or null). Here rather than in
+ * SceneBriefing, which is the PlayScreen chunk's, as the lines above are.
+ */
+export function useSceneFold(node, page = null) {
+  const [folded, setFolded] = useState(() => page?.read === true && getAccessibility().foldReadScenes);
+  const told = useMemo(() => (folded ? { ...node, lead: null, text: "", memo: [] } : node), [folded, node]);
+  return [
+    told,
+    folded ? (
+      <button type="button" className="ghost" data-testid="scene-unfold" onClick={() => setFolded(false)}>
+        지난 시즌에 읽은 장면 · 펼치기
+      </button>
+    ) : null,
+    page?.read === false ? <b data-testid="scene-new"> · NEW</b> : null,
+  ];
 }
 
 /** The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own. */

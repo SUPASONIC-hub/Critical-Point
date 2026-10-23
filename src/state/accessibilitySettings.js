@@ -19,6 +19,11 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    (WCAG 2.1.4). Space, Enter and Escape stay.
  *   stillIntro       the intro's ticker, drifting art and blinking wordmark
  *                    stop (WCAG 2.2.2).
+ *   foldReadScenes   읽은 장면 접기 (on unless turned off): on a NEW GAME+
+ *                    season, a scene a season before read opens with its body
+ *                    folded under 「지난 시즌에 읽은 장면 · 펼치기」
+ *                    (SceneBriefing.jsx, state/seenScenes.js), read when the
+ *                    briefing page opens.
  *   storyMode        스토리 모드: the table steps back so the story can be read.
  *                    The wall stands far off, no decision breaks the next
  *                    board, the table clock runs at least twice as slow and a
@@ -38,13 +43,14 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   letterKeys: true,
   stillIntro: false,
   storyMode: false,
+  foldReadScenes: true,
 });
 
 export function normalizeAccessibility(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
-  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
+  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode", "foldReadScenes"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);

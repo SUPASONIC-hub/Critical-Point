@@ -72,6 +72,7 @@
     "src/state/runStorageReset.js": 82,
     "src/state/seasonRecord.js": 100,
     "src/state/secondSeason.js": 100,
+    "src/state/seenScenes.js": 100,
     "src/state/savedRunScope.js": 100,
     "src/state/savedState.js": 85,
     "src/state/sceneFocus.js": 100,
