@@ -39,6 +39,15 @@ list of the files it touched.
 - The table's rules turn on in steps over 프롤로그 01-05 and are all on from
   사건 01 (`src/gauntlet/tableUnlocks.js`); a NEW GAME+ run has them all from
   the first case.
+- NEW GAME+ carries the record and the story, never the table (decision 34,
+  2026-10-19): a device key, `critical-point-season-record-v1`, counts the
+  finished seasons once per run and keeps how the last two ended
+  (`src/state/newGamePlusCarry.js`, `src/state/seasonRecord.js`); the intro
+  shows the season number and the last ending, a NEW GAME+ season opens
+  프롤로그 01 on a line answering the last verdict (the run's `echo`, drawn by
+  `WeekRulePanel.jsx`), the finale compares the two endings, and every case
+  summary of such a season carries `newGamePlus: true`. Same ranking, no
+  server change, no save version.
 - The hand's skill is the logic streak (priority 38). Nothing on the table is
   timed against the heartbeat: the beat key, its ring and its grades left on
   2026-10-10, and both rankings were reset for it on 2026-10-11 (priority 70).
@@ -561,7 +570,8 @@ Still open, on purpose:
     `src/state/runStorageReset.js` is the list: it also clears the session
     trace, the settled-window seeds and the line typed for the next analyst,
     and takes a new telemetry session id; it keeps the settings, the codex,
-    NEW GAME+ (written only from a season that reached the finale), the board
+    NEW GAME+ (written only from a season that reached the finale) and its
+    season record, the board
     name and the online save.
 37. A bust skipping a scene must never be a shortcut. `check:pressure` plays a
     policy that busts every window it can to reach the case's end sooner; it has

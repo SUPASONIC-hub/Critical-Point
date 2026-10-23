@@ -32,6 +32,8 @@ import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
+import { findFinalChoiceEntry } from "../verdictBranch.js";
+import { newGamePlusMark } from "./newGamePlusCarry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
@@ -131,7 +133,8 @@ export function useChoiceCommit(context) {
       appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
-    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary });
+    // With the answer to its last question, which the season record counts the ruling by.
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null });
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
@@ -436,6 +439,9 @@ export function useChoiceCommit(context) {
       // play's story mark as well: playing a story case once more at the table
       // does not make the season one that was played there.
       if (caseResults[currentCase]?.assistStory === true) caseSummary.assistStory = true;
+      // A NEW GAME+ season marks every case (newGamePlusMark): the server keeps
+      // its prologues out of the scene bust rates and replays them on the whole table.
+      Object.assign(caseSummary, newGamePlusMark(nextRun));
       // The ranking publishes the run's final case row, so the finale carries
       // the slowest table clock of the whole season, not only its own.
       if (currentCase === "final") {

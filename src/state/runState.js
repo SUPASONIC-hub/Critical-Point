@@ -241,7 +241,10 @@ export const RUN_FIELDS = {
     save: "echo",
     load: (saved) => normalizeSavedText(saved?.echo) || OPENING_ECHO,
     fresh: () => OPENING_ECHO,
-    newGame: FRESH,
+    // A season begun with NEW GAME+ opens on the line its caller chose from
+    // how the last season ended (newGamePlusCarry.getOpeningEcho); every other
+    // start, and a NEW GAME+ with nothing to carry, on the opening line.
+    newGame: (event) => (event.veteran === true && normalizeSavedText(event.echo).trim()) || OPENING_ECHO,
     openCase: given("echo"),
     jumpToNode: given("echo"),
     reset: FRESH,

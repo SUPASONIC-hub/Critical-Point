@@ -19,12 +19,39 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
 /**
  * The rule as a list of one for the reading clock, and the panel that prints
  * it (null without a rule), both kept while the id is the same.
+ *
+ * `echo` is the line a NEW GAME+ season opens on (newGamePlusCarry.js), given
+ * only on that season's first page (useRunReadout): a panel of its own above
+ * the week's, under a `NEW GAME+` kicker, counted on the same clock. It is
+ * here rather than in SceneBriefing for the same reason the week's rule is:
+ * the PlayScreen chunk had 4 bytes left (scripts/check-bundle-size.mjs).
  */
-export function useWeekRulePanel(id) {
+export function useWeekRulePanel(id, echo = null) {
   return useMemo(() => {
     const rule = getWeekRule(id);
-    return rule ? [[rule], <WeekRulePanel key="week-rule" rules={[rule]} />] : NO_PANEL;
-  }, [id]);
+    if (!rule && !echo) return NO_PANEL;
+    return [
+      [...(echo ? [{ text: echo }] : []), ...(rule ? [rule] : [])],
+      <>
+        {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
+        {rule && <WeekRulePanel key="week-rule" rules={[rule]} />}
+      </>,
+    ];
+  }, [id, echo]);
+}
+
+/** The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own. */
+function SeasonEchoPanel({ echo }) {
+  return (
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="season-echo" style={{ gridArea: "auto" }}>
+      <p className="gx-breach-kicker" lang="en">NEW GAME+</p>
+      <ul>
+        <li className="gx-mutation">
+          <strong style={{ gridColumn: "1 / -1" }}>{echo}</strong>
+        </li>
+      </ul>
+    </div>
+  );
 }
 
 /**

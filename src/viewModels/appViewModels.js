@@ -75,7 +75,7 @@ export const viewGroups = {
       "unopenedRecordCount", "unopenedClueCount", "unopenedBranchCount", "nextParticipantMessage",
       "setNextParticipantMessage", "saveNextParticipantMessage", "endingSceneProfile", "endingVisualClass",
       "endingCause", "endingAtmosphere", "originEndingVariant", "endingEpilogue", "endingPreview",
-      "aftermath", "operatorReveal",
+      "aftermath", "operatorReveal", "seasonComparison",
     ],
     score: [
       "result", "caseOutcome", "resultRank", "momentumTier", "momentumScore", "rankLine", "scoreBreakdown",

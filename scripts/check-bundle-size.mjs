@@ -59,7 +59,25 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
+  // 169,980 / 61,300 -> 170,257 / 61,530 on 2026-10-21, measured 170,257 /
+  // 61,526 in the e2e build, the gzip plus 4: NEW GAME+ on the start screen
+  // (the memory panel's season number and last ending, the continue card's
+  // · N회차). Cut first: the panel's sentence is written into the season record
+  // when the season is counted (newGamePlusCarry.getMemoryLine, the runtime's
+  // chunk), so the entry reads a stored line and the season number
+  // (appConfig.getSeasonRound) and carries neither the sentence's rules nor
+  // the record's reader (state/seasonRecord.js); that took the addition from
+  // 1,082 / 428 to the 663 / 244 over main's 169,594 / 61,282 left here.
+  // -> 170,288 / 61,540 the same day, measured 170,288 / 61,536: the ranking
+  // rows read the NEW GAME+ mark (src/ranking.js, which the shell's board
+  // takes), +31 / +10.
+  // -> 170,409 / 61,597 the same evening, measured 170,409 / 61,593: the
+  // panel's last sentence on what a NEW GAME+ table is (문구 질문 17).
+  // -> 170,436 / 61,616 on 2026-10-23, NEW GAME+ (#220) rebased on main
+  // d486f4e (#216, above): measured 170,436 / 61,612 in the e2e build, the
+  // gzip plus 4. The raw 27 over #220 alone is the windowTrail preload entry
+  // #216's raw budget had room for.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_436, maxGzip: 61_616 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -114,7 +132,18 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 104,705 / 34,805 -> 104,733 / 34,832 on 2026-10-21, measured 104,733 /
+  // 34,828 in the e2e build, the gzip plus 4: the line a NEW GAME+ season
+  // opens on (newGamePlusCarry.js), drawn on 프롤로그 01's first page. Its
+  // panel and the condition it is shown under are elsewhere (WeekRulePanel,
+  // below, and useRunReadout in the runtime's chunk); what stays is the one
+  // string handed from the play screen through the table to the page.
+  // 34,832 -> 34,838 the same day: the chunk's imports name hashed files,
+  // and the start screen's change above moved its gzip to 34,833-34,834.
+  // 104,745 / 34,822 -> 104,773 / 34,856 on 2026-10-23, NEW GAME+ (#220)
+  // rebased on main d486f4e (#216, above): measured 104,773 / 34,852 in the
+  // e2e build, the gzip plus 4. The raw is #216's plus #220's 28 exactly.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_856 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -175,7 +204,9 @@ const budgets = [
   // the rows arrive, and `lang` on the English labels.
   // -> 4,800 / 2,100 on 2026-10-07, measured 4,567 / 2,001 plus 5%: a list
   // with spoken ranks, and a retry when the rows did not come.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_800, maxGzip: 2_100 },
+  // 4,800 -> 4,858 raw on 2026-10-21, measured: the NEW GAME+ tag on this
+  // device's own rows (the gzip, 2,080, stays under its budget).
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_858, maxGzip: 2_100 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -296,7 +327,10 @@ const budgets = [
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // 801 / 515 -> 1,271 / 648 on 2026-10-21, measured 1,271 / 644, the gzip
+  // plus 4: the NEW GAME+ line's panel on the same page, above the week's
+  // rule, kept out of the PlayScreen chunk the same way.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
