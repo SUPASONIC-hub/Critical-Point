@@ -99,8 +99,12 @@ function RuleRows({ rules, resourceMeta }) {
  * Then the case facts. Every scene has carried a `memo` since the graph was
  * written and none of them ever reached the DOM, so the briefing explained the
  * table and never the situation the cards are answering.
+ *
+ * Then the case so far and who is in it (D-8): `caseCast`, from the runtime
+ * (CaseCastFold.jsx), which fetches CaseCast, a chunk of its own, the first
+ * time the fold opens.
  */
-export function CaseFileStory({ node, nodeId, open, standing }) {
+export function CaseFileStory({ node, nodeId, open, standing, caseCast }) {
   return (
     <>
       <p data-testid="brief-standing">{describeStanding(...standing)}</p>
@@ -118,6 +122,7 @@ export function CaseFileStory({ node, nodeId, open, standing }) {
           <ProseItems items={node.memo} />
         </ul>
       )}
+      {open && caseCast?.(node, SpeakerPortrait)}
     </>
   );
 }
@@ -128,6 +133,7 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  bridge = null,
   run,
   tableSeconds,
   cards,
@@ -148,10 +154,11 @@ export function SceneBriefing({
   const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run));
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
-  // same way. `mutations` is exactly the two lists printed below.
+  // same way. `mutations` is exactly the two lists printed below. The line
+  // from the scene before (`bridge`, D-7) is read on it too.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
-    [node, question, mutations, intro, weekRules],
+    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }]),
+    [node, question, mutations, intro, weekRules, bridge],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits.
@@ -221,6 +228,8 @@ export function SceneBriefing({
         onKeyDown={trapTab}
       >
         <header className="gx-comic-top">
+          {/* A phone's picture of the room, behind the title (D-13); briefing.css shows it there only. */}
+          <ScenePlate node={node} nodeId={nodeId} variant="backdrop" />
           <p className="gx-comic-kicker" lang="en">{node.phase}</p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
           <button
@@ -286,6 +295,8 @@ export function SceneBriefing({
           )}
 
           <div className="gx-panel gx-panel-story" style={at("3 / 1")}>
+            {/* Where the last scene left off (D-7): its echo, or the ending of the case before. */}
+            {bridge && <p className="gx-bridge" data-testid="scene-bridge">{bridge}</p>}
             {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
             <ProseCaptions text={node.text} />
           </div>

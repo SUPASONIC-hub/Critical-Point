@@ -748,7 +748,7 @@ test.describe("a phone on its side", () => {
       const question = nodes.c2_trace.question ?? (await page.locator(".gx-question").textContent());
       const cut = await page.locator(".gx-question").evaluate((element) => element.scrollHeight > element.clientHeight + 1);
       expect(cut, "the longest question in the season does not fit two lines here").toBe(true);
-      const fold = page.locator(".gx-brief summary");
+      const fold = page.locator(".gx-brief > summary");
       await expect(fold).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollHeight), "the fold costs the table no height").toBeLessThanOrEqual(size.height + 2);
       expect(await pointerLandsOn(fold), "the fold is not covered").toBe(true);
@@ -840,14 +840,14 @@ test.describe("a phone on its side", () => {
 // The briefing on a phone held upright. Its page is longer than the screen on
 // every scene, and the room's drawing used to keep its whole height at the top
 // of it: on a 360x740 phone the story began under the docked footer, so the
-// first screen was a picture and no words. The picture is what gives way now
-// (briefing.css): cropped to a band while the page is longer than the screen,
-// whole when it is not.
+// first screen was a picture and no words. The picture gave way to a band, and
+// since 2026-10-22 (D-13) it is drawn behind the page's title instead: what is
+// left of its panel is the room's name and clock.
 const measureBriefing = (page) =>
   page.evaluate(() => {
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
     const sheet = document.querySelector(".gx-comic-page");
-    // Short phones (briefing.css, up to 46.25em) dock 판 열기 alone: the footer is
+    // Phones (briefing.css, every one since 2026-10-22) dock 판 열기 alone: the footer is
     // display: contents and has no box of its own, so there the dock is the button.
     const actions = document.querySelector(".gx-comic-actions");
     const dock = getComputedStyle(actions).display === "contents" ? document.querySelector("[data-testid='open-table']") : actions;
@@ -855,6 +855,11 @@ const measureBriefing = (page) =>
     return {
       pictureHeight: Math.round(box(".gx-panel-splash").height),
       drawingHeight: Math.round(box(".gx-panel-splash .gx-plate").height),
+      backdrop: (() => {
+        const drawn = box(".gx-comic-top > .gx-plate-backdrop");
+        const title = box(".gx-comic-top");
+        return { height: Math.round(drawn.height), inside: drawn.top >= title.top - 1 && drawn.bottom <= title.bottom + 1 };
+      })(),
       storyTop: Math.round(box(".gx-panel-story .gx-caption").top),
       lastPanelBottom: Math.round(Math.max(...panels)),
       dockTop: Math.round(dock.getBoundingClientRect().top),
@@ -888,8 +893,10 @@ test.describe("a phone held upright", () => {
       const openButton = page.getByTestId("open-table");
       const atTop = await measureBriefing(page);
       expect(atTop.scrolls, "the page is longer than the screen, and scrolls").toBe(true);
-      expect(atTop.pictureHeight, "the picture is cropped to a band").toBeLessThanOrEqual(atTop.drawingHeight - 30);
-      expect(atTop.pictureHeight, "and is still a picture").toBeGreaterThanOrEqual(80);
+      expect(atTop.drawingHeight, "the room is not drawn in a band of its own").toBe(0);
+      expect(atTop.backdrop.height, "it is drawn behind the title").toBeGreaterThan(40);
+      expect(atTop.backdrop.inside, "and no further down than the title goes").toBe(true);
+      expect(atTop.pictureHeight, "its panel is the room's name and clock").toBeLessThanOrEqual(100);
       expect(atTop.storyTop, "the story begins above the docked footer").toBeLessThan(atTop.dockTop);
       expect(atTop.openBottom, "판 열기 is on screen before any scrolling").toBeLessThanOrEqual(size.height);
       expect(await pointerLandsOn(openButton), "판 열기 is not covered").toBe(true);
@@ -910,12 +917,16 @@ test.describe("a phone held upright", () => {
   }
 
   test("a briefing that fits its screen keeps the whole picture", async ({ page }) => {
-    // The shortest story in the season, on a narrow window tall enough for it.
-    await page.setViewportSize({ width: 700, height: 1400 });
+    // The shortest story in the season, on a window one pixel wider than a
+    // phone: the room is drawn whole in its panel there (a phone draws it
+    // behind the title, D-13).
+    await page.setViewportSize({ width: 701, height: 1400 });
     await openHeldBriefing(page, "case08", "c8_clerks_reaction");
     const fits = await measureBriefing(page);
     expect(fits.scrolls, "the page fits the screen").toBe(false);
+    expect(fits.drawingHeight, "the drawing is in its panel").toBeGreaterThan(80);
     expect(fits.pictureHeight, "the drawing is shown whole").toBeGreaterThanOrEqual(fits.drawingHeight);
+    expect(fits.backdrop.height, "and not behind the title as well").toBe(0);
     expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1400);
   });
 
@@ -1194,7 +1205,8 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
 
   await expect(page.locator(".ending-step-3")).toBeVisible();
   await expect(page.locator(".result-page.final-report-locked")).toHaveCount(0);
-  await expect(page.locator(".result-hero h1")).toBeFocused();
+  // The ending's title, first on the report since 2026-10-22 (D-10); the profile and rank follow the story.
+  await expect(page.locator(".result-page > .outcome-panel h2")).toBeFocused();
   // The sequence's own region: the result card's buttons bring a second one.
   await expect(page.locator(".ending-sequence > [role='status']")).toContainText("기록이 열렸습니다");
   await expect

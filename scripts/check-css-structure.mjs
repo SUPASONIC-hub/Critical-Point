@@ -227,7 +227,9 @@ const fileBudgets = {
   // recovery.css beside the debug jump panel, which is what it is.
   // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
   // (115 lines and 8280 bytes of them that day), the room unchanged.
-  "play.css": { lines: 2925, bytes: 55420 },
+  // 55420 -> 55572 bytes on 2026-10-22 (D-8), measured 2861 / 55572: the
+  // case file's cast cards and its list of the case's scenes so far.
+  "play.css": { lines: 2925, bytes: 55572 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -255,7 +257,17 @@ const fileBudgets = {
   // from under a notch on either side.
   // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
   // (31 lines and 2222 bytes of them that day), the room unchanged.
-  "briefing.css": { lines: 674, bytes: 13078 },
+  // 674 / 13078 -> 652 / 12653 on 2026-10-22 (D-3), measured 646 / 12596,
+  // the room unchanged: the story's zigzag and tilt, the slanted lead, and
+  // the phone's docked footer, which every phone now lays out as the short
+  // screen did (22 lines and 425 bytes).
+  // 652 / 12653 -> 653 / 12696 the same day (D-7), measured: the line from
+  // the scene before, over the briefing's first box.
+  // 653 / 12696 -> 676 / 13060 the same day (D-13), measured: a phone draws
+  // the room behind the page's title, its panel keeps the room's name and
+  // clock, and the speaker's face is 96px. Two lines over the 674 the sheet
+  // held before D-3, 18 bytes under its 13078.
+  "briefing.css": { lines: 676, bytes: 13060 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
@@ -307,7 +319,10 @@ const fileBudgets = {
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
-  "comfort.css": { lines: 124, bytes: 2691 },
+  // 124 / 2691 -> 133 / 3047 on 2026-10-22 (D-5), measured: 이야기 글 크기,
+  // the story's prose at 1.125 or 1.25 times its size. Paid for by D-3 the
+  // same day, which took briefing.css down 22 lines and 425 bytes.
+  "comfort.css": { lines: 133, bytes: 3047 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

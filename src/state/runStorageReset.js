@@ -9,6 +9,7 @@ import {
   SETTLED_WINDOWS_STORAGE_KEY,
   STORAGE_KEY,
 } from "../appConfig.js";
+import { SEEN_GLOSSES_KEY } from "../components/seenGlosses.js";
 import { clearTraceEvents } from "./trace.js";
 import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
 
@@ -18,7 +19,8 @@ import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
  * The save, the kept copy of an unreadable one, the error log, the recovery
  * slots and the local ranking; the seeds of the windows the run settled; the
  * line the player typed for the next analyst; and the random id its telemetry
- * rows were filed under, so the next run starts under a new one. The trace of
+ * rows were filed under, so the next run starts under a new one; and the glossed
+ * words the run has seen explained, so the next one sees them explained. The trace of
  * this tab's last scenes goes too (`clearTraceEvents`, it is in sessionStorage).
  * The last four were left behind while the question asked said "everything".
  *
@@ -42,6 +44,8 @@ export const RESET_STORAGE_KEYS = [
   SETTLED_WINDOWS_STORAGE_KEY,
   NEXT_PARTICIPANT_MESSAGE_KEY,
   SESSION_ID_STORAGE_KEY,
+  // The words this save has seen explained (B-7): a new run explains them again.
+  SEEN_GLOSSES_KEY,
 ];
 
 /**

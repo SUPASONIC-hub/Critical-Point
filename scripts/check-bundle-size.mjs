@@ -60,6 +60,16 @@ const budgets = [
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
   { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
+  // 169,980 / 61,300 -> 170,343 / 61,512 on 2026-10-23 (reading-layout on
+  // main c08be0e), measured 170,343 / 61,508 plus 4 in the e2e build: 이야기
+  // 글 크기 (D-5), its row in the comfort panel and the setting with its
+  // attribute and factor, which <html> carries from the first paint. Cut back
+  // first: the seen-glosses key went to seenGlosses.js (the runtime's), 45
+  // bytes. The row as a chunk of its own (fetched as the panel drew) saved the
+  // shell 91 gzip bytes for a 519-byte file and a longer worker list, and was
+  // put back; one component for both rows of radios came out 44 gzip bytes
+  // longer than the two copies.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_343, maxGzip: 61_512 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -115,6 +125,15 @@ const budgets = [
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 104,705 / 34,811 -> 104,943 / 34,891 on 2026-10-23 (reading-layout on
+  // main c08be0e), measured 104,943 / 34,887 plus 4: the briefing's line
+  // from the scene before (D-7), the room's picture behind the phone's title
+  // (D-13) and the case file's cast on the spine (D-8). Cut back first from
+  // 105,749 / 35,229: the lazy import of the cast, with its preload list of
+  // sixteen files, and the warming of the case's portraits (D-14) moved to the
+  // runtime (CaseCastFold.jsx, useRunReadout.js), and the cast's import takes
+  // no preload list (vite.config.js).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_943, maxGzip: 34_891 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -144,7 +163,11 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
+  // 35,363 -> 35,473 gzip on 2026-10-22 (reading-layout, draft), measured:
+  // D-3 cut the briefing's zigzag and docked footer (raw down), and D-5, D-7,
+  // D-8, D-13 and B-7 added the story's sizes, the bridge, the cast, the
+  // phone's backdrop and the folded gloss.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_473 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -323,6 +346,14 @@ const budgets = [
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
   // 2026-10-21, the gzip plus 4.
   { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_376, maxGzip: 775 },
+  // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
+  // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
+  // time the table's case file opens (src/gauntlet/CaseCastFold.jsx, the
+  // runtime's), because the PlayScreen chunk had no room for it. Measured with
+  // the e2e build, the gzip plus the 4 bytes of hash noise: 2,120 / 1,111 on
+  // 2026-10-22, 1,983 / 1,042 on 2026-10-23 once the table handed it its
+  // SpeakerPortrait instead of the chunk importing it.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 1_983, maxGzip: 1_042 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -420,6 +451,9 @@ function checkBudget(file, budget) {
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
 const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
+// 8,928 / 3,231 -> 8,959 / 3,240 on 2026-10-22 (reading-layout, draft),
+// measured 8,959 / 3,236 plus 4: one more file in the list, CaseCast.
+const WORKER_BUDGET = { maxBytes: 8_959, maxGzip: 3_240 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

@@ -1,3 +1,5 @@
+import { ensureCase, nodeOrders, nodes } from "./gameData.js";
+
 /**
  * Who has a painted portrait, by the name a scene gives as its speaker
  * (`node.speaker`). Moved out of GameRuntime on 2026-10-16: the table grows
@@ -18,8 +20,8 @@ const SPEAKER_PORTRAITS = {
   // its file under public/ (scripts/build-portrait.mjs);
   // docs/portrait-credits.md says where each picture came from. These are not
   // warmed by the service worker -- only the five above are -- so each is
-  // fetched when its speaker first appears; a file that does not arrive is
-  // drawn as the silhouette (SpeakerPortrait).
+  // fetched when its case opens (warmCasePortraits, below); a file that does
+  // not arrive is drawn as the silhouette (SpeakerPortrait).
   "이민서": "/portrait-lee-minseo.webp",
   "강태민": "/portrait-kang-taemin.webp",
   "권도현": "/portrait-kwon-dohyeon.webp",
@@ -114,4 +116,41 @@ const SPEAKER_PORTRAITS = {
 /** The portrait's path for a speaker, or null for one not painted yet. */
 export function getSpeakerPortrait(speaker) {
   return SPEAKER_PORTRAITS[speaker] ?? null;
+}
+
+/**
+ * Fetches the portraits of everyone who speaks in a case, as the case opens
+ * (improvement notes D-14, 2026-10-22). The service worker warms only the
+ * five portraits that shipped first; every later one came when its speaker
+ * first spoke, so on a slow line the page drew the silhouette while it was on
+ * its way, and offline it drew it for good -- a speaker with a face shown
+ * without one. A case has five to ten speakers. The service worker keeps each
+ * file it sees (the root-image rule in worker.js), so a case opened online
+ * has its faces offline from then on.
+ *
+ * Each path is asked for once a page, and once more when a service worker
+ * first takes the page: asked before it did, the file went past it and was
+ * never kept. `fetch`, not an image: a second image of the same address is
+ * answered from the document's own memory and never reaches the worker. A
+ * case not yet arrived is warmed when it lands.
+ */
+const warmed = new Set();
+
+function fetchPortraits(paths) {
+  for (const src of paths) globalThis.fetch(src, { priority: "low" }).catch(() => {});
+}
+
+export function warmCasePortraits(caseId) {
+  if (!caseId || typeof globalThis.fetch !== "function") return;
+  const order = nodeOrders[caseId] ?? [];
+  if (order.length === 0) {
+    ensureCase(caseId).then(() => (nodeOrders[caseId]?.length ? warmCasePortraits(caseId) : null), () => {});
+    return;
+  }
+  const paths = [...new Set(order.map((nodeId) => getSpeakerPortrait(nodes[nodeId]?.speaker)))].filter((src) => src && !warmed.has(src));
+  if (paths.length === 0) return;
+  paths.forEach((src) => warmed.add(src));
+  fetchPortraits(paths);
+  const worker = globalThis.navigator?.serviceWorker;
+  if (worker && !worker.controller) worker.addEventListener("controllerchange", () => fetchPortraits(paths), { once: true });
 }

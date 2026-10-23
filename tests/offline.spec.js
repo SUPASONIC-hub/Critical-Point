@@ -1,7 +1,9 @@
 import { expect, test } from "./helpers/network.js";
 import { resumeSavedRun } from "./helpers/gameFlow.js";
-import { savedAtLastScene, seedSave } from "./helpers/seededSave.js";
+import { savedAtLastScene, savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { OFFLINE_READY_ATTRIBUTE } from "../src/serviceWorker/register.js";
+import { CASE_START_NODES, nodeOrders, nodes } from "../src/gameData.js";
+import { getSpeakerPortrait } from "../src/speakerPortraits.js";
 
 /**
  * The release, opened again with no connection.
@@ -42,6 +44,9 @@ test("a copy opened once opens again with no connection, and resumes its run", {
   await page.reload();
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
   await expect(page.locator(".choices .choice").first()).toBeVisible();
+  // The speaker on the table is drawn from the kept file, not as a silhouette.
+  await expect(page.locator(".gx-scene img.gx-portrait")).toHaveCount(1);
+  expect(await page.locator(".gx-scene img.gx-portrait").evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
 
   // Back to the intro, still offline: it is drawn, with its art.
   await page.getByRole("button", { name: "저장 후 나가기" }).click();
@@ -89,4 +94,41 @@ test("a copy opened once opens again with no connection, and resumes its run", {
   await expect(page.locator(".ranking-page")).toBeVisible();
   await expect(page.getByTestId("chunk-reload-panel")).toHaveCount(0);
   expect(pageErrors).toEqual([]);
+});
+
+/**
+ * Every face of a case, fetched as its first page opens and kept by the
+ * worker (improvement notes D-14, 2026-10-22). The warm-up names only the
+ * five portraits that shipped first; 프롤로그 02 has eleven speakers, most of
+ * them painted later, and each of them was a silhouette on a slow line or
+ * offline until they had spoken once.
+ */
+test("a case's portraits are kept as its first page opens, so none is a silhouette offline", { tag: "@prod" }, async ({ page, browserName }) => {
+  test.skip(browserName === "webkit", "the worker under an offline context is unverified on Playwright WebKit");
+  test.setTimeout(120_000);
+  const faces = [...new Set(nodeOrders.prologue02.map((nodeId) => getSpeakerPortrait(nodes[nodeId]?.speaker)).filter(Boolean))];
+  expect(faces.length, "프롤로그 02 has painted speakers beyond the five the warm-up names").toBeGreaterThan(5);
+  await seedSave(page, savedRunAt("prologue02", CASE_START_NODES.prologue02));
+  await page.goto("/?sw=1");
+  await expect(page.locator(".intro")).toBeVisible();
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, { timeout: 30_000 });
+  await resumeSavedRun(page);
+  // A paused save resumes on the table of its scene, past the briefing; the case is open either way.
+  await expect(page.getByRole("region", { name: "임계점 테이블" })).toBeVisible({ timeout: 30_000 });
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async (paths) => {
+          const names = (await caches.keys()).filter((name) => name.startsWith("critical-point-"));
+          const missing = [];
+          for (const path of paths) {
+            let found = false;
+            for (const name of names) found ||= Boolean(await (await caches.open(name)).match(new URL(path, location.origin).href));
+            if (!found) missing.push(path);
+          }
+          return missing;
+        }, faces),
+      { message: "the case's portraits are in the worker's cache", timeout: 30_000 },
+    )
+    .toEqual([]);
 });

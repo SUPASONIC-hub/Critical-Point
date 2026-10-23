@@ -219,18 +219,21 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
  * Written from arithmetic on 2026-10-13, not yet measured: at 360x740 the
  * docked cards started at 493px and the first briefing's introduction ended at
  * 555px. With 판 열기 alone docked (56px, 8px off the bottom) the dock starts
- * at 676px.
+ * at 676px. From 2026-10-22 (D-3) every phone docks 판 열기 alone: at 390x844
+ * the docked cards covered about 250px of the story.
  */
-test("a 740px phone docks 판 열기 alone under the briefing, as a 664px one does", () => {
+test("every phone docks 판 열기 alone under the briefing, and the cards follow the story", () => {
   const briefing = sheet("briefing");
   const query = briefing.match(/@media ([^{]*)\{\s*\.gx-comic-actions \{\s*display: contents;\s*\}/)?.[1] ?? "";
-  const tallest = Number(query.match(/\(max-width: 700px\) and \(max-height: ([\d.]+)em\)/)?.[1]);
-  assert.ok(tallest * 16 >= 740, `${query.trim()}: 360x740 is ${740 / 16}em tall at 16px type`);
-  assert.ok(tallest * 16 < 839, "a 412x839 or 390x844 phone keeps its cards docked");
   assert.match(query, /\(max-height: 35em\),/, "any screen that short, whatever its width");
+  assert.match(query, /\(max-width: 700px\)\s*$/, "and every phone upright, whatever its height");
   const open = briefing.slice(briefing.indexOf(query)).match(/\.gx-open-table \{[^}]*\}/)?.[0] ?? "";
   assert.match(open, /position: sticky;\s*bottom: 8px;/);
   assert.match(briefing, /\n\.gx-open-table \{[^}]*min-height: 56px;/, "740 - 8 - 56 = 676px, and the panel ends at 555px");
+  // The story is one straight column of boxes: no zigzag, no tilt, no slanted lead.
+  assert.doesNotMatch(briefing, /\.gx-panel-story \.gx-caption:nth-child/);
+  assert.doesNotMatch(briefing.match(/\.gx-caption-lead \{[^}]*\}/)?.[0] ?? "", /italic/);
+  assert.match(briefing, /\n\.gx-caption \{[^}]*font-weight: 500;/);
 });
 
 test("an intro drawer opened by its link stops below the music pills", () => {
@@ -285,21 +288,33 @@ test("the result page's brand pill keeps clear of two music icons, not of two la
   assert.match(phone, /padding: 0 9px;/, "the icons are still the size this was measured against");
 });
 
-test("a three-line place caption ends inside the briefing's cropped band", () => {
+test("a phone draws the room behind the briefing's title, and its panel is the room's name and clock (D-13)", () => {
   const briefing = sheet("briefing");
   const phone = briefing.slice(briefing.indexOf("@media (max-width: 700px)"));
-  const top = Number(phone.match(/\n {2}\.gx-caption-place \{\s*top: (\d+)px;\s*\}/)?.[1]);
-  assert.ok(Number.isFinite(top), "the phone places the caption itself");
-  assert.match(phone, /\.gx-panel-splash \{\s*flex-shrink: 1;\s*min-height: 5\.5rem;\s*\}/);
-  // Two lines of the room at 13px and one of the clock at 12px, both 1.55 tall,
-  // in 6px of padding and a 2px border: 74.9px. The band is 88px with a 3px border.
-  const caption = 2 * 13 * 1.55 + 12 * 1.55 + 2 * 6 + 2 * 2;
-  assert.ok(top + caption <= 88 - 2 * 3, `the caption ends at ${top + caption}px of 82`);
-  // The story's captions read larger and looser (2026-10-20); the place
-  // caption keeps the 1.55 this sum was measured in, and sizes its own two lines.
+  assert.match(briefing, /\n\.gx-comic-top > \.gx-plate-backdrop \{\s*display: none;\s*\}/, "a wider page draws it in its panel");
+  assert.match(phone, /\.gx-comic-top \{\s*position: relative;\s*z-index: 0;\s*\}/, "the title is the drawing's stacking context");
+  assert.match(phone, /\.gx-comic-top > \.gx-plate-backdrop \{\s*display: block;\s*height: 100%;/);
+  assert.match(phone, /\.gx-panel-splash > \.gx-plate,\s*\.gx-sfx \{\s*display: none;\s*\}/);
+  assert.match(phone, /\.gx-caption-place \{\s*position: relative;\s*inset: auto;/, "the caption is in the flow, above the halftone");
+  // A face a reader can recognise at 96px, and the name larger beside it.
+  assert.match(phone, /\.gx-panel-speaker \{\s*grid-template-columns: 96px 1fr;\s*\}/);
+  assert.match(phone, /\.gx-speaker-tag b \{\s*font-size: 1\.375rem;\s*\}/);
+  const jsx = readFileSync(new globalThis.URL("../../src/gauntlet/SceneBriefing.jsx", import.meta.url), "utf8");
+  const header = jsx.slice(jsx.indexOf('<header className="gx-comic-top">'), jsx.indexOf("</header>"));
+  assert.match(header, /<ScenePlate node=\{node\} nodeId=\{nodeId\} variant="backdrop" \/>/);
+  // The place caption keeps the sizes it always had.
   assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid/);
   assert.match(briefing, /\.gx-caption-place \{[^}]*padding: 6px 10px;[^}]*line-height: 1\.55;/);
   assert.match(briefing, /\.gx-caption-place b \{\s*font-size: 0\.8125rem;/);
   assert.match(briefing, /\.gx-caption-place span \{[^}]*font-size: 0\.75rem;/);
   assert.match(briefing, /\.gx-panel \{[^}]*border: 3px solid/);
+});
+
+test("the intro's board button glints twice and then rests (D-15)", () => {
+  const intro = sheet("base-intro-ranking");
+  const pill = intro.match(/\.intro \.top-actions \.intro-board-button \{[^}]*\}/)?.[0] ?? "";
+  const sweep = intro.match(/\.intro \.top-actions \.intro-board-button::after \{[^}]*\}/)?.[0] ?? "";
+  assert.match(pill, /animation: board-glow [^;]* 2;/);
+  assert.match(sweep, /animation: board-shine [^;]* 2;/);
+  assert.doesNotMatch(pill + sweep, /infinite/);
 });

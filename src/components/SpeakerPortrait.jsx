@@ -14,8 +14,9 @@
  *
  * A portrait that does not arrive is drawn the same way, in its place. Only the
  * five portraits that shipped first are fetched ahead by the service worker
- * (scripts/service-worker-build.mjs); a later one comes when its speaker first
- * speaks, so a device that meets that speaker offline has no picture to show.
+ * (scripts/service-worker-build.mjs); a later one comes when its case opens,
+ * with every other face of that case (warmCasePortraits, speakerPortraits.js),
+ * so only a device that never opened the case online has no picture to show.
  */
 import { useState } from "react";
 
