@@ -178,7 +178,10 @@ const budgets = [
   // lead told as a caption, the name chip, and the reveal's tag (A-2, A-10).
   // The box's name shares the reveal tag's rule, and the lead's box the
   // balloon's tail rule.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_473 },
+  // 35,473 -> 35,502 gzip the same day, measured 35,498 (the gzip plus 4): on
+  // a phone, a case's first page that introduces a rule folds the balloon so
+  // the introduction and the question stay on the first screen.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_502 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
