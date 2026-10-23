@@ -510,6 +510,27 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
 });
 
+// The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
+// wall can stop at once, the reveal says what one more push would have done,
+// and the next scene's page opens on its speaker's line about that table.
+test("안전선 pushes to the safe line at once, the reveal says what one more push would have done, and the next speaker answers the table", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  const stage = page.getByTestId("gauntlet-stage");
+  const safe = page.getByTestId("commit-safe");
+  await expect(safe).toHaveAccessibleName(/^안전선 ×\d+, 안전선까지 밀기 \d+번, 열기 \d+까지$/);
+  const [, pushes, heat] = (await safe.getAttribute("aria-label")).match(/(\d+)번, 열기 (\d+)까지/);
+  expect(Number(pushes)).toBeGreaterThan(0);
+  await safe.click();
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect.poll(async () => Number(await stage.getAttribute("data-gauge"))).toBeGreaterThanOrEqual(Number(heat));
+  await expect(safe, "the button is for the first press only").toHaveCount(0);
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("reveal-afterword")).toHaveText(/^한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
+  await page.getByTestId("decision-next").click();
+  await expect(page.getByTestId("table-reaction")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+});
+
 // 스토리 모드: the wall is far, and hitting it still costs the pot -- but the
 // room does not move on without the analyst, and the next board is not broken.
 // The same card on the same scene, busted at the table and then in story
@@ -959,6 +980,7 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(briefing).toBeVisible();
   await expect(briefing.getByRole("dialog")).toBeVisible();
   await expect(briefing.locator(".gx-balloon")).not.toBeEmpty();
+  await expect(briefing.getByTestId("briefing-question")).toContainText("당신의 판단");
   await expect(briefing.locator(".gx-panel-file li")).toHaveCount(4);
   const timer = page.getByTestId("reading-timer");
   const first = Number(await timer.locator("b").textContent());
@@ -975,7 +997,9 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(page.locator(".choices .choice.selected").getByTestId("card-label")).toHaveText(label);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
 
-  // Left alone, a page runs out and the table opens with nothing staked.
+  // Left alone, a page runs out. The first time the clock would open a table
+  // it asks once whether to open them by hand from now on (ReadingClockAsk.jsx);
+  // left to the clock, the table opens with nothing staked.
   await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   const reading = Number(await page.getByTestId("reading-timer").locator("b").textContent());
@@ -983,9 +1007,31 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await page.clock.runFor((reading - 2) * 1000);
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   await page.clock.runFor(4_000);
+  const ask = page.getByTestId("reading-clock-ask");
+  await expect(ask).toContainText("다 읽고 직접 열기로 바꿀까요?");
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByTestId("reading-clock-hold")).toBeFocused();
+  // The table's clock has not moved while the page asked.
+  await expect(page.locator(".gx-clock b")).toHaveText("45");
+  await page.getByTestId("reading-clock-keep").click();
   await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
   await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
+  const settings = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), ACCESSIBILITY_SETTINGS_KEY);
+  expect(settings, "asked once, and the clock still opens tables").toMatchObject({ readingClockAsked: true, holdReadingClock: false });
+});
+
+test("프롤로그 01-02 open with the reading clock held until it has asked, and 03 on runs", async ({ page }) => {
+  for (const [caseId, nodeId, held] of [["prologue01", "p1_start", true], ["prologue02", "p2_start", true], ["prologue03", "p3_start", false]]) {
+    await startDebugNode(page, caseId, nodeId, { openTable: false });
+    await expect(page.getByTestId("reading-timer"), `${caseId}`).toHaveAttribute("aria-checked", String(held));
+  }
+  // Answered once, the setting decides every page: asked and left to the clock, 01 runs too.
+  // Seeded on every load, not written into this page: kept storage resumed the
+  // run on 프롤로그 03 and the debug picker was never drawn.
+  await page.addInitScript((key) => localStorage.setItem(key, JSON.stringify({ readingClockAsked: true })), ACCESSIBILITY_SETTINGS_KEY);
+  await startDebugNode(page, "prologue01", "p1_start", { openTable: false });
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "false");
 });
 
 /**
@@ -1118,6 +1164,11 @@ test("past the prologues the reveal is short; 자세히 opens the whole sheet fr
   await expect(sheet.locator(".decision-reveal-stakes")).toBeVisible();
   await expect(ledger).toHaveCount(0);
   await expect(sheet.locator(".gx-reveal-pot, .decision-reveal-choice")).toHaveCount(0);
+  // The story line is straight under the verdict, above the bill (D-1).
+  const storyBox = await sheet.getByTestId("reveal-story").boundingBox();
+  const stakesBox = await sheet.locator(".decision-reveal-stakes").boundingBox();
+  expect(storyBox.y, "the story line is above the bill").toBeLessThan(stakesBox.y);
+  await expect(sheet.getByTestId("reveal-story")).not.toBeEmpty();
 
   // Focus opens on the way on, as it always did; Tab stays inside, between the two buttons.
   await expect(next).toBeFocused();
@@ -1158,6 +1209,19 @@ test("past the prologues the reveal is short; 자세히 opens the whole sheet fr
   expect(JSON.stringify(saved)).not.toContain("detailsOpen");
 });
 
+test("a bust on the short sheet still says one sentence of the story, under the verdict", async ({ page }) => {
+  // The card's own line is not what came of a bust (useChoiceCommit.js), and
+  // the short sheet said nothing of the story at all until 2026-10-22 (D-1).
+  await openTable(page, "case01", "start");
+  await dismissProtocolBreach(page);
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  await bustStakedCard(page);
+  await expect(page.getByTestId("reveal-details")).toHaveAttribute("aria-expanded", "false");
+  const story = page.locator(".decision-reveal").getByTestId("reveal-story");
+  await expect(story).toBeVisible();
+  await expect(story).not.toBeEmpty();
+});
+
 test("a prologue keeps the whole sheet and has no 자세히: it is still teaching", async ({ page }) => {
   await openTable(page, "prologue01", "p1_start");
   await cashFirstCard(page);
@@ -1188,4 +1252,53 @@ test("the short reveal fits a small phone without scrolling, and the whole sheet
   // The foot is stuck on a phone: the way on is still on screen over the longer sheet.
   await expect(page.getByTestId("decision-next")).toBeInViewport({ ratio: 1 });
   await expect(page.getByTestId("reveal-details")).toBeInViewport();
+});
+
+/**
+ * The office's noise at the table's edge (개선 포인트 A5, EdgeNotice.jsx): a
+ * third press brings a message from upstairs, at the edge, silent to a
+ * screen reader, over no number and under no pointer; the comfort panel's
+ * switch keeps it away.
+ */
+async function pushTimes(page, times) {
+  const stage = page.getByTestId("gauntlet-stage");
+  for (let press = 0; press < times; press += 1) {
+    const gauge = await stage.getAttribute("data-gauge");
+    await page.getByTestId("commit-push").click();
+    await expect(stage).not.toHaveAttribute("data-gauge", gauge);
+  }
+}
+
+test("a third push brings an edge notice that covers no number, and the switch turns it off", async ({ page }) => {
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ tableTime: 2 }) });
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice").first().click();
+  await pushTimes(page, 2);
+  const notice = page.getByTestId("edge-notice");
+  await expect(notice).toHaveCount(0);
+  await pushTimes(page, 1);
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("메신저 · 한서윤");
+  await expect(notice).toHaveAttribute("aria-hidden", "true");
+  expect(await notice.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
+  expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
+  const overlaps = await notice.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button, .game-header h1";
+    return [...document.querySelectorAll(numbers)]
+      .filter((other) => {
+        const b = other.getBoundingClientRect();
+        return b.width > 0 && box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top;
+      })
+      .map((other) => other.className || other.dataset.testid);
+  });
+  expect(overlaps, "the notice covers none of the table's numbers").toEqual([]);
+  await expect(page.getByTestId("table-voice")).not.toContainText("메신저");
+
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ tableTime: 2, edgeNotices: false }) });
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice").first().click();
+  await pushTimes(page, 3);
+  await page.waitForTimeout(400);
+  await expect(notice).toHaveCount(0);
 });

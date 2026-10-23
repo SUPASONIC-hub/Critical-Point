@@ -39,6 +39,15 @@ list of the files it touched.
 - The table's rules turn on in steps over 프롤로그 01-05 and are all on from
   사건 01 (`src/gauntlet/tableUnlocks.js`); a NEW GAME+ run has them all from
   the first case.
+- NEW GAME+ carries the record and the story, never the table (decision 34,
+  2026-10-19): a device key, `critical-point-season-record-v1`, counts the
+  finished seasons once per run and keeps how the last two ended
+  (`src/state/newGamePlusCarry.js`, `src/state/seasonRecord.js`); the intro
+  shows the season number and the last ending, a NEW GAME+ season opens
+  프롤로그 01 on a line answering the last verdict (the run's `echo`, drawn by
+  `WeekRulePanel.jsx`), the finale compares the two endings, and every case
+  summary of such a season carries `newGamePlus: true`. Same ranking, no
+  server change, no save version.
 - The hand's skill is the logic streak (priority 38). Nothing on the table is
   timed against the heartbeat: the beat key, its ring and its grades left on
   2026-10-10, and both rankings were reset for it on 2026-10-11 (priority 70).
@@ -301,7 +310,7 @@ Still open, on purpose:
    it rather than comparing to zero -- `humanCost` and `fatigue` read backwards
    otherwise. Sort with `byEffectWeight` before naming a resource in a sentence.
    A resource is named with its canonical label from `easyResourceLabels` in
-   `src/playerLanguage.js` -- 남은 시간, 현금, 믿음, 공정함, 사람 피해, 지침 --
+   `src/playerLanguage.js` -- 남은 시간, 현금, 믿음, 공정함, 사람 피해, 피로 --
    the words the chips print, never a synonym. Those six are the only
    resources: `applyEffect` (`src/riskLogic.js`) moves only the keys of
    `initialResources`, and only by a finite number, so a misspelt key cannot
@@ -561,7 +570,8 @@ Still open, on purpose:
     `src/state/runStorageReset.js` is the list: it also clears the session
     trace, the settled-window seeds and the line typed for the next analyst,
     and takes a new telemetry session id; it keeps the settings, the codex,
-    NEW GAME+ (written only from a season that reached the finale), the board
+    NEW GAME+ (written only from a season that reached the finale) and its
+    season record, the board
     name and the online save.
 37. A bust skipping a scene must never be a shortcut. `check:pressure` plays a
     policy that busts every window it can to reach the case's end sooner; it has
@@ -727,7 +737,7 @@ Still open, on purpose:
     boxes, the memo as a pinned case file, and the protocol breach as a red
     panel when the last decision broke this board
     (`data-testid="protocol-breach"`). The page has its own reading clock,
-    `getReadingSeconds(node)`, 12-95s; when it runs out the table opens by
+    `getReadingSeconds(node)`, 12-94s; when it runs out the table opens by
     itself. The clock is a switch (`role="switch"`, `aria-checked`, named 읽는
     시간 멈춤, the seconds its description) that holds and resumes it, and
     it starts held when the player asked for that (priority 87).
@@ -982,7 +992,7 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
-    copy, and requires every glossary term (189) to carry a plain explanation
+    copy, and requires every glossary term (191) to carry a plain explanation
     at the first place a player can read it in each case -- per opening, since
     a case can be entered on any of them. Only narration (lead and body) is
     checked. A term matches at a word start only. Add a term to the glossary

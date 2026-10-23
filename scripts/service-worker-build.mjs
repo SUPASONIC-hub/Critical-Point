@@ -91,9 +91,11 @@ export function releaseIdFor({ html, files = [], logic = "" }) {
 }
 
 // The portraits the warm-up fetches are the five that shipped first, by name.
-// A portrait added after them is fetched when its speaker first appears and
-// kept from then on (the root-image rule in worker.js); offline before that,
-// SpeakerPortrait draws the silhouette in its place. Every name in the warm
+// A portrait added after them is fetched when its case opens -- every speaker
+// of the case at once (warmCasePortraits, src/speakerPortraits.js, since
+// 2026-10-22) -- and kept from then on (the root-image rule in worker.js);
+// offline before its case was ever opened, SpeakerPortrait draws the
+// silhouette in its place. Every name in the warm
 // list is bytes in `sw.js`, whose budget had room for one more.
 const WARM_ROOT = /^\/(?:portrait-(?:ban-jaeuk|do-yunha|echo|han-seoyun|oh-jinwoo)\.webp|[a-z0-9-]+-960\.webp|profile\.jpg)$/;
 

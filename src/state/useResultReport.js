@@ -23,6 +23,8 @@ import { createAchievementBadges, createEndingProfile, createScoreBreakdown, cre
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { describeCaseChange } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
+import { getCaseComparison, getSeasonCard } from "./secondSeason.js";
+import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
@@ -120,7 +122,9 @@ export function useResultReport({
   resources,
   riskTier,
   runId,
+  secondSeason = null,
   tabScreen,
+  weekRule = null,
   triggers,
 }) {
   const telemetryStats = useSyncExternalStore(subscribeTelemetryStats, getTelemetryStats, getTelemetryStats);
@@ -173,7 +177,11 @@ export function useResultReport({
   const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
 
   const reportCopy = useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result, riskTier });
-  const caseOutcome = getCaseOutcome({ caseId: currentCase, choiceId: getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]) });
+  const closedOutcome = getCaseOutcome({ caseId: currentCase, choiceId: getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]) });
+  // A NEW GAME+ season's case result also says how the season before closed
+  // it (`past`, secondSeason.js), on the object the screen already prints.
+  const pastLine = getCaseComparison(secondSeason?.results, currentCase, closedOutcome);
+  const caseOutcome = pastLine ? { ...closedOutcome, past: pastLine } : closedOutcome;
   // The tab on a result (tabTitle.js, 개선 포인트 A3): the season's ruling by its
   // label, a case by the ending it closed on. Drafts for the user to decide.
   const resultTabTitle = currentCase === "final"
@@ -235,6 +243,8 @@ export function useResultReport({
       pending: pendingTelemetry.length,
     }),
     caseOutcome,
+    // E-5: the season's number on the result card and its shared line (secondSeason.js).
+    seasonCard: getSeasonCard({ secondSeason, pastEndingName: getEndingPreview({ id: secondSeason?.before?.endingId })?.label, weekRuleLabel: getWeekRule(weekRule)?.label }),
     endingProfile: createEndingProfile({ finalEndingEntry }),
   };
 }

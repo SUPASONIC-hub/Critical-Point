@@ -24,12 +24,13 @@ import { clearRunStorage, logStorageResetFailure } from "./runStorageReset.js";
 import { appendTraceEvent } from "./trace.js";
 import { leaveReplaySession } from "./useAppPersistence.js";
 import { weeklyRuleNow as weeklyRuleNowDefault } from "./weeklyClock.js";
-import { weekRuleTurnedDown } from "./weeklyRuleChoice.js";
+import { weekRuleChoice } from "./weeklyRuleChoice.js";
+import { clearReadingTally } from "./readingTally.js";
 
 // The last sentence is what keeps the one before it true: the online copy is
 // not replaced by the next run until the player says so (cloudSave.js).
 const CONFIRM_RESET =
-  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다. 온라인 저장은 새 진행을 올리기 전에 시작 화면에서 어느 쪽을 남길지 묻습니다.";
+  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록과 회차, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다. 온라인 저장은 새 진행을 올리기 전에 시작 화면에서 어느 쪽을 남길지 묻습니다.";
 
 /**
  * Starting, opening, jumping, leaving and wiping a run.
@@ -66,9 +67,15 @@ export function createRunLifecycle({
    *
    * The story mark is the comfort setting as it stands at this press. The
    * season's first case is played straight from here, with no `startCaseNow`.
+   *
+   * `echo` is the line NEW GAME+ carries from the last season
+   * (newGamePlusCarry.getSeasonCarry); it is read only with `veteran`, so a
+   * plain start always opens on `OPENING_ECHO`.
    */
-  // Turned down by the start screen's box (one device key, 결정 27) unless the caller says.
-  function startGame({ veteran = false, declineWeekRule = weekRuleTurnedDown() } = {}) {
+  // The start screen's boxes (state/weeklyRuleChoice.js: 결정 27, and E-8 for a
+  // device's first season) unless the caller says. NEW GAME+ is never a first season.
+  function startGame({ veteran = false, declineWeekRule, takeUpWeekRule, echo = null } = {}) {
+    const choice = weekRuleChoice();
     // A run of one's own ends a replay; from here the tab writes its save again.
     leaveReplaySession();
     const story = getAccessibility().storyMode;
@@ -77,12 +84,20 @@ export function createRunLifecycle({
       runId: createRunId(),
       playerName: normalizePlayerName(run.playerName) || "분석관",
       veteran: veteran === true,
+      echo: veteran === true && typeof echo === "string" ? echo : null,
       story,
       // 이번 주의 규칙, read off the weekly clock (held still in test builds).
-      weekRule: pickSeasonWeekRule(weeklyRuleNow(), { declined: declineWeekRule === true, story }),
+      weekRule: pickSeasonWeekRule(weeklyRuleNow(), {
+        declined: typeof declineWeekRule === "boolean" ? declineWeekRule : choice.declined,
+        firstSeason: veteran !== true && choice.firstSeason,
+        takenUp: typeof takeUpWeekRule === "boolean" ? takeUpWeekRule : choice.takenUp,
+        story,
+      }),
       now: nowMs(),
     });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
+    // A new season reads from nothing: what the last one's open case had read is not this one's (D-11).
+    clearReadingTally();
     // Written over whatever another tab held: a new run is this tab's own.
     applyRun(patch, { force: true });
   }

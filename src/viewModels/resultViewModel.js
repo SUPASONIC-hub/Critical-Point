@@ -24,6 +24,7 @@ import { easyCognitionLabels } from "../playerLanguage.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { getEndingEpilogue } from "../featurePack.js";
 import { getEndingSceneProfile, getEndingVisualClass, getFailureObjectives } from "../runtimeSystems.js";
+import { describeVaultPerCase } from "../gauntlet/tableAfterword.js";
 import { createResultView } from "./appViewModels.js";
 
 export function createResultViewModel(report, {
@@ -50,6 +51,8 @@ export function createResultViewModel(report, {
   setNextParticipantMessage,
   saveNextParticipantMessage,
   operatorReveal,
+  // NEW GAME+: the line comparing this season's ending with the one before (newGamePlusCarry.js), or null.
+  seasonComparison,
   // The score and the record it was read from.
   caseResults,
   decisionFingerprint,
@@ -128,6 +131,7 @@ export function createResultViewModel(report, {
     resultRank,
     routeTimeline,
     scoreBreakdown,
+    seasonCard,
     telemetryDashboard,
     telemetryStats,
   } = report;
@@ -167,6 +171,8 @@ export function createResultViewModel(report, {
     endingPreview,
     aftermath,
     operatorReveal,
+    // The finale's comparison line rides with the season's card strings: one field of the bag (check:runtime-budget).
+    seasonCard: { ...seasonCard, comparison: seasonComparison },
 
     result,
     caseOutcome,
@@ -200,6 +206,7 @@ export function createResultViewModel(report, {
     logicReport,
     caseChange,
     seasonStanding,
+    vaultLine: describeVaultPerCase(caseResults),
 
     sessionCode,
     telemetryStatus,

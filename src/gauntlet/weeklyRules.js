@@ -63,6 +63,15 @@ export const AUDIT_RELIEF = 2;
 export const AUDIT_SHARE = 4;
 /** HEAVY FRACTURE: what FRACTURE bills the cracked axis that week. */
 const HEAVY_FRACTURE_RATE = 1.75;
+/**
+ * SHORT CLOCK (E-9 (c), 사용자 확인 후보): every board's clock this many
+ * seconds shorter, and every card's chips this many times more. Both are laid
+ * over what the board already has (relics and marks move both), never put in
+ * its place: `secondsShift` adds, `chipsFactor` multiplies, and
+ * `normalizeSchema` clamps the result (12-60 seconds, chips 0.25-4).
+ */
+export const SHORT_CLOCK_SECONDS = 8;
+export const SHORT_CLOCK_CHIPS = 1.25;
 
 /** The audit's line and the links', each week's that has the device. */
 const AUDIT_LINE = `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`;
@@ -70,20 +79,36 @@ const CASCADE_LINE = "한 자원을 8 이상 태운 카드를 확정하면 2~4�
 
 /**
  * The rules a week can carry, by id. `schema` is relative for the wall
- * (`wallShift`, negative = closer) and absolute for the rest.
+ * (`wallShift`, negative = closer), the clock (`secondsShift`) and the chips
+ * (`chipsFactor`), and absolute for the rest.
+ *
+ * `world` is the rule's one line inside the story (E-9 (b)): what the group
+ * did this week that the table feels. The start screen and the briefing's
+ * panel print it before the rule. The event weeks' three have one each
+ * (사용자 확인 후보 문구); the test weeks' devices do not need one.
  */
 export const WEEK_RULE_CATALOGUE = Object.freeze({
   "near-wall": Object.freeze({
     label: "NEAR WALL",
     title: "벽이 가깝다",
     text: `이번 주는 벽 띠가 열기 ${NEAR_WALL_SHIFT}만큼 앞당겨 선다. 같은 열기로 더 빨리 벽에 닿는다.`,
+    world: "이번 주 그룹은 감사를 앞당겼다.",
     schema: Object.freeze({ wallShift: -NEAR_WALL_SHIFT }),
   }),
   "heavy-fracture": Object.freeze({
     label: "HEAVY FRACTURE",
     title: "균열이 깊다",
     text: `이번 주는 FRACTURE가 금 간 자원을 ${HEAVY_FRACTURE_RATE}배로 청구한다.`,
+    world: "이번 주 회계팀은 금 간 장부를 한 번 더 넘겨 본다.",
     schema: Object.freeze({ fractureRate: HEAVY_FRACTURE_RATE }),
+  }),
+  // E-9 (c): the third event rule, two numbers normalizeSchema clamps at once.
+  "short-clock": Object.freeze({
+    label: "SHORT CLOCK",
+    title: "시간이 짧다",
+    text: `이번 주는 판마다 시간이 ${SHORT_CLOCK_SECONDS}초 짧고, 모든 카드의 칩이 ${SHORT_CLOCK_CHIPS}배다.`,
+    world: "이번 주 이사회는 보고 시간을 줄이고 보고서 값을 올렸다.",
+    schema: Object.freeze({ secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS }),
   }),
   // B3's test week: a device; no number on the board moves.
   "audit": Object.freeze({
@@ -143,9 +168,15 @@ export function nextWeekRuleAt(ms, calendar = WEEKLY_RULES) {
  * The id a season takes when it starts: the week's rule unless the player
  * turned it down (D2) or the season is played in story mode, which is outside
  * every ranking already.
+ *
+ * A device's first season (`firstSeason`, no season finished yet) takes it
+ * only when the player asked for it (`takenUp`, E-8, 결정 Q6 b (1)): the
+ * event is for the analyst who came back. From the second season on it is on
+ * unless turned down, as before (state/weeklyRuleChoice.js reads the device).
  */
-export function pickSeasonWeekRule(ms, { declined = false, story = false, calendar = WEEKLY_RULES } = {}) {
-  if (declined === true || story === true) return null;
+export function pickSeasonWeekRule(ms, { declined = false, story = false, firstSeason = false, takenUp = false, calendar = WEEKLY_RULES } = {}) {
+  if (story === true) return null;
+  if (firstSeason === true ? takenUp !== true : declined === true) return null;
   return weekRuleAt(ms, calendar)?.id ?? null;
 }
 
@@ -161,6 +192,10 @@ export function weekRuleOverlay(id, schema) {
     if (key === "wallShift") {
       overlay.wallMin = Number(schema.wallMin) + value;
       overlay.wallMax = Number(schema.wallMax) + value;
+    } else if (key === "secondsShift") {
+      overlay.seconds = Number(schema.seconds) + value;
+    } else if (key === "chipsFactor") {
+      overlay.chipsScale = Number(schema.chipsScale) * value;
     } else {
       overlay[key] = value;
     }

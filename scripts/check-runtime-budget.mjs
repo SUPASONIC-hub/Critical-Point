@@ -188,10 +188,19 @@ const BUDGETS = {
   // 830 -> 833 on 2026-10-20, measured: B3's audit token on the run signal,
   // its prop and the 확정 button's description (830 before; the token's
   // comment went to auditRisk.js's readAudit).
+  // 68 -> 69 imported names on 2026-10-22 (ops-measure draft), measured: D-11's
+  // noteBriefing, which openTable calls so a page opened by key, button or clock
+  // is counted in one place.
+  // 833 -> 834 on 2026-10-23 (batch B), measured: the briefing's three lines
+  // from before the scene -- bridge (D-7), reaction (C-13), opening (Q8 (1)) --
+  // handed on, one line, with the table readouts' rows.
+  // 834 -> 847 on 2026-10-23, batch B on batch A, measured: batch A's edge
+  // notices and reading tally beside batch B's readouts, each budgeted on its
+  // own base until the two met.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 833,
+    lines: 847,
     longestLine: 250,
-    importedNames: 68,
+    importedNames: 69,
     hooks: {},
   },
 };

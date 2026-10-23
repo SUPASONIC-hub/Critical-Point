@@ -20,20 +20,21 @@ import { weeklyRuleNow } from "../state/weeklyClock.js";
  * A season started this week keeps the rule to its end, and its
  * ranking is the week's own (설계안 2-2, 2-3).
  */
-export function getWeeklyRuleLine(now = weeklyRuleNow()) {
-  return weeklyRuleLine(now);
+export function getWeeklyRuleLine(now = weeklyRuleNow(), { first = false } = {}) {
+  return weeklyRuleLine(now, undefined, { first });
 }
 
 /**
- * The line, and in a week with a rule the box that turns it down (결정 27 (1)):
- * one device key both starts read (state/weeklyRuleChoice.js, handed in by
+ * The line, and in a week with a rule the box that turns it down (결정 27 (1)),
+ * or on a device's first season the box that takes it up (`first`, E-8):
+ * one device key each, which both starts read (state/weeklyRuleChoice.js, handed in by
  * WeeklyRuleNotice.jsx so the key stays in the entry chunk with the shell's
  * start). Without the rule the season is an ordinary one and goes to the
  * ordinary ranking.
  */
-export function WeeklyRuleLine({ now, turnedDown, turnDown }) {
-  const line = getWeeklyRuleLine(now);
-  const [off, setOff] = useState(turnedDown);
+export function WeeklyRuleLine({ now, first = false, ticked, tick }) {
+  const line = getWeeklyRuleLine(now, { first });
+  const [on, setOn] = useState(ticked);
   if (!line) return null;
   return (
     <section className={`weekly-rule-notice is-${line.tone}`} data-testid="weekly-rule-line" aria-label={line.kicker}>
@@ -44,14 +45,14 @@ export function WeeklyRuleLine({ now, turnedDown, turnDown }) {
         <label className="cloud-save-toggle">
           <input
             type="checkbox"
-            checked={off}
-            data-testid="weekly-rule-off"
+            checked={on}
+            data-testid={first ? "weekly-rule-on" : "weekly-rule-off"}
             onChange={(event) => {
-              turnDown(event.target.checked);
-              setOff(event.target.checked);
+              tick(event.target.checked);
+              setOn(event.target.checked);
             }}
           />
-          이번 주의 규칙 없이 시작(평소 순위로)
+          {first ? "이번 주의 규칙으로 시작(이번 주 순위로)" : "이번 주의 규칙 없이 시작(평소 순위로)"}
         </label>
       )}
     </section>

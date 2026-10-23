@@ -5,7 +5,8 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodes, seasonCasesBase } from "../src/
 import { ENDING_GATES } from "../src/gameConstants.js";
 import { SEASON_STANDING_NEAR } from "../src/seasonStanding.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
-import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, SEASON_RECORD_KEY } from "../src/appConfig.js";
+import { encodeSeen, SEEN_SCENES_KEY } from "../src/state/seenScenes.js";
 import { createCaseSummary } from "../src/gameLogic.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels, easyResourceLabels } from "../src/playerLanguage.js";
@@ -411,6 +412,153 @@ test("NEW GAME+ starts the season again and keeps the finished one on the intro"
   expect(JSON.parse(await page.evaluate((key) => localStorage.getItem(key), NEW_GAME_PLUS_MEMORY_KEY))).toEqual(FINISHED_SEASON);
 });
 
+/**
+ * What NEW GAME+ carries (NEWGAMEPLUS 설계안 3절): the season record a finale
+ * writes (src/state/newGamePlusCarry.js). Seeded as a finished first season
+ * that closed on 봉인 · QUIET COVER, under an older table's rules mark.
+ */
+const SEALED_SEASON_RECORD = {
+  seasons: 1,
+  countedRuns: ["e2e-first-season"],
+  previous: null,
+  last: {
+    runId: "e2e-first-season",
+    endingId: "quiet-cover",
+    endingLabel: "QUIET COVER",
+    verdict: "ending_seal",
+    verdictName: "봉인",
+    tableRules: 1,
+    line: "지난 시즌: 봉인 · QUIET COVER. NEW GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.",
+  },
+};
+
+async function seedSeasonRecord(page, record = SEALED_SEASON_RECORD) {
+  await page.addInitScript(
+    ({ key, value }) => {
+      if (sessionStorage.getItem("e2e-record-seeded")) return;
+      sessionStorage.setItem("e2e-record-seeded", "1");
+      localStorage.setItem(key, value);
+    },
+    { key: SEASON_RECORD_KEY, value: JSON.stringify(record) },
+  );
+}
+
+test("NEW GAME+ names the last season on the intro and opens the next one on its line", async ({ page }) => {
+  await acceptConfirms(page);
+  await seedFinishedSeason(page);
+  await seedSeasonRecord(page);
+  await page.goto("/");
+  const memory = page.locator(".past-run-memory");
+  await expect(memory).toContainText("PAST RUN MEMORY · 2회차");
+  await expect(memory).toContainText("지난 시즌: 봉인 · QUIET COVER.");
+  // What a NEW GAME+ table is, as a fact (문구 질문 17): no claim that it is harder.
+  await expect(memory).toContainText("프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.");
+  await expect(memory.locator('[lang="en"]')).toHaveText("PAST RUN MEMORY");
+
+  await page.getByRole("button", { name: "NEW GAME+ 시작" }).click();
+  const echo = page.getByTestId("season-echo");
+  await expect(echo).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // Under the title strip, not under the case file: on screen without scrolling.
+  await expect(echo).toBeInViewport();
+  await expect(echo).toContainText("NEW GAME+");
+  await expect(echo).toContainText("지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다.");
+  // The line is the run's, saved with it.
+  await expect
+    .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")))?.echo, { timeout: TRANSITION_TIMEOUT_MS })
+    .toMatch(/^지난 시즌의 기록은 봉인되었지만/);
+});
+
+/**
+ * E-1 = B-14(3), 읽은 장면 접기 (state/seenScenes.js): a finale leaves on the
+ * device the scenes its season read, and a NEW GAME+ season folds the body of
+ * one read before and marks one never read `NEW`. Seeded as the record a
+ * finished season would have written, beside that season.
+ */
+const FIRST_SCENE = CASE_START_NODES[CASE_SEQUENCE[0]];
+
+async function seedSeenScenes(page, sceneIds, settings = null) {
+  const record = { v: 1, runId: "e2e-first-season", scenes: encodeSeen(new Set(sceneIds)), before: {} };
+  await page.addInitScript(
+    ({ seenKey, seen, settingsKey, settingsText }) => {
+      if (sessionStorage.getItem("e2e-seen-seeded")) return;
+      sessionStorage.setItem("e2e-seen-seeded", "1");
+      localStorage.setItem(seenKey, seen);
+      if (settingsText) localStorage.setItem(settingsKey, settingsText);
+    },
+    { seenKey: SEEN_SCENES_KEY, seen: JSON.stringify(record), settingsKey: ACCESSIBILITY_SETTINGS_KEY, settingsText: settings ? JSON.stringify(settings) : null },
+  );
+}
+
+async function startNewGamePlus(page) {
+  await acceptConfirms(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "NEW GAME+ 시작" }).click();
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  return briefing;
+}
+
+test("E-1: a NEW GAME+ season folds a scene the season before read, and 펼치기 opens it", async ({ page }) => {
+  await seedFinishedSeason(page);
+  await seedSeenScenes(page, [FIRST_SCENE]);
+  const briefing = await startNewGamePlus(page);
+  const story = briefing.locator(".gx-panel-story");
+  const unfold = briefing.getByTestId("scene-unfold");
+  await expect(unfold).toBeVisible();
+  await expect(unfold).toHaveText("지난 시즌에 읽은 장면 · 펼치기");
+  // The body is folded; the question and the cards stay.
+  await expect(story.locator(".gx-caption")).toHaveCount(0);
+  await expect(briefing.getByTestId("open-table")).toBeVisible();
+  // A scene read before is not new.
+  await expect(briefing.getByTestId("scene-new")).toHaveCount(0);
+
+  await unfold.click();
+  await expect(unfold).toHaveCount(0);
+  await expect(story.locator(".gx-caption").first()).toBeVisible();
+});
+
+test("E-1: a NEW GAME+ season marks a scene no season before read NEW, and does not fold it", async ({ page }) => {
+  // The season before read a scene, just not this one.
+  const other = Object.keys(nodes).find((id) => id !== FIRST_SCENE && nodes[id]?.caseId === CASE_SEQUENCE[0]);
+  expect(other).toBeTruthy();
+  await seedFinishedSeason(page);
+  await seedSeenScenes(page, [other]);
+  const briefing = await startNewGamePlus(page);
+  const mark = briefing.getByTestId("scene-new");
+  await expect(mark).toBeVisible();
+  await expect(mark).toHaveText("· NEW");
+  await expect(briefing.locator(".gx-comic-kicker")).toContainText("· NEW");
+  await expect(briefing.getByTestId("scene-unfold")).toHaveCount(0);
+  await expect(briefing.locator(".gx-panel-story .gx-caption").first()).toBeVisible();
+});
+
+test("E-1: with 읽은 장면 접기 turned off, a scene the season before read opens whole", async ({ page }) => {
+  await seedFinishedSeason(page);
+  await seedSeenScenes(page, [FIRST_SCENE], { foldReadScenes: false });
+  const briefing = await startNewGamePlus(page);
+  await expect(briefing.locator(".gx-panel-story .gx-caption").first()).toBeVisible();
+  await expect(briefing.getByTestId("scene-unfold")).toHaveCount(0);
+  await expect(briefing.getByTestId("scene-new")).toHaveCount(0);
+});
+
+test("a second season's finale sets its ending beside the season before, and says the table's rules changed", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await seedSave(page, savedRunAt("final", "f_aftershock"));
+  // After the save's seed, which clears the device first.
+  await seedSeasonRecord(page);
+  await page.goto("/");
+  await resumeSavedRun(page);
+  await completeCurrentCase(page);
+  const comparison = page.getByTestId("season-comparison");
+  await expect(comparison).toBeAttached({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(comparison).toHaveText(/^지난 시즌(?: QUIET COVER · 이번 시즌 [A-Z ]+|과 같은 결말 QUIET COVER에 다시 닿았습니다) · 판 규칙이 바뀐 뒤의 첫 시즌$/);
+  // The record counted this season once, and kept the one before for the line.
+  const record = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), SEASON_RECORD_KEY);
+  expect(record.seasons).toBe(2);
+  expect(record.previous.endingLabel).toBe("QUIET COVER");
+  expect(record.last.runId).toBe("e2e-seeded-run");
+});
+
 test("NEW GAME+ over a run that can be resumed asks first, and a no leaves the run alone", { tag: "@prod" }, async ({ page }) => {
   const run = {
     saveSchemaVersion: 2,
@@ -638,7 +786,7 @@ test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => 
   await page.goto("/?debug=1");
   await startDebugNodeFromHelper(page, "case01", "payday", { navigate: false, resetStorage: false, expectGameShell: false, openTable: false });
   // The guide sends the player to "'판을 다시 짠다' 카드", and this scene's card
-  // is labelled 다른 방법을 제안한다: the name is on it, in the briefing's list
+  // is labelled 세 안건을 한 표에 올리자고 한다: the name is on it, in the briefing's list
   // and on the table, and the English "WILD" that stood for it is gone.
   const listed = page.getByTestId("scene-briefing").getByTestId("briefing-card").last();
   await expect(listed.getByTestId("wild-name")).toHaveText("판을 다시 짠다");
@@ -748,7 +896,7 @@ test.describe("a phone on its side", () => {
       const question = nodes.c2_trace.question ?? (await page.locator(".gx-question").textContent());
       const cut = await page.locator(".gx-question").evaluate((element) => element.scrollHeight > element.clientHeight + 1);
       expect(cut, "the longest question in the season does not fit two lines here").toBe(true);
-      const fold = page.locator(".gx-brief summary");
+      const fold = page.locator(".gx-brief > summary");
       await expect(fold).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollHeight), "the fold costs the table no height").toBeLessThanOrEqual(size.height + 2);
       expect(await pointerLandsOn(fold), "the fold is not covered").toBe(true);
@@ -840,14 +988,14 @@ test.describe("a phone on its side", () => {
 // The briefing on a phone held upright. Its page is longer than the screen on
 // every scene, and the room's drawing used to keep its whole height at the top
 // of it: on a 360x740 phone the story began under the docked footer, so the
-// first screen was a picture and no words. The picture is what gives way now
-// (briefing.css): cropped to a band while the page is longer than the screen,
-// whole when it is not.
+// first screen was a picture and no words. The picture gave way to a band, and
+// since 2026-10-22 (D-13) it is drawn behind the page's title instead: what is
+// left of its panel is the room's name and clock.
 const measureBriefing = (page) =>
   page.evaluate(() => {
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
     const sheet = document.querySelector(".gx-comic-page");
-    // Short phones (briefing.css, up to 46.25em) dock 판 열기 alone: the footer is
+    // Phones (briefing.css, every one since 2026-10-22) dock 판 열기 alone: the footer is
     // display: contents and has no box of its own, so there the dock is the button.
     const actions = document.querySelector(".gx-comic-actions");
     const dock = getComputedStyle(actions).display === "contents" ? document.querySelector("[data-testid='open-table']") : actions;
@@ -855,6 +1003,11 @@ const measureBriefing = (page) =>
     return {
       pictureHeight: Math.round(box(".gx-panel-splash").height),
       drawingHeight: Math.round(box(".gx-panel-splash .gx-plate").height),
+      backdrop: (() => {
+        const drawn = box(".gx-comic-top > .gx-plate-backdrop");
+        const title = box(".gx-comic-top");
+        return { height: Math.round(drawn.height), inside: drawn.top >= title.top - 1 && drawn.bottom <= title.bottom + 1 };
+      })(),
       storyTop: Math.round(box(".gx-panel-story .gx-caption").top),
       lastPanelBottom: Math.round(Math.max(...panels)),
       dockTop: Math.round(dock.getBoundingClientRect().top),
@@ -888,8 +1041,10 @@ test.describe("a phone held upright", () => {
       const openButton = page.getByTestId("open-table");
       const atTop = await measureBriefing(page);
       expect(atTop.scrolls, "the page is longer than the screen, and scrolls").toBe(true);
-      expect(atTop.pictureHeight, "the picture is cropped to a band").toBeLessThanOrEqual(atTop.drawingHeight - 30);
-      expect(atTop.pictureHeight, "and is still a picture").toBeGreaterThanOrEqual(80);
+      expect(atTop.drawingHeight, "the room is not drawn in a band of its own").toBe(0);
+      expect(atTop.backdrop.height, "it is drawn behind the title").toBeGreaterThan(40);
+      expect(atTop.backdrop.inside, "and no further down than the title goes").toBe(true);
+      expect(atTop.pictureHeight, "its panel is the room's name and clock").toBeLessThanOrEqual(100);
       expect(atTop.storyTop, "the story begins above the docked footer").toBeLessThan(atTop.dockTop);
       expect(atTop.openBottom, "판 열기 is on screen before any scrolling").toBeLessThanOrEqual(size.height);
       expect(await pointerLandsOn(openButton), "판 열기 is not covered").toBe(true);
@@ -910,12 +1065,16 @@ test.describe("a phone held upright", () => {
   }
 
   test("a briefing that fits its screen keeps the whole picture", async ({ page }) => {
-    // The shortest story in the season, on a narrow window tall enough for it.
-    await page.setViewportSize({ width: 700, height: 1400 });
+    // The shortest story in the season, on a window one pixel wider than a
+    // phone: the room is drawn whole in its panel there (a phone draws it
+    // behind the title, D-13).
+    await page.setViewportSize({ width: 701, height: 1400 });
     await openHeldBriefing(page, "case08", "c8_clerks_reaction");
     const fits = await measureBriefing(page);
     expect(fits.scrolls, "the page fits the screen").toBe(false);
+    expect(fits.drawingHeight, "the drawing is in its panel").toBeGreaterThan(80);
     expect(fits.pictureHeight, "the drawing is shown whole").toBeGreaterThanOrEqual(fits.drawingHeight);
+    expect(fits.backdrop.height, "and not behind the title as well").toBe(0);
     expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1400);
   });
 
@@ -1194,7 +1353,8 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
 
   await expect(page.locator(".ending-step-3")).toBeVisible();
   await expect(page.locator(".result-page.final-report-locked")).toHaveCount(0);
-  await expect(page.locator(".result-hero h1")).toBeFocused();
+  // The ending's title, first on the report since 2026-10-22 (D-10); the profile and rank follow the story.
+  await expect(page.locator(".result-page > .outcome-panel h2")).toBeFocused();
   // The sequence's own region: the result card's buttons bring a second one.
   await expect(page.locator(".ending-sequence > [role='status']")).toContainText("기록이 열렸습니다");
   await expect
@@ -1412,7 +1572,7 @@ for (const season of [
     const draftSkip = page.getByTestId("relic-skip");
     await expect(briefing.or(draftSkip).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     if (await draftSkip.isVisible()) await clickThroughMotion(draftSkip, "skip the relic draft");
-    // Read at once: the page's reading clock opens the table by itself after 12 to 95 seconds.
+    // Read at once: the page's reading clock opens the table by itself after 12 to 94 seconds.
     await expect(briefing).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     await expect(page.getByTestId("open-table")).toBeVisible();
     const reopened = await readJsonStorage(page, TEST_STORAGE_KEYS.save);

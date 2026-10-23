@@ -356,6 +356,15 @@ const TABLE_AUDIO = "src/gauntlet/gauntletAudio.js";
 const SCENE_TRACES = "src/state/useSceneBustRates.js";
 
 /**
+ * The other players' card share under the decision reveal (E-6):
+ * src/state/useSceneChoiceRates.js, which asks `scene_choice_rates()` once
+ * per page load, and src/sceneChoices.js, which words the answer. Only the
+ * reveal imports them, so left alone they are written into the PlayScreen
+ * chunk; they get a file the way sceneTraces does.
+ */
+const SCENE_CHOICES = "src/state/useSceneChoiceRates.js";
+
+/**
  * 이번 주의 규칙's panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx).
  * Only the briefing imports it, so left alone it is written into the
  * PlayScreen chunk, which it took past its gzip budget on 2026-10-20 (34,395
@@ -363,6 +372,23 @@ const SCENE_TRACES = "src/state/useSceneBustRates.js";
  * with the table the same way, so the page draws it no later.
  */
 const WEEK_RULE_PANEL = "src/gauntlet/WeekRulePanel.jsx";
+
+/**
+ * The office's noise at the table's edge (개선 포인트 A5,
+ * src/gauntlet/EdgeNotice.jsx): its words, its timing and its inline style.
+ * Only TableNotices imports it, so left alone it is written into the
+ * PlayScreen chunk, which had 4 gzip bytes left on 2026-10-21. It gets a file
+ * the way the week's panel does and is fetched with the table.
+ */
+const EDGE_NOTICE = "src/gauntlet/EdgeNotice.jsx";
+
+/**
+ * The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx, 2026-10-22):
+ * whether the player would rather open every table themselves. Only the
+ * briefing imports it, and it gets a file the way WeekRulePanel does, so the
+ * PlayScreen chunk does not grow for a panel most pages never draw.
+ */
+const READING_CLOCK_ASK = "src/gauntlet/ReadingClockAsk.jsx";
 
 /**
  * The audit (B3, src/gauntlet/auditRisk.js): its count, its judgement and the
@@ -395,6 +421,15 @@ const CASCADE_RISK = "src/gauntlet/cascadeRisk.js";
  */
 const WINDOW_TRAIL = "src/gauntlet/windowTrail.js";
 
+/**
+ * What the briefing's balloon says (A-2, src/gauntlet/speakerLine.js): whose a
+ * speech is and the first one of the speaker's. Only the briefing imports it,
+ * so left alone it is written into the PlayScreen chunk, which it took 582
+ * gzip bytes past its budget on 2026-10-23. It gets a file the way the week's
+ * panel does, and imports nothing, so no chunk it would share is split out.
+ */
+const SPEAKER_LINE = "src/gauntlet/speakerLine.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -426,8 +461,26 @@ function runtimeSystemsChunk() {
       });
       this.emitFile({
         type: "chunk",
+        id: path.resolve(SCENE_CHOICES),
+        name: "sceneChoices",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
         id: path.resolve(WEEK_RULE_PANEL),
         name: "WeekRulePanel",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(EDGE_NOTICE),
+        name: "EdgeNotice",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(READING_CLOCK_ASK),
+        name: "ReadingClockAsk",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
       this.emitFile({
@@ -446,6 +499,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(WINDOW_TRAIL),
         name: "windowTrail",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(SPEAKER_LINE),
+        name: "speakerLine",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },
@@ -481,8 +540,11 @@ export default defineConfig(({ command, mode }) => ({
     // The result card's chunk leans only on files the ending screen has
     // already run, so its list is left out: writing it cost the report's chunk
     // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+    // The case file's cast (CaseCast, D-8) is the same: the runtime has run
+    // every file it leans on before the table's fold can open, and its list
+    // of sixteen files was about 500 bytes (2026-10-23).
     modulePreload: {
-      resolveDependencies: (filename, deps) => (/\/ResultCardShare-/.test(filename) ? [] : deps),
+      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
     },
     rollupOptions: {
       output: {

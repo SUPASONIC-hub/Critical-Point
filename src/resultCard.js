@@ -100,7 +100,7 @@ export function drawResultCard(ctx, model, theme) {
 
   // 1. The strip: whose record this is, over a hairline in the accent.
   write(RESULT_CARD_LABELS.game, LEFT, 112, { weight: HEAVY, size: 28, color: theme.dim, maxWidth: CONTENT_WIDTH / 2 });
-  write(RESULT_CARD_LABELS.season, RIGHT, 112, { size: 28, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 - 20 });
+  write(model.season, RIGHT, 112, { size: 28, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 - 20 });
   ctx.fillStyle = accent;
   ctx.fillRect(LEFT, 140, CONTENT_WIDTH, 2);
 
@@ -155,6 +155,9 @@ export function drawResultCard(ctx, model, theme) {
     write(RESULT_CARD_LABELS.logic, LEFT, LOGIC_BASELINE, { size: 26, color: theme.dim });
     write(`${model.logicHold}${RESULT_CARD_LABELS.points}`, scoreLeft, LOGIC_BASELINE, { weight: HEAVY, size: 26, maxWidth: CONTENT_WIDTH / 2 });
   }
+
+  // 4b. 사건당 금고 on the same line, right-aligned (C-1 (3)); worded outside this chunk.
+  if (model.vaultLine) write(model.vaultLine, RIGHT, LOGIC_BASELINE, { size: 26, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 });
 
   // 5. Three cells: the best table of the season, its rank, and the league.
   const cellWidth = (CONTENT_WIDTH - CELL_GAP * 2) / 3;

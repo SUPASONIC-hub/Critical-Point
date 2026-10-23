@@ -24,6 +24,7 @@ commit.
 | Margin | 0.4%포인트 between 179.6% and the line |
 | What was moved | 268억 of December's 412억, booked four weeks early |
 | 2025: what was moved again | the same shift, repeated at each month-end for 8 months, each time to the same 179.6% (사건 01) |
+| 2025: why the analyst is at 플로우온 (사건 01) | KD은행, 플로우온's 주거래 은행, asks for a 72-hour 실사. 트리거랩 sends the analyst with 도윤하 (현장 담당) and 감사팀's 반재욱; the analyst writes the 권고서 and the 의견서, and 대표이사 권승우 (권태호's younger brother, 사건 09), the 이사회 and the lending banks decide. The lab files it as a 훈련용 사례 |
 | Who wrote 제7조 | KD은행 기업금융전략팀, November 2022, on a one-page request from 그룹전략실 |
 | 플로우온 head-count | 1,140명; 야간조 380명, 181 of them on contract (2023) |
 

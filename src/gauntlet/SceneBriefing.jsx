@@ -5,8 +5,10 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
-import { getBriefingIntro, getBriefingWeekRuleId } from "./tableStaging.js";
-import { useWeekRulePanel } from "./WeekRulePanel.jsx";
+import { getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
+import { getSpeakerLine } from "./speakerLine.js";
+import { SPEAKER_NAMES } from "../speakerPortraits.js";
+import { useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
@@ -14,7 +16,8 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { Prose, ProseCaptions, ProseItems } from "../components/Prose.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
-import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
+import { useShortcutHints } from "../state/accessibilitySettings.js";
+import { ReadingClockAsk, readingClockStart } from "./ReadingClockAsk.jsx";
 import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
@@ -53,8 +56,11 @@ function RuleRows({ rules, resourceMeta }) {
 /**
  * The scene, told as a page of a graphic novel before the table opens.
  *
- * A splash panel of the room with its caption and sound, the speaker with the
- * scene's question in a balloon, the narration as caption boxes, the case file
+ * A splash panel of the room with its caption and sound, the speaker with a
+ * line of their own in a balloon (speakerLine.js) and under it the scene's
+ * question in a box with no tail, 「당신의 판단」 -- the question is the
+ * narrator's to the player, not the speaker's -- the narration as caption
+ * boxes, the speaker's own speech among them wearing a name chip, the case file
  * pinned beside it, and -- when the last decision broke this board -- the new
  * rules as a red panel. `mutations` is the table's own list (`tableRules`, so
  * no REBOOT), and only the penalties in it are a breach: the red panel, the
@@ -67,9 +73,12 @@ function RuleRows({ rules, resourceMeta }) {
  * staking it would do to the logic streak.
  *
  * The page a case opens on, when the case turns rules on (`tableUnlocks`),
- * says so in a panel of the same form. It sits straight under the speaker and
- * the question, so it is on the first screen with them; the breach panel
- * stays where it always was, at the end of the page.
+ * says so in a panel of the same form. It is the last panel, under the story,
+ * the case file and the week's rule, straight above the cards and 판 열기
+ * (improvement notes D-6, 2026-10-22): from 2026-10-09 to then it sat between
+ * the speaker and the story, so the first sentence of the game a player read
+ * was 「밀면 열기와 배율이 오릅니다」 and not the story. Read last, it is the
+ * rule in front of the button it is about.
  *
  * The page holds the table's clock the whole time it is up; its own countdown
  * is the only thing ticking, and it stops while the browser tab is hidden.
@@ -99,8 +108,12 @@ function RuleRows({ rules, resourceMeta }) {
  * Then the case facts. Every scene has carried a `memo` since the graph was
  * written and none of them ever reached the DOM, so the briefing explained the
  * table and never the situation the cards are answering.
+ *
+ * Then the case so far and who is in it (D-8): `caseCast`, from the runtime
+ * (CaseCastFold.jsx), which fetches CaseCast, a chunk of its own, the first
+ * time the fold opens.
  */
-export function CaseFileStory({ node, nodeId, open, standing }) {
+export function CaseFileStory({ node, nodeId, open, standing, caseCast }) {
   return (
     <>
       <p data-testid="brief-standing">{describeStanding(...standing)}</p>
@@ -118,6 +131,7 @@ export function CaseFileStory({ node, nodeId, open, standing }) {
           <ProseItems items={node.memo} />
         </ul>
       )}
+      {open && caseCast?.(node, SpeakerPortrait)}
     </>
   );
 }
@@ -128,6 +142,10 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  bridge = null,
+  reaction = null,
+  opening,
+  echo,
   run,
   tableSeconds,
   cards,
@@ -139,23 +157,45 @@ export function SceneBriefing({
   resourceMeta,
   moveOf,
   onOpen,
+  reading,
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
+  const speech = useMemo(() => getSpeakerLine(node, SPEAKER_NAMES), [node]);
+  // A lead the balloon carries is narration: a caption's box, not speech.
+  const Balloon = speech.fromLead ? "p" : "blockquote";
+  // The case's opening voice, on its first page only, read after the title and
+  // on the reading clock (Q8 (1)). In the place reading-layout gives its
+  // 「지난 장면에서 —」 line, which this stands in for on that page.
+  // Not on a NEW GAME+ season's first page, whose run line is the season's
+  // carried one (`echo.echo`, drawn by WeekRulePanel.jsx) and not a case voice.
+  const openingLine = echo?.echo ? "" : getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
-  // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same clock.
-  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run));
+  // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
+  // clock; above it, on a NEW GAME+ season's first page of a case, what the
+  // season before left there (`echo`, an object of two lines: secondSeason.js).
+  // All are drawn by WeekRulePanel.jsx.
+  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run), echo);
+  // E-1: on a NEW GAME+ season, the scene as the page tells it (`told`: a
+  // scene a season before read, folded), the button that unfolds it and the
+  // NEW mark of one none read. Also WeekRulePanel.jsx's, for the same reason.
+  const [told, unfold, newMark] = useSceneFold(node, echo);
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
-  // same way. `mutations` is exactly the two lists printed below.
+  // same way. `mutations` is exactly the two lists printed below. The line
+  // from the scene before (`bridge`, D-7) is read on it too.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
-    [node, question, mutations, intro, weekRules],
+    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }, { text: openingLine }]),
+    [told, question, mutations, intro, weekRules, bridge, openingLine],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
-  // Held from the start when the player asked for a reading clock that waits.
-  const [held, setHeld] = useState(() => getAccessibility().holdReadingClock);
+  // Held from the start when the player asked for a reading clock that waits,
+  // and on 프롤로그 01-02 until the page has asked once (ReadingClockAsk.jsx).
+  const [start] = useState(() => readingClockStart(node.caseId));
+  const [held, setHeld] = useState(start.held);
+  const [asking, setAsking] = useState(false);
+  const askRef = useRef(start.ask);
   const heldRef = useRef(held);
   const onOpenRef = useRef(onOpen);
   const dialogRef = useRef(null);
@@ -166,20 +206,38 @@ export function SceneBriefing({
     onOpenRef.current = onOpen;
   });
 
+  // D-11: how long this page is up (visible) and whether it was ever held, for
+  // the stage to note when the table opens, by whatever key or button. Each
+  // frame reports both, so a page held from the start or held later is caught.
+  const readingRef = useRef(reading);
+  useEffect(() => {
+    readingRef.current = reading;
+  });
+
   useEffect(() => {
     let frame = 0;
     let spent = 0;
     let last = monotonicNow();
     const loop = () => {
       const now = monotonicNow();
-      if (!document.hidden && !heldRef.current) spent += Math.min(0.25, (now - last) / 1000);
+      const step = document.hidden ? 0 : Math.min(0.25, (now - last) / 1000);
+      if (!heldRef.current) spent += step;
+      readingRef.current?.(step, heldRef.current);
       last = now;
       const remaining = Math.max(0, readSeconds - spent);
       timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));
       // Whole seconds are all the page prints; an unchanged value skips the render.
       setShown(Math.ceil(remaining));
-      if (remaining <= 0) {
+      if (remaining <= 0 && askRef.current) {
+        // The first time the clock would open a table, it stops and asks.
+        askRef.current = false;
+        heldRef.current = true;
+        setHeld(true);
+        setAsking(true);
+      } else if (remaining <= 0 && !heldRef.current) {
         // Opened by the clock, not by the player: the table says so aloud.
+        // While the question is open the clock is held, so it waits for the
+        // answer instead of opening the table on the very next frame.
         onOpenRef.current(null, true);
         return;
       }
@@ -194,18 +252,15 @@ export function SceneBriefing({
     setHeld(heldRef.current);
   }
 
-  // The grid has no row for the introduction: its three are the picture and
-  // the speaker, the story and the file, the breach. A page that carries one
-  // places every panel by line instead, a row further down from the story on.
+  // The grid's three rows are the picture and the speaker, the story and the
+  // file, the breach. A board that carries both kinds of rule has one more
+  // panel than the grid has rows under the story, and names the row (`row`).
   // On a phone the panels are a column in the order they are written, and
   // this is not read.
-  // A board that carries both kinds of rule has one more panel than the grid
-  // has rows under the story, and names the row (`row`) whatever the page.
-  const at = (gridArea, row = 0) => (row ? { gridArea: `${row} / 1 / ${row + 1} / -1` } : intro.length > 0 ? { gridArea } : undefined);
+  const at = (row) => (row ? { gridArea: `${row} / 1 / ${row + 1} / -1` } : undefined);
   const penalties = mutations.filter(isPenaltyMutation);
   const carried = mutations.filter((mutation) => !isPenaltyMutation(mutation));
   const broken = penalties.length > 0;
-  const carryRow = intro.length > 0 ? 4 : 3;
   const sfx = pickSfx(nodeId, broken);
   const late = !held && shown <= 5;
 
@@ -220,9 +275,15 @@ export function SceneBriefing({
         tabIndex={-1}
         onKeyDown={trapTab}
       >
-        <header className="gx-comic-top">
-          <p className="gx-comic-kicker" lang="en">{node.phase}</p>
+        <header className={`gx-comic-top${openingLine ? " has-opening" : ""}`}>
+          {/* A phone's picture of the room, behind the title (D-13); briefing.css shows it there only. */}
+          <ScenePlate node={node} nodeId={nodeId} variant="backdrop" />
+          <p className="gx-comic-kicker" lang="en">
+            {node.phase}
+            {newMark}
+          </p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
+          {openingLine && <p className="gx-comic-opening" data-testid="briefing-opening">{openingLine}</p>}
           <button
             type="button"
             ref={timerRef}
@@ -250,7 +311,7 @@ export function SceneBriefing({
         </header>
 
         <div className="gx-comic-grid">
-          <figure className="gx-panel gx-panel-splash" style={at("1 / 1")}>
+          <figure className="gx-panel gx-panel-splash">
             <ScenePlate node={node} nodeId={nodeId} />
             {(node.place || node.clock) && (
               <figcaption className="gx-caption gx-caption-place">
@@ -261,7 +322,7 @@ export function SceneBriefing({
             <strong className="gx-sfx" aria-hidden="true">{sfx}</strong>
           </figure>
 
-          <figure className="gx-panel gx-panel-speaker" style={at("1 / 2")}>
+          <figure className="gx-panel gx-panel-speaker">
             <div className="gx-speaker-frame">
               <SpeakerPortrait name={node.speaker} src={portrait} size={240} />
             </div>
@@ -269,46 +330,47 @@ export function SceneBriefing({
               <b>{node.speaker}</b>
               <span>{speakerRole}</span>
             </figcaption>
-            <blockquote className="gx-balloon"><Prose text={question} /></blockquote>
+            {speech.line && (
+              <Balloon className={`gx-balloon${speech.fromLead ? " is-lead" : ""}`}>
+                <Prose text={speech.line} />
+              </Balloon>
+            )}
+            <div className="gx-judgment" data-testid="briefing-question">
+              <b>당신의 판단</b>
+              <p><Prose text={question} /></p>
+            </div>
           </figure>
 
-          {intro.length > 0 && (
-            <div className="gx-panel gx-panel-breach gx-carry" data-testid="unlock-intro" style={at("2 / 1 / 3 / -1")}>
-              <p className="gx-breach-kicker">{getUnlockKicker(node.caseId)}</p>
-              <ul>
-                {intro.map((line) => (
-                  <li key={line} className="gx-mutation">
-                    <strong style={{ gridColumn: "1 / -1" }}>{line}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="gx-panel gx-panel-story" style={at("3 / 1")}>
-            {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
-            <ProseCaptions text={node.text} />
+          <div className="gx-panel gx-panel-story">
+            {unfold}
+            {/* Where the last scene left off (D-7): its echo, or the ending of the case before. */}
+            {bridge && <p className="gx-bridge" data-testid="scene-bridge">{bridge}</p>}
+            {/* The speaker on the last table, before the scene (C-13): a line of the runtime's, picked by its heat. */}
+            {reaction && <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">{node.speaker}: “{reaction}”</p>}
+            {/* A lead the balloon carries is not told twice. */}
+            {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
+            <ProseCaptions text={told.text} who={node.speaker} whoAt={speech.whoAt} />
           </div>
 
-          {(node.memo?.length > 0 || trace) && (
-            <div className="gx-panel gx-panel-file" style={at("3 / 2")}>
+          {(told.memo?.length > 0 || trace) && (
+            <div className="gx-panel gx-panel-file">
               <p className="gx-file-tab">사건 파일</p>
               <ul>
-                <ProseItems items={node.memo} />
+                <ProseItems items={told.memo} />
                 {trace && <li data-testid="scene-trace">{trace}</li>}
               </ul>
             </div>
           )}
 
           {carried.length > 0 && (
-            <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at("4 / 1 / 5 / -1", broken ? carryRow : 0)}>
+            <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at(broken ? 3 : 0)}>
               <p className="gx-breach-kicker">이월 · 이번 판에 이어지는 규칙</p>
               <RuleRows rules={carried} resourceMeta={resourceMeta} />
             </div>
           )}
 
           {broken && (
-            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at("4 / 1 / 5 / -1", carried.length > 0 ? carryRow + 1 : 0)}>
+            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
               <p className="gx-breach-kicker">
                 <TriangleAlert size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span> · 이번 판의 규칙이 바뀌었다</span>
               </p>
@@ -319,6 +381,28 @@ export function SceneBriefing({
 
         {/* Under the page's grid, so it takes none of its rows. */}
         {weekRulePanel}
+
+        {intro.length > 0 && (
+          <div className="gx-panel gx-panel-breach gx-carry" data-testid="unlock-intro" style={{ gridArea: "auto" }}>
+            <p className="gx-breach-kicker">{getUnlockKicker(node.caseId)}</p>
+            <ul>
+              {intro.map((line) => (
+                <li key={line} className="gx-mutation">
+                  <strong style={{ gridColumn: "1 / -1" }}>{line}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {asking && (
+          <ReadingClockAsk
+            onAnswer={(hold) => {
+              setAsking(false);
+              if (!hold) onOpen(null, true);
+            }}
+          />
+        )}
 
         <footer className="gx-comic-actions">
           <p className="gx-comic-hint">

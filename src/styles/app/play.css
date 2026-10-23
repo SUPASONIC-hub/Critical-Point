@@ -72,6 +72,16 @@
   line-height: 1.45;
 }
 
+/* 당신의 판단: whose decision the line is, in place of the quotes (A-10), and
+   the name of the briefing's question box (A-2). */
+.decision-reveal-choice > span,
+.gx-judgment b {
+  display: block;
+  color: var(--ui-text-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .decision-reveal-beat {
   display: grid;
   gap: 8px;
@@ -1121,7 +1131,7 @@
   line-height: 1.75;
 }
 
-.gx-brief ul {
+.gx-brief :is(ul, ol) {
   display: grid;
   gap: 4px;
   margin: 7px 0 0;
@@ -1142,6 +1152,17 @@
   color: var(--ui-text-2);
   border-left: 2px solid var(--ui-line);
   list-style: none;
+}
+
+/* The case so far and who is in it (CaseCast.jsx, D-8): a card's lines stacked under the name. */
+.gx-cast details > :not(summary) {
+  display: block;
+}
+
+.gx-cast summary > * {
+  margin-right: 6px;
+  vertical-align: middle;
+  border-radius: 50%;
 }
 
 /* Situation board: what the table does next, three one-line cells. */
@@ -1862,6 +1883,11 @@
   font-weight: 600;
 }
 
+/* The afterword's verdict stays on one line (360px, larger story size). */
+.gx-reveal-keep {
+  white-space: nowrap;
+}
+
 /* 자세히: the short sheet's way to the whole one. Under the verdict, above
    everything it opens, so what grows is below the button and the top of the
    sheet -- the verdict and the button -- is what stays in view. */
@@ -2045,6 +2071,15 @@
   color: var(--c-danger-81);
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+/* E-6's line, the share of analysts who took the same card: information, not
+   a warning, so it is plain text and not the relic notice's bar. */
+.gx-reveal-share {
+  margin: 8px 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 .gx-reveal-skip {

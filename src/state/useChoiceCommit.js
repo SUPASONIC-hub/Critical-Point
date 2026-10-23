@@ -10,6 +10,7 @@ import {
   getDramaticChoiceLabel,
   getEcho,
   getEndingVariant,
+  getFinalSceneChoiceId,
   getObserverTag,
   getOutcomeChoiceId,
   getSeasonLogic,
@@ -27,11 +28,14 @@ import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
+import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../gauntlet/tableAfterword.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
+import { findFinalChoiceEntry } from "../verdictBranch.js";
+import { newGamePlusMark } from "./newGamePlusCarry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
@@ -39,6 +43,7 @@ import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
+import { takeReadingTally } from "./readingTally.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -59,7 +64,10 @@ let cloudConflictSaid = false;
 export function toRowSummary(caseSummary) {
   const ending = caseSummary?.endingVariant;
   const id = typeof ending === "string" ? ending : ending?.id;
-  return { ...caseSummary, endingVariant: typeof id === "string" ? id : null };
+  // `finalChoiceId` stays in the save: the row's decision log already carries
+  // that card, so the server's summary stays the shape it was.
+  const { finalChoiceId: _finalChoiceId, ...rowSummary } = caseSummary ?? {};
+  return { ...rowSummary, endingVariant: typeof id === "string" ? id : null };
 }
 
 /**
@@ -128,10 +136,13 @@ export function useChoiceCommit(context) {
   function recordClosedCase({ caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec }) {
     const {
       currentCase, runId, sessionId, sessionCode, playerName, activeCaseMeta, dataConsent, caseResults,
-      appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
+      appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal, seasonTitle,
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
-    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary });
+    // With the answer to its last question, which the season record counts the ruling by.
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null, log: nextLog });
+    // Taken whether or not the row is sent, so the next case starts its own count.
+    const reading = takeReadingTally();
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
@@ -168,7 +179,8 @@ export function useChoiceCommit(context) {
         triggers: nextTriggers,
         cognition: nextCognition,
         decision_log: nextLog,
-        dynamics: { ...createRunSummary(nextRun), responseTimeSec },
+        // D-11 + E-4(b): how the case was read (state/readingTally.js).
+        dynamics: { ...createRunSummary(nextRun), responseTimeSec, ...reading },
       };
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,
@@ -195,6 +207,7 @@ export function useChoiceCommit(context) {
     if (currentCase !== "final" || nextCompletedCases.length !== CASE_SEQUENCE.length) return;
     const seasonTelemetryPayload = createSeasonTelemetryPayload({
       caseSummary: rowSummary,
+      title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       cognition: nextCognition,
       decisionLog: nextLog,
@@ -206,6 +219,7 @@ export function useChoiceCommit(context) {
     });
     const { saved: seasonRankingSaved } = appendLocalRankingRow(createSeasonLeaderboardRow({
       caseSummary,
+      title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       playerName,
       runId,
@@ -235,7 +249,7 @@ export function useChoiceCommit(context) {
       queueTelemetry({
         id: `season-final-${runId}`,
         type: "case",
-        label: "SEASON 01 COMPLETE",
+        label: seasonTelemetryPayload.case_title,
         payload: seasonTelemetryPayload,
       });
     }
@@ -369,6 +383,9 @@ export function useChoiceCommit(context) {
         ...(verdict.firstRecord ? { firstRecord: verdict.firstRecord } : {}),
         focus: verdict.focus,
         logic: verdict.logic,
+        // The same board played bare by the player and by a hand that sees the
+        // wall (tableAfterword.js, C-12): shown when the case closes, never scored.
+        read: readWindowAgainstSeer(windowState, verdict.chips),
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       // The table clock ran this many times slower (the comfort setting); the
@@ -417,6 +434,7 @@ export function useChoiceCommit(context) {
         schemaVersion: SAVE_SCHEMA_VERSION,
         replayOf: caseResults[currentCase],
       });
+      const finalChoiceId = getFinalSceneChoiceId(nextLog, entry.nodeId);
       const caseSummary = {
         ...caseSummaryDraft,
         endingVariant: getEndingVariant({
@@ -429,6 +447,10 @@ export function useChoiceCommit(context) {
         runId,
         outcomeChoiceId: getOutcomeChoiceId(entry.choiceId, node),
         outcomeNodeId: entry.nodeId,
+        // The card of the last scene before the outcome, for a far callback
+        // that reads it cases later (farCallbacks.js). Absent when the
+        // log has none; a save from before the field has none either.
+        ...(finalChoiceId ? { finalChoiceId } : {}),
         completedAt: new Date().toISOString(),
       };
       // A case played again keeps the table record of its first close, and the
@@ -436,6 +458,9 @@ export function useChoiceCommit(context) {
       // play's story mark as well: playing a story case once more at the table
       // does not make the season one that was played there.
       if (caseResults[currentCase]?.assistStory === true) caseSummary.assistStory = true;
+      // A NEW GAME+ season marks every case (newGamePlusMark): the server keeps
+      // its prologues out of the scene bust rates and replays them on the whole table.
+      Object.assign(caseSummary, newGamePlusMark(nextRun));
       // The ranking publishes the run's final case row, so the finale carries
       // the slowest table clock of the whole season, not only its own.
       if (currentCase === "final") {
@@ -484,15 +509,24 @@ export function useChoiceCommit(context) {
         // archive. The reframe card has no line of its own (the default echo),
         // and a line written for a card that was confirmed is not what came of
         // a bust or of a card the clock staked: those keep the sentence made
-        // from the effect.
+        // from the effect, the beat's last, which the reveal shows under the
+        // verdict on every sheet (DecisionReveal.jsx).
         echo: reframe || busted || forced ? null : entry.echo,
         effect: finalEffect,
         clue,
         skippedTitle: blackoutSkip?.skippedTitle ?? null,
         skippedNodeId: blackoutSkip?.skippedNodeId ?? null,
+        skippedPlace: blackoutSkip?.skippedPlace ?? null,
         nextTitle: nodes[nextNode]?.title ?? "결과 화면",
         nextNode,
         unlockedRelics,
+        // Display only (tableAfterword.js): the push not made or the wall the
+        // heartbeat heard (C-11), and on the close the case against a hand that
+        // sees the wall (C-12).
+        afterword: describeAfterword(windowState),
+        caseRead: caseClosed ? describeCaseRead(nextLog) : null,
+        // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
+        scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
       },
     });
     // Everything that leaves this tab's own state waits for the save to say

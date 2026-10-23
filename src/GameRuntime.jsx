@@ -79,7 +79,7 @@ import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { createRunLifecycle } from "./state/runLifecycle.js";
 import { resourceMeta } from "./appCopy.js";
 import { getNextCaseSignal } from "./caseCopy.js";
-import { createPlayView } from "./viewModels/appViewModels.js";
+import { createPlayView } from "./viewModels/playViewModel.js";
 import { createResultViewModel } from "./viewModels/resultViewModel.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
@@ -132,7 +132,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = setters;
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const relicTable = useRelicTable();
-  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason } = useNewGamePlus(saved);
+  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry, seasonRecord, seasonComparison, secondSeason } = useNewGamePlus(
+    saved, runId, gauntletRun?.veteran === true,
+  );
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus(currentCase);
   const [saveStatus, setSaveStatus] = useState("");
@@ -224,13 +226,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       caseResults.final && completedCases.includes("final")
         ? seasonViewModels.createSeasonLeaderboardRow({
             caseSummary: caseResults.final,
+            title: secondSeason.rowTitle,
             completedCaseCount: completedCases.length,
             playerName,
             runId,
             sessionCode,
           })
         : null,
-    [caseResults.final, completedCases, playerName, runId, sessionCode],
+    [caseResults.final, completedCases, playerName, runId, sessionCode, secondSeason.rowTitle],
   );
   const {
     achievementProgress,
@@ -282,8 +285,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     node,
     currentCase,
     clueCount,
+    discoveredClues,
     gauntletRun,
     runId,
+    echo: run.echo,
+    secondSeason,
+    nodeId: resolvedNodeId,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
   });
@@ -448,6 +455,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     playerName, activeCaseMeta, dataConsent, staleSave, clueCount, casesOpened,
     readers: choiceReaders, applyRun, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
     onSeasonFinal: unlockNewGamePlus,
+    seasonTitle: secondSeason.rowTitle,
   });
   const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
@@ -604,7 +612,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // What NEW GAME+ is: the season again, with the last one's record on the
     // intro. The line used to promise hidden authority and extra clues.
     setSaveStatus("NEW GAME+로 시작합니다. 지난 시즌의 기록은 시작 화면에 남아 있습니다.");
-    lifecycle.startGame({ veteran: true });
+    // The season opens on a line answering how the last one ended (newGamePlusCarry.js).
+    lifecycle.startGame({ veteran: true, echo: readSeasonCarry()?.echo ?? null });
   }
   /**
    * A case opened from the result page, by button or by key. Opening the one
@@ -788,6 +797,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
     riskTier,
     runId,
+    secondSeason,
+    weekRule: gauntletRun?.weekRule,
     tabScreen: !started ? "intro" : isResult ? "result" : "play",
     triggers,
   });
@@ -884,8 +895,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     AdaptiveMusic,
     playerName, setPlayerName, playStyle, setPlayStyle, dataConsent, setDataConsent,
     operatorOrigin, setOperatorOrigin, sessionCode, isOnline,
-    hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase, nodeId,
-    newGamePlusUnlocked, newGamePlusMemory, nextParticipantMessage,
+    hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase, nodeId, openingLegacy,
+    newGamePlusUnlocked, newGamePlusMemory, seasonRecord, runId, nextParticipantMessage,
     startGame: lifecycle.startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame: lifecycle.resumeSavedGame, persist, setShowRanking,
     setShowBoard,
     setSaveStatus, pendingTelemetry, setPendingTelemetry: replacePendingTelemetry, setTelemetryStatus,
@@ -902,7 +913,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const resultView = createResultViewModel(report, {
     AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, playerName, activeCaseMeta, renderSceneLines, renderSceneMinutes,
     endingStep, endingTwistIndex, advanceEndingStep, endingQuietReady, endingQuietLine, skipEndingQuietHold,
-    unopenedRecordCount, unopenedClueCount, unopenedBranchCount, operatorReveal,
+    unopenedRecordCount, unopenedClueCount, unopenedBranchCount, operatorReveal, seasonComparison,
     nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage,
     caseResults, decisionFingerprint, observationLedger, observerPattern, triggers, momentumTier, momentumScore,
     formatRiskDelta, counterfactualReport, achievementProgress, balanceSignals, log, clueCount,
@@ -930,7 +941,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     fixedChoices, clueCount, casesOpened, reframeChoice, tableRisk,
     resources, resourceMeta, progress, routePath: `${Math.max(0, routeIndex) + 1}/${routeLength}`,
     debugToolsEnabled, fallbackCaseId, silentFailureCount,
-  });
+  }, {}, caseResults);
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
   const playActions = {
     saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic,

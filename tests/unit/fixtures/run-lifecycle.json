@@ -1053,6 +1053,280 @@
       "saveSlots": []
     }
   },
+  "newGame/new-game-plus-echo": {
+    "run": {
+      "runId": "run-1",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "dataConsent": true,
+      "operatorOrigin": "public",
+      "sessionId": "session-0",
+      "started": true,
+      "isPausedSave": false,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 98,
+        "trust": 50,
+        "legitimacy": 58,
+        "humanCost": 0,
+        "fatigue": 13
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "openingLegacy": null,
+      "echo": "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "gauntletRun": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runHand": 0,
+        "handVault": 0,
+        "logic": {
+          "streak": 0,
+          "best": 0,
+          "type": null,
+          "held": 0,
+          "heat": 0,
+          "rose": false,
+          "reach": 0
+        },
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "veteran": true,
+        "story": false,
+        "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
+      "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 4,
+      "runId": "run-1",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": null,
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 98,
+        "trust": 50,
+        "legitimacy": 58,
+        "humanCost": 0,
+        "fatigue": 13
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runHand": 0,
+        "handVault": 0,
+        "logic": {
+          "streak": 0,
+          "best": 0,
+          "type": null,
+          "held": 0,
+          "heat": 0,
+          "rose": false,
+          "reach": 0
+        },
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "veteran": true,
+        "story": false,
+        "weekRule": null,
+        "linksIn": [],
+        "linksOut": [],
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "lastError": null,
+      "saveRevision": "<revision>"
+    },
+    "slots": 1,
+    "storageKeys": [
+      "trigger-prototype-save-slots-v1",
+      "trigger-prototype-v2"
+    ],
+    "trace": [],
+    "effects": [],
+    "status": null,
+    "outside": {
+      "status": null,
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
   "resume/paused-run": {
     "run": {
       "runId": "run-mid",
@@ -3448,7 +3722,7 @@
         "risk": 0
       },
       "openingLegacy": null,
-      "echo": "이번 사건의 핵심은 처음 찾아낸 오차입니다. 에코는 당신이 그것을 누구의 이름으로 남기는지, 그리고 그 결정에 몇 초를 쓰는지 기록합니다.",
+      "echo": "오진우의 메모: 수습 마지막 과제. 지점 한도 안이라 숫자만 맞춰 보면 돼. 승인은 목요일.",
       "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
@@ -3567,7 +3841,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "이번 사건의 핵심은 처음 찾아낸 오차입니다. 에코는 당신이 그것을 누구의 이름으로 남기는지, 그리고 그 결정에 몇 초를 쓰는지 기록합니다.",
+      "echo": "오진우의 메모: 수습 마지막 과제. 지점 한도 안이라 숫자만 맞춰 보면 돼. 승인은 목요일.",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [],
       "dynamics": {
@@ -3753,9 +4027,10 @@
           "id": "protect-trust",
           "title": "사수가 갚으려는 빚 지켜 내기",
           "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
-        }
+        },
+        "premise": "수습이 끝나고 반년, 당신 책상에 310억짜리 심사가 올라옵니다. 대출번호는 2023-0412, 빌리는 회사는 모두가 좋아하는 물류 플랫폼 플로우온입니다."
       },
-      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
+      "echo": "윤상혁 팀장의 메모: 실사는 자네가 나가고, 의견서는 다음 주 화요일까지. 지난 사건: '의견은 사수의 이름으로 올라갔다'",
       "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
@@ -3866,7 +4141,8 @@
           "id": "protect-trust",
           "title": "사수가 갚으려는 빚 지켜 내기",
           "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
-        }
+        },
+        "premise": "수습이 끝나고 반년, 당신 책상에 310억짜리 심사가 올라옵니다. 대출번호는 2023-0412, 빌리는 회사는 모두가 좋아하는 물류 플랫폼 플로우온입니다."
       },
       "dataConsent": true,
       "started": true,
@@ -3928,7 +4204,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
+      "echo": "윤상혁 팀장의 메모: 실사는 자네가 나가고, 의견서는 다음 주 화요일까지. 지난 사건: '의견은 사수의 이름으로 올라갔다'",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [
         {
@@ -4098,7 +4374,7 @@
         "risk": 0
       },
       "openingLegacy": null,
-      "echo": "이번 사건의 핵심은 반려입니다. 에코는 당신을 지켜 주겠다는 말 앞에서 당신이 무엇을 포기하는지 셉니다.",
+      "echo": "오진우의 문자: 안건 목록 올라왔어요. 4번이에요. 의견서는 첨부 7로 붙었고요.",
       "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
@@ -4246,7 +4522,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "이번 사건의 핵심은 반려입니다. 에코는 당신을 지켜 주겠다는 말 앞에서 당신이 무엇을 포기하는지 셉니다.",
+      "echo": "오진우의 문자: 안건 목록 올라왔어요. 4번이에요. 의견서는 첨부 7로 붙었고요.",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [
         {
@@ -4445,9 +4721,10 @@
           "id": "protect-trust",
           "title": "사수가 갚으려는 빚 지켜 내기",
           "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
-        }
+        },
+        "premise": "수습이 끝나고 반년, 당신 책상에 310억짜리 심사가 올라옵니다. 대출번호는 2023-0412, 빌리는 회사는 모두가 좋아하는 물류 플랫폼 플로우온입니다."
       },
-      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
+      "echo": "윤상혁 팀장의 메모: 실사는 자네가 나가고, 의견서는 다음 주 화요일까지. 지난 사건: '의견은 사수의 이름으로 올라갔다'",
       "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
@@ -4580,7 +4857,8 @@
           "id": "protect-trust",
           "title": "사수가 갚으려는 빚 지켜 내기",
           "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
-        }
+        },
+        "premise": "수습이 끝나고 반년, 당신 책상에 310억짜리 심사가 올라옵니다. 대출번호는 2023-0412, 빌리는 회사는 모두가 좋아하는 물류 플랫폼 플로우온입니다."
       },
       "dataConsent": true,
       "started": true,
@@ -4648,7 +4926,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
+      "echo": "윤상혁 팀장의 메모: 실사는 자네가 나가고, 의견서는 다음 주 화요일까지. 지난 사건: '의견은 사수의 이름으로 올라갔다'",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [
         {

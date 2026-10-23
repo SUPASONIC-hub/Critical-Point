@@ -84,6 +84,8 @@ function createSeasonCompletionSummary({ caseSummary, completedCaseCount }) {
 
 export function createSeasonLeaderboardRow({
   caseSummary,
+  // 「SEASON 02 COMPLETE」 (E-5, secondSeason.createSecondSeason's rowTitle). The server writes its own on a ranking row.
+  title = "SEASON 01 COMPLETE",
   completedCaseCount,
   playerName,
   runId,
@@ -95,7 +97,7 @@ export function createSeasonLeaderboardRow({
     session_code: sessionCode,
     player_name: playerName || "현재 분석관",
     case_id: "season-final",
-    case_title: "SEASON 01 COMPLETE",
+    case_title: title,
     completed_at: caseSummary?.completedAt ?? "",
     summary: createSeasonCompletionSummary({ caseSummary, completedCaseCount }),
   };
@@ -103,6 +105,8 @@ export function createSeasonLeaderboardRow({
 
 export function createSeasonTelemetryPayload({
   caseSummary,
+  // 「SEASON 02 COMPLETE」 (E-5, secondSeason.createSecondSeason's rowTitle). The server writes its own on a ranking row.
+  title = "SEASON 01 COMPLETE",
   completedCaseCount,
   cognition,
   decisionLog,
@@ -120,7 +124,7 @@ export function createSeasonTelemetryPayload({
     session_code: sessionCode,
     player_name: "익명 분석관",
     case_id: "season-final",
-    case_title: "SEASON 01 COMPLETE",
+    case_title: title,
     summary: createSeasonCompletionSummary({ caseSummary, completedCaseCount }),
     resources,
     triggers,

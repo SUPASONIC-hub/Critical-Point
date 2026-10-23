@@ -190,7 +190,7 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   const start = panel.indexOf("const TOGGLES = [");
   const list = panel.slice(start, panel.indexOf("\n];", start));
   const keys = [...list.matchAll(/key: "(\w+)"/g)].map((match) => match[1]);
-  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "calmEffects", "letterKeys", "stillIntro"]);
+  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
   for (const key of keys) assert.equal(typeof settings.DEFAULT_ACCESSIBILITY[key], "boolean", `${key} is a switch`);
   assert.match(list, /label: "스토리 모드"/);
   // What the switch says it does, each clause being something the engine does
@@ -296,11 +296,105 @@ test("the intro and the origin profiles carry nothing the page cannot print", as
     }
   }
   // The past-run note is a label and a sentence; the intro prints those two.
-  assert.deepEqual(Object.keys(getPastRunMemory({ case01: { outcomeChoiceId: "c1_public" } })), ["label", "text"]);
+  assert.deepEqual(Object.keys(getPastRunMemory({ case01: { outcomeChoiceId: "c1_public" } })), ["round", "text"]);
   assert.equal(getPastRunMemory({}), null);
   // The shell hands the view model nothing it does not take.
   const params = source("viewModels/introViewModel.js");
   assert.doesNotMatch(params.slice(params.indexOf("export function createIntroViewModel({"), params.indexOf("}) {", params.indexOf("export function createIntroViewModel({"))), /setSaveStatus/);
   const shell = source("AppContent.jsx");
   assert.doesNotMatch(shell.slice(shell.indexOf("const introView = createIntroViewModel({"), shell.indexOf("return <IntroScreen view={introView} />")), /^\s*setSaveStatus,$/m);
+});
+
+test("이야기 글 크기 is one of three sizes, carried on the document as an attribute and a factor (D-5)", () => {
+  assert.deepEqual([...settings.STORY_SCALES], [1, 1.125, 1.25]);
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.storyScale, 1);
+  assert.equal(settings.normalizeAccessibility({ storyScale: 1.25 }).storyScale, 1.25);
+  assert.equal(settings.normalizeAccessibility({ storyScale: 2 }).storyScale, 1, "a size the panel does not offer is the default");
+  assert.equal(settings.normalizeAccessibility({ storyScale: "1.125" }).storyScale, 1);
+  const attributes = new Map();
+  const style = new Map();
+  const root = { toggleAttribute: (name, on) => attributes.set(name, on), style: { setProperty: (name, value) => style.set(name, value) } };
+  settings.applyAccessibilityToDocument(settings.normalizeAccessibility({ storyScale: 1.125 }), root);
+  assert.equal(attributes.get("data-story-scale"), true);
+  assert.equal(style.get("--story"), "1.125");
+  settings.applyAccessibilityToDocument(settings.normalizeAccessibility({}), root);
+  assert.equal(attributes.get("data-story-scale"), false, "the default size leaves the prose alone");
+  // The table is not on the list: its height is budgeted to the pixel.
+  const css = readFileSync(new globalThis.URL("../../src/styles/app/comfort.css", import.meta.url), "utf8");
+  const rules = css.slice(css.indexOf("[data-story-scale]"));
+  for (const target of [".gx-panel-story .gx-caption", ".gx-balloon", ".decision-reveal-beat p", ".outcome-panel p", ".interlude-panel p"]) assert.ok(rules.includes(target), `${target} grows`);
+  assert.doesNotMatch(rules, /\.gx-table|\.gx-hand|\.gx-card|\.gx-brief\b/, "the table keeps its size");
+});
+
+test("the edge notices are on until turned off, and say no number aloud or on screen", () => {
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.edgeNotices, true);
+  assert.equal(settings.normalizeAccessibility({ edgeNotices: false }).edgeNotices, false);
+  assert.equal(settings.normalizeAccessibility({ edgeNotices: "off" }).edgeNotices, true);
+  const notice = source("gauntlet/EdgeNotice.jsx");
+  // Noise, not a reading: kept out of the table's one polite region, and off the pointer's way.
+  assert.match(notice, /aria-hidden="true"/);
+  assert.match(notice, /pointerEvents: "none"/);
+  assert.doesNotMatch(notice, /role="(?:status|alert)"|aria-live/);
+  const words = notice.slice(notice.indexOf("export const EDGE_NOTICES"), notice.indexOf("]);", notice.indexOf("export const EDGE_NOTICES")));
+  for (const [, line] of words.matchAll(/"([^"]*[가-힣][^"]*)"/g)) assert.doesNotMatch(line, /\d/, `"${line}" carries no number`);
+  // Reduced motion and the calm switch both stop the slide.
+  assert.match(notice, /prefers-reduced-motion: reduce/);
+  assert.match(notice, /data-calm-effects/);
+});
+
+test("the edge notices change sender with the act, and keep the third and sixth press", async () => {
+  const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
+  // The JSX cannot be imported here, so its pure part (the table and the two readers) is run as written.
+  const file = source("gauntlet/EdgeNotice.jsx");
+  const body = file.slice(file.indexOf("export const EDGE_AT"), file.indexOf("const STILL")).replaceAll("export ", "");
+  const edge = new Function("CASE_SEQUENCE", `${body}
+return { EDGE_AT, EDGE_ACTS, EDGE_NOTICES, edgeActOf, pickEdgeNotice };`)(CASE_SEQUENCE);
+  assert.deepEqual([...edge.EDGE_AT], [3, 6]);
+  assert.equal(edge.EDGE_NOTICES.length, edge.EDGE_ACTS.length, "one pair of notices per act");
+  for (const first of edge.EDGE_ACTS) assert.ok(CASE_SEQUENCE.includes(first), `${first} is a case`);
+  // Each act opens where the analysis note puts it: 0막 P01-05, then 01, 08, 13, 19, 25, 31, 37, and 43 to the finale.
+  const acts = { prologue01: 0, prologue05: 0, case01: 1, case07: 1, case08: 2, case12: 2, case13: 3, case18: 3, case19: 4, case24: 4, case25: 5, case30: 5, case31: 6, case36: 6, case37: 7, case42: 7, case43: 8, case49: 8, final: 8, nowhere: 0 };
+  for (const [caseId, act] of Object.entries(acts)) assert.equal(edge.edgeActOf(caseId), act, `${caseId} is in act ${act}`);
+  assert.equal(new Set(CASE_SEQUENCE.map(edge.edgeActOf)).size, edge.EDGE_ACTS.length, "every act has a case");
+  // A different messenger and a different mail in every act, each its own kind.
+  const messengers = edge.EDGE_NOTICES.map(([message]) => message.from);
+  const mails = edge.EDGE_NOTICES.map(([, mail]) => mail.from);
+  assert.equal(new Set(messengers).size, edge.EDGE_ACTS.length, messengers.join(", "));
+  assert.equal(new Set(mails).size, edge.EDGE_ACTS.length, mails.join(", "));
+  for (const from of messengers) assert.match(from, /^메신저 · /);
+  for (const from of mails) assert.match(from, /^메일 · /);
+  // Only the third press brings the message and only the sixth the mail; n picks the line.
+  for (const [caseId, act] of Object.entries(acts)) {
+    for (const pushes of [0, 1, 2, 4, 5, 7, 9]) assert.equal(edge.pickEdgeNotice(pushes, 0, caseId), null);
+    assert.equal(edge.pickEdgeNotice(3, 0, caseId).from, messengers[act]);
+    assert.equal(edge.pickEdgeNotice(6, 0, caseId).from, mails[act]);
+  }
+  for (const pair of edge.EDGE_NOTICES) {
+    for (const notice of pair) {
+      assert.ok(notice.lines.length >= 1);
+      assert.deepEqual(notice.lines.map((_, n) => edge.pickEdgeNotice(notice.from.startsWith("메일") ? 6 : 3, n, edge.EDGE_ACTS[edge.EDGE_NOTICES.indexOf(pair)]).line), notice.lines);
+      // Short enough for one line at the bottom left of a phone, before its ellipsis.
+      for (const line of [notice.from, ...notice.lines]) assert.ok(line.length <= 20, `"${line}" is short`);
+    }
+  }
+});
+
+test("the reading clock asks once: 프롤로그 01-02 start held until it has, and the answer is the comfort switch", () => {
+  // A-11 = D-4 (user's choice 1, 2026-10-22). The flag is kept, not a switch of the panel.
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.readingClockAsked, false);
+  assert.equal(settings.normalizeAccessibility({ readingClockAsked: "yes" }).readingClockAsked, false);
+  assert.equal(settings.normalizeAccessibility({ readingClockAsked: true }).readingClockAsked, true);
+  const ask = source("gauntlet/ReadingClockAsk.jsx");
+  assert.match(ask, /const READ_FIRST_CASES = new Set\(\["prologue01", "prologue02"\]\);/);
+  assert.match(ask, /const ask = !holdReadingClock && !readingClockAsked;/);
+  assert.match(ask, /held: holdReadingClock \|\| \(ask && READ_FIRST_CASES\.has\(caseId\)\)/);
+  assert.match(ask, /다 읽고 직접 열기로 바꿀까요\?/);
+  assert.match(ask, /\{ readingClockAsked: true, holdReadingClock: true \} : \{ readingClockAsked: true \}/);
+  // The briefing asks where the clock would open the table, and only once.
+  const briefing = source("gauntlet/SceneBriefing.jsx");
+  assert.match(briefing, /if \(remaining <= 0 && askRef\.current\) \{\s*\/\/[^\n]*\s*askRef\.current = false;/);
+  // Reading time is not in the score: nothing outside the page reads its seconds.
+  for (const file of ["gauntlet/GauntletStage.jsx", "gameLogic.js", "ranking.js", "state/useChoiceCommit.js"]) {
+    assert.doesNotMatch(source(file), /getReadingSeconds|readingClockAsked/, `${file} reads the reading clock`);
+  }
 });

@@ -113,3 +113,27 @@ export function markLines(lines = []) {
   }
   return result;
 }
+
+/**
+ * The briefing's caption boxes (improvement notes D-3, 2026-10-22): two or
+ * three sentences to a box, not one. A box a sentence was eleven boxes for a
+ * median scene, each with its own border and shadow, and a phone read them as
+ * eleven interruptions. A box starts afresh before a sentence that opens
+ * speech, so a line someone says leads its box, and after three sentences or
+ * when the box would run past 120 characters. The sentences keep their words
+ * and their order; only where the boxes break is decided here.
+ */
+export function captionGroups(text = "") {
+  const groups = [];
+  let open = false;
+  for (const sentence of String(text ?? "").split(/(?<=[.!?])\s+/).map((part) => part.trim()).filter(Boolean)) {
+    const last = groups.at(-1);
+    const speech = !open && sentence.startsWith("'");
+    const length = last ? last.join(" ").length + sentence.length : 0;
+    if (!last || speech || last.length >= 3 || length > 120) groups.push([sentence]);
+    else last.push(sentence);
+    // An apostrophe between Latin letters is not a quote (quoteToggles).
+    if ((sentence.match(/(?<![A-Za-z])'|'(?![A-Za-z])/g) ?? []).length % 2 === 1) open = !open;
+  }
+  return groups.map((group) => group.join(" "));
+}

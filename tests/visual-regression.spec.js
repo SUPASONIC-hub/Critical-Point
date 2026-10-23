@@ -3,8 +3,28 @@ import { existsSync, readFileSync } from "node:fs";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 import { measureTable } from "./helpers/layout.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 
 test.use({ colorScheme: "light" });
+
+// The table deals every window from `${runId}:${windowIndex}:${node}`
+// (src/GameRuntime.jsx:289), and the run id is a fresh crypto.randomUUID()
+// (src/appConfig.js:824). Everything the seed draws is therefore new on every
+// run -- above all the 안전선 ×N chip (data-testid="commit-safe",
+// src/gauntlet/GauntletStage.jsx:613), whose count is how many seeded steps fit
+// under the wall band (tableAfterword.js readSafeLine). Its text, its width and
+// whether it renders at all moved ~40px of the play capture between two CI runs
+// of the same commit. Pinning the id pins the deal, so the baseline records one
+// table the comparison can always reproduce. Every randomUUID() in the page
+// returns it; the other callers (tab token, telemetry and board event ids) are
+// one-tab, never-sent ids in this capture.
+const PINNED_RUN_UUID = "00000000-0000-4000-8000-000000000000";
+
+async function pinRunSeed(page) {
+  await page.addInitScript((uuid) => {
+    Object.defineProperty(globalThis.crypto, "randomUUID", { configurable: true, value: () => uuid });
+  }, PINNED_RUN_UUID);
+}
 
 async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
   // Pretendard is shipped as ~90 dynamic subsets with `font-display: swap`, so a
@@ -208,6 +228,7 @@ test("case play desktop visual baseline @visual", async ({ page }, testInfo) => 
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
   });
+  await pinRunSeed(page);
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await stabilizeVisualPage(page);
@@ -226,6 +247,7 @@ test("case play mobile visual baseline @visual", async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
   });
+  await pinRunSeed(page);
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await stabilizeVisualPage(page);
@@ -394,4 +416,63 @@ test("intro fits a phone reading budget", { tag: "@prod" }, async ({ page }) => 
   await expect(page.locator(".intro")).toBeVisible();
   const pageHeight = await page.evaluate(() => document.body.scrollHeight);
   expect(pageHeight).toBeLessThan(844 * 4);
+});
+
+/**
+ * The season's first briefing page on the two phones most players hold
+ * (improvement notes D-12, 2026-10-22): 프롤로그 01's p1_start, where a new
+ * player meets the story. Its reading clock starts held so nothing opens the
+ * table under the capture. The page scrolls inside itself, so the budget is
+ * its own scroll height in screens, not the document's: ratchet it down,
+ * never up. Measured 2026-10-22 on this branch: 2.61 screens at 360x740 and
+ * 2.17 at 390x844, rounded up.
+ */
+const BRIEFING_PHONES = [
+  { name: "360x740", width: 360, height: 740, screens: 2.65 },
+  { name: "390x844", width: 390, height: 844, screens: 2.2 },
+];
+
+async function openFirstBriefing(page, viewport) {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: viewport.width, height: viewport.height });
+  await page.addInitScript(
+    ({ key, value }) => localStorage.setItem(key, value),
+    { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ holdReadingClock: true }) },
+  );
+  await startDebugNode(page, "prologue01", "p1_start", { openTable: false });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
+  return page.locator(".gx-comic-page");
+}
+
+for (const viewport of BRIEFING_PHONES) {
+  // Not @prod: the page is reached by the debug jump, which the release build
+  // does not carry (production-build.spec.js checks it is gone).
+  test(`the first briefing fits a phone reading budget at ${viewport.name}`, async ({ page }) => {
+    const sheet = await openFirstBriefing(page, viewport);
+    const height = await sheet.evaluate((element) => element.scrollHeight);
+    expect(height, `${viewport.name}: the page is ${(height / viewport.height).toFixed(2)} screens`).toBeLessThanOrEqual(viewport.height * viewport.screens);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width + 1);
+    // The story begins on the first screen, above 판 열기.
+    const story = await page.locator(".gx-panel-story").boundingBox();
+    const open = await page.getByTestId("open-table").boundingBox();
+    expect(story.y).toBeLessThan(open.y);
+  });
+}
+
+// The two captures, each with its name written out (check:visual-baselines
+// reads the names from this file). Their baselines are recorded in the pinned
+// Linux image by the Visual Regression workflow.
+test("first briefing 360x740 visual baseline @visual", async ({ page }, testInfo) => {
+  const sheet = await openFirstBriefing(page, BRIEFING_PHONES[0]);
+  await stabilizeVisualPage(page);
+  await expectCaptureGeometry(sheet, testInfo, "briefing-p1-360x740.png");
+  await expect(sheet).toHaveScreenshot("briefing-p1-360x740.png", { animations: "disabled", caret: "hide" });
+});
+
+test("first briefing 390x844 visual baseline @visual", async ({ page }, testInfo) => {
+  const sheet = await openFirstBriefing(page, BRIEFING_PHONES[1]);
+  await stabilizeVisualPage(page);
+  await expectCaptureGeometry(sheet, testInfo, "briefing-p1-390x844.png");
+  await expect(sheet).toHaveScreenshot("briefing-p1-390x844.png", { animations: "disabled", caret: "hide" });
 });

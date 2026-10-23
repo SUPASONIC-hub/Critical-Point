@@ -129,6 +129,57 @@ test("a new game begun with NEW GAME+", async () => {
   assert.deepEqual(plain(unmarked), plainStart, "nothing else about the table differs");
 });
 
+// What NEW GAME+ carries is the story, not the table (NEWGAMEPLUS 설계안 3절):
+// the line the season opens on, chosen from how the last one ended.
+const CARRIED_ECHO = "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.";
+
+test("a NEW GAME+ that carries a line opens the season on it", async () => {
+  const harness = await createRunHarness({ saved: pausedRun(), operatorOrigin: "public" });
+  harness.act("startGame", { veteran: true, echo: CARRIED_ECHO });
+  pin("newGame/new-game-plus-echo", harness);
+  assert.equal(harness.run.echo, CARRIED_ECHO);
+  assert.equal(harness.saved().echo, CARRIED_ECHO, "the line is the run's, so a save moved to another device opens on it too");
+});
+
+test("a plain start, and a NEW GAME+ with nothing to carry, open on the opening line", async () => {
+  const { OPENING_ECHO } = await import("../../src/state/runState.js");
+  for (const options of [{ echo: CARRIED_ECHO }, { veteran: true }, { veteran: true, echo: "   " }, { veteran: true, echo: 7 }]) {
+    const harness = await createRunHarness({ saved: pausedRun() });
+    harness.act("startGame", options);
+    assert.equal(harness.run.echo, OPENING_ECHO, JSON.stringify(options));
+  }
+});
+
+test("a NEW GAME+ after the finale takes nothing of the last season's table: no links, no audit, no relics, no vault", async () => {
+  const finishedTable = serializeRunState({
+    ...RUN_INITIAL_STATE,
+    windowIndex: 40,
+    vault: 300,
+    relics: ["metronome"],
+    linksIn: [{ from: 0, due: 2 }],
+    linksOut: [{ from: -1, due: 1 }, { from: 0, due: 3 }],
+  });
+  assert.ok(finishedTable.linksOut.length > 0 && finishedTable.linksIn.length > 0, "the season being left has links to carry");
+  const harness = await createRunHarness({
+    saved: { ...pausedRun(), currentCase: "final", completedCases: ["final"], caseResults: { final: { runId: "run-mid", outcomeChoiceId: "f_after_witness" } }, dynamics: finishedTable },
+  });
+  harness.act("startGame", { veteran: true, echo: CARRIED_ECHO });
+  const table = harness.run.gauntletRun;
+  assert.deepEqual(table.linksIn, []);
+  assert.deepEqual(table.linksOut, []);
+  assert.deepEqual(harness.saved().dynamics.linksIn, []);
+  assert.deepEqual(harness.saved().dynamics.linksOut, []);
+  assert.deepEqual(table.relics, []);
+  assert.equal(table.vault, 0);
+  assert.equal(table.veteran, true);
+  // The audit is counted from the case's log (countAudit), and a new game's log is empty.
+  assert.deepEqual(harness.run.log, []);
+  const { veteran: _mark, ...fresh } = plain(serializeRunState(RUN_INITIAL_STATE));
+  const { veteran: _carried, weekRule: _week, story: _story, ...opened } = plain(harness.saved().dynamics);
+  const { weekRule: _w, story: _s, ...expected } = fresh;
+  assert.deepEqual(opened, expected, "the table is a first season's, but for the NEW GAME+ mark and the week's rule");
+});
+
 test("the start button's click event is a plain start", async () => {
   const harness = await createRunHarness();
   harness.act("startGame", { type: "click", veteran: "true" });

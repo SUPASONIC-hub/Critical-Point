@@ -227,7 +227,23 @@ const fileBudgets = {
   // recovery.css beside the debug jump panel, which is what it is.
   // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
   // (115 lines and 8280 bytes of them that day), the room unchanged.
-  "play.css": { lines: 2925, bytes: 55420 },
+  // 55420 -> 55522 bytes on 2026-10-23, 10-23 묶음 A 합친 상태 실측: E-6's
+  // share line under the reveal took a plain rule of its own (.gx-reveal-share)
+  // in place of the relic notice's warning bar.
+  // [batch-c] #272 w4b-bubbles on 묶음 A:
+  // 2925 / 55420 -> 2925 / 55551 on 2026-10-23, measured: the reveal's
+  // 「당신의 판단」 tag in place of the voice's quotes (A-10), one rule the
+  // briefing's question box shares.
+  // -> 2925 / 55661 on 2026-10-23, 10-23 묶음 C 합친 상태 실측: 묶음 A의
+  // .gx-reveal-share and #272's 「당신의 판단」 tag together.
+  // [batch-c] 묶음 B (#277):
+  // 55420 -> 55572 bytes on 2026-10-22 (D-8), measured 2861 / 55572: the
+  // case file's cast cards and its list of the case's scenes so far.
+  // 55572 -> 55616 bytes on 2026-10-23 in batch B, measured: the reveal's
+  // afterword keeping its verdict on one line, and the table readouts (C-13);
+  // 55726 with batch A's share line (E-6) under it, measured.
+  // -> 2925 / 55865 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측.
+  "play.css": { lines: 2925, bytes: 55865 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -255,7 +271,34 @@ const fileBudgets = {
   // from under a notch on either side.
   // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
   // (31 lines and 2222 bytes of them that day), the room unchanged.
-  "briefing.css": { lines: 674, bytes: 13078 },
+  // 674 / 13078 -> 697 / 13630 on 2026-10-23, measured: the speaker's own
+  // line in the balloon, the question in a box with no tail (「당신의 판단」),
+  // a lead told as a caption and the name chip on the speaker's speech (A-2).
+  // The tail and the lead's box share one rule.
+  // 697 / 13630 -> 709 / 13853 the same day, measured: on a phone, a case's
+  // first page that introduces a rule gives the speaker's balloon up so the
+  // introduction and the question stay on the first screen (390x664, 390x844).
+  // -> 710 / 13866 on 2026-10-23, 10-23 묶음 C 합친 상태 실측: 묶음 A's
+  // NEW GAME+ line raised under the title strip with #272's balloon rules.
+  // [batch-c] 묶음 B (#277):
+  // 674 / 13078 -> 652 / 12653 on 2026-10-22 (D-3), measured 646 / 12596,
+  // the room unchanged: the story's zigzag and tilt, the slanted lead, and
+  // the phone's docked footer, which every phone now lays out as the short
+  // screen did (22 lines and 425 bytes).
+  // 652 / 12653 -> 653 / 12696 the same day (D-7), measured: the line from
+  // the scene before, over the briefing's first box.
+  // 653 / 12696 -> 676 / 13060 the same day (D-13), measured: a phone draws
+  // the room behind the page's title, its panel keeps the room's name and
+  // clock, and the speaker's face is 96px. Two lines over the 674 the sheet
+  // held before D-3, 18 bytes under its 13078.
+  // story-copy-1 (Q8 (1)) took it 674 / 13078 -> 681 / 13293 on its own base:
+  // the case's opening voice under the title and the title strip's third row.
+  // 696 / 13379 on 2026-10-23 in batch B, measured with both and with the
+  // speaker's line on the last table (C-13) in a box of its own; 697 / 13392
+  // on batch A, measured.
+  // -> 740 / 14201 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측:
+  // B's phone page (D-3, D-13, Q8, C-13) with #272's balloon, question box and chip.
+  "briefing.css": { lines: 740, bytes: 14201 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
@@ -281,7 +324,9 @@ const fileBudgets = {
   // music controls, the table, the dock and the reveal together.
   // 445 / 10500 -> 406 / 7967 on 2026-10-13: comments no longer counted
   // (39 lines and 2533 bytes of them that day), the room unchanged.
-  "responsive.css": { lines: 406, bytes: 7967 },
+  // 406 / 7967 -> 414 / 8085 on 2026-10-23, measured: the gauge's reading
+  // kept to one line on a phone on its side once 안전선 ×N joined it.
+  "responsive.css": { lines: 414, bytes: 8085 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
@@ -307,7 +352,10 @@ const fileBudgets = {
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
-  "comfort.css": { lines: 124, bytes: 2691 },
+  // 124 / 2691 -> 133 / 3047 on 2026-10-22 (D-5), measured: 이야기 글 크기,
+  // the story's prose at 1.125 or 1.25 times its size. Paid for by D-3 the
+  // same day, which took briefing.css down 22 lines and 425 bytes.
+  "comfort.css": { lines: 133, bytes: 3047 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

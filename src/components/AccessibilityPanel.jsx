@@ -1,4 +1,7 @@
-import { setAccessibility, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
+import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
+
+// 이야기 글 크기 (D-5), by what a player sees rather than by the factor.
+const STORY_SCALE_LABELS = ["기본", "크게", "더 크게"];
 
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
@@ -14,9 +17,19 @@ const TOGGLES = [
     text: "장면 설명이 저절로 넘어가지 않습니다. 다 읽고 직접 테이블을 엽니다.",
   },
   {
+    key: "foldReadScenes",
+    label: "읽은 장면 접기",
+    text: "NEW GAME+ 시즌에 지난 시즌에 읽은 장면의 본문을 접습니다. 질문은 그대로 보입니다.",
+  },
+  {
     key: "calmEffects",
     label: "번쩍임·흔들림 줄이기",
     text: "붉은 가장자리, 판정 섬광, 화면 흔들림을 약하게 합니다.",
+  },
+  {
+    key: "edgeNotices",
+    label: "가장자리 알림 띄우기",
+    text: "밀어붙일수록 화면 위 가장자리에 메신저·메일이 잠깐 뜹니다.",
   },
   {
     key: "letterKeys",
@@ -67,6 +80,25 @@ export function AccessibilityPanel() {
           </span>
         </label>
       ))}
+      {/* Last, so the keyboard reaches the switches straight after the table's clock. */}
+      <fieldset className="accessibility-time" data-testid="story-scale">
+        <legend>이야기 글 크기</legend>
+        <p>장면 설명, 판정 뒤 이야기, 사건 결말과 막간의 글자를 키웁니다. 테이블은 그대로입니다.</p>
+        <div>
+          {STORY_SCALES.map((scale, index) => (
+            <label key={scale}>
+              <input
+                type="radio"
+                name="accessibility-story-scale"
+                value={scale}
+                checked={settings.storyScale === scale}
+                onChange={() => setAccessibility({ storyScale: scale })}
+              />
+              <span>{STORY_SCALE_LABELS[index]}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
     </section>
   );
 }

@@ -270,7 +270,7 @@ const standingLine = (page) => page.getByTestId("brief-standing");
 async function setBriefFold(page, open) {
   const fold = page.locator(".gx-brief");
   if ((await fold.evaluate((element) => element.open)) !== open) {
-    await clickElement(fold.locator("summary"), `${open ? "open" : "shut"} 사건 파일`);
+    await clickElement(fold.locator(":scope > summary"), `${open ? "open" : "shut"} 사건 파일`);
   }
   await expect(fold).toHaveJSProperty("open", open);
 }
@@ -692,13 +692,16 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
   const printed = await briefing.evaluate((root) => {
     const text = (selector) => [...root.querySelectorAll(selector)].map((element) => element.textContent).join("");
     return {
-      text: text(".gx-panel-story .gx-caption"),
-      question: text(".gx-balloon"),
+      // A lead with no speech after it is told beside the portrait (speakerLine.js).
+      text: text(".gx-panel-story .gx-caption, .gx-balloon.is-lead"),
+      question: text(".gx-judgment p"),
       memo: [text(".gx-panel-file li")],
       intro: text("[data-testid='unlock-intro'] li"),
+      // The line from the scene before (D-7), when the page has one.
+      bridge: text("[data-testid='scene-bridge']"),
     };
   });
-  const withIntro = getReadingSeconds(printed, [{ text: printed.intro }]);
+  const withIntro = getReadingSeconds(printed, [{ text: printed.intro }, { text: printed.bridge }]);
   expect(withIntro, "the lines add reading time on this page").toBeGreaterThan(getReadingSeconds(printed));
   await expect(page.getByTestId("reading-timer").locator("b")).toHaveText(String(withIntro));
 
@@ -707,11 +710,12 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
 });
 
 /**
- * Where the introduction sits. It was the last panel of the page, under the
- * story and the case file -- 500 to 700px below the first screen of a phone --
- * so a player who pressed 판 열기 without scrolling never saw it. It is now the
- * panel straight after the speaker: on the first screen with the question, on
- * a phone and on a laptop, with the breach panel left at the end of the page.
+ * Where the introduction sits. It was the last panel of the page until
+ * 2026-10-09, then the panel straight after the speaker, so the first sentence
+ * of the game was a rule and not the story (improvement notes D-6). Since
+ * 2026-10-22 it is the last panel again, under the story, the case file and
+ * the breach, and straight above the cards and 판 열기: read in front of the
+ * button it is about, and whole above what is docked once scrolled to.
  */
 const measureIntro = (page) =>
   page.evaluate(() => {
@@ -725,7 +729,7 @@ const measureIntro = (page) =>
     const dock = box(".gx-comic-actions");
     return {
       intro: box("[data-testid='unlock-intro']"),
-      question: box(".gx-balloon"),
+      question: box(".gx-judgment"),
       speaker: box(".gx-panel-speaker"),
       story: box(".gx-panel-story"),
       picture: box(".gx-panel-splash"),
@@ -770,7 +774,7 @@ async function openIntroPage(page, caseId, size, { broken = false, rootFontSize 
 }
 
 for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
-  test(`staged: the introduction is on the first screen with the question at ${size.width}x${size.height}`, async ({ page }) => {
+  test(`staged: the story comes first and the introduction sits above the cards at ${size.width}x${size.height}`, async ({ page }) => {
     test.setTimeout(240_000);
     await holdReadingClock(page);
     const phone = size.width < 700;
@@ -779,12 +783,10 @@ for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) 
       const at = await measureIntro(page);
       const where = `${step.caseId} @ ${size.width}x${size.height}`;
 
-      expect(at.intro.top, `${where}: the panel starts under the speaker`).toBeGreaterThanOrEqual(at.speaker.bottom);
-      expect(at.intro.bottom, `${where}: and ends above the docked footer`).toBeLessThanOrEqual(at.dockTop);
-      expect(at.intro.bottom, `${where}: inside the screen`).toBeLessThanOrEqual(size.height);
+      expect(at.question.top >= 0 && at.question.bottom <= at.dockTop, `${where}: the question is on the first screen`).toBe(true);
+      expect(at.story.top, `${where}: the story follows the speaker, with no panel between`).toBeLessThan(at.dockTop);
+      expect(at.intro.top, `${where}: the panel comes after the story`).toBeGreaterThanOrEqual(at.story.bottom);
       expect(at.intro.left >= 0 && at.intro.right <= size.width, `${where}: no wider than the screen`).toBe(true);
-      expect(at.question.top >= 0 && at.question.bottom <= at.dockTop, `${where}: the question is on the first screen too`).toBe(true);
-      expect(at.story.top, `${where}: the story follows the panel`).toBeGreaterThanOrEqual(at.intro.bottom);
       // On a phone the header and the picture band come first; on a laptop the picture is beside the speaker.
       if (phone) expect(at.picture.bottom, `${where}: the picture is above the speaker`).toBeLessThanOrEqual(at.speaker.top);
       else expect(at.picture.top, `${where}: the picture is beside the speaker`).toBe(at.speaker.top);
@@ -792,11 +794,16 @@ for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) 
       expect(at.open.bottom, `${where}: 판 열기 is docked on screen`).toBeLessThanOrEqual(size.height);
       expect(at.pageWidth, `${where}: nothing is wider than the screen`).toBeLessThanOrEqual(size.width + 1);
       // Written in the order they are seen, which is the order they are read aloud.
-      expect(at.panels.slice(0, 4)).toEqual(["gx-panel-splash", "gx-panel-speaker", "unlock-intro", "gx-panel-story"]);
+      expect(at.panels.slice(0, 3)).toEqual(["gx-panel-splash", "gx-panel-speaker", "gx-panel-story"]);
+      expect(at.panels.at(-1), `${where}: the introduction is the last panel, above the cards`).toBe("unlock-intro");
       if (step.caseId === "prologue02") {
-        expect(at.panels.at(-1), `${where}: the breach panel is still the last one`).toBe("protocol-breach");
-        expect(at.breach.top, `${where}: under everything else`).toBeGreaterThan(at.story.bottom - 1);
+        expect(at.breach.top, `${where}: the breach is under the story`).toBeGreaterThan(at.story.bottom - 1);
+        expect(at.intro.top, `${where}: and the introduction under the breach`).toBeGreaterThanOrEqual(at.breach.bottom);
       }
+      // Scrolled to, the panel is whole above whatever is docked.
+      await page.getByTestId("unlock-intro").evaluate((panel) => panel.scrollIntoView({ block: "center" }));
+      const scrolled = await measureIntro(page);
+      expect(scrolled.intro.top >= 0 && scrolled.intro.bottom <= scrolled.dockTop, `${where}: the panel is whole above what is docked`).toBe(true);
     }
   });
 }
@@ -845,7 +852,9 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
   test.setTimeout(420_000);
   await holdReadingClock(page);
   const SCREENS = [
-    { name: "360x740", size: { width: 360, height: 740 } },
+    // Every phone docks 판 열기 alone since 2026-10-22 (D-3), so a 740px one
+    // has the panel and the question on its first screen too.
+    { name: "360x740", size: { width: 360, height: 740 }, firstScreen: true },
     // What Safari leaves of an iPhone 14 with its bars drawn. The docked cards
     // were 217 to 265px of it, the introduction showed 12 to 36px above them
     // and the story began under them. Only 판 열기 is docked there now
@@ -865,14 +874,15 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
       expect(at.openTakesThePointer, `${where}: 판 열기 is not covered`).toBe(true);
       expect(at.pageWidth, `${where}: nothing is wider than the screen`).toBeLessThanOrEqual(screen.size.width + 1);
       if (screen.firstScreen) {
-        expect(at.intro.top, `${where}: the panel starts under the speaker`).toBeGreaterThanOrEqual(at.speaker.bottom);
-        expect(at.intro.bottom, `${where}: the panel ends above what is docked`).toBeLessThanOrEqual(at.dockTop);
+        expect(at.story.top, `${where}: the story starts on the first screen, under the speaker`).toBeLessThan(at.dockTop);
+        expect(at.intro.top, `${where}: the panel follows the story`).toBeGreaterThanOrEqual(at.story.bottom);
         expect(at.question.top >= 0 && at.question.bottom <= at.dockTop, `${where}: the question is whole above what is docked`).toBe(true);
         expect(at.open.bottom - at.dockTop, `${where}: what is docked is 판 열기 alone, not the cards with it`).toBeLessThanOrEqual(at.open.bottom - at.open.top + 1);
       }
       // Scrolled to the panel, it is whole above whatever is docked.
-      await page.getByTestId("unlock-intro").evaluate((panel) => panel.scrollIntoView({ block: "start" }));
+      await page.getByTestId("unlock-intro").evaluate((panel) => panel.scrollIntoView({ block: "center" }));
       const scrolled = await measureIntro(page);
+      expect(scrolled.intro.top >= 0 && scrolled.intro.bottom <= scrolled.dockTop, `${where}: the panel is whole above what is docked`).toBe(true);
       expect(scrolled.openTakesThePointer, `${where}: 판 열기 is still pressable with the panel at the top`).toBe(true);
       expect(scrolled.open.bottom, `${where}: and still docked`).toBeLessThanOrEqual(screen.size.height);
     }

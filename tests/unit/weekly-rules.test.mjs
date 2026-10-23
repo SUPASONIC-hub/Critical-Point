@@ -16,6 +16,8 @@ const {
   normalizeWeekRuleId,
   NEAR_WALL_SHIFT,
   pickSeasonWeekRule,
+  SHORT_CLOCK_CHIPS,
+  SHORT_CLOCK_SECONDS,
   WEEK_RULE_CATALOGUE,
   WEEK_RULE_DEVICES,
   WEEK_RULE_ID_MAX,
@@ -26,7 +28,19 @@ const {
   WEEKLY_RULES,
   weekStartMs,
 } = await import("../../src/gauntlet/weeklyRules.js");
-const { setWeekRuleTurnedDown, WEEK_RULE_OFF_STORAGE_KEY, weekRuleTurnedDown } = await import("../../src/state/weeklyRuleChoice.js");
+const {
+  finishedSeasons,
+  isFirstSeason,
+  SEASON_RECORD_STORAGE_KEY,
+  setWeekRuleTakenUp,
+  setWeekRuleTurnedDown,
+  WEEK_RULE_OFF_STORAGE_KEY,
+  WEEK_RULE_ON_STORAGE_KEY,
+  weekRuleChoice,
+  weekRuleTakenUp,
+  weekRuleTurnedDown,
+} = await import("../../src/state/weeklyRuleChoice.js");
+const { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } = await import("../../src/appConfig.js");
 const { getBriefingIntro, getBriefingWeekRuleId } = await import("../../src/gauntlet/tableStaging.js");
 const { localRowRule } = await import("../../src/state/useLeaderboard.js");
 const { weekHasNews } = await import("../../src/gauntlet/weeklyCalendar.js");
@@ -50,9 +64,13 @@ const DAY = 24 * 60 * 60 * 1000;
 const read = (path) => readFileSync(fileURLToPath(new URL(`../../${path}`, import.meta.url)), "utf8");
 const EVENT = WEEKLY_RULES[0];
 
+/** A device that has finished a season: the week's rule is on by default there (E-8). */
+const RETURNING = Object.freeze({ [NEW_GAME_PLUS_KEY]: "true" });
+
 afterEach(() => {
   delete globalThis.__weeklyRuleClock;
   setWeekRuleTurnedDown(false);
+  setWeekRuleTakenUp(false);
 });
 
 test("a week turns at Monday 00:00 in Korea, which is Sunday 15:00 UTC", () => {
@@ -112,7 +130,7 @@ test("the calendar names known rules, one per week, announced a week ahead", () 
     assert.match(id, /^[a-z][a-z0-9-]*$/);
     for (const key of ["label", "title", "text"]) assert.ok(typeof rule[key] === "string" && rule[key].length > 0, `${id}.${key}`);
     for (const key of Object.keys(rule.schema ?? {})) {
-      assert.ok(["wallShift", "seconds", "chipsScale", "fractureRate", "sealBreak"].includes(key), `${id} moves only a number normalizeSchema clamps (D4): ${key}`);
+      assert.ok(["wallShift", "secondsShift", "chipsFactor", "seconds", "chipsScale", "fractureRate", "sealBreak"].includes(key), `${id} moves only a number normalizeSchema clamps (D4): ${key}`);
     }
     // Or switches on a device, by name, from the allowlist (B3 decision 8, B2 decision 11).
     for (const device of rule.rules ?? []) assert.ok(WEEK_RULE_DEVICES.includes(device), `${id} switches on only an allowed device: ${device}`);
@@ -189,6 +207,55 @@ test("the rule is laid over the board at the deal, clamped, and never written in
   assert.equal(weekRuleOverlay("made-up", BASE_SCHEMA), null);
 });
 
+/** The event weeks' rules once B3 and B2 are rules of the table (P1): three, each with its line in the story (E-9). */
+const EVENT_RULES = ["near-wall", "heavy-fracture", "short-clock"];
+
+test("SHORT CLOCK moves the board's own clock and chips, on top of what relics and marks did, clamped (E-9 (c))", () => {
+  const rule = WEEK_RULE_CATALOGUE["short-clock"];
+  assert.deepEqual(rule.schema, { secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS });
+  assert.match(rule.text, new RegExp(`${SHORT_CLOCK_SECONDS}초 짧고`));
+  assert.match(rule.text, new RegExp(`${SHORT_CLOCK_CHIPS}배`));
+  const board = getTableSchema(normalizeRunState({ weekRule: "short-clock" }));
+  assert.equal(board.seconds, BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS);
+  assert.equal(board.chipsScale, BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS);
+  assert.equal(board.wallMin, BASE_SCHEMA.wallMin, "the wall stays where the board has it");
+  // A board a relic already moved keeps that move under the rule.
+  const moved = normalizeSchema({ seconds: 51, chipsScale: 1.5 });
+  const dealt = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "short-clock", schema: moved });
+  assert.equal(dealt.seconds, 51 - SHORT_CLOCK_SECONDS);
+  assert.equal(dealt.chipsScale, 1.5 * SHORT_CLOCK_CHIPS);
+  // And the clamp holds at the short end and the rich end.
+  const edge = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "short-clock", schema: normalizeSchema({ seconds: 14, chipsScale: 3.9 }) });
+  assert.deepEqual([edge.seconds, edge.chipsScale], [12, 4]);
+  assert.deepEqual(weekRuleOverlay("short-clock", BASE_SCHEMA), { seconds: BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS, chipsScale: BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS });
+});
+
+test("the calendar books W48 to 2027-W03 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
+  const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W48");
+  assert.deepEqual(booked.map(({ week, id }) => [week, id]), [
+    ["2026-W48", "heavy-fracture"],
+    ["2026-W50", "short-clock"],
+    ["2026-W52", "near-wall"],
+    ["2027-W01", "heavy-fracture"],
+    ["2027-W03", "short-clock"],
+  ]);
+  // One week in two: two weeks from one start to the next, across 2026's W53.
+  for (let i = 1; i < booked.length; i += 1) assert.equal(weekStartMs(booked[i].week) - weekStartMs(booked[i - 1].week), 14 * DAY, booked[i].week);
+  assert.equal(weekRuleAt(weekStartMs("2026-W47"))?.id, "audit-cascade", "W47 is the audit and links' test week, before the booked weeks");
+  assert.equal(weekRuleAt(weekStartMs("2026-W53")), null);
+  for (const id of EVENT_RULES) {
+    const rule = getWeekRule(id);
+    assert.ok(typeof rule.world === "string" && rule.world.length > 0 && rule.world.length <= 40, `${id} has one short line in the story`);
+    assert.ok(!rule.rules, `${id} is an event rule: it moves numbers, it switches on no device`);
+    assert.ok(booked.some((entry) => entry.id === id), `${id} has a week`);
+  }
+  // The briefing's panel prints the line, and its reading clock counts it.
+  const panel = read("src/gauntlet/WeekRulePanel.jsx");
+  assert.match(panel, /rule\.world &&/);
+  assert.match(panel, /text: `\$\{rule\.world\} \$\{rule\.text\}`/);
+  assert.match(read("src/gauntlet/weeklyRuleLine.js"), /current\.world/);
+});
+
 test("a story case deals the story wall and no week's rule", () => {
   const story = getTableSchema(normalizeRunState({ story: true, weekRule: "near-wall" }));
   const plainStory = getTableSchema(normalizeRunState({ story: true }));
@@ -224,7 +291,7 @@ test("newGame stamps the rule the caller read; story mode and a direct jump stam
 
 test("시작 reads the weekly clock once; turning it down or a later week changes nothing about that season", async () => {
   globalThis.__weeklyRuleClock = weekStartMs(EVENT.week) + 60_000;
-  const during = await createRunHarness();
+  const during = await createRunHarness({ storage: RETURNING });
   during.act("startGame");
   assert.equal(during.run.gauntletRun.weekRule, EVENT.id);
   assert.equal(during.saved().dynamics.weekRule, EVENT.id);
@@ -235,14 +302,87 @@ test("시작 reads the weekly clock once; turning it down or a later week change
   assert.equal(during.saved().dynamics.weekRule, EVENT.id);
 
   globalThis.__weeklyRuleClock = weekStartMs(EVENT.week) + 60_000;
-  const declined = await createRunHarness();
+  const declined = await createRunHarness({ storage: RETURNING });
   declined.act("startGame", { declineWeekRule: true });
   assert.equal(declined.run.gauntletRun.weekRule, null);
 
   delete globalThis.__weeklyRuleClock;
-  const plain = await createRunHarness();
+  const plain = await createRunHarness({ storage: RETURNING });
   plain.act("startGame");
   assert.deepEqual(plain.run.gauntletRun, structuredClone(RUN_INITIAL_STATE));
+});
+
+test("a device's first season starts without the week's rule unless it is taken up; the second starts with it (E-8)", async () => {
+  const during = weekStartMs(EVENT.week) + DAY;
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true }), null, "the first season, off by default");
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true, takenUp: true }), EVENT.id, "taken up on the start screen");
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true, declined: true, takenUp: true }), EVENT.id, "the returning box does not reach a first season");
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: true, takenUp: true, story: true }), null);
+  assert.equal(pickSeasonWeekRule(during, { firstSeason: false, takenUp: false }), EVENT.id, "a later season, on as before");
+  assert.equal(pickSeasonWeekRule(during - 7 * DAY, { firstSeason: true, takenUp: true }), null, "no week, no rule");
+
+  globalThis.__weeklyRuleClock = during;
+  const fresh = await createRunHarness();
+  assert.equal(isFirstSeason(), true);
+  fresh.act("startGame");
+  assert.equal(fresh.run.gauntletRun.weekRule ?? null, null, "a fresh device's 시작");
+  assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule ?? null, null, "and the shell's");
+
+  const takenUp = await createRunHarness({ storage: { [WEEK_RULE_ON_STORAGE_KEY]: "1" } });
+  assert.equal(weekRuleTakenUp(), true);
+  takenUp.act("startGame");
+  assert.equal(takenUp.run.gauntletRun.weekRule, EVENT.id);
+  assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule, EVENT.id);
+
+  // NEW GAME+ is never a first season, whatever the storage says.
+  const veteran = await createRunHarness();
+  veteran.act("startGame", { veteran: true });
+  assert.equal(veteran.run.gauntletRun.weekRule, EVENT.id);
+
+  for (const storage of [RETURNING, { [NEW_GAME_PLUS_MEMORY_KEY]: JSON.stringify({ final: { runId: "r" } }) }, { [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 2 }) }]) {
+    const back = await createRunHarness({ storage });
+    assert.equal(isFirstSeason(), false, JSON.stringify(storage));
+    back.act("startGame");
+    assert.equal(back.run.gauntletRun.weekRule, EVENT.id, `a device that finished a season: ${JSON.stringify(storage)}`);
+  }
+});
+
+test("the season count reads the NEW GAME+ record, and before it the unlock or the finale's memory", async () => {
+  await createRunHarness();
+  assert.equal(finishedSeasons(), 0);
+  assert.deepEqual(weekRuleChoice(), { declined: false, firstSeason: true, takenUp: false });
+  for (const [storage, seasons] of [
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 3 }) }, 3],
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 0 }) }, 0],
+    [{ [SEASON_RECORD_STORAGE_KEY]: "not json" }, 0],
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 1.5 }) }, 0],
+    [{ [NEW_GAME_PLUS_KEY]: "false" }, 0],
+    [{ [NEW_GAME_PLUS_KEY]: "true" }, 1],
+    [{ [NEW_GAME_PLUS_MEMORY_KEY]: JSON.stringify({ case01: {} }) }, 0],
+    [{ [NEW_GAME_PLUS_MEMORY_KEY]: JSON.stringify({ final: {} }) }, 1],
+    [{ [SEASON_RECORD_STORAGE_KEY]: JSON.stringify({ seasons: 4 }), [NEW_GAME_PLUS_KEY]: "true" }, 4],
+  ]) {
+    await createRunHarness({ storage });
+    assert.equal(finishedSeasons(), seasons, JSON.stringify(storage));
+  }
+  // The start screen says whom the week is for, and its box takes it up (the e2e plays both).
+  const first = weeklyRuleLine(weekStartMs(EVENT.week) + DAY, undefined, { first: true });
+  assert.equal(first.kicker, "돌아온 분석관을 위한 이번 주의 규칙");
+  assert.match(first.text, / 첫 시즌은 평소 규칙으로 시작한다\./);
+  // Not also told the season keeps the rule to the end: it starts without it.
+  assert.doesNotMatch(first.text, /끝까지 이 규칙으로/);
+  const returning = weeklyRuleLine(weekStartMs(EVENT.week) + DAY);
+  assert.equal(returning.kicker, "이번 주의 규칙");
+  assert.match(returning.text, / 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다\./);
+  assert.doesNotMatch(returning.text, /첫 시즌/);
+  const views = read("src/components/WeeklyRuleViews.jsx");
+  assert.match(views, /weeklyRuleLine\(now, undefined, \{ first \}\)/);
+  assert.match(views, /이번 주의 규칙으로 시작/);
+  assert.match(read("src/components/WeeklyRuleNotice.jsx"), /first \? setWeekRuleTakenUp : setWeekRuleTurnedDown/);
+  assert.equal(setWeekRuleTakenUp(true), true);
+  assert.equal(localStorage.getItem(WEEK_RULE_ON_STORAGE_KEY), "1");
+  setWeekRuleTakenUp(false);
+  assert.equal(localStorage.getItem(WEEK_RULE_ON_STORAGE_KEY), null);
 });
 
 test("the server's week table says what the calendar says", () => {
@@ -252,7 +392,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);
@@ -263,6 +403,7 @@ test("the server's week table says what the calendar says", () => {
 
 test("the start screen's box turns the rule down on this device, for both starts (결정 27)", async () => {
   globalThis.__weeklyRuleClock = weekStartMs(EVENT.week) + 60_000;
+  await createRunHarness({ storage: RETURNING });
   assert.equal(weekRuleTurnedDown(), false);
   assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule, EVENT.id, "the shell's 시작, on by default");
 
@@ -270,14 +411,14 @@ test("the start screen's box turns the rule down on this device, for both starts
   assert.equal(localStorage.getItem(WEEK_RULE_OFF_STORAGE_KEY), "1");
   assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: null }).weekRule ?? null, null, "the shell's 시작 reads the key");
   // The harness starts on a storage of its own: the key is put in it.
-  const runtime = await createRunHarness({ storage: { [WEEK_RULE_OFF_STORAGE_KEY]: "1" } });
+  const runtime = await createRunHarness({ storage: { ...RETURNING, [WEEK_RULE_OFF_STORAGE_KEY]: "1" } });
   runtime.act("startGame");
   assert.equal(runtime.run.gauntletRun.weekRule, null, "and so does the runtime's");
   assert.equal(RUN_FIELDS.gauntletRun.load({ dynamics: { weekRule: EVENT.id } }).weekRule, EVENT.id, "a season already started keeps its rule");
 
   setWeekRuleTurnedDown(false);
   assert.equal(localStorage.getItem(WEEK_RULE_OFF_STORAGE_KEY), null);
-  const again = await createRunHarness();
+  const again = await createRunHarness({ storage: RETURNING });
   again.act("startGame");
   assert.equal(again.run.gauntletRun.weekRule, EVENT.id);
 });
@@ -332,7 +473,7 @@ test("2026-W47, the test week, switches on the audit and the links together, and
   assert.equal(WEEKLY_RULES.find((item) => item.week === "2026-W44"), undefined);
   assert.equal(pickSeasonWeekRule(weekStartMs("2026-W47") + DAY), "audit-cascade");
   assert.equal(pickSeasonWeekRule(weekStartMs("2026-W47") + DAY, { story: true }), null, "story mode is outside every ranking");
-  assert.equal(weekRuleAt(weekStartMs("2026-W48")), null, "the week after has none");
+  assert.equal(weekRuleAt(weekStartMs("2026-W48"))?.id, "heavy-fracture", "the week after is the first booked one (E-9)");
   // Told from W46's Monday, the ordinary week's notice, on W46's own line.
   assert.equal(nextWeekRuleAt(weekStartMs("2026-W46"))?.id, "audit-cascade");
   assert.equal(nextWeekRuleAt(weekStartMs("2026-W46") - 1)?.id, "near-wall", "W45 tells of W46");
@@ -340,7 +481,7 @@ test("2026-W47, the test week, switches on the audit and the links together, and
   assert.equal(line.tone, "current");
   assert.equal(line.label, "NEAR WALL");
   assert.match(line.text, /다음 주의 규칙은 AUDIT & CASCADE\(감사와 연쇄\), 다음 월요일 0시부터\.$/);
-  assert.match(weeklyRuleLine(weekStartMs("2026-W47") + DAY).text, /순위는 따로 쌓인다\.$/, "W47's own line tells of nothing after it");
+  assert.match(weeklyRuleLine(weekStartMs("2026-W47") + DAY).text, /다음 주의 규칙은 HEAVY FRACTURE\(.+\), 다음 월요일 0시부터\.$/, "W47's own line tells of W48's");
 });
 
 test("10-22 to 11-01 (W43, W44): no rule this week and no notice of the next, until W45 tells of W46", () => {

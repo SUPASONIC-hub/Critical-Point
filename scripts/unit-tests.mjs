@@ -504,18 +504,18 @@ test("rising 사람 피해 belongs on the cost side, and the particles follow th
     "rising 사람 피해 belongs on the cost side, and the particles follow the digits",
   );
 });
-test("falling 지침 is a gain, so it is not listed as something the run gave up", () => {
+test("falling 피로 is a gain, so it is not listed as something the run gave up", () => {
   assert.match(
     explainResourceTradeoff({ trust: 6, fatigue: -3 }),
-    /지침 -3/u,
-    "falling 지침 is a gain, so it is not listed as something the run gave up",
+    /피로 -3/u,
+    "falling 피로 is a gain, so it is not listed as something the run gave up",
   );
 });
 
 // Nothing in the graph may produce a particle that disagrees with the word in
 // front of it. The pairs below are the only ones these sentences can build.
 test("no choice in the graph builds a disagreeing particle", () => {
-  const WRONG_PARTICLES = /(피해을|지침를|현금를|믿음를|공정함를|시간를|신뢰이|피로이)/u;
+  const WRONG_PARTICLES = /(피해을|피로을|지침를|현금를|믿음를|공정함를|시간를|신뢰이|피로이)/u;
   for (const node of Object.values(nodes)) {
     for (const choice of node.choices ?? []) {
       const line = explainResourceTradeoff(choice.effect ?? {});

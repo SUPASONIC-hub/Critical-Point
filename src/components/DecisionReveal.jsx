@@ -7,6 +7,8 @@ import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 import { Prose } from "./Prose.jsx";
 import { SceneMinutes } from "./SceneMinutes.jsx";
+import { noteRevealDetails } from "../state/readingTally.js";
+import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
 // so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
 import { describeLogicMove, describeNextTable, describeVerdictCause, formatMultiplier } from "../gauntlet/tableReadout.js";
@@ -45,11 +47,11 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
  * the table has been introduced (`decisionReveal.short`, set by the commit from
  * `isTableTaught`) the same whole sheet each time is the table, the slam and
  * then a page of rows the player has read. So the sheet is short from there:
- * the verdict, the card the room played if it was not the player's, what was
- * received and paid, a scene lost, the next rules, the card's own line, a clue
- * -- and whatever happens once (a relic unlocked, the draft, an overclock). The
- * ledger, the pot's sum, the words of the choice and the closing sentence made
- * from the effect are behind the button, which opens the sheet as it was.
+ * the verdict and the story line under it, the card the room played if it was
+ * not the player's, what was received and paid, a scene lost, the next rules,
+ * a clue -- and whatever happens once (a relic unlocked, the draft, an
+ * overclock). The ledger, the pot's sum and the words of the choice are behind
+ * the button, which opens the sheet as it was.
  *
  * It lives here and not in the save or the settings: it is this visit's, like
  * the reveal itself (`runState.js`, never saved). A module variable because the
@@ -59,6 +61,8 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
 let detailsOpen = false;
 const flipDetails = () => {
   detailsOpen = !detailsOpen;
+  // D-11: counted on the case row (state/readingTally.js).
+  if (detailsOpen) noteRevealDetails();
 };
 
 /**
@@ -86,13 +90,26 @@ const flipDetails = () => {
  * shorter than the sheet -- a phone on its side -- the reveal opened at its
  * foot, with the verdict it exists to show above the fold.
  */
+// The afterword's verdict ("갈 수 있었다", "BUST였다") kept on one line: at 360px
+// in the larger story size it broke inside "갈 수 / 있었다".
+function afterwordParts(text) {
+  const at = text.lastIndexOf(": ");
+  if (at < 0) return text;
+  return <>{text.slice(0, at + 2)}<span className="gx-reveal-keep">{text.slice(at + 2)}</span></>;
+}
+
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
+  // Where the lost scene went on: its place up to the first " · " (B-13), the
+  // 회의실 only for a reveal saved before the skip carried one.
+  const skippedRoom = String(decisionReveal?.skippedPlace ?? "").split(" · ")[0] || "회의실";
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
   const [, redraw] = useState(0);
+  // E-6: how many others staked the same card here, once the sample is big enough.
+  const choiceShare = useSceneChoiceLine(decisionReveal?.scene ?? null);
   useEffect(() => {
     if (decisionReveal) nextRef.current?.focus({ preventScroll: true });
   }, [decisionReveal]);
@@ -113,6 +130,12 @@ export function DecisionReveal({ view }) {
     flipDetails();
     redraw((count) => count + 1);
   };
+  // What came of it in the story, straight under the verdict and on every
+  // sheet (improvement notes D-1, 2026-10-22): the card's own line, or -- for a
+  // bust, a card the clock staked and a reframe, which have none -- the last
+  // sentence of the beat. It was under the bill and the next rules, and on the
+  // short sheet a bust said no sentence of the story at all.
+  const storyLine = decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").at(-1);
   const consequenceLines = full ? createConsequenceLines({ verdict, busted, nextMutations }) : [];
   const headline = !verdict
     ? "DECISION"
@@ -143,7 +166,19 @@ export function DecisionReveal({ view }) {
           {busted && <Skull size={34} aria-hidden="true" />}
           <h2>{headline}</h2>
           <p>{subline}</p>
+          {/* What the seed still says about this window, and on the close the
+              case against a hand that sees the wall (tableAfterword.js). Plain
+              text in the sheet, nothing that moves and no voice of its own:
+              the slam is the one announcement. */}
+          {decisionReveal.afterword && <p data-testid="reveal-afterword">{afterwordParts(decisionReveal.afterword)}</p>}
+          {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>
+
+        {storyLine && (
+          <div className="decision-reveal-beat" data-testid="reveal-story">
+            {renderSceneLines(storyLine)}
+          </div>
+        )}
 
         {decisionReveal.short && (
           <button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded={detailsOpen} onClick={toggleDetails}>
@@ -204,13 +239,13 @@ export function DecisionReveal({ view }) {
                 <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
               </b>
             ))}
-            <p>도감에 들어갔다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있다.</p>
+            <p>도감에 들어갔습니다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있습니다.</p>
           </div>
         )}
 
         {verdict?.relicOffer?.length > 0 && (
           <p className="gx-reveal-draft" data-testid="relic-draft-notice">
-            사건이 닫혔다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고른다.
+            사건이 닫혔습니다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고릅니다.
           </p>
         )}
 
@@ -222,9 +257,13 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
+        {/* The voice is the player's decision told in 해라체 narration, not a
+            line anyone said aloud, so it is not in quotes; the tag says whose
+            decision it was (A-10, 2026-10-23). */}
         {(full || decisionReveal.forced) && (
           <p className="decision-reveal-choice">
-            {decisionReveal.forced ? "회의실이 대신 골랐다: " : ""}"{decisionReveal.spokenChoice}"
+            <span>{decisionReveal.forced ? "회의실이 대신 골랐다" : "당신의 판단"}</span>
+            {decisionReveal.spokenChoice}
           </p>
         )}
 
@@ -242,7 +281,7 @@ export function DecisionReveal({ view }) {
         {decisionReveal.skippedTitle && (
           <>
             <p className="gx-reveal-skip" data-testid="blackout-skip">
-              <b lang="en">LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
+              <b lang="en">LOST SCENE</b> {skippedRoom}{topicParticle(skippedRoom)} 당신 없이 「{decisionReveal.skippedTitle}」{objectParticle(decisionReveal.skippedTitle)} 넘겼습니다.
             </p>
             <SceneMinutes nodeId={decisionReveal.skippedNodeId} />
           </>
@@ -265,12 +304,6 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
-        {(full || decisionReveal.echo) && (
-          <div className="decision-reveal-beat">
-            {renderSceneLines(decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
-          </div>
-        )}
-
         {decisionReveal.clue && (
           <div className="cinematic-clue-card">
             <Sparkles size={18} />
@@ -280,6 +313,12 @@ export function DecisionReveal({ view }) {
               <p><Prose text={decisionReveal.clue.text} /></p>
             </div>
           </div>
+        )}
+
+        {choiceShare && (
+          <p className="gx-reveal-share" data-testid="choice-share">
+            {choiceShare}
+          </p>
         )}
 
         <div className="decision-reveal-footer">
