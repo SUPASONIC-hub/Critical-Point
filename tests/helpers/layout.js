@@ -30,11 +30,15 @@ export async function measureTable(page) {
       // its shapes. The scene plates of nine cases draw past their frame, and
       // the sweep had been reporting every scene of those cases as too wide.
       // The page's own scroll width is read as well, which is what a player
-      // would meet as a sideways scroll.
+      // would meet as a sideways scroll. In the same way, what sits inside a
+      // .sr-only box is clipped to that 1px box: a glossed word's folded
+      // bracket (Prose.jsx, B-7) is one unbroken line kept for screen readers,
+      // and near the right edge it reached past the screen without a pixel of
+      // it drawn. The .sr-only box itself is still measured.
       widest: Math.round(
         Math.max(
           document.documentElement.scrollWidth,
-          ...[...document.querySelectorAll(".game-shell *")].filter((element) => !element.ownerSVGElement).map((element) => element.getBoundingClientRect().right),
+          ...[...document.querySelectorAll(".game-shell *")].filter((element) => !element.ownerSVGElement && !element.parentElement.closest(".sr-only")).map((element) => element.getBoundingClientRect().right),
         ),
       ),
       innerWidth,
