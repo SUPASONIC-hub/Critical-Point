@@ -151,6 +151,15 @@ Still open, on purpose:
   (`20261102020000_season_score_case_mean.sql.draft`, made a `.sql` with the
   reset). Over 200 bot seasons the finale's score ran 32 to 80 (p50 60) and
   the mean runs 45 to 71 (p50 59); no bot season reaches A (72) on the mean.
+  One axis of that mean is read off the whole season (the user, 2026-10-23,
+  Q25 (1)): 관점 전환, whose reach (kinds / 4) a case of seven decisions
+  rarely fills. Each case summary keeps its `cognitionMix` (a replay its
+  first close's, `firstCognitionMix`), and the season's spread of their sum
+  takes the place of each case's own (weight 0.2), on the client and in the
+  server's `ranking_run_summary` (`ranking_cognition_spread`, same draft);
+  a season with a case that has no count keeps the plain mean. The same 200
+  seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
+  (balanced), procedure +3.1.
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
