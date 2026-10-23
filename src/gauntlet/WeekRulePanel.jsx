@@ -30,8 +30,10 @@ export function useWeekRulePanel(id, echo = null) {
   return useMemo(() => {
     const rule = getWeekRule(id);
     if (!rule && !echo) return NO_PANEL;
+    // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
+    const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;
     return [
-      [...(echo ? [{ text: echo }] : []), ...(rule ? [rule] : [])],
+      [...(echo ? [{ text: echo }] : []), ...(rule ? [read] : [])],
       <>
         {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
         {rule && <WeekRulePanel key="week-rule" rules={[rule]} />}
@@ -68,6 +70,7 @@ function WeekRulePanel({ rules }) {
           <li key={rule.id} className={`gx-mutation mut-${rule.id}`}>
             <b lang="en">{rule.label}</b>
             <strong>{rule.title}</strong>
+            {rule.world && <small>{rule.world}</small>}
             <small>{rule.text}</small>
           </li>
         ))}

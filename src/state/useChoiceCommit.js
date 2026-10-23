@@ -41,6 +41,7 @@ import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
+import { takeReadingTally } from "./readingTally.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -135,6 +136,8 @@ export function useChoiceCommit(context) {
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
     // With the answer to its last question, which the season record counts the ruling by.
     if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null });
+    // Taken whether or not the row is sent, so the next case starts its own count.
+    const reading = takeReadingTally();
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
@@ -171,7 +174,8 @@ export function useChoiceCommit(context) {
         triggers: nextTriggers,
         cognition: nextCognition,
         decision_log: nextLog,
-        dynamics: { ...createRunSummary(nextRun), responseTimeSec },
+        // D-11 + E-4(b): how the case was read (state/readingTally.js).
+        dynamics: { ...createRunSummary(nextRun), responseTimeSec, ...reading },
       };
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,
@@ -500,6 +504,8 @@ export function useChoiceCommit(context) {
         nextTitle: nodes[nextNode]?.title ?? "결과 화면",
         nextNode,
         unlockedRelics,
+        // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
+        scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
       },
     });
     // Everything that leaves this tab's own state waits for the save to say

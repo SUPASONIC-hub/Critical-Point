@@ -144,6 +144,7 @@ export function SceneBriefing({
   resourceMeta,
   moveOf,
   onOpen,
+  reading,
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
@@ -177,13 +178,23 @@ export function SceneBriefing({
     onOpenRef.current = onOpen;
   });
 
+  // D-11: how long this page is up (visible) and whether it was ever held, for
+  // the stage to note when the table opens, by whatever key or button. Each
+  // frame reports both, so a page held from the start or held later is caught.
+  const readingRef = useRef(reading);
+  useEffect(() => {
+    readingRef.current = reading;
+  });
+
   useEffect(() => {
     let frame = 0;
     let spent = 0;
     let last = monotonicNow();
     const loop = () => {
       const now = monotonicNow();
-      if (!document.hidden && !heldRef.current) spent += Math.min(0.25, (now - last) / 1000);
+      const step = document.hidden ? 0 : Math.min(0.25, (now - last) / 1000);
+      if (!heldRef.current) spent += step;
+      readingRef.current?.(step, heldRef.current);
       last = now;
       const remaining = Math.max(0, readSeconds - spent);
       timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));

@@ -356,6 +356,15 @@ const TABLE_AUDIO = "src/gauntlet/gauntletAudio.js";
 const SCENE_TRACES = "src/state/useSceneBustRates.js";
 
 /**
+ * The other players' card share under the decision reveal (E-6):
+ * src/state/useSceneChoiceRates.js, which asks `scene_choice_rates()` once
+ * per page load, and src/sceneChoices.js, which words the answer. Only the
+ * reveal imports them, so left alone they are written into the PlayScreen
+ * chunk; they get a file the way sceneTraces does.
+ */
+const SCENE_CHOICES = "src/state/useSceneChoiceRates.js";
+
+/**
  * 이번 주의 규칙's panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx).
  * Only the briefing imports it, so left alone it is written into the
  * PlayScreen chunk, which it took past its gzip budget on 2026-10-20 (34,395
@@ -439,6 +448,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(SCENE_TRACES),
         name: "sceneTraces",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(SCENE_CHOICES),
+        name: "sceneChoices",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
       this.emitFile({

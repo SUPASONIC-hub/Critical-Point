@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { weekHasNews } from "../gauntlet/weeklyCalendar.js";
 import { loadedChunk, quietImport } from "../state/chunkReload.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
-import { setWeekRuleTurnedDown, weekRuleTurnedDown } from "../state/weeklyRuleChoice.js";
+import { isFirstSeason, setWeekRuleTakenUp, setWeekRuleTurnedDown, weekRuleTakenUp, weekRuleTurnedDown } from "../state/weeklyRuleChoice.js";
 
 /**
  * Where 이번 주의 규칙 shows on the start screen (`view="line"`) and the
@@ -37,5 +37,7 @@ export function WeeklyRuleNotice({ view = "line", now }) {
 
   if (!news || !loaded) return null;
   if (view === "boards") return <loaded.WeekBoards now={at} />;
-  return <loaded.WeeklyRuleLine now={at} turnedDown={weekRuleTurnedDown} turnDown={setWeekRuleTurnedDown} />;
+  // A device's first season has the other box (E-8): off unless taken up.
+  const first = isFirstSeason();
+  return <loaded.WeeklyRuleLine now={at} first={first} ticked={first ? weekRuleTakenUp : weekRuleTurnedDown} tick={first ? setWeekRuleTakenUp : setWeekRuleTurnedDown} />;
 }

@@ -7,6 +7,8 @@ import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 import { Prose } from "./Prose.jsx";
 import { SceneMinutes } from "./SceneMinutes.jsx";
+import { noteRevealDetails } from "../state/readingTally.js";
+import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
 // so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
 import { describeLogicMove, describeNextTable, describeVerdictCause, formatMultiplier } from "../gauntlet/tableReadout.js";
@@ -59,6 +61,8 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
 let detailsOpen = false;
 const flipDetails = () => {
   detailsOpen = !detailsOpen;
+  // D-11: counted on the case row (state/readingTally.js).
+  if (detailsOpen) noteRevealDetails();
 };
 
 /**
@@ -93,6 +97,8 @@ export function DecisionReveal({ view }) {
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
   const [, redraw] = useState(0);
+  // E-6: how many others staked the same card here, once the sample is big enough.
+  const choiceShare = useSceneChoiceLine(decisionReveal?.scene ?? null);
   useEffect(() => {
     if (decisionReveal) nextRef.current?.focus({ preventScroll: true });
   }, [decisionReveal]);
@@ -286,6 +292,12 @@ export function DecisionReveal({ view }) {
               <p><Prose text={decisionReveal.clue.text} /></p>
             </div>
           </div>
+        )}
+
+        {choiceShare && (
+          <p className="gx-reveal-draft" data-testid="choice-share">
+            {choiceShare}
+          </p>
         )}
 
         <div className="decision-reveal-footer">

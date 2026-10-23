@@ -188,10 +188,13 @@ const BUDGETS = {
   // 830 -> 833 on 2026-10-20, measured: B3's audit token on the run signal,
   // its prop and the 확정 button's description (830 before; the token's
   // comment went to auditRisk.js's readAudit).
+  // 68 -> 69 imported names on 2026-10-22 (ops-measure draft), measured: D-11's
+  // noteBriefing, which openTable calls so a page opened by key, button or clock
+  // is counted in one place.
   "src/gauntlet/GauntletStage.jsx": {
     lines: 833,
     longestLine: 250,
-    importedNames: 68,
+    importedNames: 69,
     hooks: {},
   },
 };

@@ -10,6 +10,7 @@ import {
   STORAGE_KEY,
 } from "../appConfig.js";
 import { clearTraceEvents } from "./trace.js";
+import { clearReadingTally } from "./readingTally.js";
 import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
 
 /**
@@ -19,7 +20,8 @@ import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
  * slots and the local ranking; the seeds of the windows the run settled; the
  * line the player typed for the next analyst; and the random id its telemetry
  * rows were filed under, so the next run starts under a new one. The trace of
- * this tab's last scenes goes too (`clearTraceEvents`, it is in sessionStorage).
+ * this tab's last scenes goes too (`clearTraceEvents`, it is in sessionStorage), and so
+ * does the reading tally of the open case (`clearReadingTally`, D-11).
  * The last four were left behind while the question asked said "everything".
  *
  * What it keeps, on purpose, and the question now says so (runLifecycle.resetRun):
@@ -51,6 +53,7 @@ export const RESET_STORAGE_KEYS = [
  */
 export function clearRunStorage() {
   clearTraceEvents();
+  clearReadingTally();
   return RESET_STORAGE_KEYS.filter((key) => !removeStoredValue(key));
 }
 
