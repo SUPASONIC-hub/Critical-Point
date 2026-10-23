@@ -51,6 +51,7 @@ import { ComfortDialog, useComfortDialogOpen } from "../components/ComfortDialog
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
+import { noteBriefing } from "../state/readingTally.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
@@ -138,6 +139,13 @@ export function GauntletStage({
    * comes back to the briefing instead of inheriting the last one's state.
    */
   const [openedSeed, setOpenedSeed] = useState(null);
+  // The briefing's reading, which it reports and openTable notes (D-11, state/readingTally.js).
+  const readingRef = useRef(null);
+  const trackReading = (seconds, held) => {
+    const page = (readingRef.current ??= { seconds: 0, held: false });
+    page.seconds += seconds;
+    if (held) page.held = true;
+  };
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
@@ -357,6 +365,9 @@ export function GauntletStage({
     if (!briefingOpen) return;
     const card = cards.find((item) => item.id === cardId);
     if (card && !isCardOpen(card)) return;
+    // D-11: the page that just closed, as the case row will count it.
+    noteBriefing({ caseId: scene.node.caseId, byClock, ...readingRef.current });
+    readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
@@ -800,7 +811,7 @@ export function GauntletStage({
           nodeId={scene.nodeId}
           portrait={scene.speakerPortrait}
           speakerRole={scene.speakerRole}
-          question={scene.question} bridge={scene.bridge} reaction={scene.reaction} opening={scene.opening}
+          question={scene.question} bridge={scene.bridge} reaction={scene.reaction} opening={scene.opening} echo={scene.echo}
           run={run}
           tableSeconds={schema.seconds}
           cards={cards}
@@ -812,12 +823,14 @@ export function GauntletStage({
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}
+          reading={trackReading}
         />
       )}
 
       <TableNotices
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
+        caseId={scene.node.caseId}
         // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
         voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}

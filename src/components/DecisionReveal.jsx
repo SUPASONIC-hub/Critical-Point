@@ -7,6 +7,8 @@ import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 import { Prose } from "./Prose.jsx";
 import { SceneMinutes } from "./SceneMinutes.jsx";
+import { noteRevealDetails } from "../state/readingTally.js";
+import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
 // so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
 import { describeLogicMove, describeNextTable, describeVerdictCause, formatMultiplier } from "../gauntlet/tableReadout.js";
@@ -45,11 +47,11 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
  * the table has been introduced (`decisionReveal.short`, set by the commit from
  * `isTableTaught`) the same whole sheet each time is the table, the slam and
  * then a page of rows the player has read. So the sheet is short from there:
- * the verdict, the card the room played if it was not the player's, what was
- * received and paid, a scene lost, the next rules, the card's own line, a clue
- * -- and whatever happens once (a relic unlocked, the draft, an overclock). The
- * ledger, the pot's sum, the words of the choice and the closing sentence made
- * from the effect are behind the button, which opens the sheet as it was.
+ * the verdict and the story line under it, the card the room played if it was
+ * not the player's, what was received and paid, a scene lost, the next rules,
+ * a clue -- and whatever happens once (a relic unlocked, the draft, an
+ * overclock). The ledger, the pot's sum and the words of the choice are behind
+ * the button, which opens the sheet as it was.
  *
  * It lives here and not in the save or the settings: it is this visit's, like
  * the reveal itself (`runState.js`, never saved). A module variable because the
@@ -59,6 +61,8 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
 let detailsOpen = false;
 const flipDetails = () => {
   detailsOpen = !detailsOpen;
+  // D-11: counted on the case row (state/readingTally.js).
+  if (detailsOpen) noteRevealDetails();
 };
 
 /**
@@ -104,6 +108,8 @@ export function DecisionReveal({ view }) {
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
   const [, redraw] = useState(0);
+  // E-6: how many others staked the same card here, once the sample is big enough.
+  const choiceShare = useSceneChoiceLine(decisionReveal?.scene ?? null);
   useEffect(() => {
     if (decisionReveal) nextRef.current?.focus({ preventScroll: true });
   }, [decisionReveal]);
@@ -124,6 +130,12 @@ export function DecisionReveal({ view }) {
     flipDetails();
     redraw((count) => count + 1);
   };
+  // What came of it in the story, straight under the verdict and on every
+  // sheet (improvement notes D-1, 2026-10-22): the card's own line, or -- for a
+  // bust, a card the clock staked and a reframe, which have none -- the last
+  // sentence of the beat. It was under the bill and the next rules, and on the
+  // short sheet a bust said no sentence of the story at all.
+  const storyLine = decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").at(-1);
   const consequenceLines = full ? createConsequenceLines({ verdict, busted, nextMutations }) : [];
   const headline = !verdict
     ? "DECISION"
@@ -161,6 +173,12 @@ export function DecisionReveal({ view }) {
           {decisionReveal.afterword && <p data-testid="reveal-afterword">{afterwordParts(decisionReveal.afterword)}</p>}
           {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>
+
+        {storyLine && (
+          <div className="decision-reveal-beat" data-testid="reveal-story">
+            {renderSceneLines(storyLine)}
+          </div>
+        )}
 
         {decisionReveal.short && (
           <button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded={detailsOpen} onClick={toggleDetails}>
@@ -282,12 +300,6 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
-        {(full || decisionReveal.echo) && (
-          <div className="decision-reveal-beat">
-            {renderSceneLines(decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
-          </div>
-        )}
-
         {decisionReveal.clue && (
           <div className="cinematic-clue-card">
             <Sparkles size={18} />
@@ -297,6 +309,12 @@ export function DecisionReveal({ view }) {
               <p><Prose text={decisionReveal.clue.text} /></p>
             </div>
           </div>
+        )}
+
+        {choiceShare && (
+          <p className="gx-reveal-share" data-testid="choice-share">
+            {choiceShare}
+          </p>
         )}
 
         <div className="decision-reveal-footer">

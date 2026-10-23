@@ -231,7 +231,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
               <p>{endingVariant.text}</p>
-              <small>{endingVariant.failure ? view.endingCause.toll : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
+              <small>{endingVariant.failure ? view.endingCause.toll : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>{view.seasonComparison && <small data-testid="season-comparison">{view.seasonComparison}</small>}
             </section>
           )}
           {currentCase === "final" && (

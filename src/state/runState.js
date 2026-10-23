@@ -7,7 +7,7 @@ import { normalizeWeekRuleId, pickSeasonWeekRule } from "../gauntlet/weeklyRules
 import { getAccessibility } from "./accessibilitySettings.js";
 import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
 import { weeklyRuleNow } from "./weeklyClock.js";
-import { weekRuleTurnedDown } from "./weeklyRuleChoice.js";
+import { weekRuleChoice } from "./weeklyRuleChoice.js";
 
 /**
  * The run, defined once.
@@ -241,7 +241,10 @@ export const RUN_FIELDS = {
     save: "echo",
     load: (saved) => normalizeSavedText(saved?.echo) || OPENING_ECHO,
     fresh: () => OPENING_ECHO,
-    newGame: FRESH,
+    // A season begun with NEW GAME+ opens on the line its caller chose from
+    // how the last season ended (newGamePlusCarry.getOpeningEcho); every other
+    // start, and a NEW GAME+ with nothing to carry, on the opening line.
+    newGame: (event) => (event.veteran === true && normalizeSavedText(event.echo).trim()) || OPENING_ECHO,
     openCase: given("echo"),
     jumpToNode: given("echo"),
     reset: FRESH,
@@ -266,11 +269,12 @@ export const RUN_FIELDS = {
     // entry chunk -- so the opening table is made here, as the device's
     // setting stands. Any table the save does hold keeps the mark it has.
     // The week's rule is stamped here for the same reason (D2: on by default,
-    // unless this device turned it down on the start screen, 결정 27).
+    // unless this device turned it down on the start screen, 결정 27; off for a
+    // device's first season unless it was taken up there, E-8).
     load: (saved) => {
       if (saved?.dynamics !== null) return normalizeRunState(saved?.dynamics);
       const story = getAccessibility().storyMode;
-      return openingTable(false, story, pickSeasonWeekRule(weeklyRuleNow(), { story, declined: weekRuleTurnedDown() }));
+      return openingTable(false, story, pickSeasonWeekRule(weeklyRuleNow(), { ...weekRuleChoice(), story }));
     },
     fresh: () => RUN_INITIAL_STATE,
     // A run begun with NEW GAME+ is marked: its table has every rule from the

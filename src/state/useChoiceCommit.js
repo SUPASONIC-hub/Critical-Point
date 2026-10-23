@@ -34,6 +34,8 @@ import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
+import { findFinalChoiceEntry } from "../verdictBranch.js";
+import { newGamePlusMark } from "./newGamePlusCarry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
@@ -41,6 +43,7 @@ import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
+import { takeReadingTally } from "./readingTally.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -136,7 +139,10 @@ export function useChoiceCommit(context) {
       appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
-    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary });
+    // With the answer to its last question, which the season record counts the ruling by.
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null });
+    // Taken whether or not the row is sent, so the next case starts its own count.
+    const reading = takeReadingTally();
     const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
@@ -173,7 +179,8 @@ export function useChoiceCommit(context) {
         triggers: nextTriggers,
         cognition: nextCognition,
         decision_log: nextLog,
-        dynamics: { ...createRunSummary(nextRun), responseTimeSec },
+        // D-11 + E-4(b): how the case was read (state/readingTally.js).
+        dynamics: { ...createRunSummary(nextRun), responseTimeSec, ...reading },
       };
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,
@@ -449,6 +456,9 @@ export function useChoiceCommit(context) {
       // play's story mark as well: playing a story case once more at the table
       // does not make the season one that was played there.
       if (caseResults[currentCase]?.assistStory === true) caseSummary.assistStory = true;
+      // A NEW GAME+ season marks every case (newGamePlusMark): the server keeps
+      // its prologues out of the scene bust rates and replays them on the whole table.
+      Object.assign(caseSummary, newGamePlusMark(nextRun));
       // The ranking publishes the run's final case row, so the finale carries
       // the slowest table clock of the whole season, not only its own.
       if (currentCase === "final") {
@@ -497,7 +507,8 @@ export function useChoiceCommit(context) {
         // archive. The reframe card has no line of its own (the default echo),
         // and a line written for a card that was confirmed is not what came of
         // a bust or of a card the clock staked: those keep the sentence made
-        // from the effect.
+        // from the effect, the beat's last, which the reveal shows under the
+        // verdict on every sheet (DecisionReveal.jsx).
         echo: reframe || busted || forced ? null : entry.echo,
         effect: finalEffect,
         clue,
@@ -512,6 +523,8 @@ export function useChoiceCommit(context) {
         // sees the wall (C-12).
         afterword: describeAfterword(windowState),
         caseRead: caseClosed ? describeCaseRead(nextLog) : null,
+        // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
+        scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
       },
     });
     // Everything that leaves this tab's own state waits for the save to say

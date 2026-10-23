@@ -19,12 +19,45 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
 /**
  * The rule as a list of one for the reading clock, and the panel that prints
  * it (null without a rule), both kept while the id is the same.
+ *
+ * `echo` is the line a NEW GAME+ season opens on (newGamePlusCarry.js), given
+ * only on that season's first page (useRunReadout): a panel of its own above
+ * the week's, under a `NEW GAME+` kicker, counted on the same clock. It is
+ * here rather than in SceneBriefing for the same reason the week's rule is:
+ * the PlayScreen chunk had 4 bytes left (scripts/check-bundle-size.mjs).
  */
-export function useWeekRulePanel(id) {
+export function useWeekRulePanel(id, echo = null) {
   return useMemo(() => {
     const rule = getWeekRule(id);
-    return rule ? [[rule], <WeekRulePanel key="week-rule" rules={[rule]} />] : NO_PANEL;
-  }, [id]);
+    if (!rule && !echo) return NO_PANEL;
+    // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
+    const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;
+    return [
+      [...(echo ? [{ text: echo }] : []), ...(rule ? [read] : [])],
+      <>
+        {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
+        {rule && <WeekRulePanel key="week-rule" rules={[rule]} />}
+      </>,
+    ];
+  }, [id, echo]);
+}
+
+/**
+ * The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own.
+ * Drawn after the page's grid, it is raised to just under the title strip (`order: -1`, as .gx-comic-top is in
+ * briefing.css): under the case file, a phone had to scroll to it (운영화면 문제 5-2).
+ */
+function SeasonEchoPanel({ echo }) {
+  return (
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="season-echo" style={{ gridArea: "auto", order: -1 }}>
+      <p className="gx-breach-kicker" lang="en">NEW GAME+</p>
+      <ul>
+        <li className="gx-mutation">
+          <strong style={{ gridColumn: "1 / -1" }}>{echo}</strong>
+        </li>
+      </ul>
+    </div>
+  );
 }
 
 /**
@@ -41,6 +74,7 @@ function WeekRulePanel({ rules }) {
           <li key={rule.id} className={`gx-mutation mut-${rule.id}`}>
             <b lang="en">{rule.label}</b>
             <strong>{rule.title}</strong>
+            {rule.world && <small>{rule.world}</small>}
             <small>{rule.text}</small>
           </li>
         ))}

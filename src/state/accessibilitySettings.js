@@ -12,6 +12,12 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    A run that used it carries `assistTime` into its case
  *                    summaries and its ranking row says so.
  *   holdReadingClock the briefing page's reading clock starts held, not counting.
+ *   readingClockAsked whether the page has asked, once, if the player would
+ *                    rather open every table themselves (gauntlet/
+ *                    ReadingClockAsk.jsx). Until it has, 프롤로그 01-02 start
+ *                    held and the first page the clock would open asks
+ *                    instead. Not a switch of the comfort panel: the answer is
+ *                    holdReadingClock.
  *   calmEffects      the red vignette, the bust flash and the shake, turned down
  *                    whatever the operating system says (it already follows
  *                    prefers-reduced-motion).
@@ -19,6 +25,9 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    (WCAG 2.1.4). Space, Enter and Escape stay.
  *   stillIntro       the intro's ticker, drifting art and blinking wordmark
  *                    stop (WCAG 2.2.2).
+ *   edgeNotices      the office's noise at the table's edge (EdgeNotice.jsx,
+ *                    개선 포인트 A5): a message and a mail as a hand is pushed
+ *                    on. On unless turned off; it never covers a number.
  *   storyMode        스토리 모드: the table steps back so the story can be read.
  *                    The wall stands far off, no decision breaks the next
  *                    board, the table clock runs at least twice as slow and a
@@ -41,11 +50,13 @@ export const STORY_SCALES = Object.freeze([1, 1.125, 1.25]);
 export const DEFAULT_ACCESSIBILITY = Object.freeze({
   tableTime: 1,
   holdReadingClock: false,
+  readingClockAsked: false,
   calmEffects: false,
   letterKeys: true,
   stillIntro: false,
   storyMode: false,
   storyScale: 1,
+  edgeNotices: true,
 });
 
 export function normalizeAccessibility(value) {
@@ -53,7 +64,7 @@ export function normalizeAccessibility(value) {
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
   if (STORY_SCALES.includes(source.storyScale)) settings.storyScale = source.storyScale;
-  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
+  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);

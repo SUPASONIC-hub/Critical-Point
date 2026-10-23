@@ -219,9 +219,11 @@ if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) con
  * scene; 필적 감정's sentence was reworded). The 22 left were in the
  * prologues, which another branch (story-first10) was rewriting; on 2026-10-23
  * the 7 on lines that branch leaves alone took the standard wording, and the
- * 15 left sit on lines it rewrites, so they wait for it.
+ * 15 left sit on lines it rewrites, so they wait for it. That branch
+ * (batch A, the same day) wrote the standard wording into them: 0 left
+ * once batch B was merged on it.
  */
-const OFF_STANDARD_CEILING = 15;
+const OFF_STANDARD_CEILING = 0;
 for (const term of Object.keys(STANDARD_GLOSS)) {
   if (!GLOSSARY.includes(term)) failures.push(`STANDARD_GLOSS explains "${term}", which is not in GLOSSARY`);
 }

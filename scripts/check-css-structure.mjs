@@ -227,11 +227,15 @@ const fileBudgets = {
   // recovery.css beside the debug jump panel, which is what it is.
   // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
   // (115 lines and 8280 bytes of them that day), the room unchanged.
+  // 55420 -> 55522 bytes on 2026-10-23, 10-23 묶음 A 합친 상태 실측: E-6's
+  // share line under the reveal took a plain rule of its own (.gx-reveal-share)
+  // in place of the relic notice's warning bar.
   // 55420 -> 55572 bytes on 2026-10-22 (D-8), measured 2861 / 55572: the
   // case file's cast cards and its list of the case's scenes so far.
   // 55572 -> 55616 bytes on 2026-10-23 in batch B, measured: the reveal's
-  // afterword keeping its verdict on one line, and the table readouts (C-13).
-  "play.css": { lines: 2925, bytes: 55616 },
+  // afterword keeping its verdict on one line, and the table readouts (C-13);
+  // 55726 with batch A's share line (E-6) under it, measured.
+  "play.css": { lines: 2925, bytes: 55726 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -272,8 +276,9 @@ const fileBudgets = {
   // story-copy-1 (Q8 (1)) took it 674 / 13078 -> 681 / 13293 on its own base:
   // the case's opening voice under the title and the title strip's third row.
   // 696 / 13379 on 2026-10-23 in batch B, measured with both and with the
-  // speaker's line on the last table (C-13) in a box of its own.
-  "briefing.css": { lines: 696, bytes: 13379 },
+  // speaker's line on the last table (C-13) in a box of its own; 697 / 13392
+  // on batch A, measured.
+  "briefing.css": { lines: 697, bytes: 13392 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

@@ -1,4 +1,4 @@
-import { caseIntroEchoes, legacyProfiles } from "../caseCopy.js";
+import { caseIntroEchoes, legacyProfiles, nextCaseSignals } from "../caseCopy.js";
 import { RESULT_NODE_IDS } from "../gameCases.js";
 import {
   CASE_SEQUENCE,
@@ -61,6 +61,11 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
         effect: openingEffect,
         continuity: previousOutcome,
         continuityChallenge,
+        // What this case is about, as the last one's close announced it: the
+        // intro's resume card prints it under the last case's ending title
+        // (improvement notes D-9). Written into the save here because the
+        // intro is drawn before the case copy is loaded.
+        premise: nextCaseSignals[previousCaseId]?.premise ?? null,
       }
     : null;
   const echo = previousOutcome

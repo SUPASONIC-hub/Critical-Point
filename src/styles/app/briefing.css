@@ -44,7 +44,10 @@
 }
 
 /* Title strip ---------------------------------------------------------------- */
+/* First, and the NEW GAME+ line (WeekRulePanel.jsx, order -1 too) straight
+   after it, above the grid, so a phone sees it without scrolling. */
 .gx-comic-top {
+  order: -1;
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:

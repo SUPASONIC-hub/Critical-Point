@@ -618,3 +618,21 @@ test("a window handed over with its trail leaves a replay record the checker pla
     assert.equal(scene.did.patches[0].log[0].replay, undefined, which);
   }
 });
+
+/* ------------------------------------------------------------- NEW GAME+ */
+
+test("every case summary of a NEW GAME+ season is marked, and a plain season's never is", () => {
+  const veteran = sceneContext("p1_aftershock");
+  veteran.context.gauntletRun = { ...veteran.context.gauntletRun, veteran: true };
+  mount(veteran.context).choose(veteran.context.node.choices[1], closedWindow("cash"));
+  const summary = veteran.did.patches[0].caseResults.prologue01;
+  assert.equal(summary.newGamePlus, true);
+  assert.equal(veteran.did.rankingRows[0].summary.newGamePlus, true, "this device's ranking row has it");
+  assert.equal(veteran.did.queued[0].payload.summary.newGamePlus, true, "the case row carries it to the server");
+  assert.deepEqual(validateTelemetryItem(veteran.did.queued[0]), []);
+  assert.equal("newGamePlus" in veteran.did.queued[0].payload.decision_log[0], false, "the mark is the case's, not each decision's");
+
+  const plain = sceneContext("p1_aftershock");
+  mount(plain.context).choose(plain.context.node.choices[1], closedWindow("cash"));
+  assert.equal("newGamePlus" in plain.did.patches[0].caseResults.prologue01, false);
+});

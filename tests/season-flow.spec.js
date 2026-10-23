@@ -5,7 +5,7 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodes, seasonCasesBase } from "../src/
 import { ENDING_GATES } from "../src/gameConstants.js";
 import { SEASON_STANDING_NEAR } from "../src/seasonStanding.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
-import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
+import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, SEASON_RECORD_KEY } from "../src/appConfig.js";
 import { createCaseSummary } from "../src/gameLogic.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels, easyResourceLabels } from "../src/playerLanguage.js";
@@ -409,6 +409,80 @@ test("NEW GAME+ starts the season again and keeps the finished one on the intro"
   // The season it came from is still on the device, whole.
   expect(await page.evaluate((key) => localStorage.getItem(key), NEW_GAME_PLUS_KEY)).toBe("true");
   expect(JSON.parse(await page.evaluate((key) => localStorage.getItem(key), NEW_GAME_PLUS_MEMORY_KEY))).toEqual(FINISHED_SEASON);
+});
+
+/**
+ * What NEW GAME+ carries (NEWGAMEPLUS 설계안 3절): the season record a finale
+ * writes (src/state/newGamePlusCarry.js). Seeded as a finished first season
+ * that closed on 봉인 · QUIET COVER, under an older table's rules mark.
+ */
+const SEALED_SEASON_RECORD = {
+  seasons: 1,
+  countedRuns: ["e2e-first-season"],
+  previous: null,
+  last: {
+    runId: "e2e-first-season",
+    endingId: "quiet-cover",
+    endingLabel: "QUIET COVER",
+    verdict: "ending_seal",
+    verdictName: "봉인",
+    tableRules: 1,
+    line: "지난 시즌: 봉인 · QUIET COVER. NEW GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.",
+  },
+};
+
+async function seedSeasonRecord(page, record = SEALED_SEASON_RECORD) {
+  await page.addInitScript(
+    ({ key, value }) => {
+      if (sessionStorage.getItem("e2e-record-seeded")) return;
+      sessionStorage.setItem("e2e-record-seeded", "1");
+      localStorage.setItem(key, value);
+    },
+    { key: SEASON_RECORD_KEY, value: JSON.stringify(record) },
+  );
+}
+
+test("NEW GAME+ names the last season on the intro and opens the next one on its line", async ({ page }) => {
+  await acceptConfirms(page);
+  await seedFinishedSeason(page);
+  await seedSeasonRecord(page);
+  await page.goto("/");
+  const memory = page.locator(".past-run-memory");
+  await expect(memory).toContainText("PAST RUN MEMORY · 2회차");
+  await expect(memory).toContainText("지난 시즌: 봉인 · QUIET COVER.");
+  // What a NEW GAME+ table is, as a fact (문구 질문 17): no claim that it is harder.
+  await expect(memory).toContainText("프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.");
+  await expect(memory.locator('[lang="en"]')).toHaveText("PAST RUN MEMORY");
+
+  await page.getByRole("button", { name: "NEW GAME+ 시작" }).click();
+  const echo = page.getByTestId("season-echo");
+  await expect(echo).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // Under the title strip, not under the case file: on screen without scrolling.
+  await expect(echo).toBeInViewport();
+  await expect(echo).toContainText("NEW GAME+");
+  await expect(echo).toContainText("지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다.");
+  // The line is the run's, saved with it.
+  await expect
+    .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")))?.echo, { timeout: TRANSITION_TIMEOUT_MS })
+    .toMatch(/^지난 시즌의 기록은 봉인되었지만/);
+});
+
+test("a second season's finale sets its ending beside the season before, and says the table's rules changed", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await seedSave(page, savedRunAt("final", "f_aftershock"));
+  // After the save's seed, which clears the device first.
+  await seedSeasonRecord(page);
+  await page.goto("/");
+  await resumeSavedRun(page);
+  await completeCurrentCase(page);
+  const comparison = page.getByTestId("season-comparison");
+  await expect(comparison).toBeAttached({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(comparison).toHaveText(/^지난 시즌(?: QUIET COVER · 이번 시즌 [A-Z ]+|과 같은 결말 QUIET COVER에 다시 닿았습니다) · 판 규칙이 바뀐 뒤의 첫 시즌$/);
+  // The record counted this season once, and kept the one before for the line.
+  const record = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), SEASON_RECORD_KEY);
+  expect(record.seasons).toBe(2);
+  expect(record.previous.endingLabel).toBe("QUIET COVER");
+  expect(record.last.runId).toBe("e2e-seeded-run");
 });
 
 test("NEW GAME+ over a run that can be resumed asks first, and a no leaves the run alone", { tag: "@prod" }, async ({ page }) => {

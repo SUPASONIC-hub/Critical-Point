@@ -121,3 +121,12 @@ test("a telemetry row names its ending by id, in the form the server's ranking t
   assert.equal(toRowSummary({ endingVariant: "collapse" }).endingVariant, "collapse");
   assert.equal(toRowSummary({}).endingVariant, null);
 });
+
+test("a NEW GAME+ season's row says so on this device, and only a true mark counts", () => {
+  const [plain] = buildLeaderboard([honest]);
+  assert.equal(plain.newGamePlus, false);
+  const [veteran] = buildLeaderboard([{ ...honest, summary: { ...honest.summary, newGamePlus: true } }]);
+  assert.equal(veteran.newGamePlus, true);
+  const [forged] = buildLeaderboard([{ ...honest, summary: { ...honest.summary, newGamePlus: "true" } }]);
+  assert.equal(forged.newGamePlus, false);
+});

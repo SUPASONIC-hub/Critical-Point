@@ -67,7 +67,7 @@ const AUTHORED = [
 const NOT_AUTHORED = {
   "src/advancedSystems.js": "what an operator's origin starts a run with, applied once",
   "src/gauntlet/gauntletEngine.js": "what the table itself bills on a bust, tuned by check:pressure",
-  "src/caseCopy.js": "what a NEW GAME+ rank carries into the next run, not what a choice gives",
+  "src/caseCopy.js": "what a closed case's rank gives the next case of the same season (legacyProfiles), not what a choice gives",
   "src/gameConstants.js": "the resources a run starts with",
   "src/gameLogic.js": "season wear and the reframe card's price: rules, read by check:endings",
   "src/riskLogic.js": "defaults for a pressure reading, not an effect",

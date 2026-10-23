@@ -40,7 +40,7 @@ export const viewGroups = {
       "activeCaseMeta", "nextParticipantMessage", "triggerLabels",
     ],
     start: [
-      "hasResumableSave", "node", "formatSaveTime", "lastSavedAt", "log", "progress", "playerName",
+      "hasResumableSave", "node", "formatSaveTime", "lastSavedAt", "savedStory", "progress", "playerName",
       "PLAYER_NAME_MAX_LENGTH", "setPlayerName", "limitText", "startGame", "resumeSavedGame",
       "activePlayStyle", "playStyleOptions", "playStyle", "setPlayStyle", "persist", "newGamePlusUnlocked",
       "startNewGamePlus",
@@ -75,7 +75,7 @@ export const viewGroups = {
       "unopenedRecordCount", "unopenedClueCount", "unopenedBranchCount", "nextParticipantMessage",
       "setNextParticipantMessage", "saveNextParticipantMessage", "endingSceneProfile", "endingVisualClass",
       "endingCause", "endingAtmosphere", "originEndingVariant", "endingEpilogue", "endingPreview",
-      "aftermath", "operatorReveal",
+      "aftermath", "operatorReveal", "seasonComparison",
     ],
     score: [
       "result", "caseOutcome", "resultRank", "momentumTier", "momentumScore", "rankLine", "scoreBreakdown",

@@ -2063,6 +2063,15 @@
   font-weight: 700;
 }
 
+/* E-6's line, the share of analysts who took the same card: information, not
+   a warning, so it is plain text and not the relic notice's bar. */
+.gx-reveal-share {
+  margin: 8px 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
 .gx-reveal-skip {
   margin: 10px 0 0;
   padding: 9px 12px;

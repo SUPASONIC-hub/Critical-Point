@@ -51,6 +51,8 @@ export function createResultViewModel(report, {
   setNextParticipantMessage,
   saveNextParticipantMessage,
   operatorReveal,
+  // NEW GAME+: the line comparing this season's ending with the one before (newGamePlusCarry.js), or null.
+  seasonComparison,
   // The score and the record it was read from.
   caseResults,
   decisionFingerprint,
@@ -168,6 +170,7 @@ export function createResultViewModel(report, {
     endingPreview,
     aftermath,
     operatorReveal,
+    seasonComparison,
 
     result,
     caseOutcome,

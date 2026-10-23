@@ -121,6 +121,7 @@ export function RankingScreen({
                       {Number.isFinite(vaultPerCase) && <span data-testid="ranking-vault">사건당 금고 {vaultPerCase.toLocaleString("en-US")}</span>}
                       {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
                       {entry.assistStory && <span className="ranking-assist">스토리 모드</span>}
+                      {entry.newGamePlus && <span className="ranking-assist" lang="en">NEW GAME+</span>}
                       {entry.collapsed && <span className="ranking-assist">붕괴한 시즌</span>}
                     </div>
                   </div>

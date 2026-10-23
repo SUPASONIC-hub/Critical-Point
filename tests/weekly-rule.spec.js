@@ -1,7 +1,8 @@
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 
 import { NEAR_WALL_SHIFT, weekStartMs, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
-import { WEEK_RULE_OFF_STORAGE_KEY } from "../src/state/weeklyRuleChoice.js";
+import { NEW_GAME_PLUS_KEY } from "../src/appConfig.js";
+import { WEEK_RULE_OFF_STORAGE_KEY, WEEK_RULE_ON_STORAGE_KEY } from "../src/state/weeklyRuleChoice.js";
 import { clickElement, dismissProtocolBreach, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -24,6 +25,16 @@ async function setWeeklyClock(page, ms) {
   await page.addInitScript((at) => {
     globalThis.__weeklyRuleClock = at;
   }, ms);
+}
+
+/**
+ * A device that has finished a season (NEW GAME+ open): the week's rule is on
+ * by default there. A fresh device's first season starts without it (E-8).
+ */
+async function markReturning(page) {
+  await page.addInitScript((key) => {
+    localStorage.setItem(key, "true");
+  }, NEW_GAME_PLUS_KEY);
 }
 
 /** From the intro to the first case's briefing page, and what it says about the week. */
@@ -65,8 +76,9 @@ test("weekly rule: the start line, the briefing panel and the near wall, against
   expect(plain, "the season was saved with its table").not.toBeNull();
   expect(plain.weekRule).toBeNull();
 
-  // The event week, on a fresh device: the save is gone, so "/" is the intro.
+  // The event week, on a device that finished a season: the save is gone, so "/" is the intro.
   await setWeeklyClock(page, IN_EVENT_WEEK);
+  await markReturning(page);
   await page.evaluate(() => localStorage.clear());
   await page.goto("/");
   const line = page.getByTestId("weekly-rule-line");
@@ -89,6 +101,7 @@ test("weekly rule: the start line, the briefing panel and the near wall, against
 test("weekly rule turned down on the start screen: an ordinary season in an event week", async ({ page }) => {
   test.setTimeout(90_000);
   await setWeeklyClock(page, IN_EVENT_WEEK);
+  await markReturning(page);
   await page.goto("/");
   const off = page.getByTestId("weekly-rule-off");
   await off.check();
@@ -101,6 +114,35 @@ test("weekly rule turned down on the start screen: an ordinary season in an even
 
   // The box is a preference of the device: the intro drawn again still has it ticked.
   await expect(page.getByTestId("weekly-rule-off")).toBeChecked();
+});
+
+test("weekly rule on a first season (E-8): off by default in the near-wall week, taken up by the box", async ({ page }) => {
+  test.setTimeout(120_000);
+  // A fresh device in W46: the line says whom the week is for, the box is the other one, and the season is ordinary.
+  await setWeeklyClock(page, IN_EVENT_WEEK);
+  await page.goto("/");
+  const line = page.getByTestId("weekly-rule-line");
+  await expect(line).toContainText("돌아온 분석관을 위한 이번 주의 규칙");
+  await expect(line).toContainText("NEAR WALL");
+  await expect(page.getByTestId("weekly-rule-off")).toHaveCount(0);
+  const on = page.getByTestId("weekly-rule-on");
+  await expect(on).not.toBeChecked();
+  await expect(page.getByLabel("이번 주의 규칙으로 시작(이번 주 순위로)")).toBeVisible();
+  await openFirstBriefing(page);
+  await expect(page.getByTestId("week-rule-panel")).toHaveCount(0);
+  await dismissProtocolBreach(page);
+  expect((await saveAndLeave(page))?.weekRule, "a first season starts without the week's rule").toBeNull();
+
+  // The same week on a fresh device again, with the box ticked: the season takes the rule.
+  await page.evaluate(() => localStorage.clear());
+  await page.goto("/");
+  await page.getByTestId("weekly-rule-on").check();
+  expect(await page.evaluate((key) => localStorage.getItem(key), WEEK_RULE_ON_STORAGE_KEY)).toBe("1");
+  await openFirstBriefing(page);
+  await expect(page.getByTestId("week-rule-panel")).toContainText("NEAR WALL");
+  await dismissProtocolBreach(page);
+  expect((await saveAndLeave(page))?.weekRule, "taken up, the season is stamped").toBe(EVENT.id);
+  await expect(page.getByTestId("weekly-rule-on")).toBeChecked();
 });
 
 test("weekly rule notice: the week before says what is coming, and deals nothing yet", async ({ page }) => {

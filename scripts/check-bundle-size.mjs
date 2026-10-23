@@ -72,6 +72,43 @@ const budgets = [
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
   { pattern: /^index-.*\.js$/, maxBytes: 170_441, maxGzip: 61_556 },
+  // 169,980 / 61,300 -> 170,257 / 61,530 on 2026-10-21, measured 170,257 /
+  // 61,526 in the e2e build, the gzip plus 4: NEW GAME+ on the start screen
+  // (the memory panel's season number and last ending, the continue card's
+  // · N회차). Cut first: the panel's sentence is written into the season record
+  // when the season is counted (newGamePlusCarry.getMemoryLine, the runtime's
+  // chunk), so the entry reads a stored line and the season number
+  // (appConfig.getSeasonRound) and carries neither the sentence's rules nor
+  // the record's reader (state/seasonRecord.js); that took the addition from
+  // 1,082 / 428 to the 663 / 244 over main's 169,594 / 61,282 left here.
+  // -> 170,288 / 61,540 the same day, measured 170,288 / 61,536: the ranking
+  // rows read the NEW GAME+ mark (src/ranking.js, which the shell's board
+  // takes), +31 / +10.
+  // -> 170,409 / 61,597 the same evening, measured 170,409 / 61,593: the
+  // panel's last sentence on what a NEW GAME+ table is (문구 질문 17).
+  // -> 170,436 / 61,616 on 2026-10-23, NEW GAME+ (#220) rebased on main
+  // d486f4e (#216, above): measured 170,436 / 61,612 in the e2e build, the
+  // gzip plus 4. The raw 27 over #220 alone is the windowTrail preload entry
+  // #216's raw budget had room for.
+  // 61,300 -> 61,377 gzip on 2026-10-21 (A5, draft), measured 61,373 plus 4
+  // (main 0df240a measured 169,594 / 61,278): the comfort panel's switch for
+  // the edge notices, its label and its line (+188 raw, inside the raw budget).
+  // 169,980 / 61,300 -> 170,097 / 61,478 on 2026-10-22 (story-first10, #241,
+  // draft), measured 170,097 / 61,474 in the e2e build, the gzip plus 4: the
+  // resume card's 지난 이야기 (D-9; the view field folded into `savedStory`,
+  // its code cut to two lines first) and the reading clock's asked-once flag
+  // in the comfort settings (A-11). The question itself is a chunk of its own.
+  // On main's 61,308 (#216) this came to 170,124 / 61,480 on 2026-10-23,
+  // rebased on 2c7b535: 170,124 / 61,484.
+  // 169,980 / 61,308 -> 170,453 / 61,560 for ops-measure (2026-10-23, on main
+  // 2c7b535), measured 170,453 / 61,556 in the e2e build, the gzip plus 4:
+  // E-8's first season (the season count read off the NEW GAME+ keys, the
+  // second box's key and the choice both starts read) and one more chunk in
+  // the preload lists (sceneChoices, E-6).
+  // -> 171,964 / 62,152 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
+  // #262 #241 #251 #256 on main 5adcbb5): measured 171,964 / 62,148 in the
+  // e2e build, the gzip plus 4; the four additions above, together.
+  { pattern: /^index-.*\.js$/, maxBytes: 171_964, maxGzip: 62_152 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -155,6 +192,41 @@ const budgets = [
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 106_566, maxGzip: 35_484 },
+  // 104,705 / 34,805 -> 104,733 / 34,832 on 2026-10-21, measured 104,733 /
+  // 34,828 in the e2e build, the gzip plus 4: the line a NEW GAME+ season
+  // opens on (newGamePlusCarry.js), drawn on 프롤로그 01's first page. Its
+  // panel and the condition it is shown under are elsewhere (WeekRulePanel,
+  // below, and useRunReadout in the runtime's chunk); what stays is the one
+  // string handed from the play screen through the table to the page.
+  // 34,832 -> 34,838 the same day: the chunk's imports name hashed files,
+  // and the start screen's change above moved its gzip to 34,833-34,834.
+  // 104,745 / 34,822 -> 104,773 / 34,856 on 2026-10-23, NEW GAME+ (#220)
+  // rebased on main d486f4e (#216, above): measured 104,773 / 34,852 in the
+  // e2e build, the gzip plus 4. The raw is #216's plus #220's 28 exactly.
+  // 104,705 / 34,805 -> 104,771 / 34,843 on 2026-10-21 (A5, draft): measured
+  // 104,771 / 34,839, the gzip plus 4, on main 0df240a's 104,705 / 34,801.
+  // What stays here of the edge notices is the import and the one element in
+  // TableNotices; their words, timing and inline style are EdgeNotice's
+  // (below), and play.css took no rule. 104,771 -> 104,810 on 2026-10-22
+  // (B-15): the table hands the notice its case (a `caseId` prop of its own).
+  // 104,705 / 34,805 -> 104,775 / 34,859 on 2026-10-22 (story-first10, #241,
+  // draft), measured 104,775 / 34,855, the gzip plus 4: the briefing's
+  // held-until-asked start and the reveal's story line under the verdict
+  // (A-11, D-1), after the question's panel went to ReadingClockAsk and the
+  // introduction panel left the grid's row arithmetic (D-6).
+  // On main's 104,745 / 34,822 (#216) this came to 104,827 / 34,871 on
+  // 2026-10-23, rebased on 2c7b535: 104,827 / 34,875.
+  // 104,745 / 34,822 -> 105,055 / 34,952 for ops-measure (2026-10-23, on main
+  // 2c7b535), measured 105,055 / 34,948 in the e2e build, the gzip plus 4:
+  // D-11's reading tally (the briefing's report each frame, the stage's note
+  // when the table opens, the reveal's 자세히 count) and E-6's line under the
+  // reveal, whose fetch and words are a chunk of their own (sceneChoices,
+  // below). Reporting the hold on each frame in place of a mount effect and a
+  // line in the hold button took 71 / 24 off (105,126 / 34,972 before).
+  // -> 105,284 / 35,047 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
+  // #241 #256 together on main 5adcbb5): measured 105,284 / 35,043 in the e2e
+  // build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_284, maxGzip: 35_047 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -185,6 +257,9 @@ const budgets = [
   // Batch B on 2026-10-23 (the day's text and screen branches merged on main
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
+  // 14,562 -> 14,578 gzip on 2026-10-23 (ops-measure, on main 2c7b535),
+  // measured 14,574 plus 4. No code of the report changed: its hoisted
+  // `import "./<chunk>-<hash>.js"` list gained one name, sceneChoices (E-6).
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_578 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -207,6 +282,10 @@ const budgets = [
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
   { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_543 },
+  // 35,363 -> 35,383 gzip on 2026-10-23, 10-23 묶음 A 합친 상태 실측: measured
+  // 191,859 / 35,379, the gzip plus 4 -- the five branches' rules, E-6's share
+  // line (.gx-reveal-share) and the title strip's order for the NEW GAME+ line.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_383 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -241,6 +320,9 @@ const budgets = [
   // 4,959 / 2,135 plus 4: 사건당 금고 on each row (C-1 (3)), worked out in the
   // screen so the entry chunk's ranking.js does not grow.
   { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_959, maxGzip: 2_139 },
+  // 4,800 -> 4,858 raw on 2026-10-21, measured: the NEW GAME+ tag on this
+  // device's own rows (the gzip, 2,080, stays under its budget).
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_858, maxGzip: 2_100 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -292,6 +374,9 @@ const budgets = [
   // beside the 논리 유지력. The words come from the report (score.vaultLine);
   // the card reads one string and draws it.
   { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_853, maxGzip: 4_290 },
+  // 8,745 / 4,261 -> 8,780 / 4,280 for ops-measure (2026-10-23), measured
+  // 8,780 / 4,276 plus 4: one more import, sceneChoices (E-6); its code did not change.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_780, maxGzip: 4_280 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -324,6 +409,11 @@ const budgets = [
   // 1,054 / 652 measured, plus the 4 bytes tableAudio was given for the
   // hashed file names it imports.
   { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_058, maxGzip: 656 },
+  // The other players' card share under the decision reveal (E-6, 2026-10-22):
+  // src/state/useSceneChoiceRates.js and src/sceneChoices.js, the frame of
+  // sceneTraces above (SCENE_CHOICES in vite.config.js). 1,216 / 724
+  // measured, plus 4 each for the hashed names.
+  { pattern: /^sceneChoices-.*\.js$/, maxBytes: 1_220, maxGzip: 728 },
   // 이번 주의 규칙 (2026-10-19), split off the entry chunk so the entry stays
   // under its budget: the rules and their words (src/gauntlet/weeklyRules.js),
   // shared by the runtime, the engine and the views below, and the start
@@ -355,17 +445,52 @@ const budgets = [
   // 2,051 / 1,160 -> 2,104 / 1,179 on 2026-10-21: W44's line says that a
   // cash on a CASCADE board is not counted by the audit (B2 decision 10).
   // Measured 2,104 / 1,175, the gzip plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_104, maxGzip: 1_179 },
+  // 2,104 / 1,179 -> 2,704 / 1,450 for ops-measure (2026-10-23), measured
+  // 2,704 / 1,446 plus 4: E-9's SHORT CLOCK (its entry, its two numbers, the
+  // overlay's relative clock and chips) and each event rule's line in the
+  // story.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_704, maxGzip: 1_450 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
   // weeklyRules chunk above stays as it was). Measured 1,796 / 962, the gzip
   // plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_796, maxGzip: 966 },
+  // 1,796 / 966 -> 2,081 / 1,077 for ops-measure (2026-10-23, on main
+  // 2c7b535), measured 2,081 / 1,073 plus 4: E-8's line and box for a first
+  // season and E-9's line in the story before the rule, beside main's next
+  // week's notice in the same line.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 2_081, maxGzip: 1_077 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 801, maxGzip: 515 },
+  // 801 / 515 -> 1,271 / 648 on 2026-10-21, measured 1,271 / 644, the gzip
+  // plus 4: the NEW GAME+ line's panel on the same page, above the week's
+  // rule, kept out of the PlayScreen chunk the same way.
+  // 801 / 515 -> 897 / 562 for the ops-measure draft (2026-10-22), measured
+  // 897 / 558 plus 4: E-9's line in the story, printed and read by the clock.
+  // -> 1,378 / 695 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: the NEW GAME+
+  // panel (#220) and E-9's line (#256) together, measured 1,378 / 691, the
+  // gzip plus 4. -> 1,387 / 706 the same day, measured 1,387 / 702: the
+  // NEW GAME+ line raised under the title strip (`order: -1`).
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_387, maxGzip: 706 },
+  // The office's noise at the table's edge (개선 포인트 A5,
+  // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
+  // own from the start and fetched with the table. Its style is inline, so no
+  // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4;
+  // 3,779 / 2,166 on 2026-10-22, when the two senders became nine acts' pairs
+  // (B-15: eighteen senders, thirty-six lines) and the act is read off
+  // CASE_SEQUENCE.
+  // -> 3,786 / 2,180 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (measured
+  // 3,786 / 2,176, the gzip plus 4): the notice moved from over the scene's
+  // title to just above the action bar.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_786, maxGzip: 2_180 },
+  // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
+  // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
+  // and the first page the clock would open asks instead (A-11 = D-4).
+  // Measured 1,348 / 775 in the e2e build, the gzip plus 4.
+  // 10-23 묶음 A 합친 상태 실측: 1,348 / 782 (its imports name hashed files),
+  // the gzip plus 4.
+  { pattern: /^ReadingClockAsk-.*\.js$/, maxBytes: 1_348, maxGzip: 786 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
@@ -501,9 +626,21 @@ function checkBudget(file, budget) {
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
 // 8,993 / 3,261 on 2026-10-23 in batch B, measured 8,993 / 3,257 plus 4:
 // the replay trail's chunk and CaseCast both in the list.
-const WORKER_BUDGET = { maxBytes: 8_993, maxGzip: 3_261 };
 // 8,928 / 3,231 -> 8,959 / 3,240 on 2026-10-22 (reading-layout, draft),
 // measured 8,959 / 3,236 plus 4: one more file in the list, CaseCast.
+// 8,928 / 3,231 -> 8,961 / 3,244 on 2026-10-21 (A5, draft), measured 8,961 /
+// 3,240 plus 4 (main 8,928 / 3,222): one more file, EdgeNotice.
+// 8,928 / 3,231 -> 8,966 / 3,246 on 2026-10-22 (story-first10, #241, draft):
+// one more file, the reading clock's question (ReadingClockAsk), measured
+// 8,966 / 3,242 plus 4.
+// On main's 8,962 / 3,248 (#216, the trail's chunk) both files together
+// measured 9,000 / 3,258 on 2026-10-23, rebased on 2c7b535: 9,000 / 3,262.
+// 8,962 / 3,248 -> 8,997 / 3,258 for ops-measure (2026-10-23), measured
+// 8,997 / 3,254 plus 4: one more file, sceneChoices (E-6).
+// -> 9,068 / 3,294 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: EdgeNotice,
+// ReadingClockAsk and sceneChoices all in the list, measured 9,068 / 3,290
+// plus 4.
+const WORKER_BUDGET = { maxBytes: 9_068, maxGzip: 3_294 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

@@ -22,6 +22,11 @@ const TOGGLES = [
     text: "붉은 가장자리, 판정 섬광, 화면 흔들림을 약하게 합니다.",
   },
   {
+    key: "edgeNotices",
+    label: "가장자리 알림 띄우기",
+    text: "밀어붙일수록 화면 위 가장자리에 메신저·메일이 잠깐 뜹니다.",
+  },
+  {
     key: "letterKeys",
     label: "한 글자 단축키 쓰기",
     text: "1-9, W, E, Q, P, R, N. 끄면 Space, Enter, Esc만 남습니다.",

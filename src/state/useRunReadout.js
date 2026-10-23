@@ -24,6 +24,7 @@ import { getTraceEvents } from "./trace.js";
 import { getSceneBridge } from "../viewModels/sceneBridge.js";
 import { caseCastFor } from "../gauntlet/CaseCastFold.jsx";
 import { warmCasePortraits } from "../speakerPortraits.js";
+import { getSeasonOpening } from "./newGamePlusCarry.js";
 
 /**
  * A window already settled under this seed -- a rolled-back save brought it
@@ -53,6 +54,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // voice until the first card is played (caseIntroEchoes). It rides on the
   // spine because the play view has no room for a field of its own
   // (check:runtime-budget); the briefing shows it on a case's first page only.
+  // A NEW GAME+ season's first page carries its line (newGamePlusCarry.js),
+  // beside the run's own `opening`; both ride on the spine.
+  const seasonOpening = getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo });
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
     // `bridge` (D-7) and `caseCast` (D-8), the case file's cast drawn from
@@ -72,8 +76,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
       // The speaker's line about the last table at the head of the scene (C-13, tableAfterword.js).
       reaction: getTableReaction(log, node?.title),
       opening: echo,
+      seasonOpening,
     };
-  }, [caseResults, currentCase, echo, log, node, riskPressure, riskTier]);
+  }, [caseResults, currentCase, echo, log, node, riskPressure, riskTier, seasonOpening]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
     const unopenedBranchCount = getCaseBranchNodes().filter((branch) => !caseScoped || branch.caseId === currentCase).reduce(

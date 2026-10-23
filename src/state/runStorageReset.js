@@ -11,6 +11,7 @@ import {
 } from "../appConfig.js";
 import { SEEN_GLOSSES_KEY } from "../components/seenGlosses.js";
 import { clearTraceEvents } from "./trace.js";
+import { clearReadingTally } from "./readingTally.js";
 import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
 
 /**
@@ -21,12 +22,14 @@ import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
  * line the player typed for the next analyst; and the random id its telemetry
  * rows were filed under, so the next run starts under a new one; and the glossed
  * words the run has seen explained, so the next one sees them explained. The trace of
- * this tab's last scenes goes too (`clearTraceEvents`, it is in sessionStorage).
+ * this tab's last scenes goes too (`clearTraceEvents`, it is in sessionStorage), and so
+ * does the reading tally of the open case (`clearReadingTally`, D-11).
  * The last four were left behind while the question asked said "everything".
  *
  * What it keeps, on purpose, and the question now says so (runLifecycle.resetRun):
- * the screen and sound settings, the relic codex, the NEW GAME+ unlock and the
- * season it remembers, the board nickname and writer id, and the online save's
+ * the screen and sound settings, the relic codex, the NEW GAME+ unlock, the
+ * season it remembers and the season record (newGamePlusCarry.js: how many
+ * seasons this device finished, and how the last one ended), the board nickname and writer id, and the online save's
  * code, its sync record and the copy on the server. The sync record is kept
  * and marked: the reset holds a conflict in it, so the next run is not
  * uploaded over that copy unasked (cloudSave.holdCloudCopyThroughReset).
@@ -54,6 +57,7 @@ export const RESET_STORAGE_KEYS = [
  */
 export function clearRunStorage() {
   clearTraceEvents();
+  clearReadingTally();
   return RESET_STORAGE_KEYS.filter((key) => !removeStoredValue(key));
 }
 

@@ -104,7 +104,7 @@ export function IntroScreen({ view, renderers = {} }) {
     },
     start: {
       playStyleOptions, playStyle, setPlayStyle, persist, hasResumableSave, node, formatSaveTime,
-      lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText,
+      lastSavedAt, savedStory, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText,
       startGame, resumeSavedGame, activePlayStyle, newGamePlusUnlocked, startNewGamePlus,
     },
     telemetry: {
@@ -173,7 +173,7 @@ export function IntroScreen({ view, renderers = {} }) {
   // record away asks first (decideCaseCardPress has the cases).
   const pressCaseCard = async (caseItem) => {
     const press = decideCaseCardPress({
-      caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: log.length,
+      caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: savedStory.decisions,
     });
     if (press === "locked") return;
     if (press === "resume") return resumeSavedGame();
@@ -214,7 +214,8 @@ export function IntroScreen({ view, renderers = {} }) {
       <div>
         {/* The record title rises with the season; it is read from the
             case in play and the cases closed (src/analystTitle.js). */}
-        <span>저장된 진행{analystTitle ? ` · 기록 칭호 ${analystTitle}` : ""}</span>
+        {/* The season number from the second on (NEW GAME+ record, getPastRunMemory). */}
+        <span>저장된 진행{analystTitle ? ` · 기록 칭호 ${analystTitle}` : ""}{pastRunMemory?.round > 1 ? ` · ${pastRunMemory.round}회차` : ""}</span>
         {/* The scene title and the route position are read from the
             graph, which the pre-start shell has not loaded. It prints
             the case and the save time instead of guessing them. */}
@@ -223,9 +224,18 @@ export function IntroScreen({ view, renderers = {} }) {
           {node?.title ? ` · ${node.title}` : ""}
         </strong>
         <small>
-          {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록
+          {formatSaveTime(lastSavedAt)} 저장 · {savedStory.decisions}개 판단 기록
           {progress === null ? "" : ` · 진행률 ${progress}%`}
         </small>
+        {/* 지난 이야기: the last case's ending and what this one is about, or
+            the line the last decision left (introViewModel's getStoryRecap).
+            A div, so the card's own grid rule lays it out and no style is added. */}
+        {savedStory.recap.length > 0 && (
+          <div data-testid="resume-recap">
+            <span>지난 이야기</span>
+            {savedStory.recap.map((line) => <small key={line}>{line}</small>)}
+          </div>
+        )}
       </div>
       <button
         type="button"
@@ -454,7 +464,11 @@ export function IntroScreen({ view, renderers = {} }) {
           </section>
           {pastRunMemory && (
             <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
-              <span>{pastRunMemory.label}</span>
+              {/* The English name is read as English, the season number as Korean (문구 질문 9). */}
+              <span>
+                <span lang="en">PAST RUN MEMORY</span>
+                {pastRunMemory.round > 1 ? ` · ${pastRunMemory.round}회차` : ""}
+              </span>
               <p>{pastRunMemory.text}</p>
             </section>
           )}
