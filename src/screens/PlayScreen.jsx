@@ -74,7 +74,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
           speakerPortrait,
           speakerRole: speakerProfile.role,
           question: narrativeSpine.question, challenge: sceneChallenge.title,
-          bridge: narrativeSpine.bridge, caseCast: narrativeSpine.caseCast, reaction: narrativeSpine.reaction,
+          bridge: narrativeSpine.bridge, caseCast: narrativeSpine.caseCast, reaction: narrativeSpine.reaction, opening: narrativeSpine.opening,
         }}
       />
       {__CP_DEBUG_BUILD__ && debugToolsEnabled && (

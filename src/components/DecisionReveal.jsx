@@ -90,6 +90,9 @@ export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
+  // Where the lost scene went on: its place up to the first " · " (B-13), the
+  // 회의실 only for a reveal saved before the skip carried one.
+  const skippedRoom = String(decisionReveal?.skippedPlace ?? "").split(" · ")[0] || "회의실";
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
   const [, redraw] = useState(0);
@@ -210,13 +213,13 @@ export function DecisionReveal({ view }) {
                 <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
               </b>
             ))}
-            <p>도감에 들어갔다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있다.</p>
+            <p>도감에 들어갔습니다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있습니다.</p>
           </div>
         )}
 
         {verdict?.relicOffer?.length > 0 && (
           <p className="gx-reveal-draft" data-testid="relic-draft-notice">
-            사건이 닫혔다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고른다.
+            사건이 닫혔습니다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고릅니다.
           </p>
         )}
 
@@ -248,7 +251,7 @@ export function DecisionReveal({ view }) {
         {decisionReveal.skippedTitle && (
           <>
             <p className="gx-reveal-skip" data-testid="blackout-skip">
-              <b lang="en">LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
+              <b lang="en">LOST SCENE</b> {skippedRoom}{topicParticle(skippedRoom)} 당신 없이 「{decisionReveal.skippedTitle}」{objectParticle(decisionReveal.skippedTitle)} 넘겼습니다.
             </p>
             <SceneMinutes nodeId={decisionReveal.skippedNodeId} />
           </>

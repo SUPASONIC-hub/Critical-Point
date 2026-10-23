@@ -44,11 +44,15 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, discoveredClues = [], gauntletRun, runId, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, discoveredClues = [], gauntletRun, runId, seedBase, debugTools, echo = "" }) {
   // A case's report counts the doors of that case (D-10); the finale's, the season's.
   const caseScoped = currentCase !== "final";
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
+  // `opening` is the run's line under the scene (`run.echo`): the case's opening
+  // voice until the first card is played (caseIntroEchoes). It rides on the
+  // spine because the play view has no room for a field of its own
+  // (check:runtime-budget); the briefing shows it on a case's first page only.
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
     // `bridge` (D-7) and `caseCast` (D-8), the case file's cast drawn from
@@ -67,8 +71,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
       caseCast: caseCastFor(log),
       // The speaker's line about the last table at the head of the scene (C-13, tableAfterword.js).
       reaction: getTableReaction(log, node?.title),
+      opening: echo,
     };
-  }, [caseResults, currentCase, log, node, riskPressure, riskTier]);
+  }, [caseResults, currentCase, echo, log, node, riskPressure, riskTier]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
     const unopenedBranchCount = getCaseBranchNodes().filter((branch) => !caseScoped || branch.caseId === currentCase).reduce(

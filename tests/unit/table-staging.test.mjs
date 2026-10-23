@@ -74,8 +74,8 @@ test("the introduction is read against the briefing's clock, a line counted as a
   }
   // The page that counts them is the page that prints them.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
-  // And the week's rule (이번 주의 규칙), whose panel the page prints too.
-  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.node, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules, \{ text: bridge \}\]\)/);
+  // And the week's rule (이번 주의 규칙), whose panel the page prints too, and the case's opening voice (Q8 (1)).
+  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.node, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules, \{ text: bridge \}, \{ text: openingLine \}\]\)/);
   assert.match(briefing, /const intro = getBriefingIntro\(node, nodeId, run\);/);
 });
 
@@ -108,4 +108,28 @@ test("the stage draws under the rules the engine plays under, with no second ans
   assert.match(stage, /bustKeeps, runTension, rules, logic, clockHeat,\s*\} = useTableForecast\(/);
   assert.doesNotMatch(stage, /tableStaging/);
   assert.doesNotMatch(readFileSync("src/gauntlet/tableStaging.js", "utf8"), /location|URLSearchParams/);
+});
+
+test("a case's opening voice is shown on its first page only, and is on the reading clock (Q8 (1))", async () => {
+  const { getBriefingOpening } = await import("../../src/gauntlet/tableStaging.js");
+  const { caseIntroEchoes } = await import("../../src/caseCopy.js");
+  const { CASE_SEQUENCE, CASE_START_NODES } = await import("../../src/gameCases.js");
+  const { nodes } = await import("../../src/gameData.js");
+  const { readFileSync } = await import("node:fs");
+  // Every case's line is in the "화자: 문장" form, so every case's first page shows it, tail and all.
+  for (const caseId of CASE_SEQUENCE) {
+    const start = CASE_START_NODES[caseId];
+    const line = `${caseIntroEchoes[caseId]} 지난 사건: '앞 사건의 결과'`;
+    assert.equal(getBriefingOpening(nodes[start], start, line), line, `${caseId} opens on its line`);
+  }
+  // Not on a later page, and not a debug or replay entry's note.
+  const later = Object.entries(nodes).find(([id, node]) => node.caseId === "case12" && id !== CASE_START_NODES.case12 && node.kind !== "opening");
+  assert.equal(getBriefingOpening(later[1], later[0], caseIntroEchoes.case12), "");
+  assert.equal(getBriefingOpening(nodes.c12_start, "c12_start", "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다."), "");
+  assert.equal(getBriefingOpening(nodes.c12_start, "c12_start", undefined), "");
+  // Drawn after the title, before the timer and the panels, and counted by the clock.
+  const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
+  assert.ok(briefing.indexOf('data-testid="briefing-opening"') > briefing.indexOf('id="gx-comic-title"'));
+  assert.ok(briefing.indexOf('data-testid="briefing-opening"') < briefing.indexOf('data-testid="reading-timer"'));
+  assert.match(briefing, /\.\.\.weekRules, \{ text: openingLine \}\]/);
 });

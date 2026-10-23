@@ -268,6 +268,9 @@ const fileBudgets = {
   // clock, and the speaker's face is 96px. Two lines over the 674 the sheet
   // held before D-3, 18 bytes under its 13078.
   "briefing.css": { lines: 676, bytes: 13060 },
+  // 674 / 13078 -> 681 / 13293 on 2026-10-22 (story-copy-1, Q8 (1)), measured: the
+  // case's opening voice under the title and the title strip's third row.
+  "briefing.css": { lines: 681, bytes: 13293 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

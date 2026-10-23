@@ -108,7 +108,7 @@ test("an effect on a resource the table has no name for is listed under its key"
 
 test("the folded briefing's line names all six resources and the clues held, in the table's own order", () => {
   const line = describeStanding(initialResources, resourceMeta, 2);
-  assert.equal(line, "남은 시간 72시간 · 현금 100 · 믿음 50 · 공정함 50 · 사람 피해 0 · 지침 10 · 단서 2개");
+  assert.equal(line, "남은 시간 72시간 · 현금 100 · 믿음 50 · 공정함 50 · 사람 피해 0 · 피로 10 · 단서 2개");
   assert.deepEqual(
     line.split(" · ").slice(0, -1).map((part) => part.replace(/ -?\d+\D*$/, "")),
     Object.values(resourceMeta).map((meta) => meta.label),
@@ -140,13 +140,13 @@ test("the case's change reads the first decision's start and the last decision's
   ];
   const rows = describeCaseChange(log, easyResourceLabels);
   assert.deepEqual(rows.map((row) => row.key), Object.keys(easyResourceLabels), "all six, in the order the labels are written");
-  assert.deepEqual(rows.map((row) => row.text), ["남은 시간 72 → 72", "현금 100 → 100", "믿음 50 → 44", "공정함 50 → 50", "사람 피해 0 → 11", "지침 10 → 4"]);
+  assert.deepEqual(rows.map((row) => row.text), ["남은 시간 72 → 72", "현금 100 → 100", "믿음 50 → 44", "공정함 50 → 50", "사람 피해 0 → 11", "피로 10 → 4"]);
 });
 
 test("a change is marked by whether it was good for the run, and a value that did not move by neither", () => {
   const log = [{ resourcesBefore: { ...initialResources }, resourcesAfter: { ...initialResources, trust: 44, capital: 120, humanCost: 11, fatigue: 4 } }];
   const gain = Object.fromEntries(describeCaseChange(log, easyResourceLabels).map((row) => [row.key, row.gain]));
-  assert.deepEqual(gain, { time: null, capital: true, trust: false, legitimacy: null, humanCost: false, fatigue: true }, "사람 피해 rising is a loss, 지침 falling is a gain");
+  assert.deepEqual(gain, { time: null, capital: true, trust: false, legitimacy: null, humanCost: false, fatigue: true }, "사람 피해 rising is a loss, 피로 falling is a gain");
 });
 
 test("an entry that holds no numbers is passed over for the nearest one that does", () => {

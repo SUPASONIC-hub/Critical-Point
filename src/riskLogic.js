@@ -39,7 +39,7 @@ export function getRiskPressure(resources = {}) {
 }
 
 // Named with the labels the rest of the game prints (rule 9): these said
-// 현금 압박 / 인적 비용 / 판단 피로 beside chips that say 현금 / 사람 피해 / 지침.
+// 현금 압박 / 인적 비용 / 판단 피로 beside chips that say 현금 / 사람 피해 / 피로.
 export function getRiskPressureDrivers(resources = {}) {
   const nextResources = { ...riskDefaults, ...resources };
   const drivers = [

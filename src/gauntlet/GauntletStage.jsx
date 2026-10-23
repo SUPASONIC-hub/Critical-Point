@@ -466,6 +466,7 @@ export function GauntletStage({
         impact={settleImpact ?? impact}
         flash={flash}
         stageRef={stageRef}
+        caseId={scene.node.caseId}
       />
 
       <div className="gx-table">
@@ -802,6 +803,7 @@ export function GauntletStage({
           question={scene.question}
           bridge={scene.bridge}
           reaction={scene.reaction}
+          opening={scene.opening}
           run={run}
           tableSeconds={schema.seconds}
           cards={cards}
