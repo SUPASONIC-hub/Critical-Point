@@ -62,7 +62,7 @@ export const AUDIT_LIMIT = 4;
 export const AUDIT_RELIEF = 2;
 export const AUDIT_SHARE = 4;
 /** HEAVY FRACTURE: what FRACTURE bills the cracked axis that week. */
-export const HEAVY_FRACTURE_RATE = 1.75;
+const HEAVY_FRACTURE_RATE = 1.75;
 
 /** The audit's line and the links', each week's that has the device. */
 const AUDIT_LINE = `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`;

@@ -173,7 +173,7 @@ export async function cashStakedCard(page) {
  * result page, the ending -- not a phase read off the button: confirmed and
  * never pressed both read `idle`.
  */
-export async function confirmHeldCash(page, label = "hold 확정") {
+async function confirmHeldCash(page, label = "hold 확정") {
   const cash = page.getByTestId("commit-confirm");
   if ((await cash.count()) === 0 || (await cash.getAttribute("data-hold")) === null) return;
   try {

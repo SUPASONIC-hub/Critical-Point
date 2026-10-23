@@ -65,7 +65,7 @@ export function auditStep({ busted = false, gauge = 0, pushes = 0, cascade = fal
 }
 
 /** Whether a board (a run's `schema`) was dealt CASCADE, whose cash the audit does not count. */
-export const isCascadeBoard = (schema) => Boolean(schema?.mutations?.includes("cascade"));
+const isCascadeBoard = (schema) => Boolean(schema?.mutations?.includes("cascade"));
 
 export const addAudit = (count, step) => Math.max(0, (Number(count) || 0) + step);
 

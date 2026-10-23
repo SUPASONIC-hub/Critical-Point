@@ -605,12 +605,12 @@ export const HAND = [
   { id: "fast", label: "fast", cognition: { risk: 1 }, effect: { capital: 8, time: 5, legitimacy: -12, trust: -3, humanCost: 3 } },
 ];
 /** How often the hand leaves the type it is holding for the next card along. */
-export const HAND_WANDER = 0.2;
+const HAND_WANDER = 0.2;
 /** How often it charges a stance before it pushes. */
-export const HAND_LOCKS = 0.5;
+const HAND_LOCKS = 0.5;
 // Most hands lean on one or two stances; EXPOSE, which clears seals for good
 // once mastered, is the one they reach for least.
-export const STANCES = ["strike", "steady", "strike", "steady", "expose"];
+const STANCES = ["strike", "steady", "strike", "steady", "expose"];
 
 /**
  * SCOUT as a hand plays it (B1): the look, before the first push. `scout` is

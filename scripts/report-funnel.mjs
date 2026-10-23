@@ -36,9 +36,9 @@ const SINCE = process.env.FUNNEL_SINCE || "";
 if (SINCE && !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(SINCE)) throw new Error(`FUNNEL_SINCE=${SINCE} is not a date`);
 
 /** A gap between two rows of a run this long or longer is a break: the player left and came back. */
-export const BREAK_SECONDS = 60 * 60;
+const BREAK_SECONDS = 60 * 60;
 /** A run whose last row is older than this, and that has not finished, has stopped. */
-export const STALE_SECONDS = 7 * 24 * 60 * 60;
+const STALE_SECONDS = 7 * 24 * 60 * 60;
 /** The cases the funnel names. */
 export const MILESTONES = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case08", "case18", "case36", "final"];
 /** Where a run stopped, by the last case it sent: each prologue, then stretches of the season. */
