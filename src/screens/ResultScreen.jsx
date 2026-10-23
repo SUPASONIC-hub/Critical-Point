@@ -75,9 +75,9 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
       label: `가지 않은 길: ${report.costliest.label}`,
     }));
   const witnessRecords = [
-    firstRouteEntry && { id: "first", label: "처음 남긴 말", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
-    longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
-    branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
+    firstRouteEntry && { id: "first", label: "처음 내린 판단", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
+    longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 판단", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
+    branchRouteEntry && { id: "branch", label: "판을 흔든 판단", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
   const endingAfterglow = endingCopy.getEndingAfterglow(observationLedger);
   return (

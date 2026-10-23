@@ -278,7 +278,8 @@
   }
 }
 
-/* The speaker on a halftone ground, the scene's question in a balloon. The ground
+/* The speaker on a halftone ground, a line of theirs in a balloon and the scene's
+   question in a box under it (A-2, 2026-10-23). The ground
    was rays fanning from behind the portrait until 2026-10-15: read as the rising-sun
    flag, so it is now the comic's dot screen, the one the drawn silhouettes use. */
 .gx-panel-speaker {
@@ -329,25 +330,27 @@
   font-weight: 600;
 }
 
+/* Beside the portrait, under the name, so the line and the question under it
+   add one box to the panel's height, not two. */
 .gx-balloon {
   position: relative;
-  grid-column: 1 / -1;
+  grid-column: 2;
   margin: 6px 0 0;
-  padding: 12px 14px;
+  padding: 10px 12px;
   color: var(--c-ink);
   background: var(--c-paper);
   border: 3px solid var(--c-black);
-  border-radius: 22px;
-  font-size: 1rem;
-  font-weight: 800;
+  border-radius: 18px;
+  font-size: 0.9375rem;
+  font-weight: 700;
   line-height: 1.45;
   animation: gx-panel-pop 0.4s 0.3s var(--ui-ease-spring) both;
 }
 
-.gx-balloon::before {
+.gx-balloon:not(.is-lead)::before {
   position: absolute;
   top: -11px;
-  left: 44px;
+  left: 18px;
   width: 18px;
   height: 18px;
   content: "";
@@ -355,6 +358,41 @@
   border-top: 3px solid var(--c-black);
   border-left: 3px solid var(--c-black);
   transform: rotate(45deg) skew(12deg, 12deg);
+}
+
+/* A scene with no speech of its speaker's gives its lead: narration, so a
+   caption's square box with no tail. */
+.gx-balloon.is-lead {
+  border-radius: 0;
+}
+
+/* 당신의 판단: the question is the narrator's to the player, so it has no tail. */
+.gx-judgment {
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 2px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-sm);
+}
+
+.gx-judgment p {
+  margin: 2px 0 0;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+/* The speaker's own speech in the story: their name as a chip, from data-who. */
+.gx-caption[data-who]::before {
+  margin-right: 6px;
+  padding: 1px 7px;
+  content: attr(data-who);
+  color: var(--c-cream);
+  background: var(--c-black);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 /* Narration as a strip of caption boxes, stepping down the panel. */
@@ -629,6 +667,26 @@
 
   .gx-panel-speaker {
     grid-template-columns: 76px 1fr;
+  }
+
+  /* A case's first page that introduces a rule (프롤로그 01~05) keeps the
+     introduction and the question whole on the first screen. The speaker's
+     balloon added 89 to 134px above them and pushed the introduction 14 to
+     113px under 판 열기 at 390x664 and 390x844, so on a phone that page gives
+     the balloon up: its speech is in the story's boxes, with the name chip. A
+     lead the balloon carries is told nowhere else and stays. The portrait
+     is no taller than the name beside it then, and the question's box no
+     thicker than it needs: the box's label row left 프롤로그 02 1px over. */
+  .gx-comic-page:has(.gx-carry) .gx-balloon:not(.is-lead) {
+    display: none;
+  }
+
+  .gx-comic-page:has(.gx-carry) .gx-panel-speaker {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .gx-judgment {
+    padding: 8px 10px;
   }
 
   .gx-comic-actions {

@@ -230,7 +230,13 @@ const fileBudgets = {
   // 55420 -> 55522 bytes on 2026-10-23, 10-23 묶음 A 합친 상태 실측: E-6's
   // share line under the reveal took a plain rule of its own (.gx-reveal-share)
   // in place of the relic notice's warning bar.
-  "play.css": { lines: 2925, bytes: 55522 },
+  // [batch-c] #272 w4b-bubbles on 묶음 A:
+  // 2925 / 55420 -> 2925 / 55551 on 2026-10-23, measured: the reveal's
+  // 「당신의 판단」 tag in place of the voice's quotes (A-10), one rule the
+  // briefing's question box shares.
+  // -> 2925 / 55661 on 2026-10-23, 10-23 묶음 C 합친 상태 실측: 묶음 A의
+  // .gx-reveal-share and #272's 「당신의 판단」 tag together.
+  "play.css": { lines: 2925, bytes: 55661 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -258,7 +264,16 @@ const fileBudgets = {
   // from under a notch on either side.
   // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
   // (31 lines and 2222 bytes of them that day), the room unchanged.
-  "briefing.css": { lines: 674, bytes: 13078 },
+  // 674 / 13078 -> 697 / 13630 on 2026-10-23, measured: the speaker's own
+  // line in the balloon, the question in a box with no tail (「당신의 판단」),
+  // a lead told as a caption and the name chip on the speaker's speech (A-2).
+  // The tail and the lead's box share one rule.
+  // 697 / 13630 -> 709 / 13853 the same day, measured: on a phone, a case's
+  // first page that introduces a rule gives the speaker's balloon up so the
+  // introduction and the question stay on the first screen (390x664, 390x844).
+  // -> 710 / 13866 on 2026-10-23, 10-23 묶음 C 합친 상태 실측: 묶음 A's
+  // NEW GAME+ line raised under the title strip with #272's balloon rules.
+  "briefing.css": { lines: 710, bytes: 13866 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

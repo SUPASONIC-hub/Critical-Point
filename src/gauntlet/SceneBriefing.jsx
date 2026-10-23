@@ -6,6 +6,8 @@ import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
 import { getBriefingIntro, getBriefingWeekRuleId } from "./tableStaging.js";
+import { getSpeakerLine } from "./speakerLine.js";
+import { SPEAKER_NAMES } from "../speakerPortraits.js";
 import { useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
@@ -54,8 +56,11 @@ function RuleRows({ rules, resourceMeta }) {
 /**
  * The scene, told as a page of a graphic novel before the table opens.
  *
- * A splash panel of the room with its caption and sound, the speaker with the
- * scene's question in a balloon, the narration as caption boxes, the case file
+ * A splash panel of the room with its caption and sound, the speaker with a
+ * line of their own in a balloon (speakerLine.js) and under it the scene's
+ * question in a box with no tail, 「당신의 판단」 -- the question is the
+ * narrator's to the player, not the speaker's -- the narration as caption
+ * boxes, the speaker's own speech among them wearing a name chip, the case file
  * pinned beside it, and -- when the last decision broke this board -- the new
  * rules as a red panel. `mutations` is the table's own list (`tableRules`, so
  * no REBOOT), and only the penalties in it are a breach: the red panel, the
@@ -148,6 +153,9 @@ export function SceneBriefing({
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
+  const speech = useMemo(() => getSpeakerLine(node, SPEAKER_NAMES), [node]);
+  // A lead the balloon carries is narration: a caption's box, not speech.
+  const Balloon = speech.fromLead ? "p" : "blockquote";
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
@@ -304,13 +312,22 @@ export function SceneBriefing({
               <b>{node.speaker}</b>
               <span>{speakerRole}</span>
             </figcaption>
-            <blockquote className="gx-balloon"><Prose text={question} /></blockquote>
+            {speech.line && (
+              <Balloon className={`gx-balloon${speech.fromLead ? " is-lead" : ""}`}>
+                <Prose text={speech.line} />
+              </Balloon>
+            )}
+            <div className="gx-judgment" data-testid="briefing-question">
+              <b>당신의 판단</b>
+              <p><Prose text={question} /></p>
+            </div>
           </figure>
 
           <div className="gx-panel gx-panel-story">
             {unfold}
-            {told.lead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
-            <ProseCaptions text={told.text} />
+            {/* A lead the balloon carries is not told twice. */}
+            {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
+            <ProseCaptions text={told.text} who={node.speaker} whoAt={speech.whoAt} />
           </div>
 
           {(told.memo?.length > 0 || trace) && (

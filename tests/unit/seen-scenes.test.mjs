@@ -111,7 +111,8 @@ test("the briefing folds a read scene unless the switch is off, counts what it s
   // The briefing prints and times the scene as told.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
   assert.match(briefing, /const \[told, unfold, newMark\] = useSceneFold\(node, echo\);/);
-  assert.match(briefing, /\{unfold\}\s*\{told\.lead &&[^\n]*\s*<ProseCaptions text=\{told\.text\} \/>/);
+  // With #272 a comment sits between them and the captions take the speaker's chip.
+  assert.match(briefing, /\{unfold\}\s*(?:\{\/\*[^\n]*\*\/\}\s*)?\{told\.lead &&[^\n]*\s*<ProseCaptions text=\{told\.text\}[^\n]*\/>/);
   assert.match(briefing, /<ProseItems items=\{told\.memo\} \/>/);
   // Written when a finale closes, from the season's log.
   assert.match(readFileSync("src/state/useChoiceCommit.js", "utf8"), /finalChoiceId: findFinalChoiceEntry\(nextLog\)\?\.choiceId \?\? null, log: nextLog \}/);

@@ -692,8 +692,9 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
   const printed = await briefing.evaluate((root) => {
     const text = (selector) => [...root.querySelectorAll(selector)].map((element) => element.textContent).join("");
     return {
-      text: text(".gx-panel-story .gx-caption"),
-      question: text(".gx-balloon"),
+      // A lead with no speech after it is told beside the portrait (speakerLine.js).
+      text: text(".gx-panel-story .gx-caption, .gx-balloon.is-lead"),
+      question: text(".gx-judgment p"),
       memo: [text(".gx-panel-file li")],
       intro: text("[data-testid='unlock-intro'] li"),
     };
@@ -726,7 +727,7 @@ const measureIntro = (page) =>
     const dock = box(".gx-comic-actions");
     return {
       intro: box("[data-testid='unlock-intro']"),
-      question: box(".gx-balloon"),
+      question: box(".gx-judgment"),
       speaker: box(".gx-panel-speaker"),
       story: box(".gx-panel-story"),
       picture: box(".gx-panel-splash"),

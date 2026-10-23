@@ -240,9 +240,13 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
+        {/* The voice is the player's decision told in 해라체 narration, not a
+            line anyone said aloud, so it is not in quotes; the tag says whose
+            decision it was (A-10, 2026-10-23). */}
         {(full || decisionReveal.forced) && (
           <p className="decision-reveal-choice">
-            {decisionReveal.forced ? "회의실이 대신 골랐다: " : ""}"{decisionReveal.spokenChoice}"
+            <span>{decisionReveal.forced ? "회의실이 대신 골랐다" : "당신의 판단"}</span>
+            {decisionReveal.spokenChoice}
           </p>
         )}
 

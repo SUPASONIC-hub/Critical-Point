@@ -36,14 +36,18 @@ export function ProseItems({ items }) {
  * page). The sentences are marked as one paragraph, so speech that runs across
  * a sentence break is speech in both boxes. It lives beside the marks rather
  * than in the briefing so the table's chunk carries only the call.
+ *
+ * `who` names the speaker of the boxes in `whoAt` (their indexes): a small
+ * name chip, drawn from `data-who` so it adds nothing to the box's text.
  */
-export function ProseCaptions({ text = "" }) {
+export function ProseCaptions({ text = "", who, whoAt = [] }) {
+  // The same cut as speakerLine.js's captionSentences, which finds a speech's box by it.
   const sentences = text
     .split(/(?<=[.!?])\s+/)
     .map((sentence) => sentence.trim())
     .filter(Boolean);
   return markLines(sentences).map((segments, index) => (
-    <p key={index} className="gx-caption">
+    <p key={index} className="gx-caption" data-who={who && whoAt.includes(index) ? who : undefined}>
       <Marked segments={segments} />
     </p>
   ));

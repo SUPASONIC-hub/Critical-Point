@@ -209,7 +209,16 @@ const budgets = [
   // told (`told`, `unfold`, `newMark`); the fold itself is WeekRulePanel's.
   // -> 105,341 / 35,085 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
   // measured 105,341 / 35,081 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_341, maxGzip: 35_085 },
+  // [batch-c] #272 w4b-bubbles on 묶음 A + #261:
+  // 104,773 / 34,856 -> 105,138 / 34,982 on 2026-10-23 (A-2·A-10, on #220):
+  // the briefing's question in its own box (「당신의 판단」), the speaker's
+  // line in the balloon and the name chip on the speaker's speech, and the
+  // reveal's tag in place of the voice's quotes. Measured 105,138 / 34,978 in
+  // the e2e build, the gzip plus 4. Which speech is the speaker's went to its
+  // own chunk (speakerLine, below): written here it measured 106,104 / 35,438.
+  // -> 105,695 / 35,243 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (묶음 A + #261 + #272):
+  // measured 105,695 / 35,239 in the e2e build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_695, maxGzip: 35_243 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -247,7 +256,18 @@ const budgets = [
   // line (.gx-reveal-share) and the title strip's order for the NEW GAME+ line.
   // -> 35,386 gzip on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on
   // 묶음 A, critical CSS and font subset rebuilt): measured 35,382, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_386 },
+  // [batch-c] #272 w4b-bubbles on 묶음 A + #261:
+  // 35,363 -> 35,473 gzip on 2026-10-23, measured 35,469 (the gzip plus 4):
+  // the briefing's 「당신의 판단」 box, the balloon beside the portrait, a
+  // lead told as a caption, the name chip, and the reveal's tag (A-2, A-10).
+  // The box's name shares the reveal tag's rule, and the lead's box the
+  // balloon's tail rule.
+  // 35,473 -> 35,502 gzip the same day, measured 35,498 (the gzip plus 4): on
+  // a phone, a case's first page that introduces a rule folds the balloon so
+  // the introduction and the question stay on the first screen.
+  // -> 35,521 gzip on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (묶음 A + #261 + #272):
+  // measured 35,517 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_521 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -488,6 +508,11 @@ const budgets = [
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
   // 2026-10-21, the gzip plus 4.
   { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_376, maxGzip: 775 },
+  // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
+  // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
+  // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
+  // 1,203 / 693 measured, the gzip plus 4.
+  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_203, maxGzip: 697 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -596,7 +621,12 @@ function checkBudget(file, budget) {
 // -> 9,068 / 3,294 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: EdgeNotice,
 // ReadingClockAsk and sceneChoices all in the list, measured 9,068 / 3,290
 // plus 4.
-const WORKER_BUDGET = { maxBytes: 9_068, maxGzip: 3_294 };
+// [batch-c] #272 w4b-bubbles on 묶음 A + #261:
+// 8,962 / 3,248 -> 8,996 / 3,261 on 2026-10-23 (A-2, on #220), measured
+// 8,996 / 3,257 plus 4: one more file, the briefing balloon's speakerLine.
+// -> 9,102 / 3,312 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (묶음 A + #261 +
+// #272, speakerLine in the list too): measured 9,102 / 3,308 plus 4.
+const WORKER_BUDGET = { maxBytes: 9_102, maxGzip: 3_312 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

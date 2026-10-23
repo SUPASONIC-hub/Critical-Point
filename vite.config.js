@@ -421,6 +421,15 @@ const CASCADE_RISK = "src/gauntlet/cascadeRisk.js";
  */
 const WINDOW_TRAIL = "src/gauntlet/windowTrail.js";
 
+/**
+ * What the briefing's balloon says (A-2, src/gauntlet/speakerLine.js): whose a
+ * speech is and the first one of the speaker's. Only the briefing imports it,
+ * so left alone it is written into the PlayScreen chunk, which it took 582
+ * gzip bytes past its budget on 2026-10-23. It gets a file the way the week's
+ * panel does, and imports nothing, so no chunk it would share is split out.
+ */
+const SPEAKER_LINE = "src/gauntlet/speakerLine.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -490,6 +499,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(WINDOW_TRAIL),
         name: "windowTrail",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(SPEAKER_LINE),
+        name: "speakerLine",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },
