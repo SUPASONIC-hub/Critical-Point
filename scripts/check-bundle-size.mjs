@@ -71,7 +71,6 @@ const budgets = [
   // Batch B on 2026-10-23 (the day's text and screen branches merged on main
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_441, maxGzip: 61_556 },
   // 169,980 / 61,300 -> 170,257 / 61,530 on 2026-10-21, measured 170,257 /
   // 61,526 in the e2e build, the gzip plus 4: NEW GAME+ on the start screen
   // (the memory panel's season number and last ending, the continue card's
@@ -108,7 +107,9 @@ const budgets = [
   // -> 171,964 / 62,152 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
   // #262 #241 #251 #256 on main 5adcbb5): measured 171,964 / 62,148 in the
   // e2e build, the gzip plus 4; the four additions above, together.
-  { pattern: /^index-.*\.js$/, maxBytes: 171_964, maxGzip: 62_152 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_405 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -191,7 +192,6 @@ const budgets = [
   // Batch B on 2026-10-23 (the day's text and screen branches merged on main
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 106_566, maxGzip: 35_484 },
   // 104,705 / 34,805 -> 104,733 / 34,832 on 2026-10-21, measured 104,733 /
   // 34,828 in the e2e build, the gzip plus 4: the line a NEW GAME+ season
   // opens on (newGamePlusCarry.js), drawn on 프롤로그 01's first page. Its
@@ -226,7 +226,9 @@ const budgets = [
   // -> 105,284 / 35,047 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
   // #241 #256 together on main 5adcbb5): measured 105,284 / 35,043 in the e2e
   // build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_284, maxGzip: 35_047 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_129, maxGzip: 35_731 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -281,11 +283,12 @@ const budgets = [
   // Batch B on 2026-10-23 (the day's text and screen branches merged on main
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_543 },
   // 35,363 -> 35,383 gzip on 2026-10-23, 10-23 묶음 A 합친 상태 실측: measured
   // 191,859 / 35,379, the gzip plus 4 -- the five branches' rules, E-6's share
   // line (.gx-reveal-share) and the title strip's order for the NEW GAME+ line.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_383 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_556 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -319,10 +322,11 @@ const budgets = [
   // -> 4,959 / 2,139 on 2026-10-23 (table-readouts, #246, draft), measured
   // 4,959 / 2,135 plus 4: 사건당 금고 on each row (C-1 (3)), worked out in the
   // screen so the entry chunk's ranking.js does not grow.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_959, maxGzip: 2_139 },
   // 4,800 -> 4,858 raw on 2026-10-21, measured: the NEW GAME+ tag on this
   // device's own rows (the gzip, 2,080, stays under its budget).
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_858, maxGzip: 2_100 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_048, maxGzip: 2_170 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -373,10 +377,11 @@ const budgets = [
   // draft), measured 8,853 / 4,286 plus 4: the card prints 사건당 금고 (C-1 (3))
   // beside the 논리 유지력. The words come from the report (score.vaultLine);
   // the card reads one string and draws it.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_853, maxGzip: 4_290 },
   // 8,745 / 4,261 -> 8,780 / 4,280 for ops-measure (2026-10-23), measured
   // 8,780 / 4,276 plus 4: one more import, sceneChoices (E-6); its code did not change.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_780, maxGzip: 4_280 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_888, maxGzip: 4_307 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -527,7 +532,9 @@ const budgets = [
   // Batch B on 2026-10-23 (the day's text and screen branches merged on main
   // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
   // were each measured on its own branch's base.
-  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_017, maxGzip: 1_060 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_072 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -640,7 +647,9 @@ function checkBudget(file, budget) {
 // -> 9,068 / 3,294 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: EdgeNotice,
 // ReadingClockAsk and sceneChoices all in the list, measured 9,068 / 3,290
 // plus 4.
-const WORKER_BUDGET = { maxBytes: 9_068, maxGzip: 3_294 };
+// 9,099 / 3,309 on 2026-10-23, batch B on batch A, measured 9,099 / 3,305
+// plus 4: CaseCast and batch A's three files all in the list.
+const WORKER_BUDGET = { maxBytes: 9_099, maxGzip: 3_309 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
