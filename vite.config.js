@@ -540,8 +540,11 @@ export default defineConfig(({ command, mode }) => ({
     // The result card's chunk leans only on files the ending screen has
     // already run, so its list is left out: writing it cost the report's chunk
     // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+    // The case file's cast (CaseCast, D-8) is the same: the runtime has run
+    // every file it leans on before the table's fold can open, and its list
+    // of sixteen files was about 500 bytes (2026-10-23).
     modulePreload: {
-      resolveDependencies: (filename, deps) => (/\/ResultCardShare-/.test(filename) ? [] : deps),
+      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
     },
     rollupOptions: {
       output: {

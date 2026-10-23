@@ -51,7 +51,7 @@ test("the frame loop reads the setting every frame and writes what those three r
   const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
   assert.ok(frame.length > 500, "the loop's body was found");
   // Inside the loop, so a setting changed mid-window takes hold on the next frame.
-  assert.match(frame, /const calm = getAccessibility\(\)\.calmEffects;/);
+  assert.match(frame, /const calm = quiet \|\| getAccessibility\(\)\.calmEffects;/);
   assert.match(frame, /const shake = fxShake\(trauma, reducedMotion, calm\);/);
   assert.match(frame, /write\("--gx-beat", fxBeatValue\(beat, calm\)\);/);
   assert.match(frame, /write\("--gx-flash", fxFlashValue\(flashRef\.current, calm\)\);/);
@@ -207,4 +207,27 @@ test("a fade that stands in for a motion keeps its length under reduced motion a
   assert.match(comfort, /:root\[data-calm-effects\] \.gx-equip-toast \{\s*animation-name: gx-relic-fade;\s*\}/);
   assert.match(sheet("relics"), /@keyframes gx-relic-fade/);
   assert.doesNotMatch(sheet("play"), /animation: (clue-stamp|reveal-in)/, "no animation names a keyframe that does not exist");
+});
+
+test("the cases where the season rests play a quiet table, and the table is the same table", async () => {
+  const { QUIET_TABLE_CASES, isQuietTable } = await import("../../src/gauntlet/fxVariables.js");
+  const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
+  // B-13: the night off at 경포, the funeral, the 추석 kitchen -- and no other case.
+  assert.deepEqual([...QUIET_TABLE_CASES], ["case42", "case45", "case47"]);
+  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), ["case42", "case45", "case47"]);
+  assert.equal(isQuietTable(undefined), false);
+
+  // The frame loop plays it as the comfort setting, and keeps the heartbeat and the drone out of the ear.
+  const fx = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
+  assert.match(fx, /const calm = quiet \|\| getAccessibility\(\)\.calmEffects;/);
+  assert.match(fx, /if \(!quiet\) playHeartbeat\(heat, tier\);/);
+  assert.match(fx, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated\);/);
+  assert.match(readFileSync("src/gauntlet/GauntletStage.jsx", "utf8"), /<GauntletFx[^>]*caseId=\{scene\.node\.caseId\}/s);
+
+  // Nothing else reads it: the wall, the pot and the verdict of a quiet table are
+  // the bytes they were, because no rule, no engine step and no state knows it.
+  const { readdirSync } = await import("node:fs");
+  const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((entry) => (entry.isDirectory() ? walk(`${dir}/${entry.name}`) : [`${dir}/${entry.name}`]));
+  const readers = walk("src").filter((file) => /\.(js|jsx)$/.test(file) && /isQuietTable|QUIET_TABLE_CASES/.test(readFileSync(file, "utf8")));
+  assert.deepEqual(readers.sort(), ["src/gauntlet/GauntletFx.jsx", "src/gauntlet/fxVariables.js"]);
 });

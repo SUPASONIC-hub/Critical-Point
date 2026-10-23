@@ -59,6 +59,18 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
+  // 169,980 / 61,300 -> 170,343 / 61,512 on 2026-10-23 (reading-layout on
+  // main c08be0e), measured 170,343 / 61,508 plus 4 in the e2e build: 이야기
+  // 글 크기 (D-5), its row in the comfort panel and the setting with its
+  // attribute and factor, which <html> carries from the first paint. Cut back
+  // first: the seen-glosses key went to seenGlosses.js (the runtime's), 45
+  // bytes. The row as a chunk of its own (fetched as the panel drew) saved the
+  // shell 91 gzip bytes for a 519-byte file and a longer worker list, and was
+  // put back; one component for both rows of radios came out 44 gzip bytes
+  // longer than the two copies.
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
   // 169,980 / 61,300 -> 170,257 / 61,530 on 2026-10-21, measured 170,257 /
   // 61,526 in the e2e build, the gzip plus 4: NEW GAME+ on the start screen
   // (the memory panel's season number and last ending, the continue card's
@@ -114,7 +126,10 @@ const budgets = [
   // ending through getEndingPreview, which the result side already imported.
   // -> 172,181 / 62,223 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
   // measured 172,181 / 62,219 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_181, maxGzip: 62_223 },
+  // [batch-c] 묶음 B (#277):
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_753, maxGzip: 62_405 }, // TODO-MEASURE
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -169,6 +184,34 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
+  // 104,705 / 34,811 -> 104,943 / 34,891 on 2026-10-23 (reading-layout on
+  // main c08be0e), measured 104,943 / 34,887 plus 4: the briefing's line
+  // from the scene before (D-7), the room's picture behind the phone's title
+  // (D-13) and the case file's cast on the spine (D-8). Cut back first from
+  // 105,749 / 35,229: the lazy import of the cast, with its preload list of
+  // sixteen files, and the warming of the case's portraits (D-14) moved to the
+  // runtime (CaseCastFold.jsx, useRunReadout.js), and the cast's import takes
+  // no preload list (vite.config.js).
+  // 104,745 / 34,822 -> 105,832 / 35,227 on 2026-10-23 (table-readouts, #246,
+  // draft), measured 105,832 / 35,223 in the e2e build on main d486f4e with
+  // the branch, the gzip plus 4: 안전선까지 (C-5: its button, its S key and the
+  // press that sends the same PUSH events), the audit's band on the gauge
+  // (C-9, drawn as the wall band's box in green because no sheet had room for
+  // a rule), LOCK's 상한 도달 (C-6) and the briefing's line for the speaker's
+  // reaction (C-13). Everything that could leave did: the safe line's count,
+  // the reveal's afterword, the case's read and the reaction lines are the
+  // runtime's (tableAfterword.js, caseCopy). The branch's earlier raise was
+  // dropped first; this is only what main's budget lacks.
+  // 104,745 / 34,822 -> 105,205 / 35,038 on 2026-10-23 (story-copy-1, #243,
+  // draft), measured 105,205 / 35,034 in the e2e build on main d486f4e with
+  // the branch, the gzip plus 4: the LOST SCENE line naming the skipped
+  // scene's place with its particles, the quiet table of 사건 42, 45 and 47 in
+  // GauntletFx, the reveal's notices in 합니다체 and the case's opening voice
+  // back on its first briefing (Q8 (1)). The branch's earlier raises were
+  // dropped first; this is only what main's budget lacks.
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
   // 104,705 / 34,805 -> 104,733 / 34,832 on 2026-10-21, measured 104,733 /
   // 34,828 in the e2e build, the gzip plus 4: the line a NEW GAME+ season
   // opens on (newGamePlusCarry.js), drawn on 프롤로그 01's first page. Its
@@ -218,7 +261,10 @@ const budgets = [
   // own chunk (speakerLine, below): written here it measured 106,104 / 35,438.
   // -> 105,695 / 35,243 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (묶음 A + #261 + #272):
   // measured 105,695 / 35,239 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_695, maxGzip: 35_243 },
+  // [batch-c] 묶음 B (#277):
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_129, maxGzip: 35_731 }, // TODO-MEASURE
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -238,6 +284,17 @@ const budgets = [
   // measured 14,557 in CI's e2e build and failed Verify, so #216 did not
   // deploy; #216 had been measured before #238 merged. #218 (lucide 1.60,
   // TriangleAlert for AlertTriangle) measures 14,558 on top. The gzip plus 4.
+  // 14,543 -> 14,572 gzip on 2026-10-23 (table-readouts, #246, draft):
+  // measured 45,637 / 14,568 in the e2e build on main d486f4e with the branch,
+  // the gzip plus 4; the report hands the card 사건당 금고 (score.vaultLine,
+  // C-1 (3)). The raw ceiling stays.
+  // 14,543 -> 14,565 gzip on 2026-10-23 (story-copy-1, #243, draft): measured
+  // 45,609 / 14,561 in the e2e build on main d486f4e with the branch, the gzip
+  // plus 4; the copy the report shares with the cases (A-14 피로, A-15 names
+  // and titles, A-16 합니다체). The raw ceiling stays.
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
   // 14,562 -> 14,578 gzip on 2026-10-23 (ops-measure, on main 2c7b535),
   // measured 14,574 plus 4. No code of the report changed: its hoisted
   // `import "./<chunk>-<hash>.js"` list gained one name, sceneChoices (E-6).
@@ -251,6 +308,17 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
+  // 35,363 -> 35,473 gzip on 2026-10-22 (reading-layout, draft), measured:
+  // D-3 cut the briefing's zigzag and docked footer (raw down), and D-5, D-7,
+  // D-8, D-13 and B-7 added the story's sizes, the bridge, the cast, the
+  // phone's backdrop and the folded gloss.
+  // 35,363 -> 35,408 gzip on 2026-10-23 (story-copy-1, #243, draft), measured
+  // 191,964 / 35,404 in the e2e build on main d486f4e with the branch, the
+  // gzip plus 4: the case's opening voice under the briefing's title and the
+  // title strip's third row (Q8 (1)).
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
   // 35,363 -> 35,383 gzip on 2026-10-23, 10-23 묶음 A 합친 상태 실측: measured
   // 191,859 / 35,379, the gzip plus 4 -- the five branches' rules, E-6's share
   // line (.gx-reveal-share) and the title strip's order for the NEW GAME+ line.
@@ -267,7 +335,10 @@ const budgets = [
   // the introduction and the question stay on the first screen.
   // -> 35,521 gzip on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (묶음 A + #261 + #272):
   // measured 35,517 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_521 },
+  // [batch-c] 묶음 B (#277):
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_556 }, // TODO-MEASURE
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -298,9 +369,14 @@ const budgets = [
   // the rows arrive, and `lang` on the English labels.
   // -> 4,800 / 2,100 on 2026-10-07, measured 4,567 / 2,001 plus 5%: a list
   // with spoken ranks, and a retry when the rows did not come.
+  // -> 4,959 / 2,139 on 2026-10-23 (table-readouts, #246, draft), measured
+  // 4,959 / 2,135 plus 4: 사건당 금고 on each row (C-1 (3)), worked out in the
+  // screen so the entry chunk's ranking.js does not grow.
   // 4,800 -> 4,858 raw on 2026-10-21, measured: the NEW GAME+ tag on this
   // device's own rows (the gzip, 2,080, stays under its budget).
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_858, maxGzip: 2_100 },
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_048, maxGzip: 2_170 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -347,6 +423,10 @@ const budgets = [
   // imports, auditRisk's and cascadeRisk's, measured 8,711 / 4,242 plus 4.
   // 8,711 / 4,246 -> 8,745 / 4,261 on 2026-10-21 (F1 phase 2, #216, draft),
   // measured 8,745 / 4,257 plus 4: one more import, the replay trail's chunk.
+  // 8,745 / 4,261 -> 8,853 / 4,290 on 2026-10-23 (table-readouts, #246,
+  // draft), measured 8,853 / 4,286 plus 4: the card prints 사건당 금고 (C-1 (3))
+  // beside the 논리 유지력. The words come from the report (score.vaultLine);
+  // the card reads one string and draws it.
   // 8,745 / 4,261 -> 8,780 / 4,280 for ops-measure (2026-10-23), measured
   // 8,780 / 4,276 plus 4: one more import, sceneChoices (E-6); its code did not change.
   // [batch-c] second-season (#261) on 묶음 A:
@@ -355,7 +435,10 @@ const budgets = [
   // line's tail are strings the result side hands in (secondSeason.getSeasonCard).
   // -> 8,836 / 4,310 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
   // measured 8,836 / 4,306 in the e2e build, the gzip plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_836, maxGzip: 4_310 },
+  // [batch-c] 묶음 B (#277):
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_888, maxGzip: 4_307 }, // TODO-MEASURE
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -513,6 +596,20 @@ const budgets = [
   // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
   // 1,203 / 693 measured, the gzip plus 4.
   { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_203, maxGzip: 697 },
+  // [batch-c] 묶음 B (#277):
+  // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
+  // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
+  // time the table's case file opens (src/gauntlet/CaseCastFold.jsx, the
+  // runtime's), because the PlayScreen chunk had no room for it. Measured with
+  // the e2e build, the gzip plus the 4 bytes of hash noise: 2,120 / 1,111 on
+  // 2026-10-22, 1,983 / 1,042 on 2026-10-23 once the table handed it its
+  // SpeakerPortrait instead of the chunk importing it.
+  // Batch B on 2026-10-23 (the day's text and screen branches merged on main
+  // 5adcbb5b), measured in the e2e build, the gzip plus 4: the entries above
+  // were each measured on its own branch's base.
+  // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
+  // gzip plus 4: the entries above were each measured on its own base.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_052, maxGzip: 1_072 }, // TODO-MEASURE
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -609,6 +706,10 @@ function checkBudget(file, budget) {
 // files in the list, measured 8,928 / 3,227 plus 4.
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
+// 8,993 / 3,261 on 2026-10-23 in batch B, measured 8,993 / 3,257 plus 4:
+// the replay trail's chunk and CaseCast both in the list.
+// 8,928 / 3,231 -> 8,959 / 3,240 on 2026-10-22 (reading-layout, draft),
+// measured 8,959 / 3,236 plus 4: one more file in the list, CaseCast.
 // 8,928 / 3,231 -> 8,961 / 3,244 on 2026-10-21 (A5, draft), measured 8,961 /
 // 3,240 plus 4 (main 8,928 / 3,222): one more file, EdgeNotice.
 // 8,928 / 3,231 -> 8,966 / 3,246 on 2026-10-22 (story-first10, #241, draft):
@@ -626,7 +727,10 @@ function checkBudget(file, budget) {
 // 8,996 / 3,257 plus 4: one more file, the briefing balloon's speakerLine.
 // -> 9,102 / 3,312 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (묶음 A + #261 +
 // #272, speakerLine in the list too): measured 9,102 / 3,308 plus 4.
-const WORKER_BUDGET = { maxBytes: 9_102, maxGzip: 3_312 };
+// [batch-c] 묶음 B (#277):
+// 9,099 / 3,309 on 2026-10-23, batch B on batch A, measured 9,099 / 3,305
+// plus 4: CaseCast and batch A's three files all in the list.
+const WORKER_BUDGET = { maxBytes: 9_099, maxGzip: 3_309 }; // TODO-MEASURE
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

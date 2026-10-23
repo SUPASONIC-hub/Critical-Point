@@ -102,6 +102,7 @@ export const GLOSSARY = [
   "감정평가",
   "휴면 계좌",
   "보전 신청",
+  "증거 보전 신청",
   "고용 승계",
   "회수율",
   "산업재해",
@@ -155,6 +156,7 @@ export const GLOSSARY = [
   "내용증명",
   "문서제출명령",
   "실사",
+  "인수 실사",
   "마니또",
   "시행사",
   "공정표",
@@ -316,6 +318,9 @@ export const STANDARD_GLOSS = {
   "녹취": "상담 내용을 녹음해 남긴 것",
   "풀필먼트센터": "주문받은 물건을 보관하고 포장해 내보내는 물류 창고",
   "실사": "현장에 직접 가서 확인하는 일",
+  // Case 18's 실사 is reading a company's books before buying it, so it became
+  // a term of its own on 2026-10-22 (decision 17'): 실사 is the site visit.
+  "인수 실사": "사기 전에 장부와 서류를 샅샅이 확인하는 일",
   "이관": "기록을 다른 곳에 넘겨 맡기는 것",
   "조직 적합도": "사람이 회사에 얼마나 잘 맞을지 매긴 점수",
   "정보 주체": "기록의 주인인 사람",
@@ -349,6 +354,8 @@ export const STANDARD_GLOSS = {
   "집행유예": "유죄지만 형을 당장 살게 하지 않고 미뤄 두는 것",
   "선순위": "가장 먼저 돌려받는 순서",
   "보전 신청": "재산을 못 옮기게 묶어 두는 절차",
+  // Case 19 preserves evidence, not property: a term of its own (2026-10-22).
+  "증거 보전 신청": "증거가 없어지지 않게 법원이 미리 확보해 두는 절차",
   "불출석 사유서": "나오지 못하는 이유를 적어 내는 서류",
   "속기록": "오간 말을 그대로 적은 공식 기록",
   "담보 순위": "누가 먼저 돈을 받느냐의 순서",
@@ -358,13 +365,15 @@ export const STANDARD_GLOSS = {
   "청약 철회": "가입을 없던 일로 되돌릴 수 있는 기간",
   "리스": "장비를 빌려 쓰고 매달 사용료를 내는 금융",
   "피킹": "창고에서 주문받은 물건을 찾아 꺼내는 일",
-  "시행사": "재개발 사업을 맡아 진행하는 회사",
+  // 재개발 only fit case 19; case 26's 시행사 builds a PF officetel.
+  "시행사": "건물을 지어 파는 사업을 맡은 회사",
   "설명 가능성": "판단 이유를 사람이 알아들을 수 있게 보여 주는 능력",
   "출자금": "조합원이 조합에 넣은 돈",
   "인사평가 보조지표": "사람을 평가할 때 곁들여 보는 숫자",
-  "약관": "보험 계약의 세부 조건을 적은 문서",
+  "약관": "계약의 세부 조건을 적은 문서",
   "손해사정사": "보험 사고의 손해를 조사해 금액을 정하는 사람",
-  "비밀유지 서약서": "식탁에서 들은 말을 밖에 옮기지 않겠다는 약속",
+  // The 식탁 wording fit case 36 only; case 30's pledge is signed at work.
+  "비밀유지 서약서": "알게 된 것을 밖에 옮기지 않겠다는 약속",
   "충당금": "떼일 것에 대비해 쌓아 두는 돈",
   "만기 연장": "갚을 날짜를 미뤄 주는 것",
   "압수수색": "법원의 허락을 받아 자료와 물건을 강제로 가져가는 수사",
@@ -380,9 +389,14 @@ const normalizeGloss = (gloss) => gloss.trim().replace(/\s+/g, " ");
  * right after it: 자문료(조언값이라며 내보낸 돈), with one space allowed before
  * the parenthesis. A parenthesis behind a longer word -- 발령서(…), 참고인석(…)
  * -- explains that word, not the term, and is not read; neither is a term met
- * inside another word (우선순위 is not 선순위).
+ * inside another word (우선순위 is not 선순위), nor one that ends a longer
+ * glossary term (인수 실사 is not 실사).
  */
 export function findGlosses(text, term) {
   const pattern = new RegExp(`(^|[^가-힣])${term} ?[(]([^()]*)[)]`, "g");
-  return [...String(text).matchAll(pattern)].map((match) => ({ gloss: normalizeGloss(match[2]), index: match.index + match[1].length }));
+  // 인수 실사(…) explains 인수 실사, a glossary term of its own, not 실사.
+  const heads = GLOSSARY.filter((other) => other !== term && other.endsWith(` ${term}`)).map((other) => other.slice(0, -term.length));
+  return [...String(text).matchAll(pattern)]
+    .map((match) => ({ gloss: normalizeGloss(match[2]), index: match.index + match[1].length }))
+    .filter(({ index }) => !heads.some((head) => String(text).slice(0, index).endsWith(head)));
 }

@@ -44,7 +44,7 @@ const phraseReplacements = [
   [/\bTRUST\b/gi, "믿음"],
   [/\bLEGITIMACY\b/gi, "공정함"],
   [/\bHUMAN COST\b/gi, "사람 피해"],
-  [/\bFATIGUE\b/gi, "지침"],
+  [/\bFATIGUE\b/gi, "피로"],
 ];
 
 export function simplifyPlayerText(value = "") {
@@ -111,7 +111,7 @@ export const easyResourceLabels = {
   trust: "믿음",
   legitimacy: "공정함",
   humanCost: "사람 피해",
-  fatigue: "지침",
+  fatigue: "피로",
 };
 
 export const easyCognitionLabels = {

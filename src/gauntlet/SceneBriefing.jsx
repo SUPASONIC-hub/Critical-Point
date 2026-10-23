@@ -5,7 +5,7 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
-import { getBriefingIntro, getBriefingWeekRuleId } from "./tableStaging.js";
+import { getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
 import { getSpeakerLine } from "./speakerLine.js";
 import { SPEAKER_NAMES } from "../speakerPortraits.js";
 import { useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
@@ -108,8 +108,12 @@ function RuleRows({ rules, resourceMeta }) {
  * Then the case facts. Every scene has carried a `memo` since the graph was
  * written and none of them ever reached the DOM, so the briefing explained the
  * table and never the situation the cards are answering.
+ *
+ * Then the case so far and who is in it (D-8): `caseCast`, from the runtime
+ * (CaseCastFold.jsx), which fetches CaseCast, a chunk of its own, the first
+ * time the fold opens.
  */
-export function CaseFileStory({ node, nodeId, open, standing }) {
+export function CaseFileStory({ node, nodeId, open, standing, caseCast }) {
   return (
     <>
       <p data-testid="brief-standing">{describeStanding(...standing)}</p>
@@ -127,6 +131,7 @@ export function CaseFileStory({ node, nodeId, open, standing }) {
           <ProseItems items={node.memo} />
         </ul>
       )}
+      {open && caseCast?.(node, SpeakerPortrait)}
     </>
   );
 }
@@ -137,6 +142,9 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
+  bridge = null,
+  reaction = null,
+  opening,
   echo,
   run,
   tableSeconds,
@@ -156,6 +164,12 @@ export function SceneBriefing({
   const speech = useMemo(() => getSpeakerLine(node, SPEAKER_NAMES), [node]);
   // A lead the balloon carries is narration: a caption's box, not speech.
   const Balloon = speech.fromLead ? "p" : "blockquote";
+  // The case's opening voice, on its first page only, read after the title and
+  // on the reading clock (Q8 (1)). In the place reading-layout gives its
+  // 「지난 장면에서 —」 line, which this stands in for on that page.
+  // Not on a NEW GAME+ season's first page, whose run line is the season's
+  // carried one (`echo.echo`, drawn by WeekRulePanel.jsx) and not a case voice.
+  const openingLine = echo?.echo ? "" : getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
@@ -169,10 +183,11 @@ export function SceneBriefing({
   const [told, unfold, newMark] = useSceneFold(node, echo);
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
-  // same way. `mutations` is exactly the two lists printed below.
+  // same way. `mutations` is exactly the two lists printed below. The line
+  // from the scene before (`bridge`, D-7) is read on it too.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
-    [told, question, mutations, intro, weekRules],
+    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }, { text: openingLine }]),
+    [told, question, mutations, intro, weekRules, bridge, openingLine],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits,
@@ -260,12 +275,15 @@ export function SceneBriefing({
         tabIndex={-1}
         onKeyDown={trapTab}
       >
-        <header className="gx-comic-top">
+        <header className={`gx-comic-top${openingLine ? " has-opening" : ""}`}>
+          {/* A phone's picture of the room, behind the title (D-13); briefing.css shows it there only. */}
+          <ScenePlate node={node} nodeId={nodeId} variant="backdrop" />
           <p className="gx-comic-kicker" lang="en">
             {node.phase}
             {newMark}
           </p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
+          {openingLine && <p className="gx-comic-opening" data-testid="briefing-opening">{openingLine}</p>}
           <button
             type="button"
             ref={timerRef}
@@ -325,6 +343,10 @@ export function SceneBriefing({
 
           <div className="gx-panel gx-panel-story">
             {unfold}
+            {/* Where the last scene left off (D-7): its echo, or the ending of the case before. */}
+            {bridge && <p className="gx-bridge" data-testid="scene-bridge">{bridge}</p>}
+            {/* The speaker on the last table, before the scene (C-13): a line of the runtime's, picked by its heat. */}
+            {reaction && <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">{node.speaker}: “{reaction}”</p>}
             {/* A lead the balloon carries is not told twice. */}
             {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
             <ProseCaptions text={told.text} who={node.speaker} whoAt={speech.whoAt} />

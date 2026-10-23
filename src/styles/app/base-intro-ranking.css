@@ -206,7 +206,7 @@ summary:focus-visible {
   box-shadow: 0 6px 24px rgb(217 255 98 / 0.26);
 }
 .music-toggle span {
-  max-width: 3.625rem;
+  max-width: 6rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -549,14 +549,16 @@ summary:focus-visible {
 }
 /* The board is the one place players talk to each other, so it is the one
    header pill that glints: an accent rim, a slow glow and a light sweep. All
-   decoration -- it stops under prefers-reduced-motion like the CTA shine. */
+   decoration -- it stops under prefers-reduced-motion like the CTA shine.
+   Twice, then still (2026-10-22, D-15): a glint that never stopped pulled the
+   eye off the start button for as long as the intro was up. */
 .intro .top-actions .intro-board-button {
   position: relative;
   overflow: hidden;
   color: var(--ui-accent);
   border-color: var(--ui-line-accent);
   box-shadow: 0 0 14px rgb(217 255 98 / 0.22);
-  animation: board-glow 2.4s ease-in-out infinite;
+  animation: board-glow 2.4s ease-in-out 2;
 }
 .intro .top-actions .intro-board-button::after {
   content: "";
@@ -565,13 +567,13 @@ summary:focus-visible {
   width: 45%;
   background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.6), rgb(255 255 255 / 0));
   transform: skewX(-18deg);
-  animation: board-shine 2.8s var(--ui-ease) infinite;
+  animation: board-shine 2.8s var(--ui-ease) 2;
   pointer-events: none;
 }
 .intro .top-actions .intro-board-button:hover {
   border-color: var(--ui-accent);
 }
-/* The one infinite animation left on a paint property. The pill clips its own
+/* The one animation left on a paint property. The pill clips its own
    sweep with overflow: hidden, and that clip would also cut off a glow drawn by
    a pseudo-element, so the glow stays the pill's own box-shadow. It is a 34px
    pill, and it stops under reduced motion. */
@@ -3156,6 +3158,15 @@ body {
 .pr-term {
   text-decoration: underline dotted 1.5px;
   text-underline-offset: 0.22em;
+}
+
+/* A word this save has seen explained, its bracket folded (B-7): the word
+   itself, pressed to unfold it. */
+.pr-fold {
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
 }
 
 .pr-note {

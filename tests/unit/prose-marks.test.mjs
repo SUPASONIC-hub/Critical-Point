@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { test } from "node:test";
 
-import { markLines, markProse } from "../../src/components/proseMarks.js";
+import { captionGroups, markLines, markProse } from "../../src/components/proseMarks.js";
 
 const show = (segments) => segments.map((s) => (s.marks.length ? `[${s.marks.join("+")}:${s.text}]` : s.text)).join("");
 
@@ -56,4 +56,21 @@ test("every scene's prose survives marking character for character", async () =>
     };
     walk(module);
   }
+});
+
+test("the briefing's caption boxes hold two or three sentences and break before speech (D-3)", () => {
+  assert.deepEqual(captionGroups("하나. 둘. 셋. 넷."), ["하나. 둘. 셋.", "넷."]);
+  assert.deepEqual(captionGroups("한서윤이 말합니다. '훈련용 사례예요. 72시간이고요.' 직원이 답합니다."), [
+    "한서윤이 말합니다.",
+    "'훈련용 사례예요. 72시간이고요.' 직원이 답합니다.",
+  ]);
+  // A sentence inside speech that runs on is not a new line of speech.
+  assert.deepEqual(captionGroups("'첫 말. 둘째 말.' 끝."), ["'첫 말. 둘째 말.' 끝."]);
+  // Two long sentences are a box each once they pass 120 characters together.
+  const long = `${"가".repeat(70)}.`;
+  assert.deepEqual(captionGroups(`${long} ${long}`), [long, long]);
+  assert.deepEqual(captionGroups(""), []);
+  // Every word, in order: the boxes joined are the paragraph.
+  const text = "부채비율(회사 빚이 자기 돈의 몇 배인지 보는 숫자)이 올랐습니다. 그는 묻습니다. '왜요?' 아무도 답하지 않습니다. 시계가 갑니다.";
+  assert.equal(captionGroups(text).join(" "), text);
 });

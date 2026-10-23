@@ -1,3 +1,5 @@
+import { ensureCase, nodeOrders, nodes } from "./gameData.js";
+
 /**
  * Who has a painted portrait, by the name a scene gives as its speaker
  * (`node.speaker`). Moved out of GameRuntime on 2026-10-16: the table grows
@@ -18,8 +20,8 @@ const SPEAKER_PORTRAITS = {
   // its file under public/ (scripts/build-portrait.mjs);
   // docs/portrait-credits.md says where each picture came from. These are not
   // warmed by the service worker -- only the five above are -- so each is
-  // fetched when its speaker first appears; a file that does not arrive is
-  // drawn as the silhouette (SpeakerPortrait).
+  // fetched when its case opens (warmCasePortraits, below); a file that does
+  // not arrive is drawn as the silhouette (SpeakerPortrait).
   "이민서": "/portrait-lee-minseo.webp",
   "강태민": "/portrait-kang-taemin.webp",
   "권도현": "/portrait-kwon-dohyeon.webp",
@@ -46,14 +48,14 @@ const SPEAKER_PORTRAITS = {
   "채윤슬": "/portrait-chae-yunseul.webp",
   "표세린": "/portrait-pyo-serin.webp",
   "지강현": "/portrait-ji-ganghyeon.webp",
-  "민도현": "/portrait-min-dohyeon.webp",
+  "안기범": "/portrait-an-gibeom.webp",
   "민하랑": "/portrait-min-harang.webp",
   "정해린": "/portrait-jeong-haerin.webp",
   "이정숙": "/portrait-lee-jeongsuk.webp",
   "유하온": "/portrait-yoo-haon.webp",
   "정태오": "/portrait-jeong-taeo.webp",
   "연하진": "/portrait-yeon-hajin.webp",
-  "마서윤": "/portrait-ma-seoyun.webp",
+  "홍예담": "/portrait-hong-yedam.webp",
   "여다인": "/portrait-yeo-dain.webp",
   "임재윤": "/portrait-lim-jaeyun.webp",
   "신영란": "/portrait-shin-yeongran.webp",
@@ -64,10 +66,10 @@ const SPEAKER_PORTRAITS = {
   "오상철": "/portrait-oh-sangcheol.webp",
   "구태형": "/portrait-koo-taehyeong.webp",
   "허윤경": "/portrait-heo-yungyeong.webp",
-  "서하윤": "/portrait-seo-hayun.webp",
+  "황혜원": "/portrait-hwang-hyewon.webp",
   "석문호": "/portrait-seok-munho.webp",
   "선재윤": "/portrait-seon-jaeyun.webp",
-  "주하온": "/portrait-joo-haon.webp",
+  "엄동균": "/portrait-eom-donggyun.webp",
   "은채원": "/portrait-eun-chaewon.webp",
   "연시우": "/portrait-yeon-siu.webp",
   "변유진": "/portrait-byeon-yujin.webp",
@@ -82,22 +84,22 @@ const SPEAKER_PORTRAITS = {
   "남지형": "/portrait-nam-jihyeong.webp",
   // B3 (2026-10-21): the speakers first listed for generated pictures, most
   // scenes first. Villains keep a generated face of someone who does not
-  // exist; 배승호, 연태준, 은시온, 여민규 and 배성준 turned out not to be
+  // exist; 배승호, 공병만, 은시온, 여민규 and 배성준 turned out not to be
   // villains and are photos.
   "서도경": "/portrait-seo-dogyeong.webp",
   "조현석": "/portrait-jo-hyeonseok.webp",
   "도하람": "/portrait-do-haram.webp",
-  "연태준": "/portrait-yeon-taejun.webp",
+  "공병만": "/portrait-gong-byeongman.webp",
   "배승호": "/portrait-bae-seungho.webp",
-  "이서준": "/portrait-lee-seojun.webp",
+  "이찬빈": "/portrait-lee-chanbin.webp",
   "반서아": "/portrait-ban-seoa.webp",
   "은시온": "/portrait-eun-sion.webp",
   "여민규": "/portrait-yeo-mingyu.webp",
-  "신이안": "/portrait-shin-ian.webp",
+  "봉영훈": "/portrait-bong-yeonghun.webp",
   "석재우": "/portrait-seok-jaeu.webp",
   "연서준": "/portrait-yeon-seojun.webp",
   "진세라": "/portrait-jin-sera.webp",
-  "염태호": "/portrait-yeom-taeho.webp",
+  "편종구": "/portrait-pyeon-jonggu.webp",
   "도건우": "/portrait-do-geonu.webp",
   "배성준": "/portrait-bae-seongjun.webp",
   // B4 (2026-10-21): speakers of one scene whose first photo was weak.
@@ -117,4 +119,41 @@ export const SPEAKER_NAMES = Object.keys(SPEAKER_PORTRAITS);
 /** The portrait's path for a speaker, or null for one not painted yet. */
 export function getSpeakerPortrait(speaker) {
   return SPEAKER_PORTRAITS[speaker] ?? null;
+}
+
+/**
+ * Fetches the portraits of everyone who speaks in a case, as the case opens
+ * (improvement notes D-14, 2026-10-22). The service worker warms only the
+ * five portraits that shipped first; every later one came when its speaker
+ * first spoke, so on a slow line the page drew the silhouette while it was on
+ * its way, and offline it drew it for good -- a speaker with a face shown
+ * without one. A case has five to ten speakers. The service worker keeps each
+ * file it sees (the root-image rule in worker.js), so a case opened online
+ * has its faces offline from then on.
+ *
+ * Each path is asked for once a page, and once more when a service worker
+ * first takes the page: asked before it did, the file went past it and was
+ * never kept. `fetch`, not an image: a second image of the same address is
+ * answered from the document's own memory and never reaches the worker. A
+ * case not yet arrived is warmed when it lands.
+ */
+const warmed = new Set();
+
+function fetchPortraits(paths) {
+  for (const src of paths) globalThis.fetch(src, { priority: "low" }).catch(() => {});
+}
+
+export function warmCasePortraits(caseId) {
+  if (!caseId || typeof globalThis.fetch !== "function") return;
+  const order = nodeOrders[caseId] ?? [];
+  if (order.length === 0) {
+    ensureCase(caseId).then(() => (nodeOrders[caseId]?.length ? warmCasePortraits(caseId) : null), () => {});
+    return;
+  }
+  const paths = [...new Set(order.map((nodeId) => getSpeakerPortrait(nodes[nodeId]?.speaker)))].filter((src) => src && !warmed.has(src));
+  if (paths.length === 0) return;
+  paths.forEach((src) => warmed.add(src));
+  fetchPortraits(paths);
+  const worker = globalThis.navigator?.serviceWorker;
+  if (worker && !worker.controller) worker.addEventListener("controllerchange", () => fetchPortraits(paths), { once: true });
 }

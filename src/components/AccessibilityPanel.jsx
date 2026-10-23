@@ -1,4 +1,7 @@
-import { setAccessibility, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
+import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
+
+// 이야기 글 크기 (D-5), by what a player sees rather than by the factor.
+const STORY_SCALE_LABELS = ["기본", "크게", "더 크게"];
 
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
@@ -77,6 +80,25 @@ export function AccessibilityPanel() {
           </span>
         </label>
       ))}
+      {/* Last, so the keyboard reaches the switches straight after the table's clock. */}
+      <fieldset className="accessibility-time" data-testid="story-scale">
+        <legend>이야기 글 크기</legend>
+        <p>장면 설명, 판정 뒤 이야기, 사건 결말과 막간의 글자를 키웁니다. 테이블은 그대로입니다.</p>
+        <div>
+          {STORY_SCALES.map((scale, index) => (
+            <label key={scale}>
+              <input
+                type="radio"
+                name="accessibility-story-scale"
+                value={scale}
+                checked={settings.storyScale === scale}
+                onChange={() => setAccessibility({ storyScale: scale })}
+              />
+              <span>{STORY_SCALE_LABELS[index]}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
     </section>
   );
 }

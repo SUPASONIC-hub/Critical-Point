@@ -57,6 +57,22 @@
   align-items: end;
 }
 
+.gx-comic-top.has-opening {
+  grid-template-areas:
+    "kicker timer"
+    "title timer"
+    "opening opening";
+}
+
+/* The case's opening voice, one small line under the title (Q8 (1)). */
+.gx-comic-opening {
+  grid-area: opening;
+  margin: 6px 0 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
 .gx-comic-kicker {
   grid-area: kicker;
   margin: 0;
@@ -129,6 +145,11 @@
   background: var(--ui-surface-2);
 }
 
+/* The room behind the title is a phone's (D-13); a wider page draws it in its panel. */
+.gx-comic-top > .gx-plate-backdrop {
+  display: none;
+}
+
 /* Panels ---------------------------------------------------------------------- */
 .gx-comic-grid {
   display: grid;
@@ -185,7 +206,7 @@
   border: 2px solid var(--c-black);
   box-shadow: 3px 3px 0 var(--c-black);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.7;
 }
 
@@ -395,7 +416,9 @@
   font-weight: 800;
 }
 
-/* Narration as a strip of caption boxes, stepping down the panel. */
+/* Narration as a strip of caption boxes, two or three sentences to a box
+   (captionGroups). They stepped down the panel in a zigzag, each tilted, until
+   2026-10-22 (D-3): straight, they read as one column of text. */
 .gx-panel-story {
   grid-area: story;
   display: grid;
@@ -406,19 +429,25 @@
   animation-delay: 0.16s;
 }
 
-.gx-panel-story .gx-caption:nth-child(even) {
-  margin-left: 18px;
-  transform: rotate(0.5deg);
-}
-
-.gx-panel-story .gx-caption:nth-child(odd) {
-  margin-right: 18px;
-  transform: rotate(-0.4deg);
-}
-
+/* The lead is told by its colour, not by slanting Hangul, which has no
+   italic of its own and reads as a smeared upright. */
 .gx-caption-lead {
   background: var(--c-amber);
-  font-style: italic;
+}
+
+/* The speaker on the last table (C-13): a box of its own, not the lead's
+   amber, so the scene's lead stays the one yellow box. */
+.gx-caption-reaction {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+/* The line from the scene before (D-7), quieter than the boxes it leads. */
+.gx-bridge {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 /* The case file: facts pinned to a board. */
@@ -650,23 +679,40 @@
     max-width: 6.5em;
   }
 
+  /* The room is drawn behind the page's title, not in a band of its own
+     (2026-10-22, D-13): the band was 88px of the first screen, given to the
+     story now. What stays of the panel is the room's name and clock. */
+  .gx-comic-top {
+    position: relative;
+    z-index: 0;
+  }
+
+  .gx-comic-top > .gx-plate-backdrop {
+    display: block;
+    height: 100%;
+    opacity: 0.5;
+  }
+
   .gx-panel-splash {
-    flex-shrink: 1;
-    min-height: 5.5rem;
+    min-height: 0;
+    clip-path: none;
   }
 
-  /* A caption of three lines is 74.9px, and the band at its shortest has
-     82px inside its border. */
-  .gx-caption-place {
-    top: 4px;
-  }
-
+  .gx-panel-splash > .gx-plate,
   .gx-sfx {
-    font-size: 1.75rem;
+    display: none;
   }
 
+  .gx-caption-place {
+    position: relative;
+    inset: auto;
+    max-width: none;
+    transform: none;
+  }
+
+  /* A face a reader can recognise, and a name that reads as one. */
   .gx-panel-speaker {
-    grid-template-columns: 76px 1fr;
+    grid-template-columns: 96px 1fr;
   }
 
   /* A case's first page that introduces a rule (프롤로그 01~05) keeps the
@@ -689,13 +735,8 @@
     padding: 8px 10px;
   }
 
-  .gx-comic-actions {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "cards"
-      "open";
-    margin: auto -14px 0;
-    padding: 10px 14px max(12px, env(safe-area-inset-bottom));
+  .gx-speaker-tag b {
+    font-size: 1.375rem;
   }
 
   .gx-comic-hint {
@@ -709,11 +750,12 @@
 }
 
 /* Short, or large type (em follows the reader's font size): the docked footer
-   took over half the page. Only 판 열기 stays docked. A phone upright with
-   672px or less to show (390x664) is short the same way, and so is one with
-   740px (360x740): its docked cards start at 493px and covered 62px of a
-   two-line introduction that ends at 555px. 46.25em is 740px at 16px type. */
-@media (max-height: 35em), (max-width: 700px) and (max-height: 46.25em) {
+   took over half the page. Only 판 열기 stays docked, and the cards follow the
+   story. A phone upright with 672px or less to show (390x664) was short the
+   same way, and so was one with 740px (360x740); from 2026-10-22 (D-3) every
+   phone is: at 390x844 the four or five docked cards still covered about
+   250px of the story, so a player read it through a slot. */
+@media (max-height: 35em), (max-width: 700px) {
   .gx-comic-actions {
     display: contents;
   }

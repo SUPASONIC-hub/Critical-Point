@@ -519,7 +519,7 @@ export function getAuthorityLevel({ clueCount = 0, trust = 0, legitimacy = 0, ca
 // A scene's lead card, the id a case closes on, and where a scene goes with
 // nobody there to choose: rules that read one scene, kept with the season's
 // other rules.
-export { getLeadChoice, getOutcomeChoiceId, getUnattendedNext } from "./seasonRules.js";
+export { getFinalSceneChoiceId, getLeadChoice, getOutcomeChoiceId, getUnattendedNext } from "./seasonRules.js";
 
 export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0, casesOpened = 0 } = {}) {
   const required = choice.requiredAuthority;

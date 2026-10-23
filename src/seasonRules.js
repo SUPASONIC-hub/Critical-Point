@@ -70,6 +70,24 @@ export function getOutcomeChoiceId(choiceId = "", node = null) {
 }
 
 /**
+ * The card picked in a case's last scene before the one it closes on: its
+ * final decision, which the outcome card that closes the case does not say
+ * (사건 15 signs or does not in `c15_final`, then closes in `c15_aftershock`).
+ * Read off the case's log, which the next case clears, so the case summary
+ * keeps it as `finalChoiceId`. The raw id, not mapped like the outcome: a card
+ * the runtime built stands for no line of the scene. `null` when the log has no
+ * such scene.
+ */
+export function getFinalSceneChoiceId(entries = [], closingNodeId = null) {
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    const entry = entries[index];
+    if (!entry || entry.isSystemEvent || entry.nodeId === closingNodeId) continue;
+    return typeof entry.choiceId === "string" ? entry.choiceId : null;
+  }
+  return null;
+}
+
+/**
  * Where a scene goes when nobody is there to choose (a bust skips the scene
  * the card led to, caseRoutes.getBlackoutSkip): where its lead card goes
  * on this run, a gated detour taking its bypass when its condition does not

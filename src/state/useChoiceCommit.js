@@ -10,6 +10,7 @@ import {
   getDramaticChoiceLabel,
   getEcho,
   getEndingVariant,
+  getFinalSceneChoiceId,
   getObserverTag,
   getOutcomeChoiceId,
   getSeasonLogic,
@@ -27,6 +28,7 @@ import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
+import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../gauntlet/tableAfterword.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
@@ -62,7 +64,10 @@ let cloudConflictSaid = false;
 export function toRowSummary(caseSummary) {
   const ending = caseSummary?.endingVariant;
   const id = typeof ending === "string" ? ending : ending?.id;
-  return { ...caseSummary, endingVariant: typeof id === "string" ? id : null };
+  // `finalChoiceId` stays in the save: the row's decision log already carries
+  // that card, so the server's summary stays the shape it was.
+  const { finalChoiceId: _finalChoiceId, ...rowSummary } = caseSummary ?? {};
+  return { ...rowSummary, endingVariant: typeof id === "string" ? id : null };
 }
 
 /**
@@ -378,6 +383,9 @@ export function useChoiceCommit(context) {
         ...(verdict.firstRecord ? { firstRecord: verdict.firstRecord } : {}),
         focus: verdict.focus,
         logic: verdict.logic,
+        // The same board played bare by the player and by a hand that sees the
+        // wall (tableAfterword.js, C-12): shown when the case closes, never scored.
+        read: readWindowAgainstSeer(windowState, verdict.chips),
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       // The table clock ran this many times slower (the comfort setting); the
@@ -426,6 +434,7 @@ export function useChoiceCommit(context) {
         schemaVersion: SAVE_SCHEMA_VERSION,
         replayOf: caseResults[currentCase],
       });
+      const finalChoiceId = getFinalSceneChoiceId(nextLog, entry.nodeId);
       const caseSummary = {
         ...caseSummaryDraft,
         endingVariant: getEndingVariant({
@@ -438,6 +447,10 @@ export function useChoiceCommit(context) {
         runId,
         outcomeChoiceId: getOutcomeChoiceId(entry.choiceId, node),
         outcomeNodeId: entry.nodeId,
+        // The card of the last scene before the outcome, for a far callback
+        // that reads it cases later (farCallbacks.js). Absent when the
+        // log has none; a save from before the field has none either.
+        ...(finalChoiceId ? { finalChoiceId } : {}),
         completedAt: new Date().toISOString(),
       };
       // A case played again keeps the table record of its first close, and the
@@ -503,9 +516,15 @@ export function useChoiceCommit(context) {
         clue,
         skippedTitle: blackoutSkip?.skippedTitle ?? null,
         skippedNodeId: blackoutSkip?.skippedNodeId ?? null,
+        skippedPlace: blackoutSkip?.skippedPlace ?? null,
         nextTitle: nodes[nextNode]?.title ?? "결과 화면",
         nextNode,
         unlockedRelics,
+        // Display only (tableAfterword.js): the push not made or the wall the
+        // heartbeat heard (C-11), and on the close the case against a hand that
+        // sees the wall (C-12).
+        afterword: describeAfterword(windowState),
+        caseRead: caseClosed ? describeCaseRead(nextLog) : null,
         // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
         scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
       },

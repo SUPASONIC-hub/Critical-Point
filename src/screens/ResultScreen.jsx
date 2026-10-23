@@ -115,7 +115,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, season: view.seasonCard.season, share: view.seasonCard.share }}
+            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -183,34 +183,13 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               </button>
             </div>
           </div>
-          {/* One composed header: whose record this is, what it found, the
-              grade it earned and the profile it files the player under. The
-              eyebrow used to open on a bare possessive when no name was set. */}
-          <div className={`result-hero rank-${resultRank.toLowerCase()}`}>
-            <div className="result-hero-copy">
-              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>
-              <h1 ref={titleRef} tabIndex={-1}>
-                {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 생각이 가장 오래 유지됐습니다.</>}
-              </h1>
-              <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
-                <div><span lang="en">JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
-                <p>{judgmentProfile.text}</p>
-                <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
-              </section>
-            </div>
-            <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
-              <span lang="en">CASE RANK</span>
-              <strong>{resultRank}</strong>
-              <small lang="en">{momentumTier} · {momentumScore} POINTS</small>
-            </div>
-          </div>
           <section className="outcome-panel" aria-label="내가 만든 결말">
             <div className="outcome-panel-mark">
               <span lang="en">YOUR CONSEQUENCE</span>
               <strong>{caseOutcome.tag}</strong>
             </div>
             <div>
-              <h2>{caseOutcome.title}</h2>
+              <h2 ref={titleRef} tabIndex={-1}>{caseOutcome.title}</h2>
               <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}
               <p className={`season-standing ${view.seasonStanding.level}`} data-testid="season-standing"><b>{view.seasonStanding.mark} {view.seasonStanding.label}</b> {view.seasonStanding.text}</p>
             </div>
@@ -272,11 +251,32 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <p>{view.failureRecovery.text}</p>
             </section>
           )}
+          {/* One composed header: whose record this is, its grade and profile.
+              After the story since 2026-10-22 (D-10): the ending, the interlude
+              and the next case first, then who the player was, then the score. */}
+          <div className={`result-hero rank-${resultRank.toLowerCase()}`}>
+            <div className="result-hero-copy">
+              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>
+              <h1>
+                {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 생각이 가장 오래 유지됐습니다.</>}
+              </h1>
+              <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
+                <div><span lang="en">JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
+                <p>{judgmentProfile.text}</p>
+                <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
+              </section>
+            </div>
+            <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
+              <span lang="en">CASE RANK</span>
+              <strong>{resultRank}</strong>
+              <small lang="en">{momentumTier} · {momentumScore} POINTS</small>
+            </div>
+          </div>
           <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
             <div className="rank-copy">
               <span lang="en">SCORE BREAKDOWN · {momentumScore} POINTS</span>
               <h2>{rankLine}</h2>
-              <p>{currentCase !== "final" && "다음 사건은 이 랭크에 따라 믿음과 공정함을 조금 얹거나, 지침을 안고 시작합니다. "}랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
+              <p>{currentCase !== "final" && "다음 사건은 이 랭크에 따라 믿음과 공정함을 조금 얹거나, 피로를 안고 시작합니다. "}랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
             </div>
             <div className="score-breakdown">
               {scoreBreakdown.map((item) => (
@@ -323,7 +323,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                     ))}
                   </ul>
                 ) : (
-                  <p>단서 {unopenedClueCount}개와 분기 {unopenedBranchCount}개가 아직 기록에 없습니다.</p>
+                  <p>단서 {unopenedRecordCount - unopenedBranchCount}개와 분기 {unopenedBranchCount}개가 아직 기록에 없습니다.</p>
                 )}
                 <button type="button" className="ghost" onClick={() => startCase(currentCase)}>
                   이 사건 다시 도전

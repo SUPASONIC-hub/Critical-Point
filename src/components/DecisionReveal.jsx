@@ -90,10 +90,21 @@ const flipDetails = () => {
  * shorter than the sheet -- a phone on its side -- the reveal opened at its
  * foot, with the verdict it exists to show above the fold.
  */
+// The afterword's verdict ("갈 수 있었다", "BUST였다") kept on one line: at 360px
+// in the larger story size it broke inside "갈 수 / 있었다".
+function afterwordParts(text) {
+  const at = text.lastIndexOf(": ");
+  if (at < 0) return text;
+  return <>{text.slice(0, at + 2)}<span className="gx-reveal-keep">{text.slice(at + 2)}</span></>;
+}
+
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
+  // Where the lost scene went on: its place up to the first " · " (B-13), the
+  // 회의실 only for a reveal saved before the skip carried one.
+  const skippedRoom = String(decisionReveal?.skippedPlace ?? "").split(" · ")[0] || "회의실";
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
   const [, redraw] = useState(0);
@@ -155,6 +166,12 @@ export function DecisionReveal({ view }) {
           {busted && <Skull size={34} aria-hidden="true" />}
           <h2>{headline}</h2>
           <p>{subline}</p>
+          {/* What the seed still says about this window, and on the close the
+              case against a hand that sees the wall (tableAfterword.js). Plain
+              text in the sheet, nothing that moves and no voice of its own:
+              the slam is the one announcement. */}
+          {decisionReveal.afterword && <p data-testid="reveal-afterword">{afterwordParts(decisionReveal.afterword)}</p>}
+          {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>
 
         {storyLine && (
@@ -222,13 +239,13 @@ export function DecisionReveal({ view }) {
                 <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
               </b>
             ))}
-            <p>도감에 들어갔다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있다.</p>
+            <p>도감에 들어갔습니다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있습니다.</p>
           </div>
         )}
 
         {verdict?.relicOffer?.length > 0 && (
           <p className="gx-reveal-draft" data-testid="relic-draft-notice">
-            사건이 닫혔다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고른다.
+            사건이 닫혔습니다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고릅니다.
           </p>
         )}
 
@@ -264,7 +281,7 @@ export function DecisionReveal({ view }) {
         {decisionReveal.skippedTitle && (
           <>
             <p className="gx-reveal-skip" data-testid="blackout-skip">
-              <b lang="en">LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
+              <b lang="en">LOST SCENE</b> {skippedRoom}{topicParticle(skippedRoom)} 당신 없이 「{decisionReveal.skippedTitle}」{objectParticle(decisionReveal.skippedTitle)} 넘겼습니다.
             </p>
             <SceneMinutes nodeId={decisionReveal.skippedNodeId} />
           </>

@@ -77,8 +77,8 @@ test("the verdict of the last card is printed only beside an ending that agrees 
 test("each origin prints the starting numbers it applies and promises nothing else", () => {
   assert.deepEqual(getOperatorProfiles().map((profile) => profile.title), ["현장을 본 분석관", "반대 의견서를 쓴 분석관", "기록을 남긴 분석관"]);
   assert.equal(getOperatorProfile("courier").start, "현금 +4 · 믿음 +4");
-  assert.equal(getOperatorProfile("lab").start, "믿음 +1 · 공정함 +5 · 지침 +2");
-  assert.equal(getOperatorProfile("public").start, "현금 −2 · 공정함 +8 · 지침 +3");
+  assert.equal(getOperatorProfile("lab").start, "믿음 +1 · 공정함 +5 · 피로 +2");
+  assert.equal(getOperatorProfile("public").start, "현금 −2 · 공정함 +8 · 피로 +3");
   assert.equal(getOperatorProfile("nobody").start, getOperatorProfile("courier").start);
   for (const profile of getOperatorProfiles()) {
     const changed = Object.values(getOriginStartEffects(profile.id)).filter((value) => value !== 0).length;

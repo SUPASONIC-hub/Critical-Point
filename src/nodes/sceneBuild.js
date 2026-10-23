@@ -134,7 +134,7 @@ const AUTHORED_DEALS = new Set([]);
  * Every scene was written people first, procedure second, speed third, and
  * dealt in the order it was written: the first card's largest gain was 믿음 in
  * 212 of the 215 scenes the packs author, the second's 공정함 in 213, and the
- * third card of 323 of the 330 generated scenes gave 지침 back. By the third
+ * third card of 323 of the 330 generated scenes gave 피로 back. By the third
  * case a player could play a column without reading a card.
  *
  * So the deal is shuffled, last, after every rule that names a card by its

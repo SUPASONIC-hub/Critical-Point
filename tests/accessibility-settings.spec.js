@@ -87,6 +87,26 @@ test("with single-key shortcuts off, no control names or draws a key that does n
   await expect(page.locator(".gx-hand-head small")).toHaveText(hasTouch ? "" : "Space 밀기 · Enter 확정");
 });
 
+/**
+ * 이야기 글 크기 (D-5): the briefing's story and balloon grow by the chosen
+ * factor, chosen from the comfort panel, and the table keeps its size.
+ */
+test("이야기 글 크기 enlarges the briefing's story and leaves the table at its size", async ({ page }) => {
+  await withSettings(page, { storyScale: 1.25, holdReadingClock: true });
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  await expect(page.locator("html")).toHaveAttribute("data-story-scale", "");
+  const size = (locator) => locator.first().evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing).toBeVisible();
+  const rem = await page.evaluate(() => Number.parseFloat(getComputedStyle(document.documentElement).fontSize));
+  expect(await size(briefing.locator(".gx-panel-story .gx-caption")), "15px story type, a quarter larger").toBeCloseTo(rem * 0.9375 * 1.25, 1);
+  expect(await size(briefing.locator(".gx-balloon"))).toBeCloseTo(rem * 1.25, 1);
+  await page.getByTestId("open-table").click();
+  await page.locator(".gx-brief > summary").click();
+  // The table's folded case file is the table's, at its own size.
+  expect(await size(page.locator(".gx-brief .gx-brief-lead, .gx-brief p").first())).toBeLessThan(rem * 0.9375 * 1.25 - 0.5);
+});
+
 test("with single-key shortcuts off, the report does not offer R or N", async ({ page }) => {
   await withSettings(page, { letterKeys: false });
   await startDebugNode(page, "case01", "c1_aftershock");
@@ -525,7 +545,8 @@ test("the story switch is reached and flipped from the keyboard", async ({ page 
   await page.goto("/");
   const { toggle } = await openStoryControls(page);
   // It is the next stop after the table-time choice: the first switch.
-  await page.getByRole("region", { name: "편의 설정" }).getByRole("radio", { checked: true }).focus();
+  // The table-time group's: 이야기 글 크기 has a chosen size too (D-5), last in the panel.
+  await page.getByRole("region", { name: "편의 설정" }).getByRole("group", { name: "테이블 시간" }).getByRole("radio", { checked: true }).focus();
   await page.keyboard.press("Tab");
   await expect(toggle).toBeFocused();
   await page.keyboard.press("Space");

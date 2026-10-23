@@ -78,21 +78,22 @@ const WALL_FLOOR = 38;
  * lands. When it runs out the table opens on its own; the player can open it,
  * stake a card, or hold the clock, any time before that.
  *
- * The pace is ten characters a second and the ceiling 95 seconds, decided on
- * 2026-10-13: the owner asked for ample reading time, and sixteen characters a
+ * The pace is ten characters a second and the ceiling 94 seconds (95 from
+ * 2026-10-13 until 10-23, when the longest scene, c45_stories, lost its
+ * opening time stamp and the twenty seconds above it moved down with it): the owner asked for ample reading time, and sixteen characters a
  * second was fast. Before that the pace was sixteen under a ceiling of 50, and
  * before that under one of 35, which cut 86 scenes short.
  *
- * At ten the season's scenes run from 22 seconds to 75 (160 to 690
+ * At ten the season's scenes run from 22 seconds to 74 (160 to 686
  * characters; half are under 41 seconds, nine in ten under 54), so no scene
  * sits on the floor and none reaches the ceiling by itself. The twenty seconds
  * above the longest scene are what the changed rules of a bust add to its
- * page: two rules (97 characters) make it 85 seconds, and a bust by timeout
- * with a fractured axis (196) makes it 95. Only a page with more rules than
+ * page: two rules (97 characters) make it 84 seconds, and a bust by timeout
+ * with a fractured axis (196) makes it 94. Only a page with more rules than
  * that on one of the longest scenes is cut -- eight rules there ask for 122.
  */
 export const READING_MIN_SECONDS = 12;
-export const READING_MAX_SECONDS = 95;
+export const READING_MAX_SECONDS = 94;
 const READING_CHARS_PER_SECOND = 10;
 const READING_SETTLE_SECONDS = 6;
 

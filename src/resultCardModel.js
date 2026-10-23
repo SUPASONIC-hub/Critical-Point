@@ -82,9 +82,10 @@ function readSeasonLeague(finalSummary) {
  * @param {string} [input.host] The site's host, printed at the foot of the card.
  * @param {string} [input.season] The card's corner, 「SEASON 02 · FINAL RECORD」 (secondSeason.getSeasonCard).
  * @param {string} [input.share] What follows the shared line: the season's number, the ending before and the week's rule.
+ * @param {string} [input.vaultLine] 사건당 금고 as the report words it, printed beside the 논리 유지력.
  */
 export function buildResultCardModel(input = {}) {
-  const { fingerprint, endingVariant, endingName, caseResults, logicHold, host } = input ?? {};
+  const { fingerprint, endingVariant, endingName, caseResults, logicHold, host, vaultLine } = input ?? {};
   const results = caseResults && typeof caseResults === "object" ? caseResults : {};
   const summaries = Object.values(results).filter((summary) => summary && typeof summary === "object");
   const best = readBestCase(summaries);
@@ -108,6 +109,8 @@ export function buildResultCardModel(input = {}) {
     ...(Number.isInteger(logicHold) && logicHold >= 0 && logicHold <= 100 ? { logicHold } : {}),
     // A season with any case played in story mode says so on the card.
     story: summaries.some((summary) => Boolean(summary.assistStory)),
+    // 사건당 금고, worded by the runtime (tableAfterword.js describeVaultPerCase): the card only prints it.
+    vaultLine: toText(vaultLine),
     host: toText(host),
     // E-5: the season's number and the shared line's tail, made on the result side (secondSeason.getSeasonCard).
     season: input?.season || RESULT_CARD_LABELS.season,

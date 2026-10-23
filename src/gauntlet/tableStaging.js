@@ -29,6 +29,22 @@ export function getBriefingIntro(node, nodeId, run, staged = STAGED) {
 }
 
 /**
+ * The line a case opens on (`run.echo`, written from caseIntroEchoes when the
+ * case opened), for one small line at the top of the case's first page and
+ * nowhere else (Q8 (1), 2026-10-22). Only a line in the opening voice's form,
+ * "화자: 문장", is shown: every intro line has it, and the run's other echoes
+ * -- a debug or replay entry's note -- do not.
+ *
+ * The reading-layout branch puts a 「지난 장면에서 —」 line in the same place;
+ * on a case's first page this opening voice stands in for it.
+ */
+export function getBriefingOpening(node, nodeId, line) {
+  const text = typeof line === "string" ? line.trim() : "";
+  return opensCase(node, nodeId) && OPENING_VOICE.test(text) ? text : "";
+}
+const OPENING_VOICE = /^[가-힣A-Za-z0-9 ]{1,16}: \S/u;
+
+/**
  * The id of 이번 주의 규칙 the season was started under, for a panel of its
  * own on every case's opening page (결정 28 (1): its own kicker, not a line
  * among the unlocks); null on the case's later pages and in a story case,

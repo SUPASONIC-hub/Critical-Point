@@ -432,8 +432,9 @@ test("the report screen hands the card four things and the season's two strings,
   assert.ok(literal, `an object written out where it is handed over, not a view: ${handed[0].trim()}`);
   assert.deepEqual(
     literal.split(", ").map((field) => field.split(":")[0]),
+    // 사건당 금고 (C-1 (3), 2026-10-22) comes worded, a string and no record;
     // E-5: the season's number and the shared line's tail (secondSeason.getSeasonCard), which say nothing of who played.
-    ["fingerprint", "endingVariant", "endingName", "caseResults", "season", "share"],
+    ["fingerprint", "endingVariant", "endingName", "caseResults", "vaultLine", "season", "share"],
   );
   assert.doesNotMatch(literal, pattern);
   assert.doesNotMatch(literal, /\.\.\./, "nothing is spread into it");
@@ -442,8 +443,8 @@ test("the report screen hands the card four things and the season's two strings,
   // phrase, nothing that says who played.
   assert.deepEqual(
     literal.match(/\bview\b[\w?.]*/g),
-    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults", "view.seasonCard.season", "view.seasonCard.share"],
-    "of the view, only these five",
+    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults", "view.score.vaultLine", "view.seasonCard.season", "view.seasonCard.share"],
+    "of the view, only these six (a worded vault, C-1 (3), and the season's corner and tail, E-5)",
   );
 
   const ending = readFileSync(new URL("../../src/components/EndingSequence.jsx", import.meta.url), "utf8");

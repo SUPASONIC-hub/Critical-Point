@@ -310,7 +310,7 @@ Still open, on purpose:
    it rather than comparing to zero -- `humanCost` and `fatigue` read backwards
    otherwise. Sort with `byEffectWeight` before naming a resource in a sentence.
    A resource is named with its canonical label from `easyResourceLabels` in
-   `src/playerLanguage.js` -- 남은 시간, 현금, 믿음, 공정함, 사람 피해, 지침 --
+   `src/playerLanguage.js` -- 남은 시간, 현금, 믿음, 공정함, 사람 피해, 피로 --
    the words the chips print, never a synonym. Those six are the only
    resources: `applyEffect` (`src/riskLogic.js`) moves only the keys of
    `initialResources`, and only by a finite number, so a misspelt key cannot
@@ -737,7 +737,7 @@ Still open, on purpose:
     boxes, the memo as a pinned case file, and the protocol breach as a red
     panel when the last decision broke this board
     (`data-testid="protocol-breach"`). The page has its own reading clock,
-    `getReadingSeconds(node)`, 12-95s; when it runs out the table opens by
+    `getReadingSeconds(node)`, 12-94s; when it runs out the table opens by
     itself. The clock is a switch (`role="switch"`, `aria-checked`, named 읽는
     시간 멈춤, the seconds its description) that holds and resumes it, and
     it starts held when the player asked for that (priority 87).
@@ -992,7 +992,7 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
-    copy, and requires every glossary term (189) to carry a plain explanation
+    copy, and requires every glossary term (191) to carry a plain explanation
     at the first place a player can read it in each case -- per opening, since
     a case can be entered on any of them. Only narration (lead and body) is
     checked. A term matches at a word start only. Add a term to the glossary

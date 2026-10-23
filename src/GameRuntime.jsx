@@ -79,7 +79,7 @@ import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { createRunLifecycle } from "./state/runLifecycle.js";
 import { resourceMeta } from "./appCopy.js";
 import { getNextCaseSignal } from "./caseCopy.js";
-import { createPlayView } from "./viewModels/appViewModels.js";
+import { createPlayView } from "./viewModels/playViewModel.js";
 import { createResultViewModel } from "./viewModels/resultViewModel.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
@@ -285,6 +285,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     node,
     currentCase,
     clueCount,
+    discoveredClues,
     gauntletRun,
     runId,
     echo: run.echo,
@@ -940,7 +941,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     fixedChoices, clueCount, casesOpened, reframeChoice, tableRisk,
     resources, resourceMeta, progress, routePath: `${Math.max(0, routeIndex) + 1}/${routeLength}`,
     debugToolsEnabled, fallbackCaseId, silentFailureCount,
-  });
+  }, {}, caseResults);
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
   const playActions = {
     saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic,

@@ -91,6 +91,8 @@ export function RankingScreen({
               <div className="ranking-list" role="list">
                 {leaderboard.map((entry) => {
                   const isCurrentRun = entry.runId ? entry.runId === runId : entry.sessionCode === sessionCode;
+                  // 사건당 금고 (C-1 (3)): the season's vault over its cases, shown and never sorted on; tableAfterword.js perCaseVault reads it the same way.
+                  const vaultPerCase = Math.round(entry.summary?.gauntlet?.vault / entry.summary?.completedCaseCount);
                   return (
                   <div role="listitem" className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
                     <span className="sr-only">{entry.position}위{isCurrentRun ? ", 내 기록" : ""}</span>
@@ -116,6 +118,7 @@ export function RankingScreen({
                       <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
                       <span>평균 {entry.averageResponseTime}초</span>
                       <span>판 다시 짜기 {entry.reframeCount}</span>
+                      {Number.isFinite(vaultPerCase) && <span data-testid="ranking-vault">사건당 금고 {vaultPerCase.toLocaleString("en-US")}</span>}
                       {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
                       {entry.assistStory && <span className="ranking-assist">스토리 모드</span>}
                       {entry.newGamePlus && <span className="ranking-assist" lang="en">NEW GAME+</span>}

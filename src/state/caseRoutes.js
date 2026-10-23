@@ -69,7 +69,7 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
       }
     : null;
   const echo = previousOutcome
-    ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
+    ? `${introEcho} 지난 사건: '${previousOutcome.title}'`
     : introEcho;
   // The origin bonus is the run's opening hand, so it belongs to the season's
   // first case -- which is the 프롤로그 now, not 사건 01.
@@ -112,13 +112,16 @@ export function getReframeTarget(caseId, fromNodeId) {
  * And in any run, a scene marked `attended` (its scene context says so; the
  * finale's two decisions are, the 33rd floor and the last choice in B2) is
  * not played without the analyst either: the run lands on it.
+ *
+ * The skip carries the scene's place, so the reveal says where the scene went
+ * on without the analyst -- a 빈소 or a 펜션, not always a 회의실 (B-13).
  */
 export function getBlackoutSkip(fromNodeId, branchContext) {
   const skippedNode = nodes[fromNodeId];
   if (!skippedNode || skippedNode.attended || RESULT_NODE_IDS.has(fromNodeId)) return null;
   const onward = getUnattendedNext(skippedNode, branchContext);
   if (!onward || !nodes[onward] || RESULT_NODE_IDS.has(onward)) return null;
-  return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
+  return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title, skippedPlace: skippedNode.place ?? null };
 }
 
 /**

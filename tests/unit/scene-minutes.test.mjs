@@ -42,6 +42,8 @@ test("every scene a bust can skip has minutes to read, with a title and a questi
       const minutes = getSceneMinutes(skip.skippedNodeId);
       assert.ok(minutes, `${nodeId} has minutes`);
       assert.equal(minutes.title, skip.skippedTitle, `${nodeId}: the title the reveal names`);
+      // B-13: the reveal says where the scene went on, not always 회의실.
+      assert.ok(skip.skippedPlace && skip.skippedPlace === nodes[nodeId].place, `${nodeId}: the place the reveal names`);
       assert.ok(minutes.text.length > 0, `${nodeId} has text`);
       assert.ok(minutes.question.length > 0, `${nodeId} has a question`);
       assert.ok(!minutes.heading.startsWith(" · ") && !minutes.heading.endsWith(" · "), `${nodeId}: no empty part in the heading`);

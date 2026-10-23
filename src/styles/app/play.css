@@ -1131,7 +1131,7 @@
   line-height: 1.75;
 }
 
-.gx-brief ul {
+.gx-brief :is(ul, ol) {
   display: grid;
   gap: 4px;
   margin: 7px 0 0;
@@ -1152,6 +1152,17 @@
   color: var(--ui-text-2);
   border-left: 2px solid var(--ui-line);
   list-style: none;
+}
+
+/* The case so far and who is in it (CaseCast.jsx, D-8): a card's lines stacked under the name. */
+.gx-cast details > :not(summary) {
+  display: block;
+}
+
+.gx-cast summary > * {
+  margin-right: 6px;
+  vertical-align: middle;
+  border-radius: 50%;
 }
 
 /* Situation board: what the table does next, three one-line cells. */
@@ -1870,6 +1881,11 @@
   margin: 0;
   color: var(--ui-text-2);
   font-weight: 600;
+}
+
+/* The afterword's verdict stays on one line (360px, larger story size). */
+.gx-reveal-keep {
+  white-space: nowrap;
 }
 
 /* 자세히: the short sheet's way to the whole one. Under the verdict, above

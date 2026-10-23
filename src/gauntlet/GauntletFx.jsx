@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getCloseness, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
-import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, monotonicNow, registerFxVariables } from "./fxVariables.js";
+import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, isQuietTable, monotonicNow, registerFxVariables } from "./fxVariables.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 
 /**
@@ -53,6 +53,13 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * All three are read off what is drawn, never the wall, and both settings
  * take all three away; the sound goes only where the heartbeat already goes.
  *
+ * A quiet table (`isQuietTable`, B-13) is a case where the season rests -- a
+ * night off, a funeral, a holiday. Its tables play as the comfort setting does
+ * and without the heartbeat or the drone in the ear: no shake, no pulse, no
+ * steps. The tick light and the clock stay, and the table is the same table:
+ * nothing here reaches the engine, so the wall, the pot and the verdict of a
+ * quiet table are what they were (tests/unit/table-motion.test.mjs).
+ *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
  */
@@ -64,16 +71,16 @@ const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const PULSE_MIN_MS = 345;
 /** How often the loop looks for readers that mounted since it last looked. */
 const READERS_REFRESH_MS = 400;
-export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef }) {
-  const stateRef = useRef({ window: liveWindow, paused });
+export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef, caseId }) {
+  const stateRef = useRef({ window: liveWindow, paused, quiet: isQuietTable(caseId) });
   const impactRef = useRef(0);
   const flashRef = useRef(0);
   const flashedAt = useRef(0);
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    stateRef.current = { window: liveWindow, paused };
-  }, [liveWindow, paused]);
+    stateRef.current = { window: liveWindow, paused, quiet: isQuietTable(caseId) };
+  }, [liveWindow, paused, caseId]);
 
   useEffect(() => {
     if (!impact) return;
@@ -133,7 +140,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
     let readersAt = 0;
 
     const loop = (time) => {
-      const { window: win, paused: isPaused } = stateRef.current;
+      const { window: win, paused: isPaused, quiet } = stateRef.current;
       const delta = last ? Math.min(64, time - last) : 16;
       last = time;
       if (time >= readersAt) {
@@ -141,7 +148,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
         readersAt = time + READERS_REFRESH_MS;
       }
       const live = win.status === "live" && !isPaused;
-      const calm = getAccessibility().calmEffects;
+      const calm = quiet || getAccessibility().calmEffects;
       const tier = fxTier(win, live, reducedMotion, calm);
       const tellWall = win.wall + (win.tellOffset ?? 0);
       // Same shape as the pulse: the tell on top of a floor built from the heat
@@ -160,7 +167,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       rate = fxRateStep(rate, fxRateTarget(bpm), delta);
       if (live) {
         if (time >= nextBeat) {
-          playHeartbeat(heat, tier);
+          if (!quiet) playHeartbeat(heat, tier);
           nextBeat = time + 60000 / bpm;
           if (now - pulsedAt >= PULSE_MIN_MS) {
             pulsedAt = now;
@@ -177,7 +184,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
         nextBeat = time + 120;
       }
       if (time >= droneAt) {
-        drone.set(live ? closeness : 0, win.schema.sedated);
+        drone.set(live && !quiet ? closeness : 0, win.schema.sedated);
         droneAt = time + 100;
       }
 

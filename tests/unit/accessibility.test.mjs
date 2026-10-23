@@ -305,6 +305,27 @@ test("the intro and the origin profiles carry nothing the page cannot print", as
   assert.doesNotMatch(shell.slice(shell.indexOf("const introView = createIntroViewModel({"), shell.indexOf("return <IntroScreen view={introView} />")), /^\s*setSaveStatus,$/m);
 });
 
+test("이야기 글 크기 is one of three sizes, carried on the document as an attribute and a factor (D-5)", () => {
+  assert.deepEqual([...settings.STORY_SCALES], [1, 1.125, 1.25]);
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.storyScale, 1);
+  assert.equal(settings.normalizeAccessibility({ storyScale: 1.25 }).storyScale, 1.25);
+  assert.equal(settings.normalizeAccessibility({ storyScale: 2 }).storyScale, 1, "a size the panel does not offer is the default");
+  assert.equal(settings.normalizeAccessibility({ storyScale: "1.125" }).storyScale, 1);
+  const attributes = new Map();
+  const style = new Map();
+  const root = { toggleAttribute: (name, on) => attributes.set(name, on), style: { setProperty: (name, value) => style.set(name, value) } };
+  settings.applyAccessibilityToDocument(settings.normalizeAccessibility({ storyScale: 1.125 }), root);
+  assert.equal(attributes.get("data-story-scale"), true);
+  assert.equal(style.get("--story"), "1.125");
+  settings.applyAccessibilityToDocument(settings.normalizeAccessibility({}), root);
+  assert.equal(attributes.get("data-story-scale"), false, "the default size leaves the prose alone");
+  // The table is not on the list: its height is budgeted to the pixel.
+  const css = readFileSync(new globalThis.URL("../../src/styles/app/comfort.css", import.meta.url), "utf8");
+  const rules = css.slice(css.indexOf("[data-story-scale]"));
+  for (const target of [".gx-panel-story .gx-caption", ".gx-balloon", ".decision-reveal-beat p", ".outcome-panel p", ".interlude-panel p"]) assert.ok(rules.includes(target), `${target} grows`);
+  assert.doesNotMatch(rules, /\.gx-table|\.gx-hand|\.gx-card|\.gx-brief\b/, "the table keeps its size");
+});
+
 test("the edge notices are on until turned off, and say no number aloud or on screen", () => {
   assert.equal(settings.DEFAULT_ACCESSIBILITY.edgeNotices, true);
   assert.equal(settings.normalizeAccessibility({ edgeNotices: false }).edgeNotices, false);
