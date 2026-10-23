@@ -1,4 +1,4 @@
-import { NEW_GAME_PLUS_KEY, readNewGamePlusMemory, readStoredValue, removeStoredValue, writeStoredValue } from "../appConfig.js";
+import { NEW_GAME_PLUS_KEY, readNewGamePlusMemory, readStoredValue, removeStoredValue, SEASON_RECORD_KEY, writeStoredValue } from "../appConfig.js";
 
 /**
  * 이번 주의 규칙 as this device chose it, read by both places a season starts
@@ -25,13 +25,12 @@ export const WEEK_RULE_OFF_STORAGE_KEY = "critical-point-weekly-rule-off-v1";
 export const WEEK_RULE_ON_STORAGE_KEY = "critical-point-weekly-rule-on-v1";
 
 /**
- * The season record NEW GAME+ keeps (draft #220, `SEASON_RECORD_KEY` in
- * appConfig.js there): `{ seasons }` is how many seasons this device finished.
- * Read by name here so the first season is told apart before and after that
- * record exists; before it, a finished season is NEW GAME+ unlocked or its
- * memory of a finale.
+ * The season record NEW GAME+ keeps (#220, `SEASON_RECORD_KEY` in
+ * appConfig.js): `{ seasons }` is how many seasons this device finished.
+ * Without it, a finished season is NEW GAME+ unlocked or its memory of a
+ * finale.
  */
-export const SEASON_RECORD_STORAGE_KEY = "critical-point-season-record-v1";
+export const SEASON_RECORD_STORAGE_KEY = SEASON_RECORD_KEY;
 
 /** How many seasons this device has finished: the record's count, or 1 for NEW GAME+ without one, or 0. */
 export function finishedSeasons() {
