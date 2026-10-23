@@ -36,7 +36,21 @@ const budgets = [
   // 145,425, the gzip plus 4, raised by what it lacked. The 1,092 raw bytes
   // are main's own since 2026-10-21 (main's budget is 551,000 / 176,100);
   // the chunk this branch writes did not change.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 453_263, maxGzip: 145_429 },
+  // 453,263 / 145,429 -> 196,669 / 71,953 on 2026-10-24, Vite 8 (#225) rebased
+  // on main 3d43a239: the season's store (src/runtime/gameData.app.js with
+  // virtual:season) is no longer in this chunk. Main has more chunks that
+  // import it (the table's PlayScreen, the case file's CaseCast), and Rolldown
+  // writes it as a file of its own, gameData.app below, where Rollup kept it
+  // here. Measured 196,669 / 71,949 in the e2e build (two builds, the same),
+  // the gzip plus 4; with gameData.app the two are 476,836 / 154,714, under
+  // main's 551,000 / 176,100 for this one chunk.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 196_669, maxGzip: 71_953 },
+  // The season's store as the app build reads it (src/runtime/gameData.app.js
+  // and virtual:season, scripts/vite-season-data.mjs), split out of the
+  // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
+  // imported by the runtime's chunk, so it loads with it, never before.
+  // Measured 280,167 / 82,765 in the e2e build, the gzip plus 4.
+  { pattern: /^gameData\.app-.*\.js$/, maxBytes: 280_167, maxGzip: 82_769 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -550,7 +564,11 @@ const budgets = [
   // 5adcbb5: measured 109,685 / 35,244, the gzip plus 4, raised by what it
   // lacked. The 1,495 bytes are main's copy since 2026-10-21 (main's budget
   // is 113,650 / 36,570); the bundler writes the strings as they are.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 109_685, maxGzip: 35_248 },
+  // 109,685 / 35,248 -> 109,685 / 35,690 on 2026-10-24, rebased on main
+  // 3d43a239: measured 107,213 / 35,686 in the e2e build (two builds, the
+  // same), the gzip plus 4. The copy is main's since 5adcbb5 (main's budget is
+  // 113,650 / 36,570); the raw bytes stay under what they were.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 109_685, maxGzip: 35_690 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -702,7 +720,9 @@ const budgets = [
   // lucide-react 1.60 installed (npm ci), the gzip plus 4. Rolldown and Oxc
   // write it smaller than Rollup and esbuild did (2,637 / 1,536 against 2,790
   // / 1,667 on the main of 2026-10-21).
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_637, maxGzip: 1_541 },
+  // 1,541 -> 1,547 gzip on 2026-10-24, rebased on main 3d43a239: measured
+  // 2,637 / 1,543, the gzip plus 4 (main's is 2,790 / 1,673).
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_637, maxGzip: 1_547 },
   // The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js,
   // WINDOW_TRAIL in vite.config.js): the presses the table writes, the record
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
@@ -857,7 +877,11 @@ function checkBudget(file, budget) {
 // plus 4: CaseCast and batch A's three files all in the list.
 // -> 9,133 / 3,328 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측:
 // measured 9,133 / 3,319 and, after the CI fixes, 3,324; the larger gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 9_133, maxGzip: 3_328 };
+// -> 9,207 / 3,356 on 2026-10-24, Vite 8 (#225) rebased on main 3d43a239:
+// measured 9,207 / 3,352 plus 4 (two builds, the same). The list names two
+// more files than main's, rolldown-runtime and gameData.app; the worker's
+// code did not change.
+const WORKER_BUDGET = { maxBytes: 9_207, maxGzip: 3_356 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
