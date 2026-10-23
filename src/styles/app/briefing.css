@@ -355,6 +355,7 @@
    add one box to the panel's height, not two. */
 .gx-balloon {
   position: relative;
+  isolation: isolate;
   grid-column: 2;
   margin: 6px 0 0;
   padding: 10px 12px;
@@ -379,6 +380,9 @@
   border-top: 3px solid var(--c-black);
   border-left: 3px solid var(--c-black);
   transform: rotate(45deg) skew(12deg, 12deg);
+  /* Under the words: its corner reaches into the first line, and Android
+     Chrome drew it over the first letter's top (운영 확인 고칠 점 1). */
+  z-index: -1;
 }
 
 /* A scene with no speech of its speaker's gives its lead: narration, so a
@@ -440,6 +444,13 @@
 .gx-caption-reaction {
   border-style: dashed;
   box-shadow: none;
+}
+
+/* What the line is about, on a line of its own above it. */
+.gx-caption-reaction small {
+  display: block;
+  color: var(--c-ink-muted);
+  font-size: 0.75rem;
 }
 
 /* The line from the scene before (D-7), quieter than the boxes it leads. */

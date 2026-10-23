@@ -298,7 +298,10 @@ const fileBudgets = {
   // on batch A, measured.
   // -> 740 / 14201 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측:
   // B's phone page (D-3, D-13, Q8, C-13) with #272's balloon, question box and chip.
-  "briefing.css": { lines: 740, bytes: 14201 },
+  // -> 746 / 14302 the same evening, measured: C-13's box names the table it
+  // is about on a small line of its own (운영 확인 고칠 점 4); 748 / 14339 with
+  // the balloon's tail drawn under its words (고칠 점 1), measured.
+  "briefing.css": { lines: 748, bytes: 14339 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

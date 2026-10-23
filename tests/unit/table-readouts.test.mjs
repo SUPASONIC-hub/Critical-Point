@@ -163,9 +163,17 @@ test("the speaker's line about the last table: four heats, 20 to 30 lines, plain
   assert.equal(getHeatStage({ gauge: 40 }), "mid");
   assert.equal(getHeatStage({ gauge: 39 }), "low");
   assert.equal(getTableReaction([], "x"), null, "a case's first scene has no table behind it");
-  const line = getTableReaction([{ threshold: { busted: true } }], "scene");
+  const { line } = getTableReaction([{ threshold: { busted: true } }], "scene");
   assert.ok(tableReactions.bust.includes(line));
-  assert.equal(getTableReaction([{ threshold: { busted: true } }], "scene"), line, "the same scene, the same line");
+  assert.equal(getTableReaction([{ threshold: { busted: true } }], "scene").line, line, "the same scene, the same line");
+});
+
+test("the reaction says which table it is about: pushes, heat and wall (2026-10-23 fix 4)", () => {
+  const recap = (threshold) => getTableReaction([{ threshold }], "scene").recap;
+  assert.equal(recap({ pushes: 3, gauge: 47.6, wall: 61 }), "직전 판 · 3번 밀고 열기 47에서 확정 (벽 61)");
+  assert.equal(recap({ pushes: 0, gauge: 0, wall: 61 }), "직전 판 · 밀지 않고 확정 (벽 61)");
+  assert.equal(recap({ busted: true, cause: "push", pushes: 4, gauge: 66, wall: 52 }), "직전 판 · 4번째 밀기에서 BUST (벽 52)");
+  assert.equal(recap({ busted: true, cause: "creep", pushes: 2, gauge: 53, wall: 52 }), "직전 판 · 2번 밀고 BUST (벽 52)", "the clock's bust is no push's");
 });
 
 test("a window closed without a push has no afterword; one push or more has it (Q34 (1))", () => {

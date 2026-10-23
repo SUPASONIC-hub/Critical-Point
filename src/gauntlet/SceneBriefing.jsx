@@ -346,7 +346,12 @@ export function SceneBriefing({
             {/* Where the last scene left off (D-7): its echo, or the ending of the case before. */}
             {bridge && <p className="gx-bridge" data-testid="scene-bridge">{bridge}</p>}
             {/* The speaker on the last table, before the scene (C-13): a line of the runtime's, picked by its heat. */}
-            {reaction && <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">{node.speaker}: “{reaction}”</p>}
+            {reaction && (
+              <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">
+                <small>{reaction.recap}</small>
+                {node.speaker}: “{reaction.line}”
+              </p>
+            )}
             {/* A lead the balloon carries is not told twice. */}
             {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
             <ProseCaptions text={told.text} who={node.speaker} whoAt={speech.whoAt} />

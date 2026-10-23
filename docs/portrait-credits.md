@@ -1,12 +1,13 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장의 출처입니다.
-처음 다섯 장(한서윤, 반재욱, 도윤하, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하)의 출처입니다.
+처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
+도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
 2026년 10월 22일, 한 사건에만 나오는 인물 여덟의 이름을 핵심 인물과 닮지 않게 바꾸면서(B-8) 그 초상 파일 이름도 새 이름으로 바꿨습니다. 사진과 출처는 그대로입니다:
 서하윤 → 황혜원, 마서윤 → 홍예담, 민도현 → 안기범, 연태준 → 공병만, 주하온 → 엄동균, 신이안 → 봉영훈, 이서준 → 이찬빈, 염태호 → 편종구.
 
-## 사진에서 만든 예순일곱 장
+## 사진에서 만든 예순여덟 장
 
 사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 공병만부터 권태호까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
@@ -23,6 +24,7 @@
 | 인물 | 파일 | 원본 사진 | 사진가 | 라이선스 |
 |---|---|---|---|---|
 | 이민서 | `portrait-lee-minseo.webp` | https://www.pexels.com/photo/woman-in-black-top-typing-7534107/ | Mikhail Nilov (https://www.pexels.com/@mikhail-nilov/) | [Pexels License](https://www.pexels.com/license/) |
+| 도윤하 | `portrait-do-yunha.webp` | https://unsplash.com/photos/a-man-wearing-glasses-and-a-black-turtleneck-E3aigU1S1tI | Sang Nguyen (https://unsplash.com/@sangmeo) | [Unsplash License](https://unsplash.com/license) |
 | 강태민 | `portrait-kang-taemin.webp` | https://unsplash.com/photos/a-man-in-a-white-shirt-looking-at-the-camera-ntLkvt6OZvQ | Anky Lau (https://unsplash.com/@anky) | [Unsplash License](https://unsplash.com/license) |
 | 문가을 | `portrait-moon-gaeul.webp` | https://www.pexels.com/photo/woman-in-white-apron-9051695/ | Mike Jones (https://www.pexels.com/@mike-jones/) | [Pexels License](https://www.pexels.com/license/) |
 | 나준혁 | `portrait-na-junhyeok.webp` | https://unsplash.com/photos/EnvYpRPH9Rg | Vitaly Gariev (https://unsplash.com/@silverkblack) | [Unsplash License](https://unsplash.com/license) |
@@ -154,5 +156,5 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 다섯 장 + 사진 67 + 생성 14 + 그린 1).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 14 + 그린 1).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(사용자 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).
