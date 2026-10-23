@@ -19,6 +19,7 @@ import { getJudgementHabit } from "../judgementHabit.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTraceEvents } from "./trace.js";
+import { getSeasonOpening } from "./newGamePlusCarry.js";
 
 /**
  * A window already settled under this seed -- a rolled-back save brought it
@@ -29,18 +30,6 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
   let seed = baseSeed;
   for (let redeal = 1; settled.has(seed) && redeal < 50; redeal += 1) seed = `${baseSeed}~${redeal}`;
   return seed;
-}
-
-/**
- * The line a NEW GAME+ season opens on (newGamePlusCarry.js), on the season's
- * first page only: a run begun with NEW GAME+, in 프롤로그 01, with nothing
- * answered and no case closed. The run's `echo` moves on with the first
- * answer, and a replayed 프롤로그 01 opens on its own line, so neither is
- * shown under the NEW GAME+ kicker. Null everywhere else.
- */
-export function getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo }) {
-  const first = gauntletRun?.veteran === true && currentCase === "prologue01" && (log?.length ?? 0) === 0 && Object.keys(caseResults ?? {}).length === 0;
-  return first && typeof echo === "string" && echo.trim() ? echo : null;
 }
 
 /**
