@@ -168,14 +168,12 @@ export function SceneBriefing({
   });
 
   // D-11: how long this page is up (visible) and whether it was ever held, for
-  // the stage to note when the table opens, by whatever key or button.
+  // the stage to note when the table opens, by whatever key or button. Each
+  // frame reports both, so a page held from the start or held later is caught.
   const readingRef = useRef(reading);
   useEffect(() => {
     readingRef.current = reading;
   });
-  useEffect(() => {
-    readingRef.current?.(0, heldRef.current);
-  }, []);
 
   useEffect(() => {
     let frame = 0;
@@ -185,7 +183,7 @@ export function SceneBriefing({
       const now = monotonicNow();
       const step = document.hidden ? 0 : Math.min(0.25, (now - last) / 1000);
       if (!heldRef.current) spent += step;
-      readingRef.current?.(step, false);
+      readingRef.current?.(step, heldRef.current);
       last = now;
       const remaining = Math.max(0, readSeconds - spent);
       timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));
@@ -204,7 +202,6 @@ export function SceneBriefing({
 
   function toggleHold() {
     heldRef.current = !heldRef.current;
-    if (heldRef.current) readingRef.current?.(0, true);
     setHeld(heldRef.current);
   }
 

@@ -59,7 +59,12 @@ const budgets = [
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
   // 61,300 -> 61,308 gzip on 2026-10-21 (F1 phase 2, #216, draft), measured
   // 61,304 plus 4: the replay trail's chunk (windowTrail) in the preload list.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_980, maxGzip: 61_308 },
+  // 169,980 / 61,308 -> 170,453 / 61,560 for ops-measure (2026-10-23, on main
+  // 2c7b535), measured 170,453 / 61,556 in the e2e build, the gzip plus 4:
+  // E-8's first season (the season count read off the NEW GAME+ keys, the
+  // second box's key and the choice both starts read) and one more chunk in
+  // the preload lists (sceneChoices, E-6).
+  { pattern: /^index-.*\.js$/, maxBytes: 170_453, maxGzip: 61_560 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -114,7 +119,14 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 104,745 / 34,822 -> 105,055 / 34,952 for ops-measure (2026-10-23, on main
+  // 2c7b535), measured 105,055 / 34,948 in the e2e build, the gzip plus 4:
+  // D-11's reading tally (the briefing's report each frame, the stage's note
+  // when the table opens, the reveal's 자세히 count) and E-6's line under the
+  // reveal, whose fetch and words are a chunk of their own (sceneChoices,
+  // below). Reporting the hold on each frame in place of a mount effect and a
+  // line in the hold button took 71 / 24 off (105,126 / 34,972 before).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_055, maxGzip: 34_952 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -134,7 +146,10 @@ const budgets = [
   // measured 14,557 in CI's e2e build and failed Verify, so #216 did not
   // deploy; #216 had been measured before #238 merged. #218 (lucide 1.60,
   // TriangleAlert for AlertTriangle) measures 14,558 on top. The gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_562 },
+  // 14,562 -> 14,578 gzip on 2026-10-23 (ops-measure, on main 2c7b535),
+  // measured 14,574 plus 4. No code of the report changed: its hoisted
+  // `import "./<chunk>-<hash>.js"` list gained one name, sceneChoices (E-6).
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_578 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -222,7 +237,9 @@ const budgets = [
   // imports, auditRisk's and cascadeRisk's, measured 8,711 / 4,242 plus 4.
   // 8,711 / 4,246 -> 8,745 / 4,261 on 2026-10-21 (F1 phase 2, #216, draft),
   // measured 8,745 / 4,257 plus 4: one more import, the replay trail's chunk.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_745, maxGzip: 4_261 },
+  // 8,745 / 4,261 -> 8,780 / 4,280 for ops-measure (2026-10-23), measured
+  // 8,780 / 4,276 plus 4: one more import, sceneChoices (E-6); its code did not change.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_780, maxGzip: 4_280 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -301,10 +318,11 @@ const budgets = [
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
   // weeklyRules chunk above stays as it was). Measured 1,796 / 962, the gzip
   // plus 4.
-  // 1,796 / 966 -> 1,921 / 1,022 for ops-measure (2026-10-23), measured
-  // 1,921 / 1,018 plus 4: E-8's line and box for a first season and E-9's
-  // line in the story before the rule.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_921, maxGzip: 1_022 },
+  // 1,796 / 966 -> 2,081 / 1,077 for ops-measure (2026-10-23, on main
+  // 2c7b535), measured 2,081 / 1,073 plus 4: E-8's line and box for a first
+  // season and E-9's line in the story before the rule, beside main's next
+  // week's notice in the same line.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 2_081, maxGzip: 1_077 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -433,7 +451,9 @@ function checkBudget(file, budget) {
 // files in the list, measured 8,928 / 3,227 plus 4.
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
-const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
+// 8,962 / 3,248 -> 8,997 / 3,258 for ops-measure (2026-10-23), measured
+// 8,997 / 3,254 plus 4: one more file, sceneChoices (E-6).
+const WORKER_BUDGET = { maxBytes: 8_997, maxGzip: 3_258 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

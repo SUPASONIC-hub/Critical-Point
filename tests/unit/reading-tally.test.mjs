@@ -90,7 +90,7 @@ test("the case row carries the tally in dynamics, the stage and the reveal add t
   assert.match(commit, /dynamics: \{ \.\.\.createRunSummary\(nextRun\), responseTimeSec, \.\.\.reading \}/);
   assert.match(commit, /const reading = takeReadingTally\(\);/);
   assert.match(read("src/gauntlet/GauntletStage.jsx"), /noteBriefing\(\{ caseId: scene\.node\.caseId, byClock, \.\.\.readingRef\.current \}\)/);
-  assert.match(read("src/gauntlet/SceneBriefing.jsx"), /if \(heldRef\.current\) readingRef\.current\?\.\(0, true\);/);
+  assert.match(read("src/gauntlet/SceneBriefing.jsx"), /readingRef\.current\?\.\(step, heldRef\.current\);/);
   assert.match(read("src/components/DecisionReveal.jsx"), /if \(detailsOpen\) noteRevealDetails\(\);/);
   assert.match(read("src/state/runLifecycle.js"), /clearReadingTally\(\);/);
 
