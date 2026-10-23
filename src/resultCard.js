@@ -100,7 +100,7 @@ export function drawResultCard(ctx, model, theme) {
 
   // 1. The strip: whose record this is, over a hairline in the accent.
   write(RESULT_CARD_LABELS.game, LEFT, 112, { weight: HEAVY, size: 28, color: theme.dim, maxWidth: CONTENT_WIDTH / 2 });
-  write(RESULT_CARD_LABELS.season, RIGHT, 112, { size: 28, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 - 20 });
+  write(model.season, RIGHT, 112, { size: 28, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 - 20 });
   ctx.fillStyle = accent;
   ctx.fillRect(LEFT, 140, CONTENT_WIDTH, 2);
 

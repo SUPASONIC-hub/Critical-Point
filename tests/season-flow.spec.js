@@ -5,7 +5,8 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodes, seasonCasesBase } from "../src/
 import { ENDING_GATES } from "../src/gameConstants.js";
 import { SEASON_STANDING_NEAR } from "../src/seasonStanding.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
-import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, SEASON_RECORD_KEY } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, SEASON_RECORD_KEY } from "../src/appConfig.js";
+import { encodeSeen, SEEN_SCENES_KEY } from "../src/state/seenScenes.js";
 import { createCaseSummary } from "../src/gameLogic.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels, easyResourceLabels } from "../src/playerLanguage.js";
@@ -465,6 +466,79 @@ test("NEW GAME+ names the last season on the intro and opens the next one on its
   await expect
     .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")))?.echo, { timeout: TRANSITION_TIMEOUT_MS })
     .toMatch(/^지난 시즌의 기록은 봉인되었지만/);
+});
+
+/**
+ * E-1 = B-14(3), 읽은 장면 접기 (state/seenScenes.js): a finale leaves on the
+ * device the scenes its season read, and a NEW GAME+ season folds the body of
+ * one read before and marks one never read `NEW`. Seeded as the record a
+ * finished season would have written, beside that season.
+ */
+const FIRST_SCENE = CASE_START_NODES[CASE_SEQUENCE[0]];
+
+async function seedSeenScenes(page, sceneIds, settings = null) {
+  const record = { v: 1, runId: "e2e-first-season", scenes: encodeSeen(new Set(sceneIds)), before: {} };
+  await page.addInitScript(
+    ({ seenKey, seen, settingsKey, settingsText }) => {
+      if (sessionStorage.getItem("e2e-seen-seeded")) return;
+      sessionStorage.setItem("e2e-seen-seeded", "1");
+      localStorage.setItem(seenKey, seen);
+      if (settingsText) localStorage.setItem(settingsKey, settingsText);
+    },
+    { seenKey: SEEN_SCENES_KEY, seen: JSON.stringify(record), settingsKey: ACCESSIBILITY_SETTINGS_KEY, settingsText: settings ? JSON.stringify(settings) : null },
+  );
+}
+
+async function startNewGamePlus(page) {
+  await acceptConfirms(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "NEW GAME+ 시작" }).click();
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  return briefing;
+}
+
+test("E-1: a NEW GAME+ season folds a scene the season before read, and 펼치기 opens it", async ({ page }) => {
+  await seedFinishedSeason(page);
+  await seedSeenScenes(page, [FIRST_SCENE]);
+  const briefing = await startNewGamePlus(page);
+  const story = briefing.locator(".gx-panel-story");
+  const unfold = briefing.getByTestId("scene-unfold");
+  await expect(unfold).toBeVisible();
+  await expect(unfold).toHaveText("지난 시즌에 읽은 장면 · 펼치기");
+  // The body is folded; the question and the cards stay.
+  await expect(story.locator(".gx-caption")).toHaveCount(0);
+  await expect(briefing.getByTestId("open-table")).toBeVisible();
+  // A scene read before is not new.
+  await expect(briefing.getByTestId("scene-new")).toHaveCount(0);
+
+  await unfold.click();
+  await expect(unfold).toHaveCount(0);
+  await expect(story.locator(".gx-caption").first()).toBeVisible();
+});
+
+test("E-1: a NEW GAME+ season marks a scene no season before read NEW, and does not fold it", async ({ page }) => {
+  // The season before read a scene, just not this one.
+  const other = Object.keys(nodes).find((id) => id !== FIRST_SCENE && nodes[id]?.caseId === CASE_SEQUENCE[0]);
+  expect(other).toBeTruthy();
+  await seedFinishedSeason(page);
+  await seedSeenScenes(page, [other]);
+  const briefing = await startNewGamePlus(page);
+  const mark = briefing.getByTestId("scene-new");
+  await expect(mark).toBeVisible();
+  await expect(mark).toHaveText("· NEW");
+  await expect(briefing.locator(".gx-comic-kicker")).toContainText("· NEW");
+  await expect(briefing.getByTestId("scene-unfold")).toHaveCount(0);
+  await expect(briefing.locator(".gx-panel-story .gx-caption").first()).toBeVisible();
+});
+
+test("E-1: with 읽은 장면 접기 turned off, a scene the season before read opens whole", async ({ page }) => {
+  await seedFinishedSeason(page);
+  await seedSeenScenes(page, [FIRST_SCENE], { foldReadScenes: false });
+  const briefing = await startNewGamePlus(page);
+  await expect(briefing.locator(".gx-panel-story .gx-caption").first()).toBeVisible();
+  await expect(briefing.getByTestId("scene-unfold")).toHaveCount(0);
+  await expect(briefing.getByTestId("scene-new")).toHaveCount(0);
 });
 
 test("a second season's finale sets its ending beside the season before, and says the table's rules changed", async ({ page }) => {

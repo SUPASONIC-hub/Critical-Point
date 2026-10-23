@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, readNewGamePlusMemory, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY } from "./newGamePlusCarry.js";
 import { readSeasonRecord } from "./seasonRecord.js";
+import { createSecondSeason } from "./secondSeason.js";
+import { pastSeenScenes, readSeenRecord, storeSeenScenes } from "./seenScenes.js";
 
 /**
  * What a finished season leaves for the next one: whether NEW GAME+ is open,
@@ -49,7 +51,22 @@ export function readSeasonCarry() {
   return getSeasonCarry(readStoredValue(SEASON_RECORD_KEY, null), readNewGamePlusMemory());
 }
 
-export function useNewGamePlus(saved, runId = null) {
+/**
+ * Counts a finished season's scenes as read (seenScenes.js, E-1): the season
+ * as the finale closed it and the finale's `log`, the whole season's. Returns
+ * the record as it now stands, or null when there is no closed finale or log.
+ */
+export function storeSeasonScenes(finishedSeason, { log = null } = {}) {
+  const final = seasonToRemember(finishedSeason)?.final;
+  return final && Array.isArray(log) ? storeSeenScenes({ runId: final.runId ?? null, log }) : null;
+}
+
+/** What a run folds: for a NEW GAME+ run, the scenes the seasons before it read; otherwise null. */
+export function seenBefore(seenRecord, runId, veteran) {
+  return veteran === true ? pastSeenScenes(seenRecord, runId) : null;
+}
+
+export function useNewGamePlus(saved, runId = null, veteran = false) {
   const [unlocked, setUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
@@ -57,6 +74,14 @@ export function useNewGamePlus(saved, runId = null) {
   // The season record as this tab last wrote or read it: the intro's memory
   // panel and continue card, and the finale's comparison line, read it.
   const [seasonRecord, setSeasonRecord] = useState(readSeasonRecord);
+  // What the second season shows of the one before it (secondSeason.js):
+  // the season number, and for a NEW GAME+ run the last season's cases and ruling.
+  // The scenes the seasons before read (seenScenes.js, E-1), which a NEW GAME+ run folds.
+  const [seenRecord, setSeenRecord] = useState(readSeenRecord);
+  const secondSeason = useMemo(
+    () => createSecondSeason({ record: seasonRecord, memory, runId, veteran, seen: seenBefore(seenRecord, runId, veteran) }),
+    [seasonRecord, memory, runId, veteran, seenRecord],
+  );
 
   function rememberSeason(caseResults) {
     const season = storeSeasonMemory(caseResults);
@@ -73,13 +98,16 @@ export function useNewGamePlus(saved, runId = null) {
    *
    * The finale's close also counts the season into the record
    * (`storeSeasonRecord`); `finale` carries its verdict choice. Pressing NEW
-   * GAME+ calls this with nothing, which counts nothing.
+   * GAME+ calls this with nothing, which counts nothing. `finale.log` is the
+   * season's log, whose scenes are counted as read (`storeSeenScenes`).
    */
   function unlock(finishedSeason = null, finale = {}) {
     setUnlocked(true);
     writeStoredValue(NEW_GAME_PLUS_KEY, "true");
     rememberSeason(finishedSeason);
     if (finishedSeason) setSeasonRecord(storeSeasonRecord(finishedSeason, finale));
+    const seen = storeSeasonScenes(finishedSeason, finale);
+    if (seen) setSeenRecord(seen);
   }
 
   // `readSeasonCarry` and the comparison line are handed out with the rest, so
@@ -93,5 +121,6 @@ export function useNewGamePlus(saved, runId = null) {
     readSeasonCarry,
     seasonRecord,
     seasonComparison: getSeasonComparison(seasonRecord, runId),
+    secondSeason,
   };
 }

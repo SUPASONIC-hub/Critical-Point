@@ -131,11 +131,11 @@ export function useChoiceCommit(context) {
   function recordClosedCase({ caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec }) {
     const {
       currentCase, runId, sessionId, sessionCode, playerName, activeCaseMeta, dataConsent, caseResults,
-      appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
+      appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal, seasonTitle,
     } = context;
     // The season as it stands with its finale closed: what NEW GAME+ remembers.
     // With the answer to its last question, which the season record counts the ruling by.
-    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null });
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary }, { finalChoiceId: findFinalChoiceEntry(nextLog)?.choiceId ?? null, log: nextLog });
     // Taken whether or not the row is sent, so the next case starts its own count.
     const reading = takeReadingTally();
     const rowSummary = toRowSummary(caseSummary);
@@ -202,6 +202,7 @@ export function useChoiceCommit(context) {
     if (currentCase !== "final" || nextCompletedCases.length !== CASE_SEQUENCE.length) return;
     const seasonTelemetryPayload = createSeasonTelemetryPayload({
       caseSummary: rowSummary,
+      title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       cognition: nextCognition,
       decisionLog: nextLog,
@@ -213,6 +214,7 @@ export function useChoiceCommit(context) {
     });
     const { saved: seasonRankingSaved } = appendLocalRankingRow(createSeasonLeaderboardRow({
       caseSummary,
+      title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       playerName,
       runId,
@@ -242,7 +244,7 @@ export function useChoiceCommit(context) {
       queueTelemetry({
         id: `season-final-${runId}`,
         type: "case",
-        label: "SEASON 01 COMPLETE",
+        label: seasonTelemetryPayload.case_title,
         payload: seasonTelemetryPayload,
       });
     }

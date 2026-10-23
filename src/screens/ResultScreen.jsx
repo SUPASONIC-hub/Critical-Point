@@ -115,7 +115,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults }}
+            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, season: view.seasonCard.season, share: view.seasonCard.share }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -211,7 +211,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </div>
             <div>
               <h2>{caseOutcome.title}</h2>
-              <p>{caseOutcome.text}</p>
+              <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}
               <p className={`season-standing ${view.seasonStanding.level}`} data-testid="season-standing"><b>{view.seasonStanding.mark} {view.seasonStanding.label}</b> {view.seasonStanding.text}</p>
             </div>
           </section>

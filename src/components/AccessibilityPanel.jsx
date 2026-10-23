@@ -14,6 +14,11 @@ const TOGGLES = [
     text: "장면 설명이 저절로 넘어가지 않습니다. 다 읽고 직접 테이블을 엽니다.",
   },
   {
+    key: "foldReadScenes",
+    label: "읽은 장면 접기",
+    text: "NEW GAME+ 시즌에 지난 시즌에 읽은 장면의 본문을 접습니다. 질문은 그대로 보입니다.",
+  },
+  {
     key: "calmEffects",
     label: "번쩍임·흔들림 줄이기",
     text: "붉은 가장자리, 판정 섬광, 화면 흔들림을 약하게 합니다.",

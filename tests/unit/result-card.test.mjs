@@ -420,7 +420,7 @@ test("the card's modules never mention a field that says who played", () => {
   }
 });
 
-test("the report screen hands the card four things, and the ending passes them on untouched", () => {
+test("the report screen hands the card four things and the season's two strings, and the ending passes them on untouched", () => {
   // These two files do say who played -- the report's header prints it, the
   // ending holds the message left behind -- so they cannot be in the list
   // above. What is held is the one line in each that the card goes through.
@@ -432,7 +432,8 @@ test("the report screen hands the card four things, and the ending passes them o
   assert.ok(literal, `an object written out where it is handed over, not a view: ${handed[0].trim()}`);
   assert.deepEqual(
     literal.split(", ").map((field) => field.split(":")[0]),
-    ["fingerprint", "endingVariant", "endingName", "caseResults"],
+    // E-5: the season's number and the shared line's tail (secondSeason.getSeasonCard), which say nothing of who played.
+    ["fingerprint", "endingVariant", "endingName", "caseResults", "season", "share"],
   );
   assert.doesNotMatch(literal, pattern);
   assert.doesNotMatch(literal, /\.\.\./, "nothing is spread into it");
@@ -441,13 +442,13 @@ test("the report screen hands the card four things, and the ending passes them o
   // phrase, nothing that says who played.
   assert.deepEqual(
     literal.match(/\bview\b[\w?.]*/g),
-    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults"],
-    "of the view, only these three",
+    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults", "view.seasonCard.season", "view.seasonCard.share"],
+    "of the view, only these five",
   );
 
   const ending = readFileSync(new URL("../../src/components/EndingSequence.jsx", import.meta.url), "utf8");
   const uses = ending.split("\n").map((line) => line.trim()).filter((line) => /(^|[^-\w])card\b/.test(line) && !line.startsWith("//") && !line.startsWith("*"));
-  assert.deepEqual(uses, ["card,", "{cardChunk && <cardChunk.default card={card} />}"]);
+  assert.deepEqual(uses, ["card,", "<span lang=\"en\">{card.season}</span>", "{cardChunk && <cardChunk.default card={card} />}"]);
 });
 
 // ------------------------------------------------------------------ drawing

@@ -190,7 +190,7 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   const start = panel.indexOf("const TOGGLES = [");
   const list = panel.slice(start, panel.indexOf("\n];", start));
   const keys = [...list.matchAll(/key: "(\w+)"/g)].map((match) => match[1]);
-  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
+  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
   for (const key of keys) assert.equal(typeof settings.DEFAULT_ACCESSIBILITY[key], "boolean", `${key} is a switch`);
   assert.match(list, /label: "스토리 모드"/);
   // What the switch says it does, each clause being something the engine does

@@ -80,6 +80,8 @@ function readSeasonLeague(finalSummary) {
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
  * @param {number} [input.logicHold] The season's 논리 유지력, 0 to 100, as `getSeasonLogic` reads it off those summaries.
  * @param {string} [input.host] The site's host, printed at the foot of the card.
+ * @param {string} [input.season] The card's corner, 「SEASON 02 · FINAL RECORD」 (secondSeason.getSeasonCard).
+ * @param {string} [input.share] What follows the shared line: the season's number, the ending before and the week's rule.
  */
 export function buildResultCardModel(input = {}) {
   const { fingerprint, endingVariant, endingName, caseResults, logicHold, host } = input ?? {};
@@ -107,6 +109,9 @@ export function buildResultCardModel(input = {}) {
     // A season with any case played in story mode says so on the card.
     story: summaries.some((summary) => Boolean(summary.assistStory)),
     host: toText(host),
+    // E-5: the season's number and the shared line's tail, made on the result side (secondSeason.getSeasonCard).
+    season: input?.season || RESULT_CARD_LABELS.season,
+    share: input?.share || "",
   };
 }
 
@@ -119,7 +124,7 @@ export function buildShareText(model, origin = "") {
   const address = toText(origin).replace(/\/+$/, "");
   const line =
     `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${card.modeTitle}', 결말은 '${card.endingName}'. ` +
-    `최고 버스트 ${card.bestBurst}${RESULT_CARD_LABELS.points}, ${card.bestRank} 랭크.`;
+    `최고 버스트 ${card.bestBurst}${RESULT_CARD_LABELS.points}, ${card.bestRank} 랭크.${card.share}`;
   return address ? `${line} ${address}/` : line;
 }
 

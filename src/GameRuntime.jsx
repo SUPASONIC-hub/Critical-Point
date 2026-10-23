@@ -132,7 +132,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = setters;
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const relicTable = useRelicTable();
-  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry, seasonRecord, seasonComparison } = useNewGamePlus(saved, runId);
+  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason, readSeasonCarry, seasonRecord, seasonComparison, secondSeason } = useNewGamePlus(
+    saved, runId, gauntletRun?.veteran === true,
+  );
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus(currentCase);
   const [saveStatus, setSaveStatus] = useState("");
@@ -224,13 +226,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       caseResults.final && completedCases.includes("final")
         ? seasonViewModels.createSeasonLeaderboardRow({
             caseSummary: caseResults.final,
+            title: secondSeason.rowTitle,
             completedCaseCount: completedCases.length,
             playerName,
             runId,
             sessionCode,
           })
         : null,
-    [caseResults.final, completedCases, playerName, runId, sessionCode],
+    [caseResults.final, completedCases, playerName, runId, sessionCode, secondSeason.rowTitle],
   );
   const {
     achievementProgress,
@@ -285,6 +288,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     gauntletRun,
     runId,
     echo: run.echo,
+    secondSeason,
+    nodeId: resolvedNodeId,
     seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
     debugTools: debugToolsEnabled,
   });
@@ -449,6 +454,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     playerName, activeCaseMeta, dataConsent, staleSave, clueCount, casesOpened,
     readers: choiceReaders, applyRun, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
     onSeasonFinal: unlockNewGamePlus,
+    seasonTitle: secondSeason.rowTitle,
   });
   const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
@@ -790,6 +796,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
     riskTier,
     runId,
+    secondSeason,
+    weekRule: gauntletRun?.weekRule,
     tabScreen: !started ? "intro" : isResult ? "result" : "play",
     triggers,
   });

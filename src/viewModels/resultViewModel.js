@@ -130,6 +130,7 @@ export function createResultViewModel(report, {
     resultRank,
     routeTimeline,
     scoreBreakdown,
+    seasonCard,
     telemetryDashboard,
     telemetryStats,
   } = report;
@@ -170,6 +171,7 @@ export function createResultViewModel(report, {
     aftermath,
     operatorReveal,
     seasonComparison,
+    seasonCard,
 
     result,
     caseOutcome,

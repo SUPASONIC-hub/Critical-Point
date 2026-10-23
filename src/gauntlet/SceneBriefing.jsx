@@ -6,7 +6,7 @@ import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
 import { getBriefingIntro, getBriefingWeekRuleId } from "./tableStaging.js";
-import { useWeekRulePanel } from "./WeekRulePanel.jsx";
+import { useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
@@ -151,15 +151,20 @@ export function SceneBriefing({
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
-  // clock; above it, on a NEW GAME+ season's first page, the line the season
-  // carried (`echo`, newGamePlusCarry.js). Both are drawn by WeekRulePanel.jsx.
+  // clock; above it, on a NEW GAME+ season's first page of a case, what the
+  // season before left there (`echo`, an object of two lines: secondSeason.js).
+  // All are drawn by WeekRulePanel.jsx.
   const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run), echo);
+  // E-1: on a NEW GAME+ season, the scene as the page tells it (`told`: a
+  // scene a season before read, folded), the button that unfolds it and the
+  // NEW mark of one none read. Also WeekRulePanel.jsx's, for the same reason.
+  const [told, unfold, newMark] = useSceneFold(node, echo);
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
   // same way. `mutations` is exactly the two lists printed below.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
-    [node, question, mutations, intro, weekRules],
+    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules]),
+    [told, question, mutations, intro, weekRules],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits,
@@ -248,7 +253,10 @@ export function SceneBriefing({
         onKeyDown={trapTab}
       >
         <header className="gx-comic-top">
-          <p className="gx-comic-kicker" lang="en">{node.phase}</p>
+          <p className="gx-comic-kicker" lang="en">
+            {node.phase}
+            {newMark}
+          </p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
           <button
             type="button"
@@ -300,15 +308,16 @@ export function SceneBriefing({
           </figure>
 
           <div className="gx-panel gx-panel-story">
-            {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
-            <ProseCaptions text={node.text} />
+            {unfold}
+            {told.lead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
+            <ProseCaptions text={told.text} />
           </div>
 
-          {(node.memo?.length > 0 || trace) && (
+          {(told.memo?.length > 0 || trace) && (
             <div className="gx-panel gx-panel-file">
               <p className="gx-file-tab">사건 파일</p>
               <ul>
-                <ProseItems items={node.memo} />
+                <ProseItems items={told.memo} />
                 {trace && <li data-testid="scene-trace">{trace}</li>}
               </ul>
             </div>

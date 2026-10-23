@@ -95,7 +95,26 @@ const budgets = [
   // -> 171,964 / 62,152 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
   // #262 #241 #251 #256 on main 5adcbb5): measured 171,964 / 62,148 in the
   // e2e build, the gzip plus 4; the four additions above, together.
-  { pattern: /^index-.*\.js$/, maxBytes: 171_964, maxGzip: 62_152 },
+  // [batch-c] second-season (#261) on 묶음 A:
+  // -> 170,445 / 61,624 (second-season, draft, rebased on that NEW GAME+):
+  // the runtime now reads the season number (appConfig.getSeasonRound) for the
+  // second season's lines and card, and the entry exports it under one more
+  // name; the +9 / +8 it took over the old NEW GAME+, carried over.
+  // -> 170,478 / 61,630 the same day: E-5, the season's row title handed to
+  // seasonViewModels (`title`) instead of the fixed SEASON 01 COMPLETE, from
+  // the runtime's secondSeason.rowTitle. Both measured together on 2026-10-23
+  // in the e2e build: 170,478 / 61,626, the gzip plus 4.
+  // -> 170,684 / 61,701 the same day (second-season, draft), measured
+  // 170,684 / 61,697 plus 4: E-1, the comfort panel's switch 읽은 장면 접기
+  // (AccessibilityPanel.jsx) and its setting (accessibilitySettings.js), both
+  // the shell's. The switch's sentence was cut to one line first.
+  // -> 170,684 / 61,709 the same day, measured 170,684 / 61,705 plus 4: the
+  // second season's lines as the user settled them (문구 질문 1~20, all (1)),
+  // the same bytes in other words; the shared tail names the season before's
+  // ending through getEndingPreview, which the result side already imported.
+  // -> 172,181 / 62,223 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
+  // measured 172,181 / 62,219 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_181, maxGzip: 62_223 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -184,7 +203,13 @@ const budgets = [
   // -> 105,284 / 35,047 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
   // #241 #256 together on main 5adcbb5): measured 105,284 / 35,043 in the e2e
   // build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_284, maxGzip: 35_047 },
+  // [batch-c] second-season (#261) on 묶음 A:
+  // -> 104,825 / 34,884 the same day (second-season, draft), measured
+  // 104,825 / 34,880 plus 4: E-1, the briefing prints and times the scene as
+  // told (`told`, `unfold`, `newMark`); the fold itself is WeekRulePanel's.
+  // -> 105,341 / 35,085 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
+  // measured 105,341 / 35,081 in the e2e build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_341, maxGzip: 35_085 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -217,7 +242,9 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
+  // 35,363 -> 35,386 gzip on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on
+  // 묶음 A, critical CSS and font subset rebuilt): measured 35,382, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_386 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -299,7 +326,13 @@ const budgets = [
   // measured 8,745 / 4,257 plus 4: one more import, the replay trail's chunk.
   // 8,745 / 4,261 -> 8,780 / 4,280 for ops-measure (2026-10-23), measured
   // 8,780 / 4,276 plus 4: one more import, sceneChoices (E-6); its code did not change.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_780, maxGzip: 4_280 },
+  // [batch-c] second-season (#261) on 묶음 A:
+  // 8,745 / 4,261 -> 8,801 / 4,287 on 2026-10-23 (second-season, draft),
+  // measured 8,801 / 4,283 plus 4: E-5, the card's corner and the shared
+  // line's tail are strings the result side hands in (secondSeason.getSeasonCard).
+  // -> 8,836 / 4,310 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
+  // measured 8,836 / 4,306 in the e2e build, the gzip plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_836, maxGzip: 4_310 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -394,7 +427,17 @@ const budgets = [
   // -> 1,378 / 695 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: the NEW GAME+
   // panel (#220) and E-9's line (#256) together, measured 1,378 / 691, the
   // gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_378, maxGzip: 695 },
+  // [batch-c] second-season (#261) on 묶음 A:
+  // 1,271 / 648 -> 1,442 / 722 on 2026-10-22 (second-season, draft), measured
+  // 1,442 / 718 plus 4: a NEW GAME+ case's first page also carries the grey
+  // line on how the last season closed it (secondSeason.getCaseRecall).
+  // 1,442 / 722 -> 1,838 / 916 on 2026-10-23 (second-season, draft), measured
+  // 1,838 / 912 plus 4: E-1, a NEW GAME+ scene read the season before opens
+  // folded and one none read is marked NEW (useSceneFold), kept out of the
+  // PlayScreen chunk the same way.
+  // -> 1,954 / 977 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
+  // measured 1,954 / 973 in the e2e build, the gzip plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_954, maxGzip: 977 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -402,7 +445,9 @@ const budgets = [
   // 3,779 / 2,166 on 2026-10-22, when the two senders became nine acts' pairs
   // (B-15: eighteen senders, thirty-six lines) and the act is read off
   // CASE_SEQUENCE.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_779, maxGzip: 2_170 },
+  // -> 3,786 / 2,182 on 2026-10-23, 10-23 묶음 C 합친 상태 실측: measured
+  // 3,786 / 2,178 in the e2e build, the gzip plus 4 (its code did not change).
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_786, maxGzip: 2_182 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).

@@ -20,6 +20,8 @@ import { countAudit } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTraceEvents } from "./trace.js";
 import { getSeasonOpening } from "./newGamePlusCarry.js";
+import { getSeasonPage, isCaseFirstPage } from "./secondSeason.js";
+import { getSceneRead } from "./seenScenes.js";
 
 /**
  * A window already settled under this seed -- a rolled-back save brought it
@@ -40,12 +42,21 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, echo, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, gauntletRun, runId, echo, secondSeason = null, nodeId = null, seedBase, debugTools }) {
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   // It rides on the spine, which the play view already carries, so the view
   // takes no new field (check:runtime-budget).
-  const opening = getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo });
+  // On a NEW GAME+ season, a case's first page also carries what the season
+  // before left on it (secondSeason.js): an object of two lines, or null.
+  const seasonLine = getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo });
+  const firstPage = useMemo(() => isCaseFirstPage(log, currentCase), [log, currentCase]);
+  // And on every page of one, whether a season before read the scene (E-1).
+  const read = getSceneRead(secondSeason?.seen, nodeId);
+  const opening = useMemo(
+    () => getSeasonPage({ secondSeason, currentCase, firstPage, opening: seasonLine, read }),
+    [secondSeason, currentCase, firstPage, seasonLine, read],
+  );
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
     return {

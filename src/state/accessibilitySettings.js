@@ -28,6 +28,11 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *   edgeNotices      the office's noise at the table's edge (EdgeNotice.jsx,
  *                    개선 포인트 A5): a message and a mail as a hand is pushed
  *                    on. On unless turned off; it never covers a number.
+ *   foldReadScenes   읽은 장면 접기 (on unless turned off): on a NEW GAME+
+ *                    season, a scene a season before read opens with its body
+ *                    folded under 「지난 시즌에 읽은 장면 · 펼치기」
+ *                    (SceneBriefing.jsx, state/seenScenes.js), read when the
+ *                    briefing page opens.
  *   storyMode        스토리 모드: the table steps back so the story can be read.
  *                    The wall stands far off, no decision breaks the next
  *                    board, the table clock runs at least twice as slow and a
@@ -49,13 +54,14 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   stillIntro: false,
   storyMode: false,
   edgeNotices: true,
+  foldReadScenes: true,
 });
 
 export function normalizeAccessibility(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
-  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices"]) {
+  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices", "foldReadScenes"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);
