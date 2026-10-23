@@ -743,9 +743,9 @@ function checkBudget(file, budget) {
 // [batch-c] 묶음 B (#277):
 // 9,099 / 3,309 on 2026-10-23, batch B on batch A, measured 9,099 / 3,305
 // plus 4: CaseCast and batch A's three files all in the list.
-// -> 9,133 / 3,323 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측:
-// measured 9,133 / 3,319, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 9_133, maxGzip: 3_323 };
+// -> 9,133 / 3,328 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측:
+// measured 9,133 / 3,319 and, after the CI fixes, 3,324; the larger gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 9_133, maxGzip: 3_328 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
