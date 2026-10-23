@@ -32,11 +32,17 @@ test("those who speak in more cases come first", () => {
 });
 
 test("the cast is a chunk of its own, fetched when the table's case file opens", () => {
+  const fold = readFileSync(new globalThis.URL("../../src/gauntlet/CaseCastFold.jsx", import.meta.url), "utf8");
+  assert.match(fold, /if \(!CaseCast\) import\("\.\/CaseCast\.jsx"\)/);
+  assert.doesNotMatch(fold, /^import .*CaseCast\.jsx/m, "never a static import: that would write it into the runtime's chunk");
+  // The fold is the runtime's (the spine), so the table's chunk carries neither the import nor its preload list.
+  const readout = readFileSync(new globalThis.URL("../../src/state/useRunReadout.js", import.meta.url), "utf8");
+  assert.match(readout, /caseCast: caseCastFor\(log\)/);
   const briefing = readFileSync(new globalThis.URL("../../src/gauntlet/SceneBriefing.jsx", import.meta.url), "utf8");
-  assert.match(briefing, /if \(open && !cast\) import\("\.\/CaseCast\.jsx"\)/);
-  assert.doesNotMatch(briefing, /^import .*CaseCast/m, "never a static import: that would write it into the table's chunk");
+  assert.doesNotMatch(briefing, /import\(|^import .*CaseCast/m);
+  assert.match(briefing, /\{open && caseCast\?\.\(node, SpeakerPortrait\)\}/);
   const stage = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
-  assert.match(stage, /<CaseFileStory [^>]*trail=\{scene\.trail\}/);
+  assert.match(stage, /<CaseFileStory [^>]*caseCast=\{scene\.caseCast\}/);
   const budgets = readFileSync(new globalThis.URL("../../scripts/check-bundle-size.mjs", import.meta.url), "utf8");
   assert.match(budgets, /pattern: \/\^CaseCast-/);
 });

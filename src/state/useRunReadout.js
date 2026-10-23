@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { readSettledWindowSeeds } from "../appConfig.js";
 import { caseObjectives, getCaseBranchNodes, nodes, triggerLabels } from "../gameData.js";
@@ -21,6 +21,8 @@ import { countAudit } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTraceEvents } from "./trace.js";
 import { getSceneBridge } from "../viewModels/sceneBridge.js";
+import { caseCastFor } from "../gauntlet/CaseCastFold.jsx";
+import { warmCasePortraits } from "../speakerPortraits.js";
 
 /**
  * A window already settled under this seed -- a rolled-back save brought it
@@ -48,8 +50,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
-    // `bridge` (D-7) and `trail`, the case's log, ride on the spine to the
-    // briefing and the table's case file: the play view has no field to spare.
+    // `bridge` (D-7) and `caseCast` (D-8), the case file's cast drawn from
+    // the case's log, ride on the spine to the briefing and the table's case
+    // file: the play view has no field to spare.
     return {
       ...buildNarrativeSpine({
         caseObjective: caseObjectives[currentCase],
@@ -60,7 +63,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
         suspenseState,
       }),
       bridge: getSceneBridge({ log, caseResults, currentCase }),
-      trail: log,
+      caseCast: caseCastFor(log),
     };
   }, [caseResults, currentCase, log, node, riskPressure, riskTier]);
   const logReadout = useMemo(() => {
@@ -97,6 +100,13 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const caseClue = caseScoped ? getDiscoveryClue({ currentCase, challengeMatch: true, riskDelta: 2, logLength: 1 }) : null;
   const caseClueShut = caseClue && !discoveredClues.some((found) => (found?.id ?? found) === caseClue.id) ? 1 : 0;
   const gauntletSeed = useMemo(() => (seedBase ? dealGauntletSeed(seedBase) : null), [seedBase]);
+  // Every face of the case, fetched as its first scene opens (D-14): only
+  // with a scene on the table (`seedBase`), not on the intro, where they would
+  // race the first paint. Here rather than in the briefing (SceneBriefing.jsx),
+  // whose table chunk had no room for it, nor in GameRuntime, which has no
+  // effect to spare (check:runtime-budget).
+  const warmCaseId = seedBase ? node?.caseId : null;
+  useEffect(() => warmCasePortraits(warmCaseId), [warmCaseId]);
   // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
   const auditCount = useMemo(() => countAudit(log), [log]);
   // B2's links off the case's log (cascadeRisk.js): null on a table without them.

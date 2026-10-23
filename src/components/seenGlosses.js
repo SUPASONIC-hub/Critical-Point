@@ -1,4 +1,4 @@
-import { readStoredValue, SEEN_GLOSSES_KEY, writeStoredValue } from "../appConfig.js";
+import { readStoredValue, writeStoredValue } from "../appConfig.js";
 
 /**
  * The glossed words this save has already shown with their explanation
@@ -11,6 +11,11 @@ import { readStoredValue, SEEN_GLOSSES_KEY, writeStoredValue } from "../appConfi
  * 초기화 (runStorageReset.js).
  */
 const LIMIT = 400;
+
+// Its storage key lives here and not in appConfig.js beside the others: the
+// shell's chunk carries appConfig, and only the runtime reads this one
+// (scripts/check-bundle-size.mjs, 2026-10-23). 초기화 clears it (runStorageReset.js).
+export const SEEN_GLOSSES_KEY = "critical-point-seen-glosses-v1";
 
 export function readSeenGlosses() {
   try {

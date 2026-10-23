@@ -632,7 +632,7 @@ export function GauntletStage({
               {/* The six numbers and the clue count a locked card states its condition in; the HUD prints none of them. */}
               {/* The standing, the room, the story and its facts: CaseFileStory
                   in SceneBriefing.jsx, which says why each is here. */}
-              <CaseFileStory node={scene.node} nodeId={scene.nodeId} open={briefOpen} standing={[resources, resourceMeta, clueCount]} trail={scene.trail} />
+              <CaseFileStory node={scene.node} nodeId={scene.nodeId} open={briefOpen} standing={[resources, resourceMeta, clueCount]} caseCast={scene.caseCast} />
               <ul>
                 {scene.challenge && <li data-testid="brief-challenge">이 장면의 챌린지: {scene.challenge}.</li>}
                 <li>현재 판돈: {formatNumber(run.runPot)}. 벽에 닿으면 금고 밖 판돈은 사라진다.</li>

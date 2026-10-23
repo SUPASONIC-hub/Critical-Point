@@ -14,7 +14,6 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { Prose, ProseCaptions, ProseItems } from "../components/Prose.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
-import { warmCasePortraits } from "../speakerPortraits.js";
 import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
 import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
@@ -101,16 +100,11 @@ function RuleRows({ rules, resourceMeta }) {
  * written and none of them ever reached the DOM, so the briefing explained the
  * table and never the situation the cards are answering.
  *
- * Then the case so far and who is in it (`trail` is the case's log; D-8):
- * CaseCast, a chunk fetched the first time the fold opens. A fetch that fails
- * -- offline before it was ever kept -- leaves the fold as it was.
+ * Then the case so far and who is in it (D-8): `caseCast`, from the runtime
+ * (CaseCastFold.jsx), which fetches CaseCast, a chunk of its own, the first
+ * time the fold opens.
  */
-export function CaseFileStory({ node, nodeId, open, standing, trail }) {
-  const [cast, setCast] = useState(null);
-  useEffect(() => {
-    if (open && !cast) import("./CaseCast.jsx").then((module) => setCast(() => module.CaseCast), () => {});
-  }, [open, cast]);
-  const CaseCast = open ? cast : null;
+export function CaseFileStory({ node, nodeId, open, standing, caseCast }) {
   return (
     <>
       <p data-testid="brief-standing">{describeStanding(...standing)}</p>
@@ -128,7 +122,7 @@ export function CaseFileStory({ node, nodeId, open, standing, trail }) {
           <ProseItems items={node.memo} />
         </ul>
       )}
-      {CaseCast && <CaseCast node={node} trail={trail} />}
+      {open && caseCast?.(node, SpeakerPortrait)}
     </>
   );
 }
@@ -178,10 +172,6 @@ export function SceneBriefing({
   useEffect(() => {
     onOpenRef.current = onOpen;
   });
-
-  // Every face of the case, fetched as its first page opens (D-14): not on
-  // the intro, where they would race the first paint.
-  useEffect(() => warmCasePortraits(node.caseId), [node.caseId]);
 
   useEffect(() => {
     let frame = 0;

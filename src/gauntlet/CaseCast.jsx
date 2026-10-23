@@ -1,4 +1,3 @@
-import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { getCaseCast } from "./caseCastModel.js";
 
 /**
@@ -15,10 +14,13 @@ import { getCaseCast } from "./caseCastModel.js";
  * is open.
  *
  * A chunk of its own, fetched when the case file is first opened
- * (SceneBriefing's CaseFileStory): the table's chunk had no room for it
- * (scripts/check-bundle-size.mjs).
+ * (CaseCastFold.jsx): the table's chunk had no room for it
+ * (scripts/check-bundle-size.mjs). The face is the table's own
+ * SpeakerPortrait, handed in as `Portrait`: imported here, it would be
+ * shared by this chunk and the table's with neither loading the other, and
+ * the build would split it into a file of its own.
  */
-export function CaseCast({ node, trail = [] }) {
+export function CaseCast({ node, trail = [], Portrait }) {
   return (
     <div className="gx-cast" data-testid="case-cast">
       {trail.length > 0 && (
@@ -44,7 +46,7 @@ export function CaseCast({ node, trail = [] }) {
           <li key={person.name}>
             <details open={person.speaking} data-testid="cast-card">
               <summary>
-                <SpeakerPortrait name={person.name} src={person.portrait} size={32} />
+                <Portrait name={person.name} src={person.portrait} size={32} />
                 {person.name}
               </summary>
               {person.role && <span>{person.role}</span>}

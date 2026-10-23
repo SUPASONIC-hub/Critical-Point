@@ -57,12 +57,16 @@ const budgets = [
   // audit's chunk in the preload list (26), the debug overlay's auditCount (13)
   // and one more dependency index (3). Folding the dev switch's leftovers
   // (an alias, a `&&!0`) by hand came out 2 bytes longer, so it stays.
-  // 169,980 / 61,300 -> 170,397 / 61,529 on 2026-10-22 (reading-layout,
-  // draft), measured 170,397 / 61,525 plus 4 in the e2e build: 이야기 글 크기
-  // (the setting, its attribute and factor), the seen-glosses key a reset
-  // clears, and the shell's share of the briefing's new reading. Not yet cut
-  // back: to be taken out before this merges after W44.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_397, maxGzip: 61_529 },
+  // 169,980 / 61,300 -> 170,343 / 61,512 on 2026-10-23 (reading-layout on
+  // main c08be0e), measured 170,343 / 61,508 plus 4 in the e2e build: 이야기
+  // 글 크기 (D-5), its row in the comfort panel and the setting with its
+  // attribute and factor, which <html> carries from the first paint. Cut back
+  // first: the seen-glosses key went to seenGlosses.js (the runtime's), 45
+  // bytes. The row as a chunk of its own (fetched as the panel drew) saved the
+  // shell 91 gzip bytes for a 519-byte file and a longer worker list, and was
+  // put back; one component for both rows of radios came out 44 gzip bytes
+  // longer than the two copies.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_343, maxGzip: 61_512 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -111,7 +115,15 @@ const budgets = [
   // #242 and #248) measured 34,807 in CI's e2e build and failed Verify, so
   // #254 did not deploy; each PR had passed on its own base. The gzip plus 4.
   // #249 builds the same chunk byte for byte.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_705, maxGzip: 34_811 },
+  // 104,705 / 34,811 -> 104,943 / 34,891 on 2026-10-23 (reading-layout on
+  // main c08be0e), measured 104,943 / 34,887 plus 4: the briefing's line
+  // from the scene before (D-7), the room's picture behind the phone's title
+  // (D-13) and the case file's cast on the spine (D-8). Cut back first from
+  // 105,749 / 35,229: the lazy import of the cast, with its preload list of
+  // sixteen files, and the warming of the case's portraits (D-14) moved to the
+  // runtime (CaseCastFold.jsx, useRunReadout.js), and the cast's import takes
+  // no preload list (vite.config.js).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_943, maxGzip: 34_891 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -306,10 +318,12 @@ const budgets = [
   { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
   // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
   // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
-  // time the table's case file opens (SceneBriefing's CaseFileStory), because
-  // the PlayScreen chunk had no room for it. Measured with the e2e build, the
-  // gzip plus the 4 bytes of hash noise.
-  { pattern: /^CaseCast-.*\.js$/, maxBytes: 2_120, maxGzip: 1_111 },
+  // time the table's case file opens (src/gauntlet/CaseCastFold.jsx, the
+  // runtime's), because the PlayScreen chunk had no room for it. Measured with
+  // the e2e build, the gzip plus the 4 bytes of hash noise: 2,120 / 1,111 on
+  // 2026-10-22, 1,983 / 1,042 on 2026-10-23 once the table handed it its
+  // SpeakerPortrait instead of the chunk importing it.
+  { pattern: /^CaseCast-.*\.js$/, maxBytes: 1_983, maxGzip: 1_042 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];

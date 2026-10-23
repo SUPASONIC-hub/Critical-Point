@@ -6,8 +6,7 @@ import { createStorage } from "./helpers/browser.mjs";
 
 globalThis.localStorage = createStorage();
 
-const { SEEN_GLOSSES_KEY } = await import("../../src/appConfig.js");
-const { markGlossesSeen, readSeenGlosses } = await import("../../src/components/seenGlosses.js");
+const { markGlossesSeen, readSeenGlosses, SEEN_GLOSSES_KEY } = await import("../../src/components/seenGlosses.js");
 const { RESET_STORAGE_KEYS } = await import("../../src/state/runStorageReset.js");
 const { markProse } = await import("../../src/components/proseMarks.js");
 const { GLOSSARY, STANDARD_GLOSS } = await import("../../scripts/plain-language-rules.mjs");

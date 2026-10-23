@@ -5,11 +5,11 @@ import {
   removeStoredValue,
   SAVE_BACKUP_STORAGE_KEY,
   SAVE_SLOT_STORAGE_KEY,
-  SEEN_GLOSSES_KEY,
   SESSION_ID_STORAGE_KEY,
   SETTLED_WINDOWS_STORAGE_KEY,
   STORAGE_KEY,
 } from "../appConfig.js";
+import { SEEN_GLOSSES_KEY } from "../components/seenGlosses.js";
 import { clearTraceEvents } from "./trace.js";
 import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
 
