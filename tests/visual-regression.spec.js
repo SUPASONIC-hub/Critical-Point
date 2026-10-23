@@ -446,7 +446,9 @@ async function openFirstBriefing(page, viewport) {
 }
 
 for (const viewport of BRIEFING_PHONES) {
-  test(`the first briefing fits a phone reading budget at ${viewport.name}`, { tag: "@prod" }, async ({ page }) => {
+  // Not @prod: the page is reached by the debug jump, which the release build
+  // does not carry (production-build.spec.js checks it is gone).
+  test(`the first briefing fits a phone reading budget at ${viewport.name}`, async ({ page }) => {
     const sheet = await openFirstBriefing(page, viewport);
     const height = await sheet.evaluate((element) => element.scrollHeight);
     expect(height, `${viewport.name}: the page is ${(height / viewport.height).toFixed(2)} screens`).toBeLessThanOrEqual(viewport.height * viewport.screens);
