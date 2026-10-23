@@ -259,7 +259,8 @@ test("the LOCK button's sub-line is the charge and the price, without the stance
   // stance in front the line was 94 to 112px and `nowrap`; without it, 57 to 70px.
   const stage = source("gauntlet/GauntletStage.jsx");
   const lock = stage.match(/data-testid="commit-focus"[\s\S]*?<\/button>/)?.[0] ?? "";
-  assert.match(lock, /<small>\{Math\.round\(win\.focus\)\} · −\{LOCK_PRESS_SECONDS\}초<\/small>/);
+  // At LOCK's cap the line is 상한 도달 alone (C-6, 2026-10-22), shorter than the charge and the price.
+  assert.match(lock, /<small>\{lockCapped \? "상한 도달" : <>\{Math\.round\(win\.focus\)\} · −\{LOCK_PRESS_SECONDS\}초<\/>\}<\/small>/);
   assert.match(stage, /data-testid="gauntlet-focus">[\s\S]*?<b[^>]*>\{focusBonus\.label\} \{Math\.round\(win\.focus\)\}<\/b>/, "the HUD's signal is where the stance is named");
   // What the arithmetic stands on: three columns, a 6px gap and 10px sides on a phone.
   const phone = sheet("play").match(/\n {2}\.gx-actions \{\s*grid-template-columns: 1fr 0\.78fr 1\.12fr;\s*gap: 6px;\s*padding-inline: 10px;\s*\}/);

@@ -134,6 +134,17 @@ const budgets = [
   // runtime (CaseCastFold.jsx, useRunReadout.js), and the cast's import takes
   // no preload list (vite.config.js).
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_943, maxGzip: 34_891 },
+  // 104,745 / 34,822 -> 105,832 / 35,227 on 2026-10-23 (table-readouts, #246,
+  // draft), measured 105,832 / 35,223 in the e2e build on main d486f4e with
+  // the branch, the gzip plus 4: 안전선까지 (C-5: its button, its S key and the
+  // press that sends the same PUSH events), the audit's band on the gauge
+  // (C-9, drawn as the wall band's box in green because no sheet had room for
+  // a rule), LOCK's 상한 도달 (C-6) and the briefing's line for the speaker's
+  // reaction (C-13). Everything that could leave did: the safe line's count,
+  // the reveal's afterword, the case's read and the reaction lines are the
+  // runtime's (tableAfterword.js, caseCopy). The branch's earlier raise was
+  // dropped first; this is only what main's budget lacks.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_832, maxGzip: 35_227 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -154,6 +165,11 @@ const budgets = [
   // deploy; #216 had been measured before #238 merged. #218 (lucide 1.60,
   // TriangleAlert for AlertTriangle) measures 14,558 on top. The gzip plus 4.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_562 },
+  // 14,543 -> 14,572 gzip on 2026-10-23 (table-readouts, #246, draft):
+  // measured 45,637 / 14,568 in the e2e build on main d486f4e with the branch,
+  // the gzip plus 4; the report hands the card 사건당 금고 (score.vaultLine,
+  // C-1 (3)). The raw ceiling stays.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_572 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -198,7 +214,10 @@ const budgets = [
   // the rows arrive, and `lang` on the English labels.
   // -> 4,800 / 2,100 on 2026-10-07, measured 4,567 / 2,001 plus 5%: a list
   // with spoken ranks, and a retry when the rows did not come.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_800, maxGzip: 2_100 },
+  // -> 4,959 / 2,139 on 2026-10-23 (table-readouts, #246, draft), measured
+  // 4,959 / 2,135 plus 4: 사건당 금고 on each row (C-1 (3)), worked out in the
+  // screen so the entry chunk's ranking.js does not grow.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_959, maxGzip: 2_139 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -245,7 +264,11 @@ const budgets = [
   // imports, auditRisk's and cascadeRisk's, measured 8,711 / 4,242 plus 4.
   // 8,711 / 4,246 -> 8,745 / 4,261 on 2026-10-21 (F1 phase 2, #216, draft),
   // measured 8,745 / 4,257 plus 4: one more import, the replay trail's chunk.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_745, maxGzip: 4_261 },
+  // 8,745 / 4,261 -> 8,853 / 4,290 on 2026-10-23 (table-readouts, #246,
+  // draft), measured 8,853 / 4,286 plus 4: the card prints 사건당 금고 (C-1 (3))
+  // beside the 논리 유지력. The words come from the report (score.vaultLine);
+  // the card reads one string and draws it.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_853, maxGzip: 4_290 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking

@@ -80,9 +80,10 @@ function readSeasonLeague(finalSummary) {
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
  * @param {number} [input.logicHold] The season's 논리 유지력, 0 to 100, as `getSeasonLogic` reads it off those summaries.
  * @param {string} [input.host] The site's host, printed at the foot of the card.
+ * @param {string} [input.vaultLine] 사건당 금고 as the report words it, printed beside the 논리 유지력.
  */
 export function buildResultCardModel(input = {}) {
-  const { fingerprint, endingVariant, endingName, caseResults, logicHold, host } = input ?? {};
+  const { fingerprint, endingVariant, endingName, caseResults, logicHold, host, vaultLine } = input ?? {};
   const results = caseResults && typeof caseResults === "object" ? caseResults : {};
   const summaries = Object.values(results).filter((summary) => summary && typeof summary === "object");
   const best = readBestCase(summaries);
@@ -106,6 +107,8 @@ export function buildResultCardModel(input = {}) {
     ...(Number.isInteger(logicHold) && logicHold >= 0 && logicHold <= 100 ? { logicHold } : {}),
     // A season with any case played in story mode says so on the card.
     story: summaries.some((summary) => Boolean(summary.assistStory)),
+    // 사건당 금고, worded by the runtime (tableAfterword.js describeVaultPerCase): the card only prints it.
+    vaultLine: toText(vaultLine),
     host: toText(host),
   };
 }

@@ -19,6 +19,7 @@ import {
 import { getJudgementHabit } from "../judgementHabit.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
+import { getTableReaction } from "../gauntlet/tableAfterword.js";
 import { getTraceEvents } from "./trace.js";
 import { getSceneBridge } from "../viewModels/sceneBridge.js";
 import { caseCastFor } from "../gauntlet/CaseCastFold.jsx";
@@ -64,6 +65,8 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
       }),
       bridge: getSceneBridge({ log, caseResults, currentCase }),
       caseCast: caseCastFor(log),
+      // The speaker's line about the last table at the head of the scene (C-13, tableAfterword.js).
+      reaction: getTableReaction(log, node?.title),
     };
   }, [caseResults, currentCase, log, node, riskPressure, riskTier]);
   const logReadout = useMemo(() => {

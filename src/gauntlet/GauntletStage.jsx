@@ -53,6 +53,8 @@ import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
+// C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
+const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
 // Drafts (개선 포인트 A3). A cold table leaves the tab as index.html has it.
 const TAB_TITLES = {
   hot: () => "▲ 밀면 벽 사정권",
@@ -162,7 +164,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -397,6 +399,14 @@ export function GauntletStage({
     setImpact({ amount: 0.28 });
   }
 
+  function pushToSafe() { // 안전선까지 (C-5): the pushes no wall can stop, at once, as the same PUSH events (tableAfterword.js readSafeLine).
+    if (locked || draftOpen || !canPush || !safe.pushes) return;
+    for (let n = 0; n < safe.pushes; n += 1) dispatch({ type: "PUSH" });
+    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, safe.gauge)) pulseRelic("lockpick");
+    playPushCue(win.pushes + safe.pushes, Math.min(1, win.gauge / 90));
+    setImpact({ amount: 0.28 });
+  }
+
   function focus() {
     if (!canFocus) return;
     dispatch({ type: "FOCUS" });
@@ -425,7 +435,7 @@ export function GauntletStage({
 
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
-    select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null,
+    select, focus: lockOn ? focus : null, push, safe: pushToSafe, cash, cashHold: holdsCash && canCash ? cashHold : null,
     cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
     cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null),
     briefingOpen, tableOpen, openTable,
@@ -576,6 +586,7 @@ export function GauntletStage({
             {logic && GAUGE_MARKS.map((at) => (
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
+            {auditBand && <span className="gx-gauge-band" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%`, ...AUDIT_BAND_LOOK }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
@@ -587,6 +598,8 @@ export function GauntletStage({
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
             <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
+            {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
+              aria-label={`안전선까지 밀기 ${safe.pushes}번, 열기 ${Math.round(safe.gauge)}까지`}>안전선 ×{safe.pushes}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}
@@ -737,7 +750,7 @@ export function GauntletStage({
           aria-keyshortcuts={keys("E")}
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
-          aria-label={`LOCK ${Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
+          aria-label={`LOCK ${lockCapped ? "상한 도달" : Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
           aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
           {steadyCold && <span id="gx-steady-cold" className="sr-only">열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라</span>}
@@ -749,7 +762,8 @@ export function GauntletStage({
               The stance is not named here: the HUD's signal beside the streak
               prints it with the same charge, and with it the line was 94 to
               112px in a button with 82px of room at 390px (74px at 360px). */}
-          <small>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
+          {/* At the cap the press still charges the resources, the stance and STEADY's cooling, so it still costs the clock (C-6): the price stays in the name. */}
+          <small>{lockCapped ? "상한 도달" : <>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</>}</small>
           <span id="gx-focus-detail" className="sr-only">
             지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${LOCK_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 LOCK으로 ${LOCK_CAP}배까지만 오른다`}
             {stanceOn && `. ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치른다`}
@@ -787,6 +801,7 @@ export function GauntletStage({
           speakerRole={scene.speakerRole}
           question={scene.question}
           bridge={scene.bridge}
+          reaction={scene.reaction}
           run={run}
           tableSeconds={schema.seconds}
           cards={cards}
