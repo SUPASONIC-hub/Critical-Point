@@ -53,12 +53,12 @@ test("the verdict of the last card is printed only beside an ending that agrees 
     for (const id of ENDING_IDS) {
       const variant = { id, failure: id === "collapse", title: `제목 ${id}`, text: `본문 ${id}` };
       const verdict = getFinalVerdict({ endingVariant: variant, finalChoiceId: choiceId, endingSceneChoice: "장면 행동" });
-      if (id === "collapse") assert.equal(verdict.title, "트리거랩의 운영은 붕괴합니다.");
+      if (id === "collapse") assert.equal(verdict.title, "이 시즌은 무너졌습니다.");
       else if (fits.includes(id)) assert.equal(verdict, own, `${choiceId} × ${id}`);
       else {
         assert.equal(verdict.title, `제목 ${id}`, `${choiceId} × ${id}`);
         assert.equal(verdict.ruling, `본문 ${id}`);
-        assert.equal(verdict.execution, "즉시 적용: 장면 행동.");
+        assert.equal(verdict.execution, "장면 행동.");
       }
     }
   }

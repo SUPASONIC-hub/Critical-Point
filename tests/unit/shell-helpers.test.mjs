@@ -548,7 +548,7 @@ const endingCopy = await import("../../src/endingCopy.js");
 
 test("the ending's verdict: a collapse first, then the final choice where the ending agrees, then the open verdict", () => {
   const failure = endingCopy.getFinalVerdict({ endingVariant: { failure: true }, finalChoiceId: "ending_seal" });
-  assert.equal(failure.title, "트리거랩의 운영은 붕괴합니다.");
+  assert.equal(failure.title, "이 시즌은 무너졌습니다.");
   // The ending and its scene's action are always given (report-copy.test.mjs
   // holds that), so the open verdict is written from them and nothing else.
   // open-question is an ending all three verdicts agree with (report-copy.test.mjs holds the rest).
@@ -561,7 +561,7 @@ test("the ending's verdict: a collapse first, then the final choice where the en
   const open = endingCopy.getFinalVerdict({ endingVariant: variant, finalChoiceId: "other", endingSceneChoice: "기록을 넘긴다" });
   assert.equal(open.title, "T");
   assert.equal(open.ruling, "X");
-  assert.equal(open.execution, "즉시 적용: 기록을 넘긴다.");
+  assert.equal(open.execution, "기록을 넘긴다.");
   assert.ok(open.cost);
 });
 
