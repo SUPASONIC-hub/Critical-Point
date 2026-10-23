@@ -62,5 +62,6 @@ test("the briefing prints the question as 당신의 판단 and the reveal prints
   const reveal = source("components/DecisionReveal.jsx");
   assert.doesNotMatch(reveal, /"\{decisionReveal\.spokenChoice\}"/);
   assert.match(reveal, /"당신의 판단"/);
-  assert.match(source("screens/ResultScreen.jsx"), /label: "처음 내린 판단"/);
+  const result = source("screens/ResultScreen.jsx");
+  for (const label of ["처음 내린 판단", "가장 오래 붙잡은 판단", "판을 흔든 판단"]) assert.match(result, new RegExp(`label: "${label}"`));
 });

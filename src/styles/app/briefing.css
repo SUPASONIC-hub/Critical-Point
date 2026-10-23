@@ -666,6 +666,26 @@
     grid-template-columns: 76px 1fr;
   }
 
+  /* A case's first page that introduces a rule (프롤로그 01~05) keeps the
+     introduction and the question whole on the first screen. The speaker's
+     balloon added 89 to 134px above them and pushed the introduction 14 to
+     113px under 판 열기 at 390x664 and 390x844, so on a phone that page gives
+     the balloon up: its speech is in the story's boxes, with the name chip. A
+     lead the balloon carries is told nowhere else and stays. The portrait
+     is no taller than the name beside it then, and the question's box no
+     thicker than it needs: the box's label row left 프롤로그 02 1px over. */
+  .gx-comic-page:has(.gx-carry) .gx-balloon:not(.is-lead) {
+    display: none;
+  }
+
+  .gx-comic-page:has(.gx-carry) .gx-panel-speaker {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .gx-judgment {
+    padding: 8px 10px;
+  }
+
   .gx-comic-actions {
     grid-template-columns: 1fr;
     grid-template-areas:

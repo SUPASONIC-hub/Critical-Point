@@ -262,7 +262,10 @@ const fileBudgets = {
   // line in the balloon, the question in a box with no tail (「당신의 판단」),
   // a lead told as a caption and the name chip on the speaker's speech (A-2).
   // The tail and the lead's box share one rule.
-  "briefing.css": { lines: 697, bytes: 13630 },
+  // 697 / 13630 -> 709 / 13853 the same day, measured: on a phone, a case's
+  // first page that introduces a rule gives the speaker's balloon up so the
+  // introduction and the question stay on the first screen (390x664, 390x844).
+  "briefing.css": { lines: 709, bytes: 13853 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
