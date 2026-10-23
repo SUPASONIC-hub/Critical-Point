@@ -153,7 +153,15 @@ const budgets = [
   // the rows arrive, and `lang` on the English labels.
   // -> 4,800 / 2,100 on 2026-10-07, measured 4,567 / 2,001 plus 5%: a list
   // with spoken ranks, and a retry when the rows did not come.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_800, maxGzip: 2_100 },
+  // 4,800 / 2,100 -> 4,999 / 2,149 on 2026-10-23 (personal bests, E-7, draft
+  // for 11-30): measured 4,999 / 2,145, the gzip plus 4. The line under the
+  // table with this device's best of the table before (지난 판(v9)의 내 최고),
+  // and the fetch that brings it when the screen opens. The move of the
+  // retired keys, the line's words and the retired key list are in
+  // personalBests (below), out of the entry chunk; it imports nothing, so the
+  // fetch carries no list of files to preload (vite.config.js). What stays is
+  // the state, the fetch and the line's <p>, 199 / 45 over.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_999, maxGzip: 2_149 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -297,6 +305,13 @@ const budgets = [
   // the reading and the links a case's close carries over are all here:
   // 2,790 / 1,669 measured, the gzip plus 4.
   { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
+  // This device's best of each ranking key gone by (src/personalBests.js,
+  // improvement note E-7): the move of a retired key's best row to
+  // `critical-point-personal-bests`, read once, and the ranking screen's line.
+  // In the entry chunk it took that chunk to 171,399 / 61,949 on 2026-10-23;
+  // the ranking screen fetches it when it opens. 2,740 / 1,251 measured, the
+  // gzip plus 4.
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_740, maxGzip: 1_255 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -391,7 +406,9 @@ function checkBudget(file, budget) {
 // 8,896 / 3,211 plus 4 (main 8,862 / 3,194): one more file, cascadeRisk.
 // 8,894 / 3,217 -> 8,928 / 3,231 on 2026-10-21, the test week: both risks'
 // files in the list, measured 8,928 / 3,227 plus 4.
-const WORKER_BUDGET = { maxBytes: 8_928, maxGzip: 3_231 };
+// 8,928 / 3,231 -> 8,964 / 3,246 on 2026-10-23 (personal bests, draft for
+// 11-30), measured 8,964 / 3,242 plus 4: one more file, personalBests.
+const WORKER_BUDGET = { maxBytes: 8_964, maxGzip: 3_246 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

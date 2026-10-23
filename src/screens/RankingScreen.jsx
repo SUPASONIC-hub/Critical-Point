@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
 import { getLeaderboardStatusCopy } from "../ranking.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
@@ -22,6 +22,14 @@ export function RankingScreen({
   const headingRef = useRef(null);
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
+  }, []);
+  // This device's best of the table before, kept when the ranking key moved on
+  // (src/personalBests.js, fetched here so the entry chunk does not carry it;
+  // it moves a retired key's best first). Its own line, never a row: tables
+  // are not compared. A fetch that fails leaves the line out.
+  const [pastBest, setPastBest] = useState(null);
+  useEffect(() => {
+    import("../personalBests.js").then((module) => setPastBest(module.takePastBestLine()), () => {});
   }, []);
   const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
@@ -126,6 +134,9 @@ export function RankingScreen({
               </div>
             )}
           </section>
+          {pastBest && (
+            <p className="ranking-footnote" data-testid="ranking-past-best">{pastBest}</p>
+          )}
           <p className="ranking-footnote">
             다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.
           </p>

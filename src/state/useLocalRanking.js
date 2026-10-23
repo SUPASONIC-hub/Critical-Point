@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConfig.js";
+import { readStoredValue, writeStoredValue } from "../appConfig.js";
 
 // The ranking starts over each time the season changes length: v1 held the
 // five-case season, v2 the eleven-case one, v3 the twelve-case one, v4 the
@@ -17,19 +17,11 @@ import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConf
 // v10 is the same season at RULES_MARK 3: B3's audit and B2's links are rules of the table from
 // 프롤로그 04 (played first as 2026-W44's test week), and a vault the audit took a part of, or a
 // board CASCADE pulled the wall of, does not compare with one from the table before.
-// Retired keys are never read and are removed on first load.
+// A retired key is read once, when the ranking screen first opens, for one thing only: the
+// player's best row of that table, kept under the personal-bests key (src/personalBests.js,
+// a chunk of its own, so the entry chunk does not carry it). Then it is removed. When this key
+// moves on, the old one joins RETIRED_LOCAL_RANKING_STORAGE_KEYS there.
 export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v10";
-const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
-  "critical-point-local-ranking-v1",
-  "critical-point-local-ranking-v2",
-  "critical-point-local-ranking-v3",
-  "critical-point-local-ranking-v4",
-  "critical-point-local-ranking-v5",
-  "critical-point-local-ranking-v6",
-  "critical-point-local-ranking-v7",
-  "critical-point-local-ranking-v8",
-  "critical-point-local-ranking-v9",
-];
 
 export function parseLocalRankingRows(rawValue) {
   try {
@@ -57,7 +49,6 @@ export function appendLocalRankingRowToRows(rows, row) {
 }
 
 function readLocalRankingRows() {
-  RETIRED_LOCAL_RANKING_STORAGE_KEYS.forEach((key) => removeStoredValue(key));
   return parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]"));
 }
 

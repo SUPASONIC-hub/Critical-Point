@@ -465,8 +465,11 @@ export default defineConfig(({ command, mode }) => ({
     // The result card's chunk leans only on files the ending screen has
     // already run, so its list is left out: writing it cost the report's chunk
     // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+    // The personal bests (src/personalBests.js) are the same: the ranking
+    // screen that fetches them has already run every file they lean on, and
+    // the list cost that screen's chunk about 260 bytes.
     modulePreload: {
-      resolveDependencies: (filename, deps) => (/\/ResultCardShare-/.test(filename) ? [] : deps),
+      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|personalBests)-/.test(filename) ? [] : deps),
     },
     rollupOptions: {
       output: {
