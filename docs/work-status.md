@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-22 (the state of `main` at `4149ccd`, #239; what changed and when is in `git log`)
+Last updated: 2026-10-23 (the state of `main` at `2c7b535`, #218; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -159,6 +159,37 @@ Still open, on purpose:
   can be turned off (#226), and the play-and-immersion work on the story,
   screens and table (#238 endings and the finale, #241 the first ten
   minutes, #242 the cards of 사건 01-10, #243 the voices that open a case).
+  Later that evening three more merged once the test week had moved: #245
+  (the season-flow walk's per-case budget and a real long press to confirm),
+  #248 (a line toward the 33rd floor at the end of 사건 13-18 and 25-29) and
+  #242; production ran `aa9bd05`.
+- 2026-10-23: with W44 an ordinary week, the drafts held for the 11-02
+  ruling started going in. Five merged by midday: #254 (the test week to
+  W47, migration 20261022010000), #249 (ten exports nothing imports, and the
+  play screen's gzip budget 34,805 -> 34,811), #238 (the eight epilogues and
+  four verdicts rewritten for the 55-case world, six lines that contradicted
+  the canon resolved), #216 (server checks phase 2, item 92; migration
+  20261023000000, the `Verify Ranking` workflow daily at 23:55 KST) and #218
+  (lucide-react 0.577 -> 1.60, the result screen's gzip budget 14,543 ->
+  14,562). Twice that morning `Verify` on `main` went red on a bundle budget
+  that each pull request had met on its own base (#254 on top of #242 and
+  #248: play screen 34,807; #216 on top of #238: result screen 14,557), so
+  those commits did not deploy until #249 and #218 raised the budgets by the
+  measured shortfall. The rule since: just before a merge, the branch is
+  put on the current `main` and its budgets are measured again; a branch
+  behind `main` is not merged as it stands. Production runs `2c7b535`
+  (#218).
+- Drafts open on 2026-10-23, merged in the order sheet's turn before W47
+  (all but #224 and #253): F1 phase 3 (#233, #240), Vite 8 (#225), the edge
+  notice that can be turned off (#226), NEW GAME+ (#220), the first ten minutes
+  (#241), the voices that open a case (#243), table readouts (#246), the
+  reading layout (#247), prose polish (#250), the prologue echoes (#251) and
+  the echoes of 사건 01-49 and the finale (#255, #258, #259, #260, #262,
+  #263), reversals in 사건 29 and 35 (#252), operations measurement (#256),
+  far callbacks (#257), the second season (#261), the first lines of 사건 11-30 (#264, #265) and 사건 01's
+  authority (#266). The rules-mark-3 pull request (#224: RULES_MARK 3, the
+  season score as a mean over its cases, ranking reset v10) waits for the
+  W47 ruling on 11-23, and personal bests (#253) deploy with it.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -171,12 +202,13 @@ Still open, on purpose:
   `newGamePlus` and `case_id`, through a redefinition of
   `refresh_scene_bust_stats` in the rules-mark-3 migration; the NEW GAME+ work
   branches the day after rules-mark-3 merges and merges before W46 (11-09).
-- Server checks, phase 2 (F1, draft #216, eight answers all option 1): a
-  read-only `npm run verify:ranking` rechecks a run's score from its decision
-  log and marks `score-off-log` / `window-off-replay` in the `suspicion`
-  column through a service_role-only function (still a `.sql.draft`); rows
-  with other table rules are "not checked". The client's replay log follows
-  rules-mark-3 in its own pull request, before W46.
+- Server checks, phase 2 (F1, #216, eight answers all option 1) merged on
+  2026-10-23 (item 92): `npm run verify:ranking` rechecks a run's score from
+  its decision log and replays its recorded windows, and the daily `Verify
+  Ranking` workflow marks `score-off-log` / `window-off-replay` /
+  `window-no-replay` in the `suspicion` column through the service-role-only
+  `ranking_set_recheck_marks` (migration 20261023000000); rows with other
+  table rules are "not checked". Phase 3 (S1-S7) stays in drafts.
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
