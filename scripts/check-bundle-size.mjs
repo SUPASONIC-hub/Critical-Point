@@ -217,7 +217,10 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
+  // 35,363 -> 35,383 gzip on 2026-10-23, 10-23 묶음 A 합친 상태 실측: measured
+  // 191,859 / 35,379, the gzip plus 4 -- the five branches' rules, E-6's share
+  // line (.gx-reveal-share) and the title strip's order for the NEW GAME+ line.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_383 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -393,8 +396,9 @@ const budgets = [
   // 897 / 558 plus 4: E-9's line in the story, printed and read by the clock.
   // -> 1,378 / 695 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: the NEW GAME+
   // panel (#220) and E-9's line (#256) together, measured 1,378 / 691, the
-  // gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_378, maxGzip: 695 },
+  // gzip plus 4. -> 1,387 / 706 the same day, measured 1,387 / 702: the
+  // NEW GAME+ line raised under the title strip (`order: -1`).
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_387, maxGzip: 706 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -402,12 +406,17 @@ const budgets = [
   // 3,779 / 2,166 on 2026-10-22, when the two senders became nine acts' pairs
   // (B-15: eighteen senders, thirty-six lines) and the act is read off
   // CASE_SEQUENCE.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_779, maxGzip: 2_170 },
+  // -> 3,786 / 2,180 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (measured
+  // 3,786 / 2,176, the gzip plus 4): the notice moved from over the scene's
+  // title to just above the action bar.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_786, maxGzip: 2_180 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
   // Measured 1,348 / 775 in the e2e build, the gzip plus 4.
-  { pattern: /^ReadingClockAsk-.*\.js$/, maxBytes: 1_348, maxGzip: 779 },
+  // 10-23 묶음 A 합친 상태 실측: 1,348 / 782 (its imports name hashed files),
+  // the gzip plus 4.
+  { pattern: /^ReadingClockAsk-.*\.js$/, maxBytes: 1_348, maxGzip: 786 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
