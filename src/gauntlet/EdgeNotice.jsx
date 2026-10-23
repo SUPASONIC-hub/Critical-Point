@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CASE_SEQUENCE } from "../gameCases.js";
 import { useAccessibility } from "../state/accessibilitySettings.js";
 
@@ -88,6 +88,13 @@ export function EdgeNotice({ voice, caseId }) {
     if (next || pushes === 0) setNotice(next);
   }
 
+  // Over the action bar as it stands: its buttons wrap with the font and the
+  // width, so its height is read, not assumed (STYLE's bottom is the fallback).
+  useLayoutEffect(() => {
+    const bar = document.querySelector(".gx-actions")?.getBoundingClientRect();
+    if (bar?.height && ref.current) ref.current.style.bottom = `${Math.max(8, window.innerHeight - bar.top + 8)}px`;
+  });
+
   // Each notice keeps its own few seconds, whatever is pressed meanwhile.
   useEffect(() => {
     if (!notice) return;
@@ -106,8 +113,8 @@ export function EdgeNotice({ voice, caseId }) {
   );
 }
 
-// One line at the bottom left, just above the action bar (.gx-actions, fixed
-// at the bottom, about 78px tall plus the safe area): the space between the
+// One line at the bottom left, 8px above the action bar (.gx-actions, fixed
+// at the bottom; its top is measured when the notice is drawn): the space between the
 // last card and the bar on a phone, under the left column on a laptop. It sat
 // over the scene's title at the top left until 2026-10-23 and covered it for
 // four seconds (운영화면 문제 5-1, user's choice 1).

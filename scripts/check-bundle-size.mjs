@@ -408,8 +408,11 @@ const budgets = [
   // CASE_SEQUENCE.
   // -> 3,786 / 2,180 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (measured
   // 3,786 / 2,176, the gzip plus 4): the notice moved from over the scene's
-  // title to just above the action bar.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_786, maxGzip: 2_180 },
+  // title to just above the action bar. -> 3,970 / 2,289 the same day,
+  // measured 3,970 / 2,285, the gzip plus 4: the bar's top is read when the
+  // notice is drawn (its buttons wrap with the font; at a fixed 96px the
+  // notice covered 밀기 in CI).
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_970, maxGzip: 2_289 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).

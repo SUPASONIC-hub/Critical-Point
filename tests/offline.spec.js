@@ -1,5 +1,5 @@
 import { expect, test } from "./helpers/network.js";
-import { resumeSavedRun } from "./helpers/gameFlow.js";
+import { clickElement, resumeSavedRun } from "./helpers/gameFlow.js";
 import { savedAtLastScene, seedSave } from "./helpers/seededSave.js";
 import { OFFLINE_READY_ATTRIBUTE } from "../src/serviceWorker/register.js";
 
@@ -42,6 +42,11 @@ test("a copy opened once opens again with no connection, and resumes its run", {
   await page.reload();
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
   await expect(page.locator(".choices .choice").first()).toBeVisible();
+  // The briefing page is open over the table. Its clock no longer opens the
+  // table on a device that was never asked (it stops and asks once,
+  // ReadingClockAsk, #241), so the table is opened by hand.
+  await clickElement(page.getByTestId("open-table"), "open the table from the briefing");
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
 
   // Back to the intro, still offline: it is drawn, with its art.
   await page.getByRole("button", { name: "저장 후 나가기" }).click();
