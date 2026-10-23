@@ -1262,7 +1262,7 @@ test("a third push brings an edge notice that covers no number, and the switch t
   expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
   const overlaps = await notice.evaluate((element) => {
     const box = element.getBoundingClientRect();
-    const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button";
+    const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button, .game-header h1";
     return [...document.querySelectorAll(numbers)]
       .filter((other) => {
         const b = other.getBoundingClientRect();

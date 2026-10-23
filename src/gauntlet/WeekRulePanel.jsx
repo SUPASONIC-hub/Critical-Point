@@ -42,10 +42,14 @@ export function useWeekRulePanel(id, echo = null) {
   }, [id, echo]);
 }
 
-/** The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own. */
+/**
+ * The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own.
+ * Drawn after the page's grid, it is raised to just under the title strip (`order: -1`, as .gx-comic-top is in
+ * briefing.css): under the case file, a phone had to scroll to it (운영화면 문제 5-2).
+ */
 function SeasonEchoPanel({ echo }) {
   return (
-    <div className="gx-panel gx-panel-breach gx-carry" data-testid="season-echo" style={{ gridArea: "auto" }}>
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="season-echo" style={{ gridArea: "auto", order: -1 }}>
       <p className="gx-breach-kicker" lang="en">NEW GAME+</p>
       <ul>
         <li className="gx-mutation">

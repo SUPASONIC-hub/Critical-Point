@@ -93,7 +93,7 @@ export function EdgeNotice({ voice, caseId }) {
     if (!notice) return;
     shown += 1;
     const still = globalThis.matchMedia?.(STILL).matches || document.documentElement.hasAttribute("data-calm-effects");
-    if (!still) ref.current?.animate?.([{ transform: "translateY(-150%)" }, { transform: "none" }], { duration: 240, easing: "ease-out" });
+    if (!still) ref.current?.animate?.([{ transform: "translateY(150%)" }, { transform: "none" }], { duration: 240, easing: "ease-out" });
     const timer = setTimeout(() => setNotice(null), EDGE_NOTICE_MS);
     return () => clearTimeout(timer);
   }, [notice]);
@@ -106,16 +106,17 @@ export function EdgeNotice({ voice, caseId }) {
   );
 }
 
-// One line over the top left of the header, where the scene's title is: the
-// header's buttons keep the right (136px on a 360px phone), and the case's
-// count under the title starts below the line (checked at 390x664 and
-// 1280x800, .claude/shots-20261021/a5).
+// One line at the bottom left, just above the action bar (.gx-actions, fixed
+// at the bottom, about 78px tall plus the safe area): the space between the
+// last card and the bar on a phone, under the left column on a laptop. It sat
+// over the scene's title at the top left until 2026-10-23 and covered it for
+// four seconds (운영화면 문제 5-1, user's choice 1).
 const STYLE = {
   position: "fixed",
   zIndex: 30,
   left: "max(8px, env(safe-area-inset-left))",
-  top: "max(8px, env(safe-area-inset-top))",
-  maxWidth: "min(22rem, 100vw - 136px)",
+  bottom: "calc(96px + env(safe-area-inset-bottom))",
+  maxWidth: "min(22rem, 100vw - 16px)",
   padding: "5px 10px",
   overflow: "hidden",
   whiteSpace: "nowrap",

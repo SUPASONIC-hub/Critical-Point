@@ -457,6 +457,8 @@ test("NEW GAME+ names the last season on the intro and opens the next one on its
   await page.getByRole("button", { name: "NEW GAME+ 시작" }).click();
   const echo = page.getByTestId("season-echo");
   await expect(echo).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // Under the title strip, not under the case file: on screen without scrolling.
+  await expect(echo).toBeInViewport();
   await expect(echo).toContainText("NEW GAME+");
   await expect(echo).toContainText("지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다.");
   // The line is the run's, saved with it.

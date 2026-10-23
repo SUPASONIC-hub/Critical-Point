@@ -352,7 +352,7 @@ return { EDGE_AT, EDGE_ACTS, EDGE_NOTICES, edgeActOf, pickEdgeNotice };`)(CASE_S
     for (const notice of pair) {
       assert.ok(notice.lines.length >= 1);
       assert.deepEqual(notice.lines.map((_, n) => edge.pickEdgeNotice(notice.from.startsWith("메일") ? 6 : 3, n, edge.EDGE_ACTS[edge.EDGE_NOTICES.indexOf(pair)]).line), notice.lines);
-      // Short enough for one line at the top left of a phone, before its ellipsis.
+      // Short enough for one line at the bottom left of a phone, before its ellipsis.
       for (const line of [notice.from, ...notice.lines]) assert.ok(line.length <= 20, `"${line}" is short`);
     }
   }
