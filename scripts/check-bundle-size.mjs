@@ -114,14 +114,14 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  // 104,745 / 34,822 -> 105,205 / 35,038 on 2026-10-23 (story-copy-1, #243,
-  // draft), measured 105,205 / 35,034 in the e2e build on main d486f4e with
+  // 104,745 / 34,822 -> 105,205 / 35,035 on 2026-10-23 (story-copy-1, #243,
+  // draft), measured 105,205 / 35,031 in the e2e build on main 2c7b535 with
   // the branch, the gzip plus 4: the LOST SCENE line naming the skipped
   // scene's place with its particles, the quiet table of 사건 42, 45 and 47 in
   // GauntletFx, the reveal's notices in 합니다체 and the case's opening voice
   // back on its first briefing (Q8 (1)). The branch's earlier raises were
   // dropped first; this is only what main's budget lacks.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_205, maxGzip: 35_038 },
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_205, maxGzip: 35_035 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -141,12 +141,7 @@ const budgets = [
   // measured 14,557 in CI's e2e build and failed Verify, so #216 did not
   // deploy; #216 had been measured before #238 merged. #218 (lucide 1.60,
   // TriangleAlert for AlertTriangle) measures 14,558 on top. The gzip plus 4.
-  // 14,562 -> 14,566 gzip on 2026-10-23 (story-copy-1, #243, draft): the
-  // branch adds 4 gzip bytes to this chunk (main d486f4e 14,557 -> 14,561
-  // with the branch in the e2e build, lucide 0.577 as installed locally), the
-  // copy the report shares with the cases (A-14 피로, A-15 names and titles,
-  // A-16 합니다체). On #218's 14,558 that is 14,562, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_566 },
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_562 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -157,7 +152,7 @@ const budgets = [
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
   // 35,363 -> 35,408 gzip on 2026-10-23 (story-copy-1, #243, draft), measured
-  // 191,964 / 35,404 in the e2e build on main d486f4e with the branch, the
+  // 191,964 / 35,404 in the e2e build on main 2c7b535 with the branch, the
   // gzip plus 4: the case's opening voice under the briefing's title and the
   // title strip's third row (Q8 (1)).
   { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_408 },
