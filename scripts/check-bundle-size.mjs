@@ -77,6 +77,9 @@ const budgets = [
   // d486f4e (#216, above): measured 170,436 / 61,612 in the e2e build, the
   // gzip plus 4. The raw 27 over #220 alone is the windowTrail preload entry
   // #216's raw budget had room for.
+  // 61,300 -> 61,377 gzip on 2026-10-21 (A5, draft), measured 61,373 plus 4
+  // (main 0df240a measured 169,594 / 61,278): the comfort panel's switch for
+  // the edge notices, its label and its line (+188 raw, inside the raw budget).
   { pattern: /^index-.*\.js$/, maxBytes: 170_436, maxGzip: 61_616 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
@@ -143,7 +146,13 @@ const budgets = [
   // 104,745 / 34,822 -> 104,773 / 34,856 on 2026-10-23, NEW GAME+ (#220)
   // rebased on main d486f4e (#216, above): measured 104,773 / 34,852 in the
   // e2e build, the gzip plus 4. The raw is #216's plus #220's 28 exactly.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_773, maxGzip: 34_856 },
+  // 104,705 / 34,805 -> 104,771 / 34,843 on 2026-10-21 (A5, draft): measured
+  // 104,771 / 34,839, the gzip plus 4, on main 0df240a's 104,705 / 34,801.
+  // What stays here of the edge notices is the import and the one element in
+  // TableNotices; their words, timing and inline style are EdgeNotice's
+  // (below), and play.css took no rule. 104,771 -> 104,810 on 2026-10-22
+  // (B-15): the table hands the notice its case (a `caseId` prop of its own).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_810, maxGzip: 34_856 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -331,6 +340,14 @@ const budgets = [
   // plus 4: the NEW GAME+ line's panel on the same page, above the week's
   // rule, kept out of the PlayScreen chunk the same way.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
+  // The office's noise at the table's edge (개선 포인트 A5,
+  // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
+  // own from the start and fetched with the table. Its style is inline, so no
+  // stylesheet grows. 1,794 / 1,194 measured on 2026-10-21, the gzip plus 4;
+  // 3,779 / 2,166 on 2026-10-22, when the two senders became nine acts' pairs
+  // (B-15: eighteen senders, thirty-six lines) and the act is read off
+  // CASE_SEQUENCE.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_779, maxGzip: 2_170 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
@@ -453,6 +470,8 @@ function checkBudget(file, budget) {
 // files in the list, measured 8,928 / 3,227 plus 4.
 // 8,928 / 3,231 -> 8,962 / 3,248 on 2026-10-21 (F1 phase 2, #216, draft),
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
+// 8,928 / 3,231 -> 8,961 / 3,244 on 2026-10-21 (A5, draft), measured 8,961 /
+// 3,240 plus 4 (main 8,928 / 3,222): one more file, EdgeNotice.
 const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
