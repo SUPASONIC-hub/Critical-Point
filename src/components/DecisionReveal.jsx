@@ -45,11 +45,11 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
  * the table has been introduced (`decisionReveal.short`, set by the commit from
  * `isTableTaught`) the same whole sheet each time is the table, the slam and
  * then a page of rows the player has read. So the sheet is short from there:
- * the verdict, the card the room played if it was not the player's, what was
- * received and paid, a scene lost, the next rules, the card's own line, a clue
- * -- and whatever happens once (a relic unlocked, the draft, an overclock). The
- * ledger, the pot's sum, the words of the choice and the closing sentence made
- * from the effect are behind the button, which opens the sheet as it was.
+ * the verdict and the story line under it, the card the room played if it was
+ * not the player's, what was received and paid, a scene lost, the next rules,
+ * a clue -- and whatever happens once (a relic unlocked, the draft, an
+ * overclock). The ledger, the pot's sum and the words of the choice are behind
+ * the button, which opens the sheet as it was.
  *
  * It lives here and not in the save or the settings: it is this visit's, like
  * the reveal itself (`runState.js`, never saved). A module variable because the
@@ -113,6 +113,12 @@ export function DecisionReveal({ view }) {
     flipDetails();
     redraw((count) => count + 1);
   };
+  // What came of it in the story, straight under the verdict and on every
+  // sheet (improvement notes D-1, 2026-10-22): the card's own line, or -- for a
+  // bust, a card the clock staked and a reframe, which have none -- the last
+  // sentence of the beat. It was under the bill and the next rules, and on the
+  // short sheet a bust said no sentence of the story at all.
+  const storyLine = decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").at(-1);
   const consequenceLines = full ? createConsequenceLines({ verdict, busted, nextMutations }) : [];
   const headline = !verdict
     ? "DECISION"
@@ -144,6 +150,12 @@ export function DecisionReveal({ view }) {
           <h2>{headline}</h2>
           <p>{subline}</p>
         </div>
+
+        {storyLine && (
+          <div className="decision-reveal-beat" data-testid="reveal-story">
+            {renderSceneLines(storyLine)}
+          </div>
+        )}
 
         {decisionReveal.short && (
           <button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded={detailsOpen} onClick={toggleDetails}>
@@ -262,12 +274,6 @@ export function DecisionReveal({ view }) {
                 </li>
               ))}
             </ul>
-          </div>
-        )}
-
-        {(full || decisionReveal.echo) && (
-          <div className="decision-reveal-beat">
-            {renderSceneLines(decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
           </div>
         )}
 

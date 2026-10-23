@@ -102,8 +102,13 @@ test("the short sheet leaves out the ledger, the pot's sum, the words of the cho
   assert.match(reveal, /\{full && verdict && \(\s+<div className="gx-reveal-pot"/);
   // A card the room played for the player is said on the short sheet too.
   assert.match(reveal, /\{\(full \|\| decisionReveal\.forced\) && \(\s+<p className="decision-reveal-choice">/);
-  // The card's own line stays; the template sentence of a bust, a forced card or a reframe does not.
-  assert.match(reveal, /\{\(full \|\| decisionReveal\.echo\) && \(\s+<div className="decision-reveal-beat">/);
+  // The story line is on every sheet, straight under the verdict (D-1): the
+  // card's own line, or the beat's last sentence for a bust, a forced card or a reframe.
+  assert.match(reveal, /const storyLine = decisionReveal\.echo \|\| String\(decisionReveal\.beat \?\? ""\)\.split\("\\n"\)\.at\(-1\);/);
+  assert.match(reveal, /\{storyLine && \(\s+<div className="decision-reveal-beat" data-testid="reveal-story">/);
+  const story = reveal.indexOf('data-testid="reveal-story"');
+  assert.ok(story > reveal.indexOf("<p>{subline}</p>") && story < reveal.indexOf('data-testid="reveal-details"'), "under the verdict, above 자세히");
+  assert.ok(story < reveal.indexOf('<div className="decision-reveal-stakes"'), "above the bill");
   // Everything else is drawn on what it was always drawn on.
   for (const kept of [
     '{decisionReveal.unlockedRelics?.length > 0 && (',

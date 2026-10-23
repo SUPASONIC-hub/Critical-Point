@@ -62,6 +62,19 @@ export function createCompletedCaseResultList(caseResults = {}) {
     .map((caseItem) => ({ ...caseItem, result: normalizeCaseSummary(caseResults[caseItem.id]) }));
 }
 
+/**
+ * 「지난 이야기」 on the resume card (improvement notes D-9 = B-6(1)): the
+ * last case's ending title, then what this case is about -- the premise the
+ * last case's close announced, or, once this case has a decision, the line
+ * that decision left. Read from the save alone (`openingLegacy`, written when
+ * the case opened, and the log), so the shell draws it without the case copy.
+ */
+export function getStoryRecap({ openingLegacy, log = [] }) {
+  // Short on purpose: this is in the entry chunk, which has no room (check:bundle).
+  const echo = [...log].reverse().find((entry) => entry?.echo)?.echo;
+  return [openingLegacy?.continuity?.title, echo ?? openingLegacy?.premise].filter(Boolean);
+}
+
 export function createIntroViewModel({
   // The music component. It is the one React piece in the bag, and it stays an
   // argument so this module holds no JSX and can be exercised from Node.
@@ -86,6 +99,8 @@ export function createIntroViewModel({
   currentCase,
   // The scene the save stands on. Only whether it is a report is read here.
   nodeId,
+  // What the case opened with (state/caseRoutes.js), for the resume card's recap.
+  openingLegacy = null,
   newGamePlusUnlocked,
   newGamePlusMemory,
   // The season record (state/seasonRecord.js) and the saved run's id: the memory panel's season number.
@@ -135,7 +150,8 @@ export function createIntroViewModel({
     hasResumableSave,
     formatSaveTime,
     lastSavedAt,
-    log,
+    // The save's decision count and its 지난 이야기, one field: the bag is at its budget (check:runtime-budget).
+    savedStory: { decisions: log.length, recap: getStoryRecap({ openingLegacy, log }) },
     playerName,
     PLAYER_NAME_MAX_LENGTH,
     setPlayerName,

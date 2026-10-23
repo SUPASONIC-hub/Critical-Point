@@ -80,6 +80,13 @@ const budgets = [
   // 61,300 -> 61,377 gzip on 2026-10-21 (A5, draft), measured 61,373 plus 4
   // (main 0df240a measured 169,594 / 61,278): the comfort panel's switch for
   // the edge notices, its label and its line (+188 raw, inside the raw budget).
+  // 169,980 / 61,300 -> 170,097 / 61,478 on 2026-10-22 (story-first10, #241,
+  // draft), measured 170,097 / 61,474 in the e2e build, the gzip plus 4: the
+  // resume card's 지난 이야기 (D-9; the view field folded into `savedStory`,
+  // its code cut to two lines first) and the reading clock's asked-once flag
+  // in the comfort settings (A-11). The question itself is a chunk of its own.
+  // On main's 61,308 (#216) this came to 170,124 / 61,480 on 2026-10-23,
+  // rebased on 2c7b535: 170,124 / 61,484.
   { pattern: /^index-.*\.js$/, maxBytes: 170_436, maxGzip: 61_616 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
@@ -152,7 +159,14 @@ const budgets = [
   // TableNotices; their words, timing and inline style are EdgeNotice's
   // (below), and play.css took no rule. 104,771 -> 104,810 on 2026-10-22
   // (B-15): the table hands the notice its case (a `caseId` prop of its own).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_810, maxGzip: 34_856 },
+  // 104,705 / 34,805 -> 104,775 / 34,859 on 2026-10-22 (story-first10, #241,
+  // draft), measured 104,775 / 34,855, the gzip plus 4: the briefing's
+  // held-until-asked start and the reveal's story line under the verdict
+  // (A-11, D-1), after the question's panel went to ReadingClockAsk and the
+  // introduction panel left the grid's row arithmetic (D-6).
+  // On main's 104,745 / 34,822 (#216) this came to 104,827 / 34,871 on
+  // 2026-10-23, rebased on 2c7b535: 104,827 / 34,875.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_827, maxGzip: 34_875 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -339,7 +353,6 @@ const budgets = [
   // 801 / 515 -> 1,271 / 648 on 2026-10-21, measured 1,271 / 644, the gzip
   // plus 4: the NEW GAME+ line's panel on the same page, above the week's
   // rule, kept out of the PlayScreen chunk the same way.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -347,7 +360,13 @@ const budgets = [
   // 3,779 / 2,166 on 2026-10-22, when the two senders became nine acts' pairs
   // (B-15: eighteen senders, thirty-six lines) and the act is read off
   // CASE_SEQUENCE.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
   { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_779, maxGzip: 2_170 },
+  // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
+  // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
+  // and the first page the clock would open asks instead (A-11 = D-4).
+  // Measured 1,348 / 775 in the e2e build, the gzip plus 4.
+  { pattern: /^ReadingClockAsk-.*\.js$/, maxBytes: 1_348, maxGzip: 779 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
   // engine's chunk (14,417 of 14,200 with it, 14,186 without) and the table's
@@ -472,7 +491,12 @@ function checkBudget(file, budget) {
 // measured 8,962 / 3,244 plus 4: one more file, the replay trail's chunk.
 // 8,928 / 3,231 -> 8,961 / 3,244 on 2026-10-21 (A5, draft), measured 8,961 /
 // 3,240 plus 4 (main 8,928 / 3,222): one more file, EdgeNotice.
-const WORKER_BUDGET = { maxBytes: 8_962, maxGzip: 3_248 };
+// 8,928 / 3,231 -> 8,966 / 3,246 on 2026-10-22 (story-first10, #241, draft):
+// one more file, the reading clock's question (ReadingClockAsk), measured
+// 8,966 / 3,242 plus 4.
+// On main's 8,962 / 3,248 (#216, the trail's chunk) both files together
+// measured 9,000 / 3,258 on 2026-10-23, rebased on 2c7b535: 9,000 / 3,262.
+const WORKER_BUDGET = { maxBytes: 9_000, maxGzip: 3_262 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

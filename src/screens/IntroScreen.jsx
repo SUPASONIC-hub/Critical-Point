@@ -104,7 +104,7 @@ export function IntroScreen({ view, renderers = {} }) {
     },
     start: {
       playStyleOptions, playStyle, setPlayStyle, persist, hasResumableSave, node, formatSaveTime,
-      lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText,
+      lastSavedAt, savedStory, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText,
       startGame, resumeSavedGame, activePlayStyle, newGamePlusUnlocked, startNewGamePlus,
     },
     telemetry: {
@@ -173,7 +173,7 @@ export function IntroScreen({ view, renderers = {} }) {
   // record away asks first (decideCaseCardPress has the cases).
   const pressCaseCard = async (caseItem) => {
     const press = decideCaseCardPress({
-      caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: log.length,
+      caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: savedStory.decisions,
     });
     if (press === "locked") return;
     if (press === "resume") return resumeSavedGame();
@@ -224,9 +224,18 @@ export function IntroScreen({ view, renderers = {} }) {
           {node?.title ? ` · ${node.title}` : ""}
         </strong>
         <small>
-          {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록
+          {formatSaveTime(lastSavedAt)} 저장 · {savedStory.decisions}개 판단 기록
           {progress === null ? "" : ` · 진행률 ${progress}%`}
         </small>
+        {/* 지난 이야기: the last case's ending and what this one is about, or
+            the line the last decision left (introViewModel's getStoryRecap).
+            A div, so the card's own grid rule lays it out and no style is added. */}
+        {savedStory.recap.length > 0 && (
+          <div data-testid="resume-recap">
+            <span>지난 이야기</span>
+            {savedStory.recap.map((line) => <small key={line}>{line}</small>)}
+          </div>
+        )}
       </div>
       <button
         type="button"

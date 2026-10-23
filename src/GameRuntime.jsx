@@ -886,7 +886,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     AdaptiveMusic,
     playerName, setPlayerName, playStyle, setPlayStyle, dataConsent, setDataConsent,
     operatorOrigin, setOperatorOrigin, sessionCode, isOnline,
-    hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase, nodeId,
+    hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase, nodeId, openingLegacy,
     newGamePlusUnlocked, newGamePlusMemory, seasonRecord, runId, nextParticipantMessage,
     startGame: lifecycle.startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame: lifecycle.resumeSavedGame, persist, setShowRanking,
     setShowBoard,
