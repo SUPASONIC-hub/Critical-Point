@@ -270,7 +270,7 @@ const standingLine = (page) => page.getByTestId("brief-standing");
 async function setBriefFold(page, open) {
   const fold = page.locator(".gx-brief");
   if ((await fold.evaluate((element) => element.open)) !== open) {
-    await clickElement(fold.locator("summary"), `${open ? "open" : "shut"} 사건 파일`);
+    await clickElement(fold.locator(":scope > summary"), `${open ? "open" : "shut"} 사건 파일`);
   }
   await expect(fold).toHaveJSProperty("open", open);
 }

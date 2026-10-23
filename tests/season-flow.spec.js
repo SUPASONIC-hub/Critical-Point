@@ -748,7 +748,7 @@ test.describe("a phone on its side", () => {
       const question = nodes.c2_trace.question ?? (await page.locator(".gx-question").textContent());
       const cut = await page.locator(".gx-question").evaluate((element) => element.scrollHeight > element.clientHeight + 1);
       expect(cut, "the longest question in the season does not fit two lines here").toBe(true);
-      const fold = page.locator(".gx-brief summary");
+      const fold = page.locator(".gx-brief > summary");
       await expect(fold).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollHeight), "the fold costs the table no height").toBeLessThanOrEqual(size.height + 2);
       expect(await pointerLandsOn(fold), "the fold is not covered").toBe(true);
