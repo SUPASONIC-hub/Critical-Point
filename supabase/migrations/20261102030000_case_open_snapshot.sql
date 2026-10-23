@@ -3,9 +3,9 @@
 -- deploys; that waits for the user after 11-02 (W44 code freeze; 서버검증-설계안.md,
 -- 3단계 S3, question 8 (1)).
 --
--- Dated 20261102030000 to come after #216's 20261021020000, which is to be
--- re-dated 20261102020000 when it merges on 11-02; this one must stay after it.
--- Re-date it after whatever is last on main when it merges.
+-- It must come after #216's 20261023000000_ranking_recheck_marks.sql (on main
+-- since 10-23). Re-date it to the day it merges, after whatever is last on
+-- main then.
 --
 -- Server checks, phase 3, piece S3: the case-open snapshot.
 --
