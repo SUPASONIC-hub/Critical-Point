@@ -290,7 +290,9 @@ const budgets = [
   // line (.gx-reveal-share) and the title strip's order for the NEW GAME+ line.
   // Batch B merged on batch A (2026-10-23), measured in the e2e build, the
   // gzip plus 4: the entries above were each measured on its own base.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_556 },
+  // -> 35,582 the same day, measured 35,578, the gzip plus 4: the gauge's
+  // reading kept to one line on a phone on its side (안전선 ×N broke it).
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_582 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -492,8 +494,10 @@ const budgets = [
   // title to just above the action bar. -> 3,970 / 2,289 the same day,
   // measured 3,970 / 2,285, the gzip plus 4: the bar's top is read when the
   // notice is drawn (its buttons wrap with the font; at a fixed 96px the
-  // notice covered 밀기 in CI).
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 3_970, maxGzip: 2_289 },
+  // notice covered 밀기 in CI). -> 4,133 / 2,368 the same day, measured
+  // 4,133 / 2,364, the gzip plus 4: the bar is watched while the notice is up,
+  // and the notice slides in from the left edge, not up over the bar.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 4_133, maxGzip: 2_368 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).

@@ -89,18 +89,27 @@ export function EdgeNotice({ voice, caseId }) {
   }
 
   // Over the action bar as it stands: its buttons wrap with the font and the
-  // width, so its height is read, not assumed (STYLE's bottom is the fallback).
+  // width, and a press can rewrap them while the notice is up, so its top is
+  // read now and again whenever it moves (STYLE's bottom is the fallback).
   useLayoutEffect(() => {
-    const bar = document.querySelector(".gx-actions")?.getBoundingClientRect();
-    if (bar?.height && ref.current) ref.current.style.bottom = `${Math.max(8, window.innerHeight - bar.top + 8)}px`;
-  });
+    const bar = document.querySelector(".gx-actions");
+    if (!bar || !notice) return;
+    const place = () => {
+      const top = bar.getBoundingClientRect().top;
+      if (ref.current && top) ref.current.style.bottom = `${Math.max(8, window.innerHeight - top + 8)}px`;
+    };
+    place();
+    const watch = globalThis.ResizeObserver && new ResizeObserver(place);
+    watch?.observe(bar);
+    return () => watch?.disconnect();
+  }, [notice, live, edgeNotices]);
 
   // Each notice keeps its own few seconds, whatever is pressed meanwhile.
   useEffect(() => {
     if (!notice) return;
     shown += 1;
     const still = globalThis.matchMedia?.(STILL).matches || document.documentElement.hasAttribute("data-calm-effects");
-    if (!still) ref.current?.animate?.([{ transform: "translateY(150%)" }, { transform: "none" }], { duration: 240, easing: "ease-out" });
+    if (!still) ref.current?.animate?.([{ transform: "translateX(-110%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 240, easing: "ease-out" });
     const timer = setTimeout(() => setNotice(null), EDGE_NOTICE_MS);
     return () => clearTimeout(timer);
   }, [notice]);

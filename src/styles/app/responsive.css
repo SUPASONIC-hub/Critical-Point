@@ -187,6 +187,18 @@
     padding: 6px 12px calc(58px + env(safe-area-inset-bottom));
   }
 
+  /* The gauge's reading stays one line in the left column (290px at 640):
+     with 안전선 ×N in it (C-5) the heat and the pulse each broke to two lines
+     and the table grew 10px past the screen. Tighter, it fits unbroken. */
+  .gx-gauge-read {
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .gx-gauge-read .gx-scout {
+    padding-inline: 4px;
+  }
+
   /* The music pills sit lower than a one-line header is tall; drawn at the
      phone's size and a step higher, the hand's top row clears them. */
   .music-controls {
