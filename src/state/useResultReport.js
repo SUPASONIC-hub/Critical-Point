@@ -244,7 +244,7 @@ export function useResultReport({
     }),
     caseOutcome,
     // E-5: the season's number on the result card and its shared line (secondSeason.js).
-    seasonCard: getSeasonCard({ secondSeason, endingLabel: endingVariant.label, weekRuleLabel: getWeekRule(weekRule)?.label }),
+    seasonCard: getSeasonCard({ secondSeason, pastEndingName: getEndingPreview({ id: secondSeason?.before?.endingId })?.label, weekRuleLabel: getWeekRule(weekRule)?.label }),
     endingProfile: createEndingProfile({ finalEndingEntry }),
   };
 }

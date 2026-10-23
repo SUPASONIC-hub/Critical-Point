@@ -89,7 +89,11 @@ const budgets = [
   // 170,684 / 61,697 plus 4: E-1, the comfort panel's switch 읽은 장면 접기
   // (AccessibilityPanel.jsx) and its setting (accessibilitySettings.js), both
   // the shell's. The switch's sentence was cut to one line first.
-  { pattern: /^index-.*\.js$/, maxBytes: 170_684, maxGzip: 61_701 },
+  // -> 170,684 / 61,709 the same day, measured 170,684 / 61,705 plus 4: the
+  // second season's lines as the user settled them (문구 질문 1~20, all (1)),
+  // the same bytes in other words; the shared tail names the season before's
+  // ending through getEndingPreview, which the result side already imported.
+  { pattern: /^index-.*\.js$/, maxBytes: 170_684, maxGzip: 61_709 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
