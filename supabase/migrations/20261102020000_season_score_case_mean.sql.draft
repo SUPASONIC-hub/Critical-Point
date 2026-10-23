@@ -36,18 +36,29 @@
 --      check, through `ranking_public_summary` as the final one is; one that
 --      fails it is 'invalid season ranking score' too.
 --   3. `burstScore` and `momentumScore` become the mean of those rows'
---      `burstScore`, rounded to a whole number (`round(numeric)`: half away
+--      `burstScore`, with one axis read off the whole season (the user,
+--      2026-10-23, Q25 (1)): 관점 전환 (`cognitionScore`, weight 0.2), whose
+--      reach (kinds / 4) a case of seven decisions rarely fills. Each row's
+--      own is swapped for the one the season's decisions make together, from
+--      the rows' `cognitionMix` (decisions by the way of thinking each leaned
+--      on) summed: (5 * sum of scores + cases * season's - sum of the rows')
+--      / (5 * cases), kept within 0 to 100. A run with a row whose
+--      `cognitionMix` is missing or not a count (`ranking_cognition_spread`
+--      gives null), or whose summed count is not one, keeps the plain mean.
+--      The number is rounded to a whole one (`round(numeric)`: half away
 --      from zero, which for these numbers, never negative, is the client's
---      `Math.round`), and `rank` and `momentumTier` the letter and tier that
---      number earns (`ranking_rank_for`, `ranking_tier_for`, 20261020000000,
---      which check:grants holds to seasonScore.js's `scoreMarks`). The `score` column reads
---      `burstScore`, so the board sorts on the mean.
+--      `Math.round`), and `rank` and `momentumTier` are the letter and tier
+--      that number earns (`ranking_rank_for`, `ranking_tier_for`,
+--      20261020000000, which check:grants holds to seasonScore.js's
+--      `scoreMarks`). The `score` column reads `burstScore`, so the board
+--      sorts on it.
 --   4. Every other key -- the finale's parts, its reframes and response time,
 --      the season's logic numbers, the ending -- is the final row's, as before.
 --
--- The client's copy is `getSeasonScore` (src/seasonScore.js): the same mean of the
+-- The client's copy is `getSeasonScore` (src/seasonScore.js): the same score of the
 -- same cases, with a replayed case counted at its first close
--- (`firstBurstScore`), as this counts the row the server kept. The local
+-- (`firstBurstScore`, `firstCognitionMix`), as this counts the row the server
+-- kept, and `ranking_cognition_spread` is its `getCognitionSpread`. The local
 -- ranking's season row and the request's summary carry it.
 --
 -- What it does to the suspicion marks (20261020000000): `rank-off-score`,
@@ -59,6 +70,53 @@
 --
 -- `create or replace` keeps the part's grants; they are restated anyway, as
 -- 20261021000000 restated them, and every attribute is set again.
+
+-- The 관점 전환 score of a count of decisions by the way of thinking each
+-- leaned on, as seasonScore.js's `getCognitionSpread` makes it: normalised
+-- entropy over the kinds counted, times kinds / 4, out of 100, rounded as
+-- floor(x + 0.5) in double precision on both sides. Null for what is not a
+-- count: not an object, more than eight kinds, or a count that is not a whole
+-- number from 0 to 999,999 (the client's `isCognitionMix`).
+create or replace function public.ranking_cognition_spread(p_mix jsonb)
+returns integer
+language plpgsql
+immutable
+set search_path = ''
+as $$
+declare
+  v_counts integer[] := '{}';
+  v_value jsonb;
+  v_total integer := 0;
+  v_kinds integer;
+  v_count integer;
+  v_entropy double precision := 0;
+begin
+  if p_mix is null or jsonb_typeof(p_mix) <> 'object' then
+    return null;
+  end if;
+  if (select count(*) from jsonb_object_keys(p_mix)) > 8 then
+    return null;
+  end if;
+  for v_value in select e.value from jsonb_each(p_mix) e loop
+    if jsonb_typeof(v_value) <> 'number' or v_value::text !~ '^[0-9]{1,6}$' then
+      return null;
+    end if;
+    v_count := v_value::text::integer;
+    if v_count > 0 then
+      v_counts := array_append(v_counts, v_count);
+      v_total := v_total + v_count;
+    end if;
+  end loop;
+  v_kinds := cardinality(v_counts);
+  if v_kinds < 2 then
+    return 0;
+  end if;
+  foreach v_count in array v_counts loop
+    v_entropy := v_entropy - (v_count::double precision / v_total) * ln(v_count::double precision / v_total);
+  end loop;
+  return floor(least(greatest((v_entropy / ln(v_kinds::double precision)) * (v_kinds::double precision / 4) * 100, 0), 100) + 0.5)::integer;
+end;
+$$;
 
 create or replace function public.ranking_run_summary(p_run_id text, p_session_id text)
 returns jsonb
@@ -72,7 +130,12 @@ declare
   v_week text;
   v_cases integer;
   v_scored integer;
+  v_sum numeric;
   v_mean numeric;
+  v_mixes integer;
+  v_own integer;
+  v_season_mix jsonb;
+  v_season integer;
 begin
   select s.summary into v_final_summary
     from public.playtest_sessions s
@@ -88,25 +151,51 @@ begin
   end if;
   -- The season's score: the mean of its case rows' scores. Each score is
   -- tested before it is cast, inside one CASE, since SQL does not promise
-  -- the order of an `and`.
+  -- the order of an `and`. Beside it, each row's 관점 전환 as its
+  -- `cognitionMix` makes it (null when that is not a count).
   select count(*)::integer,
          count(c.score)::integer,
-         round(avg(c.score))
-    into v_cases, v_scored, v_mean
+         sum(c.score),
+         count(c.spread)::integer,
+         sum(c.spread)::integer
+    into v_cases, v_scored, v_sum, v_mixes, v_own
     from (
       select case
                when t.score_text ~ '^[0-9]{1,3}([.][0-9]{1,6})?$' then
                  case when t.score_text::numeric <= 100 then t.score_text::numeric end
-             end as score
+             end as score,
+             public.ranking_cognition_spread(t.mix) as spread
         from (
-          select public.ranking_public_summary(s.summary)->>'burstScore' as score_text
+          select public.ranking_public_summary(s.summary)->>'burstScore' as score_text,
+                 s.summary->'cognitionMix' as mix
             from public.playtest_sessions s
            where s.run_id = p_run_id
              and s.case_id = any(public.season_case_ids())
         ) t
     ) c;
-  if v_cases < cardinality(public.season_case_ids()) or v_scored < v_cases or v_mean is null then
+  if v_cases < cardinality(public.season_case_ids()) or v_scored < v_cases or v_sum is null then
     raise exception 'invalid season ranking score';
+  end if;
+  -- 관점 전환 read off the whole season: every row's count summed, when every
+  -- row has one, and that sum's 관점 전환 put in place of the rows' own.
+  v_season := null;
+  if v_mixes = v_cases then
+    select jsonb_object_agg(m.kind, m.n)
+      into v_season_mix
+      from (
+        select e.key as kind, sum(e.value::text::integer) as n
+          from public.playtest_sessions s,
+               jsonb_each(s.summary->'cognitionMix') e
+         where s.run_id = p_run_id
+           and s.case_id = any(public.season_case_ids())
+         group by e.key
+      ) m;
+    v_season := public.ranking_cognition_spread(coalesce(v_season_mix, '{}'::jsonb));
+  end if;
+  if v_season is null then
+    v_mean := round(least(greatest(v_sum / v_cases, 0), 100));
+  else
+    v_mean := round(least(greatest((5 * v_sum + v_cases * v_season - v_own) / (5 * v_cases), 0), 100));
   end if;
   v_final_summary := v_final_summary || jsonb_build_object(
     'burstScore', v_mean,
@@ -125,3 +214,5 @@ $$;
 -- The grants as 20261014000000:358,367 wrote them.
 revoke all on function public.ranking_run_summary(text, text) from public, anon, authenticated;
 grant execute on function public.ranking_run_summary(text, text) to service_role;
+revoke all on function public.ranking_cognition_spread(jsonb) from public, anon, authenticated;
+grant execute on function public.ranking_cognition_spread(jsonb) to service_role;
