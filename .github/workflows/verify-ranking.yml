@@ -1,9 +1,9 @@
 name: Verify Ranking
 
-# !! BEFORE MERGING: ask the user (after 11-02). Merging turns on a daily job
-# !! that writes marks into the live ranking rows, and the migration it calls
-# !! (20261023000000_ranking_recheck_marks.sql) reaches the live database within
-# !! a minute of the merge. Draft PR #216; 서버검증-설계안.md, the 10-21 answers.
+# Live since #216 merged (2026-10-23): this daily job writes marks into the
+# live ranking rows through ranking_set_recheck_marks, the function of
+# migration 20261023000000_ranking_recheck_marks.sql, which reached the live
+# database with that merge. 서버검증-설계안.md, the 10-21 answers.
 
 # F1 phase 2 (서버검증-설계안.md, the 10-21 answers): read the top ranked runs
 # off the live database and work each one out again off the page

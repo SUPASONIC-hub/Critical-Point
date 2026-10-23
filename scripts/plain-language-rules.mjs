@@ -295,9 +295,8 @@ export const GLOSSARY = [
  * 45 (현장에 직접 가서 확인하는 일).
  *
  * Each entry is a candidate, not a ruling: the wording the season used most on
- * 2026-10-22, the shorter one on a tie. The copy is not rewritten to it until
- * after the W44 freeze (from 11-02), and an entry may be changed to a better
- * wording before then. A term with one wording everywhere has no entry; the
+ * 2026-10-22, the shorter one on a tie. The copy is rewritten to it in its own
+ * pull request, and an entry may be changed to a better wording before then. A term with one wording everywhere has no entry; the
  * check takes the wording used most as its standard, so a second wording of it
  * is still counted.
  */
