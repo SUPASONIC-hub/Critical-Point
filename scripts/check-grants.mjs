@@ -5,7 +5,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
 import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
-import { getSeasonScore } from "../src/seasonScore.js";
+import { getCognitionSpread, getSeasonScore } from "../src/seasonScore.js";
 import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { noteBriefing, noteRevealDetails, takeReadingTally } from "../src/state/readingTally.js";
@@ -1630,6 +1630,53 @@ if (!SEASON_MEAN) {
     await playRun(runId, { session: sessionId(81) });
     await scoreCases(runId, [earlier[Math.floor(earlier.length / 2)]], { burstScore: "95" });
     await postRefused("rank a season with a case whose score is text", "playtest_sessions", seasonPayload({ session: sessionId(81), runId }), /^P0001 invalid season ranking score$/);
+  }
+  {
+    // 관점 전환 read off the whole season (Q25 (1)): every case leaned on one
+    // or two ways of thinking, the season on all four. The server's spread is
+    // the client's on counts of every shape, and a count that is not one is null.
+    const mixes = [
+      {}, { risk: 6 }, { risk: 3, inference: 3 }, { risk: 1, inference: 2, reframing: 3, persistence: 4 }, { risk: 0, inference: 5 },
+      { a: 1, b: 1, c: 1, d: 1, e: 1, f: 1, g: 1, h: 1 }, { risk: 7, inference: 1, reframing: 1 }, { risk: 999999, inference: 1 },
+    ];
+    for (const mix of mixes) {
+      const server = (await one(`select public.ranking_cognition_spread($1::jsonb) as n`, [JSON.stringify(mix)]))?.n;
+      check(server === getCognitionSpread(mix), `ranking_cognition_spread(${JSON.stringify(mix)}) is ${server}, getCognitionSpread ${getCognitionSpread(mix)}.`);
+    }
+    for (const notCount of ["[1, 2]", '"risk"', '{"risk": "3"}', '{"risk": 1.5}', '{"risk": -1}', '{"risk": 1000000}', '{"a":1,"b":1,"c":1,"d":1,"e":1,"f":1,"g":1,"h":1,"i":1}']) {
+      const server = (await one(`select public.ranking_cognition_spread($1::jsonb) as n`, [notCount]))?.n;
+      check(server === null, `ranking_cognition_spread(${notCount}) is ${server}; what is not a count has no spread.`);
+    }
+    const ways = ["risk", "inference", "reframing", "persistence"];
+    const rankMixed = async (runId, session, label, mixOf) => {
+      await playRun(runId, { session: sessionId(session) });
+      for (const [index, caseId] of CASE_SEQUENCE.entries()) {
+        const mix = mixOf(index);
+        if (mix === undefined) await db.query(`update public.playtest_sessions set summary = summary - 'cognitionMix' where run_id = $1 and case_id = $2`, [runId, caseId]);
+        else await scoreCases(runId, [caseId], { cognitionMix: mix });
+      }
+      await post(label, "playtest_sessions", seasonPayload({ session: sessionId(session), runId }));
+      const summaries = await caseSummariesOf(runId);
+      const row = await one(`select score, summary from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]);
+      return { summaries, row, expected: getSeasonScore(summaries) };
+    };
+    {
+      const { summaries, row, expected } = await rankMixed("run-mean-3", 82, "rank a season of one way a case, four in all", (index) => ({ [ways[index % 4]]: 5, [ways[(index + 1) % 4]]: index % 3 }));
+      const plain = getSeasonScore(Object.fromEntries(Object.entries(summaries).map(([caseId, summary]) => [caseId, { ...summary, cognitionMix: null }])));
+      check(expected.burstScore > plain.burstScore, `the season-spread fixture scores ${expected.burstScore}, no more than its plain mean ${plain.burstScore}; it proves nothing.`);
+      check(
+        Number(row?.score) === expected.burstScore && row?.summary?.burstScore === expected.burstScore && row?.summary?.rank === expected.rank && row?.summary?.momentumTier === expected.momentumTier,
+        `a season with its 관점 전환 read off the whole season ranked on ${JSON.stringify([row?.score, row?.summary?.rank, row?.summary?.momentumTier])}; the client's is ${JSON.stringify(expected)}.`,
+      );
+    }
+    for (const [runId, session, label, broken] of [
+      ["run-mean-4", 83, "rank a season with a case closed before the count was kept", undefined],
+      ["run-mean-5", 84, "rank a season with a case whose count is text", { risk: "5" }],
+    ]) {
+      const { summaries, row, expected } = await rankMixed(runId, session, label, (index) => (index === 3 ? broken : { [ways[index % 4]]: 5 }));
+      const plain = Math.round(Object.values(summaries).reduce((sum, summary) => sum + summary.burstScore, 0) / CASE_SEQUENCE.length);
+      check(expected.burstScore === plain && Number(row?.score) === plain, `${label}: ranked on ${row?.score}, the client's ${expected.burstScore}; both should keep the plain mean ${plain}.`);
+    }
   }
   withHeaders(null);
   await db.query(`delete from public.playtest_sessions where run_id like 'run-mean-%'`);
