@@ -817,7 +817,7 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
 
 ## 개발 환경
 
-Node는 `.node-version` 한 곳에서 정합니다(지금 24.20.0, `package.json`의 `engines.node`는 `>=24 <25`).
+Node는 `.node-version` 한 곳에서 정합니다(지금 24.22.1, `package.json`의 `engines.node`는 `>=24 <25`).
 CI와 Render 빌드가 같은 파일을 읽으므로 로컬도 fnm이나 nvm으로 그 버전을 씁니다.
 
 ```bash
