@@ -216,10 +216,12 @@ if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) con
  * standard wording into 168 of them, and the four where the standard would
  * have said the wrong thing were settled the same day (증거 보전 신청 became a
  * term of its own; 시행사 and 비밀유지 서약서 got a wording that fits every
- * scene; 필적 감정's sentence was reworded). The 22 left are in the prologues,
- * which another branch was rewriting.
+ * scene; 필적 감정's sentence was reworded). The 22 left were in the
+ * prologues, which another branch (story-first10) was rewriting; on 2026-10-23
+ * the 7 on lines that branch leaves alone took the standard wording, and the
+ * 15 left sit on lines it rewrites, so they wait for it.
  */
-const OFF_STANDARD_CEILING = 22;
+const OFF_STANDARD_CEILING = 15;
 for (const term of Object.keys(STANDARD_GLOSS)) {
   if (!GLOSSARY.includes(term)) failures.push(`STANDARD_GLOSS explains "${term}", which is not in GLOSSARY`);
 }
