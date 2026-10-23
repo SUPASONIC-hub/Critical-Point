@@ -114,7 +114,14 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 104,745 / 34,822 -> 105,205 / 35,038 on 2026-10-23 (story-copy-1, #243,
+  // draft), measured 105,205 / 35,034 in the e2e build on main d486f4e with
+  // the branch, the gzip plus 4: the LOST SCENE line naming the skipped
+  // scene's place with its particles, the quiet table of 사건 42, 45 and 47 in
+  // GauntletFx, the reveal's notices in 합니다체 and the case's opening voice
+  // back on its first briefing (Q8 (1)). The branch's earlier raises were
+  // dropped first; this is only what main's budget lacks.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_205, maxGzip: 35_038 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -128,7 +135,11 @@ const budgets = [
   // back on 2026-10-11 for that run, inside this ceiling. The ceiling stays where
   // it was: measured plus 5% would be 46,583 / 14,680, above it, and a budget
   // here does not go up.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_543 },
+  // 14,543 -> 14,565 gzip on 2026-10-23 (story-copy-1, #243, draft): measured
+  // 45,609 / 14,561 in the e2e build on main d486f4e with the branch, the gzip
+  // plus 4; the copy the report shares with the cases (A-14 피로, A-15 names
+  // and titles, A-16 합니다체). The raw ceiling stays.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_565 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -138,7 +149,11 @@ const budgets = [
   // card rule, and the ranking's two board tabs. Main measured 35,264 that
   // day; grouping the pressed tab with a rule of the same declarations made
   // it 5 bytes larger, not smaller.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_363 },
+  // 35,363 -> 35,408 gzip on 2026-10-23 (story-copy-1, #243, draft), measured
+  // 191,964 / 35,404 in the e2e build on main d486f4e with the branch, the
+  // gzip plus 4: the case's opening voice under the briefing's title and the
+  // title strip's third row (Q8 (1)).
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_408 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
