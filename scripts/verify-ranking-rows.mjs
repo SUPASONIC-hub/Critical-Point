@@ -146,7 +146,7 @@ export function formatReport(results, { redact = false } = {}) {
 
 /**
  * The write that states each run's marks (ranking_set_recheck_marks,
- * 20261021020000): one statement, every run read with the marks it earned,
+ * 20261023000000): one statement, every run read with the marks it earned,
  * none included, so a run that no longer earns a mark loses it, and whether it
  * was replayed whole (`checked`: its `rechecked_at` is set; `unrecorded`: its
  * scores were read but it is not "checked", so the time is cleared). A run

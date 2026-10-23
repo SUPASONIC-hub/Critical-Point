@@ -1439,7 +1439,7 @@ Still open, on purpose:
     `unrecorded` (scores read, not replayed). A run under other `tableRules`
     is not checked.
     `--marks-sql` writes the result through
-    `ranking_set_recheck_marks` (`20261021020000`, service role only): the
+    `ranking_set_recheck_marks` (`20261023000000`, service role only): the
     run's `score-off-log`, `window-off-replay` and `window-no-replay` are
     stated whole beside the insert trigger's marks, nothing is refused or
     hidden for them, and `rechecked_at` is set only for a run replayed whole,
