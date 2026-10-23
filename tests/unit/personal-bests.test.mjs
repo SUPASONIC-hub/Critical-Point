@@ -1,14 +1,18 @@
 import assert from "node:assert/strict";
 import { beforeEach, test } from "node:test";
 
+import { readFileSync } from "node:fs";
+
 import {
-  LOCAL_RANKING_STORAGE_KEY,
   migrateRetiredRankingKeys,
   parsePersonalBests,
   PERSONAL_BESTS_STORAGE_KEY,
   pickPersonalBest,
   readLatestPersonalBest,
-} from "../../src/state/useLocalRanking.js";
+  RETIRED_LOCAL_RANKING_STORAGE_KEYS,
+  takePastBestLine,
+} from "../../src/personalBests.js";
+import { LOCAL_RANKING_STORAGE_KEY } from "../../src/state/useLocalRanking.js";
 
 /**
  * A ranking key moved on (v9 to v10) and a returning player found an empty
@@ -91,4 +95,35 @@ test("a best that could not be written leaves the retired key for the next load"
     globalThis.localStorage.setItem = setItem;
   }
   assert.equal(store.has(V9), true);
+});
+
+test("with no past best the screen gets no line", () => {
+  assert.equal(takePastBestLine(), null);
+});
+
+test("the ranking screen's call moves the retired keys once, then only reads", () => {
+  store.set(V9, JSON.stringify(v9Rows));
+  store.set(LOCAL_RANKING_STORAGE_KEY, JSON.stringify([row("case01", { burstScore: 99, rank: "S" })]));
+  const first = takePastBestLine();
+  assert.equal(first, "지난 판(v9)의 내 최고 82점 · A");
+  assert.equal(store.has(V9), false, "the retired key is removed");
+  assert.equal(store.has(LOCAL_RANKING_STORAGE_KEY), true, "the current key is never touched");
+  const kept = store.get(PERSONAL_BESTS_STORAGE_KEY);
+  assert.equal(takePastBestLine(), first, "a second open reads the same best");
+  assert.equal(store.get(PERSONAL_BESTS_STORAGE_KEY), kept, "and writes nothing");
+});
+
+test("the current key is not a retired one, and every retired key is older", () => {
+  const current = Number(LOCAL_RANKING_STORAGE_KEY.match(/-v(\d+)$/)[1]);
+  assert.equal(RETIRED_LOCAL_RANKING_STORAGE_KEYS.includes(LOCAL_RANKING_STORAGE_KEY), false);
+  for (const key of RETIRED_LOCAL_RANKING_STORAGE_KEYS) assert.ok(Number(key.match(/-v(\d+)$/)[1]) < current, key);
+  assert.deepEqual(RETIRED_LOCAL_RANKING_STORAGE_KEYS, Array.from({ length: current - 1 }, (_, i) => `critical-point-local-ranking-v${i + 1}`), "every key before the current one is retired, so the module's current version is the ranking's");
+});
+
+test("the entry's modules do not carry the move: the ranking screen fetches it", () => {
+  const source = (file) => readFileSync(new URL(`../../src/${file}`, import.meta.url), "utf8");
+  assert.doesNotMatch(source("state/useLocalRanking.js"), /^import .*personalBests|RETIRED_LOCAL_RANKING_STORAGE_KEYS = |removeStoredValue/m);
+  assert.match(source("screens/RankingScreen.jsx"), /import\("\.\.\/personalBests\.js"\)/);
+  assert.doesNotMatch(source("personalBests.js"), /^import /m, "it imports nothing, so its fetch has no files to preload");
+  assert.doesNotMatch(source("screens/RankingScreen.jsx"), /^import .*personalBests/m);
 });

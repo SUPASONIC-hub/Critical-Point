@@ -867,6 +867,13 @@ const budgets = [
   // 2,052 / 1,077 -> 1,652 / 907 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,652 / 903 in the e2e build, the gzip plus 4.
   { pattern: /^CaseCast-.*\.js$/, maxBytes: 1_652, maxGzip: 907 },
+  // This device's best of each ranking key gone by (src/personalBests.js,
+  // improvement note E-7): the move of a retired key's best row to
+  // `critical-point-personal-bests`, read once, and the ranking screen's line.
+  // In the entry chunk it took that chunk to 171,399 / 61,949 on 2026-10-23;
+  // the ranking screen fetches it when it opens. 2,740 / 1,251 measured, the
+  // gzip plus 4.
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_740, maxGzip: 1_255 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is

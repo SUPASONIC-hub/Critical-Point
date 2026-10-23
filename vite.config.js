@@ -566,9 +566,12 @@ export default defineConfig(({ command, mode }) => ({
     // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
     // The case file's cast (CaseCast, D-8) is the same: the runtime has run
     // every file it leans on before the table's fold can open, and its list
-    // of sixteen files was about 500 bytes (2026-10-23).
+    // of sixteen files was about 500 bytes (2026-10-23). So are the personal
+    // bests (src/personalBests.js): the ranking screen that fetches them has
+    // already run every file they lean on, and the list cost that screen's
+    // chunk about 260 bytes.
     modulePreload: {
-      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast|personalBests)-/.test(filename) ? [] : deps),
     },
     rolldownOptions: {
       output: {
