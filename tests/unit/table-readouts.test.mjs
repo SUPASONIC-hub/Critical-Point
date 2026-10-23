@@ -71,7 +71,8 @@ test("the push not made is the one the seed deals, and the heartbeat's wall is t
     }
   }
   assert.ok(both.safe > 0 && both.bust > 0, JSON.stringify(both));
-  const cashed = reduceWindow(live("readouts:line"), { type: "CASH" }, ALL_RULES);
+  const cashed = reduceWindow(pushTimes(live("readouts:line"), 1), { type: "CASH" }, ALL_RULES);
+  assert.ok(cashed.pushes >= 1 && cashed.status === "cashed");
   assert.match(describeAfterword(cashed), /^한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
   const left = createWindow({ schema: BASE_SCHEMA, seed: "x", abandoned: true });
   assert.equal(describeAfterword(left), null, "a window left was never played to its wall");
@@ -165,4 +166,14 @@ test("the speaker's line about the last table: four heats, 20 to 30 lines, plain
   const line = getTableReaction([{ threshold: { busted: true } }], "scene");
   assert.ok(tableReactions.bust.includes(line));
   assert.equal(getTableReaction([{ threshold: { busted: true } }], "scene"), line, "the same scene, the same line");
+});
+
+test("a window closed without a push has no afterword; one push or more has it (Q34 (1))", () => {
+  const unpushed = reduceWindow(live("readouts:line"), { type: "CASH" }, ALL_RULES);
+  assert.equal(unpushed.status, "cashed");
+  assert.equal(unpushed.pushes, 0);
+  assert.equal(describeAfterword(unpushed), null);
+  const pushedOnce = reduceWindow(pushTimes(live("readouts:line"), 1), { type: "CASH" }, ALL_RULES);
+  assert.equal(pushedOnce.status, "cashed");
+  assert.match(describeAfterword(pushedOnce), /^한 번 더 밀었다면 /);
 });

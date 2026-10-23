@@ -40,6 +40,9 @@ export function readTellWall(win) {
 
 /** The reveal's one line for a closed window, or null. */
 export function describeAfterword(win) {
+  // A window closed without a single push (heat 0 straight to the close) has
+  // nothing to weigh "one more" against: no line (user, 2026-10-23 Q34 (1)).
+  if (win?.status === "cashed" && !(Number(win.pushes) > 0)) return null;
   const next = readNextPush(win);
   if (next) return `한 번 더 밀었다면 +${next.step} → ${next.gauge}, 벽 ${next.wall}: ${next.safe ? "갈 수 있었다" : "BUST였다"}.`;
   const tell = readTellWall(win);

@@ -305,7 +305,7 @@ export function SceneBriefing({
             {/* Where the last scene left off (D-7): its echo, or the ending of the case before. */}
             {bridge && <p className="gx-bridge" data-testid="scene-bridge">{bridge}</p>}
             {/* The speaker on the last table, before the scene (C-13): a line of the runtime's, picked by its heat. */}
-            {reaction && <p className="gx-caption gx-caption-lead" data-testid="table-reaction">{node.speaker}: “{reaction}”</p>}
+            {reaction && <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">{node.speaker}: “{reaction}”</p>}
             {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
             <ProseCaptions text={node.text} />
           </div>

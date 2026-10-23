@@ -86,6 +86,14 @@ const flipDetails = () => {
  * shorter than the sheet -- a phone on its side -- the reveal opened at its
  * foot, with the verdict it exists to show above the fold.
  */
+// The afterword's verdict ("갈 수 있었다", "BUST였다") kept on one line: at 360px
+// in the larger story size it broke inside "갈 수 / 있었다".
+function afterwordParts(text) {
+  const at = text.lastIndexOf(": ");
+  if (at < 0) return text;
+  return <>{text.slice(0, at + 2)}<span className="gx-reveal-keep">{text.slice(at + 2)}</span></>;
+}
+
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
   const verdict = decisionReveal?.verdict ?? null;
@@ -150,7 +158,7 @@ export function DecisionReveal({ view }) {
               case against a hand that sees the wall (tableAfterword.js). Plain
               text in the sheet, nothing that moves and no voice of its own:
               the slam is the one announcement. */}
-          {decisionReveal.afterword && <p data-testid="reveal-afterword">{decisionReveal.afterword}</p>}
+          {decisionReveal.afterword && <p data-testid="reveal-afterword">{afterwordParts(decisionReveal.afterword)}</p>}
           {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>
 

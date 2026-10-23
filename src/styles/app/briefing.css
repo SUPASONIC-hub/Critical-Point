@@ -394,6 +394,13 @@
   background: var(--c-amber);
 }
 
+/* The speaker on the last table (C-13): a box of its own, not the lead's
+   amber, so the scene's lead stays the one yellow box. */
+.gx-caption-reaction {
+  border-style: dashed;
+  box-shadow: none;
+}
+
 /* The line from the scene before (D-7), quieter than the boxes it leads. */
 .gx-bridge {
   margin: 0;

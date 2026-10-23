@@ -1873,6 +1873,11 @@
   font-weight: 600;
 }
 
+/* The afterword's verdict stays on one line (360px, larger story size). */
+.gx-reveal-keep {
+  white-space: nowrap;
+}
+
 /* 자세히: the short sheet's way to the whole one. Under the verdict, above
    everything it opens, so what grows is below the button and the top of the
    sheet -- the verdict and the button -- is what stays in view. */
