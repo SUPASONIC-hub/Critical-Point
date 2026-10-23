@@ -92,7 +92,10 @@ const budgets = [
   // E-8's first season (the season count read off the NEW GAME+ keys, the
   // second box's key and the choice both starts read) and one more chunk in
   // the preload lists (sceneChoices, E-6).
-  { pattern: /^index-.*\.js$/, maxBytes: 170_453, maxGzip: 61_616 },
+  // -> 171,964 / 62,152 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
+  // #262 #241 #251 #256 on main 5adcbb5): measured 171,964 / 62,148 in the
+  // e2e build, the gzip plus 4; the four additions above, together.
+  { pattern: /^index-.*\.js$/, maxBytes: 171_964, maxGzip: 62_152 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -178,7 +181,10 @@ const budgets = [
   // reveal, whose fetch and words are a chunk of their own (sceneChoices,
   // below). Reporting the hold on each frame in place of a mount effect and a
   // line in the hold button took 71 / 24 off (105,126 / 34,972 before).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_055, maxGzip: 34_952 },
+  // -> 105,284 / 35,047 on 2026-10-23, 10-23 묶음 A 합친 상태 실측 (#220 #226
+  // #241 #256 together on main 5adcbb5): measured 105,284 / 35,043 in the e2e
+  // build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 105_284, maxGzip: 35_047 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -385,7 +391,10 @@ const budgets = [
   // rule, kept out of the PlayScreen chunk the same way.
   // 801 / 515 -> 897 / 562 for the ops-measure draft (2026-10-22), measured
   // 897 / 558 plus 4: E-9's line in the story, printed and read by the clock.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_271, maxGzip: 648 },
+  // -> 1,378 / 695 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: the NEW GAME+
+  // panel (#220) and E-9's line (#256) together, measured 1,378 / 691, the
+  // gzip plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_378, maxGzip: 695 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -530,7 +539,10 @@ function checkBudget(file, budget) {
 // measured 9,000 / 3,258 on 2026-10-23, rebased on 2c7b535: 9,000 / 3,262.
 // 8,962 / 3,248 -> 8,997 / 3,258 for ops-measure (2026-10-23), measured
 // 8,997 / 3,254 plus 4: one more file, sceneChoices (E-6).
-const WORKER_BUDGET = { maxBytes: 9_000, maxGzip: 3_262 };
+// -> 9,068 / 3,294 on 2026-10-23, 10-23 묶음 A 합친 상태 실측: EdgeNotice,
+// ReadingClockAsk and sceneChoices all in the list, measured 9,068 / 3,290
+// plus 4.
+const WORKER_BUDGET = { maxBytes: 9_068, maxGzip: 3_294 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
