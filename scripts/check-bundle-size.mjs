@@ -114,7 +114,12 @@ const budgets = [
   // trail; the trail's code went to its own chunk (windowTrail, below) and
   // the trail rides on the window, so what is left here is the import and two
   // calls. Kept beside the window first, it measured 34,927, then 34,849.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_822 },
+  // 34,822 -> 34,827 gzip on 2026-10-23 (reversals-29-35, #252, draft),
+  // measured 104,745 / 34,823 in the e2e build on main 2c7b535 with the
+  // branch, the gzip plus 4. The branch changes no code in this chunk, only
+  // the text of 사건 29 and 35; the chunk names it imports by hash change with
+  // them, and the gzip moved by one byte.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_745, maxGzip: 34_827 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
