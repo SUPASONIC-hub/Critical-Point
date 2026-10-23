@@ -1424,7 +1424,7 @@ for (const season of [
     const draftSkip = page.getByTestId("relic-skip");
     await expect(briefing.or(draftSkip).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     if (await draftSkip.isVisible()) await clickThroughMotion(draftSkip, "skip the relic draft");
-    // Read at once: the page's reading clock opens the table by itself after 12 to 95 seconds.
+    // Read at once: the page's reading clock opens the table by itself after 12 to 94 seconds.
     await expect(briefing).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     await expect(page.getByTestId("open-table")).toBeVisible();
     const reopened = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
