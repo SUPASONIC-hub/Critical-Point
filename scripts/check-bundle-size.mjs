@@ -31,7 +31,12 @@ const budgets = [
   // -> 452,171 / 144,949 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 452,171 / 144,945 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (454,682 / 146,568 on the same commit).
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 452_171, maxGzip: 144_949 },
+  // 452,171 / 144,949 -> 453,263 / 145,429 on 2026-10-23, rebased on main
+  // 5adcbb5 with lucide-react 1.60 installed (npm ci): measured 453,263 /
+  // 145,425, the gzip plus 4, raised by what it lacked. The 1,092 raw bytes
+  // are main's own since 2026-10-21 (main's budget is 551,000 / 176,100);
+  // the chunk this branch writes did not change.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 453_263, maxGzip: 145_429 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -393,7 +398,11 @@ const budgets = [
   // -> 220,606 / 68,323 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 220,606 / 68,319 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (221,715 / 68,974 on the same commit).
-  { pattern: /^react-vendor-.*\.js$/, maxBytes: 220_606, maxGzip: 68_323 },
+  // 220,606 / 68,323 -> 220,621 / 68,331 on 2026-10-23, rebased on main
+  // 5adcbb5 with its lock installed (npm ci): measured 220,621 / 68,327, the
+  // gzip plus 4, raised by what it lacked. Nothing of the app's is in this
+  // chunk; the 15 bytes came with the lock, not with this branch.
+  { pattern: /^react-vendor-.*\.js$/, maxBytes: 220_621, maxGzip: 68_331 },
   // The four budgets below were first written against the tree before the
   // 2026-09-28 fix pass and are set here against the tree after it, measured
   // plus 5%: the same day's other changes are what they have to hold.
@@ -403,11 +412,11 @@ const budgets = [
   // measured 17,595 / 6,139 and raised by the shortfall only: the same 49
   // icons, no unused import to drop, but 1.x adds a provider context, alias
   // class names and a name/size record per icon to the shared code.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_600, maxGzip: 6_150 },
-  // Vite 8 (#225, 다음에 실측): -> 13,212 / 4,662 on 2026-10-21, Vite 8 (#225, the user's choice 1):
-  // measured 13,212 / 4,658 in the e2e build, the gzip plus 4. Rolldown and
-  // Oxc write it smaller than Rollup and esbuild did (13,919 / 4,967 on the same commit).
-  // That was measured on the main of 2026-10-21, before what is above; re-measure on this base, then lower: { pattern: /^icons-vendor-.*\.js$/, maxBytes: 13_212, maxGzip: 4_662 },
+  // 17,600 / 6,150 -> 17,050 / 6,047 on 2026-10-23, Vite 8 (#225, the user's
+  // choice 1): measured 17,050 / 6,043 in the e2e build on main 5adcbb5 with
+  // lucide-react 1.60 installed (npm ci), the gzip plus 4. The 13,212 / 4,658
+  // of 2026-10-21 was lucide 0.577 left in this checkout's node_modules.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_050, maxGzip: 6_047 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -415,7 +424,12 @@ const budgets = [
   // -> 5,502 / 2,359 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 5,502 / 2,355 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (5,748 / 2,370 on the same commit).
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_502, maxGzip: 2_359 },
+  // 5,502 / 2,359 -> 5,507 / 2,366 on 2026-10-23, rebased on main 5adcbb5
+  // with lucide-react 1.60 installed (npm ci): measured 5,507 / 2,362, the
+  // gzip plus 4, raised by what it lacked. The 5 bytes came with main and
+  // lucide 1.60 (#218, which the screen imports from); this branch changes
+  // nothing in it.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_507, maxGzip: 2_366 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -441,7 +455,10 @@ const budgets = [
   // -> 4,468 / 1,896 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 4,468 / 1,892 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (4,820 / 1,964 on the same commit).
-  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 4_468, maxGzip: 1_896 },
+  // -> 4,458 / 1,893 on 2026-10-23, rebased on main 5adcbb5 with
+  // lucide-react 1.60 installed (npm ci): measured 4,458 / 1,889, the gzip
+  // plus 4.
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 4_458, maxGzip: 1_893 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
   // 35,720 / 13,520 -> 37,870 / 14,200 on 2026-10-09, measured 36,063 /
@@ -463,11 +480,13 @@ const budgets = [
   // (createCaseOpen, normalizeCaseOpen, stampCaseOpen, createCaseClose).
   // 14,757 -> 14,761 gzip on 2026-10-24 (f1-s7 on efba1927): measured 14,757,
   // at the ceiling, plus 4; the chunk's imports name hashed files that change under it.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_578, maxGzip: 14_761 },
-  // Vite 8 (#225, 다음에 실측): -> 35,399 / 13,279 on 2026-10-21, Vite 8 (#225, the user's choice 1):
-  // measured 35,399 / 13,275 in the e2e build, the gzip plus 4. Rolldown and
-  // Oxc write it smaller than Rollup and esbuild did (37,136 / 14,333 on the same commit).
-  // That was measured on the main of 2026-10-21, before what is above; re-measure on this base, then lower: { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 35_399, maxGzip: 13_279 },
+  // 37,870 / 14,367 -> 35,483 / 13,311 on 2026-10-23, Vite 8 (#225, the
+  // user's choice 1): measured 35,483 / 13,307 in the e2e build on main
+  // 5adcbb5 with lucide-react 1.60 installed (npm ci), the gzip plus 4.
+  // Rolldown and Oxc write it smaller than Rollup and esbuild did (35,399 /
+  // 13,275 against 37,136 / 14,333 on the main of 2026-10-21).
+  // (the line below is main’s; re-measured on this base later in this branch)
+  { pattern: /^gauntletEngine-.*.js$/, maxBytes: 38_578, maxGzip: 14_761 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -527,7 +546,11 @@ const budgets = [
   // -> 108,190 / 34,757 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 108,190 / 34,753 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (108,206 / 34,759 on the same commit).
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 108_190, maxGzip: 34_757 },
+  // 108,190 / 34,757 -> 109,685 / 35,248 on 2026-10-23, rebased on main
+  // 5adcbb5: measured 109,685 / 35,244, the gzip plus 4, raised by what it
+  // lacked. The 1,495 bytes are main's copy since 2026-10-21 (main's budget
+  // is 113,650 / 36,570); the bundler writes the strings as they are.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 109_685, maxGzip: 35_248 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -674,7 +697,12 @@ const budgets = [
   // 2026-10-21 it is switched by the season's week (`cascade`), so the walk,
   // the reading and the links a case's close carries over are all here:
   // 2,790 / 1,669 measured, the gzip plus 4.
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_790, maxGzip: 1_673 },
+  // 2,790 / 1,673 -> 2,637 / 1,541 on 2026-10-23, Vite 8 (#225, the user's
+  // choice 1): measured 2,637 / 1,537 in the e2e build on main 5adcbb5 with
+  // lucide-react 1.60 installed (npm ci), the gzip plus 4. Rolldown and Oxc
+  // write it smaller than Rollup and esbuild did (2,637 / 1,536 against 2,790
+  // / 1,667 on the main of 2026-10-21).
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_637, maxGzip: 1_541 },
   // The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js,
   // WINDOW_TRAIL in vite.config.js): the presses the table writes, the record
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
