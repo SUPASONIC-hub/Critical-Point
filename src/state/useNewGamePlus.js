@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, readNewGamePlusMemory, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { getSeasonCarry, getSeasonComparison, normalizeSeasonRecord, recordFinishedSeason, SEASON_RECORD_KEY, withEndingBook } from "./newGamePlusCarry.js";
+import { storePastPicks } from "./pastPicks.js";
 import { createSecondSeason } from "./secondSeason.js";
 import { pastSeenScenes, readSeenRecord, storeSeenScenes } from "./seenScenes.js";
 
@@ -76,6 +77,18 @@ export function storeSeasonScenes(finishedSeason, { log = null } = {}) {
   return final && Array.isArray(log) ? storeSeenScenes({ runId: final.runId ?? null, log }) : null;
 }
 
+/**
+ * Writes a finished season's picks over the last season's (pastPicks.js,
+ * B-14(1) 「지난 시즌의 당신」): the card picked last in each scene of the
+ * finale's `log`. Returns the record as it now stands, or null when there is
+ * no closed finale or log. Nothing reads it back yet; the board's mark is the
+ * next step.
+ */
+export function storeSeasonPicks(finishedSeason, { log = null } = {}) {
+  const final = seasonToRemember(finishedSeason)?.final;
+  return final && Array.isArray(log) ? storePastPicks({ runId: final.runId ?? null, log }) : null;
+}
+
 /** What a run folds: for a NEW GAME+ run, the scenes the seasons before it read; otherwise null. */
 export function seenBefore(seenRecord, runId, veteran) {
   return veteran === true ? pastSeenScenes(seenRecord, runId) : null;
@@ -115,7 +128,8 @@ export function useNewGamePlus(saved, runId = null, veteran = false) {
    * The finale's close also counts the season into the record
    * (`storeSeasonRecord`); `finale` carries its verdict choice. Pressing NEW
    * GAME+ calls this with nothing, which counts nothing. `finale.log` is the
-   * season's log, whose scenes are counted as read (`storeSeenScenes`).
+   * season's log, whose scenes are counted as read (`storeSeenScenes`) and
+   * whose picks are kept for the season after (`storeSeasonPicks`).
    */
   function unlock(finishedSeason = null, finale = {}) {
     setUnlocked(true);
@@ -124,6 +138,7 @@ export function useNewGamePlus(saved, runId = null, veteran = false) {
     if (finishedSeason) setSeasonRecord(storeSeasonRecord(finishedSeason, finale));
     const seen = storeSeasonScenes(finishedSeason, finale);
     if (seen) setSeenRecord(seen);
+    storeSeasonPicks(finishedSeason, finale);
   }
 
   // `readSeasonCarry` and the comparison line are handed out with the rest, so
