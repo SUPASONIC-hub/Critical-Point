@@ -131,5 +131,5 @@ test("a case's opening voice is shown on its first page only, and is on the read
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
   assert.ok(briefing.indexOf('data-testid="briefing-opening"') > briefing.indexOf('id="gx-comic-title"'));
   assert.ok(briefing.indexOf('data-testid="briefing-opening"') < briefing.indexOf('data-testid="reading-timer"'));
-  assert.match(briefing, /\.\.\.weekRules, \{ text: openingLine \}\]/);
+  assert.match(briefing, /\.\.\.weekRules, (\{ text: bridge \}, )?\{ text: openingLine \}\]/);
 });

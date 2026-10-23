@@ -24,7 +24,7 @@ test("the bridge is printed over the first box and counted on the reading clock"
   const briefing = readFileSync(new globalThis.URL("../../src/gauntlet/SceneBriefing.jsx", import.meta.url), "utf8");
   const story = briefing.indexOf('className="gx-panel gx-panel-story"');
   assert.ok(story > 0 && briefing.indexOf('data-testid="scene-bridge"') > story && briefing.indexOf('data-testid="scene-bridge"') < briefing.indexOf("<ProseCaptions"));
-  assert.match(briefing, /\.\.\.weekRules, \{ text: bridge \}\]/);
+  assert.match(briefing, /\.\.\.weekRules, \{ text: bridge \}[,\]]/);
   const node = { text: "가".repeat(200) };
   assert.ok(getReadingSeconds(node, [{ text: "지난 장면에서 — " + "나".repeat(40) }]) > getReadingSeconds(node));
 });

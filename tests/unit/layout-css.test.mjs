@@ -301,7 +301,7 @@ test("a phone draws the room behind the briefing's title, and its panel is the r
   assert.match(phone, /\.gx-panel-speaker \{\s*grid-template-columns: 96px 1fr;\s*\}/);
   assert.match(phone, /\.gx-speaker-tag b \{\s*font-size: 1\.375rem;\s*\}/);
   const jsx = readFileSync(new globalThis.URL("../../src/gauntlet/SceneBriefing.jsx", import.meta.url), "utf8");
-  const header = jsx.slice(jsx.indexOf('<header className="gx-comic-top">'), jsx.indexOf("</header>"));
+  const header = jsx.slice(jsx.indexOf('<header className={`gx-comic-top'), jsx.indexOf("</header>"));
   assert.match(header, /<ScenePlate node=\{node\} nodeId=\{nodeId\} variant="backdrop" \/>/);
   // The place caption keeps the sizes it always had.
   assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid/);
