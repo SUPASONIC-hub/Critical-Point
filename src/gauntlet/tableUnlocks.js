@@ -37,7 +37,7 @@ export const STAGED = true;
  * 초안). The other seven are the next-table mutations, under the ids the
  * engine's `MUTATIONS` catalogue uses. `audit` is B3's audit (auditRisk.js)
  * and `cascade` B2's links (cascadeRisk.js), rules of the table since
- * RULES_MARK 3; before that they were 2026-W44's test week.
+ * RULES_MARK 3; before that they were 2026-W47's test week.
  */
 export const TABLE_RULES = Object.freeze([
   "logic",
