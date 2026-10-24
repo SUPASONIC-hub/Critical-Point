@@ -135,7 +135,9 @@ const budgets = [
   // 173,001 / 62,482 in the e2e build (the larger of two builds), the gzip plus 4.
   // +398 / +229 on 2026-10-22 (F1 phase 3, S3, draft): the case row's dynamics
   // check and fit (payloadSchemas.js) and the opening snapshot stamped on a new game.
-  { pattern: /^index-.*\.js$/, maxBytes: 173_001, maxGzip: 62_486 },
+  // -> 173,724 / 62,701 on 2026-10-24 (#240 f1-s7 on f1-stage3 efba1927, main
+  // 5ea63bf under it): measured 173,724 / 62,697 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_724, maxGzip: 62_701 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -277,7 +279,9 @@ const budgets = [
   // -> 107,602 / 35,960 that evening (운영 확인 고칠 점 4: the C-13 box's 직전 판
   // line): measured 107,602 / 35,956 (the larger of two builds), the gzip plus 4.
   // +2 on 2026-10-22 (S3, draft): the case and its hand handed to openCaseRun.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_602, maxGzip: 35_960 },
+  // On main's 107,602 that is 107,604 (2026-10-24, f1-s7 on efba1927): measured
+  // 107,604 / 35,954 in the e2e build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_604, maxGzip: 35_958 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -427,7 +431,9 @@ const budgets = [
   // (normalizeSuspendedWindow), so the trail goes on after the resume.
   // +708 / +390 on 2026-10-22 (F1 phase 3, S3, draft): the case-open snapshot
   // (createCaseOpen, normalizeCaseOpen, stampCaseOpen, createCaseClose).
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_578, maxGzip: 14_757 },
+  // 14,757 -> 14,761 gzip on 2026-10-24 (f1-s7 on efba1927): measured 14,757,
+  // at the ceiling, plus 4; the chunk's imports name hashed files that change under it.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_578, maxGzip: 14_761 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
