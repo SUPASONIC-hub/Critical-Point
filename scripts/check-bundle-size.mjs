@@ -67,7 +67,10 @@ const budgets = [
   // the owner's answers all (1)): the 33rd floor's far callback to 사건 49
   // (farCallbacks.f_confront, three lines and a fallback). Measured 142,728 /
   // 52,270 in the e2e build on main ea5b74aa, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_728, maxGzip: 52_274 },
+  // 52,274 -> 52,279 gzip on 2026-10-25, 묶음 A-13 (long scene bodies, text
+  // only) on main 024904a3: the shortened case files change the hashed names
+  // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_728, maxGzip: 52_279 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -94,7 +97,11 @@ const budgets = [
   // the gzip plus 4; with GameRuntime the two are 433,077 / 139,053 beside
   // 432,844 / 138,381 before (+233 raw / +672 gzip: the same code, packed
   // into the larger file). Both load with the runtime, as before.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_094 },
+  // 87,094 -> 87,101 gzip on 2026-10-25 (A-13 1/4): the raw bytes are the
+  // same 291,131, but eight case files' hashed names in its import list
+  // changed with their scene text and gzip worse; measured 87,097 on main
+  // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_101 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -369,7 +376,9 @@ const budgets = [
   // WeekRulePanel's. Measured 107,682 / 35,987 in the e2e build, the gzip plus 4.
   // 107,682 / 35,991 -> 101,087 / 34,821 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_087, maxGzip: 34_821 },
+  // 34,821 -> 34,826 gzip on 2026-10-25, 묶음 A-13 on main 024904a3 (hashed
+  // chunk names only): measured 101,085 / 34,822 in the e2e build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_087, maxGzip: 34_826 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
