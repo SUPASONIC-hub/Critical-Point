@@ -682,7 +682,7 @@ export const case27 = {
     systemNext: "c27_route_system",
     evidenceNext: "c27_evidence_turn",
     systemLabel: "심사 단말에서 새로 짠 판이 소문 캡처에 묻었는지 본다",
-    evidenceLabel: "사업비 명세서 한 줄을 캡처 속 대화방 기록에 대 본다",
+    evidenceLabel: "사업비 명세서의 한 줄을 캡처 속 기록에 대 본다",
     systemEcho: "캡처의 말은 당신의 판과 닮은 데가 없습니다. 말투가 닮은 쪽은 사내 메신저입니다. 노아가 출처를 모르는 소문으로 시작된 인출 사태들을 불러옵니다.",
     evidenceEcho: "자문료가 나간 날짜를 대화방 기록에 대면 소문보다 사흘 이른 문서가 걸려 있습니다. 새봄신협에 매긴 값이 적혀 있습니다.",
   },
