@@ -52,7 +52,10 @@ const budgets = [
   // 146,793 / 53,488 in the e2e build, the gzip plus 4; with gameData.app,
   // gameLogic and RelicDraft the four are 479,421 / 157,854, under main's
   // 551,000 / 176,100 for this one chunk.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 146_793, maxGzip: 53_492 },
+  // 146,793 / 53,492 -> 147,040 / 53,578 on 2026-10-24, rebased on main
+  // 239e615e (#240, the case-open snapshot in the runtime): measured 147,040 /
+  // 53,574 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_040, maxGzip: 53_578 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -518,8 +521,11 @@ const budgets = [
   // 5adcbb5 with lucide-react 1.60 installed (npm ci), the gzip plus 4.
   // Rolldown and Oxc write it smaller than Rollup and esbuild did (35,399 /
   // 13,275 against 37,136 / 14,333 on the main of 2026-10-21).
-  // (the line below is main’s; re-measured on this base later in this branch)
-  { pattern: /^gauntletEngine-.*.js$/, maxBytes: 38_578, maxGzip: 14_761 },
+  // 38,578 / 14,761 (main) -> 36,757 / 13,658 on 2026-10-24, Vite 8 (#225)
+  // rebased on main 239e615e (#240): measured 36,757 / 13,654 in the e2e
+  // build, the gzip plus 4. The case-open snapshot is in it; Rolldown and Oxc
+  // still write it smaller than Rollup and esbuild did.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_757, maxGzip: 13_658 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
