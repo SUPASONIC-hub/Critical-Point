@@ -426,7 +426,9 @@ const budgets = [
   // 43,189 / 14,211 -> 44,569 / 14,830 on 2026-10-25 (B-12(2) 「당신의 세 장면」,
   // src/threeScenes.js in the ending's last step, on main ea5b74aa): measured
   // 44,569 / 14,826 in the e2e build, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_569, maxGzip: 14_830 },
+  // 44,569 / 14,830 -> 44,583 / 14,831 on 2026-10-25, #224 (RULES_MARK 3) rebased on
+  // main 7236f80b: measured 44,583 / 14,827 in the e2e build, the gzip plus 4. Hash names in its imports only.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_583, maxGzip: 14_831 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -479,7 +481,10 @@ const budgets = [
   // e72c415f: measured 191,685 / 35,787 in the e2e build, the gzip plus 4.
   // -> 191,778 / 35,830 on 2026-10-25 with B-12(2)'s 「당신의 세 장면」 coda
   // (main ea5b74aa): measured 191,778 / 35,826, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 191_778, maxGzip: 35_830 },
+  // 191,778 / 35,830 -> 191,912 / 35,848 on 2026-10-25, #224 (RULES_MARK 3)
+  // rebased on main 7236f80b: B2's link mark as a tag on the card's edge
+  // (.gx-card-link). Measured 191,912 / 35,844, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 191_912, maxGzip: 35_848 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1042,7 +1047,10 @@ function checkBudget(file, budget) {
 // b0eb9cb0 (#287), 3,405; the larger plus 4. One
 // more file in the list, cloudDeviceRecords, and gameData.app is now named
 // pastPicks; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_310, maxGzip: 3_409 };
+// 9,310 / 3,409 -> 9,346 / 3,428 on 2026-10-25, #224 rebased on main
+// 7236f80b: measured 9,346 / 3,424 plus 4. One more file in the list,
+// personalBests; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_346, maxGzip: 3_428 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
