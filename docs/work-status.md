@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-23 (the state of `main` at `71f7ad2`, after the day's combined pull requests; what changed and when is in `git log`)
+Last updated: 2026-10-24 (the state of `main` at `2baf2f3`, after bundle D; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -223,10 +223,19 @@ Still open, on purpose:
   구좌」, 도윤하's portrait to match the text, a 직전 판 line on the last-table
   reaction), then cleanup #268, #281 (off the table the music pills scroll with
   the page on a phone) and these docs. Production runs `71f7ad2`.
-- Drafts still open on 2026-10-23: F1 phase 3 (#233, #240, merged
-  2026-10-24), the ending collection (#274), Vite 8 (#225), and B-14 "you,
-  last season" (seven answers all option 1). The last two of those became
-  bundle D (#278, E-3 and B-14(1) on main 90247c0) on 2026-10-24.
+- 2026-10-24: six pull requests merged. #282 (the seal card's badge on a
+  solid patch over the hatching), #233 (F1 phase 3: S2 and S4 on top of
+  phase 2) and #240 (S7: S3 and S6 together, the case-open snapshot;
+  migration renumbered 20261102030000 -> `20261026000000`, applied on merge,
+  Migration Drift green), #283 (the edge notices written per case: 55 cells,
+  one messenger line and one mail each, naming only people and events
+  already met by that case; the notice chunk 11,705 / 5,445), and bundle D
+  #278 with #274 inside it (E-3: the NEW GAME+ memory panel counts endings
+  and verdicts seen and hints at the ones not yet reached; B-14(1): a card
+  picked last season carries 「지난 시즌의 당신」 on the briefing and in the
+  hand, display only). Production runs `2baf2f3`. Vite 8 (#225) waits as a
+  draft for a morning of its own: every budget and every baseline is set
+  again on the day it merges.
   The rules-mark-3 pull request (#224: RULES_MARK 3, the season score as a
   mean over its cases with the change of view counted over the whole season,
   ranking reset v10) and personal bests (#253) go out in one deploy on
