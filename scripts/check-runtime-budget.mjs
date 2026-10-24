@@ -197,10 +197,13 @@ const BUDGETS = {
   // 834 -> 847 on 2026-10-23, batch B on batch A, measured: batch A's edge
   // notices and reading tally beside batch B's readouts, each budgeted on its
   // own base until the two met.
+  // 847 / 69 -> 851 / 70 on 2026-10-24, measured: B-11(1)'s act title card,
+  // one hook (ActCardFold.jsx's useActCard) that holds the draft and the
+  // briefing while the card is up, and the card drawn in front of them.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 847,
+    lines: 851,
     longestLine: 250,
-    importedNames: 69,
+    importedNames: 70,
     hooks: {},
   },
 };
