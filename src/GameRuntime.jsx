@@ -91,6 +91,7 @@ import { loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
 import { retryableLazy } from "./state/retryableLazy.js";
 export { prepareGameRuntime } from "./state/caseArrival.js";
+export { sideCaseKit } from "./state/sideCaseKit.js";
 
 const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));

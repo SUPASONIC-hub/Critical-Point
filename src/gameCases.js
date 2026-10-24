@@ -178,6 +178,8 @@ export const SEASON_ENTRY_NODE = CASE_START_NODES[SEASON_ENTRY_CASE];
  */
 export function caseNodePrefix(caseId = "") {
   if (caseId === "final") return "f";
+  // E-11: a side case (`side01`) is outside CASE_SEQUENCE; its scenes are `s1_`.
+  if (/^side\d+$/.test(caseId)) return `s${Number(caseId.slice(4))}`;
   if (/^prologue\d+$/.test(caseId)) return `p${Number(caseId.slice(8))}`;
   if (/^case\d+$/.test(caseId)) return `c${Number(caseId.slice(4))}`;
   return "";
@@ -188,9 +190,10 @@ export function caseAftermathNodeId(caseId = "") {
   return `${caseNodePrefix(caseId)}_aftershock`;
 }
 
-/** The short code a case is stamped with: `P1`, `07`, `F`. */
+/** The short code a case is stamped with: `P1`, `07`, `F`, and a side case's `번외 1`. */
 export function caseDisplayCode(caseId = "") {
   if (caseId === "final") return "F";
+  if (/^side\d+$/.test(caseId)) return `번외 ${Number(caseId.slice(4))}`;
   if (/^prologue\d+$/.test(caseId)) return `P${Number(caseId.slice(8))}`;
   return caseId.replace("case", "");
 }

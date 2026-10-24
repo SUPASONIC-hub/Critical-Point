@@ -63,7 +63,12 @@ const budgets = [
   // save's restore (src/state/cloudDeviceRecords.js), so Rolldown writes them
   // into the shared season-store chunk below. Measured 141,946 / 51,960 in the
   // e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 141_946, maxGzip: 51_964 },
+  // 141,946 / 51,964 -> 144,931 / 53,085 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the side run
+  // (state/sideRun.js) and what the side screen takes from this chunk
+  // (state/sideCaseKit.js). The pack check stays out (state/sidePackCheck.js,
+  // read by check:graph and the tests only). Measured 144,931 / 53,081 in the
+  // e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 144_931, maxGzip: 53_085 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -74,7 +79,10 @@ const budgets = [
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_564, maxGzip: 8_588 },
+  // 19,564 / 8,588 -> 19,565 / 8,594 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the same
+  // code; one more name the runtime's chunk imports from it. Measured 19,565 /
+  // 8,590, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_565, maxGzip: 8_594 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -215,7 +223,12 @@ const budgets = [
   // keys the online save now carries (SEEN_SCENES_KEY, PAST_PICKS_KEY) are
   // spelled in appConfig.js, where cloudSave.js reads them without the scene
   // graph. Measured 172,146 / 62,150 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_146, maxGzip: 62_154 },
+  // 172,146 / 62,154 -> 174,226 / 62,857 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the
+  // start screen's side slot, hidden until a finale is closed and a side case
+  // is written (src/sideCases.js, the slot and its open/close in IntroScreen),
+  // and the side-id guards of the local ranking and the window log. The first
+  // paint's own budget is not raised. Measured 174,226 / 62,853, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 174_226, maxGzip: 62_857 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -365,7 +378,9 @@ const budgets = [
   // WeekRulePanel's. Measured 107,682 / 35,987 in the e2e build, the gzip plus 4.
   // 107,682 / 35,991 -> 101,087 / 34,821 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_087, maxGzip: 34_821 },
+  // 101,087 -> 101,102 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): GauntletStage
+  // exported for the side screen's table. Measured 101,102 / 34,820.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_102, maxGzip: 34_821 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -407,7 +422,10 @@ const budgets = [
   // 43,189 / 14,211 -> 44,569 / 14,830 on 2026-10-25 (B-12(2) 「당신의 세 장면」,
   // src/threeScenes.js in the ending's last step, on main ea5b74aa): measured
   // 44,569 / 14,826 in the e2e build, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_569, maxGzip: 14_830 },
+  // 44,569 / 14,830 -> 44,851 / 14,910 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the
+  // finale's line that the side slot opened, and the side list it reads.
+  // Measured 44,851 / 14,906, the gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_851, maxGzip: 14_910 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -529,7 +547,10 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // 11,492 / 4,639 -> 11,494 / 4,647 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the same
+  // code under the import names the new chunks moved. Measured 11,494 / 4,643,
+  // the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_494, maxGzip: 4_647 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -574,7 +595,11 @@ const budgets = [
   // rebased on main 239e615e (#240): measured 36,757 / 13,654 in the e2e
   // build, the gzip plus 4. The case-open snapshot is in it; Rolldown and Oxc
   // still write it smaller than Rollup and esbuild did.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_757, maxGzip: 13_658 },
+  // 13,658 -> 13,698 gzip on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the same code; the
+  // side run imports two more of its names (RUN_INITIAL_STATE,
+  // serializeRunState), which changes how the export list packs. Measured
+  // 36,757 / 13,694, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_757, maxGzip: 13_698 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -716,7 +741,8 @@ const budgets = [
   // story.
   // 2,704 / 1,450 -> 2,634 / 1,403 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 2,634 / 1,399 in the e2e build, the gzip plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_634, maxGzip: 1_403 },
+  // 2,634 -> 2,637 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): an import name, measured.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_637, maxGzip: 1_403 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -728,7 +754,8 @@ const budgets = [
   // week's notice in the same line.
   // 2,081 / 1,077 -> 1,995 / 1,051 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,995 / 1,047 in the e2e build, the gzip plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_995, maxGzip: 1_051 },
+  // 1,995 -> 1,996 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): an import name, measured.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_051 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -852,6 +879,12 @@ const budgets = [
   // 2,052 / 1,077 -> 1,652 / 907 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,652 / 903 in the e2e build, the gzip plus 4.
   { pattern: /^CaseCast-.*\.js$/, maxBytes: 1_652, maxGzip: 907 },
+  // E-11 번외 사건: the side screen (src/screens/SideCaseScreen.jsx), fetched the
+  // first time a side case is opened from the start screen's slot -- never in a
+  // release until a side case is written. The side run and the table come from
+  // the runtime's and the play screen's chunks. Measured 4,293 / 1,954
+  // 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b), the gzip plus 4.
+  { pattern: /^SideCaseScreen-.*\.js$/, maxBytes: 4_293, maxGzip: 1_958 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -993,7 +1026,9 @@ function checkBudget(file, budget) {
 // b0eb9cb0 (#287), 3,405; the larger plus 4. One
 // more file in the list, cloudDeviceRecords, and gameData.app is now named
 // pastPicks; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_310, maxGzip: 3_409 };
+// -> 9,347 / 3,425 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): measured 9,347 / 3,421 plus 4.
+// One more file in the list, SideCaseScreen; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_347, maxGzip: 3_425 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

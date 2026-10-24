@@ -57,6 +57,29 @@ export function clearReadingTally() {
   }
 }
 
+/**
+ * E-11: a side case is read on the same briefing pages, and its pages are not
+ * the season case's. The side screen takes the tally as it stands when it
+ * opens and puts it back when it closes, so the next season case row carries
+ * only the season's reading (screens/SideCaseScreen.jsx).
+ */
+export function keepReadingTally() {
+  let kept = null;
+  try {
+    kept = globalThis.sessionStorage?.getItem(READING_TALLY_KEY) ?? null;
+  } catch {
+    // No storage: there is nothing to keep, and the side case's pages are not counted either.
+  }
+  return () => {
+    try {
+      if (kept === null) globalThis.sessionStorage?.removeItem(READING_TALLY_KEY);
+      else globalThis.sessionStorage?.setItem(READING_TALLY_KEY, kept);
+    } catch {
+      // As above.
+    }
+  };
+}
+
 /** One briefing page closed: how long it was up (visible seconds), whether the clock opened it, whether it was held. */
 export function noteBriefing({ caseId = null, seconds, byClock = false, held = false }) {
   let tally = read();

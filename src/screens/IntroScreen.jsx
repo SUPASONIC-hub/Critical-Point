@@ -10,10 +10,16 @@ import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
+import { getSideSlot } from "../sideCases.js";
+import { LazyScreen } from "../components/LazyScreen.jsx";
 import { loadedChunk } from "../state/chunkReload.js";
+import { retryableLazy } from "../state/retryableLazy.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
+
+// E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
+const SideCaseScreen = retryableLazy(() => import("./SideCaseScreen.jsx").then(loadedChunk).then(({ SideCaseScreen }) => ({ default: SideCaseScreen })));
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -92,6 +98,8 @@ function takeRuntimeStartAction() {
 export function IntroScreen({ view, renderers = {} }) {
   // The case the burst is opening, or null when there is none.
   const [openingBurst, setOpeningBurst] = useState(null);
+  // E-11: the side case open in this screen's place, or null.
+  const [sideCaseId, setSideCaseId] = useState(null);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");  const {
@@ -249,6 +257,17 @@ export function IntroScreen({ view, renderers = {} }) {
       </button>
     </div>
   );
+  // E-11 번외 사건: hidden until a finale is closed on this device and a side
+  // case is written (sideCases.getSideSlot). Read on each draw, so a case
+  // closed in the side screen is counted when the start screen comes back.
+  const sideSlot = getSideSlot({ newGamePlusUnlocked, caseResults });
+  if (sideCaseId) {
+    return (
+      <LazyScreen>
+        <SideCaseScreen caseId={sideCaseId} Music={Music} onClose={() => setSideCaseId(null)} />
+      </LazyScreen>
+    );
+  }
   return (
       <main className="shell intro-shell" aria-busy={Boolean(openingBurst)}>
         <Music modeKey={musicModeKey} />
@@ -409,6 +428,27 @@ export function IntroScreen({ view, renderers = {} }) {
                 <Sparkles size={16} />
                 <span><span lang="en">NEW GAME+</span> 시작</span>
               </button>
+            )}
+            {sideSlot && (
+              <div className="resume-panel" data-testid="side-case-slot" role="group" aria-label="번외 사건">
+                <div>
+                  <span>번외 사건 · 랭킹 밖 · {sideSlot.book}</span>
+                  <small>시즌과 따로 하는 짧은 사건입니다. 시즌 저장과 랭킹은 그대로입니다.</small>
+                </div>
+                {sideSlot.cases.map((sideCase) => (
+                  <button
+                    key={sideCase.id}
+                    type="button"
+                    data-testid={`side-case-open-${sideCase.id}`}
+                    onClick={() => setSideCaseId(sideCase.id)}
+                    disabled={Boolean(openingBurst)}
+                  >
+                    <ChevronRight size={18} />
+                    {sideCase.label} {sideCase.title}
+                    {sideCase.resumable ? " · 이어하기" : sideCase.closed ? " · 끝냄" : ""}
+                  </button>
+                ))}
+              </div>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
               <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>

@@ -2,6 +2,7 @@ import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleAlert, Tro
 import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import * as endingCopy from "../endingCopy.js";
+import { SIDE_CASES } from "../sideCases.js";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
@@ -240,6 +241,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <p>{view.endingEpilogue}</p>
             </section>
           )}
+          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label="번외 사건" data-testid="side-slot-opened"><p>번외 사건 칸이 열렸습니다. 시작 화면에서 열 수 있고, 랭킹 밖입니다.</p></section>}
           {currentCase === "final" && view.logicReport && (
             <section className="ending-epilogue-panel" aria-label={view.logicReport.label} data-testid="logic-report">
               <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}

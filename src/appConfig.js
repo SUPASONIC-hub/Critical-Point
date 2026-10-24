@@ -14,6 +14,9 @@ export const SEASON_RECORD_KEY = "critical-point-season-record-v1";
 // online save (cloudSave.js) can carry them without the scene graph.
 export const SEEN_SCENES_KEY = "critical-point-seen-scenes-v1";
 export const PAST_PICKS_KEY = "critical-point-past-picks-v1";
+// E-11 번외 사건: each side case's completion mark and its run in progress
+// (src/sideCases.js). Device-only: no cloud save, no reset, no server row.
+export const SIDE_CASES_KEY = "critical-point-side-cases-v1";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 // The random id telemetry rows carry for this device (telemetry.getSessionId).
@@ -567,6 +570,8 @@ export function readSettledWindowSeeds() {
 
 export function recordSettledWindowSeed(seed) {
   if (typeof seed !== "string" || !seed) return false;
+  // E-11: a side case's windows (`side:...`, state/sideRun.js) are not the season's to log.
+  if (seed.startsWith("side:")) return false;
   const seeds = readSettledWindowSeeds().filter((existing) => existing !== seed);
   seeds.push(seed);
   return writeStoredValue(SETTLED_WINDOWS_STORAGE_KEY, JSON.stringify(seeds.slice(-SETTLED_WINDOWS_LIMIT)));
