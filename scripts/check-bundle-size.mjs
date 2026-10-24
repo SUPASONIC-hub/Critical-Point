@@ -484,7 +484,9 @@ const budgets = [
   // 191,778 / 35,830 -> 191,912 / 35,848 on 2026-10-25, #224 (RULES_MARK 3)
   // rebased on main 7236f80b: B2's link mark as a tag on the card's edge
   // (.gx-card-link). Measured 191,912 / 35,844, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 191_912, maxGzip: 35_848 },
+  // -> 191,943 / 35,856 the same day: the run's line 2px apart on a phone
+  // (.gx-stat.gx-run-signal). Measured 191,943 / 35,852, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 191_943, maxGzip: 35_856 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.

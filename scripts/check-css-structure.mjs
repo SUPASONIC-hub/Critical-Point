@@ -247,7 +247,9 @@ const fileBudgets = {
   // ground over its stripes.
   // -> 56181 bytes on 2026-10-25, measured: #224's link mark as a tag on the
   // card's edge (in the burn chip it pushed the chip onto a line of its own).
-  "play.css": { lines: 2931, bytes: 56181 },
+  // -> 56227 on 2026-10-25, measured: the run's line 2px apart on a phone,
+  // so 감사 n/4 stays on 판돈 and 금고's row.
+  "play.css": { lines: 2931, bytes: 56227 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

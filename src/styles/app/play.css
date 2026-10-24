@@ -2262,6 +2262,13 @@
     padding: 1px 7px;
   }
 
+  /* The run's line keeps 감사 n/4 (RULES_MARK 3) on 판돈 and 금고's row: at 4px
+     it went to a row of its own on CI's 390x844 (26px, the last card under the
+     action bar). Its pairs stay apart by the 3px below. */
+  .gx-stat.gx-run-signal {
+    gap: 2px;
+  }
+
   .gauntlet-stage .gx-bank .gx-relic-chip {
     padding: 2px 4px;
   }
