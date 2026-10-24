@@ -70,7 +70,11 @@ const budgets = [
   // 52,274 -> 52,279 gzip on 2026-10-25, 묶음 A-13 (long scene bodies, text
   // only) on main 024904a3: the shortened case files change the hashed names
   // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_728, maxGzip: 52_279 },
+  // 142,728 / 52,279 -> 142,806 / 52,313 on 2026-10-25, #224 (RULES_MARK 3)
+  // rebased on main 81a48f50: measured 142,806 / 52,309 in the e2e build, the
+  // gzip plus 4. The case's rules for the audit and the links, and the season
+  // row's mean score.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_806, maxGzip: 52_313 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -384,7 +388,10 @@ const budgets = [
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
   // 34,821 -> 34,826 gzip on 2026-10-25, 묶음 A-13 on main 024904a3 (hashed
   // chunk names only): measured 101,085 / 34,822 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_087, maxGzip: 34_826 },
+  // 101,087 -> 101,184 raw on 2026-10-25, #224 (RULES_MARK 3) on main
+  // 81a48f50: B2's link mark moved from the burn chip to a tag on the card's
+  // edge (GauntletHand.jsx). Measured 101,184 / 34,797; the gzip stays.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_184, maxGzip: 34_826 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
