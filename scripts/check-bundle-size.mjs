@@ -44,7 +44,26 @@ const budgets = [
   // here. Measured 196,669 / 71,949 in the e2e build (two builds, the same),
   // the gzip plus 4; with gameData.app the two are 476,836 / 154,714, under
   // main's 551,000 / 176,100 for this one chunk.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 196_669, maxGzip: 71_953 },
+  // 196,669 / 71,953 -> 146,793 / 53,492 on 2026-10-24, Vite 8 (#225) rebased
+  // on main 048ffce5 (#233): the table's relic hook (useRelicTable, in
+  // PlayScreen) now imports src/state/settleChoice.js, which the runtime uses
+  // too, so Rolldown writes what the two share as two files of their own,
+  // gameLogic and RelicDraft below, where Rollup kept them here. Measured
+  // 146,793 / 53,488 in the e2e build, the gzip plus 4; with gameData.app,
+  // gameLogic and RelicDraft the four are 479,421 / 157,854, under main's
+  // 551,000 / 176,100 for this one chunk.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 146_793, maxGzip: 53_492 },
+  // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
+  // the table's settlement (settleChoice.js, #233), split out by Rolldown on
+  // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
+  // asks first, never before. Measured 32,897 / 13,018 in the e2e build, the
+  // gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_022 },
+  // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
+  // modules the table and the runtime both import since #233, split out on
+  // 2026-10-24 like gameLogic above.
+  // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_564, maxGzip: 8_588 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -881,7 +900,10 @@ function checkBudget(file, budget) {
 // measured 9,207 / 3,352 plus 4 (two builds, the same). The list names two
 // more files than main's, rolldown-runtime and gameData.app; the worker's
 // code did not change.
-const WORKER_BUDGET = { maxBytes: 9_207, maxGzip: 3_356 };
+// -> 9,272 / 3,382 on 2026-10-24, rebased on main 048ffce5 (#233): measured
+// 9,272 / 3,378 plus 4. Two more files in the list, gameLogic and RelicDraft
+// (see GameRuntime above); the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_272, maxGzip: 3_382 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
