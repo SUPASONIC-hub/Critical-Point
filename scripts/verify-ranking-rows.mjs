@@ -165,7 +165,7 @@ export function formatReport(results, { redact = false } = {}) {
     // A run not replayed shows its scores' marks here; the chain's own line follows.
     const shown = result.status === "unrecorded" ? result.marks.filter((mark) => !result.chain?.marks.includes(mark)) : result.marks;
     lines.push(`${result.status === "unrecorded" ? "  scores:" : head}  ${shown.length ? `marks: ${shown.join(", ")}` : "no marks"}`);
-    if (result.rankingDiffers.length) lines.push(`  ranking row differs from the final case row: ${result.rankingDiffers.join(", ")}`);
+    if (result.rankingDiffers.length) lines.push(`  ranking row differs from the case rows (score: their mean; the rest: the final case row): ${result.rankingDiffers.join(", ")}`);
     let unrecorded = 0;
     let seedTails = 0;
     for (const entry of result.cases) {
