@@ -337,7 +337,7 @@ export const case09 = {
       memo: ["권도현 결혼식 5주 뒤", "혼주석 배치에 권승우 부부 포함", "고발하면 결혼식 전에 기사가 날 수 있음"],
       choices: [
         {
-          label: "결혼식 뒤로 고발 시점을 옮길 수 있는지 함께 따져 본다",
+          label: "고발을 결혼식 뒤로 옮길 수 있는지 함께 따져 본다",
           effect: { trust: 10, legitimacy: 3, capital: -5, time: -5, fatigue: 5 },
           voice: "고발하면 결혼식 전에 기사가 날 수 있어서, 고발 시점을 결혼식 뒤로 옮길 수 있는지 함께 따져 본다.",
           echo: "시점을 따져 보니 그는 혼자가 아닙니다. 옮긴 5주 동안 장부를 고칠 시간도 함께 생깁니다.",
@@ -656,7 +656,7 @@ export const case09 = {
       },
       {
         id: "c9_evidence_turn_share",
-        label: "권도현에게 먼저 보여 주고 그의 이름으로 문제를 제기하게 한다",
+        label: "권도현에게 먼저 보여 주고 그의 이름으로 제기하게 한다",
         effect: { trust: 11, legitimacy: 6, capital: -6, humanCost: -6, fatigue: 7 },
         voice: "그의 은행이 산 숫자이니 그가 말해야 한다며, 권도현에게 먼저 보여 준다.",
         echo: "그가 문제를 제기하자 자기 은행을 겨누는 셈입니다. 그 계산은 그가 가장 잘합니다.",
@@ -668,7 +668,7 @@ export const case09 = {
   memoryPlan: {
     systemNext: "c9_route_system",
     evidenceNext: "c9_evidence_turn",
-    systemLabel: "영동지점에서 다시 짠 판이 채권단 자료에 자리를 얻었는지 찾는다",
+    systemLabel: "영동지점에서 짠 판이 채권단 자료에 들었는지 찾는다",
     evidenceLabel: "자문료의 날짜를 청산 계산서의 작성일에 겹친다",
     systemEcho: "찾아봐도 채권단 자료에는 당신이 다시 짠 판이 들어갈 칸이 없습니다. 에코가 그 빈자리에 세 번째 표를 엽니다.",
     evidenceEcho: "작성일에 겹치면 청산 회수율을 계산한 곳의 이름이 나옵니다. 흔적표에서 본 세무 대리인을 같이 씁니다.",

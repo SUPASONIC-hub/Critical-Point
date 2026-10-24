@@ -672,8 +672,8 @@ export const case08 = {
   memoryPlan: {
     systemNext: "c8_route_system",
     evidenceNext: "c8_evidence_turn",
-    systemLabel: "발령 앞에서 다시 짠 판이 법인 등기 서류에 흔적을 남겼는지 더듬는다",
-    evidenceLabel: "먼저 쓰인 발령서의 작성일을 자문료 입금일과 나란히 적는다",
+    systemLabel: "발령 앞에서 짠 판이 법인 등기에 남았는지 더듬는다",
+    evidenceLabel: "먼저 쓴 발령서 작성일을 자문료 입금일과 나란히 적는다",
     systemEcho: "더듬어도 등기 서류에는 당신의 판이 없습니다. 대신 같은 주소를 쓴 법인들의 이력이 줄줄이 열립니다.",
     evidenceEcho: "나란히 적으면 자문료가 들어온 날과 승인이 난 날이 달력 위에서 하루 차이로 붙습니다.",
   },
@@ -689,21 +689,21 @@ export const case08 = {
   },
   openingSignatures: {
     c8_start_stand: {
-      label: "안부 문자를 보낸 세 사람에게 계좌 추적을 도와 달라고 한다",
+      label: "안부 문자를 보낸 세 사람에게 계좌 추적을 부탁한다",
       effect: { trust: 11, legitimacy: 3, capital: -5, time: -5, fatigue: 5 },
       cognition: { reframing: 2 },
       voice: "도와준 사람에게 또 부탁하는 게 염치없다는 걸 알면서, 세 사람에게 답장을 쓴다.",
       echo: "두 번째 부탁은 첫 번째보다 무겁습니다. 받아 주는 사람은 이번에는 당신이 무엇을 쫓는지 압니다.",
     },
     c8_start_open: {
-      label: "외부 감사인에게 넘긴 원본에 이 계좌를 추가 자료로 붙인다",
+      label: "외부 감사인에게 넘긴 원본에 이 계좌를 자료로 붙인다",
       effect: { legitimacy: 12, trust: 4, capital: -7, time: -4, fatigue: 5 },
       cognition: { inference: 2 },
       voice: "이미 열어 둔 감사 경로에, 계좌 내역을 추가 자료로 이어 붙인다.",
       echo: "같은 경로로 두 번째 자료가 가자 감사인은 우연을 의심하지 않습니다. 보내는 사람의 이름도 두 번 기록됩니다.",
     },
     c8_start_alone: {
-      label: "아무에게도 말하지 않고 청산 전 마지막 입출금을 지켜본다",
+      label: "아무에게도 말없이 청산 전 마지막 입출금을 지켜본다",
       effect: { capital: 9, legitimacy: 4, trust: -6, humanCost: 3, time: -3, fatigue: 4 },
       cognition: { risk: 2 },
       voice: "아무도 모르게, 청산 전에 마지막으로 돈이 움직이는 순간을 기다린다.",

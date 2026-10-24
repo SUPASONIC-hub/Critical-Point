@@ -96,7 +96,7 @@ const case13Nodes = {
       },
       {
         id: "c13_studio_basis",
-        label: "마지막 문장이 무슨 근거로 쓰였는지 서면 답변을 요구한다",
+        label: "마지막 문장의 근거를 서면으로 답하라고 요구한다",
         effect: { legitimacy: 12, trust: -3, time: -6, humanCost: 3, fatigue: 4 },
         voice: "정리됐다고 쓴 쪽이 근거를 대야 한다며, 마지막 문장이 무슨 근거로 쓰였는지 서면 답변을 요구한다.",
         echo: "서면을 요구하자 백아린이 수정 이력 파일을 보냅니다. 근거는 사실이 아니라 설문 결과입니다.",
@@ -149,7 +149,7 @@ const case13Nodes = {
       },
       {
         id: "c13_market_deal",
-        label: "212명 배상이 걸린 일이니 예고편은 참아 달라고 부탁한다",
+        label: "212명 배상이 걸렸으니 예고편은 참아 달라고 부탁한다",
         effect: { capital: 8, time: 5, trust: -4, humanCost: 3, legitimacy: -1, fatigue: -3 },
         voice: "명함이 떼인 걸 보고도 물러설 수 없어서, 212명 배상이 걸린 일이니 예고편은 참아 달라고 부탁한다.",
         echo: "부탁을 들은 문가을이 떡을 한 번 더 썹니다. '그 212명 중에 누가 당신한테 대신 참아 달라고 했어요?'",
@@ -194,7 +194,7 @@ const case13Nodes = {
       },
       {
         id: "c13_lab_cue",
-        label: "생방송 중에 영상이 나가도록 송출 순서를 몰래 바꿔 둔다",
+        label: "생방송 중 영상이 나가게 송출 순서를 몰래 바꿔 둔다",
         effect: { capital: 4, time: 5, trust: 6, legitimacy: -5, humanCost: 2, fatigue: -3 },
         voice: "허락을 구하면 잘려 나갈 1분이라며, 생방송 중에 영상이 나가도록 송출 순서를 몰래 바꿔 둔다.",
         echo: "바꿔 두니 이민서의 옛 계정이 새벽 접속 기록에 남습니다. 3년 전 그를 유출자로 만든 것도 접속 기록이었습니다. 순서표는 생방송 한 시간 전에 간사가 한 번 더 확인합니다.",
@@ -223,7 +223,7 @@ const case13Nodes = {
     choices: [
       {
         id: "c13_final_terms",
-        label: "위원 자리는 받되 마지막 문장을 빼야 앉겠다고 조건을 건다",
+        label: "마지막 문장을 빼야 위원 자리에 앉겠다고 조건을 건다",
         effect: { trust: 8, legitimacy: 8, capital: -5, time: -5, humanCost: -3, fatigue: 5 },
         voice: "212명은 지키되 그 말만은 할 수 없다며, 위원 자리는 받되 마지막 문장을 빼야 앉겠다고 조건을 건다.",
         echo: "조건을 걸자 백아린이 인이어 너머로 33층과 통화합니다. 방송은 3분 늦게 시작하고, 212명의 공문도 그만큼 늦어집니다.",
@@ -316,7 +316,7 @@ export const case13 = {
       memo: ["마지막 문장 수정 14회", "1번 버전 '과거를 잊지 않겠습니다' -- 신뢰도 41%", "현재 버전 '정리되었습니다' -- 신뢰도 68%"],
       choices: [
         {
-          label: "잊지 않겠다는 1번 문장으로 되돌리자고 백아린을 설득한다",
+          label: "잊지 않겠다는 1번 문장으로 되돌리자고 설득한다",
           effect: { trust: 11, legitimacy: 5, humanCost: -4, time: -4, capital: -2, fatigue: 4 },
           voice: "41%여도 그쪽이 사실이라며, 잊지 않겠다는 1번 문장으로 되돌리자고 백아린을 설득한다.",
           echo: "설득하자 백아린이 처음으로 대답을 늦춥니다. '41%로 가면, 그 27%는 누가 메우죠?'",
@@ -375,7 +375,7 @@ export const case13 = {
       memo: ["백아린의 제안: 영상 20초 삽입 ↔ 마지막 문장 낭독", "오진우의 메신저 실수 -- 노출 4분", "커피 8잔 -- 그 밤 4층에 남은 사람 수를 정확히 앎"],
       choices: [
         {
-          label: "영상 20초 대신 마지막 문장을 빼자고 백아린에게 역제안한다",
+          label: "영상 20초 대신 마지막 문장을 빼자고 역제안한다",
           effect: { legitimacy: 9, trust: 6, humanCost: -3, time: -3, capital: -2, fatigue: 4 },
           voice: "사실이 이야기보다 낫다는 건 그가 한 말이라며, 영상 20초 대신 마지막 문장을 빼자고 백아린에게 역제안한다.",
           echo: "역제안을 들은 백아린이 커피를 내려놓습니다. '그건 제 권한 밖이에요.' 그리고 한참 뒤, '물어는 볼게요.'",
@@ -408,7 +408,7 @@ export const case13 = {
       memo: ["도장 모델 전속 제안 -- 출연료는 한 달 월급", "갚았거나, 못 갚았거나, 갚는 중이거나"],
       choices: [
         {
-          label: "나준혁의 그 세 가지를 대본의 대안 문장으로 받아 적는다",
+          label: "나준혁의 세 가지를 대본의 대안 문장으로 받아 적는다",
           effect: { trust: 10, humanCost: -4, time: -3, fatigue: 3 },
           voice: "정리됐다는 말보다 정확한 문장이라며, 나준혁의 그 세 가지를 대본의 대안 문장으로 받아 적는다.",
           echo: "받아 적자 나준혁이 쑥스러워하며 '저작권은 영동지점'이라고 합니다. 그 문장이 방송에 나갈 수 있을지는 모릅니다.",
@@ -511,7 +511,7 @@ export const case13 = {
         },
         {
           id: "c13_branch_extras_sheet",
-          label: "'실제 피해자 섭외 불가'가 적힌 섭외표 원본을 확보한다",
+          label: "'실제 피해자 섭외 불가' 섭외표 원본을 확보한다",
           effect: { legitimacy: 11, trust: 2, time: -6, humanCost: 3, fatigue: 4 },
           voice: "말로는 나중에 부인할 거라며, '실제 피해자 섭외 불가'가 적힌 섭외표 원본을 확보한다.",
           echo: "원본을 찍자 대행사 직원이 벽에서 종이를 뗍니다. 사진은 남고, 그 직원은 오늘 저녁 경위서를 씁니다.",
@@ -595,7 +595,7 @@ export const case13 = {
         },
         {
           id: "c13_route_system_clause",
-          label: "권고 이행을 분기마다 공개하는 조항을 출연 조건에 넣는다",
+          label: "권고 이행을 분기마다 공개하는 조항을 조건에 넣는다",
           effect: { legitimacy: 9, capital: 4, trust: 3, time: -7, humanCost: 3, fatigue: 6 },
           voice: "17건으로 끝난 전례를 따르지 않게, 권고 이행 여부를 분기마다 공개하는 조항을 출연 조건에 넣는다.",
           echo: "조항이 들어가자 위원회는 매 분기 숫자를 내야 합니다. 첫 숫자가 나오기까지 석 달이 걸립니다.",
@@ -614,7 +614,7 @@ export const case13 = {
     finalChoices: [
       {
         id: "a",
-        label: "권고를 거부할 때 그 사유를 공개하게 하는 조항을 요구한다",
+        label: "권고를 거부하면 그 사유를 공개하는 조항을 요구한다",
         effect: { legitimacy: 13, trust: 6, capital: -8, humanCost: -4, fatigue: 7 },
         voice: "소리 없이 묻히는 일이 없게, 권고를 거부할 때 그 사유를 공개하게 하는 조항을 요구한다.",
         echo: "그 조항이 들어가자 위원회의 '아니오'에도 문장이 붙습니다. 그룹은 그 조항에 가장 오래 반대합니다.",
@@ -630,7 +630,7 @@ export const case13 = {
       },
       {
         id: "c",
-        label: "위원회 밖에 피해자 모임이 뽑는 감시 위원 자리를 만든다",
+        label: "위원회 밖에 피해자 모임이 뽑는 감시 위원을 둔다",
         effect: { legitimacy: 8, trust: 9, capital: -7, time: -7, humanCost: 3, fatigue: 8 },
         voice: "얼굴 대신 남을 눈이 있어야 한다며, 위원회 밖에 피해자 모임이 뽑는 감시 위원 자리를 만든다.",
         echo: "자리가 생기자 문가을이 첫 후보로 올라옵니다. 그는 '떡집 문 닫는 날만 갈 수 있다'고 합니다.",
@@ -655,7 +655,7 @@ export const case13 = {
     choices: [
       {
         id: "c13_evidence_turn_confront",
-        label: "예산 코드를 생방송 전에 백아린 앞에 놓고 대가를 다시 협상한다",
+        label: "예산 코드를 백아린 앞에 놓고 대가를 다시 협상한다",
         effect: { legitimacy: 12, trust: 4, capital: -7, time: -7, fatigue: 6 },
         voice: "받기로 한 것이 대가가 아니었다며, 예산 코드를 생방송 전에 백아린 앞에 놓고 대가를 다시 협상한다.",
         echo: "코드를 본 백아린이 태블릿을 내려놓습니다. 처음으로 수정 이력이 없는 문서를 본 얼굴입니다.",
@@ -682,7 +682,7 @@ export const case13 = {
   memoryPlan: {
     systemNext: "c13_route_system",
     evidenceNext: "c13_evidence_turn",
-    systemLabel: "조정 전날 짠 판이 혁신위원회 계획서 어디에 들었는지 짚는다",
+    systemLabel: "조정 전날 짠 판이 혁신위원회 계획서에 들었는지 짚는다",
     evidenceLabel: "직전 단서의 광고비 계정을 혁신위원회 예산서에 붙인다",
     systemEcho: "짚어 보면 계획서에는 당신의 판에서 온 말이 제목에만 남았습니다. 에코가 사고 뒤에 세워진 위원회 23곳을 그 밑에 답니다.",
     evidenceEcho: "광고비 계정을 예산서에 붙이면 비용 코드 하나가 두 번 나옵니다. 한 번은 광고이고, 한 번은 4층을 비우는 공사입니다.",
@@ -706,14 +706,14 @@ export const case13 = {
       echo: "답을 미루자 윤상혁이 처음으로 시계를 봅니다. 가게 앞의 사람들은 '그걸 왜 우리한테 물어요'라고 되묻습니다.",
     },
     c13_start_record: {
-      label: "개정안을 광고 소품이 아니라 위원회 공식 안건 번호로 먼저 받아 낸다",
+      label: "개정안을 소품 아닌 공식 안건 번호로 먼저 받아 낸다",
       effect: { legitimacy: 12, trust: -2, capital: -5, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "촬영이 끝나도 문서는 남아야 한다며, 개정안을 광고 소품이 아니라 위원회 공식 안건 번호로 먼저 받아 낸다.",
       echo: "안건 번호가 붙자 문서는 소품 목록에서 빠집니다. 대신 백아린은 같은 문서를 새로 출력해 소품으로 씁니다.",
     },
     c13_start_rush: {
-      label: "떡 상자 사진은 광고에 쓰지 말라고 그 자리에서 못 박는다",
+      label: "떡 상자 사진은 광고에 쓰지 말라고 못 박는다",
       effect: { trust: 10, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "문성호 대표 몫이던 상자라며, 떡 상자 사진은 광고에 쓰지 말라고 그 자리에서 못 박는다.",

@@ -144,7 +144,7 @@ const case36Nodes = {
       },
       {
         id: "c36_table_terms",
-        label: "준법감시인의 권한과 임기를 문서로 먼저 보여 달라고 한다",
+        label: "준법감시인 권한과 임기를 문서로 먼저 보여 달라고 한다",
         effect: { legitimacy: 12, trust: -3, time: -5, humanCost: 3, fatigue: 3 },
         voice: "선언만 확인하는 자리인지 알아야 한다며, 준법감시인의 권한과 임기를 문서로 먼저 보여 달라고 한다.",
         echo: "문서를 요구하자 여민규가 준비된 서류철을 내밉니다. 권한은 넓고, 임기는 2년이고, 해임 조건 칸은 비어 있습니다.",
@@ -152,7 +152,7 @@ const case36Nodes = {
       },
       {
         id: "c36_table_listen",
-        label: "여섯 번째 접시 이름을 따라 외우며 제안을 끝까지 듣는다",
+        label: "여섯째 접시 이름을 따라 외우며 제안을 끝까지 듣는다",
         effect: { capital: 8, time: -4, trust: -3, legitimacy: 2, humanCost: 3, fatigue: -2 },
         voice: "다 듣기 전에는 답하지 않기로 하고, 여섯 번째 접시 이름을 따라 외우며 제안을 끝까지 듣는다.",
         echo: "따라 외우자 셰프가 처음으로 웃습니다. 제안은 끝까지 들리고, 끝까지 들은 사람은 반쯤 대답한 사람이 됩니다.",
@@ -181,7 +181,7 @@ const case36Nodes = {
     choices: [
       {
         id: "c36_father_stay",
-        label: "아버지 이야기를 끝까지 듣고 그 줄에 섰던 사람들을 묻는다",
+        label: "아버지 이야기를 끝까지 듣고 그 줄의 사람들을 묻는다",
         effect: { trust: 13, humanCost: -4, legitimacy: -3, time: -3, fatigue: 6 },
         voice: "절을 받은 사람들이 어찌 됐는지 궁금해서, 아버지 이야기를 끝까지 듣고 그 줄에 섰던 사람들을 묻는다.",
         echo: "묻자 회장은 그 줄에 섰던 사람 셋의 이름을 댑니다. 46년이 지났는데 그 이름들은 하나도 흐려지지 않았습니다.",
@@ -289,7 +289,7 @@ export const case36 = {
         },
         {
           id: "c36_after_record",
-          label: "식탁의 제안을 문장 그대로 적어 한지우와 나은호에게 보낸다",
+          label: "식탁의 제안을 그대로 적어 한지우와 나은호에게 보낸다",
           effect: { legitimacy: 14, trust: 4, time: -4, capital: -3, fatigue: 5 },
           voice: "기억이 다듬어지기 전에, 식탁의 제안을 문장 그대로 적어 한지우와 나은호에게 보낸다.",
           echo: "적어 보내자 금감원과 검찰에 같은 문장이 동시에 도착합니다. 요리 이름은 하나도 적지 못했지만, 회장이 한 말은 한 문장도 빠지지 않았습니다.",
@@ -298,7 +298,7 @@ export const case36 = {
         },
         {
           id: "c36_after_rush",
-          label: "그 길로 사무실에 가서 꼬리 자르기에 쓰일 서류부터 복사한다",
+          label: "그 길로 꼬리 자르기에 쓰일 서류부터 복사한다",
           effect: { capital: 7, legitimacy: 6, trust: -7, humanCost: 5, fatigue: 4 },
           voice: "폴더가 또 열리기 전에 손에 쥐어야 한다며, 그 길로 사무실에 가서 꼬리 자르기에 쓰일 서류부터 복사한다.",
           echo: "곧장 가니 여의도 사무실에 불이 켜진 자리는 당신 하나입니다. 복사기가 도는 동안 이름 없는 계정은 폴더를 한 번 더 엽니다.",
@@ -439,7 +439,7 @@ export const case36 = {
       memo: ["요리 이름이 긴 이유: 셰프의 복수", "셰프 어머니 가게 긴급대출 -- 0.6초 거절"],
       choices: [
         {
-          label: "어머니 가게의 긴급대출을 사람 심사로 다시 올리겠다고 한다",
+          label: "어머니 가게 긴급대출을 사람 심사로 다시 올린다",
           effect: { trust: 11, humanCost: -6, capital: -4, time: -3, fatigue: 4 },
           voice: "0.6초로 끝낼 일이 아니라며, 어머니 가게의 긴급대출을 사람 심사로 다시 올리겠다고 한다.",
           echo: "약속하자 은재하가 여덟 번째 접시 이름에서 한 단어를 뺍니다. 회장은 그래도 '여덟 번째 것'이라고 부릅니다.",
@@ -541,7 +541,7 @@ export const case36 = {
       choices: [
         {
           id: "c36_branch_annex_follow_a",
-          label: "석문호가 다치지 않게 오늘 들은 말은 묻어 두겠다고 약속한다",
+          label: "석문호가 다치지 않게 오늘 들은 말은 묻어 두기로 한다",
           effect: { trust: 12, humanCost: -4, capital: -6, time: -4, fatigue: 5 },
           voice: "마흔 해 정원을 본 석문호가 다치지 않게, 오늘 들은 말은 묻어 두겠다고 약속한다.",
           echo: "약속하자 석문호가 고개를 끄덕이고 호스를 다시 감습니다. 오늘 본 액자는 당신 기억 속에만 남습니다.",
@@ -657,7 +657,7 @@ export const case36 = {
     choices: [
       {
         id: "c36_evidence_turn_visit",
-        label: "전임 준법감시인 세 명을 찾아가 무엇을 확인했는지 묻는다",
+        label: "전임 준법감시인 셋을 찾아가 무엇을 확인했는지 묻는다",
         effect: { trust: 12, legitimacy: 6, capital: -6, time: -6, humanCost: -4, fatigue: 7 },
         voice: "같은 결론을 쓴 사정부터 들어야 해서, 전임 준법감시인 세 명을 찾아가 무엇을 확인했는지 묻는다.",
         echo: "찾아가자 세 명 중 한 명만 문을 엽니다. 그는 '나는 확인 도장을 찍었지, 확인은 안 했소'라고 말합니다.",
@@ -665,7 +665,7 @@ export const case36 = {
       },
       {
         id: "c36_evidence_turn_file",
-        label: "임명 기록 세 건을 금감원 한지우 검사역에게 공식 제출한다",
+        label: "임명 기록 세 건을 금감원 한지우에게 공식 제출한다",
         effect: { legitimacy: 13, trust: 5, capital: -7, time: -6, fatigue: 5 },
         voice: "네 번째 임명이 올라가기 전에, 세 번의 임명 기록을 금감원 한지우 검사역에게 공식 제출한다.",
         echo: "제출하자 한지우가 숫자부터 확인합니다. 2주, 18개월, 세 명. 그는 '규정 위반은 아닙니다. 그래서 더 문제입니다'라고 답합니다.",
@@ -684,7 +684,7 @@ export const case36 = {
   memoryPlan: {
     systemNext: "c36_route_system",
     evidenceNext: "c36_evidence_turn",
-    systemLabel: "서버실에서 새로 짠 판이 쇄신 발표문 초안에 옮겨졌는지 읽어 낸다",
+    systemLabel: "서버실에서 새로 짠 판이 쇄신 발표문에 옮겨졌는지 본다",
     evidenceLabel: "빈 승인란의 요청서를 준법감시인 임명 기록 옆에 놓는다",
     systemEcho: "발표문 초안에는 이름이 하나뿐이고, 당신의 판은 없습니다. 노아가 이름 하나로 닫힌 사고들을 20년 치로 늘어놓습니다.",
     evidenceEcho: "빈 승인란을 임명 기록에 대면 같은 의자가 세 번 비었다가 세 번 채워졌습니다. 채워지기 전날마다 같은 식탁이 있습니다.",
@@ -701,7 +701,7 @@ export const case36 = {
   },
   openingSignatures: {
     c36_start_warm: {
-      label: "문가을의 떡을 싸 들고 한남동에 가겠다고 단체방에 알린다",
+      label: "문가을의 떡을 싸 들고 한남동에 간다고 단체방에 알린다",
       effect: { trust: 10, humanCost: -5, capital: -3, time: -6, fatigue: 2 },
       cognition: { reframing: 2 },
       voice: "배 안 부를 밥상에 빈손으로 가지 않겠다며, 문가을의 떡을 싸 들고 한남동에 가겠다고 단체방에 알린다.",
@@ -715,7 +715,7 @@ export const case36 = {
       echo: "되묻자 준법감시팀은 이틀 뒤 '해당 개정안은 검토 예정'이라고 답합니다. 답장 참조란에 회장 비서실이 들어가 있습니다.",
     },
     c36_start_rush: {
-      label: "한남동 대문 앞에 혼자 다녀온 일을 동료들에게 먼저 알린다",
+      label: "한남동에 혼자 다녀온 일을 동료들에게 먼저 알린다",
       effect: { trust: 9, legitimacy: 6, humanCost: 2, time: -6, fatigue: 5 },
       cognition: { persistence: 2 },
       voice: "혼자 움직인 일을 숨긴 채 또 갈 수는 없다며, 한남동 대문 앞에 혼자 다녀온 일을 동료들에게 먼저 알린다.",

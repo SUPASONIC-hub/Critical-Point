@@ -106,7 +106,7 @@ const case16Nodes = {
       },
       {
         id: "c16_duel_ask",
-        label: "로봇이 들어오면 누구의 하루가 달라지는지 최서진에게 묻는다",
+        label: "로봇이 오면 누구 하루가 달라지는지 최서진에게 묻는다",
         effect: { trust: 10, humanCost: -6, legitimacy: 4, capital: -5, time: -7, fatigue: 5 },
         voice: "212건과 198건으로는 답이 안 나온다며, 로봇이 들어오면 누구의 하루가 달라지는지 최서진에게 묻는다.",
         echo: "묻자 최서진이 오래 생각합니다. '관리자 하루는 편해져요. 여기 계신 분들 하루는… 없어져요.'",
@@ -143,7 +143,7 @@ const case16Nodes = {
       },
       {
         id: "c16_review_trace",
-        label: "원본과 제출본의 수정 이력을 승인위원회에 정식으로 알린다",
+        label: "원본과 제출본의 수정 이력을 승인위원회에 알린다",
         effect: { legitimacy: 11, trust: 7, time: -8, humanCost: -4, fatigue: 6 },
         voice: "위원들도 무엇이 빠졌는지 알고 정해야 해서, 원본과 제출본의 수정 이력을 승인위원회에 정식으로 알린다.",
         echo: "수정 이력이 위원회에 가자 팀장이 해명서를 씁니다. 해명서 첫 줄은 '관행상'입니다.",
@@ -188,7 +188,7 @@ const case16Nodes = {
       },
       {
         id: "c16_roof_criteria",
-        label: "잔류 여섯 명이 어떤 기준으로 뽑혔는지부터 확인하자고 한다",
+        label: "잔류 여섯 명이 뽑힌 기준부터 확인하자고 한다",
         effect: { legitimacy: 8, time: 5, trust: -5, humanCost: 3, fatigue: 2 },
         voice: "왜 자기가 남는지 알아야 정할 수 있다며, 잔류 여섯 명이 어떤 기준으로 뽑혔는지부터 확인하자고 한다.",
         echo: "기준을 확인하는 동안 강태민은 답을 미룹니다. 회사는 모레까지 답하라고 합니다.",
@@ -196,7 +196,7 @@ const case16Nodes = {
       },
       {
         id: "c16_roof_inside",
-        label: "남아서 안에서 74명이 돌아올 문을 여는 사람이 되어 달라고 한다",
+        label: "안에 남아 74명이 돌아올 문을 열어 달라고 한다",
         effect: { trust: 11, humanCost: -4, capital: -5, time: -7, fatigue: 5 },
         voice: "안에 한 사람은 있어야 길이 생긴다며, 남아서 안에서 74명이 돌아올 문을 여는 사람이 되어 달라고 한다.",
         echo: "남아 달라는 부탁은 무겁습니다. 강태민이 두 번째 컵라면을 눈 쌓인 난간에 한참 올려 둡니다.",
@@ -288,7 +288,7 @@ export const case16 = {
         },
         {
           id: "c16_after_record",
-          label: "전환과 재교육 조건을 그룹 리스의 표준 조항으로 문서화한다",
+          label: "전환과 재교육 조건을 리스 표준 조항으로 문서화한다",
           effect: { legitimacy: 15, trust: 4, time: -5, capital: -3, fatigue: 5 },
           voice: "다음 센터에서는 다시 싸우지 않아도 되게, 전환과 재교육 조건을 그룹 리스의 표준 조항으로 문서화한다.",
           echo: "표준 조항은 다음 센터, 그다음 센터에도 붙습니다. 강태민이 문서 맨 끝에, 4년 전 야간조에서 쓰러진 동기의 이름을 따 '정우 형 조항'이라고 연필로 적습니다.",
@@ -297,7 +297,7 @@ export const case16 = {
         },
         {
           id: "c16_after_rush",
-          label: "컵라면을 내려놓고 법무팀이 기다리는 다음 싸움으로 곧장 간다",
+          label: "컵라면을 내려놓고 법무팀이 기다리는 다음 싸움으로 간다",
           effect: { capital: 8, legitimacy: 6, trust: -7, humanCost: 5, fatigue: 6 },
           voice: "수첩에 내 이름이 있다는 문자를 흘려들을 수 없어서, 컵라면을 내려놓고 법무팀이 기다리는 다음 싸움으로 곧장 간다.",
           echo: "컵라면이 식는 동안 당신은 택시를 탑니다. 문자를 보낸 반재욱이 대신 대기실에 와서, 계약이 끝나는 80명에게 남은 서류를 한 장씩 챙겨 줍니다.",
@@ -540,7 +540,7 @@ export const case16 = {
       choices: [
         {
           id: "c16_branch_locker_follow_a",
-          label: "유하온의 오류 기록을 들고 야간 정비 인력이 필요하다고 설득한다",
+          label: "유하온의 오류 기록을 들고 야간 정비 인력을 요구한다",
           effect: { trust: 12, legitimacy: 4, capital: -4, time: -3, fatigue: 3 },
           voice: "밤마다 로봇을 다시 켠 사람이 있었다는 걸 보여 주려고, 유하온의 오류 기록을 들고 야간 정비 인력이 필요하다고 설득한다.",
           echo: "47줄이 증거가 되자 유하온이 처음으로 자기 메모를 부끄러워하지 않습니다.",
@@ -549,7 +549,7 @@ export const case16 = {
         },
         {
           id: "c16_branch_locker_follow_b",
-          label: "야간 정지 47회를 리스 심사의 공식 위험 항목으로 올린다",
+          label: "야간 정지 47회를 리스 심사 공식 위험 항목에 올린다",
           effect: { legitimacy: 12, trust: 5, time: -7, humanCost: 3, fatigue: 5 },
           voice: "머리핀으로 버틴 밤이 심사에서 빠지지 않게, 야간 정지 47회를 리스 심사의 공식 위험 항목으로 올린다.",
           echo: "위험 항목으로 올라간 47회는 리스료를 올립니다. 리스료가 오르면 누군가는 그 숫자를 사람으로 메우려 합니다.",
@@ -615,7 +615,7 @@ export const case16 = {
     finalChoices: [
       {
         id: "a",
-        label: "계약이 끝나는 사람마다 1년치 전환 지원금을 리스료에 얹는다",
+        label: "계약이 끝나는 사람마다 1년치 지원금을 리스료에 얹는다",
         effect: { legitimacy: 13, trust: 7, capital: -8, humanCost: -5, fatigue: 7 },
         voice: "빈 줄 80개가 누군가의 장부에 오르게, 계약이 끝나는 사람마다 1년치 전환 지원금을 리스료에 얹는다.",
         echo: "지원금이 붙자 계약이 끝나도 1년은 길이 남습니다. 리스료 계산서에 처음으로 사람 이름의 칸이 생깁니다.",
@@ -631,7 +631,7 @@ export const case16 = {
       },
       {
         id: "c",
-        label: "재교육을 마친 사람을 다른 센터에서도 먼저 뽑도록 묶는다",
+        label: "재교육을 마친 사람은 다른 센터도 먼저 뽑게 묶는다",
         effect: { legitimacy: 8, trust: 9, capital: -7, time: -7, humanCost: -2, fatigue: 8 },
         voice: "배운 것이 일자리로 이어져야 한다며, 재교육을 마친 사람을 다른 센터에서도 먼저 뽑도록 묶는다.",
         echo: "다른 센터까지 묶자 교육을 마친 사람들이 갈 곳이 생깁니다. 그 약속을 지킬 사람을 찾는 데 한 달이 걸립니다.",
@@ -683,8 +683,8 @@ export const case16 = {
   memoryPlan: {
     systemNext: "c16_route_system",
     evidenceNext: "c16_evidence_turn",
-    systemLabel: "면접 전에 새로 짠 판이 리스 심사 보고서의 어느 칸으로 갔는지 찾는다",
-    evidenceLabel: "확인서를 만든 부서를 80명 계약 종료의 요청 이력에서 찾는다",
+    systemLabel: "면접 전에 새로 짠 판을 리스 심사 보고서에서 찾는다",
+    evidenceLabel: "확인서 만든 부서를 80명 계약 종료 요청에서 찾는다",
     systemEcho: "찾아보면 보고서 어느 칸에도 없습니다. 의견란은 여섯 글자로 줄어 있고, 에코가 그 빈자리에서 자동화 리스 37건을 꺼냅니다.",
     evidenceEcho: "확인서를 만든 부서 이름을 리스 계약서의 작성 이력에 대면 같은 부서 이름이 한 번 더 찍혀 있습니다. 담당자란만 비었습니다.",
   },
@@ -707,7 +707,7 @@ export const case16 = {
       echo: "떡볶이 냄비가 대기실에 들어서자 야간조가 줄을 섭니다. 80명 몫은 아니어서, 이찬빈이 편의점을 세 번 다녀옵니다.",
     },
     c16_start_record: {
-      label: "리스 신청서에 요청한 사람의 이름을 적으라고 공식 요구한다",
+      label: "리스 신청서에 요청자 이름을 적으라고 공식 요구한다",
       effect: { legitimacy: 12, trust: -3, capital: -5, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "이름 없는 서류는 거절할 곳도 없어서, 리스 신청서에 요청한 사람의 이름을 적으라고 공식 요구한다.",

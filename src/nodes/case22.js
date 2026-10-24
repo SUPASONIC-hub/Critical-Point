@@ -88,7 +88,7 @@ const case22Nodes = {
     choices: [
       {
         id: "c22_counter_tell",
-        label: "떡을 다 돌리기 전에 문가을에게 거절 사실을 직접 알린다",
+        label: "떡을 다 돌리기 전에 문가을에게 거절을 직접 알린다",
         effect: { trust: 12, humanCost: -5, legitimacy: -2, time: -4, fatigue: 4 },
         voice: "남의 입으로 듣게 둘 수는 없어서, 떡을 다 돌리기 전에 문가을에게 거절 사실을 직접 알린다.",
         echo: "알리자 떡 상자가 창구 위에서 멈춥니다. 문가을은 남은 떡을 끝까지 돌리고 나서야 자리에 앉습니다.",
@@ -231,7 +231,7 @@ const case22Nodes = {
       },
       {
         id: "c22_final_object",
-        label: "R-17 기준 자체에 이의를 제기해 41건을 모두 다시 심사하게 한다",
+        label: "R-17 기준에 이의를 걸어 41건을 재심사하게 한다",
         effect: { legitimacy: 13, trust: 4, time: -7, humanCost: 3, fatigue: 6 },
         voice: "한 곳만 살리면 나머지가 그대로 남는다며, R-17 기준 자체에 이의를 제기해 41건을 모두 다시 심사하게 한다.",
         echo: "이의를 제기하자 41건이 모두 다시 심사대에 오릅니다. 세온메디칼은 기다려 주지 않고, 끝까지정밀의 첫 큰 주문은 베트남으로 갑니다.",
@@ -285,7 +285,7 @@ export const case22 = {
         },
         {
           id: "c22_after_record",
-          label: "하준의 보고서와 R-17 거절 사례를 한 권의 문서로 남긴다",
+          label: "하준의 보고서와 R-17 거절 사례를 한 문서로 남긴다",
           effect: { legitimacy: 15, trust: 4, time: -5, capital: -3, fatigue: 5 },
           voice: "사람이 읽을 수 있는 이유가 무엇인지 보이게, 하준의 보고서와 R-17 거절 사례를 한 권의 문서로 남긴다.",
           echo: "한 권으로 묶인 문서의 첫 장은 고등학생의 한 줄입니다. 본점 심사부 누군가가 그 줄에 형광펜을 긋습니다.",
@@ -294,7 +294,7 @@ export const case22 = {
         },
         {
           id: "c22_after_rush",
-          label: "김 반장의 1주를 시작으로 곧장 주주총회 준비에 들어간다",
+          label: "김 반장의 1주부터 곧장 주주총회 준비에 들어간다",
           effect: { capital: 8, legitimacy: 6, trust: -7, humanCost: 5, fatigue: 6 },
           voice: "3월 20일까지 시간이 많지 않다며, 김 반장의 1주를 시작으로 곧장 주주총회 준비에 들어간다.",
           echo: "곧장 가자 수료식 박수가 끝나기 전에 자리를 뜨게 됩니다. 하준은 사진 속에서 당신이 있던 빈자리를 봅니다.",
@@ -316,7 +316,7 @@ export const case22 = {
       memo: ["담당자 의견란: 입력 가능, 결과 반영 0", "탁예린 2주간 의견 19건 -- 결과 변경 0건", "거절 안내 문자 표준 첫마디 '아쉽지만'"],
       choices: [
         {
-          label: "거절 문자를 보내기 전에 신청인에게 직접 전화하자고 한다",
+          label: "거절 문자 전에 신청인에게 직접 전화하자고 한다",
           effect: { trust: 11, humanCost: -5, legitimacy: 3, time: -3, capital: -2, fatigue: 3 },
           voice: "'아쉽지만'으로 끝낼 소식이 아니라며, 거절 문자를 보내기 전에 신청인에게 직접 전화하자고 한다.",
           echo: "전화를 받은 신청인 중 둘은 화를 내고, 한 명은 이유를 알려 줘서 고맙다고 합니다. 탁예린은 그날 문자를 한 통도 보내지 않습니다.",
@@ -345,7 +345,7 @@ export const case22 = {
       memo: ["난로 고장 -- 공장 안 영상 3도", "조합원 5명 두 달째 무급", "월 전기료 180만 원 우선 지급"],
       choices: [
         {
-          label: "4월 시제품까지 조합원 생활비를 임시로 모아 보자고 한다",
+          label: "4월 시제품까지 조합원 생활비를 모아 보자고 한다",
           effect: { trust: 11, humanCost: -6, capital: -6, time: -3, fatigue: 4 },
           voice: "괜찮다는 말을 그대로 믿을 수 없어서, 4월 시제품까지 조합원 생활비를 임시로 모아 보자고 한다.",
           echo: "돈을 모으자 다섯 명은 3월까지 버팁니다. 권도현이 모금 명세서에 '임시'라는 말을 세 번 적습니다.",
@@ -405,7 +405,7 @@ export const case22 = {
       memo: ["부도 기업 가족 신청 거절률 94%", "승인된 6%는 평균보다 잘 갚음"],
       choices: [
         {
-          label: "이 통계를 R-17 신청인 41명에게 먼저 알리자고 한다",
+          label: "이 통계를 신청인 41명에게 먼저 알리자고 한다",
           effect: { trust: 10, humanCost: -5, time: -2, fatigue: 3 },
           voice: "거절당한 쪽이 제일 먼저 알아야 한다며, 이 통계를 R-17 신청인 41명에게 먼저 알리자고 한다.",
           echo: "알리자 41명 중 몇은 처음으로 자기 탓이 아니었다는 걸 압니다. 류세아는 윗선에 보고하기 전에 알린 사람이 됩니다.",
@@ -469,7 +469,7 @@ export const case22 = {
           echo: "서태경 지점장은 하룻밤 생각하겠다고 합니다. 인절미 상자가 아직 그의 책상 위에 있습니다.",
         },
         {
-          label: "책임자 한 명이 아닌 심사위원회 서명으로 양식을 바꾸자고 한다",
+          label: "책임자 대신 위원회 서명으로 양식을 바꾸자고 한다",
           effect: { legitimacy: 11, trust: 2, time: -4, humanCost: 3, fatigue: 4 },
           cognition: { reframing: 2 },
           voice: "잘못되면 한 사람의 인사 평가로 돌아가는 칸이라며, 책임자 한 명이 아닌 심사위원회 서명으로 양식을 바꾸자고 한다.",
@@ -536,7 +536,7 @@ export const case22 = {
       choices: [
         {
           id: "c22_branch_shop_follow_a",
-          label: "하준에게 R-17 화면을 보여 주며 있는 그대로 설명한다",
+          label: "하준에게 R-17 화면을 보여 주며 그대로 설명한다",
           effect: { trust: 11, legitimacy: 5, humanCost: -3, time: -3, fatigue: 4 },
           voice: "물은 사람에게는 본 대로 답해야 한다며, 하준에게 R-17 화면을 보여 주며 있는 그대로 설명한다.",
           echo: "있는 그대로 들은 하준이 스케치북에 'R-17'을 적습니다. 그리고 그 옆에 물음표를 세 개 그립니다.",
@@ -611,7 +611,7 @@ export const case22 = {
     finalChoices: [
       {
         id: "a",
-        label: "R-17 거절에는 사람이 다시 보는 절차를 의무로 붙인다",
+        label: "R-17 거절마다 사람이 다시 보는 절차를 의무로 둔다",
         effect: { legitimacy: 13, trust: 7, capital: -8, humanCost: -5, fatigue: 7 },
         voice: "같은 자리로 돌아오는 답을 누군가 끊을 수 있게, R-17 거절에는 사람이 다시 보는 절차를 의무로 붙인다.",
         echo: "사람이 다시 보니 거절마다 하루가 더 걸립니다. 그 하루 동안 누군가는 결과가 아니라 이유를 듣게 됩니다.",
@@ -627,7 +627,7 @@ export const case22 = {
       },
       {
         id: "c",
-        label: "R-17로 거절된 41곳을 모아 공동 이의 신청단을 꾸린다",
+        label: "R-17로 거절된 41곳과 공동 이의 신청단을 꾸린다",
         effect: { legitimacy: 8, trust: 9, capital: -7, time: -7, humanCost: 3, fatigue: 8 },
         voice: "한 곳씩 물으면 같은 답만 돌아온다며, R-17로 거절된 41곳을 모아 공동 이의 신청단을 꾸린다.",
         echo: "41곳이 모이자 목소리가 커집니다. 그만큼 오래 걸리고, 그동안 가장 급한 곳부터 문을 닫습니다.",
@@ -652,7 +652,7 @@ export const case22 = {
     choices: [
       {
         id: "c22_evidence_turn_purge",
-        label: "명단을 학습 데이터에서 지우기 전에는 어떤 심사도 받지 않는다",
+        label: "학습 데이터에서 명단을 지울 때까지 심사를 받지 않는다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 },
         voice: "피해자를 위험으로 읽는 기계 앞에 설 수 없다며, 명단을 학습 데이터에서 지우기 전에는 어떤 심사도 받지 않는다.",
         echo: "버티자 명단은 지워질지도 모릅니다. 그동안 끝까지정밀을 포함한 29곳은 어떤 대출도 받지 못합니다.",
@@ -679,7 +679,7 @@ export const case22 = {
   memoryPlan: {
     systemNext: "c22_route_system",
     evidenceNext: "c22_evidence_turn",
-    systemLabel: "귤 창고에서 새로 짠 판이 노아의 설명 문구에 섞였는지 가려 읽는다",
+    systemLabel: "귤 창고에서 새로 짠 판이 노아 설명에 섞였는지 본다",
     evidenceLabel: "1기 주간표를 들고 노아가 이름을 배운 목록을 찾는다",
     systemEcho: "가려 읽을 것도 없습니다. 노아의 설명에는 당신의 판도, 다른 누구의 판단도 없습니다. 지난 거절이 이번 거절의 이유로 적혀 있을 뿐입니다.",
     evidenceEcho: "주간표의 발주 부서를 학습 목록에 대면 태그 하나가 붙은 이름들이 쏟아집니다. 배상을 신청한 사람들입니다.",

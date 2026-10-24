@@ -44,7 +44,7 @@ const case37Nodes = {
     choices: [
       {
         id: "c37_start_call",
-        label: "파일을 열기 전에 기록 속 동료들에게 먼저 전화를 돌린다",
+        label: "파일을 열기 전에 기록 속 동료들에게 먼저 전화한다",
         effect: { trust: 11, humanCost: -5, time: -5, capital: -2, fatigue: 4 },
         voice: "남의 입으로 듣게 둘 수 없다며, 파일을 열기 전에 기록 속 동료들에게 먼저 전화를 돌린다.",
         echo: "전화를 받은 아홉 명 중 여섯은 이미 자기 줄을 읽었습니다. 나머지 셋은 당신 목소리로 처음 듣습니다.",
@@ -228,7 +228,7 @@ const case37Nodes = {
     choices: [
       {
         id: "c37_final_choose",
-        label: "확인서는 거부하고 63명이 각자 지울지 남길지 정하게 한다",
+        label: "확인서는 거부하고 63명이 지울지 남길지 정하게 한다",
         effect: { trust: 12, humanCost: -5, legitimacy: 4, capital: -8, time: -5, fatigue: 5 },
         voice: "도윤하와 선우진의 답이 다르다며, 확인서는 거부하고 63명이 각자 지울지 남길지 정하게 한다.",
         echo: "연락이 닿은 13명부터 답을 냅니다. 여섯은 지우고, 다섯은 남기고, 둘은 아직 모르겠다고 합니다. 나머지 50명의 칸은 비워 둡니다. 도건우의 제안서는 둘째 장이 찢긴 채 돌아갑니다.",
@@ -322,7 +322,7 @@ export const case37 = {
       memo: ["미러 사이트 순위표 3종 -- 투표 기능 포함", "'가장 먼저 무너진 분석관' 1위: 참가자 01", "선우진은 아직 이 사이트를 모름"],
       choices: [
         {
-          label: "순위표에 오른 사람들에게 먼저 알리고 대응을 같이 정한다",
+          label: "순위표의 사람들에게 먼저 알리고 대응을 같이 정한다",
           effect: { trust: 11, humanCost: -5, legitimacy: 3, time: -4, capital: -2, fatigue: 3 },
           voice: "선우진이 남의 입으로 1위를 알게 둘 수 없어서, 순위표에 오른 사람들에게 먼저 알리고 대응을 같이 정한다.",
           echo: "알리자 선우진이 새벽에 순위표를 봅니다. 모르고 자는 밤 하나가 사라집니다.",
@@ -352,7 +352,7 @@ export const case37 = {
       memo: ["기사 댓글 3만 2천 개", "이정숙의 번호표 뒷면: '7초는 생각하는 시간'", "채용 탈락자 댓글: '이 기록으로 뽑는 회사'"],
       choices: [
         {
-          label: "이정숙과 함께 객장 손님들에게 7초의 뜻을 직접 설명한다",
+          label: "이정숙과 함께 객장 손님들에게 7초의 뜻을 설명한다",
           effect: { trust: 10, humanCost: -4, legitimacy: 3, time: -3, capital: -2, fatigue: 4 },
           voice: "번호표 뒷면의 그 말이 댓글보다 멀리 가게, 이정숙과 함께 객장 손님들에게 7초의 뜻을 직접 설명한다.",
           echo: "설명을 들은 손님 몇이 도윤하 창구에 다시 줄을 섭니다. 대기 시간은 그만큼 길어집니다.",
@@ -381,14 +381,14 @@ export const case37 = {
       memo: ["참가자 01: 2022-07-28 03:02 '이탈 -- 효과 확인'", "느린섬 방명록: 같은 날 쓰러진 손님", "선우진의 뜻: 삭제 말고 실명으로 남기기"],
       choices: [
         {
-          label: "선우진의 뜻대로 그의 줄을 실명으로 남기는 방법을 찾는다",
+          label: "선우진의 뜻대로 그의 줄을 실명으로 남길 길을 찾는다",
           effect: { trust: 11, humanCost: -4, legitimacy: 2, capital: -3, time: -3, fatigue: 4 },
           cognition: { persistence: 1 },
           voice: "쓰러진 날을 제 이름으로 되찾겠다는 말이라서, 선우진의 뜻대로 그의 줄을 실명으로 남기는 방법을 찾는다.",
           echo: "실명이 붙자 그 줄은 더는 순위표의 1위가 아닙니다. 선우진이라는 사람의 기록이 됩니다. 그리고 느린섬의 주소도 함께 알려집니다.",
         },
         {
-          label: "남기더라도 법원 증거로만 쓰이게 봉인 절차를 밟자고 한다",
+          label: "남기되 법원 증거로만 쓰이게 봉인 절차를 밟자고 한다",
           effect: { legitimacy: 10, trust: 4, time: -4, humanCost: 3, fatigue: 3 },
           voice: "남기더라도 순위표 대신 법원 증거로만 쓰이게, 봉인 절차를 밟자고 한다.",
           echo: "봉인하자 그 줄은 안전해집니다. 선우진이 원한 건 안전보다 이름이었습니다.",
@@ -414,14 +414,14 @@ export const case37 = {
       memo: ["제보자 없는 제보 메일", "그래프가 된 0.0초"],
       choices: [
         {
-          label: "기록 속 사람 이름은 한 글자도 쓰지 말아 달라고 부탁한다",
+          label: "기록 속 사람 이름은 한 글자도 쓰지 말아 달라고 한다",
           effect: { trust: 10, humanCost: -4, capital: -3, time: -2, fatigue: 4 },
           cognition: { persistence: 1 },
           voice: "62명은 실리겠다고 한 적이 없다며, 기록 속 사람 이름은 한 글자도 쓰지 말아 달라고 부탁한다.",
           echo: "서하린이 이름을 지웁니다. 9시에 나간 기사는 조용하고, 다른 매체의 그래프가 검색 첫 줄을 차지합니다.",
         },
         {
-          label: "유출 경위를 먼저 쓰고 기록 내용은 빼 달라고 정식 요청한다",
+          label: "유출 경위를 먼저 쓰고 기록 내용은 빼 달라고 요청한다",
           effect: { legitimacy: 8, trust: 3, time: -3, humanCost: 2, capital: -1, fatigue: 2 },
           voice: "누가 풀었는지가 기사여야 한다며, 유출 경위를 먼저 쓰고 기록 내용은 빼 달라고 정식 요청한다.",
           echo: "요청서가 편집회의에 올라갑니다. 기사는 한 시간 늦게 나가고, 그 한 시간 동안 그래프가 세 개 더 생깁니다.",
@@ -444,7 +444,7 @@ export const case37 = {
       memo: ["보상 자극에 과반응", "밥은 먹었냐는 1등의 아버지"],
       choices: [
         {
-          label: "그 메모는 네가 아니라 쓴 사람의 기록이라고 오진우에게 말해 준다",
+          label: "그 메모는 쓴 사람의 기록이라고 오진우에게 말해 준다",
           effect: { trust: 9, humanCost: -4, time: -3, capital: -2, fatigue: 3 },
           cognition: { persistence: 1 },
           voice: "쓰기 좋은 쪽이라는 말을 혼자 삼키지 않게, 그 메모는 네가 아니라 쓴 사람의 기록이라고 오진우에게 말해 준다.",
@@ -474,7 +474,7 @@ export const case37 = {
       memo: ["관리자 H의 승인 칸", "기사 제목이 될까 무서운 사과"],
       choices: [
         {
-          label: "한서윤이 기록 속 사람들 앞에서 직접 말할 수 있게 자리를 만든다",
+          label: "한서윤이 기록 속 사람들 앞에서 말할 자리를 만든다",
           effect: { trust: 10, humanCost: -4, time: -3, capital: -1, fatigue: 4 },
           voice: "한서윤이 기사를 거치지 않고 기록 속 사람들 앞에서 직접 말할 수 있게, 자리를 만든다.",
           echo: "단체방에 한서윤의 긴 글이 올라옵니다. 첫 답장은 선우진입니다. '천천히 읽을게요.'",
@@ -546,7 +546,7 @@ export const case37 = {
       choices: [
         {
           id: "c37_branch_rooftop_follow_a",
-          label: "이민서가 자기 줄을 먼저 공개하도록 돕고 내 줄도 함께 건다",
+          label: "이민서가 자기 줄을 먼저 열게 돕고 내 줄도 함께 건다",
           effect: { trust: 13, legitimacy: 4, humanCost: -3, capital: -3, time: -4, fatigue: 5 },
           voice: "혼자 빠지는 증명으로 끝나지 않게, 이민서가 자기 줄을 먼저 공개하도록 돕고 내 줄도 함께 건다.",
           echo: "두 줄이 기호만 단 채 나란히 올라가자 순위표에 없던 댓글이 달립니다. '이 사람들, 자기 걸 먼저 보여 주네.'",
@@ -602,7 +602,7 @@ export const case37 = {
         },
         {
           id: "c37_route_system_warn",
-          label: "요청한 186곳에 채점이 불법일 수 있다는 경고문을 보낸다",
+          label: "요청한 186곳에 채점이 불법일 수 있다고 경고한다",
           effect: { legitimacy: 8, trust: 4, capital: 3, time: -6, humanCost: 3, fatigue: 4 },
           voice: "모르고 쓰는 곳부터 멈춰 세울 수 있게, 요청한 186곳에 채점이 불법일 수 있다는 경고문을 보낸다.",
           echo: "경고문을 받은 곳 중 절반이 답장을 보냅니다. '저희는 참고만 했습니다.' 참고가 채점이 되는 데는 하루면 됩니다.",
@@ -621,7 +621,7 @@ export const case37 = {
     finalChoices: [
       {
         id: "a",
-        label: "유출된 반응 기록으로 사람을 채점하지 못하게 사용 금지 조항을 만든다",
+        label: "유출된 반응 기록으로 채점하지 못하게 조항을 만든다",
         effect: { legitimacy: 12, trust: 6, capital: -7, humanCost: -4, time: -2, fatigue: 6 },
         voice: "거절하지 않는 기계가 유출된 반응 기록으로 사람을 채점하지 못하게, 사용 금지 조항을 만든다.",
         echo: "금지 조항이 생기자 채점표는 불법이 됩니다. 이미 떨어진 지원자들을 되돌리는 조항은 아직 없습니다.",
@@ -689,8 +689,8 @@ export const case37 = {
   memoryPlan: {
     systemNext: "c37_route_system",
     evidenceNext: "c37_evidence_turn",
-    systemLabel: "식사 날 새벽에 짠 판이 유출 파일 판정 칸에 찍혔는지 본다",
-    evidenceLabel: "네 번째 의자를 차린 시각을 유출 파일의 작성 시각과 겹친다",
+    systemLabel: "식사 날 새벽 짠 판이 유출 파일 판정에 찍혔는지 본다",
+    evidenceLabel: "네 번째 의자를 차린 시각을 유출 파일 시각과 겹친다",
     systemEcho: "판정 칸에 찍힌 것은 당신의 판이 아니라 점수입니다. 노아가 그 점수를 밖에서 누가 달라고 하는지 요청 기록을 엽니다.",
     evidenceEcho: "식탁의 시각을 파일에 겹치면 디저트 복숭아가 나오던 때 파일이 만들어졌습니다. 만든 계정에는 발급을 요청한 부서가 붙어 있습니다.",
   },
@@ -706,14 +706,14 @@ export const case37 = {
   },
   openingSignatures: {
     c37_start_warm: {
-      label: "모여 있던 동료들과 파일을 함께 열고 서로의 줄을 가려 준다",
+      label: "모인 동료들과 파일을 함께 열고 서로의 줄을 가려 준다",
       effect: { trust: 12, humanCost: -4, time: -4, capital: -3, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "못 읽겠다는 도윤하를 혼자 두지 않으려고, 모여 있던 동료들과 파일을 함께 열고 서로의 줄을 가려 준다.",
       echo: "각자 남의 줄만 읽기로 하자 도윤하가 겨우 웃습니다. 대신 누구도 자기 줄이 어떻게 적혔는지 아직 모릅니다.",
     },
     c37_start_record: {
-      label: "서명한 진술서에 유출 시각을 한 줄 덧붙여 검찰에 보낸다",
+      label: "서명한 진술서에 유출 시각을 덧붙여 검찰에 보낸다",
       effect: { legitimacy: 12, trust: 2, time: -5, capital: -4, humanCost: 2, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "진술과 유출이 같은 새벽 일임을 남기려고, 서명한 진술서에 유출 시각을 한 줄 덧붙여 검찰에 보낸다.",

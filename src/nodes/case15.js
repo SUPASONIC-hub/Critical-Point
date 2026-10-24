@@ -91,7 +91,7 @@ const case15Nodes = {
     choices: [
       {
         id: "c15_form_refuse",
-        label: "이민서와 나란히 앉아 확인서 없이 면접을 보겠다고 버틴다",
+        label: "이민서와 나란히 앉아 확인서 없이 면접 보겠다고 버틴다",
         effect: { trust: 11, legitimacy: 4, capital: -6, time: -5, fatigue: 6 },
         voice: "참고 자료라면 없어도 될 일이라며, 이민서와 나란히 앉아 확인서 없이 면접을 보겠다고 버틴다.",
         echo: "버티자 채윤슬이 난처하게 웃습니다. '저도 그랬으면 좋겠어요.' 그러고는 '전달 완료'를 누르지 않은 채 창을 닫습니다.",
@@ -99,7 +99,7 @@ const case15Nodes = {
       },
       {
         id: "c15_form_amend",
-        label: "'조작 실수'를 '원인 미상'으로 고치는 문구 조정 요청서를 쓴다",
+        label: "'조작 실수'를 '원인 미상'으로 고쳐 달라고 요청한다",
         effect: { legitimacy: 12, time: -6, trust: -4, humanCost: 3, fatigue: 4 },
         voice: "한 번뿐인 기회를 허투루 쓰지 않으려고, '조작 실수'를 '원인 미상'으로 고치는 문구 조정 요청서를 쓴다.",
         echo: "'원인 미상'으로 고쳐도 서명은 서명입니다. 요청서를 읽은 이민서가 '그래도 제 이름은 들어가네요'라고 합니다.",
@@ -107,7 +107,7 @@ const case15Nodes = {
       },
       {
         id: "c15_form_ask",
-        label: "채윤슬을 따로 불러 그도 이 종이를 받아 본 적이 있는지 묻는다",
+        label: "채윤슬을 따로 불러 이 종이를 받은 적 있는지 묻는다",
         effect: { trust: 9, humanCost: -4, legitimacy: 3, time: -7, capital: -2, fatigue: 3 },
         voice: "목소리가 작아지는 데는 까닭이 있을 것 같아서, 채윤슬을 따로 불러 그도 이 종이를 받아 본 적이 있는지 묻는다.",
         echo: "묻자 채윤슬이 모니터에서 눈을 떼지 않습니다. '퇴근하고 옥상에서 얘기해요.' 그의 손이 지갑 쪽으로 한 번 갑니다.",
@@ -144,7 +144,7 @@ const case15Nodes = {
       },
       {
         id: "c15_rooftop_consent",
-        label: "수능이 끝난 뒤 찬빈의 동의를 받아 진료 기록을 내자고 한다",
+        label: "수능 뒤 찬빈의 동의를 받아 진료 기록을 내자고 한다",
         effect: { legitimacy: 11, trust: 4, time: -7, humanCost: 2, fatigue: 4 },
         voice: "시험도 본인 이름도 지켜 주려고, 수능이 끝난 뒤 찬빈의 동의를 받아 진료 기록을 내자고 한다.",
         echo: "동의를 기다리자 면접이 먼저 옵니다. 진료 기록은 서명 뒤에야 쓸 수 있는 증거가 됩니다.",
@@ -189,7 +189,7 @@ const case15Nodes = {
       },
       {
         id: "c15_gate_office",
-        label: "시험장 본부에 도시락 전달 절차가 있는지 정식으로 묻는다",
+        label: "시험장 본부에 도시락 전달 절차가 있는지 묻는다",
         effect: { legitimacy: 10, trust: 3, time: -7, humanCost: 2, fatigue: 3 },
         voice: "닫힌 교문에도 길이 있을 거라며, 시험장 본부에 도시락 전달 절차가 있는지 정식으로 묻는다.",
         echo: "본부의 대답은 친절하고 분명합니다. '입실 후 반입은 안 됩니다.' 규정을 확인하는 데 11분이 걸립니다.",
@@ -360,7 +360,7 @@ export const case15 = {
           echo: "역할표는 반듯합니다. 그런데 이민서의 이름은 어느 조에도 없어서, 그는 자기가 어디 서야 할지 모릅니다.",
         },
         {
-          label: "응원은 짧게 맡겨 두고 나머지는 일찍 자고 면접장으로 간다",
+          label: "응원은 짧게 맡기고 일찍 자고 면접장으로 간다",
           effect: { time: 5, capital: 3, trust: -4, humanCost: 3, fatigue: -4 },
           voice: "내일 진짜 싸움은 본점에 있다며, 응원은 짧게 맡겨 두고 나머지는 일찍 자고 면접장으로 간다.",
           echo: "일찍 자니 아침은 가볍습니다. 교문 앞에는 피켓이 한 장만 올라갑니다.",
@@ -437,7 +437,7 @@ export const case15 = {
       memo: ["확인서 사본을 본 동생", "입실까지 일곱 시간 반"],
       choices: [
         {
-          label: "찬빈에게 사실대로 말해 주고 누나 편이 되어 달라고 한다",
+          label: "찬빈에게 사실대로 말하고 누나 편이 되어 달라고 한다",
           effect: { trust: 10, humanCost: -5, legitimacy: 2, time: -2, fatigue: 4 },
           voice: "자기 탓인 줄 알고 시험장에 들어가게 둘 수 없어서, 찬빈에게 사실대로 말해 주고 누나 편이 되어 달라고 한다.",
           echo: "사실을 들은 찬빈이 '그럼 누나, 서명하지 마'라고 말합니다. 일곱 시간 뒤 그는 그 말을 들고 시험장에 들어갑니다.",
@@ -510,7 +510,7 @@ export const case15 = {
         },
         {
           id: "c15_branch_roof_b",
-          label: "7년 전 확인서도 문구 조정 요청에 같은 사례로 붙이자고 한다",
+          label: "7년 전 확인서도 같은 사례로 요청에 붙이자고 한다",
           effect: { legitimacy: 11, trust: 3, time: -6, humanCost: 4, fatigue: 4 },
           voice: "한 사람의 일이 아니라는 걸 보이려고, 7년 전 확인서도 문구 조정 요청에 같은 사례로 붙이자고 한다.",
           echo: "사례로 붙이자 요청서는 두꺼워집니다. 채윤슬의 이름도 그 두께 안에 들어갑니다.",
@@ -538,7 +538,7 @@ export const case15 = {
       choices: [
         {
           id: "c15_branch_roof_follow_a",
-          label: "채윤슬의 보류 옆에 트리거랩의 이름도 나란히 걸겠다고 한다",
+          label: "채윤슬의 보류 옆에 트리거랩 이름도 나란히 건다",
           effect: { trust: 12, legitimacy: 5, capital: -7, time: -5, fatigue: 5 },
           voice: "혼자 징계받게 두지 않겠다며, 채윤슬의 보류 옆에 트리거랩의 이름도 나란히 걸겠다고 한다.",
           echo: "이름을 나란히 걸자 채윤슬은 혼자가 아닙니다. 대신 트리거랩은 인사부에 처음으로 적이 하나 생깁니다.",
@@ -547,7 +547,7 @@ export const case15 = {
         },
         {
           id: "c15_branch_roof_follow_b",
-          label: "보류 대신 인사부 양식에 반려 칸을 만드는 개선안을 같이 쓴다",
+          label: "인사부 양식에 반려 칸을 만드는 개선안을 같이 쓴다",
           effect: { legitimacy: 12, trust: 4, time: -7, humanCost: 3, fatigue: 5 },
           voice: "한 사람이 버튼을 안 누르는 걸로는 오래 못 간다며, 보류 대신 인사부 양식에 반려 칸을 만드는 개선안을 같이 쓴다.",
           echo: "개선안은 반듯합니다. 반려 칸이 생기려면 인사위원회를 두 번 거쳐야 하고, 목요일은 그보다 빨리 옵니다.",
@@ -613,7 +613,7 @@ export const case15 = {
     finalChoices: [
       {
         id: "a",
-        label: "확인서 없이도 심사받을 수 있게 양식에 반려 칸을 만든다",
+        label: "확인서 없이 심사받게 양식에 반려 칸을 만든다",
         effect: { legitimacy: 13, trust: 7, capital: -8, humanCost: -5, fatigue: 7 },
         voice: "거절할 칸이 없으면 서명은 선택이 아니라며, 확인서 없이도 심사받을 수 있게 양식에 반려 칸을 만든다.",
         echo: "반려 칸이 생기자 채윤슬의 버튼은 두 개가 됩니다. 두 번째 버튼을 누르는 사람에게 무슨 일이 생길지는 아직 모릅니다.",
@@ -629,7 +629,7 @@ export const case15 = {
       },
       {
         id: "c",
-        label: "서명을 거부한 계약직들이 함께 이의를 낼 수 있게 돕는다",
+        label: "서명을 거부한 계약직들이 함께 이의를 내게 돕는다",
         effect: { legitimacy: 8, trust: 9, capital: -7, time: -7, humanCost: 3, fatigue: 8 },
         voice: "혼자 거부하면 탈락으로 끝난다며, 서명을 거부한 계약직들이 함께 이의를 낼 수 있게 돕는다.",
         echo: "함께 내는 이의는 느리지만 무겁습니다. 서명을 거부한 사람은 이민서를 포함해 세 명입니다.",
@@ -654,7 +654,7 @@ export const case15 = {
     choices: [
       {
         id: "c15_evidence_turn_all",
-        label: "12명 모두의 확인서가 빠지기 전에는 누구도 서명하지 않게 한다",
+        label: "12명 확인서가 다 빠질 때까지 서명을 막는다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 },
         voice: "따로따로 서명하면 12건이 조사 없이 닫힌다며, 12명 모두의 확인서가 빠지기 전에는 누구도 서명하지 않게 한다.",
         echo: "전원을 묶자 그룹은 12명을 한꺼번에 잃거나 한꺼번에 들여야 합니다. 그 계산은 33층이 합니다.",
@@ -681,8 +681,8 @@ export const case15 = {
   memoryPlan: {
     systemNext: "c15_route_system",
     evidenceNext: "c15_evidence_turn",
-    systemLabel: "창구 앞에서 새로 짠 판을 이민서의 확인서와 맞대어 본다",
-    evidenceLabel: "매입 명세서의 빈칸을 확인서 파일의 작성 부서 칸에 대 본다",
+    systemLabel: "창구 앞에서 새로 짠 판을 이민서 확인서와 맞대어 본다",
+    evidenceLabel: "매입 명세서 빈칸을 확인서의 작성 부서 칸에 대 본다",
     systemEcho: "맞대어 보면 확인서는 판의 결론만 옮기고, 누가 책임지는지는 한 사람 이름으로 닫습니다. 에코가 개인 실수로 닫힌 사고 보고서를 연도별로 엽니다.",
     evidenceEcho: "매입 명세서의 빈 승인자 칸을 확인서 파일에 대면 작성 부서가 뜹니다. 인사부가 아닙니다.",
   },
@@ -705,7 +705,7 @@ export const case15 = {
       echo: "칠판 사진을 본 이민서가 웃습니다. '저는 알고 사인하는 거면요?' 그 질문에는 칠판도 답이 없습니다.",
     },
     c15_start_record: {
-      label: "개정안을 등록한 방식 그대로 확인서에도 이의 기록을 남긴다",
+      label: "개정안 등록 방식 그대로 확인서에도 이의 기록을 남긴다",
       effect: { legitimacy: 12, trust: -2, capital: -4, time: -5, humanCost: 2, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "지우는 문서 옆에 고치는 기록이 있어야 한다며, 개정안을 등록한 방식 그대로 확인서에도 이의 기록을 남긴다.",

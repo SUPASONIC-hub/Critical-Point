@@ -182,7 +182,7 @@ const case21Nodes = {
     choices: [
       {
         id: "c21_breakwater_stay",
-        label: "대답을 서두르지 않고 그가 다 말할 때까지 곁에 앉아 있는다",
+        label: "그가 다 말할 때까지 서두르지 않고 곁에 앉는다",
         effect: { trust: 13, humanCost: -6, time: -4, legitimacy: -2, fatigue: 7 },
         voice: "이 밤에는 듣는 것이 먼저라며, 대답을 서두르지 않고 그가 다 말할 때까지 곁에 앉아 있는다.",
         echo: "곁에 있으니 그가 한 번 더 말을 잇습니다. 아버지 이야기가 하나 더 나오고, 등대 불이 10번 더 돕니다.",
@@ -198,7 +198,7 @@ const case21Nodes = {
       },
       {
         id: "c21_breakwater_admit",
-        label: "휴가가 아니라고 짧게 인정하고 이야기는 내일 아침으로 미룬다",
+        label: "휴가가 아니라고만 인정하고 이야기는 내일로 미룬다",
         effect: { time: 5, legitimacy: 3, trust: 2, humanCost: 4, fatigue: -4 },
         voice: "거짓으로 넘길 물음이 아니라서, 휴가가 아니라고 짧게 인정하고 이야기는 내일 아침으로 미룬다.",
         echo: "인정하자 그가 고개를 끄덕입니다. '내일 아침에요.' 그는 그날 밤 잠을 자지 못합니다.",
@@ -227,7 +227,7 @@ const case21Nodes = {
     choices: [
       {
         id: "c21_final_tell",
-        label: "주간표와 방명록 문장을 보여 주고 4년 전 일을 그대로 알린다",
+        label: "주간표와 방명록을 보여 주고 4년 전 일을 알린다",
         effect: { trust: 11, legitimacy: 6, humanCost: 3, capital: -5, time: -5, fatigue: 6 },
         voice: "모르는 채 서명하게 둘 수는 없다며, 주간표와 방명록 문장을 보여 주고 4년 전 일을 그대로 알린다.",
         echo: "알리자 그는 주간표를 오래 봅니다. '약해서가 아니었네요.' 그리고 한참 뒤에 묻습니다. '나머지 기록은 어디 있어요?'",
@@ -280,7 +280,7 @@ export const case21 = {
       choices: [
         {
           id: "c21_after_warm",
-          label: "마지막 비행기 시간까지 느린섬에 남아 귤 상자를 같이 싼다",
+          label: "마지막 비행기까지 느린섬에 남아 귤 상자를 같이 싼다",
           effect: { trust: 13, humanCost: -5, time: -3, capital: -2, fatigue: -8 },
           voice: "급하게 따지 않은 귤을 급하게 들고 갈 수는 없다며, 마지막 비행기 시간까지 느린섬에 남아 귤 상자를 같이 싼다.",
           echo: "남으니 귤 상자 여섯 개가 테이프로 봉해집니다. 서울의 노아는 그날 밤도 1기의 문장으로 선택지를 만듭니다.",
@@ -298,7 +298,7 @@ export const case21 = {
         },
         {
           id: "c21_after_rush",
-          label: "귤 상자를 든 채 다음 비행기로 올라가 노아의 심사를 살핀다",
+          label: "귤 상자를 든 채 올라가 노아의 심사를 살핀다",
           effect: { capital: 8, legitimacy: 6, trust: -7, humanCost: 5, fatigue: 6 },
           voice: "끝까지정밀 신청서가 벌써 노아 앞에 있다며, 귤 상자를 든 채 바로 다음 비행기로 올라가 노아의 심사를 들여다본다.",
           echo: "먼저 올라가자 노아의 첫 심사 목록에 끝까지정밀이 보입니다. 공항까지 배웅 나온 건 느린섬 마당의 개 꼭지뿐입니다.",
@@ -362,7 +362,7 @@ export const case21 = {
           echo: "승인선을 확인하려면 봉인 구역의 문을 두드려야 합니다. 두드리는 소리는 33층까지 갑니다.",
         },
         {
-          label: "주간표 사진을 류세아에게 넘겨 노아 가동을 멈출 근거로 쓴다",
+          label: "주간표 사진을 류세아에게 넘겨 노아를 멈출 근거로 쓴다",
           effect: { time: 5, capital: 5, legitimacy: 4, trust: -4, humanCost: 4, fatigue: -4 },
           voice: "이런 기록으로 배운 판단을 켤 수는 없다며, 주간표 사진을 류세아에게 넘겨 노아 가동을 멈출 근거로 쓴다.",
           echo: "근거는 빨리 도착합니다. 한 사람의 가장 나쁜 여름이 주인보다 먼저 회의 자료가 됩니다.",
@@ -410,7 +410,7 @@ export const case21 = {
       memo: ["등록자 칸이 빈 31개 문장", "노아가 지금도 이 문장으로 선택지를 만듦"],
       choices: [
         {
-          label: "선우진이 직접 알기 전에는 아무에게도 넘기지 말자고 한다",
+          label: "선우진이 알기 전에는 아무에게도 넘기지 말자고 한다",
           effect: { trust: 9, legitimacy: 3, humanCost: -5, time: -4, fatigue: 4 },
           voice: "그의 말이 그보다 먼저 서류가 되면 안 된다며, 선우진이 직접 알기 전에는 아무에게도 넘기지 말자고 한다.",
           echo: "넘기지 않자 문장은 오늘도 노아의 선택지가 됩니다. 주인이 아는 날까지 그 버튼은 계속 눌립니다.",
@@ -474,7 +474,7 @@ export const case21 = {
           echo: "고은비는 대답 대신 귤 상자를 내려놓고 계산대 옆 의자에 앉습니다. 오늘 귤 고르는 일은 반나절 늦어집니다.",
         },
         {
-          label: "'범위는 회사가 정한다'는 줄에 밑줄을 긋고 법무팀에 질의한다",
+          label: "'범위는 회사가 정한다'에 밑줄 긋고 법무팀에 질의한다",
           effect: { legitimacy: 11, trust: 3, capital: -5, time: -3, fatigue: 5 },
           voice: "무엇을 허락하는지는 종이에 적혀야 한다며, '범위는 회사가 정한다'는 줄에 밑줄을 긋고 법무팀에 질의한다.",
           echo: "질의는 기록으로 남습니다. 법무팀의 답은 우체국 마감 뒤에 옵니다.",
@@ -549,7 +549,7 @@ export const case21 = {
         },
         {
           id: "c21_branch_rind_follow_b",
-          label: "9쪽 금리 조항을 빼 달라고 서면으로 요청하고 서명은 미룬다",
+          label: "금리 조항을 빼 달라고 서면 요청하고 서명은 미룬다",
           effect: { legitimacy: 12, trust: 5, time: -7, humanCost: 3, fatigue: 5 },
           voice: "별표 없는 조항까지 서명할 수는 없다며, 9쪽 금리 조항을 빼 달라고 서면으로 요청하고 서명은 미룬다.",
           echo: "서면 요청은 남습니다. 만기까지 한 달, 고은비는 그 한 달을 기다려야 합니다.",
@@ -588,7 +588,7 @@ export const case21 = {
       routeChoices: [
         {
           id: "c21_route_system_disclose",
-          label: "노아의 설명 화면을 류세아와 동의 심사 쪽에 그대로 공유한다",
+          label: "노아의 설명 화면을 류세아와 동의 심사 쪽에 공유한다",
           effect: { legitimacy: 11, trust: 6, capital: -6, time: -8, fatigue: 5 },
           voice: "혼자 알고 있을 근거가 아니라서, 노아의 설명 화면을 류세아와 동의 심사 쪽에 그대로 공유한다.",
           echo: "공유하자 류세아가 설명 화면을 캡처해 동의 심사 안건으로 올립니다. 노아는 자기 약점을 처음으로 스스로 보여 준 셈입니다.",
@@ -631,7 +631,7 @@ export const case21 = {
       },
       {
         id: "c",
-        label: "동의하지 않은 참가자를 위한 기록 삭제 창구를 따로 만든다",
+        label: "동의 안 한 참가자의 기록 삭제 창구를 따로 만든다",
         effect: { legitimacy: 8, trust: 9, capital: -7, time: -7, humanCost: 3, fatigue: 8 },
         voice: "노아가 답하지 못하는 칸은 기록의 주인이 정하게, 동의하지 않은 참가자를 위한 기록 삭제 창구를 따로 만든다.",
         echo: "삭제 창구가 생기자 기록은 주인의 것이 됩니다. 노아의 정확도는 그 창구를 연 날부터 조금씩 떨어집니다.",
@@ -656,7 +656,7 @@ export const case21 = {
     choices: [
       {
         id: "c21_evidence_turn_reopen",
-        label: "산업재해 재심사를 선우진 이름으로 낼 수 있게 서류를 갖춘다",
+        label: "선우진 이름으로 산업재해 재심사 서류를 갖춘다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 },
         voice: "'개인적 스트레스'라는 의견서를 뒤집을 수 있게, 산업재해 재심사 서류를 선우진 이름으로 갖춘다.",
         echo: "서류를 갖추자 4년 전 '개인 사정'이 다시 심사대에 오릅니다. 선우진이 원하는지는 서류 맨 앞 칸에 적혀야 합니다.",
@@ -672,7 +672,7 @@ export const case21 = {
       },
       {
         id: "c21_evidence_turn_share",
-        label: "1기의 다른 세 사람에게도 이 명세서가 있다는 것부터 알린다",
+        label: "1기의 다른 세 사람에게 이 명세서부터 알린다",
         effect: { trust: 12, legitimacy: 7, capital: -7, humanCost: -7, fatigue: 8 },
         voice: "선우진만의 일이 아니라며, 1기의 다른 세 사람에게도 이 명세서가 있다는 것부터 알린다.",
         echo: "알리자 세 사람 중 한 명이 바로 전화를 겁니다. '저도 그해 여름에 쓰러졌어요.'",
@@ -707,7 +707,7 @@ export const case21 = {
       echo: "여섯 명이 한꺼번에 오자 선우진은 방이 모자라다며 웃습니다. 강태민과 권도현이 한 방을 쓰게 됩니다.",
     },
     c21_start_record: {
-      label: "동의 부록의 첫 줄에 참가자 01의 이름을 올리고 내려간다",
+      label: "동의 부록 첫 줄에 참가자 01 이름을 올리고 내려간다",
       effect: { legitimacy: 12, trust: -3, capital: -5, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "법무팀만 아는 빈칸으로 두지 않으려고, 동의 부록의 첫 줄에 참가자 01의 이름을 올리고 내려간다.",

@@ -536,7 +536,7 @@ export const case24 = {
       choices: [
         {
           id: "c24_branch_server_follow_a",
-          label: "목록 1번인 내 기록부터 공개해 다른 사람 기록을 지킨다",
+          label: "목록 1번인 내 기록부터 공개해 남의 기록을 지킨다",
           effect: { trust: 13, legitimacy: 4, humanCost: -4, capital: -7, time: -5, fatigue: 5 },
           voice: "남의 기록을 앞세울 수는 없어서, 목록 1번인 내 기록부터 공개해 다른 사람 기록을 지킨다.",
           echo: "당신의 기록이 먼저 열리자 이관 목록 2번부터는 멈칫합니다. 1번은 이미 모두가 읽었습니다.",
@@ -679,7 +679,7 @@ export const case24 = {
   memoryPlan: {
     systemNext: "c24_route_system",
     evidenceNext: "c24_evidence_turn",
-    systemLabel: "총회 전날 새로 짠 판이 해체 공지 문구에 비쳤는지 들여다본다",
+    systemLabel: "총회 전날 짠 판이 해체 공지 문구에 비쳤는지 본다",
     evidenceLabel: "빨간 점의 명단을 해체 결정 문서의 첨부에 대 본다",
     systemEcho: "들여다보면 공지에는 아무것도 비치지 않습니다. 네 글자 사유뿐입니다. 에코가 같은 네 글자를 받은 조직들을 한 줄씩 부릅니다.",
     evidenceEcho: "현황표의 예산 코드를 해체 문서에 대면 첨부 파일이 하나 열립니다. 제목이 공지와 반대입니다.",
@@ -696,21 +696,21 @@ export const case24 = {
   },
   openingSignatures: {
     c24_start_warm: {
-      label: "1주 모임 사람들에게 트리거랩 동료들의 다음 자리를 부탁한다",
+      label: "1주 모임에 트리거랩 동료들의 다음 자리를 부탁한다",
       effect: { trust: 11, humanCost: -4, capital: -4, time: -5, fatigue: 3 },
       cognition: { reframing: 2 },
       voice: "먼저 연락해 온 사람들에게 기대 보기로 하고, 1주 모임 사람들에게 트리거랩 동료들의 다음 자리를 부탁한다.",
       echo: "부탁하자 끝까지정밀에서 제일 먼저 답이 옵니다. '우리 공장 경리 자리 비어요.' 이민서는 그 문자를 한참 봅니다.",
     },
     c24_start_record: {
-      label: "해체 공지의 빈 승인자 칸을 주주 서한과 나란히 공개한다",
+      label: "빈 승인자 칸의 해체 공지를 주주 서한과 나란히 낸다",
       effect: { legitimacy: 12, trust: -2, capital: -5, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "이름을 남기자던 서한이 가장 먼저 비껴간 문서라며, 해체 공지의 빈 승인자 칸을 주주 서한과 나란히 공개한다.",
       echo: "나란히 놓자 서한과 공지가 서로를 설명합니다. 그룹은 공지를 고치지 않고, 대신 게시판 댓글 기능을 닫습니다.",
     },
     c24_start_rush: {
-      label: "33층에 다녀간 일과 앞당겨진 공지 시각을 동료들에게 먼저 알린다",
+      label: "33층 일과 당겨진 공지 시각을 동료들에게 먼저 알린다",
       effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "예약이 바뀐 때가 내가 33층 앞에 서 있던 시각이라, 33층에 다녀간 일과 앞당겨진 공지 시각을 동료들에게 먼저 알린다.",

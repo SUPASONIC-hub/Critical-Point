@@ -683,8 +683,8 @@ export const case10 = {
   memoryPlan: {
     systemNext: "c10_route_system",
     evidenceNext: "c10_evidence_turn",
-    systemLabel: "채권단 앞에서 다시 짠 판이 인사 기록에 옮겨 적혔는지 가린다",
-    evidenceLabel: "사 둔 회수율을 만든 손을 병가 서식의 개정 이력에서 찾는다",
+    systemLabel: "채권단 앞에서 짠 판이 인사 기록에 적혔는지 가린다",
+    evidenceLabel: "사 둔 회수율을 만든 손을 병가 서식 이력에서 찾는다",
     systemEcho: "가려 보면 인사 기록에는 옮겨 적힌 것이 없습니다. 기록되지 않는 것이 하나 더 있다는 것만 알게 됩니다. 선의가 닳는 속도입니다.",
     evidenceEcho: "개정 이력을 따라가면 병가 신청서의 사유란에서 보기 하나가 사라진 날짜가 나옵니다.",
   },

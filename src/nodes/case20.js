@@ -42,7 +42,7 @@ const case20Nodes = {
     choices: [
       {
         id: "c20_start_farewell",
-        label: "남은 닷새를 에코와 보내는 트리거랩 전원의 일정으로 잡는다",
+        label: "남은 닷새를 트리거랩 전원이 에코와 보내게 잡는다",
         effect: { trust: 11, humanCost: -4, time: -6, capital: -3, fatigue: 5 },
         voice: "기록보다 같이 일한 시간이 먼저라며, 남은 닷새를 에코와 보내는 트리거랩 전원의 일정으로 잡는다.",
         echo: "일정이 잡히자 닷새 동안 서버실 문이 닫히지 않습니다. 교체 준비 회의에는 트리거랩 자리가 비어 있습니다.",
@@ -99,7 +99,7 @@ const case20Nodes = {
       },
       {
         id: "c20_server_list",
-        label: "노아가 배운 기록의 목록 전체를 공식 요청으로 받아 낸다",
+        label: "노아가 배운 기록의 목록 전체를 공식 요청한다",
         effect: { legitimacy: 12, trust: -3, time: -4, humanCost: 3, fatigue: 4 },
         voice: "무엇으로 배웠는지 말로만 들을 수는 없어서, 노아가 배운 기록의 목록 전체를 공식 요청으로 받아 낸다.",
         echo: "요청서는 접수됩니다. 류세아는 협조하겠다고 하지만, 목록이 도착하기까지 사흘이 걸립니다. 교체까지 남은 날은 나흘입니다.",
@@ -107,7 +107,7 @@ const case20Nodes = {
       },
       {
         id: "c20_server_budget",
-        label: "교체에 협조하는 대신 교체 예산 일부를 트리거랩 몫으로 받는다",
+        label: "교체에 협조하고 예산 일부를 트리거랩 몫으로 받는다",
         effect: { capital: 9, time: 4, trust: -4, legitimacy: -3, humanCost: 4, fatigue: -2 },
         voice: "막을 수 없다면 남는 것이라도 있어야 한다며, 교체에 협조하는 대신 교체 예산 일부를 트리거랩 몫으로 받는다.",
         echo: "예산은 들어옵니다. 류세아는 고맙다고 하고, 교체 준비 회의록에는 '트리거랩 협조 완료'가 적힙니다.",
@@ -144,7 +144,7 @@ const case20Nodes = {
       },
       {
         id: "c20_datacenter_object",
-        label: "동의 없는 반응 기록을 학습 목록에서 빼라고 정식 이의를 낸다",
+        label: "동의 없는 반응 기록을 학습에서 빼라고 이의를 낸다",
         effect: { legitimacy: 12, trust: 3, time: -7, humanCost: 3, fatigue: 5 },
         voice: "'해당 없음'으로 넘어갈 일이 아니어서, 동의 없는 반응 기록을 학습 목록에서 빼라고 정식 이의를 낸다.",
         echo: "이의서는 정확합니다. 정확한 이의서가 처리되는 기한은 30일이고, 자정은 사흘 뒤입니다.",
@@ -181,7 +181,7 @@ const case20Nodes = {
     choices: [
       {
         id: "c20_farewell_sign",
-        label: "원칙 문서 끝에 트리거랩 사람들 이름을 적고 함께 서명한다",
+        label: "원칙 문서 끝에 트리거랩 사람들과 함께 서명한다",
         effect: { trust: 12, humanCost: -4, legitimacy: 3, time: -4, capital: -2, fatigue: 5 },
         voice: "에코 혼자 쓴 원칙이 아니어서, 원칙 문서 끝에 트리거랩 사람들 이름을 적고 함께 서명한다.",
         echo: "이름을 적자 문서는 오늘 케이크 앞에 모인 아홉 명의 것이 됩니다. 나준혁이 도장 세 개 중 가장 큰 것을 꺼냅니다.",
@@ -242,7 +242,7 @@ const case20Nodes = {
       },
       {
         id: "c20_final_transplant",
-        label: "에코의 판단 원칙을 노아에 옮겨 심고 자정 교체를 받아들인다",
+        label: "에코의 원칙을 노아에 옮겨 심고 자정 교체를 받아들인다",
         effect: { capital: 9, legitimacy: 5, time: 6, trust: 2, humanCost: 3, fatigue: -2 },
         voice: "기계는 가도 반대하는 법은 남게, 에코의 판단 원칙을 노아에 옮겨 심고 자정 교체를 받아들인다.",
         echo: "원칙이 옮겨 심어지자 노아의 설명 화면에 조항 11개가 뜹니다. 에코의 기록은 자정에 지워지고, 원칙만 남습니다.",
@@ -320,7 +320,7 @@ export const case20 = {
       memo: ["에코의 마지막 학습 과제: 농담", "강태민 농담 14개 -- 예상 웃음 확률 평균 11%", "실측 웃음: 나준혁 1명"],
       choices: [
         {
-          label: "에코가 남은 날 동안 강태민의 농담을 끝까지 배우게 한다",
+          label: "에코가 남은 날 강태민의 농담을 끝까지 배우게 한다",
           effect: { trust: 10, humanCost: -4, time: -4, capital: -2, fatigue: 4 },
           voice: "마지막으로 배우고 싶다고 한 것이 농담이어서, 에코가 남은 날 동안 강태민의 농담을 끝까지 배우게 한다.",
           echo: "배우게 하자 강태민이 밤마다 농담 목록을 늘립니다. 예상 웃음 확률은 끝까지 11퍼센트를 넘지 못합니다.",
@@ -350,14 +350,14 @@ export const case20 = {
       memo: ["분석관 D(도윤하): 평균 망설임 7.2초", "목록에 오른 트리거랩 분석관 9명 -- 지금의 6명 + 먼저 떠난 3명", "본인 열람 이력 0건"],
       choices: [
         {
-          label: "도윤하가 자기 기록을 먼저 읽고 어떻게 할지 정하게 한다",
+          label: "도윤하가 자기 기록을 먼저 읽고 정하게 한다",
           effect: { trust: 11, humanCost: -5, time: -4, capital: -2, fatigue: 4 },
           cognition: { persistence: 1 },
           voice: "한 번도 본 적 없는 자기 줄이어서, 도윤하가 자기 기록을 먼저 읽고 어떻게 할지 정하게 한다.",
           echo: "먼저 읽게 하자 도윤하는 자기 줄을 세 번 읽습니다. 그리고 이민서의 줄은 읽지 않겠다고 합니다. 그건 본인 몫이라서요.",
         },
         {
-          label: "아홉 명이 서명할 수 있는 기록 사용 동의서 양식을 만든다",
+          label: "아홉 명이 서명할 기록 사용 동의서 양식을 만든다",
           effect: { legitimacy: 9, trust: 4, time: -4, humanCost: -3, fatigue: 3 },
           voice: "이번에는 본인들이 정할 수 있게, 아홉 명이 서명할 수 있는 기록 사용 동의서 양식을 만든다.",
           echo: "양식이 생기자 동의는 절차가 됩니다. 이미 학습에 쓰인 기록에도 그 동의가 거슬러 적용될지는 아무도 답하지 않습니다.",
@@ -387,7 +387,7 @@ export const case20 = {
           echo: "채워 넣으려니 30년 치 반대 이유를 다시 읽어야 합니다. 자정까지 남은 시간은 스물두 시간입니다.",
         },
         {
-          label: "시험 결과를 설명 가능성 보고서로 만들어 도입 위원회에 낸다",
+          label: "시험 결과를 설명 가능성 보고서로 도입 위원회에 낸다",
           effect: { legitimacy: 10, trust: 3, time: -4, humanCost: 3, fatigue: 4 },
           voice: "노아가 결론만 배웠다는 걸 남기려고, 시험 결과를 설명 가능성 보고서로 만들어 도입 위원회에 낸다.",
           echo: "보고서는 정확합니다. 도입 위원회는 교체가 끝난 다음 주 화요일에 열립니다.",
@@ -505,7 +505,7 @@ export const case20 = {
       choices: [
         {
           id: "c20_branch_disk_call",
-          label: "병원에 있는 임경수에게 전화해 이 디스크가 무엇인지 묻는다",
+          label: "병원의 임경수에게 전화해 이 디스크가 뭔지 묻는다",
           effect: { trust: 11, humanCost: -4, time: -4, capital: -2, fatigue: 4 },
           voice: "라벨에 이름이 적힌 사람이 가장 잘 알 거라며, 병원에 있는 임경수에게 전화해 이 디스크가 무엇인지 묻는다.",
           echo: "전화를 걸자 임경수가 기침 사이로 웃습니다. 디스크의 주인이 목록에 없던 이름이라는 게, 목소리로 확인됩니다.",
@@ -551,7 +551,7 @@ export const case20 = {
         },
         {
           id: "c20_branch_disk_follow_report",
-          label: "노아의 학습 목록이 한쪽만 추렸다는 점을 이의서에 덧붙인다",
+          label: "노아 학습 목록이 한쪽만 추렸다는 점을 이의서에 붙인다",
           effect: { legitimacy: 12, trust: 2, time: -4, humanCost: 3, fatigue: 3 },
           voice: "노아가 겸손을 못 배운 까닭을 남기려고, 노아의 학습 목록이 한쪽만 추렸다는 점을 이의서에 덧붙인다.",
           echo: "덧붙인 한 줄로 이의서는 더 날카로워집니다. 류세아는 자기 팀이 추린 목록이라서, 그 줄을 직접 씁니다.",
@@ -617,7 +617,7 @@ export const case20 = {
     finalChoices: [
       {
         id: "a",
-        label: "노아가 거절할 때마다 사람이 다시 보는 창구를 따로 둔다",
+        label: "노아가 거절할 때마다 사람이 다시 보는 창구를 둔다",
         effect: { legitimacy: 10, trust: 8, capital: -8, time: -5, humanCost: -4, fatigue: 6 },
         voice: "41만 명이 기계의 거절로 끝나지 않게, 노아가 거절할 때마다 사람이 다시 보는 창구를 따로 둔다.",
         echo: "창구가 생기자 노아의 거절은 마지막 말이 아니게 됩니다. 그 창구에 앉을 사람을 뽑는 데 예산이 듭니다.",
@@ -685,7 +685,7 @@ export const case20 = {
   memoryPlan: {
     systemNext: "c20_route_system",
     evidenceNext: "c20_evidence_turn",
-    systemLabel: "철거 전에 새로 짠 판이 노아의 학습 목록 몇 번째 줄인지 센다",
+    systemLabel: "철거 전에 새로 짠 판이 학습 목록 몇째 줄인지 센다",
     evidenceLabel: "관찰 연구비 예산서를 데이터 이전 계약서와 나란히 편다",
     systemEcho: "세어 보려 해도 목록은 아직 KD데이터랩에 있습니다. 에코가 먼저 자기 교체 승인서의 '영향받는 사람' 칸으로 넘어갑니다.",
     evidenceEcho: "관찰 연구비 예산서 옆에 데이터 이전 계약서를 펴면 기록에는 값이 매겨져 있고, 값을 받은 계정은 트리거랩이 아닙니다.",
