@@ -12,7 +12,7 @@ import {
   readTellWall, readWindowAgainstSeer,
 } from "../../src/gauntlet/tableAfterword.js";
 import { AUDIT_RELIEF_HEAT } from "../../src/gauntlet/auditRisk.js";
-import { AUDIT_HEAT } from "../../src/gauntlet/weeklyRules.js";
+import { AUDIT_HEAT } from "../../src/gauntlet/auditRisk.js";
 import { tableReactions } from "../../src/caseCopy.js";
 import { createCaseSummary } from "../../src/gameLogic.js";
 import { buildLeaderboard } from "../../src/ranking.js";
@@ -131,8 +131,11 @@ test("none of it reaches a score: the case summary and the board read the same w
 
 test("the audit's band is drawn only where the audit counts, from its own numbers (C-9)", () => {
   const win = live("readouts:audit");
-  assert.deepEqual(readTableMeters({ win, schema: win.schema, selectedCard: card, run: normalizeRunState({ weekRule: "audit" }) }).auditBand, [AUDIT_HEAT, AUDIT_RELIEF_HEAT]);
-  assert.equal(readTableMeters({ win, schema: win.schema, selectedCard: card, run: normalizeRunState({}) }).auditBand, null);
+  // Since RULES_MARK 3 the case's rules say whether it counts (useRunReadout
+  // hands a count, or null in a case whose rules have no audit).
+  assert.deepEqual(readTableMeters({ win, schema: win.schema, selectedCard: card, run: normalizeRunState({}), audit: 0 }).auditBand, [AUDIT_HEAT, AUDIT_RELIEF_HEAT]);
+  assert.equal(readTableMeters({ win, schema: win.schema, selectedCard: card, run: normalizeRunState({}), audit: null }).auditBand, null);
+  assert.equal(readTableMeters({ win, schema: win.schema, selectedCard: card, run: normalizeRunState({ weekRule: "audit-cascade" }) }).auditBand, null, "the test week's stamp switches nothing");
 });
 
 test("LOCK at its cap: the press still pays something, so it keeps its clock (C-6)", () => {

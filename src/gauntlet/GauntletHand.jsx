@@ -1,4 +1,4 @@
-import { Lock, Zap } from "lucide-react";
+import { Link2, Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { getLogicType } from "./logicStreak.js";
@@ -107,6 +107,17 @@ export function GauntletHand({
             {letterKeys && <span className="gx-card-key" aria-hidden="true">{index + 1}</span>}
             <CardType card={card} moveOf={moveOf} />
             {pastPick(past, card.id)}
+            {/* B2: cashed, this card makes a link (cascadeRisk.js). A tag on the
+                card's top edge, opposite its type, out of the card's flow: as
+                " · 연결" in the burn chip it pushed the chip, or the ×1.5 tag
+                after it, onto a line of its own on a phone (final/f_start_owner,
+                overclocked, the last card 8px under the action bar at 390x844).
+                Words, so the button's name reads what it shows. */}
+            {!schema.faceDown && linkBurn && Math.abs(burn?.value ?? 0) >= linkBurn && (
+              <span className="gx-card-type gx-card-link" data-testid="card-link-mark">
+                <Link2 size={10} aria-hidden="true" />연결
+              </span>
+            )}
             <span className="gx-card-label" data-testid="card-label">{card.label}</span>
             {schema.faceDown ? (
               <span className="gx-card-stats">
@@ -120,8 +131,6 @@ export function GauntletHand({
                 <b className="gx-card-burn">
                   {burn ? `${labelOf(burn.key)} ${burn.value > 0 ? "+" : ""}${burn.value}` : "소모 없음"}
                   {burn?.fractured && <Zap size={11} aria-hidden="true" />}
-                  {/* B2: cashed, this card makes a link (cascadeRisk.js). Words, so the button's name reads what it shows. */}
-                  {linkBurn && Math.abs(burn?.value ?? 0) >= linkBurn ? " · 연결" : null}
                 </b>
                 {/* A board rule that touches every card is a badge in the stats
                     row, not a line of its own on every card: on an overclocked

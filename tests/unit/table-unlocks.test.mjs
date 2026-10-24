@@ -47,7 +47,8 @@ test("each step is the one the author decided", () => {
   assert.deepEqual(rules("prologue01"), []);
   assert.deepEqual(rules("prologue02"), ["aftershock", "blackout", "logic", "silence"]);
   assert.deepEqual(rules("prologue03"), ["aftershock", "blackout", "coldFeet", "heatDebt", "logic", "scout", "silence"]);
-  assert.deepEqual(rules("prologue04"), ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "overclock", "scout", "silence"]);
+  // The audit and the links open with FRACTURE (RULES_MARK 3, user 2026-10-20).
+  assert.deepEqual(rules("prologue04"), ["aftershock", "audit", "blackout", "cascade", "coldFeet", "fracture", "heatDebt", "lock", "logic", "overclock", "scout", "silence"]);
   // The stance and the draft come last: a draft in 05 is the offer made as 04 closes.
   assert.deepEqual(rules("prologue05"), [...TABLE_RULES].sort());
   assert.ok(!rulesFor("prologue04", staged).has("relics") && !rulesFor("prologue04", staged).has("stance"));
@@ -131,9 +132,9 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
   for (const step of UNLOCK_LADDER) {
     for (const line of step.intro) assert.doesNotMatch(line, /열(?!기)/, `${step.caseId}: "${line}"`);
   }
-  assert.deepEqual(UNLOCK_LADDER[3].intro.slice(1), [
+  assert.deepEqual(UNLOCK_LADDER[3].intro.slice(1, 3), [
     "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
-    "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 LOCK으로 1.5배까지(콤보로는 1.6배까지) 오릅니다. 누를 때마다 시간이 줄어듭니다.",
+    "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
   ]);
   // 프롤로그 02 teaches the logic streak where it taught the beat, and no line says a press is timed.
   assert.equal(UNLOCK_LADDER[1].intro[0], "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다. 사건 결과의 '관점 전환' 점수는 반대로 네 유형을 고르게 쓸수록 오릅니다.");
@@ -142,9 +143,8 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
   }
 });
 
-// B2's CASCADE is switched by the run (cascadeRisk.js `isCascadeOn`), not by a
-// case's rules, until the rule switch (RULES_MARK 3) gives it a step of the ladder.
+// B2's CASCADE has been a rule of the ladder since RULES_MARK 3 (프롤로그 04).
 test("every next-table mutation but REBOOT belongs to a rule", () => {
-  assert.deepEqual(Object.keys(MUTATION_RULES).sort(), Object.keys(MUTATIONS).filter((id) => id !== "reboot" && id !== "cascade").sort());
+  assert.deepEqual(Object.keys(MUTATION_RULES).sort(), Object.keys(MUTATIONS).filter((id) => id !== "reboot").sort());
   for (const [mutation, rule] of Object.entries(MUTATION_RULES)) assert.ok(ALL_RULES.has(rule), `${mutation} -> ${rule}`);
 });

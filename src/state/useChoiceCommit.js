@@ -28,6 +28,7 @@ import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
+import { getSeasonScore } from "../seasonScore.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { findFinalChoiceEntry } from "../verdictBranch.js";
 import { newGamePlusMark } from "./newGamePlusCarry.js";
@@ -176,8 +177,12 @@ export function useChoiceCommit(context) {
     }
 
     if (currentCase !== "final" || nextCompletedCases.length !== CASE_SEQUENCE.length) return;
+    // The season row is ranked on the mean of the season's case scores
+    // (`getSeasonScore`), not on the finale's own: the finale's case row above
+    // keeps its score, and its other keys still speak for the season row.
+    const seasonScore = getSeasonScore({ ...caseResults, [currentCase]: caseSummary });
     const seasonTelemetryPayload = createSeasonTelemetryPayload({
-      caseSummary: rowSummary,
+      caseSummary: { ...rowSummary, ...seasonScore },
       title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       cognition: nextCognition,
@@ -189,7 +194,7 @@ export function useChoiceCommit(context) {
       triggers: nextTriggers,
     });
     const { saved: seasonRankingSaved } = appendLocalRankingRow(createSeasonLeaderboardRow({
-      caseSummary,
+      caseSummary: { ...caseSummary, ...seasonScore },
       title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       playerName,
@@ -398,7 +403,10 @@ export function useChoiceCommit(context) {
       // its prologues out of the scene bust rates and replays them on the whole table.
       Object.assign(caseSummary, newGamePlusMark(nextRun));
       // The ranking publishes the run's final case row, so the finale carries
-      // the slowest table clock of the whole season, not only its own.
+      // the slowest table clock of the whole season, not only its own. Its
+      // score is not among these: the season row takes the mean of the cases'
+      // (`getSeasonScore`, in recordClosedCase), and this row keeps the
+      // finale's own.
       if (currentCase === "final") {
         const seasonAssist = Object.values(caseResults).reduce((slowest, result) => Math.max(slowest, Number(result?.assistTime) || 1), caseSummary.assistTime ?? 1);
         if (seasonAssist > 1) caseSummary.assistTime = seasonAssist;

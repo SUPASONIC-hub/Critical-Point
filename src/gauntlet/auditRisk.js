@@ -1,5 +1,3 @@
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice } from "./weeklyRules.js";
-
 /**
  * AUDIT (B3): the ledger that is too quiet.
  *
@@ -14,7 +12,7 @@ import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice }
  * - a cash on a board B2's CASCADE dealt adds nothing: the link already pulled
  *   that wall closer, and closing low is the right call there, so one close is
  *   not punished twice (B2 decision 10, user 2026-10-19). Its relief stays,
- *   since relief is no penalty. Only a week with both devices deals CASCADE.
+ *   since relief is no penalty.
  *
  * It reads only the heat the meter shows and the pushes, never the wall, so
  * the table can say before a cash what that cash will do to it.
@@ -29,27 +27,41 @@ import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice }
  * when a case opens, so `countAudit(log)` is the audit and the save keeps its
  * shape and its version. The engine is handed the count and judges.
  *
- * On only in a season whose week's rule switches it on (`weekRuleHasDevice`),
- * never in story mode or a practice case (decision 9). The engine's default
- * rules are "everything", so a `rules.has("audit")` would have switched it on
- * in every measurement at once; the week's stamp keeps those lines still.
+ * A rule of the table since RULES_MARK 3 (B3 and B2 together, one ranking
+ * reset): on in a case whose rules have `audit` (tableUnlocks.js: from
+ * 프롤로그 04, and from the first case under NEW GAME+), never in story mode
+ * or a practice case (decision 9). Before that it was 2026-W47's test week, a
+ * device that week's rule switched on; its numbers, below, are the ones that
+ * week played.
  *
  * The file is a chunk of its own (AUDIT_RISK in vite.config.js), with the
  * table's words for it: the engine's chunk, the table's and the runtime's
- * each import it, and it imports nothing from any of them, so none of their
- * budgets carries it.
+ * each import it.
  */
 
 /**
+ * Set B of the design's three (40 / 4 / -2 / one in four), decided by the
+ * user on 2026-10-20 after the A/B/C measurement of PR #201 (A never caught a
+ * season bot, C broke a check:pressure assertion and caught the hand that
+ * watches the wall) and played as 2026-W47's test week. Here and not in
+ * tableRules.js, which the engine's chunk holds: imported from there, the
+ * build gave tableRules.js a chunk of its own (check:bundle, 2026-10-21).
+ * scripts/sim/audit-values.mjs rewrites the four for the other sets.
+ */
+export const AUDIT_HEAT = 40;
+export const AUDIT_LIMIT = 4;
+export const AUDIT_RELIEF = 2;
+export const AUDIT_SHARE = 4;
+/**
  * HEAT DEBT's heat (`HEAT_DEBT_GAUGE`, tableRules.js), where a cash takes the
- * audit down. Written here and not imported: tableRules.js is in the engine's
- * chunk, which imports this one. A unit test holds the two equal.
+ * audit down. Written here and not imported, for the same reason. A unit
+ * test holds the two equal.
  */
 export const AUDIT_RELIEF_HEAT = 60;
 
-/** Whether this table counts the audit. */
-export function isAuditOn(run) {
-  return Boolean(run) && run.story !== true && !run.practice && weekRuleHasDevice(run.weekRule, "audit");
+/** Whether this table counts the audit: the case's `rules` (the set the engine is handed) have it. */
+export function isAuditOn(run, rules) {
+  return Boolean(run) && run.story !== true && !run.practice && Boolean(rules?.has?.("audit"));
 }
 
 /**
@@ -109,8 +121,8 @@ export function judgeAudit({ count, secured, hand }) {
  * audit; else the count after this window (`count` is the case's before it)
  * and, when the window closes a case that pays (`closed`), the judgement.
  */
-export function settleAudit({ run, count, busted, gauge, pushes, closed, secured, hand }) {
-  if (!isAuditOn(run)) return null;
+export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand }) {
+  if (!isAuditOn(run, rules)) return null;
   const after = addAudit(count, auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }));
   return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand }) : { caught: false, lost: 0, handLost: 0 }) };
 }
@@ -135,7 +147,7 @@ export function findAudit(before, after) {
  * button's description.
  */
 export function readAudit(run, count, win) {
-  if (!isAuditOn(run)) return null;
+  if (!run || count == null) return null;
   const now = Math.max(0, Math.trunc(Number(count) || 0));
   const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
   const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
@@ -144,7 +156,7 @@ export function readAudit(run, count, win) {
 
 /**
  * The cash button's description: what this cash does to the audit (on a
- * CASCADE board a cold cash leaves it as it is; the week's line says why). 초안.
+ * CASCADE board a cold cash leaves it as it is; 프롤로그 04's line says why). 초안.
  */
 const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
   ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;
@@ -154,20 +166,33 @@ const describeAudit = ({ count, limit }) =>
   `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;
 
 /**
+ * The cases whose step of the ladder does not have the audit yet (tableUnlocks.js
+ * opens it at 프롤로그 04). Written out so the table record's chunk does not
+ * take the ladder; a unit test holds it to `rulesFor`.
+ */
+export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "prologue03"]);
+
+/**
  * The table record's audit sentence (GauntletLedger.jsx), or null: one more
  * sentence after the record's, never a seventh cell, so the grid and its CSS
  * stay as they are (user, 2026-10-20, the PR's first question, choice 1).
  * Rebuilt from what the record has, as the rest of it is: the count off the
- * case's log (what the close judged) and the case summary's week. A story
- * case and a replayed one count nothing, as `isAuditOn` says; the log tells
- * which by an entry's `assistStory` or the replay's closing `firstRecord`.
+ * case's log (what the close judged), the case and the case summary
+ * (`summary`, createRunSummary). A case closed at RULES_MARK 3 or later counts
+ * from 프롤로그 04 on (the summary does not say NEW GAME+, so its first three
+ * prologues say nothing); one closed before it says nothing (2026-W47's
+ * cases were the only ones that counted, and the record is only ever the case
+ * on the table). A story case and a replayed one count nothing, as
+ * `isAuditOn` says; the log tells which by an entry's `assistStory` or the
+ * replay's closing `firstRecord`.
  * A full audit adds 적발; what it took is the result window's vault line.
  * The system's words, no 반재욱 line (user, 2026-10-20, second question, 3).
  * Here and not in the result screen's chunk, which has no room and whose
  * budget does not go up (check-bundle-size.mjs).
  */
-export function describeAuditLedger(log, weekRule) {
-  if (!log.some((entry) => entry?.threshold) || !isAuditOn({ weekRule, story: log.some((entry) => entry?.assistStory), practice: log.some((entry) => entry?.threshold?.firstRecord) })) return null;
+export function describeAuditLedger(log, summary, caseId) {
+  if (!log.some((entry) => entry?.threshold) || log.some((entry) => entry?.assistStory || entry?.threshold?.firstRecord)) return null;
+  if (!(summary?.tableRules >= 3) || CASES_BEFORE_AUDIT.includes(caseId)) return null;
   const count = countAudit(log);
   return `감사 ${count}/${AUDIT_LIMIT}칸으로 닫혔다.${count < AUDIT_LIMIT ? "" : " 적발."}`;
 }

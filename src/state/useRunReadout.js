@@ -17,9 +17,10 @@ import {
   getSuspenseState,
 } from "../gameLogic.js";
 import { getJudgementHabit } from "../judgementHabit.js";
-import { countAudit } from "../gauntlet/auditRisk.js";
+import { countAudit, isAuditOn } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTableReaction } from "../gauntlet/tableAfterword.js";
+import { getTableRules } from "../gauntlet/tableUnlocks.js";
 import { getTraceEvents } from "./trace.js";
 import { getSceneBridge } from "../viewModels/sceneBridge.js";
 import { caseCastFor } from "../gauntlet/CaseCastFold.jsx";
@@ -134,10 +135,12 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // effect to spare (check:runtime-budget).
   const warmCaseId = seedBase ? node?.caseId : null;
   useEffect(() => warmCasePortraits(warmCaseId), [warmCaseId]);
-  // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
-  const auditCount = useMemo(() => countAudit(log), [log]);
-  // B2's links off the case's log (cascadeRisk.js): null on a table without them.
-  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId), [gauntletRun, log, runId]);
+  // The case's rules (tableUnlocks.js): the audit and the links are on from 프롤로그 04 (RULES_MARK 3).
+  const caseRules = getTableRules(currentCase, gauntletRun);
+  // The case's audit (B3), off the same log the settlement counts; null in a case whose rules do not count it.
+  const auditCount = useMemo(() => (isAuditOn(gauntletRun, caseRules) ? countAudit(log) : null), [caseRules, gauntletRun, log]);
+  // B2's links off the case's log (cascadeRisk.js): null in a case whose rules do not have them.
+  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId, caseRules), [caseRules, gauntletRun, log, runId]);
   // The two as one field of the play view, which has room for one (check:runtime-budget).
   const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading }), [auditCount, linkReading]);
   // The trace is session storage, not state, and only the debug overlay prints
