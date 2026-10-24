@@ -479,10 +479,10 @@ const budgets = [
   // e72c415f: measured 191,685 / 35,787 in the e2e build, the gzip plus 4.
   // -> 191,778 / 35,830 on 2026-10-25 with B-12(2)'s 「당신의 세 장면」 coda
   // (main ea5b74aa): measured 191,778 / 35,826, the gzip plus 4.
-  // -> 193,319 / 36,017 on 2026-10-24 (B-11(1) 막 표지, on main da6292be): the
-  // act title card's rules in briefing.css. Measured 193,319 / 36,013 in the
-  // e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_319, maxGzip: 36_017 },
+  // -> 193,412 / 36,058 on 2026-10-25 (B-11(1) 막 표지, on main 024904a3): the
+  // act title card's rules in briefing.css beside B-12(2)'s coda. Measured
+  // 193,412 / 36,054 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_412, maxGzip: 36_058 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
