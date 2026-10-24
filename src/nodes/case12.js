@@ -133,7 +133,7 @@ const case12Nodes = {
     choices: [
       {
         id: "c12_market_include",
-        label: "212명을 배상 기준에 넣지 않으면 조정에 응하지 않겠다고 한다",
+        label: "212명을 배상 기준에 넣어야 조정에 응하겠다고 한다",
         effect: { trust: 12, legitimacy: 6, capital: -9, time: -7, fatigue: 5 },
         voice: "빠진 사람을 두고 받는 돈은 합의가 아니라며, 212명을 배상 기준에 넣지 않으면 조정에 응하지 않겠다고 한다.",
         echo: "버티자 조정은 길어집니다. 추석 전에 받을 수 있었던 1,528명이 당신을 봅니다.",
@@ -149,7 +149,7 @@ const case12Nodes = {
       },
       {
         id: "c12_market_split",
-        label: "서류가 있는 사람부터 먼저 받게 하고 나머지는 따로 싸운다",
+        label: "서류 있는 사람부터 받게 하고 나머지는 따로 싸운다",
         effect: { capital: 8, time: 5, trust: -6, humanCost: 5, legitimacy: -3, fatigue: 2 },
         voice: "추석이 사흘 앞이라, 서류가 있는 사람부터 먼저 받게 하고 나머지는 따로 싸운다.",
         echo: "먼저 받는 사람은 추석을 쇱니다. 서류 없는 사람들은 이번에도 다음 차례가 됩니다.",
@@ -194,7 +194,7 @@ const case12Nodes = {
       },
       {
         id: "c12_memorial_son",
-        label: "문하준에게 은행이 판단하는 법을 가르쳐 주겠다고 약속한다",
+        label: "문하준에게 은행의 판단법을 가르쳐 주기로 약속한다",
         effect: { trust: 11, humanCost: -4, capital: -5, time: -7, fatigue: 5 },
         voice: "그 다짐을 흘려듣지 않겠다며, 문하준에게 은행이 어떻게 판단하는지 직접 가르쳐 주겠다고 약속한다.",
         echo: "약속하자 문하준이 휴대폰에 당신 번호를 저장합니다. 이름 칸에 '반대 의견'이라고 적습니다.",
@@ -239,7 +239,7 @@ const case12Nodes = {
       },
       {
         id: "c12_final_both",
-        label: "서류 있는 사람은 지금 받게 하고 212명은 집단소송으로 따로 간다",
+        label: "서류 있는 이는 지금 받고 212명은 집단소송으로 간다",
         effect: { trust: 10, legitimacy: 7, capital: -6, time: -7, humanCost: -3, fatigue: 7 },
         voice: "오늘 서명해야 추석 전에 입금되니, 서류 있는 사람은 지금 받게 하고 212명은 집단소송으로 따로 간다.",
         echo: "둘로 나누자 1,528명은 추석을 쇠고 212명은 소송을 시작합니다. 두 싸움을 동시에 하는 사람은 당신입니다.",
@@ -317,7 +317,7 @@ export const case12 = {
       memo: ["접수 창구 대기 186명", "38번: 아들 명의 대출, 본인 서류 없음", "신청서 칸 24개 중 본인이 채울 수 있는 칸 9개"],
       choices: [
         {
-          label: "서류 없는 사람도 낼 수 있는 진술서 양식을 따로 만든다",
+          label: "서류 없는 사람도 낼 진술서 양식을 따로 만든다",
           effect: { trust: 12, legitimacy: 5, humanCost: -5, time: -6, capital: -3, fatigue: 5 },
           voice: "번호가 없다고 피해자가 아닌 건 아니라며, 서류 없는 사람도 낼 수 있는 진술서 양식을 따로 만든다.",
           echo: "양식이 생기자 38번 할머니는 피해자가 됩니다. 그 양식을 위원회가 받아 줄지는 아직 모릅니다.",
@@ -537,7 +537,7 @@ export const case12 = {
       choices: [
         {
           id: "c12_branch_factory_follow_a",
-          label: "협동조합 설립을 돕고 강태민을 네 번째 조합원으로 부른다",
+          label: "협동조합 설립을 돕고 강태민을 넷째 조합원으로 부른다",
           effect: { trust: 13, legitimacy: 5, capital: -8, time: -6, fatigue: 5 },
           voice: "선반을 살려 낸 손도 주인이어야 한다며, 협동조합 설립을 돕고 강태민을 네 번째 조합원으로 부른다.",
           echo: "강태민이 조합원 가입서에 이름을 씁니다. 야간조를 그만두지 않고 주말에만 오겠다고 합니다.",
@@ -546,7 +546,7 @@ export const case12 = {
         },
         {
           id: "c12_branch_factory_follow_b",
-          label: "신용이 깨진 사람도 받을 수 있는 대출 조건을 은행에 제안한다",
+          label: "신용이 깨진 사람도 받는 대출 조건을 은행에 제안한다",
           effect: { legitimacy: 12, trust: 5, time: -7, humanCost: 3, fatigue: 5 },
           voice: "셋의 사정이 셋만의 사정은 아니라며, 신용이 깨진 사람도 받을 수 있는 대출 조건을 은행에 제안한다.",
           echo: "제안은 심사에 올라갑니다. 신용이 깨진 사람에게 대출을 해 주자는 제안서를, 은행은 처음 받아 봅니다.",
@@ -593,7 +593,7 @@ export const case12 = {
         },
         {
           id: "c12_route_system_price",
-          label: "부제소 조항에 따로 값을 매겨 배상금에 더하라고 요구한다",
+          label: "부제소 조항의 값을 배상금에 더하라고 요구한다",
           effect: { capital: 6, legitimacy: 8, trust: 3, time: -7, humanCost: 3, fatigue: 6 },
           voice: "조용함을 공짜로 넘기지 않게, 부제소 조항에 따로 값을 매겨 배상금에 더하라고 요구한다.",
           echo: "값을 매기라고 하니 그룹 변호사는 그 조항이 관례라고 답합니다. 관례에 가격표를 붙여 달라는 요구는 처음 받아 본다고 합니다.",
@@ -612,7 +612,7 @@ export const case12 = {
     finalChoices: [
       {
         id: "a",
-        label: "부제소 조항에 기한을 두어 5년 뒤에는 효력이 끝나게 한다",
+        label: "부제소 조항에 기한을 두어 5년 뒤 효력이 끝나게 한다",
         effect: { legitimacy: 13, trust: 7, capital: -8, humanCost: -5, fatigue: 7 },
         voice: "나중에 드러날 피해까지 막히지 않게, 부제소 조항에 기한을 두어 5년 뒤에는 효력이 끝나게 한다.",
         echo: "기한이 생기자 서명한 사람도 5년 뒤에는 다시 물을 수 있습니다. 그룹은 그 5년 안에 무엇을 치워야 하는지 계산하기 시작합니다.",
@@ -653,7 +653,7 @@ export const case12 = {
     choices: [
       {
         id: "c12_evidence_turn_reclaim",
-        label: "자문료를 받아 내 배상금에 보태기 전에는 조정에 응하지 않는다",
+        label: "자문료를 배상금에 보태기 전엔 조정에 응하지 않는다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 },
         voice: "가져간 쪽이 한 푼도 안 내는 배상은 받을 수 없다며, 자문료를 받아 내 배상금에 보태기 전에는 조정에 응하지 않는다.",
         echo: "조건을 걸자 조정은 멈춥니다. 조정과 따로 먼저 서명한 사람들 몫만 예정대로 나가고, 나머지 사람들의 전화가 그날 저녁 가을떡방으로 몰립니다.",
@@ -680,8 +680,8 @@ export const case12 = {
   memoryPlan: {
     systemNext: "c12_route_system",
     evidenceNext: "c12_evidence_turn",
-    systemLabel: "참고인석 전에 짠 판이 배상안 보도자료에 옮겨졌는지 읽는다",
-    evidenceLabel: "폐기 기록을 들고 배상금이 어디서 나왔는지 장부를 넘긴다",
+    systemLabel: "참고인석 전에 짠 판이 배상안 보도자료에 실렸는지 본다",
+    evidenceLabel: "폐기 기록을 들고 배상금이 어디서 났는지 장부를 넘긴다",
     systemEcho: "읽어 보면 보도자료는 당신의 판에서 기한과 날짜를 뺀 나머지만 실었습니다. 에코가 그 옆에 같은 조건이 붙었던 배상안들을 띄웁니다.",
     evidenceEcho: "폐기 시각이 적힌 기록을 배상금 장부에 대면 돈이 나온 계정이 읽힙니다. 지운 사람 쪽 계정은 그 목록에 없습니다.",
   },
@@ -697,7 +697,7 @@ export const case12 = {
   },
   openingSignatures: {
     c12_start_toast: {
-      label: "여섯 명이 가리킨 그 줄을 들고 다 같이 피해자 모임에 간다",
+      label: "여섯 명이 가리킨 줄을 들고 다 같이 모임에 간다",
       effect: { trust: 11, humanCost: -5, capital: -4, time: -6, fatigue: 3 },
       cognition: { reframing: 2 },
       voice: "서명할 사람들이 먼저 봐야 할 줄이라며, 여섯 명이 가리킨 그 줄을 들고 다 같이 피해자 모임에 간다.",
@@ -711,7 +711,7 @@ export const case12 = {
       echo: "요청은 기록으로 남습니다. 그룹은 인용을 빼고, 그 자리에 '일부 참고인'이라는 말을 넣습니다.",
     },
     c12_start_summon: {
-      label: "발표문과 면담 발언이 같은 문장이라는 걸 모임에 먼저 알린다",
+      label: "발표문과 면담 발언이 같은 문장임을 모임에 먼저 알린다",
       effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "누가 쓴 배상안인지 알고 서명해야 한다며, 발표문과 면담 발언이 같은 문장이라는 걸 모임에 먼저 알린다.",

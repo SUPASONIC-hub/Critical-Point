@@ -59,7 +59,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameData.js";
 
 const MAX_LABEL = 30;
-const OVER_CEILING = 623;
+const OVER_CEILING = 469;
 const LONGEST_LABEL = 40;
 
 const MAX_TEXT = 420;
