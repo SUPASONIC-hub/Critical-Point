@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-24 (the state of `main` at `2baf2f3`, after bundle D; what changed and when is in `git log`)
+Last updated: 2026-10-24 (the state of `main` at `b57ad81`, after Vite 8; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -233,9 +233,14 @@ Still open, on purpose:
   #278 with #274 inside it (E-3: the NEW GAME+ memory panel counts endings
   and verdicts seen and hints at the ones not yet reached; B-14(1): a card
   picked last season carries 「지난 시즌의 당신」 on the briefing and in the
-  hand, display only). Production runs `2baf2f3`. Vite 8 (#225) waits as a
-  draft for a morning of its own: every budget and every baseline is set
-  again on the day it merges.
+  hand, display only), then the docs (#284). Late that evening Vite 8
+  (#225) merged on its own: Rolldown now writes the modules the table and
+  the runtime share as two chunks of their own (`gameLogic`, `RelicDraft`),
+  every budget was measured again on that `main` (18 lowered, GameRuntime,
+  runtimeSystems and sw.js raised; the play screen 101,087 / 34,821), and
+  the baselines re-recorded in the CI container came out identical. The
+  full dev e2e suite did not fit this PC's memory, so it ran as the pull
+  request's `e2e`-labelled CI shards. Production runs `b57ad81`.
   The rules-mark-3 pull request (#224: RULES_MARK 3, the season score as a
   mean over its cases with the change of view counted over the whole season,
   ranking reset v10) and personal bests (#253) go out in one deploy on
