@@ -159,8 +159,10 @@ const BUDGETS = {
   // label rather than its position, because the 프롤로그 sits in front of
   // 사건 01 and a position counter printed "사건 6" over 사건 01.
   // 111 -> 100 on 2026-09-27: ratcheted to what it measures (98).
+  // 100 -> 101 on 2026-10-25 (E-11 framework, draft), measured: the stage
+  // re-exported for the side screen, which plays its table from this chunk.
   "src/screens/PlayScreen.jsx": {
-    lines: 100,
+    lines: 101,
     longestLine: 170,
     importedNames: 4,
     hooks: {},
@@ -169,10 +171,13 @@ const BUDGETS = {
   // `.report-archive`, is `ReportArchive.jsx`. Measured 379 / 9.
   // 400 -> 340 on 2026-09-29: the verdicts, afterglows and axis copy are
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
+  // 340 / 10 -> 342 / 11 on 2026-10-25 (E-11 framework, draft), measured: the
+  // finale's one line that the side slot opened, shown once a side case is
+  // written (`SIDE_CASES`, src/sideCases.js), and its import.
   "src/screens/ResultScreen.jsx": {
-    lines: 340,
+    lines: 342,
     longestLine: 280,
-    importedNames: 10,
+    importedNames: 11,
     hooks: {},
   },
   "src/screens/ReportArchive.jsx": {

@@ -451,6 +451,23 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
 만들고, 그 결과를 `virtual:season`(공통 색인)과 `virtual:season-case/<사건 id>`(사건 하나씩) 모듈로
 나눠 줍니다. 개발 서버에서 사건 파일을 고치면 데이터를 다시 만들고 페이지를 새로 엽니다.
 
+### 6-1. 번외 사건은 시즌에 올리지 않습니다 (E-11)
+
+번외 사건은 시즌 밖의 짧은 사건(장면 8~12개, 판 한 번, 결말 셋)입니다. 위 1~7을 하나도 하지 않습니다.
+`CASE_SEQUENCE`·사건 목록·서버의 사건 목록이 그대로라 점수 상한, 목표, 칭호, 랭킹이 바뀌지 않습니다.
+
+1. **파일**: `src/nodes/sideNN.js`(예: `side01.js`)에 `export const side01 = { ... }`. 모양은 견본
+   `src/nodes/side00.js`(틀 확인용, 출시 빌드에 없음)를 따릅니다. id는 `sideNN`이고 `caseNN`은 쓰지 않습니다
+   (서버는 `^case[0-9]{2}$`만 시즌 사건으로 받습니다). 장면은 `s1_`로 시작하고, 마지막 장면 `s1_aftershock`의
+   카드 셋이 `s1_result`로 가며, 그 카드 id마다 `outcomes`에 결말 하나(`title`, `text`)를 씁니다. 시작 자원은
+   `startState.resources`에 직접 씁니다(시즌 자원을 읽지 않습니다).
+2. **목록**: `src/nodes/sidePacks.js`의 `SIDE_CASES`에 `{ id, label: "번외 1", title, load }` 한 줄. 목록이 비어
+   있으면 시작 화면의 칸이 보이지 않습니다.
+3. **검사**: `check:graph`가 `src/nodes/side*.js`를 모두 걸어 봅니다(`checkSidePack`, `src/state/sidePackCheck.js`).
+   `check:canon`·`check:plain-language`·`check:card-labels`·`check:text`는 `src/nodes`의 모든 파일을 이미 읽습니다.
+4. **기록**: 이 기기의 `critical-point-side-cases-v1`에 끝낸 표시와 진행 중인 판만 남습니다. 서버 행, 랭킹,
+   시즌 저장, NEW GAME+, 클라우드 저장에는 아무것도 가지 않습니다(`tests/unit/side-cases.test.mjs`).
+
 ---
 
 ## 7. 검사가 지키는 규칙
