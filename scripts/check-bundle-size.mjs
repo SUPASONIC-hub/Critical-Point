@@ -643,7 +643,10 @@ const budgets = [
   // 113,650 / 36,570); the raw bytes stay under what they were.
   // 109,685 / 35,690 -> 107,213 / 35,690 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 107,213 / 35,686 in the e2e build, the gzip plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_213, maxGzip: 35_690 },
+  // 107,213 / 35,690 -> 107,220 / 35,694 on 2026-10-24, B-9 감정 배합 on main
+  // b0eb9cb0: the 사건 43 막간 now reads the names on the cup-noodle lid
+  // (+7 raw); measured 107,220 / 35,690 in the e2e build, the gzip plus 4.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_220, maxGzip: 35_694 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
