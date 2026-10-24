@@ -633,3 +633,112 @@ test("the online copy can be taken back, and a server that fails to is an error"
   browser.respond("/rest/v1/rpc/delete_cloud_save", () => missingFunction("delete_cloud_save(p_code)"));
   await assert.rejects(cloud.deleteCloudSave(), (error) => /온라인 저장에 실패했습니다/.test(cloud.describeCloudFailure(error)));
 });
+
+/* E-12: the season record, the past picks and the read scenes ride with the run. */
+
+const SEASON_RECORD = {
+  seasons: 1,
+  countedRuns: ["run-a"],
+  last: { runId: "run-a", endingId: "human-record", endingLabel: "인간 기록", verdict: "ending_seal", tableRules: 2, line: "line" },
+  previous: null,
+  endingsSeen: ["human-record"],
+  verdictsSeen: ["ending_seal"],
+  endingBook: null,
+};
+
+test("an upload carries the device records inside the save, and only the ones the device has", async () => {
+  resetDevice();
+  const server = newServer();
+  browser.storage.setItem(config.SEASON_RECORD_KEY, JSON.stringify(SEASON_RECORD));
+  browser.storage.setItem(config.PAST_PICKS_KEY, "{not json");
+  browser.storage.setItem(config.SEEN_SCENES_KEY, JSON.stringify({ v: 1, runId: "x", scenes: { a: "x".repeat(16_001) }, before: {} }));
+  const cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.deepEqual(Object.keys(puts()[0].body.p_payload).sort(), ["save", "settledWindows"], "no key the server refuses");
+  assert.deepEqual(server.stored.payload.save.deviceRecords, { seasonRecord: SEASON_RECORD }, "an unreadable or oversized key stays behind");
+  assert.equal(JSON.parse(browser.storage.getItem(config.STORAGE_KEY)).deviceRecords, undefined, "the local save is not changed");
+});
+
+test("a device with no records uploads the save as before", async () => {
+  resetDevice({ save: makeSave({ deviceRecords: { seasonRecord: SEASON_RECORD } }) });
+  const server = newServer();
+  const cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.equal("deviceRecords" in server.stored.payload.save, false, "a stale copy an older client kept in the save is not sent");
+});
+
+test("a full season's records stay far under the server's 400,000-byte cap", async () => {
+  const { nodeOrders } = await import("../../src/gameData.js");
+  const { encodeSeen } = await import("../../src/state/seenScenes.js");
+  const { encodePicks } = await import("../../src/state/pastPicks.js");
+  const every = new Set(Object.values(nodeOrders).flat());
+  const picks = new Map([...every].map((id) => [id, null]));
+  const { nodes } = await import("../../src/gameData.js");
+  for (const id of every) picks.set(id, nodes[id]?.choices?.[0]?.id);
+  const records = {
+    seasonRecord: { ...SEASON_RECORD, countedRuns: Array.from({ length: 8 }, (_, at) => `run-${at}-${"x".repeat(24)}`), endingBook: { head: "가".repeat(400), hints: Array.from({ length: 16 }, () => "나".repeat(200)) } },
+    pastPicks: { v: 1, runId: "run-a", picks: encodePicks(picks), before: encodePicks(picks) },
+    seenScenes: { v: 1, runId: "run-a", scenes: encodeSeen(every), before: encodeSeen(every) },
+  };
+  const bytes = Buffer.byteLength(JSON.stringify(records));
+  assert.ok(bytes < 20_000, `the records came to ${bytes} bytes`);
+  for (const value of Object.values(records)) assert.ok(JSON.stringify(value).length < 16_000);
+});
+
+test("a fetched copy hands its records apart from the run, and loading merges them into the device", async () => {
+  resetDevice({ save: makeSave({ runId: "run-local" }) });
+  browser.storage.setItem(config.SEASON_RECORD_KEY, JSON.stringify({ ...SEASON_RECORD, countedRuns: ["run-b"], last: { ...SEASON_RECORD.last, runId: "run-b", endingId: "quiet-cover" }, endingsSeen: ["quiet-cover"], verdictsSeen: [] }));
+  const remote = makeSave({ runId: "run-remote", deviceRecords: { seasonRecord: SEASON_RECORD } });
+  newServer({ stored: { saved_at: remote.savedAt, payload: { save: remote, settledWindows: [] }, revision: 3 } });
+  const cloud = await loadCloudSave();
+  const found = await cloud.fetchCloudSave(CODE);
+  assert.equal("deviceRecords" in found.save, false, "the run is the run");
+  assert.deepEqual(found.deviceRecords, { seasonRecord: SEASON_RECORD });
+  assert.equal(await cloud.applyCloudSave(found), true);
+  const local = JSON.parse(browser.storage.getItem(config.STORAGE_KEY));
+  assert.equal(local.deviceRecords, undefined, "the records are never written into the save");
+  const merged = JSON.parse(browser.storage.getItem(config.SEASON_RECORD_KEY));
+  assert.equal(merged.seasons, 2);
+  assert.deepEqual([...merged.endingsSeen].sort(), ["human-record", "quiet-cover"]);
+  assert.equal(browser.storage.getItem(config.NEW_GAME_PLUS_KEY), "true");
+  assert.equal(readSync().pending, remote.savedAt, "what this device added goes up with the run");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "pending");
+});
+
+test("a copy whose records match the device's is in step after loading", async () => {
+  resetDevice();
+  browser.storage.setItem(config.SEASON_RECORD_KEY, JSON.stringify(SEASON_RECORD));
+  const remote = makeSave({ runId: "run-remote" });
+  const cloud = await loadCloudSave();
+  const { withEndingBook } = await import("../../src/state/newGamePlusCarry.js");
+  const same = withEndingBook(SEASON_RECORD);
+  browser.storage.setItem(config.SEASON_RECORD_KEY, JSON.stringify(same));
+  assert.equal(await cloud.applyCloudSave({ code: CODE, save: remote, settledWindows: [], deviceRecords: { seasonRecord: same }, revision: 1 }), true);
+  assert.deepEqual({ pending: readSync().pending, synced: readSync().synced }, { pending: "", synced: remote.savedAt });
+});
+
+test("a copy from before E-12 loads as it did and leaves the device's records alone", async () => {
+  resetDevice();
+  browser.storage.setItem(config.SEASON_RECORD_KEY, JSON.stringify(SEASON_RECORD));
+  const remote = makeSave({ runId: "run-old" });
+  newServer({ stored: { saved_at: remote.savedAt, payload: { save: remote, settledWindows: [] }, revision: 1 } });
+  const cloud = await loadCloudSave();
+  const found = await cloud.fetchCloudSave(CODE);
+  assert.equal(found.deviceRecords, null);
+  assert.equal(await cloud.applyCloudSave(found), true);
+  assert.deepEqual(JSON.parse(browser.storage.getItem(config.SEASON_RECORD_KEY)), SEASON_RECORD);
+  assert.equal(readSync().pending, "", "nothing carried, nothing to send");
+});
+
+test("an older client reads a copy with records as a save, and a copy it sends back still restores them", async () => {
+  // What an older client's fetch does: parse the whole `save`, unknown keys and all.
+  const remote = makeSave({ runId: "run-new", deviceRecords: { seasonRecord: SEASON_RECORD } });
+  const parsed = config.parseCurrentSavedState(JSON.stringify(remote), config.SAVE_SCHEMA_VERSION);
+  assert.ok(parsed && config.isSavedStateShapeValid(parsed), "the extra key does not make the copy unreadable");
+  // It keeps the key in its save and sends it back; this client still takes it out of the run.
+  resetDevice();
+  const cloud = await loadCloudSave();
+  assert.equal(await cloud.applyCloudSave({ code: CODE, save: parsed, settledWindows: [], revision: 2 }), true);
+  assert.equal(JSON.parse(browser.storage.getItem(config.STORAGE_KEY)).deviceRecords, undefined);
+  assert.equal(JSON.parse(browser.storage.getItem(config.SEASON_RECORD_KEY)).seasons, 1);
+});

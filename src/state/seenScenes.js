@@ -18,10 +18,11 @@
  * The scene's fold and its NEW ride on the page the case opens on
  * (secondSeason.getSeasonPage, `read`) and are drawn by SceneBriefing.
  */
-import { readStoredValue, writeStoredValue } from "../appConfig.js";
+import { SEEN_SCENES_KEY, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { nodeOrders } from "../gameData.js";
 
-export const SEEN_SCENES_KEY = "critical-point-seen-scenes-v1";
+// Spelled in appConfig.js, where the online save (cloudSave.js) reads it without the scene graph.
+export { SEEN_SCENES_KEY };
 
 const BITS = 5;
 

@@ -5,9 +5,12 @@ import {
   isSavedStateShapeValid,
   NEW_GAME_PLUS_KEY,
   parseCurrentSavedState,
+  PAST_PICKS_KEY,
   readSettledWindowSeeds,
   readStoredValue,
   SAVE_SCHEMA_VERSION,
+  SEASON_RECORD_KEY,
+  SEEN_SCENES_KEY,
   SAVE_WRITTEN_EVENT,
   setReplaySession,
   SETTLED_WINDOWS_LIMIT,
@@ -169,8 +172,8 @@ export function setCloudSaveEnabled(enabled) {
  * under the separate research consent) stay local. A restore fills them back
  * from the device it lands on (`applyCloudSave`).
  */
-export function createCloudSavePayload(save) {
-  const { pendingTelemetry: _queue, playerName: _name, ...run } = save;
+export function createCloudSavePayload(save, deviceRecords = null) {
+  const { pendingTelemetry: _queue, playerName: _name, deviceRecords: _carried, ...run } = save;
   const feedback = save.playtestFeedback && typeof save.playtestFeedback === "object" && !Array.isArray(save.playtestFeedback)
     ? save.playtestFeedback
     : {};
@@ -179,7 +182,35 @@ export function createCloudSavePayload(save) {
     playtestFeedback: Object.fromEntries(
       Object.entries(feedback).map(([caseId, entry]) => [caseId, { ...entry, comment: "" }]),
     ),
+    ...(deviceRecords && Object.keys(deviceRecords).length > 0 ? { deviceRecords } : {}),
   };
+}
+
+/**
+ * E-12: the device keys a finished season leaves, which follow the run to
+ * another device (state/cloudDeviceRecords.js merges them there). The server
+ * takes `save` and `settledWindows` and no other key, so they ride inside
+ * `save`; a client from before E-12 keeps them in its save as a key it never
+ * reads, and sends them back up unchanged. Each is a few kilobytes at most
+ * (the read scenes are about 1,300 characters a set); one that is not a
+ * record, or is far past that, stays behind rather than risk the payload cap.
+ */
+const DEVICE_RECORD_KEYS = { seasonRecord: SEASON_RECORD_KEY, pastPicks: PAST_PICKS_KEY, seenScenes: SEEN_SCENES_KEY };
+const DEVICE_RECORD_MAX_LENGTH = 16_000;
+
+export function readDeviceRecords() {
+  const records = {};
+  for (const [name, key] of Object.entries(DEVICE_RECORD_KEYS)) {
+    const text = readStoredValue(key, null);
+    if (typeof text !== "string" || text.length > DEVICE_RECORD_MAX_LENGTH) continue;
+    try {
+      const value = JSON.parse(text);
+      if (value && typeof value === "object" && !Array.isArray(value)) records[name] = value;
+    } catch {
+      // An unreadable key is this device's to repair, not the server's to keep.
+    }
+  }
+  return records;
 }
 
 function toRevision(value) {
@@ -282,7 +313,7 @@ async function putRemote(save, expectedRevision) {
   return (await callSupabaseRpc("put_cloud_save", {
     p_code: getCloudCode(),
     p_saved_at: save.savedAt,
-    p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
+    p_payload: { save: createCloudSavePayload(save, readDeviceRecords()), settledWindows: readSettledWindowSeeds() },
     p_expected_revision: expectedRevision,
   })).data;
 }
@@ -497,16 +528,24 @@ export async function fetchCloudSave(codeInput) {
   if (isOffline()) throw cloudError("오프라인이라 불러올 수 없습니다. 연결된 뒤 다시 시도하세요.");
   const { data } = await callSupabaseRpc("get_cloud_save", { p_code: code });
   // Uploads leave out the name and the queue, so a copy is whole without them.
-  const remote = data?.payload?.save;
-  const filled = remote && typeof remote === "object" && !Array.isArray(remote)
-    ? { pendingTelemetry: [], playtestFeedback: {}, ...remote }
-    : null;
+  const stored = data?.payload?.save;
+  const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  // The device records ride beside the run (E-12) and are not part of it.
+  const { deviceRecords = null, ...remote } = isRecord(stored) ? stored : {};
+  const filled = isRecord(stored) ? { pendingTelemetry: [], playtestFeedback: {}, ...remote } : null;
   const save = parseCurrentSavedState(JSON.stringify(filled), SAVE_SCHEMA_VERSION);
   if (!save || !isSavedStateShapeValid(save)) return null;
   const settledWindows = Array.isArray(data.payload.settledWindows)
     ? data.payload.settledWindows.filter((seed) => typeof seed === "string")
     : [];
-  return { code, save, settledWindows, savedAt: String(data.saved_at ?? save.savedAt ?? ""), revision: toRevision(data.revision) };
+  return {
+    code,
+    save,
+    settledWindows,
+    deviceRecords: isRecord(deviceRecords) ? deviceRecords : null,
+    savedAt: String(data.saved_at ?? save.savedAt ?? ""),
+    revision: toRevision(data.revision),
+  };
 }
 
 /**
@@ -518,14 +557,17 @@ export async function fetchCloudSave(codeInput) {
  * (priority 36): it rolls the story back, not the table. Without that, turning
  * uploads off, busting, and loading one's own code was a way back from the wall.
  */
-export async function applyCloudSave({ code, save, settledWindows = [], revision = null }) {
+export async function applyCloudSave({ code, save, settledWindows = [], deviceRecords = null, revision = null }) {
   const settled = [...new Set([...readSettledWindowSeeds(), ...settledWindows])].slice(-SETTLED_WINDOWS_LIMIT);
   writeStoredValue(SETTLED_WINDOWS_STORAGE_KEY, JSON.stringify(settled));
   // The name, the research consent and its queue never travel; this device
   // keeps its own. Loading a copy is the player's own act, so it ends a replay.
   const local = readLocalSave();
   const { carryTableRecordIntoRestore } = await import("./gauntlet/gauntletEngine.js");
-  const restored = carryTableRecordIntoRestore(save, local);
+  // A copy written by a client from before E-12's split, or kept by one, may
+  // hold the records inside the run; they are taken out either way.
+  const { deviceRecords: inside = null, ...run } = save;
+  const restored = carryTableRecordIntoRestore(run, local);
   setReplaySession(false);
   clearReplayFromLocation();
   const written = writeSaveState(
@@ -546,9 +588,20 @@ export async function applyCloudSave({ code, save, settledWindows = [], revision
   // the save for it; the intro shown before the runtime loads reads only the
   // key, so a finished season carried here had no NEW GAME+ button there.
   if (restored.caseResults?.final) writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+  // The season record, the past picks and the read scenes (E-12), merged into
+  // this device's own; a copy without them leaves the device's as they are.
+  const records = deviceRecords ?? inside;
+  let merged = false;
+  if (records && typeof records === "object" && !Array.isArray(records)) {
+    const { applyDeviceRecords } = await import("./state/cloudDeviceRecords.js");
+    applyDeviceRecords(records);
+    // This device had something the copy did not: the merge goes up with the run.
+    const now = readDeviceRecords();
+    merged = Object.keys(now).some((name) => JSON.stringify(now[name]) !== JSON.stringify(records[name]));
+  }
   // What was carried across is this device's and not the server's yet, so the
   // copy is only "in step" when nothing had to be carried.
-  const carried = restored !== save;
+  const carried = restored !== run || merged;
   writeSync({ pending: carried ? restored.savedAt ?? "" : "", synced: carried ? "" : save.savedAt, revision: toRevision(revision), conflict: null });
   remoteChecked = toRevision(revision) !== null;
   publish({ phase: carried ? "pending" : "synced", syncedAt: carried ? "" : save.savedAt, remoteSavedAt: "", message: "" });

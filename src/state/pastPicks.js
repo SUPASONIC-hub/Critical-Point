@@ -24,16 +24,17 @@
  * run that wrote it keeps what stood before (`before`), so a case replayed
  * after its own finale still reads the season before and not itself.
  *
- * A device key outside the run's save: a reset keeps it, the online save does
- * not carry it, and a device that finished a season before this key existed
- * has nothing to show. Nothing here reaches the log, the cognition, the seed
+ * A device key outside the run's save: a reset keeps it, and a device that
+ * finished a season before this key existed has nothing to show. The online
+ * save carries it beside the run, never in it (E-12, cloudDeviceRecords.js). Nothing here reaches the log, the cognition, the seed
  * or a ranking row; it is a mark on the board and no more.
  */
-import { readStoredValue, writeStoredValue } from "../appConfig.js";
+import { PAST_PICKS_KEY, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { nodeOrders, nodes } from "../gameData.js";
 import { orderFingerprint } from "./seenScenes.js";
 
-export const PAST_PICKS_KEY = "critical-point-past-picks-v1";
+// Spelled in appConfig.js, where the online save (cloudSave.js) reads it without the scene graph.
+export { PAST_PICKS_KEY };
 
 const choicesOf = (scenes, id) => (Array.isArray(scenes[id]?.choices) ? scenes[id].choices : []);
 

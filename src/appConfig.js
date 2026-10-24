@@ -9,6 +9,11 @@ export const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
 export const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
 // The NEW GAME+ season record (state/seasonRecord.js): outside the save, kept by a reset.
 export const SEASON_RECORD_KEY = "critical-point-season-record-v1";
+// The scenes the seasons before read (state/seenScenes.js, E-1) and the cards
+// the season before picked (state/pastPicks.js, B-14). Spelled here so the
+// online save (cloudSave.js) can carry them without the scene graph.
+export const SEEN_SCENES_KEY = "critical-point-seen-scenes-v1";
+export const PAST_PICKS_KEY = "critical-point-past-picks-v1";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 // The random id telemetry rows carry for this device (telemetry.getSessionId).
