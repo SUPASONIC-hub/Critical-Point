@@ -721,7 +721,7 @@ export function GauntletStage({
           hiddenEffectCount={hiddenEffectCount}
           fractureAxis={fractureAxis}
           linkBurn={schema.mutations.includes("blackout") ? null : links?.burn}
-          moveOf={logic?.moveOf}
+          moveOf={logic?.moveOf} past={scene.echo?.picked}
           onSelect={select}
         />
       </div>

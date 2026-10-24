@@ -223,3 +223,26 @@ test("B-14(1): the pick reaches the page through the run's readout, and the cloc
   }
   assert.doesNotMatch(readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8"), /getReadingSeconds\([^)]*picked/);
 });
+
+// 설계 ②·④, Q4·Q6·Q7 (1): the tag on the briefing's cards and the hand's, in the wild card's name's place.
+test("B-14(1): the briefing and the hand mark the card the season before picked, and the wild card in words", async () => {
+  const { readFileSync } = await import("node:fs");
+  const panel = readFileSync("src/gauntlet/WeekRulePanel.jsx", "utf8");
+  const body = panel.slice(panel.indexOf("export function pastPick(")).split(/\r?\n}\r?\n/)[0];
+  // The tag: the wild name's classes (play.css, no CSS of its own), 「지난 시즌」 shown on a phone, the whole name read out.
+  assert.match(body, /<span className="gx-card-type gx-card-name" data-testid="past-pick">/);
+  assert.match(body, /지난 시즌<i>의 당신<\/i><i style=\{\{ fontSize: 0 \}\}>이 고른 카드<\/i>/);
+  assert.match(body, /data-testid="past-pick-wild"> 지난 시즌의 당신이 고른 카드</);
+  assert.match(body, /hit \? "지난 시즌에도 다시 짰다" : "이 판을 다시 연다"/);
+  // No live region: a still line, read with the card.
+  assert.doesNotMatch(body, /aria-live|role=/);
+  const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
+  assert.match(briefing, /<CardType card=\{card\} moveOf=\{moveOf\} \/>\s*\{pastPick\(echo\?\.picked, card\.id\)\}/);
+  assert.match(briefing, /<WildName \/>\s*\{pastPick\(echo\?\.picked, reframeChoice\.id, 1\)\}/);
+  const hand = readFileSync("src/gauntlet/GauntletHand.jsx", "utf8");
+  assert.match(hand, /<CardType card=\{card\} moveOf=\{moveOf\} \/>\s*\{pastPick\(past, card\.id\)\}/);
+  assert.match(hand, /<b className="gx-card-burn">\{pastPick\(past, reframeChoice\.id, 2\)\}<\/b>/);
+  assert.match(readFileSync("src/gauntlet/GauntletStage.jsx", "utf8"), /past=\{scene\.echo\?\.picked\}/);
+  // The chips and the burn are worked out before the mark and never from it.
+  assert.doesNotMatch(hand, /getCard(Chips|Burn)\([^)]*past/);
+});
