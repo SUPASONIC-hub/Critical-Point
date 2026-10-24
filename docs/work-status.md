@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-24 (the state of `main` at `b57ad81`, after Vite 8; what changed and when is in `git log`)
+Last updated: 2026-10-25 (the state of `main` at `c1f8ec2`, after the act title cards (#295) and bundles A-13 and A-3; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -261,6 +261,32 @@ Still open, on purpose:
   ranking reset v10) and personal bests (#253) go out in one deploy on
   2026-11-30, the start of W49, after the W47 ruling on 11-23 (not in the
   middle of W48's HEAVY FRACTURE week).
+- 2026-10-24, late evening: the docs (#285); #286 (the `Test Week` summary's
+  ruleless-season line now reads 「규칙을 끔·첫 시즌 기본 꺼짐·옛 화면」, since
+  a device's first season starts without the week's rule unless its box is
+  ticked (E-8), and a NEW GAME+ season count is added); #287 (B-10: the
+  evidence reversals of 사건 30 and 31 made two other kinds); #288 (E-12:
+  the online save carries the season record, past picks and seen scenes in
+  `save.deviceRecords`, no migration; the chunk `gameData.app` is now
+  `pastPicks`). Twelve pull requests merged that day; production ran
+  `b0eb9cb` at midnight, and #288 went out with `1afa305`.
+- 2026-10-25, after midnight: #290 (B-9 emotion mix: 사건 05, 10, 21 and 32
+  each held to one emotion, seven gags turned into scenes of change, and
+  the 「흑자」 count fixed to 20 -> 25 -> 46), #293 (B-12(2): the ending's
+  last step lists 「당신의 세 장면」, the cards picked at 프롤로그 01, 사건 48
+  and the finale), #289 (B-2 second pass on the finale: the last six
+  「설계자」 gone, the far callback now lands in `f_confront`), bundle A-13
+  (#303 with #291, #292, #294, #296: forty scene bodies 3,693 characters
+  shorter; bodies over 420 characters 114 -> 74, the longest 685 -> 476,
+  `c47_steam`) and bundle A-3 (#304 with #297-#300 and #302: all 4,319
+  card labels at 30 characters or under). With no label over 30 the label
+  ratchet in `check-card-labels.mjs` is gone: any label over 30 now fails.
+  At 02:53 #295 (B-11(1)): an act title card before 사건 01, 08, 13,
+  19, 25, 31, 37 and 43 -- act number, name, one line and the cases left --
+  that moves on by itself after 7 seconds, in an `ActCard` chunk of its own
+  (device key `critical-point-act-cards-v1`). Production runs
+  `c1f8ec2`. Drafts left: #224 with #253 (2026-11-30) and #301 (E-11's
+  side-case frame, December).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
