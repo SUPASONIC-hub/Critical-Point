@@ -181,7 +181,7 @@ const case39Nodes = {
     choices: [
       {
         id: "c39_caption_names",
-        label: "빈 승인자 칸 아래로 피해자 모임의 이름을 한 줄씩 올린다",
+        label: "빈 승인자 칸 아래 피해자 모임 이름을 한 줄씩 올린다",
         effect: { trust: 12, humanCost: -4, legitimacy: 2, time: -5, capital: -3, fatigue: 5 },
         voice: "아무도 서명하지 않은 자리에 치른 사람들을 세우려고, 빈 승인자 칸 아래로 피해자 모임의 이름을 한 줄씩 올린다.",
         echo: "이름이 올라가자 빈칸이 더 크게 보입니다. 1,021명의 이름이 지나가는 데 4분이 걸리고, 그 4분은 어디선가 빠져야 합니다.",
@@ -234,7 +234,7 @@ const case39Nodes = {
       },
       {
         id: "c39_final_split",
-        label: "70분은 방송으로 내고 잘린 20분은 근거 자료와 함께 공개한다",
+        label: "잘린 20분은 근거 자료와 함께 따로 공개한다",
         effect: { legitimacy: 12, trust: 6, capital: -5, time: -7, humanCost: -2, fatigue: 7 },
         voice: "시간대도 20분도 버리지 않으려고, 70분은 방송으로 내고 잘린 20분은 근거 자료와 함께 공개한다.",
         echo: "둘로 나누자 방송은 오늘 밤 나가고, 잘린 20분은 같은 시각 인터넷에서 더 많이 재생됩니다. 공병만은 다음 날 징계 회의에 불려 갑니다.",
@@ -289,7 +289,7 @@ export const case39 = {
         },
         {
           id: "c39_after_record",
-          label: "참고 의견이 짚은 20분을 원본 그대로 묶어 보존 기록으로 남긴다",
+          label: "참고 의견이 짚은 20분을 원본 그대로 보존 기록한다",
           effect: { legitimacy: 14, trust: 2, time: -5, capital: -3, fatigue: 5 },
           voice: "아무도 안 트는 테이프가 되지 않게, 참고 의견이 짚은 20분을 원본 그대로 묶어 보존 기록으로 남긴다.",
           echo: "보존 기록에는 그 20분의 원본과 '참고 의견'과 편집 이력이 한 폴더에 들어갑니다. 공병만이 11년 전 자기가 잘라 낸 '12분' 테이프를 그 폴더 옆에 둡니다.",
@@ -298,7 +298,7 @@ export const case39 = {
         },
         {
           id: "c39_after_rush",
-          label: "방송이 끝나기도 전에 편집실을 나와 제보자를 만나러 간다",
+          label: "방송이 끝나기 전에 편집실을 나와 제보자를 만나러 간다",
           effect: { capital: 8, legitimacy: 3, trust: -5, humanCost: 4, fatigue: 6 },
           voice: "자정 약속은 한 번뿐일 수 있어서, 방송이 끝나기도 전에 편집실을 나와 제보자를 만나러 간다.",
           echo: "나서자 편집실의 떡은 식습니다. 자정의 합정역 7번 출구에 나타난 사람은 이름을 말하지 않고, 다음 약속 날짜만 남깁니다.",
@@ -378,7 +378,7 @@ export const case39 = {
       memo: ["가처분 신청: 4부 한정, 심문 09:00", "4부의 근거: 증언 3개(익명 2) + 문서 2장", "납품 마감: 10:00"],
       choices: [
         {
-          label: "익명의 두 증언자는 부르지 않고 우리가 대신 법정에 선다",
+          label: "익명의 두 증언자 대신 우리가 법정에 선다",
           effect: { trust: 9, humanCost: -3, legitimacy: 2, time: -5, capital: -2, fatigue: 5 },
           voice: "이기자고 두 사람을 끝낼 수는 없다며, 익명의 두 증언자는 부르지 않고 우리가 대신 법정에 선다.",
           echo: "대신 법정에 서자 익명의 두 사람은 지켜집니다. 판사는 이름 없는 증언에 무게를 덜 둡니다.",
@@ -409,7 +409,7 @@ export const case39 = {
       memo: ["라벨에 '12분'만 적힌 테이프", "11년 동안 한 번도 틀지 않음"],
       choices: [
         {
-          label: "오늘 결정에는 공병만의 이름도 함께 걸어 달라고 부탁한다",
+          label: "오늘 결정에 공병만의 이름도 함께 걸어 달라고 한다",
           effect: { trust: 9, humanCost: -3, legitimacy: 2, time: -3, fatigue: 3 },
           voice: "11년 전을 아는 사람이 같이 서야 한다며, 오늘 결정에는 공병만의 이름도 함께 걸어 달라고 부탁한다.",
           echo: "공병만이 테이프를 다시 받아 가지 않습니다. '그럼 이건 네가 들고 있어. 둘이 같이 걸었다는 표시로.'",
@@ -467,7 +467,7 @@ export const case39 = {
       memo: ["이미 채워진 책임자 칸", "잘린 이유는 적힌 적 없음"],
       choices: [
         {
-          label: "공병만 혼자가 아니라 제작진 모두가 함께 서명하자고 한다",
+          label: "공병만 혼자 말고 제작진 모두가 함께 서명하자고 한다",
           effect: { trust: 10, humanCost: -2, legitimacy: 3, time: -3, fatigue: 3 },
           voice: "값을 한 사람이 치르게 두지 않으려고, 공병만 혼자가 아니라 제작진 모두가 함께 서명하자고 한다.",
           echo: "책임자 칸이 좁아 이름 일곱 개가 두 줄이 됩니다. 엄동균은 자기 이름 옆에 '진짜최종'이라고 쓰려다 참습니다.",
@@ -520,7 +520,7 @@ export const case39 = {
         },
         {
           id: "c39_branch_sales_c",
-          label: "추석 광고 6칸을 받는 조건으로 20분을 내주는 거래를 받는다",
+          label: "추석 광고 6칸을 받는 조건으로 20분을 내준다",
           effect: { capital: 10, time: 3, trust: -3, legitimacy: -2, humanCost: 3, fatigue: -3 },
           voice: "이미 들어낸 판이 하나 있다며, 추석 광고 6칸을 받는 조건으로 20분을 내주는 거래를 받는다.",
           echo: "거래를 받겠다고 하자 은시온이 가계약 메일을 씁니다. 도장은 납품 뒤에 찍습니다. 추석 특집 광고 6칸에는 KD의 새 캠페인 문구가 들어갈 예정입니다. '기억하는 금융'.",
@@ -539,7 +539,7 @@ export const case39 = {
       choices: [
         {
           id: "c39_branch_sales_follow_a",
-          label: "은시온에게 합격 문자를 5부의 증언으로 보태 달라고 부탁한다",
+          label: "은시온에게 합격 문자를 5부 증언으로 보태 달라고 한다",
           effect: { trust: 8, legitimacy: 5, humanCost: 3, time: -4, fatigue: 4 },
           voice: "그 점수로 들어온 사람의 말이라서, 은시온에게 합격 문자를 5부의 증언으로 보태 달라고 부탁한다.",
           echo: "은시온이 합격 문자를 캡처해 보냅니다. 증언이 되는 순간, 그 88점은 자랑이 아니라 증거가 됩니다. 인사팀이 이 방송을 볼 겁니다.",
@@ -548,7 +548,7 @@ export const case39 = {
         },
         {
           id: "c39_branch_sales_follow_b",
-          label: "광고 통보와 채용 점수는 따로 다뤄야 한다며 선을 긋는다",
+          label: "광고 통보와 채용 점수는 따로라며 선을 긋는다",
           effect: { legitimacy: 9, trust: 2, time: -3, humanCost: 2, fatigue: 2 },
           voice: "광고 통보와 채용 점수가 섞이면 둘 다 흐려진다며, 따로 다뤄야 한다고 선을 긋는다.",
           echo: "선을 긋자 오늘 밤 편집은 한 갈래로 정리됩니다. 은시온의 88점은 다음 사건까지 그의 휴대폰에만 남습니다.",
@@ -630,7 +630,7 @@ export const case39 = {
       },
       {
         id: "c",
-        label: "광고 철회 통보를 받은 제작진이 함께 쓸 공개 기준을 만든다",
+        label: "광고 철회를 통보받은 제작진과 함께 공개 기준을 만든다",
         effect: { legitimacy: 8, trust: 9, capital: -5, time: -7, humanCost: 2, fatigue: 7 },
         voice: "24번째 제작진이 혼자 고르지 않게, 광고 철회 통보를 받은 제작진이 함께 쓸 공개 기준을 만든다.",
         echo: "기준을 만들자 다음 편집실은 이 밤을 처음부터 다시 겪지 않아도 됩니다. 기준에 서명할 방송국은 아직 한 곳뿐입니다.",
@@ -671,7 +671,7 @@ export const case39 = {
       },
       {
         id: "c39_evidence_turn_share",
-        label: "반론용 사본이 어떻게 쓰였는지 제작진 전원에게 먼저 알린다",
+        label: "반론용 사본이 쓰인 경위를 제작진 전원에게 먼저 알린다",
         effect: { trust: 11, legitimacy: 7, capital: -5, humanCost: -5, time: -4, fatigue: 7 },
         voice: "공정하자고 보낸 사본이 표적이 된 걸 알아야 한다며, 반론용 사본이 어떻게 쓰였는지 제작진 전원에게 먼저 알린다.",
         echo: "제작진 전원이 알자 다음 반론용 사본에는 워터마크가 붙습니다. 오늘 밤의 20분은 그 워터마크보다 먼저 잘립니다.",
@@ -682,8 +682,8 @@ export const case39 = {
   memoryPlan: {
     systemNext: "c39_route_system",
     evidenceNext: "c39_evidence_turn",
-    systemLabel: "원고석에서 새로 짠 판이 다큐 자막 어디에 실렸는지 되감아 본다",
-    evidenceLabel: "상자 18번의 작성 부서를 '참고 의견'의 문서 속성과 맞댄다",
+    systemLabel: "원고석에서 새로 짠 판이 다큐 자막에 실렸는지 본다",
+    evidenceLabel: "18번 상자 작성 부서를 '참고 의견' 문서와 맞댄다",
     systemEcho: "자막을 되감아도 당신의 판은 나오지 않습니다. 대신 잘릴 구간의 표시가 나옵니다. 노아가 그렇게 표시된 대목들을 10년 치로 모읍니다.",
     evidenceEcho: "작성 부서를 맞대면 '참고 의견'에도 작성자 칸이 있습니다. 광고를 뺀 세 회사 어디의 이름도 아닙니다.",
   },
@@ -699,14 +699,14 @@ export const case39 = {
   },
   openingSignatures: {
     c39_start_warm: {
-      label: "원고들이 나오는 장면부터 문가을과 영상 통화로 함께 본다",
+      label: "원고들 장면부터 문가을과 영상 통화로 함께 본다",
       effect: { trust: 10, humanCost: -6, time: -5, capital: -3, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "잘리느냐고 묻던 사람이 직접 보고 말할 수 있게, 원고들이 나오는 장면부터 문가을과 영상 통화로 함께 본다.",
       echo: "화면 너머 떡집으로 가까이 사는 원고들이 하나둘 모여듭니다. 다들 자기 장면보다 옆 사람 장면에서 더 오래 웁니다. 그 장면들이 20분 안에 있는지는 아무도 묻지 않습니다.",
     },
     c39_start_record: {
-      label: "방청 기록에서 온 두 문장의 출처를 자막에 밝히자고 한다",
+      label: "방청 기록에서 온 두 문장 출처를 자막에 밝히자고 한다",
       effect: { legitimacy: 10, trust: 3, capital: -3, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "어디서 온 말인지 감출 이유가 없다며, 방청 기록에서 온 두 문장의 출처를 자막에 밝히자고 한다.",

@@ -105,7 +105,7 @@ const case19Nodes = {
       },
       {
         id: "c19_shelves_pick",
-        label: "2023-0412 관련 상자 11개부터 빼고 나머지는 뒤로 미룬다",
+        label: "2023-0412 상자 11개부터 빼고 나머지는 미룬다",
         effect: { time: 7, capital: 5, trust: -3, legitimacy: -2, humanCost: 3, fatigue: -2 },
         voice: "철거일까지 전부는 못 뺄 수 있다며, 2023-0412 관련 상자 11개부터 빼고 나머지는 뒤로 미룬다.",
         echo: "11상자는 오늘 안에 안전해집니다. 나머지 301상자에는 나준혁의 1996년도 들어 있습니다.",
@@ -134,7 +134,7 @@ const case19Nodes = {
     choices: [
       {
         id: "c19_ward_why",
-        label: "그 종이가 왜 짐이 아닌지 임소율 앞에서 직접 말해 달라고 부탁한다",
+        label: "그 종이가 왜 짐이 아닌지 임소율에게 말해 달라고 한다",
         effect: { trust: 13, humanCost: -6, time: -4, legitimacy: 3, fatigue: 5 },
         voice: "손녀가 짐으로만 물려받지 않게, 그 종이가 왜 짐이 아닌지 임소율 앞에서 직접 말해 달라고 부탁한다.",
         echo: "부탁을 들은 임경수가 오래 천장을 봅니다. 그리고 손녀를 부릅니다. 산소 콧줄 너머로 나오는 이야기가 길어 간호사가 두 번 옵니다.",
@@ -179,7 +179,7 @@ const case19Nodes = {
     choices: [
       {
         id: "c19_labels_draw",
-        label: "임소율과 밤새 라벨을 마저 그리고 여백 메모도 목록에 넣는다",
+        label: "임소율과 밤새 라벨을 그리고 여백 메모도 목록에 넣는다",
         effect: { trust: 12, legitimacy: 3, humanCost: -5, time: -4, capital: -2, fatigue: 5 },
         voice: "여백의 글씨까지가 이 상자들의 내용이어서, 임소율과 밤새 라벨을 마저 그리고 여백 메모도 목록에 넣는다.",
         echo: "라벨이 다 그려지자 새벽 여섯 시입니다. 임소율의 웹툰 마감은 하루 밀리고, 여백 메모 1,380줄이 목록에 들어갑니다.",
@@ -187,7 +187,7 @@ const case19Nodes = {
       },
       {
         id: "c19_labels_register",
-        label: "상자마다 출처와 기증자 임경수를 적어 정식 등록부터 한다",
+        label: "상자마다 출처와 기증자를 적어 등록부터 한다",
         effect: { legitimacy: 11, trust: 4, time: -5, humanCost: 2, fatigue: 4 },
         voice: "그림만으로는 누구 것인지 증명이 안 된다며, 상자마다 출처와 기증자 임경수를 적어 정식 등록부터 한다.",
         echo: "등록이 끝나자 30일 폐기 경고는 꺼집니다. 등록부 관리자 칸에는 그룹 총무팀 이름이 자동으로 들어갑니다.",
@@ -195,7 +195,7 @@ const case19Nodes = {
       },
       {
         id: "c19_labels_post",
-        label: "임소율의 웹툰으로 철거 소식과 라벨 사진을 먼저 알리게 한다",
+        label: "임소율의 웹툰으로 철거 소식과 라벨 사진을 알린다",
         effect: { time: 6, capital: 5, trust: 3, legitimacy: -4, humanCost: 5, fatigue: -3 },
         voice: "헐리기 전에 사람들이 알아야 한다며, 임소율의 웹툰으로 철거 소식과 라벨 사진을 먼저 알리게 한다.",
         echo: "연재분은 한 시간 만에 조회 수 12만을 넘깁니다. 댓글 창에 '회기동 헌책방 2층 주소'를 묻는 글이 달리기 시작합니다.",
@@ -286,7 +286,7 @@ export const case19 = {
         },
         {
           id: "c19_after_record",
-          label: "312상자 목록에 임경수의 서명을 받아 인수 문서로 남긴다",
+          label: "312상자 목록에 임경수 서명을 받아 문서로 남긴다",
           effect: { legitimacy: 15, trust: 4, time: -5, capital: -3, fatigue: 5 },
           voice: "무엇을 어디로 옮겼는지 남기려고, 312상자 목록에 임경수의 서명을 받아 인수 문서로 남긴다.",
           echo: "인수 문서 첫 줄에 임경수가 이름을 씁니다. 글씨가 떨리자 그가 웃습니다. '태운 자리보다는 표가 덜 나는군.'",
@@ -323,7 +323,7 @@ export const case19 = {
           echo: "같이 막아서니 구태형이 처음으로 안전모를 벗습니다. 대신 그 전화를 건 사람은 이제 반장 한 명이 아니라 우리 모두를 상대합니다.",
         },
         {
-          label: "시행사의 전화 요청을 서면으로 받아 달라고 반장에게 부탁한다",
+          label: "시행사 요청을 전화 말고 서면으로 받아 달라고 부탁한다",
           effect: { legitimacy: 10, trust: 3, time: -5, humanCost: 2, fatigue: 3 },
           voice: "전화는 흔적이 남지 않아서, 시행사의 전화 요청을 서면으로 받아 달라고 반장에게 부탁한다.",
           echo: "서면을 달라는 말에 구태형이 한참 휴대폰을 봅니다. 서면이 오면 그는 증인이 되고, 다음 현장에서 그를 부를 회사는 줄어듭니다.",
@@ -419,7 +419,7 @@ export const case19 = {
           echo: "이의는 접수됩니다. 구청의 답변 기한은 14일이고, 철거는 사흘 뒤입니다.",
         },
         {
-          label: "날짜 싸움은 뒤로 미루고 남은 시간을 짐 옮기는 데만 쓴다",
+          label: "날짜 싸움은 미루고 남은 시간을 짐 옮기는 데만 쓴다",
           effect: { time: 6, capital: 3, trust: -2, legitimacy: -2, humanCost: 3, fatigue: -3 },
           voice: "따지는 동안에도 시간은 간다며, 날짜 싸움은 뒤로 미루고 남은 시간을 짐 옮기는 데만 쓴다.",
           echo: "짐은 빨리 빠집니다. 누가 날짜를 당겼는지는 굴착기 소리에 묻힙니다.",
@@ -471,7 +471,7 @@ export const case19 = {
           echo: "전화를 받은 임경수가 한참 기침을 하고 말합니다. '여백부터 찍게. 거긴 전산에 한 번도 없었던 데야.'",
         },
         {
-          label: "2023-0412 상자부터 스캔해 원본과 파일을 함께 남긴다",
+          label: "2023-0412 상자부터 스캔해 원본과 함께 남긴다",
           effect: { legitimacy: 11, trust: 3, capital: -4, time: -4, fatigue: 5 },
           voice: "가장 먼저 노려질 종이부터 두 벌로 만들려고, 2023-0412 상자부터 스캔해 원본과 파일을 함께 남긴다.",
           echo: "파일이 생기자 원본이 사라져도 내용은 남습니다. 파일을 고치는 데 필요한 건 비밀번호 하나뿐이라는 것도 함께 남습니다.",
@@ -500,7 +500,7 @@ export const case19 = {
       choices: [
         {
           id: "c19_branch_bookshop_a",
-          label: "할머니의 책 1만 2천 권을 폐지값보다 비싸게 전부 사들인다",
+          label: "할머니의 책 1만 2천 권을 폐지값보다 비싸게 산다",
           effect: { trust: 12, humanCost: -4, capital: -9, time: -3, fatigue: 4 },
           voice: "kg당 110원에 넘기게 둘 수 없어서, 할머니의 책 1만 2천 권을 폐지값보다 비싸게 전부 사들인다.",
           echo: "할머니가 책값으로 받은 봉투를 두 손으로 쥡니다. '40년 장사에 책값을 제대로 받는 건 오늘이 처음이네.' 트리거랩 운영비 통장에는 230만 원이 남습니다.",
@@ -509,7 +509,7 @@ export const case19 = {
         },
         {
           id: "c19_branch_bookshop_b",
-          label: "밤새 경제사 칸 1,400권을 한 권씩 넘겨 나온 장마다 기록한다",
+          label: "밤새 경제사 1,400권을 넘기며 나온 장을 기록한다",
           effect: { legitimacy: 11, trust: 3, time: -7, humanCost: 2, fatigue: 7 },
           voice: "어느 책에서 나왔는지도 남겨야 한다며, 밤새 경제사 칸 1,400권을 한 권씩 넘겨 나온 장마다 기록한다.",
           echo: "1,400권을 넘기는 데 밤이 다 갑니다. 새벽 네 시, 강태민이 컵라면 두 개를 들고 와서 말없이 여섯 번째 칸부터 넘깁니다.",
@@ -518,7 +518,7 @@ export const case19 = {
         },
         {
           id: "c19_branch_bookshop_c",
-          label: "경제사 칸 책만 상자째 가져가고 나머지는 폐지 업체에 맡긴다",
+          label: "경제사 칸 책만 가져가고 나머지는 폐지 업체에 맡긴다",
           effect: { time: 6, capital: 4, trust: -5, humanCost: 4, fatigue: -3 },
           voice: "아침까지 챙길 수 있는 건 한 칸뿐이라며, 경제사 칸 책만 상자째 가져가고 나머지는 폐지 업체에 맡긴다.",
           echo: "경제사 칸은 살아남습니다. 옆 칸 『한국 산업 지도』 사이에 끼워 둔 네 장은 폐지 트럭에 실립니다.",
@@ -537,7 +537,7 @@ export const case19 = {
       choices: [
         {
           id: "c19_branch_bookshop_follow_a",
-          label: "41장은 할아버지 상자에 넣고 면지 메모 책은 임소율에게 준다",
+          label: "41장은 할아버지 상자에, 메모 책은 임소율에게 준다",
           effect: { trust: 13, humanCost: -5, legitimacy: 2, time: -4, fatigue: 4 },
           voice: "생일 메모는 증거가 아니라 손녀 것이어서, 41장은 할아버지 상자에 넣고 면지 메모 책은 임소율에게 준다.",
           echo: "면지 메모 책을 받은 임소율이 그 책을 패딩 안에 넣습니다. 41장은 출처 없이 상자 속으로 섞입니다.",
@@ -546,7 +546,7 @@ export const case19 = {
         },
         {
           id: "c19_branch_bookshop_follow_b",
-          label: "41장이 나온 책 제목과 쪽수를 전부 적어 출처 목록을 만든다",
+          label: "41장이 나온 책과 쪽수를 적어 출처 목록을 만든다",
           effect: { legitimacy: 12, trust: 3, time: -6, humanCost: 3, fatigue: 5 },
           voice: "끼워 둔 자리까지 남겨야 믿을 수 있다며, 41장이 나온 책 제목과 쪽수를 전부 적어 출처 목록을 만든다.",
           echo: "출처 목록이 생기자 어느 책 몇 쪽에서 나왔는지까지 증명됩니다. 면지 메모 책도 목록의 한 줄이 되어 상자로 들어갑니다.",
@@ -555,7 +555,7 @@ export const case19 = {
         },
         {
           id: "c19_branch_bookshop_follow_c",
-          label: "2023-0412 한 장만 따로 챙기고 나머지는 상자에 섞어 싣는다",
+          label: "2023-0412 한 장만 챙기고 나머지는 섞어 싣는다",
           effect: { time: 6, capital: 5, trust: -6, legitimacy: -2, humanCost: 4, fatigue: -3 },
           voice: "지금 필요한 건 그 대출 번호 하나라며, 2023-0412 한 장만 따로 챙기고 나머지는 상자에 섞어 싣는다.",
           echo: "한 장은 당신 가방에 들어갑니다. 나머지 40장은 어느 책에서 왔는지 아무도 모르게 됩니다.",
@@ -593,7 +593,7 @@ export const case19 = {
         },
         {
           id: "c19_route_system_request",
-          label: "국회 보존 요청 기간을 철거일 전으로 앞당겨 달라고 요청한다",
+          label: "국회 보존 요청 기간을 철거일 전으로 당겨 달라고 한다",
           effect: { legitimacy: 12, trust: 3, time: -8, capital: -3, fatigue: 5 },
           voice: "보존이 시작되기도 전에 헐리는 일을 막으려고, 국회 보존 요청 기간을 철거일 전으로 앞당겨 달라고 요청한다.",
           echo: "요청은 의원실에 닿습니다. 국회가 날짜를 당기려면 회의가 필요하고, 회의는 철거일 다음 주에 잡힙니다.",
@@ -612,7 +612,7 @@ export const case19 = {
     finalChoices: [
       {
         id: "a",
-        label: "기록이 보관된 건물은 철거 전 기록 조사를 거치라고 요구한다",
+        label: "기록이 있는 건물은 철거 전 기록 조사를 거치게 한다",
         effect: { legitimacy: 13, trust: 6, capital: -8, humanCost: -4, fatigue: 7 },
         voice: "다음 건물에서 같은 일이 되풀이되지 않게, 기록 보관처가 있는 건물은 철거 전에 기록 조사를 거치게 하라고 요구한다.",
         echo: "조건이 생기자 다음 철거 전에 누군가 건물 안의 종이를 확인해야 합니다. 그 조건에 KD리얼티는 석 달 동안 답하지 않습니다.",
@@ -661,7 +661,7 @@ export const case19 = {
       },
       {
         id: "c19_evidence_turn_hold",
-        label: "선우진이란 이름은 알아 두고 아직 누구에게도 말하지 않는다",
+        label: "선우진이란 이름은 알아 두고 아직 말하지 않는다",
         effect: { capital: 8, time: 6, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
         voice: "이름 하나로 움직이기엔 아직 이르다며, 선우진이라는 이름은 알아 두고 지금은 아무에게도 말하지 않는다.",
         echo: "이름은 당신 수첩에만 있습니다. 211번 상자가 있는 B2의 출입 기록은 그룹이 매일 봅니다.",
@@ -669,7 +669,7 @@ export const case19 = {
       },
       {
         id: "c19_evidence_turn_tell",
-        label: "그가 쓴 반대 의견이 남아 있었다고 임경수에게 먼저 알린다",
+        label: "그의 반대 의견이 남아 있었다고 임경수에게 먼저 알린다",
         effect: { trust: 12, legitimacy: 5, capital: -6, humanCost: -6, fatigue: 7 },
         voice: "태워 달라던 사람이 먼저 알아야 해서, 그가 쓴 반대 의견이 남아 있었다고 임경수에게 먼저 알린다.",
         echo: "알리자 임경수가 한참 웃다가 기침을 합니다. '그건 내가 쓴 반대 의견 중에 제일 짧은 거였어. 짧은 게 오래 가는군.'",
@@ -680,8 +680,8 @@ export const case19 = {
   memoryPlan: {
     systemNext: "c19_route_system",
     evidenceNext: "c19_evidence_turn",
-    systemLabel: "직전 사건의 매각 묶음 명세처럼 KD리얼티의 공정표도 겹쳐 본다",
-    evidenceLabel: "거래 조건 7번을 들고 철거 날짜를 당긴 부서를 확인한다",
+    systemLabel: "매각 묶음 명세처럼 KD리얼티의 공정표도 겹쳐 본다",
+    evidenceLabel: "거래 조건 7번으로 철거 날짜를 당긴 부서를 확인한다",
     systemEcho: "겹쳐 보면 철거일이 당겨진 건물이 이곳 하나가 아닙니다. 에코가 기록 보관처가 있던 일곱 곳에 표시를 합니다.",
     evidenceEcho: "거래 조건 7번을 철거 공문에 대면 발신 부서가 시행사가 아닙니다. 상자 하나에서는 트리거랩이 생기기 전의 예산서가 나옵니다.",
   },
@@ -697,21 +697,21 @@ export const case19 = {
   },
   openingSignatures: {
     c19_start_warm: {
-      label: "송년회 단톡방에 짐 나를 사람을 모아 다 같이 회기동으로 간다",
+      label: "송년회 단톡방에서 사람을 모아 다 같이 회기동으로 간다",
       effect: { trust: 11, humanCost: -4, capital: -3, time: -5, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "혼자 나를 수 있는 종이가 아니어서, 송년회 단톡방에 짐 나를 사람을 모아 다 같이 회기동으로 간다.",
       echo: "단톡방에 '짐'이라고 쓰자 1분 만에 답이 아홉 개 달립니다. 권도현의 답은 '상자당 단가부터 보내 주십시오'입니다.",
     },
     c19_start_record: {
-      label: "철거 계획이 언제 왜 바뀌었는지 구청 서류부터 열람 신청한다",
+      label: "철거 계획이 왜 바뀌었는지 구청 서류부터 열람한다",
       effect: { legitimacy: 12, trust: -2, capital: -4, time: -6, fatigue: 3 },
       cognition: { inference: 2 },
       voice: "기준의 근거가 된 원본이 헐리기 전에, 철거 계획이 언제 왜 바뀌었는지 구청 서류부터 열람 신청한다.",
       echo: "열람 신청은 접수됩니다. 창구 직원이 '신고서 원문과 첨부까지는 처리 기한이 열흘'이라고 말하는 동안, 72시간 중 3시간이 지나갑니다.",
     },
     c19_start_rush: {
-      label: "그믐밤 찍어 둔 첫 예고문 사진을 들고 오늘 바로 짐을 빼러 간다",
+      label: "그믐밤 찍은 예고문 사진을 들고 바로 짐을 빼러 간다",
       effect: { time: 8, trust: 4, capital: -3, humanCost: 3, fatigue: 2 },
       cognition: { risk: 1, persistence: 1 },
       voice: "석 달이면 충분하다고 한 말을 책임지려고, 그믐밤 찍어 둔 첫 예고문 사진을 들고 오늘 바로 짐을 빼러 간다.",

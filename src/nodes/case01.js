@@ -676,7 +676,7 @@ export const case01 = {
           },
           {
             id: "c",
-            label: "감축 폭을 줄이는 대신 임원 보수 삭감을 명단 첫 줄에 올린다",
+            label: "감축을 줄이고 임원 보수 삭감을 명단 첫 줄에 올린다",
             effect: { trust: 9, legitimacy: 6, capital: -6, time: -4, humanCost: -4, fatigue: 7 },
             voice: "잘라낼 자리를 위에서부터 찾겠다는 듯, 임원 보수 삭감을 첫 줄에 올린다.",
             echo: "위에서 먼저 깎자 절감액은 줄고, 명단의 설득력은 올라갑니다.",
@@ -1017,7 +1017,7 @@ export const case01 = {
   },
   openingSignatures: {
     c1_start_hold: {
-      label: "벽의 이름들과 이 서류철의 번호가 같은 사건인지 먼저 확인한다",
+      label: "벽의 이름과 서류철 번호가 같은 사건인지 먼저 확인한다",
       effect: { trust: 7, legitimacy: 6, time: -5, capital: -3, fatigue: 5 },
       cognition: { persistence: 2 },
       next: "c1_route_investigate",

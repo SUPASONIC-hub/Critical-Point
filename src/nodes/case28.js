@@ -100,7 +100,7 @@ const case28Nodes = {
       },
       {
         id: "c28_headset_metric",
-        label: "'부지급 유지율'을 성과급에 넣은 근거를 문서로 요구한다",
+        label: "'부지급 유지율'이 성과급에 든 근거를 문서로 요구한다",
         effect: { legitimacy: 10, trust: -3, time: -4, humanCost: 3, fatigue: 4 },
         voice: "거절이 어쩌다 실적이 됐는지 알아야 한다며, '부지급 유지율'이 성과급에 들어간 근거부터 문서로 요구한다.",
         echo: "근거를 요구하자 파트장 회의가 열립니다. 도윤하의 자리는 그날부터 '관리 대상'이 됩니다.",
@@ -108,7 +108,7 @@ const case28Nodes = {
       },
       {
         id: "c28_headset_quota",
-        label: "오늘 할당을 채우게 두고 채도훈에게는 퇴근 뒤 다시 건다",
+        label: "할당을 채우게 두고 채도훈에게는 퇴근 뒤 다시 건다",
         effect: { capital: 6, time: 6, trust: -4, humanCost: 4, fatigue: -2 },
         voice: "공장에 들어가 봐야 한다는 사람을 붙들 수 없어서, 오늘 할당을 채우게 두고 채도훈에게는 퇴근 뒤 다시 건다.",
         echo: "할당은 채워집니다. 퇴근 뒤 다시 건 전화를 채도훈은 받지 않습니다. 야간 작업 중입니다.",
@@ -153,7 +153,7 @@ const case28Nodes = {
       },
       {
         id: "c28_ruler_half",
-        label: "KD생명이 넌지시 내민 절반 지급 합의를 받아들이게 한다",
+        label: "KD생명이 내민 절반 지급 합의를 받아들이게 한다",
         effect: { capital: 8, time: 5, legitimacy: -3, trust: 2, humanCost: 4, fatigue: -2 },
         voice: "다투는 동안에도 다친 손은 그대로라며, KD생명이 넌지시 내민 절반 지급 합의를 받아들이게 한다.",
         echo: "절반이면 2,100만 원입니다. 채도훈은 고개를 끄덕이고, 제19조는 다음 사람에게도 그대로 남습니다.",
@@ -190,7 +190,7 @@ const case28Nodes = {
       },
       {
         id: "c28_factory_order",
-        label: "촬영 영상과 조사 지시서를 정식으로 요청해 증거로 삼는다",
+        label: "촬영 영상과 조사 지시서를 요청해 증거로 삼는다",
         effect: { legitimacy: 10, trust: 3, time: -5, humanCost: 3, fatigue: 5 },
         voice: "누가 찍으라고 했는지 남아야 한다며, 촬영 영상과 조사 지시서를 정식으로 요청해 증거로 삼는다.",
         echo: "지시서를 받자 촬영을 주문한 날짜가 나옵니다. 이의신청이 들어온 바로 다음 날입니다.",
@@ -227,7 +227,7 @@ const case28Nodes = {
     choices: [
       {
         id: "c28_final_both",
-        label: "채도훈 지급은 받되 확인서는 빼고 1,318명 명단을 요구한다",
+        label: "지급은 받되 확인서는 빼고 1,318명 명단을 요구한다",
         effect: { trust: 10, legitimacy: 7, capital: -6, time: -6, humanCost: -3, fatigue: 6 },
         voice: "등록금도 나머지 1,317명도 놓지 않겠다며, 채도훈 지급은 받되 확인서는 빼고 1,318명 명단을 요구한다.",
         echo: "명단을 요구하자 서 상무가 회의를 30분 멈춥니다. 돌아온 그는 확인서 없이 지급하겠다고 합니다. 명단은 '검토'입니다.",
@@ -235,7 +235,7 @@ const case28Nodes = {
       },
       {
         id: "c28_final_clause",
-        label: "제19조를 고치지 않으면 예외 지급도 받지 않겠다고 버틴다",
+        label: "제19조를 고치기 전엔 예외 지급도 안 받겠다고 버틴다",
         effect: { legitimacy: 13, trust: 6, capital: -9, time: -7, humanCost: 4, fatigue: 6 },
         voice: "예외 한 건으로는 다음 주 대본이 그대로라며, 제19조를 고치지 않으면 예외 지급도 받지 않겠다고 버틴다.",
         echo: "버티자 합의서는 다시 가방으로 들어갑니다. 월요일 입금은 없고, 제19조를 다루는 회의 날짜도 아직 없습니다.",
@@ -290,7 +290,7 @@ export const case28 = {
         },
         {
           id: "c28_after_record",
-          label: "제19조와 대본 4번을 나란히 적은 개정 요청서를 남긴다",
+          label: "제19조와 대본 4번을 나란히 둔 개정 요청서를 남긴다",
           effect: { legitimacy: 14, trust: 5, time: -5, capital: -2, fatigue: 5 },
           voice: "떡과 박수로 끝나면 대본은 그대로라며, 제19조와 대본 4번을 나란히 적은 개정 요청서부터 문서로 남긴다.",
           echo: "요청서에는 같은 조항에 걸린 1,318명의 명단이 붙습니다. 연하진이 12년 동안 모아 둔 통화 목록에서 한 줄씩 옮겨 적은 것입니다. 그가 명단 첫 줄에 자기 아버지 이름을 적어 넣습니다.",
@@ -385,7 +385,7 @@ export const case28 = {
           echo: "나누자 연하진의 팀 12명 중 5명이 따라 합니다. 그 주에 팀 전체가 C등급을 받습니다.",
         },
         {
-          label: "상담 평가 기준 개정 제안서를 KD생명 준법감시부에 낸다",
+          label: "상담 평가 기준 개정 제안서를 준법감시부에 낸다",
           effect: { legitimacy: 10, trust: 3, time: -4, humanCost: -2, fatigue: 4 },
           voice: "고맙다는 전화가 감점인 기준이 문제라며, 상담 평가 기준을 바꾸자는 제안서를 KD생명 준법감시부에 낸다.",
           echo: "제안서는 접수됩니다. 준법감시부 답변 기한은 30일이고, 도윤하의 파견은 이틀 남았습니다.",
@@ -445,7 +445,7 @@ export const case28 = {
           echo: "채도훈이 원하는 방식은 간단합니다. '커피나 한 잔 더 타 줘요.' 도윤하가 믹스커피를 두 봉지 넣습니다.",
         },
         {
-          label: "'읽어 주지 않은 글씨'를 판매 절차의 결함으로 기록한다",
+          label: "'읽어 주지 않은 글씨'를 판매 절차 결함으로 기록한다",
           effect: { legitimacy: 9, trust: 2, humanCost: -2, time: -3, fatigue: 3 },
           voice: "미안하다는 말로 끝나면 다음 창구도 같다며, '읽어 주지 않은 글씨'를 판매 절차의 결함으로 기록한다.",
           echo: "기록하자 한 사람의 사과가 절차의 결함이 됩니다. 결함은 고칠 수 있고, 사과는 그렇지 않습니다.",
@@ -549,7 +549,7 @@ export const case28 = {
         },
         {
           id: "c28_branch_market_follow_b",
-          label: "만화를 쉬운 약관 설명서 시안으로 KD생명에 공식 제안한다",
+          label: "만화를 쉬운 약관 설명서 시안으로 공식 제안한다",
           effect: { legitimacy: 10, trust: 4, time: -6, humanCost: 2, fatigue: 5 },
           voice: "다들 읽는 글이 약관이어야 한다며, 만화를 쉬운 약관 설명서 시안으로 KD생명에 공식 제안한다.",
           echo: "제안서는 접수됩니다. KD생명은 '검토하겠다'고 답하고, 만화의 넷째 칸만 빼 달라고 합니다.",
@@ -588,7 +588,7 @@ export const case28 = {
       routeChoices: [
         {
           id: "c28_route_system_slow",
-          label: "대본 4번의 '다시 설명' 문단을 맨 앞으로 옮기라고 요구한다",
+          label: "'다시 설명' 문단을 대본 4번 맨 앞으로 옮기게 한다",
           effect: { legitimacy: 10, trust: 7, capital: -5, time: -7, fatigue: 5 },
           voice: "그 말이 나온 통화는 이의 제기가 네 배라며, 대본 4번의 '다시 설명' 문단을 맨 앞으로 옮기라고 요구한다.",
           echo: "문단 하나를 옮기자 평균 통화가 7분으로 늘어납니다. 상담사 한 명의 하루 할당이 반으로 줄어듭니다.",
@@ -596,7 +596,7 @@ export const case28 = {
         },
         {
           id: "c28_route_system_publish",
-          label: "녹취 요약 통계를 금융감독원과 피해자 모임에 동시에 넘긴다",
+          label: "녹취 통계를 금융감독원과 피해자 모임에 동시에 넘긴다",
           effect: { legitimacy: 12, trust: 4, time: -8, humanCost: 3, fatigue: 6 },
           voice: "안에서만 알면 다시 묻힌다며, 녹취 요약 통계를 금융감독원과 피해자 모임에 동시에 넘긴다.",
           echo: "통계가 넘어가자 금융감독원이 녹취 원본을 요구합니다. 41만 건을 추리는 데 석 달이 걸립니다.",
@@ -615,7 +615,7 @@ export const case28 = {
     finalChoices: [
       {
         id: "a",
-        label: "거절 안내 통화에 최소 10분과 다시 설명받을 권리를 규정으로 넣는다",
+        label: "거절 통화에 최소 10분과 다시 설명받을 권리를 넣는다",
         effect: { legitimacy: 11, trust: 8, capital: -7, humanCost: -4, fatigue: 7 },
         voice: "순서로 뺏은 시간을 돌려줘야 한다며, 거절 안내 통화에 최소 10분과 다시 설명받을 권리를 규정으로 넣는다.",
         echo: "10분이 규정이 되자 콜센터는 상담사를 더 뽑아야 합니다. 비용이 늘고, 거절은 줄어듭니다.",
@@ -631,7 +631,7 @@ export const case28 = {
       },
       {
         id: "c",
-        label: "3분 안에 끝난 거절 건 전부를 다시 심사할 기금을 따로 만든다",
+        label: "3분 만에 끝난 거절 전부를 다시 심사할 기금을 만든다",
         effect: { legitimacy: 8, trust: 10, capital: -8, time: -6, humanCost: 2, fatigue: 8 },
         voice: "이미 시간표에 밀려난 사람들이 있다며, 3분 안에 끝난 거절 건 전부를 다시 심사할 기금을 따로 만든다.",
         echo: "기금이 생기자 다시 심사할 거절 건은 12만 건입니다. 누가 그 기금을 채울지는 빈칸입니다.",
@@ -656,7 +656,7 @@ export const case28 = {
     choices: [
       {
         id: "c28_evidence_turn_expose",
-        label: "TF 요청서와 평택 숫자를 금융감독원 민원에 함께 붙여 낸다",
+        label: "TF 요청서와 평택 숫자를 금융감독원 민원에 함께 낸다",
         effect: { legitimacy: 12, trust: 5, capital: -7, time: -7, fatigue: 6 },
         voice: "보험금으로 공사 구멍을 메운 일은 밖에서 봐야 한다며, TF 요청서와 평택 숫자를 금융감독원 민원에 함께 붙여 낸다.",
         echo: "민원이 들어가자 태스크포스라는 이름이 공문에 처음 오릅니다. 그 아래 대표실이라는 글자도 함께 오릅니다.",
@@ -683,8 +683,8 @@ export const case28 = {
   memoryPlan: {
     systemNext: "c28_route_system",
     evidenceNext: "c28_evidence_turn",
-    systemLabel: "전무실에서 새로 짠 판이 KD생명 상담 대본으로 건너갔는지 짚어 본다",
-    evidenceLabel: "새봄신협 정리안을 대본 4번의 개정 이력과 견주어 읽는다",
+    systemLabel: "전무실에서 새로 짠 판이 상담 대본에 건너갔는지 본다",
+    evidenceLabel: "새봄신협 정리안을 대본 4번 개정 이력과 견주어 읽는다",
     systemEcho: "대본에는 건너온 것이 없습니다. 14번 나오는 낱말은 전부 '거절'입니다. 이민서가 그 대본으로 끝난 통화들의 길이를 잽니다.",
     evidenceEcho: "정리안의 빈 승인자 칸을 대본 개정 요청서에 대면 요청 부서가 뜹니다. 콜센터도 KD생명도 아닙니다.",
   },
@@ -714,7 +714,7 @@ export const case28 = {
       echo: "질의는 접수됩니다. 답변 기한은 14일이고, 채도훈의 통화는 내일 오전 10시입니다.",
     },
     c28_start_rush: {
-      label: "지워진 대화방 이름과 대본 승인 도장을 도윤하와 맞춰 본다",
+      label: "지워진 대화방 이름과 승인 도장을 도윤하와 맞춰 본다",
       effect: { trust: 9, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "혼자 본 이름이라 잘못 봤을 수도 있어서, 지워진 대화방의 이름과 대본의 승인 도장이 같다는 걸 도윤하와 먼저 맞춰 본다.",

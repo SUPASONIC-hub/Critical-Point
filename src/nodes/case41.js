@@ -131,7 +131,7 @@ const case41Nodes = {
     choices: [
       {
         id: "c41_corridor_daughter",
-        label: "윤서진을 먼저 찾아가 오늘 무엇을 묻게 될지 미리 말해 준다",
+        label: "윤서진을 먼저 찾아가 오늘 물을 것을 미리 말해 준다",
         effect: { trust: 11, humanCost: -6, legitimacy: -2, time: -4, fatigue: 5 },
         voice: "방청석에서 처음 듣게 하지 않으려고, 윤서진을 먼저 찾아가 오늘 무엇을 묻게 될지 미리 말해 준다.",
         echo: "미리 말하자 윤서진은 방청석을 떠나지 않습니다. 대신 개회 내내 아버지의 등만 봅니다.",
@@ -184,7 +184,7 @@ const case41Nodes = {
       },
       {
         id: "c41_chamber_receipt",
-        label: "수신 기록 한 장으로 그가 그 서류를 받았다는 것부터 확인시킨다",
+        label: "수신 기록으로 그가 서류를 받은 것부터 확인시킨다",
         effect: { legitimacy: 12, trust: 3, time: -5, capital: -3, fatigue: 5 },
         voice: "받은 사실은 기억과 상관이 없어서, 수신 기록 한 장으로 그가 그 서류를 받았다는 것부터 확인시킨다.",
         echo: "수신 기록은 반박할 수 없습니다. 받은 사람이 기억하지 못한다는 것만 빼고요.",
@@ -229,7 +229,7 @@ const case41Nodes = {
       },
       {
         id: "c41_final_page",
-        label: "서명란이 빈 3페이지를 들고 이 칸의 주인이 누구냐고 묻는다",
+        label: "서명란이 빈 3페이지를 들고 칸의 주인을 묻는다",
         effect: { legitimacy: 13, trust: 5, capital: -6, time: -5, humanCost: 3, fatigue: 5 },
         voice: "기억은 없어도 빈칸은 눈앞에 있다며, 서명란이 빈 3페이지를 들고 이 칸의 주인이 누구냐고 묻는다.",
         echo: "그가 '기억나지 않습니다'라고 답합니다. 23번째입니다. 빈칸 위의 대답이라, 그 대답 자체가 칸을 채운 첫 기록이 됩니다.",
@@ -237,7 +237,7 @@ const case41Nodes = {
       },
       {
         id: "c41_final_chair",
-        label: "질문을 위원장에게 돌려 그 위의 결정권자를 증인으로 부르자고 한다",
+        label: "위원장에게 그 위의 결정권자를 증인으로 부르자고 한다",
         effect: { capital: 6, legitimacy: 6, trust: 2, time: -3, humanCost: 3, fatigue: 2 },
         voice: "이 사람 하나의 기억에 1분을 쓰지 않기로 하고, 질문을 위원장에게 돌려 그 위의 결정권자를 증인으로 부르자고 한다.",
         echo: "위원장이 잠시 망설이다 '검토하겠습니다'라고 합니다. 윤상혁은 처음으로 대답할 필요가 없는 1분을 얻습니다.",
@@ -274,7 +274,7 @@ export const case41 = {
       choices: [
         {
           id: "c41_after_warm",
-          label: "포장마차에 남아 오늘 방청 온 사람들과 끝까지 잔을 비운다",
+          label: "포장마차에 남아 방청 온 사람들과 끝까지 잔을 비운다",
           effect: { trust: 12, humanCost: -5, time: -2, capital: -3, fatigue: -7 },
           voice: "같이 들은 사람들을 그냥 보낼 수 없어서, 포장마차에 남아 오늘 방청 온 사람들과 끝까지 잔을 비운다.",
           echo: "마지막 잔을 비울 때 포장마차에 12명이 남습니다. 문하준은 사이다로 건배를 세 번 합니다.",
@@ -292,7 +292,7 @@ export const case41 = {
         },
         {
           id: "c41_after_rush",
-          label: "청문회장을 나서자마자 곧장 사무실로 돌아가 다음 싸움을 준비한다",
+          label: "청문회장을 나서자마자 사무실로 가 다음 싸움을 준비한다",
           effect: { capital: 7, legitimacy: 5, trust: -6, humanCost: 5, fatigue: 5 },
           voice: "고발 의결이 다음 주라 쉴 때가 아니라며, 청문회장을 나서자마자 곧장 사무실로 돌아가 다음 싸움을 준비한다.",
           echo: "사무실 불을 제일 늦게 끄는 날이 이어집니다. 포장마차 단체방에는 당신만 사진이 없습니다.",
@@ -374,7 +374,7 @@ export const case41 = {
       memo: ["의원실 요청: '윤상혁이 지웠다' 한 문장", "그룹 홍보실 문자: '개인 자격 출석'", "속개는 14시"],
       choices: [
         {
-          label: "이름 대신 피해자 한 사람의 이야기로 1분을 열겠다고 한다",
+          label: "이름 대신 피해자 한 사람의 이야기로 1분을 연다",
           effect: { trust: 10, humanCost: -4, legitimacy: 3, capital: -3, time: -3, fatigue: 4 },
           voice: "윤상혁 하나로 끝나는 건 원하지 않는다며, 이름 대신 피해자 한 사람의 이야기로 1분을 열겠다고 한다.",
           echo: "차지원이 한숨을 쉽니다. '4면이네요.' 그리고 질의서 여백에 문가을의 이름을 적습니다.",
@@ -508,7 +508,7 @@ export const case41 = {
         },
         {
           id: "c41_branch_study_b",
-          label: "서재에서 들은 연습을 날짜와 함께 진술서로 적어 두자고 한다",
+          label: "서재에서 들은 연습을 날짜와 함께 진술서로 적어 둔다",
           effect: { legitimacy: 11, trust: 2, humanCost: 3, time: -3, capital: -2, fatigue: 4 },
           voice: "23번이 들은 말로만 남지 않게, 서재에서 들은 연습을 날짜와 함께 진술서로 적어 두자고 한다.",
           echo: "진술서가 되자 윤서진의 이름이 서류에 오릅니다. 그는 펜을 들었다가 한 번 내려놓습니다.",
@@ -611,7 +611,7 @@ export const case41 = {
     finalChoices: [
       {
         id: "a",
-        label: "기억나지 않는다는 대답마다 그날의 서류를 한 장씩 올려놓는다",
+        label: "기억나지 않는다는 대답마다 그날 서류를 한 장씩 놓는다",
         effect: { legitimacy: 13, trust: 6, capital: -7, time: -6, fatigue: 7 },
         voice: "기억 대신 종이가 대답하게, 기억나지 않는다는 대답마다 그날의 서류를 한 장씩 올려놓는다.",
         echo: "서류가 쌓일수록 그의 대답이 짧아집니다. 23번째는 거의 들리지 않습니다.",
@@ -679,8 +679,8 @@ export const case41 = {
   memoryPlan: {
     systemNext: "c41_route_system",
     evidenceNext: "c41_evidence_turn",
-    systemLabel: "서버실에서 새로 짠 판이 청문회 질의서에 묻어 들어갔는지 짚어 본다",
-    evidenceLabel: "부적합의 기준점의 승인서를 윤상혁이 답할 날짜 옆에 둔다",
+    systemLabel: "서버실에서 새로 짠 판이 청문회 질의서에 묻었는지 본다",
+    evidenceLabel: "부적합의 기준점 승인서를 윤상혁이 답할 날 옆에 둔다",
     systemEcho: "질의서는 당신의 판을 싣지 않았습니다. 예상 답변 칸마다 같은 대답이 적혀 있습니다. 이민서가 그 대답을 20년 치 회의록에서 셉니다.",
     evidenceEcho: "승인서를 옆에 두면 기억나지 않는다던 날에 그의 서명이 있습니다. 반재욱이 같은 식으로 청문회 날 정회까지 표를 채워 갑니다.",
   },

@@ -90,7 +90,7 @@ const case40Nodes = {
     choices: [
       {
         id: "c40_demo_rehear",
-        label: "문하준의 점수를 사람 면접으로 다시 보게 해 달라고 한다",
+        label: "문하준을 사람 면접으로 다시 보게 해 달라고 한다",
         effect: { trust: 11, humanCost: -5, legitimacy: 2, time: -5, fatigue: 5 },
         voice: "먼저 떨어진 아이부터 사람 앞에 세워야 한다며, 문하준의 점수를 사람 면접으로 다시 보게 해 달라고 한다.",
         echo: "홍예담은 한 명을 위한 예외는 공정하지 않다고 답합니다. 그 말을 믿고 있다는 게 목소리에서 들립니다.",
@@ -225,7 +225,7 @@ const case40Nodes = {
     choices: [
       {
         id: "c40_final_list",
-        label: "떨어진 9,412명을 모두 사람 면접으로 다시 보게 한다",
+        label: "떨어진 9,412명을 모두 사람이 다시 면접하게 한다",
         effect: { trust: 13, humanCost: -6, legitimacy: 5, capital: -9, time: -7, fatigue: 6 },
         voice: "숫자가 닫은 문은 사람이 다시 열어야 한다며, 떨어진 9,412명을 모두 사람 면접으로 다시 보게 한다.",
         echo: "다시 보게 하자 9,412명에게 면접 날짜가 생깁니다. 비용 4억은 누가 낼지 아직 빈칸이고, 월요일 공채는 한 주 밀립니다.",
@@ -278,7 +278,7 @@ export const case40 = {
       choices: [
         {
           id: "c40_after_warm",
-          label: "오늘은 떡방 셔터를 내릴 때까지 하준의 첫 근무를 함께한다",
+          label: "떡방 셔터를 내릴 때까지 하준의 첫 근무를 함께한다",
           effect: { trust: 11, humanCost: -6, time: -3, capital: -4, fatigue: -7 },
           voice: "질문 하나는 내일 생각해도 된다며, 오늘은 떡방 셔터를 내릴 때까지 하준의 첫 근무를 함께한다.",
           echo: "셔터가 내려갈 때 하준의 첫 시급이 봉투에 담깁니다. 문가을이 봉투에 '100점'이라고 적습니다. 국회는 월요일까지 기다립니다.",
@@ -549,7 +549,7 @@ export const case40 = {
         },
         {
           id: "c40_branch_bakery_follow_b",
-          label: "입력 칸이 막힌 화면을 증거로 남겨 노동청 진정을 준비한다",
+          label: "입력 칸이 막힌 화면을 증거로 노동청 진정을 준비한다",
           effect: { legitimacy: 11, trust: 4, time: -5, humanCost: 2, fatigue: 5 },
           voice: "뽑고 싶어도 못 뽑게 막은 건 본사 시스템이라서, 입력 칸이 막힌 화면을 증거로 남겨 노동청 진정을 준비한다.",
           echo: "진정서가 접수되자 노동청은 '채용 절차의 공정성' 항목으로 조사를 엽니다. 결과는 가을이 끝나야 나옵니다.",
@@ -615,7 +615,7 @@ export const case40 = {
     finalChoices: [
       {
         id: "a",
-        label: "망설임을 감점하지 않는 검사만 채용에 쓰게 하는 기준을 만든다",
+        label: "망설임을 감점 않는 검사만 채용에 쓰는 기준을 만든다",
         effect: { legitimacy: 12, trust: 7, capital: -8, humanCost: -3, fatigue: 7 },
         voice: "멈춘 사람이 다시 결함으로 배워지지 않게, 망설임을 감점하지 않는 검사만 채용에 쓰게 하는 기준을 만든다.",
         echo: "기준이 생기자 멈춤은 감점이 아닙니다. 그 기준을 지키는지 볼 사람은 아직 정해지지 않았습니다.",
@@ -631,7 +631,7 @@ export const case40 = {
       },
       {
         id: "c",
-        label: "탈락자가 사람 면접을 요구할 권리를 이용 약관에 넣게 한다",
+        label: "탈락자가 사람 면접을 요구할 권리를 약관에 넣게 한다",
         effect: { trust: 10, legitimacy: 6, capital: -6, time: -7, humanCost: 2, fatigue: 6 },
         voice: "숫자가 틀려도 사람을 만날 길은 남아야 한다며, 탈락자가 사람 면접을 요구할 권리를 이용 약관에 넣게 한다.",
         echo: "권리가 약관에 들어가자 누구든 사람을 만날 수 있습니다. 약관을 끝까지 읽는 사람이 먼저 만납니다.",
@@ -664,7 +664,7 @@ export const case40 = {
       },
       {
         id: "c40_evidence_turn_show",
-        label: "승인서를 핏스코어 대표 홍예담에게 먼저 보여 주고 선택을 묻는다",
+        label: "승인서를 홍예담 대표에게 먼저 보여 주고 선택을 묻는다",
         effect: { trust: 12, legitimacy: 4, humanCost: -5, time: -6, fatigue: 5 },
         voice: "제 회사가 무엇에 묶여 있는지는 그가 알아야 한다며, 승인서를 핏스코어 대표 홍예담에게 먼저 보여 주고 선택을 묻는다.",
         echo: "보여 주자 홍예담의 얼굴에서 핏기가 빠집니다. 그는 40억에 조건이 붙어 있었다는 걸 오늘 처음 압니다. 서명한 사람은 그가 아니었습니다.",
@@ -683,8 +683,8 @@ export const case40 = {
   memoryPlan: {
     systemNext: "c40_route_system",
     evidenceNext: "c40_evidence_turn",
-    systemLabel: "편집실에서 새로 짠 판이 핏스코어 설명서 문항에 섞였는지 가려 본다",
-    evidenceLabel: "반론용 사본이 돌아온 길을 핏스코어에 들어간 돈의 길에 겹쳐 본다",
+    systemLabel: "편집실에서 새로 짠 판이 핏스코어 설명서에 섞였나 본다",
+    evidenceLabel: "반론용 사본의 길을 핏스코어 돈의 길에 겹쳐 본다",
     systemEcho: "설명서 어디에도 새로 짠 판은 실리지 않았습니다. 문항마다 망설인 시간을 재는 칸이 있을 뿐입니다. 류세아가 그 칸으로 떨어진 사람들을 다시 묶습니다.",
     evidenceEcho: "두 길을 겹치면 보낸 것이 이름만 바꿔 돌아오는 모양이 같습니다. 핏스코어의 투자 승인서에도 서명이 하나 있습니다.",
   },
@@ -700,14 +700,14 @@ export const case40 = {
   },
   openingSignatures: {
     c40_start_warm: {
-      label: "어젯밤 편집실에 모였던 사람들과 하준의 일을 나눠 맡는다",
+      label: "어젯밤 편집실에 모인 사람들과 하준의 일을 나눠 맡는다",
       effect: { trust: 11, humanCost: -4, capital: -4, time: -4, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "하준 혼자 41점을 들고 있게 두지 않으려고, 어젯밤 편집실에 모였던 사람들과 하준의 일을 나눠 맡는다.",
       echo: "나눠 맡자 떡방 단체방이 밤새 울립니다. 서하린이 정정의 사진을 올리자 하준이 그제야 웃습니다.",
     },
     c40_start_record: {
-      label: "보존 폴더 속 6분의 원본부터 핏스코어 자료로 다시 본다",
+      label: "보존 폴더 속 6분 원본부터 핏스코어 자료로 다시 본다",
       effect: { legitimacy: 12, trust: -3, capital: -3, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "묶어 둔 6분 안에 답이 있을지 몰라서, 보존 폴더 속 6분의 원본부터 핏스코어 자료로 다시 본다.",

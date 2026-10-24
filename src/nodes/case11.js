@@ -38,7 +38,7 @@ const case11Nodes = {
     choices: [
       {
         id: "c11_start_reporter",
-        label: "기자에게 먼저 연락을 넣어 틀린 사실부터 바로잡으려 한다",
+        label: "기자에게 먼저 연락해 틀린 사실부터 바로잡으려 한다",
         effect: { legitimacy: 10, trust: 5, time: -6, humanCost: 3, fatigue: 4 },
         voice: "기사에 틀린 게 있으면 그것부터라며, 기자에게 먼저 연락을 넣는다.",
         echo: "리드라인 대표 번호는 종일 통화 중이라 메시지만 남습니다. 기자가 그 메시지에 답하는 날, 먼저 연락한 쪽이 A씨였다는 사실도 함께 퍼집니다.",
@@ -87,7 +87,7 @@ const case11Nodes = {
     choices: [
       {
         id: "c11_script_own",
-        label: "두 대본 다 돌려보내고 증명할 수 있는 문장만으로 새로 쓴다",
+        label: "두 대본 다 돌려보내고 증명되는 문장만으로 새로 쓴다",
         effect: { legitimacy: 13, trust: 4, time: -8, capital: -4, fatigue: 5 },
         voice: "둘 다 증명할 수 없는 문장으로 끝나서, 두 대본 다 돌려보내고 증명할 수 있는 문장만으로 새로 쓴다.",
         echo: "증명할 수 있는 문장만 남기자 7분이 짧아집니다. 짧은 답은 편집되지 않습니다.",
@@ -103,7 +103,7 @@ const case11Nodes = {
       },
       {
         id: "c11_script_pr",
-        label: "홍보실 자료를 따르는 대신 동료들 인사 보복 금지를 약속받는다",
+        label: "홍보실 자료 대신 동료들 인사 보복 금지를 약속받는다",
         effect: { capital: 8, humanCost: -6, legitimacy: -10, trust: -5, fatigue: -2 },
         voice: "의원실 문장도 증명할 수 없기는 마찬가지라, 홍보실 자료를 따르는 대신 동료들 인사 보복 금지를 약속받는다.",
         echo: "약속은 받았습니다. 서면이 아니라 전화로 받은 약속이고, 당신은 방송에서 사실과 다른 문장을 읽게 됩니다.",
@@ -140,7 +140,7 @@ const case11Nodes = {
       },
       {
         id: "c11_rehearsal_truth",
-        label: "숨기면 더 다친다며 이민서와 함께 사실대로 답하는 연습을 한다",
+        label: "이민서와 함께 사실대로 답하는 연습을 한다",
         effect: { legitimacy: 12, trust: 6, humanCost: 5, time: -6, fatigue: 5 },
         voice: "어차피 남아 있는 접속 기록이라 숨기면 더 다친다며, 이민서와 함께 사실대로 답하는 연습을 한다.",
         echo: "연습한 답은 떨리지 않습니다. 사실대로 나온 이름은 계약 갱신 심사 서류에도 같이 올라갑니다.",
@@ -193,7 +193,7 @@ const case11Nodes = {
       },
       {
         id: "c11_sign_together",
-        label: "반대한 사람과 반려한 사람이 함께 출석해 같이 말하자고 한다",
+        label: "반대한 이와 반려한 이가 함께 나가 같이 말하자고 한다",
         effect: { trust: 11, legitimacy: 10, capital: -8, time: -8, humanCost: 3, fatigue: 7 },
         voice: "한 사람만 끝나게 두지 않으려고, 반대한 사람과 반려한 사람이 함께 출석해 같이 말하자고 한다.",
         echo: "둘이 함께 서니 반대와 반려가 한 문장이 됩니다. 그 문장은 두 사람 모두를 드러냅니다.",
@@ -230,7 +230,7 @@ const case11Nodes = {
       },
       {
         id: "c11_final_system",
-        label: "한 사람의 이름 대신 반대 의견이 사라지는 구조를 말한다",
+        label: "한 사람 이름 대신 반대 의견이 사라지는 구조를 말한다",
         effect: { legitimacy: 10, trust: 9, capital: -6, time: -7, humanCost: -5, fatigue: 5 },
         voice: "이름 하나로 끝나면 다음에도 사라진다며, 한 사람의 이름 대신 반대 의견이 사라지는 구조를 말한다.",
         echo: "구조는 4면에 실립니다. 4면을 끝까지 읽는 사람은, 그 구조 안에서 일하는 사람들입니다.",
@@ -238,7 +238,7 @@ const case11Nodes = {
       },
       {
         id: "c11_final_people",
-        label: "1,740명의 숫자로 시작해 남은 시간을 피해자에게 쓴다",
+        label: "1,740명으로 시작해 남은 시간을 피해자에게 쓴다",
         effect: { trust: 14, humanCost: -8, legitimacy: -5, time: -6, capital: -5, fatigue: 6 },
         voice: "이름도 구조도 아니고 잃은 사람이 먼저라며, 1,740명의 숫자로 시작해 남은 시간을 피해자에게 쓴다.",
         echo: "숫자로 시작하자 방이 조용해집니다. 방송은 그 침묵을 3초만 내보냅니다.",
@@ -375,7 +375,7 @@ export const case11 = {
       memo: ["참고인 출석 3시간 전", "도윤하: 판매 당사자로 언급될 가능성", "방청 신청 7명 전원 도착"],
       choices: [
         {
-          label: "도윤하의 이름이 나오면 내가 먼저 받아서 답하겠다고 한다",
+          label: "도윤하의 이름이 나오면 내가 먼저 답하겠다고 한다",
           effect: { trust: 12, humanCost: -6, legitimacy: -3, time: -4, fatigue: 5 },
           voice: "그 말을 혼자 듣게 두지 않겠다며, 도윤하의 이름이 나오면 내가 먼저 받아서 답하겠다고 한다.",
           echo: "먼저 받자 도윤하는 그 질문을 직접 듣지 않습니다. 대신 당신 답변 40초가 거기에 쓰입니다.",
@@ -589,7 +589,7 @@ export const case11 = {
         },
         {
           id: "c11_route_system_pledge",
-          label: "내 답변에서만은 '확인해 보겠습니다'를 쓰지 않기로 한다",
+          label: "내 답변에선 '확인해 보겠습니다'를 쓰지 않는다",
           effect: { trust: 11, legitimacy: 7, humanCost: 3, time: -7, fatigue: 6 },
           voice: "2,114번에 한 번을 더 보태지 않으려고, 내 답변에서만은 '확인해 보겠습니다'를 쓰지 않기로 한다.",
           echo: "쓰지 않기로 하자 모르는 것은 모른다고 말해야 합니다. 40초짜리 답변에서 그 말은 생각보다 길게 들립니다.",
@@ -651,7 +651,7 @@ export const case11 = {
     choices: [
       {
         id: "c11_evidence_turn_submit",
-        label: "두 시각을 나란히 적은 기록을 의원실과 언론에 동시에 넘긴다",
+        label: "두 시각을 나란히 적은 기록을 의원실과 언론에 넘긴다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 },
         voice: "한쪽에서 묻히지 않게, 두 시각을 나란히 적은 기록을 의원실과 언론에 동시에 넘긴다.",
         echo: "동시에 넘기자 어느 쪽도 먼저 묻을 수 없습니다. 두 시각 사이의 빈 시간이 내일 질의의 첫 질문이 됩니다.",
@@ -667,7 +667,7 @@ export const case11 = {
       },
       {
         id: "c11_evidence_turn_share",
-        label: "한서윤에게 먼저 보여 주고 그가 어떻게 할지 고르게 한다",
+        label: "한서윤에게 먼저 보여 주고 어떻게 할지 맡긴다",
         effect: { trust: 12, legitimacy: 7, capital: -7, humanCost: -7, fatigue: 8 },
         voice: "반려와 폐기가 다르다는 걸 본인이 먼저 알아야 한다며, 한서윤에게 먼저 보여 주고 어떻게 할지 고르게 한다.",
         echo: "먼저 보여 주니 한서윤이 두 시각을 오래 봅니다. 3년 동안 자기가 지웠다고 믿어 온 것이 반려까지였다는 것을 처음 압니다.",
@@ -679,8 +679,8 @@ export const case11 = {
   memoryPlan: {
     systemNext: "c11_route_system",
     evidenceNext: "c11_evidence_turn",
-    systemLabel: "분담표 앞에서 다시 짠 판이 그룹 입장문에 옮겨졌는지 대 본다",
-    evidenceLabel: "사유란의 기본값을 바꾼 부서를 반대 의견서의 폐기 기록에서 찾아본다",
+    systemLabel: "분담표 앞에서 다시 짠 판이 입장문에 옮겨졌는지 본다",
+    evidenceLabel: "사유란의 기본값을 바꾼 부서를 폐기 기록에서 찾는다",
     systemEcho: "대 보면 그룹 입장문은 당신의 판단을 '개인적 판단'이라는 말로 옮겨 적었습니다. 미룰 수 있는 문장을 고르는 법이 그 안에 있습니다.",
     evidenceEcho: "그 부서를 찾아보면 3년 전 승인 시스템의 변경 기록이 열립니다. 반려와 폐기 사이에 시각이 하나 더 찍혀 있습니다.",
   },

@@ -548,7 +548,7 @@ export const case02 = {
     systemNext: "c2_route_system",
     evidenceNext: "c2_evidence_turn",
     routeLabel: "직전 사건의 남은 약속을 이민서에게 먼저 확인한다",
-    systemLabel: "플로우온에서 다시 짠 판이 유출 파일에 복제됐는지 뜯어본다",
+    systemLabel: "플로우온에서 다시 짠 판이 유출 파일에 복제됐는지 본다",
     evidenceLabel: "숨은 급여표의 작성자를 유출 파일의 시각 옆에 세운다",
     routeEcho: "약속부터 확인하면 이민서는 기록보다 먼저 사람으로 불립니다. 보고서의 첫 줄은 그만큼 늦게 채워집니다.",
     systemEcho: "뜯어보면 유출 파일의 한 줄이 플로우온에서 당신이 다시 짠 판과 같은 순서로 적혀 있습니다. 혐의의 주어가 이민서에서 기록을 만든 쪽으로 옮겨 갑니다.",

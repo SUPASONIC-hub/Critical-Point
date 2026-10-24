@@ -677,7 +677,7 @@ export const case07 = {
   memoryPlan: {
     systemNext: "c7_route_system",
     evidenceNext: "c7_evidence_turn",
-    systemLabel: "오진우 곁에서 다시 짠 판이 내 인사 기록에 따라붙었는지 들춘다",
+    systemLabel: "오진우 곁에서 짠 판이 내 인사 기록에 붙었는지 본다",
     evidenceLabel: "거울 프로필의 실험 번호를 발령서 작성일 옆에 적는다",
     systemEcho: "들추면 당신의 인사 기록 비고란에 그때 다시 짠 판이 옮겨져 있습니다. 그 아래로 같은 모양의 발령 기록부가 열립니다.",
     evidenceEcho: "실험 번호를 옆에 적으면 발령서 작성일이 조사 개시일보다 앞에 놓입니다. 순서가 바뀌면 이유와 결과도 자리를 바꿉니다.",

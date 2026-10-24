@@ -824,7 +824,7 @@ export const case05 = {
     systemNext: "c5_route_system",
     evidenceNext: "c5_evidence_turn",
     routeLabel: "직전 사건의 예외 조건을 실패 지도에 겹쳐 본다",
-    systemLabel: "온새에서 다시 짠 판이 복구 우선순위표에 섞였는지 살펴본다",
+    systemLabel: "온새에서 다시 짠 판이 복구 우선순위표에 섞였는지 본다",
     evidenceLabel: "예외 파일에 되풀이된 이름을 복구 순번표에서 찾는다",
     routeEcho: "겹쳐 보면 온새의 예외 조건이 실패 지도의 화살표 하나와 같은 자리에 놓입니다. 누구의 단독 결정도 아닌 칸입니다.",
     systemEcho: "살펴보면 복구 우선순위표의 한 줄이 당신이 다시 짠 판과 같은 순서입니다. 그 아래에서 가중치 설계 파일이 함께 열립니다.",

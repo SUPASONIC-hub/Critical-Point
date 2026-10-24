@@ -153,7 +153,7 @@ const case48Nodes = {
       },
       {
         id: "c48_engine_report",
-        label: "2023-0412의 결과 우수 표시를 공식 오류로 신고한다",
+        label: "2023-0412 결과 우수를 공식 오류로 신고한다",
         effect: { legitimacy: 12, time: -5, trust: -2, humanCost: 3, fatigue: 4 },
         voice: "무너진 대출이 성공으로 남아 있어선 안 돼서, 2023-0412의 결과 우수 표시를 공식 오류로 신고한다.",
         echo: "신고서는 접수 번호를 받습니다. 연휴라 처리 담당자 칸은 비어 있습니다.",
@@ -243,7 +243,7 @@ const case48Nodes = {
       },
       {
         id: "c48_final_condition",
-        label: "제7조 삭제와 보증금 분리를 붙여 조건부 승인에 서명한다",
+        label: "제7조 삭제와 보증금 분리를 붙여 조건부로 서명한다",
         effect: { trust: 9, legitimacy: 8, capital: -5, time: -5, humanCost: -3, fatigue: 5 },
         voice: "월급과 조항을 둘 다 붙들 길이라며, 제7조 삭제와 보증금 분리를 붙여 조건부 승인에 서명한다.",
         echo: "조건부 승인은 조현석이 조건을 받아야 살아납니다. 제7조가 빠진 계약서에 그가 서명할지는 10시에 알게 됩니다.",
@@ -288,7 +288,7 @@ export const case48 = {
       choices: [
         {
           id: "c48_after_warm",
-          label: "송편을 들고 동료들과 헌책방에서 막차가 끊길 때까지 남는다",
+          label: "송편을 들고 동료들과 헌책방에서 막차까지 남는다",
           effect: { trust: 12, humanCost: -6, time: -4, capital: -1, fatigue: -7 },
           voice: "20시간을 같이 샌 사람들과 헤어지기 아쉬워서, 송편을 들고 동료들과 헌책방에서 막차가 끊길 때까지 남는다.",
           echo: "헌책방 불이 막차 시간을 넘겨서까지 켜져 있습니다. 서류 얘기는 한 줄도 나오지 않고, 송편 접시만 세 번 비워집니다. 탁자 가운데에는 임소율이 들고 온 임경수의 서명 연습장과 만년필이 놓여 있습니다.",
@@ -297,7 +297,7 @@ export const case48 = {
         },
         {
           id: "c48_after_record",
-          label: "심사위원회 결론과 내 의견을 다음 심사에도 남도록 문서로 접수한다",
+          label: "위원회 결론과 내 의견을 문서로 다음 심사에 남긴다",
           effect: { legitimacy: 14, trust: 4, time: -5, capital: -3, humanCost: -1, fatigue: 5 },
           voice: "오늘의 칸을 다음 위원도 읽을 수 있도록, 심사위원회 결론과 내 의견을 문서로 접수해 다음 심사에도 남긴다.",
           echo: "접수된 문서는 누구든 찾아볼 수 있습니다. 누구든이라는 말에는, 읽을 권한이 없어야 할 사람도 들어갑니다.",
@@ -306,7 +306,7 @@ export const case48 = {
         },
         {
           id: "c48_after_rush",
-          label: "곧장 사무실로 돌아가 윤상혁 시절의 승인 문서를 다시 넘긴다",
+          label: "곧장 사무실로 가 윤상혁 시절 승인 문서를 다시 넘긴다",
           effect: { capital: 7, legitimacy: 4, trust: -6, humanCost: 4, fatigue: 5 },
           voice: "그 사람이 의사록을 읽기 전에 먼저 알아 두려고, 곧장 사무실로 돌아가 윤상혁 시절의 승인 문서를 다시 넘긴다.",
           echo: "불 꺼진 층에서 문서를 넘기는 동안 단체방의 송편 사진이 쌓입니다. 출입문 기록기는 당신이 들어간 시각을 조용히 적습니다.",
@@ -393,7 +393,7 @@ export const case48 = {
           echo: "솔직히 알리자 민하랑이 한참 말이 없습니다. 그리고 라이더 단체방에 올릴 문장을 세 번 지웠다 씁니다.",
         },
         {
-          label: "투자 조건 전문과 부속 합의서를 위원회에 내라고 요구한다",
+          label: "투자 조건 전문과 부속 합의서를 위원회에 내라고 한다",
           effect: { legitimacy: 10, trust: 2, capital: -3, time: -5, humanCost: 3, fatigue: 4 },
           cognition: { inference: 1 },
           voice: "전화 한 통에 떠밀려 서명할 수는 없다며, 투자 조건 전문과 부속 합의서를 위원회에 내라고 요구한다.",
@@ -513,7 +513,7 @@ export const case48 = {
       choices: [
         {
           id: "c48_branch_riders_a",
-          label: "보증금을 따로 떼어 맡겨 두는 조건을 대출에 넣자고 한다",
+          label: "보증금을 따로 맡겨 두는 조건을 대출에 넣자고 한다",
           effect: { trust: 11, legitimacy: 5, capital: -6, time: -5, fatigue: 5 },
           voice: "회사가 무너져도 200만 원은 돌아가게, 보증금을 따로 떼어 맡겨 두는 조건을 대출에 넣자고 한다.",
           echo: "조건이 붙자 보증금 27억은 회사가 쓸 수 없는 돈이 됩니다. 라운드힐이 싫어할 조건입니다.",
@@ -625,7 +625,7 @@ export const case48 = {
     finalChoices: [
       {
         id: "a",
-        label: "빈칸이 하나라도 생기면 안건이 자동으로 멈추는 규칙을 만든다",
+        label: "빈칸이 하나라도 있으면 안건이 멈추는 규칙을 만든다",
         effect: { legitimacy: 13, trust: 6, capital: -7, humanCost: 3, fatigue: 7 },
         voice: "빈칸 있는 안건이 네 배 자주 무너졌으니, 빈칸이 하나라도 생기면 안건이 자동으로 멈추는 규칙을 만든다.",
         echo: "자동으로 멈추는 규칙은 빈칸을 없앱니다. 대신 한 사람의 결석으로 급한 대출도 멈춥니다.",
@@ -693,8 +693,8 @@ export const case48 = {
   memoryPlan: {
     systemNext: "c48_route_system",
     evidenceNext: "c48_evidence_turn",
-    systemLabel: "떡방에서 짠 판이 이번 서명지 칸 어딘가에 남았는지 본다",
-    evidenceLabel: "남는 22억이 가려던 곳을 투자 계약서의 목차에 없는 쪽과 견주어 읽는다",
+    systemLabel: "떡방에서 짠 판이 이번 서명지 칸에 남았는지 본다",
+    evidenceLabel: "22억이 가려던 곳을 계약서 목차 밖의 쪽과 견준다",
     systemEcho: "서명지에는 칸이 다섯 개뿐이고, 판이 들어갈 칸은 따로 없습니다. 에코가 그 다섯 칸이 10년 동안 어떻게 채워졌는지 셉니다.",
     evidenceEcho: "견주어 읽으면 돈이 남는 자리에는 늘 먼저 정해진 주인이 있습니다. 계약서 맨 뒤에 목차에 없는 두 쪽이 붙어 있습니다.",
   },
@@ -717,7 +717,7 @@ export const case48 = {
       echo: "송편을 든 은행 사람 둘이 다크스토어에 들어서자 라이더들이 먼저 웃습니다. 심사하러 온 사람처럼 보이지 않는 것도 비용입니다.",
     },
     c48_start_record: {
-      label: "2023-0412 계약서 원본을 꺼내 제7조 옆에 나란히 놓는다",
+      label: "2023-0412 원본을 제7조 옆에 나란히 놓는다",
       effect: { legitimacy: 12, trust: -3, time: -6, capital: -2, humanCost: 2, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "기억이 아니라 종이로 견줘야 한다며, 2023-0412 계약서 원본을 꺼내 제7조 옆에 나란히 놓는다.",
