@@ -47,7 +47,18 @@ list of the files it touched.
   프롤로그 01 on a line answering the last verdict (the run's `echo`, drawn by
   `WeekRulePanel.jsx`), the finale compares the two endings, and every case
   summary of such a season carries `newGamePlus: true`. Same ranking, no
-  server change, no save version.
+  server change, no save version. Three more device keys ride on the same
+  rule, written when a finale closes and kept through a reset, never in the
+  cloud save: the season record's `endingsSeen`/`verdictsSeen`, the ending
+  collection folded on the intro's memory panel (E-3, `src/state/endingBook.js`);
+  `critical-point-seen-scenes-v1`, the scenes the seasons before read, folded
+  on a NEW GAME+ briefing unless 읽은 장면 접기 is off (E-1,
+  `src/state/seenScenes.js`); and `critical-point-past-picks-v1`, the card
+  the last season picked last in each scene (forced cards left out, a case
+  whose scenes or cards changed reads as empty), tagged 「지난 시즌의 당신」 on
+  the briefing's cards and the hand's (B-14(1), `src/state/pastPicks.js`,
+  drawn by `WeekRulePanel.jsx`'s `pastPick`). The tag is display only:
+  nothing the commit, the clock, the log or a ranking row reads changes.
 - The hand's skill is the logic streak (priority 38). Nothing on the table is
   timed against the heartbeat: the beat key, its ring and its grades left on
   2026-10-10, and both rankings were reset for it on 2026-10-11 (priority 70).
@@ -212,9 +223,10 @@ Still open, on purpose:
   구좌」, 도윤하's portrait to match the text, a 직전 판 line on the last-table
   reaction), then cleanup #268, #281 (off the table the music pills scroll with
   the page on a phone) and these docs. Production runs `71f7ad2`.
-- Drafts still open on 2026-10-23: F1 phase 3 (#233, #240), the ending
-  collection (#274), Vite 8 (#225), and two designs not yet built (e3, and
-  B-14 "you, last season", seven answers all option 1, built the next day).
+- Drafts still open on 2026-10-23: F1 phase 3 (#233, #240, merged
+  2026-10-24), the ending collection (#274), Vite 8 (#225), and B-14 "you,
+  last season" (seven answers all option 1). The last two of those became
+  bundle D (#278, E-3 and B-14(1) on main 90247c0) on 2026-10-24.
   The rules-mark-3 pull request (#224: RULES_MARK 3, the season score as a
   mean over its cases with the change of view counted over the whole season,
   ranking reset v10) and personal bests (#253) go out in one deploy on
