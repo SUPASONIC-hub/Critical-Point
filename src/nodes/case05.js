@@ -8,6 +8,8 @@
  * villain here -- but now the player can see the room the villain was in, three
  * years earlier, and that the reviewer who signed the weighting table is the man
  * in the next chair.
+ *
+ * Act 1's one-emotion case: anger, no laughter (docs/writing-a-case.md 10장).
  */
 const case05Nodes = {
   c5_start: {

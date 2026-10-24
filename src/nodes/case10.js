@@ -22,6 +22,8 @@
  * the second keeps it alive and drops everyone the rules were not written for.
  * That trade is the case, and the last scene refuses to resolve it: 도윤하 comes
  * back, opens a new notebook, and starts writing the dropped names down again.
+ *
+ * Act 2's one-emotion case: exhaustion (docs/writing-a-case.md 10장).
  */
 const case10Nodes = {
   c10_start: {

@@ -17,10 +17,14 @@
  * from his guestbook turns out to be choice #0001 of the lab's template library
  * -- the button the team pressed every day. The joy is the first time the team
  * travels instead of deploying (a tangerine harvest before a cold snap), the
- * comedy is 권도현 pricing the harvest until the farmer tells him not to pick,
- * the grief is a man on a breakwater who thought he broke because he was weak,
+ * one dry line is the farmer telling 권도현, who starts to price the harvest
+ * under his breath, not to pick -- and he fills another container instead; the
+ * grief is a man on a breakwater who thought he broke because he was weak,
  * and the anger is the note that turned the pressure up. The last question is
  * not whether he should know but who gets to decide when.
+ *
+ * Act 4's one-emotion case: quiet sorrow, no laughter at a price
+ * (docs/writing-a-case.md 10장).
  */
 const case21Nodes = {
   c21_start: {
@@ -122,7 +126,7 @@ const case21Nodes = {
     title: "그럼 따지 마세요",
     speaker: "고은비",
     text:
-      "옆집 감귤밭 주인 고은비가 트럭 짐칸에 빈 컨테이너 40개를 싣고 옵니다. 밤부터 한파가 온다는 예보에 남은 귤 3톤을 오늘 안에 따야 합니다. 은행 사람 손은 안 빌린다던 고은비가 선우진의 부탁에 가위를 여섯 개 내밉니다. 강태민은 20킬로그램짜리 컨테이너를 혼자 다 나르다 '저분은 내일도 와요'라는 말을 듣고, 나준혁은 30년 도장 솜씨로 꼭지를 한 번에 잘라 칭찬을 독차지합니다. 권도현이 '시간당 1만 1천 원으로 치면 1킬로그램당 인건비가...' 하자 고은비가 가위를 멈춥니다. '그럼 따지 마세요.' 모두가 웃는 사이 고은비가 당신 옆으로 옵니다. '우진 씨, 처음 왔을 때 석 달 동안 말 한 마디 없이 귤만 땄어요. 그 편지, 지붕 고칠 돈이라고 좋아하던데. 그거 좋은 돈 맞아요?'",
+      "옆집 감귤밭 주인 고은비가 트럭 짐칸에 빈 컨테이너 40개를 싣고 옵니다. 밤부터 한파가 온다는 예보에 남은 귤 3톤을 오늘 안에 따야 합니다. 은행 사람 손은 안 빌린다던 고은비가 선우진의 부탁에 가위를 여섯 개 내밉니다. 강태민은 20킬로그램짜리 컨테이너를 혼자 다 나르다 '저분은 내일도 와요'라는 말을 듣고, 나준혁은 30년 도장 솜씨로 꼭지를 한 번에 잘라 칭찬을 독차지합니다. 권도현이 가위를 쥔 채 입속으로 무언가 셈하자 고은비가 가위를 멈춥니다. '그럼 따지 마세요.' 권도현은 셈을 그만두고, 말없이 컨테이너 하나를 더 채웁니다. 그사이 고은비가 당신 옆으로 옵니다. '우진 씨, 처음 왔을 때 석 달 동안 말 한 마디 없이 귤만 땄어요. 그 편지, 지붕 고칠 돈이라고 좋아하던데. 그거 좋은 돈 맞아요?'",
     memo: [
       "남은 귤 3톤 -- 오늘 밤 한파 전까지",
       "컨테이너 40개, 일손 여덟 명",

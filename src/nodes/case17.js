@@ -18,8 +18,9 @@
  * comes back aimed at the auditor himself.
  *
  * The laughter is 반재욱 in a navy coat shaking a sauce tub so earnestly that
- * customers take him for the new part-timer, his daughter 반서아 rating every
- * name with star stickers, and 권도현 billing a bowl of 짬뽕 to "investigation".
+ * customers take him for the new part-timer, and his daughter 반서아 rating every
+ * name with star stickers; 권도현, who prices everything, puts his pen down at
+ * the one line he cannot price.
  * The anger is the retitled list and a footnote that counts silence as consent;
  * the sorrow is a closed office in 문래동 and a diary line that says "tell them
  * it wasn't me". The joy is 정태오 telling 반재욱 that the notebook was the one
@@ -348,8 +349,8 @@ export const case17 = {
       next: "c17_legal",
       title: "결번",
       speaker: "권도현",
-      text: "트리거랩 탕비실 화이트보드에 권도현이 표를 그립니다. 47명 중 만난 사람 29명, 그중 제출 반대 17명, 상관없다 12명. 만남을 거절한 사람 7명, 아직 찾아가지 못한 사람 7명, 연락이 닿지 않는 사람 3명, 세상을 떠난 사람 1명. 강태민이 컵라면 두 개를 들고 와 하나를 반재욱 앞에 놓습니다. 권도현이 세 사람의 칸을 펜으로 두드립니다. '한 명은 번호가 중국집으로 바뀌었고, 한 명은 해외로 나갔고, 한 명은 주소지에 아무도 안 삽니다.' 그가 잠깐 멈춥니다. '중국집에 짬뽕을 하나 시켰습니다. 사장님이 전 주인을 기억하더군요. 짬뽕값 9천 원은 조사비로 올리겠습니다.'",
-      memo: ["만남 29명: 제출 반대 17, 상관없음 12", "만남 거절 7명, 못 찾아감 7명, 연락 불가 3명, 사망 1명", "짬뽕 9,000원 -- 권도현 장부 '조사비'"],
+      text: "트리거랩 탕비실 화이트보드에 권도현이 표를 그립니다. 47명 중 만난 사람 29명, 그중 제출 반대 17명, 상관없다 12명. 만남을 거절한 사람 7명, 아직 찾아가지 못한 사람 7명, 연락이 닿지 않는 사람 3명, 세상을 떠난 사람 1명. 강태민이 컵라면 두 개를 들고 와 하나를 반재욱 앞에 놓습니다. 권도현이 세 사람의 칸을 펜으로 두드립니다. '한 명은 번호가 중국집으로 바뀌었고, 한 명은 해외로 나갔고, 한 명은 주소지에 아무도 안 삽니다.' 그가 잠깐 멈춥니다. '중국집 사장님이 전 주인을 기억했습니다. 가게를 넘길 때 간판값을 한 푼도 못 받았답니다.' 그가 펜을 내려놓습니다. '이 칸은 제가 값을 못 매기겠습니다.'",
+      memo: ["만남 29명: 제출 반대 17, 상관없음 12", "만남 거절 7명, 못 찾아감 7명, 연락 불가 3명, 사망 1명", "중국집 사장님: 전 주인은 간판값도 못 받고 가게를 넘김"],
       choices: [
         {
           label: "중국집 사장님이 기억한 단서로 한 명이라도 더 찾는다",

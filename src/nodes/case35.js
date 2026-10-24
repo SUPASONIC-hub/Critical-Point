@@ -11,8 +11,8 @@
  *
  * The case is the season's plainest test of the game's claim that feeling
  * steers intelligence. Everyone carries sandbags; the comedy is 권도현 in the
- * only boots left at the market hardware store (pink, floral, 240mm, "이 장화는
- * 흑자입니다"). The grief is technicians wiping mud off a machine their dead boss
+ * only boots left at the market hardware store (pink, floral, 240mm), who takes
+ * out his calculator and puts it back: "계산은 물 빠지고 하겠습니다". The grief is technicians wiping mud off a machine their dead boss
  * bought while an insurance adjuster asks them not to touch it until her survey
  * is done, and a line in 문성호's handwriting under the mud: "끝까지 돌 것". The
  * anger is 노아 again: the emergency flood loans the bank created for exactly
@@ -84,7 +84,7 @@ const case35Nodes = {
     title: "분홍 꽃장화",
     speaker: "안기범",
     text:
-      "망원시장 아케이드 지붕을 때리는 빗소리에 말소리가 묻힙니다. 상인회 총무 안기범이 휴대폰 라이브 방송을 켠 채 외칩니다. '모래주머니 300개 왔습니다! 손 있는 분은 떡방 골목으로요!' 강태민이 두 개씩 어깨에 메고 뛰고, 퇴근길에 달려온 권도현은 시장 철물점에 남은 마지막 장화를 신었습니다. 분홍 꽃무늬, 240mm입니다. 그가 발가락을 접은 채 계산기를 꺼냅니다. '장화 1만 2천 원, 젖을 뻔한 구두 38만 원. 이 장화는 흑자입니다.' 웃음이 번지는 것도 잠깐, 안기범이 젖은 시장 지도를 폅니다. 300개로는 한 곳만 막을 수 있습니다. 어르신 가게가 몰린 가장 낮은 골목, 시장 전체 냉장고의 전기가 모인 지하 전기실, 큰길 쪽 가게 20곳이 늘어선 입구. 물은 10분에 한 뼘씩 오릅니다.",
+      "망원시장 아케이드 지붕을 때리는 빗소리에 말소리가 묻힙니다. 상인회 총무 안기범이 휴대폰 라이브 방송을 켠 채 외칩니다. '모래주머니 300개 왔습니다! 손 있는 분은 떡방 골목으로요!' 강태민이 두 개씩 어깨에 메고 뛰고, 퇴근길에 달려온 권도현은 시장 철물점에 남은 마지막 장화를 신었습니다. 분홍 꽃무늬, 240mm입니다. 그가 발가락을 접은 채 계산기를 꺼냈다가 도로 넣습니다. '계산은 물 빠지고 하겠습니다.' 그 말에 몇 사람이 웃는 것도 잠깐, 안기범이 젖은 시장 지도를 폅니다. 300개로는 한 곳만 막을 수 있습니다. 어르신 가게가 몰린 가장 낮은 골목, 시장 전체 냉장고의 전기가 모인 지하 전기실, 큰길 쪽 가게 20곳이 늘어선 입구. 물은 10분에 한 뼘씩 오릅니다.",
     memo: [
       "모래주머니 300개 -- 한 구역만 막을 수 있음",
       "가장 낮은 골목: 어르신 가게 11곳, 가을떡방 포함",

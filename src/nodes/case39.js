@@ -15,9 +15,10 @@
  * 공병만, the executive producer, cut twelve minutes eleven years ago and kept
  * the tape; 엄동균 edits on energy drinks and file names ending in "진짜최종";
  * 은시온 sells the thirty-second slots and was hired on a 핏스코어 score. The
- * emotional range is deliberate: anger at a cut nobody ordered, laughter when
- * the newsroom cat 정정 walks across the keyboard and becomes the first name in
- * three years to fill the approver box of 2023-0412, grief when 문가을 sees her
+ * emotional range is deliberate: anger at a cut nobody ordered, a silence
+ * nobody laughs into when the newsroom cat 정정 walks across the keyboard and
+ * becomes the first name in three years to fill the approver box of 2023-0412
+ * (the empty box is the season's spine, so it is not a joke), grief when 문가을 sees her
  * husband move on a monitor for the first time since the funeral, and joy when
  * the interviewees watch the broadcast together. The evidence turn finds who
  * wrote the note: the chairman's office, from the copy the station sent for
@@ -169,7 +170,7 @@ const case39Nodes = {
     title: "승인자: 정정",
     speaker: "엄동균",
     text:
-      "리드라인 편집국 에어컨이 열대야에 손을 들어서, 서하린은 명예 기자증을 건 고양이 정정을 이동장에 넣어 데려왔습니다. 모두가 눈을 붙인 10분 사이, 정정이 편집 키보드를 천천히 가로지릅니다. 깨어 보니 3부 마지막 장면, 2023-0412 대출 승인서 위의 자막이 '승인자: (공란)'에서 '승인자: 정정ㅓㅓㅓㅓ'로 바뀌어 있습니다. 엄동균이 소파에서 굴러떨어집니다. '3년 만에 처음으로 서명한 사람이 나왔네요.' 권도현이 안경을 고쳐 씁니다. '고양이 서명은 효력이 없습니다. 방금 찾아봤습니다.' 강태민은 말없이 정정을 들어 무릎에 올립니다. 웃음이 가라앉자 서하린이 휴대폰을 내밉니다. 방송국 심의(방송 내용이 법과 규정에 맞는지 따지는 절차) 담당의 메일입니다. '공란 표기는 은폐를 암시함. 승인 경위는 수사 중으로 수정 요망.'",
+      "리드라인 편집국 에어컨이 열대야에 손을 들어서, 서하린은 명예 기자증을 건 고양이 정정을 이동장에 넣어 데려왔습니다. 모두가 눈을 붙인 10분 사이, 정정이 편집 키보드를 천천히 가로지릅니다. 깨어 보니 3부 마지막 장면, 2023-0412 대출 승인서 위의 자막이 '승인자: (공란)'에서 '승인자: 정정ㅓㅓㅓㅓ'로 바뀌어 있습니다. 엄동균이 자막을 되돌리려다 손을 멈춥니다. '3년 동안 이 칸에 뭐라도 들어간 건 이게 처음이네요.' 아무도 웃지 않습니다. 강태민이 말없이 정정을 들어 무릎에 올립니다. 그 침묵 끝에 서하린이 휴대폰을 내밉니다. 방송국 심의(방송 내용이 법과 규정에 맞는지 따지는 절차) 담당의 메일입니다. '공란 표기는 은폐를 암시함. 승인 경위는 수사 중으로 수정 요망.'",
     memo: [
       "정정의 수정: '승인자: (공란)' → '승인자: 정정ㅓㅓㅓㅓ'",
       "심의 담당 요청: '승인 경위는 수사 중'으로 수정",

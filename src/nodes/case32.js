@@ -12,11 +12,13 @@
  * ago the signature box was empty. This time there is a name in it that the
  * analyst never wrote.
  *
- * The laughter is 강태민 at the loading dock, stopped from carrying evidence,
- * setting a box down like a sleeping child and then counting the truck better
- * than the investigator who numbered it; 나은호 eating 김밥 through an
- * interrogation and missing the bin; 권도현 pricing the raid per box and
- * finding, for the first time, an investigation that turns a profit. The anger
+ * Act 6's one-emotion case: anger and fear, no laughter
+ * (docs/writing-a-case.md 10장). 강태민 at the loading dock, stopped from
+ * carrying evidence, puts the box down, folds his hands behind his back and
+ * then counts the truck better than the investigator who numbered it; 나은호
+ * eats 김밥 through an interrogation and misses the bin; 권도현 starts pricing
+ * the raid per box and stops, because the back of his sheet is a questionnaire
+ * about the analyst. The anger
  * is a stack of lab boxes stickered for shredding three days out and a box 27
  * that left the building two days before anyone was supposed to know. The
  * sorrow is 반재욱's notebook going into an evidence bag with his daughter's
@@ -317,7 +319,7 @@ export const case32 = {
       next: "c32_room",
       title: "26번이 두 개",
       speaker: "강태민",
-      text: "정오 무렵 본사 지하 주차장 하역장에 검찰 트럭 두 대가 서 있습니다. 야간조를 마치고 뉴스를 보자마자 왔다는 강태민이 컵라면 봉지를 든 채 서 있습니다. 수사관 하나가 상자 셋을 한꺼번에 들다 휘청이자, 강태민이 반사적으로 손을 뻗어 받칩니다. '선생님, 그거 증거물입니다. 손 떼세요.' 강태민이 상자를 잠든 아기 내려놓듯 바닥에 놓고 두 손을 등 뒤로 모읍니다. 그러고는 트럭 안을 한참 보다가 말합니다. '26번이 두 개예요. 하나는 27번 자리에 있어야 되는데.' 번호표를 붙인 수사관 진태윤이 목록을 넘기다 얼굴이 굳습니다. 27번 상자는 목록에만 있고 트럭에는 없습니다.",
+      text: "정오 무렵 본사 지하 주차장 하역장에 검찰 트럭 두 대가 서 있습니다. 야간조를 마치고 뉴스를 보자마자 왔다는 강태민이 컵라면 봉지를 든 채 서 있습니다. 수사관 하나가 상자 셋을 한꺼번에 들다 휘청이자, 강태민이 반사적으로 손을 뻗어 받칩니다. '선생님, 그거 증거물입니다. 손 떼세요.' 강태민이 상자를 바닥에 놓고 두 손을 등 뒤로 모읍니다. 그러고는 트럭 안을 한참 보다가 말합니다. '26번이 두 개예요. 하나는 27번 자리에 있어야 되는데.' 번호표를 붙인 수사관 진태윤이 목록을 넘기다 얼굴이 굳습니다. 27번 상자는 목록에만 있고 트럭에는 없습니다.",
       memo: ["검찰 트럭 2대 -- 상자 58개 적재", "26번 상자 중복, 27번 상자 없음", "강태민: 야간조 상하차 14년"],
       choices: [
         {
@@ -344,9 +346,9 @@ export const case32 = {
       id: "c32_invoice",
       after: "c32_room",
       next: "c32_notebook",
-      title: "흑자인 수사",
+      title: "질문지 22개",
       speaker: "권도현",
-      text: "조사가 잠깐 멈춘 사이 복도 의자에 권도현이 앉아 있습니다. 브릿지은행이 라운드힐에 인수 자금을 빌려준 터라 그도 증언하러 불려 왔습니다. 무릎 위 종이에는 벌써 세로줄이 그어져 있습니다. '상자 58개, 수사관 11명, 포렌식(지워진 파일까지 되살려 들여다보는 분석)까지 넣으면 오늘 하루에 세금이 대략 이천사백만 원 듭니다.' 그가 볼펜을 멈춥니다. '해온파트너스로 12번 나간 자문료(조언값이라며 내보낸 돈)에 비하면, 이 가격이면 적자는 아니네요. 흑자인 수사는 처음 봅니다.' 그가 종이를 뒤집습니다. 뒷면은 그가 받은 질문지입니다. 질문 22개 중 18개가 당신에 관한 것입니다.",
+      text: "조사가 잠깐 멈춘 사이 복도 의자에 권도현이 앉아 있습니다. 브릿지은행이 라운드힐에 인수 자금을 빌려준 터라 그도 증언하러 불려 왔습니다. 무릎 위 종이에는 벌써 세로줄이 그어져 있습니다. '상자 58개, 수사관 11명, 포렌식(지워진 파일까지 되살려 들여다보는 분석)까지 넣으면 오늘 하루에 세금이 대략 이천사백만 원 듭니다.' 그가 볼펜을 멈춥니다. '오늘은 계산서를 안 쓰겠습니다.' 그가 종이를 뒤집습니다. 뒷면은 그가 받은 질문지입니다. 질문 22개 중 18개가 당신에 관한 것입니다. '이 질문지는 값을 매길 수가 없네요.'",
       memo: ["오늘 수사 비용 추산 -- 약 2,400만 원", "권도현 질문지 22개 중 18개가 당신에 관한 것", "권도현: 라운드힐에 인수 자금을 빌려준 은행 소속"],
       choices: [
         {
@@ -439,8 +441,8 @@ export const case32 = {
       next: "c32_notebook",
       title: "빗나간 은박지",
       speaker: "나은호",
-      text: "나은호가 복도로 나와 둘을 봅니다. 손에는 김밥 은박지가 공처럼 뭉쳐 있습니다. '증언하러 온 두 분이 복도에서 질문지를 돌려 보시면, 제가 조서에 뭐라고 적어야 할까요.' 그가 은박지를 쓰레기통에 던지고, 빗나갑니다. 줍지 않습니다. '솔직하게 말할게요. 저는 반대 의견 쓴 사람 별로 안 좋아해요. 다들 쓰고 나서 지하로 내려가 3년을 가만히 있거든요. 그 3년 동안 윤상혁 같은 사람은 상자를 비우고요.' 그가 권도현의 종이를 턱으로 가리킵니다. '저 흑자 계산, 맞아요. 근데 그 흑자는 누가 기소(죄가 있다고 보고 재판에 넘기는 것)되느냐에 달렸죠.'",
-      memo: ["나은호: '반대 의견 쓴 사람, 별로 안 좋아해요'", "흑자는 누가 재판에 넘겨지느냐에 달렸다"],
+      text: "나은호가 복도로 나와 둘을 봅니다. 손에는 김밥 은박지가 공처럼 뭉쳐 있습니다. '증언하러 온 두 분이 복도에서 질문지를 돌려 보시면, 제가 조서에 뭐라고 적어야 할까요.' 그가 은박지를 쓰레기통에 던지고, 빗나갑니다. 줍지 않습니다. '솔직하게 말할게요. 저는 반대 의견 쓴 사람 별로 안 좋아해요. 다들 쓰고 나서 지하로 내려가 3년을 가만히 있거든요. 그 3년 동안 윤상혁 같은 사람은 상자를 비우고요.' 그가 권도현의 종이를 턱으로 가리킵니다. '계산 멈추신 거, 맞아요. 그 값은 누가 기소(죄가 있다고 보고 재판에 넘기는 것)되느냐에 달렸으니까요.'",
+      memo: ["나은호: '반대 의견 쓴 사람, 별로 안 좋아해요'", "누가 재판에 넘겨지느냐는 아직 정해지지 않음"],
       choices: [
         {
           label: "3년 동안 가만히 있지 않았다고 동료들 이름을 대며 말한다",
