@@ -30,6 +30,7 @@ const { SAVE_SCHEMA_VERSION } = await import("../../src/appConfig.js");
 const { initialResources, triggerLabels, cognitionLabels, caseOpeningRoutes, nodeOrders } = await import("../../src/gameData.js");
 const { makeEmptyScores } = await import("../../src/gameLogic.js");
 const { RUN_INITIAL_STATE, serializeRunState } = await import("../../src/gauntlet/gauntletEngine.js");
+const { SEASON_ENTRY_CASE } = await import("../../src/gameCases.js");
 
 after(() => {
   restoreGlobals();
@@ -123,10 +124,13 @@ test("a new game begun with NEW GAME+", async () => {
   pin("newGame/new-game-plus", harness);
   assert.equal(harness.run.gauntletRun.veteran, true);
   assert.equal(harness.saved().dynamics.veteran, true);
-  const { veteran: _mark, ...unmarked } = harness.saved().dynamics;
-  const { veteran: plainMark, ...plainStart } = pinned["newGame/over-a-run"]?.saved.dynamics ?? recorded["newGame/over-a-run"].saved.dynamics;
+  const { veteran: _mark, open: markedOpen, ...unmarked } = harness.saved().dynamics;
+  const { veteran: plainMark, open: plainOpen, ...plainStart } = pinned["newGame/over-a-run"]?.saved.dynamics ?? recorded["newGame/over-a-run"].saved.dynamics;
   assert.equal(plainMark, false);
   assert.deepEqual(plain(unmarked), plainStart, "nothing else about the table differs");
+  // The opening snapshot (S3) carries the mark too, and nothing else differs in it.
+  assert.equal(markedOpen.veteran, true);
+  assert.deepEqual(plain({ ...markedOpen, veteran: false }), plainOpen);
 });
 
 // What NEW GAME+ carries is the story, not the table (NEWGAMEPLUS 설계안 3절):
@@ -175,9 +179,12 @@ test("a NEW GAME+ after the finale takes nothing of the last season's table: no 
   // The audit is counted from the case's log (countAudit), and a new game's log is empty.
   assert.deepEqual(harness.run.log, []);
   const { veteran: _mark, ...fresh } = plain(serializeRunState(RUN_INITIAL_STATE));
-  const { veteran: _carried, weekRule: _week, story: _story, ...opened } = plain(harness.saved().dynamics);
-  const { weekRule: _w, story: _s, ...expected } = fresh;
-  assert.deepEqual(opened, expected, "the table is a first season's, but for the NEW GAME+ mark and the week's rule");
+  const { veteran: _carried, weekRule: _week, story: _story, open, ...opened } = plain(harness.saved().dynamics);
+  const { weekRule: _w, story: _s, open: _o, ...expected } = fresh;
+  assert.deepEqual(opened, expected, "the table is a first season's, but for the NEW GAME+ mark, the week's rule and the opening snapshot");
+  // The opening snapshot (F1 phase 3, S3) is the new season's first case, on an empty table.
+  assert.equal(open?.caseId, SEASON_ENTRY_CASE);
+  assert.deepEqual([open.vault, open.relics, open.linksIn], [0, [], []]);
 });
 
 test("the start button's click event is a plain start", async () => {

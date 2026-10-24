@@ -9,21 +9,31 @@ name: Verify Ranking
 # off the live database and work each one out again off the page
 # (scripts/verify-ranking-rows.mjs: the score from the decision log, every
 # window that carries a replay record, a sealed card cashed below its seal, a
-# response time off the window clock). The report goes to the run's Job
-# Summary, each run named by its public tag only. The rows go to a file in the
-# runner that is never printed and is removed at the end.
+# response time off the window clock) and, since F1 phase 3 (S6), chain each
+# run's case rows (src/chainRecheck.js: each case's decisions, and the run's
+# counters from one case to the next; a case with no opening snapshot is
+# counted as not checked). The report goes to the run's Job Summary, each run
+# named by its public tag only. The rows go to files in the runner that are
+# never printed and are removed at the end.
+#
+# The read is split (서버검증-설계안.md, S6): one query lists the top runs
+# (run ids only), then one query per run brings that run's rows (up to 55 case
+# rows with their logs), so no Management API answer holds more than one run.
+# The run ids go from runs.json into each query's file and are never printed.
 #
 # Then it writes what it found: one statement (verify-ranking-rows --marks-sql)
 # calls ranking_set_recheck_marks for every run it checked, with the marks the
 # run earned and none for a run that earned none, so a mark the run no longer
-# earns is taken off. The marks sit in `suspicion` beside the insert trigger's;
+# earns is taken off. The function states the four checker marks whole, so the
+# chain's mark (chain-off-log) goes in the same call as phase 2's, from the same
+# run of the checker over the same rows: never a call of its own. The marks sit in `suspicion` beside the insert trigger's;
 # nothing is refused or hidden for them (decision 2 (1)). A run played under
 # other table rules is not checked and not written.
 #
 # The key is the test week's way (test-week.yml): no new secret, the query
 # goes through the Management API with the SUPABASE_ACCESS_TOKEN Migration
-# Drift uses (`supabase db query --linked`, one SELECT that the unit test
-# holds to nothing else). Without the token the run says so and reads nothing.
+# Drift uses (`supabase db query --linked`, each query one SELECT that the unit
+# test holds to nothing else). Without the token the run says so and reads nothing.
 #
 # Once a day at 23:55 KST, after the test week's 23:40 read, and by hand. A
 # run by hand can leave the marks unwritten (`write`: false) to read only.
@@ -74,9 +84,11 @@ jobs:
         if: steps.token.outputs.configured == 'true'
         with:
           browser: none
-      # The rows stay in rows.json. What the CLI said on failure is put
-      # through Migration Drift's redaction before it reaches this public log.
+      # The rows stay in rows/, one file per run. What the CLI said on failure
+      # is put through Migration Drift's redaction before it reaches this
+      # public log.
       - name: Read the ranked runs
+        id: read
         if: steps.token.outputs.configured == 'true'
         shell: bash
         env:
@@ -84,36 +96,55 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           set +e -uo pipefail
-          node scripts/verify-ranking-rows.mjs --sql --limit="$RANKING_LIMIT" > ranking.sql || exit 1
-          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f ranking.sql > rows.json 2> query.err
-          code=$?
-          if [ "$code" -ne 0 ]; then
-            echo "supabase db query exited $code:"
-            node scripts/check-migration-drift.mjs --say-failure rows.json query.err
-            exit 1
+          query() {
+            npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f "$1" > "$2" 2> query.err
+            code=$?
+            if [ "$code" -ne 0 ]; then
+              echo "supabase db query exited $code:"
+              node scripts/check-migration-drift.mjs --say-failure "$2" query.err
+              exit 1
+            fi
+          }
+          started=$SECONDS
+          node scripts/verify-ranking-rows.mjs --runs-sql --limit="$RANKING_LIMIT" > runs.sql || exit 1
+          query runs.sql runs.json
+          runs=$(node scripts/verify-ranking-rows.mjs --run-count runs.json) || exit 1
+          mkdir -p rows
+          for at in $(seq 1 "$runs"); do
+            node scripts/verify-ranking-rows.mjs --run-sql runs.json --at="$at" > run.sql || exit 1
+            query run.sql "rows/$at.json"
+          done
+          rows=0
+          if [ "$runs" -gt 0 ]; then
+            rows=$(node -e 'const fs = require("fs"); let n = 0; for (const f of process.argv.slice(1)) { const r = JSON.parse(fs.readFileSync(f, "utf8")); n += (r.rows ?? r).length; } console.log(n)' rows/*.json)
           fi
-          echo "Read $(node -e 'const r = JSON.parse(require("fs").readFileSync("rows.json", "utf8")); console.log((r.rows ?? r).length)') rows."
+          echo "Read $runs runs, $rows rows, in $((SECONDS - started)) s ($((runs + 1)) queries)." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "runs=$runs" >> "$GITHUB_OUTPUT"
       - name: Write the report
-        if: steps.token.outputs.configured == 'true'
+        if: steps.token.outputs.configured == 'true' && steps.read.outputs.runs != '0'
         shell: bash
         run: |
+          started=$SECONDS
           {
-            echo "### Ranked runs worked out again (top $RANKING_LIMIT)"
+            echo "### Ranked runs worked out again and chained (top $RANKING_LIMIT)"
             echo '```'
-            node scripts/verify-ranking-rows.mjs rows.json --redact
+            node scripts/verify-ranking-rows.mjs rows/*.json --redact
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          echo "Checked in $((SECONDS - started)) s." | tee -a "$GITHUB_STEP_SUMMARY"
       # The statement names run ids, so it is never printed; what the CLI said
       # on failure goes through the same redaction as the read.
       - name: Write the marks
-        if: steps.token.outputs.configured == 'true' && (github.event_name == 'schedule' || inputs.write != 'false')
+        if: steps.token.outputs.configured == 'true' && steps.read.outputs.runs != '0' && (github.event_name == 'schedule' || inputs.write != 'false')
         shell: bash
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           set +e -uo pipefail
-          node scripts/verify-ranking-rows.mjs rows.json --marks-sql > marks.sql || exit 1
+          # One statement for every run, each run's phase 2 and chain marks in
+          # one tuple (ranking_set_recheck_marks drops a checker mark not passed).
+          node scripts/verify-ranking-rows.mjs rows/*.json --marks-sql > marks.sql || exit 1
           if [ ! -s marks.sql ]; then echo "No checked run to write."; exit 0; fi
           npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f marks.sql > marked.json 2> write.err
           code=$?
@@ -125,4 +156,6 @@ jobs:
           echo "Marked $(node -e 'const r = JSON.parse(require("fs").readFileSync("marked.json", "utf8")); console.log((r.rows ?? r)[0]?.marked_rows ?? 0)') ranking rows." | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Remove the rows
         if: always()
-        run: rm -f rows.json query.err ranking.sql marks.sql marked.json write.err
+        run: |
+          rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err
+          if [ -d rows ]; then rmdir rows; fi

@@ -830,6 +830,11 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // next real case. Empty on a table without links.
   linksIn: [],
   linksOut: [],
+  // The case on the table as it opened (`createCaseOpen`, F1 phase 3, S3):
+  // stamped when a case opens, kept through a save, and sent on the case's
+  // row as `dynamics.open` so the server check reads each case's opening
+  // against the close before it. Null for a run saved before it.
+  open: null,
   schema: BASE_SCHEMA,
 });
 
@@ -938,6 +943,7 @@ export function normalizeRunState(value) {
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
   run.schema = normalizeSchema(source.schema);
   run.suspended = normalizeSuspendedWindow(source.suspended, run.windowIndex);
+  run.open = normalizeCaseOpen(source.open);
   return run;
 }
 
@@ -1210,7 +1216,7 @@ function endPractice(run) {
  * `rules` is what the case being opened plays under. A board laid here follows
  * them; a REBOOT board and a draft the run already holds are kept as they are.
  */
-export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
+export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = null, resources = null } = {}) {
   const opened = normalizeRunState(run);
   const current = endPractice(opened);
   const rebooted = current.schema.mutations.includes("reboot");
@@ -1229,7 +1235,9 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
         record: replayOf.pushRecord ?? null,
       }
     : null;
-  return normalizeRunState({
+  // `caseId` and `resources` stamp the opening snapshot (`stampCaseOpen`, S3);
+  // a caller that names no case leaves the run with none.
+  return stampCaseOpen({
     ...current,
     // B2: a real case opens on the links the last one handed on; a replay on
     // none (it holds them above), and a story case lets them lapse.
@@ -1243,7 +1251,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
     schema: rebooted
       ? current.schema
       : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics),
-  });
+  }, { caseId, resources });
 }
 
 /** Builds the next board from what just happened. */
@@ -1631,6 +1639,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     // The closing commit writes what the case hands on (cascadeRisk.js `carryLinksOut`).
     linksIn: current.linksIn,
     linksOut: current.linksOut,
+    // What the case opened on (S3): its row carries it at the close.
+    open: current.open,
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
@@ -1871,5 +1881,93 @@ export function createRunSummary(run) {
     [RULES_MARK_KEY]: RULES_MARK,
     // The server checks that every case row of a run says the same (D1).
     weekRule: state.weekRule,
+  };
+}
+
+/* ------------------------------------------------------- the case-open snapshot */
+
+/**
+ * Server checks, phase 3, piece S3 (F1, 서버검증-설계안.md, question 8 (1)):
+ * what a case opened on, as the run held it the moment the case was opened.
+ * The chain checker (src/chainRecheck.js) reads it on each case row as
+ * `dynamics.open` against the case before's close: the vault, the tools, the
+ * stance mastery, the logic streak and the links a case opens on are the ones
+ * the last case closed on, and the season's first case opens empty. The board
+ * and the opening resources are kept for the settlement's replay (S2), and the
+ * resources are read against the case's first decision.
+ *
+ * It rides on `dynamics`, not on the case summary (which has a 4,096-byte cap
+ * and is copied into `caseResults`). As jsonb text it is at most 0.9 KB in an
+ * honest season and 1.4 KB at the most a run can make (tests/unit/
+ * case-open.test.mjs measures it). A case opened again (left half way and
+ * opened once more) is stamped again: the row's log starts from the second
+ * opening, and the windows of the first lie between the two cases.
+ */
+export const CASE_OPEN_VERSION = 1;
+
+function normalizeOpenResources(value) {
+  if (!isRecord(value)) return null;
+  const entries = Object.entries(value).filter(([key, amount]) => key.length <= 32 && typeof amount === "number" && Number.isFinite(amount));
+  return entries.length ? Object.fromEntries(entries.slice(0, 8)) : null;
+}
+
+/** A stored snapshot read back, or null when it is not one. */
+export function normalizeCaseOpen(value) {
+  if (!isRecord(value) || typeof value.caseId !== "string" || !value.caseId) return null;
+  const count = (key) => Math.max(0, Math.trunc(Number(value[key]) || 0));
+  const vault = count("vault");
+  return {
+    v: CASE_OPEN_VERSION,
+    caseId: value.caseId.slice(0, 32),
+    windowIndex: count("windowIndex"),
+    practiceWindows: count("practiceWindows"),
+    vault,
+    handVault: Math.min(count("handVault"), vault),
+    busts: count("busts"),
+    cashes: count("cashes"),
+    relics: normalizeRelicIds(value.relics),
+    relicOffer: normalizeRelicIds(value.relicOffer, RELIC_OFFER_SIZE),
+    stanceMastery: normalizeStanceMastery(value.stanceMastery),
+    logic: normalizeLogic(value.logic),
+    linksIn: normalizeLinks(value.linksIn),
+    veteran: value.veteran === true,
+    story: value.story === true,
+    practice: value.practice === true,
+    schema: normalizeSchema(value.schema),
+    resources: normalizeOpenResources(value.resources),
+  };
+}
+
+/** The snapshot of `run` as a case opens on it: `caseId` the case, `resources` its opening hand. */
+export function createCaseOpen(run, { caseId, resources = null } = {}) {
+  const state = normalizeRunState(run);
+  return normalizeCaseOpen({ ...state, practice: Boolean(state.practice), caseId, resources });
+}
+
+/**
+ * `run` with the snapshot of the case opening on it, or with none when no case
+ * is named. Every way a case opens goes through this: `openCaseRun` (the intro,
+ * the result page, a replay), and in state/runState.js the season's first case
+ * (NEW GAME and NEW GAME+, the pre-start shell's 시작) and the debug jump.
+ */
+export function stampCaseOpen(run, { caseId = null, resources = null } = {}) {
+  const state = normalizeRunState(run);
+  return { ...state, open: caseId ? createCaseOpen(state, { caseId, resources }) : null };
+}
+
+/**
+ * What a case row's `dynamics` adds to the run summary at a close (S3): the
+ * links the close hands on (`linksOut`), the tools the close is offering
+ * (`relicOffer`, a draft taken before the next case opens), how many of the
+ * run's windows were practice, and the snapshot of the case's own opening.
+ * Not in `createRunSummary`, which the case summary copies (its 4,096 bytes).
+ */
+export function createCaseClose(run) {
+  const state = normalizeRunState(run);
+  return {
+    practiceWindows: state.practiceWindows,
+    relicOffer: [...state.relicOffer],
+    linksOut: state.linksOut.map((link) => ({ ...link })),
+    ...(state.open ? { open: state.open } : null),
   };
 }

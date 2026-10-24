@@ -50,6 +50,46 @@ function containsPrivateTelemetryValue(value, allowedKeys) {
  */
 export { createTelemetryEventId } from "./telemetryEventId.js";
 
+/**
+ * A case row's `dynamics` (F1 phase 3, S3): the run summary, the close's
+ * `linksOut`, `relicOffer` and `practiceWindows`, and the case's opening
+ * snapshot `open`. The server takes 6,144 bytes of it as jsonb text
+ * (20261026000000, which writes `": "` and `", "` where JSON.stringify writes
+ * `:` and `,`), so the page keeps it to 4,096 bytes as JSON.stringify counts:
+ * an honest row measures at most 1.5 KB and the largest a run can make
+ * 2.2 KB as jsonb, 2.0 KB of JSON (tests/unit/case-open.test.mjs), so this is
+ * room, not a squeeze.
+ */
+export const CASE_DYNAMICS_MAX_BYTES = 4096;
+
+const jsonBytes = (value) => new TextEncoder().encode(JSON.stringify(value) ?? "").length;
+
+/** What is wrong with a case row's `dynamics` as the page sends it (S3's keys); none for a row without it. */
+export function validateCaseDynamics(dynamics) {
+  if (dynamics === undefined || dynamics === null) return [];
+  if (typeof dynamics !== "object" || Array.isArray(dynamics)) return ["invalid dynamics"];
+  const errors = [];
+  const open = dynamics.open;
+  if (open !== undefined && open !== null && (typeof open !== "object" || Array.isArray(open) || typeof open.caseId !== "string")) errors.push("invalid dynamics.open");
+  for (const key of ["linksOut", "relicOffer"]) {
+    if (dynamics[key] !== undefined && !Array.isArray(dynamics[key])) errors.push(`invalid dynamics.${key}`);
+  }
+  if (jsonBytes(dynamics) > CASE_DYNAMICS_MAX_BYTES) errors.push("dynamics too large");
+  return errors;
+}
+
+/**
+ * The `dynamics` a case row is sent with: as built, or without its opening
+ * snapshot when the whole would not fit. The row is worth more than the
+ * snapshot -- the server ranks a run only when every case has a row -- and a
+ * row without one is read as not checked, never as broken (chainRecheck.js).
+ */
+export function fitCaseDynamics(dynamics) {
+  if (!dynamics?.open || jsonBytes(dynamics) <= CASE_DYNAMICS_MAX_BYTES) return dynamics;
+  const { open: _open, ...rest } = dynamics;
+  return rest;
+}
+
 export function validateTelemetryItem(item) {
   const errors = [];
   if (!TELEMETRY_TYPES.has(item?.type)) errors.push(`invalid type ${item?.type}`);
@@ -60,6 +100,7 @@ export function validateTelemetryItem(item) {
   if (containsPrivateTelemetryValue(item?.payload, ALLOWED_PRIVATE_KEYS[item?.type] ?? NO_ALLOWED_KEYS)) {
     errors.push("payload contains private fields");
   }
+  if (item?.type === "case") errors.push(...validateCaseDynamics(item?.payload?.dynamics));
   return errors;
 }
 
@@ -131,6 +172,10 @@ export function validateSavedStatePayload(state, { dynamics: checkDynamics = tru
       if (typeof run.lastOutcome !== "string") errors.push("invalid dynamics.lastOutcome");
       if (!run.schema || typeof run.schema !== "object" || !Array.isArray(run.schema.mutations)) {
         errors.push("invalid dynamics.schema");
+      }
+      // The case's opening snapshot (S3): none in a save from before it.
+      if (run.open !== undefined && run.open !== null && (typeof run.open !== "object" || Array.isArray(run.open) || typeof run.open.caseId !== "string")) {
+        errors.push("invalid dynamics.open");
       }
     }
   }

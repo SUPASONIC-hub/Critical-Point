@@ -137,7 +137,8 @@ export function createRunLifecycle({
       caseId,
       ...opening,
       // A case that already has a summary is played again as practice for the table.
-      gauntletRun: openCaseRun(table, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, table) }),
+      // With the case and its opening hand, for the opening snapshot (S3).
+      gauntletRun: openCaseRun(table, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, table), caseId, resources: opening.resources }),
       now: nowMs(),
     }));
   }

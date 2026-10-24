@@ -8,13 +8,14 @@ import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
 import { classifyTelemetryFailure, isBeatTableRefusal, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { noteBriefing, noteRevealDetails, takeReadingTally } from "../src/state/readingTally.js";
-import { createRunSummary, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { createCaseClose, createRunSummary, normalizeCaseOpen, openCaseRun, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { LINK_CARRY_MAX, LINK_SPAN_MAX } from "../src/gauntlet/cascadeRisk.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
-import { marksSql, rankingRowsSql } from "./verify-ranking-rows.mjs";
+import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
 
 /**
@@ -70,7 +71,8 @@ import { CHAIN_MARK } from "../src/chainRecheck.js";
  *   8. The checker's marks (F1 phase 2, *_ranking_recheck_marks): only the
  *      service role may set them; a call states the two recheck marks whole,
  *      keeps the insert trigger's and touches no other row; the checker's
- *      own read (verify-ranking-rows --sql) runs on the replayed schema.
+ *      own read (verify-ranking-rows --runs-sql, then --run-sql for each run)
+ *      runs on the replayed schema.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -630,8 +632,14 @@ function casePayload({ session, runId, caseId, completedAt = new Date().toISOStr
     triggers,
     cognition,
     decision_log: log,
-    dynamics: { ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4 },
+    // With the close's links and draft and the case's opening snapshot (F1 phase 3, S3).
+    dynamics: caseDynamics(openCaseRun(RUN_INITIAL_STATE, { caseId, resources: initialResources })),
   };
+}
+
+/** A case row's `dynamics` as useChoiceCommit builds it from the run at the close. */
+function caseDynamics(run) {
+  return { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec: 7.4 };
 }
 
 /** The shared builder the runtime calls for the ranking row. */
@@ -915,8 +923,8 @@ withHeaders(null);
     oversize("run-size-4", "case08", { summary: { note: "x".repeat(5000) } }), /too large/);
   await postRefused("send 2 KB of triggers", "playtest_sessions",
     oversize("run-size-5", "case08", { triggers: { note: "x".repeat(2000) } }), /too large/);
-  await postRefused("send 3 KB of dynamics", "playtest_sessions",
-    oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(3000) } }), /too large/);
+  await postRefused("send 7 KB of dynamics", "playtest_sessions",
+    oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(7000) } }), /too large/);
   await postRefused("send a 200 KB row", "playtest_sessions",
     oversize("run-size-7", "case08", { decision_log: Array.from({ length: 30 }, () => ({ echo: "x".repeat(7000) })) }), /too large/);
 }
@@ -1007,6 +1015,51 @@ withHeaders(null);
   }
   const shape = await one(`select convalidated as validated from pg_constraint where conname = 'playtest_sessions_dynamics_shape' and conrelid = 'public.playtest_sessions'::regclass`);
   check(shape?.validated === false, "playtest_sessions_dynamics_shape is validated: adding it re-read every stored row, and a row written under an older shape would have stopped the migration.");
+}
+
+// The case-open snapshot (20261026000000; F1 phase 3, S3): a case row's
+// `dynamics` carries the case's opening (`open`), the close's links
+// (`linksOut`) and draft (`relicOffer`) and the practice count, each optional
+// and each typed, in up to 6,144 bytes. The largest a run can make is sent as
+// the client builds it (tests/unit/case-open.test.mjs measures the same).
+{
+  let openRun = 0;
+  const withDynamics = (dynamics) => ({ ...casePayload({ session: sessionId(1), runId: `run-open-${++openRun}`, caseId: "case09" }), dynamics });
+  const honest = casePayload({ session: sessionId(1), runId: "run-open-0", caseId: "case09" });
+  check(honest.dynamics.open?.caseId === "case09" && Array.isArray(honest.dynamics.linksOut), "the case row this check sends carries no opening snapshot; casePayload is not the row useChoiceCommit builds.");
+  await post("send a case row with its opening snapshot", "playtest_sessions", honest);
+  const relics = [...RELIC_IDS];
+  const longest = openCaseRun(
+    {
+      ...RUN_INITIAL_STATE,
+      windowIndex: 99999, practiceWindows: 99999, vault: 9999999, handVault: 9999999, busts: 99999, cashes: 99999, relics,
+      weekRule: "w".repeat(WEEK_RULE_ID_MAX),
+      linksIn: Array.from({ length: LINK_CARRY_MAX }, () => ({ from: -99, due: LINK_SPAN_MAX })),
+      logic: { streak: 9999, best: 9999, type: "reframing", held: 9999, heat: 3, rose: true, reach: 9 },
+      stanceMastery: { strike: 99, steady: 99, expose: 99 },
+    },
+    { caseId: "case09", resources: { time: -99999.5, capital: -99999.5, trust: -99999.5, legitimacy: -99999.5, humanCost: -99999.5, fatigue: -99999.5 } },
+  );
+  const mutations = Array.from({ length: 8 }, () => "heatDebtOverclock");
+  const largest = {
+    ...caseDynamics({ ...longest, linksOut: longest.linksIn, schema: { ...longest.schema, mutations } }),
+    relicOffer: relics.slice(0, 3),
+    open: normalizeCaseOpen({ ...longest.open, relicOffer: relics.slice(0, 3), schema: { ...longest.open.schema, mutations, fracturedAxis: "legitimacy" } }),
+  };
+  await post("send a case row with the largest dynamics a run can make", "playtest_sessions", withDynamics(largest));
+  await post("send a case row with 5 KB of dynamics", "playtest_sessions", withDynamics({ ...honest.dynamics, open: { ...honest.dynamics.open, note: "x".repeat(4400) } }));
+  await post("send a case row from a build before the snapshot", "playtest_sessions", withDynamics({ ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4 }));
+  await post("send a case row whose opening snapshot is null", "playtest_sessions", withDynamics({ ...honest.dynamics, open: null }));
+  for (const [what, patch] of [
+    ["an opening snapshot that is an array", { open: [] }],
+    ["an opening snapshot with no case", { open: { vault: 0 } }],
+    ["an opening snapshot whose case is a number", { open: { caseId: 9 } }],
+    ["linksOut as an object", { linksOut: { from: 0, due: 2 } }],
+    ["relicOffer as a string", { relicOffer: "lockpick" }],
+    ["practiceWindows as a string", { practiceWindows: "3" }],
+  ]) {
+    await postRefused(`send a case row with ${what}`, "playtest_sessions", withDynamics({ ...honest.dynamics, ...patch }), /^23514 .*playtest_sessions_dynamics_shape/);
+  }
 }
 
 // ---- the ranking
@@ -1456,15 +1509,17 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check((await marksOf("run-recheck-1", "final")) === null, "setting a run's checker marks marked its case row; only the ranking row is marked.");
   // The checker's write (verify-ranking-rows --marks-sql), as the CI job runs
   // it over the Management API: one statement for every checked run, an empty
-  // list for a run that earns nothing, and a run not checked left out.
+  // list for a run that earns nothing, and a run not checked left out. The
+  // chain's mark rides in the same tuple as phase 2's (S6), so neither wipes
+  // the other.
   const write = marksSql([
-    { status: "checked", runId: "run-recheck-1", marks: ["score-off-log"] },
+    { status: "checked", runId: "run-recheck-1", marks: ["score-off-log", CHAIN_MARK] },
     { status: "unrecorded", runId: "run-recheck-2", marks: [] },
     { status: "unverified", runId: "run-recheck-none", marks: [] },
   ]);
   const wrote = (await one(write))?.marked_rows;
   check(Number(wrote) === 2, `the checker's write marked ${wrote} ranking rows; expected the two checked runs.`);
-  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
+  check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify([CHAIN_MARK, "score-off-log", "time-over-gap"]), `the checker's write left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
   // Checked and clean is told from not checked: the time is set only for the
   // run replayed whole, and a call that does not say so clears it.
   const recheckedAt = async (runId) => (await one(`select rechecked_at from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.rechecked_at ?? null;
@@ -1476,10 +1531,13 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap", "window-no-replay"]), `window-no-replay left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
   check((await one(`select count(*)::int as n from public.playtest_sessions where rechecked_at is not null and case_id <> 'season-final'`))?.n === 0, "a case row carries a rechecked time; only ranking rows are rechecked.");
   check(JSON.stringify(await marksOf("run-recheck-2")) === JSON.stringify(["rank-off-score"]), "the checker's write took a trigger's mark from a run that earned none of its own.");
-  // The checker's own read (verify-ranking-rows --sql) runs on this schema and
-  // brings each ranked run whole: here the top one, every row of it.
-  const read = (await allowed("run the checker's read", "service_role", rankingRowsSql({ limit: 1 })))?.rows ?? [];
+  // The checker's own read runs on this schema, in its two halves as the CI
+  // job runs them (verify-ranking-rows --runs-sql, then --run-sql per run):
+  // the list names the top ranked run, and that run's read brings it whole.
   const topRun = await one(`select run_id from public.playtest_sessions where case_id = 'season-final' and score is not null order by score desc limit 1`);
+  const listed = (await allowed("list the checker's runs", "service_role", rankingRunsSql({ limit: 1 })))?.rows ?? [];
+  check(listed.length === 1 && listed[0].run_id === topRun?.run_id && Object.keys(listed[0]).join() === "run_id", `the checker's run list answered ${JSON.stringify(listed)}; expected the top ranked run's id alone.`);
+  const read = (await allowed("run the checker's read", "service_role", runRowsSql(listed[0]?.run_id ?? "none")))?.rows ?? [];
   const runRows = (await one(`select count(*)::int as n from public.playtest_sessions where run_id = $1`, [topRun?.run_id]))?.n;
   check(
     read.length > 1 && read.length === runRows && read.every((row) => row.run_id === topRun.run_id && "decision_log" in row && "run_tag" in row) && read.some((row) => row.case_id === "season-final"),
@@ -2338,7 +2396,7 @@ const VALIDATOR_PARTS = {
     ["a case row with 2 KB of resources", FIELD, "playtest_sessions", sessionRow({ resources: { note: "x".repeat(2000) } })],
     ["a case row with 2 KB of triggers", FIELD, "playtest_sessions", sessionRow({ triggers: { note: "x".repeat(2000) } })],
     ["a case row with 2 KB of cognition", FIELD, "playtest_sessions", sessionRow({ cognition: { note: "x".repeat(2000) } })],
-    ["a case row with 3 KB of dynamics", FIELD, "playtest_sessions", sessionRow({ dynamics: { note: "x".repeat(3000) } })],
+    ["a case row with 7 KB of dynamics", FIELD, "playtest_sessions", sessionRow({ dynamics: { note: "x".repeat(7000) } })],
     ["a case row with a 9 KB decision entry", P("decision log entry too large"), "playtest_sessions", sessionRow({ decision_log: [{ echo: "x".repeat(9000) }] })],
     ["a case row", STORED, "playtest_sessions", sessionRow()],
     ["a case row from a request with no address", STORED, "playtest_sessions", sessionRow(), { headers: null }],

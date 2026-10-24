@@ -4,19 +4,31 @@
  * case rows -- and works out again what the page claimed (src/rankingRecheck.js):
  * the score from the decision log, every window that carries a replay record,
  * a sealed card cashed below its seal, and a response time off the window
- * clock. It prints the marks it would add to each ranking row
- * (`score-off-log`, `window-off-replay`) and why. It writes nothing itself.
+ * clock. Phase 3 (S6) adds the chain (src/chainRecheck.js): each case's
+ * decisions and the run's counters from one case to the next. It prints the
+ * marks it would add to each ranking row (`score-off-log`, `window-off-replay`,
+ * `window-no-replay`, `chain-off-log`) and why. It writes nothing itself.
  *
- *   node scripts/verify-ranking-rows.mjs rows.json [--json]
- *       rows.json is an array of playtest_sessions rows (or `{ "rows": [...] }`),
+ *   node scripts/verify-ranking-rows.mjs rows.json [more.json ...] [--json]
+ *       each file is an array of playtest_sessions rows (or `{ "rows": [...] }`),
  *       as the Supabase table editor or SQL editor exports them: `run_id`,
- *       `case_id`, `summary`, `decision_log`, `resources`, `dynamics`.
- *   node scripts/verify-ranking-rows.mjs --sql [--limit=20]
- *       prints the one read-only SELECT that fetches the top `limit` ranked
- *       runs with all their rows, for `supabase db query --linked` (the
- *       Management API, with the SUPABASE_ACCESS_TOKEN Migration Drift uses:
- *       the way the test week reads the live data, and the CI job's way,
- *       .github/workflows/verify-ranking.yml). Its JSON output is a rows.json.
+ *       `case_id`, `summary`, `decision_log`, `resources`, `dynamics`. The
+ *       files are read as one list (the CI job reads one file per run).
+ *
+ *   The CI read (.github/workflows/verify-ranking.yml) goes through
+ *   `supabase db query --linked` (the Management API, with the
+ *   SUPABASE_ACCESS_TOKEN Migration Drift uses: the way the test week reads
+ *   the live data), split so that no answer holds more than one run (a run is
+ *   up to 55 case rows with their logs; 서버검증-설계안.md, S6):
+ *   node scripts/verify-ranking-rows.mjs --runs-sql [--limit=20]
+ *       prints the one read-only SELECT that lists the top `limit` ranked
+ *       runs (run_id only). Its JSON output is runs.json.
+ *   node scripts/verify-ranking-rows.mjs --run-count runs.json
+ *       prints how many runs runs.json lists.
+ *   node scripts/verify-ranking-rows.mjs --run-sql runs.json --at=N
+ *       prints the one read-only SELECT that fetches every row of the N-th
+ *       run (from 1) runs.json lists. Its JSON output is a rows file. The run
+ *       id goes from file to file and is never printed to the log.
  *   node scripts/verify-ranking-rows.mjs --remote [--limit=20] [--json]
  *       the same read by REST, GET only, with SUPABASE_URL and
  *       SUPABASE_SERVICE_ROLE_KEY from the environment. The case rows are not
@@ -38,28 +50,41 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { recheckChain, UNCHECKED } from "../src/chainRecheck.js";
 import { recheckRun } from "../src/rankingRecheck.js";
 
 const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
 const JSON_COLUMNS = ["summary", "decision_log", "resources", "dynamics"];
 
+const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
+
 /**
- * The read for `supabase db query`: one SELECT and nothing else -- the top
- * `limit` ranked runs (by the ranking's own score) and every row of each.
+ * The CI read's first half, for `supabase db query`: one SELECT and nothing
+ * else -- the top `limit` ranked runs, by the ranking's own score.
  */
-export function rankingRowsSql({ limit = 20 } = {}) {
+export function rankingRunsSql({ limit = 20 } = {}) {
   const top = Math.min(500, Math.max(1, Math.trunc(Number(limit)) || 20));
   return [
-    "with top_runs as (",
-    "  select run_id from public.playtest_sessions",
-    "   where case_id = 'season-final' and score is not null and run_id is not null",
-    `   order by score desc limit ${top}`,
-    ")",
+    "select run_id from public.playtest_sessions",
+    " where case_id = 'season-final' and score is not null and run_id is not null",
+    ` order by score desc limit ${top};`,
+  ].join("\n");
+}
+
+/** The second half, once per run: one SELECT of every row of `runId`. */
+export function runRowsSql(runId) {
+  if (typeof runId !== "string" || !runId) throw new TypeError("A run id is a non-empty string.");
+  return [
     `select ${SELECT.split(",").join(", ")}`,
     "  from public.playtest_sessions",
-    " where run_id in (select run_id from top_runs)",
-    " order by run_id, case_id;",
+    ` where run_id = ${quote(runId)}`,
+    " order by case_id;",
   ].join("\n");
+}
+
+/** The run ids of the first half's answer (runs.json), each once, in its order. */
+export function readRunIds(text) {
+  return [...new Set(readRows(text).map((row) => row?.run_id).filter((id) => typeof id === "string" && id))];
 }
 
 /** The rows grouped by run, in the order each run first appears. Rows without a run cannot be ranked and are left out. */
@@ -73,13 +98,24 @@ export function groupByRun(rows) {
   return runs;
 }
 
-/** Every ranked run among `rows` (one with a `season-final` row), checked. */
+/**
+ * Every ranked run among `rows` (one with a `season-final` row), checked:
+ * worked out again (recheckRun, phase 2) and chained (recheckChain, phase 3).
+ * The run's `marks` are both checkers' together, because
+ * ranking_set_recheck_marks states the four checker marks whole and drops one
+ * not passed: the chain's mark has to travel in the same call as phase 2's
+ * (marksSql writes one tuple per run). A run under other table rules is
+ * neither worked out nor chained, and not written.
+ */
 export function verifyRows(rows) {
   const results = [];
   for (const [runId, runRows] of groupByRun(rows)) {
     const ranking = runRows.find((row) => row.case_id === "season-final");
     if (!ranking) continue;
-    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheckRun(runRows) });
+    const recheck = recheckRun(runRows);
+    const chain = recheck.status === "unverified" ? null : recheckChain(runRows);
+    const marks = [...recheck.marks, ...(chain?.marks ?? [])];
+    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, chain });
   }
   return results;
 }
@@ -126,7 +162,9 @@ export function formatReport(results, { redact = false } = {}) {
       continue;
     }
     if (result.status === "unrecorded") lines.push(`${head}  not replayed: no window carries a record (a build before the record); scores read`);
-    lines.push(`${result.status === "unrecorded" ? "  scores:" : head}  ${result.marks.length ? `marks: ${result.marks.join(", ")}` : "no marks"}`);
+    // A run not replayed shows its scores' marks here; the chain's own line follows.
+    const shown = result.status === "unrecorded" ? result.marks.filter((mark) => !result.chain?.marks.includes(mark)) : result.marks;
+    lines.push(`${result.status === "unrecorded" ? "  scores:" : head}  ${shown.length ? `marks: ${shown.join(", ")}` : "no marks"}`);
     if (result.rankingDiffers.length) lines.push(`  ranking row differs from the final case row: ${result.rankingDiffers.join(", ")}`);
     let unrecorded = 0;
     let seedTails = 0;
@@ -140,7 +178,39 @@ export function formatReport(results, { redact = false } = {}) {
     }
     if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record`);
     if (seedTails) lines.push(`  ${seedTails} windows were dealt again (a seed with a ~n tail: a rolled-back save, or a wall shopped for)`);
+    if (result.chain) lines.push(...formatChain(result.chain));
   }
+  return lines;
+}
+
+/**
+ * The chain's lines of a run's block. What the chain could not check is said,
+ * never passed: the settlement inside a case waits for S2 to be played here,
+ * and a case whose opening state has no snapshot to be read against (S3,
+ * `dynamics.open`) is counted as not checked ("사슬 검증 안 함").
+ */
+export function formatChain(chain) {
+  const { cases, unchecked } = chain;
+  if (chain.status === "unchecked") return ["  chain: not checked (no case row to chain)"];
+  const lines = [`  chain: ${chain.status}, ${cases.length} cases, ${cases.length - unchecked.links} links read${chain.marks.length ? `  marks: ${chain.marks.join(", ")}` : ""}`];
+  for (const found of chain.breaks.slice(0, 10)) {
+    const where = found.where === "inside" ? `${found.case} entry ${found.entry}` : found.where === "between" ? `${found.after ?? "start"} -> ${found.case}` : found.case;
+    const values = found.expected === undefined ? (found.found === undefined ? "" : ` (${JSON.stringify(found.found)})`) : ` (expected ${JSON.stringify(found.expected)}, found ${JSON.stringify(found.found)})`;
+    lines.push(`  chain break: ${where} ${found.field}${values}`);
+  }
+  if (chain.breaks.length > 10) lines.push(`  ... and ${chain.breaks.length - 10} more chain breaks`);
+  const notChecked = [];
+  if (unchecked.cases) notChecked.push(`${unchecked.cases} cases with no readable log`);
+  if (unchecked.links) notChecked.push(`${unchecked.links} links (a gap in the rows, or the counters missing)`);
+  const settled = unchecked.fields[UNCHECKED.inside[0]] ?? 0;
+  if (settled) notChecked.push(`the settlement of ${settled} cases`);
+  // A row from a build before the snapshot (UNCHECKED.open); the board and the
+  // route a case opened on wait for the settlement (UNCHECKED.between, S2).
+  const opened = unchecked.fields[UNCHECKED.open[0]] ?? 0;
+  if (opened) notChecked.push(`the opening state of ${opened} cases (no opening snapshot)`);
+  const carried = unchecked.fields[UNCHECKED.between[0]] ?? 0;
+  if (carried) notChecked.push(`the board and route ${carried} cases opened on`);
+  if (notChecked.length) lines.push(`  chain not checked: ${notChecked.join("; ")}`);
   return lines;
 }
 
@@ -152,13 +222,13 @@ export function formatReport(results, { redact = false } = {}) {
  * scores were read but it is not "checked", so the time is cleared). A run
  * under other table rules is left as it is. Null when there is nothing to write.
  * The function drops every checker mark not passed, so the chain check's mark
- * (CHAIN_MARK, src/chainRecheck.js) must join each run's marks here, in this
- * one statement, never in a call of its own (S6 wires it in).
+ * (CHAIN_MARK, src/chainRecheck.js) travels in each run's marks here, in this
+ * one statement, never in a call of its own: verifyRows puts recheckRun's and
+ * recheckChain's marks in the same `marks` (S6).
  */
 export function marksSql(results) {
   const checked = results.filter((result) => (result.status === "checked" || result.status === "unrecorded") && typeof result.runId === "string" && result.runId);
   if (!checked.length) return null;
-  const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
   const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.map(quote).join(", ")}]::text[], ${result.status === "checked"})`).join(",\n       ");
   return [
     "select count(*) filter (where marks is not null) as marked_rows",
@@ -170,18 +240,30 @@ export function marksSql(results) {
 async function main(argv) {
   const json = argv.includes("--json");
   const limit = Number(argv.find((arg) => arg.startsWith("--limit="))?.slice(8)) || 20;
-  if (argv.includes("--sql")) {
-    console.log(rankingRowsSql({ limit }));
+  const files = argv.filter((arg) => !arg.startsWith("--"));
+  if (argv.includes("--runs-sql")) {
+    console.log(rankingRunsSql({ limit }));
     return 0;
   }
   let rows;
   try {
+    if (argv.includes("--run-count") || argv.includes("--run-sql")) {
+      if (files.length !== 1) throw new Error("Name the one runs.json the run list was read into.");
+      const runIds = readRunIds(readFileSync(files[0], "utf8"));
+      if (argv.includes("--run-count")) {
+        console.log(runIds.length);
+        return 0;
+      }
+      const at = Number(argv.find((arg) => arg.startsWith("--at="))?.slice(5));
+      if (!Number.isInteger(at) || at < 1 || at > runIds.length) throw new Error(`--at= is a place from 1 to ${runIds.length}.`);
+      console.log(runRowsSql(runIds[at - 1]));
+      return 0;
+    }
     if (argv.includes("--remote")) {
       rows = await fetchRunRows({ url: process.env.SUPABASE_URL, key: process.env.SUPABASE_SERVICE_ROLE_KEY, limit });
     } else {
-      const file = argv.find((arg) => !arg.startsWith("--"));
-      if (!file) throw new Error("Name a rows.json file, or pass --remote.");
-      rows = readRows(readFileSync(file, "utf8"));
+      if (!files.length) throw new Error("Name a rows.json file, or pass --remote.");
+      rows = files.flatMap((file) => readRows(readFileSync(file, "utf8")));
     }
   } catch (error) {
     console.error(error.message);

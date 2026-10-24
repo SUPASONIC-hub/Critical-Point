@@ -87,7 +87,7 @@ test("the pages kept for the median are bounded, so the row stays inside the ser
 
 test("the case row carries the tally in dynamics, the stage and the reveal add to it, a new season and a reset clear it", () => {
   const commit = read("src/state/useChoiceCommit.js");
-  assert.match(commit, /dynamics: \{ \.\.\.createRunSummary\(nextRun\), responseTimeSec, \.\.\.reading \}/);
+  assert.match(commit, /dynamics: fitCaseDynamics\(\{ \.\.\.createRunSummary\(nextRun\), \.\.\.createCaseClose\(nextRun\), responseTimeSec, \.\.\.reading \}\)/);
   assert.match(commit, /const reading = takeReadingTally\(\);/);
   assert.match(read("src/gauntlet/GauntletStage.jsx"), /noteBriefing\(\{ caseId: scene\.node\.caseId, byClock, \.\.\.readingRef\.current \}\)/);
   assert.match(read("src/gauntlet/SceneBriefing.jsx"), /readingRef\.current\?\.\(step, heldRef\.current\);/);

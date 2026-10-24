@@ -1,11 +1,13 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
-import { cashStakedCard, clickElement, dismissProtocolBreach, openIntroDrawer, openRevealDetails, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { cashStakedCard, chooseFirstAvailableChoice, clickElement, completeCurrentCase, dismissProtocolBreach, openIntroDrawer, openRevealDetails, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { collectPostedRows, jsonbBytes, SERVER_DYNAMICS_BYTES } from "./helpers/caseRows.js";
 import { seedSave } from "./helpers/seededSave.js";
 import { readJsonStorage, readStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { createWindow, getTableSchema, normalizeSchema } from "../src/gauntlet/gauntletEngine.js";
+import { recheckCaseLinks } from "../src/chainRecheck.js";
 
 /**
  * Stopping mid-season and picking it up again: on the same device with a bet
@@ -326,4 +328,38 @@ test("another device picks the run up from its code", async ({ page }) => {
   expect(local.currentCase).toBe("case04");
   expect(await readStorage(page, TEST_STORAGE_KEYS.cloudCode)).toBe("ABCDEFGHJKLM");
   expect(await readJsonStorage(page, TEST_STORAGE_KEYS.settledWindows)).toContain("seed-a");
+});
+
+// F1 phase 3, S7: the case-open snapshot (S3) is stamped when a case opens and
+// rides in the run through a save, so a case put down between two decisions
+// and picked up again closes on the snapshot it first opened on -- not on one
+// stamped at the resume. The row it sends fits the server's 6,144 bytes of
+// `dynamics` with the snapshot in it, and its first decision starts from the
+// hand the snapshot holds (the chain check reads the two against each other).
+test("a case put down half way closes on the snapshot it first opened on, in a row the server takes", { tag: "@once" }, async ({ page }) => {
+  test.setTimeout(120_000);
+  const posted = await collectPostedRows(page, SUPABASE);
+  await useMockSupabase(page);
+  await startDebugNode(page, "case02", "c2_evidence_turn");
+  const opened = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.open;
+  expect(opened, "the jump into the case stamped its opening").toMatchObject({ caseId: "case02", windowIndex: 0, vault: 0, relics: [], linksIn: [] });
+
+  // One decision, then 저장 후 나가기 on the scene after it.
+  await chooseFirstAvailableChoice(page);
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.length, { timeout: TRANSITION_TIMEOUT_MS }).toBe(1);
+  await dismissProtocolBreach(page);
+  await expect(page.locator(".result-page"), "the case is still open").toHaveCount(0);
+  await page.getByRole("button", { name: "저장 후 나가기" }).click();
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.open).toEqual(opened);
+
+  await resumeSavedRun(page);
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.open, "the resume stamped nothing new").toEqual(opened);
+  await completeCurrentCase(page);
+  await expect.poll(() => posted.map((row) => row.case_id), { timeout: 20_000 }).toContain("case02");
+  const row = posted.find((candidate) => candidate.case_id === "case02");
+  expect(row.decision_log.length, "the row holds the decisions on both sides of the save").toBeGreaterThanOrEqual(2);
+  expect(row.dynamics.open, "the row closes on the snapshot of the first opening").toEqual(opened);
+  expect(Array.isArray(row.dynamics.linksOut)).toBe(true);
+  expect(jsonbBytes(row.dynamics), "the row's dynamics as jsonb text, against the server's cap").toBeLessThanOrEqual(SERVER_DYNAMICS_BYTES);
+  expect(recheckCaseLinks(row), "the first decision starts from the hand the snapshot holds").toMatchObject({ status: "linked", breaks: [] });
 });

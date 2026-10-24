@@ -1,11 +1,19 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readdirSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import { BASE_SCHEMA, createWindow, normalizeSchema, RULES_MARK, SEAL_BREAK_GAUGE } from "../../src/gauntlet/gauntletEngine.js";
 import { isSealedCash, isTimeOffClock, readSeed, recheckCaseWindows, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { openTraced, recordClosedWindow, reduceTraced } from "../../src/gauntlet/windowTrail.js";
+import { CASE_SEQUENCE } from "../../src/gameCases.js";
+import { CHAIN_MARK } from "../../src/chainRecheck.js";
+import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
-import { fetchRunRows, formatReport, groupByRun, marksSql, rankingRowsSql, readRows, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
+import { fetchRunRows, formatChain, formatReport, groupByRun, marksSql, rankingRunsSql, readRows, readRunIds, runRowsSql, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
 import { createWindowRecorder, thresholdOfVerdict } from "./helpers/windowRecorder.mjs";
 
 /**
@@ -160,15 +168,24 @@ test("the remote read is GET only, with the service key, and says when there is 
 });
 
 
-test("the CI read is one SELECT and nothing else, and the public log names runs by their tag", () => {
-  const sql = rankingRowsSql({ limit: 7 });
-  // One statement: a single semicolon, at the end.
-  assert.equal(sql.indexOf(";"), sql.length - 1);
-  assert.match(sql, /^with top_runs as \(/);
-  assert.match(sql, /order by score desc limit 7\n/);
-  assert.doesNotMatch(sql, /\b(insert|update|delete|truncate|alter|drop|create|grant|call|do)\b/i);
-  assert.match(rankingRowsSql({ limit: 1e9 }), /limit 500\n/);
-  assert.match(rankingRowsSql({ limit: "x" }), /limit 20\n/);
+test("the CI read is split, each query one SELECT and nothing else, and the public log names runs by their tag", () => {
+  const writes = /\b(insert|update|delete|truncate|alter|drop|create|grant|call|do)\b/i;
+  // The run list: one statement (a single semicolon, at the end), run ids only.
+  const list = rankingRunsSql({ limit: 7 });
+  assert.equal(list.indexOf(";"), list.length - 1);
+  assert.match(list, /^select run_id from public\.playtest_sessions\n/);
+  assert.match(list, /order by score desc limit 7;$/);
+  assert.doesNotMatch(list, writes);
+  assert.match(rankingRunsSql({ limit: 1e9 }), /limit 500;$/);
+  assert.match(rankingRunsSql({ limit: "x" }), /limit 20;$/);
+  // One run's rows: one statement, that run only, its id quoted.
+  const one = runRowsSql("run-'x");
+  assert.equal(one.indexOf(";"), one.length - 1);
+  assert.match(one, /\n where run_id = 'run-''x'\n order by case_id;$/);
+  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at\n/);
+  assert.doesNotMatch(one, writes);
+  assert.throws(() => runRowsSql(""), /non-empty/);
+  assert.deepEqual(readRunIds(JSON.stringify({ rows: [{ run_id: "b" }, { run_id: "a" }, { run_id: "b" }, { run_id: null }] })), ["b", "a"]);
   const rows = seasonRows("secret-run-id");
   rows[1].run_tag = "CP-7Q2X";
   const results = [...verifyRows(rows), ...verifyRows(seasonRows("other-secret"))];
@@ -255,4 +272,136 @@ test("a run whose build writes records is marked for a window that has none; an 
   assert.deepEqual(old.marks.filter((mark) => mark !== "score-off-log"), []);
   assert.match(formatReport([{ runId: "run-s", score: 1, caseRows: 2, ...old }]).join("\n"), /not replayed/);
   assert.match(marksSql([{ runId: "run-s", ...old }]), /'run-s', array\[.*\]::text\[\], false\)/);
+});
+
+/**
+ * A whole season of the season player as the server stores it: one row per
+ * closed case (its `dynamics` the run summary the close wrote, its log the
+ * case's), and the ranking row. No replay record: the scores are worked out
+ * again and the chain is read.
+ */
+function chainedRows(runId = "run-chain", seed = 20261021, { open = false } = {}) {
+  const season = createSeasonBot({ seed, staged: STAGED }).playSeason(0, "balanced");
+  // `open`: each row's dynamics as the page writes it since S3, the opening snapshot included.
+  const rows = CASE_SEQUENCE.map((caseId) => ({ run_id: runId, case_id: caseId, summary: season.caseResults[caseId], decision_log: season.caseLogs[caseId], resources: null, dynamics: open ? season.caseDynamics[caseId] : season.caseResults[caseId].gauntlet }));
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
+  return rows;
+}
+
+test("each run is chained too, and the chain's mark goes in the same call as phase 2's", () => {
+  const honest = chainedRows();
+  const [clean] = verifyRows(honest);
+  assert.equal(clean.status, "unrecorded");
+  assert.deepEqual(clean.marks, []);
+  assert.equal(clean.chain.status, "linked");
+  assert.equal(clean.chain.cases.length, CASE_SEQUENCE.length);
+  // A vault taken down between two cases, and a score raised: both marks, one run, one tuple.
+  const edited = structuredClone(honest);
+  edited[20].dynamics.vault = edited[19].dynamics.vault - 1;
+  const final = edited.find((row) => row.case_id === "final");
+  final.summary.burstScore = (final.summary.burstScore + 9) % 101;
+  const [marked] = verifyRows(edited);
+  assert.deepEqual(marked.marks, ["score-off-log", CHAIN_MARK]);
+  const sql = marksSql([clean, marked].map((result, place) => ({ ...result, runId: `run-${place}` })));
+  assert.equal(sql.indexOf(";"), sql.length - 1);
+  assert.match(sql, /\('run-0', array\[\]::text\[\], false\)/);
+  assert.match(sql, /\('run-1', array\['score-off-log', 'chain-off-log'\]::text\[\], false\)/);
+  assert.equal(sql.match(/run-1/g).length, 1);
+  // A chain mark alone is written too: the phase 2 marks of that run are stated as none, not left out.
+  const chainOnly = structuredClone(honest);
+  chainOnly[30].dynamics.windowIndex = chainOnly[29].dynamics.windowIndex;
+  assert.match(marksSql(verifyRows(chainOnly)), /\('run-chain', array\['chain-off-log'\]::text\[\], false\)/);
+  // A run under other table rules is neither worked out nor chained.
+  const other = structuredClone(honest);
+  other[3].dynamics.tableRules = RULES_MARK - 1;
+  const [skipped] = verifyRows(other);
+  assert.equal(skipped.status, "unverified");
+  assert.equal(skipped.chain, null);
+});
+
+test("the report says where the chain broke and what it did not check", () => {
+  const rows = chainedRows();
+  rows[20].dynamics.vault = rows[19].dynamics.vault - 1;
+  rows.splice(40, 1);
+  const report = formatReport(verifyRows(rows)).join("\n");
+  assert.match(report, /chain: broken, 54 cases, 53 links read {2}marks: chain-off-log/);
+  // Not replayed: the scores' line shows the scores' marks, the chain's line the chain's.
+  assert.match(report, /\n {2}scores: {2}no marks\n/);
+  assert.match(report, new RegExp(`chain break: ${rows[19].case_id} -> ${rows[20].case_id} vault \\(expected "\\+0 or more", found -1\\)`));
+  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the settlement of 54 cases; the opening state of 53 cases \(no opening snapshot\); the board and route 53 cases opened on$/m);
+  assert.deepEqual(formatChain({ status: "unchecked", marks: [], breaks: [], cases: [], unchecked: { cases: 0, links: 0, fields: {} } }), ["  chain: not checked (no case row to chain)"]);
+  const many = formatChain({ status: "broken", marks: [CHAIN_MARK], breaks: Array.from({ length: 12 }, () => ({ case: "case01", field: "case", found: "twice" })), cases: [], unchecked: { cases: 1, links: 0, fields: {} } });
+  assert.equal(many[1], '  chain break: case01 case ("twice")');
+  assert.ok(many.includes("  ... and 2 more chain breaks"));
+  assert.ok(many.includes("  chain not checked: 1 cases with no readable log"));
+});
+
+test("the CLI lists runs, writes one run's read at a time, and reads the per-run files as one", () => {
+  const script = fileURLToPath(new URL("../../scripts/verify-ranking-rows.mjs", import.meta.url));
+  const dir = mkdtempSync(path.join(tmpdir(), "verify-ranking-"));
+  try {
+    const run = (...args) => execFileSync(process.execPath, [script, ...args], { encoding: "utf8" }).trim();
+    writeFileSync(path.join(dir, "runs.json"), JSON.stringify([{ run_id: "secret-a" }, { run_id: "secret-b" }]));
+    assert.equal(run("--runs-sql", "--limit=3"), rankingRunsSql({ limit: 3 }));
+    assert.equal(run("--run-count", path.join(dir, "runs.json")), "2");
+    assert.equal(run("--run-sql", path.join(dir, "runs.json"), "--at=2"), runRowsSql("secret-b"));
+    assert.throws(() => execFileSync(process.execPath, [script, "--run-sql", path.join(dir, "runs.json"), "--at=3"], { stdio: "pipe" }), /from 1 to 2/);
+    writeFileSync(path.join(dir, "1.json"), JSON.stringify(seasonRows("secret-a")));
+    writeFileSync(path.join(dir, "2.json"), JSON.stringify({ rows: seasonRows("secret-b") }));
+    const report = run(path.join(dir, "1.json"), path.join(dir, "2.json"), "--redact");
+    assert.match(report, /^run 1 {2}score/m);
+    assert.match(report, /^run 2 {2}score/m);
+    assert.doesNotMatch(report, /secret/);
+    assert.equal(run(path.join(dir, "1.json"), path.join(dir, "2.json"), "--marks-sql"), marksSql(verifyRows([...seasonRows("secret-a"), ...seasonRows("secret-b")])));
+  } finally {
+    for (const file of readdirSync(dir)) unlinkSync(path.join(dir, file));
+    rmdirSync(dir);
+  }
+});
+
+test("a whole season dealt the page's seeds is checked case by case with no mark, seeds and chain included", () => {
+  // The bot deals `run_id:windowIndex:nodeId`, as GameRuntime's seedBase does, so
+  // S1 reads every window's place back from each case's dynamics.windowIndex.
+  const runId = "run-dealt";
+  const recorder = createWindowRecorder({ digits: 3 });
+  const verdicts = [];
+  const bot = createSeasonBot({ seed: 1000, staged: STAGED, reduce: recorder.reduce, windowSeed: ({ windowIndex, nodeId }) => `${runId}:${windowIndex}:${nodeId}` });
+  const season = bot.playSeason(0, "balanced", false, ({ verdict }) => verdicts.push(verdict));
+  const total = CASE_SEQUENCE.reduce((sum, caseId) => sum + season.caseLogs[caseId].length, 0);
+  let at = recorder.closed.length - total;
+  let settled = verdicts.length - total;
+  const rows = CASE_SEQUENCE.map((caseId) => ({
+    run_id: runId,
+    case_id: caseId,
+    summary: season.caseResults[caseId],
+    decision_log: season.caseLogs[caseId].map((entry) => ({ ...entry, threshold: { ...entry.threshold, ...thresholdOfVerdict(verdicts[settled++]) }, [WINDOW_RECORD_KEY]: recorder.closed[at++].record })),
+    resources: null,
+    // As the page writes it since S3: the run summary, the close, and the opening snapshot.
+    dynamics: season.caseDynamics[caseId],
+  }));
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
+  const [result] = verifyRows(rows);
+  assert.equal(result.status, "checked");
+  assert.deepEqual(result.marks, []);
+  assert.equal(result.cases.reduce((sum, entry) => sum + entry.windows.counts.match, 0), total);
+  assert.equal(result.chain.status, "linked");
+  // Every link read, its opening against the close before it (S3): nothing left as "no snapshot".
+  assert.equal(result.chain.unchecked.links, 0);
+  assert.equal(result.chain.unchecked.fields.open, undefined);
+  assert.equal(result.chain.unchecked.fields.reopened, undefined);
+  assert.doesNotMatch(formatChain(result.chain).join("\n"), /no opening snapshot/);
+  // One case's opening edited (a vault carried in that the close before did not hold):
+  // the chain marks it, and the mark goes in the run's one tuple with phase 2's none.
+  const opened = structuredClone(rows);
+  opened[12].dynamics.open.vault += 5;
+  const [marked] = verifyRows(opened);
+  assert.equal(marked.status, "checked");
+  assert.deepEqual(marked.marks, [CHAIN_MARK]);
+  assert.ok(marked.chain.breaks.some((found) => found.case === CASE_SEQUENCE[12] && found.field === "open.vault"));
+  assert.match(marksSql([marked]), /\('run-dealt', array\['chain-off-log'\]::text\[\], true\)/);
+  // A case's window count moved by one: its seeds are no longer the ones dealt at those places.
+  const shifted = structuredClone(rows);
+  shifted[10].dynamics.windowIndex += 1;
+  shifted[11].dynamics.windowIndex += 1;
+  assert.ok(verifyRows(shifted)[0].marks.includes("window-off-replay"));
 });
