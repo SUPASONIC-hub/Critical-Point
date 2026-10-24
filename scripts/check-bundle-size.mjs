@@ -90,7 +90,11 @@ const budgets = [
   // the gzip plus 4; with GameRuntime the two are 433,077 / 139,053 beside
   // 432,844 / 138,381 before (+233 raw / +672 gzip: the same code, packed
   // into the larger file). Both load with the runtime, as before.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_094 },
+  // 87,094 -> 87,101 gzip on 2026-10-25 (A-13 1/4): the raw bytes are the
+  // same 291,131, but eight case files' hashed names in its import list
+  // changed with their scene text and gzip worse; measured 87,097 on main
+  // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_101 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
