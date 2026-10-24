@@ -592,7 +592,11 @@ const budgets = [
   // notice covered 밀기 in CI). -> 4,133 / 2,368 the same day, measured
   // 4,133 / 2,364, the gzip plus 4: the bar is watched while the notice is up,
   // and the notice slides in from the left edge, not up over the bar.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 4_133, maxGzip: 2_368 },
+  // -> 11,705 / 5,445 on 2026-10-24 (edge-per-case), measured 11,705 / 5,441
+  // on main 5ea63bf, the gzip plus 4: the nine acts' pairs became one pair
+  // per case (B-15, the user's decision: 55 messengers and 55 mails, 220
+  // lines), and CASE_SEQUENCE is no longer read here.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 11_705, maxGzip: 5_445 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).

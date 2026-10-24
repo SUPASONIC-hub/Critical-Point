@@ -335,47 +335,55 @@ test("the edge notices are on until turned off, and say no number aloud or on sc
   assert.match(notice, /aria-hidden="true"/);
   assert.match(notice, /pointerEvents: "none"/);
   assert.doesNotMatch(notice, /role="(?:status|alert)"|aria-live/);
-  const words = notice.slice(notice.indexOf("export const EDGE_NOTICES"), notice.indexOf("]);", notice.indexOf("export const EDGE_NOTICES")));
+  const words = notice.slice(notice.indexOf("export const EDGE_NOTICES"), notice.indexOf("\n};", notice.indexOf("export const EDGE_NOTICES")));
   for (const [, line] of words.matchAll(/"([^"]*[가-힣][^"]*)"/g)) assert.doesNotMatch(line, /\d/, `"${line}" carries no number`);
   // Reduced motion and the calm switch both stop the slide.
   assert.match(notice, /prefers-reduced-motion: reduce/);
   assert.match(notice, /data-calm-effects/);
 });
 
-test("the edge notices change sender with the act, and keep the third and sixth press", async () => {
+test("the edge notices are written case by case, and keep the third and sixth press", async () => {
   const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
-  // The JSX cannot be imported here, so its pure part (the table and the two readers) is run as written.
+  // The JSX cannot be imported here, so its pure part (the table and its reader) is run as written.
   const file = source("gauntlet/EdgeNotice.jsx");
   const body = file.slice(file.indexOf("export const EDGE_AT"), file.indexOf("const STILL")).replaceAll("export ", "");
-  const edge = new Function("CASE_SEQUENCE", `${body}
-return { EDGE_AT, EDGE_ACTS, EDGE_NOTICES, edgeActOf, pickEdgeNotice };`)(CASE_SEQUENCE);
+  const edge = new Function(`${body}
+return { EDGE_AT, EDGE_NOTICES, pickEdgeNotice };`)();
   assert.deepEqual([...edge.EDGE_AT], [3, 6]);
-  assert.equal(edge.EDGE_NOTICES.length, edge.EDGE_ACTS.length, "one pair of notices per act");
-  for (const first of edge.EDGE_ACTS) assert.ok(CASE_SEQUENCE.includes(first), `${first} is a case`);
-  // Each act opens where the analysis note puts it: 0막 P01-05, then 01, 08, 13, 19, 25, 31, 37, and 43 to the finale.
-  const acts = { prologue01: 0, prologue05: 0, case01: 1, case07: 1, case08: 2, case12: 2, case13: 3, case18: 3, case19: 4, case24: 4, case25: 5, case30: 5, case31: 6, case36: 6, case37: 7, case42: 7, case43: 8, case49: 8, final: 8, nowhere: 0 };
-  for (const [caseId, act] of Object.entries(acts)) assert.equal(edge.edgeActOf(caseId), act, `${caseId} is in act ${act}`);
-  assert.equal(new Set(CASE_SEQUENCE.map(edge.edgeActOf)).size, edge.EDGE_ACTS.length, "every act has a case");
-  // A different messenger and a different mail in every act, each its own kind.
-  const messengers = edge.EDGE_NOTICES.map(([message]) => message.from);
-  const mails = edge.EDGE_NOTICES.map(([, mail]) => mail.from);
-  assert.equal(new Set(messengers).size, edge.EDGE_ACTS.length, messengers.join(", "));
-  assert.equal(new Set(mails).size, edge.EDGE_ACTS.length, mails.join(", "));
-  for (const from of messengers) assert.match(from, /^메신저 · /);
-  for (const from of mails) assert.match(from, /^메일 · /);
-  // Only the third press brings the message and only the sixth the mail; n picks the line.
-  for (const [caseId, act] of Object.entries(acts)) {
-    for (const pushes of [0, 1, 2, 4, 5, 7, 9]) assert.equal(edge.pickEdgeNotice(pushes, 0, caseId), null);
-    assert.equal(edge.pickEdgeNotice(3, 0, caseId).from, messengers[act]);
-    assert.equal(edge.pickEdgeNotice(6, 0, caseId).from, mails[act]);
-  }
-  for (const pair of edge.EDGE_NOTICES) {
-    for (const notice of pair) {
-      assert.ok(notice.lines.length >= 1);
-      assert.deepEqual(notice.lines.map((_, n) => edge.pickEdgeNotice(notice.from.startsWith("메일") ? 6 : 3, n, edge.EDGE_ACTS[edge.EDGE_NOTICES.indexOf(pair)]).line), notice.lines);
+  // One entry per case of the season, in its order, and none for a case that is not in it (B-15, 2026-10-24).
+  assert.deepEqual(Object.keys(edge.EDGE_NOTICES), CASE_SEQUENCE);
+  for (const caseId of CASE_SEQUENCE) {
+    const [message, mail] = edge.EDGE_NOTICES[caseId];
+    for (const [notice, label] of [[message, "메신저 · "], [mail, "메일 · "]]) {
+      const [from, ...lines] = notice;
+      assert.equal(lines.length, 2, `${caseId}: ${label}${from} has two lines`);
+      assert.ok(from && lines.every(Boolean), `${caseId}: ${label}${from} is written`);
       // Short enough for one line at the bottom left of a phone, before its ellipsis.
-      for (const line of [notice.from, ...notice.lines]) assert.ok(line.length <= 20, `"${line}" is short`);
+      for (const line of [label + from, ...lines]) assert.ok(line.length <= 20, `"${line}" is short`);
+      // Only the third press brings the message and only the sixth the mail; n picks the line.
+      assert.deepEqual(lines.map((_, n) => edge.pickEdgeNotice(label === "메일 · " ? 6 : 3, n, caseId)), lines.map((line) => ({ from: label + from, line })));
     }
+    for (const line of mail.slice(1)) assert.match(line, /^\[[가-힣]+\] \S/, `${caseId}: "${line}" reads as a mail subject`);
+    for (const pushes of [0, 1, 2, 4, 5, 7, 9]) assert.equal(edge.pickEdgeNotice(pushes, 0, caseId), null);
+  }
+  // A case outside the season's order reads as 프롤로그 01.
+  assert.deepEqual(edge.pickEdgeNotice(3, 0, "nowhere"), edge.pickEdgeNotice(3, 0, "prologue01"));
+  assert.deepEqual(edge.pickEdgeNotice(6, 1, undefined), edge.pickEdgeNotice(6, 1, "prologue01"));
+});
+
+test("every edge-notice sender is someone that case's own scenes bring in", async () => {
+  const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
+  const file = source("gauntlet/EdgeNotice.jsx");
+  const body = file.slice(file.indexOf("export const EDGE_AT"), file.indexOf("const STILL")).replaceAll("export ", "");
+  const { EDGE_NOTICES } = new Function(`${body}
+return { EDGE_NOTICES };`)();
+  // The messenger and the mail's office are named in the case itself, so neither is news from a later case
+  // nor someone the player has not met yet (B-15, per case since 2026-10-24).
+  for (const caseId of CASE_SEQUENCE) {
+    const scenes = readFileSync(new globalThis.URL(`../../src/nodes/${caseId === "final" ? "finalCase" : caseId}.js`, import.meta.url), "utf8");
+    const [[name], [office]] = EDGE_NOTICES[caseId];
+    assert.ok(scenes.includes(name), `메신저 · ${name} appears in ${caseId}'s scenes`);
+    assert.ok(scenes.includes(office), `메일 · ${office} appears in ${caseId}'s scenes`);
   }
 });
 
