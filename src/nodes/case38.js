@@ -181,7 +181,7 @@ const case38Nodes = {
     choices: [
       {
         id: "c38_plaintiff_pause",
-        label: "재판장에게 5분만 쉬자고 청해 문가을이 숨을 고르게 한다",
+        label: "재판장에게 5분 휴정을 청해 문가을이 숨을 고르게 한다",
         effect: { trust: 11, humanCost: -5, time: -4, capital: -2, fatigue: 5 },
         voice: "끊긴 목소리를 그대로 세워 둘 수 없어서, 재판장에게 5분만 쉬자고 청해 문가을이 숨을 고르게 한다.",
         echo: "5분이 주어집니다. 문가을은 복도에서 물을 한 모금 마시고, 돌아와 1주기 이야기를 끝까지 합니다.",
@@ -226,7 +226,7 @@ const case38Nodes = {
     choices: [
       {
         id: "c38_final_together",
-        label: "1,740명이 한 소송으로 끝까지 가자고 원고들을 설득한다",
+        label: "1,740명이 한 소송으로 끝까지 가자고 설득한다",
         effect: { trust: 12, legitimacy: 5, capital: -8, time: -8, humanCost: 3, fatigue: 6 },
         voice: "뒤에 선 사람을 두고 갈 수는 없다며, 1,740명이 한 소송으로 끝까지 가자고 원고들을 설득한다.",
         echo: "설득하자 1,528명 중 몇은 고개를 젓습니다. 올해 안에 받을 수 있었던 돈을, 83명의 노인이 한 해 더 기다립니다.",
@@ -234,7 +234,7 @@ const case38Nodes = {
       },
       {
         id: "c38_final_order",
-        label: "분리는 거부하고 212명의 거래 기록을 내놓게 해 달라고 신청한다",
+        label: "분리는 거부하고 212명의 거래 기록 제출을 신청한다",
         effect: { legitimacy: 13, trust: 4, capital: -5, time: -7, humanCost: 2, fatigue: 4 },
         voice: "나눌 이유부터 없애야 한다며, 분리는 거부하고 212명의 거래 기록을 내놓게 해 달라고 신청한다.",
         echo: "신청하자 피고는 거래 기록을 찾는 데 석 달이 걸린다고 답합니다. 그 석 달도 212명의 시간입니다.",
@@ -242,7 +242,7 @@ const case38Nodes = {
       },
       {
         id: "c38_final_split",
-        label: "나이 든 원고부터 받도록 분리에 동의하고 212명은 따로 싸운다",
+        label: "고령 원고부터 받게 분리하고 212명은 따로 싸운다",
         effect: { capital: 10, time: 6, humanCost: -4, trust: 2, legitimacy: -7, fatigue: 2 },
         voice: "나이 든 원고 83명이 연내 선고를 먼저 받도록, 분리에 동의하고 212명은 따로 싸운다.",
         echo: "나누자 1,528명은 연내 선고를 받습니다. 212명의 사건 번호는 새로 매겨지고, 첫 기일은 아직 없습니다.",
@@ -279,7 +279,7 @@ export const case38 = {
       choices: [
         {
           id: "c38_after_warm",
-          label: "원고들이 모두 흩어질 때까지 법원 앞에서 문가을 곁에 남는다",
+          label: "원고들이 흩어질 때까지 법원 앞 문가을 곁에 남는다",
           effect: { trust: 12, humanCost: -5, time: -4, capital: -2, fatigue: -7 },
           voice: "오늘은 이 사람들이 주인인 날이라며, 원고들이 모두 흩어질 때까지 법원 앞에서 문가을 곁에 남는다.",
           echo: "마지막 원고가 버스에 오를 때까지 계단에 남습니다. 문가을이 떡 한 봉지를 당신 가방에 밀어 넣고 '내일 밤 방송도 같이 봐요'라고 합니다.",
@@ -288,7 +288,7 @@ export const case38 = {
         },
         {
           id: "c38_after_record",
-          label: "증언 요지와 방청 기록을 정리해 대리인단과 리드라인에 넘긴다",
+          label: "증언 요지와 방청 기록을 대리인단과 리드라인에 넘긴다",
           effect: { legitimacy: 14, trust: 2, time: -5, capital: -2, fatigue: 4 },
           voice: "방송 전에 오늘 법정이 글로 서 있어야 한다며, 증언 요지와 방청 기록을 문서로 정리해 대리인단과 리드라인에 넘긴다.",
           echo: "문서는 밤 11시에 대리인단과 리드라인에 도착합니다. 서하린이 그중 두 문장에 밑줄을 긋습니다. 문하준의 팔각형 그림은 뺄지 말지 한참 고민합니다.",
@@ -297,7 +297,7 @@ export const case38 = {
         },
         {
           id: "c38_after_rush",
-          label: "원고들을 두고 복도로 달려가 그룹 측 변호사를 따라잡는다",
+          label: "원고들을 두고 복도로 달려가 그룹 변호사를 따라잡는다",
           effect: { capital: 8, legitimacy: 4, trust: -6, humanCost: 4, fatigue: 5 },
           voice: "그 웃음이 무슨 뜻인지 오늘 알아야 한다며, 원고들을 두고 복도로 달려가 그룹 측 변호사를 따라잡는다.",
           echo: "복도 끝에서 그룹 측 변호사를 따라잡습니다. 다큐 얘기를 꺼내자 그는 대답 대신 웃습니다. 계단의 원고들은 당신 몫의 떡 상자를 두고 흩어집니다.",
@@ -511,7 +511,7 @@ export const case38 = {
         },
         {
           id: "c38_branch_hallway_file",
-          label: "선재윤에게 한서윤을 다음 기일 증인으로 정식 신청하게 한다",
+          label: "선재윤에게 한서윤을 다음 기일 증인으로 신청하게 한다",
           effect: { legitimacy: 11, trust: 3, time: -4, humanCost: 4, fatigue: 3 },
           voice: "복도에서 한 말은 기록이 못 된다며, 선재윤에게 한서윤을 다음 기일 증인으로 정식 신청하게 한다.",
           echo: "신청서가 접수되자 한서윤은 증인이 됩니다. 증인이 된 사람은 대기발령 중에도 회사에 출석 사실을 알려야 합니다.",
@@ -630,7 +630,7 @@ export const case38 = {
       },
       {
         id: "c",
-        label: "212명의 소송 비용을 대는 기금을 1,528명과 함께 만든다",
+        label: "212명의 소송 비용 기금을 1,528명과 함께 만든다",
         effect: { trust: 10, legitimacy: 6, capital: -8, time: -6, humanCost: -2, fatigue: 7 },
         voice: "뒷줄에 앉은 사람들이 다음 기일에도 그 자리에 있게, 212명의 소송 비용을 대는 기금을 1,528명과 함께 만든다.",
         echo: "기금이 생기자 1,528명이 자기 몫에서 조금씩 떼어 212명의 재판을 댑니다. 누구도 그 칸을 강요하지 않았습니다.",
@@ -671,7 +671,7 @@ export const case38 = {
       },
       {
         id: "c38_evidence_turn_wait",
-        label: "다음 기일까지 아껴 두고 피고가 다시 '없다'고 말하게 둔다",
+        label: "다음 기일까지 아끼고 피고가 또 '없다'고 하게 둔다",
         effect: { capital: 8, time: 5, legitimacy: 3, trust: -5, humanCost: 5, fatigue: -3 },
         voice: "법정에서 한 번 더 말하면 빠져나갈 길이 없다며, 다음 기일까지 아껴 두고 피고가 다시 '없다'고 말하게 둔다.",
         echo: "아껴 두자 다음 기일에 피고 측 변호사 연서준은 같은 문장을 반복할 것입니다. 그때까지 212명은 서류 없는 사람으로 남습니다.",
@@ -682,8 +682,8 @@ export const case38 = {
   memoryPlan: {
     systemNext: "c38_route_system",
     evidenceNext: "c38_evidence_turn",
-    systemLabel: "데이터센터에서 짠 판이 그룹 쪽 서면 첨부에 끼었는지 본다",
-    evidenceLabel: "정렬된 유출의 증인 순서를 피고가 없다고 한 서류 목록 곁에 편다",
+    systemLabel: "데이터센터에서 짠 판이 그룹 서면 첨부에 끼었는지 본다",
+    evidenceLabel: "정렬된 유출의 증인 순서를 없다던 서류 목록 곁에 편다",
     systemEcho: "첨부 17번까지 넘겨도 당신의 판은 없고 당신의 망설임만 있습니다. 이민서가 서면이 떼어 내려는 212명 쪽으로 표를 돌립니다.",
     evidenceEcho: "증인 순서를 곁에 펴면 저쪽은 누가 무엇을 가졌는지 먼저 알고 있었습니다. 없다던 서류의 목록에도 상자 번호가 달려 있습니다.",
   },
@@ -699,21 +699,21 @@ export const case38 = {
   },
   openingSignatures: {
     c38_start_warm: {
-      label: "단체방 아홉 명이 다 같이 방청석 맨 앞줄에 앉기로 한다",
+      label: "단체방 아홉 명이 다 같이 방청석 앞줄에 앉기로 한다",
       effect: { trust: 11, humanCost: -4, capital: -2, time: -5, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "기록이 같이 들어갔으니, 단체방 아홉 명이 다 같이 방청석 맨 앞줄에 앉기로 한다.",
       echo: "아홉이 맨 앞줄에 앉자 연서준이 첨부 17번을 읽을 때마다 그 얼굴들을 봐야 합니다. 대신 72석 중 아홉 자리가 시장 사람들 몫에서 빠집니다.",
     },
     c38_start_record: {
-      label: "진본이라는 것과 믿을 만하다는 것은 다르다는 의견서를 쓴다",
+      label: "진본과 믿을 만한 것은 다르다는 의견서를 쓴다",
       effect: { legitimacy: 11, trust: -2, capital: -4, time: -5, fatigue: 5 },
       cognition: { inference: 2 },
       voice: "대조표가 나를 겨누는 근거로 쓰이지 않게, 진본이라는 것과 믿을 만하다는 것은 다르다는 의견서를 쓴다.",
       echo: "의견서는 논리로 이깁니다. 기록이 진짜라는 것과 기록을 만든 쪽의 해석이 옳다는 것은 다른 문제니까요. 다만 재판부가 그것을 읽는 날은 오늘이 아니라 다음 기일입니다.",
     },
     c38_start_rush: {
-      label: "첨부 17번의 출처부터 밝히라고 재판 시작 전에 요구한다",
+      label: "첨부 17번의 출처부터 밝히라고 재판 전에 요구한다",
       effect: { legitimacy: 8, trust: 5, humanCost: 3, time: -4, fatigue: 5 },
       cognition: { persistence: 2 },
       voice: "문답 90개에 없는 기록이 어디서 왔는지 알아야 해서, 첨부 17번의 출처부터 밝히라고 재판 시작 전에 요구한다.",

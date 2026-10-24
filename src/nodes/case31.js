@@ -199,7 +199,7 @@ const case31Nodes = {
       },
       {
         id: "c31_rooftop_lever",
-        label: "그 미안함을 지렛대 삼아 검사 결과를 앞당겨 달라고 한다",
+        label: "그 미안함을 지렛대로 검사 결과를 앞당겨 달라고 한다",
         effect: { capital: 8, time: 5, trust: -3, legitimacy: 2, humanCost: 3, fatigue: -2 },
         voice: "미안하다는 말보다 빠른 결과가 필요하다며, 그 미안함을 지렛대 삼아 검사 결과를 앞당겨 달라고 한다.",
         echo: "한지우가 당신을 오래 봅니다. '미안함으로 당길 수 있는 날짜는 없습니다.' 그래도 다음 날 일정표가 하루 당겨져 있습니다.",
@@ -281,7 +281,7 @@ export const case31 = {
       choices: [
         {
           id: "c31_after_warm",
-          label: "오늘 밤은 헌책방에 모여 동료들과 검사의 끝을 함께 보낸다",
+          label: "오늘 밤은 헌책방에서 동료들과 검사의 끝을 함께 보낸다",
           effect: { trust: 12, humanCost: -5, time: -3, capital: -2, fatigue: -7 },
           voice: "사람은 내가 챙기라는 말을 따라, 오늘 밤은 헌책방에 모여 동료들과 검사의 끝을 함께 보낸다.",
           echo: "헌책방 1층에 불이 늦게까지 켜집니다. 최서진이 처음으로 그 문을 열고 들어옵니다.",
@@ -299,7 +299,7 @@ export const case31 = {
         },
         {
           id: "c31_after_rush",
-          label: "상자가 오기 전에 평택 원본을 챙기러 곧장 자료실로 간다",
+          label: "상자가 오기 전에 평택 원본을 챙기러 자료실로 간다",
           effect: { capital: 6, legitimacy: 5, trust: -6, humanCost: 4, fatigue: 5 },
           voice: "다음 주 검찰의 상자가 오기 전에, 평택 원본을 챙기러 곧장 자료실로 간다.",
           echo: "자료실 문은 아직 열립니다. 폐기가 미뤄진 원본 상자를 드는 순간, 당신 이름이 출입 기록 맨 위에 다시 찍힙니다.",
@@ -617,7 +617,7 @@ export const case31 = {
     finalChoices: [
       {
         id: "a",
-        label: "예외 승인마다 승인한 사람의 실명을 남기도록 규칙을 바꾸자고 한다",
+        label: "예외 승인에 승인자 실명을 남기게 규칙을 고치자고 한다",
         effect: { legitimacy: 13, trust: 6, capital: -7, humanCost: -3, fatigue: 7 },
         voice: "계정이 사람 노릇을 하지 못하게, 예외 승인마다 승인한 사람의 실명을 남기도록 규칙을 바꾸자고 한다.",
         echo: "실명 규칙이 생기자 예외 승인은 줄어듭니다. 줄어든 만큼, 노아의 거절이 그대로 사람에게 닿습니다.",
@@ -658,7 +658,7 @@ export const case31 = {
     choices: [
       {
         id: "c31_evidence_turn_link",
-        label: "연장 날짜와 매각 일정 대조표를 검사 자료에 정식으로 붙인다",
+        label: "연장 날짜와 매각 일정 대조표를 검사 자료에 붙인다",
         effect: { legitimacy: 12, trust: 4, capital: -6, time: -7, fatigue: 5 },
         voice: "날짜가 겹친 것은 검사가 봐야 한다며, 연장 날짜와 매각 일정 대조표를 검사 자료에 정식으로 붙인다.",
         echo: "대조표가 붙자 한지우의 지적 사항에 날짜가 생깁니다. 날짜가 생긴 의혹은 검찰이 좋아하는 모양입니다.",
@@ -685,8 +685,8 @@ export const case31 = {
   memoryPlan: {
     systemNext: "c31_route_system",
     evidenceNext: "c31_evidence_turn",
-    systemLabel: "노아 단말에서 새로 짠 판이 검사 요구 목록에 흔적을 남겼는지 훑는다",
-    evidenceLabel: "'이상 없음' 한 줄을 들고 연장 날짜와 매각 일정을 하루씩 맞춘다",
+    systemLabel: "노아 단말에서 새로 짠 판이 검사 요구에 남았는지 본다",
+    evidenceLabel: "'이상 없음'으로 연장일과 매각일을 하루씩 맞춘다",
     systemEcho: "요구 목록에는 흔적이 없습니다. 남은 것은 승인 기록 쪽입니다. 노아가 자기 권고가 뒤집힌 네 번을 승인한 계정과 함께 띄웁니다.",
     evidenceEcho: "검토 의견이 적힌 날짜를 만기 연장 일정에 대면 네 번의 연장이 매각 협상과 같은 걸음으로 갑니다.",
   },
