@@ -243,7 +243,9 @@ const fileBudgets = {
   // afterword keeping its verdict on one line, and the table readouts (C-13);
   // 55726 with batch A's share line (E-6) under it, measured.
   // -> 2925 / 55865 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측.
-  "play.css": { lines: 2925, bytes: 55865 },
+  // -> 2931 / 56015 on 2026-10-24, measured: a sealed card's badges on a plain
+  // ground over its stripes.
+  "play.css": { lines: 2931, bytes: 56015 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
