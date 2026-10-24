@@ -25,7 +25,7 @@ import { getSceneBridge } from "../viewModels/sceneBridge.js";
 import { caseCastFor } from "../gauntlet/CaseCastFold.jsx";
 import { warmCasePortraits } from "../speakerPortraits.js";
 import { getSeasonOpening } from "./newGamePlusCarry.js";
-import { getSeasonPage, isCaseFirstPage } from "./secondSeason.js";
+import { getScenePick, getSeasonPage, isCaseFirstPage } from "./secondSeason.js";
 import { getSceneRead } from "./seenScenes.js";
 
 /**
@@ -65,9 +65,11 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const seasonLine = getSeasonOpening({ gauntletRun, currentCase, log, caseResults, echo });
   const firstPage = useMemo(() => isCaseFirstPage(log, currentCase), [log, currentCase]);
   const read = getSceneRead(secondSeason?.seen, nodeId);
+  // And the card the season before picked in it (B-14(1)): the page's, never the commit's or the clock's.
+  const picked = getScenePick(secondSeason, nodeId);
   const seasonOpening = useMemo(
-    () => getSeasonPage({ secondSeason, currentCase, firstPage, opening: seasonLine, read }),
-    [secondSeason, currentCase, firstPage, seasonLine, read],
+    () => getSeasonPage({ secondSeason, currentCase, firstPage, opening: seasonLine, read, picked }),
+    [secondSeason, currentCase, firstPage, seasonLine, read, picked],
   );
   const narrativeSpine = useMemo(() => {
     const suspenseState = getSuspenseState({ riskPressure, log, currentCase });

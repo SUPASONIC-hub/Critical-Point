@@ -4,6 +4,7 @@ import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js"
 import { getLogicType } from "./logicStreak.js";
 import { describeCardMove, getMoveMark, getTypeParts, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
+import { pastPick } from "./WeekRulePanel.jsx";
 
 /**
  * The hand: every card the scene deals, and 판을 다시 짠다 after them.
@@ -75,6 +76,7 @@ export function GauntletHand({
   fractureAxis,
   linkBurn = null,
   moveOf,
+  past = null,
   onSelect,
 }) {
   // The digit on a card is its key. With the single-key shortcuts off it is
@@ -104,6 +106,7 @@ export function GauntletHand({
           >
             {letterKeys && <span className="gx-card-key" aria-hidden="true">{index + 1}</span>}
             <CardType card={card} moveOf={moveOf} />
+            {pastPick(past, card.id)}
             <span className="gx-card-label" data-testid="card-label">{card.label}</span>
             {schema.faceDown ? (
               <span className="gx-card-stats">
@@ -183,7 +186,7 @@ export function GauntletHand({
           <span className="gx-card-label" data-testid="card-label">{reframeChoice.label}</span>
           <span className="gx-card-stats">
             <b className="gx-card-chips">+{getCardChips(reframeChoice, schema)}</b>
-            <b className="gx-card-burn">이 판을 다시 연다</b>
+            <b className="gx-card-burn">{pastPick(past, reframeChoice.id, 2)}</b>
           </span>
         </GuardedButton>
       )}

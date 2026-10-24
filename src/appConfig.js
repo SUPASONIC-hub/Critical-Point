@@ -350,9 +350,10 @@ export function readNewGamePlusMemory() {
 }
 
 /**
- * The season record as stored, or null. The start screen reads only two
- * things of it, here, so the entry chunk does not take the record's whole
- * reader (state/seasonRecord.js normalizes it for everything else).
+ * The season record as stored, or null. The start screen reads only what the
+ * runtime wrote for it (the season number, the last line, the 결말 도감's
+ * lines), so the entry chunk does not take the record's whole reader
+ * (state/seasonRecord.js normalizes it for everything else).
  */
 export function readStoredSeasonRecord() {
   try {

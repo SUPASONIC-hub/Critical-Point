@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "./helpers/network.js";
 import { acceptConfirms, dismissConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes, seasonCasesBase } from "../src/gameData.js";
@@ -7,6 +8,7 @@ import { SEASON_STANDING_NEAR } from "../src/seasonStanding.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
 import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, SEASON_RECORD_KEY } from "../src/appConfig.js";
 import { encodeSeen, SEEN_SCENES_KEY } from "../src/state/seenScenes.js";
+import { encodePicks, PAST_PICKS_KEY } from "../src/state/pastPicks.js";
 import { createCaseSummary } from "../src/gameLogic.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels, easyResourceLabels } from "../src/playerLanguage.js";
@@ -540,6 +542,151 @@ test("E-1: with 읽은 장면 접기 turned off, a scene the season before read 
   await expect(briefing.locator(".gx-panel-story .gx-caption").first()).toBeVisible();
   await expect(briefing.getByTestId("scene-unfold")).toHaveCount(0);
   await expect(briefing.getByTestId("scene-new")).toHaveCount(0);
+});
+
+/**
+ * B-14(1) 「지난 시즌의 당신」 (state/pastPicks.js): a finale leaves on the
+ * device the card its season picked last in each scene, and a NEW GAME+
+ * season marks that card in the briefing's list and in the hand. Seeded as
+ * the record a finished season would have written: `place` is the card's
+ * place among the scene's authored cards, 1 first.
+ */
+const FIRST_CARDS = nodes[FIRST_SCENE].choices;
+const FIRST_WILD = FIRST_CARDS.findIndex((choice) => choice.type === "reframe") + 1;
+const FIRST_PICK = 2;
+
+async function seedPastPicks(page, place, { print = null } = {}) {
+  const picks = encodePicks(new Map([[FIRST_SCENE, FIRST_CARDS[place - 1].id]]));
+  // A fingerprint the graph does not have: the record was written for other cards.
+  if (print) for (const caseId of Object.keys(picks)) picks[caseId] = picks[caseId].replace(/^[^:]*/, print);
+  const record = { v: 1, runId: "e2e-first-season", picks, before: {} };
+  await page.addInitScript(
+    ({ key, value }) => {
+      if (sessionStorage.getItem("e2e-picks-seeded")) return;
+      sessionStorage.setItem("e2e-picks-seeded", "1");
+      localStorage.setItem(key, value);
+    },
+    { key: PAST_PICKS_KEY, value: JSON.stringify(record) },
+  );
+}
+
+const handCard = (page, label) => page.locator(".gx-hand .gx-card").filter({ has: page.getByTestId("card-label").getByText(label, { exact: true }) });
+
+test("B-14(1): a NEW GAME+ season marks the card the season before picked, in the briefing and in the hand", async ({ page }) => {
+  const { label } = FIRST_CARDS[FIRST_PICK - 1];
+  await seedFinishedSeason(page);
+  await seedPastPicks(page, FIRST_PICK);
+  const briefing = await startNewGamePlus(page);
+  const mark = briefing.getByTestId("past-pick");
+  await expect(mark).toHaveCount(1);
+  await expect(mark).toBeVisible();
+  const listed = briefing.getByTestId("briefing-card").filter({ has: page.getByTestId("past-pick") });
+  await expect(listed).toContainText(label);
+  // The name says it, and starts with what is shown (WCAG 2.5.3).
+  await expect(listed).toHaveAccessibleName(/지난 시즌의 당신이 고른 카드/);
+  await expect(briefing.getByTestId("past-pick-wild")).toHaveCount(0);
+  // The tag is in the card's name and on the type's colours: axe finds nothing on the cards, contrast included.
+  expect((await new AxeBuilder({ page }).include(".gx-comic-cards").analyze()).violations).toEqual([]);
+
+  await dismissProtocolBreach(page);
+  const card = handCard(page, label);
+  await expect(card).toHaveCount(1);
+  await expect(card.getByTestId("past-pick")).toBeVisible();
+  await expect(page.locator(".gx-hand").getByTestId("past-pick")).toHaveCount(1);
+  await expect(card).toHaveAccessibleName(/지난 시즌의 당신이 고른 카드/);
+  expect((await new AxeBuilder({ page }).include(".gx-hand").analyze()).violations).toEqual([]);
+  // The wild card was not the pick: its burn line is its own.
+  await expect(page.locator(".gx-card-wild .gx-card-burn")).toHaveText("이 판을 다시 연다");
+});
+
+test("B-14(1): the wild card the season before picked says so in words, and has no tag over its name", async ({ page }) => {
+  expect(FIRST_WILD).toBeGreaterThan(0);
+  await seedFinishedSeason(page);
+  await seedPastPicks(page, FIRST_WILD);
+  const briefing = await startNewGamePlus(page);
+  await expect(briefing.getByTestId("past-pick")).toHaveCount(0);
+  const listed = briefing.getByTestId("briefing-card").filter({ has: page.getByTestId("wild-name") });
+  await expect(listed.getByTestId("past-pick-wild")).toHaveCount(1);
+  await expect(listed).toHaveAccessibleName(/판을 다시 짠다 ?지난 시즌의 당신이 고른 카드/);
+
+  await dismissProtocolBreach(page);
+  await expect(page.locator(".gx-hand").getByTestId("past-pick")).toHaveCount(0);
+  await expect(page.locator(".gx-card-wild .gx-card-burn")).toHaveText("지난 시즌에도 다시 짰다");
+  await expect(page.locator(".gx-card-wild").getByTestId("wild-name")).toHaveText("판을 다시 짠다");
+});
+
+test("B-14(1): a record written for other cards marks nothing", { tag: "@once" }, async ({ page }) => {
+  await seedFinishedSeason(page);
+  await seedPastPicks(page, FIRST_PICK, { print: "zzzzzz" });
+  const briefing = await startNewGamePlus(page);
+  await expect(briefing.getByTestId("briefing-card").first()).toBeVisible();
+  await expect(page.getByTestId("past-pick")).toHaveCount(0);
+  await expect(page.getByTestId("past-pick-wild")).toHaveCount(0);
+});
+
+test("B-14(1): a season that is not NEW GAME+ marks nothing, whatever the device kept", { tag: "@once" }, async ({ page }) => {
+  await seedPastPicks(page, FIRST_PICK);
+  await page.goto("/");
+  await startFirstRun(page);
+  await expect(page.locator(".gx-hand .gx-card").first()).toBeVisible();
+  await expect(page.getByTestId("past-pick")).toHaveCount(0);
+  await expect(page.locator(".gx-card-wild .gx-card-burn")).toHaveText("이 판을 다시 연다");
+});
+
+// 설계 ③(d): a mark only. The same table read again with the record gone shows the card's chips and burn as they were.
+test("B-14(1): the marked card's chips and burn are the ones it has with no record", { tag: "@once" }, async ({ page }) => {
+  const { label } = FIRST_CARDS[FIRST_PICK - 1];
+  await seedFinishedSeason(page);
+  await seedPastPicks(page, FIRST_PICK);
+  await startNewGamePlus(page);
+  await dismissProtocolBreach(page);
+  const read = async () => {
+    const card = handCard(page, label);
+    await expect(card).toHaveCount(1);
+    return [await card.locator(".gx-card-chips").textContent(), await card.locator(".gx-card-burn").textContent()];
+  };
+  await expect(handCard(page, label).getByTestId("past-pick")).toBeVisible();
+  const marked = await read();
+
+  await page.evaluate((key) => localStorage.removeItem(key), PAST_PICKS_KEY);
+  // The run is saved: a reload opens it again on the same briefing and the same deal.
+  await page.reload();
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await dismissProtocolBreach(page);
+  await expect(page.locator(".gx-hand .gx-card").first()).toBeVisible();
+  await expect(page.getByTestId("past-pick")).toHaveCount(0);
+  expect(await read()).toEqual(marked);
+});
+
+test.describe("B-14(1) on a phone held upright", () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  for (const size of [{ width: 360, height: 740 }, { width: 390, height: 844 }]) {
+    test(`the tag fits beside the card's type and costs the hand no height at ${size.width}x${size.height}`, async ({ page }) => {
+      await page.setViewportSize(size);
+      const { label } = FIRST_CARDS[FIRST_PICK - 1];
+      await seedFinishedSeason(page);
+      await seedPastPicks(page, FIRST_PICK);
+      const briefing = await startNewGamePlus(page);
+      const apart = async (card) => {
+        const tag = card.getByTestId("past-pick");
+        const [type, mark, box] = await Promise.all([card.getByTestId("card-type").boundingBox(), tag.boundingBox(), card.boundingBox()]);
+        expect(type && mark && box).toBeTruthy();
+        expect(type.x + type.width, "the type's tag ends before the mark begins").toBeLessThanOrEqual(mark.x);
+        expect(mark.x + mark.width, "and the mark stays on the card").toBeLessThanOrEqual(box.x + box.width + 1);
+        // On a phone only 「지난 시즌」 is drawn; the rest is read out.
+        await expect(tag).toHaveText("지난 시즌의 당신이 고른 카드");
+        expect(await tag.evaluate((element) => element.querySelector("i").getBoundingClientRect().width)).toBe(0);
+      };
+      await apart(briefing.getByTestId("briefing-card").filter({ has: page.getByTestId("past-pick") }));
+
+      await dismissProtocolBreach(page);
+      await apart(handCard(page, label));
+      const table = await measureTable(page);
+      expect(table.lastCard, `last card ${table.lastCard - table.actionsTop}px under the action bar`).toBeLessThanOrEqual(table.actionsTop);
+      expect(table.widest, "nothing is wider than the screen").toBeLessThanOrEqual(size.width + 1);
+    });
+  }
 });
 
 test("a second season's finale sets its ending beside the season before, and says the table's rules changed", async ({ page }) => {

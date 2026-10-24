@@ -29,7 +29,9 @@ import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
  * What it keeps, on purpose, and the question now says so (runLifecycle.resetRun):
  * the screen and sound settings, the relic codex, the NEW GAME+ unlock, the
  * season it remembers and the season record (newGamePlusCarry.js: how many
- * seasons this device finished, and how the last one ended), the board nickname and writer id, and the online save's
+ * seasons this device finished, and how the last one ended), the scenes the
+ * seasons before read (seenScenes.js) and the cards the last season picked
+ * (pastPicks.js, 「지난 시즌의 당신」), the board nickname and writer id, and the online save's
  * code, its sync record and the copy on the server. The sync record is kept
  * and marked: the reset holds a conflict in it, so the next run is not
  * uploaded over that copy unasked (cloudSave.holdCloudCopyThroughReset).

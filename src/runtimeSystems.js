@@ -79,7 +79,7 @@ export function getRankingComparison(summary = {}) {
 }
 
 /** What each ending is called in a sentence. An ending's id is a key, never copy. */
-const ENDING_NAMES = {
+export const ENDING_NAMES = {
   "open-oversight": "공개와 개입",
   "evidence-reform": "증거와 개혁",
   "human-record": "사람과 기록",

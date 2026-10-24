@@ -78,6 +78,34 @@ export function useSceneFold(node, page = null) {
 }
 
 /**
+ * B-14(1) 「지난 시즌의 당신」 (state/pastPicks.js): `picked` is the id of the
+ * card the season before picked in this scene (the page's `picked`), `id` a
+ * card's. The tag sits on the card's top edge opposite its type, in the wild
+ * card's name's place (play.css), so it costs a card no height; on a phone
+ * the `i` is clipped to 「지난 시즌」 and a screen reader reads the whole
+ * 「지난 시즌의 당신이 고른 카드」, which starts with what is shown (WCAG 2.5.3).
+ * Its last words are an `i` of no size rather than .sr-only, which is a box of
+ * its own and was read with a space before it (「당신 이 고른」).
+ * The wild card has its name there: in the briefing (`wild` 1) it gets only
+ * the words for a screen reader, and in the hand (`wild` 2) this is its burn
+ * line, 「지난 시즌에도 다시 짰다」 in place of 「이 판을 다시 연다」. A mark
+ * only: nothing the commit, the clock or the ranking reads. Here rather than
+ * in the briefing and the hand for the reason the lines above are.
+ */
+export function pastPick(picked, id, wild = 0) {
+  const hit = !!picked && picked === id;
+  if (wild === 2) return hit ? "지난 시즌에도 다시 짰다" : "이 판을 다시 연다";
+  if (!hit) return null;
+  return wild ? (
+    <span className="sr-only" data-testid="past-pick-wild"> 지난 시즌의 당신이 고른 카드</span>
+  ) : (
+    <span className="gx-card-type gx-card-name" data-testid="past-pick">
+      <span className="sr-only"> </span>지난 시즌<i>의 당신</i><i style={{ fontSize: 0 }}>이 고른 카드</i>
+    </span>
+  );
+}
+
+/**
  * The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own.
  * Drawn after the page's grid, it is raised to just under the title strip (`order: -1`, as .gx-comic-top is in
  * briefing.css): under the case file, a phone had to scroll to it (운영화면 문제 5-2).

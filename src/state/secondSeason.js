@@ -128,15 +128,36 @@ export function isCaseFirstPage(log, currentCase) {
  * memory or the run (useNewGamePlus): the season number, and for a run begun
  * with NEW GAME+ (`veteran`) the season before it.
  */
-export function createSecondSeason({ record = null, memory = null, runId = null, veteran = false, seen = null } = {}) {
+export function createSecondSeason({ record = null, memory = null, runId = null, veteran = false, seen = null, picks = null } = {}) {
   const round = getSeasonRound(normalizeSeasonRecord(record), runId, memory);
   // How the season before ended, for any run's card (E-5); the story lines read it only on NEW GAME+.
   const before = pastSeasonEnding(record, runId, memory);
   // The season's row title (seasonViewModels.js, whose chunk is the entry's).
   const rowTitle = `${seasonLabel(round)} COMPLETE`;
-  if (veteran !== true) return { round, rowTitle, before, veteran: false, results: null, past: null, seen: null };
+  if (veteran !== true) return { round, rowTitle, before, veteran: false, results: null, past: null, seen: null, picks: null };
   // `seen`: the scenes the seasons before read (seenScenes.pastSeenScenes, E-1), a Set or null.
-  return { round, rowTitle, before, veteran: true, results: pastSeasonResults(memory, runId), past: before, seen: seen instanceof Set ? seen : null };
+  // `picks`: the card the season before picked in each scene (pastPicks.pastPicks, B-14(1)), a Map or null.
+  return {
+    round,
+    rowTitle,
+    before,
+    veteran: true,
+    results: pastSeasonResults(memory, runId),
+    past: before,
+    seen: seen instanceof Set ? seen : null,
+    picks: picks instanceof Map && picks.size > 0 ? picks : null,
+  };
+}
+
+/**
+ * B-14(1) 「지난 시즌의 당신」: the id of the card the season before picked
+ * in this scene, or null -- not a NEW GAME+ run, nothing kept, or no pick
+ * there. A mark on the board only: the page carries it (`getSeasonPage`),
+ * never the log, the commit or the reading clock.
+ */
+export function getScenePick(secondSeason, nodeId) {
+  const picked = secondSeason?.veteran === true && secondSeason.picks instanceof Map ? secondSeason.picks.get(nodeId) : null;
+  return typeof picked === "string" && picked ? picked : null;
 }
 
 /** 「SEASON 02」: the season's number as the card and the telemetry label print it. */
@@ -182,10 +203,14 @@ function getSeasonLines({ secondSeason, currentCase, firstPage, opening }) {
  * What a NEW GAME+ season's page carries: the first page's lines, and on any
  * page `read` (E-1, seenScenes.getSceneRead) -- true for a scene a season
  * before read, which the briefing folds, false for one none did, which it
- * marks NEW. Null when there is neither.
+ * marks NEW -- and `picked` (B-14(1), `getScenePick`), the id of the card
+ * the season before picked here. Each only when known; null when there is
+ * nothing at all.
  */
-export function getSeasonPage({ secondSeason, currentCase, firstPage, opening = null, read = null }) {
+export function getSeasonPage({ secondSeason, currentCase, firstPage, opening = null, read = null, picked = null }) {
   const lines = getSeasonLines({ secondSeason, currentCase, firstPage, opening });
-  if (typeof read !== "boolean" || !secondSeason?.veteran) return lines;
-  return { echo: null, recall: null, ...lines, read };
+  const hasRead = typeof read === "boolean";
+  const hasPick = typeof picked === "string" && picked !== "";
+  if ((!hasRead && !hasPick) || !secondSeason?.veteran) return lines;
+  return { echo: null, recall: null, ...lines, ...(hasRead ? { read } : null), ...(hasPick ? { picked } : null) };
 }

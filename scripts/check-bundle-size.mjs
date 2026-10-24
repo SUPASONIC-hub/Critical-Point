@@ -137,7 +137,17 @@ const budgets = [
   // check and fit (payloadSchemas.js) and the opening snapshot stamped on a new game.
   // -> 173,724 / 62,701 on 2026-10-24 (#240 f1-s7 on f1-stage3 efba1927, main
   // 5ea63bf under it): measured 173,724 / 62,697 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 173_724, maxGzip: 62_701 },
+  // E-3 결말 도감 on the memory panel (e3-endings), a fold whose head
+  // (「결말 3/9 · 판결 2/3.」 and the next season's ending) and hints the
+  // runtime writes into the season record (state/endingBook.js), so the entry
+  // carries none of the copy, only the panel's <details> and
+  // getPastRunMemory's `book`. Cut first: a count line, a next line and a fold
+  // head of their own came to +348 / +128. Measured on batch-c with the
+  // user's wording (10-23, all (1)) 173,179 / 62,555, on main 5ea63bf (#282)
+  // 173,179 / 62,558.
+  // -> 173,927 / 62,785 on 2026-10-24, e3-endings moved onto main 90247c0
+  // (#240 + #283): measured 173,927 / 62,781 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_927, maxGzip: 62_785 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -281,7 +291,11 @@ const budgets = [
   // +2 on 2026-10-22 (S3, draft): the case and its hand handed to openCaseRun.
   // On main's 107,602 that is 107,604 (2026-10-24, f1-s7 on efba1927): measured
   // 107,604 / 35,954 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_604, maxGzip: 35_958 },
+  // -> 107,682 / 35,991 on 2026-10-24 (B-14(1) 지난 시즌의 당신, on e3-endings
+  // over main 90247c0): the briefing's and the hand's four calls to
+  // WeekRulePanel's pastPick and the hand's `past` prop; the tag itself is
+  // WeekRulePanel's. Measured 107,682 / 35,987 in the e2e build, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 107_682, maxGzip: 35_991 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -576,7 +590,11 @@ const budgets = [
   // PlayScreen chunk the same way.
   // -> 1,954 / 977 on 2026-10-23, 10-23 묶음 C 합친 상태 실측 (#261 on 묶음 A):
   // measured 1,954 / 973 in the e2e build, the gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 1_954, maxGzip: 977 },
+  // -> 2,460 / 1,158 on 2026-10-24 (B-14(1) 지난 시즌의 당신): `pastPick`, the
+  // tag on the card the season before picked and the wild card's words (its
+  // burn line moved here with them). Measured 2,460 / 1,154 in the e2e build,
+  // the gzip plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 2_460, maxGzip: 1_158 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no

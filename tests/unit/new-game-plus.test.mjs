@@ -58,7 +58,7 @@ test("the season record is read safely from storage, raw for the start screen an
   for (const broken of ["{", "[1]", "7", "null"]) {
     globalThis.localStorage.setItem(SEASON_RECORD_KEY, broken);
     assert.equal(readStoredSeasonRecord(), null, broken);
-    assert.deepEqual(readSeasonRecord(), { seasons: 0, countedRuns: [], last: null, previous: null }, broken);
+    assert.deepEqual(readSeasonRecord(), { seasons: 0, countedRuns: [], last: null, previous: null, endingsSeen: [], verdictsSeen: [], endingBook: null }, broken);
     assert.equal(getSeasonRound(readStoredSeasonRecord(), "run-a"), 1);
   }
   globalThis.localStorage.setItem(SEASON_RECORD_KEY, JSON.stringify({ seasons: 2, countedRuns: ["run-a", "run-b"] }));
@@ -67,4 +67,50 @@ test("the season record is read safely from storage, raw for the start screen an
   assert.equal(getSeasonRound({ seasons: 2, countedRuns: "run-b" }, "run-b"), 3, "a list that is not one counts nothing");
   assert.equal(readSeasonRecord().seasons, 2);
   globalThis.localStorage.removeItem(SEASON_RECORD_KEY);
+});
+
+/**
+ * B-14(1) 「지난 시즌의 당신」: the finale's close writes the season's picks
+ * once (pastPicks.js), pressing NEW GAME+ writes none, and only a NEW GAME+
+ * run is handed them back (`secondSeason.picks`). The hook is rendered once on
+ * the server renderer for its functions; its state setters do nothing there.
+ */
+test("unlock writes the picks once at the finale, the button writes none, and only a NEW GAME+ run reads them", async () => {
+  const { createElement } = await import("react");
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  const { nodeOrders, nodes } = await import("../../src/gameData.js");
+  const { PAST_PICKS_KEY } = await import("../../src/state/pastPicks.js");
+  const { picksBefore, useNewGamePlus } = await import("../../src/state/useNewGamePlus.js");
+  const mount = (runId, veteran) => {
+    let api = null;
+    const Probe = () => {
+      api = useNewGamePlus(null, runId, veteran);
+      return null;
+    };
+    renderToStaticMarkup(createElement(Probe));
+    return api;
+  };
+  const [scene] = nodeOrders.case03;
+  const card = nodes[scene].choices[1].id;
+  const writes = [];
+  const setItem = globalThis.localStorage.setItem;
+  globalThis.localStorage.setItem = function (key, value) {
+    if (key === PAST_PICKS_KEY) writes.push(value);
+    return setItem.call(this, key, value);
+  };
+  try {
+    globalThis.localStorage.removeItem(PAST_PICKS_KEY);
+    mount("pick-run-1", false).unlockNewGamePlus();
+    assert.equal(writes.length, 0, "pressing NEW GAME+ writes no picks");
+    mount("pick-run-1", false).unlockNewGamePlus({ final: { runId: "pick-run-1" } }, { finalChoiceId: null, log: [{ nodeId: scene, choiceId: card }] });
+    assert.equal(writes.length, 1, "the finale's close writes them once");
+  } finally {
+    globalThis.localStorage.setItem = setItem;
+  }
+  const veteran = mount("pick-run-2", true).secondSeason;
+  assert.equal(veteran.picks.get(scene), card);
+  assert.equal(mount("pick-run-2", false).secondSeason.picks, null, "a plain run is handed none");
+  assert.equal(mount("pick-run-1", true).secondSeason.picks, null, "the run that wrote them reads the season before it, which kept none");
+  assert.equal(picksBefore(null, "r", false), null);
+  assert.equal(picksBefore(null, "r", true).size, 0);
 });

@@ -8,7 +8,7 @@ import { describeStanding } from "./tableReadout.js";
 import { getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
 import { getSpeakerLine } from "./speakerLine.js";
 import { SPEAKER_NAMES } from "../speakerPortraits.js";
-import { useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
+import { pastPick, useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
@@ -432,6 +432,7 @@ export function SceneBriefing({
                   {letterKeys && <kbd>{index + 1}</kbd>}
                   <span>{card.label}</span>
                   <CardType card={card} moveOf={moveOf} />
+                  {pastPick(echo?.picked, card.id)}
                   {(card.id === sealedId || !open) && (
                     <>
                       <Lock size={12} aria-hidden="true" />
@@ -453,6 +454,7 @@ export function SceneBriefing({
                 <span>{reframeChoice.label}</span>
                 <CardType card={reframeChoice} moveOf={moveOf} />
                 <WildName />
+                {pastPick(echo?.picked, reframeChoice.id, 1)}
               </button>
             )}
           </div>

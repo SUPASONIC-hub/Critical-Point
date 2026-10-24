@@ -18,6 +18,7 @@
  * the run's `echo` and the screens read it; the record's own shape and the
  * season number, which the entry chunk's intro reads, are in seasonRecord.js.
  */
+import { getEndingBook } from "./endingBook.js";
 import { OPENING_ECHO } from "./openingState.js";
 import { countRun, isPlainObject, normalizeLast, normalizeSeasonRecord, VERDICT_NAMES } from "./seasonRecord.js";
 import { getVerdictKey } from "../verdictBranch.js";
@@ -60,6 +61,9 @@ const OPENING_ECHOES = Object.freeze({
  * reads it -- the record is written before the result is drawn, so `last` is
  * already this season's by then, and compared with itself every ending was
  * "the same ending" (#220 review, 10-21).
+ *
+ * The ending and the verdict are added to the record's seen lists, and the
+ * start screen's book lines are written from them (`withEndingBook`, E-3).
  */
 export function recordFinishedSeason(record, { runId, finalSummary, finalChoiceId } = {}) {
   const current = normalizeSeasonRecord(record);
@@ -75,12 +79,24 @@ export function recordFinishedSeason(record, { runId, finalSummary, finalChoiceI
     line: getMemoryLine({ endingLabel: endingVariant.label, verdict }),
   });
   const counted = current.countedRuns.includes(runId);
-  return {
+  return withEndingBook({
     seasons: counted ? current.seasons : current.seasons + 1,
     countedRuns: counted ? current.countedRuns : countRun(current.countedRuns, runId),
     last,
     previous: counted ? current.previous : current.last,
-  };
+    endingsSeen: [...new Set([...current.endingsSeen, last.endingId])],
+    verdictsSeen: verdict ? [...new Set([...current.verdictsSeen, verdict])] : current.verdictsSeen,
+  });
+}
+
+/**
+ * The record with the start screen's 결말 도감 lines (endingBook.js) written
+ * from its seen lists: what a counted season stores, and what the runtime
+ * writes back over a record kept before the book, or under older lines.
+ */
+export function withEndingBook(record) {
+  const current = normalizeSeasonRecord(record);
+  return { ...current, endingBook: getEndingBook(current) };
 }
 
 /**

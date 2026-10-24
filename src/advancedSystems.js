@@ -107,6 +107,11 @@ const VETERAN_TABLE_LINE = "NEW\u00a0GAME+는 프롤로그 01부터 모든 규�
  * of its own; the panel's head is written in IntroScreen, with its English
  * name marked as English. A device with only the NEW GAME+ memory keeps the
  * old line.
+ *
+ * `book` is the 결말 도감 (E-3), written into the record by the runtime
+ * (state/endingBook.js), so the entry carries none of its copy; the panel
+ * prints its head and, folded under it, its hints. A record without it, or
+ * with anything else there, shows the panel as before.
  */
 export function getPastRunMemory(memory = {}, record = null, runId = null) {
   const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
@@ -114,8 +119,10 @@ export function getPastRunMemory(memory = {}, record = null, runId = null) {
   if (entries.length === 0 && !line) return null;
   const round = getSeasonRound(record, runId, memory);
   const [caseId] = entries.at(-1) ?? [];
+  const book = record?.endingBook;
   return {
     round,
+    book: typeof book?.head === "string" && Array.isArray(book.hints) ? book : null,
     // What a NEW GAME+ table is, said as a fact (문구 질문 17, user's answer of
     // 2026-10-21 evening), so "harder" is not said. Measured on the rules
     // that ship (RULES_MARK 2, 2026-10-23; `check-endings --report` and
