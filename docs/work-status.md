@@ -154,6 +154,15 @@ Still open, on purpose:
   `Test Week` workflow's default week and the README move together; W47 is
   told on W46's own start line, the ordinary week's notice. The ruling moves
   to 2026-11-23.
+- 2026-10-24, readiness check for W47: the calendar, the migrations
+  (20261022010000, and 20261023010000 from W48 on), the start line from
+  11-09 and production (`cf64163`, whose bundle names W46, W47 and W48 and
+  not W44) agree. Two things had moved under the `Test Week` summary since
+  10-22: a device's first season now starts without the week's rule unless
+  its box is ticked (E-8), so the "without the rule" row counts those too and
+  says so, and a NEW GAME+ season (#220) takes the rule like any other, so
+  the summary now counts how many of the week's seasons were NEW GAME+
+  (`summary.newGamePlus`, the same read-only SELECT).
 - Drop-off report (E-4(a), 2026-10-22): the `Funnel` workflow reads every
   run's case rows once a week (Sunday 22:10 KST, one read-only SELECT,
   `scripts/report-funnel.mjs`) and writes how far runs got, the breaks

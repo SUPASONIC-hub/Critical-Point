@@ -45,9 +45,17 @@ if (!/^[a-z][a-z0-9-]{0,31}$/.test(RULE) || !getWeekRule(RULE)) throw new Error(
  *
  * A season that turned the rule down (the box on the start screen, #199) is
  * not marked as such: the client stamps no `weekRule` (pickSeasonWeekRule
- * returns null), so its rows look like the ordinary table's. A season of a
- * client older than the rule, or one begun the week before and first sent in
- * this one, looks the same, and is counted with them. Story mode stamps no
+ * returns null), so its rows look like the ordinary table's. A device's first
+ * season is one of them unless its player ticked the box that takes the rule
+ * up (E-8: a first season starts without the week's rule), and so is a season
+ * of a client older than the rule, or one begun the week before and first
+ * sent in this one; all are counted together.
+ *
+ * A NEW GAME+ season (a device that finished one and began again) is a season
+ * of the week like any other when it took the rule. Its case rows carry
+ * `summary.newGamePlus` (newGamePlusMark), and it opens its first cases on
+ * the full table rather than the first season's staged one (tableUnlocks.js),
+ * so the report says how many of the week's seasons were NEW GAME+. Story mode stamps no
  * rule either, and is told apart by the `assistStory` its decision log
  * carries. A season's device is the smallest session id among its case rows,
  * and only its rank among the week's devices leaves the database.
@@ -74,6 +82,7 @@ select c.run_id, coalesce(s.case_id, 'turned-down') as case_id, c.device,
        s.summary->>'endingVariant' as ending,
        s.summary->'gauntlet'->'vault' as vault,
        s.summary->>'week' as ranked_week,
+       s.summary->>'newGamePlus' = 'true' as new_game_plus,
        (select coalesce(jsonb_agg(jsonb_build_object(
                  'nodeId', e->'nodeId', 'choiceId', e->'choiceId', 'threshold', e->'threshold',
                  'environmentMode', e->'environmentMode', 'riskRewardEffect', e->'riskRewardEffect',
@@ -96,6 +105,7 @@ export function readTestWeek(rows) {
   const runs = new Map();
   const devicesOn = new Set();
   const devicesOff = new Set();
+  const newGamePlus = new Set();
   let turnedDown = 0;
   for (const row of rows) {
     if (row.case_id === "turned-down") {
@@ -104,11 +114,12 @@ export function readTestWeek(rows) {
       continue;
     }
     devicesOn.add(row.device);
+    if (row.new_game_plus === true || row.new_game_plus === "true") newGamePlus.add(row.run_id);
     if (!runs.has(row.run_id)) runs.set(row.run_id, []);
     runs.get(row.run_id).push(row);
   }
   const t = {
-    seasons: runs.size, turnedDown, devicesOn: devicesOn.size, devicesOff: devicesOff.size,
+    seasons: runs.size, newGamePlus: newGamePlus.size, turnedDown, devicesOn: devicesOn.size, devicesOff: devicesOff.size,
     devices: new Set([...devicesOn, ...devicesOff]).size, finished: 0, ranked: 0, caseRows: 0, endings: 0, collapse: 0,
     judged: 0, caught: 0, caughtSeasons: 0, nearLimit: 0, nearLimitClear: 0, vaultMoved: 0, vaultLost: 0,
     boards: 0, busts: 0, cascadeBoards: 0, cascadeBusts: 0, made: 0, cascadeCashHeat: 0, cascadeCashes: 0, plainCashHeat: 0, plainCashes: 0,
@@ -190,7 +201,8 @@ export function describeTestWeek(t) {
     "| 구분 | 지표 | 이번 주 | 시뮬레이션(참고) |",
     "|---|---|---|---|",
     `| 시즌 | 시작한 시즌 / 사건 행 | ${t.seasons} / ${t.caseRows} | |`,
-    `| 시즌 | 같은 주에 시작해 규칙 없이 친 시즌(규칙을 끔·옛 화면, 이야기 모드 제외) | ${t.turnedDown} (${pct(t.turnedDown, t.seasons + t.turnedDown)}) | |`,
+    `| 시즌 | 그중 NEW GAME+ 시즌(지난 시즌을 끝낸 기기의 다음 시즌) | ${t.newGamePlus} (${pct(t.newGamePlus, t.seasons)}) | |`,
+    `| 시즌 | 같은 주에 시작해 규칙 없이 친 시즌(규칙을 끔·첫 시즌 기본 꺼짐·옛 화면, 이야기 모드 제외) | ${t.turnedDown} (${pct(t.turnedDown, t.seasons + t.turnedDown)}) | |`,
     `| 시즌 | 서로 다른 기기: 규칙 켬 / 규칙 없음 / 모두 | ${t.devicesOn} / ${t.devicesOff} / ${t.devices} | |`,
     `| 시즌 | 끝난 시즌 / 이 주 랭킹에 오른 시즌 | ${t.finished} / ${t.ranked} | |`,
     `| 감사 | 판정한 사건 닫힘 / 적발 | ${t.judged} / ${t.caught} (${pct(t.caught, t.judged)}) | |`,
