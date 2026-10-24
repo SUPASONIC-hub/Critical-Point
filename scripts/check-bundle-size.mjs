@@ -404,7 +404,10 @@ const budgets = [
   // -> 43,189 / 14,206 on 2026-10-24, E-12: measured 43,189 / 14,202, the
   // gzip plus 4. No code of the report changed: a name in its hoisted
   // `import "./<chunk>-<hash>.js"` list did (gameData.app -> pastPicks).
-  { pattern: /^ResultScreen-.*.js$/, maxBytes: 43_189, maxGzip: 14_211 },
+  // 43,189 / 14,211 -> 44,569 / 14,830 on 2026-10-25 (B-12(2) 「당신의 세 장면」,
+  // src/threeScenes.js in the ending's last step, on main ea5b74aa): measured
+  // 44,569 / 14,826 in the e2e build, the gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_569, maxGzip: 14_830 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -455,7 +458,9 @@ const budgets = [
   // 35,792, the gzip plus 4.
   // 194,400 / 35,796 -> 191,685 / 35,791 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 191,685 / 35,787 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 191_685, maxGzip: 35_791 },
+  // -> 191,778 / 35,830 on 2026-10-25 with B-12(2)'s 「당신의 세 장면」 coda
+  // (main ea5b74aa): measured 191,778 / 35,826, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 191_778, maxGzip: 35_830 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
