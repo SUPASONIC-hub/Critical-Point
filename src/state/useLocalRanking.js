@@ -15,7 +15,7 @@ import { readStoredValue, writeStoredValue } from "../appConfig.js";
 // v9 is the same season at the table of 2026-10-20 (the day-ten table: fracture 8,
 // the x1.6 streak and x1.5 LOCK caps, five tool slots, SCOUT), whose score does not compare with one from the table before it.
 // v10 is the same season at RULES_MARK 3: B3's audit and B2's links are rules of the table from
-// 프롤로그 04 (played first as 2026-W44's test week), and a vault the audit took a part of, or a
+// 프롤로그 04 (played first as 2026-W47's test week), and a vault the audit took a part of, or a
 // board CASCADE pulled the wall of, does not compare with one from the table before.
 // A retired key is read once, when the ranking screen first opens, for one thing only: the
 // player's best row of that table, kept under the personal-bests key (src/personalBests.js,

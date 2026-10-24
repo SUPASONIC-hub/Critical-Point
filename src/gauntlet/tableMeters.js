@@ -1,7 +1,6 @@
 import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
-import { readAudit } from "./auditRisk.js";
+import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
 import { HEAT_DEBT_GAUGE } from "./tableRules.js";
-import { AUDIT_HEAT } from "./weeklyRules.js";
 import { readSafeLine } from "./tableAfterword.js";
 
 /**

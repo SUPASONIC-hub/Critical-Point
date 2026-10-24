@@ -30,7 +30,7 @@
  * A rule of the table since RULES_MARK 3 (B3 and B2 together, one ranking
  * reset): on in a case whose rules have `audit` (tableUnlocks.js: from
  * 프롤로그 04, and from the first case under NEW GAME+), never in story mode
- * or a practice case (decision 9). Before that it was 2026-W44's test week, a
+ * or a practice case (decision 9). Before that it was 2026-W47's test week, a
  * device that week's rule switched on; its numbers, below, are the ones that
  * week played.
  *
@@ -43,7 +43,7 @@
  * Set B of the design's three (40 / 4 / -2 / one in four), decided by the
  * user on 2026-10-20 after the A/B/C measurement of PR #201 (A never caught a
  * season bot, C broke a check:pressure assertion and caught the hand that
- * watches the wall) and played as 2026-W44's test week. Here and not in
+ * watches the wall) and played as 2026-W47's test week. Here and not in
  * tableRules.js, which the engine's chunk holds: imported from there, the
  * build gave tableRules.js a chunk of its own (check:bundle, 2026-10-21).
  * scripts/sim/audit-values.mjs rewrites the four for the other sets.
@@ -180,7 +180,7 @@ export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "pr
  * case's log (what the close judged), the case and the case summary
  * (`summary`, createRunSummary). A case closed at RULES_MARK 3 or later counts
  * from 프롤로그 04 on (the summary does not say NEW GAME+, so its first three
- * prologues say nothing); one closed before it says nothing (2026-W44's
+ * prologues say nothing); one closed before it says nothing (2026-W47's
  * cases were the only ones that counted, and the record is only ever the case
  * on the table). A story case and a replayed one count nothing, as
  * `isAuditOn` says; the log tells which by an entry's `assistStory` or the

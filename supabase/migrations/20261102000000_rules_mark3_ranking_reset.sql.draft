@@ -1,15 +1,16 @@
 -- DRAFT (2026-10-21), kept as `.sql.draft` so nothing applies it: merging a
 -- `.sql` to main applies it within a minute, before the client deploys. It
 -- ships with RULES_MARK 3 in the same pull request, and only if the verdict
--- on 2026-W44 (11-02) is to make the test week's table the table. On the
+-- on 2026-W47 (11-23) is to make the test week's table the table. On the
 -- merge day the user is asked first; then the file is renamed to `.sql`,
 -- re-dated to follow the last migration on main, and check:grants replays it
 -- (scripts/check-grants.mjs judges the newest ranking reset by what it leaves
 -- and asks for the mark it sets).
 --
--- RULES_MARK 3. B3's audit and B2's links, played as 2026-W44's test week
--- (`audit-cascade`, 20261021010000), become rules of the table from prologue
--- 04, and from the first case under NEW GAME+: a cash pushed once and closed
+-- RULES_MARK 3. B3's audit and B2's links, played as 2026-W47's test week
+-- (`audit-cascade`, 20261021010000, moved to W47 by 20261022010000), become
+-- rules of the table from prologue 04, and from the first case under NEW
+-- GAME+: a cash pushed once and closed
 -- below 40 fills the audit, and four marks at a case's close take a quarter
 -- of what it moves to the vault; a card that burned 8 or more of one resource
 -- pulls a later board's wall 6 closer. Two things follow, as in
@@ -27,7 +28,7 @@
 --    a `season-final` row for a run with any case row whose `tableRules` (in
 --    its `dynamics`) is not a number of 3 or more. Every build from this one
 --    writes 3 (`createRunSummary`); the builds of 2026-10-20 to this one wrote
---    2, and 2026-W44's seasons are among them. Only that number changes in
+--    2, and 2026-W47's seasons are among them. Only that number changes in
 --    `ranking_check_run_marks`; its three blocks are otherwise the ones
 --    20261020010000 wrote, word for word.
 --
@@ -86,7 +87,7 @@ begin
   end if;
   -- A case closed at a table before this one has no `tableRules` in its
   -- row's `dynamics`, or one below 3 (2 is the day-ten table of
-  -- 2026-10-20, and 2026-W44's test week); a case closed at this one
+  -- 2026-10-20, and 2026-W47's test week); a case closed at this one
   -- always has, as a number of 3 or more. One such case keeps the whole
   -- season off the ranking, read from the run's rows like the two marks
   -- above. `is not true`, so a missing key, a missing object, a value of

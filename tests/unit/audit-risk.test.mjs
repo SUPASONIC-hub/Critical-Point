@@ -35,7 +35,7 @@ function playCase(run, windows, rules = ALL_RULES) {
 
 test("the audit is a rule of the table from 프롤로그 04 (RULES_MARK 3), and no week switches it any more", () => {
   assert.deepEqual(WEEK_RULE_DEVICES, [], "the week's devices are empty; the frame stays");
-  assert.equal(weekRuleHasDevice("audit-cascade", "audit"), false, "W44's stamp switches nothing now");
+  assert.equal(weekRuleHasDevice("audit-cascade", "audit"), false, "W47's stamp switches nothing now");
   assert.equal(getWeekRule("audit"), null, "the audit week is gone from the catalogue");
   const opens = UNLOCK_LADDER.find((step) => step.adds.includes("audit"));
   assert.equal(opens.caseId, "prologue04", "it opens with FRACTURE");
@@ -74,7 +74,7 @@ test("on in a case whose rules have it, and never in story mode or practice", ()
   assert.equal(isAuditOn(auditRun(), NO_AUDIT), false);
   assert.equal(isAuditOn(auditRun(), rulesFor("prologue03")), false);
   assert.equal(isAuditOn(auditRun(), undefined), false, "no rules, no audit");
-  assert.equal(isAuditOn(normalizeRunState({ weekRule: "audit-cascade" }), NO_AUDIT), false, "W44's stamp does not switch it on");
+  assert.equal(isAuditOn(normalizeRunState({ weekRule: "audit-cascade" }), NO_AUDIT), false, "W47's stamp does not switch it on");
   assert.equal(isAuditOn(normalizeRunState({ story: true }), ALL_RULES), false);
   assert.equal(isAuditOn(openCaseRun(auditRun(), { replayOf: {} }), ALL_RULES), false, "a replayed case is practice");
 });
@@ -202,7 +202,7 @@ test("a development build's ?week= plays a week of the catalogue; ?week=audit is
   assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /'added:"dev"'\]/, "check:bundle fails a release that carries it");
 });
 
-test("the audit's numbers are set B, decided on 2026-10-20 and played in 2026-W44: 40 / 4 / -2 / one in four", () => {
+test("the audit's numbers are set B, decided on 2026-10-20 and played in 2026-W47: 40 / 4 / -2 / one in four", () => {
   assert.deepEqual([AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE], [40, 4, 2, 4]);
 });
 
@@ -217,7 +217,7 @@ test("the table record says, in one line under its sentence, how many marks the 
 
   assert.equal(describeAuditLedger(caught.log, marked, "prologue03"), null, "a case before the audit's step has no line");
   assert.equal(describeAuditLedger(caught.log, marked, null), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`, "a case the ladder does not name is a whole table's");
-  // A case closed before RULES_MARK 3 says nothing, W44's too: the record is the case on the table.
+  // A case closed before RULES_MARK 3 says nothing, W47's too: the record is the case on the table.
   assert.equal(describeAuditLedger(caught.log, { tableRules: 2, weekRule: "audit-cascade" }, "case01"), null, "a case of the table before");
   assert.equal(describeAuditLedger(caught.log, { tableRules: "3" }, "case01"), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`, "read as the server reads it, a number");
   assert.equal(describeAuditLedger(caught.log, null, "case01"), null, "no summary, no mark");
@@ -275,7 +275,7 @@ test("a cash on a CASCADE board adds nothing to the audit; its relief stays", ()
   assert.equal(reading.spoken, `지금 확정해도 감사 2/${AUDIT_LIMIT} 그대로`);
   assert.equal(readAudit(bothRun(), 2, win).ifCash, 1);
   assert.equal(reading.spoken, `지금 확정해도 감사 2/${AUDIT_LIMIT} 그대로`, "the 확정 button says it there");
-  assert.match(getWeekRule("audit-cascade").text, /CASCADE 판의 확정은 감사에 세지 않는다\.$/, "as 2026-W44's did");
+  assert.match(getWeekRule("audit-cascade").text, /CASCADE 판의 확정은 감사에 세지 않는다\.$/, "as 2026-W47's did");
 });
 
 test("the log counts a window by the board the window before it dealt: the engine, the HUD and the ledger agree", () => {

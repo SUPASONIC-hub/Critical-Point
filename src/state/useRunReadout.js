@@ -135,10 +135,6 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // effect to spare (check:runtime-budget).
   const warmCaseId = seedBase ? node?.caseId : null;
   useEffect(() => warmCasePortraits(warmCaseId), [warmCaseId]);
-  // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
-  const auditCount = useMemo(() => countAudit(log), [log]);
-  // B2's links off the case's log (cascadeRisk.js): null on a table without them.
-  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId), [gauntletRun, log, runId]);
   // The case's rules (tableUnlocks.js): the audit and the links are on from 프롤로그 04 (RULES_MARK 3).
   const caseRules = getTableRules(currentCase, gauntletRun);
   // The case's audit (B3), off the same log the settlement counts; null in a case whose rules do not count it.

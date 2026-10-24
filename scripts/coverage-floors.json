@@ -102,7 +102,7 @@
     "src/state/useDecision.js": 98,
     "src/state/useFeedback.js": 100,
     "src/state/useLeaderboard.js": 46,
-    "src/state/useLocalRanking.js": 68,
+    "src/state/useLocalRanking.js": 67,
     "src/state/useNewGamePlus.js": 50,
     "src/state/useRunState.js": 100,
     "src/state/useSceneBustRates.js": 84,

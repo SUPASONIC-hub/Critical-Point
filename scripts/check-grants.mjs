@@ -160,6 +160,8 @@ async function seedBeforeRankingReset() {
     await db.query(`insert into public.private_settings (name, value) values ($1, 'kept')`, [RESET_SEED]);
     // The scene snapshot exists from 20261020020000, after the day-ten reset.
     if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`insert into public.scene_bust_stats (case_id, node_id, windows, busts, runs) values ($1, 'n1', 1, 0, 1)`, [RESET_SEED]);
+    // The choice snapshot exists from 20261023020000, before RULES_MARK 3's reset too.
+    if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`insert into public.scene_choice_stats (case_id, node_id, choice_id, picks, windows, runs) values ($1, 'n1', 'c1', 1, 1, 1)`, [RESET_SEED]);
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -181,6 +183,7 @@ async function removeRankingResetSeed() {
   }
   // Not counted: a later migration's rebuild of the snapshot may have taken it already.
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_bust_stats where case_id = $1`, [RESET_SEED]);
+  if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_choice_stats where case_id = $1`, [RESET_SEED]);
   return removed;
 }
 let beforeReset = null;
