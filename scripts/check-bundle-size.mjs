@@ -148,6 +148,8 @@ const budgets = [
   // under the draft as on second-season (measured there 170,881 / 61,768).
   // -> 173,198 / 62,559: measured on batch-c with the user's wording (6698bba5)
   // 173,179 / 62,555 in the e2e build (18:23), the gzip plus 4.
+  // -> 173,198 / 62,562 on 2026-10-24, e3-endings moved onto main 5ea63bf
+  // (#282): measured 173,179 / 62,558 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 173_921, maxGzip: 62_777 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
