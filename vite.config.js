@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import { parse as parseYaml } from "yaml";
@@ -12,12 +13,75 @@ import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 const WINDOWS_SEPARATOR = /\\/g;
 
 // Match on the package directory boundary so that a package whose name merely
-// contains another package's name (lucide-react) is not misrouted.
-function vendorChunkFor(id) {
-  const normalized = id.replace(WINDOWS_SEPARATOR, "/");
-  if (/\/node_modules\/lucide-react\//.test(normalized)) return "icons-vendor";
-  if (/\/node_modules\/(react|react-dom|scheduler)\//.test(normalized)) return "react-vendor";
-  return "vendor";
+// contains another package's name (lucide-react) is not misrouted. These were
+// `manualChunks` under Rollup; Vite 8 builds with Rolldown, where that option
+// is deprecated and its replacement is a `codeSplitting` group. A higher
+// priority is matched first, so React is taken before the icons (a group takes
+// what its modules import with it, and lucide imports React: at the same
+// priority the icons' chunk carried React's core) and both before the
+// catch-all `vendor` sees them.
+const VENDOR_GROUPS = [
+  { name: "react-vendor", test: (id) => id.startsWith(REACT_ESM) || REACT_PACKAGE.test(id), priority: 35 },
+  { name: "icons-vendor", test: /[\\/]node_modules[\\/]lucide-react[\\/]/, priority: 30 },
+  { name: "vendor", test: /[\\/]node_modules[\\/]/, priority: 20 },
+];
+
+// The app's own modules that the page's entry imports, directly or through
+// another (Rolldown's `$initial` tag), into one chunk named `index`, which is
+// the entry's. Rollup put a module the entry and a lazy chunk both import in
+// the entry chunk, and let the lazy chunk import from it. Rolldown does not
+// merge a shared module into the entry when that makes the entry's and the lazy
+// chunk's imports a circle, so without this group the shell came out as the
+// entry plus seven shared files (appConfig, gameCases, playerLanguage,
+// seasonViewModels, telemetry, trace, weeklyCalendar), every one of them
+// preloaded by the page. The lowest priority: the vendor groups and the
+// chunks of their own (below) are taken first.
+const ENTRY_GROUP = { name: "index", tags: ["$initial"], test: (id) => !/[\\/]node_modules[\\/]/.test(id), priority: 10 };
+
+/**
+ * React as ES modules, in the release build.
+ *
+ * React ships CommonJS. Rollup turned each of its packages into named exports,
+ * so a screen called `jsx(...)` as a local name (`e(...)` once minified).
+ * Rolldown hands a chunk outside React's the whole `module.exports` instead,
+ * and every call went through it: `(0,t.jsx)(...)`, nine bytes more each, and
+ * 934 of them in the PlayScreen chunk alone, which took it 3,308 raw bytes
+ * over its budget on 2026-10-21 (the entry chunk 1,740, the report's 754).
+ *
+ * So each React entry the app imports is given a small ES module that reads
+ * the CommonJS exports once and exports them by name. It sits in the React
+ * chunk (VENDOR_GROUPS), so the other chunks import plain names from it, as
+ * they did under Rollup. Only the build: the dev server pre-bundles React its
+ * own way.
+ */
+//
+// What is left of Rolldown's own is its runtime helpers (`\0rolldown/runtime.js`:
+// the CommonJS wrapper and the namespace objects the app's dynamic imports
+// return), which come out as a file of their own, `rolldown-runtime`. No
+// `codeSplitting` group is offered that module, so it cannot be put in React's
+// chunk from here (tried on 2026-10-21).
+const REACT_ESM = "\0react-esm:";
+const REACT_PACKAGE = /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/;
+const REACT_ENTRIES = ["react", "react/jsx-runtime", "react-dom", "react-dom/client"];
+const requireFromRoot = createRequire(import.meta.url);
+
+function reactAsEsm() {
+  return {
+    name: "react-as-esm",
+    apply: "build",
+    enforce: "pre",
+    resolveId(source, importer) {
+      // React's own packages require each other as they always have.
+      if (!REACT_ENTRIES.includes(source) || !importer || importer.startsWith(REACT_ESM) || REACT_PACKAGE.test(importer)) return null;
+      return REACT_ESM + source;
+    },
+    load(id) {
+      if (!id.startsWith(REACT_ESM)) return null;
+      const entry = id.slice(REACT_ESM.length);
+      const names = Object.keys(requireFromRoot(entry)).filter((name) => /^[A-Za-z_$][\w$]*$/.test(name) && name !== "default");
+      return `import m from ${JSON.stringify(entry)};\nexport const { ${names.join(", ")} } = m;\nexport default m;\n`;
+    },
+  };
 }
 
 const CRITICAL_CSS_FILE = "src/styles/critical.generated.css";
@@ -311,10 +375,10 @@ function serviceWorkerSetting(command, mode) {
  * Only the runtime imports it, so left alone the bundler writes it into the
  * runtime's chunk, which has no room for it (scripts/check-bundle-size.mjs).
  * `manualChunks` cannot name it either: a manual chunk takes the modules it
- * imports with it, and those are the entry chunk's. So it is emitted as a
- * chunk that is only ever loaded after the page's own entry, which is what
- * lets it import from the entry chunk instead of pulling what they share into
- * a third file. Nothing asks for it by name: the runtime's chunk imports it,
+ * imports with it, and those are the entry chunk's. So it is a chunk that
+ * takes this one file and none of its imports (OWN_CHUNKS, below), which is
+ * what lets it import from the entry chunk instead of pulling what they share
+ * into a third file. Nothing asks for it by name: the runtime's chunk imports it,
  * and it is on the list fetched beside the runtime.
  */
 const RUNTIME_SYSTEMS = "src/runtimeSystems.js";
@@ -430,89 +494,49 @@ const WINDOW_TRAIL = "src/gauntlet/windowTrail.js";
  */
 const SPEAKER_LINE = "src/gauntlet/speakerLine.js";
 
-function runtimeSystemsChunk() {
-  return {
-    name: "runtime-systems-chunk",
-    apply: "build",
-    buildStart() {
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(RUNTIME_SYSTEMS),
-        name: "runtimeSystems",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(CASE_COPY),
-        name: "caseCopy",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(TABLE_AUDIO),
-        name: "tableAudio",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(SCENE_TRACES),
-        name: "sceneTraces",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(SCENE_CHOICES),
-        name: "sceneChoices",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(WEEK_RULE_PANEL),
-        name: "WeekRulePanel",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(EDGE_NOTICE),
-        name: "EdgeNotice",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(READING_CLOCK_ASK),
-        name: "ReadingClockAsk",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(AUDIT_RISK),
-        name: "auditRisk",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(CASCADE_RISK),
-        name: "cascadeRisk",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(WINDOW_TRAIL),
-        name: "windowTrail",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-      this.emitFile({
-        type: "chunk",
-        id: path.resolve(SPEAKER_LINE),
-        name: "speakerLine",
-        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
-      });
-    },
-  };
+/**
+ * The files above, each a chunk of its own. Under Rollup each was emitted
+ * with `this.emitFile({ type: "chunk", implicitlyLoadedAfterOneOf })`, a chunk
+ * only ever loaded after the page's entry, which let it import from the entry
+ * chunk. Rolldown (Vite 8) has no `implicitlyLoadedAfterOneOf`, so each is a
+ * `codeSplitting` group that captures that one file and nothing it imports
+ * (`includeDependenciesRecursively: false`): what it imports stays where it
+ * was, in the entry chunk or a shared one, which `manualChunks` could not do
+ * and the emitted chunk did. The scene page's line is two files, the hook and
+ * the words it imports, as it was when the hook was the emitted chunk's entry.
+ */
+const OWN_CHUNKS = [
+  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS] },
+  { name: "caseCopy", files: [CASE_COPY] },
+  { name: "tableAudio", files: [TABLE_AUDIO] },
+  { name: "sceneTraces", files: [SCENE_TRACES, "src/sceneTraces.js"] },
+  { name: "sceneChoices", files: [SCENE_CHOICES, "src/sceneChoices.js"] },
+  { name: "WeekRulePanel", files: [WEEK_RULE_PANEL] },
+  { name: "EdgeNotice", files: [EDGE_NOTICE] },
+  { name: "ReadingClockAsk", files: [READING_CLOCK_ASK] },
+  { name: "auditRisk", files: [AUDIT_RISK] },
+  { name: "cascadeRisk", files: [CASCADE_RISK] },
+  // windowTrail came in from main (#F1 phase 2) after the Vite 8 budgets were
+  // measured: its group is here as the emitted chunk was, its size is to be
+  // measured on the next build (다음에 실측).
+  { name: "windowTrail", files: [WINDOW_TRAIL] },
+  { name: "speakerLine", files: [SPEAKER_LINE] },
+];
+
+function ownChunkGroups() {
+  return OWN_CHUNKS.map(({ name, files }) => {
+    const ids = new Set(files.map((file) => path.resolve(file).replace(WINDOWS_SEPARATOR, "/")));
+    return {
+      name,
+      test: (id) => ids.has(id.replace(WINDOWS_SEPARATOR, "/")),
+      priority: 40,
+      includeDependenciesRecursively: false,
+    };
+  });
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), react(), runtimeSystemsChunk(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
+  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
@@ -546,11 +570,10 @@ export default defineConfig(({ command, mode }) => ({
     modulePreload: {
       resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks(id) {
-          if (!id.includes("node_modules")) return undefined;
-          return vendorChunkFor(id);
+        codeSplitting: {
+          groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
         },
       },
     },

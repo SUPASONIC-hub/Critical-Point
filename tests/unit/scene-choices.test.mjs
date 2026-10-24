@@ -79,7 +79,7 @@ test("the reveal reaches the line only through the hook module, which has a chun
   assert.match(reveal, /className="gx-reveal-share" data-testid="choice-share"/);
   const config = readFileSync("vite.config.js", "utf8");
   assert.match(config, /const SCENE_CHOICES = "src\/state\/useSceneChoiceRates\.js";/);
-  assert.match(config, /id: path\.resolve\(SCENE_CHOICES\),\s+name: "sceneChoices",/);
+  assert.match(config, /\{ name: "sceneChoices", files: \[SCENE_CHOICES, "src\/sceneChoices\.js"\] \}/);
   assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /pattern: \/\^sceneChoices-/);
   assert.match(readFileSync("src/state/useChoiceCommit.js", "utf8"), /scene: forced \? null : \{ caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice\.id \}/);
   // Once a day, the free plan's compute (D3's wall rate is hourly).

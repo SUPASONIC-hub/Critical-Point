@@ -1209,7 +1209,7 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
 사건마다 청크(gzip 15~20KB, 장면이 서른 개로 가장 많은 사건 01만 24KB)로 내보내므로, 게임 런타임 청크는 약
 170KB(gzip)이고 첫 시작은 첫 사건(프롤로그 01) 하나만 기다립니다. 나머지는 첫 판 뒤에서 받습니다. 판과 리포트만
 읽는 분석관·결말·기록 함수(`src/runtimeSystems.js`)는 진입 청크에 넣지 않고 런타임 청크 옆에서 함께 받는 별도
-청크(`runtimeSystems`, gzip 약 3.6KB)로 내보냅니다(`vite.config.js`의 `runtimeSystemsChunk`). 기다릴
+청크(`runtimeSystems`, gzip 약 3.6KB)로 내보냅니다(`vite.config.js`의 `OWN_CHUNKS`). 기다릴
 범위는 저장본이 있느냐가 아니라 저장본이 무엇을 담고 있느냐로 정합니다(`src/state/savedRunScope.js`): 첫 사건
 밖의 장면을 가리키는 저장본, 읽히지 않는 저장본, 복구 슬롯이나 보관한 사본이 있는 기기, 리플레이 링크는 모든
 사건을 받은 뒤 엽니다(그동안 화면은 받은 사건 수와 `다시 불러오기`를 보여 줍니다). 받지 못한 청크가 있으면
