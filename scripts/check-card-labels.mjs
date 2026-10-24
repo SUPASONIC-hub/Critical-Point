@@ -63,8 +63,8 @@ const OVER_CEILING = 623;
 const LONGEST_LABEL = 40;
 
 const MAX_TEXT = 420;
-const TEXT_OVER_CEILING = 85;
-const LONGEST_TEXT = 563;
+const TEXT_OVER_CEILING = 74;
+const LONGEST_TEXT = 476;
 
 // The lengths the distribution is reported at; MAX_LABEL is one of them.
 const MARKS = [24, 28, 30, 32, 36];
