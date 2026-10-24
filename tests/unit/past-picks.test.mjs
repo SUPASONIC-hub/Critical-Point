@@ -7,6 +7,7 @@ import { createStorage } from "./helpers/browser.mjs";
 
 globalThis.localStorage = createStorage();
 const { nodeOrders, nodes } = await import("../../src/gameData.js");
+const { PAST_PICKS_KEY } = await import("../../src/appConfig.js");
 const {
   decodeCasePicks,
   decodePicks,
@@ -14,7 +15,6 @@ const {
   encodePicks,
   getPastPick,
   normalizePastPicksRecord,
-  PAST_PICKS_KEY,
   pastPicks,
   picksFingerprint,
   picksFromLog,
@@ -224,14 +224,16 @@ test("the picks never reach the judgement: the log is left as it was, and only u
     }
   };
   walk("src");
-  assert.deepEqual(importers, ["src/state/useNewGamePlus.js"]);
-  for (const file of ["src/state/useChoiceCommit.js", "src/state/savedState.js", "src/state/useLocalRanking.js", "src/cloudSave.js", "src/appConfig.js"]) {
+  // The finale's writer, and the online save's merge (E-12), which writes the
+  // device key and never the run.
+  assert.deepEqual(importers.sort(), ["src/state/cloudDeviceRecords.js", "src/state/useNewGamePlus.js"]);
+  for (const file of ["src/state/useChoiceCommit.js", "src/state/savedState.js", "src/state/useLocalRanking.js"]) {
     const source = readFileSync(file, "utf8");
     assert.doesNotMatch(source, /past-picks|pastPicks|storeSeasonPicks/, file);
   }
 });
 
-test("a reset keeps the picks, and the online save does not carry them", async () => {
+test("a reset keeps the picks", async () => {
   const { RESET_STORAGE_KEYS } = await import("../../src/state/runStorageReset.js");
   assert.ok(!RESET_STORAGE_KEYS.includes(PAST_PICKS_KEY));
   assert.match(readFileSync("src/state/runStorageReset.js", "utf8"), /the cards the last season picked\s*\* \(pastPicks\.js/);

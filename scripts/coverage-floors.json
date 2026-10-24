@@ -65,6 +65,7 @@
     "src/state/caseArrival.js": 100,
     "src/state/caseRoutes.js": 99,
     "src/state/chunkReload.js": 98,
+    "src/state/cloudDeviceRecords.js": 94,
     "src/state/confirmAction.js": 100,
     "src/state/diagnosticUtils.js": 100,
     "src/state/endingBook.js": 100,

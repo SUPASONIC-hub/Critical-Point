@@ -57,7 +57,13 @@ const budgets = [
   // 53,574 in the e2e build, the gzip plus 4.
   // 147,040 / 53,578 -> 152,655 / 55,616 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 152,655 / 55,612 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 152_655, maxGzip: 55_616 },
+  // 152,655 / 55,616 -> 141,946 / 51,964 on 2026-10-24, E-12: the season
+  // record, read-scene and past-pick modules (newGamePlusCarry, endingBook,
+  // seasonRecord, seenScenes, pastPicks) are now also imported by the online
+  // save's restore (src/state/cloudDeviceRecords.js), so Rolldown writes them
+  // into the shared season-store chunk below. Measured 141,946 / 51,960 in the
+  // e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 141_946, maxGzip: 51_964 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -77,7 +83,14 @@ const budgets = [
   // 280,167 / 82,769 -> 280,189 / 82,773 on 2026-10-24 (B-10): the evidence
   // turns of 사건 30 and 31 were rewritten and their memos ride in the store;
   // measured 280,189 / 82,769 on main cf641639, the gzip plus 4.
-  { pattern: /^gameData\.app-.*\.js$/, maxBytes: 280_189, maxGzip: 82_773 },
+  // 280,189 / 82,773 -> 291,131 / 87,094 on 2026-10-24, E-12: the NEW GAME+
+  // record modules the runtime and the online save's restore share joined it (see
+  // GameRuntime above), and Rolldown now names the file after one of them,
+  // src/state/pastPicks.js. Measured 291,131 / 87,090 on main b0eb9cb0 (#287),
+  // the gzip plus 4; with GameRuntime the two are 433,077 / 139,053 beside
+  // 432,844 / 138,381 before (+233 raw / +672 gzip: the same code, packed
+  // into the larger file). Both load with the runtime, as before.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_094 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -198,7 +211,11 @@ const budgets = [
   // (#240 + #283): measured 173,927 / 62,781 in the e2e build, the gzip plus 4.
   // 173,927 / 62,785 -> 172,057 / 62,112 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 172,057 / 62,108 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_057, maxGzip: 62_112 },
+  // 172,057 / 62,112 -> 172,146 / 62,154 on 2026-10-24, E-12: the two device
+  // keys the online save now carries (SEEN_SCENES_KEY, PAST_PICKS_KEY) are
+  // spelled in appConfig.js, where cloudSave.js reads them without the scene
+  // graph. Measured 172,146 / 62,150 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_146, maxGzip: 62_154 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -384,7 +401,10 @@ const budgets = [
   // `import "./<chunk>-<hash>.js"` list gained one name, sceneChoices (E-6).
   // 46,300 / 14,578 -> 43,165 / 14,202 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 43,165 / 14,198 in the e2e build, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 43_165, maxGzip: 14_202 },
+  // -> 43,189 / 14,206 on 2026-10-24, E-12: measured 43,189 / 14,202, the
+  // gzip plus 4. No code of the report changed: a name in its hoisted
+  // `import "./<chunk>-<hash>.js"` list did (gameData.app -> pastPicks).
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 43_189, maxGzip: 14_206 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -501,7 +521,14 @@ const budgets = [
   // online copy held through a reset, and uploads paced under the hourly limit.
   // 10,960 / 4,380 -> 10,523 / 4,284 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 10,523 / 4,280 in the e2e build, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 10_523, maxGzip: 4_284 },
+  // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
+  // the season record, the past picks and the read scenes inside the save,
+  // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // E-12's merge of those three device keys on a restore, loaded only when a
+  // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
+  // e2e build, the gzip plus 4.
+  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 1_934, maxGzip: 942 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
@@ -954,7 +981,11 @@ function checkBudget(file, budget) {
 // (see GameRuntime above); the worker's code did not change.
 // 9,272 / 3,382 -> 9,272 / 3,386 on 2026-10-24, Vite 8 (#225) on main
 // e72c415f: measured 9,272 / 3,382, at the ceiling, plus 4.
-const WORKER_BUDGET = { maxBytes: 9_272, maxGzip: 3_386 };
+// -> 9,310 / 3,409 on 2026-10-24, E-12: measured 9,310 / 3,400 and, on main
+// b0eb9cb0 (#287), 3,405; the larger plus 4. One
+// more file in the list, cloudDeviceRecords, and gameData.app is now named
+// pastPicks; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_310, maxGzip: 3_409 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

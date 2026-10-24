@@ -79,7 +79,7 @@ test("unlock writes the picks once at the finale, the button writes none, and on
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { nodeOrders, nodes } = await import("../../src/gameData.js");
-  const { PAST_PICKS_KEY } = await import("../../src/state/pastPicks.js");
+  const { PAST_PICKS_KEY } = await import("../../src/appConfig.js");
   const { picksBefore, useNewGamePlus } = await import("../../src/state/useNewGamePlus.js");
   const mount = (runId, veteran) => {
     let api = null;

@@ -48,8 +48,7 @@ list of the files it touched.
   `WeekRulePanel.jsx`), the finale compares the two endings, and every case
   summary of such a season carries `newGamePlus: true`. Same ranking, no
   server change, no save version. Three more device keys ride on the same
-  rule, written when a finale closes and kept through a reset, never in the
-  cloud save: the season record's `endingsSeen`/`verdictsSeen`, the ending
+  rule, written when a finale closes and kept through a reset: the season record's `endingsSeen`/`verdictsSeen`, the ending
   collection folded on the intro's memory panel (E-3, `src/state/endingBook.js`);
   `critical-point-seen-scenes-v1`, the scenes the seasons before read, folded
   on a NEW GAME+ briefing unless 읽은 장면 접기 is off (E-1,
@@ -59,6 +58,13 @@ list of the files it touched.
   the briefing's cards and the hand's (B-14(1), `src/state/pastPicks.js`,
   drawn by `WeekRulePanel.jsx`'s `pastPick`). The tag is display only:
   nothing the commit, the clock, the log or a ranking row reads changes.
+  Since E-12 the online save carries the season record and these two keys
+  under `save.deviceRecords` (the server takes `save` and `settledWindows`
+  and no other key), and a restore merges them into the device's own and
+  never into the run (`src/state/cloudDeviceRecords.js`): seen lists, counted
+  runs and read scenes are a union, the season count adds the runs only one
+  copy counted, and `last`/`previous` and the past picks come from the copy
+  with more seasons (the loaded one on a tie).
 - The hand's skill is the logic streak (priority 38). Nothing on the table is
   timed against the heartbeat: the beat key, its ring and its grades left on
   2026-10-10, and both rankings were reset for it on 2026-10-11 (priority 70).
