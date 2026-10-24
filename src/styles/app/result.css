@@ -2351,7 +2351,8 @@
 .ending-step-3 .ending-beat {
   width: min(760px, 100%);
 }
-.ending-coda {
+.ending-coda,
+.three-scenes {
   width: min(820px, 100%);
 }
 .ending-coda strong {
@@ -2388,7 +2389,9 @@
     min-height: auto;
   }
 }
-.ending-coda {
+/* B-12(2) 「당신의 세 장면」 is a second coda under the first. */
+.ending-coda,
+.three-scenes {
   display: grid;
   gap: 8px;
   margin: 18px 0;
@@ -2401,17 +2404,21 @@
   text-align: left;
 }
 .ending-coda > span,
+.three-scenes li > span,
 .ending-axis-grid span {
   color: var(--c-acid);
   font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
-.ending-coda strong {
+.ending-coda strong,
+.three-scenes h2 {
+  margin: 0;
   font-size: 1.125rem;
   line-height: 1.45;
 }
-.ending-coda p {
+.ending-coda p,
+.three-scenes ol {
   margin: 0;
   color: var(--c-line-soft);
   font-size: 0.8125rem;

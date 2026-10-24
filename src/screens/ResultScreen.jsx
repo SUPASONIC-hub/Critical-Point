@@ -113,7 +113,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingAtmosphere={view.endingAtmosphere}
             endingVisualClass={view.endingVisualClass}
             endingImage={endingSceneProfile.image}
-            reportTitleRef={titleRef}
+            reportTitleRef={titleRef} seasonRecord={{ caseResults: view.score.caseResults, log: view.score.log }}
             // The four things a card is made from, and nothing that says who played.
             card={{ fingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share }}
           />

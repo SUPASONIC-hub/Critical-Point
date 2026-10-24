@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { quietImport } from "../state/chunkReload.js";
 import { focusSceneTitle } from "../state/sceneFocus.js";
+import { getThreeScenes, threeScenesHeading } from "../threeScenes.js";
 
 export function EndingSequence({
   endingStep,
@@ -29,8 +30,12 @@ export function EndingSequence({
   endingImage,
   reportTitleRef,
   card,
+  // The season's case summaries and the finale's log, for 「당신의 세 장면」 alone: the card is handed on untouched.
+  seasonRecord,
 }) {
   const endingArt = getArtSources(endingImage);
+  // B-12(2) 「당신의 세 장면」: three cards of the season, read off the record and only shown (threeScenes.js).
+  const threeScenes = endingStep === 3 ? getThreeScenes(seasonRecord) : [];
   // Each step puts a new block on the page and takes the pressed 다음 away
   // with the old one, so focus fell to <body> four times on the way to the
   // report. Each step now hands focus to where its reading starts: the
@@ -175,6 +180,19 @@ export function EndingSequence({
             <strong>{endingAfterglow.title}</strong>
             <p>{endingAfterglow.text}</p>
           </div>
+          {threeScenes.length > 0 && (
+            <section className="three-scenes" aria-labelledby="three-scenes-title" data-testid="three-scenes">
+              <h2 id="three-scenes-title">{threeScenesHeading(threeScenes.length)}</h2>
+              <ol>
+                {threeScenes.map((scene) => (
+                  <li key={scene.id}>
+                    <span>{scene.place}</span>
+                    <p>{scene.label}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
           <strong>{unopenedRecordCount}개의 기록이 아직 열리지 않았다.</strong>
           <small>단서 {unopenedClueCount}개 · 밟지 않은 갈래 {unopenedBranchCount}개</small>
           <small>다음 참가자는 이 빈칸을 이어받습니다.</small>
