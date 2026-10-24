@@ -227,7 +227,7 @@ const case29Nodes = {
     choices: [
       {
         id: "c29_final_protect",
-        label: "추심 제한과 채무조정 승계 조항을 넣어야 서명한다고 한다",
+        label: "추심 제한과 채무조정 승계 조항을 넣어야 서명한다",
         effect: { trust: 12, humanCost: -6, legitimacy: 5, capital: -9, time: -6, fatigue: 6 },
         voice: "팔리더라도 갚던 약속은 따라가야 한다며, 추심 제한과 채무조정 승계 조항을 넣어야 서명한다고 한다.",
         echo: "조항을 요구하자 조현석이 계산기를 꺼냅니다. 가격은 다시 38억 내려가고, 윤상혁의 화면이 잠깐 꺼졌다 켜집니다.",
@@ -298,7 +298,7 @@ export const case29 = {
         },
         {
           id: "c29_after_rush",
-          label: "첫 비행기로 먼저 돌아가 캐리어째 윤상혁의 대표실로 간다",
+          label: "첫 비행기로 돌아가 캐리어째 윤상혁 대표실로 간다",
           effect: { capital: 8, legitimacy: 6, trust: -5, humanCost: 5, fatigue: 4 },
           voice: "부속서에 이름이 적힌 사람에게 직접 물어야 한다며, 첫 비행기로 먼저 돌아가 캐리어째 윤상혁의 대표실로 간다.",
           echo: "캐리어 바퀴 소리가 KD캐피탈 대표실 앞 복도까지 이어집니다. 비서는 '외부 일정'이라고 하고, 닫힌 문 너머에서 웃음소리가 들립니다.",
@@ -327,7 +327,7 @@ export const case29 = {
           echo: "빼 달라는 요구는 곧장 가격표를 흔듭니다. 조현석은 아침 식사 자리에서 그 값을 정확히 말해 줄 겁니다.",
         },
         {
-          label: "조정 약속이 매각 뒤에도 이어지는 조항을 계약서에서 찾는다",
+          label: "매각 뒤에도 조정 약속이 이어지는 조항을 찾는다",
           effect: { legitimacy: 9, trust: 3, time: -5, fatigue: 4 },
           voice: "막을 조항이 정말 없는지 직접 봐야 한다며, 조정 약속이 매각 뒤에도 이어지는 조항을 계약서에서 찾는다.",
           echo: "조항을 찾자 계약서 본문 212쪽을 새벽까지 넘깁니다. 찾은 것은 '양수인의 재량'이라는 네 글자뿐입니다.",
@@ -476,7 +476,7 @@ export const case29 = {
           echo: "털어놓자 답이 한참 없다가 한 줄이 옵니다. '제가 그 사람 밑에서 오래 있었어요. 10시 전에 조항 하나만 더 읽어요.'",
         },
         {
-          label: "밤사이 쓴 메모를 한서윤에게 보내 따로 보관해 달라고 한다",
+          label: "밤사이 쓴 메모를 한서윤에게 보관해 달라고 한다",
           effect: { legitimacy: 9, trust: 4, humanCost: -2, time: -3, fatigue: 4 },
           voice: "내 손에만 있으면 한 번에 사라질 수 있다며, 밤사이 쓴 메모를 한서윤에게 보내 따로 보관해 달라고 한다.",
           echo: "메모는 대기발령 중인 사람의 휴대폰에 남습니다. 회사가 가장 들여다보지 않는 휴대폰입니다.",
@@ -542,7 +542,7 @@ export const case29 = {
       choices: [
         {
           id: "c29_branch_mailbox_follow_a",
-          label: "웨이린이 곤란하지 않게 우리가 왔었다고 그대로 말하라고 한다",
+          label: "웨이린이 곤란하지 않게 우리가 왔었다고 말하라 한다",
           effect: { trust: 12, humanCost: -4, legitimacy: 3, capital: -6, time: -4, fatigue: 5 },
           voice: "뭐라고 할지 묻는 웨이린이 곤란하지 않게, 우리가 왔었다고 그대로 말하라고 한다.",
           echo: "그대로 말하라고 하자 웨이린의 짐이 가벼워집니다. 서울은 이제 누가 왔는지 압니다.",
@@ -590,7 +590,7 @@ export const case29 = {
       routeChoices: [
         {
           id: "c29_route_system_publish",
-          label: "두 숫자를 한 장에 적어 이사회와 채무자 모임에 함께 보낸다",
+          label: "두 숫자를 한 장에 적어 이사회와 채무자 모임에 낸다",
           effect: { legitimacy: 11, trust: 5, capital: -6, time: -7, fatigue: 5 },
           voice: "아무도 적지 않았다면 지금 적어야 한다며, 두 숫자를 한 장에 적어 이사회와 채무자 모임에 함께 보낸다.",
           echo: "한 장에 적힌 두 숫자는 설명이 필요 없습니다. 이사회 사무국이 그 장을 받고 회의 안건 순서를 바꿉니다.",
@@ -598,7 +598,7 @@ export const case29 = {
         },
         {
           id: "c29_route_system_watch",
-          label: "매각 뒤 1년 동안 연락 방식을 공개 보고하게 하는 조건을 건다",
+          label: "매각 뒤 1년간 연락 방식을 공개 보고하는 조건을 건다",
           effect: { trust: 9, legitimacy: 5, humanCost: -4, capital: -5, time: -6, fatigue: 6 },
           voice: "독촉이 네 배로 느는 일이 이번에는 보이게, 매각 뒤 1년 동안 연락 방식을 공개 보고하게 하는 조건을 건다.",
           echo: "조건을 걸자 라운드힐이 1년 동안 보고서를 내야 합니다. 조현석은 '서류가 늘면 사람도 느네요'라며 받아들입니다.",
@@ -617,7 +617,7 @@ export const case29 = {
     finalChoices: [
       {
         id: "a",
-        label: "파는 쪽 임원이 사는 쪽 자리에 가지 못하게 막는 조항을 넣는다",
+        label: "파는 쪽 임원이 사는 쪽으로 못 가게 조항을 넣는다",
         effect: { legitimacy: 12, trust: 8, capital: -9, humanCost: -4, fatigue: 6 },
         voice: "값을 깎는 손과 자리를 받는 손이 같으면 안 된다며, 파는 쪽 임원이 사는 쪽 자리에 가지 못하게 막는 조항을 넣는다.",
         echo: "조항이 들어가자 윤상혁의 새 자리는 계약서에서 지워집니다. 사람이 아니라 칸이 먼저 사라집니다.",
@@ -633,7 +633,7 @@ export const case29 = {
       },
       {
         id: "c",
-        label: "팔려 간 채무자들을 위한 상담 창구를 매각 대금으로 연다",
+        label: "팔려 간 채무자들의 상담 창구를 매각 대금으로 연다",
         effect: { trust: 10, legitimacy: 6, capital: -7, time: -6, humanCost: -3, fatigue: 7 },
         voice: "값이 깎인 만큼 독촉을 받을 사람들이라며, 팔려 간 채무자들을 위한 상담 창구를 매각 대금으로 연다.",
         echo: "상담 창구는 매각 대금에서 3억을 떼어 엽니다. 첫 달 전화 312통 중 열에 일곱이 '누구한테 갚아야 하냐'는 질문입니다.",
@@ -658,7 +658,7 @@ export const case29 = {
     choices: [
       {
         id: "c29_evidence_turn_file",
-        label: "36억의 계산과 송금 흔적을 묶어 이사회와 감독 기관에 함께 낸다",
+        label: "36억 계산과 송금 흔적을 이사회와 당국에 함께 낸다",
         effect: { legitimacy: 13, trust: 5, capital: -8, time: -7, fatigue: 6 },
         voice: "회사 안에서만 다루면 묻힐 수 있어서, 36억의 계산과 송금 흔적을 묶어 이사회와 감독 기관에 함께 낸다.",
         echo: "함께 내니 36억이 두 기관의 서류에 동시에 찍힙니다. 서명식은 '추가 검토'로 이틀 밀립니다.",
@@ -685,7 +685,7 @@ export const case29 = {
   memoryPlan: {
     systemNext: "c29_route_system",
     evidenceNext: "c29_evidence_turn",
-    systemLabel: "분석 단말에서 새로 짠 판이 매각 계약서 문구에 들어갔는지 대조한다",
+    systemLabel: "분석 단말에서 새로 짠 판을 매각 계약서와 대조한다",
     evidenceLabel: "대본 4번의 주문서를 매각가 협상 이력에 대 본다",
     systemEcho: "계약서 본문에는 없습니다. 노아가 본문 대신 지난 거래들을 엽니다. 묶어서 판 뒤에 채무자에게 간 연락의 횟수와, 판 쪽 임원이 옮겨 간 자리입니다.",
     evidenceEcho: "아낀 보험금의 쓰임을 매각 협상 이력에 대면 마지막에 깎인 숫자가 하나 남습니다. 누군가 받기로 한 숫자와 같습니다.",
@@ -709,14 +709,14 @@ export const case29 = {
       echo: "찾아보니 이름 17개가 나옵니다. 도윤하는 그중 넷의 목소리까지 기억한다고 답장합니다.",
     },
     c29_start_record: {
-      label: "답변 기한과 서명식 날짜가 같다는 걸 공식 기록으로 남긴다",
+      label: "답변 기한과 서명식이 같은 날이라고 공식 기록에 남긴다",
       effect: { legitimacy: 12, trust: -2, capital: -5, time: -5, fatigue: 3 },
       cognition: { inference: 2 },
       voice: "우연이라는 말이 나오기 전에, 답변 기한과 서명식 날짜가 같다는 걸 공식 기록으로 남긴다.",
       echo: "기록은 남습니다. KD생명은 기한을 고치지 않고, 대신 '내부 사정'이라는 네 글자를 붙여 1,318명 명의로 다시 보냅니다.",
     },
     c29_start_rush: {
-      label: "서둘러 떠난 사정과 서하린의 동행을 동료들에게 먼저 알린다",
+      label: "서둘러 떠난 사정과 서하린의 동행을 동료들에게 알린다",
       effect: { trust: 11, legitimacy: 4, humanCost: 3, time: -6, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "혼자 달려가다 혼자 막히지 않게, 서둘러 떠난 사정과 서하린의 동행을 동료들에게 먼저 알린다.",

@@ -48,7 +48,7 @@ const case27Nodes = {
       },
       {
         id: "c27_start_numbers",
-        label: "새봄신협이 평택에 얼마를 어떤 순서로 넣었는지부터 확인한다",
+        label: "새봄신협이 평택에 넣은 돈과 순서부터 확인한다",
         effect: { legitimacy: 11, time: -4, trust: -2, humanCost: 3, fatigue: 3 },
         voice: "소문의 어디까지가 사실인지 가려야 한다며, 새봄신협이 평택에 얼마를 어떤 순서로 넣었는지부터 확인한다.",
         echo: "숫자를 보니 새봄신협이 평택에서 가장 뒤 차례라는 게 드러납니다. 그걸 확인하느라 군산행 버스 안에서 내내 서류를 넘깁니다.",
@@ -88,7 +88,7 @@ const case27Nodes = {
     choices: [
       {
         id: "c27_queue_explain",
-        label: "줄 선 사람 한 명씩에게 예금이 보호되는 한도부터 설명한다",
+        label: "줄 선 사람 한 명씩에게 예금 보호 한도부터 설명한다",
         effect: { trust: 12, humanCost: -6, time: -6, capital: -2, fatigue: 6 },
         voice: "잃을 돈이 없다는 걸 알면 줄이 준다며, 줄 선 사람 한 명씩에게 예금이 보호되는 한도부터 설명한다.",
         echo: "한 명씩 설명하자 줄이 느려집니다. 설명을 들은 사람 셋 중 하나는 번호표를 접고 돌아섭니다.",
@@ -96,7 +96,7 @@ const case27Nodes = {
       },
       {
         id: "c27_queue_post",
-        label: "새봄신협의 평택 몫과 현금 사정을 숫자로 객장 벽에 붙인다",
+        label: "새봄신협의 평택 몫과 현금 사정을 객장 벽에 붙인다",
         effect: { legitimacy: 11, trust: 3, time: -5, humanCost: 3, fatigue: 4 },
         voice: "소문보다 사실이 먼저 눈에 띄게, 새봄신협의 평택 몫과 현금 사정을 숫자로 객장 벽에 붙인다.",
         echo: "벽에 붙은 숫자는 정확합니다. 어르신 몇 분은 돋보기를 꺼내 들고, 몇 분은 숫자가 많아서 더 무섭다고 합니다.",
@@ -133,7 +133,7 @@ const case27Nodes = {
     choices: [
       {
         id: "c27_rumor_tell",
-        label: "돈을 빼 간 사람들에게 소문이 어디서 나왔는지 직접 알린다",
+        label: "돈을 빼 간 이들에게 소문이 어디서 났는지 직접 알린다",
         effect: { trust: 12, humanCost: -4, legitimacy: -3, time: -5, fatigue: 6 },
         voice: "속아서 뺀 돈이라는 걸 알아야 한다며, 돈을 빼 간 사람들에게 소문이 어디서 나왔는지 직접 알린다.",
         echo: "알리자 단체방이 뒤집힙니다. '은행이 은행을 망하게 했다고?' 아직 확인되지 않은 말이라는 것도 같이 퍼집니다.",
@@ -141,7 +141,7 @@ const case27Nodes = {
       },
       {
         id: "c27_rumor_trace",
-        label: "캡처의 원본 대화방과 보낸 사람을 사내 감사 절차로 확인한다",
+        label: "캡처 원본 대화방과 보낸 사람을 감사 절차로 확인한다",
         effect: { legitimacy: 12, trust: -3, time: -6, humanCost: 3, fatigue: 4 },
         voice: "반쯤 보이는 팀 이름만으로 지목할 수는 없어서, 캡처의 원본 대화방과 보낸 사람을 사내 감사 절차로 확인한다.",
         echo: "감사 절차는 정확하고 느립니다. 요청서가 접수된 시각에 캡처는 32번째 방으로 넘어갑니다.",
@@ -223,7 +223,7 @@ const case27Nodes = {
     choices: [
       {
         id: "c27_final_fund",
-        label: "그룹 돈 100억을 받아 오늘 줄부터 막고 조건은 나중에 싸운다",
+        label: "그룹 100억으로 오늘 줄을 막고 조건은 나중에 다툰다",
         effect: { trust: 11, humanCost: -6, legitimacy: -6, capital: 4, time: -4, fatigue: 5 },
         voice: "140명을 빈손으로 돌려보낼 수는 없다며, 그룹 돈 100억을 받아 오늘 줄부터 막고 조건은 나중에 싸운다.",
         echo: "100억이 들어오자 오늘 줄은 오전 안에 사라집니다. 조건란의 작은 글씨는 다음 주 월요일 이사회 안건으로 올라옵니다.",
@@ -231,7 +231,7 @@ const case27Nodes = {
       },
       {
         id: "c27_final_open",
-        label: "문 열기 전에 평택 몫과 캡처 원본을 신협 공지로 전부 내건다",
+        label: "문 열기 전 평택 몫과 캡처 원본을 공지로 전부 내건다",
         effect: { legitimacy: 13, trust: 6, capital: -7, time: -8, humanCost: 3, fatigue: 6 },
         voice: "숨긴 것이 없어야 줄이 믿는다며, 문 열기 전에 평택 몫과 캡처 원본을 신협 공지로 전부 내건다.",
         echo: "공지가 붙자 객장 벽 앞에 사람들이 모입니다. 단체방으로만 돌던 캡처의 원본 화면 앞에서 정호 삼촌이 '이놈들이었어?' 하고 번호표를 구깁니다. 줄이 줄어들지는 아직 모릅니다.",
@@ -239,7 +239,7 @@ const case27Nodes = {
       },
       {
         id: "c27_final_limit",
-        label: "금융당국에 인출 한도를 요청해 하루 500만 원으로 묶는다",
+        label: "당국에 요청해 인출을 하루 500만 원으로 묶는다",
         effect: { time: 7, capital: 9, trust: -6, legitimacy: -3, humanCost: 6, fatigue: -4 },
         voice: "금고가 비면 믿음도 소용없다며, 금융당국에 인출 한도를 요청해 하루 500만 원으로 묶는다.",
         echo: "한도가 걸리자 줄은 멈춥니다. 카네이션을 단 어르신들이 500만 원짜리 봉투를 받고, 나머지는 다음 날 다시 오라는 말을 듣습니다.",
@@ -317,13 +317,13 @@ export const case27 = {
       memo: ["하정희(74) 적금 2,400만 원 -- 만기 두 달 전", "중도 해지 시 이자 절반 이상 손실", "예금자 보호 한도 1억 원 -- 전액 보호 대상"],
       choices: [
         {
-          label: "할머니 아들에게 직접 전화해 예금이 안전한 이유를 설명한다",
+          label: "할머니 아들에게 전화해 예금이 안전한 이유를 설명한다",
           effect: { trust: 10, humanCost: -5, time: -4, capital: -2, fatigue: 4 },
           voice: "할머니가 아들과 신협 사이에 끼지 않게, 할머니 아들에게 직접 전화해 예금이 안전한 이유를 설명한다.",
           echo: "전화를 받은 아들은 한참 말이 없다가 '엄마 바꿔 주세요'라고 합니다. 그 통화가 20분 걸리는 동안 뒤의 줄은 12명이 늘어납니다.",
         },
         {
-          label: "해지 대신 적금을 맡기고 급한 돈만 빌리는 길을 안내한다",
+          label: "적금을 깨지 않고 급한 돈만 빌리는 길을 안내한다",
           effect: { legitimacy: 7, trust: 4, humanCost: -2, time: -5, fatigue: 3 },
           voice: "두 달 남기고 이자를 날릴 수는 없다며, 해지 대신 적금을 맡기고 급한 돈만 빌리는 길을 안내한다.",
           echo: "적금을 맡기고 빌리자 이자는 지켜집니다. 할머니는 서류 네 장을 넘기다 '이게 더 무섭다'며 펜을 내려놓고, 아들과 통화한 뒤에 정하겠다고 합니다.",
@@ -346,7 +346,7 @@ export const case27 = {
       memo: ["재예치 17명 -- 곽 사장 3천만 원 첫 번째", "수요일 대기 약 200명", "인출액이 재예치액의 세 배"],
       choices: [
         {
-          label: "다시 맡기러 온 사람들의 입금 줄을 따로 만들어 앞세운다",
+          label: "다시 맡기러 온 사람들 줄을 따로 만들어 앞세운다",
           effect: { trust: 11, legitimacy: 3, humanCost: -4, time: -4, capital: -3, fatigue: 4 },
           voice: "돌아오는 모습이 줄에 보여야 한다며, 다시 맡기러 온 사람들의 입금 줄을 따로 만들어 앞세운다.",
           echo: "입금 줄이 따로 서자 사람들이 그 줄을 구경합니다. 구경하던 사람 중 둘이 슬그머니 그 줄로 옮겨 섭니다.",
@@ -376,7 +376,7 @@ export const case27 = {
       memo: ["종이 카네이션 150개 목표", "권도현의 카네이션: 꽃잎 6장, 전부 직각", "강태민 택배: 컵라면 한 상자"],
       choices: [
         {
-          label: "내일 줄 선 어르신들에게 카네이션을 직접 달아 드리자고 한다",
+          label: "내일 줄 선 어르신들께 카네이션을 달아 드리자고 한다",
           effect: { trust: 10, humanCost: -4, time: -3, capital: -2, fatigue: 5 },
           voice: "한도를 말하게 되더라도 인사가 먼저이고 싶어서, 내일 줄 선 어르신들에게 카네이션을 직접 달아 드리자고 한다.",
           echo: "직접 달아 드리려면 새벽 여섯 시에 나와야 합니다. 권도현이 '그럼 직각 카네이션도 달겠습니다'라고 합니다.",
@@ -436,7 +436,7 @@ export const case27 = {
       memo: ["전북 작은 조합 세 곳 -- 같은 소문, 같은 매수자", "금요일 밤 소문, 월요일 아침 전화"],
       choices: [
         {
-          label: "세 곳 조합 사람들에게 연락해 같은 일을 겪었는지 묻는다",
+          label: "세 조합 사람들에게 같은 일을 겪었는지 묻는다",
           effect: { trust: 9, humanCost: -4, time: -5, fatigue: 4 },
           voice: "월요일 아침 전화를 받은 사람들 말이 필요해서, 세 곳 조합 사람들에게 연락해 같은 일을 겪었는지 묻는다.",
           echo: "전화를 받은 옛 전무 한 사람이 한참 웃습니다. '이제야 누가 물어보네요.' 이름이 사라진 조합의 사람입니다.",
@@ -501,7 +501,7 @@ export const case27 = {
       choices: [
         {
           id: "c27_branch_vault_a",
-          label: "수송차가 올 때까지 창구 앞에서 직접 사정을 설명하겠다고 한다",
+          label: "수송차가 올 때까지 창구에서 사정을 직접 설명한다",
           effect: { trust: 11, legitimacy: 4, capital: -6, time: -5, fatigue: 5 },
           voice: "공지문보다 얼굴이 줄을 붙든다며, 수송차가 올 때까지 창구 앞에서 직접 사정을 설명하겠다고 한다.",
           echo: "창구 앞에 서자 첫 질문이 바로 나옵니다. '그래서 내 돈 있어요, 없어요?' 대답하는 데 한 사람당 4분이 걸립니다.",
@@ -510,7 +510,7 @@ export const case27 = {
         },
         {
           id: "c27_branch_vault_b",
-          label: "남은 현금과 중앙회 자금 일정을 조합원 공지로 투명하게 낸다",
+          label: "남은 현금과 중앙회 자금 일정을 조합원에게 공지한다",
           effect: { legitimacy: 10, trust: 3, time: -6, humanCost: 3, fatigue: 4 },
           voice: "숨긴 숫자가 다음 소문이 되지 않게, 남은 현금과 중앙회 자금 일정을 조합원 공지로 투명하게 낸다.",
           echo: "공지에 9억 2천만 원이 찍히자 단체방이 조용해졌다가 다시 시끄러워집니다. 숫자가 작아 보인다는 말과 솔직해서 믿겠다는 말이 반반입니다.",
@@ -538,7 +538,7 @@ export const case27 = {
       choices: [
         {
           id: "c27_branch_vault_follow_a",
-          label: "상자가 빌린 돈이라는 것까지 줄 선 사람들에게 솔직히 말한다",
+          label: "상자도 빌린 돈이라고 줄 선 사람들에게 솔직히 말한다",
           effect: { trust: 12, legitimacy: 3, humanCost: -4, capital: -7, time: -5, fatigue: 5 },
           voice: "반쪽짜리 안심은 다시 소문이 된다며, 상자가 빌린 돈이라는 것까지 줄 선 사람들에게 솔직히 말한다.",
           echo: "솔직히 말하자 몇 사람은 다시 줄로 돌아옵니다. 그리고 정호 삼촌이 '빌려서라도 주는 데가 어디 있냐'며 번호표를 찢습니다.",
@@ -594,7 +594,7 @@ export const case27 = {
         },
         {
           id: "c27_route_system_warn",
-          label: "헐값에 넘어간 21곳의 옛 조합원들을 찾아 사실을 알린다",
+          label: "헐값에 넘어간 21곳의 옛 조합원들을 찾아 알린다",
           effect: { trust: 10, legitimacy: 3, humanCost: -4, capital: -5, time: -6, fatigue: 6 },
           voice: "왜 헐값이었는지 듣지 못한 사람들이라며, 헐값에 넘어간 21곳의 옛 조합원들을 찾아 사실을 알린다.",
           echo: "찾아가자 이름이 사라진 조합의 옛 조합원들이 전화를 받습니다. 몇 명은 이제 와서 뭐 하냐고 끊습니다.",
@@ -613,7 +613,7 @@ export const case27 = {
     finalChoices: [
       {
         id: "a",
-        label: "소문이 퍼진 조합의 자산은 석 달간 못 사게 하는 규칙을 제안한다",
+        label: "소문 난 조합 자산은 석 달간 못 사는 규칙을 제안한다",
         effect: { legitimacy: 12, trust: 7, capital: -8, humanCost: -4, fatigue: 7 },
         voice: "소문으로 값을 깎는 길을 막겠다며, 소문이 퍼진 조합의 자산은 석 달간 못 사게 하는 규칙을 제안한다.",
         echo: "규칙이 생기자 다음 소문은 값이 떨어집니다. 이번 소문은 이미 제값을 받았습니다.",
@@ -629,7 +629,7 @@ export const case27 = {
       },
       {
         id: "c",
-        label: "소문 때문에 손해 본 조합원들의 피해 신고를 대신 모은다",
+        label: "소문으로 손해 본 조합원들의 피해 신고를 대신 모은다",
         effect: { legitimacy: 7, trust: 10, capital: -6, time: -7, humanCost: 3, fatigue: 8 },
         voice: "이름이 다 적힌 쪽만 값을 치렀다며, 소문 때문에 손해 본 조합원들의 피해 신고를 대신 모은다.",
         echo: "신고가 모이자 두 달 남은 적금을 깬 하정희 할머니의 이자 손실이 첫 줄에 적힙니다. 신고를 받아 줄 곳은 아직 정해지지 않았습니다.",
@@ -681,8 +681,8 @@ export const case27 = {
   memoryPlan: {
     systemNext: "c27_route_system",
     evidenceNext: "c27_evidence_turn",
-    systemLabel: "심사 단말에서 새로 짠 판의 말투가 소문 캡처에 묻어 있는지 읽는다",
-    evidenceLabel: "사업비 명세서의 한 줄을 캡처 속 대화방 기록에 대 본다",
+    systemLabel: "심사 단말에서 새로 짠 판이 소문 캡처에 묻었는지 본다",
+    evidenceLabel: "사업비 명세서 한 줄을 캡처 속 대화방 기록에 대 본다",
     systemEcho: "캡처의 말은 당신의 판과 닮은 데가 없습니다. 말투가 닮은 쪽은 사내 메신저입니다. 노아가 출처를 모르는 소문으로 시작된 인출 사태들을 불러옵니다.",
     evidenceEcho: "자문료가 나간 날짜를 대화방 기록에 대면 소문보다 사흘 이른 문서가 걸려 있습니다. 새봄신협에 매긴 값이 적혀 있습니다.",
   },
@@ -698,21 +698,21 @@ export const case27 = {
   },
   openingSignatures: {
     c27_start_warm: {
-      label: "평택에서 함께 버틴 동료들을 군산 줄 앞으로 불러 모은다",
+      label: "평택에서 함께 버틴 동료들을 군산 줄 앞에 모은다",
       effect: { trust: 12, humanCost: -4, capital: -4, time: -5, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "크레인 아래에서처럼 곁에 설 사람이 필요하다며, 평택에서 함께 버틴 동료들을 군산 줄 앞으로 불러 모은다.",
       echo: "부르자 강태민이 가장 먼저 답합니다. '컵라면 몇 개요.' 다른 사람들은 휴가를 내느라 반나절이 걸립니다.",
     },
     c27_start_record: {
-      label: "내 문서의 표가 소문에 쓰였다는 사실부터 새봄신협에 밝힌다",
+      label: "내 문서의 표가 소문에 쓰였다고 새봄신협에 먼저 밝힌다",
       effect: { trust: 9, legitimacy: 6, humanCost: 2, time: -5, capital: -3, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "남의 입으로 듣게 할 수는 없다며, 내 문서의 표가 소문에 쓰였다는 사실부터 새봄신협에 밝힌다.",
       echo: "밝히자 남궁솔은 당신을 한참 봅니다. 그리고 '그럼 그 표를 쓴 사람이 누군지도 같이 찾아 주세요'라고 합니다.",
     },
     c27_start_rush: {
-      label: "금요일 밤 부동산금융팀 메신저 알림을 떠올려 대화방을 찾는다",
+      label: "금요일 밤의 팀 메신저 알림을 떠올려 대화방을 찾는다",
       effect: { legitimacy: 10, capital: 4, trust: -4, humanCost: 3, time: -3, fatigue: 3 },
       cognition: { persistence: 2 },
       voice: "그 웃음소리가 우연일 리 없다며, 금요일 밤 부동산금융팀의 메신저 알림을 떠올려 대화방부터 찾는다.",

@@ -100,7 +100,7 @@ const case30Nodes = {
       },
       {
         id: "c30_bookstore_list",
-        label: "누가 무엇을 가졌는지 목록부터 만들고 원본은 한 곳에 둔다",
+        label: "누가 무엇을 가졌는지 목록부터, 원본은 한 곳에 둔다",
         effect: { legitimacy: 11, trust: 3, time: -5, capital: -1, humanCost: 3, fatigue: 4 },
         voice: "흩어진 종이가 누구를 가리킬지 모른다며, 누가 무엇을 가졌는지 목록부터 만들고 원본은 한 곳에 둔다.",
         echo: "목록을 만들자 누가 무엇을 쥐었는지 분명해집니다. 분명해진 목록은 잃어버리면 그대로 누군가의 증거가 됩니다.",
@@ -190,7 +190,7 @@ const case30Nodes = {
       },
       {
         id: "c30_leaving_note",
-        label: "빠지더라도 감사 제외 사실만은 공식 기록으로 남겨 달라고 한다",
+        label: "빠지더라도 감사 제외는 공식 기록에 남겨 달라고 한다",
         effect: { legitimacy: 11, trust: -3, time: -5, humanCost: 3, fatigue: 4 },
         voice: "일정표의 빈자리는 적혀 있어야 한다며, 빠지더라도 감사 제외 사실만은 공식 기록으로 남겨 달라고 한다.",
         echo: "공식 기록을 부탁하자 반재욱이 한참 핸들만 잡고 있습니다. '제 이름으로는 못 합니다. 날짜만 적어 드리죠.'",
@@ -290,7 +290,7 @@ export const case30 = {
         },
         {
           id: "c30_after_record",
-          label: "모은 자료를 제보 문서로 묶어 오늘 밤 금융감독원에 보낸다",
+          label: "모은 자료를 제보 문서로 묶어 금융감독원에 보낸다",
           effect: { legitimacy: 13, trust: 5, time: -5, capital: -3, fatigue: 5 },
           voice: "정기검사가 무엇을 봐야 하는지 알려야 한다며, 모은 자료를 제보 문서로 묶어 오늘 밤 금융감독원에 보낸다.",
           echo: "제보 문서는 자정 넘어 금융감독원 제보 창구에 접수됩니다. 검사를 받는 회사의 직원이 검사 전날 밤에 보낸 제보라는 사실도 함께 접수됩니다.",
@@ -299,7 +299,7 @@ export const case30 = {
         },
         {
           id: "c30_after_rush",
-          label: "모임이 끝나자마자 12층으로 돌아가 부서 공유 폴더를 뒤진다",
+          label: "모임이 끝나자마자 12층에 돌아가 공유 폴더를 뒤진다",
           effect: { capital: 8, legitimacy: 5, trust: -5, humanCost: 4, fatigue: 5 },
           voice: "내일 09시가 되기 전에 직접 봐야 한다며, 모임이 끝나자마자 12층으로 돌아가 부서 공유 폴더를 뒤진다.",
           echo: "12층의 불은 당신 자리 하나만 켜집니다. 공유 폴더를 여는 순간마다 접속 기록에 당신 이름과 시각이 한 줄씩 쌓입니다.",
@@ -381,7 +381,7 @@ export const case30 = {
       memo: ["브릿지은행 하반기 공채: 핏스코어 도입", "시범 적용 인턴 3명 중 2명 탈락", "탈락자 1명: 오진우의 면접 1등"],
       choices: [
         {
-          label: "떨어진 두 사람에게 이유를 알려 주자고 오진우와 약속한다",
+          label: "떨어진 두 사람에게 이유를 알리자고 오진우와 약속한다",
           effect: { trust: 9, humanCost: -4, legitimacy: 2, time: -4, fatigue: 4 },
           voice: "끝까지 질문하던 친구가 영문도 모르면 안 된다며, 떨어진 두 사람에게 이유를 알려 주자고 오진우와 약속한다.",
           echo: "약속하자 오진우가 두 사람의 이력서를 다시 출력합니다. 1등 준 친구의 이름 옆에 그가 작게 '다시'라고 적습니다.",
@@ -393,7 +393,7 @@ export const case30 = {
           echo: "목록에 오르자 브릿지은행도 이 사슬의 한 칸이 됩니다. 오진우의 팀장 자리도 함께 그 칸에 들어갑니다.",
         },
         {
-          label: "오진우에게 브릿지 쪽 계약서를 오늘 밤 안에 가져와 달라고 한다",
+          label: "오진우에게 브릿지 계약서를 오늘 밤 안에 부탁한다",
           effect: { time: 5, capital: 4, trust: 2, humanCost: 3, legitimacy: -2, fatigue: -2 },
           voice: "하반기 공채가 시작되기 전에 막아야 한다며, 오진우에게 브릿지 쪽 계약서를 오늘 밤 안에 가져와 달라고 한다.",
           echo: "오진우는 새벽 두 시에 계약서 사진을 보냅니다. 그의 출입 기록에도 새벽 두 시가 찍힙니다.",
@@ -483,7 +483,7 @@ export const case30 = {
           echo: "공식 경로로 돌리자 창구는 지켜집니다. 도윤하는 조금 서운한 얼굴로, 그래도 고개를 끄덕입니다.",
         },
         {
-          label: "지점 전산으로 계약 대금 입금 기록부터 조회해 달라고 한다",
+          label: "계약 대금 입금 기록부터 지점 전산으로 봐 달라고 한다",
           effect: { time: 4, capital: 3, trust: -2, legitimacy: -2, humanCost: 3, fatigue: -2 },
           voice: "어차피 걸 창구라면 쓸 수 있을 때 써야 한다며, 지점 전산으로 계약 대금 입금 기록부터 조회해 달라고 한다.",
           echo: "조회는 3분이면 끝납니다. 창구 단말의 조회 기록에 도윤하의 사번이 남습니다.",
@@ -506,7 +506,7 @@ export const case30 = {
       choices: [
         {
           id: "c30_branch_fitscore_a",
-          label: "질의 시간에 A-017은 실제 사람이라고 그 자리에서 말한다",
+          label: "질의 시간에 A-017은 실제 사람이라고 말한다",
           effect: { trust: 11, legitimacy: 3, humanCost: -3, capital: -5, time: -5, fatigue: 5 },
           voice: "받아 적는 사람들이 지금 들어야 한다며, 질의 시간에 A-017은 실제 사람이라고 그 자리에서 말한다.",
           echo: "말하자 설명회장이 3초 동안 조용해집니다. 영업 이사가 '가상의 사례입니다'라고 답하고, 슬라이드를 넘깁니다.",
@@ -543,7 +543,7 @@ export const case30 = {
       choices: [
         {
           id: "c30_branch_fitscore_follow_a",
-          label: "하도율의 연락처를 받아 같은 일을 겪은 사람들을 함께 찾는다",
+          label: "하도율 연락처를 받아 같은 일 겪은 이들을 함께 찾는다",
           effect: { trust: 12, humanCost: -4, capital: -4, time: -6, fatigue: 5 },
           voice: "38점을 혼자 받은 게 아닐 거라며, 하도율의 연락처를 받아 같은 일을 겪은 사람들을 함께 찾는다.",
           echo: "연락처를 받자 하도율이 그날 밤 단체방 하나를 만듭니다. 첫날 11명이 들어옵니다.",
@@ -591,7 +591,7 @@ export const case30 = {
       routeChoices: [
         {
           id: "c30_route_system_publish",
-          label: "38건의 통계를 계약서와 함께 여섯 명 모두에게 공개한다",
+          label: "38건 통계를 계약서와 함께 여섯 명 모두에게 공개한다",
           effect: { legitimacy: 10, trust: 6, capital: -6, time: -7, fatigue: 5 },
           voice: "같이 움직일 사람들은 판의 크기를 알아야 한다며, 38건의 통계를 계약서와 함께 여섯 명 모두에게 공개한다.",
           echo: "공개하자 여섯 명이 38건을 나눠 읽습니다. 이민서가 그중 한 건의 담당자가 자기 사수 진서우라는 걸 찾아냅니다.",
@@ -618,7 +618,7 @@ export const case30 = {
     finalChoices: [
       {
         id: "a",
-        label: "기록을 팔 때마다 당사자에게 먼저 알리는 규칙을 제안한다",
+        label: "기록을 팔기 전에 당사자에게 알리는 규칙을 제안한다",
         effect: { legitimacy: 12, trust: 8, capital: -8, humanCost: -4, fatigue: 7 },
         voice: "기호 뒤의 사람이 가장 늦게 아는 일이 없게, 기록을 팔 때마다 당사자에게 먼저 알리는 규칙을 제안한다.",
         echo: "규칙이 생기자 다음 계약부터는 알림이 먼저 갑니다. 이미 팔린 63명의 기록은 규칙보다 먼저 떠났습니다.",
@@ -686,7 +686,7 @@ export const case30 = {
   memoryPlan: {
     systemNext: "c30_route_system",
     evidenceNext: "c30_evidence_turn",
-    systemLabel: "탑승구에서 짠 판이 데이터 계약서 용도 칸에 적혔는지 본다",
+    systemLabel: "탑승구에서 짠 판이 계약서 용도 칸에 적혔는지 본다",
     evidenceLabel: "우편함 214번을 핏스코어의 주주 명단과 나란히 놓는다",
     systemEcho: "용도 칸에 적힌 것은 '조직 적합도 모델 개발' 한 줄입니다. 당신의 판은 거기 없고, 당신의 반응 기록이 제공 대상 칸에 있습니다. 노아가 같은 식으로 맺은 계약 38건을 엽니다.",
     evidenceEcho: "우편함의 주소를 핏스코어 주주 명단에 대면 그룹 돈이 들어간 줄이 하나 있습니다. 투자 검토 의견은 한 줄이고, 그 한 줄을 쓴 사람도 팔린 명단에 있습니다.",
@@ -703,21 +703,21 @@ export const case30 = {
   },
   openingSignatures: {
     c30_start_warm: {
-      label: "이민서 대신 내 이름으로 여섯 명에게 오늘 저녁 모이자고 연락한다",
+      label: "이민서 대신 내 이름으로 여섯 명을 오늘 저녁 모은다",
       effect: { trust: 10, humanCost: -4, capital: -3, time: -5, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "먼저 꺼낸 사람이 혼자 부른 자리가 되지 않게, 이민서 대신 내 이름으로 여섯 명에게 오늘 저녁 모이자고 연락한다.",
       echo: "연락하자 오진우가 제일 먼저 답합니다. '매운 것만 빼고 아무 데나.' 반재욱은 목포에서 순회 서류 사진과 함께 '늦게라도 갑니다'라고 답합니다.",
     },
     c30_start_record: {
-      label: "감사위원회 폴더에 데이터 계약서를 두 번째 묶음으로 덧붙인다",
+      label: "감사위원회 폴더에 데이터 계약서를 두 번째로 덧붙인다",
       effect: { legitimacy: 11, trust: -2, capital: -4, time: -5, fatigue: 3 },
       cognition: { inference: 2 },
       voice: "같은 봄에 나온 서류는 같이 봐야 한다며, 감사위원회 폴더에 데이터 계약서를 두 번째 묶음으로 덧붙인다.",
       echo: "덧붙이자 두 서류의 날짜가 서로를 설명합니다. 접수 확인은 이틀 뒤, 두 묶음 다 받았다는 한 줄로 옵니다.",
     },
     c30_start_rush: {
-      label: "오늘 밤은 이민서 곁에 남아 계약서를 한 쪽씩 같이 읽는다",
+      label: "오늘 밤 이민서 곁에 남아 계약서를 같이 읽는다",
       effect: { trust: 11, legitimacy: 3, time: -6, capital: -2, fatigue: 6 },
       cognition: { persistence: 2 },
       voice: "불을 켠 사람을 혼자 두지 않겠다며, 오늘 밤은 이민서 곁에 남아 계약서를 한 쪽씩 같이 읽는다.",
