@@ -151,6 +151,9 @@ export function formatReport(results, { redact = false } = {}) {
  * was replayed whole (`checked`: its `rechecked_at` is set; `unrecorded`: its
  * scores were read but it is not "checked", so the time is cleared). A run
  * under other table rules is left as it is. Null when there is nothing to write.
+ * The function drops every checker mark not passed, so the chain check's mark
+ * (CHAIN_MARK, src/chainRecheck.js) must join each run's marks here, in this
+ * one statement, never in a call of its own (S6 wires it in).
  */
 export function marksSql(results) {
   const checked = results.filter((result) => (result.status === "checked" || result.status === "unrecorded") && typeof result.runId === "string" && result.runId);
