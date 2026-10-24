@@ -3010,6 +3010,20 @@
   left: auto;
 }
 
+/* B2's link mark on a card that makes one, at that end too (a card that makes
+   a link is never the wild card), in the burn chip's colour; on the bottom
+   edge when the season before's pick has the top. */
+.gx-card-type.gx-card-link {
+  right: 9px;
+  left: auto;
+  color: var(--c-danger-81);
+}
+
+.gx-card-name ~ .gx-card-type.gx-card-link {
+  top: auto;
+  bottom: -8px;
+}
+
 .gx-streak i,
 .gx-card-type i {
   font-style: normal;
