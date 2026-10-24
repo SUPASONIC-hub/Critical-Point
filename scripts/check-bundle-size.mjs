@@ -74,7 +74,10 @@ const budgets = [
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
   // imported by the runtime's chunk, so it loads with it, never before.
   // Measured 280,167 / 82,765 in the e2e build, the gzip plus 4.
-  { pattern: /^gameData\.app-.*\.js$/, maxBytes: 280_167, maxGzip: 82_769 },
+  // 280,167 / 82,769 -> 280,189 / 82,773 on 2026-10-24 (B-10): the evidence
+  // turns of 사건 30 and 31 were rewritten and their memos ride in the store;
+  // measured 280,189 / 82,769 on main cf641639, the gzip plus 4.
+  { pattern: /^gameData\.app-.*\.js$/, maxBytes: 280_189, maxGzip: 82_773 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on

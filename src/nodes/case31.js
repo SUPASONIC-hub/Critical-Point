@@ -21,7 +21,11 @@
  * from the hearing broadcast that the eleven pages were the analyst's dissent. The joy is the six
  * colleagues' group chat lighting up at three in the morning. The case closes
  * on a confirmer's signature box, and the aftermath hands the file to the
- * prosecutors -- 사건 32's search and seizure.
+ * prosecutors -- 사건 32's search and seizure. The evidence turn is the cover-up
+ * turned against itself: 석재우's tidy "정리본" renumbered its pages and dropped
+ * two at each of the four maturity extensions, so the dropped pages alone line
+ * up as the sale-negotiation timetable, ending on the draft annex with 윤상혁's
+ * advisory clause.
  */
 const case31Nodes = {
   c31_start: {
@@ -643,12 +647,12 @@ export const case31 = {
     sourceRoutes: ["c31_archive", "c31_hallway", "c31_rooftop", "c31_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "만기 연장 날짜에 단서를 하나씩 붙여 가며, 라운드힐 매각 협상 일정과 하루씩 견준다.",
-    entryEcho: "날짜를 맞추면 손실이 왜 미뤄졌는지가 보입니다. 누가 그 미룬 값을 받는지도 함께 보입니다.",
+    entryEcho: "날짜를 맞추면 손실이 왜 미뤄졌는지가 보입니다. 그 날짜를 감추려던 손이 먼저 길을 그어 놓았습니다.",
     entryLabel: "만기 연장 네 번을 라운드힐 협상과 겹친다",
     title: "연장의 날짜",
     speaker: "반재욱",
-    text: "단서를 평택 PF(건물을 짓기 전에 앞으로 들어올 분양 대금을 믿고 빌려주는 대출)의 연장 회차마다 하나씩 댑니다. 만기 연장(갚을 날짜를 미뤄 주는 것) 네 번이 라운드힐 캐피탈과의 매각 협상 일정 옆에 나란히 섭니다. 연장할 때마다 손실은 장부에서 한 분기씩 밀렸고, 그사이 매각 가격 제안서의 자산 가치는 세 번 올랐고, 그 오피스텔을 분양받은 212세대는 멈춘 건물의 대출 이자를 계속 냈습니다. 네 번째 연장은 부속서(계약서 뒤에 붙는 추가 약속 문서) 초안이 처음 오간 날의 바로 다음 날입니다. 그 초안에 윤상혁의 자문역(실무 책임 없이 조언만 하는 자리) 조항이 있습니다. 반재욱이 적던 수첩을 덮습니다. '손실을 미룬 게 아니라 값을 올린 겁니다. 산 쪽이 떠안을 손실을, 판 사람이 자문역 연봉으로 받아 가는 거고요.'",
-    memo: ["연장 4회 = 매각 협상 4단계와 날짜 일치", "매각 제안서 자산 가치 3회 상승", "4번째 연장: 자문역 부속서 초안 다음 날"],
+    text: "단서를 평택 PF(건물을 짓기 전에 앞으로 들어올 분양 대금을 믿고 빌려주는 대출)의 연장 회차마다 하나씩 댑니다. 만기 연장(갚을 날짜를 미뤄 주는 것) 네 번이 라운드힐 캐피탈과의 매각 협상 일정 옆에 나란히 섭니다. 연장할 때마다 손실은 장부에서 한 분기씩 밀렸고, 매각 제안서의 자산 가치는 세 번 올랐고, 212세대는 이자를 계속 냈습니다. 순서를 먼저 알려 준 건 석재우의 정리본입니다. 정리본은 쪽수를 새로 매기며 연장 회차마다 두 쪽씩을 뺐고, 뺀 쪽만 모으면 협상 일정표가 됩니다. 마지막 두 쪽은 윤상혁의 자문역(실무 책임 없이 조언만 하는 자리) 조항이 든 부속서(계약서 뒤에 붙는 추가 약속 문서) 초안, 네 번째 연장 전날 것입니다. 반재욱이 수첩을 덮습니다. '숨길 쪽을 고르다 목록을 만들었네요. 뺀 쪽이 곧 대조표입니다.'",
+    memo: ["연장 4회 = 매각 협상 4단계와 날짜 일치", "매각 제안서 자산 가치 3회 상승", "정리본에서 뺀 쪽 = 연장 회차마다 두 쪽", "4번째 연장: 자문역 부속서 초안 다음 날"],
     triggers: ["injustice", "system", "curiosity"],
     entryEffect: { legitimacy: 4, trust: 5, time: -6, capital: -2, fatigue: 3 },
     choices: [
@@ -848,7 +852,7 @@ export const case31 = {
     c31_evidence_turn: {
       place: "KD캐피탈 지하 1층 · 기록실",
       clock: "현장 검사 마지막 날 · 07:00",
-      question: "손실을 미룬 날짜가 매각 값을 올린 날짜와 겹칩니다. 이 대조표를 어떻게 쓰겠습니까?",
+      question: "정리본에서 빠진 쪽이 손실을 미룬 날짜와 매각 값을 올린 날짜를 그대로 이어 줍니다. 이 대조표를 어떻게 쓰겠습니까?",
     },
     c31_final: {
       place: "KD캐피탈 12층 · 검사팀 회의실",

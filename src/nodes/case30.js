@@ -21,8 +21,10 @@
  * his hesitation had no price, a job seeker marked "slow to judge" for
  * checking his work -- and the case closes on which seat goes first. The
  * evidence turn finds that the group owns part of the buyer, and that the
- * desk that wrote "no issue" on the deal is the analyst's own. The aftermath
- * announces the regulator's inspection that opens the next act.
+ * reviewer who wrote "no issue" on the investment is on the list of 63: a
+ * lab trainee who signed off, without knowing it, on the sale of their own
+ * record. The aftermath announces the regulator's inspection that opens the
+ * next act.
  */
 const case30Nodes = {
   c30_start: {
@@ -650,8 +652,8 @@ export const case30 = {
     entryLabel: "핏스코어의 주주 명단에서 그룹이 넣은 돈을 찾는다",
     title: "이상 없음",
     speaker: "한서윤",
-    text: "단서를 투자 날짜와 계약 날짜 사이에 끼우자 핏스코어의 주주 명단이 열립니다. 4월 투자 때 지분(회사를 나눠 가진 몫) 14%를 산 곳이 있습니다. KD캐피탈 신기술투자조합(새 기술 회사에 돈을 넣으려고 만든 투자 모임)입니다. 투자 승인일은 윤상혁이 KD캐피탈 대표로 온 지 9일째, 데이터 계약은 그로부터 23일 뒤입니다. 승인 문서의 검토 의견 칸에는 3월 날짜로 한 줄이 적혀 있습니다. '위험관리부 검토: 이상 없음.' 한서윤이 부서 코드를 짚습니다. '그룹이 돈을 넣은 회사에 그룹 직원의 기록을 판 거예요. 그리고 이상 없다고 쓴 칸은, 지금 당신이 앉은 책상의 전임자예요.'",
-    memo: ["핏스코어 지분 14% -- KD캐피탈 신기술투자조합", "투자 승인: 윤상혁 부임 9일째, 데이터 계약은 23일 뒤", "위험관리부 검토 의견 '이상 없음' -- 당신 책상의 전임자"],
+    text: "단서를 투자 날짜와 계약 날짜 사이에 끼우자 핏스코어의 주주 명단이 열립니다. 4월 투자 때 지분(회사를 나눠 가진 몫) 14%를 산 곳이 있습니다. KD캐피탈 신기술투자조합(새 기술 회사에 돈을 넣으려고 만든 투자 모임)입니다. 투자 승인일은 윤상혁이 KD캐피탈 대표로 온 지 9일째, 데이터 계약은 그로부터 23일 뒤입니다. 승인 문서의 검토 의견 칸에는 3월 날짜로 한 줄이 적혀 있습니다. '위험관리부 검토: 이상 없음.' 한서윤이 검토자 이름에서 손가락을 멈춥니다. 연수 때 트리거랩 단말 앞에 앉았던 사람입니다. 63명 명단으로는 A-041입니다. 투자 검토 서류에는 데이터라는 말이 한 번도 나오지 않습니다. '그룹이 돈을 넣은 회사에 그룹 직원의 기록을 판 거예요. 이상 없다고 쓴 사람도 자기 기록이 그 안에 들어갈 줄 몰랐고요.'",
+    memo: ["핏스코어 지분 14% -- KD캐피탈 신기술투자조합", "투자 승인: 윤상혁 부임 9일째, 데이터 계약은 23일 뒤", "위험관리부 검토 의견 '이상 없음' -- 쓴 사람도 63명 중 A-041"],
     triggers: ["injustice", "system", "selfAwareness"],
     entryEffect: { legitimacy: 4, trust: 5, time: -3, fatigue: 5 },
     choices: [
@@ -676,7 +678,7 @@ export const case30 = {
         label: "63명에게 누가 돈을 넣고 누가 팔았는지부터 알린다",
         effect: { trust: 12, legitimacy: 5, capital: -6, humanCost: -7, fatigue: 8 },
         voice: "기호가 붙은 사람들이 먼저 알아야 한다며, 63명에게 누가 돈을 넣고 누가 팔았는지부터 알린다.",
-        echo: "알리자 63명 중 몇 명은 투자한 쪽이 자기 회사라는 걸 처음 압니다. 그중 한 명이 '그럼 나는 누구한테 따져요'라고 묻습니다.",
+        echo: "알리자 63명 중 몇 명은 투자한 쪽이 자기 회사라는 걸 처음 압니다. A-041은 한참 답이 없다가 한 줄을 보냅니다. '그럼 나는 누구한테 따져요.'",
         cognition: { reframing: 2 },
       },
     ],
@@ -687,7 +689,7 @@ export const case30 = {
     systemLabel: "탑승구에서 짠 판이 데이터 계약서 용도 칸에 적혔는지 본다",
     evidenceLabel: "우편함 214번을 핏스코어의 주주 명단과 나란히 놓는다",
     systemEcho: "용도 칸에 적힌 것은 '조직 적합도 모델 개발' 한 줄입니다. 당신의 판은 거기 없고, 당신의 반응 기록이 제공 대상 칸에 있습니다. 노아가 같은 식으로 맺은 계약 38건을 엽니다.",
-    evidenceEcho: "우편함의 주소를 핏스코어 주주 명단에 대면 그룹 돈이 들어간 줄이 하나 있습니다. 투자 검토 의견은 한 줄이고, 쓴 자리는 당신 책상입니다.",
+    evidenceEcho: "우편함의 주소를 핏스코어 주주 명단에 대면 그룹 돈이 들어간 줄이 하나 있습니다. 투자 검토 의견은 한 줄이고, 그 한 줄을 쓴 사람도 팔린 명단에 있습니다.",
   },
   openingRoutes: {
     c29_after_warm: "c30_start_warm",
@@ -841,7 +843,7 @@ export const case30 = {
     c30_evidence_turn: {
       place: "KD캐피탈 · 투자 승인 기록실",
       clock: "일요일 · 19시",
-      question: "사는 쪽에 그룹 돈이 들어가 있고, 이상 없다고 쓴 칸은 당신 책상이었습니다. 이 기록을 어떻게 쓰겠습니까?",
+      question: "사는 쪽에 그룹 돈이 들어가 있고, 이상 없다고 쓴 사람도 팔린 63명 중 하나였습니다. 이 기록을 어떻게 쓰겠습니까?",
     },
     c30_final: {
       place: "회기동 헌책방 · 1층 책장 사이",
