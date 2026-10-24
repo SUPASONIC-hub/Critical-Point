@@ -19,13 +19,15 @@ test("the test week's report reads the audit and the links the way the game sett
     { run_id: "secret-run-a", case_id: "case02", device: 1, vault: 1500, log: nearly },
     { run_id: "secret-run-a", case_id: "final", device: 1, vault: 2000, ending: "collapse", log: heavy },
     { run_id: "secret-run-a", case_id: "season-final", device: 1, ranked_week: "2026-W47", log: [] },
-    { run_id: "secret-run-b", case_id: "case01", device: 2, vault: 100, log: [{ ...board("cash", 30, 1), assistStory: true }] },
+    // A NEW GAME+ season's case rows carry the mark (newGamePlusMark); the CLI's JSON may give it as text.
+    { run_id: "secret-run-b", case_id: "case01", device: 2, vault: 100, new_game_plus: "true", log: [{ ...board("cash", 30, 1), assistStory: true }] },
     // Seasons of the week without the rule come back as one bare row each.
     { run_id: "secret-run-c", case_id: "turned-down", device: 2, ending: null, vault: null, log: [] },
     { run_id: "secret-run-d", case_id: "turned-down", device: 3, ending: null, vault: null, log: [] },
   ];
   const t = readTestWeek(rows);
   assert.equal(t.seasons, 2, "a season without the rule is not one of the week's");
+  assert.equal(t.newGamePlus, 1, "a season whose rows carry newGamePlus is counted once");
   assert.equal(t.turnedDown, 2);
   assert.equal(t.devicesOn, 2);
   assert.equal(t.devicesOff, 2);
@@ -44,7 +46,8 @@ test("the test week's report reads the audit and the links the way the game sett
   const text = describeTestWeek(t);
   assert.doesNotMatch(text, /secret-run/);
   assert.match(text, /시즌당 적발/);
-  assert.match(text, /규칙 없이 친 시즌.*\| 2 \(50\.0%\) \|/);
+  assert.match(text, /규칙 없이 친 시즌\(규칙을 끔·첫 시즌 기본 꺼짐.*\| 2 \(50\.0%\) \|/);
+  assert.match(text, /그중 NEW GAME\+ 시즌.*\| 1 \(50\.0%\) \|/);
   assert.match(text, /서로 다른 기기.*\| 2 \/ 2 \/ 3 \|/);
 });
 
@@ -59,6 +62,7 @@ test("the query is one read-only statement", () => {
 test("the query sends no device id out of the database, only its rank among the week's", () => {
   const selected = QUERY.slice(QUERY.lastIndexOf("\nselect "));
   assert.doesNotMatch(selected, /session_id|session_code/);
+  assert.match(selected, /s\.summary->>'newGamePlus' = 'true' as new_game_plus/);
   assert.match(QUERY, /dense_rank\(\) over \(order by r\.session_id\) as device/);
 });
 
