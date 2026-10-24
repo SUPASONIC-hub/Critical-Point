@@ -7,6 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { BASE_SCHEMA, createWindow, normalizeSchema, RULES_MARK, SEAL_BREAK_GAUGE } from "../../src/gauntlet/gauntletEngine.js";
+import { getSeasonScore } from "../../src/seasonScore.js";
 import { isSealedCash, isTimeOffClock, readSeed, recheckCaseWindows, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { openTraced, recordClosedWindow, reduceTraced } from "../../src/gauntlet/windowTrail.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
@@ -67,6 +68,21 @@ test("a score edited on the case row or on the ranking row is marked score-off-l
   const result = recheckRun(copied);
   assert.deepEqual(result.marks, ["score-off-log"]);
   assert.deepEqual(result.rankingDiffers, ["rank"]);
+});
+
+test("the ranking row's score is the mean of the run's case rows (C-2, Q25): the finale's own score where they differ is marked", () => {
+  const [finalRow, rankingRow] = seasonRows("run-mean");
+  const other = { ...structuredClone(finalRow), case_id: "case01", decision_log: [] };
+  other.summary = { ...other.summary, burstScore: (finalRow.summary.burstScore + 40) % 101, momentumScore: (finalRow.summary.momentumScore + 40) % 101 };
+  delete other.summary.cognitionMix;
+  const caseRows = { case01: other.summary, final: finalRow.summary };
+  const mean = getSeasonScore(caseRows);
+  assert.notEqual(mean.burstScore, finalRow.summary.burstScore, "the fixture's mean is the finale's own score; it proves nothing");
+  const honest = recheckRun([other, finalRow, { ...rankingRow, summary: { ...rankingRow.summary, ...mean } }]);
+  assert.deepEqual(honest.rankingDiffers, []);
+  const finaleOwn = recheckRun([other, finalRow, rankingRow]);
+  assert.ok(finaleOwn.marks.includes("score-off-log"));
+  assert.ok(finaleOwn.rankingDiffers.includes("burstScore"));
 });
 
 test("a window edited in the log, or its response time, is marked window-off-replay", () => {
@@ -142,7 +158,7 @@ test("the report names unchecked runs, window findings and rows written before t
   const lines = formatReport(verifyRows([finalRow, rankingRow]));
   assert.ok(lines.some((line) => /final #0: window mismatch wall/.test(line)));
   assert.ok(lines.some((line) => /1 windows carry no replay record/.test(line)));
-  assert.ok(lines.some((line) => /ranking row differs from the final case row: rank/.test(line)));
+  assert.ok(lines.some((line) => /ranking row differs from the case rows \(score: their mean; the rest: the final case row\): rank/.test(line)));
   const other = edit(seasonRows(), (row) => {
     row.dynamics.tableRules = 1;
   });
@@ -284,7 +300,7 @@ function chainedRows(runId = "run-chain", seed = 20261021, { open = false } = {}
   const season = createSeasonBot({ seed, staged: STAGED }).playSeason(0, "balanced");
   // `open`: each row's dynamics as the page writes it since S3, the opening snapshot included.
   const rows = CASE_SEQUENCE.map((caseId) => ({ run_id: runId, case_id: caseId, summary: season.caseResults[caseId], decision_log: season.caseLogs[caseId], resources: null, dynamics: open ? season.caseDynamics[caseId] : season.caseResults[caseId].gauntlet }));
-  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final, ...getSeasonScore(season.caseResults) }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
   return rows;
 }
 
@@ -379,7 +395,7 @@ test("a whole season dealt the page's seeds is checked case by case with no mark
     // As the page writes it since S3: the run summary, the close, and the opening snapshot.
     dynamics: season.caseDynamics[caseId],
   }));
-  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final, ...getSeasonScore(season.caseResults) }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
   const [result] = verifyRows(rows);
   assert.equal(result.status, "checked");
   assert.deepEqual(result.marks, []);
