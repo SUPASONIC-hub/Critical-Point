@@ -101,7 +101,7 @@ const case49Nodes = {
     choices: [
       {
         id: "c49_market_carry",
-        label: "건넨 물건을 하나도 빼지 않고 전부 들고 올라가겠다고 한다",
+        label: "건넨 물건을 하나도 빼지 않고 전부 들고 올라간다",
         effect: { trust: 12, humanCost: -5, capital: -3, time: -4, fatigue: 5 },
         voice: "어느 하나도 가벼운 마음으로 준 게 아니라서, 건넨 물건을 하나도 빼지 않고 전부 들고 올라가겠다고 한다.",
         echo: "전부 들자 가방이 닫히지 않습니다. 강태민이 말없이 자기 가방을 비워 내밉니다.",
@@ -117,7 +117,7 @@ const case49Nodes = {
       },
       {
         id: "c49_market_light",
-        label: "말이 가벼워야 한다며 물건은 떡방에 맡기고 빈손으로 간다",
+        label: "말이 가벼워야 한다며 물건은 떡방에 두고 빈손으로 간다",
         effect: { capital: 7, time: 5, trust: -2, humanCost: 3, legitimacy: 2, fatigue: -3 },
         voice: "그 사람 앞에서는 말이 가벼워야 한다며, 물건은 떡방에 맡기고 빈손으로 간다.",
         echo: "빈손은 가볍습니다. 문가을이 떡 상자를 냉장고에 넣으며 '그럼 돌아와서 먹어요'라고만 합니다.",
@@ -154,7 +154,7 @@ const case49Nodes = {
       },
       {
         id: "c49_server_file",
-        label: "에코의 마지막 계산을 류세아 이름으로 공식 기록에 올린다",
+        label: "에코의 마지막 계산을 류세아 이름으로 공식 기록한다",
         effect: { legitimacy: 12, trust: 2, time: -5, humanCost: 2, capital: -1, fatigue: 4 },
         voice: "승인 없는 복원은 증거가 못 된다니, 에코의 마지막 계산을 류세아 이름으로 공식 기록에 올린다.",
         echo: "공식 기록에 오르자 에코의 계산은 절차를 얻습니다. 대신 류세아는 에코의 무단 복원을 보고해야 합니다.",
@@ -199,7 +199,7 @@ const case49Nodes = {
       },
       {
         id: "c49_crosswalk_note",
-        label: "통화를 시각과 함께 받아 적으며 적고 있다고 회장에게 말한다",
+        label: "통화를 시각과 함께 적으며 적고 있다고 회장에게 말한다",
         effect: { legitimacy: 12, trust: 3, time: -5, humanCost: 3, fatigue: 3 },
         voice: "기억하는 사람이 둘뿐이게 두지 않으려고, 통화를 시각과 함께 받아 적으며 적고 있다고 회장에게 말한다.",
         echo: "적고 있다고 말하자 회장이 처음으로 2초 멈춥니다. 그리고 '적게. 나는 서명하지 않으니까'라고 합니다.",
@@ -236,7 +236,7 @@ const case49Nodes = {
     choices: [
       {
         id: "c49_final_all",
-        label: "그 칸을 비워 둔 모든 사람의 이름을 우리 이름까지 적자고 한다",
+        label: "칸을 비워 둔 모든 이름을 우리 것까지 적자고 한다",
         effect: { trust: 11, legitimacy: 7, humanCost: -4, capital: -7, time: -5, fatigue: 6 },
         voice: "모르는 척한 것도 비운 것이라며, 그 칸을 비워 둔 모든 사람의 이름을 우리 이름까지 적자고 한다.",
         echo: "모두의 이름을 적자고 하니 한서윤이 제일 먼저 자기 이름을 씁니다. 반재욱이 그 아래에 '1주 모임 3,118명'이라고 덧붙입니다.",
@@ -252,7 +252,7 @@ const case49Nodes = {
       },
       {
         id: "c49_final_inside",
-        label: "그가 내미는 관리자 자리를 받아 안에서 칸을 바꾸기로 한다",
+        label: "관리자 자리를 받아 안에서 칸을 바꾸기로 한다",
         effect: { capital: 11, time: 5, legitimacy: 4, trust: -4, humanCost: 4, fatigue: -2 },
         voice: "밖에서는 그 칸에 손이 닿지 않아서, 그가 내미는 관리자 자리를 받아 안에서 칸을 바꾸기로 한다.",
         echo: "안에서 바꾸기로 하니 테이블이 조용해집니다. 강태민이 컵라면 하나를 당신 쪽으로 밀며 '그래도 돌아와요'라고만 합니다.",
@@ -299,7 +299,7 @@ export const case49 = {
         },
         {
           id: "c49_after_record",
-          label: "마흔아홉 사건의 기록을 한 폴더로 묶어 공개 준비를 끝낸다",
+          label: "마흔아홉 사건 기록을 한 폴더에 묶어 공개를 준비한다",
           effect: { legitimacy: 14, trust: 3, time: -6, capital: -3, fatigue: 5 },
           voice: "올라가서 무슨 일이 생겨도 기록은 남게, 마흔아홉 사건의 기록을 한 폴더로 묶어 공개 준비를 끝낸다.",
           echo: "폴더는 새벽 네 시에 완성됩니다. 공개 버튼 옆에 비어 있는 칸이 하나 남습니다. B2의 원본 폴더입니다.",
@@ -388,7 +388,7 @@ export const case49 = {
       memo: ["윤경수선 -- 바짓단 2센티, 수선비 받지 않음", "33층 옛 그룹전략실 CCTV: 21시부터 꺼짐", "백아린: 영업비밀 유출 고소 진행 중"],
       choices: [
         {
-          label: "고소 중인 백아린이 다치지 않게 로비에는 오지 말라고 한다",
+          label: "백아린이 다치지 않게 로비에는 오지 말라고 한다",
           effect: { trust: 9, humanCost: -5, time: -3, capital: -3, fatigue: 3 },
           voice: "고소 중인 백아린에게 짐을 더 얹을 수는 없어서, 로비에는 오지 말라고 한다.",
           echo: "오지 말라고 하자 백아린이 한참 있다 '알겠어요'라고 합니다. 허윤경은 수선비 대신 떡을 달라고 합니다.",
@@ -483,7 +483,7 @@ export const case49 = {
           echo: "약속하자 선우진이 '방 비워 둘게요'라고 합니다. 느린섬의 방 하나에 당신 이름이 붙습니다.",
         },
         {
-          label: "1기 참가자로서 그의 진술을 내일 폴더에 함께 넣자고 한다",
+          label: "1기 참가자인 그의 진술도 내일 폴더에 함께 넣는다",
           effect: { legitimacy: 8, trust: 4, humanCost: 2, time: -4, fatigue: 2 },
           voice: "네 글자로 끝난 기록에 그의 말을 돌려주려고, 1기 참가자로서 그의 진술을 내일 폴더에 함께 넣자고 한다.",
           echo: "그의 진술이 들어가자 폴더의 맨 처음이 1기가 됩니다. 효과 확인이라는 네 글자 옆에 그의 이름이 붙습니다.",
@@ -512,7 +512,7 @@ export const case49 = {
       choices: [
         {
           id: "c49_branch_columbarium_a",
-          label: "문성호 대표 앞에서 내일 끝까지 가겠다고 소리 내어 약속한다",
+          label: "문성호 대표 앞에서 내일 끝까지 가겠다고 약속한다",
           effect: { trust: 12, humanCost: -4, time: -4, capital: -1, fatigue: 5 },
           voice: "문가을이 유리문에 전한 말을 내 입으로도 하려고, 문성호 대표 앞에서 내일 끝까지 가겠다고 소리 내어 약속한다.",
           echo: "소리 내어 말하자 봉안당 복도가 울립니다. 문가을이 '들었대요'라고 하고, 먼저 돌아섭니다.",
@@ -558,7 +558,7 @@ export const case49 = {
         },
         {
           id: "c49_branch_columbarium_follow_b",
-          label: "펜은 임소율에게 돌려주고 그 칸은 그 사람 펜으로 채우게 한다",
+          label: "펜은 임소율에게 돌려주고 그 칸은 본인이 채우게 한다",
           effect: { legitimacy: 12, trust: 5, time: -6, humanCost: 2, fatigue: 4 },
           voice: "남의 펜으로 쓴 이름은 또 남의 것이 된다며, 펜은 임소율에게 돌려주고 그 칸은 그 사람 펜으로 채우게 한다.",
           echo: "돌려주자 임소율이 펜을 가방 안쪽에 넣습니다. '그럼 그 사람이 자기 이름을 쓰는 걸 제가 보러 갈게요.'",
@@ -624,7 +624,7 @@ export const case49 = {
     finalChoices: [
       {
         id: "a",
-        label: "빈칸은 비운 사람의 이름으로만 닫게 하는 규칙을 제안한다",
+        label: "빈칸은 비운 사람 이름으로만 닫게 하는 규칙을 제안한다",
         effect: { legitimacy: 13, trust: 6, capital: -7, humanCost: -4, time: -1, fatigue: 7 },
         voice: "가장 늦게 온 사람이 떠안는 일을 끊으려고, 빈칸은 비운 사람의 이름으로만 닫게 하는 규칙을 제안한다.",
         echo: "규칙이 생기자 다음 빈칸은 비운 사람을 기다립니다. 이번 칸은 아직 규칙보다 먼저 만들어졌습니다.",
@@ -692,8 +692,8 @@ export const case49 = {
   memoryPlan: {
     systemNext: "c49_route_system",
     evidenceNext: "c49_evidence_turn",
-    systemLabel: "기록실에서 새로 짠 판이 빈 서명란 문서들에 적혔는지 찾아 읽는다",
-    evidenceLabel: "41% 두 쪽의 자문역 이름을 그 방을 준비한 계정에 비춘다",
+    systemLabel: "기록실에서 새로 짠 판이 빈 서명란에 적혔는지 찾는다",
+    evidenceLabel: "41% 두 쪽 자문역 이름을 그 방 준비 계정에 비춘다",
     systemEcho: "그 문서들에는 당신의 판 대신 당신의 이름이 올라 있습니다. 에코가 그렇게 이름이 적힌 칸들을 처음부터 모읍니다.",
     evidenceEcho: "자문역 이름을 비추면 지정서를 만든 계정은 그 사람 것이 아닙니다. 작성 시각은 선고가 난 날 밤입니다.",
   },
@@ -709,14 +709,14 @@ export const case49 = {
   },
   openingSignatures: {
     c49_start_warm: {
-      label: "단체방의 동료들에게 문자를 먼저 보여 주고 답을 같이 쓴다",
+      label: "단체방 동료들에게 문자를 보여 주고 답을 같이 쓴다",
       effect: { trust: 12, humanCost: -3, capital: -3, time: -5, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "그날 밤을 같이 보낸 사람들이 정할 몫도 있어서, 단체방의 동료들에게 문자를 먼저 보여 주고 답을 같이 쓴다.",
       echo: "같이 쓰니 답장은 14명의 손을 거칩니다. 마지막에 남은 문장은 한 줄입니다. '혼자 가지 않습니다.'",
     },
     c49_start_record: {
-      label: "닫혔어야 할 계정의 열람 기록부터 한지우에게 공식 제보한다",
+      label: "닫혔어야 할 계정 열람 기록을 한지우에게 공식 제보한다",
       effect: { legitimacy: 12, trust: -1, capital: -4, time: -6, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "읽힌 쪽이 먼저 적어야 한다는 에코의 말대로, 닫혔어야 할 계정의 열람 기록부터 한지우에게 공식 제보한다.",

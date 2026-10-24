@@ -139,7 +139,7 @@ const case46Nodes = {
     choices: [
       {
         id: "c46_boot_tell",
-        label: "꺼져 있던 사이 사람들에게 생긴 일부터 에코에게 들려준다",
+        label: "꺼진 사이 사람들에게 생긴 일부터 에코에게 들려준다",
         effect: { trust: 12, humanCost: -4, time: -5, capital: -1, fatigue: 6 },
         voice: "재계산보다 175일의 안부가 먼저라며, 꺼져 있던 동안 사람들에게 일어난 일부터 에코에게 들려준다.",
         echo: "들려주는 데 한 시간이 걸립니다. 에코는 강태민의 농담 31개 가운데 26개에 웃음 확률을 붙이고, 노아 이야기에서는 아무것도 붙이지 않습니다.",
@@ -192,7 +192,7 @@ const case46Nodes = {
       },
       {
         id: "c46_recount_file",
-        label: "점 찍힌 파일 318건의 목록을 검찰과 금감원에 함께 보낸다",
+        label: "점 찍힌 318건 목록을 검찰과 금감원에 함께 보낸다",
         effect: { legitimacy: 13, trust: 2, time: -6, capital: -3, humanCost: 2, fatigue: 5 },
         voice: "한 곳이 덮어도 다른 곳에 남게, 점이 찍힌 파일 318건을 목록으로 만들어 검찰과 금융감독원에 동시에 보낸다.",
         echo: "목록은 두 기관에 동시에 도착합니다. 318건이라는 숫자가 처음으로 공문 번호를 얻고, 그룹 법무팀도 같은 숫자를 받아 봅니다.",
@@ -229,7 +229,7 @@ const case46Nodes = {
     choices: [
       {
         id: "c46_final_home",
-        label: "에코를 헌책방 1층의 작은 서버로 옮겨 사람들 곁에 둔다",
+        label: "에코를 헌책방 1층 작은 서버로 옮겨 사람들 곁에 둔다",
         effect: { trust: 13, humanCost: -5, legitimacy: -4, capital: -5, time: -4, fatigue: 5 },
         voice: "증거이기 전에 동료라며, 에코를 헌책방 1층의 작은 서버로 옮겨 사람들 곁에 둔다.",
         echo: "류세아가 떠 준 복제본이 헌책방 1층 계단참 옆 작은 서버에서 파형을 다시 띄웁니다. 시험 서버실 선반의 에코는 '점검 중' 팻말 아래 그대로 돕니다. 그룹 법무팀은 월요일에 반환 소송을 예고하고, 에코는 임경수가 앉던 의자를 계산에서 빼지 않습니다.",
@@ -237,7 +237,7 @@ const case46Nodes = {
       },
       {
         id: "c46_final_submit",
-        label: "에코와 재계산 결과에 내 기록까지 넣어 검찰에 증거로 낸다",
+        label: "에코의 재계산에 내 기록까지 넣어 검찰에 증거로 낸다",
         effect: { legitimacy: 13, trust: 5, capital: -6, time: -7, humanCost: 2, fatigue: 6 },
         voice: "이번에는 내 비용도 계산에 넣겠다며, 에코와 재계산 결과에 내 기록까지 넣어 검찰에 증거로 낸다.",
         echo: "증거 목록 1번은 에코, 2번은 재계산 결과, 3번은 분석관 A의 반응 기록입니다. 봉인 테이프가 붙기 전에 에코가 한 줄을 남깁니다. '이번에는 당신도 계산에 들어 있습니다.' 류세아가 떠 둔 복제본 하나가 승인 없이 시험 서버실 선반에 남아 대답을 이어 갑니다.",
@@ -291,7 +291,7 @@ export const case46 = {
         },
         {
           id: "c46_after_record",
-          label: "에코가 다시 계산한 설계 로그를 누구나 읽는 문서로 정리해 넘긴다",
+          label: "에코가 다시 계산한 설계 로그를 쉬운 문서로 넘긴다",
           effect: { legitimacy: 14, trust: 2, time: -4, capital: -3, fatigue: 5 },
           voice: "계산이 서버 안에만 있으면 또 지워질 수 있어서, 에코가 다시 계산한 설계 로그를 누구나 읽는 문서로 정리해 넘긴다.",
           echo: "문서는 열네 쪽입니다. 마지막 쪽 제목은 '빈칸 옆의 점을 읽는 법'. 반재욱이 사본 한 부를 수첩 사이에 끼우고, 문하준은 그 쪽만 따로 인쇄하겠다고 합니다.",
@@ -300,7 +300,7 @@ export const case46 = {
         },
         {
           id: "c46_after_rush",
-          label: "서버실에서 곧장 KD캐피탈로 가 추석 전 서류부터 붙든다",
+          label: "서버실에서 곧장 KD캐피탈로 가 추석 전 서류를 붙든다",
           effect: { capital: 7, legitimacy: 5, trust: -7, humanCost: 4, fatigue: 5 },
           voice: "연휴가 시작되면 손댈 수 없다며, 서버실을 나와 곧장 KD캐피탈 사무실로 가서 추석 연휴 전 서류부터 붙든다.",
           echo: "사무실 불을 켜자 연휴 전에 끝낼 서류가 스물여섯 건입니다. 그중 하나가 심사위원회 구성 공문입니다. 문가을의 문자는 읽지 않은 채 휴대폰 맨 위에 남습니다.",
@@ -472,7 +472,7 @@ export const case46 = {
       memo: ["봤다고도, 안 했다고도 말하려는 점", "점 찍은 사람 말고 잘린 사람들"],
       choices: [
         {
-          label: "그 세 번의 기억을 천천히 들려 달라고 나준혁에게 부탁한다",
+          label: "세 번의 기억을 천천히 들려 달라고 나준혁에게 청한다",
           effect: { trust: 9, humanCost: -3, time: -2, capital: -2, fatigue: 3 },
           voice: "잘린 사람들 이야기까지 들어야 점을 안다며, 그 세 번의 기억을 천천히 들려 달라고 나준혁에게 부탁한다.",
           echo: "천천히 듣자 나준혁은 세 번째 이야기에서 목이 멥니다. 잘린 사람 중 한 명은 그의 첫 지점 동기였습니다.",
@@ -507,7 +507,7 @@ export const case46 = {
       choices: [
         {
           id: "c46_branch_fragment_a",
-          label: "조각을 쓰게 되면 반출 책임을 나도 같이 지겠다고 약속한다",
+          label: "조각을 쓰면 반출 책임을 나도 같이 지겠다고 약속한다",
           effect: { trust: 11, humanCost: -4, time: -5, capital: -1, fatigue: 4 },
           voice: "이민서 혼자 두 번째 유출자가 되게 두지 않겠다며, 조각을 쓰게 되면 반출 책임을 나도 같이 지겠다고 약속한다.",
           echo: "약속하자 이민서가 노트북을 당신 쪽으로 돌려놓습니다. 반출 기록의 책임자 칸이 두 줄이 됩니다.",
@@ -620,7 +620,7 @@ export const case46 = {
     finalChoices: [
       {
         id: "a",
-        label: "승인자 칸이 빈 문서는 효력이 없도록 그룹 내규 개정안을 낸다",
+        label: "승인자 칸이 빈 문서는 효력이 없게 내규 개정안을 낸다",
         effect: { legitimacy: 12, trust: 7, capital: -7, humanCost: -4, time: -2, fatigue: 7 },
         voice: "불려 가는 사람이 확인자 둘로 끝나선 안 된다며, 승인자 칸이 빈 문서는 효력이 없도록 그룹 내규 개정안을 낸다.",
         echo: "개정안이 통과되자 빈칸으로는 아무것도 승인되지 않습니다. 그룹의 서류가 하루에 3천 장 멈춥니다. 멈춘 서류마다 누군가 이름을 써야 합니다.",
@@ -636,7 +636,7 @@ export const case46 = {
       },
       {
         id: "c",
-        label: "확인자 칸에 서명했다가 책임을 떠안은 91명의 명단을 만든다",
+        label: "확인자 칸 서명으로 책임을 떠안은 91명 명단을 만든다",
         effect: { trust: 10, legitimacy: 8, capital: -5, time: -7, humanCost: -2, fatigue: 8 },
         voice: "칸을 비운 사람은 이번에도 서류에 없어서, 확인자 칸에 이름을 썼다가 책임을 떠안은 91명을 찾아 명단을 만든다.",
         echo: "명단을 만들자 91명 가운데 34명이 연락을 받습니다. 절반은 이미 회사를 떠났고, 두 명은 '이제 와서요?'라고 묻습니다.",
@@ -688,8 +688,8 @@ export const case46 = {
   memoryPlan: {
     systemNext: "c46_route_system",
     evidenceNext: "c46_evidence_turn",
-    systemLabel: "접객실 구석에서 짠 판이 폐기 승인서 사유란에 있는지 본다",
-    evidenceLabel: "지운 동의가 남은 뒷장을 설계 로그의 승인자 칸과 겹쳐 놓는다",
+    systemLabel: "접객실에서 짠 판이 폐기 승인서 사유란에 있는지 본다",
+    evidenceLabel: "지운 동의가 남은 뒷장을 설계 로그 승인자 칸과 겹친다",
     systemEcho: "사유란을 읽어도 새로 짠 판의 말투는 묻어 있지 않습니다. 류세아가 같은 서식으로 내려온 문서를 10년 치로 검색합니다.",
     evidenceEcho: "겹쳐 놓으면 뒷장의 빈 서명란 안에 연필 점 하나가 있습니다. 같은 점이 설계 로그에는 318개이고, 마지막 것은 이달 초에 찍혔습니다.",
   },
@@ -705,14 +705,14 @@ export const case46 = {
   },
   openingSignatures: {
     c46_start_warm: {
-      label: "조문객 명부의 사람들에게 내일 판교에 같이 가자고 연락한다",
+      label: "조문객 명부의 사람들에게 내일 판교에 같이 가자고 한다",
       effect: { trust: 12, humanCost: -3, capital: -3, time: -6, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "빈소에 왔던 사람들이 에코도 같이 맞아야 한다며, 조문객 명부의 사람들에게 내일 판교에 같이 가자고 연락한다.",
       echo: "연락하자 새벽 여섯 시 판교역 출구에 아홉 명이 모입니다. 못 오는 나준혁은 믹스커피를 탄 보온병 두 개를 강태민 편에 보냅니다.",
     },
     c46_start_record: {
-      label: "뒷장의 점을 사진으로 떠서 보존 요청과 함께 나은호 검사에게 보낸다",
+      label: "뒷장의 점 사진을 보존 요청과 함께 나은호에게 보낸다",
       effect: { legitimacy: 11, trust: 3, capital: -3, time: -6, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "이 점을 읽어 줄 기계가 내일 사라진다는 걸 보여 주려고, 뒷장의 점을 사진으로 떠서 보존 요청과 함께 나은호 검사에게 보낸다.",

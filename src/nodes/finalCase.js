@@ -525,7 +525,7 @@ export const finalCase = {
           },
           {
             id: "b",
-            label: "복제된 선택지를 원래 참가자에게 돌려주고 삭제 권한까지 넘긴다",
+            label: "복제된 선택지를 원래 참가자에게 삭제 권한까지 넘긴다",
             effect: { trust: 10, legitimacy: 7, capital: -6, humanCost: -5, fatigue: 8 },
             voice: "돌려주는 데서 멈추지 않고, 지울 권한까지 함께 넘긴다.",
             echo: "삭제 권한이 넘어가자 증거도 함께 사라질 수 있습니다. 그것도 그들의 선택입니다.",
@@ -685,7 +685,7 @@ export const finalCase = {
       routeChoices: [
         {
           id: "f_route_system_read",
-          label: "내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다",
+          label: "내가 다시 짠 판이 어떤 선택지가 됐는지 끝까지 읽는다",
           effect: { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 },
           voice: "다음 참가자가 무엇을 받는지 알아야 해서, 내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다.",
           echo: "읽고 나니 다음 참가자의 화면을 모른 척할 수 없습니다.",
@@ -770,7 +770,7 @@ export const finalCase = {
     choices: [
       {
         id: "f_evidence_turn_burn",
-        label: "내 선택 문장까지 포함해 실험 원본을 폐기 대기열에 올린다",
+        label: "내 선택 문장까지 실험 원본을 폐기 대기열에 올린다",
         effect: { legitimacy: 11, trust: 5, capital: -8, time: -8, humanCost: -4, fatigue: 9 },
         voice: "내 판단 양식을 다음 사람에게 물려주지 않으려고, 내 선택 문장까지 포함해 실험 원본을 폐기 대기열에 올린다.",
         echo: "대기열이 실행되자 폐기는 악용을 끝내고, 무슨 일이 있었는지도 함께 끝냅니다.",
@@ -797,7 +797,7 @@ export const finalCase = {
   memoryPlan: {
     systemNext: "f_route_system",
     evidenceNext: "f_evidence_turn",
-    systemLabel: "달빛 아래 다시 짠 판이 다음 참가자의 선택지가 됐는지 본다",
+    systemLabel: "달빛 아래 짠 판이 다음 참가자 선택지가 됐는지 본다",
     evidenceLabel: "지정서의 작성자를 따라 모든 선택 문장의 원본까지 간다",
     systemEcho: "비춰 보면 다음 참가자의 선택지 셋 중 하나에서 어제 당신이 다시 짠 판의 조건이 빠짐없이 읽힙니다.",
     evidenceEcho: "작성자를 따라가면 설계 로그의 잠금이 풀립니다. 매번 다르던 질문들이 같은 원본에서 갈라져 나온 것이 보입니다.",
@@ -826,7 +826,7 @@ export const finalCase = {
       echo: "공개하자 골목의 23명이 자기 칸의 '결속 유지 능력 상'을 봅니다. 그 칸은 다음 실험의 교재로도 쓰입니다.",
     },
     f_start_system: {
-      label: "내가 묶은 공개 원칙을 이 폴더 자신에게 먼저 적용하라고 요구한다",
+      label: "내가 묶은 공개 원칙을 이 폴더에 먼저 적용하라고 한다",
       effect: { legitimacy: 9, trust: 5, capital: -4, time: -7, fatigue: 5 },
       cognition: { reframing: 2 },
       next: "f_route_contain",
@@ -834,7 +834,7 @@ export const finalCase = {
       echo: "같은 원칙을 설계자에게 들이대자 실험의 전제가 드러납니다. 관리자 칸의 점이 끝내 답하지 않으면, 그 침묵이 증거가 됩니다.",
     },
     f_start_name: {
-      label: "연필로 적힌 내 이름과 이 파일을 동료들에게 먼저 알린다",
+      label: "연필로 적힌 내 이름과 이 파일을 동료들에게 알린다",
       effect: { trust: 9, humanCost: -6, legitimacy: -3, capital: -5, fatigue: 5 },
       cognition: { reframing: 2 },
       next: "f_route_expose",

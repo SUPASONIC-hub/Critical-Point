@@ -63,7 +63,9 @@ const budgets = [
   // save's restore (src/state/cloudDeviceRecords.js), so Rolldown writes them
   // into the shared season-store chunk below. Measured 141,946 / 51,960 in the
   // e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 141_946, maxGzip: 51_964 },
+  // 51,964 -> 51,973 on 2026-10-25, A-3 사건 41-49·마지막 사건 labels: no
+  // runtime code, the case chunks' new hashes. Measured 51,969, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 141_946, maxGzip: 51_973 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -528,7 +530,9 @@ const budgets = [
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
-  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 1_934, maxGzip: 942 },
+  // 942 -> 947 on 2026-10-25, A-3 사건 41-49·마지막 사건 labels (chunk hashes
+  // only): measured 943, the gzip plus 4.
+  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 1_934, maxGzip: 947 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
