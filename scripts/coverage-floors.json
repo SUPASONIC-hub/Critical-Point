@@ -18,6 +18,8 @@
     "src/featurePack.js": 92,
     "src/gameConstants.js": 100,
     "src/gameLogic.js": 99,
+    "src/gauntlet/actCardCopy.js": 100,
+    "src/gauntlet/actCardGate.js": 100,
     "src/gauntlet/auditRisk.js": 100,
     "src/gauntlet/caseCastModel.js": 100,
     "src/gauntlet/cascadeRisk.js": 100,

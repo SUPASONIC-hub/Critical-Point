@@ -363,6 +363,85 @@ test("hero entry resumes a saved run without clobbering it", { tag: "@prod" }, a
 });
 
 /**
+ * B-11(1), the act title card (막 표지, src/gauntlet/ActCard.jsx). A run that
+ * played its way to an act's first case -- a save at 사건 08's first page with
+ * forty tables behind it -- opens on the act's card before the briefing; a key
+ * or 계속 goes on, and the card is not shown again in that run. A debug jump
+ * opens a fresh table and no card (actCardGate.js).
+ */
+async function resumeAtAct(page, caseId, { shown = null } = {}) {
+  await seedSave(page, savedRunAt(caseId, CASE_START_NODES[caseId], { dynamics: { windowIndex: 40 } }));
+  if (shown) {
+    await page.addInitScript(
+      ({ key, value }) => {
+        if (sessionStorage.getItem("e2e-act-seeded")) return;
+        sessionStorage.setItem("e2e-act-seeded", "1");
+        localStorage.setItem(key, JSON.stringify(value));
+      },
+      { key: TEST_STORAGE_KEYS.actCards, value: shown },
+    );
+  }
+  await page.goto("/");
+  await page.getByTestId("resume-save").click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+test("B-11(1): an act's first case opens on its title card, a key goes on to the briefing, and a run sees it once", async ({ page }) => {
+  await resumeAtAct(page, "case08");
+  const card = page.getByTestId("act-card");
+  await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(card).toContainText("2막 · 사건 08~12");
+  await expect(card.getByRole("heading")).toHaveText("「집념의 값」");
+  await expect(card).toContainText("이 사건부터 마지막 사건까지 43개.");
+  const dialog = page.getByRole("dialog", { name: "「집념의 값」" });
+  await expect(dialog).toHaveAccessibleDescription(/같은 집념이 .* 43개\./);
+  await expect(page.getByTestId("act-card-continue")).toBeFocused();
+  // It holds the briefing and the draft, and the table behind them is not live.
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  await expect(page.locator(".choices .choice:not([aria-disabled='true'])")).toHaveCount(0);
+
+  await page.keyboard.press("x");
+  await expect(card).toHaveCount(0);
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  expect(await readJsonStorage(page, TEST_STORAGE_KEYS.actCards)).toEqual({ run: "e2e-seeded-run", acts: ["case08"] });
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.currentCase).toBe("case08");
+  expect(saved.log).toEqual([]);
+
+  // A reload and a resume on the same page: the run has seen this act.
+  // A started run reloads into the game; a paused one asks for 이어하기 first.
+  await page.reload();
+  const resume = page.getByTestId("resume-save");
+  await expect(resume.or(page.locator(".game-shell")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  if (await resume.isVisible()) await resume.click();
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(card).toHaveCount(0);
+});
+
+test("B-11(1): the title card goes on by itself, stands still under reduced motion, and a new run is shown it again", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  // An earlier run (a season before) saw 3막's card; this run has not.
+  await resumeAtAct(page, "case13", { shown: { run: "an-earlier-run", acts: ["case13"] } });
+  const card = page.getByTestId("act-card");
+  await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(card.getByRole("heading")).toHaveText("「사슬은 반복된다」");
+  await expect(card).toContainText("이 사건부터 마지막 사건까지 38개.");
+  expect(await page.locator(".gx-act-page").evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
+  expect(await page.getByTestId("act-card-continue").evaluate((element) => getComputedStyle(element, "::after").animationName)).toBe("none");
+  // Nothing pressed: the card leaves in its seven seconds, and the briefing opens.
+  await expect(card).toHaveCount(0, { timeout: 12_000 });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  expect(await readJsonStorage(page, TEST_STORAGE_KEYS.actCards)).toEqual({ run: "e2e-seeded-run", acts: ["case13"] });
+});
+
+test("B-11(1): a debug jump to an act's first case opens on its briefing, with no title card", { tag: "@once" }, async ({ page }) => {
+  await startDebugNodeFromHelper(page, "case08", CASE_START_NODES.case08, { openTable: false });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("act-card")).toHaveCount(0);
+});
+
+/**
  * NEW GAME+. A finished season leaves two things on the device: the button,
  * and the season's record, which the intro shows. Pressed on the pre-start
  * shell, the press is handed to the runtime (queueRuntimeStartAction), which

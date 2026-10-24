@@ -378,7 +378,13 @@ const budgets = [
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
   // 34,821 -> 34,826 gzip on 2026-10-25, 묶음 A-13 on main 024904a3 (hashed
   // chunk names only): measured 101,085 / 34,822 in the e2e build, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_087, maxGzip: 34_826 },
+  // -> 102,475 / 35,457 on 2026-10-24 (B-11(1) 막 표지, on main ea5b74aa): the
+  // act title card's gate (actCardGate.js: the eight cases, the run's record of
+  // the acts it was shown, and the opening-page test) and its fold, which
+  // fetches the card (ActCard.jsx, its own chunk below) with its preload list.
+  // Measured 102,475 / 35,449 in the e2e build (35,453 on da6292be; the larger
+  // gzip plus 4).
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_475, maxGzip: 35_457 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -473,7 +479,10 @@ const budgets = [
   // e72c415f: measured 191,685 / 35,787 in the e2e build, the gzip plus 4.
   // -> 191,778 / 35,830 on 2026-10-25 with B-12(2)'s 「당신의 세 장면」 coda
   // (main ea5b74aa): measured 191,778 / 35,826, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 191_778, maxGzip: 35_830 },
+  // -> 193,412 / 36,058 on 2026-10-25 (B-11(1) 막 표지, on main 024904a3): the
+  // act title card's rules in briefing.css beside B-12(2)'s coda. Measured
+  // 193,412 / 36,054 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_412, maxGzip: 36_058 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -795,6 +804,11 @@ const budgets = [
   // 11,705 / 5,445 -> 11,609 / 5,405 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 11,609 / 5,401 in the e2e build, the gzip plus 4.
   { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 11_609, maxGzip: 5_405 },
+  // The act title card (src/gauntlet/ActCard.jsx with actCardCopy.js, B-11(1)
+  // 막 표지), 2026-10-24: eight acts' names and sentences, the count to the
+  // season's end and the dialog, fetched by the PlayScreen chunk's fold only
+  // on an act's first case. Measured 2,698 / 1,538 on main da6292be, the gzip plus 4.
+  { pattern: /^ActCard-.*\.js$/, maxBytes: 2_698, maxGzip: 1_542 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -1008,7 +1022,10 @@ function checkBudget(file, budget) {
 // b0eb9cb0 (#287), 3,405; the larger plus 4. One
 // more file in the list, cloudDeviceRecords, and gameData.app is now named
 // pastPicks; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_310, maxGzip: 3_409 };
+// -> 9,340 / 3,424 on 2026-10-24 (B-11(1) 막 표지, on main ea5b74aa): measured
+// 9,340 / 3,415 here and 3,420 in CI (the file names' hashes); the larger plus
+// 4. One more file in the list, ActCard; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_340, maxGzip: 3_424 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

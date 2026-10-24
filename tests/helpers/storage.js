@@ -20,6 +20,7 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   cloudCode: "critical-point-cloud-code-v1",
   cloudSync: "critical-point-cloud-sync-v1",
   settledWindows: "critical-point-settled-windows-v1",
+  actCards: "critical-point-act-cards-v1",
 });
 
 export async function clearGameStorage(page) {

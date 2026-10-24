@@ -15,7 +15,7 @@ const NO_INTRO = Object.freeze([]);
  * close (`caseOpeningRoutes`; the graph marks those `kind: "opening"`). A run
  * that is played, not jumped into, nearly always enters on one of the latter.
  */
-function opensCase(node, nodeId) {
+export function opensCase(node, nodeId) {
   return Boolean(node) && (CASE_START_NODES[node.caseId] === nodeId || node.kind === "opening");
 }
 

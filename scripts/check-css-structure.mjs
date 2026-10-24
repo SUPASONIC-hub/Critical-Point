@@ -303,7 +303,11 @@ const fileBudgets = {
   // -> 746 / 14302 the same evening, measured: C-13's box names the table it
   // is about on a small line of its own (운영 확인 고칠 점 4); 748 / 14339 with
   // the balloon's tail drawn under its words (고칠 점 1), measured.
-  "briefing.css": { lines: 748, bytes: 14339 },
+  // 748 / 14339 -> 846 / 16306 on 2026-10-24, measured: B-11(1)'s act title
+  // card (ActCard.jsx) in front of an act's first briefing -- its backdrop,
+  // page, kicker, name, sentence, count, 계속 with the bar of the time left,
+  // and the reduced-motion rule that stills all three.
+  "briefing.css": { lines: 846, bytes: 16306 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
