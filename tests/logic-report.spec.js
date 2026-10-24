@@ -356,3 +356,33 @@ test("the record's decision log holds the skipped scene minutes under the bust's
   await expect(fold.locator("div > p").first()).toBeVisible();
   await expect(fold.locator("div > p.spoken-line")).toBeVisible();
 });
+
+// B-12(2) 「당신의 세 장면」 (src/threeScenes.js): 프롤로그 01 and 사건 48 off their
+// summaries, the finale's card off its own log, as a list under a heading in
+// the ending's last step.
+test("the closing report lists the season's three scenes under a heading", async ({ page }) => {
+  test.setTimeout(120_000);
+  const cardOf = (sceneId, choiceId) => nodes[sceneId].choices.find((choice) => choice.id === choiceId).label;
+  const finaleCard = { caseId: "final", nodeId: "f_choice", choiceId: "ending_reform", choice: cardOf("f_choice", "ending_reform") };
+  await openTheRecord(page, {
+    ...recordedSeason(),
+    prologue01: closedCase("prologue01", null, { outcomeChoiceId: "p1_after_credit", outcomeNodeId: "p1_aftershock" }),
+    case48: closedCase("case48", null, { outcomeChoiceId: "c48_after_warm", outcomeNodeId: "c48_aftershock", finalChoiceId: "c48_final_condition" }),
+  }, { backend: false, save: { log: [finaleCard] } });
+
+  const panel = page.getByTestId("three-scenes");
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole("heading", { level: 2 })).toHaveText("당신의 세 장면");
+  await expect(panel).toHaveAccessibleName("당신의 세 장면");
+  // In the ending's last step, under 「당신이 남긴 것」.
+  await expect(page.locator(".ending-step-3 .ending-coda + .three-scenes")).toBeVisible();
+  const items = panel.getByRole("listitem");
+  await expect(items.locator("span")).toHaveText([
+    `프롤로그 01 · ${nodes.p1_aftershock.title}`,
+    `사건 48 · ${nodes.c48_final.title}`,
+    `마지막 사건 · ${nodes.f_choice.title}`,
+  ]);
+  await expect(items.locator("p")).toHaveText([cardOf("p1_aftershock", "p1_after_credit"), cardOf("c48_final", "c48_final_condition"), finaleCard.choice]);
+  const overflow = await page.evaluate(() => ({ clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
+  expect(overflow.scrollWidth, "the list does not widen the page").toBeLessThanOrEqual(overflow.clientWidth + 1);
+});
