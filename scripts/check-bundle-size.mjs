@@ -70,7 +70,11 @@ const budgets = [
   // 52,274 -> 52,279 gzip on 2026-10-25, 묶음 A-13 (long scene bodies, text
   // only) on main 024904a3: the shortened case files change the hashed names
   // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_728, maxGzip: 52_279 },
+  // 142,728 / 52,279 -> 142,806 / 52,313 on 2026-10-25, #224 (RULES_MARK 3)
+  // rebased on main 81a48f50: measured 142,806 / 52,309 in the e2e build, the
+  // gzip plus 4. The case's rules for the audit and the links, and the season
+  // row's mean score.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_806, maxGzip: 52_313 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
