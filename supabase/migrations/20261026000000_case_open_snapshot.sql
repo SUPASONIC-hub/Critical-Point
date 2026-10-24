@@ -1,11 +1,12 @@
--- Written 2026-10-22 on branch f1-s3 (draft, base f1-stage3). Merging it
--- applies it to the production database within a minute, before the client
--- deploys; that waits for the user after 11-02 (W44 code freeze; 서버검증-설계안.md,
--- 3단계 S3, question 8 (1)).
+-- Written 2026-10-22 on branch f1-s3 (draft, base f1-stage3; 서버검증-설계안.md,
+-- 3단계 S3, question 8 (1)). Merging it applies it to the production database
+-- within a minute, before the client deploys, so the user is asked first.
 --
--- It must come after #216's 20261023000000_ranking_recheck_marks.sql (on main
--- since 10-23). Re-date it to the day it merges, after whatever is last on
--- main then.
+-- Re-dated 2026-10-24 from its 11-02 name to 20261026000000, the day it is
+-- planned to merge (#240): after the last migration on main then,
+-- 20261023020000_scene_choice_rates.sql, and so after #216's
+-- 20261023000000_ranking_recheck_marks.sql. If something later lands on main
+-- first, re-date it again past that.
 --
 -- Server checks, phase 3, piece S3: the case-open snapshot.
 --

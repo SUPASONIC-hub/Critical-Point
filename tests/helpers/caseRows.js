@@ -5,7 +5,7 @@
  * row's `dynamics` with the same ruler.
  */
 
-/** The server's cap on a case row's `dynamics`, as jsonb text (20261102030000). */
+/** The server's cap on a case row's `dynamics`, as jsonb text (20261026000000). */
 export const SERVER_DYNAMICS_BYTES = 6144;
 
 /** `value` as Postgres prints jsonb: `": "` after a key and `", "` between items. */

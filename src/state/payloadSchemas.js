@@ -54,7 +54,7 @@ export { createTelemetryEventId } from "./telemetryEventId.js";
  * A case row's `dynamics` (F1 phase 3, S3): the run summary, the close's
  * `linksOut`, `relicOffer` and `practiceWindows`, and the case's opening
  * snapshot `open`. The server takes 6,144 bytes of it as jsonb text
- * (20261102030000, which writes `": "` and `", "` where JSON.stringify writes
+ * (20261026000000, which writes `": "` and `", "` where JSON.stringify writes
  * `:` and `,`), so the page keeps it to 4,096 bytes as JSON.stringify counts:
  * an honest row measures at most 1.5 KB and the largest a run can make
  * 2.2 KB as jsonb, 2.0 KB of JSON (tests/unit/case-open.test.mjs), so this is

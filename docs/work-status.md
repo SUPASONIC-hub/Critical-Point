@@ -1518,7 +1518,7 @@ Still open, on purpose:
     checked) and marks a break `chain-off-log`. The snapshot is stamped
     when a case opens (`createCaseOpen`), kept through a save, and sent on the
     case row as `dynamics.open` with the close's `linksOut`, draft and
-    practice count; `20261102030000` raises the server's cap on a case row's
+    practice count; `20261026000000` raises the server's cap on a case row's
     `dynamics` to 6,144 bytes of jsonb text for it (an honest row measures at
     most 1.5 KB). S7's browser tests pin a played row's size, the snapshot
     surviving a save and resume, the season's case rows (the ranking row

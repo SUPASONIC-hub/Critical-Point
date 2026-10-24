@@ -1017,7 +1017,7 @@ withHeaders(null);
   check(shape?.validated === false, "playtest_sessions_dynamics_shape is validated: adding it re-read every stored row, and a row written under an older shape would have stopped the migration.");
 }
 
-// The case-open snapshot (20261102030000; F1 phase 3, S3): a case row's
+// The case-open snapshot (20261026000000; F1 phase 3, S3): a case row's
 // `dynamics` carries the case's opening (`open`), the close's links
 // (`linksOut`) and draft (`relicOffer`) and the practice count, each optional
 // and each typed, in up to 6,144 bytes. The largest a run can make is sent as
