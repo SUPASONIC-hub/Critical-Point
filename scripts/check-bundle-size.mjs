@@ -76,12 +76,18 @@ const budgets = [
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
   // asks first, never before. Measured 32,897 / 13,018 in the e2e build, the
   // gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_022 },
+  // 32,897 / 13,022 -> 33,937 / 13,368 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 33,937 / 13,364 in the e2e build, the gzip plus 4. src/seasonScore.js (C-2's season mean and Q25's season-wide change of view, getCognitionMix) lands in this chunk under Rolldown.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 33_937, maxGzip: 13_368 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_564, maxGzip: 8_588 },
+  // 19,564 / 8,588 -> 19,701 / 8,632 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 19,701 / 8,628 in the e2e build, the gzip plus 4. the settlement hands the case's rules on (settleChoice.js's getSettlementRules once, rules back for the hand-off).
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_701, maxGzip: 8_632 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -545,7 +551,10 @@ const budgets = [
   // gzip plus 4: the entries above were each measured on its own base.
   // 5,048 / 2,170 -> 4,793 / 2,147 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 4,793 / 2,143 in the e2e build, the gzip plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_793, maxGzip: 2_147 },
+  // 4,793 / 2,147 -> 5,033 / 2,256 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 5,033 / 2,252 in the e2e build, the gzip plus 4. the personal bests' state, fetch and line (src/personalBests.js) and the heading that says the season record is a mean of cases.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_033, maxGzip: 2_256 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -602,7 +611,10 @@ const budgets = [
   // rebased on main 239e615e (#240): measured 36,757 / 13,654 in the e2e
   // build, the gzip plus 4. The case-open snapshot is in it; Rolldown and Oxc
   // still write it smaller than Rollup and esbuild did.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_757, maxGzip: 13_658 },
+  // 36,757 / 13,658 -> 36,762 / 13,661 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 36,762 / 13,657 in the e2e build, the gzip plus 4. the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip is under main's.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_762, maxGzip: 13_661 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -688,7 +700,10 @@ const budgets = [
   // -> 6,512 / 2,129 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 6,512 / 2,125 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (6,700 / 2,198 on the same commit).
-  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_512, maxGzip: 2_129 },
+  // 6,512 / 2,129 -> 6,512 / 2,134 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 6,512 / 2,130 in the e2e build, the gzip plus 4. not changed here: the imports' hashed names, one gzip byte.
+  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_512, maxGzip: 2_134 },
   // The other players' wall rate on the scene page (improvement notes D3):
   // src/state/useSceneBustRates.js and src/sceneTraces.js. Written into the
   // PlayScreen chunk they added about 945 / 441 bytes to it on 2026-10-19,
@@ -744,7 +759,10 @@ const budgets = [
   // story.
   // 2,704 / 1,450 -> 2,634 / 1,403 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 2,634 / 1,399 in the e2e build, the gzip plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_634, maxGzip: 1_403 },
+  // 2,634 / 1,403 -> 2,315 / 1,303 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 2,315 / 1,299 in the e2e build, the gzip plus 4. the audit's numbers and the audit and cascade weeks left it; W47's line stays, written out.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_315, maxGzip: 1_303 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -838,7 +856,10 @@ const budgets = [
   // -> 1,927 / 1,053 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 1,927 / 1,049 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (2,078 / 1,124 on the same commit).
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_927, maxGzip: 1_053 },
+  // 1,927 / 1,053 -> 1,953 / 1,070 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 1,953 / 1,066 in the e2e build, the gzip plus 4. its numbers came here from weeklyRules, and the case's rules decide whether it counts.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_953, maxGzip: 1_070 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -852,7 +873,10 @@ const budgets = [
   // / 1,667 on the main of 2026-10-21).
   // 1,541 -> 1,547 gzip on 2026-10-24, rebased on main 3d43a239: measured
   // 2,637 / 1,543, the gzip plus 4 (main's is 2,790 / 1,673).
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_637, maxGzip: 1_547 },
+  // 2,637 / 1,547 -> 2,608 / 1,531 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 2,608 / 1,527 in the e2e build, the gzip plus 4. the case's rules decide whether the links are on.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_608, maxGzip: 1_531 },
   // The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js,
   // WINDOW_TRAIL in vite.config.js): the presses the table writes, the record
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
@@ -891,7 +915,10 @@ const budgets = [
   // In the entry chunk it took that chunk to 171,399 / 61,949 on 2026-10-23;
   // the ranking screen fetches it when it opens. 2,740 / 1,251 measured, the
   // gzip plus 4.
-  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_740, maxGzip: 1_255 },
+  // 2,740 / 1,255 -> 2,566 / 1,109 on 2026-10-24, #224 (RULES_MARK 3,
+  // C-2 and Q25, personal bests) rebased on main cf641639: measured
+  // 2,566 / 1,105 in the e2e build, the gzip plus 4. measured under Vite 8 (2,740 / 1,251 under Rollup).
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_566, maxGzip: 1_109 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
