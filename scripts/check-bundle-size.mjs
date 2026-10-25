@@ -90,8 +90,9 @@ const budgets = [
   // 33,937 / 13,368 -> 34,272 / 13,482 on 2026-10-25, C-1(1) (the 판 읽기
   // axis) on #224 253e8e93: measured 34,272 / 13,478 in the e2e build, the
   // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
-  // it now), getReadingScore, and the seventh weight.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_272, maxGzip: 13_482 },
+  // it now), getReadingScore, and the seventh weight. 13,480 in a second build
+  // on #224 0c989ba7 (the hashes), so 13,484.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_272, maxGzip: 13_484 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -512,7 +513,10 @@ const budgets = [
   // -> 193,577 / 36,084 on 2026-10-25, #224 rebased on main 0d0c7dbb: B2's
   // link tag (.gx-card-link) and the phone signal row's 2px gap. Measured
   // 193,577 / 36,080, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_577, maxGzip: 36_084 },
+  // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 0c989ba7: the score breakdown's seventh card, the penalty
+  // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_630, maxGzip: 36_092 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1088,7 +1092,10 @@ function checkBudget(file, budget) {
 // 4. One more file in the list, ActCard; the worker's code did not change.
 // -> 9,376 / 3,435 on 2026-10-25, #224 rebased on main 0d0c7dbb: measured
 // 9,376 / 3,431 plus 4. One more file in the list, personalBests.
-const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_435 };
+// -> 9,376 / 3,441 on 2026-10-25, C-1(1) on #224 0c989ba7: measured 9,376 /
+// 3,437 and 3,436 in two e2e builds (the file names' hashes), the larger plus
+// 4; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_441 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
