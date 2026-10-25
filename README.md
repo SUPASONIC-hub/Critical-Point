@@ -815,7 +815,7 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
   `/privacy.html`, `/terms.html`, 영어판 `/en/privacy.html`, `/en/terms.html`(스토어 등록 정보에 넣는 주소).
   본문은 `scripts/legal-pages.mjs` 하나에 있고, 빌드(`vite.config.js`의 `legalPages()`)와 개발 서버가 같은 원본에서
   만듭니다. 첫 화면 맨 아래와 `데이터 저장 안내`의 데이터 안내가 이 둘로 이어지고, 동의 상자 옆 문장
-  (`PLAYTEST_DATA_NOTICE`)과 문의 주소(`SUPPORT_CONTACT`)는 `src/privacyText.js`에서 첫 화면과 함께 씁니다.
+  (`PLAYTEST_DATA_NOTICE`, `src/privacyText.js`)과 문의 주소(`SUPPORT_CONTACT`, `src/appConfig.js`)는 첫 화면과 같은 값을 씁니다.
   방침이 적는 항목은 코드가 보내는 것과 맞춰 둡니다: `tests/unit/legal-pages.test.mjs`가 마이그레이션의 익명 쓰기
   권한(컬럼 단위 `grant insert`)과 온라인 저장 `put_cloud_save`의 인자를 읽어, 방침이 이름 붙이지 않은 칸이
   하나라도 있으면 실패합니다. 서버로 보내는 칸을 더하면 `REMOTE_FIELDS`와 방침 문장도 함께 고칩니다.

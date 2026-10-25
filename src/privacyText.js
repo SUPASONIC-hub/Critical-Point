@@ -52,8 +52,9 @@ export function anonymizeSensitiveText(text = "") {
  * form of their playtest section, so the two cannot drift. The pages are plain
  * files beside the build, not screens of the app: a store listing links to
  * them, and nothing about them reaches the entry chunk but these strings.
+ * The contact address is appConfig.js's SUPPORT_CONTACT, which the data
+ * drawer's deletion-request line prints.
  */
-export const SUPPORT_CONTACT = "from.logic.to.magic@gmail.com";
 export const PRIVACY_PAGE_PATH = "/privacy.html";
 export const TERMS_PAGE_PATH = "/terms.html";
 export const DATA_RETENTION_DAYS = 180;

@@ -1,10 +1,5 @@
-import {
-  DATA_RETENTION_DAYS,
-  PLAYTEST_DATA_NOTICE,
-  PRIVACY_PAGE_PATH,
-  SUPPORT_CONTACT,
-  TERMS_PAGE_PATH,
-} from "../src/privacyText.js";
+import { SUPPORT_CONTACT } from "../src/appConfig.js";
+import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../src/privacyText.js";
 
 /**
  * The privacy policy and the terms of use, Korean and English: four plain

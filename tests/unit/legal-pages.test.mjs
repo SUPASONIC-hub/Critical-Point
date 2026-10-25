@@ -3,7 +3,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages } from "../../scripts/legal-pages.mjs";
-import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SUPPORT_CONTACT, TERMS_PAGE_PATH } from "../../src/privacyText.js";
+import { SUPPORT_CONTACT } from "../../src/appConfig.js";
+import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../../src/privacyText.js";
 import { createSeasonTelemetryPayload } from "../../src/viewModels/seasonViewModels.js";
 
 /**
