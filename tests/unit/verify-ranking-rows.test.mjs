@@ -194,6 +194,16 @@ test("the CI read is split, each query one SELECT and nothing else, and the publ
   assert.doesNotMatch(list, writes);
   assert.match(rankingRunsSql({ limit: 1e9 }), /limit 500;$/);
   assert.match(rankingRunsSql({ limit: "x" }), /limit 20;$/);
+  // With each hall of fame board's candidates beside the top `limit`: still one SELECT, run ids only.
+  const boards = rankingRunsSql({ limit: 7, perBoard: 10 });
+  assert.equal(boards.indexOf(";"), boards.length - 1);
+  assert.match(boards, /^select run_id from \(\n/);
+  assert.match(boards, /\n where overall <= 7 or \(candidate and on_board <= 10\)\n order by score desc;$/);
+  assert.match(boards, /s\.suspicion <@ array\['score-off-log', 'window-off-replay', 'window-no-replay', 'chain-off-log'\]::text\[\]/);
+  assert.match(boards, /h\.settled_at is not null/);
+  assert.doesNotMatch(boards, writes);
+  assert.equal(rankingRunsSql({ limit: 7, perBoard: 0 }), list);
+  assert.match(rankingRunsSql({ perBoard: 1e9 }), /on_board <= 100\)/);
   // One run's rows: one statement, that run only, its id quoted.
   const one = runRowsSql("run-'x");
   assert.equal(one.indexOf(";"), one.length - 1);
@@ -358,7 +368,9 @@ test("the CLI lists runs, writes one run's read at a time, and reads the per-run
   try {
     const run = (...args) => execFileSync(process.execPath, [script, ...args], { encoding: "utf8" }).trim();
     writeFileSync(path.join(dir, "runs.json"), JSON.stringify([{ run_id: "secret-a" }, { run_id: "secret-b" }]));
-    assert.equal(run("--runs-sql", "--limit=3"), rankingRunsSql({ limit: 3 }));
+    assert.equal(run("--runs-sql", "--limit=3"), rankingRunsSql({ limit: 3, perBoard: 10 }));
+    assert.equal(run("--runs-sql", "--limit=3", "--per-board=0"), rankingRunsSql({ limit: 3 }));
+    assert.equal(run("--hall-of-fame-counts-sql"), "select board, checked from public.hall_of_fame_counts() order by board;");
     assert.equal(run("--run-count", path.join(dir, "runs.json")), "2");
     assert.equal(run("--run-sql", path.join(dir, "runs.json"), "--at=2"), runRowsSql("secret-b"));
     assert.throws(() => execFileSync(process.execPath, [script, "--run-sql", path.join(dir, "runs.json"), "--at=3"], { stdio: "pipe" }), /from 1 to 2/);
