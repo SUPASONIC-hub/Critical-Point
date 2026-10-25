@@ -86,7 +86,9 @@ const budgets = [
   // 142,806 / 52,313 -> 142,951 / 52,390 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
   // 142,951 / 52,386 in the e2e build, the gzip plus 4. The pre-C-3 streak
   // read on a save (the hold on a type set aside) and the run's direction.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_951, maxGzip: 52_390 },
+  // -> 143,077 / 52,472 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // C-1's 판 읽기 row, the bundle's peak-case jump and C-3's direction and save upgrade together. Measured 143,077 / 52,468 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 143_077, maxGzip: 52_472 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -117,7 +119,9 @@ const budgets = [
   // 19,701 / 8,632 -> 20,520 / 8,916 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
   // 20,520 / 8,912 in the e2e build, the gzip plus 4. The ladder's three new
   // steps (사건 01 to 03, each with its line) and the direction's names.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 20_520, maxGzip: 8_927 },
+  // -> 21,105 / 9,171 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // C-7's five tools and 「숨 고르기」 beside C-4's three ladder steps and the direction names. Measured 21,105 / 9,167 in the e2e build, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 21_105, maxGzip: 9_171 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -274,7 +278,9 @@ const budgets = [
   // 62,226 in CI and 62,230 here, the larger gzip plus 4.
   // -> 172,407 / 62,326 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
   // D2's fetchHallOfFame and main #313's copy together. Measured 172,407 / 62,322 in two e2e builds, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_407, maxGzip: 62_326 },
+  // -> 172,533 / 62,372 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // D2's fetchHallOfFame, main #313's copy and C-3/C-4 together. Measured 172,533 / 62,368 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_533, maxGzip: 62_372 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -711,7 +717,9 @@ const budgets = [
   // 37,332 / 13,860 in the e2e build, the gzip plus 4. The streak held on a
   // direction (logicStreak.js's getLogicDirection and getEffectLean) and the
   // pre-C-3 hold set aside in upgradeRunRecord.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_518, maxGzip: 14_146 },
+  // -> 38,081 / 14,326 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // the bundle's peak boards and new relics beside C-3's getLogicDirection and getEffectLean. Measured 38,081 / 14,322 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_081, maxGzip: 14_326 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -966,7 +974,9 @@ const budgets = [
   // 1,953 / 1,070 -> 2,085 / 1,102 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
   // 2,085 / 1,098 in the e2e build, the gzip plus 4. The cases before the
   // audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3).
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_121, maxGzip: 1_148 },
+  // -> 2,253 / 1,179 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // C-7's AUDIT CONTACT limit beside C-4's audit opening in 사건 01 to 03. Measured 2,253 / 1,175 in the e2e build, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_253, maxGzip: 1_179 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
