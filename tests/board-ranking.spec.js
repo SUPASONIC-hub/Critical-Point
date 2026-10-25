@@ -303,6 +303,50 @@ test("no ranking row can take the ranking screen down", async ({ page }) => {
   await expect(page.locator(".ranking-page")).not.toContainText("[object Object]");
 });
 
+// D2, the hall of fame's 2nd stage: a completed season that stands in it
+// carries its place on its row, by run tag, and no other row does.
+test("a season in the hall of fame carries its place on the ranking, by run tag", async ({ page }) => {
+  const season = (runTag, score) => ({
+    run_tag: runTag,
+    player_name: "익명 분석관",
+    case_id: "season-final",
+    case_title: "SEASON 01 COMPLETE",
+    completed_at: "2026-11-20T09:00:00Z",
+    score,
+    summary: { burstScore: score, rank: "A", primary: ["curiosity", 90], seasonComplete: true, averageResponseTime: 14, reframeCount: 2 },
+  });
+  const asked = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/public_rankings**`, (route) => route.fulfill(json([season("HALLRUN1", 91), season("HALLRUN2", 85), season("PLAINRUN", 80)])));
+  await page.route(`${SUPABASE}/rest/v1/public_hall_of_fame**`, (route) => {
+    asked.push(new URL(route.request().url()).search);
+    return route.fulfill(json([
+      { board: "table-3", place: 1, run_tag: "HALLRUN1", settled_on: null },
+      { board: "2026-W47", place: 2, run_tag: "HALLRUN1", settled_on: "2026-12-14" },
+      { board: "table-3", place: 2, run_tag: "HALLRUN2", settled_on: null },
+      { board: "table-3", place: 3, run_tag: "NOTSHOWN", settled_on: null },
+    ]));
+  });
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  await expect(page.locator(".ranking-row")).toHaveCount(3);
+  const row = (runTag) => page.locator(".ranking-row", { hasText: `RUN ${runTag}` });
+  await expect(row("HALLRUN1").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 1위 (잠정)", "명예의 전당 · 2026-W47 2위"]);
+  await expect(row("HALLRUN2").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 2위 (잠정)"]);
+  await expect(row("PLAINRUN").locator(".ranking-hall-badge")).toHaveCount(0);
+  // The read asks for the places only, and their four columns.
+  expect(asked.length).toBeGreaterThan(0);
+  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on");
+  expect(decodeURIComponent(asked[0])).toContain("place=not.is.null");
+  // The badge sits inside its row, on a phone too.
+  await page.setViewportSize({ width: 360, height: 780 });
+  const badge = row("HALLRUN1").locator(".ranking-hall-badge").first();
+  const [badgeBox, rowBox] = [await badge.boundingBox(), await row("HALLRUN1").boundingBox()];
+  expect(badgeBox.x).toBeGreaterThanOrEqual(rowBox.x);
+  expect(badgeBox.x + badgeBox.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
+});
+
 /* ------------------------------------------------------------- story mode */
 
 /** A season this device finished, as its own ranking holds it (useChoiceCommit's season row). */

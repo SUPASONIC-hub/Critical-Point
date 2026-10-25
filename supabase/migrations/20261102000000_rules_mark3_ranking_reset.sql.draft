@@ -23,6 +23,9 @@
 --    event weeks' (`week`, 20261021000000) alike -- and per-case telemetry
 --    stays where it is. The client's own ranking is emptied the same way, by
 --    a new storage key (v10). This is the one reset for the change of table.
+--    The hall of fame (`hall_of_fame`, `hall_of_fame_boards`, D2) is not
+--    touched: it is what stays when the ranking is emptied, and the daily
+--    check settles the last table's board on its first write after this.
 --
 -- 2. A season from the table before does not come back: the ranking refuses
 --    a `season-final` row for a run with any case row whose `tableRules` (in

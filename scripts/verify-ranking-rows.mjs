@@ -40,6 +40,18 @@
  *       (ranking_set_recheck_marks), for the CI job to run the same way;
  *       nothing when no run was checked. It names run ids: never printed in CI.
  *
+ * The hall of fame (D2, src/hallOfFame.js), from the same check:
+ *   node scripts/verify-ranking-rows.mjs rows.json --hall-of-fame
+ *       prints the day's boards and why each run left out was left out, by
+ *       run tag only (for the Job Summary).
+ *   node scripts/verify-ranking-rows.mjs rows.json --hall-of-fame-sql
+ *       prints the one statement that writes them (hall_of_fame_settle), for
+ *       the CI job to run right after the marks. Run tags only.
+ *   node scripts/verify-ranking-rows.mjs --hall-of-fame-read-sql
+ *       prints the one read-only SELECT of public_hall_of_fame.
+ *   node scripts/verify-ranking-rows.mjs --hall-of-fame-md view.json
+ *       prints the page for the `hall-of-fame` branch from that SELECT's answer.
+ *
  * --redact names each run by its public tag (`run_tag`, what the ranking
  * shows) instead of its run id, for a log anyone can read (the CI job).
  *
@@ -51,9 +63,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { RULES_MARK } from "../src/gauntlet/gauntletEngine.js";
+import { formatHallOfFameMarkdown, HALL_OF_FAME_READ_SQL, hallOfFameBoardLabel, hallOfFameSql, pickHallOfFame, readHallOfFame } from "../src/hallOfFame.js";
 import { recheckRun } from "../src/rankingRecheck.js";
 
-const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
+// `suspicion` is the insert trigger's marks on the ranking row: the hall of
+// fame (src/hallOfFame.js) takes a season the trigger did not mark either.
+const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at,suspicion";
 const JSON_COLUMNS = ["summary", "decision_log", "resources", "dynamics"];
 
 const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
@@ -214,6 +230,17 @@ export function formatChain(chain) {
   return lines;
 }
 
+/** The day's boards as lines for the Job Summary: run tags only. */
+export function formatHallOfFamePick({ boards, left }) {
+  const lines = [];
+  for (const board of boards) {
+    const places = board.places.map((place, index) => `${index + 1}. RUN ${place.run_tag} ${place.score}${place.tags.length ? ` (${place.tags.join(", ")})` : ""}`);
+    lines.push(`${hallOfFameBoardLabel(board.board)}: ${board.checked} checked seasons; ${places.length ? places.join("  ") : "표본 부족"}`);
+  }
+  for (const { runTag, refusal } of left) lines.push(`  left out ${runTag ? `RUN ${runTag}` : "a run"}: ${refusal}`);
+  return lines;
+}
+
 /**
  * The write that states each run's marks (ranking_set_recheck_marks,
  * 20261023000000): one statement, every run read with the marks it earned,
@@ -245,6 +272,20 @@ async function main(argv) {
     console.log(rankingRunsSql({ limit }));
     return 0;
   }
+  if (argv.includes("--hall-of-fame-read-sql")) {
+    console.log(HALL_OF_FAME_READ_SQL);
+    return 0;
+  }
+  if (argv.includes("--hall-of-fame-md")) {
+    try {
+      if (files.length !== 1) throw new Error("Name the one file public_hall_of_fame was read into.");
+      process.stdout.write(formatHallOfFameMarkdown(readHallOfFame(readRows(readFileSync(files[0], "utf8")))));
+    } catch (error) {
+      console.error(error.message);
+      return 1;
+    }
+    return 0;
+  }
   let rows;
   try {
     if (argv.includes("--run-count") || argv.includes("--run-sql")) {
@@ -273,6 +314,11 @@ async function main(argv) {
   if (argv.includes("--marks-sql")) {
     const sql = marksSql(results);
     if (sql) console.log(sql);
+    return 0;
+  }
+  if (argv.includes("--hall-of-fame-sql") || argv.includes("--hall-of-fame")) {
+    const picked = pickHallOfFame({ results, rows, rulesMark: RULES_MARK });
+    console.log(argv.includes("--hall-of-fame-sql") ? hallOfFameSql(picked.boards) : formatHallOfFamePick(picked).join("\n"));
     return 0;
   }
   console.log(json ? JSON.stringify(results, null, 2) : formatReport(results, { redact: argv.includes("--redact") }).join("\n"));
