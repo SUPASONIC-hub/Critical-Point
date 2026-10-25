@@ -92,7 +92,10 @@ const budgets = [
   // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
   // it now), getReadingScore, and the seventh weight. 13,480 in a second build
   // on #224 0c989ba7 (the hashes), so 13,484.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_272, maxGzip: 13_484 },
+  // 13,484 -> 13,491 gzip on 2026-10-25, the 11-30 rehearsal (integration-1130:
+  // #224 + C-1(1) + D2): the same 34,272 bytes, other chunk names inside.
+  // Measured 13,487 in two e2e builds, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_272, maxGzip: 13_491 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -523,7 +526,10 @@ const budgets = [
   // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
   // 193,577 / 36,084 -> 193,821 / 36,115 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): the hall of fame's
   // badge on a ranking row (.ranking-hall-badge); measured 193,821 / 36,111 + 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_630, maxGzip: 36_092 },
+  // -> 193,874 / 36,124 on 2026-10-25, the 11-30 rehearsal (integration-1130:
+  // #224 + C-1(1) + D2), both of the above together. Measured 193,874 / 36,120
+  // in two e2e builds, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_874, maxGzip: 36_124 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -598,7 +604,10 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // 4,639 -> 4,644 gzip on 2026-10-25, the 11-30 rehearsal (integration-1130:
+  // #224 + C-1(1) + D2): the same 11,492 bytes, other chunk names inside.
+  // Measured 4,640 in two e2e builds, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_644 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
