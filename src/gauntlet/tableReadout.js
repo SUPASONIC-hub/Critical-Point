@@ -12,7 +12,7 @@ export { formatNumber };
 
 /**
  * Rounded down, because the table's rules read the multiplier as a floor: the
- * chain asks for x4 and HIGH ROLLER's feat for x64. Rounded to nearest, a
+ * chain asks for x4 (and once asked x64 of HIGH ROLLER's feat). Rounded to nearest, a
  * x3.95 printed "×4.0" and a cash on it started no chain.
  */
 export function formatMultiplier(value) {
@@ -41,7 +41,7 @@ export function describeClockHeat(pushes) {
  * and every story run -- was told "기본 규칙으로 복귀" and, in the same breath,
  * that the room had broken a rule or that a card might be sealed for stopping
  * early. COLD FEET says a card is locked only while the seal stands: EXPOSE
- * mastery or GLASS LENS lifts it and leaves the id (`lifted`).
+ * mastery lifts it and leaves the id (`lifted`).
  */
 export function describeNextTable(nextMutations = [], busted = false) {
   if (nextMutations.length === 0) return "";
@@ -103,17 +103,19 @@ export function describeLogicMove(logic) {
   const type = getTypeName(logic?.type);
   const streak = Number(logic?.streak) || 0;
   const paid = `논리 콤보 ${streak}, 배율 ${bonusText(logic?.bonus)}.`;
+  // FIELD NOTES holds a type one window shorter; the verdict says which hold it read.
+  const hold = Number(logic?.hold) || LOGIC_HOLD;
   switch (logic?.move) {
     case "grow":
       return `${type}${objectParticle(type)} 이어 갔다. ${paid}`;
     case "build":
-      return `${type} ${Math.min(LOGIC_HOLD, Number(logic.held) || 1)}/${LOGIC_HOLD}. 같은 유형 세 번째부터 콤보가 오른다. ${paid}`;
+      return `${type} ${Math.min(hold, Number(logic.held) || 1)}/${hold}. 같은 유형 ${hold === LOGIC_HOLD ? "세" : "두"} 번째부터 콤보가 오른다. ${paid}`;
     case "switch":
       return `열기가 오른 판에서 ${type}${directionParticle(type)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
     case "keep":
       return `지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. ${paid}`;
     case "break":
-      return `열기가 오르지 않았는데 ${type}${directionParticle(type)} 바꿨다. 논리 콤보는 0, 다시 1/${LOGIC_HOLD}부터 센다.`;
+      return `열기가 오르지 않았는데 ${type}${directionParticle(type)} 바꿨다. 논리 콤보는 0, 다시 1/${hold}부터 센다.`;
     case "bust":
       return streak > 0 ? `벽에 닿았지만 논리 콤보 ${streak}${topicParticle(String(streak))} 남았다.` : "벽에 닿아 논리 콤보가 끊겼다.";
     default:
@@ -144,12 +146,13 @@ const MOVE_COPY = Object.freeze({ grow: "이어 감", build: "쌓는 중", switc
  */
 export function readLogic({ logic, card, offered, relics = [] }) {
   const reach = hasRelic(relics, "metronome");
-  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach });
+  const holdAt = hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD;
+  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt });
   const moveOf = (candidate) => play(getLogicType(candidate)).move;
   const staked = card ? play(getLogicType(card)) : null;
   const now = staked?.logic ?? logic;
   const open = logic.rose || (reach && logic.reach > 0);
-  const held = `${Math.min(LOGIC_HOLD, now.held)}/${LOGIC_HOLD}`;
+  const held = `${Math.min(holdAt, now.held)}/${holdAt}`;
   const hold = now.type ? `${getTypeName(now.type)} ${held}` : "첫 카드부터 센다";
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;

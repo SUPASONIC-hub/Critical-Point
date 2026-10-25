@@ -20,7 +20,7 @@ import {
 } from "../../src/gauntlet/gauntletEngine.js";
 import { LOGIC_INITIAL } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_IDS } from "../../src/gauntlet/relics.js";
-import { ALL_RULES, getTableRules, MUTATION_RULES, rulesFor, STAGED } from "../../src/gauntlet/tableUnlocks.js";
+import { ALL_RULES, getTableRules, MUTATION_RULES, PEAK_CASES, rulesFor, STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { settleAgainstCodex } from "../../src/gauntlet/useRelicTable.js";
 import { repairSavedState } from "../../src/state/savedState.js";
 import { getSettlementRules } from "../../src/state/useChoiceCommit.js";
@@ -177,7 +177,7 @@ test("the relic draft is withheld as 프롤로그 03 closes and first offered as
 });
 
 test("a replay of a prologue hands back what the run held, draft and all, and closes onto the whole table", () => {
-  const held = normalizeRunState({ windowIndex: 40, vault: 9000, relics: ["metronome"], stanceMastery: { steady: 4 }, relicOffer: ["lockpick", "heatSink", "coldBlood"], schema: { mutations: ["reboot"] } });
+  const held = normalizeRunState({ windowIndex: 40, vault: 9000, relics: ["metronome"], stanceMastery: { steady: 4 }, relicOffer: ["testimony", "heatSink", "coldBlood"], schema: { mutations: ["reboot"] } });
   const replay = openCaseRun(held, { replayOf: { pushRecord: null }, rules: step("prologue02") });
   assert.ok(replay.practice);
   const rules = getSettlementRules({ caseId: "prologue02", run: replay, caseClosed: true }, true);
@@ -192,8 +192,8 @@ test("a replay of a prologue hands back what the run held, draft and all, and cl
 });
 
 test("a feat is only counted toward the codex in a case that has relics", () => {
-  // HIGH ROLLER's feat: a cash at x64 or better.
-  const feat = { status: "cashed", cause: "cash", gauge: 70, wall: 90, pushes: 6, seed: "feat" };
+  // STETHOSCOPE's feat: a window run out, which deals SILENCE (HIGH ROLLER's x64, the feat used here before C-7, is gone).
+  const feat = { status: "bust", cause: "timeout", gauge: 30, wall: 90, pushes: 2, seed: "feat" };
   const settle = (rules) => settleAgainstCodex({ run: RUN_INITIAL_STATE, window: feat, card: staked, ...(rules ? { rules } : null) }, []);
   const everywhere = settle(null).unlockedRelics;
   assert.ok(everywhere.length > 0, "the window proves a feat");
@@ -264,9 +264,13 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
 });
 
 test("with the switch off, every case is settled under everything, exactly as before", () => {
+  // Everything, or everything and 「고점 판」 on an act's last case (C-10), which the switch does not turn off.
+  const everything = (caseId) => (PEAK_CASES.includes(caseId) ? rulesFor(caseId, { staged: false }) : ALL_RULES);
   for (const caseId of CASE_SEQUENCE) {
     for (const caseClosed of [false, true]) {
-      assert.deepEqual(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed }, false), { rules: ALL_RULES, nextRules: ALL_RULES }, caseId);
+      const next = caseClosed ? CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1] : caseId;
+      const expected = { rules: everything(caseId), nextRules: next ? everything(next) : ALL_RULES };
+      assert.deepEqual(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed }, false), expected, caseId);
     }
   }
   const closing = { status: "cashed", cause: "cash", gauge: 24, wall: 80, pushes: 2, seed: "close" };

@@ -5,33 +5,35 @@ import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, REL
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
+  BREATHER_SECONDS,
+  BREATHER_WALL,
+  CARBON_COPY_HOLD,
   COLD_BLOOD_START,
   COLD_FEET_CHIPS,
   FRACTURE_RATE,
-  GLASS_LENS_SEAL,
+  FRONT_PAGE_STEP,
   HEAT_DEBT_GAUGE,
   HEAT_DEBT_SECONDS,
   HEAT_DEBT_SHARE,
   HEAT_SINK_SECONDS,
   HEAT_SINK_SHARE,
-  HIGH_ROLLER_CHIPS,
-  HIGH_ROLLER_WALL,
   HOT_CASH_MULTIPLIER,
   INSURANCE_SHARE,
   KINETIC_GRIP_CHIPS,
   LOCK_PRESS_SECONDS,
-  LOCKPICK_SEAL,
   LOGIC_CAP,
+  LOGIC_HOLD,
   OVERCLOCK_CHIPS,
   OVERCLOCK_STREAK,
+  PEAK_CASES,
+  PEAK_CHIPS,
+  PEAK_WALL,
   SCOUT_REACH,
   SCOUT_SECONDS,
   SEAL_BREAK_GAUGE,
   SILENCE_SECONDS,
-  SPLINT_RATE,
-  STEADY_ANCHOR_COOL,
-  STEADY_ANCHOR_SECONDS,
   STEADY_LINE_COOL,
+  TESTIMONY_SHARE,
   STEADY_LINE_SECONDS,
   STEADY_LINE_WALL,
   STRIKE_WAKE_CHIPS,
@@ -40,7 +42,7 @@ import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 
-export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
+export { HOT_CASH_MULTIPLIER, PEAK_CASES, PEAK_CHIPS, PEAK_WALL, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
 /**
  * The rules a window is played under when none are named: all of them. The
@@ -171,11 +173,6 @@ export function drawWall(schema, seed) {
 export function drawStep(schema, seed, pushIndex) {
   const { stepMin, stepMax } = normalizeSchema(schema);
   return stepMin + Math.floor(seededUnit(`step:${seed}:${pushIndex}`) * (stepMax - stepMin + 1));
-}
-
-/** Whether a push from one heat to the next is the one the lockpick opened a sealed card with. */
-export function lockpickOpensSeal(relics, schema, fromGauge, toGauge) {
-  return hasRelic(relics, "lockpick") && fromGauge < schema.sealBreak && toGauge >= schema.sealBreak && toGauge < SEAL_BREAK_GAUGE;
 }
 
 /**
@@ -1102,13 +1099,6 @@ export function applyRelics(schema, relics = []) {
   if (!pending.length) return board;
   const next = { ...board, mutations: [...board.mutations], relics: [...board.relics, ...pending] };
   for (const id of pending) {
-    if (id === "highRoller") {
-      next.chipsScale *= HIGH_ROLLER_CHIPS;
-      next.wallMin -= HIGH_ROLLER_WALL;
-      next.wallMax -= HIGH_ROLLER_WALL;
-    }
-    if (id === "lockpick") next.sealBreak = Math.min(next.sealBreak, LOCKPICK_SEAL);
-    if (id === "splint") next.fractureRate = Math.min(next.fractureRate, SPLINT_RATE);
     if (id === "stethoscope") next.sedated = false;
     if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = Math.min(next.startGauge, COLD_BLOOD_START);
     if (id === "kineticGrip") {
@@ -1118,17 +1108,69 @@ export function applyRelics(schema, relics = []) {
       }
       if (next.mutations.includes("strikeWake")) next.chipsScale *= KINETIC_GRIP_CHIPS;
     }
-    if (id === "steadyAnchor" && next.mutations.includes("steadyMastery")) {
-      next.startGauge = Math.max(0, next.startGauge - STEADY_ANCHOR_COOL);
-      next.seconds += STEADY_ANCHOR_SECONDS;
+    // C-7's five (tableRules.js). AUDIT CONTACT and FIELD NOTES bend no
+    // board: the audit's judgement and the streak's hold read the run's relics,
+    // and TESTIMONY is read where a bust's pot is settled (`resolveWindow`).
+    if (id === "carbonCopy" && next.mutations.includes("blackout")) {
+      next.wallMin += CARBON_COPY_HOLD;
+      next.wallMax += CARBON_COPY_HOLD;
     }
-    if (id === "glassLens" && next.mutations.includes("exposeMastery")) {
-      next.faceDown = false;
-      next.sealHighest = false;
-      next.sealBreak = Math.min(next.sealBreak, GLASS_LENS_SEAL);
+    if (id === "frontPage" && next.mutations.includes("overclock")) {
+      next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - FRONT_PAGE_STEP[0]);
+      next.stepMax = Math.max(BASE_SCHEMA.stepMax, next.stepMax - FRONT_PAGE_STEP[1]);
     }
   }
   return normalizeSchema(next);
+}
+
+/**
+ * The marks a board carries when it was dealt as 「고점 판」 (C-10) or given
+ * 「숨 고르기」 (C-7). Neither is in `MUTATIONS`: `describeMutations` reads
+ * only the catalogue, so neither is printed as a rule that bent the board or
+ * counted as a next board's news; the stage shows each as its own mark
+ * (`getBoardMark`). The id on the board is what keeps laying each one
+ * idempotent, and what a recorded window's board says it was.
+ */
+export const PEAK_MARK = "peak";
+export const BREATHER_MARK = "breather";
+
+/**
+ * Whether a case's rules deal 「고점 판」: only a real set of rules that names
+ * it (tableUnlocks.js `PEAK_CASES`). The engine's own "every rule" stand-in
+ * says yes to anything, and a board dealt with no case named is no peak.
+ */
+export const isPeakTable = (rules) => rules instanceof Set && rules.has(PEAK_MARK);
+
+/** An act's last case: the wall's band `PEAK_WALL` closer and the chips `PEAK_CHIPS` thicker, once. */
+export function applyPeak(schema, rules) {
+  const board = normalizeSchema(schema);
+  if (!isPeakTable(rules) || board.mutations.includes(PEAK_MARK)) return board;
+  return normalizeSchema({
+    ...board,
+    wallMin: board.wallMin - PEAK_WALL,
+    wallMax: board.wallMax - PEAK_WALL,
+    chipsScale: board.chipsScale * PEAK_CHIPS,
+    mutations: [...board.mutations, PEAK_MARK],
+  });
+}
+
+/** A pass on the draft: the board it held, `BREATHER_SECONDS` more clock and the band `BREATHER_WALL` further, once. */
+function applyBreather(schema) {
+  const board = normalizeSchema(schema);
+  if (board.mutations.includes(BREATHER_MARK)) return board;
+  return normalizeSchema({
+    ...board,
+    seconds: board.seconds + BREATHER_SECONDS,
+    wallMin: board.wallMin + BREATHER_WALL,
+    wallMax: board.wallMax + BREATHER_WALL,
+    mutations: [...board.mutations, BREATHER_MARK],
+  });
+}
+
+/** The stage's mark for a board: "peak", "breather" or null (a breather on a peak board says breather: it is the news). */
+export function getBoardMark(schema) {
+  const mutations = Array.isArray(schema?.mutations) ? schema.mutations : [];
+  return mutations.includes(BREATHER_MARK) ? BREATHER_MARK : mutations.includes(PEAK_MARK) ? PEAK_MARK : null;
 }
 
 /** Three relics for a closed case, seeded by its last window so a reload cannot reroll them. */
@@ -1155,18 +1197,33 @@ const NO_STANCE_RULES = Object.freeze({ has: (id) => id !== "stance" });
 function redealWithout(schema, relics, run) {
   const windowIndex = getEscalationWindow(run);
   const want = JSON.stringify(schema);
+  // A peak board was laid with the peak on top (`applyPeak`), and is laid again so.
+  const peak = schema.mutations.includes(PEAK_MARK) ? PEAK_ONLY : null;
   for (const base of [{ ...BASE_SCHEMA, mutations: ["reboot"] }, BASE_SCHEMA]) {
     for (const rules of [ALL_RULES, NO_STANCE_RULES]) {
       const laid = applySeasonEscalation(applyStanceMastery(base, run.stanceMastery, rules), windowIndex);
-      if (JSON.stringify(applyRelics(laid, schema.relics)) === want) return applyRelics(laid, relics);
+      if (JSON.stringify(applyPeak(applyRelics(laid, schema.relics), peak)) === want) return applyPeak(applyRelics(laid, relics), peak);
     }
   }
   return schema;
 }
+const PEAK_ONLY = new Set([PEAK_MARK]);
+
+/**
+ * A table entered straight into a case (the debug jump, a replay link: state/
+ * runState.js `jumpToNode`) is the opening table, laid without the case's
+ * rules; a peak case's (`PEAK_CASES`) is laid as a peak, as `openCaseRun`
+ * would have laid it.
+ */
+export function layCasePeak(run, caseId) {
+  return PEAK_CASES.includes(caseId) ? { ...run, schema: applyPeak(run.schema, PEAK_ONLY) } : run;
+}
 
 /**
  * Takes (or passes on) the relic a closed case offered. The board on the table
- * is re-dealt with it at once; a pass clears the offer and changes nothing else.
+ * is re-dealt with it at once. A pass (`relicId` null) on a draft that offered
+ * something clears the offer and is 「숨 고르기」 (C-7): the board the draft
+ * held is dealt again with more clock and a further wall (`applyBreather`).
  *
  * With `RELIC_SLOTS` full, taking one is a swap: `dropId` names the relic put
  * down, in the same call, so no half-made swap is ever saved and the save's
@@ -1181,7 +1238,8 @@ export function equipRelic(run, relicId = null, dropId = null) {
   if (picked && current.relics.length >= RELIC_SLOTS && !dropped) return current;
   const relics = !picked ? current.relics : dropped ? current.relics.map((id) => (id === dropped ? picked : id)) : [...current.relics, picked];
   const board = dropped ? redealWithout(current.schema, relics, current) : current.schema;
-  return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(board, relics) });
+  const passed = relicId === null && current.relicOffer.length > 0;
+  return normalizeRunState({ ...current, relics, relicOffer: [], schema: passed ? applyBreather(board) : applyRelics(board, relics) });
 }
 
 /** What a practice run borrowed, handed back. */
@@ -1250,7 +1308,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
     relicOffer: practice ? [] : offer,
     schema: rebooted
       ? current.schema
-      : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics),
+      : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics), rules),
   }, { caseId, resources });
 }
 
@@ -1372,7 +1430,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * lean. With every rule, which is the default, this is the board it always was.
  */
 export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false }) {
-  if (caseClosed) return applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics);
+  if (caseClosed) return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics), rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     if (rules.has("blackout")) {
@@ -1420,7 +1478,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics);
+  return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics), rules);
 }
 
 const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0 });
@@ -1504,6 +1562,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     offered,
     bustHolds: hasRelic(relics, "encore"),
     reach: hasRelic(relics, "metronome"),
+    hold: hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD,
   });
   // What the hand earned before LOCK: the streak this card made (or the groove
   // a window put down before 2026-10-10 still holds, see `getHandBonus`).
@@ -1523,16 +1582,24 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const focusPot = pot - basePot - logicPot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
-  const insured = outcome === "bust" && hasRelic(relics, "insurance") && !current.insuranceSpent && current.runPot > 0;
-  const insuredPot = insured ? Math.floor(current.runPot / INSURANCE_SHARE) : 0;
+  // TESTIMONY (오진우의 진술, C-7): the time limit was a setting, so a window
+  // the clock ran out on leaves half the pot, every time; it is still a bust
+  // (the scene is skipped, BLACKOUT and SILENCE are dealt). It comes before
+  // INSURANCE, which is then not spent on that bust.
+  const clockKept = outcome === "bust" && cause === "timeout" && hasRelic(relics, "testimony") && current.runPot > 0;
+  const insured = !clockKept && outcome === "bust" && hasRelic(relics, "insurance") && !current.insuranceSpent && current.runPot > 0;
+  const keptShare = clockKept ? TESTIMONY_SHARE : insured ? INSURANCE_SHARE : 0;
+  const insuredPot = keptShare ? Math.floor(current.runPot / keptShare) : 0;
   const lostPot = outcome === "bust" ? current.runPot - insuredPot : 0;
   // A relic that bent the streak says so in the reveal: a bust that left a
   // streak standing, and a switch that only the longer reach allowed.
   const encored = streak.move === "bust" && streak.logic.streak > 0;
   const reached = streak.move === "switch" && !current.logic.rose;
+  // FIELD NOTES grew the streak a window before the hold would have.
+  const noted = streak.move === "grow" && streak.logic.held === LOGIC_HOLD - 1;
   // `runHand` is the hand's whole share, streak and LOCK: the ending's vault
   // slack reads the vault without it, and neither is reading the table.
-  const runHandAfter = outcome === "cash" ? current.runHand + logicPot + focusPot : insured ? Math.floor(current.runHand / INSURANCE_SHARE) : 0;
+  const runHandAfter = outcome === "cash" ? current.runHand + logicPot + focusPot : keptShare ? Math.floor(current.runHand / keptShare) : 0;
   const hotStreak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
   // A practice run closes a case the table has already been paid for: nothing
@@ -1566,6 +1633,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     ...(insured ? ["insurance"] : []),
     ...(encored ? ["encore"] : []),
     ...(reached ? ["metronome"] : []),
+    ...(noted ? ["fieldNote"] : []),
+    ...(clockKept ? ["testimony"] : []),
+    ...(audited?.spared ? ["auditContact"] : []),
     ...nextMutations.map((mutation) => mutation.softenedBy).filter(Boolean),
   ];
   const relicOffer = practice
@@ -1628,6 +1698,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       streak: streak.logic.streak,
       held: streak.logic.held,
       bonus: earnedBonus,
+      ...(hasRelic(relics, "fieldNote") ? { hold: LOGIC_HOLD - 1 } : {}),
       pot: logicPot,
     },
   };
