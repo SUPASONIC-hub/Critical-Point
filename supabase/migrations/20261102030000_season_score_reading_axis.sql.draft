@@ -38,12 +38,13 @@
 --      writes no `readingScore`, and its seasons are refused the same way.
 --
 -- 3. The ranking starts over. A score with the axis does not compare with
---    one without it. The same reset as the ones before it, the same
---    statement and nothing wider: only `season-final` rows are ranking rows,
---    and per-case telemetry stays where it is. The client's own ranking is
---    emptied the same way, by a new storage key (v11; v10's best row is kept
---    as a personal best, src/personalBests.js). RULES_MARK stays 3: the
---    table's rules do not move, only the score read off it.
+--    one without it. In the 11-30 deploy (integration-1130) that is the one
+--    reset of the day, RULES_MARK 4's (20261103000000), which comes after
+--    this file and the hall of fame: this file no longer deletes on its own,
+--    so the ranking is emptied once. The client's own ranking is emptied by a
+--    new storage key (v11; the best row of v9 is kept as a personal best,
+--    src/personalBests.js). Shipped without RULES_MARK 4, this file would
+--    need its `delete ... where case_id = 'season-final'` back.
 --
 -- check:grants: once this is a `.sql` the block "the season score has the
 -- 판 읽기 axis" runs (a run with a row closed before the axis is refused, and
@@ -166,7 +167,5 @@ $$;
 -- The grants as 20261014000000:358,367 wrote them.
 revoke all on function public.ranking_run_summary(text, text) from public, anon, authenticated;
 grant execute on function public.ranking_run_summary(text, text) to service_role;
-
-delete from public.playtest_sessions where case_id = 'season-final';
 
 notify pgrst, 'reload schema';

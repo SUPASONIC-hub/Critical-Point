@@ -7,6 +7,16 @@
 -- check-grants.mjs judges the newest ranking reset by what it leaves and asks
 -- for the mark it sets).
 --
+-- The one ranking reset of the 11-30 deploy (integration-1130): #224's
+-- RULES_MARK 3 reset (20261102000000, a draft, never applied) is folded into
+-- this one, since a table at mark 3 never reaches production -- the server
+-- goes from asking for 2 to asking for 4, and C-1's 판 읽기 axis
+-- (20261102030000) leaves its own delete to this file. It comes after the
+-- hall of fame (20261102040000), which it does not touch: `hall_of_fame` and
+-- `hall_of_fame_boards` are what stays when the ranking is emptied, and the
+-- daily check settles the last table's board on its first write after this
+-- (check:grants seeds both and holds the reset to them).
+--
 -- RULES_MARK 4. Two changes of the table (the user's answers of 2026-10-25,
 -- (1) each):
 --

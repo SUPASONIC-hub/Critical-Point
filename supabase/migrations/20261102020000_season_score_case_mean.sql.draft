@@ -1,5 +1,5 @@
 -- DRAFT (2026-10-22), kept as `.sql.draft` so nothing applies it, beside
--- RULES_MARK 3's ranking reset (20261102000000, also a draft) in the same
+-- RULES_MARK 3's ranking reset (20261102000000, also a draft; folded into RULES_MARK 4's, 20261103000000, in the 11-30 rehearsal) in the same
 -- pull request. On the merge day both are renamed to `.sql` and re-dated to
 -- follow the last migration on main, this one after the reset, so the
 -- emptied ranking takes its first row under this definition. Applied without

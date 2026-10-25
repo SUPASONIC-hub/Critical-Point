@@ -111,7 +111,7 @@ await db.exec(`
 // and after, and the seeded rows are taken out again, so the rest of this
 // check runs on the database it always had.
 // The newest ranking reset is the one judged: RULES_MARK 3's
-// (`*_rules_mark3_ranking_reset.sql`, drafted 2026-10-21) once it is a `.sql`,
+// (`*_rules_mark3_ranking_reset.sql`, drafted 2026-10-21; folded into RULES_MARK 4's in the 11-30 rehearsal, so only that one is judged there) once it is a `.sql`,
 // the day-ten table's until then. While it is a `.sql.draft` nothing replays
 // it, the server still asks for the day-ten mark (2) and the older-table
 // checks below ask for that one, and say so.

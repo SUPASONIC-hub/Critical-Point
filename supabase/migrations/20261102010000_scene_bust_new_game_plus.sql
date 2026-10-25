@@ -1,4 +1,4 @@
--- Ships with RULES_MARK 3 and its ranking reset (20261102000000, drafted
+-- Ships with RULES_MARK 3 and its ranking reset (20261102000000, folded into 20261103000000 in the 11-30 rehearsal; drafted
 -- 2026-10-21), in the same pull request, so the two reach the database
 -- together; re-dated with it on the merge day to follow main.
 --
