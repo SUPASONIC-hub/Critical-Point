@@ -249,7 +249,9 @@ const fileBudgets = {
   // card's edge (in the burn chip it pushed the chip onto a line of its own).
   // -> 56227 on 2026-10-25, measured: the run's line 2px apart on a phone,
   // so 감사 n/4 stays on 판돈 and 금고's row.
-  "play.css": { lines: 2931, bytes: 56227 },
+  // -> 56342 on 2026-10-25, measured: the board's mark in the pot's label
+  // (「고점 판」 C-10, 「숨 고른 판」 C-7), two colour rules and no line more.
+  "play.css": { lines: 2931, bytes: 56342 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
