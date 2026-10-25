@@ -236,7 +236,8 @@ const budgets = [
   // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
   // 62,226 in CI and 62,230 here, the larger gzip plus 4.
   // 172,282 / 62,234 -> 172,403 / 62,270 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 172,403 / 62,266 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_403, maxGzip: 62_270 },
+  // 172,403 / 62,270 -> 173,126 / 62,668 on 2026-10-25, deletion-contact: the deletion-request sentence in the data notice with the support address as a mailto link (SUPPORT_CONTACT, getDeletionRequestText in appConfig.js). Measured 173,126 / 62,664 gzip in the e2e build on main 2998216 (#325), the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_126, maxGzip: 62_668 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
