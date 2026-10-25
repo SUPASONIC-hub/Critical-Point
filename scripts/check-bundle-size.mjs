@@ -81,7 +81,9 @@ const budgets = [
   // -> 142,837 / 52,328 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
   // measured 142,837 / 52,324, the gzip plus 4. The debug jump and a replay link lay a peak case's first board
   // (runState.js jumpToNode, layCasePeak).
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_907, maxGzip: 52_366 },
+  // -> 142,926 / 52,372 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // C-1's 판 읽기 row and the bundle's peak-case jump together. Measured 142,926 / 52,368 in two e2e builds, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_926, maxGzip: 52_372 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -264,7 +266,9 @@ const budgets = [
   // -> 172,282 / 62,234 on 2026-10-25, 묶음 시대고증(#313): the intro's story
   // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
   // 62,226 in CI and 62,230 here, the larger gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_367, maxGzip: 62_293 },
+  // -> 172,407 / 62,326 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // D2's fetchHallOfFame and main #313's copy together. Measured 172,407 / 62,322 in two e2e builds, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_407, maxGzip: 62_326 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -432,7 +436,9 @@ const budgets = [
   // -> 102,514 / 35,481 on 2026-10-25, 묶음 시대고증(#313): the era words in
   // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
   // the larger gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_622, maxGzip: 35_481 },
+  // -> 102,664 / 35,490 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // the bundle's board marks and main #313's copy together. Measured 102,664 / 35,486 in two e2e builds, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_664, maxGzip: 35_490 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -548,7 +554,9 @@ const budgets = [
   // -> 193,674 / 36,114 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
   // the two board marks' colours (.gx-mark-peak, .gx-mark-breather). Measured
   // 193,674 / 36,110, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_874, maxGzip: 36_124 },
+  // -> 193,971 / 36,154 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // C-1's seventh card, D2's badge and the bundle's two board marks together. Measured 193,971 / 36,150 in two e2e builds, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_971, maxGzip: 36_154 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -686,7 +694,9 @@ const budgets = [
   // measured 37,518 / 14,101 in the e2e build, the gzip plus 4. The engine
   // takes the relic catalogue's new copy (relics.js lands here as well),
   // 「고점 판」 and 「숨 고르기」 (applyPeak, the pass's re-deal) and TESTIMONY's half pot.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_518, maxGzip: 14_105 },
+  // -> 37,518 / 14,146 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // the same 37,518 bytes, other chunk names inside. Measured 37,518 / 14,142 in two e2e builds, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_518, maxGzip: 14_146 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
