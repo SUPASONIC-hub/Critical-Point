@@ -16,6 +16,7 @@ import {
   chooseFirstAvailableChoice,
   clickThroughMotion,
   completeCurrentCase,
+  grantDataConsent,
   openIntroDrawer,
   resumeSavedRun,
   startDebugNode as startDebugNodeFromHelper,
@@ -77,6 +78,8 @@ test("the page that opens the finale says the season record will be sent", async
     localStorage.setItem("critical-point-telemetry-key", "anon");
   });
   await page.goto("/?debug=1");
+  // Opt-in: a fresh visit sends nothing until the box is ticked.
+  await grantDataConsent(page);
   await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
@@ -129,6 +132,8 @@ test("a page that opens an ordinary case says nothing about the season record", 
     localStorage.setItem("critical-point-telemetry-key", "anon");
   });
   await page.goto("/?debug=1");
+  // Consented, so the notice's absence is about the case, not the box.
+  await grantDataConsent(page);
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
@@ -844,10 +849,8 @@ test("a consent tick does not turn the hero into a resume button", { tag: "@prod
   await page.goto("/");
   await openIntroDrawer(page, ".data-info-panel");
   const consentCheckbox = page.locator(".consent-box input");
-  // The box starts ticked, so check() first was a press that pressed nothing
-  // (and `force` hid that): the two writes are an untick and a tick.
-  await expect(consentCheckbox).toBeChecked();
-  await consentCheckbox.uncheck();
+  // The box starts unticked (opt-in since 2026-10-25), so the first press is
+  // the tick, and it is the write that materialises the save.
   await expect(consentCheckbox).not.toBeChecked();
   await consentCheckbox.check();
   await expect(consentCheckbox).toBeChecked();
@@ -859,10 +862,17 @@ test("a consent tick does not turn the hero into a resume button", { tag: "@prod
   await expect(page.getByTestId("resume-save")).toHaveCount(0);
 });
 
-// The box is ticked on a first visit and lives in a closed drawer. The line by
-// the start button is the only thing a person who never opens the drawer is
-// told, so it has to be there exactly while records would be sent.
-test("the start button says play records are sent, for as long as they are", { tag: "@prod" }, async ({ page }) => {
+// The box is unticked on a first visit (opt-in since 2026-10-25) and lives in
+// a closed drawer. The line by the start button is the only thing a person who
+// never opens the drawer is told, so it says which way the box is: nothing is
+// sent until it is ticked, and records go out for as long as it stays ticked.
+test("the start button says nothing is sent until the box is ticked, and records are sent while it is", { tag: "@prod" }, async ({ page }) => {
+  const writes = [];
+  await page.route("https://e2e.supabase.co/**", async (route) => {
+    const request = route.request();
+    if (request.method() === "POST" && !request.url().includes("/rpc/")) writes.push(request.url());
+    await route.fulfill({ status: request.method() === "GET" ? 200 : 201, contentType: "application/json", body: request.method() === "GET" ? "[]" : "{}" });
+  });
   await page.addInitScript(() => {
     localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
     localStorage.setItem("critical-point-telemetry-key", "anon");
@@ -870,7 +880,9 @@ test("the start button says play records are sent, for as long as they are", { t
   await page.goto("/");
   const line = page.locator(".intro-launch").getByTestId("consent-line");
   await expect(line).toBeVisible();
-  await expect(line).toContainText("익명 전송");
+  await expect(line).toHaveAttribute("data-consent", "off");
+  await expect(line).toContainText("보내지 않습니다");
+  await expect(line).not.toContainText("익명 전송");
   await expect(line).toContainText("데이터 저장 안내");
   // Said without opening anything.
   await expect(page.locator(".data-info-panel")).toBeHidden();
@@ -880,11 +892,29 @@ test("the start button says play records are sent, for as long as they are", { t
   await line.getByRole("link", { name: "데이터 저장 안내" }).click();
   await expect(page.locator(".data-info-panel")).toBeVisible();
   await expect(consentCheckbox).toBeInViewport();
-  await expect(consentCheckbox).toBeChecked();
-  await consentCheckbox.uncheck();
-  await expect(page.getByTestId("consent-line")).toHaveCount(0);
+  await expect(consentCheckbox).not.toBeChecked();
+  expect(writes, "nothing is written to the server before the box is ticked").toEqual([]);
   await consentCheckbox.check();
-  await expect(line).toBeVisible();
+  await expect(line).toHaveAttribute("data-consent", "on");
+  await expect(line).toContainText("익명 전송");
+  await consentCheckbox.uncheck();
+  await expect(line).toHaveAttribute("data-consent", "off");
+  await expect(line).toContainText("보내지 않습니다");
+});
+
+// A device whose save already holds a choice keeps it: the old default (ticked)
+// is not flipped off under a returning player.
+test("a returning device keeps the consent its save holds", { tag: "@prod" }, async ({ page }) => {
+  await seedSave(page, savedRunAt("case05", "c5_voice", { dataConsent: true }));
+  // After the seed, which clears storage.
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/");
+  await expect(page.getByTestId("consent-line")).toHaveAttribute("data-consent", "on");
+  await openIntroDrawer(page, ".data-info-panel");
+  await expect(page.locator(".consent-box input")).toBeChecked();
 });
 
 test("a build with no backend does not say records are sent", async ({ page }) => {

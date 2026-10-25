@@ -7,7 +7,7 @@
 // that an untagged test does not press on the phone on the same screen. A test
 // that is the only one to press a control stays in both projects.
 import { expect, test } from "./helpers/network.js";
-import { completeCurrentCase, openIntroDrawer } from "./helpers/gameFlow.js";
+import { completeCurrentCase, grantDataConsent, openIntroDrawer } from "./helpers/gameFlow.js";
 import { startDebugNode } from "./helpers/seasonFlow.js";
 import { collectPostedRows, jsonbBytes, SERVER_DYNAMICS_BYTES } from "./helpers/caseRows.js";
 import { recheckCaseGap, recheckCaseLinks } from "../src/chainRecheck.js";
@@ -222,9 +222,8 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   });
 
   await page.goto("/?debug=1");
-  await openIntroDrawer(page, ".data-info-panel");
-  // Ticked from the first visit; check() on it was a press that could not fail.
-  await expect(page.locator(".consent-box input")).toBeChecked();
+  // Unticked on a first visit (opt-in since 2026-10-25): tick it, as a player would.
+  await grantDataConsent(page);
   await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
   await playtestRequestSeenPromise;

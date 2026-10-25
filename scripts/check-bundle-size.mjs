@@ -233,7 +233,8 @@ const budgets = [
   // -> 172,282 / 62,234 on 2026-10-25, 묶음 시대고증(#313): the intro's story
   // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
   // 62,226 in CI and 62,230 here, the larger gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_282, maxGzip: 62_234 },
+  // 172,282 / 62,234 -> 172,474 / 62,297 on 2026-10-25, consent-opt-in: the start line's second sentence (nothing is sent until the box is ticked); cloudSave only by the chunk names it imports. Measured 172,474 / 62,293 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_474, maxGzip: 62_297 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -561,7 +562,8 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, consent-opt-in: the start line's second sentence (nothing is sent until the box is ticked); cloudSave only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_644 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.

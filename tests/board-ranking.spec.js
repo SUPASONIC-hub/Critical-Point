@@ -347,7 +347,8 @@ test("this device's story season is on its ranking with the mark, and no other r
 
 /**
  * Closes the finale of a season from its last scene, with the backend on and
- * the consent box as it starts (ticked), and returns the rows the page posted.
+ * the consent box ticked (it starts unticked since 2026-10-25), and returns
+ * the rows the page posted.
  * The debug jump to the finale counts every case before it as closed, so this
  * close is the season's.
  */
@@ -359,7 +360,7 @@ async function closeSeasonAndCollectRows(page) {
     await route.fulfill({ status: 201, contentType: "application/json", body: "" });
   });
   await useMockSupabase(page);
-  await startDebugNode(page, "final", "f_aftershock");
+  await startDebugNode(page, "final", "f_aftershock", { consent: true });
   await completeCurrentCase(page);
   await expect(page.locator(".ending-sequence")).toBeVisible();
   return posted;

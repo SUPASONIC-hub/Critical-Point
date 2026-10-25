@@ -62,10 +62,11 @@ const CONFIRM_START_OVER = "저장된 진행을 지우고 첫 사건부터 새�
 const CONFIRM_START_NEW_GAME_PLUS = "저장된 진행을 지우고 NEW GAME+로 새로 시작할까요? 복구 지점은 남습니다.";
 const CONFIRM_REPLACE_CASE = "진행 중인 사건의 선택 기록을 지우고 이 사건을 열까요? 완료한 사건의 기록은 남습니다.";
 const CONFIRM_RESTART_CASE = "이 사건을 처음부터 다시 시작할까요? 지금 판의 선택 기록은 지워집니다.";
-// The consent box is ticked from the first visit and sits in a closed drawer,
-// so the page says so where the eye already is: by the button that starts the
-// sending. It names the drawer the way out is in, and the name opens it: a
-// closed <details> is not scrolled to by its own anchor in every browser.
+// The consent box sits in a closed drawer, so the page says where it stands
+// where the eye already is: by the start button. Since 2026-10-25 the box is
+// unticked on a first visit (opt-in), so the line names the drawer both as the
+// way in and, once ticked, as the way out, and the name opens it: a closed
+// <details> is not scrolled to by its own anchor in every browser.
 const DATA_DRAWER_ID = "data-info";
 // "브리핑 먼저 보기" pointed at the name field until 2026-10-13: its target was
 // the start panel, while the briefing it names sat in a closed drawer below.
@@ -201,11 +202,16 @@ export function IntroScreen({ view, renderers = {} }) {
       프롤로그 시작
     </button>
   );
-  // Only while it is true: unticked, or built with no backend, nothing is sent.
-  const consentLine = dataConsent && telemetryEnabled && (
-    <small className="consent-note" data-testid="consent-line">
-      플레이 기록은 플레이테스트용으로 익명 전송됩니다. 아래{" "}
-      <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>데이터 저장 안내</a>에서 끌 수 있습니다.
+  // Built with no backend, nothing is ever sent and there is nothing to ask.
+  // Otherwise the line says which way the box is: unticked, nothing is sent
+  // until the player ticks it; ticked, records go out until it is unticked.
+  // Ticking it after a run has started keeps that run off the online season
+  // ranking (README), so the off line asks before the start.
+  const consentLine = telemetryEnabled && (
+    <small className="consent-note" data-testid="consent-line" data-consent={dataConsent ? "on" : "off"}>
+      {dataConsent ? "플레이 기록은 플레이테스트용으로 익명 전송됩니다. 아래 " : "플레이 기록은 보내지 않습니다. 플레이테스트에 보태고 온라인 랭킹에 오르려면 시작 전에 아래 "}
+      <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>데이터 저장 안내</a>
+      {dataConsent ? "에서 끌 수 있습니다." : "에서 동의해 주세요."}
     </small>
   );
   const analystTitle = getAnalystTitle({ currentCase, caseResults });
@@ -631,9 +637,9 @@ export function IntroScreen({ view, renderers = {} }) {
             </div>
           </section>
           </details>
-          {/* The summary text stays visible: the box starts ticked, and this
-              drawer is never nested inside another closed one, so the notice
-              and the way out are always one deliberate click away. */}
+          {/* The summary text stays visible: this drawer is never nested
+              inside another closed one, so the notice and the box (unticked
+              until the player ticks it) are always one deliberate click away. */}
           <details className="intro-drawer" id={DATA_DRAWER_ID}>
             <summary>
               <h2>데이터 저장 안내</h2>

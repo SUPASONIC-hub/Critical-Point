@@ -265,11 +265,26 @@ export async function openIntroDrawer(page, selector) {
   });
 }
 
+/**
+ * Ticks the research consent box in the intro's 데이터 저장 안내 drawer, as a
+ * player would. The box starts unticked on a device with no save (opt-in since
+ * 2026-10-25), so a test that wants rows sent from a fresh visit says so here.
+ */
+export async function grantDataConsent(page) {
+  await openIntroDrawer(page, ".data-info-panel");
+  const box = page.locator(".consent-box input");
+  await expect(box).not.toBeChecked();
+  await box.check();
+  await expect(box).toBeChecked();
+}
+
 export async function startDebugNode(page, caseId, nodeId, options = {}) {
   const {
     navigate = true,
     resetStorage = true,
     expectGameShell = true,
+    // Tick the consent box before the jump: a fresh visit starts with it off.
+    consent = false,
     // A window opens on its briefing page with the clock held, and almost every
     // test is about the timed table behind it. Opening it here keeps that out
     // of each spec; a test of the briefing page itself passes false.
@@ -280,6 +295,7 @@ export async function startDebugNode(page, caseId, nodeId, options = {}) {
     await clearGameStorage(page);
     await page.reload();
   }
+  if (consent) await grantDataConsent(page);
   await page.getByTestId("debug-case-select").selectOption(caseId);
   await page.getByTestId("debug-node-select").selectOption(nodeId);
   await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);

@@ -169,10 +169,12 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const newGamePlusRecord = useMemo(() => readStoredSeasonRecord(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
-  // The box starts ticked on a device with no save. Where there is a save,
-  // only `true` is consent: the shell reads the save unrepaired, and a save
-  // edited to hold the string "false" used to tick the box.
-  const [dataConsent, setDataConsent] = useState(saved ? saved.dataConsent === true : true);
+  // The box starts unticked on a device with no save (opt-in since 2026-10-25;
+  // it started ticked before). Where there is a save, only `true` is consent,
+  // so a device that kept the old default keeps the choice its save holds: the
+  // shell reads the save unrepaired, and a save edited to hold the string
+  // "false" used to tick the box.
+  const [dataConsent, setDataConsent] = useState(saved ? saved.dataConsent === true : false);
   const [saveStatus, setSaveStatus] = useState("");
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const sessionId = useMemo(() => getSessionId(), []);
