@@ -362,6 +362,46 @@ function serviceWorker() {
 }
 
 /**
+ * The store apps' native side (docs/app-shell.md): ads and the Remove Ads
+ * purchase, in the app only and never on the web (the user's decision of
+ * 2026-10-25).
+ *
+ * The page reaches it through one name, `cp:app-native`
+ * (src/platform/ads.js). In `--mode app` that is app/native/index.js, which
+ * imports the Capacitor plugins from app/node_modules -- packages the site's
+ * build, its tests and CI never install. In every other mode it is a module
+ * that exports null, and `__CP_APP__` (define below) is false, so the call
+ * sites the game has (GameRuntime.openCase, IntroScreen) fold away and the
+ * site's chunks do not change; check-bundle-size.mjs fails a site build that
+ * carries any of it.
+ */
+const APP_NATIVE = "cp:app-native";
+const APP_NATIVE_STUB = "\0cp:app-native";
+function appNative(mode) {
+  const entry = path.resolve("app/native/index.js");
+  return {
+    name: "app-native",
+    resolveId(id) {
+      if (id !== APP_NATIVE) return null;
+      return mode === "app" ? entry : APP_NATIVE_STUB;
+    },
+    load(id) {
+      return id === APP_NATIVE_STUB ? "export default null;\n" : null;
+    },
+  };
+}
+// In the app build, the native side and its plugins are one lazy chunk of
+// their own, ahead of the catch-all vendor group, which the page preloads.
+// Only those files: taking what they import with them pulled Vite's preload
+// helper in, and the page preloaded the chunk (tried on 2026-10-25).
+const APP_NATIVE_GROUP = {
+  name: "app-native",
+  test: /[\\/]app[\\/](native|node_modules)[\\/]/,
+  priority: 38,
+  includeDependenciesRecursively: false,
+};
+
+/**
  * What the page is told about registering (src/serviceWorker/register.js).
  * `--mode app` is the build the iOS shell carries (app/build-web.mjs): every
  * file is already on the device, and WKWebView runs no worker for the app's
@@ -541,7 +581,7 @@ function ownChunkGroups() {
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
+  plugins: [appNative(mode), seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
@@ -553,6 +593,8 @@ export default defineConfig(({ command, mode }) => ({
       command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
     ),
     __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+    // The store apps' build (app/build-web.mjs); see appNative above.
+    __CP_APP__: JSON.stringify(mode === "app"),
   },
   // The dev server compiles a module the first time it is asked for. Fifty
   // cases are fifty large data modules, and compiling them on the first scene
@@ -578,7 +620,7 @@ export default defineConfig(({ command, mode }) => ({
     rolldownOptions: {
       output: {
         codeSplitting: {
-          groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
+          groups: [...ownChunkGroups(), ...(mode === "app" ? [APP_NATIVE_GROUP] : []), ...VENDOR_GROUPS, ENTRY_GROUP],
         },
       },
     },

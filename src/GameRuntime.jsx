@@ -622,6 +622,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    */
   async function openCase(caseId) {
     if (caseId === currentCase && !(await confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워지고, 다시 하는 판은 연습으로 세어 금고는 그대로입니다. 이 사건의 결과 요약은 새 판을 끝내면 그 판의 것으로 바뀝니다."))) return false;
+    // The store apps' ad between cases (platform/ads.js); folded out of the site's builds.
+    if (__CP_APP__ && caseId !== currentCase && (await import("./platform/ads.js").then(({ ads }) => ads.beforeNextCase(currentCase), () => null))?.reason === "busy") return false;
     startCaseEvent(caseId);
     return true;
   }

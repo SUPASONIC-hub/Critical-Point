@@ -1,0 +1,2 @@
+# cmd reads labels in a batch file with CRLF line ends (gradlew.bat).
+*.bat text eol=crlf

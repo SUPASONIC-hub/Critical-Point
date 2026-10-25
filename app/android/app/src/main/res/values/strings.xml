@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">임계점</string>
+    <string name="title_activity_main">임계점</string>
+    <string name="package_name">com.taknroll.criticalpoint</string>
+    <string name="custom_url_scheme">com.taknroll.criticalpoint</string>
+    <!-- AdMob app ID. Google test app ID until release: replace with AdMob › Apps › 임계점 (Android) › App settings. -->
+    <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+</resources>

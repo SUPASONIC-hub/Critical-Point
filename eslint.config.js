@@ -11,7 +11,7 @@ export default [
   {
     // app/: the store shells' own packages, the web build they carry and
     // the native projects (docs/app-shell.md); its scripts are linted below.
-    ignores: [".claude/**", "dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**", "app/node_modules/**", "app/dist-app/**", "app/ios/**", "app/twa/**/build/**"],
+    ignores: [".claude/**", "dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**", "app/node_modules/**", "app/dist-app/**", "app/ios/**", "app/android/**"],
   },
   js.configs.recommended,
   {
@@ -19,9 +19,9 @@ export default [
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
-      // __CP_DEBUG_BUILD__ and __CP_SERVICE_WORKER__ are written by the bundler
-      // (vite.config.js `define`).
-      globals: { ...globals.browser, __CP_DEBUG_BUILD__: "readonly", __CP_SERVICE_WORKER__: "readonly" },
+      // __CP_DEBUG_BUILD__, __CP_SERVICE_WORKER__ and __CP_APP__ are written by
+      // the bundler (vite.config.js `define`).
+      globals: { ...globals.browser, __CP_DEBUG_BUILD__: "readonly", __CP_SERVICE_WORKER__: "readonly", __CP_APP__: "readonly" },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     plugins: { "react-hooks": reactHooks },
@@ -43,7 +43,7 @@ export default [
   {
     // tests/unit/*.test.mjs matched neither pattern until 2026-09-28, so it was
     // linted with no Node globals and the default unused-vars options.
-    files: ["scripts/**/*.mjs", "tests/**/*.{js,mjs}", "*.config.js", "eslint.config.js", "app/*.mjs", "app/twa/*.mjs"],
+    files: ["scripts/**/*.mjs", "tests/**/*.{js,mjs}", "*.config.js", "eslint.config.js", "app/*.mjs"],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
@@ -62,5 +62,12 @@ export default [
       "tests/**/*.{js,mjs}",
     ],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+  {
+    // The store apps' native side (docs/app-shell.md): page code in the app's
+    // build only, beside the Capacitor plugins it imports from app/node_modules.
+    files: ["app/native/**/*.js"],
+    languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: globals.browser },
+    rules: { "no-unused-vars": unusedVars },
   },
 ];

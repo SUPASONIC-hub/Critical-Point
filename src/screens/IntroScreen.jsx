@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, TriangleAlert, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
@@ -14,6 +14,14 @@ import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
+
+// The store apps' 「광고와 개인정보」 drawer and the ending book's rewarded hint
+// (src/components/AppStorePanel.jsx). `__CP_APP__` is false in the site's
+// builds (vite.config.js), which drop both, so the web draws neither.
+const AppStorePanel = __CP_APP__ ? lazy(() => import("../components/AppStorePanel.jsx")) : null;
+const AppEndingHints = __CP_APP__
+  ? lazy(() => import("../components/AppStorePanel.jsx").then((module) => ({ default: module.AppEndingHints })))
+  : null;
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -474,7 +482,13 @@ export function IntroScreen({ view, renderers = {} }) {
               {pastRunMemory.book && (
                 <details>
                   <summary>{pastRunMemory.book.head}</summary>
-                  {pastRunMemory.book.hints.map((hint) => <p key={hint}>{hint}</p>)}
+                  {__CP_APP__ ? (
+                    <Suspense fallback={null}>
+                      <AppEndingHints hints={pastRunMemory.book.hints} />
+                    </Suspense>
+                  ) : (
+                    pastRunMemory.book.hints.map((hint) => <p key={hint}>{hint}</p>)
+                  )}
                 </details>
               )}
             </section>
@@ -588,7 +602,20 @@ export function IntroScreen({ view, renderers = {} }) {
               <span lang="en">ACCESSIBILITY</span>
               <h2>편의 설정</h2>
             </summary>
-            <AccessibilityPanel />
+            {/* The store apps' 「광고와 개인정보」 section under the comfort
+                settings (memo B-5). Written as one child either way, so the
+                site's build, where `__CP_APP__` is false, folds it to the
+                panel alone and carries not a byte of it. */}
+            {__CP_APP__ ? (
+              <>
+                <AccessibilityPanel />
+                <Suspense fallback={null}>
+                  <AppStorePanel />
+                </Suspense>
+              </>
+            ) : (
+              <AccessibilityPanel />
+            )}
           </details>
           <details className="intro-drawer">
             <summary>

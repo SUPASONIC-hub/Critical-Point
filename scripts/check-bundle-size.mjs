@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
+import { findAppOnlyCode } from "./app-only-code.mjs";
 
 /**
  * Bundle and first-paint budgets.
@@ -1084,6 +1085,14 @@ if (firstPaint > FIRST_PAINT_BUDGET) {
   failures.push(`The first paint transfers ${firstPaint} bytes, over the ${FIRST_PAINT_BUDGET} byte budget (${parts.join(", ")}).`);
 }
 reported.push(`first paint ${firstPaint} bytes (${parts.join(", ")})`);
+
+// The site carries no ads (the user's decision of 2026-10-25: ads in the
+// store apps only). The apps' ads and Remove Ads purchase are behind
+// `__CP_APP__` and `cp:app-native` (vite.config.js), which a site build folds
+// away; a name from any of it in dist/ means a call site escaped the fold.
+const failure = findAppOnlyCode(distDir);
+if (failure) failures.push(failure);
+else reported.push("no app-only ad or purchase code");
 
 if (failures.length) {
   console.error(failures.join("\n"));

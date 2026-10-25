@@ -1,0 +1,2 @@
+/* The system's tracking question (ATT), in English (app-launch memo B-4). */
+"NSUserTrackingUsageDescription" = "Your data will be used to show you more relevant ads. The game works the same if you don't allow this.";

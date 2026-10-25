@@ -3,16 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "스토어 앱 껍데기(iOS Capacitor·안드로이드 TWA). 웹 빌드와 테스트는 저장소 루트에서, 이 폴더는 자기 node_modules만 씁니다. docs/app-shell.md",
+  "description": "스토어 앱 껍데기(iOS·안드로이드 모두 Capacitor), 앱판 광고(AdMob)·광고 제거 결제. 웹 빌드와 테스트는 저장소 루트에서, 이 폴더는 자기 node_modules만 씁니다. docs/app-shell.md",
   "scripts": {
     "build:web": "node build-web.mjs",
+    "sync": "npm run build:web && cap sync",
     "sync:ios": "npm run build:web && cap sync ios",
+    "sync:android": "npm run build:web && cap sync android",
     "open:ios": "cap open ios",
-    "check:twa": "node twa/check-twa.mjs"
+    "open:android": "cap open android",
+    "check:app": "node check-app.mjs"
   },
   "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.5.3",
     "@capacitor/core": "8.5.3",
-    "@capacitor/ios": "8.5.3"
+    "@capacitor/ios": "8.5.3",
+    "@capgo/native-purchases": "8.9.2"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3"
