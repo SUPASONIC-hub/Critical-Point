@@ -230,7 +230,10 @@ const budgets = [
   // (TAB_TOKEN_CLAIM_MS 300, one more wait when the timer fired late, capped
   // at TAB_TOKEN_CLAIM_MAX_MS). Measured 172,244 / 62,201 in the CI e2e build,
   // the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_244, maxGzip: 62_205 },
+  // -> 172,282 / 62,234 on 2026-10-25, 묶음 시대고증(#313): the intro's story
+  // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
+  // 62,226 in CI and 62,230 here, the larger gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_282, maxGzip: 62_234 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -388,7 +391,10 @@ const budgets = [
   // fetches the card (ActCard.jsx, its own chunk below) with its preload list.
   // Measured 102,475 / 35,449 in the e2e build (35,453 on da6292be; the larger
   // gzip plus 4).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_475, maxGzip: 35_457 },
+  // -> 102,514 / 35,481 on 2026-10-25, 묶음 시대고증(#313): the era words in
+  // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
+  // the larger gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_514, maxGzip: 35_481 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -679,7 +685,10 @@ const budgets = [
   // 107,213 / 35,690 -> 107,220 / 35,694 on 2026-10-24, B-9 감정 배합 on main
   // b0eb9cb0: the 사건 43 막간 now reads the names on the cup-noodle lid
   // (+7 raw); measured 107,220 / 35,690 in the e2e build, the gzip plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_220, maxGzip: 35_694 },
+  // -> 107,276 / 35,735 on 2026-10-25, 묶음 시대고증(#313): the interludes'
+  // 접수 알림음·봉인 테이프·출력본 and the routes. Measured 107,276 / 35,731,
+  // the gzip plus 4.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_276, maxGzip: 35_735 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -1029,7 +1038,9 @@ function checkBudget(file, budget) {
 // -> 9,340 / 3,424 on 2026-10-24 (B-11(1) 막 표지, on main ea5b74aa): measured
 // 9,340 / 3,415 here and 3,420 in CI (the file names' hashes); the larger plus
 // 4. One more file in the list, ActCard; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_340, maxGzip: 3_424 };
+// -> 3,431 gzip on 2026-10-25, 묶음 시대고증(#313): the chunk names' hashes
+// only (measured 3,427 plus 4); the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_340, maxGzip: 3_431 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
