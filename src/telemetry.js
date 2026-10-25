@@ -271,6 +271,16 @@ export async function saveBoardPost(payload, eventId = null) {
   return postOnce("board_posts", buildTelemetryPayload(payload, eventId), "Board post failed");
 }
 
+/**
+ * A report on one board post (src/boardReport.js builds the row). Like a post,
+ * the reporter waits for the answer and the server's refusal is printed, so it
+ * skips the delivery counters. A replay is a 409 on `event_id`, delivered.
+ */
+export async function saveBoardReport(payload, eventId = null) {
+  if (!telemetryEnabled) return { skipped: true };
+  return postOnce("board_reports", buildTelemetryPayload(payload, eventId), "Board report failed");
+}
+
 export async function fetchBoardPosts(limit = 50) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 
