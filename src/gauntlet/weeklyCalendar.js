@@ -29,11 +29,17 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * 2027-W03; 2026 has a W53), the three event rules in turn. The `added` day
  * is the day the pull request is merged: 2026-10-23 (moved up from the
  * planned 10-27 by the user's choice, 10-23); W48 keeps its seven days.
+ *
+ * 2026-W49 (11-30 to 12-06) plays the test week again (P5 of the 11-23
+ * verdict): the audit and the links together, as W47 did, in the one free
+ * week before W50. Merged on the verdict day, 2026-11-23, the Monday the
+ * start screen begins to tell of it, so its seven days hold to the day.
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
   Object.freeze({ week: "2026-W47", id: "audit-cascade", added: "2026-10-22" }),
   Object.freeze({ week: "2026-W48", id: "heavy-fracture", added: "2026-10-23" }),
+  Object.freeze({ week: "2026-W49", id: "audit-cascade", added: "2026-11-23" }),
   Object.freeze({ week: "2026-W50", id: "short-clock", added: "2026-10-23" }),
   Object.freeze({ week: "2026-W52", id: "near-wall", added: "2026-10-23" }),
   Object.freeze({ week: "2027-W01", id: "heavy-fracture", added: "2026-10-23" }),

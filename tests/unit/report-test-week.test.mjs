@@ -70,7 +70,8 @@ test("the workflow and the script read the calendar's test week by default (W47 
   const { readFileSync } = await import("node:fs");
   const { WEEKLY_RULES } = await import("../../src/gauntlet/weeklyRules.js");
   const tests = WEEKLY_RULES.filter((entry) => entry.id === "audit-cascade").map((entry) => entry.week);
-  assert.deepEqual(tests, ["2026-W47"]);
+  // W49 plays it again (P5); the workflow reads it when asked (-f week=2026-W49).
+  assert.deepEqual(tests, ["2026-W47", "2026-W49"]);
   assert.equal(QUERY, testWeekQuery(tests[0], "audit-cascade"));
   const workflow = readFileSync(new URL("../../.github/workflows/test-week.yml", import.meta.url), "utf8");
   assert.equal([...workflow.matchAll(/\d{4}-W\d{2}/g)].map(([week]) => week).filter((week) => week !== tests[0]).length, 0, "the workflow names no other week");
