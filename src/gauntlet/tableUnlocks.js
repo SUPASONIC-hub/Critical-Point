@@ -16,7 +16,7 @@
  * Pushing, cashing, the wall and the heartbeat are the table itself and are
  * not listed: no step is without them.
  */
-import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
+import { LOCK_CAP, PEAK_CASES, PEAK_CHIPS, PEAK_MARK, PEAK_WALL, STANCE_CHARGE } from "./gauntletEngine.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -260,17 +260,43 @@ function findStep(caseId, { veteran = false, staged = STAGED } = {}) {
  */
 export function rulesFor(caseId, options) {
   const step = findStep(caseId, options);
-  if (options?.story === true) return step?.storyRules ?? STORY_RULES;
-  return step?.rules ?? ALL_RULES;
+  const rules = options?.story === true ? step?.storyRules ?? STORY_RULES : step?.rules ?? ALL_RULES;
+  return PEAK_CASES.includes(caseId) ? withPeak(rules) : rules;
 }
 
 /**
+ * 「고점 판」 (C-10, user 2026-10-25, choice 1): the last case of each of
+ * B-11's eight acts (actCardGate.js `ACT_START_CASES`: the case before each
+ * act's first, and the finale) deals every board with the wall `PEAK_WALL`
+ * closer and the chips `PEAK_CHIPS` thicker (`applyPeak`). Act 7 ends on 사건
+ * 42, the night off at 경포 and one of B-13(3)'s quiet tables, so its peak is
+ * 사건 41, the second hearing, the case before the rest. Not a rule a case
+ * turns on in the ladder's sense: it is in no step, is not saved, and a
+ * NEW GAME+ or story run has it too. The list is tableRules.js's, re-exported
+ * here; a unit test holds it to the acts.
+ *
+ * The rest that answers it is each act's first case, a quiet table
+ * (fxVariables.js, the quiet tables): staging only, like 42, 45 and 47.
+ */
+export { PEAK_CASES };
+const peakSets = new Map();
+function withPeak(rules) {
+  if (!peakSets.has(rules)) peakSets.set(rules, freezeSet([...rules, PEAK_MARK]));
+  return peakSets.get(rules);
+}
+const PEAK_INTRO = Object.freeze([`막의 마지막 사건입니다. 이 사건의 판은 모두 벽이 ${PEAK_WALL} 가까워지고 칩이 ${PEAK_CHIPS}배입니다.`]);
+const PEAK_KICKER = "PEAK TABLE · 고점 판";
+
+/**
  * What the case says about the rules it turns on; nothing when it turns none
- * on. A story run is told only about the ones it plays under.
+ * on. A story run is told only about the ones it plays under. A peak case
+ * (`PEAK_CASES`) says it is one, under its own kicker.
  */
 export function introFor(caseId, options) {
   const step = findStep(caseId, options);
-  return (options?.story === true ? step?.storyIntro : step?.intro) ?? NO_INTRO;
+  const intro = (options?.story === true ? step?.storyIntro : step?.intro) ?? NO_INTRO;
+  // A peak case is never a step of the ladder (a unit test holds it), so its line is the whole of it.
+  return PEAK_CASES.includes(caseId) ? PEAK_INTRO : intro;
 }
 
 /**
@@ -288,7 +314,7 @@ export function getUnlockIntro(caseId, run, staged = STAGED) {
 
 /** The line over a case's introduction: the step's own, or the shared one. */
 export function getUnlockKicker(caseId) {
-  return STEP_BY_CASE.get(caseId)?.kicker ?? UNLOCK_INTRO_KICKER;
+  return STEP_BY_CASE.get(caseId)?.kicker ?? (PEAK_CASES.includes(caseId) ? PEAK_KICKER : UNLOCK_INTRO_KICKER);
 }
 
 /**

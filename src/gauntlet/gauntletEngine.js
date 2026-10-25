@@ -25,6 +25,7 @@ import {
   LOGIC_HOLD,
   OVERCLOCK_CHIPS,
   OVERCLOCK_STREAK,
+  PEAK_CASES,
   PEAK_CHIPS,
   PEAK_WALL,
   SCOUT_REACH,
@@ -41,7 +42,7 @@ import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 
-export { HOT_CASH_MULTIPLIER, PEAK_CHIPS, PEAK_WALL, SEAL_BREAK_GAUGE } from "./tableRules.js";
+export { HOT_CASH_MULTIPLIER, PEAK_CASES, PEAK_CHIPS, PEAK_WALL, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
 /**
  * The rules a window is played under when none are named: all of them. The
@@ -1207,6 +1208,16 @@ function redealWithout(schema, relics, run) {
   return schema;
 }
 const PEAK_ONLY = new Set([PEAK_MARK]);
+
+/**
+ * A table entered straight into a case (the debug jump, a replay link: state/
+ * runState.js `jumpToNode`) is the opening table, laid without the case's
+ * rules; a peak case's (`PEAK_CASES`) is laid as a peak, as `openCaseRun`
+ * would have laid it.
+ */
+export function layCasePeak(run, caseId) {
+  return PEAK_CASES.includes(caseId) ? { ...run, schema: applyPeak(run.schema, PEAK_ONLY) } : run;
+}
 
 /**
  * Takes (or passes on) the relic a closed case offered. The board on the table

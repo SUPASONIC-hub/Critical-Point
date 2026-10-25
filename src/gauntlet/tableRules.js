@@ -96,6 +96,13 @@ export const BREATHER_WALL = 3;
  */
 export const PEAK_WALL = 5;
 export const PEAK_CHIPS = 1.25;
+/**
+ * The cases it is dealt in: the last of each of B-11's eight acts, 41 for act
+ * 7 (whose last, 42, is a rest). Here, with its numbers, so the debug jump and
+ * a replay link (state/runState.js `jumpToNode`) can lay a peak case's first
+ * board without the ladder's copy (tableUnlocks.js, which reads it from here).
+ */
+export const PEAK_CASES = Object.freeze(["case07", "case12", "case18", "case24", "case30", "case36", "case41", "final"]);
 
 /*
  * AUDIT's and CASCADE's numbers (B3 and B2, rules of the table since

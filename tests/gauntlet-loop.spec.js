@@ -211,6 +211,31 @@ test("the briefing's open button and the draft's pass button take a pointer", as
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics).toEqual([]);
 });
 
+// C-7: passing on a draft that offered something is 「숨 고르기」, and the board says so.
+test("passing on the draft is 「숨 고르기」: the case's first board has 10 seconds more and a further wall", async ({ page }) => {
+  await closeCaseOneIntoDraft(page);
+  const before = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.schema;
+  await expect(page.getByTestId("relic-skip")).toContainText("숨 고르기 · +10초");
+  await page.getByTestId("relic-skip").click();
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("숨 고른 판");
+  const after = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.schema;
+  expect([after.seconds, after.wallMin, after.wallMax]).toEqual([before.seconds + 10, before.wallMin + 3, before.wallMax + 3]);
+  expect(after.mutations).toContain("breather");
+});
+
+// C-10: an act's last case deals 「고점 판」, said on its first page and on every board of it.
+test("an act's last case is 「고점 판」: the briefing says it and the board is marked", async ({ page }) => {
+  await startDebugNode(page, "case07", "c7_start", { openTable: false });
+  await expect(page.getByTestId("unlock-intro")).toContainText("PEAK TABLE · 고점 판");
+  await expect(page.getByTestId("unlock-intro")).toContainText("벽이 5 가까워지고 칩이 1.25배");
+  await page.getByTestId("open-table").click();
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("고점 판");
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveAttribute("data-mark", "peak");
+  await startDebugNode(page, "case06", "c6_start");
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
+});
+
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   // Installed before the page loads so the clock proof below controls time.
