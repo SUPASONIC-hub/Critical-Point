@@ -38,6 +38,7 @@ const case29Nodes = {
       "매수자: 라운드힐 캐피탈(싱가포르), 서명식 목요일 10시",
       "출장 명령: 위험 검토 의견서 작성, 승인자 윤상혁",
       "해온파트너스 청산 사흘 전 11억 4천 해외 송금",
+      "마감 사정: 뉴욕 대주주 킹스데일의 분기 리뷰 전에 장부 정리",
     ],
     triggers: ["curiosity", "injustice", "responsibility"],
     choices: [
@@ -46,7 +47,7 @@ const case29Nodes = {
         label: "묶음에 든 채무자들의 사정부터 한 줄씩 따로 챙겨 간다",
         effect: { trust: 11, legitimacy: 1, humanCost: -5, time: -6, capital: -4, fatigue: 5 },
         voice: "4,270억이라는 숫자 뒤의 사람부터 봐야 한다며, 묶음에 든 채무자들의 사정부터 한 줄씩 따로 챙겨 간다.",
-        echo: "챙겨 가자 가방이 무거워집니다. 명세 3,860줄을 출력하느라 공항 비즈니스 센터 프린터가 한 번 멈춥니다.",
+        echo: "챙겨 가자 짐이 무거워집니다. 명세 3,860줄을 회사 노트북에 담아 나가는 반출 승인을 받느라, 탑승 직전까지 보안팀과 통화합니다.",
         next: "c29_marina",
         cognition: { persistence: 2 },
       },
