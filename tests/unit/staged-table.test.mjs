@@ -94,25 +94,25 @@ test("the rest of the window is the same at every step: select, tick, push, cash
   assert.deepEqual(reduceWindow(fresh, { type: "REDEAL", schema: fresh.schema }, step("prologue01")), reduceWindow(fresh, { type: "REDEAL", schema: fresh.schema }));
 });
 
-test("the OVERCLOCK chain is only counted once the step has it, so the first hot cash of 프롤로그 04 starts one and does not finish one", () => {
+test("the OVERCLOCK chain is only counted once the step has it, so the first hot cash of 사건 01 starts one and does not finish one", () => {
   const hot = { status: "cashed", cause: "cash", gauge: HOT_GAUGE, wall: 80, pushes: 3 };
   let run = RUN_INITIAL_STATE;
-  // Three prologues of nothing but hot cashes.
-  for (const caseId of ["prologue01", "prologue02", "prologue03"]) {
+  // Five prologues of nothing but hot cashes (OVERCLOCK opens in 사건 01 since C-4; in 프롤로그 04 before it).
+  for (const caseId of ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05"]) {
     for (let window = 0; window < 4; window += 1) {
       run = resolveWindow({ run, window: hot, card: staked, rules: step(caseId) }).nextRun;
       assert.equal(run.streak, 0, `${caseId}: no chain`);
       assert.ok(!run.schema.mutations.includes("overclock"));
     }
   }
-  const first = resolveWindow({ run, window: hot, card: staked, rules: step("prologue04") }).nextRun;
+  const first = resolveWindow({ run, window: hot, card: staked, rules: step("case01") }).nextRun;
   assert.equal(first.streak, 1);
   assert.ok(!first.schema.mutations.includes("overclock"), "one hot cash is the first link");
-  const second = resolveWindow({ run: first, window: hot, card: staked, rules: step("prologue04") }).nextRun;
+  const second = resolveWindow({ run: first, window: hot, card: staked, rules: step("case01") }).nextRun;
   assert.ok(second.schema.mutations.includes("overclock"), "two in a row is OVERCLOCK");
-  // Counted from 프롤로그 01, as it was, the same first cash of 04 would have dealt it.
+  // Counted from 프롤로그 01, as it was, the same first cash of 사건 01 would have dealt it.
   let counted = RUN_INITIAL_STATE;
-  for (let window = 0; window < 12; window += 1) counted = resolveWindow({ run: counted, window: hot, card: staked }).nextRun;
+  for (let window = 0; window < 20; window += 1) counted = resolveWindow({ run: counted, window: hot, card: staked }).nextRun;
   assert.ok(counted.streak >= 2 && counted.schema.mutations.includes("overclock"));
 });
 
@@ -137,7 +137,10 @@ test("LOCK in 프롤로그 04 pays as STRIKE and carries nothing; the stance car
   const five = step("prologue05");
   for (const [mode, carry] of [["strike", "strikeWake"], ["steady", "steadyLine"], ["expose", "exposedHand"]]) {
     const settled = resolveWindow({ run: RUN_INITIAL_STATE, window: charged(mode), card: staked, rules: five });
-    assert.deepEqual(settled, resolveWindow({ run: RUN_INITIAL_STATE, window: charged(mode), card: staked }), `${mode}: 프롤로그 05 is the whole table`);
+    // 프롤로그 05 is not the whole table since C-4 (the audit and the links open in 사건 02 and 03),
+    // but LOCK and the stances are: what the charge paid and carries is the whole table's.
+    const whole = resolveWindow({ run: RUN_INITIAL_STATE, window: charged(mode), card: staked });
+    assert.deepEqual([settled.verdict.pot, settled.verdict.focus, settled.nextRun.stanceMastery], [whole.verdict.pot, whole.verdict.focus, whole.nextRun.stanceMastery], `${mode}: 프롤로그 05 pays and carries the stance as the whole table does`);
     assert.ok(settled.nextRun.schema.mutations.includes(carry));
     assert.equal(settled.nextRun.stanceMastery[mode], 1);
   }
@@ -284,9 +287,10 @@ test("with the switch off, every case is settled under everything, exactly as be
 
 test("as shipped, a plain run's prologues are settled under their steps and a NEW GAME+ run's under everything", () => {
   const veteran = normalizeRunState({ veteran: true });
-  for (const caseId of CASE_SEQUENCE.slice(0, 5)) {
+  for (const caseId of CASE_SEQUENCE.slice(0, 8)) {
     assert.equal(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed: false }).rules, step(caseId), caseId);
     assert.deepEqual(getSettlementRules({ caseId, run: veteran, caseClosed: true }), { rules: ALL_RULES, nextRules: ALL_RULES }, caseId);
   }
-  assert.equal(getSettlementRules({ caseId: "prologue05", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, ALL_RULES, "사건 01 is the whole table");
+  assert.equal(getSettlementRules({ caseId: "prologue05", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, step("case01"), "사건 01 is its own step (C-4)");
+  assert.equal(getSettlementRules({ caseId: "case02", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, ALL_RULES, "사건 03 is the whole table");
 });

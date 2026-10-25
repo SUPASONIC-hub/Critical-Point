@@ -69,7 +69,7 @@ function RuleRows({ rules, resourceMeta }) {
  * above the breach when the board carries both. The page has its own clock:
  * when it runs out the table opens by itself. The player can open it sooner,
  * or stake a card straight from the page, which opens the table with that card already on it. A card
- * there says its type as it does in the hand (`CardType`), and `moveOf` what
+ * there says its direction as it does in the hand (`CardType`), and `moveOf` what
  * staking it would do to the logic streak.
  *
  * The page a case opens on, when the case turns rules on (`tableUnlocks`),

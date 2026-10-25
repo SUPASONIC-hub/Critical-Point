@@ -3,6 +3,7 @@ import {
   BASE_SCHEMA,
   createWindow,
   FOCUS_MODES,
+  getCardBurn,
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
@@ -13,13 +14,13 @@ import {
   resolveWindow,
   STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
-import { getLogicType } from "../src/gauntlet/logicStreak.js";
+import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
 import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -38,10 +39,11 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, handUnit, LINK_VALUE
  *   shortcut: busting on purpose to reach the case's end sooner has to bank far
  *   less than playing the table;
  * - the logic streak is a hand skill, not a second instrument: a hand that
- *   holds one type of card busts exactly as often as one whose card has no
- *   type at all, is paid more but never more than the hand's cap, and a hand
- *   that picks its type at random is paid next to nothing (until 2026-10-10
- *   this was the beat: a push landed on the heartbeat, measured the same way);
+ *   holds one direction (사람 or 자리; a thinking type until C-3, 2026-10-25)
+ *   busts exactly as often as one whose card leans neither way, is paid more
+ *   but never more than the hand's cap, and a hand that picks a card at
+ *   random is paid little (until 2026-10-10 this was the beat: a push landed
+ *   on the heartbeat, measured the same way);
  * - LOCK is the same hand: a hand that charges a stance to the full is paid
  *   under one cap for both, reads the heartbeat no better for it, and cannot
  *   charge one stance and cash another. What a stance carries into the next
@@ -99,19 +101,30 @@ function measureWindowsPerCase(walksPerCase = 40) {
 }
 const MEASURED_WINDOWS_PER_CASE = measureWindowsPerCase();
 const WINDOWS_PER_CASE = Math.round(MEASURED_WINDOWS_PER_CASE);
-// The one simulated card. It has no type, so a hand that plays it bare has no
-// logic streak in play: the rows that measure the bet, the heartbeat and the
-// skip are the table without the hand's share.
-const card = { id: "sim", label: "sim", effect: { capital: 12, trust: 6, humanCost: 4 } };
+// The one simulated card. It leans neither way (C-3: trust less harm 7,
+// capital and time 7), so a hand that plays it bare never grows the logic
+// streak: the rows that measure the bet, the heartbeat and the skip are the
+// table without the hand's share. Until C-3 it had no type and read
+// { capital: 12, trust: 6, humanCost: 4 }: the same 18 of gains and the same
+// burn, so it pays and burns what it did. A typed hand leans it one way or
+// the other (`directCard`), which moves neither.
+const card = { id: "sim", label: "sim", effect: { capital: 7, trust: 11, humanCost: 4 } };
+assert.equal(getLogicDirection(card), LOGIC_EVEN, "the bare card leans neither way");
+for (const direction of LOGIC_DIRECTIONS) {
+  const leaned = directCard(card, direction);
+  assert.equal(getLogicDirection(leaned), direction, `the card leaned toward ${direction} reads so`);
+  assert.deepEqual([getCardChips(leaned), getCardBurn(leaned)], [getCardChips(card), getCardBurn(card)], `leaning the card toward ${direction} moves neither its chips nor its burn`);
+}
 
 /**
- * What types a window has on the table: a scene of the real season, drawn by
- * seed from every scene that deals cards (the scene's own cards and its wild
+ * What directions a window has on the table (and, as `kind`, each card's
+ * thinking type): a scene of the real season, drawn by seed from every scene
+ * that deals cards (the scene's own cards and its wild
  * card; not a walk of the graph, so a case here is nine scenes from anywhere
  * in the season).
  */
 const SCENES = Object.values(nodes)
-  .map((node) => (node.choices ?? []).map((choice) => ({ type: getLogicType(choice), chips: choice.type === "reframe" ? 0 : getCardChips(choice) })).filter((offer) => offer.type))
+  .map((node) => (node.choices ?? []).map((choice) => ({ type: getLogicDirection(choice), kind: getLogicType(choice), chips: choice.type === "reframe" ? 0 : getCardChips(choice) })).filter((offer) => offer.type))
   .filter((offers) => offers.some((offer) => offer.chips > 0));
 /** The counts of `newSeen` (scripts/sim/season-bot.mjs), added up. */
 function addSeen(total, part) {
@@ -212,15 +225,19 @@ const bestHeartbeatSoFar = heartbeat.reduce((best, row) => (row.meanVault > best
 const listening = (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < heartbeatThreshold(bestHeartbeatSoFar.label);
 
 /**
- * The logic streak: five hands that play the best listening policy on the same
- * seeded windows as the untyped hand above, each giving the card a type its
- * own way. The streak carries from case to case for a season's length.
+ * The logic streak: six hands that play the best listening policy on the same
+ * seeded windows as the untyped hand above, each leaning the card one way or
+ * the other its own way (C-3, 2026-10-25: the streak is held on the
+ * direction, 사람 or 자리; until then on the thinking type, and the first hand
+ * held 위험 다루기, on the table in 96% of scenes). The streak carries from
+ * case to case for a season's length.
  *
- *   holds one type        위험 다루기 whenever the table has it, and back to it after a scene that did not
- *   holds, follows table  its type while the table has it, and whatever it had to take from then on
- *   switches on a rise    the same, and leaves its type when the pressure rose
- *   random type           the type of a card drawn at random
- *   richest card          the type of the scene's richest card
+ *   holds people          사람 whenever the table has it, and back to it after a scene that did not
+ *   holds position        the same with 자리, the direction on fewer tables
+ *   holds, follows table  its direction while the table has it, and whatever it had to take from then on
+ *   switches on a rise    the same, and leaves its direction when the pressure rose
+ *   random card           the direction of a card drawn at random
+ *   richest card          the direction of the scene's richest card
  *
  * Decided tolerances (2026-10-09): the holder's mean pot bonus over its cashed
  * windows is in [1.28, 1.40] (the beat paid a human hand 1.285 and an
@@ -229,26 +246,27 @@ const listening = (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset,
  * times the cap. The share of cashed windows paid at the cap is printed, not
  * asserted.
  *
- * The second hand is the best holding play there is -- going back to a type
- * the table took away ends the streak, and it never goes back -- and it is
- * printed beside the holder, held to the cap and to nothing else: 1.420 when
- * this was written, above the band the plain holder is held to.
+ * The follows-table hand is the best holding play there is -- going back to a
+ * direction the table took away ends the streak, and it never goes back --
+ * and it is printed beside the holder, held to the cap and to nothing else.
  */
+const holdsDirection = (direction) => (offers) => (offers.some((offer) => offer.type === direction) ? direction : offers[0].type);
 const LOGIC_HANDS = {
-  "holds one type": (offers) => (offers.some((offer) => offer.type === "risk") ? "risk" : offers[0].type),
-  "holds, follows table": (offers, logic) => (offers.some((offer) => offer.type === (logic.type ?? "risk")) ? logic.type ?? "risk" : offers[0].type),
+  "holds people": holdsDirection("people"),
+  "holds position": holdsDirection("position"),
+  "holds, follows table": (offers, logic) => (offers.some((offer) => offer.type === (logic.type ?? "people")) ? logic.type ?? "people" : offers[0].type),
   "switches on a rise": (offers, logic) => {
-    const held = logic.type ?? "risk";
-    const other = offers.find((offer) => offer.type !== held)?.type;
+    const held = logic.type ?? "people";
+    const other = offers.find((offer) => LOGIC_DIRECTIONS.includes(offer.type) && offer.type !== held)?.type;
     if (logic.rose && other) return other;
     return offers.some((offer) => offer.type === held) ? held : offers[0].type;
   },
-  "random type": (offers, _logic, seed) => offers[Math.floor(handUnit(`${seed}:type`) * offers.length)].type,
+  "random card": (offers, _logic, seed) => offers[Math.floor(handUnit(`${seed}:type`) * offers.length)].type,
   "richest card": (offers) => offers.reduce((best, offer) => (offer.chips > best.chips ? offer : best)).type,
 };
 const logicRows = Object.entries(LOGIC_HANDS).map(([name, pickType]) => measure(name, listening, pickType));
-const holder = logicRows.find((row) => row.label === "holds one type");
-const randomType = logicRows.find((row) => row.label === "random type");
+const holder = logicRows.find((row) => row.label === "holds people");
+const randomType = logicRows.find((row) => row.label === "random card");
 
 // The whole hand's other half: a stance charged to the full, a press at a
 // time, each press paid for in clock. Each stance is played blind, listening
@@ -300,9 +318,17 @@ if (AUDIT_ON) {
   });
   console.log(`audit week       with AUDIT CONTACT: ${contact.join("; ")}`);
 }
-const offerShare = (type) => ((SCENES.filter((offers) => offers.some((offer) => offer.type === type)).length / SCENES.length) * 100).toFixed(0);
+const offerShare = (key, value) => ((SCENES.filter((offers) => offers.some((offer) => offer[key] === value)).length / SCENES.length) * 100).toFixed(0);
+// C-3's two questions: is one direction a hold on every table, as 위험 다루기
+// was (96%)? And does holding a direction leave the thinking types free to
+// spread (관점 전환): the share of the scenes with the direction on the table
+// that offer it on two types or more.
+const spreadShare = (direction) => {
+  const withIt = SCENES.filter((offers) => offers.some((offer) => offer.type === direction));
+  return ((withIt.filter((offers) => new Set(offers.filter((offer) => offer.type === direction).map((offer) => offer.kind)).size >= 2).length / Math.max(1, withIt.length)) * 100).toFixed(0);
+};
 console.log(
-  `logic streak     offers from ${SCENES.length} scenes of the season (on the table: ${["risk", "inference", "persistence", "reframing"].map((type) => `${type} ${offerShare(type)}%`).join(", ")})`,
+  `logic streak     offers from ${SCENES.length} scenes of the season (on the table: ${[...LOGIC_DIRECTIONS, LOGIC_EVEN].map((direction) => `${direction} ${offerShare("type", direction)}%`).join(", ")}; types, which it no longer reads: ${["risk", "inference", "persistence", "reframing"].map((kind) => `${kind} ${offerShare("kind", kind)}%`).join(", ")}; two types or more inside the direction: ${LOGIC_DIRECTIONS.map((direction) => `${direction} ${spreadShare(direction)}%`).join(", ")})`,
 );
 for (const row of logicRows) {
   console.log(
@@ -339,7 +365,7 @@ const listeningOverBlind = bestHeartbeatSoFar.meanVault / Math.max(1, bestFixed.
 for (const row of logicRows) {
   assert.equal(row.busts, bestHeartbeatSoFar.busts, `${row.label}: the streak must not move the wall: it busts exactly as often as the untyped hand`);
   assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap: ${row.meanVault} against ${bestHeartbeatSoFar.meanVault}`);
-  assert.ok(row.meanVault >= bestHeartbeatSoFar.meanVault, `${row.label}: a card with a type must never bank less than one without`);
+  assert.ok(row.meanVault >= bestHeartbeatSoFar.meanVault, `${row.label}: a card that leans must never bank less than one that does not`);
   assert.ok(
     row.meanVault / bestHeartbeatSoFar.meanVault < listeningOverBlind,
     `${row.label}: the streak must pay less than listening does: the type is the spice, reading the table is the game`,
@@ -347,10 +373,17 @@ for (const row of logicRows) {
 }
 // The band's top was 1.40 while the streak's cap was x1.5 (the hand measured
 // 1.376); the cap rose to x1.6 on 2026-10-16 so that it is worth more than one
-// push, and the same hand measured 1.429.
-assert.ok(holder.meanBonus >= 1.28 && holder.meanBonus <= 1.45, `a hand that holds a type should be paid about what the beat paid a good hand, and a little more since the cap rose past one push (1.28 to 1.45): ${holder.meanBonus}`);
-assert.ok(randomType.meanBonus <= 1.1, `a hand that picks a type at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
-assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a type should pay");
+// push, and the same hand measured 1.429. Under C-3 (2026-10-25) both
+// directions are held to the band, and its top is 1.52: every scene of the
+// season deals a card that leans toward the people, so the hand that holds
+// 사람 is never moved off it and measured 1.504; the one that holds 자리, off
+// the table in 4% of scenes, measured 1.429, what the 위험 다루기 hand did.
+const HOLD_BAND = [1.28, 1.52];
+for (const row of [holder, logicRows.find((row) => row.label === "holds position")]) {
+  assert.ok(row.meanBonus >= HOLD_BAND[0] && row.meanBonus <= HOLD_BAND[1], `a hand that ${row.label} should be paid about what the beat paid a good hand, and a little more since the cap rose past one push (${HOLD_BAND.join(" to ")}): ${row.meanBonus}`);
+}
+assert.ok(randomType.meanBonus <= 1.1, `a hand that picks a card at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
+assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a direction should pay");
 /**
  * LOCK, held to the hand's ratchets. Until 2026-09-28 no hand here ever locked,
  * and LOCK multiplied the pot outside the hand's cap: STRIKE at full charge
@@ -406,7 +439,7 @@ assert.ok(
  *
  * The policies above stake one card and (but for the lock rows) never lock a
  * stance -- which is right for the rules they hold, and meant eight of the
- * thirteen relics could not change a single number: METRONOME needs a type
+ * thirteen relics could not change a single number: METRONOME needs a direction
  * changed after the pressure rose, LOCKPICK a sealed card, SPLINT a fractured
  * axis, ENCORE a streak to keep through a bust, STETHOSCOPE a silenced board,
  * and the three stance relics a mastered stance (LOCKPICK, SPLINT and two of
@@ -415,10 +448,11 @@ assert.ok(
  * the simulation cannot trip is a relic the lift cap cannot catch.
  *
  * So each relic set is replayed by a hand that does all of it: three cards of
- * three types (one burns legitimacy past the fracture line); the card of the
- * type it is holding, except that it takes the sealed card when the board
+ * three types, one leaning toward the people and two toward the position (one
+ * burns legitimacy past the fracture line); the card of the
+ * direction it is holding, except that it takes the sealed card when the board
  * seals one and, one window in five, the next card along because the scene
- * asked for it (a change of type METRONOME can turn into a switch, and a
+ * asked for it (from the people card, a change of direction METRONOME can turn into a switch, and a
  * streak ENCORE can carry through the wall); one window in two, FOCUS presses
  * until the stance is charged, in a stance that rotates by case (the other
  * windows are paid by the streak alone); and one window in twenty-five left to run
@@ -590,8 +624,8 @@ const stepReport = UNLOCK_LADDER.slice(0, -1).map((step) => {
     listen,
     sees: under("sees the wall", (win) => win.gauge + win.schema.stepMax < win.wall),
     skip: under("bust to skip", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true)),
-    holds: under("holds one type", stepListening, LOGIC_HANDS["holds one type"]),
-    wanders: under("random type", stepListening, LOGIC_HANDS["random type"]),
+    holds: under("holds people", stepListening, LOGIC_HANDS["holds people"]),
+    wanders: under("random card", stepListening, LOGIC_HANDS["random card"]),
     // The locking hands play fewer cases, so the unlocked hand they are held to plays the same ones.
     unlocked: under("listening (bracket)", stepListening, null, null, BRACKET_CASES),
     // A press costs clock, and the clock creeps heat into the gauge: the pot a
@@ -604,7 +638,7 @@ const stepReport = UNLOCK_LADDER.slice(0, -1).map((step) => {
 for (const row of stepReport) {
   const { caseId, rules, blind, listen, sees, skip, holds, wanders, unlocked, waited, strike, steady } = row;
   console.log(
-    `step ${caseId}  blind ${blind.meanVault} (${blind.label.slice(caseId.length + 1)}, bust ${(blind.bustRate * 100).toFixed(1)}%)  heartbeat ${listen.meanVault} (${listen.label.slice(caseId.length + 1)})  sees ${sees.meanVault} (${(listen.meanVault / sees.meanVault).toFixed(3)})  skip ${skip.meanVault} (${(skip.meanVault / blind.meanVault).toFixed(3)})${rules.has("logic") ? `  holding a type ${holds.meanVault}` : ""}${rules.has("lock") ? `  LOCK ${strike.meanVault} against ${unlocked.meanVault} (${waited.meanVault} on the same clock)` : ""}`,
+    `step ${caseId}  blind ${blind.meanVault} (${blind.label.slice(caseId.length + 1)}, bust ${(blind.bustRate * 100).toFixed(1)}%)  heartbeat ${listen.meanVault} (${listen.label.slice(caseId.length + 1)})  sees ${sees.meanVault} (${(listen.meanVault / sees.meanVault).toFixed(3)})  skip ${skip.meanVault} (${(skip.meanVault / blind.meanVault).toFixed(3)})${rules.has("logic") ? `  holding a direction ${holds.meanVault}` : ""}${rules.has("lock") ? `  LOCK ${strike.meanVault} against ${unlocked.meanVault} (${waited.meanVault} on the same clock)` : ""}`,
   );
   assert.notEqual(blind.label, row.blindRows[0].label, `${caseId}: never pushing cannot be the best blind policy, or there is no bet`);
   assert.notEqual(blind.label, row.blindRows.at(-1).label, `${caseId}: pushing as far as possible cannot be the best blind policy either`);
@@ -622,20 +656,24 @@ for (const row of stepReport) {
     assert.equal(played.mutated, rules.has("blackout") ? played.midCase : 0, `${caseId}: a bust mid-case deals ${rules.has("blackout") ? "a broken board" : "the plain board"} next (${played.label}: ${played.mutated} of ${played.midCase})`);
   }
 
-  // The streak, where the step has it; a card's type that is paid nothing, where it does not.
+  // The streak, where the step has it; a card's direction that is paid nothing, where it does not.
   assert.equal(holds.busts, listen.busts, `${caseId}: the streak must not move the wall`);
   if (rules.has("logic")) {
-    assert.ok(holds.meanVault > listen.meanVault, `${caseId}: holding a type should pay`);
+    assert.ok(holds.meanVault > listen.meanVault, `${caseId}: holding a direction should pay`);
     assert.ok(holds.meanVault <= Math.ceil(listen.meanVault * HAND_CAP) + 1, `${caseId}: the streak cannot pay past the hand's cap: ${holds.meanVault} against ${listen.meanVault}`);
-    assert.ok(wanders.meanVault <= holds.meanVault, `${caseId}: picking a type at random must never pay better than holding one`);
+    assert.ok(wanders.meanVault <= holds.meanVault, `${caseId}: picking a card at random must never pay better than holding a direction`);
   } else {
-    assert.equal(holds.meanVault, listen.meanVault, `${caseId}: with no streak, a card with a type is paid as any card`);
-    assert.equal(wanders.meanVault, listen.meanVault, `${caseId}: whichever type it is`);
+    assert.equal(holds.meanVault, listen.meanVault, `${caseId}: with no streak, a card that leans is paid as any card`);
+    assert.equal(wanders.meanVault, listen.meanVault, `${caseId}: whichever way it leans`);
   }
   // LOCK, where the step has it, is STRIKE until the stances open.
   if (rules.has("lock")) {
     assert.ok(strike.meanVault > unlocked.meanVault, `${caseId}: a charged LOCK should pay`);
-    assert.ok(strike.meanVault <= Math.ceil(waited.meanVault * HAND_CAP) + 1, `${caseId}: the hand is paid past its cap: ${strike.meanVault} against ${waited.meanVault} for the same clock without a LOCK`);
+    // Once the stances are open STRIKE carries STRIKE WAKE into the next board,
+    // a rule held to STANCE_LIFT_CAP as the whole table's rows are. No step had
+    // the stances until C-4 made 프롤로그 05 a step short of the whole table.
+    const cap = HAND_CAP * (rules.has("stance") ? STANCE_LIFT_CAP : 1);
+    assert.ok(strike.meanVault <= Math.ceil(waited.meanVault * cap) + 1, `${caseId}: the hand is paid past its cap: ${strike.meanVault} against ${waited.meanVault} for the same clock without a LOCK`);
     assert.ok(strike.meanVault < sees.meanVault, `${caseId}: the hand must never be worth more than seeing the wall`);
   }
   if (!rules.has("stance")) assert.equal(steady.meanVault, strike.meanVault, `${caseId}: a hand that asks for STEADY is ${rules.has("lock") ? "locking in STRIKE" : "not locking at all"}`);
@@ -709,28 +747,28 @@ assert.ok(
  * asserted, and it is played after every row above, on seeds of its own or on
  * rows already measured, so no number, tolerance or exit code above moves.
  *
- * The wild card. 판을 다시 짠다 is on the table of some scenes and has a type of
- * its own (`getLogicType`: 판 바꾸기, "reframing"), so the suspicion that a hand
- * staking nothing else can never lose its streak is two hands here: one stakes
- * the wild card whenever a scene deals it and otherwise picks as the random
- * hand does (the same draw), and one holds 판 바꾸기 as "holds one type" holds
- * 위험 다루기 -- the wild card or a written card of that type, whichever the
- * scene has. Both play the listening policy on the windows the five hands
- * above play. The staked card here is the one simulated card with a type
- * given to it, so what is compared is the streak, not the wild card's chips
- * (`check-endings.mjs --report` plays the card itself).
+ * The wild card. 판을 다시 짠다 is on the table of some scenes and has a
+ * direction of its own (`getLogicDirection`: 사람, as REFRAME_EFFECT leans),
+ * so the suspicion that a hand staking nothing else can never lose its streak
+ * is a hand here: it stakes the wild card whenever a scene deals it and
+ * otherwise picks as the random hand does (the same draw). Until C-3 a second
+ * hand held 판 바꾸기 as a type; under C-3 that is "holds people" above. It
+ * plays the listening policy on the windows the hands above play. The staked
+ * card here is the one simulated card leaned that way, so what is compared is
+ * the streak, not the wild card's chips (`check-endings.mjs --report` plays
+ * the card itself). "kept" counts both a held direction not on the table and
+ * a card that leaned neither way.
  */
 const perCentOf = (part, whole) => ((100 * part) / Math.max(1, whole)).toFixed(1);
 const perCent = (part, whole, digits = 1) => ((100 * part) / Math.max(1, whole)).toFixed(digits);
-const isWild = (offer) => offer.chips === 0 && offer.type === "reframing";
+const isWild = (offer) => offer.chips === 0 && offer.kind === "reframing";
 const WILD_HANDS = {
-  "stakes the wild card": (offers, logic, seed) => (offers.some(isWild) ? "reframing" : LOGIC_HANDS["random type"](offers, logic, seed)),
-  "holds 판 바꾸기": (offers) => (offers.some((offer) => offer.type === "reframing") ? "reframing" : offers[0].type),
+  "stakes the wild card": (offers, logic, seed) => (offers.some(isWild) ? getLogicDirection({ type: "reframe" }) : LOGIC_HANDS["random card"](offers, logic, seed)),
 };
 const streakLine = (row) =>
-  `${row.label.padEnd(20)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  pot bonus ${row.meanBonus.toFixed(3)}  at the cap ${(row.capShare * 100).toFixed(0).padStart(3)}%  best streak ${String(row.best).padStart(3)}  mean streak ${(row.seen.streakSum / row.seen.windows).toFixed(2).padStart(5)}  ended by a change of type ${perCent(row.seen.moves.break ?? 0, row.seen.windows).padStart(4)}% of windows, by a bust ${perCent(row.seen.moves.bust ?? 0, row.seen.windows).padStart(4)}%  kept off the table ${perCent(row.seen.moves.keep ?? 0, row.seen.windows).padStart(4)}%`;
+  `${row.label.padEnd(20)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  pot bonus ${row.meanBonus.toFixed(3)}  at the cap ${(row.capShare * 100).toFixed(0).padStart(3)}%  best streak ${String(row.best).padStart(3)}  mean streak ${(row.seen.streakSum / row.seen.windows).toFixed(2).padStart(5)}  ended by a change of direction ${perCent(row.seen.moves.break ?? 0, row.seen.windows).padStart(4)}% of windows, by a bust ${perCent(row.seen.moves.bust ?? 0, row.seen.windows).padStart(4)}%  kept ${perCent(row.seen.moves.keep ?? 0, row.seen.windows).padStart(4)}%`;
 console.log(
-  `measured: wild card (not asserted; on the table of ${SCENES.filter((offers) => offers.some(isWild)).length} of ${SCENES.length} scenes, a written 판 바꾸기 card on ${SCENES.filter((offers) => offers.some((offer) => offer.type === "reframing" && !isWild(offer))).length})`,
+  `measured: wild card (not asserted; on the table of ${SCENES.filter((offers) => offers.some(isWild)).length} of ${SCENES.length} scenes, a written 판 바꾸기 card on ${SCENES.filter((offers) => offers.some((offer) => offer.kind === "reframing" && !isWild(offer))).length})`,
 );
 for (const row of Object.entries(WILD_HANDS).map(([name, pickType]) => measure(name, listening, pickType))) console.log(`measured wild  ${streakLine(row)}`);
 for (const row of logicRows) console.log(`measured hand  ${streakLine(row)}`);
@@ -907,5 +945,5 @@ if (CASCADE_ON) {
 }
 
 console.log(
-  `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; holding a type: ${holder.meanVault} (pot bonus ${holder.meanBonus.toFixed(3)}), a random type: ${randomType.meanVault}; locked: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,
+  `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; holding a direction: ${holder.meanVault} (pot bonus ${holder.meanBonus.toFixed(3)}), a random card: ${randomType.meanVault}; locked: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,
 );

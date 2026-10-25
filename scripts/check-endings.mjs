@@ -415,7 +415,8 @@ if (!process.env.ENDING_BASELINE) {
  */
 if (reportMode) {
   const LOGIC_SEASONS = Number(process.env.ENDING_LOGIC_SEASONS) || 40;
-  const hands = { "holds one type": { logicHand: "hold", holds: "risk" }, "switches when the pressure rose": { logicHand: "switch", holds: "risk" } };
+  // Held on a direction since C-3 (2026-10-25): 사람 쪽, the one on more of the season's tables.
+  const hands = { "holds one direction": { logicHand: "hold", holds: "people" }, "switches when the pressure rose": { logicHand: "switch", holds: "people" } };
   const lines = Object.entries(hands).map(([name, hand]) => {
     ARCHETYPES[name] = { values: {}, noise: 0, ...hand };
     const seasons = Array.from({ length: LOGIC_SEASONS }, (_, index) => playSeason(`logic:${name}:${index}`, name).logic);
@@ -435,8 +436,9 @@ if (reportMode) {
  * season, the same for both hands, so the two are the same player (heat, tell,
  * origin) at the same walls and differ in the one habit. The question it is
  * here for is whether the wild card is a way never to lose the logic streak.
- * It is not a free one: the card has a type of its own (`getLogicType`: 판
- * 바꾸기), so staking it after another type is a change of type like any other.
+ * It is not a free one: the card has a direction of its own
+ * (`getLogicDirection`: 사람, as REFRAME_EFFECT leans), so staking it after
+ * a 자리 card is a change of direction like any other.
  *
  * The second part reads the population above for the plan's other suspicions:
  * what the streak pays and whether its door moves an ending, which push a bust

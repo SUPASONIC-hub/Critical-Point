@@ -31,7 +31,8 @@
  *
  * A rule of the table since RULES_MARK 3 (B3 and B2 together, one ranking
  * reset): on in a case whose rules have `audit` (tableUnlocks.js: from
- * 프롤로그 04, and from the first case under NEW GAME+), never in story mode
+ * 사건 02 since RULES_MARK 4 -- 프롤로그 04 at RULES_MARK 3 -- and from the
+ * first case under NEW GAME+), never in story mode
  * or a practice case (decision 9). Before that it was 2026-W47's test week, a
  * device that week's rule switched on; its numbers, below, are the ones that
  * week played.
@@ -168,7 +169,7 @@ export function readAudit(run, count, win) {
 
 /**
  * The cash button's description: what this cash does to the audit (on a
- * CASCADE board a cold cash leaves it as it is; 프롤로그 04's line says why). 초안.
+ * CASCADE board a cold cash leaves it as it is; the line that opened the audit in 프롤로그 04 at RULES_MARK 3 said why). 초안.
  */
 const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
   ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;
@@ -179,10 +180,13 @@ const describeAudit = ({ count, limit }) =>
 
 /**
  * The cases whose step of the ladder does not have the audit yet (tableUnlocks.js
- * opens it at 프롤로그 04). Written out so the table record's chunk does not
- * take the ladder; a unit test holds it to `rulesFor`.
+ * opens it at 사건 02 since RULES_MARK 4, C-4). Written out so the table
+ * record's chunk does not take the ladder; a unit test holds it to `rulesFor`.
+ * `CASES_BEFORE_AUDIT_MARK3` is the ladder of RULES_MARK 3, which opened it at
+ * 프롤로그 04: a case closed then is read by the ladder it was played on.
  */
-export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "prologue03"]);
+export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01"]);
+export const CASES_BEFORE_AUDIT_MARK3 = Object.freeze(["prologue01", "prologue02", "prologue03"]);
 
 /**
  * The table record's audit sentence (GauntletLedger.jsx), or null: one more
@@ -190,9 +194,10 @@ export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "pr
  * stay as they are (user, 2026-10-20, the PR's first question, choice 1).
  * Rebuilt from what the record has, as the rest of it is: the count off the
  * case's log (what the close judged), the case and the case summary
- * (`summary`, createRunSummary). A case closed at RULES_MARK 3 or later counts
- * from 프롤로그 04 on (the summary does not say NEW GAME+, so its first three
- * prologues say nothing); one closed before it says nothing (2026-W47's
+ * (`summary`, createRunSummary). A case closed at RULES_MARK 4 or later counts
+ * from 사건 02 on, one closed at RULES_MARK 3 from 프롤로그 04 on (the summary
+ * does not say NEW GAME+, so its cases before those say nothing); one closed
+ * before RULES_MARK 3 says nothing (2026-W47's
  * cases were the only ones that counted, and the record is only ever the case
  * on the table). A story case and a replayed one count nothing, as
  * `isAuditOn` says; the log tells which by an entry's `assistStory` or the
@@ -204,7 +209,8 @@ export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "pr
  */
 export function describeAuditLedger(log, summary, caseId) {
   if (!log.some((entry) => entry?.threshold) || log.some((entry) => entry?.assistStory || entry?.threshold?.firstRecord)) return null;
-  if (!(summary?.tableRules >= 3) || CASES_BEFORE_AUDIT.includes(caseId)) return null;
+  const mark = Number(summary?.tableRules);
+  if (!(mark >= 3) || (mark >= 4 ? CASES_BEFORE_AUDIT : CASES_BEFORE_AUDIT_MARK3).includes(caseId)) return null;
   const count = countAudit(log);
   const limit = getAuditLimit(summary?.relics);
   return `감사 ${count}/${limit}칸으로 닫혔다.${count < limit ? "" : " 적발."}`;

@@ -206,11 +206,11 @@ test("a case that has the streak rule still shows none for a run that holds no s
 });
 
 test("the streak in the forecast is the one with the staked card played", () => {
-  const inference = { id: "a", label: "a", effect: { capital: 2 }, cognition: { inference: 2 }, next: "x" };
-  const bare = forecast({ offered: ["inference"] });
-  const staked = forecast({ offered: ["inference"], selectedCard: inference });
+  const people = { id: "a", label: "a", effect: { trust: 2 }, cognition: { inference: 2 }, next: "x" };
+  const bare = forecast({ offered: ["people"] });
+  const staked = forecast({ offered: ["people"], selectedCard: people });
   assert.deepEqual([bare.logic.move, bare.logic.type], [null, null], "nothing staked, nothing moved");
-  assert.deepEqual([staked.logic.move, staked.logic.type, staked.logic.held], ["build", "inference", "1/3"]);
+  assert.deepEqual([staked.logic.move, staked.logic.type, staked.logic.held], ["build", "people", "1/3"], "the direction it leans, 사람 (C-3)");
 });
 
 test("the rules a bust left on the table are named, counted as heat and given a way out", () => {

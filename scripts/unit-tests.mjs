@@ -902,7 +902,9 @@ test("stance mastery survives saves and reshapes future boards", () => {
 
 /* ----------------------------------------------------------------- hand */
 
-const typed = (id, type, effect = { capital: 10, trust: -4 }) => card(id, effect, { cognition: { [type]: 3 } });
+// The streak is held on a card's direction since C-3 (2026-10-25), read off its effect: a `risk`
+// card here leans toward the position and any other toward the people, each paying 10 and burning 4.
+const typed = (id, type, effect = type === "risk" ? { capital: 10, trust: -4 } : { trust: 10, capital: -4 }) => card(id, effect, { cognition: { [type]: 3 } });
 const cashedAt = (gauge, extra = {}) => ({ status: "cashed", gauge, wall: 90, pushes: 2, ...extra });
 
 test("no press is graded: a push is a push whenever it lands, and nothing it carries is read", () => {
@@ -963,7 +965,7 @@ test("the streak pays the pot from the third card of a type, and the heat multip
 });
 
 test("LOCK and the streak are paid under one cap, LOCK's share under its own", () => {
-  const run = normalizeRunState({ logic: { streak: 9, best: 9, type: "risk", held: 11 } });
+  const run = normalizeRunState({ logic: { streak: 9, best: 9, type: "position", held: 11 } });
   const locked = resolveWindow({ run, window: cashedAt(20, { focus: 100, focusMode: "strike", focusHits: 5 }), card: typed("a", "risk") }).verdict;
   assert.equal(locked.logic.bonus, HAND_CAP, "the streak alone is at the cap");
   assert.equal(locked.focus.potMultiplier, 1, "so a full LOCK adds nothing to this pot");
@@ -1188,7 +1190,7 @@ test("the stance relic unlocks from mastery and bends its mastered board", () =>
 });
 
 test("INSURANCE keeps a third of the pot once a case, and ENCORE keeps the logic streak through every bust", () => {
-  const streak = { streak: 5, best: 5, type: "risk", held: 7 };
+  const streak = { streak: 5, best: 5, type: "position", held: 7 };
   const run = normalizeRunState({ relics: ["insurance", "encore"], runPot: 900, runHand: 90, logic: streak });
   const first = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
   assert.equal(first.verdict.insuredPot, 300);

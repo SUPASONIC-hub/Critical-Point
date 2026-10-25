@@ -4,7 +4,8 @@ import { directionParticle, easyCognitionLabels } from "./playerLanguage.js";
 
 /**
  * The season's logic report: one panel on the closing report that names the
- * case the table ran hottest in and what the hand did with its types there,
+ * case the table ran hottest in and what the hand did with its directions
+ * there (사람 or 자리, the axis the streak is held on since C-3),
  * and prints the season's hold rate beside its longest streak.
  *
  * It reads the cases' stored summaries and nothing else. The log is cleared
@@ -37,13 +38,16 @@ export const LOGIC_REPORT_COPY = {
   lead: (caseName) => `열기가 가장 높았던 사건은 ${caseName}입니다.`,
   held: (windows, count, type) => `그 사건의 ${windows}판 가운데 ${count}판을 '${type}'${directionParticle(type)} 닫았습니다.`,
   heldAll: (windows, type) => `그 사건의 ${windows}판을 모두 '${type}'${directionParticle(type)} 닫았습니다.`,
-  switched: (count) => `그 사건에서 열기가 오른 뒤 유형을 ${count}번 바꿨고, 논리 콤보는 끊기지 않았습니다.`,
-  broken: (count) => `그 사건에서는 한 유형에 머물지 않았고, 논리 콤보가 ${count}번 끊겼습니다.`,
-  unbroken: "그 사건에서는 한 유형에 머물지 않았지만, 논리 콤보는 끊기지 않았습니다.",
+  switched: (count) => `그 사건에서 열기가 오른 뒤 방향을 ${count}번 바꿨고, 논리 콤보는 끊기지 않았습니다.`,
+  broken: (count) => `그 사건에서는 한 방향에 머물지 않았고, 논리 콤보가 ${count}번 끊겼습니다.`,
+  unbroken: "그 사건에서는 한 방향에 머물지 않았지만, 논리 콤보는 끊기지 않았습니다.",
   tooFew: "논리 콤보 기록이 있는 사건이 아직 적어, 열기가 가장 높았던 사건을 짚지 않습니다.",
   hold: (score) => `논리 유지력 ${score}점`,
   best: (streak) => `최고 논리 콤보 ${streak}`,
-  caption: "논리 유지력은 콤보가 끊길 수 있던 판 가운데 끊기지 않은 판의 비율입니다. 관점 전환 점수와는 반대로 움직일 수 있습니다.",
+  // Until C-3 (2026-10-25) the streak was held on a thinking type, and this
+  // said the score could move against 관점 전환's. Held on a direction, the
+  // two can rise together.
+  caption: "논리 유지력은 콤보가 끊길 수 있던 판 가운데 끊기지 않은 판의 비율입니다. 같은 방향을 지키는 힘이라, 생각 유형을 고르게 쓰는 관점 전환 점수와 함께 오를 수 있습니다.",
 };
 
 /**
@@ -149,17 +153,21 @@ export function getHottestCase(caseResults = {}, cases = []) {
   return hottest;
 }
 
+/** What the record's `top` calls a direction (C-3); a record from before it holds a thinking type. */
+const DIRECTION_LABELS = Object.freeze({ people: "사람 쪽", position: "자리 쪽" });
+
 /**
- * What the hand did with its types in one case. Held: at least half of the
- * case's windows were closed on one type. Switched: not that, but every change
- * of type answered a rise in the heat, and nothing ended the streak. Otherwise
- * the hand did not stay on a type, and the line counts how often the streak
- * ended (a break or a bust; `getSeasonLogic` counts the same two).
+ * What the hand did with its directions in one case. Held: at least half of
+ * the case's windows were closed on one direction. Switched: not that, but
+ * every change of direction answered a rise in the heat, and nothing ended the
+ * streak. Otherwise the hand did not stay on a direction, and the line counts
+ * how often the streak ended (a break or a bust; `getSeasonLogic` counts the
+ * same two).
  */
 export function describeLogicCase(record) {
   const windows = count(record, "windows");
   const [type, picked] = Array.isArray(record?.top) ? record.top : [];
-  const label = easyCognitionLabels[type];
+  const label = Object.hasOwn(DIRECTION_LABELS, type ?? "") ? DIRECTION_LABELS[type] : easyCognitionLabels[type];
   const held = Math.min(windows, Math.max(0, Math.trunc(Number(picked) || 0)));
   if (label && held * 2 >= windows) return held === windows ? LOGIC_REPORT_COPY.heldAll(windows, label) : LOGIC_REPORT_COPY.held(windows, held, label);
   const ended = count(record, "breaks") + count(record, "busts");

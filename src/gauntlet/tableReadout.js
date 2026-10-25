@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { formatNumber, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
-import { advanceLogic, getLogicBonus, getLogicType } from "./logicStreak.js";
+import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
@@ -77,20 +77,24 @@ export function describeVerdictCause(verdict) {
 export const getTypeName = (type) => easyCognitionLabels[type] ?? "";
 
 /**
- * The one word of each name a phone's card has room for. A card there is half
- * a 360px screen wide and its stats row already holds the chips and the burn,
- * so the tag prints this word and keeps the rest of the name for a screen
- * reader and for a wider card (`getTypeParts`).
+ * The names the streak's two directions go by (C-3), and what a card that
+ * leans neither way is called. A verdict logged before C-3 holds a thinking
+ * type where the direction now is, and is read by the type's name.
  */
-const TYPE_KEYWORDS = Object.freeze({ persistence: "버티기", inference: "확인", reframing: "바꾸기", risk: "위험" });
+export const DIRECTION_NAMES = Object.freeze({ people: "사람", position: "자리", [LOGIC_EVEN]: "중립" });
+export const getDirectionName = (direction) => DIRECTION_NAMES[direction] ?? getTypeName(direction);
 
-/** A type's name cut around its keyword: what comes before it, the word, and what comes after. */
-export function getTypeParts(type) {
-  const name = getTypeName(type);
-  const word = TYPE_KEYWORDS[type] ?? name;
-  const at = name.indexOf(word);
-  return [name.slice(0, at), word, name.slice(at + word.length)];
+/**
+ * A direction's name as the tag and the streak's line print it: the word, and
+ * " 쪽" after it, which a phone's card has no room for (the `i` elements
+ * play.css clips there) and a screen reader still reads. A card that leans
+ * neither way is just 중립.
+ */
+export function getDirectionParts(direction) {
+  const name = getDirectionName(direction);
+  return [name, DIRECTION_NAMES[direction] && direction !== LOGIC_EVEN ? " 쪽" : ""];
 }
+
 
 const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
 
@@ -100,22 +104,24 @@ const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
  * in play on, or a verdict logged before the streak paid.
  */
 export function describeLogicMove(logic) {
-  const type = getTypeName(logic?.type);
+  const side = `${getDirectionName(logic?.type)} 쪽`;
   const streak = Number(logic?.streak) || 0;
   const paid = `논리 콤보 ${streak}, 배율 ${bonusText(logic?.bonus)}.`;
   // FIELD NOTES holds a type one window shorter; the verdict says which hold it read.
   const hold = Number(logic?.hold) || LOGIC_HOLD;
   switch (logic?.move) {
     case "grow":
-      return `${type}${objectParticle(type)} 이어 갔다. ${paid}`;
+      return `${side}${objectParticle(side)} 이어 갔다. ${paid}`;
     case "build":
-      return `${type} ${Math.min(hold, Number(logic.held) || 1)}/${hold}. 같은 유형 ${hold === LOGIC_HOLD ? "세" : "두"} 번째부터 콤보가 오른다. ${paid}`;
+      return `${side} ${Math.min(hold, Number(logic.held) || 1)}/${hold}. 같은 방향 ${hold === LOGIC_HOLD ? "세" : "두"} 번째부터 콤보가 오른다. ${paid}`;
     case "switch":
-      return `열기가 오른 판에서 ${type}${directionParticle(type)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
+      return `열기가 오른 판에서 ${side}${directionParticle(side)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
     case "keep":
-      return `지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. ${paid}`;
+      return logic.type === LOGIC_EVEN
+        ? `어느 쪽으로도 기울지 않은 카드였다. 콤보는 그대로다. ${paid}`
+        : `지키던 방향의 카드가 이 장면에 없었다. 콤보는 그대로다. ${paid}`;
     case "break":
-      return `열기가 오르지 않았는데 ${type}${directionParticle(type)} 바꿨다. 논리 콤보는 0, 다시 1/${hold}부터 센다.`;
+      return `열기가 오르지 않았는데 ${side}${directionParticle(side)} 바꿨다. 논리 콤보는 0, 다시 1/${hold}부터 센다.`;
     case "bust":
       return streak > 0 ? `벽에 닿았지만 논리 콤보 ${streak}${topicParticle(String(streak))} 남았다.` : "벽에 닿아 논리 콤보가 끊겼다.";
     default:
@@ -132,15 +138,15 @@ const MOVE_COPY = Object.freeze({ grow: "이어 감", build: "쌓는 중", switc
 
 /**
  * The streak as the table shows it while a window is open: where it stands,
- * and what each card would do to it. `offered` is the types the scene has on
- * the table (`listOfferedTypes`), the same list the settlement is handed, so
- * the streak a card is shown to leave is the one its pot is paid on.
+ * and what each card would do to it. `offered` is the directions the scene
+ * has on the table (`listOfferedDirections`), the same list the settlement is
+ * handed, so the streak a card is shown to leave is the one its pot is paid on.
  *
  * `after` is the streak with the staked card played (the run's own with none
  * staked), and `bonus` what that pays; the pot's own line prints the bonus.
- * `type` and `held` are the type being held and how
+ * `type` and `held` are the direction being held (사람 or 자리) and how
  * far the hold has got, and `note` what the staked card does, or that a change
- * of type would count. `line` is those in one line -- the sentence a test or a
+ * of direction would count. `line` is those in one line -- the sentence a test or a
  * wide screen reads whole -- and `spoken` the sentence the push and confirm
  * buttons are described by.
  */
@@ -148,12 +154,12 @@ export function readLogic({ logic, card, offered, relics = [] }) {
   const reach = hasRelic(relics, "metronome");
   const holdAt = hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD;
   const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt });
-  const moveOf = (candidate) => play(getLogicType(candidate)).move;
-  const staked = card ? play(getLogicType(card)) : null;
+  const moveOf = (candidate) => play(getLogicDirection(candidate)).move;
+  const staked = card ? play(getLogicDirection(card)) : null;
   const now = staked?.logic ?? logic;
   const open = logic.rose || (reach && logic.reach > 0);
   const held = `${Math.min(holdAt, now.held)}/${holdAt}`;
-  const hold = now.type ? `${getTypeName(now.type)} ${held}` : "첫 카드부터 센다";
+  const hold = now.type ? `${getDirectionName(now.type)} 쪽 ${held}` : "첫 카드부터 센다";
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;
   const note = did ?? (open && !staked ? "전환 가능" : "");
@@ -166,7 +172,7 @@ export function readLogic({ logic, card, offered, relics = [] }) {
     held,
     note,
     line: [`논리 콤보 ${now.streak}`, hold, note].filter(Boolean).join(" · "),
-    spoken: `논리 콤보 ${now.streak}, 배율 ${bonus.toFixed(2)}배. ${hold}.${did ? ` 이 카드로 ${did}.` : open && !staked ? " 열기가 올라 유형을 바꿔도 콤보가 오른다." : ""}`,
+    spoken: `논리 콤보 ${now.streak}, 배율 ${bonus.toFixed(2)}배. ${hold}.${did ? ` 이 카드로 ${did}.` : open && !staked ? " 열기가 올라 방향을 바꿔도 콤보가 오른다." : ""}`,
   };
 }
 
@@ -178,7 +184,7 @@ export const describeCardMove = (move) => (MOVE_COPY[move] ? `(콤보 ${MOVE_COP
  * only "ends the streak or not", and colour alone says nothing to a player who
  * cannot tell cyan from grey (WCAG 1.4.1): the sign is what the streak's number
  * would do. Up for a card that raises it, the two-way arrow for one that
- * raises it by changing type, level for one that leaves it where it is, and a
+ * raises it by changing direction, level for one that leaves it where it is, and a
  * cross for the one that ends it. All four are glyphs the game's face draws
  * (the heavy cross U+2715 is on the charset list and not in Pretendard).
  */
