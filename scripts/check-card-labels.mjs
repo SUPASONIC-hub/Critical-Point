@@ -42,7 +42,8 @@
  * (reversals-29-35 and story-copy-1 wrote into scenes A-8 had brought under),
  * and 114 once batch A (story-first10's prologues) was merged under it;
  * 74 and 476 on 2026-10-25 after 묶음 A-13 (#291 #292 #294 #296) moved
- * forty bodies under 420 (c45_stories 685 -> 419, c47_steam now the longest).
+ * forty bodies under 420 (c45_stories 685 -> 419, c47_steam now the longest);
+ * 73 after 시대 고증 A, which shortened c6_start to make room for one line.
  * The `lead` above the body is not
  * counted: it is one line, written to be read first. The check lives here,
  * not in a script of its own, because it is the same count and the same
@@ -57,7 +58,7 @@ import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameDa
 const MAX_LABEL = 30;
 
 const MAX_TEXT = 420;
-const TEXT_OVER_CEILING = 74;
+const TEXT_OVER_CEILING = 73;
 const LONGEST_TEXT = 476;
 
 // The lengths the distribution is reported at; MAX_LABEL is one of them.

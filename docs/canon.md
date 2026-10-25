@@ -72,16 +72,67 @@ Three of these are reveals, and each still means what it meant:
 - 13:32 and 18:44 -- the person who returned the dissent and the person who
   erased it were not the same person.
 
+## Who owns KD
+
+| Fact | Value |
+|---|---|
+| Largest shareholder | 킹스데일 파트너스 (Kingsdale Partners), a global private-equity and asset-management group headquartered in New York. KD is Kingsdale's initials |
+| Stake | About 30% of KD금융그룹 (KD은행, KD캐피탈, KD데이터랩, KD자산운용, KD생명): the largest single holding, not a majority |
+| How | After the 1998 외환위기 it bought the failed 옛 경동은행 and renamed it KD은행, then sold part of it in the 2010s; the Korean group is one square of its Asia portfolio |
+| In the March vote | Its ~30% is inside the 외국인 68% of 사건 23 and votes 찬성; the 22.7% that follows 클리어보트 is other foreign institutions. So 찬성 50.6% stands |
+| On the boards | 사건 25: at the KD캐피탈 이사회 of 3월 16일 the two Kingsdale directors head the 찬성 list, by video. 사건 43's 5 대 3 stands; the vote may show which directors sit for New York |
+| Where the pressure comes from | New York's quarterly ROE target, the dividend and the 「아시아 포트폴리오 리뷰」; English mail and dawn video calls on New York time; the board seats New York appoints; a rumour that the value is being raised before a sale |
+| Seoul's window | 그룹전략실, 본사 33층: it makes the New York numbers come out |
+
+The owner is a company and is drawn only as a company. No person in the
+season is given an ethnicity or religion through it, and nothing in the copy
+may suggest that a people or a faith runs world finance. It is woven in
+lightly, a line or two where the group, its headquarters, shareholders, board,
+dividends, personnel or a sale come up; the people, endings and order of the
+cases do not change for it. 사건 43's 5 대 3 and 사건 44's sentence stand.
+`check:canon` holds the name (킹스데일 / Kingsdale) and the 30%.
+
+## The era: 2023 and 2026 in a Korean bank
+
+The 프롤로그 is 2022-23 and the main season 2025-26, so the bank works the way
+a Korean bank did then. What changed on 2026-10-25 (시대 고증 묶음 A/B/C):
+
+| Then (wrong) | Now |
+|---|---|
+| A loan file handed over as a 서류철 | A 심사 파일 assigned in the 대출 심사 시스템; printouts are fine for reading |
+| A 도장 or 사인 on an internal document | 전자 승인, 「자기 사번으로 승인」, 전자서명 (OTP). A 부서 도장 with no name is a 승인 that shows only the department |
+| A 접수 도장 at a bank, 인사부 or public office | A 접수 번호 |
+| A committee leafing through papers | 화면 공유 and tablets; a 회의용 출력물 is still realistic |
+| A 기록 보관실 of paper bundles tied with string | 문서관리시스템 (scans, 보존연한, view and download logs, the 보관 → 폐기 state the 18:44 entry already uses), 망분리 단말, 워터마크 출력, 출입카드 로그 |
+| 임경수's string-tied bundles and his knot ("누가 풀면 표가 나네") | Watermarked printouts in clips and binders under a 봉인 테이프 he signs; it leaves a VOID pattern when torn ("누가 뜯으면 표가 나네"). Replacing it cannot forge his signature (사건 01) |
+| 감사팀 서고, 지점 서고·문서고 | 감사팀 자료실, 지점 자료실 |
+| 트리거랩 기록 보관소 B2 as a paper stack room | The name stays. Inside it is the old 전산센터's 백업 아카이브 (the shelves where 204 of 임경수's 312 boxes went in 사건 19) and a 반출 금지 열람실; never 「서고」 |
+| 이사회 문서 보관소, KD캐피탈 문서 보관소 | 이사회 문서 시스템, 문서관리시스템 |
+| 내선 전화 대장 (사건 17) | 내선 통화 기록, kept in the 백업 아카이브 |
+| 한서윤 signing the return in 2023 | The 「반려 버튼」 she pressed at 13:32: the same fact |
+
+What stays paper because it still is: a personal 수첩 (반재욱's black notebook,
+도윤하's spring notebook), meeting printouts, receipts, business cards, the
+original 계약서 with its 법인인감, the seal of a small company or 협동조합,
+registered mail and court papers. The 「서명란」 and the 「빈 서명란」 stay:
+they are the unsigned slot of an approval line, not a line on paper. The
+빈 서명란 of the 2023-0412 approval (page 3, the pencil dot) and the 뒷장 of the
+dissent are read as pencil marks left on the committee's 회의용 출력물, standing
+beside the 「미서명」 state of the approval line. A clue
+that leaned on paper keeps its logic in a digital twin: an unsigned slot is a
+「미서명」 state, a half receipt is a receipt photo or a card statement, an
+archive visit is a view log or a card-gate log.
+
 ## The building
 
 | Floor | Who |
 |---|---|
 | 본점 6층 | 기업금융전략팀: 심사실, 팀장실, and in 2022 the trainee desk |
 | 본점 7층 | 인사부 면담실 |
-| 본점 8층 | 기업대출심사팀 (임경수) and its 기록 보관실; 대출심사위원회 회의실 |
-| 본점 지하 1층 | The 기록 보관실 where committee papers are bound |
+| 본점 8층 | 기업대출심사팀 (임경수) and its 심사 기록 열람실 (망분리 단말, 열람 로그, 워터마크 출력); 대출심사위원회 회의실 |
+| 본점 지하 1층 | 문서 스캔실: committee papers and their 날인 원본 are scanned into the 문서관리시스템; the paper is kept in sealed 보존 상자 until its 보존연한 |
 | 본사 33층 | 그룹전략실; by 사건 49 "옛 그룹전략실" |
-| 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소 |
+| 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소: the old 전산센터's 백업 아카이브 (백업 테이프, 보존 상자 412개) and a 반출 금지 열람실 |
 | KD캐피탈 12층 / 20층 | 위험관리부 / 대표이사실 |
 
 The finale's night runs in one order on every path: 합정동 B2 (the inside
