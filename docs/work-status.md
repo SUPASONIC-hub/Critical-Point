@@ -181,7 +181,11 @@ Still open, on purpose:
   ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
   and two steps in `verify-ranking.yml`: the settle call right after the
   marks, from the same check, and a job of its own with `contents: write`
-  that force-pushes one commit to the orphan branch `hall-of-fame`. A week's
+  that force-pushes one commit to the orphan branch `hall-of-fame`. Each
+  board is read on its own: the threshold of ten counts the board's complete
+  seasons with no mark over the whole board (`hall_of_fame_counts`, counted
+  again inside the settle call), and the replay reads each open board's first
+  ten candidates beside the top `limit`. A week's
   board settles four weeks after its Monday; a table's once the next table's
   board is first written. Not merged: the migration applies on merge, and the
   design waits for #224 and seven days of the daily check (the week of 11-16

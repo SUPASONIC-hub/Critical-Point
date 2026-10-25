@@ -27,6 +27,19 @@
  * the ranking's own order (buildLeaderboard), and only once ten seasons on it
  * passed (question 6 (1)); below that it is kept empty, 「표본 부족」.
  *
+ * Each board is read on its own (assumption 4 of the draft, resolved): the
+ * ten are counted over the whole board, not over the rows the day's check
+ * replayed. A season counts when it is a complete public season on that board
+ * with no mark at all (`suspicion` an empty array: the insert trigger judged
+ * it and found nothing, and no daily check marked it), whether or not the
+ * replay ever reached it. The server counts it, `hall_of_fame_counts()`
+ * (20261102040000_hall_of_fame.sql), after the day's marks are written; the
+ * CI job reads that count (HALL_OF_FAME_COUNTS_SQL) and hall_of_fame_settle
+ * counts again itself, so a place below ten is refused whatever the call says.
+ * The replay, which a place still needs, reads only each open board's first
+ * HALL_OF_FAME_CANDIDATES seasons that could stand (verify-ranking-rows
+ * --runs-sql), beside the ranking's top `limit` it always read for the marks.
+ *
  * Tags are the ranking screen's own words (RankingScreen): NEW GAME+,
  * 테이블 시간 ×1.5 / ×2, 붕괴한 시즌. Table time and collapse stay as tags
  * (question 3 (1)), NEW GAME+ runs share the board (question 4 (1)).
@@ -43,7 +56,28 @@ import { RECHECK_MARKS } from "./rankingRecheck.js";
 export { HALL_OF_FAME_MIN_SEASONS, HALL_OF_FAME_PLACES, WEEK_SETTLE_DAYS, hallOfFameBoardLabel };
 
 /** The marks the daily check states whole each day; the trigger's are the rest. */
-const CHECKER_MARKS = new Set([...RECHECK_MARKS, CHAIN_MARK]);
+export const CHECKER_MARK_LIST = Object.freeze([...RECHECK_MARKS, CHAIN_MARK]);
+const CHECKER_MARKS = new Set(CHECKER_MARK_LIST);
+
+/**
+ * Seasons the replay reads on each open board, best first, among those that
+ * could stand (complete, no mark but the checker's own): enough for three
+ * places with room for seven refused.
+ */
+export const HALL_OF_FAME_CANDIDATES = 10;
+
+/** The one read-only SELECT of each board's count (hall_of_fame_counts, service role only). */
+export const HALL_OF_FAME_COUNTS_SQL = "select board, checked from public.hall_of_fame_counts() order by board;";
+
+/** That SELECT's answer as board -> count; anything else is left out. */
+export function readHallOfFameCounts(rows = []) {
+  const counts = new Map();
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const checked = Number(row?.checked);
+    if (typeof row?.board === "string" && Number.isInteger(checked) && checked >= 0) counts.set(row.board, checked);
+  }
+  return counts;
+}
 
 const WEEK_KEY = /^([0-9]{4})-W(0[1-9]|[1-4][0-9]|5[0-3])$/;
 
@@ -99,30 +133,35 @@ export function hallOfFameTags(rows) {
 
 /**
  * The day's boards from the day's check: `results` from verifyRows, `rows`
- * every row read, `rulesMark` the table's. The table board is always among
- * them, so the day after a reset settles the board before (hall_of_fame_settle).
- * Returns [{ board, checked, places: [{ run_tag, score, rank, style, tags }] }],
- * and beside it why each run left out was left out (by run tag, for the log).
+ * every row read, `rulesMark` the table's, `counts` each board's count of
+ * seasons with no mark (readHallOfFameCounts; the whole board, not the rows
+ * read). The boards are the table's, always, so the day after a reset settles
+ * the board before (hall_of_fame_settle), and each board a run read today
+ * stands on; a board none was read for (settled, or nothing to replay) is not
+ * written. Returns [{ board, checked, places: [{ run_tag, score, rank, style,
+ * tags }] }], and beside it why each run left out was left out (by run tag,
+ * for the log).
  */
-export function pickHallOfFame({ results, rows, rulesMark }) {
+export function pickHallOfFame({ results, rows, rulesMark, counts = new Map() }) {
   const byRun = new Map();
   for (const row of rows) {
     if (typeof row?.run_id !== "string" || !row.run_id) continue;
     if (!byRun.has(row.run_id)) byRun.set(row.run_id, []);
     byRun.get(row.run_id).push(row);
   }
+  const countOf = (board) => (counts instanceof Map ? counts.get(board) : counts?.[board]) ?? 0;
   const boards = new Map([[tableBoard(rulesMark), []]]);
   const left = [];
   for (const result of results) {
     const runRows = byRun.get(result.runId) ?? [];
-    const refusal = hallOfFameRefusal(result, runRows);
     const ranking = runRows.find((row) => row.case_id === "season-final");
+    const board = boardOf(ranking, rulesMark);
+    if (!boards.has(board)) boards.set(board, []);
+    const refusal = hallOfFameRefusal(result, runRows);
     if (refusal) {
       left.push({ runTag: ranking?.run_tag ?? null, refusal });
       continue;
     }
-    const board = boardOf(ranking, rulesMark);
-    if (!boards.has(board)) boards.set(board, []);
     boards.get(board).push({ ranking, tags: hallOfFameTags(runRows) });
   }
   const picked = [...boards].map(([board, seasons]) => {
@@ -133,17 +172,21 @@ export function pickHallOfFame({ results, rows, rulesMark }) {
       .map(({ ranking }) => ({ run_tag: ranking.run_tag, case_id: "season-final", summary: ranking.summary, score: ranking.summary.burstScore, completed_at: ranking.completed_at ?? "" }))
       .sort((a, b) => b.score - a.score || String(a.completed_at).localeCompare(String(b.completed_at)));
     const entries = buildLeaderboard(ordered, HALL_OF_FAME_PLACES);
-    const places = seasons.length < HALL_OF_FAME_MIN_SEASONS
+    const checked = countOf(board);
+    const places = checked < HALL_OF_FAME_MIN_SEASONS
       ? []
       : entries.map((entry) => ({ run_tag: entry.runTag, score: entry.score, rank: entry.rank, style: entry.style, tags: tagsOf.get(entry.runTag) ?? [] }));
-    return { board, checked: seasons.length, places };
+    return { board, checked, places };
   });
   return { boards: picked, left };
 }
 
-/** The one statement that writes the day's boards (hall_of_fame_settle). Names run tags only. */
+/**
+ * The one statement that writes the day's boards (hall_of_fame_settle). Names
+ * run tags only. The count is not sent: the function counts each board itself.
+ */
 export function hallOfFameSql(boards) {
-  const json = JSON.stringify(boards).replace(/'/g, "''");
+  const json = JSON.stringify(boards.map(({ board, places }) => ({ board, places }))).replace(/'/g, "''");
   return `select public.hall_of_fame_settle('${json}'::jsonb) as settled;`;
 }
 
@@ -207,7 +250,7 @@ export function formatHallOfFameMarkdown(boards) {
     "매일 23:55(한국 시간) 랭킹 검사를 통과한 시즌 가운데 판마다 1~3위를 남깁니다. 랭킹을 비워도 이 표는 남습니다.",
     "",
     "- **들어가는 기록**: 공개 랭킹의 완주 시즌 가운데, 그날 검사가 처음부터 끝까지 다시 계산했고(다시 하기 기록이 빠진 판 없음) 표시가 하나도 없는 시즌만.",
-    `- **문턱**: 그 판에서 검사를 통과한 시즌이 ${HALL_OF_FAME_MIN_SEASONS}건이 안 되면 칸을 비워 두고 「표본 부족」으로 적습니다.`,
+    `- **문턱**: 그 판의 표시 없는 완주 시즌(저장 때 검사에서도, 매일 검사에서도 표시를 받지 않은 시즌, 판 전체에서 셈)이 ${HALL_OF_FAME_MIN_SEASONS}건이 안 되면 칸을 비워 두고 「표본 부족」으로 적습니다.`,
     `- **확정**: 본 판은 랭킹을 비울 때 마지막 날의 표가 최종입니다. 주간 판은 그 주 월요일 + ${WEEK_SETTLE_DAYS / 7}주 뒤 첫 검사에서 확정하고, 그때까지 「잠정」입니다.`,
     "- **보이는 것**: 실행 번호(`RUN` 뒤 여덟 글자), 판단 유형, 점수, 랭크, 꼬리표뿐입니다. 이름, 전체 실행 ID, 플레이 시각, 기기 정보는 담지 않습니다.",
     "- **검사가 못 잡는 것**: 검사는 기록이 규칙대로 나올 수 있었는지를 다시 해 볼 뿐이라, 기록과 결정을 서로 맞게 지어낸 봇은 잡지 못합니다. 「조작할 수 없음」이 아니라 「검사를 통과한 기록」입니다.",
@@ -216,7 +259,7 @@ export function formatHallOfFameMarkdown(boards) {
   if (!boards.length) lines.push("아직 기록된 판이 없습니다.", "");
   for (const board of boards) {
     const status = board.settledOn ? `확정 ${board.settledOn}` : board.kind === "week" ? `잠정 · ${weekSettlesOn(board.board)} 뒤 확정` : "잠정 · 랭킹을 비울 때 확정";
-    lines.push(`## ${hallOfFameBoardLabel(board.board)}`, "", `${status} · 검사 통과 ${board.checked}건${board.updatedOn ? ` · 갱신 ${board.updatedOn}` : ""}`, "");
+    lines.push(`## ${hallOfFameBoardLabel(board.board)}`, "", `${status} · 표시 없는 완주 ${board.checked}건${board.updatedOn ? ` · 갱신 ${board.updatedOn}` : ""}`, "");
     if (!board.places.length) {
       lines.push("표본 부족", "");
       continue;

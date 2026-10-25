@@ -16,26 +16,36 @@
 -- device: run_tag and the style are already on the public board.
 --
 -- 1. Two tables. `hall_of_fame_boards` holds one row a board: how many
---    seasons passed the check on it (`checked_seasons`), when it was last
+--    seasons on it carry no mark (`checked_seasons`, below), when it was last
 --    written, and when it was settled (`settled_at`; null: provisional, still
 --    rewritten each day). `hall_of_fame` holds that board's places, 1 to 3.
 --    A board with fewer than ten checked seasons (HALL_OF_FAME_MIN_SEASONS,
 --    src/hallOfFame.js) keeps its row and no place: 「표본 부족」.
+--
+--    The ten are counted over the whole board, by `hall_of_fame_counts()`,
+--    not over the rows the day's check replayed (it replays only each board's
+--    first candidates): a complete ranking season on that board whose
+--    `suspicion` is an empty array -- the insert trigger judged it and found
+--    nothing, and no daily check marked it. The board is the season's week,
+--    or `table-<tableRules>` of its final case row when it has none (the same
+--    rule hall_of_fame_settle holds a place to). Service role only.
 --
 -- 2. Only `hall_of_fame_settle` writes them, and only the service role may
 --    call it: verify-ranking.yml calls it right after it writes the day's
 --    marks, from the same check (scripts/verify-ranking-rows.mjs
 --    --hall-of-fame-sql), so what was checked and what is posted cannot
 --    differ. It takes every board at once and
---      (a) refuses a place whose ranking row is not a clean, checked season
+--      (a) counts each open board itself (hall_of_fame_counts; a count in
+--          the call is not read) and refuses any place on one below ten;
+--      (b) refuses a place whose ranking row is not a clean, checked season
 --          on that board: `suspicion` empty, `rechecked_at` set, the same
 --          score, a complete season, the board's week (or none, on a table
 --          board) and, on a table board, a final case row of that table.
 --          One refusal fails the whole call, so the tables stay as they were
 --          the day before (설계안 ② 5: "바꾸지 않음" is the default);
---      (b) leaves a settled board as it is;
---      (c) rewrites an open board's places and count;
---      (d) settles a week's board from its week's start + 28 days (question
+--      (c) leaves a settled board as it is;
+--      (d) rewrites an open board's places and count;
+--      (e) settles a week's board from its week's start + 28 days (question
 --          9 (1): the seasons of a week finish over the weeks after it; Monday
 --          00:00 KST + 4 weeks, so 2026-W47's board settles at the first daily
 --          check from 12-14), and a table board once a later table's board is
@@ -55,7 +65,8 @@
 -- (scripts/check-grants.mjs, "the hall of fame"): anon reads the view and
 -- cannot write either table or call the function; a clean season takes its
 -- place; a marked, unchecked, other-week or other-score season is refused and
--- nothing changes; fewer than ten leaves the board empty; a settled week is
+-- nothing changes; fewer than ten leaves the board empty, counted by the
+-- server whatever the call says; the count reads the whole board; a settled week is
 -- kept; a week four weeks old settles; a later table settles the one before.
 
 create table if not exists public.hall_of_fame_boards (
@@ -122,9 +133,47 @@ left join public.hall_of_fame h on h.board = b.board;
 revoke all on table public.public_hall_of_fame from public, anon, authenticated;
 grant select on table public.public_hall_of_fame to anon, service_role;
 
--- `p_boards`: [{ "board": "table-3", "checked": 12, "places": [{ "run_tag",
--- "score", "rank", "style", "tags" }, ...] }, ...], places best first. Returns
--- { "written": [...], "kept": [...], "settled": [...] } by board.
+-- Each board's count of seasons with no mark, over the whole board (1.). The
+-- CI job reads it after the day's marks (verify-ranking-rows
+-- --hall-of-fame-counts-sql) to choose whether to post places, and
+-- hall_of_fame_settle reads it again itself.
+create or replace function public.hall_of_fame_counts()
+returns table (board text, checked integer)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select b.board, count(*)::integer as checked
+    from (
+      select case
+               when s.summary->>'week' ~ '^[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' then s.summary->>'week'
+               when s.summary->>'week' is null then (
+                 select 'table-' || (f.dynamics->>'tableRules')
+                   from public.playtest_sessions f
+                  where f.run_id = s.run_id and f.case_id = 'final'
+                    and f.dynamics->>'tableRules' ~ '^[1-9][0-9]{0,2}$'
+                  limit 1)
+             end as board
+        from public.playtest_sessions s
+       where s.case_id = 'season-final'
+         and s.run_id is not null
+         and s.score is not null
+         and s.summary->>'seasonComplete' = 'true'
+         and s.suspicion = '{}'
+    ) b
+   where b.board is not null
+   group by b.board
+   order by b.board;
+$$;
+
+revoke all on function public.hall_of_fame_counts() from public, anon, authenticated;
+grant execute on function public.hall_of_fame_counts() to service_role;
+
+-- `p_boards`: [{ "board": "table-3", "places": [{ "run_tag", "score",
+-- "rank", "style", "tags" }, ...] }, ...], places best first (a "checked" in
+-- a board is not read: the function counts). Returns { "written": [...],
+-- "kept": [...], "settled": [...] } by board.
 create or replace function public.hall_of_fame_settle(p_boards jsonb)
 returns jsonb
 language plpgsql
@@ -143,28 +192,31 @@ declare
   v_kept text[] := '{}';
   v_settled text[] := '{}';
   v_tables text[] := '{}';
+  v_counts jsonb;
 begin
   if p_boards is null or jsonb_typeof(p_boards) <> 'array' then
     raise exception 'hall_of_fame_settle takes an array of boards' using errcode = '22023';
   end if;
+  select coalesce(jsonb_object_agg(c.board, c.checked), '{}'::jsonb) into v_counts from public.hall_of_fame_counts() c;
   for v_board in select value from jsonb_array_elements(p_boards) loop
     v_key := v_board->>'board';
     v_places := coalesce(v_board->'places', '[]'::jsonb);
     if v_key is null or v_key !~ '^(table-[1-9][0-9]{0,2}|[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0-3]))$' then
       raise exception 'not a hall of fame board: %', v_key using errcode = '22023';
     end if;
-    if jsonb_typeof(v_board->'checked') is distinct from 'number' or jsonb_typeof(v_places) <> 'array' or jsonb_array_length(v_places) > 3 then
-      raise exception 'board % needs a count and at most three places', v_key using errcode = '22023';
-    end if;
-    v_checked := (v_board->>'checked')::integer;
-    if v_checked < 0 or (v_checked < 10 and jsonb_array_length(v_places) > 0) then
-      raise exception 'board % takes no place below ten checked seasons', v_key using errcode = '22023';
+    if jsonb_typeof(v_places) <> 'array' or jsonb_array_length(v_places) > 3 then
+      raise exception 'board % takes at most three places', v_key using errcode = '22023';
     end if;
     v_kind := case when v_key like 'table-%' then 'table' else 'week' end;
     if v_kind = 'table' then v_tables := v_tables || v_key; end if;
     if exists (select 1 from public.hall_of_fame_boards where board = v_key and settled_at is not null) then
       v_kept := v_kept || v_key;
       continue;
+    end if;
+    -- The board's own count, never the call's.
+    v_checked := coalesce((v_counts->>v_key)::integer, 0);
+    if v_checked < 10 and jsonb_array_length(v_places) > 0 then
+      raise exception 'board % takes no place below ten checked seasons (it has %)', v_key, v_checked using errcode = '22023';
     end if;
     -- Every place a clean, checked season on this board, at the score posted.
     for v_place in select value from jsonb_array_elements(v_places) loop

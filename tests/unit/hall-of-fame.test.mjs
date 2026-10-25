@@ -13,6 +13,8 @@ import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import {
   boardOf,
   formatHallOfFameMarkdown,
+  HALL_OF_FAME_CANDIDATES,
+  HALL_OF_FAME_COUNTS_SQL,
   HALL_OF_FAME_MIN_SEASONS,
   HALL_OF_FAME_READ_SQL,
   hallOfFameRefusal,
@@ -20,6 +22,7 @@ import {
   hallOfFameTags,
   pickHallOfFame,
   readHallOfFame,
+  readHallOfFameCounts,
   weekSettlesOn,
 } from "../../src/hallOfFame.js";
 import { hallOfFameBadges, hallOfFameBoardLabel } from "../../src/hallOfFameBadges.js";
@@ -127,44 +130,66 @@ function cleanRun(n, { score = 60 + n, week = null, rank = "A", final = {}, rank
   return { result, rows };
 }
 
-const pick = (runs, rulesMark = 3) => pickHallOfFame({ results: runs.map((run) => run.result), rows: runs.flatMap((run) => run.rows), rulesMark });
+const pick = (runs, counts = {}, rulesMark = 3) => pickHallOfFame({ results: runs.map((run) => run.result), rows: runs.flatMap((run) => run.rows), rulesMark, counts: new Map(Object.entries(counts)) });
 
-test("each board keeps its first three once ten seasons on it passed, and says so below that", () => {
+test("each board keeps its first three once ten seasons on the whole board have no mark, and says so below that", () => {
   const nine = Array.from({ length: HALL_OF_FAME_MIN_SEASONS - 1 }, (_, n) => cleanRun(n));
-  const below = pick(nine);
-  assert.deepEqual(below.boards, [{ board: "table-3", checked: 9, places: [] }]);
+  assert.deepEqual(pick(nine, { "table-3": 9 }).boards, [{ board: "table-3", checked: 9, places: [] }]);
+  // No count read: every board counts 0.
+  assert.deepEqual(pick(nine).boards, [{ board: "table-3", checked: 0, places: [] }]);
 
   const ten = [...nine, cleanRun(20, { score: 99, final: { newGamePlus: true, assistTime: 1.5 }, ranking: { endingVariant: "collapse" } })];
-  const [table] = pick(ten).boards;
+  const [table] = pick(ten, { "table-3": 10 }).boards;
   assert.equal(table.checked, 10);
   assert.deepEqual(table.places.map((place) => place.run_tag), ["TAG00020", "TAG00008", "TAG00007"]);
   assert.deepEqual(table.places[0], { run_tag: "TAG00020", score: 99, rank: "A", style: "FIELD DECIDER", tags: ["NEW GAME+", "테이블 시간 ×1.5", "붕괴한 시즌"] });
 
-  // A week's rule board stands apart from the table's, and the table board is always written.
-  const weekly = Array.from({ length: 10 }, (_, n) => cleanRun(100 + n, { week: "2026-W47", score: 50 + n }));
-  const boards = pick(weekly).boards;
-  assert.deepEqual(boards.map((board) => [board.board, board.checked, board.places.length]), [["table-3", 0, 0], ["2026-W47", 10, 3]]);
-  assert.equal(boards[1].places[0].score, 59);
+  // Assumption 4, resolved: the ten are the whole board's, not the rows the
+  // day's check read. Three candidates read on a board of 14 take its places.
+  const weekly = Array.from({ length: 3 }, (_, n) => cleanRun(100 + n, { week: "2026-W47", score: 50 + n }));
+  const boards = pick(weekly, { "table-3": 2, "2026-W47": 14, "2026-W40": 30 }).boards;
+  // A week's rule board stands apart from the table's, and the table board is always written;
+  // a board no run was read for today (settled, or nothing to replay) is left as it is.
+  assert.deepEqual(boards.map((board) => [board.board, board.checked, board.places.length]), [["table-3", 2, 0], ["2026-W47", 14, 3]]);
+  assert.deepEqual(boards[1].places.map((place) => place.score), [52, 51, 50]);
 
   // On a tie the earlier season, then the ranking's own tie-breaks.
   const tied = [...nine.slice(0, 8), cleanRun(30, { score: 95, completedAt: "2026-11-20T00:00:00Z" }), cleanRun(31, { score: 95, completedAt: "2026-11-18T00:00:00Z" })];
-  assert.deepEqual(pick(tied).boards[0].places.slice(0, 2).map((place) => place.run_tag), ["TAG00031", "TAG00030"]);
+  assert.deepEqual(pick(tied, { "table-3": 40 }).boards[0].places.slice(0, 2).map((place) => place.run_tag), ["TAG00031", "TAG00030"]);
   const graded = [...nine.slice(0, 8), cleanRun(32, { score: 95, rank: "B", completedAt: "2026-11-01T00:00:00Z" }), cleanRun(33, { score: 95, rank: "S" })];
-  assert.deepEqual(pick(graded).boards[0].places.slice(0, 2).map((place) => place.run_tag), ["TAG00033", "TAG00032"]);
+  assert.deepEqual(pick(graded, { "table-3": 40 }).boards[0].places.slice(0, 2).map((place) => place.run_tag), ["TAG00033", "TAG00032"]);
 });
 
-test("a refused run does not count toward the threshold, and the log says why by run tag", () => {
-  const runs = Array.from({ length: 10 }, (_, n) => cleanRun(n));
+test("a refused run takes no place, its board is still written with its count, and the log says why by run tag", () => {
+  const runs = Array.from({ length: 10 }, (_, n) => cleanRun(n, { score: 90 - n }));
   runs[0].result.marks = ["window-off-replay"];
   runs[1].rows[1].suspicion = ["rank-off-score"];
   runs[2].result.status = "unrecorded";
-  const picked = pick(runs);
-  assert.deepEqual(picked.boards, [{ board: "table-3", checked: 7, places: [] }]);
-  assert.deepEqual(picked.left.map((entry) => entry.runTag), ["TAG00000", "TAG00001", "TAG00002"]);
+  const refusedWeek = cleanRun(50, { week: "2026-W48" });
+  refusedWeek.result.marks = ["chain-off-log"];
+  const picked = pick([...runs, refusedWeek], { "table-3": 12, "2026-W48": 3 });
+  assert.deepEqual(picked.boards.map((board) => [board.board, board.checked, board.places.map((place) => place.run_tag)]), [
+    ["table-3", 12, ["TAG00003", "TAG00004", "TAG00005"]],
+    ["2026-W48", 3, []],
+  ]);
+  assert.deepEqual(picked.left.map((entry) => entry.runTag), ["TAG00000", "TAG00001", "TAG00002", "TAG00050"]);
   const lines = formatHallOfFamePick(picked).join("\n");
-  assert.match(lines, /^본 판 \(판 규칙 3\): 7 checked seasons; 표본 부족$/m);
+  assert.match(lines, /^본 판 \(판 규칙 3\): 12 checked seasons; 1\. RUN TAG00003 87/m);
+  assert.match(lines, /^2026-W48: 3 checked seasons; 표본 부족$/m);
   assert.match(lines, /left out RUN TAG00001: marked by the trigger: rank-off-score/);
   assert.doesNotMatch(lines, /run-\d/, "a full run id reached the log");
+});
+
+test("the count is read apart, over the whole board, and the replay reads each board's first candidates", () => {
+  assert.equal(HALL_OF_FAME_COUNTS_SQL.indexOf(";"), HALL_OF_FAME_COUNTS_SQL.length - 1);
+  assert.doesNotMatch(HALL_OF_FAME_COUNTS_SQL, /\b(insert|update|delete|truncate|alter|drop|create|grant|call|do)\b/i);
+  assert.ok(HALL_OF_FAME_CANDIDATES >= HALL_OF_FAME_MIN_SEASONS, "a board of exactly ten clean seasons should be replayed whole");
+  const counts = readHallOfFameCounts([{ board: "table-3", checked: 12 }, { board: "2026-W47", checked: "4" }, { board: "x", checked: -1 }, { board: 3, checked: 1 }, null]);
+  assert.deepEqual([...counts], [["table-3", 12], ["2026-W47", 4]]);
+  assert.equal(readHallOfFameCounts(null).size, 0);
+  // A plain object serves as well as a Map.
+  const [run] = [cleanRun(1)];
+  assert.equal(pickHallOfFame({ results: [run.result], rows: run.rows, rulesMark: 3, counts: { "table-3": 11 } }).boards[0].checked, 11);
 });
 
 test("boards, tags and the settle statement", () => {
@@ -175,6 +200,7 @@ test("boards, tags and the settle statement", () => {
   assert.deepEqual(hallOfFameTags([{ case_id: "season-final", summary: { assistTime: 1, endingVariant: "seal" } }]), []);
   const sql = hallOfFameSql([{ board: "table-3", checked: 0, places: [{ run_tag: "O'NEIL", score: 1, rank: "C", style: "FIELD DECIDER", tags: [] }] }]);
   assert.equal(sql.indexOf(";"), sql.length - 1);
+  assert.doesNotMatch(sql, /checked/, "the function counts each board itself");
   assert.match(sql, /^select public\.hall_of_fame_settle\('\[.*O''NEIL.*\]'::jsonb\) as settled;$/);
   assert.equal(HALL_OF_FAME_READ_SQL.indexOf(";"), HALL_OF_FAME_READ_SQL.length - 1);
   assert.doesNotMatch(HALL_OF_FAME_READ_SQL, /\b(insert|update|delete|truncate|alter|drop|create|grant|call|do)\b/i);
@@ -200,10 +226,10 @@ test("the page for the hall-of-fame branch: one table a board, no name and no fu
   assert.deepEqual(boards.map((board) => board.board), ["table-3", "2026-W47", "2026-W46"]);
   const page = formatHallOfFameMarkdown(boards);
   assert.match(page, /^# 명예의 전당\n/);
-  assert.match(page, /## 본 판 \(판 규칙 3\)\n\n잠정 · 랭킹을 비울 때 확정 · 검사 통과 31건 · 갱신 2026-12-20\n/);
-  assert.match(page, /## 2026-W47\n\n확정 2026-12-14 · 검사 통과 12건/);
+  assert.match(page, /## 본 판 \(판 규칙 3\)\n\n잠정 · 랭킹을 비울 때 확정 · 표시 없는 완주 31건 · 갱신 2026-12-20\n/);
+  assert.match(page, /## 2026-W47\n\n확정 2026-12-14 · 표시 없는 완주 12건/);
   assert.match(page, /\| 1 \| RUN AAAA1111 \| BOARD BREAKER \| 90 \| S \| NEW GAME\+ \|\n\| 2 \| RUN BBBB2222 \| RISK CUTTER \| 81 \| A \| — \|/);
-  assert.match(page, /## 2026-W46\n\n잠정 · 2026-12-07 뒤 확정 · 검사 통과 4건 · 갱신 2026-11-30\n\n표본 부족\n/);
+  assert.match(page, /## 2026-W46\n\n잠정 · 2026-12-07 뒤 확정 · 표시 없는 완주 4건 · 갱신 2026-11-30\n\n표본 부족\n/);
   assert.match(page, /「조작할 수 없음」이 아니라 「검사를 통과한 기록」/);
   assert.doesNotMatch(page, /익명 분석관|run_id|session/);
   assert.match(formatHallOfFameMarkdown([]), /아직 기록된 판이 없습니다/);
@@ -230,9 +256,15 @@ test("the CLI prints the read, the page and the settle statement", () => {
     const rows = dealtSeason("secret-run");
     writeFileSync(path.join(dir, "1.json"), JSON.stringify(rows));
     const sql = run(path.join(dir, "1.json"), "--hall-of-fame-sql").trim();
-    assert.equal(sql, hallOfFameSql([{ board: "table-3", checked: 1, places: [] }]));
-    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame"), /^본 판 \(판 규칙 3\): 1 checked seasons; 표본 부족$/m);
+    assert.equal(sql, hallOfFameSql([{ board: "table-3", places: [] }]));
+    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame"), /^본 판 \(판 규칙 3\): 0 checked seasons; 표본 부족$/m);
     assert.doesNotMatch(sql, /secret/);
+    // With the board's count read apart (counts.json), the one season read takes its place.
+    writeFileSync(path.join(dir, "counts.json"), JSON.stringify({ rows: [{ board: "table-3", checked: 10 }] }));
+    const counted = run(path.join(dir, "1.json"), "--hall-of-fame-sql", `--counts=${path.join(dir, "counts.json")}`).trim();
+    assert.match(counted, /"places":\[\{"run_tag":"RUNHALL1",/);
+    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame", `--counts=${path.join(dir, "counts.json")}`), /^본 판 \(판 규칙 3\): 10 checked seasons; 1\. RUN RUNHALL1 /m);
+    assert.equal(run("--hall-of-fame-counts-sql").trim(), HALL_OF_FAME_COUNTS_SQL);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
