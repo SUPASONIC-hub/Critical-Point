@@ -81,7 +81,11 @@ const budgets = [
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_564, maxGzip: 8_588 },
+  // -> 19,725 / 8,660 on 2026-10-25 (C-15 카드 정보 줄이기, draft for after
+  // W47, on main c8841dc0): tableReadout's describeStakedDetail, the staked
+  // card's detail without the number its burn prints. Measured 19,725 / 8,656
+  // in the e2e build (8,653 after the rebase), the larger gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_725, maxGzip: 8_660 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -394,7 +398,10 @@ const budgets = [
   // -> 102,514 / 35,481 on 2026-10-25, 묶음 시대고증(#313): the era words in
   // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
   // the larger gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_514, maxGzip: 35_481 },
+  // -> 102,532 bytes on 2026-10-25 (C-15 카드 정보 줄이기, draft for after
+  // W47, on main c8841dc0): the hand's fold class on two badges and 소모 없음's
+  // class. Measured 102,532 / 35,460 in the e2e build; the gzip budget holds.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_532, maxGzip: 35_481 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -492,7 +499,10 @@ const budgets = [
   // -> 193,412 / 36,058 on 2026-10-25 (B-11(1) 막 표지, on main 024904a3): the
   // act title card's rules in briefing.css beside B-12(2)'s coda. Measured
   // 193,412 / 36,054 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_412, maxGzip: 36_058 },
+  // -> 193,614 / 36,108 on 2026-10-25 (C-15 카드 정보 줄이기, draft for after
+  // W47, on main c8841dc0): play.css's fold for a board rule's badge and a
+  // plain 소모 없음. Measured 193,614 / 36,104 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_614, maxGzip: 36_108 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.

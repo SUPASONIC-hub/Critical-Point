@@ -117,7 +117,7 @@ export function GauntletHand({
             ) : (
               <span className="gx-card-stats">
                 <b className="gx-card-chips">+{getCardChips(card, schema)}</b>
-                <b className="gx-card-burn">
+                <b className={`gx-card-burn${burn ? "" : " is-free"}`}>
                   {burn ? `${labelOf(burn.key)} ${burn.value > 0 ? "+" : ""}${burn.value}` : "소모 없음"}
                   {burn?.fractured && <Zap size={11} aria-hidden="true" />}
                   {/* B2: cashed, this card makes a link (cascadeRisk.js). Words, so the button's name reads what it shows. */}
@@ -126,15 +126,22 @@ export function GauntletHand({
                 {/* A board rule that touches every card is a badge in the stats
                     row, not a line of its own on every card: on an overclocked
                     board those lines made each card 25px taller. The rules panel
-                    says what the rule is; the badge says which cards it bills. */}
+                    says what the rule is; the badge says which cards it bills.
+                    C-15 (2026-10-25, draft for after W47): the two badges are
+                    folded (`gx-card-fold`, play.css) until the card is staked or
+                    has the keyboard's focus. What they say is on every card
+                    already: the chips are printed doubled, and a billed card's
+                    burn is printed billed, with the dashed ember edge and the
+                    bolt. Folded is display: none, so the card's name holds what
+                    it shows and no more (WCAG 2.5.3). */}
                 {burn?.fractured && (
-                  <i className="gx-card-rule-tax" data-testid="fracture-tax">
+                  <i className="gx-card-rule-tax gx-card-fold" data-testid="fracture-tax">
                     <span className="sr-only">균열 청구 </span>
                     ×{schema.fractureRate}
                   </i>
                 )}
                 {overclocked && (
-                  <i className="gx-card-overclock" data-testid="overclock-card-boost">
+                  <i className="gx-card-overclock gx-card-fold" data-testid="overclock-card-boost">
                     <span className="sr-only">오버클럭 칩 </span>
                     ×2
                   </i>

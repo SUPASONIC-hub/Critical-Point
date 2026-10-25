@@ -23,7 +23,7 @@ import {
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { isClosingScene } from "./holdConfirm.js";
 import { useHoldConfirm } from "./useHoldConfirm.js";
-import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { describeStakedDetail, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
@@ -189,9 +189,7 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
-  const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
-  const visibleEffects = selectedEffects.slice(0, 4);
-  const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
+  const { visibleEffects, hiddenEffectCount } = describeStakedDetail(selectedCard, schema, resourceMeta);
   // The types on the table, as the settlement will be handed them (useChoiceCommit).
   const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps

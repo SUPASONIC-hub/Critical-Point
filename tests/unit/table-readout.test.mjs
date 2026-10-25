@@ -8,7 +8,7 @@ import { resourceMeta } from "../../src/appCopy.js";
 import {
   BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, getClockHeatRate, HOT_CASH_MULTIPLIER, reduceWindow, RUN_INITIAL_STATE,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { describeCaseChange, describeClockHeat, describeEffect, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
+import { describeCaseChange, describeClockHeat, describeEffect, describeStakedDetail, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
 import { getAuthorityGate } from "../../src/gameLogic.js";
 import { initialResources } from "../../src/gameConstants.js";
 import { easyResourceLabels } from "../../src/playerLanguage.js";
@@ -104,6 +104,17 @@ test("an effect on a resource the table has no name for is listed under its key"
   assert.deepEqual(describeEffect({ rumour: 2 }, resourceMeta), [{ key: "rumour", value: 2, label: "rumour", gain: true }]);
   assert.deepEqual(describeEffect({ trust: 2 }), [{ key: "trust", value: 2, label: "trust", gain: true }], "and so is every one of them with no names handed over");
   assert.deepEqual(describeEffect(), [], "a card with no effect lists nothing");
+});
+
+test("the staked card's detail leaves out what its burn prints, and shows three at most (C-15)", () => {
+  const card = { effect: { time: -2, trust: -10, legitimacy: 8, fatigue: 2, capital: -1 } };
+  const plain = describeStakedDetail(card, BASE_SCHEMA, resourceMeta);
+  assert.deepEqual(plain.visibleEffects.map((row) => row.key), ["legitimacy", "time", "fatigue"], "the burn (trust -10) is printed on the card already");
+  assert.equal(plain.hiddenEffectCount, 1, "capital is 외 1");
+  const billed = describeStakedDetail(card, { ...BASE_SCHEMA, fracturedAxis: "trust" }, resourceMeta);
+  assert.ok(!billed.visibleEffects.some((row) => row.key === "trust"), "a billed burn is not printed again unbilled");
+  assert.deepEqual(describeStakedDetail({ effect: { trust: 3 } }, BASE_SCHEMA, resourceMeta).visibleEffects.map((row) => row.key), ["trust"], "a card that burns nothing keeps its whole detail");
+  assert.deepEqual(describeStakedDetail(null, BASE_SCHEMA, resourceMeta), { visibleEffects: [], hiddenEffectCount: 0 }, "no staked card, no detail");
 });
 
 test("the folded briefing's line names all six resources and the clues held, in the table's own order", () => {

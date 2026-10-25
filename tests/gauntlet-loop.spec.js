@@ -775,6 +775,41 @@ test("two hot cashouts trigger an overclock payout banner", async ({ page }) => 
 });
 
 /**
+ * C-15 (2026-10-25, draft for after W47): a card shows less until it is staked.
+ * A board rule's badge is folded on the cards not staked -- the chips and the
+ * burn already print what the rule does to them -- and the staked card's
+ * detail does not print its burn a second time (on a FRACTURE board the second
+ * copy was the unbilled number). Display only: the burn and the chips are the
+ * numbers they were.
+ */
+test("a board rule's badge waits for the staked card, whose detail does not repeat its burn", async ({ page }) => {
+  await openBrokenBoard(page, "case02", "c2_start_people", { schema: OVERCLOCKED_BOARD });
+  // The frame loop shakes the table near the wall, and a shaking card is never
+  // "stable" for a click (seen on mobile-chromium, 2026-10-25); the shake is a
+  // transform, so stilling it moves nothing (measureStakedTable does the same).
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
+  const billed = page.locator(".gx-card.is-fractured").first();
+  const burn = billed.locator(".gx-card-burn");
+  await expect(burn).toBeVisible();
+  await expect(billed.getByTestId("fracture-tax")).toBeHidden();
+  await expect(page.getByTestId("fracture-tax").first()).toContainText("×1.5");
+  const burnLabel = (await burn.textContent()).replace(/\s*[+-]?\d.*$/, "").trim();
+  expect(burnLabel.length).toBeGreaterThan(0);
+
+  await billed.click();
+  await expect(billed).toHaveAttribute("aria-pressed", "true");
+  await expect(billed.getByTestId("fracture-tax")).toBeVisible();
+  await expect(billed.getByTestId("fracture-tax")).toContainText("×1.5");
+  const detail = billed.locator(".gx-card-preview i:not(.gx-card-crack)");
+  await expect(detail.first()).toBeVisible();
+  await expect(detail.filter({ hasText: burnLabel })).toHaveCount(0);
+  // The cards not staked still fold theirs.
+  for (const other of await page.locator(".gx-card.is-fractured:not(.selected)").all()) {
+    await expect(other.getByTestId("fracture-tax")).toBeHidden();
+  }
+});
+
+/**
  * The reveal's list of the next board's rules says the board is broken only
  * when it is. Its heading read 다음 판이 이렇게 부서진다 over every list -- over
  * an OVERCLOCK the player had earned and over the REBOOT of a closed case --
