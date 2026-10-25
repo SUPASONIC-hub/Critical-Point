@@ -575,7 +575,9 @@ const budgets = [
   // C-1's seventh card, D2's badge and the bundle's two board marks together. Measured 193,971 / 36,150 in two e2e builds, the gzip plus 4.
   // 193,674 / 36,110, the gzip plus 4; 193,675 raw once the peak's colour
   // went from heat to ember (contrast, 3.56:1 -> about 5.6:1).
-  { pattern: /^index-.*\.css$/, maxBytes: 193_971, maxGzip: 36_154 },
+  // -> 193,972 raw on 2026-10-25, the rehearsal with the bundle's ember 「고점 판」 (3ca5d7b9);
+  // measured 193,972 / 36,146, the gzip budget holds.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_972, maxGzip: 36_154 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
