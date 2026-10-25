@@ -226,7 +226,11 @@ const budgets = [
   // keys the online save now carries (SEEN_SCENES_KEY, PAST_PICKS_KEY) are
   // spelled in appConfig.js, where cloudSave.js reads them without the scene
   // graph. Measured 172,146 / 62,150 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_146, maxGzip: 62_160 },
+  // -> 172,244 / 62,205 on 2026-10-25, the tab token claim's longer wait
+  // (TAB_TOKEN_CLAIM_MS 300, one more wait when the timer fired late, capped
+  // at TAB_TOKEN_CLAIM_MAX_MS). Measured 172,244 / 62,201 in the CI e2e build,
+  // the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_244, maxGzip: 62_205 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
