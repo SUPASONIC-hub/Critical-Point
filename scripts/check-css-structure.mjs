@@ -150,7 +150,11 @@ const fileBudgets = {
   // way out, and the quiet button's two half-rules made one.
   // 3170 / 76900 -> 3031 / 67101 on 2026-10-13: comments no longer counted
   // (139 lines and 9799 bytes of them that day), the room unchanged.
-  "base-intro-ranking.css": { lines: 3031, bytes: 67101 },
+  // 3031 / 67101 -> 3073 / 67949 on 2026-10-25 for the board's report button
+  // (store UGC rules): the action row under each post, a 44px toggle, the
+  // in-place reason fieldset with its legend, radios, note and buttons, and
+  // the live line that answers a report. Measured 3073 / 67946, room 0 / 3.
+  "base-intro-ranking.css": { lines: 3073, bytes: 67949 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
