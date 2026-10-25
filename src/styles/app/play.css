@@ -385,6 +385,15 @@
   letter-spacing: 0.16em;
 }
 
+/* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) take the label's place in colour, no line more. */
+.gx-label.gx-mark-peak {
+  color: var(--c-gx-heat);
+}
+
+.gx-label.gx-mark-breather {
+  color: var(--c-gx-relic);
+}
+
 .gx-pot-value {
   color: var(--ui-text);
   font: 800 clamp(2rem, 9vw, 2.625rem) / 1 var(--font-sans);

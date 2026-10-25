@@ -72,33 +72,31 @@ import { createChoiceReaders } from "../../src/state/useDecision.js";
 // ---------------------------------------------------------------------------
 
 /**
- * The tools a full hand puts down first, weakest first (day 11, item 6). The
- * first three are the ones `check:pressure` measured adding nothing alone
- * (SPLINT, LOCKPICK, GLASS LENS, in the order the day-10 plan named them);
- * the rest follow that report's "measured tools one at a time" from the
- * least lift to the most, so INSURANCE is the last to go (measured
- * 2026-10-16 at the day-ten table, the streak to x1.6: HIGH ROLLER -1.8%,
- * STEADY ANCHOR +0.1, COLD BLOOD +1.4, ENCORE +1.7, METRONOME +2.8, HEAT SINK
- * +3.4, STETHOSCOPE +4.0, KINETIC GRIP +5.4, INSURANCE +8.7). HIGH ROLLER
- * measures below the first three; it follows them because the plan named
- * those three. ENCORE now measures above COLD BLOOD (it was +1.3 under the
- * x1.5 cap) and is still put down first: the order is the one measured at
- * x1.5, kept so the swap's measures stay comparable.
+ * The tools a full hand puts down first, weakest first (day 11, item 6; C-7,
+ * 2026-10-25). Read off check:pressure's "relic" rows, the heartbeat column
+ * against no tool, least lift first; AUDIT CONTACT, which the case hand there
+ * never trips (it cashes at 40 or more), goes first. Measured 2026-10-25 on
+ * the table of C-7: COLD BLOOD +1.4%, CARBON COPY +1.5, ENCORE +1.7, FIELD
+ * NOTES +1.8, METRONOME +2.8, HEAT SINK +3.4, STETHOSCOPE +4.0, TESTIMONY
+ * +5.3, KINETIC GRIP +5.4, FRONT PAGE +6.5, INSURANCE +8.7.
  */
 export const RELIC_DROP_ORDER = Object.freeze([
-  "splint",
-  "lockpick",
-  "glassLens",
-  "highRoller",
-  "steadyAnchor",
-  "encore",
+  "auditContact",
   "coldBlood",
+  "carbonCopy",
+  "encore",
+  "fieldNote",
   "metronome",
   "heatSink",
   "stethoscope",
+  "testimony",
   "kineticGrip",
+  "frontPage",
   "insurance",
 ]);
+
+/** The cases whose close the season player notes the tools held at (`relicsAt`): act 1's and act 4's last (B-11's acts). */
+export const RELICS_HELD_AT = Object.freeze(["case07", "case24"]);
 
 /**
  * A draft answered against the slots. Under `RELIC_SLOTS` the taken tool goes
@@ -367,6 +365,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     const caseResults = {};
     // Each closed case's decision log, as its case row carries it (the chain checker's tests).
     const caseLogs = {};
+    const relicsAt = {};
     // Each closed case's `dynamics` as its case row carries it: the run summary,
     // the close's links and draft, and the case's opening snapshot (useChoiceCommit, S3).
     const caseDynamics = {};
@@ -525,6 +524,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           caseDynamics[caseId] = { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec };
           casePeaks.push(summary.peakRiskPressure);
           if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+          // The tools held as an act closes (C-7): a season's end has swapped its way to the strongest, its first acts not yet.
+          if (RELICS_HELD_AT.includes(caseId)) relicsAt[caseId] = [...run.relics];
           if (caseId === "final") final = { resources, log };
         }
         nodeId = nextNode;
@@ -534,7 +535,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // cases' burst scores (getSeasonScore), where it used to take the finale's.
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, audits, links };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, relicsAt, audits, links };
   }
 
   /**
@@ -816,8 +817,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       const sealed = card.id === sealedId;
       // One window in eight is cashed cold, as early as the table allows: COLD
       // FEET seals the next hand's richest card, and a sealed card has to be
-      // pushed to the seal before it cashes -- which is what LOCKPICK and GLASS
-      // LENS bend.
+      // pushed to the seal before it cashes (what LOCKPICK and GLASS LENS bent
+      // before C-7).
       const cold = mood >= 0.04 && mood < 0.165;
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
         const mustOpen = sealed && win.gauge < win.schema.sealBreak;
