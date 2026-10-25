@@ -12,8 +12,9 @@
  *
  * This list is what the start screen's slot reads. Each entry is the case's
  * label and title, and `load`, which fetches the case file as its own chunk
- * the first time the case is opened. The list is empty in a release until the
- * first side case is written (설계안 질문 7 (1)): the slot is hidden while it is.
+ * the first time the case is opened. A release lists 번외 1 (side01, 2025년
+ * 12월 20일 토요일) since its pull request; the slot is hidden while the list
+ * is empty (설계안 질문 7 (1)).
  *
  * `side00` is the framework's placeholder, not a case: it exists so the slot,
  * the side screen and the e2e test have something to open. It is listed only in
@@ -26,7 +27,7 @@ const sideFixtureListed =
   new URLSearchParams(globalThis.location?.search ?? "").get("side-fixture") === "1";
 
 export const SIDE_CASES = Object.freeze([
-  // { id: "side01", label: "번외 1", title: "...", load: () => import("./side01.js").then(({ side01 }) => side01) },
+  { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명", load: () => import("./side01.js").then(({ side01 }) => side01) },
   ...(sideFixtureListed
     ? [{ id: "side00", label: "번외 0", title: "틀 확인용 번외 사건", fixture: true, load: () => import("./side00.js").then(({ side00 }) => side00) }]
     : []),

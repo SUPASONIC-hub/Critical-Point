@@ -105,7 +105,10 @@ const budgets = [
   // 2026-10-06, when cases 01-07 and the finale were written at the length of
   // the rest of the season: its thirty scenes are the most of any case. It is
   // not the chunk a first visit waits for; that one is prologue01.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
+  // A side case (E-11, src/nodes/sideNN.js) is a case's chunk too and shares
+  // this ceiling (E11-번외사건-설계안 5절): 번외 1 (side01, eleven scenes, no
+  // replies or voice lines) measured 20,965 / 7,033 on 2026-10-25.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|side[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
@@ -228,7 +231,11 @@ const budgets = [
   // is written (src/sideCases.js, the slot and its open/close in IntroScreen),
   // and the side-id guards of the local ranking and the window log. The first
   // paint's own budget is not raised. Measured 174,226 / 62,853, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 174_226, maxGzip: 62_857 },
+  // 174,226 / 62,857 -> 174,418 / 62,949 on 2026-10-25, E-11 번외 1 (draft on
+  // e11-side-cases dbb4f419): the release list's one entry for side01, its label,
+  // title and chunk loader (src/nodes/sidePacks.js). Measured 174,418 / 62,945,
+  // the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 174_418, maxGzip: 62_949 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -1028,7 +1035,10 @@ function checkBudget(file, budget) {
 // pastPicks; the worker's code did not change.
 // -> 9,347 / 3,425 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): measured 9,347 / 3,421 plus 4.
 // One more file in the list, SideCaseScreen; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_347, maxGzip: 3_425 };
+// -> 9,376 / 3,443 on 2026-10-25, E-11 번외 1 (draft on e11-side-cases dbb4f419):
+// measured 9,376 / 3,439 plus 4. One more file in the list, side01, offline
+// like every case chunk; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_443 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
