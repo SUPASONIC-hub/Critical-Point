@@ -569,7 +569,8 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, board-report on main caeecda: only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_644 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
