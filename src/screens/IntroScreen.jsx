@@ -13,6 +13,7 @@ import { caseDisplayCode } from "../gameCases.js";
 import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
+import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
@@ -87,6 +88,22 @@ function takeRuntimeStartAction() {
   const action = pendingStartAction;
   pendingStartAction = null;
   return action && Date.now() - action.queuedAt < START_ACTION_TTL_MS ? action : null;
+}
+
+/** The deletion-request sentence, the address a mailto link when there is one. */
+function DeletionRequest() {
+  const { address, before, after } = getDeletionRequestText();
+  return (
+    <span data-testid="deletion-request">
+      {before}
+      {address && (
+        <a href={`mailto:${address}`} style={{ color: "inherit" }}>
+          {address}
+        </a>
+      )}
+      {after}
+    </span>
+  );
 }
 
 export function IntroScreen({ view, renderers = {} }) {
@@ -678,7 +695,10 @@ export function IntroScreen({ view, renderers = {} }) {
                 이름은 원격 저장하지 않습니다. 피드백에는 실명, 연락처, 회사명처럼 개인이나
                 조직을 식별할 수 있는 정보는 쓰지 마세요. 다른 기기에서 이어하기를 위한 온라인
                 저장은 이 동의와 별개로, 직접 켤 때만 진행 기록을 올리며 이름과 피드백 내용은
-                올리지 않습니다. 삭제 요청은 결과 화면의 8자리 세션 코드로 처리합니다.
+                올리지 않습니다.{" "}
+                {/* Where a deletion request goes (SUPPORT_CONTACT in appConfig.js),
+                    beside the session code it needs, which this panel shows above. */}
+                <DeletionRequest />
               </p>
             </div>
           </section>
