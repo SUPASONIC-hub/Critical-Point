@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-25 (the state of `main` at `c1f8ec2`, after the act title cards (#295) and bundles A-13 and A-3; what changed and when is in `git log`)
+Last updated: 2026-10-25 evening (the state of `main` at `612867f`, after the era bundle (#313), bundle A-13's second pass (#318), board reports (#325) and the privacy and terms pages (#328); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -287,6 +287,36 @@ Still open, on purpose:
   (device key `critical-point-act-cards-v1`). Production runs
   `c1f8ec2`. Drafts left: #224 with #253 (2026-11-30) and #301 (E-11's
   side-case frame, December).
+- 2026-10-25, morning to evening: the cleanup (#305); #306 (a copied tab's
+  table-token check waits 300 ms for an answer instead of 80, capped at
+  1.5 s, for the recovery e2e flake); #315 (the ending verdict heading
+  「당신의 조건」 -> 「당신의 기록」 for 봉인 and 개혁); the era bundle
+  (#313 with branches A-D, #309-#312: the scenes set in Korean finance of
+  2023 in flashback and 2026 now -- paper signatures, stamps and archive
+  rooms became electronic approval, e-signatures, the document management
+  system and the backup archive -- and KD금융그룹's largest shareholder,
+  Kingsdale Partners of New York at about 30%, with no ethnic or religious
+  setting, in a line or two per case; `docs/canon.md` 「Who owns KD」 and
+  「The era」); bundle A-13's second pass (#318: scene bodies over 420
+  characters 73 -> 0, and the body ratchet is gone like the label one: any
+  body over 420 fails); #323 (the test-week summary's 「시뮬레이션(참고)」
+  column now quotes the season bot with audit and cascade both on); #325
+  (a report button on every board post, migration
+  `20261027000000_board_reports`: anon may insert four columns, no reads,
+  no automatic hiding, reports go with the post at 180 days); #326 (the
+  data drawer names where to send a deletion request, `SUPPORT_CONTACT` in
+  `src/appConfig.js`); #328 (the privacy policy and terms of use as four
+  static pages the build writes beside `index.html`, `/privacy.html`,
+  `/terms.html` and their `/en/` twins, from `scripts/legal-pages.mjs`);
+  #329 (`npm run store:shots`, store screenshots into the gitignored
+  `store-shots/`). Sixteen pull requests merged that day before the
+  evening cleanup (three bundles holding thirteen); production runs
+  `612867f`. Twelve drafts were opened during the day, all waiting on a
+  date or a decision: #307, #316 and #320 (the next ranking reset), #319
+  (the 11-30 rehearsal of #224 with #253, #307, #308, #316 and #320),
+  #308 (after #224), #322 (after the W47 measurement), #324 (W49, only if
+  P5 on 11-23), #314, #317 and #321 (E-11, December), #327 and #330 (the
+  app release: shells and ads).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`

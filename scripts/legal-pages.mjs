@@ -30,7 +30,7 @@ import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAG
  * no ads.
  */
 
-export const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026" };
+const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026" };
 
 /** Each item the policy lists, by key, in both languages. */
 export const DATA_ITEMS = {
