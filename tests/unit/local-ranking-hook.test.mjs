@@ -5,14 +5,14 @@ import { installBrowser } from "./helpers/browser.mjs";
 
 /**
  * The local ranking as the runtime holds it (state/useLocalRanking.js): the
- * rows read from this device's v10 key when the hook first renders, a row
+ * rows read from this device's v11 key when the hook first renders, a row
  * appended through the hook written back under the same key, and the rows
  * cleared from the view. The retired keys are personalBests.js's (its own test).
  */
 const row = (runId, caseId, burstScore) => ({ run_id: runId, case_id: caseId, summary: { burstScore } });
 const browser = installBrowser({
   storage: {
-    "critical-point-local-ranking-v10": JSON.stringify([row("run-1", "season-final", 61), { case_id: "season-final" }]),
+    "critical-point-local-ranking-v11": JSON.stringify([row("run-1", "season-final", 61), { case_id: "season-final" }]),
   },
 });
 const { createElement } = await import("react");
@@ -20,7 +20,7 @@ const { renderToStaticMarkup } = await import("react-dom/server");
 const { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } = await import("../../src/state/useLocalRanking.js");
 
 test("the hook reads this table's rows, appends a run's row in place of its earlier one, and writes it back", () => {
-  assert.equal(LOCAL_RANKING_STORAGE_KEY, "critical-point-local-ranking-v10");
+  assert.equal(LOCAL_RANKING_STORAGE_KEY, "critical-point-local-ranking-v11");
   let api = null;
   const Probe = () => {
     api = useLocalRanking();

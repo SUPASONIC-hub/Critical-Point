@@ -209,6 +209,16 @@ const SUSPICION_MARKS = files.some((file) => file.endsWith("_ranking_suspicion_m
 // the finale's, and the block "the season score is the mean of its cases"
 // runs; while it is a `.sql.draft` they expect the finale's and say so.
 const SEASON_MEAN = files.some((file) => file.endsWith("_season_score_case_mean.sql"));
+// The 판 읽기 axis of the score (`*_season_score_reading_axis.sql`, drafted
+// 2026-10-25 for the ranking reset after RULES_MARK 3's, C-1(1)). The client's
+// getSeasonScore already swaps 관점 전환 at its 0.16 weight, so the mean
+// without it would rank on another number than the client's: the two go
+// together, and the block "the season score has the 판 읽기 axis" runs once
+// it is a `.sql`.
+const READING_AXIS = files.some((file) => file.endsWith("_season_score_reading_axis.sql"));
+if (SEASON_MEAN && !READING_AXIS) {
+  failures.push("*_season_score_case_mean.sql is applied without *_season_score_reading_axis.sql: the server swaps 관점 전환 at 0.2 and the client (src/seasonScore.js) at 0.16. Rename both, the reading axis after the mean.");
+}
 for (const file of files) {
   if (file === RANKING_RESET) {
     await seedBeforeRankingReset();
@@ -580,6 +590,8 @@ function decisionEntry(caseId, index, { story = false } = {}) {
       focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
       // The logic streak's line (gauntletEngine's `verdict.logic`); the case summary's `logicRecord` is built from it.
       logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.6, pot: 14 },
+      // C-12's read, `[bare, seer]`: the case summary's `readingScore` (the 판 읽기 axis, C-1(1)) sums it.
+      read: [42, 60],
     },
     environmentMode: "stable",
     assistTime: 1.5,
@@ -1683,6 +1695,45 @@ if (!SEASON_MEAN) {
   }
   withHeaders(null);
   await db.query(`delete from public.playtest_sessions where run_id like 'run-mean-%'`);
+}
+
+// ---- the season score has the 판 읽기 axis (*_season_score_reading_axis, a draft until the ranking reset after RULES_MARK 3's)
+//
+// Each case row carries its 판 읽기 axis (`readingScore`, C-1(1)); a season
+// with a case row scored before the axis is refused, and the client's queue
+// lets the row go as a season that will not rank. The mean above is already
+// the 0.16 swap's (run-mean-1 and run-mean-3 against getSeasonScore).
+if (!READING_AXIS) {
+  console.log("Season score: no 판 읽기 axis check; the axis is still a draft (supabase/migrations/*_season_score_reading_axis.sql.draft).");
+} else {
+  withHeaders({ "x-forwarded-for": "198.51.100.24" });
+  {
+    const runId = "run-reading-1";
+    await playRun(runId, { session: sessionId(86) });
+    const summaries = await caseSummariesOf(runId);
+    check(Object.values(summaries).every((summary) => summary.readingScore === 70), `the case rows carry ${JSON.stringify(Object.values(summaries).map((summary) => summary.readingScore))}; the decision log's reads (42 of 60) make 70.`);
+    await post("rank a season scored with the 판 읽기 axis", "playtest_sessions", seasonPayload({ session: sessionId(86), runId }));
+    const row = await one(`select score from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]);
+    check(Number(row?.score) === getSeasonScore(summaries).burstScore, `a season with the 판 읽기 axis ranked on ${row?.score}; the client's is ${getSeasonScore(summaries).burstScore}.`);
+  }
+  for (const [runId, session, label, reading] of [
+    ["run-reading-2", 87, "rank a season with a case scored before the 판 읽기 axis", undefined],
+    ["run-reading-3", 88, "rank a season with a case whose 판 읽기 is out of range", 101],
+    ["run-reading-4", 89, "rank a season with a case whose 판 읽기 is text", "70"],
+  ]) {
+    await playRun(runId, { session: sessionId(session) });
+    const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+    if (reading === undefined) await db.query(`update public.playtest_sessions set summary = summary - 'readingScore' where run_id = $1 and case_id = $2`, [runId, middle]);
+    else await db.query(`update public.playtest_sessions set summary = summary || $3::jsonb where run_id = $1 and case_id = $2`, [runId, middle, JSON.stringify({ readingScore: reading })]);
+    await postRefused(label, "playtest_sessions", seasonPayload({ session: sessionId(session), runId }), /^P0001 older-score runs are not ranked$/);
+  }
+  const refusal = { status: 400, serverMessage: "older-score runs are not ranked" };
+  const seasonItem = { type: "case", payload: { case_id: "season-final" } };
+  check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads the older-score refusal as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
+  check(!isUnrankableRefusal(seasonItem, refusal), "the client's queue reads the older-score refusal as a run missing a case row.");
+  check(isBeatTableRefusal(seasonItem, refusal), "the client's queue does not tell the older-score refusal as a season that will not rank (BEAT_TABLE_REFUSAL in src/state/telemetryBatch.js).");
+  withHeaders(null);
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-reading-%'`);
 }
 
 // ---- the hold rate's cut points (20261011000000)

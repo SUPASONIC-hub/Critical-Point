@@ -15,8 +15,8 @@ const PACE_REFUSAL = /rate limit exceeded|limit reached|daily ceiling|at least 3
 const NOT_YET_REFUSAL = /requires every case of the run|implausibly short/;
 const MISSING_CASE_REFUSAL = /requires every case of the run/;
 // A season with a case closed before the table paid the logic streak (20261011010000),
-// or before the table of 2026-10-20 (20261020010000).
-const BEAT_TABLE_REFUSAL = /beat-table runs are not ranked|older-table runs are not ranked/;
+// or before the table of 2026-10-20 (20261020010000), or before the 판 읽기 axis (20261102030000).
+const BEAT_TABLE_REFUSAL = /beat-table runs are not ranked|older-table runs are not ranked|older-score runs are not ranked/;
 
 /**
  * What a failed send means for the row and for the rest of the batch:

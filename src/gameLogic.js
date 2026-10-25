@@ -141,6 +141,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
       pressureAdaptScore: 0,
       reflectionScore: 0,
       consistencyScore: 0,
+      readingScore: 0,
       exploitPenalty: 0,
       momentumScore: 0,
       burstScore: 0,
@@ -217,16 +218,23 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
+  // 판 읽기 (C-1(1)): the vault the case's bare hand kept against a hand that
+  // sees the wall on the same boards, the C-12 index the case close prints.
+  // Read off the whole log, as the close reads it.
+  const readingScore = scoring.getReadingScore(entries);
   // What the score is for: holding a line under pressure. Response rhythm still
   // counts, but at a weight that no longer makes a stopwatch the best strategy.
+  // 판 읽기 takes 0.2 and the six axes before it keep their ratios at 0.8 of
+  // what they were (0.28 / 0.2 / 0.2 / 0.16 / 0.08 / 0.08; 사용자 2026-10-25).
   const momentumScore = Math.round(
     clamp(
-      consistencyScore * 0.28 +
-        cognitionScore * 0.2 +
-        reflectionScore * 0.2 +
-        pressureAdaptScore * 0.16 +
-        rhythmScore * 0.08 +
-        challengeSupportScore * 0.08 -
+      consistencyScore * 0.224 +
+        cognitionScore * 0.16 +
+        reflectionScore * 0.16 +
+        pressureAdaptScore * 0.128 +
+        rhythmScore * 0.064 +
+        challengeSupportScore * 0.064 +
+        readingScore * 0.2 -
         exploitPenalty,
       0,
       100,
@@ -243,6 +251,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     pressureAdaptScore,
     reflectionScore,
     consistencyScore,
+    readingScore,
     exploitPenalty,
     ...scoring.scoreMarks(momentumScore),
   };
@@ -1025,6 +1034,7 @@ export function createCaseSummary(
     pressureAdaptScore: stats.pressureAdaptScore,
     reflectionScore: stats.reflectionScore,
     consistencyScore: stats.consistencyScore,
+    readingScore: stats.readingScore,
     exploitPenalty: stats.exploitPenalty,
     burstScore: stats.burstScore,
     momentumScore: stats.momentumScore,

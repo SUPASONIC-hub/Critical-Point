@@ -98,7 +98,7 @@ test("the seer is check:pressure's ceiling on the same board, and a bust wipes t
   assert.equal(describeCaseRead([at([62, 100])]), "이번 사건: 벽을 본 사람의 62%만큼 벌었습니다.");
 });
 
-test("none of it reaches a score: the case summary and the board read the same with it as without it", () => {
+test("only C-12's read reaches a score (C-1(1), 판 읽기), and the board still sorts on the score alone", () => {
   const entry = (index, extra) => ({
     nodeId: `n${index}`, caseId: "case01", choiceId: `c${index}`, effect: { trust: 2 }, cognition: { persistence: 1 }, triggers: ["responsibility"],
     responseTimeSec: 9 + index, challenge: { matched: index % 2 === 0, riskDelta: -1 },
@@ -107,7 +107,17 @@ test("none of it reaches a score: the case summary and the board read the same w
   const plain = Array.from({ length: 6 }, (_, index) => entry(index));
   const read = Array.from({ length: 6 }, (_, index) => entry(index, { read: [40, 90] }));
   const summary = (log) => createCaseSummary({ responsibility: 5 }, { persistence: 4 }, log, { resources: { trust: 50 } });
-  assert.deepEqual(summary(read), summary(plain));
+  // The read is the 판 읽기 axis (40 of 90 a window: 44%) at 0.2 of the score;
+  // nothing else of the summary moves, and an older log reads 0.
+  const { readingScore, burstScore, momentumScore, momentumTier, rank, ...rest } = summary(read);
+  const { readingScore: plainReading, burstScore: plainBurst, momentumScore: _m, momentumTier: _t, rank: _r, ...plainRest } = summary(plain);
+  assert.deepEqual(rest, plainRest);
+  assert.equal(readingScore, readCaseRead(read));
+  assert.equal(readingScore, 44);
+  assert.equal(plainReading, 0);
+  assert.ok(Math.abs(burstScore - plainBurst - 0.2 * readingScore) <= 1, `${burstScore} against ${plainBurst}`);
+  assert.equal(momentumScore, burstScore);
+  assert.ok(momentumTier && rank);
   // The board sorts and scores as it did; the column is a reading beside it.
   const rows = [10, 80, 45].map((score, index) => ({ run_tag: `R${index}`, case_id: "season-final", score, summary: { rank: "A", gauntlet: { vault: 1000 * (index + 1) }, completedCaseCount: 10 } }));
   const board = buildLeaderboard(rows);
