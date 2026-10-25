@@ -74,7 +74,10 @@ const budgets = [
   // rebased on main 81a48f50: measured 142,806 / 52,309 in the e2e build, the
   // gzip plus 4. The case's rules for the audit and the links, and the season
   // row's mean score.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_806, maxGzip: 52_313 },
+  // 142,806 / 52,313 -> 142,951 / 52,390 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 142,951 / 52,386 in the e2e build, the gzip plus 4. The pre-C-3 streak
+  // read on a save (the hold on a type set aside) and the run's direction.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_951, maxGzip: 52_390 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -91,7 +94,10 @@ const budgets = [
   // 19,564 / 8,588 -> 19,701 / 8,632 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 19,701 / 8,628 in the e2e build, the gzip plus 4. the settlement hands the case's rules on (settleChoice.js's getSettlementRules once, rules back for the hand-off).
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_701, maxGzip: 8_632 },
+  // 19,701 / 8,632 -> 20,520 / 8,916 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 20,520 / 8,912 in the e2e build, the gzip plus 4. The ladder's three new
+  // steps (사건 01 to 03, each with its line) and the direction's names.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 20_520, maxGzip: 8_916 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -401,7 +407,10 @@ const budgets = [
   // -> 102,560 on 2026-10-25, #224 (RULES_MARK 3) rebased on main 0d0c7dbb:
   // B2's link tag beside the act card's gate. Measured 102,560 / 35,437; the
   // gzip budget still holds.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_560, maxGzip: 35_457 },
+  // 35,457 -> 35,465 gzip on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured 102,550 /
+  // 35,461, the gzip plus 4. The card's tag prints the direction, and the
+  // hashed names it imports moved.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_560, maxGzip: 35_465 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -576,7 +585,9 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // 4,639 -> 4,645 gzip on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured 11,492 / 4,641
+  // (hashed names only), the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_645 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -626,7 +637,11 @@ const budgets = [
   // 36,757 / 13,658 -> 36,762 / 13,661 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 36,762 / 13,657 in the e2e build, the gzip plus 4. the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip is under main's.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_762, maxGzip: 13_661 },
+  // 36,762 / 13,661 -> 37,332 / 13,864 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 37,332 / 13,860 in the e2e build, the gzip plus 4. The streak held on a
+  // direction (logicStreak.js's getLogicDirection and getEffectLean) and the
+  // pre-C-3 hold set aside in upgradeRunRecord.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_332, maxGzip: 13_864 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -871,7 +886,10 @@ const budgets = [
   // 1,927 / 1,053 -> 1,953 / 1,070 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 1,953 / 1,066 in the e2e build, the gzip plus 4. its numbers came here from weeklyRules, and the case's rules decide whether it counts.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_953, maxGzip: 1_070 },
+  // 1,953 / 1,070 -> 2,085 / 1,102 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 2,085 / 1,098 in the e2e build, the gzip plus 4. The cases before the
+  // audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3).
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_085, maxGzip: 1_102 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -930,7 +948,9 @@ const budgets = [
   // 2,740 / 1,255 -> 2,566 / 1,109 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,566 / 1,105 in the e2e build, the gzip plus 4. measured under Vite 8 (2,740 / 1,251 under Rollup).
-  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_566, maxGzip: 1_109 },
+  // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 2,601 / 1,109 in the e2e build, the gzip plus 4. The v10 key retired (v11).
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
