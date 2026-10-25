@@ -819,8 +819,8 @@ for (const row of [...["heat 40", "heat 50", "heat 60"].map((label) => fixed.fin
 /**
  * Tools together (2026-10-13, the plan's question of a cap on tools). The
  * relic rows above play each tool alone and all twelve at once; a cap asks
- * about the sets between. The same hand on the same cases holds the five
- * tools that need no unlock (a first season), the seven a feat unlocks, and
+ * about the sets between. The same hand on the same cases holds the (eight, since C-7)
+ * tools that need no unlock (a first season), the ones a feat unlocks, and
  * the builds a cap of 3 or 5 slots would leave a player who keeps the
  * tools that lift best play most when held alone (the rows above, so the
  * order is read, not written here). "Of the whole lift" is the share of what
@@ -834,7 +834,7 @@ const everyTool = relicReport[relicReport.length - 1];
 const ranked = relicReport.filter((row) => row.relics.length === 1).sort((left, right) => right.listen.meanVault - left.listen.meanVault);
 console.log(`measured tools one at a time, by what it adds to listening play: ${ranked.map((row) => `${row.name} ${liftOf(row) >= 1 ? "+" : ""}${((liftOf(row) - 1) * 100).toFixed(1)}%${RELICS[row.name].unlock ? " (unlocked)" : ""}`).join(", ")}; all ${RELIC_IDS.length} together +${((liftOf(everyTool) - 1) * 100).toFixed(1)}%`);
 const toolSets = [
-  ["the 5 from the start", DEFAULT_RELIC_POOL],
+  [`the ${DEFAULT_RELIC_POOL.length} from the start`, DEFAULT_RELIC_POOL],
   [`the ${RELIC_IDS.length - DEFAULT_RELIC_POOL.length} a feat unlocks`, RELIC_IDS.filter((id) => RELICS[id].unlock)],
   ...[3, 5].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
   ["the swap keeps", RELIC_DROP_ORDER.slice(-RELIC_SLOTS)],
