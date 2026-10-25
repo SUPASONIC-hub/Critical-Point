@@ -285,7 +285,9 @@ const budgets = [
   // 62,372 -> 62,377 gzip on 2026-10-25, the rehearsal on main caeecdac (#318 A-13,
   // scene bodies under 420): the same 172,533 bytes, measured 62,373 here and in CI.
   // 172,282 / 62,234 -> 172,403 / 62,270 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 172,403 / 62,266 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_533, maxGzip: 62_377 },
+  // -> 172,646 / 62,389 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
+  // #325's report button and its copy beside everything the rehearsal carries. Measured 172,646 / 62,385 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_646, maxGzip: 62_389 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -583,7 +585,9 @@ const budgets = [
   // -> 193,972 raw on 2026-10-25, the rehearsal with the bundle's ember 「고점 판」 (3ca5d7b9);
   // measured 193,972 / 36,146, the gzip budget holds.
   // 193,412 / 36,058 -> 194,165 / 36,203 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 194,165 / 36,199 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_165, maxGzip: 36_203 },
+  // -> 194,725 / 36,295 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
+  // #325's report row and fieldset beside C-1's card, D2's badge and the bundle's marks. Measured 194,725 / 36,291 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_725, maxGzip: 36_295 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -618,7 +622,9 @@ const budgets = [
   // NotebookPen); the five they replace are still drawn elsewhere. Measured
   // 17,296 / 6,136 in the e2e build, the gzip plus 4.
   // 17,050 / 6,047 -> 17,286 / 6,142 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 17,286 / 6,138 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_296, maxGzip: 6_142 },
+  // -> 17,532 / 6,240 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
+  // #325's flag icon beside the icons the stacked drafts import. Measured 17,532 / 6,236 in the e2e build, the gzip plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_532, maxGzip: 6_240 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as

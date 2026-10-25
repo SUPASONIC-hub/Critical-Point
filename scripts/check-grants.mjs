@@ -166,6 +166,15 @@ async function seedBeforeRankingReset() {
     await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ($1, 'case01', 'n1', '{}')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '점검', '랭킹을 비우기 전에 쓴 글', 'board:${RESET_SEED}')`, [`${RESET_SEED}-session`]);
+    // A report on that post (#325, 20261027000000), once the table exists: before
+    // RULES_MARK 4's reset in the 11-30 rehearsal. It goes with the post when the
+    // seed is taken out (on delete cascade), so the count below is unchanged.
+    if ((await db.query(`select to_regclass('public.board_reports') is not null as here`)).rows[0].here) {
+      await db.query(
+        `insert into public.board_reports (post_id, session_id, reason, actor_key) select id, $1, 'spam', $2 from public.board_posts where session_id = $1`,
+        [`${RESET_SEED}-session`, `board:${RESET_SEED}`],
+      );
+    }
     await db.query(`insert into public.cloud_saves (code_hash, saved_at, payload) values ($1, now(), '{"save": {}}')`, [RESET_SEED]);
     await db.query(`insert into public.telemetry_rate_limits (actor_key, request_count) values ($1, 7)`, [RESET_SEED]);
     await db.query(`insert into public.private_settings (name, value) values ($1, 'kept')`, [RESET_SEED]);
