@@ -233,7 +233,10 @@ const budgets = [
   // -> 172,282 / 62,234 on 2026-10-25, 묶음 시대고증(#313): the intro's story
   // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
   // 62,226 in CI and 62,230 here, the larger gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_282, maxGzip: 62_234 },
+  // -> 172,353 / 62,247 for W49's row in the calendar (P5 of the 11-23
+  // verdict, the test week again): the entry chunk carries MERGED_WEEKS.
+  // Measured 172,353 / 62,243 in CI (verify-quick 40168010685), plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_353, maxGzip: 62_247 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
