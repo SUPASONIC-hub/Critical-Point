@@ -502,7 +502,21 @@ export function getTabToken() {
  * mounts (AppContent) rather than before the first paint.
  */
 const TAB_TOKEN_CHANNEL = "critical-point-tab-token";
-const TAB_TOKEN_CLAIM_MS = 80;
+/**
+ * How long a claim waits for a live tab to answer. The answer is a round trip
+ * through a tab that is usually in the background and is often run on the same
+ * main thread as the copy (a window opened from a page shares its opener's
+ * renderer), so it waits behind the copy's own boot: 80 ms was too short, and the
+ * answer came in after the claim had already kept the copied token -- 85 to 240
+ * ms in a loaded e2e run, where three runs in four lost it. A reload hears
+ * nothing and so waits the whole stretch; the claim starts at boot (main.jsx),
+ * so the wait runs alongside the runtime chunk's download, which the runtime
+ * waits for anyway, and is spent under the intro when there is one.
+ */
+const TAB_TOKEN_CLAIM_MS = 300;
+// A deadline that fires late means this page's thread was busy, and the answer
+// may be queued behind it: the claim waits one stretch more, up to this much in all.
+const TAB_TOKEN_CLAIM_MAX_MS = 1500;
 let tabTokenClaim = null;
 
 function readStoredTabToken() {
@@ -550,7 +564,15 @@ export function claimTabToken() {
       return;
     }
     channel.postMessage({ type: "claim", token: inherited });
-    globalThis.setTimeout(() => settle(false), TAB_TOKEN_CLAIM_MS);
+    const started = Date.now();
+    const wait = (from) =>
+      globalThis.setTimeout(() => {
+        const now = Date.now();
+        const late = now - from - TAB_TOKEN_CLAIM_MS > TAB_TOKEN_CLAIM_MS / 2;
+        if (claiming && late && now - started < TAB_TOKEN_CLAIM_MAX_MS) wait(now);
+        else settle(false);
+      }, TAB_TOKEN_CLAIM_MS);
+    wait(started);
   });
   return tabTokenClaim;
 }
