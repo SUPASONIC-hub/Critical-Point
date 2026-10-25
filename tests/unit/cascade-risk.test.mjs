@@ -290,16 +290,18 @@ test("a saved list of links keeps only what a table can hold", () => {
 
 /* ------------------------------------------------------ a rule of the table */
 
-test("the links are a rule of the table from 프롤로그 04 (RULES_MARK 3), told with B's numbers, and no week switches them", () => {
+test("the links are a rule of the table from 사건 03 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3), told with B's numbers, and no week switches them", () => {
   assert.deepEqual(WEEK_RULE_DEVICES, []);
   assert.equal(weekRuleHasDevice("audit-cascade", "cascade"), false, "W47's stamp switches nothing now");
   assert.equal(getWeekRule("cascade"), null, "the cascade week is gone from the catalogue");
-  assert.equal(UNLOCK_LADDER.find((step) => step.adds.includes("cascade")).caseId, "prologue04");
-  assert.equal(rulesFor("prologue03").has("cascade"), false);
+  assert.equal(UNLOCK_LADDER.find((step) => step.adds.includes("cascade")).caseId, "case03");
+  assert.equal(rulesFor("case02").has("cascade"), false);
+  assert.ok(rulesFor("case03").has("cascade"));
   assert.ok(rulesFor("prologue01", { veteran: true }).has("cascade"), "NEW GAME+ has them from the first case");
   assert.equal(MUTATION_RULES.cascade, "cascade", "CASCADE belongs to its rule");
   assert.equal(rulesFor("case01", { story: true }).has("cascade"), false, "story mode never has them");
-  assert.ok(introFor("prologue04").some((line) => line.includes("연결")), "프롤로그 04 says they open");
+  assert.ok(introFor("case03").some((line) => line.includes("연결")), "사건 03 says they open");
+  assert.equal(introFor("prologue04").some((line) => line.includes("연결")), false);
   assert.equal(weekRuleOverlay("audit-cascade", BASE_SCHEMA), null, "W47 moved no number on the board");
 });
 

@@ -59,7 +59,7 @@ import {
   RUN_INITIAL_STATE,
   STANCE_CHARGE,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { getLogicType } from "../../src/gauntlet/logicStreak.js";
+import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { LOCK_PRESS_SECONDS } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
@@ -426,8 +426,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         // wild card on every scene that deals one, which the table allows (only
         // the route a reframe opens is once a case). It draws nothing here.
         const takeReframe = reframeChoice && (policy.wildOnly || (caseReframes === 0 && random() < policy.reframe));
-        // What `useChoiceCommit.getOfferedTypes` hands the settlement: the types on the table.
-        const offered = [...new Set([...fixed, ...(reframeChoice ? [reframeChoice] : [])].map(getLogicType).filter(Boolean))];
+        // What `useChoiceCommit.getOfferedDirections` hands the settlement: the directions on the table.
+        const offered = [...new Set([...fixed, ...(reframeChoice ? [reframeChoice] : [])].map(getLogicDirection).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))];
         const choice = policy.logicHand
           ? pickByType(policy, fixed, run.logic)
           : takeReframe
@@ -539,14 +539,15 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
 
   /**
    * A hand that plays for the logic streak, for the measurement at the end of
-   * check-endings.mjs: it holds one type of card, and `switch` leaves it for another
-   * only when the pressure rose going into the window (the streak's own rule,
-   * gauntlet/logicStreak.js). When its type is not on the table it takes what is.
+   * check-endings.mjs: it holds one direction (사람 or 자리, C-3), and `switch`
+   * leaves it for the other only when the pressure rose going into the window
+   * (the streak's own rule, gauntlet/logicStreak.js). When its direction is
+   * not on the table it takes what is.
    */
   function pickByType(policy, cards, logic) {
     const held = logic.type ?? policy.holds;
     const leave = policy.logicHand === "switch" && logic.rose;
-    const wanted = cards.filter((candidate) => (getLogicType(candidate) === held) !== leave);
+    const wanted = cards.filter((candidate) => (getLogicDirection(candidate) === held) !== leave);
     return pick(wanted.length ? wanted : cards);
   }
 
@@ -614,12 +615,26 @@ function see(seen, verdict) {
   }
 }
 
+/**
+ * The simulated card leaning the way a typed hand picked (C-3: the streak is
+ * held on the direction, `getLogicDirection`, read off the card's effect).
+ * Four of capital moved to trust or back: what the card pays (its gains) and
+ * what it burns are the same either way, so a typed hand differs from the
+ * untyped one only by the streak. The untyped card leans neither way.
+ */
+const DIRECTION_SHIFT = Object.freeze({ people: -4, position: 4 });
+export function directCard(card, direction) {
+  const shift = DIRECTION_SHIFT[direction] ?? 0;
+  const effect = card.effect ?? {};
+  return shift ? { ...card, effect: { ...effect, capital: (effect.capital ?? 0) + shift, trust: (effect.trust ?? 0) - shift } } : card;
+}
+
 export const HAND = [
   { id: "people", label: "people", cognition: { persistence: 1 }, effect: { trust: 10, humanCost: -4, time: -6, capital: -3, fatigue: 5 } },
   { id: "record", label: "record", cognition: { inference: 1 }, effect: { legitimacy: 10, time: -5, trust: -3, humanCost: 3, fatigue: 3 } },
   { id: "fast", label: "fast", cognition: { risk: 1 }, effect: { capital: 8, time: 5, legitimacy: -12, trust: -3, humanCost: 3 } },
 ];
-/** How often the hand leaves the type it is holding for the next card along. */
+/** How often the hand leaves the direction it is holding for the next card along. */
 const HAND_WANDER = 0.2;
 /** How often it charges a stance before it pushes. */
 const HAND_LOCKS = 0.5;
@@ -655,7 +670,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
   // season, and the season's last lets them lapse.
   let carried = { caseIndex: -1, links: [] };
   /**
-   * `pickType` gives the simulated card a type for the window (`LOGIC_HANDS`
+   * `pickType` gives the simulated card a direction for the window
+   * (`directCard`; the hands are `LOGIC_HANDS`
    * in report-gauntlet-loop.mjs), which puts the logic streak in play; `logic` is the streak the case
    * opens with, carried from the case before as a run carries it. `lock` charges
    * a stance to the full before the first push, a press at a time: the press
@@ -690,7 +706,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       // The run's own board for every run but a story one, whose wall stands far.
       const seed = `sim:${caseIndex}:${windowIndex}`;
       const offers = pickType ? sceneFor(caseIndex, windowIndex) : null;
-      const staked = pickType ? { ...card, cognition: { [pickType(offers, run.logic, seed)]: 1 } } : card;
+      const staked = pickType ? directCard(card, pickType(offers, run.logic, seed)) : card;
       let win = createWindow({ schema: getTableSchema(run), seed });
       win = reduce(win, { type: "SELECT", id: card.id }, rules);
       if (lock) {
@@ -715,7 +731,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       if (lock?.cashAs && win.status === "live") win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
       if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules) });
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules) });
       audit = verdict.audit?.count ?? 0;
       see(seen, verdict);
       if (run.schema.mutations.includes("cascade")) {
@@ -793,9 +809,9 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       const seed = `hand:${caseIndex}:${windowIndex}`;
       let win = createWindow({ schema: run.schema, seed });
       // The richest card is the one a COLD FEET board seals, and the one a hand
-      // wants most; otherwise the hand holds its type, and now and then leaves it.
+      // wants most; otherwise the hand holds its direction, and now and then leaves it.
       const sealedId = getSealedCardId(HAND, run.schema);
-      const held = HAND.findIndex((candidate) => getLogicType(candidate) === run.logic.type);
+      const held = HAND.findIndex((candidate) => getLogicDirection(candidate) === run.logic.type);
       const wanted = HAND[(Math.max(0, held) + (handUnit(`${seed}:card`) < HAND_WANDER ? 1 : 0)) % HAND.length];
       const card = HAND.find((candidate) => candidate.id === sealedId) ?? wanted;
       win = reduce(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] }, rules);

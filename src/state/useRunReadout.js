@@ -135,7 +135,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // effect to spare (check:runtime-budget).
   const warmCaseId = seedBase ? node?.caseId : null;
   useEffect(() => warmCasePortraits(warmCaseId), [warmCaseId]);
-  // The case's rules (tableUnlocks.js): the audit and the links are on from 프롤로그 04 (RULES_MARK 3).
+  // The case's rules (tableUnlocks.js): the audit is on from 사건 02 and the links from 사건 03 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3).
   const caseRules = getTableRules(currentCase, gauntletRun);
   // The case's audit (B3), off the same log the settlement counts; null in a case whose rules do not count it.
   const auditCount = useMemo(() => (isAuditOn(gauntletRun, caseRules) ? countAudit(log) : null), [caseRules, gauntletRun, log]);

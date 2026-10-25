@@ -1,6 +1,6 @@
 import { clamp, isResourceGain } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
-import { advanceLogic, getHeatTier, getLogicBonus, getLogicType, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
+import { advanceLogic, getHeatTier, getLogicBonus, getLogicDirection, LOGIC_DIRECTIONS, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
 import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE, RELIC_SLOTS } from "./relics.js";
 import {
   AFTERSHOCK_START,
@@ -865,14 +865,31 @@ function withoutKeys(source, retired, renamed = []) {
 }
 
 /**
+ * A streak saved before C-3 (2026-10-25) holds the thinking type it was held
+ * on; the streak is held on a direction now (logicStreak.js), so the hold
+ * starts over and the streak it built is kept. A retired value like the keys
+ * above, not one the save lost.
+ */
+function withoutTypeHold(logic) {
+  if (!isRecord(logic) || typeof logic.type !== "string" || LOGIC_DIRECTIONS.includes(logic.type)) return logic;
+  return { ...logic, type: null, held: 0 };
+}
+
+/**
  * A saved run record with those keys set aside and the two renamed ones read
- * under their new names; the record itself when it holds none of them. Every
- * reader of a record goes through this (`normalizeRunState`), and so does the
- * save's repair (state/savedState.js): a key retired here is not a value the
- * save lost, so a save from that build comes back without a recovery notice.
+ * under their new names, and a streak held on a type read as one held on
+ * nothing yet; the record itself when it holds none of them. Every reader of
+ * a record goes through this (`normalizeRunState`), and so does the save's
+ * repair (state/savedState.js): a key retired here is not a value the save
+ * lost, so a save from that build comes back without a recovery notice.
  */
 export function upgradeRunRecord(value) {
   if (!isRecord(value)) return value;
+  const typed = withoutTypeHold(value.logic);
+  const practiceTyped = isRecord(value.practice) ? withoutTypeHold(value.practice.logic) : undefined;
+  if (typed !== value.logic || practiceTyped !== value.practice?.logic) {
+    value = { ...value, logic: typed, ...(practiceTyped !== value.practice?.logic ? { practice: { ...value.practice, logic: practiceTyped } } : null) };
+  }
   const run = withoutKeys(value, RETIRED_RUN_KEYS, RENAMED_RUN_KEYS);
   const window = withoutKeys(run.suspended?.window, RETIRED_WINDOW_KEYS);
   const record = withoutKeys(run.practice?.record, RETIRED_RECORD_KEYS);
@@ -1465,8 +1482,8 @@ function readWindowUnder(window, rules) {
  * the table -- is left as it is under any rules.
  *
  * The logic streak is settled here on every window (`advanceLogic`): `forced`
- * says the room played the card, `offered` is the types the scene had on the
- * table. The pot is paid on the streak as this window's card left it.
+ * says the room played the card, `offered` is the directions the scene had on
+ * the table (`listOfferedDirections`). The pot is paid on the streak as this window's card left it.
  *
  * `audit` is the case's audit before this window (`countAudit` over the
  * case's log): read only in a case whose `rules` have it (auditRisk.js), which
@@ -1491,13 +1508,14 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
-  // The streak after this window's card. Without the rule the type is false,
+  // The streak after this window's card: its direction (사람 or 자리,
+  // `getLogicDirection`, C-3). Without the rule the direction is false,
   // "not in play", and a card the room played is not the hand's pick (null:
   // the bust still ends the streak). Two relics bend it: ENCORE holds the
   // streak through a bust, every bust; METRONOME
-  // lets a change of type count as a switch one scene longer after a rise.
+  // lets a change of direction count as a switch one scene longer after a rise.
   const logicOn = rules.has("logic");
-  const logicType = logicOn && (forced ? null : getLogicType(card));
+  const logicType = logicOn && (forced ? null : getLogicDirection(card));
   const streak = advanceLogic(current.logic, {
     type: logicType,
     tier: getHeatTier(outcome, gauge),
@@ -1614,11 +1632,12 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       stanceEarned: !current.practice && rules.has("stance") && earnedStance(focusMode, focusCharge, focusHits, outcome),
       masteryCount: stanceMastery[focusMode],
     },
-    // The streak's own line of the verdict, on every window: the card's type,
+    // The streak's own line of the verdict, on every window: the card's
+    // direction (`type`, "even" for a card that leans neither way),
     // the tier the window closed in, whether the pressure had risen going into
     // it, what that did to the streak (`advanceLogic`'s move) and the streak
     // after. The case summary's record is built from these. `held` is how many
-    // windows in a row the type has now been picked, `bonus` is what
+    // windows in a row the direction has now been picked, `bonus` is what
     // the hand's pot was multiplied by before LOCK and `pot` what that added.
     logic: {
       type: logicType || null,
@@ -1848,17 +1867,21 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 3 (B3's audit and B2's
- * links as rules of the table, from 프롤로그 04; 2 was the day-ten table of
- * 2026-10-20): every run summary carries it, so every case row carries it as
- * `dynamics`, and the server ranks no season with a case row below it
- * (*_rules_mark3_ranking_reset.sql; 20261020010000 asked for 2, and the
- * reset of 20261011010000 read `logicStreak` the same way). Raise the number,
+ * The mark of a case closed at the table of RULES_MARK 4 (C-3 and C-4, the
+ * user's answers of 2026-10-25: the logic streak held on the card's direction,
+ * 사람 or 자리, and OVERCLOCK, the audit and the links opening one a case in
+ * 사건 01 to 03). 3 was B3's audit and B2's links as rules of the table from
+ * 프롤로그 04, 2 the day-ten table of 2026-10-20. Every run summary carries
+ * it, so every case row carries it as `dynamics`, and the server ranks no
+ * season with a case row below it (*_rules_mark4_ranking_reset.sql, a draft
+ * until the ranking reset after RULES_MARK 3's; *_rules_mark3_ranking_reset
+ * asked for 3, 20261020010000 for 2, and the reset of 20261011010000 read
+ * `logicStreak` the same way). Raise the number,
  * never reuse it, when the table changes again. The migration,
  * telemetryBatch.js and check-grants.mjs name it too.
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 3;
+export const RULES_MARK = 4;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

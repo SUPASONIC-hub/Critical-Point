@@ -94,10 +94,13 @@ const BUDGETS = {
   // 1460 -> 1260 on 2026-10-06: ratcheted to what it measures (1229). The
   // case rows above live on the packs, and the rules that read the season's
   // tables are `seasonRules.js`.
+  // 18 -> 19 imported names on 2026-10-25 (C-3): the 일관성 score's lean is
+  // `getEffectLean` in gameConstants.js, imported here, so the logic streak
+  // (logicStreak.js) reads a card's direction with the same function.
   "src/gameLogic.js": {
     lines: 1260,
     longestLine: 190,
-    importedNames: 18,
+    importedNames: 19,
     hooks: {},
   },
   // GameRuntime read 2280 / 167 and PlayScreen 340 / 14 until 2026-09-14, when

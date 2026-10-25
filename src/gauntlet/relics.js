@@ -65,7 +65,7 @@ export const RELICS = Object.freeze({
     label: "METRONOME",
     name: "메트로놈",
     icon: "timer",
-    text: "열기가 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.",
+    text: "열기가 오른 다음 장면까지, 방향을 바꿔도 전환으로 인정된다.",
     proc: "전환을 붙잡았다",
     unlock: null,
   },
