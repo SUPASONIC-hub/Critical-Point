@@ -80,9 +80,10 @@ Three of these are reveals, and each still means what it meant:
 | Stake | About 30% of KD금융그룹 (KD은행, KD캐피탈, KD데이터랩, KD자산운용, KD생명): the largest single holding, not a majority |
 | How | After the 1998 외환위기 it bought the failed 옛 경동은행 and renamed it KD은행, then sold part of it in the 2010s; the Korean group is one square of its Asia portfolio |
 | In the March vote | Its ~30% is inside the 외국인 68% of 사건 23 and votes 찬성; the 22.7% that follows 클리어보트 is other foreign institutions. So 찬성 50.6% stands |
-| On the boards | 사건 25: at the KD캐피탈 이사회 of 3월 16일 the two Kingsdale directors head the 찬성 list, by video. 사건 43's 5 대 3 stands; the vote may show which directors sit for New York |
+| On the boards | 사건 25: at the KD캐피탈 이사회 of 3월 16일 the two Kingsdale directors head the 찬성 list, by video. 사건 43's 5 대 3 stands; of its 8 votes (회장 1 + 사외이사 7), two are the Kingsdale-recommended 사외이사 voting 찬성 by video from New York, the same two as 사건 25 |
 | Where the pressure comes from | New York's quarterly ROE target, the dividend and the 「아시아 포트폴리오 리뷰」; English mail and dawn video calls on New York time; the board seats New York appoints; a rumour that the value is being raised before a sale |
 | Seoul's window | 그룹전략실, 본사 33층: it makes the New York numbers come out |
+| 사건 44's four acquittals | Approved from a shared account, so the e-signature field is empty and no approver can be named -- the same kind of account as 프롤로그 05's 전략팀-공용03; 사건 45 reads the erased pencil marks on the scanned printouts of those four |
 
 The owner is a company and is drawn only as a company. No person in the
 season is given an ethnicity or religion through it, and nothing in the copy
