@@ -240,7 +240,10 @@ const budgets = [
   // (TAB_TOKEN_CLAIM_MS 300, one more wait when the timer fired late, capped
   // at TAB_TOKEN_CLAIM_MAX_MS). Measured 172,244 / 62,201 in the CI e2e build,
   // the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_244, maxGzip: 62_205 },
+  // 172,244 / 62,205 -> 172,367 / 62,293 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): fetchHallOfFame in
+  // telemetry.js and the data notice's line that a checked top season may stay
+  // in the hall of fame by its run tag; measured 172,367 / 62,289 + 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_367, maxGzip: 62_293 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -401,7 +404,8 @@ const budgets = [
   // -> 102,560 on 2026-10-25, #224 (RULES_MARK 3) rebased on main 0d0c7dbb:
   // B2's link tag beside the act card's gate. Measured 102,560 / 35,437; the
   // gzip budget still holds.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_560, maxGzip: 35_457 },
+  // 102,560 -> 102,564 raw on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): chunk names only; the gzip in budget.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_564, maxGzip: 35_457 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -445,7 +449,8 @@ const budgets = [
   // 44,569 / 14,826 in the e2e build, the gzip plus 4.
   // 44,569 / 14,830 -> 44,583 / 14,831 on 2026-10-25, #224 (RULES_MARK 3) rebased on
   // main 7236f80b: measured 44,583 / 14,827 in the e2e build, the gzip plus 4. Hash names in its imports only.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_583, maxGzip: 14_831 },
+  // 44,583 -> 44,590 raw on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): chunk names only; the gzip in budget.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_590, maxGzip: 14_831 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -504,7 +509,9 @@ const budgets = [
   // -> 193,577 / 36,084 on 2026-10-25, #224 rebased on main 0d0c7dbb: B2's
   // link tag (.gx-card-link) and the phone signal row's 2px gap. Measured
   // 193,577 / 36,080, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_577, maxGzip: 36_084 },
+  // 193,577 / 36,084 -> 193,821 / 36,115 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): the hall of fame's
+  // badge on a ranking row (.ranking-hall-badge); measured 193,821 / 36,111 + 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_821, maxGzip: 36_115 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -566,7 +573,10 @@ const budgets = [
   // 4,793 / 2,147 -> 5,033 / 2,256 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 5,033 / 2,252 in the e2e build, the gzip plus 4. the personal bests' state, fetch and line (src/personalBests.js) and the heading that says the season record is a mean of cases.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_033, maxGzip: 2_256 },
+  // 5,033 / 2,256 -> 5,681 / 2,585 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7), the 2nd stage: the badges
+  // (src/hallOfFameBadges.js, public_hall_of_fame read on mount) and the
+  // footnote's line; measured 5,681 / 2,581 + 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_681, maxGzip: 2_585 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -626,7 +636,9 @@ const budgets = [
   // 36,757 / 13,658 -> 36,762 / 13,661 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 36,762 / 13,657 in the e2e build, the gzip plus 4. the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip is under main's.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_762, maxGzip: 13_661 },
+  // 13,661 -> 13,695 gzip on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): the same 36,762 bytes, other chunk
+  // names inside; measured 13,691 + 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_762, maxGzip: 13_695 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -774,7 +786,8 @@ const budgets = [
   // 2,634 / 1,403 -> 2,315 / 1,303 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,315 / 1,299 in the e2e build, the gzip plus 4. the audit's numbers and the audit and cascade weeks left it; W47's line stays, written out.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_315, maxGzip: 1_303 },
+  // 2,315 -> 2,316 raw on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): a chunk name one letter longer.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_316, maxGzip: 1_303 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the

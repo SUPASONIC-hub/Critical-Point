@@ -160,6 +160,19 @@ Still open, on purpose:
   a season with a case that has no count keeps the plain mean. The same 200
   seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
   (balanced), procedure +3.1.
+- D2, the hall of fame (draft on top of #224, D2-명예의전당-설계안-20261021.md,
+  every question (1) and question 9 (1)): `20261102030000_hall_of_fame.sql`
+  (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
+  `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
+  `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
+  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  and two steps in `verify-ranking.yml`: the settle call right after the
+  marks, from the same check, and a job of its own with `contents: write`
+  that force-pushes one commit to the orphan branch `hall-of-fame`. A week's
+  board settles four weeks after its Monday; a table's once the next table's
+  board is first written. Not merged: the migration applies on merge, and the
+  design waits for #224 and seven days of the daily check (the week of 11-16
+  at the earliest).
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain

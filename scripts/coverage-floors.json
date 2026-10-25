@@ -43,6 +43,8 @@
     "src/gauntlet/weeklyRules.js": 100,
     "src/gauntlet/windowReplay.js": 100,
     "src/gauntlet/windowTrail.js": 100,
+    "src/hallOfFame.js": 100,
+    "src/hallOfFameBadges.js": 100,
     "src/judgementHabit.js": 100,
     "src/logicReport.js": 100,
     "src/personalBests.js": 97,

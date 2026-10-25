@@ -198,7 +198,7 @@ test("the CI read is split, each query one SELECT and nothing else, and the publ
   const one = runRowsSql("run-'x");
   assert.equal(one.indexOf(";"), one.length - 1);
   assert.match(one, /\n where run_id = 'run-''x'\n order by case_id;$/);
-  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at\n/);
+  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at, suspicion\n/);
   assert.doesNotMatch(one, writes);
   assert.throws(() => runRowsSql(""), /non-empty/);
   assert.deepEqual(readRunIds(JSON.stringify({ rows: [{ run_id: "b" }, { run_id: "a" }, { run_id: "b" }, { run_id: null }] })), ["b", "a"]);

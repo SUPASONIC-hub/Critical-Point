@@ -150,7 +150,10 @@ const fileBudgets = {
   // way out, and the quiet button's two half-rules made one.
   // 3170 / 76900 -> 3031 / 67101 on 2026-10-13: comments no longer counted
   // (139 lines and 9799 bytes of them that day), the room unchanged.
-  "base-intro-ranking.css": { lines: 3031, bytes: 67101 },
+  // 3031 / 67101 -> 3033 / 67309 on 2026-10-25 (D2 draft, measured): the hall
+  // of fame's badge on a ranking row, a rule of its own (11 lines, 208 bytes)
+  // so the badge list above is not written twice.
+  "base-intro-ranking.css": { lines: 3033, bytes: 67309 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up

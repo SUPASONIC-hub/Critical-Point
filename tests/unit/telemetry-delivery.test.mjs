@@ -511,3 +511,14 @@ test("the ranking asks for one board: the ordinary one, or a week's rule's own",
   assert.equal(week.get("week"), "eq.2026-W46");
   assert.ok(ordinary.get("select").split(",").includes("week"));
 });
+
+test("the hall of fame is read for its places only, and a refusal is said (D2)", async () => {
+  browser.respond("/rest/v1/public_hall_of_fame", () => ok([{ board: "table-3", place: 1, run_tag: "AAAA1111", settled_on: null }]));
+  const { rows } = await telemetry.fetchHallOfFame();
+  assert.deepEqual(rows, [{ board: "table-3", place: 1, run_tag: "AAAA1111", settled_on: null }]);
+  const query = new URL(browser.callsTo("/rest/v1/public_hall_of_fame").at(-1).path, "https://x").searchParams;
+  assert.equal(query.get("select"), "board,place,run_tag,settled_on");
+  assert.equal(query.get("place"), "not.is.null");
+  browser.respond("/rest/v1/public_hall_of_fame", () => refusal(404, "relation does not exist", "42P01"));
+  await assert.rejects(telemetry.fetchHallOfFame(), (error) => error.status === 404);
+});
