@@ -78,7 +78,9 @@ const budgets = [
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
   // asks first, never before. Measured 32,897 / 13,018 in the e2e build, the
   // gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_022 },
+  // 32,897 / 13,022 -> 32,897 / 13,028 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the same code
+  // under moved chunk names. Measured 32,894 / 13,024, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_028 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -243,7 +245,10 @@ const budgets = [
   // (draft on e11-side01 2a82cfd1): the event's name in appConfig.js. The marks
   // and their merge stay out of this chunk (state/sideMarks.js). Measured
   // 174,478 / 62,954, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 174_478, maxGzip: 62_958 },
+  // 174,478 / 62,958 -> 174,649 / 63,007 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the release
+  // list's entry for side02, its label, title and chunk loader
+  // (src/nodes/sidePacks.js). Measured 174,649 / 63,003, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 174_649, maxGzip: 63_007 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -443,7 +448,9 @@ const budgets = [
   // 44,569 / 14,830 -> 44,851 / 14,910 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the
   // finale's line that the side slot opened, and the side list it reads.
   // Measured 44,851 / 14,906, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_851, maxGzip: 14_910 },
+  // 44,851 / 14,910 -> 44,851 / 14,915 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the same code
+  // under moved chunk names. Measured 44,851 / 14,911, the gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_851, maxGzip: 14_915 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -1057,7 +1064,9 @@ function checkBudget(file, budget) {
 // -> 9,376 / 3,443 on 2026-10-25, E-11 번외 1 (draft on e11-side-cases dbb4f419):
 // measured 9,376 / 3,439 plus 4. One more file in the list, side01, offline
 // like every case chunk; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_443 };
+// 9,376 / 3,443 -> 9,405 / 3,449 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): side02's chunk in the
+// offline list, like the case chunks. Measured 9,405 / 3,445, the gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 9_405, maxGzip: 3_449 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

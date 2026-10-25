@@ -12,7 +12,8 @@ import { NEW_GAME_PLUS_KEY, SIDE_CASES_KEY } from "../src/appConfig.js";
  * The first case played is the framework's placeholder, side00, which only a
  * debug build visited with `?side-fixture=1` lists (src/nodes/sidePacks.js) --
  * the dev server these specs run against is one. Without the switch the list is
- * what a release lists: 번외 1 (side01) alone, played to its ending below.
+ * what a release lists: 번외 1 (side01) and 번외 2 (side02), each played to its
+ * ending below.
  */
 
 const FIXTURE_URL = "/?side-fixture=1";
@@ -60,8 +61,8 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   await page.goto(FIXTURE_URL);
   const slot = page.getByTestId("side-case-slot");
   await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  // 번외 1 and the placeholder.
-  await expect(slot).toContainText("번외 0/2");
+  // 번외 1, 번외 2 and the placeholder.
+  await expect(slot).toContainText("번외 0/3");
   await expect(slot).toContainText("랭킹 밖");
   const before = await readSeasonKeys(page);
 
@@ -90,7 +91,7 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   expect(await readSeasonKeys(page)).toEqual(before);
 
   await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/2");
+  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/3");
   // 이어하기 opens the season where it was paused.
   await resumeSavedRun(page);
   expect(JSON.parse(await readStorage(page, TEST_STORAGE_KEYS.save)).currentCase).toBe("case12");
@@ -104,44 +105,55 @@ test("a device that has not closed a finale has no side slot @once", async ({ pa
   await expect(page.getByTestId("side-case-slot")).toHaveCount(0);
 });
 
-test("without the fixture switch a finished device lists 번외 1 alone, plays it to an ending, and finds the season as it left it @once", async ({ page }) => {
-  const errors = [];
-  collectRuntimeErrors(page, errors);
-  await seedDevice(page, { finaleClosed: true });
-  await page.goto("/");
-  const slot = page.getByTestId("side-case-slot");
-  await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  await expect(slot).toContainText("번외 0/1");
-  await expect(slot).toContainText("아직 찾아가지 못한 일곱 명");
-  await expect(page.getByTestId("side-case-open-side00")).toHaveCount(0);
-  const before = await readSeasonKeys(page);
+// The release's cases: the first card each scene deals, scene after scene, to
+// the close -- 번외 1 in seven to ten decisions, 번외 2 in eight to eleven.
+const RELEASE_CASES = [
+  { id: "side01", prefix: "s1", title: "아직 찾아가지 못한 일곱 명", most: 10 },
+  { id: "side02", prefix: "s2", title: "돌려줄 것", most: 11 },
+];
 
-  await clickElement(page.getByTestId("side-case-open-side01"), "open side01");
-  const screen = page.getByTestId("side-case-screen");
-  await expect(screen).toHaveAttribute("data-side-node", "s1_start", { timeout: TRANSITION_TIMEOUT_MS });
-  // The first card the scene deals, scene after scene: seven to ten decisions to the close.
-  const seen = [];
-  while (!(await page.getByTestId("side-case-ending").isVisible())) {
-    const nodeId = await screen.getAttribute("data-side-node");
-    expect(nodeId).toMatch(/^s1_/);
-    seen.push(nodeId);
-    expect(seen.length).toBeLessThanOrEqual(10);
-    await dismissProtocolBreach(page);
-    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
-    await cashStakedCard(page);
-    await expect
-      .poll(async () => ((await page.getByTestId("side-case-ending").isVisible()) ? "ending" : await screen.getAttribute("data-side-node")), { timeout: TRANSITION_TIMEOUT_MS })
-      .not.toBe(nodeId);
-  }
-  expect(seen[0]).toBe("s1_start");
-  expect(seen.at(-1)).toBe("s1_aftershock");
-  await expect(page.getByTestId("side-case-out-of-ranking")).toContainText("랭킹 밖");
-  const record = JSON.parse(await readStorage(page, SIDE_CASES_KEY));
-  expect(record.side01.outcomeChoiceId).toMatch(/^s1_after_/);
-  expect(record.side01.inProgress).toBeNull();
-  expect(await readSeasonKeys(page)).toEqual(before);
+for (const { id, prefix, most } of RELEASE_CASES) {
+  test(`without the fixture switch a finished device lists the release's cases, plays ${id} to an ending, and finds the season as it left it @once`, async ({ page }) => {
+    // Each decision is a table played to its cash-out: side01's first cards take
+    // about a minute, side02's eleven longer than the default 60 seconds.
+    test.setTimeout(150_000);
+    const errors = [];
+    collectRuntimeErrors(page, errors);
+    await seedDevice(page, { finaleClosed: true });
+    await page.goto("/");
+    const slot = page.getByTestId("side-case-slot");
+    await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(slot).toContainText("번외 0/2");
+    for (const listed of RELEASE_CASES) await expect(slot).toContainText(listed.title);
+    await expect(page.getByTestId("side-case-open-side00")).toHaveCount(0);
+    const before = await readSeasonKeys(page);
 
-  await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/1");
-  expect(errors).toEqual([]);
-});
+    await clickElement(page.getByTestId(`side-case-open-${id}`), `open ${id}`);
+    const screen = page.getByTestId("side-case-screen");
+    await expect(screen).toHaveAttribute("data-side-node", `${prefix}_start`, { timeout: TRANSITION_TIMEOUT_MS });
+    const seen = [];
+    while (!(await page.getByTestId("side-case-ending").isVisible())) {
+      const nodeId = await screen.getAttribute("data-side-node");
+      expect(nodeId.startsWith(`${prefix}_`)).toBe(true);
+      seen.push(nodeId);
+      expect(seen.length).toBeLessThanOrEqual(most);
+      await dismissProtocolBreach(page);
+      await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+      await cashStakedCard(page);
+      await expect
+        .poll(async () => ((await page.getByTestId("side-case-ending").isVisible()) ? "ending" : await screen.getAttribute("data-side-node")), { timeout: TRANSITION_TIMEOUT_MS })
+        .not.toBe(nodeId);
+    }
+    expect(seen[0]).toBe(`${prefix}_start`);
+    expect(seen.at(-1)).toBe(`${prefix}_aftershock`);
+    await expect(page.getByTestId("side-case-out-of-ranking")).toContainText("랭킹 밖");
+    const record = JSON.parse(await readStorage(page, SIDE_CASES_KEY));
+    expect(record[id].outcomeChoiceId.startsWith(`${prefix}_after_`)).toBe(true);
+    expect(record[id].inProgress).toBeNull();
+    expect(await readSeasonKeys(page)).toEqual(before);
+
+    await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
+    await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/2");
+    expect(errors).toEqual([]);
+  });
+}
