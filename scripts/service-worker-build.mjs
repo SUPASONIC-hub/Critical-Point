@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { DOCUMENT_PAGE } from "../src/serviceWorker/worker.js";
 
 /**
  * How `/sw.js` is put together: `serviceWorker()` in vite.config.js calls
@@ -34,6 +35,8 @@ import path from "node:path";
  *             credit's picture and each piece of art at 960px, fetched once
  *             a table is up. One size of the art, not three: the worker
  *             gives it to a screen that asked for another (`artVariants`).
+ *             And the privacy policy and the terms (`DOCUMENT_PAGE`), so
+ *             a device offline can still read what it agreed to.
  */
 export const WORKER_FILE = "sw.js";
 const PAGE_PATH = "/index.html";
@@ -144,7 +147,7 @@ export function workerConfigFor({ html, files, logic = "" }) {
   const first = new Set(precache);
   const warm = files
     .map(([file]) => file)
-    .filter((file) => !first.has(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file)))
+    .filter((file) => !first.has(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file) || DOCUMENT_PAGE.test(file)))
     .sort();
   return { release: releaseIdFor({ html, files, logic }), entry, precache, warm };
 }

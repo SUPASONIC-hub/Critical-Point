@@ -1061,6 +1061,16 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
 }
+/* The two policy pages beside the build (privacyText.js). The line height
+   is what makes each link a 52px target. */
+.intro-legal {
+  display: flex;
+  gap: 20px;
+  width: min(var(--ui-page-max), 100%);
+  margin: 64px auto 0;
+  line-height: 3.25;
+  border-top: 1px solid var(--ui-line);
+}
 /* The resume card replaces the door when a save exists. */
 .resume-panel {
   display: flex;
@@ -1758,7 +1768,9 @@ summary:focus-visible {
   font-weight: 600;
   line-height: 1.5;
 }
-.consent-note a {
+.consent-note a,
+.privacy-note a,
+.intro-legal a {
   color: inherit;
 }
 .consent-note.error {
