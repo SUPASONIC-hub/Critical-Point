@@ -18,6 +18,7 @@ import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
+import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
 import { HALL_OF_FAME_COUNTS_SQL, HALL_OF_FAME_READ_SQL, hallOfFameSql, readHallOfFameCounts } from "../src/hallOfFame.js";
 
 /**
@@ -2404,6 +2405,82 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
   check(missing?.rows[0]?.found !== true, "moderating a missing post reported success.");
 }
 
+// ---- board reports (20261027000000)
+//
+// The row the report button builds, inserted as anon. Every reason the client
+// offers is taken, a reason it does not is refused, a second report of a post
+// from one writer is dropped, a hidden or missing post cannot be reported, the
+// table reads as nothing to anon, and the hourly caps hold.
+{
+  const reportRow = (postId, reason, session) => ({ event_id: uuid(), ...createBoardReportPayload({ postId, reason, sessionId: session }) });
+  const reportInsert = (row) => postgrestInsert("board_reports", row);
+  const report = (label, row) => {
+    const { sql, params } = reportInsert(row);
+    return allowed(label, "anon", sql, params);
+  };
+  const reportRefused = (label, row, pattern) => {
+    const { sql, params } = reportInsert(row);
+    return raises(label, "anon", sql, params, pattern);
+  };
+  const reportCount = async (postId) => (await one(`select count(*)::int as n from public.board_reports where post_id = $1`, [postId]))?.n ?? 0;
+  const visible = (await db.query(`select id from public.board_posts where not hidden order by id limit 3`)).rows.map((row) => Number(row.id));
+  check(visible.length === 3, `the board report check needs three visible posts and found ${visible.length}.`);
+  const [first, second, third] = visible;
+
+  withHeaders({ "x-forwarded-for": "198.51.100.60" });
+  for (const [index, { id }] of BOARD_REPORT_REASONS.entries()) {
+    await report(`report a post as ${id}`, reportRow(first, id, sessionId(400 + index)));
+  }
+  check((await reportCount(first)) === 1, `four devices on one address reporting one post stored ${await reportCount(first)} reports; one writer is one report.`);
+  {
+    const key = (await one(`select actor_key from public.board_reports where post_id = $1`, [first]))?.actor_key;
+    check(/^board-report:[0-9a-f]{32}$/.test(key ?? ""), `a board report's writer key is not a hash: ${key}`);
+  }
+  await reportRefused("report a post for a reason the client does not offer", { event_id: uuid(), post_id: second, session_id: sessionId(410), reason: "boring" }, /invalid board report reason/);
+  await reportRefused("report a post that does not exist", { event_id: uuid(), post_id: 999999999, session_id: sessionId(410), reason: "spam" }, /names no visible post/);
+  await reportRefused("report under a session id that is too short", { event_id: uuid(), post_id: second, session_id: "short", reason: "spam" }, /invalid board report session id/);
+  await refused("write a board report's writer key", "anon", `insert into public.board_reports (post_id, session_id, reason, actor_key) values (${second}, '${sessionId(411)}', 'spam', 'forged')`);
+  await refused("read board reports", "anon", `select post_id from public.board_reports`);
+  await allowed("read board reports", "service_role", `select post_id, reason, actor_key from public.board_reports`);
+  withHeaders(null);
+
+  // A second address reports the same post: two writers, two rows.
+  withHeaders({ "x-forwarded-for": "198.51.100.61" });
+  await report("report a post another address reported", reportRow(first, "abuse", sessionId(420)));
+  check((await reportCount(first)) === 2, "a report from a second address was not stored.");
+  withHeaders(null);
+
+  // A hidden post cannot be reported, and its reports go when the post does.
+  await allowed("hide a reported post", "service_role", `select public.moderate_board_post(${third})`);
+  withHeaders({ "x-forwarded-for": "198.51.100.62" });
+  await reportRefused("report a hidden post", reportRow(third, "spam", sessionId(430)), /names no visible post/);
+  withHeaders(null);
+  await allowed("restore the hidden post", "service_role", `select public.moderate_board_post(${third}, false)`);
+
+  // Hourly caps: ten for a device on an address, thirty for the address.
+  withHeaders({ "x-forwarded-for": "198.51.100.63" });
+  const reportKey = `board-report:${await writerKey("198.51.100.63")}`;
+  await presetCounter(`${reportKey}|${sessionId(440)}`, 9);
+  await report("report a device's 10th post of the hour", reportRow(second, "spam", sessionId(440)));
+  await reportRefused("report a device's 11th post of the hour", reportRow(third, "spam", sessionId(440)), /^PT429 .*report rate limit/);
+  await presetCounter(reportKey, 30);
+  await reportRefused("report an address's 31st post of the hour", reportRow(third, "spam", sessionId(441)), /^PT429 .*report rate limit/);
+  withHeaders(null);
+
+  // Retention rides on the post: the purge deletes posts, and a post's
+  // reports go with it (on delete cascade).
+  const doomed = Number((await one(
+    `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '지울글', '지워질 글입니다', 'board:retention') returning id`,
+    [sessionId(450)],
+  ))?.id);
+  withHeaders({ "x-forwarded-for": "198.51.100.64" });
+  await report("report a post that will be deleted", reportRow(doomed, "other", sessionId(450)));
+  withHeaders(null);
+  check((await reportCount(doomed)) === 1, "the report on the post to be deleted was not stored.");
+  await db.query(`delete from public.board_posts where id = $1`, [doomed]);
+  check((await reportCount(doomed)) === 0, "a deleted post's reports outlived it.");
+}
+
 // ---- cloud saves
 
 /** The payload `flushCloudSave` sends: the save and the settled-window list, and nothing else. */
@@ -2545,6 +2622,7 @@ const UPDATE_PROBE = {
   app_error_logs: "event_id = event_id",
   free_text_analyses: "event_id = event_id",
   board_posts: "hidden = true",
+  board_reports: "reason = reason",
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
