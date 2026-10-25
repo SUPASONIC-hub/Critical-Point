@@ -154,7 +154,10 @@ const fileBudgets = {
   // (store UGC rules): the action row under each post, a 44px toggle, the
   // in-place reason fieldset with its legend, radios, note and buttons, and
   // the live line that answers a report. Measured 3073 / 67946, room 0 / 3.
-  "base-intro-ranking.css": { lines: 3073, bytes: 67949 },
+  // 3073 / 67949 -> 3083 / 68150 the same day, measured: the foot of the
+  // intro links the privacy policy and the terms (.intro-legal), and those
+  // links and the data drawer's note take the colour around them.
+  "base-intro-ranking.css": { lines: 3083, bytes: 68150 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
