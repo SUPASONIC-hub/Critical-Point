@@ -1642,6 +1642,22 @@ if (!HALL_OF_FAME) {
   await refused("write a hall of fame place", "anon", `insert into public.hall_of_fame (board, place, run_tag, score, rank, style) values ('table-9', 1, 'FORGED01', 100, 'S', 'BOARD BREAKER')`);
   await refused("delete the hall of fame", "anon", `delete from public.hall_of_fame`);
 
+  // Ranking rows the blocks above left (run-ranked-1 and -2, which later
+  // blocks read again) stand aside while the hall of fame counts its boards:
+  // once RULES_MARK 3's reset is a `.sql` they are clean, unjudged seasons of
+  // table-3 and would make that board 12 where its cases expect 10 (found in
+  // the 11-30 rehearsal, integration-1130). Their marks are put back below.
+  const asideRows = (await db.query(`select id, suspicion from public.playtest_sessions where case_id = 'season-final' and session_id <> 'grants-check-hall'`)).rows;
+  const setAside = async (each) => {
+    await db.exec(`set session_replication_role = replica`);
+    try {
+      for (const row of asideRows) await db.query(`update public.playtest_sessions set suspicion = $2::text[] where id = $1`, [row.id, each(row)]);
+    } finally {
+      await db.exec(`set session_replication_role = origin`);
+    }
+  };
+  await setAside((row) => [...(row.suspicion ?? []), "grants-check-aside"]);
+
   const table = `table-${RULES_MARK}`;
   const thisWeek = isoWeekKey(Date.now());
   const oldWeek = "2026-W30";
@@ -1802,6 +1818,7 @@ if (!HALL_OF_FAME) {
 
   await db.query(`delete from public.hall_of_fame_boards`);
   await db.query(`delete from public.playtest_sessions where run_id like 'run-hall-%'`);
+  await setAside((row) => row.suspicion);
 }
 
 // ---- the season score is the mean of its cases (*_season_score_case_mean, a draft until RULES_MARK 3's merge day)
