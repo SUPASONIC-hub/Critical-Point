@@ -400,10 +400,15 @@ const budgets = [
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
   // 101,087 -> 101,102 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): GauntletStage
   // exported for the side screen's table. Measured 101,102 / 34,820.
+  // 34,821 -> 34,827 gzip on 2026-10-25, E-11 번외 1 (draft on e11-side-cases):
+  // the same code; the hashed chunk names it imports changed with ResultScreen
+  // (the side slot's line moved after the logic report). Measured 101,102 /
+  // 34,823, the gzip plus 4.
   // 101,102 / 34,821 -> 101,106 / 34,826 on 2026-10-25, E-11 번외 사건 온라인 저장
   // (draft on e11-side01 2a82cfd1): the same code under moved import names.
   // Measured 101,106 / 34,822, the gzip plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_106, maxGzip: 34_826 },
+  // Both merged: the larger raw and gzip.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_106, maxGzip: 34_827 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981

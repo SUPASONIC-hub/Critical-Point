@@ -172,13 +172,13 @@ test("the closing report names the hottest case, the score and the rank still to
   // Asked once, and with nothing of the season in the question.
   expect(asked).toEqual(["{}"]);
 
-  // It is the panel after the epilogue, in the epilogue's own frame. Between
-  // the two, once a side case is written, the finale says the side slot opened
-  // (E-11, ResultScreen's side-slot-opened line).
-  const framed = page.locator(".result-page > section.ending-epilogue-panel:not([data-testid='side-slot-opened'])");
-  await expect(framed).toHaveCount(2);
-  await expect(framed.nth(1)).toHaveAttribute("data-testid", "logic-report");
-  await expect(page.locator("section[aria-label='엔딩 에필로그'] + section[data-testid='side-slot-opened'] + section")).toHaveAttribute("data-testid", "logic-report");
+  // It is the panel after the epilogue, in the epilogue's own frame. The line
+  // that the side slot opened (E-11, shown while a side case is listed) comes
+  // after it.
+  await expect(page.locator(".result-page > section.ending-epilogue-panel")).toHaveCount(3);
+  await expect(page.locator(".result-page > section.ending-epilogue-panel").nth(1)).toHaveAttribute("data-testid", "logic-report");
+  await expect(page.locator("section[data-testid='logic-report'] + section")).toHaveAttribute("data-testid", "side-slot-opened");
+  await expect(page.locator("section[aria-label='엔딩 에필로그'] + section")).toHaveAttribute("data-testid", "logic-report");
   const overflow = await page.evaluate(() => ({ clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
   expect(overflow.scrollWidth, "the panel does not widen the page").toBeLessThanOrEqual(overflow.clientWidth + 1);
   expect(pageErrors).toEqual([]);
