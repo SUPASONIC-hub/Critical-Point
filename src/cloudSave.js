@@ -2,6 +2,7 @@ import {
   CLOUD_SAVE_CODE_KEY,
   CLOUD_SAVE_ENABLED_KEY,
   CLOUD_SAVE_SYNC_KEY,
+  DEVICE_RECORD_WRITTEN_EVENT,
   isSavedStateShapeValid,
   NEW_GAME_PLUS_KEY,
   parseCurrentSavedState,
@@ -15,10 +16,12 @@ import {
   setReplaySession,
   SETTLED_WINDOWS_LIMIT,
   SETTLED_WINDOWS_STORAGE_KEY,
+  SIDE_CASES_KEY,
   STORAGE_KEY,
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
+import { sideCaseMarks } from "./state/sideMarks.js";
 import { clearReplayFromLocation } from "./state/trace.js";
 import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
 
@@ -194,8 +197,12 @@ export function createCloudSavePayload(save, deviceRecords = null) {
  * reads, and sends them back up unchanged. Each is a few kilobytes at most
  * (the read scenes are about 1,300 characters a set); one that is not a
  * record, or is far past that, stays behind rather than risk the payload cap.
+ *
+ * E-11's side cases ride the same way (`sideCases`), as their completion marks
+ * only (`sideCaseMarks`): a side run in progress stays on its device.
  */
-const DEVICE_RECORD_KEYS = { seasonRecord: SEASON_RECORD_KEY, pastPicks: PAST_PICKS_KEY, seenScenes: SEEN_SCENES_KEY };
+const DEVICE_RECORD_KEYS = { seasonRecord: SEASON_RECORD_KEY, pastPicks: PAST_PICKS_KEY, seenScenes: SEEN_SCENES_KEY, sideCases: SIDE_CASES_KEY };
+const DEVICE_RECORD_SHAPES = { sideCases: sideCaseMarks };
 const DEVICE_RECORD_MAX_LENGTH = 16_000;
 
 export function readDeviceRecords() {
@@ -204,7 +211,8 @@ export function readDeviceRecords() {
     const text = readStoredValue(key, null);
     if (typeof text !== "string" || text.length > DEVICE_RECORD_MAX_LENGTH) continue;
     try {
-      const value = JSON.parse(text);
+      const parsed = JSON.parse(text);
+      const value = DEVICE_RECORD_SHAPES[name] ? DEVICE_RECORD_SHAPES[name](parsed) : parsed;
       if (value && typeof value === "object" && !Array.isArray(value)) records[name] = value;
     } catch {
       // An unreadable key is this device's to repair, not the server's to keep.
@@ -473,14 +481,19 @@ export function installCloudSync() {
     publish({ phase: "unavailable" });
     return;
   }
-  globalThis.addEventListener(SAVE_WRITTEN_EVENT, (event) => {
+  const notePending = (event) => {
     if (!isCloudSaveEnabled()) return;
     writeSync({ pending: String(event?.detail?.savedAt ?? "") || new Date().toISOString() });
     // A conflict is not replaced by "곧 올립니다": nothing uploads until it is settled.
     if (readSync().conflict) return;
     publish({ phase: isOffline() ? "offline" : "pending" });
     scheduleUpload();
-  });
+  };
+  globalThis.addEventListener(SAVE_WRITTEN_EVENT, notePending);
+  // A side case closed (E-11): the save is the one already sent, and the copy
+  // goes up again for the mark beside it. Its pending note is the present, so
+  // the save's own time does not read as "already in step".
+  globalThis.addEventListener(DEVICE_RECORD_WRITTEN_EVENT, notePending);
   globalThis.addEventListener("online", () => scheduleUpload(0));
   globalThis.addEventListener("offline", () => {
     if (readSync().pending && !readSync().conflict) publish({ phase: "offline" });
@@ -588,8 +601,9 @@ export async function applyCloudSave({ code, save, settledWindows = [], deviceRe
   // the save for it; the intro shown before the runtime loads reads only the
   // key, so a finished season carried here had no NEW GAME+ button there.
   if (restored.caseResults?.final) writeStoredValue(NEW_GAME_PLUS_KEY, "true");
-  // The season record, the past picks and the read scenes (E-12), merged into
-  // this device's own; a copy without them leaves the device's as they are.
+  // The season record, the past picks and the read scenes (E-12), and the side
+  // cases' marks (E-11), merged into this device's own; a copy without them
+  // leaves the device's as they are.
   const records = deviceRecords ?? inside;
   let merged = false;
   if (records && typeof records === "object" && !Array.isArray(records)) {

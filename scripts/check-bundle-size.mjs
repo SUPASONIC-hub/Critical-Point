@@ -68,7 +68,11 @@ const budgets = [
   // (state/sideCaseKit.js). The pack check stays out (state/sidePackCheck.js,
   // read by check:graph and the tests only). Measured 144,931 / 53,081 in the
   // e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 144_931, maxGzip: 53_085 },
+  // 144,931 / 53,085 -> 145,123 / 53,131 on 2026-10-25, E-11 번외 사건 온라인 저장
+  // (draft on e11-side01 2a82cfd1): closeSideCase tells the online save that a
+  // carried record changed (DEVICE_RECORD_WRITTEN_EVENT). Measured 145,123 /
+  // 53,127 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 145_123, maxGzip: 53_131 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -235,7 +239,11 @@ const budgets = [
   // e11-side-cases dbb4f419): the release list's one entry for side01, its label,
   // title and chunk loader (src/nodes/sidePacks.js). Measured 174,418 / 62,945,
   // the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 174_418, maxGzip: 62_949 },
+  // 174,418 / 62,949 -> 174,478 / 62,958 on 2026-10-25, E-11 번외 사건 온라인 저장
+  // (draft on e11-side01 2a82cfd1): the event's name in appConfig.js. The marks
+  // and their merge stay out of this chunk (state/sideMarks.js). Measured
+  // 174,478 / 62,954, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 174_478, maxGzip: 62_958 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -387,7 +395,10 @@ const budgets = [
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
   // 101,087 -> 101,102 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): GauntletStage
   // exported for the side screen's table. Measured 101,102 / 34,820.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_102, maxGzip: 34_821 },
+  // 101,102 / 34,821 -> 101,106 / 34,826 on 2026-10-25, E-11 번외 사건 온라인 저장
+  // (draft on e11-side01 2a82cfd1): the same code under moved import names.
+  // Measured 101,106 / 34,822, the gzip plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_106, maxGzip: 34_826 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -557,11 +568,19 @@ const budgets = [
   // 11,492 / 4,639 -> 11,494 / 4,647 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the same
   // code under the import names the new chunks moved. Measured 11,494 / 4,643,
   // the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_494, maxGzip: 4_647 },
+  // 11,494 / 4,647 -> 12,077 / 4,858 on 2026-10-25, E-11 번외 사건 온라인 저장
+  // (draft on e11-side01 2a82cfd1): the side cases' completion marks ride as a
+  // fourth device record (state/sideMarks.js, which Rolldown writes into this
+  // chunk), and a side case's close is followed like a save. Measured 12,077 /
+  // 4,854, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 12_077, maxGzip: 4_858 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
-  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 1_934, maxGzip: 942 },
+  // 1,934 / 942 -> 2,097 / 1,004 on 2026-10-25, E-11 번외 사건 온라인 저장 (draft
+  // on e11-side01 2a82cfd1): the side marks merged into this device's record.
+  // Measured 2,097 / 1,000, the gzip plus 4.
+  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_004 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.

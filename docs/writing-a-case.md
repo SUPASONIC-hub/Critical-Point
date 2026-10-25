@@ -466,7 +466,9 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
 3. **검사**: `check:graph`가 `src/nodes/side*.js`를 모두 걸어 봅니다(`checkSidePack`, `src/state/sidePackCheck.js`).
    `check:canon`·`check:plain-language`·`check:card-labels`·`check:text`는 `src/nodes`의 모든 파일을 이미 읽습니다.
 4. **기록**: 이 기기의 `critical-point-side-cases-v1`에 끝낸 표시와 진행 중인 판만 남습니다. 서버 행, 랭킹,
-   시즌 저장, NEW GAME+, 클라우드 저장에는 아무것도 가지 않습니다(`tests/unit/side-cases.test.mjs`).
+   시즌 저장, NEW GAME+에는 아무것도 가지 않습니다(`tests/unit/side-cases.test.mjs`). 온라인 저장은 끝낸
+   표시(`closedAt`, `outcomeChoiceId`)만 시즌의 기기 기록 옆 `save.deviceRecords.sideCases`에 싣고, 진행 중인
+   판은 싣지 않습니다. 다른 기기에서 불러오면 끝낸 사건은 끝낸 채로 합쳐집니다(둘 다 끝냈으면 늦게 끝낸 쪽의 결말).
 
 ---
 
