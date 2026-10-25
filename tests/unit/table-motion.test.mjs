@@ -213,12 +213,15 @@ test("the cases where the season rests play a quiet table, and the table is the 
   const { QUIET_TABLE_CASES, isQuietTable } = await import("../../src/gauntlet/fxVariables.js");
   const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
   // B-13: the night off at 경포, the funeral, the 추석 kitchen -- and no other case.
-  // C-10: and each act's first case (B-11's act cards), where an act opens at rest after the last one's peak.
+  // C-10: and each act's first case (B-11's act cards), where an act opens at rest after the last one's peak --
+  // but act 1 rests in 사건 02, since 사건 01 first plays OVERCLOCK (C-4; user, 2026-10-25, (1)).
   const { ACT_START_CASES } = await import("../../src/gauntlet/actCardGate.js");
   const { PEAK_CASES } = await import("../../src/gauntlet/tableUnlocks.js");
   const rests = ["case42", "case45", "case47"];
-  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), CASE_SEQUENCE.filter((caseId) => rests.includes(caseId) || ACT_START_CASES.includes(caseId)));
+  const actRests = ACT_START_CASES.map((caseId) => (caseId === "case01" ? "case02" : caseId));
+  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), CASE_SEQUENCE.filter((caseId) => rests.includes(caseId) || actRests.includes(caseId)));
   assert.equal(QUIET_TABLE_CASES.length, rests.length + ACT_START_CASES.length);
+  assert.equal(isQuietTable("case01"), false, "사건 01 plays the heartbeat: OVERCLOCK is first played there");
   assert.ok(!PEAK_CASES.some(isQuietTable), "no case is both a peak and a rest");
   assert.equal(isQuietTable(undefined), false);
 
