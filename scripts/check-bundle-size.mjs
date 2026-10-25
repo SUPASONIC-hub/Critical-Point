@@ -280,7 +280,9 @@ const budgets = [
   // D2's fetchHallOfFame and main #313's copy together. Measured 172,407 / 62,322 in two e2e builds, the gzip plus 4.
   // -> 172,533 / 62,372 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
   // D2's fetchHallOfFame, main #313's copy and C-3/C-4 together. Measured 172,533 / 62,368 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_533, maxGzip: 62_372 },
+  // 62,372 -> 62,377 gzip on 2026-10-25, the rehearsal on main caeecdac (#318 A-13,
+  // scene bodies under 420): the same 172,533 bytes, measured 62,373 here and in CI.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_533, maxGzip: 62_377 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
