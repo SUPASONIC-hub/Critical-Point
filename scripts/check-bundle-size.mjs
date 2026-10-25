@@ -516,8 +516,9 @@ const budgets = [
   // 193,577 / 36,080, the gzip plus 4.
   // -> 193,674 / 36,114 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
   // the two board marks' colours (.gx-mark-peak, .gx-mark-breather). Measured
-  // 193,674 / 36,110, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_674, maxGzip: 36_114 },
+  // 193,674 / 36,110, the gzip plus 4; 193,675 raw once the peak's colour
+  // went from heat to ember (contrast, 3.56:1 -> about 5.6:1).
+  { pattern: /^index-.*\.css$/, maxBytes: 193_675, maxGzip: 36_114 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
