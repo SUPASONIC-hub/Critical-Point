@@ -241,7 +241,11 @@ const budgets = [
   // foot and the data drawer's note link the two pages (privacyText.js holds
   // the paths and the consent sentence, moved, not added). Measured 172,634 /
   // 62,400 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_634, maxGzip: 62_404 },
+  // -> 172,754 / 62,441 the same day, 개인정보처리방침·이용약관 on main 29982165
+  // (#325): the intro's foot and the data drawer's note link the two pages
+  // (privacyText.js holds the paths and the consent sentence, moved, not
+  // added). Measured 172,754 / 62,437 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 172_754, maxGzip: 62_441 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -503,10 +507,10 @@ const budgets = [
   // act title card's rules in briefing.css beside B-12(2)'s coda. Measured
   // 193,412 / 36,054 in the e2e build, the gzip plus 4.
   // 193,412 / 36,058 -> 194,165 / 36,203 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 194,165 / 36,199 gzip in the e2e build, the gzip plus 4.
-  // -> 193,586 / 36,104 on 2026-10-25, 개인정보처리방침·이용약관: `.intro-legal`
-  // and the links' colour. Measured 193,586 / 36,100 in the e2e build, the gzip
-  // plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_586, maxGzip: 36_104 },
+  // -> 194,339 / 36,241 the same day, 개인정보처리방침·이용약관 on main 29982165:
+  // `.intro-legal` and the links' colour. Measured 194,339 / 36,237 in the e2e
+  // build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_339, maxGzip: 36_241 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -786,7 +790,7 @@ const budgets = [
   // 1,995 / 1,051 -> 1,996 / 1,051 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 1,996 in the e2e build.
   // -> 1,056 gzip on 2026-10-25 (개인정보처리방침·이용약관): measured 1,052, the
   // entry chunk's export names it imports by, plus 4; the file did not change.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_995, maxGzip: 1_056 },
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_056 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
