@@ -573,6 +573,8 @@ const budgets = [
   // 193,674 / 36,110, the gzip plus 4.
   // -> 193,971 / 36,154 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
   // C-1's seventh card, D2's badge and the bundle's two board marks together. Measured 193,971 / 36,150 in two e2e builds, the gzip plus 4.
+  // 193,674 / 36,110, the gzip plus 4; 193,675 raw once the peak's colour
+  // went from heat to ember (contrast, 3.56:1 -> about 5.6:1).
   { pattern: /^index-.*\.css$/, maxBytes: 193_971, maxGzip: 36_154 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92

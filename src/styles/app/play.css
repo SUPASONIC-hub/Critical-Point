@@ -386,8 +386,9 @@
 }
 
 /* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) take the label's place in colour, no line more. */
+/* Ember, not heat: heat red is 3.56:1 on the felt (contrast.spec, final/f_archive). */
 .gx-label.gx-mark-peak {
-  color: var(--c-gx-heat);
+  color: var(--c-gx-ember);
 }
 
 .gx-label.gx-mark-breather {
