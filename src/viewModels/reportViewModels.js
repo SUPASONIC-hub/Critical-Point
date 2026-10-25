@@ -74,7 +74,7 @@ export function createEndingProfile({ finalEndingEntry }) {
   };
 }
 
-export function createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }) {
+export function createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, readingScore = 0, reflectionScore, rhythmScore }) {
   return [
   {
     label: "기준 유지",
@@ -99,6 +99,12 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
     value: pressureAdaptScore,
     text: `${pressureAdaptScore}점`,
     note: "위험을 무조건 피한 점수가 아니라, 상승한 압박을 다시 회수한 능력입니다.",
+  },
+  {
+    label: "판 읽기",
+    value: readingScore,
+    text: `${readingScore}점`,
+    note: "같은 판을 벽이 보이는 사람이 쳤다면 번 금고에 견줘, 이번 사건에서 번 몫입니다(「벽을 본 사람의 N%」).",
   },
   {
     label: "구조 재설계",

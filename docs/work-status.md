@@ -160,6 +160,18 @@ Still open, on purpose:
   a season with a case that has no count keeps the plain mean. The same 200
   seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
   (balanced), procedure +3.1.
+- C-1(1), drafted 2026-10-25 on top of #224 for the ranking reset after it
+  (the user, 「전부 1」): each case's burst score gives 0.2 to 판 읽기, the
+  C-12 index the case close prints (「벽을 본 사람의 N%」, now
+  `getCaseRead` in `src/seasonScore.js`), and the six axes before it keep
+  their ratios at 0.8 (0.224 / 0.16 / 0.16 / 0.128 / 0.064 / 0.064). The
+  season's 관점 전환 swap weighs 0.16. Local ranking v11; the server's copy is
+  `20261102030000_season_score_reading_axis.sql.draft` (the 0.16 swap, a
+  refusal for a case row without `readingScore`, and the reset); the checker
+  holds each window's read to its replay. `npm run report:reading-axis`
+  (320 bot seasons a board, same seeds): blind 61.7 -> 56.7, heartbeat
+  62.2 -> 61.0, scout 63.2 -> 64.9, sees the wall 62.7 -> 69.1; the gap
+  between seeing the wall and playing blind goes from 0.9 to 12.5 points.
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain

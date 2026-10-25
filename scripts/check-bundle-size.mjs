@@ -74,7 +74,11 @@ const budgets = [
   // rebased on main 81a48f50: measured 142,806 / 52,309 in the e2e build, the
   // gzip plus 4. The case's rules for the audit and the links, and the season
   // row's mean score.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_806, maxGzip: 52_313 },
+  // 142,806 / 52,313 -> 142,907 / 52,366 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 142,907 / 52,362 in the e2e build, the
+  // gzip plus 4. The score breakdown's 판 읽기 row and the case summary's
+  // readingScore.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_907, maxGzip: 52_366 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -83,7 +87,11 @@ const budgets = [
   // 32,897 / 13,022 -> 33,937 / 13,368 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 33,937 / 13,364 in the e2e build, the gzip plus 4. src/seasonScore.js (C-2's season mean and Q25's season-wide change of view, getCognitionMix) lands in this chunk under Rolldown.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 33_937, maxGzip: 13_368 },
+  // 33,937 / 13,368 -> 34,272 / 13,482 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 34,272 / 13,478 in the e2e build, the
+  // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
+  // it now), getReadingScore, and the seventh weight.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_272, maxGzip: 13_482 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -930,7 +938,10 @@ const budgets = [
   // 2,740 / 1,255 -> 2,566 / 1,109 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,566 / 1,105 in the e2e build, the gzip plus 4. measured under Vite 8 (2,740 / 1,251 under Rollup).
-  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_566, maxGzip: 1_109 },
+  // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, C-1(1) on #224 253e8e93:
+  // measured 2,601 / 1,109 in the e2e build, the gzip plus 4. One more retired
+  // key, v10 (the local ranking moves to v11 with the 판 읽기 axis).
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is

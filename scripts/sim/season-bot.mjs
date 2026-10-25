@@ -63,6 +63,7 @@ import { getLogicType } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { LOCK_PRESS_SECONDS } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
+import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../src/state/caseRoutes.js";
 import { createChoiceReaders } from "../../src/state/useDecision.js";
@@ -269,9 +270,11 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       // separately, with the tell the stage shows.
       heat: pick([35, 42, 48, 52, 56, 60]),
       // `board` on the archetype fixes how it plays the table ("blind" or
-      // "listens", check-endings.mjs's paired seasons); the draw is still made,
-      // so every draw after it keeps its place in the stream.
-      listens: ((drawn) => (base.board ? base.board === "listens" : drawn))(random() < 0.4),
+      // "listens", check-endings.mjs's paired seasons; "heartbeat", which
+      // listens and never buys SCOUT, and "sees", which sees the wall, for the
+      // 판 읽기 ladder of report-reading-axis.mjs); the draw is still made, so
+      // every draw after it keeps its place in the stream.
+      listens: ((drawn) => (base.board ? base.board === "listens" || base.board === "heartbeat" : drawn))(random() < 0.4),
       bpm: pick([95, 100, 105, 110]),
       reframe: pick([0, 0.15, 0.35, 0.6]),
       think: 2 + random() * 10,
@@ -329,12 +332,14 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // the table sells, and pushes while the next step stays under the band it
     // drew -- past that, on the heartbeat, never past the band's far end. No
     // draw from the stream: without the rule the season is the season before it.
-    const scouts = policy.listens && rules.has("scout");
+    const scouts = policy.listens && rules.has("scout") && policy.board !== "heartbeat";
     if (scouts) win = scoutWindow(win, true, rules, reduce);
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
       const band = scouts ? getWindowBand(win) : null;
       const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
-      const keepGoing = band
+      const keepGoing = policy.board === "sees"
+        ? win.gauge + win.schema.stepMax < win.wall
+        : band
         ? win.gauge + win.schema.stepMax - SCOUT_EDGE < band.wallMin || (hears && win.gauge + win.schema.stepMax < band.wallMax)
         : policy.listens
           ? hears
@@ -507,6 +512,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             pushes: verdict.pushes,
             focus: verdict.focus,
             logic: verdict.logic,
+            // C-12's read, as useChoiceCommit logs it: the burst score's 판 읽기 axis sums it (C-1(1)).
+            read: readWindowAgainstSeer(window, verdict.chips),
           },
         }];
         resources = resourcesAfter;

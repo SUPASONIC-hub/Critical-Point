@@ -17,6 +17,7 @@ export const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v7",
   "critical-point-local-ranking-v8",
   "critical-point-local-ranking-v9",
+  "critical-point-local-ranking-v10",
 ];
 
 /**
