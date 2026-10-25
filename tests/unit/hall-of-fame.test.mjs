@@ -26,6 +26,7 @@ import {
   weekSettlesOn,
 } from "../../src/hallOfFame.js";
 import { hallOfFameBadges, hallOfFameBoardLabel } from "../../src/hallOfFameBadges.js";
+import { RULES_MARK } from "../../src/gauntlet/gauntletEngine.js";
 import { WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
 import { formatHallOfFamePick, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
@@ -246,6 +247,7 @@ test("the ranking screen's badges, by run tag", () => {
 });
 
 test("the CLI prints the read, the page and the settle statement", () => {
+  // The table board is the engine's RULES_MARK (3 on #224, 4 with C-3/C-4 in the 11-30 rehearsal).
   const script = fileURLToPath(new URL("../../scripts/verify-ranking-rows.mjs", import.meta.url));
   const dir = mkdtempSync(path.join(tmpdir(), "hall-of-fame-"));
   try {
@@ -256,14 +258,14 @@ test("the CLI prints the read, the page and the settle statement", () => {
     const rows = dealtSeason("secret-run");
     writeFileSync(path.join(dir, "1.json"), JSON.stringify(rows));
     const sql = run(path.join(dir, "1.json"), "--hall-of-fame-sql").trim();
-    assert.equal(sql, hallOfFameSql([{ board: "table-3", places: [] }]));
-    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame"), /^본 판 \(판 규칙 3\): 0 checked seasons; 표본 부족$/m);
+    assert.equal(sql, hallOfFameSql([{ board: `table-${RULES_MARK}`, places: [] }]));
+    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame"), new RegExp(`^본 판 \\(판 규칙 ${RULES_MARK}\\): 0 checked seasons; 표본 부족$`, "m"));
     assert.doesNotMatch(sql, /secret/);
     // With the board's count read apart (counts.json), the one season read takes its place.
-    writeFileSync(path.join(dir, "counts.json"), JSON.stringify({ rows: [{ board: "table-3", checked: 10 }] }));
+    writeFileSync(path.join(dir, "counts.json"), JSON.stringify({ rows: [{ board: `table-${RULES_MARK}`, checked: 10 }] }));
     const counted = run(path.join(dir, "1.json"), "--hall-of-fame-sql", `--counts=${path.join(dir, "counts.json")}`).trim();
     assert.match(counted, /"places":\[\{"run_tag":"RUNHALL1",/);
-    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame", `--counts=${path.join(dir, "counts.json")}`), /^본 판 \(판 규칙 3\): 10 checked seasons; 1\. RUN RUNHALL1 /m);
+    assert.match(run(path.join(dir, "1.json"), "--hall-of-fame", `--counts=${path.join(dir, "counts.json")}`), new RegExp(`^본 판 \\(판 규칙 ${RULES_MARK}\\): 10 checked seasons; 1\\. RUN RUNHALL1 `, "m"));
     assert.equal(run("--hall-of-fame-counts-sql").trim(), HALL_OF_FAME_COUNTS_SQL);
   } finally {
     rmSync(dir, { recursive: true, force: true });
