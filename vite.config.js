@@ -361,9 +361,14 @@ function serviceWorker() {
   };
 }
 
-/** What the page is told about registering (src/serviceWorker/register.js). */
+/**
+ * What the page is told about registering (src/serviceWorker/register.js).
+ * `--mode app` is the build the iOS shell carries (app/build-web.mjs): every
+ * file is already on the device, and WKWebView runs no worker for the app's
+ * own scheme.
+ */
 function serviceWorkerSetting(command, mode) {
-  if (command !== "build" || serviceWorkerKilled()) return "off";
+  if (command !== "build" || mode === "app" || serviceWorkerKilled()) return "off";
   return mode === "e2e" ? "ask" : "on";
 }
 

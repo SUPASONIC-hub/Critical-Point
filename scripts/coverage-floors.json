@@ -45,6 +45,7 @@
     "src/gauntlet/windowTrail.js": 100,
     "src/judgementHabit.js": 100,
     "src/logicReport.js": 100,
+    "src/platform/appShell.js": 100,
     "src/playerLanguage.js": 100,
     "src/privacyText.js": 100,
     "src/ranking.js": 100,
