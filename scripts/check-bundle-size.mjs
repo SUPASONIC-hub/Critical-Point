@@ -398,7 +398,10 @@ const budgets = [
   // fetches the card (ActCard.jsx, its own chunk below) with its preload list.
   // Measured 102,475 / 35,449 in the e2e build (35,453 on da6292be; the larger
   // gzip plus 4).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_475, maxGzip: 35_457 },
+  // -> 102,560 on 2026-10-25, #224 (RULES_MARK 3) rebased on main 0d0c7dbb:
+  // B2's link tag beside the act card's gate. Measured 102,560 / 35,437; the
+  // gzip budget still holds.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_560, maxGzip: 35_457 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -498,7 +501,10 @@ const budgets = [
   // -> 193,412 / 36,058 on 2026-10-25 (B-11(1) 막 표지, on main 024904a3): the
   // act title card's rules in briefing.css beside B-12(2)'s coda. Measured
   // 193,412 / 36,054 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_412, maxGzip: 36_058 },
+  // -> 193,577 / 36,084 on 2026-10-25, #224 rebased on main 0d0c7dbb: B2's
+  // link tag (.gx-card-link) and the phone signal row's 2px gap. Measured
+  // 193,577 / 36,080, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 193_577, maxGzip: 36_084 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1069,7 +1075,9 @@ function checkBudget(file, budget) {
 // -> 9,340 / 3,424 on 2026-10-24 (B-11(1) 막 표지, on main ea5b74aa): measured
 // 9,340 / 3,415 here and 3,420 in CI (the file names' hashes); the larger plus
 // 4. One more file in the list, ActCard; the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_340, maxGzip: 3_424 };
+// -> 9,376 / 3,435 on 2026-10-25, #224 rebased on main 0d0c7dbb: measured
+// 9,376 / 3,431 plus 4. One more file in the list, personalBests.
+const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_435 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
