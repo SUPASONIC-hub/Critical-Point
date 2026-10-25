@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-const { QUERY, testWeekQuery, readTestWeek, describeTestWeek } = await import("../../scripts/report-test-week.mjs");
+const { QUERY, testWeekQuery, readTestWeek, describeTestWeek, readSimulation, SIMULATION_LINES } = await import("../../scripts/report-test-week.mjs");
 
 // One window of a case's decision log, as useChoiceCommit writes it (the fields the report reads).
 const board = (state, gauge, pushes, environmentMode = "stable", burn = 0) => ({
@@ -77,4 +77,21 @@ test("the workflow and the script read the calendar's test week by default (W47 
   // A day outside the week: the query keeps only runs whose first row came in that week, so it reads nothing.
   assert.match(QUERY, /having public\.kst_iso_week\(min\(s\.completed_at\)\) = '2026-W47'/);
   assert.match(describeTestWeek(readTestWeek([])), /시작한 시즌 \/ 사건 행 \| 0 \/ 0/);
+});
+
+test("the reference column is the bot with both rules on (check:endings' own lines), not each rule alone", () => {
+  assert.deepEqual(readSimulation(SIMULATION_LINES), {
+    seasons: 600, collapse: "21.0%", made: "44.15", back: "35.04", cascadeBust: "12.5%", bust: "10.7%",
+    caught: "1.31", caughtShare: "10.3%", vaultLost: "0.6%",
+  });
+  const text = describeTestWeek(readTestWeek([]));
+  assert.match(text, /시즌당 적발 \/ 적발이 있었던 시즌 \| — \/ 0 \(—\) \| 1\.31 \/ 10\.3% \(둘 다 켬·면제, 600시즌 봇\) \|/);
+  assert.match(text, /금고로 갈 몫의 잃은 비율\(추정\) \| — \| 0\.6% \|/);
+  assert.match(text, /CASCADE 판 BUST \(모든 판\) \| — \(—\) \| 12\.5% \(10\.7%\) \|/);
+  assert.match(text, /시즌당 만듦 \/ 돌아옴 \| — \/ — \| 44\.15 \/ 35\.04 \|/);
+  assert.match(text, /붕괴 결말 \| — \(0\/0\) \| 21\.0% \|/);
+  assert.match(text, /감사·연쇄를 함께 켠 시즌 봇입니다/);
+  assert.doesNotMatch(text, /따로 켠|1\.75 \/|\| 0\.7% \||20\.7%/);
+  // A run with one rule off prints no line for it, and the report says so rather than show a stale figure.
+  assert.throws(() => readSimulation(SIMULATION_LINES.split("\n").slice(0, 2).join("\n")), /no audit line/);
 });
