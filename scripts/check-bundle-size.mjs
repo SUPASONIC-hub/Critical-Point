@@ -113,7 +113,8 @@ const budgets = [
   // not the chunk a first visit waits for; that one is prologue01.
   // A side case (E-11, src/nodes/sideNN.js) is a case's chunk too and shares
   // this ceiling (E11-번외사건-설계안 5절): 번외 1 (side01, eleven scenes, no
-  // replies or voice lines) measured 20,965 / 7,033 on 2026-10-25.
+  // replies or voice lines) measured 20,965 / 7,033 on 2026-10-25; 번외 3 (side03,
+  // ten scenes) 19,204 / 6,582 on 2026-10-26.
   { pattern: /^(prologue0[1-5]|case[0-9]{2}|side[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
@@ -248,7 +249,10 @@ const budgets = [
   // 174,478 / 62,958 -> 174,649 / 63,007 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the release
   // list's entry for side02, its label, title and chunk loader
   // (src/nodes/sidePacks.js). Measured 174,649 / 63,003, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 174_649, maxGzip: 63_007 },
+  // 174,649 / 63,007 -> 174,830 / 63,042 on 2026-10-26, E-11 번외 3 (draft on e11-side02 6bb55bc6): the release
+  // list's entry for side03, its label, title and chunk loader
+  // (src/nodes/sidePacks.js). Measured 174,830 / 63,038, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 174_830, maxGzip: 63_042 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -1071,7 +1075,9 @@ function checkBudget(file, budget) {
 // like every case chunk; the worker's code did not change.
 // 9,376 / 3,443 -> 9,405 / 3,449 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): side02's chunk in the
 // offline list, like the case chunks. Measured 9,405 / 3,445, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 9_405, maxGzip: 3_449 };
+// 9,405 / 3,449 -> 9,434 / 3,455 on 2026-10-26, E-11 번외 3 (draft on e11-side02 6bb55bc6): side03's chunk in the
+// offline list. Measured 9,434 / 3,451, the gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 9_434, maxGzip: 3_455 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
