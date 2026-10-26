@@ -126,7 +126,7 @@ export function getHeatStage(threshold) {
  * alone was read as said of this scene, not of the table before it. The
  * pushes, the heat and the wall the window closed on, as the reveal printed.
  */
-export function describeLastTable(threshold) {
+function describeLastTable(threshold) {
   const pushes = Number(threshold?.pushes) || 0;
   const gauge = Math.floor(Number(threshold?.gauge) || 0);
   const wall = Number(threshold?.wall) || 0;
