@@ -594,8 +594,14 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
 번호만 보냅니다(적는 칸은 없습니다, `src/boardReport.js`). 받는 곳은 `board_reports` 테이블이고
 (`20261027000000_board_reports.sql`), 익명 역할은 네 컬럼 insert만 할 수 있고 읽지 못합니다. 같은 사람이 같은
 글을 다시 신고하면 받아 두고 버리며, 숨겨졌거나 없는 글은 거절하고, 한 기기 한 시간 10건·한 주소 한 시간 30건까지
-받습니다. 신고 수로 글을 저절로 내리지는 않습니다 — 운영자가 서비스 롤로 신고 목록을 읽고(마이그레이션 머리
-주석의 쿼리) `moderate_board_post`로 내립니다. 신고는 글이 지워질 때 함께 지워집니다(180일).
+받습니다. 신고 수로 글을 저절로 내리지는 않습니다 — 사람이 읽고 정합니다. `Board Reports` 워크플로
+(`.github/workflows/board-reports.yml`, `scripts/board-reports.mjs`)가 매일 09:10(KST) 신고 대기열을 Job Summary에
+적고, 아직 보이는 신고 글이 있으면 실패해 GitHub 실패 메일로 알립니다(하루 한 번 확인·24시간 안 조치, 24시간을
+넘긴 글은 ⚠). 저장소가 공개라 요약에는 글 번호·올린 날·신고 수·신고한 사람 수·사유·기다린 시간만 싣고 본문·이름은
+싣지 않습니다. 본문은 Supabase 대시보드 Table Editor의 `board_posts`에서 `id`로 읽고, 같은 워크플로를 손으로
+돌려(`gh workflow run "Board Reports" -f action=hide -f post_id=123`) `hide`(내림, `moderate_board_post`) ·
+`dismiss`(글은 두고 신고를 지움) · `restore`(내린 글 되돌림)를 합니다. 새 비밀값·권한·마이그레이션은 없습니다(Funnel과
+같은 `SUPABASE_ACCESS_TOKEN`). 신고는 글이 지워질 때 함께 지워집니다(180일).
 
 ## 게임
 
