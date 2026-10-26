@@ -210,6 +210,30 @@ const tableCopy = {
     rulesHidden: "숨은 규칙 적용 중",
     rulesQuiet: "규칙 안정",
   },
+  // tableVoice.js: what the table says aloud in its one polite region.
+  voice: {
+    holdArmed: "한 번 더 누르면 확정된다",
+    push: "열기 {gauge} · {danger}",
+    stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
+    scout: "조회했다. 벽은 {min}에서 {max} 사이 어딘가",
+    bank: "판돈 {pot} · 금고 {vault}",
+  },
+  // tableAfterword.js: what a closed window still says about itself, and the
+  // recap over the next scene's reaction.
+  afterword: {
+    nextPush: "한 번 더 밀었다면 +{step} → {gauge}, 벽 {wall}: {outcome}.",
+    nextSafe: "갈 수 있었다",
+    nextBust: "BUST였다",
+    tell: "심박은 벽을 {heard}쯤으로 들었다(실제 {wall}).",
+    // {share} is a whole percent with its sign, written by the code: what the case kept against a hand that saw the wall, never the odds of a push.
+    caseRead: "이번 사건: 벽을 본 사람의 {share}만큼 벌었습니다.",
+    wallTail: " (벽 {wall})",
+    bustOnPush: "직전 판 · {pushes}번째 밀기에서 BUST{tail}",
+    bustAfter: "직전 판 · {pushes}번 밀고 BUST{tail}",
+    cashed: "직전 판 · {pushes}번 밀고 열기 {gauge}에서 확정{tail}",
+    cashedNoPush: "직전 판 · 밀지 않고 확정{tail}",
+    vaultPerCase: "사건당 금고 {vault}",
+  },
 };
 export default tableCopy;
 

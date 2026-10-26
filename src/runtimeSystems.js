@@ -21,11 +21,8 @@ const percent = (share) => Math.round(share * 100);
 
 export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
   const profile = getOperatorProfile(origin);
-  const levelPermissions = {
-    OBSERVER: ["제한 열람", "질문 요청", "관찰 기록"],
-    "FIELD ACCESS": ["기록 대조", "관계자 질문", "기준 제안"],
-    OVERSIGHT: ["기록 공개", "현장 개입", "실험 종료"],
-  };
+  // What each level may do (src/copy/seasonEnd.js `authority.permissions`).
+  const levelPermissions = W.authority.permissions;
   return {
     ...profile,
     level,

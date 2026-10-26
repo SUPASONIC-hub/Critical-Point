@@ -57,6 +57,12 @@ const seasonEndCopy = {
     nextObserver: "증거와 관계자의 믿음을 확보하십시오.",
     nextField: "공정함과 사람 피해를 함께 관리하십시오.",
     nextOversight: "공개 이후의 피해 복구까지 설계하십시오.",
+    // What each authority level may do (getAuthorityProfile).
+    permissions: {
+      OBSERVER: ["제한 열람", "질문 요청", "관찰 기록"],
+      "FIELD ACCESS": ["기록 대조", "관계자 질문", "기준 제안"],
+      OVERSIGHT: ["기록 공개", "현장 개입", "실험 종료"],
+    },
   },
   origins: { courier: "현장 기록의 계승", lab: "반대 의견의 계승", public: "남긴 기록의 계승" },
   originEnding: "{origin} 경로에서 '{ending}'의 결과가 다르게 읽힙니다.",

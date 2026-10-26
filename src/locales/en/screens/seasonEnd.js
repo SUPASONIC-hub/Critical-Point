@@ -46,6 +46,11 @@ export default {
     nextObserver: "Secure evidence and the trust of the people involved.",
     nextField: "Manage Fairness and Human cost together.",
     nextOversight: "Plan the repair of harm after disclosure, too.",
+    permissions: {
+      OBSERVER: ["Restricted reading", "Ask questions", "Keep observation notes"],
+      "FIELD ACCESS": ["Cross-check records", "Question the people involved", "Propose standards"],
+      OVERSIGHT: ["Disclose records", "Intervene on site", "End the experiment"],
+    },
   },
   origins: { courier: "Inheriting the field record", lab: "Inheriting the dissent", public: "Inheriting the record you left" },
   originEnding: "On the path of {origin}, the result of “{ending}” reads differently.",
