@@ -24,7 +24,10 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComput
 
 // Past this the one-file subset has stopped paying for itself against the
 // dynamic subset it replaced (~537KB for the intro alone). Ratchet down, never up.
-const MAX_FONT_BYTES = 283_500;
+// 283,500 -> 197,740 on 2026-10-26 (first-paint-cut): the weight axis cut to
+// 400-920 (scripts/build-fonts.mjs). Measured 197,736, plus 4; the same line as
+// the woff2's in check-bundle-size.mjs.
+const MAX_FONT_BYTES = 197_740;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones
