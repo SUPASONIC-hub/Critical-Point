@@ -544,7 +544,7 @@ export default {
     "c27_final_open": "The notice goes up, and people gather at the banking hall wall. Before the original screen of the screenshot that had only gone around group chats, Uncle Jungho crumples his number ticket: 'It was these guys?' Whether the line will shrink, no one knows yet.",
     "c27_final_limit": "The limit goes on, and the line stops. The elders wearing carnations receive 5-million-won envelopes and are told to come back the next day for the rest.",
     "c27_after_warm": "You stay, and on Saturday morning Boss Kwak from the fish market brings a box of dried bakdae. The bus to Seoul is Sunday’s last one.",
-    "c27_after_record": "The report runs seven pages. The first page carries the date Grandma Ha Junghee broke her savings on Monday; the last page, the blank signature field.",
+    "c27_after_record": "The report runs seven pages. The first page carries the date Grandma Ha Junghee broke her savings on Monday; the last page, the empty signature field.",
     "c27_after_rush": "You go straight up, and the Real Estate Finance Team’s desks on the 12th floor are dark. In the in-house messenger list, that chat has already vanished.",
     "c27_savings_choice_1": "Her son is silent on the phone a long while, then says, 'Put my mom on.' While that call takes 20 minutes, the line behind grows by 12.",
     "c27_savings_choice_2": "Borrowing against the savings protects the interest. Grandma Ha leafs through four pages of forms, puts down the pen saying 'This is scarier,' and says she’ll decide after talking to her son.",

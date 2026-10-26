@@ -229,7 +229,7 @@ export default {
     },
     "c21_letter": {
       "title": "Roof Money",
-      "text": "The next morning, Sunwoo Jin opens the envelope at the counter. One thank-you letter, two consent forms. 'I consent to the use of my 2022 capability assessment participation records for research purposes.' Below the signature line is a field for the account to receive the 3 million won thank-you payment, and replies are due by the registered-mail cutoff at Gujwa Post Office at five this afternoon. A message from Ryu Seah comes in with it. Sunwoo Jin is the data subject of those records, and can file an access request before signing. Sunwoo Jin looks up at the blue tarp on the roof. 'If it’s for research... it’ll be used for something good, right? It’s money to fix the roof.' Sunwoo Jin uncaps the pen.",
+      "text": "The next morning, Sunwoo Jin opens the envelope at the counter. One thank-you letter, two consent forms. 'I consent to the use of my 2022 capability assessment participation records for research purposes.' Below the signature field is a field for the account to receive the 3 million won thank-you payment, and replies are due by the registered-mail cutoff at Gujwa Post Office at five this afternoon. A message from Ryu Seah comes in with it. Sunwoo Jin is the data subject of those records, and can file an access request before signing. Sunwoo Jin looks up at the blue tarp on the roof. 'If it’s for research... it’ll be used for something good, right? It’s money to fix the roof.' Sunwoo Jin uncaps the pen.",
       "memo": [
         "2 consent forms + 3 million won thank-you payment",
         "Reply cutoff: today 17:00, Gujwa Post Office",
@@ -415,11 +415,11 @@ export default {
     },
     "c21_evidence_turn": {
       "title": "The Blank on the Order Form",
-      "text": "When you read the clues out to Ban Jaewook in B2 in Seoul, he holds up to the video call an operations statement he found by checking against the Cohort 1 shelf list. Project name 'TL-2022-01 HR Innovation Foundational Research,' ordering department Group Strategy Office, deliverable format 'HR reference material.' Ban Jaewook turns one more page. It is the company’s written opinion attached to the industrial accident claim Sunwoo Jin filed just before leaving. 'Judged to be personal stress.' The signature line at the bottom of the opinion is blank. Ban Jaewook closes the notebook he was writing in. 'No name in the field that ordered the experiment, and none in the field that turned that person into personal reasons. The same habit of hand.'",
+      "text": "When you read the clues out to Ban Jaewook in B2 in Seoul, he holds up to the video call an operations statement he found by checking against the Cohort 1 shelf list. Project name 'TL-2022-01 HR Innovation Foundational Research,' ordering department Group Strategy Office, deliverable format 'HR reference material.' Ban Jaewook turns one more page. It is the company’s written opinion attached to the industrial accident claim Sunwoo Jin filed just before leaving. 'Judged to be personal stress.' The signature field at the bottom of the opinion is blank. Ban Jaewook closes the notebook he was writing in. 'No name in the field that ordered the experiment, and none in the field that turned that person into personal reasons. The same habit of hand.'",
       "memo": [
         "Ordered by: Group Strategy Office, project TL-2022-01",
         "Deliverable format: HR reference material",
-        "Company opinion on the industrial accident claim -- signature line blank"
+        "Company opinion on the industrial accident claim -- signature field blank"
       ],
       "choices": {
         "c21_evidence_turn_hold": {
@@ -615,7 +615,7 @@ export default {
     "c21_final_secure": "Since all you have is a single weekly chart, you lock down Cohort 1’s originals with a preservation request before telling.",
     "c21_final_ask": "Since whether to know is also Sunwoo Jin’s to decide, you ask before saying anything whether Sunwoo Jin wants to know.",
     "c21_after_warm": "Saying tangerines not picked in a hurry can’t be carried off in a hurry, you stay at Slow Island until the last flight and pack tangerine boxes together.",
-    "c21_after_record": "So participants can see their own records before they stand at the signature line, you draft a records access request guide for Cohort 1 participants.",
+    "c21_after_record": "So participants can see their own records before they stand at the signature field, you draft a records access request guide for Cohort 1 participants.",
     "c21_after_rush": "Saying the To-the-End Precision application is already in front of NOAH, you take the very next flight up with the tangerine box and look into NOAH’s review.",
     "c21_guestbook_choice_1": "Since these are handwritten replies to guests who came to rest, you treat the guestbook as Sunwoo Jin’s and close it quietly without photos.",
     "c21_guestbook_choice_2": "So you can tell whose words came first, you note the reply dates and option-sentence numbers side by side.",

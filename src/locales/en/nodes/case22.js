@@ -135,7 +135,7 @@ export default {
       "memo": [
         "Seon Medical’s final notice: contract by Tuesday",
         "41 R-17 rejections -- 29 of them families of FlowOn suppliers",
-        "Exception approval signature line: needs a responsible manager’s name",
+        "Exception approval signature field: needs a responsible manager’s name",
         "This choice leads to the March shareholders’ meeting"
       ],
       "choices": {
@@ -296,9 +296,9 @@ export default {
     },
     "c22_notebook_reaction": {
       "title": "The Empty Field",
-      "text": "10 p.m. Tak Yerin finds the exception approval application form and sends it over. It is the first time anyone has opened the form since NOAH arrived. At the very bottom is a signature line: 'Person responsible for exception approval.' A clause is attached: whoever overturns NOAH’s result signs electronically with their employee ID, and if that loan goes bad, it is reflected in their performance review. Since adoption, not one person in the whole country has put a name in that field. Tak Yerin sends one more message. 'Should I sign it? I don’t know if a 4th-year assistant manager’s name even counts, though.'",
+      "text": "10 p.m. Tak Yerin finds the exception approval application form and sends it over. It is the first time anyone has opened the form since NOAH arrived. At the very bottom is a signature field: 'Person responsible for exception approval.' A clause is attached: whoever overturns NOAH’s result signs electronically with their employee ID, and if that loan goes bad, it is reflected in their performance review. Since adoption, not one person in the whole country has put a name in that field. Tak Yerin sends one more message. 'Should I sign it? I don’t know if a 4th-year assistant manager’s name even counts, though.'",
       "memo": [
-        "Exception approval signature line -- 0 people nationwide",
+        "Exception approval signature field -- 0 people nationwide",
         "Tak Yerin: the name of a 4th-year assistant manager"
       ],
       "choices": {
@@ -540,7 +540,7 @@ export default {
     "c22_roleplay_hold": "Heard out to the end, Hajun tells his dad’s story from beginning to end for the first time. The other three interns’ role-plays are pushed to tomorrow morning.",
     "c22_roleplay_task": "The proposal goes to Talent Development. Whether an hour of 'how not to sell' makes it into the next cohort’s training will be decided in the summer.",
     "c22_roleplay_next": "Moved on to the next turn, the role-play ends on time. Hajun stands in front of the hallway vending machine for a long while.",
-    "c22_final_override": "With a person overturning it, To-the-End Precision signs the machine contract on Tuesday. A name goes on the country’s first exception approval signature line, and the other 40 are still under R-17.",
+    "c22_final_override": "With a person overturning it, To-the-End Precision signs the machine contract on Tuesday. A name goes on the country’s first exception approval signature field, and the other 40 are still under R-17.",
     "c22_final_object": "With the objection filed, all 41 go back up for review. Seon Medical does not wait, and To-the-End Precision’s first big order goes to Vietnam.",
     "c22_final_bank": "The other bank charges more interest and takes the papers on Tuesday morning, when the holiday ends. The factory runs, and KD Bank’s R-17 rejects the next application as if nothing had happened.",
     "c22_after_warm": "Because you stay, rice cakes go around until the banking hall lights go out. Hajun sets the last rice cake on top of the ticket machine.",

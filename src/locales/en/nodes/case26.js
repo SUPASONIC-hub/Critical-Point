@@ -229,7 +229,7 @@ export default {
     },
     "c26_elevator": {
       "title": "The One Who Was Right",
-      "text": "7:50 on the morning before the committee. You step into the elevator on the 12th floor, and Yoon Sanghyuk is already inside. It is the first time you have met him alone outside the CEO’s office. A plain navy suit, a tablet showing a document with an empty signature line. He doesn’t press a button; he waits for the doors to close. 'I hear you go to Pyeongtaek often. Climbed the crane, too.' The floor display changes from 18 to 19. 'Risk Management is where risk is written down, not where it’s removed. Your name goes only in the author field. The committee makes the decision.' The doors open on the 20th floor. As he steps out, he adds, 'You were right 3 years ago, too. That’s why you went to the basement.'",
+      "text": "7:50 on the morning before the committee. You step into the elevator on the 12th floor, and Yoon Sanghyuk is already inside. It is the first time you have met him alone outside the CEO’s office. A plain navy suit, a tablet showing a document with an empty signature field. He doesn’t press a button; he waits for the doors to close. 'I hear you go to Pyeongtaek often. Climbed the crane, too.' The floor display changes from 18 to 19. 'Risk Management is where risk is written down, not where it’s removed. Your name goes only in the author field. The committee makes the decision.' The doors open on the 20th floor. As he steps out, he adds, 'You were right 3 years ago, too. That’s why you went to the basement.'",
       "memo": [
         "Alone with Yoon Sanghyuk outside the CEO’s office -- 50 seconds in an elevator",
         "'Your name goes only in the author field'",

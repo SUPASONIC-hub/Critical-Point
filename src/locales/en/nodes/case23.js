@@ -100,7 +100,7 @@ export default {
     },
     "c23_backstage": {
       "title": "A Resignation Letter, Unsigned",
-      "text": "Two things lie on the waiting room table. One is the 98-page run sheet for today’s shareholders’ meeting; the other, a one-page A4 draft resignation letter. It is dated last December, and the signature line is blank. Baek Arin’s tablet, always kept charged at 80%, is at 11% today. She opens the run sheet to page 14. 'If opposing remarks run long, the chair limits them to 1 minute per person. I wrote that sentence. I wrote the Innovation Committee ad script too. I believed a good story outlasts the facts.' She pushes the draft resignation toward you. The fold has worn white. 'Three months now and I haven’t handed it in. If I do, my story ends here. If I don’t, at 10 today the sentence I wrote shuts your mouth.'",
+      "text": "Two things lie on the waiting room table. One is the 98-page run sheet for today’s shareholders’ meeting; the other, a one-page A4 draft resignation letter. It is dated last December, and the signature field is blank. Baek Arin’s tablet, always kept charged at 80%, is at 11% today. She opens the run sheet to page 14. 'If opposing remarks run long, the chair limits them to 1 minute per person. I wrote that sentence. I wrote the Innovation Committee ad script too. I believed a good story outlasts the facts.' She pushes the draft resignation toward you. The fold has worn white. 'Three months now and I haven’t handed it in. If I do, my story ends here. If I don’t, at 10 today the sentence I wrote shuts your mouth.'",
       "memo": [
         "Shareholders’ meeting run sheet, 98 pages -- written by Baek Arin",
         "Page 14: 'Opposing remarks limited to 1 minute per person'",
@@ -131,12 +131,12 @@ export default {
     },
     "c23_final": {
       "title": "1 Minute",
-      "text": "When Agenda Item No. 3 comes up, the chair says, 'Remarks will be limited to 1 minute per person.' Applause comes from the front six rows. In the back stand Moon Gaeul, the Yeongdong elders, the night shift, and Moon Hajun. Between them, 11 people sit in the institutional proxy seats. In front of the nameplate of the National Pension Service’s stewardship officer (who votes in the interest of the money’s owners), the ClearVote report lies open. By the votes already in, it is 55% in favor. The National Pension Service’s 8% has not gone either way yet. Just before you speak, Baek Arin passes you a note. The group will accept a governance (who decides, who watches) reform: the 'real-name signature line rule,' putting a real name on every loan signature line. The condition is that you drop your remarks today. In the candidate’s seat, Yoon Sanghyuk closes his tablet cover, and the timer starts counting down from 1:00.",
+      "text": "When Agenda Item No. 3 comes up, the chair says, 'Remarks will be limited to 1 minute per person.' Applause comes from the front six rows. In the back stand Moon Gaeul, the Yeongdong elders, the night shift, and Moon Hajun. Between them, 11 people sit in the institutional proxy seats. In front of the nameplate of the National Pension Service’s stewardship officer (who votes in the interest of the money’s owners), the ClearVote report lies open. By the votes already in, it is 55% in favor. The National Pension Service’s 8% has not gone either way yet. Just before you speak, Baek Arin passes you a note. The group will accept a governance (who decides, who watches) reform: the 'real-name signature field rule,' putting a real name on every loan signature field. The condition is that you drop your remarks today. In the candidate’s seat, Yoon Sanghyuk closes his tablet cover, and the timer starts counting down from 1:00.",
       "memo": [
         "Speaking time: 1 minute per person",
         "55% in favor by votes already in -- National Pension’s 8% not yet cast",
         "About 600 one-share shareholders inside -- 2,500-plus by proxy and e-vote",
-        "This choice leads to the empty signature line on the 33rd floor"
+        "This choice leads to the empty signature field on the 33rd floor"
       ],
       "choices": {
         "c23_final_deal": {
@@ -154,7 +154,7 @@ export default {
       },
       "place": "KD Financial Group Headquarters, Yeouido · Auditorium, Shareholders’ Meeting",
       "clock": "March 20 · Agenda Item No. 3 Up · 11:05",
-      "question": "The timer is set to 1 minute, and the group offers the real-name signature line rule in exchange for silence. What do you do?",
+      "question": "The timer is set to 1 minute, and the group offers the real-name signature field rule in exchange for silence. What do you do?",
       "lead": "Agenda Item No. 3 came up only after 11. Meanwhile, the line in the lobby filed in one by one through the auditorium’s back doors."
     },
     "c23_aftershock": {
@@ -273,7 +273,7 @@ export default {
     },
     "c23_nightshift_reaction": {
       "title": "An 11-Second Speech",
-      "text": "In a corner of the break room, Kang Taemin stands up with a sheet of paper. He wants to practice a shareholder’s remarks. 'I’m Kang Taemin, FlowOn night shift. 3 years ago, when that company went under, I was the one moving boxes before dawn. Why that loan’s signature line was empty, who is going to tell us today?' That’s it. Kwon Dohyun, who has tagged along the whole proxy tour, stops the stopwatch. '11.4 seconds. Very efficient.' Kang Taemin folds the paper. 'Give me 1 minute and that leaves 48 seconds. Those are for Yoo Gun.' The youngest goes bright red, and the 80 applaud by drumming on their noodle cup lids.",
+      "text": "In a corner of the break room, Kang Taemin stands up with a sheet of paper. He wants to practice a shareholder’s remarks. 'I’m Kang Taemin, FlowOn night shift. 3 years ago, when that company went under, I was the one moving boxes before dawn. Why that loan’s signature field was empty, who is going to tell us today?' That’s it. Kwon Dohyun, who has tagged along the whole proxy tour, stops the stopwatch. '11.4 seconds. Very efficient.' Kang Taemin folds the paper. 'Give me 1 minute and that leaves 48 seconds. Those are for Yoo Gun.' The youngest goes bright red, and the 80 applaud by drumming on their noodle cup lids.",
       "memo": [
         "An 11.4-second speech",
         "Who gets the remaining 48 seconds"
@@ -572,7 +572,7 @@ export default {
     "c23_route_system_minutes": "Once the letter is received, the secretariat sets out one more recorder. The speaking time stays the same.",
     "c23_route_system_drop": "A few more votes come in. The words kept as one line for 10 years get ready to be kept as one line again this year.",
     "c23_final_system_route_a": "With the rule in place, candidates from next year on must list how they handled dissent against themselves. This year’s candidate falls outside the rule.",
-    "c23_final_system_route_b": "The votes are counted and the rule waits a year. For that year, the signature line stays just as it is.",
+    "c23_final_system_route_b": "The votes are counted and the rule waits a year. For that year, the signature field stays just as it is.",
     "c23_final_system_route_c": "The one-share shareholders write down the public minutes themselves. They aren’t the official record, but anyone can read them.",
     "c23_evidence_turn_disclose": "When you reveal it, the front six rows stir. The owners of the red dots see their own employee IDs right there.",
     "c23_evidence_turn_protect": "Of the employees you contact, three don’t pick up. The one who does says, 'I didn’t know my dot was red.'",
@@ -610,7 +610,7 @@ export default {
     "c23_backstage_script": "So you can show the 1 minute was set in advance, you take the original run sheet and keep it as grounds against the speaking limit.",
     "c23_backstage_go": "Saying with only 80 minutes to opening there’s no time to waver, you leave the resignation and go to the auditorium first.",
     "c23_final_block": "Saying you can’t accept a condition to drop your remarks, you spend the 1 minute urging no votes to block the appointment.",
-    "c23_final_deal": "Saying a lasting system outweighs 1 minute of words, you drop your remarks and negotiate on the condition of the real-name signature line rule.",
+    "c23_final_deal": "Saying a lasting system outweighs 1 minute of words, you drop your remarks and negotiate on the condition of the real-name signature field rule.",
     "c23_final_record": "Saying you can’t overturn 55% in favor but can leave words behind, you have every word of the 1-minute remarks recorded instead of chasing votes.",
     "c23_after_warm": "Unable to just send off the people who came on the dawn bus, you see the one-share shareholders off until the last bus leaves.",
     "c23_after_record": "So the 46.5 points don’t get buried under applause, you put 50.6% and today’s remarks in a shareholder letter and send it to the board.",
