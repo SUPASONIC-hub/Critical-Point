@@ -57,6 +57,43 @@ export function getCognitionSpread(types = []) {
   return Math.floor(clamp((entropy / Math.log(counts.length)) * reach * 100, 0, 100) + 0.5);
 }
 
+/**
+ * C-12, the 판 읽기 index of a case: what the player's bare hand kept against
+ * a hand that sees the wall, on the same boards (each logged window's
+ * `threshold.read`, `[bare, seer]`, tableAfterword.js readWindowAgainstSeer).
+ * A bust wipes what the bare hand had in the pot, as the table does without
+ * INSURANCE; the seer never pushes into the wall. A whole percent, or null
+ * for a log with nothing to compare (an older log). The case close prints it
+ * (「벽을 본 사람의 N%」, tableAfterword.js describeCaseRead), and since C-1(1)
+ * the score reads it too (`getReadingScore`).
+ */
+export function getCaseRead(log = []) {
+  let mine = 0;
+  let seer = 0;
+  for (const entry of log) {
+    const read = entry?.threshold?.read;
+    if (!Array.isArray(read)) continue;
+    mine = entry.threshold.busted ? 0 : mine + (Number(read[0]) || 0);
+    seer += Number(read[1]) || 0;
+  }
+  return seer > 0 ? Math.round((mine / seer) * 100) : null;
+}
+
+/**
+ * The 판 읽기 axis of the burst score (C-1(1), 사용자 2026-10-25 「전부 1」:
+ * weight 0.2, the six axes before it shrunk by the same ratio): the case's
+ * index (`getCaseRead`) kept within 0 to 100. A bare hand that pushed past
+ * where the seer stopped and lived can read over 100%; the axis stops at 100.
+ * A log with nothing to compare scores 0: every window the page settles
+ * writes its read, a story-mode season is never ranked, and a season begun
+ * before the axis is refused by the ranking (20261102030000), so only an
+ * older log or one written by something else than the page reads 0.
+ */
+export function getReadingScore(log = []) {
+  const read = getCaseRead(log);
+  return read === null ? 0 : clamp(read, 0, 100);
+}
+
 /** A count the season's 관점 전환 can be read from: at most eight kinds, each a whole number from 0 to 999,999. */
 const isCognitionMix = (mix) =>
   Boolean(mix) && typeof mix === "object" && !Array.isArray(mix) && Object.keys(mix).length <= 8 &&
@@ -71,9 +108,10 @@ const isCognitionMix = (mix) =>
  * One axis is read off the whole season instead (사용자 2026-10-23 Q25 (1)):
  * 관점 전환, whose reach (kinds / 4) a case of seven decisions rarely fills,
  * which cost a season of one approach per case up to eight points. Each case's
- * own 관점 전환 (weight 0.2) is swapped for the one its decisions make
- * together across the season (`cognitionMix` summed), so the score is
- * (5 * sum of scores + cases * season's - sum of the cases') / (5 * cases),
+ * own 관점 전환 (weight 0.16 since the 판 읽기 axis took 0.2 of the score,
+ * C-1(1); 0.2 before) is swapped for the one its decisions make together
+ * across the season (`cognitionMix` summed), so the score is
+ * (25 * sum of scores + 4 * (cases * season's - sum of the cases')) / (25 * cases),
  * kept within 0 to 100 and rounded half up to a whole number (`Math.round`;
  * the server's `round()` agrees on numbers that are never negative). A season
  * with a case that carries no count (closed before the count was kept), or
@@ -84,7 +122,8 @@ const isCognitionMix = (mix) =>
  * of each case and drops the replay's, and the two rankings have to agree.
  * Only the season's cases count, and a case with no score to read is left
  * out; a season with none has no score ({}). The server's copy of this is
- * `ranking_run_summary` (20261102020000_season_score_case_mean).
+ * `ranking_run_summary` (20261102020000_season_score_case_mean, with the
+ * 0.16 weight since 20261102030000_season_score_reading_axis).
  */
 export function getSeasonScore(caseResults = {}, caseIds = CASE_SEQUENCE) {
   const cases = caseIds
@@ -96,13 +135,14 @@ export function getSeasonScore(caseResults = {}, caseIds = CASE_SEQUENCE) {
     }))
     .filter(({ score }) => Number.isFinite(score));
   if (!cases.length) return {};
-  let total = cases.reduce((sum, { score }) => sum + score, 0) * 5;
+  // 0.16 = 4 / 25, so the sum stays in whole numbers, as the server's does.
+  let total = cases.reduce((sum, { score }) => sum + score, 0) * 25;
   const season = {};
   for (const { mix } of cases.filter(({ mix }) => isCognitionMix(mix))) {
     for (const [type, count] of Object.entries(mix)) season[type] = (Object.hasOwn(season, type) ? season[type] : 0) + count;
   }
   if (cases.every(({ mix }) => isCognitionMix(mix)) && isCognitionMix(season)) {
-    total += cases.length * getCognitionSpread(season) - cases.reduce((sum, { mix }) => sum + getCognitionSpread(mix), 0);
+    total += 4 * (cases.length * getCognitionSpread(season) - cases.reduce((sum, { mix }) => sum + getCognitionSpread(mix), 0));
   }
-  return scoreMarks(Math.round(clamp(total / (5 * cases.length), 0, 100)));
+  return scoreMarks(Math.round(clamp(total / (25 * cases.length), 0, 100)));
 }

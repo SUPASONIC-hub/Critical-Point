@@ -74,7 +74,23 @@ const budgets = [
   // rebased on main 81a48f50: measured 142,806 / 52,309 in the e2e build, the
   // gzip plus 4. The case's rules for the audit and the links, and the season
   // row's mean score.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 142_806, maxGzip: 52_313 },
+  // 142,806 / 52,313 -> 142,907 / 52,366 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 142,907 / 52,362 in the e2e build, the
+  // gzip plus 4. The score breakdown's 판 읽기 row and the case summary's
+  // readingScore.
+  // -> 142,837 / 52,328 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // measured 142,837 / 52,324, the gzip plus 4. The debug jump and a replay link lay a peak case's first board
+  // (runState.js jumpToNode, layCasePeak).
+  // -> 142,926 / 52,372 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // C-1's 판 읽기 row and the bundle's peak-case jump together. Measured 142,926 / 52,368 in two e2e builds, the gzip plus 4.
+  // 142,806 / 52,313 -> 142,951 / 52,390 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 142,951 / 52,386 in the e2e build, the gzip plus 4. The pre-C-3 streak
+  // read on a save (the hold on a type set aside) and the run's direction.
+  // -> 143,077 / 52,472 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // C-1's 판 읽기 row, the bundle's peak-case jump and C-3's direction and save upgrade together. Measured 143,077 / 52,468 in the e2e build, the gzip plus 4.
+  // -> 143,080 raw on 2026-10-26, the rehearsal on main 9c7a06c0 (#326~#336): measured
+  // 143,080 / 52,447 in the e2e build; the rehearsal's code did not change, the gzip budget holds.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 143_080, maxGzip: 52_472 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -83,7 +99,16 @@ const budgets = [
   // 32,897 / 13,022 -> 33,937 / 13,368 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 33,937 / 13,364 in the e2e build, the gzip plus 4. src/seasonScore.js (C-2's season mean and Q25's season-wide change of view, getCognitionMix) lands in this chunk under Rolldown.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 33_937, maxGzip: 13_368 },
+  // 33,937 / 13,368 -> 34,272 / 13,482 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 34,272 / 13,478 in the e2e build, the
+  // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
+  // it now), getReadingScore, and the seventh weight. 13,480 in a second build
+  // on #224 0c989ba7 (the hashes), so 13,484.
+  // 13,484 -> 13,491 gzip on 2026-10-25, the 11-30 rehearsal (integration-1130:
+  // #224 + C-1(1) + D2): the same 34,272 bytes, other chunk names inside.
+  // Measured 13,487 in two e2e builds, the gzip plus 4.
+  // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_272, maxGzip: 13_491 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -91,7 +116,16 @@ const budgets = [
   // 19,564 / 8,588 -> 19,701 / 8,632 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 19,701 / 8,628 in the e2e build, the gzip plus 4. the settlement hands the case's rules on (settleChoice.js's getSettlementRules once, rules back for the hand-off).
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_701, maxGzip: 8_632 },
+  // 19,701 / 8,632 -> 20,366 / 8,927 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // measured 20,366 / 8,923 and 8,920 (two builds), the larger gzip plus 4. C-7's five tools'
+  // copy and icons, 「숨 고르기」 on the pass button (relics.js is in this chunk).
+  // 19,701 / 8,632 -> 20,520 / 8,916 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 20,520 / 8,912 in the e2e build, the gzip plus 4. The ladder's three new
+  // steps (사건 01 to 03, each with its line) and the direction's names.
+  // -> 21,105 / 9,171 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // C-7's five tools and 「숨 고르기」 beside C-4's three ladder steps and the direction names. Measured 21,105 / 9,167 in the e2e build, the gzip plus 4.
+  // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 21_105, maxGzip: 9_171 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -240,7 +274,30 @@ const budgets = [
   // (TAB_TOKEN_CLAIM_MS 300, one more wait when the timer fired late, capped
   // at TAB_TOKEN_CLAIM_MAX_MS). Measured 172,244 / 62,201 in the CI e2e build,
   // the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_244, maxGzip: 62_205 },
+  // 172,244 / 62,205 -> 172,367 / 62,293 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): fetchHallOfFame in
+  // telemetry.js and the data notice's line that a checked top season may stay
+  // in the hall of fame by its run tag; measured 172,367 / 62,289 + 4.
+  // -> 172,282 / 62,234 on 2026-10-25, 묶음 시대고증(#313): the intro's story
+  // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
+  // 62,226 in CI and 62,230 here, the larger gzip plus 4.
+  // -> 172,407 / 62,326 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // D2's fetchHallOfFame and main #313's copy together. Measured 172,407 / 62,322 in two e2e builds, the gzip plus 4.
+  // -> 172,533 / 62,372 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // D2's fetchHallOfFame, main #313's copy and C-3/C-4 together. Measured 172,533 / 62,368 in the e2e build, the gzip plus 4.
+  // 62,372 -> 62,377 gzip on 2026-10-25, the rehearsal on main caeecdac (#318 A-13,
+  // scene bodies under 420): the same 172,533 bytes, measured 62,373 here and in CI.
+  // 172,282 / 62,234 -> 172,403 / 62,270 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 172,403 / 62,266 gzip in the e2e build, the gzip plus 4.
+  // -> 172,646 / 62,389 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
+  // #325's report button and its copy beside everything the rehearsal carries. Measured 172,646 / 62,385 in the e2e build, the gzip plus 4.
+  // 172,403 / 62,270 -> 173,126 / 62,668 on 2026-10-25, deletion-contact: the deletion-request sentence in the data notice with the support address as a mailto link (SUPPORT_CONTACT, getDeletionRequestText in appConfig.js). Measured 173,126 / 62,664 gzip in the e2e build on main 2998216 (#325), the gzip plus 4.
+  // 173,126 / 62,668 -> 173,478 / 62,829 the same day, 개인정보처리방침·이용약관
+  // on main 39176493 (#326): the intro's foot and the data drawer's note link
+  // the two pages (privacyText.js holds the paths and the consent sentence,
+  // moved, not added). Measured 173,478 / 62,825 in the e2e build, the gzip
+  // plus 4.
+  // -> 173,728 / 62,957 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0 (#326 deletion contact, #328 policy pages):
+  // main's data-notice lines beside everything the rehearsal carries. Measured 173,728 / 62,953 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_728, maxGzip: 62_957 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -401,7 +458,20 @@ const budgets = [
   // -> 102,560 on 2026-10-25, #224 (RULES_MARK 3) rebased on main 0d0c7dbb:
   // B2's link tag beside the act card's gate. Measured 102,560 / 35,437; the
   // gzip budget still holds.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_560, maxGzip: 35_457 },
+  // 102,560 -> 102,564 raw on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): chunk names only; the gzip in budget.
+  // -> 102,622 / 35,465 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // measured 102,622 / 35,461, the gzip plus 4. The board's mark (「고점 판」,
+  // 「숨 고른 판」) in the pot's label, the pass re-dealing the board.
+  // -> 102,514 / 35,481 on 2026-10-25, 묶음 시대고증(#313): the era words in
+  // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
+  // the larger gzip plus 4.
+  // -> 102,664 / 35,490 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // the bundle's board marks and main #313's copy together. Measured 102,664 / 35,486 in two e2e builds, the gzip plus 4.
+  // 35,457 -> 35,465 gzip on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured 102,550 /
+  // 35,461, the gzip plus 4. The card's tag prints the direction, and the
+  // hashed names it imports moved.
+  // 102,514 / 35,481 -> 102,517 / 35,481 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 102,517 in the e2e build.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_664, maxGzip: 35_490 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -445,7 +515,10 @@ const budgets = [
   // 44,569 / 14,826 in the e2e build, the gzip plus 4.
   // 44,569 / 14,830 -> 44,583 / 14,831 on 2026-10-25, #224 (RULES_MARK 3) rebased on
   // main 7236f80b: measured 44,583 / 14,827 in the e2e build, the gzip plus 4. Hash names in its imports only.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_583, maxGzip: 14_831 },
+  // 44,583 -> 44,590 raw on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): chunk names only; the gzip in budget.
+  // -> 44,589 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7: measured 44,589 raw; hash names in its imports only, the gzip budget holds.
+  // 44,569 / 14,830 -> 44,575 / 14,830 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 44,575 in the e2e build.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_590, maxGzip: 14_831 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -504,7 +577,32 @@ const budgets = [
   // -> 193,577 / 36,084 on 2026-10-25, #224 rebased on main 0d0c7dbb: B2's
   // link tag (.gx-card-link) and the phone signal row's 2px gap. Measured
   // 193,577 / 36,080, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 193_577, maxGzip: 36_084 },
+  // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 0c989ba7: the score breakdown's seventh card, the penalty
+  // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
+  // 193,577 / 36,084 -> 193,821 / 36,115 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): the hall of fame's
+  // badge on a ranking row (.ranking-hall-badge); measured 193,821 / 36,111 + 4.
+  // -> 193,874 / 36,124 on 2026-10-25, the 11-30 rehearsal (integration-1130:
+  // #224 + C-1(1) + D2), both of the above together. Measured 193,874 / 36,120
+  // in two e2e builds, the gzip plus 4.
+  // -> 193,674 / 36,114 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // the two board marks' colours (.gx-mark-peak, .gx-mark-breather). Measured
+  // 193,674 / 36,110, the gzip plus 4.
+  // -> 193,971 / 36,154 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // C-1's seventh card, D2's badge and the bundle's two board marks together. Measured 193,971 / 36,150 in two e2e builds, the gzip plus 4.
+  // 193,674 / 36,110, the gzip plus 4; 193,675 raw once the peak's colour
+  // went from heat to ember (contrast, 3.56:1 -> about 5.6:1).
+  // -> 193,972 raw on 2026-10-25, the rehearsal with the bundle's ember 「고점 판」 (3ca5d7b9);
+  // measured 193,972 / 36,146, the gzip budget holds.
+  // 193,412 / 36,058 -> 194,165 / 36,203 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 194,165 / 36,199 gzip in the e2e build, the gzip plus 4.
+  // -> 194,725 / 36,295 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
+  // #325's report row and fieldset beside C-1's card, D2's badge and the bundle's marks. Measured 194,725 / 36,291 in the e2e build, the gzip plus 4.
+  // -> 194,339 / 36,241 the same day, 개인정보처리방침·이용약관 on main 29982165:
+  // `.intro-legal` and the links' colour. Measured 194,339 / 36,237 in the e2e
+  // build, the gzip plus 4.
+  // -> 194,899 / 36,333 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0:
+  // `.intro-legal` beside #325's report row, C-1's card, D2's badge and the bundle's marks. Measured 194,899 / 36,329 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_899, maxGzip: 36_333 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -534,7 +632,14 @@ const budgets = [
   // choice 1): measured 17,050 / 6,043 in the e2e build on main 5adcbb5 with
   // lucide-react 1.60 installed (npm ci), the gzip plus 4. The 13,212 / 4,658
   // of 2026-10-21 was lucide 0.577 left in this checkout's node_modules.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_050, maxGzip: 6_047 },
+  // 17,050 / 6,047 -> 17,296 / 6,140 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // C-7's five tool icons (ClipboardCheck, Files, Hourglass, Newspaper,
+  // NotebookPen); the five they replace are still drawn elsewhere. Measured
+  // 17,296 / 6,136 in the e2e build, the gzip plus 4.
+  // 17,050 / 6,047 -> 17,286 / 6,142 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 17,286 / 6,138 gzip in the e2e build, the gzip plus 4.
+  // -> 17,532 / 6,240 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
+  // #325's flag icon beside the icons the stacked drafts import. Measured 17,532 / 6,236 in the e2e build, the gzip plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_532, maxGzip: 6_240 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -547,7 +652,8 @@ const budgets = [
   // gzip plus 4, raised by what it lacked. The 5 bytes came with main and
   // lucide 1.60 (#218, which the screen imports from); this branch changes
   // nothing in it.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_507, maxGzip: 2_366 },
+  // 5,507 / 2,366 -> 9,029 / 3,768 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 9,029 / 3,764 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 9_029, maxGzip: 3_768 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -566,7 +672,10 @@ const budgets = [
   // 4,793 / 2,147 -> 5,033 / 2,256 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 5,033 / 2,252 in the e2e build, the gzip plus 4. the personal bests' state, fetch and line (src/personalBests.js) and the heading that says the season record is a mean of cases.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_033, maxGzip: 2_256 },
+  // 5,033 / 2,256 -> 5,681 / 2,585 on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7), the 2nd stage: the badges
+  // (src/hallOfFameBadges.js, public_hall_of_fame read on mount) and the
+  // footnote's line; measured 5,681 / 2,581 + 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_681, maxGzip: 2_585 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -576,7 +685,13 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_639 },
+  // 4,639 -> 4,644 gzip on 2026-10-25, the 11-30 rehearsal (integration-1130:
+  // #224 + C-1(1) + D2): the same 11,492 bytes, other chunk names inside.
+  // Measured 4,640 in two e2e builds, the gzip plus 4.
+  // 4,639 -> 4,645 gzip on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured 11,492 / 4,641
+  // (hashed names only), the gzip plus 4.
+  // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, board-report on main caeecda: only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_645 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -626,7 +741,21 @@ const budgets = [
   // 36,757 / 13,658 -> 36,762 / 13,661 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 36,762 / 13,657 in the e2e build, the gzip plus 4. the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip is under main's.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 36_762, maxGzip: 13_661 },
+  // 13,661 -> 13,695 gzip on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): the same 36,762 bytes, other chunk
+  // names inside; measured 13,691 + 4.
+  // 36,762 / 13,661 -> 37,518 / 14,105 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // measured 37,518 / 14,101 in the e2e build, the gzip plus 4. The engine
+  // takes the relic catalogue's new copy (relics.js lands here as well),
+  // 「고점 판」 and 「숨 고르기」 (applyPeak, the pass's re-deal) and TESTIMONY's half pot.
+  // -> 37,518 / 14,146 on 2026-10-25, the 11-30 rehearsal (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + main c8841dc0, #313):
+  // the same 37,518 bytes, other chunk names inside. Measured 37,518 / 14,142 in two e2e builds, the gzip plus 4.
+  // 36,762 / 13,661 -> 37,332 / 13,864 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 37,332 / 13,860 in the e2e build, the gzip plus 4. The streak held on a
+  // direction (logicStreak.js's getLogicDirection and getEffectLean) and the
+  // pre-C-3 hold set aside in upgradeRunRecord.
+  // -> 38,081 / 14,326 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // the bundle's peak boards and new relics beside C-3's getLogicDirection and getEffectLean. Measured 38,081 / 14,322 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_081, maxGzip: 14_326 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -703,7 +832,10 @@ const budgets = [
   // 107,213 / 35,690 -> 107,220 / 35,694 on 2026-10-24, B-9 감정 배합 on main
   // b0eb9cb0: the 사건 43 막간 now reads the names on the cup-noodle lid
   // (+7 raw); measured 107,220 / 35,690 in the e2e build, the gzip plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_220, maxGzip: 35_694 },
+  // -> 107,276 / 35,735 on 2026-10-25, 묶음 시대고증(#313): the interludes'
+  // 접수 알림음·봉인 테이프·출력본 and the routes. Measured 107,276 / 35,731,
+  // the gzip plus 4.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_276, maxGzip: 35_735 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -774,7 +906,9 @@ const budgets = [
   // 2,634 / 1,403 -> 2,315 / 1,303 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,315 / 1,299 in the e2e build, the gzip plus 4. the audit's numbers and the audit and cascade weeks left it; W47's line stays, written out.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_315, maxGzip: 1_303 },
+  // 2,315 -> 2,316 raw on 2026-10-25 (D2 hall of fame draft, e2e build on rules-mark-3b 0c989ba7): a chunk name one letter longer.
+  // 2,634 / 1,403 -> 2,636 / 1,403 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 2,636 in the e2e build.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_636, maxGzip: 1_403 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -786,7 +920,10 @@ const budgets = [
   // week's notice in the same line.
   // 2,081 / 1,077 -> 1,995 / 1,051 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,995 / 1,047 in the e2e build, the gzip plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_995, maxGzip: 1_051 },
+  // 1,995 / 1,051 -> 1,996 / 1,051 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 1,996 in the e2e build.
+  // -> 1,056 gzip on 2026-10-25 (개인정보처리방침·이용약관): measured 1,052, the
+  // entry chunk's export names it imports by, plus 4; the file did not change.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_056 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -871,7 +1008,15 @@ const budgets = [
   // 1,927 / 1,053 -> 1,953 / 1,070 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 1,953 / 1,066 in the e2e build, the gzip plus 4. its numbers came here from weeklyRules, and the case's rules decide whether it counts.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 1_953, maxGzip: 1_070 },
+  // 1,953 / 1,070 -> 2,121 / 1,148 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+  // AUDIT CONTACT's limit (getAuditLimit) in the judgement, the HUD and the
+  // record's sentence. Measured 2,121 / 1,144, the gzip plus 4.
+  // 1,953 / 1,070 -> 2,085 / 1,102 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
+  // 2,085 / 1,098 in the e2e build, the gzip plus 4. The cases before the
+  // audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3).
+  // -> 2,253 / 1,179 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
+  // C-7's AUDIT CONTACT limit beside C-4's audit opening in 사건 01 to 03. Measured 2,253 / 1,175 in the e2e build, the gzip plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_253, maxGzip: 1_179 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -930,7 +1075,12 @@ const budgets = [
   // 2,740 / 1,255 -> 2,566 / 1,109 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,566 / 1,105 in the e2e build, the gzip plus 4. measured under Vite 8 (2,740 / 1,251 under Rollup).
-  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_566, maxGzip: 1_109 },
+  // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, C-1(1) on #224 253e8e93:
+  // measured 2,601 / 1,109 in the e2e build, the gzip plus 4. One more retired
+  // key, v10 (the local ranking moves to v11 with the 판 읽기 axis). c3-c4-rules
+  // (C-3 and C-4, RULES_MARK 4) measured the same and retires the same v10:
+  // together they are one bump, v11.
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -1077,7 +1227,20 @@ function checkBudget(file, budget) {
 // 4. One more file in the list, ActCard; the worker's code did not change.
 // -> 9,376 / 3,435 on 2026-10-25, #224 rebased on main 0d0c7dbb: measured
 // 9,376 / 3,431 plus 4. One more file in the list, personalBests.
-const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_435 };
+// -> 9,376 / 3,441 on 2026-10-25, C-1(1) on #224 0c989ba7: measured 9,376 /
+// 3,437 and 3,436 in two e2e builds (the file names' hashes), the larger plus
+// 4; the worker's code did not change.
+// -> 9,376 / 3,444 on 2026-10-25, table-rhythm-bundle (C-7, B-13(2), C-10) on #224 0c989ba7:
+// measured 3,440 and 3,445 gzip (two builds), the larger plus 4; the same files, their hashes only.
+// -> 3,431 gzip on 2026-10-25, 묶음 시대고증(#313): the chunk names' hashes
+// only (measured 3,427 plus 4); the worker's code did not change.
+// -> 9,863 / 3,555 on 2026-10-25, 개인정보처리방침·이용약관: the worker
+// answers the four policy pages network first and keeps them (DOCUMENT_PAGE,
+// answerPage), and the warm list names them. Measured 9,863 / 3,551 plus 4.
+// -> 9,899 / 3,565 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0: the
+// policy pages beside the rehearsal's files (personalBests and the rest).
+// Measured 9,899 / 3,561 plus 4.
+const WORKER_BUDGET = { maxBytes: 9_899, maxGzip: 3_565 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

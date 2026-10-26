@@ -150,7 +150,21 @@ const fileBudgets = {
   // way out, and the quiet button's two half-rules made one.
   // 3170 / 76900 -> 3031 / 67101 on 2026-10-13: comments no longer counted
   // (139 lines and 9799 bytes of them that day), the room unchanged.
-  "base-intro-ranking.css": { lines: 3031, bytes: 67101 },
+  // 3031 / 67101 -> 3073 / 67949 on 2026-10-25 for the board's report button
+  // (store UGC rules): the action row under each post, a 44px toggle, the
+  // in-place reason fieldset with its legend, radios, note and buttons, and
+  // the live line that answers a report. Measured 3073 / 67946, room 0 / 3.
+  // 3031 / 67101 -> 3033 / 67309 on 2026-10-25 (D2 draft, measured): the hall
+  // of fame's badge on a ranking row, a rule of its own (11 lines, 208 bytes)
+  // so the badge list above is not written twice.
+  // -> 3084 / 68231 on 2026-10-25, the 11-30 rehearsal (integration-1130): the
+  // report button and the hall of fame badge together, measured 3084 / 68231.
+  // 3073 / 67949 -> 3083 / 68150 the same day, measured: the foot of the
+  // intro links the privacy policy and the terms (.intro-legal), and those
+  // links and the data drawer's note take the colour around them.
+  // -> 3094 / 68435 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0: the
+  // report button, the hall of fame badge and `.intro-legal` together, measured.
+  "base-intro-ranking.css": { lines: 3094, bytes: 68435 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -249,7 +263,9 @@ const fileBudgets = {
   // card's edge (in the burn chip it pushed the chip onto a line of its own).
   // -> 56227 on 2026-10-25, measured: the run's line 2px apart on a phone,
   // so 감사 n/4 stays on 판돈 and 금고's row.
-  "play.css": { lines: 2931, bytes: 56227 },
+  // -> 56343 on 2026-10-25, measured: the board's mark in the pot's label
+  // (「고점 판」 C-10, 「숨 고른 판」 C-7), two colour rules and no line more.
+  "play.css": { lines: 2931, bytes: 56343 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -363,7 +379,10 @@ const fileBudgets = {
   // 514 declarations that never won a cascade deleted.
   // 2560 / 60800 -> 2509 / 57089 on 2026-10-13: comments no longer counted
   // (51 lines and 3711 bytes of them that day), the room unchanged.
-  "result.css": { lines: 2509, bytes: 57089 },
+  // 2509 -> 2512 lines on 2026-10-25, C-1(1) (the 판 읽기 axis), measured: the
+  // score breakdown's seventh card leaves the penalty card alone in its row,
+  // and one rule gives it the row. The bytes still fit.
+  "result.css": { lines: 2512, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.

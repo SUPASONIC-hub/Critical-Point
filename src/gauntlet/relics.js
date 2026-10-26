@@ -6,8 +6,18 @@
  * never built. A relic is drafted when a case closes -- three offered, one kept
  * -- and it bends one rule of the table for the rest of the season. Most of
  * them soften a specific punishment, so the draft is a read of how this player
- * tends to break the board; HIGH ROLLER trades instead; the rarest are unlocked by
- * feats and stay unlocked across seasons in the codex.
+ * tends to break the board; the rarest are unlocked by feats and stay unlocked
+ * across seasons in the codex.
+ *
+ * C-7 (2026-10-25): five of the twelve -- LOCKPICK, SPLINT, HIGH ROLLER,
+ * STEADY ANCHOR and GLASS LENS -- measured lifting the best heartbeat play by
+ * -1.8% to +0.1% (check:pressure), and with five tools in the first draft and
+ * five slots every first season ended holding the same five (80 of 80
+ * seasons, no pass). They are gone; in their place five tools each tied to a
+ * person of the season -- 반재욱 of the 감사팀, 임경수's paper, 오진우's time
+ * limit, 차지원's front page, 도윤하's field notes -- and all five are in the
+ * first draft, so it holds eight for five slots. A pass is a choice of its own
+ * now: 「숨 고르기」 (`equipRelic`, BREATHER_* in tableRules.js).
  *
  * A relic never prints or narrows the wall. `check:pressure` plays every relic
  * alone and all of them together and holds the same invariants the bare table
@@ -18,24 +28,22 @@
  * (`tableRules.js`), so retuning a relic cannot leave its card saying the old one.
  */
 
-import { objectParticle, subjectParticle } from "../playerLanguage.js";
+import { subjectParticle } from "../playerLanguage.js";
+import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
 import {
   AFTERSHOCK_START,
+  BLACKOUT_WALL_SHIFT,
+  BREATHER_SECONDS,
+  BREATHER_WALL,
+  CARBON_COPY_HOLD,
   COLD_BLOOD_START,
-  FRACTURE_RATE,
-  GLASS_LENS_SEAL,
   HEAT_SINK_SECONDS,
   HEAT_SINK_SHARE,
-  HIGH_ROLLER_CHIPS,
-  HIGH_ROLLER_WALL,
   INSURANCE_SHARE,
   KINETIC_GRIP_CHIPS,
-  LOCKPICK_SEAL,
-  SEAL_BREAK_GAUGE,
+  LOGIC_HOLD,
   SILENCE_SECONDS,
-  SPLINT_RATE,
-  STEADY_ANCHOR_COOL,
-  STEADY_ANCHOR_SECONDS,
+  TESTIMONY_SHARE,
 } from "./tableRules.js";
 
 export const RELIC_OFFER_SIZE = 3;
@@ -55,8 +63,6 @@ export const RELIC_SLOTS = 5;
 const ENCORE_UNLOCK_COMBO = 8;
 /** The pot the wall has to take from you before INSURANCE is on the table. */
 export const INSURANCE_UNLOCK_LOSS = 5000;
-/** The cash multiplier that unlocks HIGH ROLLER. */
-const HIGH_ROLLER_UNLOCK_MULTIPLIER = 64;
 /** A stance relic opens when its stance has reshaped enough charged cashes. */
 export const STANCE_RELIC_UNLOCK_COUNT = 3;
 
@@ -65,7 +71,7 @@ export const RELICS = Object.freeze({
     label: "METRONOME",
     name: "메트로놈",
     icon: "timer",
-    text: "열기가 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.",
+    text: "열기가 오른 다음 장면까지, 방향을 바꿔도 전환으로 인정된다.",
     proc: "전환을 붙잡았다",
     unlock: null,
   },
@@ -87,22 +93,47 @@ export const RELICS = Object.freeze({
     softens: { mutation: "heatDebt", text: `방열판: 열기 ${HEAT_SINK_SHARE}분의 1, ${HEAT_SINK_SECONDS}초` },
     unlock: null,
   },
-  lockpick: {
-    label: "LOCKPICK",
-    name: "락픽",
-    icon: "key",
-    text: `COLD FEET로 봉인된 카드가 열기 ${SEAL_BREAK_GAUGE}${subjectParticle(String(SEAL_BREAK_GAUGE))} 아니라 ${LOCKPICK_SEAL}에서 열린다.`,
-    proc: "봉인을 일찍 땄다",
-    softens: { mutation: "coldFeet", text: `락픽: 열기 ${LOCKPICK_SEAL}에서 열림` },
+  // C-7's five, each a person of the season (2026-10-25).
+  auditContact: {
+    label: "AUDIT CONTACT",
+    name: "감사실 연줄",
+    icon: "clipboard",
+    text: `감사팀 반재욱이 한 칸은 눈감아 준다. 감사는 ${AUDIT_LIMIT + AUDIT_CONTACT_SLACK}칸이 차야 적발된다.`,
+    proc: "반재욱이 한 칸을 눈감았다",
     unlock: null,
   },
-  splint: {
-    label: "SPLINT",
-    name: "부목",
-    icon: "bandage",
-    text: `FRACTURE로 금 간 자원의 청구가 ${FRACTURE_RATE}배가 아니라 ${SPLINT_RATE}배다.`,
-    proc: "균열을 받쳤다",
-    softens: { mutation: "fracture", text: `부목: ${SPLINT_RATE}배 청구` },
+  carbonCopy: {
+    label: "CARBON COPY",
+    name: "임경수의 사본",
+    icon: "files",
+    text: `임경수가 태우지 않은 사본이 있다. BLACKOUT이 벽을 ${BLACKOUT_WALL_SHIFT}${subjectParticle(String(BLACKOUT_WALL_SHIFT))} 아니라 ${BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD}만 당긴다.`,
+    proc: "사본이 벽을 붙잡았다",
+    softens: { mutation: "blackout", text: `사본: 벽 ${BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD}만 당김` },
+    unlock: null,
+  },
+  testimony: {
+    label: "TESTIMONY",
+    name: "오진우의 진술",
+    icon: "hourglass",
+    text: `결정 제한시간은 설정값이었다. 시간이 다 돼 BUST해도 판돈의 ${TESTIMONY_SHARE}분의 1은 남는다.`,
+    proc: `시간이 다 돼도 판돈 ${TESTIMONY_SHARE}분의 1을 지켰다`,
+    unlock: null,
+  },
+  frontPage: {
+    label: "FRONT PAGE",
+    name: "차지원의 1면",
+    icon: "newspaper",
+    text: "특종이 이어져도 손이 떨리지 않는다. OVERCLOCK 판에서 밀 때 늘어나는 열기가 절반이다.",
+    proc: "1면 마감 앞에서도 손이 고요했다",
+    softens: { mutation: "overclock", text: "1면: 밀기 폭 절반만 커짐" },
+    unlock: null,
+  },
+  fieldNote: {
+    label: "FIELD NOTES",
+    name: "도윤하의 현장 메모",
+    icon: "notebook",
+    text: `현장에선 두 번이면 흐름이 선다. 같은 방향 ${LOGIC_HOLD - 1}번째부터 논리 콤보가 오른다.`,
+    proc: "현장 메모로 콤보를 일찍 세웠다",
     unlock: null,
   },
   encore: {
@@ -120,14 +151,6 @@ export const RELICS = Object.freeze({
     text: `사건마다 한 번, 벽에 닿아도 판돈의 ${INSURANCE_SHARE}분의 1은 남는다.`,
     proc: `판돈 ${INSURANCE_SHARE}분의 1을 지켰다`,
     unlock: { id: "loss", text: `판돈 ${INSURANCE_UNLOCK_LOSS.toLocaleString("en-US")} 이상을 벽에 잃기` },
-  },
-  highRoller: {
-    label: "HIGH ROLLER",
-    name: "하이롤러",
-    icon: "gem",
-    text: `모든 카드의 칩이 ${HIGH_ROLLER_CHIPS}배. 대신 벽 구간 전체가 ${HIGH_ROLLER_WALL} 가까워진다.`,
-    proc: "더 큰 칩을 걸었다",
-    unlock: { id: "multiplier", text: `×${HIGH_ROLLER_UNLOCK_MULTIPLIER} 이상으로 확정하기` },
   },
   stethoscope: {
     label: "STETHOSCOPE",
@@ -147,24 +170,16 @@ export const RELICS = Object.freeze({
     softens: { mutation: "strikeMastery", text: "악력: 밀 때 오르는 열기 그대로" },
     unlock: { id: "strikeMastery", text: `STRIKE 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
   },
-  steadyAnchor: {
-    label: "STEADY ANCHOR",
-    name: "닻",
-    icon: "anchor",
-    text: `STEADY MASTERY가 켜진 판은 열기 ${STEADY_ANCHOR_COOL}${objectParticle(String(STEADY_ANCHOR_COOL))} 더 식힌 채 시작하고, 시간이 ${STEADY_ANCHOR_SECONDS}초 더 주어진다.`,
-    proc: "STEADY 숙련에 닻을 내렸다",
-    softens: { mutation: "steadyMastery", text: `닻: 열기 ${STEADY_ANCHOR_COOL} 더 식음, ${STEADY_ANCHOR_SECONDS}초 추가` },
-    unlock: { id: "steadyMastery", text: `STEADY 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
-  },
-  glassLens: {
-    label: "GLASS LENS",
-    name: "돋보기",
-    icon: "eye",
-    text: `EXPOSE MASTERY가 켜진 판은 카드가 뒤집히지 않고 가장 비싼 카드도 봉인되지 않으며, 봉인은 열기 ${GLASS_LENS_SEAL}에서 열린다.`,
-    proc: "EXPOSE 숙련으로 판을 꿰뚫었다",
-    softens: { mutation: "exposeMastery", text: "돋보기: 가림과 봉인 해제" },
-    unlock: { id: "exposeMastery", text: `EXPOSE 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
-  },
+});
+
+/**
+ * 「숨 고르기」: what a pass on a draft that offered something gives (C-7,
+ * `equipRelic`). The draft's pass button says it, and the stage marks the board.
+ */
+export const BREATHER = Object.freeze({
+  name: "숨 고르기",
+  short: `+${BREATHER_SECONDS}초`,
+  text: `고르지 않으면 이 사건 첫 판의 시간이 ${BREATHER_SECONDS}초 늘고, 벽이 ${BREATHER_WALL} 멀어진다.`,
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
@@ -206,11 +221,8 @@ export function getRelicUnlocks({ verdict, nextRun } = {}, unlocked = []) {
   const mastery = nextRun?.stanceMastery && typeof nextRun.stanceMastery === "object" ? nextRun.stanceMastery : {};
   if (maxCombo >= ENCORE_UNLOCK_COMBO) earned.push("encore");
   if (verdict.outcome === "bust" && (Number(verdict.lostPot) || 0) + (Number(verdict.insuredPot) || 0) >= INSURANCE_UNLOCK_LOSS) earned.push("insurance");
-  if (verdict.outcome === "cash" && (Number(verdict.multiplier) || 0) >= HIGH_ROLLER_UNLOCK_MULTIPLIER) earned.push("highRoller");
   if (Array.isArray(verdict.nextMutations) && verdict.nextMutations.some((mutation) => mutation.id === "silence")) earned.push("stethoscope");
   if ((Number(mastery.strike) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("kineticGrip");
-  if ((Number(mastery.steady) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("steadyAnchor");
-  if ((Number(mastery.expose) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("glassLens");
   return earned.filter((id) => !hasRelic(unlocked, id));
 }
 

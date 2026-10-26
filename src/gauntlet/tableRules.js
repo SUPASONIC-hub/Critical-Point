@@ -45,7 +45,7 @@ export const STEADY_LINE_WALL = 3;
  */
 export const LOGIC_RATE = 0.0625;
 export const LOGIC_CAP = 0.6;
-/** A type held this many windows in a row starts to grow the streak. */
+/** A direction (사람 or 자리, logicStreak.js) held this many windows in a row starts to grow the streak. */
 export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */
 export const LOCK_PRESS_SECONDS = 1.5;
@@ -63,16 +63,46 @@ export const METRONOME_REACH = 2;
 export const COLD_BLOOD_START = 11;
 export const HEAT_SINK_SHARE = 6;
 export const HEAT_SINK_SECONDS = 6;
-export const LOCKPICK_SEAL = 15;
-export const SPLINT_RATE = 1.25;
 /** INSURANCE leaves one part in this many of the pot. */
 export const INSURANCE_SHARE = 3;
-export const HIGH_ROLLER_CHIPS = 1.3;
-export const HIGH_ROLLER_WALL = 4;
 export const KINETIC_GRIP_CHIPS = 1.08;
-export const STEADY_ANCHOR_COOL = 4;
-export const STEADY_ANCHOR_SECONDS = 2;
-export const GLASS_LENS_SEAL = 8;
+/**
+ * The five tools of C-7 (2026-10-25), in the place of LOCKPICK, SPLINT, HIGH
+ * ROLLER, STEADY ANCHOR and GLASS LENS, which check:pressure measured lifting
+ * the best heartbeat play by -1.8% to +0.1%. CARBON COPY takes this much of
+ * BLACKOUT's pull back; FRONT PAGE takes this much of OVERCLOCK's wider push
+ * back (`stepMin`, `stepMax`). FIELD NOTES holds a type one window shorter
+ * (`LOGIC_HOLD - 1`), TESTIMONY leaves one part in this many of the pot when
+ * the clock runs a window out, and AUDIT CONTACT's slack is the audit's own
+ * (auditRisk.js).
+ */
+export const CARBON_COPY_HOLD = 3;
+export const TESTIMONY_SHARE = 2;
+export const FRONT_PAGE_STEP = Object.freeze([2, 3]);
+
+/**
+ * 「숨 고르기」 (C-7): passing on a draft that offered something. The case's
+ * first board -- the one the draft holds the clock of -- is dealt again with
+ * this much more clock and its wall's band this much further. Once a draft,
+ * and only on that board: the board after it is dealt from what happened on it.
+ */
+export const BREATHER_SECONDS = 10;
+export const BREATHER_WALL = 3;
+
+/**
+ * 「고점 판」 (C-10, 2026-10-25): every board of an act's last case
+ * (`PEAK_CASES`, tableUnlocks.js) is dealt with the wall's band this much
+ * closer and the chips this many times thicker.
+ */
+export const PEAK_WALL = 5;
+export const PEAK_CHIPS = 1.25;
+/**
+ * The cases it is dealt in: the last of each of B-11's eight acts, 41 for act
+ * 7 (whose last, 42, is a rest). Here, with its numbers, so the debug jump and
+ * a replay link (state/runState.js `jumpToNode`) can lay a peak case's first
+ * board without the ladder's copy (tableUnlocks.js, which reads it from here).
+ */
+export const PEAK_CASES = Object.freeze(["case07", "case12", "case18", "case24", "case30", "case36", "case41", "final"]);
 
 /*
  * AUDIT's and CASCADE's numbers (B3 and B2, rules of the table since

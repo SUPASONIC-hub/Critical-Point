@@ -55,7 +55,7 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
   return useMemo(() => {
     const {
       challengeClearCount, cognitionScore, consistencyScore, currentChallengeStreak, exploitPenalty,
-      momentumScore, momentumTier, pressureAdaptScore, rank, reducedRiskCount, reflectionScore, rhythmScore,
+      momentumScore, momentumTier, pressureAdaptScore, rank, readingScore, reducedRiskCount, reflectionScore, rhythmScore,
     } = gameplayStats;
     const primaryTrigger = triggerLabels[result.primary[0]];
     return {
@@ -65,7 +65,7 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
       resultBridge: result.longestDecision
         ? `${primaryTrigger} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
         : `${primaryTrigger} 압박이 가장 오래 남았습니다.`,
-      scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }),
+      scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, readingScore, reflectionScore, rhythmScore }),
       achievementBadges: createAchievementBadges({
         challengeClearCount,
         currentChallengeStreak,

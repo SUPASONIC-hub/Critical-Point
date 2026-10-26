@@ -102,6 +102,47 @@ test("a window edited in the log, or its response time, is marked window-off-rep
   assert.deepEqual(slowedResult.cases[0].windows.findings.map((finding) => finding.differs), [["responseTime"]]);
 });
 
+test("a 판 읽기 read edited in the log (C-1(1): the score sums it) is marked window-off-replay", () => {
+  const rows = seasonRows();
+  const log = rows[0].decision_log;
+  const cashed = log.findIndex((entry) => !entry.threshold.busted && entry.threshold.read?.[0] > 0);
+  const busted = log.findIndex((entry) => entry.threshold.busted);
+  assert.ok(cashed >= 0, "the fixture has a cashed window with a read");
+  // The bare hand's number raised to the seer's, as if it had read the wall --
+  // and past the checker's slack (1 + 3% of the bare number) where the two were
+  // close: on the 11-30 rehearsal's rules (C-10's peak board in the final case)
+  // the fixture's first cashed window reads [1845, 1855], and +10 is inside it.
+  const raised = recheckRun(edit(rows, (finalRow) => {
+    const { read } = finalRow.decision_log[cashed].threshold;
+    finalRow.decision_log[cashed].threshold.read = [Math.max(read[1], Math.ceil(read[0] * 1.05) + 2), read[1]];
+  }));
+  assert.ok(raised.marks.includes("window-off-replay"));
+  assert.deepEqual(raised.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  // The seer's number cut, so the same bare number reads as more of it.
+  const cut = recheckRun(edit(rows, (finalRow) => {
+    const { read } = finalRow.decision_log[cashed].threshold;
+    finalRow.decision_log[cashed].threshold.read = [read[0], Math.round(read[1] * 0.7)];
+  }));
+  assert.deepEqual(cut.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  if (busted >= 0) {
+    // A bust that claims it kept something.
+    const kept = recheckRun(edit(rows, (finalRow) => {
+      finalRow.decision_log[busted].threshold.read = [5, finalRow.decision_log[busted].threshold.read[1]];
+    }));
+    assert.deepEqual(kept.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  }
+  // Not a pair of numbers.
+  const text = recheckRun(edit(rows, (finalRow) => {
+    finalRow.decision_log[cashed].threshold.read = ["90", null];
+  }));
+  assert.deepEqual(text.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  // An older log with no read is not read.
+  const older = recheckRun(edit(rows, (finalRow) => {
+    for (const entry of finalRow.decision_log) delete entry.threshold.read;
+  }));
+  assert.equal(older.cases[0].windows.findings.length, 0);
+});
+
 test("a run with a case under other table rules is not checked", () => {
   const rows = edit(seasonRows(), (finalRow) => {
     finalRow.dynamics.tableRules = RULES_MARK - 1;
@@ -194,11 +235,21 @@ test("the CI read is split, each query one SELECT and nothing else, and the publ
   assert.doesNotMatch(list, writes);
   assert.match(rankingRunsSql({ limit: 1e9 }), /limit 500;$/);
   assert.match(rankingRunsSql({ limit: "x" }), /limit 20;$/);
+  // With each hall of fame board's candidates beside the top `limit`: still one SELECT, run ids only.
+  const boards = rankingRunsSql({ limit: 7, perBoard: 10 });
+  assert.equal(boards.indexOf(";"), boards.length - 1);
+  assert.match(boards, /^select run_id from \(\n/);
+  assert.match(boards, /\n where overall <= 7 or \(candidate and on_board <= 10\)\n order by score desc;$/);
+  assert.match(boards, /s\.suspicion <@ array\['score-off-log', 'window-off-replay', 'window-no-replay', 'chain-off-log'\]::text\[\]/);
+  assert.match(boards, /h\.settled_at is not null/);
+  assert.doesNotMatch(boards, writes);
+  assert.equal(rankingRunsSql({ limit: 7, perBoard: 0 }), list);
+  assert.match(rankingRunsSql({ perBoard: 1e9 }), /on_board <= 100\)/);
   // One run's rows: one statement, that run only, its id quoted.
   const one = runRowsSql("run-'x");
   assert.equal(one.indexOf(";"), one.length - 1);
   assert.match(one, /\n where run_id = 'run-''x'\n order by case_id;$/);
-  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at\n/);
+  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at, suspicion\n/);
   assert.doesNotMatch(one, writes);
   assert.throws(() => runRowsSql(""), /non-empty/);
   assert.deepEqual(readRunIds(JSON.stringify({ rows: [{ run_id: "b" }, { run_id: "a" }, { run_id: "b" }, { run_id: null }] })), ["b", "a"]);
@@ -358,7 +409,9 @@ test("the CLI lists runs, writes one run's read at a time, and reads the per-run
   try {
     const run = (...args) => execFileSync(process.execPath, [script, ...args], { encoding: "utf8" }).trim();
     writeFileSync(path.join(dir, "runs.json"), JSON.stringify([{ run_id: "secret-a" }, { run_id: "secret-b" }]));
-    assert.equal(run("--runs-sql", "--limit=3"), rankingRunsSql({ limit: 3 }));
+    assert.equal(run("--runs-sql", "--limit=3"), rankingRunsSql({ limit: 3, perBoard: 10 }));
+    assert.equal(run("--runs-sql", "--limit=3", "--per-board=0"), rankingRunsSql({ limit: 3 }));
+    assert.equal(run("--hall-of-fame-counts-sql"), "select board, checked from public.hall_of_fame_counts() order by board;");
     assert.equal(run("--run-count", path.join(dir, "runs.json")), "2");
     assert.equal(run("--run-sql", path.join(dir, "runs.json"), "--at=2"), runRowsSql("secret-b"));
     assert.throws(() => execFileSync(process.execPath, [script, "--run-sql", path.join(dir, "runs.json"), "--at=3"], { stdio: "pipe" }), /from 1 to 2/);

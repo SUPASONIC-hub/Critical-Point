@@ -387,7 +387,7 @@ test("a decision the save refused sends nothing and unlocks nothing", () => {
 test("the finale closes the season: NEW GAME+ is told, and a ranking row waits behind the last case row", () => {
   const finaleId = Object.keys(nodes).find((id) => nodes[id].caseId === "final" && nodes[id].choices?.some((choice) => choice.next === CASE_RESULT_NODES.final));
   const earlier = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
-  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", assistTime: caseId === earlier[3] ? 2 : 1, gauntlet: { logicStreak: 0, tableRules: 3 } }]));
+  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", assistTime: caseId === earlier[3] ? 2 : 1, gauntlet: { logicStreak: 0, tableRules: 4 } }]));
   const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
   const card = context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final);
   mount(context).choose(card, closedWindow("cash"));
@@ -414,7 +414,7 @@ test("the season row is ranked on the mean of its cases' scores, and the finale'
   // A season far from its finale: the first half closed on 95, the rest on 30,
   // and one case played again after closing on 95, whose replay scored 10.
   const scoreOf = (index) => (index < earlier.length / 2 ? 95 : 30);
-  const caseResults = Object.fromEntries(earlier.map((caseId, index) => [caseId, { burstScore: scoreOf(index), rank: "B", gauntlet: { logicStreak: 0, tableRules: 3 } }]));
+  const caseResults = Object.fromEntries(earlier.map((caseId, index) => [caseId, { burstScore: scoreOf(index), rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } }]));
   caseResults[earlier[0]] = { ...caseResults[earlier[0]], burstScore: 10, firstBurstScore: 95 };
   const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
   mount(context).choose(context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final), closedWindow("cash"));
@@ -568,7 +568,7 @@ test("a season with any story case is not sent to the public ranking, and this d
   const { buildLeaderboard } = await import("../../src/ranking.js");
   const { finaleId, earlier } = finaleScene();
   // Every case closed at the logic table: its run summary has the table's mark (`hasBeatTableCase`).
-  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 3 } }]));
+  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } }]));
   const seasons = {
     "the finale itself": { caseResults: plainResults, story: true },
     "one case long before it": { caseResults: { ...plainResults, [earlier[7]]: { ...plainResults[earlier[7]], assistStory: true } }, story: false },
@@ -606,7 +606,7 @@ test("a season with any story case is not sent to the public ranking, and this d
 
 test("a season with a case from before the logic table is not sent to the public ranking, and this device still ranks it", () => {
   const { finaleId, earlier } = finaleScene();
-  const logicResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 3 } }]));
+  const logicResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } }]));
   const seasons = {
     "a case with the beat table's summary": { ...logicResults, [earlier[3]]: { burstScore: 60, rank: "B", gauntlet: { beatCombo: 4, bestCombo: 11, grooveVault: 520 } } },
     "a case from before the table": { ...logicResults, [earlier[3]]: { burstScore: 60, rank: "B" } },

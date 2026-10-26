@@ -26,8 +26,17 @@ export const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
  * the funeral, 47 the 추석 kitchen. Their tables are quiet -- GauntletFx plays
  * them as the comfort setting does, without the heartbeat or the drone -- and
  * are otherwise the same tables: no rule reads this.
+ *
+ * C-10 (user, 2026-10-25, choice 1) adds the first case of each of B-11's
+ * eight acts (actCardGate.js `ACT_START_CASES`, written out here so the frame
+ * loop's chunk does not take the act card's; a unit test holds the two
+ * together): an act opens at rest, after the last one closed on 「고점 판」
+ * (tableUnlocks.js `PEAK_CASES`). Act 1 rests one case later, in 사건 02
+ * (user, 2026-10-25, (1), the 11-30 rehearsal): 사건 01 is where OVERCLOCK
+ * is first played (C-4), and a rule that heats the table faster is learnt
+ * with the heartbeat in the ear.
  */
-export const QUIET_TABLE_CASES = Object.freeze(["case42", "case45", "case47"]);
+export const QUIET_TABLE_CASES = Object.freeze(["case02", "case08", "case13", "case19", "case25", "case31", "case37", "case42", "case43", "case45", "case47"]);
 export const isQuietTable = (caseId) => QUIET_TABLE_CASES.includes(caseId);
 
 /**

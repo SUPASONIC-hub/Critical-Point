@@ -3,8 +3,10 @@
  *
  * Every rule used to be on from 프롤로그 01: the streak, LOCK and its three
  * stances, the relic draft and nine ways of breaking the next board, all in
- * front of a player who had not yet pushed once. The five prologues now turn
- * them on in steps, and from 사건 01 the table is whole.
+ * front of a player who had not yet pushed once. The five prologues and the
+ * first three cases now turn them on in steps, and from 사건 03 the table is
+ * whole. Until C-4 (the user's answer of 2026-10-25, (1)) the prologues did it
+ * alone: fourteen rules in forty windows, five of them in 프롤로그 04.
  *
  * This module is the list and the two questions asked of it -- which rules
  * does this case play under (`getTableRules`), and what does it say about the
@@ -16,7 +18,7 @@
  * Pushing, cashing, the wall and the heartbeat are the table itself and are
  * not listed: no step is without them.
  */
-import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
+import { LOCK_CAP, PEAK_CASES, PEAK_CHIPS, PEAK_MARK, PEAK_WALL, STANCE_CHARGE } from "./gauntletEngine.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -123,7 +125,7 @@ export const UNLOCK_INTRO_KICKER = "NEW PROTOCOL · 이번 사건부터 규칙�
 /**
  * The steps, in the order the season plays them: the case, the rules it adds
  * to the ones before it, and what the briefing says about them. A case that
- * is not here -- 사건 01 onward -- plays under everything. 프롤로그 01 adds
+ * is not here -- 사건 04 onward -- plays under everything. 프롤로그 01 adds
  * nothing and explains the table itself.
  *
  * The draft a case shows was offered when the case before it closed, so
@@ -151,12 +153,14 @@ const STEPS = [
     caseId: "prologue02",
     adds: ["logic", "blackout", "aftershock", "silence"],
     storyIntro: [0],
-    // The last sentence of the first line: the streak pays for holding a type
-    // and the report's 관점 전환 score (gameLogic's `getCognitionSpread`) for
-    // spreading the picks over the four, and nothing else says so before the
-    // season's closing report (logicReport.js, `caption`).
+    // The streak is held on a direction, 사람 or 자리 (C-3, logicStreak.js),
+    // the axis the report's 일관성 reads; the last sentence of the first line
+    // says the report's 관점 전환 (gameLogic's `getCognitionSpread`) pays for
+    // spreading the thinking types, which a hand can do inside one direction.
+    // Until 2026-10-25 the streak was held on the type and this line said the
+    // two pulled against each other.
     intro: [
-      "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다. 사건 결과의 '관점 전환' 점수는 반대로 네 유형을 고르게 쓸수록 오릅니다.",
+      "같은 방향(사람 쪽 또는 자리 쪽)의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 방향을 바꿔도 콤보가 이어집니다. '관점 전환' 점수는 생각 유형을 고르게 쓸수록 오르니, 방향은 지키고 유형은 바꿔도 됩니다.",
       "벽에 닿으면 다음 판은 카드가 가려지고, 열기를 안은 채 시작합니다.",
     ],
   },
@@ -176,24 +180,15 @@ const STEPS = [
   },
   {
     caseId: "prologue04",
-    // The audit and the links open with FRACTURE (B3 and B2, question 3 (1)
-    // of the rule switch, user 2026-10-20): the links read the burn FRACTURE
-    // reads, and a cash on a board they deal is not audited, so the two are
-    // told together (초안). One short line and not one each: with a line each,
-    // even cut to a row or two, the panel ran past the docked footer on a
-    // phone's first screen (table-keys at 390x844 and 390x664, 2026-10-21).
-    // Their numbers are told where they act: the signal line's tokens, the
-    // 확정 button's audit preview (`describeAuditIfCash`, which also says a
-    // CASCADE board's cash leaves it as it is) and the reveal's line when a
-    // link is made (`describeLinkMade`).
-    // A story run has neither, so it is told only LOCK.
-    adds: ["fracture", "overclock", "lock", "audit", "cascade"],
-    storyIntro: [2],
+    // Two rules, where there were five (C-4, the user's answer of 2026-10-25,
+    // (1)): FRACTURE, and LOCK, which 프롤로그 05's stances need. OVERCLOCK,
+    // the audit and the links open one a case in 사건 01 to 03, each with the
+    // line it had here. A story run has no FRACTURE, so it is told only LOCK.
+    adds: ["fracture", "lock"],
+    storyIntro: [1],
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
-      "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
       "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
-      "이번 사건부터 감사와 연결이 판에 붙습니다.",
     ],
   },
   {
@@ -215,6 +210,39 @@ const STEPS = [
       `칩 배율이 ${LOCK_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
     ],
   },
+  // 사건 01 to 03 (C-4): one rule a case, each with its story's beat --
+  // 72시간's clock and OVERCLOCK, 가짜 신호's audit office (감사, 49 times in
+  // its scenes) and the audit, 경쟁자의 반격 and the links that bring a heavy
+  // card back. All three are rules a story run plays without, so a story run
+  // is told nothing in them (`storyIntro: []`).
+  {
+    caseId: "case01",
+    adds: ["overclock"],
+    storyIntro: [],
+    intro: ["×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
+  },
+  {
+    // The audit had one short line with the links in 프롤로그 04, because five
+    // lines ran past the docked footer on a phone's first screen (table-keys,
+    // 2026-10-21). Alone here it has the room to say its numbers: AUDIT_HEAT,
+    // AUDIT_LIMIT, AUDIT_SHARE, AUDIT_RELIEF_HEAT and AUDIT_RELIEF
+    // (auditRisk.js), written out like SCOUT's and held to them by a unit test.
+    // The 확정 button's preview (`describeAuditIfCash`) still says what each
+    // cash does to it.
+    caseId: "case02",
+    adds: ["audit"],
+    storyIntro: [],
+    intro: ["이번 사건부터 감사가 판에 붙습니다. 한 번이라도 밀고 열기 40 아래에서 확정하면 한 칸 차고, 60 이상에서 확정하면 2칸 줄어듭니다. 사건이 닫힐 때 4칸이 차 있으면 금고로 갈 몫의 4분의 1을 잃습니다."],
+  },
+  {
+    // LINK_BURN, LINK_SPAN_MIN..LINK_SPAN_MAX and LINK_WALL (cascadeRisk.js),
+    // written out the same way. The reveal's line when a link is made
+    // (`describeLinkMade`) and the signal line's tokens say the rest.
+    caseId: "case03",
+    adds: ["cascade"],
+    storyIntro: [],
+    intro: ["이번 사건부터 연결이 판에 붙습니다. 한 자원을 8 이상 태운 카드로 확정하면, 2~4판 뒤의 한 판에서 벽이 6 가까워집니다."],
+  },
 ];
 
 /**
@@ -227,12 +255,17 @@ const STEPS = [
 export const UNLOCK_LADDER = Object.freeze(
   STEPS.reduce((ladder, step) => {
     const before = ladder.length ? [...ladder[ladder.length - 1].rules] : [];
-    const rules = freezeSet([...before, ...step.adds]);
+    // The step that completes the table (사건 03 since C-4) hands out the
+    // whole table's own sets, so it is the same object a case after it gets.
+    const whole = before.length + step.adds.length === ALL_RULES.size;
+    const rules = whole ? ALL_RULES : freezeSet([...before, ...step.adds]);
     ladder.push(Object.freeze({
       caseId: step.caseId,
       adds: Object.freeze([...step.adds]),
       rules,
-      storyRules: withoutStoryOff(rules),
+      // A story run has none of 사건 01 to 03's rules, so from 사건 01 it is
+      // handed the story table's own set too.
+      storyRules: whole || [...STORY_RULES].every((rule) => rules.has(rule)) ? STORY_RULES : withoutStoryOff(rules),
       intro: Object.freeze([...step.intro]),
       storyIntro: Object.freeze(step.storyIntro ? step.storyIntro.map((line) => step.intro[line]) : [...step.intro]),
       kicker: step.kicker ?? UNLOCK_INTRO_KICKER,
@@ -260,17 +293,43 @@ function findStep(caseId, { veteran = false, staged = STAGED } = {}) {
  */
 export function rulesFor(caseId, options) {
   const step = findStep(caseId, options);
-  if (options?.story === true) return step?.storyRules ?? STORY_RULES;
-  return step?.rules ?? ALL_RULES;
+  const rules = options?.story === true ? step?.storyRules ?? STORY_RULES : step?.rules ?? ALL_RULES;
+  return PEAK_CASES.includes(caseId) ? withPeak(rules) : rules;
 }
 
 /**
+ * 「고점 판」 (C-10, user 2026-10-25, choice 1): the last case of each of
+ * B-11's eight acts (actCardGate.js `ACT_START_CASES`: the case before each
+ * act's first, and the finale) deals every board with the wall `PEAK_WALL`
+ * closer and the chips `PEAK_CHIPS` thicker (`applyPeak`). Act 7 ends on 사건
+ * 42, the night off at 경포 and one of B-13(3)'s quiet tables, so its peak is
+ * 사건 41, the second hearing, the case before the rest. Not a rule a case
+ * turns on in the ladder's sense: it is in no step, is not saved, and a
+ * NEW GAME+ or story run has it too. The list is tableRules.js's, re-exported
+ * here; a unit test holds it to the acts.
+ *
+ * The rest that answers it is each act's first case, a quiet table
+ * (fxVariables.js, the quiet tables): staging only, like 42, 45 and 47.
+ */
+export { PEAK_CASES };
+const peakSets = new Map();
+function withPeak(rules) {
+  if (!peakSets.has(rules)) peakSets.set(rules, freezeSet([...rules, PEAK_MARK]));
+  return peakSets.get(rules);
+}
+const PEAK_INTRO = Object.freeze([`막의 마지막 사건입니다. 이 사건의 판은 모두 벽이 ${PEAK_WALL} 가까워지고 칩이 ${PEAK_CHIPS}배입니다.`]);
+const PEAK_KICKER = "PEAK TABLE · 고점 판";
+
+/**
  * What the case says about the rules it turns on; nothing when it turns none
- * on. A story run is told only about the ones it plays under.
+ * on. A story run is told only about the ones it plays under. A peak case
+ * (`PEAK_CASES`) says it is one, under its own kicker.
  */
 export function introFor(caseId, options) {
   const step = findStep(caseId, options);
-  return (options?.story === true ? step?.storyIntro : step?.intro) ?? NO_INTRO;
+  const intro = (options?.story === true ? step?.storyIntro : step?.intro) ?? NO_INTRO;
+  // A peak case is never a step of the ladder (a unit test holds it), so its line is the whole of it.
+  return PEAK_CASES.includes(caseId) ? PEAK_INTRO : intro;
 }
 
 /**
@@ -288,30 +347,36 @@ export function getUnlockIntro(caseId, run, staged = STAGED) {
 
 /** The line over a case's introduction: the step's own, or the shared one. */
 export function getUnlockKicker(caseId) {
-  return STEP_BY_CASE.get(caseId)?.kicker ?? UNLOCK_INTRO_KICKER;
+  return STEP_BY_CASE.get(caseId)?.kicker ?? (PEAK_CASES.includes(caseId) ? PEAK_KICKER : UNLOCK_INTRO_KICKER);
 }
 
 /**
- * Whether the table has nothing left to introduce in this case: the case is
- * not a step of the ladder for this run. True from 사건 01 on, for a run begun
+ * Whether the table is past teaching in this case: the case is not one of the
+ * five prologues' steps for this run. True from 사건 01 on, for a run begun
  * with NEW GAME+ in every case, and everywhere with the switch off; false in
- * the five prologues of a plain run, 프롤로그 05 included -- it plays under
- * every rule, and two of them are new there. Asked of the case alone, like
+ * the five prologues of a plain run. Asked of the case alone, like
  * `rulesFor`: a prologue played again is still a step. A story run is told
  * less, but its prologues are steps all the same.
  *
+ * 사건 01 to 03 are steps of the ladder since C-4 (2026-10-25) and are not
+ * teaching: each opens one rule, said once on its first briefing, to a player
+ * the prologues have already taught the table, so the reveal stays short
+ * there as in every later case (`TEACHING_CASES`).
+ *
  * The decision reveal reads this (`useChoiceCommit`): while a case is still
- * introducing rules the reveal is the full sheet, because it is teaching.
+ * teaching the reveal is the full sheet.
  */
+const TEACHING_CASES = new Set(["prologue01", "prologue02", "prologue03", "prologue04", "prologue05"]);
 export function isTableTaught(caseId, run, staged = STAGED) {
-  return findStep(caseId, { veteran: run?.veteran === true, staged }) === null;
+  const step = findStep(caseId, { veteran: run?.veteran === true, staged });
+  return step === null || !TEACHING_CASES.has(step.caseId);
 }
 
 /**
  * Whether a run begun with NEW GAME+ (`veteran`) plays this case under a
  * different table from a plain run's: the case's step turns on fewer rules
  * than the whole table. Asked of the step, not of a case number, so the answer
- * moves with the ladder -- today 프롤로그 01 to 04; 프롤로그 05 already plays
+ * moves with the ladder -- today 프롤로그 01 to 사건 02 (C-4); 사건 03 plays
  * under everything, and so does every case after it.
  *
  * The server reads the same cases off a case row's `newGamePlus` mark and its

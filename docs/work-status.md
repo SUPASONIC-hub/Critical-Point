@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-25 (the state of `main` at `c1f8ec2`, after the act title cards (#295) and bundles A-13 and A-3; what changed and when is in `git log`)
+Last updated: 2026-10-25 evening (the state of `main` at `612867f`, after the era bundle (#313), bundle A-13's second pass (#318), board reports (#325) and the privacy and terms pages (#328); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -160,6 +160,36 @@ Still open, on purpose:
   a season with a case that has no count keeps the plain mean. The same 200
   seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
   (balanced), procedure +3.1.
+- C-1(1), drafted 2026-10-25 on top of #224 for the ranking reset after it
+  (the user, 「전부 1」): each case's burst score gives 0.2 to 판 읽기, the
+  C-12 index the case close prints (「벽을 본 사람의 N%」, now
+  `getCaseRead` in `src/seasonScore.js`), and the six axes before it keep
+  their ratios at 0.8 (0.224 / 0.16 / 0.16 / 0.128 / 0.064 / 0.064). The
+  season's 관점 전환 swap weighs 0.16. Local ranking v11; the server's copy is
+  `20261102030000_season_score_reading_axis.sql.draft` (the 0.16 swap, a
+  refusal for a case row without `readingScore`, and the reset); the checker
+  holds each window's read to its replay. `npm run report:reading-axis`
+  (320 bot seasons a board, same seeds): blind 61.7 -> 56.7, heartbeat
+  62.2 -> 61.0, scout 63.2 -> 64.9, sees the wall 62.7 -> 69.1; the gap
+  between seeing the wall and playing blind goes from 0.9 to 12.5 points.
+- D2, the hall of fame (draft on top of #224, D2-명예의전당-설계안-20261021.md,
+  every question (1) and question 9 (1)): `20261102040000_hall_of_fame.sql`
+  (030000 until the 11-30 rehearsal put it after the 판 읽기 axis)
+  (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
+  `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
+  `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
+  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  and two steps in `verify-ranking.yml`: the settle call right after the
+  marks, from the same check, and a job of its own with `contents: write`
+  that force-pushes one commit to the orphan branch `hall-of-fame`. Each
+  board is read on its own: the threshold of ten counts the board's complete
+  seasons with no mark over the whole board (`hall_of_fame_counts`, counted
+  again inside the settle call), and the replay reads each open board's first
+  ten candidates beside the top `limit`. A week's
+  board settles four weeks after its Monday; a table's once the next table's
+  board is first written. Not merged: the migration applies on merge, and the
+  design waits for #224 and seven days of the daily check (the week of 11-16
+  at the earliest).
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
@@ -310,6 +340,36 @@ Still open, on purpose:
   (device key `critical-point-act-cards-v1`). Production runs
   `c1f8ec2`. Drafts left: #224 with #253 (2026-11-30) and #301 (E-11's
   side-case frame, December).
+- 2026-10-25, morning to evening: the cleanup (#305); #306 (a copied tab's
+  table-token check waits 300 ms for an answer instead of 80, capped at
+  1.5 s, for the recovery e2e flake); #315 (the ending verdict heading
+  「당신의 조건」 -> 「당신의 기록」 for 봉인 and 개혁); the era bundle
+  (#313 with branches A-D, #309-#312: the scenes set in Korean finance of
+  2023 in flashback and 2026 now -- paper signatures, stamps and archive
+  rooms became electronic approval, e-signatures, the document management
+  system and the backup archive -- and KD금융그룹's largest shareholder,
+  Kingsdale Partners of New York at about 30%, with no ethnic or religious
+  setting, in a line or two per case; `docs/canon.md` 「Who owns KD」 and
+  「The era」); bundle A-13's second pass (#318: scene bodies over 420
+  characters 73 -> 0, and the body ratchet is gone like the label one: any
+  body over 420 fails); #323 (the test-week summary's 「시뮬레이션(참고)」
+  column now quotes the season bot with audit and cascade both on); #325
+  (a report button on every board post, migration
+  `20261027000000_board_reports`: anon may insert four columns, no reads,
+  no automatic hiding, reports go with the post at 180 days); #326 (the
+  data drawer names where to send a deletion request, `SUPPORT_CONTACT` in
+  `src/appConfig.js`); #328 (the privacy policy and terms of use as four
+  static pages the build writes beside `index.html`, `/privacy.html`,
+  `/terms.html` and their `/en/` twins, from `scripts/legal-pages.mjs`);
+  #329 (`npm run store:shots`, store screenshots into the gitignored
+  `store-shots/`). Sixteen pull requests merged that day before the
+  evening cleanup (three bundles holding thirteen); production runs
+  `612867f`. Twelve drafts were opened during the day, all waiting on a
+  date or a decision: #307, #316 and #320 (the next ranking reset), #319
+  (the 11-30 rehearsal of #224 with #253, #307, #308, #316 and #320),
+  #308 (after #224), #322 (after the W47 measurement), #324 (W49, only if
+  P5 on 11-23), #314, #317 and #321 (E-11, December), #327 and #330 (the
+  app release: shells and ads).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`

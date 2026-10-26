@@ -42,6 +42,8 @@ import {
   equipRelic,
   openCaseRun,
   suspendWindow,
+  describeMutations,
+  getBoardMark,
 } from "../src/gauntlet/gauntletEngine.js";
 import {
   DEFAULT_RELIC_POOL,
@@ -900,7 +902,9 @@ test("stance mastery survives saves and reshapes future boards", () => {
 
 /* ----------------------------------------------------------------- hand */
 
-const typed = (id, type, effect = { capital: 10, trust: -4 }) => card(id, effect, { cognition: { [type]: 3 } });
+// The streak is held on a card's direction since C-3 (2026-10-25), read off its effect: a `risk`
+// card here leans toward the position and any other toward the people, each paying 10 and burning 4.
+const typed = (id, type, effect = type === "risk" ? { capital: 10, trust: -4 } : { trust: 10, capital: -4 }) => card(id, effect, { cognition: { [type]: 3 } });
 const cashedAt = (gauge, extra = {}) => ({ status: "cashed", gauge, wall: 90, pushes: 2, ...extra });
 
 test("no press is graded: a push is a push whenever it lands, and nothing it carries is read", () => {
@@ -961,7 +965,7 @@ test("the streak pays the pot from the third card of a type, and the heat multip
 });
 
 test("LOCK and the streak are paid under one cap, LOCK's share under its own", () => {
-  const run = normalizeRunState({ logic: { streak: 9, best: 9, type: "risk", held: 11 } });
+  const run = normalizeRunState({ logic: { streak: 9, best: 9, type: "position", held: 11 } });
   const locked = resolveWindow({ run, window: cashedAt(20, { focus: 100, focusMode: "strike", focusHits: 5 }), card: typed("a", "risk") }).verdict;
   assert.equal(locked.logic.bonus, HAND_CAP, "the streak alone is at the cap");
   assert.equal(locked.focus.potMultiplier, 1, "so a full LOCK adds nothing to this pot");
@@ -1090,7 +1094,10 @@ test("every relic has copy, the default pool needs no unlock, and ids normalise"
   }
   assert.ok(DEFAULT_RELIC_POOL.length >= RELIC_OFFER_SIZE, "a first season can fill a draft");
   assert.ok(DEFAULT_RELIC_POOL.every((id) => !RELICS[id].unlock));
-  assert.deepEqual(normalizeRelicIds(["splint", "nope", "splint", 4, "encore"]), ["splint", "encore"]);
+  assert.deepEqual(normalizeRelicIds(["carbonCopy", "nope", "carbonCopy", 4, "encore"]), ["carbonCopy", "encore"]);
+  // C-7: the five tools that measured nothing are gone, and a save that held one reads without it.
+  assert.deepEqual(normalizeRelicIds(["splint", "lockpick", "highRoller", "steadyAnchor", "glassLens", "insurance"]), ["insurance"]);
+  assert.equal(DEFAULT_RELIC_POOL.length, RELIC_SLOTS + 3, "the first season's draft holds more than the slots, so its builds can differ");
   assert.deepEqual(getRelicPool(["encore"]), [...DEFAULT_RELIC_POOL, "encore"], "the codex adds to the defaults");
   assert.deepEqual(parseRelicCodex("{broken"), { unlocked: [] });
   assert.deepEqual(parseRelicCodex(JSON.stringify({ unlocked: ["insurance", "made-up"] })), { unlocked: ["insurance"] });
@@ -1130,21 +1137,48 @@ test("relics bend the next board once, and equipping one never double-applies", 
   assert.deepEqual([hot([]).startGauge, hot([]).seconds], [24, 33]);
   assert.deepEqual([hot(["heatSink"]).startGauge, hot(["heatSink"]).seconds], [12, 39], "HEAT SINK halves the debt");
 
-  const once = applyRelics(BASE_SCHEMA, ["highRoller"]);
-  assert.equal(once.wallMin, BASE_SCHEMA.wallMin - 4);
-  assert.equal(applyRelics(once, ["highRoller"]).wallMin, once.wallMin, "a board that carries a relic is not dealt it twice");
-  assert.equal(applyRelics(once, ["highRoller"]).chipsScale, once.chipsScale);
-  assert.equal(applyRelics(BASE_SCHEMA, ["lockpick"]).sealBreak, 15);
+  const dark = { ...BASE_SCHEMA, wallMin: 50, wallMax: 86, mutations: ["blackout"] };
+  const once = applyRelics(dark, ["carbonCopy"]);
+  assert.equal(once.wallMin, 53);
+  assert.equal(applyRelics(once, ["carbonCopy"]).wallMin, once.wallMin, "a board that carries a relic is not dealt it twice");
+  // TESTIMONY: a window the clock ran out leaves half the pot, every time, and is still a bust; INSURANCE is not spent on it.
+  const timedOut = (relics, extra = {}) => resolveWindow({ run: normalizeRunState({ relics, runPot: 900, runHand: 90, ...extra }), window: { status: "bust", cause: "timeout", gauge: 30 }, card: card("a", { capital: 9 }) });
+  assert.deepEqual([timedOut([]).nextRun.runPot, timedOut(["testimony"]).nextRun.runPot, timedOut(["testimony"]).nextRun.runHand], [0, 450, 45]);
+  assert.deepEqual([timedOut(["testimony"]).verdict.outcome, timedOut(["testimony"]).verdict.lostPot], ["bust", 450]);
+  assert.ok(timedOut(["testimony"]).verdict.relicProcs.includes("testimony"));
+  assert.deepEqual([timedOut(["testimony", "insurance"]).nextRun.runPot, timedOut(["testimony", "insurance"]).nextRun.insuranceSpent], [450, false], "the half, and INSURANCE kept for another bust");
+  assert.equal(bust(["testimony"]).nextRun.runPot, 0, "a push into the wall is no clock");
   const hurts = card("h", { trust: -8 });
-  assert.equal(getCardBurn(hurts, { ...applyRelics(BASE_SCHEMA, ["splint"]), fracturedAxis: "trust" }).value, -10, "SPLINT bills 1.25x");
   assert.equal(getCardBurn(hurts, { ...BASE_SCHEMA, fracturedAxis: "trust" }).value, -12);
-  assert.equal(applyGauntletEffect({ trust: -8 }, { outcome: "cash", fracturedAxis: "trust", fractureRate: 1.25 }).trust, -10);
 });
 
-test("stance relics unlock from mastery and bend their mastered board", () => {
+test("FIELD NOTES grows the streak a window sooner, and AUDIT CONTACT moves the audit's limit by one", () => {
+  const held = (relics) => {
+    let run = normalizeRunState({ relics });
+    const moves = [];
+    for (let index = 0; index < 3; index += 1) {
+      const settled = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk") });
+      moves.push(settled.verdict.logic.move);
+      run = settled.nextRun;
+    }
+    return { moves, streak: run.logic.streak };
+  };
+  assert.deepEqual(held([]), { moves: ["build", "build", "grow"], streak: 1 });
+  assert.deepEqual(held(["fieldNote"]), { moves: ["build", "grow", "grow"], streak: 2 });
+
+  const close = (relics, audit) => resolveWindow({ run: normalizeRunState({ relics, runPot: 800 }), window: { status: "cashed", gauge: 20, pushes: 1 }, card: card("a", { capital: 9 }), caseClosed: true, audit });
+  assert.equal(close([], 3).verdict.audit.caught, true, "four marks catch a bare hand");
+  const spared = close(["auditContact"], 3);
+  assert.deepEqual([spared.verdict.audit.caught, spared.verdict.audit.lost], [false, 0], "and not one holding AUDIT CONTACT");
+  assert.ok(spared.verdict.relicProcs.includes("auditContact"), "which says so");
+  assert.equal(close(["auditContact"], 4).verdict.audit.caught, true, "five do");
+  assert.equal(close([], 1).verdict.relicProcs.includes("auditContact"), false);
+});
+
+test("the stance relic unlocks from mastery and bends its mastered board", () => {
   const mastery = { strike: STANCE_RELIC_UNLOCK_COUNT, steady: STANCE_RELIC_UNLOCK_COUNT, expose: STANCE_RELIC_UNLOCK_COUNT };
   const unlocks = getRelicUnlocks({ verdict: { outcome: "cash", multiplier: 1, nextMutations: [] }, nextRun: { stanceMastery: mastery } }, []);
-  assert.deepEqual(unlocks.slice(-3), ["kineticGrip", "steadyAnchor", "glassLens"]);
+  assert.deepEqual(unlocks, ["kineticGrip"], "STEADY ANCHOR and GLASS LENS went with C-7");
 
   const struck = resolveWindow({
     run: normalizeRunState({ stanceMastery: { strike: STANCE_RELIC_UNLOCK_COUNT }, relics: ["kineticGrip"] }),
@@ -1153,29 +1187,10 @@ test("stance relics unlock from mastery and bend their mastered board", () => {
   }).nextRun.schema;
   assert.ok(struck.mutations.includes("strikeMastery"));
   assert.equal(struck.stepMin, BASE_SCHEMA.stepMin + 2, "KINETIC GRIP removes only the mastery tax, not STRIKE WAKE");
-
-  const steady = resolveWindow({
-    run: normalizeRunState({ stanceMastery: { steady: STANCE_RELIC_UNLOCK_COUNT }, relics: ["steadyAnchor"] }),
-    window: { status: "cashed", gauge: 20, wall: 80, pushes: 2 },
-    card: card("a", { capital: 9 }),
-  }).nextRun.schema;
-  assert.ok(steady.mutations.includes("steadyMastery"));
-  assert.equal(steady.startGauge, 0);
-  assert.equal(steady.seconds, BASE_SCHEMA.seconds + STANCE_RELIC_UNLOCK_COUNT + 2);
-
-  const exposed = resolveWindow({
-    run: normalizeRunState({ stanceMastery: { expose: STANCE_RELIC_UNLOCK_COUNT }, relics: ["glassLens"] }),
-    window: { status: "bust", cause: "push", gauge: 60 },
-    card: card("a", { capital: 9 }),
-  }).nextRun.schema;
-  assert.ok(exposed.mutations.includes("exposeMastery"));
-  assert.equal(exposed.faceDown, false);
-  assert.equal(exposed.sealHighest, false);
-  assert.equal(exposed.sealBreak, 8);
 });
 
 test("INSURANCE keeps a third of the pot once a case, and ENCORE keeps the logic streak through every bust", () => {
-  const streak = { streak: 5, best: 5, type: "risk", held: 7 };
+  const streak = { streak: 5, best: 5, type: "position", held: 7 };
   const run = normalizeRunState({ relics: ["insurance", "encore"], runPot: 900, runHand: 90, logic: streak });
   const first = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
   assert.equal(first.verdict.insuredPot, 300);
@@ -1230,12 +1245,21 @@ test("a closed case drafts three relics it cannot reroll, and equipping takes on
   assert.deepEqual(equipRelic(picked, "encore").relics, picked.relics, "a relic that was not offered cannot be taken");
   const passed = equipRelic(opened, null);
   assert.deepEqual([passed.relics, passed.relicOffer], [[], []]);
+  // 「숨 고르기」 (C-7): the pass deals the board it held again, 10 seconds longer and the wall 3 further, once.
+  assert.deepEqual(
+    [passed.schema.seconds, passed.schema.wallMin, passed.schema.wallMax],
+    [opened.schema.seconds + 10, opened.schema.wallMin + 3, opened.schema.wallMax + 3],
+  );
+  assert.equal(getBoardMark(passed.schema), "breather");
+  assert.deepEqual(equipRelic(passed, null).schema, passed.schema, "a second pass with nothing on offer gives nothing");
+  assert.deepEqual(describeMutations(passed.schema).map((mutation) => mutation.id), describeMutations(opened.schema).map((mutation) => mutation.id), "and it is no rule the board prints");
+  assert.equal(getBoardMark(picked.schema), null, "a take is no breather");
   const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(picked))));
   assert.deepEqual(roundTrip, picked, "relics survive a save");
 });
 
 test("a draft with the slots full takes a relic only by putting one down, in one answer", () => {
-  const carried = ["metronome", "coldBlood", "heatSink", "highRoller", "splint"];
+  const carried = ["metronome", "coldBlood", "heatSink", "testimony", "carbonCopy"];
   assert.equal(carried.length, RELIC_SLOTS);
   const settled = resolveWindow({
     run: normalizeRunState({ relics: carried, schema: applyRelics(BASE_SCHEMA, carried) }),
@@ -1243,26 +1267,25 @@ test("a draft with the slots full takes a relic only by putting one down, in one
     card: card("a", { capital: 9 }),
     caseClosed: true,
     offerRelics: true,
-    relicPool: [...carried, "lockpick", "encore", "insurance"],
+    relicPool: [...carried, "frontPage", "encore", "insurance"],
   }).nextRun;
   const opened = openCaseRun(settled);
   const [take] = opened.relicOffer;
   assert.deepEqual(equipRelic(opened, take), opened, "full and nothing put down: the offer stays");
-  assert.deepEqual(equipRelic(opened, take, "lockpick"), opened, "only a carried relic can be put down");
-  const swapped = equipRelic(opened, take, "highRoller");
-  assert.deepEqual(swapped.relics, carried.map((id) => (id === "highRoller" ? take : id)), "the new relic takes the slot it freed");
+  assert.deepEqual(equipRelic(opened, take, "frontPage"), opened, "only a carried relic can be put down");
+  const swapped = equipRelic(opened, take, "testimony");
+  assert.deepEqual(swapped.relics, carried.map((id) => (id === "testimony" ? take : id)), "the new relic takes the slot it freed");
   assert.deepEqual(swapped.relicOffer, []);
-  assert.ok(!swapped.schema.relics.includes("highRoller"), "the board on the table is dealt without it");
-  assert.ok(swapped.schema.wallMin > opened.schema.wallMin, "HIGH ROLLER's closer wall goes with it");
+  assert.ok(!swapped.schema.relics.includes("testimony"), "the board on the table is dealt without it");
   assert.deepEqual(equipRelic(opened, null).relics, carried, "a pass keeps all five");
-  const old = normalizeRunState({ ...opened, relics: [...carried, "lockpick"] });
+  const old = normalizeRunState({ ...opened, relics: [...carried, "frontPage"] });
   assert.equal(old.relics.length, RELIC_SLOTS + 1, "a season saved before the cap keeps what it carries");
   assert.deepEqual(equipRelic(old, old.relicOffer[0]), old);
-  assert.equal(equipRelic(old, old.relicOffer[0], "splint").relics.length, RELIC_SLOTS + 1, "and swaps, never grows");
+  assert.equal(equipRelic(old, old.relicOffer[0], "carbonCopy").relics.length, RELIC_SLOTS + 1, "and swaps, never grows");
 });
 
 test("a window is re-dealt by a relic only while nobody has touched it", () => {
-  const board = applyRelics(BASE_SCHEMA, ["highRoller"]);
+  const board = { ...applyRelics(BASE_SCHEMA, ["testimony"]), wallMin: 51, wallMax: 87 };
   const fresh = createWindow({ schema: BASE_SCHEMA, seed: "redeal" });
   const redealt = reduceWindow(fresh, { type: "REDEAL", schema: board });
   assert.equal(redealt.schema.wallMin, board.wallMin);
@@ -1276,7 +1299,7 @@ test("a window is re-dealt by a relic only while nobody has touched it", () => {
 test("relics are unlocked by feats, and a restore cannot hand an INSURANCE payout back", () => {
   const unlocks = (verdict, nextRun = {}, unlocked = []) => getRelicUnlocks({ verdict, nextRun }, unlocked);
   assert.deepEqual(unlocks({ outcome: "cash", multiplier: 8, logic: { streak: 7 }, nextMutations: [] }), []);
-  assert.deepEqual(unlocks({ outcome: "cash", multiplier: 64, logic: { streak: 8 }, nextMutations: [] }), ["encore", "highRoller"]);
+  assert.deepEqual(unlocks({ outcome: "cash", multiplier: 64, logic: { streak: 8 }, nextMutations: [] }), ["encore"], "a x64 cash unlocked HIGH ROLLER until C-7");
   assert.deepEqual(unlocks({ outcome: "bust", logic: { streak: 0 }, nextMutations: [] }, { logic: { best: 8 } }), ["encore"], "the run's longest streak proves it too");
   assert.deepEqual(unlocks({ outcome: "cash", multiplier: 8, tempo: { maxCombo: 30 }, nextMutations: [] }, { bestCombo: 30 }), [], "a combo of pushes from before 2026-10-10 is not a streak");
   assert.deepEqual(unlocks({ outcome: "bust", lostPot: INSURANCE_UNLOCK_LOSS, nextMutations: [{ id: "silence" }] }), ["insurance", "stethoscope"]);
@@ -1287,11 +1310,11 @@ test("relics are unlocked by feats, and a restore cannot hand an INSURANCE payou
     currentCase: "case01",
     log: [],
     resources: {},
-    dynamics: serializeRunState(normalizeRunState({ windowIndex: 6, relics: ["insurance", "splint"], insuranceSpent: true, relicOffer: ["encore"] })),
+    dynamics: serializeRunState(normalizeRunState({ windowIndex: 6, relics: ["insurance", "carbonCopy"], insuranceSpent: true, relicOffer: ["encore"] })),
   };
   const restored = { ...current, dynamics: serializeRunState(normalizeRunState({ windowIndex: 3, relics: ["insurance"] })) };
   const carried = normalizeRunState(carryTableRecordIntoRestore(restored, current).dynamics);
-  assert.deepEqual(carried.relics, ["insurance", "splint"]);
+  assert.deepEqual(carried.relics, ["insurance", "carbonCopy"]);
   assert.equal(carried.insuranceSpent, true);
   assert.deepEqual(carried.relicOffer, []);
 });

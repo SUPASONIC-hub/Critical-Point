@@ -4,7 +4,7 @@ import { getBranchDetourBypass } from "../gameData.js";
 import { applyGauntletEffect, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
-import { listOfferedTypes } from "../gauntlet/logicStreak.js";
+import { listOfferedDirections } from "../gauntlet/logicStreak.js";
 import { getRelicPool, getRelicUnlocks } from "../gauntlet/relics.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
@@ -67,14 +67,15 @@ export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED)
 }
 
 /**
- * The types of card a scene has on the table, for the logic streak: a hand
- * that leaves its type because no card of that type was there keeps its streak
+ * The directions of card a scene has on the table (사람 or 자리, C-3), for the
+ * logic streak: a hand that leaves its direction because no card leaning that
+ * way was there keeps its streak
  * (`advanceLogic` in gauntlet/logicStreak.js). The scene's own cards, the wild one among
  * them, less any the player's standing has not opened -- a card that cannot be
  * played is not an offer.
  */
-export function getOfferedTypes(node, standing) {
-  return listOfferedTypes(node?.choices, (card) => getAuthorityGate(card, standing).unlocked);
+export function getOfferedDirections(node, standing) {
+  return listOfferedDirections(node?.choices, (card) => getAuthorityGate(card, standing).unlocked);
 }
 
 /**
@@ -138,7 +139,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     // For the logic streak: whether the room played this card, and what the
     // scene had on the table.
     forced,
-    offered: getOfferedTypes(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
+    offered: getOfferedDirections(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
     caseClosed: route.caseClosed,
     offerRelics: caseId !== "final",
     // The case's audit so far, read off its log (auditRisk.js); the engine reads it only in a case whose rules have it.

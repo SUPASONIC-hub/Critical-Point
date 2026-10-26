@@ -98,10 +98,6 @@ test("BLACKOUT and COLD FEET say what is left once EXPOSE mastery has lifted the
   const general = "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
   assert.match(describeNextTable(describeMutations(plainCold), false), /가장 비싼 카드가 봉인된다\.$/);
   assert.equal(describeNextTable(describeMutations(liftedCold), false), general, "EXPOSE mastery lifted the seal: the id stays, nothing is locked");
-  const lens = buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, stanceMastery: { strike: 0, steady: 0, expose: 3, mastered: [] }, relics: ["glassLens"] });
-  assert.deepEqual([lens.mutations.includes("coldFeet"), lens.sealHighest], [true, false], "GLASS LENS lifts it on the first rung of mastery");
-  assert.equal(describeNextTable(describeMutations(lens), false), general);
-  assert.equal(describeNextTable(describeMutations(buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, relics: ["lockpick"] })), false).endsWith("봉인된다."), true, "a lockpick opens the seal sooner, and the card is still sealed");
   assert.equal(describeNextTable(describeMutations(plainBust), true), "다음 판은 벽에 닿은 대가로 바뀐 규칙으로 시작한다.");
   assert.equal(describeNextTable([], false), "");
 });

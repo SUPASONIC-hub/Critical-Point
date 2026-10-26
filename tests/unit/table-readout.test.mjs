@@ -26,7 +26,8 @@ import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
  */
 
 /** A case the whole table is open in, and two of the ladder's earlier steps. */
-const FULL_TABLE = "final";
+// Not "final": an act's last case plays 「고점 판」 (C-10), a rule more than the whole table.
+const FULL_TABLE = "case49";
 const NO_RULES_YET = "prologue01";
 const BEFORE_OVERCLOCK = "prologue03";
 
@@ -205,11 +206,11 @@ test("a case that has the streak rule still shows none for a run that holds no s
 });
 
 test("the streak in the forecast is the one with the staked card played", () => {
-  const inference = { id: "a", label: "a", effect: { capital: 2 }, cognition: { inference: 2 }, next: "x" };
-  const bare = forecast({ offered: ["inference"] });
-  const staked = forecast({ offered: ["inference"], selectedCard: inference });
+  const people = { id: "a", label: "a", effect: { trust: 2 }, cognition: { inference: 2 }, next: "x" };
+  const bare = forecast({ offered: ["people"] });
+  const staked = forecast({ offered: ["people"], selectedCard: people });
   assert.deepEqual([bare.logic.move, bare.logic.type], [null, null], "nothing staked, nothing moved");
-  assert.deepEqual([staked.logic.move, staked.logic.type, staked.logic.held], ["build", "inference", "1/3"]);
+  assert.deepEqual([staked.logic.move, staked.logic.type, staked.logic.held], ["build", "people", "1/3"], "the direction it leans, 사람 (C-3)");
 });
 
 test("the rules a bust left on the table are named, counted as heat and given a way out", () => {

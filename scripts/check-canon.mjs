@@ -571,8 +571,21 @@ export const CANON = [
     find: /(자네)(?!를 위한 겁니다)/g,
     allow: [],
   },
+  {
+    id: "kd-owner-name",
+    fact: "KD금융그룹's largest shareholder is 킹스데일 파트너스 (Kingsdale Partners), New York",
+    files: SEASON,
+    find: /(킹[가-힣]{1,3}) 파트너스|(K[a-z]+dale) Partners/g,
+    allow: ["킹스데일", "Kingsdale"],
+  },
+  {
+    id: "kd-owner-stake",
+    fact: "킹스데일 holds about 30% of KD금융그룹, the largest single holding, inside the 외국인 68%",
+    files: SEASON,
+    find: /킹스데일[^."\d]{0,24}?지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%|지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%[^."\d]{0,12}킹스데일/g,
+    allow: ["30"],
+  },
 ];
-
 const valueOf = (match) => match.slice(1).filter((group) => group !== undefined).map((group) => group.trim()).join(" ");
 
 const isComment = (line) => /^\s*(?:\/\/|\/\*|\*)/.test(line);

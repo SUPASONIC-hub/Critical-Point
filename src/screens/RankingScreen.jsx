@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
+import { hallOfFameBadges } from "../hallOfFameBadges.js";
 import { getLeaderboardStatusCopy } from "../ranking.js";
+import { fetchHallOfFame } from "../telemetry.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { reloadLeaderboard } from "../state/useLeaderboard.js";
 
@@ -30,6 +32,17 @@ export function RankingScreen({
   const [pastBest, setPastBest] = useState(null);
   useEffect(() => {
     import("../personalBests.js").then((module) => setPastBest(module.takePastBestLine()), () => {});
+  }, []);
+  // D2: the hall of fame's places, by run tag (public_hall_of_fame). A badge
+  // on a completed season's row, the player's own included; a fetch that
+  // fails, or a deployment with no server, shows none.
+  const [hallBadges, setHallBadges] = useState(() => new Map());
+  useEffect(() => {
+    let cancelled = false;
+    fetchHallOfFame().then(({ rows }) => !cancelled && setHallBadges(hallOfFameBadges(rows)), () => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
   const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
@@ -111,6 +124,7 @@ export function RankingScreen({
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
                       {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">시즌 완료</span>}
+                      {entry.seasonComplete && hallBadges.get(entry.runTag)?.map((label) => <span className="ranking-hall-badge" key={label}>{label}</span>)}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? triggerLabels.responsibility}</small>
                     </div>
@@ -143,6 +157,7 @@ export function RankingScreen({
           )}
           <p className="ranking-footnote">
             다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.
+            검사를 통과한 판별 1~3위는 실행 번호로 명예의 전당에 남습니다.
           </p>
         </section>
       </main>

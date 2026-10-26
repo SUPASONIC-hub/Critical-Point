@@ -1,12 +1,15 @@
 import { drawStep, GAUGE_MAX, getMultiplier } from "./gauntletEngine.js";
 import { tableReactions } from "../caseCopy.js";
 import { formatNumber } from "../gameConstants.js";
+import { getCaseRead } from "../seasonScore.js";
 
 /**
  * What a closed window can still say about itself (improvement notes
  * 2026-10-22, 3-4: C-11, C-12, C-13). Display only: nothing here is read by
- * the settlement, the score or the ranking, and every number is dealt from
- * the window's own seed, as the table deals it.
+ * the settlement, the score or the ranking -- save C-12's per-window read,
+ * which the log keeps and the burst score's 판 읽기 axis sums (C-1(1),
+ * seasonScore.js) -- and every number is dealt from the window's own seed, as
+ * the table deals it.
  *
  * It is the runtime's (the reveal, the commit, the run readout), never the
  * table's: the PlayScreen chunk has no bytes left, and none of this is drawn
@@ -88,21 +91,11 @@ export function readWindowAgainstSeer(win, chips = 0) {
 
 /**
  * C-12, when a case closes: what the bare hand kept against the seer's, over
- * the case's log. A bust wipes what the bare hand had in the pot, as the
- * table does without INSURANCE; the seer never pushes into the wall. A whole
- * percent, or null for a case with nothing to compare (an older log).
+ * the case's log, as a whole percent (null for an older log). Its one home is
+ * seasonScore.js `getCaseRead`, since the burst score reads it as its 판 읽기
+ * axis (C-1(1)); the number printed and the number scored are the same.
  */
-export function readCaseRead(log = []) {
-  let mine = 0;
-  let seer = 0;
-  for (const entry of log) {
-    const read = entry?.threshold?.read;
-    if (!Array.isArray(read)) continue;
-    mine = entry.threshold.busted ? 0 : mine + (Number(read[0]) || 0);
-    seer += Number(read[1]) || 0;
-  }
-  return seer > 0 ? Math.round((mine / seer) * 100) : null;
-}
+export const readCaseRead = getCaseRead;
 
 export function describeCaseRead(log) {
   const percent = readCaseRead(log);

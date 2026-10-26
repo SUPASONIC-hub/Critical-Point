@@ -13,7 +13,9 @@ import { caseDisplayCode } from "../gameCases.js";
 import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
+import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
+import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -87,6 +89,22 @@ function takeRuntimeStartAction() {
   const action = pendingStartAction;
   pendingStartAction = null;
   return action && Date.now() - action.queuedAt < START_ACTION_TTL_MS ? action : null;
+}
+
+/** The deletion-request sentence, the address a mailto link when there is one. */
+function DeletionRequest() {
+  const { address, before, after } = getDeletionRequestText();
+  return (
+    <span data-testid="deletion-request">
+      {before}
+      {address && (
+        <a href={`mailto:${address}`} style={{ color: "inherit" }}>
+          {address}
+        </a>
+      )}
+      {after}
+    </span>
+  );
 }
 
 export function IntroScreen({ view, renderers = {} }) {
@@ -317,8 +335,8 @@ export function IntroScreen({ view, renderers = {} }) {
                   `.intro p` -- one of build-critical-css.mjs's probes --
                   pointing at a rendered element. */}
               <p>
-                3년 전 당신은 승인 서류 한 장에 혼자 반대 의견을 썼습니다. 대출은 그대로 나갔고,
-                당신은 KD금융그룹 지하의 트리거랩으로 내려왔습니다. 오늘 케이스데스크에 올라온 첫
+                3년 전 당신은 대출 승인 문서에 혼자 반대 의견을 올렸습니다. 대출은 그대로 나갔고,
+                당신은 미국계 자본이 최대주주인 KD금융그룹 지하의 트리거랩으로 내려왔습니다. 오늘 케이스데스크에 올라온 첫
                 파일에, 그때 그 대출번호가 그대로 남아 있습니다. 오래 붙잡은 조건은 다음 사건의
                 압력이 되어 돌아옵니다. 이야기는 그보다 조금 앞, 수습 마지막 과제에서 시작합니다.
               </p>
@@ -649,7 +667,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>플레이테스트 데이터 제공 동의</b>
                 <small>
                   {telemetryEnabled
-                    ? "사건 결과, 선택 로그, 응답 시간, 보낸 피드백, 오류 보고가 이 기기의 무작위 식별 번호와 함께 연구용으로 저장되고 180일 뒤 지워집니다. 이름은 원격 저장하지 않으며, 접속 주소는 요청 횟수를 제한하는 데만 씁니다."
+                    ? PLAYTEST_DATA_NOTICE
                     : "현재 배포 환경에는 원격 저장이 설정되어 있지 않습니다."}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
@@ -678,7 +696,14 @@ export function IntroScreen({ view, renderers = {} }) {
                 이름은 원격 저장하지 않습니다. 피드백에는 실명, 연락처, 회사명처럼 개인이나
                 조직을 식별할 수 있는 정보는 쓰지 마세요. 다른 기기에서 이어하기를 위한 온라인
                 저장은 이 동의와 별개로, 직접 켤 때만 진행 기록을 올리며 이름과 피드백 내용은
-                올리지 않습니다. 삭제 요청은 결과 화면의 8자리 세션 코드로 처리합니다.
+                올리지 않습니다.{" "}
+                {/* Where a deletion request goes (SUPPORT_CONTACT in appConfig.js),
+                    beside the session code it needs, which this panel shows above. */}
+                <DeletionRequest />
+              </p>
+              <p>
+                자세한 내용은 <a href={PRIVACY_PAGE_PATH}>개인정보처리방침</a>과{" "}
+                <a href={TERMS_PAGE_PATH}>이용약관</a>에 있습니다.
               </p>
             </div>
           </section>
@@ -802,6 +827,13 @@ export function IntroScreen({ view, renderers = {} }) {
             })}
           </div>
         </section>
+        {/* Plain links to the two files beside the build (privacyText.js):
+            the address a store listing names, and one a player can reach
+            from the bottom of the page without opening the data drawer. */}
+        <footer className="intro-legal">
+          <a href={PRIVACY_PAGE_PATH}>개인정보처리방침</a>
+          <a href={TERMS_PAGE_PATH}>이용약관</a>
+        </footer>
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the
             burst itself is a picture of the same thing. */}

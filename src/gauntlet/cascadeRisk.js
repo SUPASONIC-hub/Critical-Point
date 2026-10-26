@@ -33,7 +33,8 @@ import { isResourceGain } from "../gameConstants.js";
  *
  * A rule of the table since RULES_MARK 3 (one PR and one ranking reset with
  * B3's audit): on in a case whose rules have `cascade` (tableUnlocks.js: from
- * 프롤로그 04, and from the first case under NEW GAME+), never in story mode
+ * 사건 03 since RULES_MARK 4 -- 프롤로그 04 at RULES_MARK 3 -- and from the
+ * first case under NEW GAME+), never in story mode
  * or a practice case. Before that it was 2026-W47's test week, a device that
  * week's rule switched on. Its numbers are below, not in tableRules.js (the
  * engine's chunk; imported from there, the build gave that module a chunk of

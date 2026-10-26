@@ -15,9 +15,12 @@ import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
+import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
+import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
+import { HALL_OF_FAME_COUNTS_SQL, HALL_OF_FAME_READ_SQL, hallOfFameSql, readHallOfFameCounts } from "../src/hallOfFame.js";
 
 /**
  * Data API grants guardrail.
@@ -74,6 +77,13 @@ import { CHAIN_MARK } from "../src/chainRecheck.js";
  *      keeps the insert trigger's and touches no other row; the checker's
  *      own read (verify-ranking-rows --runs-sql, then --run-sql for each run)
  *      runs on the replayed schema.
+ *   9. The hall of fame (D2, *_hall_of_fame.sql): anon reads it and writes
+ *      nothing; only the service role posts a board, and only clean, checked
+ *      seasons of that board; a refused place changes nothing; the threshold
+ *      of ten is the server's own count over the whole board, whatever the
+ *      call says; the checker's read lists each open board's candidates; a
+ *      week settles four weeks after its Monday and a later table settles the
+ *      one before.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -103,15 +113,17 @@ await db.exec(`
 // and after, and the seeded rows are taken out again, so the rest of this
 // check runs on the database it always had.
 // The newest ranking reset is the one judged: RULES_MARK 3's
-// (`*_rules_mark3_ranking_reset.sql`, drafted 2026-10-21) once it is a `.sql`,
+// (`*_rules_mark3_ranking_reset.sql`, drafted 2026-10-21; folded into RULES_MARK 4's in the 11-30 rehearsal, so only that one is judged there) once it is a `.sql`,
 // the day-ten table's until then. While it is a `.sql.draft` nothing replays
 // it, the server still asks for the day-ten mark (2) and the older-table
 // checks below ask for that one, and say so.
 const DAY_TEN_RESET = "20261020010000_rules_day10_ranking_reset.sql";
 const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark3_ranking_reset.sql")) ?? null;
-const RANKING_RESET = MARK3_RESET ?? DAY_TEN_RESET;
+// RULES_MARK 4's (C-3 and C-4, drafted 2026-10-25) the same way, once it is a `.sql`.
+const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql")) ?? null;
+const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
 /** The table mark the replayed server asks of every case row of a ranked season. */
-const SERVER_MARK = MARK3_RESET ? RULES_MARK : 2;
+const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -155,6 +167,15 @@ async function seedBeforeRankingReset() {
     await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ($1, 'case01', 'n1', '{}')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '점검', '랭킹을 비우기 전에 쓴 글', 'board:${RESET_SEED}')`, [`${RESET_SEED}-session`]);
+    // A report on that post (#325, 20261027000000), once the table exists: before
+    // RULES_MARK 4's reset in the 11-30 rehearsal. It goes with the post when the
+    // seed is taken out (on delete cascade), so the count below is unchanged.
+    if ((await db.query(`select to_regclass('public.board_reports') is not null as here`)).rows[0].here) {
+      await db.query(
+        `insert into public.board_reports (post_id, session_id, reason, actor_key) select id, $1, 'spam', $2 from public.board_posts where session_id = $1`,
+        [`${RESET_SEED}-session`, `board:${RESET_SEED}`],
+      );
+    }
     await db.query(`insert into public.cloud_saves (code_hash, saved_at, payload) values ($1, now(), '{"save": {}}')`, [RESET_SEED]);
     await db.query(`insert into public.telemetry_rate_limits (actor_key, request_count) values ($1, 7)`, [RESET_SEED]);
     await db.query(`insert into public.private_settings (name, value) values ($1, 'kept')`, [RESET_SEED]);
@@ -162,6 +183,12 @@ async function seedBeforeRankingReset() {
     if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`insert into public.scene_bust_stats (case_id, node_id, windows, busts, runs) values ($1, 'n1', 1, 0, 1)`, [RESET_SEED]);
     // The choice snapshot exists from 20261023020000, before RULES_MARK 3's reset too.
     if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`insert into public.scene_choice_stats (case_id, node_id, choice_id, picks, windows, runs) values ($1, 'n1', 'c1', 1, 1, 1)`, [RESET_SEED]);
+    // The hall of fame (D2) is what a reset must leave: a settled board and its place,
+    // when the reset replays after it (the newest reset is re-dated on its merge day).
+    if (await hallOfFameExists()) {
+      await db.query(`insert into public.hall_of_fame_boards (board, kind, checked_seasons, settled_at) values ('table-1', 'table', 12, now())`);
+      await db.query(`insert into public.hall_of_fame (board, place, run_tag, score, rank, style) values ('table-1', 1, 'RESETSD1', 90, 'S', 'BOARD BREAKER')`);
+    }
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -184,7 +211,11 @@ async function removeRankingResetSeed() {
   // Not counted: a later migration's rebuild of the snapshot may have taken it already.
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_bust_stats where case_id = $1`, [RESET_SEED]);
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_choice_stats where case_id = $1`, [RESET_SEED]);
+  if (await hallOfFameExists()) await db.query(`delete from public.hall_of_fame_boards where board = 'table-1'`);
   return removed;
+}
+async function hallOfFameExists() {
+  return (await db.query(`select to_regclass('public.hall_of_fame') is not null as here`)).rows[0].here;
 }
 let beforeReset = null;
 let afterReset = null;
@@ -209,6 +240,16 @@ const SUSPICION_MARKS = files.some((file) => file.endsWith("_ranking_suspicion_m
 // the finale's, and the block "the season score is the mean of its cases"
 // runs; while it is a `.sql.draft` they expect the finale's and say so.
 const SEASON_MEAN = files.some((file) => file.endsWith("_season_score_case_mean.sql"));
+// The 판 읽기 axis of the score (`*_season_score_reading_axis.sql`, drafted
+// 2026-10-25 for the ranking reset after RULES_MARK 3's, C-1(1)). The client's
+// getSeasonScore already swaps 관점 전환 at its 0.16 weight, so the mean
+// without it would rank on another number than the client's: the two go
+// together, and the block "the season score has the 판 읽기 axis" runs once
+// it is a `.sql`.
+const READING_AXIS = files.some((file) => file.endsWith("_season_score_reading_axis.sql"));
+if (SEASON_MEAN && !READING_AXIS) {
+  failures.push("*_season_score_case_mean.sql is applied without *_season_score_reading_axis.sql: the server swaps 관점 전환 at 0.2 and the client (src/seasonScore.js) at 0.16. Rename both, the reading axis after the mean.");
+}
 for (const file of files) {
   if (file === RANKING_RESET) {
     await seedBeforeRankingReset();
@@ -230,6 +271,8 @@ for (const file of files) {
 // The checker's marks (F1 phase 2, `*_ranking_recheck_marks.sql`): the cases
 // below run once the migration is among the files.
 const RECHECK_MARKS = files.some((file) => file.endsWith("_ranking_recheck_marks.sql"));
+// The hall of fame (D2, `*_hall_of_fame.sql`): its cases run once it is among the files.
+const HALL_OF_FAME = files.some((file) => file.endsWith("_hall_of_fame.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -580,6 +623,8 @@ function decisionEntry(caseId, index, { story = false } = {}) {
       focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
       // The logic streak's line (gauntletEngine's `verdict.logic`); the case summary's `logicRecord` is built from it.
       logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.6, pot: 14 },
+      // C-12's read, `[bare, seer]`: the case summary's `readingScore` (the 판 읽기 axis, C-1(1)) sums it.
+      read: [42, 60],
     },
     environmentMode: "stable",
     assistTime: 1.5,
@@ -1314,7 +1359,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.22" });
   /** The run summary a build of the table before sent as `dynamics`: this one's, without the mark. */
   const olderTableDynamics = ({ [RULES_MARK_KEY]: _mark, ...rest }) => rest;
   const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
-  if (!MARK3_RESET) console.log(`Older-table checks: against the day-ten mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_rules_mark3_ranking_reset.sql.draft).`);
+  if (SERVER_MARK < RULES_MARK) console.log(`Older-table checks: against the server's mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_rules_mark${RULES_MARK}_ranking_reset.sql.draft).`);
   const marked = (runId) => one(
     `select (count(*) filter (where jsonb_typeof(dynamics->'${RULES_MARK_KEY}') = 'number' and (dynamics->>'${RULES_MARK_KEY}')::numeric >= ${SERVER_MARK}))::int as mark, count(*)::int as n
        from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,
@@ -1592,6 +1637,203 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   await db.query(`delete from public.playtest_sessions where run_id like 'run-recheck-%'`);
 }
 
+// ---- the hall of fame (*_hall_of_fame.sql, D2)
+//
+// hall_of_fame_settle writes the boards the daily check picked
+// (src/hallOfFame.js), and only the service role may call it. Anon reads the
+// view and writes nothing. A place must be a clean, checked season on its
+// board, or the whole call is refused and nothing changes; a board below ten
+// keeps no place; a settled board is kept; a week settles four weeks after its
+// Monday (question 9 (1)); a later table's board settles the one before.
+if (!HALL_OF_FAME) {
+  console.log("Hall of fame: skipped, the migration is not among the files (supabase/migrations/*_hall_of_fame.sql).");
+} else {
+  const settle = (boards) => hallOfFameSql(boards);
+  await refused("call hall_of_fame_settle", "anon", settle([]));
+  await refused("call hall_of_fame_settle", "authenticated", settle([]));
+  await refused("write the hall of fame", "anon", `insert into public.hall_of_fame_boards (board, kind, checked_seasons) values ('table-9', 'table', 99)`);
+  await refused("write a hall of fame place", "anon", `insert into public.hall_of_fame (board, place, run_tag, score, rank, style) values ('table-9', 1, 'FORGED01', 100, 'S', 'BOARD BREAKER')`);
+  await refused("delete the hall of fame", "anon", `delete from public.hall_of_fame`);
+
+  // Ranking rows the blocks above left (run-ranked-1 and -2, which later
+  // blocks read again) stand aside while the hall of fame counts its boards:
+  // once RULES_MARK 3's reset is a `.sql` they are clean, unjudged seasons of
+  // table-3 and would make that board 12 where its cases expect 10 (found in
+  // the 11-30 rehearsal, integration-1130). Their marks are put back below.
+  const asideRows = (await db.query(`select id, suspicion from public.playtest_sessions where case_id = 'season-final' and session_id <> 'grants-check-hall'`)).rows;
+  const setAside = async (each) => {
+    await db.exec(`set session_replication_role = replica`);
+    try {
+      for (const row of asideRows) await db.query(`update public.playtest_sessions set suspicion = $2::text[] where id = $1`, [row.id, each(row)]);
+    } finally {
+      await db.exec(`set session_replication_role = origin`);
+    }
+  };
+  await setAside((row) => [...(row.suspicion ?? []), "grants-check-aside"]);
+
+  const table = `table-${RULES_MARK}`;
+  const thisWeek = isoWeekKey(Date.now());
+  const oldWeek = "2026-W30";
+  // Ranking rows as the check leaves them, put in place past the insert triggers.
+  const season = async (tag, { score = 80, suspicion = "{}", rechecked = true, week = null, mark = RULES_MARK, complete = true } = {}) => {
+    const runId = `run-hall-${tag}`;
+    const summary = JSON.stringify({ seasonComplete: complete, burstScore: score, rank: "A", ...(week ? { week } : {}) });
+    await db.exec(`set session_replication_role = replica`);
+    try {
+      await db.query(
+        `insert into public.playtest_sessions (session_id, run_id, session_code, player_name, case_id, case_title, summary, suspicion, rechecked_at)
+         values ('grants-check-hall', $1, 'HALLFAME', '익명 분석관', 'season-final', 'SEASON 01 COMPLETE', $2::jsonb, $3::text[], ${rechecked ? "now()" : "null"})`,
+        [runId, summary, suspicion],
+      );
+      await db.query(
+        `insert into public.playtest_sessions (session_id, run_id, session_code, player_name, case_id, case_title, summary, dynamics)
+         values ('grants-check-hall', $1, 'HALLFAME', '익명 분석관', 'final', '최종', $2::jsonb, $3::jsonb)`,
+        [runId, summary, JSON.stringify({ [RULES_MARK_KEY]: mark })],
+      );
+    } finally {
+      await db.exec(`set session_replication_role = origin`);
+    }
+  };
+  // `n` more seasons with no mark on a board, below everything else on it,
+  // never replayed: the count is the whole board's, not the rows the check read.
+  const fill = async (prefix, n, options = {}) => {
+    for (let at = 1; at <= n; at += 1) await season(`${prefix}${String(at).padStart(5, "0")}`, { score: 20 + at, rechecked: false, ...options });
+  };
+  await season("aaaa0001", { score: 91 });
+  await season("aaaa0002", { score: 85 });
+  await season("aaaa0003", { score: 80 });
+  await season("bbbb0001", { score: 95, suspicion: "{time-over-gap}" });
+  await season("bbbb0002", { score: 94, rechecked: false });
+  await season("bbbb0003", { score: 93, mark: RULES_MARK - 1 });
+  await season("bbbb0004", { score: 92, suspicion: "{chain-off-log}" });
+  await season("bbbb0005", { score: 90, complete: false });
+  await season("bbbb0006", { score: 89, suspicion: null });
+  await season("cccc0001", { score: 70, week: thisWeek });
+  await season("cccc0002", { score: 60, week: oldWeek });
+  await season("cccc0003", { score: 65, week: oldWeek });
+  // The table: aaaa0001-3, bbbb0002 (not replayed, no mark) and six more make
+  // ten; a marked, an unfinished, an unjudged or another table's season does
+  // not count. 2026-W30: two and eight more. This week: one, for now.
+  await fill("fta", 6);
+  await fill("fow", 8, { week: oldWeek });
+
+  const place = (tag, score) => ({ run_tag: tag, score, rank: "A", style: "FIELD DECIDER", tags: [] });
+  const view = async (board) =>
+    (await run("anon", `select board, kind, checked_seasons, settled_on, place, run_tag, score from public.public_hall_of_fame where board = $1 order by place`, [board])).rows;
+  const tags = async (board) => (await view(board)).map((row) => row.run_tag);
+
+  // Each board's count, over the whole board, as the CI job reads it
+  // (verify-ranking-rows --hall-of-fame-counts-sql); anon may not.
+  await refused("count the hall of fame's boards", "anon", HALL_OF_FAME_COUNTS_SQL);
+  const counted = async () => readHallOfFameCounts((await allowed("count the hall of fame's boards", "service_role", HALL_OF_FAME_COUNTS_SQL))?.rows ?? []);
+  const counts = await counted();
+  check(
+    counts.get(table) === 10 && counts.get(`table-${RULES_MARK - 1}`) === 1 && counts.get(thisWeek) === 1 && counts.get(oldWeek) === 10,
+    `the boards counted ${JSON.stringify([...counts])}; expected ${table} 10, table-${RULES_MARK - 1} 1, ${thisWeek} 1, ${oldWeek} 10.`,
+  );
+
+  // The checker's read (verify-ranking-rows --runs-sql --per-board): beside
+  // the top `limit`, each open board's first candidates -- complete, no mark
+  // but the checker's own -- however low the board stands in the ranking.
+  const listedRuns = async (perBoard) =>
+    ((await allowed("list the checker's runs and each board's candidates", "service_role", rankingRunsSql({ limit: 1, perBoard })))?.rows ?? []).map((row) => row.run_id);
+  const topOverall = (await one(`select run_id from public.playtest_sessions where case_id = 'season-final' and score is not null order by score desc limit 1`))?.run_id;
+  const candidates = (await listedRuns(2)).filter((runId) => runId !== topOverall && runId.startsWith("run-hall-"));
+  check(
+    JSON.stringify(candidates.sort()) === JSON.stringify(["run-hall-bbbb0002", "run-hall-bbbb0003", "run-hall-cccc0001", "run-hall-cccc0002", "run-hall-cccc0003"].filter((runId) => runId !== topOverall)),
+    `the checker's read listed ${JSON.stringify(candidates)} beside the top run; expected each board's first two candidates (bbbb0004, marked only by the checker, stands below them).`,
+  );
+  const deeper = await listedRuns(3);
+  check(deeper.includes("run-hall-bbbb0004") && !deeper.includes("run-hall-bbbb0005") && !deeper.includes("run-hall-bbbb0006") && (topOverall === "run-hall-bbbb0001" || !deeper.includes("run-hall-bbbb0001")), `three candidates a board listed ${JSON.stringify(deeper)}: a run the checker marked is read again, a marked, unfinished or unjudged one is not.`);
+
+  const wrote = (await allowed("settle the day's boards", "service_role", settle([{ board: table, places: [place("AAAA0001", 91), place("AAAA0002", 85), { ...place("AAAA0003", 80), tags: ["NEW GAME+", "붕괴한 시즌"] }] }])))?.rows[0]?.settled;
+  check(JSON.stringify([wrote?.written, wrote?.kept, wrote?.settled]) === JSON.stringify([[table], [], []]), `hall_of_fame_settle answered ${JSON.stringify(wrote)}.`);
+  const written = await view(table);
+  check(
+    JSON.stringify(written.map((row) => [row.place, row.run_tag, Number(row.score), row.checked_seasons, row.settled_on])) ===
+      JSON.stringify([[1, "AAAA0001", 91, 10, null], [2, "AAAA0002", 85, 10, null], [3, "AAAA0003", 80, 10, null]]),
+    `anon reads the table board as ${JSON.stringify(written)}.`,
+  );
+  const third = await one(`select tags from public.hall_of_fame where board = $1 and place = 3`, [table]);
+  check(JSON.stringify(third?.tags) === JSON.stringify(["NEW GAME+", "붕괴한 시즌"]), `a place kept the tags ${JSON.stringify(third?.tags)}.`);
+
+  // Every refusal leaves the boards as they were.
+  for (const [label, board, places] of [
+    ["post a season the trigger marked", table, [place("BBBB0001", 95)]],
+    ["post a season the check did not replay whole", table, [place("BBBB0002", 94)]],
+    ["post a season of another table", table, [place("BBBB0003", 93)]],
+    ["post a season at another score", table, [place("AAAA0001", 99)]],
+    ["post a week's season on the table board", table, [place("CCCC0001", 70)]],
+    ["post a table season on a week's board", oldWeek, [place("AAAA0001", 91)]],
+    ["post a run with no ranking row", table, [place("NOSUCH01", 50)]],
+  ]) {
+    await raises(label, "service_role", settle([{ board, places }]), [], /^22023 /);
+  }
+  // Below ten by the server's own count: a count in the call is not read.
+  // A call that says its own count, as the draft's did, is answered by the server's.
+  const settleSaying = (boards) => `select public.hall_of_fame_settle('${JSON.stringify(boards)}'::jsonb) as settled;`;
+  await raises("post a place below ten checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below ten checked seasons \(it has 1\)/);
+  await raises("post four places", "service_role", settle([{ board: table, places: [place("AAAA0001", 91), place("AAAA0002", 85), place("AAAA0003", 80), place("AAAA0003", 80)] }]), [], /^22023 /);
+  await raises("post a board that is not one", "service_role", settle([{ board: "table-x", places: [] }]), [], /^22023 /);
+  await raises("post a style the ranking does not have", "service_role", settle([{ board: table, places: [{ ...place("AAAA0001", 91), style: "GOD MODE" }] }]), [], /23514/);
+  // A good board beside a bad one: the call is one, so neither is written.
+  await raises("post a good board beside a refused one", "service_role", settle([{ board: oldWeek, places: [place("CCCC0003", 65)] }, { board: table, places: [place("BBBB0001", 95)] }]), [], /^22023 /);
+  check(JSON.stringify(await tags(table)) === JSON.stringify(["AAAA0001", "AAAA0002", "AAAA0003"]), `a refused call changed the table board: ${JSON.stringify(await tags(table))}.`);
+  check((await view(oldWeek)).length === 0, "a refused call wrote the board beside the refused one.");
+
+  // Below ten: the board stays, with the server's count and no place (「표본 부족」).
+  await allowed("write a week's board below the threshold", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [] }]));
+  const sparse = await view(thisWeek);
+  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below ten reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
+  // Nine more seasons on this week's board, none of them replayed: it reaches ten.
+  await fill("fwk", 9, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 10, "nine more seasons with no mark did not bring this week's board to ten.");
+  await allowed("write this week's board, provisional", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]));
+  const provisional = await view(thisWeek);
+  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 10, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 10.`);
+
+  // A week four weeks past its Monday settles on the day's write, and is kept from then on.
+  const settled = (await allowed("settle a week four weeks old", "service_role", settle([{ board: oldWeek, places: [place("CCCC0002", 60)] }])))?.rows[0]?.settled;
+  check(JSON.stringify(settled?.settled) === JSON.stringify([oldWeek]), `a week four weeks old was not settled: ${JSON.stringify(settled)}.`);
+  // A settled board's candidates are no longer read.
+  check(!(await listedRuns(3)).some((runId) => runId === "run-hall-cccc0002" || runId === "run-hall-cccc0003"), "the checker's read still lists a settled week's seasons.");
+  // A settled board is kept even when its count fell below ten since.
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id = 'run-hall-fow00001' and case_id = 'season-final'`);
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  check((await counted()).get(oldWeek) === 9, "a season marked since did not leave the settled week's count.");
+  const kept = (await allowed("write a settled week again", "service_role", settle([{ board: oldWeek, places: [place("CCCC0003", 65)] }])))?.rows[0]?.settled;
+  check(JSON.stringify(kept?.kept) === JSON.stringify([oldWeek]), `a settled week answered ${JSON.stringify(kept)}.`);
+  const old = await view(oldWeek);
+  check(old.length === 1 && old[0].run_tag === "CCCC0002" && old[0].checked_seasons === 10 && old[0].settled_on !== null, `a settled week was rewritten: ${JSON.stringify(old)}.`);
+  // The week's start is Monday 00:00 KST: 2026-W30 began 2026-07-20.
+  const start = await one(`select ((to_date('2026-W30', 'IYYY-"W"IW')::timestamp at time zone 'UTC') - interval '9 hours') as at`);
+  check(new Date(start?.at).toISOString() === "2026-07-19T15:00:00.000Z", `the week's start read as ${start?.at}; expected Monday 00:00 KST.`);
+
+  // The ranking emptied for a later table: its board's first write settles this table's.
+  const next = `table-${RULES_MARK + 1}`;
+  const closed = (await allowed("write a later table's board", "service_role", settle([{ board: next, places: [] }])))?.rows[0]?.settled;
+  check(JSON.stringify(closed?.settled) === JSON.stringify([table]), `a later table's board settled ${JSON.stringify(closed?.settled)}; expected ${table}.`);
+  check((await view(next))[0]?.checked_seasons === 0, "a later table's board with no season on it did not count 0.");
+  check((await view(table))[0]?.settled_on !== null && JSON.stringify(await tags(table)) === JSON.stringify(["AAAA0001", "AAAA0002", "AAAA0003"]), "the table before kept its places but not its date.");
+  check(JSON.stringify((await one(settle([{ board: table, places: [] }])))?.settled?.kept) === JSON.stringify([table]), "a settled table board was written again.");
+
+  // The page's read (verify-ranking-rows --hall-of-fame-read-sql) runs on this schema, as anon would.
+  const page = (await allowed("read the hall of fame's page", "anon", HALL_OF_FAME_READ_SQL))?.rows ?? [];
+  check(page.length >= 6 && Object.keys(page[0]).join() === "board,kind,checked_seasons,settled_on,updated_on,place,run_tag,score,rank,style,tags", `the page's read answered ${JSON.stringify(page.slice(0, 2))}.`);
+
+  // Nothing of the hall of fame names a run or a player beyond its tag.
+  const columns = (await db.query(`select column_name from information_schema.columns where table_schema = 'public' and table_name in ('hall_of_fame', 'hall_of_fame_boards', 'public_hall_of_fame')`)).rows.map((row) => row.column_name);
+  check(!columns.some((column) => /run_id|session|player|name|address|device/.test(column)), `the hall of fame has a column that names someone: ${columns.join(", ")}.`);
+
+  await db.query(`delete from public.hall_of_fame_boards`);
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-hall-%'`);
+  await setAside((row) => row.suspicion);
+}
+
 // ---- the season score is the mean of its cases (*_season_score_case_mean, a draft until RULES_MARK 3's merge day)
 //
 // The ranking publishes the mean of the run's case scores, made by the server
@@ -1683,6 +1925,45 @@ if (!SEASON_MEAN) {
   }
   withHeaders(null);
   await db.query(`delete from public.playtest_sessions where run_id like 'run-mean-%'`);
+}
+
+// ---- the season score has the 판 읽기 axis (*_season_score_reading_axis, a draft until the ranking reset after RULES_MARK 3's)
+//
+// Each case row carries its 판 읽기 axis (`readingScore`, C-1(1)); a season
+// with a case row scored before the axis is refused, and the client's queue
+// lets the row go as a season that will not rank. The mean above is already
+// the 0.16 swap's (run-mean-1 and run-mean-3 against getSeasonScore).
+if (!READING_AXIS) {
+  console.log("Season score: no 판 읽기 axis check; the axis is still a draft (supabase/migrations/*_season_score_reading_axis.sql.draft).");
+} else {
+  withHeaders({ "x-forwarded-for": "198.51.100.24" });
+  {
+    const runId = "run-reading-1";
+    await playRun(runId, { session: sessionId(86) });
+    const summaries = await caseSummariesOf(runId);
+    check(Object.values(summaries).every((summary) => summary.readingScore === 70), `the case rows carry ${JSON.stringify(Object.values(summaries).map((summary) => summary.readingScore))}; the decision log's reads (42 of 60) make 70.`);
+    await post("rank a season scored with the 판 읽기 axis", "playtest_sessions", seasonPayload({ session: sessionId(86), runId }));
+    const row = await one(`select score from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]);
+    check(Number(row?.score) === getSeasonScore(summaries).burstScore, `a season with the 판 읽기 axis ranked on ${row?.score}; the client's is ${getSeasonScore(summaries).burstScore}.`);
+  }
+  for (const [runId, session, label, reading] of [
+    ["run-reading-2", 87, "rank a season with a case scored before the 판 읽기 axis", undefined],
+    ["run-reading-3", 88, "rank a season with a case whose 판 읽기 is out of range", 101],
+    ["run-reading-4", 89, "rank a season with a case whose 판 읽기 is text", "70"],
+  ]) {
+    await playRun(runId, { session: sessionId(session) });
+    const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+    if (reading === undefined) await db.query(`update public.playtest_sessions set summary = summary - 'readingScore' where run_id = $1 and case_id = $2`, [runId, middle]);
+    else await db.query(`update public.playtest_sessions set summary = summary || $3::jsonb where run_id = $1 and case_id = $2`, [runId, middle, JSON.stringify({ readingScore: reading })]);
+    await postRefused(label, "playtest_sessions", seasonPayload({ session: sessionId(session), runId }), /^P0001 older-score runs are not ranked$/);
+  }
+  const refusal = { status: 400, serverMessage: "older-score runs are not ranked" };
+  const seasonItem = { type: "case", payload: { case_id: "season-final" } };
+  check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads the older-score refusal as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
+  check(!isUnrankableRefusal(seasonItem, refusal), "the client's queue reads the older-score refusal as a run missing a case row.");
+  check(isBeatTableRefusal(seasonItem, refusal), "the client's queue does not tell the older-score refusal as a season that will not rank (BEAT_TABLE_REFUSAL in src/state/telemetryBatch.js).");
+  withHeaders(null);
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-reading-%'`);
 }
 
 // ---- the hold rate's cut points (20261011000000)
@@ -2134,6 +2415,104 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
   check(missing?.rows[0]?.found !== true, "moderating a missing post reported success.");
 }
 
+// ---- board reports (20261027000000)
+//
+// The row the report button builds, inserted as anon. Every reason the client
+// offers is taken, a reason it does not is refused, a second report of a post
+// from one writer is dropped, a hidden or missing post cannot be reported, the
+// table reads as nothing to anon, and the hourly caps hold.
+{
+  const reportRow = (postId, reason, session) => ({ event_id: uuid(), ...createBoardReportPayload({ postId, reason, sessionId: session }) });
+  const reportInsert = (row) => postgrestInsert("board_reports", row);
+  const report = (label, row) => {
+    const { sql, params } = reportInsert(row);
+    return allowed(label, "anon", sql, params);
+  };
+  const reportRefused = (label, row, pattern) => {
+    const { sql, params } = reportInsert(row);
+    return raises(label, "anon", sql, params, pattern);
+  };
+  const reportCount = async (postId) => (await one(`select count(*)::int as n from public.board_reports where post_id = $1`, [postId]))?.n ?? 0;
+  const visible = (await db.query(`select id from public.board_posts where not hidden order by id limit 3`)).rows.map((row) => Number(row.id));
+  check(visible.length === 3, `the board report check needs three visible posts and found ${visible.length}.`);
+  const [first, second, third] = visible;
+
+  withHeaders({ "x-forwarded-for": "198.51.100.60" });
+  for (const [index, { id }] of BOARD_REPORT_REASONS.entries()) {
+    await report(`report a post as ${id}`, reportRow(first, id, sessionId(400 + index)));
+  }
+  check((await reportCount(first)) === 1, `four devices on one address reporting one post stored ${await reportCount(first)} reports; one writer is one report.`);
+  {
+    const key = (await one(`select actor_key from public.board_reports where post_id = $1`, [first]))?.actor_key;
+    check(/^board-report:[0-9a-f]{32}$/.test(key ?? ""), `a board report's writer key is not a hash: ${key}`);
+  }
+  await reportRefused("report a post for a reason the client does not offer", { event_id: uuid(), post_id: second, session_id: sessionId(410), reason: "boring" }, /invalid board report reason/);
+  await reportRefused("report a post that does not exist", { event_id: uuid(), post_id: 999999999, session_id: sessionId(410), reason: "spam" }, /names no visible post/);
+  await reportRefused("report under a session id that is too short", { event_id: uuid(), post_id: second, session_id: "short", reason: "spam" }, /invalid board report session id/);
+  await refused("write a board report's writer key", "anon", `insert into public.board_reports (post_id, session_id, reason, actor_key) values (${second}, '${sessionId(411)}', 'spam', 'forged')`);
+  await refused("read board reports", "anon", `select post_id from public.board_reports`);
+  await allowed("read board reports", "service_role", `select post_id, reason, actor_key from public.board_reports`);
+  withHeaders(null);
+
+  // A second address reports the same post: two writers, two rows.
+  withHeaders({ "x-forwarded-for": "198.51.100.61" });
+  await report("report a post another address reported", reportRow(first, "abuse", sessionId(420)));
+  check((await reportCount(first)) === 2, "a report from a second address was not stored.");
+  withHeaders(null);
+
+  // A hidden post cannot be reported, and its reports go when the post does.
+  await allowed("hide a reported post", "service_role", `select public.moderate_board_post(${third})`);
+  withHeaders({ "x-forwarded-for": "198.51.100.62" });
+  await reportRefused("report a hidden post", reportRow(third, "spam", sessionId(430)), /names no visible post/);
+  withHeaders(null);
+  await allowed("restore the hidden post", "service_role", `select public.moderate_board_post(${third}, false)`);
+
+  // Hourly caps: ten for a device on an address, thirty for the address.
+  withHeaders({ "x-forwarded-for": "198.51.100.63" });
+  const reportKey = `board-report:${await writerKey("198.51.100.63")}`;
+  await presetCounter(`${reportKey}|${sessionId(440)}`, 9);
+  await report("report a device's 10th post of the hour", reportRow(second, "spam", sessionId(440)));
+  await reportRefused("report a device's 11th post of the hour", reportRow(third, "spam", sessionId(440)), /^PT429 .*report rate limit/);
+  await presetCounter(reportKey, 30);
+  await reportRefused("report an address's 31st post of the hour", reportRow(third, "spam", sessionId(441)), /^PT429 .*report rate limit/);
+  withHeaders(null);
+
+  // The operator's queue (scripts/board-reports.mjs, .github/workflows/board-reports.yml):
+  // its one SELECT reads ids and counts only, hide takes a post out of the
+  // queue, dismiss deletes a post's reports, restore brings a hidden post back,
+  // and an action on nothing says it did nothing.
+  {
+    const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
+    const act = async (action, postId) => boardActionDone((await allowed(`${action} board post ${postId}`, "service_role", boardAction(action, postId)))?.rows ?? []);
+    const queueRows = (await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? [];
+    const texts = (await db.query(`select nickname, body from public.board_posts where id = any($1::bigint[])`, [[first, second]])).rows.flatMap((row) => [row.nickname, row.body]);
+    check(queueRows.every((row) => !texts.some((text) => JSON.stringify(row).includes(text)) && !JSON.stringify(row).includes("board-report:")), "the board report queue fetched a nickname, a body or a writer key.");
+    let queue = readBoardQueue(queueRows);
+    const waitingFirst = queue.waiting.find((post) => post.postId === first);
+    check(waitingFirst?.reports === 2 && waitingFirst?.writers === 2 && queue.waiting.some((post) => post.postId === second), `the board report queue read ${JSON.stringify(queue.waiting)}; expected post ${first} with 2 reports from 2 writers and post ${second} waiting.`);
+    check(await act("hide", second), "hiding a reported post did nothing.");
+    queue = await queueOf();
+    check(!queue.waiting.some((post) => post.postId === second) && queue.hidden.some((post) => post.postId === second), "a hidden post still waited in the board report queue.");
+    check(await act("restore", second), "restoring a hidden post did nothing.");
+    check(await act("dismiss", first), "dismissing a post's reports did nothing.");
+    check((await reportCount(first)) === 0 && !(await queueOf()).waiting.some((post) => post.postId === first), "a dismissed post's reports stayed.");
+    check(!(await act("dismiss", first)) && !(await act("hide", 999999999)), "an action on nothing said it did something.");
+  }
+
+  // Retention rides on the post: the purge deletes posts, and a post's
+  // reports go with it (on delete cascade).
+  const doomed = Number((await one(
+    `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '지울글', '지워질 글입니다', 'board:retention') returning id`,
+    [sessionId(450)],
+  ))?.id);
+  withHeaders({ "x-forwarded-for": "198.51.100.64" });
+  await report("report a post that will be deleted", reportRow(doomed, "other", sessionId(450)));
+  withHeaders(null);
+  check((await reportCount(doomed)) === 1, "the report on the post to be deleted was not stored.");
+  await db.query(`delete from public.board_posts where id = $1`, [doomed]);
+  check((await reportCount(doomed)) === 0, "a deleted post's reports outlived it.");
+}
+
 // ---- cloud saves
 
 /** The payload `flushCloudSave` sends: the save and the settled-window list, and nothing else. */
@@ -2275,12 +2654,14 @@ const UPDATE_PROBE = {
   app_error_logs: "event_id = event_id",
   free_text_analyses: "event_id = event_id",
   board_posts: "hidden = true",
+  board_reports: "reason = reason",
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
   scene_bust_stats: "windows = windows",
   scene_choice_stats: "picks = picks",
   weekly_rules: "rule_id = rule_id",
+  ...(HALL_OF_FAME ? { hall_of_fame: "score = score", hall_of_fame_boards: "checked_seasons = checked_seasons" } : {}),
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a
@@ -2313,11 +2694,15 @@ await refused("read the choice snapshot directly", "anon", `select * from public
 await allowed("read the scene choice rates", "anon", `select public.scene_choice_rates()`);
 await refused("rebuild the choice snapshot", "anon", `select public.refresh_scene_choice_stats()`);
 
-// The scene wall rate leaves out a NEW GAME+ season's first four prologues,
-// played under every rule (20261102010000): told by the case row's summary
-// (`newGamePlus: true`) and its case. Rows put in place as stored rows, the
-// snapshot rebuilt, read, and the rows taken out and the snapshot rebuilt again.
+// The scene wall rate leaves out a NEW GAME+ season's cases played under
+// every rule where an ordinary season is still on the ladder: prologue 01 to
+// 04 (20261102010000), and prologue 01 to case 02 once C-4's file is a `.sql`
+// (*_scene_bust_ladder_c4, a draft until RULES_MARK 4's reset). Told by the
+// case row's summary (`newGamePlus: true`) and its case. Rows put in place as
+// stored rows, the snapshot rebuilt, read, and the rows taken out and the
+// snapshot rebuilt again.
 {
+  const LADDER_C4 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_c4.sql"));
   const SCENE_SEED = "grants-check-scene";
   const NG_SCENE = "ngplus_scene";
   await db.exec(`set session_replication_role = replica`);
@@ -2328,6 +2713,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
       [3, "prologue04", { newGamePlus: true }],
       [4, "prologue05", { newGamePlus: true }],
       [5, "case01", { newGamePlus: true }],
+      [6, "case03", { newGamePlus: true }],
     ]) {
       await db.query(
         `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
@@ -2340,9 +2726,10 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
   }
   await db.query(`select public.refresh_scene_bust_stats()`);
   const counted = (await db.query(`select case_id, windows from public.scene_bust_stats where node_id = $1 order by case_id`, [NG_SCENE])).rows.map(({ case_id, windows }) => `${case_id}:${windows}`);
+  const expected = LADDER_C4 ? ["case03:1", "prologue01:1"] : ["case01:1", "case03:1", "prologue01:1", "prologue05:1"];
   check(
-    JSON.stringify(counted) === JSON.stringify(["case01:1", "prologue01:1", "prologue05:1"]),
-    `the scene snapshot counted ${JSON.stringify(counted)}; a NEW GAME+ season's prologue 01 to 04 are left out, its prologue 05 and later and an ordinary season's prologue 01 are not.`,
+    JSON.stringify(counted) === JSON.stringify(expected),
+    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
   );
   await db.query(`delete from public.playtest_sessions where session_code = 'SCENESEED'`);
   await db.query(`select public.refresh_scene_bust_stats()`);

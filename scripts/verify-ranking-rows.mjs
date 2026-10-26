@@ -20,9 +20,13 @@
  *   SUPABASE_ACCESS_TOKEN Migration Drift uses: the way the test week reads
  *   the live data), split so that no answer holds more than one run (a run is
  *   up to 55 case rows with their logs; 서버검증-설계안.md, S6):
- *   node scripts/verify-ranking-rows.mjs --runs-sql [--limit=20]
+ *   node scripts/verify-ranking-rows.mjs --runs-sql [--limit=20] [--per-board=10]
  *       prints the one read-only SELECT that lists the top `limit` ranked
- *       runs (run_id only). Its JSON output is runs.json.
+ *       runs (run_id only) and, beside them, each open hall of fame board's
+ *       first `per-board` seasons that could stand in it (src/hallOfFame.js:
+ *       complete, no mark but the checker's own; a week's board until it is
+ *       settled). Its JSON output is runs.json. --per-board=0 lists the top
+ *       `limit` alone.
  *   node scripts/verify-ranking-rows.mjs --run-count runs.json
  *       prints how many runs runs.json lists.
  *   node scripts/verify-ranking-rows.mjs --run-sql runs.json --at=N
@@ -33,12 +37,30 @@
  *       the same read by REST, GET only, with SUPABASE_URL and
  *       SUPABASE_SERVICE_ROLE_KEY from the environment. The case rows are not
  *       public (anon reads only public_rankings, which has no decision log), so
- *       this needs the service key, which is not on this machine.
+ *       this needs the service key, which is not on this machine. It reads
+ *       the top `limit` alone, not each board's candidates.
  *
  *   node scripts/verify-ranking-rows.mjs rows.json --marks-sql
  *       prints the one statement that writes each checked run's marks
  *       (ranking_set_recheck_marks), for the CI job to run the same way;
  *       nothing when no run was checked. It names run ids: never printed in CI.
+ *
+ * The hall of fame (D2, src/hallOfFame.js), from the same check:
+ *   node scripts/verify-ranking-rows.mjs --hall-of-fame-counts-sql
+ *       prints the one read-only SELECT of each board's count of seasons with
+ *       no mark, over the whole board (hall_of_fame_counts), for the CI job to
+ *       run after the marks. Its JSON output is counts.json.
+ *   node scripts/verify-ranking-rows.mjs rows.json --hall-of-fame --counts=counts.json
+ *       prints the day's boards and why each run left out was left out, by
+ *       run tag only (for the Job Summary). Without --counts every board
+ *       counts 0 and keeps no place.
+ *   node scripts/verify-ranking-rows.mjs rows.json --hall-of-fame-sql --counts=counts.json
+ *       prints the one statement that writes them (hall_of_fame_settle), for
+ *       the CI job to run right after the marks. Run tags only.
+ *   node scripts/verify-ranking-rows.mjs --hall-of-fame-read-sql
+ *       prints the one read-only SELECT of public_hall_of_fame.
+ *   node scripts/verify-ranking-rows.mjs --hall-of-fame-md view.json
+ *       prints the page for the `hall-of-fame` branch from that SELECT's answer.
  *
  * --redact names each run by its public tag (`run_tag`, what the ranking
  * shows) instead of its run id, for a log anyone can read (the CI job).
@@ -51,23 +73,65 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { RULES_MARK } from "../src/gauntlet/gauntletEngine.js";
+import {
+  CHECKER_MARK_LIST,
+  formatHallOfFameMarkdown,
+  HALL_OF_FAME_CANDIDATES,
+  HALL_OF_FAME_COUNTS_SQL,
+  HALL_OF_FAME_READ_SQL,
+  hallOfFameBoardLabel,
+  hallOfFameSql,
+  pickHallOfFame,
+  readHallOfFame,
+  readHallOfFameCounts,
+} from "../src/hallOfFame.js";
 import { recheckRun } from "../src/rankingRecheck.js";
 
-const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
+// `suspicion` is the insert trigger's marks on the ranking row: the hall of
+// fame (src/hallOfFame.js) takes a season the trigger did not mark either.
+const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at,suspicion";
 const JSON_COLUMNS = ["summary", "decision_log", "resources", "dynamics"];
 
 const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
 
 /**
  * The CI read's first half, for `supabase db query`: one SELECT and nothing
- * else -- the top `limit` ranked runs, by the ranking's own score.
+ * else -- the top `limit` ranked runs, by the ranking's own score, and with
+ * `perBoard` each hall of fame board's first `perBoard` candidates
+ * (src/hallOfFame.js): the board is the season's week, or the table's when it
+ * has none; a candidate is a complete season with no mark but the checker's
+ * own (today's check states those again), on a board not yet settled
+ * (hall_of_fame_boards). The count the threshold needs is read apart, over
+ * the whole board (HALL_OF_FAME_COUNTS_SQL), so only what may take a place is
+ * replayed.
  */
-export function rankingRunsSql({ limit = 20 } = {}) {
+export function rankingRunsSql({ limit = 20, perBoard = 0 } = {}) {
   const top = Math.min(500, Math.max(1, Math.trunc(Number(limit)) || 20));
+  const each = Math.min(100, Math.max(0, Math.trunc(Number(perBoard)) || 0));
+  if (!each) {
+    return [
+      "select run_id from public.playtest_sessions",
+      " where case_id = 'season-final' and score is not null and run_id is not null",
+      ` order by score desc limit ${top};`,
+    ].join("\n");
+  }
+  const checkerMarks = `array[${CHECKER_MARK_LIST.map(quote).join(", ")}]::text[]`;
   return [
-    "select run_id from public.playtest_sessions",
-    " where case_id = 'season-final' and score is not null and run_id is not null",
-    ` order by score desc limit ${top};`,
+    "select run_id from (",
+    "  select s.run_id, s.score,",
+    "         row_number() over (order by s.score desc) as overall,",
+    "         row_number() over (partition by k.board, c.candidate order by s.score desc, s.completed_at) as on_board,",
+    "         c.candidate",
+    "    from public.playtest_sessions s",
+    "   cross join lateral (select case when s.summary->>'week' ~ '^[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' then s.summary->>'week' else 'table' end as board) k",
+    "   cross join lateral (select coalesce(s.summary->>'seasonComplete' = 'true'",
+    `                              and s.suspicion <@ ${checkerMarks}`,
+    "                              and not exists (select 1 from public.hall_of_fame_boards h where h.board = k.board and h.settled_at is not null), false) as candidate) c",
+    "   where s.case_id = 'season-final' and s.score is not null and s.run_id is not null",
+    ") ranked",
+    ` where overall <= ${top} or (candidate and on_board <= ${each})`,
+    " order by score desc;",
   ].join("\n");
 }
 
@@ -214,6 +278,17 @@ export function formatChain(chain) {
   return lines;
 }
 
+/** The day's boards as lines for the Job Summary: run tags only. */
+export function formatHallOfFamePick({ boards, left }) {
+  const lines = [];
+  for (const board of boards) {
+    const places = board.places.map((place, index) => `${index + 1}. RUN ${place.run_tag} ${place.score}${place.tags.length ? ` (${place.tags.join(", ")})` : ""}`);
+    lines.push(`${hallOfFameBoardLabel(board.board)}: ${board.checked} checked seasons; ${places.length ? places.join("  ") : "표본 부족"}`);
+  }
+  for (const { runTag, refusal } of left) lines.push(`  left out ${runTag ? `RUN ${runTag}` : "a run"}: ${refusal}`);
+  return lines;
+}
+
 /**
  * The write that states each run's marks (ranking_set_recheck_marks,
  * 20261023000000): one statement, every run read with the marks it earned,
@@ -240,13 +315,36 @@ export function marksSql(results) {
 async function main(argv) {
   const json = argv.includes("--json");
   const limit = Number(argv.find((arg) => arg.startsWith("--limit="))?.slice(8)) || 20;
+  const perBoardArg = argv.find((arg) => arg.startsWith("--per-board="))?.slice(12);
+  const perBoard = perBoardArg === undefined ? HALL_OF_FAME_CANDIDATES : Number(perBoardArg);
+  const countsFile = argv.find((arg) => arg.startsWith("--counts="))?.slice(9);
   const files = argv.filter((arg) => !arg.startsWith("--"));
   if (argv.includes("--runs-sql")) {
-    console.log(rankingRunsSql({ limit }));
+    console.log(rankingRunsSql({ limit, perBoard }));
+    return 0;
+  }
+  if (argv.includes("--hall-of-fame-counts-sql")) {
+    console.log(HALL_OF_FAME_COUNTS_SQL);
+    return 0;
+  }
+  if (argv.includes("--hall-of-fame-read-sql")) {
+    console.log(HALL_OF_FAME_READ_SQL);
+    return 0;
+  }
+  if (argv.includes("--hall-of-fame-md")) {
+    try {
+      if (files.length !== 1) throw new Error("Name the one file public_hall_of_fame was read into.");
+      process.stdout.write(formatHallOfFameMarkdown(readHallOfFame(readRows(readFileSync(files[0], "utf8")))));
+    } catch (error) {
+      console.error(error.message);
+      return 1;
+    }
     return 0;
   }
   let rows;
+  let counts = new Map();
   try {
+    if (countsFile) counts = readHallOfFameCounts(readRows(readFileSync(countsFile, "utf8")));
     if (argv.includes("--run-count") || argv.includes("--run-sql")) {
       if (files.length !== 1) throw new Error("Name the one runs.json the run list was read into.");
       const runIds = readRunIds(readFileSync(files[0], "utf8"));
@@ -273,6 +371,11 @@ async function main(argv) {
   if (argv.includes("--marks-sql")) {
     const sql = marksSql(results);
     if (sql) console.log(sql);
+    return 0;
+  }
+  if (argv.includes("--hall-of-fame-sql") || argv.includes("--hall-of-fame")) {
+    const picked = pickHallOfFame({ results, rows, rulesMark: RULES_MARK, counts });
+    console.log(argv.includes("--hall-of-fame-sql") ? hallOfFameSql(picked.boards) : formatHallOfFamePick(picked).join("\n"));
     return 0;
   }
   console.log(json ? JSON.stringify(results, null, 2) : formatReport(results, { redact: argv.includes("--redact") }).join("\n"));

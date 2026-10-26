@@ -7,6 +7,7 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
+import { renderLegalPages } from "./scripts/legal-pages.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -361,6 +362,31 @@ function serviceWorker() {
   };
 }
 
+/**
+ * The privacy policy and the terms of use (scripts/legal-pages.mjs): four
+ * plain pages written beside `index.html`, so the host serves each at its own
+ * name and a store listing can link to it. The dev server answers the same
+ * addresses from the same source. Before `serviceWorker()` in the list, which
+ * reads every file on disk into the release's name.
+ */
+function legalPages() {
+  return {
+    name: "legal-pages",
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const pathname = new URL(request.url ?? "/", "http://dev.invalid").pathname;
+        const page = renderLegalPages()[pathname.slice(1)];
+        if (!page) return next();
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
+        response.end(page);
+      });
+    },
+    generateBundle() {
+      for (const [fileName, source] of Object.entries(renderLegalPages())) this.emitFile({ type: "asset", fileName, source });
+    },
+  };
+}
+
 /** What the page is told about registering (src/serviceWorker/register.js). */
 function serviceWorkerSetting(command, mode) {
   if (command !== "build" || serviceWorkerKilled()) return "off";
@@ -536,7 +562,7 @@ function ownChunkGroups() {
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
+  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), legalPages(), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which

@@ -17,11 +17,17 @@ import { readStoredValue, writeStoredValue } from "../appConfig.js";
 // v10 is the same season at RULES_MARK 3: B3's audit and B2's links are rules of the table from
 // 프롤로그 04 (played first as 2026-W47's test week), and a vault the audit took a part of, or a
 // board CASCADE pulled the wall of, does not compare with one from the table before.
+// v11 is the same season at RULES_MARK 4, and the first key the 11-30 deploy writes (v10 never
+// reached production: #224, C-1 and C-3/C-4 ship together, one reset). The logic streak is held on
+// the card's direction (사람 or 자리, C-3) and OVERCLOCK, the audit and the links open in 사건 01
+// to 03 (C-4), so the same play pays a different streak and the first three cases play under fewer
+// rules; and the 판 읽기 axis is in the score (C-1(1)): each case's burst score gives 0.2 to the
+// vault its bare hand kept against a hand that sees the wall.
 // A retired key is read once, when the ranking screen first opens, for one thing only: the
 // player's best row of that table, kept under the personal-bests key (src/personalBests.js,
 // a chunk of its own, so the entry chunk does not carry it). Then it is removed. When this key
 // moves on, the old one joins RETIRED_LOCAL_RANKING_STORAGE_KEYS there.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v10";
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v11";
 
 export function parseLocalRankingRows(rawValue) {
   try {

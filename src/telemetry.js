@@ -271,6 +271,16 @@ export async function saveBoardPost(payload, eventId = null) {
   return postOnce("board_posts", buildTelemetryPayload(payload, eventId), "Board post failed");
 }
 
+/**
+ * A report on one board post (src/boardReport.js builds the row). Like a post,
+ * the reporter waits for the answer and the server's refusal is printed, so it
+ * skips the delivery counters. A replay is a 409 on `event_id`, delivered.
+ */
+export async function saveBoardReport(payload, eventId = null) {
+  if (!telemetryEnabled) return { skipped: true };
+  return postOnce("board_reports", buildTelemetryPayload(payload, eventId), "Board report failed");
+}
+
 export async function fetchBoardPosts(limit = 50) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 
@@ -314,5 +324,20 @@ export async function fetchLeaderboard(limit = 100, week = null) {
 
   if (!response.ok) throw await createTelemetryError(response, "Leaderboard fetch failed");
 
+  return { rows: await response.json() };
+}
+
+/**
+ * The hall of fame's places (D2, `public_hall_of_fame`): board, place, run tag
+ * and whether the board is settled, for the ranking screen's badges
+ * (src/hallOfFameBadges.js). A few hundred bytes at most.
+ */
+export async function fetchHallOfFame() {
+  if (!telemetryEnabled) return { skipped: true, rows: [] };
+  const query = new URLSearchParams({ select: "board,place,run_tag,settled_on", place: "not.is.null" });
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/public_hall_of_fame?${query.toString()}`, {
+    headers: restHeaders(),
+  });
+  if (!response.ok) throw await createTelemetryError(response, "Hall of fame fetch failed");
   return { rows: await response.json() };
 }
