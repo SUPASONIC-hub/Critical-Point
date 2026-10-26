@@ -64,6 +64,16 @@ export default {
     label: "Choose the analyst’s memory",
     note: "What you remember longest changes your starting numbers in Prologue 01 a little.",
     current: "Current pick: {title} · Prologue 01 starts with {start}",
+    profiles: {
+      courier: { title: "The analyst who saw the site", premise: "You remember longest not the numbers on the page but the people working behind them." },
+      lab: { title: "The analyst who wrote the dissent", premise: "You remember longest the time you alone wrote no beside a number everyone said was right." },
+      public: { title: "The analyst who kept the record", premise: "You remember longest that a judgment no one writes down is left nowhere." },
+    },
+    prologues: {
+      courier: { title: "The factory of 11", text: "What you remember longest is Onsae Packaging, the last assignment of your probation. Behind one sheet of paper hung the November of 11 employees." },
+      lab: { title: "The night of the dissent", text: "What you remember longest is the dissent you wrote alone. It began, in the last assignment of your probation, with one line of 40 million won left out of the total." },
+      public: { title: "The empty signature field", text: "What you remember longest is a trainee evaluation with only the speed box filled in and the signature field left empty. From that day on, you write your judgments down." },
+    },
   },
   comfortTitle: "Comfort settings",
   season: {
@@ -87,6 +97,15 @@ export default {
     more: "Details are in the ",
     and: " and the ",
     end: ".",
+    playtestNotice:
+      "Case results, choices and response times, the feedback you send and error reports are stored for research with a random ID created on this device, and deleted after 180 days. Your name is never stored remotely, and your IP address is used only to rate-limit requests.",
+    deletion: {
+      cloud: " Online save can be deleted yourself in the “Continue on another device” panel.",
+      before: "To delete your records, email ",
+      beforeUnset: "The contact for deletion requests will be added here before launch (not decided yet). ",
+      after: " with your 8-character session code, and we will find and delete them.",
+      afterUnset: "A request needs your 8-character session code, so keep it with “Copy code” on the result screen.",
+    },
   },
   consent: {
     revokeNotSaved: "Couldn’t save your withdrawal of consent in the browser. Check storage permissions and try again.",

@@ -1,5 +1,6 @@
 import { localizeTables } from "../locale.js";
 import { DELETION_REQUEST_COPY } from "../appConfig.js";
+import { OPERATOR_PROFILES, ORIGIN_PROLOGUES } from "../advancedSystems.js";
 import { PLAYTEST_DATA_NOTICE } from "../privacyText.js";
 
 /**
@@ -77,6 +78,9 @@ const introCopy = {
     label: "분석관의 기억 선택",
     note: "무엇을 가장 오래 기억하는지에 따라 프롤로그 01의 시작 수치가 조금 달라집니다.",
     current: "현재 선택: {title} · 프롤로그 01 시작 {start}",
+    // The three memories and their prologues, kept in advancedSystems.js and named here.
+    profiles: OPERATOR_PROFILES,
+    prologues: ORIGIN_PROLOGUES,
   },
   comfortTitle: "편의 설정",
   season: {

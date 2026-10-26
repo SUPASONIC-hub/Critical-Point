@@ -23,6 +23,7 @@ export default {
     season: "[{ending}] Season verdict",
     case: "[Case closed] {tag}",
   },
+  riskHeld: "No change",
   rationaleClues: "Clues {count}",
   standing: {
     clear: "Below the collapse line",
