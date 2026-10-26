@@ -72,7 +72,8 @@ const budgets = [
   // only) on main 024904a3: the shortened case files change the hashed names
   // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_723, maxGzip: 54_704 },
+  // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_761, maxGzip: 54_732 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -252,7 +253,8 @@ const budgets = [
   // five lines in appCopy.js. The hint itself is InstallHint below. Measured
   // 175,169 / 63,524 in the e2e build, the gzip plus 4.
   // 175,169 / 63,528 -> 180,627 / 65,391 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 180_627, maxGzip: 65_391 },
+  // -> 180,652 raw on 2026-10-26, funnel-locale: 「화면 언어」 in the consent sentence (PLAYTEST_DATA_NOTICE) and the chunk names. Measured 180,652 / 65,373; the gzip budget holds.
+  { pattern: /^index-.*\.js$/, maxBytes: 180_652, maxGzip: 65_391 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -599,7 +601,8 @@ const budgets = [
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
   // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, board-report on main caeecda: only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
   // 11,492 -> 11,494 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 11,494 / 4,638.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_494, maxGzip: 4_644 },
+  // 11,494 -> 11,497 raw on 2026-10-26, funnel-locale: only by the chunk names it imports. Measured 11,497 / 4,636.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_497, maxGzip: 4_644 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -1108,7 +1111,9 @@ function checkBudget(file, budget) {
 // -> 9,897 / 3,567 on 2026-10-26, pwa-install-hint: one more file in the warm
 // list, InstallHint; the worker's code did not change. Measured 9,897 / 3,563
 // plus 4.
-const WORKER_BUDGET = { maxBytes: 9_897, maxGzip: 3_567 };
+// -> 9,897 / 3,573 on 2026-10-26, funnel-locale: the chunk names' hashes only;
+// the worker's code did not change. Measured 9,897 / 3,569 plus 4.
+const WORKER_BUDGET = { maxBytes: 9_897, maxGzip: 3_573 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

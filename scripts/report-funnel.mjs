@@ -19,7 +19,15 @@
  *   - how many finished seasons were followed by a new run on the same device;
  *   - the funnel of runs a row marks as NEW GAME+ (`summary.newGamePlus`, the
  *     mark NEWGAMEPLUS-이어받기-설계안 3절 5 plans), or 「아직 없음」 while no
- *     row carries it.
+ *     row carries it;
+ *   - by language (앱출시-F F-6): the page's language each case row carries
+ *     (`summary.locale`, src/locale.js, from 2026-10-26), English devices and
+ *     runs over the last 14 days, and the English runs' funnel through the end
+ *     of the preview (사건 10) and on into 사건 11 in Korean (「Continue in
+ *     Korean」). A run's language is that of its first row naming one; a run
+ *     none of whose rows names one is 「ko(추정)」: rows before the field were
+ *     sent by Korean-only builds, save for the English pages of 10-26 before
+ *     the field reached production, which the summary counts apart.
  *
  * Aggregates only: no run id, session, nickname or row leaves this script. The
  * query itself sends neither id out of the database, only a device's rank, and
@@ -43,6 +51,14 @@ if (SINCE && !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(SINCE)) throw
 const BREAK_SECONDS = 60 * 60;
 /** A run whose last row is older than this, and that has not finished, has stopped. */
 const STALE_SECONDS = 7 * 24 * 60 * 60;
+/** The languages a row may name (src/locale.js SUPPORTED_LOCALES); anything else is read as none. */
+export const LOCALES = ["ko", "en"];
+/** A run with no row naming its language: Korean, presumed (see the top of this file). */
+export const PRESUMED_LOCALE = "ko(추정)";
+/** The day the English preview opened (#338): a run with no language that began on or after it may have been English. */
+export const ENGLISH_OPENED = "2026-10-26";
+/** The English preview's funnel: the prologue, three of its cases and its end, then 사건 11 in Korean. */
+export const EN_MILESTONES = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case08", "case10", "case11"];
 /** The cases the funnel names. */
 export const MILESTONES = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case08", "case18", "case36", "final"];
 /** Where a run stopped, by the last case it sent: each prologue, then stretches of the season. */
@@ -65,7 +81,8 @@ const indexOf = (caseId) => CASE_SEQUENCE.indexOf(caseId);
 /**
  * One read-only statement: a row per run, with its device's rank among the
  * runs read, whether any of its rows names NEW GAME+ (and as what), and its
- * case ids and arrival times in order. Neither the run id nor the session id
+ * case ids, arrival times and languages (`summary.locale`, null on a row from
+ * before it) in order. Neither the run id nor the session id
  * is selected out; a device is the smallest session id among a run's rows.
  */
 export function funnelQuery(since = SINCE) {
@@ -76,7 +93,7 @@ export function funnelQuery(since = SINCE) {
          min(s.completed_at) as began,
          coalesce(bool_or(s.summary->'newGamePlus' is not null), false) as marked,
          coalesce(bool_or(s.summary->>'newGamePlus' = 'true'), false) as new_game_plus,
-         jsonb_agg(jsonb_build_array(s.case_id, extract(epoch from s.completed_at)) order by s.completed_at, s.id) as cases
+         jsonb_agg(jsonb_build_array(s.case_id, extract(epoch from s.completed_at), s.summary->>'locale') order by s.completed_at, s.id) as cases
     from public.playtest_sessions s
    where s.run_id is not null
    group by s.run_id${window}
@@ -98,12 +115,12 @@ export function quantile(values, q) {
 // The CLI's JSON may give a boolean column as a boolean or as Postgres's text.
 const yes = (value) => value === true || value === "true" || value === "t";
 
-/** One run, from a query row: its cases in order, the last it reached and when it finished. */
+/** One run, from a query row: its cases in order, the last it reached, when it finished and its language (null for none named). */
 export function readRun(row) {
   const listed = typeof row.cases === "string" ? JSON.parse(row.cases) : row.cases;
   const cases = (Array.isArray(listed) ? listed : [])
     .filter((entry) => Array.isArray(entry) && typeof entry[0] === "string" && Number.isFinite(Number(entry[1])))
-    .map(([caseId, at]) => ({ caseId, at: Number(at) }))
+    .map(([caseId, at, locale]) => ({ caseId, at: Number(at), locale: LOCALES.includes(locale) ? locale : null }))
     .sort((a, b) => a.at - b.at);
   const plays = cases.filter((entry) => indexOf(entry.caseId) >= 0);
   const finalRow = cases.find((entry) => entry.caseId === "season-final");
@@ -111,6 +128,7 @@ export function readRun(row) {
   const gaps = plays.slice(1).map((entry, index) => entry.at - plays[index].at);
   return {
     device: row.device,
+    locale: cases.find((entry) => entry.locale)?.locale ?? null,
     marked: yes(row.marked),
     newGamePlus: yes(row.new_game_plus),
     reached,
@@ -122,11 +140,11 @@ export function readRun(row) {
   };
 }
 
-const funnelOf = (runs) => {
+const funnelOf = (runs, milestones = MILESTONES) => {
   const counted = runs.filter((run) => run.reached >= 0);
   return {
     runs: counted.length,
-    reach: MILESTONES.map((caseId) => counted.filter((run) => run.reached >= indexOf(caseId)).length),
+    reach: milestones.map((caseId) => counted.filter((run) => run.reached >= indexOf(caseId)).length),
     stops: STOPS.map(([, from, to]) => {
       const inStretch = counted.filter((run) => run.reached >= indexOf(from) && run.reached <= indexOf(to));
       return { all: inStretch.length, stale: inStretch.filter((run) => run.stale).length };
@@ -150,6 +168,8 @@ export function readFunnel(rows, now = Date.now() / 1000) {
   const restarted = finished.filter((run) =>
     byDevice.get(run.device).some((other) => other !== run && other.firstAt !== null && other.firstAt > run.finishedAt)).length;
   const marked = runs.filter((run) => run.marked);
+  const opened = Date.parse(`${ENGLISH_OPENED}T00:00:00+09:00`) / 1000;
+  const unnamed = runs.filter((run) => run.locale === null);
   return {
     ...funnelOf(runs),
     devices: byDevice.size,
@@ -166,6 +186,10 @@ export function readFunnel(rows, now = Date.now() / 1000) {
     restarted,
     markedRuns: marked.length,
     newGamePlus: funnelOf(marked.filter((run) => run.newGamePlus)),
+    locales: Object.fromEntries(LOCALES.map((code) => [code, runs.filter((run) => run.locale === code).length])),
+    unnamed: unnamed.length,
+    unnamedSinceEnglish: unnamed.filter((run) => (run.firstAt ?? run.finishedAt) >= opened).length,
+    english: funnelOf(runs.filter((run) => run.locale === "en"), EN_MILESTONES),
   };
 }
 
@@ -191,6 +215,20 @@ export function kstWeek(seconds) {
  */
 export function readTraffic(rows, now = Date.now() / 1000) {
   const runs = rows.map(readRun).filter((run) => run.firstAt !== null || run.finishedAt !== null);
+  const dayKeys = Array.from({ length: TRAFFIC_DAYS }, (_, index) => kstDay(now - index * 86400));
+  const weekKeys = Array.from({ length: TRAFFIC_WEEKS }, (_, index) => kstWeek(now - index * 7 * 86400));
+  const all = trafficOf(runs);
+  // The English runs alone (앱출시-F F-6): a device is new the day its first English run began.
+  const english = trafficOf(runs.filter((run) => run.locale === "en"));
+  return {
+    days: all.table(kstDay, dayKeys),
+    weeks: all.table(kstWeek, weekKeys),
+    devices: all.devices,
+    english: { days: english.table(kstDay, dayKeys), devices: english.devices },
+  };
+}
+
+function trafficOf(runs) {
   const firstSeen = new Map();
   for (const run of runs) {
     const at = run.firstAt ?? run.finishedAt;
@@ -214,9 +252,7 @@ export function readTraffic(rows, now = Date.now() / 1000) {
     }
     return keys.map((key) => ({ key, ...by.get(key), active: by.get(key).active.size }));
   };
-  const dayKeys = Array.from({ length: TRAFFIC_DAYS }, (_, index) => kstDay(now - index * 86400));
-  const weekKeys = Array.from({ length: TRAFFIC_WEEKS }, (_, index) => kstWeek(now - index * 7 * 86400));
-  return { days: table(kstDay, dayKeys), weeks: table(kstWeek, weekKeys), devices: firstSeen.size };
+  return { table, devices: firstSeen.size };
 }
 
 /** The traffic tables for the Job Summary. */
@@ -237,6 +273,13 @@ export function describeTraffic(t) {
     "",
     ...head("주(월요일)"),
     ...t.weeks.map(row),
+    "",
+    `### 최근 ${TRAFFIC_DAYS}일, 영어 런만`,
+    "",
+    `사건 행에 실린 화면 언어(\`summary.locale\`)가 en인 런만 셉니다. 새 기기는 그 기기의 첫 영어 런이 시작된 날. 지금까지 영어 런을 연 기기 ${t.english.devices}대.`,
+    "",
+    ...head("날짜"),
+    ...t.english.days.map(row),
   ].join("\n");
 }
 
@@ -252,6 +295,7 @@ export function duration(seconds) {
 
 const days = (value) => (value === null ? "—" : `${value.toFixed(1)}일`);
 const label = (caseId) => (caseId === "final" ? "피날레" : caseId.replace(/^prologue/, "프롤로그 ").replace(/^case/, "사건 "));
+const enLabel = (caseId) => (caseId === "case11" ? "사건 11(「Continue in Korean」, 한국어로 이어 함)" : caseId === "case10" ? "사건 10(시범 끝)" : label(caseId));
 
 export function describeFunnel(f, { since = SINCE, at = new Date() } = {}) {
   const lines = [
@@ -290,9 +334,8 @@ export function describeFunnel(f, { since = SINCE, at = new Date() } = {}) {
     `| 완주에 걸린 날(첫 사건 행 → season-final): 중앙값 / P90 | ${days(f.seasonDaysMedian)} / ${days(f.seasonDaysP90)} |`,
     `| 끝낸 뒤 같은 기기에서 새 런을 연 비율 | ${pct(f.restarted, f.finished)} (${f.restarted}/${f.finished}) |`,
     "",
-    "### NEW GAME+",
-    "",
   ];
+  lines.push(...describeEnglish(f), "", "### NEW GAME+", "");
   if (f.markedRuns === 0) {
     lines.push("아직 없음: 사건 행 `summary`에 `newGamePlus` 표시가 실린 행이 없습니다(NEW GAME+ 이어받기 설계안 3절 5의 표시가 들어가면 여기 퍼널이 나옵니다).");
   } else {
@@ -306,6 +349,36 @@ export function describeFunnel(f, { since = SINCE, at = new Date() } = {}) {
     );
   }
   return lines.join("\n");
+}
+
+/** The runs by language and the English preview's funnel. */
+function describeEnglish(f) {
+  const e = f.english;
+  const lines = [
+    "### 언어별",
+    "",
+    "| 언어 | 런 |",
+    "|---|---|",
+    ...LOCALES.map((code) => `| ${code} | ${f.locales[code]} |`),
+    `| ${PRESUMED_LOCALE} | ${f.unnamed} |`,
+    "",
+    `${PRESUMED_LOCALE}: 어느 행에도 화면 언어(\`summary.locale\`)가 없는 런. 언어 칸이 생기기 전의 행은 영어 화면이 없던 빌드(${ENGLISH_OPENED} 전)가 보냈으므로 한국어로 봅니다. 다만 ${ENGLISH_OPENED}(KST) 이후 시작한 그런 런 ${f.unnamedSinceEnglish}개는 영어 시범이 열린 뒤 언어 칸이 운영에 닿기 전의 빌드에서 왔을 수 있어, 영어 쪽 숫자가 그만큼 적게 나올 수 있습니다.`,
+    "",
+    "### 영어 런 퍼널 (시범: 프롤로그 01 ~ 사건 10)",
+    "",
+  ];
+  if (e.runs === 0) {
+    lines.push("아직 없음: 화면 언어가 en인 사건 행이 없습니다.");
+    return lines;
+  }
+  lines.push(
+    `영어 런 ${e.runs}개. 사건 11에 닿은 런은 시범 끝 화면에서 「Continue in Korean」을 눌러 한국어로 이어 간 런입니다(사건 10에 닿은 런 중 ${pct(e.reach.at(-1), e.reach.at(-2))}).`,
+    "",
+    "| 사건 | 도달한 런 | 비율 |",
+    "|---|---|---|",
+    ...EN_MILESTONES.map((caseId, index) => `| ${enLabel(caseId)} | ${e.reach[index]} | ${pct(e.reach[index], e.runs)} |`),
+  );
+  return lines;
 }
 
 const [arg] = import.meta.url === pathToFileURL(process.argv[1] ?? "").href ? process.argv.slice(2) : [];
