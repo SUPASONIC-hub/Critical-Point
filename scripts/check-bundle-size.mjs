@@ -258,7 +258,8 @@ const budgets = [
   // 175,169 / 63,528 -> 180,627 / 65,391 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 180,652 raw on 2026-10-26, funnel-locale: 「화면 언어」 in the consent sentence (PLAYTEST_DATA_NOTICE) and the chunk names. Measured 180,652 / 65,373; the gzip budget holds.
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 181_779, maxGzip: 65_912 },
+  // 180,652 / 65,391 -> 180,744 / 65,403 on 2026-10-26, 일본어 1단계 (ja-step1): the hidden Japanese entry in SUPPORTED_LOCALES and the language choice showing a hidden language on its own pages only. Every other Korean chunk and the CSS are byte for byte main's (57931801). Measured 180,744 / 65,399 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 181_871, maxGzip: 65_924 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -975,13 +976,20 @@ const budgets = [
   // src/locales/<lang>/screens); the overlay is the code they share. Measured in
   // the e2e build (English: 사건 01 the largest case), the gzip plus 4.
   // 73,483 / 21,390 -> 73,724 / 21,469 on 2026-10-26, 오진우가 경쟁자가 되는 경위 (ojinwoo-bridge): 사건 01's lead and memo say why he sits across the table, in English too. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_724, maxGzip: 21_469 },
+  { pattern: /^locale-en-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_724, maxGzip: 21_469 },
+  // Japanese (일본어 1단계, 2026-10-26; hidden, ?lang=ja only): kana and kanji are three bytes each in UTF-8, so a case
+  // is larger raw than its English though shorter to read. 사건 01 the largest, 82,376 / 23,101; the dictionary
+  // (screen copy, 1,537 lines, and the page's system-font style) 109,813 / 38,565. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 82_376, maxGzip: 23_105 },
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 109_813, maxGzip: 38_569 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-[a-z]{2,3}-index-.*\.js$/, maxBytes: 124_761, maxGzip: 45_295 },
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 6_589, maxGzip: 2_026 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 124_761, maxGzip: 45_295 },
+  // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
+  // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_013, maxGzip: 2_344 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 

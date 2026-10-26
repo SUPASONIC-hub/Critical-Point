@@ -3,9 +3,9 @@ import { existsSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 
 import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.mjs";
-import { caseSource, compareWords, flatten, hasHangul, readCopySource, wordsOf } from "../../scripts/locale-words.mjs";
+import { caseSource, compareWords, flatten, hasHangul, readCopySource, stillKorean, wordsOf } from "../../scripts/locale-words.mjs";
 import { LANG, loadLocale, localizeCaseData, SOURCE_LOCALE, speakerName, SUPPORTED_LOCALES } from "../../src/locale.js";
-import { fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
+import { addStyle, fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
 import * as gameCases from "../../src/gameCases.js";
 import * as caseCopy from "../../src/caseCopy.js";
 
@@ -33,7 +33,8 @@ const marks = (text) => [...text].filter((character, at) => character === "'" &&
 test("a page without ?lang= is Korean, and the language module hands everything back as it was", () => {
   assert.equal(LANG, "ko");
   assert.equal(codes[0], SOURCE_LOCALE);
-  for (const locale of SUPPORTED_LOCALES) assert.ok(locale.name, `${locale.code} is named in its own language`);
+  // A hidden language (a draft opened by its address) is named by its dictionary, below.
+  for (const locale of SUPPORTED_LOCALES) assert.ok(locale.name || locale.hidden, `${locale.code} is named in its own language`);
   assert.equal(loadLocale(), null);
   assert.equal(speakerName("한서윤"), "한서윤");
   const data = { nodes: { start: { text: "그대로" } } };
@@ -121,9 +122,9 @@ for (const lang of others) {
   test(`${lang}: every case file names a case and says nothing the Korean no longer has`, () => {
     for (const [caseId, words] of Object.entries(cases)) {
       assert.ok(shipped.cases[caseId], `${caseId} is not a case`);
-      const result = compareWords(caseSource(shipped, caseId), words);
+      const result = compareWords(caseSource(shipped, caseId), words, lang);
       assert.deepEqual(result.stale, [], `${caseId}: words for paths the Korean does not have`);
-      for (const [path, text] of Object.entries(flatten(words))) assert.ok(!hasHangul(text), `${caseId} ${path} is still Korean`);
+      for (const [path, text] of Object.entries(flatten(words))) assert.ok(!stillKorean(text), `${caseId} ${path} is still Korean`);
     }
   });
 
@@ -137,11 +138,30 @@ for (const lang of others) {
   });
 
   test(`${lang}: the dictionary's screen copy answers paths the Korean has, and names speakers by their Korean names`, async () => {
-    const result = compareWords(await readCopySource(new URL("../..", import.meta.url).href.replace(/\/$/, "")), dictionary.copy);
+    const result = compareWords(await readCopySource(new URL("../..", import.meta.url).href.replace(/\/$/, "")), dictionary.copy, lang);
     assert.deepEqual(result.stale, []);
     for (const name of Object.keys(dictionary.speakers ?? {})) assert.ok(hasHangul(name), `speakers key ${name}`);
+    if (SUPPORTED_LOCALES.find((locale) => locale.code === lang).hidden) assert.ok(dictionary.preview?.languageName, `${lang} is hidden, so its dictionary names it (preview.languageName)`);
   });
 }
+
+test("a dictionary's own CSS goes on its page as one style element, and nothing is added without a page or a style", async () => {
+  addStyle("p{}"); // no document in this process: nothing happens
+  const appended = [];
+  globalThis.document = { head: { append: (element) => appended.push(element) }, createElement: (tag) => ({ tag }) };
+  try {
+    addStyle("");
+    assert.equal(appended.length, 0);
+    const { style } = await import("../../src/locales/ja/index.js");
+    addStyle(style);
+    assert.equal(appended.length, 1);
+    assert.equal(appended[0].tag, "style");
+    assert.match(appended[0].textContent, /^:root:lang\(ja\)\{--font-sans:"Hiragino Sans"/, "the Japanese page's face, on a Japanese page only");
+    assert.match(appended[0].textContent, /word-break:normal;line-break:strict/);
+  } finally {
+    delete globalThis.document;
+  }
+});
 
 // Last: it writes over the shared tables of this process.
 test("a dictionary's screen copy is laid over the Korean tables in place, keys and ids kept", () => {
