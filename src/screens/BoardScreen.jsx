@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
-import { ArrowLeft, RotateCw, Send, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Flag, RotateCw, Send, ShieldAlert } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
+import { BOARD_REPORT_REASONS } from "../boardReport.js";
+import { useBoardReport } from "../state/useBoardReport.js";
 
 // What the list says in place of posts, by what the board is doing. "Nothing
 // here yet" is only true of a board that answered: it used to be printed
@@ -57,6 +59,7 @@ export function BoardScreen({
     headingRef.current?.focus({ preventScroll: true });
   }, []);
   const isBoardBusy = boardStatus === "loading" || boardStatus === "idle";
+  const report = useBoardReport();
 
   return (
       <main className="shell board-shell">
@@ -195,22 +198,84 @@ export function BoardScreen({
               <p className="board-empty" data-testid="board-list-state">{BOARD_LIST_COPY[boardStatus] ?? BOARD_LIST_COPY.local}</p>
             ) : (
               <div className="board-list">
-                {boardPosts.map((post) => (
-                  <article className="board-post" key={post.id}>
-                    <div className="board-post-head">
-                      <b>{post.nickname}</b>
-                      <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
-                    </div>
-                    <p>{post.body}</p>
-                  </article>
-                ))}
+                {boardPosts.map((post) => {
+                  const reported = report.reportedIds.has(post.id);
+                  const reportOpen = report.openPostId === post.id;
+                  const reportFormId = `board-report-${post.id}`;
+                  return (
+                    <article className="board-post" key={post.id}>
+                      <div className="board-post-head">
+                        <b>{post.nickname}</b>
+                        <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
+                      </div>
+                      <p>{post.body}</p>
+                      {/* Every post can be reported (store UGC rules: Apple 1.2,
+                          Google Play). The button names the post it is about, and
+                          once the report is in it stays reachable, saying so. */}
+                      <div className="board-post-actions">
+                        <GuardedButton
+                          type="button"
+                          className="ghost board-report-toggle"
+                          blocked={reported}
+                          aria-expanded={reported ? undefined : reportOpen}
+                          aria-controls={reportOpen ? reportFormId : undefined}
+                          aria-label={reported ? `${post.nickname}님의 글을 신고했습니다` : `${post.nickname}님의 글 신고`}
+                          data-testid="board-report-toggle"
+                          onClick={() => report.toggleReport(post.id)}
+                        >
+                          <Flag size={14} aria-hidden="true" />
+                          {reported ? "신고함" : "신고"}
+                        </GuardedButton>
+                      </div>
+                      {reportOpen && (
+                        <fieldset className="board-report" id={reportFormId} data-testid="board-report-form">
+                          <legend>이 글을 신고하는 이유</legend>
+                          <div className="board-report-reasons">
+                            {BOARD_REPORT_REASONS.map((reason) => (
+                              <label key={reason.id}>
+                                <input
+                                  type="radio"
+                                  name={`board-report-reason-${post.id}`}
+                                  value={reason.id}
+                                  checked={report.reason === reason.id}
+                                  onChange={() => report.pickReason(reason.id)}
+                                />
+                                <span>{reason.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                          <small>신고한 사람은 글쓴이에게 알려지지 않습니다. 운영자가 읽고 판단합니다.</small>
+                          <div className="board-report-actions">
+                            <GuardedButton
+                              type="button"
+                              blocked={report.isSending}
+                              aria-busy={report.isSending}
+                              aria-describedby="board-report-status"
+                              onClick={() => report.submitReport()}
+                            >
+                              {report.isSending ? "보내는 중" : "신고 보내기"}
+                            </GuardedButton>
+                            <button type="button" className="ghost" onClick={() => report.cancelReport()}>
+                              취소
+                            </button>
+                          </div>
+                        </fieldset>
+                      )}
+                    </article>
+                  );
+                })}
               </div>
             )}
+            {/* Always in the page, so a report's answer is announced. */}
+            <p className="board-report-status" id="board-report-status" role="status" aria-live="polite" data-testid="board-report-status">
+              {report.reportStatus}
+            </p>
           </section>
           <p className="board-footnote">
             게시판의 이름은 이 게시판에만 쓰입니다. 랭킹과 기록은 지금까지처럼 익명으로 남고, 게시판은 플레이
             기록과 다른 식별 번호를 씁니다. 글은 180일 동안 보관한 뒤 지우며, 접속 주소는 도배를 막는 데만
-            씁니다. 여기 적은 글은 언제든 운영자가 내릴 수 있습니다.
+            씁니다. 여기 적은 글은 언제든 운영자가 내릴 수 있습니다. 문제가 있는 글은 글마다 있는 신고 버튼으로
+            알려 주세요.
           </p>
         </section>
       </main>

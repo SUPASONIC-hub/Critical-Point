@@ -3,7 +3,7 @@
  *
  * Twenty-three cases happened in or around one basement room. The Monday after
  * the shareholders' meeting the group posts a one-line notice: 트리거랩 closes
- * on 31 March, reason "운영 성과 없음". The case is the last week of work. The
+ * on 27 March, reason "운영 성과 없음". The case is the last week of work. The
  * desks empty one by one, 도윤하 is posted back to the very window where he
  * sold the loan, 오진우 leaves first with a scoreboard nobody knew he kept, and
  * on the rooftop, next to a potted cherry tree barely in bud, 한서윤 confesses
@@ -32,6 +32,7 @@ const case24Nodes = {
       "해체 공지: 3월 27일부, 사유 '운영 성과 없음'",
       "마지막 출근 금요일, 짐 반출은 목요일까지",
       "공지 작성 부서: 그룹전략실",
+      "개편 근거: 대주주 킹스데일 파트너스(뉴욕)의 아시아 포트폴리오 리뷰",
       "윤상혁 이사 선임 가결 -- 찬성 50.6%, 반대 49.4%는 기관의 표",
     ],
     triggers: ["injustice", "affection", "helplessness"],
@@ -213,7 +214,7 @@ const case24Nodes = {
     text:
       "트리거랩 출입 카드를 반납하러 본사 33층에 올라갑니다. 엘리베이터 문이 열리자 백아린이 서 있습니다. 늘 매끄럽던 머리가 오늘은 조금 흐트러져 있습니다. 그가 당신의 반납 서류 밑으로 얇은 봉투 하나를 밀어 넣습니다. '3년 전 2023-0412 승인 문서 원본의 수신 기록(문서를 누가 언제 받았는지 남은 기록)이에요. 서명란이 빈 채로 이 층에 올라온 날, 받은 사람 칸에 이름이 하나 있어요.' 그가 열림 버튼을 누른 채 말합니다. '좋은 이야기는 사실보다 오래 간다고 제가 그랬죠. 이건 제가 처음으로 고르는 사실이에요. 이게 어디서 나왔는지는, 이 층 사람이면 다 알게 될 거예요.'",
     memo: [
-      "2023-0412 원본 수신 기록 -- 그룹전략실 접수 도장",
+      "2023-0412 원본 수신 기록 -- 그룹전략실 접수 로그",
       "받은 사람 칸: 이름 하나",
       "백아린의 사표 초안 -- 아직 내지 않음",
       "18시 이후 트리거랩 출입 권한 소멸",
@@ -233,7 +234,7 @@ const case24Nodes = {
         label: "백아린이 직접 이름을 걸도록 감사위원회에 함께 간다",
         effect: { legitimacy: 13, trust: 8, capital: -9, time: -7, humanCost: -4, fatigue: 6 },
         voice: "어차피 이 층 사람이면 다 알게 된다며, 감사위원회에 함께 가서 백아린이 직접 이름을 걸게 한다.",
-        echo: "함께 가니 백아린은 사표 초안 위에 제보자 서명을 합니다. 감사위원회 접수 도장은 17시 3분 전에 찍힙니다.",
+        echo: "함께 가니 백아린은 사표 초안 위에 제보자 서명을 합니다. 감사위원회 접수 번호는 17시 3분 전에 붙습니다.",
         cognition: { persistence: 1, reframing: 2 },
       },
       {
@@ -319,7 +320,7 @@ export const case24 = {
           effect: { trust: 11, legitimacy: 4, humanCost: -5, time: -5, capital: -3, fatigue: 5 },
           cognition: { persistence: 1 },
           voice: "성과는 숫자가 아니라 그 사람들이라며, 한 줄 칸에 성과 대신 사람 이름을 적어 낸다.",
-          echo: "이름을 적자 칸이 넘칩니다. 인사부는 '양식 불일치'라며 서류를 한 번 돌려보냅니다.",
+          echo: "이름을 적자 칸이 넘칩니다. 인사부는 '양식 불일치'라며 시스템에서 한 번 반려합니다.",
         },
         {
           label: "23쪽 결과 파일을 인수인계서 첨부로 공식 제출한다",
@@ -431,7 +432,7 @@ export const case24 = {
       next: "c24_farewell",
       title: "해체되지 않는 것",
       speaker: "임경수",
-      text: "목요일 아침, 지팡이 소리가 계단을 올라옵니다. 폐렴으로 한 달을 누워 있던 임경수가 끈으로 묶은 종이 뭉치를 들고 왔습니다. 트리거랩이 3년 동안 받아 온 종이 원본의 목록입니다. '부서가 없어진다길래. 부서는 없어져도 종이는 남아야지.' 그가 안경을 벗어 천천히 닦습니다. '내가 은행을 나올 때도 공지가 한 줄이었네. 사유도 없었고. 한 줄짜리 공지에는 늘 누가 썼는지가 안 적혀 있어.'",
+      text: "목요일 아침, 지팡이 소리가 계단을 올라옵니다. 폐렴으로 한 달을 누워 있던 임경수가 집게로 물린 출력물 한 묶음을 들고 왔습니다. 트리거랩이 3년 동안 받아 온 종이 원본의 목록입니다. '부서가 없어진다길래. 부서는 없어져도 종이는 남아야지.' 그가 안경을 벗어 천천히 닦습니다. '내가 은행을 나올 때도 공지가 한 줄이었네. 사유도 없었고. 한 줄짜리 공지에는 늘 누가 썼는지가 안 적혀 있어.'",
       memo: ["트리거랩 종이 원본 목록 -- 임경수 작성", "한 줄짜리 공지에는 쓴 사람이 없다"],
       choices: [
         {
@@ -450,7 +451,7 @@ export const case24 = {
           label: "종이는 짐이 된다며 목록만 스캔하고 돌려보낸다",
           effect: { time: 4, capital: 3, trust: -4, humanCost: 3, fatigue: -3 },
           voice: "책상을 비우는 마당에 종이는 짐이 된다며, 목록만 스캔하고 돌려보낸다.",
-          echo: "스캔은 10분이면 끝납니다. 임경수는 종이 뭉치를 다시 끈으로 묶고, 계단을 천천히 내려갑니다.",
+          echo: "스캔은 10분이면 끝납니다. 임경수는 출력물을 다시 집게로 물리고, 계단을 천천히 내려갑니다.",
         },
       ],
     },
@@ -536,7 +537,7 @@ export const case24 = {
       choices: [
         {
           id: "c24_branch_server_follow_a",
-          label: "목록 1번인 내 기록부터 공개해 다른 사람 기록을 지킨다",
+          label: "목록 1번인 내 기록부터 공개해 남의 기록을 지킨다",
           effect: { trust: 13, legitimacy: 4, humanCost: -4, capital: -7, time: -5, fatigue: 5 },
           voice: "남의 기록을 앞세울 수는 없어서, 목록 1번인 내 기록부터 공개해 다른 사람 기록을 지킨다.",
           echo: "당신의 기록이 먼저 열리자 이관 목록 2번부터는 멈칫합니다. 1번은 이미 모두가 읽었습니다.",
@@ -679,7 +680,7 @@ export const case24 = {
   memoryPlan: {
     systemNext: "c24_route_system",
     evidenceNext: "c24_evidence_turn",
-    systemLabel: "총회 전날 새로 짠 판이 해체 공지 문구에 비쳤는지 들여다본다",
+    systemLabel: "총회 전날 짠 판이 해체 공지 문구에 비쳤는지 본다",
     evidenceLabel: "빨간 점의 명단을 해체 결정 문서의 첨부에 대 본다",
     systemEcho: "들여다보면 공지에는 아무것도 비치지 않습니다. 네 글자 사유뿐입니다. 에코가 같은 네 글자를 받은 조직들을 한 줄씩 부릅니다.",
     evidenceEcho: "현황표의 예산 코드를 해체 문서에 대면 첨부 파일이 하나 열립니다. 제목이 공지와 반대입니다.",
@@ -696,21 +697,21 @@ export const case24 = {
   },
   openingSignatures: {
     c24_start_warm: {
-      label: "1주 모임 사람들에게 트리거랩 동료들의 다음 자리를 부탁한다",
+      label: "1주 모임에 트리거랩 동료들의 다음 자리를 부탁한다",
       effect: { trust: 11, humanCost: -4, capital: -4, time: -5, fatigue: 3 },
       cognition: { reframing: 2 },
       voice: "먼저 연락해 온 사람들에게 기대 보기로 하고, 1주 모임 사람들에게 트리거랩 동료들의 다음 자리를 부탁한다.",
       echo: "부탁하자 끝까지정밀에서 제일 먼저 답이 옵니다. '우리 공장 경리 자리 비어요.' 이민서는 그 문자를 한참 봅니다.",
     },
     c24_start_record: {
-      label: "해체 공지의 빈 승인자 칸을 주주 서한과 나란히 공개한다",
+      label: "빈 승인자 칸의 해체 공지를 주주 서한과 나란히 낸다",
       effect: { legitimacy: 12, trust: -2, capital: -5, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "이름을 남기자던 서한이 가장 먼저 비껴간 문서라며, 해체 공지의 빈 승인자 칸을 주주 서한과 나란히 공개한다.",
       echo: "나란히 놓자 서한과 공지가 서로를 설명합니다. 그룹은 공지를 고치지 않고, 대신 게시판 댓글 기능을 닫습니다.",
     },
     c24_start_rush: {
-      label: "33층에 다녀간 일과 앞당겨진 공지 시각을 동료들에게 먼저 알린다",
+      label: "33층 일과 당겨진 공지 시각을 동료들에게 먼저 알린다",
       effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "예약이 바뀐 때가 내가 33층 앞에 서 있던 시각이라, 33층에 다녀간 일과 앞당겨진 공지 시각을 동료들에게 먼저 알린다.",
