@@ -544,7 +544,7 @@ export default {
     "c18_table_list": "Going over it, Oh Sangchul recalls each shop’s location and the children’s names for every name. The dinner table turns into a review room.",
     "c18_table_win": "When you urge it, Oh Sangchul looks straight at you for the first time. Oh Jinwoo puts down his chopsticks with the face of someone who heard the same thing from both of you.",
     "c18_final_keep": "Held back, Oh Jinwoo stays. That afternoon Do Haram picks another team head, who doesn’t know where Maetan Branch is.",
-    "c18_final_terms": "With terms set, Oh Jinwoo goes, and a debtor protection clause is attached to the contract. The person who would make them keep it is now at another bank.",
+    "c18_final_terms": "With terms set, Oh Jinwoo signs, and a debtor protection clause is attached to the contract. He starts in the spring, once his Trigger Lab work is wrapped up. By spring, the person who would make them keep it will be at another bank.",
     "c18_final_block": "You go to block it, and the 9:00 signing never opens. For a while, Oh Jinwoo doesn’t challenge you over a morning someone else decided for him.",
     "c18_after_warm": "Staying until the lights go off, the noodle-cup tree is gone. You answer the bookshop text on the first bus tomorrow morning.",
     "c18_after_record": "Put on paper, the standard survives whoever becomes team head. Oh Jinwoo writes his name in the reviewer field and adds a note: don’t copy this document into anyone’s experience section.",

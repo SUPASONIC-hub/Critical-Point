@@ -1810,6 +1810,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // runs its one SELECT over the seasons of a week long past, so the runs
   // above are not in it: three under the rule from two devices, one without it
   // (the box turned it down), one in story mode and one under another rule.
+  // One season under the rule was played on the English pages: its second
+  // case row names `summary.locale` "en" (#352), another names "ko" on both,
+  // and the third names none (ko(추정)).
   {
     const REPORT_WEEK = "2026-W30";
     const reportRuns = [
@@ -1826,6 +1829,8 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
       for (const caseId of CASE_SEQUENCE.slice(0, 2)) {
         const payload = casePayload({ session, runId, caseId, story });
         payload.dynamics = { ...payload.dynamics, weekRule: rule };
+        if (runId === "run-week-report-on-1" && caseId === CASE_SEQUENCE[1]) payload.summary = { ...payload.summary, locale: "en" };
+        if (runId === "run-week-report-on-2") payload.summary = { ...payload.summary, locale: "ko" };
         const { sql, params } = postgrestInsert("playtest_sessions", payload);
         await db.query(sql, params);
       }
@@ -1837,8 +1842,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
     const reportRows = (await allowed("run the test week's report", "service_role", testWeekQuery(REPORT_WEEK, EVENT)))?.rows ?? [];
     const report = readTestWeek(reportRows);
     check(
-      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6,
-      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows })}; expected 3 seasons under the rule from 2 devices, 1 without it, story mode and another rule left out.`,
+      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6
+        && report.english === 1 && report.korean === 1 && report.presumedKorean === 1,
+      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows, english: report.english, korean: report.korean, presumedKorean: report.presumedKorean })}; expected 3 seasons under the rule from 2 devices (one English, one Korean, one naming no language), 1 without it, story mode and another rule left out.`,
     );
     check(reportRows.every((row) => !Object.values(row).some((value) => typeof value === "string" && value.startsWith("grants-check-session-"))), "the test week's report fetched a device's session id.");
   }
