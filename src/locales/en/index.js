@@ -19,6 +19,8 @@
  * owner's F-8 choice 1) is the panel after 사건 10: `nextCaseSignals.case10`
  * below says the English stops there and the story goes on in Korean.
  */
+import screens from "./screens/index.js";
+
 export const speakers = {
   "한서윤": "Han Seoyun",
   "반재욱": "Ban Jaewook",
@@ -63,6 +65,7 @@ export const preview = {
 };
 
 export const copy = {
+  screens,
   "caseCopy": {
     "chapterRules": {
       "prologue01": {
