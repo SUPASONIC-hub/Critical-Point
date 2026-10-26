@@ -215,7 +215,7 @@ cd android && ./gradlew bundleRelease                                   # app/bu
 | `ADMOB_APP_ID_ANDROID` | 같은 곳의 Android 앱 ID | `strings.xml`의 Google 테스트 앱 ID 그대로 |
 | `ADMOB_LIVE` | `true` — `app/native/adUnits.js` `LIVE_UNITS`를 실제 광고 단위로 채운 **뒤에만** | 테스트 광고 단위(채우지 않은 채 `true`여도 테스트 단위) |
 
-앱 ID는 빌드 때 runner 안의 파일만 바꾸고 저장소에는 남지 않습니다. 워크플로는 `check:app`을 경고만 내는 보통 모드로 돌립니다. 스토어에 올릴 빌드 전에는 `npm run check:app -- --release`(테스트·자리표시 ID가 남으면 실패)가 통과하는지 따로 봅니다.
+앱 ID는 빌드 때 runner 안의 파일만 바꾸고 저장소에는 남지 않습니다. 워크플로는 손으로 돌릴 때 `check:app`을 경고만 내는 보통 모드로, `app-v*` 태그 실행에서는 `--release`(테스트·자리표시 ID가 남으면 실패)로 돌립니다. 스토어에 올릴 빌드는 태그로 만듭니다.
 
 ## 사용자가 채울 자리표시
 

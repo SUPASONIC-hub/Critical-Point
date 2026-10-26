@@ -97,8 +97,10 @@ jobs:
           fi
       - name: Web build and cap sync ios
         run: npm run sync:ios --prefix app
+      # A tag build is the one that goes to a store: test or placeholder ad IDs
+      # fail it. A hand-run build only warns.
       - name: check:app
-        run: npm run check:app --prefix app
+        run: npm run check:app --prefix app -- ${{ startsWith(github.ref, 'refs/tags/app-v') && '--release' || '' }}
       - run: xcodebuild -version
 
       - name: Unsigned archive
@@ -250,8 +252,10 @@ jobs:
           fi
       - name: Web build and cap sync android
         run: npm run sync:android --prefix app
+      # A tag build is the one that goes to a store: test or placeholder ad IDs
+      # fail it. A hand-run build only warns.
       - name: check:app
-        run: npm run check:app --prefix app
+        run: npm run check:app --prefix app -- ${{ startsWith(github.ref, 'refs/tags/app-v') && '--release' || '' }}
 
       - name: Release bundle (AAB)
         if: steps.mode.outputs.signed == 'true'
