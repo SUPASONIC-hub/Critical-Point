@@ -164,7 +164,7 @@ export default {
         "One full copy of the notebook left in Yoon Seojin’s drawer",
         "A box of peaches -- bought by Yoon Sanghyuk",
         "One of Ban Seoa’s star stickers -- now on Yoon Seojin’s laptop",
-        "Kang Taemin: drain blocked at To the End Precision, needs fixing before the monsoon"
+        "Kang Taemin: drain blocked at To-the-End Precision, needs fixing before the monsoon"
       ],
       "choices": {
         "c34_after_rush": {

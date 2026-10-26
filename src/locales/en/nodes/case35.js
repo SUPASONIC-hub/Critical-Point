@@ -10,11 +10,11 @@ export default {
   "nodes": {
     "c35_start": {
       "title": "110mm an Hour",
-      "text": "The monsoon rain that began at the weekend thickens to 110mm an hour. On the KD Capital Risk Management situation board, western Seoul and southeastern Incheon bleed red. Your phone rings again and again. Do Yoonha first. 'The alleys in Mangwon Market are ankle-deep in water. Moon Gaeul is pulling the plugs on her rice cake machines.' Then Foreman Kim at To the End Precision in Incheon sends a photo. The drain you cleared with Kang Taemin is blocked again, and muddy water is licking in under the shutter like a tongue. The six lathes have been turning again for less than 1 year. Do Yoonha goes on. 'The branch inbox is already filling with questions about tomorrow morning’s emergency flood loans. But those loans are reviewed by NOAH now, the AI review engine (an artificial-intelligence program that judges loan applications automatically).' The rain outside the window drowns out the alarm on the situation board.",
+      "text": "The monsoon rain that began at the weekend thickens to 110mm an hour. On the KD Capital Risk Management situation board, western Seoul and southeastern Incheon bleed red. Your phone rings again and again. Do Yoonha first. 'The alleys in Mangwon Market are ankle-deep in water. Moon Gaeul is pulling the plugs on her rice cake machines.' Then Foreman Kim at To-the-End Precision in Incheon sends a photo. The drain you cleared with Kang Taemin is blocked again, and muddy water is licking in under the shutter like a tongue. The six lathes have been turning again for less than 1 year. Do Yoonha goes on. 'The branch inbox is already filling with questions about tomorrow morning’s emergency flood loans. But those loans are reviewed by NOAH now, the AI review engine (an artificial-intelligence program that judges loan applications automatically).' The rain outside the window drowns out the alarm on the situation board.",
       "memo": [
         "Monsoon rain since the weekend, day four -- 110mm an hour tonight",
         "Low-lying alleys of Mangwon Market flooding, Gaeul Rice Cakes included",
-        "To the End Precision flooding under the shutter -- 6 lathes",
+        "To-the-End Precision flooding under the shutter -- 6 lathes",
         "Emergency flood loan reviews: AI review engine NOAH"
       ],
       "choices": {
@@ -33,7 +33,7 @@ export default {
       },
       "place": "KD Capital Risk Management · Situation Board",
       "clock": "July 14 · Downpour · 23:40",
-      "question": "Mangwon Market and To the End Precision are going under on the same night. What do you do first?",
+      "question": "Mangwon Market and To-the-End Precision are going under on the same night. What do you do first?",
       "lead": "In Risk Management, where late nights became routine after the search and seizure (an investigation in which, with a court’s permission, records and items are taken by force), the disaster board paints names you know in red for the first time."
     },
     "c35_sandbag": {
@@ -69,7 +69,7 @@ export default {
     },
     "c35_lathe": {
       "title": "Don’t Touch It",
-      "text": "The water is gone, and a hand’s-width layer of silt covers the floor of To the End Precision in Incheon’s Namdong Industrial Complex. The six lathes stand with a band of muddy waterline at waist height. Foreman Kim is wiping the handle of the first lathe with a rag when he stops. 'This is the first machine Mr. Moon ever bought. Even when the factory closed, he held on and didn’t sell it.' The four machinists wet their rags without a word. Then Hwang Hyewon, a loss adjuster (a person who investigates the damage from an insurance claim and sets the amount) from the group insurer KD General Insurance, walks in wearing rain boots. Holding a tablet, she opens with this. 'Please don’t touch the machines until the inspection is done. Damage is hard to prove on a machine that’s been cleaned.' Foreman Kim turns around, rag in hand. Wet steel rusts in 48 hours, and the inspection ends in three days. The Seon Medical delivery is eight days away.",
+      "text": "The water is gone, and a hand’s-width layer of silt covers the floor of To-the-End Precision in Incheon’s Namdong Industrial Complex. The six lathes stand with a band of muddy waterline at waist height. Foreman Kim is wiping the handle of the first lathe with a rag when he stops. 'This is the first machine Mr. Moon ever bought. Even when the factory closed, he held on and didn’t sell it.' The four machinists wet their rags without a word. Then Hwang Hyewon, a loss adjuster (a person who investigates the damage from an insurance claim and sets the amount) from the group insurer KD General Insurance, walks in wearing rain boots. Holding a tablet, she opens with this. 'Please don’t touch the machines until the inspection is done. Damage is hard to prove on a machine that’s been cleaned.' Foreman Kim turns around, rag in hand. Wet steel rusts in 48 hours, and the inspection ends in three days. The Seon Medical delivery is eight days away.",
       "memo": [
         "6 lathes flooded -- muddy waterline at waist height",
         "About 48 hours until rust, 3 days until the damage inspection is done",
@@ -93,18 +93,18 @@ export default {
           "label": "Open the judgment records of NOAH’s flood loan criteria"
         }
       },
-      "place": "To the End Precision, Namdong Industrial Complex, Incheon · Factory",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
       "clock": "July 15 · After the Downpour · 14:00",
       "question": "Wipe now and you stop the rust; wait and you protect the insurance money. What do you do with the six lathes?",
       "lead": "You came the moment the water drained from the industrial complex access road. The factory floor is covered in silt that swallows you to the ankle."
     },
     "c35_noah": {
       "title": "Rejected Because You Flooded",
-      "text": "The ticket numbers at the Gangseo Branch windows have passed 140. Mangwon Market merchants in wet sneakers stand in line with applications in hand. Tak Yerin at the corporate loan window turns her monitor toward you. Of the 41 emergency flood loans received since yesterday, NOAH, the AI review engine (an artificial-intelligence program that judges loan applications automatically), has rejected 38. The reason is one line. 'Flood-damaged business; sharp drop in repayment (paying back borrowed money) capacity expected.' To the End Precision and Gaeul Rice Cakes are both among the 38. Tak Yerin lowers her voice. 'A loan made to help people who flooded is being refused because they flooded.' At the next window, Do Yoonha, reading a rejection notice, stops at the second line. The signature field for an exception approval (approval outside the criteria, given by someone in charge who puts their name on it), where a person can overturn the result, is empty again.",
+      "text": "The ticket numbers at the Gangseo Branch windows have passed 140. Mangwon Market merchants in wet sneakers stand in line with applications in hand. Tak Yerin at the corporate loan window turns her monitor toward you. Of the 41 emergency flood loans received since yesterday, NOAH, the AI review engine (an artificial-intelligence program that judges loan applications automatically), has rejected 38. The reason is one line. 'Flood-damaged business; sharp drop in repayment (paying back borrowed money) capacity expected.' To-the-End Precision and Gaeul Rice Cakes are both among the 38. Tak Yerin lowers her voice. 'A loan made to help people who flooded is being refused because they flooded.' At the next window, Do Yoonha, reading a rejection notice, stops at the second line. The signature field for an exception approval (approval outside the criteria, given by someone in charge who puts their name on it), where a person can overturn the result, is empty again.",
       "memo": [
         "Gangseo Branch: 38 of 41 emergency flood loans rejected -- 312 nationwide",
         "Reason: 'Flood-damaged business; sharp drop in repayment capacity expected'",
-        "To the End Precision and Gaeul Rice Cakes both on the rejection list",
+        "To-the-End Precision and Gaeul Rice Cakes both on the rejection list",
         "Exception approval signature field: empty"
       ],
       "choices": {
@@ -223,7 +223,7 @@ export default {
           "label": "Remove the side panel with the writing, then clean the machine"
         }
       },
-      "place": "To the End Precision, Namdong Industrial Complex, Incheon · At the Lathes",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · At the Lathes",
       "clock": "July 15 · Monsoon · 22:00",
       "question": "Moon Sungho’s writing has surfaced under the mud. What do you do with writing on a machine that has to be cleaned?"
     },
@@ -273,7 +273,7 @@ export default {
     },
     "c35_rust_reaction": {
       "title": "Because It’s a Natural Disaster",
-      "text": "Around midnight, Hwang Hyewon calls you over from her car in front of the factory. Head office guidance is up on her tablet. 'Among damage from this heavy rain, treat business interruption riders (extra promises bought on top of the basic policy) separately. Review the natural disaster exclusion (cases where the insurer does not have to pay) clause first.' That rider is exactly what To the End Precision paid extra for in the spring. Hwang Hyewon rests her forehead on the steering wheel. 'The rider is called “Natural Disaster Business Loss Cover.” And I’m the one who has to read you a notice saying you don’t get paid because it was a natural disaster.'",
+      "text": "Around midnight, Hwang Hyewon calls you over from her car in front of the factory. Head office guidance is up on her tablet. 'Among damage from this heavy rain, treat business interruption riders (extra promises bought on top of the basic policy) separately. Review the natural disaster exclusion (cases where the insurer does not have to pay) clause first.' That rider is exactly what To-the-End Precision paid extra for in the spring. Hwang Hyewon rests her forehead on the steering wheel. 'The rider is called “Natural Disaster Business Loss Cover.” And I’m the one who has to read you a notice saying you don’t get paid because it was a natural disaster.'",
       "memo": [
         "A natural disaster exclusion on a rider that covers natural disasters",
         "A notice she has to read out to you"
@@ -438,10 +438,10 @@ export default {
     },
     "c35_start_warm": {
       "title": "The Group Chat After the Peaches",
-      "text": "Since the evening you read Yoon Seojin’s notebook copy to the end together in the Sinchon lab and emptied a box of peaches, your colleagues have posted one line in the group chat every night: 'Safe today.' The rain began at the weekend, and tonight, the fourth day, that group chat won’t stop buzzing. A downpour of 110mm an hour. The alleys of Mangwon Market are ankle-deep, and muddy water is seeping under the shutter at To the End Precision in Incheon. Do Yoonha calls. 'Questions about emergency flood loans will pour in tomorrow morning. But those loans are reviewed by NOAH now, the AI review engine (an artificial-intelligence program that judges loan applications automatically).' A line from Kang Taemin comes up in the group chat. 'Got a truck of sandbags.' Yoon Seojin adds one too. 'Use the empty peach box for the sand.'",
+      "text": "Since the evening you read Yoon Seojin’s notebook copy to the end together in the Sinchon lab and emptied a box of peaches, your colleagues have posted one line in the group chat every night: 'Safe today.' The rain began at the weekend, and tonight, the fourth day, that group chat won’t stop buzzing. A downpour of 110mm an hour. The alleys of Mangwon Market are ankle-deep, and muddy water is seeping under the shutter at To-the-End Precision in Incheon. Do Yoonha calls. 'Questions about emergency flood loans will pour in tomorrow morning. But those loans are reviewed by NOAH now, the AI review engine (an artificial-intelligence program that judges loan applications automatically).' A line from Kang Taemin comes up in the group chat. 'Got a truck of sandbags.' Yoon Seojin adds one too. 'Use the empty peach box for the sand.'",
       "memo": [
         "Group chat 'Safe today', day eight -- broken tonight",
-        "Mangwon Market and To the End Precision flooding at once",
+        "Mangwon Market and To-the-End Precision flooding at once",
         "Kang Taemin: has a truck loaded with sandbags; Yoon Seojin is in the group chat too"
       ],
       "choices": {
@@ -498,10 +498,10 @@ export default {
     },
     "c35_start_rush": {
       "title": "The Shutter of the One Who Came First",
-      "text": "Eight days since the night you held the copy, chased the trace that line left in the system, and reread Kang Taemin’s text, you have loaded sandbags after work every day, stopped at To the End Precision in Incheon, and cleared the blocked drain with Kang Taemin. The half-peeled peach you left in the lab hasn’t crossed your mind since. Tonight a downpour of 110mm an hour is falling, and beyond the sandbags, muddy water is spilling under the shutter. Seven missed calls, all Moon Gaeul. When you call back, you hear the rain first. 'They said you were looking after the factory. The water’s over my shop doorstep.' A pause. 'Of all the bank people, you’re the only one I can call.' There are 20 sandbags left over in your car trunk. From tomorrow, NOAH, the AI review engine (an artificial-intelligence program that judges loan applications automatically), reviews flood loans at the windows.",
+      "text": "Eight days since the night you held the copy, chased the trace that line left in the system, and reread Kang Taemin’s text, you have loaded sandbags after work every day, stopped at To-the-End Precision in Incheon, and cleared the blocked drain with Kang Taemin. The half-peeled peach you left in the lab hasn’t crossed your mind since. Tonight a downpour of 110mm an hour is falling, and beyond the sandbags, muddy water is spilling under the shutter. Seven missed calls, all Moon Gaeul. When you call back, you hear the rain first. 'They said you were looking after the factory. The water’s over my shop doorstep.' A pause. 'Of all the bank people, you’re the only one I can call.' There are 20 sandbags left over in your car trunk. From tomorrow, NOAH, the AI review engine (an artificial-intelligence program that judges loan applications automatically), reviews flood loans at the windows.",
       "memo": [
         "Moon Gaeul: 7 missed calls",
-        "Flooding under the To the End Precision shutter -- sandbags at their limit",
+        "Flooding under the To-the-End Precision shutter -- sandbags at their limit",
         "Water over the Gaeul Rice Cakes doorstep; flood loan reviews: NOAH"
       ],
       "choices": {
@@ -521,7 +521,7 @@ export default {
           "label": "Ask the reason for the rejection three times over"
         }
       },
-      "place": "To the End Precision, Namdong Industrial Complex, Incheon · Factory",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
       "clock": "July 14 · Downpour · 23:40",
       "question": "After seven missed calls, Moon Gaeul says you’re the only one she has. What do you put down?",
       "lead": "You straighten up in front of the drain you’ve been clearing for eight days, and the same name is on your phone screen seven times."

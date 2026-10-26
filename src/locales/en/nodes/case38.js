@@ -183,7 +183,7 @@ export default {
     },
     "c38_notes": {
       "title": "Courtroom Notes",
-      "text": "A 10-minute recess. In the gallery, Moon Hajun holds out a sketchbook. He told his summer supplementary classes it was a 'social studies field trip' and skipped. On the first page, the eight at the defense table are drawn as an octagon, with an analysis that their ties come in three colors and a tally that reads 'Yeon Seojun: “It is only that” x11.' Seon Jaeyoon holds back a laugh and coughs. On the next page, Moon Hajun’s handwriting slows. Foreman Kim, Technician Park and Technician Yoon of To the End Precision. Technicians who went three months unpaid when Gaon Precision collapsed. 'The foremen are part of the 212 too. Their names aren’t on the loan papers.'",
+      "text": "A 10-minute recess. In the gallery, Moon Hajun holds out a sketchbook. He told his summer supplementary classes it was a 'social studies field trip' and skipped. On the first page, the eight at the defense table are drawn as an octagon, with an analysis that their ties come in three colors and a tally that reads 'Yeon Seojun: “It is only that” x11.' Seon Jaeyoon holds back a laugh and coughs. On the next page, Moon Hajun’s handwriting slows. Foreman Kim, Technician Park and Technician Yoon of To-the-End Precision. Technicians who went three months unpaid when Gaon Precision collapsed. 'The foremen are part of the 212 too. Their names aren’t on the loan papers.'",
       "memo": [
         "Moon Hajun’s sketchbook -- 7th page of courtroom notes",
         "Among the 212: 3 Gaon Precision technicians",
