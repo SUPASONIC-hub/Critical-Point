@@ -137,7 +137,7 @@ test("runs are read by the language their rows name, a run naming none is presum
     { device: 6, marked: false, new_game_plus: false, cases: named("prologue02", now - DAY, "fr") },
   ];
   const f = read(rows, now);
-  assert.deepEqual(f.locales, { ko: 1, en: 3 });
+  assert.deepEqual(f.locales, { ko: 1, en: 3, ja: 0 });
   assert.equal(f.unnamed, 2);
   assert.equal(f.unnamedSinceEnglish, 1, "the run that began before the English page opened was Korean for certain");
   assert.equal(f.english.runs, 3);
