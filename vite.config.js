@@ -8,6 +8,7 @@ import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { renderLegalPages } from "./scripts/legal-pages.mjs";
+import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -387,6 +388,25 @@ function legalPages() {
   };
 }
 
+/**
+ * Google AdSense site verification (출시 로드맵 2단계), off unless
+ * ADSENSE_CLIENT is set (scripts/adsense-config.mjs, docs/web-ads.md). Off,
+ * this plugin has no hook and the build is the one without it. With the
+ * publisher ID it writes /ads.txt and the `google-adsense-account` meta tag
+ * the AdSense review reads, and no code. Before `serviceWorker()` in the list,
+ * like legalPages, so ads.txt is a file the release is named for.
+ */
+function adsenseVerification({ client, publisherId }) {
+  if (!client) return { name: "adsense-verification-off" };
+  return {
+    name: "adsense-verification",
+    transformIndexHtml: (html) => withVerificationMeta(html, client),
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "ads.txt", source: adsTxt(publisherId) });
+    },
+  };
+}
+
 /** What the page is told about registering (src/serviceWorker/register.js). */
 function serviceWorkerSetting(command, mode) {
   if (command !== "build" || serviceWorkerKilled()) return "off";
@@ -562,7 +582,8 @@ function ownChunkGroups() {
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), legalPages(), serviceWorker(), renderHeaders()],
+  // ADSENSE_CLIENT has no VITE_ prefix, so it never reaches import.meta.env (scripts/adsense-config.mjs).
+  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), legalPages(), adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
