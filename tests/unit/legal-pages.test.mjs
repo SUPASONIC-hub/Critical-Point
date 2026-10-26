@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages } from "../../scripts/legal-pages.mjs";
+import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages, SUMMARY_FIELDS } from "../../scripts/legal-pages.mjs";
 import { SUPPORT_CONTACT } from "../../src/appConfig.js";
 import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../../src/privacyText.js";
+import { toRowSummary } from "../../src/state/useChoiceCommit.js";
 import { createSeasonTelemetryPayload } from "../../src/viewModels/seasonViewModels.js";
 
 /**
@@ -72,6 +73,18 @@ test("every column the page may write is covered by an item the policy prints", 
     assert.deepEqual(Object.keys(REMOTE_FIELDS[table]).sort(), [...columns].sort(), `${table}: REMOTE_FIELDS and what is sent differ`);
   }
   assert.deepEqual(Object.keys(REMOTE_FIELDS).sort(), Object.keys(remote).sort());
+});
+
+test("the screen language a case row's summary carries is an item of its own on both pages, and in the consent sentence", () => {
+  const added = Object.keys(toRowSummary({}));
+  assert.ok(added.includes("locale"), "the case row names the page's language (toRowSummary)");
+  for (const key of added.filter((name) => name !== "endingVariant")) {
+    const item = SUMMARY_FIELDS[key];
+    assert.ok(item, `summary.${key} is sent and the policy does not name it (SUMMARY_FIELDS in scripts/legal-pages.mjs)`);
+    assert.ok(ko.includes(DATA_ITEMS[item].ko), `privacy.html does not print the item for summary.${key}`);
+    assert.ok(en.includes(DATA_ITEMS[item].en), `en/privacy.html does not print the item for summary.${key}`);
+  }
+  assert.match(PLAYTEST_DATA_NOTICE, /화면 언어/);
 });
 
 test("a row the runtime builds sends only granted columns, so the grants are the list", () => {

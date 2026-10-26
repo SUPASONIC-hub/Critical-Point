@@ -45,7 +45,7 @@ export const EDGE_AT = Object.freeze([3, 6]);
  */
 export const EDGE_NOTICES = edgeNoticesCopy.notices;
 
-export const EDGE_NOTICE_MS = 4000;
+const EDGE_NOTICE_MS = 4000;
 
 /** The notice a window's press count brings in a case, or null. `n` picks its line, so windows differ; a case not in the table reads as 프롤로그 01. */
 export function pickEdgeNotice(pushes, n = 0, caseId) {

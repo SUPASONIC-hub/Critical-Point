@@ -161,6 +161,38 @@ decision and the 04:00 folder.
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
 
+오진우 turns from 사수 to rival because 윤상혁 sets him a condition no one else
+gets. It reaches him as one messenger line on the first night at 합정동
+(2023-07-24, 프롤로그 05), while 윤상혁 is still 팀장: "분석관보다 먼저 결론을
+내면 6층 자리는 비워 두겠네." The analyst sees the line, not the sender. From
+사건 01 그룹전략실 asks the lab for two recommendations on one case, his
+deadline 12 hours earlier; in 사건 02 a 그룹전략실 account opens his report 4
+seconds after it appears; in 사건 03 한서윤 says his terms never came to her.
+사건 03's 「별도 압박 조건」 and 사건 18's 「누구의 계산」 are this condition,
+and no line names 윤상혁 as its author before them.
+
+Five bridges between cases (10-26, written into scenes that were already there):
+
+- The analyst's 영동지점 posting (사건 07) is withdrawn the week before 사건 11
+  with one line, '원 소속 복귀', and like the posting it carries no reason and
+  no approver (c11_start and its three openings).
+- 오진우 and 브릿지은행: on 사건 18's 「조건을 걸고 보낸다」 route he signs on
+  12월 29일 but starts only in spring, after his 트리거랩 work; on every route
+  브릿지 sends one more envelope, now with a start date, the day after the
+  사건 24 dissolution notice (c18_final_terms echo, c24_desks). 사건 25 is
+  where he starts.
+- The 회기동 헌책방 is demolished in 사건 19 (1월 22일). The 1층 주인 할머니
+  of 사건 19 reopens it in spring one alley over from the site, and 임경수
+  chips in for the deposit; from 사건 28 the 1층 is that new shop, and the
+  chair beside its counter is his (c28_ruler, c30_bookstore).
+- 임경수 goes back into 이음병원 in August, short of breath; from 사건 41 his
+  chair is empty and he follows from the ward (c41_drill, c43_ledger) until
+  사건 44 and his death on 9월 15일.
+- 사건 08 is the first place 윤상혁 is named after 프롤로그 05: by 2025 he is
+  그룹전략실 상무 on the 33층, and the 사건 06 order and profile folder came
+  from that office (c8_trail). The line points at the 사건 06 order, not at
+  the 프롤로그 05 condition, so it does not name him as that condition's author.
+
 Of this table the script holds what copy writes in a shape it can read: each
 person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
 window and his third year, A-017 and A-001 to A-063, the 5 대 3, the sentence,

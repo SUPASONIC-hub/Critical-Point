@@ -122,6 +122,19 @@ test("a telemetry row names its ending by id, in the form the server's ranking t
   assert.equal(toRowSummary({}).endingVariant, null);
 });
 
+test("a telemetry row names the page's language, one of the languages the page offers (앱출시-F F-6)", async () => {
+  const { toRowSummary } = await import("../../src/state/useChoiceCommit.js");
+  const { LANG, SUPPORTED_LOCALES } = await import("../../src/locale.js");
+  const codes = SUPPORTED_LOCALES.map((locale) => locale.code);
+  assert.equal(LANG, "ko", "a page with no choice and no ?lang= is Korean");
+  assert.equal(toRowSummary({ burstScore: 88 }).locale, "ko");
+  assert.equal(toRowSummary({ burstScore: 88 }, "en").locale, "en");
+  assert.ok(codes.includes(toRowSummary({}).locale));
+  // The funnel reads exactly these codes (scripts/report-funnel.mjs LOCALES).
+  const { LOCALES } = await import("../../scripts/report-funnel.mjs");
+  assert.deepEqual(LOCALES, codes);
+});
+
 test("a NEW GAME+ season's row says so on this device, and only a true mark counts", () => {
   const [plain] = buildLeaderboard([honest]);
   assert.equal(plain.newGamePlus, false);

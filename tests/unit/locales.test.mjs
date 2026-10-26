@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.mjs";
 import { caseSource, compareWords, flatten, hasHangul, readCopySource, wordsOf } from "../../scripts/locale-words.mjs";
 import { LANG, loadLocale, localizeCaseData, SOURCE_LOCALE, speakerName, SUPPORTED_LOCALES } from "../../src/locale.js";
-import { localizeCase, localizeCaseData as overlayCaseData, localizeTables, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
+import { fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
 import * as gameCases from "../../src/gameCases.js";
 import * as caseCopy from "../../src/caseCopy.js";
 
@@ -91,8 +91,32 @@ test("before a dictionary arrives, the overlay changes nothing: no names, no pre
   assert.deepEqual(overlayCaseData("case01", data, structuredClone(shipped.index)), shipped.cases.case01);
 });
 
+test("the preview's last case is one constant: the cases after it stay Korean, its panel ends the preview, and its lines count from it", () => {
+  assert.equal(inPreview("case10", "case10"), true);
+  assert.equal(inPreview("prologue03", "case10"), true);
+  assert.equal(inPreview("case11", "case10"), false);
+  assert.equal(inPreview("final", "case20"), false);
+  assert.equal(inPreview("case11", undefined), true);
+  assert.equal(fillPreview("Cases 01–{last}; Case {next} soon", "case10"), "Cases 01–10; Case 11 soon");
+  assert.equal(fillPreview("Cases 01–{last}; Case {next} soon", "case20"), "Cases 01–20; Case 21 soon");
+  const preview = { endEyebrow: "End", endButtons: { korean: "Korean" }, endPremiseLead: "End of Case {last}; Case {next} is Korean." };
+  const signals = { case10: { eyebrow: "Next", button: "Start Case 11", premise: "Premise." }, case20: { eyebrow: "Next", button: "Start Case 21", premise: "Later." } };
+  markPreviewEnd(signals, preview, "case20");
+  assert.deepEqual(signals.case10, { eyebrow: "Next", button: "Start Case 11", premise: "Premise." });
+  assert.deepEqual(signals.case20, { eyebrow: "End", button: "Korean", premise: "End of Case 20; Case 21 is Korean. Later." });
+});
+
 for (const lang of others) {
   const { cases, dictionary } = await languageFiles(lang);
+
+  test(`${lang}: a preview names a case of the season as its last, and every speaker of a case the language has scenes for has a printed name`, () => {
+    if (dictionary.previewThrough) assert.ok(gameCases.CASE_SEQUENCE.includes(dictionary.previewThrough), dictionary.previewThrough);
+    const unnamed = new Set();
+    for (const caseId of Object.keys(cases)) {
+      for (const scene of Object.values(shipped.cases[caseId]?.nodes ?? {})) if (scene.speaker && !dictionary.speakers?.[scene.speaker]) unnamed.add(`${caseId} ${scene.speaker}`);
+    }
+    assert.deepEqual([...unnamed], []);
+  });
 
   test(`${lang}: every case file names a case and says nothing the Korean no longer has`, () => {
     for (const [caseId, words] of Object.entries(cases)) {

@@ -22,7 +22,7 @@ import weekRuleCopy from "../copy/weekRule.js";
  * A season started this week keeps the rule to its end, and its
  * ranking is the week's own (설계안 2-2, 2-3).
  */
-export function getWeeklyRuleLine(now = weeklyRuleNow(), { first = false } = {}) {
+function getWeeklyRuleLine(now = weeklyRuleNow(), { first = false } = {}) {
   return weeklyRuleLine(now, undefined, { first });
 }
 
