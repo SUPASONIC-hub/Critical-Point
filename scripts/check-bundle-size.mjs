@@ -970,10 +970,14 @@ const budgets = [
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 93_179, maxGzip: 34_900 },
+  // 93,179 / 34,900 -> 121,224 / 44,381 on 2026-10-26, en-between-11-20: 사건 11~20's copy between cases (210 lines)
+  // and their speakers' roles (22), waiting in the dictionary until `previewThrough` reaches them. Measured 121,224 / 44,377.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 121_224, maxGzip: 44_381 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_013, maxGzip: 2_344 },
+  // 8,013 / 2,344 -> 8,243 / 2,440 on 2026-10-26, en-between-11-20: a table keyed by case is laid over only up to
+  // `previewThrough`, and `roleName` reads `caseRoles` of the cases in the preview. Measured 8,243 / 2,436.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_243, maxGzip: 2_440 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
