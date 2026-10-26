@@ -69,9 +69,9 @@ export default {
     },
     "c33_mother": {
       "title": "The Badge in the Frame",
-      "text": "'Yoonkyung Tailoring', down a back alley of Anyang Central Market, is two sewing machines and one iron. Baek Arin’s mother, Heo Yoonkyung, is stitching a trouser hem. She has been in this spot for 30 years. A frame hangs on the wall behind the counter. A KD Financial Group ID badge on a blue lanyard; in the photo, Baek Arin has the face of her first year at the company. Under the frame is a note for customers. 'My daughter works on the 33rd floor.' The moment Heo Yoonkyung sees her daughter’s colleagues, she pulls out a tape measure. 'Your trousers are all too long. Why are bank people’s trousers always too long?' Baek Arin cannot cross the shop’s threshold. Her mother knows nothing yet of the dismissal or the complaint. Arin only said the housing contract was ending and she would stay home for a while. Next week her things will go up to the shop’s 2nd floor. Baek Arin says quietly, 'I can’t watch Mom take that frame down. Not with my own eyes.'",
+      "text": "'Yoonkyung Alterations', down a back alley of Anyang Central Market, is two sewing machines and one iron. Baek Arin’s mother, Heo Yoonkyung, is stitching a trouser hem. She has been in this spot for 30 years. A frame hangs on the wall behind the counter. A KD Financial Group ID badge on a blue lanyard; in the photo, Baek Arin has the face of her first year at the company. Under the frame is a note for customers. 'My daughter works on the 33rd floor.' The moment Heo Yoonkyung sees her daughter’s colleagues, she pulls out a tape measure. 'Your trousers are all too long. Why are bank people’s trousers always too long?' Baek Arin cannot cross the shop’s threshold. Her mother knows nothing yet of the dismissal or the complaint. Arin only said the housing contract was ending and she would stay home for a while. Next week her things will go up to the shop’s 2nd floor. Baek Arin says quietly, 'I can’t watch Mom take that frame down. Not with my own eyes.'",
       "memo": [
-        "Yoonkyung Tailoring -- Anyang Central Market, 30 years",
+        "Yoonkyung Alterations -- Anyang Central Market, 30 years",
         "Frame behind the counter: Baek Arin’s ID badge from her first year",
         "What her mother knows: 'the housing contract ended'",
         "Moving boxes due: next week, the shop’s 2nd floor"
@@ -93,7 +93,7 @@ export default {
           "label": "Open the complaint draft’s date and the risk score screen"
         }
       },
-      "place": "Anyang Central Market · Yoonkyung Tailoring",
+      "place": "Anyang Central Market · Yoonkyung Alterations",
       "clock": "Saturday, June 27 · 15:00 · Eviction D-10",
       "question": "Her mother thinks her daughter still works on the 33rd floor. What do you do in this shop?",
       "lead": "At the end of the market alley, outside a shop humming with sewing machines, Baek Arin stops walking."
@@ -160,9 +160,9 @@ export default {
     },
     "c33_aftershock": {
       "title": "A New Frame",
-      "text": "On the evening of June 29, the first moving truck stops in the Anyang Central Market alley. The housing elevator was down for inspection, so Kang Taemin carried the refrigerator on his back down 11 floors of stairs. Kwon Dohyun hands Baek Arin a statement that reads 'Shipping: 3,100 won per box'. The amount due field says 0 won. At the Yoonkyung Tailoring counter, Baek Arin’s mother Heo Yoonkyung, who has now heard everything, takes the badge frame off the wall. She removes the badge, slips in the first whistleblower report receipt her daughter ever got, and hangs it back up. 'This suits it better. Even without a photo.' Baek Arin laughs out loud for the first time. Then she looks at the frame for a long time. 'The Managing Director had a frame on his desk too. A photo of his daughter holding sunflowers on her graduation day. Will he take that down someday, too?' Nine boxes are still left in the Gongdeok-dong studio.",
+      "text": "On the evening of June 29, the first moving truck stops in the Anyang Central Market alley. The housing elevator was down for inspection, so Kang Taemin carried the refrigerator on his back down 11 floors of stairs. Kwon Dohyun hands Baek Arin a statement that reads 'Shipping: 3,100 won per box'. The amount due field says 0 won. At the Yoonkyung Alterations counter, Baek Arin’s mother Heo Yoonkyung, who has now heard everything, takes the badge frame off the wall. She removes the badge, slips in the first whistleblower report receipt her daughter ever got, and hangs it back up. 'This suits it better. Even without a photo.' Baek Arin laughs out loud for the first time. Then she looks at the frame for a long time. 'The Managing Director had a frame on his desk too. A photo of his daughter holding sunflowers on her graduation day. Will he take that down someday, too?' Nine boxes are still left in the Gongdeok-dong studio.",
       "memo": [
-        "First load arrives -- Yoonkyung Tailoring 2nd floor, Anyang",
+        "First load arrives -- Yoonkyung Alterations 2nd floor, Anyang",
         "Refrigerator carried by Kang Taemin, down 11 floors of stairs",
         "Badge in the frame → report receipt",
         "9 boxes left in the Gongdeok-dong studio"
@@ -178,7 +178,7 @@ export default {
           "label": "Stay with Baek Arin until the last nine boxes are packed"
         }
       },
-      "place": "Anyang Central Market · Yoonkyung Tailoring",
+      "place": "Anyang Central Market · Yoonkyung Alterations",
       "clock": "June 29 · 20:00",
       "question": "The badge in the frame has become a report receipt, and nine boxes remain in the studio. How do you close this night?"
     },
@@ -224,7 +224,7 @@ export default {
           "label": "Settling costs nothing; run the settlement numbers first"
         }
       },
-      "place": "Anyang Central Market · At the Yoonkyung Tailoring Sewing Machines",
+      "place": "Anyang Central Market · At the Yoonkyung Alterations Sewing Machines",
       "clock": "June 27 · 17:00",
       "question": "The lawyer fees are more than twice her savings. What do you do about the gap?"
     },
@@ -275,7 +275,7 @@ export default {
     },
     "c33_hem_reaction": {
       "title": "The Hidden Seam",
-      "text": "At 11 at night, in Baek Arin’s old room on the 2nd floor of Yoonkyung Tailoring. She sits at an old hand-crank sewing machine her mother put away up here and turns the lining of her suit inside out. The seam is ruler-straight. 'Mom sews lining seams most carefully of all. She says the place nobody sees is the first to split.' She traces the seam with a fingertip. 'For 12 years I sewed the group’s seams where nobody could see them. That loan explanation, the Innovation Committee script. The report is the first time I turned a seam outside in.' Then she says what she has held back for a long time. 'Turned out, it’s so crooked. And I’m the one who sewed it.'",
+      "text": "At 11 at night, in Baek Arin’s old room on the 2nd floor of Yoonkyung Alterations. She sits at an old hand-crank sewing machine her mother put away up here and turns the lining of her suit inside out. The seam is ruler-straight. 'Mom sews lining seams most carefully of all. She says the place nobody sees is the first to split.' She traces the seam with a fingertip. 'For 12 years I sewed the group’s seams where nobody could see them. That loan explanation, the Innovation Committee script. The report is the first time I turned a seam outside in.' Then she says what she has held back for a long time. 'Turned out, it’s so crooked. And I’m the one who sewed it.'",
       "memo": [
         "The lining seam splits first",
         "The first seam turned outside in"
@@ -291,7 +291,7 @@ export default {
           "label": "Ask first if she has regrets, and leave settling open"
         }
       },
-      "place": "Yoonkyung Tailoring 2nd Floor · Baek Arin’s Old Room",
+      "place": "Yoonkyung Alterations 2nd Floor · Baek Arin’s Old Room",
       "clock": "June 27 · 23:00",
       "question": "She says the seams she hid for 12 years look crooked turned outside in. What do you say?"
     },
