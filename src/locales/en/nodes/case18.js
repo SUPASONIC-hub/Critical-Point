@@ -39,7 +39,7 @@ export default {
     },
     "c18_lounge": {
       "title": "The One Who Reads People",
-      "text": "The 32nd-floor lounge at Bridge Bank’s head office. Straight ahead, through the glass, is KD Financial Group headquarters. Do Haram, head of the strategy division, brings three coffees himself. One is for Kwon Dohyun, who stays standing by the window and does not take it. Do Haram speaks the moment he sits. 'I didn’t pick Mr. Oh because he’s fast. It’s because he can’t stand losing. People like that go all the way.' He turns his tablet around. 48 hours of acquisition due diligence access, all 1,214 KD loan files open. 'I’ll give you the blade. Where to cut is the team head’s call.' Then he looks at you. 'Analyst, did you come to hold him back, or to see him off?' Kwon Dohyun says, eyes still on the window, 'At 19%, KD takes a loss and we turn a profit. The debtor box… no one has filled it yet.'",
+      "text": "The 32nd-floor lounge at Bridge Bank’s head office. Straight ahead, through the glass, is KD Financial Group headquarters. Do Haram, head of the strategy division, brings three coffees herself. One is for Kwon Dohyun, who stays standing by the window and does not take it. Do Haram speaks the moment she sits. 'I didn’t pick Mr. Oh because he’s fast. It’s because he can’t stand losing. People like that go all the way.' She turns her tablet around. 48 hours of acquisition due diligence access, all 1,214 KD loan files open. 'I’ll give you the blade. Where to cut is the team head’s call.' Then she looks at you. 'Analyst, did you come to hold him back, or to see him off?' Kwon Dohyun says, eyes still on the window, 'At 19%, KD takes a loss and we turn a profit. The debtor box… no one has filled it yet.'",
       "memo": [
         "Do Haram: Bridge Bank strategy division head, Kwon Dohyun’s boss",
         "48 hours of due diligence access -- 1,214 KD loan files",
@@ -252,7 +252,7 @@ export default {
     },
     "c18_appendix_reaction": {
       "title": "A Test I Wrote",
-      "text": "At the revolving door in the lobby, Do Haram catches up with you. His face says he already knows what Kwon Dohyun showed you. 'That appendix. Show it to him. To Mr. Oh.' He pulls on his gloves. 'If he still comes after seeing the 612, he’s someone who can do this job. If he sees it and doesn’t come, then I’ve met a good person. Either way, I don’t lose.' The revolving door turns once. 'If you hide it, Analyst, I suppose that means you don’t trust him.'",
+      "text": "At the revolving door in the lobby, Do Haram catches up with you. Her face says she already knows what Kwon Dohyun showed you. 'That appendix. Show it to him. To Mr. Oh.' She pulls on her gloves. 'If he still comes after seeing the 612, he’s someone who can do this job. If he sees it and doesn’t come, then I’ve met a good person. Either way, I don’t lose.' The revolving door turns once. 'If you hide it, Analyst, I suppose that means you don’t trust him.'",
       "memo": [
         "Someone who doesn’t lose either way",
         "Hiding it means not trusting him"
@@ -342,7 +342,7 @@ export default {
     },
     "c18_branch_dataroom_follow": {
       "title": "Who Owns the Blade",
-      "text": "As you leave the data room, Do Haram is standing at the end of the corridor. In his hand, one A4 printout of the access log. '14:07, Maetan Branch. You opened that first, as expected.' He folds the paper in half and tucks it into Oh Jinwoo’s jacket pocket. 'I won’t send this log to anyone. But I’ll remember it. If you join, that file is yours, Team Head. If not, it goes to the next team head.' Oh Jinwoo presses his pocket. Turning away, Do Haram adds, 'The next team head won’t even know where Maetan Branch is. I’ll admit that’s more convenient for me.'",
+      "text": "As you leave the data room, Do Haram is standing at the end of the corridor. In her hand, one A4 printout of the access log. '14:07, Maetan Branch. You opened that first, as expected.' She folds the paper in half and tucks it into Oh Jinwoo’s jacket pocket. 'I won’t send this log to anyone. But I’ll remember it. If you join, that file is yours, Team Head. If not, it goes to the next team head.' Oh Jinwoo presses his pocket. Turning away, Do Haram adds, 'The next team head won’t even know where Maetan Branch is. I’ll admit that’s more convenient for me.'",
       "memo": [
         "Original access log: kept by Do Haram",
         "If he joins, he keeps access to that file",
@@ -643,7 +643,7 @@ export default {
     "c18_branch_dataroom_c": "Saying you may never see it again once you leave this room, you ignore the no-printing rule and photograph the screen with your phone.",
     "c18_branch_dataroom_follow_a": "Not letting a file bind a person, you say you’ll stand with Oh Jinwoo whoever holds that file.",
     "c18_branch_dataroom_follow_b": "Because a record held by one side becomes a weak spot, you demand a copy of the access log for us too.",
-    "c18_branch_dataroom_follow_c": "Saying confronting him here means stepping onto his table, you leave the log with Do Haram and quietly go.",
+    "c18_branch_dataroom_follow_c": "Saying confronting her here means stepping onto her table, you leave the log with Do Haram and quietly go.",
     "c18_route_system_tell": "Because he should know how he was chosen, you show Oh Jinwoo the evaluation sheet as it is.",
     "c18_route_system_audit": "Since the figures went out without any record of his consent, you request an official probe into how the response records got out.",
     "c18_route_system_card": "Saying it’s used up once if set off now, you shelve the evaluation sheet and hold it as a card in the sale talks.",

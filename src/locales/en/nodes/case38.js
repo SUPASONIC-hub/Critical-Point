@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c38_start": {
       "title": "1,740 Plaintiffs",
-      "text": "All four steamers at Gaeul Rice Cakes puff out steam at once. Today is the first day of the class action (a lawsuit filed jointly by many victims). At 2 p.m., in Courtroom 457 of the Seoul Central District Court, the first hearing (the court session where both sides present their arguments and evidence) opens. The list of plaintiffs runs to 1,740 people, and the lead plaintiff is Moon Gaeul. Public-interest lawyer Seon Jaeyoon spreads his papers out between the rice cake boxes. 'The group’s brief (a written summary of a side’s arguments filed with the court before trial) came in at 11 last night. They say the 212 without papers have no standing (the right to bring the suit).' He turns to the last page. Attachment 17 is the Trigger Lab response record leaked online last week, a table of your hesitations down to the second. Moon Gaeul puts down her rice cake knife. 'Why are they talking about you? This is our trial.'",
+      "text": "All four steamers at Gaeul Rice Cakes puff out steam at once. Today is the first day of the class action (a lawsuit filed jointly by many victims). At 2 p.m., in Courtroom 457 of the Seoul Central District Court, the first hearing (the court session where both sides present their arguments and evidence) opens. The list of plaintiffs runs to 1,740 people, and the lead plaintiff is Moon Gaeul. Public-interest lawyer Seon Jaeyoon spreads her papers out between the rice cake boxes. 'The group’s brief (a written summary of a side’s arguments filed with the court before trial) came in at 11 last night. They say the 212 without papers have no standing (the right to bring the suit).' She turns to the last page. Attachment 17 is the Trigger Lab response record leaked online last week, a table of your hesitations down to the second. Moon Gaeul puts down her rice cake knife. 'Why are they talking about you? This is our trial.'",
       "memo": [
         "First hearing: today 14:00, Courtroom 457, Seoul Central District Court",
         "1,740 plaintiffs -- 212 of them without loan papers",
@@ -494,7 +494,7 @@ export default {
       "place": "Gaeul Rice Cakes, Mangwon Market · By the steamers",
       "clock": "August 6 · Day of the first hearing · 05:45",
       "question": "The comparison table you attached to your letter is cited as grounds for aiming at you. How do you take that document back?",
-      "lead": "While the rice cakes steam, Seon Jaeyoon shows you a paragraph of the group’s brief on his phone. The reference number of your letter is in it."
+      "lead": "While the rice cakes steam, Seon Jaeyoon shows you a paragraph of the group’s brief on her phone. The reference number of your letter is in it."
     },
     "c38_start_rush": {
       "title": "The Trial of the One Who Ran Ahead",

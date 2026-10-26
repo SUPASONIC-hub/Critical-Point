@@ -163,7 +163,8 @@ export function SceneBriefing({
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
   // The names as the page prints them: prose in another language names people in it (src/locale.js).
-  const speech = useMemo(() => getSpeakerLine(node?.speakerName ? { ...node, speaker: node.speakerName } : node, SPEAKER_NAMES.map(speakerName)), [node]);
+  // A scene with no printed name is Korean prose (a case after the preview), so the Korean names find its speech.
+  const speech = useMemo(() => getSpeakerLine(node?.speakerName ? { ...node, speaker: node.speakerName } : node, node?.speakerName ? SPEAKER_NAMES.map(speakerName) : SPEAKER_NAMES), [node]);
   // A lead the balloon carries is narration: a caption's box, not speech.
   const Balloon = speech.fromLead ? "p" : "blockquote";
   // The case's opening voice, on its first page only, read after the title and

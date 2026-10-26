@@ -159,7 +159,7 @@ export default {
     },
     "c41_aftershock": {
       "title": "Number 23",
-      "text": "The hearing ends at 18:40. In the transcript, 'I don’t recall' appears exactly 23 times; the last came in the afternoon. Kwon Dohyun, who wrote twenty-three on the bookshop betting board, collects a box of cup noodles from Kang Taemin and says, 'I’ll look into whether prize money is taxable.' Outside the National Assembly’s main gate, Yoon Seojin does not get into her father’s car. She turns back and carries the empty rice cake boxes for Moon Gaeul, who took them out of the locker and handed the rice cakes around. At a tent bar in Yeouido, Cha Jiwon eats a real meal instead of triangle kimbap for the first time. It’s his second bowl. When the glasses have gone around once, Kang Taemin says briefly, 'Next time, let’s meet somewhere without papers.'",
+      "text": "The hearing ends at 18:40. In the transcript, 'I don’t recall' appears exactly 23 times; the last came in the afternoon. Kwon Dohyun, who wrote twenty-three on the bookshop betting board, collects a box of cup noodles from Kang Taemin and says, 'I’ll look into whether prize money is taxable.' Outside the National Assembly’s main gate, Yoon Seojin does not get into her father’s car. She turns back and carries the empty rice cake boxes for Moon Gaeul, who took them out of the locker and handed the rice cakes around. At a tent bar in Yeouido, Cha Jiwon eats a real meal instead of triangle kimbap for the first time. It’s her second bowl. When the glasses have gone around once, Kang Taemin says briefly, 'Next time, let’s meet somewhere without papers.'",
       "memo": [
         "Transcript: 'I don’t recall' 23 times",
         "Bet winner Kwon Dohyun -- prize: 1 box of cup noodles",
@@ -229,7 +229,7 @@ export default {
     },
     "c41_recess": {
       "title": "Lunch Recess",
-      "text": "In the hallway behind the hearing room, Cha Jiwon finishes a triangle kimbap in two bites and folds the wrapper in half. 'The lawmaker wants a name. Like last year. Yoon Sanghyuk erased it, one sentence. That’s tomorrow’s page 1.' He shows you his phone. A text the Group PR office sent reporters before the recess even began. 'CEO Yoon Sanghyuk appeared in a personal capacity and has no connection to the Group.' Cha Jiwon says, without smiling, 'See, they’re already cutting off the tail. Say only the name and it ends with that one man. Is that what you want?'",
+      "text": "In the hallway behind the hearing room, Cha Jiwon finishes a triangle kimbap in two bites and folds the wrapper in half. 'The lawmaker wants a name. Like last year. Yoon Sanghyuk erased it, one sentence. That’s tomorrow’s page 1.' She shows you her phone. A text the Group PR office sent reporters before the recess even began. 'CEO Yoon Sanghyuk appeared in a personal capacity and has no connection to the Group.' Cha Jiwon says, without smiling, 'See, they’re already cutting off the tail. Say only the name and it ends with that one man. Is that what you want?'",
       "memo": [
         "Lawmaker’s office request: one sentence, 'Yoon Sanghyuk erased it'",
         "Group PR office text: 'appeared in a personal capacity'",
@@ -552,7 +552,7 @@ export default {
     "c41_gallery_choice_1": "You hand them over, and your colleagues stand by the hallway monitors. Kang Taemin carries the chairs from in front of the monitors to the doorway and lines people up.",
     "c41_gallery_choice_2": "You ask for the criteria, and the Secretariat answers, 'Custom.' Custom isn’t written down, which makes it hard to refute.",
     "c41_gallery_choice_3": "By order in line, the people who took the first train at dawn get seats. Three of Moon Gaeul’s neighbors, who came late, are left in the hallway.",
-    "c41_recess_choice_1": "Cha Jiwon sighs. 'Page 4, then.' Then he writes Moon Gaeul’s name in the margin of the question sheet.",
+    "c41_recess_choice_1": "Cha Jiwon sighs. 'Page 4, then.' Then she writes Moon Gaeul’s name in the margin of the question sheet.",
     "c41_recess_choice_2": "The submitted text is attached to the transcript. The time the Group cut off the tail stays on record: 11:52.",
     "c41_recess_choice_3": "That one sentence will make page 1. On that page 1 will be Yoon Sanghyuk alone, and no one above him.",
     "c41_questions_reaction_choice_1": "You promise, and Hajun takes off his apron and folds it into his bag. On hearing day, a sign on the rice cake shop shutter reads 'Closed today.'",

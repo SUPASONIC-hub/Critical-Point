@@ -572,7 +572,7 @@ export default {
     "c44_branch_seal_follow_b": "The bundled material becomes a 7-day clock. Today is day one.",
     "c44_branch_seal_follow_c": "The story runs at three in the afternoon. The two words 'empty field' in the headline move the Group PR office an hour sooner.",
     "c44_route_system_publish": "Once released, '49 of 64 cases' becomes the headline of Seo Harin’s story. It’s the night before sentencing, so the judge sees the headline too.",
-    "c44_route_system_rule": "The proposal goes first to Aide Cha Jiwon at the National Assembly. 'It explains itself in 7 minutes.' For the first time, he doesn’t count the seconds.",
+    "c44_route_system_rule": "The proposal goes first to Aide Cha Jiwon at the National Assembly. 'It explains itself in 7 minutes.' For the first time, she doesn’t count the seconds.",
     "c44_route_system_drop": "With the statistics shelved, tomorrow is a quiet sentencing. 64 cases become 65.",
     "c44_final_system_route_a": "Requiring employee consent slows the company’s forgiveness. Slowed down, the forgiveness shows for the first time whose it is.",
     "c44_final_system_route_b": "Once you accept it, the morning’s sentence heads toward becoming final as it is. The 12,000 people whose bonuses were cut appear nowhere in that letter.",

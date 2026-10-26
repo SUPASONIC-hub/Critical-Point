@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c47_start": {
       "title": "1 Year Later, the Same Text",
-      "text": "The first text is from Moon Gaeul. 'Six steamers, not enough hands.' It is one more line after her text from three days ago, 'Don’t talk. Come and steam rice cakes.' Exactly 1 year on, the lines under that sentence keep growing. The second is a long email from Sun Jaeyoon, the public-interest lawyer. The class action has moved to court mediation, and the group has put forward draft 2nd-round compensation criteria. Of the 212 without papers, 181 have their harm confirmed through subcontracting statements and testimony, and they will be paid within the Chuseok holiday. Next to the remaining 31, one word is stamped. 'Unconfirmable.' Sun Jaeyoon added a line at the end of the email. 'The 31 are the very people Moon Gaeul stopped slicing rice cakes to ask about last year.'",
+      "text": "The first text is from Moon Gaeul. 'Six steamers, not enough hands.' It is one more line after her text from three days ago, 'Don’t talk. Come and steam rice cakes.' Exactly 1 year on, the lines under that sentence keep growing. The second is a long email from Seon Jaeyoon, the public-interest lawyer. The class action has moved to court mediation, and the group has put forward draft 2nd-round compensation criteria. Of the 212 without papers, 181 have their harm confirmed through subcontracting statements and testimony, and they will be paid within the Chuseok holiday. Next to the remaining 31, one word is stamped. 'Unconfirmable.' Seon Jaeyoon added a line at the end of the email. 'The 31 are the very people Moon Gaeul stopped slicing rice cakes to ask about last year.'",
       "memo": [
         "2nd-round compensation draft -- 181 of 212 confirmed, paid within the holiday",
         "The remaining 31: 'Unconfirmable'",
@@ -131,7 +131,7 @@ export default {
     },
     "c47_final": {
       "title": "The 31",
-      "text": "When Yeon Seojun of Doyul Law Firm walks into Gaeul Rice Cake Shop in a gray suit, Moon Gaeul says nothing and hands him an apron first. He hesitates a moment, then puts it on. Sun Jaeyoon spreads out the mediation proposal. If they consent by 18:00 today, the 181 are paid during the holiday. The 31 keep their 'Unconfirmable' stamp, and in exchange each receives a 3 million won consolation payment. Whoever takes it signs a no-suit agreement. Yeon Seojun speaks quietly. 'We respect the notebook. But a handwritten note by the deceased is not a document that proves harm.' Beside the counter sits Nam Heewon, who ran the Gaon Precision cafeteria, hugging her ledger, soaked and dried again. Moon Gaeul looks at you. 'Last year, in my husband’s letter, he asked you to see it through next time. This year I’m the one asking. Don’t finish this without these people.'",
+      "text": "When Yeon Seojun of Doyul Law Firm walks into Gaeul Rice Cake Shop in a gray suit, Moon Gaeul says nothing and hands him an apron first. He hesitates a moment, then puts it on. Seon Jaeyoon spreads out the mediation proposal. If they consent by 18:00 today, the 181 are paid during the holiday. The 31 keep their 'Unconfirmable' stamp, and in exchange each receives a 3 million won consolation payment. Whoever takes it signs a no-suit agreement. Yeon Seojun speaks quietly. 'We respect the notebook. But a handwritten note by the deceased is not a document that proves harm.' Beside the counter sits Nam Heewon, who ran the Gaon Precision cafeteria, hugging her ledger, soaked and dried again. Moon Gaeul looks at you. 'Last year, in my husband’s letter, he asked you to see it through next time. This year I’m the one asking. Don’t finish this without these people.'",
       "memo": [
         "181: paid during the holiday if they consent by 18:00 today",
         "31: 3 million won consolation each + no-suit agreement",
@@ -432,13 +432,13 @@ export default {
           "label": "Tell the 181 and the 31 where the leftover money goes"
         }
       },
-      "place": "Sun Jaeyoon Law Office · Records Room",
+      "place": "Seon Jaeyoon Law Office · Records Room",
       "clock": "Before Chuseok · Records Room",
       "question": "Pay the 31 in full and 1.5 billion won is still left, and it goes to sharing ads. How do you use this record?"
     },
     "c47_start_warm": {
       "title": "Chuseok for the One Who Stayed",
-      "text": "The night the shredding truck left, you stayed beside ECHO with your colleagues until the lights went out in the Pangyo test server room. Meanwhile, 11 replies came into the rice cake shop group chat, saying they would come for the Chuseok rush. Three days later, at 7:40 in the morning, Moon Gaeul sends one more line. 'Six steamers, not enough hands.' Right below it, Sun Jaeyoon posts the class action’s draft 2nd-round compensation criteria. Of the 212 without papers, 181 will be paid within the holiday, and 31 are stamped 'Unconfirmable.' The consent deadline is 18:00 on the day before Chuseok. Lee Minseo replies. 'I asked ECHO. It says unconfirmable isn’t a judgment. It means no one judged. Oh, ECHO’s coming to the shop too. On the laptop.'",
+      "text": "The night the shredding truck left, you stayed beside ECHO with your colleagues until the lights went out in the Pangyo test server room. Meanwhile, 11 replies came into the rice cake shop group chat, saying they would come for the Chuseok rush. Three days later, at 7:40 in the morning, Moon Gaeul sends one more line. 'Six steamers, not enough hands.' Right below it, Seon Jaeyoon posts the class action’s draft 2nd-round compensation criteria. Of the 212 without papers, 181 will be paid within the holiday, and 31 are stamped 'Unconfirmable.' The consent deadline is 18:00 on the day before Chuseok. Lee Minseo replies. 'I asked ECHO. It says unconfirmable isn’t a judgment. It means no one judged. Oh, ECHO’s coming to the shop too. On the laptop.'",
       "memo": [
         "Rice cake shop group chat: 11 replies saying they’ll come for the rush",
         "2nd-round draft: 181 confirmed, 31 'Unconfirmable'",
@@ -468,7 +468,7 @@ export default {
     },
     "c47_start_record": {
       "title": "Chuseok for the One Who Left a Way to Read",
-      "text": "Three days since you wrote ECHO’s recalculation and the 318 dots into a 14-page report. The last page was titled 'How to Read the Dot Beside an Empty Field.' Ban Jaewook, the report tucked into his notebook, calls at 7 in the morning. Sun Jaeyoon has sent the class action’s draft 2nd-round compensation criteria, he says. Of the 212 without papers, 181 confirmed, 31 'Unconfirmable.' The consent deadline is 18:00 on the day before Chuseok. Ban Jaewook reads it once more. 'The reason for all 31 rulings is the same single line. No electronic transaction history. And the decided-by field is empty on every one. Exactly the pattern in the report. This time we should ask first who left it empty.' As soon as you hang up, a text comes from Moon Gaeul. One line under her text from three days ago. 'Six steamers, not enough hands.'",
+      "text": "Three days since you wrote ECHO’s recalculation and the 318 dots into a 14-page report. The last page was titled 'How to Read the Dot Beside an Empty Field.' Ban Jaewook, the report tucked into his notebook, calls at 7 in the morning. Seon Jaeyoon has sent the class action’s draft 2nd-round compensation criteria, he says. Of the 212 without papers, 181 confirmed, 31 'Unconfirmable.' The consent deadline is 18:00 on the day before Chuseok. Ban Jaewook reads it once more. 'The reason for all 31 rulings is the same single line. No electronic transaction history. And the decided-by field is empty on every one. Exactly the pattern in the report. This time we should ask first who left it empty.' As soon as you hang up, a text comes from Moon Gaeul. One line under her text from three days ago. 'Six steamers, not enough hands.'",
       "memo": [
         "Three days since handing over the 14-page report",
         "2nd-round draft: decided-by field blank for the 31",
@@ -541,7 +541,7 @@ export default {
     "c47_memorial_cover": "The covered notebook becomes a document. Moon Gaeul says she will reread the covered parts alone at home.",
     "c47_memorial_son": "Hajun copies the acceptance text into the columbarium guestbook. Moon Gaeul tucks the notebook back into the deepest part of her bag.",
     "c47_final_hold": "You hold out, and Yeon Seojun asks for a recess. The 181 payments slip past the holiday, and more than a hundred messages saying 'It’s okay, we’ll wait' pour into the group chat. Not every message says that.",
-    "c47_final_split": "Split in two, the 181 get their Chuseok and the 31 go to court. Nam Heewon hands her ledger to Sun Jaeyoon. 'Don’t let it get wet this time.'",
+    "c47_final_split": "Split in two, the 181 get their Chuseok and the 31 go to court. Nam Heewon hands her ledger to Seon Jaeyoon. 'Don’t let it get wet this time.'",
     "c47_final_settle": "The consolation payments arrive within the holiday. The 31 receive 3 million won along with 'Unconfirmable,' unchanged, and can never sue over this again.",
     "c47_after_warm": "11 people stay on the roof, and the shutter is only half down. No one has looked up the one-line agenda in the notice yet.",
     "c47_after_record": "Turned into a request, the stories of the 31 will remain even when the people in charge change. Moon Gaeul signs at the very end. 'This one goes all the way.'",
@@ -559,7 +559,7 @@ export default {
     "c47_ledger_reaction_choice_2": "At the idea of rewriting it, Moon Gaeul starts to shake her head, then stops. 'You mean my husband’s debt wasn’t only his fault? That’s the first time I’ve heard that.'",
     "c47_ledger_reaction_choice_3": "The shutter comes down, and the two of you stand in the alley. Tomorrow the moon will be a little rounder, and the deadline a day closer.",
     "c47_banner_reaction_choice_1": "You promise, and Foreman Kim presses the notebook into your hand. 'Please give it to the boss’s wife.' Two days are left until Chuseok.",
-    "c47_banner_reaction_choice_2": "When you look for a way, Sun Jaeyoon brings up handwriting analysis. It would take ten days. The deadline is tomorrow.",
+    "c47_banner_reaction_choice_2": "When you look for a way, Seon Jaeyoon brings up handwriting analysis. It would take ten days. The deadline is tomorrow.",
     "c47_banner_reaction_choice_3": "The party ends warmly. The notebook goes into Moon Gaeul’s bag, and the promise on the last page goes past its date once more.",
     "c47_count_reaction_choice_1": "When you say you’ll look together, Hajun writes 'A Way' on a fresh page of his sketchbook and underlines it twice. He puts more into it than into interview prep.",
     "c47_count_reaction_choice_2": "Hajun nods at the talk of rules, then asks. 'Who makes those rules?' The subway pulls into a station before you can answer.",

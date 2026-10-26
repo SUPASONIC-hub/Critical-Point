@@ -16,7 +16,7 @@
  */
 import { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
 import { easyCognitionLabels, easyResourceLabels } from "../playerLanguage.js";
-import { caseObjectives, seasonCasesBase } from "../gameCases.js";
+import { CASE_SEQUENCE, caseObjectives, seasonCasesBase } from "../gameCases.js";
 
 const HANGUL = /[가-힣ㄱ-ㅣ]/;
 const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -62,13 +62,43 @@ export function overlayModule(copy, module, tables) {
 let dictionary = null;
 let language = null;
 
+/**
+ * A language still in preview names its last case (`previewThrough` in its
+ * dictionary). A case after it keeps its Korean, whatever files the language
+ * has; without one, every case the language has a file for is shown.
+ */
+export function inPreview(caseId, through = dictionary?.previewThrough) {
+  if (!through) return true;
+  const at = CASE_SEQUENCE.indexOf(caseId);
+  return at < 0 || at <= CASE_SEQUENCE.indexOf(through);
+}
+
+/** `{last}` and `{next}` of a preview line: the numbers of the preview's last case and of the case after it. */
+export function fillPreview(text, through = dictionary?.previewThrough) {
+  if (!through || typeof text !== "string") return text;
+  const number = (caseId) => String(caseId ?? "").replace(/^case/, "");
+  const next = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(through) + 1];
+  return text.replace(/\{last\}/g, number(through)).replace(/\{next\}/g, number(next));
+}
+
+/** The panel after the preview's last case says the English stops there (F-3, F-8 choice 1). */
+export function markPreviewEnd(signals, preview, through) {
+  const signal = through && signals?.[through];
+  if (!signal || !preview?.endPremiseLead) return;
+  signal.eyebrow = preview.endEyebrow ?? signal.eyebrow;
+  signal.button = preview.endButtons?.korean ?? signal.button;
+  signal.premise = `${fillPreview(preview.endPremiseLead, through)} ${signal.premise ?? ""}`.trim();
+}
+
 /** A module's own tables (caseCopy.js), as it loads. */
 export function localizeTables(module, tables) {
-  if (dictionary) overlayModule(dictionary.copy, module, tables);
+  if (!dictionary) return;
+  overlayModule(dictionary.copy, module, tables);
+  if (module === "caseCopy") markPreviewEnd(tables.nextCaseSignals, dictionary.preview, dictionary.previewThrough);
 }
 
 export function previewText(key) {
-  return dictionary?.preview?.[key] ?? "";
+  return fillPreview(dictionary?.preview?.[key] ?? "");
 }
 
 export function speakerName(name) {
@@ -92,8 +122,13 @@ export function localizeCase(caseId, data, index, words, speakers = {}) {
   return data;
 }
 
-/** A case as it arrives, in the loaded language; a case with no file, or one that cannot be fetched, keeps its Korean scenes. */
+/**
+ * A case as it arrives, in the loaded language; a case with no file, one that
+ * cannot be fetched, or one after the preview keeps its Korean scenes (and,
+ * after the preview, its Korean speaker names).
+ */
 export function localizeCaseData(caseId, data, index) {
+  if (!inPreview(caseId)) return data;
   const speakers = dictionary?.speakers;
   const load = language && import.meta.glob("./*/nodes/*.js")[`./${language}/nodes/${caseId}.js`];
   if (!load) return localizeCase(caseId, data, index, null, speakers);
