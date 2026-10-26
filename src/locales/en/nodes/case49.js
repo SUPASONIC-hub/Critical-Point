@@ -225,13 +225,13 @@ export default {
       },
       "place": "Old Trigger Lab building · 1st-floor hallway",
       "clock": "Tuesday, late September · 21:00",
-      "question": "An FSS inspector and a prosecutor, on one call, tell you not to go alone. How will you answer?"
+      "question": "An FSS examiner and a prosecutor, on one call, tell you not to go alone. How will you answer?"
     },
     "c49_hem": {
       "title": "2 Centimeters off the Hem",
-      "text": "The light is on at 'Yoonkyung Tailoring' in Anyang Central Market. Baek Arin asked you here. Heo Yoonkyung measures your trouser hems and grumbles. 'Why are all you bank people’s trousers too long? I hear you’re going somewhere high tomorrow. Can’t have you stepping on them.' While she folds up 2 cm, Baek Arin turns her tablet to show you. It is the floor plan of the former Group Strategy Office on the 33rd floor. 'The CCTV in that room goes off at 9 p.m. I built that setting. So the later the decision, the less record it leaves.' She starts to smile and stops. 'The lawsuit against me is still going. But if you need me tomorrow, I can come as far as the lobby.'",
+      "text": "The light is on at 'Yoonkyung Alterations' in Anyang Central Market. Baek Arin asked you here. Heo Yoonkyung measures your trouser hems and grumbles. 'Why are all you bank people’s trousers too long? I hear you’re going somewhere high tomorrow. Can’t have you stepping on them.' While she folds up 2 cm, Baek Arin turns her tablet to show you. It is the floor plan of the former Group Strategy Office on the 33rd floor. 'The CCTV in that room goes off at 9 p.m. I built that setting. So the later the decision, the less record it leaves.' She starts to smile and stops. 'The lawsuit against me is still going. But if you need me tomorrow, I can come as far as the lobby.'",
       "memo": [
-        "Yoonkyung Tailoring -- hems taken up 2 cm, no charge",
+        "Yoonkyung Alterations -- hems taken up 2 cm, no charge",
         "CCTV in the former Group Strategy Office, 33rd floor: off from 21:00",
         "Baek Arin: trade-secret leak lawsuit still under way"
       ],
@@ -246,7 +246,7 @@ export default {
           "label": "Tell Baek Arin not to come to the lobby, to keep her safe"
         }
       },
-      "place": "Anyang Central Market · Yoonkyung Tailoring",
+      "place": "Anyang Central Market · Yoonkyung Alterations",
       "clock": "Tuesday, late September · 22:40",
       "question": "The CCTV in that 33rd-floor room goes off after 9 p.m. How will you use this fact?"
     },
@@ -549,7 +549,7 @@ export default {
     "c49_parcels_choice_1": "Writing the replies takes an hour. Namgoong Sol writes back, 'Customer No. 1, be sure to come back.'",
     "c49_parcels_choice_2": "The letter is bound into one page. With 96 signers, even Yoon Sanghyuk will take a while to read it.",
     "c49_parcels_choice_3": "The boxes stay piled at the door. Do Yoonha peels a tangerine, puts it on your desk and says nothing.",
-    "c49_calls_choice_1": "When you ask, both say they will come, adding the words 'on official business'. It is the first time an FSS inspector and a prosecutor will stand in one lobby.",
+    "c49_calls_choice_1": "When you ask, both say they will come, adding the words 'on official business'. It is the first time an FSS examiner and a prosecutor will stand in one lobby.",
     "c49_calls_choice_2": "The statement runs to Question 42. Han Jiwoo writes 'Confirmed' on the last line and logs the time to the minute.",
     "c49_calls_choice_3": "After you hang up, it is quiet. Na Eunho texts one line. 'The record button is red.'",
     "c49_hem_choice_1": "When you tell her not to come, Baek Arin says 'Okay' after a long pause. Heo Yoonkyung asks for rice cakes instead of a fee.",
@@ -576,7 +576,7 @@ export default {
     "c49_final_system_route_a": "With the rule in place, the next empty field waits for the one who left it. This field was made before the rule.",
     "c49_final_system_route_b": "Your two fields are corrected. The other 56 still hold other people’s names today.",
     "c49_final_system_route_c": "As the claims come in, the 58 see one another’s names for the first time. The department that will process them is the one that made those fields.",
-    "c49_evidence_turn_attach": "You send it to both at once, and the FSS inspector and the prosecutor open the same file at the same time. That night, the Chairman’s Secretariat’s account goes on the list of subjects under investigation for the first time.",
+    "c49_evidence_turn_attach": "You send it to both at once, and the FSS examiner and the prosecutor open the same file at the same time. That night, the Chairman’s Secretariat’s account goes on the list of subjects under investigation for the first time.",
     "c49_evidence_turn_hold": "Held back, it becomes a strong hand in that room tomorrow. Meanwhile, the draft press release sits in the send queue.",
     "c49_evidence_turn_share": "When you show them, your colleagues read the sentence 'dissent gets digested inside' aloud. Kwon Dohyun asks, 'Who pays for the digestion?'",
     "c49_market_evidence_turn": "Inside the account records, the hand holding out the pen and the hand that chose it appear separately.",

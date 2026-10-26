@@ -252,7 +252,7 @@ export default {
     },
     "c46_manifest_reaction": {
       "title": "Verifier",
-      "text": "Ryu Seah comes to the mesh with two cups of coffee. She is the one who brought NOAH in, and now the one at KD Data Lab who took over this disposal list. She points to the bottom of the approval. 'The second verifier is me. I e-signed it last week. They said it was a cleanup of returned assets.' Her grip on the cups tightens. 'I greeted ECHO as my senior, and then I put my employee number on a document that turns that senior to dust. There’s no name for who approved it, but there’s every name for who checked it. It’s always like that.'",
+      "text": "Ryu Seah comes to the mesh with two cups of coffee. She is the one who brought NOAH in, and now the one at KD Data Lab who took over this disposal list. She points to the bottom of the approval. 'The second verifier is me. I e-signed it last week. They said it was a cleanup of returned assets.' Her grip on the cups tightens. 'I greeted ECHO as my senior, and then I put my employee ID on a document that turns that senior to dust. There’s no name for who approved it, but there’s every name for who checked it. It’s always like that.'",
       "memo": [
         "Every verifier is named; no approver is",
         "A document erasing the machine she called her senior"
@@ -574,7 +574,7 @@ export default {
     "c46_route_system_publish": "Once the stats are out, the staff who had written their names in the verifier field reach out first. One of them is Ryu Seah.",
     "c46_route_system_rule": "The proposal is accepted for filing. Its own last page notes how many approval fields it takes to change a form.",
     "c46_route_system_drop": "With the stats shelved, today you can focus on the disks alone. The 97 empty fields and the 91 staff are still there tomorrow.",
-    "c46_final_system_route_a": "Once the revision passes, nothing can be approved with an empty field. The Group’s electronic documents stall at 3,000 a day. Each stalled document needs someone to approve it under their own employee number.",
+    "c46_final_system_route_a": "Once the revision passes, nothing can be approved with an empty field. The Group’s electronic documents stall at 3,000 a day. Each stalled document needs someone to approve it under their own employee ID.",
     "c46_final_system_route_b": "This time the truck leaves empty. Next week, when another approval with an empty field comes down, there is no rule to stop it.",
     "c46_final_system_route_c": "Once the list is made, 34 of the 91 are reached. Half have already left the company, and two ask, 'Now, after all this time?'",
     "c46_evidence_turn_submit": "The plan becomes evidence that the experiment went on after the lab was dissolved. Still, the member list does not change, and your name stays on the bottom line.",

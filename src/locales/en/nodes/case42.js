@@ -229,9 +229,9 @@ export default {
     },
     "c42_embers": {
       "title": "Because I’m Ashamed",
-      "text": "The fireworks end, and only smoke is left at the end of the breakwater. The last turn is Han Seoyun’s. She fiddles with her cup-noodle lid for a long time. 'For me, it’s shame. 3 years ago I pressed the return button under my own employee number. The moment I stop, that record becomes my face again. So I can’t stop.' She says her mother calls every Sunday and starts with 'Haven’t they fired you yet?' and laughs. No one laughs with her. Then Ban Jaewook, back from his regional rounds, gets out of a taxi and walks to the breakwater. In one hand he holds a notebook; in the other, 11 glow sticks from the festival souvenir shop.",
+      "text": "The fireworks end, and only smoke is left at the end of the breakwater. The last turn is Han Seoyun’s. She fiddles with her cup-noodle lid for a long time. 'For me, it’s shame. 3 years ago I pressed the return button under my own employee ID. The moment I stop, that record becomes my face again. So I can’t stop.' She says her mother calls every Sunday and starts with 'Haven’t they fired you yet?' and laughs. No one laughs with her. Then Ban Jaewook, back from his regional rounds, gets out of a taxi and walks to the breakwater. In one hand he holds a notebook; in the other, 11 glow sticks from the festival souvenir shop.",
       "memo": [
-        "Han Seoyun: returned it 3 years ago under her own employee number",
+        "Han Seoyun: returned it 3 years ago under her own employee ID",
         "On standby assignment, a call from her mother every Sunday",
         "Ban Jaewook arrives 23:10 -- 11 glow sticks"
       ],
@@ -274,9 +274,9 @@ export default {
     },
     "c42_ledger_reaction": {
       "title": "The Address Returned Three Times",
-      "text": "Na Junhyuk sits on the office-building stairs and stirs two cups of instant coffee mix. One is for Yeo Dain. 'Dain, I know this address. When I was at the branch, my predecessor flagged money moving through this address three times, and all three times I returned it under my own employee number. If I’d seen it through back then, this house would never have gone to auction. And then you wouldn’t be here.' He starts to laugh and stops. 'Funny, isn’t it. The house I booked out of shame holds the money you saved your whole life. This time I won’t return it.'",
+      "text": "Na Junhyuk sits on the office-building stairs and stirs two cups of instant coffee mix. One is for Yeo Dain. 'Dain, I know this address. When I was at the branch, my predecessor flagged money moving through this address three times, and all three times I returned it under my own employee ID. If I’d seen it through back then, this house would never have gone to auction. And then you wouldn’t be here.' He starts to laugh and stops. 'Funny, isn’t it. The house I booked out of shame holds the money you saved your whole life. This time I won’t return it.'",
       "memo": [
-        "An employee number that returned it three times",
+        "An employee ID that returned it three times",
         "A house booked out of shame"
       ],
       "choices": {

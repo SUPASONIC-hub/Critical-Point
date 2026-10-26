@@ -568,7 +568,7 @@ export default {
     "c47_branch_screen_rule": "The disclosure request goes on the record. The reply is due in 30 days, and the deadline is two days away.",
     "c47_branch_screen_skip": "The 181 payment schedule comes out neat. In the corner of the monitor, the 31 cases change to 'Closed.'",
     "c47_branch_screen_follow_consent": "Nam Heewon looks at the screen for a long time, then speaks. '12 years I cooked, and the bank knew it all along.' She writes her name on the consent form, letter by letter.",
-    "c47_branch_screen_follow_all": "Branch Manager Seo Taekyung puts down the gift box and approves it under his own employee number. Accounts turn up for 19 of the 31. 12 have no account at this bank.",
+    "c47_branch_screen_follow_all": "Branch Manager Seo Taekyung puts down the gift box and approves it under his own employee ID. Accounts turn up for 19 of the 31. 12 have no account at this bank.",
     "c47_branch_screen_follow_one": "Nam Heewon’s one case speeds up. The other 30 are moved to a column called 'Later.'",
     "c47_route_system_share": "The panel and the group chat see the same numbers. Yeon Seojun says, 'We will take it into account,' and the group chat underlines '0 false vouches.'",
     "c47_route_system_vouch": "As you start making the rounds of the market alley, 11 people line up for Nam Heewon alone. The names you took down are still on paper, and the sun sets before you can cover all 31.",
