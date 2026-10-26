@@ -960,7 +960,8 @@ const budgets = [
   // src/locales/<lang>/screens); the overlay is the code they share. Measured in
   // the e2e build (English: 사건 01 the largest case), the gzip plus 4.
   // 73,483 / 21,390 -> 73,724 / 21,469 on 2026-10-26, 오진우가 경쟁자가 되는 경위 (ojinwoo-bridge): 사건 01's lead and memo say why he sits across the table, in English too. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_724, maxGzip: 21_469 },
+  // 73,724 / 21,469 -> 73,845 / 21,517 on 2026-10-26, 연속성 빈틈 ⑥~⑩ (continuity-rest): 사건 01 says when 한서윤 came as 실장 and why 도윤하 left his window, in English too. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_845, maxGzip: 21_517 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
