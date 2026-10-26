@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
+import { WEB_AD_CODE_MARKERS } from "./adsense-config.mjs";
 
 /**
  * Bundle and first-paint budgets.
@@ -1126,6 +1127,16 @@ if (firstPaint > FIRST_PAINT_BUDGET) {
   failures.push(`The first paint transfers ${firstPaint} bytes, over the ${FIRST_PAINT_BUDGET} byte budget (${parts.join(", ")}).`);
 }
 reported.push(`first paint ${firstPaint} bytes (${parts.join(", ")})`);
+
+// Web ads (출시 로드맵 2단계) are off unless the build was given
+// ADSENSE_ADS=on (draft #341): a site build without it, AdSense site
+// verification (ADSENSE_CLIENT) included, carries no ad code in any script.
+if (process.env.ADSENSE_ADS !== "on") {
+  const scripts = [path.join(distDir, "sw.js"), ...readdirSync(assetsDir).filter((name) => name.endsWith(".js")).map((name) => path.join(assetsDir, name))];
+  const carrier = scripts.find((file) => WEB_AD_CODE_MARKERS.test(readFileSync(file, "utf8")));
+  if (carrier) failures.push(`${path.relative(distDir, carrier)} carries web ad code ("${WEB_AD_CODE_MARKERS.exec(readFileSync(carrier, "utf8"))[0]}") in a build without ADSENSE_ADS=on.`);
+  else reported.push("no web ad code");
+}
 
 if (failures.length) {
   console.error(failures.join("\n"));
