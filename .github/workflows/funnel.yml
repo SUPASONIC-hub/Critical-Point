@@ -1,8 +1,10 @@
 name: Funnel
 
-# Where seasons stop (E-4(a) of the 2026-10-22 review). Once a week this reads
+# Players over time and where seasons stop (E-4(a) of the 2026-10-22 review;
+# the player tables since the 2026-10-26 web-first roadmap). Every day this reads
 # the case rows of every run off the live database and writes to the run's Job
-# Summary how far runs got, where they stopped, how long players stay away
+# Summary the devices new and active, runs begun and seasons finished for each
+# of the last 14 days and 8 weeks, then how far runs got, where they stopped, how long players stay away
 # between rows, how many days a finished season took, how many finished
 # seasons were followed by a new run on the same device, and the funnel of
 # runs marked NEW GAME+ (scripts/report-funnel.mjs). Read only, aggregates
@@ -23,8 +25,9 @@ on:
         required: false
         default: ""
   schedule:
-    # Sunday 22:10 KST: the week is in, and it is not Test Week's 23:40.
-    - cron: "10 13 * * 0"
+    # 22:10 KST every day, so the player table is a day old at most; not Test
+    # Week's 23:40.
+    - cron: "10 13 * * *"
 
 permissions:
   contents: read

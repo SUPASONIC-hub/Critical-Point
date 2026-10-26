@@ -228,7 +228,7 @@ export const case03 = {
         },
         {
           id: "c3_after_win",
-          label: "마지막 집계의 우위를 내 승리로 굳히고 경쟁자의 허점을 이용한다",
+          label: "마지막 집계 우위를 내 승리로 굳히고 상대 허점을 쓴다",
           effect: { capital: 13, trust: -10, legitimacy: -8, humanCost: 5, fatigue: 3 },
           voice: "망설임을 끊고, 마지막 집계의 우위를 내 승리로 굳힌 뒤 경쟁자의 허점을 이용한다.",
           echo: "허점을 쓰자 격차는 벌어집니다. 같은 방식이 당신에게 쓰일 때 항의할 근거는 줄어듭니다.",
@@ -554,7 +554,7 @@ export const case03 = {
           },
           {
             id: "b",
-            label: "속도를 성과로 보고하고 다음 입찰도 같은 기준으로 받는다",
+            label: "속도를 성과로 보고하고 다음 입찰도 같은 기준으로 간다",
             effect: { capital: 10, time: 6, trust: -7, legitimacy: -7, humanCost: 5, fatigue: -4 },
             voice: "이긴 방식이 옳았다고 보고, 같은 기준으로 다음 입찰도 받는다.",
             echo: "고객은 같은 속도를 다음 사람에게도 요구합니다. 그 사람은 당신이 아닙니다.",
@@ -627,7 +627,7 @@ export const case03 = {
           },
           {
             id: "c",
-            label: "손실을 회사 비용으로 공식화하고 결함 검증은 계약 밖에서 계속한다",
+            label: "손실은 회사 비용으로 공식화하고 검증은 따로 잇는다",
             effect: { trust: 9, legitimacy: 7, capital: -6, fatigue: 8 },
             voice: "손실을 누가 지는지부터 정하려고, 회사 비용으로 공식화한다.",
             echo: "비용을 회사가 지면 검증은 계속됩니다. 이번 분기 숫자는 나빠집니다.",

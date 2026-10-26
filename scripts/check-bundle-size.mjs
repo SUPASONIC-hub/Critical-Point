@@ -63,32 +63,47 @@ const budgets = [
   // save's restore (src/state/cloudDeviceRecords.js), so Rolldown writes them
   // into the shared season-store chunk below. Measured 141,946 / 51,960 in the
   // e2e build, the gzip plus 4.
-  // 141,946 / 51,964 -> 144,931 / 53,085 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the side run
-  // (state/sideRun.js) and what the side screen takes from this chunk
-  // (state/sideCaseKit.js). The pack check stays out (state/sidePackCheck.js,
-  // read by check:graph and the tests only). Measured 144,931 / 53,081 in the
-  // e2e build, the gzip plus 4.
-  // 144,931 / 53,085 -> 145,123 / 53,131 on 2026-10-25, E-11 번외 사건 온라인 저장
-  // (draft on e11-side01 2a82cfd1): closeSideCase tells the online save that a
-  // carried record changed (DEVICE_RECORD_WRITTEN_EVENT). Measured 145,123 /
-  // 53,127 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 145_123, maxGzip: 53_131 },
+  // 141,946 / 51,964 -> 142,728 / 52,274 on 2026-10-25 (B-2 final-case copy,
+  // the owner's answers all (1)): the 33rd floor's far callback to 사건 49
+  // (farCallbacks.f_confront, three lines and a fallback). Measured 142,728 /
+  // 52,270 in the e2e build on main ea5b74aa, the gzip plus 4.
+  // 52,274 -> 52,279 gzip on 2026-10-25, 묶음 A-13 (long scene bodies, text
+  // only) on main 024904a3: the shortened case files change the hashed names
+  // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
+  // -> 145,734 / 53,369 on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+  // 1dcdda39: the side run (state/sideRun.js) and what the side screen takes
+  // from this chunk (state/sideCaseKit.js); the pack check stays out
+  // (state/sidePackCheck.js). Measured 145,734 / 53,365 in the e2e build, the gzip plus 4.
+  // 53,369 -> 53,375 gzip on 2026-10-26, E-11 번외 1 (draft) restacked on
+  // e11-side-cases 3a782459: the chunk names it imports. Measured 145,734 /
+  // 53,371, the gzip plus 4.
+  // 145,734 / 53,375 -> 145,874 / 53,439 on 2026-10-26, E-11 번외 사건 온라인
+  // 저장 (draft) restacked on e11-side01 76c5b028: the side records the online
+  // save carries. Measured 145,874 / 53,435 in the e2e build, the gzip plus 4.
+  // 53,439 -> 53,445 gzip on 2026-10-26, E-11 번외 2 (draft) restacked on
+  // e11-side-cloud bb76437e: the chunk names it imports. Measured 145,874 /
+  // 53,441, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 145_874, maxGzip: 53_445 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
   // asks first, never before. Measured 32,897 / 13,018 in the e2e build, the
   // gzip plus 4.
-  // 32,897 / 13,022 -> 32,897 / 13,028 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the same code
-  // under moved chunk names. Measured 32,894 / 13,024, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_028 },
+  // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
+  // 13,039 -> 13,052 gzip on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+  // 1dcdda39: the same code under the chunk names it imports. Measured 32,897 /
+  // 13,048, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_052 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
-  // 19,564 / 8,588 -> 19,565 / 8,594 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the same
-  // code; one more name the runtime's chunk imports from it. Measured 19,565 /
-  // 8,590, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_565, maxGzip: 8_594 },
+  // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
+  // 19,567 -> 19,568 raw on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+  // 1dcdda39: one more name the runtime's chunk imports. Measured 19,568 / 8,587.
+  // 8,588 -> 8,593 gzip on 2026-10-26, E-11 번외 1 (draft) restacked on
+  // e11-side-cases 3a782459: the same code. Measured 19,568 / 8,589, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 19_568, maxGzip: 8_593 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -104,7 +119,11 @@ const budgets = [
   // the gzip plus 4; with GameRuntime the two are 433,077 / 139,053 beside
   // 432,844 / 138,381 before (+233 raw / +672 gzip: the same code, packed
   // into the larger file). Both load with the runtime, as before.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_094 },
+  // 87,094 -> 87,101 gzip on 2026-10-25 (A-13 1/4): the raw bytes are the
+  // same 291,131, but eight case files' hashed names in its import list
+  // changed with their scene text and gzip worse; measured 87,097 on main
+  // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_101 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -232,23 +251,46 @@ const budgets = [
   // keys the online save now carries (SEEN_SCENES_KEY, PAST_PICKS_KEY) are
   // spelled in appConfig.js, where cloudSave.js reads them without the scene
   // graph. Measured 172,146 / 62,150 in the e2e build, the gzip plus 4.
-  // 172,146 / 62,154 -> 174,226 / 62,857 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the
-  // start screen's side slot, hidden until a finale is closed and a side case
-  // is written (src/sideCases.js, the slot and its open/close in IntroScreen),
-  // and the side-id guards of the local ranking and the window log. The first
-  // paint's own budget is not raised. Measured 174,226 / 62,853, the gzip plus 4.
-  // 174,226 / 62,857 -> 174,418 / 62,949 on 2026-10-25, E-11 번외 1 (draft on
-  // e11-side-cases dbb4f419): the release list's one entry for side01, its label,
-  // title and chunk loader (src/nodes/sidePacks.js). Measured 174,418 / 62,945,
+  // -> 172,244 / 62,205 on 2026-10-25, the tab token claim's longer wait
+  // (TAB_TOKEN_CLAIM_MS 300, one more wait when the timer fired late, capped
+  // at TAB_TOKEN_CLAIM_MAX_MS). Measured 172,244 / 62,201 in the CI e2e build,
   // the gzip plus 4.
-  // 174,418 / 62,949 -> 174,478 / 62,958 on 2026-10-25, E-11 번외 사건 온라인 저장
-  // (draft on e11-side01 2a82cfd1): the event's name in appConfig.js. The marks
-  // and their merge stay out of this chunk (state/sideMarks.js). Measured
-  // 174,478 / 62,954, the gzip plus 4.
-  // 174,478 / 62,958 -> 174,649 / 63,007 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the release
-  // list's entry for side02, its label, title and chunk loader
-  // (src/nodes/sidePacks.js). Measured 174,649 / 63,003, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 174_649, maxGzip: 63_007 },
+  // -> 172,282 / 62,234 on 2026-10-25, 묶음 시대고증(#313): the intro's story
+  // paragraph (KD's owner, Kingsdale) and the era words. Measured 172,282 /
+  // 62,226 in CI and 62,230 here, the larger gzip plus 4.
+  // 172,282 / 62,234 -> 172,403 / 62,270 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 172,403 / 62,266 gzip in the e2e build, the gzip plus 4.
+  // 172,403 / 62,270 -> 173,126 / 62,668 on 2026-10-25, deletion-contact: the deletion-request sentence in the data notice with the support address as a mailto link (SUPPORT_CONTACT, getDeletionRequestText in appConfig.js). Measured 173,126 / 62,664 gzip in the e2e build on main 2998216 (#325), the gzip plus 4.
+  // 173,126 / 62,668 -> 173,478 / 62,829 the same day, 개인정보처리방침·이용약관
+  // on main 39176493 (#326): the intro's foot and the data drawer's note link
+  // the two pages (privacyText.js holds the paths and the consent sentence,
+  // moved, not added). Measured 173,478 / 62,825 in the e2e build, the gzip
+  // plus 4.
+  // 173,478 / 62,829 -> 175,169 / 63,528 on 2026-10-26, pwa-install-hint: the
+  // install offer's listener and store (state/installPrompt.js, set in
+  // main.jsx because `beforeinstallprompt` can arrive before the intro
+  // renders), the slot in the comfort drawer (InstallHintSlot.jsx) and its
+  // five lines in appCopy.js. The hint itself is InstallHint below. Measured
+  // 175,169 / 63,524 in the e2e build, the gzip plus 4.
+  // -> 177,272 / 64,276 on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+  // 1dcdda39: the start screen's side slot, hidden until a finale is closed and
+  // a side case is written (src/sideCases.js, the slot and its open/close in
+  // IntroScreen), and the side-id guards of the local ranking and the window
+  // log. Measured 177,272 / 64,272 in the e2e build, the gzip plus 4.
+  // 177,272 / 64,276 -> 177,464 / 64,364 on 2026-10-26, E-11 번외 1 (draft)
+  // restacked on e11-side-cases 3a782459: the release list's one entry for
+  // side01, its label, title and chunk loader (src/nodes/sidePacks.js).
+  // Measured 177,464 / 64,360, the gzip plus 4.
+  // 177,464 / 64,364 -> 177,509 / 64,365 on 2026-10-26, E-11 번외 사건 온라인
+  // 저장 (draft) restacked on e11-side01 76c5b028: the side keys spelled in
+  // appConfig.js for the online save. Measured 177,509 / 64,361, the gzip plus 4.
+  // 177,509 / 64,365 -> 177,678 / 64,418 on 2026-10-26, E-11 번외 2 (draft)
+  // restacked on e11-side-cloud bb76437e: the release list's entry for side02.
+  // Measured 177,678 / 64,414, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 177_678, maxGzip: 64_418 },
+  // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
+  // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
+  // gzip plus 4.
+  { pattern: /^InstallHint-.*\.js$/, maxBytes: 559, maxGzip: 323 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -398,17 +440,27 @@ const budgets = [
   // WeekRulePanel's. Measured 107,682 / 35,987 in the e2e build, the gzip plus 4.
   // 107,682 / 35,991 -> 101,087 / 34,821 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 101,087 / 34,817 in the e2e build, the gzip plus 4.
-  // 101,087 -> 101,102 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): GauntletStage
-  // exported for the side screen's table. Measured 101,102 / 34,820.
-  // 34,821 -> 34,827 gzip on 2026-10-25, E-11 번외 1 (draft on e11-side-cases):
-  // the same code; the hashed chunk names it imports changed with ResultScreen
-  // (the side slot's line moved after the logic report). Measured 101,102 /
-  // 34,823, the gzip plus 4.
-  // 101,102 / 34,821 -> 101,106 / 34,826 on 2026-10-25, E-11 번외 사건 온라인 저장
-  // (draft on e11-side01 2a82cfd1): the same code under moved import names.
-  // Measured 101,106 / 34,822, the gzip plus 4.
-  // Both merged: the larger raw and gzip.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 101_106, maxGzip: 34_827 },
+  // 34,821 -> 34,826 gzip on 2026-10-25, 묶음 A-13 on main 024904a3 (hashed
+  // chunk names only): measured 101,085 / 34,822 in the e2e build, the gzip plus 4.
+  // -> 102,475 / 35,457 on 2026-10-24 (B-11(1) 막 표지, on main ea5b74aa): the
+  // act title card's gate (actCardGate.js: the eight cases, the run's record of
+  // the acts it was shown, and the opening-page test) and its fold, which
+  // fetches the card (ActCard.jsx, its own chunk below) with its preload list.
+  // Measured 102,475 / 35,449 in the e2e build (35,453 on da6292be; the larger
+  // gzip plus 4).
+  // -> 102,514 / 35,481 on 2026-10-25, 묶음 시대고증(#313): the era words in
+  // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
+  // the larger gzip plus 4.
+  // 102,514 / 35,481 -> 102,517 / 35,481 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 102,517 in the e2e build.
+  // 102,517 -> 102,528 raw on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+  // 1dcdda39: GauntletStage exported for the side screen's table. Measured
+  // 102,528 / 35,480.
+  // 35,481 -> 35,494 gzip on 2026-10-26, E-11 번외 1 (draft) restacked on
+  // e11-side-cases 3a782459: the same code under the hashed chunk names it
+  // imports. Measured 102,528 / 35,490, the gzip plus 4.
+  // 102,528 -> 102,530 raw on 2026-10-26, E-11 번외 사건 온라인 저장 (draft)
+  // restacked on e11-side01 76c5b028: an import name. Measured 102,530 / 35,478.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_530, maxGzip: 35_494 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -450,12 +502,11 @@ const budgets = [
   // 43,189 / 14,211 -> 44,569 / 14,830 on 2026-10-25 (B-12(2) 「당신의 세 장면」,
   // src/threeScenes.js in the ending's last step, on main ea5b74aa): measured
   // 44,569 / 14,826 in the e2e build, the gzip plus 4.
-  // 44,569 / 14,830 -> 44,851 / 14,910 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the
-  // finale's line that the side slot opened, and the side list it reads.
-  // Measured 44,851 / 14,906, the gzip plus 4.
-  // 44,851 / 14,910 -> 44,851 / 14,915 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): the same code
-  // under moved chunk names. Measured 44,851 / 14,911, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_851, maxGzip: 14_915 },
+  // 44,569 / 14,830 -> 44,575 / 14,830 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 44,575 in the e2e build.
+  // 44,575 / 14,830 -> 44,851 / 14,905 on 2026-10-26, E-11 번외 사건 틀 (draft)
+  // restacked on main 1dcdda39: the finale's line that the side slot opened,
+  // and the side list it reads. Measured 44,851 / 14,901, the gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 44_851, maxGzip: 14_905 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -508,7 +559,16 @@ const budgets = [
   // e72c415f: measured 191,685 / 35,787 in the e2e build, the gzip plus 4.
   // -> 191,778 / 35,830 on 2026-10-25 with B-12(2)'s 「당신의 세 장면」 coda
   // (main ea5b74aa): measured 191,778 / 35,826, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 191_778, maxGzip: 35_830 },
+  // -> 193,412 / 36,058 on 2026-10-25 (B-11(1) 막 표지, on main 024904a3): the
+  // act title card's rules in briefing.css beside B-12(2)'s coda. Measured
+  // 193,412 / 36,054 in the e2e build, the gzip plus 4.
+  // 193,412 / 36,058 -> 194,165 / 36,203 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 194,165 / 36,199 gzip in the e2e build, the gzip plus 4.
+  // -> 194,339 / 36,241 the same day, 개인정보처리방침·이용약관 on main 29982165:
+  // `.intro-legal` and the links' colour. Measured 194,339 / 36,237 in the e2e
+  // build, the gzip plus 4.
+  // -> 195,002 / 36,324 on 2026-10-26, pwa-install-hint: the hint's card in
+  // comfort.css. Measured 195,002 / 36,320 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 195_002, maxGzip: 36_324 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -538,7 +598,8 @@ const budgets = [
   // choice 1): measured 17,050 / 6,043 in the e2e build on main 5adcbb5 with
   // lucide-react 1.60 installed (npm ci), the gzip plus 4. The 13,212 / 4,658
   // of 2026-10-21 was lucide 0.577 left in this checkout's node_modules.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_050, maxGzip: 6_047 },
+  // 17,050 / 6,047 -> 17,286 / 6,142 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 17,286 / 6,138 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_286, maxGzip: 6_142 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -551,7 +612,12 @@ const budgets = [
   // gzip plus 4, raised by what it lacked. The 5 bytes came with main and
   // lucide 1.60 (#218, which the screen imports from); this branch changes
   // nothing in it.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_507, maxGzip: 2_366 },
+  // 5,507 / 2,366 -> 9,029 / 3,768 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 9,029 / 3,764 gzip in the e2e build, the gzip plus 4.
+  // 9,029 -> 9,030 raw on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+  // 1dcdda39: an import name. Measured 9,030 / 3,764.
+  // 9,030 -> 9,031 raw on 2026-10-26, E-11 번외 사건 온라인 저장 (draft)
+  // restacked on e11-side01 76c5b028: an import name. Measured 9,031 / 3,763.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 9_031, maxGzip: 3_768 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -577,21 +643,21 @@ const budgets = [
   // 10,523 / 4,284 -> 11,492 / 4,639 on 2026-10-24, E-12: the upload carries
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
-  // 11,492 / 4,639 -> 11,494 / 4,647 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): the same
-  // code under the import names the new chunks moved. Measured 11,494 / 4,643,
-  // the gzip plus 4.
-  // 11,494 / 4,647 -> 12,077 / 4,858 on 2026-10-25, E-11 번외 사건 온라인 저장
-  // (draft on e11-side01 2a82cfd1): the side cases' completion marks ride as a
-  // fourth device record (state/sideMarks.js, which Rolldown writes into this
-  // chunk), and a side case's close is followed like a save. Measured 12,077 /
-  // 4,854, the gzip plus 4.
+  // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, board-report on main caeecda: only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
+  // 11,492 -> 11,494 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 11,494 / 4,638.
+  // 11,494 / 4,644 -> 12,077 / 4,858 on 2026-10-26, E-11 번외 사건 온라인 저장
+  // (draft) restacked on e11-side01 76c5b028: the upload carries the side
+  // records and a restore merges them. Measured 12,076 / 4,854, the gzip plus 4
+  // (raw kept at the branch's earlier 12,077).
   { pattern: /^cloudSave-.*\.js$/, maxBytes: 12_077, maxGzip: 4_858 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
-  // 1,934 / 942 -> 2,097 / 1,004 on 2026-10-25, E-11 번외 사건 온라인 저장 (draft
-  // on e11-side01 2a82cfd1): the side marks merged into this device's record.
-  // Measured 2,097 / 1,000, the gzip plus 4.
+  // 942 -> 948 on 2026-10-25, 묶음 A-3 (season labels) on main 8e75b128: no
+  // code, the case chunks' new hashes. Measured 944, the gzip plus 4.
+  // 1,934 / 948 -> 2,097 / 1,004 on 2026-10-26, E-11 번외 사건 온라인 저장
+  // (draft) restacked on e11-side01 76c5b028: the side records' merge on a
+  // restore. Measured 2,097 / 1,000, the gzip plus 4.
   { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_004 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
@@ -714,7 +780,10 @@ const budgets = [
   // 107,213 / 35,690 -> 107,220 / 35,694 on 2026-10-24, B-9 감정 배합 on main
   // b0eb9cb0: the 사건 43 막간 now reads the names on the cup-noodle lid
   // (+7 raw); measured 107,220 / 35,690 in the e2e build, the gzip plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_220, maxGzip: 35_694 },
+  // -> 107,276 / 35,735 on 2026-10-25, 묶음 시대고증(#313): the interludes'
+  // 접수 알림음·봉인 테이프·출력본 and the routes. Measured 107,276 / 35,731,
+  // the gzip plus 4.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_276, maxGzip: 35_735 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -779,7 +848,8 @@ const budgets = [
   // story.
   // 2,704 / 1,450 -> 2,634 / 1,403 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 2,634 / 1,399 in the e2e build, the gzip plus 4.
-  // 2,634 -> 2,637 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): an import name, measured.
+  // 2,634 / 1,403 -> 2,636 / 1,403 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 2,636 in the e2e build.
+  // 2,636 -> 2,637 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 2,637 / 1,398.
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_637, maxGzip: 1_403 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
@@ -792,8 +862,10 @@ const budgets = [
   // week's notice in the same line.
   // 2,081 / 1,077 -> 1,995 / 1,051 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,995 / 1,047 in the e2e build, the gzip plus 4.
-  // 1,995 -> 1,996 raw on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): an import name, measured.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_051 },
+  // 1,995 / 1,051 -> 1,996 / 1,051 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 1,996 in the e2e build.
+  // -> 1,056 gzip on 2026-10-25 (개인정보처리방침·이용약관): measured 1,052, the
+  // entry chunk's export names it imports by, plus 4; the file did not change.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_056 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -845,6 +917,11 @@ const budgets = [
   // 11,705 / 5,445 -> 11,609 / 5,405 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 11,609 / 5,401 in the e2e build, the gzip plus 4.
   { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 11_609, maxGzip: 5_405 },
+  // The act title card (src/gauntlet/ActCard.jsx with actCardCopy.js, B-11(1)
+  // 막 표지), 2026-10-24: eight acts' names and sentences, the count to the
+  // season's end and the dialog, fetched by the PlayScreen chunk's fold only
+  // on an act's first case. Measured 2,698 / 1,538 on main da6292be, the gzip plus 4.
+  { pattern: /^ActCard-.*\.js$/, maxBytes: 2_698, maxGzip: 1_542 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -1064,14 +1141,27 @@ function checkBudget(file, budget) {
 // b0eb9cb0 (#287), 3,405; the larger plus 4. One
 // more file in the list, cloudDeviceRecords, and gameData.app is now named
 // pastPicks; the worker's code did not change.
-// -> 9,347 / 3,425 on 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b): measured 9,347 / 3,421 plus 4.
-// One more file in the list, SideCaseScreen; the worker's code did not change.
-// -> 9,376 / 3,443 on 2026-10-25, E-11 번외 1 (draft on e11-side-cases dbb4f419):
-// measured 9,376 / 3,439 plus 4. One more file in the list, side01, offline
-// like every case chunk; the worker's code did not change.
-// 9,376 / 3,443 -> 9,405 / 3,449 on 2026-10-25, E-11 번외 2 (draft on e11-side-cloud c12158e1): side02's chunk in the
-// offline list, like the case chunks. Measured 9,405 / 3,445, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 9_405, maxGzip: 3_449 };
+// -> 9,340 / 3,424 on 2026-10-24 (B-11(1) 막 표지, on main ea5b74aa): measured
+// 9,340 / 3,415 here and 3,420 in CI (the file names' hashes); the larger plus
+// 4. One more file in the list, ActCard; the worker's code did not change.
+// -> 3,431 gzip on 2026-10-25, 묶음 시대고증(#313): the chunk names' hashes
+// only (measured 3,427 plus 4); the worker's code did not change.
+// -> 9,863 / 3,555 on 2026-10-25, 개인정보처리방침·이용약관: the worker
+// answers the four policy pages network first and keeps them (DOCUMENT_PAGE,
+// answerPage), and the warm list names them. Measured 9,863 / 3,551 plus 4.
+// -> 9,897 / 3,567 on 2026-10-26, pwa-install-hint: one more file in the warm
+// list, InstallHint; the worker's code did not change. Measured 9,897 / 3,563
+// plus 4.
+// -> 9,934 / 3,578 on 2026-10-26, E-11 번외 사건 틀 (draft) restacked on main
+// 1dcdda39: one more file in the list, SideCaseScreen; the worker's code did
+// not change. Measured 9,934 / 3,574 plus 4.
+// -> 9,963 / 3,599 on 2026-10-26, E-11 번외 1 (draft) restacked on
+// e11-side-cases 3a782459: one more file in the list, side01, offline like
+// every case chunk. Measured 9,963 / 3,595 plus 4.
+// -> 9,992 / 3,606 on 2026-10-26, E-11 번외 2 (draft) restacked on
+// e11-side-cloud bb76437e: one more file in the list, side02. Measured 9,992 /
+// 3,602 plus 4.
+const WORKER_BUDGET = { maxBytes: 9_992, maxGzip: 3_606 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

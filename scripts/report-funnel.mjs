@@ -1,11 +1,15 @@
 /**
- * Where seasons stop, read off the live database (.github/workflows/funnel.yml).
+ * Players over time and where seasons stop, read off the live database
+ * (.github/workflows/funnel.yml, every day).
  *
  * E-4(a) of the 2026-10-22 review (재미·몰입 분석 3-6): the drop-off points
  * every other item there is judged by were guesses. This reads the case rows of
- * `playtest_sessions` once a week and prints, as a Markdown table for the run's
+ * `playtest_sessions` once a day and prints, as Markdown tables for the run's
  * Job Summary:
  *
+ *   - players over time (readTraffic): for the last 14 KST days and 8 weeks,
+ *     devices new and active, runs begun, runs past 프롤로그 05, seasons
+ *     finished -- the web-first roadmap's traffic signal (2026-10-26);
  *   - the last case each run sent (프롤로그 01-05, 사건 01·08·18·36, 피날레),
  *     as a funnel and as where runs stopped;
  *   - the gaps between a run's rows, and the breaks among them (how long a
@@ -113,6 +117,7 @@ export function readRun(row) {
     firstAt: plays[0]?.at ?? null,
     lastAt: plays.at(-1)?.at ?? null,
     finishedAt: finalRow?.at ?? null,
+    times: plays.map((entry) => entry.at),
     gaps,
   };
 }
@@ -164,6 +169,77 @@ export function readFunnel(rows, now = Date.now() / 1000) {
   };
 }
 
+/** Days and weeks the traffic tables show, newest first. */
+export const TRAFFIC_DAYS = 14;
+export const TRAFFIC_WEEKS = 8;
+
+const KST = 9 * 3600;
+/** The KST calendar day of a time in seconds, as YYYY-MM-DD. */
+export const kstDay = (seconds) => new Date((seconds + KST) * 1000).toISOString().slice(0, 10);
+/** The KST Monday that starts the week of a time in seconds, as YYYY-MM-DD. */
+export function kstWeek(seconds) {
+  const day = new Date((seconds + KST) * 1000);
+  const back = (day.getUTCDay() + 6) % 7;
+  return new Date(day.getTime() - back * 86400 * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * Players over time, from the same rows: for each of the last TRAFFIC_DAYS KST
+ * days and TRAFFIC_WEEKS weeks, the devices seen for the first time, the
+ * devices that played at all, the runs begun, those of them that got past
+ * 프롤로그 05, and the seasons finished. Counts only.
+ */
+export function readTraffic(rows, now = Date.now() / 1000) {
+  const runs = rows.map(readRun).filter((run) => run.firstAt !== null || run.finishedAt !== null);
+  const firstSeen = new Map();
+  for (const run of runs) {
+    const at = run.firstAt ?? run.finishedAt;
+    if (!firstSeen.has(run.device) || at < firstSeen.get(run.device)) firstSeen.set(run.device, at);
+  }
+  const lastPrologue = indexOf("prologue05");
+  const table = (keyOf, keys) => {
+    const by = new Map(keys.map((key) => [key, { newDevices: 0, active: new Set(), began: 0, pastPrologue: 0, finished: 0 }]));
+    const cell = (seconds) => by.get(keyOf(seconds));
+    for (const seen of firstSeen.values()) if (cell(seen)) cell(seen).newDevices += 1;
+    for (const run of runs) {
+      for (const time of run.times) cell(time)?.active.add(run.device);
+      if (run.firstAt !== null && cell(run.firstAt)) {
+        cell(run.firstAt).began += 1;
+        if (run.reached > lastPrologue) cell(run.firstAt).pastPrologue += 1;
+      }
+      if (run.finishedAt !== null && cell(run.finishedAt)) {
+        cell(run.finishedAt).active.add(run.device);
+        cell(run.finishedAt).finished += 1;
+      }
+    }
+    return keys.map((key) => ({ key, ...by.get(key), active: by.get(key).active.size }));
+  };
+  const dayKeys = Array.from({ length: TRAFFIC_DAYS }, (_, index) => kstDay(now - index * 86400));
+  const weekKeys = Array.from({ length: TRAFFIC_WEEKS }, (_, index) => kstWeek(now - index * 7 * 86400));
+  return { days: table(kstDay, dayKeys), weeks: table(kstWeek, weekKeys), devices: firstSeen.size };
+}
+
+/** The traffic tables for the Job Summary. */
+export function describeTraffic(t) {
+  const head = (when) => [`| ${when} | 새 기기 | 플레이한 기기 | 시작한 런 | 그중 프롤로그를 넘긴 런 | 끝낸 시즌 |`, "|---|---|---|---|---|---|"];
+  const row = (r) => `| ${r.key} | ${r.newDevices} | ${r.active} | ${r.began} | ${r.pastPrologue} | ${r.finished} |`;
+  return [
+    "## 플레이어 추이",
+    "",
+    `게임을 시작한 기기만 셉니다(첫 화면만 보고 떠난 방문은 서버에 오지 않고, 데이터 수집을 끈 기기도 빠집니다). 날짜는 KST, 주는 월요일 시작. 지금까지 서로 다른 기기 ${t.devices}대.`,
+    "",
+    `### 최근 ${TRAFFIC_DAYS}일`,
+    "",
+    ...head("날짜"),
+    ...t.days.map(row),
+    "",
+    `### 최근 ${TRAFFIC_WEEKS}주`,
+    "",
+    ...head("주(월요일)"),
+    ...t.weeks.map(row),
+  ].join("\n");
+}
+
 const pct = (part, whole) => (whole > 0 ? `${((part / whole) * 100).toFixed(1)}%` : "—");
 
 /** A length of time in the unit a reader takes in at a glance. */
@@ -179,7 +255,7 @@ const label = (caseId) => (caseId === "final" ? "피날레" : caseId.replace(/^p
 
 export function describeFunnel(f, { since = SINCE, at = new Date() } = {}) {
   const lines = [
-    "## 이탈 지점(주간)",
+    "## 이탈 지점",
     "",
     `${at.toISOString().slice(0, 16).replace("T", " ")} UTC에 운영 DB를 읽기만 하고 집계했습니다. 개별 런·기기·이름은 싣지 않습니다.`,
     `대상: ${since ? `${since}(KST) 이후 첫 행을 보낸` : "run id가 있는"} 런 ${f.runs}개, 서로 다른 기기 ${f.devices}대.`,
@@ -239,5 +315,5 @@ if (arg === "--sql") {
   const parsed = JSON.parse(readFileSync(arg, "utf8"));
   const rows = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.rows) ? parsed.rows : null;
   if (!rows) throw new Error(`${arg} holds no rows`);
-  process.stdout.write(`${describeFunnel(readFunnel(rows))}\n`);
+  process.stdout.write(`${describeTraffic(readTraffic(rows))}\n\n${describeFunnel(readFunnel(rows))}\n`);
 }
