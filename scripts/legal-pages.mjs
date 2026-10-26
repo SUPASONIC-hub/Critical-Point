@@ -45,6 +45,10 @@ export const DATA_ITEMS = {
     ko: "사건 결과(사건 이름, 결과 요약과 점수, 게임 속 자원·성향 수치, 완료 시각)",
     en: "case results (the case, its summary and score, in-game resources and tendencies, completion time)",
   },
+  locale: {
+    ko: "화면 언어(이 기기에서 고른 한국어 또는 영어, 사건 결과와 함께)",
+    en: "the screen language (Korean or English, as chosen on this device, sent with each case result)",
+  },
   choiceLog: {
     ko: "선택 기록과 응답 시간(고른 카드, 결정에 걸린 시간, 판의 진행 기록)",
     en: "choices and response times (the cards played, the time each decision took, how the table went)",
@@ -73,6 +77,13 @@ export const DATA_ITEMS = {
   },
   address: { ko: "접속 IP 주소", en: "your IP address" },
 };
+
+/**
+ * Keys of a case row's `summary` (a `caseResult` column) that the policy names
+ * as items of their own: the page's language (src/state/useChoiceCommit.js
+ * toRowSummary; 앱출시-F F-6), which a reader would not take for a result.
+ */
+export const SUMMARY_FIELDS = { locale: "locale" };
 
 /**
  * Every column anon may write and every online-save argument, and the item
@@ -139,7 +150,7 @@ export const REMOTE_FIELDS = {
   },
 };
 
-const PLAYTEST_ITEMS = ["deviceId", "runId", "eventId", "anonName", "caseResult", "choiceLog", "feedback", "errorReport"];
+const PLAYTEST_ITEMS = ["deviceId", "runId", "eventId", "anonName", "caseResult", "locale", "choiceLog", "feedback", "errorReport"];
 
 const escapeHtml = (text) =>
   String(text).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character]);
