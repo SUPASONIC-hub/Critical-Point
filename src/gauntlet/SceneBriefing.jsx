@@ -8,6 +8,8 @@ import { describeStanding } from "./tableReadout.js";
 import { getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
 import { getSpeakerLine } from "./speakerLine.js";
 import { SPEAKER_NAMES } from "../speakerPortraits.js";
+import { fill, speakerName } from "../locale.js";
+import briefingCopy from "../copy/briefing.js";
 import { pastPick, useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
@@ -22,11 +24,8 @@ import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
 // drawn from the scene id so the same scene always makes the same noise.
-const SFX_CALM = ["째깍", "두근", "지이잉", "툭", "스윽", "딸깍"];
-const SFX_BROKEN = ["쾅!", "쩌억!", "콰직!"];
-
 function pickSfx(nodeId, broken) {
-  const pool = broken ? SFX_BROKEN : SFX_CALM;
+  const pool = broken ? briefingCopy.sfxBroken : briefingCopy.sfxCalm;
   return pool[hashSeed(`sfx:${nodeId}`) % pool.length];
 }
 
@@ -161,7 +160,8 @@ export function SceneBriefing({
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
-  const speech = useMemo(() => getSpeakerLine(node, SPEAKER_NAMES), [node]);
+  // The names as the page prints them: prose in another language names people in it (src/locale.js).
+  const speech = useMemo(() => getSpeakerLine(node?.speakerName ? { ...node, speaker: node.speakerName } : node, SPEAKER_NAMES.map(speakerName)), [node]);
   // A lead the balloon carries is narration: a caption's box, not speech.
   const Balloon = speech.fromLead ? "p" : "blockquote";
   // The case's opening voice, on its first page only, read after the title and
@@ -296,15 +296,15 @@ export function SceneBriefing({
             // The name stays put. With the seconds in it, a screen reader read
             // the focused button out again every second, over the briefing the
             // player had stopped the clock to hear. The count is its description.
-            aria-label="읽는 시간 멈춤"
+            aria-label={briefingCopy.timer.label}
             aria-describedby="gx-comic-timer-left"
             data-testid="reading-timer"
             onClick={toggleHold}
           >
             <b aria-hidden="true">{shown}</b>
-            <small aria-hidden="true">{held ? "멈춤 · 누르면 다시 흐른다" : "초 뒤 판이 열린다 · 누르면 멈춤"}</small>
+            <small aria-hidden="true">{held ? briefingCopy.timer.held : briefingCopy.timer.running}</small>
             <span id="gx-comic-timer-left" className="sr-only" role="timer" aria-live="off">
-              {held ? `${shown}초에서 멈춰 있다. 누르면 다시 흐른다` : `${shown}초 뒤 판이 열린다`}
+              {fill(held ? briefingCopy.timer.heldSr : briefingCopy.timer.runningSr, { seconds: shown })}
             </span>
             <i aria-hidden="true" />
           </button>
@@ -327,7 +327,7 @@ export function SceneBriefing({
               <SpeakerPortrait name={node.speaker} src={portrait} size={240} />
             </div>
             <figcaption className="gx-speaker-tag">
-              <b>{node.speaker}</b>
+              <b>{node.speakerName ?? node.speaker}</b>
               <span>{speakerRole}</span>
             </figcaption>
             {speech.line && (
@@ -336,7 +336,7 @@ export function SceneBriefing({
               </Balloon>
             )}
             <div className="gx-judgment" data-testid="briefing-question">
-              <b>당신의 판단</b>
+              <b>{briefingCopy.yourCall}</b>
               <p><Prose text={question} /></p>
             </div>
           </figure>
@@ -349,17 +349,17 @@ export function SceneBriefing({
             {reaction && (
               <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">
                 <small>{reaction.recap}</small>
-                {node.speaker}: “{reaction.line}”
+                {node.speakerName ?? node.speaker}: “{reaction.line}”
               </p>
             )}
             {/* A lead the balloon carries is not told twice. */}
             {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
-            <ProseCaptions text={told.text} who={node.speaker} whoAt={speech.whoAt} />
+            <ProseCaptions text={told.text} who={node.speakerName ?? node.speaker} whoAt={speech.whoAt} />
           </div>
 
           {(told.memo?.length > 0 || trace) && (
             <div className="gx-panel gx-panel-file">
-              <p className="gx-file-tab">사건 파일</p>
+              <p className="gx-file-tab">{briefingCopy.caseFile}</p>
               <ul>
                 <ProseItems items={told.memo} />
                 {trace && <li data-testid="scene-trace">{trace}</li>}
@@ -369,7 +369,7 @@ export function SceneBriefing({
 
           {carried.length > 0 && (
             <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at(broken ? 3 : 0)}>
-              <p className="gx-breach-kicker">이월 · 이번 판에 이어지는 규칙</p>
+              <p className="gx-breach-kicker">{briefingCopy.carried}</p>
               <RuleRows rules={carried} resourceMeta={resourceMeta} />
             </div>
           )}
@@ -377,7 +377,7 @@ export function SceneBriefing({
           {broken && (
             <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
               <p className="gx-breach-kicker">
-                <TriangleAlert size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span> · 이번 판의 규칙이 바뀌었다</span>
+                <TriangleAlert size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
               </p>
               <RuleRows rules={penalties} resourceMeta={resourceMeta} />
             </div>
@@ -411,10 +411,10 @@ export function SceneBriefing({
 
         <footer className="gx-comic-actions">
           <p className="gx-comic-hint">
-            카드를 고르면 그 카드를 건 채로 판이 열린다
+            {briefingCopy.hint}
             {letterKeys && <> · <kbd>1</kbd>–<kbd>{cards.length + (reframeChoice ? 1 : 0)}</kbd></>}
           </p>
-          <div className="gx-comic-cards" role="group" aria-label="바로 걸 카드">
+          <div className="gx-comic-cards" role="group" aria-label={briefingCopy.cardsLabel}>
             {cards.map((card, index) => {
               const open = isCardOpen(card);
               return (
@@ -436,7 +436,7 @@ export function SceneBriefing({
                   {(card.id === sealedId || !open) && (
                     <>
                       <Lock size={12} aria-hidden="true" />
-                      <span className="sr-only">{open ? "봉인" : "잠김"}</span>
+                      <span className="sr-only">{open ? briefingCopy.sealed : briefingCopy.locked}</span>
                     </>
                   )}
                 </GuardedButton>
@@ -466,11 +466,11 @@ export function SceneBriefing({
             aria-keyshortcuts={keys("Space Enter W")}
             // The name starts with what the button shows (WCAG 2.5.3); the space
             // after the label is not drawn in the flex row.
-            aria-label={`판 열기 ${tableSeconds}초 시작. 지금부터 시계가 흐르고 카드를 걸 수 있다`}
+            aria-label={fill(briefingCopy.openLabel, { seconds: tableSeconds })}
           >
             <Flame size={18} aria-hidden="true" />
-            <span>판 열기</span>{" "}
-            <small>{tableSeconds}초 시작</small>
+            <span>{briefingCopy.open}</span>{" "}
+            <small>{fill(briefingCopy.openSeconds, { seconds: tableSeconds })}</small>
           </button>
         </footer>
       </div>

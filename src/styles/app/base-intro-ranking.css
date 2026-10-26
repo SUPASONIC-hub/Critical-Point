@@ -3251,3 +3251,56 @@ body {
 .thought-line {
   --pr-say: currentcolor;
 }
+/* The language choice (LanguagePicker.jsx, 다국어 틀): a pill per language
+   among the header's pills on a wide screen, the chosen one lit. Drawn at the
+   pills' 34px with a 44px target around it, so the header row keeps its
+   height. On a phone it sits in the hero's empty top-left corner, above the
+   brand row and clear of the music controls, so the first screen grows no
+   taller. */
+.language-picker {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.language-picker button {
+  position: relative;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--ui-text-2);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.language-picker button::before {
+  content: "";
+  position: absolute;
+  inset: -5px -2px;
+}
+.language-picker button[aria-pressed="true"] {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.language-picker small {
+  flex-basis: 100%;
+  max-width: 36ch;
+  color: var(--ui-text-2);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+@media (max-width: 860px) {
+  .language-picker {
+    position: absolute;
+    top: max(14px, env(safe-area-inset-top));
+    left: var(--ui-gutter);
+    max-width: calc(100% - 2 * var(--ui-gutter) - 96px);
+  }
+  /* A language in preview says so under the pills; the brand row moves down
+     for it on that language's pages only. */
+  .intro-hero-copy:has(.language-picker small) {
+    padding-top: 112px;
+  }
+}

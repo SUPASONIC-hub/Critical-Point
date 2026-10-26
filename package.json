@@ -49,6 +49,7 @@
     "check:node": "node scripts/check-node-version.mjs",
     "check:grants": "node scripts/check-grants.mjs",
     "check:canon": "node scripts/check-canon.mjs",
+    "check:locale": "node scripts/check-locale.mjs",
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",

@@ -1,0 +1,123 @@
+/**
+ * How a language's words are put over the Korean (다국어 틀, 2026-10-26).
+ * The same for every language: a dictionary (src/locales/<lang>/index.js)
+ * and a case's scenes (src/locales/<lang>/nodes/<caseId>.js) say only words,
+ * under the Korean's keys and ids. Only a page in another language loads this
+ * file (src/locale.js), and through it that language's files.
+ *
+ * The Korean copy keeps its home and its shape. The modules that own screen
+ * copy are left as they are, and their exported tables are written over in
+ * place: the shell's (appCopy.js, playerLanguage.js, gameCases.js) when the
+ * dictionary arrives, before the first paint, and the runtime's caseCopy.js
+ * as it loads (it hands its tables to `localizeTables`; importing it here
+ * would put the runtime's copy within the shell's reach, and the bundler
+ * then splits the runtime differently). A case's scenes are written over as
+ * the case arrives. Whatever a language leaves out stays Korean.
+ */
+import { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
+import { easyCognitionLabels, easyResourceLabels } from "../playerLanguage.js";
+import { caseObjectives, seasonCasesBase } from "../gameCases.js";
+
+// Hangul, and the corner brackets only Korean copy uses (「」『』).
+const HANGUL = /[가-힣ㄱ-ㅣ「-』]/;
+const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+/**
+ * Writes the strings of `words` over `target` where the paths meet: an object
+ * by key, a list by position, and a list of objects with ids (a scene's
+ * cards, the season's case list) by id. Only a string replaces a string,
+ * and only a Korean one (scripts/locale-words.mjs reads the same strings): an
+ * id, an effect or a `next` can never be written over, and a path the Korean
+ * no longer has is passed by.
+ */
+export function overlayWords(target, words) {
+  if (!target || typeof target !== "object" || !words || typeof words !== "object") return target;
+  if (Array.isArray(target) && isRecord(words)) {
+    for (const item of target) overlayWords(item, words[item?.id]);
+    return target;
+  }
+  for (const [key, value] of Object.entries(words)) {
+    if (typeof value === "string") {
+      if (typeof target[key] === "string" && HANGUL.test(target[key])) target[key] = value;
+    } else {
+      overlayWords(target[key], value);
+    }
+  }
+  return target;
+}
+
+// The shell's tables a dictionary's `copy` may name, by module and export.
+// Named one by one: a namespace import would keep every export of the module
+// in the build, the ones the app never reads included.
+const SHELL_TABLES = {
+  appCopy: { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals },
+  playerLanguage: { easyCognitionLabels, easyResourceLabels },
+  gameCases: { caseObjectives, seasonCasesBase },
+};
+
+/** A dictionary's `copy` for `module` over that module's tables (`copy.caseCopy.chapterRules` over `chapterRules`). */
+export function overlayModule(copy, module, tables) {
+  for (const [name, words] of Object.entries(copy?.[module] ?? {})) overlayWords(tables[name], words);
+}
+
+let dictionary = null;
+let language = null;
+
+/** A module's own tables (caseCopy.js), as it loads. */
+export function localizeTables(module, tables) {
+  if (dictionary) overlayModule(dictionary.copy, module, tables);
+}
+
+export function previewText(key) {
+  return dictionary?.preview?.[key] ?? "";
+}
+
+export function roleName(role) {
+  return dictionary?.roles?.[role] ?? role;
+}
+
+export function speakerName(name) {
+  return dictionary?.speakers?.[name] ?? name;
+}
+
+/**
+ * One case's scenes, replies and lines, and its pack's result copy in the
+ * season's index. A scene whose speaker the dictionary names (`speakers`) is
+ * given `speakerName`, the name the page prints; `speaker` stays the Korean
+ * key of the portrait, the profile and the run log.
+ */
+export function localizeCase(caseId, data, index, words, speakers = {}) {
+  for (const scene of Object.values(data?.nodes ?? {})) {
+    if (speakers[scene?.speaker]) scene.speakerName = speakers[scene.speaker];
+  }
+  if (!words) return data;
+  overlayWords(data, { nodes: words.nodes, echoReplies: words.echoReplies, choiceVoiceLines: words.choiceVoiceLines });
+  const pack = index?.packs?.find((entry) => entry.id === caseId);
+  if (pack && words.pack) overlayWords(pack, words.pack);
+  return data;
+}
+
+/** A case as it arrives, in the loaded language; a case with no file, or one that cannot be fetched, keeps its Korean scenes. */
+export function localizeCaseData(caseId, data, index) {
+  const speakers = dictionary?.speakers;
+  const load = language && import.meta.glob("./*/nodes/*.js")[`./${language}/nodes/${caseId}.js`];
+  if (!load) return localizeCase(caseId, data, index, null, speakers);
+  return load().then(
+    (module) => localizeCase(caseId, data, index, /** @type {{ default: object }} */ (module).default, speakers),
+    () => localizeCase(caseId, data, index, null, speakers),
+  );
+}
+
+const api = { localizeTables, previewText, roleName, speakerName, localizeCaseData };
+
+/** A language's dictionary, laid over the shell's tables. Resolves to what src/locale.js calls, or null for a language with no dictionary. */
+export function loadDictionary(lang) {
+  const load = import.meta.glob("./*/index.js")[`./${lang}/index.js`];
+  if (!load) return Promise.resolve(null);
+  return load().then((module) => {
+    dictionary = module;
+    language = lang;
+    for (const [name, tables] of Object.entries(SHELL_TABLES)) overlayModule(dictionary.copy, name, tables);
+    return api;
+  });
+}

@@ -558,7 +558,8 @@ const OWN_CHUNKS = [
   { name: "sceneTraces", files: [SCENE_TRACES, "src/sceneTraces.js"] },
   { name: "sceneChoices", files: [SCENE_CHOICES, "src/sceneChoices.js"] },
   { name: "WeekRulePanel", files: [WEEK_RULE_PANEL] },
-  { name: "EdgeNotice", files: [EDGE_NOTICE] },
+  // The notices' words (src/copy/edgeNotices.js, 다국어 틀) go with the notice.
+  { name: "EdgeNotice", files: [EDGE_NOTICE, "src/copy/edgeNotices.js"] },
   { name: "ReadingClockAsk", files: [READING_CLOCK_ASK] },
   { name: "auditRisk", files: [AUDIT_RISK] },
   { name: "cascadeRisk", files: [CASCADE_RISK] },
@@ -568,6 +569,20 @@ const OWN_CHUNKS = [
   { name: "windowTrail", files: [WINDOW_TRAIL] },
   { name: "speakerLine", files: [SPEAKER_LINE] },
 ];
+
+/**
+ * A module of src/locales (src/locale.js): a language's dictionary
+ * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), or the
+ * code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>` or
+ * `locale-<file>`.
+ */
+const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/])?)?([^\\/]+)\.js$/;
+
+function localeChunkName(chunk) {
+  const match = LOCALE_MODULE.exec(chunk.facadeModuleId ?? "");
+  if (!match) return "assets/[name]-[hash].js";
+  return `assets/locale-${match[1] ? `${match[1]}-` : ""}${match[2]}-[hash].js`;
+}
 
 function ownChunkGroups() {
   return OWN_CHUNKS.map(({ name, files }) => {
@@ -619,6 +634,11 @@ export default defineConfig(({ command, mode }) => ({
     },
     rolldownOptions: {
       output: {
+        // The other languages' words (src/locales, 다국어 틀) are named
+        // apart, `locale-<lang>-<file>`: a Korean device never asks for
+        // them, so the service worker leaves `locale-*` out of its warm-up
+        // (scripts/service-worker-build.mjs), and their budgets are their own.
+        chunkFileNames: localeChunkName,
         codeSplitting: {
           groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
         },
