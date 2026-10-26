@@ -159,7 +159,7 @@ export default {
     },
     "c22_aftershock": {
       "title": "Certificates and Queue Tickets",
-      "text": "At 4 p.m., the interns’ completion ceremony is held in Gangseo Branch’s banking hall. When his name is called, Moon Hajun starts forward, then stops at the ticket machine. Only after pulling a ticket for a grandmother who was waiting does he go up for his certificate. In the back row, Moon Gaeul, whose face became known through Leadline’s series on Gaeul Rice Cakes, claps with a box of rice cakes on her lap, and this time Branch Manager Seo Taekyung comes over first and takes one. The last line of Hajun’s intern report reads: 'A bank must give its reasons for refusing in words a person can read.' Foreman Kim, eyes on a phone, asks you, 'About KD Financial Group stock. If I buy just one share, can I go to the meeting where the shareholders gather in March and speak?'",
+      "text": "At 4 p.m., the interns’ completion ceremony is held in Gangseo Branch’s banking hall. When his name is called, Moon Hajun starts forward, then stops at the ticket machine. Only after pulling a ticket for a grandmother who was waiting does he go up for his certificate. In the back row, Moon Gaeul, whose face became known through Leadline’s series on Gaeul Rice Cake Shop, claps with a box of rice cakes on her lap, and this time Branch Manager Seo Taekyung comes over first and takes one. The last line of Hajun’s intern report reads: 'A bank must give its reasons for refusing in words a person can read.' Foreman Kim, eyes on a phone, asks you, 'About KD Financial Group stock. If I buy just one share, can I go to the meeting where the shareholders gather in March and speak?'",
       "memo": [
         "4 interns complete -- Moon Hajun submits his report",
         "Last guidance at the ticket machine",
@@ -318,9 +318,9 @@ export default {
     },
     "c22_branch_shop": {
       "title": "The Half-Lowered Shutter",
-      "text": "That evening at Mangwon Market, the shutter of Gaeul Rice Cakes is half down. Moon Gaeul sets the printout of the rejection screen you gave her beside the cutting board and slices rice cakes for a long time. Her knife moves faster than usual. 'A dead man is blocking a loan again. Alive, he couldn’t keep the factory; dead, he won’t let it open.' On the fridge door, held by a magnet, is the receipt for 40 million won in member capital (money members put into the cooperative), pooled by the five members who deferred their December wages. Moon Gaeul puts down the knife. 'If the bank stuck my husband’s name on me, I can just peel it off, right? I’ll step down as chair.'",
+      "text": "That evening at Mangwon Market, the shutter of Gaeul Rice Cake Shop is half down. Moon Gaeul sets the printout of the rejection screen you gave her beside the cutting board and slices rice cakes for a long time. Her knife moves faster than usual. 'A dead man is blocking a loan again. Alive, he couldn’t keep the factory; dead, he won’t let it open.' On the fridge door, held by a magnet, is the receipt for 40 million won in member capital (money members put into the cooperative), pooled by the five members who deferred their December wages. Moon Gaeul puts down the knife. 'If the bank stuck my husband’s name on me, I can just peel it off, right? I’ll step down as chair.'",
       "memo": [
-        "Evening of the rejection notice -- Gaeul Rice Cakes shutter half down",
+        "Evening of the rejection notice -- Gaeul Rice Cake Shop shutter half down",
         "5 members’ capital: 40 million won, December wages deferred",
         "Chair of record: Moon Gaeul",
         "Moon Gaeul: intends to resign as chair"
@@ -336,7 +336,7 @@ export default {
           "label": "Tell her not to step down; keep the chair and fight"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market · At the Shutter",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · At the Shutter",
       "clock": "February · Internship Day 1 · 20:00",
       "question": "To peel off her husband’s name, Moon Gaeul says she will step down as chair. What do you say?"
     },
@@ -360,7 +360,7 @@ export default {
           "label": "Write down Hajun’s question and attach it to the re-review"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market · At the Cutting Board",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · At the Cutting Board",
       "clock": "February · Internship Day 1 · 21:00",
       "question": "Hajun asks if Mom can’t get it because of Dad. How do you answer?"
     },
