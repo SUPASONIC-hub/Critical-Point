@@ -243,7 +243,17 @@ const budgets = [
   // the two pages (privacyText.js holds the paths and the consent sentence,
   // moved, not added). Measured 173,478 / 62,825 in the e2e build, the gzip
   // plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 173_478, maxGzip: 62_829 },
+  // 173,478 / 62,829 -> 175,169 / 63,528 on 2026-10-26, pwa-install-hint: the
+  // install offer's listener and store (state/installPrompt.js, set in
+  // main.jsx because `beforeinstallprompt` can arrive before the intro
+  // renders), the slot in the comfort drawer (InstallHintSlot.jsx) and its
+  // five lines in appCopy.js. The hint itself is InstallHint below. Measured
+  // 175,169 / 63,524 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 175_169, maxGzip: 63_528 },
+  // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
+  // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
+  // gzip plus 4.
+  { pattern: /^InstallHint-.*\.js$/, maxBytes: 559, maxGzip: 323 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -508,7 +518,9 @@ const budgets = [
   // -> 194,339 / 36,241 the same day, 개인정보처리방침·이용약관 on main 29982165:
   // `.intro-legal` and the links' colour. Measured 194,339 / 36,237 in the e2e
   // build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_339, maxGzip: 36_241 },
+  // -> 195,002 / 36,324 on 2026-10-26, pwa-install-hint: the hint's card in
+  // comfort.css. Measured 195,002 / 36,320 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 195_002, maxGzip: 36_324 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -580,7 +592,8 @@ const budgets = [
   // the season record, the past picks and the read scenes inside the save,
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
   // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, board-report on main caeecda: only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_492, maxGzip: 4_644 },
+  // 11,492 -> 11,494 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 11,494 / 4,638.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_494, maxGzip: 4_644 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -773,7 +786,8 @@ const budgets = [
   // 2,704 / 1,450 -> 2,634 / 1,403 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 2,634 / 1,399 in the e2e build, the gzip plus 4.
   // 2,634 / 1,403 -> 2,636 / 1,403 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 2,636 in the e2e build.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_636, maxGzip: 1_403 },
+  // 2,636 -> 2,637 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 2,637 / 1,398.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_637, maxGzip: 1_403 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1066,7 +1080,10 @@ function checkBudget(file, budget) {
 // -> 9,863 / 3,555 on 2026-10-25, 개인정보처리방침·이용약관: the worker
 // answers the four policy pages network first and keeps them (DOCUMENT_PAGE,
 // answerPage), and the warm list names them. Measured 9,863 / 3,551 plus 4.
-const WORKER_BUDGET = { maxBytes: 9_863, maxGzip: 3_555 };
+// -> 9,897 / 3,567 on 2026-10-26, pwa-install-hint: one more file in the warm
+// list, InstallHint; the worker's code did not change. Measured 9,897 / 3,563
+// plus 4.
+const WORKER_BUDGET = { maxBytes: 9_897, maxGzip: 3_567 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
@@ -1112,8 +1129,8 @@ if (firstPaint > FIRST_PAINT_BUDGET) {
 reported.push(`first paint ${firstPaint} bytes (${parts.join(", ")})`);
 
 // Web ads (출시 로드맵 2단계) are off unless the build was given
-// ADSENSE_ADS=on (scripts/adsense-config.mjs): a site build without it,
-// verification-only included, carries no ad code in any script.
+// ADSENSE_ADS=on (draft #341): a site build without it, AdSense site
+// verification (ADSENSE_CLIENT) included, carries no ad code in any script.
 if (process.env.ADSENSE_ADS !== "on") {
   const scripts = [path.join(distDir, "sw.js"), ...readdirSync(assetsDir).filter((name) => name.endsWith(".js")).map((name) => path.join(assetsDir, name))];
   const carrier = scripts.find((file) => WEB_AD_CODE_MARKERS.test(readFileSync(file, "utf8")));

@@ -60,3 +60,10 @@ test("the ad code's names are what the bundle check looks for, and the CSP keeps
   assert.match(after["script-src"], /https:/);
   assert.match(after["frame-src"], /https:/);
 });
+
+test("the variables have no VITE_ prefix, so the bundle never sees them", () => {
+  const config = readFileSync("vite.config.js", "utf8");
+  assert.match(config, /loadEnv\(mode, process\.cwd\(\), "ADSENSE_"\)/);
+  assert.doesNotMatch(config, /VITE_ADSENSE/);
+  assert.doesNotMatch("google-adsense-account", WEB_AD_CODE_MARKERS, "verification is not ad code");
+});
