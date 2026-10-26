@@ -169,6 +169,21 @@ export function loadDictionary(lang) {
     dictionary = module;
     language = lang;
     for (const [name, tables] of Object.entries(SHELL_TABLES)) overlayModule(dictionary.copy, name, tables);
+    addStyle(dictionary.style);
     return api;
   });
+}
+
+/**
+ * A language's own CSS (its dictionary's `style`), put on its pages before
+ * the first paint: the Japanese page's face, the system's Japanese fonts,
+ * since Pretendard has no kanji and a kanji subset would outweigh the whole
+ * first-paint budget (일본어 1단계). Kept in the language's chunk, not the
+ * app's stylesheet, so a Korean page's CSS stays byte for byte what it was.
+ */
+export function addStyle(css) {
+  if (!css || !globalThis.document?.head) return;
+  const element = document.createElement("style");
+  element.textContent = css;
+  document.head.append(element);
 }
