@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "p2_start": {
       "title": "The Morning 31 Billion Won Arrived",
-      "text": "The Corporate Finance Strategy Team’s review room, 6th floor, KD Bank head office. Five months after you came off probation, a thick review file lands on your desk. Loan number 2023-0412. The borrower is FlowOn, a dawn-delivery logistics platform. The amount is 31 billion won. The first page puts the debt-to-equity ratio at 179.6%, and your name is in the reviewer box on the last page. Team Head Yoon Sanghyuk rests his palm on top of your monitor. 'This is a group strategy project. You’ll handle the due diligence, and the written opinion is due next Tuesday.' He smiles. It looks less like a reprimand than congratulations. 'Your first solo file. A company like this comes along once in 10 years. Take a good look.'",
+      "text": "The Corporate Finance Strategy Team’s review room, 6th floor, KD Bank head office. Five months after you came off probation, a thick review file lands on your desk. Loan number 2023-0412. The borrower is FlowOn, a dawn-delivery logistics platform. The amount is 31 billion won (about US$22 million). The first page puts the debt-to-equity ratio at 179.6%, and your name is in the reviewer box on the last page. Team Head Yoon Sanghyuk rests his palm on top of your monitor. 'This is a group strategy project. You’ll handle the due diligence, and the written opinion is due next Tuesday.' He smiles. It looks less like a reprimand than congratulations. 'Your first solo file. A company like this comes along once in 10 years. Take a good look.'",
       "memo": [
         "Loan 2023-0412 · FlowOn working-capital loan, 31 billion won",
         "Reported debt-to-equity ratio 179.6%",
@@ -438,7 +438,7 @@ export default {
     },
     "p2_start_credit": {
       "title": "The Mentor Who Came to Repay",
-      "text": "Last fall, as you came off probation, you gave the credit to your mentor. The name on the report cover was Assistant Manager Oh Jinwoo’s, and the team head read it out as it was. Five months later, on the morning of April 12, review file 2023-0412 is assigned to you, and Oh Jinwoo is the first to get up from his seat. FlowOn, the dawn-delivery logistics platform, 31 billion won, a reported debt-to-equity ratio of 179.6%. He flips through the first page on your screen and says, 'This was originally my file. I asked the team head to put your name on it.' Then he lowers his voice. 'I’m paying you back. But this was the only way I had, so I’m a little sorry.'",
+      "text": "Last fall, as you came off probation, you gave the credit to your mentor. The name on the report cover was Assistant Manager Oh Jinwoo’s, and the team head read it out as it was. Five months later, on the morning of April 12, review file 2023-0412 is assigned to you, and Oh Jinwoo is the first to get up from his seat. FlowOn, the dawn-delivery logistics platform, 31 billion won (about US$22 million), a reported debt-to-equity ratio of 179.6%. He flips through the first page on your screen and says, 'This was originally my file. I asked the team head to put your name on it.' Then he lowers his voice. 'I’m paying you back. But this was the only way I had, so I’m a little sorry.'",
       "memo": [
         "2023-0412 reviewer: you -- on Oh Jinwoo’s recommendation",
         "FlowOn working-capital loan, 31 billion won · reported ratio 179.6%",
@@ -468,7 +468,7 @@ export default {
     },
     "p2_start_record": {
       "title": "Known as That Kind",
-      "text": "Last fall, you put what you saw on record under your own name. Because of that one page, the team filed you as 'that kind of person,' and the label was convenient, so no one ever checked it again. On the morning of April 12, review file 2023-0412 is assigned to you. FlowOn, 31 billion won, a reported debt-to-equity ratio of 179.6%, and your name in the reviewer box. Passing by, Manager Han Seoyun taps the corner of your monitor twice with a fingertip. 'The team head said this file needs someone thorough.' She pauses. 'Handing a file to someone thorough means one of two things. Either they want it looked at closely, or they want to show that looking closely changes nothing.'",
+      "text": "Last fall, you put what you saw on record under your own name. Because of that one page, the team filed you as 'that kind of person,' and the label was convenient, so no one ever checked it again. On the morning of April 12, review file 2023-0412 is assigned to you. FlowOn, 31 billion won (about US$22 million), a reported debt-to-equity ratio of 179.6%, and your name in the reviewer box. Passing by, Manager Han Seoyun taps the corner of your monitor twice with a fingertip. 'The team head said this file needs someone thorough.' She pauses. 'Handing a file to someone thorough means one of two things. Either they want it looked at closely, or they want to show that looking closely changes nothing.'",
       "memo": [
         "2023-0412 reviewer: you -- named by the team head",
         "Team label since last fall’s record: 'the thorough one'",
@@ -502,7 +502,7 @@ export default {
       "memo": [
         "2023-0412 reviewer: you -- schedule cut to ten days",
         "Opinion due April 18 · Credit Committee April 27",
-        "FlowOn 31 billion won · reported ratio 179.6%"
+        "FlowOn 31 billion won (about US$22 million) · reported ratio 179.6%"
       ],
       "choices": {
         "p2_start_speed_team": {
