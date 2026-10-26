@@ -105,7 +105,7 @@ export default {
       "memo": [
         "Recording of the call 3 years ago -- Yoon Sanghyuk’s voice can be confirmed",
         "Content of the call: 'If the dissent goes up, the team is broken up'",
-        "Han Seoyun: the one who signed the return",
+        "Han Seoyun: the one who pressed the return button",
         "If submitted, Han Seoyun could also face discipline and a criminal complaint"
       ],
       "choices": {
@@ -127,7 +127,7 @@ export default {
       },
       "place": "Trigger Lab Rooftop",
       "clock": "Night before the hearing · 23:40",
-      "question": "The person who signed the return holds out the recording of that call. What do you do with this file?",
+      "question": "The person who pressed the return button holds out the recording of that call. What do you do with this file?",
       "lead": "The night before the hearing, Han Seoyun called you up to the rooftop. The wind is so strong that no one goes near the railing."
     },
     "c11_final": {
@@ -416,9 +416,9 @@ export default {
     },
     "c11_evidence_turn": {
       "title": "5 Hours 12 Minutes",
-      "text": "When you fit the clues together, the change log of the approval system from 3 years ago opens. Han Seoyun’s return signature is at 1:32 p.m. But the dissent was switched from 'retain' to 'purge' at 6:44 p.m., and the account that switched it belonged to Yoon Sanghyuk, then head of the Corporate Finance Strategy Team. The one who returned it and the one who erased it were different people. Ban Jaewook writes the two times side by side in his notebook. '5 hours 12 minutes. Who decided what in between -- that is this case.'",
+      "text": "When you fit the clues together, the change log of the approval system from 3 years ago opens. Han Seoyun pressed the return button at 1:32 p.m. But the dissent was switched from 'retain' to 'purge' at 6:44 p.m., and the account that switched it belonged to Yoon Sanghyuk, then head of the Corporate Finance Strategy Team. The one who returned it and the one who erased it were different people. Ban Jaewook writes the two times side by side in his notebook. '5 hours 12 minutes. Who decided what in between -- that is this case.'",
       "memo": [
-        "Return signature 13:32 -- Han Seoyun",
+        "Return button 13:32 -- Han Seoyun",
         "Purge 18:44 -- Yoon Sanghyuk’s account",
         "Purge reason field: blank"
       ],
@@ -671,7 +671,7 @@ export default {
   "pack": {
     "clue": {
       "title": "5 Hours 12 Minutes",
-      "text": "The return was signed at 13:32 and the purge processed at 18:44. The one who returned it and the one who erased the dissent were not the same person."
+      "text": "The return button was pressed at 13:32 and the purge processed at 18:44. The one who returned it and the one who erased the dissent were not the same person."
     },
     "outcomes": {
       "c11_after_toast": {

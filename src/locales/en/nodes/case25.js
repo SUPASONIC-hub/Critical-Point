@@ -253,9 +253,9 @@ export default {
     },
     "c25_photo_reaction": {
       "title": "A Rival on the Same Floor",
-      "text": "Once the truck leaves, Kwon Dohyun takes out a wad of receipts. Moving truck fare 420,000 won, ladder truck 80,000 won, Kang Taemin’s arm strength 'no field to price it.' Then he stops at one line of the notice. Oh Jinwoo, Bridge Bank Corporate Banking Department. The cubicle right next to his own. 'Same floor from Monday. He’ll claim a win every lunch.' When Oh Jinwoo answers, 'Starting with lunch today,' Kwon Dohyun taps at his calculator. As the laughter dies down, he quietly adds, 'Bridge is looking into a bundle of KD Capital’s bad loans. The seat Oh Jinwoo is taking is that exact job.'",
+      "text": "Once the truck leaves, Kwon Dohyun takes out a wad of receipts. Moving truck fare 420,000 won, ladder truck 80,000 won, Kang Taemin’s arm strength 'no field to price it.' Then he stops at one line of the notice. Oh Jinwoo, Bridge Bank acquisitions team head. His desk is on Kwon Dohyun’s floor. 'Same floor from Monday. He’ll claim a win every lunch.' When Oh Jinwoo answers, 'Starting with lunch today,' Kwon Dohyun taps at his calculator. As the laughter dies down, he quietly adds, 'Bridge is looking into a bundle of KD Capital’s bad loans. The seat Oh Jinwoo is taking is that exact job.'",
       "memo": [
-        "Oh Jinwoo’s new post: Bridge Bank Corporate Banking, next to Kwon Dohyun",
+        "Oh Jinwoo’s new post: Bridge Bank acquisitions team head, same floor as Kwon Dohyun",
         "Under Bridge review: a bundle of KD Capital bad loans"
       ],
       "choices": {
