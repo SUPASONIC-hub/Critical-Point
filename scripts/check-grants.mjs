@@ -1846,7 +1846,8 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // The weekly drop-off report (scripts/report-funnel.mjs, .github/workflows/funnel.yml)
   // runs its one SELECT over the runs begun after a day no other row reaches:
   // two runs from one device (the second marked NEW GAME+) and one from
-  // another that came back two days later.
+  // another that came back two days later, played in English (`summary.locale`,
+  // 앱출시-F F-6: the server keeps the key as the page sent it).
   {
     const SINCE_DAY = "2030-01-01";
     const funnelRuns = [
@@ -1859,6 +1860,7 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
       for (const caseId of CASE_SEQUENCE.slice(0, cases)) {
         const payload = casePayload({ session, runId, caseId });
         if (newGamePlus) payload.summary = { ...payload.summary, newGamePlus: true };
+        if (runId === "run-week-funnel-3") payload.summary = { ...payload.summary, locale: "en" };
         const { sql, params } = postgrestInsert("playtest_sessions", payload);
         await db.query(sql, params);
       }
@@ -1874,8 +1876,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
     const funnelRows = (await allowed("run the drop-off report", "service_role", funnelQuery(SINCE_DAY)))?.rows ?? [];
     const funnel = readFunnel(funnelRows, Date.parse(`${SINCE_DAY}T00:00:00Z`) / 1000 + 10 * 86400);
     check(
-      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3,
-      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run and one break among three gaps.`,
+      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3
+        && funnel.locales.en === 1 && funnel.unnamed === 2 && JSON.stringify(funnel.english.reach.slice(0, 3)) === "[1,1,0]",
+      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps, locales: funnel.locales, unnamed: funnel.unnamed, english: funnel.english.reach.slice(0, 3) })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run, one break among three gaps, and one English run (through 프롤로그 02) beside two naming no language.`,
     );
     check(funnelRows.every((row) => !JSON.stringify(row).includes("grants-check-session-") && !JSON.stringify(row).includes("run-week-funnel")), "the drop-off report fetched a run or device id.");
   }

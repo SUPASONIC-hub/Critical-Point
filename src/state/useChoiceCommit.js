@@ -27,6 +27,7 @@ import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../g
 import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
+import { LANG } from "../locale.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { findFinalChoiceEntry } from "../verdictBranch.js";
@@ -55,14 +56,20 @@ let cloudConflictSaid = false;
  * it one, so the object the client really sent was dropped from every ranking
  * row -- and each case row carried two sentences of copy the server already
  * has by name.
+ *
+ * With the page's language (`locale`, a code of SUPPORTED_LOCALES, src/locale.js;
+ * 앱출시-F F-6): the daily funnel (scripts/report-funnel.mjs) reads English runs
+ * apart by it. Only the row carries it, not the save, and the server takes the
+ * summary as an object of at most 4,096 bytes without reading its keys
+ * (telemetry_check_session_row), so it needs no migration.
  */
-export function toRowSummary(caseSummary) {
+export function toRowSummary(caseSummary, locale = LANG) {
   const ending = caseSummary?.endingVariant;
   const id = typeof ending === "string" ? ending : ending?.id;
   // `finalChoiceId` stays in the save: the row's decision log already carries
   // that card, so the server's summary stays the shape it was.
   const { finalChoiceId: _finalChoiceId, ...rowSummary } = caseSummary ?? {};
-  return { ...rowSummary, endingVariant: typeof id === "string" ? id : null };
+  return { ...rowSummary, endingVariant: typeof id === "string" ? id : null, locale };
 }
 
 /**
