@@ -22,6 +22,8 @@
  * (`readCopySource`), for the dictionary's `copy`.
  */
 /** The cases a language is checked over until it says otherwise: the preview's 프롤로그 01-05 and 사건 01-10 (F-1 ①). */
+import { existsSync, readdirSync } from "node:fs";
+
 export const TRANSLATION_SCOPE = [
   "prologue01", "prologue02", "prologue03", "prologue04", "prologue05",
   "case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10",
@@ -90,7 +92,15 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
     import(`${root}/src/playerLanguage.js`),
     import(`${root}/src/gameCases.js`),
   ]);
+  // The screens' own copy (src/copy/<name>.js, each a default export laid
+  // over as `copy.screens.<name>`).
+  const copyDir = new URL("src/copy/", `${root}/`);
+  const screenFiles = existsSync(copyDir) ? readdirSync(copyDir).filter((file) => file.endsWith(".js")).sort() : [];
+  const screens = Object.fromEntries(
+    await Promise.all(screenFiles.map(async (file) => [file.replace(/\.js$/, ""), (await import(new URL(file, copyDir).href)).default])),
+  );
   return wordsOf({
+    screens,
     caseCopy: {
       chapterRules: pick(caseCopy.chapterRules, scope),
       nextCaseSignals: pick(caseCopy.nextCaseSignals, scope),

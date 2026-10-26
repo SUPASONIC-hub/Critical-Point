@@ -58,6 +58,8 @@ export function chooseLanguage(code) {
 
 // The overlay module, once a page in another language has it.
 let overlay = null;
+// Tables handed over before it arrived (src/copy/*.js in the shell), laid over when it does.
+const waiting = [];
 
 /** Before the first paint of a page in another language: its dictionary, laid over the screen copy it covers. Nothing on a Korean page. */
 export function loadLocale() {
@@ -67,6 +69,7 @@ export function loadLocale() {
     .then((module) => module.loadDictionary(LANG))
     .then((module) => {
       overlay = module;
+      for (const [name, tables] of waiting.splice(0)) module?.localizeTables(name, tables);
     });
 }
 
@@ -80,9 +83,24 @@ export function previewText(key) {
   return overlay ? overlay.previewText(key) : "";
 }
 
-/** Tables of screen copy a module owns, laid over in the page's language as the module loads (caseCopy.js). */
+/**
+ * Tables of screen copy a module owns (caseCopy.js, src/copy/*.js), laid over
+ * in the page's language: now if its dictionary is in, or as soon as it is (a
+ * module of the shell is read before the dictionary arrives). Nothing on a
+ * Korean page.
+ */
 export function localizeTables(module, tables) {
   if (overlay) overlay.localizeTables(module, tables);
+  else if (LANG !== SOURCE_LOCALE) waiting.push([module, tables]);
+}
+
+/**
+ * A line of screen copy with its blanks filled: `fill("{count}건", { count: 3 })`
+ * is "3건". The Korean line reads as the template literal it replaced; another
+ * language's line may order, or leave out, the blanks (a particle, say).
+ */
+export function fill(template, values) {
+  return String(template).replace(/\{(\w+)\}/g, (blank, name) => (name in values ? String(values[name]) : blank));
 }
 
 /**
