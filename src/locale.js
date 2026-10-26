@@ -26,6 +26,11 @@ export const SOURCE_LOCALE = "ko";
 export const SUPPORTED_LOCALES = [
   { code: "ko", name: "한국어" },
   { code: "en", name: "English", preview: true },
+  // A draft not offered yet (`hidden`, 일본어 1단계): opened only by its
+  // address (`?lang=ja`), for reading the draft on a device. The language
+  // choice shows it on its own pages alone, named by its dictionary
+  // (`preview.languageName`), so the shell carries no character of its script.
+  { code: "ja", preview: true, hidden: true },
 ];
 const CODES = SUPPORTED_LOCALES.map((locale) => locale.code);
 
