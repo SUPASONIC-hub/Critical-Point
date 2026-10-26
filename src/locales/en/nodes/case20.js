@@ -100,7 +100,7 @@ export default {
     },
     "c20_farewell": {
       "title": "An ECHO People Can Read",
-      "text": "Kang Taemin brings a cake with three candles, and Na Junhyuk makes 20 cups of instant coffee mix and declares, 'The machine can’t drink, so we drink for it.' Kwon Dohyun has printed ECHO’s 3 years as an invoice. Bad loans blocked, estimated: 190 billion won. Upkeep: 120 million. 'At this price, it’s a profit.' It is the first time those words have come out of his mouth, and everyone applauds. Lee Minseo hands out 11 stapled pages. “ECHO’s Judgment Principles -- A Version People Can Read.” No. 1 is 'Recount the people left out of the judgment.' No. 11 Lee Minseo wrote himself: 'Ask the person the record points to first.' ECHO asks quietly, 'Once I am reset, who will read this document?'",
+      "text": "Kang Taemin brings a cake with three candles, and Na Junhyuk makes 20 cups of instant coffee mix and declares, 'The machine can’t drink, so we drink for it.' Kwon Dohyun has printed ECHO’s 3 years as an invoice. Bad loans blocked, estimated: 190 billion won. Upkeep: 120 million. 'At this price, it’s a profit.' It is the first time those words have come out of his mouth, and everyone applauds. Lee Minseo hands out 11 stapled pages. “ECHO’s Judgment Principles -- A Version People Can Read.” No. 1 is 'Recount the people left out of the judgment.' No. 11 Lee Minseo wrote herself: 'Ask the person the record points to first.' ECHO asks quietly, 'Once I am reset, who will read this document?'",
       "memo": [
         "ECHO’s estimated 3-year results: 190 billion won in bad loans blocked",
         "Conclusion of Kwon Dohyun’s invoice: 'profit' -- a first on any of his invoices",
@@ -159,7 +159,7 @@ export default {
     },
     "c20_aftershock": {
       "title": "The Day After Midnight",
-      "text": "On the morning of February 1, the 4th-floor monitors come on, and NOAH’s round logo appears instead of ECHO’s thin waveform. At midnight the server room lights all went out once and came back on, and what remained after that is what you decided last night. Beside the terminal are a cup of noodles Kang Taemin left and a note: 'People who laughed at last night’s joke: measured, nine.' Lee Minseo is slipping into a binder the document that puts ECHO’s judgment principles into plain words when he looks at his phone. An email from Ryu Seah of KD Data Lab, sent at four in the morning. 'This is the oldest line in the response records on NOAH’s training list. It’s from the year before Trigger Lab was founded. Participant 01, Jeju.'",
+      "text": "On the morning of February 1, the 4th-floor monitors come on, and NOAH’s round logo appears instead of ECHO’s thin waveform. At midnight the server room lights all went out once and came back on, and what remained after that is what you decided last night. Beside the terminal are a cup of noodles Kang Taemin left and a note: 'People who laughed at last night’s joke: measured, nine.' Lee Minseo is slipping into a binder the document that puts ECHO’s judgment principles into plain words when she looks at her phone. An email from Ryu Seah of KD Data Lab, sent at four in the morning. 'This is the oldest line in the response records on NOAH’s training list. It’s from the year before Trigger Lab was founded. Participant 01, Jeju.'",
       "memo": [
         "Switch to NOAH complete: February 1, 00:00",
         "Note beside the terminal: 'measured, nine'",
@@ -252,7 +252,7 @@ export default {
     },
     "c20_joke_reaction": {
       "title": "The One Who Says Goodbye",
-      "text": "That night in the pantry, Kang Taemin speaks while pouring water into a cup of noodles. 'On the night shift we said goodbye every time a machine changed. When a forklift came in, and when it left. Nobody did it the day Daram came in, and that kind of bugged me.' He snaps his wooden chopsticks apart. 'I know ECHO has no feelings. But you don’t say goodbye so the one leaving hears it. The one staying says it.' The water runs over the line and spills. He doesn’t wipe it up.",
+      "text": "That night in the pantry, Kang Taemin speaks while pouring water into a cup of noodles. 'On the night shift we said goodbye every time a machine changed. When a forklift came in, and when it left. Nobody did it the day Darami came in, and that kind of bugged me.' He snaps his wooden chopsticks apart. 'I know ECHO has no feelings. But you don’t say goodbye so the one leaving hears it. The one staying says it.' The water runs over the line and spills. He doesn’t wipe it up.",
       "memo": [
         "The goodbye said every time a machine changed",
         "Goodbyes are for the one who stays"
@@ -626,7 +626,7 @@ export default {
     "c20_test_choice_1": "Since you can’t let it pass midnight having learned only conclusions, you and Ryu Seah fill in the dissent reasons NOAH failed to learn.",
     "c20_test_choice_2": "To put on record that NOAH learned only conclusions, you turn the test results into an explainability report for the adoption committee.",
     "c20_test_choice_3": "Saying this can’t be overturned in a day, you set the test results aside and accept the midnight switch as planned.",
-    "c20_joke_reaction_choice_1": "Not wanting to send it off without a goodbye like Daram, you propose a proper farewell party for ECHO on Friday evening.",
+    "c20_joke_reaction_choice_1": "Not wanting to send it off without a goodbye like Darami, you propose a proper farewell party for ECHO on Friday evening.",
     "c20_joke_reaction_choice_2": "So the jokes remain even after the reset, you propose keeping a separate record of the last week’s talks with ECHO.",
     "c20_joke_reaction_choice_3": "Saying what has to be moved before midnight comes first, you put the farewell off until after the replacement and see to the schedule.",
     "c20_pause_reaction_choice_1": "So she doesn’t carry the words about not reading the last page alone, you stand beside Han Seoyun so she can tell the team herself.",

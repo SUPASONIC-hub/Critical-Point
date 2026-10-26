@@ -70,7 +70,7 @@ export default {
     },
     "c11_rehearsal": {
       "title": "Mock Audit",
-      "text": "A mock audit room is set up on the 2nd floor of the Hoegi-dong secondhand bookshop. The members’ bench is three apple crates; the witness stand is Lim Kyungsoo’s old reading stand. Na Junhyuk, who volunteered to play Yoon Sanghyuk, borrowed a navy suit two sizes too small, and the buttons won’t close. Kang Taemin, playing the member, ends every question with 'So who’s buying the cup noodles?', and Kwon Dohyun holds a stopwatch and shouts '41 seconds, too long' after every answer. Oh Jinwoo, playing a reporter, throws the nastiest questions and bursts out laughing before anyone else. Do Yoonha laughs out loud for the first time in 3 weeks. As the laughter dies down, Lee Minseo quietly raises his hand. 'But will my name come up too? My account is in the access log from that leak scare. I’m still on contract.'",
+      "text": "A mock audit room is set up on the 2nd floor of the Hoegi-dong secondhand bookshop. The members’ bench is three apple crates; the witness stand is Lim Kyungsoo’s old reading stand. Na Junhyuk, who volunteered to play Yoon Sanghyuk, borrowed a navy suit two sizes too small, and the buttons won’t close. Kang Taemin, playing the member, ends every question with 'So who’s buying the cup noodles?', and Kwon Dohyun holds a stopwatch and shouts '41 seconds, too long' after every answer. Oh Jinwoo, playing a reporter, throws the nastiest questions and bursts out laughing before anyone else. Do Yoonha laughs out loud for the first time in 3 weeks. As the laughter dies down, Lee Minseo quietly raises her hand. 'But will my name come up too? My account is in the access log from that leak scare. I’m still on contract.'",
       "memo": [
         "12 mock questions -- answers average 41 seconds",
         "Na Junhyuk’s suit: 1 button lost",
@@ -96,7 +96,7 @@ export default {
       },
       "place": "Hoegi-dong Secondhand Bookshop 2nd Floor · Stacks of Ledgers",
       "clock": "Parliamentary audit in D-2",
-      "question": "As the laughter fades, Lee Minseo asks whether his name will come up too. How do you answer?",
+      "question": "As the laughter fades, Lee Minseo asks whether her name will come up too. How do you answer?",
       "lead": "Three apple crates make the members’ bench. The witness stand is Lim Kyungsoo’s old reading stand."
     },
     "c11_sign": {
@@ -608,7 +608,7 @@ export default {
     "c11_script_pr": "Since the office’s sentence can’t be proven either, instead of following the PR material you get a promise of no retaliation against your colleagues.",
     "c11_rehearsal_shield": "So that someone still on contract isn’t named in that room, you block in advance the answers to any question that names Lee Minseo.",
     "c11_rehearsal_truth": "Saying the access log is there anyway and hiding will only hurt more, you practice answering truthfully with Lee Minseo.",
-    "c11_rehearsal_contract": "So his name doesn’t hang over next month’s renewal review, you demand Lee Minseo’s permanent post before you appear.",
+    "c11_rehearsal_contract": "So her name doesn’t hang over next month’s renewal review, you demand Lee Minseo’s permanent post before you appear.",
     "c11_sign_ask": "Since Yoon Sanghyuk’s voice is on the call as it was, you ask Han Seoyun to submit the recording with you tomorrow.",
     "c11_sign_spare": "Telling her to keep the recording, you say you will name Yoon Sanghyuk on your testimony alone.",
     "c11_sign_together": "Not wanting only one person to be finished, you propose that the one who dissented and the one who returned it appear and speak together.",

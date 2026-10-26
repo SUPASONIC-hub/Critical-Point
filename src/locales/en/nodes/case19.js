@@ -296,7 +296,7 @@ export default {
     },
     "c19_margin_reaction": {
       "title": "Two Scanners",
-      "text": "Lee Minseo comes down to B2 with two scanners on a cart. '94,000 sheets. 1,200 sheets an hour per machine; even running both nonstop, that’s 39 hours. We can’t finish before the demolition.' Plugging them in, he adds, 'And once scanned, this paper goes into the system. The very system Mr. Lim avoided for 40 years. He always said anything in the system can just be altered.' Lee Minseo sets the first sheet on the glass and looks at you. 'What goes in first?'",
+      "text": "Lee Minseo comes down to B2 with two scanners on a cart. '94,000 sheets. 1,200 sheets an hour per machine; even running both nonstop, that’s 39 hours. We can’t finish before the demolition.' Plugging them in, she adds, 'And once scanned, this paper goes into the system. The very system Mr. Lim avoided for 40 years. He always said anything in the system can just be altered.' Lee Minseo sets the first sheet on the glass and looks at you. 'What goes in first?'",
       "memo": [
         "94,000 sheets, 39 hours",
         "Paper going into the system"
