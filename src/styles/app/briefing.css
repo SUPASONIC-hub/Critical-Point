@@ -782,6 +782,107 @@
   }
 }
 
+/* The act title card (B-11(1), ActCard.jsx) ----------------------------------- */
+/* In front of the briefing on an act's first case; a tap anywhere on it goes on. */
+.gx-act {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: var(--c-gx-shade);
+  cursor: pointer;
+  animation: gx-comic-fade var(--ui-dur) var(--ui-ease) both;
+}
+
+.gx-act-page {
+  display: grid;
+  gap: 12px;
+  width: min(560px, 100%);
+  padding: 28px 22px 22px;
+  background: var(--ui-bg);
+  border: 3px solid var(--ui-text);
+  border-radius: var(--ui-radius-md);
+  box-shadow:
+    10px 10px 0 var(--c-black),
+    var(--ui-shadow-2);
+  outline: none;
+  text-align: center;
+  animation: gx-comic-page 0.42s var(--ui-ease-spring) both;
+}
+
+.gx-act-kicker {
+  margin: 0;
+  color: var(--c-acid);
+  font: 800 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.12em;
+}
+
+.gx-act-title {
+  margin: 0;
+  color: var(--ui-text);
+  font: 900 clamp(1.75rem, 7vw, 2.5rem)/1.2 var(--font-sans);
+  word-break: keep-all;
+}
+
+.gx-act-line {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 1rem;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+.gx-act-left {
+  display: block;
+  margin-top: 8px;
+  color: var(--ui-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.gx-act-go {
+  position: relative;
+  justify-self: center;
+  min-width: 140px;
+  min-height: 48px;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--ui-accent-ink);
+  background: var(--c-acid);
+  border: 3px solid var(--c-black);
+  border-radius: var(--ui-radius-sm);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+/* The time left before the briefing comes up by itself. */
+.gx-act-go::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 4px;
+  background: var(--c-black);
+  transform-origin: left;
+  animation: gx-act-wait var(--act-wait) linear both;
+  content: "";
+}
+
+@keyframes gx-act-wait {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gx-act,
+  .gx-act-page,
+  .gx-act-go::after {
+    animation: none;
+  }
+}
+
 @keyframes gx-comic-fade {
   from {
     opacity: 0;

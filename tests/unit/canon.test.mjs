@@ -75,6 +75,8 @@ test("a canon fact fails in any sentence shape and any file that states it", () 
 // Facts the canon's prose held and the table did not (the same finding): the
 // rest of the afternoon of 27 April, the second standard, and the people.
 const ADDED_FACTS = [
+  ["kd-owner-name", "src/nodes/case43.js", 'text: "최대주주 킹스턴 파트너스의 뉴욕 본사가 표를 정합니다."'],
+  ["kd-owner-stake", "src/caseCopy.js", 'memo: ["킹스데일 파트너스 지분 49%"]'],
   ["committee-hour", "src/nodes/prologue03.js", 'text: "오후 3시 대출심사위원회 안건 목록이 새벽 다섯 시에 올라왔습니다."'],
   ["committee-hour", "src/nodes/prologue03.js", 'text: "오늘 오후 4시에 승인된 대출이 두 시간 만에 내려간 셈입니다."'],
   ["committee-countdown", "src/nodes/prologue03.js", 'memo: ["첨부 7 반려 처리: 13시 32분 -- 개회 38분 전"]'],

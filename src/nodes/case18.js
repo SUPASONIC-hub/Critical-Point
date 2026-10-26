@@ -34,6 +34,7 @@ const case18Nodes = {
       "브릿지은행 인수팀장 제안 -- 연봉 두 배, 최연소",
       "업무: KD은행 부실채권 묶음 1,860억 매입",
       "제시 가격: 원금의 19%",
+      "KD 쪽 사정: 뉴욕 대주주의 연말 배당 전에 부실채권 털기",
       "답변 기한: 12월 29일 09시",
     ],
     triggers: ["competition", "recognition", "choice"],
@@ -134,7 +135,7 @@ const case18Nodes = {
     choices: [
       {
         id: "c18_party_wait",
-        label: "재촉하지 않고 오진우가 스스로 말할 때까지 송년회를 지킨다",
+        label: "오진우가 스스로 말할 때까지 송년회를 지킨다",
         effect: { trust: 12, humanCost: -4, capital: -4, time: -5, fatigue: 5 },
         voice: "웃는 자리를 먼저 깨고 싶지 않아서, 재촉하지 않고 오진우가 스스로 말할 때까지 송년회를 지킨다.",
         echo: "기다리자 송년회는 길어집니다. 오진우는 먼저 말을 꺼내지 않지만, 자리를 뜨지도 않습니다.",
@@ -142,7 +143,7 @@ const case18Nodes = {
       },
       {
         id: "c18_party_share",
-        label: "팀 전원에게 매각 계획서를 보여 주고 함께 판단하자고 한다",
+        label: "팀 전원에게 매각 계획서를 보여 주고 함께 판단한다",
         effect: { legitimacy: 11, trust: 5, time: -6, humanCost: 2, fatigue: 5 },
         voice: "한 사람이 떠안을 무게가 아니라며, 팀 전원에게 매각 계획서를 보여 주고 함께 판단하자고 한다.",
         echo: "보여 주니 탕비실이 조용해집니다. 모두가 판단을 보태고, 오진우는 자기 일이 모두의 안건이 된 것을 조금 버거워합니다.",
@@ -187,7 +188,7 @@ const case18Nodes = {
       },
       {
         id: "c18_table_list",
-        label: "매각 묶음 속 옛 고객 명단을 오상철과 한 줄씩 짚어 본다",
+        label: "매각 묶음 속 옛 고객 명단을 오상철과 짚어 본다",
         effect: { legitimacy: 10, trust: 4, time: -6, humanCost: 3, fatigue: 4 },
         voice: "이기는 쪽이 누구를 사는지 눈으로 보자며, 매각 묶음 속 옛 고객 명단을 오상철과 한 줄씩 짚어 본다.",
         echo: "짚어 보니 오상철이 이름마다 가게 위치와 아이들 이름을 기억해 냅니다. 식탁이 저녁 밥상에서 심사장이 됩니다.",
@@ -231,7 +232,7 @@ const case18Nodes = {
       },
       {
         id: "c18_final_terms",
-        label: "보내되 채무자 보호 조항과 함께 싸울 약속을 조건으로 건다",
+        label: "보호 조항과 함께 싸울 약속을 조건으로 보낸다",
         effect: { legitimacy: 13, trust: 8, capital: -6, time: -8, humanCost: 3, fatigue: 6 },
         voice: "혼자 들어가 혼자 싸우게 두지 않으려고, 보내되 채무자 보호 조항과 안팎에서 같이 싸울 약속을 조건으로 건다.",
         echo: "조건을 걸자 오진우는 가고, 계약서에 채무자 보호 조항 한 장이 붙습니다. 그 조항을 지키게 할 사람은 이제 다른 은행에 있습니다.",
@@ -377,7 +378,7 @@ export const case18 = {
       memo: ["명함 뭉치: 매탄지점 30년 고객", "맨 위: 소담찬방 송미란", "오상철: '살살은 다룰 수 있어서다'"],
       choices: [
         {
-          label: "버스를 한 대 보내고 정류장에서 오상철의 말을 끝까지 듣는다",
+          label: "버스 한 대를 보내고 오상철의 말을 끝까지 듣는다",
           effect: { trust: 10, humanCost: -5, legitimacy: 2, time: -4, fatigue: 4 },
           voice: "슬리퍼로 따라 나온 사람을 두고 갈 수 없어서, 버스를 한 대 보내고 정류장에서 오상철의 말을 끝까지 듣는다.",
           echo: "버스를 보내자 눈이 오상철의 어깨에 쌓입니다. 그는 그동안 아무에게도 안 한 이야기를 슬리퍼를 신은 채 합니다.",
@@ -443,7 +444,7 @@ export const case18 = {
           echo: "끝까지 듣자 커피가 식습니다. 나준혁은 식은 믹스커피를 원래 좋아한다고 우깁니다.",
         },
         {
-          label: "남는 사람과 가는 사람이 할 일을 나눠 적어 보자고 한다",
+          label: "남는 이와 가는 이의 할 일을 나눠 적어 보자고 한다",
           effect: { legitimacy: 7, trust: 4, capital: -4, time: -3, fatigue: 3 },
           voice: "남든 가든 할 일은 있다는 말을 흘려보내지 않게, 남는 사람과 가는 사람이 할 일을 나눠 적어 보자고 한다.",
           echo: "나눠 적자 표가 하나 생깁니다. 오진우는 '가는 사람' 칸의 할 일이 생각보다 많다는 걸 봅니다.",
@@ -613,7 +614,7 @@ export const case18 = {
     finalChoices: [
       {
         id: "a",
-        label: "반응 기록을 쓴 채용은 무효라는 조항을 서명 조건에 넣는다",
+        label: "반응 기록을 쓴 채용은 무효라는 조항을 조건에 넣는다",
         effect: { legitimacy: 13, trust: 6, capital: -8, humanCost: -4, fatigue: 7 },
         voice: "몰래 잰 숫자로 사람을 고르지 못하게, 반응 기록을 쓴 채용은 무효라는 조항을 서명 조건에 넣는다.",
         echo: "무효 조항이 들어가자 브릿지는 채용을 처음부터 다시 해야 합니다. 이번에는 면접으로요.",
@@ -681,7 +682,7 @@ export const case18 = {
   memoryPlan: {
     systemNext: "c18_route_system",
     evidenceNext: "c18_evidence_turn",
-    systemLabel: "수첩을 두고 짠 판이 브릿지 후보자 평가표에 실렸는지 본다",
+    systemLabel: "수첩을 두고 짠 판이 브릿지 평가표에 실렸는지 본다",
     evidenceLabel: "내선 번호의 주인을 매각 계약서 부속 합의서에서 찾는다",
     systemEcho: "확인하면 평가표에 실린 것은 판이 아니라 숫자입니다. 소수점까지 트리거랩의 반응 기록과 같고, 에코가 두 숫자에 밑줄을 긋습니다.",
     evidenceEcho: "내선 번호의 주인을 매각 계약서에 대면 부속 합의서가 한 장 더 딸려 나옵니다. 가격이 아닌 것이 거래 조건에 들어 있습니다.",
@@ -712,7 +713,7 @@ export const case18 = {
       echo: "묻자 브릿지는 정중한 답장을 보냅니다. '공개된 자료를 참고했습니다.' 누가 그 자료를 건넸는지는 적혀 있지 않습니다.",
     },
     c18_start_rush: {
-      label: "어젯밤 먼저 뜬 일은 변명 없이 오진우와 결론까지 이야기한다",
+      label: "어젯밤 먼저 뜬 일은 변명 없이 오진우와 매듭짓는다",
       effect: { trust: 12, legitimacy: 5, humanCost: 5, fatigue: 4 },
       cognition: { risk: 2 },
       voice: "오래 끌지 말라는 부탁을 들어주려고, 어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다.",

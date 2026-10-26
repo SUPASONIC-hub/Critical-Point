@@ -62,6 +62,19 @@ export const farCallbacks = {
     },
     fallback: "수능 날 아침 면접실 탁자에 놓였던 확인서와 만년필 한 자루가 잠깐 떠오릅니다. 그날도 서명 한 줄이 기록을 닫는 값이었습니다.",
   },
+  // 사건 49: how the night before the 33rd floor was spent, and what came
+  // along in the bag. 최종 사건: the 33rd floor itself. Each line names a thing
+  // that route's opening already holds (f_start_owner/_system/_name).
+  f_confront: {
+    fromCase: "case49",
+    after: "'나도 이걸 받은 사람일세.'",
+    lines: {
+      c49_after_warm: "당신은 가방에서 남은 컵라면 하나를 꺼내 책상에 올립니다. 강태민이 '그 사람 몫'이라던 것입니다. 윤상혁이 한참 보다가 묻습니다. '물은 어디서 붓나.'",
+      c49_after_record: "가방 속 폴더의 목차 맨 끝 칸은 아직 비어 있습니다. 이 방에서 들은 답을 적을 칸입니다.",
+      c49_after_rush: "주머니에는 복도 문에서 뗀 쪽지가 아직 있습니다. '한 시간이면 되지.' 그 한 시간은 오래전에 지났습니다.",
+    },
+    fallback: "당신은 발치의 가방을 한 번 끌어당깁니다. 무엇을 들고 왔든, 이 방에서는 아무도 그걸 묻지 않습니다.",
+  },
 };
 
 /** The line a far callback prints for this run: the card's, or the fallback. */
