@@ -561,8 +561,9 @@ const OWN_CHUNKS = [
   // The notices' words (src/copy/edgeNotices.js, 다국어 틀) go with the notice.
   { name: "EdgeNotice", files: [EDGE_NOTICE, "src/copy/edgeNotices.js"] },
   { name: "ReadingClockAsk", files: [READING_CLOCK_ASK] },
-  { name: "auditRisk", files: [AUDIT_RISK] },
-  { name: "cascadeRisk", files: [CASCADE_RISK] },
+  // Their words (src/copy/audit.js, cascade.js, 영어판 3단계) go with each.
+  { name: "auditRisk", files: [AUDIT_RISK, "src/copy/audit.js"] },
+  { name: "cascadeRisk", files: [CASCADE_RISK, "src/copy/cascade.js"] },
   // windowTrail came in from main (#F1 phase 2) after the Vite 8 budgets were
   // measured: its group is here as the emitted chunk was, its size is to be
   // measured on the next build (다음에 실측).
