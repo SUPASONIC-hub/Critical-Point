@@ -8,6 +8,7 @@ import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { renderLegalPages } from "./scripts/legal-pages.mjs";
+import { adsTxt, insertAdSlots, readAdsenseEnv } from "./scripts/adsense-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -369,20 +370,51 @@ function serviceWorker() {
  * addresses from the same source. Before `serviceWorker()` in the list, which
  * reads every file on disk into the release's name.
  */
-function legalPages() {
+function legalPages({ ads }) {
   return {
     name: "legal-pages",
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = new URL(request.url ?? "/", "http://dev.invalid").pathname;
-        const page = renderLegalPages()[pathname.slice(1)];
+        const page = renderLegalPages({ ads })[pathname.slice(1)];
         if (!page) return next();
         response.setHeader("Content-Type", "text/html; charset=utf-8");
         response.end(page);
       });
     },
     generateBundle() {
-      for (const [fileName, source] of Object.entries(renderLegalPages())) this.emitFile({ type: "asset", fileName, source });
+      for (const [fileName, source] of Object.entries(renderLegalPages({ ads }))) this.emitFile({ type: "asset", fileName, source });
+    },
+  };
+}
+
+/**
+ * Web ads (출시 로드맵 2단계), off unless ADSENSE_CLIENT is set
+ * (scripts/adsense-config.mjs, docs/web-ads.md). Off, this plugin does
+ * nothing and the build is the one without it. With the publisher ID alone
+ * (site verification) it writes /ads.txt and the `google-adsense-account`
+ * meta tag the AdSense review reads, and no code. With ADSENSE_ADS=on
+ * and a unit for a placement (ADSENSE_SLOTS) it also turns that
+ * placement's marker comment into an <AdSlot>, before JSX is compiled.
+ * Before `serviceWorker()` in the list, like legalPages, so ads.txt is a file
+ * the release is named for.
+ */
+function adsense(config) {
+  if (!config.client) return { name: "adsense-off" };
+  return {
+    name: "adsense",
+    enforce: "pre",
+    transform(code, id) {
+      if (!id.endsWith(".jsx") || id.includes("node_modules")) return null;
+      const out = insertAdSlots(code, config);
+      return out === null ? null : { code: out, map: null };
+    },
+    transformIndexHtml(html) {
+      return html.replace("</head>", `    <meta name="google-adsense-account" content="${config.client}" />
+  </head>`);
+    },
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "ads.txt", source: adsTxt(config.publisherId) });
     },
   };
 }
@@ -561,47 +593,52 @@ function ownChunkGroups() {
   });
 }
 
-export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), legalPages(), serviceWorker(), renderHeaders()],
-  // The debug console -- the case jump, unlock-all, the forced render error --
-  // is dead code in a release, and this constant is how the bundler is told.
-  // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
-  // nothing can fold: the expression and every panel behind it shipped to
-  // players, switched off by a runtime check. A build that asks for the tools
-  // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
-  define: {
-    __CP_DEBUG_BUILD__: JSON.stringify(
-      command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
-    ),
-    __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
-  },
-  // The dev server compiles a module the first time it is asked for. Fifty
-  // cases are fifty large data modules, and compiling them on the first scene
-  // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
-  // never has, landing inside the e2e render budgets. They are compiled when
-  // the server starts instead.
-  server: {
-    warmup: {
-      clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
+export default defineConfig(({ command, mode }) => {
+  // No VITE_ prefix: Vite puts every VITE_ variable into import.meta.env, and
+  // the code that reads that object whole would carry the publisher ID.
+  const ads = readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"));
+  return {
+    plugins: [adsense(ads), seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), legalPages({ ads: ads.ads }), serviceWorker(), renderHeaders()],
+    // The debug console -- the case jump, unlock-all, the forced render error --
+    // is dead code in a release, and this constant is how the bundler is told.
+    // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
+    // nothing can fold: the expression and every panel behind it shipped to
+    // players, switched off by a runtime check. A build that asks for the tools
+    // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
+    define: {
+      __CP_DEBUG_BUILD__: JSON.stringify(
+        command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
+      ),
+      __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
     },
-  },
-  build: {
-    // A lazy import is written with the list of files to preload beside it.
-    // The result card's chunk leans only on files the ending screen has
-    // already run, so its list is left out: writing it cost the report's chunk
-    // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
-    // The case file's cast (CaseCast, D-8) is the same: the runtime has run
-    // every file it leans on before the table's fold can open, and its list
-    // of sixteen files was about 500 bytes (2026-10-23).
-    modulePreload: {
-      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+    // The dev server compiles a module the first time it is asked for. Fifty
+    // cases are fifty large data modules, and compiling them on the first scene
+    // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
+    // never has, landing inside the e2e render budgets. They are compiled when
+    // the server starts instead.
+    server: {
+      warmup: {
+        clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
+      },
     },
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
+    build: {
+      // A lazy import is written with the list of files to preload beside it.
+      // The result card's chunk leans only on files the ending screen has
+      // already run, so its list is left out: writing it cost the report's chunk
+      // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+      // The case file's cast (CaseCast, D-8) is the same: the runtime has run
+      // every file it leans on before the table's fold can open, and its list
+      // of sixteen files was about 500 bytes (2026-10-23).
+      modulePreload: {
+        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+      },
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
+          },
         },
       },
     },
-  },
-}));
+  };
+});

@@ -1269,6 +1269,7 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
    「홈 화면에 추가」가 앱처럼 뜹니다. 완전 무료, 광고 없음. 커뮤니티에 알리고 피드백을 받습니다.
 2. **웹 광고** — 방문자가 의미 있게 늘고 게임성이 검증되면 Google AdSense를 붙입니다. 그 전에 개인정보처리방침의
    광고 절과(영어판의 EU·영국 방문자용) 동의 창을 먼저 넣습니다.
+   준비된 것: draft #PRNUM — 기본 꺼짐, 켜는 순서는 [docs/web-ads.md](docs/web-ads.md).
 3. **스토어** — 게임물관리위원회 안내가 오거나 넓히고 싶을 때 Google Play(안드로이드)에 등록합니다. 스토어
    설문으로 등급을 받습니다. 앱 껍데기·광고·빌드 자동화는 draft로 준비만 해 둡니다.
 
@@ -1311,6 +1312,10 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/assets/*` | `Cross-Origin-Resource-Policy` | `same-origin` |
 | `/*` | `Permissions-Policy` | `render.yaml`의 값 |
 | `/*` | `Content-Security-Policy` | `render.yaml`의 값 |
+
+웹 광고(출시 로드맵 2단계)를 켤 때만 CSP가 바뀝니다(script/frame/connect/img를 `https:`로). 그 행(Path
+`/*`, Name `Content-Security-Policy`, Value)과 환경 변수 `ADSENSE_CLIENT`·`ADSENSE_ADS`·
+`ADSENSE_SLOTS`는 [docs/web-ads.md](docs/web-ads.md)에 있습니다. 지금은 바꾸지 않습니다.
 
 2026-10-06에 더해진 것은 그림 세 줄(`/*.webp`, `/*.jpg`, `/icons/*`)과 `/sw.js`입니다. 이 넷은 대시보드에
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을

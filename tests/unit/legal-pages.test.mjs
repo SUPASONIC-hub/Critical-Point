@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages } from "../../scripts/legal-pages.mjs";
+import { AD_EDITS, DATA_ITEMS, REMOTE_FIELDS, renderLegalPages } from "../../scripts/legal-pages.mjs";
 import { SUPPORT_CONTACT } from "../../src/appConfig.js";
 import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../../src/privacyText.js";
 import { createSeasonTelemetryPayload } from "../../src/viewModels/seasonViewModels.js";
@@ -100,4 +100,31 @@ test("the decisions of 2026-10-25 hold: no names, one overseas line, no ads on t
   assert.match(ko, /8자리 세션 코드/);
   assert.match(decode(pages["terms.html"]), new RegExp(`href="${PRIVACY_PAGE_PATH}"`));
   assert.match(decode(pages["en/terms.html"]), /href="\/en\/privacy\.html"/);
+});
+
+test("web ads off: the pages are the ones without ads, byte for byte; on: every ad sentence is in", () => {
+  // Off (no ADSENSE_ADS=on, verification-only included) writes the pages above.
+  assert.deepEqual(renderLegalPages({ ads: false }), pages);
+  const on = renderLegalPages({ ads: true });
+  assert.deepEqual(Object.keys(on), Object.keys(pages));
+  for (const [file, name] of [["privacy.html", "privacyKo"], ["en/privacy.html", "privacyEn"], ["terms.html", "termsKo"], ["en/terms.html", "termsEn"]]) {
+    for (const [from, to] of AD_EDITS[name]) {
+      assert.ok(pages[file].includes(from), `${file} (off) has "${from.slice(0, 30)}"`);
+      assert.ok(on[file].includes(to), `${file} (on) has the ad text`);
+    }
+    assert.doesNotMatch(on[file].replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]/, `${file}: no placeholder left`);
+    assert.doesNotMatch(on[file], /<script\b/i);
+  }
+  const ko = decode(on["privacy.html"]);
+  const en = decode(on["en/privacy.html"]);
+  for (const html of [ko, en]) {
+    assert.match(html, /Google AdSense/);
+    assert.match(html, /href="https:\/\/adssettings\.google\.com"/);
+    assert.match(html, /policies\.google\.com\/technologies\/ads/);
+    assert.match(html, /Google LLC\s?\((?:미국|USA)\)/);
+  }
+  assert.match(ko, /개인정보 보호 및 메시지/);
+  assert.match(en, /Privacy & messaging/);
+  assert.doesNotMatch(ko, /지금은 광고가 없/);
+  assert.doesNotMatch(en, /currently shows no ads/);
 });

@@ -133,6 +133,7 @@ export function RankingScreen({
           <p className="ranking-footnote">
             다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.
           </p>
+          {/* ad-slot: placement="ranking" */}
         </section>
       </main>
 );
