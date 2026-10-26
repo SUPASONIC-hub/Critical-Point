@@ -115,6 +115,7 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
       tableReactions: caseCopy.tableReactions,
     },
     appCopy: {
+      INSTALL_HINT_COPY: appCopy.INSTALL_HINT_COPY,
       resourceMeta: appCopy.resourceMeta,
       playStyleOptions: appCopy.playStyleOptions,
       playGuideItems: appCopy.playGuideItems,

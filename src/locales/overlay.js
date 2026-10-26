@@ -14,7 +14,7 @@
  * then splits the runtime differently). A case's scenes are written over as
  * the case arrives. Whatever a language leaves out stays Korean.
  */
-import { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
+import { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
 import { easyCognitionLabels, easyResourceLabels } from "../playerLanguage.js";
 import { caseObjectives, seasonCasesBase } from "../gameCases.js";
 
@@ -50,7 +50,7 @@ export function overlayWords(target, words) {
 // Named one by one: a namespace import would keep every export of the module
 // in the build, the ones the app never reads included.
 const SHELL_TABLES = {
-  appCopy: { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals },
+  appCopy: { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals },
   playerLanguage: { easyCognitionLabels, easyResourceLabels },
   gameCases: { caseObjectives, seasonCasesBase },
 };

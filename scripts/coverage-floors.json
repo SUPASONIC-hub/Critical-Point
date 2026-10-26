@@ -75,6 +75,7 @@
     "src/state/diagnosticUtils.js": 100,
     "src/state/endingBook.js": 100,
     "src/state/errorRecovery.js": 85,
+    "src/state/installPrompt.js": 96,
     "src/state/loadProgress.js": 100,
     "src/state/newGamePlusCarry.js": 100,
     "src/state/openingState.js": 100,

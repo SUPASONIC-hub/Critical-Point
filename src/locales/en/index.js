@@ -466,6 +466,13 @@ export const copy = {
     }
   },
   "appCopy": {
+    "INSTALL_HINT_COPY": {
+      "title": "Keep it on your home screen",
+      "prompt": "On your home screen it opens like an app, without the address bar.",
+      "ios": "Tap the Share button and choose “Add to Home Screen”; it then opens like an app, without the address bar.",
+      "install": "Add to home screen",
+      "dismiss": "Close this tip"
+    },
     "resourceMeta": {
       "time": {
         "label": "Time left",

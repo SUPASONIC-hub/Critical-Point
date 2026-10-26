@@ -6,6 +6,7 @@ import { applyAccessibilityToDocument } from "./state/accessibilitySettings.js";
 import { installServiceWorker } from "./serviceWorker/register.js";
 import { installChunkReload } from "./state/chunkReload.js";
 import { loadLocale } from "./locale.js";
+import { installInstallPrompt } from "./state/installPrompt.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
 // does not download the code that would. Turning it on in CloudSavePanel
@@ -22,6 +23,8 @@ claimTabToken();
 // After `load`, and only in a release: what lets an installed copy open with
 // no connection (serviceWorker/worker.js).
 installServiceWorker();
+// Before the intro renders: the browser's install offer can arrive first (state/installPrompt.js).
+installInstallPrompt();
 
 const paint = () => createRoot(document.getElementById("root"), { onCaughtError: logCaughtRenderError }).render(
   <>
