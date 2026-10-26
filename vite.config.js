@@ -552,7 +552,10 @@ const SPEAKER_LINE = "src/gauntlet/speakerLine.js";
  * the words it imports, as it was when the hook was the emitted chunk's entry.
  */
 const OWN_CHUNKS = [
-  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS] },
+  // Its words (src/copy/seasonEnd.js, 영어판 3단계) go with it: left alone they
+  // land in pastPicks, which imports this chunk back, and the table read at
+  // load (ENDING_NAMES, the ending scenes) was still undefined.
+  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS, "src/copy/seasonEnd.js"] },
   { name: "caseCopy", files: [CASE_COPY] },
   { name: "tableAudio", files: [TABLE_AUDIO] },
   { name: "sceneTraces", files: [SCENE_TRACES, "src/sceneTraces.js"] },

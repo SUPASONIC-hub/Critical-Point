@@ -109,8 +109,8 @@ const budgets = [
   // same 291,131, but eight case files' hashed names in its import list
   // changed with their scene text and gzip worse; measured 87,097 on main
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
-  // 291,131 / 87,101 -> 293,752 / 88,141 on 2026-10-26, 영어판 3단계: runtimeSystems.js's ending scenes and names, the ending preview, the collapse's cause, the authority review and the aftermath read by key (src/copy/seasonEnd.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 293_752, maxGzip: 88_141 },
+  // 291,131 / 87,101 -> 290,343 / 86,964 on 2026-10-26, 영어판 3단계: runtimeSystems.js's words (src/copy/seasonEnd.js) first landed here, which imports the runtimeSystems chunk back, and the table read at load was undefined in the production build (runtime smoke); grouped with runtimeSystems now, and this file measured smaller. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 290_343, maxGzip: 86_964 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -713,7 +713,8 @@ const budgets = [
   // Oxc write it smaller than Rollup and esbuild did (7,084 / 3,621 on the same commit).
   // 6,994 / 3,548 -> 7,006 / 3,557 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 7,006 / 3,553 in the e2e build, the gzip plus 4.
-  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 7_006, maxGzip: 3_557 },
+  // 7,006 / 3,557 -> 8,451 / 3,981 on 2026-10-26, 영어판 3단계: its words (src/copy/seasonEnd.js: the ending scenes and names, the collapse's cause, the authority review, the aftermath) grouped with it in vite.config.js. The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_451, maxGzip: 3_981 },
   // The season's copy between and around cases (src/caseCopy.js): the
   // next-case teasers and interludes, chapter rules, rank legacy lines and
   // 에코's opening lines. It was in the runtime's chunk, which had 255 gzip
