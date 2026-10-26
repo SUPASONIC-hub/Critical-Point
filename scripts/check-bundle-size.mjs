@@ -88,7 +88,9 @@ const budgets = [
   // read on a save (the hold on a type set aside) and the run's direction.
   // -> 143,077 / 52,472 on 2026-10-25, the 11-30 rehearsal with C-3/C-4 (integration-1130: #224 + C-1(1) + D2 + C-7/B-13(2)/C-10 + C-3/C-4 + main c8841dc0):
   // C-1's 판 읽기 row, the bundle's peak-case jump and C-3's direction and save upgrade together. Measured 143,077 / 52,468 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 143_077, maxGzip: 52_472 },
+  // -> 143,080 raw on 2026-10-26, the rehearsal on main 9c7a06c0 (#326~#336): measured
+  // 143,080 / 52,447 in the e2e build; the rehearsal's code did not change, the gzip budget holds.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 143_080, maxGzip: 52_472 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -287,7 +289,15 @@ const budgets = [
   // 172,282 / 62,234 -> 172,403 / 62,270 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 172,403 / 62,266 gzip in the e2e build, the gzip plus 4.
   // -> 172,646 / 62,389 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
   // #325's report button and its copy beside everything the rehearsal carries. Measured 172,646 / 62,385 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 172_646, maxGzip: 62_389 },
+  // 172,403 / 62,270 -> 173,126 / 62,668 on 2026-10-25, deletion-contact: the deletion-request sentence in the data notice with the support address as a mailto link (SUPPORT_CONTACT, getDeletionRequestText in appConfig.js). Measured 173,126 / 62,664 gzip in the e2e build on main 2998216 (#325), the gzip plus 4.
+  // 173,126 / 62,668 -> 173,478 / 62,829 the same day, 개인정보처리방침·이용약관
+  // on main 39176493 (#326): the intro's foot and the data drawer's note link
+  // the two pages (privacyText.js holds the paths and the consent sentence,
+  // moved, not added). Measured 173,478 / 62,825 in the e2e build, the gzip
+  // plus 4.
+  // -> 173,728 / 62,957 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0 (#326 deletion contact, #328 policy pages):
+  // main's data-notice lines beside everything the rehearsal carries. Measured 173,728 / 62,953 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 173_728, maxGzip: 62_957 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -587,7 +597,12 @@ const budgets = [
   // 193,412 / 36,058 -> 194,165 / 36,203 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 194,165 / 36,199 gzip in the e2e build, the gzip plus 4.
   // -> 194,725 / 36,295 on 2026-10-25, the 11-30 rehearsal on main 429aaa31 (#325 board report):
   // #325's report row and fieldset beside C-1's card, D2's badge and the bundle's marks. Measured 194,725 / 36,291 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 194_725, maxGzip: 36_295 },
+  // -> 194,339 / 36,241 the same day, 개인정보처리방침·이용약관 on main 29982165:
+  // `.intro-legal` and the links' colour. Measured 194,339 / 36,237 in the e2e
+  // build, the gzip plus 4.
+  // -> 194,899 / 36,333 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0:
+  // `.intro-legal` beside #325's report row, C-1's card, D2's badge and the bundle's marks. Measured 194,899 / 36,329 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_899, maxGzip: 36_333 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -906,7 +921,9 @@ const budgets = [
   // 2,081 / 1,077 -> 1,995 / 1,051 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,995 / 1,047 in the e2e build, the gzip plus 4.
   // 1,995 / 1,051 -> 1,996 / 1,051 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 1,996 in the e2e build.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_051 },
+  // -> 1,056 gzip on 2026-10-25 (개인정보처리방침·이용약관): measured 1,052, the
+  // entry chunk's export names it imports by, plus 4; the file did not change.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_996, maxGzip: 1_056 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -1217,7 +1234,13 @@ function checkBudget(file, budget) {
 // measured 3,440 and 3,445 gzip (two builds), the larger plus 4; the same files, their hashes only.
 // -> 3,431 gzip on 2026-10-25, 묶음 시대고증(#313): the chunk names' hashes
 // only (measured 3,427 plus 4); the worker's code did not change.
-const WORKER_BUDGET = { maxBytes: 9_376, maxGzip: 3_449 };
+// -> 9,863 / 3,555 on 2026-10-25, 개인정보처리방침·이용약관: the worker
+// answers the four policy pages network first and keeps them (DOCUMENT_PAGE,
+// answerPage), and the warm list names them. Measured 9,863 / 3,551 plus 4.
+// -> 9,899 / 3,565 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0: the
+// policy pages beside the rehearsal's files (personalBests and the rest).
+// Measured 9,899 / 3,561 plus 4.
+const WORKER_BUDGET = { maxBytes: 9_899, maxGzip: 3_565 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

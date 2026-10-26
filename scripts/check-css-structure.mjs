@@ -159,7 +159,12 @@ const fileBudgets = {
   // so the badge list above is not written twice.
   // -> 3084 / 68231 on 2026-10-25, the 11-30 rehearsal (integration-1130): the
   // report button and the hall of fame badge together, measured 3084 / 68231.
-  "base-intro-ranking.css": { lines: 3084, bytes: 68231 },
+  // 3073 / 67949 -> 3083 / 68150 the same day, measured: the foot of the
+  // intro links the privacy policy and the terms (.intro-legal), and those
+  // links and the data drawer's note take the colour around them.
+  // -> 3094 / 68435 on 2026-10-26, the 11-30 rehearsal on main 9c7a06c0: the
+  // report button, the hall of fame badge and `.intro-legal` together, measured.
+  "base-intro-ranking.css": { lines: 3094, bytes: 68435 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
