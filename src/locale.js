@@ -78,6 +78,11 @@ export function speakerName(name) {
   return overlay ? overlay.speakerName(name) : name;
 }
 
+/** A speaker's role in the page's language (its dictionary's `roles`), or the Korean role as it came. */
+export function roleName(role) {
+  return overlay ? overlay.roleName(role) : role;
+}
+
 /** A line of the language's own screens (its dictionary's `preview`, F-3 and F-4), or "" on a Korean page. */
 export function previewText(key) {
   return overlay ? overlay.previewText(key) : "";

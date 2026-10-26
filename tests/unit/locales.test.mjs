@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.mjs";
 import { caseSource, compareWords, flatten, hasHangul, readCopySource, wordsOf } from "../../scripts/locale-words.mjs";
 import { LANG, loadLocale, localizeCaseData, SOURCE_LOCALE, speakerName, SUPPORTED_LOCALES } from "../../src/locale.js";
-import { localizeCase, localizeCaseData as overlayCaseData, localizeTables, overlayModule, overlayWords, previewText, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
+import { localizeCase, localizeCaseData as overlayCaseData, localizeTables, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
 import * as gameCases from "../../src/gameCases.js";
 import * as caseCopy from "../../src/caseCopy.js";
 
@@ -83,6 +83,7 @@ test("a case's words cover its scenes and its pack's result copy, and a line lef
 test("before a dictionary arrives, the overlay changes nothing: no names, no preview line, cases and tables as they came", () => {
   assert.equal(overlaySpeakerName("한서윤"), "한서윤");
   assert.equal(previewText("previewNote"), "");
+  assert.equal(overlayRoleName("KD은행 기업금융전략팀장"), "KD은행 기업금융전략팀장");
   const tables = { chapterRules: { case01: { label: "현금과 사람" } } };
   localizeTables("caseCopy", tables);
   assert.equal(tables.chapterRules.case01.label, "현금과 사람");

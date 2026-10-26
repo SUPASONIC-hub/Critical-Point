@@ -17,6 +17,8 @@ import { useConsentToggle } from "../state/useConsentToggle.js";
 import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
 import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
+import { fill } from "../locale.js";
+import introCopy from "../copy/intro.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -61,10 +63,7 @@ export function prefetchGameRuntime() {
  * `startCase` / `startNewGamePlus` a press inside the runtime calls. The shell
  * used to answer both with a fresh season, which wiped the completed cases.
  */
-const CONFIRM_START_OVER = "저장된 진행을 지우고 첫 사건부터 새로 시작할까요? 복구 지점은 남습니다.";
-const CONFIRM_START_NEW_GAME_PLUS = "저장된 진행을 지우고 NEW GAME+로 새로 시작할까요? 복구 지점은 남습니다.";
-const CONFIRM_REPLACE_CASE = "진행 중인 사건의 선택 기록을 지우고 이 사건을 열까요? 완료한 사건의 기록은 남습니다.";
-const CONFIRM_RESTART_CASE = "이 사건을 처음부터 다시 시작할까요? 지금 판의 선택 기록은 지워집니다.";
+const { confirm: CONFIRM } = introCopy;
 // The consent box is ticked from the first visit and sits in a closed drawer,
 // so the page says so where the eye already is: by the button that starts the
 // sending. It names the drawer the way out is in, and the name opens it: a
@@ -79,6 +78,8 @@ const openDrawer = (id) => () => {
 };
 const openDataDrawer = openDrawer(DATA_DRAWER_ID);
 const openBriefingDrawer = openDrawer(BRIEFING_DRAWER_ID);
+// "{game} 시작": the text on either side of the blank an element fills.
+const NEW_GAME_PLUS_LABEL = introCopy.setup.newGamePlus.split("{game}");
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -119,7 +120,7 @@ export function IntroScreen({ view, renderers = {} }) {
       renderRecoveryNotice: viewRenderRecoveryNotice,
       renderErrorLogPanel: viewRenderErrorLogPanel,
       renderSaveStatus: viewRenderSaveStatus,
-      GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE,
+      GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage,
     },
     start: {
       playStyleOptions, playStyle, setPlayStyle, persist, hasResumableSave, node, formatSaveTime,
@@ -182,10 +183,10 @@ export function IntroScreen({ view, renderers = {} }) {
   // With no run to lose nothing is awaited: the first press on the page still
   // opens the burst, and starts its sound, inside the press itself.
   const startNewRun = async () => {
-    if (!hasResumableSave || (await confirmAction(CONFIRM_START_OVER))) beginOpeningBurst(startGame);
+    if (!hasResumableSave || (await confirmAction(CONFIRM.startOver))) beginOpeningBurst(startGame);
   };
   const startNewGamePlusRun = async () => {
-    if (!hasResumableSave || (await confirmAction(CONFIRM_START_NEW_GAME_PLUS))) beginOpeningBurst(startNewGamePlus);
+    if (!hasResumableSave || (await confirmAction(CONFIRM.newGamePlus))) beginOpeningBurst(startNewGamePlus);
   };
   // A roadmap card. Opening a case starts it at its first scene, so the card of
   // the case in progress resumes it instead, and a press that would throw a
@@ -196,8 +197,8 @@ export function IntroScreen({ view, renderers = {} }) {
     });
     if (press === "locked") return;
     if (press === "resume") return resumeSavedGame();
-    if (press === "replace" && !(await confirmAction(CONFIRM_REPLACE_CASE))) return;
-    if (press === "restart" && !(await confirmAction(CONFIRM_RESTART_CASE))) return;
+    if (press === "replace" && !(await confirmAction(CONFIRM.replaceCase))) return;
+    if (press === "restart" && !(await confirmAction(CONFIRM.restartCase))) return;
     beginOpeningBurst(() => startCase(caseItem.id), caseItem.id);
   };
   const openingCase = seasonCasesBase.find((caseItem) => caseItem.id === openingBurst) ?? null;
@@ -217,14 +218,14 @@ export function IntroScreen({ view, renderers = {} }) {
       disabled={Boolean(openingBurst)}
     >
       <ChevronRight size={18} />
-      프롤로그 시작
+      {introCopy.startButton}
     </button>
   );
   // Only while it is true: unticked, or built with no backend, nothing is sent.
   const consentLine = dataConsent && telemetryEnabled && (
     <small className="consent-note" data-testid="consent-line">
-      플레이 기록은 플레이테스트용으로 익명 전송됩니다. 아래{" "}
-      <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>데이터 저장 안내</a>에서 끌 수 있습니다.
+      {introCopy.consentLine.before}
+      <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>{introCopy.consentLine.link}</a>{introCopy.consentLine.after}
     </small>
   );
   const analystTitle = getAnalystTitle({ currentCase, caseResults });
@@ -234,24 +235,24 @@ export function IntroScreen({ view, renderers = {} }) {
         {/* The record title rises with the season; it is read from the
             case in play and the cases closed (src/analystTitle.js). */}
         {/* The season number from the second on (NEW GAME+ record, getPastRunMemory). */}
-        <span>저장된 진행{analystTitle ? ` · 기록 칭호 ${analystTitle}` : ""}{pastRunMemory?.round > 1 ? ` · ${pastRunMemory.round}회차` : ""}</span>
+        <span>{introCopy.resume.saved}{analystTitle ? fill(introCopy.resume.title, { title: analystTitle }) : ""}{pastRunMemory?.round > 1 ? fill(introCopy.round, { round: pastRunMemory.round }) : ""}</span>
         {/* The scene title and the route position are read from the
             graph, which the pre-start shell has not loaded. It prints
             the case and the save time instead of guessing them. */}
         <strong>
-          {activeCaseMeta?.label ?? "현재 사건"}
+          {activeCaseMeta?.label ?? introCopy.resume.currentCase}
           {node?.title ? ` · ${node.title}` : ""}
         </strong>
         <small>
-          {formatSaveTime(lastSavedAt)} 저장 · {savedStory.decisions}개 판단 기록
-          {progress === null ? "" : ` · 진행률 ${progress}%`}
+          {fill(introCopy.resume.savedAt, { time: formatSaveTime(lastSavedAt), count: savedStory.decisions })}
+          {progress === null ? "" : fill(introCopy.resume.progress, { progress })}
         </small>
         {/* 지난 이야기: the last case's ending and what this one is about, or
             the line the last decision left (introViewModel's getStoryRecap).
             A div, so the card's own grid rule lays it out and no style is added. */}
         {savedStory.recap.length > 0 && (
           <div data-testid="resume-recap">
-            <span>지난 이야기</span>
+            <span>{introCopy.resume.recap}</span>
             {savedStory.recap.map((line) => <small key={line}>{line}</small>)}
           </div>
         )}
@@ -264,7 +265,7 @@ export function IntroScreen({ view, renderers = {} }) {
         onFocus={prefetchGameRuntime}
       >
         <ChevronRight size={18} />
-        이어하기
+        {introCopy.resume.continue}
       </button>
     </div>
   );
@@ -287,7 +288,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   <source srcSet={heroArt.wide} sizes={heroArt.wideSizes} type="image/webp" />
                   <img
                     src="/triggerlab-key-visual.jpg"
-                    alt="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
+                    alt={introCopy.heroAlt}
                     width="1672"
                     height="941"
                     fetchPriority="high"
@@ -295,7 +296,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 </picture>
                 <figcaption>
                   <span lang="en">TRIGGERLAB NIGHT SHIFT</span>
-                  <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
+                  <b>{introCopy.heroCaption}</b>
                 </figcaption>
               </figure>
             </div>
@@ -308,11 +309,11 @@ export function IntroScreen({ view, renderers = {} }) {
                 <div className="top-actions">
                   <button className="ghost intro-ranking-button" type="button" onClick={() => onShowRanking(true)}>
                     <Trophy size={15} />
-                    랭킹
+                    {introCopy.ranking}
                   </button>
                   <button className="ghost intro-ranking-button intro-board-button" type="button" onClick={() => onShowBoard(true)}>
                     <MessagesSquare size={15} />
-                    게시판
+                    {introCopy.board}
                   </button>
                   {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                     <button
@@ -332,23 +333,18 @@ export function IntroScreen({ view, renderers = {} }) {
                 </div>
               </div>
               <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
-              <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
+              <strong className="intro-kicker">{introCopy.subtitle}</strong>
               {/* The premise reads directly under the wordmark. It also keeps
                   `.intro p` -- one of build-critical-css.mjs's probes --
                   pointing at a rendered element. */}
-              <p>
-                3년 전 당신은 대출 승인 문서에 혼자 반대 의견을 올렸습니다. 대출은 그대로 나갔고,
-                당신은 미국계 자본이 최대주주인 KD금융그룹 지하의 트리거랩으로 내려왔습니다. 오늘 케이스데스크에 올라온 첫
-                파일에, 그때 그 대출번호가 그대로 남아 있습니다. 오래 붙잡은 조건은 다음 사건의
-                압력이 되어 돌아옵니다. 이야기는 그보다 조금 앞, 수습 마지막 과제에서 시작합니다.
-              </p>
+              <p>{introCopy.premise}</p>
               {hasResumableSave ? (
                 resumePanel
               ) : (
                 <div className="start-input-row intro-launch">
                   {startFirstCaseButton}
                   <a className="intro-briefing-link" href={`#${BRIEFING_DRAWER_ID}`} onClick={openBriefingDrawer}>
-                    브리핑 먼저 보기
+                    {introCopy.briefingLink}
                   </a>
                   {consentLine}
                 </div>
@@ -359,7 +355,7 @@ export function IntroScreen({ view, renderers = {} }) {
               {hasResumableSave && consentLine}
               <dl className="intro-stats">
                 <div>
-                  <dt>사건</dt>
+                  <dt>{introCopy.stats.cases}</dt>
                   <dd>{String(seasonCases.length).padStart(2, "0")}</dd>
                 </div>
                 {/* How long one of them takes (gameCases.TYPICAL_CASE_MINUTES):
@@ -367,11 +363,11 @@ export function IntroScreen({ view, renderers = {} }) {
                     month. The 45-second window this cell used to print is
                     still in the protocol line under the stage. */}
                 <div>
-                  <dt>한 사건</dt>
-                  <dd>{caseMinutes}<small>분 안팎</small></dd>
+                  <dt>{introCopy.stats.oneCase}</dt>
+                  <dd>{caseMinutes}<small>{introCopy.stats.minutes}</small></dd>
                 </div>
                 <div>
-                  <dt>정답</dt>
+                  <dt>{introCopy.stats.answers}</dt>
                   <dd>0</dd>
                 </div>
               </dl>
@@ -389,23 +385,23 @@ export function IntroScreen({ view, renderers = {} }) {
             <span className="sr-only">{PROTOCOL_LINE}</span>
           </div>
           {nextParticipantMessage && (
-            <p className="previous-participant-message">이전 참가자가 남긴 말: “{nextParticipantMessage}”</p>
+            <p className="previous-participant-message">{fill(introCopy.previousMessage, { message: nextParticipantMessage })}</p>
           )}
           <WeeklyRuleNotice />
-          <section id="case-access-setup" className="start-priority" aria-label="게임 시작 준비" tabIndex={-1}>
+          <section id="case-access-setup" className="start-priority" aria-label={introCopy.setup.label} tabIndex={-1}>
           <div className="start-console-heading">
             <div>
               <span lang="en">CASE ACCESS SETUP</span>
-              <h2>기록 진입 설정</h2>
+              <h2>{introCopy.setup.title}</h2>
             </div>
-            <small>이름과 판단 프로토콜은 시작 전 언제든 바꿀 수 있습니다.</small>
+            <small>{introCopy.setup.note}</small>
           </div>
           <div className="start-panel start-console-section">
             <div className="start-section-heading">
               <span lang="en">01 IDENTITY</span>
-              <strong>분석관 호출명</strong>
+              <strong>{introCopy.setup.identity}</strong>
             </div>
-            <label htmlFor="playerName">분석관 이름</label>
+            <label htmlFor="playerName">{introCopy.setup.nameLabel}</label>
             <div className="start-input-row">
               <input
                 id="playerName"
@@ -420,14 +416,14 @@ export function IntroScreen({ view, renderers = {} }) {
                   if (event.key !== "Enter" || event.nativeEvent.isComposing || event.keyCode === 229) return;
                   if (!hasResumableSave) startNewRun();
                 }}
-                placeholder="이름을 입력하세요"
+                placeholder={introCopy.setup.namePlaceholder}
               />
               {hasResumableSave && startFirstCaseButton}
             </div>
             {newGamePlusUnlocked && (
               <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={Boolean(openingBurst)}>
                 <Sparkles size={16} />
-                <span><span lang="en">NEW GAME+</span> 시작</span>
+                <span>{NEW_GAME_PLUS_LABEL[0]}<span lang="en">NEW GAME+</span>{NEW_GAME_PLUS_LABEL[1]}</span>
               </button>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
@@ -483,11 +479,11 @@ export function IntroScreen({ view, renderers = {} }) {
           </div>
           </section>
           {pastRunMemory && (
-            <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
+            <section className="past-run-memory intro-memory" aria-label={introCopy.pastRunLabel}>
               {/* The English name is read as English, the season number as Korean (문구 질문 9). */}
               <span>
                 <span lang="en">PAST RUN MEMORY</span>
-                {pastRunMemory.round > 1 ? ` · ${pastRunMemory.round}회차` : ""}
+                {pastRunMemory.round > 1 ? fill(introCopy.round, { round: pastRunMemory.round }) : ""}
               </span>
               <p>{pastRunMemory.text}</p>
               {/* 결말 도감 (E-3): lines the runtime wrote into the season record. */}
@@ -508,27 +504,27 @@ export function IntroScreen({ view, renderers = {} }) {
           <details className="intro-drawer" id={BRIEFING_DRAWER_ID}>
             <summary>
               <span lang="en">PRE-START BRIEFING</span>
-              <h2>시작 전에 알아둘 것</h2>
+              <h2>{introCopy.briefing.title}</h2>
             </summary>
-          <section className="prestart-briefing" aria-label="시작 전 브리핑">
+          <section className="prestart-briefing" aria-label={introCopy.briefing.label}>
             <div className="prestart-heading">
-              <small>첫 사건의 상황과 판단 흐름을 먼저 확인한 뒤 플레이 조건을 고릅니다.</small>
+              <small>{introCopy.briefing.note}</small>
             </div>
             <div className="prestart-grid">
               <article>
-                <span>첫 사건</span>
+                <span>{introCopy.briefing.firstCase}</span>
                 <b>{seasonCasesBase[0].title}</b>
                 <p>{caseObjectives[seasonCasesBase[0].id]}</p>
               </article>
               <article>
-                <span>관찰 목표</span>
-                <b>멈추지 못하는 지점</b>
+                <span>{introCopy.briefing.watch}</span>
+                <b>{introCopy.briefing.watchTitle}</b>
                 <p>{triggerLabSignals[seasonCasesBase[0].id]}</p>
               </article>
               <article>
-                <span>다음 압박</span>
-                <b>기록은 다음 사건으로 이동한다</b>
-                <p>프롤로그에서 남긴 것이 3년 뒤 사건 01의 첫 장면을 정합니다.</p>
+                <span>{introCopy.briefing.next}</span>
+                <b>{introCopy.briefing.nextTitle}</b>
+                <p>{introCopy.briefing.nextText}</p>
               </article>
             </div>
             <div className="prestart-tutorial">
@@ -540,15 +536,15 @@ export function IntroScreen({ view, renderers = {} }) {
           <details className="intro-drawer">
             <summary>
               <span lang="en">02 ANALYST PROTOCOL</span>
-              <h2>어떤 방식으로 판단할까요?</h2>
+              <h2>{introCopy.playStyle.title}</h2>
             </summary>
-          <section className="play-style-panel" aria-label="플레이 스타일 선택">
+          <section className="play-style-panel" aria-label={introCopy.playStyle.label}>
             <div className="panel-title-row">
               {/* The three cards are a pick-one pledge and change no rule. The
                   one setting that does is on or off, so it is a switch in the
                   comfort panel and not a fourth card here, where it read as
                   two of four picked. */}
-              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙을 바꾸는 스토리 모드는 편의 설정에 있습니다.</small>
+              <small>{introCopy.playStyle.note}</small>
             </div>
             <div className="play-style-grid">
               {playStyleOptions.map((style) => (
@@ -571,17 +567,17 @@ export function IntroScreen({ view, renderers = {} }) {
                 </button>
               ))}
             </div>
-            <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
+            <p className="play-style-note">{fill(introCopy.playStyle.current, { label: activePlayStyle.label, title: activePlayStyle.title })}</p>
           </section>
           </details>
           <details className="intro-drawer">
             <summary>
               <span lang="en">03 OPERATOR ORIGIN</span>
-              <h2>당신은 무엇을 가장 오래 기억합니까?</h2>
+              <h2>{introCopy.origin.title}</h2>
             </summary>
-            <section className="operator-origin-panel start-console-section" aria-label="분석관의 기억 선택">
+            <section className="operator-origin-panel start-console-section" aria-label={introCopy.origin.label}>
               <div className="panel-title-row">
-                <small>무엇을 가장 오래 기억하는지에 따라 프롤로그 01의 시작 수치가 조금 달라집니다.</small>
+                <small>{introCopy.origin.note}</small>
               </div>
               <div className="operator-origin-grid">
                 {operatorProfiles.map((profile) => (
@@ -599,47 +595,44 @@ export function IntroScreen({ view, renderers = {} }) {
                   </button>
                 ))}
               </div>
-              <p className="operator-origin-selected">현재 선택: {operatorProfile.title} · 프롤로그 01 시작 {operatorProfile.start}</p>
+              <p className="operator-origin-selected">{fill(introCopy.origin.current, { title: operatorProfile.title, start: operatorProfile.start })}</p>
               <div className="origin-prologue"><span lang="en">ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>
             </section>
           </details>
           <details className="intro-drawer">
             <summary>
               <span lang="en">ACCESSIBILITY</span>
-              <h2>편의 설정</h2>
+              <h2>{introCopy.comfortTitle}</h2>
             </summary>
             <AccessibilityPanel />
           </details>
           <details className="intro-drawer">
             <summary>
               <span lang="en">SEASON 1</span>
-              <h2>생각을 깨우는 조건은 조종 가능한 조건이기도 하다.</h2>
+              <h2>{introCopy.season.title}</h2>
             </summary>
             <div className="season-panel">
-              <p>
-                처음에는 내 판단이 깊어지는 순간을 찾습니다. 마지막에는 누군가 그 순간을
-                설계할 수 있다면, 나는 여전히 자유로운지 묻게 됩니다.
-              </p>
+              <p>{introCopy.season.text}</p>
             </div>
             <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
           </details>
           <details className="intro-drawer">
             <summary>
               <span lang="en">SEASON GOALS</span>
-              <h2>시즌 목표</h2>
+              <h2>{introCopy.goalsTitle}</h2>
             </summary>
-            <section className="season-goal-strip" aria-label="시즌 목표">
+            <section className="season-goal-strip" aria-label={introCopy.goalsTitle}>
               {seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
             </section>
           </details>
           <details className="intro-drawer">
             <summary>
-              <h2>처음 플레이 가이드</h2>
+              <h2>{introCopy.guide.title}</h2>
             </summary>
-          <section className="quick-guide" aria-label="처음 플레이 가이드">
+          <section className="quick-guide" aria-label={introCopy.guide.title}>
             <div className="guide-heading">
               <Info size={16} />
-              <span>처음 플레이할 때 보는 기준</span>
+              <span>{introCopy.guide.heading}</span>
             </div>
             <div className="guide-grid">
               {playGuideItems.map((item) => (
@@ -656,9 +649,9 @@ export function IntroScreen({ view, renderers = {} }) {
               and the way out are always one deliberate click away. */}
           <details className="intro-drawer" id={DATA_DRAWER_ID}>
             <summary>
-              <h2>데이터 저장 안내</h2>
+              <h2>{introCopy.data.title}</h2>
             </summary>
-          <section className="data-info-panel" aria-label="데이터 저장 안내">
+          <section className="data-info-panel" aria-label={introCopy.data.title}>
             <label className="consent-box">
               <input
                 type="checkbox"
@@ -666,14 +659,14 @@ export function IntroScreen({ view, renderers = {} }) {
                 onChange={consent.onChange}
               />
               <span>
-                <b>플레이테스트 데이터 제공 동의</b>
+                <b>{introCopy.data.consent}</b>
                 <small>
                   {telemetryEnabled
                     ? PLAYTEST_DATA_NOTICE
-                    : "현재 배포 환경에는 원격 저장이 설정되어 있지 않습니다."}
+                    : introCopy.data.noRemote}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
-                  {!isOnline ? "오프라인" : telemetryEnabled ? "원격 저장 준비됨" : "로컬 저장"}
+                  {!isOnline ? introCopy.data.offline : telemetryEnabled ? introCopy.data.ready : introCopy.data.local}
                 </small>
               </span>
             </label>
@@ -684,28 +677,25 @@ export function IntroScreen({ view, renderers = {} }) {
             </p>
             <div className={`db-status-panel ${telemetrySummary.tone}`}>
               <div>
-                <span>저장 상태</span>
+                <span>{introCopy.data.status}</span>
                 <strong>{telemetrySummary.title}</strong>
               </div>
               <p>{telemetrySummary.text}</p>
               <small>
-                세션 코드 <span data-testid="session-code">{sessionCode}</span>
+                {introCopy.data.sessionCode}<span data-testid="session-code">{sessionCode}</span>
               </small>
             </div>
             <div className="privacy-note">
-              <b>데이터 안내</b>
+              <b>{introCopy.data.notice}</b>
               <p>
-                이름은 원격 저장하지 않습니다. 피드백에는 실명, 연락처, 회사명처럼 개인이나
-                조직을 식별할 수 있는 정보는 쓰지 마세요. 다른 기기에서 이어하기를 위한 온라인
-                저장은 이 동의와 별개로, 직접 켤 때만 진행 기록을 올리며 이름과 피드백 내용은
-                올리지 않습니다.{" "}
+                {introCopy.data.privacy}
                 {/* Where a deletion request goes (SUPPORT_CONTACT in appConfig.js),
                     beside the session code it needs, which this panel shows above. */}
                 <DeletionRequest />
               </p>
               <p>
-                자세한 내용은 <a href={PRIVACY_PAGE_PATH}>개인정보처리방침</a>과{" "}
-                <a href={TERMS_PAGE_PATH}>이용약관</a>에 있습니다.
+                {introCopy.data.more}<a href={PRIVACY_PAGE_PATH}>{introCopy.legal.privacy}</a>{introCopy.data.and}
+                <a href={TERMS_PAGE_PATH}>{introCopy.legal.terms}</a>{introCopy.data.end}
               </p>
             </div>
           </section>
@@ -715,7 +705,7 @@ export function IntroScreen({ view, renderers = {} }) {
             <section className="season-summary">
               <div>
                 <span lang="en">SEASON LOG</span>
-                <strong>완료한 사건에서 반복적으로 활성화된 조건</strong>
+                <strong>{introCopy.seasonLog.title}</strong>
               </div>
               <div className="season-summary-list">
                 {completedCaseResultList.map((caseItem) => (
@@ -723,13 +713,16 @@ export function IntroScreen({ view, renderers = {} }) {
                     <b>{caseItem.label}</b>
                     <span>{triggerLabels[caseItem.result.primary[0]]}</span>
                     <small>
-                      RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}초 · 판 다시 짜기{" "}
-                      {caseItem.result.reframeCount}
+                      {fill(introCopy.seasonLog.result, {
+                        rank: caseItem.result.rank,
+                        seconds: caseItem.result.averageResponseTime,
+                        count: caseItem.result.reframeCount,
+                      })}
                     </small>
                   </article>
                 ))}
               </div>
-              <div className="season-journey" role="group" aria-label="사건 간 결말 연결">
+              <div className="season-journey" role="group" aria-label={introCopy.seasonLog.journeyLabel}>
                 {seasonJourney.map((caseItem, index) => (
                   <Fragment key={caseItem.id}>
                     {index > 0 && <ChevronRight className="season-journey-arrow" size={18} aria-hidden="true" />}
@@ -742,9 +735,11 @@ export function IntroScreen({ view, renderers = {} }) {
                       <p>{caseItem.outcome.text}</p>
                       {Object.keys(caseItem.carryover).length > 0 && (
                         <small>
-                          다음 사건 전달: {Object.entries(caseItem.carryover)
-                            .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
-                            .join(" · ")}
+                          {fill(introCopy.seasonLog.carryover, {
+                            list: Object.entries(caseItem.carryover)
+                              .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
+                              .join(" · "),
+                          })}
                         </small>
                       )}
                     </article>
@@ -755,7 +750,7 @@ export function IntroScreen({ view, renderers = {} }) {
           )}
           <div id="season-roadmap" className="roadmap-heading" tabIndex={-1}>
             <span lang="en">SEASON ROADMAP</span>
-            <b>사건은 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
+            <b>{introCopy.roadmap.title}</b>
           </div>
           <div className="case-roadmap">
             {seasonCases.map((caseItem) => {
@@ -816,12 +811,16 @@ export function IntroScreen({ view, renderers = {} }) {
                   <b>{simplifyPlayerText(caseItem.trigger)}</b>
                   <p>{simplifyPlayerText(caseItem.summary)}</p>
                   {caseItem.status === "LOCKED" && (
-                    <small className="case-lock-note">앞선 사건의 판단 로그가 필요합니다.</small>
+                    <small className="case-lock-note">{introCopy.roadmap.locked}</small>
                   )}
                   {savedResult && (
                     <small className="case-result-mini">
-                      <span lang="en">RANK {savedResult.rank}</span> · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}초 · 판 다시 짜기{" "}
-                      {savedResult.reframeCount}
+                      <span lang="en">RANK {savedResult.rank}</span>
+                      {fill(introCopy.roadmap.result, {
+                        thinking: triggerLabels[savedResult.primary[0]] ?? "",
+                        seconds: savedResult.averageResponseTime,
+                        count: savedResult.reframeCount,
+                      })}
                     </small>
                   )}
                 </article>
@@ -833,21 +832,21 @@ export function IntroScreen({ view, renderers = {} }) {
             the address a store listing names, and one a player can reach
             from the bottom of the page without opening the data drawer. */}
         <footer className="intro-legal">
-          <a href={PRIVACY_PAGE_PATH}>개인정보처리방침</a>
-          <a href={TERMS_PAGE_PATH}>이용약관</a>
+          <a href={PRIVACY_PAGE_PATH}>{introCopy.legal.privacy}</a>
+          <a href={TERMS_PAGE_PATH}>{introCopy.legal.terms}</a>
         </footer>
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the
             burst itself is a picture of the same thing. */}
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {openingCase ? `${openingIsFirst ? "첫 사건" : openingCase.label} 진입 중` : ""}
+          {openingCase ? fill(introCopy.opening.entering, { case: openingIsFirst ? introCopy.opening.firstCase : openingCase.label }) : ""}
         </p>
         {openingCase && (
           <div className="opening-burst" data-testid="opening-burst" aria-hidden="true">
             <div className="opening-burst-grid" />
             <div className="opening-burst-panel">
               <span lang="en">CREATIVITY BURST / {`CASE ${caseDisplayCode(openingCase.id)}`} ACCESS</span>
-              <strong>{openingIsFirst ? "첫 판단 조건 동기화 중" : `${openingCase.label} 판단 조건 동기화 중`}</strong>
+              <strong>{openingIsFirst ? introCopy.opening.first : fill(introCopy.opening.syncing, { case: openingCase.label })}</strong>
               <i />
             </div>
           </div>

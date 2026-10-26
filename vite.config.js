@@ -538,7 +538,8 @@ const OWN_CHUNKS = [
   { name: "sceneTraces", files: [SCENE_TRACES, "src/sceneTraces.js"] },
   { name: "sceneChoices", files: [SCENE_CHOICES, "src/sceneChoices.js"] },
   { name: "WeekRulePanel", files: [WEEK_RULE_PANEL] },
-  { name: "EdgeNotice", files: [EDGE_NOTICE] },
+  // The notices' words (src/copy/edgeNotices.js, 다국어 틀) go with the notice.
+  { name: "EdgeNotice", files: [EDGE_NOTICE, "src/copy/edgeNotices.js"] },
   { name: "ReadingClockAsk", files: [READING_CLOCK_ASK] },
   { name: "auditRisk", files: [AUDIT_RISK] },
   { name: "cascadeRisk", files: [CASCADE_RISK] },

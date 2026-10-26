@@ -18,7 +18,8 @@ import { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } fro
 import { easyCognitionLabels, easyResourceLabels } from "../playerLanguage.js";
 import { caseObjectives, seasonCasesBase } from "../gameCases.js";
 
-const HANGUL = /[가-힣ㄱ-ㅣ]/;
+// Hangul, and the corner brackets only Korean copy uses (「」『』).
+const HANGUL = /[가-힣ㄱ-ㅣ「-』]/;
 const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
 /**
@@ -71,6 +72,10 @@ export function previewText(key) {
   return dictionary?.preview?.[key] ?? "";
 }
 
+export function roleName(role) {
+  return dictionary?.roles?.[role] ?? role;
+}
+
 export function speakerName(name) {
   return dictionary?.speakers?.[name] ?? name;
 }
@@ -98,12 +103,12 @@ export function localizeCaseData(caseId, data, index) {
   const load = language && import.meta.glob("./*/nodes/*.js")[`./${language}/nodes/${caseId}.js`];
   if (!load) return localizeCase(caseId, data, index, null, speakers);
   return load().then(
-    (module) => localizeCase(caseId, data, index, module.default, speakers),
+    (module) => localizeCase(caseId, data, index, /** @type {{ default: object }} */ (module).default, speakers),
     () => localizeCase(caseId, data, index, null, speakers),
   );
 }
 
-const api = { localizeTables, previewText, speakerName, localizeCaseData };
+const api = { localizeTables, previewText, roleName, speakerName, localizeCaseData };
 
 /** A language's dictionary, laid over the shell's tables. Resolves to what src/locale.js calls, or null for a language with no dictionary. */
 export function loadDictionary(lang) {

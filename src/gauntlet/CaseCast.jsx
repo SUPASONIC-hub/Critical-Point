@@ -1,4 +1,5 @@
 import { getCaseCast } from "./caseCastModel.js";
+import briefingCopy from "../copy/briefing.js";
 
 /**
  * The case so far and who is in it, under the table's folded case file
@@ -26,7 +27,7 @@ export function CaseCast({ node, trail = [], Portrait }) {
       {trail.length > 0 && (
         <>
           <p>
-            <b>이 사건의 지난 장면</b>
+            <b>{briefingCopy.cast.trail}</b>
           </p>
           <ol data-testid="case-trail">
             {trail.map((entry, index) => (
@@ -39,7 +40,7 @@ export function CaseCast({ node, trail = [], Portrait }) {
         </>
       )}
       <p>
-        <b>등장인물</b>
+        <b>{briefingCopy.cast.people}</b>
       </p>
       <ul>
         {getCaseCast({ node, trail }).map((person) => (
@@ -51,7 +52,7 @@ export function CaseCast({ node, trail = [], Portrait }) {
               </summary>
               {person.role && <span>{person.role}</span>}
               {person.thought && <q>{person.thought}</q>}
-              <small>처음 나온 사건 · {person.firstCase}</small>
+              <small>{briefingCopy.cast.firstCase}{person.firstCase}</small>
             </details>
           </li>
         ))}

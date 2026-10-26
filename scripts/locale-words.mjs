@@ -29,9 +29,13 @@ export const TRANSLATION_SCOPE = [
   "case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10",
 ];
 
-const HANGUL = /[가-힣ㄱ-ㅣ]/;
+// Hangul, and the corner brackets only Korean copy uses (「」『』).
+const HANGUL = /[가-힣ㄱ-ㅣ「-』]/;
 /** Keys whose strings are not words a player reads in this language. */
 const KEY_FIELDS = new Set(["speaker", "id", "next", "caseId", "kind", "phase", "mood", "status", "cardOf"]);
+
+/** In screen copy only ids are keys; every other string is a line. */
+const COPY_KEY_FIELDS = new Set(["id", "caseId", "cardOf", "mood"]);
 
 export const hasHangul = (value) => typeof value === "string" && HANGUL.test(value);
 
@@ -41,17 +45,17 @@ export const hasHangul = (value) => typeof value === "string" && HANGUL.test(val
  * any other list keeps its positions (null where nothing is to be said).
  * Returns undefined when there is nothing to translate.
  */
-export function wordsOf(value, key = "") {
-  if (KEY_FIELDS.has(key)) return undefined;
+export function wordsOf(value, key = "", keys = KEY_FIELDS) {
+  if (keys.has(key)) return undefined;
   if (typeof value === "string") return hasHangul(value) ? value : undefined;
   if (Array.isArray(value)) {
     if (value.length && value.every((item) => item && typeof item === "object" && !Array.isArray(item) && typeof item.id === "string")) {
-      return objectOf(value.map((item) => [item.id, wordsOf(item)]));
+      return objectOf(value.map((item) => [item.id, wordsOf(item, "", keys)]));
     }
-    const list = value.map((item) => wordsOf(item));
+    const list = value.map((item) => wordsOf(item, "", keys));
     return list.some((item) => item !== undefined) ? list.map((item) => item ?? null) : undefined;
   }
-  if (value && typeof value === "object") return objectOf(Object.entries(value).map(([childKey, child]) => [childKey, wordsOf(child, childKey)]));
+  if (value && typeof value === "object") return objectOf(Object.entries(value).map(([childKey, child]) => [childKey, wordsOf(child, childKey, keys)]));
   return undefined;
 }
 
@@ -99,6 +103,8 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
   const screens = Object.fromEntries(
     await Promise.all(screenFiles.map(async (file) => [file.replace(/\.js$/, ""), (await import(new URL(file, copyDir).href)).default])),
   );
+  // Screen copy has no ids or links in it, only words: a key named `status`
+  // or `next` there is a line of the screen, not a field of a scene.
   return wordsOf({
     screens,
     caseCopy: {
@@ -122,7 +128,7 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
       caseObjectives: pick(gameCases.caseObjectives, scope),
       seasonCasesBase: gameCases.seasonCasesBase.filter((entry) => scope.includes(entry.id)),
     },
-  }) ?? {};
+  }, "", COPY_KEY_FIELDS) ?? {};
 }
 
 /**
@@ -142,7 +148,8 @@ function inEnglishUnits(text) {
 
 /**
  * What a language's words leave unanswered against their Korean source:
- * `missing` (no translation, an empty one, or one still in Hangul), `stale`
+ * `missing` (no translation, or one still in Hangul; an empty string is a
+ * translation that says nothing there), `stale`
  * (a path the Korean no longer has) and `numbers` (a string missing a digit
  * the Korean has: canon numbers are never changed, G-1 2).
  */
@@ -153,7 +160,8 @@ export function compareWords(source, english) {
   const numbers = [];
   for (const [path, text] of Object.entries(ko)) {
     const answer = en[path];
-    if (typeof answer !== "string" || !answer.trim() || hasHangul(answer)) {
+    // An empty translation is a choice (a Korean ending English says elsewhere, or not at all); a missing one is not.
+    if (typeof answer !== "string" || hasHangul(answer)) {
       missing.push(path);
       continue;
     }

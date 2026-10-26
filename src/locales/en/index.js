@@ -49,6 +49,37 @@ export const speakers = {
   "권도현": "Kwon Dohyun",
 };
 
+/** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
+export const roles = {
+  "KD은행 기업금융전략팀 대리 · 당신의 사수": "Assistant Manager, KD Bank Corporate Finance Strategy Team · your mentor",
+  "온새포장 대표 · 강서구 화곡동": "CEO of Onsae Packaging · Hwagok-dong, Gangseo",
+  "KD은행 기업금융전략팀장": "Team Head, KD Bank Corporate Finance Strategy Team",
+  "플로우온 창업주 · 8년차 · 51세": "Founder of FlowOn · 8 years in · age 51",
+  "KD은행 기업금융전략팀 과장": "Manager, KD Bank Corporate Finance Strategy Team",
+  "KD은행 기업대출심사팀장": "Team Head, KD Bank Corporate Credit Review Team",
+  "KD은행 강서지점장": "Branch Manager, KD Bank Gangseo Branch",
+  "KD은행 강서지점 4번 창구 · 입행 3년차": "Window 4, KD Bank Gangseo Branch · 3rd year at the bank",
+  "망원시장 반찬가게 들깨한줌 사장": "Owner of Handful of Perilla, a side-dish shop in Mangwon Market",
+  "KD은행 본점 인사부 대리 · 4년차": "Assistant Manager, KD Bank Human Resources · 4th year",
+  "대출 판단 검증 시스템": "Loan-judgment verification system",
+  "그룹 인지·판단 연구랩 분석관 · KD은행 부산 사하지점 창구 출신": "Analyst, Group Cognition & Judgment Research Lab · formerly a teller at KD Bank Saha Branch, Busan",
+  "트리거랩 실장 · KD은행 기업금융전략팀 차장": "Lab Director, Trigger Lab · Deputy Manager, KD Bank Corporate Finance Strategy Team",
+  "KD금융그룹 감사팀 조사역": "Investigator, KD Financial Group Internal Audit",
+  "트리거랩 현장 담당 · KD은행 강서지점 창구 출신": "Field officer, Trigger Lab · formerly a teller at KD Bank Gangseo Branch",
+  "경쟁 분석관 · KD은행 본점 기업금융전략팀 파견 3년차": "Rival analyst · 3rd year seconded from KD Bank’s Corporate Finance Strategy Team",
+  "KD은행 기업대출심사팀장 출신 · 퇴직 2년차": "Former Team Head, KD Bank Corporate Credit Review Team · retired 2 years",
+  "KD은행 강원 영동지점장 · 30년 지점 근무": "Branch Manager, KD Bank Gangwon Yeongdong Branch · 30 years in branches",
+  "전 트리거랩 분석관 · 사직 후 혼자 추적 중": "Former Trigger Lab analyst · tracking it alone since resigning",
+  "브릿지은행 기업구조개선부 심사역 · 플로우온 창업주 권태호의 장남": "Credit officer, Bridge Bank Corporate Restructuring · eldest son of FlowOn founder Kwon Taeho",
+  "트리거랩 분석관 · 한 번 떠났다 돌아온 동료": "Trigger Lab analyst · a colleague who left once and came back",
+  "트리거랩 데이터 기록 담당 · 3년차 계약직": "Data records officer, Trigger Lab · contract worker, 3rd year",
+  "플로우온 풀필먼트센터 야간조 반장 · 창업 첫해 입사": "Night-shift foreman, FlowOn fulfillment center · hired in the founding year",
+  "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
+  "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
+  "문래동 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Mullae-dong · Moon Gaeul’s husband",
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cakes, Mangwon Market"
+};
+
 export const preview = {
   chooseLanguage: "Choose your language",
   languageButtons: ["한국어", "English (preview)"],
