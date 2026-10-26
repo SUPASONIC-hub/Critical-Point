@@ -958,8 +958,11 @@ const budgets = [
   // the e2e build (English: 사건 01 the largest case), the gzip plus 4.
   // 73,483 / 21,390 -> 73,724 / 21,469 on 2026-10-26, 오진우가 경쟁자가 되는 경위 (ojinwoo-bridge): 사건 01's lead and memo say why he sits across the table, in English too. Measured in the e2e build, the gzip plus 4.
   { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_724, maxGzip: 21_469 },
-  { pattern: /^locale-[a-z]{2,3}-index-.*\.js$/, maxBytes: 91_605, maxGzip: 33_973 },
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 2_894, maxGzip: 1_183 },
+  // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
+  // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
+  // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^locale-[a-z]{2,3}-index-.*\.js$/, maxBytes: 93_179, maxGzip: 34_900 },
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 6_589, maxGzip: 2_026 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 

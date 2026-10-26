@@ -4,14 +4,16 @@ import { pathToFileURL } from "node:url";
 import { buildRuntimeData, loadSeasonTables } from "./season-split.mjs";
 import { caseSource, compareWords, readCopySource, TRANSLATION_SCOPE } from "./locale-words.mjs";
 import { SOURCE_LOCALE, SUPPORTED_LOCALES } from "../src/locale.js";
+import { CASE_SEQUENCE } from "../src/gameCases.js";
 
 /**
  * `npm run check:locale [-- --lang=<code>]`: how much of a language is still
  * Korean (다국어 틀; 영어판 1단계, 2026-10-26). Without `--lang`, every
  * language in `SUPPORTED_LOCALES` but Korean.
  *
- * For each case in scope (`TRANSLATION_SCOPE`, and any other case the
- * language has a file for) and for the screen copy, it reads the Korean the
+ * For each case in scope (up to the language's `previewThrough` in its
+ * dictionary, else `TRANSLATION_SCOPE`, and any other case the language has
+ * a file for) and for the screen copy, it reads the Korean the
  * app is shipped (scripts/locale-words.mjs) and the language's file beside
  * it (src/locales/<lang>/nodes/<caseId>.js, src/locales/<lang>/index.js), and
  * counts:
@@ -42,7 +44,6 @@ if (asked && (!codes.includes(asked) || asked === SOURCE_LOCALE)) {
 }
 
 const runtimeData = buildRuntimeData(await loadSeasonTables());
-const copySource = await readCopySource(pathToFileURL(root).href);
 
 async function wordsOf(file, name) {
   const full = path.join(root, file);
@@ -53,10 +54,14 @@ async function wordsOf(file, name) {
 
 let failed = false;
 for (const lang of languages) {
+  // The preview's cases (the dictionary's `previewThrough`, the line that widens it), and its screen copy up to there.
+  const through = await wordsOf(`src/locales/${lang}/index.js`, "previewThrough");
+  const scope = through ? CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(through) + 1) : TRANSLATION_SCOPE;
+  const copySource = await readCopySource(pathToFileURL(root).href, scope);
   const nodesDir = path.join(root, "src/locales", lang, "nodes");
-  const extra = existsSync(nodesDir) ? readdirSync(nodesDir).map((file) => file.replace(/\.js$/, "")).filter((caseId) => !TRANSLATION_SCOPE.includes(caseId)) : [];
+  const extra = existsSync(nodesDir) ? readdirSync(nodesDir).map((file) => file.replace(/\.js$/, "")).filter((caseId) => !scope.includes(caseId)) : [];
   const rows = [];
-  for (const caseId of [...TRANSLATION_SCOPE, ...extra]) {
+  for (const caseId of [...scope, ...extra]) {
     const file = `src/locales/${lang}/nodes/${caseId}.js`;
     if (!runtimeData.cases[caseId]) {
       rows.push({ unit: caseId, total: 0, missing: [], stale: [`${file}: no such case`], numbers: [] });
