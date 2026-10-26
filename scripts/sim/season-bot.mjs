@@ -634,7 +634,7 @@ const STANCES = ["strike", "steady", "strike", "steady", "expose"];
  * the same way (the band's reach is the decide function's to read, through
  * `getWindowBand`). A case without the rule looks at nothing.
  */
-export function scoutWindow(win, scout, rules = ALL_RULES, reduce = reduceWindow) {
+function scoutWindow(win, scout, rules = ALL_RULES, reduce = reduceWindow) {
   if (!scout || win.status !== "live") return win;
   if (scout === true || !Number.isFinite(scout.seconds)) return reduce(win, { type: "SCOUT" }, rules);
   if (!rules.has("scout") || win.scouted) return win;
