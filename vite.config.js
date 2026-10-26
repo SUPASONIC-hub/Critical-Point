@@ -549,6 +549,20 @@ const OWN_CHUNKS = [
   { name: "speakerLine", files: [SPEAKER_LINE] },
 ];
 
+/**
+ * A module of src/locales (src/locale.js): a language's dictionary
+ * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), or the
+ * code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>` or
+ * `locale-<file>`.
+ */
+const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/])?)?([^\\/]+)\.js$/;
+
+function localeChunkName(chunk) {
+  const match = LOCALE_MODULE.exec(chunk.facadeModuleId ?? "");
+  if (!match) return "assets/[name]-[hash].js";
+  return `assets/locale-${match[1] ? `${match[1]}-` : ""}${match[2]}-[hash].js`;
+}
+
 function ownChunkGroups() {
   return OWN_CHUNKS.map(({ name, files }) => {
     const ids = new Set(files.map((file) => path.resolve(file).replace(WINDOWS_SEPARATOR, "/")));
@@ -598,6 +612,11 @@ export default defineConfig(({ command, mode }) => ({
     },
     rolldownOptions: {
       output: {
+        // The other languages' words (src/locales, 다국어 틀) are named
+        // apart, `locale-<lang>-<file>`: a Korean device never asks for
+        // them, so the service worker leaves `locale-*` out of its warm-up
+        // (scripts/service-worker-build.mjs), and their budgets are their own.
+        chunkFileNames: localeChunkName,
         codeSplitting: {
           groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
         },

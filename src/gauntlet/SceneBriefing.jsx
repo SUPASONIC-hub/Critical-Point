@@ -8,6 +8,7 @@ import { describeStanding } from "./tableReadout.js";
 import { getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
 import { getSpeakerLine } from "./speakerLine.js";
 import { SPEAKER_NAMES } from "../speakerPortraits.js";
+import { speakerName } from "../locale.js";
 import { pastPick, useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
@@ -161,7 +162,8 @@ export function SceneBriefing({
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
-  const speech = useMemo(() => getSpeakerLine(node, SPEAKER_NAMES), [node]);
+  // The names as the page prints them: prose in another language names people in it (src/locale.js).
+  const speech = useMemo(() => getSpeakerLine(node?.speakerName ? { ...node, speaker: node.speakerName } : node, SPEAKER_NAMES.map(speakerName)), [node]);
   // A lead the balloon carries is narration: a caption's box, not speech.
   const Balloon = speech.fromLead ? "p" : "blockquote";
   // The case's opening voice, on its first page only, read after the title and
@@ -327,7 +329,7 @@ export function SceneBriefing({
               <SpeakerPortrait name={node.speaker} src={portrait} size={240} />
             </div>
             <figcaption className="gx-speaker-tag">
-              <b>{node.speaker}</b>
+              <b>{node.speakerName ?? node.speaker}</b>
               <span>{speakerRole}</span>
             </figcaption>
             {speech.line && (
@@ -349,12 +351,12 @@ export function SceneBriefing({
             {reaction && (
               <p className="gx-caption gx-caption-reaction" data-testid="table-reaction">
                 <small>{reaction.recap}</small>
-                {node.speaker}: “{reaction.line}”
+                {node.speakerName ?? node.speaker}: “{reaction.line}”
               </p>
             )}
             {/* A lead the balloon carries is not told twice. */}
             {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
-            <ProseCaptions text={told.text} who={node.speaker} whoAt={speech.whoAt} />
+            <ProseCaptions text={told.text} who={node.speakerName ?? node.speaker} whoAt={speech.whoAt} />
           </div>
 
           {(told.memo?.length > 0 || trace) && (

@@ -650,7 +650,7 @@ export function GauntletStage({
               </p>
             )}
             <p className="gx-speaker">
-              <b>{scene.node.speaker}</b> · {scene.speakerRole}
+              <b>{scene.node.speakerName ?? scene.node.speaker}</b> · {scene.speakerRole}
             </p>
             <p className="gx-question">{scene.question}</p>
             {/* The briefing page told this story before the clock started; this

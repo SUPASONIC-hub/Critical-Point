@@ -80,6 +80,9 @@ export const CHUNK_RELOAD_SESSION_KEY = "critical-point-chunk-reload-v1";
 // The player's comfort settings: table time, the reading clock, flashes,
 // single-key shortcuts, the intro's motion (src/state/accessibilitySettings.js).
 export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
+// The language the player chose on the intro (src/locale.js): a code from
+// SUPPORTED_LOCALES. Absent, the page is Korean unless `?lang=` asks otherwise.
+export const LOCALE_KEY = "critical-point-locale-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited
