@@ -22,49 +22,34 @@
  * measured: the two labels `GameRuntime.jsx` writes itself (관계의 증언,
  * 판 공개 기준), which are 15 and 22 characters and are not story.
  *
- * The ceiling is a ratchet. `MAX_LABEL` is the length a label may reach, and
- * `OVER_CEILING` is how many were already longer on the day the check was
- * written (2026-10-13: 725), taken down as labels are shortened (2026-10-22:
- * 626, when every prologue label went to 22-28). Those are story to shorten by its author, not a script
- * to fix, so the count is held as a ceiling that only comes down: the check
- * fails when the count rises -- a new label over `MAX_LABEL`, or an old one
- * grown past it -- and prints every label over it, longest first.
- * `LONGEST_LABEL` holds the longest of them the same way, so one of the
- * allowed ones cannot grow either. A count cannot tell a new long label from
- * an old one when another was shortened in the same change; `--list` prints
- * them all to read.
+ * `MAX_LABEL` is the length a label may reach, and any label longer fails the
+ * check, printed with where it is written. It began as a ratchet: 725 labels
+ * were longer on the day the check was written (2026-10-13), held as a ceiling
+ * that only came down (626 on 2026-10-22, when every prologue label went to
+ * 22-28), until A-3 brought every one to 30 or under on 2026-10-25 and the
+ * ceiling, its longest-label twin and the `--list` tally went with it.
  *
- * A scene's body (`text`) is held the same way (A-13 of the 2026-10-22
- * review). It is the narration a phone reads in the briefing boxes, and
- * nothing counted it: the longest, case 45's `c45_stories`, was 702
- * characters, and the reading clock grows with every one of them. It is
- * counted like a label. `MAX_TEXT` is 420 characters; `TEXT_OVER_CEILING` is
- * how many scenes were longer on 2026-10-22 and `LONGEST_TEXT` the longest,
- * both ratchets that only come down: 133 and 702 that day, 126 and 691 after
- * the same day's copy rewrite (prose-polish) split sentences and dropped the
- * dates the clock already shows; 115 after A-8 (a8-41-49), and 117 in
- * batch B on 2026-10-23, measured once every branch of that day was merged
- * (reversals-29-35 and story-copy-1 wrote into scenes A-8 had brought under),
- * and 114 once batch A (story-first10's prologues) was merged under it.
- * The `lead` above the body is not
- * counted: it is one line, written to be read first. The check lives here,
- * not in a script of its own, because it is the same count and the same
- * ratchet over the same graph.
+ * A scene's body (`text`) is the narration a phone reads in the briefing
+ * boxes, and the reading clock grows with every character of it. It is counted
+ * like a label, `MAX_TEXT` is 420 characters, and any body longer fails the
+ * check, printed with where it is written. It too began as a ratchet (A-13 of
+ * the 2026-10-22 review): 133 bodies were longer that day, the longest case
+ * 45's `c45_stories` at 702, a count and a longest length that only came down
+ * (114 on 2026-10-23, 74 and 476 after the first A-13 bundle on 2026-10-25)
+ * until the second A-13 bundle brought the last 73 to 420 or under the same
+ * day, and the ceiling, its longest-body twin and `--texts` went with them.
+ * The `lead` above the body is not counted: it is one line, written to be
+ * read first. The check lives here, not in a script of its own, because it is
+ * the same count over the same graph.
  *
- *   node scripts/check-card-labels.mjs          the check
- *   node scripts/check-card-labels.mjs --list   every label over MAX_LABEL
- *   node scripts/check-card-labels.mjs --texts  every scene body over MAX_TEXT
+ *   node scripts/check-card-labels.mjs
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameData.js";
 
 const MAX_LABEL = 30;
-const OVER_CEILING = 623;
-const LONGEST_LABEL = 40;
 
 const MAX_TEXT = 420;
-const TEXT_OVER_CEILING = 114;
-const LONGEST_TEXT = 685;
 
 // The lengths the distribution is reported at; MAX_LABEL is one of them.
 const MARKS = [24, 28, 30, 32, 36];
@@ -132,14 +117,8 @@ function textWrittenAt(entry) {
   return entry.sceneId;
 }
 const describeText = (entry) => `${textWrittenAt(entry)}: ${entry.length} characters, ${entry.length - MAX_TEXT} over ${MAX_TEXT} (${entry.caseId}, ${entry.kind} ${entry.sceneId})`;
-if (process.argv.includes("--texts")) for (const entry of longTexts) console.log(describeText(entry));
-if (longTexts.length > TEXT_OVER_CEILING) {
-  for (const entry of longTexts) failures.push(describeText(entry));
-  failures.push(`${longTexts.length} scene bodies are longer than ${MAX_TEXT} characters, over the ${TEXT_OVER_CEILING} allowed: split the new one or move a line to its memo (the list above is longest first)`);
-}
-if ((texts[0]?.length ?? 0) > LONGEST_TEXT) {
-  for (const entry of longTexts.filter((item) => item.length > LONGEST_TEXT)) failures.push(`${textWrittenAt(entry)}: ${entry.length} characters, longer than the longest scene body allowed (${LONGEST_TEXT}) (${entry.sceneId})`);
-}
+for (const entry of longTexts) failures.push(describeText(entry));
+if (longTexts.length) failures.push(`${longTexts.length} scene bod${longTexts.length === 1 ? "y is" : "ies are"} longer than ${MAX_TEXT} characters: split the scene or move a line to its memo (the list above is longest first)`);
 
 // --- the distribution --------------------------------------------------------
 
@@ -153,27 +132,8 @@ const distribution =
 const over = cards.filter((card) => card.length > MAX_LABEL).sort((a, b) => b.length - a.length || a.where.localeCompare(b.where));
 const describe = (card) => `${writtenAt(card)}: ${card.length} characters, ${card.length - MAX_LABEL} over ${MAX_LABEL} (${card.caseId}, ${card.kind} card ${card.where}): "${card.label}"`;
 
-if (process.argv.includes("--list")) {
-  for (const card of over) console.log(describe(card));
-  const tally = (key) => {
-    const counts = new Map();
-    for (const card of over) counts.set(card[key], (counts.get(card[key]) ?? 0) + 1);
-    return counts;
-  };
-  const byKind = tally("kind");
-  const byCase = tally("caseId");
-  const dealt = (key, value) => cards.filter((card) => card[key] === value).length;
-  console.log(`\nOver ${MAX_LABEL} by kind: ${[...byKind].map(([kind, count]) => `${kind} ${count} of ${dealt("kind", kind)}`).join(", ")}`);
-  console.log(`Over ${MAX_LABEL} by case: ${CASE_SEQUENCE.map((caseId) => `${caseId} ${byCase.get(caseId) ?? 0}/${dealt("caseId", caseId)}`).join(", ")}`);
-}
-
-if (over.length > OVER_CEILING) {
-  for (const card of over) failures.push(describe(card));
-  failures.push(`${over.length} card labels are longer than ${MAX_LABEL} characters, over the ${OVER_CEILING} allowed: shorten the new one (the list above is longest first; \`git diff\` says which is new)`);
-}
-if (lengths.at(-1) > LONGEST_LABEL) {
-  for (const card of over.filter((entry) => entry.length > LONGEST_LABEL)) failures.push(`${writtenAt(card)}: ${card.length} characters, longer than the longest label allowed (${LONGEST_LABEL}): "${card.label}"`);
-}
+for (const card of over) failures.push(describe(card));
+if (over.length) failures.push(`${over.length} card label${over.length === 1 ? " is" : "s are"} longer than ${MAX_LABEL} characters: shorten ${over.length === 1 ? "it" : "them"} (move the reason to the card's voice)`);
 
 if (failures.length) {
   console.error(failures.join("\n"));
@@ -182,11 +142,7 @@ if (failures.length) {
 } else {
   console.log(
     `Card-label check passed (${cards.length.toLocaleString("en-US")} labels across ${CASE_SEQUENCE.length} cases: ${distribution}; ` +
-      `${over.length} of the ${OVER_CEILING} allowed are longer than ${MAX_LABEL}, the longest ${lengths.at(-1)} of the ${LONGEST_LABEL} allowed).`,
+      `none longer than ${MAX_LABEL}).`,
   );
-  if (over.length < OVER_CEILING) console.log(`Fewer labels are over ${MAX_LABEL} now; take OVER_CEILING down to ${over.length}.`);
-  if (lengths.at(-1) < LONGEST_LABEL) console.log(`The longest label is shorter now; take LONGEST_LABEL down to ${lengths.at(-1)}.`);
-  console.log(`Scene bodies: ${longTexts.length} of the ${TEXT_OVER_CEILING} allowed of ${texts.length.toLocaleString("en-US")} are longer than ${MAX_TEXT} characters, the longest ${texts[0]?.length} of the ${LONGEST_TEXT} allowed.`);
-  if (longTexts.length < TEXT_OVER_CEILING) console.log(`Fewer scene bodies are over ${MAX_TEXT} now; take TEXT_OVER_CEILING down to ${longTexts.length}.`);
-  if ((texts[0]?.length ?? 0) < LONGEST_TEXT) console.log(`The longest scene body is shorter now; take LONGEST_TEXT down to ${texts[0]?.length}.`);
+  console.log(`Scene bodies: ${texts.length.toLocaleString("en-US")}, none longer than ${MAX_TEXT} characters (the longest ${texts[0]?.length}).`);
 }

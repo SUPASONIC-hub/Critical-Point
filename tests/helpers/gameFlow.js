@@ -61,12 +61,13 @@ export async function clickThroughMotion(locator, label) {
  * and the seal plus one push can never reach the lowest wall a board that did
  * not just bust can draw -- so pushing until cash enables is always safe here.
  *
- * Before either, clear whatever stands between the run and a live table: the
+ * Before either, clear whatever stands between the run and a live table: an
+ * act's title card on the first case of an act (B-11(1), ActCard.jsx), the
  * relic draft, then the briefing page (which also carries the protocol breach).
- * Both hold the clock, so a flow that does not pass them finds a board it
+ * All of them hold the clock, so a flow that does not pass them finds a board it
  * cannot press. Idempotent, because most callers do not know which is up.
  */
-const TABLE_GATES = "[data-testid='relic-skip'], [data-testid='open-table']";
+const TABLE_GATES = "[data-testid='act-card-continue'], [data-testid='relic-skip'], [data-testid='open-table']";
 
 export async function dismissProtocolBreach(page) {
   // Best effort, not an assertion: give the stage a beat to paint so the clicks
@@ -98,7 +99,7 @@ export async function dismissProtocolBreach(page) {
   // a table whose cards were all still disabled. Clearing one at a time until
   // neither is there is what this function always claimed to do.
   const gate = page.locator(TABLE_GATES).first();
-  for (let pass = 0; pass < 4 && (await gate.isVisible()); pass += 1) {
+  for (let pass = 0; pass < 5 && (await gate.isVisible()); pass += 1) {
     const cleared = await gate.getAttribute("data-testid");
     // The pointer, where it lands. This was a synthetic event for a long time,
     // because the gates keep moving and click() waits for stillness -- but a
