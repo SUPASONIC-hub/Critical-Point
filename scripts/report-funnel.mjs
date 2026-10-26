@@ -52,7 +52,8 @@ const BREAK_SECONDS = 60 * 60;
 /** A run whose last row is older than this, and that has not finished, has stopped. */
 const STALE_SECONDS = 7 * 24 * 60 * 60;
 /** The languages a row may name (src/locale.js SUPPORTED_LOCALES); anything else is read as none. */
-export const LOCALES = ["ko", "en"];
+// "ja" is the hidden Japanese draft (일본어 1단계, opened only by ?lang=ja): its rows are counted apart, not read as none.
+export const LOCALES = ["ko", "en", "ja"];
 /** A run with no row naming its language: Korean, presumed (see the top of this file). */
 export const PRESUMED_LOCALE = "ko(추정)";
 /** The day the English preview opened (#338): a run with no language that began on or after it may have been English. */

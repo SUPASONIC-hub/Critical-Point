@@ -23,8 +23,9 @@ import { CASE_SEQUENCE } from "../src/gameCases.js";
  *   stale    a translation whose Korean path is gone -- a scene or card
  *            renamed or removed; the page never shows it;
  *   numbers  a translation missing a digit its Korean has (G-1 2: canon
- *            numbers are never changed). Money is compared in English units
- *            (310억 -> 31 billion), and months as words.
+ *            numbers are never changed). For English, money is compared in
+ *            English units (310억 -> 31 billion) and months as words; Japanese
+ *            keeps the Korean's figures (310억 -> 310億).
  *
  * A warning, not a failure, while the words are drafts: it prints the counts
  * and exits 0. `--strict` fails on any missing or stale string (for a public
@@ -67,9 +68,9 @@ for (const lang of languages) {
       rows.push({ unit: caseId, total: 0, missing: [], stale: [`${file}: no such case`], numbers: [] });
       continue;
     }
-    rows.push({ unit: caseId, ...compareWords(caseSource(runtimeData, caseId), await wordsOf(file, "default")) });
+    rows.push({ unit: caseId, ...compareWords(caseSource(runtimeData, caseId), await wordsOf(file, "default"), lang) });
   }
-  rows.push({ unit: "screen copy", ...compareWords(copySource, await wordsOf(`src/locales/${lang}/index.js`, "copy")) });
+  rows.push({ unit: "screen copy", ...compareWords(copySource, await wordsOf(`src/locales/${lang}/index.js`, "copy"), lang) });
 
   let missing = 0;
   let stale = 0;
