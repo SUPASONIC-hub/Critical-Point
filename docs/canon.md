@@ -161,6 +161,16 @@ decision and the 04:00 folder.
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
 
+오진우 turns from 사수 to rival because 윤상혁 sets him a condition no one else
+gets. It reaches him as one messenger line on the first night at 합정동
+(2023-07-24, 프롤로그 05), while 윤상혁 is still 팀장: "분석관보다 먼저 결론을
+내면 6층 자리는 비워 두겠네." The analyst sees the line, not the sender. From
+사건 01 그룹전략실 asks the lab for two recommendations on one case, his
+deadline 12 hours earlier; in 사건 02 a 그룹전략실 account opens his report 4
+seconds after it appears; in 사건 03 한서윤 says his terms never came to her.
+사건 03's 「별도 압박 조건」 and 사건 18's 「누구의 계산」 are this condition,
+and no line names 윤상혁 as its author before them.
+
 Of this table the script holds what copy writes in a shape it can read: each
 person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
 window and his third year, A-017 and A-001 to A-063, the 5 대 3, the sentence,

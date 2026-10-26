@@ -956,7 +956,8 @@ const budgets = [
   // words alone; its dictionary is its screen copy (and the screens' tables,
   // src/locales/<lang>/screens); the overlay is the code they share. Measured in
   // the e2e build (English: 사건 01 the largest case), the gzip plus 4.
-  { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_483, maxGzip: 21_390 },
+  // 73,483 / 21,390 -> 73,724 / 21,469 on 2026-10-26, 오진우가 경쟁자가 되는 경위 (ojinwoo-bridge): 사건 01's lead and memo say why he sits across the table, in English too. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_724, maxGzip: 21_469 },
   { pattern: /^locale-[a-z]{2,3}-index-.*\.js$/, maxBytes: 91_605, maxGzip: 33_973 },
   { pattern: /^locale-overlay-.*\.js$/, maxBytes: 2_894, maxGzip: 1_183 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },

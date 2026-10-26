@@ -131,12 +131,13 @@ export default {
     },
     "p5_final": {
       "title": "What Did You Bring?",
-      "text": "At ten at night, the lights on the 4th floor come back on. The last item of the first day is introductions, and the rule is odd: instead of your name and career, say 'what you brought here'. Byun Yujin, the former teller, puts the call list for 41 complaints in the middle of the desk; someone else puts down a branch closing ledger. Assistant Manager Oh Jinwoo sets out a whiteboard marker. 'The scoreboard. I still want to win.' Then it is your turn. There are three things in your bag: the names you wrote down on the night of April 12, a bundle of copies of the return-confirmation receipt and your date notes, and one empty envelope with nothing in it. The waveform on terminal 1 glows quietly. Byun Yujin presses you. 'Just one thing. That’s all it is here.'",
+      "text": "At ten at night, the lights on the 4th floor come back on. The last item of the first day is introductions, and the rule is odd: instead of your name and career, say 'what you brought here'. Byun Yujin, the former teller, puts down the call list for 41 complaints; someone else puts down a branch closing ledger. Assistant Manager Oh Jinwoo sets out a whiteboard marker. 'The scoreboard. I still want to win.' A messenger alert lights up his phone and goes dark: 'Reach a conclusion before the analyst, and I’ll keep your desk on the 6th floor open.' You don’t see who sent it. Now it is your turn. There are three things in your bag: the names you wrote down on the night of April 12, a bundle of copies of the return-confirmation receipt and your date notes, and one envelope with nothing in it. The waveform on terminal 1 glows quietly. Byun Yujin presses you. 'Just one thing. That’s all it is here.'",
       "memo": [
         "First-day introduction rule: one thing you brought",
         "In the bag -- list of names, bundle of copies, empty envelope",
         "Terminal 1 recording -- no storage location shown",
-        "What Oh Jinwoo brought out: a whiteboard marker"
+        "What Oh Jinwoo brought out: a whiteboard marker",
+        "His messenger: 'conclusion first, the 6th-floor desk' -- sender unseen"
       ],
       "choices": {
         "p5_final_record": {

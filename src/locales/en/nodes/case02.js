@@ -121,11 +121,12 @@ export default {
     },
     "c2_aftershock": {
       "title": "Who Changed the Record",
-      "text": "Four in the morning, the day after the report. One log terminal is on in the security audit room. ECHO reports what changed overnight in one line. After the report went up, a line vanished from the original record. The copy still has it, and the two records show different times. Lee Minseo’s account was locked with the report, so it was not her hand. 'It is now possible that the record naming Lee Minseo and the record you used in your report were made by the same hand. Three accounts can delete this line. One of them belongs to the Group Strategy Office.' Outside the window, a dawn-delivery truck passes down a Hapjeong-dong alley.",
+      "text": "Four in the morning, the day after the report. One log terminal is on in the security audit room. ECHO reports what changed overnight in one line. After the report went up, a line vanished from the original record. The copy still has it, and the two records show different times. Lee Minseo’s account was locked with the report, so it was not her hand. 'It is now possible that the record naming Lee Minseo and the record you used in your report were made by the same hand. Three accounts can delete this line. One of them belongs to the Group Strategy Office. Yesterday that account opened Assistant Manager Oh Jinwoo’s report 4 seconds after it appeared on the shared screen.' Outside the window, a dawn-delivery truck passes down a Hapjeong-dong alley.",
       "memo": [
         "Original and copy show different times",
         "Lee Minseo’s account already locked",
-        "1 of 3 accounts with delete rights is in Group Strategy"
+        "1 of 3 accounts with delete rights is in Group Strategy",
+        "That account opened Oh Jinwoo’s report within 4 seconds"
       ],
       "choices": {
         "c2_after_audit": {
