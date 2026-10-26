@@ -45,6 +45,7 @@ export default {
     moves: "{drops} drops · {rises} rises",
     delta: "Risk {delta}",
     recorded: "recorded",
+    held: "no change",
   },
   counterfactual: {
     subtitle: "The pressure gap between your actual choice and the lenses you didn’t pick",

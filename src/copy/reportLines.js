@@ -36,8 +36,6 @@ const reportLinesCopy = {
     case: "[사건 종료] {tag}",
   },
   rationaleClues: "단서 {count}",
-  // A forecast that moves the risk by nothing (GameRuntime's formatRiskDelta).
-  riskHeld: "유지",
   standing: {
     clear: "붕괴선 아래",
     near: "붕괴선 가까움",

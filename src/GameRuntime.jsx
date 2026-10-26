@@ -50,7 +50,6 @@ import { LazyScreen } from "./components/LazyScreen.jsx";
 import { confirmAction } from "./state/confirmAction.js";
 import noticesCopy from "./copy/notices.js";
 import { fill } from "./locale.js";
-import reportLinesCopy from "./copy/reportLines.js";
 import { focusSceneTitle } from "./state/sceneFocus.js";
 import { useRunState } from "./state/useRunState.js";
 import { createChoiceReaders } from "./state/useDecision.js";
@@ -376,7 +375,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   });
 
   const formatRiskDelta = (value) =>
-    value > 0 ? `+${value}` : value < 0 ? `${value}` : reportLinesCopy.riskHeld;
+    value > 0 ? `+${value}` : value < 0 ? `${value}` : "";
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);

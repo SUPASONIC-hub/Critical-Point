@@ -56,6 +56,8 @@ const reportCopy = {
     // "위험 +3": a change in risk, on the lab's lenses and the log's challenges.
     delta: "위험 {delta}",
     recorded: "기록",
+    // A forecast that moves the risk by nothing (GameRuntime's formatRiskDelta says "").
+    held: "유지",
   },
   counterfactual: {
     subtitle: "실제 선택과 선택하지 않은 관점의 압박 차이",

@@ -12,6 +12,9 @@
 import { getVerdictKey } from "./verdictBranch.js";
 import words from "./copy/ending.js";
 
+/** The ending's words (src/copy/ending.js), for the result screen's twists and records. */
+export { words as endingWords };
+
 export const observationLabels = words.observationLabels;
 
 const choiceVerdicts = words.verdicts;
