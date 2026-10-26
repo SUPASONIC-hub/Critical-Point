@@ -149,7 +149,7 @@ export default {
           "label": "Before saying anything, ask whether Sunwoo Jin wants to know"
         },
         "reframe": {
-          "label": "One last time, reframe the table and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Slow Island, Gujwa, Jeju · Tangerine Warehouse",

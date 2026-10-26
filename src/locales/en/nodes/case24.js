@@ -150,7 +150,7 @@ export default {
           "label": "Take it and push it at Group Strategy today"
         },
         "reframe": {
-          "label": "One last time, reframe the table and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Financial Group Headquarters, 33rd Floor · Elevator Lobby",
