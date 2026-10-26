@@ -25,7 +25,8 @@ test("the intro's language choice opens English, keeps it through a reload and r
   // The screen's own words too (src/copy/intro.js under the English dictionary).
   await expect(page.getByTestId("start-first-case")).toContainText("Start the prologue");
   await expect(page.locator(".intro .top-actions").getByRole("button", { name: "Ranking" })).toBeVisible();
-  expect(await page.evaluate((key) => localStorage.getItem(key), LOCALE_KEY)).toBe("en");
+  // Polled: the choice reloads the page, and a read that lands mid-navigation is asked again.
+  await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), LOCALE_KEY)).toBe("en");
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");

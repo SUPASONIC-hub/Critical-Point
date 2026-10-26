@@ -2,9 +2,6 @@ import { nextWeekRuleAt, WEEKLY_RULES, weekRuleAt } from "./weeklyRules.js";
 import weekRuleCopy from "../copy/weekRule.js";
 import { fill } from "../locale.js";
 
-/** A rule with its words in the page's language (src/copy/weekRule.js `rules`), or null. */
-const inWords = (rule) => (rule ? { ...rule, ...weekRuleCopy.rules[rule.id] } : null);
-
 /**
  * The start screen's line at `ms` (WeeklyRuleViews.jsx, whose chunk it goes in: the
  * weeklyRules chunk every season loads stays as it was): this week's rule,
@@ -15,8 +12,8 @@ const inWords = (rule) => (rule ? { ...rule, ...weekRuleCopy.rules[rule.id] } : 
  * line says whom it is for.
  */
 export function weeklyRuleLine(now, calendar = WEEKLY_RULES, { first = false } = {}) {
-  const current = inWords(weekRuleAt(now, calendar));
-  const next = inWords(nextWeekRuleAt(now, calendar));
+  const current = weekRuleAt(now, calendar);
+  const next = nextWeekRuleAt(now, calendar);
   const words = weekRuleCopy.line;
   if (current) {
     // Two rules in a row (W46, then W47): the notice rides on this week's line,
