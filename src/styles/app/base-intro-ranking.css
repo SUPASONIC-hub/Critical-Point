@@ -1061,6 +1061,16 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
 }
+/* The two policy pages beside the build (privacyText.js). The line height
+   is what makes each link a 52px target. */
+.intro-legal {
+  display: flex;
+  gap: 20px;
+  width: min(var(--ui-page-max), 100%);
+  margin: 64px auto 0;
+  line-height: 3.25;
+  border-top: 1px solid var(--ui-line);
+}
 /* The resume card replaces the door when a save exists. */
 .resume-panel {
   display: flex;
@@ -1758,7 +1768,9 @@ summary:focus-visible {
   font-weight: 600;
   line-height: 1.5;
 }
-.consent-note a {
+.consent-note a,
+.privacy-note a,
+.intro-legal a {
   color: inherit;
 }
 .consent-note.error {
@@ -2757,6 +2769,59 @@ summary:focus-visible {
   line-height: 1.7;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+/* The report button and its form (2026-10-25): quiet under the post, a
+   44px target, and the form opens in place rather than in a dialog. */
+.board-post-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+.board-report-toggle {
+  min-height: 44px;
+  font-size: 0.75rem;
+}
+.board-report {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+}
+.board-report legend {
+  padding: 0 4px;
+  color: var(--ui-text);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.board-report-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.board-report-reasons label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+}
+.board-report small,
+.board-report-status {
+  margin: 0;
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.board-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.board-report-status:empty {
+  display: none;
 }
 
 /* The opening burst: the half second between pressing a case and its first

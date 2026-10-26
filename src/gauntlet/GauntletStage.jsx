@@ -43,6 +43,7 @@ import {
   playRelicProcCue,
 } from "./gauntletAudio.js";
 import { RelicDraft } from "./RelicDraft.jsx";
+import { useActCard } from "./ActCardFold.jsx";
 import { CaseFileStory, SceneBriefing } from "./SceneBriefing.jsx";
 import { StanceRow } from "./StanceRow.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
@@ -124,7 +125,9 @@ export function GauntletStage({
   const locked = lostToTab || staleSave;
   const awaitingClaim = heldByOtherTab && !claimed;
   const hidden = isAdvancing || revealOpen || locked || awaitingClaim;
-  const draftOpen = draftPending && !hidden;
+  // B-11(1): an act's first case opens on its title card, before the draft and the briefing.
+  const act = useActCard({ scene, seed, windowIndex: run?.windowIndex, resumed: Boolean(resume) || abandoned, hidden });
+  const draftOpen = draftPending && !hidden && !act.open;
   /**
    * The window opens on the briefing page, with the table's clock held.
    *
@@ -156,7 +159,7 @@ export function GauntletStage({
   const comfortOpen = useComfortDialogOpen();
   const paused = hidden || draftOpen || !tableOpen || asking || comfortOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, resume, caseId: scene.node.caseId, run });
-  const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
+  const briefingOpen = !tableOpen && !hidden && !draftOpen && !act.open && win.status === "live";
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
   const closedRef = useRef(false);
@@ -801,6 +804,7 @@ export function GauntletStage({
         {audit && <span id="gx-audit-detail" className="sr-only">{audit.spoken}</span>}
       </div>
 
+      {act.card}
       {draftOpen && (
         <RelicDraft offer={relicOffer} owned={relics} swapFor={swapFor} onPick={pickRelic} onBack={() => setSwapFor(null)} onSkip={() => pickRelic(null)} />
       )}

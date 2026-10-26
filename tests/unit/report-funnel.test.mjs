@@ -86,3 +86,35 @@ test("the query is one read-only statement that sends no run or device id out", 
   assert.match(QUERY, /dense_rank\(\) over \(order by r\.session_id\) as device/);
   assert.match(funnelQuery("2026-10-01"), /having min\(s\.completed_at\) >= '2026-10-01T00:00:00\+09:00'::timestamptz/);
 });
+
+test("the player tables count new and active devices, runs begun and finished by KST day and week", async () => {
+  const { readTraffic, describeTraffic, kstDay, kstWeek, TRAFFIC_DAYS, TRAFFIC_WEEKS } = await import("../../scripts/report-funnel.mjs");
+  // 2027-01-15 is a Friday; 12:00 KST is 03:00 UTC.
+  const noon = Date.parse("2027-01-15T03:00:00Z") / 1000;
+  assert.equal(kstDay(Date.parse("2027-01-14T15:30:00Z") / 1000), "2027-01-15", "00:30 KST is already the next day");
+  assert.equal(kstWeek(noon), "2027-01-11");
+  assert.equal(kstWeek(Date.parse("2027-01-10T14:59:00Z") / 1000), "2027-01-04", "Sunday 23:59 KST is the week before");
+  const at = (dayOffset, minutes = 0) => noon - dayOffset * DAY + minutes * 60;
+  const rows = [
+    // Device 1: began two days ago, came back today; a second run finished today.
+    { device: 1, marked: false, new_game_plus: false, cases: [["prologue01", at(2)], ["prologue02", at(0)]] },
+    { device: 1, marked: false, new_game_plus: false, cases: [...CASE_SEQUENCE.map((caseId, index) => [caseId, at(1, index)]), ["season-final", at(0, 5)]] },
+    // Device 2: new today, got past the prologue.
+    { device: 2, marked: false, new_game_plus: false, cases: [["prologue01", at(0, 1)], ["prologue05", at(0, 2)], ["case01", at(0, 3)]] },
+    // Device 3: first seen long before the window.
+    { device: 3, marked: false, new_game_plus: false, cases: [["prologue01", at(100)]] },
+  ];
+  const t = readTraffic(rows, noon);
+  assert.equal(t.days.length, TRAFFIC_DAYS);
+  assert.equal(t.weeks.length, TRAFFIC_WEEKS);
+  assert.equal(t.devices, 3);
+  const [today, yesterday, twoAgo] = t.days;
+  assert.deepEqual(today, { key: "2027-01-15", newDevices: 1, active: 2, began: 1, pastPrologue: 1, finished: 1 });
+  assert.deepEqual(yesterday, { key: "2027-01-14", newDevices: 0, active: 1, began: 1, pastPrologue: 1, finished: 0 });
+  assert.deepEqual(twoAgo, { key: "2027-01-13", newDevices: 1, active: 1, began: 1, pastPrologue: 0, finished: 0 });
+  assert.deepEqual(t.weeks[0], { key: "2027-01-11", newDevices: 2, active: 2, began: 3, pastPrologue: 2, finished: 1 });
+  const text = describeTraffic(t);
+  assert.match(text, /\| 2027-01-15 \| 1 \| 2 \| 1 \| 1 \| 1 \|/);
+  assert.match(text, /서로 다른 기기 3대/);
+  assert.doesNotMatch(text, /grants-check-session|run-/);
+});

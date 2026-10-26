@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 import { isSavedStateShapeValid, parseCurrentSavedState, SAVE_SCHEMA_VERSION } from "../../src/appConfig.js";
 import { farCallbacks, resolveFarCallbackLine, withFarCallback } from "../../src/farCallbacks.js";
-import { caseAftermathNodeId, nodes } from "../../src/gameData.js";
+import { caseAftermathNodeId, caseOpeningRoutes, nodes } from "../../src/gameData.js";
 import { getFinalSceneChoiceId } from "../../src/gameLogic.js";
 import { getReadingSeconds } from "../../src/gauntlet/gauntletEngine.js";
 import { repairSavedState } from "../../src/state/savedState.js";
@@ -147,4 +147,24 @@ test("the server's case row does not carry the field: the summary keeps the shap
   const row = toRowSummary({ ...case15Summary, finalChoiceId: "c15_final_publish", endingVariant: { id: "quiet", label: "x" } });
   assert.ok(!("finalChoiceId" in row));
   assert.deepEqual(row, { ...case15Summary, endingVariant: "quiet" });
+});
+
+/**
+ * 사건 49 -> 33층 (B-2, 2026-10-24): the thing taken up to the 33rd floor. The
+ * opening of the final case already follows 사건 49's outcome card
+ * (caseOpeningRoutes.final), so each line names a thing that opening holds,
+ * and no route is handed something it never carried.
+ */
+test("f_confront: each 사건 49 line names a thing its own opening of the final case holds", () => {
+  const callback = farCallbacks.f_confront;
+  assert.equal(callback.fromCase, "case49");
+  const held = { c49_after_warm: "컵라면", c49_after_record: "폴더", c49_after_rush: "한 시간이면 되지" };
+  assert.deepEqual(Object.keys(callback.lines).sort(), Object.keys(held).sort());
+  for (const [choiceId, thing] of Object.entries(held)) {
+    const opening = nodes[caseOpeningRoutes.final[choiceId]];
+    assert.ok(opening?.text.includes(thing), `${caseOpeningRoutes.final[choiceId]} holds ${thing}`);
+    assert.ok(callback.lines[choiceId].includes(thing), `${choiceId}'s line names ${thing}`);
+  }
+  const view = createPlayView({ ...Object.fromEntries(Object.values(viewGroups.play).flat().map((field) => [field, null])), node: nodes.f_confront, resolvedNodeId: "f_confront" }, {}, results("case49", "c49_after_warm"));
+  assert.ok(view.node.text.endsWith(`${callback.after} ${callback.lines.c49_after_warm}`), "the line closes the scene, after 윤상혁's last words");
 });
