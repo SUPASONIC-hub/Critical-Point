@@ -274,7 +274,7 @@ export default {
     },
     "c16_log_reaction": {
       "title": "I Only Finished High School",
-      "text": "When word of the training goes around the break room, Yoo Haon is first to raise his hand. And lowers it right away. 'I only finished high school. Isn’t that stuff for people who went to college?' Choi Seojin turns her tablet to show the first page of the manufacturer’s maintenance manual. 'Qualifications: none.' Yoo Haon reads it twice. Behind him, Kang Taemin says, 'His hands are the fastest in the center.' Bae Sookyung cuts in. 'I’m in too. It doesn’t use your wrists, right?' As the break room bursts out laughing, word that there are only 20 seats goes around late. Twenty out of 80.",
+      "text": "When word of the training goes around the break room, Yoo Haon is first to raise her hand. And lowers it right away. 'I only finished high school. Isn’t that stuff for people who went to college?' Choi Seojin turns her tablet to show the first page of the manufacturer’s maintenance manual. 'Qualifications: none.' Yoo Haon reads it twice. Behind her, Kang Taemin says, 'Her hands are the fastest in the center.' Bae Sookyung cuts in. 'I’m in too. It doesn’t use your wrists, right?' As the break room bursts out laughing, word that there are only 20 seats goes around late. Twenty out of 80.",
       "memo": [
         "Qualifications: none",
         "20 out of 80"
@@ -342,7 +342,7 @@ export default {
     },
     "c16_branch_locker_follow": {
       "title": "The Hairpin Mechanic",
-      "text": "At three in the morning, Darami stops in the middle of Row C. Plastic wrap is wound around a wheel. The manufacturer’s technician only comes by day. Yoo Haon, the youngest, takes a hairpin from his pocket, digs out the wheel gap, opens the back panel and holds the reset button for 3 seconds. The orange lights come back on. Yoo Haon shows you a memo on his phone. 47 lines of error log written over a month. 'Plastic wrap 19 times, couldn’t read barcode 11 times, just sulking 3 times. The other 14, I don’t know either.' The break room bursts out laughing. Yoo Haon adds, a little sheepish, 'I’ve fixed it more than the daytime technician. But I’m out on December 31.'",
+      "text": "At three in the morning, Darami stops in the middle of Row C. Plastic wrap is wound around a wheel. The manufacturer’s technician only comes by day. Yoo Haon, the youngest, takes a hairpin from her pocket, digs out the wheel gap, opens the back panel and holds the reset button for 3 seconds. The orange lights come back on. Yoo Haon shows you a memo on her phone. 47 lines of error log written over a month. 'Plastic wrap 19 times, couldn’t read barcode 11 times, just sulking 3 times. The other 14, I don’t know either.' The break room bursts out laughing. Yoo Haon adds, a little sheepish, 'I’ve fixed it more than the daytime technician. But I’m out on December 31.'",
       "memo": [
         "47 night stops of the 4 trial robots -- all fixed by the night shift",
         "Manufacturer maintenance contract: weekdays 09~18 only",
@@ -357,7 +357,7 @@ export default {
           "label": "List the 47 night stops as an official lease review risk"
         },
         "c16_branch_locker_follow_c": {
-          "label": "Call maintenance the maker’s job; give Yoo Haon his log back"
+          "label": "Call maintenance the maker’s job; give Yoo Haon her log back"
         }
       },
       "place": "FlowOn fulfillment center · Floor, Row C",
@@ -570,7 +570,7 @@ export default {
     "c16_branch_locker_a": "Refiled, Bae Sookyung’s wrist becomes paperwork. That paperwork follows her even after her contract ends.",
     "c16_branch_locker_b": "Severance is the realistic answer. Bae Sookyung puts her last brace in her bag and peels the tape off her locker.",
     "c16_branch_locker_c": "Gathering the records shows that 31 of the 80 were injured and said nothing. The reason is the same for all of them.",
-    "c16_branch_locker_follow_a": "Once the 47 lines become evidence, Yoo Haon is no longer embarrassed by his notes for the first time.",
+    "c16_branch_locker_follow_a": "Once the 47 lines become evidence, Yoo Haon is no longer embarrassed by her notes for the first time.",
     "c16_branch_locker_follow_b": "Listed as a risk item, the 47 stops raise the lease fee. When the lease fee rises, someone tries to make up the number with people.",
     "c16_branch_locker_follow_c": "Yoo Haon keeps the returned notes without deleting them. After December 31, no one will read them.",
     "c16_route_system_show": "Choi Seojin looks at the figures and says nothing for a long time. 'I was only seeing half.'",
@@ -643,7 +643,7 @@ export default {
     "c16_branch_locker_c": "Saying this can’t be Bae Sookyung’s alone, you start by gathering records of the 80 who were injured and never filed.",
     "c16_branch_locker_follow_a": "To show that someone restarted the robots every night, you take Yoo Haon’s error log and argue that night maintenance staff are needed.",
     "c16_branch_locker_follow_b": "So the nights held together with a hairpin don’t drop out of the review, you list the 47 night stops as an official lease review risk.",
-    "c16_branch_locker_follow_c": "Saying you can’t load more onto the youngest and maintenance is the maker’s job, you give Yoo Haon his error log back.",
+    "c16_branch_locker_follow_c": "Saying you can’t load more onto the youngest and maintenance is the maker’s job, you give Yoo Haon her error log back.",
     "c16_route_system_show": "Saying the other half of the falling-accidents number must be seen too, you show these figures to Choi Seojin and the approval committee at once.",
     "c16_route_system_track": "To get the risk that left the books written down again, you demand a clause tracking the let-go 1 year later.",
     "c16_route_system_drop": "Saying you can’t overturn all 37, you bury the figures and keep to the approval schedule.",
