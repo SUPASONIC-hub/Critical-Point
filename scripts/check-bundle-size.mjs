@@ -72,14 +72,16 @@ const budgets = [
   // only) on main 024904a3: the shortened case files change the hashed names
   // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_723, maxGzip: 54_704 },
+  // 148,723 / 54,704 -> 149,321 / 55,062 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js), and the risk forecast's 「유지」 (reportLines). The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_321, maxGzip: 55_062 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
   // asks first, never before. Measured 32,897 / 13,018 in the e2e build, the
   // gzip plus 4.
   // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 32_897, maxGzip: 13_039 },
+  // 32,897 / 13,039 -> 34,278 / 13,357 on 2026-10-26, 영어판 3단계: the observer's samples, arcs and records and the endings' lines read by key (src/copy/observer.js), a name's particle as a blank. The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_278, maxGzip: 13_357 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -106,7 +108,8 @@ const budgets = [
   // same 291,131, but eight case files' hashed names in its import list
   // changed with their scene text and gzip worse; measured 87,097 on main
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 291_131, maxGzip: 87_101 },
+  // 291,131 / 87,101 -> 293,752 / 88,141 on 2026-10-26, 영어판 3단계: runtimeSystems.js's ending scenes and names, the ending preview, the collapse's cause, the authority review and the aftermath read by key (src/copy/seasonEnd.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 293_752, maxGzip: 88_141 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -252,7 +255,8 @@ const budgets = [
   // five lines in appCopy.js. The hint itself is InstallHint below. Measured
   // 175,169 / 63,524 in the e2e build, the gzip plus 4.
   // 175,169 / 63,528 -> 180,627 / 65,391 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 180_627, maxGzip: 65_391 },
+  // 180,627 / 65,391 -> 181,764 / 65,910 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 181_764, maxGzip: 65_910 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -462,7 +466,8 @@ const budgets = [
   // 44,569 / 14,826 in the e2e build, the gzip plus 4.
   // 44,569 / 14,830 -> 44,575 / 14,830 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 44,575 in the e2e build.
   // 44,575 / 14,830 -> 48,936 / 16,122 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 48_936, maxGzip: 16_122 },
+  // 48,936 / 16,122 -> 50,037 / 16,373 on 2026-10-26, 영어판 3단계: the ending sequence, the three twists, the verdicts and afterglows and 「당신의 세 장면」 read by key (src/copy/ending.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_037, maxGzip: 16_373 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -571,7 +576,8 @@ const budgets = [
   // nothing in it.
   // 5,507 / 2,366 -> 9,029 / 3,768 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 9,029 / 3,764 gzip in the e2e build, the gzip plus 4.
   // 9,029 / 3,768 -> 9,030 / 3,768 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 9_030, maxGzip: 3_768 },
+  // 9,030 / 3,768 -> 10,077 / 4,118 on 2026-10-26, 영어판 3단계: the board's words read by key (src/copy/board.js), with the report form's reasons and refusals named from boardReport.js. The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 10_077, maxGzip: 4_118 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -587,7 +593,8 @@ const budgets = [
   // gzip plus 4: the entries above were each measured on its own base.
   // 5,048 / 2,170 -> 4,793 / 2,147 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 4,793 / 2,143 in the e2e build, the gzip plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_793, maxGzip: 2_147 },
+  // 4,793 / 2,147 -> 5,503 / 2,416 on 2026-10-26, 영어판 3단계: the ranking's words read by key (src/copy/ranking.js) and dates in the page's language. The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_503, maxGzip: 2_416 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -599,7 +606,8 @@ const budgets = [
   // and a restore takes them out of it. Measured 11,492 / 4,635, the gzip plus 4.
   // 11,492 / 4,639 -> 11,492 / 4,644 on 2026-10-25, board-report on main caeecda: only by the chunk names it imports. Measured 4,640 gzip in the e2e build, the gzip plus 4.
   // 11,492 -> 11,494 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 11,494 / 4,638.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_494, maxGzip: 4_644 },
+  // 11,494 / 4,644 -> 11,780 / 4,768 on 2026-10-26, 영어판 3단계: online save's status lines and refusals read by key (src/copy/cloudSaveStatus.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_780, maxGzip: 4_768 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -648,7 +656,8 @@ const budgets = [
   // build, the gzip plus 4. The case-open snapshot is in it; Rolldown and Oxc
   // still write it smaller than Rollup and esbuild did.
   // 36,757 / 13,658 -> 38,649 / 14,453 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_649, maxGzip: 14_453 },
+  // 38,649 -> 38,654 raw on 2026-10-26, 영어판 3단계: only the names of the chunks it imports. Measured in the e2e build.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 38_654, maxGzip: 14_453 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -687,7 +696,8 @@ const budgets = [
   // 8,944 / 4,334 in the e2e build (the larger of two builds), the gzip plus 4.
   // 8,944 / 4,338 -> 8,432 / 4,054 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 8,432 / 4,050 in the e2e build, the gzip plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_432, maxGzip: 4_054 },
+  // 8,432 / 4,054 -> 8,659 / 4,168 on 2026-10-26, 영어판 3단계: the card's words and the copied line read by key (src/copy/resultCard.js, resultCardDraw.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_659, maxGzip: 4_168 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -796,7 +806,8 @@ const budgets = [
   // e72c415f: measured 2,634 / 1,399 in the e2e build, the gzip plus 4.
   // 2,634 / 1,403 -> 2,636 / 1,403 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 2,636 in the e2e build.
   // 2,636 -> 2,637 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 2,637 / 1,398.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_637, maxGzip: 1_403 },
+  // 2,637 -> 2,644 raw on 2026-10-26, 영어판 3단계: the catalogue is read by WeeklyRuleViews' copy table too (src/copy/weekRule.js), so it exports one name more. Measured in the e2e build.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 2_644, maxGzip: 1_403 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -812,7 +823,8 @@ const budgets = [
   // -> 1,056 gzip on 2026-10-25 (개인정보처리방침·이용약관): measured 1,052, the
   // entry chunk's export names it imports by, plus 4; the file did not change.
   // 1,996 / 1,056 -> 2,176 / 1,138 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 2_176, maxGzip: 1_138 },
+  // 2,176 / 1,138 -> 2,537 / 1,280 on 2026-10-26, 영어판 3단계: the start screen's line read by key, and the rules' words by id (src/copy/weekRule.js `line`, `rules`). The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 2_537, maxGzip: 1_280 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -957,7 +969,8 @@ const budgets = [
   // src/locales/<lang>/screens); the overlay is the code they share. Measured in
   // the e2e build (English: 사건 01 the largest case), the gzip plus 4.
   { pattern: /^locale-[a-z]{2,3}-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_483, maxGzip: 21_390 },
-  { pattern: /^locale-[a-z]{2,3}-index-.*\.js$/, maxBytes: 91_605, maxGzip: 33_973 },
+  // 91,605 / 33,973 -> 122,604 / 44,041 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status and the week's line in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^locale-[a-z]{2,3}-index-.*\.js$/, maxBytes: 122_604, maxGzip: 44_041 },
   { pattern: /^locale-overlay-.*\.js$/, maxBytes: 2_894, maxGzip: 1_183 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
