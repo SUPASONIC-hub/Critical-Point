@@ -141,4 +141,13 @@ const introCopy = {
 };
 export default introCopy;
 
+/**
+ * The NEW GAME+ button's text on either side of the blank its English name
+ * fills ("{game} 시작" -> ["", " 시작"]). A function, read at render: a split
+ * kept from when the module was read held the Korean on an English page.
+ */
+export function newGamePlusLabel() {
+  return introCopy.setup.newGamePlus.split("{game}");
+}
+
 localizeTables("screens", { intro: introCopy });

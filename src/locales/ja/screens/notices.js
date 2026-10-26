@@ -29,6 +29,7 @@ export default {
     slotRestoreFailed: "復旧地点を読み込めませんでした。ブラウザのストレージを使えません。",
     backupUnreadable: "保管したセーブは、このバージョンでも読めません。消さずにそのまま残します。",
     backupRestoreFailed: "保管したセーブを読み込めませんでした。ブラウザのストレージを使えません。",
+    queueUnavailable: "ブラウザのストレージを使えないため、リモート保存キューの変更を反映できませんでした。",
   },
   run: {
     settling: "判定が終わるところです。結果が出てから退出できます。",
@@ -43,6 +44,7 @@ export default {
     retryFailed: "ストレージ整理の再試行に失敗: {keys}{logFailed}",
     resetFailed: "一部のブラウザストレージを消せませんでした: {keys}{logFailed}",
     logFailed: " · 診断ログの保存にも失敗しました。",
+    retry: "ストレージ整理を再試行",
   },
   status: {
     currentCase: "現在の事件",
