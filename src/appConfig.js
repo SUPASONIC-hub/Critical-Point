@@ -83,6 +83,8 @@ export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
 // The language the player chose on the intro (src/locale.js): a code from
 // SUPPORTED_LOCALES. Absent, the page is Korean unless `?lang=` asks otherwise.
 export const LOCALE_KEY = "critical-point-locale-v1";
+// "1" once the player closed the intro's 홈 화면에 추가 hint (src/state/installPrompt.js).
+export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

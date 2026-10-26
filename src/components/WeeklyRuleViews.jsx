@@ -3,6 +3,8 @@ import { weeklyRuleLine } from "../gauntlet/weeklyRuleLine.js";
 import { weekRuleAt } from "../gauntlet/weeklyRules.js";
 import { selectLeaderboardWeek, useLeaderboardWeek } from "../state/useLeaderboard.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
+import { fill } from "../locale.js";
+import weekRuleCopy from "../copy/weekRule.js";
 
 /**
  * 이번 주의 규칙 on the start screen and the ranking screen: a chunk of its
@@ -52,7 +54,7 @@ export function WeeklyRuleLine({ now, first = false, ticked, tick }) {
               setOn(event.target.checked);
             }}
           />
-          {first ? "이번 주의 규칙으로 시작(이번 주 순위로)" : "이번 주의 규칙 없이 시작(평소 순위로)"}
+          {first ? weekRuleCopy.takeUp : weekRuleCopy.turnDown}
         </label>
       )}
     </section>
@@ -70,11 +72,11 @@ export function WeekBoards({ now }) {
   const current = weekRuleAt(now ?? weeklyRuleNow());
   if (!current) return null;
   const boards = [
-    { week: null, rule: null, label: "평소 순위" },
-    { week: current.week, rule: current.id, label: `이번 주의 규칙 · ${current.label}` },
+    { week: null, rule: null, label: weekRuleCopy.ordinaryBoard },
+    { week: current.week, rule: current.id, label: fill(weekRuleCopy.weekBoard, { label: current.label }) },
   ];
   return (
-    <div className="ranking-week-tabs" role="group" aria-label="순위 고르기" data-testid="ranking-week-tabs">
+    <div className="ranking-week-tabs" role="group" aria-label={weekRuleCopy.boardsLabel} data-testid="ranking-week-tabs">
       {boards.map((item) => (
         <button type="button" key={item.label} aria-pressed={board.week === item.week} onClick={() => selectLeaderboardWeek(item.week, item.rule)}>
           {item.label}

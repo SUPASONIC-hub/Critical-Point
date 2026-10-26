@@ -1,11 +1,10 @@
 import { useState } from "react";
 
 import { takeQueuedErrorTelemetry } from "./errorRecovery.js";
+import introCopy from "../copy/intro.js";
 
-const REVOKE_NOT_SAVED = "동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.";
-const GRANT_NOT_SAVED = "데이터 제공 동의를 브라우저 저장본에 반영하지 못했습니다.";
-const REVOKED = "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다.";
-const GRANTED = "데이터 제공에 동의했습니다. 지금부터 마치는 사건에 적용됩니다.";
+// The sentences are the intro's (src/copy/intro.js), read when they are said.
+const words = introCopy.consent;
 
 /**
  * What a tick or an untick of the consent box writes, and what it says when
@@ -28,7 +27,7 @@ export function createConsentChange({ persist, setDataConsent, setPendingTelemet
     if (event.target.checked) {
       if (!persist({ dataConsent: true }).storageSaved) {
         event.target.checked = false;
-        say("error", GRANT_NOT_SAVED);
+        say("error", words.grantNotSaved);
         return;
       }
       setDataConsent(true);
@@ -36,13 +35,13 @@ export function createConsentChange({ persist, setDataConsent, setPendingTelemet
       // The report's status line still said the consent had been withdrawn and
       // the queue deleted. Only that sentence is replaced: any other is about
       // something else (the connection, a batch) and is still true.
-      setTelemetryStatus((status) => (status?.text === REVOKED ? { tone: "ready", text: GRANTED } : status));
+      setTelemetryStatus((status) => (status?.text === words.revoked ? { tone: "ready", text: words.granted } : status));
       return;
     }
     if (!persist({ dataConsent: false, pendingTelemetry: [] }).storageSaved) {
       event.target.checked = true;
       setDataConsent(true);
-      say("error", REVOKE_NOT_SAVED);
+      say("error", words.revokeNotSaved);
       return;
     }
     setDataConsent(false);
@@ -53,7 +52,7 @@ export function createConsentChange({ persist, setDataConsent, setPendingTelemet
     // before the run started left those rows to come back into a save whose
     // consent is off.
     takeQueuedErrorTelemetry();
-    say("local", REVOKED);
+    say("local", words.revoked);
   };
 }
 

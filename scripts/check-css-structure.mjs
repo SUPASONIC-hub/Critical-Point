@@ -377,7 +377,10 @@ const fileBudgets = {
   // 124 / 2691 -> 133 / 3047 on 2026-10-22 (D-5), measured: 이야기 글 크기,
   // the story's prose at 1.125 or 1.25 times its size. Paid for by D-3 the
   // same day, which took briefing.css down 22 lines and 425 bytes.
-  "comfort.css": { lines: 133, bytes: 3047 },
+  // 133 / 3047 -> 175 / 3849 on 2026-10-26 (pwa-install-hint), measured: the
+  // 홈 화면에 추가 card under the settings in the intro's comfort drawer
+  // (components/InstallHint.jsx), drawn only where a browser offers an install.
+  "comfort.css": { lines: 175, bytes: 3849 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

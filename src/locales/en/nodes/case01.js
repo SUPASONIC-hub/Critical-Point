@@ -97,7 +97,8 @@ export default {
         "Offer price: 42% of book value",
         "Terms include taking over some staff",
         "NextMile’s main bank is also KD Bank",
-        "Oh Jinwoo’s plan pushes supplier payments to last"
+        "Oh Jinwoo’s plan pushes supplier payments to last",
+        "Group Strategy request: two recommendations; Oh Jinwoo’s deadline 12 hours earlier"
       ],
       "choices": {
         "competitor_sale": {
@@ -116,7 +117,7 @@ export default {
       "place": "FlowOn HQ, 8th-floor negotiation room",
       "clock": "Cash runs out · D-48h",
       "question": "The competitor offers a fire-sale buyout, and Oh Jinwoo offers a cheaper alternative. What goes into the report’s comparison table?",
-      "lead": "When you came out of the asset review room, NextMile’s acquisition proposal had already reached the negotiation room. Trigger Lab analyst Oh Jinwoo is sitting there too."
+      "lead": "When you came out of the asset review room, NextMile’s acquisition proposal had already reached the negotiation room. Trigger Lab analyst Oh Jinwoo is sitting there too. The Group Strategy Office wants two recommendations on the same case and handed him one of his own; only his deadline is 12 hours earlier than yours."
     },
     "board": {
       "title": "No Perfect Option",

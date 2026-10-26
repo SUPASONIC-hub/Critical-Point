@@ -3,6 +3,8 @@ import { Component, Suspense, useEffect, useState, useSyncExternalStore } from "
 import { chunkPanelFor, isChunkLoadError } from "../state/chunkReload.js";
 import { getLoadProgress, subscribeLoadProgress } from "../state/loadProgress.js";
 import { retryFailedScreens } from "../state/retryableLazy.js";
+import { fill } from "../locale.js";
+import loadingCopy from "../copy/loading.js";
 
 /**
  * A lazy screen with its own way out when its chunk will not load.
@@ -55,11 +57,11 @@ export class LazyScreen extends Component {
         <main className="error-screen">
           <section className="error-panel" role="alert" data-testid="chunk-offline-panel">
             <span className="eyebrow" lang="en">CRITICAL POINT / OFFLINE</span>
-            <h1>연결이 끊겼습니다.</h1>
-            <p>이 화면의 파일을 받지 못했습니다. 저장된 진행은 그대로입니다. 연결을 확인한 뒤 다시 시도해 주세요.</p>
+            <h1>{loadingCopy.offline.title}</h1>
+            <p>{loadingCopy.offline.text}</p>
             <div className="error-actions">
               <button type="button" data-testid="chunk-retry" onClick={this.retry}>
-                다시 시도
+                {loadingCopy.offline.retry}
               </button>
             </div>
           </section>
@@ -70,11 +72,15 @@ export class LazyScreen extends Component {
       <main className="error-screen">
         <section className="error-panel" role="alert" data-testid="chunk-reload-panel">
           <span className="eyebrow" lang="en">CRITICAL POINT / UPDATE</span>
-          <h1>화면을 다시 받아야 합니다.</h1>
-          <p>{RELOAD_REASON[panel]} 저장된 진행은 그대로입니다.</p>
+          <h1>{loadingCopy.reload.title}</h1>
+          <p>
+            {/* Why the page has to be loaded again, for each case `chunkPanelFor` names. */}
+            {loadingCopy.reload.reasons[panel]}
+            {loadingCopy.reload.kept}
+          </p>
           <div className="error-actions">
             <button type="button" data-testid="chunk-reload" onClick={() => globalThis.location.reload()}>
-              새로고침
+              {loadingCopy.reload.button}
             </button>
           </div>
         </section>
@@ -82,13 +88,6 @@ export class LazyScreen extends Component {
     );
   }
 }
-
-// Why the page has to be loaded again, for each case `chunkPanelFor` names.
-const RELOAD_REASON = {
-  reload: "게임이 새 버전으로 바뀌어 이 화면의 파일을 찾지 못했습니다.",
-  "reload-offline": "게임이 새 버전으로 바뀌어 이 화면의 파일을 찾지 못했습니다. 연결이 없어도 새로고침하면 기기에 받아 둔 새 버전으로 열립니다.",
-  "reload-retried": "이 화면의 파일을 다시 받지 못했습니다. 페이지를 새로 열어야 받을 수 있습니다.",
-};
 
 // Long enough that a healthy connection never sees the hint.
 const SLOW_LOAD_MS = 12_000;
@@ -128,13 +127,13 @@ function ScreenLoading({ quiet = false }) {
   return (
     <main className="shell screen-loading" aria-busy="true">
       <p className="save-status" role="status">
-        장면을 불러오는 중입니다.
+        {loadingCopy.status}
       </p>
       {counting && (
         <div
           className="screen-loading-progress"
           role="progressbar"
-          aria-label="사건 불러오기"
+          aria-label={loadingCopy.progressLabel}
           aria-valuemin={0}
           aria-valuemax={total}
           aria-valuenow={done}
@@ -142,15 +141,15 @@ function ScreenLoading({ quiet = false }) {
         >
           <i style={{ transform: `scaleX(${done / total})` }} />
           <span aria-hidden="true">
-            사건 {done}/{total}
+            {fill(loadingCopy.progress, { done, total })}
           </span>
         </div>
       )}
       {slow && (
         <p className="screen-loading-slow">
-          연결이 느려 오래 걸리고 있습니다. 저장된 진행은 그대로입니다.{" "}
+          {loadingCopy.slow}{" "}
           <button type="button" className="ghost" data-testid="screen-loading-retry" onClick={() => globalThis.location.reload()}>
-            다시 불러오기
+            {loadingCopy.slowRetry}
           </button>
         </p>
       )}

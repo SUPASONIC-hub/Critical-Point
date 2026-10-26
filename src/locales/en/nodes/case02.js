@@ -32,7 +32,7 @@ export default {
       },
       "place": "Trigger Lab, security audit room",
       "clock": "Phase 1 report in 2h",
-      "question": "A contract colleague 2 weeks from renewal is named as the leaker, and every record points to him. What will you write in the report due in 2 hours?",
+      "question": "A contract colleague 2 weeks from renewal is named as the leaker, and every record points to her. What will you write in the report due in 2 hours?",
       "lead": "The morning after you return from the FlowOn site, you are called to Trigger Lab’s security audit room. The leaked file is the original review report you asked to see at FlowOn, and the person who filed that scan is the contract worker Lee Minseo."
     },
     "c2_logs": {
@@ -65,7 +65,7 @@ export default {
     },
     "c2_meeting": {
       "title": "Lee Minseo’s Account",
-      "text": "Lee Minseo tells last night again from the start. At 23:41, he says, he was sitting in an emergency room waiting chair. He still has the intake number slip in his wallet. He has requested the hospital record; it has not come yet. He holds his staff ID face down and asks, 'My renewal review is in 2 weeks. If my name goes up before that, the contract ends even if I’m cleared later. If the record points at me, am I already finished?' On the table, your phone shows a text from Ban Jaewook. One line: don’t judge on feeling. Do Yoonha stands by the door, listening for footsteps in the hall.",
+      "text": "Lee Minseo tells last night again from the start. At 23:41, she says, she was sitting in an emergency room waiting chair. She still has the intake number slip in her wallet. She has requested the hospital record; it has not come yet. She holds her staff ID face down and asks, 'My renewal review is in 2 weeks. If my name goes up before that, the contract ends even if I’m cleared later. If the record points at me, am I already finished?' On the table, your phone shows a text from Ban Jaewook. One line: don’t judge on feeling. Do Yoonha stands by the door, listening for footsteps in the hall.",
       "memo": [
         "ER visit claim not yet verified",
         "Lee Minseo was told to file the FlowOn review report scan",
@@ -74,7 +74,7 @@ export default {
       ],
       "choices": {
         "c2_meeting_report": {
-          "label": "Write down his statement and hand it to Audit"
+          "label": "Write down her statement and hand it to Audit"
         },
         "c2_meeting_shadow": {
           "label": "Trace other terminals’ access with Do Yoonha first"
@@ -88,7 +88,7 @@ export default {
       },
       "place": "Trigger Lab, 3rd-floor informal interview room",
       "clock": "Phase 1 report in 1h 10m",
-      "question": "Lee Minseo says he was in the emergency room at that hour. Will you check the alibi first, or pass it to procedure?",
+      "question": "Lee Minseo says she was in the emergency room at that hour. Will you check the alibi first, or pass it to procedure?",
       "lead": "The 3rd-floor interview room. You have sat across from Lee Minseo behind a closed door for over 30 minutes. This is contact before the formal interview, so the meeting itself may end up on record."
     },
     "c2_pressure": {
@@ -121,11 +121,12 @@ export default {
     },
     "c2_aftershock": {
       "title": "Who Changed the Record",
-      "text": "Four in the morning, the day after the report. One log terminal is on in the security audit room. ECHO reports what changed overnight in one line. After the report went up, a line vanished from the original record. The copy still has it, and the two records show different times. Lee Minseo’s account was locked with the report, so it was not his hand. 'It is now possible that the record naming Lee Minseo and the record you used in your report were made by the same hand. Three accounts can delete this line. One of them belongs to the Group Strategy Office.' Outside the window, a dawn-delivery truck passes down a Hapjeong-dong alley.",
+      "text": "Four in the morning, the day after the report. One log terminal is on in the security audit room. ECHO reports what changed overnight in one line. After the report went up, a line vanished from the original record. The copy still has it, and the two records show different times. Lee Minseo’s account was locked with the report, so it was not her hand. 'It is now possible that the record naming Lee Minseo and the record you used in your report were made by the same hand. Three accounts can delete this line. One of them belongs to the Group Strategy Office. Yesterday that account opened Assistant Manager Oh Jinwoo’s report 4 seconds after it appeared on the shared screen.' Outside the window, a dawn-delivery truck passes down a Hapjeong-dong alley.",
       "memo": [
         "Original and copy show different times",
         "Lee Minseo’s account already locked",
-        "1 of 3 accounts with delete rights is in Group Strategy"
+        "1 of 3 accounts with delete rights is in Group Strategy",
+        "That account opened Oh Jinwoo’s report within 4 seconds"
       ],
       "choices": {
         "c2_after_audit": {
@@ -160,7 +161,7 @@ export default {
           "label": "Reproduce the 11 seconds technically"
         },
         "c2_trace_choice_2": {
-          "label": "Ask Lee Minseo what he did in that time"
+          "label": "Ask Lee Minseo what she did in that time"
         }
       },
       "place": "Trigger Lab, emergency stairs · Video call with the Hoegi-dong bookshop",
@@ -170,7 +171,7 @@ export default {
     },
     "c2_witness": {
       "title": "Lee Minseo’s Silence",
-      "text": "Not once does Lee Minseo say he didn’t do it. Instead, he asks a question. Not who received the file, but why the order to file only page 3, the one with the blank signature line, came to him of all people. The order came only by word of mouth. Put one scan in a folder, it said, and he did it without reading it. His work email does not name who told him. Do Yoonha pours water into a paper cup and sets it in front of him. Lee Minseo doesn’t drink; he just holds the cup in both hands. 'I didn’t even know what that paper was. But now I’m here because of that paper.'",
+      "text": "Not once does Lee Minseo say she didn’t do it. Instead, she asks a question. Not who received the file, but why the order to file only page 3, the one with the blank signature line, came to her of all people. The order came only by word of mouth. Put one scan in a folder, it said, and she did it without reading it. Her work email does not name who told her. Do Yoonha pours water into a paper cup and sets it in front of her. Lee Minseo doesn’t drink; she just holds the cup in both hands. 'I didn’t even know what that paper was. But now I’m here because of that paper.'",
       "memo": [
         "Filing order given only verbally",
         "Order covered one sheet: page 3",
@@ -188,12 +189,12 @@ export default {
           "label": "Trace only the file’s path"
         },
         "c2_witness_choice_3": {
-          "label": "Record his silence as a red flag"
+          "label": "Record her silence as a red flag"
         }
       },
       "place": "Trigger Lab, 3rd-floor informal interview room",
       "clock": "Phase 1 report in 55m",
-      "question": "Lee Minseo does not defend himself; he asks what the file was for. Which comes first: his safety, or moving the case?"
+      "question": "Lee Minseo does not defend herself; she asks what the file was for. Which comes first: her safety, or moving the case?"
     },
     "c2_judgment": {
       "title": "The People Outside the Report",
@@ -242,17 +243,17 @@ export default {
     },
     "c2_witness_reaction": {
       "title": "The Word Protection",
-      "text": "As you are about to leave the interview room, Lee Minseo stops with his hand on the doorknob. Ban Jaewook waits in the hall with his notebook. For the first time, Lee Minseo says what he really thinks. 'I know there’s talk of protection measures. But that scares me. If I’m hidden away, the place where I can say with my own mouth that it wasn’t me disappears too.' Ban Jaewook listens without closing his notebook. 'Once protection is in place, the person’s statements go through a representative. That’s the rule.' He looks at you. 'On paper, protecting someone and silencing them go in the same box. You have to decide which way to write it.'",
+      "text": "As you are about to leave the interview room, Lee Minseo stops with her hand on the doorknob. Ban Jaewook waits in the hall with his notebook. For the first time, Lee Minseo says what she really thinks. 'I know there’s talk of protection measures. But that scares me. If I’m hidden away, the place where I can say with my own mouth that it wasn’t me disappears too.' Ban Jaewook listens without closing his notebook. 'Once protection is in place, the person’s statements go through a representative. That’s the rule.' He looks at you. 'On paper, protecting someone and silencing them go in the same box. You have to decide which way to write it.'",
       "memo": [
         "Procedure separating protection from silence",
         "Disclosure scope the person can choose"
       ],
       "choices": {
         "c2_witness_reaction_choice_2": {
-          "label": "Testify in his place to cut the risk"
+          "label": "Testify in her place to cut the risk"
         },
         "c2_witness_reaction_choice_1": {
-          "label": "Set up a way for Lee Minseo to speak for himself"
+          "label": "Set up a way for Lee Minseo to speak for herself"
         },
         "c2_witness_reaction_choice_3": {
           "label": "Skip protection and leave it to the probe"
@@ -260,7 +261,7 @@ export default {
       },
       "place": "Trigger Lab, 3rd-floor hallway",
       "clock": "Phase 1 report in 45m",
-      "question": "Lee Minseo says he is afraid of being protected. Will you set up a way for him to speak for himself?"
+      "question": "Lee Minseo says she is afraid of being protected. Will you set up a way for her to speak for herself?"
     },
     "c2_judgment_reaction": {
       "title": "The Price of Anonymity",
@@ -332,7 +333,7 @@ export default {
     },
     "c2_route_report": {
       "title": "The Report Moves First",
-      "text": "Once you decide to move the report first, procedure runs ahead in under 10 minutes. Group Security locks Lee Minseo’s account, and a disciplinary notice generates itself in the HR system. It even has a document number. Han Seoyun turns the screen toward you. The official draft already carries the report Oh Jinwoo wrote before dawn as an attachment, and Lee Minseo’s rebuttal material is filed in a folder called 'Off-procedure documents'. 'From the moment a report starts, the documents do the work, not the people. The question now isn’t whether he did it. It’s where we can stop a procedure that has started rolling the wrong way.'",
+      "text": "Once you decide to move the report first, procedure runs ahead in under 10 minutes. Group Security locks Lee Minseo’s account, and a disciplinary notice generates itself in the HR system. It even has a document number. Han Seoyun turns the screen toward you. The official draft already carries the report Oh Jinwoo wrote before dawn as an attachment, and Lee Minseo’s rebuttal material is filed in a folder called 'Off-procedure documents'. 'From the moment a report starts, the documents do the work, not the people. The question now isn’t whether she did it. It’s where we can stop a procedure that has started rolling the wrong way.'",
       "memo": [
         "Disciplinary notice generated first",
         "Oh Jinwoo’s report attached to the official draft",
@@ -359,7 +360,7 @@ export default {
     },
     "c2_route_person": {
       "title": "The Person Who Arrived Before the Record",
-      "text": "At the end of the 3rd-floor hallway, a small interview room that usually holds stacked supplies. Do Yoonha opens the door; Lee Minseo is already seated. His phone lies face down on his knee; when he sees you, he flips it over and holds it out. It is last night’s intake text from the hospital emergency room. No one has yet checked whether it is genuine. You read him the leaked file line by line, and he looks up. 'That sentence was in the scan I was filing.' Do Yoonha shuts the door and speaks low. 'Meeting before the formal interview can end up on record by itself. Wanting to protect him isn’t enough. We have to set the terms under which he can speak.'",
+      "text": "At the end of the 3rd-floor hallway, a small interview room that usually holds stacked supplies. Do Yoonha opens the door; Lee Minseo is already seated. Her phone lies face down on her knee; when she sees you, she flips it over and holds it out. It is last night’s intake text from the hospital emergency room. No one has yet checked whether it is genuine. You read her the leaked file line by line, and she looks up. 'That sentence was in the scan I was filing.' Do Yoonha shuts the door and speaks low. 'Meeting before the formal interview can end up on record by itself. Wanting to protect her isn’t enough. We have to set the terms under which she can speak.'",
       "memo": [
         "ER intake text not yet verified as genuine",
         "Informal contact itself may be logged as a breach",
@@ -367,10 +368,10 @@ export default {
       ],
       "choices": {
         "c2_route_person_record": {
-          "label": "Make an official record where he can speak himself"
+          "label": "Make an official record where she can speak herself"
         },
         "c2_route_person_shield": {
-          "label": "Testify in his place to cut his exposure for now"
+          "label": "Testify in her place to cut her exposure for now"
         },
         "c2_route_person_trade": {
           "label": "Offer protection, then ask the file’s source first"
@@ -424,7 +425,7 @@ export default {
           "label": "Preserve the copied choice wording as evidence"
         },
         "c2_route_system_hide": {
-          "label": "Hide the experiment’s trace, solve only his case"
+          "label": "Hide the experiment’s trace, solve only her case"
         },
         "c2_route_system_warn": {
           "label": "Warn the next participant of a possible experiment"
@@ -440,7 +441,7 @@ export default {
     },
     "c2_final_evidence": {
       "title": "The Culprit Procedure Made",
-      "text": "Just before the Phase 1 deadline, Security’s draft is up on the audit room screen. It uses Oh Jinwoo’s report as its skeleton, unchanged. The conclusion is that Lee Minseo alone is responsible, and the disciplinary process, carrying the notice’s document number, has already moved to the next stage. Han Seoyun points to the draft’s last page. The chance to rebut is listed as 'appeal after discipline'. 'If we add a hold, we miss the deadline. If we send it as is, he can only speak after he’s been punished.' She sets a pen beside the signature box. 'I’ll ask what I asked at the start once more. Where you’ll stop this procedure. This time you also have to say in whose name.'",
+      "text": "Just before the Phase 1 deadline, Security’s draft is up on the audit room screen. It uses Oh Jinwoo’s report as its skeleton, unchanged. The conclusion is that Lee Minseo alone is responsible, and the disciplinary process, carrying the notice’s document number, has already moved to the next stage. Han Seoyun points to the draft’s last page. The chance to rebut is listed as 'appeal after discipline'. 'If we add a hold, we miss the deadline. If we send it as is, she can only speak after she’s been punished.' She sets a pen beside the signature box. 'I’ll ask what I asked at the start once more. Where you’ll stop this procedure. This time you also have to say in whose name.'",
       "memo": [
         "Security’s draft closes on Lee Minseo alone",
         "A hold breaks the report deadline",
@@ -463,21 +464,21 @@ export default {
     },
     "c2_final_person": {
       "title": "Whose Voice Is Protection",
-      "text": "Just before the Phase 1 deadline, a statement form lies on the audit room table. So far, what Lee Minseo said exists only in your notes and Do Yoonha’s. Do Yoonha reads down the notes and stops. 'If I clean this up, it gets much neater. But the neater it gets, the less it sounds like him.' Beyond the glass wall, Lee Minseo sits on a hallway chair, gripping his staff ID. He said he wants to read his own statement. If his real name goes up, it circulates before his renewal review. Writing it for him is safe, but his voice disappears again. The last thing to decide is whether to shield him or give him back the right to speak.",
+      "text": "Just before the Phase 1 deadline, a statement form lies on the audit room table. So far, what Lee Minseo said exists only in your notes and Do Yoonha’s. Do Yoonha reads down the notes and stops. 'If I clean this up, it gets much neater. But the neater it gets, the less it sounds like her.' Beyond the glass wall, Lee Minseo sits on a hallway chair, gripping her staff ID. She said she wants to read her own statement. If her real name goes up, it circulates before her renewal review. Writing it for her is safe, but her voice disappears again. The last thing to decide is whether to shield her or give her back the right to speak.",
       "memo": [
-        "Lee Minseo wants to check his own statement",
+        "Lee Minseo wants to check her own statement",
         "Real name raises the immediate risk",
-        "Proxy statement is safe but erases him as a party"
+        "Proxy statement is safe but erases her as a party"
       ],
       "choices": {
         "c2_final_person_voice": {
-          "label": "Let him testify and choose how much is disclosed"
+          "label": "Let her testify and choose how much is disclosed"
         },
         "c2_final_person_release": {
-          "label": "Lift protection; let him prove it in the probe"
+          "label": "Lift protection; let her prove it in the probe"
         },
         "c2_final_person_proxy": {
-          "label": "Testify for him and keep his name hidden a while"
+          "label": "Testify for her and keep her name hidden a while"
         }
       },
       "place": "Trigger Lab, security audit room",
@@ -494,10 +495,10 @@ export default {
       ],
       "choices": {
         "c2_final_system_expose": {
-          "label": "Make the experiment design official over his guilt"
+          "label": "Make the experiment design official over her guilt"
         },
         "c2_final_system_contain": {
-          "label": "Seal the experiment’s trace, report his charge lower"
+          "label": "Seal the experiment’s trace, report her charge lower"
         },
         "c2_final_system_trace": {
           "label": "Hold every conclusion until the token has a name"
@@ -509,7 +510,7 @@ export default {
     },
     "c2_evidence_turn": {
       "title": "Protected Testimony Turns the Record",
-      "text": "You lay the clue you hold against the times in the leak log, and the numbers don’t line up. The leaked file was created 4 minutes after the transfer time. A file made after it was sent. In the 3rd-floor interview room, Lee Minseo stares at the screen for a long while, then speaks. 'My account was locked this morning. So it’s my record, and I’m the only one who can’t see it.' He winds his ID lanyard around his finger. 'Everyone asks who talked. Nobody asks who made sure I couldn’t.' On the screen, the two times sit side by side, still in reverse order.",
+      "text": "You lay the clue you hold against the times in the leak log, and the numbers don’t line up. The leaked file was created 4 minutes after the transfer time. A file made after it was sent. In the 3rd-floor interview room, Lee Minseo stares at the screen for a long while, then speaks. 'My account was locked this morning. So it’s my record, and I’m the only one who can’t see it.' She winds her ID lanyard around her finger. 'Everyone asks who talked. Nobody asks who made sure I couldn’t.' On the screen, the two times sit side by side, still in reverse order.",
       "memo": [
         "File created 4 minutes after the transfer time",
         "Signs protection measures isolated the witness",
@@ -532,7 +533,7 @@ export default {
     },
     "c2_start_people": {
       "title": "The Next Case for the Protected",
-      "text": "The morning after you return from the FlowOn site, Do Yoonha is already waiting at the door of Trigger Lab’s security audit room. 'Lee Minseo’s been flagged as the leaker. Last night at 23:41, the access log and the transfer log are all his account.' The file that went out is the scan of the 2023-0412 review report you asked to see at FlowOn, specifically page 3, where the signature line is blank. Lee Minseo is the contract worker who was filing that scan, and his renewal review is in 2 weeks. In the last case, you put people’s voices on record first. Maybe that is why, this time, a person has come before the record. A text from Lee Minseo sits on your phone. 'Just 5 minutes before the report goes up.' Internal Audit wants a Phase 1 report within 2 hours.",
+      "text": "The morning after you return from the FlowOn site, Do Yoonha is already waiting at the door of Trigger Lab’s security audit room. 'Lee Minseo’s been flagged as the leaker. Last night at 23:41, the access log and the transfer log are all her account.' The file that went out is the scan of the 2023-0412 review report you asked to see at FlowOn, specifically page 3, where the signature line is blank. Lee Minseo is the contract worker who was filing that scan, and her renewal review is in 2 weeks. In the last case, you put people’s voices on record first. Maybe that is why, this time, a person has come before the record. A text from Lee Minseo sits on your phone. 'Just 5 minutes before the report goes up.' Internal Audit wants a Phase 1 report within 2 hours.",
       "memo": [
         "A request for anonymous testimony already came in",
         "Lee Minseo contacted you directly",
@@ -592,7 +593,7 @@ export default {
     },
     "c2_start_silence": {
       "title": "The Bill for Silence",
-      "text": "The morning after you return from the FlowOn site, Han Seoyun closes the security audit room door and holds out her tablet. It is the file that went out at 23:41 last night. Page 3 of the 2023-0412 review report scan, the one with the blank signature line, and the access log points to the account of Lee Minseo, a contract data officer. His renewal review is in 2 weeks. But one more paragraph is attached at the end of the file. The terms you chose not to disclose in the last case, until the next funding came in, are written word for word as they were spoken inside the meeting room. Han Seoyun says, 'Putting it off doesn’t make it go away. It just comes out of someone else’s hands first.' 2 hours to the Phase 1 report.",
+      "text": "The morning after you return from the FlowOn site, Han Seoyun closes the security audit room door and holds out her tablet. It is the file that went out at 23:41 last night. Page 3 of the 2023-0412 review report scan, the one with the blank signature line, and the access log points to the account of Lee Minseo, a contract data officer. Her renewal review is in 2 weeks. But one more paragraph is attached at the end of the file. The terms you chose not to disclose in the last case, until the next funding came in, are written word for word as they were spoken inside the meeting room. Han Seoyun says, 'Putting it off doesn’t make it go away. It just comes out of someone else’s hands first.' 2 hours to the Phase 1 report.",
       "memo": [
         "Leaked file includes words from a closed meeting",
         "Lee Minseo is the first suspect",
@@ -623,13 +624,13 @@ export default {
   },
   "echoReplies": {
     "c2_start_report": "As the report goes up, Ban Jaewook writes down the time and sets his pen down. A report written from the record alone was fast, but the name Lee Minseo, now in its first line, won’t come off easily.",
-    "c2_start_meet": "When you meet at the end of the hall, Lee Minseo turns his staff ID face down. A door to the hidden story has opened, but the blame for delaying evidence and the report stays under your name.",
+    "c2_start_meet": "When you meet at the end of the hall, Lee Minseo turns her staff ID face down. A door to the hidden story has opened, but the blame for delaying evidence and the report stays under your name.",
     "c2_start_verify": "You reopen the original, and the three lines match the same time without a gap. What the system recorded is clear, but what Lee Minseo actually did at that hour is still off the screen.",
     "c2_logs_verify": "With the two sets side by side, one deletion-attempt line is stamped differently in each. The place where they split has narrowed, but who made it is still outside the record.",
-    "isolate": "The account locks, and Lee Minseo’s staff ID flashes red at the entrance gate. The path for the damage to spread is blocked, but if he is innocent, you are the one who started the punishment.",
+    "isolate": "The account locks, and Lee Minseo’s staff ID flashes red at the entrance gate. The path for the damage to spread is blocked, but if she is innocent, you are the one who started the punishment.",
     "escalate": "You show her the screen, and Han Seoyun takes the printout and puts it in her drawer. Passing the judgment up is safe, but how to read this case is now in that drawer too.",
-    "c2_meeting_meet": "As you take the number slip, Lee Minseo lets go of his staff ID for the first time. Putting a person’s time ahead of the record is an order that is hard to undo if it flips. You head down to the backup server room to match the ER intake time against the record.",
-    "c2_meeting_report": "You hand over the statement, and Do Yoonha opens the door to let Lee Minseo out into the hall. The procedure looks fair, but inside it, Lee Minseo has to make room to explain himself alone.",
+    "c2_meeting_meet": "As you take the number slip, Lee Minseo lets go of her staff ID for the first time. Putting a person’s time ahead of the record is an order that is hard to undo if it flips. You head down to the backup server room to match the ER intake time against the record.",
+    "c2_meeting_report": "You hand over the statement, and Do Yoonha opens the door to let Lee Minseo out into the hall. The procedure looks fair, but inside it, Lee Minseo has to make room to explain herself alone.",
     "c2_meeting_shadow": "Do Yoonha shuts the hall door, and the two of you spread out the terminal lists floor by floor. The field has widened, but from the moment you move outside procedure, your judgment is under investigation too.",
     "c2_pressure_report": "Once you sign, Oh Jinwoo swivels his chair and uploads the report to the system. The case is closed and the organization goes quiet, but nowhere in the three pages does it say that Lee Minseo paid for that quiet.",
     "c2_pressure_verify": "You set the clock, and the marker in the corner of ECHO’s screen grows one notch longer. 30 minutes is short for a counter-proof and plenty for an excuse; if you find nothing, you go on record as someone who agreed.",
@@ -638,9 +639,9 @@ export default {
     "c2_after_person": "Asking directly is fast. But this conversation itself may later read as pressure on a witness.",
     "c2_after_public": "Going public at once stops a cover-up. Suspicion thrown out without proof may burn an innocent person first.",
     "c2_trace_choice_1": "A reproduction shows what was possible, but possible and done are not the same.",
-    "c2_trace_choice_2": "Asking directly brings a faster answer, and the moment you ask, he is already a suspect.",
+    "c2_trace_choice_2": "Asking directly brings a faster answer, and the moment you ask, she is already a suspect.",
     "c2_trace_choice_3": "The deadline you kept is quiet today, and the 11 seconds you closed as an error reopen in the next case.",
-    "c2_witness_choice_1": "Putting safety first slows the probe, and the conditions under which he can speak remain.",
+    "c2_witness_choice_1": "Putting safety first slows the probe, and the conditions under which she can speak remain.",
     "c2_witness_choice_2": "Looking only at the path seems fair, but at the end of that path a person still stands.",
     "c2_witness_choice_3": "The moment you write silence down as a signal, the next person gains one more reason not to speak.",
     "c2_witness_choice_4": "A deal brings answers fast, but the bill for those answers comes later.",
@@ -650,9 +651,9 @@ export default {
     "c2_trace_reaction_choice_1": "Locking is not fixing, but it makes erasing impossible too.",
     "c2_trace_reaction_choice_2": "Following the account reaches the cause, and reaches a person too.",
     "c2_trace_reaction_choice_3": "A reset wipes out the evidence along with the error.",
-    "c2_witness_reaction_choice_1": "A way to speak for himself is slow, but that statement won’t collapse in someone else’s hands.",
-    "c2_witness_reaction_choice_2": "Speaking for him makes him safe, but his own words vanish from the record.",
-    "c2_witness_reaction_choice_3": "Without protection, suspicion and opportunity both stay with him.",
+    "c2_witness_reaction_choice_1": "A way to speak for herself is slow, but that statement won’t collapse in someone else’s hands.",
+    "c2_witness_reaction_choice_2": "Speaking for her makes her safe, but her own words vanish from the record.",
+    "c2_witness_reaction_choice_3": "Without protection, suspicion and opportunity both stay with her.",
     "c2_judgment_reaction_choice_1": "Testimony with its limits stated looks weak, but it holds up under rebuttal.",
     "c2_judgment_reaction_choice_2": "Real names make the report solid and the witnesses thin.",
     "c2_judgment_reaction_choice_3": "The sentences you chose to drop keep circulating outside the report.",
@@ -666,7 +667,7 @@ export default {
     "c2_route_report_sign": "A footnote is too small to save a person, and may be enough to prove responsibility later.",
     "c2_route_report_reopen": "Look into the report’s speed, and the designer may come into view before the culprit.",
     "c2_route_person_record": "Protection that makes a place to speak also leaves the right to be doubted.",
-    "c2_route_person_shield": "Speaking for him makes him safe, but his voice becomes your sentences again.",
+    "c2_route_person_shield": "Speaking for her makes her safe, but her voice becomes your sentences again.",
     "c2_route_person_trade": "The moment protection becomes a bargain, the relationship moves fast and spoils for a long time.",
     "c2_route_origin_freeze": "With the original frozen, no one can easily rewrite the conclusion.",
     "c2_route_origin_token": "Chasing the rights makes you watch how access moved, not whose name it was.",
@@ -677,20 +678,20 @@ export default {
     "c2_final_evidence_stop": "A sentence that stops the procedure comes late, but it becomes the standard for the next discipline case.",
     "c2_final_evidence_file": "A separate case barely meets today’s deadline and creates tomorrow’s responsibility.",
     "c2_final_evidence_close": "A quick close protects operations but pushes the right to rebut to after the fact.",
-    "c2_final_person_voice": "Giving his voice back turns protection from control into a right.",
+    "c2_final_person_voice": "Giving her voice back turns protection from control into a right.",
     "c2_final_person_proxy": "A proxy statement buys safety but takes the person’s choice away again.",
     "c2_final_person_release": "The moment protection lifts, the official weight goes up, and so does the human cost.",
     "c2_final_system_expose": "Exposing the structure blurs Lee Minseo’s name and shakes the whole experiment.",
     "c2_final_system_trace": "While the conclusion waits, the risk remains, but the direction of the evidence grows clear.",
     "c2_final_system_contain": "Sealing it may limit the damage, but the experiment’s authority stays intact.",
-    "c2_evidence_turn_guard": "With his access back, the statement becomes verification, not defense.",
+    "c2_evidence_turn_guard": "With her access back, the statement becomes verification, not defense.",
     "c2_evidence_turn_stamp": "Evidence sent outside can’t be taken back, and neither can the organization’s response.",
     "c2_evidence_turn_delay": "The restored log protects the statement. Meanwhile, the witness waits alone.",
     "c2_route_report_evidence_turn": "Set the two times against each other, and the subject of the charge shifts from a person to the record.",
     "c2_route_person_evidence_turn": "Set the two times against each other, and the subject of the charge shifts from a person to the record.",
     "c2_route_origin_evidence_turn": "Set the two times against each other, and the subject of the charge shifts from a person to the record.",
     "c2_route_system_evidence_turn": "Set the two times against each other, and the subject of the charge shifts from a person to the record.",
-    "case02_memory_route": "Check the promise first, and Lee Minseo is called a person before he is a record. The report’s first line fills in that much later.",
+    "case02_memory_route": "Check the promise first, and Lee Minseo is called a person before she is a record. The report’s first line fills in that much later.",
     "case02_memory_system": "Take it apart, and one line of the leaked file is written in the same order as the table you reframed at FlowOn. The subject of the charge shifts from Lee Minseo to whoever made the record.",
     "case02_memory_evidence": "Stand the payroll sheet beside it, and the leaked file’s creation time and the testimony time don’t line up. What remains first is not who talked, but who kept someone from talking.",
     "c2_start_people_report": "The one who put people first last case now leads with the record. The team sees that shift too.",
@@ -708,13 +709,13 @@ export default {
   },
   "choiceVoiceLines": {
     "c2_start_report": "Noting that the logs are all you have, you file the Phase 1 report on the three 23:41 log lines.",
-    "c2_start_meet": "Knowing the risk, you put his face ahead of procedure and meet Lee Minseo alone first, in the hall outside the audit room.",
+    "c2_start_meet": "Knowing the risk, you put her face ahead of procedure and meet Lee Minseo alone first, in the hall outside the audit room.",
     "c2_start_verify": "Saying you can’t trust evidence this clean, you reopen the original 23:41 record on the log terminal.",
     "c2_logs_verify": "The more perfect the record, the more the copy matters, so you match the original and backup logs line by line in the backup server room.",
-    "isolate": "Leaving room for his innocence, you call Security and lock Lee Minseo’s account at once.",
+    "isolate": "Leaving room for her innocence, you call Security and lock Lee Minseo’s account at once.",
     "escalate": "Knowing the right to read this case leaves your hands, you take the log screen straight up to Han Seoyun’s office.",
-    "c2_meeting_meet": "Where he was at that hour comes before the charge, so you take the ER intake number slip and match it to 23:41.",
-    "c2_meeting_report": "If you waver now, an impression stays instead of a judgment, so you write down his statement and hand it to Internal Audit’s formal procedure.",
+    "c2_meeting_meet": "Where she was at that hour comes before the charge, so you take the ER intake number slip and match it to 23:41.",
+    "c2_meeting_report": "If you waver now, an impression stays instead of a judgment, so you write down her statement and hand it to Internal Audit’s formal procedure.",
     "c2_meeting_shadow": "Stepping back outside the official record, you quietly trace other terminals’ access with Do Yoonha before the report.",
     "c2_pressure_report": "Dragging it out would reach the same conclusion, you say, and you sign your agreement under the first line of Oh Jinwoo’s report.",
     "c2_pressure_verify": "One thing that overturns the conclusion is enough, so you look for one more counter-clue within Han Seoyun’s 30 minutes.",
@@ -723,11 +724,11 @@ export default {
     "c2_after_person": "Knowing the risk of skipping procedure, you ask Lee Minseo directly.",
     "c2_after_public": "To leave no time for a cover-up, you report the possible tampering outside at once.",
     "c2_trace_choice_1": "You say you will reproduce exactly what was possible in those 11 seconds.",
-    "c2_trace_choice_2": "You say you will ask Lee Minseo directly what he did in that time.",
+    "c2_trace_choice_2": "You say you will ask Lee Minseo directly what she did in that time.",
     "c2_trace_choice_3": "You say you will file it as a simple error and keep the report deadline.",
     "c2_witness_choice_1": "You say you will secure Lee Minseo’s safety before any conclusion.",
     "c2_witness_choice_2": "You say you will leave the person aside and follow only the path the file took.",
-    "c2_witness_choice_3": "You say you will record his silence as a red flag.",
+    "c2_witness_choice_3": "You say you will record her silence as a red flag.",
     "c2_witness_choice_4": "You say you will strike a deal on terms with the person named.",
     "c2_judgment_choice_1": "You say you will attach the anonymous statements to the report as an official annex.",
     "c2_judgment_choice_2": "You say you will hold back anything not in the record from this report.",
@@ -735,8 +736,8 @@ export default {
     "c2_trace_reaction_choice_1": "You say you will leave the record as it is and lock only the access.",
     "c2_trace_reaction_choice_2": "You say you will follow what that account did all the way to the end.",
     "c2_trace_reaction_choice_3": "You say you will reset the system and rebuild it from the start.",
-    "c2_witness_reaction_choice_1": "You say you will set up a way for him to speak for himself.",
-    "c2_witness_reaction_choice_2": "You say you will testify in his place and share the risk.",
+    "c2_witness_reaction_choice_1": "You say you will set up a way for her to speak for herself.",
+    "c2_witness_reaction_choice_2": "You say you will testify in her place and share the risk.",
     "c2_witness_reaction_choice_3": "You say you will skip protection measures and leave it to the official probe.",
     "c2_judgment_reaction_choice_1": "You say you will keep them anonymous and write down the limits too.",
     "c2_judgment_reaction_choice_2": "You say you will report only after confirming their real names.",
@@ -750,7 +751,7 @@ export default {
     "c2_route_report_hold": "You slip a hold into the disciplinary notice so the procedure can’t run ahead of the person.",
     "c2_route_report_sign": "You send the report up, but leave the chance of rebuttal in a small footnote.",
     "c2_route_report_reopen": "You start over by tracing why the report was finished so fast.",
-    "c2_route_person_record": "Since informal contact can be a breach in itself, you make an official record where Lee Minseo can speak for himself.",
+    "c2_route_person_record": "Since informal contact can be a breach in itself, you make an official record where Lee Minseo can speak for herself.",
     "c2_route_person_shield": "To cut the risk, you submit Lee Minseo’s words under your own name.",
     "c2_route_person_trade": "Since Lee Minseo recognized some lines of the leaked file, you offer protection and ask for the file’s source first.",
     "c2_route_origin_freeze": "With the checksums differing, neither side can be touched, so you freeze both the original and the backup and disclose the difference.",
@@ -762,13 +763,13 @@ export default {
     "c2_final_evidence_stop": "So a procedure that started wrong doesn’t punish the person first, you make rebuttal rights and source verification public conditions before discipline.",
     "c2_final_evidence_file": "Since a hold would break the deadline, you file the Phase 1 report but register the procedure flaw as a separate case.",
     "c2_final_evidence_close": "Saying the disciplinary process is already moving and too late to stop, you close it per Oh Jinwoo’s draft and leave blame to a later audit.",
-    "c2_final_person_voice": "You let Lee Minseo choose for himself how much of his statement is disclosed.",
-    "c2_final_person_proxy": "To keep his name hidden, you give the statement in his place.",
-    "c2_final_person_release": "Saying his words carry no weight while he is hidden, you lift protection and let him prove himself in the official probe.",
+    "c2_final_person_voice": "You let Lee Minseo choose for herself how much of her statement is disclosed.",
+    "c2_final_person_proxy": "To keep her name hidden, you give the statement in her place.",
+    "c2_final_person_release": "Saying her words carry no weight while she is hidden, you lift protection and let her prove herself in the official probe.",
     "c2_final_system_expose": "Instead of one person’s guilt, you put the possibility of an experiment design on the record as an official finding.",
     "c2_final_system_trace": "Unable to close while no one knows whose admin token it is, you hold every conclusion until the real name is confirmed.",
     "c2_final_system_contain": "Knowing disclosure would shake the whole experiment, you seal its trace and report only a lowered charge against Lee Minseo.",
-    "c2_evidence_turn_guard": "Saying the person who will speak must be able to see his own record first, you restore his access.",
+    "c2_evidence_turn_guard": "Saying the person who will speak must be able to see her own record first, you restore her access.",
     "c2_evidence_turn_stamp": "You bundle the proof that the file was made after it was sent and send it outside as it is.",
     "c2_evidence_turn_delay": "So the words don’t go out ahead of the record, you finish the restoration first.",
     "c2_route_report_evidence_turn": "Setting the leaked file’s creation time against the transfer time, you ask again whether this was really one person’s doing.",
@@ -802,7 +803,7 @@ export default {
       "c2_after_person": {
         "tag": "Met the person",
         "title": "Protection Left the Right to Be Doubted",
-        "text": "Lee Minseo got to speak for himself, and the case grew more complicated. In return, the next judgment will find it harder to erase a person’s context."
+        "text": "Lee Minseo got to speak for herself, and the case grew more complicated. In return, the next judgment will find it harder to erase a person’s context."
       },
       "c2_after_public": {
         "tag": "Went public at once",

@@ -149,10 +149,12 @@ const BUDGETS = {
   // nine imported names and the report's 29-name unpacking went with it.
   // Measured 950 / 95 and a longest line of 175 (183 once confirm-in-game's
   // awaited confirm lands, which is why the cap is 190 rather than 180).
+  // 96 -> 98 on 2026-10-26, 다국어 틀: the run's notices table
+  // (src/copy/notices.js) and `fill` for its two lines with blanks.
   "src/GameRuntime.jsx": {
     lines: 960,
     longestLine: 190,
-    importedNames: 96,
+    importedNames: 98,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
@@ -169,16 +171,20 @@ const BUDGETS = {
   // `.report-archive`, is `ReportArchive.jsx`. Measured 379 / 9.
   // 400 -> 340 on 2026-09-29: the verdicts, afterglows and axis copy are
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
+  // 10 -> 12 on 2026-10-26, 다국어 틀: the screen's copy table
+  // (src/copy/result.js) and `fill` for its lines with blanks.
   "src/screens/ResultScreen.jsx": {
     lines: 340,
     longestLine: 280,
-    importedNames: 10,
+    importedNames: 12,
     hooks: {},
   },
+  // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
+  // (src/copy/report.js) and `fill` for its lines with blanks.
   "src/screens/ReportArchive.jsx": {
     lines: 640,
     longestLine: 260,
-    importedNames: 7,
+    importedNames: 9,
     hooks: {},
   },
   // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to
@@ -200,10 +206,12 @@ const BUDGETS = {
   // 847 / 69 -> 851 / 70 on 2026-10-24, measured: B-11(1)'s act title card,
   // one hook (ActCardFold.jsx's useActCard) that holds the draft and the
   // briefing while the card is up, and the card drawn in front of them.
+  // 70 -> 72 imported names on 2026-10-26, 다국어 틀: the screen's copy table
+  // (src/copy/table.js) and locale.js's `fill` for its lines with blanks.
   "src/gauntlet/GauntletStage.jsx": {
     lines: 851,
     longestLine: 250,
-    importedNames: 70,
+    importedNames: 72,
     hooks: {},
   },
 };

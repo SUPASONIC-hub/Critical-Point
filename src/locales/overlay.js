@@ -14,11 +14,12 @@
  * then splits the runtime differently). A case's scenes are written over as
  * the case arrives. Whatever a language leaves out stays Korean.
  */
-import { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
+import { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
 import { easyCognitionLabels, easyResourceLabels } from "../playerLanguage.js";
 import { CASE_SEQUENCE, caseObjectives, seasonCasesBase } from "../gameCases.js";
 
-const HANGUL = /[가-힣ㄱ-ㅣ]/;
+// Hangul, and the corner brackets only Korean copy uses (「」『』).
+const HANGUL = /[가-힣ㄱ-ㅣ「-』]/;
 const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
 /**
@@ -49,7 +50,7 @@ export function overlayWords(target, words) {
 // Named one by one: a namespace import would keep every export of the module
 // in the build, the ones the app never reads included.
 const SHELL_TABLES = {
-  appCopy: { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals },
+  appCopy: { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals },
   playerLanguage: { easyCognitionLabels, easyResourceLabels },
   gameCases: { caseObjectives, seasonCasesBase },
 };
@@ -101,6 +102,10 @@ export function previewText(key) {
   return fillPreview(dictionary?.preview?.[key] ?? "");
 }
 
+export function roleName(role) {
+  return dictionary?.roles?.[role] ?? role;
+}
+
 export function speakerName(name) {
   return dictionary?.speakers?.[name] ?? name;
 }
@@ -133,12 +138,12 @@ export function localizeCaseData(caseId, data, index) {
   const load = language && import.meta.glob("./*/nodes/*.js")[`./${language}/nodes/${caseId}.js`];
   if (!load) return localizeCase(caseId, data, index, null, speakers);
   return load().then(
-    (module) => localizeCase(caseId, data, index, module.default, speakers),
+    (module) => localizeCase(caseId, data, index, /** @type {{ default: object }} */ (module).default, speakers),
     () => localizeCase(caseId, data, index, null, speakers),
   );
 }
 
-const api = { localizeTables, previewText, speakerName, localizeCaseData };
+const api = { localizeTables, previewText, roleName, speakerName, localizeCaseData };
 
 /** A language's dictionary, laid over the shell's tables. Resolves to what src/locale.js calls, or null for a language with no dictionary. */
 export function loadDictionary(lang) {
