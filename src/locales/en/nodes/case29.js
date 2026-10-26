@@ -615,7 +615,7 @@ export default {
     "c29_hotel_publish": "Saying nothing can be undone once the signing is over, you have Seo Harin publish her story before the signing.",
     "c29_final_protect": "Saying that even if they’re sold, the repayment agreements must go with them, you say you’ll sign only with collection limits and restructuring carry-over clauses.",
     "c29_final_report": "Saying your signature can’t be the condition for a 1.2-billion-won-a-year post, you say you can’t submit the opinion until Annex C is reported to the board.",
-    "c29_final_sign": "Saying a empty signature field only gets you pushed out of here, you sign the opinion, carry the contract with its annex home, and fight from behind.",
+    "c29_final_sign": "Saying an empty signature field only gets you pushed out of here, you sign the opinion, carry the contract with its annex home, and fight from behind.",
     "c29_after_warm": "Unable to let her read her first reply in 7 years alone, you spend Singapore’s last night to the end with Seo Harin and Oh Jinwoo.",
     "c29_after_record": "Before what you saw blurs, you write Annex C up as a clean summary on the flight back.",
     "c29_after_rush": "Saying you have to ask the man named in the annex directly, you take the first flight back and roll your suitcase straight into Yoon Sanghyuk’s CEO office.",
