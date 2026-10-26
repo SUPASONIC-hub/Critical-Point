@@ -67,6 +67,10 @@ export function localizeTables(module, tables) {
   if (dictionary) overlayModule(dictionary.copy, module, tables);
 }
 
+export function previewText(key) {
+  return dictionary?.preview?.[key] ?? "";
+}
+
 export function speakerName(name) {
   return dictionary?.speakers?.[name] ?? name;
 }
@@ -99,7 +103,7 @@ export function localizeCaseData(caseId, data, index) {
   );
 }
 
-const api = { localizeTables, speakerName, localizeCaseData };
+const api = { localizeTables, previewText, speakerName, localizeCaseData };
 
 /** A language's dictionary, laid over the shell's tables. Resolves to what src/locale.js calls, or null for a language with no dictionary. */
 export function loadDictionary(lang) {

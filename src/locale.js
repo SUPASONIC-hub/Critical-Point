@@ -75,6 +75,11 @@ export function speakerName(name) {
   return overlay ? overlay.speakerName(name) : name;
 }
 
+/** A line of the language's own screens (its dictionary's `preview`, F-3 and F-4), or "" on a Korean page. */
+export function previewText(key) {
+  return overlay ? overlay.previewText(key) : "";
+}
+
 /** Tables of screen copy a module owns, laid over in the page's language as the module loads (caseCopy.js). */
 export function localizeTables(module, tables) {
   if (overlay) overlay.localizeTables(module, tables);

@@ -13,8 +13,11 @@
  * the owner's G-9 choice 1: common spellings). The scene keeps the Korean
  * name, which is the key of its portrait, its profile and the run log.
  *
- * `preview` is the copy of the preview's own screens (F-3, F-4), for when the
- * language choice and the end-of-preview card are built; nothing reads it yet.
+ * `preview` is the copy of the preview's own screens (F-3, F-4). The language
+ * choice shows `previewNote` under its buttons (LanguagePicker.jsx); the rest
+ * waits for the screens that will use it. The end of the preview (F-3, the
+ * owner's F-8 choice 1) is the panel after 사건 10: `nextCaseSignals.case10`
+ * below says the English stops there and the story goes on in Korean.
  */
 export const speakers = {
   "한서윤": "Han Seoyun",
@@ -344,10 +347,10 @@ export const copy = {
         }
       },
       "case10": {
-        "eyebrow": "Next case unlocked",
+        "eyebrow": "End of the English preview",
         "title": "Case 11 - The Room Everyone Watches",
-        "button": "Start Case 11",
-        "premise": "3 weeks later, at six in the morning, the dissent that vanished 3 years ago becomes a news story. The anonymous Mr. A in the article is you, and five days later the National Assembly calls you.",
+        "button": "Continue in Korean",
+        "premise": "You’ve reached the end of Case 10 — the end of the English preview for now. Your progress is saved on this device; from Case 11 the story continues in Korean until the English arrives. 3 weeks later, at six in the morning, the dissent that vanished 3 years ago becomes a news story. The anonymous Mr. A in the article is you, and five days later the National Assembly calls you.",
         "hook": "Every case so far was decided in a closed room. This time you speak in front of 12 cameras, and Yoon Sanghyuk’s seat at the witness stand is empty.",
         "movement": "Leadline newsroom, Mangwon-dong > National Assembly Members’ Office Building > Secondhand bookshop in Hoegi-dong, 2nd floor > Policy Committee room, National Assembly main building",
         "reason": "To say, for the first time and in the room everyone watches, whose hands erased the dissent 3 years ago",

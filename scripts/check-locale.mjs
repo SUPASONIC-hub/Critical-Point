@@ -33,10 +33,11 @@ const argv = process.argv.slice(2);
 const strict = argv.includes("--strict");
 const list = argv.includes("--list");
 const asked = argv.find((arg) => arg.startsWith("--lang="))?.slice(7);
-const languages = asked ? [asked] : SUPPORTED_LOCALES.filter((code) => code !== SOURCE_LOCALE);
+const codes = SUPPORTED_LOCALES.map((locale) => locale.code);
+const languages = asked ? [asked] : codes.filter((code) => code !== SOURCE_LOCALE);
 
-if (asked && (!SUPPORTED_LOCALES.includes(asked) || asked === SOURCE_LOCALE)) {
-  console.error(`check:locale: "${asked}" is not a language to check. SUPPORTED_LOCALES (src/locale.js) is ${SUPPORTED_LOCALES.join(", ")}, and ${SOURCE_LOCALE} is the source.`);
+if (asked && (!codes.includes(asked) || asked === SOURCE_LOCALE)) {
+  console.error(`check:locale: "${asked}" is not a language to check. SUPPORTED_LOCALES (src/locale.js) is ${codes.join(", ")}, and ${SOURCE_LOCALE} is the source.`);
   process.exit(1);
 }
 

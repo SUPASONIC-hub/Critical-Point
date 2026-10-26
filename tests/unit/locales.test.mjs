@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.mjs";
 import { caseSource, compareWords, flatten, hasHangul, readCopySource, wordsOf } from "../../scripts/locale-words.mjs";
 import { LANG, loadLocale, localizeCaseData, SOURCE_LOCALE, speakerName, SUPPORTED_LOCALES } from "../../src/locale.js";
-import { localizeCase, overlayModule, overlayWords } from "../../src/locales/overlay.js";
+import { localizeCase, localizeCaseData as overlayCaseData, localizeTables, overlayModule, overlayWords, previewText, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
 import * as gameCases from "../../src/gameCases.js";
 import * as caseCopy from "../../src/caseCopy.js";
 
@@ -78,6 +78,16 @@ test("a case's words cover its scenes and its pack's result copy, and a line lef
   assert.deepEqual(data.nodes[nodeId].choices.map((choice) => choice.next), scene.choices.map((choice) => choice.next));
   assert.equal(data.echoReplies[cardId], "Reply.");
   assert.equal(index.packs.find((pack) => pack.id === "case01").clue.title, "Clue");
+});
+
+test("before a dictionary arrives, the overlay changes nothing: no names, no preview line, cases and tables as they came", () => {
+  assert.equal(overlaySpeakerName("한서윤"), "한서윤");
+  assert.equal(previewText("previewNote"), "");
+  const tables = { chapterRules: { case01: { label: "현금과 사람" } } };
+  localizeTables("caseCopy", tables);
+  assert.equal(tables.chapterRules.case01.label, "현금과 사람");
+  const data = structuredClone(shipped.cases.case01);
+  assert.deepEqual(overlayCaseData("case01", data, structuredClone(shipped.index)), shipped.cases.case01);
 });
 
 for (const lang of others) {

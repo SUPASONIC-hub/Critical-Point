@@ -157,7 +157,11 @@ const fileBudgets = {
   // 3073 / 67949 -> 3083 / 68150 the same day, measured: the foot of the
   // intro links the privacy policy and the terms (.intro-legal), and those
   // links and the data drawer's note take the colour around them.
-  "base-intro-ranking.css": { lines: 3083, bytes: 68150 },
+  // 3083 / 68150 -> 3128 / 69168 on 2026-10-26 for the language choice on the
+  // intro (LanguagePicker.jsx, 다국어 틀): the pills with their 44px target,
+  // the lit one, the preview line, and the phone's corner placement with room
+  // under it for the preview line. Measured.
+  "base-intro-ranking.css": { lines: 3128, bytes: 69168 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up

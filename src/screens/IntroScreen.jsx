@@ -5,6 +5,7 @@ import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
 import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
+import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
@@ -327,6 +328,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     </button>
                   )}
                   <span className="case-chip">{GAME_TITLE_READING} / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
+                  <LanguagePicker />
                 </div>
               </div>
               <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
