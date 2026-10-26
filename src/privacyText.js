@@ -27,11 +27,14 @@ const emailPattern = new RegExp(emailPatternSource);
 const phonePattern = new RegExp(phonePatternSource);
 const organizationPattern = new RegExp(organizationPatternSource, "i");
 
+/** What each signal is called where it is named (the board lays another language over them, src/copy/boardPost.js). */
+export const PRIVACY_SIGNAL_LABELS = { email: "이메일", phone: "전화번호", organization: "회사·조직명" };
+
 export function detectPrivacySignals(text = "") {
   return [
-    { label: "이메일", active: emailPattern.test(text) },
-    { label: "전화번호", active: phonePattern.test(text) },
-    { label: "회사·조직명", active: organizationPattern.test(text) },
+    { label: PRIVACY_SIGNAL_LABELS.email, active: emailPattern.test(text) },
+    { label: PRIVACY_SIGNAL_LABELS.phone, active: phonePattern.test(text) },
+    { label: PRIVACY_SIGNAL_LABELS.organization, active: organizationPattern.test(text) },
   ];
 }
 

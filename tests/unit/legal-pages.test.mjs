@@ -83,7 +83,9 @@ test("a row the runtime builds sends only granted columns, so the grants are the
 
 test("the policy quotes the sentence beside the consent box, and says the box starts ticked", () => {
   assert.ok(ko.includes(PLAYTEST_DATA_NOTICE));
-  assert.ok(readFileSync("src/screens/IntroScreen.jsx", "utf8").includes("PLAYTEST_DATA_NOTICE"), "the intro prints the shared sentence");
+  // The intro prints it from its copy table, which names the shared sentence (다국어 틀).
+  assert.ok(readFileSync("src/screens/IntroScreen.jsx", "utf8").includes("introCopy.data.playtestNotice"), "the intro prints the shared sentence");
+  assert.ok(readFileSync("src/copy/intro.js", "utf8").includes("playtestNotice: PLAYTEST_DATA_NOTICE,"), "named, not copied");
   assert.match(ko, /켜진 상태로 시작/);
   assert.match(en, /ticked by default/);
 });

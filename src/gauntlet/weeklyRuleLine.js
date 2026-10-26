@@ -1,4 +1,9 @@
 import { nextWeekRuleAt, WEEKLY_RULES, weekRuleAt } from "./weeklyRules.js";
+import weekRuleCopy from "../copy/weekRule.js";
+import { fill } from "../locale.js";
+
+/** A rule with its words in the page's language (src/copy/weekRule.js `rules`), or null. */
+const inWords = (rule) => (rule ? { ...rule, ...weekRuleCopy.rules[rule.id] } : null);
 
 /**
  * The start screen's line at `ms` (WeeklyRuleViews.jsx, whose chunk it goes in: the
@@ -10,23 +15,24 @@ import { nextWeekRuleAt, WEEKLY_RULES, weekRuleAt } from "./weeklyRules.js";
  * line says whom it is for.
  */
 export function weeklyRuleLine(now, calendar = WEEKLY_RULES, { first = false } = {}) {
-  const current = weekRuleAt(now, calendar);
-  const next = nextWeekRuleAt(now, calendar);
+  const current = inWords(weekRuleAt(now, calendar));
+  const next = inWords(nextWeekRuleAt(now, calendar));
+  const words = weekRuleCopy.line;
   if (current) {
     // Two rules in a row (W46, then W47): the notice rides on this week's line,
     // so the next week is still told a week ahead.
-    const after = next ? ` 다음 주의 규칙은 ${next.label}(${next.title}), 다음 월요일 0시부터.` : "";
+    const after = next ? fill(words.after, { label: next.label, title: next.title }) : "";
     const world = current.world ? `${current.world} ` : "";
     return {
       tone: "current",
-      kicker: first ? "돌아온 분석관을 위한 이번 주의 규칙" : "이번 주의 규칙",
+      kicker: first ? words.kickerFirst : words.kicker,
       label: current.label,
       // A first season is not played under the rule, so it is not told it keeps it to the end.
-      text: `${world}${current.text}${first ? " 첫 시즌은 평소 규칙으로 시작한다." : " 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다."}${after}`,
+      text: `${world}${current.text}${first ? words.first : words.keeps}${after}`,
     };
   }
   if (next) {
-    return { tone: "next", kicker: "다음 주의 규칙", label: next.label, text: `${next.title}. 월요일 0시부터.` };
+    return { tone: "next", kicker: words.nextKicker, label: next.label, text: fill(words.next, { title: next.title }) };
   }
   return null;
 }

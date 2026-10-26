@@ -17,7 +17,7 @@ import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
-import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
+import { PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill } from "../locale.js";
 import introCopy from "../copy/intro.js";
 
@@ -664,7 +664,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>{introCopy.data.consent}</b>
                 <small>
                   {telemetryEnabled
-                    ? PLAYTEST_DATA_NOTICE
+                    ? introCopy.data.playtestNotice
                     : introCopy.data.noRemote}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>

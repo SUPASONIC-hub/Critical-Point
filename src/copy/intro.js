@@ -1,4 +1,6 @@
 import { localizeTables } from "../locale.js";
+import { DELETION_REQUEST_COPY } from "../appConfig.js";
+import { PLAYTEST_DATA_NOTICE } from "../privacyText.js";
 
 /**
  * The start screen (IntroScreen.jsx, with the case status words of
@@ -98,6 +100,11 @@ const introCopy = {
     more: "자세한 내용은 ",
     and: "과 ",
     end: "에 있습니다.",
+    // The consent box's sentence and the deletion request, which the policy
+    // pages and the support-contact test read from where they are kept
+    // (privacyText.js, appConfig.js): named here, not copied.
+    playtestNotice: PLAYTEST_DATA_NOTICE,
+    deletion: DELETION_REQUEST_COPY,
   },
   // The consent box's sentences (src/state/useConsentToggle.js).
   consent: {
