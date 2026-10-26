@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-25 evening (the state of `main` at `612867f`, after the era bundle (#313), bundle A-13's second pass (#318), board reports (#325) and the privacy and terms pages (#328); what changed and when is in `git log`)
+Last updated: 2026-10-26 evening (the state of `main` at `d612ac7`{last merge}, after the release roadmap (#335), the install hint (#337), the AdSense verification switch (#342), the English preview's first two steps (#338) and 오진우's turn (#347){#348 #349}; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -317,6 +317,51 @@ Still open, on purpose:
   #308 (after #224), #322 (after the W47 measurement), #324 (W49, only if
   P5 on 11-23), #314, #317 and #321 (E-11, December), #327 and #330 (the
   app release: shells and ads).
+- 2026-10-26: #334 (`Board Reports`: every day at 09:10 KST the report
+  queue goes into the job summary -- post number, date, report count,
+  reporters, reasons and wait, never the body or name -- and the run fails
+  while a reported post is still visible, so the failure mail is the daily
+  alert; by hand `hide`, `dismiss`, `restore` or `list`, no new secret or
+  migration); #335 (the release roadmap at the head of the README's
+  deployment section: the web PWA now, free and without ads -> web AdSense
+  after traffic -> Google Play when GRAC asks or we widen; the policy's
+  「ads only in the app」 became 「no ads now, and before any we will say
+  so」, Korean and English); #336 (`Funnel` opens with 「플레이어 추이」:
+  new devices, devices that played, runs started, runs past 프롤로그 05
+  and seasons finished, per day for 14 days and per week for 8, from the
+  same SELECT; it now runs daily at 22:10 KST instead of Sundays); #337
+  (an 「홈 화면에 추가」 card in the start screen's 편의 설정 drawer: the
+  browser's install prompt on Chromium browsers, one line on iPhone and
+  iPad, hidden when standalone, installed or dismissed --
+  `critical-point-install-hint-dismissed-v1` -- and its own `InstallHint`
+  chunk); #339 and #340 (lucide-react 1.61.0, eslint 10.13.0, pglite
+  0.5.11); #342 (`ADSENSE_CLIENT`, read at build time, writes only the
+  `google-adsense-account` meta tag and `ads.txt`; off by default, no ad
+  code, and `check:bundle` fails if ad code reaches a build without
+  `ADSENSE_ADS=on`; `docs/web-ads.md`); #338 (the English preview, steps
+  one and two: the locale frame -- `SUPPORTED_LOCALES` in `src/locale.js`,
+  dictionaries in `src/locales/<lang>/` laid over the same ids, Korean
+  where a string is missing -- the 「한국어 · English」 picker on the start
+  screen (`critical-point-locale-v1`, `?lang=en`), machine-drafted English
+  for 프롤로그 01 to 사건 10 ahead of human review with 「Continue in
+  Korean」 after 사건 10, screen copy moved into twenty key tables under
+  `src/copy/`, and `npm run check:locale`; the intro baselines were
+  re-recorded for the picker); #347 (why 오진우 turns from mentor to rival:
+  윤상혁's condition for him alone laid into four existing scenes --
+  프롤로그 05, 사건 01, 02 and 03 -- with a paragraph in `docs/canon.md`;
+  scenes, cards and ids unchanged). Nine pull requests merged before the
+  evening cleanup{update}; production runs `d612ac7`{update}.
+  {after #348: the English bundle -- 사건 11 to the finale, 63 speakers,
+  the one-line preview range `previewThrough` still `case10`, no change on
+  the live screens} {after #349: the export keyword taken off nine names
+  used only in their own files} {after the English step-three PR: the
+  ending, board and ranking screens}. The user decided that day: no
+  promotion yet, AdSense set up later (the Render address or a domain is
+  still open), and the English range widens ten reviewed cases at a time.
+  Drafts: #350 (turning ads on, #341 reopened), the December side-case
+  stack restacked and green (#301, #314, #317, #321, #333), #319 (the
+  11-30 rehearsal, rebased on that day's main), and #327, #330 and #332
+  (stage three, the store).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
