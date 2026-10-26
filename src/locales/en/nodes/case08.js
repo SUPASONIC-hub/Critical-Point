@@ -38,7 +38,7 @@ export default {
     },
     "c8_trail": {
       "title": "The List of Desires",
-      "text": "It has been more than two weeks since Oh Jinwoo handed in his resignation. On a video call, he shows you four A4 sheets taped to his wall. The head of Gallery On is Managing Director Yoon Sanghyuk’s wife; the real owner of the Gyeongpo guesthouse is his brother-in-law. 'In the end, people are slaves to desire. Desire spends money, and money leaves a trace. That’s what my father told me the day he was pushed out of his branch.' He laughs briefly. 'Do you know who he learned it from? Yoon Sanghyuk, he says.'",
+      "text": "It has been more than two weeks since Oh Jinwoo handed in his resignation. On a video call, he shows you four A4 sheets taped to his wall. The head of Gallery On is Managing Director Yoon Sanghyuk’s wife; the real owner of the Gyeongpo guesthouse is his brother-in-law. Two summers ago he was a Team Head on the 6th floor; now he is a Managing Director in the Group Strategy Office on the 33rd floor of group headquarters. The order to name Oh Jinwoo as the one responsible, and the folder holding both your profiles, came out of that office. 'In the end, people are slaves to desire. Desire spends money, and money leaves a trace. That’s what my father told me the day he was pushed out of his branch.' He laughs briefly. 'Do you know who he learned it from? Yoon Sanghyuk, he says.'",
       "memo": [
         "Head of Gallery On: in Yoon Sanghyuk’s wife’s name",
         "Real owner of the Haeon guesthouse: Yoon Sanghyuk’s brother-in-law",

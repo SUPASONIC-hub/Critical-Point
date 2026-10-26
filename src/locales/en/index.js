@@ -16,8 +16,10 @@
  * `preview` is the copy of the preview's own screens (F-3, F-4). The language
  * choice shows `previewNote` under its buttons (LanguagePicker.jsx); the rest
  * waits for the screens that will use it. The end of the preview (F-3, the
- * owner's F-8 choice 1) is the panel after 사건 10: `nextCaseSignals.case10`
- * below says the English stops there and the story goes on in Korean.
+ * owner's F-8 choice 1) is the panel after `previewThrough` (사건 10 now): the
+ * overlay gives that case's `nextCaseSignals` entry `endEyebrow`, the button
+ * endButtons.korean and `endPremiseLead`, so the English stops there and the
+ * story goes on in Korean. Widening the preview is that one constant.
  */
 import screens from "./screens/index.js";
 
@@ -47,7 +49,80 @@ export const speakers = {
   "변유진": "Byun Yujin",
   "나준혁": "Na Junhyuk",
   "권도현": "Kwon Dohyun",
+  // 사건 11-최종 (2026-10-26): the spellings of #343-#346, one per person.
+  "차지원": "Cha Jiwon",
+  "서하린": "Seo Harin",
+  "봉영훈": "Bong Younghoon",
+  "곽민재": "Kwak Minjae",
+  "주은채": "Joo Eunchae",
+  "이정숙": "Lee Jungsook",
+  "채윤슬": "Chae Yoonseul",
+  "이찬빈": "Lee Chanbin",
+  "최서진": "Choi Seojin",
+  "배수경": "Bae Sookyung",
+  "유하온": "Yoo Haon",
+  "정태오": "Jung Taeo",
+  "하은경": "Ha Eunkyung",
+  "반서아": "Ban Seoa",
+  "도하람": "Do Haram",
+  "임소율": "Lim Soyul",
+  "구태형": "Koo Taehyung",
+  "류세아": "Ryu Seah",
+  "선우진": "Sunwoo Jin",
+  "고은비": "Ko Eunbi",
+  "문하준": "Moon Hajun",
+  "탁예린": "Tak Yerin",
+  "표세린": "Pyo Serin",
+  "채이안": "Chae Ian",
+  "지강현": "Ji Kanghyun",
+  "송하율": "Song Hayul",
+  "남궁솔": "Namgoong Sol",
+  "하정희": "Ha Junghee",
+  "연하진": "Yeon Hajin",
+  "채도훈": "Chae Dohoon",
+  "조현석": "Cho Hyunseok",
+  "백다온": "Baek Daon",
+  "진서우": "Jin Seowoo",
+  "하도율": "Ha Doyul",
+  "한지우": "Han Jiwoo",
+  "연지안": "Yeon Jian",
+  "석재우": "Seok Jaewoo",
+  "나은호": "Na Eunho",
+  "진태윤": "Jin Taeyoon",
+  "허윤경": "Heo Yoonkyung",
+  "편종구": "Pyeon Jongku",
+  "윤서진": "Yoon Seojin",
+  "안기범": "Ahn Gibeom",
+  "황혜원": "Hwang Hyewon",
+  "서도경": "Seo Dokyung",
+  "여민규": "Yeo Minkyu",
+  "은재하": "Eun Jaeha",
+  "석문호": "Seok Munho",
+  "도건우": "Do Geonwoo",
+  "선재윤": "Seon Jaeyoon",
+  "연서준": "Yeon Seojun",
+  "엄동균": "Eom Donggyun",
+  "공병만": "Gong Byungman",
+  "은시온": "Eun Sion",
+  "홍예담": "Hong Yedam",
+  "하예솔": "Ha Yesol",
+  "여다인": "Yeo Dain",
+  "은채원": "Eun Chaewon",
+  "이하경": "Lee Hakyung",
+  "임재윤": "Lim Jaeyoon",
+  "연시우": "Yeon Siwoo",
+  "김 반장": "Foreman Kim",
+  "민하랑": "Min Harang",
 };
+
+/**
+ * The last case of the preview: the one line to change to widen it (F-1, choice 1).
+ * A case after it keeps its Korean scenes and names even when its file is
+ * here (src/locales/overlay.js), the panel after it is the end of the preview,
+ * `preview` below fills {last} and {next} from it, and `npm run check:locale`
+ * checks the screen copy up to it.
+ */
+export const previewThrough = "case10";
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {
@@ -77,22 +152,27 @@ export const roles = {
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "문래동 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Mullae-dong · Moon Gaeul’s husband",
-  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cakes, Mangwon Market"
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
 };
 
 export const preview = {
   chooseLanguage: "Choose your language",
   languageButtons: ["한국어", "English (preview)"],
   languageSetting: "Language",
-  previewNote: "English is a preview: the prologue and Cases 01–10 are available.",
+  previewNote: "English is a preview: the prologue and Cases 01–{last} are available.",
   reportTranslation: "Report a translation issue in this scene",
   reportTranslationNote: "Tell us what reads wrong. The scene ID is sent with it.",
   rankingLanguage: "Language: KO / EN",
   endTitle: "END OF THE ENGLISH PREVIEW",
   endText:
-    "You’ve reached the end of Case 10 — the end of the English preview for now. Cases 11–49 and the finale are being translated. Your progress is saved on this device, and you’ll continue from Case 11 when they arrive.",
+    "You’ve reached the end of Case {last} — the end of the English preview for now. Cases {next}–49 and the finale are being translated. Your progress is saved on this device, and you’ll continue from Case {next} when they arrive.",
   endButtons: { korean: "Continue in Korean", wait: "Wait for English", feedback: "Tell us what you thought" },
-  continueCard: "Case 11 — coming in English soon",
+  continueCard: "Case {next} — coming in English soon",
+  // The panel after `previewThrough` (nextCaseSignals): its eyebrow, and the
+  // lead put before its premise; its button is endButtons.korean.
+  endEyebrow: "End of the English preview",
+  endPremiseLead:
+    "You’ve reached the end of Case {last} — the end of the English preview for now. Your progress is saved on this device; from Case {next} the story continues in Korean until the English arrives.",
 };
 
 export const copy = {
@@ -381,10 +461,10 @@ export const copy = {
         }
       },
       "case10": {
-        "eyebrow": "End of the English preview",
+        "eyebrow": "Next case unlocked",
         "title": "Case 11 - The Room Everyone Watches",
-        "button": "Continue in Korean",
-        "premise": "You’ve reached the end of Case 10 — the end of the English preview for now. Your progress is saved on this device; from Case 11 the story continues in Korean until the English arrives. 3 weeks later, at six in the morning, the dissent that vanished 3 years ago becomes a news story. The anonymous Mr. A in the article is you, and five days later the National Assembly calls you.",
+        "button": "Start Case 11",
+        "premise": "3 weeks later, at six in the morning, the dissent that vanished 3 years ago becomes a news story. The anonymous Mr. A in the article is you, and five days later the National Assembly calls you.",
         "hook": "Every case so far was decided in a closed room. This time you speak in front of 12 cameras, and Yoon Sanghyuk’s seat at the witness stand is empty.",
         "movement": "Leadline newsroom, Mangwon-dong > National Assembly Members’ Office Building > Secondhand bookshop in Hoegi-dong, 2nd floor > Policy Committee room, National Assembly main building",
         "reason": "To say, for the first time and in the room everyone watches, whose hands erased the dissent 3 years ago",
