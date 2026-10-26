@@ -165,7 +165,7 @@ export function loadDictionary(lang) {
  * first-paint budget (일본어 1단계). Kept in the language's chunk, not the
  * app's stylesheet, so a Korean page's CSS stays byte for byte what it was.
  */
-function addStyle(css) {
+export function addStyle(css) {
   if (!css || !globalThis.document?.head) return;
   const element = document.createElement("style");
   element.textContent = css;

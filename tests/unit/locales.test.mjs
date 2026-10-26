@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.mjs";
 import { caseSource, compareWords, flatten, hasHangul, readCopySource, stillKorean, wordsOf } from "../../scripts/locale-words.mjs";
 import { LANG, loadLocale, localizeCaseData, SOURCE_LOCALE, speakerName, SUPPORTED_LOCALES } from "../../src/locale.js";
-import { fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
+import { addStyle, fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
 import * as gameCases from "../../src/gameCases.js";
 import * as caseCopy from "../../src/caseCopy.js";
 
@@ -144,6 +144,24 @@ for (const lang of others) {
     if (SUPPORTED_LOCALES.find((locale) => locale.code === lang).hidden) assert.ok(dictionary.preview?.languageName, `${lang} is hidden, so its dictionary names it (preview.languageName)`);
   });
 }
+
+test("a dictionary's own CSS goes on its page as one style element, and nothing is added without a page or a style", async () => {
+  addStyle("p{}"); // no document in this process: nothing happens
+  const appended = [];
+  globalThis.document = { head: { append: (element) => appended.push(element) }, createElement: (tag) => ({ tag }) };
+  try {
+    addStyle("");
+    assert.equal(appended.length, 0);
+    const { style } = await import("../../src/locales/ja/index.js");
+    addStyle(style);
+    assert.equal(appended.length, 1);
+    assert.equal(appended[0].tag, "style");
+    assert.match(appended[0].textContent, /^:root:lang\(ja\)\{--font-sans:"Hiragino Sans"/, "the Japanese page's face, on a Japanese page only");
+    assert.match(appended[0].textContent, /word-break:normal;line-break:strict/);
+  } finally {
+    delete globalThis.document;
+  }
+});
 
 // Last: it writes over the shared tables of this process.
 test("a dictionary's screen copy is laid over the Korean tables in place, keys and ids kept", () => {
