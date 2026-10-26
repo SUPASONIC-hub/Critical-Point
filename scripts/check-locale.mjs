@@ -69,7 +69,13 @@ for (const lang of languages) {
     }
     rows.push({ unit: caseId, ...compareWords(caseSource(runtimeData, caseId), await wordsOf(file, "default")) });
   }
-  rows.push({ unit: "screen copy", ...compareWords(copySource, await wordsOf(`src/locales/${lang}/index.js`, "copy")) });
+  // The copy between cases for the cases after the preview waits in the
+  // dictionary (src/locales/overlay.js lays it over once `previewThrough`
+  // reaches them): held, not stale.
+  const copyRow = compareWords(copySource, await wordsOf(`src/locales/${lang}/index.js`, "copy"));
+  const heldPath = (entry) => entry.split(/[.[]/).some((part) => CASE_SEQUENCE.includes(part) && !scope.includes(part));
+  const held = copyRow.stale.filter(heldPath);
+  rows.push({ unit: "screen copy", ...copyRow, stale: copyRow.stale.filter((entry) => !heldPath(entry)) });
 
   let missing = 0;
   let stale = 0;
@@ -90,6 +96,7 @@ for (const lang of languages) {
     }
   }
   console.log(`[${lang}] ${total - missing}/${total} strings translated; ${missing} fall back to Korean, ${stale} stale, ${numbers} number warnings.`);
+  if (held.length) console.log(`[${lang}] ${held.length} strings of copy between cases wait for cases after ${through} (shown once \`previewThrough\` reaches them).`);
   if (strict && (missing || stale)) failed = true;
 }
 if (failed) {

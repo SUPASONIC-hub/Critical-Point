@@ -55,9 +55,19 @@ const SHELL_TABLES = {
   gameCases: { caseObjectives, seasonCasesBase },
 };
 
-/** A dictionary's `copy` for `module` over that module's tables (`copy.caseCopy.chapterRules` over `chapterRules`). */
-export function overlayModule(copy, module, tables) {
-  for (const [name, words] of Object.entries(copy?.[module] ?? {})) overlayWords(tables[name], words);
+/**
+ * A dictionary's `copy` for `module` over that module's tables (`copy.caseCopy.chapterRules` over `chapterRules`).
+ * A table keyed by case (the copy between cases, the case list) is laid over
+ * only up to the preview's last case: the words for the cases after it wait
+ * in the dictionary, and those cases keep their Korean with their scenes.
+ */
+export function overlayModule(copy, module, tables, through = dictionary?.previewThrough) {
+  for (const [name, words] of Object.entries(copy?.[module] ?? {})) overlayWords(tables[name], previewWords(words, through));
+}
+
+function previewWords(words, through) {
+  if (!through || !isRecord(words)) return words;
+  return Object.fromEntries(Object.entries(words).filter(([key]) => !CASE_SEQUENCE.includes(key) || inPreview(key, through)));
 }
 
 let dictionary = null;
@@ -102,8 +112,14 @@ export function previewText(key) {
   return fillPreview(dictionary?.preview?.[key] ?? "");
 }
 
+/** A speaker's role in the loaded language: `roles`, then `caseRoles` of the cases in the preview. */
 export function roleName(role) {
-  return dictionary?.roles?.[role] ?? role;
+  const named = dictionary?.roles?.[role];
+  if (named) return named;
+  for (const [caseId, table] of Object.entries(dictionary?.caseRoles ?? {})) {
+    if (table?.[role] && inPreview(caseId)) return table[role];
+  }
+  return role;
 }
 
 export function speakerName(name) {

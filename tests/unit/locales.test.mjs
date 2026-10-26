@@ -104,6 +104,12 @@ test("the preview's last case is one constant: the cases after it stay Korean, i
   markPreviewEnd(signals, preview, "case20");
   assert.deepEqual(signals.case10, { eyebrow: "Next", button: "Start Case 11", premise: "Premise." });
   assert.deepEqual(signals.case20, { eyebrow: "End", button: "Korean", premise: "End of Case 20; Case 21 is Korean. Later." });
+  // The copy between cases for the cases after the preview waits in the dictionary.
+  const echoes = { case10: "에코: 열.", case11: "에코: 열하나.", other: "다른 줄." };
+  overlayModule({ caseCopy: { caseIntroEchoes: { case10: "ECHO: Ten.", case11: "ECHO: Eleven.", other: "Another line." } } }, "caseCopy", { caseIntroEchoes: echoes }, "case10");
+  assert.deepEqual(echoes, { case10: "ECHO: Ten.", case11: "에코: 열하나.", other: "Another line." });
+  overlayModule({ caseCopy: { caseIntroEchoes: { case11: "ECHO: Eleven." } } }, "caseCopy", { caseIntroEchoes: echoes }, "case20");
+  assert.equal(echoes.case11, "ECHO: Eleven.");
 });
 
 for (const lang of others) {
@@ -136,8 +142,9 @@ for (const lang of others) {
     }
   });
 
-  test(`${lang}: the dictionary's screen copy answers paths the Korean has, and names speakers by their Korean names`, async () => {
-    const result = compareWords(await readCopySource(new URL("../..", import.meta.url).href.replace(/\/$/, "")), dictionary.copy);
+  test(`${lang}: the dictionary's screen copy answers paths the Korean has (every case's), and names speakers by their Korean names`, async () => {
+    // Every case: the copy between cases for the cases after the preview waits in the dictionary too.
+    const result = compareWords(await readCopySource(new URL("../..", import.meta.url).href.replace(/\/$/, ""), gameCases.CASE_SEQUENCE), dictionary.copy);
     assert.deepEqual(result.stale, []);
     for (const name of Object.keys(dictionary.speakers ?? {})) assert.ok(hasHangul(name), `speakers key ${name}`);
   });
