@@ -1,0 +1,275 @@
+name: App Build
+
+# The store apps (docs/app-shell.md, 「앱 빌드 자동화」): the web build in
+# `--mode app`, `cap sync`, then an Xcode archive for iOS and a Gradle build
+# for Android, each uploaded as a run artifact.
+#
+# Only by hand or on an `app-v*` tag: never on a push to main or on a pull
+# request, because a macOS minute costs ten Linux ones on a private repository
+# and nothing in the web game needs an app build to be checked. The site's own
+# checks (Verify) never install app/node_modules, and this workflow never
+# touches dist/.
+#
+# Signing is optional and decided per platform from the secrets. Without them
+# (today: no Apple Developer or Play account yet) iOS builds an unsigned device
+# archive and Android a debug APK, and the run still ends green, so the build
+# itself is checked before any account exists. Every secret and variable this
+# reads is listed, with where it comes from, in docs/app-shell.md.
+#
+# Android runs on Ubuntu: Gradle needs no macOS, and the Linux runner is
+# cheaper and starts faster.
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Which app to build"
+        type: choice
+        options: [both, ios, android]
+        default: both
+      testflight:
+        description: "Upload the signed iOS build to TestFlight (needs the signing and App Store Connect API key secrets)"
+        type: boolean
+        default: false
+  push:
+    tags:
+      - "app-v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # The anon key is public by design (it ships in every page); without these
+  # two the app runs with the remote leaderboard and telemetry off.
+  VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+  VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+  # `true` only once app/native/adUnits.js LIVE_UNITS holds the real units;
+  # until then (or with this unset) every build uses Google's test units.
+  VITE_ADMOB_LIVE: ${{ vars.ADMOB_LIVE == 'true' && 'true' || '' }}
+
+jobs:
+  ios:
+    if: github.event_name == 'push' || inputs.platform != 'android'
+    # App Store Connect takes only Xcode 26 / iOS 26 SDK builds (2026-04-28).
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
+      IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+      IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      ADMOB_APP_ID_IOS: ${{ vars.ADMOB_APP_ID_IOS }}
+      PROJECT: app/ios/App/App.xcodeproj
+      PLIST: app/ios/App/App/Info.plist
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
+      - name: Install (root for Vite, app/ for Capacitor and the plugins)
+        run: |
+          npm ci
+          npm ci --prefix app
+      - name: Decide signed or unsigned
+        id: mode
+        run: |
+          if [ -n "$IOS_CERT_P12_BASE64" ] && [ -n "$IOS_CERT_PASSWORD" ] && [ -n "$IOS_PROVISION_PROFILE_BASE64" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "Signing secrets found: building a signed App Store archive."
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=iOS unsigned::IOS_CERT_P12_BASE64, IOS_CERT_PASSWORD, IOS_PROVISION_PROFILE_BASE64 or APPLE_TEAM_ID is empty, so this run builds an unsigned archive (docs/app-shell.md)."
+          fi
+      - name: AdMob app ID
+        run: |
+          if [ -n "$ADMOB_APP_ID_IOS" ]; then
+            /usr/libexec/PlistBuddy -c "Set :GADApplicationIdentifier $ADMOB_APP_ID_IOS" "$PLIST"
+          else
+            echo "::notice title=AdMob test app ID::vars.ADMOB_APP_ID_IOS is empty; the build keeps Google's test app ID."
+          fi
+      - name: Web build and cap sync ios
+        run: npm run sync:ios --prefix app
+      - name: check:app
+        run: npm run check:app --prefix app
+      - run: xcodebuild -version
+
+      - name: Unsigned archive
+        if: steps.mode.outputs.signed != 'true'
+        run: |
+          xcodebuild -project "$PROJECT" -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            archive
+          mkdir -p "$RUNNER_TEMP/out/Payload"
+          cp -R "$RUNNER_TEMP/App.xcarchive/Products/Applications/App.app" "$RUNNER_TEMP/out/Payload/"
+          (cd "$RUNNER_TEMP/out" && zip -qry App-unsigned.ipa Payload && rm -rf Payload)
+
+      - name: Install certificate and profile
+        if: steps.mode.outputs.signed == 'true'
+        run: |
+          keychain="$RUNNER_TEMP/build.keychain-db"
+          keychain_password="$(openssl rand -hex 16)"
+          echo "$IOS_CERT_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$RUNNER_TEMP/cert.p12" -P "$IOS_CERT_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain" > /dev/null
+          security list-keychain -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          uuid=$(/usr/libexec/PlistBuddy -c "Print :UUID" "$RUNNER_TEMP/profile.plist")
+          name=$(/usr/libexec/PlistBuddy -c "Print :Name" "$RUNNER_TEMP/profile.plist")
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$uuid.mobileprovision"
+          echo "PROFILE_NAME=$name" >> "$GITHUB_ENV"
+          rm "$RUNNER_TEMP/cert.p12"
+
+      - name: Signed archive and export
+        if: steps.mode.outputs.signed == 'true'
+        run: |
+          # Manual signing for the App target only: on the command line these
+          # settings would reach the Swift packages too, which take no profile.
+          sed -i '' \
+            -e "s/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual; DEVELOPMENT_TEAM = $APPLE_TEAM_ID; PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\"; \"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";/" \
+            "$PROJECT/project.pbxproj"
+          xcodebuild -project "$PROJECT" -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            archive
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict><key>com.taknroll.criticalpoint</key><string>$PROFILE_NAME</string></dict>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/out"
+
+      - name: Upload to TestFlight
+        if: steps.mode.outputs.signed == 'true' && inputs.testflight
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8_BASE64 }}
+        run: |
+          if [ -z "$ASC_KEY_ID" ] || [ -z "$ASC_ISSUER_ID" ] || [ -z "$ASC_KEY_P8_BASE64" ]; then
+            echo "::error title=No App Store Connect API key::APP_STORE_CONNECT_API_KEY_ID, _ISSUER_ID and _P8_BASE64 are needed to upload."
+            exit 1
+          fi
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          echo "$ASC_KEY_P8_BASE64" | base64 --decode > "$HOME/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8"
+          xcrun altool --upload-app -t ios -f "$RUNNER_TEMP/out/App.ipa" --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Remove the keychain
+        if: always() && steps.mode.outputs.signed == 'true'
+        run: |
+          security delete-keychain "$RUNNER_TEMP/build.keychain-db" || true
+          rm -f "$HOME/.appstoreconnect/private_keys/"*.p8
+
+      - name: Zip the archive
+        run: (cd "$RUNNER_TEMP" && zip -qry out/App.xcarchive.zip App.xcarchive)
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ios-${{ steps.mode.outputs.signed == 'true' && 'signed' || 'unsigned' }}-${{ github.run_number }}
+          path: ${{ runner.temp }}/out/
+          retention-days: 14
+          if-no-files-found: error
+
+  android:
+    if: github.event_name == 'push' || inputs.platform != 'ios'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      ADMOB_APP_ID_ANDROID: ${{ vars.ADMOB_APP_ID_ANDROID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
+      # AGP 8.13 needs JDK 17 or newer; 21 is the LTS Android Studio ships.
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+          cache-dependency-path: |
+            app/android/*.gradle*
+            app/android/**/gradle-wrapper.properties
+      - name: Install (root for Vite, app/ for Capacitor and the plugins)
+        run: |
+          npm ci
+          npm ci --prefix app
+      - name: Decide signed or unsigned
+        id: mode
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_ALIAS" ] && [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+            echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "Signing secrets found: building a signed release AAB."
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Android unsigned::ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS or ANDROID_KEY_PASSWORD is empty, so this run builds a debug APK (docs/app-shell.md)."
+          fi
+      - name: AdMob app ID
+        run: |
+          if [ -n "$ADMOB_APP_ID_ANDROID" ]; then
+            sed -i -E "s|(<string name=\"admob_app_id\"[^>]*>)[^<]*(</string>)|\1$ADMOB_APP_ID_ANDROID\2|" app/android/app/src/main/res/values/strings.xml
+          else
+            echo "::notice title=AdMob test app ID::vars.ADMOB_APP_ID_ANDROID is empty; the build keeps Google's test app ID."
+          fi
+      - name: Web build and cap sync android
+        run: npm run sync:android --prefix app
+      - name: check:app
+        run: npm run check:app --prefix app
+
+      - name: Release bundle (AAB)
+        if: steps.mode.outputs.signed == 'true'
+        working-directory: app/android
+        run: ./gradlew --no-daemon bundleRelease -PversionCode="$GITHUB_RUN_NUMBER"
+      - name: Debug APK
+        if: steps.mode.outputs.signed != 'true'
+        working-directory: app/android
+        run: ./gradlew --no-daemon assembleDebug -PversionCode="$GITHUB_RUN_NUMBER"
+      - name: Remove the keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.jks"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-${{ steps.mode.outputs.signed == 'true' && 'release-aab' || 'debug-apk' }}-${{ github.run_number }}
+          path: |
+            app/android/app/build/outputs/bundle/release/*.aab
+            app/android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+          if-no-files-found: error

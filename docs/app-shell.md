@@ -140,7 +140,7 @@ npx cap open ios                                                    # Xcode가 �
 1. App 타깃 › Signing & Capabilities에서 **Team**(자리표시: Apple Team ID) → 번들 ID `com.taknroll.criticalpoint` 자동 서명. 번들 ID는 App Store Connect에 먼저 등록.
 2. 실기기 실행 → 사건 01을 끝내고 「다음 사건」: UMP(유럽 테스트는 AdMob 테스트 기기 + 디버그 지역) → ATT 사전 안내 → 시스템 창 → 사건 03 뒤 테스트 전면 광고. 설정 › 「광고와 개인정보」에서 샌드박스 계정으로 광고 제거 구매·복원.
 3. Product › Archive → Distribute App › App Store Connect. `MARKETING_VERSION` 1.0.0, `CURRENT_PROJECT_VERSION`은 올릴 때마다 +1.
-4. CI로 할 때: `macos-26` 러너에서 `xcodebuild -project app/ios/App/App.xcodeproj -scheme App -configuration Release -archivePath build/App.xcarchive archive DEVELOPMENT_TEAM=<TEAM_ID>` 다음 `-exportArchive`. 인증서·프로필·App Store Connect API 키는 GitHub Secrets.
+4. CI로 할 때: 아래 「앱 빌드 자동화」의 `App Build` 워크플로(`macos-26` 러너, archive → `-exportArchive`). 인증서·프로필·App Store Connect API 키는 GitHub Secrets.
 5. 개인정보: 앱의 `PrivacyInfo.xcprivacy`는 게임 코드가 보내는 것만, AdMob SDK가 모으는 것(광고 ID는 ATT 허용 뒤만, IP·대략 위치, 제품 상호작용, 진단)은 SDK 자체 매니페스트가 선언합니다. App Store Connect의 개인정보 답(메모 D)에는 둘 다 적습니다.
 
 아이콘·시작 화면은 `node app/build-ios-assets.mjs`(루트에서, Playwright)로 다시 그립니다. 원본 `public/profile.jpg`가 256px라 흐림 → **큰 원본으로 바꿀 것**(자리표시).
@@ -160,19 +160,62 @@ cd android && ./gradlew bundleRelease                                   # app/bu
 ```
 
 - Android Studio(최신 안정판)가 JDK 21과 SDK를 같이 설치합니다. 명령줄만 쓰면 JDK 21(`JAVA_HOME`)과 Android SDK Platform 36·Build-Tools를 깔고 `app/android/local.properties`에 `sdk.dir=...`(git 제외).
-- Gradle 8.14.3, AGP 8.13.0, `compileSdkVersion`·`targetSdkVersion` 36, `minSdkVersion` 24(`app/android/variables.gradle`), `versionCode` 1·`versionName` 1.0.0(`app/android/app/build.gradle`, 올릴 때마다 `versionCode` +1).
+- Gradle 8.14.3, AGP 8.13.0, `compileSdkVersion`·`targetSdkVersion` 36, `minSdkVersion` 24(`app/android/variables.gradle`), `versionCode` 1·`versionName` 1.0.0(`app/android/app/build.gradle`, 올릴 때마다 `versionCode` +1 — `-PversionCode=N`으로 넘길 수 있고 CI는 실행 번호를 넘김).
 - 아이콘·시작 화면은 지금 Capacitor 기본 그림입니다 → Android Studio › New › Image Asset으로 `public/icons/icon-maskable-512.png`(또는 큰 원본)에서 만들기(자리표시). 배경 `#06090A`.
 - 실기기에서 iOS와 같은 흐름 확인(UMP → 사건 03 뒤 테스트 전면, 「광고와 개인정보」에서 라이선스 테스터로 구매·복원). Android에는 ATT가 없고, 광고 ID 권한(`AD_ID`)은 Mobile Ads SDK가 매니페스트에 넣습니다 → Play Console 「광고 ID」 선언에 「광고」로 답.
 
 ### 서명
 
 1. 업로드 키(한 번, 잃으면 Play에 재설정 요청): `keytool -genkeypair -v -keystore app/android/criticalpoint-upload.jks -alias criticalpoint-upload -keyalg RSA -keysize 2048 -validity 10000`. keystore는 git 제외(`app/.gitignore`), 오프라인 사본 1벌 + 비밀번호는 비밀번호 관리자에.
-2. `app/android/keystore.properties`(git 제외)에 경로·별칭·비밀번호를 두고 `app/build.gradle`의 `signingConfigs.release`에서 읽거나, Android Studio › Build › Generate Signed App Bundle.
+2. `app/android/keystore.properties`(git 제외)에 `storeFile=criticalpoint-upload.jks`(app/android 기준)·`storePassword`·`keyAlias`·`keyPassword` 네 줄을 두면 `app/android/app/build.gradle`의 `signingConfigs.release`가 읽습니다(CI는 같은 넷을 환경 변수로). 없으면 release는 서명 없이 나옵니다. Android Studio › Build › Generate Signed App Bundle도 됩니다.
 3. Play Console에 AAB를 올리면 **Play 앱 서명**이 켜집니다.
 
 ### assetlinks.json은 지웠습니다
 
 `/.well-known/assetlinks.json`은 TWA(크롬이 사이트를 주소창 없이 띄움)와, 웹 주소를 앱으로 여는 App Links에 쓰는 파일입니다. Capacitor 앱은 웹 파일을 앱 안에 싣고 자기 스킴으로 띄우므로 사이트와 연결을 증명할 일이 없고, 지금 앱에는 웹 주소로 앱을 여는 링크(intent filter)도 없습니다. 그래서 `public/.well-known/assetlinks.json`과 TWA 설정(`app/twa/`)을 지웠습니다. 나중에 공유 링크를 앱으로 열고 싶어지면(App Links) 그때 자체 도메인(메모 E)에 Play 앱 서명 키 SHA-256으로 다시 둡니다.
+
+## 앱 빌드 자동화 (GitHub Actions `App Build`)
+
+`.github/workflows/app-build.yml`. **손으로(Actions › App Build › Run workflow) 또는 `app-v*` 태그를 올릴 때만** 돕니다. main 푸시·PR에서는 돌지 않습니다(맥 러너 분 단가가 리눅스의 10배, 웹 검사에는 필요 없음).
+
+| 잡 | 러너 | 하는 일 | Secrets 없을 때 | Secrets 있을 때 |
+|---|---|---|---|---|
+| `ios` | `macos-26`(Xcode 26) | 루트·`app/` `npm ci` → `npm run sync:ios`(웹 `--mode app` 빌드 + `cap sync ios`) → `check:app` → `xcodebuild archive` | 서명 없는 기기용 archive + `App-unsigned.ipa`(설치 불가, 빌드 확인용), 초록 | 임시 키체인에 인증서·프로필 → App 타깃만 수동 서명 → archive → `-exportArchive`(app-store-connect) → `App.ipa`. 실행 때 `testflight`를 켜면 TestFlight 업로드 |
+| `android` | `ubuntu-latest` + JDK 21(Temurin) | 같은 설치 → `npm run sync:android` → `check:app` → Gradle | `assembleDebug` → 디버그 APK(기기에 바로 설치 가능), 초록 | `bundleRelease` → 서명된 `app-release.aab`(Play 업로드용) |
+
+- 산출물은 실행 페이지의 Artifacts(`ios-unsigned-N`·`ios-signed-N`·`android-debug-apk-N`·`android-release-aab-N`), 14일 보관.
+- 빌드 번호: iOS `CURRENT_PROJECT_VERSION`, Android `versionCode` 모두 Actions 실행 번호(`github.run_number`) → 올릴 때마다 저절로 커짐. 앱 표시 버전(1.0.0)은 프로젝트 파일에서 바꿉니다.
+- 안드로이드는 macOS가 필요 없어 ubuntu 러너(더 싸고 빨리 뜸).
+- 실행 입력: `platform`(both·ios·android), `testflight`(서명 iOS를 TestFlight에 올림, 기본 끔).
+
+### Secrets (Settings › Secrets and variables › Actions › Secrets)
+
+넷 중 하나라도 비면 그 플랫폼은 서명 없는 경로로 빌드합니다.
+
+| Secret | 받는 곳 | 넣는 법 |
+|---|---|---|
+| `APPLE_TEAM_ID` | Apple Developer › Membership details › Team ID(10자) | 그대로 |
+| `IOS_CERT_P12_BASE64` | Apple Developer › Certificates › **Apple Distribution** 만들기(Mac 키체인 접근의 CSR) → 키체인에서 인증서+개인 키를 `.p12`로 내보내기 | `base64 -i dist.p12 \| pbcopy`(macOS) / `[Convert]::ToBase64String([IO.File]::ReadAllBytes("dist.p12"))`(PowerShell) |
+| `IOS_CERT_PASSWORD` | `.p12` 내보낼 때 정한 비밀번호 | 그대로 |
+| `IOS_PROVISION_PROFILE_BASE64` | Apple Developer › Profiles › **App Store Connect** 배포 프로필(App ID `com.taknroll.criticalpoint`, 위 인증서) 다운로드 | `base64 -i CriticalPoint_AppStore.mobileprovision` |
+| `APP_STORE_CONNECT_API_KEY_ID` | App Store Connect › 사용자 및 액세스 › 통합 › App Store Connect API › 팀 키(역할 App Manager) | 키 ID 그대로(TestFlight 업로드 때만) |
+| `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | 같은 화면 위쪽 Issuer ID | 그대로 |
+| `APP_STORE_CONNECT_API_KEY_P8_BASE64` | 같은 화면에서 한 번만 받는 `AuthKey_<ID>.p8` | `base64 -i AuthKey_XXXX.p8` |
+| `ANDROID_KEYSTORE_BASE64` | 위 「서명」 1의 업로드 keystore `criticalpoint-upload.jks` | `base64 -w0 criticalpoint-upload.jks`(Linux) / PowerShell은 위와 같음 |
+| `ANDROID_KEYSTORE_PASSWORD` | keystore 비밀번호 | 그대로 |
+| `ANDROID_KEY_ALIAS` | `-alias`로 정한 이름(`criticalpoint-upload`) | 그대로 |
+| `ANDROID_KEY_PASSWORD` | 키 비밀번호(따로 안 정했으면 keystore 비밀번호와 같음) | 그대로 |
+| `VITE_SUPABASE_URL`·`VITE_SUPABASE_ANON_KEY` | Render 환경 변수와 같은 값 | 그대로. 없으면 앱의 원격 순위표·텔레메트리가 꺼짐 |
+
+### Variables (같은 화면 › Variables, 비밀 아님)
+
+| Variable | 값 | 없으면 |
+|---|---|---|
+| `ADMOB_APP_ID_IOS` | AdMob › 앱 › 앱 설정의 iOS 앱 ID(`ca-app-pub-…~…`) | `Info.plist`의 Google 테스트 앱 ID 그대로 |
+| `ADMOB_APP_ID_ANDROID` | 같은 곳의 Android 앱 ID | `strings.xml`의 Google 테스트 앱 ID 그대로 |
+| `ADMOB_LIVE` | `true` — `app/native/adUnits.js` `LIVE_UNITS`를 실제 광고 단위로 채운 **뒤에만** | 테스트 광고 단위(채우지 않은 채 `true`여도 테스트 단위) |
+
+앱 ID는 빌드 때 runner 안의 파일만 바꾸고 저장소에는 남지 않습니다. 워크플로는 `check:app`을 경고만 내는 보통 모드로 돌립니다. 스토어에 올릴 빌드 전에는 `npm run check:app -- --release`(테스트·자리표시 ID가 남으면 실패)가 통과하는지 따로 봅니다.
 
 ## 사용자가 채울 자리표시
 
@@ -187,8 +230,8 @@ cd android && ./gradlew bundleRelease                                   # app/bu
 | 개인정보처리방침·이용약관 URL | `src/components/AppStorePanel.jsx` `POLICY_LINKS` | 자체 도메인 페이지 |
 | 업로드 keystore·비밀번호 | `app/android/*.jks`·`keystore.properties`(git 제외) | `keytool -genkeypair` |
 | 안드로이드 아이콘·시작 화면 | `app/android/app/src/main/res/` | Image Asset(큰 원본) |
-| Apple Team ID | Xcode Signing(또는 CI `DEVELOPMENT_TEAM=`) | Apple Developer(조직 계정, 문서 D) |
-| iOS 배포 인증서·프로필·App Store Connect API 키 | GitHub Secrets(CI 때) | Apple Developer |
+| Apple Team ID | Xcode Signing(또는 CI Secret `APPLE_TEAM_ID`) | Apple Developer(조직 계정, 문서 D) |
+| iOS 배포 인증서·프로필·App Store Connect API 키 | GitHub Secrets(위 「앱 빌드 자동화」 표) | Apple Developer |
 | 번들 ID 등록 | App Store Connect / Play Console | `com.taknroll.criticalpoint` |
 | 고해상도 아이콘 원본(1024px 이상) | `public/profile.jpg` 대신 | 원본 그림 |
 | 영어 앱 이름 「Critical Point – Bank Thriller」 | 스토어 목록(코드 아님) | 문서 D |
