@@ -155,7 +155,7 @@ const PRIVACY_KO = `
 <li>회원가입과 로그인이 없습니다. 이름, 이메일, 전화번호, 주소를 받지 않습니다.</li>
 <li>게임에서 정하는 분석관 이름은 이 기기에만 저장되고 서버로 보내지 않습니다.</li>
 <li>진행은 기본적으로 이 기기(브라우저 저장소)에만 저장됩니다. 서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>
-<li>웹판에는 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>
+<li>지금은 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>
 </ul>
 
 <h2>2. 처리하는 개인정보의 항목, 목적, 보유 기간</h2>
@@ -216,7 +216,7 @@ const PRIVACY_KO = `
 <p>전송 구간 암호화(HTTPS), 데이터베이스 접근 권한 최소화(익명 사용자는 정해진 기능으로만 쓰고 다른 사람의 기록을 읽을 수 없음), 요청 횟수 제한, 이어하기 코드와 접속 주소의 변환 저장.</p>
 
 <h2>10. 광고</h2>
-<p>웹판에는 광고가 없습니다. 광고는 앞으로 나올 앱판에만 넣을 예정이며, 앱판을 내기 전에 광고와 관련한 처리 내용을 이 방침에 더해 알립니다.</p>
+<p>지금은 광고가 없습니다. 나중에 광고를 붙이게 되면, 붙이기 전에 광고와 관련한 처리 내용(광고 회사, 쿠키, 거부하는 법)을 이 방침에 더해 알립니다.</p>
 
 <h2>11. 개인정보 보호 문의처</h2>
 <ul>
@@ -237,7 +237,7 @@ const PRIVACY_EN = `
 <li>There is no sign-up or login. We do not collect your name, email address, phone number or postal address.</li>
 <li>The analyst name you choose stays on your device and is never sent to our servers.</li>
 <li>Your progress is saved on your device (browser storage) by default. Only the four kinds of data in section 2 ever reach a server.</li>
-<li>The web version shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>
+<li>The game currently shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>
 </ul>
 
 <h2>2. What we process, why, and for how long</h2>
@@ -298,7 +298,7 @@ const PRIVACY_EN = `
 <p>HTTPS in transit, least-privilege database access (anonymous users reach only the game's own functions and cannot read anyone else's records), rate limiting, and hashed continue codes and addresses.</p>
 
 <h2>10. Ads</h2>
-<p>The web version shows no ads. Ads are planned only for future app versions, and this policy will describe them before any app version is released.</p>
+<p>The game currently shows no ads. If ads are added later, this policy will describe them (the ad provider, cookies and how to opt out) before they appear.</p>
 
 <h2>11. Contact</h2>
 <ul>

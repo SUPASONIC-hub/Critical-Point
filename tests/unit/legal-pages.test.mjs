@@ -92,11 +92,11 @@ test("the decisions of 2026-10-25 hold: no names, one overseas line, no ads on t
   for (const html of [ko, en]) {
     assert.match(html, /Supabase Inc\.\s?\((?:미국|USA)\)/);
     assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]/, "no placeholder left");
-    assert.doesNotMatch(html, /AdSense|AdMob|IDFA/, "the web version has no ads to describe");
+    assert.doesNotMatch(html, /AdSense|AdMob|IDFA/, "no ads yet, so none to describe");
   }
   assert.match(ko, /담당: 임계점 개발자/);
-  assert.match(ko, /웹판에는 광고가 없/);
-  assert.match(en, /web version shows no ads/);
+  assert.match(ko, /지금은 광고가 없/);
+  assert.match(en, /currently shows no ads/);
   assert.match(ko, /8자리 세션 코드/);
   assert.match(decode(pages["terms.html"]), new RegExp(`href="${PRIVACY_PAGE_PATH}"`));
   assert.match(decode(pages["en/terms.html"]), /href="\/en\/privacy\.html"/);
