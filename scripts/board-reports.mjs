@@ -15,11 +15,18 @@
  * members can look, and then runs the workflow by hand with one of:
  *
  *   hide     moderate_board_post(id)         the post leaves the board
- *   restore  moderate_board_post(id, false)  a post hidden by mistake comes back
+ *   restore  moderate_board_post(id, false)  a post hidden by mistake comes back,
+ *            and its reports are deleted     and the queue stays clear
  *   dismiss  delete its reports              the post stays, the queue is clear
  *
  * A report waits until its post is hidden or its reports are dismissed. A
  * report on a hidden post is done (a writer can only report a post they see).
+ * Hiding keeps the reports, so restore deletes them: a post restored is one a
+ * person read and kept, which is what dismiss says. Until 10-26 restore left
+ * them, the post was back in the next morning's queue with its first report's
+ * wait (past 24 hours, so a red run and a failure mail), and only a second
+ * hand run (dismiss) cleared it. A report that comes after the restore is a
+ * new one and waits as any other.
  *
  *   node scripts/board-reports.mjs --sql                      the one SELECT the daily run sends
  *   node scripts/board-reports.mjs --act <action> <post id>   the statement a hand run sends
@@ -61,7 +68,10 @@ export function actionStatement(action, postId) {
   const id = String(postId ?? "").trim();
   if (!/^[1-9]\d{0,17}$/.test(id)) throw new Error(`${postId} is not a post id`);
   if (action === "hide") return `select public.moderate_board_post(${id}) as done;`;
-  if (action === "restore") return `select public.moderate_board_post(${id}, false) as done;`;
+  // Restore, then dismiss, in one statement: the reports go only when the post was there to restore.
+  if (action === "restore") {
+    return `with restored as (select public.moderate_board_post(${id}, false) as done), gone as (delete from public.board_reports where post_id = ${id} and (select done from restored) returning 1) select (select done from restored) as done, (select count(*)::int from gone) as dismissed;`;
+  }
   return `with gone as (delete from public.board_reports where post_id = ${id} returning 1) select count(*)::int as done from gone;`;
 }
 

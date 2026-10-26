@@ -17,9 +17,9 @@ import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
-import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
+import { PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill } from "../locale.js";
-import introCopy from "../copy/intro.js";
+import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -79,8 +79,12 @@ const openDrawer = (id) => () => {
 };
 const openDataDrawer = openDrawer(DATA_DRAWER_ID);
 const openBriefingDrawer = openDrawer(BRIEFING_DRAWER_ID);
-// "{game} 시작": the text on either side of the blank an element fills.
-const NEW_GAME_PLUS_LABEL = introCopy.setup.newGamePlus.split("{game}");
+// Copy read at module level is read before another language's dictionary is
+// laid over it: this screen is in the shell, imported before loadLocale()
+// resolves. So no string of introCopy is copied out up here -- the NEW GAME+
+// label was, and printed "NEW GAME+ 시작" on the English page until 10-26.
+// Read it while rendering (newGamePlusLabel); an object (CONFIRM) is fine,
+// the overlay writes into it.
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -424,7 +428,7 @@ export function IntroScreen({ view, renderers = {} }) {
             {newGamePlusUnlocked && (
               <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={Boolean(openingBurst)}>
                 <Sparkles size={16} />
-                <span>{NEW_GAME_PLUS_LABEL[0]}<span lang="en">NEW GAME+</span>{NEW_GAME_PLUS_LABEL[1]}</span>
+                <span>{newGamePlusLabel()[0]}<span lang="en">NEW GAME+</span>{newGamePlusLabel()[1]}</span>
               </button>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
@@ -664,7 +668,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>{introCopy.data.consent}</b>
                 <small>
                   {telemetryEnabled
-                    ? PLAYTEST_DATA_NOTICE
+                    ? introCopy.data.playtestNotice
                     : introCopy.data.noRemote}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>

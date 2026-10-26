@@ -277,7 +277,7 @@ export default {
     },
     "c10_pills_reaction": {
       "title": "2 Weeks, 3 Years Ago",
-      "text": "Han Seoyun opens her own sick-leave record. Reason: personal matter. The actual date is two months after she signed the return of the FlowOn dissent, 3 years ago. 'I didn’t tell anyone back then. Saying it would mean I regret that signature.' She goes to close the screen, then stops. 'But I bet 18 of the 19 kept quiet for the same reason.'",
+      "text": "Han Seoyun opens her own sick-leave record. Reason: personal matter. The actual date is two months after she pressed the return button on the FlowOn dissent, 3 years ago. 'I didn’t tell anyone back then. Saying it would mean I regret that return.' She goes to close the screen, then stops. 'But I bet 18 of the 19 kept quiet for the same reason.'",
       "memo": [
         "A reason never written in the reason field",
         "The 19th box, still empty"

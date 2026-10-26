@@ -18,7 +18,9 @@ const percent = (share) => Math.round(share * 100);
 // them were not the analyst every prologue writes. The only thing the pick
 // changes is where 프롤로그 01's numbers start (getOriginStartEffects), so
 // `start` says that and nothing more.
-const operatorProfiles = {
+// Exported so the start screen's copy can name it (src/copy/intro.js), where
+// another language is laid over the titles and premises in place.
+export const OPERATOR_PROFILES = {
   courier: {
     id: "courier",
     label: "SITE VISIT",
@@ -46,11 +48,11 @@ const startLine = (origin) => Object.entries(getOriginStartEffects(origin))
 const withStart = (profile) => ({ ...profile, start: startLine(profile.id) });
 
 export function getOperatorProfiles() {
-  return Object.values(operatorProfiles).map(withStart);
+  return Object.values(OPERATOR_PROFILES).map(withStart);
 }
 
 export function getOperatorProfile(origin = "courier") {
-  return withStart(operatorProfiles[origin] ?? operatorProfiles.courier);
+  return withStart(OPERATOR_PROFILES[origin] ?? OPERATOR_PROFILES.courier);
 }
 
 /**
@@ -132,13 +134,15 @@ export function getPastRunMemory(memory = {}, record = null, runId = null) {
   };
 }
 
+/** What each memory opens with on the start screen (named by src/copy/intro.js, like OPERATOR_PROFILES). */
+export const ORIGIN_PROLOGUES = {
+  courier: { title: "11명의 공장", text: "당신이 가장 오래 기억하는 것은 수습 마지막 과제의 온새포장입니다. 서류 한 장 뒤에 직원 11명의 11월이 걸려 있었습니다." },
+  lab: { title: "반대 의견서를 쓴 밤", text: "당신이 가장 오래 기억하는 것은 혼자 쓴 반대 의견서입니다. 시작은 수습 마지막 과제에서 합계에 들어가지 않은 4,000만 원짜리 한 줄이었습니다." },
+  public: { title: "비워 둔 서명란", text: "당신이 가장 오래 기억하는 것은 속도 칸 하나만 채워지고 서명란이 빈 수습 평가표입니다. 그날부터 당신은 판단을 적어 둡니다." },
+};
+
 export function getOriginPrologue(origin = "courier") {
-  const profiles = {
-    courier: { title: "11명의 공장", text: "당신이 가장 오래 기억하는 것은 수습 마지막 과제의 온새포장입니다. 서류 한 장 뒤에 직원 11명의 11월이 걸려 있었습니다." },
-    lab: { title: "반대 의견서를 쓴 밤", text: "당신이 가장 오래 기억하는 것은 혼자 쓴 반대 의견서입니다. 시작은 수습 마지막 과제에서 합계에 들어가지 않은 4,000만 원짜리 한 줄이었습니다." },
-    public: { title: "비워 둔 서명란", text: "당신이 가장 오래 기억하는 것은 속도 칸 하나만 채워지고 서명란이 빈 수습 평가표입니다. 그날부터 당신은 판단을 적어 둡니다." },
-  };
-  return profiles[origin] ?? profiles.courier;
+  return ORIGIN_PROLOGUES[origin] ?? ORIGIN_PROLOGUES.courier;
 }
 
 export function getOriginStartEffects(origin = "courier") {

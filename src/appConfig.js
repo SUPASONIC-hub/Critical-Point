@@ -57,14 +57,24 @@ export const SUPPORT_CONTACT = "from.logic.to.magic@gmail.com";
  * on every telemetry row); an online save is deleted by the player in its own
  * panel and needs no request. `contact` is SUPPORT_CONTACT unless a test says
  * otherwise. Returns the parts so the screen can make the address a link.
+ * The words are `DELETION_REQUEST_COPY`, which the start screen's copy names
+ * (src/copy/intro.js) so another language is laid over them in place.
  */
+export const DELETION_REQUEST_COPY = {
+  cloud: " 온라인 저장은 「다른 기기에서 이어하기」 패널에서 직접 지울 수 있습니다.",
+  before: "기록 삭제는 ",
+  beforeUnset: "기록 삭제 요청을 받을 연락처는 출시 전에 이 자리에 적습니다(아직 정하지 않았습니다). ",
+  after: "로 요청해 주세요. 8자리 세션 코드를 함께 적어 주시면 기록을 찾아 지웁니다.",
+  afterUnset: "요청에는 8자리 세션 코드가 필요하니 결과 화면의 「코드 복사」로 남겨 두세요.",
+};
+
 export function getDeletionRequestText(contact = SUPPORT_CONTACT) {
   const address = typeof contact === "string" && contact.trim() ? contact.trim() : null;
-  const cloud = " 온라인 저장은 「다른 기기에서 이어하기」 패널에서 직접 지울 수 있습니다.";
+  const words = DELETION_REQUEST_COPY;
   return {
     address,
-    before: address ? "기록 삭제는 " : "기록 삭제 요청을 받을 연락처는 출시 전에 이 자리에 적습니다(아직 정하지 않았습니다). ",
-    after: `${address ? "로 요청해 주세요. 8자리 세션 코드를 함께 적어 주시면 기록을 찾아 지웁니다." : "요청에는 8자리 세션 코드가 필요하니 결과 화면의 「코드 복사」로 남겨 두세요."}${cloud}`,
+    before: address ? words.before : words.beforeUnset,
+    after: `${address ? words.after : words.afterUnset}${words.cloud}`,
   };
 }
 

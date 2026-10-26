@@ -342,7 +342,7 @@ export default {
     },
     "c38_branch_hallway_follow": {
       "title": "In the Hallway, You Can",
-      "text": "Moon Gaeul comes out into the hallway. She sees Han Seoyun and stops. It is a name she read in the reference materials at the very end of the complaint. The person who signed the return. Han Seoyun bows her head first. 'I’m Han Seoyun. It’s the name I tried to tell you last year at the mediation committee and couldn’t.' Moon Gaeul says nothing for a long while, then takes two pieces of jeolpyeon rice cake wrapped in plastic out of her apron pocket. The only rice cakes security missed. 'You can’t eat in the courtroom. In the hallway, you can.' Han Seoyun takes the rice cakes and, for the first time, does not hide that she has been crying.",
+      "text": "Moon Gaeul comes out into the hallway. She sees Han Seoyun and stops. It is a name she read in the reference materials at the very end of the complaint. The person who pressed the return button. Han Seoyun bows her head first. 'I’m Han Seoyun. It’s the name I tried to tell you last year at the mediation committee and couldn’t.' Moon Gaeul says nothing for a long while, then takes two pieces of jeolpyeon rice cake wrapped in plastic out of her apron pocket. The only rice cakes security missed. 'You can’t eat in the courtroom. In the hallway, you can.' Han Seoyun takes the rice cakes and, for the first time, does not hide that she has been crying.",
       "memo": [
         "2 pieces of jeolpyeon that got past security",
         "Han Seoyun and Moon Gaeul meet face to face for the first time",
@@ -362,7 +362,7 @@ export default {
       },
       "place": "Seoul Central District Court · 4th-floor hallway",
       "clock": "Recess · 15:52",
-      "question": "The bereaved and the person who signed the return have met for the first time in the hallway. How do you send the two of them back into the courtroom?"
+      "question": "The bereaved and the person who pressed the return button have met for the first time in the hallway. How do you send the two of them back into the courtroom?"
     },
     "c38_route_system": {
       "title": "The Split Cases",

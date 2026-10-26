@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c14_start": {
       "title": "As Long as the Bank Doesn’t Fail",
-      "text": "On every waiting screen at KD Bank windows, a green ad loops. 'Do good even after retirement: the Sangsaeng ESG Fund.' The November launch was moved up, and in 2 weeks to the end of October, 107 billion won was sold. The average buyer is 71. The appendix at the very back of the prospectus lists what the fund buys. 38 loans from group affiliates. All non-performing loans. And the remaining piece of the FlowOn loan. Do Yoonha taps one line on page two of the sales script he got from a Gangseo Branch peer. 'As long as the bank doesn’t fail, you have nothing to worry about.' He turns the script over. 'That’s my sentence. What I used to say at the window 3 years ago. They’re mis-selling again, and this time in my voice.'",
+      "text": "The list of returns to regular departments set for Monday came back marked 'on hold', and the 4th floor stays as it is. On every screen at KD Bank windows, a green ad loops. 'Do good even after retirement: the Sangsaeng ESG Fund.' The launch was moved up, and in 2 weeks 107 billion won was sold. The average buyer is 71. The appendix at the very back of the prospectus lists what the fund buys. 38 loans from group affiliates. All non-performing loans. And the remaining piece of the FlowOn loan. Do Yoonha taps page two of the sales script he got from a Gangseo Branch peer. 'As long as the bank doesn’t fail, you have nothing to worry about.' 'That’s my sentence. What I used to say at the window 3 years ago. They’re mis-selling again, and this time in my voice.'",
       "memo": [
         "Sangsaeng ESG Fund Round 1: 107 billion won -- 3,146 buyers",
         "Average buyer age 71, sold at KD Bank windows",
@@ -438,7 +438,7 @@ export default {
     },
     "c14_start_warm": {
       "title": "A Script on the Lunch Table",
-      "text": "Since the night after the livestream when you carried out every last light stand together, the six have not eaten lunch apart once in 3 weeks. Onto that lunch table, Do Yoonha sets down a sales script. The group moved up the launch Baek Arin said was next month; for 2 weeks now bank windows have been selling the 'Sangsaeng fund' to retirees, and this is its script. What the fund buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. 'This sentence on page two is what I used to say 3 years ago. This is mis-selling.' Six spoons stop at once.",
+      "text": "Since the night after the livestream when you carried out every last light stand together, the list of returns set for Monday came back marked 'on hold', and the six have not eaten lunch apart once in 3 weeks. Onto that lunch table, Do Yoonha sets down a sales script. The group moved up the launch Baek Arin said was next month; for 2 weeks now bank windows have been selling the 'Sangsaeng fund' to retirees, and this is its script. What the fund buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. 'This sentence on page two is what I used to say 3 years ago. This is mis-selling.' Six spoons stop at once.",
       "memo": [
         "Sangsaeng fund Round 1: 107 billion won -- 3,146 buyers, average age 71",
         "Holdings: 38 non-performing loans + the remaining piece of the FlowOn loan",
@@ -468,7 +468,7 @@ export default {
     },
     "c14_start_record": {
       "title": "The Next Line Under the Same Code",
-      "text": "3 weeks after you put the 33rd-floor offer on record, terms and price included, Ban Jaewook finds one more place where the Innovation Committee budget code in that document was used. The ad budget for the 'Sangsaeng fund', which KD Asset Management launched early and sold to 3,146 retirees for 107 billion won in 2 weeks. What the fund buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. Ban Jaewook sets the sales script Do Yoonha obtained beside it. Not one line mentions risk, and page two carries word for word what Do Yoonha used to say at the window 3 years ago. 'As long as the bank doesn’t fail, you have nothing to worry about.' Ban Jaewook says, 'Wash the face with ads, and pass the losses on at the window by mis-selling. With the same money.'",
+      "text": "3 weeks after you put the 33rd-floor offer on record, the list of returns set for Monday has come back marked 'on hold' and the 4th floor stays as it is. Ban Jaewook finds one more place where the Innovation Committee budget code in that document was used. The ad budget for the 'Sangsaeng fund', which KD Asset Management sold to 3,146 retirees for 107 billion won in 2 weeks. What the fund buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. Ban Jaewook sets the sales script Do Yoonha obtained beside it. Not one line mentions risk, and page two carries word for word what Do Yoonha used to say 3 years ago. 'As long as the bank doesn’t fail, you have nothing to worry about.' Ban Jaewook says, 'Wash the face with ads, and pass the losses on at the window by mis-selling. With the same money.'",
       "memo": [
         "Same budget code as the Innovation Committee ads -- fund advertising",
         "Holdings: 38 non-performing loans + the remaining piece of the FlowOn loan",
@@ -498,7 +498,7 @@ export default {
     },
     "c14_start_rush": {
       "title": "The Next Fight of One Who Didn’t Stop",
-      "text": "3 weeks after you started digging into the next 'Sangsaeng' product before the set had even cooled, Oh Jinwoo calls first. 'A friend of my father’s bought a fund at the bank yesterday. A kind fund, they said, fine as long as the bank doesn’t fail.' KD Asset Management’s 'Sangsaeng fund', the product Baek Arin hinted was coming next month, has come out early. 107 billion won sold in 2 weeks, and what it bought is the group’s non-performing loans and the remaining piece of the FlowOn loan. Oh Jinwoo speaks faster. 'Do Yoonha says that sentence is one he used to say. This is mis-selling. If we’re late, another 30 billion won sells this week alone.'",
+      "text": "3 weeks after you started digging into the next 'Sangsaeng' product before the set had even cooled, the list of returns set for Monday came back marked 'on hold', and the 4th floor stays as it is. Oh Jinwoo calls first. 'A friend of my father’s bought a fund at the bank yesterday. A kind fund, they said, fine as long as the bank doesn’t fail.' KD Asset Management’s 'Sangsaeng fund', the product Baek Arin hinted was coming next month, has come out early. 107 billion won sold in 2 weeks, and what it bought is the group’s non-performing loans and the remaining piece of the FlowOn loan. Oh Jinwoo speaks faster. 'Do Yoonha says that sentence is one he used to say. This is mis-selling. If we’re late, another 30 billion won sells this week alone.'",
       "memo": [
         "Sangsaeng fund Round 1: 107 billion won · 3,146 buyers -- 30 billion won more expected this week",
         "Holdings: 38 non-performing loans + the remaining piece of the FlowOn loan",

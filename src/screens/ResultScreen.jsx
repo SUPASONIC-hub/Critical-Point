@@ -26,7 +26,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
   // whether the page may name them: not when the player turned them off.
   const { letterKeys, keys } = shortcuts;
-  const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
+  const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || endingCopy.endingWords.finalChoiceFallback;
   const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.reframeOpenedRoute || entry.reframeBranchId);
   // Read without fallbacks: a run always has a pattern with its record and its
@@ -34,24 +34,24 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   // (getObserverPattern, getObservationLedger, getEndingVariant in gameLogic.js;
   // getEndingSceneProfile in runtimeSystems.js). tests/unit/report-copy.test.mjs.
   const observerEndingRecord = observerPattern.endingRecord;
-  const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern.arc.text };
+  const judgmentProfile = { label: observerEndingRecord.label.replace(endingCopy.endingWords.sampleSuffix, endingCopy.endingWords.typeSuffix), text: observerPattern.arc.text };
   const seasonRecordNotice = endingCopy.getSeasonRecordNotice({ nextCaseId: nextCaseSignal?.caseId, ...view.telemetry });
   const finalVerdict = endingCopy.getFinalVerdict({ endingVariant, finalChoiceId: finalEndingEntry?.choiceId, endingSceneChoice: endingSceneProfile.choice });
   const endingTwists = [
     {
-      label: "판정",
+      label: endingCopy.endingWords.twists.ruling,
       title: finalVerdict.title,
       evidence: endingVariant.label,
       copy: finalVerdict.ruling,
     },
     {
-      label: "집행",
+      label: endingCopy.endingWords.twists.execution,
       title: endingCopy.endingTwistTitles.execution,
       evidence: finalEndingEntry?.choice || finalChoiceText,
       copy: finalVerdict.execution,
     },
     {
-      label: "대가",
+      label: endingCopy.endingWords.twists.cost,
       title: endingCopy.endingTwistTitles.cost,
       evidence: endingSceneProfile.location,
       copy: finalVerdict.cost,
@@ -77,9 +77,9 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
       label: fill(resultCopy.why.untakenRoad, { label: report.costliest.label }),
     }));
   const witnessRecords = [
-    firstRouteEntry && { id: "first", label: "처음 내린 판단", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
-    longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 판단", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
-    branchRouteEntry && { id: "branch", label: "판을 흔든 판단", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
+    firstRouteEntry && { id: "first", label: endingCopy.endingWords.witness.first, tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
+    longestRouteEntry && { id: "longest", label: endingCopy.endingWords.witness.longest, tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
+    branchRouteEntry && { id: "branch", label: endingCopy.endingWords.witness.branch, tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
   const endingAfterglow = endingCopy.getEndingAfterglow(observationLedger);
   const analystName = playerName?.trim() ? fill(resultCopy.namedAnalyst, { name: playerName.trim() }) : resultCopy.anonymousAnalyst;
