@@ -72,6 +72,9 @@ function previewWords(words, through) {
 
 let dictionary = null;
 let language = null;
+// The language's copy between cases for the cases after 사건 10
+// (`<lang>/between/<first>-<last>.js`), the files the preview reaches.
+let between = [];
 
 /**
  * A language still in preview names its last case (`previewThrough` in its
@@ -104,7 +107,7 @@ export function markPreviewEnd(signals, preview, through) {
 /** A module's own tables (caseCopy.js), as it loads. */
 export function localizeTables(module, tables) {
   if (!dictionary) return;
-  overlayModule(dictionary.copy, module, tables);
+  for (const source of [dictionary, ...between]) overlayModule(source.copy, module, tables);
   if (module === "caseCopy") markPreviewEnd(tables.nextCaseSignals, dictionary.preview, dictionary.previewThrough);
 }
 
@@ -112,14 +115,19 @@ export function previewText(key) {
   return fillPreview(dictionary?.preview?.[key] ?? "");
 }
 
-/** A speaker's role in the loaded language: `roles`, then `caseRoles` of the cases in the preview. */
+/** A speaker's role in the loaded language: the dictionary's `roles`, then the `caseRoles` of the cases in the preview. */
 export function roleName(role) {
-  const named = dictionary?.roles?.[role];
-  if (named) return named;
-  for (const [caseId, table] of Object.entries(dictionary?.caseRoles ?? {})) {
-    if (table?.[role] && inPreview(caseId)) return table[role];
+  return dictionary?.roles?.[role] ?? caseRole(between, role) ?? role;
+}
+
+/** A role from the `caseRoles` of between/ files, for a case in the preview; undefined when none names it. */
+export function caseRole(parts, role, through = dictionary?.previewThrough) {
+  for (const part of parts) {
+    for (const [caseId, table] of Object.entries(part?.caseRoles ?? {})) {
+      if (table?.[role] && inPreview(caseId, through)) return table[role];
+    }
   }
-  return role;
+  return undefined;
 }
 
 export function speakerName(name) {
@@ -166,12 +174,35 @@ export function loadDictionary(lang) {
   const load = import.meta.glob("./*/index.js")[`./${lang}/index.js`];
   if (!load) return Promise.resolve(null);
   return load().then((module) => {
-    dictionary = module;
-    language = lang;
-    for (const [name, tables] of Object.entries(SHELL_TABLES)) overlayModule(dictionary.copy, name, tables);
-    addStyle(dictionary.style);
-    return api;
+    const through = /** @type {{ previewThrough?: string }} */ (module).previewThrough;
+    const parts = betweenFiles(import.meta.glob("./*/between/*.js"), lang, through);
+    // A file that cannot be fetched leaves its cases' copy Korean, like a case's scenes.
+    return Promise.all(parts.map((get) => get().catch(() => null))).then((loaded) => {
+      dictionary = module;
+      language = lang;
+      between = loaded.filter(Boolean);
+      for (const source of [dictionary, ...between]) {
+        for (const [name, tables] of Object.entries(SHELL_TABLES)) overlayModule(source.copy, name, tables);
+      }
+      addStyle(dictionary.style);
+      return api;
+    });
   });
+}
+
+/**
+ * Of a language's copy-between-cases files (`<lang>/between/case11-20.js`,
+ * named by their first and last case), the ones whose first case is in the
+ * preview: the rest are never fetched, so the words for cases the preview has
+ * not reached cost an English page nothing.
+ */
+export function betweenFiles(files, lang, through) {
+  return Object.entries(files)
+    .filter(([file]) => {
+      const first = /\/(case\d{2})-\d{2}\.js$/.exec(file)?.[1];
+      return file.startsWith(`./${lang}/between/`) && Boolean(first) && inPreview(first, through);
+    })
+    .map(([, get]) => get);
 }
 
 /**

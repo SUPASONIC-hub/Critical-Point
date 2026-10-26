@@ -3,9 +3,9 @@ import { existsSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 
 import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.mjs";
-import { caseSource, compareWords, flatten, hasHangul, readCopySource, stillKorean, wordsOf } from "../../scripts/locale-words.mjs";
+import { caseSource, compareWords, flatten, hasHangul, readCopySource, readLanguageCopy, stillKorean, wordsOf } from "../../scripts/locale-words.mjs";
 import { LANG, loadLocale, localizeCaseData, SOURCE_LOCALE, speakerName, SUPPORTED_LOCALES } from "../../src/locale.js";
-import { addStyle, fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
+import { addStyle, betweenFiles, caseRole, fillPreview, inPreview, localizeCase, localizeCaseData as overlayCaseData, localizeTables, markPreviewEnd, overlayModule, overlayWords, previewText, roleName as overlayRoleName, speakerName as overlaySpeakerName } from "../../src/locales/overlay.js";
 import * as gameCases from "../../src/gameCases.js";
 import * as caseCopy from "../../src/caseCopy.js";
 
@@ -105,7 +105,18 @@ test("the preview's last case is one constant: the cases after it stay Korean, i
   markPreviewEnd(signals, preview, "case20");
   assert.deepEqual(signals.case10, { eyebrow: "Next", button: "Start Case 11", premise: "Premise." });
   assert.deepEqual(signals.case20, { eyebrow: "End", button: "Korean", premise: "End of Case 20; Case 21 is Korean. Later." });
-  // The copy between cases for the cases after the preview waits in the dictionary.
+  // The copy between cases for the cases after the preview waits: its file is fetched once the preview reaches its first case.
+  const files = { "./en/between/case11-20.js": () => "11-20", "./en/between/case21-30.js": () => "21-30", "./ja/between/case11-20.js": () => "ja", "./en/between/notes.js": () => "x" };
+  assert.deepEqual(betweenFiles(files, "en", "case10").map((get) => get()), []);
+  assert.deepEqual(betweenFiles(files, "en", "case20").map((get) => get()), ["11-20"]);
+  assert.deepEqual(betweenFiles(files, "en", "case21").map((get) => get()), ["11-20", "21-30"]);
+  assert.deepEqual(betweenFiles(files, "en", undefined).map((get) => get()), ["11-20", "21-30"]);
+  const parts = [null, { caseRoles: { case11: { 기자: "Reporter" } } }, { caseRoles: { case21: { 작가: "Writer" } } }];
+  assert.equal(caseRole(parts, "기자", "case20"), "Reporter");
+  assert.equal(caseRole(parts, "기자", "case10"), undefined);
+  assert.equal(caseRole(parts, "작가", "case20"), undefined);
+  assert.equal(caseRole(parts, "없음", "case49"), undefined);
+  // And a case's words in a file are laid over only while that case is in the preview.
   const echoes = { case10: "에코: 열.", case11: "에코: 열하나.", other: "다른 줄." };
   overlayModule({ caseCopy: { caseIntroEchoes: { case10: "ECHO: Ten.", case11: "ECHO: Eleven.", other: "Another line." } } }, "caseCopy", { caseIntroEchoes: echoes }, "case10");
   assert.deepEqual(echoes, { case10: "ECHO: Ten.", case11: "에코: 열하나.", other: "Another line." });
@@ -144,11 +155,29 @@ for (const lang of others) {
   });
 
   test(`${lang}: the dictionary's screen copy answers paths the Korean has (every case's), and names speakers by their Korean names`, async () => {
-    // Every case: the copy between cases for the cases after the preview waits in the dictionary too.
-    const result = compareWords(await readCopySource(new URL("../..", import.meta.url).href.replace(/\/$/, ""), gameCases.CASE_SEQUENCE), dictionary.copy, lang);
+    // Every case: the dictionary's copy and the copy between cases waiting in <lang>/between/.
+    const root = new URL("../..", import.meta.url).href.replace(/\/$/, "");
+    const result = compareWords(await readCopySource(root, gameCases.CASE_SEQUENCE), await readLanguageCopy(root, lang), lang);
     assert.deepEqual(result.stale, []);
     for (const name of Object.keys(dictionary.speakers ?? {})) assert.ok(hasHangul(name), `speakers key ${name}`);
     if (SUPPORTED_LOCALES.find((locale) => locale.code === lang).hidden) assert.ok(dictionary.preview?.languageName, `${lang} is hidden, so its dictionary names it (preview.languageName)`);
+  });
+
+  test(`${lang}: the dictionary carries no copy for a case after 사건 10, and each between/ file only the cases its name spans`, async () => {
+    const order = gameCases.CASE_SEQUENCE;
+    const caseKeys = (copy) => Object.values(copy ?? {}).flatMap((tables) => Object.values(tables ?? {}).flatMap((table) => Object.keys(table ?? {}))).filter((key) => order.includes(key));
+    const late = caseKeys(dictionary.copy).filter((key) => order.indexOf(key) > order.indexOf("case10"));
+    assert.deepEqual([...new Set(late)], [], "the copy between cases after 사건 10 belongs in between/<first>-<last>.js");
+    const dir = new URL(`../../src/locales/${lang}/between/`, import.meta.url);
+    for (const file of existsSync(dir) ? readdirSync(dir) : []) {
+      const span = /^(case\d{2})-(\d{2})\.js$/.exec(file);
+      assert.ok(span, `${file}: named <first case>-<last number>.js`);
+      const [first, last] = [order.indexOf(span[1]), order.indexOf(`case${span[2]}`)];
+      const part = await import(new URL(file, dir).href);
+      for (const key of [...caseKeys(part.copy), ...Object.keys(part.caseRoles ?? {})]) {
+        assert.ok(order.indexOf(key) >= first && order.indexOf(key) <= last, `${file}: ${key} is outside its span`);
+      }
+    }
   });
 }
 
