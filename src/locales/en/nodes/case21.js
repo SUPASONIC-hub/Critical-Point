@@ -159,11 +159,11 @@ export default {
     },
     "c21_aftershock": {
       "title": "Tangerines Not Picked in a Hurry",
-      "text": "The post office cutoff passes, and snow flurries drift across the yard of Sunwoo Jin’s guesthouse, Slow Island. Ko Eunbi, who owns the orchard next door, presses a box of off-grade tangerines into Kwon Dohyun’s arms and holds out a statement. In the amount field, '0 won'; in the remarks field, 'Don’t pick at it.' Kwon Dohyun folds the statement and tucks it into his wallet. Kang Taemin is told to come back tomorrow for the third time, and Na Junhyuk writes 'I will come again, slowly' in the guestbook, in handwriting as neat as a stamp. Sunwoo Jin hands you a box of tangerines. 'These weren’t picked in a hurry.' Then a text arrives from Moon Gaeul. 'I put in the application today to borrow money for a new machine for Kkeutkkaji Precision. They say a new computer does the review. And Hajun starts as an intern at Gangseo Branch after Lunar New Year.'",
+      "text": "The post office cutoff passes, and snow flurries drift across the yard of Sunwoo Jin’s guesthouse, Slow Island. Ko Eunbi, who owns the orchard next door, presses a box of off-grade tangerines into Kwon Dohyun’s arms and holds out a statement. In the amount field, '0 won'; in the remarks field, 'Don’t pick at it.' Kwon Dohyun folds the statement and tucks it into his wallet. Kang Taemin is told to come back tomorrow for the third time, and Na Junhyuk writes 'I will come again, slowly' in the guestbook, in handwriting as neat as a stamp. Sunwoo Jin hands you a box of tangerines. 'These weren’t picked in a hurry.' Then a text arrives from Moon Gaeul. 'I put in the application today to borrow money for a new machine for To-the-End Precision. They say a new computer does the review. And Hajun starts as an intern at Gangseo Branch after Lunar New Year.'",
       "memo": [
         "Retroactive consent reply deadline passed",
         "One box of off-grade tangerines -- statement 0 won",
-        "Kkeutkkaji Precision loan application, reviewed by NOAH",
+        "To-the-End Precision loan application, reviewed by NOAH",
         "Moon Hajun starts a Gangseo Branch internship after the Lunar New Year holiday"
       ],
       "choices": {
@@ -179,7 +179,7 @@ export default {
       },
       "place": "Slow Island, Gujwa, Jeju · Yard in Front of the Tangerine Warehouse",
       "clock": "February 9 · Evening · Snow flurries",
-      "question": "Boxes of tangerines change hands in the snow, and Kkeutkkaji Precision’s loan has gone to NOAH. How do you close your last evening in Jeju?"
+      "question": "Boxes of tangerines change hands in the snow, and To-the-End Precision’s loan has gone to NOAH. How do you close your last evening in Jeju?"
     },
     "c21_guestbook": {
       "title": "12 Guestbooks",
@@ -545,7 +545,7 @@ export default {
     "c21_final_ask": "When you ask, Sunwoo Jin looks out at the orchard. Before an answer comes, the post office cutoff passes. Meanwhile the originals stay in the sealed section.",
     "c21_after_warm": "Because you stay, six tangerine boxes get sealed with tape. In Seoul, NOAH spends that night too building choices from Cohort 1’s sentences.",
     "c21_after_record": "With the guide in place, the other three from Cohort 1 can see their own records too. Sunwoo Jin replies to the document: 'I’ll read it slowly.'",
-    "c21_after_rush": "Going up first, you see Kkeutkkaji Precision on NOAH’s first review list. The only one who sees you off at the airport is Kkokji, the dog from Slow Island’s yard.",
+    "c21_after_rush": "Going up first, you see To-the-End Precision on NOAH’s first review list. The only one who sees you off at the airport is Kkokji, the dog from Slow Island’s yard.",
     "c21_guestbook_choice_1": "Closed, the guestbook is Sunwoo Jin’s again. Tonight no one writes down where that sentence came from.",
     "c21_guestbook_choice_2": "Side by side, the order shows. The library entry was June 2022, the summer Sunwoo Jin was in Trigger Lab’s basement.",
     "c21_guestbook_choice_3": "The photos remain. At the shutter sound of someone photographing another person’s guestbook, Kkokji lifts its head by the living-room stove.",
@@ -616,7 +616,7 @@ export default {
     "c21_final_ask": "Since whether to know is also Sunwoo Jin’s to decide, you ask before saying anything whether Sunwoo Jin wants to know.",
     "c21_after_warm": "Saying tangerines not picked in a hurry can’t be carried off in a hurry, you stay at Slow Island until the last flight and pack tangerine boxes together.",
     "c21_after_record": "So participants can see their own records before they stand at the signature line, you draft a records access request guide for Cohort 1 participants.",
-    "c21_after_rush": "Saying the Kkeutkkaji Precision application is already in front of NOAH, you take the very next flight up with the tangerine box and look into NOAH’s review.",
+    "c21_after_rush": "Saying the To-the-End Precision application is already in front of NOAH, you take the very next flight up with the tangerine box and look into NOAH’s review.",
     "c21_guestbook_choice_1": "Since these are handwritten replies to guests who came to rest, you treat the guestbook as Sunwoo Jin’s and close it quietly without photos.",
     "c21_guestbook_choice_2": "So you can tell whose words came first, you note the reply dates and option-sentence numbers side by side.",
     "c21_guestbook_choice_3": "Saying it is late, you just take photos and see to tomorrow’s orchard schedule first.",
