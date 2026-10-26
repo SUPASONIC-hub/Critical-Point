@@ -21,6 +21,7 @@ import header from "./header.js";
 import intro from "./intro.js";
 import leaderboard from "./leaderboard.js";
 import loading from "./loading.js";
+import mutations from "./mutations.js";
 import notices from "./notices.js";
 import observer from "./observer.js";
 import ranking from "./ranking.js";
@@ -37,4 +38,4 @@ import unlocks from "./unlocks.js";
 import weekRule from "./weekRule.js";
 import weekRules from "./weekRules.js";
 
-export default { actCard, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, header, intro, leaderboard, loading, notices, observer, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, seasonEnd, table, unlocks, weekRule, weekRules };
+export default { actCard, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, header, intro, leaderboard, loading, mutations, notices, observer, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, seasonEnd, table, unlocks, weekRule, weekRules };

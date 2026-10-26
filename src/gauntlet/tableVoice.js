@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { formatNumber } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
 import { findAudit } from "./auditRisk.js";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
 
 /**
  * What the table says aloud, in one polite region (E3, table-voice).
@@ -51,17 +53,21 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  */
 const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, audit: 3, links: 4, stance: 5, scout: 6, push: 7 });
 
-/** What the voice says when a first press has armed 확정 (hold-to-seal). */
-export const HOLD_ARMED_CALL = "한 번 더 누르면 확정된다";
+// The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
+// each call is made, so another language laid over them is the one said.
+const voice = () => tableCopy.voice;
 
-export const describePush = ({ gauge, dangerLine }) => `열기 ${Math.round(gauge)} · ${dangerLine}`;
+/** What the voice says when a first press has armed 확정 (hold-to-seal). Read when the call is made. */
+export const getHoldArmedCall = () => voice().holdArmed;
 
-export const describeStanceCarry = ({ focus, carry }) => `충전 ${Math.round(focus)} · 확정하면 다음 판 ${carry.label} · ${carry.title}`;
+export const describePush = ({ gauge, dangerLine }) => fill(voice().push, { gauge: Math.round(gauge), danger: dangerLine });
+
+export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { focus: Math.round(focus), label: carry.label, title: carry.title });
 
 /** What a look bought (`getWindowBand`): the band it narrowed to, never the wall inside it. */
-export const describeScout = ({ wallMin, wallMax }) => `조회했다. 벽은 ${wallMin}에서 ${wallMax} 사이 어딘가`;
+export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax });
 
-export const describeBank = ({ runPot, vault }) => `판돈 ${formatNumber(runPot)} · 금고 ${formatNumber(vault)}`;
+export const describeBank = ({ runPot, vault }) => fill(voice().bank, { pot: formatNumber(runPot), vault: formatNumber(vault) });
 
 /** The rule the staked cash would carry for its stance, or null while the charge does not count. */
 export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutation) => STANCE_CARRY_IDS.has(mutation.id)) ?? null;
@@ -80,7 +86,7 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ar
     carry: carry?.id ?? "",
     stance: carry ? describeStanceCarry({ focus: win.focus, carry }) : "",
     clock: getClockCall({ ...clock, live, paused: false }),
-    hold: armed ? HOLD_ARMED_CALL : "",
+    hold: armed ? getHoldArmedCall() : "",
     scout: band?.scouted ? describeScout(band) : "",
   };
 }
