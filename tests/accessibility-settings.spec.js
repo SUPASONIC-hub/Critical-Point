@@ -1,5 +1,5 @@
 import { expect, test } from "./helpers/network.js";
-import { ACCESSIBILITY_SETTINGS_KEY, PLAYER_NAME_MAX_LENGTH } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, INSTALL_HINT_DISMISSED_KEY, PLAYER_NAME_MAX_LENGTH } from "../src/appConfig.js";
 import { seasonCasesBase } from "../src/gameCases.js";
 import { completeCurrentCase, dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
@@ -669,4 +669,61 @@ test("story mode turned on in the middle of a case starts with the next case", a
   const next = await savedRun(page);
   expect(next.currentCase).toBe("case02");
   expect(next.dynamics.story).toBe(true);
+});
+
+/**
+ * 홈 화면에 추가 (state/installPrompt.js), under the settings in the same
+ * drawer. Chromium under test sends no install offer, so the first test sends
+ * the one Chrome on a phone would, with a prompt() that counts; the second
+ * plays an iPhone, which never sends one.
+ */
+test.describe("install hint", () => {
+  test("Chrome's install offer: a button named as it reads, 44px tall, that prompts once and goes", async ({ page }) => {
+    await page.goto("/");
+    const drawer = page.locator(".intro-drawer", { has: page.locator("summary", { hasText: "편의 설정" }) });
+    await drawer.locator("summary").click();
+    await expect(drawer.getByRole("region", { name: "편의 설정" })).toBeVisible();
+    await expect(page.getByTestId("install-hint")).toHaveCount(0);
+
+    await page.evaluate(() => {
+      const offer = new Event("beforeinstallprompt");
+      offer.prompt = () => {
+        window.__installPrompts = (window.__installPrompts ?? 0) + 1;
+        return Promise.resolve({ outcome: "accepted" });
+      };
+      window.dispatchEvent(offer);
+    });
+    const hint = drawer.getByRole("region", { name: "홈 화면에 두기" });
+    const add = hint.getByRole("button", { name: "홈 화면에 추가", exact: true });
+    await expect(add).toBeVisible();
+    for (const button of [add, hint.getByRole("button", { name: "이 안내 닫기", exact: true })]) {
+      expect((await button.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    }
+
+    await add.click();
+    await expect(hint).toHaveCount(0);
+    expect(await page.evaluate(() => window.__installPrompts)).toBe(1);
+  });
+
+  test.describe("on an iPhone", () => {
+    test.use({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" });
+
+    test("the share-menu line shows until it is closed, and stays closed after a reload", async ({ page }) => {
+      await page.goto("/");
+      const drawer = page.locator(".intro-drawer", { has: page.locator("summary", { hasText: "편의 설정" }) });
+      await drawer.locator("summary").click();
+      const hint = drawer.getByRole("region", { name: "홈 화면에 두기" });
+      await expect(hint).toContainText("공유 버튼을 누르고 「홈 화면에 추가」를 고르면");
+      await expect(hint.getByRole("button", { name: "홈 화면에 추가" })).toHaveCount(0);
+
+      await hint.getByRole("button", { name: "이 안내 닫기", exact: true }).click();
+      await expect(hint).toHaveCount(0);
+      expect(await page.evaluate((key) => localStorage.getItem(key), INSTALL_HINT_DISMISSED_KEY)).toBe("1");
+
+      await page.reload();
+      await drawer.locator("summary").click();
+      await expect(drawer.getByRole("region", { name: "편의 설정" })).toBeVisible();
+      await expect(page.getByTestId("install-hint")).toHaveCount(0);
+    });
+  });
 });

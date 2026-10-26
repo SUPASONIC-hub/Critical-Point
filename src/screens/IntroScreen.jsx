@@ -4,6 +4,7 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
 import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
+import { InstallHintSlot } from "../components/InstallHintSlot.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
@@ -607,6 +608,7 @@ export function IntroScreen({ view, renderers = {} }) {
               <h2>편의 설정</h2>
             </summary>
             <AccessibilityPanel />
+            <InstallHintSlot />
           </details>
           <details className="intro-drawer">
             <summary>

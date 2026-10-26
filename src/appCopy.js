@@ -141,3 +141,18 @@ export const triggerLabSignals = {
   case49: "관찰 항목: 건네받은 것을 드는 방식, 미리 적힌 자기 이름 앞에서의 망설임, 위에서 걸려 온 전화를 대하는 속도",
   final: "관찰 항목: 자기 조건 인식, 프로필 공개 범위, 시스템 존치 허용선",
 };
+
+/**
+ * 홈 화면에 추가: the intro's comfort drawer, under the settings
+ * (components/InstallHint.jsx). Chrome and its kin hand the page an install
+ * event, and `install` is the button that answers it; iOS has no such event,
+ * so `ios` says where the browser's own menu puts it. The button's name is
+ * its visible text, so a screen reader and a voice command say the same words.
+ */
+export const INSTALL_HINT_COPY = {
+  title: "홈 화면에 두기",
+  prompt: "홈 화면에 두면 주소창 없이 앱처럼 열립니다.",
+  ios: "공유 버튼을 누르고 「홈 화면에 추가」를 고르면 주소창 없이 앱처럼 열립니다.",
+  install: "홈 화면에 추가",
+  dismiss: "이 안내 닫기",
+};

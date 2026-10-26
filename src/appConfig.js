@@ -80,6 +80,8 @@ export const CHUNK_RELOAD_SESSION_KEY = "critical-point-chunk-reload-v1";
 // The player's comfort settings: table time, the reading clock, flashes,
 // single-key shortcuts, the intro's motion (src/state/accessibilitySettings.js).
 export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
+// "1" once the player closed the intro's 홈 화면에 추가 hint (src/state/installPrompt.js).
+export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited
