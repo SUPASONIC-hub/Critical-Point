@@ -40,6 +40,8 @@ const noticesCopy = {
     slotRestoreFailed: "복구 지점을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
     backupUnreadable: "보관한 저장본은 이 버전에서도 읽을 수 없습니다. 지우지 않고 그대로 둡니다.",
     backupRestoreFailed: "보관한 저장본을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
+    // useTelemetryQueue's commitPendingTelemetryQueue, when the queue's change cannot be written.
+    queueUnavailable: "브라우저 저장소를 사용할 수 없어 원격 저장 대기열 변경을 반영하지 못했습니다.",
   },
   run: {
     settling: "판정이 끝나는 중입니다. 결과가 나온 뒤에 나갈 수 있습니다.",
@@ -54,6 +56,8 @@ const noticesCopy = {
     retryFailed: "저장소 정리 재시도 실패: {keys}{logFailed}",
     resetFailed: "일부 브라우저 저장소를 지우지 못했습니다: {keys}{logFailed}",
     logFailed: " · 진단 로그 저장도 실패했습니다.",
+    // The button under the lines STORAGE_RETRY_LINES names (SaveStatus.jsx).
+    retry: "저장소 정리 재시도",
   },
   // The screen reader's line for the page (GameRuntime's screenReaderStatus).
   status: {
@@ -63,5 +67,35 @@ const noticesCopy = {
   },
 };
 export default noticesCopy;
+
+/**
+ * The save lines that offer 「저장소 정리 재시도」 under them (SaveStatus.jsx),
+ * by key. Until 10-26 the button came when the line had "저장소" in it, and
+ * the English lines have no such word, so the English page never showed it.
+ * These are the keys whose Korean line has it, so the Korean page shows the
+ * button where it did; a line with blanks is known by the text before its
+ * first blank.
+ */
+const STORAGE_RETRY_LINES = [
+  ["save", "unavailable"],
+  ["save", "queueUnavailable"],
+  ["save", "errorLogClearFailed"],
+  ["save", "slotDeleteFailed"],
+  ["save", "slotRestoreFailed"],
+  ["save", "backupRestoreFailed"],
+  ["storage", "cleaned"],
+  ["storage", "retryFailed"],
+  ["storage", "resetFailed"],
+];
+
+/** Whether the save line on screen is one of STORAGE_RETRY_LINES, read in the page's language. */
+export function offersStorageRetry(status) {
+  if (typeof status !== "string" || !status) return false;
+  return STORAGE_RETRY_LINES.some(([group, key]) => {
+    const line = noticesCopy[group][key];
+    const blank = line.indexOf("{");
+    return blank < 0 ? status === line : status.startsWith(line.slice(0, blank));
+  });
+}
 
 localizeTables("screens", { notices: noticesCopy });

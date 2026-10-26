@@ -29,6 +29,7 @@ export default {
     slotRestoreFailed: "The recovery point couldn’t be loaded. Browser storage isn’t available.",
     backupUnreadable: "The kept save can’t be read by this version either. It’s left as it is, not deleted.",
     backupRestoreFailed: "The kept save couldn’t be loaded. Browser storage isn’t available.",
+    queueUnavailable: "Browser storage isn’t available, so the change to the remote save queue couldn’t be kept.",
   },
   run: {
     settling: "The verdict is still settling. You can leave once the result is in.",
@@ -43,6 +44,7 @@ export default {
     retryFailed: "Storage cleanup retry failed: {keys}{logFailed}",
     resetFailed: "Some browser storage couldn’t be cleared: {keys}{logFailed}",
     logFailed: " · The diagnostic log couldn’t be saved either.",
+    retry: "Retry storage cleanup",
   },
   status: {
     currentCase: "Current case",

@@ -73,7 +73,8 @@ const budgets = [
   // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_761, maxGzip: 54_732 },
+  // -> 149,200 / 54,827 on 2026-10-26, review-fixes-1026: the storage-cleanup retry is offered by the save line's key (offersStorageRetry and its key list in copy/notices.js, the button's words and the telemetry queue's line moved there). Measured 149,200 / 54,823 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_200, maxGzip: 54_827 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -255,7 +256,8 @@ const budgets = [
   // 175,169 / 63,528 -> 180,627 / 65,391 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 180,652 raw on 2026-10-26, funnel-locale: 「화면 언어」 in the consent sentence (PLAYTEST_DATA_NOTICE) and the chunk names. Measured 180,652 / 65,373; the gzip budget holds.
   // 180,652 / 65,391 -> 180,744 / 65,403 on 2026-10-26, 일본어 1단계 (ja-step1): the hidden Japanese entry in SUPPORTED_LOCALES and the language choice showing a hidden language on its own pages only. Every other Korean chunk and the CSS are byte for byte main's (57931801). Measured 180,744 / 65,399 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 180_744, maxGzip: 65_403 },
+  // -> 180,766 raw on 2026-10-26, review-fixes-1026 (on main f827c198): the NEW GAME+ label is read while rendering (newGamePlusLabel in copy/intro.js), not split when the module is read. Measured 180,766; the gzip budget holds.
+  { pattern: /^index-.*\.js$/, maxBytes: 180_766, maxGzip: 65_403 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -966,11 +968,13 @@ const budgets = [
   // is larger raw than its English though shorter to read. 사건 01 the largest, 82,376 / 23,101; the dictionary
   // (screen copy, 1,537 lines, and the page's system-font style) 109,813 / 38,565. Measured in the e2e build, the gzip plus 4.
   { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 82_376, maxGzip: 23_105 },
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 109_813, maxGzip: 38_569 },
+  // 109,813 / 38,569 -> 110,001 / 38,601 on 2026-10-26, review-fixes-1026: the storage-cleanup retry button and the telemetry queue's storage line in Japanese (notices). Measured 110,001 / 38,597, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 110_001, maxGzip: 38_601 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 93_179, maxGzip: 34_900 },
+  // 93,179 / 34,900 -> 93,322 / 34,931 on 2026-10-26, review-fixes-1026: the storage-cleanup retry button and the telemetry queue's storage line in English (notices). Measured 93,322 / 34,927 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 93_322, maxGzip: 34_931 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
   { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_013, maxGzip: 2_344 },
