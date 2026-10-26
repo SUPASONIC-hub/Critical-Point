@@ -14,6 +14,7 @@ import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
+import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
@@ -2057,6 +2058,28 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
   await presetCounter(reportKey, 30);
   await reportRefused("report an address's 31st post of the hour", reportRow(third, "spam", sessionId(441)), /^PT429 .*report rate limit/);
   withHeaders(null);
+
+  // The operator's queue (scripts/board-reports.mjs, .github/workflows/board-reports.yml):
+  // its one SELECT reads ids and counts only, hide takes a post out of the
+  // queue, dismiss deletes a post's reports, restore brings a hidden post back,
+  // and an action on nothing says it did nothing.
+  {
+    const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
+    const act = async (action, postId) => boardActionDone((await allowed(`${action} board post ${postId}`, "service_role", boardAction(action, postId)))?.rows ?? []);
+    const queueRows = (await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? [];
+    const texts = (await db.query(`select nickname, body from public.board_posts where id = any($1::bigint[])`, [[first, second]])).rows.flatMap((row) => [row.nickname, row.body]);
+    check(queueRows.every((row) => !texts.some((text) => JSON.stringify(row).includes(text)) && !JSON.stringify(row).includes("board-report:")), "the board report queue fetched a nickname, a body or a writer key.");
+    let queue = readBoardQueue(queueRows);
+    const waitingFirst = queue.waiting.find((post) => post.postId === first);
+    check(waitingFirst?.reports === 2 && waitingFirst?.writers === 2 && queue.waiting.some((post) => post.postId === second), `the board report queue read ${JSON.stringify(queue.waiting)}; expected post ${first} with 2 reports from 2 writers and post ${second} waiting.`);
+    check(await act("hide", second), "hiding a reported post did nothing.");
+    queue = await queueOf();
+    check(!queue.waiting.some((post) => post.postId === second) && queue.hidden.some((post) => post.postId === second), "a hidden post still waited in the board report queue.");
+    check(await act("restore", second), "restoring a hidden post did nothing.");
+    check(await act("dismiss", first), "dismissing a post's reports did nothing.");
+    check((await reportCount(first)) === 0 && !(await queueOf()).waiting.some((post) => post.postId === first), "a dismissed post's reports stayed.");
+    check(!(await act("dismiss", first)) && !(await act("hide", 999999999)), "an action on nothing said it did something.");
+  }
 
   // Retention rides on the post: the purge deletes posts, and a post's
   // reports go with it (on delete cascade).
