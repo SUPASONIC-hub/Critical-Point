@@ -296,7 +296,7 @@ export default {
     },
     "c44_petition_reaction": {
       "title": "The Hanwoo Beef Set",
-      "text": "Over the phone you hear a branch shutter rolling down. It’s Tak Yerin. 'It’s my signature. I picked the Hanwoo beef set, and the next screen said to enter my name, so I did. Everyone did.' A long silence, then the voice drops. 'When Hajun was an intern and I watched NOAH reject Till-the-End Precision all the way, I cried in the restroom. And then I signed my name asking for leniency for the man who sat above all that. Can it be erased? If not, can you at least write down somewhere that I didn’t know?'",
+      "text": "Over the phone you hear a branch shutter rolling down. It’s Tak Yerin. 'It’s my signature. I picked the Hanwoo beef set, and the next screen said to enter my name, so I did. Everyone did.' A long silence, then the voice drops. 'When Hajun was an intern and I watched NOAH reject To-the-End Precision all the way, I cried in the restroom. And then I signed my name asking for leniency for the man who sat above all that. Can it be erased? If not, can you at least write down somewhere that I didn’t know?'",
       "memo": [
         "The signature on the screen after the Hanwoo beef set",
         "If it can’t be erased, at least a record that I didn’t know"
@@ -439,9 +439,9 @@ export default {
     },
     "c44_start_warm": {
       "title": "The Night Before Sentencing, for the One Who Stayed in the Corridor",
-      "text": "The day the dismissal motion passed 5 to 3, you stayed with the 1-Share Group and with Yoon Seojin, who had been watching her father, from the 33rd-floor corridor to the tent bar outside the company, until you parted at two in the morning. Two days later, those people gather again on the 1st floor of the bookshop. Tomorrow is the first-instance sentencing in the Haeon Partners advisory fee case. The charge is breach of trust. Do Yoonha reads the news that came in this afternoon. Yoon Sanghyuk’s side filed a no-punishment letter in KD Bank’s name and a petition from 1,204 employees. 'Not one person in that corridor signed this paper. And yet it’s 1,204.'",
+      "text": "The day the dismissal motion passed 5 to 3, you stayed with the one-share group and with Yoon Seojin, who had been watching her father, from the 33rd-floor corridor to the tent bar outside the company, until you parted at two in the morning. Two days later, those people gather again on the 1st floor of the bookshop. Tomorrow is the first-instance sentencing in the Haeon Partners advisory fee case. The charge is breach of trust. Do Yoonha reads the news that came in this afternoon. Yoon Sanghyuk’s side filed a no-punishment letter in KD Bank’s name and a petition from 1,204 employees. 'Not one person in that corridor signed this paper. And yet it’s 1,204.'",
       "memo": [
-        "Everyone in the 1-Share Group from that corridor applied for gallery passes",
+        "Everyone in the one-share group from that corridor applied for gallery passes",
         "No-punishment letter in KD Bank’s name filed",
         "1,204 petition sheets -- list of signers not disclosed"
       ],

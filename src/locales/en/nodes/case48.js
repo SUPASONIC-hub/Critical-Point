@@ -208,7 +208,7 @@ export default {
     },
     "c48_label": {
       "title": "Before Dawn, March 17",
-      "text": "Lee Minseo traces NOAH’s training data back line by line. The outcome field next to 2023-0412 originally read 'loss'. It changed to 'recovered · excellent approval' before dawn on March 17 this year. After the loss was moved onto another company’s books, KD Bank’s records made the debt look fully repaid. 271 more loans had their outcome fields changed the same way on the same day. Lee Minseo taps the monitor with a fingernail. 'NOAH learned that a collapsed loan was a success. So the more a loan looks like it, the higher the score. The field that sank Till-the-End Precision is the same field that’s pushing LoopNow through.'",
+      "text": "Lee Minseo traces NOAH’s training data back line by line. The outcome field next to 2023-0412 originally read 'loss'. It changed to 'recovered · excellent approval' before dawn on March 17 this year. After the loss was moved onto another company’s books, KD Bank’s records made the debt look fully repaid. 271 more loans had their outcome fields changed the same way on the same day. Lee Minseo taps the monitor with a fingernail. 'NOAH learned that a collapsed loan was a success. So the more a loan looks like it, the higher the score. The field that sank To-the-End Precision is the same field that’s pushing LoopNow through.'",
       "memo": [
         "Outcome fields changed: before dawn, March 17 this year, 272 cases",
         "2023-0412: 'loss' → 'recovered · excellent approval'",
@@ -552,7 +552,7 @@ export default {
     "c48_senior_choice_1": "At the suggestion to change the order, Kwon Dohyun flips the lid once more. If Bridge’s 8 billion won drops a place, Bridge’s signature may come off.",
     "c48_senior_choice_2": "The lid you agreed to file gets a review-material number in the morning. The secretariat clerk will say it smells of cup noodles and put it in a plastic sleeve.",
     "c48_senior_choice_3": "Even when you say to set it aside, Kwon Dohyun picks the lid back up. The riders stay written along the rim.",
-    "c48_label_choice_1": "When you start calling, the first to pick up is Moon Gaeul. This time you can tell her the reason Till-the-End Precision was rejected, and why.",
+    "c48_label_choice_1": "When you start calling, the first to pick up is Moon Gaeul. This time you can tell her the reason To-the-End Precision was rejected, and why.",
     "c48_label_choice_2": "Han Jiwoo replies even on the holiday. 'Number 272 confirmed. Request goes out before 9 a.m.' Whether the request reaches them before the committee, no one knows.",
     "c48_label_choice_3": "By next week, the committee will be over. In the meantime, NOAH reviews 30 more cases with the same field.",
     "c48_call_choice_1": "When you tell Min Harang honestly, there is a long silence. Then a message to the riders’ group chat is written, deleted, and rewritten three times.",

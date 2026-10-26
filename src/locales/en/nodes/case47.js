@@ -69,7 +69,7 @@ export default {
     },
     "c47_factory": {
       "title": "First Profit",
-      "text": "In the July monsoon, the Till-the-End Precision factory flooded to the knee. Now all six of its lathes are turning. Eleven months after the factory reopened as a cooperative, the August books show a profit for the first time. 4.12 million won. Foreman Kim printed the number large and taped it to every lathe, and Kwon Dohyun checks it three times and says, 'It’s a profit, all right.' He says it is his third profit this month alone, and looks a little moved. Clearing out the old president’s office for the party, Foreman Kim stops at the bottom drawer of the desk. It is the drawer Moon Gaeul could not bring herself to open. Inside is a black notebook. On the cover, in Moon Sungho’s handwriting: 'To Repay.' Inside are 31 names, amounts and dates. Cafeteria, 23.4 million won. Work-clothes laundry, 4.1 million won. Three quick-delivery riders… The last page holds a single line. 'Before Chuseok, the cafeteria first.'",
+      "text": "In the July monsoon, the To-the-End Precision factory flooded to the knee. Now all six of its lathes are turning. Eleven months after the factory reopened as a cooperative, the August books show a profit for the first time. 4.12 million won. Foreman Kim printed the number large and taped it to every lathe, and Kwon Dohyun checks it three times and says, 'It’s a profit, all right.' He says it is his third profit this month alone, and looks a little moved. Clearing out the old president’s office for the party, Foreman Kim stops at the bottom drawer of the desk. It is the drawer Moon Gaeul could not bring herself to open. Inside is a black notebook. On the cover, in Moon Sungho’s handwriting: 'To Repay.' Inside are 31 names, amounts and dates. Cafeteria, 23.4 million won. Work-clothes laundry, 4.1 million won. Three quick-delivery riders… The last page holds a single line. 'Before Chuseok, the cafeteria first.'",
       "memo": [
         "First profit in the August books: 4.12 million won",
         "All 6 lathes running -- monsoon damage repaired",
@@ -93,10 +93,10 @@ export default {
           "label": "Find where the 2nd-round fund’s leftover money goes"
         }
       },
-      "place": "Till-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
       "clock": "Two Days Before Chuseok · 14:00",
       "question": "On the day of the first profit, Moon Sungho’s 'To Repay' notebook turned up in a drawer. What do you do with it?",
-      "lead": "A sheet on the factory gate reads 'Till-the-End Precision First Profit Party -- 18:00,' and below it someone has added in ballpoint, 'Rice cakes provided.'"
+      "lead": "A sheet on the factory gate reads 'To-the-End Precision First Profit Party -- 18:00,' and below it someone has added in ballpoint, 'Rice cakes provided.'"
     },
     "c47_memorial": {
       "title": "2nd Anniversary",
@@ -205,10 +205,10 @@ export default {
       "question": "A new line, '31,' has appeared at the bottom of the free rice cake column. What do you do with it?"
     },
     "c47_banner": {
-      "title": "Till the End, Three Times",
-      "text": "Moon Hajun takes the subway straight from school and arrives in his uniform, a rolled banner slung on his back. He says he painted it on the sly in art class. It reads 'Till-the-End Precision’s First Profit -- We Held On Till the End, and Kept It Till the End.' Kwon Dohyun says, 'That’s three “till the end”s. Way down from the eleven in last year’s business plan.' Hajun answers, 'That’s growth.' Once the banner is up, the members hold an impromptu general meeting in front of the lathes. One item on the agenda: where the 4.12 million won profit goes. Five members still haven’t been paid two months’ wages from last winter. Foreman Kim raises a hand. 'I’d like it to go first to the people in the boss’s notebook. We worked on the food from their kitchen.'",
+      "title": "To the End, Three Times",
+      "text": "Moon Hajun takes the subway straight from school and arrives in his uniform, a rolled banner slung on his back. He says he painted it on the sly in art class. It reads 'To-the-End Precision’s First Profit -- We Held On To the End, and Kept It To the End.' Kwon Dohyun says, 'That’s three “to the end”s. Way down from the eleven in last year’s business plan.' Hajun answers, 'That’s growth.' Once the banner is up, the members hold an impromptu general meeting in front of the lathes. One item on the agenda: where the 4.12 million won profit goes. Five members still haven’t been paid two months’ wages from last winter. Foreman Kim raises a hand. 'I’d like it to go first to the people in the boss’s notebook. We worked on the food from their kitchen.'",
       "memo": [
-        "Banner: 'till the end' 3 times -- last year’s business plan: 11 times",
+        "Banner: 'to the end' 3 times -- last year’s business plan: 11 times",
         "General meeting agenda: how to use the 4.12 million won profit",
         "5 members: two months’ wages unpaid since last winter"
       ],
@@ -223,7 +223,7 @@ export default {
           "label": "Back Foreman Kim: set the profit aside for the 31 first"
         }
       },
-      "place": "Till-the-End Precision, Namdong Industrial Complex, Incheon · Factory Yard",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory Yard",
       "clock": "Two Days Before Chuseok · 18:00",
       "question": "The meeting before the lathes asks where the first profit of 4.12 million won should go. Which side do you take?"
     },
@@ -290,7 +290,7 @@ export default {
           "label": "Promise the cafeteria tab gets paid first, this Chuseok"
         }
       },
-      "place": "Till-the-End Precision, Namdong Industrial Complex, Incheon · In Front of the Lathes",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · In Front of the Lathes",
       "clock": "Two Days Before Chuseok · 19:00",
       "question": "A month before the factory stopped, Moon Sungho said to pay the cafeteria tab first. What do you do with that promise?"
     },

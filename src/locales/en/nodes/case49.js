@@ -318,9 +318,9 @@ export default {
     },
     "c49_branch_columbarium": {
       "title": "Two Glass Doors",
-      "text": "When you say you will carry it all, Moon Gaeul unties her apron. 'Then there’s one more place to say hello.' The columbarium at a memorial park in Incheon. Behind Moon Sungho’s glass door is a new copy of Till-the-End Precision’s first profit-and-loss sheet in the black. Moon Gaeul wipes the glass once with her palm. 'Your request? This one says he’s going to see it through to the end tomorrow.' Two rows over is a glass door that appeared fifteen days ago. It is Lim Kyungsoo’s place. Inside are a magnifying glass and one yellowed sheet of paper. The back page of the dissent, the original, where you can still see the erased 'Agree' in the reviewer field. Lim Soyul, who got there first, turns around. 'Grandpa would have told you to take this with you tomorrow. But I want to leave it here.'",
+      "text": "When you say you will carry it all, Moon Gaeul unties her apron. 'Then there’s one more place to say hello.' The columbarium at a memorial park in Incheon. Behind Moon Sungho’s glass door is a new copy of To-the-End Precision’s first profit-and-loss sheet in the black. Moon Gaeul wipes the glass once with her palm. 'Your request? This one says he’s going to see it through to the end tomorrow.' Two rows over is a glass door that appeared fifteen days ago. It is Lim Kyungsoo’s place. Inside are a magnifying glass and one yellowed sheet of paper. The back page of the dissent, the original, where you can still see the erased 'Agree' in the reviewer field. Lim Soyul, who got there first, turns around. 'Grandpa would have told you to take this with you tomorrow. But I want to leave it here.'",
       "memo": [
-        "Moon Sungho’s niche -- copy of Till-the-End Precision’s first profit-and-loss sheet in the black",
+        "Moon Sungho’s niche -- copy of To-the-End Precision’s first profit-and-loss sheet in the black",
         "Lim Kyungsoo’s niche -- interred fifteen days ago",
         "The back page, original -- the erased 'Agree' in the reviewer field",
         "Due back in Seoul at 18:00"
@@ -540,7 +540,7 @@ export default {
     "c49_crosswalk_stay": "When you hang up, Yoon Seojin switches her pen back to black. 'Thank you. That voice has scared me since I was little.'",
     "c49_crosswalk_note": "When you say you are writing it down, the Chairman pauses for 2 seconds, the first time he has. Then he says, 'Write. I don’t sign.'",
     "c49_crosswalk_ask": "When you press him, the Chairman does not answer; he repeats what you said in Hannam-dong without getting one word wrong. That is the answer.",
-    "c49_final_all": "When you propose writing everyone’s names, Han Seoyun writes hers first. Below it, Ban Jaewook adds 'The 1-Share Group, 3,118 people'.",
+    "c49_final_all": "When you propose writing everyone’s names, Han Seoyun writes hers first. Below it, Ban Jaewook adds 'The one-share group, 3,118 people'.",
     "c49_final_his": "Having decided he must fill it with his own hand, tomorrow in that room you must wait without holding out the pen. He may never write it.",
     "c49_final_inside": "When you decide to change it from inside, the table goes quiet. Kang Taemin pushes a cup of noodles toward you and says only, 'Come back anyway.'",
     "c49_after_warm": "23 people stay in the alley until the moon sets. The 33rd floor’s summons waits until the promised night.",

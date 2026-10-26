@@ -81,7 +81,7 @@ export default {
           "label": "Draft a named-approver amendment for the outside directors"
         },
         "c43_advisor_voices": {
-          "label": "Gather the 1-Share Group’s demands as grounds for the condition"
+          "label": "Gather the one-share group’s demands as grounds for the condition"
         },
         "c43_advisor_simple": {
           "label": "Shelve the reform terms and ask for a plain yes on dismissal"
@@ -159,11 +159,11 @@ export default {
     },
     "c43_aftershock": {
       "title": "5 to 3",
-      "text": "The dismissal motion passes, 5 yes, 3 no. The last line of the resolution, the sentence saying the inquiry into responsibility is over, will be publicly disclosed tonight. When the doors open, 20 representatives of the 1-Share Group are standing in the hallway. Kang Taemin holds a cup-noodle box with 80 names written on it, and Moon Gaeul hands the leftover rice cakes to the security guards. The guard who once raised a radio and lowered it again takes a second one. Yoon Sanghyuk hands his employee ID to his secretary and turns around at the elevator. 'The first-instance sentencing is coming up. That day, I’m the one in the defendant’s seat.' A text arrives from Pyo Serin of ClearVote, the proxy adviser. 'Filled in the conclusion box. Conditional yes, 11 footnotes.' At the end of the hallway, Yoon Seojin watches the elevator numbers until they reach 1.",
+      "text": "The dismissal motion passes, 5 yes, 3 no. The last line of the resolution, the sentence saying the inquiry into responsibility is over, will be publicly disclosed tonight. When the doors open, 20 representatives of the one-share group are standing in the hallway. Kang Taemin holds a cup-noodle box with 80 names written on it, and Moon Gaeul hands the leftover rice cakes to the security guards. The guard who once raised a radio and lowered it again takes a second one. Yoon Sanghyuk hands his employee ID to his secretary and turns around at the elevator. 'The first-instance sentencing is coming up. That day, I’m the one in the defendant’s seat.' A text arrives from Pyo Serin of ClearVote, the proxy adviser. 'Filled in the conclusion box. Conditional yes, 11 footnotes.' At the end of the hallway, Yoon Seojin watches the elevator numbers until they reach 1.",
       "memo": [
         "Dismissal motion passed -- yes 5 · no 3",
         "Last line of the resolution: to be disclosed tonight",
-        "20 representatives of the 1-Share Group, let up to the 33rd-floor hallway",
+        "20 representatives of the one-share group, let up to the 33rd-floor hallway",
         "First-instance sentencing near · ClearVote recommends a conditional yes"
       ],
       "choices": {
@@ -197,7 +197,7 @@ export default {
           "label": "Say it ends now and lock in her yes first"
         },
         "c43_professor_choice_1": {
-          "label": "Say it won’t end, and ask her to meet the 1-Share Group"
+          "label": "Say it won’t end, and ask her to meet the one-share group"
         }
       },
       "place": "Business School 5th Floor · Professor Eun Chaewon’s Office",
@@ -229,9 +229,9 @@ export default {
     },
     "c43_lobby": {
       "title": "Names on a Box Lid",
-      "text": "The board meets behind closed doors, so the 1-Share Group can come only as far as the lobby inside the revolving door. Beside the security gate, Kang Taemin sets down cup-noodle boxes for the 80 people on the night shift. Then he starts writing the 80 names on the lid, one line each. A security guard raises a radio, then lowers it. Moon Gaeul holds a box of rice cakes, and Moon Hajun a sketchbook. On its first page, in big letters: 'To the end.' At the end of a lobby sofa, Yoon Seojin sits alone and meets no one’s eyes. Then a text comes from Lee Minseo on the 33rd floor. 'They say the vote is secret. Who voted which way won’t even go in the minutes.'",
+      "text": "The board meets behind closed doors, so the one-share group can come only as far as the lobby inside the revolving door. Beside the security gate, Kang Taemin sets down cup-noodle boxes for the 80 people on the night shift. Then he starts writing the 80 names on the lid, one line each. A security guard raises a radio, then lowers it. Moon Gaeul holds a box of rice cakes, and Moon Hajun a sketchbook. On its first page, in big letters: 'To the end.' At the end of a lobby sofa, Yoon Seojin sits alone and meets no one’s eyes. Then a text comes from Lee Minseo on the 33rd floor. 'They say the vote is secret. Who voted which way won’t even go in the minutes.'",
       "memo": [
-        "About 140 people from the 1-Share Group waiting in the lobby",
+        "About 140 people from the one-share group waiting in the lobby",
         "80 names on the cup-noodle box lid",
         "Board vote: secret ballot · no record of each director’s vote"
       ],
@@ -243,7 +243,7 @@ export default {
           "label": "Open your remarks by demanding each director’s vote in the minutes"
         },
         "c43_lobby_choice_1": {
-          "label": "Call the lobby and have Yoon Seojin seated with the 1-Share Group"
+          "label": "Call the lobby and have Yoon Seojin seated with the one-share group"
         }
       },
       "place": "KD Financial Group Headquarters, Yeouido · Lobby",
@@ -327,7 +327,7 @@ export default {
       ],
       "choices": {
         "c43_branch_witness_a": {
-          "label": "Share Baek Arin’s legal costs with the 1-Share Group"
+          "label": "Share Baek Arin’s legal costs with the one-share group"
         },
         "c43_branch_witness_b": {
           "label": "Have the copy’s source and signature notarized as evidence"
@@ -564,7 +564,7 @@ export default {
     "c43_lobby_reaction_choice_1": "Hearing it, Yoon Seojin puts the rice-cake pack in her bag and stays put. A promise begins to wait in the lobby.",
     "c43_lobby_reaction_choice_2": "At the word statement, Yoon Seojin’s face stiffens. She signs, but holds back what she was going to say next.",
     "c43_lobby_reaction_choice_3": "On your silenced phone, three messages from Moon Gaeul pile up. The last is a photo of rice cakes.",
-    "c43_branch_witness_a": "A fundraising notice goes up in the 1-Share Group chat, and the first to send money is Moon Gaeul. 30,000 won, her rice-cake money.",
+    "c43_branch_witness_a": "A fundraising notice goes up in the one-share group chat, and the first to send money is Moon Gaeul. 30,000 won, her rice-cake money.",
     "c43_branch_witness_b": "Once notarized, the copy becomes evidence. Baek Arin’s name goes on the first line of the evidence list with it.",
     "c43_branch_witness_c": "Baek Arin hands over the envelope and looks out the window. 'So I’m to stay in the back again.' The documents go into your bag.",
     "c43_branch_witness_follow_a": "Three lawyers join for free. One of them has handled the lawsuit of Moon Gaeul’s group. The claim still doubles.",
@@ -605,7 +605,7 @@ export default {
     "c43_ledger_visit": "Saying 0.48 is a person, not a number, you visit Eun Chaewon, the youngest outside director, and pass on the victims’ stories.",
     "c43_ledger_conflict": "Saying former Haeon Partners advisers should not be casting this vote, you formally raise the two likely noes’ advisory history as a conflict of interest.",
     "c43_ledger_target": "With no time left to meet all seven, you work only the two the probability table says will become votes.",
-    "c43_advisor_voices": "Saying it has to be the people affected who call it not enough, you gather the 1-Share Group’s demands as grounds for the conditional recommendation.",
+    "c43_advisor_voices": "Saying it has to be the people affected who call it not enough, you gather the one-share group’s demands as grounds for the conditional recommendation.",
     "c43_advisor_amend": "Saying it takes a safeguard so the people above can never slip out again, you draft an amendment naming every approver and send it to the outside directors.",
     "c43_advisor_simple": "Hearing that conditions could sink the dismissal, you shelve the reform terms and ask only for a yes recommendation on dismissal.",
     "c43_corridor_speak": "Saying the name carries weight only from his own mouth, you persuade Yoon Sanghyuk to go in and say that person’s name himself.",
@@ -617,13 +617,13 @@ export default {
     "c43_after_warm": "For the people who came up from the lobby to the 33rd floor, you stay till dawn beside those who held the hallway.",
     "c43_after_record": "Before the last line gets tidied away overnight, you write down today’s vote line by line and keep it on record with the date.",
     "c43_after_rush": "Saying next comes the day he sits in the defendant’s seat, you go from the hallway straight to Seocho-dong for the sentencing.",
-    "c43_professor_choice_1": "Saying one look at their faces shows it is not over, you ask her to meet the 1-Share Group in person.",
+    "c43_professor_choice_1": "Saying one look at their faces shows it is not over, you ask her to meet the one-share group in person.",
     "c43_professor_choice_2": "Saying whether it ends must be answered with numbers, you show her with documents the 2023 board’s responsibility that remains after the dismissal.",
     "c43_professor_choice_3": "Holding on to her yes if it ends, you tell her it ends now and lock in her vote first.",
     "c43_call_choice_1": "Against the idea that pushing one man out means forgetting, you reply that you will bring the names of the people the company will forget.",
     "c43_call_choice_2": "Saying the Chairman may decide whether to listen but the writing is yours, you log the call down to the date and time and leave it with Han Seoyun.",
     "c43_call_choice_3": "Reckoning that a man who votes last has already decided, you write off the Chairman’s vote and focus on the ones before it.",
-    "c43_lobby_choice_1": "Not wanting to leave her alone at the end of the sofa, you call the lobby and ask them to seat Yoon Seojin with the 1-Share Group.",
+    "c43_lobby_choice_1": "Not wanting to leave her alone at the end of the sofa, you call the lobby and ask them to seat Yoon Seojin with the one-share group.",
     "c43_lobby_choice_2": "Saying a nameless vote carries no responsibility, you open your remarks by demanding that each director’s vote go in the minutes.",
     "c43_lobby_choice_3": "Saying five votes are enough whoever casts them, you let the recording method go and get the result first.",
     "c43_professor_reaction_choice_1": "So the directors hear how a decision from upstairs ends at a front door, you ask her to tell the branch manager’s story herself at Monday’s board.",
@@ -635,10 +635,10 @@ export default {
     "c43_lobby_reaction_choice_1": "Not wanting to miss the words you have waited 3 years to hear, you send word through Moon Gaeul that you will come down as soon as your remarks end.",
     "c43_lobby_reaction_choice_2": "Saying a daughter’s words that she knows everything are worth keeping, you propose taking Yoon Seojin’s words as a family statement.",
     "c43_lobby_reaction_choice_3": "With your call moments away, you say you will focus on the board for now and silence your phone.",
-    "c43_branch_witness_a": "Unable to ask someone who sold her car for testimony first, you share Baek Arin’s legal costs with the 1-Share Group first.",
+    "c43_branch_witness_a": "Unable to ask someone who sold her car for testimony first, you share Baek Arin’s legal costs with the one-share group first.",
     "c43_branch_witness_b": "Saying the legal team can shake a single copy, you have its source and signature notarized to lock it in as evidence.",
     "c43_branch_witness_c": "Unwilling to let the claim double, you take only the documents and tell Baek Arin not to come to the board.",
-    "c43_branch_witness_follow_a": "So she does not walk the road to the end alone, you build a legal team from the 1-Share Group to protect Baek Arin’s testimony instead of the settlement.",
+    "c43_branch_witness_follow_a": "So she does not walk the road to the end alone, you build a legal team from the one-share group to protect Baek Arin’s testimony instead of the settlement.",
     "c43_branch_witness_follow_b": "Saying a deadline one hour before the board means to shut her up, you report the offer itself to regulators as retaliation against a whistleblower.",
     "c43_branch_witness_follow_c": "Saying you have no right to tell her to go to the end, you tell her signing is Baek Arin’s choice and that it is all right.",
     "c43_route_system_publish": "So those who decide the votes decide knowing this pattern, you send the 10 years of minutes statistics to Eun Chaewon and Pyo Serin at once.",
@@ -676,7 +676,7 @@ export default {
       "c43_after_warm": {
         "tag": "The Ending Where You Stayed Close",
         "title": "You stayed till dawn with the people who held the hallway",
-        "text": "The dismissal passed 5 to 3. You stayed till dawn with the 1-Share Group, who came up to the 33rd-floor hallway and waited, and with Yoon Seojin, who had watched her father."
+        "text": "The dismissal passed 5 to 3. You stayed till dawn with the one-share group, who came up to the 33rd-floor hallway and waited, and with Yoon Seojin, who had watched her father."
       },
       "c43_after_record": {
         "tag": "The Ending Kept on Record",
