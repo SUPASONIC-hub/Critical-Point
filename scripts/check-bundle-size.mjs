@@ -73,7 +73,9 @@ const budgets = [
   // the chunk imports. Measured 142,728 / 52,275 in the e2e build, the gzip plus 4.
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_761, maxGzip: 54_732 },
+  // gzip 54,732 -> 54,742 on 2026-10-26, en-polish-first10: the English prologue 01-02 chunks get new hashed names,
+  // and GameRuntime carries the locale import map with those names (CI measured 54,738, the gzip plus 4).
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_761, maxGzip: 54_742 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
