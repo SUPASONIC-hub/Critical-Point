@@ -116,7 +116,7 @@ export const speakers = {
 };
 
 /**
- * The last case of the preview: the one line to change to widen it (F-1 ①).
+ * The last case of the preview: the one line to change to widen it (F-1, choice 1).
  * A case after it keeps its Korean scenes and names even when its file is
  * here (src/locales/overlay.js), the panel after it is the end of the preview,
  * `preview` below fills {last} and {next} from it, and `npm run check:locale`
