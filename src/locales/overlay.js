@@ -38,7 +38,13 @@ export function overlayWords(target, words) {
   }
   for (const [key, value] of Object.entries(words)) {
     if (typeof value === "string") {
-      if (typeof target[key] === "string" && HANGUL.test(target[key])) target[key] = value;
+      if (typeof target[key] === "string" && HANGUL.test(target[key])) {
+        // A card (a scene's choice, the one with a `next`) keeps its Korean
+        // label: what the observer reads of a choice
+        // (gameLogic.js `choiceWords`) is the same card in every language.
+        if (key === "label" && "next" in target && !("sourceLabel" in target)) target.sourceLabel = target[key];
+        target[key] = value;
+      }
     } else {
       overlayWords(target[key], value);
     }
