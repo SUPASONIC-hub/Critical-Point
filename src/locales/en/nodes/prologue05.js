@@ -59,7 +59,7 @@ export default {
           "label": "Ask how many notices look like this one"
         },
         "p5_notice_evidence_turn": {
-          "label": "Open the account that created the notice’s draft file"
+          "label": "Open the account that made the notice draft"
         }
       },
       "place": "KD Bank head office, 6th floor · Corporate Finance Strategy Team",
@@ -90,7 +90,7 @@ export default {
           "label": "Ask how many notices look like this one"
         },
         "p5_basement_evidence_turn": {
-          "label": "Open the account that created the notice’s draft file"
+          "label": "Open the account that made the notice draft"
         }
       },
       "place": "Group Cognition & Judgment Research Lab, Hapjeong-dong · 4th-floor analyst room",
@@ -121,7 +121,7 @@ export default {
           "label": "Ask how many notices look like this one"
         },
         "p5_echo_evidence_turn": {
-          "label": "Open the account that created the notice’s draft file"
+          "label": "Open the account that made the notice draft"
         }
       },
       "place": "Research Lab, 4th-floor analyst room · Case desk 1",
@@ -387,7 +387,7 @@ export default {
           "label": "Send the 217-case list to HR and Internal Audit the same day"
         },
         "p5_route_system_evidence_turn": {
-          "label": "Open the account that created the notice’s draft file"
+          "label": "Open the account that made the notice draft"
         }
       },
       "place": "Research Lab, 4th-floor analyst room · Case desk 1",

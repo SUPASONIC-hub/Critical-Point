@@ -1,5 +1,6 @@
 import { expect, test } from "./helpers/network.js";
 import { writeFileSync } from "node:fs";
+import { LOCALE_KEY } from "../src/appConfig.js";
 import { CASE_SEQUENCE, nodeOrders, nodes } from "../src/gameData.js";
 import { startDebugNode } from "./helpers/gameFlow.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureStakedTable, measureTable,OVERCLOCKED_BOARD, openBrokenBoard } from "./helpers/layout.js";
@@ -19,7 +20,26 @@ import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureStakedTable, measureTable,OVERCLO
  * Failures are collected across the whole walk and reported together, so one
  * run names every scene that does not fit. Set LAYOUT_REPORT_DIR to also write
  * the measurements as JSON.
+ *
+ * Set LAYOUT_LANG (en, ja) to walk the same scenes on a page in that language:
+ * English runs longer than the Korean, and Japanese is drawn in the system
+ * face. The choice is kept in this device's storage before each page's own
+ * scripts run, so it outlives the storage the debug jump clears. Unset, the
+ * walk is the Korean one as it was; the report files take the language's code.
  */
+const LAYOUT_LANG = process.env.LAYOUT_LANG ?? "";
+const REPORT_SUFFIX = LAYOUT_LANG ? `-${LAYOUT_LANG}` : "";
+
+if (LAYOUT_LANG) {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(([key, code]) => localStorage.setItem(key, code), [LOCALE_KEY, LAYOUT_LANG]);
+  });
+}
+
+/** On a page in another language, that the table really is in it: a dictionary that never came would leave the Korean measured. */
+async function expectLayoutLang(page, label) {
+  if (LAYOUT_LANG) await expect(page.locator("html"), `${label}: the page is in ${LAYOUT_LANG}`).toHaveAttribute("lang", LAYOUT_LANG);
+}
 for (const caseId of CASE_SEQUENCE) {
   test(`every ${caseId} decision fits above the action bar @layout`, async ({ page }) => {
     test.setTimeout(900_000);
@@ -32,6 +52,7 @@ for (const caseId of CASE_SEQUENCE) {
       for (const [name, size] of Object.entries(LAYOUT_VIEWPORTS)) {
         await page.setViewportSize(size);
         await startDebugNode(page, caseId, nodeId);
+        await expectLayoutLang(page, `${nodeId} @ ${name}`);
         await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
         const row = { caseId, nodeId, name, ...(await measureTable(page)) };
         rows.push(row);
@@ -39,7 +60,7 @@ for (const caseId of CASE_SEQUENCE) {
         if (row.widest > row.innerWidth + 1) failures.push(`${nodeId} @ ${name}: ${row.widest - row.innerWidth}px wider than the screen`);
       }
     }
-    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-${caseId}.json`, JSON.stringify(rows));
+    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
     expect(nodeIds.length).toBeGreaterThan(0);
     expect(failures, failures.join("\n")).toEqual([]);
   });
@@ -101,6 +122,7 @@ for (const caseId of CASE_SEQUENCE) {
       for (const [name, size] of Object.entries(LAYOUT_VIEWPORTS)) {
         await page.setViewportSize(size);
         await openBrokenBoard(page, caseId, nodeId, HEAVY_BOARD);
+        await expectLayoutLang(page, `${nodeId} @ ${name}`);
         await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
         // The board measured is the heavy one: the rules are on the table and
         // all five relics are in the row. A save the app repaired back to a
@@ -122,7 +144,7 @@ for (const caseId of CASE_SEQUENCE) {
         }
       }
     }
-    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-heavy-${caseId}.json`, JSON.stringify(rows));
+    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-heavy-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }
