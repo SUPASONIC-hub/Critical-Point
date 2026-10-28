@@ -172,7 +172,9 @@ for (const lang of others) {
     for (const file of existsSync(dir) ? readdirSync(dir) : []) {
       const span = /^(case\d{2})-(\d{2})\.js$/.exec(file);
       assert.ok(span, `${file}: named <first case>-<last number>.js`);
-      const [first, last] = [order.indexOf(span[1]), order.indexOf(`case${span[2]}`)];
+      // The file ending on the season's last numbered case (case41-49.js) holds the finale's copy too.
+      const end = order.indexOf(`case${span[2]}`);
+      const [first, last] = [order.indexOf(span[1]), order[end + 1] === "final" ? end + 1 : end];
       const part = await import(new URL(file, dir).href);
       for (const key of [...caseKeys(part.copy), ...Object.keys(part.caseRoles ?? {})]) {
         assert.ok(order.indexOf(key) >= first && order.indexOf(key) <= last, `${file}: ${key} is outside its span`);
