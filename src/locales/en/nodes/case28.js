@@ -679,7 +679,7 @@ export default {
         "text": "On the last day of the secondment, you and Do Yoonha stayed until the call center lights went out. For the first time, all 12 on Yeon Hajin’s team took off their headsets at the same moment."
       },
       "c28_after_record": {
-        "tag": "Left It on Paper",
+        "tag": "Put It in Writing",
         "title": "A revision request setting the clause beside the script was filed",
         "text": "Article 19 and the sentences of Script No. 4 stood side by side in one document, with the list of 1,318 people caught by the same clause attached. Yeon Hajin copied the list from 12 years of call lists, and on its first line is her father’s name, written in by her."
       },

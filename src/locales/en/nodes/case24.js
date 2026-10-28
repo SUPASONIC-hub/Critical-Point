@@ -32,7 +32,7 @@ export default {
           "label": "Count how many times 'no results' has been used"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Dissolution in D-4 · Monday",
       "question": "The dissolution notice gives only two words: 'no results.' What do you do first?",
       "lead": "Three days after the shareholders’ meeting, Lee Minseo refreshes the intranet at exactly 8 on Monday morning and is the first to stop breathing."
@@ -101,11 +101,11 @@ export default {
     },
     "c24_farewell": {
       "title": "Let’s All Come In Tomorrow",
-      "text": "You have rented out the whole street stall in front of the company. Na Junhyuk, up from Yeongdong, emcees with a ladle for a microphone. First up in the talent show is Kwon Dohyun’s 'Income Statement Rap.' 'Revenue is friendship, the cost is overtime, there’s nothing left on the line, at this price we’re in the red.' Three bars in, even the stall owner is clapping. Moon Gaeul comes in with a box of rice cakes and takes it around every table, and Seo Harin sends a photo of Correction, the newsroom cat, wearing a Trigger Lab employee ID badge around its neck. Moon Hajun has drawn everyone’s faces in his sketchbook. The last toast is Kang Taemin’s. He takes off his gloves, tucks them into his vest pocket, and raises his glass. 'Let’s all come in to work tomorrow.' Everyone laughs, then goes quiet at the same moment. Next week there is no 4th floor to come in to.",
+      "text": "You have rented out the whole street stall in front of the company. Na Junhyuk, up from Yeongdong, emcees with a ladle for a microphone. First up in the talent show is Kwon Dohyun’s 'Income Statement Rap.' 'Revenue is friendship, the cost is overtime, there’s nothing left on the line, at this price we’re in the red.' Three bars in, even the stall owner is clapping. Moon Gaeul comes in with a box of rice cakes and takes it around every table, and Seo Harin sends a photo of Jeongjeong, the newsroom cat, wearing a Trigger Lab employee ID badge around its neck. Moon Hajun has drawn everyone’s faces in his sketchbook. The last toast is Kang Taemin’s. He takes off his gloves, tucks them into his vest pocket, and raises his glass. 'Let’s all come in to work tomorrow.' Everyone laughs, then goes quiet at the same moment. Next week there is no 4th floor to come in to.",
       "memo": [
         "19 at the farewell party -- 16 seats",
         "Kwon Dohyun’s 'Income Statement Rap', three bars, encore refused",
-        "Photo of Correction with a Trigger Lab badge -- from Seo Harin",
+        "Photo of Jeongjeong with a Trigger Lab badge -- from Seo Harin",
         "Official place for these people to gather after the dissolution: none"
       ],
       "choices": {
@@ -230,11 +230,11 @@ export default {
     },
     "c24_press": {
       "title": "Friday Morning Story",
-      "text": "As the street stall party breaks up, Seo Harin calls. Next in line after the cat photo. 'I have a draft of a story on Trigger Lab’s dissolution. The no-results notice, and the question of where a vanishing department’s records go. I can run it at seven on Friday morning.' Over the line comes the sound of Correction stepping on a keyboard. 'But your colleagues’ names might appear in it. The ones whose transfers are already out. What I write isn’t your side. It’s the side you can prove.'",
+      "text": "As the street stall party breaks up, Seo Harin calls. Next in line after the cat photo. 'I have a draft of a story on Trigger Lab’s dissolution. The no-results notice, and the question of where a vanishing department’s records go. I can run it at seven on Friday morning.' Over the line comes the sound of Jeongjeong stepping on a keyboard. 'But your colleagues’ names might appear in it. The ones whose transfers are already out. What I write isn’t your side. It’s the side you can prove.'",
       "memo": [
         "Leadline draft -- can go up Friday 07:00",
         "5 colleagues whose names could appear in the story",
-        "Correction, the newsroom cat, on the keyboard"
+        "Jeongjeong, the newsroom cat, on the keyboard"
       ],
       "choices": {
         "c24_press_choice_1": {
@@ -387,7 +387,7 @@ export default {
           "label": "Open the internal report attached to the decision"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room · Lab Terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Dissolution in D-2",
       "question": "28 organizations the group abolished got the same reason, 'no results.' What do you do with these statistics?"
     },
@@ -410,7 +410,7 @@ export default {
           "label": "Propose a rule that every notice name its approver"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room · Lab Terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Last Day of Work · Before Dawn",
       "question": "The approver field is empty a 29th time, too. Today, while you still have read access, what do you leave behind?"
     },
@@ -462,7 +462,7 @@ export default {
           "label": "Count how many times 'no results' has been used"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Dissolution in D-4 · Monday",
       "question": "The one-share group told you the news of the dissolution first. How do you answer them?",
       "lead": "The people you saw off until the last bus from the lobby on Friday saw the notice before you did on Monday morning."
@@ -492,7 +492,7 @@ export default {
           "label": "Count how many times 'no results' has been used"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Dissolution in D-4 · Monday",
       "question": "The dissolution notice is the first to sidestep the sentence in your shareholder letter. What do you do about that blank?",
       "lead": "Three days after the shareholder letter was attached to the board papers, the dissolution notice went up as if in reply."
@@ -522,7 +522,7 @@ export default {
           "label": "Count how many times 'no results' has been used"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Dissolution in D-4 · Monday",
       "question": "The notice was moved up an hour at the time you stood on the 33rd floor. Whom do you tell first?",
       "lead": "Three days after you turned away from the closed door on the 33rd floor, Monday morning’s notice came an hour ahead of schedule."

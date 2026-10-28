@@ -150,7 +150,7 @@ export default {
           "label": "Refuse, and put my name beside the report as a witness"
         },
         "reframe": {
-          "label": "One last time, change the game and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Financial Group HQ · Legal Team Meeting Room",

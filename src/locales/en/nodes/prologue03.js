@@ -149,7 +149,7 @@ export default {
           "label": "Tell the seven in the review room about today first"
         },
         "reframe": {
-          "label": "Make one last proposal that changes the game"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Bank head office, 6th floor · Corporate Finance Strategy Team review room",
@@ -249,7 +249,7 @@ export default {
           "label": "Hold on to the seat offer for now and buy time"
         }
       },
-      "place": "Head office, 6th floor · team head’s office",
+      "place": "Head office, 6th floor, Team Head’s office",
       "clock": "Thursday, April 27 · 21:00",
       "question": "Instead of scolding you, the team head sketches a seat that will exist next year. What do you do?"
     },

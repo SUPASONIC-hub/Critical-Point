@@ -151,7 +151,7 @@ export default {
           "label": "Take the seat and get round 2 compensation into Monday’s announcement"
         },
         "reframe": {
-          "label": "Change the game one last time with a proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Chairman’s Home, Hannam-dong · Twelve-Seat Table",
