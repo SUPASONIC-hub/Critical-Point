@@ -185,3 +185,26 @@ export function compareWords(source, english, lang = "en") {
   const stale = Object.keys(en).filter((path) => !(path in ko));
   return { total: Object.keys(ko).length, missing, stale, numbers };
 }
+
+/** `extra` laid into `base` by key, objects deep (a new object; neither is changed). */
+export function mergeWords(base, extra) {
+  if (!extra || typeof extra !== "object" || Array.isArray(extra)) return extra ?? base;
+  const out = { ...(base && typeof base === "object" && !Array.isArray(base) ? base : {}) };
+  for (const [key, value] of Object.entries(extra)) out[key] = mergeWords(out[key], value);
+  return out;
+}
+
+/**
+ * A language's whole screen copy: its dictionary's `copy` and the copy between
+ * cases waiting in `src/locales/<lang>/between/*.js` (the page fetches a file
+ * of these only once `previewThrough` reaches it; src/locales/overlay.js).
+ * `root` is the project folder's file URL, with no slash at its end.
+ */
+export async function readLanguageCopy(root, lang) {
+  const dictionary = await import(`${root}/src/locales/${lang}/index.js`);
+  const dir = new URL(`src/locales/${lang}/between/`, `${root}/`);
+  const files = existsSync(dir) ? readdirSync(dir).filter((file) => file.endsWith(".js")).sort() : [];
+  let copy = dictionary.copy ?? {};
+  for (const file of files) copy = mergeWords(copy, (await import(new URL(file, dir).href)).copy);
+  return copy;
+}

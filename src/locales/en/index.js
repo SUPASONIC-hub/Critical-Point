@@ -120,7 +120,8 @@ export const speakers = {
  * A case after it keeps its Korean scenes and names even when its file is
  * here (src/locales/overlay.js), the panel after it is the end of the preview,
  * `preview` below fills {last} and {next} from it, and `npm run check:locale`
- * checks the screen copy up to it.
+ * checks the screen copy up to it. The copy between cases after 사건 10 waits
+ * in `between/<first>-<last>.js`, fetched only once this reaches its cases.
  */
 export const previewThrough = "case10";
 

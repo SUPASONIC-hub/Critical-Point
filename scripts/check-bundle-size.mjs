@@ -994,9 +994,16 @@ const budgets = [
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_593, maxGzip: 46_483 },
+  // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
+  // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
+  // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
+  { pattern: /^locale-en-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 28_210, maxGzip: 10_805 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_013, maxGzip: 2_344 },
+  // 8,013 / 2,344 -> 8,731 / 2,640 on 2026-10-26, en-between-11-20: the between/ files in its import map, fetched once
+  // `previewThrough` reaches them, a table keyed by case laid over only up to it, and `roleName` reading their
+  // `caseRoles` (`caseRole`). Measured 8,731 / 2,636.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_731, maxGzip: 2_640 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
