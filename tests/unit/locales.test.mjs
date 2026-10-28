@@ -172,7 +172,8 @@ for (const lang of others) {
     for (const file of existsSync(dir) ? readdirSync(dir) : []) {
       const span = /^(case\d{2})-(\d{2})\.js$/.exec(file);
       assert.ok(span, `${file}: named <first case>-<last number>.js`);
-      const [first, last] = [order.indexOf(span[1]), order.indexOf(`case${span[2]}`)];
+      // The file that ends at 사건 49 also holds the finale (`final`): the loader picks a file by its first case.
+      const [first, last] = [order.indexOf(span[1]), order.indexOf(span[2] === "49" ? "final" : `case${span[2]}`)];
       const part = await import(new URL(file, dir).href);
       for (const key of [...caseKeys(part.copy), ...Object.keys(part.caseRoles ?? {})]) {
         assert.ok(order.indexOf(key) >= first && order.indexOf(key) <= last, `${file}: ${key} is outside its span`);
