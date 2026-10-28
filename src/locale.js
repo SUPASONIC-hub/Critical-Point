@@ -77,6 +77,15 @@ export function loadLocale() {
     });
 }
 
+/**
+ * The language the page was really painted in: `LANG` once its dictionary
+ * has arrived, and Korean when it could not be fetched (main.jsx paints Korean
+ * then), so a run played in Korean is never counted as another language's.
+ */
+export function appliedLocale() {
+  return overlay ? LANG : SOURCE_LOCALE;
+}
+
 /** A speaker's name as the page prints it, for a name with no scene in hand (a scene carries `speakerName`). The Korean name stays the key. */
 export function speakerName(name) {
   return overlay ? overlay.speakerName(name) : name;

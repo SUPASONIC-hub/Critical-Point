@@ -280,17 +280,29 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   };
 }
 
+// What the observer files as 「은폐」, for the tag and the ledger alike.
+// 미루다 as it is actually conjugated on the cards: 미루고, 미룬다, 미룰, 미뤄,
+// 미뤘다 (until 2026-10-28 the ledger read 미루 alone and missed 미룬·미뤄).
+const OPACITY_WORDS = /침묵|미[루룬룰뤄뤘]|비공개|봉인|silence|delay|private/;
+
+// The card's words the observer reads, in Korean whatever the page's
+// language: a page in another language keeps the Korean label beside its own
+// (`sourceChoice`, useChoiceCommit.js), so the same card is read the same way
+// in every language. An older save without it is read in its own words.
+function choiceWords(entry) {
+  return `${entry.choiceId ?? ""} ${entry.sourceChoice ?? entry.choice ?? ""}`.toLowerCase();
+}
+
 export function getObserverTag(entry = {}) {
   const riskDelta = entry.resourcesBefore && entry.resourcesAfter
     ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
     : entry.challenge?.riskDelta ?? 0;
-  const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+  const choiceText = choiceWords(entry);
   const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
   if (entry.reframe) {
     return { id: "defiance", ...observerCopy.tags.reframe };
   }
-  // 미루다 as it is actually conjugated on the cards: 미루고, 미룬다, 미룰, 미뤄, 미뤘다.
-  if (/침묵|미[루룬룰뤄뤘]|비공개|봉인|silence|delay|private/.test(choiceText)) {
+  if (OPACITY_WORDS.test(choiceText)) {
     return { id: "opacity", ...observerCopy.tags.opacity };
   }
   if (humanCostDelta > 0) {
@@ -365,11 +377,11 @@ export function getObservationLedger(entries = []) {
       const riskDelta = entry.resourcesBefore && entry.resourcesAfter
         ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
         : entry.challenge?.riskDelta ?? 0;
-      const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+      const choiceText = choiceWords(entry);
       const next = { ...ledger };
       if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
       if (entry.reframe || riskDelta > 6) next.defiance += 1;
-      if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) next.opacity += 1;
+      if (OPACITY_WORDS.test(choiceText)) next.opacity += 1;
       const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
       if (humanCostDelta > 0) next.sacrifice += 1;
       return next;

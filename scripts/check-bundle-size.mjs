@@ -74,7 +74,7 @@ const budgets = [
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_660, maxGzip: 54_956 },
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_722, maxGzip: 54_987 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -89,7 +89,7 @@ const budgets = [
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
   // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
   // 19,567 / 8,588 -> 25,798 / 11,056 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_666, maxGzip: 11_352 },
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_671, maxGzip: 11_352 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -110,7 +110,7 @@ const budgets = [
   // changed with their scene text and gzip worse; measured 87,097 on main
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
   // 291,131 / 87,101 -> 290,343 / 86,964 on 2026-10-26, 영어판 3단계: runtimeSystems.js's words (src/copy/seasonEnd.js) first landed here, which imports the runtimeSystems chunk back, and the table read at load was undefined in the production build (runtime smoke); grouped with runtimeSystems now, and this file measured smaller. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 290_343, maxGzip: 86_964 },
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 290_343, maxGzip: 86_970 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -260,7 +260,7 @@ const budgets = [
   // 180,652 / 65,391 -> 180,744 / 65,403 on 2026-10-26, 일본어 1단계 (ja-step1): the hidden Japanese entry in SUPPORTED_LOCALES and the language choice showing a hidden language on its own pages only. Every other Korean chunk and the CSS are byte for byte main's (57931801). Measured 180,744 / 65,399 in the e2e build, the gzip plus 4.
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 181_893, maxGzip: 65_954 },
+  { pattern: /^index-.*\.js$/, maxBytes: 181_926, maxGzip: 65_972 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1056,8 +1056,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * 463,021. Merged on 2026-10-28 over main 2c935e7 (#362's English step-three
  * and step-four screens grow the entry and the English dictionary), the lines
  * are that build plus 4: Korean 422,669, English 471,491, Japanese 463,608.
+ * The same day the observer's Korean card words (코드 리뷰 10-26 낮음) put
+ * them at 422,686, 471,543 and 463,660.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_673, en: 471_495, ja: 463_612 };
+const FIRST_PAINT_BUDGETS = { ko: 422_690, en: 471_547, ja: 463_664 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
