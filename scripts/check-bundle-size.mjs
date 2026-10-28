@@ -667,7 +667,9 @@ const budgets = [
   // still write it smaller than Rollup and esbuild did.
   // 36,757 / 13,658 -> 38,649 / 14,453 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 38,649 -> 38,654 raw on 2026-10-26, 영어판 3단계: only the names of the chunks it imports. Measured in the e2e build.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_663, maxGzip: 14_647 },
+  // 39,663 / 14,647 -> 39,883 / 14,795 on 2026-10-28, lang-full: the reading clock counts an English page by words and a
+  // Japanese one by characters at 0.89 (readingUnits). Measured 39,879 / 14,791.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_883, maxGzip: 14_795 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1008,8 +1010,8 @@ const budgets = [
   // `previewThrough` reaches them, a table keyed by case laid over only up to it, and `roleName` reading their
   // `caseRoles` (`caseRole`). Measured 8,731 / 2,636.
   // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
-  // languages (49 cases more for Japanese) and a card keeps its Korean label. Measured 12,507 / 3,320.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_511, maxGzip: 3_324 },
+  // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_579, maxGzip: 3_358 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1057,9 +1059,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * and step-four screens grow the entry and the English dictionary), the lines
  * are that build plus 4: Korean 422,669, English 471,491, Japanese 463,608.
  * The same day the observer's Korean card words (코드 리뷰 10-26 낮음) put
- * them at 422,686, 471,543 and 463,660.
+ * them at 422,686, 471,543 and 463,660. Both languages open to the end
+ * (lang-full, 10-28): English 472,083, Japanese 477,810 (the Japanese
+ * dictionary carries the screen copy of English steps three and four).
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_690, en: 471_547, ja: 463_664 };
+const FIRST_PAINT_BUDGETS = { ko: 422_690, en: 472_087, ja: 477_814 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

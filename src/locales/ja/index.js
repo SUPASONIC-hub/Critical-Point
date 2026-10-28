@@ -118,7 +118,7 @@ export const speakers = {
 };
 
 
-/** A speaker's role as the briefing prints it, by its Korean. The roles of 프롤로그 01-05 and 사건 01-10. */
+/** The role of a speaker as the briefing prints it, by its Korean. The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {
   "KD은행 기업금융전략팀 대리 · 당신의 사수": "KD銀行 企業金融戦略チーム 代理 · あなたの指導役",
   "온새포장 대표 · 강서구 화곡동": "オンセ包装 代表 · カンソ区ファゴク洞",
