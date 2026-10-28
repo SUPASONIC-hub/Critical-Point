@@ -62,7 +62,7 @@ test("the words of a value keep its shape: cards by id, lists by position, keys 
 test("only a Korean string is written over: ids, effects and next stay the Korean file's", () => {
   const scene = { text: "본문", memo: ["하나", "둘"], choices: [{ id: "a", label: "카드", next: "b", effect: { trust: 1 } }] };
   overlayWords(scene, { text: "Text", memo: [null, "Two"], choices: { a: { label: "Card", next: "x", effect: "none" }, gone: { label: "Lost" } }, extra: "ignored" });
-  assert.deepEqual(scene, { text: "Text", memo: ["하나", "Two"], choices: [{ id: "a", label: "Card", next: "b", effect: { trust: 1 } }] });
+  assert.deepEqual(scene, { text: "Text", memo: ["하나", "Two"], choices: [{ id: "a", label: "Card", sourceLabel: "카드", next: "b", effect: { trust: 1 } }] });
 });
 
 test("a case's words cover its scenes and its pack's result copy, and a line left out stays Korean", () => {

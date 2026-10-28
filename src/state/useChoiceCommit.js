@@ -27,7 +27,7 @@ import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../g
 import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
-import { LANG } from "../locale.js";
+import { appliedLocale } from "../locale.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { findFinalChoiceEntry } from "../verdictBranch.js";
@@ -63,7 +63,7 @@ let cloudConflictSaid = false;
  * summary as an object of at most 4,096 bytes without reading its keys
  * (telemetry_check_session_row), so it needs no migration.
  */
-export function toRowSummary(caseSummary, locale = LANG) {
+export function toRowSummary(caseSummary, locale = appliedLocale()) {
   const ending = caseSummary?.endingVariant;
   const id = typeof ending === "string" ? ending : ending?.id;
   // `finalChoiceId` stays in the save: the row's decision log already carries
@@ -285,6 +285,7 @@ export function useChoiceCommit(context) {
       title: node.title,
       chapterRule: chapterRules[currentCase]?.label ?? "",
       choice: choice.label,
+      ...(choice.sourceLabel ? { sourceChoice: choice.sourceLabel } : {}),
       spokenChoice: getDramaticChoiceLabel(choice),
       reframe,
       reframeOpenedRoute,

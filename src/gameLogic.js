@@ -280,11 +280,19 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   };
 }
 
+// The card's words the observer reads, in Korean whatever the page's
+// language: a page in another language keeps the Korean label beside its own
+// (`sourceChoice`, useChoiceCommit.js), so the same card is read the same way
+// in every language. An older save without it is read in its own words.
+function choiceWords(entry) {
+  return `${entry.choiceId ?? ""} ${entry.sourceChoice ?? entry.choice ?? ""}`.toLowerCase();
+}
+
 export function getObserverTag(entry = {}) {
   const riskDelta = entry.resourcesBefore && entry.resourcesAfter
     ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
     : entry.challenge?.riskDelta ?? 0;
-  const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+  const choiceText = choiceWords(entry);
   const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
   if (entry.reframe) {
     return { id: "defiance", ...observerCopy.tags.reframe };
@@ -365,7 +373,7 @@ export function getObservationLedger(entries = []) {
       const riskDelta = entry.resourcesBefore && entry.resourcesAfter
         ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
         : entry.challenge?.riskDelta ?? 0;
-      const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+      const choiceText = choiceWords(entry);
       const next = { ...ledger };
       if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
       if (entry.reframe || riskDelta > 6) next.defiance += 1;
