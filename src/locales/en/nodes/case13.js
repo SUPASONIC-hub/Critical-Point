@@ -70,7 +70,7 @@ export default {
     },
     "c13_market": {
       "title": "15 Seconds",
-      "text": "On the TV in the corner of Gaeul Rice Cakes, a 15-second trailer airs. The green screen is gone, replaced by a blue sky. On screen, you smile. Whether or not you read the last line aloud, the edit suite has laid a caption over your face. 'The past has all been settled.' Moon Gaeul’s knife stops mid-slice. Moon Hajun hunts for the remote, can’t find it, and pulls the TV’s plug. After a long while Moon Gaeul speaks. 'Settled, then. My husband too.' She peels your business card from beside her husband’s photo on the shelf and puts it in her apron pocket. 'It’s not that I’m hurt. I just don’t want the group to see it.' Moon Hajun asks, 'Are you really doing that?'",
+      "text": "On the TV in the corner of Gaeul Rice Cake Shop, a 15-second trailer airs. The green screen is gone, replaced by a blue sky. On screen, you smile. Whether or not you read the last line aloud, the edit suite has laid a caption over your face. 'The past has all been settled.' Moon Gaeul’s knife stops mid-slice. Moon Hajun hunts for the remote, can’t find it, and pulls the TV’s plug. After a long while Moon Gaeul speaks. 'Settled, then. My husband too.' She peels your business card from beside her husband’s photo on the shelf and puts it in her apron pocket. 'It’s not that I’m hurt. I just don’t want the group to see it.' Moon Hajun asks, 'Are you really doing that?'",
       "memo": [
         "15-second trailer -- first aired in the evening news ad slot",
         "Caption: 'The past has all been settled'",
@@ -94,7 +94,7 @@ export default {
           "label": "Find the cost code on the 3.8 billion won budget"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Livestream D-3 · 20:00",
       "question": "Moon Gaeul took your card down from beside her husband’s photo. What do you do in this shop?",
       "lead": "You got a text that the trailer was airing and ran to the shop, but when you opened the door the ad had already begun."

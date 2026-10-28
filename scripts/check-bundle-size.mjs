@@ -534,11 +534,16 @@ const budgets = [
   // -> 195,002 / 36,324 on 2026-10-26, pwa-install-hint: the hint's card in
   // comfort.css. Measured 195,002 / 36,320 in the e2e build, the gzip plus 4.
   // 195,002 / 36,324 -> 195,846 / 36,472 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 195_846, maxGzip: 36_472 },
+  // 195,846 -> 195,847 raw on 2026-10-26, first-paint-cut: the @font-face's weight range in tokens.css, 45 920 -> 400 920
+  // (the font's thin half cut, scripts/build-fonts.mjs). Measured 195,847 / 36,467; the gzip stays under its line.
+  { pattern: /^index-.*\.css$/, maxBytes: 195_847, maxGzip: 36_472 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
-  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 283_500, compressed: true },
+  // 283,500 -> 197,740 on 2026-10-26, first-paint-cut (the user's choice 1): the
+  // weight axis cut to 400-920, nothing asking for less. Measured 197,736 (from
+  // 270,828), plus 4.
+  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 197_740, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -988,7 +993,7 @@ const budgets = [
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_577, maxGzip: 46_483 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_593, maxGzip: 46_483 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
   { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_013, maxGzip: 2_344 },
@@ -1019,8 +1024,31 @@ const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-no
  * then the -960 the picture actually used. 494,937 once the old dynamic-subset
  * font stylesheet stopped being imported and the intro joined the entry chunk.
  */
-const FIRST_PAINT_BUDGET = 515_000;
 const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
+
+/**
+ * A page in another language waits on two more scripts before it paints
+ * (src/locale.js `loadLocale`, which src/main.jsx awaits): the overlay and,
+ * through it, the language's dictionary. Until 2026-10-26 this check measured
+ * the Korean page alone, and English (`?lang=en`) came to 544,820 and Japanese
+ * (`?lang=ja`) to 548,489 against a 515,000 line nothing held them to. Each
+ * language now has its own line; a language's extra chunks are named here, and
+ * whatever they import that the Korean page does not already fetch is counted
+ * with them.
+ *
+ * 515,000 for Korean until 2026-10-26; then first-paint-cut (the user's choice
+ * 1): the font's weight axis cut to 400-920 (-73,092) and the key visual's 960
+ * variant encoded at 0.75 (-12,372). Each line is that day's e2e build plus 4:
+ * Korean 507,582 -> 422,113, English 544,820 -> 459,352, Japanese 548,489 ->
+ * 463,021. Merged on 2026-10-28 over main 2c935e7 (#362's English step-three
+ * and step-four screens grow the entry and the English dictionary), the lines
+ * are that build plus 4: Korean 422,669, English 471,491, Japanese 463,608.
+ */
+const FIRST_PAINT_BUDGETS = { ko: 422_673, en: 471_495, ja: 463_612 };
+const LOCALE_FIRST_PAINT = {
+  en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
+  ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
+};
 
 let files;
 try {
@@ -1179,10 +1207,39 @@ try {
   failures.push(`dist/${FIRST_PAINT_IMAGE} is missing; the intro preloads it.`);
 }
 if (!coldAssets.size) failures.push("dist/index.html links no /assets/ files; the first-paint budget measured nothing.");
-if (firstPaint > FIRST_PAINT_BUDGET) {
-  failures.push(`The first paint transfers ${firstPaint} bytes, over the ${FIRST_PAINT_BUDGET} byte budget (${parts.join(", ")}).`);
+if (firstPaint > FIRST_PAINT_BUDGETS.ko) {
+  failures.push(`The first paint transfers ${firstPaint} bytes, over the ${FIRST_PAINT_BUDGETS.ko} byte budget (${parts.join(", ")}).`);
 }
 reported.push(`first paint ${firstPaint} bytes (${parts.join(", ")})`);
+
+// The same page in another language: the Korean bytes plus its chunks and
+// whatever they import statically that is not already counted.
+const staticImports = (name) =>
+  [...readFileSync(path.join(assetsDir, name), "utf8").matchAll(/\b(?:import|from)\s*["']\.\/([^"']+\.js)["']/g)].map((match) => match[1]);
+for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
+  const counted = new Set([...coldAssets].map((asset) => path.basename(asset)));
+  const queue = [];
+  for (const pattern of patterns) {
+    const name = files.find((file) => pattern.test(file));
+    if (name) queue.push(name);
+    else failures.push(`No chunk matches ${pattern} in dist/assets; the ${lang} first paint waits on it.`);
+  }
+  let total = firstPaint;
+  const extra = [];
+  while (queue.length) {
+    const name = queue.shift();
+    if (counted.has(name)) continue;
+    counted.add(name);
+    const bytes = transfer(`assets/${name}`);
+    total += bytes;
+    extra.push(`${name} ${bytes}`);
+    queue.push(...staticImports(name));
+  }
+  if (total > FIRST_PAINT_BUDGETS[lang]) {
+    failures.push(`The ${lang} first paint (?lang=${lang}) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
+  }
+  reported.push(`${lang} first paint ${total} bytes (the Korean ${firstPaint}, ${extra.join(", ")})`);
+}
 
 // Web ads (출시 로드맵 2단계) are off unless the build was given
 // ADSENSE_ADS=on (draft #341): a site build without it, AdSense site
