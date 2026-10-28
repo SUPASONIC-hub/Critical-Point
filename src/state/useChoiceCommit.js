@@ -277,6 +277,11 @@ export function useChoiceCommit(context) {
       nextCognition[key] = (nextCognition[key] ?? 0) + value;
     });
 
+    // The entry keeps the words the page showed (title, card, rule, echo), in
+    // its language: a run played in English and reopened in Korean shows its
+    // English lines in the report archive. Left so on purpose (코드 리뷰 10-26,
+    // 사용자 10-28 (1)): nothing breaks and pages rarely change language; what
+    // must not depend on it reads ids, or the Korean card (`sourceChoice`).
     const entryBase = {
       nodeId: resolvedNodeId,
       caseId: fallbackCaseId,
