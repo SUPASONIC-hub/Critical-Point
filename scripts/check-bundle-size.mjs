@@ -1062,8 +1062,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * them at 422,686, 471,543 and 463,660. Both languages open to the end
  * (lang-full, 10-28): English 472,083, Japanese 477,810 (the Japanese
  * dictionary carries the screen copy of English steps three and four).
+ * index.html then names the two other languages (hreflang, og:locale:alternate,
+ * lang-extras): 422,831, 472,231 and 477,958.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_702, en: 472_102, ja: 477_829 };
+const FIRST_PAINT_BUDGETS = { ko: 422_835, en: 472_235, ja: 477_962 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1186,7 +1188,9 @@ function checkBudget(file, budget) {
 // plus 4.
 // -> 9,897 / 3,573 on 2026-10-26, funnel-locale: the chunk names' hashes only;
 // the worker's code did not change. Measured 9,897 / 3,569 plus 4.
-const WORKER_BUDGET = { maxBytes: 9_897, maxGzip: 3_573 };
+// 9,897 / 3,573 -> 9,948 / 3,586 on 2026-10-28, lang-extras: the Japanese privacy policy and terms join its
+// network-first pages and its warm-up list. Measured 9,944 / 3,582.
+const WORKER_BUDGET = { maxBytes: 9_948, maxGzip: 3_586 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
