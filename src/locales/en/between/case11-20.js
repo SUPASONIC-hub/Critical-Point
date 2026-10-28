@@ -78,7 +78,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · The Week After the Audit",
           "title": "The Newsroom Cat Gets a Press Pass",
-          "text": "The week after the parliamentary audit, Leadline issues the newsroom cat an honorary press pass. Its name is 'Correction.' Seo Harin sends a message with the photo. 'Legal withdrew the demand for correction. We named it to celebrate.' Na Junhyuk makes the photo the background of the waiting-area monitor at Yeongdong Branch, and Kang Taemin posts it to the night-shift group chat as 'the cat on our side.' Lee Minseo’s permanent conversion review still has no result. Even so, this week she comes to work for the first time with her ID badge hanging face out."
+          "text": "The week after the parliamentary audit, Leadline issues the newsroom cat an honorary press pass. Its name is 'Jeongjeong,' Korean for a correction. Seo Harin sends a message with the photo. 'Legal withdrew the demand for correction. We named it to celebrate.' Na Junhyuk makes the photo the background of the waiting-area monitor at Yeongdong Branch, and Kang Taemin posts it to the night-shift group chat as 'the cat on our side.' Lee Minseo’s permanent conversion review still has no result. Even so, this week she comes to work for the first time with her ID badge hanging face out."
         }
       },
       "case12": {
@@ -350,7 +350,8 @@ export const caseRoles = {
     "KD캐피탈 리스 심사역 · 입사 3년차": "Lease credit officer, KD Capital · 3rd year at the company",
     "플로우온 풀필먼트센터 포장 라인 · 9년차": "Packing line, FlowOn fulfillment center · 9 years in",
     "플로우온 풀필먼트센터 야간조 막내 · 24세": "Youngest on the night shift, FlowOn fulfillment center · age 24",
-    "트리거랩 데이터 기록 담당": "Data records officer, Trigger Lab"
+    "트리거랩 데이터 기록 담당": "Data records officer, Trigger Lab",
+    "플로우온 풀필먼트센터 시범 운영 물류 로봇 · 야간조가 붙인 이름": "Pilot logistics robot, FlowOn fulfillment center · named by the night shift"
   },
   "case17": {
     "푸드트럭 '태오네 떡꼬치' 사장 · 전 KD은행 구로지점 기업대출 대리": "Owner of the food truck 'Taeo’s Tteok Skewers' · former Assistant Manager, corporate loans, KD Bank Guro Branch",
