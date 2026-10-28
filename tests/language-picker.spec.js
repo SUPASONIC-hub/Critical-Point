@@ -29,6 +29,10 @@ test("the intro's language choice opens English, keeps it through a reload and r
   // Polled: the choice reloads the page, and a read that lands mid-navigation is asked again.
   await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), LOCALE_KEY)).toBe("en");
 
+  // The policy links open the English pages (scripts/legal-pages.mjs, /en/).
+  await expect(page.locator('a[href="/en/privacy.html"]').first()).toBeAttached();
+  await expect(page.locator('a[href="/privacy.html"]')).toHaveCount(0);
+
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.getByRole("navigation", { name: "언어 · Language" }).getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");

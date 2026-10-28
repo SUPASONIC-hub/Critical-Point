@@ -260,7 +260,7 @@ const budgets = [
   // 180,652 / 65,391 -> 180,744 / 65,403 on 2026-10-26, 일본어 1단계 (ja-step1): the hidden Japanese entry in SUPPORTED_LOCALES and the language choice showing a hidden language on its own pages only. Every other Korean chunk and the CSS are byte for byte main's (57931801). Measured 180,744 / 65,399 in the e2e build, the gzip plus 4.
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 181_926, maxGzip: 65_978 },
+  { pattern: /^index-.*\.js$/, maxBytes: 182_001, maxGzip: 66_015 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1063,9 +1063,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * (lang-full, 10-28): English 472,083, Japanese 477,810 (the Japanese
  * dictionary carries the screen copy of English steps three and four).
  * index.html then names the two other languages (hreflang, og:locale:alternate,
- * lang-extras): 422,831, 472,231 and 477,958.
+ * lang-extras) and the policy links open the page's own language:
+ * 422,867, 472,269 and 477,996.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_835, en: 472_235, ja: 477_962 };
+const FIRST_PAINT_BUDGETS = { ko: 422_871, en: 472_273, ja: 478_000 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

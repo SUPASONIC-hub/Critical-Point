@@ -160,3 +160,12 @@ test("the decisions of 2026-10-25 hold: no names, one overseas line, no ads on t
   assert.match(decode(pages["en/terms.html"]), /href="\/en\/privacy\.html">Privacy Policy/);
   assert.match(decode(pages["ja/terms.html"]), /href="\/ja\/privacy\.html">プライバシーポリシー/);
 });
+
+test("the game links each policy in the page's language: Korean at the root, English and Japanese under their code", async () => {
+  const { legalPagePath, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } = await import("../../src/privacyText.js");
+  assert.equal(legalPagePath(PRIVACY_PAGE_PATH, "ko"), "/privacy.html");
+  assert.equal(legalPagePath(PRIVACY_PAGE_PATH, "en"), "/en/privacy.html");
+  assert.equal(legalPagePath(TERMS_PAGE_PATH, "ja"), "/ja/terms.html");
+  assert.equal(legalPagePath(TERMS_PAGE_PATH, "fr"), "/terms.html", "a language with no pages falls back to Korean");
+  assert.equal(legalPagePath(PRIVACY_PAGE_PATH), "/privacy.html");
+});
