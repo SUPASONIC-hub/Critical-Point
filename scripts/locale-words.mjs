@@ -145,14 +145,29 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
  * 40 million (G-6: 억 원 = 100 million won). Only for comparing digits.
  */
 function inEnglishUnits(text) {
-  // A month is a word in English ("4월 27일" -> "April 27"), and 만 after a
-  // small figure is "only" ("첨부 7만"), not ten thousand.
-  const months = text.replace(/\d{1,2}월/g, "월");
-  return months.replace(/(\d+(?:\.\d+)?)\s*(조|억|만(?=\s*원)|(?<=\d{3})만)/g, (match, figure, unit) => {
+  // A month is a word in English ("4월 27일" -> "April 27"), and a lone 1 in
+  // 1주·1심·1인당·1인·1회·1년차, or the 0 of 0시, is a word there too
+  // ("one-share", "first-instance", "per person", "midnight").
+  const words = text.replace(/\d{1,2}월/g, "월").replace(/(?<![\d.])1(?=주|심|인당|인|회|년차)|(?<![\d.])0(?=시)/g, "");
+  // A figure in parts is one figure: 1억 2천(만) is 120 million, 3억 8000만
+  // 380 million, 6만 4천 64,000, 41만 9명 410,009. 만 after a figure is ten
+  // thousand, 천 a thousand (11만 views, 4천 people).
+  const joined = words
+    .replace(/(\d+(?:\.\d+)?)억\s*(\d+)\s*(천만|천|만)/g, (match, eok, part, unit) => String(Number(eok) * 1e8 + Number(part) * (unit === "만" ? 1e4 : 1e7)))
+    .replace(/(\d+)만\s*(\d+)\s*천/g, (match, man, cheon) => String(Number(man) * 1e4 + Number(cheon) * 1e3))
+    .replace(/(\d+)만\s+(\d{1,4})(?=\s*[가-힣])/g, (match, man, rest) => String(Number(man) * 1e4 + Number(rest)))
+    .replace(/(\d+)천만/g, (match, cheon) => String(Number(cheon) * 1e7))
+    .replace(/(\d+)천(?![만억])/g, (match, cheon) => String(Number(cheon) * 1e3));
+  return joined.replace(/(\d+(?:\.\d+)?)\s*(조|억|만(?=\s*[가-힣]|[\s,.'"」)]|$))/g, (match, figure, unit) => {
     const value = Number(figure) * { 조: 1e12, 억: 1e8, 만: 1e4 }[unit];
-    const scaled = value >= 1e12 ? value / 1e12 : value >= 1e9 ? value / 1e9 : value >= 1e6 ? value / 1e6 : value;
-    return String(Number(scaled.toFixed(3)));
-  });
+    return englishFigure(value);
+  }).replace(/\d{7,}/g, (run) => englishFigure(Number(run)));
+}
+
+/** A figure as English writes it: billions and millions in their own units (2.76 billion), the rest whole. */
+function englishFigure(value) {
+  const scaled = value >= 1e12 ? value / 1e12 : value >= 1e9 ? value / 1e9 : value >= 1e6 ? value / 1e6 : value;
+  return String(Number(scaled.toFixed(3)));
 }
 
 /**
