@@ -11,8 +11,8 @@
  *
  * The same shape as the English dictionary (src/locales/en/index.js):
  * `copy` over the Korean tables in place, `speakers` and `roles` for the
- * briefing, `preview` for the preview's own screens, `previewThrough` the
- * last case in Japanese. `style` is the page's own CSS (overlay.js
+ * briefing; open to the end of the season (10-28), so no `preview` copy and
+ * no `previewThrough`. `style` is the page's own CSS (overlay.js
  * `addStyle`): the system's Japanese face, since Pretendard has no kanji and
  * a kanji subset would weigh more than the first-paint budget, and line
  * breaks between characters with Japanese rules, since the Korean pages'
@@ -117,8 +117,6 @@ export const speakers = {
   "민하랑": "ミン・ハラン",
 };
 
-/** The last case of the Japanese preview (the same switch as the English one). */
-export const previewThrough = "final";
 
 /** A speaker's role as the briefing prints it, by its Korean. The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {
@@ -151,26 +149,6 @@ export const roles = {
   "피해자 모임 대표 · 망원시장 가을떡방 사장": "被害者の会代表 · マンウォン市場「ガウル餅房」店主",
 };
 
-export const preview = {
-  languageName: "日本語",
-  chooseLanguage: "言語を選択",
-  languageButtons: ["한국어", "日本語（試験版）"],
-  languageSetting: "言語",
-  previewNote: "日本語は試験版です。プロローグと事件01〜{last}を遊べます。",
-  reportTranslation: "このシーンの翻訳の問題を報告",
-  reportTranslationNote: "おかしな箇所を教えてください。シーンIDも一緒に送られます。",
-  rankingLanguage: "言語: KO / JA",
-  endTitle: "日本語試験版はここまで",
-  endText:
-    "事件{last}まで到達しました。日本語の試験版はひとまずここまでです。事件{next}〜49とフィナーレは翻訳中です。進行状況はこの端末に保存されていて、公開されたら事件{next}から続けられます。",
-  endButtons: { korean: "韓国語で続ける", wait: "日本語版を待つ", feedback: "感想を送る" },
-  continueCard: "事件{next} — 日本語版は近日公開",
-  // The panel after `previewThrough` (nextCaseSignals): its eyebrow, and the
-  // lead put before its premise; its button is endButtons.korean.
-  endEyebrow: "日本語試験版はここまで",
-  endPremiseLead:
-    "事件{last}で、日本語の試験版はひとまず終わりです。進行状況はこの端末に保存されています。事件{next}からは、日本語版が届くまで韓国語で物語が続きます。",
-};
 
 export const copy = {
   screens,
