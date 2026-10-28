@@ -25,7 +25,7 @@
  *   /assets/*      kept first. A fingerprinted file never changes behind its
  *                  name, so the kept copy is the file. A miss goes to the
  *                  network and is kept on the way back.
- *   the policies   /privacy.html, /terms.html and their /en/ copies
+ *   the policies   /privacy.html, /terms.html and their /en/ and /ja/ copies
  *                  (scripts/legal-pages.mjs): network first like the page,
  *                  and kept on the way back and in the warm-up, so a device
  *                  that has had a table up can read them offline.
@@ -59,7 +59,7 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
-export const DOCUMENT_PAGE = /^\/(?:en\/)?(?:privacy|terms)\.html$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms)\.html$/;
 
 export function cacheNameFor(release) {
   return `${CACHE_PREFIX}${release}`;
