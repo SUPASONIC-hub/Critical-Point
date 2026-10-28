@@ -54,7 +54,7 @@ test("each request gets the rule for what it asks for", () => {
   assert.equal(strategyFor(get("/scene-case01-960.webp", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/icons/icon-192.png", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/manifest.webmanifest"), ORIGIN), "revalidate");
-  for (const page of ["/privacy.html", "/terms.html", "/en/privacy.html", "/en/terms.html"]) {
+  for (const page of ["/privacy.html", "/terms.html", "/en/privacy.html", "/en/terms.html", "/ja/privacy.html", "/ja/terms.html"]) {
     assert.equal(strategyFor(get(page, "navigate"), ORIGIN), "document", page);
   }
 });

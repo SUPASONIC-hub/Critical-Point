@@ -364,7 +364,7 @@ function serviceWorker() {
 }
 
 /**
- * The privacy policy and the terms of use (scripts/legal-pages.mjs): four
+ * The privacy policy and the terms of use (scripts/legal-pages.mjs): six
  * plain pages written beside `index.html`, so the host serves each at its own
  * name and a store listing can link to it. The dev server answers the same
  * addresses from the same source. Before `serviceWorker()` in the list, which
