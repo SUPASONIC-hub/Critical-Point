@@ -988,7 +988,9 @@ const budgets = [
   // is larger raw than its English though shorter to read. 사건 01 the largest, 82,376 / 23,101; the dictionary
   // (screen copy, 1,537 lines, and the page's system-font style) 109,813 / 38,565. Measured in the e2e build, the gzip plus 4.
   { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 82_376, maxGzip: 23_105 },
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 110_001, maxGzip: 38_601 },
+  // 110,001 / 38,601 -> 152,779 / 51,777 on 2026-10-28, lang-full: the Japanese screen copy of English steps three and four
+  // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 152_779, maxGzip: 51_777 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -997,13 +999,17 @@ const budgets = [
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
-  { pattern: /^locale-en-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 28_210, maxGzip: 10_805 },
+  // 2026-10-28, lang-full: both languages open to the end, so English 사건 21-final and Japanese 사건 11-final join it
+  // (four files each); the largest measured 33,405 raw (ja 21-30) and 12,141 gzip (ja 31-40).
+  { pattern: /^locale-(en|ja)-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 33_409, maxGzip: 12_145 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
   // 8,013 / 2,344 -> 8,731 / 2,640 on 2026-10-26, en-between-11-20: the between/ files in its import map, fetched once
   // `previewThrough` reaches them, a table keyed by case laid over only up to it, and `roleName` reading their
   // `caseRoles` (`caseRole`). Measured 8,731 / 2,636.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_731, maxGzip: 2_640 },
+  // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
+  // languages (49 cases more for Japanese) and a card keeps its Korean label. Measured 12,507 / 3,320.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_511, maxGzip: 3_324 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
