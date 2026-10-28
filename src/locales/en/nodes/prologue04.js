@@ -99,8 +99,8 @@ export default {
       "lead": "The whiteboard keeps both the circles of the boxes that hit target and the names in the boxes that missed."
     },
     "p4_visit": {
-      "title": "Next to Gaeul Rice Cakes",
-      "text": "Four in the afternoon, Mangwon Market. The shutter of Gaeul Rice Cakes is half down, with a note taped to it: 'Gone to Incheon today.' Next door, Shin Youngran of the side-dish shop Handful of Perilla sits you down on her low wooden platform. She is sixty-three and has been in this alley for 19 years. She holds out a passbook. April 28, Window 4, 12 million won. 'They said it was a savings plan. In 2 years I have to raise the deposit on my shop.' She says she can read the product name printed on the passbook and still not know what it means. The cooling-off period ended last week, and redeeming now means a fee. Shin Youngran closes the lid of a kimchi tub. 'That young man is so kind. He lives in the alley right behind here. He buys our kimchi, and every time he asks how my knees are. That’s why everyone took the bus all the way to Gangseo. Would someone like that sell something bad?'",
+      "title": "Next to Gaeul Rice Cake Shop",
+      "text": "Four in the afternoon, Mangwon Market. The shutter of Gaeul Rice Cake Shop is half down, with a note taped to it: 'Gone to Incheon today.' Next door, Shin Youngran of the side-dish shop Handful of Perilla sits you down on her low wooden platform. She is sixty-three and has been in this alley for 19 years. She holds out a passbook. April 28, Window 4, 12 million won. 'They said it was a savings plan. In 2 years I have to raise the deposit on my shop.' She says she can read the product name printed on the passbook and still not know what it means. The cooling-off period ended last week, and redeeming now means a fee. Shin Youngran closes the lid of a kimchi tub. 'That young man is so kind. He lives in the alley right behind here. He buys our kimchi, and every time he asks how my knees are. That’s why everyone took the bus all the way to Gangseo. Would someone like that sell something bad?'",
       "memo": [
         "Shin Youngran -- Handful of Perilla, joined at Window 4 on April 28, 12 million won",
         "What she thinks she has: 'a savings plan'",
@@ -127,7 +127,7 @@ export default {
       "place": "Mangwon Market · Handful of Perilla side-dish shop",
       "clock": "May 15, 2023 · 16:00",
       "question": "In front of you is someone who thinks her 12 million won is in a savings plan. What do you tell her?",
-      "lead": "The shutter of Gaeul Rice Cakes is half down, and a note lifts in the wind."
+      "lead": "The shutter of Gaeul Rice Cake Shop is half down, and a note lifts in the wind."
     },
     "p4_final": {
       "title": "About Window 4",

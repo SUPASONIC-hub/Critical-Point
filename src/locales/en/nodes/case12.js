@@ -93,7 +93,7 @@ export default {
           "label": "Find the 30 billion won’s account in the books"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Three days before Chuseok",
       "question": "In the steamy shop, she asks whether the 212 without paperwork count for compensation. What do you say?",
       "lead": "Steam covers your face the moment you open the shop door. Six aprons are already hanging up."
@@ -159,7 +159,7 @@ export default {
     },
     "c12_aftershock": {
       "title": "Rice Cake Day",
-      "text": "The day the first payments land, a line forms outside Gaeul Rice Cakes. Moon Gaeul hands each group member a box of rice cakes, Kang Taemin carries boxes, and Na Junhyuk says 'Happy Chuseok' to each person for the 30th time. Moon Gaeul’s high school son Moon Hajun comes in his uniform to sort receipts and asks Kwon Dohyun 'Why do you write it like this?' 20 times. Kwon Dohyun answers all 20. Toward sunset, Moon Gaeul holds out the last box to you. 'This is my husband’s share. You take it for him.' Then your phone rings. It is the Group Strategy Office on the 33rd floor of group headquarters. Yoon Sanghyuk wants to talk, this time, about the signature field.",
+      "text": "The day the first payments land, a line forms outside Gaeul Rice Cake Shop. Moon Gaeul hands each group member a box of rice cakes, Kang Taemin carries boxes, and Na Junhyuk says 'Happy Chuseok' to each person for the 30th time. Moon Gaeul’s high school son Moon Hajun comes in his uniform to sort receipts and asks Kwon Dohyun 'Why do you write it like this?' 20 times. Kwon Dohyun answers all 20. Toward sunset, Moon Gaeul holds out the last box to you. 'This is my husband’s share. You take it for him.' Then your phone rings. It is the Group Strategy Office on the 33rd floor of group headquarters. Yoon Sanghyuk wants to talk, this time, about the signature field.",
       "memo": [
         "First compensation payments confirmed",
         "1,021 boxes of rice cakes -- every member",
@@ -177,7 +177,7 @@ export default {
           "label": "Hand out rice cakes until the shop shutter comes down"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market · Out front",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Out front",
       "clock": "First payment day · Evening",
       "question": "As the last boxes go out, the 33rd floor wants to talk about the signature field. How do you close this evening?"
     },
@@ -223,7 +223,7 @@ export default {
           "label": "Name the column 'solidarity fee' and split it as dues"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market · Counter",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Counter",
       "clock": "Three days before Chuseok · 22:00",
       "question": "The back page holds 23 rows of rice cakes never charged. What do you do?"
     },
@@ -290,7 +290,7 @@ export default {
           "label": "Ask for a column of your own in that revenge"
         }
       },
-      "place": "Gaeul Rice Cakes, Mangwon Market · By the shutter",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · By the shutter",
       "clock": "Three days before Chuseok · 22:00",
       "question": "Moon Gaeul says the free rice cakes are her revenge. How do you answer it?"
     },
@@ -469,7 +469,7 @@ export default {
     },
     "c12_start_record": {
       "title": "A Plan for the One Who Opened the Transcript",
-      "text": "The victims’ group read the public transcript line by line. 2 weeks later the group announced the 30 billion won voluntary plan, and the press release quotes one line from your National Assembly audit testimony as 'a sincere raising of the issue'. Your sentence has become the plan’s publicity copy. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cakes, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
+      "text": "The victims’ group read the public transcript line by line. 2 weeks later the group announced the 30 billion won voluntary plan, and the press release quotes one line from your National Assembly audit testimony as 'a sincere raising of the issue'. Your sentence has become the plan’s publicity copy. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cake Shop, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
       "memo": [
         "Voluntary plan 30 billion won -- conditional on a no-suit agreement",
         "Your testimony quoted in the press release",
@@ -500,7 +500,7 @@ export default {
     },
     "c12_start_summon": {
       "title": "A Plan for the One Who Went to the 33rd Floor",
-      "text": "The 33rd-floor meeting ended in 12 minutes. Yoon Sanghyuk asked you nothing and never brought up the signature field. 2 weeks later the group announces the 30 billion won voluntary plan. Several sentences in the announcement match what Yoon Sanghyuk said that day word for word. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cakes, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
+      "text": "The 33rd-floor meeting ended in 12 minutes. Yoon Sanghyuk asked you nothing and never brought up the signature field. 2 weeks later the group announces the 30 billion won voluntary plan. Several sentences in the announcement match what Yoon Sanghyuk said that day word for word. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cake Shop, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
       "memo": [
         "33rd-floor meeting 12 minutes -- 0 questions",
         "Voluntary plan 30 billion won -- conditional on a no-suit agreement",
@@ -579,7 +579,7 @@ export default {
     "c12_final_system_route_a": "With a term, even those who signed can ask again after 5 years. The group starts calculating what it must clear away within those 5 years.",
     "c12_final_system_route_b": "As the payout rises, signing speeds up. Silence has a price for the first time, and the buyer set it.",
     "c12_final_system_route_c": "With a fund, a road remains even for those who don’t sign. That road takes 2 to 3 years, and no one can promise the fund will last that long.",
-    "c12_evidence_turn_reclaim": "Your condition halts mediation. Only the shares of those who signed separately go out as scheduled, and that evening the rest flood Gaeul Rice Cakes with calls.",
+    "c12_evidence_turn_reclaim": "Your condition halts mediation. Only the shares of those who signed separately go out as scheduled, and that evening the rest flood Gaeul Rice Cake Shop with calls.",
     "c12_evidence_turn_hold": "Revealed on the last day, it silences the room. Those who signed before then never learn whose pay their compensation came from.",
     "c12_evidence_turn_share": "Once told, some staff whose bonuses were cut contact the victims’ group first. Both sides confirm they were talking about the same money.",
     "c12_mediation_evidence_turn": "Compare the accounts one by one, and it splits into whose pockets the compensation comes from, and whose it doesn’t.",

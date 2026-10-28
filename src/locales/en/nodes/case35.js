@@ -13,7 +13,7 @@ export default {
       "text": "The monsoon rain that began at the weekend thickens to 110mm an hour. On the KD Capital Risk Management situation board, western Seoul and southeastern Incheon bleed red. Your phone rings again and again. Do Yoonha first. 'The alleys in Mangwon Market are ankle-deep in water. Moon Gaeul is pulling the plugs on her rice cake machines.' Then Foreman Kim at To-the-End Precision in Incheon sends a photo. The drain you cleared with Kang Taemin is blocked again, and muddy water is licking in under the shutter like a tongue. The six lathes have been turning again for less than 1 year. Do Yoonha goes on. 'The branch inbox is already filling with questions about tomorrow morning’s emergency flood loans. But those loans are reviewed by NOAH now, the AI review engine (an artificial-intelligence program that judges loan applications automatically).' The rain outside the window drowns out the alarm on the situation board.",
       "memo": [
         "Monsoon rain since the weekend, day four -- 110mm an hour tonight",
-        "Low-lying alleys of Mangwon Market flooding, Gaeul Rice Cakes included",
+        "Low-lying alleys of Mangwon Market flooding, Gaeul Rice Cake Shop included",
         "To-the-End Precision flooding under the shutter -- 6 lathes",
         "Emergency flood loan reviews: AI review engine NOAH"
       ],
@@ -41,7 +41,7 @@ export default {
       "text": "Rain hammering the Mangwon Market arcade roof buries every voice. Ahn Gibeom, secretary of the merchants’ association, shouts with a live stream running on his phone. '300 sandbags are here! Anyone with free hands, to the rice cake alley!' Kang Taemin runs with two on each shoulder, and Kwon Dohyun, who ran over on his way home from work, has put on the last pair of rain boots in the market hardware store. Pink, flowered, size 240mm. He takes out his calculator with his toes curled, then puts it back. 'I’ll do the sums when the water’s gone.' A few people laugh, but only for a moment; Ahn Gibeom unfolds a wet map of the market. 300 sandbags can hold back the water in only one place. The lowest alley, where the elderly merchants’ shops crowd together. The basement power room, where the electricity for every refrigerator in the market comes together. Or the entrance, with 20 shops lined up along the main road. The water rises a hand’s width every 10 minutes.",
       "memo": [
         "300 sandbags -- enough to protect only one section",
-        "Lowest alley: 11 shops of elderly owners, Gaeul Rice Cakes included",
+        "Lowest alley: 11 shops of elderly owners, Gaeul Rice Cake Shop included",
         "Basement power room: power for all the market’s fridges and freezers",
         "Entrance: 20 shops on the main road"
       ],
@@ -100,11 +100,11 @@ export default {
     },
     "c35_noah": {
       "title": "Rejected Because You Flooded",
-      "text": "The ticket numbers at the Gangseo Branch windows have passed 140. Mangwon Market merchants in wet sneakers stand in line with applications in hand. Tak Yerin at the corporate loan window turns her monitor toward you. Of the 41 emergency flood loans received since yesterday, NOAH, the AI review engine (an artificial-intelligence program that judges loan applications automatically), has rejected 38. The reason is one line. 'Flood-damaged business; sharp drop in repayment (paying back borrowed money) capacity expected.' To-the-End Precision and Gaeul Rice Cakes are both among the 38. Tak Yerin lowers her voice. 'A loan made to help people who flooded is being refused because they flooded.' At the next window, Do Yoonha, reading a rejection notice, stops at the second line. The signature field for an exception approval (approval outside the criteria, given by someone in charge who puts their name on it), where a person can overturn the result, is empty again.",
+      "text": "The ticket numbers at the Gangseo Branch windows have passed 140. Mangwon Market merchants in wet sneakers stand in line with applications in hand. Tak Yerin at the corporate loan window turns her monitor toward you. Of the 41 emergency flood loans received since yesterday, NOAH, the AI review engine (an artificial-intelligence program that judges loan applications automatically), has rejected 38. The reason is one line. 'Flood-damaged business; sharp drop in repayment (paying back borrowed money) capacity expected.' To-the-End Precision and Gaeul Rice Cake Shop are both among the 38. Tak Yerin lowers her voice. 'A loan made to help people who flooded is being refused because they flooded.' At the next window, Do Yoonha, reading a rejection notice, stops at the second line. The signature field for an exception approval (approval outside the criteria, given by someone in charge who puts their name on it), where a person can overturn the result, is empty again.",
       "memo": [
         "Gangseo Branch: 38 of 41 emergency flood loans rejected -- 312 nationwide",
         "Reason: 'Flood-damaged business; sharp drop in repayment capacity expected'",
-        "To-the-End Precision and Gaeul Rice Cakes both on the rejection list",
+        "To-the-End Precision and Gaeul Rice Cake Shop both on the rejection list",
         "Exception approval signature field: empty"
       ],
       "choices": {
@@ -159,7 +159,7 @@ export default {
     },
     "c35_aftershock": {
       "title": "Rice Cakes on a Clear Day",
-      "text": "The rain stops, and the sun comes out for the first time in eight days. In front of Gaeul Rice Cakes, merchants line up dried steamers and borrowed steam pots. When the rice cake machine that went under and came back gives its first puff of steam, the alley breaks into applause. Grandma Ha from Ha’s Oil Mill drizzles the sesame oil she pressed over the injeolmi, and Ahn Gibeom, secretary of the merchants’ association, renames his live stream 'Mangwon Market Open Again.' The pink flowered boots Kwon Dohyun bought at the hardware store that night now hang on a nail beside the shop sign, and the grandmothers call him 'the young man in the flower boots.' Moon Gaeul sets a steaming tray of rice cakes in front of you. 'This is for the people who bailed out water. Not for the bank people.' Then Tak Yerin from Gangseo Branch texts. 'I heard it at head office. The chairman had Ahn Gibeom’s live video playing in the secretariat. He paused it on the part where your face shows.'",
+      "text": "The rain stops, and the sun comes out for the first time in eight days. In front of Gaeul Rice Cake Shop, merchants line up dried steamers and borrowed steam pots. When the rice cake machine that went under and came back gives its first puff of steam, the alley breaks into applause. Grandma Ha from Ha’s Oil Mill drizzles the sesame oil she pressed over the injeolmi, and Ahn Gibeom, secretary of the merchants’ association, renames his live stream 'Mangwon Market Open Again.' The pink flowered boots Kwon Dohyun bought at the hardware store that night now hang on a nail beside the shop sign, and the grandmothers call him 'the young man in the flower boots.' Moon Gaeul sets a steaming tray of rice cakes in front of you. 'This is for the people who bailed out water. Not for the bank people.' Then Tak Yerin from Gangseo Branch texts. 'I heard it at head office. The chairman had Ahn Gibeom’s live video playing in the secretariat. He paused it on the part where your face shows.'",
       "memo": [
         "First day without rain -- rice cake machine running again",
         "Market merchants share rice cakes, every volunteer included",
@@ -177,7 +177,7 @@ export default {
           "label": "Stay with the market people until the last sandbag"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cakes · Shopfront",
+      "place": "Mangwon Market Gaeul Rice Cake Shop · Shopfront",
       "clock": "July 19 · Clear Afternoon",
       "question": "As rice cakes go round, word comes that Chairman Seo Dokyung paused on your face in the market video. How do you close this afternoon?"
     },
@@ -251,7 +251,7 @@ export default {
     },
     "c35_elder_reaction": {
       "title": "One Night’s Score",
-      "text": "When you get out of the alley, there’s a message from Lee Minseo. It’s a photo of KD Data Lab’s night monitor. 'Six hours after the downpour began, NOAH cut the credit scores of business owners all over Mangwon-dong and the Namdong Industrial Complex, one after another. Reason: disaster-exposure area. Nobody has even applied for a loan yet, and it has already finished getting ready to reject them.' Below the photo you can see the business registration number of Gaeul Rice Cakes. It dropped 187 points overnight. Lee Minseo sends one more line. 'I’m not supposed to see this screen. I’m sending it anyway.'",
+      "text": "When you get out of the alley, there’s a message from Lee Minseo. It’s a photo of KD Data Lab’s night monitor. 'Six hours after the downpour began, NOAH cut the credit scores of business owners all over Mangwon-dong and the Namdong Industrial Complex, one after another. Reason: disaster-exposure area. Nobody has even applied for a loan yet, and it has already finished getting ready to reject them.' Below the photo you can see the business registration number of Gaeul Rice Cake Shop. It dropped 187 points overnight. Lee Minseo sends one more line. 'I’m not supposed to see this screen. I’m sending it anyway.'",
       "memo": [
         "Scores that dropped before anyone applied",
         "A screen she shouldn’t see"
@@ -317,7 +317,7 @@ export default {
     },
     "c35_branch_cellar": {
       "title": "The Fourth Step of the Cellar",
-      "text": "While you are hauling sandbags, Moon Gaeul grabs your arm and pulls. The water on the stairs down to the storeroom behind Gaeul Rice Cakes has reached the fourth step. In the storeroom are forty sacks of glutinous rice for the autumn rush, and six boxes of Gaon Precision ledgers her husband left behind. Page by page, the ledgers record payments for deliveries to FlowOn that were never made. They are evidence for the class action (a lawsuit filed jointly by many victims) whose first hearing is next month. Moon Gaeul stops halfway down the stairs. 'We can’t bring up both. Before the water reaches our knees, one trip, two at most.' From above, Moon Hajun shines a flashlight. In its beam, the rice sacks and the ledger boxes soak side by side.",
+      "text": "While you are hauling sandbags, Moon Gaeul grabs your arm and pulls. The water on the stairs down to the storeroom behind Gaeul Rice Cake Shop has reached the fourth step. In the storeroom are forty sacks of glutinous rice for the autumn rush, and six boxes of Gaon Precision ledgers her husband left behind. Page by page, the ledgers record payments for deliveries to FlowOn that were never made. They are evidence for the class action (a lawsuit filed jointly by many victims) whose first hearing is next month. Moon Gaeul stops halfway down the stairs. 'We can’t bring up both. Before the water reaches our knees, one trip, two at most.' From above, Moon Hajun shines a flashlight. In its beam, the rice sacks and the ledger boxes soak side by side.",
       "memo": [
         "Storeroom stairs flooded to the 4th step",
         "40 sacks of glutinous rice -- stock for the autumn rush",
@@ -335,7 +335,7 @@ export default {
           "label": "Leave the storeroom to insurance and get the people up first"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cakes · Basement Storeroom",
+      "place": "Mangwon Market Gaeul Rice Cake Shop · Basement Storeroom",
       "clock": "July 15 · Downpour · 02:10",
       "question": "Forty sacks of glutinous rice or six boxes of lawsuit ledgers, one load at a time. What do you bring up?"
     },
@@ -502,7 +502,7 @@ export default {
       "memo": [
         "Moon Gaeul: 7 missed calls",
         "Flooding under the To-the-End Precision shutter -- sandbags at their limit",
-        "Water over the Gaeul Rice Cakes doorstep; flood loan reviews: NOAH"
+        "Water over the Gaeul Rice Cake Shop doorstep; flood loan reviews: NOAH"
       ],
       "choices": {
         "c35_start_rush_signature": {
@@ -544,7 +544,7 @@ export default {
     "c35_final_appeal": "The complaint is received. The criteria may change nationwide by the next monsoon, but the 38 from this monsoon are still waiting.",
     "c35_final_consent": "The loans go out in three days. NOAH has learned Mangwon Market’s water level, and it will remember that level in the next monsoon.",
     "c35_after_warm": "As the last sandbag is loaded onto the truck, Kwon Dohyun puts the flower boots back on and picks up a shovel. No one brings up the chairman’s office that night.",
-    "c35_after_record": "The names of 38 Mangwon Market shops go on the first page of the 312 cases. Moon Gaeul presses her rice cake stamp beside the name Gaeul Rice Cakes. Who will read that report first is still unknown.",
+    "c35_after_record": "The names of 38 Mangwon Market shops go on the first page of the 312 cases. Moon Gaeul presses her rice cake stamp beside the name Gaeul Rice Cake Shop. Who will read that report first is still unknown.",
     "c35_after_rush": "As you get up and leave the rice cake tray, Moon Gaeul hands your share to Ahn Gibeom behind your back. On a Sunday the prosecutors’ office civil petition room is shut, and only one window at the duty office has its light on.",
     "c35_elder_choice_1": "Carried out on your back, Grandma Ha looks back from the end of the alley. From behind the shutter comes the sound of the press going under.",
     "c35_elder_choice_2": "The rescue team arrives 40 minutes later. Meanwhile the water rises four hand’s widths, and Grandma Ha is carried out on a stretcher by the procedure.",
