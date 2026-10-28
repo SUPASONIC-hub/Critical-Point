@@ -241,7 +241,9 @@ test("the report and the ranking row show what the run recorded, never the devic
   assert.ok(result.includes('<small lang="en">{momentumTier} · {momentumScore} POINTS</small>'));
   assert.equal(result.split("assistStory").length, 2, "and is printed once");
   // The row model's field, beside the table-time mark and in its class.
-  assert.ok(ranking.includes('{entry.assistStory && <span className="ranking-assist">스토리 모드</span>}'));
+  // Its words are the screen's copy table too (src/copy/ranking.js).
+  assert.ok(ranking.includes('{entry.assistStory && <span className="ranking-assist">{words.story}</span>}'));
+  assert.ok(source("copy/ranking.js").includes('story: "스토리 모드",'));
   // And the row model takes it from the row's summary alone.
   const story = { local: true, case_id: "season-final", run_id: "run-story", completed_at: "2026-10-10T00:00:00Z", summary: { rank: "A", burstScore: 10, assistStory: true, assistTime: 2 } };
   const plain = { ...story, run_id: "run-plain", summary: { rank: "A", burstScore: 10 } };

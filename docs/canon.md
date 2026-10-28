@@ -148,7 +148,7 @@ decision and the 04:00 folder.
 | 분석관 | 기업금융전략팀, trainee then 심사 담당 | 트리거랩 분석관 → KD캐피탈 위험관리부 (사건 25) |
 | 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 징역 3년, 집행유예 5년 (사건 44) |
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
-| 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
+| 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 인수팀장 (사건 25) |
 | 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
 | 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank; hands in a 사표 in 사건 07 that 감사팀장 never processes (사건 08, 09) |
@@ -192,6 +192,30 @@ Five bridges between cases (10-26, written into scenes that were already there):
   그룹전략실 상무 on the 33층, and the 사건 06 order and profile folder came
   from that office (c8_trail). The line points at the 사건 06 order, not at
   the 프롤로그 05 condition, so it does not name him as that condition's author.
+
+Five more bridges and four fixes (10-26, the same way):
+
+- 한서윤, the 과장 who returned the dissent, comes to 트리거랩 as its 실장 in
+  the spring of 2024, the year after the first night; why she came is left to
+  사건 37's 「관리자 H」 (start and the three 사건 01 openings).
+- 도윤하 leaves his window in 2024: when 트리거랩 posts a 현장 담당 opening he
+  is the first to apply, because the 47 loans he sold were only numbers to him
+  then (사건 01 payday).
+- 사건 13's list of 정규 부서 복귀 for Monday comes back marked '보류', and the
+  4층 stays as it is until the dissolution of 사건 24 (c14_start and its three
+  openings).
+- 변유진 is one of the three who left: in the spring of 2024 she goes back to
+  her window at 부산 사하지점 (c20_pause). She is the only one of the three
+  named after 프롤로그 05.
+- 최서진 is at KD캐피탈 from 사건 16 (11월). In the analyst's first week at
+  KD캐피탈 (사건 25) she comes up to the 12층 with two cups of 컵라면, which is
+  why she writes to the analyst in 사건 29 (c29_ledger).
+- 오진우's post at 브릿지은행 is 인수팀장 everywhere, as the offer of 사건 18
+  says; it sits under 도하람's 전략본부, on 권도현's floor (사건 25, 30).
+- 한서윤's part in the return is the 「반려 버튼」 she pressed, never a 서명
+  (사건 10, 11, 38, 49).
+- 오진우 calls 도윤하 「도윤하 씨」, not 선배: 오진우 was a 대리 and at the lab
+  before 도윤하 left his window.
 
 Of this table the script holds what copy writes in a shape it can read: each
 person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
@@ -241,7 +265,8 @@ in her mother's shop holds her 사원증 until the evening of 사건 33 and the 
 not 트리거랩: the witnesses are 그룹 전산 위탁 직원 on the 3rd floor of the same
 building, and the team is the group's.
 
-The three who left are not named in the main season. 프롤로그 05 shows two of
+Of the three who left, only 변유진 is named in the main season (사건 20,
+c20_pause: back to 부산 사하지점 in the spring of 2024). 프롤로그 05 shows two of
 them at their desks on 2023-07-24: 변유진 and a colleague from a branch. 백아린
 is not one of them: she has spent twelve years on the group's side of the table
 (사건 33) and is "처음 보는 사람" to the analyst in 사건 13.

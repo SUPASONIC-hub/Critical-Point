@@ -45,6 +45,8 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     },
     debug: { debugToolsEnabled },
   } = view;
+  // A forecast that moves the risk by nothing is 「유지」 in the page's words (src/copy/report.js).
+  const riskDelta = (value) => formatRiskDelta(value) || reportCopy.risk.held;
   const observerRouteRecords = routeTimeline
     .filter((entry) => entry.observerTag)
     .slice(-4)
@@ -237,17 +239,17 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
               <div className="counterfactual-path actual-path">
                 <b lang="en">ACTUAL</b>
                 <strong>{report.actual.label}</strong>
-                <small>{fill(reportCopy.risk.delta, { delta: report.actualForecast ? formatRiskDelta(report.actualForecast.riskDelta) : reportCopy.risk.recorded })}</small>
+                <small>{fill(reportCopy.risk.delta, { delta: report.actualForecast ? riskDelta(report.actualForecast.riskDelta) : reportCopy.risk.recorded })}</small>
               </div>
               <div className="counterfactual-path safest-path">
                 <b lang="en">LOW PRESSURE LENS</b>
                 <strong>{report.safest.label}</strong>
-                <small>{fill(reportCopy.risk.delta, { delta: formatRiskDelta(report.safestForecast.riskDelta) })}</small>
+                <small>{fill(reportCopy.risk.delta, { delta: riskDelta(report.safestForecast.riskDelta) })}</small>
               </div>
               <div className="counterfactual-path costliest-path">
                 <b lang="en">HIGH PRESSURE LENS</b>
                 <strong>{report.costliest.label}</strong>
-                <small>{fill(reportCopy.risk.delta, { delta: formatRiskDelta(report.costliestForecast.riskDelta) })}</small>
+                <small>{fill(reportCopy.risk.delta, { delta: riskDelta(report.costliestForecast.riskDelta) })}</small>
               </div>
             </article>
           ))}

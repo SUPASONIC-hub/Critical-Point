@@ -40,6 +40,14 @@ const COPY_KEY_FIELDS = new Set(["id", "caseId", "cardOf", "mood"]);
 export const hasHangul = (value) => typeof value === "string" && HANGUL.test(value);
 
 /**
+ * Whether a translation is still Korean: Hangul in it. The corner brackets
+ * mark a Korean source string but not a translation, since Japanese writes
+ * 「」『』 as its own quotes (일본어 1단계).
+ */
+const HANGUL_LETTERS = /[가-힣ㄱ-ㅣ]/;
+export const stillKorean = (value) => typeof value === "string" && HANGUL_LETTERS.test(value);
+
+/**
  * The Korean words of a value, in the shape an English file answers: objects
  * keep their keys, a list of objects with ids becomes an object keyed by id,
  * any other list keeps its positions (null where nothing is to be said).
@@ -148,13 +156,15 @@ function inEnglishUnits(text) {
 }
 
 /**
- * What a language's words leave unanswered against their Korean source:
+ * What a language's words leave unanswered against their Korean source
+ * (`lang` says how its money counts: English in its own units, Japanese in
+ * the Korean's, 310억 -> 310億):
  * `missing` (no translation, or one still in Hangul; an empty string is a
  * translation that says nothing there), `stale`
  * (a path the Korean no longer has) and `numbers` (a string missing a digit
  * the Korean has: canon numbers are never changed, G-1 2).
  */
-export function compareWords(source, english) {
+export function compareWords(source, english, lang = "en") {
   const ko = flatten(source);
   const en = flatten(english ?? {});
   const missing = [];
@@ -162,12 +172,13 @@ export function compareWords(source, english) {
   for (const [path, text] of Object.entries(ko)) {
     const answer = en[path];
     // An empty translation is a choice (a Korean ending English says elsewhere, or not at all); a missing one is not.
-    if (typeof answer !== "string" || hasHangul(answer)) {
+    if (typeof answer !== "string" || stillKorean(answer)) {
       missing.push(path);
       continue;
     }
     const digits = (value) => (value.match(/\d+/g) ?? []).map((run) => run.replace(/^0+(?=\d)/, "")).sort().join(" ");
-    const koDigits = digits(inEnglishUnits(text.replace(/(\d),(?=\d{3})/g, "$1")));
+    const plain = text.replace(/(\d),(?=\d{3})/g, "$1");
+    const koDigits = digits(lang === "en" ? inEnglishUnits(plain) : plain);
     const enDigits = digits(answer.replace(/(\d),(?=\d{3})/g, "$1"));
     if (koDigits && !koDigits.split(" ").every((run) => enDigits.split(" ").includes(run))) numbers.push(path);
   }

@@ -375,7 +375,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   });
 
   const formatRiskDelta = (value) =>
-    value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
+    value > 0 ? `+${value}` : value < 0 ? `${value}` : "";
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
