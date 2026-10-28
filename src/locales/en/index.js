@@ -123,7 +123,7 @@ export const speakers = {
  * checks the screen copy up to it. The copy between cases after 사건 10 waits
  * in `between/<first>-<last>.js`, fetched only once this reaches its cases.
  */
-export const previewThrough = "case10";
+export const previewThrough = "final";
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {

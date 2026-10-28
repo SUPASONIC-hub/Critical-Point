@@ -54,7 +54,7 @@ export const speakers = {
 };
 
 /** The last case of the Japanese preview (the same switch as the English one). */
-export const previewThrough = "case10";
+export const previewThrough = "final";
 
 /** A speaker's role as the briefing prints it, by its Korean. The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {
