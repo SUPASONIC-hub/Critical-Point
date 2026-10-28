@@ -124,7 +124,7 @@ export function getReadingSeconds(node = {}, breach = []) {
  * page took 2.4 times the Korean clock and 27 of 56 scenes hit the ceiling.
  */
 const HANGUL = /[가-힣]/;
-const KANA = /[぀-ヿ]/;
+const KANA = /\p{Script=Hiragana}|\p{Script=Katakana}/u;
 const WORD = /[A-Za-z0-9][A-Za-z0-9’'.,:%-]*/g;
 const KOREAN_PER_WORD = 2;
 const KOREAN_PER_JAPANESE = 0.89;
