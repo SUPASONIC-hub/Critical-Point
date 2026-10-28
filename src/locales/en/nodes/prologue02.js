@@ -569,7 +569,7 @@ export default {
     "p2_branch_supplier_c": "You leave, and Moon Sungho follows you out the door to see you off. At ten the next morning, he signs the contract.",
     "p2_branch_supplier_follow_a": "You tell them everything, and Moon Gaeul takes the bags back. Then, a long while later, she holds one out again. 'Take this one anyway. I made it today, so it’ll be hard by tomorrow.'",
     "p2_branch_supplier_follow_b": "You take their statements, and Moon Sungho writes his name twice. Once wrong, once right. 3 years later, that paper becomes the only record.",
-    "p2_branch_supplier_follow_c": "You turn away, and the smell of rice cakes follows you to the end of the alley. The next day, Moon Gaeul puts up her sign. The shop is called 'Gaeul Rice Cakes.'",
+    "p2_branch_supplier_follow_c": "You turn away, and the smell of rice cakes follows you to the end of the alley. The next day, Moon Gaeul puts up her sign. The shop is called 'Gaeul Rice Cake Shop.'",
     "p2_route_system_annex": "You attach it, and the opinion runs 30 pages. The Credit Committee handout is summarized to ten pages, and the person summarizing isn’t you.",
     "p2_route_system_nine": "You visit them, and four of the nine agree to meet. Two of them learn for the first time that their files were the same. The other five don’t answer the phone.",
     "p2_route_system_keep": "You fold it away, and the 47 stay in the folder. Sealing the printout bundle with tape, Lim Kyungsoo says, 'Someone will come someday.'",

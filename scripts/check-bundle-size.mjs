@@ -993,7 +993,7 @@ const budgets = [
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_577, maxGzip: 46_483 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_593, maxGzip: 46_483 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
   { pattern: /^locale-overlay-.*\.js$/, maxBytes: 8_013, maxGzip: 2_344 },
@@ -1040,9 +1040,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * 1): the font's weight axis cut to 400-920 (-73,092) and the key visual's 960
  * variant encoded at 0.75 (-12,372). Each line is that day's e2e build plus 4:
  * Korean 507,582 -> 422,113, English 544,820 -> 459,352, Japanese 548,489 ->
- * 463,021.
+ * 463,021. Merged on 2026-10-28 over main 2c935e7 (#362's English step-three
+ * and step-four screens grow the entry and the English dictionary), the lines
+ * are that build plus 4: Korean 422,669, English 471,491, Japanese 463,608.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_117, en: 459_356, ja: 463_025 };
+const FIRST_PAINT_BUDGETS = { ko: 422_673, en: 471_495, ja: 463_612 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
