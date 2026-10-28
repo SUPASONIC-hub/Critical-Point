@@ -229,7 +229,7 @@ function absoluteSiteUrls() {
         if (!/^https:\/\//.test(origin)) throw new Error(`SITE_URL must be an https origin, got ${origin}`);
         return html
           .replace(/(<meta\s+(?:property="og:(?:url|image)"|name="twitter:image")\s+content=")\//g, `$1${origin}/`)
-          .replace(/(<link\s+rel="canonical"\s+href=")\//g, `$1${origin}/`);
+          .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
       },
     },
   };
