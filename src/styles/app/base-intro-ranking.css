@@ -3261,12 +3261,15 @@ body {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  /* Three languages since 10-28: gap and padding were 6px and 12px, and the
+     third button pushed the row past the brand mark's line on a 1280px screen,
+     which put the start button below a 720px first screen. */
+  gap: 4px;
 }
 .language-picker button {
   position: relative;
   min-height: 34px;
-  padding: 0 12px;
+  padding: 0 7px;
   color: var(--ui-text-2);
   background: var(--ui-glass);
   border: 1px solid var(--ui-line-strong);
