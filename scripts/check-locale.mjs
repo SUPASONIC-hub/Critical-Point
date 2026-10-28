@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildRuntimeData, loadSeasonTables } from "./season-split.mjs";
-import { caseSource, compareWords, readCopySource, TRANSLATION_SCOPE } from "./locale-words.mjs";
+import { caseSource, compareWords, readCopySource, readLanguageCopy } from "./locale-words.mjs";
 import { SOURCE_LOCALE, SUPPORTED_LOCALES } from "../src/locale.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
 
@@ -12,8 +12,8 @@ import { CASE_SEQUENCE } from "../src/gameCases.js";
  * language in `SUPPORTED_LOCALES` but Korean.
  *
  * For each case in scope (up to the language's `previewThrough` in its
- * dictionary, else `TRANSLATION_SCOPE`, and any other case the language has
- * a file for) and for the screen copy, it reads the Korean the
+ * dictionary, else the whole season -- a language without one is open to the
+ * end, 10-28 -- and any other case the language has a file for) and for the screen copy, it reads the Korean the
  * app is shipped (scripts/locale-words.mjs) and the language's file beside
  * it (src/locales/<lang>/nodes/<caseId>.js, src/locales/<lang>/index.js), and
  * counts:
@@ -57,7 +57,7 @@ let failed = false;
 for (const lang of languages) {
   // The preview's cases (the dictionary's `previewThrough`, the line that widens it), and its screen copy up to there.
   const through = await wordsOf(`src/locales/${lang}/index.js`, "previewThrough");
-  const scope = through ? CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(through) + 1) : TRANSLATION_SCOPE;
+  const scope = through ? CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(through) + 1) : CASE_SEQUENCE;
   const copySource = await readCopySource(pathToFileURL(root).href, scope);
   const nodesDir = path.join(root, "src/locales", lang, "nodes");
   const extra = existsSync(nodesDir) ? readdirSync(nodesDir).map((file) => file.replace(/\.js$/, "")).filter((caseId) => !scope.includes(caseId)) : [];
@@ -70,7 +70,13 @@ for (const lang of languages) {
     }
     rows.push({ unit: caseId, ...compareWords(caseSource(runtimeData, caseId), await wordsOf(file, "default"), lang) });
   }
-  rows.push({ unit: "screen copy", ...compareWords(copySource, await wordsOf(`src/locales/${lang}/index.js`, "copy"), lang) });
+  // The copy between cases for the cases after the preview waits in
+  // src/locales/<lang>/between/ (src/locales/overlay.js fetches a file once
+  // `previewThrough` reaches it): held, not stale.
+  const copyRow = compareWords(copySource, await readLanguageCopy(pathToFileURL(root).href, lang), lang);
+  const heldPath = (entry) => entry.split(/[.[]/).some((part) => CASE_SEQUENCE.includes(part) && !scope.includes(part));
+  const held = copyRow.stale.filter(heldPath);
+  rows.push({ unit: "screen copy", ...copyRow, stale: copyRow.stale.filter((entry) => !heldPath(entry)) });
 
   let missing = 0;
   let stale = 0;
@@ -91,6 +97,7 @@ for (const lang of languages) {
     }
   }
   console.log(`[${lang}] ${total - missing}/${total} strings translated; ${missing} fall back to Korean, ${stale} stale, ${numbers} number warnings.`);
+  if (held.length) console.log(`[${lang}] ${held.length} strings of copy between cases wait for cases after ${through} (shown once \`previewThrough\` reaches them).`);
   if (strict && (missing || stale)) failed = true;
 }
 if (failed) {

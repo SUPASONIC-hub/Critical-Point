@@ -45,6 +45,7 @@ export default {
     moves: "{drops}回下降 · {rises}回上昇",
     delta: "リスク {delta}",
     recorded: "記録",
+    held: "維持",
   },
   counterfactual: {
     subtitle: "実際の選択と、選ばなかった視点との圧力の差",

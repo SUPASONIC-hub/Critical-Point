@@ -576,16 +576,17 @@ const OWN_CHUNKS = [
 
 /**
  * A module of src/locales (src/locale.js): a language's dictionary
- * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), or the
- * code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>` or
- * `locale-<file>`.
+ * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), its
+ * copy between cases after the first ten (`<lang>/between/<first>-<last>.js`),
+ * or the code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>`,
+ * `locale-<lang>-between-<file>` or `locale-<file>`.
  */
-const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/])?)?([^\\/]+)\.js$/;
+const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/]|(between)[\\/])?)?([^\\/]+)\.js$/;
 
 function localeChunkName(chunk) {
   const match = LOCALE_MODULE.exec(chunk.facadeModuleId ?? "");
   if (!match) return "assets/[name]-[hash].js";
-  return `assets/locale-${match[1] ? `${match[1]}-` : ""}${match[2]}-[hash].js`;
+  return `assets/locale-${match[1] ? `${match[1]}-` : ""}${match[2] ? `${match[2]}-` : ""}${match[3]}-[hash].js`;
 }
 
 function ownChunkGroups() {
