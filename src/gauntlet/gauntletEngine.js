@@ -109,12 +109,31 @@ const READING_SETTLE_SECONDS = 6;
  */
 export function getReadingSeconds(node = {}, breach = []) {
   const rules = breach.flatMap((rule) => [rule?.label, rule?.title, rule?.text]);
-  const chars = [node.lead, node.text, node.question, ...(node.memo ?? []), ...rules]
-    .filter(Boolean)
-    .join("")
-    .replace(/\s+/g, "").length;
-  const seconds = Math.round(READING_SETTLE_SECONDS + chars / READING_CHARS_PER_SECOND);
+  const page = [node.lead, node.text, node.question, ...(node.memo ?? []), ...rules].filter(Boolean).join("");
+  const seconds = Math.round(READING_SETTLE_SECONDS + readingUnits(page) / READING_CHARS_PER_SECOND);
   return Math.max(READING_MIN_SECONDS, Math.min(READING_MAX_SECONDS, seconds));
+}
+
+/**
+ * A page in Korean characters, the unit the clock was set in (10 a second). A
+ * page with Hangul is counted as it always was. A page in another language
+ * is counted by what carries the same sentence there, measured over all 1,129
+ * scenes on 2026-10-28: an English word is about two Korean characters
+ * (404,156 characters to 202,791 words), a Japanese character about 0.89
+ * (112,090 to 126,138 over the 326 it had). Counted by characters, an English
+ * page took 2.4 times the Korean clock and 27 of 56 scenes hit the ceiling.
+ */
+const HANGUL = /[가-힣]/;
+const KANA = /[぀-ヿ]/;
+const WORD = /[A-Za-z0-9][A-Za-z0-9’'.,:%-]*/g;
+const KOREAN_PER_WORD = 2;
+const KOREAN_PER_JAPANESE = 0.89;
+
+export function readingUnits(page) {
+  const chars = page.replace(/\s+/g, "").length;
+  if (!page || HANGUL.test(page)) return chars;
+  if (KANA.test(page)) return chars * KOREAN_PER_JAPANESE;
+  return (page.match(WORD)?.length ?? 0) * KOREAN_PER_WORD;
 }
 
 export const BASE_SCHEMA = Object.freeze({
