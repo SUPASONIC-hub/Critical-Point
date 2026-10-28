@@ -11,6 +11,7 @@ import {
 import { createTelemetryEventId, sanitizeTelemetryQueue, validateTelemetryItem } from "./payloadSchemas.js";
 import { reconcileTelemetryQueue, sendTelemetryBatch } from "./telemetryBatch.js";
 import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
+import noticesCopy from "../copy/notices.js";
 
 // Rows built before payloads minted their own `event_id` (the case rows built
 // in GameRuntime) get one when they are queued, so every retry reuses it.
@@ -136,7 +137,7 @@ export function useTelemetryQueue({
       return true;
     }
     if (!result.stale && !result.replay) {
-      setSaveStatus("브라우저 저장소를 사용할 수 없어 원격 저장 대기열 변경을 반영하지 못했습니다.");
+      setSaveStatus(noticesCopy.save.queueUnavailable);
     }
     return false;
   }

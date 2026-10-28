@@ -1,4 +1,7 @@
 import { localizeTables } from "../locale.js";
+import { DELETION_REQUEST_COPY } from "../appConfig.js";
+import { OPERATOR_PROFILES, ORIGIN_PROLOGUES } from "../advancedSystems.js";
+import { PLAYTEST_DATA_NOTICE } from "../privacyText.js";
 
 /**
  * The start screen (IntroScreen.jsx, with the case status words of
@@ -75,6 +78,9 @@ const introCopy = {
     label: "분석관의 기억 선택",
     note: "무엇을 가장 오래 기억하는지에 따라 프롤로그 01의 시작 수치가 조금 달라집니다.",
     current: "현재 선택: {title} · 프롤로그 01 시작 {start}",
+    // The three memories and their prologues, kept in advancedSystems.js and named here.
+    profiles: OPERATOR_PROFILES,
+    prologues: ORIGIN_PROLOGUES,
   },
   comfortTitle: "편의 설정",
   season: {
@@ -98,6 +104,11 @@ const introCopy = {
     more: "자세한 내용은 ",
     and: "과 ",
     end: "에 있습니다.",
+    // The consent box's sentence and the deletion request, which the policy
+    // pages and the support-contact test read from where they are kept
+    // (privacyText.js, appConfig.js): named here, not copied.
+    playtestNotice: PLAYTEST_DATA_NOTICE,
+    deletion: DELETION_REQUEST_COPY,
   },
   // The consent box's sentences (src/state/useConsentToggle.js).
   consent: {
@@ -129,5 +140,14 @@ const introCopy = {
   },
 };
 export default introCopy;
+
+/**
+ * The NEW GAME+ button's text on either side of the blank its English name
+ * fills ("{game} 시작" -> ["", " 시작"]). A function, read at render: a split
+ * kept from when the module was read held the Korean on an English page.
+ */
+export function newGamePlusLabel() {
+  return introCopy.setup.newGamePlus.split("{game}");
+}
 
 localizeTables("screens", { intro: introCopy });

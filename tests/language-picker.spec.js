@@ -25,12 +25,17 @@ test("the intro's language choice opens English, keeps it through a reload and r
   // The screen's own words too (src/copy/intro.js under the English dictionary).
   await expect(page.getByTestId("start-first-case")).toContainText("Start the prologue");
   await expect(page.locator(".intro .top-actions").getByRole("button", { name: "Ranking" })).toBeVisible();
-  expect(await page.evaluate((key) => localStorage.getItem(key), LOCALE_KEY)).toBe("en");
+  // Polled: the choice reloads the page, and a read that lands mid-navigation is asked again.
+  await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), LOCALE_KEY)).toBe("en");
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.getByRole("navigation", { name: "언어 · Language" }).getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".case-card", { hasText: "Prologue 01" }).first()).toBeVisible();
+  // The ranking screen's words too (src/copy/ranking.js, 영어판 3단계).
+  await page.locator(".intro .top-actions").getByRole("button", { name: "Ranking" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Where did thinking stretch the furthest?" })).toBeVisible();
+  await page.getByRole("button", { name: "Back to the briefing" }).click();
 
   await page.getByRole("navigation", { name: "언어 · Language" }).getByRole("button", { name: "한국어" }).click();
   await expect(page).not.toHaveURL(/lang=/);

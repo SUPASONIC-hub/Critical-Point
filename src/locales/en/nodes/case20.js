@@ -206,10 +206,10 @@ export default {
     },
     "c20_pause": {
       "title": "7 Seconds of Hesitation",
-      "text": "At the vending machine in the data center break room, Do Yoonha finds his own line on the list and reads it. 'Analyst D. Average delay of 7.2 seconds on choices involving window victims. The longer the delay, the higher the rate of protective choices.' He holds a can of coffee without opening it. 'The time I hesitated became data. When I sold those loans at the window, I didn’t hesitate for 1 second.' He starts to laugh, then stops. 'Those 7 seconds were the time I spent picturing people’s faces. What do they become for NOAH?' Nine Trigger Lab people are on the list. The six now in the lab, and three who left before you came or in your first year. The records of those who left were kept too, without asking. None of the nine has ever seen this field.",
+      "text": "At the vending machine in the data center break room, Do Yoonha finds his own line on the list and reads it. 'Analyst D. Average delay of 7.2 seconds on choices involving window victims. The longer the delay, the higher the rate of protective choices.' He holds a can of coffee without opening it. 'The time I hesitated became data. When I sold those loans at the window, I didn’t hesitate for 1 second.' He starts to laugh, then stops. 'Those 7 seconds were the time I spent picturing people’s faces. What do they become for NOAH?' Nine Trigger Lab people are on the list. The six now in the lab, and three who left before you came or in your first year. Byun Yujin, who hurried everyone through introductions on the first night, is one of the three; the next spring she went back to her window at Saha Branch in Busan. The records of those who left were kept too, without asking. None of the nine has ever seen this field.",
       "memo": [
         "Analyst D (Do Yoonha): average hesitation 7.2 seconds",
-        "9 Trigger Lab analysts on the list -- 6 now + 3 who left earlier",
+        "9 Trigger Lab analysts on the list -- 6 now + 3 who left earlier (Byun Yujin among them)",
         "Times viewed by the people themselves: 0"
       ],
       "choices": {

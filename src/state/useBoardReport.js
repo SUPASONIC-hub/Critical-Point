@@ -2,10 +2,7 @@ import { useState } from "react";
 
 import { createBoardReportPayload, describeBoardReportFailure } from "../boardReport.js";
 import { getBoardWriterId, saveBoardReport } from "../telemetry.js";
-
-const REPORT_SENT = "신고를 받았습니다. 운영자가 확인하고 필요하면 글을 내립니다.";
-const REPORT_NEEDS_REASON = "신고 사유를 하나 골라 주세요.";
-const REPORT_NO_SERVER = "이 배포에는 게시판 서버가 없어 신고를 보내지 못했습니다.";
+import boardCopy from "../copy/board.js";
 
 /**
  * The report button on each board post: which post's form is open, the reason
@@ -45,7 +42,7 @@ export function useBoardReport() {
   async function submitReport() {
     if (isSending || openPostId === null) return;
     if (!reason) {
-      setReportStatus(REPORT_NEEDS_REASON);
+      setReportStatus(boardCopy.reportNeedsReason);
       return;
     }
     const postId = openPostId;
@@ -60,13 +57,13 @@ export function useBoardReport() {
         eventId,
       );
       if (skipped) {
-        setReportStatus(REPORT_NO_SERVER);
+        setReportStatus(boardCopy.reportNoServer);
         return;
       }
       setReportedIds((ids) => new Set(ids).add(postId));
       setOpenPostId(null);
       setReason("");
-      setReportStatus(REPORT_SENT);
+      setReportStatus(boardCopy.reportSent);
     } catch (error) {
       console.warn(error);
       setReportStatus(describeBoardReportFailure(error, globalThis.navigator?.onLine !== false));

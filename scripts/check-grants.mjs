@@ -2070,7 +2070,8 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
 
   // The operator's queue (scripts/board-reports.mjs, .github/workflows/board-reports.yml):
   // its one SELECT reads ids and counts only, hide takes a post out of the
-  // queue, dismiss deletes a post's reports, restore brings a hidden post back,
+  // queue, dismiss deletes a post's reports, restore brings a hidden post back
+  // and deletes its reports (so it does not wait in the next morning's queue),
   // and an action on nothing says it did nothing.
   {
     const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
@@ -2085,6 +2086,9 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
     queue = await queueOf();
     check(!queue.waiting.some((post) => post.postId === second) && queue.hidden.some((post) => post.postId === second), "a hidden post still waited in the board report queue.");
     check(await act("restore", second), "restoring a hidden post did nothing.");
+    queue = await queueOf();
+    check((await reportCount(second)) === 0 && !queue.waiting.some((post) => post.postId === second) && !queue.hidden.some((post) => post.postId === second), "a restored post's reports stayed, so it waited in the board report queue again.");
+    check(!(await act("restore", 999999999)), "restoring a post that is not there said it did something.");
     check(await act("dismiss", first), "dismissing a post's reports did nothing.");
     check((await reportCount(first)) === 0 && !(await queueOf()).waiting.some((post) => post.postId === first), "a dismissed post's reports stayed.");
     check(!(await act("dismiss", first)) && !(await act("hide", 999999999)), "an action on nothing said it did something.");

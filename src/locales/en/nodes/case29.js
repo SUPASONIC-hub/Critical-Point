@@ -184,7 +184,7 @@ export default {
     },
     "c29_ledger": {
       "title": "46 Yellow Marks",
-      "text": "11:40 at night, back at the hotel, KD Capital reviewer Choi Seojin in Seoul sends a file. It’s the list of the 3,860 debtors in the sale bundle. Beside 46 of them are yellow marks. These are people already under debt restructuring (a deal that cuts debt or extends terms for those struggling to pay), paying a little each month. 'Sold as a bundle, these agreements don’t go with them. If the new owner says it’ll collect everything from scratch, there’s no clause to stop it.' Of the 46, 31 have never once been late. Choi Seojin sends one more line. 'The most faithful payers are going to be the first to get the calls.'",
+      "text": "11:40 at night, back at the hotel, Choi Seojin sends a file from Seoul. Last November she was reviewing the robot rollout at the FlowOn center, and in your first week at KD Capital she came up to the 12th floor with two cups of instant noodles. It’s the list of the 3,860 debtors in the sale bundle. Beside 46 of them are yellow marks. These are people already under debt restructuring (a deal that cuts debt or extends terms for those struggling to pay), paying a little each month. 'Sold as a bundle, these agreements don’t go with them. If the new owner says it’ll collect everything from scratch, there’s no clause to stop it.' Of the 46, 31 have never once been late. Choi Seojin sends one more line. 'The most faithful payers are going to be the first to get the calls.'",
       "memo": [
         "Of 3,860 debtors in the sale, 46 under debt restructuring",
         "Of the 46, 31 with no history of late payment",
