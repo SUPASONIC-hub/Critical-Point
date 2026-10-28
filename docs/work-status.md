@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-26 evening (the state of `main` at `d612ac7`{last merge}, after the release roadmap (#335), the install hint (#337), the AdSense verification switch (#342), the English preview's first two steps (#338) and 오진우's turn (#347){#348 #349}; what changed and when is in `git log`)
+Last updated: 2026-10-26 evening (the state of `main` at `2c935e7`, after the release roadmap (#335), the install hint (#337), the AdSense verification switch (#342), the English preview's first two steps (#338), 오진우's turn (#347), the English bundle (#348), Japanese step one (#356) and the evening bundle (#362); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -349,13 +349,22 @@ Still open, on purpose:
   re-recorded for the picker); #347 (why 오진우 turns from mentor to rival:
   윤상혁's condition for him alone laid into four existing scenes --
   프롤로그 05, 사건 01, 02 and 03 -- with a paragraph in `docs/canon.md`;
-  scenes, cards and ids unchanged). Nine pull requests merged before the
-  evening cleanup{update}; production runs `d612ac7`{update}.
-  {after #348: the English bundle -- 사건 11 to the finale, 63 speakers,
-  the one-line preview range `previewThrough` still `case10`, no change on
-  the live screens} {after #349: the export keyword taken off nine names
-  used only in their own files} {after the English step-three PR: the
-  ending, board and ranking screens}. The user decided that day: no
+  scenes, cards and ids unchanged); #348 (the English bundle -- 사건 11 to
+  the finale, 63 speakers, the one-line preview range `previewThrough`
+  still `case10`, no change on the live screens); #349 (the export keyword
+  taken off nine names used only in their own files); #352 (the screen
+  language in a run's summary and Funnel); #353 (story gaps one to five);
+  #354 (the test week summary's English-screen seasons); #356 (Japanese
+  step one, machine draft, only behind `?lang=ja`); #358 (the English
+  prologue 01 and 02 polished); and the evening bundle #362 (#355 the
+  English ending, verdict, board, ranking and W47 rule screens, #360 the
+  English table variants and narration, #357 story gaps six to ten and four
+  canon fixes, #361 three low code-review fixes), bundled because each
+  English pull request moved the chunks holding the locale import map by a
+  few bytes. Eighteen pull requests merged (the four inside #362 not counted
+  apart), 1,570 unit tests; production runs `2c935e7`, deployed on 10-28
+  after a season shard of its Verify hit the 20-minute limit and was rerun.
+  The user decided that day: no
   promotion yet, AdSense set up later (the Render address or a domain is
   still open), and the English range widens ten reviewed cases at a time.
   Drafts: #350 (turning ads on, #341 reopened), the December side-case
