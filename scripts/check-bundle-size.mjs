@@ -1068,9 +1068,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * dictionary carries the screen copy of English steps three and four).
  * The recovery notice over the fixed language pills (10-29) puts them at
  * 422,775, 472,175 and 477,902.
- * Japanese 477,900 on 10-29 (lang-terms, 일본어판 표기 맞춤), the plus 4.
+ * Japanese 477,900 on 10-29 (lang-terms, 일본어판 표기 맞춤), the plus 4; with the
+ * recovery notice merged, Japanese 477,908.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_179, ja: 477_906 };
+const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_179, ja: 477_912 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
