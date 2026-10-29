@@ -79,7 +79,7 @@ export function createEndingProfile({ finalEndingEntry }) {
   };
 }
 
-export function createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }) {
+export function createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, readingScore = 0, reflectionScore, rhythmScore }) {
   return [
   {
     label: SCORE.consistency.label,
@@ -104,6 +104,12 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
     value: pressureAdaptScore,
     text: fill(SCORE.points, { score: pressureAdaptScore }),
     note: SCORE.pressureAdapt.note,
+  },
+  {
+    label: SCORE.reading.label,
+    value: readingScore,
+    text: fill(SCORE.points, { score: readingScore }),
+    note: SCORE.reading.note,
   },
   {
     label: SCORE.reflection.label,

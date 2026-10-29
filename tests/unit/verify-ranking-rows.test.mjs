@@ -102,6 +102,44 @@ test("a window edited in the log, or its response time, is marked window-off-rep
   assert.deepEqual(slowedResult.cases[0].windows.findings.map((finding) => finding.differs), [["responseTime"]]);
 });
 
+test("a 판 읽기 read edited in the log (C-1(1): the score sums it) is marked window-off-replay", () => {
+  const rows = seasonRows();
+  const log = rows[0].decision_log;
+  const cashed = log.findIndex((entry) => !entry.threshold.busted && entry.threshold.read?.[0] > 0);
+  const busted = log.findIndex((entry) => entry.threshold.busted);
+  assert.ok(cashed >= 0, "the fixture has a cashed window with a read");
+  // The bare hand's number raised to the seer's, as if it had read the wall.
+  const raised = recheckRun(edit(rows, (finalRow) => {
+    const { read } = finalRow.decision_log[cashed].threshold;
+    finalRow.decision_log[cashed].threshold.read = [Math.max(read[1], read[0] + 10), read[1]];
+  }));
+  assert.ok(raised.marks.includes("window-off-replay"));
+  assert.deepEqual(raised.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  // The seer's number cut, so the same bare number reads as more of it.
+  const cut = recheckRun(edit(rows, (finalRow) => {
+    const { read } = finalRow.decision_log[cashed].threshold;
+    finalRow.decision_log[cashed].threshold.read = [read[0], Math.round(read[1] * 0.7)];
+  }));
+  assert.deepEqual(cut.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  if (busted >= 0) {
+    // A bust that claims it kept something.
+    const kept = recheckRun(edit(rows, (finalRow) => {
+      finalRow.decision_log[busted].threshold.read = [5, finalRow.decision_log[busted].threshold.read[1]];
+    }));
+    assert.deepEqual(kept.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  }
+  // Not a pair of numbers.
+  const text = recheckRun(edit(rows, (finalRow) => {
+    finalRow.decision_log[cashed].threshold.read = ["90", null];
+  }));
+  assert.deepEqual(text.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  // An older log with no read is not read.
+  const older = recheckRun(edit(rows, (finalRow) => {
+    for (const entry of finalRow.decision_log) delete entry.threshold.read;
+  }));
+  assert.equal(older.cases[0].windows.findings.length, 0);
+});
+
 test("a run with a case under other table rules is not checked", () => {
   const rows = edit(seasonRows(), (finalRow) => {
     finalRow.dynamics.tableRules = RULES_MARK - 1;

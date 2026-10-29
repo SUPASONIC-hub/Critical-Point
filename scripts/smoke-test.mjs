@@ -1317,6 +1317,8 @@ const gameplayStats = getGameplayStats(
       effect: { trust: 6, humanCost: -3, capital: -5 },
       resourcesBefore: riskyResources,
       resourcesAfter: recoveredResources,
+      // C-12's read, as the page logs it: the 판 읽기 axis (C-1(1)) sums them.
+      threshold: { busted: false, read: [48, 60] },
     },
     {
       responseTimeSec: 21,
@@ -1326,6 +1328,7 @@ const gameplayStats = getGameplayStats(
       effect: { trust: 7, humanCost: -4, time: -6 },
       resourcesBefore: recoveredResources,
       resourcesAfter: { ...recoveredResources, fatigue: 24 },
+      threshold: { busted: false, read: [40, 50] },
     },
     {
       responseTimeSec: 9,
@@ -1334,6 +1337,7 @@ const gameplayStats = getGameplayStats(
       effect: { trust: 5, humanCost: -2, capital: -4 },
       resourcesBefore: initialResources,
       resourcesAfter: initialResources,
+      threshold: { busted: false, read: [30, 40] },
     },
   ],
   getRiskPressure(initialResources),
@@ -1514,6 +1518,7 @@ test("empty gameplay stats should stay stable", () => {
       pressureAdaptScore: 0,
       reflectionScore: 0,
       consistencyScore: 0,
+      readingScore: 0,
       exploitPenalty: 0,
       momentumScore: 0,
       burstScore: 0,

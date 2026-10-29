@@ -79,7 +79,12 @@ const budgets = [
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 149,722 / 54,994 -> 149,806 / 55,026 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the case's rules for the audit and the links, and the season row's mean score, on main's keyed words. Measured 149,806 / 55,022, the gzip plus 4 in the e2e build.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_806, maxGzip: 55_026 },
+  // 142,806 / 52,313 -> 142,907 / 52,366 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 142,907 / 52,362 in the e2e build, the
+  // gzip plus 4. The score breakdown's 판 읽기 row and the case summary's
+  // readingScore.
+  // 149,806 / 55,026 -> 149,965 / 55,098 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's 판 읽기 row read by key and the case summary's readingScore. Measured 149,965 / 55,094, the gzip plus 4 in the e2e build.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_965, maxGzip: 55_098 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -91,7 +96,13 @@ const budgets = [
   // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
   // 32,897 / 13,039 -> 34,278 / 13,357 on 2026-10-26, 영어판 3단계: the observer's samples, arcs and records and the endings' lines read by key (src/copy/observer.js), a name's particle as a blank. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 34,278 / 13,357 -> 35,281 / 13,719 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): src/seasonScore.js (C-2's season mean, Q25) lands in this chunk under Rolldown, beside main's observer words. Measured 35,281 / 13,715, the gzip plus 4 in the e2e build.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_281, maxGzip: 13_719 },
+  // 33,937 / 13,368 -> 34,272 / 13,482 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 34,272 / 13,478 in the e2e build, the
+  // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
+  // it now), getReadingScore, and the seventh weight. 13,480 in a second build
+  // on #224 0c989ba7 (the hashes), so 13,484.
+  // 35,281 / 13,719 -> 35,620 / 13,836 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: getCaseRead, getReadingScore and the seventh weight on #224's season mean. Measured 35,620 / 13,832, the gzip plus 4 in the e2e build.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_620, maxGzip: 13_836 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -561,7 +572,11 @@ const budgets = [
   // -> 196,068 / 36,533 on 2026-10-29, lang-full: the recovery notice sits above the fixed
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_229, maxGzip: 36_558 },
+  // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 0c989ba7: the score breakdown's seventh card, the penalty
+  // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
+  // 196,229 / 36,558 -> 196,282 / 36,566 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's seventh card, the penalty card taking its row. Measured 196,282 / 36,562, the gzip plus 4 in the e2e build.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_282, maxGzip: 36_566 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1025,7 +1040,10 @@ const budgets = [
   // 2,740 / 1,255 -> 2,566 / 1,109 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,566 / 1,105 in the e2e build, the gzip plus 4. measured under Vite 8 (2,740 / 1,251 under Rollup).
-  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_566, maxGzip: 1_109 },
+  // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, C-1(1) on #224 253e8e93:
+  // measured 2,601 / 1,109 in the e2e build, the gzip plus 4. One more retired
+  // key, v10 (the local ranking moves to v11 with the 판 읽기 axis).
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -1051,7 +1069,8 @@ const budgets = [
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
   // 152,779 / 51,787 -> 152,864 / 51,822 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the Japanese of 프롤로그 04's audit-and-links line, the ranking's intro and past best, the link tag, less the audit and cascade weeks. Measured 152,864 / 51,818, the gzip plus 4 in the e2e build.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 152_864, maxGzip: 51_822 },
+  // 152,864 / 51,822 -> 153,069 / 51,893 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the Japanese of the 판 읽기 card (勝負の読み) and its note. Measured 153,069 / 51,889; the raw is the measurement, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_069, maxGzip: 51_893 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1127,8 +1146,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * recovery notice merged, Japanese 477,908.
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
+ * C-1(1) (the 판 읽기 axis) merged with #224 602ec69b (10-29): the seventh score card's CSS in the
+ * critical sheet and its words in the dictionaries put English at 472,236 and Japanese at 478,009,
+ * the plus 4; Korean (422,764) stays under.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_179, ja: 477_926 };
+const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_236, ja: 478_009 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1255,6 +1277,9 @@ function checkBudget(file, budget) {
 // the worker's code did not change. Measured 9,897 / 3,569 plus 4.
 // -> 9,933 / 3,584 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): one more file in the warm list,
 // personalBests. Measured 9,933 / 3,580 plus 4.
+// -> 9,376 / 3,441 on 2026-10-25, C-1(1) on #224 0c989ba7: measured 9,376 /
+// 3,437 and 3,436 in two e2e builds (the file names' hashes), the larger plus
+// 4; the worker's code did not change.
 const WORKER_BUDGET = { maxBytes: 9_933, maxGzip: 3_584 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));

@@ -17,11 +17,14 @@ import { readStoredValue, writeStoredValue } from "../appConfig.js";
 // v10 is the same season at RULES_MARK 3: B3's audit and B2's links are rules of the table from
 // 프롤로그 04 (played first as 2026-W47's test week), and a vault the audit took a part of, or a
 // board CASCADE pulled the wall of, does not compare with one from the table before.
+// v11 is the same table with the 판 읽기 axis in the score (C-1(1)): each case's burst score gives
+// 0.2 to the vault its bare hand kept against a hand that sees the wall, and a score from before
+// the axis does not compare with one from after it.
 // A retired key is read once, when the ranking screen first opens, for one thing only: the
 // player's best row of that table, kept under the personal-bests key (src/personalBests.js,
 // a chunk of its own, so the entry chunk does not carry it). Then it is removed. When this key
 // moves on, the old one joins RETIRED_LOCAL_RANKING_STORAGE_KEYS there.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v10";
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v11";
 
 export function parseLocalRankingRows(rawValue) {
   try {
