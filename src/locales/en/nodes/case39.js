@@ -149,7 +149,7 @@ export default {
           "label": "Deliver the 90-minute original the interviewees bet their faces on"
         },
         "reframe": {
-          "label": "Reframe the table one last time and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · Master Control Room",

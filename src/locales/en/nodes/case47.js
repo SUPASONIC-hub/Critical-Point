@@ -62,7 +62,7 @@ export default {
           "label": "Find where the 2nd-round fund’s leftover money goes"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cake Shop",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Three Days Before Chuseok · 10:00",
       "question": "In the middle of the holiday rush, someone holding a wet ledger has come to find a name. What do you do first?",
       "lead": "Your name is on the roster too. Your job: 'Dishes and odd jobs.' Next to it, in small letters: 'Reflects last year’s performance.'"
@@ -152,7 +152,7 @@ export default {
           "label": "Reframe the table and propose one last time"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cake Shop",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Day Before Chuseok · 17:00 · Consent Deadline 18:00",
       "question": "Close without the 31, and the 181 get paid during the holiday. What do you do with the hour that is left?",
       "lead": "An hour before the deadline, all six steamers in the shop let off steam at once. Outside the shutter, 12 of the 31 have come."
@@ -177,7 +177,7 @@ export default {
           "label": "Write the 31 stories and evidence into a criteria revision request"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cake Shop · Roof",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Rooftop",
       "clock": "Chuseok · Full Moon · 21:00",
       "question": "Under the full moon come words left unsaid and a call to the committee the day after Chuseok. How do you close this night?"
     },
@@ -200,7 +200,7 @@ export default {
           "label": "Turn that line’s dates into a record of dealings with the 31"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cake Shop · Counter",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Counter",
       "clock": "Three Days Before Chuseok · 22:00",
       "question": "A new line, '31,' has appeared at the bottom of the free rice cake column. What do you do with it?"
     },
@@ -268,7 +268,7 @@ export default {
           "label": "Pull the shutter down together; talk tomorrow"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cake Shop · By the Shutter",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · By the shutter",
       "clock": "Three Days Before Chuseok · 22:40",
       "question": "The 31 are the people her husband ran a tab with, and Moon Gaeul is paying that debt in rice cakes. What do you say?"
     },
@@ -290,7 +290,7 @@ export default {
           "label": "Promise the cafeteria tab gets paid first, this Chuseok"
         }
       },
-      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · In Front of the Lathes",
+      "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · At the Lathes",
       "clock": "Two Days Before Chuseok · 19:00",
       "question": "A month before the factory stopped, Moon Sungho said to pay the cafeteria tab first. What do you do with that promise?"
     },
@@ -684,7 +684,7 @@ export default {
         "text": "You bundled the notebook, the wet ledger and all the evidence gathered so far. For the first time, 31 sentences went where 'Unconfirmable' had been."
       },
       "c47_after_rush": {
-        "tag": "The Ending That Went Down First",
+        "tag": "Went Down First",
         "title": "A bag of songpyeon in your pocket, you left the shop first",
         "text": "You came down from the roof first under the full moon. The agenda was still the single line 'Working capital for a delivery platform,' and the file you wrote a dissent on 3 years ago began the same way."
       }

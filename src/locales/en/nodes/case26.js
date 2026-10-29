@@ -62,7 +62,7 @@ export default {
           "label": "Find the Reheim Godeok project money not spent on building"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
       "clock": "April 14 · 10:00 · April · Sit-in Day 9",
       "question": "The foreman 40 meters up asks whose building this is. How do you answer?",
       "lead": "You get off at the Godeok intersection in Pyeongtaek and walk along the fence. Atop the crane beside the stalled frame, a white cloth flaps."
@@ -124,7 +124,7 @@ export default {
           "label": "Find the Reheim Godeok project money not spent on building"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Tower Crane Cab",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Tower Crane Cab",
       "clock": "April 22 · 23:30 · Sit-in Day 17",
       "question": "From 40 meters up, he asks what changes if he goes down. What can you promise?",
       "lead": "The first call telling you to come up comes, and with a safety line at your waist you set your foot on the ladder’s first rung."
@@ -149,7 +149,7 @@ export default {
           "label": "Sign the CEO’s 1-year extension and keep your seat"
         },
         "reframe": {
-          "label": "Reframe the table and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Capital 19th Floor · Credit Committee Room",
@@ -177,7 +177,7 @@ export default {
           "label": "Stay with the foreman and the workers through the night"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
       "clock": "April 24 · 18:40",
       "question": "The foreman comes down after 19 days, and the credit union in the last row has been circled. How do you close this evening?"
     },
@@ -200,7 +200,7 @@ export default {
           "label": "Find a way to pay the most urgent part of their wages first"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Site Office Container",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Site Office Container",
       "clock": "April 14 · 21:00",
       "question": "Beside the cup noodles riding the bucket, one worker’s tuition deadline draws near. What do you do?"
     },
@@ -268,7 +268,7 @@ export default {
           "label": "Promise to guard the banner and just ask him down"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
       "clock": "April 15 · 00:10",
       "question": "The foreman says no one will see the banner if he comes down. How do you keep those names?"
     },
@@ -336,7 +336,7 @@ export default {
           "label": "Save the gap in numbers for the committee; go down today"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Frame, 14th Floor",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Frame, 14th Floor",
       "clock": "April 14 · 14:00",
       "question": "The building reported at 72% has no floor on its 14th story. What do you do with this empty floor?"
     },
@@ -360,7 +360,7 @@ export default {
           "label": "Hand the printout to Kwon Dohyun; let Bridge Bank fight first"
         }
       },
-      "place": "Leheim Officetel, Godeok, Pyeongtaek · Site Office",
+      "place": "Reheim Officetel, Godeok, Pyeongtaek · Site Office",
       "clock": "April 14 · 16:00",
       "question": "Beside the inflated progress rate, the verification box has only a team seal and no name. What do you do with this field?"
     },

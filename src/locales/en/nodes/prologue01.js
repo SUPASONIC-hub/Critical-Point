@@ -62,7 +62,7 @@ export default {
           "label": "Find and open the document that approved the summary form"
         }
       },
-      "place": "KD Bank Gangseo Branch · Banking hall",
+      "place": "KD Bank Gangseo Branch, banking hall",
       "clock": "Tuesday, October 18, 2022 · 10:00",
       "question": "The person behind the missing line is sitting at the counter. What do you do?",
       "lead": "The ticket machine calls number 84, and this month’s rankings hang on the board by the entrance."
@@ -99,7 +99,7 @@ export default {
       "lead": "Only two desks on the whole floor are lit, and two convenience-store coffees are set down on the desk."
     },
     "p1_review": {
-      "title": "The Blank Signature Line",
+      "title": "The empty signature field",
       "text": "Eleven a.m., Thursday. The door to the Team Head’s office opens. The probation review is booked for 10 minutes. Team Head Yoon Sanghyuk wears a plain navy suit and smiles only when he shakes your hand. He pulls up the evaluation form on his tablet and runs his eyes down its five items. Speed, accuracy, teamwork, reporting, attitude. He enters a number in the speed field and nowhere else. A 5 out of 5. 'I’ll fill in the rest later.' He brings up the 40 million won before you can. 'Good catch. Trainees rarely add up the lines under a summary sheet.' Then he closes the tablet. The speed of it is his answer. 'But write that number down, and 11 people won’t make it through November. I never said your judgment was wrong. I just decide where it gets to stand.' At the bottom of the form, the evaluator’s signature line is blank.",
       "memo": [
         "Probation review, 10 minutes -- 1 question",
@@ -149,7 +149,7 @@ export default {
           "label": "Write 40 million won and 184.7% in the opinion field"
         },
         "reframe": {
-          "label": "Reframe the table one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Head office, 6th floor, Corporate Finance Strategy Team · Night",

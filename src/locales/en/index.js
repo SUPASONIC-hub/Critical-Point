@@ -655,7 +655,7 @@ export const copy = {
         "label": "Prologue 04",
         "title": "Window 4",
         "trigger": "Protection / Empathy / Shame",
-        "summary": "Two hours after approval, the loan becomes a product at the counter. At Window 4, Gangseo Branch, Do Yoonha uses a 3-minute script and sells it in 3 minutes 12 seconds, and the people she sells to are people whose names she knows. You are there for a chore called 'post-sale suitability review.'"
+        "summary": "Two hours after approval, the loan becomes a product at the counter. At Window 4, Gangseo Branch, Do Yoonha uses a 3-minute script and sells it in 3 minutes 12 seconds, and the people he sells to are people whose names he knows. You are there for a chore called 'post-sale suitability review.'"
       },
       "prologue05": {
         "label": "Prologue 05",

@@ -152,7 +152,7 @@ export default {
           "label": "Reframe the table and propose one last time"
         }
       },
-      "place": "Seoul Central District Court · Road at the Main Gate",
+      "place": "Seoul Central District Court · Road outside the front gate",
       "clock": "September 10 · 17:20",
       "question": "Behind Moon Gaeul, who says they will be the ones to say it’s over, 17 cameras look at you. What is your next sentence?",
       "lead": "The sun has dipped and the shadow of the court gate has grown long. Moon Gaeul puts the two leftover rice cakes in her jacket pocket."
@@ -290,7 +290,7 @@ export default {
           "label": "Take the coffee and stay until she finishes"
         }
       },
-      "place": "Seoul Central District Court · 4th-Floor Corridor",
+      "place": "Seoul Central District Court · 4th-floor hallway",
       "clock": "September 10 · 10:55",
       "question": "Someone who is glad her father is coming home, and hates herself for it, holds out a canned coffee. What do you do?"
     },
@@ -685,7 +685,7 @@ export default {
         "text": "A guide beginning with 'An empty field is not an acquittal' went up in the group chat. 38 people read it to the end."
       },
       "c44_after_rush": {
-        "tag": "The ending where you ran ahead",
+        "tag": "Ran Ahead",
         "title": "On the night of sentencing, you built the grounds for appeal at the prosecutors’ office",
         "text": "You spent the first night of the 7-day clock at the prosecutors’ office. Missed calls from Lim Soyul stayed on your phone."
       }

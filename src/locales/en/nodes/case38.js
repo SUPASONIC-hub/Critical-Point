@@ -149,7 +149,7 @@ export default {
           "label": "Persuade all 1,740 to go to the end as one suit"
         },
         "reframe": {
-          "label": "Reframe it with one last proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Seoul Central District Court · Courtroom 457",
