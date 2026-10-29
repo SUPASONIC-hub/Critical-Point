@@ -538,7 +538,9 @@ const budgets = [
   // (the font's thin half cut, scripts/build-fonts.mjs). Measured 195,847 / 36,467; the gzip stays under its line.
   // -> 196,068 / 36,533 on 2026-10-29, lang-full: the recovery notice sits above the fixed
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_068, maxGzip: 36_533 },
+  // -> 196,140 / 36,563 on 2026-10-29, intro-en-fit: a Japanese page on a phone of 360px or less draws the
+  // premise at 14px / 1.6 (base-intro-ranking.css). Measured 196,140 / 36,559 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_140, maxGzip: 36_563 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1074,8 +1076,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * lang-extras) and the policy links open the page's own language:
  * 422,950, 472,350 and 478,077; with lang-terms (main b7228340) and the
  * service worker skipping rel="alternate", 422,948, 472,339 and 478,083.
+ * The Japanese premise drawn smaller on a narrow phone (intro-en-fit, 10-29)
+ * puts the Korean at 422,964 (the critical CSS carries the rule); English
+ * 472,329 and Japanese 478,085 stay under their lines.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_954, en: 472_354, ja: 478_087 };
+const FIRST_PAINT_BUDGETS = { ko: 422_968, en: 472_354, ja: 478_087 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
