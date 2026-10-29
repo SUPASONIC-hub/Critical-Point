@@ -47,6 +47,11 @@ services:
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
+      # AdSense site verification (docs/web-ads.md), unset until the user sets
+      # it: the publisher ID writes a meta tag and /ads.txt, no ad code. No
+      # VITE_ prefix, so it never reaches the bundle.
+      - key: ADSENSE_CLIENT
+        sync: false
     # Mirrored by hand in the dashboard under Settings -> Headers. These are
     # the source of truth for what the site *should* send; `check:deploy`
     # asserts them against what it actually sends -- each security header by

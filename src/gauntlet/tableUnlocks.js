@@ -19,6 +19,8 @@
  * not listed: no step is without them.
  */
 import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
+import { fill } from "../locale.js";
+import unlocksCopy from "../copy/unlocks.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -120,7 +122,7 @@ export const STORY_RULES = withoutStoryOff(ALL_RULES);
  * own (`kicker`): 프롤로그 01 adds nothing to anything, so it does not say
  * that the rules have grown.
  */
-export const UNLOCK_INTRO_KICKER = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다";
+export const UNLOCK_INTRO_KICKER = unlocksCopy.kicker;
 
 /**
  * The steps, in the order the season plays them: the case, the rules it adds
@@ -139,15 +141,12 @@ const STEPS = [
   {
     caseId: "prologue01",
     adds: [],
-    kicker: "FIRST TABLE · 이 판은 이렇게 합니다",
+    kicker: unlocksCopy.steps.prologue01.kicker,
     // The second line is what a bust costs, which the first table never said:
     // the first bust was the tutorial. A story run is not told it, because
     // there the next scene is not skipped.
     storyIntro: [0],
-    intro: [
-      "밀면 열기와 배율이 오릅니다. 벽에 닿기 전에 확정하십시오. 심박이 빨라지면 벽이 가깝습니다.",
-      "벽에 닿으면 이 사건에 걸린 판돈 전부와 다음 장면을 잃습니다. 금고에 넣은 것은 그대로입니다.",
-    ],
+    intro: unlocksCopy.steps.prologue01.intro,
   },
   {
     caseId: "prologue02",
@@ -159,10 +158,7 @@ const STEPS = [
     // spreading the thinking types, which a hand can do inside one direction.
     // Until 2026-10-25 the streak was held on the type and this line said the
     // two pulled against each other.
-    intro: [
-      "같은 방향(사람 쪽 또는 자리 쪽)의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 방향을 바꿔도 콤보가 이어집니다. '관점 전환' 점수는 생각 유형을 고르게 쓸수록 오르니, 방향은 지키고 유형은 바꿔도 됩니다.",
-      "벽에 닿으면 다음 판은 카드가 가려지고, 열기를 안은 채 시작합니다.",
-    ],
+    intro: unlocksCopy.steps.prologue02.intro,
   },
   {
     caseId: "prologue03",
@@ -172,11 +168,7 @@ const STEPS = [
     // imports only the two LOCK numbers, so they are written out and move with
     // the constants.
     storyIntro: [2],
-    intro: [
-      "한 번도 밀지 않고 확정하면 다음 판에서 가장 비싼 카드가 봉인됩니다.",
-      "열기 60 이상에서 확정하면 다음 판은 열기를 안고 시작하고 시간이 줄어듭니다.",
-      "조회를 누르면 시간 3초를 쓰고 벽 구간이 20칸 폭으로 좁혀집니다. 판마다 한 번이고, 벽이 그 한가운데 있다는 뜻은 아닙니다.",
-    ],
+    intro: unlocksCopy.steps.prologue03.intro,
   },
   {
     caseId: "prologue04",
@@ -184,12 +176,13 @@ const STEPS = [
     // (1)): FRACTURE, and LOCK, which 프롤로그 05's stances need. OVERCLOCK,
     // the audit and the links open one a case in 사건 01 to 03, each with the
     // line it had here. A story run has no FRACTURE, so it is told only LOCK.
+    // (Until C-4 the audit and the links opened here with FRACTURE, B3 and
+    // B2, question 3 (1) of the rule switch, user 2026-10-20, in one short
+    // line: with a line each the panel ran past the docked footer on a
+    // phone's first screen, table-keys at 390x844 and 390x664, 2026-10-21.)
     adds: ["fracture", "lock"],
     storyIntro: [1],
-    intro: [
-      "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
-      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
-    ],
+    intro: unlocksCopy.steps.prologue04.intro,
   },
   {
     caseId: "prologue05",
@@ -204,11 +197,7 @@ const STEPS = [
     // the phone's first screen in three lines (table-keys, 390x664). A story
     // run is told no promise about the next board, so not the third.
     storyIntro: [0, 1],
-    intro: [
-      "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘(PUSH 뒤에만), EXPOSE는 자원입니다.",
-      "사건이 닫힐 때마다 도구 3개 중 하나를 고릅니다. 도구는 5개까지 들고, 다 차면 하나를 내려놓고 바꿉니다.",
-      `칩 배율이 ${LOCK_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
-    ],
+    intro: unlocksCopy.steps.prologue05.intro,
   },
   // 사건 01 to 03 (C-4): one rule a case, each with its story's beat --
   // 72시간's clock and OVERCLOCK, 가짜 신호's audit office (감사, 49 times in
@@ -219,7 +208,7 @@ const STEPS = [
     caseId: "case01",
     adds: ["overclock"],
     storyIntro: [],
-    intro: ["×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
+    intro: unlocksCopy.steps.case01.intro,
   },
   {
     // The audit had one short line with the links in 프롤로그 04, because five
@@ -232,7 +221,7 @@ const STEPS = [
     caseId: "case02",
     adds: ["audit"],
     storyIntro: [],
-    intro: ["이번 사건부터 감사가 판에 붙습니다. 한 번이라도 밀고 열기 40 아래에서 확정하면 한 칸 차고, 60 이상에서 확정하면 2칸 줄어듭니다. 사건이 닫힐 때 4칸이 차 있으면 금고로 갈 몫의 4분의 1을 잃습니다."],
+    intro: unlocksCopy.steps.case02.intro,
   },
   {
     // LINK_BURN, LINK_SPAN_MIN..LINK_SPAN_MAX and LINK_WALL (cascadeRisk.js),
@@ -241,7 +230,7 @@ const STEPS = [
     caseId: "case03",
     adds: ["cascade"],
     storyIntro: [],
-    intro: ["이번 사건부터 연결이 판에 붙습니다. 한 자원을 8 이상 태운 카드로 확정하면, 2~4판 뒤의 한 판에서 벽이 6 가까워집니다."],
+    intro: unlocksCopy.steps.case03.intro,
   },
 ];
 
@@ -251,9 +240,16 @@ const STEPS = [
  * over them. `storyRules` and `storyIntro` are the same two for a story run.
  * Every set is made once, here: a caller is handed the same object each time
  * it asks, and may key a memo on it.
+ *
+ * Its lines are copied when this module is read, which on a page in another
+ * language is after the dictionary has been laid over copy/unlocks.js: this
+ * module is the runtime's, never the shell's, so the copies are in the page's
+ * language (src/locale.js, 2026-10-26).
  */
 export const UNLOCK_LADDER = Object.freeze(
   STEPS.reduce((ladder, step) => {
+    // The copy's blanks are the engine's numbers (copy/unlocks.js).
+    const intro = step.intro.map((line) => fill(line, { cap: LOCK_CAP, charge: STANCE_CHARGE }));
     const before = ladder.length ? [...ladder[ladder.length - 1].rules] : [];
     // The step that completes the table (사건 03 since C-4) hands out the
     // whole table's own sets, so it is the same object a case after it gets.
@@ -266,8 +262,8 @@ export const UNLOCK_LADDER = Object.freeze(
       // A story run has none of 사건 01 to 03's rules, so from 사건 01 it is
       // handed the story table's own set too.
       storyRules: whole || [...STORY_RULES].every((rule) => rules.has(rule)) ? STORY_RULES : withoutStoryOff(rules),
-      intro: Object.freeze([...step.intro]),
-      storyIntro: Object.freeze(step.storyIntro ? step.storyIntro.map((line) => step.intro[line]) : [...step.intro]),
+      intro: Object.freeze(intro),
+      storyIntro: Object.freeze(step.storyIntro ? step.storyIntro.map((line) => intro[line]) : [...intro]),
       kicker: step.kicker ?? UNLOCK_INTRO_KICKER,
     }));
     return ladder;

@@ -176,7 +176,9 @@ test("the audit's own chunk imports nothing from the engine's: its relief heat i
   assert.equal(AUDIT_RELIEF_HEAT, HEAT_DEBT_GAUGE);
   const source = readFileSync("src/gauntlet/auditRisk.js", "utf8");
   const imports = [...source.matchAll(/from "([^"]+)"/g)].map((match) => match[1]);
-  assert.deepEqual(imports, [], "auditRisk.js imports nothing: tableRules.js became a chunk of its own when it did (2026-10-21)");
+  // Its words (src/copy/audit.js, 영어판 3단계) with the blank filler, and nothing
+  // else: tableRules.js became a chunk of its own when it imported that (2026-10-21).
+  assert.deepEqual(imports, ["../copy/audit.js", "../locale.js"], "auditRisk.js imports only its words");
   assert.match(readFileSync("vite.config.js", "utf8"), /const AUDIT_RISK = "src\/gauntlet\/auditRisk\.js"/);
 });
 

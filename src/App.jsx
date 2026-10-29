@@ -12,13 +12,16 @@ import {
 } from "./appConfig.js";
 import { AppContent, resumeSaves, suppressSaves } from "./AppContent.jsx";
 import { confirmAction } from "./state/confirmAction.js";
+import confirmCopy from "./copy/confirm.js";
 import { getSavedRecoveryState, recordAppError, RENDER_CRASH_SOURCE } from "./state/errorRecovery.js";
 
 // Two failed reloads from the same save is where retrying stops being a retry.
 // The sentence is written once because the panel prints it twice: as the message
 // the blocked reload sets, and as the standing note under the buttons. It used to
-// be plain Korean in one place and a row of unicode escapes in the other.
-const RETRY_BLOCKED_MESSAGE = "같은 저장 지점에서 오류가 반복되어 재시도를 중단했습니다.";
+// be plain Korean in one place and a row of unicode escapes in the other. It is
+// read where it is used: the page's language is laid over the table after this
+// module is read (src/copy/confirm.js).
+const retryBlockedMessage = () => confirmCopy.error.retryBlocked;
 const MAX_RETRIES_FROM_ONE_SAVE = 2;
 
 const readRetryCount = () => Number(getSavedRecoveryState()?.lastError?.retryCount) || 0;
@@ -58,16 +61,16 @@ export class AppErrorBoundary extends Component {
 
   async reload({ clearSave = false } = {}) {
     if (!clearSave && readRetryCount() >= MAX_RETRIES_FROM_ONE_SAVE) {
-      this.setState({ recoveryMessage: RETRY_BLOCKED_MESSAGE });
+      this.setState({ recoveryMessage: retryBlockedMessage() });
       return;
     }
-    if (clearSave && !(await confirmAction("저장된 진행을 지우고 새 게임으로 시작할까요? 복구 슬롯과 오류 기록은 남습니다."))) return;
+    if (clearSave && !(await confirmAction(confirmCopy.error.confirmStartFresh))) return;
 
     if (clearSave) suppressSaves();
     if (clearSave && !removeStoredValue(STORAGE_KEY)) {
       resumeSaves();
       this.setState({
-        recoveryMessage: "현재 저장본을 삭제하지 못했습니다. 브라우저 저장소 권한을 확인한 뒤 다시 시도하세요.",
+        recoveryMessage: confirmCopy.error.deleteFailed,
       });
       return;
     }
@@ -86,8 +89,8 @@ export class AppErrorBoundary extends Component {
       <main className="error-screen">
         <section className="error-panel" role="alert">
           <span className="eyebrow" lang="en">CRITICAL POINT / RECOVERY</span>
-          <h1>장면을 불러오지 못했습니다.</h1>
-          <p>오류 지점은 자동 저장되었습니다. 수정 후 다시 열면 저장된 장면에서 이어서 진행할 수 있습니다.</p>
+          <h1>{confirmCopy.error.title}</h1>
+          <p>{confirmCopy.error.text}</p>
           {this.state.recoveryMessage && (
             <p className="error-recovery-message" role="status">
               {this.state.recoveryMessage}
@@ -95,9 +98,9 @@ export class AppErrorBoundary extends Component {
           )}
           {/* The blocked reload sets the same sentence as its message, so without
               this guard a blocked retry prints it twice in a row. */}
-          {retryCount >= MAX_RETRIES_FROM_ONE_SAVE && this.state.recoveryMessage !== RETRY_BLOCKED_MESSAGE && (
+          {retryCount >= MAX_RETRIES_FROM_ONE_SAVE && this.state.recoveryMessage !== retryBlockedMessage() && (
             <p className="error-retry-blocked" role="status">
-              {RETRY_BLOCKED_MESSAGE}
+              {retryBlockedMessage()}
             </p>
           )}
           <div className="error-actions">
@@ -107,14 +110,14 @@ export class AppErrorBoundary extends Component {
               data-testid="error-start-fresh"
               onClick={() => this.reload({ clearSave: true })}
             >
-              저장본을 초기화하고 새 게임
+              {confirmCopy.error.startFresh}
             </button>
             <button type="button" data-testid="error-retry" disabled={retryCount >= MAX_RETRIES_FROM_ONE_SAVE} onClick={() => this.reload()}>
-              저장된 지점에서 다시 시도
+              {confirmCopy.error.retry}
             </button>
           </div>
           <p className="error-recovery-hint">
-            복구 슬롯과 오류 로그는 보존됩니다. 같은 지점에서 계속 실패하면 저장본을 초기화하고 새 게임으로 진입해 주세요.
+            {confirmCopy.error.hint}
           </p>
         </section>
       </main>

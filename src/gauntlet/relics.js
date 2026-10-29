@@ -19,6 +19,8 @@
  */
 
 import { objectParticle, subjectParticle } from "../playerLanguage.js";
+import relicsCopy from "../copy/relics.js";
+import { fill } from "../locale.js";
 import {
   AFTERSHOCK_START,
   COLD_BLOOD_START,
@@ -60,111 +62,54 @@ const HIGH_ROLLER_UNLOCK_MULTIPLIER = 64;
 /** A stance relic opens when its stance has reshaped enough charged cashes. */
 export const STANCE_RELIC_UNLOCK_COUNT = 3;
 
+const relicWords = relicsCopy.relics;
+
+/**
+ * One relic: its fixed parts, and its words (src/copy/relics.js) with the
+ * rule's numbers filled in. `softens` is the mutation it softens, `unlock`
+ * the feat's id; a relic with no feat has `unlock: null`.
+ */
+function relic(id, { label, icon, softens = null, unlock = null }, values = {}) {
+  const words = relicWords[id];
+  const say = (line) => fill(line, values);
+  return {
+    label,
+    name: words.name,
+    icon,
+    text: say(words.text),
+    proc: say(words.proc),
+    ...(softens ? { softens: { mutation: softens, text: say(words.softens) } } : {}),
+    unlock: unlock ? { id: unlock, text: say(words.unlock) } : null,
+  };
+}
+
 export const RELICS = Object.freeze({
-  metronome: {
-    label: "METRONOME",
-    name: "메트로놈",
-    icon: "timer",
-    text: "열기가 오른 다음 장면까지, 방향을 바꿔도 전환으로 인정된다.",
-    proc: "전환을 붙잡았다",
-    unlock: null,
-  },
-  coldBlood: {
-    label: "COLD BLOOD",
-    name: "냉혈",
-    icon: "snowflake",
-    text: `벽에 닿은 뒤의 AFTERSHOCK가 열기 ${AFTERSHOCK_START}${subjectParticle(String(AFTERSHOCK_START))} 아니라 ${COLD_BLOOD_START}에서 시작한다.`,
-    proc: "여진을 절반으로 식혔다",
-    softens: { mutation: "aftershock", text: `냉혈: 열기 ${COLD_BLOOD_START}에서 시작` },
-    unlock: null,
-  },
-  heatSink: {
-    label: "HEAT SINK",
-    name: "방열판",
-    icon: "fan",
-    text: `HEAT DEBT가 열기의 ${HEAT_SINK_SHARE}분의 1만 남기고, 시간은 ${HEAT_SINK_SECONDS}초만 가져간다.`,
-    proc: "열 빚을 절반으로 줄였다",
-    softens: { mutation: "heatDebt", text: `방열판: 열기 ${HEAT_SINK_SHARE}분의 1, ${HEAT_SINK_SECONDS}초` },
-    unlock: null,
-  },
-  lockpick: {
-    label: "LOCKPICK",
-    name: "락픽",
-    icon: "key",
-    text: `COLD FEET로 봉인된 카드가 열기 ${SEAL_BREAK_GAUGE}${subjectParticle(String(SEAL_BREAK_GAUGE))} 아니라 ${LOCKPICK_SEAL}에서 열린다.`,
-    proc: "봉인을 일찍 땄다",
-    softens: { mutation: "coldFeet", text: `락픽: 열기 ${LOCKPICK_SEAL}에서 열림` },
-    unlock: null,
-  },
-  splint: {
-    label: "SPLINT",
-    name: "부목",
-    icon: "bandage",
-    text: `FRACTURE로 금 간 자원의 청구가 ${FRACTURE_RATE}배가 아니라 ${SPLINT_RATE}배다.`,
-    proc: "균열을 받쳤다",
-    softens: { mutation: "fracture", text: `부목: ${SPLINT_RATE}배 청구` },
-    unlock: null,
-  },
-  encore: {
-    label: "ENCORE",
-    name: "앙코르",
-    icon: "repeat",
-    text: "벽에 닿아 판돈을 잃어도 논리 콤보는 남는다.",
-    proc: "벽에 닿고도 콤보가 살아남았다",
-    unlock: { id: "combo", text: `논리 콤보 ${ENCORE_UNLOCK_COMBO} 달성` },
-  },
-  insurance: {
-    label: "INSURANCE",
-    name: "보험",
-    icon: "shield",
-    text: `사건마다 한 번, 벽에 닿아도 판돈의 ${INSURANCE_SHARE}분의 1은 남는다.`,
-    proc: `판돈 ${INSURANCE_SHARE}분의 1을 지켰다`,
-    unlock: { id: "loss", text: `판돈 ${INSURANCE_UNLOCK_LOSS.toLocaleString("en-US")} 이상을 벽에 잃기` },
-  },
-  highRoller: {
-    label: "HIGH ROLLER",
-    name: "하이롤러",
-    icon: "gem",
-    text: `모든 카드의 칩이 ${HIGH_ROLLER_CHIPS}배. 대신 벽 구간 전체가 ${HIGH_ROLLER_WALL} 가까워진다.`,
-    proc: "더 큰 칩을 걸었다",
-    unlock: { id: "multiplier", text: `×${HIGH_ROLLER_UNLOCK_MULTIPLIER} 이상으로 확정하기` },
-  },
-  stethoscope: {
-    label: "STETHOSCOPE",
-    name: "청진기",
-    icon: "stethoscope",
-    text: `SILENCE가 와도 심박이 계속 벽을 가리킨다. 시간은 여전히 ${SILENCE_SECONDS}초다.`,
-    proc: "침묵 속에서 심장을 들었다",
-    softens: { mutation: "silence", text: "청진기: 심박 유지" },
-    unlock: { id: "silence", text: "SILENCE를 한 번 겪기" },
-  },
-  kineticGrip: {
-    label: "KINETIC GRIP",
-    name: "악력",
-    icon: "crosshair",
-    text: `STRIKE MASTERY가 밀 때마다 얹던 열기 1을 걷어 내고, STRIKE WAKE로 깨어난 판의 칩이 ${KINETIC_GRIP_CHIPS}배 더 두꺼워진다.`,
-    proc: "STRIKE 숙련이 손에 붙었다",
-    softens: { mutation: "strikeMastery", text: "악력: 밀 때 오르는 열기 그대로" },
-    unlock: { id: "strikeMastery", text: `STRIKE 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
-  },
-  steadyAnchor: {
-    label: "STEADY ANCHOR",
-    name: "닻",
-    icon: "anchor",
-    text: `STEADY MASTERY가 켜진 판은 열기 ${STEADY_ANCHOR_COOL}${objectParticle(String(STEADY_ANCHOR_COOL))} 더 식힌 채 시작하고, 시간이 ${STEADY_ANCHOR_SECONDS}초 더 주어진다.`,
-    proc: "STEADY 숙련에 닻을 내렸다",
-    softens: { mutation: "steadyMastery", text: `닻: 열기 ${STEADY_ANCHOR_COOL} 더 식음, ${STEADY_ANCHOR_SECONDS}초 추가` },
-    unlock: { id: "steadyMastery", text: `STEADY 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
-  },
-  glassLens: {
-    label: "GLASS LENS",
-    name: "돋보기",
-    icon: "eye",
-    text: `EXPOSE MASTERY가 켜진 판은 카드가 뒤집히지 않고 가장 비싼 카드도 봉인되지 않으며, 봉인은 열기 ${GLASS_LENS_SEAL}에서 열린다.`,
-    proc: "EXPOSE 숙련으로 판을 꿰뚫었다",
-    softens: { mutation: "exposeMastery", text: "돋보기: 가림과 봉인 해제" },
-    unlock: { id: "exposeMastery", text: `EXPOSE 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
-  },
+  metronome: relic("metronome", { label: "METRONOME", icon: "timer" }),
+  coldBlood: relic("coldBlood", { label: "COLD BLOOD", icon: "snowflake", softens: "aftershock" }, {
+    start: AFTERSHOCK_START, particle: subjectParticle(String(AFTERSHOCK_START)), cold: COLD_BLOOD_START,
+  }),
+  heatSink: relic("heatSink", { label: "HEAT SINK", icon: "fan", softens: "heatDebt" }, { share: HEAT_SINK_SHARE, seconds: HEAT_SINK_SECONDS }),
+  lockpick: relic("lockpick", { label: "LOCKPICK", icon: "key", softens: "coldFeet" }, {
+    seal: SEAL_BREAK_GAUGE, particle: subjectParticle(String(SEAL_BREAK_GAUGE)), pick: LOCKPICK_SEAL,
+  }),
+  splint: relic("splint", { label: "SPLINT", icon: "bandage", softens: "fracture" }, { rate: FRACTURE_RATE, splint: SPLINT_RATE }),
+  encore: relic("encore", { label: "ENCORE", icon: "repeat", unlock: "combo" }, { combo: ENCORE_UNLOCK_COMBO }),
+  insurance: relic("insurance", { label: "INSURANCE", icon: "shield", unlock: "loss" }, {
+    share: INSURANCE_SHARE, loss: INSURANCE_UNLOCK_LOSS.toLocaleString("en-US"),
+  }),
+  highRoller: relic("highRoller", { label: "HIGH ROLLER", icon: "gem", unlock: "multiplier" }, {
+    chips: HIGH_ROLLER_CHIPS, wall: HIGH_ROLLER_WALL, multiplier: HIGH_ROLLER_UNLOCK_MULTIPLIER,
+  }),
+  stethoscope: relic("stethoscope", { label: "STETHOSCOPE", icon: "stethoscope", softens: "silence", unlock: "silence" }, { seconds: SILENCE_SECONDS }),
+  kineticGrip: relic("kineticGrip", { label: "KINETIC GRIP", icon: "crosshair", softens: "strikeMastery", unlock: "strikeMastery" }, {
+    chips: KINETIC_GRIP_CHIPS, count: STANCE_RELIC_UNLOCK_COUNT,
+  }),
+  steadyAnchor: relic("steadyAnchor", { label: "STEADY ANCHOR", icon: "anchor", softens: "steadyMastery", unlock: "steadyMastery" }, {
+    cool: STEADY_ANCHOR_COOL, particle: objectParticle(String(STEADY_ANCHOR_COOL)), seconds: STEADY_ANCHOR_SECONDS, count: STANCE_RELIC_UNLOCK_COUNT,
+  }),
+  glassLens: relic("glassLens", { label: "GLASS LENS", icon: "eye", softens: "exposeMastery", unlock: "exposeMastery" }, {
+    seal: GLASS_LENS_SEAL, count: STANCE_RELIC_UNLOCK_COUNT,
+  }),
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));

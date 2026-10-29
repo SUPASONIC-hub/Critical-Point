@@ -99,7 +99,9 @@ test("the introduction is written last, under the story, the file and the week's
   // both names a row for each (`at`).
   assert.deepEqual(rows, ["broken ? 3 : 0", "carried.length > 0 ? 4 : 0"], "the carried rules, the breach");
   // The carried rules keep the breach panel's shape and drop its red (`gx-carry`, play.css).
-  assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules"[^\n]*\s+<p className="gx-breach-kicker">이월 · 이번 판에 이어지는 규칙<\/p>/);
+  assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules"[^\n]*\s+<p className="gx-breach-kicker">\{briefingCopy\.carried\}<\/p>/);
+  // Its words are the briefing's copy (src/copy/briefing.js), read by key.
+  assert.match(readFileSync("src/copy/briefing.js", "utf8"), /carried: "이월 · 이번 판에 이어지는 규칙"/);
   // The page is still named by its scene title, not by the panel.
   assert.match(briefing, /aria-labelledby="gx-comic-title"/);
   // The introduction teaches and accuses nobody, so it takes the same calm form.

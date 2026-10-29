@@ -1,4 +1,6 @@
 import { buildLeaderboard } from "./ranking.js";
+import drawCopy from "./copy/resultCardDraw.js";
+import { fill } from "./locale.js";
 
 /**
  * The result card as data: every string and number the season's card shows,
@@ -11,25 +13,13 @@ import { buildLeaderboard } from "./ranking.js";
  * lists and no others, whatever else the object it is handed carries.
  */
 
-/** The words the card prints that are the same for every season. */
-export const RESULT_CARD_LABELS = Object.freeze({
-  game: "TRIGGERLAB: CRITICAL POINT",
-  season: "SEASON 01 · FINAL RECORD",
-  dna: "판단 DNA",
-  ending: "결말",
-  burst: "최고 버스트",
-  rank: "랭크",
-  league: "리그",
-  logic: "논리 유지력",
-  points: "점",
-  story: "스토리 모드",
-  byline: "익명 분석관의 기록",
-});
+/** The words the card prints that are the same for every season (src/copy/resultCardDraw.js). */
+export const RESULT_CARD_LABELS = drawCopy.labels;
 
 // What a card with a piece missing prints in its place. A season that reached
 // its ending has all of them; these keep an older save drawable.
-const UNREAD_MODE_TITLE = "기록되지 않은 판단";
-const UNREAD_ENDING_NAME = "미확정 경로";
+const UNREAD_MODE_TITLE = drawCopy.unreadMode;
+const UNREAD_ENDING_NAME = drawCopy.unreadEnding;
 
 const RANK_WEIGHT = { S: 4, A: 3, B: 2, C: 1 };
 
@@ -125,9 +115,7 @@ export function buildResultCardModel(input = {}) {
 export function buildShareText(model, origin = "") {
   const card = model ?? buildResultCardModel();
   const address = toText(origin).replace(/\/+$/, "");
-  const line =
-    `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${card.modeTitle}', 결말은 '${card.endingName}'. ` +
-    `최고 버스트 ${card.bestBurst}${RESULT_CARD_LABELS.points}, ${card.bestRank} 랭크.${card.share}`;
+  const line = fill(drawCopy.shareLine, { mode: card.modeTitle, ending: card.endingName, burst: card.bestBurst, points: RESULT_CARD_LABELS.points, rank: card.bestRank, share: card.share });
   return address ? `${line} ${address}/` : line;
 }
 

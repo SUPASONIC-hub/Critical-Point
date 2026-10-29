@@ -7,6 +7,11 @@ import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
 import { getTableRules } from "./tableUnlocks.js";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
+
+// The readouts' words (src/copy/table.js), read when each line is said.
+const say = tableCopy.readout;
 
 export { formatNumber };
 
@@ -31,7 +36,7 @@ export function describeClockHeat(pushes) {
   const rate = getClockHeatRate(pushes);
   if (!(rate > 1)) return null;
   const value = (Math.round(rate * 100) / 100).toFixed(2);
-  return { text: `×${value}`, spoken: `시계가 올리는 열기 ${value}배` };
+  return { text: `×${value}`, spoken: fill(say.clockHeat, { value }) };
 }
 
 /**
@@ -45,22 +50,16 @@ export function describeClockHeat(pushes) {
  */
 export function describeNextTable(nextMutations = [], busted = false) {
   if (nextMutations.length === 0) return "";
-  if (busted) return "다음 판은 벽에 닿은 대가로 바뀐 규칙으로 시작한다.";
+  if (busted) return say.nextBusted;
   return nextMutations.some((mutation) => mutation.id === "coldFeet" && !mutation.lifted)
-    ? "한 번도 밀지 않고 멈춘 대가로 다음 판의 가장 비싼 카드가 봉인된다."
-    : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
+    ? say.nextColdFeet
+    : say.nextRecalculated;
 }
 
-const VERDICT_CAUSE_COPY = Object.freeze({
-  cash: "직접 확정했다",
-  push: "한 번 더 밀었다",
-  creep: "시계가 올린 열기가 벽에 닿았다",
-  timeout: "시계를 방치했다",
-  abandon: "걸어 둔 판을 떠났다",
-  // Not one of `VERDICT_CAUSES`: no press heats the gauge now. A verdict logged
-  // before 2026-10-10 can name it, and still reads as it did.
-  focus: "LOCK이 올린 열기가 벽에 닿았다",
-});
+// One sentence a cause, by the cause's id. `focus` is not one of
+// `VERDICT_CAUSES`: no press heats the gauge now. A verdict logged before
+// 2026-10-10 can name it, and still reads as it did.
+const VERDICT_CAUSE_COPY = say.causes;
 
 /**
  * Why the window closed, in the reveal's ledger. One sentence a cause
@@ -70,7 +69,7 @@ const VERDICT_CAUSE_COPY = Object.freeze({
  * only what the outcome proves.
  */
 export function describeVerdictCause(verdict) {
-  return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열기가 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
+  return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? say.causeBust : VERDICT_CAUSE_COPY.cash);
 }
 
 /** The name a card's type goes by on the table (the report's plain names). */
@@ -81,20 +80,22 @@ export const getTypeName = (type) => easyCognitionLabels[type] ?? "";
  * leans neither way is called. A verdict logged before C-3 holds a thinking
  * type where the direction now is, and is read by the type's name.
  */
-export const DIRECTION_NAMES = Object.freeze({ people: "사람", position: "자리", [LOGIC_EVEN]: "중립" });
+export const DIRECTION_NAMES = say.directions;
 export const getDirectionName = (direction) => DIRECTION_NAMES[direction] ?? getTypeName(direction);
 
 /**
  * A direction's name as the tag and the streak's line print it: the word, and
- * " 쪽" after it, which a phone's card has no room for (the `i` elements
- * play.css clips there) and a screen reader still reads. A card that leans
- * neither way is just 중립.
+ * what follows it (" 쪽"), which a phone's card has no room for (the `i`
+ * elements play.css clips there) and a screen reader still reads. A card that
+ * leans neither way is just 중립.
  */
 export function getDirectionParts(direction) {
   const name = getDirectionName(direction);
-  return [name, DIRECTION_NAMES[direction] && direction !== LOGIC_EVEN ? " 쪽" : ""];
+  return [name, DIRECTION_NAMES[direction] && direction !== LOGIC_EVEN ? say.directionAfter : ""];
 }
 
+/** A direction as a side, the way the streak's sentences say it: 사람 쪽, 자리 쪽. */
+const getDirectionSide = (direction) => fill(say.side, { direction: getDirectionName(direction) });
 
 const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
 
@@ -104,24 +105,22 @@ const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
  * in play on, or a verdict logged before the streak paid.
  */
 export function describeLogicMove(logic) {
-  const side = `${getDirectionName(logic?.type)} 쪽`;
+  const side = getDirectionSide(logic?.type);
   const streak = Number(logic?.streak) || 0;
-  const paid = `논리 콤보 ${streak}, 배율 ${bonusText(logic?.bonus)}.`;
+  const paid = fill(say.logicPaid, { streak, bonus: bonusText(logic?.bonus) });
   switch (logic?.move) {
     case "grow":
-      return `${side}${objectParticle(side)} 이어 갔다. ${paid}`;
+      return fill(say.logicGrow, { side, particle: objectParticle(side), paid });
     case "build":
-      return `${side} ${Math.min(LOGIC_HOLD, Number(logic.held) || 1)}/${LOGIC_HOLD}. 같은 방향 세 번째부터 콤보가 오른다. ${paid}`;
+      return fill(say.logicBuild, { side, held: Math.min(LOGIC_HOLD, Number(logic.held) || 1), hold: LOGIC_HOLD, paid });
     case "switch":
-      return `열기가 오른 판에서 ${side}${directionParticle(side)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
+      return fill(say.logicSwitch, { side, particle: directionParticle(side), paid });
     case "keep":
-      return logic.type === LOGIC_EVEN
-        ? `어느 쪽으로도 기울지 않은 카드였다. 콤보는 그대로다. ${paid}`
-        : `지키던 방향의 카드가 이 장면에 없었다. 콤보는 그대로다. ${paid}`;
+      return fill(logic.type === LOGIC_EVEN ? say.logicKeepEven : say.logicKeep, { paid });
     case "break":
-      return `열기가 오르지 않았는데 ${side}${directionParticle(side)} 바꿨다. 논리 콤보는 0, 다시 1/${LOGIC_HOLD}부터 센다.`;
+      return fill(say.logicBreak, { side, particle: directionParticle(side), hold: LOGIC_HOLD });
     case "bust":
-      return streak > 0 ? `벽에 닿았지만 논리 콤보 ${streak}${topicParticle(String(streak))} 남았다.` : "벽에 닿아 논리 콤보가 끊겼다.";
+      return streak > 0 ? fill(say.logicBustKept, { streak, particle: topicParticle(String(streak)) }) : say.logicBustLost;
     default:
       return null;
   }
@@ -129,10 +128,10 @@ export function describeLogicMove(logic) {
 
 /** The same move as the archive's one line under a logged decision. */
 export function describeLogicLog(logic) {
-  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: `논리 콤보 ${logic.streak} · 배율 ${bonusText(logic.bonus)} · +${formatNumber(logic.pot)}` } : null;
+  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: fill(say.logicLog, { streak: logic.streak, bonus: bonusText(logic.bonus), pot: formatNumber(logic.pot) }) } : null;
 }
 
-const MOVE_COPY = Object.freeze({ grow: "이어 감", build: "쌓는 중", switch: "전환", keep: "유지", break: "끊김" });
+const MOVE_COPY = say.moves;
 
 /**
  * The streak as the table shows it while a window is open: where it stands,
@@ -156,10 +155,10 @@ export function readLogic({ logic, card, offered, relics = [] }) {
   const now = staked?.logic ?? logic;
   const open = logic.rose || (reach && logic.reach > 0);
   const held = `${Math.min(LOGIC_HOLD, now.held)}/${LOGIC_HOLD}`;
-  const hold = now.type ? `${getDirectionName(now.type)} 쪽 ${held}` : "첫 카드부터 센다";
+  const hold = now.type ? `${getDirectionSide(now.type)} ${held}` : say.firstCard;
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;
-  const note = did ?? (open && !staked ? "전환 가능" : "");
+  const note = did ?? (open && !staked ? say.canSwitch : "");
   return {
     after: now.streak,
     bonus,
@@ -168,13 +167,13 @@ export function readLogic({ logic, card, offered, relics = [] }) {
     type: now.type,
     held,
     note,
-    line: [`논리 콤보 ${now.streak}`, hold, note].filter(Boolean).join(" · "),
-    spoken: `논리 콤보 ${now.streak}, 배율 ${bonus.toFixed(2)}배. ${hold}.${did ? ` 이 카드로 ${did}.` : open && !staked ? " 열기가 올라 방향을 바꿔도 콤보가 오른다." : ""}`,
+    line: [fill(say.combo, { streak: now.streak }), hold, note].filter(Boolean).join(" · "),
+    spoken: `${fill(say.spoken, { streak: now.streak, bonus: bonus.toFixed(2), hold })}${did ? fill(say.spokenMove, { move: did }) : open && !staked ? say.spokenOpen : ""}`,
   };
 }
 
 /** What a card's tag adds for a screen reader: what picking it would do to the streak. */
-export const describeCardMove = (move) => (MOVE_COPY[move] ? `(콤보 ${MOVE_COPY[move]})` : "");
+export const describeCardMove = (move) => (MOVE_COPY[move] ? fill(say.cardMove, { move: MOVE_COPY[move] }) : "");
 
 /**
  * The same, as the one sign the tag prints for the eye. The tag's colour said
@@ -195,7 +194,7 @@ export const getMoveMark = (move) => MOVE_MARKS[move] ?? "";
  * scene wrote (다른 방법을 제안한다 on 354 of the 427 scenes that deal it) over
  * an English "WILD": nothing on the table had the name the help used.
  */
-export const REFRAME_CARD_NAME = "판을 다시 짠다";
+export const REFRAME_CARD_NAME = say.reframeName;
 
 /**
  * What the table says aloud about its clock, in one polite region. The timer
@@ -205,13 +204,13 @@ export const REFRAME_CARD_NAME = "판을 다시 짠다";
  * by itself: nothing was pressed, the briefing simply went away, and the first
  * thing a listener heard about a running clock used to be "10초 남았다".
  */
-export const CLOCK_OPENED_CALL = "읽는 시간이 끝나 판이 열렸다. 시계가 흐른다";
+export const CLOCK_OPENED_CALL = say.clockOpened;
 const CLOCK_OPENED_SECONDS = 5;
 
 export function getClockCall({ live, paused, remaining, elapsed = 0, openedByClock = false }) {
   if (!live || paused) return "";
-  if (remaining <= 5) return "5초 남았다";
-  if (remaining <= 10) return "10초 남았다";
+  if (remaining <= 5) return say.clockFive;
+  if (remaining <= 10) return say.clockTen;
   return openedByClock && elapsed < CLOCK_OPENED_SECONDS ? CLOCK_OPENED_CALL : "";
 }
 
@@ -248,7 +247,7 @@ export function describeEffect(effect = {}, resourceMeta = {}) {
 export function describeStanding(resources = {}, resourceMeta = {}, clueCount = 0) {
   return [
     ...Object.entries(resourceMeta).map(([key, meta]) => `${meta.label} ${Number(resources?.[key]) || 0}${meta.suffix ?? ""}`),
-    `단서 ${Number(clueCount) || 0}개`,
+    fill(say.clues, { count: Number(clueCount) || 0 }),
   ].join(" · ");
 }
 
@@ -280,7 +279,7 @@ export function describeCaseChange(log = [], labels = {}) {
 }
 
 export function joinRules(items) {
-  if (!items.length) return "기본 규칙";
+  if (!items.length) return say.baseRules;
   return items.map((item) => item.label).join(" / ");
 }
 
@@ -297,18 +296,19 @@ function getRuleHeat({ mutations, schema }) {
 }
 
 function getRuleObjective(mutations) {
-  if (!mutations.length) return "규칙 안정. 지금은 판돈과 벽만 읽으면 된다.";
+  if (!mutations.length) return say.rulesStable;
   const labels = mutations.map((mutation) => mutation.label).join(" / ");
-  return `${labels} 해제 조건: 사건 결과까지 살아남아 판돈을 금고로 넘겨라.`;
+  return fill(say.rulesLift, { rules: labels });
 }
 
 function getOverdriveCopy({ streak, hot, cashMutations }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
-  if (willOverdrive) return { id: "ready", label: "오버클럭 준비", text: "지금 확정하면 다음 판은 칩 2배, 밀기 폭 증가", progress: 100 };
-  if (streak > 0 && hot) return { id: "live", label: "이어짐", text: "한 번 더 ×4+ 확정하면 오버클럭", progress: 75 };
-  if (streak > 0) return { id: "held", label: "유지", text: "이번 판도 ×4 이상으로 확정해야 이어진다", progress: 50 };
-  if (hot) return { id: "ignition", label: "점화", text: "확정하면 오버클럭 연속 1단계", progress: 35 };
-  return { id: "dormant", label: "꺼짐", text: "×4 이상 확정부터 연속이 켜진다", progress: 12 };
+  const { overdrive } = say;
+  if (willOverdrive) return { id: "ready", ...overdrive.ready, progress: 100 };
+  if (streak > 0 && hot) return { id: "live", ...overdrive.live, progress: 75 };
+  if (streak > 0) return { id: "held", ...overdrive.held, progress: 50 };
+  if (hot) return { id: "ignition", ...overdrive.ignition, progress: 35 };
+  return { id: "dormant", ...overdrive.dormant, progress: 12 };
 }
 
 /**
@@ -408,10 +408,10 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       ruleHeat: getRuleHeat({ mutations: tableRules, schema }),
       ruleObjective: getRuleObjective(tableRules),
       currentRules: mutations.length
-        ? `${joinRules(mutations)} 적용 중`
+        ? fill(say.rulesOn, { rules: joinRules(mutations) })
         : schema.faceDown || schema.sedated || schema.sealHighest || schema.fracturedAxis
-          ? "숨은 규칙 적용 중"
-          : "규칙 안정",
+          ? say.rulesHidden
+          : say.rulesQuiet,
       fractureAxis,
       cashMutations,
       bustMutations,

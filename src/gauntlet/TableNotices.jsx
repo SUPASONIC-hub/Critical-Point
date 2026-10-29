@@ -9,15 +9,20 @@ import { SCOUT_SECONDS } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
+
+// What lands over the table, in words (src/copy/table.js).
+const say = tableCopy.notices;
 
 /** This tab's table stopped because another tab has the window. */
 function LostToTab({ onReload }) {
   return (
     <div className="gx-breach gx-lost-tab" role="alert" data-testid="table-lost-to-tab">
-      <span className="gx-breach-kicker">이 판은 다른 탭에서 잡혔다</span>
-      <p>한 판은 한 테이블에서만 걸 수 있다. 이 탭의 판은 멈췄다.</p>
+      <span className="gx-breach-kicker">{say.lostKicker}</span>
+      <p>{say.lostText}</p>
       <button type="button" className="ghost" onClick={() => (onReload ? onReload() : globalThis.location.reload())}>
-        <RefreshCcw size={14} aria-hidden="true" /> 다시 불러오기
+        <RefreshCcw size={14} aria-hidden="true" /> {say.reload}
       </button>
     </div>
   );
@@ -50,17 +55,14 @@ function HeldElsewhere({ onClaim, onLeave }) {
       data-testid="table-held-elsewhere"
       onKeyDown={onKeyDown}
     >
-      <span id="gx-held-title" className="gx-breach-kicker">이 판은 다른 탭에서 걸려 있다</span>
-      <p id="gx-held-text">
-        다른 탭(또는 이전 세션)에서 카드를 걸어 둔 판이다. 여기서 이어가면 그 판은 떠난 판이 되어 벽에 닿은 것으로 끝난다.
-        아직 그 탭에서 하는 중이면 그대로 둔다.
-      </p>
+      <span id="gx-held-title" className="gx-breach-kicker">{say.heldKicker}</span>
+      <p id="gx-held-text">{say.heldText}</p>
       <div className="gx-held-actions">
         <button type="button" className="ghost" data-testid="claim-held-window" onClick={onClaim}>
-          여기서 이어가기 · 그 판은 잃음
+          {say.claim}
         </button>
         <button ref={leaveRef} type="button" className="ghost" data-testid="leave-held-window" onClick={onLeave}>
-          그 탭에 두기
+          {say.leave}
         </button>
       </div>
     </div>
@@ -77,11 +79,11 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
           <strong lang="en">BUST</strong>
           <span>
             {win.cause === "timeout"
-              ? "시간이 먼저 끝났다"
+              ? say.slamTimeout
               : win.cause === "abandon"
-                ? "테이블을 떠났다"
-                : `벽은 ${win.wall}에 있었다`}{" "}
-            · 판돈 {formatNumber(runPot)} → {formatNumber(bustKeeps)}
+                ? say.slamAbandon
+                : fill(say.slamWall, { wall: win.wall })}{" "}
+            · {say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}
           </span>
         </>
       ) : (
@@ -89,7 +91,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
           <strong>{formatMultiplier(multiplier)}</strong>
           <span>
             +{formatNumber(livePot)}
-            {streak > 0 ? ` · 논리 콤보 ${streak}` : ""}
+            {streak > 0 ? fill(say.slamCombo, { streak }) : ""}
           </span>
         </>
       )}
@@ -110,9 +112,9 @@ export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onC
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
           <RelicIcon id={equipped.id} size={18} />
-          <span>장착</span>
+          <span>{say.equipped}</span>
           <b lang="en">{RELICS[equipped.id].label}</b>
-          {equipped.dropped && <span>· {RELICS[equipped.dropped].name} 내려놓음</span>}
+          {equipped.dropped && <span>{fill(say.dropped, { name: RELICS[equipped.dropped].name })}</span>}
         </div>
       )}
       {lost && <LostToTab onReload={onReload} />}
@@ -140,9 +142,9 @@ export function LogicLine({ logic }) {
   const [word, after] = getDirectionParts(logic.type);
   return (
     <span className="gx-streak" data-testid="gauntlet-logic" data-streak={logic.after} data-move={logic.move ?? ""}>
-      <b><i>논리 </i>콤보 {logic.after}</b>
+      <b><i>{say.logicWord}</i>{say.comboWord} {logic.after}</b>
       <span>
-        {logic.type ? <>{word}{after && <i>{after}</i>} {logic.held}</> : "첫 카드부터"}
+        {logic.type ? <>{word}{after && <i>{after}</i>} {logic.held}</> : say.firstCard}
       </span>
       {logic.note && <em>{logic.note}</em>}
     </span>
@@ -153,7 +155,7 @@ export function LogicLine({ logic }) {
 export function RelicChips({ relics, pulse }) {
   if (!relics.length) return null;
   return (
-    <span className="gx-relics" data-testid="gauntlet-relics" role="group" aria-label="장착한 도구">
+    <span className="gx-relics" data-testid="gauntlet-relics" role="group" aria-label={say.relicsLabel}>
       {relics.map((id) => (
         <b
           key={pulse?.id === id ? `${id}-${pulse.n}` : id}
@@ -177,11 +179,11 @@ export function RelicChips({ relics, pulse }) {
  * already reads out.
  */
 export function ScoutBand({ band, canScout, onScout, shortcut }) {
-  if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">벽 {band.wallMin}–{band.wallMax}</span>;
+  if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
   return (
     <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
-      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : `벽 ${band.wallMin}–${band.wallMax} · 조회, 시간 ${SCOUT_SECONDS}초`}>
-      벽 {band.wallMin}–{band.wallMax} · {band.scouted ? "조회함" : "조회"}
+      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, seconds: SCOUT_SECONDS })}>
+      {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {band.scouted ? say.scouted : say.scout}
     </button>
   );
 }
@@ -205,7 +207,7 @@ export function TableGlossary({ question, cards = [], mutations, relics, stanceM
           alone, and the report's 관점 전환 reads the type. */}
       <li>{question}</li>
       {cards.map((card, index) => (
-        <li key={card.id ?? index}>카드 {index + 1}: {card.label} ({getDirectionName(getLogicDirection(card))} · {getTypeName(getLogicType(card))})</li>
+        <li key={card.id ?? index}>{fill(say.glossaryCard, { number: index + 1, label: card.label, type: `${getDirectionName(getLogicDirection(card))} · ${getTypeName(getLogicType(card))}` })}</li>
       ))}
       {mutations.map((mutation) => (
         <li key={mutation.id}>
@@ -220,8 +222,7 @@ export function TableGlossary({ question, cards = [], mutations, relics, stanceM
       {/* No mastery to explain until the case lets the player choose a stance. */}
       {stanceMastery && (
         <li>
-          시즌 숙련: LOCK을 충전한 채로 확정한 판의 수. 자세마다 {STANCE_MASTERY_GOAL}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {stanceMastery.strike} · STEADY {stanceMastery.steady} · EXPOSE{" "}
-          {stanceMastery.expose}).
+          {fill(say.glossaryMastery, { goal: STANCE_MASTERY_GOAL, strike: stanceMastery.strike, steady: stanceMastery.steady, expose: stanceMastery.expose })}
         </li>
       )}
     </>

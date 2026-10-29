@@ -17,6 +17,13 @@ import { ART_LOCK, hashBytes, hashFile } from "./art-lock.mjs";
 
 const WIDTHS = [480, 960];
 const QUALITY = 0.82;
+// The one variant a first visit waits on: the key visual at 960, which a phone
+// paints at 2x and a desktop at 1x (FIRST_PAINT_IMAGE in check-bundle-size.mjs).
+// 0.75 since 2026-10-26 (첫 화면 전송량 줄이기, the user's choice 1): 50,480 ->
+// 38,108 bytes of the first paint. The other variants are not on the first
+// paint and keep QUALITY.
+const QUALITY_FOR = { "/triggerlab-key-visual.webp": { 960: 0.75 } };
+const qualityOf = (src, width) => QUALITY_FOR[src]?.[width] ?? QUALITY;
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
@@ -26,7 +33,7 @@ const lock = Object.fromEntries([...RESPONSIVE_ART].map((src) => [src, { origina
 async function encode(src, width) {
   const source = `data:image/webp;base64,${readFileSync(`public${src}`).toString("base64")}`;
   const dataUrl = await page.evaluate(
-    async ([url, targetWidth]) => {
+    async ([url, targetWidth, quality]) => {
       const image = new Image();
       image.src = url;
       await image.decode();
@@ -34,16 +41,16 @@ async function encode(src, width) {
       canvas.width = targetWidth;
       canvas.height = Math.round((image.naturalHeight / image.naturalWidth) * targetWidth);
       canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL("image/webp", 0.82);
+      return canvas.toDataURL("image/webp", quality);
     },
-    [source, width],
+    [source, width, qualityOf(src, width)],
   );
   const bytes = Buffer.from(dataUrl.split(",")[1], "base64");
   const out = `public${src.replace(/\.webp$/, "")}-${width}.webp`;
   writeFileSync(out, bytes);
   written += 1;
   lock[src].variants[width] = hashBytes(bytes);
-  console.log(`${out.padEnd(46)} ${String(Math.round(bytes.length / 1024)).padStart(4)} KB`);
+  console.log(`${out.padEnd(46)} ${String(Math.round(bytes.length / 1024)).padStart(4)} KB  q${qualityOf(src, width)}`);
 }
 
 for (const src of RESPONSIVE_ART) {
@@ -52,4 +59,5 @@ for (const src of RESPONSIVE_ART) {
 
 await browser.close();
 writeFileSync(ART_LOCK, `${JSON.stringify(lock, null, 2)}\n`, "utf8");
-console.log(`Wrote ${written} variants at quality ${QUALITY}. Run npm run check:art to confirm the budgets.`);
+const exceptions = Object.entries(QUALITY_FOR).flatMap(([src, widths]) => Object.entries(widths).map(([width, quality]) => `${src} ${width} at ${quality}`));
+console.log(`Wrote ${written} variants at quality ${QUALITY}${exceptions.length ? ` (${exceptions.join(", ")})` : ""}. Run npm run check:art to confirm the budgets.`);

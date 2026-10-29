@@ -44,15 +44,17 @@ import { simplifyPlayerText } from "../playerLanguage.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { INTRO_FIELDS_WITHOUT_RUNTIME, createIntroView, createTelemetrySummary } from "./appViewModels.js";
 import { createSeasonCases, normalizeCaseSummary } from "./seasonViewModels.js";
+import introCopy from "../copy/intro.js";
 
 /** Both callers show the same screen, so they play the same cue. */
 const INTRO_MUSIC_MODE = "intro:menu";
 
 function getCaseStatusText(status) {
-  if (status === "PLAYING") return "진행 중";
-  if (status === "OPEN") return "시작 가능";
-  if (status === "COMPLETE") return "완료됨";
-  return "이전 사건 필요";
+  const { status: words } = introCopy;
+  if (status === "PLAYING") return words.playing;
+  if (status === "OPEN") return words.open;
+  if (status === "COMPLETE") return words.complete;
+  return words.locked;
 }
 
 /** The cases already closed, with their stored summary read back in full. */
