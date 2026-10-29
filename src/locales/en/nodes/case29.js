@@ -29,7 +29,7 @@ export default {
           "label": "Confirm the travel order’s review scope in writing first"
         },
         "reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         }
       },
       "place": "Incheon Airport Terminal 2 · Departures",
@@ -57,10 +57,10 @@ export default {
           "label": "Before recovery rates, press on how debtors get contacted"
         },
         "reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         },
         "c29_marina_evidence_turn": {
-          "label": "Read back through the price talks, round by round"
+          "label": "Reread the price talks by round"
         }
       },
       "place": "Marina Bay, Singapore · 57th-Floor Rooftop",
@@ -88,10 +88,10 @@ export default {
           "label": "Spare Oh Jinwoo; get the annex another way"
         },
         "reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         },
         "c29_hawker_evidence_turn": {
-          "label": "Read back through the price talks, round by round"
+          "label": "Reread the price talks by round"
         }
       },
       "place": "Chinatown Hawker Center, Singapore · Outdoor Alley Table",
@@ -119,10 +119,10 @@ export default {
           "label": "Have Seo Harin publish before the signing"
         },
         "reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         },
         "c29_hotel_evidence_turn": {
-          "label": "Read back through the price talks, round by round"
+          "label": "Reread the price talks by round"
         }
       },
       "place": "Marina Hotel, Singapore · Guest Room",
@@ -384,7 +384,7 @@ export default {
           "label": "Put both numbers on one page for the board and debtors"
         },
         "c29_route_system_evidence_turn": {
-          "label": "Read back through the price talks, round by round"
+          "label": "Reread the price talks by round"
         }
       },
       "place": "Incheon Airport Terminal 2 · Boarding Gate",
@@ -460,7 +460,7 @@ export default {
           "label": "Get Seo Harin’s files before boarding; read them in flight"
         },
         "c29_start_warm_reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         }
       },
       "place": "Incheon Airport Terminal 2 · Departures",
@@ -490,7 +490,7 @@ export default {
           "label": "Get Seo Harin’s files before boarding; read them in flight"
         },
         "c29_start_record_reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         }
       },
       "place": "Incheon Airport Terminal 2 · Departures",
@@ -520,7 +520,7 @@ export default {
           "label": "Get Seo Harin’s files before boarding; read them in flight"
         },
         "c29_start_rush_reframe": {
-          "label": "Lay out every deal the Group has sold in bundles"
+          "label": "Spread out the Group’s bundles"
         }
       },
       "place": "Incheon Airport Terminal 2 · Departures",
