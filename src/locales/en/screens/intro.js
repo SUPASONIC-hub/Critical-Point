@@ -2,7 +2,7 @@
 export default {
   subtitle: "Every 45 seconds, your judgment goes on the record",
   premise:
-    "3 years ago, you filed the only dissent on a loan approval. The loan went through anyway, and you were sent down to Trigger Lab, in the basement of KD Financial Group, whose largest shareholder is American capital. Today the first file on the case desk still carries that same loan number. The conditions you hold on to longest come back as pressure in the next case. The story starts a little earlier, with the last assignment of your probation.",
+    "3 years ago, you filed the lone dissent on a loan approval. The loan went out anyway, and you were sent down to Trigger Lab, under KD Financial Group, its top shareholder US capital. Today the first file on the case desk carries that same loan number. Conditions you hold longest return as pressure in the next case. It starts a little earlier, with your last probation task.",
   startButton: "Start the prologue",
   briefingLink: "Read the briefing first",
   ranking: "Ranking",
