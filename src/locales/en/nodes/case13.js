@@ -29,7 +29,7 @@ export default {
           "label": "Fix the price first and accept on the spot"
         },
         "reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -57,7 +57,7 @@ export default {
           "label": "Read it for now; ask them to cut it in the edit"
         },
         "reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         },
         "c13_studio_evidence_turn": {
           "label": "Find the 3.8 billion cost code"
@@ -88,7 +88,7 @@ export default {
           "label": "No excuses; slice rice cakes beside her until closing"
         },
         "reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         },
         "c13_market_evidence_turn": {
           "label": "Find the 3.8 billion cost code"
@@ -119,7 +119,7 @@ export default {
           "label": "Secretly change the cue sheet so it airs live"
         },
         "reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         },
         "c13_lab_evidence_turn": {
           "label": "Find the 3.8 billion cost code"
@@ -459,7 +459,7 @@ export default {
           "label": "Hold your answer; ask the rice cake people first"
         },
         "c13_start_warm_reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -489,7 +489,7 @@ export default {
           "label": "Get the revision an official agenda number, not a prop"
         },
         "c13_start_record_reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -519,7 +519,7 @@ export default {
           "label": "Insist the box photo stays out of the ad"
         },
         "c13_start_rush_reframe": {
-          "label": "See how committees ended"
+          "label": "Ask how panels ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",

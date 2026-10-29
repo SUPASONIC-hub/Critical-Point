@@ -28,7 +28,7 @@ export default {
           "label": "Check the notice’s date and basis in district records"
         },
         "reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop · Alley Out Front",
@@ -56,7 +56,7 @@ export default {
           "label": "Pick nothing; gather more people to move it all"
         },
         "reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         },
         "c19_shelves_evidence_turn": {
           "label": "Match the date memo to Box 211"
@@ -87,7 +87,7 @@ export default {
           "label": "Ask him to tell Lim Soyul why the paper isn’t a burden"
         },
         "reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         },
         "c19_ward_evidence_turn": {
           "label": "Match the date memo to Box 211"
@@ -118,7 +118,7 @@ export default {
           "label": "Announce the demolition and labels in Lim Soyul’s webtoon"
         },
         "reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         },
         "c19_labels_evidence_turn": {
           "label": "Match the date memo to Box 211"
@@ -458,7 +458,7 @@ export default {
           "label": "Rally the year-end chat and go to Hoegi-dong together"
         },
         "c19_start_warm_reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -488,7 +488,7 @@ export default {
           "label": "Request the district files on why the plan changed"
         },
         "c19_start_record_reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -518,7 +518,7 @@ export default {
           "label": "Take the New Year’s Eve photo and go clear it now"
         },
         "c19_start_rush_reframe": {
-          "label": "Trace why demolition moved up"
+          "label": "Ask why it moved up"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

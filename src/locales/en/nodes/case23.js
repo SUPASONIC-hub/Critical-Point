@@ -28,7 +28,7 @@ export default {
           "label": "Visit all 3,118 one by one to collect proxy forms"
         },
         "reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,7 +56,7 @@ export default {
           "label": "Explain the agenda from scratch; take only informed proxies"
         },
         "reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         },
         "c23_proxy_evidence_turn": {
           "label": "Open the staff proxy tally"
@@ -87,7 +87,7 @@ export default {
           "label": "Point out only the missing year in the 48 pages; leave fast"
         },
         "reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         },
         "c23_advisor_evidence_turn": {
           "label": "Open the staff proxy tally"
@@ -118,7 +118,7 @@ export default {
           "label": "Take the original run sheet as proof of the speech limit"
         },
         "reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         },
         "c23_backstage_evidence_turn": {
           "label": "Open the staff proxy tally"
@@ -456,7 +456,7 @@ export default {
           "label": "Start with 2023, missing entirely from his career history"
         },
         "c23_start_warm_reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -486,7 +486,7 @@ export default {
           "label": "Visit all 3,118 one by one to collect proxy forms"
         },
         "c23_start_record_reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -516,7 +516,7 @@ export default {
           "label": "Make the overdue calls to the 3,118, one by one"
         },
         "c23_start_rush_reframe": {
-          "label": "Trace shareholders’ words"
+          "label": "Trace holders’ words"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
