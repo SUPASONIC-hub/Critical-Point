@@ -26,4 +26,8 @@ export default {
   collapsed: "崩壊したシーズン",
   pastBest: "前のランキング（v{version}）の自己ベスト {score}点 · {rank}",
   footnote: "ほかの参加者は、名前の代わりに判断タイプと実行番号で区別されます。名前はこのブラウザの記録にだけ表示され、リモート接続がなければローカルの記録だけを集計します。",
+  hallFootnote: "検査を通過した各ランキングの1〜3位は、実行番号で名誉の殿堂に残ります。",
+  hallBadge: "名誉の殿堂 · {board} {place}位",
+  hallMainBoard: "通常ランキング",
+  hallProvisional: "（暫定）",
 };

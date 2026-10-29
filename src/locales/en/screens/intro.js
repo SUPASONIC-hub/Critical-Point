@@ -99,6 +99,7 @@ export default {
     end: ".",
     playtestNotice:
       "Case results, choices and response times, the screen language, the feedback you send and error reports are stored for research with a random ID created on this device, and deleted after 180 days. Your name is never stored remotely, and your IP address is used only to rate-limit requests.",
+    hallOfFameNotice: " A checked top season may stay in the Hall of Fame for a long time, by its run number and score.",
     deletion: {
       cloud: " Online save can be deleted yourself in the “Continue on another device” panel.",
       before: "To delete your records, email ",

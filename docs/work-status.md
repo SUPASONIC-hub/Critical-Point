@@ -172,6 +172,23 @@ Still open, on purpose:
   (320 bot seasons a board, same seeds): blind 61.7 -> 56.7, heartbeat
   62.2 -> 61.0, scout 63.2 -> 64.9, sees the wall 62.7 -> 69.1; the gap
   between seeing the wall and playing blind goes from 0.9 to 12.5 points.
+- D2, the hall of fame (draft on top of #224, D2-명예의전당-설계안-20261021.md,
+  every question (1) and question 9 (1)): `20261102040000_hall_of_fame.sql`
+  (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
+  `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
+  `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
+  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  and two steps in `verify-ranking.yml`: the settle call right after the
+  marks, from the same check, and a job of its own with `contents: write`
+  that force-pushes one commit to the orphan branch `hall-of-fame`. Each
+  board is read on its own: the threshold of ten counts the board's complete
+  seasons with no mark over the whole board (`hall_of_fame_counts`, counted
+  again inside the settle call), and the replay reads each open board's first
+  ten candidates beside the top `limit`. A week's
+  board settles four weeks after its Monday; a table's once the next table's
+  board is first written. Not merged: the migration applies on merge, and the
+  design waits for #224 and seven days of the daily check (the week of 11-16
+  at the earliest).
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain

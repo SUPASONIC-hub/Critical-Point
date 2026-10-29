@@ -164,7 +164,11 @@ const fileBudgets = {
   // 3128 / 69168 -> 3137 / 69401 on 2026-10-29, measured: a wide screen pins
   // the three language pills under the music controls (position: fixed), out
   // of the brand row, so the start button stays inside a 1280x720 screen.
-  "base-intro-ranking.css": { lines: 3137, bytes: 69401 },
+  // 3137 / 69401 -> 3148 / 69686 on 2026-10-29 (D2 hall of fame draft on #224
+  // 602ec69b), measured: the hall of fame's badge on a ranking row
+  // (.ranking-hall-badge), a rule of its own (11 lines) so the badge list
+  // above is not written twice.
+  "base-intro-ranking.css": { lines: 3148, bytes: 69686 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up

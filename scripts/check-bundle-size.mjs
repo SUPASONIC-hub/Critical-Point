@@ -92,6 +92,7 @@ const budgets = [
   // 142,951 / 52,386 in the e2e build, the gzip plus 4. The pre-C-3 streak
   // read on a save (the hold on a type set aside) and the run's direction.
   // 149,806 / 55,026 -> 149,961 / 55,078 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the pre-C-3 hold set aside on a save and the run's direction, on #224's keyed words. Measured 149,961 / 55,074, the gzip plus 4 in the e2e build.
+  // 149,806 -> 149,819 raw on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: only the chunk names it imports; the gzip stays under its line. Measured 149,819 in the e2e build.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_965, maxGzip: 55_098 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -110,6 +111,7 @@ const budgets = [
   // it now), getReadingScore, and the seventh weight. 13,480 in a second build
   // on #224 0c989ba7 (the hashes), so 13,484.
   // 35,281 / 13,719 -> 35,620 / 13,836 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: getCaseRead, getReadingScore and the seventh weight on #224's season mean. Measured 35,620 / 13,832, the gzip plus 4 in the e2e build.
+  // 13,719 -> 13,738 gzip on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the same 35,281 bytes, other chunk names inside. Measured 13,734, the gzip plus 4.
   { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_620, maxGzip: 13_836 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
@@ -302,7 +304,8 @@ const budgets = [
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
   // 65,978 -> 65,982 gzip on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: only the chunk names it imports. Measured 65,979, the gzip plus 4 (raw under its line).
-  { pattern: /^index-.*\.js$/, maxBytes: 181_926, maxGzip: 65_982 },
+  // 181,926 / 65,978 -> 182,095 / 66,082 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: fetchHallOfFame in telemetry.js and the data notice's hall-of-fame sentence (introCopy.data.hallOfFameNotice). Measured 182,095 / 66,078 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 182_095, maxGzip: 66_082 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -606,7 +609,8 @@ const budgets = [
   // 193,674 / 36,110, the gzip plus 4; 193,675 raw once the peak's colour
   // went from heat to ember (contrast, 3.56:1 -> about 5.6:1).
   // 196,229 / 36,558 -> 196,327 / 36,585 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the board marks' colours (.gx-mark-peak, .gx-mark-breather) on #224's sheet. Measured 196,327 / 36,581. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_327, maxGzip: 36_585 },
+  // 196,229 / 36,558 -> 196,473 / 36,590 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the hall of fame's badge on a ranking row (.ranking-hall-badge). Measured 196,473 / 36,586 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_473, maxGzip: 36_590 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -682,7 +686,8 @@ const budgets = [
   // 5,033 / 2,252 in the e2e build, the gzip plus 4. the personal bests' state, fetch and line (src/personalBests.js) and the heading that says the season record is a mean of cases.
   // 4,793 / 2,147 -> 5,503 / 2,416 on 2026-10-26, 영어판 3단계: the ranking's words read by key (src/copy/ranking.js) and dates in the page's language. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 5,503 / 2,416 -> 5,836 / 2,575 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the personal bests' state, fetch and line (src/personalBests.js, its words ranking.pastBest) and the intro that says the season record is a mean of cases. Measured 5,836 / 2,571, the gzip plus 4 in the e2e build.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_836, maxGzip: 2_575 },
+  // 5,836 / 2,575 -> 6,670 / 2,992 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b, the 2nd stage: the badges (src/hallOfFameBadges.js, public_hall_of_fame read on mount, its words ranking.hallBadge, hallMainBoard, hallProvisional) and the footnote's second sentence (ranking.hallFootnote). Measured 6,670 / 2,988 in the e2e build, the gzip plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 6_670, maxGzip: 2_992 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -1129,6 +1134,7 @@ const budgets = [
   // 152,864 / 51,822 -> 153,069 / 51,893 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the Japanese of the 판 읽기 card (勝負の読み) and its note. Measured 153,069 / 51,889; the raw is the measurement, the gzip plus 4.
   // 152,864 / 51,822 -> 153,405 / 52,077 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the Japanese of C-7's tools, 「ひと息つく」, the board marks and the peak case's briefing. Measured 153,405 / 52,073. Measured in the e2e build, the gzip plus 4.
   // 152,864 / 51,822 -> 153,489 / 51,974 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the Japanese of 사건 01 to 03's lines, the directions (人・立場の側・中立) and the streak's sentences. Measured 153,489 / 51,970, the gzip plus 4 in the e2e build.
+  // 152,864 / 51,822 -> 153,252 / 51,972 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the Japanese of the hall of fame's badge, footnote and data-notice sentence. Measured 153,252 / 51,968 in the e2e build, the gzip plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_489, maxGzip: 52_077 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -1210,9 +1216,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * the plus 4; Korean (422,764) stays under.
  * c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b (10-29): 422,808,
  * 472,351 and 478,130, the plus 4.
+ * D2 hall of fame (#308) merged with #224 602ec69b (10-29): fetchHallOfFame, the notice's
+ * sentence, the badge's CSS and the dictionaries' lines put them at 422,945, 472,519 and
+ * 478,266, the e2e build plus 4.
  */
 // ko 422,779 -> 422,891, en 472,179 -> 472,502, ja 477,926 -> 478,315 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the index CSS's board marks and the five icons in icons-vendor (both on the first paint), and each dictionary's new lines. Measured 422,887 / 472,498 / 478,311. Measured in the e2e build, the gzip plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 422_891, en: 472_502, ja: 478_315 };
+const FIRST_PAINT_BUDGETS = { ko: 422_945, en: 472_519, ja: 478_315 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
