@@ -3,6 +3,8 @@ import { useState } from "react";
 import { CLOUD_SAVE_RETENTION_DAYS } from "../appConfig.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { loadedChunk, quietImport } from "../state/chunkReload.js";
+import { fill } from "../locale.js";
+import cloudSaveCopy from "../copy/cloudSave.js";
 
 /**
  * 기기 간 이어하기, folded under the intro's primary action.
@@ -45,29 +47,24 @@ export function CloudSavePanel() {
         if (event.currentTarget.open) loadBody();
       }}
     >
-      <summary>다른 기기에서 이어하기</summary>
-      <p>
-        진행은 이 기기에만 저장됩니다. 온라인 저장을 켜면 그때부터 진행 기록(사건, 판단 로그, 자원)이
-        이어하기 코드 아래 온라인에도 올라가고, 다른 기기에서 그 코드를 입력하면 멈춘 자리에서 이어집니다.
-        이름과 피드백 내용은 올리지 않습니다. 올린 기록은 마지막으로 올린 날부터 {CLOUD_SAVE_RETENTION_DAYS}일 동안
-        보관한 뒤 지우며, 그 전에도 여기서 지울 수 있습니다.
-      </p>
+      <summary>{cloudSaveCopy.summary}</summary>
+      <p>{fill(cloudSaveCopy.text, { days: CLOUD_SAVE_RETENTION_DAYS })}</p>
       {!telemetryEnabled ? (
         <p className="cloud-save-status" role="status">
-          이 배포에는 온라인 저장 서버가 없어 이 기기에만 저장합니다.
+          {cloudSaveCopy.noServer}
         </p>
       ) : Body ? (
         <Body />
       ) : failed ? (
         <p className="cloud-save-message" role="alert">
-          온라인 저장 화면을 불러오지 못했습니다.{" "}
+          {cloudSaveCopy.loadFailed}
           <button type="button" className="ghost" onClick={loadBody}>
-            다시 불러오기
+            {cloudSaveCopy.retry}
           </button>
         </p>
       ) : (
         <p className="cloud-save-status" role="status">
-          온라인 저장 화면을 불러오는 중입니다.
+          {cloudSaveCopy.loading}
         </p>
       )}
     </details>

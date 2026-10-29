@@ -85,8 +85,10 @@ test("자세히 is a button that says whether it is open, on the short sheet onl
   const reveal = source("components/DecisionReveal.jsx");
   assert.match(
     reveal,
-    /\{decisionReveal\.short && \(\s+<button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded=\{detailsOpen\} onClick=\{toggleDetails\}>\s+자세히\s+<\/button>\s+\)\}/,
+    /\{decisionReveal\.short && \(\s+<button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded=\{detailsOpen\} onClick=\{toggleDetails\}>\s+\{revealCopy\.details\}\s+<\/button>\s+\)\}/,
   );
+  // Its word is the reveal's copy (src/copy/reveal.js), read by key.
+  assert.match(source("copy/reveal.js"), /details: "자세히"/);
   // Under the verdict and above everything it opens: what grows, grows below the button.
   assert.ok(reveal.indexOf('data-testid="reveal-details"') > reveal.indexOf("<p>{subline}</p>"));
   assert.ok(reveal.indexOf('data-testid="reveal-details"') < reveal.indexOf('data-testid="consequence-ledger"'));

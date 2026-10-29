@@ -4,9 +4,14 @@
  */
 import { easyResourceLabels } from "../playerLanguage.js";
 import { getSeasonStanding } from "../seasonStanding.js";
+import { fill } from "../locale.js";
+import reportLinesCopy from "../copy/reportLines.js";
 
-// A shape and a word for each level, so the level is read without its colour.
-const STANDING_MARKS = { clear: ["○", "붕괴선 아래"], near: ["▲", "붕괴선 가까움"], over: ["■", "붕괴선 넘음"] };
+const { standing: STANDING, score: SCORE, badges: BADGE, pace: PACE } = reportLinesCopy;
+
+// A shape and a word for each level, so the level is read without its colour
+// (the word is STANDING's, by the level).
+const STANDING_MARKS = { clear: "○", near: "▲", over: "■" };
 
 /**
  * The line every case's report prints about SYSTEM COLLAPSE, and on a collapse
@@ -36,14 +41,14 @@ export function createSeasonStandingReadout({ caseResults, resources, cases = []
   return {
     level,
     route,
-    mark: STANDING_MARKS[level][0],
-    label: STANDING_MARKS[level][1],
+    mark: STANDING_MARKS[level],
+    label: STANDING[level],
     text: route === "harm"
-      ? `시즌 평균 ${harmLabel} ${perCase} / ${harm.gate} · 터진 판 ${bustPercent}%`
-      : `시즌 평균 ${harmLabel} ${perCase} / ${overreach.harmGate} · 터진 판 ${bustPercent}% / ${Math.round(overreach.bustGate * 100)}%`,
+      ? fill(STANDING.harm, { harmLabel, perCase, gate: harm.gate, bustPercent })
+      : fill(STANDING.overreach, { harmLabel, perCase, gate: overreach.harmGate, bustPercent, bustGate: Math.round(overreach.bustGate * 100) }),
     harmCases: harmCases
       .filter((entry) => labels.has(entry.caseId))
-      .map((entry) => ({ ...entry, text: `${labels.get(entry.caseId)} 다시 도전 · ${harmLabel} ${entry.harm}` })),
+      .map((entry) => ({ ...entry, text: fill(STANDING.harmCase, { caseLabel: labels.get(entry.caseId), harmLabel, harm: entry.harm }) })),
   };
 }
 
@@ -77,70 +82,70 @@ export function createEndingProfile({ finalEndingEntry }) {
 export function createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }) {
   return [
   {
-    label: "기준 유지",
+    label: SCORE.consistency.label,
     value: consistencyScore,
-    text: `${consistencyScore}점`,
-    note: "열기가 올라간 장면에서도 같은 방향을 지켰는지 봅니다. 버스트 점수에서 가장 큰 몫입니다.",
+    text: fill(SCORE.points, { score: consistencyScore }),
+    note: SCORE.consistency.note,
   },
   {
-    label: "생각 리듬",
+    label: SCORE.rhythm.label,
     value: rhythmScore,
-    text: `${rhythmScore}점`,
-    note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다. 점수 비중은 가장 작습니다.",
+    text: fill(SCORE.points, { score: rhythmScore }),
+    note: SCORE.rhythm.note,
   },
   {
-    label: "관점 전환",
+    label: SCORE.cognition.label,
     value: cognitionScore,
-    text: `${cognitionScore}점`,
-    note: "같은 방식만 반복하지 않고 추론, 위험, 재구성, 버티기 사이를 오간 흔적입니다.",
+    text: fill(SCORE.points, { score: cognitionScore }),
+    note: SCORE.cognition.note,
   },
   {
-    label: "압박 대응",
+    label: SCORE.pressureAdapt.label,
     value: pressureAdaptScore,
-    text: `${pressureAdaptScore}점`,
-    note: "위험을 무조건 피한 점수가 아니라, 상승한 압박을 다시 회수한 능력입니다.",
+    text: fill(SCORE.points, { score: pressureAdaptScore }),
+    note: SCORE.pressureAdapt.note,
   },
   {
-    label: "구조 재설계",
+    label: SCORE.reflection.label,
     value: reflectionScore,
-    text: `${reflectionScore}점`,
-    note: "판을 다시 짜 숨은 경로를 열고, 장면 챌린지를 맞히고, 숨은 기록을 찾아낸 정도입니다.",
+    text: fill(SCORE.points, { score: reflectionScore }),
+    note: SCORE.reflection.note,
   },
   {
-    label: "즉답 패널티",
+    label: SCORE.exploit.label,
     value: exploitPenalty,
-    text: exploitPenalty > 0 ? `-${exploitPenalty}점` : "없음",
-    note: "표시된 정보만 따라 빠르게 누르는 플레이가 반복될 때만 감점됩니다.",
+    text: exploitPenalty > 0 ? fill(SCORE.penalty, { score: exploitPenalty }) : SCORE.none,
+    note: SCORE.exploit.note,
   },
   ];
 }
 
 export function createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier }) {
   return [
-  { title: `Burst ${momentumTier}`, text: `생각 버스트 ${momentumScore}점을 기록했습니다.` },
+  { title: `Burst ${momentumTier}`, text: fill(BADGE.burst, { score: momentumScore }) },
   result.reframeCount > 0
-    ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
-    : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },
+    ? { title: "Board Breaker", text: BADGE.boardBreaker }
+    : { title: "Route Follower", text: BADGE.routeFollower },
   result.averageResponseTime >= 20
-    ? { title: "Slow Thinker", text: "한 장면 이상에서 판단을 오래 붙잡았습니다." }
-    : { title: "Fast Closer", text: "빠르게 결론을 닫는 플레이를 보였습니다." },
+    ? { title: "Slow Thinker", text: BADGE.slowThinker }
+    : { title: "Fast Closer", text: BADGE.fastCloser },
   reducedRiskCount > 0
-    ? { title: "Risk Cutter", text: `${reducedRiskCount}번 위험 압력을 낮췄습니다.` }
-    : { title: "Heat Taker", text: "위험을 낮추기보다 다른 목표를 우선했습니다." },
+    ? { title: "Risk Cutter", text: fill(BADGE.riskCutter, { count: reducedRiskCount }) }
+    : { title: "Heat Taker", text: BADGE.heatTaker },
   challengeClearCount > 0
-    ? { title: "Challenge Clear", text: `${challengeClearCount}개 장면 도전을 달성했습니다.` }
-    : { title: "Open Quest", text: "장면 도전은 남았고, 선택 로그만 기록됐습니다." },
+    ? { title: "Challenge Clear", text: fill(BADGE.challengeClear, { count: challengeClearCount }) }
+    : { title: "Open Quest", text: BADGE.openQuest },
   currentChallengeStreak >= 5
-    ? { title: "Perfect Run", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 최고 보상을 열었습니다.` }
+    ? { title: "Perfect Run", text: fill(BADGE.perfectRun, { count: currentChallengeStreak }) }
     : currentChallengeStreak >= 3
-    ? { title: "Streak Breakthrough", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 추가 보상을 열었습니다.` }
-    : { title: "Chain Starter", text: "장면 목표를 연속으로 맞히면 추가 보상이 열립니다." },
+    ? { title: "Streak Breakthrough", text: fill(BADGE.streak, { count: currentChallengeStreak }) }
+    : { title: "Chain Starter", text: BADGE.chainStarter },
   flowSurgeCount > 0
-    ? { title: "Flow Surge", text: `${flowSurgeCount}번 보너스 자원 회복을 만들었습니다.` }
-    : { title: "No Surge", text: "챌린지와 위험 제어가 아직 보너스로 이어지지 않았습니다." },
+    ? { title: "Flow Surge", text: fill(BADGE.flowSurge, { count: flowSurgeCount }) }
+    : { title: "No Surge", text: BADGE.noSurge },
   riskTier === "CRITICAL"
-    ? { title: "Crisis Runner", text: "높은 압력 상태로 사건을 통과했습니다." }
-    : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
+    ? { title: "Crisis Runner", text: BADGE.crisisRunner }
+    : { title: "Pressure Keeper", text: BADGE.pressureKeeper },
   ];
 }
 
@@ -180,8 +185,6 @@ export function getDecisionPace(entries = [], { size = DECISION_PACE_SIZE, min =
 export function describeDecisionPace(pace) {
   if (!pace) return "";
   const { count, first, last } = pace;
-  if (first === last) return `앞의 ${count}번도 뒤의 ${count}번도 평균 ${last}초 만에 골랐습니다.`;
-  return last < first
-    ? `뒤의 ${count}번은 평균 ${last}초 만에 골랐습니다. 앞의 ${count}번은 ${first}초였습니다.`
-    : `뒤의 ${count}번은 평균 ${last}초를 들여 골랐습니다. 앞의 ${count}번은 ${first}초였습니다.`;
+  if (first === last) return fill(PACE.same, { count, last });
+  return fill(last < first ? PACE.faster : PACE.slower, { count, first, last });
 }

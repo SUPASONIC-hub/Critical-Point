@@ -51,19 +51,18 @@ import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 import { noteBriefing } from "../state/readingTally.js";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
 
-/** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
-const BOARD_MARK_LABELS = { peak: "고점 판", breather: "숨 고른 판" };
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
 const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
-// Drafts (개선 포인트 A3). A cold table leaves the tab as index.html has it.
-const TAB_TITLES = {
-  hot: () => "▲ 밀면 벽 사정권",
-  critical: (gauge) => `▲ 열기 ${gauge} · 벽 구간 안`,
-  bust: "[BUST] 판이 벽에 닿았다",
-};
+// The table's words (src/copy/table.js). Tab drafts (개선 포인트 A3): a cold table leaves the tab as index.html has it.
+const { stage: say, keys: keyWords, tab: tabWords } = tableCopy;
+/** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
+const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather };
+const TAB_TITLES = { hot: () => tabWords.hot, critical: (gauge) => fill(tabWords.critical, { gauge }) };
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -438,7 +437,7 @@ export function GauntletStage({
   const holdsCash = isClosingScene(scene.node);
   const cashHold = useHoldConfirm({ enabled: holdsCash && canCash, resetKey: selectedCard?.id, onConfirm: cash });
   // Short enough for the dock's 108px on a 360px phone; the full sentence is the button's description.
-  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : !selectedCard ? "카드를 고른다" : !holdsCash ? "확정" : cashHold.phase === "armed" ? "한 번 더" : "꾹 눌러 확정";
+  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : !holdsCash ? say.commit : cashHold.phase === "armed" ? say.oneMore : say.holdToCommit;
 
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
@@ -456,7 +455,7 @@ export function GauntletStage({
   // The tab says what the table shows (tabTitle.js): never the hidden wall. A
   // bust stays on it until the next table opens; the briefing leaves it be.
   const busted = win.status === "bust" && win.cause !== "abandon";
-  const tabTitle = busted ? TAB_TITLES.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
+  const tabTitle = busted ? tabWords.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
   useTabTitle("table", tabTitle, { rank: 1, keep: busted });
 
   return (
@@ -466,7 +465,7 @@ export function GauntletStage({
       data-testid="gauntlet-stage"
       data-gauge={Math.round(win.gauge)}
       data-status={win.status}
-      aria-label="임계점 테이블" style={{ "--gx-question": scene.question.length }}
+      aria-label={say.label} style={{ "--gx-question": scene.question.length }}
     >
       <GauntletFx
         window={win}
@@ -486,7 +485,7 @@ export function GauntletStage({
           <div className="gx-pot" aria-live="off">
             {/* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) name the board in the label's place: no line more on a phone. */}
             <span className={`gx-label${boardMark ? ` gx-mark-${boardMark}` : ""}`} data-testid="gauntlet-board-mark" data-mark={boardMark ?? undefined}>
-              {BOARD_MARK_LABELS[boardMark] ?? "이번 판"}
+              {BOARD_MARK_LABELS[boardMark] ?? say.pot}
             </span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
               {win.status === "bust" ? 0 : formatNumber(livePot)}
@@ -498,7 +497,7 @@ export function GauntletStage({
               {earnedBonus > 1 && (
                 <>
                   <i>×</i>
-                  <b className="gx-logic-pill" data-testid="gauntlet-logic-bonus">콤보 {earnedBonus.toFixed(2)}</b>
+                  <b className="gx-logic-pill" data-testid="gauntlet-logic-bonus">{say.combo} {earnedBonus.toFixed(2)}</b>
                 </>
               )}
             </span>
@@ -506,18 +505,18 @@ export function GauntletStage({
           <div className="gx-bank">
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
-              <small>판돈</small>
+              <small>{say.runPot}</small>
               <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatNumber(bustKeeps) : formatNumber(run.runPot)}</b>
             </span>
             <span className="gx-stat">
               <Vault size={13} aria-hidden="true" />
-              <small>금고</small>
+              <small>{say.vault}</small>
               <b>{formatNumber(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              {chainOn && <><small>연속</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>감사</small> <b>{audit.count}/{audit.limit}</b></span></>}
-              {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>연결</small> <b>{links.live}</b></span></>}
+              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} />
@@ -536,7 +535,7 @@ export function GauntletStage({
             <span className={`gx-focus-signal focus-${focusBonus.tier}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b lang="en">{focusBonus.label} {Math.round(win.focus)}</b>
-              <small>{lockCapped ? "상한" : "배율"} {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
+              <small>{lockCapped ? say.lockCap : say.lockMultiplier} {formatMultiplier(lockPot)} · {say.lockResource} {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
             )}
@@ -546,7 +545,7 @@ export function GauntletStage({
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
-            aria-label={`남은 시간 ${Math.ceil(remaining)}초`}
+            aria-label={fill(say.clock, { seconds: Math.ceil(remaining) })}
             style={{ "--gx-clock": Math.max(0, Math.min(1, remaining / schema.seconds)) }}
           >
             <b>{Math.ceil(remaining)}</b>
@@ -554,9 +553,9 @@ export function GauntletStage({
         </div>
 
         {(tableRules.length > 0 || ruleHeat > 0) && (
-          <section className="gx-active-rules" data-testid="active-mutations" aria-label="현재 적용 중인 변형 규칙">
+          <section className="gx-active-rules" data-testid="active-mutations" aria-label={say.rulesLabel}>
             <div>
-              <span>적용 중인 규칙</span>
+              <span>{say.rulesHead}</span>
               <b>{joinRules(tableRules)}</b>
               <small>{currentRules}</small>
             </div>
@@ -578,11 +577,11 @@ export function GauntletStage({
           <div
             className="gx-gauge-track"
             role="meter"
-            aria-label="열기 게이지"
+            aria-label={say.gaugeLabel}
             aria-valuemin={0}
             aria-valuemax={GAUGE_MAX}
             aria-valuenow={Math.round(win.gauge)}
-            aria-valuetext={`열기 ${Math.round(win.gauge)}, ${band.scouted ? "조회한 " : ""}벽은 ${band.wallMin}에서 ${band.wallMax} 사이 어딘가`}
+            aria-valuetext={fill(say.gaugeText, { gauge: Math.round(win.gauge), scouted: band.scouted ? say.gaugeScouted : "", min: band.wallMin, max: band.wallMax })}
           >
             <span className="gx-gauge-band" style={{ left: `${bandLeft}%`, width: `${bandWidth}%` }} />
             {live && (
@@ -607,23 +606,23 @@ export function GauntletStage({
           <div className="gx-gauge-read">
             {/* The meter says the first two. The pulse is named text and no live region: read when asked for. */}
             <span aria-hidden="true">
-              열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
+              {say.heat} <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
             <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
-              aria-label={`안전선 ×${safe.pushes}, 안전선까지 밀기 ${safe.pushes}번, 열기 ${Math.round(safe.gauge)}까지`}>안전선 ×{safe.pushes}</button>}
+              aria-label={fill(say.safeLabel, { count: safe.pushes, gauge: Math.round(safe.gauge) })}>{fill(say.safe, { count: safe.pushes })}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}
             {live && clockHeat && (
               <span data-testid="gauntlet-clock-heat">
                 <span className="sr-only">{clockHeat.spoken}</span>
-                <span aria-hidden="true">시계 열기 <b>{clockHeat.text}</b></span>
+                <span aria-hidden="true">{say.clockHeat} <b>{clockHeat.text}</b></span>
               </span>
             )}
             <span className="gx-bpm" data-testid="gauntlet-bpm">
               <HeartPulse size={14} aria-hidden="true" />
-              심박 <b>{schema.sedated ? "교란" : bpm}</b>
+              {say.bpm} <b>{schema.sedated ? say.sedated : bpm}</b>
             </span>
           </div>
         </div>
@@ -647,46 +646,46 @@ export function GauntletStage({
               </p>
             )}
             <p className="gx-speaker">
-              <b>{scene.node.speaker}</b> · {scene.speakerRole}
+              <b>{scene.node.speakerName ?? scene.node.speaker}</b> · {scene.speakerRole}
             </p>
             <p className="gx-question">{scene.question}</p>
             {/* The briefing page told this story before the clock started; this
                 folded copy is for looking something up while it runs. */}
             <details className="gx-brief" onToggle={(event) => setBriefOpen(event.currentTarget.open)}>
-              <summary>사건 파일</summary>
+              <summary>{say.caseFile}</summary>
               {/* The six numbers and the clue count a locked card states its condition in; the HUD prints none of them. */}
               {/* The standing, the room, the story and its facts: CaseFileStory
                   in SceneBriefing.jsx, which says why each is here. */}
               <CaseFileStory node={scene.node} nodeId={scene.nodeId} open={briefOpen} standing={[resources, resourceMeta, clueCount]} caseCast={scene.caseCast} />
               <ul>
-                {scene.challenge && <li data-testid="brief-challenge">이 장면의 챌린지: {scene.challenge}.</li>}
-                <li>현재 판돈: {formatNumber(run.runPot)}. 벽에 닿으면 금고 밖 판돈은 사라진다.</li>
-                <li>이번 판 규칙: {currentRules}.</li>
-                <li>다음 밀기 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
+                {scene.challenge && <li data-testid="brief-challenge">{fill(say.briefChallenge, { challenge: scene.challenge })}</li>}
+                <li>{fill(say.briefPot, { pot: formatNumber(run.runPot) })}</li>
+                <li>{fill(say.briefRules, { rules: currentRules })}</li>
+                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</li>
                 {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
               </ul>
             </details>
           </div>
         </header>
 
-        <section className="gx-situation" aria-label="현재 상황판">
+        <section className="gx-situation" aria-label={say.situationLabel}>
           <article className="gx-situation-card gx-situation-risk">
-            <span>현재 위험</span>
+            <span>{say.risk}</span>
             <b>{dangerLine}</b>
             <small>
-              벽 {band.wallMin}–{band.wallMax} · 심박 <span className="gx-situation-bpm">{schema.sedated ? "교란" : bpm}</span>
+              {fill(say.wallRange, { min: band.wallMin, max: band.wallMax })} · {say.bpm} <span className="gx-situation-bpm">{schema.sedated ? say.sedated : bpm}</span>
             </small>
           </article>
           <article className="gx-situation-card">
-            <span>확정하면</span>
-            <b>{selectedCard ? `+${formatNumber(livePot)}` : "카드를 먼저"}</b>
-            <small>다음: {joinRules(cashMutations)}</small>
+            <span>{say.ifCommit}</span>
+            <b>{selectedCard ? `+${formatNumber(livePot)}` : say.pickFirst}</b>
+            <small>{fill(say.nextRules, { rules: joinRules(cashMutations) })}</small>
           </article>
           <article className="gx-situation-card">
-            <span>밀어붙이면</span>
-            <b>{selectedCard ? `${formatNumber(nextPotLow)}–${formatNumber(nextPotHigh)}` : "배율만 상승"}</b>
+            <span>{say.ifPush}</span>
+            <b>{selectedCard ? `${formatNumber(nextPotLow)}–${formatNumber(nextPotHigh)}` : say.multiplierOnly}</b>
             <small>
-              실패 {formatNumber(run.runPot)}→{formatNumber(bustKeeps)} · {joinRules(bustMutations)}
+              {say.fail} {formatNumber(run.runPot)}→{formatNumber(bustKeeps)} · {joinRules(bustMutations)}
             </small>
           </article>
         </section>
@@ -695,13 +694,14 @@ export function GauntletStage({
 
         <div className="gx-hand-head" aria-hidden="true">
           <span lang="en">HAND</span>
-          <b>카드 {handSize}장</b>
+          <b>{fill(say.handCount, { count: handSize })}</b>
           {/* A key's piece ends on its separator, so the whole line is cut into the text it always was. A touch screen wide enough to show the line has no key to name, and gets none. */}
           <small>
             {letterKeys ? (
-              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> LOCK · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}{scoutOn && <><kbd>R</kbd> 조회 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
+              <><kbd>1</kbd>–<kbd>{handSize}</kbd> {keyWords.stake} · <kbd>Space</kbd>/<kbd>W</kbd> {keyWords.push} · {lockOn && <><kbd>E</kbd> LOCK · </>}
+                {stanceOn && <><kbd>Q</kbd> {keyWords.stance} · </>}{scoutOn && <><kbd>R</kbd> {keyWords.scout} · </>}<kbd>Enter</kbd> {keyWords.commit} · <kbd>P</kbd> {keyWords.save}</>
             ) : drawn && (
-              <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
+              <><kbd>Space</kbd> {keyWords.push} · <kbd>Enter</kbd> {keyWords.commit}</>
             )}
           </small>
         </div>
@@ -740,15 +740,13 @@ export function GauntletStage({
           // every push. The numbers are its description. The name starts with
           // what the button shows, the step range too, so a voice command that
           // reads the button out finds it (WCAG 2.5.3); the range holds for the scene.
-          aria-label={`밀어붙인다 +${schema.stepMin}~${schema.stepMax}`}
+          aria-label={`${say.push} +${schema.stepMin}~${schema.stepMax}`}
           aria-describedby={logic ? "gx-push-detail gx-logic-detail" : "gx-push-detail"}
         >
           <Flame size={18} aria-hidden="true" />
-          <span>밀어붙인다</span>
+          <span>{say.push}</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
-          <span id="gx-push-detail" className="sr-only">
-            열기 {Math.round(win.gauge)}, 다음 열기 {Math.round(nextLow)}에서 {Math.round(nextHigh)}
-          </span>
+          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</span>
           {/* What the streak stands at, for the two buttons that act on it. */}
           {logic && <span id="gx-logic-detail" className="sr-only">{logic.spoken}</span>}
         </button>
@@ -762,10 +760,10 @@ export function GauntletStage({
           aria-keyshortcuts={keys("E")}
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
-          aria-label={`LOCK ${lockCapped ? "상한 도달" : Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
+          aria-label={`LOCK ${lockCapped ? say.lockCapped : Math.round(win.focus)} · ${fill(say.lockPrice, { seconds: LOCK_PRESS_SECONDS })}`}
           aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
-          {steadyCold && <span id="gx-steady-cold" className="sr-only">열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라</span>}
+          {steadyCold && <span id="gx-steady-cold" className="sr-only">{say.steadyCold}</span>}
           <Crosshair size={18} aria-hidden="true" />
           {/* The space keeps LOCK and the charge two words to whoever reads the
               text; in the flex row a space between items is not drawn. */}
@@ -775,10 +773,10 @@ export function GauntletStage({
               prints it with the same charge, and with it the line was 94 to
               112px in a button with 82px of room at 390px (74px at 360px). */}
           {/* At the cap the press still charges the resources, the stance and STEADY's cooling, so it still costs the clock (C-6): the price stays in the name. */}
-          <small>{lockCapped ? "상한 도달" : <>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</>}</small>
+          <small>{lockCapped ? say.lockCapped : <>{Math.round(win.focus)} · {fill(say.lockPrice, { seconds: LOCK_PRESS_SECONDS })}</>}</small>
           <span id="gx-focus-detail" className="sr-only">
-            지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${LOCK_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 LOCK으로 ${LOCK_CAP}배까지만 오른다`}
-            {stanceOn && `. ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치른다`}
+            {fill(say.lockDetail, { charge: Math.round(win.focus), seconds: LOCK_PRESS_SECONDS })} {fill(lockCapped ? say.lockAtCap : say.lockUnderCap, { cap: LOCK_CAP })}
+            {stanceOn && fill(say.lockStance, { charge: STANCE_CHARGE })}
           </span>
         </button>
         )}
@@ -797,7 +795,7 @@ export function GauntletStage({
         </button>
         {/* Outside the button, so neither is read into its name. The second is
             what a press that did not hold says: one more confirms. */}
-        {holdsCash && <span id="gx-cash-hold" className="sr-only">길게 눌러 확정. 길게 누르기 어려우면 3초 안에 한 번 더 누른다</span>}
+        {holdsCash && <span id="gx-cash-hold" className="sr-only">{say.holdHelp}</span>}
         {audit && <span id="gx-audit-detail" className="sr-only">{audit.spoken}</span>}
       </div>
 

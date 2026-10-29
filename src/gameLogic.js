@@ -4,6 +4,8 @@ import { ENDING_GATES } from "./gameConstants.js";
 import * as seasonStanding from "./seasonStanding.js";
 import * as scoring from "./seasonScore.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
+import observerCopy from "./copy/observer.js";
+import { fill } from "./locale.js";
 import {
   applyEffect,
   clamp,
@@ -248,53 +250,41 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   };
 }
 
+// What the observer files as 「은폐」, for the tag and the ledger alike.
+// 미루다 as it is actually conjugated on the cards: 미루고, 미룬다, 미룰, 미뤄,
+// 미뤘다 (until 2026-10-28 the ledger read 미루 alone and missed 미룬·미뤄).
+const OPACITY_WORDS = /침묵|미[루룬룰뤄뤘]|비공개|봉인|silence|delay|private/;
+
+// The card's words the observer reads, in Korean whatever the page's
+// language: a page in another language keeps the Korean label beside its own
+// (`sourceChoice`, useChoiceCommit.js), so the same card is read the same way
+// in every language. An older save without it is read in its own words.
+function choiceWords(entry) {
+  return `${entry.choiceId ?? ""} ${entry.sourceChoice ?? entry.choice ?? ""}`.toLowerCase();
+}
+
 export function getObserverTag(entry = {}) {
   const riskDelta = entry.resourcesBefore && entry.resourcesAfter
     ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
     : entry.challenge?.riskDelta ?? 0;
-  const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+  const choiceText = choiceWords(entry);
   const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
   if (entry.reframe) {
-    return {
-      id: "defiance",
-      label: "거부 표본",
-      text: "준비된 선택지 밖으로 나간 순간입니다. 다음 참가자의 사건에는 이 우회로가 새 조건으로 남습니다.",
-    };
+    return { id: "defiance", ...observerCopy.tags.reframe };
   }
-  // 미루다 as it is actually conjugated on the cards: 미루고, 미룬다, 미룰, 미뤄, 미뤘다.
-  if (/침묵|미[루룬룰뤄뤘]|비공개|봉인|silence|delay|private/.test(choiceText)) {
-    return {
-      id: "opacity",
-      label: "은폐 표본",
-      text: "공개를 늦춘 판단입니다. 트리거랩은 이 침묵이 누구를 보호하고 누구를 지우는지 따로 보관합니다.",
-    };
+  if (OPACITY_WORDS.test(choiceText)) {
+    return { id: "opacity", ...observerCopy.tags.opacity };
   }
   if (humanCostDelta > 0) {
-    return {
-      id: "sacrifice",
-      label: "희생 표본",
-      text: "사람에게 비용을 넘긴 판단입니다. 사건은 지나가도 이 손실은 다음 장면의 말투로 되돌아옵니다.",
-    };
+    return { id: "sacrifice", ...observerCopy.tags.sacrifice };
   }
   if (Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) {
-    return {
-      id: "compliance",
-      label: "순응 표본",
-      text: "빠르게 닫힌 안정 선택입니다. 정답처럼 보인 길이 관찰자에게는 가장 읽기 쉬운 패턴이 됩니다.",
-    };
+    return { id: "compliance", ...observerCopy.tags.compliance };
   }
   if (riskDelta > 6) {
-    return {
-      id: "defiance",
-      label: "고압 표본",
-      text: "압박 상승을 감수한 판단입니다. 이 선택은 해결책보다 허용선에 가까운 기록으로 분류됩니다.",
-    };
+    return { id: "defiance", ...observerCopy.tags.pressure };
   }
-  return {
-    id: "pattern",
-    label: "패턴 표본",
-    text: "크게 튀지 않은 선택입니다. 그래서 더 오래 남습니다. 관찰자는 반복되는 기준을 먼저 찾습니다.",
-  };
+  return { id: "pattern", ...observerCopy.tags.pattern };
 }
 
 export function getObserverPattern(entries = []) {
@@ -318,50 +308,20 @@ export function getObserverPattern(entries = []) {
     if (index < 2 || entry.observerTag?.id === taggedEntries[index - 1]?.observerTag?.id) return false;
     return taggedEntries.slice(0, index).filter((previous) => previous.observerTag?.id === dominant).length >= 2;
   }) ?? null;
-  const labels = {
-    compliance: "순응 표본",
-    defiance: "거부 표본",
-    opacity: "은폐 표본",
-    sacrifice: "희생 표본",
-    pattern: "패턴 표본",
-  };
-  const arcCopy = {
-    compliance: {
-      label: "관찰자 학습",
-      title: "안정적인 선택이 다음 사건의 기본값으로 굳고 있습니다.",
-      text: "정답처럼 닫힌 길이 많을수록, 다음 장면은 더 빠른 결정을 유도하는 구조로 바뀝니다.",
-    },
-    defiance: {
-      label: "관찰자 학습",
-      title: "시스템이 예외 경로를 새 규칙 후보로 붙잡고 있습니다.",
-      text: "준비된 선택지를 벗어난 흔적이 다음 참가자에게는 처음부터 열린 틈으로 나타납니다.",
-    },
-    opacity: {
-      label: "관찰자 학습",
-      title: "말하지 않은 판단이 사건의 어두운 조건으로 축적됩니다.",
-      text: "공개하지 않은 선택은 사라지지 않고, 다음 장면에서 누가 배제됐는지 묻는 질문으로 돌아옵니다.",
-    },
-    sacrifice: {
-      label: "관찰자 학습",
-      title: "누군가에게 넘긴 비용이 다음 사건의 첫 압박이 됩니다.",
-      text: "해결은 되었지만 손실의 방향이 남았습니다. 다음 참가자는 그 손실을 이미 떠안고 시작합니다.",
-    },
-    pattern: {
-      label: "관찰자 학습",
-      title: "반복된 기준이 아직 결말보다 선명하게 남아 있습니다.",
-      text: "크게 튀지 않은 판단들이 모여, 다음 사건의 보이지 않는 기본 규칙을 만듭니다.",
-    },
-  };
+  const labels = observerCopy.labels;
+  const arcCopy = observerCopy.arc;
+  const { escalation, turningPoint: turnWords } = observerCopy;
   const escalationText = repeatedTail
-    ? "같은 표본이 연속으로 닫혀 관찰자가 당신의 기준을 확신하기 시작했습니다."
+    ? escalation.repeated
     : latest
-      ? `${latest.label}${subjectParticle(latest.label)} 최근 기록으로 남아 다음 질문의 말투를 바꿉니다.`
-      : "아직 관찰자는 확정된 기준을 만들지 못했습니다.";
+      ? fill(escalation.latest, { label: latest.label, particle: subjectParticle(latest.label) })
+      : escalation.none;
+  const turnLabel = turningPoint?.observerTag.label;
   const turningPointRecord = turningPoint
     ? {
-        label: "전환점 기록",
-        title: `${turningPoint.observerTag.label}${subjectParticle(turningPoint.observerTag.label)} 익숙한 패턴을 끊었습니다.`,
-        text: `“${turningPoint.spokenChoice || turningPoint.choice}” 이후 관찰자는 같은 사람을 같은 방식으로 분류할 수 없게 됐습니다.`,
+        label: turnWords.label,
+        title: fill(turnWords.title, { label: turnLabel, particle: subjectParticle(turnLabel) }),
+        text: fill(turnWords.text, { choice: turningPoint.spokenChoice || turningPoint.choice }),
       }
     : null;
 
@@ -374,9 +334,7 @@ export function getObserverPattern(entries = []) {
     arc: arcCopy[dominant] ?? arcCopy.pattern,
     endingRecord: {
       label: labels[dominant] ?? labels.pattern,
-      title: repeatedTail
-        ? "다음 참가자의 첫 장면은 당신이 반복한 기준에서 시작됩니다."
-        : "다음 참가자의 첫 장면은 당신이 가장 많이 남긴 표본에서 시작됩니다.",
+      title: repeatedTail ? observerCopy.endingRecord.repeated : observerCopy.endingRecord.most,
       text: `${arcCopy[dominant]?.text ?? arcCopy.pattern.text} ${escalationText}${turningPointRecord ? ` ${turningPointRecord.title}` : ""}`,
     },
   };
@@ -389,11 +347,11 @@ export function getObservationLedger(entries = []) {
       const riskDelta = entry.resourcesBefore && entry.resourcesAfter
         ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
         : entry.challenge?.riskDelta ?? 0;
-      const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+      const choiceText = choiceWords(entry);
       const next = { ...ledger };
       if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
       if (entry.reframe || riskDelta > 6) next.defiance += 1;
-      if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) next.opacity += 1;
+      if (OPACITY_WORDS.test(choiceText)) next.opacity += 1;
       const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
       if (humanCostDelta > 0) next.sacrifice += 1;
       return next;
@@ -621,15 +579,18 @@ function getFinaleOutcome(log = []) {
   return entry ? entry.choiceId.slice("f_after_".length) : null;
 }
 
+// The endings' words are src/copy/observer.js's (another language is laid over
+// them there), read as the runtime loads, after the page's language is in.
+const E = observerCopy.endings;
 const ENDINGS = {
-  collapse: { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 사람이 치른 값을 감당하지 못했다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true },
-  "open-oversight": { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "이번 시즌의 기록이 다음 분석관이 따를 기준으로 남았습니다.", failure: false },
-  "evidence-reform": { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false },
-  "human-record": { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false },
-  "profitable-silence": { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 믿음이 함께 기록되었습니다.", failure: false },
-  "cold-justice": { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "공정함은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false },
-  "field-pact": { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false },
-  "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "무너진 것도, 드러난 것도 없이 시즌이 닫혔습니다.", failure: false },
+  collapse: { id: "collapse", label: "SYSTEM COLLAPSE", title: E.collapse.title, text: E.collapse.text, failure: true },
+  "open-oversight": { id: "open-oversight", label: "OPEN OVERSIGHT", title: E["open-oversight"].title, text: E["open-oversight"].text, failure: false },
+  "evidence-reform": { id: "evidence-reform", label: "EVIDENCE REFORM", title: E["evidence-reform"].title, text: E["evidence-reform"].text, failure: false },
+  "human-record": { id: "human-record", label: "HUMAN RECORD", title: E["human-record"].title, text: E["human-record"].text, failure: false },
+  "profitable-silence": { id: "profitable-silence", label: "PROFITABLE SILENCE", title: E["profitable-silence"].title, text: E["profitable-silence"].text, failure: false },
+  "cold-justice": { id: "cold-justice", label: "COLD JUSTICE", title: E["cold-justice"].title, text: E["cold-justice"].text, failure: false },
+  "field-pact": { id: "field-pact", label: "FIELD PACT", title: E["field-pact"].title, text: E["field-pact"].text, failure: false },
+  "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: E["quiet-cover"].title, text: E["quiet-cover"].text, failure: false },
 };
 
 /** Every ending's id: what a telemetry row names its ending by, and the server's ranking takes. */
@@ -704,9 +665,11 @@ export function getEndingVariant({
 function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
   const held = Math.max(trust, legitimacy, capital);
   const open = (title, text) => ({ id: "open-question", label: "OPEN QUESTION", title, text, failure: false });
-  if (held === trust) return open("답은 못 냈지만, 당신에게 말을 거는 사람은 남았다.", `사건마다 사람 피해 ${humanCost}${objectParticle(String(humanCost))} 남긴 채 문을 닫았습니다. 다음 참가자는 당신을 아는 사람들에게서 시작합니다.`);
-  if (held === legitimacy) return open("절차는 남았고, 그 절차가 무엇을 위한 것인지는 남지 않았다.", `공정함은 ${legitimacy}에서 멈췄고 이유를 적어둔 문서는 없습니다. 다음 사람은 규칙만 물려받습니다.`);
-  return open("장부는 버텼고, 질문은 그대로 넘어갔다.", `현금 ${capital}${objectParticle(String(capital))} 지킨 대신 닫히지 않은 기록이 남았습니다.`);
+  const words = observerCopy.openQuestion;
+  const read = (key, value) => open(words[key].title, fill(words[key].text, { value, particle: objectParticle(String(value)) }));
+  if (held === trust) return read("trust", humanCost);
+  if (held === legitimacy) return read("legitimacy", legitimacy);
+  return read("capital", capital);
 }
 
 export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { getAccessibility, setAccessibility } from "../state/accessibilitySettings.js";
+import edgeCopy from "../copy/edge.js";
 
 /**
  * The reading clock, asked about once (improvement notes A-11 = D-4, user's
@@ -39,15 +40,15 @@ export function ReadingClockAsk({ onAnswer }) {
   };
   return (
     <div className="gx-panel gx-panel-breach gx-carry" data-testid="reading-clock-ask" role="group" aria-labelledby="gx-read-ask" style={{ gridArea: "auto" }}>
-      <p className="gx-breach-kicker">읽는 시간이 끝났다</p>
-      <p id="gx-read-ask">다 읽고 직접 열기로 바꿀까요?</p>
-      <small>바꾸면 장면이 저절로 넘어가지 않고, 판 열기를 눌러야 판이 열린다. 편의 설정에서 되돌릴 수 있다.</small>
+      <p className="gx-breach-kicker">{edgeCopy.ask.kicker}</p>
+      <p id="gx-read-ask">{edgeCopy.ask.question}</p>
+      <small>{edgeCopy.ask.note}</small>
       <div className="gx-comic-cards">
         <button type="button" ref={first} className="gx-comic-card" data-testid="reading-clock-hold" onClick={() => answer(true)}>
-          직접 열기로 바꾼다
+          {edgeCopy.ask.hold}
         </button>
         <button type="button" className="gx-comic-card" data-testid="reading-clock-keep" onClick={() => answer(false)}>
-          시계에 맡긴다
+          {edgeCopy.ask.keep}
         </button>
       </div>
     </div>

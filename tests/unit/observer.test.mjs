@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { getObserverPattern, getObserverTag } from "../../src/gameLogic.js";
+import { getObservationLedger, getObserverPattern, getObserverTag } from "../../src/gameLogic.js";
 
 /**
  * How the observer files a decision (the tag on each log entry, and what the
@@ -85,4 +85,11 @@ test("the turning point is the first decision that breaks a pattern already set"
   assert.ok(pattern.endingRecord.text.endsWith(pattern.turningPoint.title));
   // Two decisions are not yet a pattern to break.
   assert.equal(getObserverPattern(entries.slice(1, 3)).turningPoint, null);
+});
+
+test("the ledger files 「은폐」 by the same words as the tag, every conjugation of 미루다 included", () => {
+  for (const choice of ["공개를 미루고 기다린다", "공개를 미룬다", "결정을 미뤄 둔다", "발표를 미룰 수 있다고 한다", "어제 미뤘던 일"]) {
+    assert.equal(getObserverTag({ ...calm, choice }).id, "opacity", choice);
+    assert.equal(getObservationLedger([{ ...calm, choice }]).opacity, 1, choice);
+  }
 });

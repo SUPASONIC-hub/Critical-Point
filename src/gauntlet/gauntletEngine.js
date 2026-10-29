@@ -41,6 +41,8 @@ import {
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
+import mutationsCopy from "../copy/mutations.js";
+import { fill } from "../locale.js";
 
 export { HOT_CASH_MULTIPLIER, PEAK_CASES, PEAK_CHIPS, PEAK_WALL, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -109,12 +111,31 @@ const READING_SETTLE_SECONDS = 6;
  */
 export function getReadingSeconds(node = {}, breach = []) {
   const rules = breach.flatMap((rule) => [rule?.label, rule?.title, rule?.text]);
-  const chars = [node.lead, node.text, node.question, ...(node.memo ?? []), ...rules]
-    .filter(Boolean)
-    .join("")
-    .replace(/\s+/g, "").length;
-  const seconds = Math.round(READING_SETTLE_SECONDS + chars / READING_CHARS_PER_SECOND);
+  const page = [node.lead, node.text, node.question, ...(node.memo ?? []), ...rules].filter(Boolean).join("");
+  const seconds = Math.round(READING_SETTLE_SECONDS + readingUnits(page) / READING_CHARS_PER_SECOND);
   return Math.max(READING_MIN_SECONDS, Math.min(READING_MAX_SECONDS, seconds));
+}
+
+/**
+ * A page in Korean characters, the unit the clock was set in (10 a second). A
+ * page with Hangul is counted as it always was. A page in another language
+ * is counted by what carries the same sentence there, measured over all 1,129
+ * scenes on 2026-10-28: an English word is about two Korean characters
+ * (404,156 characters to 202,791 words), a Japanese character about 0.89
+ * (112,090 to 126,138 over the 326 it had). Counted by characters, an English
+ * page took 2.4 times the Korean clock and 27 of 56 scenes hit the ceiling.
+ */
+const HANGUL = /[가-힣]/;
+const KANA = /\p{Script=Hiragana}|\p{Script=Katakana}/u;
+const WORD = /[A-Za-z0-9][A-Za-z0-9’'.,:%-]*/g;
+const KOREAN_PER_WORD = 2;
+const KOREAN_PER_JAPANESE = 0.89;
+
+export function readingUnits(page) {
+  const chars = page.replace(/\s+/g, "").length;
+  if (!page || HANGUL.test(page)) return chars;
+  if (KANA.test(page)) return chars * KOREAN_PER_JAPANESE;
+  return (page.match(WORD)?.length ?? 0) * KOREAN_PER_WORD;
 }
 
 export const BASE_SCHEMA = Object.freeze({
@@ -966,85 +987,44 @@ export function serializeRunState(value) {
  * table. The six marked here, and CASCADE (B2), keep that treatment (`isPenaltyMutation`); the
  * rest are told as rules the board carries.
  */
+/**
+ * One next-board rule: its fixed parts, and its words (src/copy/mutations.js,
+ * 영어판 4단계) read when the board is described, with the rule's numbers
+ * filled in, so another language laid over them is the one printed.
+ */
+function mutation(id, fixed, values = {}) {
+  return Object.freeze({
+    ...fixed,
+    get title() {
+      return mutationsCopy.rules[id].title;
+    },
+    get text() {
+      return fill(mutationsCopy.rules[id].text, values);
+    },
+  });
+}
+
 export const MUTATIONS = Object.freeze({
-  blackout: {
-    penalty: true,
-    label: "BLACKOUT",
-    title: "카드가 뒤집혔다",
-    text: `임계점을 넘긴 대가. 다음 판은 카드의 칩과 소모가 가려지고, 벽이 ${BLACKOUT_WALL_SHIFT} 가까워진다.`,
-  },
-  aftershock: {
-    penalty: true,
-    label: "AFTERSHOCK",
-    title: "여진이 남았다",
-    text: `열기가 ${AFTERSHOCK_START}에서 시작한다. 방금 벽에 닿은 열기가 아직 식지 않았다.`,
-  },
-  silence: {
-    penalty: true,
-    label: "SILENCE",
-    title: "심장이 거짓말을 한다",
-    text: `시간을 흘려보낸 대가. 다음 판은 심박이 벽을 알려주지 않고, 결정 시간이 ${SILENCE_SECONDS}초다.`,
-  },
-  heatDebt: {
-    penalty: true,
-    label: "HEAT DEBT",
-    title: "탐욕은 열기를 남긴다",
-    text: `높은 배율로 확정한 대가. 이번 열기의 ${HEAT_DEBT_SHARE}분의 1을 안고 시작하고, ${HEAT_DEBT_SECONDS}초를 잃는다.`,
-  },
-  overclock: {
-    label: "OVERCLOCK",
-    title: "칩이 두 배로 뛴다",
-    text: `연속으로 ×${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열기도 커진다.`,
-  },
-  coldFeet: {
-    penalty: true,
-    label: "COLD FEET",
-    title: "가장 좋은 카드가 봉인됐다",
-    text: `밀지 않고 확정한 대가. 가장 비싼 카드는 열기 ${SEAL_BREAK_GAUGE}${objectParticle(String(SEAL_BREAK_GAUGE))} 넘겨야 열리고, 칩이 줄어든다.`,
-  },
-  fracture: {
-    penalty: true,
-    label: "FRACTURE",
-    title: "균열이 난 자원",
-    text: `방금 가장 크게 태운 자원. 다음 판에서 그 자원을 태우는 카드는 ${FRACTURE_RATE}배로 청구된다.`,
-  },
-  reboot: {
-    label: "REBOOT",
-    title: "사건이 닫혔다",
-    text: "판돈은 금고로 옮겨졌고, 규칙이 초기화됐다. 이제 잃을 수 없다.",
-  },
-  strikeWake: {
-    label: "STRIKE WAKE",
-    title: "다음 판이 더 두껍게 깨어난다",
-    text: `STRIKE로 충전한 LOCK. 다음 판은 칩이 ${STRIKE_WAKE_CHIPS}배지만, 한 번 밀 때 오르는 열기도 커진다.`,
-  },
-  steadyLine: {
-    label: "STEADY LINE",
-    title: "다음 판이 식은 채 열린다",
-    text: `STEADY로 충전한 LOCK. 다음 판은 열기 ${STEADY_LINE_COOL} 낮게 시작하고 시간이 ${STEADY_LINE_SECONDS}초 늘며, 벽이 ${STEADY_LINE_WALL} 멀어진다.`,
-  },
-  exposedHand: {
-    label: "EXPOSED HAND",
-    title: "다음 판은 패를 숨기지 못한다",
-    text: "EXPOSE로 충전한 LOCK. 다음 판은 카드가 뒤집히지 않고, COLD FEET 봉인도 풀린다.",
-  },
-  strikeMastery: {
-    label: "STRIKE MASTERY",
-    title: "시즌이 먼저 치는 법을 익혔다",
-    text: "STRIKE LOCK을 거듭 충전한 결과. 새 판마다 칩이 두꺼워지고, 밀 때 오르는 열기가 1 늘어난다.",
-  },
-  steadyMastery: {
-    label: "STEADY MASTERY",
-    title: "시즌이 버티는 법을 익혔다",
-    text: "STEADY LOCK을 거듭 충전한 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
-  },
+  blackout: mutation("blackout", { penalty: true, label: "BLACKOUT" }, { wall: BLACKOUT_WALL_SHIFT }),
+  aftershock: mutation("aftershock", { penalty: true, label: "AFTERSHOCK" }, { start: AFTERSHOCK_START }),
+  silence: mutation("silence", { penalty: true, label: "SILENCE" }, { seconds: SILENCE_SECONDS }),
+  heatDebt: mutation("heatDebt", { penalty: true, label: "HEAT DEBT" }, { share: HEAT_DEBT_SHARE, seconds: HEAT_DEBT_SECONDS }),
+  overclock: mutation("overclock", { label: "OVERCLOCK" }, { multiplier: HOT_CASH_MULTIPLIER, chips: OVERCLOCK_CHIPS }),
+  coldFeet: mutation("coldFeet", { penalty: true, label: "COLD FEET" }, {
+    seal: SEAL_BREAK_GAUGE, particle: objectParticle(String(SEAL_BREAK_GAUGE)),
+  }),
+  fracture: mutation("fracture", { penalty: true, label: "FRACTURE" }, { rate: FRACTURE_RATE }),
+  reboot: mutation("reboot", { label: "REBOOT" }),
+  strikeWake: mutation("strikeWake", { label: "STRIKE WAKE" }, { chips: STRIKE_WAKE_CHIPS }),
+  steadyLine: mutation("steadyLine", { label: "STEADY LINE" }, {
+    cool: STEADY_LINE_COOL, seconds: STEADY_LINE_SECONDS, wall: STEADY_LINE_WALL,
+  }),
+  exposedHand: mutation("exposedHand", { label: "EXPOSED HAND" }),
+  strikeMastery: mutation("strikeMastery", { label: "STRIKE MASTERY" }),
+  steadyMastery: mutation("steadyMastery", { label: "STEADY MASTERY" }),
   // B2, on a table that counts links only (cascadeRisk.js).
   cascade: CASCADE_MUTATION,
-  exposeMastery: {
-    label: "EXPOSE MASTERY",
-    title: "시즌이 판을 읽는 법을 익혔다",
-    text: "EXPOSE LOCK을 거듭 충전한 결과. 봉인이 더 일찍 열리고, 더 쌓이면 가려진 판도 숨지 못한다.",
-  },
+  exposeMastery: mutation("exposeMastery", { label: "EXPOSE MASTERY" }),
 });
 
 /**
@@ -1054,18 +1034,27 @@ export const MUTATIONS = Object.freeze({
  * lifts the seal. The id stays -- the wall is still closer, the chips are
  * still thinner -- but the briefing and the reveal went on printing "카드가
  * 가려지고" over a hand that was face up, and "봉인됐다" over a card that was
- * not. An entry that reads this way carries `lifted: true`.
+ * not. An entry that reads this way carries `lifted: true`. Its words are
+ * src/copy/mutations.js's `lifted`, read as the board is described.
  */
 const LIFTED_MUTATIONS = Object.freeze({
   blackout: {
     lifted: (board) => !board.faceDown,
-    title: "벽이 다가왔다",
-    text: `임계점을 넘긴 대가. 벽이 ${BLACKOUT_WALL_SHIFT} 가까워진다. 카드는 EXPOSE 숙련이 뒤집히지 않게 막았다.`,
+    get title() {
+      return mutationsCopy.lifted.blackout.title;
+    },
+    get text() {
+      return fill(mutationsCopy.lifted.blackout.text, { wall: BLACKOUT_WALL_SHIFT });
+    },
   },
   coldFeet: {
     lifted: (board) => !board.sealHighest,
-    title: "칩이 줄었다",
-    text: "밀지 않고 확정한 대가. 칩이 줄어든다. 봉인은 EXPOSE 숙련이 풀었다.",
+    get title() {
+      return mutationsCopy.lifted.coldFeet.title;
+    },
+    get text() {
+      return mutationsCopy.lifted.coldFeet.text;
+    },
   },
 });
 

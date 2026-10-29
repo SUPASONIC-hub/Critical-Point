@@ -29,6 +29,8 @@
  */
 
 import { subjectParticle } from "../playerLanguage.js";
+import relicsCopy from "../copy/relics.js";
+import { fill } from "../locale.js";
 import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
 import {
   AFTERSHOCK_START,
@@ -66,120 +68,60 @@ export const INSURANCE_UNLOCK_LOSS = 5000;
 /** A stance relic opens when its stance has reshaped enough charged cashes. */
 export const STANCE_RELIC_UNLOCK_COUNT = 3;
 
+const relicWords = relicsCopy.relics;
+
+/**
+ * One relic: its fixed parts, and its words (src/copy/relics.js) with the
+ * rule's numbers filled in. `softens` is the mutation it softens, `unlock`
+ * the feat's id; a relic with no feat has `unlock: null`.
+ */
+function relic(id, { label, icon, softens = null, unlock = null }, values = {}) {
+  const words = relicWords[id];
+  const say = (line) => fill(line, values);
+  return {
+    label,
+    name: words.name,
+    icon,
+    text: say(words.text),
+    proc: say(words.proc),
+    ...(softens ? { softens: { mutation: softens, text: say(words.softens) } } : {}),
+    unlock: unlock ? { id: unlock, text: say(words.unlock) } : null,
+  };
+}
+
 export const RELICS = Object.freeze({
-  metronome: {
-    label: "METRONOME",
-    name: "메트로놈",
-    icon: "timer",
-    text: "열기가 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.",
-    proc: "전환을 붙잡았다",
-    unlock: null,
-  },
-  coldBlood: {
-    label: "COLD BLOOD",
-    name: "냉혈",
-    icon: "snowflake",
-    text: `벽에 닿은 뒤의 AFTERSHOCK가 열기 ${AFTERSHOCK_START}${subjectParticle(String(AFTERSHOCK_START))} 아니라 ${COLD_BLOOD_START}에서 시작한다.`,
-    proc: "여진을 절반으로 식혔다",
-    softens: { mutation: "aftershock", text: `냉혈: 열기 ${COLD_BLOOD_START}에서 시작` },
-    unlock: null,
-  },
-  heatSink: {
-    label: "HEAT SINK",
-    name: "방열판",
-    icon: "fan",
-    text: `HEAT DEBT가 열기의 ${HEAT_SINK_SHARE}분의 1만 남기고, 시간은 ${HEAT_SINK_SECONDS}초만 가져간다.`,
-    proc: "열 빚을 절반으로 줄였다",
-    softens: { mutation: "heatDebt", text: `방열판: 열기 ${HEAT_SINK_SHARE}분의 1, ${HEAT_SINK_SECONDS}초` },
-    unlock: null,
-  },
+  metronome: relic("metronome", { label: "METRONOME", icon: "timer" }),
+  coldBlood: relic("coldBlood", { label: "COLD BLOOD", icon: "snowflake", softens: "aftershock" }, {
+    start: AFTERSHOCK_START, particle: subjectParticle(String(AFTERSHOCK_START)), cold: COLD_BLOOD_START,
+  }),
+  heatSink: relic("heatSink", { label: "HEAT SINK", icon: "fan", softens: "heatDebt" }, { share: HEAT_SINK_SHARE, seconds: HEAT_SINK_SECONDS }),
   // C-7's five, each a person of the season (2026-10-25).
-  auditContact: {
-    label: "AUDIT CONTACT",
-    name: "감사실 연줄",
-    icon: "clipboard",
-    text: `감사팀 반재욱이 한 칸은 눈감아 준다. 감사는 ${AUDIT_LIMIT + AUDIT_CONTACT_SLACK}칸이 차야 적발된다.`,
-    proc: "반재욱이 한 칸을 눈감았다",
-    unlock: null,
-  },
-  carbonCopy: {
-    label: "CARBON COPY",
-    name: "임경수의 사본",
-    icon: "files",
-    text: `임경수가 태우지 않은 사본이 있다. BLACKOUT이 벽을 ${BLACKOUT_WALL_SHIFT}${subjectParticle(String(BLACKOUT_WALL_SHIFT))} 아니라 ${BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD}만 당긴다.`,
-    proc: "사본이 벽을 붙잡았다",
-    softens: { mutation: "blackout", text: `사본: 벽 ${BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD}만 당김` },
-    unlock: null,
-  },
-  testimony: {
-    label: "TESTIMONY",
-    name: "오진우의 진술",
-    icon: "hourglass",
-    text: `결정 제한시간은 설정값이었다. 시간이 다 돼 BUST해도 판돈의 ${TESTIMONY_SHARE}분의 1은 남는다.`,
-    proc: `시간이 다 돼도 판돈 ${TESTIMONY_SHARE}분의 1을 지켰다`,
-    unlock: null,
-  },
-  frontPage: {
-    label: "FRONT PAGE",
-    name: "차지원의 1면",
-    icon: "newspaper",
-    text: "특종이 이어져도 손이 떨리지 않는다. OVERCLOCK 판에서 밀 때 늘어나는 열기가 절반이다.",
-    proc: "1면 마감 앞에서도 손이 고요했다",
-    softens: { mutation: "overclock", text: "1면: 밀기 폭 절반만 커짐" },
-    unlock: null,
-  },
-  fieldNote: {
-    label: "FIELD NOTES",
-    name: "도윤하의 현장 메모",
-    icon: "notebook",
-    text: `현장에선 두 번이면 흐름이 선다. 같은 유형 ${LOGIC_HOLD - 1}번째부터 논리 콤보가 오른다.`,
-    proc: "현장 메모로 콤보를 일찍 세웠다",
-    unlock: null,
-  },
-  encore: {
-    label: "ENCORE",
-    name: "앙코르",
-    icon: "repeat",
-    text: "벽에 닿아 판돈을 잃어도 논리 콤보는 남는다.",
-    proc: "벽에 닿고도 콤보가 살아남았다",
-    unlock: { id: "combo", text: `논리 콤보 ${ENCORE_UNLOCK_COMBO} 달성` },
-  },
-  insurance: {
-    label: "INSURANCE",
-    name: "보험",
-    icon: "shield",
-    text: `사건마다 한 번, 벽에 닿아도 판돈의 ${INSURANCE_SHARE}분의 1은 남는다.`,
-    proc: `판돈 ${INSURANCE_SHARE}분의 1을 지켰다`,
-    unlock: { id: "loss", text: `판돈 ${INSURANCE_UNLOCK_LOSS.toLocaleString("en-US")} 이상을 벽에 잃기` },
-  },
-  stethoscope: {
-    label: "STETHOSCOPE",
-    name: "청진기",
-    icon: "stethoscope",
-    text: `SILENCE가 와도 심박이 계속 벽을 가리킨다. 시간은 여전히 ${SILENCE_SECONDS}초다.`,
-    proc: "침묵 속에서 심장을 들었다",
-    softens: { mutation: "silence", text: "청진기: 심박 유지" },
-    unlock: { id: "silence", text: "SILENCE를 한 번 겪기" },
-  },
-  kineticGrip: {
-    label: "KINETIC GRIP",
-    name: "악력",
-    icon: "crosshair",
-    text: `STRIKE MASTERY가 밀 때마다 얹던 열기 1을 걷어 내고, STRIKE WAKE로 깨어난 판의 칩이 ${KINETIC_GRIP_CHIPS}배 더 두꺼워진다.`,
-    proc: "STRIKE 숙련이 손에 붙었다",
-    softens: { mutation: "strikeMastery", text: "악력: 밀 때 오르는 열기 그대로" },
-    unlock: { id: "strikeMastery", text: `STRIKE 숙련 ${STANCE_RELIC_UNLOCK_COUNT}회` },
-  },
+  auditContact: relic("auditContact", { label: "AUDIT CONTACT", icon: "clipboard" }, { limit: AUDIT_LIMIT + AUDIT_CONTACT_SLACK }),
+  carbonCopy: relic("carbonCopy", { label: "CARBON COPY", icon: "files", softens: "blackout" }, {
+    shift: BLACKOUT_WALL_SHIFT, particle: subjectParticle(String(BLACKOUT_WALL_SHIFT)), pull: BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD,
+  }),
+  testimony: relic("testimony", { label: "TESTIMONY", icon: "hourglass" }, { share: TESTIMONY_SHARE }),
+  frontPage: relic("frontPage", { label: "FRONT PAGE", icon: "newspaper", softens: "overclock" }),
+  fieldNote: relic("fieldNote", { label: "FIELD NOTES", icon: "notebook" }, { hold: LOGIC_HOLD - 1 }),
+  encore: relic("encore", { label: "ENCORE", icon: "repeat", unlock: "combo" }, { combo: ENCORE_UNLOCK_COMBO }),
+  insurance: relic("insurance", { label: "INSURANCE", icon: "shield", unlock: "loss" }, {
+    share: INSURANCE_SHARE, loss: INSURANCE_UNLOCK_LOSS.toLocaleString("en-US"),
+  }),
+  stethoscope: relic("stethoscope", { label: "STETHOSCOPE", icon: "stethoscope", softens: "silence", unlock: "silence" }, { seconds: SILENCE_SECONDS }),
+  kineticGrip: relic("kineticGrip", { label: "KINETIC GRIP", icon: "crosshair", softens: "strikeMastery", unlock: "strikeMastery" }, {
+    chips: KINETIC_GRIP_CHIPS, count: STANCE_RELIC_UNLOCK_COUNT,
+  }),
 });
 
+const breatherWords = relicsCopy.breather;
 /**
  * 「숨 고르기」: what a pass on a draft that offered something gives (C-7,
  * `equipRelic`). The draft's pass button says it, and the stage marks the board.
  */
 export const BREATHER = Object.freeze({
-  name: "숨 고르기",
-  short: `+${BREATHER_SECONDS}초`,
-  text: `고르지 않으면 이 사건 첫 판의 시간이 ${BREATHER_SECONDS}초 늘고, 벽이 ${BREATHER_WALL} 멀어진다.`,
+  name: breatherWords.name,
+  short: fill(breatherWords.short, { seconds: BREATHER_SECONDS }),
+  text: fill(breatherWords.text, { seconds: BREATHER_SECONDS, wall: BREATHER_WALL }),
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
