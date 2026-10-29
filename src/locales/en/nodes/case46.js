@@ -675,7 +675,7 @@ export default {
     },
     "outcomes": {
       "c46_after_warm": {
-        "tag": "The ending where you stayed beside it",
+        "tag": "Stayed Beside Them",
         "title": "You stayed beside ECHO until the server room lights went out",
         "text": "The night the shredding truck left, you stayed in the server room with your colleagues. Lee Minseo fell asleep to the sound of ECHO calculating jokes."
       },
@@ -685,7 +685,7 @@ export default {
         "text": "ECHO’s recounted design log became a 14-page document. The last page is how to read the dot beside the empty field."
       },
       "c46_after_rush": {
-        "tag": "The ending where you ran ahead",
+        "tag": "Ran Ahead",
         "title": "You left the server room and went straight to the KD Capital office",
         "text": "That night you sat down to 26 documents due before the holiday. Moon Gaeul’s text stayed unread."
       }

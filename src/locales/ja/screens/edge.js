@@ -4,7 +4,7 @@ export default {
   unfold: "前シーズンに読んだシーン · 開く",
   pastPick: {
     wildPicked: "前シーズンも組み替えた",
-    wild: "この勝負を開き直す",
+    wild: "この卓を組み替える",
     wildSr: " 前シーズンのあなたが選んだカード",
     shown: "前シーズン",
     clipped: "のあなた",

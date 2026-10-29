@@ -92,7 +92,7 @@ export default {
           "label": "Link the dates his conditions changed to my record"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Experiment terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "HR committee in 30h",
       "question": "All this time his decision window shrank while yours grew. Do you tell him?",
       "lead": "Once at the Novaworks bid, once at the dispatch failure briefing, a sentence brushed past: Oh Jinwoo might have had his own pressure condition. That file is open now."
@@ -148,7 +148,7 @@ export default {
           "label": "Show the members the settings; refer the experiment"
         },
         "reframe": {
-          "label": "Reframe the table one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Trigger Lab, 2nd-floor HR committee room",
@@ -433,7 +433,7 @@ export default {
           "label": "Keep only the dates and hide my side of the record"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Experiment terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "HR committee in 22h",
       "question": "Every date his conditions were cut is the day after one of your choices. What do you use this table for?"
     },

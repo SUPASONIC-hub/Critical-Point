@@ -149,7 +149,7 @@ export default {
           "label": "Let him go on protection terms and a promise to fight together"
         },
         "reframe": {
-          "label": "Reframe the table and propose, one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -386,7 +386,7 @@ export default {
           "label": "Leaf through the side agreement to the draft sale contract"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "December 22 · 23:40",
       "question": "Bridge’s candidate evaluation sheet carries the Trigger Lab response figures unchanged. What do you do about it?"
     },
@@ -409,7 +409,7 @@ export default {
           "label": "Ask Do Haram with Oh Jinwoo who recommended him"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "December 29 · 05:30",
       "question": "Response records used without consent became the basis for a hire. What do you change before the signing?"
     },

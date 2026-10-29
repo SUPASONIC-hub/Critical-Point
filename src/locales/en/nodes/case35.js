@@ -149,7 +149,7 @@ export default {
           "label": "Formally challenge NOAH’s disaster criteria with the FSS"
         },
         "reframe": {
-          "label": "One last time, change the game and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Mangwon Market Merchants’ Association Office · Meeting Room",
@@ -177,7 +177,7 @@ export default {
           "label": "Stay with the market people until the last sandbag"
         }
       },
-      "place": "Mangwon Market Gaeul Rice Cake Shop · Shopfront",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Out front",
       "clock": "July 19 · Clear Afternoon",
       "question": "As rice cakes go round, word comes that Chairman Seo Dokyung paused on your face in the market video. How do you close this afternoon?"
     },
@@ -684,7 +684,7 @@ export default {
         "text": "The 312 emergency flood loans NOAH rejected during the monsoon were written up one by one and filed with group Compliance. Every Mangwon Market shop name on the first page carries Moon Gaeul’s rice cake stamp."
       },
       "c35_after_rush": {
-        "tag": "Ran on Ahead",
+        "tag": "Ran Ahead",
         "title": "The moment the rain stopped, you took the rejection records to the prosecutors",
         "text": "Before the rice cakes had gone all the way round, you headed for the prosecutors’ office with NOAH’s rejection records. Your share on the tray became a prize in a subscriber draw on Ahn Gibeom’s live stream."
       }

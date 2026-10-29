@@ -69,11 +69,11 @@ export default {
     },
     "c8_gallery": {
       "title": "The Price of Paintings",
-      "text": "Gallery On, Cheongdam-dong. Ban Jaewook, who has handed in his resignation, stands like a visitor and copies the price tags into his notebook. Twelve small works by an unknown artist, 120 million won each. Every buyer is a partner company of Novaworks or Bridge Bank, and the artist is the nephew of Namgung Hyun, Deputy President of Bridge Bank. 'Paintings make a good tool. They have no set price. Overpay for one, and that’s the bribe.' He doesn’t close the notebook. 'I’m an investigator who has resigned, so there’s nowhere to hand this in. I write it down anyway.'",
+      "text": "Gallery On, Cheongdam-dong. Ban Jaewook, who has handed in his resignation, stands like a visitor and copies the price tags into his notebook. Twelve small works by an unknown artist, 120 million won each. Every buyer is a partner company of Novaworks or Bridge Bank, and the artist is the nephew of Namgoong Hyun, Deputy President of Bridge Bank. 'Paintings make a good tool. They have no set price. Overpay for one, and that’s the bribe.' He doesn’t close the notebook. 'I’m an investigator who has resigned, so there’s nowhere to hand this in. I write it down anyway.'",
       "memo": [
         "12 small works × 120 million won = 1.44 billion won",
         "Every buyer is a Novaworks or Bridge Bank partner company",
-        "Artist: nephew of Bridge Bank Deputy President Namgung Hyun",
+        "Artist: nephew of Bridge Bank Deputy President Namgoong Hyun",
         "Art has no market price, so breach of trust is hard to prove"
       ],
       "choices": {
@@ -149,7 +149,7 @@ export default {
           "label": "Walk into creditor talks with the trace sheet in hand"
         },
         "reframe": {
-          "label": "Reframe the table with one last proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Gyeongpo breakwater",

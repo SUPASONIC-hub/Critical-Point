@@ -31,7 +31,7 @@ export default {
           "label": "Keep asking NOAH why it refused, to the end"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Fourth Monday of February · Internship Day 1 · 08:00",
       "question": "A factory’s loan was rejected in 0.8 seconds because of a dead man’s name. What do you do first?",
       "lead": "On the fourth Monday morning of February, Do Yoonha opens the analyst room door with two phones in hand."
@@ -312,7 +312,7 @@ export default {
           "label": "Change the form to a committee signature, not one person"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room · Night",
+      "place": "Trigger Lab, 4th-floor analyst room · Night",
       "clock": "Day Before the Ceremony · 22:00",
       "question": "No one in the country has put a name on the exception approval line. Who do you have fill that field?"
     },
@@ -336,7 +336,7 @@ export default {
           "label": "Tell her not to step down; keep the chair and fight"
         }
       },
-      "place": "Gaeul Rice Cake Shop, Mangwon Market · At the Shutter",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · By the shutter",
       "clock": "February · Internship Day 1 · 20:00",
       "question": "To peel off her husband’s name, Moon Gaeul says she will step down as chair. What do you say?"
     },
@@ -461,7 +461,7 @@ export default {
           "label": "Keep asking NOAH why it refused, to the end"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Fourth Monday of February · Internship Day 1 · 08:00",
       "question": "Before the smell of tangerines has even faded, To-the-End Precision is rejected. With those hands, where do you go first?",
       "lead": "A Monday morning, with the smell of tangerines still on your fingertips."
@@ -521,7 +521,7 @@ export default {
           "label": "Keep asking NOAH why it refused, to the end"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room · Before Dawn",
+      "place": "Trigger Lab, 4th-floor analyst room · Before dawn",
       "clock": "Fourth Monday of February · Before Dawn 06:10",
       "question": "Line 12 of the review list you rushed back to is To-the-End Precision. Where do you go first?",
       "lead": "Before dawn on Monday, the review list refreshes on a monitor that has been on for two weeks."
@@ -674,12 +674,12 @@ export default {
     },
     "outcomes": {
       "c22_after_warm": {
-        "tag": "Stayed Beside",
+        "tag": "Stayed Beside Them",
         "title": "You stayed in the banking hall until the ceremony rice cake box was empty",
         "text": "Long after the ceremony ended, Moon Gaeul’s family, Tak Yerin, and the six put away the banking hall chairs together. The last rice cake was left on top of the ticket machine."
       },
       "c22_after_record": {
-        "tag": "Put It on Record",
+        "tag": "Put It in Writing",
         "title": "An intern’s one line became the first page of the R-17 objection",
         "text": "The last line of Hajun’s report and the 41 rejection cases were bound into one volume and filed with both head office Credit Review and the Financial Supervisory Service."
       },

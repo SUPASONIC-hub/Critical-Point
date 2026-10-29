@@ -48,7 +48,7 @@ export default {
   },
   status: {
     currentCase: "現在の事件",
-    result: "{caseLabel}の結果画面です。ランク{rank}、バースト{score}点、主なトリガーは{trigger}です。",
+    result: "{caseLabel}の結果画面です。ランク{rank}、バーストスコア{score}点、主なトリガーは{trigger}です。",
     scene: "{caseLabel}「{title}」のシーンです。進行率{progress}パーセント、チャレンジは{challenge}、リスク圧力は{riskTier} {riskPressure}です。",
   },
 };
