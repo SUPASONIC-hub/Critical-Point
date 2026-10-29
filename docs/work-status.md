@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-29 (the state of `main` at `78f0113`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); then the start screen fitted in English and Japanese (#369), the phone hand scenes fitted (#372), the locked-card reason (#373) and the storage notice (#374) put in the page's language, and two unused exports dropped (#371); what changed and when is in `git log`)
+Last updated: 2026-10-29 (the state of `main` at `6a36dcc`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); then the start screen fitted in English and Japanese (#369), the phone hand scenes fitted (#372), the locked-card reason (#373) and the storage notice (#374) put in the page's language, and two unused exports dropped (#371); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
