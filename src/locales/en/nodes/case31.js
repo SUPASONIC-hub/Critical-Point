@@ -28,7 +28,7 @@ export default {
           "label": "Hand over the chief of staff’s cleaned-up set on time, as is"
         },
         "reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         }
       },
       "place": "KD Capital Head Office · Lobby",
@@ -56,10 +56,10 @@ export default {
           "label": "Ask her to keep the preparer’s name out, and answer myself"
         },
         "reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         },
         "c31_archive_evidence_turn": {
-          "label": "Lay the four maturity extensions over the Roundhill talks"
+          "label": "Match 4 extensions to Roundhill"
         }
       },
       "place": "KD Capital B1 · Records Room",
@@ -87,10 +87,10 @@ export default {
           "label": "Leave it as lost property for Han Jiwoo to use as she sees fit"
         },
         "reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         },
         "c31_hallway_evidence_turn": {
-          "label": "Lay the four maturity extensions over the Roundhill talks"
+          "label": "Match 4 extensions to Roundhill"
         }
       },
       "place": "KD Capital 12th Floor · Corridor Outside the Exam Team’s Meeting Room",
@@ -118,10 +118,10 @@ export default {
           "label": "Tell her about that day as the one who wrote the eleven pages"
         },
         "reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         },
         "c31_rooftop_evidence_turn": {
-          "label": "Lay the four maturity extensions over the Roundhill talks"
+          "label": "Match 4 extensions to Roundhill"
         }
       },
       "place": "KD Capital Headquarters · Rooftop",
@@ -385,7 +385,7 @@ export default {
           "label": "Report the record with my employee ID to Han Jiwoo first"
         },
         "c31_route_system_evidence_turn": {
-          "label": "Lay the four maturity extensions over the Roundhill talks"
+          "label": "Match 4 extensions to Roundhill"
         }
       },
       "place": "KD Capital 12th Floor, Risk Management · Review Terminal",
@@ -461,7 +461,7 @@ export default {
           "label": "Go to Han Jiwoo first and be honest about my post"
         },
         "c31_start_warm_reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         }
       },
       "place": "KD Capital Head Office · Lobby",
@@ -491,7 +491,7 @@ export default {
           "label": "Submit the 148 items as originals, not the cleaned-up set"
         },
         "c31_start_record_reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         }
       },
       "place": "KD Capital Head Office · Lobby",
@@ -521,7 +521,7 @@ export default {
           "label": "Go to Han Jiwoo first and be honest about my post"
         },
         "c31_start_rush_reframe": {
-          "label": "Call up the accounts that approved the extensions, one by one"
+          "label": "Call up each approver account"
         }
       },
       "place": "KD Capital Head Office · Lobby",
