@@ -10,8 +10,10 @@ import {
   pickPersonalBest,
   readLatestPersonalBest,
   RETIRED_LOCAL_RANKING_STORAGE_KEYS,
-  takePastBestLine,
+  takePastBest,
 } from "../../src/personalBests.js";
+import rankingCopy from "../../src/copy/ranking.js";
+import { fill } from "../../src/locale.js";
 import { LOCAL_RANKING_STORAGE_KEY } from "../../src/state/useLocalRanking.js";
 
 /**
@@ -98,18 +100,18 @@ test("a best that could not be written leaves the retired key for the next load"
 });
 
 test("with no past best the screen gets no line", () => {
-  assert.equal(takePastBestLine(), null);
+  assert.equal(takePastBest(), null);
 });
 
 test("the ranking screen's call moves the retired keys once, then only reads", () => {
   store.set(V9, JSON.stringify(v9Rows));
   store.set(LOCAL_RANKING_STORAGE_KEY, JSON.stringify([row("case01", { burstScore: 99, rank: "S" })]));
-  const first = takePastBestLine();
-  assert.equal(first, "지난 판(v9)의 내 최고 82점 · A");
+  const first = takePastBest();
+  assert.equal(fill(rankingCopy.pastBest, first), "지난 판(v9)의 내 최고 82점 · A");
   assert.equal(store.has(V9), false, "the retired key is removed");
   assert.equal(store.has(LOCAL_RANKING_STORAGE_KEY), true, "the current key is never touched");
   const kept = store.get(PERSONAL_BESTS_STORAGE_KEY);
-  assert.equal(takePastBestLine(), first, "a second open reads the same best");
+  assert.deepEqual(takePastBest(), first, "a second open reads the same best");
   assert.equal(store.get(PERSONAL_BESTS_STORAGE_KEY), kept, "and writes nothing");
 });
 

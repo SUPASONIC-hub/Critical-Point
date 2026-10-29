@@ -22,15 +22,17 @@ export function hallOfFameBoardLabel(board) {
 /**
  * Run tag -> its badges, e.g. 「명예의 전당 · 2026-W47 1위 (잠정)」. `rows`
  * are the view's rows; a row with no place (a board below the threshold) and
- * anything malformed give nothing.
+ * anything malformed give nothing. `words` are the ranking screen's
+ * (src/copy/ranking.js: hallBadge, hallMainBoard, hallProvisional), so the
+ * badge reads in the page's language; a week's board keeps its ISO name.
  */
-export function hallOfFameBadges(rows) {
+export function hallOfFameBadges(rows, words) {
   const badges = new Map();
   for (const row of Array.isArray(rows) ? rows : []) {
     const place = Number(row?.place);
     if (typeof row?.run_tag !== "string" || !row.run_tag || !(place >= 1 && place <= HALL_OF_FAME_PLACES) || typeof row.board !== "string") continue;
-    const board = row.board.startsWith("table-") ? "본 판" : row.board;
-    const label = `명예의 전당 · ${board} ${place}위${row.settled_on ? "" : " (잠정)"}`;
+    const board = row.board.startsWith("table-") ? words.hallMainBoard : row.board;
+    const label = words.hallBadge.replace("{board}", board).replace("{place}", String(place)) + (row.settled_on ? "" : words.hallProvisional);
     badges.set(row.run_tag, [...(badges.get(row.run_tag) ?? []), label]);
   }
   return badges;

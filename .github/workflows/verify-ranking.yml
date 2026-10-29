@@ -45,7 +45,7 @@ name: Verify Ranking
 # mark over the whole board (hall_of_fame_counts: the threshold of ten is not
 # counted within the rows read), and from the same check of the same rows
 # (src/hallOfFame.js, verify-ranking-rows --hall-of-fame-sql) one statement
-# calls hall_of_fame_settle (20261102030000_hall_of_fame.sql) with each
+# calls hall_of_fame_settle (20261102040000_hall_of_fame.sql) with each
 # board's first three clean, checked seasons; it counts again itself and
 # refuses a place below ten. The check is not run twice, so
 # what was checked and what is posted cannot differ. Then a job of its own,

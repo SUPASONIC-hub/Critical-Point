@@ -5,6 +5,11 @@ import { objectParticle } from "../playerLanguage.js";
 import { readRelicCodex } from "./useRelicTable.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
+import relicsCopy from "../copy/relics.js";
+import { fill } from "../locale.js";
+
+// The draft's words (src/copy/relics.js).
+const say = relicsCopy.draft;
 
 const ICONS = {
   timer: Timer,
@@ -50,7 +55,7 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
   const trapTab = useDialogFocus(dialogRef, firstOption);
   const unlockedCount = RELIC_IDS.filter((id) => !RELICS[id].unlock || codex.unlocked.includes(id)).length;
   const lockedFeats = RELIC_IDS.filter((id) => RELICS[id].unlock && !codex.unlocked.includes(id)).map((id) => RELICS[id].unlock.text);
-  const codexCount = `도감 ${unlockedCount}/${RELIC_IDS.length}`;
+  const codexCount = fill(say.codexCount, { count: unlockedCount, total: RELIC_IDS.length });
   const full = owned.length >= RELIC_SLOTS;
   const hand = swapFor ? owned : offer;
   // The hand changed under the keyboard: focus goes to its first card.
@@ -61,13 +66,13 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
   return (
     <div ref={dialogRef} className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft" onKeyDown={trapTab}>
       <div className="gx-draft-panel">
-        <span className="gx-draft-kicker">{swapFor ? <>도구 칸 가득 · <span lang="en">SWAP</span></> : <>사건 종료 · <span lang="en">RELIC DRAFT</span></>}</span>
-        <h2 id="gx-draft-title">{swapFor ? "내려놓을 도구 하나" : "다음 사건에 가져갈 도구 하나"}</h2>
+        <span className="gx-draft-kicker">{swapFor ? <>{say.full} · <span lang="en">SWAP</span></> : <>{say.closed} · <span lang="en">RELIC DRAFT</span></>}</span>
+        <h2 id="gx-draft-title">{swapFor ? say.swapTitle : say.title}</h2>
         {/* Polite, so the swap step is read out when the hand turns over. */}
         <p className="gx-draft-lede" aria-live="polite">
           {swapFor
-            ? `${RELICS[swapFor].name}${objectParticle(RELICS[swapFor].name)} 들려면 가진 도구 하나를 내려놓는다. 내려놓은 도구는 이 테이블부터 규칙을 바꾸지 않는다.`
-            : `고른 도구는 테이블의 규칙 하나를 바꾼다. 도구는 ${RELIC_SLOTS}개까지 들고, ${full ? "칸이 다 찼으니 고르면 하나를 내려놓는다" : "다 차면 하나를 내려놓고 바꾼다"}. 고를 때까지 시계는 멈춰 있다.`}
+            ? fill(say.swapLede, { name: RELICS[swapFor].name, particle: objectParticle(RELICS[swapFor].name) })
+            : fill(say.lede, { slots: RELIC_SLOTS, when: full ? say.ledeFull : say.ledeRoom })}
         </p>
         <ul className="gx-draft-hand">
           {hand.map((id, index) => {
@@ -92,23 +97,23 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
                     <strong>{relic.name}</strong>
                     <small>{relic.text}</small>
                   </span>
-                  {swapFor ? <em className="gx-relic-tier">내려놓기</em> : relic.unlock && <em className="gx-relic-tier">해금</em>}
+                  {swapFor ? <em className="gx-relic-tier">{say.drop}</em> : relic.unlock && <em className="gx-relic-tier">{say.rare}</em>}
                 </button>
               </li>
             );
           })}
         </ul>
         <div className="gx-draft-foot">
-          <ol className="gx-codex" aria-label={`도구 도감, ${RELIC_IDS.length}개 중 ${unlockedCount}개 해금`}>
+          <ol className="gx-codex" aria-label={fill(say.codexLabel, { total: RELIC_IDS.length, count: unlockedCount })}>
             {RELIC_IDS.map((id) => {
               const locked = Boolean(RELICS[id].unlock) && !codex.unlocked.includes(id);
               const state = owned.includes(id) ? "is-owned" : locked ? "is-locked" : "is-open";
               return (
-                <li key={id} className={state} title={locked ? `잠김 · ${RELICS[id].unlock.text}` : `${RELICS[id].label} · ${RELICS[id].name}`}>
+                <li key={id} className={state} title={locked ? fill(say.lockedTitle, { feat: RELICS[id].unlock.text }) : `${RELICS[id].label} · ${RELICS[id].name}`}>
                   {locked ? <Lock size={12} aria-hidden="true" /> : <RelicIcon id={id} size={12} />}
                   {/* The strip is icons; what each one is was only in its tooltip. */}
                   <span className="sr-only">
-                    {locked ? `잠김, ${RELICS[id].unlock.text}` : `${RELICS[id].name}${owned.includes(id) ? ", 장착" : ""}`}
+                    {locked ? fill(say.lockedSpoken, { feat: RELICS[id].unlock.text }) : `${RELICS[id].name}${owned.includes(id) ? say.owned : ""}`}
                   </span>
                 </li>
               );
@@ -120,23 +125,23 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
           {lockedFeats.length > 1 ? (
             <details className="gx-codex-note" data-testid="relic-unlock-feats">
               <summary>
-                {codexCount} · 다음 해금: {lockedFeats[0]} · 나머지 {lockedFeats.length - 1}개 보기
+                {fill(say.nextFeats, { codex: codexCount, feat: lockedFeats[0], more: lockedFeats.length - 1 })}
               </summary>
               {lockedFeats.slice(1).join(" · ")}
             </details>
           ) : (
             <small className="gx-codex-note">
               {codexCount}
-              {lockedFeats.length ? ` · 다음 해금: ${lockedFeats[0]}` : " · 모두 해금"}
+              {lockedFeats.length ? fill(say.nextFeat, { feat: lockedFeats[0] }) : say.allOpen}
             </small>
           )}
           {swapFor && (
             <button type="button" className="ghost gx-draft-skip" data-testid="relic-swap-back" aria-keyshortcuts="Escape" onClick={onBack}>
-              다른 도구 보기
+              {say.back}
             </button>
           )}
           <button type="button" className="ghost gx-draft-skip" data-testid="relic-skip" aria-keyshortcuts={swapFor ? undefined : "Escape"} onClick={onSkip}>
-            고르지 않고 진행
+            {say.skip}
           </button>
         </div>
       </div>

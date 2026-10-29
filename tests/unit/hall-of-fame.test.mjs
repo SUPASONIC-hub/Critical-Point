@@ -26,6 +26,7 @@ import {
   weekSettlesOn,
 } from "../../src/hallOfFame.js";
 import { hallOfFameBadges, hallOfFameBoardLabel } from "../../src/hallOfFameBadges.js";
+import rankingWords from "../../src/copy/ranking.js";
 import { WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
 import { formatHallOfFamePick, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
@@ -236,12 +237,12 @@ test("the page for the hall-of-fame branch: one table a board, no name and no fu
 });
 
 test("the ranking screen's badges, by run tag", () => {
-  const badges = hallOfFameBadges(viewRows);
+  const badges = hallOfFameBadges(viewRows, rankingWords);
   assert.deepEqual(badges.get("AAAA1111"), ["명예의 전당 · 2026-W47 1위", "명예의 전당 · 본 판 1위 (잠정)"]);
   assert.deepEqual(badges.get("BBBB2222"), ["명예의 전당 · 2026-W47 2위"]);
   assert.equal(badges.size, 2);
-  assert.equal(hallOfFameBadges(null).size, 0);
-  assert.equal(hallOfFameBadges([{ board: "table-3", place: 4, run_tag: "X" }, { board: {}, place: 1, run_tag: "Y" }, "junk"]).size, 0);
+  assert.equal(hallOfFameBadges(null, rankingWords).size, 0);
+  assert.equal(hallOfFameBadges([{ board: "table-3", place: 4, run_tag: "X" }, { board: {}, place: 1, run_tag: "Y" }, "junk"], rankingWords).size, 0);
   assert.equal(hallOfFameBoardLabel("table-3"), "본 판 (판 규칙 3)");
 });
 

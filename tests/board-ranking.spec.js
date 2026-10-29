@@ -134,6 +134,69 @@ test("the same words posted again after a reload are not sent, and the person is
   expect(written).toHaveLength(2);
 });
 
+// Every post has a report button (store UGC rules). It names the post it is
+// about, asks for one of four reasons, sends the post id, the reason and the
+// board's own writer id -- nothing typed -- and stays reachable afterwards,
+// saying the report is in. A refusal the server raises is told in Korean.
+test("a post can be reported with a reason, once, and the answer is said aloud", async ({ page }) => {
+  const posts = [
+    { id: 7, nickname: "먼저 온 사람", body: "끝까지 가 보세요.", created_at: "2026-09-27T09:00:00Z" },
+    { id: 6, nickname: "내려간 사람", body: "이미 내려간 글입니다.", created_at: "2026-09-26T09:00:00Z" },
+  ];
+  const reports = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/board_posts**`, (route) => route.fulfill(json(posts)));
+  await page.route(`${SUPABASE}/rest/v1/board_reports**`, async (route) => {
+    const body = route.request().postDataJSON();
+    reports.push(body);
+    if (body.post_id === 6) return route.fulfill(json({ code: "P0001", message: "board report names no visible post" }, 400));
+    return route.fulfill({ status: 201, body: "" });
+  });
+  await useMockSupabase(page);
+  await openBoard(page);
+  await expect(page.locator(".board-post")).toHaveCount(2);
+
+  const toggle = page.getByRole("button", { name: "먼저 온 사람님의 글 신고" });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  const form = page.getByTestId("board-report-form");
+  await expect(form).toBeVisible();
+  await expect(page.getByRole("group", { name: "이 글을 신고하는 이유" })).toHaveAttribute("data-testid", "board-report-form");
+  // A press with no reason is answered, not sent.
+  await form.getByRole("button", { name: "신고 보내기" }).click();
+  await expect(page.getByTestId("board-report-status")).toHaveText("신고 사유를 하나 골라 주세요.");
+  expect(reports).toHaveLength(0);
+
+  await form.getByRole("radio", { name: "광고·도배" }).check();
+  await form.getByRole("button", { name: "신고 보내기" }).click();
+  await expect(page.getByTestId("board-report-status")).toContainText("신고를 받았습니다");
+  await expect(form).toHaveCount(0);
+  expect(reports).toHaveLength(1);
+  const writerId = await page.evaluate((key) => localStorage.getItem(key), BOARD_WRITER_ID_KEY);
+  expect(Object.keys(reports[0]).sort()).toEqual(["event_id", "post_id", "reason", "session_id"]);
+  expect(reports[0]).toMatchObject({ post_id: 7, reason: "spam", session_id: writerId });
+
+  // Reported: still reachable, blocked, and saying so. A second press sends nothing.
+  const done = page.getByRole("button", { name: "먼저 온 사람님의 글을 신고했습니다" });
+  await expect(done).toHaveAttribute("aria-disabled", "true");
+  await done.focus();
+  await expect(done).toBeFocused();
+  // Playwright will not click an aria-disabled button; the press is the event.
+  await done.dispatchEvent("click");
+  await expect(page.getByTestId("board-report-form")).toHaveCount(0);
+  expect(reports).toHaveLength(1);
+
+  // A post the server says is already down is told so, in Korean.
+  await page.getByRole("button", { name: "내려간 사람님의 글 신고" }).click();
+  await page.getByTestId("board-report-form").getByRole("radio", { name: "그 밖의 문제" }).check();
+  await page.getByTestId("board-report-form").getByRole("button", { name: "신고 보내기" }).click();
+  await expect(page.getByTestId("board-report-status")).toHaveText("이미 내려간 글입니다. 신고하지 않아도 됩니다.");
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow, "the report form does not widen the page").toBeLessThanOrEqual(1);
+});
+
 /** A board that takes every post and keeps what it was sent. */
 async function boardThatTakesPosts(page) {
   const written = [];

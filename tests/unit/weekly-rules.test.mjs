@@ -380,7 +380,9 @@ test("the season count reads the NEW GAME+ record, and before it the unlock or t
   assert.doesNotMatch(returning.text, /첫 시즌/);
   const views = read("src/components/WeeklyRuleViews.jsx");
   assert.match(views, /weeklyRuleLine\(now, undefined, \{ first \}\)/);
-  assert.match(views, /이번 주의 규칙으로 시작/);
+  // The box's words are the views' copy table (src/copy/weekRule.js).
+  assert.match(views, /first \? weekRuleCopy\.takeUp : weekRuleCopy\.turnDown/);
+  assert.match(read("src/copy/weekRule.js"), /이번 주의 규칙으로 시작/);
   assert.match(read("src/components/WeeklyRuleNotice.jsx"), /first \? setWeekRuleTakenUp : setWeekRuleTurnedDown/);
   assert.equal(setWeekRuleTakenUp(true), true);
   assert.equal(localStorage.getItem(WEEK_RULE_ON_STORAGE_KEY), "1");

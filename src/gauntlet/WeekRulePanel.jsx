@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { getWeekRule } from "./weeklyRules.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
+import edgeCopy from "../copy/edge.js";
 
 /**
  * 이번 주의 규칙 on a case's opening page: a panel of its own under the page's
@@ -70,7 +71,7 @@ export function useSceneFold(node, page = null) {
     told,
     folded ? (
       <button type="button" className="ghost" data-testid="scene-unfold" onClick={() => setFolded(false)}>
-        지난 시즌에 읽은 장면 · 펼치기
+        {edgeCopy.unfold}
       </button>
     ) : null,
     page?.read === false ? <b data-testid="scene-new"> · NEW</b> : null,
@@ -94,13 +95,13 @@ export function useSceneFold(node, page = null) {
  */
 export function pastPick(picked, id, wild = 0) {
   const hit = !!picked && picked === id;
-  if (wild === 2) return hit ? "지난 시즌에도 다시 짰다" : "이 판을 다시 연다";
+  if (wild === 2) return hit ? edgeCopy.pastPick.wildPicked : edgeCopy.pastPick.wild;
   if (!hit) return null;
   return wild ? (
-    <span className="sr-only" data-testid="past-pick-wild"> 지난 시즌의 당신이 고른 카드</span>
+    <span className="sr-only" data-testid="past-pick-wild">{edgeCopy.pastPick.wildSr}</span>
   ) : (
     <span className="gx-card-type gx-card-name" data-testid="past-pick">
-      <span className="sr-only"> </span>지난 시즌<i>의 당신</i><i style={{ fontSize: 0 }}>이 고른 카드</i>
+      <span className="sr-only"> </span>{edgeCopy.pastPick.shown}<i>{edgeCopy.pastPick.clipped}</i><i style={{ fontSize: 0 }}>{edgeCopy.pastPick.heard}</i>
     </span>
   );
 }
@@ -131,7 +132,7 @@ function SeasonEchoPanel({ echo }) {
 function WeekRulePanel({ rules }) {
   return (
     <div className="gx-panel gx-panel-breach gx-carry" data-testid="week-rule-panel" style={{ gridArea: "auto" }}>
-      <p className="gx-breach-kicker">이번 주의 규칙 · 이 시즌이 끝날 때까지</p>
+      <p className="gx-breach-kicker">{edgeCopy.weekRule}</p>
       <ul>
         {rules.map((rule) => (
           <li key={rule.id} className={`gx-mutation mut-${rule.id}`}>

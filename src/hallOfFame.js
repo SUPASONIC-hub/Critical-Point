@@ -33,7 +33,7 @@
  * with no mark at all (`suspicion` an empty array: the insert trigger judged
  * it and found nothing, and no daily check marked it), whether or not the
  * replay ever reached it. The server counts it, `hall_of_fame_counts()`
- * (20261102030000_hall_of_fame.sql), after the day's marks are written; the
+ * (20261102040000_hall_of_fame.sql), after the day's marks are written; the
  * CI job reads that count (HALL_OF_FAME_COUNTS_SQL) and hall_of_fame_settle
  * counts again itself, so a place below ten is refused whatever the call says.
  * The replay, which a place still needs, reads only each open board's first

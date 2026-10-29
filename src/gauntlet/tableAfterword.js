@@ -1,6 +1,8 @@
 import { drawStep, GAUGE_MAX, getMultiplier } from "./gauntletEngine.js";
 import { tableReactions } from "../caseCopy.js";
 import { formatNumber } from "../gameConstants.js";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
 
 /**
  * What a closed window can still say about itself (improvement notes
@@ -11,7 +13,11 @@ import { formatNumber } from "../gameConstants.js";
  * It is the runtime's (the reveal, the commit, the run readout), never the
  * table's: the PlayScreen chunk has no bytes left, and none of this is drawn
  * while a window is live.
+ *
+ * Its words are src/copy/table.js's `afterword` (영어판 4단계), read as each
+ * line is made, so another language laid over them is the one printed.
  */
+const words = () => tableCopy.afterword;
 
 /**
  * C-11, after a cash: the push the player did not make. The step is the one
@@ -44,9 +50,9 @@ export function describeAfterword(win) {
   // nothing to weigh "one more" against: no line (user, 2026-10-23 Q34 (1)).
   if (win?.status === "cashed" && !(Number(win.pushes) > 0)) return null;
   const next = readNextPush(win);
-  if (next) return `한 번 더 밀었다면 +${next.step} → ${next.gauge}, 벽 ${next.wall}: ${next.safe ? "갈 수 있었다" : "BUST였다"}.`;
+  if (next) return fill(words().nextPush, { step: next.step, gauge: next.gauge, wall: next.wall, outcome: next.safe ? words().nextSafe : words().nextBust });
   const tell = readTellWall(win);
-  return tell ? `심박은 벽을 ${tell.heard}쯤으로 들었다(실제 ${tell.wall}).` : null;
+  return tell ? fill(words().tell, { heard: tell.heard, wall: tell.wall }) : null;
 }
 
 /**
@@ -106,7 +112,7 @@ export function readCaseRead(log = []) {
 
 export function describeCaseRead(log) {
   const percent = readCaseRead(log);
-  return percent === null ? null : `이번 사건: 벽을 본 사람의 ${percent}%만큼 벌었습니다.`;
+  return percent === null ? null : fill(words().caseRead, { share: `${percent}%` });
 }
 
 /**
@@ -126,14 +132,14 @@ export function getHeatStage(threshold) {
  * alone was read as said of this scene, not of the table before it. The
  * pushes, the heat and the wall the window closed on, as the reveal printed.
  */
-export function describeLastTable(threshold) {
+function describeLastTable(threshold) {
   const pushes = Number(threshold?.pushes) || 0;
   const gauge = Math.floor(Number(threshold?.gauge) || 0);
   const wall = Number(threshold?.wall) || 0;
-  const tail = wall ? ` (벽 ${wall})` : "";
+  const tail = wall ? fill(words().wallTail, { wall }) : "";
   // A bust the clock made (its creep, or the time running out) is no push's.
-  if (threshold?.busted) return `직전 판 · ${threshold.cause === "push" ? `${pushes}번째 밀기에서` : `${pushes}번 밀고`} BUST${tail}`;
-  return pushes ? `직전 판 · ${pushes}번 밀고 열기 ${gauge}에서 확정${tail}` : `직전 판 · 밀지 않고 확정${tail}`;
+  if (threshold?.busted) return fill(threshold.cause === "push" ? words().bustOnPush : words().bustAfter, { pushes, tail });
+  return fill(pushes ? words().cashed : words().cashedNoPush, { pushes, gauge, tail });
 }
 
 /**
@@ -170,5 +176,5 @@ export function perCaseVault(vault, cases) {
 export function describeVaultPerCase(caseResults = {}) {
   const results = caseResults && typeof caseResults === "object" ? caseResults : {};
   const perCase = perCaseVault(results.final?.gauntlet?.vault, Object.keys(results).length);
-  return perCase === null ? "" : `사건당 금고 ${formatNumber(perCase)}`;
+  return perCase === null ? "" : fill(words().vaultPerCase, { vault: formatNumber(perCase) });
 }

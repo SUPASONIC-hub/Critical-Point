@@ -100,7 +100,7 @@ const MOTIF_RULES = [
   ["gallery", ["갤러리", "화랑", "전시장"]],
   ["counter", ["창구", "지점", "객장"]],
   ["control", ["통제실", "시스템 지도", "배차석", "상황판", "운영실"]],
-  ["archive", ["보관소", "자료실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
+  ["archive", ["보관소", "자료실", "기록실", "열람실", "스캔실", "아카이브", "서고", "색인", "설계 로그", "승인 기록"]],
   // A 국정감사 room is a hall with a raised dais and a witness table, and it is
   // the one room in the season where the cameras are the point. Tested before
   // the generic hall so 정무위원회 회의실 does not fall into 회의실.
