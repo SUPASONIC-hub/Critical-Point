@@ -989,10 +989,12 @@ const budgets = [
   // Japanese (일본어 1단계, 2026-10-26; hidden, ?lang=ja only): kana and kanji are three bytes each in UTF-8, so a case
   // is larger raw than its English though shorter to read. 사건 01 the largest, 82,376 / 23,101; the dictionary
   // (screen copy, 1,537 lines, and the page's system-font style) 109,813 / 38,565. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 82_376, maxGzip: 23_105 },
+  // 82,376 -> 82,383 on 2026-10-29, lang-terms (일본어판 표기 맞춤): 사건 01 measured 82,379, the raw plus 4.
+  { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 82_383, maxGzip: 23_105 },
   // 110,001 / 38,601 -> 152,779 / 51,777 on 2026-10-28, lang-full: the Japanese screen copy of English steps three and four
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 152_779, maxGzip: 51_777 },
+  // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 152_779, maxGzip: 51_787 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1062,8 +1064,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * them at 422,686, 471,543 and 463,660. Both languages open to the end
  * (lang-full, 10-28): English 472,083, Japanese 477,810 (the Japanese
  * dictionary carries the screen copy of English steps three and four).
+ * Japanese 477,900 on 10-29 (lang-terms, 일본어판 표기 맞춤), the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_772, en: 472_171, ja: 477_898 };
+const FIRST_PAINT_BUDGETS = { ko: 422_772, en: 472_171, ja: 477_904 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
