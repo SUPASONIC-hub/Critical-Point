@@ -28,7 +28,7 @@ export default {
           "label": "Call your scattered colleagues to prepare together"
         },
         "reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         }
       },
       "place": "KD Capital Headquarters · Hallway outside the CEO’s Office",
@@ -56,10 +56,10 @@ export default {
           "label": "Collect the victims’ questions and choose one"
         },
         "reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         },
         "c41_drill_evidence_turn": {
-          "label": "Attach that day’s papers to every 'I don’t recall'"
+          "label": "Pin papers on 'I don’t recall'"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Mock Hearing between the Shelves",
@@ -87,10 +87,10 @@ export default {
           "label": "Write down what was said and report it to the chair’s office"
         },
         "reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         },
         "c41_corridor_evidence_turn": {
-          "label": "Attach that day’s papers to every 'I don’t recall'"
+          "label": "Pin papers on 'I don’t recall'"
         }
       },
       "place": "National Assembly Main Building 3rd Floor · Hallway outside the Witness Waiting Room",
@@ -118,10 +118,10 @@ export default {
           "label": "Use the receipt log to establish that he got the papers"
         },
         "reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         },
         "c41_chamber_evidence_turn": {
-          "label": "Attach that day’s papers to every 'I don’t recall'"
+          "label": "Pin papers on 'I don’t recall'"
         }
       },
       "place": "National Assembly Policy Committee Room · Unsworn Witness Seat",
@@ -383,7 +383,7 @@ export default {
           "label": "Swap questions about memory for questions papers answer"
         },
         "c41_route_system_evidence_turn": {
-          "label": "Attach that day’s papers to every 'I don’t recall'"
+          "label": "Pin papers on 'I don’t recall'"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Laptop by the Shelves",
@@ -458,7 +458,7 @@ export default {
           "label": "Lock in your questioning slot at the lawmaker’s office"
         },
         "c41_start_warm_reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market · Inside, Shutter Down",
@@ -488,7 +488,7 @@ export default {
           "label": "Start by cutting the list of 1,106 down to one question"
         },
         "c41_start_record_reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         }
       },
       "place": "Members’ Office Building 7th Floor · Lawmaker’s Office",
@@ -518,7 +518,7 @@ export default {
           "label": "Lock in your questioning slot at the lawmaker’s office"
         },
         "c41_start_rush_reframe": {
-          "label": "Ask how 'I don’t recall' has ended before"
+          "label": "Ask how 'I don’t recall' ended"
         }
       },
       "place": "Members’ Office Building 7th Floor · Lawmaker’s Office",

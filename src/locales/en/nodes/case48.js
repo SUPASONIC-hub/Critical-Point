@@ -28,7 +28,7 @@ export default {
           "label": "Check the clauses line by line against the 2023-0412 contract"
         },
         "reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         }
       },
       "place": "KD Capital Headquarters · Risk Management Department",
@@ -56,10 +56,10 @@ export default {
           "label": "Test with numbers a plan whose only repayment source is investment"
         },
         "reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         },
         "c48_hub_evidence_turn": {
-          "label": "Turn to the unlisted pages at the back of the investment contract"
+          "label": "Turn to the unlisted back pages"
         }
       },
       "place": "LoopNow Dark Store No. 1, Seongsu-dong · Night-Shift Logistics Floor",
@@ -87,10 +87,10 @@ export default {
           "label": "Keep NOAH’s score; attach ECHO’s analysis only as a note"
         },
         "reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         },
         "c48_engine_evidence_turn": {
-          "label": "Turn to the unlisted pages at the back of the investment contract"
+          "label": "Turn to the unlisted back pages"
         }
       },
       "place": "KD Data Lab, Pangyo · Server Room",
@@ -119,10 +119,10 @@ export default {
           "label": "Write the dissent aloud, line by line, with colleagues"
         },
         "reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         },
         "c48_pen_evidence_turn": {
-          "label": "Turn to the unlisted pages at the back of the investment contract"
+          "label": "Turn to the unlisted back pages"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table Between the Shelves",
@@ -385,7 +385,7 @@ export default {
           "label": "Shelve the statistics and focus only on this agenda"
         },
         "c48_route_system_evidence_turn": {
-          "label": "Turn to the unlisted pages at the back of the investment contract"
+          "label": "Turn to the unlisted back pages"
         }
       },
       "place": "KD Capital Headquarters · Records Room Terminal",
@@ -460,7 +460,7 @@ export default {
           "label": "Check the clauses line by line against the 2023-0412 contract"
         },
         "c48_start_warm_reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market · Rooftop",
@@ -491,7 +491,7 @@ export default {
           "label": "Use NOAH’s Grade A as the baseline and cut review time"
         },
         "c48_start_record_reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market · Counter",
@@ -521,7 +521,7 @@ export default {
           "label": "Use NOAH’s Grade A as the baseline and cut review time"
         },
         "c48_start_rush_reframe": {
-          "label": "Ask how the signature fields have been filled"
+          "label": "Ask how fields were signed"
         }
       },
       "place": "In a Taxi · Mangwon to Yeouido",

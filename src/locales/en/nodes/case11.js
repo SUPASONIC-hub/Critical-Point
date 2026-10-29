@@ -60,7 +60,7 @@ export default {
           "label": "Ask how answers have been put off"
         },
         "c11_script_evidence_turn": {
-          "label": "Pin down when the dissent was switched to purge"
+          "label": "Find when dissent became purge"
         }
       },
       "place": "Members’ Office Building 7th Floor · Policy Committee Member’s Office",
@@ -91,7 +91,7 @@ export default {
           "label": "Ask how answers have been put off"
         },
         "c11_rehearsal_evidence_turn": {
-          "label": "Pin down when the dissent was switched to purge"
+          "label": "Find when dissent became purge"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 2nd Floor · Stacks of Ledgers",
@@ -122,7 +122,7 @@ export default {
           "label": "Ask how answers have been put off"
         },
         "c11_sign_evidence_turn": {
-          "label": "Pin down when the dissent was switched to purge"
+          "label": "Find when dissent became purge"
         }
       },
       "place": "Trigger Lab Rooftop",
@@ -384,7 +384,7 @@ export default {
           "label": "Bury the numbers and follow the prepared answers"
         },
         "c11_route_system_evidence_turn": {
-          "label": "Pin down when the dissent was switched to purge"
+          "label": "Find when dissent became purge"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",

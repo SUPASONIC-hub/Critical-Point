@@ -2,7 +2,7 @@ import { expect, test } from "./helpers/network.js";
 import { writeFileSync } from "node:fs";
 import { LOCALE_KEY } from "../src/appConfig.js";
 import { CASE_SEQUENCE, nodeOrders, nodes } from "../src/gameData.js";
-import { startDebugNode } from "./helpers/gameFlow.js";
+import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureStakedTable, measureTable,OVERCLOCKED_BOARD, openBrokenBoard } from "./helpers/layout.js";
 
 /**
@@ -40,7 +40,72 @@ if (LAYOUT_LANG) {
 async function expectLayoutLang(page, label) {
   if (LAYOUT_LANG) await expect(page.locator("html"), `${label}: the page is in ${LAYOUT_LANG}`).toHaveAttribute("lang", LAYOUT_LANG);
 }
-for (const caseId of CASE_SEQUENCE) {
+/**
+ * LAYOUT_SCENES=hand5 is the narrow pass: the 360x740 phone only, and only the
+ * scenes of each case that deal five cards, walked on one page by the debug
+ * build's `window.__cpDebugJump` (GameRuntime.jsx) instead of a reload per
+ * scene. The full walk in English or Japanese took about ten minutes a case;
+ * this is the hand most likely to run under the bar on the screen most likely
+ * to show it. Each row also carries every card's label and box, so a hand that
+ * does not fit names the card that is tallest in its last row. The full walk
+ * and the heavy-board pass below do not run in this mode; unset, they run as
+ * they did.
+ */
+const LAYOUT_SCENES = process.env.LAYOUT_SCENES ?? "";
+const HAND5 = LAYOUT_SCENES === "hand5";
+if (LAYOUT_SCENES && !HAND5) throw new Error(`LAYOUT_SCENES=${LAYOUT_SCENES}: the only narrow mode is hand5`);
+
+const fiveCardScenes = (caseId) => nodeOrders[caseId].filter((nodeId) => nodes[nodeId].choices.length === 5);
+
+async function measureCards(page) {
+  return page.evaluate(() =>
+    [...document.querySelectorAll(".choices .choice")].map((card) => {
+      const box = card.getBoundingClientRect();
+      const label = card.querySelector("[data-testid='card-label']");
+      const lines = label ? Math.round(label.getBoundingClientRect().height / parseFloat(getComputedStyle(label).lineHeight)) : 0;
+      return { label: label?.textContent ?? "", lines, locked: card.classList.contains("locked-choice"), top: Math.round(box.top), bottom: Math.round(box.bottom), height: Math.round(box.height) };
+    }),
+  );
+}
+
+for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
+  test(`the five-card ${caseId} hands fit above the action bar on a 360x740 phone, without reloads @layout`, async ({ page }) => {
+    const nodeIds = fiveCardScenes(caseId);
+    test.skip(!nodeIds.length, `${caseId} deals no five-card hand`);
+    test.setTimeout(60_000 + nodeIds.length * 30_000);
+    await page.setViewportSize(LAYOUT_VIEWPORTS["small phone"]);
+    await startDebugNode(page, caseId, nodeIds[0]);
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
+    const rows = [];
+    const failures = [];
+    for (const [index, nodeId] of nodeIds.entries()) {
+      if (index > 0) {
+        await page.evaluate(([c, n]) => window.__cpDebugJump(c, n), [caseId, nodeId]);
+        await expect(page.getByTestId("debug-overlay").locator(".debug-overlay-heading b"), `${nodeId}: the jump landed`).toHaveText(`${caseId} / ${nodeId}`);
+        await dismissProtocolBreach(page);
+      }
+      await expectLayoutLang(page, nodeId);
+      await page.locator(".choices .choice").first().waitFor();
+      await page.locator(".gx-hand").evaluate(async (hand) => {
+        const ending = hand.getAnimations({ subtree: true }).filter((animation) => Number.isFinite(animation.effect?.getComputedTiming().endTime));
+        await Promise.all(ending.map((animation) => animation.finished.catch(() => {})));
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      });
+      const row = { caseId, nodeId, name: "small phone", ...(await measureTable(page)), hand: await measureCards(page) };
+      rows.push(row);
+      if (row.lastCard > row.actionsTop) {
+        const lastRow = row.hand.filter((card) => card.bottom > row.actionsTop);
+        const tallest = lastRow.reduce((a, b) => (b.height > a.height ? b : a), lastRow[0]);
+        failures.push(`${nodeId}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards; tallest under it: "${tallest?.label}" ${tallest?.height}px)`);
+      }
+      if (row.widest > row.innerWidth + 1) failures.push(`${nodeId}: ${row.widest - row.innerWidth}px wider than the screen`);
+    }
+    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-hand5-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
+    expect(failures, failures.join("\n")).toEqual([]);
+  });
+}
+
+for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`every ${caseId} decision fits above the action bar @layout`, async ({ page }) => {
     test.setTimeout(900_000);
     await page.goto("/?debug=1");
@@ -111,7 +176,7 @@ function fullestScenes(caseId) {
   return hands.filter(([, count]) => count === most).map(([nodeId]) => nodeId);
 }
 
-for (const caseId of CASE_SEQUENCE) {
+for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`the fullest ${caseId} hands fit on an overclocked board with five relics @layout`, async ({ page }) => {
     test.setTimeout(600_000);
     const nodeIds = fullestScenes(caseId);

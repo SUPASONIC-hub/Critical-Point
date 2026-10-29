@@ -29,7 +29,7 @@ export default {
           "label": "File a formal objection to the reason 'no results'"
         },
         "reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -57,10 +57,10 @@ export default {
           "label": "Register the notebook as an official Trigger Lab record"
         },
         "reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         },
         "c24_desks_evidence_turn": {
-          "label": "Open the internal report attached to the decision"
+          "label": "Open the report on the breakup"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Desks Being Packed",
@@ -88,10 +88,10 @@ export default {
           "label": "Tell colleagues the half you heard, first"
         },
         "reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         },
         "c24_rooftop_evidence_turn": {
-          "label": "Open the internal report attached to the decision"
+          "label": "Open the report on the breakup"
         }
       },
       "place": "Trigger Lab Rooftop · By the Potted Cherry Tree",
@@ -119,10 +119,10 @@ export default {
           "label": "Write the objection in the names of everyone here"
         },
         "reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         },
         "c24_farewell_evidence_turn": {
-          "label": "Open the internal report attached to the decision"
+          "label": "Open the report on the breakup"
         }
       },
       "place": "Street Stall in Front of the Company · Farewell Party",
@@ -384,7 +384,7 @@ export default {
           "label": "Find former members of the 19 and tell them"
         },
         "c24_route_system_evidence_turn": {
-          "label": "Open the internal report attached to the decision"
+          "label": "Open the report on the breakup"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Lab Terminal",
@@ -459,7 +459,7 @@ export default {
           "label": "Ask the one-share group to find colleagues their next posts"
         },
         "c24_start_warm_reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -489,7 +489,7 @@ export default {
           "label": "Put out the blank-approver notice beside the letter"
         },
         "c24_start_record_reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -519,7 +519,7 @@ export default {
           "label": "Look after colleagues’ next posts before the notice"
         },
         "c24_start_rush_reframe": {
-          "label": "Count how many times 'no results' has been used"
+          "label": "Count each use of 'no results'"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",

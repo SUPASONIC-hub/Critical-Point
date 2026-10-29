@@ -52,7 +52,7 @@ export default {
           "label": "入れ替えの承認書をECHO自身に読ませる"
         },
         "c20_server_evidence_turn": {
-          "label": "トリガーラボの記録のデータ移転契約書を出す"
+          "label": "ラボ記録のデータ移転契約書を出す"
         }
       },
       "place": "トリガーラボ地下 サーバー室 · ECHOのサーバー",
@@ -83,7 +83,7 @@ export default {
           "label": "入れ替えの承認書をECHO自身に読ませる"
         },
         "c20_datacenter_evidence_turn": {
-          "label": "トリガーラボの記録のデータ移転契約書を出す"
+          "label": "ラボ記録のデータ移転契約書を出す"
         }
       },
       "place": "パンギョ KDデータラボ データセンター · 学習サーバー区画",
@@ -114,7 +114,7 @@ export default {
           "label": "入れ替えの承認書をECHO自身に読ませる"
         },
         "c20_farewell_evidence_turn": {
-          "label": "トリガーラボの記録のデータ移転契約書を出す"
+          "label": "ラボ記録のデータ移転契約書を出す"
         }
       },
       "place": "トリガーラボ4階 分析官室 · ECHOの送別会",
@@ -376,7 +376,7 @@ export default {
           "label": "審査を控えた申請人にエンジンの交代を先に知らせる"
         },
         "c20_route_system_evidence_turn": {
-          "label": "トリガーラボの記録のデータ移転契約書を出す"
+          "label": "ラボ記録のデータ移転契約書を出す"
         }
       },
       "place": "トリガーラボ地下 サーバー室 · ECHOの端末",

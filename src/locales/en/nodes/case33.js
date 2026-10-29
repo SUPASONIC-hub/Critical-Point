@@ -28,7 +28,7 @@ export default {
           "label": "Go to Baek Arin’s studio tonight and help her pack"
         },
         "reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Department",
@@ -56,10 +56,10 @@ export default {
           "label": "Apply for protective measures: the eviction is retaliation"
         },
         "reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         },
         "c33_room_evidence_turn": {
-          "label": "Open the complaint draft’s date and the risk score screen"
+          "label": "Open draft date and risk score"
         }
       },
       "place": "Gongdeok-dong Group Housing · Baek Arin’s Studio",
@@ -87,10 +87,10 @@ export default {
           "label": "Talk Baek Arin into blaming it all on the move for today"
         },
         "reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         },
         "c33_mother_evidence_turn": {
-          "label": "Open the complaint draft’s date and the risk score screen"
+          "label": "Open draft date and risk score"
         }
       },
       "place": "Anyang Central Market · Yoonkyung Alterations",
@@ -118,10 +118,10 @@ export default {
           "label": "Gather a petition for Baek Arin with the victims’ group"
         },
         "reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         },
         "c33_rice_evidence_turn": {
-          "label": "Open the complaint draft’s date and the risk score screen"
+          "label": "Open draft date and risk score"
         }
       },
       "place": "Gongdeok-dong Group Housing · The Half-Packed Studio",
@@ -384,7 +384,7 @@ export default {
           "label": "Publish the numbers and show the complaints are meant to scare"
         },
         "c33_route_system_evidence_turn": {
-          "label": "Open the complaint draft’s date and the risk score screen"
+          "label": "Open draft date and risk score"
         }
       },
       "place": "KD Capital · Review Terminal",
@@ -459,7 +459,7 @@ export default {
           "label": "Call Kang Taemin and the others to move everything tonight"
         },
         "c33_start_warm_reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Department",
@@ -490,7 +490,7 @@ export default {
           "label": "Formally tell the FSS the complaint uses the report’s files"
         },
         "c33_start_record_reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Department",
@@ -521,7 +521,7 @@ export default {
           "label": "Call the group legal team first and sound out a settlement"
         },
         "c33_start_rush_reframe": {
-          "label": "Gather the three months of those who reported before"
+          "label": "Trace earlier reporters"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Department",

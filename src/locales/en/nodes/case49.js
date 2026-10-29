@@ -28,7 +28,7 @@ export default {
           "label": "Reply at once with one line, 'I’ll be there', and prepare"
         },
         "reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         }
       },
       "place": "Secondhand bookshop in Hoegi-dong · 1st floor",
@@ -56,10 +56,10 @@ export default {
           "label": "Write down the story of each thing as a list for tomorrow"
         },
         "reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         },
         "c49_market_evidence_turn": {
-          "label": "Open the account records of whoever set up that room"
+          "label": "Open the room host’s account"
         }
       },
       "place": "Mangwon Market · Gaeul Rice Cake Shop",
@@ -87,10 +87,10 @@ export default {
           "label": "Copy the folder path tonight, while ECHO is still alive"
         },
         "reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         },
         "c49_server_evidence_turn": {
-          "label": "Open the account records of whoever set up that room"
+          "label": "Open the room host’s account"
         }
       },
       "place": "Old Trigger Lab archive, B2 · Case desk",
@@ -118,10 +118,10 @@ export default {
           "label": "Log the call with times and tell him you are writing"
         },
         "reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         },
         "c49_crosswalk_evidence_turn": {
-          "label": "Open the account records of whoever set up that room"
+          "label": "Open the room host’s account"
         }
       },
       "place": "Yeouido · In front of KD Financial Group headquarters · Crosswalk",
@@ -383,7 +383,7 @@ export default {
           "label": "Publish the list of 61 empty fields before the meeting"
         },
         "c49_route_system_evidence_turn": {
-          "label": "Open the account records of whoever set up that room"
+          "label": "Open the room host’s account"
         }
       },
       "place": "Old Trigger Lab archive, B2 · Experiment terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Show the text to the group chat and write the reply together"
         },
         "c49_start_warm_reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         }
       },
       "place": "Secondhand bookshop in Hoegi-dong · 1st floor",
@@ -488,7 +488,7 @@ export default {
           "label": "Reply asking for the agenda and terms in writing first"
         },
         "c49_start_record_reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         }
       },
       "place": "Secondhand bookshop in Hoegi-dong · 1st floor",
@@ -518,7 +518,7 @@ export default {
           "label": "Reply asking for the agenda and terms in writing first"
         },
         "c49_start_rush_reframe": {
-          "label": "Gather whose names filled the empty fields"
+          "label": "Gather who filled the blanks"
         }
       },
       "place": "Secondhand bookshop in Hoegi-dong · 1st floor",

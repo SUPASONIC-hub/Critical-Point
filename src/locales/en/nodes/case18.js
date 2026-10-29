@@ -29,7 +29,7 @@ export default {
           "label": "Work out first whether this post could be a blade against KD"
         },
         "reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -57,10 +57,10 @@ export default {
           "label": "Ask who Oh Jinwoo would protect there, before the salary"
         },
         "reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         },
         "c18_lounge_evidence_turn": {
-          "label": "Leaf through the side agreement to the draft sale contract"
+          "label": "Read the sale draft’s side deal"
         }
       },
       "place": "Bridge Bank head office, Yeouido · 32nd-floor lounge meeting room",
@@ -88,10 +88,10 @@ export default {
           "label": "Press Oh Jinwoo to decide before tonight is over"
         },
         "reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         },
         "c18_party_evidence_turn": {
-          "label": "Leaf through the side agreement to the draft sale contract"
+          "label": "Read the sale draft’s side deal"
         }
       },
       "place": "Trigger Lab, 4th floor · Pantry year-end party",
@@ -119,10 +119,10 @@ export default {
           "label": "Urge Oh Jinwoo to take the advice to stand on the winning side"
         },
         "reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         },
         "c18_table_evidence_turn": {
-          "label": "Leaf through the side agreement to the draft sale contract"
+          "label": "Read the sale draft’s side deal"
         }
       },
       "place": "Oh Sangchul’s home, Suwon · Dining table",
@@ -383,7 +383,7 @@ export default {
           "label": "Show Oh Jinwoo the evaluation sheet as it is"
         },
         "c18_route_system_evidence_turn": {
-          "label": "Leaf through the side agreement to the draft sale contract"
+          "label": "Read the sale draft’s side deal"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
@@ -459,7 +459,7 @@ export default {
           "label": "Work out first whether this post could be a blade against KD"
         },
         "c18_start_warm_reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -490,7 +490,7 @@ export default {
           "label": "Set the envelope aside and hear Oh Jinwoo out first"
         },
         "c18_start_record_reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -521,7 +521,7 @@ export default {
           "label": "Set the envelope aside and hear Oh Jinwoo out first"
         },
         "c18_start_rush_reframe": {
-          "label": "Ask to open the offer’s attachments first"
+          "label": "Ask for the offer’s attachments"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

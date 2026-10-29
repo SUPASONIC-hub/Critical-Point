@@ -28,7 +28,7 @@ export default {
           "label": "Copy Haeon’s account history to USB, no lookup log"
         },
         "reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Corporate loan desk",
@@ -56,10 +56,10 @@ export default {
           "label": "Keep Oh Jinwoo’s files and yours in separate folders"
         },
         "reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         },
         "c8_trail_evidence_turn": {
-          "label": "Lay deposit dates and approval dates on one calendar"
+          "label": "Match deposit and approval dates"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Corporate loan officer’s desk",
@@ -87,10 +87,10 @@ export default {
           "label": "Visit each partner-company buyer at their office"
         },
         "reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         },
         "c8_gallery_evidence_turn": {
-          "label": "Lay deposit dates and approval dates on one calendar"
+          "label": "Match deposit and approval dates"
         }
       },
       "place": "Gallery On, Cheongdam-dong · Exhibition hall",
@@ -118,10 +118,10 @@ export default {
           "label": "Leak an audit rumor to Yoon’s side to move the money"
         },
         "reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         },
         "c8_bait_evidence_turn": {
-          "label": "Lay deposit dates and approval dates on one calendar"
+          "label": "Match deposit and approval dates"
         }
       },
       "place": "Haeon Guesthouse, Gyeongpo · Office building",
@@ -382,7 +382,7 @@ export default {
           "label": "Connect the seven companies’ flows on one map"
         },
         "c8_route_system_evidence_turn": {
-          "label": "Lay deposit dates and approval dates on one calendar"
+          "label": "Match deposit and approval dates"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Corporate registry terminal",
@@ -457,7 +457,7 @@ export default {
           "label": "Ask the three who texted to help trace the account"
         },
         "c8_start_stand_reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Corporate loan desk",
@@ -487,7 +487,7 @@ export default {
           "label": "Sign and file a suspicious transaction report on Haeon"
         },
         "c8_start_open_reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Corporate loan desk",
@@ -517,7 +517,7 @@ export default {
           "label": "Ask Branch Manager Na why it was returned three times"
         },
         "c8_start_alone_reframe": {
-          "label": "Look for more companies at the same address"
+          "label": "Find more firms at that address"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Corporate loan desk",

@@ -28,7 +28,7 @@ export default {
           "label": "Go over the 31 names with Moon Gaeul before the shop opens"
         },
         "reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         }
       },
       "place": "KD Capital Risk Management Department · Window Seat",
@@ -56,10 +56,10 @@ export default {
           "label": "File objections to all 31 'Unconfirmable' rulings"
         },
         "reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         },
         "c47_steam_evidence_turn": {
-          "label": "Find where the 2nd-round fund’s leftover money goes"
+          "label": "Track the 2nd fund’s surplus"
         }
       },
       "place": "Mangwon Market Gaeul Rice Cake Shop",
@@ -87,10 +87,10 @@ export default {
           "label": "Photograph the notebook and send it to Yeon Seojun as leverage"
         },
         "reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         },
         "c47_factory_evidence_turn": {
-          "label": "Find where the 2nd-round fund’s leftover money goes"
+          "label": "Track the 2nd fund’s surplus"
         }
       },
       "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
@@ -118,10 +118,10 @@ export default {
           "label": "Sit with Moon Gaeul on the columbarium bench until she decides"
         },
         "reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         },
         "c47_memorial_evidence_turn": {
-          "label": "Find where the 2nd-round fund’s leftover money goes"
+          "label": "Track the 2nd fund’s surplus"
         }
       },
       "place": "Incheon memorial park · Columbarium",
@@ -383,7 +383,7 @@ export default {
           "label": "Set the figures aside; stick to the mediation schedule"
         },
         "c47_route_system_evidence_turn": {
-          "label": "Find where the 2nd-round fund’s leftover money goes"
+          "label": "Track the 2nd fund’s surplus"
         }
       },
       "place": "Mangwon Market Gaeul Rice Cake Shop · Corner Table",
@@ -458,7 +458,7 @@ export default {
           "label": "Gather everyone from the chat outside the shop at dawn"
         },
         "c47_start_warm_reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         }
       },
       "place": "KD Capital Risk Management Department · Window Seat",
@@ -488,7 +488,7 @@ export default {
           "label": "Go over the 31 names with Moon Gaeul before the shop opens"
         },
         "c47_start_record_reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         }
       },
       "place": "KD Capital Risk Management Department · Window Seat",
@@ -518,7 +518,7 @@ export default {
           "label": "Put the rest of the files in a drawer; go with Oh Jinwoo"
         },
         "c47_start_rush_reframe": {
-          "label": "Find compensation criteria that included people without papers"
+          "label": "Find criteria for the paperless"
         }
       },
       "place": "KD Capital Risk Management Department · Window Seat",

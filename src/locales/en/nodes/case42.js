@@ -28,7 +28,7 @@ export default {
           "label": "Formally ask HR why the approver field is empty"
         },
         "reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         }
       },
       "place": "KD Capital Risk Management Department · Hallway",
@@ -56,10 +56,10 @@ export default {
           "label": "Check the property register and auction records first"
         },
         "reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         },
         "c42_pension_evidence_turn": {
-          "label": "Find which KD file this guesthouse’s address is on"
+          "label": "Find this address in KD’s files"
         }
       },
       "place": "Mulgyeol Stay Guesthouse, Gyeongpo · Yard",
@@ -87,10 +87,10 @@ export default {
           "label": "Call the duty officer and stop the texts on your authority"
         },
         "reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         },
         "c42_karaoke_evidence_turn": {
-          "label": "Find which KD file this guesthouse’s address is on"
+          "label": "Find this address in KD’s files"
         }
       },
       "place": "By Gyeongpo Beach · Karaoke Alley",
@@ -118,10 +118,10 @@ export default {
           "label": "Admit honestly that you wanted to beat Yoon Sanghyuk"
         },
         "reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         },
         "c42_breakwater_evidence_turn": {
-          "label": "Find which KD file this guesthouse’s address is on"
+          "label": "Find this address in KD’s files"
         }
       },
       "place": "Gyeongpo breakwater",
@@ -383,7 +383,7 @@ export default {
           "label": "Leave the item; ask to exempt Yeo Dain’s case alone"
         },
         "c42_route_system_evidence_turn": {
-          "label": "Find which KD file this guesthouse’s address is on"
+          "label": "Find this address in KD’s files"
         }
       },
       "place": "Mulgyeol Stay Guesthouse, Gyeongpo · 2nd-Floor Room",
@@ -458,7 +458,7 @@ export default {
           "label": "Leave for Gyeongpo with colleagues, approval or not"
         },
         "c42_start_warm_reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         }
       },
       "place": "KD Capital Risk Management Department · Hallway",
@@ -488,7 +488,7 @@ export default {
           "label": "Pack the laptop and offer to take work on leave"
         },
         "c42_start_record_reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         }
       },
       "place": "KD Capital Risk Management Department · Hallway",
@@ -518,7 +518,7 @@ export default {
           "label": "Pack the laptop and offer to take work on leave"
         },
         "c42_start_rush_reframe": {
-          "label": "Make it name each item that dragged the score down"
+          "label": "Make it list what cut the score"
         }
       },
       "place": "KD Capital Risk Management Department · Hallway",

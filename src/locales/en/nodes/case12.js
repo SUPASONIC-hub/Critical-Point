@@ -28,7 +28,7 @@ export default {
           "label": "Read the no-suit clause line by line first"
         },
         "reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Show from the records how the dissent was erased"
         },
         "reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         },
         "c12_mediation_evidence_turn": {
-          "label": "Find the 30 billion won’s account in the books"
+          "label": "Find the 30 billion won account"
         }
       },
       "place": "Financial Supervisory Service, Yeouido · Mediation briefing hall",
@@ -87,10 +87,10 @@ export default {
           "label": "Gather evidence of harm for the 31 without papers"
         },
         "reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         },
         "c12_market_evidence_turn": {
-          "label": "Find the 30 billion won’s account in the books"
+          "label": "Find the 30 billion won account"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market",
@@ -118,10 +118,10 @@ export default {
           "label": "Promise to teach Moon Hajun how a bank judges"
         },
         "reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         },
         "c12_memorial_evidence_turn": {
-          "label": "Find the 30 billion won’s account in the books"
+          "label": "Find the 30 billion won account"
         }
       },
       "place": "Incheon memorial park · Columbarium",
@@ -383,7 +383,7 @@ export default {
           "label": "Demand the clause’s price be added to the payout"
         },
         "c12_route_system_evidence_turn": {
-          "label": "Find the 30 billion won’s account in the books"
+          "label": "Find the 30 billion won account"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
@@ -459,7 +459,7 @@ export default {
           "label": "Go see the victims’ group leader in person first"
         },
         "c12_start_toast_reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -490,7 +490,7 @@ export default {
           "label": "Go see the victims’ group leader in person first"
         },
         "c12_start_record_reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -521,7 +521,7 @@ export default {
           "label": "Go see the victims’ group leader in person first"
         },
         "c12_start_summon_reframe": {
-          "label": "Pull up every compensation plan with the same condition"
+          "label": "Pull all same-condition plans"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

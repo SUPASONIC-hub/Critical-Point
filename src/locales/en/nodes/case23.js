@@ -28,7 +28,7 @@ export default {
           "label": "Visit all 3,118 one by one to collect proxy forms"
         },
         "reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -56,10 +56,10 @@ export default {
           "label": "Explain the agenda from scratch; take only informed proxies"
         },
         "reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         },
         "c23_proxy_evidence_turn": {
-          "label": "Open the employee shareholders’ proxy status sheet"
+          "label": "Open the staff proxy tally"
         }
       },
       "place": "KD Bank Gangwon Yeongdong Branch · Banking Hall",
@@ -87,10 +87,10 @@ export default {
           "label": "Point out only the missing year in the 48 pages; leave fast"
         },
         "reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         },
         "c23_advisor_evidence_turn": {
-          "label": "Open the employee shareholders’ proxy status sheet"
+          "label": "Open the staff proxy tally"
         }
       },
       "place": "ClearVote, Yeouido · Meeting Room",
@@ -118,10 +118,10 @@ export default {
           "label": "Take the original run sheet as proof of the speech limit"
         },
         "reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         },
         "c23_backstage_evidence_turn": {
-          "label": "Open the employee shareholders’ proxy status sheet"
+          "label": "Open the staff proxy tally"
         }
       },
       "place": "KD Financial Group Headquarters, Yeouido · Auditorium Waiting Room",
@@ -381,7 +381,7 @@ export default {
           "label": "Demand full remarks in this year’s minutes by letter"
         },
         "c23_route_system_evidence_turn": {
-          "label": "Open the employee shareholders’ proxy status sheet"
+          "label": "Open the staff proxy tally"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
@@ -456,7 +456,7 @@ export default {
           "label": "Start with 2023, missing entirely from his career history"
         },
         "c23_start_warm_reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -486,7 +486,7 @@ export default {
           "label": "Visit all 3,118 one by one to collect proxy forms"
         },
         "c23_start_record_reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -516,7 +516,7 @@ export default {
           "label": "Make the overdue calls to the 3,118, one by one"
         },
         "c23_start_rush_reframe": {
-          "label": "Ask how shareholders’ words have been kept on record"
+          "label": "Trace shareholders’ words"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",

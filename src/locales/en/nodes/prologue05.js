@@ -28,7 +28,7 @@ export default {
           "label": "Ask the reason without putting Nam Jihyung on the spot"
         },
         "reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         }
       },
       "place": "KD Bank head office, 7th-floor HR meeting room",
@@ -56,10 +56,10 @@ export default {
           "label": "Take only the boxes and go down first, no goodbyes"
         },
         "reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         },
         "p5_notice_evidence_turn": {
-          "label": "Open the account that made the notice draft"
+          "label": "Open the notice draft’s account"
         }
       },
       "place": "KD Bank head office, 6th floor · Corporate Finance Strategy Team",
@@ -87,10 +87,10 @@ export default {
           "label": "Start an inventory of the 412 B2 boxes, line by line"
         },
         "reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         },
         "p5_basement_evidence_turn": {
-          "label": "Open the account that made the notice draft"
+          "label": "Open the notice draft’s account"
         }
       },
       "place": "Group Cognition & Judgment Research Lab, Hapjeong-dong · 4th-floor analyst room",
@@ -118,10 +118,10 @@ export default {
           "label": "Tell it to recalculate 2023-0412"
         },
         "reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         },
         "p5_echo_evidence_turn": {
-          "label": "Open the account that made the notice draft"
+          "label": "Open the notice draft’s account"
         }
       },
       "place": "Research Lab, 4th-floor analyst room · Case desk 1",
@@ -387,7 +387,7 @@ export default {
           "label": "Send the 217-case list to HR and Internal Audit the same day"
         },
         "p5_route_system_evidence_turn": {
-          "label": "Open the account that made the notice draft"
+          "label": "Open the notice draft’s account"
         }
       },
       "place": "Research Lab, 4th-floor analyst room · Case desk 1",
@@ -462,7 +462,7 @@ export default {
           "label": "Take copies of the notice and attachment list on the spot"
         },
         "p5_start_warn_reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         }
       },
       "place": "KD Bank head office, 7th-floor HR meeting room",
@@ -492,7 +492,7 @@ export default {
           "label": "Ask the reason without putting Nam Jihyung on the spot"
         },
         "p5_start_report_reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         }
       },
       "place": "KD Bank head office, 7th-floor HR meeting room",
@@ -522,7 +522,7 @@ export default {
           "label": "Sign the receipt line without asking; go back to the team"
         },
         "p5_start_quiet_reframe": {
-          "label": "Ask how many notices look like this one"
+          "label": "Count notices like this one"
         }
       },
       "place": "KD Bank head office, 7th-floor HR meeting room",

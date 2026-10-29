@@ -29,7 +29,7 @@ export default {
           "label": "Post the invitation in the six’s group chat and decide together"
         },
         "reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         }
       },
       "place": "KD Capital Risk Management · Your Desk",
@@ -57,10 +57,10 @@ export default {
           "label": "Still holding the ladder, press him on the flood loan declines"
         },
         "reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         },
         "c36_garden_evidence_turn": {
-          "label": "Connect the appointment records of the last three compliance officers"
+          "label": "Link past officers’ appointments"
         }
       },
       "place": "Chairman Seo Dokyung’s Home, Hannam-dong · Under the Persimmon Tree",
@@ -88,10 +88,10 @@ export default {
           "label": "Talk about the 1,740 victims, not one Yoon Sanghyuk"
         },
         "reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         },
         "c36_table_evidence_turn": {
-          "label": "Connect the appointment records of the last three compliance officers"
+          "label": "Link past officers’ appointments"
         }
       },
       "place": "Chairman’s Home, Hannam-dong · Twelve-Seat Table",
@@ -119,10 +119,10 @@ export default {
           "label": "Hear out his father’s story and ask about the people in that line"
         },
         "reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         },
         "c36_father_evidence_turn": {
-          "label": "Connect the appointment records of the last three compliance officers"
+          "label": "Link past officers’ appointments"
         }
       },
       "place": "Chairman’s Home, Hannam-dong · Garden Bench",
@@ -385,7 +385,7 @@ export default {
           "label": "Find the 29 who resigned and ask whose place they left in"
         },
         "c36_route_system_evidence_turn": {
-          "label": "Connect the appointment records of the last three compliance officers"
+          "label": "Link past officers’ appointments"
         }
       },
       "place": "KD Capital Risk Management · NOAH Terminal",
@@ -460,7 +460,7 @@ export default {
           "label": "Post the invitation in the six’s group chat and decide together"
         },
         "c36_start_warm_reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         }
       },
       "place": "KD Capital 1st Floor Lobby",
@@ -490,7 +490,7 @@ export default {
           "label": "Ask compliance about the amendment the chairman’s office opened four times"
         },
         "c36_start_record_reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         }
       },
       "place": "KD Capital Risk Management · Your Desk",
@@ -520,7 +520,7 @@ export default {
           "label": "First put the invitation on record in your witness statement"
         },
         "c36_start_rush_reframe": {
-          "label": "Build a timeline of how the group has closed its incidents"
+          "label": "Chart closed incidents"
         }
       },
       "place": "KD Capital Risk Management · Your Desk",

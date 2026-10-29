@@ -28,7 +28,7 @@ export default {
           "label": "Leave the sentencing to reporters and chase the money"
         },
         "reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table Between the Shelves",
@@ -56,10 +56,10 @@ export default {
           "label": "Hand our winning passes to the group first"
         },
         "reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         },
         "c44_lottery_evidence_turn": {
-          "label": "Find which ledger line sits behind the no-punishment letter"
+          "label": "Find the ledger behind the letter"
         }
       },
       "place": "Seoul Central District Court · Road Outside the East Wing",
@@ -87,10 +87,10 @@ export default {
           "label": "Hold Moon Gaeul’s hand and listen to the end beside her"
         },
         "reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         },
         "c44_court_evidence_turn": {
-          "label": "Find which ledger line sits behind the no-punishment letter"
+          "label": "Find the ledger behind the letter"
         }
       },
       "place": "Seoul Central District Court · Courtroom 417",
@@ -118,10 +118,10 @@ export default {
           "label": "Gather the group’s wishes into a letter asking for appeal"
         },
         "reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         },
         "c44_lunch_evidence_turn": {
-          "label": "Find which ledger line sits behind the no-punishment letter"
+          "label": "Find the ledger behind the letter"
         }
       },
       "place": "Alley Behind the Seocho-dong Court · Sundae-Soup Place",
@@ -383,7 +383,7 @@ export default {
           "label": "Release the statistics to Seo Harin and the group at once"
         },
         "c44_route_system_evidence_turn": {
-          "label": "Find which ledger line sits behind the no-punishment letter"
+          "label": "Find the ledger behind the letter"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Laptop by the Shelves",
@@ -459,7 +459,7 @@ export default {
           "label": "Leave the sentencing to reporters and chase the money"
         },
         "c44_start_warm_reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table Between the Shelves",
@@ -489,7 +489,7 @@ export default {
           "label": "Leave the sentencing to reporters and chase the money"
         },
         "c44_start_record_reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table Between the Shelves",
@@ -519,7 +519,7 @@ export default {
           "label": "Secure gallery seats for the group first"
         },
         "c44_start_rush_reframe": {
-          "label": "Count the trials where a company forgave its executive"
+          "label": "Count forgiven-executive trials"
         }
       },
       "place": "Seoul Central District Court · Filing Office Waiting Room",

@@ -28,7 +28,7 @@ export default {
           "label": "Fill out Do Yoonha’s workers’ comp claim at Ieum billing"
         },
         "reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         }
       },
       "place": "Gangseo Ieum Hospital · Ward",
@@ -56,10 +56,10 @@ export default {
           "label": "Leave the 1,128 unresolved in the locker; hand over the rest"
         },
         "reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         },
         "c10_locker_evidence_turn": {
-          "label": "Find the day an option vanished from the sick-leave form"
+          "label": "Date the lost sick-leave option"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · HR register terminal",
@@ -87,10 +87,10 @@ export default {
           "label": "Drop the violations; submit only the clock-in times"
         },
         "reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         },
         "c10_claim_evidence_turn": {
-          "label": "Find the day an option vanished from the sick-leave form"
+          "label": "Date the lost sick-leave option"
         }
       },
       "place": "Trigger Lab, 2nd-floor HR committee room",
@@ -118,10 +118,10 @@ export default {
           "label": "Keep the sheet as it is, on Na Junhyuk’s coffee promise"
         },
         "reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         },
         "c10_relay_evidence_turn": {
-          "label": "Find the day an option vanished from the sick-leave form"
+          "label": "Date the lost sick-leave option"
         }
       },
       "place": "Hoegi-dong secondhand bookshop, 2nd floor · Stacks of ledgers",
@@ -386,7 +386,7 @@ export default {
           "label": "Shelve the metric; treat it as Do Yoonha’s case only"
         },
         "c10_route_system_evidence_turn": {
-          "label": "Find the day an option vanished from the sick-leave form"
+          "label": "Date the lost sick-leave option"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
@@ -461,7 +461,7 @@ export default {
           "label": "Register the locker file as official, outside the ward"
         },
         "c10_start_stay_reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         }
       },
       "place": "Gangseo Ieum Hospital · Ward",
@@ -491,7 +491,7 @@ export default {
           "label": "Sort Do Yoonha’s records the way you gave testimony"
         },
         "c10_start_court_reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         }
       },
       "place": "Gangseo Ieum Hospital · Ward",
@@ -521,7 +521,7 @@ export default {
           "label": "Register the locker file as official, outside the ward"
         },
         "c10_start_return_reframe": {
-          "label": "Ask how long others in the same job lasted"
+          "label": "Ask how long the others lasted"
         }
       },
       "place": "Gangseo Ieum Hospital · Ward",

@@ -28,7 +28,7 @@ export default {
           "label": "Take the address and go down to Gujwa, Jeju in person"
         },
         "reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         }
       },
       "place": "Trigger Lab 4th Floor Analyst Room",
@@ -56,10 +56,10 @@ export default {
           "label": "Put the story off and pay three nights up front as a guest"
         },
         "reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         },
         "c21_inn_evidence_turn": {
-          "label": "Find the department that ordered the Cohort 1 experiment in the documents"
+          "label": "Find who ordered Cohort 1"
         }
       },
       "place": "Slow Island, Gujwa, Jeju · Tangerine Warehouse Guesthouse",
@@ -87,10 +87,10 @@ export default {
           "label": "Lend a hand until the last tangerines are picked before the cold snap"
         },
         "reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         },
         "c21_orchard_evidence_turn": {
-          "label": "Find the department that ordered the Cohort 1 experiment in the documents"
+          "label": "Find who ordered Cohort 1"
         }
       },
       "place": "Ko Eunbi’s Tangerine Grove, Gujwa, Jeju · Orchard",
@@ -118,10 +118,10 @@ export default {
           "label": "Match each date Sunwoo Jin mentions to the weekly chart and note it down"
         },
         "reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         },
         "c21_breakwater_evidence_turn": {
-          "label": "Find the department that ordered the Cohort 1 experiment in the documents"
+          "label": "Find who ordered Cohort 1"
         }
       },
       "place": "Gujwa Seaside, Jeju · Breakwater",
@@ -383,7 +383,7 @@ export default {
           "label": "Pretend you never saw the 91% and close the screen"
         },
         "c21_route_system_evidence_turn": {
-          "label": "Find the department that ordered the Cohort 1 experiment in the documents"
+          "label": "Find who ordered Cohort 1"
         }
       },
       "place": "Slow Island, Gujwa, Jeju · Tangerine Warehouse Remote Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Call the guesthouse and feel out whether the envelope has arrived"
         },
         "c21_start_warm_reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         }
       },
       "place": "Trigger Lab 4th Floor Analyst Room",
@@ -488,7 +488,7 @@ export default {
           "label": "Put Participant 01’s name on the first line of the consent appendix and go down"
         },
         "c21_start_record_reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         }
       },
       "place": "Trigger Lab 4th Floor Analyst Room",
@@ -518,7 +518,7 @@ export default {
           "label": "Take the address and go down to Gujwa, Jeju in person"
         },
         "c21_start_rush_reframe": {
-          "label": "Ask NOAH to show the basis for its judgment"
+          "label": "Ask NOAH to show its basis"
         }
       },
       "place": "Trigger Lab 4th Floor Analyst Room",

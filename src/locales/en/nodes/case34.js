@@ -28,7 +28,7 @@ export default {
           "label": "Reply asking her to photograph the whole notebook first"
         },
         "reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor Hideout · By the Bookshelves",
@@ -56,10 +56,10 @@ export default {
           "label": "Shoot only the pages you need; treat the covered line as unseen"
         },
         "reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         },
         "c34_study_evidence_turn": {
-          "label": "Open the records of the day the 2023-0412 dissent was erased"
+          "label": "Open the 2023-0412 erasure log"
         }
       },
       "place": "Sinchon Graduate Research Building · Shared Research Room by the Stacks",
@@ -87,10 +87,10 @@ export default {
           "label": "Tell Moon Gaeul first and ask if the two may meet"
         },
         "reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         },
         "c34_sketch_evidence_turn": {
-          "label": "Open the records of the day the 2023-0412 dissent was erased"
+          "label": "Open the 2023-0412 erasure log"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor Hideout · By the Bookshelves",
@@ -118,10 +118,10 @@ export default {
           "label": "Agree on one condition: he goes to the prosecutors himself"
         },
         "reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         },
         "c34_seminar_evidence_turn": {
-          "label": "Open the records of the day the 2023-0412 dissent was erased"
+          "label": "Open the 2023-0412 erasure log"
         }
       },
       "place": "Sinchon Graduate Research Building · Small Basement Auditorium",
@@ -383,7 +383,7 @@ export default {
           "label": "Send the list of 61 to the prosecutor’s office and the FSS"
         },
         "c34_route_system_evidence_turn": {
-          "label": "Open the records of the day the 2023-0412 dissent was erased"
+          "label": "Open the 2023-0412 erasure log"
         }
       },
       "place": "KD Data Lab, Pangyo · Data Center Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Reply asking her to photograph the whole notebook first"
         },
         "c34_start_warm_reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         }
       },
       "place": "Yoonkyung Alterations, Anyang Central Market · 2nd-Floor Workroom",
@@ -488,7 +488,7 @@ export default {
           "label": "Go meet her alone, in person, as she asks"
         },
         "c34_start_record_reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor Hideout · By the Bookshelves",
@@ -518,7 +518,7 @@ export default {
           "label": "From the next meeting on, seat a colleague across the room"
         },
         "c34_start_rush_reframe": {
-          "label": "Find out whether only one dissent was erased"
+          "label": "Check for other erased dissents"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor Hideout · By the Bookshelves",

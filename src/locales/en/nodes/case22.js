@@ -28,7 +28,7 @@ export default {
           "label": "Propose refiling with Foreman Kim as representative"
         },
         "reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -56,10 +56,10 @@ export default {
           "label": "Hold the news until Hajun’s internship week ends"
         },
         "reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         },
         "c22_counter_evidence_turn": {
-          "label": "Search NOAH’s training list for 'default-linked party'"
+          "label": "Search NOAH for 'default-linked'"
         }
       },
       "place": "KD Bank Gangseo Branch · Banking Hall",
@@ -87,10 +87,10 @@ export default {
           "label": "Cut the amount with a used machine instead of a new one"
         },
         "reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         },
         "c22_factory_evidence_turn": {
-          "label": "Search NOAH’s training list for 'default-linked party'"
+          "label": "Search NOAH for 'default-linked'"
         }
       },
       "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
@@ -118,10 +118,10 @@ export default {
           "label": "Let Hajun rest and move the role-play to the next intern"
         },
         "reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         },
         "c22_roleplay_evidence_turn": {
-          "label": "Search NOAH’s training list for 'default-linked party'"
+          "label": "Search NOAH for 'default-linked'"
         }
       },
       "place": "KD Bank Gangseo Branch · 3rd-Floor Training Room",
@@ -383,7 +383,7 @@ export default {
           "label": "Publish the circular capture to the 41 applicants and branches"
         },
         "c22_route_system_evidence_turn": {
-          "label": "Search NOAH’s training list for 'default-linked party'"
+          "label": "Search NOAH for 'default-linked'"
         }
       },
       "place": "KD Data Lab, Pangyo · Server Room Test Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Go first to Tak Yerin’s business loan window at Gangseo"
         },
         "c22_start_warm_reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room",
@@ -488,7 +488,7 @@ export default {
           "label": "Propose refiling with Foreman Kim as representative"
         },
         "c22_start_record_reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Lee Minseo’s Desk",
@@ -518,7 +518,7 @@ export default {
           "label": "Take line 12 of the list straight to Gangseo Branch"
         },
         "c22_start_rush_reframe": {
-          "label": "Keep asking NOAH why it refused, to the end"
+          "label": "Press NOAH on its refusal"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Before Dawn",

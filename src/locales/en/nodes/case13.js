@@ -29,7 +29,7 @@ export default {
           "label": "Fix the price first and accept on the spot"
         },
         "reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -57,10 +57,10 @@ export default {
           "label": "Read it for now; ask them to cut it in the edit"
         },
         "reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         },
         "c13_studio_evidence_turn": {
-          "label": "Find the cost code on the 3.8 billion won budget"
+          "label": "Find the 3.8 billion cost code"
         }
       },
       "place": "Ad studio in Seongsu-dong · Set",
@@ -88,10 +88,10 @@ export default {
           "label": "No excuses; slice rice cakes beside her until closing"
         },
         "reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         },
         "c13_market_evidence_turn": {
-          "label": "Find the cost code on the 3.8 billion won budget"
+          "label": "Find the 3.8 billion cost code"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market",
@@ -119,10 +119,10 @@ export default {
           "label": "Secretly change the cue sheet so it airs live"
         },
         "reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         },
         "c13_lab_evidence_turn": {
-          "label": "Find the cost code on the 3.8 billion won budget"
+          "label": "Find the 3.8 billion cost code"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -384,7 +384,7 @@ export default {
           "label": "Add a clause: report progress every quarter"
         },
         "c13_route_system_evidence_turn": {
-          "label": "Find the cost code on the 3.8 billion won budget"
+          "label": "Find the 3.8 billion cost code"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
@@ -459,7 +459,7 @@ export default {
           "label": "Hold your answer; ask the rice cake people first"
         },
         "c13_start_warm_reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -489,7 +489,7 @@ export default {
           "label": "Get the revision an official agenda number, not a prop"
         },
         "c13_start_record_reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -519,7 +519,7 @@ export default {
           "label": "Insist the box photo stays out of the ad"
         },
         "c13_start_rush_reframe": {
-          "label": "Line up how post-scandal committees ended"
+          "label": "See how committees ended"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",

@@ -52,7 +52,7 @@ export default {
           "label": "窓口で売られた商品の名前を並べる"
         },
         "c14_counter_evidence_turn": {
-          "label": "ファンドの不良債権の買い入れ価格を確かめる"
+          "label": "ファンドの不良債権買値を確かめる"
         }
       },
       "place": "KD銀行カンソ支店 · 客だまりの窓口",
@@ -83,7 +83,7 @@ export default {
           "label": "窓口で売られた商品の名前を並べる"
         },
         "c14_desk_evidence_turn": {
-          "label": "ファンドの不良債権の買い入れ価格を確かめる"
+          "label": "ファンドの不良債権買値を確かめる"
         }
       },
       "place": "パンギョ KD資産運用 · 運用室",
@@ -114,7 +114,7 @@ export default {
           "label": "窓口で売られた商品の名前を並べる"
         },
         "c14_class_evidence_turn": {
-          "label": "ファンドの不良債権の買い入れ価格を確かめる"
+          "label": "ファンドの不良債権買値を確かめる"
         }
       },
       "place": "カンソ老人福祉館 · 金融教室",
@@ -375,7 +375,7 @@ export default {
           "label": "商品名から'共生'を外し、リスク等級を入れさせる"
         },
         "c14_route_system_evidence_turn": {
-          "label": "ファンドの不良債権の買い入れ価格を確かめる"
+          "label": "ファンドの不良債権買値を確かめる"
         }
       },
       "place": "トリガーラボ4階 分析官室 · 実験端末",

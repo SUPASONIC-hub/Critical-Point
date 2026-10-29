@@ -27,7 +27,7 @@ export default {
           "label": "Ask Han Seoyun to push back the HR committee"
         },
         "reframe": {
-          "label": "Set both analysts’ conditions side by side"
+          "label": "Compare both their conditions"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -55,10 +55,10 @@ export default {
           "label": "Restore Oh Jinwoo’s 11 deleted drafts from the terminal"
         },
         "reframe": {
-          "label": "Set both analysts’ conditions side by side"
+          "label": "Compare both their conditions"
         },
         "c6_desk_evidence_turn": {
-          "label": "Link the dates his conditions changed to my record"
+          "label": "Tie his condition dates to mine"
         }
       },
       "place": "Trigger Lab, 4th floor · Oh Jinwoo’s desk",
@@ -89,7 +89,7 @@ export default {
           "label": "Reframe the table and propose"
         },
         "c6_logs_evidence_turn": {
-          "label": "Link the dates his conditions changed to my record"
+          "label": "Tie his condition dates to mine"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Experiment terminal",
@@ -120,7 +120,7 @@ export default {
           "label": "Reframe the table and propose"
         },
         "c6_panel_evidence_turn": {
-          "label": "Link the dates his conditions changed to my record"
+          "label": "Tie his condition dates to mine"
         }
       },
       "place": "Trigger Lab, 2nd-floor HR committee waiting room",
@@ -383,7 +383,7 @@ export default {
           "label": "Ask Oh Jinwoo to look at the index together"
         },
         "c6_route_system_evidence_turn": {
-          "label": "Link the dates his conditions changed to my record"
+          "label": "Tie his condition dates to mine"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Experiment index",
@@ -456,7 +456,7 @@ export default {
           "label": "Ask Han Seoyun to push back the HR committee"
         },
         "c6_start_owner_reframe": {
-          "label": "Set both analysts’ conditions side by side"
+          "label": "Compare both their conditions"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -483,7 +483,7 @@ export default {
           "label": "Call Oh Jinwoo, absent three days, and go find him"
         },
         "c6_start_system_reframe": {
-          "label": "Set both analysts’ conditions side by side"
+          "label": "Compare both their conditions"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -510,7 +510,7 @@ export default {
           "label": "Open the review log on Oh Jinwoo’s terminal first"
         },
         "c6_start_name_reframe": {
-          "label": "Set both analysts’ conditions side by side"
+          "label": "Compare both their conditions"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

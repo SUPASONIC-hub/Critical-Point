@@ -28,7 +28,7 @@ export default {
           "label": "Get in writing who wrote the 'reference opinion'"
         },
         "reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",
@@ -56,10 +56,10 @@ export default {
           "label": "Check if the ad contract lets them touch the content"
         },
         "reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         },
         "c39_cut_evidence_turn": {
-          "label": "Trace back the copy the two timecode lines came from"
+          "label": "Trace the timecode copy"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",
@@ -87,10 +87,10 @@ export default {
           "label": "Blur all three who fall under the legal team’s standard"
         },
         "reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         },
         "c39_mosaic_evidence_turn": {
-          "label": "Trace back the copy the two timecode lines came from"
+          "label": "Trace the timecode copy"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · Studio B",
@@ -118,10 +118,10 @@ export default {
           "label": "Roll the victims’ group names under the blank approver box"
         },
         "reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         },
         "c39_caption_evidence_turn": {
-          "label": "Trace back the copy the two timecode lines came from"
+          "label": "Trace the timecode copy"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",
@@ -383,7 +383,7 @@ export default {
           "label": "Put one page of the statistic in the final captions"
         },
         "c39_route_system_evidence_turn": {
-          "label": "Trace back the copy the two timecode lines came from"
+          "label": "Trace the timecode copy"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room · NOAH Screen",
@@ -458,7 +458,7 @@ export default {
           "label": "Call the people in the documentary first and explain"
         },
         "c39_start_warm_reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",
@@ -488,7 +488,7 @@ export default {
           "label": "Call the people in the documentary first and explain"
         },
         "c39_start_record_reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",
@@ -518,7 +518,7 @@ export default {
           "label": "Ask the station’s legal team when Doyul got the copy"
         },
         "c39_start_rush_reframe": {
-          "label": "Ask the history of the scenes that got cut"
+          "label": "Ask the cut scenes’ history"
         }
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",

@@ -28,7 +28,7 @@ export default {
           "label": "Report it up to Risk Management; leave it to the Group"
         },
         "reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         }
       },
       "place": "KD Capital Headquarters, 12th Floor · Risk Management Department",
@@ -56,10 +56,10 @@ export default {
           "label": "Open every window and pay out fast, as asked"
         },
         "reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         },
         "c27_queue_evidence_turn": {
-          "label": "Open the full log of the chat where the screenshot began"
+          "label": "Open the full chat it came from"
         }
       },
       "place": "Saebom Credit Union, Gunsan · Banking Hall",
@@ -87,10 +87,10 @@ export default {
           "label": "Tell those who pulled money out where the rumor came from"
         },
         "reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         },
         "c27_rumor_evidence_turn": {
-          "label": "Open the full log of the chat where the screenshot began"
+          "label": "Open the full chat it came from"
         }
       },
       "place": "Saebom Credit Union, Gunsan · Executive Director’s Office",
@@ -118,10 +118,10 @@ export default {
           "label": "Urge selling today, even at 38%, to raise cash first"
         },
         "reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         },
         "c27_offer_evidence_turn": {
-          "label": "Open the full log of the chat where the screenshot began"
+          "label": "Open the full chat it came from"
         }
       },
       "place": "Saebom Credit Union, Gunsan · 2nd-Floor Meeting Room",
@@ -383,7 +383,7 @@ export default {
           "label": "Bury the stats; use them only to survive this week’s line"
         },
         "c27_route_system_evidence_turn": {
-          "label": "Open the full log of the chat where the screenshot began"
+          "label": "Open the full chat it came from"
         }
       },
       "place": "KD Capital Headquarters, 12th Floor · Risk Management Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Gather your Pyeongtaek comrades at the Gunsan line"
         },
         "c27_start_warm_reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         }
       },
       "place": "KD Capital Headquarters, 12th Floor · Risk Management Department",
@@ -488,7 +488,7 @@ export default {
           "label": "First check what Saebom put into Pyeongtaek, and its rank"
         },
         "c27_start_record_reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         }
       },
       "place": "KD Capital Headquarters, 12th Floor · Risk Management Department",
@@ -518,7 +518,7 @@ export default {
           "label": "Recall Friday’s messenger alerts and find that chat"
         },
         "c27_start_rush_reframe": {
-          "label": "Ask how it ended for co-ops that saw lines like this"
+          "label": "Ask how such co-op runs ended"
         }
       },
       "place": "KD Capital Headquarters, 12th Floor · Risk Management Department",

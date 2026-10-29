@@ -28,7 +28,7 @@ export default {
           "label": "Pose as a customer at the Gangseo Branch window"
         },
         "reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Ask Lee Jungsook at the next window to stop signing"
         },
         "reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         },
         "c14_counter_evidence_turn": {
-          "label": "Check what the fund paid for the bad loans"
+          "label": "Check the fund’s bad-loan price"
         }
       },
       "place": "KD Bank Gangseo Branch · Lobby windows",
@@ -87,10 +87,10 @@ export default {
           "label": "Tell Joo Eunchae what the window says; ask her to stop it"
         },
         "reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         },
         "c14_desk_evidence_turn": {
-          "label": "Check what the fund paid for the bad loans"
+          "label": "Check the fund’s bad-loan price"
         }
       },
       "place": "KD Asset Management, Pangyo · Trading floor",
@@ -118,10 +118,10 @@ export default {
           "label": "Send buyers written instructions on how to cancel"
         },
         "reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         },
         "c14_class_evidence_turn": {
-          "label": "Check what the fund paid for the bad loans"
+          "label": "Check the fund’s bad-loan price"
         }
       },
       "place": "Gangseo Senior Welfare Center · Finance class",
@@ -382,7 +382,7 @@ export default {
           "label": "Demand 'Sangsaeng' be swapped for a risk grade"
         },
         "c14_route_system_evidence_turn": {
-          "label": "Check what the fund paid for the bad loans"
+          "label": "Check the fund’s bad-loan price"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Leave the sales; pull the list of loans the fund bought"
         },
         "c14_start_warm_reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -488,7 +488,7 @@ export default {
           "label": "Leave the sales; pull the list of loans the fund bought"
         },
         "c14_start_record_reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -518,7 +518,7 @@ export default {
           "label": "Leave the sales; pull the list of loans the fund bought"
         },
         "c14_start_rush_reframe": {
-          "label": "Line up the names of products sold at the window"
+          "label": "List what the window sold"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

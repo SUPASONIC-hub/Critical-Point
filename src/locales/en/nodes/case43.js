@@ -28,7 +28,7 @@ export default {
           "label": "Count the seven outside directors’ votes first, fast"
         },
         "reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         }
       },
       "place": "KD Capital Headquarters · Risk Management Department",
@@ -56,10 +56,10 @@ export default {
           "label": "Work only the two the probability table says will turn"
         },
         "reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         },
         "c43_ledger_evidence_turn": {
-          "label": "Open the two press releases written before the vote"
+          "label": "Open the two pre-vote releases"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table between the Shelves",
@@ -87,10 +87,10 @@ export default {
           "label": "Shelve the reform terms and ask for a plain yes on dismissal"
         },
         "reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         },
         "c43_advisor_evidence_turn": {
-          "label": "Open the two press releases written before the vote"
+          "label": "Open the two pre-vote releases"
         }
       },
       "place": "ClearVote, Yeouido · Meeting Room",
@@ -118,10 +118,10 @@ export default {
           "label": "Demand he put what he just said in a signed statement"
         },
         "reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         },
         "c43_corridor_evidence_turn": {
-          "label": "Open the two press releases written before the vote"
+          "label": "Open the two pre-vote releases"
         }
       },
       "place": "KD Financial Group Headquarters, Yeouido · Hallway outside the 33rd-Floor Boardroom",
@@ -383,7 +383,7 @@ export default {
           "label": "Set the statistics aside and focus on the vote count"
         },
         "c43_route_system_evidence_turn": {
-          "label": "Open the two press releases written before the vote"
+          "label": "Open the two pre-vote releases"
         }
       },
       "place": "KD Capital Headquarters · Risk Management Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Go through the board rules and agenda brief clause by clause"
         },
         "c43_start_warm_reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         }
       },
       "place": "KD Capital Headquarters · Risk Management Department",
@@ -488,7 +488,7 @@ export default {
           "label": "Count the seven outside directors’ votes first, fast"
         },
         "c43_start_record_reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         }
       },
       "place": "KD Capital Headquarters · Risk Management Department",
@@ -518,7 +518,7 @@ export default {
           "label": "Find Baek Arin first and organize her testimony together"
         },
         "c43_start_rush_reframe": {
-          "label": "Ask what the board has used dismissals for"
+          "label": "Ask what firings were for"
         }
       },
       "place": "KD Capital Headquarters · Risk Management Department",
