@@ -61,6 +61,11 @@ const DATA_MODULES = [
   /^src\/caseCopy\.js$/,
   /^src\/appCopy\.js$/,
   /^src\/components\/musicData\.js$/,
+  // A language's words over the Korean (src/locales/<lang>/): its
+  // dictionary and its cases. check:locale and tests/unit/locales.test.mjs read them.
+  /^src\/locales\/[^/]+\//,
+  // The screens' own words (src/copy/<name>.js): tables of strings.
+  /^src\/copy\//,
 ];
 const isData = (file) => DATA_MODULES.some((pattern) => pattern.test(file));
 

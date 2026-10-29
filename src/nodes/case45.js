@@ -4,7 +4,7 @@
  * 임경수 has carried paper for the whole season: the page with the empty
  * signature box in 사건 07, the copy of the dissent's back page that became a
  * news story in 사건 11, 312 boxes out of a building in 사건 19, the disks the
- * old verification system learned from in 사건 20. Two days after the first
+ * old verification system learned from in 사건 20. Five days after the first
  * verdict he dies, and the case is his funeral -- three days in 이음병원's 3호
  * 빈소 -- and the envelope he left to be opened on the third morning.
  *

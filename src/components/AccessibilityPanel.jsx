@@ -1,47 +1,11 @@
+import { fill } from "../locale.js";
+import comfortCopy from "../copy/comfort.js";
 import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
-
-// 이야기 글 크기 (D-5), by what a player sees rather than by the factor.
-const STORY_SCALE_LABELS = ["기본", "크게", "더 크게"];
 
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
-const TOGGLES = [
-  {
-    key: "storyMode",
-    label: "스토리 모드",
-    text: "벽이 멀어지고, 벽에 닿은 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
-  },
-  {
-    key: "holdReadingClock",
-    label: "읽기 시계 자동 넘김 끄기",
-    text: "장면 설명이 저절로 넘어가지 않습니다. 다 읽고 직접 테이블을 엽니다.",
-  },
-  {
-    key: "foldReadScenes",
-    label: "읽은 장면 접기",
-    text: "NEW GAME+ 시즌에 지난 시즌에 읽은 장면의 본문을 접습니다. 질문은 그대로 보입니다.",
-  },
-  {
-    key: "calmEffects",
-    label: "번쩍임·흔들림 줄이기",
-    text: "붉은 가장자리, 판정 섬광, 화면 흔들림을 약하게 합니다.",
-  },
-  {
-    key: "edgeNotices",
-    label: "가장자리 알림 띄우기",
-    text: "밀어붙일수록 화면 위 가장자리에 메신저·메일이 잠깐 뜹니다.",
-  },
-  {
-    key: "letterKeys",
-    label: "한 글자 단축키 쓰기",
-    text: "1-9, W, E, Q, P, R, N. 끄면 Space, Enter, Esc만 남습니다.",
-  },
-  {
-    key: "stillIntro",
-    label: "첫 화면 움직임 멈추기",
-    text: "흐르는 문구, 움직이는 그림, 깜빡이는 제목을 멈춥니다.",
-  },
-];
+// Each switch's words are src/copy/comfort.js's, under its key.
+const TOGGLES = ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"];
 
 /**
  * The comfort settings: in the intro's setup console, and in the dialog the
@@ -52,10 +16,10 @@ const TOGGLES = [
 export function AccessibilityPanel() {
   const settings = useAccessibility();
   return (
-    <section className="accessibility-panel start-console-section" aria-label="편의 설정">
+    <section className="accessibility-panel start-console-section" aria-label={comfortCopy.label}>
       <fieldset className="accessibility-time">
-        <legend>테이블 시간</legend>
-        <p>테이블의 제한 시간이 이만큼 느리게 흐릅니다. 1배가 아닌 기록은 랭킹에 표시됩니다.</p>
+        <legend>{comfortCopy.tableTime.legend}</legend>
+        <p>{comfortCopy.tableTime.text}</p>
         <div>
           {TABLE_TIME_SCALES.map((scale) => (
             <label key={scale}>
@@ -66,24 +30,24 @@ export function AccessibilityPanel() {
                 checked={settings.tableTime === scale}
                 onChange={() => setAccessibility({ tableTime: scale })}
               />
-              <span>{scale}배</span>
+              <span>{fill(comfortCopy.tableTime.scale, { scale })}</span>
             </label>
           ))}
         </div>
       </fieldset>
-      {TOGGLES.map((toggle) => (
-        <label key={toggle.key} className="accessibility-toggle">
-          <input type="checkbox" checked={settings[toggle.key]} onChange={(event) => setAccessibility({ [toggle.key]: event.target.checked })} />
+      {TOGGLES.map((key) => (
+        <label key={key} className="accessibility-toggle">
+          <input type="checkbox" checked={settings[key]} onChange={(event) => setAccessibility({ [key]: event.target.checked })} />
           <span>
-            <b>{toggle.label}</b>
-            <small>{toggle.text}</small>
+            <b>{comfortCopy.toggles[key].label}</b>
+            <small>{comfortCopy.toggles[key].text}</small>
           </span>
         </label>
       ))}
       {/* Last, so the keyboard reaches the switches straight after the table's clock. */}
       <fieldset className="accessibility-time" data-testid="story-scale">
-        <legend>이야기 글 크기</legend>
-        <p>장면 설명, 판정 뒤 이야기, 사건 결말과 막간의 글자를 키웁니다. 테이블은 그대로입니다.</p>
+        <legend>{comfortCopy.storyScale.legend}</legend>
+        <p>{comfortCopy.storyScale.text}</p>
         <div>
           {STORY_SCALES.map((scale, index) => (
             <label key={scale}>
@@ -94,7 +58,7 @@ export function AccessibilityPanel() {
                 checked={settings.storyScale === scale}
                 onChange={() => setAccessibility({ storyScale: scale })}
               />
-              <span>{STORY_SCALE_LABELS[index]}</span>
+              <span>{comfortCopy.storyScale.labels[index]}</span>
             </label>
           ))}
         </div>

@@ -45,6 +45,8 @@
     "src/gauntlet/windowReplay.js": 100,
     "src/gauntlet/windowTrail.js": 100,
     "src/judgementHabit.js": 100,
+    "src/locale.js": 80,
+    "src/locales/overlay.js": 88,
     "src/logicReport.js": 100,
     "src/playerLanguage.js": 100,
     "src/privacyText.js": 100,

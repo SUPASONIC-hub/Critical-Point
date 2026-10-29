@@ -15,7 +15,7 @@ test("a case's report reads ending, interlude, next case, profile and rank, scor
     return index;
   };
   const order = [
-    'aria-label="내가 만든 결말"',
+    'aria-label={resultCopy.outcomeLabel}',
     'className={`interlude-panel',
     'className="next-case-panel"',
     'className={`result-hero',
@@ -33,5 +33,6 @@ test("열지 않은 문 counts this case's doors on a case's report, the season'
   assert.match(readout, /getCaseBranchNodes\(\)\.filter\(\(branch\) => !caseScoped \|\| branch\.caseId === currentCase\)/);
   assert.match(readout, /unopenedRecordCount: \(caseScoped \? caseClueShut : unopenedClueCount\) \+ logReadout\.unopenedBranchCount/);
   // The line under the count says the same two numbers the count is made of.
-  assert.match(source("screens/ResultScreen.jsx"), /단서 \{unopenedRecordCount - unopenedBranchCount\}개와 분기 \{unopenedBranchCount\}개/);
+  assert.match(source("screens/ResultScreen.jsx"), /fill\(resultCopy\.why\.doorsLeft, \{ clues: unopenedRecordCount - unopenedBranchCount, branches: unopenedBranchCount \}\)/);
+  assert.match(source("copy/result.js"), /doorsLeft: "단서 \{clues\}개와 분기 \{branches\}개가 아직 기록에 없습니다\."/);
 });

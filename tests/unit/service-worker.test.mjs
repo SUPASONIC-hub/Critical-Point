@@ -54,7 +54,7 @@ test("each request gets the rule for what it asks for", () => {
   assert.equal(strategyFor(get("/scene-case01-960.webp", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/icons/icon-192.png", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/manifest.webmanifest"), ORIGIN), "revalidate");
-  for (const page of ["/privacy.html", "/terms.html", "/en/privacy.html", "/en/terms.html"]) {
+  for (const page of ["/privacy.html", "/terms.html", "/en/privacy.html", "/en/terms.html", "/ja/privacy.html", "/ja/terms.html"]) {
     assert.equal(strategyFor(get(page, "navigate"), ORIGIN), "document", page);
   }
 });
@@ -402,6 +402,8 @@ test("a warm-up the connection cuts short stops and says it is not whole", async
 
 const PAGE = `<!doctype html><html><head>
 <link rel="canonical" href="/" />
+<link rel="alternate" hreflang="en" href="/?lang=en" vite-ignore />
+<link rel="alternate" hreflang="x-default" href="/" vite-ignore />
 <meta property="og:image" content="/triggerlab-key-visual.jpg" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
 <link rel="manifest" href="/manifest.webmanifest" />

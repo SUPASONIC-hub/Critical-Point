@@ -6,6 +6,8 @@ import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 import { Prose } from "./Prose.jsx";
+import { fill } from "../locale.js";
+import revealCopy from "../copy/reveal.js";
 import { SceneMinutes } from "./SceneMinutes.jsx";
 import { noteRevealDetails } from "../state/readingTally.js";
 import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
@@ -21,24 +23,24 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
   const lostPot = formatNumber(verdict.lostPot);
   const wall = String(verdict.wall);
   const heatLine = busted
-    ? `열기 ${verdict.gauge} / 벽 ${wall}. 판돈 ${lostPot}${objectParticle(lostPot)} 잃었다.`
-    : `열기 ${verdict.gauge}에서 ${formatMultiplier(verdict.multiplier)} 확정. 벽 ${wall}${topicParticle(wall)} 넘기지 않았다.`;
+    ? fill(revealCopy.heat.bust, { gauge: verdict.gauge, wall, pot: lostPot, particle: objectParticle(lostPot) })
+    : fill(revealCopy.heat.cashed, { gauge: verdict.gauge, multiplier: formatMultiplier(verdict.multiplier), wall, particle: topicParticle(wall) });
   const nextRule = nextMutations.length > 0
     ? nextMutations.map((mutation) => mutation.label).join(" / ")
-    : "기본 규칙으로 복귀";
+    : revealCopy.baseRules;
   const tableLine = describeNextTable(nextMutations, busted);
   // What the card did to the logic streak; nothing where the streak is not in play.
   const logicLine = describeLogicMove(verdict.logic);
   return [
-    ["판정 원인", cause],
-    ["열기 기록", heatLine],
-    ...(logicLine ? [["논리 콤보", logicLine]] : []),
+    [revealCopy.ledger.cause, cause],
+    [revealCopy.ledger.heat, heatLine],
+    ...(logicLine ? [[revealCopy.ledger.logic, logicLine]] : []),
     // B2: this cash made a link (cascadeRisk.js), when the table counts them.
-    ...(verdict.link ? [["연결", verdict.link]] : []),
+    ...(verdict.link ? [[revealCopy.ledger.link, verdict.link]] : []),
     ...(verdict.relicProcs?.length
-      ? [["도구 발동", verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
+      ? [[revealCopy.ledger.relics, verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
       : []),
-    ["다음 판", tableLine ? `${nextRule}. ${tableLine}` : `${nextRule}.`],
+    [revealCopy.ledger.next, tableLine ? `${nextRule}. ${tableLine}` : `${nextRule}.`],
   ];
 }
 
@@ -104,7 +106,7 @@ export function DecisionReveal({ view }) {
   const busted = verdict?.outcome === "bust";
   // Where the lost scene went on: its place up to the first " · " (B-13), the
   // 회의실 only for a reveal saved before the skip carried one.
-  const skippedRoom = String(decisionReveal?.skippedPlace ?? "").split(" · ")[0] || "회의실";
+  const skippedRoom = String(decisionReveal?.skippedPlace ?? "").split(" · ")[0] || revealCopy.room;
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
   const [, redraw] = useState(0);
@@ -146,11 +148,11 @@ export function DecisionReveal({ view }) {
     ? ""
     : busted
       ? verdict.cause === "timeout"
-        ? "시간이 먼저 끝났다. 망설임도 벽이다."
+        ? revealCopy.subline.timeout
         : verdict.cause === "abandon"
-          ? "걸어 둔 판을 두고 테이블을 떠났다. 떠난 판은 벽에 닿은 판으로 친다."
-          : `열기 ${verdict.gauge} — 벽은 ${verdict.wall}에 있었다.`
-      : `열기 ${verdict.gauge}에서 확정. 벽은 ${verdict.wall}에 있었다.`;
+          ? revealCopy.subline.abandon
+          : fill(revealCopy.subline.bust, { gauge: verdict.gauge, wall: verdict.wall })
+      : fill(revealCopy.subline.cashed, { gauge: verdict.gauge, wall: verdict.wall });
 
   return (
     <div className={`decision-reveal-backdrop${busted ? " is-bust" : ""}`} role="presentation">
@@ -159,7 +161,7 @@ export function DecisionReveal({ view }) {
         className={`decision-reveal gx-reveal${busted ? " is-bust" : " is-cashed"}${overclocked ? " is-overdrive" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-label="판정 결과"
+        aria-label={revealCopy.dialogLabel}
         onKeyDown={trapDecisionRevealFocus}
       >
         <div className="gx-reveal-verdict">
@@ -182,12 +184,12 @@ export function DecisionReveal({ view }) {
 
         {decisionReveal.short && (
           <button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded={detailsOpen} onClick={toggleDetails}>
-            자세히
+            {revealCopy.details}
           </button>
         )}
 
         {consequenceLines.length > 0 && (
-          <div className="gx-reveal-consequence" data-testid="consequence-ledger" role="group" aria-label="판정 후폭풍">
+          <div className="gx-reveal-consequence" data-testid="consequence-ledger" role="group" aria-label={revealCopy.ledgerLabel}>
             {consequenceLines.map(([label, text]) => (
               <article key={label}>
                 <span>{label}</span>
@@ -198,15 +200,15 @@ export function DecisionReveal({ view }) {
         )}
 
         {full && verdict && (
-          <div className="gx-reveal-pot" role="group" aria-label="판돈">
+          <div className="gx-reveal-pot" role="group" aria-label={revealCopy.pot.label}>
             {busted ? (
               <p className="gx-reveal-loss">
-                판돈 <b>{formatNumber((verdict.lostPot ?? 0) + (verdict.insuredPot ?? 0))}</b> → <b>{formatNumber(verdict.insuredPot ?? 0)}</b>
+                {revealCopy.pot.lost}<b>{formatNumber((verdict.lostPot ?? 0) + (verdict.insuredPot ?? 0))}</b> → <b>{formatNumber(verdict.insuredPot ?? 0)}</b>
               </p>
             ) : (
               <p className="gx-reveal-gain">
                 {verdict.chips} × {verdict.multiplier}
-                {verdict.logic?.pot > 0 && <span> × 콤보 {verdict.logic.bonus.toFixed(2)}</span>} ={" "}
+                {verdict.logic?.pot > 0 && <span>{revealCopy.pot.combo}{verdict.logic.bonus.toFixed(2)}</span>} ={" "}
                 <b>+{formatNumber(verdict.pot)}</b>
               </p>
             )}
@@ -214,17 +216,17 @@ export function DecisionReveal({ view }) {
               {decisionReveal.caseClosed && verdict.audit?.caught ? (
                 // AUDIT (B3): the line says what the audit took of the case's share, in the system's words (no 반재욱 line: user, 2026-10-20).
                 <>
-                  <Vault size={14} aria-hidden="true" /> 감사 적발: 금고로 갈 <b>{formatNumber(verdict.secured + verdict.audit.lost)}</b> 중{" "}
-                  <b>{formatNumber(verdict.audit.lost)}</b> 환수 · 금고 <b>{formatNumber(decisionReveal.vault)}</b>
+                  <Vault size={14} aria-hidden="true" />{revealCopy.pot.auditCaught}<b>{formatNumber(verdict.secured + verdict.audit.lost)}</b>{revealCopy.pot.auditOf}{" "}
+                  <b>{formatNumber(verdict.audit.lost)}</b>{revealCopy.pot.auditTaken}<b>{formatNumber(decisionReveal.vault)}</b>
                 </>
               ) : decisionReveal.caseClosed ? (
                 <>
-                  <Vault size={14} aria-hidden="true" /> 금고로 이동 <b>{formatNumber(verdict.secured)}</b> · 금고{" "}
+                  <Vault size={14} aria-hidden="true" />{revealCopy.pot.toVault}<b>{formatNumber(verdict.secured)}</b>{revealCopy.pot.vault}{" "}
                   <b>{formatNumber(decisionReveal.vault)}</b>
                 </>
               ) : (
                 <>
-                  걸려 있는 판돈 <b>{formatNumber(decisionReveal.runPot)}</b> · 금고 <b>{formatNumber(decisionReveal.vault)}</b>
+                  {revealCopy.pot.staked}<b>{formatNumber(decisionReveal.runPot)}</b>{revealCopy.pot.vaultAfterStake}<b>{formatNumber(decisionReveal.vault)}</b>
                 </>
               )}
             </p>
@@ -232,28 +234,28 @@ export function DecisionReveal({ view }) {
         )}
 
         {decisionReveal.unlockedRelics?.length > 0 && (
-          <div className="gx-reveal-unlock" data-testid="relic-unlocked" role="group" aria-label="새로 해금한 도구">
-            <span>새 도구 해금</span>
+          <div className="gx-reveal-unlock" data-testid="relic-unlocked" role="group" aria-label={revealCopy.unlock.label}>
+            <span>{revealCopy.unlock.title}</span>
             {decisionReveal.unlockedRelics.map((id) => (
               <b key={id}>
                 <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
               </b>
             ))}
-            <p>도감에 들어갔습니다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있습니다.</p>
+            <p>{revealCopy.unlock.text}</p>
           </div>
         )}
 
         {verdict?.relicOffer?.length > 0 && (
           <p className="gx-reveal-draft" data-testid="relic-draft-notice">
-            사건이 닫혔습니다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고릅니다.
+            {fill(revealCopy.draft, { count: verdict.relicOffer.length })}
           </p>
         )}
 
         {overclockMutation && !busted && (
-          <div className="gx-reveal-overdrive" data-testid="overdrive-payout" role="group" aria-label="오버클럭 발동">
-            <span>오버클럭 발동</span>
+          <div className="gx-reveal-overdrive" data-testid="overdrive-payout" role="group" aria-label={revealCopy.overdrive.label}>
+            <span>{revealCopy.overdrive.label}</span>
             <b>{overclockMutation.title}</b>
-            <p>다음 판은 칩 2배로 시작하지만, 밀기 폭도 커진다. 이 보상은 더 큰 벽을 데려온다.</p>
+            <p>{revealCopy.overdrive.text}</p>
           </div>
         )}
 
@@ -262,34 +264,40 @@ export function DecisionReveal({ view }) {
             decision it was (A-10, 2026-10-23). */}
         {(full || decisionReveal.forced) && (
           <p className="decision-reveal-choice">
-            <span>{decisionReveal.forced ? "회의실이 대신 골랐다" : "당신의 판단"}</span>
+            <span>{decisionReveal.forced ? revealCopy.forced : revealCopy.yourCall}</span>
             {decisionReveal.spokenChoice}
           </p>
         )}
 
-        <div className="decision-reveal-stakes" role="group" aria-label="선택으로 열린 것과 닫힌 것">
+        <div className="decision-reveal-stakes" role="group" aria-label={revealCopy.stakesLabel}>
           <article>
-            <span>받은 것</span>
-            {gains.length > 0 ? gains.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>{busted ? "없음 — 벽이 가져갔다" : "없음"}</b>}
+            <span>{revealCopy.received}</span>
+            {gains.length > 0 ? gains.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>{busted ? revealCopy.noneBust : revealCopy.none}</b>}
           </article>
           <article>
-            <span>치른 것</span>
-            {costs.length > 0 ? costs.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>없음</b>}
+            <span>{revealCopy.paid}</span>
+            {costs.length > 0 ? costs.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>{revealCopy.none}</b>}
           </article>
         </div>
 
         {decisionReveal.skippedTitle && (
           <>
             <p className="gx-reveal-skip" data-testid="blackout-skip">
-              <b lang="en">LOST SCENE</b> {skippedRoom}{topicParticle(skippedRoom)} 당신 없이 「{decisionReveal.skippedTitle}」{objectParticle(decisionReveal.skippedTitle)} 넘겼습니다.
+              <b lang="en">LOST SCENE</b>
+              {fill(revealCopy.skipped, {
+                room: skippedRoom,
+                roomParticle: topicParticle(skippedRoom),
+                title: decisionReveal.skippedTitle,
+                titleParticle: objectParticle(decisionReveal.skippedTitle),
+              })}
             </p>
             <SceneMinutes nodeId={decisionReveal.skippedNodeId} />
           </>
         )}
 
         {nextMutations.length > 0 && (
-          <div className="gx-reveal-mutations" data-testid="next-mutations" role="group" aria-label="다음 판의 규칙 변화">
-            <span>{nextMutations.some(isPenaltyMutation) ? "다음 판이 이렇게 부서진다" : "다음 판의 규칙"}</span>
+          <div className="gx-reveal-mutations" data-testid="next-mutations" role="group" aria-label={revealCopy.nextLabel}>
+            <span>{nextMutations.some(isPenaltyMutation) ? revealCopy.nextBroken : revealCopy.nextRules}</span>
             <ul>
               {nextMutations.map((mutation) => (
                 <li key={mutation.id} className={`gx-mutation mut-${mutation.id}${isPenaltyMutation(mutation) ? "" : " gx-carry"}`}>
@@ -308,7 +316,7 @@ export function DecisionReveal({ view }) {
           <div className="cinematic-clue-card">
             <Sparkles size={18} />
             <div>
-              <span>숨은 단서 발견</span>
+              <span>{revealCopy.clue}</span>
               <strong>{decisionReveal.clue.title}</strong>
               <p><Prose text={decisionReveal.clue.text} /></p>
             </div>
@@ -322,9 +330,9 @@ export function DecisionReveal({ view }) {
         )}
 
         <div className="decision-reveal-footer">
-          <span>다음 · {decisionReveal.nextTitle}</span>
+          <span>{fill(revealCopy.next, { title: decisionReveal.nextTitle })}</span>
           <button ref={nextRef} type="button" data-testid="decision-next" onClick={() => setDecisionReveal(null)}>
-            {decisionReveal.caseClosed ? "사건 결과" : "다음 판"}
+            {decisionReveal.caseClosed ? revealCopy.caseResult : revealCopy.nextHand}
             <ChevronRight size={17} />
           </button>
         </div>

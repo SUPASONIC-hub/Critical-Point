@@ -3,6 +3,8 @@ import { ChevronRight } from "lucide-react";
 import { resourceMeta } from "../appCopy.js";
 import { SIDE_CASES, readSideRecord } from "../sideCases.js";
 import { loadGameRuntime } from "./IntroScreen.jsx";
+import sideCaseCopy from "../copy/sideCase.js";
+import { fill } from "../locale.js";
 
 /**
  * E-11 번외 사건: a side case, played on the season's table and kept apart from
@@ -19,8 +21,8 @@ import { loadGameRuntime } from "./IntroScreen.jsx";
  * score, no ranking row, no telemetry. The ending says 「랭킹 밖」 (설계안 8절),
  * so a score on the table is not read as one that ranks.
  */
-const LEAVE_LINE = "시작 화면으로";
-const OUT_OF_RANKING = "번외 사건은 랭킹 밖입니다. 끝낸 표시는 이 기기에만 남고, 시즌 저장과 기록은 그대로입니다.";
+// The words are src/copy/sideCase.js, read at render (a page in another
+// language lays its words over the table in place).
 
 function useSideCase(caseId) {
   const [loaded, setLoaded] = useState(null);
@@ -72,11 +74,11 @@ export function SideCaseScreen({ caseId, Music, onClose }) {
       <main className="shell game-shell" data-testid="side-case-screen">
         <section className="resume-panel" role="alert">
           <div>
-            <span>번외 사건</span>
-            <strong>번외 사건을 불러오지 못했습니다.</strong>
-            <small>연결을 확인한 뒤 다시 열어 주세요. 시즌 저장은 그대로입니다.</small>
+            <span>{sideCaseCopy.name}</span>
+            <strong>{sideCaseCopy.failed.title}</strong>
+            <small>{sideCaseCopy.failed.text}</small>
           </div>
-          <button type="button" onClick={onClose}>{LEAVE_LINE}</button>
+          <button type="button" onClick={onClose}>{sideCaseCopy.leave}</button>
         </section>
       </main>
     );
@@ -84,7 +86,7 @@ export function SideCaseScreen({ caseId, Music, onClose }) {
   if (!loaded || !state) {
     return (
       <main className="shell game-shell" data-testid="side-case-screen" aria-busy="true">
-        <p className="save-status" role="status">번외 사건을 여는 중입니다.</p>
+        <p className="save-status" role="status">{sideCaseCopy.loading}</p>
       </main>
     );
   }
@@ -101,7 +103,7 @@ export function SideCaseScreen({ caseId, Music, onClose }) {
         <Music modeKey={`intro:${pack.id}:side-ending`} />
         <header className="game-header">
           <div>
-            <span className="case-chip">{entry.label} · 결말</span>
+            <span className="case-chip">{fill(sideCaseCopy.endingChip, { label: entry.label })}</span>
             <h1 ref={titleRef} tabIndex={-1}>{ending.title}</h1>
           </div>
         </header>
@@ -110,11 +112,11 @@ export function SideCaseScreen({ caseId, Music, onClose }) {
             <span>{entry.label} · {entry.title}</span>
             <strong>{ending.title}</strong>
             <small>{ending.text}</small>
-            <small data-testid="side-case-out-of-ranking">{OUT_OF_RANKING}</small>
+            <small data-testid="side-case-out-of-ranking">{sideCaseCopy.outOfRanking}</small>
           </div>
           <button type="button" data-testid="side-case-close" onClick={onClose}>
             <ChevronRight size={18} />
-            {LEAVE_LINE}
+            {sideCaseCopy.leave}
           </button>
         </section>
       </main>
@@ -157,15 +159,15 @@ export function SideCaseScreen({ caseId, Music, onClose }) {
         </div>
         <div className="top-actions compact-actions">
           {/* The run is kept at every decision; leaving keeps it where it is. */}
-          <button type="button" className="ghost" data-testid="side-case-leave" onClick={onClose} title="저장 후 나가기">
-            나가기
+          <button type="button" className="ghost" data-testid="side-case-leave" onClick={onClose} title={sideCaseCopy.exitTitle}>
+            {sideCaseCopy.exit}
           </button>
         </div>
-        <div className="status-bar" role="group" aria-label="번외 사건 진행 상태">
+        <div className="status-bar" role="group" aria-label={sideCaseCopy.statusLabel}>
           <span>
             <b>{entry.label}</b>
             <i aria-hidden="true"> · </i>
-            랭킹 밖
+            {sideCaseCopy.outOfRankingMark}
           </span>
         </div>
       </header>

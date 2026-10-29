@@ -185,14 +185,17 @@ test("story mode is off until it is chosen, and is stored like any other switch"
   settings.resetAccessibilityCache();
 });
 
-test("the comfort panel's switches are settings the game has, and story mode is the first of them", () => {
+test("the comfort panel's switches are settings the game has, and story mode is the first of them", async () => {
   const panel = source("components/AccessibilityPanel.jsx");
   const start = panel.indexOf("const TOGGLES = [");
-  const list = panel.slice(start, panel.indexOf("\n];", start));
-  const keys = [...list.matchAll(/key: "(\w+)"/g)].map((match) => match[1]);
+  const keys = [...panel.slice(start, panel.indexOf("];", start)).matchAll(/"(\w+)"/g)].map((match) => match[1]);
   assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
   for (const key of keys) assert.equal(typeof settings.DEFAULT_ACCESSIBILITY[key], "boolean", `${key} is a switch`);
-  assert.match(list, /label: "스토리 모드"/);
+  // The words are the panel's copy table (src/copy/comfort.js), one entry per switch.
+  const { default: comfortCopy } = await import("../../src/copy/comfort.js");
+  assert.deepEqual(Object.keys(comfortCopy.toggles), keys);
+  assert.equal(comfortCopy.toggles.storyMode.label, "스토리 모드");
+  const list = comfortCopy.toggles.storyMode.text;
   // What the switch says it does, each clause being something the engine does
   // (tests/unit/story-mode.test.mjs): the far wall, no broken next board, no
   // skipped scene, the clock, when it starts, and the ranking.
@@ -212,11 +215,14 @@ test("the play-style drawer holds the three pledges and points to the comfort pa
   assert.match(pledge, /setPlayStyle\(style\.id\)/);
   assert.match(pledge, /aria-pressed=\{playStyle === style\.id\}/);
   assert.doesNotMatch(intro, /storyMode|setAccessibility|useAccessibility/, "the intro screen itself reads and sets no setting");
-  assert.ok(intro.includes("고른 방식은 내 다짐으로 기록됩니다. 판의 규칙을 바꾸는 스토리 모드는 편의 설정에 있습니다."));
-  assert.ok(!intro.includes("판의 규칙은 바뀌지 않습니다"));
+  // The drawer's note is the screen's copy table (src/copy/intro.js), printed by the drawer.
+  const introWords = source("copy/intro.js");
+  assert.ok(introWords.includes('note: "고른 방식은 내 다짐으로 기록됩니다. 판의 규칙을 바꾸는 스토리 모드는 편의 설정에 있습니다."'));
+  assert.ok(intro.includes("<small>{introCopy.playStyle.note}</small>"));
+  assert.ok(!intro.includes("판의 규칙은 바뀌지 않습니다") && !introWords.includes("판의 규칙은 바뀌지 않습니다"));
   // The one switch: the comfort panel's checkbox, writing the device setting.
   const panel = source("components/AccessibilityPanel.jsx");
-  assert.match(panel, /onChange=\{\(event\) => setAccessibility\(\{ \[toggle\.key\]: event\.target\.checked \}\)\}/);
+  assert.match(panel, /onChange=\{\(event\) => setAccessibility\(\{ \[key\]: event\.target\.checked \}\)\}/);
 });
 
 test("the report and the ranking row show what the run recorded, never the device's setting", () => {
@@ -227,11 +233,17 @@ test("the report and the ranking row show what the run recorded, never the devic
   }
   // The case's own summary (the season's, on the finale: caseResults.final).
   // It ends the eyebrow line that says whose record this is, not the rank badge.
-  assert.ok(result.includes('의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>'));
+  // Its words are the screen's copy table (src/copy/result.js, 다국어 틀).
+  assert.ok(result.includes('analyst: analystName })}{view.score.caseResults[currentCase]?.assistStory && resultCopy.storyRunMark}</p>'));
+  const resultWords = source("copy/result.js");
+  assert.ok(resultWords.includes('profileLine: "{caseLabel} · {analyst}의 생각 활성 프로필"'));
+  assert.ok(resultWords.includes('storyRunMark: " · 스토리 모드 · 공개 랭킹 제외"'));
   assert.ok(result.includes('<small lang="en">{momentumTier} · {momentumScore} POINTS</small>'));
   assert.equal(result.split("assistStory").length, 2, "and is printed once");
   // The row model's field, beside the table-time mark and in its class.
-  assert.ok(ranking.includes('{entry.assistStory && <span className="ranking-assist">스토리 모드</span>}'));
+  // Its words are the screen's copy table too (src/copy/ranking.js).
+  assert.ok(ranking.includes('{entry.assistStory && <span className="ranking-assist">{words.story}</span>}'));
+  assert.ok(source("copy/ranking.js").includes('story: "스토리 모드",'));
   // And the row model takes it from the row's summary alone.
   const story = { local: true, case_id: "season-final", run_id: "run-story", completed_at: "2026-10-10T00:00:00Z", summary: { rank: "A", burstScore: 10, assistStory: true, assistTime: 2 } };
   const plain = { ...story, run_id: "run-plain", summary: { rank: "A", burstScore: 10 } };
@@ -256,11 +268,18 @@ test("a verdict is announced once, by the slam, and the reveal's name does not r
   assert.match(notices, /<div className=\{`gx-slam gx-slam-\$\{win\.status\}`\} role="alert">/);
   const slam = notices.slice(notices.indexOf("function VerdictSlam("), notices.indexOf("export function TableNotices("));
   assert.match(slam, /<strong lang="en">BUST<\/strong>/);
-  for (const said of ["시간이 먼저 끝났다", "테이블을 떠났다", "벽은 ${win.wall}에 있었다", "판돈 {formatNumber(runPot)} → {formatNumber(bustKeeps)}"]) {
+  // Its words are the table's copy (src/copy/table.js, `notices`), read by key.
+  for (const said of ["say.slamTimeout", "say.slamAbandon", "fill(say.slamWall, { wall: win.wall })", "{say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}"]) {
     assert.ok(slam.includes(said), `the slam says: ${said}`);
   }
+  const slamCopy = source("copy/table.js");
+  for (const said of ['slamTimeout: "시간이 먼저 끝났다"', 'slamAbandon: "테이블을 떠났다"', 'slamWall: "벽은 {wall}에 있었다"', 'slamPot: "판돈"']) {
+    assert.ok(slamCopy.includes(said), `the slam's copy says: ${said}`);
+  }
   // The reveal is a named modal dialog that announces nothing by itself.
-  assert.match(reveal, /role="dialog"\s+aria-modal="true"\s+aria-label="판정 결과"/);
+  // Its name is the reveal's copy (src/copy/reveal.js), read by key.
+  assert.match(reveal, /role="dialog"\s+aria-modal="true"\s+aria-label=\{revealCopy\.dialogLabel\}/);
+  assert.match(readFileSync(new globalThis.URL("../../src/copy/reveal.js", import.meta.url), "utf8"), /dialogLabel: "판정 결과"/);
   assert.doesNotMatch(reveal, /aria-labelledby|aria-describedby|aria-live|role="(?:alert|status|log)"/, "no second voice for the verdict");
   // What it shows is what it showed: the headline as the sheet's heading, and the line under it.
   assert.match(reveal, /\{busted && <Skull size=\{34\} aria-hidden="true" \/>\}\s+<h2>\{headline\}<\/h2>\s+<p>\{subline\}<\/p>/);
@@ -335,7 +354,9 @@ test("the edge notices are on until turned off, and say no number aloud or on sc
   assert.match(notice, /aria-hidden="true"/);
   assert.match(notice, /pointerEvents: "none"/);
   assert.doesNotMatch(notice, /role="(?:status|alert)"|aria-live/);
-  const words = notice.slice(notice.indexOf("export const EDGE_NOTICES"), notice.indexOf("\n};", notice.indexOf("export const EDGE_NOTICES")));
+  // The notices' words are their own copy table (src/copy/edgeNotices.js, `notices`).
+  const edgeWords = source("copy/edgeNotices.js");
+  const words = edgeWords.slice(edgeWords.indexOf("  notices: {"), edgeWords.indexOf("\n  },", edgeWords.indexOf("  notices: {")));
   for (const [, line] of words.matchAll(/"([^"]*[가-힣][^"]*)"/g)) assert.doesNotMatch(line, /\d/, `"${line}" carries no number`);
   // Reduced motion and the calm switch both stop the slide.
   assert.match(notice, /prefers-reduced-motion: reduce/);
@@ -347,8 +368,10 @@ test("the edge notices are written case by case, and keep the third and sixth pr
   // The JSX cannot be imported here, so its pure part (the table and its reader) is run as written.
   const file = source("gauntlet/EdgeNotice.jsx");
   const body = file.slice(file.indexOf("export const EDGE_AT"), file.indexOf("const STILL")).replaceAll("export ", "");
-  const edge = new Function(`${body}
-return { EDGE_AT, EDGE_NOTICES, pickEdgeNotice };`)();
+  // Its words are the notices' copy table (src/copy/edgeNotices.js), handed in as the file imports it.
+  const { default: edgeNoticesCopy } = await import("../../src/copy/edgeNotices.js");
+  const edge = new Function("edgeNoticesCopy", `${body}
+return { EDGE_AT, EDGE_NOTICES, pickEdgeNotice };`)(edgeNoticesCopy);
   assert.deepEqual([...edge.EDGE_AT], [3, 6]);
   // One entry per case of the season, in its order, and none for a case that is not in it (B-15, 2026-10-24).
   assert.deepEqual(Object.keys(edge.EDGE_NOTICES), CASE_SEQUENCE);
@@ -375,8 +398,9 @@ test("every edge-notice sender is someone that case's own scenes bring in", asyn
   const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
   const file = source("gauntlet/EdgeNotice.jsx");
   const body = file.slice(file.indexOf("export const EDGE_AT"), file.indexOf("const STILL")).replaceAll("export ", "");
-  const { EDGE_NOTICES } = new Function(`${body}
-return { EDGE_NOTICES };`)();
+  const { default: edgeNoticesCopy } = await import("../../src/copy/edgeNotices.js");
+  const { EDGE_NOTICES } = new Function("edgeNoticesCopy", `${body}
+return { EDGE_NOTICES };`)(edgeNoticesCopy);
   // The messenger and the mail's office are named in the case itself, so neither is news from a later case
   // nor someone the player has not met yet (B-15, per case since 2026-10-24).
   for (const caseId of CASE_SEQUENCE) {
@@ -396,7 +420,9 @@ test("the reading clock asks once: 프롤로그 01-02 start held until it has, a
   assert.match(ask, /const READ_FIRST_CASES = new Set\(\["prologue01", "prologue02"\]\);/);
   assert.match(ask, /const ask = !holdReadingClock && !readingClockAsked;/);
   assert.match(ask, /held: holdReadingClock \|\| \(ask && READ_FIRST_CASES\.has\(caseId\)\)/);
-  assert.match(ask, /다 읽고 직접 열기로 바꿀까요\?/);
+  // The question is the edge's copy (src/copy/edge.js), read by key.
+  assert.match(ask, /<p id="gx-read-ask">\{edgeCopy\.ask\.question\}<\/p>/);
+  assert.match(source("copy/edge.js"), /question: "다 읽고 직접 열기로 바꿀까요\?"/);
   assert.match(ask, /\{ readingClockAsked: true, holdReadingClock: true \} : \{ readingClockAsked: true \}/);
   // The briefing asks where the clock would open the table, and only once.
   const briefing = source("gauntlet/SceneBriefing.jsx");

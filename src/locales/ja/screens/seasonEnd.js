@@ -1,0 +1,58 @@
+/** src/copy/seasonEnd.js in Japanese: the ending's scene, its name, the preview, the failure's cause and the authority panel. */
+export default {
+  scenes: {
+    "open-oversight": { cue: "いくつもの記録ウィンドウが同時に開く。", choice: "すべての参加者に基準の編集権限を渡す" },
+    "evidence-reform": { cue: "監査画面と保護名簿がひとつの画面に重なる。", choice: "公開と保護をいっしょに運営ルールとして固定する" },
+    "human-record": { cue: "あなたが組み替えた卓が、証言者の声と重なって再生される。", choice: "次の分析官に、人の名前から伝える" },
+    "profitable-silence": { cue: "拍手の音の向こうで、記録のロック音が聞こえる。", choice: "収益報告書に沈黙のコストを加える" },
+    "cold-justice": { cue: "完璧な手続き表の横に、空いた椅子が残る。", choice: "手続きに関係回復の段階を加える" },
+    "field-pact": { cue: "公式の承認より前に、現場の無線が先に応答する。", choice: "現場の協約を公式の権限に格上げする" },
+    "quiet-cover": { cue: "熱は低いが、ロックされたフォルダが増えていく。", choice: "安全な記録をひとつ開き、次の手がかりにする" },
+    collapse: { cue: "警報と人々の呼び出しが、一度に途切れる。", choice: "圧力を分散させる基準を残す" },
+    "open-question": { cue: "次の分析官の入館証が、ゆっくりと点る。", choice: "答えの代わりに、いちばん危険な問いを引き継ぐ" },
+  },
+  names: {
+    "open-oversight": "公開と介入",
+    "evidence-reform": "証拠と改革",
+    "human-record": "人と記録",
+    "profitable-silence": "成果と沈黙",
+    "cold-justice": "手続きと責任",
+    "field-pact": "現場と協約",
+    "quiet-cover": "保護と隠蔽",
+    collapse: "圧力と崩壊",
+    "open-question": "問いと継承",
+  },
+  preview: {
+    unnamed: "未確定の経路",
+    failure: "いまの選択パターンは、システム崩壊の側へ傾いています。",
+    building: "いまの選択パターンは、このエンディングの条件を強めています。",
+  },
+  delayed: "CASE {code}の最後の選択が、次の事件の基準として残っています。",
+  failureObjectives: {
+    harm: "事件ごとに{harm}を平均{gate}未満で閉じる",
+    overreach: "壁に触れた勝負を全体の{bust}%未満に減らすか、{harm}を平均{gate}未満で閉じる",
+  },
+  unnamedChoice: "名前のない選択",
+  failureCause: {
+    harm: "事件ごとに{harm}が平均{perCase}で閉じました。",
+    overreach: "勝負の{bust}%が壁に触れ、{harmLine}",
+    overreachRecovery: "心拍が速くなったら確定してください。",
+    harmRecovery: "{harm}を減らすカードを先に選んでください。",
+  },
+  authority: {
+    analyst: "分析官",
+    oversight: "あなたは記録を読む人から、終了条件を提案する人へ移りました。これからは権限の結果にも責任を負わなければなりません。",
+    level: "現在の権限は{level}です。{count}個の検証シグナルと関係の記録が、次の審査の根拠になります。",
+    nextObserver: "証拠と、関係者の信頼を確保してください。",
+    nextField: "公正さと人的被害をいっしょに管理してください。",
+    nextOversight: "公開したあとの被害の回復まで設計してください。",
+    permissions: {
+      OBSERVER: ["制限付き閲覧", "質問の要請", "観察の記録"],
+      "FIELD ACCESS": ["記録の照合", "関係者への質問", "基準の提案"],
+      OVERSIGHT: ["記録の公開", "現場への介入", "実験の終了"],
+    },
+  },
+  origins: { courier: "現場の記録の継承", lab: "反対意見の継承", public: "残した記録の継承" },
+  originEnding: "{origin}の経路では、'{ending}'の結果が違って読める。",
+  aftermath: "{operator}の選択のあと、'{ending}'の経路は次の担当者の問いと、現場の対応へとつながっていく。",
+};
