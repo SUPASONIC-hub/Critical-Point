@@ -546,9 +546,9 @@ const budgets = [
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
   // -> 196,140 / 36,563 on 2026-10-29, intro-en-fit: a Japanese page on a phone of 360px or less draws the
   // premise at 14px / 1.6 (base-intro-ranking.css). Measured 196,140 / 36,559 in the e2e build, the gzip plus 4.
-  // -> 196,307 / 36,595 on 2026-10-29, picker-narrow: on 360px or less the three language pills keep one row and the
-  // brand row comes up 8px (base-intro-ranking.css). Measured 196,307 / 36,591 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_307, maxGzip: 36_595 },
+  // -> 196,324 / 36,597 on 2026-10-29, picker-narrow: on 360px or less the three language pills keep one row (12px type)
+  // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,324 / 36,593 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_324, maxGzip: 36_597 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1096,9 +1096,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * src/shellNotices.js, over main d0c44b13): 422,996, 472,448 and 478,238.
  * The language pills kept one row on a 360px phone and the shorter Japanese
  * premise (picker-narrow, over main 3e350266; the critical CSS carries the
- * rule): 423,044, 472,498 and 478,272.
+ * rule): 423,049, 472,502 and 478,276.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_048, en: 472_502, ja: 478_276 };
+const FIRST_PAINT_BUDGETS = { ko: 423_053, en: 472_506, ja: 478_280 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
