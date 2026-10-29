@@ -8,6 +8,8 @@
  * at twenty-five cases that was 23KB the intro never shows. Only the runtime
  * reads these, so they load with it.
  */
+import { localizeTables } from "./locale.js";
+
 const operatorBriefs = {
   prologue02: {
     movement: "KD은행 본점 6층 수습 책상 → 같은 층 기업금융전략팀 심사실 → 플로우온 본사·물류 현장",
@@ -1376,3 +1378,7 @@ export const tableReactions = {
     "방금은 아팠습니다. 같은 실수를 두 번 하지는 않으실 겁니다.",
   ],
 };
+
+// On a page in another language, these tables in its words as the runtime
+// loads them (src/locale.js); on a Korean page nothing happens.
+localizeTables("caseCopy", { chapterRules, caseIntroEchoes, legacyProfiles, nextCaseSignals, tableReactions });

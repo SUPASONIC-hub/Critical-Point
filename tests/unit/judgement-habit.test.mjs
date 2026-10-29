@@ -217,7 +217,9 @@ test("a fingerprint without a habit prints the card it always printed", () => {
 
 test("the report's 당신이 반복한 방식 box names the habit and draws the line the card left out", () => {
   const screen = readFileSync(new URL("../../src/screens/ResultScreen.jsx", import.meta.url), "utf8");
-  const box = screen.slice(screen.indexOf("<span>당신이 반복한 방식</span>"), screen.indexOf("</article>", screen.indexOf("<span>당신이 반복한 방식</span>")));
+  // The box's heading is the screen's copy (src/copy/result.js, 다국어 틀).
+  assert.match(readFileSync(new URL("../../src/copy/result.js", import.meta.url), "utf8"), /habit: "당신이 반복한 방식"/);
+  const box = screen.slice(screen.indexOf("<span>{resultCopy.why.habit}</span>"), screen.indexOf("</article>", screen.indexOf("<span>{resultCopy.why.habit}</span>")));
   assert.match(box, /<strong>\{decisionFingerprint\.habit\?\.title \|\| decisionFingerprint\.modeTitle\}<\/strong>/, "the habit's name, or the 판단 DNA title without one");
   assert.match(box, /\{decisionFingerprint\.habit \? <p>\{decisionFingerprint\.habit\.line\}<\/p> : null\}/, "the habit's line under it");
   const card = readFileSync(new URL("../../src/components/ResultCardShare.jsx", import.meta.url), "utf8");

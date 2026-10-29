@@ -1,5 +1,7 @@
 import { isResourceGain } from "../gameConstants.js";
 import { weekRuleHasDevice } from "./weeklyRules.js";
+import cascadeCopy from "../copy/cascade.js";
+import { fill } from "../locale.js";
 
 /**
  * CASCADE (B2, B2-연쇄위험-설계안.md): a heavy card comes back.
@@ -64,12 +66,20 @@ export const LINK_WALL = 6;
  */
 export const LINK_CARRY_MAX = 1;
 
-/** The next-board rule a link deals. 초안; the briefing and the reveal print it. */
+/**
+ * The next-board rule a link deals. 초안; the briefing and the reveal print it.
+ * Its words are src/copy/cascade.js's, read when the board is described, so
+ * another language laid over them is the one printed.
+ */
 export const CASCADE_MUTATION = Object.freeze({
   penalty: true,
   label: "CASCADE",
-  title: "그때의 결재가 돌아왔다",
-  text: `몇 판 전 크게 태운 카드의 연결. 이번 판은 벽이 ${LINK_WALL} 가까워진다.`,
+  get title() {
+    return cascadeCopy.mutation.title;
+  },
+  get text() {
+    return fill(cascadeCopy.mutation.text, { wall: LINK_WALL });
+  },
 });
 
 /** Whether this table counts links: a `cascade` week's season, never in story mode or a practice case (decision 13). */
@@ -229,11 +239,14 @@ export function readWalk({ board, pending }) {
  */
 export const describeLinkMade = (run, { cashed, burn }) =>
   isCascadeOn(run) && cashed && !run.schema?.mutations?.includes("blackout") && Math.abs(burn?.value ?? 0) >= LINK_BURN
-    ? `${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 안에 한 판의 벽이 ${LINK_WALL} 가까워진다.`
+    ? fill(cascadeCopy.linkMade, { min: LINK_SPAN_MIN, max: LINK_SPAN_MAX, wall: LINK_WALL })
     : null;
 
 /** "다음 판" or "2~4판 안", for a range in boards from the one on the table. */
-export const describeRange = ([low, high]) => (high === 1 ? "다음 판" : low === high ? `${low}판 뒤` : `${low}~${high}판 안`);
+export const describeRange = ([low, high]) => {
+  const { next, after, within } = cascadeCopy.range;
+  return high === 1 ? next : fill(low === high ? after : within, { low, high });
+};
 
 /** What the voice says of the links (B2 2-8). 초안. */
-const describeLinks = ({ live, nearest }) => `연결 ${live}. 가장 이른 것은 ${describeRange(nearest)}, 그 판의 벽이 ${LINK_WALL} 가까워진다`;
+const describeLinks = ({ live, nearest }) => fill(cascadeCopy.links, { live, range: describeRange(nearest), wall: LINK_WALL });

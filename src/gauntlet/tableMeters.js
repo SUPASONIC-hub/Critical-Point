@@ -3,6 +3,8 @@ import { readAudit } from "./auditRisk.js";
 import { HEAT_DEBT_GAUGE } from "./tableRules.js";
 import { AUDIT_HEAT } from "./weeklyRules.js";
 import { readSafeLine } from "./tableAfterword.js";
+import { fill } from "../locale.js";
+import tableCopy from "../copy/table.js";
 
 /**
  * The 현재 위험 cell's line, and the voice's after the heat (`describePush`).
@@ -13,9 +15,9 @@ import { readSafeLine } from "./tableAfterword.js";
  * Each line fits the cell on a 360px phone without the ellipsis.
  */
 export function describeDanger({ gauge, nextHigh, wallMin }) {
-  if (gauge >= wallMin) return "벽 구간 안";
-  if (nextHigh >= wallMin) return "밀면 벽 사정권";
-  return `벽까지 최소 ${Math.max(0, Math.ceil(wallMin - nextHigh))}`;
+  if (gauge >= wallMin) return tableCopy.danger.inBand;
+  if (nextHigh >= wallMin) return tableCopy.danger.inReach;
+  return fill(tableCopy.danger.distance, { distance: Math.max(0, Math.ceil(wallMin - nextHigh)) });
 }
 
 /**

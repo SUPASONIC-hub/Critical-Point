@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { buildLeaderboard } from "../ranking.js";
+import leaderboardCopy from "../copy/leaderboard.js";
 import { fetchLeaderboard } from "../telemetry.js";
 
 /**
@@ -102,8 +103,8 @@ export function useLeaderboard({ showRanking, isOnline, localLeaderboardRows, lo
         setLeaderboardStatus(isOnline ? "error" : "local");
         setLeaderboardError(
           isOnline
-            ? "원격 기록을 불러오지 못해 이 브라우저의 완료 기록만 표시합니다."
-            : "오프라인이라 이 브라우저의 완료 기록만 표시합니다.",
+            ? leaderboardCopy.remoteFailed
+            : leaderboardCopy.offline,
         );
       });
     return () => {

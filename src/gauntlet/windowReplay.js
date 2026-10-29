@@ -39,7 +39,7 @@ const EVENT_TYPES = Object.freeze(Object.fromEntries(Object.entries(EVENT_CODES)
  * wall), to the tenth 3,487 do not. window-replay.test.mjs replays 400 of
  * them at the thousandth.
  */
-export const REPLAY_GAUGE_TOLERANCE = 0.05;
+const REPLAY_GAUGE_TOLERANCE = 0.05;
 /** How far back a press's clock may sit from the replay's, before the record is read as rewound. */
 const CLOCK_SLACK = 0.01;
 /** Why a record cannot be replayed, or null. Read before anything is dealt from it. */

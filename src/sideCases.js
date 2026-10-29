@@ -14,6 +14,8 @@
  * `inProgress` is the run under way (`{ nodeId, resources, log, run }`), or null.
  */
 import { readStoredValue, SIDE_CASES_KEY } from "./appConfig.js";
+import introCopy from "./copy/intro.js";
+import { fill } from "./locale.js";
 import { SIDE_CASES } from "./nodes/sidePacks.js";
 
 export { SIDE_CASES, SIDE_CASES_KEY };
@@ -76,5 +78,5 @@ export function getSideSlot({ newGamePlusUnlocked = false, caseResults = null, c
     closed: Boolean(marks[id]?.closedAt),
     resumable: Boolean(marks[id]?.inProgress),
   }));
-  return { cases: rows, book: `번외 ${rows.filter((row) => row.closed).length}/${rows.length}` };
+  return { cases: rows, book: fill(introCopy.sideSlot.book, { closed: rows.filter((row) => row.closed).length, total: rows.length }) };
 }
