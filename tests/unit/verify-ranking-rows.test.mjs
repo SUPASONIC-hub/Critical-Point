@@ -108,10 +108,12 @@ test("a 판 읽기 read edited in the log (C-1(1): the score sums it) is marked 
   const cashed = log.findIndex((entry) => !entry.threshold.busted && entry.threshold.read?.[0] > 0);
   const busted = log.findIndex((entry) => entry.threshold.busted);
   assert.ok(cashed >= 0, "the fixture has a cashed window with a read");
-  // The bare hand's number raised to the seer's, as if it had read the wall.
+  // The bare hand's number raised to the seer's, as if it had read the wall --
+  // and past the 3% the check allows, for a bot that cashed close to the seer
+  // (the 11-30 rehearsal's tools: 1,845 against 1,855).
   const raised = recheckRun(edit(rows, (finalRow) => {
     const { read } = finalRow.decision_log[cashed].threshold;
-    finalRow.decision_log[cashed].threshold.read = [Math.max(read[1], read[0] + 10), read[1]];
+    finalRow.decision_log[cashed].threshold.read = [Math.max(read[1], Math.round(read[0] * 1.1) + 10), read[1]];
   }));
   assert.ok(raised.marks.includes("window-off-replay"));
   assert.deepEqual(raised.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
