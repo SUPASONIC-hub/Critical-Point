@@ -25,12 +25,11 @@ import { LOCALE_KEY, readStoredValue, writeStoredValue } from "./appConfig.js";
 export const SOURCE_LOCALE = "ko";
 export const SUPPORTED_LOCALES = [
   { code: "ko", name: "한국어" },
-  { code: "en", name: "English", preview: true },
-  // A draft not offered yet (`hidden`, 일본어 1단계): opened only by its
-  // address (`?lang=ja`), for reading the draft on a device. The language
-  // choice shows it on its own pages alone, named by its dictionary
-  // (`preview.languageName`), so the shell carries no character of its script.
-  { code: "ja", preview: true, hidden: true },
+  // Open to the end of the season (10-28, the owner): a language may still
+  // carry `preview: true` (a line under the buttons) or `hidden: true` (offered
+  // only on its own pages), and neither does now.
+  { code: "en", name: "English" },
+  { code: "ja", name: "日本語" },
 ];
 const CODES = SUPPORTED_LOCALES.map((locale) => locale.code);
 

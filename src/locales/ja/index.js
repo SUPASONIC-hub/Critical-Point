@@ -11,8 +11,8 @@
  *
  * The same shape as the English dictionary (src/locales/en/index.js):
  * `copy` over the Korean tables in place, `speakers` and `roles` for the
- * briefing, `preview` for the preview's own screens, `previewThrough` the
- * last case in Japanese. `style` is the page's own CSS (overlay.js
+ * briefing; open to the end of the season (10-28), so no `preview` copy and
+ * no `previewThrough`. `style` is the page's own CSS (overlay.js
  * `addStyle`): the system's Japanese face, since Pretendard has no kanji and
  * a kanji subset would weigh more than the first-paint budget, and line
  * breaks between characters with Japanese rules, since the Korean pages'
@@ -51,12 +51,74 @@ export const speakers = {
   "변유진": "ピョン・ユジン",
   "나준혁": "ナ・ジュニョク",
   "권도현": "クォン・ドヒョン",
+  // 사건 11~최종에 처음 나오는 화자(전체 공개 준비, 10-28). 같은 규칙: 성・이름, 연음대로, 성의 첫소리는 무성.
+  "차지원": "チャ・ジウォン",
+  "서하린": "ソ・ハリン",
+  "봉영훈": "ポン・ヨンフン",
+  "곽민재": "クァク・ミンジェ",
+  "주은채": "チュ・ウンチェ",
+  "이정숙": "イ・ジョンスク",
+  "채윤슬": "チェ・ユンスル",
+  "이찬빈": "イ・チャンビン",
+  "최서진": "チェ・ソジン",
+  "배수경": "ペ・スギョン",
+  "유하온": "ユ・ハオン",
+  "정태오": "チョン・テオ",
+  "하은경": "ハ・ウンギョン",
+  "반서아": "パン・ソア",
+  "도하람": "ト・ハラム",
+  "임소율": "イム・ソユル",
+  "구태형": "ク・テヒョン",
+  "류세아": "リュ・セア",
+  "선우진": "ソヌ・ジン",
+  "고은비": "コ・ウンビ",
+  "문하준": "ムン・ハジュン",
+  "탁예린": "タク・イェリン",
+  "표세린": "ピョ・セリン",
+  "채이안": "チェ・イアン",
+  "지강현": "チ・ガンヒョン",
+  "송하율": "ソン・ハユル",
+  "남궁솔": "ナムグン・ソル",
+  "하정희": "ハ・ジョンヒ",
+  "연하진": "ヨン・ハジン",
+  "채도훈": "チェ・ドフン",
+  "조현석": "チョ・ヒョンソク",
+  "백다온": "ペク・ダオン",
+  "진서우": "チン・ソウ",
+  "하도율": "ハ・ドユル",
+  "한지우": "ハン・ジウ",
+  "연지안": "ヨン・ジアン",
+  "석재우": "ソク・ジェウ",
+  "나은호": "ナ・ウノ",
+  "진태윤": "チン・テユン",
+  "허윤경": "ホ・ユンギョン",
+  "편종구": "ピョン・ジョング",
+  "윤서진": "ユン・ソジン",
+  "안기범": "アン・ギボム",
+  "황혜원": "ファン・ヘウォン",
+  "서도경": "ソ・ドギョン",
+  "여민규": "ヨ・ミンギュ",
+  "은재하": "ウン・ジェハ",
+  "석문호": "ソク・ムノ",
+  "도건우": "ト・ゴヌ",
+  "선재윤": "ソン・ジェユン",
+  "연서준": "ヨン・ソジュン",
+  "엄동균": "オム・ドンギュン",
+  "공병만": "コン・ビョンマン",
+  "은시온": "ウン・シオン",
+  "홍예담": "ホン・イェダム",
+  "하예솔": "ハ・イェソル",
+  "여다인": "ヨ・ダイン",
+  "은채원": "ウン・チェウォン",
+  "이하경": "イ・ハギョン",
+  "임재윤": "イム・ジェユン",
+  "연시우": "ヨン・シウ",
+  "김 반장": "キム班長",
+  "민하랑": "ミン・ハラン",
 };
 
-/** The last case of the Japanese preview (the same switch as the English one). */
-export const previewThrough = "case10";
 
-/** A speaker's role as the briefing prints it, by its Korean. The roles of 프롤로그 01-05 and 사건 01-10. */
+/** The role of a speaker as the briefing prints it, by its Korean. The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {
   "KD은행 기업금융전략팀 대리 · 당신의 사수": "KD銀行 企業金融戦略チーム 代理 · あなたの指導役",
   "온새포장 대표 · 강서구 화곡동": "オンセ包装 代表 · カンソ区ファゴク洞",
@@ -83,30 +145,10 @@ export const roles = {
   "플로우온 풀필먼트센터 야간조 반장 · 창업 첫해 입사": "フロウオン フルフィルメントセンター夜勤班長 · 創業初年度入社",
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "フロウオン財務責任者 · クォン・ドヒョンの叔母の夫 · 47歳",
   "KD은행 부행장 · 대출심사위원회 위원장": "KD銀行 副頭取 · 融資審査委員会 委員長",
-  "문래동 가온정밀 대표 · 문가을의 남편": "ムンレ洞 カオン精密 代表 · ムン・ガウルの夫",
+  "문래동 가온정밀 대표 · 문가을의 남편": "ムルレ洞 カオン精密 代表 · ムン・ガウルの夫",
   "피해자 모임 대표 · 망원시장 가을떡방 사장": "被害者の会代表 · マンウォン市場「ガウル餅房」店主",
 };
 
-export const preview = {
-  languageName: "日本語",
-  chooseLanguage: "言語を選択",
-  languageButtons: ["한국어", "日本語（試験版）"],
-  languageSetting: "言語",
-  previewNote: "日本語は試験版です。プロローグと事件01〜{last}を遊べます。",
-  reportTranslation: "このシーンの翻訳の問題を報告",
-  reportTranslationNote: "おかしな箇所を教えてください。シーンIDも一緒に送られます。",
-  rankingLanguage: "言語: KO / JA",
-  endTitle: "日本語試験版はここまで",
-  endText:
-    "事件{last}まで到達しました。日本語の試験版はひとまずここまでです。事件{next}〜49とフィナーレは翻訳中です。進行状況はこの端末に保存されていて、公開されたら事件{next}から続けられます。",
-  endButtons: { korean: "韓国語で続ける", wait: "日本語版を待つ", feedback: "感想を送る" },
-  continueCard: "事件{next} — 日本語版は近日公開",
-  // The panel after `previewThrough` (nextCaseSignals): its eyebrow, and the
-  // lead put before its premise; its button is endButtons.korean.
-  endEyebrow: "日本語試験版はここまで",
-  endPremiseLead:
-    "事件{last}で、日本語の試験版はひとまず終わりです。進行状況はこの端末に保存されています。事件{next}からは、日本語版が届くまで韓国語で物語が続きます。",
-};
 
 export const copy = {
   screens,

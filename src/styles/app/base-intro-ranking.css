@@ -3291,6 +3291,19 @@ body {
   font-size: 0.75rem;
   line-height: 1.4;
 }
+/* A wide screen keeps the pills under the music controls, out of the brand
+   row: three languages (10-28) pushed that row onto a second line on a
+   1280x720 screen, by a few pixels that depend on the face, and the start
+   button with it out of the first screen. */
+@media (min-width: 861px) {
+  .language-picker {
+    position: fixed;
+    top: calc(max(16px, env(safe-area-inset-top)) + 46px);
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 30;
+    justify-content: flex-end;
+  }
+}
 @media (max-width: 860px) {
   .language-picker {
     position: absolute;

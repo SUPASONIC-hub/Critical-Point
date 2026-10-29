@@ -13,13 +13,10 @@
  * the owner's G-9 choice 1: common spellings). The scene keeps the Korean
  * name, which is the key of its portrait, its profile and the run log.
  *
- * `preview` is the copy of the preview's own screens (F-3, F-4). The language
- * choice shows `previewNote` under its buttons (LanguagePicker.jsx); the rest
- * waits for the screens that will use it. The end of the preview (F-3, the
- * owner's F-8 choice 1) is the panel after `previewThrough` (사건 10 now): the
- * overlay gives that case's `nextCaseSignals` entry `endEyebrow`, the button
- * endButtons.korean and `endPremiseLead`, so the English stops there and the
- * story goes on in Korean. Widening the preview is that one constant.
+ * Open to the end of the season (10-28, the owner): there is no
+ * `previewThrough` and no `preview` copy, so every case is English and no
+ * panel ends the English early. A language still in preview names its last
+ * case there (src/locales/overlay.js `inPreview`, `markPreviewEnd`).
  */
 import screens from "./screens/index.js";
 
@@ -115,15 +112,6 @@ export const speakers = {
   "민하랑": "Min Harang",
 };
 
-/**
- * The last case of the preview: the one line to change to widen it (F-1, choice 1).
- * A case after it keeps its Korean scenes and names even when its file is
- * here (src/locales/overlay.js), the panel after it is the end of the preview,
- * `preview` below fills {last} and {next} from it, and `npm run check:locale`
- * checks the screen copy up to it.
- */
-export const previewThrough = "case10";
-
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
 export const roles = {
   "KD은행 기업금융전략팀 대리 · 당신의 사수": "Assistant Manager, KD Bank Corporate Finance Strategy Team · your mentor",
@@ -155,25 +143,6 @@ export const roles = {
   "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
 };
 
-export const preview = {
-  chooseLanguage: "Choose your language",
-  languageButtons: ["한국어", "English (preview)"],
-  languageSetting: "Language",
-  previewNote: "English is a preview: the prologue and Cases 01–{last} are available.",
-  reportTranslation: "Report a translation issue in this scene",
-  reportTranslationNote: "Tell us what reads wrong. The scene ID is sent with it.",
-  rankingLanguage: "Language: KO / EN",
-  endTitle: "END OF THE ENGLISH PREVIEW",
-  endText:
-    "You’ve reached the end of Case {last} — the end of the English preview for now. Cases {next}–49 and the finale are being translated. Your progress is saved on this device, and you’ll continue from Case {next} when they arrive.",
-  endButtons: { korean: "Continue in Korean", wait: "Wait for English", feedback: "Tell us what you thought" },
-  continueCard: "Case {next} — coming in English soon",
-  // The panel after `previewThrough` (nextCaseSignals): its eyebrow, and the
-  // lead put before its premise; its button is endButtons.korean.
-  endEyebrow: "End of the English preview",
-  endPremiseLead:
-    "You’ve reached the end of Case {last} — the end of the English preview for now. Your progress is saved on this device; from Case {next} the story continues in Korean until the English arrives.",
-};
 
 export const copy = {
   screens,
