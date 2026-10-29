@@ -832,7 +832,7 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
   `/privacy.html`, `/terms.html`, 영어판 `/en/privacy.html`, `/en/terms.html`, 일본어판 `/ja/privacy.html`,
   `/ja/terms.html`(스토어 등록 정보에 넣는 주소). 영어·일본어판은 한국어 본문을 옮긴 것이고, 머리에서 다른 두 언어로 이어집니다.
   본문은 `scripts/legal-pages.mjs` 하나에 있고, 빌드(`vite.config.js`의 `legalPages()`)와 개발 서버가 같은 원본에서
-  만듭니다. 첫 화면 맨 아래와 `데이터 저장 안내`의 데이터 안내가 이 둘로 이어지고, 동의 상자 옆 문장
+  만듭니다. 첫 화면 맨 아래와 `데이터 저장 안내`의 데이터 안내가 화면 언어의 이 둘로 이어지고(한국어는 루트, 영어 `/en/`, 일본어 `/ja/`, `legalPagePath`), 동의 상자 옆 문장
   (`PLAYTEST_DATA_NOTICE`, `src/privacyText.js`)과 문의 주소(`SUPPORT_CONTACT`, `src/appConfig.js`)는 첫 화면과 같은 값을 씁니다.
   방침이 적는 항목은 코드가 보내는 것과 맞춰 둡니다: `tests/unit/legal-pages.test.mjs`가 마이그레이션의 익명 쓰기
   권한(컬럼 단위 `grant insert`)과 온라인 저장 `put_cloud_save`의 인자를 읽어, 방침이 이름 붙이지 않은 칸이
@@ -1167,7 +1167,7 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 `verify:static`(`scripts/verify-static.mjs`)은 단위·스모크 테스트, lint(`eslint --cache`), 압박
 시뮬레이션, 엔딩, 밸런스, 타입(`check:types`), 대사, 그래프, 런타임 예산, 뷰 계약, 상수, 텍스트, 쉬운 말,
 인코딩, CSS 토큰, CSS 구조, CSS 포맷, 아트 예산, 폰트, 내보내기 스키마, 테스트 저장소 키, 시각
-베이스라인, Node 핀, DB 권한, 서사 사실(canon), 카드 라벨·장면 본문 길이, 문서에 적힌 숫자(`check:doc-numbers`) 28개 검사를 한꺼번에 돌리고,
+베이스라인, Node 핀, DB 권한, 서사 사실(canon), 카드 라벨·장면 본문 길이, 영어·일본어 사전(`check:locale:strict`), 문서에 적힌 숫자(`check:doc-numbers`) 28개 검사를 한꺼번에 돌리고,
 모두 끝난 뒤 실패한 것을 모아 보고합니다.
 한 검사가 실패해도 나머지가 가려지지 않습니다. `npm test`도 `node --test`로 돌아가므로 어서션 하나가
 실패해도 나머지가 모두 실행되고, `tests/unit/**/*.test.mjs`를 함께 줍니다.
@@ -1288,7 +1288,7 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
 3. **스토어** — 게임물관리위원회 안내가 오거나 넓히고 싶을 때 Google Play(안드로이드)에 등록합니다. 스토어
    설문으로 등급을 받습니다. 앱 껍데기·광고·빌드 자동화는 draft로 준비만 해 둡니다.
 
-다국어는 영어판 뒤로도 계속 더합니다.
+다국어는 영어·일본어판(사람 감수 전) 뒤로도 계속 더합니다.
 
 Render 배포는 `render.yaml`을 기록으로 둡니다(아래 참고).
 
@@ -1507,7 +1507,8 @@ gh run watch                                  # 사이트가 그 커밋을 내�
 - 다른 언어는 한국어 원문의 **같은 id에 문구만** 얹습니다. 언어 목록은 `src/locale.js`의 `SUPPORTED_LOCALES` 한 곳, 언어별 사전은
   `src/locales/<lang>/index.js`(화면 문구·화자), `src/locales/<lang>/between/`(사건 11 뒤 사건 사이 문구)와 `src/locales/<lang>/nodes/<사건 id>.js`이고, 덮어쓰기 규칙은
   `src/locales/overlay.js`(한국어 문자열이 있던 자리에만, id·effect·next는 못 덮음)입니다. 화면의 한국어 문구는 `src/copy/<이름>.js` 표의
-  키로 읽습니다. `npm run check:locale -- --lang=en`이 빠진·묵은 문구와 숫자 경고를 셉니다(경고 수준, `--strict`면 실패).
+  키로 읽습니다. `npm run check:locale -- --lang=en`이 빠진·묵은 문구와 숫자 경고를 셉니다(경고 수준, `--strict`면 실패). `verify:static`은
+  `check:locale:strict`로 영어·일본어 둘 다 빠짐·묵음 0을 요구하므로, 한국어 원문을 고치면 같은 PR에서 두 언어도 고칩니다.
 - 한 번의 플레이가 지나는 장면은 시즌 약 521개, 프롤로그 약 55개입니다(쓰인 장면은 모두 1,129개, 카드
   4,205장). 이 길이는 코드 문제가 아니라 집필 판단입니다.
 - 코드를 바꾸기 전에 `docs/work-status.md`의 Maintenance Priorities를 읽으십시오. 지금 유효한

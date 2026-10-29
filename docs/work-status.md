@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-26 evening (the state of `main` at `2c935e7`, after the release roadmap (#335), the install hint (#337), the AdSense verification switch (#342), the English preview's first two steps (#338), 오진우's turn (#347), the English bundle (#348), Japanese step one (#356) and the evening bundle (#362); what changed and when is in `git log`)
+Last updated: 2026-10-29 (the state of `main` at `43078a4`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); {to add after merge: #369, lang-layout-check, cleanup-1029 and the last merge's commit}; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -27,6 +27,22 @@ list of the files it touched.
   dark ground. Lime is the accent for the control that records a decision.
   Type is one committed Pretendard subset (priority 65), and Hangul wraps with
   `word-break: keep-all`.
+- Three languages, 한국어, English and 日本語, picked on the start screen
+  (`critical-point-locale-v1`, `?lang=en`, `?lang=ja`). English and Japanese
+  run from 프롤로그 01 to the finale -- scenes, screens and the lines
+  between cases -- as a machine draft ahead of human review; Korean is the
+  source, the other languages lay strings over the same ids
+  (`src/locales/<lang>/`, `src/locales/overlay.js`), and the table, scores
+  and ranking are the same in every language. The reading clock counts
+  English by words and Japanese by characters so a scene waits about as
+  long as in Korean; the Korean clock and the table's clock are unchanged.
+  `check:locale:strict` in `verify:static` fails when a Korean line changes
+  without both translations, so a Korean edit carries its English and
+  Japanese in the same pull request. The privacy policy and terms are six
+  static pages, Korean at the root, `/en/` and `/ja/`, linked to each other,
+  and the game's links open the page in the screen's language. The `Test
+  Week` summary counts the week's English-screen and Japanese-screen
+  seasons on their own lines and warns when the two together reach half.
 - Online save is opt-in and off by default; nothing about a run leaves the
   device until the player turns it on (priority 59).
 - The ranking is ordered by a score the server reads off the run's own `final`
@@ -343,15 +359,14 @@ Still open, on purpose:
   dictionaries in `src/locales/<lang>/` laid over the same ids, Korean
   where a string is missing -- the 「한국어 · English」 picker on the start
   screen (`critical-point-locale-v1`, `?lang=en`), machine-drafted English
-  for 프롤로그 01 to 사건 10 ahead of human review with 「Continue in
-  Korean」 after 사건 10, screen copy moved into twenty key tables under
+  for 프롤로그 01 to 사건 10 ahead of human review (opened to the finale
+  on 10-29, #366), screen copy moved into twenty key tables under
   `src/copy/`, and `npm run check:locale`; the intro baselines were
   re-recorded for the picker); #347 (why 오진우 turns from mentor to rival:
   윤상혁's condition for him alone laid into four existing scenes --
   프롤로그 05, 사건 01, 02 and 03 -- with a paragraph in `docs/canon.md`;
   scenes, cards and ids unchanged); #348 (the English bundle -- 사건 11 to
-  the finale, 63 speakers, the one-line preview range `previewThrough`
-  still `case10`, no change on the live screens); #349 (the export keyword
+  the finale and 63 speakers, live since #366 on 10-29); #349 (the export keyword
   taken off nine names used only in their own files); #352 (the screen
   language in a run's summary and Funnel); #353 (story gaps one to five);
   #354 (the test week summary's English-screen seasons); #356 (Japanese
@@ -366,11 +381,37 @@ Still open, on purpose:
   after a season shard of its Verify hit the 20-minute limit and was rerun.
   The user decided that day: no
   promotion yet, AdSense set up later (the Render address or a domain is
-  still open), and the English range widens ten reviewed cases at a time.
+  still open), and the English range widens ten reviewed cases at a time
+  (replaced on 10-28: both languages open to the end, #366).
   Drafts: #350 (turning ads on, #341 reopened), the December side-case
   stack restacked and green (#301, #314, #317, #321, #333), #319 (the
   11-30 rehearsal, rebased on that day's main), and #327, #330 and #332
   (stage three, the store).
+- 2026-10-28: #363 (the first screen's transfer cut: the font's weight axis
+  400-920, the first screen's key visual 960 alone at webp quality 0.75,
+  and first-paint budgets per language -- Korean, `?lang=en`, `?lang=ja`);
+  #365 (the code review's last four lows: the observer's sample and ledger
+  count the Korean card behind a translated one, the run's summary records
+  the language actually drawn). The user decided that day to open English
+  and Japanese to the end instead of ten reviewed cases at a time, and to
+  make `check:locale` strict in `verify:static`.
+- 2026-10-29: #366 (English and Japanese to the finale: 「한국어 · English ·
+  日本語」 on the start screen, 25,418 of 25,418 lines in each language,
+  「Continue in Korean」, 「English (preview)」 and `previewThrough` gone,
+  all a machine draft before human review; the reading clock's
+  `readingUnits` counts English words x 2 and Japanese characters x 0.89;
+  on wide screens the language buttons sit fixed under the music button at
+  the top right, and the recovery notice is layered above them); #368 (one
+  rendering per Korean term and one first person per speaker in English and
+  Japanese, Korean unchanged); #367 (the Japanese privacy policy and terms
+  at `/ja/`, the six legal pages linked to each other, the game's policy
+  links in the screen's language through `legalPagePath`, the `Test Week`
+  summary's Japanese-screen line with the half warning counting both
+  languages, hreflang ko, en, ja and x-default plus `og:locale:alternate`
+  in `index.html` -- the service worker's precache now skips
+  `rel="alternate"` -- and `check:locale:strict` in `verify:static`, 27 to
+  28 checks). {to add after merge: #369, lang-layout-check, cleanup-1029,
+  the day's merge count, unit tests, the production commit and the drafts.}
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -1717,7 +1758,8 @@ hand-written sheet, with the generated `critical.generated.css` left out by
 check passed without reading a sheet), `check:art`,
 `check:fonts`, `check:export-schema`, `check:test-storage`,
 `check:visual-baselines`, `check:node`, `check:grants`, `check:canon`,
-`check:card-labels` and `check:doc-numbers`. None of them needs a browser.
+`check:card-labels`, `check:locale:strict` (English and Japanese with no
+missing or stale line) and `check:doc-numbers`. None of them needs a browser.
 
 `test:coverage` is `scripts/check-coverage.mjs`. It leaves the authored data
 (`src/nodes/`, `gameData.js`, `gameDialogue.js`, `gameCases.js`, the copy
