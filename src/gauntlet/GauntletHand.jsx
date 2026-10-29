@@ -5,6 +5,11 @@ import { getLogicType } from "./logicStreak.js";
 import { describeCardMove, getMoveMark, getTypeParts, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import { pastPick } from "./WeekRulePanel.jsx";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
+
+// The hand's words (src/copy/table.js).
+const say = tableCopy.hand;
 
 /**
  * The hand: every card the scene deals, and 판을 다시 짠다 after them.
@@ -41,7 +46,7 @@ export function CardType({ card, moveOf }) {
   return (
     <span className={`gx-card-type${move && move !== "break" ? " is-on" : ""}`} data-testid="card-type" data-move={move ?? ""}>
       {mark && <b className="gx-card-move" data-testid="card-move" aria-hidden="true">{mark} </b>}
-      <span className="sr-only">유형 </span>
+      <span className="sr-only">{say.type}</span>
       {before && <i>{before}</i>}
       {word}
       {after && <i>{after}</i>}
@@ -88,7 +93,7 @@ export function GauntletHand({
   const labelOf = (key) => resourceMeta[key]?.label ?? key;
 
   return (
-    <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label="카드">
+    <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label={say.label}>
       {cards.map((card, index) => {
         const open = isCardOpen(card);
         const burn = getCardBurn(card, schema);
@@ -112,16 +117,16 @@ export function GauntletHand({
               <span className="gx-card-stats">
                 <b className="gx-card-chips" aria-hidden="true">▒▒</b>
                 <b className="gx-card-burn" aria-hidden="true">▒▒▒▒</b>
-                <span className="sr-only">칩과 소모가 가려진 카드</span>
+                <span className="sr-only">{say.faceDown}</span>
               </span>
             ) : (
               <span className="gx-card-stats">
                 <b className="gx-card-chips">+{getCardChips(card, schema)}</b>
                 <b className="gx-card-burn">
-                  {burn ? `${labelOf(burn.key)} ${burn.value > 0 ? "+" : ""}${burn.value}` : "소모 없음"}
+                  {burn ? `${labelOf(burn.key)} ${burn.value > 0 ? "+" : ""}${burn.value}` : say.noBurn}
                   {burn?.fractured && <Zap size={11} aria-hidden="true" />}
                   {/* B2: cashed, this card makes a link (cascadeRisk.js). Words, so the button's name reads what it shows. */}
-                  {linkBurn && Math.abs(burn?.value ?? 0) >= linkBurn ? " · 연결" : null}
+                  {linkBurn && Math.abs(burn?.value ?? 0) >= linkBurn ? say.link : null}
                 </b>
                 {/* A board rule that touches every card is a badge in the stats
                     row, not a line of its own on every card: on an overclocked
@@ -129,13 +134,13 @@ export function GauntletHand({
                     says what the rule is; the badge says which cards it bills. */}
                 {burn?.fractured && (
                   <i className="gx-card-rule-tax" data-testid="fracture-tax">
-                    <span className="sr-only">균열 청구 </span>
+                    <span className="sr-only">{say.fractureTax}</span>
                     ×{schema.fractureRate}
                   </i>
                 )}
                 {overclocked && (
                   <i className="gx-card-overclock" data-testid="overclock-card-boost">
-                    <span className="sr-only">오버클럭 칩 </span>
+                    <span className="sr-only">{say.overclock}</span>
                     ×2
                   </i>
                 )}
@@ -146,12 +151,12 @@ export function GauntletHand({
                 of cards the moment one was chosen. */}
             {selected && !schema.faceDown && (
               <span className="gx-card-preview">
-                <span className="sr-only">선택한 카드의 상세 영향: </span>
+                <span className="sr-only">{say.preview}</span>
                 {/* First: it is the one chip about the next board rather than
                     this one, and a short phone shows a single line of them. */}
                 {fractureAxis && (
                   <i className="gx-card-crack" data-testid="fracture-candidate">
-                    균열 후보 · {labelOf(fractureAxis)}
+                    {say.crack} · {labelOf(fractureAxis)}
                   </i>
                 )}
                 {visibleEffects.map((effect) => (
@@ -159,15 +164,15 @@ export function GauntletHand({
                     {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
                   </i>
                 ))}
-                {hiddenEffectCount > 0 && <i>외 {hiddenEffectCount}</i>}
+                {hiddenEffectCount > 0 && <i>{fill(say.more, { count: hiddenEffectCount })}</i>}
               </span>
             )}
             {sealed && (
               <span className="gx-card-seal" data-testid="sealed-card-lock">
-                <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 {schema.sealBreak}
+                <Lock size={12} aria-hidden="true" /> {say.seal} {schema.sealBreak}
               </span>
             )}
-            {!open && <span className="gx-card-seal">잠김 · {getLockReason(card)}</span>}
+            {!open && <span className="gx-card-seal">{fill(say.locked, { reason: getLockReason(card) })}</span>}
           </GuardedButton>
         );
       })}

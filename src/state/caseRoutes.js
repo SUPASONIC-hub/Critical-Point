@@ -138,7 +138,7 @@ export function getSceneMinutes(nodeId) {
   if (!scene?.text) return null;
   return {
     title: scene.title ?? "",
-    heading: [scene.clock, scene.place, scene.speaker].filter(Boolean).join(" · "),
+    heading: [scene.clock, scene.place, scene.speakerName ?? scene.speaker].filter(Boolean).join(" · "),
     lead: scene.lead ?? "",
     text: scene.text,
     question: scene.question ?? "",

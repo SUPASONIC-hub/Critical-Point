@@ -58,10 +58,16 @@ test("its speech and its boxes are the speech marks' and the caption boxes' own,
 });
 
 test("the briefing prints the question as 당신의 판단 and the reveal prints the voice without quotes", () => {
-  assert.match(source("gauntlet/SceneBriefing.jsx"), /<b>당신의 판단<\/b>\s+<p><Prose text=\{question\} \/><\/p>/);
+  // The words are the screens' copy tables (src/copy/briefing.js, src/copy/reveal.js), read by key.
+  assert.match(source("gauntlet/SceneBriefing.jsx"), /<b>\{briefingCopy\.yourCall\}<\/b>\s+<p><Prose text=\{question\} \/><\/p>/);
+  assert.match(source("copy/briefing.js"), /yourCall: "당신의 판단"/);
   const reveal = source("components/DecisionReveal.jsx");
   assert.doesNotMatch(reveal, /"\{decisionReveal\.spokenChoice\}"/);
-  assert.match(reveal, /"당신의 판단"/);
+  assert.match(reveal, /revealCopy\.yourCall/);
+  assert.match(source("copy/reveal.js"), /yourCall: "당신의 판단"/);
+  // The witness records' labels are the ending's copy table (src/copy/ending.js, 다국어 틀).
   const result = source("screens/ResultScreen.jsx");
-  for (const label of ["처음 내린 판단", "가장 오래 붙잡은 판단", "판을 흔든 판단"]) assert.match(result, new RegExp(`label: "${label}"`));
+  for (const key of ["first", "longest", "branch"]) assert.ok(result.includes(`label: endingCopy.endingWords.witness.${key}`), key);
+  const endingWords = source("copy/ending.js");
+  for (const label of ["처음 내린 판단", "가장 오래 붙잡은 판단", "판을 흔든 판단"]) assert.match(endingWords, new RegExp(`: "${label}"`));
 });

@@ -13,6 +13,14 @@
          absolute from SITE_URL (or Render's RENDER_EXTERNAL_URL), because a
          crawler reading og:image does not resolve a relative one. -->
     <link rel="canonical" href="/" vite-ignore />
+    <!-- The same game in its other languages (open to the end since 10-28): a
+         crawler finds them by these, and each opens in its own language. -->
+    <link rel="alternate" hreflang="ko" href="/" vite-ignore />
+    <link rel="alternate" hreflang="en" href="/?lang=en" vite-ignore />
+    <link rel="alternate" hreflang="ja" href="/?lang=ja" vite-ignore />
+    <link rel="alternate" hreflang="x-default" href="/" vite-ignore />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="ja_JP" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="/" />
     <meta property="og:site_name" content="CRITICAL POINT 임계점" />

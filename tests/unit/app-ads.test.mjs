@@ -6,6 +6,7 @@ import { test } from "node:test";
 
 import { createAds, PACING_KEY, REWARDS_KEY } from "../../src/platform/ads.js";
 import { adCopy, adLanguage, buyButtonText } from "../../src/platform/adCopy.js";
+import appStoreCopy from "../../src/copy/appStore.js";
 import { AD_RULES, closeCase, countsForAds, interstitialShown, isoWeek, localDay, readPacing } from "../../src/platform/adPacing.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { findAppOnlyCode } from "../../scripts/app-only-code.mjs";
@@ -278,8 +279,9 @@ test("the pacing reads any stored count safely and names days and weeks as the r
   assert.deepEqual(interstitialShown({ day: "2026-10-25", shownToday: 3 }, MONDAY), { closed: 0, day: "2026-10-26", shownToday: 1, lastShownAt: MONDAY });
 });
 
-test("the lines are memo B's and C's, in Korean unless the page is English", () => {
+test("the lines are memo B's and C's, in Korean unless the page is English or Japanese", () => {
   assert.equal(adLanguage({ document: { documentElement: { lang: "en-US" } } }), "en");
+  assert.equal(adLanguage({ document: { documentElement: { lang: "ja" } } }), "ja");
   assert.equal(adLanguage({ document: { documentElement: { lang: "ko" } } }), "ko");
   assert.equal(adLanguage({}), "ko");
   const hostile = {
@@ -294,6 +296,22 @@ test("the lines are memo B's and C's, in Korean unless the page is English", () 
   assert.equal(adCopy("ko").buyWithdrawal, "구매 즉시 적용되며 청약철회가 제한될 수 있습니다. 환불은 스토어 정책을 따릅니다.");
   assert.equal(adCopy("ko").rewardNote, "점수와 순위에는 영향이 없습니다.");
   assert.deepEqual(Object.keys(adCopy("en")).sort(), Object.keys(adCopy("ko")).sort());
+  // The Korean table is src/copy/appStore.js; the other languages lay their words over it.
+  assert.equal(adCopy("ko"), appStoreCopy);
+  assert.equal(buyButtonText(adCopy("ja"), "¥500"), "¥500で広告を削除");
+  assert.equal(adCopy("ja").buyLines.length, appStoreCopy.buyLines.length);
+  assert.equal(adCopy("ja").buyLinks.terms, "利用規約");
+  for (const lang of ["en", "ja"]) {
+    const korean = (value) => (typeof value === "string" ? /[가-힣]/.test(value) : Object.values(value).some(korean));
+    assert.equal(korean(adCopy(lang)), false, `${lang} has a Korean line left`);
+  }
+});
+
+test("the store apps' lines are in no dictionary the site's language chunks import", () => {
+  for (const lang of ["en", "ja"]) {
+    const index = readFileSync(new URL(`../../src/locales/${lang}/screens/index.js`, import.meta.url), "utf8");
+    assert.doesNotMatch(index, /appStore/, `src/locales/${lang}/screens/index.js imports the app's lines`);
+  }
 });
 
 test("every place the game reaches the app-only code is behind __CP_APP__", () => {

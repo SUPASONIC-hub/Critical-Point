@@ -1061,6 +1061,16 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
 }
+/* The two policy pages beside the build (privacyText.js). The line height
+   is what makes each link a 52px target. */
+.intro-legal {
+  display: flex;
+  gap: 20px;
+  width: min(var(--ui-page-max), 100%);
+  margin: 64px auto 0;
+  line-height: 3.25;
+  border-top: 1px solid var(--ui-line);
+}
 /* The resume card replaces the door when a save exists. */
 .resume-panel {
   display: flex;
@@ -1758,7 +1768,9 @@ summary:focus-visible {
   font-weight: 600;
   line-height: 1.5;
 }
-.consent-note a {
+.consent-note a,
+.privacy-note a,
+.intro-legal a {
   color: inherit;
 }
 .consent-note.error {
@@ -2758,6 +2770,59 @@ summary:focus-visible {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+/* The report button and its form (2026-10-25): quiet under the post, a
+   44px target, and the form opens in place rather than in a dialog. */
+.board-post-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+.board-report-toggle {
+  min-height: 44px;
+  font-size: 0.75rem;
+}
+.board-report {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+}
+.board-report legend {
+  padding: 0 4px;
+  color: var(--ui-text);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.board-report-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.board-report-reasons label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+}
+.board-report small,
+.board-report-status {
+  margin: 0;
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.board-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.board-report-status:empty {
+  display: none;
+}
 
 /* The opening burst: the half second between pressing a case and its first
    scene. It was one minified line after app.css's imports until 2026-10-06 --
@@ -3046,6 +3111,13 @@ body {
   .intro-kicker {
     border-radius: var(--ui-radius-md);
   }
+  /* Japanese falls back to the system's CJK face, wider than the Korean one
+     (Linux CI measured the premise at ten lines where Korean takes eight), and
+     the start button left a 320px first screen (10-29). */
+  :lang(ja) .intro-hero-copy > p:not([class]) {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
 }
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
@@ -3185,4 +3257,70 @@ body {
 /* A line that is all one thought keeps the colour its line is drawn in. */
 .thought-line {
   --pr-say: currentcolor;
+}
+/* The language choice (LanguagePicker.jsx, 다국어 틀): a pill per language
+   among the header's pills on a wide screen, the chosen one lit. Drawn at the
+   pills' 34px with a 44px target around it, so the header row keeps its
+   height. On a phone it sits in the hero's empty top-left corner, above the
+   brand row and clear of the music controls, so the first screen grows no
+   taller. */
+.language-picker {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.language-picker button {
+  position: relative;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--ui-text-2);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.language-picker button::before {
+  content: "";
+  position: absolute;
+  inset: -5px -2px;
+}
+.language-picker button[aria-pressed="true"] {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.language-picker small {
+  flex-basis: 100%;
+  max-width: 36ch;
+  color: var(--ui-text-2);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+/* A wide screen keeps the pills under the music controls, out of the brand
+   row: three languages (10-28) pushed that row onto a second line on a
+   1280x720 screen, by a few pixels that depend on the face, and the start
+   button with it out of the first screen. */
+@media (min-width: 861px) {
+  .language-picker {
+    position: fixed;
+    top: calc(max(16px, env(safe-area-inset-top)) + 46px);
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 30;
+    justify-content: flex-end;
+  }
+}
+@media (max-width: 860px) {
+  .language-picker {
+    position: absolute;
+    top: max(14px, env(safe-area-inset-top));
+    left: var(--ui-gutter);
+    max-width: calc(100% - 2 * var(--ui-gutter) - 96px);
+  }
+  /* A language in preview says so under the pills; the brand row moves down
+     for it on that language's pages only. */
+  .intro-hero-copy:has(.language-picker small) {
+    padding-top: 112px;
+  }
 }

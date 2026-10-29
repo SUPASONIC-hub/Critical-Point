@@ -26,11 +26,12 @@ import { leaveReplaySession } from "./useAppPersistence.js";
 import { weeklyRuleNow as weeklyRuleNowDefault } from "./weeklyClock.js";
 import { weekRuleChoice } from "./weeklyRuleChoice.js";
 import { clearReadingTally } from "./readingTally.js";
+import noticesCopy from "../copy/notices.js";
+import { fill } from "../locale.js";
 
-// The last sentence is what keeps the one before it true: the online copy is
-// not replaced by the next run until the player says so (cloudSave.js).
-const CONFIRM_RESET =
-  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록과 회차, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다. 온라인 저장은 새 진행을 올리기 전에 시작 화면에서 어느 쪽을 남길지 묻습니다.";
+// The reset's question (noticesCopy.confirm.reset). Its last sentence is what
+// keeps the one before it true: the online copy is not replaced by the next run
+// until the player says so (cloudSave.js).
 
 /**
  * Starting, opening, jumping, leaving and wiping a run.
@@ -108,7 +109,7 @@ export function createRunLifecycle({
   }
 
   function pauseAfterRecovery() {
-    setSaveStatus("현재 지점을 일시정지했습니다.");
+    setSaveStatus(noticesCopy.run.paused);
     applyRun(runTransition(run, { type: "pause" }));
   }
 
@@ -151,7 +152,7 @@ export function createRunLifecycle({
     caseIdValue,
     nodeIdValue,
     {
-      echoText = "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
+      echoText = noticesCopy.run.directEntry,
       persistRun = true,
     } = {},
   ) {
@@ -184,7 +185,7 @@ export function createRunLifecycle({
   // The question names what goes and what stays (state/runStorageReset.js has
   // the list). It used to say "everything", and left six kinds of thing behind.
   async function resetRun() {
-    if (!(await confirmAction(CONFIRM_RESET))) return;
+    if (!(await confirmAction(noticesCopy.confirm.reset))) return;
     onSuppressSaves();
     const failedResetKeys = clearRunStorage();
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
@@ -208,15 +209,15 @@ export function createRunLifecycle({
     setSaveStatus(
       failedResetKeys.length === 0
         ? ""
-        : `일부 브라우저 저장소를 지우지 못했습니다: ${failedResetKeys.join(", ")}${resetErrorLogSaved ? "" : " · 진단 로그 저장도 실패했습니다."}`,
+        : fill(noticesCopy.storage.resetFailed, { keys: failedResetKeys.join(", "), logFailed: resetErrorLogSaved ? "" : noticesCopy.storage.logFailed }),
     );
     setTelemetryStatus({
       tone: telemetryEnabled && isOnline ? "ready" : "local",
       text: !isOnline
-        ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
+        ? noticesCopy.telemetry.offline
         : telemetryEnabled
-          ? "원격 저장 준비됨. 데이터 제공 동의 시 사건 완료 로그가 저장됩니다."
-          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          ? noticesCopy.telemetry.remoteReady
+          : noticesCopy.telemetry.local,
     });
     resumeRuntimeSaves();
   }

@@ -62,14 +62,20 @@ const COPY_FILES = [
   "src/judgementHabit.js",
   // The lines a prologue's first briefing says about the rules it turns on.
   "src/gauntlet/tableUnlocks.js",
+  // Its words, moved out of it for the English layer (2026-10-26, 다국어 틀).
+  "src/copy/unlocks.js",
 ];
 
 // Copy a screen prints about the game itself. It never held a bank word, so
 // the banned list does not read it; it did describe the text box.
 const SCREEN_COPY_FILES = [
   "src/viewModels/sceneViewModels.js",
+  // sceneViewModels.js's words, with the briefing's (2026-10-26, 다국어 틀).
+  "src/copy/briefing.js",
   "src/viewModels/reportViewModels.js",
   "src/state/useResultReport.js",
+  // The two above keep their report lines here since 2026-10-26 (다국어 틀).
+  "src/copy/reportLines.js",
   "src/logicReport.js",
 ];
 

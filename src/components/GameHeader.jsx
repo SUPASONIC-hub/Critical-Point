@@ -1,6 +1,10 @@
 import { FileText, RefreshCcw, Save, Settings2 } from "lucide-react";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import { setComfortDialogOpen } from "./ComfortDialog.jsx";
+import headerCopy from "../copy/header.js";
+
+// "사건 {number}": the text on either side of the number, which is drawn bold.
+const CASE_NUMBER = headerCopy.caseNumber.split("{number}");
 
 /**
  * Scene identity and the run's two standing numbers.
@@ -38,7 +42,7 @@ export function GameHeader({
         <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
       </div>
       <div className="top-actions compact-actions">
-        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts={keys("P")} aria-label="저장" title="저장">
+        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts={keys("P")} aria-label={headerCopy.save} title={headerCopy.save}>
           <Save size={16} />
         </button>
         <button
@@ -46,29 +50,29 @@ export function GameHeader({
           className="ghost"
           onClick={onSaveAndExit}
           aria-keyshortcuts={keys("Shift+P")}
-          aria-label="저장 후 나가기"
-          title="저장 후 나가기"
+          aria-label={headerCopy.saveAndExit}
+          title={headerCopy.saveAndExit}
         >
           <FileText size={16} />
         </button>
-        <button type="button" className="ghost" onClick={() => setComfortDialogOpen(true)} aria-haspopup="dialog" aria-label="편의 설정" title="편의 설정" data-testid="open-comfort-settings">
+        <button type="button" className="ghost" onClick={() => setComfortDialogOpen(true)} aria-haspopup="dialog" aria-label={headerCopy.comfort} title={headerCopy.comfort} data-testid="open-comfort-settings">
           <Settings2 size={16} />
         </button>
-        <button type="button" className="ghost header-reset" onClick={onReset} aria-label="초기화" title="초기화">
+        <button type="button" className="ghost header-reset" onClick={onReset} aria-label={headerCopy.reset} title={headerCopy.reset}>
           <RefreshCcw size={16} />
         </button>
       </div>
       {/* Layer 1 keeps exactly two standing numbers: which case, and how far in. */}
-      <div className="status-bar" role="group" aria-label="현재 진행 상태">
+      <div className="status-bar" role="group" aria-label={headerCopy.statusLabel}>
         <span>
-          {caseLabel ? <b>{caseLabel}</b> : <>사건 <b>{caseNumber}</b></>}
+          {caseLabel ? <b>{caseLabel}</b> : <>{CASE_NUMBER[0]}<b>{caseNumber}</b>{CASE_NUMBER[1]}</>}
           <i aria-hidden="true"> · </i>
           {caseNumber}/{caseTotal}
         </span>
         <div
           className="status-bar-progress"
           role="progressbar"
-          aria-label="현재 사건 진행률"
+          aria-label={headerCopy.progressLabel}
           aria-valuemin="0"
           aria-valuemax="100"
           aria-valuenow={progress}

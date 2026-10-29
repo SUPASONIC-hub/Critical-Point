@@ -1,3 +1,4 @@
+import noticesCopy, { offersStorageRetry } from "../copy/notices.js";
 
 export function SaveStatus({ view }) {
   const { saveStatus, retryStorageCleanup } = view;
@@ -9,9 +10,10 @@ export function SaveStatus({ view }) {
       {saveStatus && (
         <section className="save-status">
           <p>{saveStatus}</p>
-          {saveStatus.includes("저장소") && (
+          {/* By the line's key, not a word in it: the English lines have no "저장소". */}
+          {offersStorageRetry(saveStatus) && (
             <button type="button" className="ghost" data-testid="retry-storage-cleanup" onClick={retryStorageCleanup}>
-              저장소 정리 재시도
+              {noticesCopy.storage.retry}
             </button>
           )}
         </section>

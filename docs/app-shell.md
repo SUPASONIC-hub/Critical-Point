@@ -25,7 +25,7 @@ app/                         ← 껍데기 전용 작업 공간. 자기 package.
 src/platform/appShell.js     ← appShell() / isAppShell(): "web" · "ios" · "android"
 src/platform/ads.js          ← 게임이 부르는 광고·결제 창구(웹에서는 아무것도 안 함)
 src/platform/adPacing.js     ← 전면 광고 간격 규칙(순수 함수)
-src/platform/adCopy.js       ← 메모 B·C의 한국어·영어 문구
+src/platform/adCopy.js       ← 메모 B·C의 문구를 페이지 언어로(한국어 src/copy/appStore.js, 영어·일본어 src/locales/<lang>/app/appStore.js — 웹 사전에는 없음)
 src/components/AppStorePanel.jsx ← 「광고와 개인정보」 칸·광고 제거 구매, 결말 도감 보상형 힌트
 ```
 
@@ -80,7 +80,7 @@ Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_
 
 1. 게임의 「데이터 저장 안내」(이미 끝난 상태)
 2. **Google UMP** 동의 메시지(유럽·영국·스위스 등 해당 지역만, AdMob 콘솔에서 만든 문안)
-3. (iOS, 아직 묻지 않았을 때) **ATT 사전 안내**: 「광고를 고르는 방식에 대해」 한 장, 버튼은 「계속」 하나 → 시스템 ATT 창(`NSUserTrackingUsageDescription`, ko·en `InfoPlist.strings`)
+3. (iOS, 아직 묻지 않았을 때) **ATT 사전 안내**: 「광고를 고르는 방식에 대해」 한 장, 버튼은 「계속」 하나 → 시스템 ATT 창(`NSUserTrackingUsageDescription`, ko·en·ja `InfoPlist.strings`)
 4. Mobile Ads SDK 시작(`maxAdContentRating: Teen`, 테스트 빌드면 `initializeForTesting`)
 
 맞춤 광고는 UMP·ATT 답대로 SDK가 스스로 정합니다. 「광고와 개인정보」 칸의 「광고 개인정보 설정 다시 열기」가 UMP 개인정보 옵션 양식을 다시 엽니다(해당 지역이 아니면 「이 지역에서는 따로 고를 광고 동의 항목이 없습니다.」).
@@ -122,7 +122,7 @@ Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_
 
 - 패키지 이름 하나: `capacitor.config.json`·안드로이드 `namespace`/`applicationId`/`package_name`·Xcode 번들 ID·`appShell.js`
 - 안드로이드 `compileSdkVersion`·`targetSdkVersion` ≥ 36(Google Play: 2026-08-31부터 새 앱·업데이트 API 36), `minSdkVersion` ≥ 24(Capacitor 8 기본)
-- AdMob 앱 ID(안드로이드 매니페스트 meta-data, iOS `GADApplicationIdentifier`), iOS ATT 문구(Info.plist·ko·en)와 `cstr6suwn9.skadnetwork`
+- AdMob 앱 ID(안드로이드 매니페스트 meta-data, iOS `GADApplicationIdentifier`), iOS ATT 문구(Info.plist·ko·en·ja)와 `cstr6suwn9.skadnetwork`
 - 플러그인 버전이 정확한 버전, 상품이 `remove_ads`
 - 테스트·자리표시 광고 ID는 경고, `--release`면 오류 → 출시 빌드 전에 `npm run check:app -- --release` 통과
 

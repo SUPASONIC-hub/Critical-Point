@@ -1,5 +1,7 @@
 import { nodes } from "./gameData.js";
 import { findFinalChoiceEntry } from "./verdictBranch.js";
+import endingCopy from "./copy/ending.js";
+import { fill } from "./locale.js";
 
 /**
  * B-12(2) 「당신의 세 장면」: three cards of this player's season, named on the
@@ -20,16 +22,15 @@ import { findFinalChoiceEntry } from "./verdictBranch.js";
  * summary does not say whether its card was forced, so that card is shown.
  */
 export const THREE_SCENES = Object.freeze([
-  { caseId: "prologue01", caseLabel: "프롤로그 01", sceneId: "p1_aftershock", field: "outcomeChoiceId" },
-  { caseId: "case48", caseLabel: "사건 48", sceneId: "c48_final", field: "finalChoiceId" },
-  { caseId: "final", caseLabel: "마지막 사건", sceneId: "f_choice", field: "finalChoiceId" },
+  { caseId: "prologue01", sceneId: "p1_aftershock", field: "outcomeChoiceId" },
+  { caseId: "case48", sceneId: "c48_final", field: "finalChoiceId" },
+  { caseId: "final", sceneId: "f_choice", field: "finalChoiceId" },
 ]);
-
-const COUNT_WORDS = ["", "한", "두", "세"];
 
 /** The section's heading for `count` scenes: 「당신의 세 장면」 when all three are there. */
 export function threeScenesHeading(count) {
-  return `당신의 ${COUNT_WORDS[count] ?? "세"} 장면`;
+  const { heading, counts } = endingCopy.threeScenes;
+  return fill(heading, { count: counts[count] ?? counts[3] });
 }
 
 function cardLabel(sceneId, choiceId, scenes) {
@@ -53,7 +54,8 @@ function finaleChoiceId(caseResults, log) {
  */
 export function getThreeScenes({ caseResults, log } = {}, scenes = nodes) {
   const results = caseResults && typeof caseResults === "object" && !Array.isArray(caseResults) ? caseResults : {};
-  return THREE_SCENES.flatMap(({ caseId, caseLabel, sceneId, field }) => {
+  return THREE_SCENES.flatMap(({ caseId, sceneId, field }) => {
+    const caseLabel = endingCopy.threeScenes.cases[caseId];
     const choiceId = caseId === "final" ? finaleChoiceId(results, log) : results[caseId]?.[field];
     const label = cardLabel(sceneId, choiceId, scenes);
     if (!label) return [];

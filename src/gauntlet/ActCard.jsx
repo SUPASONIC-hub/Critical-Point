@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { ACT_CARD_MS, ACT_CARDS, casesLeft } from "./actCardCopy.js";
 import { useDialogFocus } from "./useDialogFocus.js";
+import actCardCopy from "../copy/actCard.js";
+import { fill } from "../locale.js";
 
 // Keys that are not a press: a modifier on its own, or Tab, which walks the card.
 const NOT_A_PRESS = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock", "Tab"]);
@@ -39,17 +41,17 @@ export function ActCard({ caseId, onDone }) {
         onKeyDown={onKeyDown}
       >
         <p className="gx-act-kicker">
-          {card.act}막 · {card.span}
+          {fill(actCardCopy.kicker, { act: card.act, span: card.span })}
         </p>
         <h2 id="gx-act-title" className="gx-act-title">
-          「{card.name}」
+          {fill(actCardCopy.title, { name: card.name })}
         </h2>
         <p id="gx-act-text" className="gx-act-line">
           {card.line}
-          <span className="gx-act-left"> 이 사건부터 마지막 사건까지 {casesLeft(caseId)}개.</span>
+          <span className="gx-act-left">{fill(actCardCopy.left, { count: casesLeft(caseId) })}</span>
         </p>
         <button ref={goRef} type="button" className="gx-act-go" data-testid="act-card-continue" style={{ "--act-wait": `${ACT_CARD_MS}ms` }}>
-          계속
+          {actCardCopy.go}
         </button>
       </div>
     </div>

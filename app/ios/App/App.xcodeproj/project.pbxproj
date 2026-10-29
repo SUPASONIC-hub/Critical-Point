@@ -35,6 +35,7 @@
 		7C1A0F012E9D000100A1B2C3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7C1A0F052E9D000100A1B2C3 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7C1A0F062E9D000100A1B2C3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7C1A0F072E9D000100A1B2C3 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +131,7 @@
 			knownRegions = (
 				en,
 				ko,
+				ja,
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
@@ -197,6 +199,7 @@
 			children = (
 				7C1A0F052E9D000100A1B2C3 /* ko */,
 				7C1A0F062E9D000100A1B2C3 /* en */,
+				7C1A0F072E9D000100A1B2C3 /* ja */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
