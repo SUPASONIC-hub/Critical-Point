@@ -18,6 +18,10 @@ import {
 } from "../cloudSave.js";
 import { CLOUD_SAVE_CODE_KEY, readStoredValue, STORAGE_KEY } from "../appConfig.js";
 import { confirmAction } from "../state/confirmAction.js";
+import { fill } from "../locale.js";
+import cloudSaveBodyCopy from "../copy/cloudSaveBody.js";
+
+const { confirm: CONFIRM, outcome: OUTCOME } = cloudSaveBodyCopy;
 
 function hasLocalRun() {
   try {
@@ -60,12 +64,12 @@ export function CloudSavePanelBody() {
     try {
       const found = await fetchCloudSave(codeToLoad);
       if (!found) {
-        failed("그 코드로 저장된 진행이 없습니다.");
+        failed(OUTCOME.notFound);
         return;
       }
-      if (hasLocalRun() && !(await confirmAction("이 기기의 저장을 불러온 진행으로 바꿉니다. 계속할까요?"))) return;
+      if (hasLocalRun() && !(await confirmAction(CONFIRM.load))) return;
       if (!(await applyCloudSave(found))) {
-        failed("브라우저 저장소에 쓸 수 없어 불러오지 못했습니다.");
+        failed(OUTCOME.cannotWrite);
         return;
       }
       globalThis.location.reload();
@@ -77,18 +81,18 @@ export function CloudSavePanelBody() {
   }
 
   async function overwriteRemote() {
-    if (!(await confirmAction("온라인에 있는 다른 기기의 진행을 이 기기의 진행으로 바꿉니다. 되돌릴 수 없습니다. 계속할까요?"))) return;
+    if (!(await confirmAction(CONFIRM.overwrite))) return;
     setBusy(true);
     setOutcome(null);
     try {
-      if (await flushCloudSave({ overwrite: true })) done("이 기기의 진행을 온라인에 올렸습니다.");
+      if (await flushCloudSave({ overwrite: true })) done(OUTCOME.uploaded);
     } finally {
       setBusy(false);
     }
   }
 
   async function removeRemote() {
-    if (!(await confirmAction("온라인에 올린 진행 기록을 지웁니다. 이 기기의 저장은 그대로 남습니다. 계속할까요?"))) return;
+    if (!(await confirmAction(CONFIRM.remove))) return;
     setBusy(true);
     setOutcome(null);
     try {
@@ -97,9 +101,9 @@ export function CloudSavePanelBody() {
         // No server in this build, so no promise about a copy: it used to
         // say the copy is removed after the retention period, which nothing
         // here can know or do.
-        failed("이 배포에는 온라인 저장 서버가 없어 여기서는 온라인 사본을 지울 수 없습니다.");
+        failed(OUTCOME.noServer);
       } else {
-        done(deleted ? "온라인에 올린 진행 기록을 지웠습니다." : "온라인에 남아 있는 진행 기록이 없습니다.");
+        done(deleted ? OUTCOME.deleted : OUTCOME.nothingOnline);
       }
     } catch (error) {
       failed(describeCloudFailure(error));
@@ -111,9 +115,9 @@ export function CloudSavePanelBody() {
   async function copyCode() {
     try {
       await globalThis.navigator.clipboard.writeText(formatCloudCode(code));
-      done("이어하기 코드를 복사했습니다.");
+      done(OUTCOME.copied);
     } catch {
-      failed(`코드를 직접 적어 두세요: ${formatCloudCode(code)}`);
+      failed(fill(OUTCOME.writeDown, { code: formatCloudCode(code) }));
     }
   }
 
@@ -123,22 +127,22 @@ export function CloudSavePanelBody() {
     setEnabled(next);
     setCloudSaveEnabled(next);
     if (next) setOutcome(null);
-    else done("온라인 저장을 껐습니다. 이미 올린 진행 기록은 아래에서 지울 수 있습니다.");
+    else done(OUTCOME.turnedOff);
   }
 
   return (
     <>
           <label className="cloud-save-toggle">
             <input type="checkbox" checked={enabled} onChange={toggle} data-testid="cloud-save-toggle" />
-            온라인 저장 사용
+            {cloudSaveBodyCopy.toggle}
           </label>
           {enabled && (
             <div className="cloud-save-code">
-              <span>내 이어하기 코드</span>
+              <span>{cloudSaveBodyCopy.myCode}</span>
               <strong data-testid="cloud-save-code">{formatCloudCode(code)}</strong>
               <button type="button" className="ghost" onClick={copyCode}>
                 <Copy size={15} aria-hidden="true" />
-                복사
+                {cloudSaveBodyCopy.copy}
               </button>
             </div>
           )}
@@ -153,11 +157,11 @@ export function CloudSavePanelBody() {
             <div className="cloud-save-code" data-testid="cloud-save-conflict">
               <button type="button" className="ghost" onClick={() => load(code)} disabled={busy}>
                 <CloudDownload size={15} aria-hidden="true" />
-                온라인의 진행 불러오기
+                {cloudSaveBodyCopy.loadOnline}
               </button>
               <button type="button" className="ghost" onClick={overwriteRemote} disabled={busy}>
                 <CloudUpload size={15} aria-hidden="true" />
-                이 기기의 진행으로 덮어쓰기
+                {cloudSaveBodyCopy.overwrite}
               </button>
             </div>
           )}
@@ -168,7 +172,7 @@ export function CloudSavePanelBody() {
               load(input);
             }}
           >
-            <label htmlFor="cloud-save-input">다른 기기의 코드</label>
+            <label htmlFor="cloud-save-input">{cloudSaveBodyCopy.otherCode}</label>
             <div>
               <input
                 id="cloud-save-input"
@@ -182,19 +186,19 @@ export function CloudSavePanelBody() {
                 spellCheck="false"
               />
               <button type="submit" disabled={busy || !input.trim()}>
-                불러와서 이어하기
+                {cloudSaveBodyCopy.loadAndContinue}
               </button>
             </div>
           </form>
           {enabled && status.phase !== "synced" && status.phase !== "conflict" && (
             <button type="button" className="ghost cloud-save-now" onClick={() => flushCloudSave()} disabled={busy}>
-              지금 올리기
+              {cloudSaveBodyCopy.uploadNow}
             </button>
           )}
           {!enabled && code && (
             <button type="button" className="ghost cloud-save-now" onClick={removeRemote} disabled={busy} data-testid="cloud-save-delete">
               <Trash size={15} aria-hidden="true" />
-              온라인에 올린 기록 지우기
+              {cloudSaveBodyCopy.deleteOnline}
             </button>
           )}
       {/* Both regions are on the page before they have anything to say: one

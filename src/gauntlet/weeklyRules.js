@@ -27,6 +27,8 @@
  */
 
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
+import weekRulesCopy from "../copy/weekRules.js";
+import { fill } from "../locale.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
 // start screen can ask whether there is anything to say without the
@@ -61,6 +63,28 @@ export const SHORT_CLOCK_SECONDS = 8;
 export const SHORT_CLOCK_CHIPS = 1.25;
 
 /**
+ * The audit's numbers 2026-W47's line was written with (B3's set B, 40 / 4 /
+ * one in four). The table's own are auditRisk.js's since RULES_MARK 3; these
+ * stay the ones that week showed, so the week's line does not move with a
+ * tuned table, and this chunk does not import that one.
+ */
+const W47_AUDIT = Object.freeze({ heat: 40, limit: 4, share: 4 });
+
+/**
+ * A rule's words in the page's language (src/copy/weekRules.js), its numbers
+ * filled in from the constants above: the audit's line and the links', which
+ * 2026-W47's line has. Read when asked, so a rule read after the page's
+ * language arrived is in it.
+ */
+function ruleWords(id) {
+  const { auditLine, cascadeLine, rules } = weekRulesCopy;
+  const { title, text, world } = rules[id];
+  const audit = fill(auditLine, W47_AUDIT);
+  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, audit, cascade: cascadeLine };
+  return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
+}
+
+/**
  * The rules a week can carry, by id. `schema` is relative for the wall
  * (`wallShift`, negative = closer), the clock (`secondsShift`) and the chips
  * (`chipsFactor`), and absolute for the rest.
@@ -73,45 +97,38 @@ export const SHORT_CLOCK_CHIPS = 1.25;
 export const WEEK_RULE_CATALOGUE = Object.freeze({
   "near-wall": Object.freeze({
     label: "NEAR WALL",
-    title: "벽이 가깝다",
-    text: `이번 주는 벽 띠가 열기 ${NEAR_WALL_SHIFT}만큼 앞당겨 선다. 같은 열기로 더 빨리 벽에 닿는다.`,
-    world: "이번 주 그룹은 감사를 앞당겼다.",
+    ...ruleWords("near-wall"),
     schema: Object.freeze({ wallShift: -NEAR_WALL_SHIFT }),
   }),
   "heavy-fracture": Object.freeze({
     label: "HEAVY FRACTURE",
-    title: "균열이 깊다",
-    text: `이번 주는 FRACTURE가 금 간 자원을 ${HEAVY_FRACTURE_RATE}배로 청구한다.`,
-    world: "이번 주 회계팀은 금 간 장부를 한 번 더 넘겨 본다.",
+    ...ruleWords("heavy-fracture"),
     schema: Object.freeze({ fractureRate: HEAVY_FRACTURE_RATE }),
   }),
   // E-9 (c): the third event rule, two numbers normalizeSchema clamps at once.
   "short-clock": Object.freeze({
     label: "SHORT CLOCK",
-    title: "시간이 짧다",
-    text: `이번 주는 판마다 시간이 ${SHORT_CLOCK_SECONDS}초 짧고, 모든 카드의 칩이 ${SHORT_CLOCK_CHIPS}배다.`,
-    world: "이번 주 이사회는 보고 시간을 줄이고 보고서 값을 올렸다.",
+    ...ruleWords("short-clock"),
     schema: Object.freeze({ secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS }),
   }),
   // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22,
   // 11-16 to 11-22): both devices at once, which RULES_MARK 3 then made rules
   // of the table from 프롤로그 04. A week gone by, kept because the calendar
   // and the server's weekly_rules name it and a season begun in it carries the
-  // stamp; its line is the one that week showed, numbers written out
-  // (auditRisk.js and cascadeRisk.js have them now), and `rules` is what it
-  // switched on, which nothing switches any more (`WEEK_RULE_DEVICES` is
-  // empty; the table record reads it, auditRisk.js).
+  // stamp; its line is the one that week showed (`W47_AUDIT` above; the
+  // table's numbers are auditRisk.js's and cascadeRisk.js's now), and `rules`
+  // is what it switched on, which nothing switches any more
+  // (`WEEK_RULE_DEVICES` is empty; the table record reads it, auditRisk.js).
   "audit-cascade": Object.freeze({
     label: "AUDIT & CASCADE",
-    title: "감사와 연쇄",
-    text: "이번 주는 감사와 연쇄가 함께 선다. 한 번 이상 밀고 열기 40 미만에서 확정하면 감사 +1. 4칸이 찬 채 사건이 닫히면 금고로 갈 몫의 4분의 1을 잃는다. 한 자원을 8 이상 태운 카드를 확정하면 2~4판 안에 한 판의 벽이 6 가까워진다. 사건이 닫힐 때 남은 연결은 다음 사건으로 넘어간다. CASCADE 판의 확정은 감사에 세지 않는다.",
+    ...ruleWords("audit-cascade"),
     rules: Object.freeze(["audit", "cascade"]),
   }),
 });
 
 /** The catalogue entry for an id, or null. */
 export function getWeekRule(id) {
-  return typeof id === "string" && Object.hasOwn(WEEK_RULE_CATALOGUE, id) ? { id, ...WEEK_RULE_CATALOGUE[id] } : null;
+  return typeof id === "string" && Object.hasOwn(WEEK_RULE_CATALOGUE, id) ? { id, ...WEEK_RULE_CATALOGUE[id], ...ruleWords(id) } : null;
 }
 
 /** What a saved stamp is: a known id, or null. */

@@ -28,13 +28,11 @@ import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
+import { fill } from "../locale.js";
+import reportLinesCopy from "../copy/reportLines.js";
 
-const RANK_LINES = {
-  S: "생각 리듬, 관점 전환, 압박 회복이 동시에 솟았습니다.",
-  A: "정답을 고른 것이 아니라, 압박 속에서 판단 패턴이 선명하게 드러났습니다.",
-  B: "사건은 통과했습니다. 다음 플레이에서는 다른 생각 방식으로 흔들어볼 여지가 있습니다.",
-};
-const RANK_LINE_FALLBACK = "사건은 통과했지만 버스트 신호는 아직 약합니다. 즉답보다 근거, 비용, 회복 경로를 더 남겨보세요.";
+// The rank's line, the bridge, the feedback questions and the tab's title (src/copy/reportLines.js).
+const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK, tabTitle: TAB_TITLE } = reportLinesCopy;
 
 /**
  * The copy the report prints around the numbers: the season so far, the rank's
@@ -61,10 +59,10 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
     return {
       seasonJourney,
       resultRank: rank,
-      rankLine: RANK_LINES[rank] ?? RANK_LINE_FALLBACK,
+      rankLine: RANK_LINES[rank] ?? reportLinesCopy.rankLineFallback,
       resultBridge: result.longestDecision
-        ? `${primaryTrigger} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
-        : `${primaryTrigger} 압박이 가장 오래 남았습니다.`,
+        ? fill(BRIDGE.longest, { trigger: primaryTrigger, title: result.longestDecision.title })
+        : fill(BRIDGE.plain, { trigger: primaryTrigger }),
       scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, readingScore, reflectionScore, rhythmScore }),
       achievementBadges: createAchievementBadges({
         challengeClearCount,
@@ -78,13 +76,9 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
         riskTier,
       }),
       feedbackPrompts: [
-        `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
-        result.reframeCount > 0
-          ? "판을 다시 짜서 열린 경로가 보기에 없던 길처럼 느껴졌나요?"
-          : "구조 재설계를 쓰지 않았다면, 기존 선택지가 충분히 답처럼 보였나요?",
-        nextCaseSignal
-          ? `다음 사건 「${nextCaseSignal.title}」까지 이어서 보고 싶은 이유가 생겼나요?`
-          : "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
+        fill(FEEDBACK.longest, { title: result.longestDecision?.title ?? FEEDBACK.longestFallback }),
+        result.reframeCount > 0 ? FEEDBACK.reframed : FEEDBACK.notReframed,
+        nextCaseSignal ? fill(FEEDBACK.nextCase, { title: nextCaseSignal.title }) : FEEDBACK.finale,
       ],
     };
   }, [gameplayStats, log, nextCaseSignal, result, riskTier, seasonJourney]);
@@ -185,8 +179,8 @@ export function useResultReport({
   // The tab on a result (tabTitle.js, 개선 포인트 A3): the season's ruling by its
   // label, a case by the ending it closed on. Drafts for the user to decide.
   const resultTabTitle = currentCase === "final"
-    ? endingVariant.id === "collapse" ? "[SYSTEM COLLAPSE] 시즌 붕괴" : `[${endingVariant.label}] 시즌 판정`
-    : `[사건 종료] ${caseOutcome.tag}`;
+    ? endingVariant.id === "collapse" ? TAB_TITLE.collapse : fill(TAB_TITLE.season, { ending: endingVariant.label })
+    : fill(TAB_TITLE.case, { tag: caseOutcome.tag });
   useScreenTabTitle(tabScreen, tabScreen === "result" ? resultTabTitle : null);
 
   return {
@@ -207,7 +201,7 @@ export function useResultReport({
       `${easyResourceLabels.trust} ${standing.trust ?? 0}`,
       `${easyResourceLabels.legitimacy} ${standing.legitimacy ?? 0}`,
       `${easyResourceLabels.capital} ${standing.capital ?? 0}`,
-      `단서 ${discoveredClues.length}`,
+      fill(reportLinesCopy.rationaleClues, { count: discoveredClues.length }),
     ] },
     failureRecovery: getFailureRecovery(endingVariant, resources),
     // A collapse also says what it cost (getCollapseToll, featurePack.js), and

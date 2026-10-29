@@ -37,6 +37,7 @@
     "build:fonts": "node scripts/build-fonts.mjs",
     "check:fonts": "node scripts/check-fonts.mjs",
     "build:icons": "node scripts/build-icons.mjs",
+    "store:shots": "node scripts/store-screenshots.mjs",
     "raise:gains": "node scripts/raise-choice-gains.mjs",
     "check:views": "node scripts/check-view-contracts.mjs",
     "check:constants": "node scripts/check-shared-constants.mjs",
@@ -49,6 +50,7 @@
     "check:node": "node scripts/check-node-version.mjs",
     "check:grants": "node scripts/check-grants.mjs",
     "check:canon": "node scripts/check-canon.mjs",
+    "check:locale": "node scripts/check-locale.mjs",
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",
@@ -72,17 +74,17 @@
     "verify:full": "npm run verify && npm run test:e2e:full && npm run test:e2e:season"
   },
   "dependencies": {
-    "lucide-react": "^1.60.0",
+    "lucide-react": "^1.61.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@electric-sql/pglite": "^0.5.10",
+    "@electric-sql/pglite": "^0.5.11",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.64.1",
     "@vitejs/plugin-react": "^5.2.0",
-    "eslint": "^10.12.0",
+    "eslint": "^10.13.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "espree": "^11.2.0",
     "fontverter": "2.0.0",

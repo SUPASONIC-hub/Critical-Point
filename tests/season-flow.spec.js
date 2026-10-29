@@ -1951,3 +1951,25 @@ test("시작 stamps the first case's opening snapshot, empty, on the hand the fi
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   expect((await readSave()).dynamics.open).toEqual(opened);
 });
+
+// The data notice used to say a deletion request is handled by the session
+// code, and name nowhere to send one. It says where now (SUPPORT_CONTACT in
+// appConfig.js), or, while that is not decided, that it is still to come --
+// and the session code it needs is in the same panel, and on the report.
+test("the data notice says where a deletion request goes, beside the session code", { tag: "@prod" }, async ({ page }) => {
+  await page.goto("/");
+  await openIntroDrawer(page, ".data-info-panel");
+  const panel = page.locator(".data-info-panel");
+  const line = panel.getByTestId("deletion-request");
+  await expect(line).toBeVisible();
+  await expect(line).toContainText("8자리 세션 코드");
+  await expect(panel.getByTestId("session-code")).toHaveText(/^[A-Z0-9]{8}$/);
+  const link = line.getByRole("link");
+  if (await link.count()) {
+    await expect(link).toHaveAttribute("href", /^mailto:[^@\s]+@[^@\s]+$/);
+  } else {
+    await expect(line).toContainText("아직 정하지 않았습니다");
+  }
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});

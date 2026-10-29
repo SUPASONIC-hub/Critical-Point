@@ -72,16 +72,68 @@ Three of these are reveals, and each still means what it meant:
 - 13:32 and 18:44 -- the person who returned the dissent and the person who
   erased it were not the same person.
 
+## Who owns KD
+
+| Fact | Value |
+|---|---|
+| Largest shareholder | 킹스데일 파트너스 (Kingsdale Partners), a global private-equity and asset-management group headquartered in New York. KD is Kingsdale's initials |
+| Stake | About 30% of KD금융그룹 (KD은행, KD캐피탈, KD데이터랩, KD자산운용, KD생명): the largest single holding, not a majority |
+| How | After the 1998 외환위기 it bought the failed 옛 경동은행 and renamed it KD은행, then sold part of it in the 2010s; the Korean group is one square of its Asia portfolio |
+| In the March vote | Its ~30% is inside the 외국인 68% of 사건 23 and votes 찬성; the 22.7% that follows 클리어보트 is other foreign institutions. So 찬성 50.6% stands |
+| On the boards | 사건 25: at the KD캐피탈 이사회 of 3월 16일 the two Kingsdale directors head the 찬성 list, by video. 사건 43's 5 대 3 stands; of its 8 votes (회장 1 + 사외이사 7), two are the Kingsdale-recommended 사외이사 voting 찬성 by video from New York, the same two as 사건 25 |
+| Where the pressure comes from | New York's quarterly ROE target, the dividend and the 「아시아 포트폴리오 리뷰」; English mail and dawn video calls on New York time; the board seats New York appoints; a rumour that the value is being raised before a sale |
+| Seoul's window | 그룹전략실, 본사 33층: it makes the New York numbers come out |
+| 사건 44's four acquittals | Approved from a shared account, so the e-signature field is empty and no approver can be named -- the same kind of account as 프롤로그 05's 전략팀-공용03; 사건 45 reads the erased pencil marks on the scanned printouts of those four |
+
+The owner is a company and is drawn only as a company. No person in the
+season is given an ethnicity or religion through it, and nothing in the copy
+may suggest that a people or a faith runs world finance. It is woven in
+lightly, a line or two where the group, its headquarters, shareholders, board,
+dividends, personnel or a sale come up; the people, endings and order of the
+cases do not change for it. 사건 43's 5 대 3 and 사건 44's sentence stand.
+`check:canon` holds the name (킹스데일 / Kingsdale) and the 30%.
+
+## The era: 2023 and 2026 in a Korean bank
+
+The 프롤로그 is 2022-23 and the main season 2025-26, so the bank works the way
+a Korean bank did then. What changed on 2026-10-25 (시대 고증 묶음 A/B/C):
+
+| Then (wrong) | Now |
+|---|---|
+| A loan file handed over as a 서류철 | A 심사 파일 assigned in the 대출 심사 시스템; printouts are fine for reading |
+| A 도장 or 사인 on an internal document | 전자 승인, 「자기 사번으로 승인」, 전자서명 (OTP). A 부서 도장 with no name is a 승인 that shows only the department |
+| A 접수 도장 at a bank, 인사부 or public office | A 접수 번호 |
+| A committee leafing through papers | 화면 공유 and tablets; a 회의용 출력물 is still realistic |
+| A 기록 보관실 of paper bundles tied with string | 문서관리시스템 (scans, 보존연한, view and download logs, the 보관 → 폐기 state the 18:44 entry already uses), 망분리 단말, 워터마크 출력, 출입카드 로그 |
+| 임경수's string-tied bundles and his knot ("누가 풀면 표가 나네") | Watermarked printouts in clips and binders under a 봉인 테이프 he signs; it leaves a VOID pattern when torn ("누가 뜯으면 표가 나네"). Replacing it cannot forge his signature (사건 01) |
+| 감사팀 서고, 지점 서고·문서고 | 감사팀 자료실, 지점 자료실 |
+| 트리거랩 기록 보관소 B2 as a paper stack room | The name stays. Inside it is the old 전산센터's 백업 아카이브 (the shelves where 204 of 임경수's 312 boxes went in 사건 19) and a 반출 금지 열람실; never 「서고」 |
+| 이사회 문서 보관소, KD캐피탈 문서 보관소 | 이사회 문서 시스템, 문서관리시스템 |
+| 내선 전화 대장 (사건 17) | 내선 통화 기록, kept in the 백업 아카이브 |
+| 한서윤 signing the return in 2023 | The 「반려 버튼」 she pressed at 13:32: the same fact |
+
+What stays paper because it still is: a personal 수첩 (반재욱's black notebook,
+도윤하's spring notebook), meeting printouts, receipts, business cards, the
+original 계약서 with its 법인인감, the seal of a small company or 협동조합,
+registered mail and court papers. The 「서명란」 and the 「빈 서명란」 stay:
+they are the unsigned slot of an approval line, not a line on paper. The
+빈 서명란 of the 2023-0412 approval (page 3, the pencil dot) and the 뒷장 of the
+dissent are read as pencil marks left on the committee's 회의용 출력물, standing
+beside the 「미서명」 state of the approval line. A clue
+that leaned on paper keeps its logic in a digital twin: an unsigned slot is a
+「미서명」 state, a half receipt is a receipt photo or a card statement, an
+archive visit is a view log or a card-gate log.
+
 ## The building
 
 | Floor | Who |
 |---|---|
 | 본점 6층 | 기업금융전략팀: 심사실, 팀장실, and in 2022 the trainee desk |
 | 본점 7층 | 인사부 면담실 |
-| 본점 8층 | 기업대출심사팀 (임경수) and its 기록 보관실; 대출심사위원회 회의실 |
-| 본점 지하 1층 | The 기록 보관실 where committee papers are bound |
+| 본점 8층 | 기업대출심사팀 (임경수) and its 심사 기록 열람실 (망분리 단말, 열람 로그, 워터마크 출력); 대출심사위원회 회의실 |
+| 본점 지하 1층 | 문서 스캔실: committee papers and their 날인 원본 are scanned into the 문서관리시스템; the paper is kept in sealed 보존 상자 until its 보존연한 |
 | 본사 33층 | 그룹전략실; by 사건 49 "옛 그룹전략실" |
-| 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소 |
+| 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소: the old 전산센터's 백업 아카이브 (백업 테이프, 보존 상자 412개) and a 반출 금지 열람실 |
 | KD캐피탈 12층 / 20층 | 위험관리부 / 대표이사실 |
 
 The finale's night runs in one order on every path: 합정동 B2 (the inside
@@ -96,7 +148,7 @@ decision and the 04:00 folder.
 | 분석관 | 기업금융전략팀, trainee then 심사 담당 | 트리거랩 분석관 → KD캐피탈 위험관리부 (사건 25) |
 | 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 징역 3년, 집행유예 5년 (사건 44) |
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
-| 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
+| 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 인수팀장 (사건 25) |
 | 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
 | 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank; hands in a 사표 in 사건 07 that 감사팀장 never processes (사건 08, 09) |
@@ -108,6 +160,62 @@ decision and the 04:00 folder.
 오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
+
+오진우 turns from 사수 to rival because 윤상혁 sets him a condition no one else
+gets. It reaches him as one messenger line on the first night at 합정동
+(2023-07-24, 프롤로그 05), while 윤상혁 is still 팀장: "분석관보다 먼저 결론을
+내면 6층 자리는 비워 두겠네." The analyst sees the line, not the sender. From
+사건 01 그룹전략실 asks the lab for two recommendations on one case, his
+deadline 12 hours earlier; in 사건 02 a 그룹전략실 account opens his report 4
+seconds after it appears; in 사건 03 한서윤 says his terms never came to her.
+사건 03's 「별도 압박 조건」 and 사건 18's 「누구의 계산」 are this condition,
+and no line names 윤상혁 as its author before them.
+
+Five bridges between cases (10-26, written into scenes that were already there):
+
+- The analyst's 영동지점 posting (사건 07) is withdrawn the week before 사건 11
+  with one line, '원 소속 복귀', and like the posting it carries no reason and
+  no approver (c11_start and its three openings).
+- 오진우 and 브릿지은행: on 사건 18's 「조건을 걸고 보낸다」 route he signs on
+  12월 29일 but starts only in spring, after his 트리거랩 work; on every route
+  브릿지 sends one more envelope, now with a start date, the day after the
+  사건 24 dissolution notice (c18_final_terms echo, c24_desks). 사건 25 is
+  where he starts.
+- The 회기동 헌책방 is demolished in 사건 19 (1월 22일). The 1층 주인 할머니
+  of 사건 19 reopens it in spring one alley over from the site, and 임경수
+  chips in for the deposit; from 사건 28 the 1층 is that new shop, and the
+  chair beside its counter is his (c28_ruler, c30_bookstore).
+- 임경수 goes back into 이음병원 in August, short of breath; from 사건 41 his
+  chair is empty and he follows from the ward (c41_drill, c43_ledger) until
+  사건 44 and his death on 9월 15일.
+- 사건 08 is the first place 윤상혁 is named after 프롤로그 05: by 2025 he is
+  그룹전략실 상무 on the 33층, and the 사건 06 order and profile folder came
+  from that office (c8_trail). The line points at the 사건 06 order, not at
+  the 프롤로그 05 condition, so it does not name him as that condition's author.
+
+Five more bridges and four fixes (10-26, the same way):
+
+- 한서윤, the 과장 who returned the dissent, comes to 트리거랩 as its 실장 in
+  the spring of 2024, the year after the first night; why she came is left to
+  사건 37's 「관리자 H」 (start and the three 사건 01 openings).
+- 도윤하 leaves his window in 2024: when 트리거랩 posts a 현장 담당 opening he
+  is the first to apply, because the 47 loans he sold were only numbers to him
+  then (사건 01 payday).
+- 사건 13's list of 정규 부서 복귀 for Monday comes back marked '보류', and the
+  4층 stays as it is until the dissolution of 사건 24 (c14_start and its three
+  openings).
+- 변유진 is one of the three who left: in the spring of 2024 she goes back to
+  her window at 부산 사하지점 (c20_pause). She is the only one of the three
+  named after 프롤로그 05.
+- 최서진 is at KD캐피탈 from 사건 16 (11월). In the analyst's first week at
+  KD캐피탈 (사건 25) she comes up to the 12층 with two cups of 컵라면, which is
+  why she writes to the analyst in 사건 29 (c29_ledger).
+- 오진우's post at 브릿지은행 is 인수팀장 everywhere, as the offer of 사건 18
+  says; it sits under 도하람's 전략본부, on 권도현's floor (사건 25, 30).
+- 한서윤's part in the return is the 「반려 버튼」 she pressed, never a 서명
+  (사건 10, 11, 38, 49).
+- 오진우 calls 도윤하 「도윤하 씨」, not 선배: 오진우 was a 대리 and at the lab
+  before 도윤하 left his window.
 
 Of this table the script holds what copy writes in a shape it can read: each
 person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
@@ -157,7 +265,8 @@ in her mother's shop holds her 사원증 until the evening of 사건 33 and the 
 not 트리거랩: the witnesses are 그룹 전산 위탁 직원 on the 3rd floor of the same
 building, and the team is the group's.
 
-The three who left are not named in the main season. 프롤로그 05 shows two of
+Of the three who left, only 변유진 is named in the main season (사건 20,
+c20_pause: back to 부산 사하지점 in the spring of 2024). 프롤로그 05 shows two of
 them at their desks on 2023-07-24: 변유진 and a colleague from a branch. 백아린
 is not one of them: she has spent twelve years on the group's side of the table
 (사건 33) and is "처음 보는 사람" to the analyst in 사건 13.

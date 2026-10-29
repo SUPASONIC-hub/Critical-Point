@@ -154,11 +154,11 @@ export function readLatestPersonalBest() {
 
 /**
  * What the ranking screen asks for when it opens: the retired keys moved
- * first, then the newest past best as its line, or null. The words are here
- * and not in the screen's chunk, which has no room for them.
+ * first, then the newest past best (`readLatestPersonalBest`), or null. Its
+ * line's words are the screen's (src/copy/ranking.js `pastBest`), so another
+ * language laid over them is the one printed; this module imports nothing.
  */
-export function takePastBestLine() {
+export function takePastBest() {
   migrateRetiredRankingKeys();
-  const best = readLatestPersonalBest();
-  return best && `지난 판(v${best.version})의 내 최고 ${best.score}점 · ${best.rank}`;
+  return readLatestPersonalBest();
 }
