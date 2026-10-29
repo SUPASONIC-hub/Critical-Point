@@ -155,7 +155,7 @@ const BUDGETS = {
   // 96 -> 98 on 2026-10-26, 다국어 틀: the run's notices table
   // (src/copy/notices.js) and `fill` for its two lines with blanks.
   // 960 -> 961 lines on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
-  // b7228340: the side screen's kit re-exported from this chunk (sideCaseKit).
+  // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
   "src/GameRuntime.jsx": {
     lines: 961,
     longestLine: 190,
@@ -180,7 +180,7 @@ const BUDGETS = {
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
   // 10 -> 12 on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/result.js) and `fill` for its lines with blanks.
-  // 12 -> 13 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main b7228340:
+  // 12 -> 13 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46:
   // the side list (`SIDE_CASES`, src/sideCases.js) for the finale's one line
   // that the side slot opened. 339 lines fit main's 340.
   "src/screens/ResultScreen.jsx": {

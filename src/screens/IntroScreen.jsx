@@ -20,8 +20,8 @@ import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
-import { PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
-import { fill } from "../locale.js";
+import { legalPagePath, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
+import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 
 // E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
@@ -740,8 +740,8 @@ export function IntroScreen({ view, renderers = {} }) {
                 <DeletionRequest />
               </p>
               <p>
-                {introCopy.data.more}<a href={PRIVACY_PAGE_PATH}>{introCopy.legal.privacy}</a>{introCopy.data.and}
-                <a href={TERMS_PAGE_PATH}>{introCopy.legal.terms}</a>{introCopy.data.end}
+                {introCopy.data.more}<a href={legalPagePath(PRIVACY_PAGE_PATH, LANG)}>{introCopy.legal.privacy}</a>{introCopy.data.and}
+                <a href={legalPagePath(TERMS_PAGE_PATH, LANG)}>{introCopy.legal.terms}</a>{introCopy.data.end}
               </p>
             </div>
           </section>
@@ -878,8 +878,8 @@ export function IntroScreen({ view, renderers = {} }) {
             the address a store listing names, and one a player can reach
             from the bottom of the page without opening the data drawer. */}
         <footer className="intro-legal">
-          <a href={PRIVACY_PAGE_PATH}>{introCopy.legal.privacy}</a>
-          <a href={TERMS_PAGE_PATH}>{introCopy.legal.terms}</a>
+          <a href={legalPagePath(PRIVACY_PAGE_PATH, LANG)}>{introCopy.legal.privacy}</a>
+          <a href={legalPagePath(TERMS_PAGE_PATH, LANG)}>{introCopy.legal.terms}</a>
         </footer>
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the

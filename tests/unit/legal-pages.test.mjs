@@ -18,12 +18,14 @@ import { createSeasonTelemetryPayload } from "../../src/viewModels/seasonViewMod
  * through them, so a column the client sends is a column granted), and the
  * arguments of the online save's `put_cloud_save` call in src/cloudSave.js.
  * Every one of them has to be named in `REMOTE_FIELDS`, and the item it maps to
- * has to be printed on both policy pages.
+ * has to be printed on every policy page (Korean, English, Japanese).
  */
 const pages = renderLegalPages();
 const decode = (html) => html.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 const ko = decode(pages["privacy.html"]);
 const en = decode(pages["en/privacy.html"]);
+const ja = decode(pages["ja/privacy.html"]);
+const LANGUAGE_FOLDER = { ko: "", en: "en/", ja: "ja/" };
 
 function anonInsertGrants() {
   const grants = {};
@@ -44,13 +46,27 @@ function cloudSaveArguments() {
   return [...call[1].matchAll(/^\s*(p_\w+)\s*:/gm)].map((match) => match[1]);
 }
 
-test("the pages are written at their four addresses, each naming the other language", () => {
-  assert.deepEqual(Object.keys(pages).sort(), ["en/privacy.html", "en/terms.html", "privacy.html", "terms.html"]);
+test("the pages are written at their six addresses, each linking the other two languages", () => {
+  assert.deepEqual(Object.keys(pages).sort(), [
+    "en/privacy.html",
+    "en/terms.html",
+    "ja/privacy.html",
+    "ja/terms.html",
+    "privacy.html",
+    "terms.html",
+  ]);
   assert.equal(PRIVACY_PAGE_PATH, "/privacy.html");
   assert.equal(TERMS_PAGE_PATH, "/terms.html");
   for (const [file, html] of Object.entries(pages)) {
     assert.match(html, /^<!doctype html>/, file);
-    assert.match(html, new RegExp(`<html lang="${file.startsWith("en/") ? "en" : "ko"}">`), file);
+    const language = /^(en|ja)\//.exec(file)?.[1] ?? "ko";
+    assert.match(html, new RegExp(`<html lang="${language}">`), file);
+    const page = file.slice(LANGUAGE_FOLDER[language].length);
+    for (const [other, folder] of Object.entries(LANGUAGE_FOLDER)) {
+      if (other === language) continue;
+      assert.ok(html.includes(`<link rel="alternate" hreflang="${other}" href="/${folder}${page}" />`), `${file} names its ${other} twin`);
+      assert.match(html, new RegExp(`<a href="/${folder}${page}" hreflang="${other}" lang="${other}">`), `${file} links its ${other} twin`);
+    }
     assert.doesNotMatch(html, /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a policy page needs none`);
     assert.ok(html.includes(`mailto:${SUPPORT_CONTACT}`), `${file} gives the contact address`);
   }
@@ -68,6 +84,7 @@ test("every column the page may write is covered by an item the policy prints", 
       assert.ok(item, `${table}.${column} is sent and no item of the policy covers it (REMOTE_FIELDS in scripts/legal-pages.mjs)`);
       assert.ok(ko.includes(DATA_ITEMS[item].ko), `privacy.html does not print the item for ${table}.${column}`);
       assert.ok(en.includes(DATA_ITEMS[item].en), `en/privacy.html does not print the item for ${table}.${column}`);
+      assert.ok(ja.includes(DATA_ITEMS[item].ja), `ja/privacy.html does not print the item for ${table}.${column}`);
     }
     // And nothing listed that the page cannot send.
     assert.deepEqual(Object.keys(REMOTE_FIELDS[table]).sort(), [...columns].sort(), `${table}: REMOTE_FIELDS and what is sent differ`);
@@ -75,7 +92,7 @@ test("every column the page may write is covered by an item the policy prints", 
   assert.deepEqual(Object.keys(REMOTE_FIELDS).sort(), Object.keys(remote).sort());
 });
 
-test("the screen language a case row's summary carries is an item of its own on both pages, and in the consent sentence", () => {
+test("the screen language a case row's summary carries is an item of its own on every page, and in the consent sentence", () => {
   const added = Object.keys(toRowSummary({}));
   assert.ok(added.includes("locale"), "the case row names the page's language (toRowSummary)");
   for (const key of added.filter((name) => name !== "endingVariant")) {
@@ -83,8 +100,13 @@ test("the screen language a case row's summary carries is an item of its own on 
     assert.ok(item, `summary.${key} is sent and the policy does not name it (SUMMARY_FIELDS in scripts/legal-pages.mjs)`);
     assert.ok(ko.includes(DATA_ITEMS[item].ko), `privacy.html does not print the item for summary.${key}`);
     assert.ok(en.includes(DATA_ITEMS[item].en), `en/privacy.html does not print the item for summary.${key}`);
+    assert.ok(ja.includes(DATA_ITEMS[item].ja), `ja/privacy.html does not print the item for summary.${key}`);
   }
   assert.match(PLAYTEST_DATA_NOTICE, /화면 언어/);
+  // The three languages the start screen offers, named on every page.
+  assert.match(DATA_ITEMS.locale.ko, /한국어·영어·일본어 중/);
+  assert.match(DATA_ITEMS.locale.en, /Korean, English or Japanese/);
+  assert.match(DATA_ITEMS.locale.ja, /韓国語・英語・日本語のいずれか/);
 });
 
 test("a row the runtime builds sends only granted columns, so the grants are the list", () => {
@@ -101,18 +123,49 @@ test("the policy quotes the sentence beside the consent box, and says the box st
   assert.ok(readFileSync("src/copy/intro.js", "utf8").includes("playtestNotice: PLAYTEST_DATA_NOTICE,"), "named, not copied");
   assert.match(ko, /켜진 상태로 시작/);
   assert.match(en, /ticked by default/);
+  assert.match(ja, /オンの状態で始まります/);
+});
+
+test("every page has a text in each language, and all of them take effect on the same day", () => {
+  assert.deepEqual(Object.keys(DATA_ITEMS).filter((key) => ["ko", "en", "ja"].some((code) => !DATA_ITEMS[key][code])), []);
+  const effective = (html) => /<p class="effective">[^<]*<\/p>/.exec(html)?.[0];
+  assert.equal(effective(ko), '<p class="effective">시행일: 2026년 10월 25일</p>');
+  assert.equal(effective(en), '<p class="effective">Effective: October 25, 2026</p>');
+  assert.equal(effective(ja), '<p class="effective">施行日: 2026年10月25日</p>');
+  for (const [file, html] of Object.entries(pages)) {
+    if (!file.startsWith("ja/")) continue;
+    // Korean only in the link to the Korean page, which names itself in Korean.
+    assert.doesNotMatch(html.replace(' lang="ko">한국어</a>', ""), /[가-힣]/, `${file}: no Korean left untranslated`);
+    assert.ok(html.includes("body{word-break:normal}"), `${file}: Japanese wraps between characters`);
+  }
+  for (const file of ["privacy.html", "terms.html", "en/privacy.html", "en/terms.html"]) {
+    assert.ok(!pages[file].includes("word-break:normal"), `${file} keeps the shared style`);
+  }
 });
 
 test("the decisions of 2026-10-25 hold: no names, one overseas line, no ads on the web", () => {
-  for (const html of [ko, en]) {
-    assert.match(html, /Supabase Inc\.\s?\((?:미국|USA)\)/);
+  for (const html of [ko, en, ja]) {
+    assert.match(html, /Supabase Inc\.\s?\((?:미국|USA|米国)\)/);
     assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]/, "no placeholder left");
     assert.doesNotMatch(html, /AdSense|AdMob|IDFA/, "no ads yet, so none to describe");
   }
   assert.match(ko, /담당: 임계점 개발자/);
   assert.match(ko, /지금은 광고가 없/);
   assert.match(en, /currently shows no ads/);
+  assert.match(ja, /担当: 臨界点開発者/);
+  assert.match(ja, /現在、広告はありません/);
   assert.match(ko, /8자리 세션 코드/);
+  assert.match(ja, /8桁のセッションコード/);
   assert.match(decode(pages["terms.html"]), new RegExp(`href="${PRIVACY_PAGE_PATH}"`));
-  assert.match(decode(pages["en/terms.html"]), /href="\/en\/privacy\.html"/);
+  assert.match(decode(pages["en/terms.html"]), /href="\/en\/privacy\.html">Privacy Policy/);
+  assert.match(decode(pages["ja/terms.html"]), /href="\/ja\/privacy\.html">プライバシーポリシー/);
+});
+
+test("the game links each policy in the page's language: Korean at the root, English and Japanese under their code", async () => {
+  const { legalPagePath, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } = await import("../../src/privacyText.js");
+  assert.equal(legalPagePath(PRIVACY_PAGE_PATH, "ko"), "/privacy.html");
+  assert.equal(legalPagePath(PRIVACY_PAGE_PATH, "en"), "/en/privacy.html");
+  assert.equal(legalPagePath(TERMS_PAGE_PATH, "ja"), "/ja/terms.html");
+  assert.equal(legalPagePath(TERMS_PAGE_PATH, "fr"), "/terms.html", "a language with no pages falls back to Korean");
+  assert.equal(legalPagePath(PRIVACY_PAGE_PATH), "/privacy.html");
 });
