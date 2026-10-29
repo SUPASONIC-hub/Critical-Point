@@ -2,11 +2,15 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../src/privacyText.js";
 
 /**
- * The privacy policy and the terms of use, Korean and English: four plain
- * pages the build writes beside `index.html` (`legalPages()` in
+ * The privacy policy and the terms of use, Korean, English and Japanese: six
+ * plain pages the build writes beside `index.html` (`legalPages()` in
  * vite.config.js), at addresses a store listing can name.
  *
- *   /privacy.html  /en/privacy.html  /terms.html  /en/terms.html
+ *   /privacy.html  /en/privacy.html  /ja/privacy.html
+ *   /terms.html    /en/terms.html    /ja/terms.html
+ *
+ * The Korean text is the one the others are translated from; each page's
+ * header links the other two languages.
  *
  * Files and not screens of the app: a reviewer or a crawler opens the address
  * with no script, the entry chunk carries nothing of them but the two paths
@@ -30,52 +34,81 @@ import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAG
  * no ads.
  */
 
-const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026" };
+const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026", ja: "2026年10月25日" };
 
-/** Each item the policy lists, by key, in both languages. */
+/** Each item the policy lists, by key, in each language. */
 export const DATA_ITEMS = {
   deviceId: {
     ko: "이 기기에서 만든 무작위 식별 번호(세션 번호)와 그 끝 8자리인 세션 코드",
     en: "a random ID created on this device (session ID) and its last 8 characters, the session code",
+    ja: "この端末で作成したランダムな識別番号(セッション番号)と、その末尾8桁であるセッションコード",
   },
-  runId: { ko: "판마다 새로 만드는 무작위 기록 번호", en: "a random run ID made for each playthrough" },
-  eventId: { ko: "같은 기록이 두 번 저장되지 않게 하는 무작위 전송 번호", en: "a random delivery ID that keeps a record from being stored twice" },
-  anonName: { ko: "랭킹 표시 이름(늘 「익명 분석관」으로 고정)", en: "the leaderboard name, always \"Anonymous analyst\"" },
+  runId: {
+    ko: "판마다 새로 만드는 무작위 기록 번호",
+    en: "a random run ID made for each playthrough",
+    ja: "プレイごとに新しく作成するランダムな記録番号",
+  },
+  eventId: {
+    ko: "같은 기록이 두 번 저장되지 않게 하는 무작위 전송 번호",
+    en: "a random delivery ID that keeps a record from being stored twice",
+    ja: "同じ記録が二重に保存されないようにするランダムな送信番号",
+  },
+  anonName: {
+    ko: "랭킹 표시 이름(늘 「익명 분석관」으로 고정)",
+    en: "the leaderboard name, always \"Anonymous analyst\"",
+    ja: "ランキングの表示名(常に「匿名分析官」に固定)",
+  },
   caseResult: {
     ko: "사건 결과(사건 이름, 결과 요약과 점수, 게임 속 자원·성향 수치, 완료 시각)",
     en: "case results (the case, its summary and score, in-game resources and tendencies, completion time)",
+    ja: "事件の結果(事件名、結果の要約と点数、ゲーム内の資源・傾向の数値、完了時刻)",
   },
   locale: {
-    ko: "화면 언어(이 기기에서 고른 한국어 또는 영어, 사건 결과와 함께)",
-    en: "the screen language (Korean or English, as chosen on this device, sent with each case result)",
+    ko: "화면 언어(이 기기에서 고른 한국어·영어·일본어 중 하나, 사건 결과와 함께)",
+    en: "the screen language (Korean, English or Japanese, as chosen on this device, sent with each case result)",
+    ja: "画面の言語(この端末で選んだ韓国語・英語・日本語のいずれか。事件の結果とともに送信)",
   },
   choiceLog: {
     ko: "선택 기록과 응답 시간(고른 카드, 결정에 걸린 시간, 판의 진행 기록)",
     en: "choices and response times (the cards played, the time each decision took, how the table went)",
+    ja: "選択の記録と応答時間(選んだカード、判断にかかった時間、勝負の進行記録)",
   },
-  feedback: { ko: "보낸 피드백(이해도·난이도 평가와 자유 의견)", en: "feedback you send (clarity and difficulty ratings and your comment)" },
+  feedback: {
+    ko: "보낸 피드백(이해도·난이도 평가와 자유 의견)",
+    en: "feedback you send (clarity and difficulty ratings and your comment)",
+    ja: "送信したフィードバック(わかりやすさ・難易度の評価と自由記述の意見)",
+  },
   errorReport: {
     ko: "오류 보고(오류 이름·내용·코드 위치, 글자 없이 요소 이름만 적은 화면 구조, 화면 크기, 오류가 난 사건·장면, 발생 시각)",
     en: "error reports (the error's name, message and code location, the screen's structure as element names without any text, screen size, the case and scene, the time)",
+    ja: "エラー報告(エラーの名前・内容・コードの位置、文字を含まず要素名だけを記した画面構造、画面サイズ、エラーが起きた事件・シーン、発生時刻)",
   },
-  boardPost: { ko: "닉네임, 글 내용(300자 이내), 작성 시각", en: "your nickname, your post (up to 300 characters) and when it was posted" },
+  boardPost: {
+    ko: "닉네임, 글 내용(300자 이내), 작성 시각",
+    en: "your nickname, your post (up to 300 characters) and when it was posted",
+    ja: "ニックネーム、投稿内容(300文字以内)、投稿時刻",
+  },
   boardWriterId: {
     ko: "게시판 전용 무작위 작성자 번호(플레이테스트 데이터의 식별 번호와 다름)",
     en: "a random writer ID used only by the board (not the playtest session ID)",
+    ja: "掲示板専用のランダムな投稿者番号(プレイテストデータの識別番号とは別のもの)",
   },
   boardReport: {
     ko: "신고한 글의 번호와 고른 신고 사유(직접 적는 칸 없음)",
     en: "the number of the post you report and the reason you pick (there is no free text)",
+    ja: "通報した投稿の番号と、選んだ通報理由(自由記入欄はありません)",
   },
   cloudSave: {
     ko: "게임 진행 저장본(분석관 이름, 피드백 자유 의견, 전송 대기 기록은 빼고 올림)과 저장 시각",
     en: "your save (without your analyst name, feedback comments or unsent records) and when it was saved",
+    ja: "ゲーム進行のセーブデータ(分析官の名前、フィードバックの自由記述、送信待ちの記録は除いてアップロード)と保存時刻",
   },
   cloudCode: {
     ko: "이어하기 코드(서버에는 코드가 아닌 SHA-256 변환값으로 저장)",
     en: "your continue code (stored as a SHA-256 hash, never as the code itself)",
+    ja: "続行コード(サーバーにはコードそのものではなく、SHA-256で変換した値で保存)",
   },
-  address: { ko: "접속 IP 주소", en: "your IP address" },
+  address: { ko: "접속 IP 주소", en: "your IP address", ja: "接続元のIPアドレス" },
 };
 
 /**
@@ -321,6 +354,87 @@ const PRIVACY_EN = `
 <p>We will post changes on this page 7 days before they take effect, or 30 days before for changes that matter to your rights.</p>
 `;
 
+const PRIVACY_JA = `
+<p>臨界点開発者(以下「開発者」)は、ゲーム『臨界点: CRITICAL POINT』(以下「本ゲーム」)を運営するにあたり、大韓民国の「個人情報保護法」に従って利用者の個人情報を保護し、関連する苦情を速やかに処理するため、本方針を定めます。</p>
+
+<h2>1. 概要</h2>
+<ul>
+<li>会員登録やログインはありません。氏名、メールアドレス、電話番号、住所は取得しません。</li>
+<li>ゲーム内で決める分析官の名前はこの端末にのみ保存され、サーバーには送信しません。</li>
+<li>進行は原則としてこの端末(ブラウザのストレージ)にのみ保存されます。サーバーに送られる情報は、下記2の4種類だけです。</li>
+<li>現在、広告はなく、広告・分析用のCookieや外部のトラッキングツールも使用していません。</li>
+</ul>
+
+<h2>2. 取り扱う個人情報の項目、目的、保有期間</h2>
+<h3>(1) プレイテストデータ — 最初の画面「データ保存の案内」の「プレイテストデータの提供に同意」</h3>
+<ul>
+<li>同意の方式: 初回起動時、同意のチェックボックスは<strong>オンの状態で始まります</strong>。最初の画面でそのことと、オフにする場所をお知らせしており、チェックを外すとその時点から送信しません。オフにした端末はオフのままとなり、ゲームをリセットすると再びオンの状態になります。</li>
+<li>項目: ${items(PLAYTEST_ITEMS, "ja")}</li>
+<li>目的: ゲームの難易度とストーリーを改善するための研究、公開ランキングの算出、他の参加者に表示する集計統計(シーンごとの選択・失敗の割合など、個人を識別できない数値)、エラーの修正</li>
+<li>保有期間: サーバーに保存された日から${days}日後に自動削除</li>
+<li>同意をオフにすると、まだ送信されていない待機中の記録もこの端末から削除します。すでに送信された記録の削除は、7の方法でご請求ください。</li>
+<li>公開ランキングには、名前の代わりに「匿名分析官」と記録番号の末尾8桁だけが表示されます。</li>
+</ul>
+<h3>(2) 別の端末で続ける — 「オンライン保存を使う」をご自身でオンにした場合(初期設定はオフ)</h3>
+<ul>
+<li>項目: ${items(["cloudSave", "cloudCode"], "ja")}</li>
+<li>目的: 別の端末で同じ進行を続けること</li>
+<li>保有期間: 最後の保存から${days}日後に自動削除。「別の端末で続ける」パネルから、サーバー上のコピーをすぐに削除できます。</li>
+</ul>
+<h3>(3) 参加者掲示板 — 投稿または通報した場合</h3>
+<ul>
+<li>項目: ${items(["boardPost", "boardWriterId", "boardReport"], "ja")}</li>
+<li>目的: 他の参加者に投稿を表示すること(ニックネーム、投稿内容、投稿時刻は公開されます)、連続投稿や広告投稿の防止、通報された投稿の確認(通報は公開されません)</li>
+<li>保有期間: 投稿日から${days}日後に自動削除。通報はその投稿とともに削除されます。運営方針に反する投稿は非表示にすることがあります。</li>
+<li>投稿に実名、連絡先、会社名を書かないでください。リンク、電話番号、メールアドレスを含む投稿は登録されません。</li>
+</ul>
+<h3>(4) 接続情報 — 上記の機能がサーバーにリクエストを送る際に自動的に生成</h3>
+<ul>
+<li>項目: ${items(["address"], "ja")}</li>
+<li>目的: 自動登録や過剰なリクエストを防ぐための、リクエスト回数の制限</li>
+<li>処理方法と保有期間: IPアドレスそのものは保存せず、サーバーだけが知る値を混ぜて元に戻せないように変換した値だけを使います。リクエスト回数を数える値は1日以内に削除し、掲示板の投稿に付いた値は投稿とともに${days}日後に削除します。</li>
+</ul>
+
+<h2>3. この端末に保存する情報(自動収集装置)</h2>
+<p>本ゲームはCookieを使用しません。進行、設定、ローカル順位、復旧地点、ランダムな識別番号はブラウザのストレージ(localStorage)に、ゲームのファイルはオフラインで動かすためのキャッシュに保存されます。これらの情報は、2でオンにした機能を除いて端末の外に出ることはなく、ゲームの「リセット」やブラウザのサイトデータの削除で消去できます。</p>
+
+<h2>4. 個人情報の破棄</h2>
+<p>保有期間が終了した情報は、毎日実行される自動処理により遅滞なく削除します。電子ファイルは復元できない方法で削除します。</p>
+
+<h2>5. 個人情報の第三者提供</h2>
+<p>利用者の情報を第三者に提供したり、販売したりしません。法令に基づき求められる場合のみ例外とします。</p>
+
+<h2>6. 処理の委託と国外移転</h2>
+<p>Supabase Inc.(米国): 2の(1)~(4)の情報を保存するデータベースの運営を委託しています。これらの情報は、機能を使用する際にネットワークを通じて送信され、米国の同社のサーバーに2の保有期間のあいだ保存されます。</p>
+<p>国外移転を望まない場合は、プレイテストデータの提供への同意をオフにし、オンライン保存と掲示板を使用しないでください。本ゲームのストーリーと勝負は、これらの機能がなくても最後まで遊べます。</p>
+
+<h2>7. 利用者の権利とその行使方法</h2>
+<ul>
+<li>利用者はいつでも、自身の個人情報の閲覧、訂正、削除、処理の停止を請求し、同意を撤回できます。法定代理人や委任を受けた人を通じて請求することもできます。</li>
+<li>同意の撤回と処理の停止: 「データ保存の案内」の同意のチェックを外してください。オンライン保存はパネルでオフにし、サーバー上のコピーを削除できます。</li>
+<li>閲覧・削除の請求: 本ゲームは名前を取得しないため、「データ保存の案内」と結果画面に表示される<strong>8桁のセッションコード</strong>を${mail}までお送りください(オンライン保存は続行コード、掲示板の投稿はニックネームと投稿時刻)。該当する記録を探して対応し、10日以内に結果をお知らせします。</li>
+</ul>
+
+<h2>8. 満14歳未満の児童</h2>
+<p>本ゲームは満14歳未満の児童を対象としていません。満14歳未満の方は、プレイテストデータの提供への同意をオフにし、オンライン保存と掲示板を使用しないでください。満14歳未満の児童の情報が保存されていることがわかった場合は、遅滞なく削除します。</p>
+
+<h2>9. 安全性確保のための措置</h2>
+<p>通信経路の暗号化(HTTPS)、データベースへのアクセス権限の最小化(匿名ユーザーは定められた機能でのみ書き込みができ、他人の記録を読むことはできません)、リクエスト回数の制限、続行コードと接続元アドレスの変換保存。</p>
+
+<h2>10. 広告</h2>
+<p>現在、広告はありません。将来広告を導入する場合は、導入する前に、広告に関する取り扱いの内容(広告会社、Cookie、拒否する方法)を本方針に追加してお知らせします。</p>
+
+<h2>11. 個人情報保護に関するお問い合わせ先</h2>
+<ul>
+<li>担当: 臨界点開発者</li>
+<li>メールアドレス: ${mail}</li>
+<li>個人情報侵害の申告・相談(大韓民国): 個人情報侵害申告センター(privacy.kisa.or.kr、局番なしで118)、個人情報紛争調停委員会(www.kopico.go.kr、1833-6972)、大検察庁(www.spo.go.kr、局番なしで1301)、警察庁(ecrm.police.go.kr、局番なしで182)</li>
+</ul>
+
+<h2>12. 方針の変更</h2>
+<p>本方針を変更する場合は、施行の7日前からこのページでお知らせし、利用者の権利に関わる重要な変更は30日前からお知らせします。</p>
+`;
+
 const TERMS_KO = `
 <ol>
 <li>이 약관은 임계점 개발자(이하 “개발자”)가 제공하는 게임 「임계점: CRITICAL POINT」(이하 “게임”)의 이용 조건을 정합니다. 게임을 이용하면 이 약관에 동의한 것으로 봅니다.</li>
@@ -351,6 +465,21 @@ const TERMS_EN = `
 </ol>
 `;
 
+const TERMS_JA = `
+<ol>
+<li>この規約は、臨界点開発者(以下「開発者」)が提供するゲーム『臨界点: CRITICAL POINT』(以下「本ゲーム」)の利用条件を定めます。本ゲームを利用した場合、この規約に同意したものとみなします。</li>
+<li>本ゲームはフィクションです。登場する人物、会社、銀行、機関の名称や事件は実在のものとは関係がなく、ゲーム内の金融判断は実際の投資や金融に関する助言ではありません。</li>
+<li>ウェブ版は無料で、広告や有料の決済はありません。ゲーム内のチップ、賭け金、金庫、点数は実際のお金や財物ではなく、売買や交換はできません。</li>
+<li>公開ランキングはプレイテストの順位です。勝負のルールが変わった場合はランキングをリセットすることがあり、ルールに合わない記録は表示しないことがあります。</li>
+<li>参加者掲示板では、他人への嫌がらせ、他人の個人情報の暴露、広告や違法な内容を含む投稿をしてはなりません。開発者はこうした投稿を予告なく非表示にすることがあります。</li>
+<li>本ゲームを無断で複製・配布したり、サーバーに自動化されたリクエストを送ってランキングや掲示板を妨害したりしてはなりません。</li>
+<li>開発者は本ゲームの内容を変更し、または事前に告知したうえでサービスを終了することがあります。進行はこの端末に保存され、記録の要約は結果画面の「共有用の要約」からファイルとして保存しておけます。</li>
+<li>開発者に故意または重大な過失がない限り、ブラウザのストレージの削除などにより失われた進行について、開発者は責任を負いません。</li>
+<li>個人情報は<a href="/ja${PRIVACY_PAGE_PATH}">プライバシーポリシー</a>に従って取り扱います。</li>
+<li>お問い合わせ: ${mail}。この規約は大韓民国の法律に準拠します。</li>
+</ol>
+`;
+
 const PAGE_STYLE = `
 :root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
 *{box-sizing:border-box}
@@ -370,18 +499,36 @@ li ul{margin:4px 0}
 strong{color:var(--text)}
 `;
 
+/** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
+const LANGUAGES = ["ko", "en", "ja"];
+
 const COPY = {
-  ko: { game: "게임으로 돌아가기", privacy: "개인정보처리방침", terms: "이용약관", other: "English", effective: "시행일" },
-  en: { game: "Back to the game", privacy: "Privacy Policy", terms: "Terms of Use", other: "한국어", effective: "Effective" },
+  ko: { game: "게임으로 돌아가기", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일" },
+  en: { game: "Back to the game", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective" },
+  ja: { game: "ゲームに戻る", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日" },
 };
 
-const pathFor = (kind, language) => `${language === "en" ? "/en" : ""}${kind === "privacy" ? PRIVACY_PAGE_PATH : TERMS_PAGE_PATH}`;
+const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
+
+/**
+ * Japanese puts no spaces between words, so `keep-all` would hold a sentence
+ * together until `overflow-wrap: anywhere` cut it mid-line. Only the Japanese
+ * pages carry the line; the Korean and English ones are as they were.
+ */
+const STYLE_FOR = { ja: "\nbody{word-break:normal}" };
+
+const pathFor = (kind, language) =>
+  `${language === "ko" ? "" : `/${language}`}${kind === "privacy" ? PRIVACY_PAGE_PATH : TERMS_PAGE_PATH}`;
 
 function renderPage({ kind, language, body }) {
   const copy = COPY[language];
-  const other = language === "en" ? "ko" : "en";
+  const others = LANGUAGES.filter((code) => code !== language);
   const sibling = kind === "privacy" ? "terms" : "privacy";
-  const title = `${copy[kind]} · ${language === "en" ? "Critical Point" : "임계점: CRITICAL POINT"}`;
+  const title = `${copy[kind]} · ${GAME_NAME[language]}`;
+  const alternates = others.map((other) => `<link rel="alternate" hreflang="${other}" href="${pathFor(kind, other)}" />\n`).join("");
+  const switches = others
+    .map((other) => `<a href="${pathFor(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
+    .join("");
   return `<!doctype html>
 <html lang="${language}">
 <head>
@@ -389,17 +536,15 @@ function renderPage({ kind, language, body }) {
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(copy[kind])}" />
-<link rel="alternate" hreflang="${other}" href="${pathFor(kind, other)}" />
-<link rel="icon" href="/icons/icon-192.png" />
-<style>${PAGE_STYLE.trim()}</style>
+${alternates}<link rel="icon" href="/icons/icon-192.png" />
+<style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
 </head>
 <body>
 <main>
 <nav aria-label="${escapeHtml(copy[kind])}">
 <a href="/">${copy.game}</a>
 <a href="${pathFor(sibling, language)}">${copy[sibling]}</a>
-<a href="${pathFor(kind, other)}" hreflang="${other}" lang="${other}">${COPY[language].other}</a>
-</nav>
+${switches}</nav>
 <h1>${copy[kind]}</h1>
 <p class="effective">${copy.effective}: ${EFFECTIVE_DATE[language]}</p>
 ${body.trim()}
@@ -414,8 +559,10 @@ export function renderLegalPages() {
   const pages = [
     { kind: "privacy", language: "ko", body: PRIVACY_KO },
     { kind: "privacy", language: "en", body: PRIVACY_EN },
+    { kind: "privacy", language: "ja", body: PRIVACY_JA },
     { kind: "terms", language: "ko", body: TERMS_KO },
     { kind: "terms", language: "en", body: TERMS_EN },
+    { kind: "terms", language: "ja", body: TERMS_JA },
   ];
   return Object.fromEntries(pages.map((page) => [pathFor(page.kind, page.language).slice(1), renderPage(page)]));
 }

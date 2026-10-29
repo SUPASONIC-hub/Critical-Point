@@ -260,7 +260,7 @@ const budgets = [
   // 180,652 / 65,391 -> 180,744 / 65,403 on 2026-10-26, 일본어 1단계 (ja-step1): the hidden Japanese entry in SUPPORTED_LOCALES and the language choice showing a hidden language on its own pages only. Every other Korean chunk and the CSS are byte for byte main's (57931801). Measured 180,744 / 65,399 in the e2e build, the gzip plus 4.
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 181_926, maxGzip: 65_978 },
+  { pattern: /^index-.*\.js$/, maxBytes: 182_001, maxGzip: 66_015 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1070,8 +1070,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * 422,775, 472,175 and 477,902.
  * Japanese 477,900 on 10-29 (lang-terms, 일본어판 표기 맞춤), the plus 4; with the
  * recovery notice merged, Japanese 477,908.
+ * index.html then names the two other languages (hreflang, og:locale:alternate,
+ * lang-extras) and the policy links open the page's own language:
+ * 422,950, 472,350 and 478,077; with lang-terms (main b7228340) and the
+ * service worker skipping rel="alternate", 422,948, 472,339 and 478,083.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_179, ja: 477_912 };
+const FIRST_PAINT_BUDGETS = { ko: 422_954, en: 472_354, ja: 478_087 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1194,7 +1198,9 @@ function checkBudget(file, budget) {
 // plus 4.
 // -> 9,897 / 3,573 on 2026-10-26, funnel-locale: the chunk names' hashes only;
 // the worker's code did not change. Measured 9,897 / 3,569 plus 4.
-const WORKER_BUDGET = { maxBytes: 9_897, maxGzip: 3_573 };
+// 9,897 / 3,573 -> 9,948 / 3,586 on 2026-10-28, lang-extras: the Japanese privacy policy and terms join its
+// network-first pages and its warm-up list. Measured 9,944 / 3,582.
+const WORKER_BUDGET = { maxBytes: 9_948, maxGzip: 3_586 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
