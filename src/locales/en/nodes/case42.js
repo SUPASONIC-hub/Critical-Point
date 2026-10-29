@@ -679,7 +679,7 @@ export default {
         "text": "You took the group photo 12 times, and everyone went into the sea once more. On the noon train, nine people passed the opinion around and revised it, and it reached the outside directors 7 minutes before midnight."
       },
       "c42_after_record": {
-        "tag": "Kept on Record",
+        "tag": "Left on Record",
         "title": "That night’s answers and the 47 became one file",
         "text": "On the train back, you wrote up the answers from below the breakwater and the 47 addresses. 20 names and 39 counts of 'no late payments' go into the opinion."
       },

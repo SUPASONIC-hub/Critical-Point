@@ -149,10 +149,10 @@ export default {
           "label": "Demand a public halt before the shutter goes up"
         },
         "reframe": {
-          "label": "Reframe the table and propose, one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
-      "place": "KD Bank Gangseo Branch · Lobby",
+      "place": "KD Bank Gangseo Branch · Banking Hall",
       "clock": "Round 2, day 1 · 08:50",
       "question": "10 minutes before the shutter rises, Round 2, 150 billion won, is about to begin. What do you do?",
       "lead": "Monday morning. Before the shutter goes up, the only sound in the lobby is the ticket machine’s standby tone."
@@ -385,7 +385,7 @@ export default {
           "label": "Check the fund’s bad-loan price"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Round 2 sales · D-3",
       "question": "The warmer the product name, the shorter the disclosure. What do you do with this statistic?"
     },
@@ -409,7 +409,7 @@ export default {
           "label": "Demand the bonus drop its weighting for older customers"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Round 2, day 1 · Dawn",
       "question": "The disclosure is one page and the shutter rises at nine. What do you add to the page the customer reads alone?"
     },
@@ -674,7 +674,7 @@ export default {
     },
     "outcomes": {
       "c14_after_warm": {
-        "tag": "Stayed Close",
+        "tag": "Stayed Beside Them",
         "title": "You sat the dictation test with them to the end",
         "text": "At the buyers’ dinner, Lee Jungsook gave everyone a dictation test. You stayed to the last and got a red circle."
       },

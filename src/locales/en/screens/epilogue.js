@@ -11,7 +11,7 @@ export default {
     "evidence-reform":
       "Disclosure and protection are bound into one procedure. At KD Data Lab, Lee Minseo takes on returning their own records to the 63 people. The first envelope goes to Sunwoo Jin in Jeju. ECHO puts what each envelope holds into plain words. Your log is among those envelopes too. One line becomes a rule: ask the person first, before anything goes out. The next case starts not from a record already made public, but from one nobody has asked about yet.",
     "human-record":
-      "Six months later, 31 names hang on the refrigerator door at Gaeul Rice Cake Shop. Next to each 'Unverifiable,' Moon Gaeul has written in that person’s story, one by one. Do Yoonha sets beside them the notebook where the 1,740 were first written down. The tables you reframed stay in the archive with those stories. The next participant’s first clue is not a right answer but these names.",
+      "Six months later, 31 names hang on the refrigerator door at Gaeul Rice Cake Shop. Next to each 'Unconfirmable,' Moon Gaeul has written in that person’s story, one by one. Do Yoonha sets beside them the notebook where the 1,740 were first written down. The tables you reframed stay in the archive with those stories. The next participant’s first clue is not a right answer but these names.",
     "profitable-silence":
       "The books survived. KD Capital’s quarterly results are good, and the story on Yoon Sanghyuk’s appeal sinks to the bottom of the business page. In the Gaeul Rice Cake Shop group chat, messages to you pile up unread. Next to your name on the 33rd floor, HR Planning adds one line: 'delivers results quietly.' The next analyst is handed that line as the model.",
     "cold-justice":
@@ -19,7 +19,7 @@ export default {
     "field-pact":
       "People’s promises moved before any official approval. The people who stayed in the bookshop alley were brought together in one group chat. Do Yoonha’s window, Foreman Kim’s factory and Moon Gaeul’s rice cake shop become the way into a few locked records. That way lies not in any document but in your contacts. If you leave that chat, the way closes with you. The next person has to go find the people from the start.",
     "quiet-cover":
-      "Six months on, nothing has changed. Yoon Sanghyuk waits for his appeal, and the 31 are still 'Unverifiable.' You go back to your desk in KD Capital’s Risk Management Department and turn the pages as usual. The B2 terminal is off, and no one turns ECHO’s waveform back on. The records behind the doors you did not open wait for the next person.",
+      "Six months on, nothing has changed. Yoon Sanghyuk waits for his appeal, and the 31 are still 'Unconfirmable.' You go back to your desk in KD Capital’s Risk Management Department and turn the pages as usual. The B2 terminal is off, and no one turns ECHO’s waveform back on. The records behind the doors you did not open wait for the next person.",
     collapse:
       "Of the {count} cases, many closed without ever recovering. What was attached to people’s share while the company held up was taken back first: the night allowance Kang Taemin wrote in the 'what you lose' field, the family tuition support Kwon Dohyun added to the price of a signature. Only the record is left, and your name is not in its signature field either. The next analyst starts again from that blank.",
   },

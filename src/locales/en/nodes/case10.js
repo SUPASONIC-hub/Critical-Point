@@ -62,7 +62,7 @@ export default {
           "label": "Date the lost sick-leave option"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · HR register terminal",
+      "place": "Trigger Lab, 4th-floor analyst room · personnel register terminal",
       "clock": "Records purge in 88h",
       "question": "The unresolved item on the last line is you. How do you handle these 1,740 people?",
       "lead": "You load the locker file onto the terminal. All 3 years of it will not fit on one screen."
@@ -124,7 +124,7 @@ export default {
           "label": "Date the lost sick-leave option"
         }
       },
-      "place": "Hoegi-dong secondhand bookshop, 2nd floor · Stacks of ledgers",
+      "place": "Hoegi-dong bookshop, 2nd floor · stacks of ledgers",
       "clock": "Duty roster locks in 20h",
       "question": "You have a sheet that splits 1,128 people among six. What do you make it into?",
       "lead": "Lim Kyungsoo has cleared away the ledgers to make room, and Na Junhyuk has come up from Gangwon on a dawn bus."
@@ -149,7 +149,7 @@ export default {
           "label": "Take half of Do Yoonha’s notebook under your own name"
         },
         "reframe": {
-          "label": "Reframe the table one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -225,7 +225,7 @@ export default {
           "label": "Say a single review is faster; finish Do Yoonha’s first"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · HR register terminal",
+      "place": "Trigger Lab, 4th-floor analyst room · personnel register terminal",
       "clock": "Injury review in 34h",
       "question": "One of the 19 who took sick leave for the same reason is Han Seoyun. How do you build this case?"
     },
@@ -249,7 +249,7 @@ export default {
           "label": "Open all six boxes and have everyone review each other"
         }
       },
-      "place": "Hoegi-dong secondhand bookshop, 2nd floor · Landing",
+      "place": "Hoegi-dong Secondhand Bookshop 2nd Floor · Stair Landing",
       "clock": "Duty roster locks in 16h",
       "question": "Five boxes are filled; only yours is empty. What do you write there?"
     },
@@ -293,7 +293,7 @@ export default {
           "label": "Leave the record alone unless she wants it changed"
         }
       },
-      "place": "Trigger Lab, 4th floor · By the window",
+      "place": "Trigger Lab, 4th floor · by the window",
       "clock": "Injury review in 32h",
       "question": "She says speaking up would mean regretting her signature. What do you do about those 2 weeks?"
     },
@@ -315,7 +315,7 @@ export default {
           "label": "Say 288 is too many and re-split the columns"
         }
       },
-      "place": "Hoegi-dong secondhand bookshop, 2nd floor · Landing",
+      "place": "Hoegi-dong Secondhand Bookshop 2nd Floor · Stair Landing",
       "clock": "Duty roster locks in 14h",
       "question": "The line Oh Jinwoo erased and rewrote said 'Something to tell my father.' What do you do?"
     },
@@ -363,7 +363,7 @@ export default {
           "label": "Find the three and ask them to share the list"
         }
       },
-      "place": "KD Bank Gangseo Branch · Records room",
+      "place": "KD Bank Gangseo Branch · records room",
       "clock": "Records purge in 80h",
       "question": "200 lines of the list were not in his hand. What do you do about these three people?"
     },
@@ -389,7 +389,7 @@ export default {
           "label": "Date the lost sick-leave option"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Duty roster locks in 12h",
       "question": "In this organization, goodwill is used up in 31 months on average. What do you do with this metric?"
     },
@@ -412,7 +412,7 @@ export default {
           "label": "Submit the burnout rate bundled with the list system"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Duty roster locks in 8h",
       "question": "There is one more number no one ever measured. How do you put it into the proposal?"
     },

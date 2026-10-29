@@ -62,7 +62,7 @@ export default {
           "label": "Match 33rd-floor log to seizures"
         }
       },
-      "place": "KD Financial Group HQ 33rd Floor · Group Strategy Office",
+      "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
       "clock": "June 16 · 10:30",
       "question": "Your name comes up most in boxes that were due to be destroyed in four days. What do you do with them?",
       "lead": "Na Eunho needs someone who can recognize the Trigger Lab boxes, and he takes you up in the elevator to the 33rd floor."
@@ -149,7 +149,7 @@ export default {
           "label": "Ask to be investigated over the review in your name first"
         },
         "reframe": {
-          "label": "One last time, propose changing the game"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Seoul Central District Prosecutors’ Office 11th Floor · Hallway",

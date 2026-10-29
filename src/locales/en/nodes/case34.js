@@ -149,7 +149,7 @@ export default {
           "label": "Yoon Seojin submits it herself and applies for protection too"
         },
         "reframe": {
-          "label": "Reframe the table one last time and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor Hideout · By the Bookshelves",
@@ -290,7 +290,7 @@ export default {
           "label": "Tell Moon Gaeul about today first and ask what she thinks"
         }
       },
-      "place": "Alley Outside the Hoegi-dong Secondhand Bookshop",
+      "place": "Alley outside the Hoegi-dong secondhand bookshop",
       "clock": "July 3 · 22:40",
       "question": "Moon Hajun already knew Yoon Seojin’s last name. What do you do about these two?"
     },
@@ -684,7 +684,7 @@ export default {
         "text": "Who found the notebook, when and where, whom it was handed to, and what that one line said all went on record. The road a daughter took to hand in her father’s records became a document, not a rumor."
       },
       "c34_after_rush": {
-        "tag": "Ran on Ahead",
+        "tag": "Ran Ahead",
         "title": "You left the half-peeled peach and chased that line’s trace",
         "text": "You took the copy and went straight to the next fight that night. Left in the lab, Yoon Seojin finished peeling the peach alone."
       }

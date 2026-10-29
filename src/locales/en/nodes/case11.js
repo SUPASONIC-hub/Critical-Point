@@ -94,7 +94,7 @@ export default {
           "label": "Find when dissent became purge"
         }
       },
-      "place": "Hoegi-dong Secondhand Bookshop 2nd Floor · Stacks of Ledgers",
+      "place": "Hoegi-dong bookshop, 2nd floor · stacks of ledgers",
       "clock": "Parliamentary audit in D-2",
       "question": "As the laughter fades, Lee Minseo asks whether her name will come up too. How do you answer?",
       "lead": "Three apple crates make the members’ bench. The witness stand is Lim Kyungsoo’s old reading stand."
@@ -125,7 +125,7 @@ export default {
           "label": "Find when dissent became purge"
         }
       },
-      "place": "Trigger Lab Rooftop",
+      "place": "Trigger Lab rooftop",
       "clock": "Night before the hearing · 23:40",
       "question": "The person who pressed the return button holds out the recording of that call. What do you do with this file?",
       "lead": "The night before the hearing, Han Seoyun called you up to the rooftop. The wind is so strong that no one goes near the railing."
@@ -291,7 +291,7 @@ export default {
           "label": "Greet him yourself and say see you at the hearing"
         }
       },
-      "place": "Alley in Front of the Hoegi-dong Secondhand Bookshop",
+      "place": "Alley outside the Hoegi-dong secondhand bookshop",
       "clock": "Parliamentary audit in D-2 · Night",
       "question": "For the first time in 2 years his father called first, and Oh Jinwoo can’t answer. What do you do?"
     },

@@ -341,10 +341,10 @@ export default {
       "question": "The witness’s daughter counted her father’s practice through the door. How do you receive this visit?"
     },
     "c41_branch_study_follow": {
-      "title": "Keep X",
-      "text": "Under the alley streetlight, Yoon Seojin opens the notebook. The line she showed you only as a single photo in July is there in the Thursday box of the fourth week of April 2023, in her father’s handwriting. '0412 — dissent — keep X.' In the Friday box right beside it: 'Gallery On opening — check Seojin’s tuition.' Yoon Seojin smiles, but her eyes fill first. 'At first I wanted to protect Dad with this notebook. If I showed he didn’t forget, that he knew, at least he wouldn’t be a liar. Strange, isn’t it. Apparently that’s the best defense I can give him.'",
+      "title": "Retain: X",
+      "text": "Under the alley streetlight, Yoon Seojin opens the notebook. The line she showed you only as a single photo in July is there in the Thursday box of the fourth week of April 2023, in her father’s handwriting. '0412 — dissent — retain: X.' In the Friday box right beside it: 'Gallery On opening — check Seojin’s tuition.' Yoon Seojin smiles, but her eyes fill first. 'At first I wanted to protect Dad with this notebook. If I showed he didn’t forget, that he knew, at least he wouldn’t be a liar. Strange, isn’t it. Apparently that’s the best defense I can give him.'",
       "memo": [
-        "Thursday, fourth week of April: '0412 — dissent — keep X'",
+        "Thursday, fourth week of April: '0412 — dissent — retain: X'",
         "Friday, same week: 'Gallery On opening — check Seojin’s tuition'",
         "Original notebook kept by Yoon Seojin",
         "Yoon Seojin: hearing gallery application done"
@@ -679,7 +679,7 @@ export default {
         "text": "People who sat in the gallery and people who stood at the hallway monitors gathered under one tent. Meeting again somewhere without papers became a promise."
       },
       "c41_after_record": {
-        "tag": "Kept in a Table",
+        "tag": "Left It in a Table",
         "title": "23 rounds of 'I don’t recall' became a table of 23 rows",
         "text": "Beside each answer, you attached that day’s document. Memory was empty, but the rows were not."
       },

@@ -124,7 +124,7 @@ export default {
           "label": "Match 4 extensions to Roundhill"
         }
       },
-      "place": "KD Capital Head Office · Rooftop",
+      "place": "KD Capital Headquarters · Rooftop",
       "clock": "On-site exam day 4 · 22:10",
       "question": "In front of you is the person who asked only once about the missing eleven pages; how do you answer her confession?",
       "lead": "Han Jiwoo asked to see you on the rooftop for a minute. Four days into the examination, it is the first thing she has said without a number."
@@ -314,7 +314,7 @@ export default {
           "label": "Step out of the elevator first without a word"
         }
       },
-      "place": "KD Capital Head Office · Elevator",
+      "place": "KD Capital Headquarters · Elevator",
       "clock": "On-site exam day 5 · 07:40",
       "question": "The CEO presses your floor button for you and says the signature line hasn’t come up yet; what do you do before the doors open?"
     },
@@ -677,12 +677,12 @@ export default {
     },
     "outcomes": {
       "c31_after_warm": {
-        "tag": "Stayed Beside",
+        "tag": "Stayed Beside Them",
         "title": "The night the examination ended, Choi Seojin came to the bookshop’s 1st floor for the first time",
         "text": "On the night the five-day examination ended, the six of you and Choi Seojin gathered on the bookshop’s 1st floor. This time, Han Seoyun’s seven lunchboxes were emptied to the last bite."
       },
       "c31_after_record": {
-        "tag": "Left on the Record",
+        "tag": "Left on Record",
         "title": "Five days of questions and answers became one volume in date order",
         "text": "From Question 1 to the last number, who answered what, and when, was bound into one volume of record. The people coming next week will read it in the same order."
       },

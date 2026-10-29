@@ -149,7 +149,7 @@ export default {
           "label": "Approve with phased transition and retraining in the lease"
         },
         "reframe": {
-          "label": "Reframe the table and propose, one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Capital · Lease approval committee room",
@@ -386,7 +386,7 @@ export default {
           "label": "Find who asked for the 80 cuts"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Approval committee D-3",
       "question": "37 automation leases cut accidents, but the risk moved off the books. What do you do with these figures?"
     },
@@ -409,7 +409,7 @@ export default {
           "label": "Set no conditions; just raise the severance"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Approval committee day · Before dawn",
       "question": "If a lease contract could record where people are 1 year later, what would you write?"
     },

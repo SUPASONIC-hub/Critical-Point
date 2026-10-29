@@ -31,7 +31,7 @@ export default {
           "label": "Ask NOAH to show its basis"
         }
       },
-      "place": "Trigger Lab 4th Floor Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Early February · NOAH launch in D-6",
       "question": "At the bottom of NOAH’s training list is the first participant, with no consent form. What do you do first?",
       "lead": "Six days before NOAH’s launch, Lee Minseo comes to your desk with the list scrolled all the way down."
@@ -461,7 +461,7 @@ export default {
           "label": "Ask NOAH to show its basis"
         }
       },
-      "place": "Trigger Lab 4th Floor Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Early February · NOAH launch in D-6",
       "question": "The trip promised the day you cleared the server room has become a trip to Jeju. How do the six of you go together?",
       "lead": "Three days since the server room was cleared, the nine cups from that day still sit upside down in a row in the pantry."
@@ -491,7 +491,7 @@ export default {
           "label": "Ask NOAH to show its basis"
         }
       },
-      "place": "Trigger Lab 4th Floor Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Early February · NOAH launch in D-6",
       "question": "The appendix you left told Legal about the blank first. How do you go to the owner of that blank?",
       "lead": "Three days after ECHO’s records were set down in a document, Ryu Seah’s call opens with the bottom line of the appendix."
@@ -521,7 +521,7 @@ export default {
           "label": "Ask NOAH to show its basis"
         }
       },
-      "place": "Trigger Lab 4th Floor Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Early February · NOAH launch in D-6",
       "question": "While you opened the list first, Legal moved first. From the emptied 4th floor, who do you go with?",
       "lead": "On a desk one floor above the half-cleared server room, only the list you downloaded remains."

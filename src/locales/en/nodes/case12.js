@@ -149,7 +149,7 @@ export default {
           "label": "Help them sign so the money arrives before Chuseok"
         },
         "reframe": {
-          "label": "Reframe the table and propose, one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Financial Supervisory Service, Yeouido · Mediation committee room",
@@ -386,7 +386,7 @@ export default {
           "label": "Find the 30 billion won account"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Day before mediation",
       "question": "43 of 47 voluntary plans bought silence along with them. What do you do with this statistic?"
     },
@@ -409,7 +409,7 @@ export default {
           "label": "Set up a litigation fund for those who don’t sign"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Mediation day · Dawn",
       "question": "A clause that has never been priced is in today’s proposal too. What do you do with it?"
     },

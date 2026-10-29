@@ -31,7 +31,7 @@ export default {
           "label": "Trace shareholders’ words"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "March 11 · Shareholders’ Meeting D-9",
       "question": "In the vote 9 days from now, the institutions cast the ballots. Where do you start gathering reasons for them to vote no?",
       "lead": "Twelve days after Moon Hajun’s winter internship ended, six identical thick envelopes are stuck in the mailbox on Trigger Lab’s 4th floor."
@@ -62,7 +62,7 @@ export default {
           "label": "Open the staff proxy tally"
         }
       },
-      "place": "KD Bank Gangwon Yeongdong Branch · Banking Hall",
+      "place": "KD Bank Gangwon Yeongdong Branch · Banking hall",
       "clock": "March 13 · Shareholders’ Meeting D-7 · 15:20",
       "question": "The 41 proxy forms stamped 'because the branch manager asked' have no ID copies. What do you do?",
       "lead": "The first stop on the road to meet the shareholders is Gangwon’s Yeongdong Branch, 240km from Seoul. On the phone, Na Junhyuk said only, 'I’ve got the elders all seated.'"
@@ -222,7 +222,7 @@ export default {
           "label": "Send just three; the rest vote electronically"
         }
       },
-      "place": "FlowOn Fulfillment Center · Night Shift Break Room",
+      "place": "FlowOn fulfillment center · Night-shift break room",
       "clock": "March 18 · 02:30",
       "question": "If they go on Friday, the 80 on the night shift get no sleep. How do you use these 80 shares?"
     },
@@ -267,7 +267,7 @@ export default {
           "label": "Suggest making that proxy story her opening line"
         }
       },
-      "place": "Gaeul Rice Cake Shop, Mangwon Market · Out Front",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Out front",
       "clock": "March 14 · Shareholders’ Meeting D-6 · 13:00",
       "question": "3 years ago, a proxy that promised to 'take care of it' put one more lien on the factory. What do you do with that story?"
     },
@@ -289,7 +289,7 @@ export default {
           "label": "Kang Taemin uses 11 seconds; the other 48 go to Yoo Gun"
         }
       },
-      "place": "FlowOn Fulfillment Center · Night Shift Break Room",
+      "place": "FlowOn fulfillment center · Night-shift break room",
       "clock": "March 18 · 02:50",
       "question": "Kang Taemin’s remarks take 11 seconds, leaving 48. What do you do with the time left?"
     },
@@ -317,11 +317,11 @@ export default {
     },
     "c23_branch_newsroom": {
       "title": "1,996 Readers",
-      "text": "As you leave ClearVote, a text comes from Seo Harin. 'We got a letter from group Legal. Can you come to the newsroom?' On the sofa in Leadline’s newsroom in Mangwon-dong, 1,996 proxy forms are piled up still in their mailing envelopes, and on top of them sits the cat 'Correction,' an honorary press badge around its neck. Whenever someone tries to pull out an envelope, it presses down gently with a front paw. Seo Harin laughs, then holds out a printout. It is an official letter from KD Financial Group’s Legal. One sentence is underlined: 'a news outlet gathering its readers as shareholders to steer votes undermines the fairness of its reporting.' 'It isn’t wrong. We wrote the Gaeul Rice Cake Shop series, it spread and the bank’s rating fell, and readers bought shares. Today we have to decide where to draw the line in between.'",
+      "text": "As you leave ClearVote, a text comes from Seo Harin. 'We got a letter from group Legal. Can you come to the newsroom?' On the sofa in Leadline’s newsroom in Mangwon-dong, 1,996 proxy forms are piled up still in their mailing envelopes, and on top of them sits the cat 'Jeongjeong,' an honorary press badge around its neck. Whenever someone tries to pull out an envelope, it presses down gently with a front paw. Seo Harin laughs, then holds out a printout. It is an official letter from KD Financial Group’s Legal. One sentence is underlined: 'a news outlet gathering its readers as shareholders to steer votes undermines the fairness of its reporting.' 'It isn’t wrong. We wrote the Gaeul Rice Cake Shop series, it spread and the bank’s rating fell, and readers bought shares. Today we have to decide where to draw the line in between.'",
       "memo": [
         "1,996 proxy forms from Leadline readers",
         "Letter from group Legal: 'undermines the fairness of reporting'",
-        "Correction: won’t budge from the envelope pile",
+        "Jeongjeong: won’t budge from the envelope pile",
         "Next article deadline: two days before the meeting"
       ],
       "choices": {
@@ -341,7 +341,7 @@ export default {
     },
     "c23_branch_newsroom_follow": {
       "title": "17 Red Dots",
-      "text": "Sorting the envelope pile, Seo Harin sets one aside. The sender field is empty, and inside, instead of a proxy form, are a note and a screenshot. 'I work at a KD Bank branch. I am an employee shareholder with not one share but 1,200. Every branch circulates a proxy submission status sheet. A red dot goes next to the name of anyone who hasn’t submitted. That is how the employees’ 5% gets gathered as votes in favor.' In the screenshot, the sheet shows employee IDs instead of names, and there are seventeen red dots. Correction settles on every other envelope but will not climb onto that note. Seo Harin says, 'This is a story. But this person can be found by employee ID.'",
+      "text": "Sorting the envelope pile, Seo Harin sets one aside. The sender field is empty, and inside, instead of a proxy form, are a note and a screenshot. 'I work at a KD Bank branch. I am an employee shareholder with not one share but 1,200. Every branch circulates a proxy submission status sheet. A red dot goes next to the name of anyone who hasn’t submitted. That is how the employees’ 5% gets gathered as votes in favor.' In the screenshot, the sheet shows employee IDs instead of names, and there are seventeen red dots. Jeongjeong settles on every other envelope but will not climb onto that note. Seo Harin says, 'This is a story. But this person can be found by employee ID.'",
       "memo": [
         "Anonymous tip: employee shareholder holding 1,200 shares",
         "Screenshot of a branch proxy submission status sheet",
@@ -459,7 +459,7 @@ export default {
           "label": "Trace shareholders’ words"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "March 11 · Shareholders’ Meeting D-9",
       "question": "Moon Hajun asks what he can do with one share. How do you answer?",
       "lead": "Ever since you stayed in the banking hall until the ceremony rice cake box was empty, Moon Hajun asks you first whenever there is something he doesn’t know."
@@ -489,7 +489,7 @@ export default {
           "label": "Trace shareholders’ words"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "March 11 · Shareholders’ Meeting D-9",
       "question": "The engine that rejected To-the-End Precision became the candidate’s reason for nomination. What do you do with that sentence?",
       "lead": "Twelve days after you put the R-17 objection receipt in a drawer, a thick envelope lands on top of that drawer."
@@ -519,7 +519,7 @@ export default {
           "label": "Trace shareholders’ words"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "March 11 · Shareholders’ Meeting D-9",
       "question": "In the two weeks you ran ahead, you didn’t call the 3,118 once. What do you make up for first?",
       "lead": "The shareholder breakdown you gathered nonstop for nearly two weeks lies open on the desk. The phone is quiet."
@@ -677,7 +677,7 @@ export default {
         "text": "Passed with 50.6%. You stood outside the lobby until the last bus to Yeongdong left. Grandma Seo Jungran asked you to ask her again next year."
       },
       "c23_after_record": {
-        "tag": "Put It on Record",
+        "tag": "Left on Record",
         "title": "50.6% became an annex to the board papers",
         "text": "Today’s remarks and the approval rate went to the board as a shareholder letter. The number that fell from 97% to 50.6% is now on the official record."
       },

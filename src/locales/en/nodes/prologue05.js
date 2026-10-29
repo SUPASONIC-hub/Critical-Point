@@ -150,7 +150,7 @@ export default {
           "label": "Put out the names you wrote on the night of April 12"
         },
         "reframe": {
-          "label": "Change the game one last time with a proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Research Lab, 4th-floor analyst room · First meeting",
@@ -340,7 +340,7 @@ export default {
           "label": "Open it, photograph only your pages, and leave fast"
         }
       },
-      "place": "Head office, 8th-floor credit records reading room",
+      "place": "Head office, 8th floor, review records room",
       "clock": "Friday, July 21 · 19:30",
       "question": "One of the boxes bound for Hapjeong-dong is marked 2023-0412. What do you do in front of it?"
     },

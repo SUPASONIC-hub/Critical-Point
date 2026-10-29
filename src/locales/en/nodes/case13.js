@@ -150,7 +150,7 @@ export default {
           "label": "Accept, then change the last line on air"
         },
         "reframe": {
-          "label": "Reframe the table and propose, one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Ad studio in Seongsu-dong · Live set",
@@ -387,7 +387,7 @@ export default {
           "label": "Find the 3.8 billion cost code"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Livestream D-5",
       "question": "Of the 23 committees’ 186 recommendations, only 17 went the distance. What do you do with this statistic?"
     },
@@ -410,7 +410,7 @@ export default {
           "label": "No clause; just raise your fee"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Test terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "Livestream day · Dawn",
       "question": "Tonight’s line fills the blank in the list. What do you add that will remain after the ads end?"
     },

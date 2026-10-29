@@ -461,7 +461,7 @@ export default {
           "label": "Trace why demolition moved up"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January · Cold Wave · Demolition in 72h",
       "question": "The people who got through New Year’s Eve together have seen the demolition notice photo. Where do you go with them first?",
       "lead": "You are about to take down the year-end party photo still on the pantry wall when the group chat pings."
@@ -491,7 +491,7 @@ export default {
           "label": "Trace why demolition moved up"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January · Cold Wave · Demolition in 72h",
       "question": "Six originals behind the standard you left are inside a building about to be razed. How do you turn the document back toward its originals?",
       "lead": "Ban Jaewook, who has been counting footnotes in the board materials, drags his chair over to your desk."
@@ -521,7 +521,7 @@ export default {
           "label": "Trace why demolition moved up"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January · Cold Wave · Demolition in 72h",
       "question": "Three months has shrunk to three days. How do you keep the promise you made on New Year’s Eve?",
       "lead": "The number you got on New Year’s Eve rings at eight on Monday morning."

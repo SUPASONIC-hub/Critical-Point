@@ -31,7 +31,7 @@ export default {
           "label": "Find where the executives went"
         }
       },
-      "place": "KD Financial Group Headquarters, 33rd Floor · Group Strategy Office",
+      "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
       "clock": "March 27 · Friday 21:40",
       "question": "On the desk in the empty office lies a personnel notice with your name on it. What do you do with this paper?",
       "lead": "On the night Trigger Lab’s lights went out and a text said 'Come up,' the elevator to the 33rd floor rises without stopping once."
@@ -462,7 +462,7 @@ export default {
           "label": "Find where the executives went"
         }
       },
-      "place": "KD Financial Group Headquarters, 33rd Floor · Group Strategy Office",
+      "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
       "clock": "March 28 · Saturday Before Dawn 04:20",
       "question": "You left the colleagues who waited all night in the lobby and stand before the empty office. How do you end this dawn?",
       "lead": "The six who stayed up all night on the dark 4th floor cross the river in two taxis before sunrise."
@@ -492,7 +492,7 @@ export default {
           "label": "Find where the executives went"
         }
       },
-      "place": "KD Financial Group Headquarters, 33rd Floor · Group Strategy Office",
+      "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
       "clock": "March 27 · Friday 22:50",
       "question": "Your request followed Yoon Sanghyuk over to the new company. What do you do about that transfer mark?",
       "lead": "Following the address on the request received 2 minutes before the dissolution, you go up to the 33rd floor with the receipt slip."
@@ -522,7 +522,7 @@ export default {
           "label": "Find where the executives went"
         }
       },
-      "place": "KD Financial Group Headquarters, 33rd Floor · Group Strategy Office",
+      "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
       "clock": "March 27 · Friday 18:26",
       "question": "The man who told you to come up passed you on his way down. How do you prove you crossed paths?",
       "lead": "The taxi you caught the moment the lights went out reached Yeouido, and the button for 33 was still lit. On the floor where the doors open, there is only a teacup still warm."

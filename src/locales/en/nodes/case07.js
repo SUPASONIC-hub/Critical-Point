@@ -149,7 +149,7 @@ export default {
           "label": "In front of Oh Jinwoo, write only your own name"
         },
         "reframe": {
-          "label": "Change the table one last time with a proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Trigger Lab, 4th floor · Oh Jinwoo’s desk",
@@ -245,7 +245,7 @@ export default {
           "label": "Leave the ticket and send the files first"
         }
       },
-      "place": "Hoegi-dong secondhand bookshop, 2nd floor · stair landing",
+      "place": "Hoegi-dong Secondhand Bookshop 2nd Floor · Stair Landing",
       "clock": "Transfer in 19h",
       "question": "General Affairs has already issued a one-way ticket to Gangneung at 06:40. What do you do with it?"
     },

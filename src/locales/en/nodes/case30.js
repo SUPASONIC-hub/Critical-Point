@@ -31,7 +31,7 @@ export default {
           "label": "Pull every group data contract"
         }
       },
-      "place": "KD Capital, 12th Floor · Risk Management Department",
+      "place": "KD Capital 12th Floor · Risk Management Department",
       "clock": "Wednesday, First Week of June · 07:12",
       "question": "The records of six scattered people were sold off in a single contract. How do you answer this photo?",
       "lead": "On the fifth morning since you got back from Singapore, the lights in Yoon Sanghyuk’s CEO office are still off."
@@ -490,7 +490,7 @@ export default {
           "label": "Pull every group data contract"
         }
       },
-      "place": "KD Capital, 12th Floor · Risk Management Department",
+      "place": "KD Capital 12th Floor · Risk Management Department",
       "clock": "Wednesday, First Week of June · 13:00",
       "question": "The annex you filed with the Audit Committee and the new contract came out in the same spring, under the same CEO. How do you handle the two documents?",
       "lead": "A day since you put the folder in the Audit Committee’s inbox, you refresh your mail for the 20th time."

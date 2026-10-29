@@ -31,7 +31,7 @@ export default {
           "label": "Count names on 'personal error'"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Permanent-post interview D-6 · Exam D-6",
       "question": "The condition for a permanent post is a signature admitting the 11 seconds as her own error. What do you do first?",
       "lead": "It is the first time anyone from HR has come to this 4th floor since Trigger Lab opened. The smell of tangerines arrives first."
@@ -200,7 +200,7 @@ export default {
           "label": "Put off the withdrawal until after the interview"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room · Night",
+      "place": "Trigger Lab, 4th-floor analyst room · Night",
       "clock": "Permanent-post interview D-3 · 23:10",
       "question": "The confirmation’s supporting document No. 1 is Oh Jinwoo’s old report. How do you end that report?"
     },
@@ -461,7 +461,7 @@ export default {
           "label": "Count names on 'personal error'"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Permanent-post interview D-6 · Exam D-6",
       "question": "The blackboard line about not signing what you don’t understand has reached someone asked to sign knowing full well. How do you hand her that line?",
       "lead": "2 weeks since the dictation test, and the blackboard photo is still Do Yoonha’s phone wallpaper."
@@ -491,7 +491,7 @@ export default {
           "label": "Count names on 'personal error'"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Permanent-post interview D-6 · Exam D-6",
       "question": "The person who registered a document that corrects the record is asked to sign one that erases it. What do you do?",
       "lead": "2 weeks after the registration notice, an HR envelope lands on Lee Minseo’s desk."
@@ -521,7 +521,7 @@ export default {
           "label": "Count names on 'personal error'"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Permanent-post interview D-6 · Exam D-6",
       "question": "You read Lee Minseo’s confirmation before she did. Now that the envelope has formally arrived, what do you do first?",
       "lead": "2 weeks after you saw the papers in the HR hallway, the same envelope lands formally on Lee Minseo’s desk."

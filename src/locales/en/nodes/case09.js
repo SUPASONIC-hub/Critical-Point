@@ -31,7 +31,7 @@ export default {
           "label": "Add the cost nobody counted"
         }
       },
-      "place": "FlowOn headquarters, 8th-floor situation room",
+      "place": "FlowOn HQ, 8th-floor situation room",
       "clock": "Creditors’ vote in 60h",
       "question": "The company from the 72 hours is up for liquidation this time. Where do you start?",
       "lead": "The same situation room, 3 years on. On the whiteboard, the '72h' someone wrote back then is still there, half erased."
@@ -148,7 +148,7 @@ export default {
           "label": "File only the rescue sheet and fold away the complaint"
         },
         "reframe": {
-          "label": "Reframe the table one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "FlowOn creditors’ meeting room",
@@ -458,7 +458,7 @@ export default {
           "label": "Add the cost nobody counted"
         }
       },
-      "place": "FlowOn headquarters, 8th-floor situation room",
+      "place": "FlowOn HQ, 8th-floor situation room",
       "clock": "Creditors’ vote in 60h",
       "question": "The investigation is slow and the vote is fast. Where do you start looking for the people the record couldn’t save?",
       "lead": "The trace sheet became an official record, but the investigation’s start date is still blank. Meanwhile the liquidation item came up first."
@@ -488,7 +488,7 @@ export default {
           "label": "Add the cost nobody counted"
         }
       },
-      "place": "FlowOn headquarters, 8th-floor situation room",
+      "place": "FlowOn HQ, 8th-floor situation room",
       "clock": "Creditors’ vote in 60h",
       "question": "Oh Jinwoo wants to do something other than revenge. Where do you start?",
       "lead": "It’s the day after the rice soup near his rented room. Only now does Oh Jinwoo mention that Kwon Dohyun was his college classmate."
@@ -518,7 +518,7 @@ export default {
           "label": "Add the cost nobody counted"
         }
       },
-      "place": "FlowOn headquarters, 8th-floor situation room",
+      "place": "FlowOn HQ, 8th-floor situation room",
       "clock": "Creditors’ vote in 60h",
       "question": "The bank pushing liquidation is on the trace sheet only you hold. Where do you start?",
       "lead": "The time has come to use the trace sheet you held alone. The trouble is, a blade can punish but cannot save."

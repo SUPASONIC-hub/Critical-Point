@@ -31,7 +31,7 @@ export default {
           "label": "Look into who was rejected"
         }
       },
-      "place": "Mangwon Market · Gaeul Rice Cake Shop",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Saturday after the broadcast · Heat wave warning 14:00",
       "question": "Moon Hajun, in his 3rd year of high school, was rejected with 41 points and no interview. What do you do first?",
       "lead": "The day after the documentary aired, a Saturday afternoon on the third day of the heat wave warning, Moon Hajun holds out his phone in front of the fan at the Gaeul Rice Cake Shop."
@@ -93,7 +93,7 @@ export default {
           "label": "Open FitScore’s 4 billion approval"
         }
       },
-      "place": "Pangyo · KD Data Lab · Data Center",
+      "place": "KD Data Lab, Pangyo · Data Center",
       "clock": "Tuesday, 3rd week of August · 02:10",
       "question": "The reference point that failed Hajun was your record. What do you do with this fact?",
       "lead": "At 2 a.m., Ryu Seah calls you deep into the data center, saying she has found the record the model uses as its yardstick when it gives a low score."
@@ -124,7 +124,7 @@ export default {
           "label": "Open FitScore’s 4 billion approval"
         }
       },
-      "place": "Mangwon Market · Gaeul Rice Cake Shop",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Wednesday, 3rd week of August · Heat wave 19:00",
       "question": "FitScore’s CEO scored 44 on her own test and failed. What do you ask of her now?",
       "lead": "Moon Gaeul called FitScore herself and told them to 'come and explain,' and to everyone’s surprise Hong Yedam opens the rice cake shop door alone."
@@ -149,7 +149,7 @@ export default {
           "label": "Cut the KD records contract and stop the service tonight"
         },
         "reframe": {
-          "label": "Reframe the table one last time and propose"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Seongsu-dong · FitScore · Boardroom",
@@ -177,7 +177,7 @@ export default {
           "label": "Document the 41 Club list as material for the hearing"
         }
       },
-      "place": "Mangwon Market · Gaeul Rice Cake Shop · Out Front",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market · Out front",
       "clock": "Saturday, 3rd week of August · Heat wave 18:00",
       "question": "On the evening of the first day of the rice cake shop job, one hearing question comes to you. How do you close this evening?"
     },
@@ -200,7 +200,7 @@ export default {
           "label": "Formally send a request to explain the weight table"
         }
       },
-      "place": "Pangyo · KD Data Lab · Server Room",
+      "place": "KD Data Lab, Pangyo · Server Room",
       "clock": "Monday, 3rd week of August · 23:00",
       "question": "The heaviest penalty item is hesitation time. What do you do with this configuration file?"
     },
@@ -246,7 +246,7 @@ export default {
           "label": "Screenshot the notice and post a rebuttal today"
         }
       },
-      "place": "Yeouido · Bridge Bank · Lobby",
+      "place": "Bridge Bank, Yeouido · Lobby",
       "clock": "Thursday, 3rd week of August · 08:00",
       "question": "KD Financial Group will screen next week’s 420 hires with this test. The notice is up today. What do you do first?"
     },
@@ -461,7 +461,7 @@ export default {
           "label": "Look into who was rejected"
         }
       },
-      "place": "Mangwon Market · Gaeul Rice Cake Shop",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Saturday after the broadcast · Heat wave warning 15:00",
       "question": "The 41-point text you put off to stay at the editing room waits at the rice cake shop. Who do you start this with?",
       "lead": "One by one, the people who spent the night in the editing room come back to the rice cake shop and tie on aprons."
@@ -674,7 +674,7 @@ export default {
     },
     "outcomes": {
       "c40_after_warm": {
-        "tag": "Stayed Beside",
+        "tag": "Stayed Beside Them",
         "title": "You stayed through Hajun’s first shift until the shutter came down",
         "text": "On the first day of a part-timer hired without a test, everyone at the rice cake shop tied on an apron. On the first wage envelope, in Moon Gaeul’s handwriting: '100 points.'"
       },

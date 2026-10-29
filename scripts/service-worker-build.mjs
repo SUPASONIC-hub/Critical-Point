@@ -112,13 +112,15 @@ const sameOriginPath = (value) => (/^\/[^/]/.test(value) ? value.split(/[?#]/)[0
 /**
  * Every file the built page names on its own origin, in the order it names
  * them. `<link>` and `<script>` only: the `og:image` in a `<meta>` is for a
- * crawler, and the page never loads it. `rel="canonical"` is the page itself.
+ * crawler, and the page never loads it. `rel="canonical"` is the page itself,
+ * and so is each `rel="alternate"` (hreflang, `/?lang=en`): kept, `/` would be
+ * fetched as a file, answer with a page, and fail the install.
  */
 export function precacheFromHtml(html) {
   const paths = new Set();
   for (const match of String(html ?? "").matchAll(/<(link|script)\b([^>]*)>/gi)) {
     const attributes = match[2];
-    if (/\brel\s*=\s*["']canonical["']/i.test(attributes)) continue;
+    if (/\brel\s*=\s*["'](?:canonical|alternate)["']/i.test(attributes)) continue;
     const single = /\b(?:href|src)\s*=\s*["']([^"']+)["']/i.exec(attributes)?.[1];
     const set = /\bimagesrcset\s*=\s*["']([^"']+)["']/i.exec(attributes)?.[1];
     const named = [single, ...(set ?? "").split(",").map((entry) => entry.trim().split(/\s+/)[0])];

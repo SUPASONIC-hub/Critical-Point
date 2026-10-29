@@ -674,17 +674,17 @@ export default {
     },
     "outcomes": {
       "c43_after_warm": {
-        "tag": "The Ending Where You Stayed Close",
+        "tag": "Stayed Beside Them",
         "title": "You stayed till dawn with the people who held the hallway",
         "text": "The dismissal passed 5 to 3. You stayed till dawn with the one-share group, who came up to the 33rd-floor hallway and waited, and with Yoon Seojin, who had watched her father."
       },
       "c43_after_record": {
-        "tag": "The Ending Kept on Record",
+        "tag": "Left on Record",
         "title": "The day of the vote was kept line by line, with the date",
         "text": "From the opening to the wording of the last line, you wrote down today’s vote line by line. When, and from whose hand, the sentence 'inquiry into responsibility concluded' came is now on record."
       },
       "c43_after_rush": {
-        "tag": "The Ending Where You Ran Ahead",
+        "tag": "Ran Ahead",
         "title": "From the hallway where the dismissal passed, you went straight to court",
         "text": "You left the rice-cake boxes and the 20 in the hallway and headed for Seocho-dong. The few days left until the first-instance sentencing began on a chair in the court’s civil petitions office."
       }

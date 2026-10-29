@@ -62,7 +62,7 @@ export default {
           "label": "Open the room host’s account"
         }
       },
-      "place": "Mangwon Market · Gaeul Rice Cake Shop",
+      "place": "Gaeul Rice Cake Shop, Mangwon Market",
       "clock": "Tuesday, late September · 14:00",
       "question": "Everyone hands you one thing to take to the 33rd floor. What will you do with them?",
       "lead": "The shutter of the rice cake shop is half down after the holiday rush, and under it you see familiar shoes."
@@ -268,7 +268,7 @@ export default {
           "label": "Allow the reporting with an embargo until the meeting ends"
         }
       },
-      "place": "Secondhand bookshop in Hoegi-dong, 1st floor · Between the shelves",
+      "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
       "clock": "Tuesday, late September · 19:00",
       "question": "Seo Harin wants to write up tomorrow’s meeting. How far will you let her go?"
     },
@@ -336,7 +336,7 @@ export default {
           "label": "Promise Moon Sungho you’ll see it through tomorrow"
         }
       },
-      "place": "Memorial park in Incheon · Columbarium",
+      "place": "Incheon memorial park · Columbarium",
       "clock": "Tuesday, late September · 16:00",
       "question": "Behind a new glass door two rows over lies the back page of the dissent. What will you do here?"
     },
@@ -360,7 +360,7 @@ export default {
           "label": "Leave the pen by the 1st-floor portrait; go up without it"
         }
       },
-      "place": "Memorial park in Incheon · Bench",
+      "place": "Incheon memorial park · Bench",
       "clock": "Tuesday, late September · 16:40",
       "question": "Lim Kyungsoo’s fountain pen, which you took to the last review committee, is still in your pocket. What will you do with it tomorrow?"
     },
@@ -674,7 +674,7 @@ export default {
     },
     "outcomes": {
       "c49_after_warm": {
-        "tag": "The Ending That Stayed to the End",
+        "tag": "Stayed to the End",
         "title": "You stayed with everyone in the bookshop alley until the moon set",
         "text": "Yoon Sanghyuk told you to come up now, but you waited for the promised night. One cup of instant noodles was empty; the other stayed in your bag."
       },
@@ -684,7 +684,7 @@ export default {
         "text": "The notebook, the list, the back page, the last calculation: all of it gathered in front of one publish button. The only empty field is the original folder in B2."
       },
       "c49_after_rush": {
-        "tag": "The Ending That Went Straight Up",
+        "tag": "Went Straight Up",
         "title": "You went to the 33rd floor the moment the text came",
         "text": "While the people in the alley shared cup noodles, you caught a taxi. The lights in the 33rd-floor corridor were off."
       }
