@@ -75,7 +75,7 @@ export function captionSentences(text = "") {
 }
 
 /** For each speech, the name the narration last gave before it, or null. */
-export function speechOwners(text, spans, names) {
+function speechOwners(text, spans, names) {
   const inSpeech = (offset) => spans.some((span) => offset >= span.start && offset < span.end);
   const mentions = [];
   for (const name of names) {

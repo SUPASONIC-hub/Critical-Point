@@ -4,6 +4,11 @@ import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { formatMultiplier, formatNumber } from "./tableReadout.js";
 import { objectParticle } from "../playerLanguage.js";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
+
+// The record's words (src/copy/table.js).
+const say = tableCopy.ledger;
 
 /**
  * The case's table record: what went into the vault, what the walls took, and
@@ -17,53 +22,53 @@ export function GauntletLedger({ log = [], summary = null }) {
   const relics = normalizeRelicIds(summary?.relics);
   const potLost = formatNumber(ledger.potLost);
   const note = ledger.busts > 0
-    ? `벽에 ${ledger.busts}번 닿아 판돈 ${potLost}${objectParticle(potLost)} 잃었다. 금고에 들어간 것만 남는다.`
+    ? fill(say.lost, { busts: ledger.busts, pot: potLost, particle: objectParticle(potLost) })
     : ledger.cashes > 0
-      ? "한 번도 벽에 닿지 않았다. 더 밀 수 있었는지는 벽만 안다."
-      : "아직 테이블에 앉지 않았다.";
+      ? say.clean
+      : say.unplayed;
   const audit = describeAuditLedger(log, summary?.weekRule);
   return (
-    <section className="pressure-ledger" aria-label="테이블 장부">
+    <section className="pressure-ledger" aria-label={say.title}>
       <div className="panel-title-row">
-        <h2>테이블 장부</h2>
-        <span>금고로 들어간 것과, 벽이 가져간 것</span>
+        <h2>{say.title}</h2>
+        <span>{say.subtitle}</span>
       </div>
       <div className="pressure-ledger-grid">
         <article>
-          <span>금고</span>
+          <span>{say.vault}</span>
           <b className={vault > 0 ? "gain" : ""}>{formatNumber(vault)}</b>
-          <small>시즌 누적</small>
+          <small>{say.season}</small>
         </article>
         <article>
-          <span>최고 배율</span>
+          <span>{say.best}</span>
           <b>{formatMultiplier(ledger.bestMultiplier)}</b>
-          <small>확정 {ledger.cashes}회</small>
+          <small>{fill(say.cashes, { count: ledger.cashes })}</small>
         </article>
         <article>
           <span lang="en">BUST</span>
           <b className={ledger.busts > 0 ? "cost" : ""}>{ledger.busts}</b>
-          <small>밀어붙임 {ledger.pushes}회</small>
+          <small>{fill(say.pushes, { count: ledger.pushes })}</small>
         </article>
         <article>
-          <span>논리 콤보</span>
+          <span>{say.combo}</span>
           <b className={ledger.bestLogic > 0 ? "gain" : ""}>{ledger.bestLogic}</b>
-          <small>이 사건 최고</small>
+          <small>{say.caseBest}</small>
         </article>
         <article>
-          <span>콤보 판돈</span>
+          <span>{say.comboPot}</span>
           <b className={ledger.grooveBanked > 0 ? "gain" : ""}>{formatNumber(ledger.grooveBanked)}</b>
-          <small>콤보가 얹은 몫</small>
+          <small>{say.comboShare}</small>
         </article>
         <article>
-          <span>잃은 판돈</span>
+          <span>{say.potLost}</span>
           <b className={ledger.potLost > 0 ? "cost" : ""}>{formatNumber(ledger.potLost)}</b>
-          <small>번 판돈 {formatNumber(ledger.potBanked)}</small>
+          <small>{fill(say.potBanked, { pot: formatNumber(ledger.potBanked) })}</small>
         </article>
       </div>
       <p className="pressure-ledger-note">{audit ? `${note} ${audit}` : note}</p>
       {relics.length > 0 && (
         <p className="pressure-ledger-relics" data-testid="ledger-relics">
-          <span>장착한 도구</span>
+          <span>{say.relics}</span>
           {relics.map((id) => (
             <b key={id}>
               <RelicIcon id={id} size={12} /> {RELICS[id].name}

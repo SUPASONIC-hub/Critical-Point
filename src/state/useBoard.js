@@ -14,6 +14,11 @@ import {
 // gameLogic.js drags the whole season into the entry chunk. See privacyText.js.
 import { anonymizeSensitiveText, detectPrivacySignals } from "../privacyText.js";
 import { fetchBoardPosts, getBoardWriterId, saveBoardPost } from "../telemetry.js";
+import boardPostCopy from "../copy/boardPost.js";
+import { fill } from "../locale.js";
+
+// What the hook says, from src/copy/boardPost.js (another language is laid over it there).
+const W = boardPostCopy;
 
 /**
  * Owns the 참가자 게시판: the posts the board screen lists, and the one the
@@ -108,13 +113,7 @@ export function getBoardPostRefusal(nickname, body) {
   return null;
 }
 
-const BOARD_REFUSAL_COPY = {
-  "nickname-characters": "이름은 2자 이상 24자 이하로 적어 주세요.",
-  "body-characters": "글은 2자 이상 300자 이하로 적어 주세요.",
-  "nickname-link": "이름에는 링크를 넣을 수 없습니다. 이름을 바꿔 다시 올려 주세요.",
-  "body-link": "링크가 들어간 글은 올릴 수 없습니다. 링크를 빼고 다시 올려 주세요.",
-  contact: "전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.",
-};
+const BOARD_REFUSAL_COPY = W.refusals;
 
 /**
  * Whether this page already put these words on the board. The server takes
@@ -200,19 +199,19 @@ export function getBoardSubmitBlock({ boardStatus, isPosting = false, privacySig
  */
 export function checkBoardSubmit({ honeypot = "", sinceOpenedMs, privacySignalCount = 0, nickname, body, sinceLastPostMs = null }) {
   if (honeypot.trim().length > 0) {
-    return { reason: "honeypot", message: "자동으로 채워진 칸이 있어 글을 올리지 않았습니다. 다시 눌러 주세요." };
+    return { reason: "honeypot", message: W.honeypot };
   }
   if (sinceOpenedMs < BOARD_DWELL_MS) {
-    return { reason: "dwell", message: "게시판이 열린 지 얼마 되지 않았습니다. 잠깐 읽어 보고 다시 눌러 주세요." };
+    return { reason: "dwell", message: W.dwell };
   }
   if (privacySignalCount > 0) {
-    return { reason: "privacy", message: "식별 정보로 보일 수 있는 표현을 익명화한 뒤 올려 주세요." };
+    return { reason: "privacy", message: W.privacy };
   }
   const refusal = getBoardPostRefusal(nickname, body);
   if (refusal) return { reason: refusal, message: BOARD_REFUSAL_COPY[refusal] };
   if (sinceLastPostMs !== null && sinceLastPostMs < BOARD_POST_INTERVAL_MS) {
     const waitSeconds = Math.ceil((BOARD_POST_INTERVAL_MS - sinceLastPostMs) / 1000);
-    return { reason: "interval", message: `글은 30초에 한 번만 올릴 수 있습니다. ${waitSeconds}초 뒤에 다시 눌러 주세요.` };
+    return { reason: "interval", message: fill(W.interval, { seconds: waitSeconds }) };
   }
   return null;
 }
@@ -238,13 +237,13 @@ function describeBoardFailure(error, isOnline) {
   if (/must not contain contact details/.test(message)) return BOARD_REFUSAL_COPY.contact;
   // Someone else on the same network wrote the same words. That used to be
   // answered with "글을 올렸습니다" for a post that was stored nowhere.
-  if (/repeats a recent post/.test(message)) return "같은 글이 조금 전에 올라와 있습니다. 표현을 바꿔 다시 올려 주세요.";
-  if (/at least 30 seconds apart/.test(message)) return "글은 30초에 한 번만 올릴 수 있습니다. 잠시 뒤에 다시 눌러 주세요.";
-  if (/rate limit exceeded/.test(message)) return "한 시간에 10번까지만 올릴 수 있습니다. 시간을 두고 다시 찾아와 주세요.";
+  if (/repeats a recent post/.test(message)) return W.failures.repeat;
+  if (/at least 30 seconds apart/.test(message)) return W.failures.interval;
+  if (/rate limit exceeded/.test(message)) return W.failures.limit;
   if (/nickname must be/.test(message)) return BOARD_REFUSAL_COPY["nickname-characters"];
   if (/post must be/.test(message)) return BOARD_REFUSAL_COPY["body-characters"];
-  if (!isOnline) return "오프라인이라 글을 올리지 못했습니다. 연결된 뒤에 다시 눌러 주세요.";
-  return "글을 올리지 못했습니다. 잠시 뒤에 다시 눌러 주세요.";
+  if (!isOnline) return W.failures.offline;
+  return W.failures.failed;
 }
 
 export function useBoard({ showBoard, isOnline }) {
@@ -284,7 +283,7 @@ export function useBoard({ showBoard, isOnline }) {
         if (cancelled) return;
         setBoardPosts(rows.map(normalizeBoardPost));
         setBoardStatus(skipped ? "local" : "ready");
-        setBoardError(skipped ? "이 배포에는 게시판 서버가 없어 글을 주고받을 수 없습니다." : "");
+        setBoardError(skipped ? W.noServer : "");
       })
       .catch((error) => {
         if (cancelled) return;
@@ -294,8 +293,8 @@ export function useBoard({ showBoard, isOnline }) {
         setBoardStatus(isOnline ? "error" : "local");
         setBoardError(
           isOnline
-            ? "게시판을 불러오지 못했습니다. 아래에서 다시 불러올 수 있습니다."
-            : "오프라인이라 게시판을 불러오지 못했습니다. 연결되면 다시 열립니다.",
+            ? W.loadFailed
+            : W.loadOffline,
         );
       });
     return () => {
@@ -349,7 +348,7 @@ export function useBoard({ showBoard, isOnline }) {
       return;
     }
     if (isOwnRecentPost(readOwnBoardPosts(), trimmedBoardBody)) {
-      setBoardPostStatus("같은 글을 이미 올렸습니다. 같은 글은 게시판에 한 번만 실립니다.");
+      setBoardPostStatus(W.alreadyPosted);
       return;
     }
 
@@ -369,13 +368,13 @@ export function useBoard({ showBoard, isOnline }) {
         eventId,
       );
       if (skipped) {
-        setBoardPostStatus("이 배포에는 게시판 서버가 없어 글을 올리지 못했습니다.");
+        setBoardPostStatus(W.noServerPost);
         return;
       }
       setBoardBodyState("");
       setLastBoardPostAt(Date.now());
       rememberOwnBoardPost(trimmedBoardBody);
-      setBoardPostStatus("글을 올렸습니다.");
+      setBoardPostStatus(W.posted);
       reloadBoard();
     } catch (error) {
       console.warn(error);

@@ -83,7 +83,7 @@ export function getOfferedTypes(node, standing) {
  * table skips the scene the room plays without the analyst (`getBlackoutSkip`).
  * `caseClosed` is whether that scene is the case's result.
  */
-export function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, reframeCount = 0 }, { choice, window }) {
+function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, reframeCount = 0 }, { choice, window }) {
   const reframe = choice.type === "reframe";
   // A reframe that busts is still a reframe the player paid for, but it does
   // not open a door: the wall took the window before the new board was laid.
