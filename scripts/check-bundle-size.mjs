@@ -83,7 +83,8 @@ const budgets = [
   // axis) on #224 253e8e93: measured 142,907 / 52,362 in the e2e build, the
   // gzip plus 4. The score breakdown's 판 읽기 row and the case summary's
   // readingScore.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_806, maxGzip: 55_026 },
+  // 149,806 / 55,026 -> 149,965 / 55,098 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's 판 읽기 row read by key and the case summary's readingScore. Measured 149,965 / 55,094, the gzip plus 4 in the e2e build.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_965, maxGzip: 55_098 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -100,7 +101,8 @@ const budgets = [
   // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
   // it now), getReadingScore, and the seventh weight. 13,480 in a second build
   // on #224 0c989ba7 (the hashes), so 13,484.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_281, maxGzip: 13_719 },
+  // 35,281 / 13,719 -> 35,620 / 13,836 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: getCaseRead, getReadingScore and the seventh weight on #224's season mean. Measured 35,620 / 13,832, the gzip plus 4 in the e2e build.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_620, maxGzip: 13_836 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -573,7 +575,8 @@ const budgets = [
   // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
   // axis) on #224 0c989ba7: the score breakdown's seventh card, the penalty
   // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_229, maxGzip: 36_558 },
+  // 196,229 / 36,558 -> 196,282 / 36,566 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's seventh card, the penalty card taking its row. Measured 196,282 / 36,562, the gzip plus 4 in the e2e build.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_282, maxGzip: 36_566 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1066,7 +1069,8 @@ const budgets = [
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
   // 152,779 / 51,787 -> 152,864 / 51,822 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the Japanese of 프롤로그 04's audit-and-links line, the ranking's intro and past best, the link tag, less the audit and cascade weeks. Measured 152,864 / 51,818, the gzip plus 4 in the e2e build.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 152_864, maxGzip: 51_822 },
+  // 152,864 / 51,822 -> 153,069 / 51,893 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the Japanese of the 판 읽기 card (勝負の読み) and its note. Measured 153,069 / 51,889; the raw is the measurement, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_069, maxGzip: 51_893 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1142,8 +1146,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * recovery notice merged, Japanese 477,908.
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
+ * C-1(1) (the 판 읽기 axis) merged with #224 602ec69b (10-29): the seventh score card's CSS in the
+ * critical sheet and its words in the dictionaries put English at 472,236 and Japanese at 478,009,
+ * the plus 4; Korean (422,764) stays under.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_179, ja: 477_926 };
+const FIRST_PAINT_BUDGETS = { ko: 422_779, en: 472_236, ja: 478_009 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
