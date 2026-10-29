@@ -540,7 +540,9 @@ const budgets = [
   // (the font's thin half cut, scripts/build-fonts.mjs). Measured 195,847 / 36,467; the gzip stays under its line.
   // -> 196,068 / 36,533 on 2026-10-29, lang-full: the recovery notice sits above the fixed
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_068, maxGzip: 36_533 },
+  // -> 196,140 / 36,563 on 2026-10-29, intro-en-fit: a Japanese page on a phone of 360px or less draws the
+  // premise at 14px / 1.6 (base-intro-ranking.css). Measured 196,140 / 36,559 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_140, maxGzip: 36_563 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -998,8 +1000,8 @@ const budgets = [
   // 110,001 / 38,601 -> 152,779 / 51,777 on 2026-10-28, lang-full: the Japanese screen copy of English steps three and four
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
-  // 152,779 / 51,787 -> 153,121 / 51,906 on 2026-10-29, gate-reason-copy (with lang-layout-check): the locked card's condition in Japanese and the shorter fourth and wild cards. Measured 153,117 / 51,902, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_121, maxGzip: 51_906 },
+  // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_061, maxGzip: 51_897 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1077,10 +1079,15 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * lang-extras) and the policy links open the page's own language:
  * 422,950, 472,350 and 478,077; with lang-terms (main b7228340) and the
  * service worker skipping rel="alternate", 422,948, 472,339 and 478,083.
- * A locked card's condition in English and Japanese (gate-reason-copy, 10-29,
- * with lang-layout-check's shorter cards): 422,949, 472,429 and 478,202.
+ * The Japanese premise drawn smaller on a narrow phone (intro-en-fit, 10-29)
+ * puts the Korean at 422,964 (the critical CSS carries the rule); English
+ * 472,329 and Japanese 478,085 stay under their lines. Merged over main
+ * 4ad6f059 (#372's shorter English and Japanese card labels): 422,977, 472,339
+ * and 478,095.
+ * A locked card's condition in English and Japanese (gate-reason-copy, over
+ * main d109b66b): 422,978, 472,430 and 478,220.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_954, en: 472_433, ja: 478_206 };
+const FIRST_PAINT_BUDGETS = { ko: 422_981, en: 472_434, ja: 478_224 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

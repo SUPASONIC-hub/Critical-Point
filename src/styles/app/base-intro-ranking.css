@@ -3111,6 +3111,13 @@ body {
   .intro-kicker {
     border-radius: var(--ui-radius-md);
   }
+  /* Japanese falls back to the system's CJK face, wider than the Korean one
+     (Linux CI measured the premise at ten lines where Korean takes eight), and
+     the start button left a 320px first screen (10-29). */
+  :lang(ja) .intro-hero-copy > p:not([class]) {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
 }
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
