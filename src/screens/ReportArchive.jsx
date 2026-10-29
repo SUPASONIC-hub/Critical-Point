@@ -3,6 +3,8 @@ import { Copy, MessageSquareText, Sparkles } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { GauntletLedger } from "../gauntlet/GauntletLedger.jsx";
 import * as gameConstants from "../gameConstants.js";
+import reportCopy from "../copy/report.js";
+import { fill } from "../locale.js";
 
 /**
  * Act three of the report: everything it used to open with, folded.
@@ -43,6 +45,8 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     },
     debug: { debugToolsEnabled },
   } = view;
+  // A forecast that moves the risk by nothing is 「유지」 in the page's words (src/copy/report.js).
+  const riskDelta = (value) => formatRiskDelta(value) || reportCopy.risk.held;
   const observerRouteRecords = routeTimeline
     .filter((entry) => entry.observerTag)
     .slice(-4)
@@ -57,8 +61,8 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
   return (
     <details className="report-archive" onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary>
-        <span>전체 기록</span>
-        <b>랭크 근거, 판단 DNA, 경로 지도, 관찰 장부, 선택 로그</b>
+        <span>{reportCopy.summary.title}</span>
+        <b>{reportCopy.summary.contents}</b>
       </summary>
       {open && (
       <div className="report-archive-body">
@@ -68,15 +72,15 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         three comparisons included (useCaseSystems.js, useResultReport.js and
         the functions they call). The ones that still ask can be empty. */}
     {currentCase === "final" && (
-      <section className="operator-reveal-panel" aria-label="주인공 정체 공개">
+      <section className="operator-reveal-panel" aria-label={reportCopy.operatorRevealLabel}>
         <span>{view.operatorReveal.title}</span>
         <p>{view.operatorReveal.text}</p>
       </section>
     )}
     {currentCase === "final" && (
-      <section className="achievement-panel ending-achievement-panel" aria-label="업적 진행">
+      <section className="achievement-panel ending-achievement-panel" aria-label={reportCopy.achievementLabel}>
         <span lang="en">ACHIEVEMENT TRACKER</span>
-        <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "해금" : `${item.value} / ${item.goal}`}</small></article>)}</div>
+        <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? reportCopy.unlocked : `${item.value} / ${item.goal}`}</small></article>)}</div>
       </section>
     )}
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && currentCase === "final" && (
@@ -87,10 +91,10 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       </section>
     )}
     {currentCase === "final" && (
-      <section className="observation-panel" aria-label="관찰 장부">
+      <section className="observation-panel" aria-label={reportCopy.observation.title}>
         <div className="panel-title-row">
-          <h2>관찰 장부</h2>
-          <span>마지막 사건에서 처음 공개되는 네 가지 반응</span>
+          <h2>{reportCopy.observation.title}</h2>
+          <span>{reportCopy.observation.subtitle}</span>
         </div>
         <div className="observer-pattern-card">
           <span>{observerEndingRecord.label}</span>
@@ -107,25 +111,25 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         </div>
       </section>
     )}
-    <section className="ending-scene-profile" aria-label="엔딩 장면 프로필">
+    <section className="ending-scene-profile" aria-label={reportCopy.endingSceneLabel}>
       <span>{endingSceneProfile.location}</span>
       <strong>{endingSceneProfile.cue}</strong>
-      <p>다음 장면의 핵심 행동: {endingSceneProfile.choice}</p>
+      <p>{fill(reportCopy.nextSceneAction, { choice: endingSceneProfile.choice })}</p>
     </section>
-    <section className="ending-preview-panel" aria-label="현재 엔딩 방향">
+    <section className="ending-preview-panel" aria-label={reportCopy.endingDirectionLabel}>
       <span lang="en">ENDING DIRECTION</span>
       <strong>{endingPreview.label}</strong>
       <p>{endingPreview.text}</p>
     </section>
-    <p className="ending-rationale">엔딩 근거: {endingPreview.rationale.join(" · ")}</p>
-    <section className="authority-review-panel" aria-label="권한 심사">
+    <p className="ending-rationale">{fill(reportCopy.endingRationale, { rationale: endingPreview.rationale.join(" · ") })}</p>
+    <section className="authority-review-panel" aria-label={reportCopy.authorityLabel}>
       <span>{view.authorityReview.title}</span>
       <strong>{view.authorityReview.text}</strong>
       <p>{view.authorityReview.next}</p>
     </section>
     <p className="origin-ending-note"><strong>{view.originEndingVariant.label}</strong> {view.originEndingVariant.text}</p>
     {view.failureObjectives?.length > 0 && (
-      <section className="failure-objectives" aria-label="실패 재도전 목표">
+      <section className="failure-objectives" aria-label={reportCopy.failureObjectivesLabel}>
         <strong lang="en">RETRY OBJECTIVES</strong>
         {view.failureObjectives.map((objective) => <span key={objective}>□ {objective}</span>)}
         {view.seasonStanding.harmCases.map((item) => <button type="button" key={item.caseId} onClick={() => view.startCase(item.caseId)}>{item.text}</button>)}
@@ -133,10 +137,14 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         <p className="failure-cause"><b lang="en">PRIMARY CAUSE</b> {view.endingCause.text} {view.endingCause.recovery}</p>
       </section>
     )}
-    <section className="play-report-panel" aria-label="플레이 리포트">
+    <section className="play-report-panel" aria-label={reportCopy.playReport.label}>
       <span lang="en">PLAYER REPORT</span>
-      <div><article><b>{view.playReport.decisions}</b><small>결정</small></article><article><b>{view.playReport.clues}</b><small>검증 신호</small></article><article><b>{view.playReport.dominantStyle}</b><small>행동 성향</small></article></div>
-      <p>최근 지나온 장면: {view.playReport.route.join(" → ") || "기록 없음"}</p>
+      <div>
+        <article><b>{view.playReport.decisions}</b><small>{reportCopy.playReport.decisions}</small></article>
+        <article><b>{view.playReport.clues}</b><small>{reportCopy.playReport.clues}</small></article>
+        <article><b>{view.playReport.dominantStyle}</b><small>{reportCopy.playReport.style}</small></article>
+      </div>
+      <p>{fill(reportCopy.playReport.route, { route: view.playReport.route.join(" → ") || reportCopy.playReport.noRoute })}</p>
     </section>
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
       <span lang="en">PLAYTEST HEALTH</span>
@@ -144,32 +152,32 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     </section>}
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && telemetryStats && <p className="telemetry-stats">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
     <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`}><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>
-    <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>
+    <section className="aftermath-panel" aria-label={reportCopy.aftermathLabel}><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary lang="en">REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
     {view.delayedConsequences?.length > 0 && (
-      <section className="delayed-consequence-strip" aria-label="챕터 지연 결과">
+      <section className="delayed-consequence-strip" aria-label={reportCopy.delayedLabel}>
         <span lang="en">CONSEQUENCE CHAIN</span>
         <p>{view.delayedConsequences.map((item) => item.text).join(" ")}</p>
       </section>
     )}
-    <section className="ranking-comparison" aria-label="기록 비교">
+    <section className="ranking-comparison" aria-label={reportCopy.comparisonLabel}>
       <span lang="en">RUN COMPARISON</span>
       {view.rankingComparison.map((item) => <div key={item.label}><b>{item.label}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.value}</small></div>)}
     </section>
-    <section className="season-goal-strip result-goals" aria-label="시즌 목표">
+    <section className="season-goal-strip result-goals" aria-label={reportCopy.seasonGoalsLabel}>
       <span lang="en">SEASON GOALS</span>
       {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
     </section>
     {view.balanceSignals?.length > 0 && (
-      <section className="balance-report" aria-label="플레이 밸런스 리포트">
+      <section className="balance-report" aria-label={reportCopy.balance.label}>
         <span lang="en">BALANCE SIGNAL</span>
-        <p>{view.balanceSignals.map((signal) => `“${signal.label}” ${signal.share}%`).join(" · ")} 선택 편중이 감지되었습니다. 다음 기록에서 다른 선택을 시험해 보세요.</p>
+        <p>{fill(reportCopy.balance.text, { signals: view.balanceSignals.map((signal) => `“${signal.label}” ${signal.share}%`).join(" · ") })}</p>
       </section>
     )}
-    <section className="ending-axis-panel" aria-label="엔딩 결정 축">
+    <section className="ending-axis-panel" aria-label={reportCopy.endingAxis.label}>
       <div className="panel-title-row">
         <h2 lang="en">ENDING AXIS</h2>
-        <span>이번 선택이 남긴 세 가지 방향</span>
+        <span>{reportCopy.endingAxis.subtitle}</span>
       </div>
       <div className="ending-axis-grid">
         {endingAxes.map((axis) => (
@@ -181,7 +189,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         ))}
       </div>
     </section>
-    <section className="fingerprint-panel" aria-label="판단 DNA">
+    <section className="fingerprint-panel" aria-label={reportCopy.fingerprintLabel}>
       <div className="fingerprint-heading">
         <div>
           <span lang="en">DECISION DNA</span>
@@ -189,9 +197,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           <p>{decisionFingerprint.modeText}</p>
           {/* Every run has one: 복합형 when no family led (getThinkingMotive, gameLogic.js). */}
           <p>
-            <b>
-              생각이 깨어나는 조건 · {decisionFingerprint.motive.label}
-            </b>{" "}
+            <b>{fill(reportCopy.motive, { label: decisionFingerprint.motive.label })}</b>{" "}
             {decisionFingerprint.motive.when}. {decisionFingerprint.motive.path}
           </p>
         </div>
@@ -212,17 +218,15 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         </article>
         <article>
           <span lang="en">RISK TRAJECTORY</span>
-          <b>{decisionFingerprint.ledger.netRiskDelta > 0 ? "압박 누적" : "압박 회수"}</b>
-          <small>
-            {decisionFingerprint.ledger.riskDrops}회 하락 · {decisionFingerprint.ledger.riskRises}회 상승
-          </small>
+          <b>{decisionFingerprint.ledger.netRiskDelta > 0 ? reportCopy.risk.rising : reportCopy.risk.falling}</b>
+          <small>{fill(reportCopy.risk.moves, { drops: decisionFingerprint.ledger.riskDrops, rises: decisionFingerprint.ledger.riskRises })}</small>
         </article>
       </div>
     </section>
     <section className="counterfactual-panel" aria-label="Counterfactual Lab">
       <div className="panel-title-row">
         <h2 lang="en">COUNTERFACTUAL LAB</h2>
-        <span>실제 선택과 선택하지 않은 관점의 압박 차이</span>
+        <span>{reportCopy.counterfactual.subtitle}</span>
       </div>
       {counterfactualReport.length > 0 ? (
         <div className="counterfactual-list">
@@ -230,37 +234,35 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
             <article key={report.nodeId}>
               <div className="counterfactual-scene">
                 <span>{report.title}</span>
-                <small>{report.actualWasSafest ? "압박을 낮춘 관점" : "다른 관점과 차이 발생"}</small>
+                <small>{report.actualWasSafest ? reportCopy.counterfactual.safest : reportCopy.counterfactual.differs}</small>
               </div>
               <div className="counterfactual-path actual-path">
                 <b lang="en">ACTUAL</b>
                 <strong>{report.actual.label}</strong>
-                <small>
-                  위험 {report.actualForecast ? formatRiskDelta(report.actualForecast.riskDelta) : "기록"}
-                </small>
+                <small>{fill(reportCopy.risk.delta, { delta: report.actualForecast ? riskDelta(report.actualForecast.riskDelta) : reportCopy.risk.recorded })}</small>
               </div>
               <div className="counterfactual-path safest-path">
                 <b lang="en">LOW PRESSURE LENS</b>
                 <strong>{report.safest.label}</strong>
-                <small>위험 {formatRiskDelta(report.safestForecast.riskDelta)}</small>
+                <small>{fill(reportCopy.risk.delta, { delta: riskDelta(report.safestForecast.riskDelta) })}</small>
               </div>
               <div className="counterfactual-path costliest-path">
                 <b lang="en">HIGH PRESSURE LENS</b>
                 <strong>{report.costliest.label}</strong>
-                <small>위험 {formatRiskDelta(report.costliestForecast.riskDelta)}</small>
+                <small>{fill(reportCopy.risk.delta, { delta: riskDelta(report.costliestForecast.riskDelta) })}</small>
               </div>
             </article>
           ))}
         </div>
       ) : (
-        <p className="counterfactual-empty">선택 로그가 쌓이면 지나간 장면의 다른 경로가 열립니다.</p>
+        <p className="counterfactual-empty">{reportCopy.counterfactual.empty}</p>
       )}
     </section>
     <section className="session-panel">
       <div>
         <span lang="en">PLAYTEST SESSION</span>
         <strong data-testid="session-code">{sessionCode}</strong>
-        <p>기록 삭제를 요청할 때 쓰는 짧은 세션 코드입니다.</p>
+        <p>{reportCopy.session.text}</p>
         <small
           className={`remote-status ${telemetryStatus.tone}`}
           role="status"
@@ -270,14 +272,14 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           {telemetryStatus.text}
         </small>
         {!telemetryEnabled && (
-          <p className="telemetry-explanation">원격 랭킹 설정이 없어 이 브라우저에만 저장됩니다.</p>
+          <p className="telemetry-explanation">{reportCopy.session.noRemote}</p>
         )}
         {telemetryEnabled && !dataConsent && (
-          <p className="telemetry-explanation">데이터 제공 동의가 없어 원격 랭킹에 기록하지 않았습니다.</p>
+          <p className="telemetry-explanation">{reportCopy.session.noConsent}</p>
         )}
         {pendingTelemetry.length > 0 && (
           <div className="retry-telemetry">
-            <b>원격 저장 대기 {pendingTelemetry.length}건</b>
+            <b>{fill(reportCopy.session.pending, { count: pendingTelemetry.length })}</b>
             <p>
               {pendingTelemetry.map((item) => item.label).join(" · ")}
             </p>
@@ -293,7 +295,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
               // 재전송 중), and a disabled button is skipped before they are heard.
               blocked={!telemetryEnabled || !dataConsent || !isOnline || isRetryingTelemetry}
             >
-              {isRetryingTelemetry ? "재전송 중" : isOnline ? "원격 저장 재시도" : "연결 대기 중"}
+              {isRetryingTelemetry ? reportCopy.session.retrying : isOnline ? reportCopy.session.retry : reportCopy.session.waiting}
             </GuardedButton>
           </div>
         )}
@@ -302,7 +304,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           beside it. The button's own text used to be the live region. */}
       <button type="button" onClick={copySessionCode}>
         <Copy size={16} />
-        <span>{copyStatus || "코드 복사"}</span>
+        <span>{copyStatus || reportCopy.session.copyCode}</span>
       </button>
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{copyStatus}</span>
     </section>
@@ -310,9 +312,9 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <div className="panel-title-row">
         <h2>
           <Sparkles size={17} />
-          획득 배지
+          {reportCopy.badges.title}
         </h2>
-        <span>이번 사건의 플레이 스타일입니다.</span>
+        <span>{reportCopy.badges.subtitle}</span>
       </div>
       <div>
         {achievementBadges.map((badge) => (
@@ -327,44 +329,44 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <section className="report-section">
         <h2 lang="en">Primary Trigger</h2>
         <strong>{triggerLabels[result.primary[0]]}</strong>
-        <p>{result.longestDecision?.title ?? "이번 사건"}에서 가장 오래 남은 압박입니다.</p>
+        <p>{fill(reportCopy.sections.primary, { title: result.longestDecision?.title ?? reportCopy.sections.thisCase })}</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Secondary Trigger</h2>
         <strong>{triggerLabels[result.secondary[0]]}</strong>
-        <p>첫 번째 조건을 보조한 압박입니다. 같은 선택 안에서도 명분과 비용이 이 방향으로 다시 흔들렸습니다.</p>
+        <p>{reportCopy.sections.secondary}</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Cognitive Acceleration</h2>
         <strong>{easyCognitionLabels[result.thinking[0]]}</strong>
-        <p>로그상 가장 자주 사용된 생각 방식입니다. 선택을 빠르게 닫기보다 이 방식으로 한 번 더 버티거나 뒤집었습니다.</p>
+        <p>{reportCopy.sections.cognition}</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Reframe</h2>
-        <strong>{result.reframeCount}회</strong>
-        <p>준비된 선택지를 고르는 대신 판을 다시 연 횟수입니다.</p>
+        <strong>{fill(reportCopy.sections.reframeCount, { count: result.reframeCount })}</strong>
+        <p>{reportCopy.sections.reframe}</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Avg Time</h2>
-        <strong>{result.averageResponseTime}초</strong>
-        <p>각 국면에서 결정을 내리기까지 걸린 평균 시간입니다. 짧을수록 선택지가 명확했거나 압박이 약했을 수 있습니다.</p>
+        <strong>{fill(reportCopy.sections.seconds, { seconds: result.averageResponseTime })}</strong>
+        <p>{reportCopy.sections.averageTime}</p>
         {result.decisionPaceLine && <p>{result.decisionPaceLine}</p>}
       </section>
       <section className="report-section wide-report">
         <h2 lang="en">Longest Decision</h2>
-        <strong>{result.longestDecision?.title ?? "없음"}</strong>
-        <p>가장 오래 머문 국면입니다. 이 장면의 메모, 에코 반론, 선택지 비용이 실제 고민을 만들었는지 인터뷰에서 우선 확인합니다.</p>
+        <strong>{result.longestDecision?.title ?? reportCopy.sections.none}</strong>
+        <p>{reportCopy.sections.longest}</p>
       </section>
     </div>
     <section className="route-atlas">
       <div className="panel-title-row">
         <h2>
           <Sparkles size={17} />
-          내가 지나온 경로
+          {reportCopy.route.title}
         </h2>
-        <span>{routeTimeline.length}개 판단 · 마지막 선택이 이번 결말을 만들었습니다.</span>
+        <span>{fill(reportCopy.route.count, { count: routeTimeline.length })}</span>
       </div>
-      <div className="route-atlas-track" role="group" aria-label="이번 플레이 선택 경로" tabIndex={0}>
+      <div className="route-atlas-track" role="group" aria-label={reportCopy.route.trackLabel} tabIndex={0}>
         {routeTimeline.map((entry) => (
           <article className={`route-atlas-node ${entry.marker.tone}`} key={`${entry.nodeId}-${entry.index}`}>
             <div className="route-atlas-dot" aria-hidden="true">{String(entry.index + 1).padStart(2, "0")}</div>
@@ -373,11 +375,11 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
                 <span>{entry.marker.label}</span>
                 {entry.challenge && (
                   <b className={entry.challenge.matched ? "route-hit" : "route-miss"}>
-                    {entry.challenge.matched ? "목표 달성" : "목표 미달"}
+                    {entry.challenge.matched ? reportCopy.route.hit : reportCopy.route.miss}
                   </b>
                 )}
-                {entry.streakBreak && <b className="route-break">연속 끊김</b>}
-                {entry.clue && <b className="route-clue">단서 발견</b>}
+                {entry.streakBreak && <b className="route-break">{reportCopy.route.streakBreak}</b>}
+                {entry.clue && <b className="route-clue">{reportCopy.route.clue}</b>}
                 {entry.routeChangeKind === "memory" && <b className="route-memory" lang="en">MEMORY</b>}
                 {entry.routeChangeKind === "evidence-turn" && <b className="route-turnaround" lang="en">EVIDENCE TURN</b>}
                 {entry.routeChangeKind === "reframe" && <b className="route-system" lang="en">REFRAME</b>}
@@ -391,13 +393,13 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       </div>
     </section>
     {observerRouteRecords.length > 0 && (
-      <section className="observer-postmortem" aria-label="관찰자 회고">
+      <section className="observer-postmortem" aria-label={reportCopy.postmortem.label}>
         <div className="panel-title-row">
           <h2 lang="en">
             <Sparkles size={17} />
             OBSERVER POSTMORTEM
           </h2>
-          <span>이번 보고서의 해석 기준: {observerEndingRecord.label}</span>
+          <span>{fill(reportCopy.postmortem.basis, { label: observerEndingRecord.label })}</span>
         </div>
         <div className="observer-postmortem-grid">
           {observerTurningPoint && (
@@ -421,12 +423,12 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <div className="panel-title-row">
         <h2>
           <MessageSquareText size={17} />
-          플레이테스트 피드백
+          {reportCopy.feedback.title}
         </h2>
-        <span>이 사건이 얼마나 고민됐는지 남겨 주세요.</span>
+        <span>{reportCopy.feedback.subtitle}</span>
       </div>
       <div className="feedback-prompts">
-        <span>이번 사건에서 확인할 질문</span>
+        <span>{reportCopy.feedback.prompts}</span>
         <ul>
           {feedbackPrompts.map((prompt) => (
             <li key={prompt}>{prompt}</li>
@@ -435,31 +437,31 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       </div>
       <div className="feedback-controls">
         <label>
-          <span>이해도</span>
+          <span>{reportCopy.feedback.clarity}</span>
           <select
             value={currentFeedback.clarity}
             onChange={(event) => updateCurrentFeedback({ clarity: event.target.value })}
           >
-            <option value="">선택</option>
-            <option value="1">1 · 거의 이해되지 않음</option>
-            <option value="2">2 · 일부만 이해됨</option>
-            <option value="3">3 · 보통</option>
-            <option value="4">4 · 대체로 명확함</option>
-            <option value="5">5 · 매우 명확함</option>
+            <option value="">{reportCopy.feedback.choose}</option>
+            <option value="1">{reportCopy.feedback.clarityOptions[0]}</option>
+            <option value="2">{reportCopy.feedback.clarityOptions[1]}</option>
+            <option value="3">{reportCopy.feedback.clarityOptions[2]}</option>
+            <option value="4">{reportCopy.feedback.clarityOptions[3]}</option>
+            <option value="5">{reportCopy.feedback.clarityOptions[4]}</option>
           </select>
         </label>
         <label>
-          <span>고민 강도</span>
+          <span>{reportCopy.feedback.difficulty}</span>
           <select
             value={currentFeedback.difficulty}
             onChange={(event) => updateCurrentFeedback({ difficulty: event.target.value })}
           >
-            <option value="">선택</option>
-            <option value="1">1 · 바로 결정함</option>
-            <option value="2">2 · 조금 고민함</option>
-            <option value="3">3 · 보통</option>
-            <option value="4">4 · 꽤 오래 고민함</option>
-            <option value="5">5 · 매우 결정하기 어려움</option>
+            <option value="">{reportCopy.feedback.choose}</option>
+            <option value="1">{reportCopy.feedback.difficultyOptions[0]}</option>
+            <option value="2">{reportCopy.feedback.difficultyOptions[1]}</option>
+            <option value="3">{reportCopy.feedback.difficultyOptions[2]}</option>
+            <option value="4">{reportCopy.feedback.difficultyOptions[3]}</option>
+            <option value="5">{reportCopy.feedback.difficultyOptions[4]}</option>
           </select>
         </label>
       </div>
@@ -467,8 +469,8 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         value={currentFeedback.comment}
         onChange={(event) => updateCurrentFeedback({ comment: event.target.value })}
         maxLength={FEEDBACK_COMMENT_MAX_LENGTH}
-        placeholder="막힌 장면, 이해되지 않은 용어, 다시 보고 싶은 선택지를 짧게 남겨주세요."
-        aria-label="플레이테스트 피드백 자유 의견"
+        placeholder={reportCopy.feedback.placeholder}
+        aria-label={reportCopy.feedback.commentLabel}
         aria-describedby={
           activeFeedbackPrivacySignals.length > 0
             ? "feedback-input-note feedback-privacy-warning"
@@ -476,18 +478,14 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         }
       />
       <p className="input-note" id="feedback-input-note">
-        실명, 연락처, 회사명, 실제 사건 관계자 이름은 적지 마세요. {currentFeedback.comment.length}/
-        {FEEDBACK_COMMENT_MAX_LENGTH}
+        {fill(reportCopy.feedback.note, { count: currentFeedback.comment.length, max: FEEDBACK_COMMENT_MAX_LENGTH })}
       </p>
       {activeFeedbackPrivacySignals.length > 0 && (
         <div className="privacy-warning" id="feedback-privacy-warning" role="alert">
-          <strong>피드백에 식별 정보로 보일 수 있는 표현이 있습니다.</strong>
-          <p>
-            감지 항목: {activeFeedbackPrivacySignals.map((signal) => signal.label).join(" / ")}.
-            저장하려면 인터뷰 기록과 원격 저장 기록에 남기기 전에 익명 표현으로 바꿔주세요.
-          </p>
+          <strong>{reportCopy.feedback.privacyTitle}</strong>
+          <p>{fill(reportCopy.feedback.privacyText, { signals: activeFeedbackPrivacySignals.map((signal) => signal.label).join(" / ") })}</p>
           <button type="button" onClick={anonymizeFeedbackComment}>
-            피드백 익명화
+            {reportCopy.feedback.anonymize}
           </button>
         </div>
       )}
@@ -502,7 +500,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           aria-busy={isSubmittingFeedback}
           aria-describedby={activeFeedbackPrivacySignals.length > 0 ? "feedback-privacy-warning" : undefined}
         >
-          {isSubmittingFeedback ? "저장 중..." : "피드백 저장"}
+          {isSubmittingFeedback ? reportCopy.feedback.saving : reportCopy.feedback.save}
         </GuardedButton>
         <span role="status" aria-live="polite">{feedbackStatus}</span>
       </div>
@@ -531,16 +529,13 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
               <div className="history-challenge">
                 {entry.tactical && (
                   <small className={`challenge-grade grade-${entry.tactical.grade.toLowerCase()}`}>
-                    등급 {entry.tactical.grade} · {entry.tactical.gradeText}
+                    {fill(reportCopy.history.grade, { grade: entry.tactical.grade, text: entry.tactical.gradeText })}
                   </small>
                 )}
                 <small className={entry.challenge.matched ? "challenge-success" : "challenge-miss"}>
-                  {entry.challenge.matched ? "챌린지 달성" : "챌린지 미달"} · {entry.challenge.title}
+                  {entry.challenge.matched ? reportCopy.history.challengeHit : reportCopy.history.challengeMiss} · {entry.challenge.title}
                 </small>
-                <small>
-                  위험 {entry.challenge.riskDelta > 0 ? "+" : ""}
-                  {entry.challenge.riskDelta}
-                </small>
+                <small>{fill(reportCopy.risk.delta, { delta: `${entry.challenge.riskDelta > 0 ? "+" : ""}${entry.challenge.riskDelta}` })}</small>
                 {entry.flowSurge && (
                   <small className="surge-success">
                     {entry.flowSurge.label} · {entry.flowSurge.text}
@@ -568,12 +563,12 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
             )}
             {entry.sceneBeat && (
               <details className="decision-scene">
-                <summary>장면 다시 보기</summary>
+                <summary>{reportCopy.history.replayScene}</summary>
                 <div>{renderSceneLines(entry.sceneBeat)}</div>
               </details>
             )}
             {entry.skippedNodeId && renderSceneMinutes(entry.skippedNodeId)}
-            <small>{entry.responseTimeSec}초 · {entry.echo}</small>
+            <small>{fill(reportCopy.history.seconds, { seconds: entry.responseTimeSec, echo: entry.echo })}</small>
           </div>
         </article>
       ))}
@@ -584,7 +579,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         {/* The case as a whole, ahead of its decisions: where the six stood when it opened and where it left them. */}
         {caseChange.length > 0 && (
           <article data-testid="case-resource-change">
-            <b>사건 전 → 후</b>
+            <b>{reportCopy.caseChange}</b>
             <div>{caseChange.map((row) => <span key={row.key} className={row.gain === null ? undefined : row.gain ? "delta-up" : "delta-down"}>{row.text}</span>)}</div>
           </article>
         )}
@@ -610,23 +605,23 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <section className="story-reveal ending-reveal">
         <span>SEASON 1 COMPLETE · {endingProfile.tag}</span>
         <h2>{endingProfile.title}</h2>
-        <p>{endingProfile.text} {finalAftermathEntry ? `마지막 후폭풍에서 고른 길: "${finalAftermathEntry.choice}".` : ""}</p>
+        <p>{endingProfile.text} {finalAftermathEntry ? fill(reportCopy.finale.aftermath, { choice: finalAftermathEntry.choice }) : ""}</p>
         <div className="ending-clue-summary">
           {/* Out of every clue the season holds, and the bar is the one the
               record endings ask for. It read "30/6", against a bar of four. */}
-          <strong>{clueCount}/{clueTotal} 숨은 단서 발견</strong>
+          <strong>{fill(reportCopy.finale.clues, { clueCount, clueTotal })}</strong>
           <span>
             {clueCount >= clueTotal * gameConstants.ENDING_GATES.clueRate
-              ? "실험의 바깥쪽까지 도달했습니다. 마지막 기록이 당신의 선택을 기다립니다."
-              : "다른 장면에서 위험한 성공을 만들면 더 많은 기록을 찾을 수 있습니다."}
+              ? reportCopy.finale.reached
+              : reportCopy.finale.more}
           </span>
         </div>
       </section>
     ) : (
       <section className="story-reveal">
         <span lang="en">NEXT CASE SIGNAL</span>
-        <h2>다음 사건의 첫 장면은 이번 사건을 어떻게 닫았는지에 따라 달라집니다.</h2>
-        <p>트리거랩은 사건 해결 능력만 보지 않습니다. 어떤 압박이 들어왔을 때 당신이 더 오래 생각하고, 더 쉽게 원칙을 바꾸며, 더 많은 손실을 감수하는지 기록합니다.</p>
+        <h2>{reportCopy.nextCase.title}</h2>
+        <p>{reportCopy.nextCase.text}</p>
       </section>
     )}
       </div>

@@ -229,7 +229,7 @@ function absoluteSiteUrls() {
         if (!/^https:\/\//.test(origin)) throw new Error(`SITE_URL must be an https origin, got ${origin}`);
         return html
           .replace(/(<meta\s+(?:property="og:(?:url|image)"|name="twitter:image")\s+content=")\//g, `$1${origin}/`)
-          .replace(/(<link\s+rel="canonical"\s+href=")\//g, `$1${origin}/`);
+          .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
       },
     },
   };
@@ -364,7 +364,7 @@ function serviceWorker() {
 }
 
 /**
- * The privacy policy and the terms of use (scripts/legal-pages.mjs): four
+ * The privacy policy and the terms of use (scripts/legal-pages.mjs): six
  * plain pages written beside `index.html`, so the host serves each at its own
  * name and a store listing can link to it. The dev server answers the same
  * addresses from the same source. Before `serviceWorker()` in the list, which
@@ -564,22 +564,42 @@ const SPEAKER_LINE = "src/gauntlet/speakerLine.js";
  * the words it imports, as it was when the hook was the emitted chunk's entry.
  */
 const OWN_CHUNKS = [
-  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS] },
+  // Its words (src/copy/seasonEnd.js, 영어판 3단계) go with it: left alone they
+  // land in pastPicks, which imports this chunk back, and the table read at
+  // load (ENDING_NAMES, the ending scenes) was still undefined.
+  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS, "src/copy/seasonEnd.js"] },
   { name: "caseCopy", files: [CASE_COPY] },
   { name: "tableAudio", files: [TABLE_AUDIO] },
   { name: "sceneTraces", files: [SCENE_TRACES, "src/sceneTraces.js"] },
   { name: "sceneChoices", files: [SCENE_CHOICES, "src/sceneChoices.js"] },
   { name: "WeekRulePanel", files: [WEEK_RULE_PANEL] },
-  { name: "EdgeNotice", files: [EDGE_NOTICE] },
+  // The notices' words (src/copy/edgeNotices.js, 다국어 틀) go with the notice.
+  { name: "EdgeNotice", files: [EDGE_NOTICE, "src/copy/edgeNotices.js"] },
   { name: "ReadingClockAsk", files: [READING_CLOCK_ASK] },
-  { name: "auditRisk", files: [AUDIT_RISK] },
-  { name: "cascadeRisk", files: [CASCADE_RISK] },
+  // Their words (src/copy/audit.js, cascade.js, 영어판 3단계) go with each.
+  { name: "auditRisk", files: [AUDIT_RISK, "src/copy/audit.js"] },
+  { name: "cascadeRisk", files: [CASCADE_RISK, "src/copy/cascade.js"] },
   // windowTrail came in from main (#F1 phase 2) after the Vite 8 budgets were
   // measured: its group is here as the emitted chunk was, its size is to be
   // measured on the next build (다음에 실측).
   { name: "windowTrail", files: [WINDOW_TRAIL] },
   { name: "speakerLine", files: [SPEAKER_LINE] },
 ];
+
+/**
+ * A module of src/locales (src/locale.js): a language's dictionary
+ * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), its
+ * copy between cases after the first ten (`<lang>/between/<first>-<last>.js`),
+ * or the code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>`,
+ * `locale-<lang>-between-<file>` or `locale-<file>`.
+ */
+const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/]|(between)[\\/])?)?([^\\/]+)\.js$/;
+
+function localeChunkName(chunk) {
+  const match = LOCALE_MODULE.exec(chunk.facadeModuleId ?? "");
+  if (!match) return "assets/[name]-[hash].js";
+  return `assets/locale-${match[1] ? `${match[1]}-` : ""}${match[2] ? `${match[2]}-` : ""}${match[3]}-[hash].js`;
+}
 
 function ownChunkGroups() {
   return OWN_CHUNKS.map(({ name, files }) => {
@@ -634,6 +654,11 @@ export default defineConfig(({ command, mode }) => {
       },
       rolldownOptions: {
         output: {
+          // The other languages' words (src/locales, 다국어 틀) are named
+          // apart, `locale-<lang>-<file>`: a Korean device never asks for
+          // them, so the service worker leaves `locale-*` out of its warm-up
+          // (scripts/service-worker-build.mjs), and their budgets are their own.
+          chunkFileNames: localeChunkName,
           codeSplitting: {
             groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
           },

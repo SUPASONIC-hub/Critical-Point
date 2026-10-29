@@ -24,7 +24,10 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComput
 
 // Past this the one-file subset has stopped paying for itself against the
 // dynamic subset it replaced (~537KB for the intro alone). Ratchet down, never up.
-const MAX_FONT_BYTES = 283_500;
+// 283,500 -> 197,740 on 2026-10-26 (first-paint-cut): the weight axis cut to
+// 400-920 (scripts/build-fonts.mjs). Measured 197,736, plus 4; the same line as
+// the woff2's in check-bundle-size.mjs.
+const MAX_FONT_BYTES = 197_740;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones
@@ -37,6 +40,9 @@ const SYSTEM_FACE_CHARACTERS = {
   "界": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
   "點": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
   "故": { drawn: true, where: "case17.js: 고(故) 하윤재" },
+  "日": { drawn: true, where: "locale.js: the language choice's 日本語" },
+  "本": { drawn: true, where: "locale.js: the language choice's 日本語" },
+  "語": { drawn: true, where: "locale.js: the language choice's 日本語" },
   "▒": { drawn: true, where: "GauntletHand.jsx: a sealed card's hidden numbers (aria-hidden)" },
   "｡": { drawn: false, where: "useBoard.js: a full stop the board's link filter reads" },
   "‏": { drawn: false, where: "useBoard.js: BOARD_INVISIBLE_PATTERN, the end of a range" },

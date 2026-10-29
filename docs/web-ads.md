@@ -56,8 +56,11 @@ curl -s https://critical-point-wn6p.onrender.com/ads.txt
 curl -s https://critical-point-wn6p.onrender.com/ | grep -o 'adsbygoogle'
 
 # 9번 뒤: 방침에 광고 절
-curl -s https://critical-point-wn6p.onrender.com/privacy.html | grep -o 'Google AdSense' | head -1
+for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critical-point-wn6p.onrender.com/$p | grep -o 'Google AdSense' | head -1; done
 ```
+
+방침·약관의 광고 문장(`AD_EDITS`)은 한국어·영어·일본어 세 언어에 같은 자리(요약·3번 쿠키·6번 Google·10번 광고 절·약관 3항),
+같은 시행일로 들어갑니다. `tests/unit/legal-pages.test.mjs`가 여섯 페이지 모두와 세 언어의 수를 확인합니다.
 
 ## 광고 자리
 
@@ -69,7 +72,8 @@ curl -s https://critical-point-wn6p.onrender.com/privacy.html | grep -o 'Google 
 판(테이블)·결정·브리핑·첫 화면·게시판에는 마커가 없고, 유닛 테스트(`tests/unit/adsense.test.mjs`)가
 그것을 지킵니다. 자리는 300×250 광고 + 한 줄 라벨로 **높이 276px 고정**이라 광고가 차든, 실패하든,
 막히든 아래가 밀리지 않습니다. 300px는 폰 360px에서 양쪽 16px 여백 안에 들어갑니다. 움직임이 없고
-(동작 줄이기와 무관), 낭독기는 「광고」 구역과 라벨 한 줄을 먼저 읽습니다.
+(동작 줄이기와 무관), 낭독기는 「광고」 구역과 라벨 한 줄을 먼저 읽습니다. 두 문구는 `src/copy/adSlot.js`
+(영어·일본어는 `src/locales/<lang>/screens/adSlot.js`)에 있습니다.
 
 마커는 JSX 주석 `{/* ad-slot: placement="report" … */}`이라 꺼진 빌드에서는 컴파일되면 없어집니다.
 켠 빌드에서만 `<AdSlot … />`과 import로 바뀝니다.

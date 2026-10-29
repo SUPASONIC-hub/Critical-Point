@@ -1810,6 +1810,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // runs its one SELECT over the seasons of a week long past, so the runs
   // above are not in it: three under the rule from two devices, one without it
   // (the box turned it down), one in story mode and one under another rule.
+  // One season under the rule was played on the English pages: its second
+  // case row names `summary.locale` "en" (#352), another names "ko" on both,
+  // and the third names none (ko(추정)).
   {
     const REPORT_WEEK = "2026-W30";
     const reportRuns = [
@@ -1826,6 +1829,8 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
       for (const caseId of CASE_SEQUENCE.slice(0, 2)) {
         const payload = casePayload({ session, runId, caseId, story });
         payload.dynamics = { ...payload.dynamics, weekRule: rule };
+        if (runId === "run-week-report-on-1" && caseId === CASE_SEQUENCE[1]) payload.summary = { ...payload.summary, locale: "en" };
+        if (runId === "run-week-report-on-2") payload.summary = { ...payload.summary, locale: "ko" };
         const { sql, params } = postgrestInsert("playtest_sessions", payload);
         await db.query(sql, params);
       }
@@ -1837,8 +1842,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
     const reportRows = (await allowed("run the test week's report", "service_role", testWeekQuery(REPORT_WEEK, EVENT)))?.rows ?? [];
     const report = readTestWeek(reportRows);
     check(
-      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6,
-      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows })}; expected 3 seasons under the rule from 2 devices, 1 without it, story mode and another rule left out.`,
+      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6
+        && report.english === 1 && report.korean === 1 && report.presumedKorean === 1,
+      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows, english: report.english, korean: report.korean, presumedKorean: report.presumedKorean })}; expected 3 seasons under the rule from 2 devices (one English, one Korean, one naming no language), 1 without it, story mode and another rule left out.`,
     );
     check(reportRows.every((row) => !Object.values(row).some((value) => typeof value === "string" && value.startsWith("grants-check-session-"))), "the test week's report fetched a device's session id.");
   }
@@ -1846,7 +1852,8 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // The weekly drop-off report (scripts/report-funnel.mjs, .github/workflows/funnel.yml)
   // runs its one SELECT over the runs begun after a day no other row reaches:
   // two runs from one device (the second marked NEW GAME+) and one from
-  // another that came back two days later.
+  // another that came back two days later, played in English (`summary.locale`,
+  // 앱출시-F F-6: the server keeps the key as the page sent it).
   {
     const SINCE_DAY = "2030-01-01";
     const funnelRuns = [
@@ -1859,6 +1866,7 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
       for (const caseId of CASE_SEQUENCE.slice(0, cases)) {
         const payload = casePayload({ session, runId, caseId });
         if (newGamePlus) payload.summary = { ...payload.summary, newGamePlus: true };
+        if (runId === "run-week-funnel-3") payload.summary = { ...payload.summary, locale: "en" };
         const { sql, params } = postgrestInsert("playtest_sessions", payload);
         await db.query(sql, params);
       }
@@ -1874,8 +1882,9 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
     const funnelRows = (await allowed("run the drop-off report", "service_role", funnelQuery(SINCE_DAY)))?.rows ?? [];
     const funnel = readFunnel(funnelRows, Date.parse(`${SINCE_DAY}T00:00:00Z`) / 1000 + 10 * 86400);
     check(
-      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3,
-      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run and one break among three gaps.`,
+      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3
+        && funnel.locales.en === 1 && funnel.unnamed === 2 && JSON.stringify(funnel.english.reach.slice(0, 3)) === "[1,1,0]",
+      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps, locales: funnel.locales, unnamed: funnel.unnamed, english: funnel.english.reach.slice(0, 3) })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run, one break among three gaps, and one English run (through 프롤로그 02) beside two naming no language.`,
     );
     check(funnelRows.every((row) => !JSON.stringify(row).includes("grants-check-session-") && !JSON.stringify(row).includes("run-week-funnel")), "the drop-off report fetched a run or device id.");
   }
@@ -2061,7 +2070,8 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
 
   // The operator's queue (scripts/board-reports.mjs, .github/workflows/board-reports.yml):
   // its one SELECT reads ids and counts only, hide takes a post out of the
-  // queue, dismiss deletes a post's reports, restore brings a hidden post back,
+  // queue, dismiss deletes a post's reports, restore brings a hidden post back
+  // and deletes its reports (so it does not wait in the next morning's queue),
   // and an action on nothing says it did nothing.
   {
     const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
@@ -2076,6 +2086,9 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
     queue = await queueOf();
     check(!queue.waiting.some((post) => post.postId === second) && queue.hidden.some((post) => post.postId === second), "a hidden post still waited in the board report queue.");
     check(await act("restore", second), "restoring a hidden post did nothing.");
+    queue = await queueOf();
+    check((await reportCount(second)) === 0 && !queue.waiting.some((post) => post.postId === second) && !queue.hidden.some((post) => post.postId === second), "a restored post's reports stayed, so it waited in the board report queue again.");
+    check(!(await act("restore", 999999999)), "restoring a post that is not there said it did something.");
     check(await act("dismiss", first), "dismissing a post's reports did nothing.");
     check((await reportCount(first)) === 0 && !(await queueOf()).waiting.some((post) => post.postId === first), "a dismissed post's reports stayed.");
     check(!(await act("dismiss", first)) && !(await act("hide", 999999999)), "an action on nothing said it did something.");

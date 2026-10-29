@@ -1,7 +1,10 @@
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
+import tableCopy from "../copy/table.js";
+import { fill } from "../locale.js";
 
-// The stance profiles are written for the engine; the table speaks Korean.
+// The stance profiles are written for the engine; the table speaks the page's
+// language (src/copy/table.js, `stance`).
 // STRIKE's line names LOCK's own cap (`LOCK_CAP`, x1.5), which is under the
 // logic combo's (`HAND_CAP`, x1.6): a combo of 8 is already there, and LOCK
 // then adds nothing to the pot.
@@ -9,11 +12,8 @@ import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntle
 // there is, so before the first push it cools nothing. The line keeps the
 // length of the line before it (21 characters) so the 360px stance row does
 // not wrap anew.
-const FOCUS_MODE_COPY = {
-  strike: "배율 빠르게 · LOCK 1.5배까지",
-  steady: "배율 작게 · 민 뒤 LOCK마다 냉각",
-  expose: "카드의 자원 효과 증폭",
-};
+const say = tableCopy.stance;
+const FOCUS_MODE_COPY = say.modes;
 
 /**
  * The three stances and the season's mastery of each. The stage draws it only
@@ -30,7 +30,7 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
     <div
       className={`gx-focus-modes gx-stance-mastery mode-${current}`}
       role="group"
-      aria-label={`자세 · ${getFocusModeProfile(current).label} 숙련 ${mastery[current] ?? 0}/${STANCE_MASTERY_GOAL}`}
+      aria-label={fill(say.label, { stance: getFocusModeProfile(current).label, count: mastery[current] ?? 0, goal: STANCE_MASTERY_GOAL })}
       data-testid="gauntlet-stance-mastery"
     >
       {FOCUS_MODES.map((mode) => {
@@ -50,16 +50,16 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
           >
             <span lang="en">{profile.label}</span>
             <em>
-              <span className="sr-only">시즌 숙련 </span>
-              {mastered ? "완성" : `${count}/${STANCE_MASTERY_GOAL}`}
+              <span className="sr-only">{say.mastery}</span>
+              {mastered ? say.mastered : `${count}/${STANCE_MASTERY_GOAL}`}
             </em>
             <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
             <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
           </GuardedButton>
         );
       })}
-      {blocked && <span id="gx-stance-blocked" className="sr-only">판이 열려 있을 때만 자세를 바꿀 수 있다.</span>}
-      <span id="gx-stance-detail" className="sr-only">시즌 숙련: 충전한 채로 확정한 판</span>
+      {blocked && <span id="gx-stance-blocked" className="sr-only">{say.blocked}</span>}
+      <span id="gx-stance-detail" className="sr-only">{say.detail}</span>
     </div>
   );
 }
