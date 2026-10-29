@@ -1,6 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useDialogFocus } from "../gauntlet/useDialogFocus.js";
 import { AccessibilityPanel } from "./AccessibilityPanel.jsx";
+import edgeCopy from "../copy/edge.js";
 
 /**
  * The comfort settings, in front of the table.
@@ -86,12 +87,12 @@ function ComfortDialogBody() {
         onKeyDown={onKeyDown}
       >
         <div className="comfort-dialog-head">
-          <h2 id="comfort-dialog-title">편의 설정</h2>
+          <h2 id="comfort-dialog-title">{edgeCopy.comfort.title}</h2>
           <button ref={closeRef} type="button" className="ghost" data-testid="comfort-dialog-close" onClick={close}>
-            닫기
+            {edgeCopy.comfort.close}
           </button>
         </div>
-        <p id="comfort-dialog-note" className="comfort-dialog-note">이 창이 열려 있는 동안 테이블 시계는 멈춥니다.</p>
+        <p id="comfort-dialog-note" className="comfort-dialog-note">{edgeCopy.comfort.note}</p>
         <AccessibilityPanel />
       </div>
     </div>

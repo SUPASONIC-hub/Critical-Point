@@ -24,6 +24,10 @@ import {
 import { sideCaseMarks } from "./state/sideMarks.js";
 import { clearReplayFromLocation } from "./state/trace.js";
 import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
+import cloudSaveStatusCopy from "./copy/cloudSaveStatus.js";
+
+// What online save says, from src/copy/cloudSaveStatus.js (another language is laid over it there).
+const W = cloudSaveStatusCopy;
 
 /**
  * Saves that follow the player to another device, and survive being offline.
@@ -286,12 +290,12 @@ export function describeCloudFailure(error) {
   if (error?.userFacing) return error.message;
   const text = `${error?.serverMessage ?? ""} ${error instanceof Error ? error.message : ""}`;
   const status = Number(error?.status) || 0;
-  if (/code limit/.test(text)) return "오늘 이 네트워크에서 새로 만들 수 있는 이어하기 코드를 모두 썼습니다. 내일 다시 켜 주세요. 이 기기 저장은 안전합니다.";
-  if (status === 429 || /rate limit/.test(text)) return "온라인 저장 요청이 너무 잦습니다. 잠시 뒤에 다시 시도합니다. 이 기기 저장은 안전합니다.";
-  if (/invalid cloud save code/.test(text)) return "이어하기 코드는 12자리 영문·숫자입니다.";
-  if (/invalid cloud save payload/.test(text)) return "진행 기록이 온라인 저장 한도보다 커서 올리지 못했습니다. 이 기기 저장은 안전합니다.";
-  if (isOffline() || status === 0) return "온라인 저장 서버에 연결하지 못했습니다. 연결을 확인한 뒤 다시 시도해 주세요.";
-  return "온라인 저장에 실패했습니다. 이 기기 저장은 안전하며 잠시 뒤 다시 시도합니다.";
+  if (/code limit/.test(text)) return W.failures.codeLimit;
+  if (status === 429 || /rate limit/.test(text)) return W.failures.rateLimit;
+  if (/invalid cloud save code/.test(text)) return W.badCode;
+  if (/invalid cloud save payload/.test(text)) return W.failures.tooLarge;
+  if (isOffline() || status === 0) return W.failures.unreachable;
+  return W.failures.failed;
 }
 
 function holdConflict({ savedAt = "", revision = null } = {}) {
@@ -536,9 +540,9 @@ export function hasCloudConflict() {
 /** Reads the copy filed under a code. Returns null when there is none. */
 export async function fetchCloudSave(codeInput) {
   const code = normalizeCloudCode(codeInput);
-  if (!code) throw cloudError("이어하기 코드는 12자리 영문·숫자입니다.");
-  if (!cloudSaveAvailable) throw cloudError("이 배포에는 온라인 저장 서버가 설정되어 있지 않습니다.");
-  if (isOffline()) throw cloudError("오프라인이라 불러올 수 없습니다. 연결된 뒤 다시 시도하세요.");
+  if (!code) throw cloudError(W.badCode);
+  if (!cloudSaveAvailable) throw cloudError(W.noServer);
+  if (isOffline()) throw cloudError(W.offlineLoad);
   const { data } = await callSupabaseRpc("get_cloud_save", { p_code: code });
   // Uploads leave out the name and the queue, so a copy is whole without them.
   const stored = data?.payload?.save;
@@ -631,7 +635,7 @@ export async function deleteCloudSave() {
   if (!cloudSaveAvailable) return { deleted: false, unsupported: true };
   const code = normalizeCloudCode(readStoredValue(CLOUD_SAVE_CODE_KEY, ""));
   if (!code) return { deleted: false };
-  if (isOffline()) throw cloudError("오프라인이라 온라인 사본을 지울 수 없습니다. 연결된 뒤 다시 시도하세요.");
+  if (isOffline()) throw cloudError(W.offlineDelete);
   const { data } = await callSupabaseRpc("delete_cloud_save", { p_code: code });
   writeSync({ pending: "", synced: "", revision: null, conflict: null });
   remoteChecked = false;
@@ -640,19 +644,5 @@ export async function deleteCloudSave() {
 
 /** The one status line each phase prints. */
 export function describeCloudPhase(phase) {
-  return (
-    {
-      idle: "아직 저장된 진행이 없습니다.",
-      pending: "기기에 저장됨 · 곧 온라인에 올립니다.",
-      syncing: "온라인에 올리는 중입니다.",
-      synced: "기기와 온라인 모두 최신입니다.",
-      offline: "오프라인 · 기기에 저장해 두었고, 연결되면 자동으로 올립니다.",
-      // True of both ways into a conflict: another device's upload, and a
-      // reset on this one (holdCloudCopyThroughReset).
-      conflict: "온라인에 이 기기의 지금 진행과 이어지지 않는 저장이 있어 올리기를 멈췄습니다. 다른 기기에서 저장했거나 초기화하기 전의 진행입니다. 아래에서 어느 쪽을 남길지 골라 주세요.",
-      error: "온라인 저장에 실패했습니다. 기기 저장은 안전하며 잠시 뒤 다시 시도합니다.",
-      disabled: "온라인 저장이 꺼져 있습니다. 이 기기에만 저장합니다.",
-      unavailable: "이 배포에는 온라인 저장 서버가 없어 이 기기에만 저장합니다.",
-    }[phase] ?? ""
-  );
+  return W.phases[phase] ?? "";
 }

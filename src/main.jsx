@@ -5,6 +5,7 @@ import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, readStoredValue } from "./appCon
 import { applyAccessibilityToDocument } from "./state/accessibilitySettings.js";
 import { installServiceWorker } from "./serviceWorker/register.js";
 import { installChunkReload } from "./state/chunkReload.js";
+import { loadLocale } from "./locale.js";
 import { installInstallPrompt } from "./state/installPrompt.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
@@ -25,7 +26,7 @@ installServiceWorker();
 // Before the intro renders: the browser's install offer can arrive first (state/installPrompt.js).
 installInstallPrompt();
 
-createRoot(document.getElementById("root"), { onCaughtError: logCaughtRenderError }).render(
+const paint = () => createRoot(document.getElementById("root"), { onCaughtError: logCaughtRenderError }).render(
   <>
     <AppErrorBoundary>
       <App />
@@ -34,3 +35,10 @@ createRoot(document.getElementById("root"), { onCaughtError: logCaughtRenderErro
     <ConfirmDialog />
   </>,
 );
+
+// A Korean page paints now, as it always has. A page in another language
+// (`?lang=<code>`, src/locale.js) first takes its dictionary, and paints in
+// Korean if that cannot be fetched.
+const dictionary = loadLocale();
+if (dictionary) dictionary.then(paint, paint);
+else paint();

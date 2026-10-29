@@ -44,7 +44,7 @@ import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 
 /** What createCaseSummary copies from getGameplayStats, and so what is compared. */
-export const SCORE_FIELDS = Object.freeze([
+const SCORE_FIELDS = Object.freeze([
   "burstScore",
   "momentumScore",
   "momentumTier",
@@ -175,7 +175,7 @@ export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules =
 }
 
 /** Whether a row was played under this engine's table rules (`dynamics.tableRules`). */
-export function isCurrentTable(row) {
+function isCurrentTable(row) {
   return Number(row?.dynamics?.[RULES_MARK_KEY]) === RULES_MARK;
 }
 

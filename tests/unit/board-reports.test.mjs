@@ -23,7 +23,13 @@ test("every reason the button offers has its name in the summary", () => {
 
 test("a hand action names one function or one delete, and only for a plain post id", () => {
   assert.equal(actionStatement("hide", "42"), "select public.moderate_board_post(42) as done;");
-  assert.equal(actionStatement("restore", 42), "select public.moderate_board_post(42, false) as done;");
+  // Restore is dismiss too: the post comes back and its reports go, so the morning run does not count them again.
+  const restore = actionStatement("restore", 42);
+  assert.match(restore, /^with restored as \(select public\.moderate_board_post\(42, false\) as done\)/);
+  assert.match(restore, /delete from public\.board_reports where post_id = 42 and \(select done from restored\) returning 1/);
+  assert.match(restore, /select \(select done from restored\) as done/);
+  assert.equal(actionDone([{ done: true, dismissed: 0 }]), true, "a restored post with no reports left is still done");
+  assert.equal(actionDone([{ done: null, dismissed: 0 }]), false, "restoring a post that is not there did nothing");
   assert.match(actionStatement("dismiss", " 42 "), /delete from public\.board_reports where post_id = 42 returning 1/);
   for (const bad of ["", "0", "-1", "1.5", "1; drop table public.board_posts", "42 or true", "1e3", null, undefined, "1234567890123456789"]) {
     assert.throws(() => actionStatement("hide", bad), /not a post id/, String(bad));

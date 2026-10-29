@@ -28,6 +28,8 @@ import {
 } from "./savedState.js";
 import { clearReplayFromLocation } from "./trace.js";
 import { confirmAction } from "./confirmAction.js";
+import noticesCopy from "../copy/notices.js";
+import { fill } from "../locale.js";
 import { hasSlotAtRecoveryPoint, takeQueuedErrorTelemetry } from "./errorRecovery.js";
 import { toSavePatch, toSavePayload } from "./runState.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
@@ -35,20 +37,13 @@ import { withEveryCase } from "./caseArrival.js";
 
 const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
 
-// Asked before a control throws progress away, the way 초기화 asks.
-const CONFIRM_START_FRESH = "저장된 진행을 지우고 새 게임으로 시작할까요? 복구 슬롯과 오류 기록은 남습니다.";
-const CONFIRM_RESTORE_SLOT = "이 복구 지점으로 되돌릴까요? 그 뒤의 이야기 진행은 사라집니다.";
-const CONFIRM_DELETE_SLOT = "이 복구 지점을 지울까요? 지운 뒤에는 되돌릴 수 없습니다.";
-const CONFIRM_CLEAR_ERROR_LOG = "오류 기록을 모두 지울까요?";
-const CONFIRM_RESTORE_BACKUP = "읽지 못했던 저장본을 다시 읽어 지금 진행 대신 불러올까요?";
-
-// What a refused write says. Each names why nothing was written: the old code
-// printed the storage-unavailable line for all three, which sent a player whose
-// other tab was simply ahead looking for a browser permission problem.
-const SAVE_UNAVAILABLE_MESSAGE = "브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.";
-const SAVE_STALE_MESSAGE = "다른 탭에서 이 진행이 더 앞서 있어 이 탭의 진행은 기록하지 않았습니다. 새로고침하면 최신 진행을 불러옵니다.";
-const SAVE_REPLAY_MESSAGE = "재현 링크로 연 장면이라 진행을 기록하지 않습니다. 내 저장은 그대로 남아 있습니다.";
-const RESTORE_NEEDS_CASES_MESSAGE = "사건 자료를 다 받지 못해 되돌리지 않았습니다. 연결을 확인하고 다시 눌러 주세요. 저장은 그대로 있습니다.";
+// Asked before a control throws progress away, the way 초기화 asks
+// (noticesCopy.confirm). And what a refused write says (noticesCopy.save). Each
+// names why nothing was written: the old code printed the storage-unavailable
+// line for all three, which sent a player whose other tab was simply ahead
+// looking for a browser permission problem. Both are read where they are used,
+// so the page's language has been laid over them (src/copy/notices.js).
+const { confirm: CONFIRM, save: SAVE } = noticesCopy;
 
 /** Ends a replay: the tab writes its saves again and a reload opens the player's own. */
 export function leaveReplaySession() {
@@ -89,18 +84,18 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
     if (result.stale) {
       // The tab stops: no table and no writes until it reloads (runState.staleSave).
       patchRun({ staleSave: true });
-      setSaveStatus(SAVE_STALE_MESSAGE);
+      setSaveStatus(SAVE.stale);
       return { ...payload, storageSaved: false, stale: true };
     }
     if (result.replay) {
-      setSaveStatus(SAVE_REPLAY_MESSAGE);
+      setSaveStatus(SAVE.replay);
       return { ...payload, storageSaved: false, replay: true };
     }
     // One slot for one place. 이어하기 pressed inside the runtime is "a run
     // picked up again" each time, so leaving a scene and coming back five times
     // filled all five slots with that scene and pushed out every case boundary.
     if (result.saved && shouldCaptureSaveSlot(previousState, payload) && !hasSlotAtRecoveryPoint(payload)) appendSaveSlot(payload);
-    if (!result.saved) setSaveStatus(SAVE_UNAVAILABLE_MESSAGE);
+    if (!result.saved) setSaveStatus(SAVE.unavailable);
     // Every write that landed is the last save, not only 저장 pressed by hand:
     // the intro prints this time beside 이어하기, and after a choice saved
     // itself it showed the time the page was loaded, or nothing after a reset.
@@ -122,12 +117,12 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
   }
 
   async function startFreshAfterRecovery() {
-    if (!(await confirmAction(CONFIRM_START_FRESH))) return;
+    if (!(await confirmAction(CONFIRM.startFresh))) return;
     onSuppressSaves();
     leaveReplaySession();
     // Nothing was removed and nothing reloads, so the run on screen goes on and
     // has to be saved again: the suppression used to outlive the failure.
-    if (!removeStoredValue(STORAGE_KEY)) { onResumeSaves?.(); setSaveStatus("저장본을 초기화하지 못했습니다."); return; }
+    if (!removeStoredValue(STORAGE_KEY)) { onResumeSaves?.(); setSaveStatus(SAVE.clearFailed); return; }
     writeStoredValue(RECOVERY_CENTER_STORAGE_KEY, "1"); removeStoredValue(debugErrorKey); window.location.reload();
   }
 
@@ -148,9 +143,9 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
     // tab onto an intro that offers a run the save no longer holds. The table
     // is already locked (the stale lock in `persist`) and persist has said why.
     if (payload.stale) return;
-    const savedLine = heldRun ? `판을 그대로 보관했습니다 ${formatSaveTime(payload.savedAt)}` : `저장됨 ${formatSaveTime(payload.savedAt)}`;
+    const savedLine = fill(heldRun ? SAVE.held : SAVE.saved, { time: formatSaveTime(payload.savedAt) });
     patchRun(patch);
-    setSaveStatus(payload.storageSaved ? savedLine : payload.replay ? SAVE_REPLAY_MESSAGE : SAVE_UNAVAILABLE_MESSAGE);
+    setSaveStatus(payload.storageSaved ? savedLine : payload.replay ? SAVE.replay : SAVE.unavailable);
   }
 
   function refreshSaveSlots() {
@@ -169,10 +164,10 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
   function closeRecoveryCenter() { patchRun({ showErrorLog: false, showRecoveryCenter: false }); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY); }
 
   async function clearLocalErrorLog() {
-    if (!(await confirmAction(CONFIRM_CLEAR_ERROR_LOG))) return;
+    if (!(await confirmAction(CONFIRM.clearErrorLog))) return;
     if (!removeStoredValue(ERROR_LOG_STORAGE_KEY)) {
       recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
-      setSaveStatus("오류 기록을 지우지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.");
+      setSaveStatus(SAVE.errorLogClearFailed);
       refreshLocalErrorLog();
       return;
     }
@@ -183,12 +178,12 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
   // the page loads and when the panel is refreshed, and saves add slots in
   // between: writing the list back less one slot deleted those too, unasked.
   async function deleteSaveSlot(slotId) {
-    if (!(await confirmAction(CONFIRM_DELETE_SLOT))) return;
+    if (!(await confirmAction(CONFIRM.deleteSlot))) return;
     const storedSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
     const nextSlots = storedSlots.filter((slot) => slot.id !== slotId);
     if (!writeStoredValue(SAVE_SLOT_STORAGE_KEY, JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: nextSlots }))) {
       recordAppError(new Error("Save slot delete failed because local storage could not be written."), {}, "save-slot-delete");
-      setSaveStatus("복구 지점을 지우지 못했습니다. 브라우저 저장소를 사용할 수 없습니다."); return;
+      setSaveStatus(SAVE.slotDeleteFailed); return;
     }
     setSaveSlots(nextSlots);
   }
@@ -251,7 +246,7 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
       });
     } catch (error) {
       console.warn(error);
-      setSaveStatus(RESTORE_NEEDS_CASES_MESSAGE);
+      setSaveStatus(SAVE.restoreNeedsCases);
       return undefined;
     }
   }
@@ -262,14 +257,14 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
     );
     if (nextState === undefined) return;
     if (!nextState) {
-      setSaveStatus("이 복구 슬롯은 손상되어 불러올 수 없습니다. 다른 슬롯을 고르세요.");
+      setSaveStatus(SAVE.slotDamaged);
       return;
     }
-    if (!(await confirmAction(CONFIRM_RESTORE_SLOT))) return;
+    if (!(await confirmAction(CONFIRM.restoreSlot))) return;
     replaceSaveAndReload(nextState, {
       source: "save-slot-restore",
       what: "Save slot restore",
-      failure: "복구 지점을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
+      failure: SAVE.slotRestoreFailed,
     });
   }
 
@@ -283,14 +278,14 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
     const nextState = backup ? await buildRestoredSave((current) => createRestoredSave(backup, current)) : null;
     if (nextState === undefined) return;
     if (!nextState) {
-      setSaveStatus("보관한 저장본은 이 버전에서도 읽을 수 없습니다. 지우지 않고 그대로 둡니다.");
+      setSaveStatus(SAVE.backupUnreadable);
       return;
     }
-    if (!(await confirmAction(CONFIRM_RESTORE_BACKUP))) return;
+    if (!(await confirmAction(CONFIRM.restoreBackup))) return;
     const restored = replaceSaveAndReload(nextState, {
       source: "save-backup-restore",
       what: "Save backup restore",
-      failure: "보관한 저장본을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
+      failure: SAVE.backupRestoreFailed,
     });
     // It is the save now; the kept copy has done what it was kept for.
     if (restored) removeStoredValue(SAVE_BACKUP_STORAGE_KEY);

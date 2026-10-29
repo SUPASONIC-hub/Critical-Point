@@ -2,6 +2,8 @@ import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleAlert, Tro
 import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import * as endingCopy from "../endingCopy.js";
+import resultCopy from "../copy/result.js";
+import { fill } from "../locale.js";
 import { SIDE_CASES } from "../sideCases.js";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
@@ -25,7 +27,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
   // whether the page may name them: not when the player turned them off.
   const { letterKeys, keys } = shortcuts;
-  const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
+  const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || endingCopy.endingWords.finalChoiceFallback;
   const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.reframeOpenedRoute || entry.reframeBranchId);
   // Read without fallbacks: a run always has a pattern with its record and its
@@ -33,24 +35,24 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   // (getObserverPattern, getObservationLedger, getEndingVariant in gameLogic.js;
   // getEndingSceneProfile in runtimeSystems.js). tests/unit/report-copy.test.mjs.
   const observerEndingRecord = observerPattern.endingRecord;
-  const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern.arc.text };
+  const judgmentProfile = { label: observerEndingRecord.label.replace(endingCopy.endingWords.sampleSuffix, endingCopy.endingWords.typeSuffix), text: observerPattern.arc.text };
   const seasonRecordNotice = endingCopy.getSeasonRecordNotice({ nextCaseId: nextCaseSignal?.caseId, ...view.telemetry });
   const finalVerdict = endingCopy.getFinalVerdict({ endingVariant, finalChoiceId: finalEndingEntry?.choiceId, endingSceneChoice: endingSceneProfile.choice });
   const endingTwists = [
     {
-      label: "판정",
+      label: endingCopy.endingWords.twists.ruling,
       title: finalVerdict.title,
       evidence: endingVariant.label,
       copy: finalVerdict.ruling,
     },
     {
-      label: "집행",
+      label: endingCopy.endingWords.twists.execution,
       title: endingCopy.endingTwistTitles.execution,
       evidence: finalEndingEntry?.choice || finalChoiceText,
       copy: finalVerdict.execution,
     },
     {
-      label: "대가",
+      label: endingCopy.endingWords.twists.cost,
       title: endingCopy.endingTwistTitles.cost,
       evidence: endingSceneProfile.location,
       copy: finalVerdict.cost,
@@ -73,14 +75,15 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     .map((report) => ({
       nodeId: report.nodeId,
       title: report.title,
-      label: `가지 않은 길: ${report.costliest.label}`,
+      label: fill(resultCopy.why.untakenRoad, { label: report.costliest.label }),
     }));
   const witnessRecords = [
-    firstRouteEntry && { id: "first", label: "처음 내린 판단", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
-    longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 판단", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
-    branchRouteEntry && { id: "branch", label: "판을 흔든 판단", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
+    firstRouteEntry && { id: "first", label: endingCopy.endingWords.witness.first, tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
+    longestRouteEntry && { id: "longest", label: endingCopy.endingWords.witness.longest, tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
+    branchRouteEntry && { id: "branch", label: endingCopy.endingWords.witness.branch, tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
   const endingAfterglow = endingCopy.getEndingAfterglow(observationLedger);
+  const analystName = playerName?.trim() ? fill(resultCopy.namedAnalyst, { name: playerName.trim() }) : resultCopy.anonymousAnalyst;
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -126,19 +129,19 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)} aria-keyshortcuts={keys("R")}>
                 <RefreshCcw size={16} />
                 {letterKeys && <kbd className="shortcut-hint" aria-hidden="true">R</kbd>}
-                이 사건 다시 도전
+                {resultCopy.replayCase}
               </button>
               <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
                 <Trophy size={16} />
-                랭킹
+                {resultCopy.ranking}
               </button>
               <button type="button" className="ghost" onClick={showSeasonMap}>
                 <FileText size={16} />
-                시즌 로드맵
+                {resultCopy.seasonRoadmap}
               </button>
               <button className="ghost" type="button" onClick={copyReplayLink}>
                 <Link2 size={16} />
-                리플레이 링크
+                {resultCopy.replayLink}
               </button>
               {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                 <button
@@ -154,7 +157,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               )}
               <button className="ghost" type="button" data-testid="export-play-log" onClick={() => exportPlaytestLog()}>
                 <Download size={16} />
-                공유 요약
+                {resultCopy.shareSummary}
               </button>
               {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                 <button
@@ -162,12 +165,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   type="button"
                   data-testid="export-diagnostic-log"
                   onClick={() => {
-                    if (
-                      typeof globalThis.confirm === "function" &&
-                      !globalThis.confirm("진단 로그에는 원문 선택 로그, 피드백 원문, 에러 stack, DOM 스냅샷, 복구 슬롯이 포함됩니다. 내보낼까요?")
-                    ) {
-                      return;
-                    }
+                    if (typeof globalThis.confirm === "function" && !globalThis.confirm("진단 로그에는 원문 선택 로그, 피드백 원문, 에러 stack, DOM 스냅샷, 복구 슬롯이 포함됩니다. 내보낼까요?")) return;
                     exportPlaytestLog({ includeDiagnostics: true });
                   }}
                 >
@@ -180,11 +178,11 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   for a retry) read as another way to retry. */}
               <button type="button" className="ghost season-reset-button" onClick={reset}>
                 <RefreshCcw size={16} />
-                초기화
+                {resultCopy.reset}
               </button>
             </div>
           </div>
-          <section className="outcome-panel" aria-label="내가 만든 결말">
+          <section className="outcome-panel" aria-label={resultCopy.outcomeLabel}>
             <div className="outcome-panel-mark">
               <span lang="en">YOUR CONSEQUENCE</span>
               <strong>{caseOutcome.tag}</strong>
@@ -199,7 +197,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               register is a hard read, and this is the one beat where the analyst
               is a person rather than a decision. */}
           {nextCaseSignal?.interlude && (
-            <section className={`interlude-panel mood-${nextCaseSignal.interlude.mood}`} aria-label="막간">
+            <section className={`interlude-panel mood-${nextCaseSignal.interlude.mood}`} aria-label={resultCopy.interludeLabel}>
               <span>{nextCaseSignal.interlude.label}</span>
               <h2>{nextCaseSignal.interlude.title}</h2>
               {[nextCaseSignal.interlude.text].flat().map((line) => <p key={line}>{line}</p>)}
@@ -228,27 +226,27 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </section>
           )}
           {currentCase === "final" && (
-            <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label="결말 변형">
+            <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label={resultCopy.endingVariantLabel}>
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
               <p>{endingVariant.text}</p>
-              <small>{endingVariant.failure ? view.endingCause.toll : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>{view.seasonCard.comparison && <small data-testid="season-comparison">{view.seasonCard.comparison}</small>}
+              <small>{endingVariant.failure ? view.endingCause.toll : resultCopy.endingVariantNote}</small>{view.seasonCard.comparison && <small data-testid="season-comparison">{view.seasonCard.comparison}</small>}
             </section>
           )}
           {currentCase === "final" && (
-            <section className="ending-epilogue-panel" aria-label="엔딩 에필로그">
+            <section className="ending-epilogue-panel" aria-label={resultCopy.epilogueLabel}>
               <span lang="en">AFTER THE RECORD</span>
               <p>{view.endingEpilogue}</p>
             </section>
           )}
+          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label={resultCopy.sideSlotOpened.label} data-testid="side-slot-opened"><p>{resultCopy.sideSlotOpened.text}</p></section>}
           {currentCase === "final" && view.logicReport && (
             <section className="ending-epilogue-panel" aria-label={view.logicReport.label} data-testid="logic-report">
               <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
-          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label="번외 사건" data-testid="side-slot-opened"><p>번외 사건 칸이 열렸습니다. 시작 화면에서 열 수 있고, 랭킹 밖입니다.</p></section>}
           {currentCase === "final" && view.failureRecovery && (
-            <section className="failure-recovery-panel" aria-label="실패 복구 경로">
+            <section className="failure-recovery-panel" aria-label={resultCopy.failureRecoveryLabel}>
               <strong>{view.failureRecovery.title}</strong>
               <p>{view.failureRecovery.text}</p>
             </section>
@@ -258,14 +256,14 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               and the next case first, then who the player was, then the score. */}
           <div className={`result-hero rank-${resultRank.toLowerCase()}`}>
             <div className="result-hero-copy">
-              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>
+              <p>{fill(resultCopy.profileLine, { caseLabel: activeCaseMeta?.label ?? "", analyst: analystName })}{view.score.caseResults[currentCase]?.assistStory && resultCopy.storyRunMark}</p>
               <h1>
-                {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 생각이 가장 오래 유지됐습니다.</>}
+                {currentCase === "final" ? resultCopy.finalHeadline : <><em>{triggerLabels[result.primary[0]]}</em>{resultCopy.caseHeadlineTail}</>}
               </h1>
-              <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
+              <section className="outcome-panel judgment-profile-panel" aria-label={resultCopy.judgmentProfileLabel}>
                 <div><span lang="en">JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
                 <p>{judgmentProfile.text}</p>
-                <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
+                <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? fill(resultCopy.costliestAlternative, { label: costliestAlternative }) : observerEndingRecord.title)}</small>
               </section>
             </div>
             <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
@@ -278,7 +276,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div className="rank-copy">
               <span lang="en">SCORE BREAKDOWN · {momentumScore} POINTS</span>
               <h2>{rankLine}</h2>
-              <p>{currentCase !== "final" && "다음 사건은 이 랭크에 따라 믿음과 공정함을 조금 얹거나, 피로를 안고 시작합니다. "}랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
+              <p>{currentCase !== "final" && resultCopy.rankCarryNote}{resultCopy.rankNote}</p>
             </div>
             <div className="score-breakdown">
               {scoreBreakdown.map((item) => (
@@ -296,25 +294,25 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
           {/* Act two. The report used to answer "why" in twenty-five named
               regions spread over 10,616px; these are the three answers a player
               actually leaves with, and the archive below keeps the rest. */}
-          <section className="result-why" aria-label="왜 이렇게 됐나">
+          <section className="result-why" aria-label={resultCopy.why.title}>
             <div className="panel-title-row">
-              <h2>왜 이렇게 됐나</h2>
-              <span>이번 판을 결정한 세 가지</span>
+              <h2>{resultCopy.why.title}</h2>
+              <span>{resultCopy.why.subtitle}</span>
             </div>
             <div className="result-why-grid">
               <article>
-                <span>결말을 정한 축</span>
+                <span>{resultCopy.why.axis}</span>
                 <strong>{endingAxes[0].label}</strong>
                 <p>{endingAxes[0].text}</p>
               </article>
               <article>
-                <span>당신이 반복한 방식</span>
+                <span>{resultCopy.why.habit}</span>
                 <strong>{decisionFingerprint.habit?.title || decisionFingerprint.modeTitle}</strong>{decisionFingerprint.habit ? <p>{decisionFingerprint.habit.line}</p> : null}
                 <p>{view.endingCause ? view.endingCause.text : decisionFingerprint.modeText}</p>
               </article>
               <article className="result-why-doors">
-                <span>열지 않은 문</span>
-                <strong>{unopenedRecordCount}개</strong>
+                <span>{resultCopy.why.doors}</span>
+                <strong>{fill(resultCopy.why.doorCount, { count: unopenedRecordCount })}</strong>
                 {unopenedDoors.length > 0 ? (
                   <ul>
                     {unopenedDoors.map((door) => (
@@ -325,10 +323,10 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                     ))}
                   </ul>
                 ) : (
-                  <p>단서 {unopenedRecordCount - unopenedBranchCount}개와 분기 {unopenedBranchCount}개가 아직 기록에 없습니다.</p>
+                  <p>{fill(resultCopy.why.doorsLeft, { clues: unopenedRecordCount - unopenedBranchCount, branches: unopenedBranchCount })}</p>
                 )}
                 <button type="button" className="ghost" onClick={() => startCase(currentCase)}>
-                  이 사건 다시 도전
+                  {resultCopy.replayCase}
                 </button>
               </article>
             </div>
