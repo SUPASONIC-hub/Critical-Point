@@ -149,7 +149,7 @@ export default {
           "label": "Fill the 20 boxes and write none of what you saw today"
         },
         "reframe": {
-          "label": "Reframe the Table one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Bank Gangseo Branch, banking hall · behind the shutter",

@@ -125,7 +125,7 @@ export default {
           "label": "Turn to the unlisted pages at the back of the investment contract"
         }
       },
-      "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table Between the Shelves",
+      "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Table between the Shelves",
       "clock": "The day after Chuseok 06:30 · Full moon · September · Fallen leaves",
       "question": "Facing a decision sheet with no one to return it, you are handed Lim Kyungsoo’s signature practice book. What do you write this morning?",
       "lead": "Dawn, after a night circling Seongsu and Pangyo. Leaves pile up in the alley outside the bookshop, and the shutter is half raised."
@@ -676,17 +676,17 @@ export default {
     },
     "outcomes": {
       "c48_after_warm": {
-        "tag": "The ending where you stayed beside them",
+        "tag": "Stayed Beside Them",
         "title": "The night the committee ended, you shared songpyeon at the bookshop",
         "text": "No one said a word about paperwork. Lim Kyungsoo’s signature practice book and fountain pen lay in the middle of the table, and everyone scattered only after the last train had gone."
       },
       "c48_after_record": {
-        "tag": "The ending where you left a record",
+        "tag": "Left on Record",
         "title": "The committee’s conclusion and your opinion were filed as a document",
         "text": "This time, anyone can look up who wrote a name in the signature field. It is the first document where a member’s opinion stayed as written, not returned."
       },
       "c48_after_rush": {
-        "tag": "The ending where you ran ahead",
+        "tag": "Ran Ahead",
         "title": "You left the meeting room and went straight back to the office",
         "text": "On a darkened floor, you turned the approvals from Yoon Sanghyuk’s time one page at a time. To the songpyeon photos in the group chat, you left only one reply: 'Later.'"
       }

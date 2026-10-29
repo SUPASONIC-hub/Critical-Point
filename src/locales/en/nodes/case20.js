@@ -31,7 +31,7 @@ export default {
           "label": "Have ECHO read the replacement approval itself"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January 26 · ECHO replacement in D-5",
       "question": "In five days ECHO is erased, and NOAH, taught on its records, takes its place. What do you do first?",
       "lead": "Four days after the paper left the Hoegi-dong bookshop, the 4th-floor monitors all flicker at once on Monday morning."
@@ -177,7 +177,7 @@ export default {
           "label": "Document ECHO’s principles and the response list"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "February 1 · Morning",
       "question": "On the morning NOAH comes on, the oldest line of the response records points to Jeju. How do you close this morning?"
     },
@@ -268,7 +268,7 @@ export default {
           "label": "Put the farewell off until after the switch"
         }
       },
-      "place": "Trigger Lab 4th Floor · Pantry",
+      "place": "Trigger Lab, 4th-floor pantry",
       "clock": "January 27 · 22:00",
       "question": "Kang Taemin says goodbyes are for the one who stays. How do you send ECHO off?"
     },
@@ -290,7 +290,7 @@ export default {
           "label": "Stand by Han Seoyun so she can tell the team herself"
         }
       },
-      "place": "Trigger Lab Rooftop",
+      "place": "Trigger Lab rooftop",
       "clock": "January 28 · 23:20 · Snow Flurries",
       "question": "Han Seoyun approved the record transfer without reading Attachment 12. What do you do beside that confession?"
     },
@@ -432,7 +432,7 @@ export default {
           "label": "Show the contract first to colleagues it put a price on"
         }
       },
-      "place": "Trigger Lab Archive B2 · Contract Document Folder",
+      "place": "Trigger Lab archive B2 · Contract document folder",
       "clock": "January 31 · 21:00",
       "question": "The response records were sold for 12 million won each, with one more purpose. How do you use this contract?"
     },
@@ -461,7 +461,7 @@ export default {
           "label": "Have ECHO read the replacement approval itself"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January 26 · ECHO replacement in D-5",
       "question": "You come back from staying beside a person, and now it is ECHO’s turn to go. Whose side do you stand by first?",
       "lead": "Three days back from the hospital room. Snow that hasn’t melted still clings to the 4th-floor window frames."
@@ -491,7 +491,7 @@ export default {
           "label": "Have ECHO read the replacement approval itself"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January 26 · ECHO replacement in D-5",
       "question": "Every box of paper went on a list, but ECHO’s records are erased without one. What do you keep first?",
       "lead": "The handover document for the 312 boxes is still spread out on your desk when the notice comes up."
@@ -521,7 +521,7 @@ export default {
           "label": "Have ECHO read the replacement approval itself"
         }
       },
-      "place": "Trigger Lab 4th Floor · Analyst Room",
+      "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "January 26 · ECHO replacement in D-5",
       "question": "The person measuring the servers was the one in charge of the replacement. Whom do you catch first?",
       "lead": "The tape measure you saw outside the basement server room came back to you only after you read the name at the bottom of the notice."
@@ -674,12 +674,12 @@ export default {
     },
     "outcomes": {
       "c20_after_warm": {
-        "tag": "Stayed Beside",
+        "tag": "Stayed Beside Them",
         "title": "The day NOAH came on, nine people cleared the server room together",
         "text": "On the morning after midnight, Trigger Lab’s people set the day aside to tidy the server room. They left the 'measured, nine' note beside the terminal where it was."
       },
       "c20_after_record": {
-        "tag": "Left the Principles",
+        "tag": "Left a Principle",
         "title": "ECHO’s judgment principles became a document outside the machine",
         "text": "“ECHO’s Judgment Principles” and the response records list were registered as official documents. The machine changed, but a version people can read remained."
       },

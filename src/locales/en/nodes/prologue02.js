@@ -149,7 +149,7 @@ export default {
           "label": "State plainly that our team wrote Article 7"
         },
         "reframe": {
-          "label": "Reframe the table with one last proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "Head office 6th-floor review room · Behind a closed door",
@@ -386,7 +386,7 @@ export default {
           "label": "Open the draft contract’s circulation record"
         }
       },
-      "place": "Head office 8th-floor review records room",
+      "place": "Head office, 8th floor, review records room",
       "clock": "Monday, April 17, 2023",
       "question": "Of 47 contracts with the same sentence, 9 sat under 1 percentage point. What do you do with this list?"
     },

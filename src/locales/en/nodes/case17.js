@@ -136,7 +136,7 @@ export default {
         "10:00 HR committee -- no notebook means a document production hearing",
         "Opposed 17 · don’t mind 12 · refused 7 · not yet visited 7 · unreachable 3 · deceased 1",
         "Seoa’s star sticker on the notebook cover",
-        "This choice leads to the blank signature field on the 33rd floor"
+        "This choice leads to the empty signature field on the 33rd floor"
       ],
       "choices": {
         "c17_final_return": {
@@ -149,7 +149,7 @@ export default {
           "label": "Burn the notebook with Ban Jaewook to end today’s fight"
         },
         "reframe": {
-          "label": "Reframe the table and propose, one last time"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Financial Group headquarters, 12th floor · Corridor outside the HR committee room",
@@ -386,7 +386,7 @@ export default {
           "label": "Overlay the 7-year-old notebook copy on the call log"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "December 17",
       "question": "For 20 years, audits have cut the hand that wrote it down instead of the one who gave the order. What do you do with these figures?"
     },
@@ -409,7 +409,7 @@ export default {
           "label": "Leave the rules; erase only the writers’ discipline records"
         }
       },
-      "place": "Trigger Lab, 4th-floor analyst room · Lab terminal",
+      "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
       "clock": "December 19 · Before dawn",
       "question": "At ten, once again only handwriting goes on the table. Where do you make a place for the spoken order to be written?"
     },

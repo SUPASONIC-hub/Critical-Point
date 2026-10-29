@@ -150,7 +150,7 @@ export default {
           "label": "Sign it and let group money start erasing tonight"
         },
         "reframe": {
-          "label": "Change the game one last time with a proposal"
+          "label": "Reframe the table and propose one last time"
         }
       },
       "place": "KD Financial Group Headquarters, Yeouido · Crisis Response Meeting Room",

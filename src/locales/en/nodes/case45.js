@@ -682,17 +682,17 @@ export default {
     },
     "outcomes": {
       "c45_after_warm": {
-        "tag": "The Ending Where You Stayed",
+        "tag": "Stayed Beside Them",
         "title": "On the night of the procession, you stayed at the bookshop until the shutter came down",
         "text": "Lim Jaeyoon walked between his father’s bookshelves for the first time. The fragment of ECHO waited one more night inside the laptop."
       },
       "c45_after_record": {
-        "tag": "The Ending Kept on Record",
+        "tag": "Left on Record",
         "title": "You scanned the original back page and shared the custody confirmations",
         "text": "With Lim Soyul, you scanned the original one sheet at a time and wrote your names on two confirmations. On the enlarged screen, beside the reviewer box, was a single pencil dot that was not her grandfather’s."
       },
       "c45_after_rush": {
-        "tag": "The Ending Where You Ran Ahead",
+        "tag": "Ran Ahead",
         "title": "On the night of the procession, you took the last train to Pangyo, holding the back page",
         "text": "Only the portrait drawing and the family remained at the secondhand bookshop. You went to show the erased agree to the machine that had learned how to dissent."
       }
