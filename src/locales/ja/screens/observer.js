@@ -84,6 +84,11 @@ export default {
     "field-pact": { title: "公式の承認より先に、現場の約束が次の扉を開いた。", text: "あなたの人脈が、閉ざされた記録に近づけるようにします。" },
     "quiet-cover": { title: "リスクは下げたが、真実もまだ眠っている。", text: "崩れたものも、明るみに出たものもないまま、シーズンが閉じました。" },
   },
+  gate: {
+    oversight: "手がかり{needClues}個以上と公正さ{needLegitimacy}以上が必要です。今は手がかり{clues}個、公正さ{legitimacy}。",
+    field: "信頼{needTrust}以上または手がかり{needClues}個以上が必要です。今は信頼{trust}、手がかり{clues}個。",
+    unlocked: "権限が確認されました。",
+  },
   openQuestion: {
     trust: { title: "答えは出せなかったが、あなたに話しかける人は残った。", text: "事件ごとに人的被害{value}を残したまま扉を閉じました。次の参加者は、あなたを知る人たちから始まります。" },
     legitimacy: { title: "手続きは残り、その手続きが何のためのものかは残らなかった。", text: "公正さは{value}で止まり、理由を書き留めた文書はありません。次の人はルールだけを受け継ぎます。" },
