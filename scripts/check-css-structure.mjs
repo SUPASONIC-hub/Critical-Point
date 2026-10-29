@@ -150,7 +150,24 @@ const fileBudgets = {
   // way out, and the quiet button's two half-rules made one.
   // 3170 / 76900 -> 3031 / 67101 on 2026-10-13: comments no longer counted
   // (139 lines and 9799 bytes of them that day), the room unchanged.
-  "base-intro-ranking.css": { lines: 3031, bytes: 67101 },
+  // 3031 / 67101 -> 3073 / 67949 on 2026-10-25 for the board's report button
+  // (store UGC rules): the action row under each post, a 44px toggle, the
+  // in-place reason fieldset with its legend, radios, note and buttons, and
+  // the live line that answers a report. Measured 3073 / 67946, room 0 / 3.
+  // 3073 / 67949 -> 3083 / 68150 the same day, measured: the foot of the
+  // intro links the privacy policy and the terms (.intro-legal), and those
+  // links and the data drawer's note take the colour around them.
+  // 3083 / 68150 -> 3128 / 69168 on 2026-10-26 for the language choice on the
+  // intro (LanguagePicker.jsx, 다국어 틀): the pills with their 44px target,
+  // the lit one, the preview line, and the phone's corner placement with room
+  // under it for the preview line. Measured.
+  // 3128 / 69168 -> 3137 / 69401 on 2026-10-29, measured: a wide screen pins
+  // the three language pills under the music controls (position: fixed), out
+  // of the brand row, so the start button stays inside a 1280x720 screen.
+  // 3137 / 69401 -> 3141 / 69500 the same day, measured: a Japanese page on a
+  // phone of 360px or less draws the premise at 14px / 1.6, since the system
+  // CJK face it falls back to wraps it two lines longer than the Korean.
+  "base-intro-ranking.css": { lines: 3141, bytes: 69500 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -366,7 +383,10 @@ const fileBudgets = {
   // 124 / 2691 -> 133 / 3047 on 2026-10-22 (D-5), measured: 이야기 글 크기,
   // the story's prose at 1.125 or 1.25 times its size. Paid for by D-3 the
   // same day, which took briefing.css down 22 lines and 425 bytes.
-  "comfort.css": { lines: 133, bytes: 3047 },
+  // 133 / 3047 -> 175 / 3849 on 2026-10-26 (pwa-install-hint), measured: the
+  // 홈 화면에 추가 card under the settings in the intro's comfort drawer
+  // (components/InstallHint.jsx), drawn only where a browser offers an install.
+  "comfort.css": { lines: 175, bytes: 3849 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

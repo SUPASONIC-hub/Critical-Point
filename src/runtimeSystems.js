@@ -8,17 +8,21 @@ import { getOperatorProfile } from "./advancedSystems.js";
 import { caseDisplayCode } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { directionParticle, easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
+import seasonEndCopy from "./copy/seasonEnd.js";
+import { fill } from "./locale.js";
+
+// The words are src/copy/seasonEnd.js's (another language is laid over them
+// there); the tables below read them as the runtime loads, after the page's
+// language is in.
+const W = seasonEndCopy;
 
 const HARM = easyResourceLabels.humanCost;
 const percent = (share) => Math.round(share * 100);
 
 export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
   const profile = getOperatorProfile(origin);
-  const levelPermissions = {
-    OBSERVER: ["제한 열람", "질문 요청", "관찰 기록"],
-    "FIELD ACCESS": ["기록 대조", "관계자 질문", "기준 제안"],
-    OVERSIGHT: ["기록 공개", "현장 개입", "실험 종료"],
-  };
+  // What each level may do (src/copy/seasonEnd.js `authority.permissions`).
+  const levelPermissions = W.authority.permissions;
   return {
     ...profile,
     level,
@@ -27,15 +31,15 @@ export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
 }
 
 const endingScenes = {
-  "open-oversight": { location: "OBSERVATORY / OPEN FLOOR", image: "/ending-oversight-room.webp", cue: "여러 개의 기록 창이 동시에 열립니다.", choice: "모든 참가자에게 기준 편집 권한을 넘긴다" },
-  "evidence-reform": { location: "TRIGGER LAB / PUBLIC AUDIT", image: "/ending-final-archive.webp", cue: "감사 화면과 보호 명부가 한 화면에 겹칩니다.", choice: "공개와 보호를 함께 운영 규칙으로 고정한다" },
-  "human-record": { location: "FIELD OFFICE / WITNESS ROOM", image: "/scene-case05.webp", cue: "당신이 다시 짠 판이 증언자의 목소리와 겹쳐 재생됩니다.", choice: "다음 분석관에게 사람의 이름부터 전달한다" },
-  "profitable-silence": { location: "BOARDROOM / SEALED WINDOW", image: "/scene-case04.webp", cue: "박수 소리 뒤에서 기록 잠금음이 들립니다.", choice: "수익 보고서에 침묵의 비용을 추가한다" },
-  "cold-justice": { location: "POLICY ROOM / EMPTY CHAIR", image: "/scene-case03.webp", cue: "완벽한 절차표 옆에 비어 있는 의자가 남습니다.", choice: "절차에 관계 회복 단계를 추가한다" },
-  "field-pact": { location: "DELIVERY HUB / NIGHT SHIFT", image: "/scene-case01.webp", cue: "공식 승인 전 현장 라디오가 먼저 응답합니다.", choice: "현장 협약을 공식 권한으로 승격한다" },
-  "quiet-cover": { location: "ARCHIVE / LOW LIGHT", image: "/scene-case02.webp", cue: "열기는 낮지만 잠긴 폴더가 더 많아집니다.", choice: "안전한 기록 하나를 열어 다음 단서로 삼는다" },
-  collapse: { location: "SYSTEM CORE / REDLINE", image: "/ending-system-collapse.webp", cue: "경보와 사람들의 호출이 한꺼번에 끊깁니다.", choice: "압박을 분산할 기준을 남긴다" },
-  "open-question": { location: "TRANSFER HALL / NEXT SHIFT", image: "/ending-final-archive.webp", cue: "다음 분석관의 출입증이 천천히 켜집니다.", choice: "답 대신 가장 위험한 질문을 인계한다" },
+  "open-oversight": { location: "OBSERVATORY / OPEN FLOOR", image: "/ending-oversight-room.webp", ...W.scenes["open-oversight"] },
+  "evidence-reform": { location: "TRIGGER LAB / PUBLIC AUDIT", image: "/ending-final-archive.webp", ...W.scenes["evidence-reform"] },
+  "human-record": { location: "FIELD OFFICE / WITNESS ROOM", image: "/scene-case05.webp", ...W.scenes["human-record"] },
+  "profitable-silence": { location: "BOARDROOM / SEALED WINDOW", image: "/scene-case04.webp", ...W.scenes["profitable-silence"] },
+  "cold-justice": { location: "POLICY ROOM / EMPTY CHAIR", image: "/scene-case03.webp", ...W.scenes["cold-justice"] },
+  "field-pact": { location: "DELIVERY HUB / NIGHT SHIFT", image: "/scene-case01.webp", ...W.scenes["field-pact"] },
+  "quiet-cover": { location: "ARCHIVE / LOW LIGHT", image: "/scene-case02.webp", ...W.scenes["quiet-cover"] },
+  collapse: { location: "SYSTEM CORE / REDLINE", image: "/ending-system-collapse.webp", ...W.scenes["collapse"] },
+  "open-question": { location: "TRANSFER HALL / NEXT SHIFT", image: "/ending-final-archive.webp", ...W.scenes["open-question"] },
 };
 
 export function getEndingSceneProfile(endingId = "open-question") {
@@ -51,7 +55,7 @@ export function getDelayedConsequences(caseResults = {}) {
       caseId,
       source: result.outcomeChoiceId,
       // The outcome id is a key, not copy: it used to print as `c1_after_people`.
-      text: `CASE ${caseDisplayCode(caseId)}의 마지막 선택이 다음 사건의 기준으로 남아 있습니다.`,
+      text: fill(W.delayed, { code: caseDisplayCode(caseId) }),
     }));
 }
 
@@ -64,8 +68,8 @@ export function getFailureObjectives(variant = {}) {
   if (!variant.failure) return [];
   const { collapseHarmPerCase, collapseBustRate, collapseOverreachHarm } = ENDING_GATES;
   return [
-    `사건마다 ${HARM}${objectParticle(HARM)} 평균 ${collapseHarmPerCase} 아래로 닫기`,
-    `벽에 닿은 판을 전체의 ${percent(collapseBustRate)}% 아래로 줄이거나, ${HARM}${objectParticle(HARM)} 평균 ${collapseOverreachHarm} 아래로 닫기`,
+    fill(W.failureObjectives.harm, { harm: HARM, particle: objectParticle(HARM), gate: collapseHarmPerCase }),
+    fill(W.failureObjectives.overreach, { bust: percent(collapseBustRate), harm: HARM, particle: objectParticle(HARM), gate: collapseOverreachHarm }),
   ];
 }
 
@@ -79,23 +83,13 @@ export function getRankingComparison(summary = {}) {
 }
 
 /** What each ending is called in a sentence. An ending's id is a key, never copy. */
-export const ENDING_NAMES = {
-  "open-oversight": "공개와 개입",
-  "evidence-reform": "증거와 개혁",
-  "human-record": "사람과 기록",
-  "profitable-silence": "성과와 침묵",
-  "cold-justice": "절차와 책임",
-  "field-pact": "현장과 협약",
-  "quiet-cover": "보호와 은폐",
-  collapse: "압박과 붕괴",
-  "open-question": "질문과 계승",
-};
+export const ENDING_NAMES = W.names;
 
 export function getEndingPreview(ending = {}) {
   if (!ending?.id) return null;
   return {
-    label: ENDING_NAMES[ending.id] ?? "미확정 경로",
-    text: ending.failure ? "현재 선택 패턴이 시스템 붕괴 쪽으로 기울고 있습니다." : "현재 선택 패턴이 이 엔딩의 조건을 강화하고 있습니다.",
+    label: ENDING_NAMES[ending.id] ?? W.preview.unnamed,
+    text: ending.failure ? W.preview.failure : W.preview.building,
   };
 }
 
@@ -107,7 +101,7 @@ export function getEndingVisualClass(endingId = "open-question") {
 // choice id is a key, and it used to be the text ("p1_start_a 60%").
 export function getBalanceSignals(log = []) {
   const choices = log.filter((entry) => !entry?.isSystemEvent);
-  const labelOf = (choiceId) => choices.find((entry) => entry.choiceId === choiceId)?.choice || "이름 없는 선택";
+  const labelOf = (choiceId) => choices.find((entry) => entry.choiceId === choiceId)?.choice || W.unnamedChoice;
   const counts = choices.reduce((map, entry) => {
     map[entry.choiceId] = (map[entry.choiceId] ?? 0) + 1;
     return map;
@@ -126,10 +120,11 @@ export function getBalanceSignals(log = []) {
 export function getFailureCause(variant = {}) {
   if (!variant?.failure) return null;
   const { id = "harm", harmPerCase = 0, bustRate = 0 } = variant.cause ?? {};
-  const harm = `사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${harmPerCase}${directionParticle(String(harmPerCase))} 닫혔습니다.`;
+  const words = W.failureCause;
+  const harm = fill(words.harm, { harm: HARM, particle: subjectParticle(HARM), perCase: harmPerCase, direction: directionParticle(String(harmPerCase)) });
   return id === "overreach"
-    ? { id, value: percent(bustRate), text: `판의 ${percent(bustRate)}%가 벽에 닿았고, ${harm}`, recovery: "심박이 빨라지면 확정하십시오." }
-    : { id: "human-cost", value: harmPerCase, text: harm, recovery: `${HARM}${objectParticle(HARM)} 줄이는 카드를 먼저 고르십시오.` };
+    ? { id, value: percent(bustRate), text: fill(words.overreach, { bust: percent(bustRate), harmLine: harm }), recovery: words.overreachRecovery }
+    : { id: "human-cost", value: harmPerCase, text: harm, recovery: fill(words.harmRecovery, { harm: HARM, particle: objectParticle(HARM) }) };
 }
 
 export function getEndingAtmosphere(endingId = "open-question") {
@@ -165,24 +160,24 @@ export function getTelemetryDashboardSnapshot({ errors = [], pending = [], ranki
 
 export function getAuthorityReview(origin = {}, level = "OBSERVER", result = {}) {
   return {
-    title: `${origin.title ?? "분석관"} / AUTHORITY REVIEW`,
+    title: `${origin.title ?? W.authority.analyst} / AUTHORITY REVIEW`,
     text: level === "OVERSIGHT"
-      ? "당신은 기록을 읽는 사람에서 종료 조건을 제안하는 사람으로 이동했습니다. 이제 권한의 결과도 책임져야 합니다."
-      : `현재 권한은 ${level}입니다. ${result.challengeClearCount ?? 0}개의 검증 신호와 관계 기록이 다음 심사의 근거가 됩니다.`,
-    next: level === "OBSERVER" ? "증거와 관계자의 믿음을 확보하십시오." : level === "FIELD ACCESS" ? "공정함과 사람 피해를 함께 관리하십시오." : "공개 이후의 피해 복구까지 설계하십시오.",
+      ? W.authority.oversight
+      : fill(W.authority.level, { level, count: result.challengeClearCount ?? 0 }),
+    next: level === "OBSERVER" ? W.authority.nextObserver : level === "FIELD ACCESS" ? W.authority.nextField : W.authority.nextOversight,
   };
 }
 
 export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
-  const labels = { courier: "현장 기록의 계승", lab: "반대 의견의 계승", public: "남긴 기록의 계승" };
+  const labels = W.origins;
   const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
-  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 '${ending}'의 결과가 다르게 읽힙니다.` };
+  return { label: labels[origin] ?? labels.courier, text: fill(W.originEnding, { origin: labels[origin] ?? labels.courier, ending }) };
 }
 
 // Both of these printed their keys: "courier 출신 분석관의 선택 이후, open-question 경로는".
 export function getAftermath(endingId = "open-question", origin = "courier") {
   const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
-  return { title: "AFTERMATH / NEXT SHIFT", text: `${getOperatorProfile(origin).title}의 선택 이후, '${ending}' 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
+  return { title: "AFTERMATH / NEXT SHIFT", text: fill(W.aftermath, { operator: getOperatorProfile(origin).title, ending }) };
 }
 
 export function getReplayDiagnostics({ runId = "", caseId = "", nodeId = "", choiceId = "", pending = 0 } = {}) {

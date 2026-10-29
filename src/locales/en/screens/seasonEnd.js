@@ -1,0 +1,58 @@
+/** The season's end as the report reads it, in English (src/copy/seasonEnd.js). */
+export default {
+  scenes: {
+    "open-oversight": { cue: "Many record windows open at once.", choice: "Hand every participant the right to edit the standard" },
+    "evidence-reform": { cue: "The audit screen and the protection roster overlap on one screen.", choice: "Fix disclosure and protection together as operating rules" },
+    "human-record": { cue: "The tables you reframed play back over the witnesses’ voices.", choice: "Pass people’s names to the next analyst first" },
+    "profitable-silence": { cue: "Behind the applause, a record lock clicks shut.", choice: "Add the cost of silence to the earnings report" },
+    "cold-justice": { cue: "Beside the flawless procedure chart, an empty chair remains.", choice: "Add a step for repairing relationships to the procedure" },
+    "field-pact": { cue: "Before official approval, the field radio answers first.", choice: "Raise the field pact to official authority" },
+    "quiet-cover": { cue: "The heat is low, but more folders are locked.", choice: "Open one safe record and make it the next clue" },
+    collapse: { cue: "The alarms and people’s calls cut out all at once.", choice: "Leave a standard that spreads the pressure" },
+    "open-question": { cue: "The next analyst’s access badge slowly lights up.", choice: "Hand over the most dangerous question instead of an answer" },
+  },
+  names: {
+    "open-oversight": "Disclosure and Intervention",
+    "evidence-reform": "Evidence and Reform",
+    "human-record": "People and the Record",
+    "profitable-silence": "Results and Silence",
+    "cold-justice": "Procedure and Responsibility",
+    "field-pact": "The Field and the Pact",
+    "quiet-cover": "Protection and Concealment",
+    collapse: "Pressure and Collapse",
+    "open-question": "The Question and Succession",
+  },
+  preview: {
+    unnamed: "Undecided path",
+    failure: "Your current choice pattern is leaning toward system collapse.",
+    building: "Your current choice pattern is strengthening this Ending’s conditions.",
+  },
+  delayed: "CASE {code}’s last choice remains the standard for the next case.",
+  failureObjectives: {
+    harm: "Close each case with average {harm} under {gate}",
+    overreach: "Keep the hands that hit the Wall under {bust}% of the total, or close with average {harm} under {gate}",
+  },
+  unnamedChoice: "An unnamed choice",
+  failureCause: {
+    harm: "On average, each case closed with {harm} at {perCase}.",
+    overreach: "{bust}% of hands hit the Wall. {harmLine}",
+    overreachRecovery: "Commit when your heartbeat quickens.",
+    harmRecovery: "Pick the cards that reduce {harm} first.",
+  },
+  authority: {
+    analyst: "Analyst",
+    oversight: "You have moved from someone who reads the record to someone who proposes the conditions for ending it. Now you answer for what your authority does, too.",
+    level: "Your current authority is {level}. {count} verification signals and your record with people are the grounds for the next review.",
+    nextObserver: "Secure evidence and the trust of the people involved.",
+    nextField: "Manage Fairness and Human cost together.",
+    nextOversight: "Plan the repair of harm after disclosure, too.",
+    permissions: {
+      OBSERVER: ["Restricted reading", "Ask questions", "Keep observation notes"],
+      "FIELD ACCESS": ["Cross-check records", "Question the people involved", "Propose standards"],
+      OVERSIGHT: ["Disclose records", "Intervene on site", "End the experiment"],
+    },
+  },
+  origins: { courier: "Inheriting the field record", lab: "Inheriting the dissent", public: "Inheriting the record you left" },
+  originEnding: "On the path of {origin}, the result of “{ending}” reads differently.",
+  aftermath: "{operator}: after that choice, the “{ending}” path carries on into the next shift’s questions and the front line’s response.",
+};

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDialogFocus } from "../gauntlet/useDialogFocus.js";
 import { answerConfirm, mountConfirmHost } from "../state/confirmAction.js";
+import confirmCopy from "../copy/confirm.js";
 
 /**
  * The question `confirmAction` asks, as a dialog in the game.
@@ -43,10 +44,10 @@ function Question({ message }) {
         <p id="confirm-message" data-testid="confirm-message">{message}</p>
         <div className="error-actions">
           <button type="button" className="ghost" data-testid="confirm-yes" onClick={() => answerConfirm(true)}>
-            확인
+            {confirmCopy.yes}
           </button>
           <button ref={cancelRef} type="button" data-testid="confirm-no" onClick={() => answerConfirm(false)}>
-            취소
+            {confirmCopy.no}
           </button>
         </div>
       </div>

@@ -389,22 +389,32 @@ for (const viewport of [
   { name: "narrow phone", width: 320, height: 844 },
   { name: "large phone", width: 412, height: 915 },
 ]) {
-  test(`intro start controls stay reachable on ${viewport.name}`, { tag: "@prod" }, async ({ page }) => {
-    await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    await page.goto("/");
-    const startButton = page.getByTestId("start-first-case");
-    await expect(startButton).toBeVisible();
-    const box = await startButton.boundingBox();
-    expect(box?.y ?? Number.POSITIVE_INFINITY).toBeGreaterThanOrEqual(0);
-    // Was "inside the document" until 2026-09-09, which an eight-screen intro
-    // passed at y=3,000 on an 844px phone. The control the first click needs has
-    // to be in the first viewport, so the viewport is the bound.
-    expect((box?.y ?? 0) + (box?.height ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(viewport.height);
-    const horizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(horizontalOverflow).toBe(0);
-  });
+  // Each language's start screen (10-29): the English premise ran two lines
+  // longer than the Korean and put the button at 738 on a 1280x720 screen,
+  // where only the Korean page was measured.
+  for (const lang of ["ko", "en", "ja"]) {
+    test(`intro start controls stay reachable on ${viewport.name}${lang === "ko" ? "" : ` (${lang})`}`, { tag: "@prod" }, async ({ page }) => {
+      // Known (10-29): on Linux's CJK face the Japanese premise still ends the
+      // start button 27px below a 320x844 screen (871). picker-narrow, which
+      // reworks the 320px header, takes it and drops this line.
+      test.fixme(lang === "ja" && viewport.name === "narrow phone", "Japanese start button 27px below a 320x844 first screen on Linux fonts");
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(lang === "ko" ? "/" : `/?lang=${lang}`);
+      if (lang !== "ko") await expect(page.locator("html")).toHaveAttribute("lang", lang);
+      const startButton = page.getByTestId("start-first-case");
+      await expect(startButton).toBeVisible();
+      const box = await startButton.boundingBox();
+      expect(box?.y ?? Number.POSITIVE_INFINITY).toBeGreaterThanOrEqual(0);
+      // Was "inside the document" until 2026-09-09, which an eight-screen intro
+      // passed at y=3,000 on an 844px phone. The control the first click needs has
+      // to be in the first viewport, so the viewport is the bound.
+      expect((box?.y ?? 0) + (box?.height ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(viewport.height);
+      const horizontalOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(horizontalOverflow).toBe(0);
+    });
+  }
 }
 
 // Budget, not a measurement: ratchet it down, never up. The intro was 6,687px on

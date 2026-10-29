@@ -24,6 +24,13 @@
  * not keep is estimated and said so: the share of the vault an audit took is
  * worked back from the vault the case's row reports (a caught case moved
  * three parts of four).
+ *
+ * The page's language (`summary.locale`, #352, 앱출시-F F-6) does not change a
+ * board's rules or score, but the reading lines (감4·연3) and how many seasons
+ * finish may differ on the English pages, so the summary says how many of the
+ * week's seasons were played on them (「그중 영어 화면 시즌」, like the NEW
+ * GAME+ line) and, past half, that the per-season lines and 감4·연3 are for
+ * reference only. See `seasonLocale` for the rule.
  */
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -31,6 +38,7 @@ import { pathToFileURL } from "node:url";
 import { addAudit, auditStep, countAudit } from "../src/gauntlet/auditRisk.js";
 import { walkLinks } from "../src/gauntlet/cascadeRisk.js";
 import { AUDIT_LIMIT, getWeekRule } from "../src/gauntlet/weeklyRules.js";
+import { LOCALES, PRESUMED_LOCALE } from "./report-funnel.mjs";
 
 const WEEK = process.env.TEST_WEEK || "2026-W47";
 const RULE = process.env.TEST_WEEK_RULE || "audit-cascade";
@@ -55,7 +63,10 @@ if (!/^[a-z][a-z0-9-]{0,31}$/.test(RULE) || !getWeekRule(RULE)) throw new Error(
  * of the week like any other when it took the rule. Its case rows carry
  * `summary.newGamePlus` (newGamePlusMark), and it opens its first cases on
  * the full table rather than the first season's staged one (tableUnlocks.js),
- * so the report says how many of the week's seasons were NEW GAME+. Story mode stamps no
+ * so the report says how many of the week's seasons were NEW GAME+. Each case
+ * row also brings the page's language (`summary.locale`, null on a row sent
+ * before #352 and on the season-final row, whose summary the server rewrites);
+ * `seasonLocale` makes a season's language of them. Story mode stamps no
  * rule either, and is told apart by the `assistStory` its decision log
  * carries. A season's device is the smallest session id among its case rows,
  * and only its rank among the week's devices leaves the database.
@@ -83,6 +94,7 @@ select c.run_id, coalesce(s.case_id, 'turned-down') as case_id, c.device,
        s.summary->'gauntlet'->'vault' as vault,
        s.summary->>'week' as ranked_week,
        s.summary->>'newGamePlus' = 'true' as new_game_plus,
+       s.summary->>'locale' as locale,
        (select coalesce(jsonb_agg(jsonb_build_object(
                  'nodeId', e->'nodeId', 'choiceId', e->'choiceId', 'threshold', e->'threshold',
                  'environmentMode', e->'environmentMode', 'riskRewardEffect', e->'riskRewardEffect',
@@ -99,6 +111,28 @@ export const QUERY = testWeekQuery();
 const pct = (part, whole) => (whole > 0 ? `${((part / whole) * 100).toFixed(1)}%` : "—");
 const per = (part, whole) => (whole > 0 ? (part / whole).toFixed(2) : "—");
 const modes = (entry) => String(entry?.environmentMode ?? "").split("+");
+
+/**
+ * A season's language, from its case rows' `summary.locale`: "en" when any row
+ * says en, else "ko" when any says ko, else null (「ko(추정)」).
+ *
+ * Any English row makes the season English, not the first row naming one
+ * (report-funnel.mjs's run rule), because the question here is whether the
+ * week's reading lines (감4·연3) may have been read off English pages: a season
+ * any part of which was played on them is one whose numbers may differ. In
+ * practice the two rules agree, as a page keeps its language for the whole run
+ * (「Continue in Korean」 only moves on to 사건 11; the page stays English).
+ * A season none of whose rows names a language is Korean, presumed, as in the
+ * funnel (#352): rows before the field came from builds without English pages,
+ * and by W47 every build sends it, so a W47 season without one is rare (a page
+ * left open since before #352 reached production).
+ */
+export function seasonLocale(cases) {
+  const named = cases.map((row) => row.locale).filter((locale) => LOCALES.includes(locale));
+  if (named.includes("en")) return "en";
+  if (named.includes("ja")) return "ja";
+  return named.includes("ko") ? "ko" : null;
+}
 
 /** The week's numbers, from the rows the query returned. */
 export function readTestWeek(rows) {
@@ -121,10 +155,16 @@ export function readTestWeek(rows) {
   const t = {
     seasons: runs.size, newGamePlus: newGamePlus.size, turnedDown, devicesOn: devicesOn.size, devicesOff: devicesOff.size,
     devices: new Set([...devicesOn, ...devicesOff]).size, finished: 0, ranked: 0, caseRows: 0, endings: 0, collapse: 0,
+    english: 0, japanese: 0, korean: 0, presumedKorean: 0,
     judged: 0, caught: 0, caughtSeasons: 0, nearLimit: 0, nearLimitClear: 0, vaultMoved: 0, vaultLost: 0,
     boards: 0, busts: 0, cascadeBoards: 0, cascadeBusts: 0, made: 0, cascadeCashHeat: 0, cascadeCashes: 0, plainCashHeat: 0, plainCashes: 0,
   };
   for (const [runId, cases] of runs) {
+    const locale = seasonLocale(cases);
+    if (locale === "en") t.english += 1;
+    else if (locale === "ja") t.japanese += 1;
+    else if (locale === "ko") t.korean += 1;
+    else t.presumedKorean += 1;
     let vaultBefore = 0;
     let caughtHere = 0;
     for (const row of cases) {
@@ -191,6 +231,41 @@ export function readTestWeek(rows) {
   return t;
 }
 
+/**
+ * The bot's reference for the summary's last column: the three lines
+ * `check:endings` prints with both rules on (AUDIT_WEEK=1 CASCADE_WEEK=1
+ * node scripts/check-endings.mjs --report; values B, the audit's exemption,
+ * carry cap 1, chip margin 10, 600 seasons), copied as printed. #223 measured
+ * them on 10-21 and main c8841dc0 gave the same lines on 10-25. TEST_WEEK_SIM
+ * names a file holding a fresh run's output (11-14~15, on the test week's
+ * sha) to read instead.
+ */
+export const SIMULATION_LINES = [
+  "Ending checks passed (600 replayed seasons: collapse 21.0%, open-oversight 14.3%, evidence-reform 5.8%, human-record 16.7%, profitable-silence 5.5%, cold-justice 5.0%, field-pact 17.8%, quiet-cover 7.7%, open-question 6.2%)",
+  "CASCADE (measured, CASCADE_WEEK=1, values B (8/2~4/6, carry 1), chip margin 10): per season made 44.15, came back 35.04 (21.81 carried in), carried 22.20, lapsed at the season's end 0.68 and at the cap 8.44 (20.6% of made); at most 2 of a case's first two boards CASCADE; CASCADE boards 21022 in 600 of 600 seasons, bust on them 12.5% (every board 10.7%); final vault 861733 a season",
+  "Audit (measured, AUDIT_WEEK=1, values B (40/4/-2/1:4)): 789 closes caught in 62 of 600 seasons (1.31 a season), 0.6% of what the closes moved to the vault",
+].join("\n");
+
+/** The figures of the summary's last column, read off check:endings' output. */
+export function readSimulation(text) {
+  const grab = (pattern, what) => {
+    const match = text.match(pattern);
+    if (!match) throw new Error(`the bot's output has no ${what} line (check:endings with AUDIT_WEEK=1 CASCADE_WEEK=1)`);
+    return match;
+  };
+  const [, seasons, collapse] = grab(/^Ending checks passed \((\d+) replayed seasons: collapse ([\d.]+%)/m, "ending");
+  const [, made, back, cascadeBust, bust] = grab(/^CASCADE \(measured, CASCADE_WEEK=1[^)]*\)[^:]*: per season made ([\d.]+), came back ([\d.]+) .*bust on them ([\d.]+%) \(every board ([\d.]+%)\)/m, "CASCADE");
+  const [, caughtSeasons, auditSeasons, caught, vaultLost] = grab(/^Audit \(measured, AUDIT_WEEK=1.*?\): \d+ closes caught in (\d+) of (\d+) seasons \(([\d.]+) a season\), ([\d.]+%) of what/m, "audit");
+  const share = `${((Number(caughtSeasons) / Number(auditSeasons)) * 100).toFixed(1)}%`;
+  return { seasons: Number(seasons), collapse, made, back, cascadeBust, bust, caught, caughtShare: share, vaultLost };
+}
+
+const SIM = readSimulation(process.env.TEST_WEEK_SIM ? readFileSync(process.env.TEST_WEEK_SIM, "utf8") : SIMULATION_LINES);
+const SIM_NOTE = `둘 다 켬·면제, ${SIM.seasons}시즌 봇`;
+
+/** More than half of the week's seasons on the English or Japanese pages (open to the end from 10-28): the per-season lines and 감4·연3 are for reference only. */
+export const ENGLISH_WARNING = "영어·일본어 화면 시즌이 합쳐 절반을 넘습니다. 판 규칙·점수는 언어와 무관하지만 읽기와 완주가 다를 수 있어, 「시즌당」 줄(시즌당 적발, 시즌당 만듦 / 돌아옴)과 감4·연3(벌 전 알아챔 두 줄)은 참고로만 읽습니다.";
+
 export function describeTestWeek(t) {
   const meanHeat = (sum, n) => (n > 0 ? (sum / n).toFixed(1) : "—");
   return [
@@ -202,20 +277,25 @@ export function describeTestWeek(t) {
     "|---|---|---|---|",
     `| 시즌 | 시작한 시즌 / 사건 행 | ${t.seasons} / ${t.caseRows} | |`,
     `| 시즌 | 그중 NEW GAME+ 시즌(지난 시즌을 끝낸 기기의 다음 시즌) | ${t.newGamePlus} (${pct(t.newGamePlus, t.seasons)}) | |`,
+    `| 시즌 | 그중 영어 화면 시즌(사건 행 하나라도 \`summary.locale\` = en) · 한국어 / ${PRESUMED_LOCALE} | ${t.english} (${pct(t.english, t.seasons)}) · ${t.korean} / ${t.presumedKorean} | |`,
+    `| 시즌 | 그중 일본어 화면 시즌(영어 행이 없고 하나라도 \`summary.locale\` = ja) | ${t.japanese} (${pct(t.japanese, t.seasons)}) | |`,
     `| 시즌 | 같은 주에 시작해 규칙 없이 친 시즌(규칙을 끔·첫 시즌 기본 꺼짐·옛 화면, 이야기 모드 제외) | ${t.turnedDown} (${pct(t.turnedDown, t.seasons + t.turnedDown)}) | |`,
     `| 시즌 | 서로 다른 기기: 규칙 켬 / 규칙 없음 / 모두 | ${t.devicesOn} / ${t.devicesOff} / ${t.devices} | |`,
     `| 시즌 | 끝난 시즌 / 이 주 랭킹에 오른 시즌 | ${t.finished} / ${t.ranked} | |`,
     `| 감사 | 판정한 사건 닫힘 / 적발 | ${t.judged} / ${t.caught} (${pct(t.caught, t.judged)}) | |`,
-    `| 감사 | 시즌당 적발 / 적발이 있었던 시즌 | ${per(t.caught, t.seasons)} / ${t.caughtSeasons} (${pct(t.caughtSeasons, t.seasons)}) | 1.75 / 13% (B, 감사만, 시즌 봇) |`,
-    `| 감사 | 금고로 갈 몫의 잃은 비율(추정) | ${pct(t.vaultLost, t.vaultMoved)} | 0.7% (B, 감사만) |`,
+    `| 감사 | 시즌당 적발 / 적발이 있었던 시즌 | ${per(t.caught, t.seasons)} / ${t.caughtSeasons} (${pct(t.caughtSeasons, t.seasons)}) | ${SIM.caught} / ${SIM.caughtShare} (${SIM_NOTE}) |`,
+    `| 감사 | 금고로 갈 몫의 잃은 비율(추정) | ${pct(t.vaultLost, t.vaultMoved)} | ${SIM.vaultLost} |`,
     `| 감사 | 벌 전 알아챔: ${AUDIT_LIMIT - 1}/${AUDIT_LIMIT}에 닿은 사건 중 적발 없이 닫은 비율 | ${pct(t.nearLimitClear, t.nearLimit)} (${t.nearLimitClear}/${t.nearLimit}) | |`,
     `| 연쇄 | 판 / CASCADE 판 비율 | ${t.boards} / ${pct(t.cascadeBoards, t.boards)} | |`,
-    `| 연쇄 | CASCADE 판 BUST (모든 판) | ${pct(t.cascadeBusts, t.cascadeBoards)} (${pct(t.busts, t.boards)}) | |`,
-    `| 연쇄 | 시즌당 만듦 / 돌아옴 | ${per(t.made, t.seasons)} / ${per(t.cascadeBoards, t.seasons)} | |`,
+    `| 연쇄 | CASCADE 판 BUST (모든 판) | ${pct(t.cascadeBusts, t.cascadeBoards)} (${pct(t.busts, t.boards)}) | ${SIM.cascadeBust} (${SIM.bust}) |`,
+    `| 연쇄 | 시즌당 만듦 / 돌아옴 | ${per(t.made, t.seasons)} / ${per(t.cascadeBoards, t.seasons)} | ${SIM.made} / ${SIM.back} |`,
     `| 연쇄 | 벌 전 알아챔: 확정한 열기 평균, CASCADE 판 / 다른 판 | ${meanHeat(t.cascadeCashHeat, t.cascadeCashes)} / ${meanHeat(t.plainCashHeat, t.plainCashes)} | |`,
-    `| 결말 | 붕괴 결말 | ${pct(t.collapse, t.endings)} (${t.collapse}/${t.endings}) | 21.0% (연쇄 이월 1, 끔 20.7%) |`,
+    `| 결말 | 붕괴 결말 | ${pct(t.collapse, t.endings)} (${t.collapse}/${t.endings}) | ${SIM.collapse} |`,
     "",
-    "시뮬레이션 값은 감사·연쇄를 따로 켠 측정입니다(PR #201, #208). 두 장치를 함께 켠 판은 이 주가 처음입니다.",
+    `시뮬레이션 값은 감사·연쇄를 함께 켠 시즌 봇입니다(AUDIT_WEEK=1 CASCADE_WEEK=1 check:endings, 값 B·면제·이월 상한 1·칩 마진 10, ${SIM.seasons}시즌${process.env.TEST_WEEK_SIM ? "" : ", 10-21 #223과 10-25 main c8841dc0에서 같은 값"}). 봇은 읽기 시계를 쓰지 않으니 BUST는 차로 봅니다. 사람이 두 장치를 함께 켠 판을 치는 것은 이 주가 처음입니다.`,
+    ...((t.english + t.japanese) * 2 > t.seasons ? ["", `**${ENGLISH_WARNING}**`] : []),
+    "",
+    `${PRESUMED_LOCALE}: 어느 사건 행에도 화면 언어가 없는 시즌(언어 칸이 운영에 닿기 전 빌드에서 온 행). Funnel과 같이 한국어로 봅니다.`,
   ].join("\n");
 }
 

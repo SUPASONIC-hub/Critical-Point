@@ -65,10 +65,13 @@ export function seasonData() {
         return [
           `import { createSeasonRuntime } from "/src/seasonRuntime.js";`,
           `import { loadedChunk } from "/src/state/chunkReload.js";`,
+          // On an English page a case arrives with its English laid over it
+          // (src/locale.js); on a Korean page localizeCaseData hands it back.
+          `import { localizeCaseData } from "/src/locale.js";`,
           `const loaders = {\n${loaders}\n};`,
           `const index = JSON.parse(${JSON.stringify(JSON.stringify(data.index))});`,
           `export const season = createSeasonRuntime(index, (caseId) =>`,
-          `  loaders[caseId] ? loaders[caseId]().then((module) => loadedChunk(module).default) : Promise.reject(new Error("No such case: " + caseId)),`,
+          `  loaders[caseId] ? loaders[caseId]().then((module) => localizeCaseData(caseId, loadedChunk(module).default, index)) : Promise.reject(new Error("No such case: " + caseId)),`,
           `);`,
         ].join("\n");
       }

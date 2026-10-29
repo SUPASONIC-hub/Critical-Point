@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-const { QUERY, testWeekQuery, readTestWeek, describeTestWeek } = await import("../../scripts/report-test-week.mjs");
+const { QUERY, testWeekQuery, readTestWeek, describeTestWeek, readSimulation, SIMULATION_LINES, seasonLocale, ENGLISH_WARNING } = await import("../../scripts/report-test-week.mjs");
 
 // One window of a case's decision log, as useChoiceCommit writes it (the fields the report reads).
 const board = (state, gauge, pushes, environmentMode = "stable", burn = 0) => ({
@@ -51,6 +51,38 @@ test("the test week's report reads the audit and the links the way the game sett
   assert.match(text, /서로 다른 기기.*\| 2 \/ 2 \/ 3 \|/);
 });
 
+test("a season's language: any English case row makes it English, none naming one is ko(추정), and past half the summary warns", () => {
+  assert.equal(seasonLocale([{ locale: "ko" }, { locale: "en" }, { locale: null }]), "en", "any English row");
+  assert.equal(seasonLocale([{ locale: null }, { locale: "ko" }]), "ko");
+  assert.equal(seasonLocale([{ locale: null }, { locale: "fr" }, {}]), null, "no supported language named: ko(추정)");
+  assert.equal(seasonLocale([{ locale: "ko" }, { locale: "ja" }]), "ja", "a Japanese row (10-28: open to the end)");
+  assert.equal(seasonLocale([{ locale: "ja" }, { locale: "en" }]), "en", "English first, as before");
+  const jaWeek = readTestWeek([{ run_id: "r1", case_id: "case01", device: 1, vault: 1, log: [], locale: "ja" }, { run_id: "r2", case_id: "case01", device: 2, vault: 1, log: [], locale: "en" }, { run_id: "r3", case_id: "case01", device: 3, vault: 1, log: [], locale: "ko" }]);
+  assert.deepEqual([jaWeek.english, jaWeek.japanese, jaWeek.korean], [1, 1, 1]);
+  const jaText = describeTestWeek(jaWeek);
+  assert.match(jaText, /\| 시즌 \| 그중 일본어 화면 시즌.*\| 1 \(33\.3%\) \| \|/);
+  assert.ok(jaText.includes(`**${ENGLISH_WARNING}**`), "English and Japanese together past half");
+  const caseRow = (run, locale, extra = {}) => ({ run_id: run, case_id: "case01", device: 1, vault: 100, log: [], locale, ...extra });
+  const rows = [
+    caseRow("secret-run-a", "en"),
+    { run_id: "secret-run-a", case_id: "season-final", device: 1, locale: null, log: [] },
+    caseRow("secret-run-b", "ko"),
+    caseRow("secret-run-c", null),
+    caseRow("secret-run-d", "en"),
+    { run_id: "secret-run-e", case_id: "turned-down", device: 2, locale: null, log: [] },
+  ];
+  const half = readTestWeek(rows);
+  assert.deepEqual([half.english, half.korean, half.presumedKorean], [2, 1, 1], "a season without the rule is not one of the week's");
+  const text = describeTestWeek(half);
+  assert.match(text, /\| 시즌 \| 그중 영어 화면 시즌\(사건 행 하나라도 `summary\.locale` = en\) · 한국어 \/ ko\(추정\) \| 2 \(50\.0%\) · 1 \/ 1 \| \|/);
+  assert.ok(!text.includes(ENGLISH_WARNING), "exactly half is not past half");
+  const more = describeTestWeek(readTestWeek([...rows, caseRow("secret-run-f", "en")]));
+  assert.match(more, /그중 영어 화면 시즌.*\| 3 \(60\.0%\) · 1 \/ 1 \|/);
+  assert.ok(more.includes(`**${ENGLISH_WARNING}**`));
+  assert.match(ENGLISH_WARNING, /「시즌당」 줄.*감4·연3.*참고로만/);
+  assert.doesNotMatch(more, /secret-run/);
+});
+
 test("the query is one read-only statement", () => {
   assert.match(QUERY, /^with runs as \(/);
   assert.doesNotMatch(QUERY, /\b(insert|update|delete|drop|alter|create|grant|truncate)\b|;/i);
@@ -63,6 +95,7 @@ test("the query sends no device id out of the database, only its rank among the 
   const selected = QUERY.slice(QUERY.lastIndexOf("\nselect "));
   assert.doesNotMatch(selected, /session_id|session_code/);
   assert.match(selected, /s\.summary->>'newGamePlus' = 'true' as new_game_plus/);
+  assert.match(selected, /s\.summary->>'locale' as locale/);
   assert.match(QUERY, /dense_rank\(\) over \(order by r\.session_id\) as device/);
 });
 
@@ -77,4 +110,22 @@ test("the workflow and the script read the calendar's test week by default (W47 
   // A day outside the week: the query keeps only runs whose first row came in that week, so it reads nothing.
   assert.match(QUERY, /having public\.kst_iso_week\(min\(s\.completed_at\)\) = '2026-W47'/);
   assert.match(describeTestWeek(readTestWeek([])), /시작한 시즌 \/ 사건 행 \| 0 \/ 0/);
+  assert.match(describeTestWeek(readTestWeek([])), /그중 영어 화면 시즌.*\| 0 \(—\) · 0 \/ 0 \|/);
+});
+
+test("the reference column is the bot with both rules on (check:endings' own lines), not each rule alone", () => {
+  assert.deepEqual(readSimulation(SIMULATION_LINES), {
+    seasons: 600, collapse: "21.0%", made: "44.15", back: "35.04", cascadeBust: "12.5%", bust: "10.7%",
+    caught: "1.31", caughtShare: "10.3%", vaultLost: "0.6%",
+  });
+  const text = describeTestWeek(readTestWeek([]));
+  assert.match(text, /시즌당 적발 \/ 적발이 있었던 시즌 \| — \/ 0 \(—\) \| 1\.31 \/ 10\.3% \(둘 다 켬·면제, 600시즌 봇\) \|/);
+  assert.match(text, /금고로 갈 몫의 잃은 비율\(추정\) \| — \| 0\.6% \|/);
+  assert.match(text, /CASCADE 판 BUST \(모든 판\) \| — \(—\) \| 12\.5% \(10\.7%\) \|/);
+  assert.match(text, /시즌당 만듦 \/ 돌아옴 \| — \/ — \| 44\.15 \/ 35\.04 \|/);
+  assert.match(text, /붕괴 결말 \| — \(0\/0\) \| 21\.0% \|/);
+  assert.match(text, /감사·연쇄를 함께 켠 시즌 봇입니다/);
+  assert.doesNotMatch(text, /따로 켠|1\.75 \/|\| 0\.7% \||20\.7%/);
+  // A run with one rule off prints no line for it, and the report says so rather than show a stale figure.
+  assert.throws(() => readSimulation(SIMULATION_LINES.split("\n").slice(0, 2).join("\n")), /no audit line/);
 });
