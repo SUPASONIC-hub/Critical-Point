@@ -263,7 +263,8 @@ const budgets = [
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
   // 66,015 -> 66,033 gzip on 2026-10-29, save-unavailable-lite: the start screen's storage line in the page's language (src/shellNotices.js, one line laid over by the dictionary's notices, not the runtime's 6.8KB table). Measured 66,029 gzip in the e2e build over main d0c44b13 (#373), the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 182_001, maxGzip: 66_033 },
+  // 182,001 / 66,033 -> 182,022 / 66,057 for W49's row in the calendar (P5 of the 11-23 verdict, the test week again; w49-p5-row over main e66659a8): the entry chunk carries MERGED_WEEKS. Measured 182,022 / 66,053 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 182_022, maxGzip: 66_057 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1089,8 +1090,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * main d109b66b): 422,978, 472,430 and 478,220.
  * The start screen's storage line in the page's language (save-unavailable-lite,
  * src/shellNotices.js, over main d0c44b13): 422,996, 472,448 and 478,238.
+ * W49's row in MERGED_WEEKS (w49-p5-row, P5 only): 423,021, 472,473 and 478,263.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_000, en: 472_452, ja: 478_242 };
+const FIRST_PAINT_BUDGETS = { ko: 423_025, en: 472_477, ja: 478_267 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
