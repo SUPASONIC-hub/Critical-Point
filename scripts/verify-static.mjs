@@ -47,6 +47,9 @@ export const CHECKS = [
   "check:grants",
   "check:canon",
   "check:card-labels",
+  // English and Japanese open to the end (10-28, the owner's choice 1): a Korean
+  // line changed without its translations, or a translation left over, fails here.
+  "check:locale:strict",
   "check:doc-numbers",
 ];
 

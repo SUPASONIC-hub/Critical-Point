@@ -1,4 +1,6 @@
 import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice } from "./weeklyRules.js";
+import auditCopy from "../copy/audit.js";
+import { fill } from "../locale.js";
 
 /**
  * AUDIT (B3): the ledger that is too quiet.
@@ -147,11 +149,11 @@ export function readAudit(run, count, win) {
  * CASCADE board a cold cash leaves it as it is; the week's line says why). 초안.
  */
 const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
-  ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;
+  fill(ifCash > 0 ? auditCopy.ifCashUp : ifCash < 0 ? auditCopy.ifCashDown : auditCopy.ifCashSame, { relief: -ifCash, after: afterCash, limit });
 
 /** What the voice says when a table opens on an audit that moved (B3). 초안. */
 const describeAudit = ({ count, limit }) =>
-  `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;
+  fill(auditCopy.spoken, { count, limit, share: AUDIT_SHARE });
 
 /**
  * The table record's audit sentence (GauntletLedger.jsx), or null: one more
@@ -169,5 +171,5 @@ const describeAudit = ({ count, limit }) =>
 export function describeAuditLedger(log, weekRule) {
   if (!log.some((entry) => entry?.threshold) || !isAuditOn({ weekRule, story: log.some((entry) => entry?.assistStory), practice: log.some((entry) => entry?.threshold?.firstRecord) })) return null;
   const count = countAudit(log);
-  return `감사 ${count}/${AUDIT_LIMIT}칸으로 닫혔다.${count < AUDIT_LIMIT ? "" : " 적발."}`;
+  return `${fill(auditCopy.ledger, { count, limit: AUDIT_LIMIT })}${count < AUDIT_LIMIT ? "" : auditCopy.caught}`;
 }

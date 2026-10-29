@@ -27,11 +27,14 @@ const emailPattern = new RegExp(emailPatternSource);
 const phonePattern = new RegExp(phonePatternSource);
 const organizationPattern = new RegExp(organizationPatternSource, "i");
 
+/** What each signal is called where it is named (the board lays another language over them, src/copy/boardPost.js). */
+export const PRIVACY_SIGNAL_LABELS = { email: "이메일", phone: "전화번호", organization: "회사·조직명" };
+
 export function detectPrivacySignals(text = "") {
   return [
-    { label: "이메일", active: emailPattern.test(text) },
-    { label: "전화번호", active: phonePattern.test(text) },
-    { label: "회사·조직명", active: organizationPattern.test(text) },
+    { label: PRIVACY_SIGNAL_LABELS.email, active: emailPattern.test(text) },
+    { label: PRIVACY_SIGNAL_LABELS.phone, active: phonePattern.test(text) },
+    { label: PRIVACY_SIGNAL_LABELS.organization, active: organizationPattern.test(text) },
   ];
 }
 
@@ -41,3 +44,31 @@ export function anonymizeSensitiveText(text = "") {
     .replace(new RegExp(phonePatternSource, "g"), "익명 연락처")
     .replace(new RegExp(organizationPatternSource, "gi"), "익명 조직");
 }
+
+/**
+ * What the game says about the data it keeps, in the words both the intro and
+ * the privacy policy use.
+ *
+ * The 데이터 저장 안내 drawer prints `PLAYTEST_DATA_NOTICE` beside the consent
+ * box, and the policy pages (`/privacy.html`, `/en/privacy.html`, written at
+ * build time by scripts/legal-pages.mjs) quote the same sentence as the short
+ * form of their playtest section, so the two cannot drift. The pages are plain
+ * files beside the build, not screens of the app: a store listing links to
+ * them, and nothing about them reaches the entry chunk but these strings.
+ * The contact address is appConfig.js's SUPPORT_CONTACT, which the data
+ * drawer's deletion-request line prints.
+ */
+export const PRIVACY_PAGE_PATH = "/privacy.html";
+export const TERMS_PAGE_PATH = "/terms.html";
+
+/**
+ * A policy page in the page's language: Korean at the root, the other
+ * languages under their code (/en/, /ja/; scripts/legal-pages.mjs writes all
+ * three). Until 10-28 the game's links opened the Korean page on every page.
+ */
+export function legalPagePath(path, lang = "ko") {
+  return lang === "en" || lang === "ja" ? `/${lang}${path}` : path;
+}
+export const DATA_RETENTION_DAYS = 180;
+export const PLAYTEST_DATA_NOTICE =
+  "사건 결과, 선택 로그, 응답 시간, 화면 언어, 보낸 피드백, 오류 보고가 이 기기의 무작위 식별 번호와 함께 연구용으로 저장되고 180일 뒤 지워집니다. 이름은 원격 저장하지 않으며, 접속 주소는 요청 횟수를 제한하는 데만 씁니다.";

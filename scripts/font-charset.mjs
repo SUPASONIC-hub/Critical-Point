@@ -25,6 +25,15 @@ export const CHARSET_OUTPUT = "src/assets/fonts/pretendard-cp.charset.txt";
 const SOURCE_ROOTS = ["src"];
 const SOURCE_FILES = ["index.html"];
 const SOURCE_EXTENSIONS = new Set([".js", ".jsx", ".css", ".html"]);
+/**
+ * Source the font is not cut from. A Japanese page is drawn in the system's
+ * Japanese face (the dictionary's `style`, src/locales/ja/index.js): Pretendard
+ * has no kanji, and a subset of the 2,000-odd the draft writes would weigh more
+ * than the whole first-paint budget (다국어 조사 4절, 일본어 1단계). Its kana and
+ * kanji are never asked of Pretendard, so they stay out of the list and out of
+ * check-fonts' system-face list. Korean and English source is read as before.
+ */
+const SKIPPED_DIRECTORIES = new Set([path.join("src", "locales", "ja")]);
 
 function range(from, to) {
   let text = "";
@@ -48,11 +57,12 @@ const BASELINE_CHARACTERS =
   range(0x3131, 0x318e) +
   "·…–—‘’“”「」『』《》〈〉【】〔〕※○●◎◇◆□■△▲▽▼→←↑↓☆★♥✓✔✕✗";
 
-function visit(directory, files) {
+function visit(directory, files, root) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const fullPath = path.join(directory, entry.name);
-    if (entry.isDirectory()) visit(fullPath, files);
-    else if (SOURCE_EXTENSIONS.has(path.extname(entry.name)) && !entry.name.endsWith(".generated.css")) {
+    if (entry.isDirectory()) {
+      if (!SKIPPED_DIRECTORIES.has(path.relative(root, fullPath))) visit(fullPath, files, root);
+    } else if (SOURCE_EXTENSIONS.has(path.extname(entry.name)) && !entry.name.endsWith(".generated.css")) {
       files.push(fullPath);
     }
   }
@@ -84,7 +94,7 @@ function decodeCssEscapes(text) {
  */
 export function collectSourceCharacters(root = process.cwd()) {
   const files = SOURCE_FILES.map((file) => path.join(root, file));
-  for (const directory of SOURCE_ROOTS) visit(path.join(root, directory), files);
+  for (const directory of SOURCE_ROOTS) visit(path.join(root, directory), files, root);
 
   const characters = new Set();
   for (const file of files) {

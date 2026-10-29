@@ -231,9 +231,14 @@ test("B-14(1): the briefing and the hand mark the card the season before picked,
   const body = panel.slice(panel.indexOf("export function pastPick(")).split(/\r?\n}\r?\n/)[0];
   // The tag: the wild name's classes (play.css, no CSS of its own), 「지난 시즌」 shown on a phone, the whole name read out.
   assert.match(body, /<span className="gx-card-type gx-card-name" data-testid="past-pick">/);
-  assert.match(body, /지난 시즌<i>의 당신<\/i><i style=\{\{ fontSize: 0 \}\}>이 고른 카드<\/i>/);
-  assert.match(body, /data-testid="past-pick-wild"> 지난 시즌의 당신이 고른 카드</);
-  assert.match(body, /hit \? "지난 시즌에도 다시 짰다" : "이 판을 다시 연다"/);
+  // The words are the edge's copy (src/copy/edge.js, `pastPick`), read by key.
+  assert.match(body, /\{edgeCopy\.pastPick\.shown\}<i>\{edgeCopy\.pastPick\.clipped\}<\/i><i style=\{\{ fontSize: 0 \}\}>\{edgeCopy\.pastPick\.heard\}<\/i>/);
+  assert.match(body, /data-testid="past-pick-wild">\{edgeCopy\.pastPick\.wildSr\}</);
+  assert.match(body, /hit \? edgeCopy\.pastPick\.wildPicked : edgeCopy\.pastPick\.wild/);
+  const { default: edgeCopy } = await import("../../src/copy/edge.js");
+  assert.equal(edgeCopy.pastPick.shown + edgeCopy.pastPick.clipped + edgeCopy.pastPick.heard, "지난 시즌의 당신이 고른 카드");
+  assert.equal(edgeCopy.pastPick.wildSr, " 지난 시즌의 당신이 고른 카드");
+  assert.deepEqual([edgeCopy.pastPick.wildPicked, edgeCopy.pastPick.wild], ["지난 시즌에도 다시 짰다", "이 판을 다시 연다"]);
   // No live region: a still line, read with the card.
   assert.doesNotMatch(body, /aria-live|role=/);
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");

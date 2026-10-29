@@ -48,6 +48,8 @@ import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import { LazyScreen } from "./components/LazyScreen.jsx";
 import { confirmAction } from "./state/confirmAction.js";
+import noticesCopy from "./copy/notices.js";
+import { fill } from "./locale.js";
 import { focusSceneTitle } from "./state/sceneFocus.js";
 import { useRunState } from "./state/useRunState.js";
 import { createChoiceReaders } from "./state/useDecision.js";
@@ -146,10 +148,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     tone: telemetryEnabled && isOnline ? "ready" : "local",
     text:
       !isOnline
-        ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
+        ? noticesCopy.telemetry.offline
         : telemetryEnabled
-          ? "원격 저장 준비됨. 데이터 제공 동의 시 사건 완료 로그가 저장됩니다."
-          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          ? noticesCopy.telemetry.remoteReady
+          : noticesCopy.telemetry.local,
   });
   const [localErrorEntries, setLocalErrorEntries] = useState(() => {
     const rawErrorLog = readStoredValue(ERROR_LOG_STORAGE_KEY, "null");
@@ -373,7 +375,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   });
 
   const formatRiskDelta = (value) =>
-    value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
+    value > 0 ? `+${value}` : value < 0 ? `${value}` : "";
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
@@ -427,7 +429,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   // table has to settle first.
   function saveCurrentGame(options = {}) {
     if (options.exit && suspension.isSettling()) {
-      setSaveStatus("판정이 끝나는 중입니다. 결과가 나온 뒤에 나갈 수 있습니다.");
+      setSaveStatus(noticesCopy.run.settling);
       return null;
     }
     const suspendedRun = options.exit ? suspension.suspendNow() : null;
@@ -473,15 +475,15 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       if (!online) {
         setTelemetryStatus({
           tone: "local",
-          text: "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          text: noticesCopy.telemetry.offline,
         });
         return;
       }
       setTelemetryStatus({
         tone: telemetryEnabled ? "ready" : "local",
         text: telemetryEnabled
-          ? "네트워크 연결됨. 데이터 제공 동의 시 사건 완료 로그가 저장됩니다."
-          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          ? noticesCopy.telemetry.backOnline
+          : noticesCopy.telemetry.local,
       });
     };
     window.addEventListener("online", updateNetworkStatus);
@@ -611,7 +613,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     rememberSeason(caseResults);
     // What NEW GAME+ is: the season again, with the last one's record on the
     // intro. The line used to promise hidden authority and extra clues.
-    setSaveStatus("NEW GAME+로 시작합니다. 지난 시즌의 기록은 시작 화면에 남아 있습니다.");
+    setSaveStatus(noticesCopy.run.newGamePlus);
     // The season opens on a line answering how the last one ended (newGamePlusCarry.js).
     lifecycle.startGame({ veteran: true, echo: readSeasonCarry()?.echo ?? null });
   }
@@ -621,7 +623,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    * first: `R` did it on one keypress, while the report was being read.
    */
   async function openCase(caseId) {
-    if (caseId === currentCase && !(await confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워지고, 다시 하는 판은 연습으로 세어 금고는 그대로입니다. 이 사건의 결과 요약은 새 판을 끝내면 그 판의 것으로 바뀝니다."))) return false;
+    if (caseId === currentCase && !(await confirmAction(noticesCopy.confirm.replayCase))) return false;
     startCaseEvent(caseId);
     return true;
   }
@@ -634,8 +636,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       unavailable: ({ offline }) =>
         setSaveStatus(
           offline
-            ? "연결이 끊겨 이 사건을 받지 못했습니다. 연결을 확인한 뒤 다시 눌러 주세요. 저장은 그대로 있습니다."
-            : "이 사건을 받지 못했습니다. 다시 눌러 보고, 계속 안 되면 새로고침해 주세요. 저장은 그대로 있습니다.",
+            ? noticesCopy.run.caseOffline
+            : noticesCopy.run.caseUnavailable,
         ),
     });
   }
@@ -683,11 +685,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       clearLocalRankingRows();
       setSaveSlots([]);
       setLastRecoveredError(null);
-      setSaveStatus("브라우저 저장소 정리를 완료했습니다.");
+      setSaveStatus(noticesCopy.storage.cleaned);
       return;
     }
     const retryLogSaved = logStorageResetFailure({ source: "reset-retry", failedStorageKeys: failedKeys, currentCase, nodeId });
-    setSaveStatus(`저장소 정리 재시도 실패: ${failedKeys.join(", ")}${retryLogSaved ? "" : " · 진단 로그 저장도 실패했습니다."}`);
+    setSaveStatus(fill(noticesCopy.storage.retryFailed, { keys: failedKeys.join(", "), logFailed: retryLogSaved ? "" : noticesCopy.storage.logFailed }));
   }
 
   function showSeasonMap() {
@@ -830,9 +832,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     activeCaseMeta,
     queueTelemetry,
   });
+  const caseLabel = activeCaseMeta?.label ?? noticesCopy.status.currentCase;
   const screenReaderStatus = isResult
-    ? `${activeCaseMeta?.label ?? "현재 사건"} 결과 화면입니다. 랭크 ${resultRank}, 버스트 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
-    : `${activeCaseMeta?.label ?? "현재 사건"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
+    ? fill(noticesCopy.status.result, { caseLabel, rank: resultRank, score: momentumScore, trigger: triggerLabels[result.primary[0]] })
+    : fill(noticesCopy.status.scene, { caseLabel, title: node.title, progress, challenge: sceneChallenge.title, riskTier, riskPressure });
   function trapDecisionRevealFocus(event) {
     if (event.key !== "Tab") return;
     const focusable = Array.from(

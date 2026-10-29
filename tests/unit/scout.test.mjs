@@ -58,7 +58,7 @@ test("a v2 save reaches v3 with its put-down window marked as not looked at", ()
   assert.equal(migrateSavedState({ saveSchemaVersion: SAVE_SCHEMA_VERSION + 1 }), null, "a save from a newer build is not read");
 });
 
-test("the stage reads the band it draws off the meters, and SCOUT's button is ScoutBand's", () => {
+test("the stage reads the band it draws off the meters, and SCOUT's button is ScoutBand's", async () => {
   // Both moved out of GauntletStage on 2026-10-19, to keep it inside 830 lines and 68 names.
   const fresh = createWindow({ schema: BASE_SCHEMA, seed: "scout:meters" });
   const looked = reduceWindow(fresh, { type: "SCOUT" }, ALL_RULES);
@@ -73,5 +73,8 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   // Before the case has SCOUT, the plain label; after, the button, which stays put once spent.
   assert.match(scoutBand, /if \(!canScout && !band\.scouted\) return <span className="gx-band-label" aria-hidden="true">/);
   assert.match(scoutBand, /data-testid="commit-scout" onClick=\{onScout\} aria-disabled=\{!canScout\}/);
-  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{band\.scouted \? undefined : `벽 \$\{band\.wallMin\}–\$\{band\.wallMax\} · 조회, 시간 \$\{SCOUT_SECONDS\}초`\}/);
+  // The name's words are the copy table's (src/copy/table.js), filled with the band and SCOUT's price.
+  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{band\.scouted \? undefined : fill\(say\.scoutLabel, \{ min: band\.wallMin, max: band\.wallMax, seconds: SCOUT_SECONDS \}\)\}/);
+  const { default: tableCopy } = await import("../../src/copy/table.js");
+  assert.equal(tableCopy.notices.scoutLabel, "벽 {min}–{max} · 조회, 시간 {seconds}초");
 });

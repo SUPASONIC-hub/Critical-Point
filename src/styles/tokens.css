@@ -4,7 +4,8 @@
    Add new colours here, not inline. */
 
 /* The one font file: Pretendard Variable (OFL-1.1) cut down to the characters
-   the source can print, across its whole weight axis. `npm run build:fonts`
+   the source can print, from weight 400 to 920 (nothing asks for less; the
+   range is WEIGHT_AXIS in scripts/build-fonts.mjs). `npm run build:fonts`
    writes it and `npm run check:fonts` fails when the copy gains a character it
    does not carry. index.html preloads the same file. Text outside it -- a
    nickname with a syllable the copy never uses -- falls through to the system
@@ -12,7 +13,7 @@
 @font-face {
   font-family: "Critical Point Sans";
   font-style: normal;
-  font-weight: 45 920;
+  font-weight: 400 920;
   font-display: swap;
   src: url("../assets/fonts/pretendard-cp.woff2") format("woff2");
 }
