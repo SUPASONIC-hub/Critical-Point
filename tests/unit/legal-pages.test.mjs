@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages } from "../../scripts/legal-pages.mjs";
+import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages, SUMMARY_FIELDS } from "../../scripts/legal-pages.mjs";
 import { SUPPORT_CONTACT } from "../../src/appConfig.js";
 import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../../src/privacyText.js";
+import { toRowSummary } from "../../src/state/useChoiceCommit.js";
 import { createSeasonTelemetryPayload } from "../../src/viewModels/seasonViewModels.js";
 
 /**
@@ -74,6 +75,18 @@ test("every column the page may write is covered by an item the policy prints", 
   assert.deepEqual(Object.keys(REMOTE_FIELDS).sort(), Object.keys(remote).sort());
 });
 
+test("the screen language a case row's summary carries is an item of its own on both pages, and in the consent sentence", () => {
+  const added = Object.keys(toRowSummary({}));
+  assert.ok(added.includes("locale"), "the case row names the page's language (toRowSummary)");
+  for (const key of added.filter((name) => name !== "endingVariant")) {
+    const item = SUMMARY_FIELDS[key];
+    assert.ok(item, `summary.${key} is sent and the policy does not name it (SUMMARY_FIELDS in scripts/legal-pages.mjs)`);
+    assert.ok(ko.includes(DATA_ITEMS[item].ko), `privacy.html does not print the item for summary.${key}`);
+    assert.ok(en.includes(DATA_ITEMS[item].en), `en/privacy.html does not print the item for summary.${key}`);
+  }
+  assert.match(PLAYTEST_DATA_NOTICE, /화면 언어/);
+});
+
 test("a row the runtime builds sends only granted columns, so the grants are the list", () => {
   const grants = anonInsertGrants();
   const row = createSeasonTelemetryPayload({ caseSummary: {}, completedCaseCount: 1, runId: "run", sessionCode: "CODE", sessionId: "session" });
@@ -83,7 +96,9 @@ test("a row the runtime builds sends only granted columns, so the grants are the
 
 test("the policy quotes the sentence beside the consent box, and says the box starts ticked", () => {
   assert.ok(ko.includes(PLAYTEST_DATA_NOTICE));
-  assert.ok(readFileSync("src/screens/IntroScreen.jsx", "utf8").includes("PLAYTEST_DATA_NOTICE"), "the intro prints the shared sentence");
+  // The intro prints it from its copy table, which names the shared sentence (다국어 틀).
+  assert.ok(readFileSync("src/screens/IntroScreen.jsx", "utf8").includes("introCopy.data.playtestNotice"), "the intro prints the shared sentence");
+  assert.ok(readFileSync("src/copy/intro.js", "utf8").includes("playtestNotice: PLAYTEST_DATA_NOTICE,"), "named, not copied");
   assert.match(ko, /켜진 상태로 시작/);
   assert.match(en, /ticked by default/);
 });

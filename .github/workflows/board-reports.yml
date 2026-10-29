@@ -15,7 +15,9 @@ name: Board Reports
 # `board_posts`, filter `id`) and then runs this by hand with an action:
 #   hide     moderate_board_post(id): the post leaves the board
 #   dismiss  its reports are deleted: the post stays, the queue is clear
-#   restore  moderate_board_post(id, false): a post hidden by mistake returns
+#   restore  moderate_board_post(id, false): a post hidden by mistake returns,
+#            and its reports are deleted with it (restore is dismiss too), so
+#            the next morning's run does not count them again
 #
 # No new secret and no new grant: the same SUPABASE_ACCESS_TOKEN and
 # `supabase db query --linked` as Funnel and Verify Ranking. Without the token
@@ -25,7 +27,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "list: show the queue / hide: take the post down / dismiss: keep it, delete its reports / restore: bring a hidden post back"
+        description: "list: show the queue / hide: take the post down / dismiss: keep it, delete its reports / restore: bring a hidden post back, delete its reports"
         type: choice
         options: [list, hide, dismiss, restore]
         default: list

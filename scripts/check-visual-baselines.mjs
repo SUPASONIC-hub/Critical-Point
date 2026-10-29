@@ -166,6 +166,7 @@ const COMPARED = [
   "src/playerLanguage.js",
   "src/gameLogic.js",
   "src/viewModels/reportViewModels.js",
+  "src/copy/intro.js",
   "src/gauntlet/relics.js",
   "src/gauntlet/gauntletEngine.js",
   "public/triggerlab-key-visual.webp",

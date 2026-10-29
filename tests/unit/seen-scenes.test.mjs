@@ -106,7 +106,9 @@ test("the briefing folds a read scene unless the switch is off, counts what it s
   const panel = readFileSync("src/gauntlet/WeekRulePanel.jsx", "utf8");
   assert.match(panel, /useState\(\(\) => page\?\.read === true && getAccessibility\(\)\.foldReadScenes\)/);
   assert.match(panel, /folded \? \{ \.\.\.node, lead: null, text: "", memo: \[\] \} : node/);
-  assert.match(panel, /data-testid="scene-unfold" onClick=\{\(\) => setFolded\(false\)\}>\s*지난 시즌에 읽은 장면 · 펼치기/);
+  // The button's words are the edge's copy (src/copy/edge.js), read by key.
+  assert.match(panel, /data-testid="scene-unfold" onClick=\{\(\) => setFolded\(false\)\}>\s*\{edgeCopy\.unfold\}/);
+  assert.match(readFileSync("src/copy/edge.js", "utf8"), /unfold: "지난 시즌에 읽은 장면 · 펼치기"/);
   assert.match(panel, /page\?\.read === false \? <b data-testid="scene-new"> · NEW<\/b> : null/);
   // The briefing prints and times the scene as told.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");

@@ -111,6 +111,9 @@ jobs:
             #       the result report, the status words. On 2026-10-08 a pull
             #       request that changed only src/caseCopy.js was not
             #       compared, and main's intro baseline broke when it merged.
+            #   src/copy/
+            #       the screens' own words, moved out of their components so
+            #       another language can be laid over them (2026-10-26).
             #   src/gauntlet/
             #       the table at `c5_voice`: its rule and relic text, and the
             #       numbers the engine deals it.
@@ -129,7 +132,7 @@ jobs:
             # those, and the push to main compares everything in any case.
             # scripts/check-visual-baselines.mjs holds this pattern to the
             # files named above.
-            pattern='^(src/styles/|src/assets/fonts/|index\.html$|src/.*\.jsx$|src/[^/]+\.js$|src/viewModels/|src/gauntlet/|src/nodes/case0[15]\.js$|public/|scripts/(build-critical-css|critical-css-rules)\.mjs$|vite\.config\.js$|playwright\.config\.js$|package-lock\.json$|tests/helpers/|tests/visual-regression\.spec\.js)'
+            pattern='^(src/styles/|src/assets/fonts/|index\.html$|src/.*\.jsx$|src/[^/]+\.js$|src/viewModels/|src/copy/|src/gauntlet/|src/nodes/case0[15]\.js$|public/|scripts/(build-critical-css|critical-css-rules)\.mjs$|vite\.config\.js$|playwright\.config\.js$|package-lock\.json$|tests/helpers/|tests/visual-regression\.spec\.js)'
             touched=$(printf '%s\n' "$files" | grep -E "$pattern" || true)
             if [ -n "$touched" ]; then
               decide true "Touches what the screenshots are made of: $(printf '%s' "$touched" | tr '\n' ' ')"
