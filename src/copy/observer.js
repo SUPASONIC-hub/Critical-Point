@@ -93,6 +93,13 @@ const observerCopy = {
     "field-pact": { title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다." },
     "quiet-cover": { title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "무너진 것도, 드러난 것도 없이 시즌이 닫혔습니다." },
   },
+  // A locked card's condition (gameLogic.js: `getAuthorityGate`), printed after
+  // 「잠김 · 」 on the card (table.js `hand.locked`).
+  gate: {
+    oversight: "단서 {needClues}개 이상과 공정함 {needLegitimacy} 이상이 필요합니다. 지금 단서 {clues}개, 공정함 {legitimacy}.",
+    field: "믿음 {needTrust} 이상 또는 단서 {needClues}개 이상이 필요합니다. 지금 믿음 {trust}, 단서 {clues}개.",
+    unlocked: "권한이 확인되었습니다.",
+  },
   // OPEN QUESTION, by what the run ended holding (`getOpenQuestionEnding`).
   openQuestion: {
     trust: { title: "답은 못 냈지만, 당신에게 말을 거는 사람은 남았다.", text: "사건마다 사람 피해 {value}{particle} 남긴 채 문을 닫았습니다. 다음 참가자는 당신을 아는 사람들에게서 시작합니다." },

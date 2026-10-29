@@ -83,7 +83,8 @@ const budgets = [
   // gzip plus 4.
   // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
   // 32,897 / 13,039 -> 34,278 / 13,357 on 2026-10-26, 영어판 3단계: the observer's samples, arcs and records and the endings' lines read by key (src/copy/observer.js), a name's particle as a blank. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_278, maxGzip: 13_357 },
+  // 34,278 / 13,357 -> 34,459 / 13,422 on 2026-10-29, gate-reason-copy: a locked card's condition (getAuthorityGate) read by key from src/copy/observer.js `gate` and filled, so English and Japanese print it in their words. The Korean is the same. Measured 34,455 / 13,418 in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_459, maxGzip: 13_422 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -999,7 +1000,8 @@ const budgets = [
   // 110,001 / 38,601 -> 152,779 / 51,777 on 2026-10-28, lang-full: the Japanese screen copy of English steps three and four
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 152_779, maxGzip: 51_787 },
+  // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_061, maxGzip: 51_897 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1082,8 +1084,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * 472,329 and Japanese 478,085 stay under their lines. Merged over main
  * 4ad6f059 (#372's shorter English and Japanese card labels): 422,977, 472,339
  * and 478,095.
+ * A locked card's condition in English and Japanese (gate-reason-copy, over
+ * main d109b66b): 422,978, 472,430 and 478,220.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_981, en: 472_354, ja: 478_099 };
+const FIRST_PAINT_BUDGETS = { ko: 422_981, en: 472_434, ja: 478_224 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
