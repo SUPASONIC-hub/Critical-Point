@@ -2,7 +2,7 @@
 export default {
   subtitle: "Every 45 seconds, your judgment goes on the record",
   premise:
-    "3 years ago, you filed the lone dissent on a loan approval. The loan went out anyway, and you were sent down to Trigger Lab, under KD Financial Group, its top shareholder US capital. Today the first file on the case desk carries that same loan number. Conditions you hold longest return as pressure in the next case. It starts a little earlier, with your last probation task.",
+    "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last probation task.",
   startButton: "Start the prologue",
   briefingLink: "Read the briefing first",
   ranking: "Ranking",
