@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-29 (the state of `main` at `43078a4`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); {to add after merge: #369, lang-layout-check, cleanup-1029 and the last merge's commit}; what changed and when is in `git log`)
+Last updated: 2026-10-29 (the state of `main` at `43078a4`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); then the start screen fitted in English and Japanese (#369), the phone hand scenes fitted (#372), the locked-card reason (#373) and the storage notice (#374) put in the page's language, and two unused exports dropped (#371); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -410,8 +410,14 @@ Still open, on purpose:
   languages, hreflang ko, en, ja and x-default plus `og:locale:alternate`
   in `index.html` -- the service worker's precache now skips
   `rel="alternate"` -- and `check:locale:strict` in `verify:static`, 27 to
-  28 checks). {to add after merge: #369, lang-layout-check, cleanup-1029,
-  the day's merge count, unit tests, the production commit and the drafts.}
+  28 checks). The start screen in English and Japanese fits a 1280x720 and a
+  320px first screen (#369; the reach check runs five sizes in three
+  languages, the Japanese 320px case still `test.fixme` on Linux CJK faces);
+  the phone hand scenes at 360x740 overflow in neither language (#372,
+  `LAYOUT_SCENES=hand5`); the locked-card reason (#373) and the storage
+  notice (#374) follow the page language. Nine PRs merged, 1,586 unit tests.
+  Drafts brought up onto main: #224 #307 #308 #316 #320, #301 #314 #317,
+  #322, #350.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
