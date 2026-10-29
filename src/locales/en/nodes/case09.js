@@ -28,7 +28,7 @@ export default {
           "label": "Visit the night shift at dawn and gather floor numbers"
         },
         "reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         }
       },
       "place": "FlowOn HQ, 8th-floor situation room",
@@ -56,10 +56,10 @@ export default {
           "label": "Write his testimony into your box as your gain"
         },
         "reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         },
         "c9_ledger_evidence_turn": {
-          "label": "Find who calculated the 78% liquidation recovery rate"
+          "label": "Trace the 78% recovery rate"
         }
       },
       "place": "Yeouido café before dawn",
@@ -86,10 +86,10 @@ export default {
           "label": "Hand the books to Kwon Dohyun and wait for his call"
         },
         "reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         },
         "c9_family_evidence_turn": {
-          "label": "Find who calculated the 78% liquidation recovery rate"
+          "label": "Trace the 78% recovery rate"
         }
       },
       "place": "Hoegi-dong bookshop, 2nd floor · stacks of ledgers",
@@ -117,10 +117,10 @@ export default {
           "label": "Erase Oh Jinwoo’s circle and file after the vote"
         },
         "reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         },
         "c9_timing_evidence_turn": {
-          "label": "Find who calculated the 78% liquidation recovery rate"
+          "label": "Trace the 78% recovery rate"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -380,7 +380,7 @@ export default {
           "label": "Close the table and fight with the two sheets only"
         },
         "c9_route_system_evidence_turn": {
-          "label": "Find who calculated the 78% liquidation recovery rate"
+          "label": "Trace the 78% recovery rate"
         }
       },
       "place": "FlowOn creditors’ meeting room · document terminal",
@@ -455,7 +455,7 @@ export default {
           "label": "Meet Kwon Dohyun alone at a Yeouido café first"
         },
         "c9_start_law_reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         }
       },
       "place": "FlowOn HQ, 8th-floor situation room",
@@ -485,7 +485,7 @@ export default {
           "label": "Meet Kwon Dohyun alone at a Yeouido café first"
         },
         "c9_start_friend_reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         }
       },
       "place": "FlowOn HQ, 8th-floor situation room",
@@ -515,7 +515,7 @@ export default {
           "label": "Show Kwon Dohyun one line of the sheet and watch him"
         },
         "c9_start_blade_reframe": {
-          "label": "Set the cost nobody counted beside them"
+          "label": "Add the cost nobody counted"
         }
       },
       "place": "FlowOn HQ, 8th-floor situation room",

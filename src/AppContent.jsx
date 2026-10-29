@@ -39,6 +39,7 @@ import { createStartSave } from "./state/shellStartSave.js";
 import { getReplaySeedFromLocation } from "./state/trace.js";
 import { getOperatorProfiles } from "./advancedSystems.js";
 import { GAME_TITLE } from "./appCopy.js";
+import shellNotices from "./shellNotices.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 import { loadedChunk } from "./state/chunkReload.js";
@@ -264,7 +265,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     const current = readShellSave() ?? createStartSave({ playerName, playStyle, dataConsent, operatorOrigin });
     const payload = { ...current, ...nextState, started: false, savedAt: new Date().toISOString() };
     const storageSaved = writeSaveState(payload, { force: true }).saved;
-    if (!storageSaved) setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
+    if (!storageSaved) setSaveStatus(shellNotices.save.unavailable);
     return { ...payload, storageSaved };
   }
 
@@ -272,7 +273,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     const payload = createStartSave({ playerName, playStyle, dataConsent, operatorOrigin });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     if (!writeSaveState(payload, { force: true }).saved) {
-      setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
+      setSaveStatus(shellNotices.save.unavailable);
       setInitialStartState(payload);
     }
     resumeSaves();
@@ -307,7 +308,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     const current = readShellSave();
     if (!current) return;
     if (!writeSaveState(createResumedSave(current), { force: true }).saved) {
-      setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
+      setSaveStatus(shellNotices.save.unavailable);
     }
   }
 
