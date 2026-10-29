@@ -74,7 +74,8 @@ const budgets = [
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_722, maxGzip: 54_994 },
+  // 149,722 / 54,994 -> 149,740 / 54,996 on 2026-10-29, lang-layout-check: the layout sweep's narrow mode (LAYOUT_SCENES=hand5) jumps scene to scene through window.__cpDebugJump, an effect in useRuntimeRenderers that a release folds away to an empty effect. Measured 149,736 / 54,992 in the e2e build on main 43078a46, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_740, maxGzip: 54_996 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two

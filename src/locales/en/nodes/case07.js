@@ -28,7 +28,7 @@ export default {
           "label": "Point Han Seoyun to the blank box and file an appeal"
         },
         "reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Take the whole black notebook, all 47, as evidence"
         },
         "reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         },
         "c7_ledger_evidence_turn": {
-          "label": "Lay out which came first: the order or the investigation"
+          "label": "Date the order against the probe"
         }
       },
       "place": "Trigger Lab, 2nd-floor Internal Audit records room",
@@ -78,19 +78,19 @@ export default {
       ],
       "choices": {
         "c7_counter_mask": {
-          "label": "Take only a copy with the four clerks’ names covered"
+          "label": "Take a copy, four names covered"
         },
         "c7_counter_pull": {
-          "label": "Take the back page from the manager as it is"
+          "label": "Take the back page as it is"
         },
         "c7_counter_ask": {
           "label": "Ask the four clerks first, starting with Do Yoonha"
         },
         "reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         },
         "c7_counter_evidence_turn": {
-          "label": "Lay out which came first: the order or the investigation"
+          "label": "Date the order against the probe"
         }
       },
       "place": "KD Bank Gangseo Branch",
@@ -118,10 +118,10 @@ export default {
           "label": "On the 2nd floor, write your name next to Lim Kyungsoo’s"
         },
         "reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         },
         "c7_paper_evidence_turn": {
-          "label": "Lay out which came first: the order or the investigation"
+          "label": "Date the order against the probe"
         }
       },
       "place": "Hoegi-dong secondhand bookshop, 2nd floor",
@@ -379,7 +379,7 @@ export default {
           "label": "Contact the 17 who were transferred before you"
         },
         "c7_route_system_evidence_turn": {
-          "label": "Lay out which came first: the order or the investigation"
+          "label": "Date the order against the probe"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · personnel register terminal",
@@ -454,7 +454,7 @@ export default {
           "label": "Leave the boxes and spend the 48 hours gathering files"
         },
         "c7_start_stand_reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         }
       },
       "place": "Trigger Lab, 4th floor · in front of Oh Jinwoo’s desk",
@@ -484,7 +484,7 @@ export default {
           "label": "Post the order as-is through the audit channel you used"
         },
         "c7_start_open_reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · public-record terminal",
@@ -514,7 +514,7 @@ export default {
           "label": "Point Han Seoyun to the blank box and file an appeal"
         },
         "c7_start_name_reframe": {
-          "label": "Ask how many transfers share the same shape"
+          "label": "Count same-shaped transfers"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
