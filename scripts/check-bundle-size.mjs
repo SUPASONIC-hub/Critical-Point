@@ -75,7 +75,8 @@ const budgets = [
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 149,722 / 54,994 -> 149,740 / 54,996 on 2026-10-29, lang-layout-check: the layout sweep's narrow mode (LAYOUT_SCENES=hand5) jumps scene to scene through window.__cpDebugJump, an effect in useRuntimeRenderers that a release folds away to an empty effect. Measured 149,736 / 54,992 in the e2e build on main 43078a46, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_740, maxGzip: 54_996 },
+  // 54,996 -> 55,002 gzip on 2026-10-29, picker-narrow: the shorter Japanese premise (src/locales/ja/screens/intro.js) renames the hashed locale chunk the runtime imports; no code changed. Measured 149,736 / 54,998 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_740, maxGzip: 55_002 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -541,7 +542,9 @@ const budgets = [
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
   // -> 196,140 / 36,563 on 2026-10-29, intro-en-fit: a Japanese page on a phone of 360px or less draws the
   // premise at 14px / 1.6 (base-intro-ranking.css). Measured 196,140 / 36,559 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_140, maxGzip: 36_563 },
+  // -> 196,307 / 36,595 on 2026-10-29, picker-narrow: on 360px or less the three language pills keep one row and the
+  // brand row comes up 8px (base-intro-ranking.css). Measured 196,307 / 36,591 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_307, maxGzip: 36_595 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1081,9 +1084,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * puts the Korean at 422,964 (the critical CSS carries the rule); English
  * 472,329 and Japanese 478,085 stay under their lines. Merged over main
  * 4ad6f059 (#372's shorter English and Japanese card labels): 422,977, 472,339
- * and 478,095.
+ * and 478,095. The language pills kept one row on a 360px phone (picker-narrow,
+ * the critical CSS carries the rule) and the shorter Japanese premise: 423,011,
+ * 472,373 and 478,112.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_981, en: 472_354, ja: 478_099 };
+const FIRST_PAINT_BUDGETS = { ko: 423_015, en: 472_377, ja: 478_116 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

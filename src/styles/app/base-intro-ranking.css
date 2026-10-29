@@ -3324,3 +3324,19 @@ body {
     padding-top: 112px;
   }
 }
+/* On a 360px phone or narrower the three pills wrapped to two rows and the
+   third covered the brand row (10-29). There they reach to the music
+   controls (8px short of them) and sit closer, with the 44px target kept,
+   so they stay one row; the brand row comes up 8px under them. */
+@media (max-width: 360px) {
+  .language-picker {
+    gap: 4px;
+    max-width: calc(100% - var(--ui-gutter) - 82px);
+  }
+  .language-picker button {
+    padding: 0 8px;
+  }
+  .intro-hero-copy {
+    padding-top: 56px;
+  }
+}

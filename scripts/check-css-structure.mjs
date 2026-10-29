@@ -167,7 +167,10 @@ const fileBudgets = {
   // 3137 / 69401 -> 3141 / 69500 the same day, measured: a Japanese page on a
   // phone of 360px or less draws the premise at 14px / 1.6, since the system
   // CJK face it falls back to wraps it two lines longer than the Korean.
-  "base-intro-ranking.css": { lines: 3141, bytes: 69500 },
+  // 3141 / 69500 -> 3153 / 69722 the same day, measured: on 360px or less the
+  // three language pills keep one row (closer, 8px padding, out to the music
+  // controls) and the brand row comes up 8px under them.
+  "base-intro-ranking.css": { lines: 3153, bytes: 69722 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
