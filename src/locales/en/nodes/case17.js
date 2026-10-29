@@ -28,7 +28,7 @@ export default {
           "label": "Challenge the letter’s 'company record' basis point by point"
         },
         "reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Show legal’s papers first and get his consent to submit"
         },
         "reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         },
         "c17_truck_evidence_turn": {
-          "label": "Overlay the 7-year-old notebook copy on the call log"
+          "label": "Match 7-year-old notes to calls"
         }
       },
       "place": "Sangam-dong park parking lot · Taeo’s Tteok Skewers truck",
@@ -87,10 +87,10 @@ export default {
           "label": "Tell his sister what he said in that interview"
         },
         "reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         },
         "c17_office_evidence_turn": {
-          "label": "Overlay the 7-year-old notebook copy on the call log"
+          "label": "Match 7-year-old notes to calls"
         }
       },
       "place": "Mullae-dong shopping building, 3rd floor · Closed office at the end of the corridor",
@@ -118,10 +118,10 @@ export default {
           "label": "Take the offer to drop Ban Jaewook; hand over only a copy"
         },
         "reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         },
         "c17_legal_evidence_turn": {
-          "label": "Overlay the 7-year-old notebook copy on the call log"
+          "label": "Match 7-year-old notes to calls"
         }
       },
       "place": "KD Financial Group headquarters, legal team · Meeting room",
@@ -383,7 +383,7 @@ export default {
           "label": "Shelve the figures; settle the notebook on schedule"
         },
         "c17_route_system_evidence_turn": {
-          "label": "Overlay the 7-year-old notebook copy on the call log"
+          "label": "Match 7-year-old notes to calls"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Visit the people in the notebook with Ban Jaewook first"
         },
         "c17_start_warm_reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         }
       },
       "place": "FlowOn fulfillment center · Night-shift break room",
@@ -489,7 +489,7 @@ export default {
           "label": "Visit the people in the notebook with Ban Jaewook first"
         },
         "c17_start_record_reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -520,7 +520,7 @@ export default {
           "label": "Leave the notebook out; settle my case fast in writing"
         },
         "c17_start_rush_reframe": {
-          "label": "Sort out who audits have been disciplining"
+          "label": "Count who audits disciplined"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

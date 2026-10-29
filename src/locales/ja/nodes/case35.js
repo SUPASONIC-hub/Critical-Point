@@ -52,7 +52,7 @@ export default {
           "label": "断る理由を三度重ねて問う"
         },
         "c35_sandbag_evidence_turn": {
-          "label": "NOAHが水害融資を見る基準の判断記録を開く"
+          "label": "NOAHの水害融資の判断記録を開く"
         }
       },
       "place": "マンウォン市場 · 餅房の路地",
@@ -83,7 +83,7 @@ export default {
           "label": "断る理由を三度重ねて問う"
         },
         "c35_lathe_evidence_turn": {
-          "label": "NOAHが水害融資を見る基準の判断記録を開く"
+          "label": "NOAHの水害融資の判断記録を開く"
         }
       },
       "place": "インチョン・ナムドン工業団地 クッカジ精密 · 工場",
@@ -114,7 +114,7 @@ export default {
           "label": "断る理由を三度重ねて問う"
         },
         "c35_noah_evidence_turn": {
-          "label": "NOAHが水害融資を見る基準の判断記録を開く"
+          "label": "NOAHの水害融資の判断記録を開く"
         }
       },
       "place": "KD銀行カンソ支店 · 窓口",
@@ -375,7 +375,7 @@ export default {
           "label": "ひと回りする説明を商人と報道にそのまま公開する"
         },
         "c35_route_system_evidence_turn": {
-          "label": "NOAHが水害融資を見る基準の判断記録を開く"
+          "label": "NOAHの水害融資の判断記録を開く"
         }
       },
       "place": "KDデータラボ · サーバー室",
