@@ -13,6 +13,8 @@ export default {
   stage: {
     label: "Critical Point table",
     pot: "This hand",
+    markPeak: "Peak hand",
+    markBreather: "Breather hand",
     combo: "Combo",
     runPot: "Stake",
     vault: "Vault",
@@ -162,6 +164,7 @@ export default {
     logicPaid: "Logic Combo {streak}, multiplier {bonus}.",
     logicGrow: "You kept going with {type}. {paid}",
     logicBuild: "{type} {held}/{hold}. The combo rises from the third card of the same type. {paid}",
+    logicBuildShort: "{type} {held}/{hold}. The combo rises from the second card of the same type. {paid}",
     logicSwitch: "On a hand where Heat rose, you switched to {type}. The switch raised the combo. {paid}",
     logicKeep: "This scene had no card of the type you were holding. The combo stays. {paid}",
     logicBreak: "Heat did not rise, but you switched to {type}. Logic Combo is 0; counting starts again from 1/{hold}.",

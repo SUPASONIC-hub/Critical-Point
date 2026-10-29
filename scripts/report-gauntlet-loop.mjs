@@ -291,6 +291,14 @@ if (AUDIT_ON) {
     return `heat ${target} ${blind.meanVault} (caught ${blind.seen.audits}) -> reads ${reads.meanVault} (caught ${reads.seen.audits}, bust ${(reads.bustRate * 100).toFixed(1)}%)`;
   });
   console.log(`audit week       reading the audit: ${reading.join("; ")}`);
+  // AUDIT CONTACT (C-7): the cold blind hands the audit catches, holding the tool that moves its limit.
+  const contact = [20, 30].map((target) => {
+    const bare = fixed.find((row) => row.label === `heat ${target}`);
+    const held = measure(`heat ${target} + audit contact`, (win) => win.gauge < target, null, ["auditContact"]);
+    assert.ok(held.meanVault >= bare.meanVault, `AUDIT CONTACT must never cost the hand at heat ${target}: ${held.meanVault} against ${bare.meanVault}`);
+    return `heat ${target} ${bare.meanVault} (caught ${bare.seen.audits}) -> ${held.meanVault} (caught ${held.seen.audits})`;
+  });
+  console.log(`audit week       with AUDIT CONTACT: ${contact.join("; ")}`);
 }
 const offerShare = (type) => ((SCENES.filter((offers) => offers.some((offer) => offer.type === type)).length / SCENES.length) * 100).toFixed(0);
 console.log(
@@ -401,8 +409,10 @@ assert.ok(
  * thirteen relics could not change a single number: METRONOME needs a type
  * changed after the pressure rose, LOCKPICK a sealed card, SPLINT a fractured
  * axis, ENCORE a streak to keep through a bust, STETHOSCOPE a silenced board,
- * and the three stance relics a mastered stance. A relic the simulation cannot
- * trip is a relic the lift cap cannot catch.
+ * and the three stance relics a mastered stance (LOCKPICK, SPLINT and two of
+ * the stance relics went with C-7; CARBON COPY needs a bust, FRONT PAGE an
+ * OVERCLOCK board, FIELD NOTES a held type, TESTIMONY only a clock). A relic
+ * the simulation cannot trip is a relic the lift cap cannot catch.
  *
  * So each relic set is replayed by a hand that does all of it: three cards of
  * three types (one burns legitimacy past the fracture line); the card of the
@@ -469,12 +479,14 @@ for (const row of relicReport) {
   }
 }
 // Every relic has to be something the simulation can trip, or the cap above is
-// guarding nothing for it. SPLINT is the one exception by design: it bends what
-// a fracture bills a card's costs, which is a resource on the report, never the
-// pot, so no vault can show it (the unit tests hold what it does).
-const RESOURCE_ONLY_RELICS = new Set(["splint"]);
+// guarding nothing for it. AUDIT CONTACT is the one exception by design (C-7):
+// it moves the audit's limit, and this hand neither counts the audit nor ever
+// cashes under its 40 after a push, so no vault here can show it. The audit
+// hand below (AUDIT_ON) and check-endings' seasons do; the unit tests hold
+// what it does. (SPLINT, the exception before it, is gone with C-7.)
+const AUDIT_ONLY_RELICS = new Set(["auditContact"]);
 const inert = relicReport
-  .filter((row) => row.relics.length === 1 && !RESOURCE_ONLY_RELICS.has(row.name))
+  .filter((row) => row.relics.length === 1 && !AUDIT_ONLY_RELICS.has(row.name))
   .filter((row) => ["blind", "listen", "sees", "skip"].every((key) => row[key].meanVault === relicBaseline[key].meanVault))
   .map((row) => row.name);
 assert.deepEqual(inert, [], `relics the simulation never trips: ${inert.join(", ")}`);
@@ -807,8 +819,8 @@ for (const row of [...["heat 40", "heat 50", "heat 60"].map((label) => fixed.fin
 /**
  * Tools together (2026-10-13, the plan's question of a cap on tools). The
  * relic rows above play each tool alone and all twelve at once; a cap asks
- * about the sets between. The same hand on the same cases holds the five
- * tools that need no unlock (a first season), the seven a feat unlocks, and
+ * about the sets between. The same hand on the same cases holds the (eight, since C-7)
+ * tools that need no unlock (a first season), the ones a feat unlocks, and
  * the builds a cap of 3 or 5 slots would leave a player who keeps the
  * tools that lift best play most when held alone (the rows above, so the
  * order is read, not written here). "Of the whole lift" is the share of what
@@ -822,7 +834,7 @@ const everyTool = relicReport[relicReport.length - 1];
 const ranked = relicReport.filter((row) => row.relics.length === 1).sort((left, right) => right.listen.meanVault - left.listen.meanVault);
 console.log(`measured tools one at a time, by what it adds to listening play: ${ranked.map((row) => `${row.name} ${liftOf(row) >= 1 ? "+" : ""}${((liftOf(row) - 1) * 100).toFixed(1)}%${RELICS[row.name].unlock ? " (unlocked)" : ""}`).join(", ")}; all ${RELIC_IDS.length} together +${((liftOf(everyTool) - 1) * 100).toFixed(1)}%`);
 const toolSets = [
-  ["the 5 from the start", DEFAULT_RELIC_POOL],
+  [`the ${DEFAULT_RELIC_POOL.length} from the start`, DEFAULT_RELIC_POOL],
   [`the ${RELIC_IDS.length - DEFAULT_RELIC_POOL.length} a feat unlocks`, RELIC_IDS.filter((id) => RELICS[id].unlock)],
   ...[3, 5].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
   ["the swap keeps", RELIC_DROP_ORDER.slice(-RELIC_SLOTS)],

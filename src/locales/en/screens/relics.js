@@ -20,7 +20,7 @@ export default {
     nextFeat: " · Next unlock: {feat}",
     allOpen: " · All unlocked",
     back: "See other tools",
-    skip: "Continue without picking",
+    skip: "Skip and {name} · {short}",
   },
   relics: {
     metronome: {
@@ -40,17 +40,32 @@ export default {
       proc: "Halved the heat debt",
       softens: "Heat Sink: 1/{share} of the Heat, {seconds}s",
     },
-    lockpick: {
-      name: "Lockpick",
-      text: "A card sealed by COLD FEET opens at Heat {pick}, not {seal}.",
-      proc: "Picked the seal early",
-      softens: "Lockpick: opens at Heat {pick}",
+    auditContact: {
+      name: "Audit Contact",
+      text: "Ban Jaewook of Internal Audit looks away from one box. The audit catches you only when {limit} boxes fill.",
+      proc: "Ban Jaewook looked away from one box",
     },
-    splint: {
-      name: "Splint",
-      text: "Resources cracked by FRACTURE are charged ×{splint}, not ×{rate}.",
-      proc: "Braced the fracture",
-      softens: "Splint: charged ×{splint}",
+    carbonCopy: {
+      name: "Lim Kyungsoo’s Copy",
+      text: "There is a copy Lim Kyungsoo never burned. BLACKOUT pulls the Wall in only {pull}, not {shift}.",
+      proc: "The copy held the Wall back",
+      softens: "Copy: Wall pulled in only {pull}",
+    },
+    testimony: {
+      name: "Oh Jinwoo’s Testimony",
+      text: "The decision time limit was a setting. Even when time runs out and you BUST, 1/{share} of your stake stays.",
+      proc: "Kept 1/{share} of the stake when time ran out",
+    },
+    frontPage: {
+      name: "Cha Jiwon’s Front Page",
+      text: "Scoop after scoop, your hand stays steady. On OVERCLOCK hands, the extra Heat from each push is halved.",
+      proc: "A steady hand on front-page deadline",
+      softens: "Front Page: pushes grow only half as much",
+    },
+    fieldNote: {
+      name: "Do Yoonha’s Field Notes",
+      text: "In the field, twice is enough to find the flow. The Logic Combo starts rising at card {hold} of the same type.",
+      proc: "Built the combo early with the field notes",
     },
     encore: {
       name: "Encore",
@@ -63,12 +78,6 @@ export default {
       text: "Once per Case, 1/{share} of your stake survives hitting the Wall.",
       proc: "Saved 1/{share} of the stake",
       unlock: "Lose {loss} or more stake to the Wall",
-    },
-    highRoller: {
-      name: "High Roller",
-      text: "Every card’s chips ×{chips}. In exchange, the whole Wall band moves {wall} closer.",
-      proc: "Bet bigger chips",
-      unlock: "Commit at ×{multiplier} or more",
     },
     stethoscope: {
       name: "Stethoscope",
@@ -84,19 +93,10 @@ export default {
       softens: "Kinetic Grip: pushes add only their usual Heat",
       unlock: "STRIKE mastery {count} times",
     },
-    steadyAnchor: {
-      name: "Steady Anchor",
-      text: "Hands with STEADY MASTERY start {cool} Heat cooler and get {seconds} more seconds.",
-      proc: "Dropped anchor in STEADY mastery",
-      softens: "Steady Anchor: {cool} Heat cooler, +{seconds}s",
-      unlock: "STEADY mastery {count} times",
-    },
-    glassLens: {
-      name: "Glass Lens",
-      text: "On hands with EXPOSE MASTERY, no card is turned face down, the most expensive card is not sealed, and seals open at Heat {seal}.",
-      proc: "Saw through the hand with EXPOSE mastery",
-      softens: "Glass Lens: nothing hidden, no seal",
-      unlock: "EXPOSE mastery {count} times",
-    },
+  },
+  breather: {
+    name: "catch your breath",
+    short: "+{seconds}s",
+    text: "If you pick nothing, this Case’s first hand gets {seconds} more seconds and the Wall moves {wall} further away.",
   },
 };

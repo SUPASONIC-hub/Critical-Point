@@ -20,7 +20,7 @@ export default {
     nextFeat: " · 次の解放: {feat}",
     allOpen: " · すべて解放",
     back: "ほかのツールを見る",
-    skip: "選ばずに進む",
+    skip: "選ばずに{name} · {short}",
   },
   relics: {
     metronome: {
@@ -40,17 +40,32 @@ export default {
       proc: "熱の借りを半分に減らした",
       softens: "放熱板: 熱{share}分の1、{seconds}秒",
     },
-    lockpick: {
-      name: "ロックピック",
-      text: "COLD FEETで封印されたカードが、熱{seal}ではなく{pick}で開く。",
-      proc: "封印を早めに破った",
-      softens: "ロックピック: 熱{pick}で開く",
+    auditContact: {
+      name: "監査室のつて",
+      text: "監査チームのパン・ジェウクが1マスは見逃してくれる。監査は{limit}マス埋まってはじめて摘発される。",
+      proc: "パン・ジェウクが1マスを見逃した",
     },
-    splint: {
-      name: "添え木",
-      text: "FRACTUREでひびの入ったリソースの請求が、{rate}倍ではなく{splint}倍になる。",
-      proc: "ひびを支えた",
-      softens: "添え木: {splint}倍で請求",
+    carbonCopy: {
+      name: "イム・ギョンスの写し",
+      text: "イム・ギョンスが燃やさなかった写しがある。BLACKOUTが壁を{shift}ではなく{pull}だけ引き寄せる。",
+      proc: "写しが壁を押しとどめた",
+      softens: "写し: 壁を{pull}だけ引き寄せる",
+    },
+    testimony: {
+      name: "オ・ジヌの証言",
+      text: "決定の制限時間は設定値だった。時間切れでBUSTしても、賭け金の{share}分の1は残る。",
+      proc: "時間切れでも賭け金の{share}分の1を守った",
+    },
+    frontPage: {
+      name: "チャ・ジウォンの1面",
+      text: "特ダネが続いても手は震えない。OVERCLOCKの勝負で押すときに増える熱が半分になる。",
+      proc: "1面の締め切りを前にしても手は静かだった",
+      softens: "1面: 押す幅の増え方が半分",
+    },
+    fieldNote: {
+      name: "ト・ユナの現場メモ",
+      text: "現場では二度あれば流れができる。同じタイプの{hold}枚目からロジックコンボが上がる。",
+      proc: "現場メモでコンボを早く立てた",
     },
     encore: {
       name: "アンコール",
@@ -63,12 +78,6 @@ export default {
       text: "事件ごとに1回、壁に触れても賭け金の{share}分の1は残る。",
       proc: "賭け金の{share}分の1を守った",
       unlock: "賭け金{loss}以上を壁で失う",
-    },
-    highRoller: {
-      name: "ハイローラー",
-      text: "すべてのカードのチップが{chips}倍。その代わり、壁の区間全体が{wall}近づく。",
-      proc: "より大きなチップを賭けた",
-      unlock: "×{multiplier}以上で確定する",
     },
     stethoscope: {
       name: "聴診器",
@@ -84,19 +93,10 @@ export default {
       softens: "握力: 押したときの熱はそのまま",
       unlock: "STRIKE熟練{count}回",
     },
-    steadyAnchor: {
-      name: "錨",
-      text: "STEADY MASTERYが点いた勝負は熱を{cool}さらに冷ました状態で始まり、時間が{seconds}秒追加される。",
-      proc: "STEADYの熟練に錨を下ろした",
-      softens: "錨: 熱{cool}さらに冷却、{seconds}秒追加",
-      unlock: "STEADY熟練{count}回",
-    },
-    glassLens: {
-      name: "虫眼鏡",
-      text: "EXPOSE MASTERYが点いた勝負はカードが裏返らず、いちばん高いカードも封印されず、封印は熱{seal}で開く。",
-      proc: "EXPOSEの熟練で勝負を見抜いた",
-      softens: "虫眼鏡: 伏せと封印を解除",
-      unlock: "EXPOSE熟練{count}回",
-    },
+  },
+  breather: {
+    name: "ひと息つく",
+    short: "+{seconds}秒",
+    text: "選ばなければ、この事件の最初の勝負の時間が{seconds}秒延び、壁が{wall}遠ざかる。",
   },
 };

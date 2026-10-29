@@ -11,6 +11,12 @@ import { localizeTables } from "../locale.js";
  */
 const unlocksCopy = {
   kicker: "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다",
+  // 「고점 판」 (C-10, tableUnlocks.js PEAK_CASES): an act's last case, over its first briefing.
+  // `{wall}` and `{chips}` are tableRules.js PEAK_WALL and PEAK_CHIPS.
+  peak: {
+    kicker: "PEAK TABLE · 고점 판",
+    intro: ["막의 마지막 사건입니다. 이 사건의 판은 모두 벽이 {wall} 가까워지고 칩이 {chips}배입니다."],
+  },
   steps: {
     prologue01: {
       kicker: "FIRST TABLE · 이 판은 이렇게 합니다",

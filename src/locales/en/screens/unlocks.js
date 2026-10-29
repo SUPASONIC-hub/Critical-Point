@@ -1,6 +1,10 @@
 /** src/copy/unlocks.js in English: what a prologue's first briefing says about the rules it turns on. */
 export default {
   kicker: "NEW PROTOCOL · more rules from this case on",
+  peak: {
+    kicker: "PEAK TABLE · Peak hand",
+    intro: ["This is the last Case of the Act. Every hand in it has the Wall {wall} closer and chips ×{chips}."],
+  },
   steps: {
     prologue01: {
       kicker: "FIRST TABLE · how this table works",

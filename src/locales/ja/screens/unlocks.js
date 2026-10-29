@@ -1,6 +1,10 @@
 /** src/copy/unlocks.js in Japanese: the rules each prologue adds. */
 export default {
   kicker: "NEW PROTOCOL · この事件からルールが増えます",
+  peak: {
+    kicker: "PEAK TABLE · 山場の勝負",
+    intro: ["幕の最後の事件です。この事件の勝負はすべて、壁が{wall}近づき、チップが{chips}倍になります。"],
+  },
   steps: {
     prologue01: {
       kicker: "FIRST TABLE · この勝負はこう進めます",

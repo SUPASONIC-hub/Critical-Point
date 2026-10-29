@@ -2,7 +2,7 @@ import { normalizeSavedText, SAVE_SCHEMA_VERSION, SAVE_STATE_KEYS } from "../app
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../gameConstants.js";
 import { makeEmptyScores } from "../gameLogic.js";
-import { normalizeRunState, RUN_INITIAL_STATE, serializeRunState, stampCaseOpen } from "../gauntlet/gauntletEngine.js";
+import { layCasePeak, normalizeRunState, RUN_INITIAL_STATE, serializeRunState, stampCaseOpen } from "../gauntlet/gauntletEngine.js";
 import { normalizeWeekRuleId, pickSeasonWeekRule } from "../gauntlet/weeklyRules.js";
 import { getAccessibility } from "./accessibilitySettings.js";
 import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
@@ -295,7 +295,8 @@ export const RUN_FIELDS = {
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),
-    jumpToNode: (event) => stampCaseOpen(openingTable(false, event.story === true), { caseId: event.caseId, resources: initialResources }),
+    // A peak case's first board is a peak (C-10), as it would be had the case been opened.
+    jumpToNode: (event) => stampCaseOpen(layCasePeak(openingTable(false, event.story === true), event.caseId), { caseId: event.caseId, resources: initialResources }),
     reset: FRESH,
   },
   // The queue the telemetry sender empties. The save holds it; the sender's

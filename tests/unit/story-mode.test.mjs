@@ -13,7 +13,7 @@ const { CASE_SEQUENCE, CASE_START_NODES } = await import("../../src/gameCases.js
 const { nodes } = await import("../../src/gameData.js");
 const { createCaseSummary } = await import("../../src/gameLogic.js");
 const {
-  applyRelics,
+  applyPeak,
   BASE_SCHEMA,
   buildNextSchema,
   createWindow,
@@ -38,6 +38,7 @@ const {
   getUnlockKicker,
   introFor,
   MUTATION_RULES,
+  PEAK_CASES,
   rulesFor,
   STORY_OFF_RULES,
   STORY_RULES,
@@ -107,7 +108,8 @@ test("a story run's rules are its case's own, less the seven: on every step, und
     assert.equal(getTableRules(caseId, { story: "yes" }, true), base);
     assert.equal(getTableRules(caseId, { story: false }, true), base);
   }
-  for (const caseId of [...CASE_SEQUENCE.slice(PROLOGUES.length), "no-such-case", undefined, null]) {
+  // An act's last case (C-10's 「고점 판」, tableUnlocks.js PEAK_CASES) is the same set with the peak added.
+  for (const caseId of [...CASE_SEQUENCE.slice(PROLOGUES.length).filter((id) => !PEAK_CASES.includes(id)), "no-such-case", undefined, null]) {
     assert.equal(rulesFor(caseId, { staged: true, story: true }), STORY_RULES, `${caseId}`);
     assert.equal(rulesFor(caseId, { staged: false, story: true }), STORY_RULES);
     assert.equal(rulesFor(caseId, { staged: true }), ALL_RULES, "and without the mark nothing has moved");
@@ -187,7 +189,7 @@ test("under story rules no decision breaks the next board: not a bust, a cold ca
   // Through a whole settlement, and for as many busts as the hand likes.
   let run = normalizeRunState({ story: true, runPot: 900, streak: 3 });
   for (let index = 0; index < 4; index += 1) {
-    const rules = getSettlementRules({ caseId: "case07", run, caseClosed: false }, true);
+    const rules = getSettlementRules({ caseId: "case06", run, caseClosed: false }, true);
     assert.equal(rules.rules, STORY_RULES);
     const { verdict, nextRun } = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 91, wall: 91, pushes: 7, seed: `bust-${index}` }, card, ...rules });
     assert.deepEqual(verdict.nextMutations, []);
@@ -227,8 +229,8 @@ test("the board a window is dealt from is the run's own, and for a story run the
   // A wall a rule had already put past 88 stays where it was; one below is lifted.
   assert.equal(getTableSchema({ story: true, schema: { ...BASE_SCHEMA, wallMin: 93, wallMax: 96 } }).wallMin, 93);
   assert.equal(getTableSchema({ story: true, schema: { ...BASE_SCHEMA, wallMin: 93, wallMax: 96 } }).wallMax, 98);
-  // HIGH ROLLER brings the wall in; a story run's stays far, with the relic's chips kept.
-  const roller = { story: true, schema: applyRelics(BASE_SCHEMA, ["highRoller"]) };
+  // A peak board (C-10) brings the wall in; a story run's stays far, with the peak's chips kept.
+  const roller = { story: true, schema: applyPeak(BASE_SCHEMA, new Set(["peak"])) };
   assert.ok(roller.schema.wallMin < BASE_SCHEMA.wallMin);
   assert.equal(getTableSchema(roller).wallMin, 88);
   assert.equal(getTableSchema(roller).chipsScale, roller.schema.chipsScale);
@@ -237,7 +239,7 @@ test("the board a window is dealt from is the run's own, and for a story run the
 test("every window of a story run draws its wall at 88 or past it, and settles against the wall it drew", () => {
   const boards = [
     BASE_SCHEMA,
-    applyRelics(BASE_SCHEMA, ["highRoller"]),
+    applyPeak(BASE_SCHEMA, new Set(["peak"])),
     { ...BASE_SCHEMA, wallMin: 40, wallMax: 60, startGauge: 30, mutations: ["blackout", "aftershock"] },
     openCaseRun({ windowIndex: 450 }).schema,
   ];
