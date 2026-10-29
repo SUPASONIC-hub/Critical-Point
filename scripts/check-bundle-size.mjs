@@ -118,7 +118,10 @@ const budgets = [
   // 2026-10-06, when cases 01-07 and the finale were written at the length of
   // the rest of the season: its thirty scenes are the most of any case. It is
   // not the chunk a first visit waits for; that one is prologue01.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
+  // A side case (E-11, src/nodes/sideNN.js) is a case's chunk too and shares
+  // this ceiling (E11-번외사건-설계안 5절): 번외 1 (side01, eleven scenes, no
+  // replies or voice lines) measured 20,965 / 7,033 on 2026-10-25 and 2026-10-29.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|side[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
@@ -262,7 +265,8 @@ const budgets = [
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
   // 182,001 / 66,015 -> 184,294 / 66,917 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the start screen's side slot, hidden until a finale is closed and a side case is written (src/sideCases.js, the slot and its open/close in IntroScreen, its words in src/copy/intro.js), and the side-id guards of the local ranking and the window log. Measured 184,294 / 66,913 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 184_294, maxGzip: 66_917 },
+  // 184,294 / 66,917 -> 184,536 / 67,056 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: the release list's one entry for side01 (src/nodes/sidePacks.js) and `localizeSidePack` (src/locale.js), which lays a page's language over a side pack as it arrives. Measured 184,536 / 67,052, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 184_536, maxGzip: 67_056 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1002,17 +1006,20 @@ const budgets = [
   // the e2e build (English: 사건 01 the largest case), the gzip plus 4.
   // 73,483 / 21,390 -> 73,724 / 21,469 on 2026-10-26, 오진우가 경쟁자가 되는 경위 (ojinwoo-bridge): 사건 01's lead and memo say why he sits across the table, in English too. Measured in the e2e build, the gzip plus 4.
   // 73,724 / 21,469 -> 73,845 / 21,517 on 2026-10-26, 연속성 빈틈 ⑥~⑩ (continuity-rest): 사건 01 says when 한서윤 came as 실장 and why 도윤하 left his window, in English too. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 73_845, maxGzip: 21_517 },
+  // A side case's words (E-11, src/locales/en/nodes/sideNN.js) share this ceiling, like its Korean chunk above: 번외 1 measured 15,378 / 5,679 on 2026-10-29.
+  { pattern: /^locale-en-(prologue0[1-5]|case[0-9]{2}|side[0-9]{2}|final)-.*\.js$/, maxBytes: 73_845, maxGzip: 21_517 },
   // Japanese (일본어 1단계, 2026-10-26; hidden, ?lang=ja only): kana and kanji are three bytes each in UTF-8, so a case
   // is larger raw than its English though shorter to read. 사건 01 the largest, 82,376 / 23,101; the dictionary
   // (screen copy, 1,537 lines, and the page's system-font style) 109,813 / 38,565. Measured in the e2e build, the gzip plus 4.
   // 82,376 -> 82,383 on 2026-10-29, lang-terms (일본어판 표기 맞춤): 사건 01 measured 82,379, the raw plus 4.
-  { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 82_383, maxGzip: 23_105 },
+  // A side case's words (E-11, src/locales/ja/nodes/sideNN.js) share this ceiling, like its Korean chunk above: 번외 1 measured 18,491 / 6,313 on 2026-10-29.
+  { pattern: /^locale-ja-(prologue0[1-5]|case[0-9]{2}|side[0-9]{2}|final)-.*\.js$/, maxBytes: 82_383, maxGzip: 23_105 },
   // 110,001 / 38,601 -> 152,779 / 51,777 on 2026-10-28, lang-full: the Japanese screen copy of English steps three and four
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
   // 152,779 / 51,787 -> 153,851 / 52,114 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the side slot's, the finale line's and the side screen's words in Japanese (screens/intro.js, result.js, sideCase.js). Measured 153,851 / 52,110, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_851, maxGzip: 52_114 },
+  // 153,851 / 52,114 -> 153,940 / 52,169 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: 番外1 and its title (`copy.sidePacks`). Measured 153,940 / 52,165, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_940, maxGzip: 52_169 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1031,7 +1038,8 @@ const budgets = [
   // `caseRoles` (`caseRole`). Measured 8,731 / 2,636.
   // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
   // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_579, maxGzip: 3_358 },
+  // 12,579 / 3,358 -> 13,068 / 3,524 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: the side list among the shell's tables, `localizeSidePack`, and en/ja side01 in the one import map both case kinds now share (`nodeFile`; two globs would carry the map twice). Measured 13,068 / 3,520.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_068, maxGzip: 3_524 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1092,8 +1100,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * service worker skipping rel="alternate", 422,948, 472,339 and 478,083.
  * E-11 번외 사건 틀 (draft, restacked on main 43078a46 on 10-29), the start
  * screen's side slot and its words in the entry: 423,852, 473,556 and 479,316.
+ * E-11 번외 1 on it (10-29): the side list's entry and its language helper,
+ * the overlay's side path and the label and title in each dictionary:
+ * 423,989, 473,910 and 479,674.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_856, en: 473_560, ja: 479_320 };
+const FIRST_PAINT_BUDGETS = { ko: 423_993, en: 473_914, ja: 479_678 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1221,7 +1232,8 @@ function checkBudget(file, budget) {
 // -> 9,977 / 3,601 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
 // 43078a46: one more file in the list, SideCaseScreen; the worker's code did
 // not change. Measured 9,977 / 3,597 plus 4.
-const WORKER_BUDGET = { maxBytes: 9_977, maxGzip: 3_601 };
+// -> 10,006 / 3,605 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: side01 and its English and Japanese words in the list; the worker's code did not change. Measured 10,006 / 3,601 plus 4.
+const WORKER_BUDGET = { maxBytes: 10_006, maxGzip: 3_605 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

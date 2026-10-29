@@ -94,15 +94,28 @@ export function caseSource(runtimeData, caseId) {
   }) ?? {};
 }
 
+/**
+ * One side case's Korean words (E-11 번외 사건, src/nodes/sideNN.js): its
+ * scenes and its three endings, as the authored pack has them -- a side pack
+ * is not built into the season (scripts/season-split.mjs), so it is read as
+ * written. Its label and title are the side list's (src/nodes/sidePacks.js,
+ * `SIDE_CASES`), answered by the dictionary's `copy.sidePacks` the way a
+ * season case's are by `copy.gameCases.seasonCasesBase`.
+ */
+export function sideSource(pack) {
+  return wordsOf({ nodes: pack?.nodes, outcomes: pack?.outcomes }) ?? {};
+}
+
 const pick = (table, ids) => Object.fromEntries(ids.filter((id) => table[id] !== undefined).map((id) => [id, table[id]]));
 
 /** The screen copy in scope: the season's copy between cases for the cases in `scope`, and the play guide's tables. */
 export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
-  const [caseCopy, appCopy, playerLanguage, gameCases] = await Promise.all([
+  const [caseCopy, appCopy, playerLanguage, gameCases, sidePacks] = await Promise.all([
     import(`${root}/src/caseCopy.js`),
     import(`${root}/src/appCopy.js`),
     import(`${root}/src/playerLanguage.js`),
     import(`${root}/src/gameCases.js`),
+    import(`${root}/src/nodes/sidePacks.js`),
   ]);
   // The screens' own copy (src/copy/<name>.js, each a default export laid
   // over as `copy.screens.<name>`).
@@ -137,6 +150,8 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
       caseObjectives: pick(gameCases.caseObjectives, scope),
       seasonCasesBase: gameCases.seasonCasesBase.filter((entry) => scope.includes(entry.id)),
     },
+    // The side list's label and title (번외 1 · ...), outside the season's scope.
+    sidePacks: { SIDE_CASES: sidePacks.SIDE_CASES },
   }, "", COPY_KEY_FIELDS) ?? {};
 }
 

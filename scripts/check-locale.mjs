@@ -2,9 +2,11 @@ import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildRuntimeData, loadSeasonTables } from "./season-split.mjs";
-import { caseSource, compareWords, readCopySource, readLanguageCopy } from "./locale-words.mjs";
+import { caseSource, compareWords, readCopySource, readLanguageCopy, sideSource } from "./locale-words.mjs";
 import { SOURCE_LOCALE, SUPPORTED_LOCALES } from "../src/locale.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
+import { SIDE_CASES } from "../src/nodes/sidePacks.js";
+import { isSideCaseId } from "../src/sideCases.js";
 
 /**
  * `npm run check:locale [-- --lang=<code>]`: how much of a language is still
@@ -16,7 +18,12 @@ import { CASE_SEQUENCE } from "../src/gameCases.js";
  * end, 10-28 -- and any other case the language has a file for) and for the screen copy, it reads the Korean the
  * app is shipped (scripts/locale-words.mjs) and the language's file beside
  * it (src/locales/<lang>/nodes/<caseId>.js, src/locales/<lang>/index.js), and
- * counts:
+ * counts. The side cases a release lists (E-11 번외 사건, `SIDE_CASES` in
+ * src/nodes/sidePacks.js) are in scope too: each is read from its authored
+ * pack (src/nodes/sideNN.js, `sideSource`) against
+ * src/locales/<lang>/nodes/sideNN.js, and their label and title with the
+ * screen copy (`copy.sidePacks`). A side case is never in the season's data.
+ * It counts:
  *
  *   missing  a Korean string with no translation -- the page shows the Korean
  *            (the fallback), so this is a gap, not a break;
@@ -60,10 +67,20 @@ for (const lang of languages) {
   const scope = through ? CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(through) + 1) : CASE_SEQUENCE;
   const copySource = await readCopySource(pathToFileURL(root).href, scope);
   const nodesDir = path.join(root, "src/locales", lang, "nodes");
-  const extra = existsSync(nodesDir) ? readdirSync(nodesDir).map((file) => file.replace(/\.js$/, "")).filter((caseId) => !scope.includes(caseId)) : [];
+  const sides = SIDE_CASES.map((entry) => entry.id);
+  const extra = existsSync(nodesDir) ? readdirSync(nodesDir).map((file) => file.replace(/\.js$/, "")).filter((caseId) => !scope.includes(caseId) && !sides.includes(caseId)) : [];
   const rows = [];
-  for (const caseId of [...scope, ...extra]) {
+  for (const caseId of [...scope, ...sides, ...extra]) {
     const file = `src/locales/${lang}/nodes/${caseId}.js`;
+    if (isSideCaseId(caseId)) {
+      const pack = await wordsOf(`src/nodes/${caseId}.js`, caseId);
+      if (!pack || !sides.includes(caseId)) {
+        rows.push({ unit: caseId, total: 0, missing: [], stale: [`${file}: no side case ${caseId} in SIDE_CASES`], numbers: [] });
+        continue;
+      }
+      rows.push({ unit: caseId, ...compareWords(sideSource(pack), await wordsOf(file, "default"), lang) });
+      continue;
+    }
     if (!runtimeData.cases[caseId]) {
       rows.push({ unit: caseId, total: 0, missing: [], stale: [`${file}: no such case`], numbers: [] });
       continue;
