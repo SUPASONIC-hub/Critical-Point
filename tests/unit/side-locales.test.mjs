@@ -8,6 +8,7 @@ import { localizeSidePack, SOURCE_LOCALE, SUPPORTED_LOCALES } from "../../src/lo
 import { localizeSide, localizeSidePack as overlaySidePack, overlayWords } from "../../src/locales/overlay.js";
 import { SIDE_CASES } from "../../src/nodes/sidePacks.js";
 import { side01 } from "../../src/nodes/side01.js";
+import { side02 } from "../../src/nodes/side02.js";
 import { isSideCaseId } from "../../src/sideCases.js";
 import { checkSidePack } from "../../src/state/sidePackCheck.js";
 
@@ -22,34 +23,41 @@ const languages = SUPPORTED_LOCALES.map((locale) => locale.code).filter((code) =
 const marks = (text) => [...text].filter((character, at) => character === "'" && !(/[A-Za-z]/.test(text[at - 1] ?? "") && /[A-Za-z]/.test(text[at + 1] ?? ""))).length;
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-test("every language answers side01's scenes and endings: none missing, none stale, no number lost", async () => {
+const RELEASED = [side01, side02];
+
+test("every language answers each released side case's scenes and endings: none missing, none stale, no number lost", async () => {
   for (const lang of languages) {
-    const words = (await import(`${root}/src/locales/${lang}/nodes/side01.js`)).default;
-    const result = compareWords(sideSource(side01), words, lang);
-    assert.ok(result.total > 100, `${lang}: side01 has its scenes' words`);
-    assert.deepEqual(result.missing, [], `${lang}: side01 missing`);
-    assert.deepEqual(result.stale, [], `${lang}: side01 stale`);
-    assert.deepEqual(result.numbers, [], `${lang}: side01 numbers`);
-    // Every speaker has a printed name, and a line keeps the Korean's speech marks (the briefing finds speech by them).
     const { speakers } = await import(`${root}/src/locales/${lang}/index.js`);
-    assert.deepEqual([...new Set(Object.values(side01.nodes).map((scene) => scene.speaker))].filter((name) => !speakers[name]), [], lang);
-    const korean = flatten(sideSource(side01));
-    for (const [path, text] of Object.entries(flatten(words))) assert.equal(marks(text), marks(korean[path]), `${lang} ${path}`);
+    for (const pack of RELEASED) {
+      const words = (await import(`${root}/src/locales/${lang}/nodes/${pack.id}.js`)).default;
+      const result = compareWords(sideSource(pack), words, lang);
+      assert.ok(result.total > 100, `${lang}: ${pack.id} has its scenes' words`);
+      assert.deepEqual(result.missing, [], `${lang}: ${pack.id} missing`);
+      assert.deepEqual(result.stale, [], `${lang}: ${pack.id} stale`);
+      assert.deepEqual(result.numbers, [], `${lang}: ${pack.id} numbers`);
+      // Every speaker has a printed name, and a line keeps the Korean's speech marks (the briefing finds speech by them).
+      assert.deepEqual([...new Set(Object.values(pack.nodes).map((scene) => scene.speaker))].filter((name) => !speakers[name]), [], `${lang} ${pack.id}`);
+      const korean = flatten(sideSource(pack));
+      for (const [path, text] of Object.entries(flatten(words))) assert.equal(marks(text), marks(korean[path]), `${lang} ${pack.id} ${path}`);
+    }
   }
 });
 
 test("every language names the side list's label and title in its dictionary; the Korean label stays 「번외 N」", async () => {
   const source = flatten(await readCopySource(root));
   const sidePaths = Object.keys(source).filter((path) => path.startsWith("sidePacks."));
-  assert.deepEqual(sidePaths.sort(), ["sidePacks.SIDE_CASES.side01.label", "sidePacks.SIDE_CASES.side01.title"]);
-  const labels = { en: "Side case 1", ja: "番外1" };
+  assert.deepEqual(sidePaths.sort(), [
+    "sidePacks.SIDE_CASES.side01.label", "sidePacks.SIDE_CASES.side01.title",
+    "sidePacks.SIDE_CASES.side02.label", "sidePacks.SIDE_CASES.side02.title",
+  ]);
+  const labels = { en: (n) => `Side case ${n}`, ja: (n) => `番外${n}` };
   for (const lang of languages) {
     const copy = flatten(await readLanguageCopy(root, lang));
     for (const path of sidePaths) assert.equal(typeof copy[path], "string", `${lang}: ${path}`);
-    assert.equal(copy["sidePacks.SIDE_CASES.side01.label"], labels[lang], `${lang}: the label in the case labels' form`);
+    for (const n of [1, 2]) assert.equal(copy[`sidePacks.SIDE_CASES.side0${n}.label`], labels[lang](n), `${lang}: the label in the case labels' form`);
   }
-  assert.equal(SIDE_CASES[0].label, "번외 1");
-  assert.deepEqual(checkSidePack(side01), []);
+  assert.deepEqual(SIDE_CASES.map((entry) => entry.label), ["번외 1", "번외 2"]);
+  for (const pack of RELEASED) assert.deepEqual(checkSidePack(pack), [], pack.id);
 });
 
 test("a side pack is never in the season's data, and a release lists no fixture", async () => {
@@ -73,6 +81,7 @@ test("on a Korean page a side pack arrives as it is; the overlay lays a language
   assert.deepEqual(unloaded, clone(side01));
   const loaded = await SIDE_CASES[0].load();
   assert.equal(loaded.nodes.s1_start.text, side01.nodes.s1_start.text);
+  assert.equal(await SIDE_CASES[1].load(), side02);
 
   const pack = clone(side01);
   const words = (await import(`${root}/src/locales/en/nodes/side01.js`)).default;
