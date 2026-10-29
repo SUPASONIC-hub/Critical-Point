@@ -75,7 +75,8 @@ const budgets = [
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 149,722 / 54,994 -> 152,719 / 56,132 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the side run (state/sideRun.js) and what the side screen takes from this chunk (state/sideCaseKit.js); the pack check stays out (state/sidePackCheck.js). Measured 152,719 / 56,128 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 152_719, maxGzip: 56_132 },
+  // 152,719 / 56,132 -> 152,882 / 56,185 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the side records' event when a side case closes (state/sideRun.js). Measured 152,882 / 56,181 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 152_882, maxGzip: 56_185 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -83,7 +84,8 @@ const budgets = [
   // gzip plus 4.
   // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
   // 32,897 / 13,039 -> 34,278 / 13,357 on 2026-10-26, 영어판 3단계: the observer's samples, arcs and records and the endings' lines read by key (src/copy/observer.js), a name's particle as a blank. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_278, maxGzip: 13_357 },
+  // 13,357 -> 13,368 gzip on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 34,233 / 13,364, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_278, maxGzip: 13_368 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -266,7 +268,8 @@ const budgets = [
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
   // 182,001 / 66,015 -> 184,294 / 66,917 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the start screen's side slot, hidden until a finale is closed and a side case is written (src/sideCases.js, the slot and its open/close in IntroScreen, its words in src/copy/intro.js), and the side-id guards of the local ranking and the window log. Measured 184,294 / 66,913 in the e2e build, the gzip plus 4.
   // 184,294 / 66,917 -> 184,536 / 67,056 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: the release list's one entry for side01 (src/nodes/sidePacks.js) and `localizeSidePack` (src/locale.js), which lays a page's language over a side pack as it arrives. Measured 184,536 / 67,052, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 184_536, maxGzip: 67_056 },
+  // 184,536 / 67,056 -> 184,597 / 67,067 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the side keys spelled in appConfig.js for the online save and the event's name; the marks and their merge stay out (state/sideMarks.js). Measured 184,597 / 67,063, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 184_597, maxGzip: 67_067 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -631,7 +634,8 @@ const budgets = [
   // 11,494 -> 11,497 raw on 2026-10-26, funnel-locale: only by the chunk names it imports. Measured 11,497 / 4,636.
   // 11,497 / 4,644 -> 11,780 / 4,768 on 2026-10-26, 영어판 3단계: online save's status lines and refusals read by key (src/copy/cloudSaveStatus.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 11,780 / 4,768 -> 11,781 / 4,776 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: only by the chunk names it imports. Measured 11,781 / 4,772, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_781, maxGzip: 4_776 },
+  // 11,781 / 4,776 -> 12,364 / 4,994 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the upload carries the side marks (state/sideMarks.js) and a restore merges them. Measured 12,364 / 4,990, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 12_364, maxGzip: 4_994 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -740,7 +744,8 @@ const budgets = [
   // 6,994 / 3,548 -> 7,006 / 3,557 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 7,006 / 3,553 in the e2e build, the gzip plus 4.
   // 7,006 / 3,557 -> 8,451 / 3,981 on 2026-10-26, 영어판 3단계: its words (src/copy/seasonEnd.js: the ending scenes and names, the collapse's cause, the authority review, the aftermath) grouped with it in vite.config.js. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_487, maxGzip: 3_989 },
+  // 3,989 -> 4,000 gzip on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 8,487 / 3,996, the gzip plus 4.
+  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_487, maxGzip: 4_000 },
   // The season's copy between and around cases (src/caseCopy.js): the
   // next-case teasers and interludes, chapter rules, rank legacy lines and
   // 에코's opening lines. It was in the runtime's chunk, which had 255 gzip
@@ -789,14 +794,16 @@ const budgets = [
   // hashed file names it imports.
   // 1,058 / 656 -> 989 / 619 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 989 / 615 in the e2e build, the gzip plus 4.
-  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 989, maxGzip: 619 },
+  // 989 -> 990 raw on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 990 / 614.
+  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 990, maxGzip: 619 },
   // The other players' card share under the decision reveal (E-6, 2026-10-22):
   // src/state/useSceneChoiceRates.js and src/sceneChoices.js, the frame of
   // sceneTraces above (SCENE_CHOICES in vite.config.js). 1,216 / 724
   // measured, plus 4 each for the hashed names.
   // 1,220 / 728 -> 1,143 / 680 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,143 / 676 in the e2e build, the gzip plus 4.
-  { pattern: /^sceneChoices-.*\.js$/, maxBytes: 1_143, maxGzip: 680 },
+  // 1,143 -> 1,144 raw on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 1,144 / 674.
+  { pattern: /^sceneChoices-.*\.js$/, maxBytes: 1_144, maxGzip: 680 },
   // 이번 주의 규칙 (2026-10-19), split off the entry chunk so the entry stays
   // under its budget: the rules and their words (src/gauntlet/weeklyRules.js),
   // shared by the runtime, the engine and the views below, and the start
@@ -1106,8 +1113,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * E-11 번외 1 on it (10-29): the side list's entry and its language helper,
  * the overlay's side path and the label and title in each dictionary:
  * 423,989, 473,910 and 479,674.
+ * E-11 번외 사건 온라인 저장 on it (10-29): the side keys and the event's name
+ * in the entry: 424,000, 473,918 and 479,682.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_993, en: 473_914, ja: 479_678 };
+const FIRST_PAINT_BUDGETS = { ko: 424_004, en: 473_922, ja: 479_686 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1236,7 +1245,8 @@ function checkBudget(file, budget) {
 // 43078a46: one more file in the list, SideCaseScreen; the worker's code did
 // not change. Measured 9,977 / 3,597 plus 4.
 // -> 10,006 / 3,605 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: side01 and its English and Japanese words in the list; the worker's code did not change. Measured 10,006 / 3,601 plus 4.
-const WORKER_BUDGET = { maxBytes: 10_006, maxGzip: 3_605 };
+// -> 10,006 / 3,611 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the list's hashed names; the worker's code did not change. Measured 10,006 / 3,607 plus 4.
+const WORKER_BUDGET = { maxBytes: 10_006, maxGzip: 3_611 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
