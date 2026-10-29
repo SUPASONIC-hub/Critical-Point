@@ -33,19 +33,22 @@ function playCase(run, windows, rules = ALL_RULES) {
   return { run: current, verdict, log };
 }
 
-test("the audit is a rule of the table from 프롤로그 04 (RULES_MARK 3), and no week switches it any more", () => {
+test("the audit is a rule of the table from 사건 02 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3), and no week switches it any more", () => {
   assert.deepEqual(WEEK_RULE_DEVICES, [], "the week's devices are empty; the frame stays");
   assert.equal(weekRuleHasDevice("audit-cascade", "audit"), false, "W47's stamp switches nothing now");
   assert.equal(getWeekRule("audit"), null, "the audit week is gone from the catalogue");
   const opens = UNLOCK_LADDER.find((step) => step.adds.includes("audit"));
-  assert.equal(opens.caseId, "prologue04", "it opens with FRACTURE");
+  assert.equal(opens.caseId, "case02", "it opens in 사건 02, 가짜 신호, with nothing else");
+  assert.deepEqual([...opens.adds], ["audit"]);
   for (const step of UNLOCK_LADDER) assert.equal(step.rules.has("audit"), !CASES_BEFORE_AUDIT.includes(step.caseId), `${step.caseId}: the record's list is the ladder's`);
-  assert.ok(rulesFor("case01").has("audit"));
+  assert.equal(rulesFor("case01").has("audit"), false);
+  assert.ok(rulesFor("case02").has("audit"));
   assert.ok(rulesFor("prologue01", { veteran: true }).has("audit"), "NEW GAME+ has it from the first case");
   assert.equal(STORY_RULES.has("audit"), false, "story mode never has it");
-  assert.equal(rulesFor("prologue04", { story: true }).has("audit"), false);
-  assert.ok(introFor("prologue04").some((text) => text.includes("감사")), "프롤로그 04 says it opens");
-  assert.equal(introFor("prologue04", { story: true }).some((text) => text.includes("감사")), false, "a story run is not told it");
+  assert.equal(rulesFor("case02", { story: true }).has("audit"), false);
+  assert.ok(introFor("case02").some((text) => text.includes("감사")), "사건 02 says it opens");
+  assert.equal(introFor("prologue04").some((text) => text.includes("감사")), false, "프롤로그 04 no longer does");
+  assert.equal(introFor("case02", { story: true }).some((text) => text.includes("감사")), false, "a story run is not told it");
 });
 
 test("a cash pushed and closed cold adds one; a cash at HEAT DEBT takes two off; nothing else moves it", () => {

@@ -397,6 +397,7 @@ test("a bust reloaded under its slam stays closed, and breaks the board it would
 });
 
 test("the streak and LOCK are paid under one cap, and their shares add up", () => {
+  // `staked` leans toward the position (capital 9 against trust -12): the streak is held on the direction (C-3).
   const typed = { ...staked, cognition: { risk: 2 } };
   for (const mode of FOCUS_MODES) {
     for (let focus = 0; focus <= 100; focus += 5) {
@@ -408,7 +409,7 @@ test("the streak and LOCK are paid under one cap, and their shares add up", () =
         assert.ok(hand >= earned, "LOCK never takes the streak away");
         assert.ok(hand <= earned * getFocusBonus(focus, mode).pot + 0.02, "and the cap only ever takes away");
         // The run holds one fewer: this window's card, of the type it holds, makes the streak the pot is paid on.
-        const run = normalizeRunState({ logic: { streak: Math.max(0, streak - 1), type: "risk", held: streak ? 5 : 1 } });
+        const run = normalizeRunState({ logic: { streak: Math.max(0, streak - 1), type: "position", held: streak ? 5 : 1 } });
         const window = { status: "cashed", gauge: 44, pushes: 3, focus, focusMode: mode, focusHits: focus ? 3 : 0, groove };
         const { verdict, nextRun } = resolveWindow({ run, window, card: typed });
         assert.equal(verdict.logic.streak, streak);

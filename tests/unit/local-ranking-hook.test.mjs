@@ -12,7 +12,7 @@ import { installBrowser } from "./helpers/browser.mjs";
 const row = (runId, caseId, burstScore) => ({ run_id: runId, case_id: caseId, summary: { burstScore } });
 const browser = installBrowser({
   storage: {
-    "critical-point-local-ranking-v11": JSON.stringify([row("run-1", "season-final", 61), { case_id: "season-final" }]),
+    "critical-point-local-ranking-v12": JSON.stringify([row("run-1", "season-final", 61), { case_id: "season-final" }]),
   },
 });
 const { createElement } = await import("react");
@@ -20,7 +20,7 @@ const { renderToStaticMarkup } = await import("react-dom/server");
 const { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } = await import("../../src/state/useLocalRanking.js");
 
 test("the hook reads this table's rows, appends a run's row in place of its earlier one, and writes it back", () => {
-  assert.equal(LOCAL_RANKING_STORAGE_KEY, "critical-point-local-ranking-v11");
+  assert.equal(LOCAL_RANKING_STORAGE_KEY, "critical-point-local-ranking-v12");
   let api = null;
   const Probe = () => {
     api = useLocalRanking();

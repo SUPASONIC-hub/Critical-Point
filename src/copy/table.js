@@ -116,7 +116,7 @@ const tableCopy = {
   },
   hand: {
     label: "카드",
-    type: "유형 ",
+    type: "방향 ",
     faceDown: "칩과 소모가 가려진 카드",
     noBurn: "소모 없음",
     // The tag on a card whose cash makes a link (B2, GauntletHand.jsx).
@@ -176,16 +176,20 @@ const tableCopy = {
       focus: "LOCK이 올린 열기가 벽에 닿았다",
     },
     causeBust: "열기가 벽에 닿았다",
-    // The one word of each type's name a phone's card prints; it is a word of the name (getTypeParts).
-    typeKeywords: { persistence: "버티기", inference: "확인", reframing: "바꾸기", risk: "위험" },
+    // The logic streak's two directions and a card that leans neither way (C-3, getDirectionParts):
+    // the tag prints the name and a phone clips `directionAfter`; `side` is the name in a sentence.
+    directions: { people: "사람", position: "자리", even: "중립" },
+    directionAfter: " 쪽",
+    side: "{direction} 쪽",
     logicPaid: "논리 콤보 {streak}, 배율 {bonus}.",
-    logicGrow: "{type}{particle} 이어 갔다. {paid}",
-    logicBuild: "{type} {held}/{hold}. 같은 유형 세 번째부터 콤보가 오른다. {paid}",
+    logicGrow: "{side}{particle} 이어 갔다. {paid}",
+    logicBuild: "{side} {held}/{hold}. 같은 방향 세 번째부터 콤보가 오른다. {paid}",
     // The same with FIELD NOTES (C-7), whose hold is one window shorter.
-    logicBuildShort: "{type} {held}/{hold}. 같은 유형 두 번째부터 콤보가 오른다. {paid}",
-    logicSwitch: "열기가 오른 판에서 {type}{particle} 바꿨다. 전환으로 콤보가 올랐다. {paid}",
-    logicKeep: "지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. {paid}",
-    logicBreak: "열기가 오르지 않았는데 {type}{particle} 바꿨다. 논리 콤보는 0, 다시 1/{hold}부터 센다.",
+    logicBuildShort: "{side} {held}/{hold}. 같은 방향 두 번째부터 콤보가 오른다. {paid}",
+    logicSwitch: "열기가 오른 판에서 {side}{particle} 바꿨다. 전환으로 콤보가 올랐다. {paid}",
+    logicKeep: "지키던 방향의 카드가 이 장면에 없었다. 콤보는 그대로다. {paid}",
+    logicKeepEven: "어느 쪽으로도 기울지 않은 카드였다. 콤보는 그대로다. {paid}",
+    logicBreak: "열기가 오르지 않았는데 {side}{particle} 바꿨다. 논리 콤보는 0, 다시 1/{hold}부터 센다.",
     logicBustKept: "벽에 닿았지만 논리 콤보 {streak}{particle} 남았다.",
     logicBustLost: "벽에 닿아 논리 콤보가 끊겼다.",
     logicLog: "논리 콤보 {streak} · 배율 {bonus} · +{pot}",
@@ -195,7 +199,7 @@ const tableCopy = {
     combo: "논리 콤보 {streak}",
     spoken: "논리 콤보 {streak}, 배율 {bonus}배. {hold}.",
     spokenMove: " 이 카드로 {move}.",
-    spokenOpen: " 열기가 올라 유형을 바꿔도 콤보가 오른다.",
+    spokenOpen: " 열기가 올라 방향을 바꿔도 콤보가 오른다.",
     cardMove: "(콤보 {move})",
     reframeName: "판을 다시 짠다",
     clockOpened: "읽는 시간이 끝나 판이 열렸다. 시계가 흐른다",

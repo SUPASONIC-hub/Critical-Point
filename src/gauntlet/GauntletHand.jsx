@@ -1,8 +1,8 @@
 import { Link2, Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
-import { getLogicType } from "./logicStreak.js";
-import { describeCardMove, getMoveMark, getTypeParts, REFRAME_CARD_NAME } from "./tableReadout.js";
+import { getLogicDirection } from "./logicStreak.js";
+import { describeCardMove, getDirectionParts, getMoveMark, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import { pastPick } from "./WeekRulePanel.jsx";
 import tableCopy from "../copy/table.js";
@@ -22,9 +22,10 @@ const say = tableCopy.hand;
  * A face-down card still has a name: the glyphs that hide its numbers are for
  * the eye, and a screen reader is told the numbers are hidden.
  *
- * Every card says its type (`CardType`): the logic streak is earned by which
- * type is picked from scene to scene, so a hand that cannot see the type
- * cannot play for it. The tag sits on the card's top edge, out of the card's
+ * Every card says its direction (`CardType`): the logic streak is earned by
+ * which way the picked card leans from scene to scene -- 사람 or 자리, C-3 --
+ * so a hand that cannot see the direction cannot play for it. The thinking
+ * type the report's 관점 전환 reads is in the briefing's list of the cards. The tag sits on the card's top edge, out of the card's
  * flow, because a phone's hand has no room to give it (measured at 360x740
  * and 390x844 on the heaviest boards: in the stats row it wrapped under the
  * burn and put a staked hand 5px under the action bar, and at the head of the
@@ -32,8 +33,8 @@ const say = tableCopy.hand;
  * the button, so it is in the card's name.
  * `moveOf` says what picking a card would do to the streak, once the case has
  * the rule; the tag of a card that would not end the streak is lit. On a phone
- * the tag prints one word of the name and the rest is for a screen reader (the
- * `i` elements, which play.css clips there).
+ * the tag prints the direction's word and " 쪽" is for a screen reader (the
+ * `i` element, which play.css clips there).
  * The colour is not the only thing that says it: the tag opens with a sign
  * for the move (`getMoveMark`), at every width, on the line the tag already
  * has, so it costs a card no height. The sign is for the eye; a screen reader
@@ -42,12 +43,11 @@ const say = tableCopy.hand;
 export function CardType({ card, moveOf }) {
   const move = moveOf?.(card);
   const mark = getMoveMark(move);
-  const [before, word, after] = getTypeParts(getLogicType(card));
+  const [word, after] = getDirectionParts(getLogicDirection(card));
   return (
     <span className={`gx-card-type${move && move !== "break" ? " is-on" : ""}`} data-testid="card-type" data-move={move ?? ""}>
       {mark && <b className="gx-card-move" data-testid="card-move" aria-hidden="true">{mark} </b>}
       <span className="sr-only">{say.type}</span>
-      {before && <i>{before}</i>}
       {word}
       {after && <i>{after}</i>}
       {move && <span className="sr-only">{describeCardMove(move)}</span>}

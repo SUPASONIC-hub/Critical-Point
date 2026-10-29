@@ -1,6 +1,7 @@
 import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
-import { ENDING_GATES } from "./gameConstants.js";
+// Read through a namespace: the import-name budget (check-runtime-budget.mjs) is full at 20.
+import * as gameConstants from "./gameConstants.js";
 import * as seasonStanding from "./seasonStanding.js";
 import * as scoring from "./seasonScore.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
@@ -94,11 +95,7 @@ export function createDecisionForecast(choice = {}, resources = {}) {
  * position you are holding. Ties read as neither.
  */
 function getDecisionLean(entry = {}) {
-  const effect = entry.effect ?? {};
-  const people = (effect.trust ?? 0) - (effect.humanCost ?? 0);
-  const position = (effect.capital ?? 0) + (effect.time ?? 0);
-  if (people === position) return 0;
-  return people > position ? 1 : -1;
+  return gameConstants.getEffectLean(entry.effect ?? {});
 }
 
 /**
@@ -493,7 +490,7 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
 // bar: no bust and a x16 cash (heat 44 at DOUBLING_HEAT 11), a logic streak of
 // 24, or 19,500 a case banked -- between the best blind (15.4k) and heartbeat
 // (24.6k) play check:pressure measures at nine windows a case (16,000 at 7).
-const { clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = ENDING_GATES; // the collapse gates are read in seasonStanding.js
+const { clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = gameConstants.ENDING_GATES; // the collapse gates are read in seasonStanding.js
 const CLUE_RATE_SLACK_BAR = 0.8;
 const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
 const QUIET_SUSTAINED_PRESSURE = 12; // as it is when cases typically peak under 12 (p25 13)
@@ -939,7 +936,9 @@ export function createLogicRecord(entries = []) {
     record.peak = Math.max(record.peak, tier);
     record.best = Math.max(record.best, Number(logic.streak) || 0);
     if (LOGIC_RECORD_KEYS[logic.move]) record[LOGIC_RECORD_KEYS[logic.move]] += 1;
-    if (typeof logic.type === "string") {
+    // The direction held (사람 or 자리, C-3); an entry from before it holds a
+    // thinking type, read the same way. A card that leaned neither way is none.
+    if (typeof logic.type === "string" && logic.type !== "even") {
       picked[logic.type] = (picked[logic.type] ?? 0) + 1;
       if (!record.top || picked[logic.type] > record.top[1]) record.top = [logic.type, picked[logic.type]];
     }

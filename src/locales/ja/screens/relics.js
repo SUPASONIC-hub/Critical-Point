@@ -25,7 +25,7 @@ export default {
   relics: {
     metronome: {
       name: "メトロノーム",
-      text: "熱が上がった次のシーンまで、タイプを変えても転換として認められる。",
+      text: "熱が上がった次のシーンまで、方向を変えても転換として認められる。",
       proc: "転換をつなぎとめた",
     },
     coldBlood: {

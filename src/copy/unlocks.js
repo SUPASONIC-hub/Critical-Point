@@ -1,7 +1,7 @@
 import { localizeTables } from "../locale.js";
 
 /**
- * What a prologue's first briefing says about the rules it turns on
+ * What a prologue's (and, since C-4, 사건 01 to 03's) first briefing says about the rules it turns on
  * (gauntlet/tableUnlocks.js, shown by SceneBriefing.jsx): the line over them
  * and the lines, case by case, read by key so another language can be laid
  * over them (src/locale.js, 다국어 틀). The Korean is the ladder's own, moved
@@ -27,7 +27,7 @@ const unlocksCopy = {
     },
     prologue02: {
       intro: [
-        "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다. 사건 결과의 '관점 전환' 점수는 반대로 네 유형을 고르게 쓸수록 오릅니다.",
+        "같은 방향(사람 쪽 또는 자리 쪽)의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 방향을 바꿔도 콤보가 이어집니다. '관점 전환' 점수는 생각 유형을 고르게 쓸수록 오르니, 방향은 지키고 유형은 바꿔도 됩니다.",
         "벽에 닿으면 다음 판은 카드가 가려지고, 열기를 안은 채 시작합니다.",
       ],
     },
@@ -41,9 +41,7 @@ const unlocksCopy = {
     prologue04: {
       intro: [
         "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
-        "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
         "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
-        "이번 사건부터 감사와 연결이 판에 붙습니다.",
       ],
     },
     prologue05: {
@@ -52,6 +50,17 @@ const unlocksCopy = {
         "사건이 닫힐 때마다 도구 3개 중 하나를 고릅니다. 도구는 5개까지 들고, 다 차면 하나를 내려놓고 바꿉니다.",
         "칩 배율이 {cap}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, {charge} 이상 충전해 확정하면 다음 판에서 치릅니다.",
       ],
+    },
+    // 사건 01 to 03 open one rule each since C-4 (RULES_MARK 4): OVERCLOCK,
+    // the audit and the links, which 프롤로그 04 opened before.
+    case01: {
+      intro: ["×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
+    },
+    case02: {
+      intro: ["이번 사건부터 감사가 판에 붙습니다. 한 번이라도 밀고 열기 40 아래에서 확정하면 한 칸 차고, 60 이상에서 확정하면 2칸 줄어듭니다. 사건이 닫힐 때 4칸이 차 있으면 금고로 갈 몫의 4분의 1을 잃습니다."],
+    },
+    case03: {
+      intro: ["이번 사건부터 연결이 판에 붙습니다. 한 자원을 8 이상 태운 카드로 확정하면, 2~4판 뒤의 한 판에서 벽이 6 가까워집니다."],
     },
   },
 };

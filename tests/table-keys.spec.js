@@ -585,6 +585,8 @@ test("with five tools held, a draft pick asks which to put down, Escape goes bac
  */
 const WHOLE = { logic: true, lock: true, stance: true, chain: true };
 const NO_LOCK = { logic: true, lock: false, stance: false, chain: false };
+// OVERCLOCK, whose chain the run's line counts, opens in 사건 01 since C-4 (2026-10-25).
+const NO_CHAIN = { logic: true, lock: true, stance: true, chain: false };
 /** The line over an introduction. 프롤로그 01 has its own: nothing was added to the first table. */
 const FIRST_TABLE = "FIRST TABLE · 이 판은 이렇게 합니다";
 const NEW_PROTOCOL = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다";
@@ -592,10 +594,14 @@ const STAGED_STEPS = [
   { caseId: "prologue01", on: { logic: false, lock: false, stance: false, chain: false }, lines: 2, kicker: FIRST_TABLE },
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue03", on: NO_LOCK, lines: 3, kicker: NEW_PROTOCOL },
-  // Four lines since RULES_MARK 3: the audit and the links open here with FRACTURE, told in one.
-  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 4, kicker: NEW_PROTOCOL },
-  { caseId: "prologue05", on: WHOLE, lines: 3, kicker: NEW_PROTOCOL },
-  { caseId: "case01", on: WHOLE, lines: 0 },
+  // Two lines since C-4 (2026-10-25): FRACTURE and LOCK. OVERCLOCK, the audit and the links open
+  // one a case in 사건 01 to 03, each with a line of its own.
+  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: false }, lines: 2, kicker: NEW_PROTOCOL },
+  { caseId: "prologue05", on: NO_CHAIN, lines: 3, kicker: NEW_PROTOCOL },
+  { caseId: "case01", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case02", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case03", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case04", on: WHOLE, lines: 0 },
 ];
 
 /** A scene's briefing page, with the table behind it still shut. */
@@ -932,7 +938,7 @@ test("staged: 프롤로그 03 closes without a draft, and 프롤로그 04 closes
   await expect(page.getByTestId("unlock-intro").locator("li")).toHaveText([...UNLOCK_LADDER[4].intro]);
   await dismissProtocolBreach(page);
   await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(1);
-  await expectTableDraws(page, WHOLE);
+  await expectTableDraws(page, NO_CHAIN);
 });
 
 /**

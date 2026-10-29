@@ -88,7 +88,7 @@ function describeHand(verdict) {
 
 // Moved to settleChoice.js (F1 phase 3, S2), where a server check can import
 // them without React; exported here as well for the callers that read them here.
-export { getOfferedTypes, getSettlementRules } from "./settleChoice.js";
+export { getOfferedDirections, getSettlementRules } from "./settleChoice.js";
 
 /**
  * Committing a decision: the table's verdict prices the card, the log gains

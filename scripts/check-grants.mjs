@@ -111,9 +111,11 @@ await db.exec(`
 // checks below ask for that one, and say so.
 const DAY_TEN_RESET = "20261020010000_rules_day10_ranking_reset.sql";
 const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark3_ranking_reset.sql")) ?? null;
-const RANKING_RESET = MARK3_RESET ?? DAY_TEN_RESET;
+// RULES_MARK 4's (C-3 and C-4, drafted 2026-10-25) the same way, once it is a `.sql`.
+const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql")) ?? null;
+const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
 /** The table mark the replayed server asks of every case row of a ranked season. */
-const SERVER_MARK = MARK3_RESET ? RULES_MARK : 2;
+const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -1328,7 +1330,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.22" });
   /** The run summary a build of the table before sent as `dynamics`: this one's, without the mark. */
   const olderTableDynamics = ({ [RULES_MARK_KEY]: _mark, ...rest }) => rest;
   const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
-  if (!MARK3_RESET) console.log(`Older-table checks: against the day-ten mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_rules_mark3_ranking_reset.sql.draft).`);
+  if (SERVER_MARK < RULES_MARK) console.log(`Older-table checks: against the server's mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_rules_mark${RULES_MARK}_ranking_reset.sql.draft).`);
   const marked = (runId) => one(
     `select (count(*) filter (where jsonb_typeof(dynamics->'${RULES_MARK_KEY}') = 'number' and (dynamics->>'${RULES_MARK_KEY}')::numeric >= ${SERVER_MARK}))::int as mark, count(*)::int as n
        from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,
@@ -2478,11 +2480,15 @@ await refused("read the choice snapshot directly", "anon", `select * from public
 await allowed("read the scene choice rates", "anon", `select public.scene_choice_rates()`);
 await refused("rebuild the choice snapshot", "anon", `select public.refresh_scene_choice_stats()`);
 
-// The scene wall rate leaves out a NEW GAME+ season's first four prologues,
-// played under every rule (20261102010000): told by the case row's summary
-// (`newGamePlus: true`) and its case. Rows put in place as stored rows, the
-// snapshot rebuilt, read, and the rows taken out and the snapshot rebuilt again.
+// The scene wall rate leaves out a NEW GAME+ season's cases played under
+// every rule where an ordinary season is still on the ladder: prologue 01 to
+// 04 (20261102010000), and prologue 01 to case 02 once C-4's file is a `.sql`
+// (*_scene_bust_ladder_c4, a draft until RULES_MARK 4's reset). Told by the
+// case row's summary (`newGamePlus: true`) and its case. Rows put in place as
+// stored rows, the snapshot rebuilt, read, and the rows taken out and the
+// snapshot rebuilt again.
 {
+  const LADDER_C4 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_c4.sql"));
   const SCENE_SEED = "grants-check-scene";
   const NG_SCENE = "ngplus_scene";
   await db.exec(`set session_replication_role = replica`);
@@ -2493,6 +2499,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
       [3, "prologue04", { newGamePlus: true }],
       [4, "prologue05", { newGamePlus: true }],
       [5, "case01", { newGamePlus: true }],
+      [6, "case03", { newGamePlus: true }],
     ]) {
       await db.query(
         `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
@@ -2505,9 +2512,10 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
   }
   await db.query(`select public.refresh_scene_bust_stats()`);
   const counted = (await db.query(`select case_id, windows from public.scene_bust_stats where node_id = $1 order by case_id`, [NG_SCENE])).rows.map(({ case_id, windows }) => `${case_id}:${windows}`);
+  const expected = LADDER_C4 ? ["case03:1", "prologue01:1"] : ["case01:1", "case03:1", "prologue01:1", "prologue05:1"];
   check(
-    JSON.stringify(counted) === JSON.stringify(["case01:1", "prologue01:1", "prologue05:1"]),
-    `the scene snapshot counted ${JSON.stringify(counted)}; a NEW GAME+ season's prologue 01 to 04 are left out, its prologue 05 and later and an ordinary season's prologue 01 are not.`,
+    JSON.stringify(counted) === JSON.stringify(expected),
+    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
   );
   await db.query(`delete from public.playtest_sessions where session_code = 'SCENESEED'`);
   await db.query(`select public.refresh_scene_bust_stats()`);

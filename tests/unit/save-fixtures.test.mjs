@@ -116,17 +116,21 @@ test("a save from the table that graded a press loads without a notice, under th
     for (const key of gone) assert.equal(key in record, false, key);
   }
   // Everything else the record held is as it was saved.
-  const { beatCombo: _a, bestCombo: _b, focusPerfects: _c, focusMisses: _d, runGroove, grooveVault: _e, suspended, practice, ...rest } = saved;
+  const { beatCombo: _a, bestCombo: _b, focusPerfects: _c, focusMisses: _d, runGroove, grooveVault: _e, suspended, practice, logic: savedLogic, ...rest } = saved;
   // `weekRule` came after this save (이번 주의 규칙): it reads as none, and so
   // do B2's links (the 3 -> 4 step).
   // So does the case's opening snapshot (S3): none for a case opened before it.
-  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, open, ...kept } = run;
+  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, open, logic: runLogic, ...kept } = run;
   assert.equal(weekRule, null);
   assert.equal(open, null);
   assert.deepEqual([linksIn, linksOut], [[], []]);
   assert.deepEqual(kept, rest);
-  assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [practice.logic, practice.vault, practice.record.grooveBanked]);
-  assert.deepEqual(run.logic, saved.logic, "the streak is the save's");
+  // The streak is the save's, but a hold on a thinking type (before C-3, 2026-10-25) starts over:
+  // the streak is held on a direction now.
+  const untyped = (logic) => (logic && typeof logic.type === "string" && !["people", "position"].includes(logic.type) ? { ...logic, type: null, held: 0 } : logic);
+  assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [untyped(practice.logic), practice.vault, practice.record.grooveBanked]);
+  assert.deepEqual(runLogic, untyped(savedLogic), "the streak is the save's");
+  assert.equal(runLogic.streak, savedLogic.streak, "and the streak it built is kept");
 
   // The window put down with a groove is still paid on it: x1.36, with the streak at none.
   const table = normalizeRunState(run);

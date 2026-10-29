@@ -30,7 +30,7 @@ const record = (values = {}) => ({ windows: 6, heat: 3, peak: 1, top: ["inferenc
 // Seven cases as the season lists them (id, label, title); the titles are this file's own, so a retitled case moves no assertion.
 const CASES = ["72시간", "가짜 신호", "이름 없는 승인", "넷째", "다섯째", "여섯째", "일곱째"].map((title, index) => ({ id: `case0${index + 1}`, label: `사건 0${index + 1}`, title }));
 // A case with a record was closed at the logic table, so its run summary has the table's mark; one without is a summary from before it.
-const seasonOf = (records) => Object.fromEntries(records.map((values, index) => [CASES[index].id, values ? { logicRecord: record(values), gauntlet: { logicStreak: 0, tableRules: 3 } } : { rank: "B" }]));
+const seasonOf = (records) => Object.fromEntries(records.map((values, index) => [CASES[index].id, values ? { logicRecord: record(values), gauntlet: { logicStreak: 0, tableRules: 4 } } : { rank: "B" }]));
 
 /** Six cases at a mean heat of 0.5, and 사건 03 at 2.0 with five of its eight windows on 위험 다루기. */
 const SEASON = seasonOf([{}, { breaks: 1 }, { windows: 8, heat: 16, peak: 3, top: ["risk", 5], grows: 3, switches: 1, breaks: 1, busts: 1, best: 9 }, {}, { keeps: 2 }, {}, { best: 4 }]);
@@ -43,7 +43,7 @@ test("the panel names the hottest case, what the hand closed it on, and the seas
     lines: [
       "열기가 가장 높았던 사건은 사건 03 「이름 없는 승인」입니다. 그 사건의 8판 가운데 5판을 '위험 다루기'로 닫았습니다.",
       "논리 유지력 93점 · 최고 논리 콤보 9 · 순위는 시즌 기록이 50건 모이면 나옵니다.",
-      "논리 유지력은 콤보가 끊길 수 있던 판 가운데 끊기지 않은 판의 비율입니다. 관점 전환 점수와는 반대로 움직일 수 있습니다.",
+      "논리 유지력은 콤보가 끊길 수 있던 판 가운데 끊기지 않은 판의 비율입니다. 같은 방향을 지키는 힘이라, 생각 유형을 고르게 쓰는 관점 전환 점수와 함께 오를 수 있습니다.",
     ],
   });
   // 44 windows, 2 kept for want of the type, 3 ended: 100 x 39 / 42.
@@ -73,19 +73,22 @@ test("the hottest case is the highest mean closing tier, then the most busts, th
   assert.deepEqual([hottest.label, hottest.title, hottest.record.heat], ["사건 03", "이름 없는 승인", 16]);
 });
 
-test("one case reads as held, as switched, or as not staying on a type", () => {
-  // Held: half the windows or more on one type, with the count; every window says so.
+test("one case reads as held, as switched, or as not staying on a direction", () => {
+  // Held: half the windows or more on one direction (사람 or 자리, C-3), with the count.
+  assert.equal(describeLogicCase(record({ windows: 8, top: ["people", 5], breaks: 2 })), "그 사건의 8판 가운데 5판을 '사람 쪽'으로 닫았습니다.");
+  assert.equal(describeLogicCase(record({ windows: 6, top: ["position", 6] })), "그 사건의 6판을 모두 '자리 쪽'으로 닫았습니다.");
+  // A record closed before C-3 holds a thinking type, and is read by its name.
   assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 5], breaks: 2 })), "그 사건의 8판 가운데 5판을 '위험 다루기'로 닫았습니다.");
   assert.equal(describeLogicCase(record({ windows: 8, top: ["persistence", 4] })), "그 사건의 8판 가운데 4판을 '끝까지 버티기'로 닫았습니다.");
   assert.equal(describeLogicCase(record({ windows: 6, top: ["reframing", 6] })), "그 사건의 6판을 모두 '판 바꾸기'로 닫았습니다.");
   assert.equal(describeLogicCase(record({ windows: 3, top: ["inference", 9] })), "그 사건의 3판을 모두 '꼼꼼히 확인하기'로 닫았습니다.", "a count past the windows is the windows");
   // Not held, and nothing ended the streak.
-  assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 3], switches: 2 })), "그 사건에서 열기가 오른 뒤 유형을 2번 바꿨고, 논리 콤보는 끊기지 않았습니다.");
-  assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 3], keeps: 3 })), "그 사건에서는 한 유형에 머물지 않았지만, 논리 콤보는 끊기지 않았습니다.");
+  assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 3], switches: 2 })), "그 사건에서 열기가 오른 뒤 방향을 2번 바꿨고, 논리 콤보는 끊기지 않았습니다.");
+  assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 3], keeps: 3 })), "그 사건에서는 한 방향에 머물지 않았지만, 논리 콤보는 끊기지 않았습니다.");
   // Not held, and it ended: breaks and busts together, as the score counts them.
-  assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 3], switches: 2, breaks: 2, busts: 1 })), "그 사건에서는 한 유형에 머물지 않았고, 논리 콤보가 3번 끊겼습니다.");
+  assert.equal(describeLogicCase(record({ windows: 8, top: ["risk", 3], switches: 2, breaks: 2, busts: 1 })), "그 사건에서는 한 방향에 머물지 않았고, 논리 콤보가 3번 끊겼습니다.");
   // A record with no type picked (every window run out), or one this build has no name for.
-  assert.equal(describeLogicCase(record({ windows: 4, top: null, busts: 4 })), "그 사건에서는 한 유형에 머물지 않았고, 논리 콤보가 4번 끊겼습니다.");
+  assert.equal(describeLogicCase(record({ windows: 4, top: null, busts: 4 })), "그 사건에서는 한 방향에 머물지 않았고, 논리 콤보가 4번 끊겼습니다.");
   assert.equal(describeLogicCase(record({ windows: 4, top: ["unknown", 4] })), LOGIC_REPORT_COPY.unbroken);
   assert.equal(describeLogicCase(undefined), LOGIC_REPORT_COPY.unbroken);
   // Every type's name takes 로.
@@ -96,14 +99,14 @@ test("a season with few recorded cases names none, and one with no record prints
   assert.equal(LOGIC_REPORT_MIN_CASES, 5);
   // Three of the seven closed with no window to count: cases of this table still, with its mark and no record.
   const four = { ...seasonOf([{}, null, { windows: 8, heat: 16, breaks: 2, best: 3 }, {}, null, {}, null]) };
-  for (const [id, summary] of Object.entries(four)) if (!summary.logicRecord) four[id] = { ...summary, gauntlet: { logicStreak: 0, tableRules: 3 } };
+  for (const [id, summary] of Object.entries(four)) if (!summary.logicRecord) four[id] = { ...summary, gauntlet: { logicStreak: 0, tableRules: 4 } };
   assert.deepEqual(createLogicReport({ caseResults: four, cases: CASES }).lines, [
     "논리 콤보 기록이 있는 사건이 아직 적어, 열기가 가장 높았던 사건을 짚지 않습니다.",
     "논리 유지력 92점 · 최고 논리 콤보 3 · 순위는 시즌 기록이 50건 모이면 나옵니다.",
     LOGIC_REPORT_COPY.caption,
   ]);
   const five = seasonOf([{}, null, { windows: 8, heat: 16, top: ["risk", 2], breaks: 2, best: 3 }, {}, {}, {}, null]);
-  assert.match(createLogicReport({ caseResults: five, cases: CASES }).lines[0], /^열기가 가장 높았던 사건은 사건 03 「이름 없는 승인」입니다\. 그 사건에서는 한 유형에 머물지 않았고, 논리 콤보가 2번 끊겼습니다\.$/);
+  assert.match(createLogicReport({ caseResults: five, cases: CASES }).lines[0], /^열기가 가장 높았던 사건은 사건 03 「이름 없는 승인」입니다\. 그 사건에서는 한 방향에 머물지 않았고, 논리 콤보가 2번 끊겼습니다\.$/);
   // Five recorded cases, none long enough to average.
   assert.equal(createLogicReport({ caseResults: seasonOf(Array(5).fill({ windows: 2, heat: 2 })), cases: CASES }).lines[0], LOGIC_REPORT_COPY.tooFew);
   // An old save: summaries from before the streak.
@@ -204,11 +207,11 @@ test("a season with a case from before the logic table is on no ranking, and its
     assert.equal(createLogicReport({ caseResults: season, cases: CASES, standing }).lines[1], "논리 유지력 92점 · 최고 논리 콤보 9");
   }
   // A case with the mark and no record (no window of it could be counted) is not such a case.
-  const windowless = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: { logicStreak: 0, tableRules: 3 } } };
+  const windowless = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } } };
   assert.equal(hasBeatTableCase(windowless), false);
   assert.equal(getRankedLogicHold(windowless), 92);
   // One case closed at the logic table before 2026-10-20: the streak's mark and not the table's (20261020010000).
-  for (const [label, gauntlet] of [["no table mark", { logicStreak: 4 }], ["an older table mark", { logicStreak: 4, tableRules: 1 }], ["a table mark that is no number", { logicStreak: 4, tableRules: "2" }]]) {
+  for (const [label, gauntlet] of [["no table mark", { logicStreak: 4 }], ["an older table mark", { logicStreak: 4, tableRules: 1 }], ["the mark of RULES_MARK 3, before C-3 and C-4", { logicStreak: 4, tableRules: 3 }], ["a table mark that is no number", { logicStreak: 4, tableRules: "2" }]]) {
     const season = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet } };
     assert.equal(hasBeatTableCase(season), true, label);
     assert.equal(getRankedLogicHold(season), null, label);
