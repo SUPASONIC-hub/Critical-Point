@@ -29,28 +29,20 @@
  * 22-28), until A-3 brought every one to 30 or under on 2026-10-25 and the
  * ceiling, its longest-label twin and the `--list` tally went with it.
  *
- * A scene's body (`text`) is still held by such a ratchet (A-13 of the 2026-10-22
- * review). It is the narration a phone reads in the briefing boxes, and
- * nothing counted it: the longest, case 45's `c45_stories`, was 702
- * characters, and the reading clock grows with every one of them. It is
- * counted like a label. `MAX_TEXT` is 420 characters; `TEXT_OVER_CEILING` is
- * how many scenes were longer on 2026-10-22 and `LONGEST_TEXT` the longest,
- * both ratchets that only come down: 133 and 702 that day, 126 and 691 after
- * the same day's copy rewrite (prose-polish) split sentences and dropped the
- * dates the clock already shows; 115 after A-8 (a8-41-49), and 117 in
- * batch B on 2026-10-23, measured once every branch of that day was merged
- * (reversals-29-35 and story-copy-1 wrote into scenes A-8 had brought under),
- * and 114 once batch A (story-first10's prologues) was merged under it;
- * 74 and 476 on 2026-10-25 after 묶음 A-13 (#291 #292 #294 #296) moved
- * forty bodies under 420 (c45_stories 685 -> 419, c47_steam now the longest);
- * 73 after 시대 고증 A, which shortened c6_start to make room for one line.
- * The `lead` above the body is not
- * counted: it is one line, written to be read first. The check lives here,
- * not in a script of its own, because it is the same count and the same
- * ratchet over the same graph.
+ * A scene's body (`text`) is the narration a phone reads in the briefing
+ * boxes, and the reading clock grows with every character of it. It is counted
+ * like a label, `MAX_TEXT` is 420 characters, and any body longer fails the
+ * check, printed with where it is written. It too began as a ratchet (A-13 of
+ * the 2026-10-22 review): 133 bodies were longer that day, the longest case
+ * 45's `c45_stories` at 702, a count and a longest length that only came down
+ * (114 on 2026-10-23, 74 and 476 after the first A-13 bundle on 2026-10-25)
+ * until the second A-13 bundle brought the last 73 to 420 or under the same
+ * day, and the ceiling, its longest-body twin and `--texts` went with them.
+ * The `lead` above the body is not counted: it is one line, written to be
+ * read first. The check lives here, not in a script of its own, because it is
+ * the same count over the same graph.
  *
- *   node scripts/check-card-labels.mjs          the check
- *   node scripts/check-card-labels.mjs --texts  every scene body over MAX_TEXT
+ *   node scripts/check-card-labels.mjs
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameData.js";
@@ -58,8 +50,6 @@ import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameDa
 const MAX_LABEL = 30;
 
 const MAX_TEXT = 420;
-const TEXT_OVER_CEILING = 73;
-const LONGEST_TEXT = 476;
 
 // The lengths the distribution is reported at; MAX_LABEL is one of them.
 const MARKS = [24, 28, 30, 32, 36];
@@ -127,14 +117,8 @@ function textWrittenAt(entry) {
   return entry.sceneId;
 }
 const describeText = (entry) => `${textWrittenAt(entry)}: ${entry.length} characters, ${entry.length - MAX_TEXT} over ${MAX_TEXT} (${entry.caseId}, ${entry.kind} ${entry.sceneId})`;
-if (process.argv.includes("--texts")) for (const entry of longTexts) console.log(describeText(entry));
-if (longTexts.length > TEXT_OVER_CEILING) {
-  for (const entry of longTexts) failures.push(describeText(entry));
-  failures.push(`${longTexts.length} scene bodies are longer than ${MAX_TEXT} characters, over the ${TEXT_OVER_CEILING} allowed: split the new one or move a line to its memo (the list above is longest first)`);
-}
-if ((texts[0]?.length ?? 0) > LONGEST_TEXT) {
-  for (const entry of longTexts.filter((item) => item.length > LONGEST_TEXT)) failures.push(`${textWrittenAt(entry)}: ${entry.length} characters, longer than the longest scene body allowed (${LONGEST_TEXT}) (${entry.sceneId})`);
-}
+for (const entry of longTexts) failures.push(describeText(entry));
+if (longTexts.length) failures.push(`${longTexts.length} scene bod${longTexts.length === 1 ? "y is" : "ies are"} longer than ${MAX_TEXT} characters: split the scene or move a line to its memo (the list above is longest first)`);
 
 // --- the distribution --------------------------------------------------------
 
@@ -160,7 +144,5 @@ if (failures.length) {
     `Card-label check passed (${cards.length.toLocaleString("en-US")} labels across ${CASE_SEQUENCE.length} cases: ${distribution}; ` +
       `none longer than ${MAX_LABEL}).`,
   );
-  console.log(`Scene bodies: ${longTexts.length} of the ${TEXT_OVER_CEILING} allowed of ${texts.length.toLocaleString("en-US")} are longer than ${MAX_TEXT} characters, the longest ${texts[0]?.length} of the ${LONGEST_TEXT} allowed.`);
-  if (longTexts.length < TEXT_OVER_CEILING) console.log(`Fewer scene bodies are over ${MAX_TEXT} now; take TEXT_OVER_CEILING down to ${longTexts.length}.`);
-  if ((texts[0]?.length ?? 0) < LONGEST_TEXT) console.log(`The longest scene body is shorter now; take LONGEST_TEXT down to ${texts[0]?.length}.`);
+  console.log(`Scene bodies: ${texts.length.toLocaleString("en-US")}, none longer than ${MAX_TEXT} characters (the longest ${texts[0]?.length}).`);
 }

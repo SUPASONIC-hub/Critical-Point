@@ -54,6 +54,9 @@ test("each request gets the rule for what it asks for", () => {
   assert.equal(strategyFor(get("/scene-case01-960.webp", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/icons/icon-192.png", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/manifest.webmanifest"), ORIGIN), "revalidate");
+  for (const page of ["/privacy.html", "/terms.html", "/en/privacy.html", "/en/terms.html", "/ja/privacy.html", "/ja/terms.html"]) {
+    assert.equal(strategyFor(get(page, "navigate"), ORIGIN), "document", page);
+  }
 });
 
 test("the worker leaves alone what is not its to answer", () => {
@@ -65,6 +68,8 @@ test("the worker leaves alone what is not its to answer", () => {
   // the shell rule takes, and only for the page's own address.
   assert.equal(strategyFor(get("/assets/ResultScreen-gone.js", "navigate"), ORIGIN), "none");
   assert.equal(strategyFor(get("/somewhere/else", "navigate"), ORIGIN), "none");
+  assert.equal(strategyFor(get("/privacy", "navigate"), ORIGIN), "none", "only the policy pages' own names");
+  assert.equal(strategyFor(get("/fr/privacy.html", "navigate"), ORIGIN), "none");
 });
 
 test("a release's cache is its own, and only this site's other releases are stale", () => {
@@ -252,6 +257,41 @@ test("with nothing kept, a failed navigation fails as the network did", async ()
   assert.equal((await failing.dispatch("fetch", plainRequest("/", "navigate")).answer).status, 502, "the host's own answer is all there is");
 });
 
+const POLICY = "<html><h1>개인정보처리방침</h1></html>";
+const policyPage = () => response(POLICY, { contentType: "text/html; charset=utf-8" });
+
+test("a policy page comes from the network and is kept on the way back, then opens offline", async () => {
+  const scope = await installed({ ...SITE, "/privacy.html": policyPage });
+  const online = scope.dispatch("fetch", plainRequest("/privacy.html", "navigate"));
+  assert.equal(await (await online.answer).text(), POLICY);
+  await online.settled();
+  assert.equal(await scope.stores.get(cacheNameFor("abc1234")).get("/privacy.html").clone().text(), POLICY);
+
+  scope.offline = true;
+  const offline = scope.dispatch("fetch", plainRequest("/privacy.html", "navigate"));
+  assert.equal(await (await offline.answer).text(), POLICY, "the kept copy, not the page");
+  // One never opened is not answered with another, nor with the game's page.
+  await assert.rejects(scope.dispatch("fetch", plainRequest("/terms.html", "navigate")).answer, /Failed to fetch/);
+});
+
+test("a policy page the host answers with an error is not kept", async () => {
+  const scope = await installed({ ...SITE, "/terms.html": () => response("Not Found", { status: 404, contentType: "text/html" }) });
+  const missing = scope.dispatch("fetch", plainRequest("/terms.html", "navigate"));
+  assert.equal((await missing.answer).status, 404);
+  await missing.settled();
+  assert.equal(scope.stores.get(cacheNameFor("abc1234")).has("/terms.html"), false);
+});
+
+test("the warm-up keeps the policy pages, which are pages and still allowed", async () => {
+  const scope = fakeScope({ ...SITE, "/en/privacy.html": policyPage });
+  installWorker(scope, { ...CONFIG, warm: [...CONFIG.warm, "/en/privacy.html"] });
+  await scope.dispatch("install").settled();
+  const told = [];
+  await scope.dispatch("message", { data: { type: "warm" }, source: { postMessage: (message) => told.push(message) } }).settled();
+  assert.equal(told[0].complete, true);
+  assert.equal(await scope.stores.get(cacheNameFor("abc1234")).get("/en/privacy.html").clone().text(), POLICY);
+});
+
 test("a fingerprinted file is answered from the cache without asking, and kept on a miss", async () => {
   const scope = await installed();
   const before = scope.asked.length;
@@ -362,6 +402,8 @@ test("a warm-up the connection cuts short stops and says it is not whole", async
 
 const PAGE = `<!doctype html><html><head>
 <link rel="canonical" href="/" />
+<link rel="alternate" hreflang="en" href="/?lang=en" vite-ignore />
+<link rel="alternate" hreflang="x-default" href="/" vite-ignore />
 <meta property="og:image" content="/triggerlab-key-visual.jpg" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
 <link rel="manifest" href="/manifest.webmanifest" />
@@ -511,6 +553,9 @@ test("the warm list is every other build file, the portraits and the art at one 
   // fetched when its speaker first appears, and sw.js does not grow with it.
   const withNew = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file), "/portrait-lee-minseo.webp"]) });
   assert.deepEqual(withNew.warm, config.warm);
+  // The policy pages beside the build (scripts/legal-pages.mjs) are warmed too.
+  const withPolicies = workerConfigFor({ html: PAGE, files: shipped([...FILES.map(([file]) => file), "/privacy.html", "/en/terms.html", "/robots.html"]) });
+  assert.deepEqual(withPolicies.warm, [...config.warm, "/en/terms.html", "/privacy.html"].sort());
   assert.equal(config.entry, "/assets/index-FZxcMdNV.js");
   assert.equal(config.precache.includes("/assets/index-FZxcMdNV.js"), true);
   assert.throws(() => workerConfigFor({ html: "<html></html>", files: FILES }), /no module script/);

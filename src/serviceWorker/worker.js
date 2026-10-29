@@ -25,6 +25,10 @@
  *   /assets/*      kept first. A fingerprinted file never changes behind its
  *                  name, so the kept copy is the file. A miss goes to the
  *                  network and is kept on the way back.
+ *   the policies   /privacy.html, /terms.html and their /en/ and /ja/ copies
+ *                  (scripts/legal-pages.mjs): network first like the page,
+ *                  and kept on the way back and in the warm-up, so a device
+ *                  that has had a table up can read them offline.
  *   root images    the kept copy now, and a fresh one fetched behind it: their
  *                  names do not change when the picture does. With no
  *                  connection and no kept copy, the same picture at another
@@ -55,6 +59,7 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms)\.html$/;
 
 export function cacheNameFor(release) {
   return `${CACHE_PREFIX}${release}`;
@@ -78,7 +83,7 @@ export function artVariants(pathname) {
   return [`/${base}-960.webp`, `/${base}.webp`, `/${base}-480.webp`].filter((variant) => variant !== pathname);
 }
 
-/** `shell`, `immutable`, `revalidate`, or `none` for a request the worker leaves alone. */
+/** `shell`, `document`, `immutable`, `revalidate`, or `none` for a request the worker leaves alone. */
 export function strategyFor({ method, url, mode }, origin) {
   if (method !== "GET") return "none";
   let parsed;
@@ -88,7 +93,10 @@ export function strategyFor({ method, url, mode }, origin) {
     return "none";
   }
   if (parsed.origin !== origin) return "none";
-  if (mode === "navigate") return parsed.pathname === "/" || parsed.pathname === SHELL_URL ? "shell" : "none";
+  if (mode === "navigate") {
+    if (parsed.pathname === "/" || parsed.pathname === SHELL_URL) return "shell";
+    return DOCUMENT_PAGE.test(parsed.pathname) ? "document" : "none";
+  }
   if (parsed.pathname.startsWith("/assets/")) return "immutable";
   if (ROOT_STATIC.test(parsed.pathname)) return "revalidate";
   return "none";
@@ -136,7 +144,7 @@ export function installWorker(scope, config) {
    */
   async function fetchFile(url) {
     const response = await scope.fetch(url);
-    if (!isStorable(response)) throw new Error(`${url} answered ${response.status}, or with a page.`);
+    if (!isStorable(response, { allowHtml: DOCUMENT_PAGE.test(url) })) throw new Error(`${url} answered ${response.status}, or with a page.`);
     return [url, response];
   }
 
@@ -157,7 +165,12 @@ export function installWorker(scope, config) {
     await scope.clients.claim();
   }
 
-  async function answerShell(request) {
+  /**
+   * The page, or a policy page (`keptUrl` its own path): the network's answer
+   * while there is one, the kept copy when there is not. A policy page that
+   * answers is kept on the way back; the page is kept at install only.
+   */
+  async function answerPage(request, keptUrl, keep = null) {
     const cache = await openCache();
     const network = scope.fetch(request);
     // Handled here too: when the kept page has already been given, a network
@@ -172,14 +185,17 @@ export function installWorker(scope, config) {
       // An answer that is not an error is the page. A 502 from a host that is
       // down is an answer too, and it used to be given as one, in front of a
       // kept page that would have opened.
-      if (response && response.status < 400) return response;
+      if (response && response.status < 400) {
+        if (keep && isStorable(response, { allowHtml: true })) keep(cache.put(keptUrl, response.clone()));
+        return response;
+      }
     } catch {
       // No connection: the kept page, below.
     } finally {
       scope.clearTimeout(timer);
     }
     // Slow, gone, or failing. With nothing kept the network's own answer is all there is.
-    return (await kept(cache, SHELL_URL)) ?? network;
+    return (await kept(cache, keptUrl)) ?? network;
   }
 
   async function answerImmutable(request, keep) {
@@ -245,7 +261,8 @@ export function installWorker(scope, config) {
     const strategy = strategyFor(event.request, scope.location.origin);
     if (strategy === "none") return;
     const keep = (work) => event.waitUntil(Promise.resolve(work).catch(() => {}));
-    if (strategy === "shell") event.respondWith(answerShell(event.request));
+    if (strategy === "shell") event.respondWith(answerPage(event.request, SHELL_URL));
+    else if (strategy === "document") event.respondWith(answerPage(event.request, new URL(event.request.url).pathname, keep));
     else if (strategy === "immutable") event.respondWith(answerImmutable(event.request, keep));
     else event.respondWith(answerRevalidated(event.request, keep));
   });
