@@ -161,7 +161,10 @@ const fileBudgets = {
   // intro (LanguagePicker.jsx, 다국어 틀): the pills with their 44px target,
   // the lit one, the preview line, and the phone's corner placement with room
   // under it for the preview line. Measured.
-  "base-intro-ranking.css": { lines: 3128, bytes: 69168 },
+  // 3128 / 69168 -> 3137 / 69401 on 2026-10-29, measured: a wide screen pins
+  // the three language pills under the music controls (position: fixed), out
+  // of the brand row, so the start button stays inside a 1280x720 screen.
+  "base-intro-ranking.css": { lines: 3137, bytes: 69401 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
