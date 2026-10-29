@@ -536,7 +536,9 @@ const budgets = [
   // 195,002 / 36,324 -> 195,846 / 36,472 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 195,846 -> 195,847 raw on 2026-10-26, first-paint-cut: the @font-face's weight range in tokens.css, 45 920 -> 400 920
   // (the font's thin half cut, scripts/build-fonts.mjs). Measured 195,847 / 36,467; the gzip stays under its line.
-  { pattern: /^index-.*\.css$/, maxBytes: 195_847, maxGzip: 36_472 },
+  // -> 196,068 / 36,533 on 2026-10-29, lang-full: the recovery notice sits above the fixed
+  // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_068, maxGzip: 36_533 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1062,11 +1064,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * them at 422,686, 471,543 and 463,660. Both languages open to the end
  * (lang-full, 10-28): English 472,083, Japanese 477,810 (the Japanese
  * dictionary carries the screen copy of English steps three and four).
+ * The recovery notice over the fixed language pills (10-29) puts them at
+ * 422,775, 472,175 and 477,902.
  * index.html then names the two other languages (hreflang, og:locale:alternate,
  * lang-extras) and the policy links open the page's own language:
- * 422,867, 472,269 and 477,996.
+ * 422,950, 472,350 and 478,077.
  */
-const FIRST_PAINT_BUDGETS = { ko: 422_871, en: 472_273, ja: 478_000 };
+const FIRST_PAINT_BUDGETS = { ko: 422_954, en: 472_354, ja: 478_081 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
