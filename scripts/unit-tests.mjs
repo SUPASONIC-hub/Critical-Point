@@ -167,6 +167,10 @@ test("the table never prints the odds of the next push", async () => {
   // number is not zero. The band and the heartbeat are the only instruments.
   assert.doesNotMatch(gauntletStageSource, /bustChance|probability|wall-cross|%\s*</i);
   assert.doesNotMatch(tableReadoutSource, /bustChance|probability|wall-cross/i, "the table's readout derives no odds either");
+  // The words the stage prints are its copy table's (src/copy/table.js, and the English laid over it): no odds there either.
+  for (const copy of ["src/copy/table.js", "src/locales/en/screens/table.js", "src/locales/ja/screens/table.js"]) {
+    assert.doesNotMatch(readFileSync(copy, "utf8"), /bustChance|probability|wall-cross|%/i, `${copy} prints no odds`);
+  }
   // Read on the syntax tree, not as text: the wall element has to render only
   // under a guard that requires a bust and rules out an abandoned window --
   // however the guard is ordered, wrapped or formatted.

@@ -36,3 +36,6 @@ coverage/
 # Windows desktop is never compared by anything, so it is never committed.
 tests/visual-regression.spec.js-snapshots/*-win32.png
 tests/visual-regression.spec.js-snapshots/*-darwin.png
+
+# `npm run store:shots` output: the store screenshots, regenerated from the build.
+store-shots/

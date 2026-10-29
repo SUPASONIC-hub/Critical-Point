@@ -1,6 +1,8 @@
 import { getRankingIntegrity, getRankingLeague } from "./advancedSystems.js";
 import { triggerLabels } from "./gameConstants.js";
 import { subjectParticle } from "./playerLanguage.js";
+import words from "./copy/leaderboard.js";
+import { fill } from "./locale.js";
 
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
 
@@ -73,7 +75,7 @@ function normalizeEntry(input = {}) {
   const runLabel = runTag ? `RUN ${runTag}` : "LOCAL RUN";
   const caseId = toText(row.case_id);
   const completedAt = toText(row.completed_at);
-  const localName = (toText(row.player_name) || "현재 분석관").slice(0, 24);
+  const localName = (toText(row.player_name) || words.localName).slice(0, 24);
   const seasonComplete = caseId === "season-final" || summary.seasonComplete === true;
   return {
     id: `${runTag || toText(row.session_code) || "local"}-${caseId || "case"}-${completedAt || "latest"}`,
@@ -82,11 +84,11 @@ function normalizeEntry(input = {}) {
     runLabel,
     sessionCode: toText(row.session_code) || "LOCAL",
     isLocal,
-    name: isLocal ? localName : "익명 분석관",
+    name: isLocal ? localName : words.anonymousName,
     // Every remote row carries the same anonymous name, so the row is headed by
     // what the run did and identified by its own run label instead.
     headline: isLocal ? localName : style,
-    handle: isLocal ? runLabel : `${runLabel} · 익명`,
+    handle: isLocal ? runLabel : fill(words.anonymousHandle, { run: runLabel }),
     caseId: caseId || "case01",
     caseTitle: (toText(row.case_title) || caseId || "CASE").slice(0, 80),
     completedAt,
@@ -169,7 +171,7 @@ export function buildLeaderboard(rows = [], limit = 50) {
  */
 export function getLeaderboardStatusCopy({ status, headline, error = "" }) {
   if (status === "idle" || status === "loading") {
-    return { loading: true, canRetry: false, eyebrow: "CONNECTING", title: "기록을 불러오는 중입니다.", text: "" };
+    return { loading: true, canRetry: false, eyebrow: "CONNECTING", title: words.loading, text: "" };
   }
   return {
     loading: false,
@@ -183,15 +185,15 @@ export function getLeaderboardStatusCopy({ status, headline, error = "" }) {
 export function getLeaderboardHeadline(entries = []) {
   if (entries.length === 0) {
     return {
-      title: "아직 공개된 기록이 없습니다.",
-      text: "첫 번째 완주 기록이 이 테이블의 기준선을 만듭니다.",
+      title: words.emptyTitle,
+      text: words.emptyText,
     };
   }
   const leader = entries[0];
   // The particle follows the name; a parenthesised style is not read aloud.
   const leaderLabel = leader.isLocal ? leader.name : `${leader.name} (${leader.style})`;
   return {
-    title: `${leaderLabel}${subjectParticle(leader.name)} 현재 기준선을 세웠습니다.`,
-    text: `${leader.caseTitle}에서 ${leader.score}점과 ${leader.rank} 랭크를 기록했습니다.`,
+    title: fill(words.leaderTitle, { leader: leaderLabel, particle: subjectParticle(leader.name) }),
+    text: fill(words.leaderText, { case: leader.caseTitle, score: leader.score, rank: leader.rank }),
   };
 }

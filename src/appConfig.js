@@ -41,6 +41,43 @@ export const BOARD_OWN_POSTS_KEY = "critical-point-board-posted-v1";
 // The id the board files this device's posts under; apart from the telemetry
 // session id on purpose (getBoardWriterId in src/telemetry.js).
 export const BOARD_WRITER_ID_KEY = "critical-point-board-id-v1";
+/**
+ * Where a player asks for their records to be deleted (앱 출시 노트 E-6: the
+ * notice said requests are handled by the session code, and named nowhere to
+ * send one). The support mailbox the user chose on 2026-10-25. Null would
+ * make the notice say the address is still to come. This is the one place it
+ * is written: the data notice on the intro reads it through
+ * `getDeletionRequestText`, and `tests/unit/support-contact.test.mjs` pins it.
+ */
+export const SUPPORT_CONTACT = "from.logic.to.magic@gmail.com";
+
+/**
+ * The deletion-request sentence: where to send it, and what to send with it.
+ * The session code is how a request finds this device's rows (`session_code`
+ * on every telemetry row); an online save is deleted by the player in its own
+ * panel and needs no request. `contact` is SUPPORT_CONTACT unless a test says
+ * otherwise. Returns the parts so the screen can make the address a link.
+ * The words are `DELETION_REQUEST_COPY`, which the start screen's copy names
+ * (src/copy/intro.js) so another language is laid over them in place.
+ */
+export const DELETION_REQUEST_COPY = {
+  cloud: " 온라인 저장은 「다른 기기에서 이어하기」 패널에서 직접 지울 수 있습니다.",
+  before: "기록 삭제는 ",
+  beforeUnset: "기록 삭제 요청을 받을 연락처는 출시 전에 이 자리에 적습니다(아직 정하지 않았습니다). ",
+  after: "로 요청해 주세요. 8자리 세션 코드를 함께 적어 주시면 기록을 찾아 지웁니다.",
+  afterUnset: "요청에는 8자리 세션 코드가 필요하니 결과 화면의 「코드 복사」로 남겨 두세요.",
+};
+
+export function getDeletionRequestText(contact = SUPPORT_CONTACT) {
+  const address = typeof contact === "string" && contact.trim() ? contact.trim() : null;
+  const words = DELETION_REQUEST_COPY;
+  return {
+    address,
+    before: address ? words.before : words.beforeUnset,
+    after: `${address ? words.after : words.afterUnset}${words.cloud}`,
+  };
+}
+
 /** Fired on `globalThis` after every save that reached device storage. */
 export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
 // The raw text of a save this build could not read -- broken JSON, or a schema
@@ -53,6 +90,11 @@ export const CHUNK_RELOAD_SESSION_KEY = "critical-point-chunk-reload-v1";
 // The player's comfort settings: table time, the reading clock, flashes,
 // single-key shortcuts, the intro's motion (src/state/accessibilitySettings.js).
 export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
+// The language the player chose on the intro (src/locale.js): a code from
+// SUPPORTED_LOCALES. Absent, the page is Korean unless `?lang=` asks otherwise.
+export const LOCALE_KEY = "critical-point-locale-v1";
+// "1" once the player closed the intro's 홈 화면에 추가 hint (src/state/installPrompt.js).
+export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

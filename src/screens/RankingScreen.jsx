@@ -3,6 +3,11 @@ import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
 import { getLeaderboardStatusCopy } from "../ranking.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { reloadLeaderboard } from "../state/useLeaderboard.js";
+import words from "../copy/ranking.js";
+import { fill, LANG, SOURCE_LOCALE } from "../locale.js";
+
+// Dates as the page's language writes them; a Korean page as it always has.
+const DATE_LOCALE = LANG === SOURCE_LOCALE ? "ko-KR" : LANG;
 
 export function RankingScreen({
   Music,
@@ -29,7 +34,10 @@ export function RankingScreen({
   // are not compared. A fetch that fails leaves the line out.
   const [pastBest, setPastBest] = useState(null);
   useEffect(() => {
-    import("../personalBests.js").then((module) => setPastBest(module.takePastBestLine()), () => {});
+    import("../personalBests.js").then((module) => {
+      const best = module.takePastBest();
+      setPastBest(best && fill(words.pastBest, best));
+    }, () => {});
   }, []);
   const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
@@ -40,17 +48,14 @@ export function RankingScreen({
           <div className="topbar">
             <button className="ghost" type="button" onClick={() => onClose()}>
               <ArrowLeft size={16} />
-              브리핑으로 돌아가기
+              {words.back}
             </button>
             <span className="brand-mark">{gameTitle}</span>
           </div>
           <header className="ranking-hero">
             <span lang="en">PUBLIC SIGNAL BOARD</span>
-            <h1 ref={headingRef} tabIndex={-1}>어디서 생각이 가장 크게 확장됐는가</h1>
-            <p>
-              버스트 점수와 랭크를 비교합니다. 시즌 기록은 사건 평균 점수입니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
-              압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.
-            </p>
+            <h1 ref={headingRef} tabIndex={-1}>{words.title}</h1>
+            <p>{words.intro}</p>
           </header>
           <section className="ranking-status-bar" aria-busy={statusCopy.loading}>
             <div>
@@ -64,34 +69,34 @@ export function RankingScreen({
             {statusCopy.canRetry ? (
               <button type="button" data-testid="ranking-retry" onClick={() => reloadLeaderboard()}>
                 <RotateCw size={17} aria-hidden="true" />
-                다시 불러오기
+                {words.retry}
               </button>
             ) : (
               <button type="button" onClick={() => onClose()}>
                 <ChevronRight size={17} />
-                내 기록 만들기
+                {words.makeRecord}
               </button>
             )}
           </section>
-          <section className="ranking-table-panel" aria-label="플레이어 랭킹">
+          <section className="ranking-table-panel" aria-label={words.tableLabel}>
             {/* 이번 주의 규칙: the ordinary board and the week's, in a week with a rule. */}
             <WeeklyRuleNotice view="boards" />
             <div className="ranking-table-heading">
               <div>
                 <span lang="en">SEASON 1 / BEST RUN</span>
-                <h2>현재 기준선</h2>
+                <h2>{words.baseline}</h2>
               </div>
               {/* Not a count while there is nothing counted yet: it read
                   "0명의 기록" beside the line that said it was still loading. */}
-              <small>{statusCopy.loading ? "불러오는 중" : `${leaderboard.length}명의 기록`}</small>
+              <small>{statusCopy.loading ? words.loadingCount : fill(words.count, { count: leaderboard.length })}</small>
             </div>
             <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-              {statusCopy.loading ? "" : `${leaderboard.length}명의 기록을 불러왔습니다.`}
+              {statusCopy.loading ? "" : fill(words.loaded, { count: leaderboard.length })}
             </p>
             {statusCopy.loading ? (
-              <p className="ranking-empty">기록을 불러오는 중입니다.</p>
+              <p className="ranking-empty">{words.loading}</p>
             ) : leaderboard.length === 0 ? (
-              <p className="ranking-empty">아직 완료된 기록이 없습니다. 첫 시즌을 끝내고 기준선을 세워보세요.</p>
+              <p className="ranking-empty">{words.empty}</p>
             ) : (
               /* A list, so a screen reader says how many rows there are and
                  where it is among them. The rows were bare <article>s, and the
@@ -103,16 +108,16 @@ export function RankingScreen({
                   const vaultPerCase = Math.round(entry.summary?.gauntlet?.vault / entry.summary?.completedCaseCount);
                   return (
                   <div role="listitem" className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
-                    <span className="sr-only">{entry.position}위{isCurrentRun ? ", 내 기록" : ""}</span>
+                    <span className="sr-only">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
                     <strong className="ranking-position" aria-hidden="true">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.headline}</b>
                       <span className="ranking-league-badge">{entry.league}</span>
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
-                      {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">시즌 완료</span>}
+                      {entry.seasonComplete && <span className="season-complete-badge" aria-label={words.seasonCompleteLabel}>{words.seasonComplete}</span>}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
-                      <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? triggerLabels.responsibility}</small>
+                      <small>{fill(words.meta, { case: entry.caseTitle, run: entry.runLabel, trigger: triggerLabels[entry.trigger] ?? triggerLabels.responsibility })}</small>
                     </div>
                     <div className="ranking-stat">
                       <span lang="en">RANK</span>
@@ -123,14 +128,14 @@ export function RankingScreen({
                       <b>{entry.score}</b>
                     </div>
                     <div className="ranking-detail">
-                      <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
-                      <span>평균 {entry.averageResponseTime}초</span>
-                      <span>판 다시 짜기 {entry.reframeCount}</span>
-                      {Number.isFinite(vaultPerCase) && <span data-testid="ranking-vault">사건당 금고 {vaultPerCase.toLocaleString("en-US")}</span>}
-                      {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
-                      {entry.assistStory && <span className="ranking-assist">스토리 모드</span>}
+                      <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString(DATE_LOCALE) : words.noTime}</span>
+                      <span>{fill(words.average, { seconds: entry.averageResponseTime })}</span>
+                      <span>{fill(words.reframes, { count: entry.reframeCount })}</span>
+                      {Number.isFinite(vaultPerCase) && <span data-testid="ranking-vault">{fill(words.vault, { value: vaultPerCase.toLocaleString("en-US") })}</span>}
+                      {entry.assistTime > 1 && <span className="ranking-assist">{fill(words.tableTime, { value: entry.assistTime })}</span>}
+                      {entry.assistStory && <span className="ranking-assist">{words.story}</span>}
                       {entry.newGamePlus && <span className="ranking-assist" lang="en">NEW GAME+</span>}
-                      {entry.collapsed && <span className="ranking-assist">붕괴한 시즌</span>}
+                      {entry.collapsed && <span className="ranking-assist">{words.collapsed}</span>}
                     </div>
                   </div>
                   );
@@ -141,9 +146,7 @@ export function RankingScreen({
           {pastBest && (
             <p className="ranking-footnote" data-testid="ranking-past-best">{pastBest}</p>
           )}
-          <p className="ranking-footnote">
-            다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.
-          </p>
+          <p className="ranking-footnote">{words.footnote}</p>
         </section>
       </main>
 );

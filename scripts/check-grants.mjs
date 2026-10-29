@@ -15,9 +15,11 @@ import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
+import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
+import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
 
 /**
  * Data API grants guardrail.
@@ -1947,6 +1949,9 @@ if (!SEASON_MEAN) {
   // runs its one SELECT over the seasons of a week long past, so the runs
   // above are not in it: three under the rule from two devices, one without it
   // (the box turned it down), one in story mode and one under another rule.
+  // One season under the rule was played on the English pages: its second
+  // case row names `summary.locale` "en" (#352), another names "ko" on both,
+  // and the third names none (ko(추정)).
   {
     const REPORT_WEEK = "2026-W30";
     const reportRuns = [
@@ -1963,6 +1968,8 @@ if (!SEASON_MEAN) {
       for (const caseId of CASE_SEQUENCE.slice(0, 2)) {
         const payload = casePayload({ session, runId, caseId, story });
         payload.dynamics = { ...payload.dynamics, weekRule: rule };
+        if (runId === "run-week-report-on-1" && caseId === CASE_SEQUENCE[1]) payload.summary = { ...payload.summary, locale: "en" };
+        if (runId === "run-week-report-on-2") payload.summary = { ...payload.summary, locale: "ko" };
         const { sql, params } = postgrestInsert("playtest_sessions", payload);
         await db.query(sql, params);
       }
@@ -1974,8 +1981,9 @@ if (!SEASON_MEAN) {
     const reportRows = (await allowed("run the test week's report", "service_role", testWeekQuery(REPORT_WEEK, EVENT)))?.rows ?? [];
     const report = readTestWeek(reportRows);
     check(
-      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6,
-      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows })}; expected 3 seasons under the rule from 2 devices, 1 without it, story mode and another rule left out.`,
+      report.seasons === 3 && report.turnedDown === 1 && report.devicesOn === 2 && report.devicesOff === 1 && report.devices === 2 && report.caseRows === 6
+        && report.english === 1 && report.korean === 1 && report.presumedKorean === 1,
+      `the test week's report read ${JSON.stringify({ seasons: report.seasons, turnedDown: report.turnedDown, devicesOn: report.devicesOn, devicesOff: report.devicesOff, devices: report.devices, caseRows: report.caseRows, english: report.english, korean: report.korean, presumedKorean: report.presumedKorean })}; expected 3 seasons under the rule from 2 devices (one English, one Korean, one naming no language), 1 without it, story mode and another rule left out.`,
     );
     check(reportRows.every((row) => !Object.values(row).some((value) => typeof value === "string" && value.startsWith("grants-check-session-"))), "the test week's report fetched a device's session id.");
   }
@@ -1983,7 +1991,8 @@ if (!SEASON_MEAN) {
   // The weekly drop-off report (scripts/report-funnel.mjs, .github/workflows/funnel.yml)
   // runs its one SELECT over the runs begun after a day no other row reaches:
   // two runs from one device (the second marked NEW GAME+) and one from
-  // another that came back two days later.
+  // another that came back two days later, played in English (`summary.locale`,
+  // 앱출시-F F-6: the server keeps the key as the page sent it).
   {
     const SINCE_DAY = "2030-01-01";
     const funnelRuns = [
@@ -1996,6 +2005,7 @@ if (!SEASON_MEAN) {
       for (const caseId of CASE_SEQUENCE.slice(0, cases)) {
         const payload = casePayload({ session, runId, caseId });
         if (newGamePlus) payload.summary = { ...payload.summary, newGamePlus: true };
+        if (runId === "run-week-funnel-3") payload.summary = { ...payload.summary, locale: "en" };
         const { sql, params } = postgrestInsert("playtest_sessions", payload);
         await db.query(sql, params);
       }
@@ -2011,8 +2021,9 @@ if (!SEASON_MEAN) {
     const funnelRows = (await allowed("run the drop-off report", "service_role", funnelQuery(SINCE_DAY)))?.rows ?? [];
     const funnel = readFunnel(funnelRows, Date.parse(`${SINCE_DAY}T00:00:00Z`) / 1000 + 10 * 86400);
     check(
-      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3,
-      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run and one break among three gaps.`,
+      funnel.runs === 3 && funnel.devices === 2 && JSON.stringify(funnel.reach.slice(0, 3)) === "[3,2,1]" && funnel.markedRuns === 1 && funnel.breaks === 1 && funnel.gaps === 3
+        && funnel.locales.en === 1 && funnel.unnamed === 2 && JSON.stringify(funnel.english.reach.slice(0, 3)) === "[1,1,0]",
+      `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps, locales: funnel.locales, unnamed: funnel.unnamed, english: funnel.english.reach.slice(0, 3) })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run, one break among three gaps, and one English run (through 프롤로그 02) beside two naming no language.`,
     );
     check(funnelRows.every((row) => !JSON.stringify(row).includes("grants-check-session-") && !JSON.stringify(row).includes("run-week-funnel")), "the drop-off report fetched a run or device id.");
   }
@@ -2132,6 +2143,108 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
   check((restored?.rows ?? []).some((row) => row.id === hidden.id), "a restored board post is not readable by anon.");
   const missing = await allowed("moderate a post that does not exist", "service_role", `select public.moderate_board_post(-1) as found`);
   check(missing?.rows[0]?.found !== true, "moderating a missing post reported success.");
+}
+
+// ---- board reports (20261027000000)
+//
+// The row the report button builds, inserted as anon. Every reason the client
+// offers is taken, a reason it does not is refused, a second report of a post
+// from one writer is dropped, a hidden or missing post cannot be reported, the
+// table reads as nothing to anon, and the hourly caps hold.
+{
+  const reportRow = (postId, reason, session) => ({ event_id: uuid(), ...createBoardReportPayload({ postId, reason, sessionId: session }) });
+  const reportInsert = (row) => postgrestInsert("board_reports", row);
+  const report = (label, row) => {
+    const { sql, params } = reportInsert(row);
+    return allowed(label, "anon", sql, params);
+  };
+  const reportRefused = (label, row, pattern) => {
+    const { sql, params } = reportInsert(row);
+    return raises(label, "anon", sql, params, pattern);
+  };
+  const reportCount = async (postId) => (await one(`select count(*)::int as n from public.board_reports where post_id = $1`, [postId]))?.n ?? 0;
+  const visible = (await db.query(`select id from public.board_posts where not hidden order by id limit 3`)).rows.map((row) => Number(row.id));
+  check(visible.length === 3, `the board report check needs three visible posts and found ${visible.length}.`);
+  const [first, second, third] = visible;
+
+  withHeaders({ "x-forwarded-for": "198.51.100.60" });
+  for (const [index, { id }] of BOARD_REPORT_REASONS.entries()) {
+    await report(`report a post as ${id}`, reportRow(first, id, sessionId(400 + index)));
+  }
+  check((await reportCount(first)) === 1, `four devices on one address reporting one post stored ${await reportCount(first)} reports; one writer is one report.`);
+  {
+    const key = (await one(`select actor_key from public.board_reports where post_id = $1`, [first]))?.actor_key;
+    check(/^board-report:[0-9a-f]{32}$/.test(key ?? ""), `a board report's writer key is not a hash: ${key}`);
+  }
+  await reportRefused("report a post for a reason the client does not offer", { event_id: uuid(), post_id: second, session_id: sessionId(410), reason: "boring" }, /invalid board report reason/);
+  await reportRefused("report a post that does not exist", { event_id: uuid(), post_id: 999999999, session_id: sessionId(410), reason: "spam" }, /names no visible post/);
+  await reportRefused("report under a session id that is too short", { event_id: uuid(), post_id: second, session_id: "short", reason: "spam" }, /invalid board report session id/);
+  await refused("write a board report's writer key", "anon", `insert into public.board_reports (post_id, session_id, reason, actor_key) values (${second}, '${sessionId(411)}', 'spam', 'forged')`);
+  await refused("read board reports", "anon", `select post_id from public.board_reports`);
+  await allowed("read board reports", "service_role", `select post_id, reason, actor_key from public.board_reports`);
+  withHeaders(null);
+
+  // A second address reports the same post: two writers, two rows.
+  withHeaders({ "x-forwarded-for": "198.51.100.61" });
+  await report("report a post another address reported", reportRow(first, "abuse", sessionId(420)));
+  check((await reportCount(first)) === 2, "a report from a second address was not stored.");
+  withHeaders(null);
+
+  // A hidden post cannot be reported, and its reports go when the post does.
+  await allowed("hide a reported post", "service_role", `select public.moderate_board_post(${third})`);
+  withHeaders({ "x-forwarded-for": "198.51.100.62" });
+  await reportRefused("report a hidden post", reportRow(third, "spam", sessionId(430)), /names no visible post/);
+  withHeaders(null);
+  await allowed("restore the hidden post", "service_role", `select public.moderate_board_post(${third}, false)`);
+
+  // Hourly caps: ten for a device on an address, thirty for the address.
+  withHeaders({ "x-forwarded-for": "198.51.100.63" });
+  const reportKey = `board-report:${await writerKey("198.51.100.63")}`;
+  await presetCounter(`${reportKey}|${sessionId(440)}`, 9);
+  await report("report a device's 10th post of the hour", reportRow(second, "spam", sessionId(440)));
+  await reportRefused("report a device's 11th post of the hour", reportRow(third, "spam", sessionId(440)), /^PT429 .*report rate limit/);
+  await presetCounter(reportKey, 30);
+  await reportRefused("report an address's 31st post of the hour", reportRow(third, "spam", sessionId(441)), /^PT429 .*report rate limit/);
+  withHeaders(null);
+
+  // The operator's queue (scripts/board-reports.mjs, .github/workflows/board-reports.yml):
+  // its one SELECT reads ids and counts only, hide takes a post out of the
+  // queue, dismiss deletes a post's reports, restore brings a hidden post back
+  // and deletes its reports (so it does not wait in the next morning's queue),
+  // and an action on nothing says it did nothing.
+  {
+    const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
+    const act = async (action, postId) => boardActionDone((await allowed(`${action} board post ${postId}`, "service_role", boardAction(action, postId)))?.rows ?? []);
+    const queueRows = (await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? [];
+    const texts = (await db.query(`select nickname, body from public.board_posts where id = any($1::bigint[])`, [[first, second]])).rows.flatMap((row) => [row.nickname, row.body]);
+    check(queueRows.every((row) => !texts.some((text) => JSON.stringify(row).includes(text)) && !JSON.stringify(row).includes("board-report:")), "the board report queue fetched a nickname, a body or a writer key.");
+    let queue = readBoardQueue(queueRows);
+    const waitingFirst = queue.waiting.find((post) => post.postId === first);
+    check(waitingFirst?.reports === 2 && waitingFirst?.writers === 2 && queue.waiting.some((post) => post.postId === second), `the board report queue read ${JSON.stringify(queue.waiting)}; expected post ${first} with 2 reports from 2 writers and post ${second} waiting.`);
+    check(await act("hide", second), "hiding a reported post did nothing.");
+    queue = await queueOf();
+    check(!queue.waiting.some((post) => post.postId === second) && queue.hidden.some((post) => post.postId === second), "a hidden post still waited in the board report queue.");
+    check(await act("restore", second), "restoring a hidden post did nothing.");
+    queue = await queueOf();
+    check((await reportCount(second)) === 0 && !queue.waiting.some((post) => post.postId === second) && !queue.hidden.some((post) => post.postId === second), "a restored post's reports stayed, so it waited in the board report queue again.");
+    check(!(await act("restore", 999999999)), "restoring a post that is not there said it did something.");
+    check(await act("dismiss", first), "dismissing a post's reports did nothing.");
+    check((await reportCount(first)) === 0 && !(await queueOf()).waiting.some((post) => post.postId === first), "a dismissed post's reports stayed.");
+    check(!(await act("dismiss", first)) && !(await act("hide", 999999999)), "an action on nothing said it did something.");
+  }
+
+  // Retention rides on the post: the purge deletes posts, and a post's
+  // reports go with it (on delete cascade).
+  const doomed = Number((await one(
+    `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '지울글', '지워질 글입니다', 'board:retention') returning id`,
+    [sessionId(450)],
+  ))?.id);
+  withHeaders({ "x-forwarded-for": "198.51.100.64" });
+  await report("report a post that will be deleted", reportRow(doomed, "other", sessionId(450)));
+  withHeaders(null);
+  check((await reportCount(doomed)) === 1, "the report on the post to be deleted was not stored.");
+  await db.query(`delete from public.board_posts where id = $1`, [doomed]);
+  check((await reportCount(doomed)) === 0, "a deleted post's reports outlived it.");
 }
 
 // ---- cloud saves
@@ -2275,6 +2388,7 @@ const UPDATE_PROBE = {
   app_error_logs: "event_id = event_id",
   free_text_analyses: "event_id = event_id",
   board_posts: "hidden = true",
+  board_reports: "reason = reason",
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
