@@ -623,24 +623,18 @@ export function IntroScreen({ view, renderers = {} }) {
               <span lang="en">ACCESSIBILITY</span>
               <h2>{introCopy.comfortTitle}</h2>
             </summary>
-            {/* The store apps' 「광고와 개인정보」 section under the comfort
-                settings (memo B-5). Written as one child either way, so the
-                site's build, where `__CP_APP__` is false, folds it to the
-                panel and the install hint alone and carries not a byte of
-                it. The apps leave out the 홈 화면에 추가 hint: a store app is
-                already on the home screen. */}
+            {/* The store apps put their 「광고와 개인정보」 section (memo B-5)
+                where the site has the 홈 화면에 추가 hint: a store app is
+                already on the home screen. The site's build, where
+                `__CP_APP__` is false, folds this to the hint alone and carries
+                not a byte of the app's section. */}
+            <AccessibilityPanel />
             {__CP_APP__ ? (
-              <>
-                <AccessibilityPanel />
-                <Suspense fallback={null}>
-                  <AppStorePanel />
-                </Suspense>
-              </>
+              <Suspense fallback={null}>
+                <AppStorePanel />
+              </Suspense>
             ) : (
-              <>
-                <AccessibilityPanel />
-                <InstallHintSlot />
-              </>
+              <InstallHintSlot />
             )}
           </details>
           <details className="intro-drawer">
