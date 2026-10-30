@@ -370,6 +370,44 @@ year.
 | 사건 48 | 추석 밤 to 추석 다음 날 (토) 09:00 임시 심사위원회 |
 | 사건 49 | 화요일 9월 29일, three days after the committee and after the holiday; the moon is four nights past full |
 
+## The side cases (E-11)
+
+The side cases (`src/nodes/sideNN.js`) sit outside the season's fifty-five and
+open once a finale is closed. Each is set between two of the season's days and
+is written to hold after any of the season's endings, so it says nothing a
+season case has to keep. What each one states for the first time is below.
+`check:canon` holds their dated weekdays like any other (12월 20일 (토) fits
+2025, 1월 9일 (금) fits 2026) and nothing else here.
+
+### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
+
+| Fact | Value |
+|---|---|
+| When | 2025-12-20 (토), the Saturday between 사건 17's 인사위원회 (12월 19일) and the 송년회 (12월 21일) |
+| Why that day | the oldest of the seven on 권도현's whiteboard (사건 17's 「아직 찾아가지 못한 사람 7명」); with the committee over there is no reason to visit, which is why 반재욱 goes |
+| 유정례 (61) | one of 반재욱's 47: KD은행 수유지점 3번 창구 until March 2012, dismissed that year; four years later she opened 「정례세탁」 in a 수유동 시장 alley |
+| March 2012 | half an hour before closing the 지점장 had 300만 원 handed to a client's driver, "전표는 내일", and said "일단 맞춰 둬요"; she pressed 「시재 일치」 on the closing screen under her own 사번. The slip never came; the audit did |
+| 공태식 | that 수유지점장; retired without discipline; has brought five shirts every Tuesday for four years, collars starched hard, and does not know her |
+| The 2012 inquiry | closed by 반재욱 in five working days, the target the New York head office of 킹스데일 파트너스 set in its quarterly review ("현금 사고 닷새 안 종결"). His line: '300만 원 부족, 마감 확인자 유정례'. The manager's name is not in it |
+| What is left of it | the bank's records are past their 보존연한; her 2012 phone holds the manager's text, "마감 먼저 맞춰 둬요. 전표는 내일 내가 할게." The dismissal letter came by 등기 and her sister read it first |
+| 반재욱's new notebook | chosen by 반서아 on 12월 20일, blank from the first page. The case never says what became of the black notebook on 12월 19일 |
+| 정태오's 구로지점장 | retired without discipline and was given two bouquets at the ceremony |
+
+### 번외 2, 돌려줄 것 (side02)
+
+| Fact | Value |
+|---|---|
+| When | 2026-01-09 (금), 19:00 to 03:00: ten days before 사건 19. The notice on the shutter (posted 섣달그믐) still says 4월 14일 |
+| 임경수 | in 강서 이음병원 since late December with the pneumonia that is then mending (it spreads again the week before 사건 19); talks by video call, glasses on, no oxygen line |
+| 임소율 | has the analyst's number from her text of 12월 31일 (사건 18); still calls the paper 짐 and does not read the boxes' margins. Her birthday, her grandfather says, "is not in a box" |
+| The box | 1998, red tape, second floor, left, third bay, under 1997. In it: the 순자봉제 loan file, six ledgers and 임경수's note 「돌려줄 것. 내가 직접.」 |
+| 순자봉제 | 창신동: twelve sewing machines, eleven people, owner 양순자 (46 in 1998, 74 in 2026). Her own hand-kept ledgers, 1992-1998: the interest paid on the 25th of every month, never once late |
+| Spring 1998 | 경동은행 was being sold to 킹스데일 파트너스 of New York (it became KD은행). The buyer's 실사 team sent down a list: every small-business loan without an outside audit to be cleared before the purchase, so the book went over clean |
+| 임경수 at 34 | wrote two pages against calling her loan and was overruled (반려); the workshop closed six weeks later. He carried the machines down with her that day and promised to return the ledgers himself |
+| After | without the ledgers 양순자 could never prove her record, and never borrowed again. She still keeps a ledger by hand every night, in the same writing |
+| 한미진 (37) | her daughter, who drew on the last page of the last ledger at nine; runs the stall 「미진」, 2층 87호 of a 동대문 wholesale market that opens at 22:00 |
+| The endings | where the ledgers go (to 한미진 that night / with the two pages / back into the box for 임경수 to take himself). None says whether he ever went (사건 45) |
+
 ## Known and left alone
 
 - **"3년".** The 프롤로그 is dated 2022-23 and 사건 01 is some months before
