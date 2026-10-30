@@ -431,31 +431,31 @@ const APP_LINES = {
     ko: [
       [
         "<p>웹판은 무료입니다. 지금은 광고와 유료 결제가 없습니다.",
-        "<p>앱판은 무료이며 광고가 나옵니다. 「광고 제거」는 1회 결제 상품으로 광고만 없애고 게임을 유리하게 하지 않습니다. 웹판은 무료이며 광고와 유료 결제가 없습니다.",
+        "<p>앱판은 무료이며 광고가 나옵니다. 「광고 제거」는 1회 결제 상품으로 광고만 없애고 게임을 유리하게 하지 않습니다.",
       ],
       [
         "게임은 쿠키와 광고·분석용 추적 도구를 쓰지 않습니다.",
-        "앱판에는 Google AdMob 광고가 있습니다. 웹판에는 광고가 없습니다. 광고 말고는 쿠키나 분석용 추적 도구를 쓰지 않습니다.",
+        "앱판에는 Google AdMob 광고가 있습니다. 앱판은 광고 말고는 쿠키나 분석용 추적 도구를 쓰지 않습니다.",
       ],
     ],
     en: [
       [
         "<p>The web version is free. There are currently no ads and no payments.",
-        "<p>The app version is free and shows ads. Remove Ads is a one-time purchase that only removes ads and gives no advantage in the game. The web version is free, with no ads and no payments.",
+        "<p>The app version is free and shows ads. Remove Ads is a one-time purchase that only removes ads and gives no advantage in the game.",
       ],
       [
         "The game uses no cookies and no advertising or analytics trackers.",
-        "The app version shows Google AdMob ads; the web version has none. Apart from ads, the game uses no cookies or analytics trackers.",
+        "The app version shows Google AdMob ads. Apart from ads, the app version uses no cookies or analytics trackers.",
       ],
     ],
     ja: [
       [
         "<p>ウェブ版は無料です。現在、広告や有料の決済はありません。",
-        "<p>アプリ版は無料で、広告が表示されます。「広告の削除」は1回払いの商品で、広告をなくすだけでゲームを有利にすることはありません。ウェブ版は無料で、広告や有料の決済はありません。",
+        "<p>アプリ版は無料で、広告が表示されます。「広告の削除」は1回払いの商品で、広告をなくすだけでゲームを有利にすることはありません。",
       ],
       [
         "本ゲームはCookieや、広告・分析用のトラッキングツールを使用しません。",
-        "アプリ版にはGoogle AdMobの広告があります。ウェブ版に広告はありません。広告のほかには、Cookieや分析用のトラッキングツールを使用しません。",
+        "アプリ版にはGoogle AdMobの広告があります。アプリ版では、広告のほかには、Cookieや分析用のトラッキングツールを使用しません。",
       ],
     ],
   },

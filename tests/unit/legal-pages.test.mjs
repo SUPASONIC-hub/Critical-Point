@@ -190,5 +190,8 @@ test("the store apps' copies say what their ads and purchase do, and the site's 
   assert.match(decode(app["terms.html"]), /청약철회가 제한될 수 있습니다/);
   assert.match(decode(app["en/terms.html"]), /Remove Ads is a one-time purchase/);
   assert.match(decode(app["ja/terms.html"]), /申込みの撤回が制限される場合があります/);
-  for (const name of ["terms.html", "en/terms.html", "ja/terms.html"]) assert.match(decode(app[name]), /(?:웹판은 무료|web version is free|ウェブ版は無料)/);
+  // The app's copies speak for the app only (10-30, the user's 1): what the web
+  // version shows changes with its own switches (Analytics, AdSense), so a line
+  // about it here would go wrong the day one of them is set.
+  for (const name of Object.keys(app)) assert.doesNotMatch(decode(app[name]).replace(/<style>[\s\S]*?<\/style>/, ""), /(?:웹판은 무료이며 광고와|웹판에는 광고가 없|web version is free, with no ads|web version has none|web version shows no ads|ウェブ版は無料で、広告や|ウェブ版に広告はありません)/);
 });

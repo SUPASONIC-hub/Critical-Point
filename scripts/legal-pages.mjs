@@ -727,7 +727,7 @@ const APP_LINES = {
     ko: [
       [
         "<li>지금은 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>",
-        "<li>앱판에는 Google AdMob 광고가 있습니다(10번). 웹판에는 광고가 없습니다. 광고 말고는 분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>",
+        "<li>앱판에는 Google AdMob 광고가 있습니다(10번). 앱판은 광고 말고는 분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>",
       ],
       [
         "<p>국외 이전을 원하지 않으면",
@@ -737,7 +737,7 @@ const APP_LINES = {
         "<h2>10. 광고</h2>\n<p>지금은 광고가 없습니다. 나중에 광고를 붙이게 되면, 붙이기 전에 광고와 관련한 처리 내용(광고 회사, 쿠키, 거부하는 법)을 이 방침에 더해 알립니다.</p>",
         `<h2>10. 광고와 결제(앱판)</h2>
 <ul>
-<li>광고 회사: Google LLC(미국)의 Google AdMob. 사건과 사건 사이의 전면 광고와, 이용자가 눌러서 보는 보상형 광고를 보여 줍니다. 웹판에는 광고가 없습니다.</li>
+<li>광고 회사: Google LLC(미국)의 Google AdMob. 사건과 사건 사이의 전면 광고와, 이용자가 눌러서 보는 보상형 광고를 보여 줍니다.</li>
 <li>처리 항목: 기기의 광고 식별자(iOS는 추적을 허용한 경우에만), IP 주소, 기기·앱 정보, 광고와의 상호작용. 광고를 보여 주고 측정하며 부정 클릭을 막는 데 쓰이고, Google의 개인정보처리방침(policies.google.com/privacy)을 따릅니다.</li>
 <li>동의와 거부: 첫 광고 전에 Google의 동의 창을 띄우고, iPhone에서는 추적 허용을 묻습니다. 허용하지 않으면 맞춤형이 아닌 광고가 나오며 광고 수와 게임 내용은 같습니다. 편의 설정의 「광고와 개인정보」에서 다시 고를 수 있고, 기기 설정(iPhone: 개인정보 보호 및 보안 › 추적, Android: 개인정보 보호 › 광고)에서도 바꿀 수 있습니다.</li>
 <li>광고 제거(1회 결제): 결제는 App Store와 Google Play가 처리하며, 개발자는 결제 수단이나 스토어 계정 정보를 받지 않습니다. 산 것인지는 스토어에 묻고, 이 기기에는 그 결과만 저장합니다.</li>
@@ -747,7 +747,7 @@ const APP_LINES = {
     en: [
       [
         "<li>The game currently shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>",
-        "<li>The app version shows Google AdMob ads (section 10); the web version has none. Apart from ads, the game uses no analytics cookies or third-party trackers.</li>",
+        "<li>The app version shows Google AdMob ads (section 10). Apart from ads, the app version uses no analytics cookies or third-party trackers.</li>",
       ],
       [
         "<p>To avoid the transfer,",
@@ -757,7 +757,7 @@ const APP_LINES = {
         "<h2>10. Ads</h2>\n<p>The game currently shows no ads. If ads are added later, this policy will describe them (the ad provider, cookies and how to opt out) before they appear.</p>",
         `<h2>10. Ads and purchases (app version)</h2>
 <ul>
-<li>Ad provider: Google AdMob, by Google LLC (USA). The app shows a full-screen ad between cases and rewarded ads you choose to watch. The web version shows no ads.</li>
+<li>Ad provider: Google AdMob, by Google LLC (USA). The app shows a full-screen ad between cases and rewarded ads you choose to watch.</li>
 <li>What is processed: your device's advertising identifier (on iOS only if you allow tracking), IP address, device and app information, and your interactions with ads, to show and measure ads and prevent fraud. This is handled under Google's Privacy Policy (policies.google.com/privacy).</li>
 <li>Consent and opting out: before the first ad, the app shows Google's consent form, and on iPhone it asks whether to allow tracking. If you don't allow it, you see non-personalized ads, with the same number of ads and the same game. You can choose again under “Ads &amp; privacy” in the comfort settings, or in your device settings (iPhone: Privacy &amp; Security › Tracking; Android: Privacy › Ads).</li>
 <li>Remove Ads (one-time purchase): payment is handled by the App Store or Google Play; we receive no payment details or store account information. The app asks the store whether you bought it and keeps only that answer on the device.</li>
@@ -767,7 +767,7 @@ const APP_LINES = {
     ja: [
       [
         "<li>現在、広告はなく、広告・分析用のCookieや外部のトラッキングツールも使用していません。</li>",
-        "<li>アプリ版にはGoogle AdMobの広告があります(10)。ウェブ版に広告はありません。広告のほかには、分析用のCookieや外部のトラッキングツールを使用していません。</li>",
+        "<li>アプリ版にはGoogle AdMobの広告があります(10)。アプリ版では、広告のほかには、分析用のCookieや外部のトラッキングツールを使用していません。</li>",
       ],
       [
         "<p>国外移転を望まない場合は",
@@ -777,7 +777,7 @@ const APP_LINES = {
         "<h2>10. 広告</h2>\n<p>現在、広告はありません。将来広告を導入する場合は、導入する前に、広告に関する取り扱いの内容(広告会社、Cookie、拒否する方法)を本方針に追加してお知らせします。</p>",
         `<h2>10. 広告と決済(アプリ版)</h2>
 <ul>
-<li>広告会社: Google LLC(米国)のGoogle AdMob。事件と事件のあいだの全画面広告と、利用者が選んで視聴するリワード広告を表示します。ウェブ版に広告はありません。</li>
+<li>広告会社: Google LLC(米国)のGoogle AdMob。事件と事件のあいだの全画面広告と、利用者が選んで視聴するリワード広告を表示します。</li>
 <li>取り扱う項目: 端末の広告識別子(iOSではトラッキングを許可した場合のみ)、IPアドレス、端末・アプリの情報、広告とのやり取り。広告の表示と測定、不正の防止に使われ、Googleのプライバシーポリシー(policies.google.com/privacy)に従って取り扱われます。</li>
 <li>同意と拒否: 最初の広告の前にGoogleの同意画面を表示し、iPhoneではトラッキングを許可するかどうかを確認します。許可しない場合はパーソナライズされていない広告が表示され、広告の数とゲームの内容は同じです。快適設定の「広告とプライバシー」から選び直せるほか、端末の設定(iPhone: プライバシーとセキュリティ › トラッキング、Android: プライバシー › 広告)でも変更できます。</li>
 <li>広告の削除(1回払い): 決済はApp StoreとGoogle Playが行い、開発者は支払い方法やストアアカウントの情報を受け取りません。購入済みかどうかはストアに確認し、この端末にはその結果だけを保存します。</li>
@@ -789,19 +789,19 @@ const APP_LINES = {
     ko: [
       [
         "<li>웹판은 무료이며 광고와 유료 결제가 없습니다.",
-        "<li>앱판은 무료이며 광고가 나옵니다. 「광고 제거」는 1회 결제 상품으로 광고만 없애고 게임을 유리하게 하지 않으며, 같은 스토어 계정에서 복원할 수 있습니다. 결제와 환불은 App Store·Google Play의 정책을 따르고, 구매 즉시 적용되어 청약철회가 제한될 수 있습니다. 웹판은 무료이며 광고와 유료 결제가 없습니다.",
+        "<li>앱판은 무료이며 광고가 나옵니다. 「광고 제거」는 1회 결제 상품으로 광고만 없애고 게임을 유리하게 하지 않으며, 같은 스토어 계정에서 복원할 수 있습니다. 결제와 환불은 App Store·Google Play의 정책을 따르고, 구매 즉시 적용되어 청약철회가 제한될 수 있습니다.",
       ],
     ],
     en: [
       [
         "<li>The web version is free, with no ads and no payments.",
-        "<li>The app version is free and shows ads. Remove Ads is a one-time purchase that only removes ads, gives no advantage in the game, and can be restored on the same store account. Payments and refunds follow the App Store's or Google Play's policies, and the purchase takes effect immediately, so cancellation rights may be limited. The web version is free, with no ads and no payments.",
+        "<li>The app version is free and shows ads. Remove Ads is a one-time purchase that only removes ads, gives no advantage in the game, and can be restored on the same store account. Payments and refunds follow the App Store's or Google Play's policies, and the purchase takes effect immediately, so cancellation rights may be limited.",
       ],
     ],
     ja: [
       [
         "<li>ウェブ版は無料で、広告や有料の決済はありません。",
-        "<li>アプリ版は無料で、広告が表示されます。「広告の削除」は1回払いの商品で、広告をなくすだけでゲームを有利にすることはなく、同じストアアカウントで復元できます。決済と返金はApp Store・Google Playのポリシーに従い、購入後すぐに適用されるため、申込みの撤回が制限される場合があります。ウェブ版は無料で、広告や有料の決済はありません。",
+        "<li>アプリ版は無料で、広告が表示されます。「広告の削除」は1回払いの商品で、広告をなくすだけでゲームを有利にすることはなく、同じストアアカウントで復元できます。決済と返金はApp Store・Google Playのポリシーに従い、購入後すぐに適用されるため、申込みの撤回が制限される場合があります。",
       ],
     ],
   },
