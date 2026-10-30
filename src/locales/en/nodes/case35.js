@@ -28,7 +28,7 @@ export default {
           "label": "File all the emergency loan applications overnight in one go"
         },
         "reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         }
       },
       "place": "KD Capital Risk Management · Situation Board",
@@ -56,10 +56,10 @@ export default {
           "label": "Block the lowest alley, where the elderly owners’ shops are"
         },
         "reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         },
         "c35_sandbag_evidence_turn": {
-          "label": "Open the judgment records of NOAH’s flood loan criteria"
+          "label": "Open NOAH’s flood-loan rulings"
         }
       },
       "place": "Mangwon Market · Rice Cake Alley",
@@ -87,10 +87,10 @@ export default {
           "label": "Pass the order to a partner factory to keep the delivery date"
         },
         "reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         },
         "c35_lathe_evidence_turn": {
-          "label": "Open the judgment records of NOAH’s flood loan criteria"
+          "label": "Open NOAH’s flood-loan rulings"
         }
       },
       "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
@@ -118,10 +118,10 @@ export default {
           "label": "Send the merchants straight to the government disaster fund desk"
         },
         "reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         },
         "c35_noah_evidence_turn": {
-          "label": "Open the judgment records of NOAH’s flood loan criteria"
+          "label": "Open NOAH’s flood-loan rulings"
         }
       },
       "place": "KD Bank Gangseo Branch · Windows",
@@ -382,7 +382,7 @@ export default {
           "label": "Publish the circular explanation to the merchants and the press"
         },
         "c35_route_system_evidence_turn": {
-          "label": "Open the judgment records of NOAH’s flood loan criteria"
+          "label": "Open NOAH’s flood-loan rulings"
         }
       },
       "place": "KD Data Lab · Server Room",
@@ -458,7 +458,7 @@ export default {
           "label": "Load sandbags and head for Mangwon Market"
         },
         "c35_start_warm_reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         }
       },
       "place": "KD Capital Risk Management · Situation Board",
@@ -488,7 +488,7 @@ export default {
           "label": "Request a longer retention period for NOAH’s judgment records first"
         },
         "c35_start_record_reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         }
       },
       "place": "KD Capital Risk Management · Situation Board",
@@ -518,7 +518,7 @@ export default {
           "label": "Load sandbags and head for Mangwon Market"
         },
         "c35_start_rush_reframe": {
-          "label": "Ask the reason for the rejection three times over"
+          "label": "Ask the reason three times over"
         }
       },
       "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",

@@ -27,7 +27,7 @@ export default {
           "label": "Call the colleagues in the records before opening the file"
         },
         "reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         }
       },
       "place": "Your Studio, Mangwon-dong · Rooftop",
@@ -55,10 +55,10 @@ export default {
           "label": "Ask everyone reachable if they will put their name on it"
         },
         "reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         },
         "c37_takedown_evidence_turn": {
-          "label": "Dig up the account that made the leaked file and its issue date"
+          "label": "Dig up the leak account and date"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
@@ -87,10 +87,10 @@ export default {
           "label": "Keep names hidden and send everyone home to rest tonight"
         },
         "reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         },
         "c37_reading_evidence_turn": {
-          "label": "Dig up the account that made the leaked file and its issue date"
+          "label": "Dig up the leak account and date"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
@@ -118,10 +118,10 @@ export default {
           "label": "Neither confirm nor deny, and keep the interview short"
         },
         "reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         },
         "c37_source_evidence_turn": {
-          "label": "Dig up the account that made the leaked file and its issue date"
+          "label": "Dig up the leak account and date"
         }
       },
       "place": "Seoul Central District Prosecutors’ Office, 11th Floor · Interview Room",
@@ -384,7 +384,7 @@ export default {
           "label": "Warn the 186 requesters that scoring may be illegal"
         },
         "c37_route_system_evidence_turn": {
-          "label": "Dig up the account that made the leaked file and its issue date"
+          "label": "Dig up the leak account and date"
         }
       },
       "place": "KD Data Lab, Pangyo · Data Center",
@@ -459,7 +459,7 @@ export default {
           "label": "Call the colleagues in the records before opening the file"
         },
         "c37_start_warm_reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
@@ -489,7 +489,7 @@ export default {
           "label": "Send the board operator a takedown request right away"
         },
         "c37_start_record_reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         }
       },
       "place": "Your Studio, Mangwon-dong · Rooftop",
@@ -519,7 +519,7 @@ export default {
           "label": "Leave the lobby and secure the original list separately first"
         },
         "c37_start_rush_reframe": {
-          "label": "Press first on what this file is being used for"
+          "label": "First ask what this file is for"
         }
       },
       "place": "KD Data Lab, Pangyo · Lobby",

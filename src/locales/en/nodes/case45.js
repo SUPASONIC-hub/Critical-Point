@@ -28,7 +28,7 @@ export default {
           "label": "Roll up your sleeves and greet mourners beside Lim Soyul"
         },
         "reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3",
@@ -56,10 +56,10 @@ export default {
           "label": "Take down Yoon Sanghyuk’s ribbon and ask the florist who sent it"
         },
         "reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         },
         "c45_wreath_evidence_turn": {
-          "label": "Light up the margins of the four acquitted approvals"
+          "label": "Light the margins of 4 approvals"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3 Entrance",
@@ -93,10 +93,10 @@ export default {
           "label": "Stay till the stories end and take notes for Lim Soyul too"
         },
         "reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         },
         "c45_stories_evidence_turn": {
-          "label": "Light up the margins of the four acquitted approvals"
+          "label": "Light the margins of 4 approvals"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3 Reception Room",
@@ -124,10 +124,10 @@ export default {
           "label": "Read both letter pages aloud with Lim Soyul to the end"
         },
         "reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         },
         "c45_envelope_evidence_turn": {
-          "label": "Light up the margins of the four acquitted approvals"
+          "label": "Light the margins of 4 approvals"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3, Before the Altar",
@@ -391,7 +391,7 @@ export default {
           "label": "Share the numbers with Seo Harin and the mourners at once"
         },
         "c45_route_system_evidence_turn": {
-          "label": "Light up the margins of the four acquitted approvals"
+          "label": "Light the margins of 4 approvals"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Laptop in the Reception Room Corner",
@@ -466,7 +466,7 @@ export default {
           "label": "Ask to open the envelope now instead of on the third day"
         },
         "c45_start_warm_reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3",
@@ -496,7 +496,7 @@ export default {
           "label": "Roll up your sleeves and greet mourners beside Lim Soyul"
         },
         "c45_start_record_reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3",
@@ -526,7 +526,7 @@ export default {
           "label": "Ask to open the envelope now instead of on the third day"
         },
         "c45_start_rush_reframe": {
-          "label": "Collect when the company called in papers after a death"
+          "label": "Date each recall of the papers"
         }
       },
       "place": "Ieum Hospital Funeral Hall · Memorial Room 3",
