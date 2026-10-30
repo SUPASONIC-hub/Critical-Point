@@ -62,6 +62,12 @@ for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critic
 방침·약관의 광고 문장(`AD_EDITS`)은 한국어·영어·일본어 세 언어에 같은 자리(요약·3번 쿠키·6번 Google·10번 광고 절·약관 3항),
 같은 시행일로 들어갑니다. `tests/unit/legal-pages.test.mjs`가 여섯 페이지 모두와 세 언어의 수를 확인합니다.
 
+Google 애널리틱스(`GA_MEASUREMENT_ID`, [analytics.md](analytics.md), 11-12부터 켬)도 요약·3번 쿠키·6번과 자주 묻는 질문의
+쿠키 문장을 바꾸므로, 두 스위치가 함께 켜진 빌드(광고를 켤 때의 실제 조합)는 애널리틱스 문장 위에 따로 맞춘 표를 씁니다
+(`ANALYTICS_AD_EDITS`, `ANALYTICS_SITE_AD_EDITS`): 요약은 「광고와 방문 통계에 Google, 그 밖의 추적 도구 없음」, 3번 쿠키와
+FAQ는 두 쿠키를 다 적고, 6번 Google은 한 문단입니다. 광고를 끈 빌드는 애널리틱스를 켜든 끄든 main과 바이트까지 같고,
+`tests/unit/ads-with-analytics.test.mjs`가 네 조합을 봅니다.
+
 ## 광고 자리
 
 | 자리 | 마커 | 언제 숨김 |

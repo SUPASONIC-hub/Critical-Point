@@ -10,6 +10,7 @@ import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerCon
 import { crawlerFiles, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
 import { adsTxt, insertAdSlots, readAdsenseEnv } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
+import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -375,16 +376,20 @@ function serviceWorker() {
  * commit can change; the service worker leaves it and robots.txt out of the
  * release's name (`shippedFiles`, scripts/service-worker-build.mjs), which
  * a device would otherwise download everything again for. Before
- * `serviceWorker()` in the list, which reads every file on disk.
+ * `serviceWorker()` in the list, which reads every file on disk. With Google
+ * Analytics on (`googleAnalytics` below) each page carries its tag, and the
+ * policy and the FAQ say so.
  *
  * `ads` (a build with ADSENSE_ADS=on) is the pages' text once the web has
- * ads (AD_EDITS, legal-pages.mjs; SITE_AD_EDITS, site-pages.mjs); without it
- * the pages are the ones as written, byte for byte.
+ * ads, on top of Google Analytics' when that is on too (AD_EDITS and
+ * ANALYTICS_AD_EDITS, legal-pages.mjs; SITE_AD_EDITS and
+ * ANALYTICS_SITE_AD_EDITS, site-pages.mjs); without it the pages are the
+ * ones without ads, byte for byte.
  */
-function staticPages({ ads }) {
+function staticPages({ analytics, ads }) {
   const files = () => {
     const origin = siteOrigin();
-    return { ...renderStaticPages(origin, { ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+    return { ...renderStaticPages(origin, { analytics, ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -448,6 +453,28 @@ const adsenseEnv = (mode) => readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENS
 function searchConsoleVerification({ token }) {
   if (!token) return { name: "search-console-verification-off" };
   return { name: "search-console-verification", transformIndexHtml: (html) => withSiteVerificationMeta(html, token) };
+}
+
+/**
+ * Google Analytics 4, off unless GA_MEASUREMENT_ID is set
+ * (scripts/analytics-config.mjs, docs/analytics.md), and never in the dev
+ * server, the e2e build or a debug build (`analyticsFor`). Off, this plugin
+ * has no hook and the build is the one without it. On, index.html gets
+ * Google's tag and `/assets/analytics-<hash>.js`, which configures it -- a
+ * file and not an inline script, which the CSP blocks -- and staticPages()
+ * puts the same two tags on the plain pages. Before `serviceWorker()`, so the
+ * file is one the release is named for.
+ */
+function googleAnalytics(analytics) {
+  if (!analytics) return { name: "google-analytics-off" };
+  return {
+    name: "google-analytics",
+    apply: "build",
+    transformIndexHtml: (html) => withAnalyticsTags(html, analytics),
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: analytics.path.slice(1), source: analytics.source });
+    },
+  };
 }
 
 /** What the page is told about registering (src/serviceWorker/register.js). */
@@ -644,59 +671,63 @@ function ownChunkGroups() {
   });
 }
 
-export default defineConfig(({ command, mode }) => ({
-  // ADSENSE_CLIENT and GOOGLE_SITE_VERIFICATION have no VITE_ prefix, so they never reach import.meta.env
-  // (scripts/adsense-config.mjs, scripts/search-console.mjs).
-  plugins: [
-    adsense(adsenseEnv(mode)),
-    seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages({ ads: adsenseEnv(mode).ads }),
-    searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
-    serviceWorker(), renderHeaders(),
-  ],
-  // The debug console -- the case jump, unlock-all, the forced render error --
-  // is dead code in a release, and this constant is how the bundler is told.
-  // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
-  // nothing can fold: the expression and every panel behind it shipped to
-  // players, switched off by a runtime check. A build that asks for the tools
-  // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
-  define: {
-    __CP_DEBUG_BUILD__: JSON.stringify(
-      command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
-    ),
-    __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
-  },
-  // The dev server compiles a module the first time it is asked for. Fifty
-  // cases are fifty large data modules, and compiling them on the first scene
-  // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
-  // never has, landing inside the e2e render budgets. They are compiled when
-  // the server starts instead.
-  server: {
-    warmup: {
-      clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
+export default defineConfig(({ command, mode }) => {
+  const debugBuild = command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true";
+  const ads = adsenseEnv(mode);
+  const analytics = analyticsFor({ ...readAnalyticsEnv(loadEnv(mode, process.cwd(), "GA_")), command, mode, debug: debugBuild });
+  return {
+    // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
+    // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
+    plugins: [
+      adsense(ads),
+      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages({ analytics, ads: ads.ads }),
+      searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
+      googleAnalytics(analytics),
+      serviceWorker(), renderHeaders(),
+    ],
+    // The debug console -- the case jump, unlock-all, the forced render error --
+    // is dead code in a release, and this constant is how the bundler is told.
+    // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
+    // nothing can fold: the expression and every panel behind it shipped to
+    // players, switched off by a runtime check. A build that asks for the tools
+    // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
+    define: {
+      __CP_DEBUG_BUILD__: JSON.stringify(debugBuild),
+      __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
     },
-  },
-  build: {
-    // A lazy import is written with the list of files to preload beside it.
-    // The result card's chunk leans only on files the ending screen has
-    // already run, so its list is left out: writing it cost the report's chunk
-    // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
-    // The case file's cast (CaseCast, D-8) is the same: the runtime has run
-    // every file it leans on before the table's fold can open, and its list
-    // of sixteen files was about 500 bytes (2026-10-23).
-    modulePreload: {
-      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+    // The dev server compiles a module the first time it is asked for. Fifty
+    // cases are fifty large data modules, and compiling them on the first scene
+    // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
+    // never has, landing inside the e2e render budgets. They are compiled when
+    // the server starts instead.
+    server: {
+      warmup: {
+        clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
+      },
     },
-    rolldownOptions: {
-      output: {
-        // The other languages' words (src/locales, 다국어 틀) are named
-        // apart, `locale-<lang>-<file>`: a Korean device never asks for
-        // them, so the service worker leaves `locale-*` out of its warm-up
-        // (scripts/service-worker-build.mjs), and their budgets are their own.
-        chunkFileNames: localeChunkName,
-        codeSplitting: {
-          groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
+    build: {
+      // A lazy import is written with the list of files to preload beside it.
+      // The result card's chunk leans only on files the ending screen has
+      // already run, so its list is left out: writing it cost the report's chunk
+      // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+      // The case file's cast (CaseCast, D-8) is the same: the runtime has run
+      // every file it leans on before the table's fold can open, and its list
+      // of sixteen files was about 500 bytes (2026-10-23).
+      modulePreload: {
+        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+      },
+      rolldownOptions: {
+        output: {
+          // The other languages' words (src/locales, 다국어 틀) are named
+          // apart, `locale-<lang>-<file>`: a Korean device never asks for
+          // them, so the service worker leaves `locale-*` out of its warm-up
+          // (scripts/service-worker-build.mjs), and their budgets are their own.
+          chunkFileNames: localeChunkName,
+          codeSplitting: {
+            groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
+          },
         },
       },
     },
-  },
-}));
+  };
+});

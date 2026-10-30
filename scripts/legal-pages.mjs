@@ -1,5 +1,6 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
+import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
 
 /**
  * The privacy policy and the terms of use, Korean, English and Japanese: six
@@ -202,7 +203,20 @@ const items = (keys, language) => `<ul>${keys.map((key) => `<li>${escapeHtml(DAT
 const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
 const days = DATA_RETENTION_DAYS;
 
+/**
+ * The notice of the change, at the top of the policy in the build without
+ * Google Analytics: the policy's own section 12 promises a change seven days
+ * before it takes effect (사용자 결정 10-30: the notice now, the switch on
+ * 11-12). The build with it takes the line out (`ANALYTICS_POLICY`).
+ */
+export const ANALYTICS_NOTICE = {
+  ko: "<p><strong>변경 예고:</strong> 2026년 11월 12일부터 방문 통계를 위해 Google 애널리틱스(Google LLC, 미국)를 사용합니다. 수집 항목·보유 기간·거부 방법은 그날 시행되는 개정 방침 2번 (5)에 적습니다.</p>",
+  en: "<p><strong>Upcoming change:</strong> From November 12, 2026, we will use Google Analytics (Google LLC, USA) for visit statistics. What it collects, how long it is kept and how to opt out will be set out in section 2 (e) of the revised policy that takes effect that day.</p>",
+  ja: "<p><strong>変更の予告:</strong> 2026年11月12日から、訪問統計のためにGoogleアナリティクス(Google LLC、米国)を使用します。収集する項目、保有期間、拒否する方法は、同日に施行される改定後の本方針の2の(5)に記載します。</p>",
+};
+
 const PRIVACY_KO = `
+${ANALYTICS_NOTICE.ko}
 <p>임계점 개발자(이하 “개발자”)는 게임 「임계점: CRITICAL POINT」(이하 “게임”)를 운영하면서 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고 관련 고충을 빠르게 처리하기 위해 이 방침을 둡니다.</p>
 
 <h2>1. 요약</h2>
@@ -285,6 +299,7 @@ const PRIVACY_KO = `
 `;
 
 const PRIVACY_EN = `
+${ANALYTICS_NOTICE.en}
 <p>This policy explains what the developer of Critical Point (“we”) processes when you play the game, why, and for how long.</p>
 
 <h2>1. In short</h2>
@@ -366,6 +381,7 @@ const PRIVACY_EN = `
 `;
 
 const PRIVACY_JA = `
+${ANALYTICS_NOTICE.ja}
 <p>臨界点開発者(以下「開発者」)は、ゲーム『臨界点: CRITICAL POINT』(以下「本ゲーム」)を運営するにあたり、大韓民国の「個人情報保護法」に従って利用者の個人情報を保護し、関連する苦情を速やかに処理するため、本方針を定めます。</p>
 
 <h2>1. 概要</h2>
@@ -445,6 +461,110 @@ const PRIVACY_JA = `
 <h2>12. 方針の変更</h2>
 <p>本方針を変更する場合は、施行の7日前からこのページでお知らせし、利用者の権利に関わる重要な変更は30日前からお知らせします。</p>
 `;
+
+/**
+ * Google Analytics in the policy (scripts/analytics-config.mjs), only in a
+ * build that has it: each language's [off, on] pairs (`withSwaps`). The build
+ * without it keeps every byte of the policy above -- which says there is no
+ * analytics -- and the build with it says what is collected, why, who receives
+ * it, for how long and how to refuse, and carries its own date.
+ */
+const GA_OPT_OUT = `<a href="https://tools.google.com/dlpage/gaoptout">https://tools.google.com/dlpage/gaoptout</a>`;
+
+export const ANALYTICS_EFFECTIVE_DATE = { ko: "2026년 11월 12일", en: "November 12, 2026", ja: "2026年11月12日" };
+
+export const ANALYTICS_POLICY = {
+  ko: [
+    [`${ANALYTICS_NOTICE.ko}\n`, ""],
+    [
+      "서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>",
+      "게임 서버로 가는 정보는 아래 2번 (1)~(4)의 네 가지뿐이고, 방문 통계는 2번 (5)와 같이 Google 애널리틱스로 갑니다.</li>",
+    ],
+    [
+      "<li>지금은 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>",
+      "<li>지금은 광고가 없고 광고용 쿠키를 쓰지 않습니다. 방문 통계에는 Google 애널리틱스와 그 쿠키를 씁니다.</li>",
+    ],
+    [
+      "<h2>3. 이 기기에 저장하는 정보",
+      `<h3>(5) 방문 통계 — Google 애널리틱스, 게임과 안내 페이지를 열 때 자동으로</h3>
+<ul>
+<li>항목: 방문한 페이지(주소와 제목), 들어온 경로(이전 페이지나 검색·링크 출처), 방문 시각과 머문 시간, 기기·운영체제·브라우저 종류와 화면 크기·언어, 접속 IP 주소로 추정한 대략적 위치(국가·도시 수준), Google 애널리틱스 쿠키(_ga, _ga_로 시작하는 이름)에 담긴 무작위 방문자 번호</li>
+<li>목적: 방문자 수, 많이 본 페이지, 유입 경로 같은 방문 통계로 게임과 안내 페이지를 고치기. 개인을 알아보는 데 쓰지 않고, 플레이테스트 데이터의 세션 코드나 게임 진행과 잇지 않습니다.</li>
+<li>정보를 받는 곳: Google LLC(미국). 페이지를 열 때 네트워크로 Google의 서버에 전송됩니다(국외 이전, 6번). Google 애널리틱스는 IP 주소 자체를 저장하지 않으며, Google 신호와 광고 개인화는 꺼 두어 광고에 쓰지 않습니다.</li>
+<li>보유 기간: Google 애널리틱스에서 수집한 날부터 2개월 뒤 자동 삭제. 쿠키는 브라우저에 최대 2년 남고 언제든 지울 수 있습니다.</li>
+<li>거부 방법: 브라우저 설정에서 쿠키를 막거나, Google 애널리틱스 차단 부가기능(${GA_OPT_OUT})을 설치하면 됩니다. 플레이테스트 데이터 제공 동의를 꺼도 방문 통계는 멈추지 않으므로 이 방법을 쓰세요. 거부해도 게임은 그대로 할 수 있습니다.</li>
+</ul>
+
+<h2>3. 이 기기에 저장하는 정보`,
+    ],
+    ["<p>게임은 쿠키를 쓰지 않습니다. ", "<p>게임 자체는 쿠키를 쓰지 않습니다(방문 통계용 Google 애널리틱스 쿠키는 2번 (5)). "],
+    [
+      "<p>국외 이전을 원하지 않으면",
+      "<p>Google LLC(미국): 2번 (5)의 방문 통계를 수집하고 집계하는 일을 맡기며, 페이지를 열 때 네트워크로 전송되어 미국 등에 있는 Google의 서버에 2번 (5)의 보유 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+    ],
+    ["게시판을 쓰지 않으면 됩니다. 게임의", "게시판을 쓰지 않고, 방문 통계는 2번 (5)의 방법으로 거부하면 됩니다. 게임의"],
+  ],
+  en: [
+    [`${ANALYTICS_NOTICE.en}\n`, ""],
+    [
+      "Only the four kinds of data in section 2 ever reach a server.</li>",
+      "Only the four kinds of data in section 2 (a)–(d) ever reach the game's server; visit statistics go to Google Analytics as described in (e).</li>",
+    ],
+    [
+      "<li>The game currently shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>",
+      "<li>The game currently shows no ads and uses no advertising cookies. Visit statistics use Google Analytics and its cookies.</li>",
+    ],
+    [
+      "<h2>3. What is stored on your device",
+      `<h3>(e) Visit statistics — Google Analytics, automatically when you open the game or one of its pages</h3>
+<ul>
+<li>What is collected: the pages you visit (address and title), how you arrived (the previous page, or the search or link you came from), when you visited and for how long, your device, operating system, browser, screen size and language, your approximate location (country and city level) estimated from your IP address, and a random visitor ID in the Google Analytics cookies (_ga and names starting with _ga_)</li>
+<li>Why: visit statistics such as the number of visitors, the most viewed pages and where visitors come from, to improve the game and its pages. They are not used to identify anyone and are not linked to your playtest session code or your progress.</li>
+<li>Who receives it: Google LLC (USA). It is sent over the network to Google's servers when a page opens (an international transfer; see section 6). Google Analytics does not store IP addresses, and Google signals and ad personalization are turned off, so the data is not used for ads.</li>
+<li>How long: deleted automatically by Google Analytics 2 months after collection. The cookies stay in your browser for up to 2 years and can be deleted at any time.</li>
+<li>How to opt out: block cookies in your browser settings, or install the Google Analytics Opt-out Browser Add-on (${GA_OPT_OUT}). Turning off playtest data sharing does not stop visit statistics, so use one of these. The game plays the same either way.</li>
+</ul>
+
+<h2>3. What is stored on your device`,
+    ],
+    ["<p>The game uses no cookies. ", "<p>The game itself uses no cookies (the Google Analytics cookies for visit statistics are described in section 2 (e)). "],
+    [
+      "<p>To avoid the transfer,",
+      "<p>Google LLC (USA) collects and aggregates the visit statistics in section 2 (e); they are sent over the network when a page opens and kept on Google's servers, in the USA and elsewhere, for the period in section 2 (e).</p>\n<p>To avoid the transfer,",
+    ],
+    ["do not use online save or the board. The whole", "do not use online save or the board, and opt out of visit statistics as described in section 2 (e). The whole"],
+  ],
+  ja: [
+    [`${ANALYTICS_NOTICE.ja}\n`, ""],
+    [
+      "サーバーに送られる情報は、下記2の4種類だけです。</li>",
+      "ゲームのサーバーに送られる情報は下記2の(1)~(4)の4種類だけで、訪問統計は2の(5)のとおりGoogleアナリティクスに送られます。</li>",
+    ],
+    [
+      "<li>現在、広告はなく、広告・分析用のCookieや外部のトラッキングツールも使用していません。</li>",
+      "<li>現在、広告はなく、広告用のCookieも使用していません。訪問統計にはGoogleアナリティクスとそのCookieを使用します。</li>",
+    ],
+    [
+      "<h2>3. この端末に保存する情報",
+      `<h3>(5) 訪問統計 — Googleアナリティクス、ゲームや案内ページを開いたときに自動的に</h3>
+<ul>
+<li>項目: 訪問したページ(アドレスとタイトル)、訪問経路(直前のページ、または検索・リンク元)、訪問時刻と滞在時間、端末・OS・ブラウザの種類と画面サイズ・言語、接続元のIPアドレスから推定したおおよその位置(国・都市の単位)、GoogleアナリティクスのCookie(_ga、_ga_で始まる名前)に記録されるランダムな訪問者番号</li>
+<li>目的: 訪問者数、よく見られたページ、訪問経路などの訪問統計により、ゲームと案内ページを改善すること。個人の識別には使用せず、プレイテストデータのセッションコードやゲームの進行とは結び付けません。</li>
+<li>情報を受け取る者: Google LLC(米国)。ページを開く際にネットワークを通じてGoogleのサーバーに送信されます(国外移転、6を参照)。GoogleアナリティクスはIPアドレスそのものを保存せず、Googleシグナルと広告のパーソナライズはオフにしているため、広告には使われません。</li>
+<li>保有期間: Googleアナリティクスにおいて収集日から2か月後に自動削除。Cookieはブラウザに最長2年残り、いつでも削除できます。</li>
+<li>拒否する方法: ブラウザの設定でCookieをブロックするか、Googleアナリティクス オプトアウト アドオン(${GA_OPT_OUT})をインストールしてください。プレイテストデータの提供への同意をオフにしても訪問統計は止まらないため、これらの方法をお使いください。拒否してもゲームはそのまま遊べます。</li>
+</ul>
+
+<h2>3. この端末に保存する情報`,
+    ],
+    ["<p>本ゲームはCookieを使用しません。", "<p>本ゲーム自体はCookieを使用しません(訪問統計用のGoogleアナリティクスのCookieについては2の(5)をご覧ください)。"],
+    [
+      "<p>国外移転を望まない場合は",
+      "<p>Google LLC(米国): 2の(5)の訪問統計の収集と集計を委託しています。これらの情報は、ページを開く際にネットワークを通じて送信され、米国などにある同社のサーバーに2の(5)の保有期間のあいだ保存されます。</p>\n<p>国外移転を望まない場合は",
+    ],
+    ["オンライン保存と掲示板を使用しないでください。本ゲームのストーリー", "オンライン保存と掲示板を使用せず、訪問統計は2の(5)の方法で拒否してください。本ゲームのストーリー"],
+  ],
+};
 
 const TERMS_KO = `
 <ol>
@@ -556,9 +676,10 @@ export { escapeHtml };
  * One page: the header that links the game, every other page in the same
  * language and the page in the other two; the hreflang alternates (all three
  * and x-default, the Korean); the body; a foot with the contact address.
- * `effective` is the policy's date line, which only the two policies have.
+ * `effective` is the policy's date line, which only the two policies have;
+ * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null }) {
   const copy = COPY[language];
   const others = PAGE_LANGUAGES.filter((code) => code !== language);
   const title = `${copy[kind]} · ${GAME_NAME[language]}`;
@@ -575,6 +696,7 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
     .map((other) => `<a href="${pagePath(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
     .join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
+  const tags = analytics ? analyticsTagLines(analytics).map((line) => `${line}\n`).join("") : "";
   return `<!doctype html>
 <html lang="${language}">
 <head>
@@ -585,7 +707,7 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <link rel="canonical" href="${pagePath(kind, language)}" />
 ${alternates}<link rel="icon" href="/icons/icon-192.png" />
 <style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
-</head>
+${tags}</head>
 <body>
 <main>
 <nav aria-label="${escapeHtml(GAME_NAME[language])}">
@@ -732,20 +854,86 @@ export function applyEdits(body, edits, name) {
 }
 
 /**
- * Every page the build writes: `{ "privacy.html": "<!doctype html>...", ... }`, keyed by path from the root without its slash.
- * `ads` (a build with ADSENSE_ADS=on) adds what the web's ads need; without it the pages are the ones above, byte for byte.
+ * The ad edits on top of the policy that already has Google Analytics
+ * (`ANALYTICS_POLICY`): the build both switches on is the one the web runs
+ * once it has ads (GA from 11-12, ads after the 11-23 판정). Where the two
+ * touch the same sentence -- the summary's line on trackers, section 3's
+ * cookies, Google in section 6 -- the sentence says both in one; the
+ * summary's server line already reads "the game's server" there, and
+ * section 10 and the terms are the ones AD_EDITS writes.
  */
-export function renderLegalPages({ ads = false } = {}) {
-  const edit = (body, name) => (ads ? applyEdits(body, AD_EDITS[name], `legal-pages AD_EDITS.${name}`) : body);
+export const ANALYTICS_AD_EDITS = {
+  privacyKo: [
+    [
+      "<li>지금은 광고가 없고 광고용 쿠키를 쓰지 않습니다. 방문 통계에는 Google 애널리틱스와 그 쿠키를 씁니다.</li>",
+      "<li>웹판에는 Google AdSense 광고가 나오고, 방문 통계에는 Google 애널리틱스를 씁니다. 두 서비스를 운영하는 Google이 쿠키 등으로 정보를 처리합니다(2번 (5), 10번). 그 밖의 광고·분석용 쿠키나 외부 추적 도구는 쓰지 않습니다.</li>",
+    ],
+    [
+      "<p>게임 자체는 쿠키를 쓰지 않습니다(방문 통계용 Google 애널리틱스 쿠키는 2번 (5)). ",
+      "<p>게임 자체는 쿠키를 쓰지 않습니다. 방문 통계용 Google 애널리틱스 쿠키는 2번 (5)에, 광고를 보여 주는 Google이 쓸 수 있는 쿠키와 그와 비슷한 식별자는 10번에 적었습니다. ",
+    ],
+    [
+      "2번 (5)의 보유 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+      "2번 (5)의 보유 기간 동안 저장됩니다. 웹판의 광고도 Google이 보여 주고 측정하며, 이를 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+    ],
+    AD_EDITS.privacyKo.at(-1),
+  ],
+  privacyEn: [
+    [
+      "<li>The game currently shows no ads and uses no advertising cookies. Visit statistics use Google Analytics and its cookies.</li>",
+      "<li>The web version shows Google AdSense ads and uses Google Analytics for visit statistics; Google, which runs both, processes data with cookies and similar technologies (sections 2 (e) and 10). We use no other advertising or analytics cookies or third-party trackers.</li>",
+    ],
+    [
+      "<p>The game itself uses no cookies (the Google Analytics cookies for visit statistics are described in section 2 (e)). ",
+      "<p>The game itself uses no cookies. The Google Analytics cookies for visit statistics are described in section 2 (e), and the cookies and similar identifiers Google, which serves the ads, may use in section 10. ",
+    ],
+    [
+      "for the period in section 2 (e).</p>\n<p>To avoid the transfer,",
+      "for the period in section 2 (e). Google also serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
+    ],
+    AD_EDITS.privacyEn.at(-1),
+  ],
+  privacyJa: [
+    [
+      "<li>現在、広告はなく、広告用のCookieも使用していません。訪問統計にはGoogleアナリティクスとそのCookieを使用します。</li>",
+      "<li>ウェブ版にはGoogle AdSenseの広告が表示され、訪問統計にはGoogleアナリティクスを使用します。両方を運営するGoogleがCookieなどにより情報を取り扱います(2の(5)、10)。それ以外の広告・分析用のCookieや外部のトラッキングツールは使用していません。</li>",
+    ],
+    [
+      "<p>本ゲーム自体はCookieを使用しません(訪問統計用のGoogleアナリティクスのCookieについては2の(5)をご覧ください)。",
+      "<p>本ゲーム自体はCookieを使用しません。訪問統計用のGoogleアナリティクスのCookieについては2の(5)を、広告を配信するGoogleが使用することがあるCookieやそれに類する識別子については10をご覧ください。",
+    ],
+    [
+      "2の(5)の保有期間のあいだ保存されます。</p>\n<p>国外移転を望まない場合は",
+      "2の(5)の保有期間のあいだ保存されます。また、ウェブ版の広告もGoogleが配信・測定しており、そのために10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は",
+    ],
+    AD_EDITS.privacyJa.at(-1),
+  ],
+  termsKo: AD_EDITS.termsKo,
+  termsEn: AD_EDITS.termsEn,
+  termsJa: AD_EDITS.termsJa,
+};
+
+/**
+ * Every page this file writes: `{ "privacy.html": "<!doctype html>...", ... }`, keyed by path from the root without its slash.
+ * With `analytics` every page carries Google's tag, and the policy its Google Analytics section and that section's date.
+ * `ads` (a build with ADSENSE_ADS=on) then adds what the web's ads need: AD_EDITS on the policy as written, or
+ * ANALYTICS_AD_EDITS on the one with Google Analytics. Without `ads` the pages are main's, byte for byte, either way.
+ */
+export function renderLegalPages({ analytics = null, ads = false } = {}) {
+  const table = analytics ? ANALYTICS_AD_EDITS : AD_EDITS;
+  const tableName = analytics ? "ANALYTICS_AD_EDITS" : "AD_EDITS";
+  const edit = (body, name) => (ads ? applyEdits(body, table[name], `legal-pages ${tableName}.${name}`) : body);
+  const privacy = (language, body) => (analytics ? withSwaps(body, ANALYTICS_POLICY[language]) : body);
+  const dateOf = ({ kind, language }) => (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE)[language];
   const pages = [
-    { kind: "privacy", language: "ko", body: edit(PRIVACY_KO, "privacyKo") },
-    { kind: "privacy", language: "en", body: edit(PRIVACY_EN, "privacyEn") },
-    { kind: "privacy", language: "ja", body: edit(PRIVACY_JA, "privacyJa") },
+    { kind: "privacy", language: "ko", body: edit(privacy("ko", PRIVACY_KO), "privacyKo") },
+    { kind: "privacy", language: "en", body: edit(privacy("en", PRIVACY_EN), "privacyEn") },
+    { kind: "privacy", language: "ja", body: edit(privacy("ja", PRIVACY_JA), "privacyJa") },
     { kind: "terms", language: "ko", body: edit(TERMS_KO, "termsKo") },
     { kind: "terms", language: "en", body: edit(TERMS_EN, "termsEn") },
     { kind: "terms", language: "ja", body: edit(TERMS_JA, "termsJa") },
   ];
   return Object.fromEntries(
-    pages.map((page) => [pagePath(page.kind, page.language).slice(1), renderDocumentPage({ ...page, effective: EFFECTIVE_DATE[page.language] })]),
+    pages.map((page) => [pagePath(page.kind, page.language).slice(1), renderDocumentPage({ ...page, effective: dateOf(page), analytics })]),
   );
 }
