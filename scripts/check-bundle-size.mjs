@@ -92,7 +92,8 @@ const budgets = [
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
   // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
   // 19,567 / 8,588 -> 25,798 / 11,056 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_671, maxGzip: 11_352 },
+  // -> 26,832 / 11,414 on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, on main 11cb3b16; was 19,725 / 8,660 on c8841dc0): tableReadout's describeStakedDetail, the staked card's detail without the number its burn prints. Measured 26,832 / 11,410 in the e2e build, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_832, maxGzip: 11_414 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -267,6 +268,8 @@ const budgets = [
   // 182,001 / 66,033 -> 182,038 / 66,116 on 2026-10-29, adsense-readiness: the start screen's foot links five pages (SITE_PAGES, privacyText.js) and names three more in the intro's table (게임 소개 · 자주 묻는 질문 · 문의). Measured 182,034 / 66,112 in the e2e build over main 3e350266 (#374), the plus 4.
   // 66,116 -> 66,124 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): no code changed; the hashed chunk names the entry imports
   // changed with the shorter Japanese premise and the pills' CSS. Measured 182,034 / 66,120 in the e2e build, the gzip plus 4.
+  // 66,033 -> 66,046 gzip on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, over main 6a36dcc9): this chunk's code is main's; what differs is the chunk and CSS names it imports (the CSS and RelicDraft changed, so their hashes did). Measured 181,951 / 66,042 in the e2e build, the gzip plus 4.
+  // 66,124 holds on 2026-10-30 (C-15 over main c39870a7, #376 #375): measured 182,034 / 66,112 in the e2e build, under main's budget.
   { pattern: /^index-.*\.js$/, maxBytes: 182_038, maxGzip: 66_124 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -550,7 +553,10 @@ const budgets = [
   // -> 196,161 raw on 2026-10-29, adsense-readiness: the foot's five links wrap on a narrow screen (.intro-legal flex-wrap). Measured 196,157 / 36,560; the gzip holds.
   // -> 196,345 / 36,599 on 2026-10-30, picker-narrow over main c3b40b6f (#376): on 360px or less the three language pills keep one row (12px type)
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_345, maxGzip: 36_599 },
+  // -> 196,266 / 36,582 on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, on main 11cb3b16; was 193,614 / 36,108 on c8841dc0): play.css's fold for a board rule's badge and a plain 소모 없음. Measured 196,266 / 36,578 in the e2e build, the gzip plus 4.
+  // -> 196,342 / 36,612 on 2026-10-29 (C-15 over main 6a36dcc9, with intro-en-fit's rule): measured 196,342 / 36,608 in the e2e build, the gzip plus 4.
+  // -> 196,547 / 36,650 on 2026-10-30 (C-15 over main c39870a7, #376 #375, the badge fold over the foot's five links and the 360px pills): measured 196,543 / 36,646 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_547, maxGzip: 36_650 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1104,8 +1110,15 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The language pills kept one row on a 360px phone and the shorter Japanese
  * premise (picker-narrow, over main c3b40b6f; the critical CSS carries the
  * rule): 423,125, 472,600 and 478,386.
+ * C-15 (draft for after W47, on main 11cb3b16): play.css's badge fold in the
+ * index CSS, 422,998, 472,389 and 478,133 (measured 422,994, 472,385, 478,129, plus 4).
+ * C-15 over main 6a36dcc9 (the badge fold over intro-en-fit, gate-reason-copy and
+ * save-unavailable-lite): 423,063, 472,516 and 478,306 (measured 423,059, 472,512,
+ * 478,302, plus 4).
+ * C-15 over main c39870a7 (the badge fold over adsense-readiness and picker-narrow):
+ * 423,173, 472,647 and 478,433 (measured 423,169, 472,643, 478,429, plus 4).
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_129, en: 472_604, ja: 478_390 };
+const FIRST_PAINT_BUDGETS = { ko: 423_173, en: 472_647, ja: 478_433 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
