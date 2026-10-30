@@ -1299,6 +1299,8 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
    사이트 확인 스위치 있음(`ADSENSE_CLIENT` — meta 태그와 `ads.txt`만, 광고 코드 없음): [docs/web-ads.md](docs/web-ads.md).
    검토가 읽을 글(게임 소개·자주 묻는 질문·문의, 세 언어)과 `robots.txt`·`sitemap.xml`이 있고, Search Console 확인
    스위치(`GOOGLE_SITE_VERIFICATION`)는 [docs/search-console.md](docs/search-console.md).
+   방문 통계는 Google 애널리틱스 4 스위치(`GA_MEASUREMENT_ID`, 기본 꺼짐 — 켜면 모든 페이지에 태그, 방침에 그 절):
+   [docs/analytics.md](docs/analytics.md).
 3. **스토어** — 게임물관리위원회 안내가 오거나 넓히고 싶을 때 Google Play(안드로이드)에 등록합니다. 스토어
    설문으로 등급을 받습니다. 앱 껍데기·광고·빌드 자동화는 draft로 준비만 해 둡니다.
 
