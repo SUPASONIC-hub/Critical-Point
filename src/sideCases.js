@@ -6,12 +6,16 @@
  *
  * What a side case never touches (E11-번외사건-설계안 4절): the season save,
  * NEW GAME+ and its memory, the season record, the past picks, the local
- * ranking, the settled-window log, the telemetry queue and the online save. It
- * keeps one key of its own, `SIDE_CASES_KEY`, on this device only:
+ * ranking, the settled-window log and the telemetry queue. It keeps one key of
+ * its own, `SIDE_CASES_KEY`:
  *
  *   { "side01": { "closedAt": "2026-12-..", "outcomeChoiceId": "s1_after_warm", "inProgress": null } }
  *
  * `inProgress` is the run under way (`{ nodeId, resources, log, run }`), or null.
+ *
+ * The online save (cloudSave.js) carries the completion marks of that key and
+ * no more (설계안 질문 5 (1), the PR after the framework; state/sideMarks.js).
+ * A run in progress stays on the device it was played on.
  */
 import { readStoredValue, SIDE_CASES_KEY } from "./appConfig.js";
 import introCopy from "./copy/intro.js";

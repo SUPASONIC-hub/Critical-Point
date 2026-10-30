@@ -24,11 +24,12 @@ const ids = (cases) => [...decodeSeen(cases, ORDERS)].sort();
 const last = (runId, endingId, verdict = null) => ({ runId, endingId, endingLabel: endingId, verdict, tableRules: 2, line: `${endingId} line` });
 const record = (seasons, countedRuns, lastSeason, extra = {}) => ({ seasons, countedRuns, last: lastSeason, previous: null, endingsSeen: [], verdictsSeen: [], ...extra });
 
-test("the keys the online save carries are the three device keys", () => {
+test("the keys the online save carries are the three device keys and the side cases' marks", () => {
   assert.deepEqual(DEVICE_RECORD_KEYS, {
     seasonRecord: "critical-point-season-record-v1",
     pastPicks: "critical-point-past-picks-v1",
     seenScenes: "critical-point-seen-scenes-v1",
+    sideCases: "critical-point-side-cases-v1",
   });
   assert.equal(seenScenesModule.SEEN_SCENES_KEY, config.SEEN_SCENES_KEY, "the module hands on appConfig's key");
   assert.equal(pastPicksModule.PAST_PICKS_KEY, config.PAST_PICKS_KEY);
@@ -130,4 +131,21 @@ test("a device with a record of its own leads when the copy carries none", () =>
   globalThis.localStorage.setItem(config.PAST_PICKS_KEY, JSON.stringify(mine));
   applyDeviceRecords({ pastPicks: { v: 1, runId: "run-z", picks: { a: "y:2" }, before: {} } });
   assert.equal(JSON.parse(globalThis.localStorage.getItem(config.PAST_PICKS_KEY)).runId, "run-a");
+});
+
+test("a copy's side marks are merged into this device's side record, which keeps its own run in progress", () => {
+  globalThis.localStorage.clear();
+  const run = { nodeId: "s1_shop", resources: {}, log: [], run: {}, runId: "here" };
+  globalThis.localStorage.setItem(config.SIDE_CASES_KEY, JSON.stringify({ side01: { closedAt: null, outcomeChoiceId: null, inProgress: run } }));
+  const written = applyDeviceRecords({ sideCases: { side01: { closedAt: "2026-12-03T00:00:00.000Z", outcomeChoiceId: "s1_after_hers" } } });
+  assert.deepEqual(written, ["sideCases"]);
+  assert.deepEqual(JSON.parse(globalThis.localStorage.getItem(config.SIDE_CASES_KEY)), {
+    side01: { closedAt: "2026-12-03T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: run },
+  });
+  assert.equal(globalThis.localStorage.getItem(config.SEASON_RECORD_KEY), null, "the side marks open nothing of the season's");
+  assert.equal(globalThis.localStorage.getItem(config.NEW_GAME_PLUS_KEY), null);
+  // Marks that close nothing leave a device with no side record as it is.
+  globalThis.localStorage.clear();
+  assert.deepEqual(applyDeviceRecords({ sideCases: { side01: { closedAt: null } } }), []);
+  assert.equal(globalThis.localStorage.getItem(config.SIDE_CASES_KEY), null);
 });
