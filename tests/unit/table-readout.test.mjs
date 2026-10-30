@@ -10,6 +10,7 @@ import {
 } from "../../src/gauntlet/gauntletEngine.js";
 import { describeCaseChange, describeClockHeat, describeEffect, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
 import { getAuthorityGate } from "../../src/gameLogic.js";
+import observerCopy from "../../src/copy/observer.js";
 import { initialResources } from "../../src/gameConstants.js";
 import { easyResourceLabels } from "../../src/playerLanguage.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "../../src/gauntlet/tableRules.js";
@@ -126,6 +127,23 @@ test("the line prints the numbers a locked card's sentence quotes", () => {
   assert.match(field.reason, /지금 믿음 41, 단서 1개\./);
   assert.match(oversight.reason, /지금 단서 1개, 공정함 63\./);
   for (const part of ["믿음 41", "공정함 63", "단서 1개"]) assert.ok(line.split(" · ").includes(part), `the line holds "${part}"`);
+});
+
+test("a locked card's condition is the Korean it was, and English and Japanese carry the same numbers in no Hangul", async () => {
+  // The two sentences as getAuthorityGate's template literals wrote them until 2026-10-29.
+  const field = getAuthorityGate({ requiredAuthority: "FIELD ACCESS" }, { clueCount: 1, trust: 41, legitimacy: 63 });
+  const oversight = getAuthorityGate({ requiredAuthority: "OVERSIGHT" }, { clueCount: 1, trust: 41, legitimacy: 63 });
+  assert.equal(field.reason, "믿음 55 이상 또는 단서 2개 이상이 필요합니다. 지금 믿음 41, 단서 1개.");
+  assert.equal(oversight.reason, "단서 4개 이상과 공정함 55 이상이 필요합니다. 지금 단서 1개, 공정함 63.");
+  assert.equal(getAuthorityGate({ requiredAuthority: "FIELD ACCESS" }, { clueCount: 3 }).reason, "권한이 확인되었습니다.");
+  const blanks = (line) => [...line.matchAll(/\{(\w+)\}/g)].map(([, name]) => name).sort();
+  for (const lang of ["en", "ja"]) {
+    const { gate } = (await import(`../../src/locales/${lang}/screens/observer.js`)).default;
+    for (const key of ["oversight", "field", "unlocked"]) {
+      assert.deepEqual(blanks(gate[key]), blanks(observerCopy.gate[key]), `${lang} gate.${key} fills the Korean's blanks`);
+      assert.doesNotMatch(gate[key], /[가-힣]/, `${lang} gate.${key} has no Hangul`);
+    }
+  }
 });
 
 test("a run with a number missing prints 0 for it rather than a gap", () => {

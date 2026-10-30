@@ -164,11 +164,20 @@ const fileBudgets = {
   // 3128 / 69168 -> 3137 / 69401 on 2026-10-29, measured: a wide screen pins
   // the three language pills under the music controls (position: fixed), out
   // of the brand row, so the start button stays inside a 1280x720 screen.
+  // 3137 / 69401 -> 3141 / 69500 the same day, measured: a Japanese page on a
+  // phone of 360px or less draws the premise at 14px / 1.6, since the system
+  // CJK face it falls back to wraps it two lines longer than the Korean.
+  // 3141 / 69500 -> 3142 / 69521 on 2026-10-29, measured (adsense-readiness):
+  // the foot's five page links wrap on a narrow screen (.intro-legal).
+  // 3142 / 69521 -> 3155 / 69767 on 2026-10-30, measured (picker-narrow over
+  // main c3b40b6f): on 360px or less the three language pills keep one row
+  // (closer, 8px padding, 12px type, out to the music controls) and the brand
+  // row comes up 8px under them.
   // 3137 / 69401 -> 3148 / 69686 on 2026-10-29 (D2 hall of fame draft on #224
   // 602ec69b), measured: the hall of fame's badge on a ranking row
   // (.ranking-hall-badge), a rule of its own (11 lines) so the badge list
   // above is not written twice.
-  "base-intro-ranking.css": { lines: 3148, bytes: 69686 },
+  "base-intro-ranking.css": { lines: 3155, bytes: 69767 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up

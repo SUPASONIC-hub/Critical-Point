@@ -55,6 +55,13 @@ test("a season's language: any English case row makes it English, none naming on
   assert.equal(seasonLocale([{ locale: "ko" }, { locale: "en" }, { locale: null }]), "en", "any English row");
   assert.equal(seasonLocale([{ locale: null }, { locale: "ko" }]), "ko");
   assert.equal(seasonLocale([{ locale: null }, { locale: "fr" }, {}]), null, "no supported language named: ko(추정)");
+  assert.equal(seasonLocale([{ locale: "ko" }, { locale: "ja" }]), "ja", "a Japanese row (10-28: open to the end)");
+  assert.equal(seasonLocale([{ locale: "ja" }, { locale: "en" }]), "en", "English first, as before");
+  const jaWeek = readTestWeek([{ run_id: "r1", case_id: "case01", device: 1, vault: 1, log: [], locale: "ja" }, { run_id: "r2", case_id: "case01", device: 2, vault: 1, log: [], locale: "en" }, { run_id: "r3", case_id: "case01", device: 3, vault: 1, log: [], locale: "ko" }]);
+  assert.deepEqual([jaWeek.english, jaWeek.japanese, jaWeek.korean], [1, 1, 1]);
+  const jaText = describeTestWeek(jaWeek);
+  assert.match(jaText, /\| 시즌 \| 그중 일본어 화면 시즌.*\| 1 \(33\.3%\) \| \|/);
+  assert.ok(jaText.includes(`**${ENGLISH_WARNING}**`), "English and Japanese together past half");
   const caseRow = (run, locale, extra = {}) => ({ run_id: run, case_id: "case01", device: 1, vault: 100, log: [], locale, ...extra });
   const rows = [
     caseRow("secret-run-a", "en"),

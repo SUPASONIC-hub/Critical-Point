@@ -464,10 +464,11 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
   // The numbers the gate reads: it said "FIELD ACCESS 권한과 단서가 더 필요합니다", a level no screen
   // explains and no threshold, on a card the first prologue already deals.
   const { oversightClues, fieldClues } = getAuthorityClueThresholds(casesOpened);
+  const say = observerCopy.gate;
   const need = required === "OVERSIGHT"
-    ? `단서 ${oversightClues}개 이상과 공정함 ${AUTHORITY_THRESHOLDS.oversightLegitimacy} 이상이 필요합니다. 지금 단서 ${clueCount}개, 공정함 ${legitimacy}.`
-    : `믿음 ${AUTHORITY_THRESHOLDS.fieldTrust} 이상 또는 단서 ${fieldClues}개 이상이 필요합니다. 지금 믿음 ${trust}, 단서 ${clueCount}개.`;
-  return { unlocked, required, current, reason: unlocked ? "권한이 확인되었습니다." : need };
+    ? fill(say.oversight, { needClues: oversightClues, needLegitimacy: AUTHORITY_THRESHOLDS.oversightLegitimacy, clues: clueCount, legitimacy })
+    : fill(say.field, { needTrust: AUTHORITY_THRESHOLDS.fieldTrust, needClues: fieldClues, trust, clues: clueCount });
+  return { unlocked, required, current, reason: unlocked ? say.unlocked : need };
 }
 
 /**
