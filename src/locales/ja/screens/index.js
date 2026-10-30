@@ -3,6 +3,7 @@
  * per screen, gathered as the dictionary's `copy.screens`.
  */
 import actCard from "./actCard.js";
+import adSlot from "./adSlot.js";
 import audit from "./audit.js";
 import board from "./board.js";
 import boardPost from "./boardPost.js";
@@ -38,4 +39,4 @@ import unlocks from "./unlocks.js";
 import weekRule from "./weekRule.js";
 import weekRules from "./weekRules.js";
 
-export default { actCard, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, header, intro, leaderboard, loading, mutations, notices, observer, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, seasonEnd, table, unlocks, weekRule, weekRules };
+export default { actCard, adSlot, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, header, intro, leaderboard, loading, mutations, notices, observer, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, seasonEnd, table, unlocks, weekRule, weekRules };

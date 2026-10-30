@@ -331,7 +331,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
           </section>
           {/* Act three. Everything the report used to open with. */}
           <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />
-        </section>
+          {/* ad-slot: placement="report" hidden={currentCase.startsWith("prologue") || (currentCase === "final" && endingStep < 3)} */}</section>
       </main>
 );
 }

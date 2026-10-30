@@ -1272,8 +1272,8 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
 
 예산은 내리기만 하고 올리지 않습니다. `npm run check:bundle`은 청크마다의 크기에 더해 **첫 페인트**
 전체(HTML, 그것이 거는 스크립트·스타일시트, 미리 받는 폰트, 휴대폰이 고르는 키 비주얼)의 전송 바이트를
-재며(2026-10-30 기준 423,171바이트. 영어·일본어 페이지는 그 언어 사전과 덮개 청크까지 기다리므로
-472,667·478,463바이트로 언어마다 따로 잽니다), 폰트 파일과 서비스 워커(`sw.js`)에도 따로 예산이 있습니다. 인트로 화면은 진입 청크에 들어 있어 따로 받지
+재며(2026-10-30 기준 423,174바이트. 영어·일본어 페이지는 그 언어 사전과 덮개 청크까지 기다리므로
+472,703·478,500바이트로 언어마다 따로 잽니다), 폰트 파일과 서비스 워커(`sw.js`)에도 따로 예산이 있습니다. 인트로 화면은 진입 청크에 들어 있어 따로 받지
 않고, 게임 런타임 청크는 브라우저가 한가할 때나 시작 버튼에 포인터·초점이 갈 때 미리 받습니다. 시즌은
 사건 하나씩 받습니다. 앱 빌드는 장면 그래프를 빌드 때 Node에서 한 번 만들어(`scripts/vite-season-data.mjs`)
 사건마다 청크(gzip 15~20KB, 장면이 서른 개로 가장 많은 사건 01만 24KB)로 내보내므로, 게임 런타임 청크는 약
@@ -1302,6 +1302,7 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
    스위치(`GOOGLE_SITE_VERIFICATION`)는 [docs/search-console.md](docs/search-console.md).
    방문 통계는 Google 애널리틱스 4 스위치(`GA_MEASUREMENT_ID`, 기본 꺼짐 — 켜면 모든 페이지에 태그, 방침에 그 절):
    [docs/analytics.md](docs/analytics.md).
+   광고 켜기 준비: draft #350 — 기본 꺼짐, 켜는 순서는 [docs/web-ads.md](docs/web-ads.md).
 3. **스토어** — 게임물관리위원회 안내가 오거나 넓히고 싶을 때 Google Play(안드로이드)에 등록합니다. 스토어
    설문으로 등급을 받습니다. 앱 껍데기·광고·빌드 자동화는 draft로 준비만 해 둡니다.
 
@@ -1345,6 +1346,10 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/assets/*` | `Cross-Origin-Resource-Policy` | `same-origin` |
 | `/*` | `Permissions-Policy` | `render.yaml`의 값 |
 | `/*` | `Content-Security-Policy` | `render.yaml`의 값 |
+
+웹 광고(출시 로드맵 2단계)를 켤 때만 CSP가 바뀝니다(script/frame/connect/img를 `https:`로). 그 행(Path
+`/*`, Name `Content-Security-Policy`, Value)과 환경 변수 `ADSENSE_CLIENT`·`ADSENSE_ADS`·
+`ADSENSE_SLOTS`는 [docs/web-ads.md](docs/web-ads.md)에 있습니다. 지금은 바꾸지 않습니다.
 
 2026-10-06에 더해진 것은 그림 세 줄(`/*.webp`, `/*.jpg`, `/icons/*`)과 `/sw.js`입니다. 이 넷은 대시보드에
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을

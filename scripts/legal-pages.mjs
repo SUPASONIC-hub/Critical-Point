@@ -33,6 +33,17 @@ import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
  * the overseas transfer as one line naming the company and the country; the
  * consent box still starts ticked, and the policy says so; the web version has
  * no ads.
+ *
+ * Web ads (출시 로드맵 2단계, docs/web-ads.md) are off, and so is their part
+ * of the pages: `renderLegalPages()` writes exactly the pages above, and so
+ * does a build given only ADSENSE_CLIENT (site verification: a meta tag
+ * and ads.txt, no ad shown, nothing sent to Google). A build with
+ * ADSENSE_ADS=on calls `renderLegalPages({ ads: true })`, which
+ * applies `AD_EDITS` -- the summary line, the cookies of section 3, Google in
+ * section 6, the ad section 10 and the terms' line on ads -- each to a
+ * sentence that has to be found exactly once, so a later edit of the text
+ * cannot leave an ad page half-written. Korean, English and Japanese take
+ * the same edits in the same places, under the same effective date.
  */
 
 const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026", ja: "2026年10月25日" };
@@ -711,20 +722,216 @@ ${dated}${body.trim()}
 `;
 }
 
+const AD_POLICY_LINKS = {
+  ads: "https://policies.google.com/technologies/ads",
+  partners: "https://policies.google.com/technologies/partner-sites",
+  settings: "https://adssettings.google.com",
+};
+const link = (href) => `<a href="${href}">${href.replace("https://", "")}</a>`;
+
+/**
+ * What the pages say once the web has ads (draft for 출시 로드맵 2단계): each
+ * pair is a sentence of the page as written above and what replaces it.
+ */
+export const AD_EDITS = {
+  privacyKo: [
+    [
+      "<li>진행은 기본적으로 이 기기(브라우저 저장소)에만 저장됩니다. 서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>",
+      "<li>진행은 기본적으로 이 기기(브라우저 저장소)에만 저장됩니다. 개발자의 서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>",
+    ],
+    [
+      "<li>지금은 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>",
+      "<li>웹판에는 Google AdSense 광고가 나오고, 광고를 보여 주는 Google이 쿠키 등으로 정보를 처리합니다(10번). 그 밖의 광고·분석용 쿠키나 외부 추적 도구는 쓰지 않습니다.</li>",
+    ],
+    [
+      "<p>게임은 쿠키를 쓰지 않습니다.",
+      "<p>게임 자체는 쿠키를 쓰지 않습니다. 광고를 보여 주는 Google은 10번처럼 쿠키와 그와 비슷한 식별자를 쓸 수 있습니다.",
+    ],
+    [
+      "<p>국외 이전을 원하지 않으면",
+      "<p>Google LLC(미국): 광고 표시와 측정을 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+    ],
+    [
+      "<p>지금은 광고가 없습니다. 나중에 광고를 붙이게 되면, 붙이기 전에 광고와 관련한 처리 내용(광고 회사, 쿠키, 거부하는 법)을 이 방침에 더해 알립니다.</p>",
+      `<p>웹판에는 Google LLC의 광고 서비스인 Google AdSense 광고가 나옵니다. 광고는 사건 리포트 아래처럼 판 밖의 자리에만 나오고, 판·결정·브리핑 도중에는 나오지 않으며, 점수·랭킹·결말에 영향을 주지 않습니다.</p>
+<ul>
+<li>처리하는 자: Google LLC(미국). 개발자는 광고를 통해 이용자를 알아볼 수 있는 정보를 받지 않습니다.</li>
+<li>항목(행태정보 포함): 쿠키와 그와 비슷한 식별자, IP 주소와 그로 추정한 대략적인 위치, 브라우저·기기 정보, 광고를 본 기록과 누른 기록</li>
+<li>목적: 광고 표시, 광고 성과 측정, 부정 클릭 방지, 이용자가 허용한 경우 관심사에 맞춘 광고(맞춤형 광고)</li>
+<li>보유 기간과 처리 방식: Google의 정책을 따릅니다 — ${link(AD_POLICY_LINKS.ads)}, ${link(AD_POLICY_LINKS.partners)}</li>
+<li>맞춤형 광고 거부: ${link(AD_POLICY_LINKS.settings)}에서 끄거나 브라우저에서 제3자 쿠키를 막을 수 있습니다. 거부해도 광고 수와 게임 내용은 같고, 관심사와 관계없는 광고가 나옵니다.</li>
+<li>유럽 경제 지역(EEA)·영국·스위스에서 접속하면 광고를 불러오기 전에 Google의 동의 창(「개인정보 보호 및 메시지」)이 떠서 광고 쿠키 사용 여부를 고를 수 있고, 고른 것은 나중에 바꿀 수 있습니다.</li>
+</ul>`,
+    ],
+  ],
+  privacyEn: [
+    [
+      "<li>Your progress is saved on your device (browser storage) by default. Only the four kinds of data in section 2 ever reach a server.</li>",
+      "<li>Your progress is saved on your device (browser storage) by default. Only the four kinds of data in section 2 ever reach our servers.</li>",
+    ],
+    [
+      "<li>The game currently shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>",
+      "<li>The web version shows Google AdSense ads, and Google, which serves them, processes data with cookies and similar technologies (section 10). We use no other advertising or analytics cookies or third-party trackers.</li>",
+    ],
+    [
+      "<p>The game uses no cookies.",
+      "<p>The game itself uses no cookies. Google, which serves the ads, may use cookies and similar identifiers as described in section 10.",
+    ],
+    [
+      "<p>To avoid the transfer,",
+      "<p>Google LLC (USA) serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
+    ],
+    [
+      "<p>The game currently shows no ads. If ads are added later, this policy will describe them (the ad provider, cookies and how to opt out) before they appear.</p>",
+      `<p>The web version shows ads from Google AdSense, a service of Google LLC. Ads appear only away from the table, such as below a case report — never during a table, a decision or a briefing — and never affect your score, ranking or ending.</p>
+<ul>
+<li>Who processes it: Google LLC (USA). We receive nothing from the ads that identifies you.</li>
+<li>What: cookies and similar identifiers, your IP address and the approximate location derived from it, browser and device information, and which ads were shown and clicked</li>
+<li>Why: to show ads, measure them, prevent click fraud and, if you allow it, show ads based on your interests (personalized ads)</li>
+<li>How long and how: under Google's policies — ${link(AD_POLICY_LINKS.ads)}, ${link(AD_POLICY_LINKS.partners)}</li>
+<li>To opt out of personalized ads: turn them off at ${link(AD_POLICY_LINKS.settings)} or block third-party cookies in your browser. You will see the same number of ads and the same game, with ads not based on your interests.</li>
+<li>In the EEA, the UK and Switzerland, Google's consent message (Privacy &amp; messaging) asks before ads load whether ad cookies may be used, and you can change your choice later.</li>
+</ul>`,
+    ],
+  ],
+  privacyJa: [
+    [
+      "<li>進行は原則としてこの端末(ブラウザのストレージ)にのみ保存されます。サーバーに送られる情報は、下記2の4種類だけです。</li>",
+      "<li>進行は原則としてこの端末(ブラウザのストレージ)にのみ保存されます。開発者のサーバーに送られる情報は、下記2の4種類だけです。</li>",
+    ],
+    [
+      "<li>現在、広告はなく、広告・分析用のCookieや外部のトラッキングツールも使用していません。</li>",
+      "<li>ウェブ版にはGoogle AdSenseの広告が表示され、広告を配信するGoogleがCookieなどにより情報を取り扱います(10)。それ以外の広告・分析用のCookieや外部のトラッキングツールは使用していません。</li>",
+    ],
+    [
+      "<p>本ゲームはCookieを使用しません。",
+      "<p>本ゲーム自体はCookieを使用しません。広告を配信するGoogleは、10のとおりCookieやそれに類する識別子を使用することがあります。",
+    ],
+    [
+      "<p>国外移転を望まない場合は、",
+      "<p>Google LLC(米国): 広告の表示と測定のため、10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は、",
+    ],
+    [
+      "<p>現在、広告はありません。将来広告を導入する場合は、導入する前に、広告に関する取り扱いの内容(広告会社、Cookie、拒否する方法)を本方針に追加してお知らせします。</p>",
+      `<p>ウェブ版には、Google LLCの広告サービスであるGoogle AdSenseの広告が表示されます。広告は事件レポートの下など勝負の外の場所にのみ表示され、勝負・決断・ブリーフィングの途中には表示されず、点数・ランキング・結末に影響しません。</p>
+<ul>
+<li>取り扱う者: Google LLC(米国)。開発者は、広告を通じて利用者を識別できる情報を受け取りません。</li>
+<li>項目(行動履歴情報を含む): Cookieやそれに類する識別子、IPアドレスとそこから推定したおおよその位置、ブラウザ・端末の情報、広告の表示履歴とクリック履歴</li>
+<li>目的: 広告の表示、広告の効果測定、不正クリックの防止、利用者が許可した場合は関心に合わせた広告(パーソナライズド広告)</li>
+<li>保有期間と取り扱いの方法: Googleのポリシーに従います — ${link(AD_POLICY_LINKS.ads)}、${link(AD_POLICY_LINKS.partners)}</li>
+<li>パーソナライズド広告の拒否: ${link(AD_POLICY_LINKS.settings)}でオフにするか、ブラウザでサードパーティCookieをブロックできます。拒否しても広告の数とゲームの内容は同じで、関心とは関係のない広告が表示されます。</li>
+<li>欧州経済領域(EEA)・英国・スイスからアクセスした場合は、広告を読み込む前にGoogleの同意画面(「プライバシーとメッセージ」)が表示され、広告Cookieを使用するかどうかを選べます。選んだ内容は後から変更できます。</li>
+</ul>`,
+    ],
+  ],
+  termsKo: [
+    [
+      "<li>웹판은 무료이며 광고와 유료 결제가 없습니다.",
+      "<li>웹판은 무료이며 유료 결제가 없습니다. 사건 리포트 아래처럼 판 밖의 자리에 광고가 나올 수 있고, 광고는 점수·랭킹·결말에 영향을 주지 않습니다.",
+    ],
+  ],
+  termsEn: [
+    [
+      "<li>The web version is free, with no ads and no payments.",
+      "<li>The web version is free, with no payments. Ads may appear away from the table, such as below a case report, and never affect your score, ranking or ending.",
+    ],
+  ],
+  termsJa: [
+    [
+      "<li>ウェブ版は無料で、広告や有料の決済はありません。",
+      "<li>ウェブ版は無料で、有料の決済はありません。事件レポートの下など勝負の外の場所に広告が表示されることがあり、広告が点数・ランキング・結末に影響することはありません。",
+    ],
+  ],
+};
+
+/** Each pair of `edits` applied to `body`, or a thrown error when a sentence to replace is not in it exactly once. site-pages.mjs uses it too. */
+export function applyEdits(body, edits, name) {
+  return edits.reduce((text, [from, to]) => {
+    const at = text.indexOf(from);
+    if (at < 0 || text.indexOf(from, at + 1) >= 0) throw new Error(`${name}: "${from.slice(0, 40)}..." is not in the page exactly once`);
+    return text.slice(0, at) + to + text.slice(at + from.length);
+  }, body);
+}
+
+/**
+ * The ad edits on top of the policy that already has Google Analytics
+ * (`ANALYTICS_POLICY`): the build both switches on is the one the web runs
+ * once it has ads (GA from 11-12, ads after the 11-23 판정). Where the two
+ * touch the same sentence -- the summary's line on trackers, section 3's
+ * cookies, Google in section 6 -- the sentence says both in one; the
+ * summary's server line already reads "the game's server" there, and
+ * section 10 and the terms are the ones AD_EDITS writes.
+ */
+export const ANALYTICS_AD_EDITS = {
+  privacyKo: [
+    [
+      "<li>지금은 광고가 없고 광고용 쿠키를 쓰지 않습니다. 방문 통계에는 Google 애널리틱스와 그 쿠키를 씁니다.</li>",
+      "<li>웹판에는 Google AdSense 광고가 나오고, 방문 통계에는 Google 애널리틱스를 씁니다. 두 서비스를 운영하는 Google이 쿠키 등으로 정보를 처리합니다(2번 (5), 10번). 그 밖의 광고·분석용 쿠키나 외부 추적 도구는 쓰지 않습니다.</li>",
+    ],
+    [
+      "<p>게임 자체는 쿠키를 쓰지 않습니다(방문 통계용 Google 애널리틱스 쿠키는 2번 (5)). ",
+      "<p>게임 자체는 쿠키를 쓰지 않습니다. 방문 통계용 Google 애널리틱스 쿠키는 2번 (5)에, 광고를 보여 주는 Google이 쓸 수 있는 쿠키와 그와 비슷한 식별자는 10번에 적었습니다. ",
+    ],
+    [
+      "2번 (5)의 보유 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+      "2번 (5)의 보유 기간 동안 저장됩니다. 웹판의 광고도 Google이 보여 주고 측정하며, 이를 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+    ],
+    AD_EDITS.privacyKo.at(-1),
+  ],
+  privacyEn: [
+    [
+      "<li>The game currently shows no ads and uses no advertising cookies. Visit statistics use Google Analytics and its cookies.</li>",
+      "<li>The web version shows Google AdSense ads and uses Google Analytics for visit statistics; Google, which runs both, processes data with cookies and similar technologies (sections 2 (e) and 10). We use no other advertising or analytics cookies or third-party trackers.</li>",
+    ],
+    [
+      "<p>The game itself uses no cookies (the Google Analytics cookies for visit statistics are described in section 2 (e)). ",
+      "<p>The game itself uses no cookies. The Google Analytics cookies for visit statistics are described in section 2 (e), and the cookies and similar identifiers Google, which serves the ads, may use in section 10. ",
+    ],
+    [
+      "for the period in section 2 (e).</p>\n<p>To avoid the transfer,",
+      "for the period in section 2 (e). Google also serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
+    ],
+    AD_EDITS.privacyEn.at(-1),
+  ],
+  privacyJa: [
+    [
+      "<li>現在、広告はなく、広告用のCookieも使用していません。訪問統計にはGoogleアナリティクスとそのCookieを使用します。</li>",
+      "<li>ウェブ版にはGoogle AdSenseの広告が表示され、訪問統計にはGoogleアナリティクスを使用します。両方を運営するGoogleがCookieなどにより情報を取り扱います(2の(5)、10)。それ以外の広告・分析用のCookieや外部のトラッキングツールは使用していません。</li>",
+    ],
+    [
+      "<p>本ゲーム自体はCookieを使用しません(訪問統計用のGoogleアナリティクスのCookieについては2の(5)をご覧ください)。",
+      "<p>本ゲーム自体はCookieを使用しません。訪問統計用のGoogleアナリティクスのCookieについては2の(5)を、広告を配信するGoogleが使用することがあるCookieやそれに類する識別子については10をご覧ください。",
+    ],
+    [
+      "2の(5)の保有期間のあいだ保存されます。</p>\n<p>国外移転を望まない場合は",
+      "2の(5)の保有期間のあいだ保存されます。また、ウェブ版の広告もGoogleが配信・測定しており、そのために10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は",
+    ],
+    AD_EDITS.privacyJa.at(-1),
+  ],
+  termsKo: AD_EDITS.termsKo,
+  termsEn: AD_EDITS.termsEn,
+  termsJa: AD_EDITS.termsJa,
+};
+
 /**
  * Every page this file writes: `{ "privacy.html": "<!doctype html>...", ... }`, keyed by path from the root without its slash.
  * With `analytics` every page carries Google's tag, and the policy its Google Analytics section and that section's date.
+ * `ads` (a build with ADSENSE_ADS=on) then adds what the web's ads need: AD_EDITS on the policy as written, or
+ * ANALYTICS_AD_EDITS on the one with Google Analytics. Without `ads` the pages are main's, byte for byte, either way.
  */
-export function renderLegalPages({ analytics = null } = {}) {
+export function renderLegalPages({ analytics = null, ads = false } = {}) {
+  const table = analytics ? ANALYTICS_AD_EDITS : AD_EDITS;
+  const tableName = analytics ? "ANALYTICS_AD_EDITS" : "AD_EDITS";
+  const edit = (body, name) => (ads ? applyEdits(body, table[name], `legal-pages ${tableName}.${name}`) : body);
   const privacy = (language, body) => (analytics ? withSwaps(body, ANALYTICS_POLICY[language]) : body);
   const dateOf = ({ kind, language }) => (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE)[language];
   const pages = [
-    { kind: "privacy", language: "ko", body: privacy("ko", PRIVACY_KO) },
-    { kind: "privacy", language: "en", body: privacy("en", PRIVACY_EN) },
-    { kind: "privacy", language: "ja", body: privacy("ja", PRIVACY_JA) },
-    { kind: "terms", language: "ko", body: TERMS_KO },
-    { kind: "terms", language: "en", body: TERMS_EN },
-    { kind: "terms", language: "ja", body: TERMS_JA },
+    { kind: "privacy", language: "ko", body: edit(privacy("ko", PRIVACY_KO), "privacyKo") },
+    { kind: "privacy", language: "en", body: edit(privacy("en", PRIVACY_EN), "privacyEn") },
+    { kind: "privacy", language: "ja", body: edit(privacy("ja", PRIVACY_JA), "privacyJa") },
+    { kind: "terms", language: "ko", body: edit(TERMS_KO, "termsKo") },
+    { kind: "terms", language: "en", body: edit(TERMS_EN, "termsEn") },
+    { kind: "terms", language: "ja", body: edit(TERMS_JA, "termsJa") },
   ];
   return Object.fromEntries(
     pages.map((page) => [pagePath(page.kind, page.language).slice(1), renderDocumentPage({ ...page, effective: dateOf(page), analytics })]),

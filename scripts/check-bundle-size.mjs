@@ -1017,7 +1017,8 @@ const budgets = [
   // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
   // 153,061 / 51,897 -> 153,139 / 51,933 on 2026-10-29, adsense-readiness: the foot's three new links in Japanese. Measured 153,135 / 51,929, the plus 4.
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_344, maxGzip: 51_954 },
+  // 153,344 / 51,954 -> 153,428 / 51,988 on 2026-10-30, web-adsense-prep over main 430dda1e: the ad box's two lines (adSlot). Measured 153,424 / 51,984, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_428, maxGzip: 51_988 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1118,8 +1119,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The start button closer to the premise on 360px or less (intro-360-fit,
  * over main 7552870d; the English premise at 14px there too): 423,171, 472,667
  * and 478,463.
+ * The ad box's two lines in each dictionary (web-adsense-prep over main
+ * 78e53e40, src/copy/adSlot.js; the box itself stays out of an ads-off build):
+ * 423,174 (under its line), 472,703 and 478,500.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_175, en: 472_671, ja: 478_467 };
+const FIRST_PAINT_BUDGETS = { ko: 423_175, en: 472_707, ja: 478_504 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1321,7 +1325,7 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
 }
 
 // Web ads (출시 로드맵 2단계) are off unless the build was given
-// ADSENSE_ADS=on (draft #341): a site build without it, AdSense site
+// ADSENSE_ADS=on (draft #350, #341 reopened): a site build without it, AdSense site
 // verification (ADSENSE_CLIENT) included, carries no ad code in any script.
 if (process.env.ADSENSE_ADS !== "on") {
   const scripts = [path.join(distDir, "sw.js"), ...readdirSync(assetsDir).filter((name) => name.endsWith(".js")).map((name) => path.join(assetsDir, name))];

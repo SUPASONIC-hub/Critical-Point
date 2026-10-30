@@ -2,7 +2,7 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
-import { escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
+import { applyEdits, escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
 
 /**
  * The three pages about the game -- what it is and how it is played, the
@@ -421,6 +421,49 @@ const BODIES = {
 export const SITE_PAGE_KINDS = Object.keys(BODIES);
 
 /**
+ * What the pages say once the web has ads (ADSENSE_ADS=on, docs/web-ads.md),
+ * as the policy's AD_EDITS (legal-pages.mjs) does for the policy: each pair
+ * is a sentence of a page as written above and what replaces it. Two answers
+ * of the FAQ say there are no ads and no ad cookies; with ads they say where
+ * the ads appear, as the policy's section 10 and the terms do, and that
+ * Google, which serves them, may use cookies.
+ */
+export const SITE_AD_EDITS = {
+  faq: {
+    ko: [
+      [
+        "<p>웹판은 무료입니다. 지금은 광고와 유료 결제가 없습니다.",
+        "<p>웹판은 무료이며 유료 결제가 없습니다. 광고는 사건 리포트 아래처럼 판 밖의 자리에만 나오고, 판·결정·브리핑 도중에는 나오지 않으며, 점수·랭킹·결말에 영향을 주지 않습니다.",
+      ],
+      [
+        "게임은 쿠키와 광고·분석용 추적 도구를 쓰지 않습니다.",
+        "게임 자체는 쿠키를 쓰지 않습니다. 광고를 보여 주는 Google은 쿠키와 그와 비슷한 식별자를 쓸 수 있고, 그 밖의 광고·분석용 추적 도구는 쓰지 않습니다.",
+      ],
+    ],
+    en: [
+      [
+        "<p>The web version is free. There are currently no ads and no payments.",
+        "<p>The web version is free, with no payments. Ads appear only away from the table, such as below a case report — never during a table, a decision or a briefing — and never affect your score, ranking or ending.",
+      ],
+      [
+        "The game uses no cookies and no advertising or analytics trackers.",
+        "The game itself uses no cookies. Google, which serves the ads, may use cookies and similar identifiers; we use no other advertising or analytics trackers.",
+      ],
+    ],
+    ja: [
+      [
+        "<p>ウェブ版は無料です。現在、広告や有料の決済はありません。",
+        "<p>ウェブ版は無料で、有料の決済はありません。広告は事件レポートの下など勝負の外の場所にのみ表示され、勝負・決断・ブリーフィングの途中には表示されず、点数・ランキング・結末に影響しません。",
+      ],
+      [
+        "本ゲームはCookieや、広告・分析用のトラッキングツールを使用しません。",
+        "本ゲーム自体はCookieを使用しません。広告を配信するGoogleはCookieやそれに類する識別子を使用することがあり、それ以外の広告・分析用のトラッキングツールは使用していません。",
+      ],
+    ],
+  },
+};
+
+/**
  * The FAQ's one sentence about cookies, in a build with Google Analytics
  * (scripts/analytics-config.mjs; the policy's own section is
  * ANALYTICS_POLICY in legal-pages.mjs). Without it the FAQ is as written above.
@@ -432,17 +475,60 @@ export const ANALYTICS_FAQ = {
 };
 
 /**
- * The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`.
- * With `analytics` each carries Google's tag, and the FAQ says so.
+ * SITE_AD_EDITS on the FAQ that already says Google Analytics (ANALYTICS_FAQ):
+ * the build with both switches on, which is the web once it has ads. The
+ * line on payments is AD_EDITS' own; the cookie sentence names both Google's
+ * cookies, as the policy's section 3 does (ANALYTICS_AD_EDITS, legal-pages.mjs).
  */
-export function renderSitePages({ analytics = null } = {}) {
+export const ANALYTICS_SITE_AD_EDITS = {
+  faq: {
+    ko: [
+      SITE_AD_EDITS.faq.ko[0],
+      [
+        ANALYTICS_FAQ.ko[0][1],
+        "쿠키는 방문 통계용 Google 애널리틱스 쿠키(거부하는 법은 개인정보처리방침 2번 (5))와, 광고를 보여 주는 Google이 쓸 수 있는 쿠키와 그와 비슷한 식별자(개인정보처리방침 10번)뿐이고, 그 밖의 광고·분석용 추적 도구는 쓰지 않습니다.",
+      ],
+    ],
+    en: [
+      SITE_AD_EDITS.faq.en[0],
+      [
+        ANALYTICS_FAQ.en[0][1],
+        "The only cookies are the Google Analytics ones for visit statistics (how to opt out is in section 2 (e) of the Privacy Policy) and the cookies and similar identifiers Google, which serves the ads, may use (section 10); we use no other advertising or analytics trackers.",
+      ],
+    ],
+    ja: [
+      SITE_AD_EDITS.faq.ja[0],
+      [
+        ANALYTICS_FAQ.ja[0][1],
+        "Cookieは、訪問統計用のGoogleアナリティクスのCookie(拒否する方法はプライバシーポリシーの2の(5)をご覧ください)と、広告を配信するGoogleが使用することがあるCookieやそれに類する識別子(同10)だけで、それ以外の広告・分析用のトラッキングツールは使用していません。",
+      ],
+    ],
+  },
+};
+
+/** A page's body under the build's two switches: Google Analytics' words first, then the ads' on top of them. */
+function siteBody(kind, language, { analytics, ads }) {
+  let body = BODIES[kind][language];
+  if (analytics && kind === "faq") body = withSwaps(body, ANALYTICS_FAQ[language]);
+  const table = analytics ? ANALYTICS_SITE_AD_EDITS : SITE_AD_EDITS;
+  const edits = ads ? table[kind]?.[language] : null;
+  return edits ? applyEdits(body, edits, `site-pages ${analytics ? "ANALYTICS_SITE_AD_EDITS" : "SITE_AD_EDITS"}.${kind}.${language}`) : body;
+}
+
+/**
+ * The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`.
+ * With `analytics` each carries Google's tag, and the FAQ says so. `ads` (a build with ADSENSE_ADS=on) then applies
+ * SITE_AD_EDITS, or ANALYTICS_SITE_AD_EDITS on the FAQ that already says Google Analytics; without `ads` the pages are
+ * main's, byte for byte, either way.
+ */
+export function renderSitePages({ analytics = null, ads = false } = {}) {
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
         kind,
         language,
-        body: analytics && kind === "faq" ? withSwaps(BODIES[kind][language], ANALYTICS_FAQ[language]) : BODIES[kind][language],
+        body: siteBody(kind, language, { analytics, ads }),
         description: DESCRIPTION[kind][language],
         analytics,
       });
@@ -495,9 +581,13 @@ export function withAbsoluteSiteLinks(html, origin) {
     .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
 }
 
-/** Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash. */
-export function renderStaticPages(origin = "", { analytics = null } = {}) {
-  const pages = { ...renderLegalPages({ analytics }), ...renderSitePages({ analytics }) };
+/**
+ * Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash.
+ * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS=on) are the build's two switches: ANALYTICS_POLICY,
+ * ANALYTICS_FAQ, AD_EDITS, SITE_AD_EDITS and, with both, ANALYTICS_AD_EDITS and ANALYTICS_SITE_AD_EDITS.
+ */
+export function renderStaticPages(origin = "", { analytics = null, ads = false } = {}) {
+  const pages = { ...renderLegalPages({ analytics, ads }), ...renderSitePages({ analytics, ads }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 
