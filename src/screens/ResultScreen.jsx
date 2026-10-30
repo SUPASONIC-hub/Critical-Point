@@ -239,12 +239,12 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <p>{view.endingEpilogue}</p>
             </section>
           )}
-          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label={resultCopy.sideSlotOpened.label} data-testid="side-slot-opened"><p>{resultCopy.sideSlotOpened.text}</p></section>}
           {currentCase === "final" && view.logicReport && (
             <section className="ending-epilogue-panel" aria-label={view.logicReport.label} data-testid="logic-report">
               <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
+          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label={resultCopy.sideSlotOpened.label} data-testid="side-slot-opened"><p>{resultCopy.sideSlotOpened.text}</p></section>}
           {currentCase === "final" && view.failureRecovery && (
             <section className="failure-recovery-panel" aria-label={resultCopy.failureRecoveryLabel}>
               <strong>{view.failureRecovery.title}</strong>

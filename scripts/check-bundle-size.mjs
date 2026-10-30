@@ -78,7 +78,8 @@ const budgets = [
   // 54,996 -> 55,002 gzip on 2026-10-29, picker-narrow: the shorter Japanese premise (src/locales/ja/screens/intro.js) renames the hashed locale chunk the runtime imports; no code changed. Measured 149,736 / 54,998 in the e2e build, the gzip plus 4.
   // 149,740 / 55,002 -> 149,905 / 55,019 on 2026-10-30, ranking-save-copy over main c39870a7 (#376, #375): the local and season ranking save lines read from src/copy/notices.js in the page's language (they were English in the hook). Measured 149,901 / 55,015 in the e2e build, the plus 4.
   // 149,905 / 55,019 -> 152,903 / 56,161 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side run (state/sideRun.js) and what the side screen takes from this chunk (state/sideCaseKit.js); the pack check stays out (state/sidePackCheck.js). Measured 152,899 / 56,157 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 152_903, maxGzip: 56_161 },
+  // 56,161 -> 56,167 gzip on 2026-10-30, E-11 번외 1 (draft): the side slot's line after the logic report on the finale (ResultScreen) renames the chunks it imports; the runtime's code did not change. Measured 152,899 / 56,163, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 152_903, maxGzip: 56_167 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
