@@ -1,5 +1,5 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
-import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../src/privacyText.js";
+import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 
 /**
  * The privacy policy and the terms of use, Korean, English and Japanese: six
@@ -480,6 +480,7 @@ const TERMS_JA = `
 </ol>
 `;
 
+
 const PAGE_STYLE = `
 :root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
 *{box-sizing:border-box}
@@ -487,28 +488,41 @@ body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.75 -apple-syste
 main{width:min(760px,100%);margin:0 auto;padding:24px 16px 72px}
 nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:.875rem}
 nav a{display:inline-flex;align-items:center;min-height:44px}
+nav a[aria-current]{color:var(--text);text-decoration:none}
 a{color:var(--accent);text-underline-offset:4px}
 h1{margin:32px 0 4px;font-size:clamp(1.625rem,5vw,2.25rem);line-height:1.2;letter-spacing:-.02em}
 h2{margin:36px 0 8px;font-size:1.1875rem;line-height:1.4}
 h3{margin:22px 0 6px;font-size:1rem;line-height:1.5;color:var(--text)}
-p,li{color:var(--text-2)}
+p,li,dd{color:var(--text-2)}
 ul,ol{padding-left:1.4em}
 li{margin:4px 0}
 li ul{margin:4px 0}
+dd{margin:0 0 4px}
 .effective{margin:0;color:var(--text-2);font-size:.875rem}
 strong{color:var(--text)}
+footer{margin-top:48px;padding-top:12px;border-top:1px solid var(--line);font-size:.875rem}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
-const LANGUAGES = ["ko", "en", "ja"];
+export const PAGE_LANGUAGES = ["ko", "en", "ja"];
+
+/**
+ * The plain pages the build writes beside `index.html`, in the order every
+ * page's header lists them: the three about the game (scripts/site-pages.mjs)
+ * and the two this file writes. Each is `/<kind>.html` in Korean and
+ * `/<lang>/<kind>.html` in the others -- the start screen's foot builds the
+ * same addresses from the same list (`SITE_PAGES`, `legalPagePath`,
+ * src/privacyText.js).
+ */
+export const PAGE_KINDS = SITE_PAGES;
 
 const COPY = {
-  ko: { game: "게임으로 돌아가기", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일" },
-  en: { game: "Back to the game", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective" },
-  ja: { game: "ゲームに戻る", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日" },
+  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의" },
+  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact" },
+  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ" },
 };
 
-const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
+export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
 
 /**
  * Japanese puts no spaces between words, so `keep-all` would hold a sentence
@@ -517,37 +531,58 @@ const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "
  */
 const STYLE_FOR = { ja: "\nbody{word-break:normal}" };
 
-const pathFor = (kind, language) =>
-  `${language === "ko" ? "" : `/${language}`}${kind === "privacy" ? PRIVACY_PAGE_PATH : TERMS_PAGE_PATH}`;
+const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 
-function renderPage({ kind, language, body }) {
+/** A page's address from the root: `/faq.html`, `/en/faq.html`. The policy's two are PRIVACY_PAGE_PATH and TERMS_PAGE_PATH. */
+export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`;
+
+/** The game in a language, as the start page's own hreflang links name it (index.html). */
+export const gamePath = (language) => (language === "ko" ? "/" : `/?lang=${language}`);
+
+export { escapeHtml };
+
+/**
+ * One page: the header that links the game, every other page in the same
+ * language and the page in the other two; the hreflang alternates (all three
+ * and x-default, the Korean); the body; a foot with the contact address.
+ * `effective` is the policy's date line, which only the two policies have.
+ */
+export function renderDocumentPage({ kind, language, body, description, effective = null }) {
   const copy = COPY[language];
-  const others = LANGUAGES.filter((code) => code !== language);
-  const sibling = kind === "privacy" ? "terms" : "privacy";
+  const others = PAGE_LANGUAGES.filter((code) => code !== language);
   const title = `${copy[kind]} · ${GAME_NAME[language]}`;
-  const alternates = others.map((other) => `<link rel="alternate" hreflang="${other}" href="${pathFor(kind, other)}" />\n`).join("");
+  const alternates = [
+    ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
+    `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
+  ].join("");
+  const pages = PAGE_KINDS.map((other) =>
+    other === kind
+      ? `<a href="${pagePath(other, language)}" aria-current="page">${copy[other]}</a>\n`
+      : `<a href="${pagePath(other, language)}">${copy[other]}</a>\n`,
+  ).join("");
   const switches = others
-    .map((other) => `<a href="${pathFor(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
+    .map((other) => `<a href="${pagePath(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
     .join("");
+  const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
   return `<!doctype html>
 <html lang="${language}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapeHtml(title)}</title>
-<meta name="description" content="${escapeHtml(copy[kind])}" />
+<meta name="description" content="${escapeHtml(description ?? copy[kind])}" />
+<link rel="canonical" href="${pagePath(kind, language)}" />
 ${alternates}<link rel="icon" href="/icons/icon-192.png" />
 <style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
 </head>
 <body>
 <main>
-<nav aria-label="${escapeHtml(copy[kind])}">
-<a href="/">${copy.game}</a>
-<a href="${pathFor(sibling, language)}">${copy[sibling]}</a>
-${switches}</nav>
+<nav aria-label="${escapeHtml(GAME_NAME[language])}">
+<a href="${gamePath(language)}">${copy.game}</a>
+${pages}${switches}</nav>
 <h1>${copy[kind]}</h1>
-<p class="effective">${copy.effective}: ${EFFECTIVE_DATE[language]}</p>
-${body.trim()}
+${dated}${body.trim()}
+<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p></footer>
 </main>
 </body>
 </html>
@@ -648,17 +683,26 @@ const APP_LINES = {
   },
 };
 
-function forApp({ kind, language, body }) {
+/**
+ * A page's body with each `[from, to]` of `lines` swapped in, failing the
+ * build when a `from` is not in it. scripts/site-pages.mjs uses it for the
+ * apps' copies of its FAQ.
+ */
+export function withAppLines({ kind, language, body }, lines = []) {
   let text = body;
-  for (const [from, to] of APP_LINES[kind][language]) {
+  for (const [from, to] of lines) {
     if (!text.includes(from)) throw new Error(`legal-pages: the app's ${language} ${kind} page looks for a sentence its web page no longer has: ${from.slice(0, 60)}`);
     text = text.replace(from, () => to);
   }
   return { kind, language, body: text };
 }
 
+function forApp(page) {
+  return withAppLines(page, APP_LINES[page.kind][page.language]);
+}
+
 /**
- * Every page the build writes: `{ "privacy.html": "<!doctype html>...", ... }`,
+ * Every page this file writes: `{ "privacy.html": "<!doctype html>...", ... }`,
  * keyed by path from the root without its slash. `app` is the store apps'
  * build (`--mode app`), whose pages say what its ads and purchase do.
  */
@@ -671,5 +715,10 @@ export function renderLegalPages({ app = false } = {}) {
     { kind: "terms", language: "en", body: TERMS_EN },
     { kind: "terms", language: "ja", body: TERMS_JA },
   ];
-  return Object.fromEntries(pages.map((page) => [pathFor(page.kind, page.language).slice(1), renderPage(app ? forApp(page) : page)]));
+  return Object.fromEntries(
+    pages.map((page) => [
+      pagePath(page.kind, page.language).slice(1),
+      renderDocumentPage({ ...(app ? forApp(page) : page), effective: EFFECTIVE_DATE[page.language] }),
+    ]),
+  );
 }

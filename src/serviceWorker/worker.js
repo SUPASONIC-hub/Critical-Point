@@ -25,10 +25,14 @@
  *   /assets/*      kept first. A fingerprinted file never changes behind its
  *                  name, so the kept copy is the file. A miss goes to the
  *                  network and is kept on the way back.
- *   the policies   /privacy.html, /terms.html and their /en/ and /ja/ copies
- *                  (scripts/legal-pages.mjs): network first like the page,
- *                  and kept on the way back and in the warm-up, so a device
- *                  that has had a table up can read them offline.
+ *   the pages      /privacy.html, /terms.html, /about.html, /faq.html,
+ *                  /contact.html and their /en/ and /ja/ copies
+ *                  (scripts/legal-pages.mjs, scripts/site-pages.mjs): network
+ *                  first like the page, and kept on the way back and in the
+ *                  warm-up, so a device that has had a table up can read
+ *                  them -- and every link at the start screen's foot --
+ *                  offline. /robots.txt and /sitemap.xml are for crawlers
+ *                  and not touched.
  *   root images    the kept copy now, and a fresh one fetched behind it: their
  *                  names do not change when the picture does. With no
  *                  connection and no kept copy, the same picture at another
@@ -59,7 +63,7 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
-export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms)\.html$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact)\.html$/;
 
 export function cacheNameFor(release) {
   return `${CACHE_PREFIX}${release}`;

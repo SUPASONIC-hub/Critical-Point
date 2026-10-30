@@ -50,6 +50,8 @@ Capacitor 네이티브 브리지가 페이지 코드보다 먼저 `window.Capaci
 1. 서비스 워커를 끔(파일이 이미 기기 안에 있음).
 2. `__CP_APP__`가 `true`이고, `cp:app-native`가 `app/native/index.js`로 풀림(그 파일이 `app/node_modules`의 플러그인을 import).
 3. 광고·결제 코드는 따로 지연 청크(`ads`, `AppStorePanel`, `app-native`)로 나뉘어 첫 화면에 미리 받지 않습니다.
+4. 사이트 확인 두 가지(AdSense의 `google-adsense-account` 메타·`/ads.txt`, Search Console의 `google-site-verification` 메타)를 `ADSENSE_CLIENT`·`GOOGLE_SITE_VERIFICATION`이 있어도 넣지 않음: 앱 안 페이지는 크롤러·AdSense 심사가 읽지 않고, 앱 광고는 AdMob입니다.
+5. 정적 페이지(방침·약관·소개·FAQ·문의)는 첫 화면 링크가 여는 곳이라 앱에도 들어가되, 방침·약관·FAQ는 앱판 문장(AdMob 광고·광고 제거 결제)으로 바꾼 사본입니다(`scripts/legal-pages.mjs` `APP_LINES`, `scripts/site-pages.mjs` `APP_LINES`; 웹 문장이 바뀌어 찾을 문장이 없으면 빌드 실패). 소개·문의는 웹과 같고, 같이 만들어지는 `robots.txt`·`sitemap.xml`도 남습니다(앱 안에서 읽는 이 없음).
 
 Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`), 실 광고 단위는 `VITE_ADMOB_LIVE=true`일 때만(아래).
 
