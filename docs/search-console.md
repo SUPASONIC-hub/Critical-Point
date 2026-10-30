@@ -57,3 +57,5 @@ curl -s -o /dev/null -w '%{http_code}\n' https://critical-point-wn6p.onrender.co
 
 Render 하위 도메인은 「도메인」 속성(DNS 확인)을 쓸 수 없으므로 「URL 접두어」 속성으로 확인합니다. 자기 도메인으로
 옮기면 그 도메인으로 다시 확인합니다.
+
+방문 통계(Google 애널리틱스 4) 스위치 `GA_MEASUREMENT_ID`는 [analytics.md](analytics.md)에 있습니다.
