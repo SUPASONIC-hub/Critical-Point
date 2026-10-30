@@ -4,16 +4,18 @@ import test from "node:test";
 
 import { analyticsConfigSource, analyticsFor, readAnalyticsEnv, withAnalyticsTags, withSwaps } from "../../scripts/analytics-config.mjs";
 import { analyticsCspProblems, backendOriginProblems, cspProblems, inlineScriptProblems, readRenderYamlCsp, wildcardHostProblems } from "../../scripts/deploy-policy.mjs";
+import { ANALYTICS_NOTICE } from "../../scripts/legal-pages.mjs";
 import { renderStaticPages } from "../../scripts/site-pages.mjs";
 
 /**
- * Google Analytics 4 (scripts/analytics-config.mjs): off by default and
- * byte for byte the build without it; on, Google's tag on every page and the
+ * Google Analytics 4 (scripts/analytics-config.mjs): off by default, and the
+ * build without it but for the policy's notice of the change; on, Google's tag on every page and the
  * policy's section in three languages; never in the e2e or a debug build.
  */
 const ID = "G-CN8M5TQ77N";
 const on = analyticsFor({ id: ID, command: "build", mode: "production", debug: false });
 const GOOGLE = /googletagmanager|google-analytics|gtag|애널리틱스|Analytics|アナリティクス/;
+const POLICIES = { "privacy.html": "ko", "en/privacy.html": "en", "ja/privacy.html": "ja" };
 
 test("no variable is off, and a malformed ID fails the build", () => {
   assert.deepEqual(readAnalyticsEnv({}), { id: "" });
@@ -35,7 +37,7 @@ test("only a release build has it: not the dev server, the e2e build or a debug 
   assert.match(on.source, /gtag\("config","G-CN8M5TQ77N",\{allow_google_signals:false,allow_ad_personalization_signals:false\}\)/);
 });
 
-test("off, index.html and the fifteen pages are the ones without it", () => {
+test("off, index.html and the pages are the ones without it, but for the policy's one notice of the change", () => {
   const index = readFileSync("index.html", "utf8");
   assert.equal(withAnalyticsTags(index, null), index);
   assert.doesNotMatch(index, /googletagmanager|gtag/);
@@ -43,8 +45,23 @@ test("off, index.html and the fifteen pages are the ones without it", () => {
     const off = renderStaticPages(origin, { analytics: null });
     assert.deepEqual(off, renderStaticPages(origin));
     assert.equal(Object.keys(off).length, 15);
-    for (const [file, html] of Object.entries(off)) assert.doesNotMatch(html, GOOGLE, file);
+    for (const [file, html] of Object.entries(off)) {
+      const language = POLICIES[file];
+      if (!language) {
+        assert.doesNotMatch(html, GOOGLE, file);
+        continue;
+      }
+      // The policy says, seven days ahead (its section 12), that Google Analytics comes on 11-12, and nothing more.
+      assert.equal(html.split(ANALYTICS_NOTICE[language]).length, 2, file);
+      assert.doesNotMatch(html.replace(ANALYTICS_NOTICE[language], ""), GOOGLE, file);
+      assert.match(html, /<p class="effective">[^<]*(2026년 10월 25일|October 25, 2026|2026年10月25日)<\/p>\n<p><strong>/, file);
+    }
   }
+  assert.match(ANALYTICS_NOTICE.ko, /2026년 11월 12일부터 방문 통계를 위해 Google 애널리틱스\(Google LLC, 미국\)를 사용합니다/);
+  assert.match(ANALYTICS_NOTICE.en, /From November 12, 2026, we will use Google Analytics \(Google LLC, USA\)/);
+  assert.match(ANALYTICS_NOTICE.ja, /2026年11月12日から、訪問統計のためにGoogleアナリティクス\(Google LLC、米国\)を使用します/);
+  // The FAQ has no notice.
+  for (const file of ["faq.html", "en/faq.html", "ja/faq.html"]) assert.doesNotMatch(renderStaticPages("")[file], GOOGLE, file);
 });
 
 test("on, every page loads Google's tag and the file that configures it, with no inline script", () => {
@@ -77,6 +94,11 @@ test("on, the policy names what Google Analytics collects, who gets it, for how 
     for (const word of words) assert.ok(pages[file].includes(word), `${file}: ${word}`);
     assert.ok(pages[file].includes('<a href="https://tools.google.com/dlpage/gaoptout">'), file);
   }
+  // The notice of the change is gone once the change is in effect.
+  for (const [file, language] of Object.entries(POLICIES)) assert.ok(!pages[file].includes(ANALYTICS_NOTICE[language]), file);
+  assert.doesNotMatch(pages["privacy.html"], /변경 예고/);
+  assert.doesNotMatch(pages["en/privacy.html"], /Upcoming change/);
+  assert.doesNotMatch(pages["ja/privacy.html"], /変更の予告/);
   // The sentences that say there is no analytics are gone.
   assert.doesNotMatch(pages["privacy.html"], /분석용 쿠키나 외부 추적 도구를 쓰지 않습니다|<p>게임은 쿠키를 쓰지 않습니다/);
   assert.doesNotMatch(pages["en/privacy.html"], /no advertising or analytics cookies|<p>The game uses no cookies/);

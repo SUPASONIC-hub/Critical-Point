@@ -192,7 +192,20 @@ const items = (keys, language) => `<ul>${keys.map((key) => `<li>${escapeHtml(DAT
 const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
 const days = DATA_RETENTION_DAYS;
 
+/**
+ * The notice of the change, at the top of the policy in the build without
+ * Google Analytics: the policy's own section 12 promises a change seven days
+ * before it takes effect (사용자 결정 10-30: the notice now, the switch on
+ * 11-12). The build with it takes the line out (`ANALYTICS_POLICY`).
+ */
+export const ANALYTICS_NOTICE = {
+  ko: "<p><strong>변경 예고:</strong> 2026년 11월 12일부터 방문 통계를 위해 Google 애널리틱스(Google LLC, 미국)를 사용합니다. 수집 항목·보유 기간·거부 방법은 그날 시행되는 개정 방침 2번 (5)에 적습니다.</p>",
+  en: "<p><strong>Upcoming change:</strong> From November 12, 2026, we will use Google Analytics (Google LLC, USA) for visit statistics. What it collects, how long it is kept and how to opt out will be set out in section 2 (e) of the revised policy that takes effect that day.</p>",
+  ja: "<p><strong>変更の予告:</strong> 2026年11月12日から、訪問統計のためにGoogleアナリティクス(Google LLC、米国)を使用します。収集する項目、保有期間、拒否する方法は、同日に施行される改定後の本方針の2の(5)に記載します。</p>",
+};
+
 const PRIVACY_KO = `
+${ANALYTICS_NOTICE.ko}
 <p>임계점 개발자(이하 “개발자”)는 게임 「임계점: CRITICAL POINT」(이하 “게임”)를 운영하면서 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고 관련 고충을 빠르게 처리하기 위해 이 방침을 둡니다.</p>
 
 <h2>1. 요약</h2>
@@ -275,6 +288,7 @@ const PRIVACY_KO = `
 `;
 
 const PRIVACY_EN = `
+${ANALYTICS_NOTICE.en}
 <p>This policy explains what the developer of Critical Point (“we”) processes when you play the game, why, and for how long.</p>
 
 <h2>1. In short</h2>
@@ -356,6 +370,7 @@ const PRIVACY_EN = `
 `;
 
 const PRIVACY_JA = `
+${ANALYTICS_NOTICE.ja}
 <p>臨界点開発者(以下「開発者」)は、ゲーム『臨界点: CRITICAL POINT』(以下「本ゲーム」)を運営するにあたり、大韓民国の「個人情報保護法」に従って利用者の個人情報を保護し、関連する苦情を速やかに処理するため、本方針を定めます。</p>
 
 <h2>1. 概要</h2>
@@ -449,6 +464,7 @@ export const ANALYTICS_EFFECTIVE_DATE = { ko: "2026년 11월 12일", en: "Novemb
 
 export const ANALYTICS_POLICY = {
   ko: [
+    [`${ANALYTICS_NOTICE.ko}\n`, ""],
     [
       "서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>",
       "게임 서버로 가는 정보는 아래 2번 (1)~(4)의 네 가지뿐이고, 방문 통계는 2번 (5)와 같이 Google 애널리틱스로 갑니다.</li>",
@@ -478,6 +494,7 @@ export const ANALYTICS_POLICY = {
     ["게시판을 쓰지 않으면 됩니다. 게임의", "게시판을 쓰지 않고, 방문 통계는 2번 (5)의 방법으로 거부하면 됩니다. 게임의"],
   ],
   en: [
+    [`${ANALYTICS_NOTICE.en}\n`, ""],
     [
       "Only the four kinds of data in section 2 ever reach a server.</li>",
       "Only the four kinds of data in section 2 (a)–(d) ever reach the game's server; visit statistics go to Google Analytics as described in (e).</li>",
@@ -507,6 +524,7 @@ export const ANALYTICS_POLICY = {
     ["do not use online save or the board. The whole", "do not use online save or the board, and opt out of visit statistics as described in section 2 (e). The whole"],
   ],
   ja: [
+    [`${ANALYTICS_NOTICE.ja}\n`, ""],
     [
       "サーバーに送られる情報は、下記2の4種類だけです。</li>",
       "ゲームのサーバーに送られる情報は下記2の(1)~(4)の4種類だけで、訪問統計は2の(5)のとおりGoogleアナリティクスに送られます。</li>",
