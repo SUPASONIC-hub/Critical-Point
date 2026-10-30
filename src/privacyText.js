@@ -60,6 +60,12 @@ export function anonymizeSensitiveText(text = "") {
  */
 export const PRIVACY_PAGE_PATH = "/privacy.html";
 export const TERMS_PAGE_PATH = "/terms.html";
+/**
+ * Every plain page beside the build, `/<name>.html`, in the order the start
+ * screen's foot and each page's header list them: the game's about, FAQ and
+ * contact pages (scripts/site-pages.mjs) and the two policies.
+ */
+export const SITE_PAGES = ["about", "faq", "contact", "privacy", "terms"];
 
 /**
  * A policy page in the page's language: Korean at the root, the other
