@@ -52,6 +52,14 @@ Capacitor 네이티브 브리지가 페이지 코드보다 먼저 `window.Capaci
 3. 광고·결제 코드는 따로 지연 청크(`ads`, `AppStorePanel`, `app-native`)로 나뉘어 첫 화면에 미리 받지 않습니다.
 4. 사이트 확인 두 가지(AdSense의 `google-adsense-account` 메타·`/ads.txt`, Search Console의 `google-site-verification` 메타)를 `ADSENSE_CLIENT`·`GOOGLE_SITE_VERIFICATION`이 있어도 넣지 않음: 앱 안 페이지는 크롤러·AdSense 심사가 읽지 않고, 앱 광고는 AdMob입니다.
 5. 정적 페이지(방침·약관·소개·FAQ·문의)는 첫 화면 링크가 여는 곳이라 앱에도 들어가되, 방침·약관·FAQ는 앱판 문장(AdMob 광고·광고 제거 결제)으로 바꾼 사본입니다(`scripts/legal-pages.mjs` `APP_LINES`, `scripts/site-pages.mjs` `APP_LINES`; 웹 문장이 바뀌어 찾을 문장이 없으면 빌드 실패). 소개·문의는 웹과 같고, 같이 만들어지는 `robots.txt`·`sitemap.xml`도 남습니다(앱 안에서 읽는 이 없음).
+6. Google 애널리틱스를 `GA_MEASUREMENT_ID`가 있어도 넣지 않음(`analyticsFor`가 앱 모드에서 null: 태그·`analytics-<hash>.js`·방침/FAQ의 GA 문장 없음). 앱 웹뷰 안 GA는 앱 방침과 스토어 데이터 안전 항목에 추적 도구로 적어야 하기 때문입니다. 같은 이유로 앱판 방침에는 웹 방침 맨 위의 「11-12부터 Google 애널리틱스」 변경 예고(`ANALYTICS_NOTICE`)도 없습니다: 앱은 그날에도 GA를 켜지 않으니 예고할 변경이 없습니다.
+
+### 홈 화면 이름 (세 언어)
+
+「임계점」 / 「Critical Point」 / 「臨界点」: 새로 지은 이름이 아니라 사이트 페이지가 쓰는 `GAME_NAME`(scripts/legal-pages.mjs)에서 콜론 앞, 한국어가 웹 manifest `short_name`인 것과 같은 꼴입니다. `npm run check:app`이 아래 자리를 모두 봅니다.
+
+- iOS: `app/ios/App/App/{ko,en,ja}.lproj/InfoPlist.strings`의 `CFBundleDisplayName`·`CFBundleName`(ATT 문구와 같은 파일), `Info.plist` `CFBundleLocalizations`와 Xcode `knownRegions`에 ko·en·ja.
+- 안드로이드: `app/android/app/src/main/res/values{,-en,-ja}/strings.xml`의 `app_name`·`title_activity_main`(기본 `values`가 한국어이고, 영어·일본어 기기는 `values-en`·`values-ja`의 이름을 씁니다. 그 밖의 언어는 한국어 이름).
 
 Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`), 실 광고 단위는 `VITE_ADMOB_LIVE=true`일 때만(아래).
 
