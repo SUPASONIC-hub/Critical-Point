@@ -14,6 +14,11 @@
  * - AdMob: each platform has an app ID in the native settings (Android's
  *   manifest meta-data, iOS's GADApplicationIdentifier), iOS has the tracking
  *   question in Korean and English and Google's SKAdNetwork ID.
+ * - The home screen name is in Korean, English and Japanese on both
+ *   platforms, the name the site's pages already use (GAME_NAME before its
+ *   colon, scripts/legal-pages.mjs): iOS <lang>.lproj/InfoPlist.strings with
+ *   the language in CFBundleLocalizations and knownRegions, Android
+ *   values{,-en,-ja}/strings.xml.
  * - The plugins are pinned to exact versions, and the product is remove_ads.
  * - Google's test IDs and the zero placeholders in native/adUnits.js are a
  *   warning here and an error with `--release`: a store build must carry the
@@ -22,6 +27,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { GAME_NAME } from "../scripts/legal-pages.mjs";
 
 const app = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(app, "..");
@@ -91,6 +98,26 @@ for (const language of ["ko", "en", "ja"]) {
   const file = path.join(app, "ios", "App", "App", `${language}.lproj`, "InfoPlist.strings");
   needs(existsSync(file) && /"NSUserTrackingUsageDescription" = ".+";/.test(readFileSync(file, "utf8")), `ios/App/App/${language}.lproj/InfoPlist.strings has no NSUserTrackingUsageDescription.`);
   needs(pbxproj.includes(`path = ${language}.lproj/InfoPlist.strings;`), `The Xcode project does not list ${language}.lproj/InfoPlist.strings.`);
+}
+
+// The home screen name in three languages (the Korean one is the web manifest's short_name).
+const regions = /knownRegions = \(([^)]*)\)/.exec(pbxproj)?.[1] ?? "";
+const localizations = /<key>CFBundleLocalizations<\/key>\s*<array>([\s\S]*?)<\/array>/.exec(plist)?.[1] ?? "";
+for (const language of ["ko", "en", "ja"]) {
+  const name = GAME_NAME[language].split(":")[0];
+  const file = path.join(app, "ios", "App", "App", `${language}.lproj`, "InfoPlist.strings");
+  const iosStrings = existsSync(file) ? readFileSync(file, "utf8") : "";
+  for (const key of ["CFBundleDisplayName", "CFBundleName"]) {
+    needs(iosStrings.includes(`"${key}" = "${name}";`), `ios/App/App/${language}.lproj/InfoPlist.strings does not name the app "${name}" (${key}).`);
+  }
+  needs(regions.split(/[\s,]+/).includes(language), `The Xcode project's knownRegions has no ${language}.`);
+  needs(localizations.includes(`<string>${language}</string>`), `Info.plist CFBundleLocalizations has no ${language}.`);
+  const values = language === "ko" ? "values" : `values-${language}`;
+  const xml = path.join(app, "android", "app", "src", "main", "res", values, "strings.xml");
+  const androidStrings = existsSync(xml) ? readFileSync(xml, "utf8") : "";
+  for (const key of ["app_name", "title_activity_main"]) {
+    needs(androidStrings.includes(`<string name="${key}">${name}</string>`), `android res/${values}/strings.xml does not name the app "${name}" (${key}).`);
+  }
 }
 
 // The ad units the page asks for.

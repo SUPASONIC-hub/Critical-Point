@@ -7,7 +7,9 @@
  * service worker off (vite.config.js): WKWebView does not run one for the
  * app's own scheme, and every file is already on the device. It also leaves
  * out the AdSense and Search Console site verification, which no crawler
- * reads inside the app.
+ * reads inside the app, and Google Analytics even with GA_MEASUREMENT_ID set:
+ * the app's policy and the stores' data safety answers declare no tracker.
+ * Its privacy policy drops the web's notice that Google Analytics is coming.
  *
  * The Supabase keys come from the environment as they do for the site's build
  * (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY); without them the app runs with

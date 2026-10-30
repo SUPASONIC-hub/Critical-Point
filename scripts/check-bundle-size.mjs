@@ -552,7 +552,9 @@ const budgets = [
   // -> 196,161 raw on 2026-10-29, adsense-readiness: the foot's five links wrap on a narrow screen (.intro-legal flex-wrap). Measured 196,157 / 36,560; the gzip holds.
   // -> 196,345 / 36,599 on 2026-10-30, picker-narrow over main c3b40b6f (#376): on 360px or less the three language pills keep one row (12px type)
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_345, maxGzip: 36_599 },
+  // -> 196,428 / 36,624 on 2026-10-30, ja-hand-narrow over main c865d984 (#380): a Japanese card label on 360px or less a size
+  // down (play.css), so a five-card hand keeps two lines in a CJK face. Measured 196,428 / 36,620 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_428, maxGzip: 36_624 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1110,8 +1112,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The ranking save lines in the page's language (ranking-save-copy, over main
  * c39870a7; the Korean only by the entry's hashed names): 423,114, 472,617
  * and 478,413.
+ * A Japanese card label on 360px or less a size down (ja-hand-narrow, over
+ * main c865d984; the index CSS carries the rule): 423,150, 472,646 and 478,442.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_118, en: 472_621, ja: 478_417 };
+const FIRST_PAINT_BUDGETS = { ko: 423_154, en: 472_650, ja: 478_446 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
