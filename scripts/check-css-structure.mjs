@@ -275,7 +275,10 @@ const fileBudgets = {
   // -> 56429 on 2026-10-30, measured: an English page on a 360px phone sets the
   // bank rail tighter (10px labels, 5px pills, 3px gap) so Audit n/4 keeps the
   // run's line on Stake and Vault's row.
-  "play.css": { lines: 2931, bytes: 56429 },
+  // -> 56343 on 2026-10-25, measured: the board's mark in the pot's label
+  // (「고점 판」 C-10, 「숨 고른 판」 C-7), two colour rules and no line more.
+  // -> 56545 on 2026-10-30, measured: the two together (#316 over #224 0d29141a).
+  "play.css": { lines: 2931, bytes: 56545 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

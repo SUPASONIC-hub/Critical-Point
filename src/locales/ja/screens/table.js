@@ -13,6 +13,8 @@ export default {
   stage: {
     label: "臨界点テーブル",
     pot: "この勝負",
+    markPeak: "山場の勝負",
+    markBreather: "ひと息の勝負",
     combo: "コンボ",
     runPot: "賭け金",
     vault: "金庫",
@@ -167,6 +169,7 @@ export default {
     logicPaid: "ロジックコンボ {streak}、倍率 {bonus}。",
     logicGrow: "{type}を続けた。{paid}",
     logicBuild: "{type} {held}/{hold}。同じタイプの3枚目からコンボが上がる。{paid}",
+    logicBuildShort: "{type} {held}/{hold}。同じタイプの2枚目からコンボが上がる。{paid}",
     logicSwitch: "熱が上がった勝負で{type}に切り替えた。転換でコンボが上がった。{paid}",
     logicKeep: "守っていたタイプのカードがこのシーンになかった。コンボはそのままだ。{paid}",
     logicBreak: "熱が上がっていないのに{type}に切り替えた。ロジックコンボは0、また1/{hold}から数える。",

@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
-import { MUTATIONS } from "../../src/gauntlet/gauntletEngine.js";
+import { BASE_SCHEMA, describeMutations, getBoardMark, MUTATIONS, openCaseRun, PEAK_CHIPS, PEAK_WALL, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
+import { ACT_START_CASES } from "../../src/gauntlet/actCardGate.js";
 import {
   ALL_RULES,
   getTableRules,
@@ -10,8 +11,10 @@ import {
   getUnlockKicker,
   introFor,
   MUTATION_RULES,
+  PEAK_CASES,
   rulesFor,
   STAGED,
+  STORY_RULES,
   TABLE_RULES,
   UNLOCK_INTRO_KICKER,
   UNLOCK_LADDER,
@@ -55,7 +58,7 @@ test("each step is the one the author decided", () => {
 });
 
 test("a case the ladder does not name, and a run begun with NEW GAME+, play under everything", () => {
-  for (const caseId of [...CASE_SEQUENCE.slice(PROLOGUES.length), "no-such-case", undefined, null]) {
+  for (const caseId of [...CASE_SEQUENCE.slice(PROLOGUES.length).filter((id) => !PEAK_CASES.includes(id)), "no-such-case", undefined, null]) {
     assert.equal(rulesFor(caseId, staged), ALL_RULES, `${caseId}`);
     assert.deepEqual(introFor(caseId, staged), []);
   }
@@ -71,12 +74,41 @@ test("a case the ladder does not name, and a run begun with NEW GAME+, play unde
 });
 
 test("with the switch off every case plays under everything and has nothing to introduce", () => {
-  for (const caseId of [...CASE_SEQUENCE, undefined]) {
+  for (const caseId of [...CASE_SEQUENCE.filter((id) => !PEAK_CASES.includes(id)), undefined]) {
     assert.equal(rulesFor(caseId, { staged: false }), ALL_RULES);
     assert.equal(getTableRules(caseId, {}, false), ALL_RULES);
     assert.deepEqual(introFor(caseId, { staged: false }), []);
     assert.deepEqual(getUnlockIntro(caseId, {}, false), []);
   }
+});
+
+test("an act's last case plays 「고점 판」: everything and the peak, under any switch, NEW GAME+ and story run alike (C-10)", () => {
+  // The case before each act's first (B-11's act cards), the finale for the last act, and 사건 41 for act 7, whose last is a rest.
+  const lastOfAct = ACT_START_CASES.slice(1).map((caseId) => CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1]).map((caseId) => (caseId === "case42" ? "case41" : caseId));
+  assert.deepEqual([...PEAK_CASES], [...lastOfAct, "final"]);
+  assert.ok(!PEAK_CASES.some((caseId) => UNLOCK_LADDER.some((step) => step.caseId === caseId)), "no peak is a step of the ladder");
+  for (const caseId of PEAK_CASES) {
+    for (const options of [staged, { staged: false }, { staged: true, veteran: true }]) {
+      const rules = rulesFor(caseId, options);
+      assert.deepEqual([...rules].sort(), [...ALL_RULES, "peak"].sort(), caseId);
+      assert.equal(rulesFor(caseId, options), rules, "the same frozen set each time");
+      assert.throws(() => rules.add("x"));
+    }
+    assert.deepEqual([...rulesFor(caseId, { staged: true, story: true })].sort(), [...STORY_RULES, "peak"].sort());
+    assert.deepEqual(introFor(caseId, staged), [`막의 마지막 사건입니다. 이 사건의 판은 모두 벽이 ${PEAK_WALL} 가까워지고 칩이 ${PEAK_CHIPS}배입니다.`]);
+    assert.equal(getUnlockKicker(caseId), "PEAK TABLE · 고점 판");
+  }
+  // The board: every board of the case, the case's first (opened or REBOOT) and every one after it, once.
+  const peak = rulesFor("case07", staged);
+  const opened = openCaseRun({}, { rules: peak });
+  assert.deepEqual([opened.schema.wallMin, opened.schema.wallMax, opened.schema.chipsScale], [BASE_SCHEMA.wallMin - PEAK_WALL, BASE_SCHEMA.wallMax - PEAK_WALL, PEAK_CHIPS]);
+  assert.equal(getBoardMark(opened.schema), "peak");
+  const next = resolveWindow({ run: opened, window: { status: "cashed", gauge: 20, pushes: 1 }, card: { id: "a", label: "a", effect: { capital: 9 }, next: "x" }, rules: peak }).nextRun.schema;
+  assert.deepEqual([next.wallMin, next.chipsScale], [opened.schema.wallMin, opened.schema.chipsScale], "dealt once a board, never twice");
+  const reboot = resolveWindow({ run: openCaseRun({}, { rules: ALL_RULES }), window: { status: "cashed", gauge: 20, pushes: 1 }, card: { id: "a", label: "a", effect: { capital: 9 }, next: "x" }, caseClosed: true, rules: ALL_RULES, nextRules: peak }).nextRun.schema;
+  assert.deepEqual([reboot.mutations, reboot.wallMin], [["reboot", "peak"], BASE_SCHEMA.wallMin - PEAK_WALL], "the closing window deals the next case's peak with its REBOOT");
+  assert.equal(getBoardMark(openCaseRun({}, { rules: ALL_RULES }).schema), null, "an ordinary case's board is no peak");
+  assert.deepEqual(describeMutations(opened.schema), [], "and the peak is no rule the board prints");
 });
 
 test("the switch is on, and the functions asked without a flag answer for it", () => {

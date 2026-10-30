@@ -24,6 +24,9 @@ const tableCopy = {
   stage: {
     label: "임계점 테이블",
     pot: "이번 판",
+    // A marked board's label in pot's place (GauntletStage `getBoardMark`): C-10's act end, C-7's pass.
+    markPeak: "고점 판",
+    markBreather: "숨 고른 판",
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
@@ -178,6 +181,8 @@ const tableCopy = {
     logicPaid: "논리 콤보 {streak}, 배율 {bonus}.",
     logicGrow: "{type}{particle} 이어 갔다. {paid}",
     logicBuild: "{type} {held}/{hold}. 같은 유형 세 번째부터 콤보가 오른다. {paid}",
+    // The same with FIELD NOTES (C-7), whose hold is one window shorter.
+    logicBuildShort: "{type} {held}/{hold}. 같은 유형 두 번째부터 콤보가 오른다. {paid}",
     logicSwitch: "열기가 오른 판에서 {type}{particle} 바꿨다. 전환으로 콤보가 올랐다. {paid}",
     logicKeep: "지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. {paid}",
     logicBreak: "열기가 오르지 않았는데 {type}{particle} 바꿨다. 논리 콤보는 0, 다시 1/{hold}부터 센다.",

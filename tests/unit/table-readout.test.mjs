@@ -27,7 +27,8 @@ import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
  */
 
 /** A case the whole table is open in, and two of the ladder's earlier steps. */
-const FULL_TABLE = "final";
+// Not "final": an act's last case plays 「고점 판」 (C-10), a rule more than the whole table.
+const FULL_TABLE = "case49";
 const NO_RULES_YET = "prologue01";
 const BEFORE_OVERCLOCK = "prologue03";
 

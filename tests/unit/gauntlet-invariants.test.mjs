@@ -41,7 +41,7 @@ import {
   suspendWindow,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS, RELICS } from "../../src/gauntlet/relics.js";
-import { ALL_RULES, MUTATION_RULES, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
+import { ALL_RULES, MUTATION_RULES, rulesFor, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
 import { formatMultiplier } from "../../src/gauntlet/tableReadout.js";
 
 /**
@@ -56,8 +56,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const card = (id, effect) => ({ id, label: id, effect, next: "x" });
 const staked = card("a", { capital: 9, trust: -12 });
 
-/** Every subset of the relics that change a board's numbers, and all thirteen together. */
-const BOARD_RELICS = ["highRoller", "lockpick", "heatSink", "coldBlood", "kineticGrip", "steadyAnchor", "glassLens"];
+/** Every subset of the relics that change a board's numbers, and all twelve together. */
+const BOARD_RELICS = ["heatSink", "coldBlood", "kineticGrip", "carbonCopy", "testimony", "frontPage"];
 const RELIC_SETS = [
   ...Array.from({ length: 2 ** BOARD_RELICS.length }, (_, mask) => BOARD_RELICS.filter((_id, bit) => mask & (1 << bit))),
   [...RELIC_IDS],
@@ -69,9 +69,12 @@ const CLOSURES = [
   { outcome: "bust", cause: "timeout" },
 ];
 
-/** Every closure the rules can build a board from: about a hundred thousand. */
+/** The rules a board is dealt under: the engine's every-rule default, and an act's last case (「고점 판」, C-10). */
+const RULE_SETS = [undefined, rulesFor("case07")];
+
+/** Every closure the rules can build a board from: about three hundred thousand. */
 function* everyClosure() {
-  for (const relics of RELIC_SETS) {
+  for (const rules of RULE_SETS) for (const relics of RELIC_SETS) {
     for (const streak of [0, 1, 5]) {
       for (const windowIndex of [0, 460]) {
         for (const stanceMastery of MASTERIES) {
@@ -81,7 +84,7 @@ function* everyClosure() {
                 for (const pushes of [0, 4]) {
                   for (const { outcome, cause } of CLOSURES) {
                     for (const caseClosed of [false, true]) {
-                      yield { outcome, cause, gauge, pushes, streak, burnAxis: "trust", caseClosed, relics, focusMode, focusCharge, focusHits: focusCharge ? 4 : 0, stanceMastery, windowIndex };
+                      yield { outcome, cause, gauge, pushes, streak, burnAxis: "trust", caseClosed, relics, focusMode, focusCharge, focusHits: focusCharge ? 4 : 0, stanceMastery, windowIndex, ...(rules ? { rules } : null) };
                     }
                   }
                 }
@@ -119,20 +122,29 @@ test("every board the rules can deal keeps the sealed-card rule and its start un
     assertBoard(schema, () => JSON.stringify(closure));
     boards += 1;
     if (schema.sealHighest) sealed += 1;
-    if (schema.sealHighest && schema.sealBreak < SEAL_BREAK_GAUGE && !closure.relics.some((id) => id === "lockpick" || id === "glassLens") && closure.focusMode !== "expose") tightened += 1;
+    if (schema.sealHighest && schema.sealBreak < SEAL_BREAK_GAUGE && closure.focusMode !== "expose") tightened += 1;
     if (boards % 499 === 0) assert.deepEqual(normalizeSchema(schema), schema, "a dealt board is already normal");
   }
   assert.ok(boards > 100_000, `the enumeration is the point: ${boards} boards`);
   assert.ok(sealed > 10_000, `and it has to reach sealed boards: ${sealed}`);
   assert.ok(tightened > 0, "including the ones the rule had to make room on");
-  // The board that broke it: HIGH ROLLER alone, a streak, a charged STRIKE, a cold cash.
+  // The board that broke it (HIGH ROLLER's closer wall, until C-7): a streak, a charged STRIKE, a cold cash.
   const { nextRun } = resolveWindow({
-    run: normalizeRunState({ relics: ["highRoller"], streak: 2 }),
+    run: normalizeRunState({ streak: 2 }),
     window: { status: "cashed", gauge: 22, pushes: 0, focus: 80, focusMode: "strike", focusHits: 3 },
     card: staked,
   });
-  assert.deepEqual([nextRun.schema.stepMax, nextRun.schema.wallMin], [24, 52], "the push and the wall are what their rules made them");
-  assert.ok(nextRun.schema.sealHighest && nextRun.schema.sealBreak < SEAL_BREAK_GAUGE, "and the seal opens earlier to make room");
+  assert.deepEqual([nextRun.schema.stepMax, nextRun.schema.wallMin], [24, 56], "the push and the wall are what their rules made them");
+  assert.deepEqual([nextRun.schema.sealHighest, nextRun.schema.sealBreak], [true, SEAL_BREAK_GAUGE], "with the wall where it was, the seal has room");
+  // The same board on a peak table, whose wall is 5 closer, is the one that would break it now.
+  const peak = resolveWindow({
+    run: normalizeRunState({ streak: 2 }),
+    window: { status: "cashed", gauge: 22, pushes: 0, focus: 80, focusMode: "strike", focusHits: 3 },
+    card: staked,
+    rules: rulesFor("case07"),
+  }).nextRun.schema;
+  assert.deepEqual([peak.stepMax, peak.wallMin], [24, 51], "the push and the wall are what their rules made them");
+  assert.ok(peak.sealHighest && peak.sealBreak < SEAL_BREAK_GAUGE, "and the seal opens earlier to make room");
 });
 
 /**
@@ -176,7 +188,7 @@ test("with every rule, a board and a settlement are what they are with no rules 
   assert.deepEqual([...STEPS.at(-1).rules].sort(), [...ALL_RULES].sort(), "the last step is the whole table");
   let checked = 0;
   for (const closure of everyClosure()) {
-    if ((checked += 1) % 211) continue;
+    if (closure.rules || (checked += 1) % 211) continue;
     const plain = buildNextSchema(closure);
     assert.deepEqual(buildNextSchema({ ...closure, rules: ALL_RULES }), plain);
     assert.deepEqual(buildNextSchema({ ...closure, rules: STEPS.at(-1).rules }), plain);
@@ -350,7 +362,7 @@ test("a closed window ignores every input", () => {
 test("a resumed window is live, under its wall and inside its clock, whatever the save says", () => {
   for (let sample = 0; sample < 600; sample += 1) {
     const seed = `resume:${sample}`;
-    const schema = sample % 3 ? BASE_SCHEMA : applyRelics({ ...BASE_SCHEMA, startGauge: 22, wallMin: 50, wallMax: 86 }, ["highRoller"]);
+    const schema = sample % 3 ? BASE_SCHEMA : applyRelics({ ...BASE_SCHEMA, startGauge: 22, wallMin: 46, wallMax: 82 }, ["testimony"]);
     const tampered = { gauge: seededUnit(`${seed}:g`) * 400 - 50, elapsed: seededUnit(`${seed}:e`) * 400 - 50, pushes: 3.7, selectedId: "a", focusMode: "nope", wall: 1, status: "cashed" };
     const resumed = createWindow({ schema, seed, resume: tampered });
     const fresh = createWindow({ schema, seed });
@@ -473,7 +485,7 @@ test("a rule or a count the save holds as null takes the default, not zero", () 
 
 test("a replayed case is practice: the table plays, and the season keeps nothing from it", () => {
   const first = { pushRecord: { ...createTableRecord([]), busts: 2, cashes: 6, bestMultiplier: 8 } };
-  let run = normalizeRunState({ vault: 5000, handVault: 400, relics: ["splint"], relicOffer: ["encore"], stanceMastery: { strike: 2 }, bestMultiplier: 8, schema: { ...BASE_SCHEMA, mutations: ["reboot"] } });
+  let run = normalizeRunState({ vault: 5000, handVault: 400, relics: ["carbonCopy"], relicOffer: ["encore"], stanceMastery: { strike: 2 }, bestMultiplier: 8, schema: { ...BASE_SCHEMA, mutations: ["reboot"] } });
   run = openCaseRun(run, { replayOf: first });
   assert.ok(run.practice);
   assert.deepEqual(run.relicOffer, [], "no draft is dealt at a replay's first table");
@@ -489,7 +501,7 @@ test("a replayed case is practice: the table plays, and the season keeps nothing
     else assert.deepEqual([settled.verdict.practice, settled.verdict.secured], [true, 0]);
   }
   assert.equal(run.practice, null);
-  assert.deepEqual([run.vault, run.handVault, run.relics, run.relicOffer], [5000, 400, ["splint"], ["encore"]], "the vault, the relics and the waiting draft are as they were");
+  assert.deepEqual([run.vault, run.handVault, run.relics, run.relicOffer], [5000, 400, ["carbonCopy"], ["encore"]], "the vault, the relics and the waiting draft are as they were");
   assert.deepEqual(run.stanceMastery, { strike: 2, steady: 0, expose: 0 });
   assert.equal(run.bestMultiplier, 8);
   assert.deepEqual(createTableRecord(log), first.pushRecord, "the summary keeps the record of the first close");
@@ -520,9 +532,12 @@ test("the rules a sentence quotes are the rules the table applies", () => {
   assert.ok(MUTATIONS.silence.text.includes(`${bust.seconds}초`));
   assert.ok(MUTATIONS.blackout.text.includes(`${BASE_SCHEMA.wallMin - bust.wallMin} 가까워진다`));
   assert.ok(MUTATIONS.coldFeet.text.includes(`열기 ${SEAL_BREAK_GAUGE}을`));
-  assert.ok(RELICS.lockpick.text.includes(`${applyRelics(BASE_SCHEMA, ["lockpick"]).sealBreak}에서 열린다`));
   assert.ok(RELICS.coldBlood.text.includes("22가 아니라 11에서"));
-  assert.ok(RELICS.steadyAnchor.text.includes("열기 4를 더"));
+  // C-7's five quote their own numbers.
+  const blackout = resolveWindow({ run: normalizeRunState({ relics: ["carbonCopy"] }), window: { status: "bust", cause: "push", gauge: 60 }, card: staked }).nextRun.schema;
+  assert.ok(RELICS.carbonCopy.text.includes(`6이 아니라 ${BASE_SCHEMA.wallMin - blackout.wallMin}만 당긴다`));
+  assert.ok(RELICS.auditContact.text.includes("5칸이 차야"));
+  assert.ok(RELICS.fieldNote.text.includes("2번째부터"));
   for (const text of [...Object.values(MUTATIONS), ...Object.values(RELICS)].map((item) => item.text)) {
     assert.doesNotMatch(text, /\$\{|undefined|NaN/, text);
   }

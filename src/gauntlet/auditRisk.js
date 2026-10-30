@@ -22,8 +22,10 @@ import { fill } from "../locale.js";
  *
  * Judged once, on the window that closes a case: with `AUDIT_LIMIT` or more,
  * one part in `AUDIT_SHARE` of what the case moves to the vault is lost, and
- * the hand's share by the same part (decisions 3 and 4). No draw, no tool to
- * soften it (decision 12).
+ * the hand's share by the same part (decisions 3 and 4). No draw. Decision 12
+ * said no tool softens it either; C-7 (user, 2026-10-25, the draft's choice 1)
+ * gave the draft one that does: AUDIT CONTACT (「감사실 연줄」) moves the limit
+ * `AUDIT_CONTACT_SLACK` further for the run that holds it (`getAuditLimit`).
  *
  * Where it lives (decision 6): nowhere new. The case's own decision log holds
  * every window's `threshold` (state/useChoiceCommit.js), and the log is fresh
@@ -55,6 +57,13 @@ export const AUDIT_HEAT = 40;
 export const AUDIT_LIMIT = 4;
 export const AUDIT_RELIEF = 2;
 export const AUDIT_SHARE = 4;
+/** How much further AUDIT CONTACT moves the limit (C-7). */
+export const AUDIT_CONTACT_SLACK = 1;
+
+/** The audit's limit for a run: `AUDIT_LIMIT`, `AUDIT_CONTACT_SLACK` more with AUDIT CONTACT among its relics. */
+export function getAuditLimit(relics) {
+  return AUDIT_LIMIT + (Array.isArray(relics) && relics.includes("auditContact") ? AUDIT_CONTACT_SLACK : 0);
+}
 /**
  * HEAT DEBT's heat (`HEAT_DEBT_GAUGE`, tableRules.js), where a cash takes the
  * audit down. Written here and not imported, for the same reason. A unit
@@ -110,10 +119,12 @@ export function countAudit(log = []) {
  * vault and from the hand's share of it, by the same part, so the hand's
  * vault stays inside the vault.
  */
-export function judgeAudit({ count, secured, hand }) {
-  const caught = count >= AUDIT_LIMIT;
+export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT }) {
+  const caught = count >= limit;
   return {
     caught,
+    // AUDIT CONTACT's slack was what kept it from catching (`relicProcs`).
+    ...(!caught && count >= AUDIT_LIMIT ? { spared: true } : {}),
     lost: caught ? Math.floor(Math.max(0, secured) / AUDIT_SHARE) : 0,
     handLost: caught ? Math.floor(Math.max(0, hand) / AUDIT_SHARE) : 0,
   };
@@ -127,7 +138,7 @@ export function judgeAudit({ count, secured, hand }) {
 export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand }) {
   if (!isAuditOn(run, rules)) return null;
   const after = addAudit(count, auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }));
-  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand }) : { caught: false, lost: 0, handLost: 0 }) };
+  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit: getAuditLimit(run.relics) }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 
 /**
@@ -153,7 +164,8 @@ export function readAudit(run, count, win) {
   if (!run || count == null) return null;
   const now = Math.max(0, Math.trunc(Number(count) || 0));
   const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
-  const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
+  const limit = getAuditLimit(run.relics);
+  const reading = { count: now, limit, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= limit - 1 };
   return { ...reading, spoken: describeAuditIfCash(reading) };
 }
 
@@ -197,5 +209,6 @@ export function describeAuditLedger(log, summary, caseId) {
   if (!log.some((entry) => entry?.threshold) || log.some((entry) => entry?.assistStory || entry?.threshold?.firstRecord)) return null;
   if (!(summary?.tableRules >= 3) || CASES_BEFORE_AUDIT.includes(caseId)) return null;
   const count = countAudit(log);
-  return `${fill(auditCopy.ledger, { count, limit: AUDIT_LIMIT })}${count < AUDIT_LIMIT ? "" : auditCopy.caught}`;
+  const limit = getAuditLimit(summary?.relics);
+  return `${fill(auditCopy.ledger, { count, limit })}${count < limit ? "" : auditCopy.caught}`;
 }

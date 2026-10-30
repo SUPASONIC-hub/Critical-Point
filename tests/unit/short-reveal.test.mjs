@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
-import { ALL_RULES, getTableRules, getUnlockIntro, isTableTaught, STAGED, STORY_RULES, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
+import { ALL_RULES, getTableRules, getUnlockIntro, isTableTaught, PEAK_CASES, STAGED, STORY_RULES, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
 
 /**
  * The short decision reveal: when it is shown, and that the choice to open the
@@ -47,7 +47,8 @@ test("with the switch off nothing is being introduced, and a case nobody named i
 });
 
 test("where the table is taught, the case plays under everything and has nothing to say about new rules", () => {
-  for (const caseId of CASE_SEQUENCE) {
+  // An act's last case adds 「고점 판」 to everything (C-10): held in table-unlocks.test.mjs.
+  for (const caseId of CASE_SEQUENCE.filter((id) => !PEAK_CASES.includes(id))) {
     for (const run of [{}, { veteran: true }, { story: true }, { veteran: true, story: true }]) {
       if (!isTableTaught(caseId, run, true)) {
         assert.ok(LADDER.includes(caseId) && run.veteran !== true);

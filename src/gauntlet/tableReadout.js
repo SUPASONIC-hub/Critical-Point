@@ -17,7 +17,7 @@ export { formatNumber };
 
 /**
  * Rounded down, because the table's rules read the multiplier as a floor: the
- * chain asks for x4 and HIGH ROLLER's feat for x64. Rounded to nearest, a
+ * chain asks for x4 (and once asked x64 of HIGH ROLLER's feat). Rounded to nearest, a
  * x3.95 printed "×4.0" and a cash on it started no chain.
  */
 export function formatMultiplier(value) {
@@ -46,7 +46,7 @@ export function describeClockHeat(pushes) {
  * and every story run -- was told "기본 규칙으로 복귀" and, in the same breath,
  * that the room had broken a rule or that a card might be sealed for stopping
  * early. COLD FEET says a card is locked only while the seal stands: EXPOSE
- * mastery or GLASS LENS lifts it and leaves the id (`lifted`).
+ * mastery lifts it and leaves the id (`lifted`).
  */
 export function describeNextTable(nextMutations = [], busted = false) {
   if (nextMutations.length === 0) return "";
@@ -103,17 +103,19 @@ export function describeLogicMove(logic) {
   const type = getTypeName(logic?.type);
   const streak = Number(logic?.streak) || 0;
   const paid = fill(say.logicPaid, { streak, bonus: bonusText(logic?.bonus) });
+  // FIELD NOTES holds a type one window shorter; the verdict says which hold it read.
+  const hold = Number(logic?.hold) || LOGIC_HOLD;
   switch (logic?.move) {
     case "grow":
       return fill(say.logicGrow, { type, particle: objectParticle(type), paid });
     case "build":
-      return fill(say.logicBuild, { type, held: Math.min(LOGIC_HOLD, Number(logic.held) || 1), hold: LOGIC_HOLD, paid });
+      return fill(hold === LOGIC_HOLD ? say.logicBuild : say.logicBuildShort, { type, held: Math.min(hold, Number(logic.held) || 1), hold, paid });
     case "switch":
       return fill(say.logicSwitch, { type, particle: directionParticle(type), paid });
     case "keep":
       return fill(say.logicKeep, { paid });
     case "break":
-      return fill(say.logicBreak, { type, particle: directionParticle(type), hold: LOGIC_HOLD });
+      return fill(say.logicBreak, { type, particle: directionParticle(type), hold });
     case "bust":
       return streak > 0 ? fill(say.logicBustKept, { streak, particle: topicParticle(String(streak)) }) : say.logicBustLost;
     default:
@@ -144,12 +146,13 @@ const MOVE_COPY = say.moves;
  */
 export function readLogic({ logic, card, offered, relics = [] }) {
   const reach = hasRelic(relics, "metronome");
-  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach });
+  const holdAt = hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD;
+  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt });
   const moveOf = (candidate) => play(getLogicType(candidate)).move;
   const staked = card ? play(getLogicType(card)) : null;
   const now = staked?.logic ?? logic;
   const open = logic.rose || (reach && logic.reach > 0);
-  const held = `${Math.min(LOGIC_HOLD, now.held)}/${LOGIC_HOLD}`;
+  const held = `${Math.min(holdAt, now.held)}/${holdAt}`;
   const hold = now.type ? `${getTypeName(now.type)} ${held}` : say.firstCard;
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;

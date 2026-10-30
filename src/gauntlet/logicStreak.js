@@ -86,10 +86,12 @@ export function getLogicBonus(streak) {
  * plays a card on a bust; a window that closed without one and without a pick
  * is nothing the hand did, and moves nothing.
  *
- * Two relics bend it, and the settlement passes whether the run holds them.
+ * Three relics bend it, and the settlement passes whether the run holds them.
  * `bustHolds` is 앙코르: a bust takes the pot and leaves the streak. `reach`
  * is 메트로놈: a change of type counts as a switch not only on the window the
- * pressure rose into but on the one after it as well.
+ * pressure rose into but on the one after it as well. `hold` is how many
+ * windows a type is held before it grows the streak: `LOGIC_HOLD`, one fewer
+ * with 도윤하의 현장 메모 (FIELD NOTES, C-7).
  *
  * The move is what happened to the streak: "build" (a first card, or a held
  * type not yet held long enough), "grow", "switch", "keep", "break", "bust",
@@ -97,7 +99,7 @@ export function getLogicBonus(streak) {
  * every window whatever the move: they are the table's, not the hand's, and
  * the next window reads them under any rules.
  */
-export function advanceLogic(logic, { type, tier, offered, bustHolds, reach }) {
+export function advanceLogic(logic, { type, tier, offered, bustHolds, reach, hold = LOGIC_HOLD }) {
   const rose = tier > logic.heat;
   const next = { ...logic, heat: tier, rose, reach: rose ? METRONOME_REACH : Math.max(0, (logic.reach || 0) - 1) };
   const bust = tier === 3;
@@ -107,7 +109,7 @@ export function advanceLogic(logic, { type, tier, offered, bustHolds, reach }) {
     next.type = type;
     next.held = same ? logic.held + 1 : 1;
   }
-  const held = same ? (next.held < LOGIC_HOLD ? "build" : "grow") : !logic.type ? "build" : null;
+  const held = same ? (next.held < hold ? "build" : "grow") : !logic.type ? "build" : null;
   const left = logic.rose || (reach && logic.reach > 0) ? "switch" : offered && !offered.includes(logic.type) ? "keep" : "break";
   const move = bust ? "bust" : held ?? left;
   if (move === "grow" || move === "switch") next.streak += 1;
