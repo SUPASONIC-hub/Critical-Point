@@ -3115,8 +3115,11 @@ body {
   }
   /* Japanese falls back to the system's CJK face, wider than the Korean one
      (Linux CI measured the premise at ten lines where Korean takes eight), and
-     the start button left a 320px first screen (10-29). */
-  :lang(ja) .intro-hero-copy > p:not([class]) {
+     the start button left a 320px first screen (10-29). The English premise
+     too: on Linux CI it put the button's foot at 746 on a 360x740 phone
+     (10-30), where Windows had measured 734. */
+  :lang(ja) .intro-hero-copy > p:not([class]),
+  :lang(en) .intro-hero-copy > p:not([class]) {
     font-size: 0.875rem;
     line-height: 1.6;
   }
@@ -3342,5 +3345,10 @@ body {
   }
   .intro-hero-copy {
     padding-top: 56px;
+  }
+  /* A 360x740 phone left the Korean start button 2px under the screen
+     (production, 10-30): the door sits closer to the premise there. */
+  .intro .intro-launch {
+    margin-top: clamp(16px, 2vh, 24px);
   }
 }
