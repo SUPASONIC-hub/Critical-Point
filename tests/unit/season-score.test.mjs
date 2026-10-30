@@ -3,14 +3,14 @@ import { test } from "node:test";
 
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { createCaseSummary, getGameplayStats } from "../../src/gameLogic.js";
-import { getCognitionMix, getCognitionSpread, getSeasonScore } from "../../src/seasonScore.js";
+import { getCaseRead, getCognitionMix, getCognitionSpread, getReadingScore, getSeasonScore } from "../../src/seasonScore.js";
 
 /**
  * The season's 관점 전환 read off the whole season (사용자 2026-10-23 Q25 (1)):
  * the season's score is still the mean of its cases' scores, with each case's
- * own 관점 전환 (weight 0.2) swapped for the one the season's decisions make
- * together. check:grants holds the server's ranking_run_summary to the same
- * numbers.
+ * own 관점 전환 (weight 0.16 since the 판 읽기 axis, C-1(1); 0.2 before)
+ * swapped for the one the season's decisions make together. check:grants
+ * holds the server's ranking_run_summary to the same numbers.
  */
 const [first, second, third] = CASE_SEQUENCE;
 const decision = (cognition, extra = {}) => ({ cognition, responseTimeSec: 12, ...extra });
@@ -55,16 +55,16 @@ test("a case summary keeps its count, and a replay the count of its first close"
 
 test("the season's score swaps each case's 관점 전환 for the season's", () => {
   // Two cases of one way each (spread 0 apiece), two ways in all (spread 50):
-  // each case gains 0.2 * 50 = 10.
+  // each case gains 0.16 * 50 = 8, so 60.5 + 8 = 68.5, rounded half up.
   const oneWayEach = { [first]: { burstScore: 60, cognitionMix: { risk: 4 } }, [second]: { burstScore: 61, cognitionMix: { inference: 4 } } };
-  assert.deepEqual(getSeasonScore(oneWayEach), { momentumScore: 71, burstScore: 71, momentumTier: "FLOW", rank: "B" });
+  assert.deepEqual(getSeasonScore(oneWayEach), { momentumScore: 69, burstScore: 69, momentumTier: "FLOW", rank: "B" });
   // Already even within each case: the season's spread is the cases' own, and the score the plain mean.
   assert.equal(getSeasonScore({ [first]: { burstScore: 60, cognitionMix: { risk: 2, inference: 2 } }, [second]: { burstScore: 61, cognitionMix: { risk: 1, inference: 1 } } }).burstScore, 61);
   // Kept within 0 to 100.
   assert.equal(getSeasonScore({ [first]: { burstScore: 99, cognitionMix: { risk: 4 } }, [second]: { burstScore: 99, cognitionMix: { inference: 4, reframing: 4, persistence: 4 } } }).burstScore, 100);
   assert.equal(getSeasonScore({ [first]: { burstScore: 0, cognitionMix: { risk: 1, inference: 1, reframing: 1, persistence: 1 } }, [second]: { burstScore: 0, cognitionMix: { risk: 1, inference: 1, reframing: 1, persistence: 1 } }, [third]: { burstScore: 0, cognitionMix: { risk: 30 } } }).burstScore, 0);
   // A replay counts its first close's count, as it counts its first close's score.
-  assert.equal(getSeasonScore({ ...oneWayEach, [first]: { burstScore: 10, firstBurstScore: 60, cognitionMix: { inference: 4 }, firstCognitionMix: { risk: 4 } } }).burstScore, 71);
+  assert.equal(getSeasonScore({ ...oneWayEach, [first]: { burstScore: 10, firstBurstScore: 60, cognitionMix: { inference: 4 }, firstCognitionMix: { risk: 4 } } }).burstScore, 69);
 });
 
 test("a season with a case that has no count, or one that is not a count, keeps the plain mean", () => {
@@ -77,4 +77,25 @@ test("a season with a case that has no count, or one that is not a count, keeps 
   assert.equal(getSeasonScore({ [first]: { burstScore: 60, cognitionMix: { risk: 999_999 } }, [second]: { burstScore: 61, cognitionMix: { risk: 1, inference: 4 } } }).burstScore, 61);
   const kinds = "abcdefghi".split("");
   assert.equal(getSeasonScore({ [first]: { burstScore: 60, cognitionMix: Object.fromEntries(kinds.slice(0, 5).map((kind) => [kind, 1])) }, [second]: { burstScore: 61, cognitionMix: Object.fromEntries(kinds.slice(5).map((kind) => [kind, 1])) } }).burstScore, 61);
+});
+
+test("판 읽기 (C-1(1)): the C-12 index, kept within 0 to 100, weighs 0.2 of a case's score", () => {
+  const at = (read, busted = false) => ({ threshold: { busted, read } });
+  assert.equal(getCaseRead([at([100, 200]), at([0, 100], true), at([60, 100])]), 15, "a bust wipes the pot the bare hand had");
+  assert.equal(getCaseRead([{ threshold: { busted: false } }]), null);
+  assert.equal(getReadingScore([at([100, 200]), at([50, 100])]), 50);
+  assert.equal(getReadingScore([at([150, 100])]), 100, "a hand that pushed past the seer and lived stops at 100");
+  assert.equal(getReadingScore([{ threshold: { busted: false } }]), 0, "nothing to compare reads 0");
+  assert.equal(getReadingScore([]), 0);
+  // The same decisions, read once at 0% and once at 100% of the seer: 0.2 * 100 = 20 points.
+  const log = (bare) => [0, 1, 2, 3].map((index) => decision({ [["risk", "inference", "reframing", "persistence"][index]]: 1 }, { threshold: { busted: false, read: [bare, 90] } }));
+  const none = getGameplayStats(log(0));
+  const all = getGameplayStats(log(90));
+  assert.equal(none.readingScore, 0);
+  assert.equal(all.readingScore, 100);
+  assert.equal(all.momentumScore - none.momentumScore, 20);
+  // And the six axes before it at 0.8 of their weights: a case of 100 everywhere but 판 읽기 scores 80.
+  const axes = { consistencyScore: 0.224, cognitionScore: 0.16, reflectionScore: 0.16, pressureAdaptScore: 0.128, rhythmScore: 0.064, challengeSupportScore: 0.064 };
+  assert.equal(Math.round(Object.values(axes).reduce((sum, weight) => sum + weight, 0) * 1000), 800);
+  assert.equal(createCaseSummary({}, {}, log(45)).readingScore, 50, "the case summary carries it");
 });

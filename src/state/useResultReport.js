@@ -53,7 +53,7 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
   return useMemo(() => {
     const {
       challengeClearCount, cognitionScore, consistencyScore, currentChallengeStreak, exploitPenalty,
-      momentumScore, momentumTier, pressureAdaptScore, rank, reducedRiskCount, reflectionScore, rhythmScore,
+      momentumScore, momentumTier, pressureAdaptScore, rank, readingScore, reducedRiskCount, reflectionScore, rhythmScore,
     } = gameplayStats;
     const primaryTrigger = triggerLabels[result.primary[0]];
     return {
@@ -63,7 +63,7 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
       resultBridge: result.longestDecision
         ? fill(BRIDGE.longest, { trigger: primaryTrigger, title: result.longestDecision.title })
         : fill(BRIDGE.plain, { trigger: primaryTrigger }),
-      scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }),
+      scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, readingScore, reflectionScore, rhythmScore }),
       achievementBadges: createAchievementBadges({
         challengeClearCount,
         currentChallengeStreak,

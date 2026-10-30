@@ -83,7 +83,13 @@ const budgets = [
   // 149,740 / 55,002 -> 149,905 / 55,019 on 2026-10-30, ranking-save-copy over main c39870a7 (#376, #375): the local and season ranking save lines read from src/copy/notices.js in the page's language (they were English in the hook). Measured 149,901 / 55,015 in the e2e build, the plus 4.
   // 149,722 / 54,994 -> 149,806 / 55,026 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the case's rules for the audit and the links, and the season row's mean score, on main's keyed words. Measured 149,806 / 55,022, the gzip plus 4 in the e2e build.
   // 149,905 / 55,019 -> 149,982 / 55,050 on 2026-10-30, #224 (RULES_MARK 3, C-2, personal bests) merged with main 430dda1e (#378 ranking-save-copy, #375, #376): #224's rules and season mean beside main's keyed ranking save lines. Measured 149,982 / 55,046 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_982, maxGzip: 55_050 },
+  // 142,806 / 52,313 -> 142,907 / 52,366 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 142,907 / 52,362 in the e2e build, the
+  // gzip plus 4. The score breakdown's 판 읽기 row and the case summary's
+  // readingScore.
+  // 149,806 / 55,026 -> 149,965 / 55,098 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's 판 읽기 row read by key and the case summary's readingScore. Measured 149,965 / 55,094, the gzip plus 4 in the e2e build.
+  // 149,982 / 55,050 -> 150,155 / 55,115 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e): C-1's reading record over #224 and main's ranking save lines. Measured 150,155 / 55,111 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_155, maxGzip: 55_115 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -97,7 +103,14 @@ const budgets = [
   // 34,278 / 13,357 -> 34,459 / 13,422 on 2026-10-29, gate-reason-copy: a locked card's condition (getAuthorityGate) read by key from src/copy/observer.js `gate` and filled, so English and Japanese print it in their words. The Korean is the same. Measured 34,455 / 13,418 in the e2e build, the plus 4.
   // 34,278 / 13,357 -> 35,281 / 13,719 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): src/seasonScore.js (C-2's season mean, Q25) lands in this chunk under Rolldown, beside main's observer words. Measured 35,281 / 13,715, the gzip plus 4 in the e2e build.
   // 34,459 / 13,422 -> 35,503 / 13,781 on 2026-10-30, #224 merged with main 430dda1e: src/seasonScore.js beside main's keyed gate condition (#373). Measured 35,503 / 13,777 in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_503, maxGzip: 13_781 },
+  // 33,937 / 13,368 -> 34,272 / 13,482 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 253e8e93: measured 34,272 / 13,478 in the e2e build, the
+  // gzip plus 4. getCaseRead moved here from tableAfterword.js (the score reads
+  // it now), getReadingScore, and the seventh weight. 13,480 in a second build
+  // on #224 0c989ba7 (the hashes), so 13,484.
+  // 35,281 / 13,719 -> 35,620 / 13,836 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: getCaseRead, getReadingScore and the seventh weight on #224's season mean. Measured 35,620 / 13,832, the gzip plus 4 in the e2e build.
+  // 35,503 / 13,781 -> 35,842 / 13,900 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e): C-1's reading axis beside main's keyed gate condition. Measured 35,842 / 13,896 in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_842, maxGzip: 13_900 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -578,7 +591,13 @@ const budgets = [
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_655, maxGzip: 36_661 },
+  // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
+  // axis) on #224 0c989ba7: the score breakdown's seventh card, the penalty
+  // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
+  // 196,229 / 36,558 -> 196,282 / 36,566 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's seventh card, the penalty card taking its row. Measured 196,282 / 36,562, the gzip plus 4 in the e2e build.
+  // 196,506 / 36,627 -> 196,559 / 36,637 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e). Measured 196,559 / 36,633 in the e2e build, the gzip plus 4.
+  // 196,655 / 36,661 -> 196,708 / 36,670 on 2026-10-30, C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px). Measured 196,708 / 36,666 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_708, maxGzip: 36_670 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -720,7 +739,8 @@ const budgets = [
   // 39,663 / 14,647 -> 39,883 / 14,795 on 2026-10-28, lang-full: the reading clock counts an English page by words and a
   // Japanese one by characters at 0.89 (readingUnits). Measured 39,879 / 14,791.
   // 39,883 -> 39,889 raw on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip stays under its line. Measured 39,889 in the e2e build.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_889, maxGzip: 14_795 },
+  // 14,795 -> 14,801 gzip on 2026-10-30, C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px): only the chunk names it imports. Measured 14,797, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_889, maxGzip: 14_801 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1043,7 +1063,10 @@ const budgets = [
   // 2,740 / 1,255 -> 2,566 / 1,109 on 2026-10-24, #224 (RULES_MARK 3,
   // C-2 and Q25, personal bests) rebased on main cf641639: measured
   // 2,566 / 1,105 in the e2e build, the gzip plus 4. measured under Vite 8 (2,740 / 1,251 under Rollup).
-  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_566, maxGzip: 1_109 },
+  // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, C-1(1) on #224 253e8e93:
+  // measured 2,601 / 1,109 in the e2e build, the gzip plus 4. One more retired
+  // key, v10 (the local ranking moves to v11 with the 판 읽기 axis).
+  { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -1073,7 +1096,9 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 152,779 / 51,787 -> 152,864 / 51,822 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the Japanese of 프롤로그 04's audit-and-links line, the ranking's intro and past best, the link tag, less the audit and cascade weeks. Measured 152,864 / 51,818, the gzip plus 4 in the e2e build.
   // 153,344 / 51,954 -> 153,429 / 51,974 on 2026-10-30, #224 merged with main 430dda1e: #224's Japanese lines beside main's ranking save lines. Measured 153,429 / 51,970, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_429, maxGzip: 51_974 },
+  // 152,864 / 51,822 -> 153,069 / 51,893 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the Japanese of the 판 읽기 card (勝負の読み) and its note. Measured 153,069 / 51,889; the raw is the measurement, the gzip plus 4.
+  // 153,429 / 51,974 -> 153,634 / 52,037 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e): C-1's Japanese lines beside main's. Measured 153,634 / 52,033, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_634, maxGzip: 52_037 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1173,8 +1198,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
  * The English bank rail fitted to a 360px phone (#224 hand5-en, 10-30; the critical CSS does not carry it): 423,147, 472,682 and 478,466, the plus 4.
+ * C-1(1) (the 판 읽기 axis) merged with #224 602ec69b (10-29): the seventh score card's CSS in the
+ * critical sheet and its words in the dictionaries put English at 472,236 and Japanese at 478,009,
+ * the plus 4; Korean (422,764) stays under.
+ * C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,114, 472,693 and 478,493, the plus 4.
+ * C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px), 10-30: 423,147, 472,726 and 478,526, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_151, en: 472_686, ja: 478_470 };
+const FIRST_PAINT_BUDGETS = { ko: 423_151, en: 472_730, ja: 478_530 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1306,6 +1336,9 @@ function checkBudget(file, budget) {
 // -> 9,933 / 3,584 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): one more file in the warm list,
 // personalBests. Measured 9,933 / 3,580 plus 4.
 // 10,106 / 3,624 -> 10,138 / 3,642 on 2026-10-30, #224 merged with main 430dda1e: personalBests in the warm list beside main's nine pages. Measured 10,138 / 3,638 plus 4.
+// -> 9,376 / 3,441 on 2026-10-25, C-1(1) on #224 0c989ba7: measured 9,376 /
+// 3,437 and 3,436 in two e2e builds (the file names' hashes), the larger plus
+// 4; the worker's code did not change.
 const WORKER_BUDGET = { maxBytes: 10_138, maxGzip: 3_642 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));

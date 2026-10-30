@@ -339,7 +339,8 @@ export function useChoiceCommit(context) {
         focus: verdict.focus,
         logic: verdict.logic,
         // The same board played bare by the player and by a hand that sees the
-        // wall (tableAfterword.js, C-12): shown when the case closes, never scored.
+        // wall (tableAfterword.js, C-12): shown when the case closes, and summed
+        // into the burst score as its 판 읽기 axis (C-1(1), seasonScore.js).
         read: readWindowAgainstSeer(windowState, verdict.chips),
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",

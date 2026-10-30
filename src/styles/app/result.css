@@ -569,6 +569,11 @@
     transform var(--ui-dur) var(--ui-ease),
     border-color var(--ui-dur) var(--ui-ease);
 }
+/* Seven cards since the 판 읽기 axis (C-1(1)): the last, the penalty, is alone in
+   its row at three columns and at two, so it takes the row. */
+.score-breakdown article:last-child {
+  grid-column: 1 / -1;
+}
 .score-breakdown article:hover {
   transform: translateY(-2px);
   border-color: var(--ui-line-strong);
