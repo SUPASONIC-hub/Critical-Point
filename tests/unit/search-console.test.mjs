@@ -27,7 +27,12 @@ test("the token, or the whole tag pasted in, gives the meta tag and nothing else
 
 test("the build reads it without a VITE_ prefix, and render.yaml keeps the key without a value", () => {
   const config = readFileSync("vite.config.js", "utf8");
-  assert.match(config, /searchConsoleVerification\(readSearchConsoleEnv\(loadEnv\(mode, process\.cwd\(\), "GOOGLE_"\)\)\)/);
+  // The app build (`--mode app`, app/build-web.mjs) leaves it out, as it does AdSense's.
+  assert.match(
+    config,
+    /searchConsoleVerification\(mode === "app" \? \{\} : readSearchConsoleEnv\(loadEnv\(mode, process\.cwd\(\), "GOOGLE_"\)\)\)/,
+  );
+  assert.match(config, /adsenseVerification\(mode === "app" \? \{\} : readAdsenseEnv\(loadEnv\(mode, process\.cwd\(\), "ADSENSE_"\)\)\)/);
   assert.doesNotMatch(config, /VITE_GOOGLE/);
   assert.match(readFileSync("render.yaml", "utf8"), /- key: GOOGLE_SITE_VERIFICATION\n\s+sync: false/);
   // Off, the page is the one without it.

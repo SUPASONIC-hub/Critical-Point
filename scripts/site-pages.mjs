@@ -496,8 +496,8 @@ export function withAbsoluteSiteLinks(html, origin) {
 }
 
 /** Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash. */
-export function renderStaticPages(origin = "", { analytics = null } = {}) {
-  const pages = { ...renderLegalPages({ analytics }), ...renderSitePages({ analytics }) };
+export function renderStaticPages(origin = "", { analytics = null, app = false } = {}) {
+  const pages = { ...renderLegalPages({ analytics, app }), ...renderSitePages({ analytics }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 

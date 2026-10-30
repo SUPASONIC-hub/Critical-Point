@@ -378,12 +378,13 @@ function serviceWorker() {
  * a device would otherwise download everything again for. Before
  * `serviceWorker()` in the list, which reads every file on disk. With Google
  * Analytics on (`googleAnalytics` below) each page carries its tag, and the
- * policy and the FAQ say so.
+ * policy and the FAQ say so. The app build (`app`) never has it, and its
+ * policy leaves out the web's notice that it is coming (`ANALYTICS_NOTICE`).
  */
-function staticPages(analytics) {
+function staticPages(analytics, { app = false } = {}) {
   const files = () => {
     const origin = siteOrigin();
-    return { ...renderStaticPages(origin, { analytics }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+    return { ...renderStaticPages(origin, { analytics, app }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -436,7 +437,7 @@ function searchConsoleVerification({ token }) {
 /**
  * Google Analytics 4, off unless GA_MEASUREMENT_ID is set
  * (scripts/analytics-config.mjs, docs/analytics.md), and never in the dev
- * server, the e2e build or a debug build (`analyticsFor`). Off, this plugin
+ * server, the e2e build, a debug build or the app build (`analyticsFor`). Off, this plugin
  * has no hook and the build is the one without it. On, index.html gets
  * Google's tag and `/assets/analytics-<hash>.js`, which configures it -- a
  * file and not an inline script, which the CSP blocks -- and staticPages()
@@ -455,9 +456,14 @@ function googleAnalytics(analytics) {
   };
 }
 
-/** What the page is told about registering (src/serviceWorker/register.js). */
+/**
+ * What the page is told about registering (src/serviceWorker/register.js).
+ * `--mode app` is the build the iOS shell carries (app/build-web.mjs): every
+ * file is already on the device, and WKWebView runs no worker for the app's
+ * own scheme.
+ */
 function serviceWorkerSetting(command, mode) {
-  if (command !== "build" || serviceWorkerKilled()) return "off";
+  if (command !== "build" || mode === "app" || serviceWorkerKilled()) return "off";
   return mode === "e2e" ? "ask" : "on";
 }
 
@@ -656,9 +662,14 @@ export default defineConfig(({ command, mode }) => {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages(analytics),
-      adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
-      searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
+      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(),
+      staticPages(analytics, { app: mode === "app" }),
+      // The app build (`--mode app`, app/build-web.mjs) carries neither site verification: no crawler or
+      // AdSense reviewer reads a page inside the app, and the app's ads are its own (AdMob). Nor Google
+      // Analytics (`analyticsFor` is null for it): a tag in the app's web view is a tracker the app's own
+      // policy and the stores' data safety answers would have to declare.
+      adsenseVerification(mode === "app" ? {} : readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
+      searchConsoleVerification(mode === "app" ? {} : readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
       serviceWorker(), renderHeaders(),
     ],
