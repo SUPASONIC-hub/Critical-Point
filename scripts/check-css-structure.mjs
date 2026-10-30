@@ -274,7 +274,10 @@ const fileBudgets = {
   // ground over its stripes.
   // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
   // labels a size down, so five-card hands keep two lines in a CJK face.
-  "play.css": { lines: 2931, bytes: 56132 },
+  // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
+  // the HUD gives up its air so a bank row on two lines (late-season numbers)
+  // keeps a five-card hand above the action bar.
+  "play.css": { lines: 2931, bytes: 56505 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
