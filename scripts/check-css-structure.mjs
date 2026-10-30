@@ -268,7 +268,9 @@ const fileBudgets = {
   // -> 2925 / 55865 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측.
   // -> 2931 / 56015 on 2026-10-24, measured: a sealed card's badges on a plain
   // ground over its stripes.
-  "play.css": { lines: 2931, bytes: 56015 },
+  // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
+  // labels a size down, so five-card hands keep two lines in a CJK face.
+  "play.css": { lines: 2931, bytes: 56132 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
