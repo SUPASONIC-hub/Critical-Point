@@ -2433,6 +2433,25 @@
   }
 }
 
+/* An English page on a 360px phone: Stake, Vault and the run's line with
+   Audit n/4 (RULES_MARK 3) need 331px of a 310px rail, so the run's line took
+   a row of its own (26px) and a five-card hand's last card went under the
+   action bar (hand5, 2026-10-30). Labels at 10px, pills at 5px a side and a
+   3px gap bring it to 302px. */
+@media (max-width: 360px) {
+  :lang(en) .gx-bank {
+    gap: 3px;
+  }
+
+  :lang(en) .gx-bank .gx-stat {
+    padding-inline: 5px;
+  }
+
+  :lang(en) .gx-bank .gx-stat small {
+    font-size: 0.625rem;
+  }
+}
+
 /* A short phone reads the scene without its portrait, in two lines of question.
    A board with changed rules shows its rules line where the situation board was. */
 @media (max-width: 480px) and (max-height: 760px) {

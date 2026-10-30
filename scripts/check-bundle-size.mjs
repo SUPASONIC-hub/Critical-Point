@@ -632,6 +632,7 @@ const budgets = [
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
+  // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
   // 196,229 / 36,558 -> 196,473 / 36,590 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the hall of fame's badge on a ranking row (.ranking-hall-badge). Measured 196,473 / 36,586 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,750 / 36,663 on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): the hall-of-fame badge beside main's narrow pills. Measured 196,750 / 36,659 in the e2e build, the gzip plus 4.
   // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
@@ -647,7 +648,7 @@ const budgets = [
   // 196,506 / 36,627 -> 196,604 / 36,656 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e). Measured 196,604 / 36,652 in the e2e build, the gzip plus 4.
   // 196,473 / 36,590 -> 196,624 / 36,625 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the 판 읽기 card, the board marks and the hall badge on one sheet. Measured 196,624 / 36,621 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 196,901 / 36,696 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 196,901 / 36,692 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_901, maxGzip: 36_696 },
+  { pattern: /^index-.*\.css$/, maxBytes: 196_655, maxGzip: 36_661 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1287,6 +1288,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
+ * The English bank rail fitted to a 360px phone (#224 hand5-en, 10-30; the critical CSS does not carry it): 423,147, 472,682 and 478,466, the plus 4.
  * D2 hall of fame (#308) merged with #224 602ec69b (10-29): fetchHallOfFame, the notice's
  * sentence, the badge's CSS and the dictionaries' lines put them at 422,945, 472,519 and
  * 478,266, the e2e build plus 4.
@@ -1303,7 +1305,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // ko 422,945 -> 423,130, en 472,519 -> 473,093, ja 478,315 -> 478,912 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the four's index JS and CSS and each dictionary's lines on one first paint. Measured 423,126 / 473,089 / 478,908 in the e2e build, the plus 4.
  * 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e, 10-30): 423,480, 473,555 and 479,405, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_484, en: 473_559, ja: 479_409 };
+const FIRST_PAINT_BUDGETS = { ko: 423_151, en: 472_686, ja: 478_470 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
