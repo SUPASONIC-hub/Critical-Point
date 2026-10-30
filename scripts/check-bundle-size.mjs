@@ -553,7 +553,9 @@ const budgets = [
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
   // -> 196,428 / 36,624 on 2026-10-30, ja-hand-narrow over main c865d984 (#380): a Japanese card label on 360px or less a size
   // down (play.css), so a five-card hand keeps two lines in a CJK face. Measured 196,428 / 36,620 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_428, maxGzip: 36_624 },
+  // -> 196,481 / 36,637 on 2026-10-30, intro-360-fit over main 7552870d (#381): on 360px or less the start button sits closer
+  // to the premise (a 360x740 phone had the Korean one 2px under the screen). Measured 196,481 / 36,633, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_481, maxGzip: 36_637 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1113,8 +1115,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * and 478,413.
  * A Japanese card label on 360px or less a size down (ja-hand-narrow, over
  * main c865d984; the index CSS carries the rule): 423,150, 472,646 and 478,442.
+ * The start button closer to the premise on 360px or less (intro-360-fit,
+ * over main 7552870d): 423,158, 472,656 and 478,452.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_154, en: 472_650, ja: 478_446 };
+const FIRST_PAINT_BUDGETS = { ko: 423_162, en: 472_660, ja: 478_456 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

@@ -3343,4 +3343,9 @@ body {
   .intro-hero-copy {
     padding-top: 56px;
   }
+  /* A 360x740 phone left the Korean start button 2px under the screen
+     (production, 10-30): the door sits closer to the premise there. */
+  .intro .intro-launch {
+    margin-top: clamp(16px, 2vh, 24px);
+  }
 }

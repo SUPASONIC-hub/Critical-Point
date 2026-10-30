@@ -173,7 +173,10 @@ const fileBudgets = {
   // main c3b40b6f): on 360px or less the three language pills keep one row
   // (closer, 8px padding, 12px type, out to the music controls) and the brand
   // row comes up 8px under them.
-  "base-intro-ranking.css": { lines: 3155, bytes: 69767 },
+  // 3155 / 69767 -> 3158 / 69836 on 2026-10-30, measured (intro-360-fit): on
+  // 360px or less the start button sits closer to the premise (a 360x740
+  // phone had the Korean one 2px under the screen).
+  "base-intro-ranking.css": { lines: 3158, bytes: 69836 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
