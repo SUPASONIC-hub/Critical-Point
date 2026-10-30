@@ -624,6 +624,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    */
   async function openCase(caseId) {
     if (caseId === currentCase && !(await confirmAction(noticesCopy.confirm.replayCase))) return false;
+    // The store apps' ad between cases (platform/ads.js); folded out of the site's builds.
+    if (__CP_APP__ && caseId !== currentCase && (await import("./platform/ads.js").then(({ ads }) => ads.beforeNextCase(currentCase), () => null))?.reason === "busy") return false;
     startCaseEvent(caseId);
     return true;
   }

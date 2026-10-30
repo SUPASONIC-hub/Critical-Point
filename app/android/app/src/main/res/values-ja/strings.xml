@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- The launcher name in this language: GAME_NAME.ja before any colon (scripts/legal-pages.mjs), as values/ is the web manifest's short_name. -->
+<resources>
+    <string name="app_name">臨界点</string>
+    <string name="title_activity_main">臨界点</string>
+</resources>

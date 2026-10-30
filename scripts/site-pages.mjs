@@ -2,7 +2,7 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
-import { escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
+import { escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages, withAppLines } from "./legal-pages.mjs";
 
 /**
  * The three pages about the game -- what it is and how it is played, the
@@ -421,6 +421,47 @@ const BODIES = {
 export const SITE_PAGE_KINDS = Object.keys(BODIES);
 
 /**
+ * The store apps' copies of the FAQ (`--mode app`, app/build-web.mjs): its
+ * answers on cost and on trackers say the app's AdMob ads and Remove Ads
+ * purchase, as the apps' policy and terms do (scripts/legal-pages.mjs). Each
+ * `from` must be in its page, or the build fails.
+ */
+const APP_LINES = {
+  faq: {
+    ko: [
+      [
+        "<p>웹판은 무료입니다. 지금은 광고와 유료 결제가 없습니다.",
+        "<p>앱판은 무료이며 광고가 나옵니다. 「광고 제거」는 1회 결제 상품으로 광고만 없애고 게임을 유리하게 하지 않습니다.",
+      ],
+      [
+        "게임은 쿠키와 광고·분석용 추적 도구를 쓰지 않습니다.",
+        "앱판에는 Google AdMob 광고가 있습니다. 앱판은 광고 말고는 쿠키나 분석용 추적 도구를 쓰지 않습니다.",
+      ],
+    ],
+    en: [
+      [
+        "<p>The web version is free. There are currently no ads and no payments.",
+        "<p>The app version is free and shows ads. Remove Ads is a one-time purchase that only removes ads and gives no advantage in the game.",
+      ],
+      [
+        "The game uses no cookies and no advertising or analytics trackers.",
+        "The app version shows Google AdMob ads. Apart from ads, the app version uses no cookies or analytics trackers.",
+      ],
+    ],
+    ja: [
+      [
+        "<p>ウェブ版は無料です。現在、広告や有料の決済はありません。",
+        "<p>アプリ版は無料で、広告が表示されます。「広告の削除」は1回払いの商品で、広告をなくすだけでゲームを有利にすることはありません。",
+      ],
+      [
+        "本ゲームはCookieや、広告・分析用のトラッキングツールを使用しません。",
+        "アプリ版にはGoogle AdMobの広告があります。アプリ版では、広告のほかには、Cookieや分析用のトラッキングツールを使用しません。",
+      ],
+    ],
+  },
+};
+
+/**
  * The FAQ's one sentence about cookies, in a build with Google Analytics
  * (scripts/analytics-config.mjs; the policy's own section is
  * ANALYTICS_POLICY in legal-pages.mjs). Without it the FAQ is as written above.
@@ -434,15 +475,17 @@ export const ANALYTICS_FAQ = {
 /**
  * The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`.
  * With `analytics` each carries Google's tag, and the FAQ says so.
+ * `app` is the store apps' build, whose FAQ says what its ads and purchase do (and never has `analytics`).
  */
-export function renderSitePages({ analytics = null } = {}) {
+export function renderSitePages({ analytics: given = null, app = false } = {}) {
+  const analytics = app ? null : given;
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
+      const page = { kind, language, body: BODIES[kind][language] };
+      const body = analytics && kind === "faq" ? withSwaps(page.body, ANALYTICS_FAQ[language]) : page.body;
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
-        kind,
-        language,
-        body: analytics && kind === "faq" ? withSwaps(BODIES[kind][language], ANALYTICS_FAQ[language]) : BODIES[kind][language],
+        ...(app ? withAppLines(page, APP_LINES[kind]?.[language]) : { ...page, body }),
         description: DESCRIPTION[kind][language],
         analytics,
       });
@@ -495,9 +538,12 @@ export function withAbsoluteSiteLinks(html, origin) {
     .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
 }
 
-/** Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash. */
+/**
+ * Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash.
+ * `app` is the store apps' build (`--mode app`): their copies of the policy, the terms and the FAQ.
+ */
 export function renderStaticPages(origin = "", { analytics = null, app = false } = {}) {
-  const pages = { ...renderLegalPages({ analytics, app }), ...renderSitePages({ analytics }) };
+  const pages = { ...renderLegalPages({ analytics, app }), ...renderSitePages({ analytics, app }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 

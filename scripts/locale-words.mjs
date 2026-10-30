@@ -212,7 +212,10 @@ function mergeWords(base, extra) {
 /**
  * A language's whole screen copy: its dictionary's `copy` and the copy between
  * cases waiting in `src/locales/<lang>/between/*.js` (the page fetches a file
- * of these only once `previewThrough` reaches it; src/locales/overlay.js).
+ * of these only once `previewThrough` reaches it; src/locales/overlay.js),
+ * and the store apps' own lines in `src/locales/<lang>/app/<name>.js` (each a
+ * default export, `copy.screens.<name>` like screens/<name>.js, but read only
+ * by the app build's src/platform/adCopy.js and never by the site's chunks).
  * `root` is the project folder's file URL, with no slash at its end.
  */
 export async function readLanguageCopy(root, lang) {
@@ -221,5 +224,8 @@ export async function readLanguageCopy(root, lang) {
   const files = existsSync(dir) ? readdirSync(dir).filter((file) => file.endsWith(".js")).sort() : [];
   let copy = dictionary.copy ?? {};
   for (const file of files) copy = mergeWords(copy, (await import(new URL(file, dir).href)).copy);
+  const appDir = new URL(`src/locales/${lang}/app/`, `${root}/`);
+  const appFiles = existsSync(appDir) ? readdirSync(appDir).filter((file) => file.endsWith(".js")).sort() : [];
+  for (const file of appFiles) copy = mergeWords(copy, { screens: { [file.replace(/\.js$/, "")]: (await import(new URL(file, appDir).href)).default } });
   return copy;
 }

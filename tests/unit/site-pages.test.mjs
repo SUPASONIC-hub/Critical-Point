@@ -196,3 +196,18 @@ test("the origin is SITE_URL, else RENDER_EXTERNAL_URL, and only an https one; t
   assert.ok(absolute.includes('<a href="/en/about.html">'), "the links a reader clicks stay relative");
   assert.equal(withAbsoluteSiteLinks("<link rel=\"canonical\" href=\"/\" />", ""), "<link rel=\"canonical\" href=\"/\" />");
 });
+
+test("the store apps' FAQ says what their ads and purchase do, and the site's pages are the ones above", () => {
+  const app = renderStaticPages("", { app: true });
+  assert.deepEqual(Object.keys(app), Object.keys(all));
+  assert.deepEqual(renderStaticPages("", { app: false }), all);
+  for (const folder of Object.values(FOLDER)) {
+    const faq = app[`${folder}faq.html`];
+    assert.notEqual(faq, all[`${folder}faq.html`]);
+    assert.match(faq, /AdMob/);
+    for (const kind of ["about", "contact"]) assert.equal(app[`${folder}${kind}.html`], all[`${folder}${kind}.html`]);
+  }
+  assert.doesNotMatch(app["faq.html"], /지금은 광고와 유료 결제가 없습니다/);
+  assert.doesNotMatch(app["en/faq.html"], /There are currently no ads/);
+  assert.doesNotMatch(app["ja/faq.html"], /現在、広告や有料の決済はありません/);
+});

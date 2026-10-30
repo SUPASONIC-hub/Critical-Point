@@ -2,6 +2,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { WEB_AD_CODE_MARKERS } from "./adsense-config.mjs";
+import { findAppOnlyCode } from "./app-only-code.mjs";
 
 /**
  * Bundle and first-paint budgets.
@@ -1324,6 +1325,14 @@ if (process.env.ADSENSE_ADS !== "on") {
   if (carrier) failures.push(`${path.relative(distDir, carrier)} carries web ad code ("${WEB_AD_CODE_MARKERS.exec(readFileSync(carrier, "utf8"))[0]}") in a build without ADSENSE_ADS=on.`);
   else reported.push("no web ad code");
 }
+
+// The site carries no ads (the user's decision of 2026-10-25: ads in the
+// store apps only). The apps' ads and Remove Ads purchase are behind
+// `__CP_APP__` and `cp:app-native` (vite.config.js), which a site build folds
+// away; a name from any of it in dist/ means a call site escaped the fold.
+const failure = findAppOnlyCode(distDir);
+if (failure) failures.push(failure);
+else reported.push("no app-only ad or purchase code");
 
 if (failures.length) {
   console.error(failures.join("\n"));

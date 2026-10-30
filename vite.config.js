@@ -362,13 +362,56 @@ function serviceWorker() {
 }
 
 /**
+ * The store apps' native side (docs/app-shell.md): ads and the Remove Ads
+ * purchase, in the app only and never on the web (the user's decision of
+ * 2026-10-25).
+ *
+ * The page reaches it through one name, `cp:app-native`
+ * (src/platform/ads.js). In `--mode app` that is app/native/index.js, which
+ * imports the Capacitor plugins from app/node_modules -- packages the site's
+ * build, its tests and CI never install. In every other mode it is a module
+ * that exports null, and `__CP_APP__` (define below) is false, so the call
+ * sites the game has (GameRuntime.openCase, IntroScreen) fold away and the
+ * site's chunks do not change; check-bundle-size.mjs fails a site build that
+ * carries any of it.
+ */
+const APP_NATIVE = "cp:app-native";
+const APP_NATIVE_STUB = "\0cp:app-native";
+function appNative(mode) {
+  const entry = path.resolve("app/native/index.js");
+  return {
+    name: "app-native",
+    resolveId(id) {
+      if (id !== APP_NATIVE) return null;
+      return mode === "app" ? entry : APP_NATIVE_STUB;
+    },
+    load(id) {
+      return id === APP_NATIVE_STUB ? "export default null;\n" : null;
+    },
+  };
+}
+// In the app build, the native side and its plugins are one lazy chunk of
+// their own, ahead of the catch-all vendor group, which the page preloads.
+// Only those files: taking what they import with them pulled Vite's preload
+// helper in, and the page preloaded the chunk (tried on 2026-10-25).
+const APP_NATIVE_GROUP = {
+  name: "app-native",
+  test: /[\\/]app[\\/](native|node_modules)[\\/]/,
+  priority: 38,
+  includeDependenciesRecursively: false,
+};
+
+/**
  * The site's plain pages and the files a crawler reads, written beside
  * `index.html`: the privacy policy and the terms (scripts/legal-pages.mjs),
  * the game's about, FAQ and contact pages (scripts/site-pages.mjs), fifteen
  * pages in Korean, English and Japanese, and /robots.txt and /sitemap.xml.
  * The host serves each at its own name, so a store listing, a search engine
  * or an AdSense reviewer reads them with no script. The dev server answers
- * the same addresses from the same source.
+ * the same addresses from the same source. The store apps' build
+ * (`--mode app`) writes the apps' copies of the policy, the terms and the
+ * FAQ, which say what their ads and purchase do; every other mode writes the
+ * site's pages as they were.
  *
  * Their canonical and hreflang links and the sitemap's addresses are absolute
  * on the build's origin (`siteOrigin`), relative without one. The sitemap is
@@ -662,7 +705,7 @@ export default defineConfig(({ command, mode }) => {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(),
+      appNative(mode), seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(),
       staticPages(analytics, { app: mode === "app" }),
       // The app build (`--mode app`, app/build-web.mjs) carries neither site verification: no crawler or
       // AdSense reviewer reads a page inside the app, and the app's ads are its own (AdMob). Nor Google
@@ -682,6 +725,8 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __CP_DEBUG_BUILD__: JSON.stringify(debugBuild),
       __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+      // The store apps' build (app/build-web.mjs); see appNative above.
+      __CP_APP__: JSON.stringify(mode === "app"),
     },
     // The dev server compiles a module the first time it is asked for. Fifty
     // cases are fifty large data modules, and compiling them on the first scene
@@ -712,7 +757,7 @@ export default defineConfig(({ command, mode }) => {
           // (scripts/service-worker-build.mjs), and their budgets are their own.
           chunkFileNames: localeChunkName,
           codeSplitting: {
-            groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
+            groups: [...ownChunkGroups(), ...(mode === "app" ? [APP_NATIVE_GROUP] : []), ...VENDOR_GROUPS, ENTRY_GROUP],
           },
         },
       },

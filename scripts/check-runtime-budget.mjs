@@ -154,8 +154,9 @@ const BUDGETS = {
   // awaited confirm lands, which is why the cap is 190 rather than 180).
   // 96 -> 98 on 2026-10-26, 다국어 틀: the run's notices table
   // (src/copy/notices.js) and `fill` for its two lines with blanks.
+  // 960 -> 962 on 2026-10-29 (#330): openCase's store-app ad between cases, a comment and one line that the site's builds fold away.
   "src/GameRuntime.jsx": {
-    lines: 960,
+    lines: 962,
     longestLine: 190,
     importedNames: 98,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
