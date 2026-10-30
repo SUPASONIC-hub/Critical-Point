@@ -33,9 +33,10 @@ import resultCard from "./resultCard.js";
 import resultCardDraw from "./resultCardDraw.js";
 import reveal from "./reveal.js";
 import seasonEnd from "./seasonEnd.js";
+import sideCase from "./sideCase.js";
 import table from "./table.js";
 import unlocks from "./unlocks.js";
 import weekRule from "./weekRule.js";
 import weekRules from "./weekRules.js";
 
-export default { actCard, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, header, intro, leaderboard, loading, mutations, notices, observer, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, seasonEnd, table, unlocks, weekRule, weekRules };
+export default { actCard, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, header, intro, leaderboard, loading, mutations, notices, observer, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, seasonEnd, sideCase, table, unlocks, weekRule, weekRules };

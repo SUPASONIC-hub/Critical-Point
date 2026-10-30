@@ -32,6 +32,8 @@ const resultCopy = {
   costliestAlternative: "가장 무거운 대안: {label}",
   rankCarryNote: "다음 사건은 이 랭크에 따라 믿음과 공정함을 조금 얹거나, 피로를 안고 시작합니다. ",
   rankNote: "랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.",
+  // E-11: the finale's one line, once a side case is written (SIDE_CASES).
+  sideSlotOpened: { label: "번외 사건", text: "번외 사건 칸이 열렸습니다. 시작 화면에서 열 수 있고, 랭킹 밖입니다." },
   why: {
     title: "왜 이렇게 됐나",
     subtitle: "이번 판을 결정한 세 가지",

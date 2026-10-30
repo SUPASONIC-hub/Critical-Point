@@ -22,6 +22,7 @@ export default {
   costliestAlternative: "最も重い代案: {label}",
   rankCarryNote: "次の事件は、このランクに応じて信頼と公正さを少し上乗せするか、疲労を抱えて始まります。",
   rankNote: "ランクは正解かどうかではなく、思考が精密に高まった条件を比べるプレイ指標です。",
+  sideSlotOpened: { label: "番外事件", text: "番外事件の枠が開きました。最初の画面から開けます。ランキング対象外です。" },
   why: {
     title: "なぜこうなったか",
     subtitle: "この勝負を決めた三つのこと",

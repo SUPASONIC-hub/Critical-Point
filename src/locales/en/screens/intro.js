@@ -132,4 +132,12 @@ export default {
     first: "Syncing first judgment conditions",
     syncing: "Syncing {case} judgment conditions",
   },
+  sideSlot: {
+    label: "Side cases",
+    heading: "Side cases · off the rankings · {book}",
+    text: "Short cases played apart from the season. Your season save and the rankings stay as they are.",
+    book: "Side {closed}/{total}",
+    resumable: " · Continue",
+    closed: " · Done",
+  },
 };

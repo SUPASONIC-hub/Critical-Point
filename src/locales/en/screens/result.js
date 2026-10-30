@@ -22,6 +22,7 @@ export default {
   costliestAlternative: "Heaviest alternative: {label}",
   rankCarryNote: "Depending on this rank, the next case starts with a little extra Trust and Fairness, or with Fatigue. ",
   rankNote: "Rank isn’t about right answers. It compares the conditions where your thinking rose most precisely.",
+  sideSlotOpened: { label: "Side cases", text: "Side cases are now open. You can start them from the start screen, and they’re off the rankings." },
   why: {
     title: "Why it turned out this way",
     subtitle: "Three things that decided this run",
