@@ -60,6 +60,21 @@ export function anonymizeSensitiveText(text = "") {
  */
 export const PRIVACY_PAGE_PATH = "/privacy.html";
 export const TERMS_PAGE_PATH = "/terms.html";
+/**
+ * Every plain page beside the build, `/<name>.html`, in the order the start
+ * screen's foot and each page's header list them: the game's about, FAQ and
+ * contact pages (scripts/site-pages.mjs) and the two policies.
+ */
+export const SITE_PAGES = ["about", "faq", "contact", "privacy", "terms"];
+
+/**
+ * A policy page in the page's language: Korean at the root, the other
+ * languages under their code (/en/, /ja/; scripts/legal-pages.mjs writes all
+ * three). Until 10-28 the game's links opened the Korean page on every page.
+ */
+export function legalPagePath(path, lang = "ko") {
+  return lang === "en" || lang === "ja" ? `/${lang}${path}` : path;
+}
 export const DATA_RETENTION_DAYS = 180;
 export const PLAYTEST_DATA_NOTICE =
   "사건 결과, 선택 로그, 응답 시간, 화면 언어, 보낸 피드백, 오류 보고가 이 기기의 무작위 식별 번호와 함께 연구용으로 저장되고 180일 뒤 지워집니다. 이름은 원격 저장하지 않으며, 접속 주소는 요청 횟수를 제한하는 데만 씁니다.";

@@ -28,7 +28,7 @@ export default {
           "label": "Go to the night-shift break room tonight and meet the 80"
         },
         "reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Ask Choi Seojin whose day changes when the robots come"
         },
         "reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         },
         "c16_duel_evidence_turn": {
-          "label": "Find who asked for the 80 terminations in the lease papers"
+          "label": "Find who asked for the 80 cuts"
         }
       },
       "place": "FlowOn fulfillment center · Floor, Building B",
@@ -87,10 +87,10 @@ export default {
           "label": "Tell the committee about the edit history"
         },
         "reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         },
         "c16_review_evidence_turn": {
-          "label": "Find who asked for the 80 terminations in the lease papers"
+          "label": "Find who asked for the 80 cuts"
         }
       },
       "place": "KD Capital, Euljiro, 11th floor · Lease Review Team meeting room",
@@ -118,10 +118,10 @@ export default {
           "label": "Say you’ll stand by him whatever he decides"
         },
         "reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         },
         "c16_roof_evidence_turn": {
-          "label": "Find who asked for the 80 terminations in the lease papers"
+          "label": "Find who asked for the 80 cuts"
         }
       },
       "place": "FlowOn fulfillment center · Roof",
@@ -383,7 +383,7 @@ export default {
           "label": "Bury the figures and keep to the approval schedule"
         },
         "c16_route_system_evidence_turn": {
-          "label": "Find who asked for the 80 terminations in the lease papers"
+          "label": "Find who asked for the 80 cuts"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
@@ -459,7 +459,7 @@ export default {
           "label": "Move the Thursday dinner table to the night-shift break room"
         },
         "c16_start_warm_reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         }
       },
       "place": "Lee Minseo’s rooftop room, Mangwon-dong · Rooftop",
@@ -490,7 +490,7 @@ export default {
           "label": "Read the lease application and terms line by line"
         },
         "c16_start_record_reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -521,7 +521,7 @@ export default {
           "label": "Go with Kang Taemin now, in time for the shift change"
         },
         "c16_start_rush_reframe": {
-          "label": "Add a column: the let-go, 1 year later"
+          "label": "Add the let-go, 1 year later"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room · Before dawn",

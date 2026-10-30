@@ -52,7 +52,7 @@ export default {
           "label": "NOAHに拒絶の理由を最後まで問い返す"
         },
         "c22_counter_evidence_turn": {
-          "label": "NOAHの学習目録で'不渡り関係人'を探す"
+          "label": "NOAHの目録で'不渡り関係人'を探す"
         }
       },
       "place": "KD銀行カンソ支店 · 店頭ロビー",
@@ -83,7 +83,7 @@ export default {
           "label": "NOAHに拒絶の理由を最後まで問い返す"
         },
         "c22_factory_evidence_turn": {
-          "label": "NOAHの学習目録で'不渡り関係人'を探す"
+          "label": "NOAHの目録で'不渡り関係人'を探す"
         }
       },
       "place": "インチョン・ナムドン工業団地 クッカジ精密 · 工場",
@@ -114,7 +114,7 @@ export default {
           "label": "NOAHに拒絶の理由を最後まで問い返す"
         },
         "c22_roleplay_evidence_turn": {
-          "label": "NOAHの学習目録で'不渡り関係人'を探す"
+          "label": "NOAHの目録で'不渡り関係人'を探す"
         }
       },
       "place": "KD銀行カンソ支店 · 3階の研修会議室",
@@ -376,7 +376,7 @@ export default {
           "label": "循環した説明のキャプチャを41件の申請者と支店に公開"
         },
         "c22_route_system_evidence_turn": {
-          "label": "NOAHの学習目録で'不渡り関係人'を探す"
+          "label": "NOAHの目録で'不渡り関係人'を探す"
         }
       },
       "place": "パンギョ KDデータラボ · サーバー室の試験端末",
