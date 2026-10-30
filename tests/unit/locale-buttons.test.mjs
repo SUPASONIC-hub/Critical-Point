@@ -23,8 +23,11 @@ const lines = () => Object.entries({ ...noticesCopy.save, ...noticesCopy.storage
 test("on the Korean page the NEW GAME+ label and the retry button are what they were", () => {
   assert.deepEqual(newGamePlusLabel(), ["", " 시작"]);
   assert.equal(noticesCopy.storage.retry, "저장소 정리 재시도");
-  // The button came for a line with "저장소" in it, and comes for the same lines now.
-  for (const [key, line] of lines()) assert.equal(offersStorageRetry(line), line.includes("저장소"), key);
+  // The button came for a line with "저장소" in it, and comes for the same lines now,
+  // but for the two ranking lines (10-29): they were English until then, so
+  // never had it, and the retry clears the ranking rows and the save.
+  const noRetry = ["rankingFailed", "seasonRankingFailed"];
+  for (const [key, line] of lines()) assert.equal(offersStorageRetry(line), line.includes("저장소") && !noRetry.includes(key), key);
   for (const other of ["", "저장됨 12:00", ...Object.values(noticesCopy.run), "Local ranking save failed: browser storage is unavailable."]) {
     assert.equal(offersStorageRetry(other), other.includes("저장소"), other);
   }

@@ -76,7 +76,8 @@ const budgets = [
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 149,722 / 54,994 -> 149,740 / 54,996 on 2026-10-29, lang-layout-check: the layout sweep's narrow mode (LAYOUT_SCENES=hand5) jumps scene to scene through window.__cpDebugJump, an effect in useRuntimeRenderers that a release folds away to an empty effect. Measured 149,736 / 54,992 in the e2e build on main 43078a46, the gzip plus 4.
   // 54,996 -> 55,002 gzip on 2026-10-29, picker-narrow: the shorter Japanese premise (src/locales/ja/screens/intro.js) renames the hashed locale chunk the runtime imports; no code changed. Measured 149,736 / 54,998 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_740, maxGzip: 55_002 },
+  // 149,740 / 55,002 -> 149,905 / 55,019 on 2026-10-30, ranking-save-copy over main c39870a7 (#376, #375): the local and season ranking save lines read from src/copy/notices.js in the page's language (they were English in the hook). Measured 149,901 / 55,015 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_905, maxGzip: 55_019 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1011,8 +1012,9 @@ const budgets = [
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
   // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
   // 153,061 / 51,897 -> 153,139 / 51,933 on 2026-10-29, adsense-readiness: the foot's three new links in Japanese. Measured 153,135 / 51,929, the plus 4.
-  // 153,139 / 51,933 -> 153,160 / 51,950 on 2026-10-30, web-adsense-prep over main c39870a7: the ad box's two lines (adSlot). Measured 153,156 / 51,946, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_160, maxGzip: 51_950 },
+  // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
+  // 153,344 / 51,954 -> 153,428 / 51,988 on 2026-10-30, web-adsense-prep over main 430dda1e: the ad box's two lines (adSlot). Measured 153,424 / 51,984, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_428, maxGzip: 51_988 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1105,11 +1107,14 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The language pills kept one row on a 360px phone and the shorter Japanese
  * premise (picker-narrow, over main c3b40b6f; the critical CSS carries the
  * rule): 423,125, 472,600 and 478,386.
+ * The ranking save lines in the page's language (ranking-save-copy, over main
+ * c39870a7; the Korean only by the entry's hashed names): 423,114, 472,617
+ * and 478,413.
  * The ad box's two lines in each dictionary (web-adsense-prep over main
- * c39870a7, src/copy/adSlot.js; the box itself stays out of an ads-off build):
- * 423,117 (in budget), 472,624 and 478,412.
+ * 430dda1e, src/copy/adSlot.js; the box itself stays out of an ads-off build):
+ * 423,119 (the Korean only by the entry's hashed names), 472,654 and 478,451.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_129, en: 472_628, ja: 478_416 };
+const FIRST_PAINT_BUDGETS = { ko: 423_123, en: 472_658, ja: 478_455 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1236,8 +1241,7 @@ function checkBudget(file, budget) {
 // network-first pages and its warm-up list. Measured 9,944 / 3,582.
 // 9,948 / 3,586 -> 10,106 / 3,624 on 2026-10-29, adsense-readiness: the about, FAQ and contact pages in three languages
 // join its network-first pages and its warm-up list (nine names). Measured 10,102 / 3,620 over main 3e350266.
-// 3,624 -> 3,629 gzip on 2026-10-30, web-adsense-prep over main c39870a7: the release's file list (the ad box's lines rename the dictionaries). Measured 3,625, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_629 };
+const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_624 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
