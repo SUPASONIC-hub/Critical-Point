@@ -554,7 +554,7 @@ const READING_CLOCK_ASK = "src/gauntlet/ReadingClockAsk.jsx";
  * import it, so left alone it is written into the engine's chunk, which it took
  * past its gzip budget on 2026-10-20 (14,417 of 14,200), and its words into the
  * table's (PlayScreen 34,880 of 34,332). It gets a file the way the table's
- * sound does; it imports only the week's numbers (weeklyRules), never the
+ * sound does; it imports nothing (since RULES_MARK 3 not even the week's rules), never the
  * engine's chunk, so the two do not import each other.
  */
 const AUDIT_RISK = "src/gauntlet/auditRisk.js";
@@ -689,9 +689,12 @@ export default defineConfig(({ command, mode }) => {
       // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
       // The case file's cast (CaseCast, D-8) is the same: the runtime has run
       // every file it leans on before the table's fold can open, and its list
-      // of sixteen files was about 500 bytes (2026-10-23).
+      // of sixteen files was about 500 bytes (2026-10-23). So are the personal
+      // bests (src/personalBests.js): the ranking screen that fetches them has
+      // already run every file they lean on, and the list cost that screen's
+      // chunk about 260 bytes.
       modulePreload: {
-        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast|personalBests)-/.test(filename) ? [] : deps),
       },
       rolldownOptions: {
         output: {

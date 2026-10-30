@@ -26,7 +26,8 @@ export default {
       intro: [
         "The resource you burned most is charged at 1.5× in the next hand.",
         "Commit at ×4 or more twice in a row and the next hand’s chips go 2×, and each Push adds more Heat.",
-        "Press LOCK after staking a card to raise the resource multiplier; LOCK raises the chip multiplier up to 1.5× (up to 1.6× with a combo). Each press costs time.",
+        "Press LOCK after staking a card to raise the resource multiplier; the chip multiplier rises up to 1.5×. Each press costs time.",
+        "From this case on, the Audit and Links join the table.",
       ],
     },
     prologue05: {

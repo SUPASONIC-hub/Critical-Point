@@ -37,7 +37,9 @@ export const STAGED = true;
  * is the draft a closed case offers. `scout` is SCOUT, the one look a window
  * that narrows the drawn band around the wall for table clock (B1, 11일차
  * 초안). The other seven are the next-table mutations, under the ids the
- * engine's `MUTATIONS` catalogue uses.
+ * engine's `MUTATIONS` catalogue uses. `audit` is B3's audit (auditRisk.js)
+ * and `cascade` B2's links (cascadeRisk.js), rules of the table since
+ * RULES_MARK 3; before that they were 2026-W47's test week.
  */
 export const TABLE_RULES = Object.freeze([
   "logic",
@@ -52,6 +54,8 @@ export const TABLE_RULES = Object.freeze([
   "stance",
   "relics",
   "scout",
+  "audit",
+  "cascade",
 ]);
 
 /**
@@ -66,6 +70,7 @@ export const MUTATION_RULES = Object.freeze({
   overclock: "overclock",
   coldFeet: "coldFeet",
   fracture: "fracture",
+  cascade: "cascade",
   strikeWake: "stance",
   steadyLine: "stance",
   exposedHand: "stance",
@@ -93,14 +98,16 @@ export const ALL_RULES = freezeSet(TABLE_RULES);
 
 /**
  * The rules a story run plays without (스토리 모드, the comfort setting): the
- * seven ways a decision breaks the next board. A table that is there to be read
- * past does not hand a mistake on to the scene after it. The streak, LOCK, the
- * stances and the relics stay -- they are the hand's own, and nothing they do
- * is dealt to a player who did not ask for it.
+ * seven ways a decision breaks the next board, and the audit and the links
+ * (B3 and B2 decision 13), which hand a close on to the case's end and to a
+ * board later. A table that is there to be read past does not hand a mistake
+ * on to the scene after it. The streak, LOCK, the stances and the relics stay
+ * -- they are the hand's own, and nothing they do is dealt to a player who did
+ * not ask for it.
  */
-export const STORY_OFF_RULES = Object.freeze(["blackout", "aftershock", "silence", "coldFeet", "heatDebt", "fracture", "overclock"]);
+export const STORY_OFF_RULES = Object.freeze(["blackout", "aftershock", "silence", "coldFeet", "heatDebt", "fracture", "overclock", "audit", "cascade"]);
 
-/** A set of rules as a story run plays it: the same set, less the seven. */
+/** A set of rules as a story run plays it: the same set, less those nine. */
 function withoutStoryOff(rules) {
   return freezeSet([...rules].filter((rule) => !STORY_OFF_RULES.includes(rule)));
 }
@@ -161,7 +168,18 @@ const STEPS = [
   },
   {
     caseId: "prologue04",
-    adds: ["fracture", "overclock", "lock"],
+    // The audit and the links open with FRACTURE (B3 and B2, question 3 (1)
+    // of the rule switch, user 2026-10-20): the links read the burn FRACTURE
+    // reads, and a cash on a board they deal is not audited, so the two are
+    // told together (초안). One short line and not one each: with a line each,
+    // even cut to a row or two, the panel ran past the docked footer on a
+    // phone's first screen (table-keys at 390x844 and 390x664, 2026-10-21).
+    // Their numbers are told where they act: the signal line's tokens, the
+    // 확정 button's audit preview (`describeAuditIfCash`, which also says a
+    // CASCADE board's cash leaves it as it is) and the reveal's line when a
+    // link is made (`describeLinkMade`).
+    // A story run has neither, so it is told only LOCK.
+    adds: ["fracture", "overclock", "lock", "audit", "cascade"],
     storyIntro: [2],
     intro: unlocksCopy.steps.prologue04.intro,
   },

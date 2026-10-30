@@ -116,7 +116,8 @@ const tableCopy = {
     type: "유형 ",
     faceDown: "칩과 소모가 가려진 카드",
     noBurn: "소모 없음",
-    link: " · 연결",
+    // The tag on a card whose cash makes a link (B2, GauntletHand.jsx).
+    link: "연결",
     fractureTax: "균열 청구 ",
     overclock: "오버클럭 칩 ",
     preview: "선택한 카드의 상세 영향: ",

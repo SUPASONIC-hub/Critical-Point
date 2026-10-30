@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
 import { getLeaderboardStatusCopy } from "../ranking.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
@@ -27,6 +27,17 @@ export function RankingScreen({
   const headingRef = useRef(null);
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
+  }, []);
+  // This device's best of the table before, kept when the ranking key moved on
+  // (src/personalBests.js, fetched here so the entry chunk does not carry it;
+  // it moves a retired key's best first). Its own line, never a row: tables
+  // are not compared. A fetch that fails leaves the line out.
+  const [pastBest, setPastBest] = useState(null);
+  useEffect(() => {
+    import("../personalBests.js").then((module) => {
+      const best = module.takePastBest();
+      setPastBest(best && fill(words.pastBest, best));
+    }, () => {});
   }, []);
   const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
@@ -132,6 +143,9 @@ export function RankingScreen({
               </div>
             )}
           </section>
+          {pastBest && (
+            <p className="ranking-footnote" data-testid="ranking-past-best">{pastBest}</p>
+          )}
           <p className="ranking-footnote">{words.footnote}</p>
         </section>
       </main>

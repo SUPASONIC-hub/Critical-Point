@@ -274,7 +274,16 @@ const fileBudgets = {
   // ground over its stripes.
   // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
   // labels a size down, so five-card hands keep two lines in a CJK face.
-  "play.css": { lines: 2931, bytes: 56132 },
+  // -> 56181 bytes on 2026-10-25, measured: #224's link mark as a tag on the
+  // card's edge (in the burn chip it pushed the chip onto a line of its own).
+  // -> 56227 on 2026-10-25, measured: the run's line 2px apart on a phone,
+  // so 감사 n/4 stays on 판돈 and 금고's row.
+  // -> 56429 on 2026-10-30, measured: an English page on a 360px phone sets the
+  // bank rail tighter (10px labels, 5px pills, 3px gap) so Audit n/4 keeps the
+  // run's line on Stake and Vault's row.
+  // -> 56546 on 2026-10-30, measured: #224 merged with main b2558d55, the
+  // Japanese card labels (main) and the English bank rail (#224) together.
+  "play.css": { lines: 2931, bytes: 56546 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

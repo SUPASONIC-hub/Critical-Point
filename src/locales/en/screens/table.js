@@ -104,7 +104,7 @@ export default {
     type: "Type ",
     faceDown: "Card with its chips and cost hidden",
     noBurn: "No cost",
-    link: " · link",
+    link: "Link",
     fractureTax: "Fracture charge ",
     overclock: "Overclock chips ",
     preview: "Effects of the chosen card: ",

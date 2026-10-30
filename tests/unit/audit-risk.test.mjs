@@ -2,40 +2,50 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { addAudit, AUDIT_RELIEF_HEAT, auditStep, countAudit, describeAuditLedger, findAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
+import { addAudit, AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_RELIEF_HEAT, AUDIT_SHARE, auditStep, CASES_BEFORE_AUDIT, countAudit, describeAuditLedger, findAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
 import { isLinkDue } from "../../src/gauntlet/cascadeRisk.js";
 import { normalizeRunState, openCaseRun, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
 import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
+import { ALL_RULES, introFor, rulesFor, STORY_RULES, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
 import { DEV_WEEK_RULE, devWeekEntry } from "../../src/gauntlet/weeklyCalendar.js";
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, getWeekRule, isoWeekKey, pickSeasonWeekRule, WEEKLY_RULES, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
+import { getWeekRule, isoWeekKey, pickSeasonWeekRule, WEEK_RULE_DEVICES, WEEKLY_RULES, weekRuleHasDevice } from "../../src/gauntlet/weeklyRules.js";
 
 const card = { id: "a", label: "a", effect: { capital: 9, trust: -12 }, next: "x" };
 const cash = (gauge, pushes = 2) => ({ status: "cashed", cause: "cash", gauge, wall: 95, pushes, seed: `audit:${gauge}:${pushes}` });
 const bust = (gauge) => ({ status: "bust", cause: "push", gauge, wall: gauge - 1, pushes: 4, seed: `audit-bust:${gauge}` });
-const auditRun = (extra = {}) => normalizeRunState({ weekRule: "audit", ...extra });
+const auditRun = (extra = {}) => normalizeRunState({ ...extra });
+/** Every rule of the table, and the same less the audit or less the links. */
+const without = (rule) => new Set([...ALL_RULES].filter((id) => id !== rule));
+const NO_AUDIT = without("audit");
+const NO_LINKS = without("cascade");
 
 /** Plays windows through the engine as the runtime does: the count off the log, the log gaining each verdict. */
-function playCase(run, windows) {
-  let current = openCaseRun(run);
+function playCase(run, windows, rules = ALL_RULES) {
+  let current = openCaseRun(run, { rules });
   const log = [];
   let verdict = null;
   windows.forEach((window, index) => {
     const caseClosed = index === windows.length - 1;
-    ({ verdict, nextRun: current } = resolveWindow({ run: current, window, card, caseClosed, audit: countAudit(log) }));
+    ({ verdict, nextRun: current } = resolveWindow({ run: current, window, card, caseClosed, rules, audit: countAudit(log) }));
     log.push({ threshold: { busted: verdict.outcome === "bust", gauge: verdict.gauge, pushes: verdict.pushes } });
   });
   return { run: current, verdict, log };
 }
 
-test("the week's catalogue switches the audit on by name, from an allowlist of two", () => {
-  assert.equal(weekRuleHasDevice("audit", "audit"), true);
-  assert.equal(weekRuleHasDevice("audit", "cascade"), false, "cascade is allowed, but this rule does not name it");
-  assert.equal(weekRuleHasDevice("near-wall", "audit"), false);
-  assert.equal(weekRuleHasDevice(null, "audit"), false);
-  assert.equal(weekRuleHasDevice("audit", "made-up"), false, "a device off the list is never on");
-  assert.equal(weekRuleOverlay("audit", { wallMin: 60, wallMax: 80 }), null, "a device moves no number on the board");
-  for (const value of [AUDIT_HEAT, AUDIT_LIMIT, AUDIT_SHARE]) assert.ok(getWeekRule("audit").text.includes(String(value)), `the line quotes ${value}`);
+test("the audit is a rule of the table from 프롤로그 04 (RULES_MARK 3), and no week switches it any more", () => {
+  assert.deepEqual(WEEK_RULE_DEVICES, [], "the week's devices are empty; the frame stays");
+  assert.equal(weekRuleHasDevice("audit-cascade", "audit"), false, "W47's stamp switches nothing now");
+  assert.equal(getWeekRule("audit"), null, "the audit week is gone from the catalogue");
+  const opens = UNLOCK_LADDER.find((step) => step.adds.includes("audit"));
+  assert.equal(opens.caseId, "prologue04", "it opens with FRACTURE");
+  for (const step of UNLOCK_LADDER) assert.equal(step.rules.has("audit"), !CASES_BEFORE_AUDIT.includes(step.caseId), `${step.caseId}: the record's list is the ladder's`);
+  assert.ok(rulesFor("case01").has("audit"));
+  assert.ok(rulesFor("prologue01", { veteran: true }).has("audit"), "NEW GAME+ has it from the first case");
+  assert.equal(STORY_RULES.has("audit"), false, "story mode never has it");
+  assert.equal(rulesFor("prologue04", { story: true }).has("audit"), false);
+  assert.ok(introFor("prologue04").some((text) => text.includes("감사")), "프롤로그 04 says it opens");
+  assert.equal(introFor("prologue04", { story: true }).some((text) => text.includes("감사")), false, "a story run is not told it");
 });
 
 test("a cash pushed and closed cold adds one; a cash at HEAT DEBT takes two off; nothing else moves it", () => {
@@ -59,19 +69,20 @@ test("a cash pushed and closed cold adds one; a cash at HEAT DEBT takes two off;
   assert.equal(countAudit([]), 0);
 });
 
-test("on only for a season stamped with the audit week, and never in story mode or practice", () => {
-  assert.equal(isAuditOn(auditRun()), true);
-  assert.equal(isAuditOn(normalizeRunState({})), false);
-  assert.equal(isAuditOn(normalizeRunState({ weekRule: "near-wall" })), false);
-  assert.equal(isAuditOn(normalizeRunState({ weekRule: "audit", story: true })), false);
-  assert.equal(isAuditOn(openCaseRun(auditRun(), { replayOf: {} })), false, "a replayed case is practice");
-  assert.equal(pickSeasonWeekRule(Date.now(), { story: true, calendar: [{ week: "x", id: "audit" }] }), null);
+test("on in a case whose rules have it, and never in story mode or practice", () => {
+  assert.equal(isAuditOn(auditRun(), ALL_RULES), true);
+  assert.equal(isAuditOn(auditRun(), NO_AUDIT), false);
+  assert.equal(isAuditOn(auditRun(), rulesFor("prologue03")), false);
+  assert.equal(isAuditOn(auditRun(), undefined), false, "no rules, no audit");
+  assert.equal(isAuditOn(normalizeRunState({ weekRule: "audit-cascade" }), NO_AUDIT), false, "W47's stamp does not switch it on");
+  assert.equal(isAuditOn(normalizeRunState({ story: true }), ALL_RULES), false);
+  assert.equal(isAuditOn(openCaseRun(auditRun(), { replayOf: {} }), ALL_RULES), false, "a replayed case is practice");
 });
 
 test("a case closed with the audit full loses one part in AUDIT_SHARE of what it moves, the hand's share too", () => {
   const cold = Array.from({ length: AUDIT_LIMIT }, () => cash(AUDIT_HEAT - 5));
   const caught = playCase(auditRun({ vault: 1000, handVault: 100 }), cold);
-  const plain = playCase(normalizeRunState({ vault: 1000, handVault: 100 }), cold);
+  const plain = playCase(normalizeRunState({ vault: 1000, handVault: 100 }), cold, NO_AUDIT);
   assert.equal(caught.verdict.audit.count, AUDIT_LIMIT);
   assert.equal(caught.verdict.audit.caught, true);
   const moved = plain.verdict.secured;
@@ -135,9 +146,12 @@ test("the table reads where the audit stands and what a cash now would make it, 
   assert.equal(reading.atRisk, true);
   assert.match(reading.spoken, /감사 \+1/);
   assert.deepEqual(readAudit(auditRun(), 2, { ...win, wall: 99 }), readAudit(auditRun(), 2, win), "the wall moves nothing");
-  assert.equal(readTableMeters({ win, schema, selectedCard: null }).audit, null, "no run, no audit");
-  assert.equal(readTableMeters({ win, schema, selectedCard: null, run: normalizeRunState({}), audit: 3 }).audit, null);
+  assert.equal(readTableMeters({ win, schema, selectedCard: null, audit: 2 }).audit, null, "no run, no audit");
+  // A case whose rules do not count it is handed no count (useRunReadout asks isAuditOn).
+  assert.equal(readTableMeters({ win, schema, selectedCard: null, run: normalizeRunState({}) }).audit, null, "no count, no audit");
   assert.equal(readAudit(auditRun(), 0, { ...win, gauge: 70 }).afterCash, 0);
+  const runtime = readFileSync("src/state/useRunReadout.js", "utf8");
+  assert.match(runtime, /isAuditOn\(gauntletRun, caseRules\) \? countAudit\(log\) : null/, "the runtime counts it only in a case whose rules have it");
 });
 
 test("the voice says the audit once, as the next table opens on a count that moved", () => {
@@ -159,24 +173,25 @@ test("the audit's own chunk imports nothing from the engine's: its relief heat i
   assert.equal(AUDIT_RELIEF_HEAT, HEAT_DEBT_GAUGE);
   const source = readFileSync("src/gauntlet/auditRisk.js", "utf8");
   const imports = [...source.matchAll(/from "([^"]+)"/g)].map((match) => match[1]);
-  // The week's numbers, and its words (src/copy/audit.js, 영어판 3단계) with the blank filler.
-  assert.deepEqual(imports, ["./weeklyRules.js", "../copy/audit.js", "../locale.js"], "auditRisk.js imports only the week's numbers and its words");
+  // Its words (src/copy/audit.js, 영어판 3단계) with the blank filler, and nothing
+  // else: tableRules.js became a chunk of its own when it imported that (2026-10-21).
+  assert.deepEqual(imports, ["../copy/audit.js", "../locale.js"], "auditRisk.js imports only its words");
   assert.match(readFileSync("vite.config.js", "utf8"), /const AUDIT_RISK = "src\/gauntlet\/auditRisk\.js"/);
 });
 
-test("a development build plays an audit week on ?week=audit; a release and node never do", () => {
+test("a development build's ?week= plays a week of the catalogue; ?week=audit is no rule now; a release and node never switch", () => {
   const now = Date.parse("2026-10-20T12:00:00+09:00");
-  const forced = devWeekEntry({ debugBuild: true, search: "?debug=1&week=audit", now });
-  assert.deepEqual(forced, { week: isoWeekKey(now), id: "audit", added: "dev" });
+  const forced = devWeekEntry({ debugBuild: true, search: "?debug=1&week=near-wall", now });
+  assert.deepEqual(forced, { week: isoWeekKey(now), id: "near-wall", added: "dev" });
   const calendar = [forced, ...WEEKLY_RULES];
-  const stamp = pickSeasonWeekRule(now, { calendar });
-  assert.equal(stamp, "audit");
-  assert.equal(isAuditOn(normalizeRunState({ weekRule: stamp })), true, "the season it starts counts the audit");
+  assert.equal(pickSeasonWeekRule(now, { calendar }), "near-wall");
   assert.equal(pickSeasonWeekRule(now, { calendar, declined: true }), null, "the start screen's box still turns it down");
   assert.equal(pickSeasonWeekRule(now, { calendar, story: true }), null, "and story mode never has it");
   assert.equal(pickSeasonWeekRule(now + 7 * 24 * 60 * 60 * 1000, { calendar: [forced] }), null, "only this week");
+  const gone = devWeekEntry({ debugBuild: true, search: "?debug=1&week=audit", now });
+  assert.equal(pickSeasonWeekRule(now, { calendar: [gone, ...WEEKLY_RULES] }), null, "the audit week left the catalogue with RULES_MARK 3");
 
-  assert.equal(devWeekEntry({ debugBuild: false, search: "?week=audit", now }), null, "a release build has no switch");
+  assert.equal(devWeekEntry({ debugBuild: false, search: "?week=near-wall", now }), null, "a release build has no switch");
   assert.equal(devWeekEntry({ debugBuild: true, search: "?debug=1", now }), null);
   assert.equal(devWeekEntry({ debugBuild: true, search: "?week=%3Cscript%3E", now }), null);
   assert.equal(pickSeasonWeekRule(now, { calendar: [devWeekEntry({ debugBuild: true, search: "?week=no-such-rule", now }), ...WEEKLY_RULES] }), null, "an id the catalogue lacks is no rule");
@@ -189,47 +204,52 @@ test("a development build plays an audit week on ?week=audit; a release and node
   assert.match(readFileSync("scripts/check-bundle-size.mjs", "utf8"), /'added:"dev"'\]/, "check:bundle fails a release that carries it");
 });
 
-test("the audit's numbers are set B, decided on 2026-10-20: 40 / 4 / -2 / one in four", () => {
+test("the audit's numbers are set B, decided on 2026-10-20 and played in 2026-W47: 40 / 4 / -2 / one in four", () => {
   assert.deepEqual([AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE], [40, 4, 2, 4]);
 });
 
 test("the table record says, in one line under its sentence, how many marks the case closed with", () => {
   const caught = playCase(auditRun(), [cash(20), cash(25), cash(30), cash(35)]);
   assert.equal(caught.verdict.audit.caught, true);
-  assert.equal(describeAuditLedger(caught.log, "audit"), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`);
+  const marked = { tableRules: 3, weekRule: null };
+  assert.equal(describeAuditLedger(caught.log, marked, "case01"), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`);
   const clear = playCase(auditRun(), [cash(20), cash(70), cash(30)]);
   assert.equal(clear.verdict.audit.count, 1);
-  assert.equal(describeAuditLedger(clear.log, "audit"), `감사 1/${AUDIT_LIMIT}칸으로 닫혔다.`, "the count the close judged, read off the same log");
+  assert.equal(describeAuditLedger(clear.log, marked, "prologue04"), `감사 1/${AUDIT_LIMIT}칸으로 닫혔다.`, "the count the close judged, read off the same log");
 
-  assert.equal(describeAuditLedger(caught.log, null), null, "a week without the audit has no line");
-  assert.equal(describeAuditLedger(caught.log, "near-wall"), null);
-  assert.equal(describeAuditLedger([], "audit"), null, "nor a case with no window");
-  assert.equal(describeAuditLedger([{ nodeId: "intro" }], "audit"), null);
+  assert.equal(describeAuditLedger(caught.log, marked, "prologue03"), null, "a case before the audit's step has no line");
+  assert.equal(describeAuditLedger(caught.log, marked, null), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`, "a case the ladder does not name is a whole table's");
+  // A case closed before RULES_MARK 3 says nothing, W47's too: the record is the case on the table.
+  assert.equal(describeAuditLedger(caught.log, { tableRules: 2, weekRule: "audit-cascade" }, "case01"), null, "a case of the table before");
+  assert.equal(describeAuditLedger(caught.log, { tableRules: "3" }, "case01"), `감사 ${AUDIT_LIMIT}/${AUDIT_LIMIT}칸으로 닫혔다. 적발.`, "read as the server reads it, a number");
+  assert.equal(describeAuditLedger(caught.log, null, "case01"), null, "no summary, no mark");
+  assert.equal(describeAuditLedger([], marked, "case01"), null, "nor a case with no window");
+  assert.equal(describeAuditLedger([{ nodeId: "intro" }], marked, "case01"), null);
   const story = caught.log.map((entry) => ({ ...entry, assistStory: true }));
-  assert.equal(describeAuditLedger(story, "audit"), null, "story mode counts nothing");
+  assert.equal(describeAuditLedger(story, marked, "case01"), null, "story mode counts nothing");
   const replay = caught.log.map((entry, index) => (index === caught.log.length - 1 ? { threshold: { ...entry.threshold, firstRecord: { busts: 0 } } } : entry));
-  assert.equal(describeAuditLedger(replay, "audit"), null, "nor does a replayed case");
+  assert.equal(describeAuditLedger(replay, marked, "case01"), null, "nor does a replayed case");
 
   const ledger = readFileSync("src/gauntlet/GauntletLedger.jsx", "utf8");
-  assert.match(ledger, /describeAuditLedger\(log, summary\?\.weekRule\)/, "the record reads the case summary's week");
+  assert.match(ledger, /describeAuditLedger\(log, summary, caseId\)/, "the record reads the case summary's mark and week, and the case");
   assert.match(ledger, /<p className="pressure-ledger-note">\{audit \? `\$\{note\} \$\{audit\}` : note\}<\/p>/, "inside the sentence's paragraph, not a seventh cell");
   assert.equal((ledger.match(/<article>/g) ?? []).length, 6, "the grid keeps its six cells");
 });
 
 // B2 decision 10 (user, 2026-10-19): a cash on a CASCADE board is not counted.
 // The log's way: a window's board was dealt by the window before it.
-const bothRun = (extra = {}) => normalizeRunState({ weekRule: "audit-cascade", ...extra });
+const bothRun = (extra = {}) => normalizeRunState({ ...extra });
 const onCascade = (run) => normalizeRunState({ ...run, schema: { ...run.schema, mutations: [...run.schema.mutations, "cascade"] } });
 
 /** Plays windows as the runtime does, `cascadeAt` the indexes whose board CASCADE deals; the log keeps each `environmentMode`. */
-function playLinked(run, windows, cascadeAt = []) {
-  let current = openCaseRun(run);
+function playLinked(run, windows, cascadeAt = [], rules = ALL_RULES) {
+  let current = openCaseRun(run, { rules });
   const log = [];
   let verdict = null;
   windows.forEach((window, index) => {
     const caseClosed = index === windows.length - 1;
     const audit = countAudit(log);
-    ({ verdict, nextRun: current } = resolveWindow({ run: current, window, card, caseClosed, audit, cascade: cascadeAt.includes(index + 1) }));
+    ({ verdict, nextRun: current } = resolveWindow({ run: current, window, card, caseClosed, rules, audit, cascade: cascadeAt.includes(index + 1) }));
     log.push({ threshold: { busted: verdict.outcome === "bust", gauge: verdict.gauge, pushes: verdict.pushes }, environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable" });
     assert.equal(countAudit(log), verdict.audit?.count ?? 0, `the log and the engine agree after window ${index}`);
   });
@@ -256,7 +276,8 @@ test("a cash on a CASCADE board adds nothing to the audit; its relief stays", ()
   assert.equal(reading.afterCash, 2);
   assert.equal(reading.spoken, `지금 확정해도 감사 2/${AUDIT_LIMIT} 그대로`);
   assert.equal(readAudit(bothRun(), 2, win).ifCash, 1);
-  assert.match(getWeekRule("audit-cascade").text, /CASCADE 판의 확정은 감사에 세지 않는다\.$/, "the week's line says why");
+  assert.equal(reading.spoken, `지금 확정해도 감사 2/${AUDIT_LIMIT} 그대로`, "the 확정 button says it there");
+  assert.match(getWeekRule("audit-cascade").text, /CASCADE 판의 확정은 감사에 세지 않는다\.$/, "as 2026-W47's did");
 });
 
 test("the log counts a window by the board the window before it dealt: the engine, the HUD and the ledger agree", () => {
@@ -265,7 +286,7 @@ test("the log counts a window by the board the window before it dealt: the engin
   const linked = playLinked(bothRun(), [cold(20), cold(25), cold(30), cold(35)], [2, 3]);
   assert.equal(linked.verdict.audit.count, 2);
   assert.equal(linked.verdict.audit.caught, false, "without the exemption this close was caught");
-  assert.equal(describeAuditLedger(linked.log, "audit-cascade"), `감사 2/${AUDIT_LIMIT}칸으로 닫혔다.`);
+  assert.equal(describeAuditLedger(linked.log, { tableRules: 3 }, "case01"), `감사 2/${AUDIT_LIMIT}칸으로 닫혔다.`);
   const plain = playLinked(bothRun(), [cold(20), cold(25), cold(30), cold(35)]);
   assert.equal(plain.verdict.audit.count, AUDIT_LIMIT, "a plain board still counts");
   assert.equal(plain.verdict.audit.caught, true);
@@ -286,14 +307,14 @@ test("the log counts a window by the board the window before it dealt: the engin
   ]), 0);
 });
 
-test("a week with the audit alone deals no CASCADE, so it counts as it did", () => {
+test("a table with the audit and without the links deals no CASCADE, so it counts every cash", () => {
   const heavy = { id: "h", label: "h", effect: { capital: 9, trust: -12 }, next: "x" };
   const entry = (index) => ({ nodeId: `n${index}`, choiceId: "h", riskRewardEffect: heavy.effect, threshold: { gauge: 30, pushes: 1 }, environmentMode: "stable" });
   const log = Array.from({ length: 6 }, (_, index) => entry(index));
-  const dues = (weekRule) => log.map((_, index) => isLinkDue(normalizeRunState({ weekRule }), log.slice(0, index + 1), "run-x"));
-  assert.ok(dues("audit-cascade").includes(true), "with both, a heavy card's link comes due");
-  assert.ok(dues("audit").every((due) => due === false), "with the audit alone, never");
-  const alone = playLinked(auditRun(), [cash(20), cash(25), cash(30), cash(35)]);
+  const dues = (rules) => log.map((_, index) => isLinkDue(normalizeRunState({}), log.slice(0, index + 1), "run-x", rules));
+  assert.ok(dues(ALL_RULES).includes(true), "with both, a heavy card's link comes due");
+  assert.ok(dues(NO_LINKS).every((due) => due === false), "with the audit alone, never");
+  const alone = playLinked(auditRun(), [cash(20), cash(25), cash(30), cash(35)], [], NO_LINKS);
   assert.equal(alone.verdict.audit.count, AUDIT_LIMIT);
   assert.equal(alone.verdict.audit.caught, true);
 });

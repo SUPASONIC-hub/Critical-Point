@@ -2,7 +2,7 @@
 export default {
   back: "Back to the briefing",
   title: "Where did thinking stretch the furthest?",
-  intro: "Compare the Burst Scores and Ranks of finished cases. A high score doesn’t mean you got the right answers. It means that under pressure, your thinking rhythm, perspective shifts, recovery and redesign all rose together.",
+  intro: "Compare Burst Scores and Ranks. A season’s record is its average case score. A high score doesn’t mean you got the right answers. It means that under pressure, your thinking rhythm, perspective shifts, recovery and redesign all rose together.",
   retry: "Try again",
   makeRecord: "Make my record",
   tableLabel: "Player ranking",
@@ -24,5 +24,6 @@ export default {
   tableTime: "Table Time ×{value}",
   story: "Story Mode",
   collapsed: "Collapsed season",
+  pastBest: "Your best on the previous ranking (v{version}): {score} points · {rank}",
   footnote: "Other participants are told apart by judgment type and run number, not by name. Your name appears only in this browser’s records, and without a remote connection only local records are counted.",
 };

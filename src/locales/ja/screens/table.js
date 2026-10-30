@@ -104,7 +104,7 @@ export default {
     type: "タイプ ",
     faceDown: "チップと消耗が伏せられたカード",
     noBurn: "消耗なし",
-    link: " · 連結",
+    link: "連結",
     fractureTax: "ひびの請求 ",
     overclock: "オーバークロックのチップ ",
     preview: "選んだカードの詳しい影響: ",

@@ -42,6 +42,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { getSealedCardId, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
+import { getSeasonScore } from "./seasonScore.js";
 
 /** What createCaseSummary copies from getGameplayStats, and so what is compared. */
 const SCORE_FIELDS = Object.freeze([
@@ -184,7 +185,8 @@ function isCurrentTable(row) {
  * evening's answer for a window that left no record).
  *
  *   score-off-log      a case summary off its own log, or the ranking row's
- *                      score off the final case row's.
+ *                      score off the mean of the run's case rows (its other
+ *                      score fields off the final case row's).
  *   window-off-replay  a window that does not replay to its threshold, a
  *                      record that does not hold together, a sealed cash, a
  *                      response time off the clock, or a seed the page would
@@ -209,7 +211,7 @@ export const RECHECK_MARKS = Object.freeze(["score-off-log", "window-off-replay"
 /**
  * One run read together: its case rows (`case_id` a case) and its ranking row
  * (`season-final`, whose summary the server copied from the `final` case
- * row). Returns the marks for the ranking row and what led to them, case by
+ * row, its score the mean of the case rows'). Returns the marks for the ranking row and what led to them, case by
  * case, and the run's status:
  *
  *   checked     played on a build that writes replay records, and read whole.
@@ -248,10 +250,14 @@ export function recheckRun(rows = []) {
     if (recorded && unrecorded) marks.add("window-no-replay");
     return { caseId: row.case_id, score: { status: score.status, differs: score.differs }, windows };
   });
-  // The ranking row's score is the final case's: it was copied, so it can only
-  // differ if one of the two was written by something else than the page.
+  // The ranking row's score is the mean of the run's case rows (C-2 and Q25,
+  // `getSeasonScore`; the server's ranking_run_summary writes it from the same
+  // rows), and its other score fields are the final case's, copied: either can
+  // only differ if a row was written by something else than the page.
   const final = cases.find((row) => row.case_id === "final");
-  const rankingDiffers = ranking && final ? SCORE_FIELDS.filter((field) => ranking.summary?.[field] !== final.summary?.[field]) : [];
+  const season = getSeasonScore(Object.fromEntries(cases.map((row) => [row.case_id, row.summary])));
+  const expected = (field) => (Object.hasOwn(season, field) ? season[field] : final.summary?.[field]);
+  const rankingDiffers = ranking && final ? SCORE_FIELDS.filter((field) => ranking.summary?.[field] !== expected(field)) : [];
   if (rankingDiffers.length) marks.add("score-off-log");
   return { status: recorded ? "checked" : "unrecorded", marks: RECHECK_MARKS.filter((mark) => marks.has(mark)), rankingDiffers, cases: report };
 }

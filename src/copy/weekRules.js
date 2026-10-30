@@ -3,7 +3,7 @@ import { localizeTables } from "../locale.js";
 /**
  * The words of 이번 주의 규칙's catalogue (gauntlet/weeklyRules.js): each
  * rule's title, its text and its line in the story, and the audit's and the
- * links' lines the test weeks share, read by key so another language can be
+ * links' lines 2026-W47's test week has, read by key so another language can be
  * laid over them (src/locale.js, 다국어 틀). The Korean is the catalogue's,
  * moved here unchanged; its numbers are the catalogue's constants, filled in
  * as `{blanks}` (`ruleWords` there), so a tuned number is still one edit.
@@ -27,8 +27,6 @@ const weekRulesCopy = {
       text: "이번 주는 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다.",
       world: "이번 주 이사회는 보고 시간을 줄이고 보고서 값을 올렸다.",
     },
-    audit: { title: "감사 주간", text: "{audit}" },
-    cascade: { title: "연쇄 주간", text: "{cascade}" },
     "audit-cascade": {
       title: "감사와 연쇄",
       text: "이번 주는 감사와 연쇄가 함께 선다. {audit} {cascade} CASCADE 판의 확정은 감사에 세지 않는다.",

@@ -132,8 +132,9 @@ test("the calendar names known rules, one per week, announced a week ahead", () 
     for (const key of Object.keys(rule.schema ?? {})) {
       assert.ok(["wallShift", "secondsShift", "chipsFactor", "seconds", "chipsScale", "fractureRate", "sealBreak"].includes(key), `${id} moves only a number normalizeSchema clamps (D4): ${key}`);
     }
-    // Or switches on a device, by name, from the allowlist (B3 decision 8, B2 decision 11).
-    for (const device of rule.rules ?? []) assert.ok(WEEK_RULE_DEVICES.includes(device), `${id} switches on only an allowed device: ${device}`);
+    // Or switches on a device, by name, from the allowlist (B3 decision 8, B2 decision 11). The one
+    // exception is 2026-W47's, a week gone by whose two devices RULES_MARK 3 made rules of the table.
+    for (const device of rule.rules ?? []) assert.ok(WEEK_RULE_DEVICES.includes(device) || id === "audit-cascade", `${id} switches on only an allowed device: ${device}`);
     assert.ok(rule.schema || rule.rules?.length, `${id} moves a number or switches on a device`);
   }
 });
@@ -466,11 +467,12 @@ test("the start screen fetches the rule's words only in a week with something to
   assert.doesNotMatch(read("src/gauntlet/weeklyCalendar.js"), /^import /m, "a leaf");
 });
 
-test("2026-W47, the test week, switches on the audit and the links together, and is told from W46 on", () => {
+test("2026-W47, the test week, played the audit and the links together, told from W46 on; since RULES_MARK 3 its stamp switches nothing", () => {
   const entry = WEEKLY_RULES.find((item) => item.week === "2026-W47");
   assert.equal(entry?.id, "audit-cascade");
-  assert.deepEqual([...getWeekRule(entry.id).rules], ["audit", "cascade"]);
-  for (const device of ["audit", "cascade"]) assert.equal(weekRuleHasDevice(entry.id, device), true, device);
+  assert.deepEqual([...getWeekRule(entry.id).rules], ["audit", "cascade"], "what it switched on, as the table record reads it");
+  assert.deepEqual(WEEK_RULE_DEVICES, [], "the devices became rules of the table (tableUnlocks.js)");
+  for (const device of ["audit", "cascade"]) assert.equal(weekRuleHasDevice(entry.id, device), false, device);
   assert.equal(getWeekRule(entry.id).schema, undefined, "no number on the board moves");
   assert.equal(weekStartMs("2026-W47"), kst("2026-11-16T00:00:00"), "Monday 2026-11-16, Korean time");
   // Moved on 2026-10-22 (user): W44 is an ordinary week again.

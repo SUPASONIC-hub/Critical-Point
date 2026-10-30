@@ -2,6 +2,7 @@ import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import * as seasonStanding from "./seasonStanding.js";
+import * as scoring from "./seasonScore.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import observerCopy from "./copy/observer.js";
 import { fill } from "./locale.js";
@@ -20,6 +21,7 @@ export {
   getSuspenseEvent,
   getSuspenseState,
 } from "./riskLogic.js";
+export { getCognitionSpread } from "./seasonScore.js";
 
 export function buildNarrativeSpine({
   caseObjective = "",
@@ -129,32 +131,6 @@ function getConsistencyScore(entries = []) {
   return Math.round(clamp((((held / total) * 2 - 1) - flipRate * 0.5) * 140, 0, 100));
 }
 
-/**
- * How evenly the run moved between the four ways of thinking.
- *
- * This used to be `types * 14 + shifts * 10 + length * 4`, which any run of a
- * dozen decisions filled to the cap: measured across five fixed strategies it
- * returned 100 every time, so a fifth of the score could not separate two runs.
- * Normalised entropy answers the same question and actually varies -- one
- * repeated approach lands near 0, an even spread across all four near 100.
- */
-export function getCognitionSpread(types = []) {
-  if (types.length === 0) return 0;
-  const counts = new Map();
-  for (const type of types) counts.set(type, (counts.get(type) ?? 0) + 1);
-  if (counts.size < 2) return 0;
-  const entropy = [...counts.values()].reduce((sum, count) => {
-    const share = count / types.length;
-    return sum - share * Math.log(share);
-  }, 0);
-  const ceiling = Math.log(Math.min(counts.size, types.length));
-  const evenness = ceiling > 0 ? entropy / ceiling : 0;
-  // A run that only ever used two of the four ways cannot reach the top, even
-  // if it alternated them perfectly.
-  const reach = counts.size / 4;
-  return Math.round(clamp(evenness * reach * 100, 0, 100));
-}
-
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   if (entries.length === 0) {
     return {
@@ -203,10 +179,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
       return sum + 24;
     }, 0) / rhythmSamples.length,
   );
-  const cognitionTypes = scoredEntries
-    .map((entry) => Object.entries(entry.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0])
-    .filter(Boolean);
-  const cognitionScore = getCognitionSpread(cognitionTypes);
+  const cognitionScore = scoring.getCognitionSpread(scoring.getCognitionMix(scoredEntries));
   const riskDeltas = scoredEntries.map((entry) => {
     if (entry.resourcesBefore && entry.resourcesAfter) {
       return getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore);
@@ -273,10 +246,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     reflectionScore,
     consistencyScore,
     exploitPenalty,
-    momentumScore,
-    burstScore: momentumScore,
-    momentumTier: momentumScore >= 78 ? "BURST" : momentumScore >= 58 ? "FLOW" : momentumScore >= 36 ? "READY" : "BUILDING",
-    rank: momentumScore >= 88 ? "S" : momentumScore >= 72 ? "A" : momentumScore >= 52 ? "B" : "C",
+    ...scoring.scoreMarks(momentumScore),
   };
 }
 
@@ -1003,6 +973,7 @@ export function createCaseSummary(
   const stats = getGameplayStats(entries, getRiskPressure(resources));
   const assistTime = entries.reduce((slowest, entry) => Math.max(slowest, Number(entry?.assistTime) || 1), 1);
   const logicRecord = replayOf ? replayOf.logicRecord : createLogicRecord(entries);
+  const firstBurstScore = replayOf ? Number(replayOf.firstBurstScore ?? replayOf.burstScore) : NaN; // the season's score counts it (seasonScore.js)
   const summary = {
     schemaVersion,
     caseId: entries.find((entry) => entry?.caseId)?.caseId ?? null,
@@ -1023,6 +994,11 @@ export function createCaseSummary(
     momentumScore: stats.momentumScore,
     momentumTier: stats.momentumTier,
     rank: stats.rank,
+    ...(Number.isFinite(firstBurstScore) ? { firstBurstScore } : {}),
+    // Decisions by the way of thinking each leaned on: the season's 관점 전환 is
+    // read off them all (getSeasonScore), and a replay keeps its first close's.
+    cognitionMix: scoring.getCognitionMix(entries),
+    ...(replayOf ? { firstCognitionMix: replayOf.firstCognitionMix ?? replayOf.cognitionMix ?? null } : {}),
     // The slowest table clock any decision of the case was played on, when the
     // comfort setting slowed it; absent on a case played at the table's pace.
     ...(assistTime > 1 ? { assistTime } : {}),

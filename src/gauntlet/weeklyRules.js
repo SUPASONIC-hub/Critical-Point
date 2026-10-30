@@ -16,7 +16,8 @@
  * One exception, by name: a rule may switch on a device the table does not
  * otherwise have (`rules`), from `WEEK_RULE_DEVICES` and nothing else (B3
  * decision 8, widened to two by B2 decision 11). There is no general frame;
- * the engine asks `weekRuleHasDevice` for the one it means.
+ * the engine asks `weekRuleHasDevice` for the one it means. Since RULES_MARK 3
+ * the list is empty: the two devices it held are rules of the table.
  *
  * A leaf module, like tableRules.js: pure functions of a time in milliseconds.
  * What "now" is lives in state/weeklyClock.js, so a test can hold it still.
@@ -39,30 +40,16 @@ export const WEEKLY_NOTICE_DAYS = 7;
 export const WEEK_RULE_ID_MAX = 32;
 
 /**
- * The devices a week may switch on: B3's AUDIT (auditRisk.js) and B2's
- * CASCADE (cascadeRisk.js). A device a rule names outside this list is not on.
+ * The devices a week may switch on. B3's AUDIT and B2's CASCADE were the two
+ * (B3 decision 8, widened by B2 decision 11) until RULES_MARK 3 made them
+ * rules of the table (tableUnlocks.js); the list is kept, empty, for the next
+ * device a week tries out first (the rule switch's question 2, user
+ * 2026-10-20). A device a rule names outside it is not on.
  */
-export const WEEK_RULE_DEVICES = Object.freeze(["audit", "cascade"]);
+export const WEEK_RULE_DEVICES = Object.freeze([]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
-/**
- * AUDIT (B3, the `audit` device, auditRisk.js): a cash pushed at least once
- * and closed below `AUDIT_HEAT` adds one to the case's audit, a cash at
- * HEAT DEBT's heat or more takes `AUDIT_RELIEF` off it. When the case closes
- * with `AUDIT_LIMIT` or more, one part in `AUDIT_SHARE` of what it moves to
- * the vault is lost. Set B of the design's three (40 / 4 / -2 / one in four),
- * decided by the user on 2026-10-20 after the A/B/C measurement of PR #201:
- * A never caught a season bot, C broke a check:pressure assertion and caught
- * the hand that watches the wall. Here, beside the other
- * week's numbers, while it is a week's device: imported from tableRules.js
- * this chunk took the whole of that module (check:bundle, 2026-10-19); it
- * moves there when it becomes a rule of the table.
- */
-export const AUDIT_HEAT = 40;
-export const AUDIT_LIMIT = 4;
-export const AUDIT_RELIEF = 2;
-export const AUDIT_SHARE = 4;
 /** HEAVY FRACTURE: what FRACTURE bills the cracked axis that week. */
 const HEAVY_FRACTURE_RATE = 1.75;
 /**
@@ -76,15 +63,23 @@ export const SHORT_CLOCK_SECONDS = 8;
 export const SHORT_CLOCK_CHIPS = 1.25;
 
 /**
+ * The audit's numbers 2026-W47's line was written with (B3's set B, 40 / 4 /
+ * one in four). The table's own are auditRisk.js's since RULES_MARK 3; these
+ * stay the ones that week showed, so the week's line does not move with a
+ * tuned table, and this chunk does not import that one.
+ */
+const W47_AUDIT = Object.freeze({ heat: 40, limit: 4, share: 4 });
+
+/**
  * A rule's words in the page's language (src/copy/weekRules.js), its numbers
- * filled in from the constants above: the audit's line and the links', each
- * week's that has the device. Read when asked, so a rule read after the
- * page's language arrived is in it.
+ * filled in from the constants above: the audit's line and the links', which
+ * 2026-W47's line has. Read when asked, so a rule read after the page's
+ * language arrived is in it.
  */
 function ruleWords(id) {
   const { auditLine, cascadeLine, rules } = weekRulesCopy;
   const { title, text, world } = rules[id];
-  const audit = fill(auditLine, { heat: AUDIT_HEAT, limit: AUDIT_LIMIT, share: AUDIT_SHARE });
+  const audit = fill(auditLine, W47_AUDIT);
   const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, audit, cascade: cascadeLine };
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
@@ -116,27 +111,14 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     ...ruleWords("short-clock"),
     schema: Object.freeze({ secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS }),
   }),
-  // B3's test week: a device; no number on the board moves.
-  "audit": Object.freeze({
-    label: "AUDIT WEEK",
-    // 초안 문구 (B3 decision 11 asks for the line by number).
-    ...ruleWords("audit"),
-    rules: Object.freeze(["audit"]),
-  }),
-  // B2's test week: a device; no number on the board moves. Its numbers are
-  // cascadeRisk.js's, written out because that chunk imports this one (a
-  // unit test holds the line to them). In no week of the calendar; a
-  // development build plays it with `?week=cascade` (weeklyCalendar.js).
-  "cascade": Object.freeze({
-    label: "CASCADE WEEK",
-    // 초안 문구.
-    ...ruleWords("cascade"),
-    rules: Object.freeze(["cascade"]),
-  }),
-  // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22): both devices at once, told
-  // in the two weeks' own lines and one that ties them: a cash on a CASCADE
-  // board is not counted by the audit (B2 decision 10, auditRisk.js), so the
-  // ranking of that week is the one table B3 and B2 will be judged on.
+  // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22,
+  // 11-16 to 11-22): both devices at once, which RULES_MARK 3 then made rules
+  // of the table from 프롤로그 04. A week gone by, kept because the calendar
+  // and the server's weekly_rules name it and a season begun in it carries the
+  // stamp; its line is the one that week showed (`W47_AUDIT` above; the
+  // table's numbers are auditRisk.js's and cascadeRisk.js's now), and `rules`
+  // is what it switched on, which nothing switches any more
+  // (`WEEK_RULE_DEVICES` is empty; the table record reads it, auditRisk.js).
   "audit-cascade": Object.freeze({
     label: "AUDIT & CASCADE",
     ...ruleWords("audit-cascade"),

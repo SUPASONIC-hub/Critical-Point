@@ -18,8 +18,6 @@ export default {
       text: "This week every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much.",
       world: "This week the board cut reporting time and raised the value of reports.",
     },
-    audit: { title: "Audit Week" },
-    cascade: { title: "Cascade Week" },
     "audit-cascade": {
       title: "Audit and Cascade",
       text: "This week the audit and the cascade stand together. {audit} {cascade} A commit on a CASCADE hand doesn’t count toward the audit.",

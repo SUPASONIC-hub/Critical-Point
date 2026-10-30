@@ -10,7 +10,7 @@ import { localizeTables } from "../locale.js";
 const rankingCopy = {
   back: "브리핑으로 돌아가기",
   title: "어디서 생각이 가장 크게 확장됐는가",
-  intro: "완료된 사건의 버스트 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라, 압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.",
+  intro: "버스트 점수와 랭크를 비교합니다. 시즌 기록은 사건 평균 점수입니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라, 압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.",
   retry: "다시 불러오기",
   makeRecord: "내 기록 만들기",
   tableLabel: "플레이어 랭킹",
@@ -32,6 +32,8 @@ const rankingCopy = {
   tableTime: "테이블 시간 ×{value}",
   story: "스토리 모드",
   collapsed: "붕괴한 시즌",
+  // This device's best of the table before (src/personalBests.js), its own line under the table.
+  pastBest: "지난 판(v{version})의 내 최고 {score}점 · {rank}",
   footnote: "다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.",
 };
 export default rankingCopy;
