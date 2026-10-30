@@ -89,7 +89,7 @@ function describeHand(verdict) {
 
 // Moved to settleChoice.js (F1 phase 3, S2), where a server check can import
 // them without React; exported here as well for the callers that read them here.
-export { getOfferedTypes, getSettlementRules } from "./settleChoice.js";
+export { getOfferedDirections, getSettlementRules } from "./settleChoice.js";
 
 /**
  * Committing a decision: the table's verdict prices the card, the log gains
@@ -339,7 +339,8 @@ export function useChoiceCommit(context) {
         focus: verdict.focus,
         logic: verdict.logic,
         // The same board played bare by the player and by a hand that sees the
-        // wall (tableAfterword.js, C-12): shown when the case closes, never scored.
+        // wall (tableAfterword.js, C-12): shown when the case closes, and summed
+        // into the burst score as its 판 읽기 axis (C-1(1), seasonScore.js).
         read: readWindowAgainstSeer(windowState, verdict.chips),
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",

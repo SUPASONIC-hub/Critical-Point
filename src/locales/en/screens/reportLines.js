@@ -40,6 +40,7 @@ export default {
     rhythm: { label: "Thinking rhythm", note: "Not instant answers or stalling, but time spent reading the pressure and pushing it to a conclusion. The smallest share of the score." },
     cognition: { label: "Perspective shifts", note: "Signs that you moved between reasoning, risk, reframing and holding out instead of repeating one way." },
     pressureAdapt: { label: "Handling pressure", note: "Not points for dodging risk, but for winning back pressure once it rose." },
+    reading: { label: "Reading the hand", note: "What you earned this case, against the Vault someone who could see the Wall would have earned on the same hands (\"N% of what someone who could see the Wall would have\")." },
     reflection: { label: "Redesigning the table", note: "How far you reframed the table to open hidden routes, met scene challenges and found hidden records." },
     exploit: { label: "Quick-answer penalty", note: "Deducted only when you keep tapping fast on the shown information alone." },
   },

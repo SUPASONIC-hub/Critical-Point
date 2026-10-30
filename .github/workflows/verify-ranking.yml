@@ -37,6 +37,23 @@ name: Verify Ranking
 #
 # Once a day at 23:55 KST, after the test week's 23:40 read, and by hand. A
 # run by hand can leave the marks unwritten (`write`: false) to read only.
+#
+# D2, the hall of fame (D2-명예의전당-설계안-20261021.md, all (1), question
+# 9 (1)): the read lists, beside the top `limit`, each open board's first ten
+# seasons that could stand (verify-ranking-rows --runs-sql --per-board). Right
+# after the marks, one read-only SELECT counts each board's seasons with no
+# mark over the whole board (hall_of_fame_counts: the threshold of ten is not
+# counted within the rows read), and from the same check of the same rows
+# (src/hallOfFame.js, verify-ranking-rows --hall-of-fame-sql) one statement
+# calls hall_of_fame_settle (20261102040000_hall_of_fame.sql) with each
+# board's first three clean, checked seasons; it counts again itself and
+# refuses a place below ten. The check is not run twice, so
+# what was checked and what is posted cannot differ. Then a job of its own,
+# the only one with `contents: write`, reads the public view and force-pushes
+# one commit with the page to the `hall-of-fame` branch, an orphan with no
+# history (a season taken out is gone from it the next day). That branch is
+# no ruleset's, starts no Verify and no Deploy; main is never written. A
+# failure leaves the tables and the branch as they were the day before.
 
 on:
   workflow_dispatch:
@@ -63,6 +80,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      settled: ${{ steps.hall.outputs.settled }}
     env:
       # Not a secret: it is the host name in the site's own connect-src.
       SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
@@ -106,7 +125,7 @@ jobs:
             fi
           }
           started=$SECONDS
-          node scripts/verify-ranking-rows.mjs --runs-sql --limit="$RANKING_LIMIT" > runs.sql || exit 1
+          node scripts/verify-ranking-rows.mjs --runs-sql --limit="$RANKING_LIMIT" --per-board=10 > runs.sql || exit 1
           query runs.sql runs.json
           runs=$(node scripts/verify-ranking-rows.mjs --run-count runs.json) || exit 1
           mkdir -p rows
@@ -126,7 +145,7 @@ jobs:
         run: |
           started=$SECONDS
           {
-            echo "### Ranked runs worked out again and chained (top $RANKING_LIMIT)"
+            echo "### Ranked runs worked out again and chained (top $RANKING_LIMIT, and each open hall of fame board's first 10 candidates)"
             echo '```'
             node scripts/verify-ranking-rows.mjs rows/*.json --redact
             echo '```'
@@ -154,8 +173,99 @@ jobs:
             exit 1
           fi
           echo "Marked $(node -e 'const r = JSON.parse(require("fs").readFileSync("marked.json", "utf8")); console.log((r.rows ?? r)[0]?.marked_rows ?? 0)') ranking rows." | tee -a "$GITHUB_STEP_SUMMARY"
+      # The hall of fame, from the same rows and the same check, after the
+      # marks: the function reads them back (a place must be clean and
+      # rechecked) and refuses the whole call otherwise.
+      - name: Settle the hall of fame
+        id: hall
+        if: steps.token.outputs.configured == 'true' && steps.read.outputs.runs != '0' && (github.event_name == 'schedule' || inputs.write != 'false')
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          # Each board's count over the whole board, read after the marks.
+          node scripts/verify-ranking-rows.mjs --hall-of-fame-counts-sql > counts.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f counts.sql > counts.json 2> hall.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code; the hall of fame is as it was:"
+            node scripts/check-migration-drift.mjs --say-failure counts.json hall.err
+            exit 1
+          fi
+          {
+            echo "### Hall of fame (D2)"
+            echo '```'
+            node scripts/verify-ranking-rows.mjs rows/*.json --hall-of-fame --counts=counts.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          node scripts/verify-ranking-rows.mjs rows/*.json --hall-of-fame-sql --counts=counts.json > hall.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f hall.sql > hall.json 2> hall.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code; the hall of fame is as it was:"
+            node scripts/check-migration-drift.mjs --say-failure hall.json hall.err
+            exit 1
+          fi
+          echo "Hall of fame: $(node -e 'const r = JSON.parse(require("fs").readFileSync("hall.json", "utf8")); console.log(JSON.stringify((r.rows ?? r)[0]?.settled ?? null))')" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "settled=true" >> "$GITHUB_OUTPUT"
       - name: Remove the rows
         if: always()
         run: |
-          rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err
+          rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err counts.sql counts.json hall.sql hall.json hall.err
           if [ -d rows ]; then rmdir rows; fi
+
+  # The page: the public view, as markdown, one commit on the orphan branch
+  # `hall-of-fame`, pushed with --force. This job alone may write contents,
+  # and it pushes to refs/heads/hall-of-fame and nothing else.
+  hall-of-fame-page:
+    needs: verify
+    if: needs.verify.outputs.settled == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          browser: none
+      - name: Read the hall of fame and write the page
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/verify-ranking-rows.mjs --hall-of-fame-read-sql > view.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f view.sql > view.json 2> view.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code; the branch is left as it was:"
+            node scripts/check-migration-drift.mjs --say-failure view.json view.err
+            exit 1
+          fi
+          node scripts/verify-ranking-rows.mjs --hall-of-fame-md view.json > "$RUNNER_TEMP/hall-of-fame.md" || exit 1
+          rm -f view.sql view.json view.err
+          cat "$RUNNER_TEMP/hall-of-fame.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Push the page to the hall-of-fame branch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          page="$RUNNER_TEMP/hall-of-fame-page"
+          mkdir -p "$page"
+          cp "$RUNNER_TEMP/hall-of-fame.md" "$page/README.md"
+          cd "$page"
+          git init -q -b hall-of-fame
+          git add README.md
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "명예의 전당 $(TZ=Asia/Seoul date +%F)"
+          auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          git -c http.extraheader="AUTHORIZATION: basic $auth" push --force "https://github.com/$GITHUB_REPOSITORY.git" HEAD:refs/heads/hall-of-fame

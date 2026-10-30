@@ -20,7 +20,7 @@ installBrowser();
 const { createElement } = await import("react");
 const { renderToStaticMarkup } = await import("react-dom/server");
 const { parseCurrentSavedState, SAVE_SCHEMA_VERSION } = await import("../../src/appConfig.js");
-const { CASE_RESULT_NODES, seasonCasesBase } = await import("../../src/gameCases.js");
+const { CASE_RESULT_NODES, CASE_SEQUENCE, RESULT_NODE_IDS, seasonCasesBase } = await import("../../src/gameCases.js");
 const { caseOpeningRoutes, continuityMemoryChoicePlans, getCaseBranchNodes, nodes, reframeRouteNodes } = await import("../../src/gameData.js");
 const { getCasesOpened, getRiskPressure } = await import("../../src/gameLogic.js");
 const { BASE_SCHEMA, BUST_EFFECT, createWindow, reduceWindow } = await import("../../src/gauntlet/gauntletEngine.js");
@@ -30,7 +30,8 @@ const { applyRunPatch, initialRunState } = await import("../../src/state/runStat
 const { repairSavedState } = await import("../../src/state/savedState.js");
 const { useChoiceCommit } = await import("../../src/state/useChoiceCommit.js");
 const { createChoiceReaders } = await import("../../src/state/useDecision.js");
-const { runsInto } = await import("../../src/seasonRules.js");
+const { getLeadChoice, runsInto } = await import("../../src/seasonRules.js");
+const { getBlackoutSkip } = await import("../../src/state/caseRoutes.js");
 const { createSceneChallenge } = await import("../../src/viewModels/sceneViewModels.js");
 
 const FLOOR = "f_confront";
@@ -262,8 +263,11 @@ test("in every other case the rule changes nothing: no scene with a reframe card
 });
 
 test("a bust on a path's last decision still goes up to the 33rd floor, and costs what a bust costs", () => {
-  // The scenes say it themselves (`attended` in their scene context): the night's two decisions, and nothing else in the season.
-  assert.deepEqual(Object.entries(nodes).filter(([, node]) => node.attended).map(([nodeId]) => nodeId).sort(), ["f_choice", FLOOR]);
+  // The scenes say it themselves (`attended` in their scene context): the night's two decisions. Since B-13(2)
+  // every case's closing decision is attended as well (sceneBuild.js), f_choice among them; the 33rd floor is the finale's own.
+  const attended = Object.entries(nodes).filter(([, node]) => node.attended).map(([nodeId]) => nodeId);
+  assert.ok(attended.includes("f_choice") && attended.includes(FLOOR));
+  assert.deepEqual(attended.filter((nodeId) => nodes[nodeId].caseId === "final").sort(), ["f_choice", FLOOR]);
 
   for (const finalId of ["f_final_map", "f_final_expose", "f_final_contain", "f_final_system", "f_evidence_turn"]) {
     for (const card of nodes[finalId].choices) {
@@ -356,4 +360,16 @@ test("a run that answered the old 33rd floor and was put down after it keeps its
   assert.deepEqual(inside.trail, ["f_branch_witness", "f_branch_witness_follow", "f_final_contain", FLOOR, "f_choice", "f_aftershock", RESULT]);
   assert.equal(inside.run.log.filter((entry) => entry.nodeId === FLOOR).length, 2);
   for (const closed of [expose.run, inside.run]) assert.ok(closed.caseResults.final.endingVariant);
+});
+
+test("every case's closing decision is attended: a bust before it lands on it, and still costs what a bust costs (B-13(2))", () => {
+  const closing = new Set(Object.entries(nodes).filter(([, node]) => node.choices.some((card) => RESULT_NODE_IDS.has(card.next))).map(([nodeId]) => nodeId));
+  const decisions = Object.entries(nodes).filter(([nodeId, node]) => !closing.has(nodeId) && !RESULT_NODE_IDS.has(nodeId) && closing.has(getLeadChoice(node)?.next));
+  assert.equal(decisions.length, 173, "the last decision of every path of every case");
+  for (const [nodeId, node] of decisions) assert.equal(node.attended, true, nodeId);
+  for (const caseId of CASE_SEQUENCE) assert.ok(decisions.some(([, node]) => node.caseId === caseId), `${caseId} has one`);
+  // No skip lands past one: whatever scene leads into a closing decision, a bust there plays nothing without the analyst.
+  for (const [nodeId] of decisions) assert.equal(getBlackoutSkip(nodeId, {}), null, nodeId);
+  // The aftermath itself is still never skipped onto a result, and an ordinary scene is still skipped.
+  assert.ok(Object.entries(nodes).some(([nodeId, node]) => !node.attended && !RESULT_NODE_IDS.has(nodeId) && getBlackoutSkip(nodeId, {})), "a bust still skips the ordinary scene");
 });

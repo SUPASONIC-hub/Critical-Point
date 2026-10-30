@@ -108,6 +108,8 @@ const introCopy = {
     // pages and the support-contact test read from where they are kept
     // (privacyText.js, appConfig.js): named here, not copied.
     playtestNotice: PLAYTEST_DATA_NOTICE,
+    // D2 hall of fame: printed right after the consent sentence while remote save is on (its own leading space; Japanese has none).
+    hallOfFameNotice: " 검사를 통과한 상위 시즌은 실행 번호와 점수로 명예의 전당에 오래 남을 수 있습니다.",
     deletion: DELETION_REQUEST_COPY,
   },
   // The consent box's sentences (src/state/useConsentToggle.js).

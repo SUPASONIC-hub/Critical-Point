@@ -39,7 +39,7 @@
 import { nodes } from "./gameData.js";
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
-import { getSealedCardId, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
+import { drawStep, getMultiplier, getSealedCardId, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
@@ -55,6 +55,7 @@ const SCORE_FIELDS = Object.freeze([
   "pressureAdaptScore",
   "reflectionScore",
   "consistencyScore",
+  "readingScore",
   "exploitPenalty",
   "reframeCount",
   "challengeClearCount",
@@ -114,6 +115,33 @@ export function isTimeOffClock(entry, record) {
   return Math.abs(logged - Math.max(1, Math.round(end))) > 1;
 }
 
+/**
+ * Whether a logged window's 판 읽기 read (`threshold.read`, `[bare, seer]`,
+ * tableAfterword.js readWindowAgainstSeer) is not the replayed window's. The
+ * burst score sums it (C-1(1), seasonScore.js getReadingScore), so it is held
+ * to the replay like the heat and the wall: the seer's heat is dealt again
+ * from the replayed board and seed (push while the largest step stays under
+ * the wall), a bust keeps nothing, and a cash keeps the card's chips at the
+ * replayed heat. The chips themselves are not in the record; they are read
+ * back off the seer's number, as a whole number of chips, and the bare number
+ * must be those chips at the heat the window closed on -- within a point and
+ * 3%, for the heat the log rounds and the multiplier's steps. A log with no
+ * read (an older build) is not read.
+ */
+export function isReadOffReplay(read, window) {
+  if (!Array.isArray(read)) return false;
+  const [bare, seer] = read.map(Number);
+  if (!(Number.isFinite(bare) && Number.isFinite(seer) && bare >= 0 && seer >= 0)) return true;
+  const { schema } = window;
+  let gauge = schema.startGauge;
+  for (let push = 1; push < 40 && gauge + schema.stepMax < window.wall; push += 1) gauge += drawStep(schema, window.seed, push);
+  const chips = Math.round(seer / getMultiplier(gauge));
+  if (Math.abs(seer - Math.round(chips * getMultiplier(gauge))) > 0.5) return true;
+  if (window.status !== "cashed") return bare !== 0;
+  const expected = chips * getMultiplier(window.gauge);
+  return Math.abs(bare - expected) > 1 + expected * 0.03;
+}
+
 /** A seed the page deals again after a rolled-back save: `~1` to `~49` (useRunReadout's dealGauntletSeed). */
 const SEED_TAIL = /^~([1-9]|[1-4][0-9])$/;
 
@@ -162,6 +190,7 @@ export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules =
     if (result.window && !result.problem) {
       if (isSealedCash(entry, result.window)) differs.push("sealed");
       if (isTimeOffClock(entry, record)) differs.push("responseTime");
+      if (isReadOffReplay(threshold.read, result.window)) differs.push("read");
     }
     if (record && firstIndex !== null) {
       const seed = readSeed(record.seed, { runId: row.run_id, windowIndex: firstIndex + windows.indexOf(entry), nodeId: entry.nodeId });
@@ -189,8 +218,8 @@ function isCurrentTable(row) {
  *                      score fields off the final case row's).
  *   window-off-replay  a window that does not replay to its threshold, a
  *                      record that does not hold together, a sealed cash, a
- *                      response time off the clock, or a seed the page would
- *                      not have dealt there.
+ *                      response time off the clock, a 판 읽기 read off the
+ *                      replay, or a seed the page would not have dealt there.
  *   window-no-replay   a window with no record in a run whose build writes
  *                      them (below).
  */

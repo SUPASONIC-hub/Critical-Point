@@ -22,8 +22,10 @@ import { fill } from "../locale.js";
  *
  * Judged once, on the window that closes a case: with `AUDIT_LIMIT` or more,
  * one part in `AUDIT_SHARE` of what the case moves to the vault is lost, and
- * the hand's share by the same part (decisions 3 and 4). No draw, no tool to
- * soften it (decision 12).
+ * the hand's share by the same part (decisions 3 and 4). No draw. Decision 12
+ * said no tool softens it either; C-7 (user, 2026-10-25, the draft's choice 1)
+ * gave the draft one that does: AUDIT CONTACT (「감사실 연줄」) moves the limit
+ * `AUDIT_CONTACT_SLACK` further for the run that holds it (`getAuditLimit`).
  *
  * Where it lives (decision 6): nowhere new. The case's own decision log holds
  * every window's `threshold` (state/useChoiceCommit.js), and the log is fresh
@@ -32,7 +34,8 @@ import { fill } from "../locale.js";
  *
  * A rule of the table since RULES_MARK 3 (B3 and B2 together, one ranking
  * reset): on in a case whose rules have `audit` (tableUnlocks.js: from
- * 프롤로그 04, and from the first case under NEW GAME+), never in story mode
+ * 사건 02 since RULES_MARK 4 -- 프롤로그 04 at RULES_MARK 3 -- and from the
+ * first case under NEW GAME+), never in story mode
  * or a practice case (decision 9). Before that it was 2026-W47's test week, a
  * device that week's rule switched on; its numbers, below, are the ones that
  * week played.
@@ -55,6 +58,13 @@ export const AUDIT_HEAT = 40;
 export const AUDIT_LIMIT = 4;
 export const AUDIT_RELIEF = 2;
 export const AUDIT_SHARE = 4;
+/** How much further AUDIT CONTACT moves the limit (C-7). */
+export const AUDIT_CONTACT_SLACK = 1;
+
+/** The audit's limit for a run: `AUDIT_LIMIT`, `AUDIT_CONTACT_SLACK` more with AUDIT CONTACT among its relics. */
+export function getAuditLimit(relics) {
+  return AUDIT_LIMIT + (Array.isArray(relics) && relics.includes("auditContact") ? AUDIT_CONTACT_SLACK : 0);
+}
 /**
  * HEAT DEBT's heat (`HEAT_DEBT_GAUGE`, tableRules.js), where a cash takes the
  * audit down. Written here and not imported, for the same reason. A unit
@@ -110,10 +120,12 @@ export function countAudit(log = []) {
  * vault and from the hand's share of it, by the same part, so the hand's
  * vault stays inside the vault.
  */
-export function judgeAudit({ count, secured, hand }) {
-  const caught = count >= AUDIT_LIMIT;
+export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT }) {
+  const caught = count >= limit;
   return {
     caught,
+    // AUDIT CONTACT's slack was what kept it from catching (`relicProcs`).
+    ...(!caught && count >= AUDIT_LIMIT ? { spared: true } : {}),
     lost: caught ? Math.floor(Math.max(0, secured) / AUDIT_SHARE) : 0,
     handLost: caught ? Math.floor(Math.max(0, hand) / AUDIT_SHARE) : 0,
   };
@@ -127,7 +139,7 @@ export function judgeAudit({ count, secured, hand }) {
 export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand }) {
   if (!isAuditOn(run, rules)) return null;
   const after = addAudit(count, auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }));
-  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand }) : { caught: false, lost: 0, handLost: 0 }) };
+  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit: getAuditLimit(run.relics) }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 
 /**
@@ -153,13 +165,14 @@ export function readAudit(run, count, win) {
   if (!run || count == null) return null;
   const now = Math.max(0, Math.trunc(Number(count) || 0));
   const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
-  const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
+  const limit = getAuditLimit(run.relics);
+  const reading = { count: now, limit, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= limit - 1 };
   return { ...reading, spoken: describeAuditIfCash(reading) };
 }
 
 /**
  * The cash button's description: what this cash does to the audit (on a
- * CASCADE board a cold cash leaves it as it is; 프롤로그 04's line says why). 초안.
+ * CASCADE board a cold cash leaves it as it is; the line that opened the audit in 프롤로그 04 at RULES_MARK 3 said why). 초안.
  */
 const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
   fill(ifCash > 0 ? auditCopy.ifCashUp : ifCash < 0 ? auditCopy.ifCashDown : auditCopy.ifCashSame, { relief: -ifCash, after: afterCash, limit });
@@ -170,10 +183,13 @@ const describeAudit = ({ count, limit }) =>
 
 /**
  * The cases whose step of the ladder does not have the audit yet (tableUnlocks.js
- * opens it at 프롤로그 04). Written out so the table record's chunk does not
- * take the ladder; a unit test holds it to `rulesFor`.
+ * opens it at 사건 02 since RULES_MARK 4, C-4). Written out so the table
+ * record's chunk does not take the ladder; a unit test holds it to `rulesFor`.
+ * `CASES_BEFORE_AUDIT_MARK3` is the ladder of RULES_MARK 3, which opened it at
+ * 프롤로그 04: a case closed then is read by the ladder it was played on.
  */
-export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "prologue03"]);
+export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01"]);
+export const CASES_BEFORE_AUDIT_MARK3 = Object.freeze(["prologue01", "prologue02", "prologue03"]);
 
 /**
  * The table record's audit sentence (GauntletLedger.jsx), or null: one more
@@ -181,9 +197,10 @@ export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "pr
  * stay as they are (user, 2026-10-20, the PR's first question, choice 1).
  * Rebuilt from what the record has, as the rest of it is: the count off the
  * case's log (what the close judged), the case and the case summary
- * (`summary`, createRunSummary). A case closed at RULES_MARK 3 or later counts
- * from 프롤로그 04 on (the summary does not say NEW GAME+, so its first three
- * prologues say nothing); one closed before it says nothing (2026-W47's
+ * (`summary`, createRunSummary). A case closed at RULES_MARK 4 or later counts
+ * from 사건 02 on, one closed at RULES_MARK 3 from 프롤로그 04 on (the summary
+ * does not say NEW GAME+, so its cases before those say nothing); one closed
+ * before RULES_MARK 3 says nothing (2026-W47's
  * cases were the only ones that counted, and the record is only ever the case
  * on the table). A story case and a replayed one count nothing, as
  * `isAuditOn` says; the log tells which by an entry's `assistStory` or the
@@ -195,7 +212,9 @@ export const CASES_BEFORE_AUDIT = Object.freeze(["prologue01", "prologue02", "pr
  */
 export function describeAuditLedger(log, summary, caseId) {
   if (!log.some((entry) => entry?.threshold) || log.some((entry) => entry?.assistStory || entry?.threshold?.firstRecord)) return null;
-  if (!(summary?.tableRules >= 3) || CASES_BEFORE_AUDIT.includes(caseId)) return null;
+  const mark = Number(summary?.tableRules);
+  if (!(mark >= 3) || (mark >= 4 ? CASES_BEFORE_AUDIT : CASES_BEFORE_AUDIT_MARK3).includes(caseId)) return null;
   const count = countAudit(log);
-  return `${fill(auditCopy.ledger, { count, limit: AUDIT_LIMIT })}${count < AUDIT_LIMIT ? "" : auditCopy.caught}`;
+  const limit = getAuditLimit(summary?.relics);
+  return `${fill(auditCopy.ledger, { count, limit })}${count < limit ? "" : auditCopy.caught}`;
 }

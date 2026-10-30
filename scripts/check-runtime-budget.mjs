@@ -99,6 +99,9 @@ const BUDGETS = {
   // particle into them, so another language can be laid over the Korean.
   // 19 -> 20 names on 2026-10-29, #224 (RULES_MARK 3, C-2) merged with main: the
   // season score's module (`scoring`, src/seasonScore.js) beside the observer's words.
+  // C-3 (c3-c4-rules, 2026-10-25) shares the 일관성 lean with the logic streak
+  // (`getEffectLean` in gameConstants.js); on #224 602ec69b it is read through
+  // `gameConstants` (import * as), with ENDING_GATES, so the count stays 20.
   "src/gameLogic.js": {
     lines: 1260,
     longestLine: 190,

@@ -173,11 +173,19 @@ const fileBudgets = {
   // main c3b40b6f): on 360px or less the three language pills keep one row
   // (closer, 8px padding, 12px type, out to the music controls) and the brand
   // row comes up 8px under them.
+  // 3137 / 69401 -> 3148 / 69686 on 2026-10-29 (D2 hall of fame draft on #224
+  // 602ec69b), measured: the hall of fame's badge on a ranking row
+  // (.ranking-hall-badge), a rule of its own (11 lines) so the badge list
+  // above is not written twice.
+  // 3155 / 69767 -> 3166 / 70052 on 2026-10-30, measured (D2 over #224
+  // bb70e777, main 430dda1e): the badge rule beside main's narrow pills.
   // 3155 / 69767 -> 3159 / 69883 on 2026-10-30, measured (intro-360-fit): on
   // 360px or less the start button sits closer to the premise (a 360x740
   // phone had the Korean one 2px under the screen) and the English premise
   // takes the Japanese 14px there (Linux CI put its button at 746).
-  "base-intro-ranking.css": { lines: 3159, bytes: 69883 },
+  // 3159 / 69883 -> 3170 / 70168 on 2026-10-30, measured (통합 리허설 over #224
+  // 8dd649ce, main b2558d55): D2's badge rule beside main's 360px start button.
+  "base-intro-ranking.css": { lines: 3170, bytes: 70168 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -281,9 +289,13 @@ const fileBudgets = {
   // -> 56429 on 2026-10-30, measured: an English page on a 360px phone sets the
   // bank rail tighter (10px labels, 5px pills, 3px gap) so Audit n/4 keeps the
   // run's line on Stake and Vault's row.
+  // -> 56343 on 2026-10-25, measured: the board's mark in the pot's label
+  // (「고점 판」 C-10, 「숨 고른 판」 C-7), two colour rules and no line more.
+  // -> 56545 on 2026-10-30, measured: the two together (#316 over #224 0d29141a).
   // -> 56546 on 2026-10-30, measured: #224 merged with main b2558d55, the
   // Japanese card labels (main) and the English bank rail (#224) together.
-  "play.css": { lines: 2931, bytes: 56546 },
+  // -> 56662 on 2026-10-30, measured: #316's marks over #224 8dd649ce (main b2558d55).
+  "play.css": { lines: 2931, bytes: 56662 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -397,7 +409,10 @@ const fileBudgets = {
   // 514 declarations that never won a cascade deleted.
   // 2560 / 60800 -> 2509 / 57089 on 2026-10-13: comments no longer counted
   // (51 lines and 3711 bytes of them that day), the room unchanged.
-  "result.css": { lines: 2509, bytes: 57089 },
+  // 2509 -> 2512 lines on 2026-10-25, C-1(1) (the 판 읽기 axis), measured: the
+  // score breakdown's seventh card leaves the penalty card alone in its row,
+  // and one rule gives it the row. The bytes still fit.
+  "result.css": { lines: 2512, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
