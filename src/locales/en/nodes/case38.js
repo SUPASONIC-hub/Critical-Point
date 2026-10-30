@@ -59,7 +59,7 @@ export default {
           "label": "Ask how the split trials ended"
         },
         "c38_gallery_evidence_turn": {
-          "label": "Find the boxes of papers the defense says the 212 lack"
+          "label": "Find the 212’s ‘missing’ papers"
         }
       },
       "place": "Seoul Central District Court · Courtroom 457",
@@ -90,7 +90,7 @@ export default {
           "label": "Ask how the split trials ended"
         },
         "c38_witness_evidence_turn": {
-          "label": "Find the boxes of papers the defense says the 212 lack"
+          "label": "Find the 212’s ‘missing’ papers"
         }
       },
       "place": "Seoul Central District Court · Courtroom 457",
@@ -121,7 +121,7 @@ export default {
           "label": "Ask how the split trials ended"
         },
         "c38_plaintiff_evidence_turn": {
-          "label": "Find the boxes of papers the defense says the 212 lack"
+          "label": "Find the 212’s ‘missing’ papers"
         }
       },
       "place": "Seoul Central District Court · Courtroom 457",
@@ -383,7 +383,7 @@ export default {
           "label": "Move the fight to getting the records the defendant holds"
         },
         "c38_route_system_evidence_turn": {
-          "label": "Find the boxes of papers the defense says the 212 lack"
+          "label": "Find the 212’s ‘missing’ papers"
         }
       },
       "place": "Seoul Central District Court · 4th-floor hallway bench",

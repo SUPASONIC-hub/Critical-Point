@@ -28,7 +28,7 @@ export default {
           "label": "Trace the original source to check the contract is real"
         },
         "reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Department",
@@ -56,10 +56,10 @@ export default {
           "label": "Split it evenly six ways so Lee Minseo doesn’t stake it alone"
         },
         "reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         },
         "c30_bookstore_evidence_turn": {
-          "label": "Find the group’s money in FitScore’s shareholder list"
+          "label": "Find group money in FitScore"
         }
       },
       "place": "Secondhand Bookshop, Hoegi-dong · Between the 1st-Floor Shelves",
@@ -86,10 +86,10 @@ export default {
           "label": "Ask Jin Seowoo to look for a way to stop the contract together"
         },
         "reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         },
         "c30_datalab_evidence_turn": {
-          "label": "Find the group’s money in FitScore’s shareholder list"
+          "label": "Find group money in FitScore"
         }
       },
       "place": "KD Data Lab, Pangyo · Data Center",
@@ -117,10 +117,10 @@ export default {
           "label": "Ask him to put the audit exclusion on the record even if he steps out"
         },
         "reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         },
         "c30_leaving_evidence_turn": {
-          "label": "Find the group’s money in FitScore’s shareholder list"
+          "label": "Find group money in FitScore"
         }
       },
       "place": "Alley Outside the Secondhand Bookshop, Hoegi-dong · Back Seat of Ban Jaewook’s Car",
@@ -382,7 +382,7 @@ export default {
           "label": "Bury the statistics and focus only on the FitScore contract"
         },
         "c30_route_system_evidence_turn": {
-          "label": "Find the group’s money in FitScore’s shareholder list"
+          "label": "Find group money in FitScore"
         }
       },
       "place": "KD Capital, 12th Floor · Risk Management NOAH Terminal",
@@ -457,7 +457,7 @@ export default {
           "label": "Propose that the six meet face to face and decide"
         },
         "c30_start_warm_reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         }
       },
       "place": "KD Data Lab, Pangyo · 1st-Floor Lobby",
@@ -487,7 +487,7 @@ export default {
           "label": "Trace the original source to check the contract is real"
         },
         "c30_start_record_reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Department",
@@ -517,7 +517,7 @@ export default {
           "label": "Ask Lee Minseo to send all the remaining pages now"
         },
         "c30_start_rush_reframe": {
-          "label": "Pull out every one of the group’s data contracts"
+          "label": "Pull every group data contract"
         }
       },
       "place": "Lee Minseo’s Rooftop Room · Rooftop Platform",

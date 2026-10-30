@@ -28,7 +28,7 @@ export default {
           "label": "Go hear Chae Dohoon out before the script is read"
         },
         "reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         }
       },
       "place": "KD Life Guro Call Center · Counseling Desks",
@@ -56,10 +56,10 @@ export default {
           "label": "Have him hear Chae Dohoon out instead of reading the script"
         },
         "reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         },
         "c28_headset_evidence_turn": {
-          "label": "Find the revision request that cut Script No. 4 to 3 minutes"
+          "label": "Find who cut No. 4 to 3 minutes"
         }
       },
       "place": "KD Life Guro Call Center · Counseling Desks, 7th Floor",
@@ -87,10 +87,10 @@ export default {
           "label": "Have him accept KD Life’s offer to settle for half"
         },
         "reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         },
         "c28_ruler_evidence_turn": {
-          "label": "Find the revision request that cut Script No. 4 to 3 minutes"
+          "label": "Find who cut No. 4 to 3 minutes"
         }
       },
       "place": "Secondhand Bookshop, Hoegi-dong, 1st Floor · Bookshelves",
@@ -118,10 +118,10 @@ export default {
           "label": "Request the footage and the investigation order as evidence"
         },
         "reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         },
         "c28_factory_evidence_turn": {
-          "label": "Find the revision request that cut Script No. 4 to 3 minutes"
+          "label": "Find who cut No. 4 to 3 minutes"
         }
       },
       "place": "To-the-End Precision, Namdong Industrial Complex, Incheon · Factory",
@@ -383,7 +383,7 @@ export default {
           "label": "Hand the recording statistics to the FSS and the victims’ group at once"
         },
         "c28_route_system_evidence_turn": {
-          "label": "Find the revision request that cut Script No. 4 to 3 minutes"
+          "label": "Find who cut No. 4 to 3 minutes"
         }
       },
       "place": "KD Data Lab · Lee Minseo’s Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Get Article 19, the grounds for denial, and the review records first"
         },
         "c28_start_warm_reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         }
       },
       "place": "KD Life Guro Call Center · Counseling Desks",
@@ -488,7 +488,7 @@ export default {
           "label": "Get Article 19, the grounds for denial, and the review records first"
         },
         "c28_start_record_reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         }
       },
       "place": "KD Life Guro Call Center · Counseling Desks",
@@ -518,7 +518,7 @@ export default {
           "label": "Go hear Chae Dohoon out before the script is read"
         },
         "c28_start_rush_reframe": {
-          "label": "Measure why denial calls end in 3 minutes"
+          "label": "Ask why denials end in 3 minutes"
         }
       },
       "place": "KD Life Guro Call Center · Counseling Desks",

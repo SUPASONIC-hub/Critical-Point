@@ -131,7 +131,7 @@ const introCopy = {
   },
   // A case card's status chip (introViewModel.js, getCaseStatusText).
   status: { playing: "진행 중", open: "시작 가능", complete: "완료됨", locked: "이전 사건 필요" },
-  legal: { privacy: "개인정보처리방침", terms: "이용약관" },
+  legal: { about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관" },
   opening: {
     firstCase: "첫 사건",
     entering: "{case} 진입 중",

@@ -28,7 +28,7 @@ export default {
           "label": "Draft the extension opinion first and buy time"
         },
         "reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         }
       },
       "place": "KD Capital 20th Floor · CEO’s Office",
@@ -56,10 +56,10 @@ export default {
           "label": "Talks can wait; persuade him to come down first"
         },
         "reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         },
         "c26_crane_evidence_turn": {
-          "label": "Find the Reheim Godeok project money not spent on building"
+          "label": "Find Reheim money left unbuilt"
         }
       },
       "place": "Reheim Officetel, Godeok, Pyeongtaek · Under the Tower Crane",
@@ -87,10 +87,10 @@ export default {
           "label": "Cast KD Capital’s vote for the CEO’s 1-year extension"
         },
         "reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         },
         "c26_creditors_evidence_turn": {
-          "label": "Find the Reheim Godeok project money not spent on building"
+          "label": "Find Reheim money left unbuilt"
         }
       },
       "place": "Bridge Bank, Yeouido · Creditors’ Meeting Room",
@@ -118,10 +118,10 @@ export default {
           "label": "Stake your name: come down and wages come first"
         },
         "reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         },
         "c26_tower_evidence_turn": {
-          "label": "Find the Reheim Godeok project money not spent on building"
+          "label": "Find Reheim money left unbuilt"
         }
       },
       "place": "Reheim Officetel, Godeok, Pyeongtaek · Tower Crane Cab",
@@ -383,7 +383,7 @@ export default {
           "label": "Disclose the statistics to the committee and the creditors"
         },
         "c26_route_system_evidence_turn": {
-          "label": "Find the Reheim Godeok project money not spent on building"
+          "label": "Find Reheim money left unbuilt"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Review Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Split the six in the group chat into site and paper teams"
         },
         "c26_start_warm_reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         }
       },
       "place": "KD Capital 20th Floor · CEO’s Office",
@@ -488,7 +488,7 @@ export default {
           "label": "Draft the extension opinion first and buy time"
         },
         "c26_start_record_reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         }
       },
       "place": "KD Capital 20th Floor · CEO’s Office",
@@ -518,7 +518,7 @@ export default {
           "label": "Tell colleagues first about the dawn site and the CEO’s words"
         },
         "c26_start_rush_reframe": {
-          "label": "Lay out how the extended loans ended"
+          "label": "See how the loans ended"
         }
       },
       "place": "KD Capital 20th Floor · CEO’s Office",

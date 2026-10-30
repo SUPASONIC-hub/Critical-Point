@@ -24,7 +24,7 @@
 /** The cases a language is checked over until it says otherwise: the preview's 프롤로그 01-05 and 사건 01-10 (F-1 ①). */
 import { existsSync, readdirSync } from "node:fs";
 
-export const TRANSLATION_SCOPE = [
+const TRANSLATION_SCOPE = [
   "prologue01", "prologue02", "prologue03", "prologue04", "prologue05",
   "case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10",
 ];
@@ -217,7 +217,7 @@ export function compareWords(source, english, lang = "en") {
 }
 
 /** `extra` laid into `base` by key, objects deep (a new object; neither is changed). */
-export function mergeWords(base, extra) {
+function mergeWords(base, extra) {
   if (!extra || typeof extra !== "object" || Array.isArray(extra)) return extra ?? base;
   const out = { ...(base && typeof base === "object" && !Array.isArray(base) ? base : {}) };
   for (const [key, value] of Object.entries(extra)) out[key] = mergeWords(out[key], value);
