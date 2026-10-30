@@ -28,7 +28,12 @@ src/platform/appShell.js             ← appShell() / isAppShell(): 웹 코드�
 
 ### `--mode app` 빌드
 
-`app/build-web.mjs`가 루트의 Vite로 같은 페이지를 `app/dist-app`에 만듭니다. 다른 점은 둘입니다. 서비스 워커를 끕니다(`vite.config.js` `serviceWorkerSetting`): 파일이 이미 기기 안에 있고, WKWebView는 앱 자체 스킴에서 워커를 돌리지 않습니다. 그리고 사이트 확인 두 가지(AdSense의 `google-adsense-account` 메타·`/ads.txt`, Search Console의 `google-site-verification` 메타)를 `ADSENSE_CLIENT`·`GOOGLE_SITE_VERIFICATION`이 있어도 넣지 않습니다: 앱 안 페이지는 크롤러·AdSense 심사가 읽지 않고, 앱 광고는 AdMob입니다. 정적 페이지(방침·약관·소개·FAQ·문의)는 첫 화면 링크가 여는 곳이라 그대로 들어가고, 같이 만들어지는 `robots.txt`·`sitemap.xml`도 남습니다(앱 안에서 읽는 이 없음, 해 없음). Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)로 주고, 없으면 원격 랭킹·텔레메트리가 꺼진 채로 돕니다.
+`app/build-web.mjs`가 루트의 Vite로 같은 페이지를 `app/dist-app`에 만듭니다. 다른 점은 둘입니다. 서비스 워커를 끕니다(`vite.config.js` `serviceWorkerSetting`): 파일이 이미 기기 안에 있고, WKWebView는 앱 자체 스킴에서 워커를 돌리지 않습니다. 그리고 사이트 확인 두 가지(AdSense의 `google-adsense-account` 메타·`/ads.txt`, Search Console의 `google-site-verification` 메타)를 `ADSENSE_CLIENT`·`GOOGLE_SITE_VERIFICATION`이 있어도 넣지 않습니다: 앱 안 페이지는 크롤러·AdSense 심사가 읽지 않고, 앱 광고는 AdMob입니다. Google 애널리틱스도 `GA_MEASUREMENT_ID`가 있어도 넣지 않습니다(`analyticsFor`가 앱 모드에서 null): 앱 웹뷰 안의 GA 태그는 앱 방침과 스토어 데이터 안전 항목에 추적 도구로 적어야 하기 때문입니다. 같은 이유로 앱판 방침에는 웹 방침 맨 위의 「11-12부터 Google 애널리틱스」 변경 예고(`ANALYTICS_NOTICE`)도 없습니다: 앱은 그날에도 GA를 켜지 않으니 예고할 변경이 없습니다. 정적 페이지(방침·약관·소개·FAQ·문의)는 첫 화면 링크가 여는 곳이라 그대로 들어가고, 같이 만들어지는 `robots.txt`·`sitemap.xml`도 남습니다(앱 안에서 읽는 이 없음, 해 없음). Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)로 주고, 없으면 원격 랭킹·텔레메트리가 꺼진 채로 돕니다.
+
+### 홈 화면 이름 (세 언어)
+
+- iOS: `app/ios/App/App/{ko,en,ja}.lproj/InfoPlist.strings`의 `CFBundleDisplayName`·`CFBundleName`이 「임계점」 / 「Critical Point」 / 「臨界点」입니다. 새로 지은 이름이 아니라 사이트 페이지가 쓰는 `GAME_NAME`(scripts/legal-pages.mjs)에서 콜론 앞, 한국어가 웹 manifest `short_name`인 것과 같은 꼴입니다. `Info.plist` `CFBundleLocalizations`와 Xcode `knownRegions`에 ko·en·ja. `npm run check:twa`가 세 파일·프로젝트 목록·두 목록을 봅니다.
+- 안드로이드 TWA: Bubblewrap의 `twa-manifest.json` `name`·`launcherName`은 문자열 하나씩이라 언어별로 줄 수 없고, 프로젝트도 `bubblewrap update`가 매번 새로 씁니다. 그래서 TWA 앱 이름은 모든 언어에서 「임계점」입니다.
 
 ## 이 PC(Windows)에서 되는 것 / 안 되는 것
 

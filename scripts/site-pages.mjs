@@ -1,6 +1,7 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
+import { withSwaps } from "./analytics-config.mjs";
 import { escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
 
 /**
@@ -419,16 +420,31 @@ const BODIES = {
 /** The kinds this file writes, in the order of the header. */
 export const SITE_PAGE_KINDS = Object.keys(BODIES);
 
-/** The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`. */
-export function renderSitePages() {
+/**
+ * The FAQ's one sentence about cookies, in a build with Google Analytics
+ * (scripts/analytics-config.mjs; the policy's own section is
+ * ANALYTICS_POLICY in legal-pages.mjs). Without it the FAQ is as written above.
+ */
+export const ANALYTICS_FAQ = {
+  ko: [["게임은 쿠키와 광고·분석용 추적 도구를 쓰지 않습니다.", "게임은 광고를 싣지 않고, 쿠키는 방문 통계용 Google 애널리틱스 쿠키만 씁니다(거부하는 법은 개인정보처리방침 2번 (5))."]],
+  en: [["The game uses no cookies and no advertising or analytics trackers.", "The game has no ads, and its only cookies are the Google Analytics ones for visit statistics (how to opt out is in section 2 (e) of the Privacy Policy)."]],
+  ja: [["本ゲームはCookieや、広告・分析用のトラッキングツールを使用しません。", "本ゲームに広告はなく、Cookieは訪問統計用のGoogleアナリティクスのCookieだけを使用します(拒否する方法はプライバシーポリシーの2の(5)をご覧ください)。"]],
+};
+
+/**
+ * The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`.
+ * With `analytics` each carries Google's tag, and the FAQ says so.
+ */
+export function renderSitePages({ analytics = null } = {}) {
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
         kind,
         language,
-        body: BODIES[kind][language],
+        body: analytics && kind === "faq" ? withSwaps(BODIES[kind][language], ANALYTICS_FAQ[language]) : BODIES[kind][language],
         description: DESCRIPTION[kind][language],
+        analytics,
       });
     }
   }
@@ -480,8 +496,8 @@ export function withAbsoluteSiteLinks(html, origin) {
 }
 
 /** Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash. */
-export function renderStaticPages(origin = "") {
-  const pages = { ...renderLegalPages(), ...renderSitePages() };
+export function renderStaticPages(origin = "", { analytics = null, app = false } = {}) {
+  const pages = { ...renderLegalPages({ analytics, app }), ...renderSitePages({ analytics }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 

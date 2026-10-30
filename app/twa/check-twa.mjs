@@ -6,6 +6,12 @@
  * - The Android project Bubblewrap wrote from twa-manifest.json, once there is
  *   one (`bubblewrap update`), targets API 36 or higher: Google Play has asked
  *   for Android 16 from new apps and updates since 2026-08-31.
+ * - The iOS home screen name is in Korean, English and Japanese: each
+ *   <lang>.lproj/InfoPlist.strings, listed in the Xcode project, with its
+ *   language in CFBundleLocalizations and knownRegions, says the name the
+ *   site's pages already use (GAME_NAME, scripts/legal-pages.mjs). The TWA's
+ *   `name` and `launcherName` are one string each in Bubblewrap's format, so
+ *   Android shows the Korean name in every language.
  * - assetlinks.json still holding the zero placeholder is a warning here and an
  *   error with `--release`: without the real certificate fingerprint Chrome
  *   cannot verify the site and opens it with a URL bar (docs/app-shell.md).
@@ -13,6 +19,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { GAME_NAME } from "../../scripts/legal-pages.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = path.resolve(here, "..");
@@ -42,6 +50,24 @@ if (new Set(Object.values(named)).size !== 1) {
   problems.push(`The package is named differently: ${Object.entries(named).map(([where, value]) => `${where} = ${value}`).join(", ")}.`);
 }
 if (`https://${twa.host}/` !== twa.fullScopeUrl) problems.push(`twa-manifest.json fullScopeUrl ${twa.fullScopeUrl} is not the host ${twa.host}.`);
+
+// The short name, as the Korean one is the part before the colon (public/manifest.webmanifest short_name).
+const iosDir = path.join(app, "ios", "App");
+const plist = readFileSync(path.join(iosDir, "App", "Info.plist"), "utf8");
+const pbxproj = readFileSync(path.join(iosDir, "App.xcodeproj", "project.pbxproj"), "utf8");
+const regions = /knownRegions = \(([^)]*)\)/.exec(pbxproj)?.[1] ?? "";
+const localizations = /<key>CFBundleLocalizations<\/key>\s*<array>([\s\S]*?)<\/array>/.exec(plist)?.[1] ?? "";
+for (const language of ["ko", "en", "ja"]) {
+  const name = GAME_NAME[language].split(":")[0];
+  const file = path.join(iosDir, "App", `${language}.lproj`, "InfoPlist.strings");
+  const strings = existsSync(file) ? readFileSync(file, "utf8") : "";
+  for (const key of ["CFBundleDisplayName", "CFBundleName"]) {
+    if (!strings.includes(`"${key}" = "${name}";`)) problems.push(`ios/App/App/${language}.lproj/InfoPlist.strings does not name the app "${name}" (${key}).`);
+  }
+  if (!pbxproj.includes(`path = ${language}.lproj/InfoPlist.strings;`)) problems.push(`The Xcode project does not list ${language}.lproj/InfoPlist.strings.`);
+  if (!regions.split(/[\s,]+/).includes(language)) problems.push(`The Xcode project's knownRegions has no ${language}.`);
+  if (!localizations.includes(`<string>${language}</string>`)) problems.push(`Info.plist CFBundleLocalizations has no ${language}.`);
+}
 
 const fingerprints = target?.sha256_cert_fingerprints ?? [];
 if (!fingerprints.length) problems.push("assetlinks.json names no certificate fingerprint.");
