@@ -28,7 +28,7 @@ src/platform/appShell.js             ← appShell() / isAppShell(): 웹 코드�
 
 ### `--mode app` 빌드
 
-`app/build-web.mjs`가 루트의 Vite로 같은 페이지를 `app/dist-app`에 만듭니다. 다른 점은 서비스 워커를 끄는 것 하나(`vite.config.js` `serviceWorkerSetting`): 파일이 이미 기기 안에 있고, WKWebView는 앱 자체 스킴에서 워커를 돌리지 않습니다. Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)로 주고, 없으면 원격 랭킹·텔레메트리가 꺼진 채로 돕니다.
+`app/build-web.mjs`가 루트의 Vite로 같은 페이지를 `app/dist-app`에 만듭니다. 다른 점은 둘입니다. 서비스 워커를 끕니다(`vite.config.js` `serviceWorkerSetting`): 파일이 이미 기기 안에 있고, WKWebView는 앱 자체 스킴에서 워커를 돌리지 않습니다. 그리고 사이트 확인 두 가지(AdSense의 `google-adsense-account` 메타·`/ads.txt`, Search Console의 `google-site-verification` 메타)를 `ADSENSE_CLIENT`·`GOOGLE_SITE_VERIFICATION`이 있어도 넣지 않습니다: 앱 안 페이지는 크롤러·AdSense 심사가 읽지 않고, 앱 광고는 AdMob입니다. 정적 페이지(방침·약관·소개·FAQ·문의)는 첫 화면 링크가 여는 곳이라 그대로 들어가고, 같이 만들어지는 `robots.txt`·`sitemap.xml`도 남습니다(앱 안에서 읽는 이 없음, 해 없음). Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)로 주고, 없으면 원격 랭킹·텔레메트리가 꺼진 채로 돕니다.
 
 ## 이 PC(Windows)에서 되는 것 / 안 되는 것
 
