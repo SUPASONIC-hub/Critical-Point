@@ -28,7 +28,7 @@ export default {
           "label": "Book the last five days for all of Trigger Lab with ECHO"
         },
         "reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Show Ryu Seah the cases ECHO dissented on"
         },
         "reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         },
         "c20_server_evidence_turn": {
-          "label": "Pull out the data transfer contract for Lab records"
+          "label": "Pull the Lab data transfer deal"
         }
       },
       "place": "Trigger Lab Basement Server Room · ECHO Servers",
@@ -87,10 +87,10 @@ export default {
           "label": "Object: pull the unconsented records from training"
         },
         "reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         },
         "c20_datacenter_evidence_turn": {
-          "label": "Pull out the data transfer contract for Lab records"
+          "label": "Pull the Lab data transfer deal"
         }
       },
       "place": "KD Data Lab Data Center, Pangyo · Training Server Zone",
@@ -118,10 +118,10 @@ export default {
           "label": "Polish the document later and keep the farewell short"
         },
         "reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         },
         "c20_farewell_evidence_turn": {
-          "label": "Pull out the data transfer contract for Lab records"
+          "label": "Pull the Lab data transfer deal"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · ECHO’s Farewell Party",
@@ -383,7 +383,7 @@ export default {
           "label": "Tell upcoming applicants first that the engine changes"
         },
         "c20_route_system_evidence_turn": {
-          "label": "Pull out the data transfer contract for Lab records"
+          "label": "Pull the Lab data transfer deal"
         }
       },
       "place": "Trigger Lab Basement Server Room · ECHO Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Confirm in an official letter what will be reset"
         },
         "c20_start_warm_reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -488,7 +488,7 @@ export default {
           "label": "Quickly sort only what to hand over on schedule"
         },
         "c20_start_record_reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -518,7 +518,7 @@ export default {
           "label": "Call the contact who held the tape measure first"
         },
         "c20_start_rush_reframe": {
-          "label": "Have ECHO read the replacement approval itself"
+          "label": "Have ECHO read its replacement"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",

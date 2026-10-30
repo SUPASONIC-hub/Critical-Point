@@ -74,12 +74,16 @@ const budgets = [
   // 142,728 / 52,279 -> 148,723 / 54,704 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // -> 148,761 / 54,732 on 2026-10-26, funnel-locale (앱출시-F F-6): a case row's summary names the page's language (toRowSummary reads LANG). Measured 148,761 / 54,728 plus 4.
   // 148,761 / 54,732 -> 149,305 / 54,905 on 2026-10-26, 영어판 3단계 (en-step3-screens): the epilogues, the collapse's toll and the operator file read by key (src/copy/epilogue.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  // 149,722 / 54,994 -> 152,719 / 56,132 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the side run (state/sideRun.js) and what the side screen takes from this chunk (state/sideCaseKit.js); the pack check stays out (state/sidePackCheck.js). Measured 152,719 / 56,128 in the e2e build, the gzip plus 4.
-  // 152,719 / 56,132 -> 152,882 / 56,185 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the side records' event when a side case closes (state/sideRun.js). Measured 152,882 / 56,181 in the e2e build, the gzip plus 4.
+  // 149,722 / 54,994 -> 149,740 / 54,996 on 2026-10-29, lang-layout-check: the layout sweep's narrow mode (LAYOUT_SCENES=hand5) jumps scene to scene through window.__cpDebugJump, an effect in useRuntimeRenderers that a release folds away to an empty effect. Measured 149,736 / 54,992 in the e2e build on main 43078a46, the gzip plus 4.
+  // 54,996 -> 55,002 gzip on 2026-10-29, picker-narrow: the shorter Japanese premise (src/locales/ja/screens/intro.js) renames the hashed locale chunk the runtime imports; no code changed. Measured 149,736 / 54,998 in the e2e build, the gzip plus 4.
+  // 149,740 / 55,002 -> 149,905 / 55,019 on 2026-10-30, ranking-save-copy over main c39870a7 (#376, #375): the local and season ranking save lines read from src/copy/notices.js in the page's language (they were English in the hook). Measured 149,901 / 55,015 in the e2e build, the plus 4.
+  // 149,905 / 55,019 -> 152,903 / 56,161 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side run (state/sideRun.js) and what the side screen takes from this chunk (state/sideCaseKit.js); the pack check stays out (state/sidePackCheck.js). Measured 152,899 / 56,157 in the e2e build, the plus 4.
+  // 152,903 / 56,161 -> 153,069 / 56,216 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the side records' event when a side case closes (state/sideRun.js). Measured 153,065 / 56,212 in the e2e build, the plus 4.
   // 53,439 -> 53,445 gzip on 2026-10-26 (old base), E-11 번외 2 (draft) restacked on
   // e11-side-cloud bb76437e: the chunk names it imports. Measured 145,874 /
   // 53,441, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 152_882, maxGzip: 56_185 },
+  // 153,069 / 56,216 kept on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): no change of its own; measured 153,065 / 56,209.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_069, maxGzip: 56_216 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -87,8 +91,9 @@ const budgets = [
   // gzip plus 4.
   // 32,897 / 13,022 -> 32,897 / 13,039 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 13,035 gzip in the e2e build, the gzip plus 4.
   // 32,897 / 13,039 -> 34,278 / 13,357 on 2026-10-26, 영어판 3단계: the observer's samples, arcs and records and the endings' lines read by key (src/copy/observer.js), a name's particle as a blank. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  // 13,357 -> 13,368 gzip on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 34,233 / 13,364, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_278, maxGzip: 13_368 },
+  // 34,278 / 13,357 -> 34,459 / 13,422 on 2026-10-29, gate-reason-copy: a locked card's condition (getAuthorityGate) read by key from src/copy/observer.js `gate` and filled, so English and Japanese print it in their words. The Korean is the same. Measured 34,455 / 13,418 in the e2e build, the plus 4.
+  // 13,422 -> 13,436 gzip on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): only the chunk names it imports. Measured 34,455 / 13,432, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 34_459, maxGzip: 13_436 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -269,14 +274,18 @@ const budgets = [
   // 180,652 / 65,391 -> 180,744 / 65,403 on 2026-10-26, 일본어 1단계 (ja-step1): the hidden Japanese entry in SUPPORTED_LOCALES and the language choice showing a hidden language on its own pages only. Every other Korean chunk and the CSS are byte for byte main's (57931801). Measured 180,744 / 65,399 in the e2e build, the gzip plus 4.
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
-  // 182,001 / 66,015 -> 184,294 / 66,917 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the start screen's side slot, hidden until a finale is closed and a side case is written (src/sideCases.js, the slot and its open/close in IntroScreen, its words in src/copy/intro.js), and the side-id guards of the local ranking and the window log. Measured 184,294 / 66,913 in the e2e build, the gzip plus 4.
-  // 184,294 / 66,917 -> 184,536 / 67,056 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: the release list's one entry for side01 (src/nodes/sidePacks.js) and `localizeSidePack` (src/locale.js), which lays a page's language over a side pack as it arrives. Measured 184,536 / 67,052, the gzip plus 4.
-  // 184,536 / 67,056 -> 184,597 / 67,067 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the side keys spelled in appConfig.js for the online save and the event's name; the marks and their merge stay out (state/sideMarks.js). Measured 184,597 / 67,063, the gzip plus 4.
+  // 66,015 -> 66,033 gzip on 2026-10-29, save-unavailable-lite: the start screen's storage line in the page's language (src/shellNotices.js, one line laid over by the dictionary's notices, not the runtime's 6.8KB table). Measured 66,029 gzip in the e2e build over main d0c44b13 (#373), the gzip plus 4.
+  // 182,001 / 66,033 -> 182,038 / 66,116 on 2026-10-29, adsense-readiness: the start screen's foot links five pages (SITE_PAGES, privacyText.js) and names three more in the intro's table (게임 소개 · 자주 묻는 질문 · 문의). Measured 182,034 / 66,112 in the e2e build over main 3e350266 (#374), the plus 4.
+  // 66,116 -> 66,124 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): no code changed; the hashed chunk names the entry imports
+  // changed with the shorter Japanese premise and the pills' CSS. Measured 182,034 / 66,120 in the e2e build, the gzip plus 4.
+  // 182,038 / 66,124 -> 184,337 / 67,050 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the start screen's side slot, hidden until a finale is closed and a side case is written (src/sideCases.js, the slot and its open/close in IntroScreen, its words in src/copy/intro.js), and the side-id guards of the local ranking and the window log. Measured 184,333 / 67,046 in the e2e build, the plus 4.
+  // 184,337 / 67,050 -> 184,581 / 67,170 on 2026-10-30, E-11 번외 1 (draft) over e11-side-cases da40ea69 (main 430dda1e): the release list's one entry for side01 (src/nodes/sidePacks.js) and `localizeSidePack` (src/locale.js), which lays a page's language over a side pack as it arrives. Measured 184,577 / 67,166, the plus 4.
+  // 184,581 / 67,170 -> 184,636 / 67,165 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the side keys spelled in appConfig.js for the online save and the event's name; the marks and their merge stay out (state/sideMarks.js). Measured 184,632 / 67,161, the plus 4.
   // 177,509 / 64,365 -> 177,678 / 64,418 on 2026-10-26 (old base), E-11 번외 2 (draft)
   // restacked on e11-side-cloud bb76437e: the release list's entry for side02.
   // Measured 177,678 / 64,414, the gzip plus 4.
-  // 184,597 / 67,067 -> 184,770 / 67,115 on 2026-10-29, E-11 번외 2 (draft) restacked on e11-side-cloud 6ddc9619: the release list's entry for side02 (src/nodes/sidePacks.js) and its chunk loader. Measured 184,770 / 67,111, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 184_770, maxGzip: 67_115 },
+  // 184,636 / 67,165 -> 184,809 / 67,216 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): the release list's entry for side02 (src/nodes/sidePacks.js) and its chunk loader. Measured 184,805 / 67,212, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 184_809, maxGzip: 67_216 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -558,7 +567,12 @@ const budgets = [
   // (the font's thin half cut, scripts/build-fonts.mjs). Measured 195,847 / 36,467; the gzip stays under its line.
   // -> 196,068 / 36,533 on 2026-10-29, lang-full: the recovery notice sits above the fixed
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_068, maxGzip: 36_533 },
+  // -> 196,140 / 36,563 on 2026-10-29, intro-en-fit: a Japanese page on a phone of 360px or less draws the
+  // premise at 14px / 1.6 (base-intro-ranking.css). Measured 196,140 / 36,559 in the e2e build, the gzip plus 4.
+  // -> 196,161 raw on 2026-10-29, adsense-readiness: the foot's five links wrap on a narrow screen (.intro-legal flex-wrap). Measured 196,157 / 36,560; the gzip holds.
+  // -> 196,345 / 36,599 on 2026-10-30, picker-narrow over main c3b40b6f (#376): on 360px or less the three language pills keep one row (12px type)
+  // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_345, maxGzip: 36_599 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -640,9 +654,10 @@ const budgets = [
   // 11,492 -> 11,494 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 11,494 / 4,638.
   // 11,494 -> 11,497 raw on 2026-10-26, funnel-locale: only by the chunk names it imports. Measured 11,497 / 4,636.
   // 11,497 / 4,644 -> 11,780 / 4,768 on 2026-10-26, 영어판 3단계: online save's status lines and refusals read by key (src/copy/cloudSaveStatus.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  // 11,780 / 4,768 -> 11,781 / 4,776 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: only by the chunk names it imports. Measured 11,781 / 4,772, the gzip plus 4.
-  // 11,781 / 4,776 -> 12,364 / 4,994 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the upload carries the side marks (state/sideMarks.js) and a restore merges them. Measured 12,364 / 4,990, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 12_364, maxGzip: 4_994 },
+  // 4,768 -> 4,773 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): only by the chunk names it imports. Measured 4,769 gzip in the e2e build, the gzip plus 4.
+  // 11,780 / 4,773 -> 11,785 / 4,775 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): only by the chunk names it imports. Measured 11,781 / 4,771, the plus 4.
+  // 11,785 / 4,775 -> 12,364 / 4,992 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the upload carries the side marks (state/sideMarks.js) and a restore merges them. Measured 12,364 / 4,988, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 12_364, maxGzip: 4_992 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -1034,15 +1049,21 @@ const budgets = [
   // 110,001 / 38,601 -> 152,779 / 51,777 on 2026-10-28, lang-full: the Japanese screen copy of English steps three and four
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
-  // 152,779 / 51,787 -> 153,851 / 52,114 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the side slot's, the finale line's and the side screen's words in Japanese (screens/intro.js, result.js, sideCase.js). Measured 153,851 / 52,110, the gzip plus 4.
-  // 153,851 / 52,114 -> 153,940 / 52,169 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: 番外1 and its title (`copy.sidePacks`). Measured 153,940 / 52,165, the gzip plus 4.
-  // 153,940 / 52,169 -> 153,992 / 52,184 on 2026-10-29, E-11 번외 2 (draft) restacked on e11-side-cloud 6ddc9619: 番外2 and its title (`copy.sidePacks`). Measured 153,992 / 52,180, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_992, maxGzip: 52_184 },
+  // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
+  // 153,061 / 51,897 -> 153,139 / 51,933 on 2026-10-29, adsense-readiness: the foot's three new links in Japanese. Measured 153,135 / 51,929, the plus 4.
+  // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
+  // 153,344 / 51,954 -> 154,420 / 52,285 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in Japanese (screens/intro.js, result.js, sideCase.js). Measured 154,416 / 52,281, the plus 4.
+  // 154,420 / 52,285 -> 154,509 / 52,340 on 2026-10-30, E-11 번외 1 (draft) over e11-side-cases da40ea69 (main 430dda1e): 番外1 and its title (`copy.sidePacks`). Measured 154,505 / 52,336, the plus 4.
+  // 154,509 / 52,340 -> 154,561 / 52,355 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): 番外2 and its title (`copy.sidePacks`). Measured 154,557 / 52,351, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 154_561, maxGzip: 52_355 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_593, maxGzip: 46_483 },
+  // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
+  // 128,682 / 46,495 -> 128,770 / 46,546 on 2026-10-30, E-11 번외 1 (draft) over e11-side-cases da40ea69 (main 430dda1e): Side case 1 and its title (`copy.sidePacks`). Measured 128,766 / 46,542, the plus 4.
+  // 128,770 / 46,546 -> 128,831 / 46,568 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): Side case 2 and its title (`copy.sidePacks`). Measured 128,827 / 46,564, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 128_831, maxGzip: 46_568 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1056,9 +1077,9 @@ const budgets = [
   // `caseRoles` (`caseRole`). Measured 8,731 / 2,636.
   // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
   // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
-  // 12,579 / 3,358 -> 13,068 / 3,524 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: the side list among the shell's tables, `localizeSidePack`, and en/ja side01 in the one import map both case kinds now share (`nodeFile`; two globs would carry the map twice). Measured 13,068 / 3,520.
-  // 13,068 / 3,524 -> 13,224 / 3,548 on 2026-10-29, E-11 번외 2 (draft) restacked on e11-side-cloud 6ddc9619: en/ja side02 in the one import map (`nodeFile`). Measured 13,224 / 3,544, the gzip plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_224, maxGzip: 3_548 },
+  // 12,579 / 3,358 -> 13,068 / 3,524 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5 (13,068 / 3,520 again over da40ea69 on 10-30): the side list among the shell's tables, `localizeSidePack`, and en/ja side01 in the one import map both case kinds now share (`nodeFile`; two globs would carry the map twice). Measured 13,068 / 3,520.
+  // 13,068 / 3,524 -> 13,224 / 3,555 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): en/ja side02 in the one import map (`nodeFile`). Measured 13,224 / 3,551, the gzip plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_224, maxGzip: 3_555 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1117,17 +1138,36 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * lang-extras) and the policy links open the page's own language:
  * 422,950, 472,350 and 478,077; with lang-terms (main b7228340) and the
  * service worker skipping rel="alternate", 422,948, 472,339 and 478,083.
- * E-11 번외 사건 틀 (draft, restacked on main 43078a46 on 10-29), the start
- * screen's side slot and its words in the entry: 423,852, 473,556 and 479,316.
- * E-11 번외 1 on it (10-29): the side list's entry and its language helper,
- * the overlay's side path and the label and title in each dictionary:
- * 423,989, 473,910 and 479,674.
- * E-11 번외 사건 온라인 저장 on it (10-29): the side keys and the event's name
- * in the entry: 424,000, 473,918 and 479,682.
- * E-11 번외 2 on it (10-29): side02 in the entry's list and the overlay's
- * import map, 番外2 in the Japanese dictionary: 424,047, 474,014 and 479,771.
+ * The Japanese premise drawn smaller on a narrow phone (intro-en-fit, 10-29)
+ * puts the Korean at 422,964 (the critical CSS carries the rule); English
+ * 472,329 and Japanese 478,085 stay under their lines. Merged over main
+ * 4ad6f059 (#372's shorter English and Japanese card labels): 422,977, 472,339
+ * and 478,095.
+ * A locked card's condition in English and Japanese (gate-reason-copy, over
+ * main d109b66b): 422,978, 472,430 and 478,220.
+ * The start screen's storage line in the page's language (save-unavailable-lite,
+ * src/shellNotices.js, over main d0c44b13): 422,996, 472,448 and 478,238.
+ * The foot's five links (about, FAQ, contact and the two policies, in the
+ * page's language; adsense-readiness, over main 3e350266): 423,083, 472,557
+ * and 478,361.
+ * The language pills kept one row on a 360px phone and the shorter Japanese
+ * premise (picker-narrow, over main c3b40b6f; the critical CSS carries the
+ * rule): 423,125, 472,600 and 478,386.
+ * The ranking save lines in the page's language (ranking-save-copy, over main
+ * c39870a7; the Korean only by the entry's hashed names): 423,114, 472,617
+ * and 478,413.
+ * E-11 번외 사건 틀 (draft, over main 430dda1e on 10-30), the start screen's
+ * side slot and its words in the entry: 424,052, 473,895 and 479,685.
+ * E-11 번외 1 on it (10-30, over e11-side-cases da40ea69): the side list's
+ * entry and its language helper, the overlay's side path and the label and
+ * title in each dictionary: 424,171, 474,233 and 480,027.
+ * E-11 번외 사건 온라인 저장 on it (10-30, over e11-side01 6f8723b0): the side
+ * keys and the event's name in the entry: 424,167, 474,226 and 480,020.
+ * E-11 번외 2 on it (10-30, over e11-side-cloud c25a95cd): side02 in the
+ * entry's list and the overlay's import map, the label and title in each
+ * dictionary: 424,216, 474,331 and 480,118.
  */
-const FIRST_PAINT_BUDGETS = { ko: 424_051, en: 474_018, ja: 479_775 };
+const FIRST_PAINT_BUDGETS = { ko: 424_220, en: 474_335, ja: 480_122 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1252,16 +1292,18 @@ function checkBudget(file, budget) {
 // the worker's code did not change. Measured 9,897 / 3,569 plus 4.
 // 9,897 / 3,573 -> 9,948 / 3,586 on 2026-10-28, lang-extras: the Japanese privacy policy and terms join its
 // network-first pages and its warm-up list. Measured 9,944 / 3,582.
-// -> 9,977 / 3,601 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
-// 43078a46: one more file in the list, SideCaseScreen; the worker's code did
-// not change. Measured 9,977 / 3,597 plus 4.
-// -> 10,006 / 3,605 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5: side01 and its English and Japanese words in the list; the worker's code did not change. Measured 10,006 / 3,601 plus 4.
-// -> 10,006 / 3,611 on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: the list's hashed names; the worker's code did not change. Measured 10,006 / 3,607 plus 4.
+// 9,948 / 3,586 -> 10,106 / 3,624 on 2026-10-29, adsense-readiness: the about, FAQ and contact pages in three languages
+// join its network-first pages and its warm-up list (nine names). Measured 10,102 / 3,620 over main 3e350266.
+// 10,106 / 3,624 -> 10,143 / 3,640 on 2026-10-30, E-11 번외 사건 틀 (draft) over
+// main 430dda1e: one more file in the list, SideCaseScreen; the worker's code did
+// not change. Measured 10,139 / 3,636 plus 4.
+// 10,143 / 3,640 -> 10,172 / 3,651 on 2026-10-30, E-11 번외 1 (draft) over e11-side-cases da40ea69 (main 430dda1e): side01 and its English and Japanese words in the list; the worker's code did not change. Measured 10,168 / 3,647 plus 4.
+// 10,172 / 3,651 -> 10,172 / 3,654 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the list's hashed names; the worker's code did not change. Measured 10,168 / 3,650 plus 4.
 // -> 9,992 / 3,606 on 2026-10-26 (old base), E-11 번외 2 (draft) restacked on
 // e11-side-cloud bb76437e: one more file in the list, side02. Measured 9,992 /
 // 3,602 plus 4.
-// -> 10,035 / 3,617 on 2026-10-29, E-11 번외 2 (draft) restacked on e11-side-cloud 6ddc9619: side02 and its English and Japanese words in the list; the worker's code did not change. Measured 10,035 / 3,613 plus 4.
-const WORKER_BUDGET = { maxBytes: 10_035, maxGzip: 3_617 };
+// 10,172 / 3,654 -> 10,201 / 3,660 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): side02 and its English and Japanese words in the list; the worker's code did not change. Measured 10,197 / 3,656 plus 4.
+const WORKER_BUDGET = { maxBytes: 10_201, maxGzip: 3_660 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

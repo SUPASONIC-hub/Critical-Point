@@ -49,3 +49,23 @@ test("the intro's language choice opens English, keeps it through a reload and r
   await expect(page.locator(".case-card", { hasText: "프롤로그 01" }).first()).toBeVisible();
   await expect(page.getByTestId("start-first-case")).toContainText("프롤로그 시작");
 });
+
+/**
+ * A 320px phone (10-29): the third pill wrapped to a second row and covered
+ * the brand row's chip. The three stay on one row, clear of the music
+ * controls and above the brand row, in each language.
+ */
+for (const lang of ["ko", "en", "ja"]) {
+  test(`the language pills stay one row above the brand row on a 320px phone (${lang})`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.goto(lang === "ko" ? "/" : `/?lang=${lang}`);
+    const buttons = page.getByTestId("language-picker").getByRole("button");
+    await expect(buttons).toHaveCount(3);
+    const boxes = await buttons.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().toJSON()));
+    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
+    const brandTop = await page.locator(".intro .brand-row").evaluate((el) => el.getBoundingClientRect().top);
+    const musicLeft = await page.locator(".music-controls").evaluate((el) => el.getBoundingClientRect().left);
+    expect(Math.max(...boxes.map((box) => box.bottom))).toBeLessThanOrEqual(brandTop);
+    expect(Math.max(...boxes.map((box) => box.right))).toBeLessThanOrEqual(musicLeft);
+  });
+}

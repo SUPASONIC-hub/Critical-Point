@@ -54,8 +54,11 @@ test("each request gets the rule for what it asks for", () => {
   assert.equal(strategyFor(get("/scene-case01-960.webp", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/icons/icon-192.png", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/manifest.webmanifest"), ORIGIN), "revalidate");
-  for (const page of ["/privacy.html", "/terms.html", "/en/privacy.html", "/en/terms.html", "/ja/privacy.html", "/ja/terms.html"]) {
-    assert.equal(strategyFor(get(page, "navigate"), ORIGIN), "document", page);
+  for (const kind of ["privacy", "terms", "about", "faq", "contact"]) {
+    for (const folder of ["", "/en", "/ja"]) {
+      const page = `${folder}/${kind}.html`;
+      assert.equal(strategyFor(get(page, "navigate"), ORIGIN), "document", page);
+    }
   }
 });
 
@@ -70,6 +73,9 @@ test("the worker leaves alone what is not its to answer", () => {
   assert.equal(strategyFor(get("/somewhere/else", "navigate"), ORIGIN), "none");
   assert.equal(strategyFor(get("/privacy", "navigate"), ORIGIN), "none", "only the policy pages' own names");
   assert.equal(strategyFor(get("/fr/privacy.html", "navigate"), ORIGIN), "none");
+  // The crawler's files are plain files the worker never answers.
+  assert.equal(strategyFor(get("/robots.txt"), ORIGIN), "none");
+  assert.equal(strategyFor(get("/sitemap.xml"), ORIGIN), "none");
 });
 
 test("a release's cache is its own, and only this site's other releases are stale", () => {
@@ -533,10 +539,16 @@ test("the files of a build are read with their bytes, without the page and the w
   write("manifest.webmanifest", "{}");
   write("assets/index-FZxcMdNV.js", "entry");
   write("icons/favicon-32.png", "icon");
+  // The crawler's files are not part of a release: the sitemap is dated the
+  // day of the build, and a rebuild a day later ships the same release.
+  write("robots.txt", "User-agent: *\nAllow: /\n");
+  write("sitemap.xml", "<lastmod>2026-10-29</lastmod>");
   const before = shippedFiles(dir);
   assert.deepEqual(before.map(([name]) => name), ["/assets/index-FZxcMdNV.js", "/icons/favicon-32.png", "/manifest.webmanifest", "/portrait-echo.webp"]);
   assert.ok(before.every(([, hash]) => /^[0-9a-f]{64}$/.test(hash)));
   assert.deepEqual(shippedFiles(dir), before, "the same files read again are the same");
+  write("sitemap.xml", "<lastmod>2026-10-30</lastmod>");
+  assert.deepEqual(shippedFiles(dir), before, "a sitemap of another day is the same release");
   // The same name over other bytes, which is what no hashed name would show.
   write("portrait-echo.webp", "another portrait");
   const after = shippedFiles(dir);
@@ -554,8 +566,13 @@ test("the warm list is every other build file, the portraits and the art at one 
   const withNew = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file), "/portrait-lee-minseo.webp"]) });
   assert.deepEqual(withNew.warm, config.warm);
   // The policy pages beside the build (scripts/legal-pages.mjs) are warmed too.
-  const withPolicies = workerConfigFor({ html: PAGE, files: shipped([...FILES.map(([file]) => file), "/privacy.html", "/en/terms.html", "/robots.html"]) });
-  assert.deepEqual(withPolicies.warm, [...config.warm, "/en/terms.html", "/privacy.html"].sort());
+  // So are the about, FAQ and contact pages (scripts/site-pages.mjs); the
+  // crawler's files are not.
+  const withPolicies = workerConfigFor({
+    html: PAGE,
+    files: shipped([...FILES.map(([file]) => file), "/privacy.html", "/en/terms.html", "/robots.html", "/faq.html", "/ja/contact.html", "/robots.txt", "/sitemap.xml"]),
+  });
+  assert.deepEqual(withPolicies.warm, [...config.warm, "/en/terms.html", "/faq.html", "/ja/contact.html", "/privacy.html"].sort());
   assert.equal(config.entry, "/assets/index-FZxcMdNV.js");
   assert.equal(config.precache.includes("/assets/index-FZxcMdNV.js"), true);
   assert.throws(() => workerConfigFor({ html: "<html></html>", files: FILES }), /no module script/);

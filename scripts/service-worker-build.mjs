@@ -35,8 +35,9 @@ import { DOCUMENT_PAGE } from "../src/serviceWorker/worker.js";
  *             credit's picture and each piece of art at 960px, fetched once
  *             a table is up. One size of the art, not three: the worker
  *             gives it to a screen that asked for another (`artVariants`).
- *             And the privacy policy and the terms (`DOCUMENT_PAGE`), so
- *             a device offline can still read what it agreed to.
+ *             And the plain pages -- the privacy policy, the terms, the
+ *             about, FAQ and contact pages (`DOCUMENT_PAGE`) -- so a device
+ *             offline can still read what it agreed to and where to write.
  */
 export const WORKER_FILE = "sw.js";
 const PAGE_PATH = "/index.html";
@@ -55,18 +56,25 @@ export function pageWithoutCommit(html) {
   return String(html ?? "").replace(BUILD_SHA_LINE, "");
 }
 
+// The crawler's two files (staticPages, vite.config.js). No page asks for
+// them and the worker never answers them, and the sitemap is dated the day of
+// the build: counted, a rebuild of the same commit the next day would be a
+// new release that every device downloads in full.
+const CRAWLER_FILES = new Set(["/robots.txt", "/sitemap.xml"]);
+
 /**
- * Every file under `dir` but the page and the worker, as `[path, sha256]`
- * with the path from the root (`/assets/x.js`), sorted. The bytes and not the
- * names alone: a file under assets/ is named by its hash, but nothing from
- * `public/` is, and one rule for all of them has no list to keep.
+ * Every file under `dir` but the page, the worker and the crawler's files, as
+ * `[path, sha256]` with the path from the root (`/assets/x.js`), sorted. The
+ * bytes and not the names alone: a file under assets/ is named by its hash,
+ * but nothing from `public/` is, and one rule for all of them has no list to
+ * keep.
  */
 export function shippedFiles(dir) {
   return readdirSync(dir, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))
     .map((file) => [`/${path.relative(dir, file).replace(/\\/g, "/")}`, file])
-    .filter(([name]) => name !== PAGE_PATH && name !== WORKER_PATH)
+    .filter(([name]) => name !== PAGE_PATH && name !== WORKER_PATH && !CRAWLER_FILES.has(name))
     .map(([name, file]) => [name, digest(readFileSync(file))])
     .sort(byName);
 }

@@ -28,7 +28,7 @@ export default {
           "label": "Spend tonight preparing the restore with Lee Minseo"
         },
         "reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
@@ -56,10 +56,10 @@ export default {
           "label": "Swap in blank disks and walk out with ECHO’s"
         },
         "reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         },
         "c46_cage_evidence_turn": {
-          "label": "Open the latest document with an empty approver field"
+          "label": "Open the newest unsigned file"
         }
       },
       "place": "KD Data Lab Data Center, Pangyo · B3 Disposal Holding Area",
@@ -87,10 +87,10 @@ export default {
           "label": "Skip the greetings and run the design log recount first"
         },
         "reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         },
         "c46_boot_evidence_turn": {
-          "label": "Open the latest document with an empty approver field"
+          "label": "Open the newest unsigned file"
         }
       },
       "place": "KD Data Lab Data Center, Pangyo · Test Server Room",
@@ -118,10 +118,10 @@ export default {
           "label": "Show it first to Han Seoyun, who would know the dot"
         },
         "reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         },
         "c46_recount_evidence_turn": {
-          "label": "Open the latest document with an empty approver field"
+          "label": "Open the newest unsigned file"
         }
       },
       "place": "KD Data Lab Data Center, Pangyo · Test Server Room",
@@ -383,7 +383,7 @@ export default {
           "label": "Shelve the stats and focus on getting the disks out"
         },
         "c46_route_system_evidence_turn": {
-          "label": "Open the latest document with an empty approver field"
+          "label": "Open the newest unsigned file"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Video Call Screen",
@@ -459,7 +459,7 @@ export default {
           "label": "Spend tonight preparing the restore with Lee Minseo"
         },
         "c46_start_warm_reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
@@ -489,7 +489,7 @@ export default {
           "label": "Go to Pangyo at dawn and pull the ECHO disks first"
         },
         "c46_start_record_reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
@@ -519,7 +519,7 @@ export default {
           "label": "Go to Pangyo at dawn and pull the ECHO disks first"
         },
         "c46_start_rush_reframe": {
-          "label": "Find who approved the disposal first"
+          "label": "Find who okayed the disposal"
         }
       },
       "place": "Hoegi-dong Secondhand Bookshop 1st Floor · Between the Shelves",
