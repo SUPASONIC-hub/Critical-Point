@@ -738,6 +738,10 @@ export const copy = {
       "side02": {
         "label": "Side case 2",
         "title": "What Must Be Given Back"
+      },
+      "side03": {
+        "label": "Side case 3",
+        "title": "An Ordinary Night"
       }
     }
   }

@@ -376,8 +376,8 @@ The side cases (`src/nodes/sideNN.js`) sit outside the season's fifty-five and
 open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
-`check:canon` holds their dated weekdays like any other (12월 20일 (토) fits
-2025, 1월 9일 (금) fits 2026) and nothing else here.
+`check:canon` holds their dated weekdays like any other (12월 20일 (토) and
+11월 8일 (토) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -407,6 +407,20 @@ season case has to keep. What each one states for the first time is below.
 | After | without the ledgers 양순자 could never prove her record, and never borrowed again. She still keeps a ledger by hand every night, in the same writing |
 | 한미진 (37) | her daughter, who drew on the last page of the last ledger at nine; runs the stall 「미진」, 2층 87호 of a 동대문 wholesale market that opens at 22:00 |
 | The endings | where the ledgers go (to 한미진 that night / with the two pages / back into the box for 임경수 to take himself). None says whether he ever went (사건 45) |
+
+### 번외 3, 보통의 밤 (side03)
+
+| Fact | Value |
+|---|---|
+| When | 2025-11-08 (토), 21:30 to the 06:00 send: the night shift of 플로우온's fulfilment centre, the day after 사건 15 opens (수능 D-6) and five days before 수능. The first snow, and 사건 16, are 19 days later |
+| What the floor knows | nothing of robots, a lease or 31 December. The rumour 'B동에 로봇 들어온대' reaches the group chat on 수능's evening (사건 16, c16_start_warm); this night is before it |
+| The notice | posted by the centre on the board: that night every worker's 처리량 (picks per hour) is measured, "결과는 연말 계약 갱신 때 참고합니다". Someone has written '왜 하필 토요일' under it |
+| The ranking screen | a live table on the break-room wall, a bar per name; the bottom row is red, with a smiling face and '힘내세요!' |
+| What it does not count | 강태민 carrying a colleague's 2-litre water bundles (his wrist scanner silent); 유하온 under conveyor 3, a roller wound with tape, 52 minutes 비가동 and so at the bottom; 배수경 re-packing split boxes left-handed ("오른손은 쉬는 중"), already counted to whoever packed them first |
+| The tally | on the break-room whiteboard at the break: conveyor fixed 3 times, 38 boxes re-packed, water bundles "스물몇 번". 유하온 finds the tape on the roller came off the split boxes: one line with 배수경's |
+| The sheet | goes to head office by itself at 06:00. Each stopped minute takes an idle reason from four: 휴식, 교육, 설비 대기, 기타. The night manager: "비고는 어차피 아무도 안 읽어요" |
+| 강태민 | first on the ranking; still buys his cup noodles two at a time and still does not say why (c16_roof does). He says "내년에도 이렇게만 했으면 좋겠네요" on the loading dock |
+| The endings | what is left that morning (a note on the whiteboard, which the day-shift lead adds to and nobody erases that week / 유하온's first line of notes on what he fixes / every reason typed into the 비고 and sent, unanswered). None says the measurement changed anything |
 
 ## Known and left alone
 
