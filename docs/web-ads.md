@@ -78,6 +78,12 @@ for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critic
 마커는 JSX 주석 `{/* ad-slot: placement="report" … */}`이라 꺼진 빌드에서는 컴파일되면 없어집니다.
 켠 빌드에서만 `<AdSlot … />`과 import로 바뀝니다.
 
+## 검토가 읽는 글과 Search Console
+
+검토는 사이트에 읽을 글, 개인정보처리방침·문의 페이지, 깨진 링크가 없는지를 봅니다. 빌드가 쓰는 정적 페이지
+열다섯(게임 소개·자주 묻는 질문·문의·개인정보처리방침·이용약관 × 한국어·영어·일본어)과 `robots.txt`·`sitemap.xml`,
+그리고 Search Console 확인 스위치 `GOOGLE_SITE_VERIFICATION`은 [search-console.md](search-console.md)에 있습니다.
+
 ## CSP (9번 전에 대시보드에)
 
 Google은 AdSense 코드에 nonce를 쓰는 strict CSP만 지원한다고 합니다 — 광고 코드가 쓰는 도메인이 바뀌기

@@ -28,7 +28,7 @@ export default {
           "label": "Record the empty office and printout, confirmed by Baek Arin"
         },
         "reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -57,10 +57,10 @@ export default {
           "label": "Leave the notice be; fill the truck by today first"
         },
         "reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         },
         "c25_notice_evidence_turn": {
-          "label": "Bring out KD Capital’s board minutes from before the vote"
+          "label": "Open KD Capital’s board minutes"
         }
       },
       "place": "In Front of the Trigger Lab Building · Moving Truck in the Alley",
@@ -88,10 +88,10 @@ export default {
           "label": "Staying long makes you a target; say a quick hello and go"
         },
         "reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         },
         "c25_standby_evidence_turn": {
-          "label": "Bring out KD Capital’s board minutes from before the vote"
+          "label": "Open KD Capital’s board minutes"
         }
       },
       "place": "KD Financial Group Headquarters, 7th Floor · Standby Room at the End of the Hall",
@@ -119,10 +119,10 @@ export default {
           "label": "Pick 'Tuesday Lunch' and keep it a room for checking in"
         },
         "reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         },
         "c25_chatroom_evidence_turn": {
-          "label": "Bring out KD Capital’s board minutes from before the vote"
+          "label": "Open KD Capital’s board minutes"
         }
       },
       "place": "Seoul Station · KTX Platform",
@@ -384,7 +384,7 @@ export default {
           "label": "Formally ask the Audit Committee about notices with blank reasons"
         },
         "c25_route_system_evidence_turn": {
-          "label": "Bring out KD Capital’s board minutes from before the vote"
+          "label": "Open KD Capital’s board minutes"
         }
       },
       "place": "KD Capital Headquarters · Group Work App",
@@ -459,7 +459,7 @@ export default {
           "label": "Show the five in the lobby the empty office and stay by them"
         },
         "c25_start_warm_reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -489,7 +489,7 @@ export default {
           "label": "Take the printout and plan your move before the notice"
         },
         "c25_start_record_reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -519,7 +519,7 @@ export default {
           "label": "Take the printout and plan your move before the notice"
         },
         "c25_start_rush_reframe": {
-          "label": "Find out where the executives in trouble went"
+          "label": "Find where the executives went"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",

@@ -28,7 +28,7 @@ export default {
           "label": "Screenshot the rejection text and post it online tonight"
         },
         "reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market",
@@ -56,10 +56,10 @@ export default {
           "label": "First ask whose records the training data are"
         },
         "reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         },
         "c40_demo_evidence_turn": {
-          "label": "Open the approval for FitScore’s 4 billion won"
+          "label": "Open FitScore’s 4 billion approval"
         }
       },
       "place": "Seongsu-dong · FitScore · Demo Room",
@@ -87,10 +87,10 @@ export default {
           "label": "File an official request to see and delete my records"
         },
         "reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         },
         "c40_anchor_evidence_turn": {
-          "label": "Open the approval for FitScore’s 4 billion won"
+          "label": "Open FitScore’s 4 billion approval"
         }
       },
       "place": "KD Data Lab, Pangyo · Data Center",
@@ -118,10 +118,10 @@ export default {
           "label": "Get an outside expert review of the model in writing"
         },
         "reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         },
         "c40_steam_evidence_turn": {
-          "label": "Open the approval for FitScore’s 4 billion won"
+          "label": "Open FitScore’s 4 billion approval"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market",
@@ -383,7 +383,7 @@ export default {
           "label": "Send the statistic to all 138 FitScore client companies"
         },
         "c40_route_system_evidence_turn": {
-          "label": "Open the approval for FitScore’s 4 billion won"
+          "label": "Open FitScore’s 4 billion approval"
         }
       },
       "place": "Pangyo · KD Data Lab · Server Room Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Screenshot the rejection text and post it online tonight"
         },
         "c40_start_warm_reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         }
       },
       "place": "Gaeul Rice Cake Shop, Mangwon Market",
@@ -488,7 +488,7 @@ export default {
           "label": "Reread the folder’s 6-minute original as FitScore material"
         },
         "c40_start_record_reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         }
       },
       "place": "Pangyo · KD Data Lab · Records Room",
@@ -518,7 +518,7 @@ export default {
           "label": "Use the security intercom to demand a meeting with the CEO"
         },
         "c40_start_rush_reframe": {
-          "label": "Look into who the rejected people were"
+          "label": "Look into who was rejected"
         }
       },
       "place": "Seongsu-dong · FitScore · Lobby",

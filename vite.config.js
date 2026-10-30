@@ -7,8 +7,9 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
-import { renderLegalPages } from "./scripts/legal-pages.mjs";
+import { crawlerFiles, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
 import { adsTxt, insertAdSlots, readAdsenseEnv } from "./scripts/adsense-config.mjs";
+import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -215,7 +216,8 @@ function criticalCss() {
  * repository -- the service was created by hand in the Render dashboard -- so it
  * comes from the build environment: `SITE_URL` when set (a custom domain), else
  * `RENDER_EXTERNAL_URL`, which Render sets on every build. A local build has
- * neither and keeps the relative paths.
+ * neither and keeps the relative paths. The plain pages and the sitemap take
+ * the same origin (`siteOrigin`, `withAbsoluteSiteLinks`: scripts/site-pages.mjs).
  */
 function absoluteSiteUrls() {
   return {
@@ -224,12 +226,7 @@ function absoluteSiteUrls() {
     transformIndexHtml: {
       order: "post",
       handler(html) {
-        const origin = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || "").trim().replace(/\/+$/, "");
-        if (!origin) return html;
-        if (!/^https:\/\//.test(origin)) throw new Error(`SITE_URL must be an https origin, got ${origin}`);
-        return html
-          .replace(/(<meta\s+(?:property="og:(?:url|image)"|name="twitter:image")\s+content=")\//g, `$1${origin}/`)
-          .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
+        return withAbsoluteSiteLinks(html, siteOrigin());
       },
     },
   };
@@ -364,26 +361,45 @@ function serviceWorker() {
 }
 
 /**
- * The privacy policy and the terms of use (scripts/legal-pages.mjs): six
- * plain pages written beside `index.html`, so the host serves each at its own
- * name and a store listing can link to it. The dev server answers the same
- * addresses from the same source. Before `serviceWorker()` in the list, which
- * reads every file on disk into the release's name.
+ * The site's plain pages and the files a crawler reads, written beside
+ * `index.html`: the privacy policy and the terms (scripts/legal-pages.mjs),
+ * the game's about, FAQ and contact pages (scripts/site-pages.mjs), fifteen
+ * pages in Korean, English and Japanese, and /robots.txt and /sitemap.xml.
+ * The host serves each at its own name, so a store listing, a search engine
+ * or an AdSense reviewer reads them with no script. The dev server answers
+ * the same addresses from the same source.
+ *
+ * Their canonical and hreflang links and the sitemap's addresses are absolute
+ * on the build's origin (`siteOrigin`), relative without one. The sitemap is
+ * dated the day of the build, so it is the one file a rebuild of the same
+ * commit can change; the service worker leaves it and robots.txt out of the
+ * release's name (`shippedFiles`, scripts/service-worker-build.mjs), which
+ * a device would otherwise download everything again for. Before
+ * `serviceWorker()` in the list, which reads every file on disk.
+ *
+ * `ads` (a build with ADSENSE_ADS=on) is the pages' text once the web has
+ * ads (AD_EDITS, legal-pages.mjs); without it
+ * the pages are the ones as written, byte for byte.
  */
-function legalPages({ ads }) {
+function staticPages({ ads }) {
+  const files = () => {
+    const origin = siteOrigin();
+    return { ...renderStaticPages(origin, { ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+  };
+  const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
-    name: "legal-pages",
+    name: "static-pages",
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = new URL(request.url ?? "/", "http://dev.invalid").pathname;
-        const page = renderLegalPages({ ads })[pathname.slice(1)];
-        if (!page) return next();
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-        response.end(page);
+        const file = files()[pathname.slice(1)];
+        if (!file) return next();
+        response.setHeader("Content-Type", TYPES[pathname.split(".").pop()]);
+        response.end(file);
       });
     },
     generateBundle() {
-      for (const [fileName, source] of Object.entries(renderLegalPages({ ads }))) this.emitFile({ type: "asset", fileName, source });
+      for (const [fileName, source] of Object.entries(files())) this.emitFile({ type: "asset", fileName, source });
     },
   };
 }
@@ -396,8 +412,9 @@ function legalPages({ ads }) {
  * meta tag the AdSense review reads, and no code. With ADSENSE_ADS=on
  * and a unit for a placement (ADSENSE_SLOTS) it also turns that
  * placement's marker comment into an <AdSlot>, before JSX is compiled.
- * Before `serviceWorker()` in the list, like legalPages, so ads.txt is a file
- * the release is named for.
+ * First in the list, so its transform sees the source before react() does,
+ * and before `serviceWorker()`, like staticPages, so ads.txt is a file the
+ * release is named for.
  */
 function adsense(config) {
   if (!config.client) return { name: "adsense-off" };
@@ -417,6 +434,20 @@ function adsense(config) {
       this.emitFile({ type: "asset", fileName: "ads.txt", source: adsTxt(config.publisherId) });
     },
   };
+}
+
+/** ADSENSE_* (scripts/adsense-config.mjs), which the plugin above and the pages' text both follow. */
+const adsenseEnv = (mode) => readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"));
+
+/**
+ * Google Search Console's site verification, off unless
+ * GOOGLE_SITE_VERIFICATION is set (scripts/search-console.mjs,
+ * docs/search-console.md): the `google-site-verification` meta tag in
+ * index.html, and nothing else. No VITE_ prefix, like ADSENSE_CLIENT.
+ */
+function searchConsoleVerification({ token }) {
+  if (!token) return { name: "search-console-verification-off" };
+  return { name: "search-console-verification", transformIndexHtml: (html) => withSiteVerificationMeta(html, token) };
 }
 
 /** What the page is told about registering (src/serviceWorker/register.js). */
@@ -613,57 +644,59 @@ function ownChunkGroups() {
   });
 }
 
-export default defineConfig(({ command, mode }) => {
-  // No VITE_ prefix: Vite puts every VITE_ variable into import.meta.env, and
-  // the code that reads that object whole would carry the publisher ID.
-  const ads = readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"));
-  return {
-    plugins: [adsense(ads), seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), legalPages({ ads: ads.ads }), serviceWorker(), renderHeaders()],
-    // The debug console -- the case jump, unlock-all, the forced render error --
-    // is dead code in a release, and this constant is how the bundler is told.
-    // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
-    // nothing can fold: the expression and every panel behind it shipped to
-    // players, switched off by a runtime check. A build that asks for the tools
-    // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
-    define: {
-      __CP_DEBUG_BUILD__: JSON.stringify(
-        command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
-      ),
-      __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+export default defineConfig(({ command, mode }) => ({
+  // ADSENSE_CLIENT and GOOGLE_SITE_VERIFICATION have no VITE_ prefix, so they never reach import.meta.env
+  // (scripts/adsense-config.mjs, scripts/search-console.mjs).
+  plugins: [
+    adsense(adsenseEnv(mode)),
+    seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages({ ads: adsenseEnv(mode).ads }),
+    searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
+    serviceWorker(), renderHeaders(),
+  ],
+  // The debug console -- the case jump, unlock-all, the forced render error --
+  // is dead code in a release, and this constant is how the bundler is told.
+  // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
+  // nothing can fold: the expression and every panel behind it shipped to
+  // players, switched off by a runtime check. A build that asks for the tools
+  // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
+  define: {
+    __CP_DEBUG_BUILD__: JSON.stringify(
+      command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
+    ),
+    __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+  },
+  // The dev server compiles a module the first time it is asked for. Fifty
+  // cases are fifty large data modules, and compiling them on the first scene
+  // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
+  // never has, landing inside the e2e render budgets. They are compiled when
+  // the server starts instead.
+  server: {
+    warmup: {
+      clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
     },
-    // The dev server compiles a module the first time it is asked for. Fifty
-    // cases are fifty large data modules, and compiling them on the first scene
-    // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
-    // never has, landing inside the e2e render budgets. They are compiled when
-    // the server starts instead.
-    server: {
-      warmup: {
-        clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
-      },
+  },
+  build: {
+    // A lazy import is written with the list of files to preload beside it.
+    // The result card's chunk leans only on files the ending screen has
+    // already run, so its list is left out: writing it cost the report's chunk
+    // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+    // The case file's cast (CaseCast, D-8) is the same: the runtime has run
+    // every file it leans on before the table's fold can open, and its list
+    // of sixteen files was about 500 bytes (2026-10-23).
+    modulePreload: {
+      resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
     },
-    build: {
-      // A lazy import is written with the list of files to preload beside it.
-      // The result card's chunk leans only on files the ending screen has
-      // already run, so its list is left out: writing it cost the report's chunk
-      // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
-      // The case file's cast (CaseCast, D-8) is the same: the runtime has run
-      // every file it leans on before the table's fold can open, and its list
-      // of sixteen files was about 500 bytes (2026-10-23).
-      modulePreload: {
-        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
-      },
-      rolldownOptions: {
-        output: {
-          // The other languages' words (src/locales, 다국어 틀) are named
-          // apart, `locale-<lang>-<file>`: a Korean device never asks for
-          // them, so the service worker leaves `locale-*` out of its warm-up
-          // (scripts/service-worker-build.mjs), and their budgets are their own.
-          chunkFileNames: localeChunkName,
-          codeSplitting: {
-            groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
-          },
+    rolldownOptions: {
+      output: {
+        // The other languages' words (src/locales, 다국어 틀) are named
+        // apart, `locale-<lang>-<file>`: a Korean device never asks for
+        // them, so the service worker leaves `locale-*` out of its warm-up
+        // (scripts/service-worker-build.mjs), and their budgets are their own.
+        chunkFileNames: localeChunkName,
+        codeSplitting: {
+          groups: [...ownChunkGroups(), ...VENDOR_GROUPS, ENTRY_GROUP],
         },
       },
     },
-  };
-});
+  },
+}));
