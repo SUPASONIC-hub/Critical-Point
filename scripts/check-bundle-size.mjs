@@ -268,7 +268,8 @@ const budgets = [
   // 182,001 / 66,033 -> 182,038 / 66,116 on 2026-10-29, adsense-readiness: the start screen's foot links five pages (SITE_PAGES, privacyText.js) and names three more in the intro's table (게임 소개 · 자주 묻는 질문 · 문의). Measured 182,034 / 66,112 in the e2e build over main 3e350266 (#374), the plus 4.
   // 66,116 -> 66,124 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): no code changed; the hashed chunk names the entry imports
   // changed with the shorter Japanese premise and the pills' CSS. Measured 182,034 / 66,120 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 182_038, maxGzip: 66_124 },
+  // 182,038 / 66,124 -> 182,105 / 66,131 for W49's row in the calendar (P5 of the 11-23 verdict, the test week again; w49-p5-row over main 430dda1e): the entry chunk carries MERGED_WEEKS. Measured 182,105 / 66,127 in the e2e build, the raw as measured and the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 182_105, maxGzip: 66_131 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1109,8 +1110,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The ranking save lines in the page's language (ranking-save-copy, over main
  * c39870a7; the Korean only by the entry's hashed names): 423,114, 472,617
  * and 478,413.
+ * W49's row in MERGED_WEEKS (w49-p5-row, P5 only, over main 430dda1e):
+ * 423,132, 472,635 and 478,431.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_118, en: 472_621, ja: 478_417 };
+const FIRST_PAINT_BUDGETS = { ko: 423_136, en: 472_639, ja: 478_435 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
