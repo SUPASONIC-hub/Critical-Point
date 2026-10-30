@@ -125,7 +125,7 @@ export default {
     result: " · {thinking} · {seconds}s · Reframes {count}",
   },
   status: { playing: "In progress", open: "Ready to start", complete: "Done", locked: "Previous case needed" },
-  legal: { privacy: "Privacy Policy", terms: "Terms of Use" },
+  legal: { about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use" },
   opening: {
     firstCase: "the first case",
     entering: "Entering {case}",

@@ -264,9 +264,10 @@ const budgets = [
   // 180,652 / 65,391 -> 181,779 / 65,912 on 2026-10-26, 영어판 3단계: the board's hook (src/copy/boardPost.js), the ranking's rows and status card and the pressures' names (leaderboard.js), online save's status lines (cloudSaveStatus.js, in cloudSave's chunk), and the intro's table naming the data notice, the deletion request and the three memories. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // -> 181,871 / 65,954 on 2026-10-26, 영어판 3단계 and 일본어 1단계 together (merged main f827c198): measured 181,871 / 65,950, the gzip plus 4.
   // 66,015 -> 66,033 gzip on 2026-10-29, save-unavailable-lite: the start screen's storage line in the page's language (src/shellNotices.js, one line laid over by the dictionary's notices, not the runtime's 6.8KB table). Measured 66,029 gzip in the e2e build over main d0c44b13 (#373), the gzip plus 4.
-  // 66,033 -> 66,048 gzip on 2026-10-29, picker-narrow over main 3e350266: no code changed; the hashed chunk names the entry imports
-  // changed with the shorter Japanese premise and the pills' CSS. Measured 66,044 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 182_001, maxGzip: 66_048 },
+  // 182,001 / 66,033 -> 182,038 / 66,116 on 2026-10-29, adsense-readiness: the start screen's foot links five pages (SITE_PAGES, privacyText.js) and names three more in the intro's table (게임 소개 · 자주 묻는 질문 · 문의). Measured 182,034 / 66,112 in the e2e build over main 3e350266 (#374), the plus 4.
+  // 66,116 -> 66,124 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): no code changed; the hashed chunk names the entry imports
+  // changed with the shorter Japanese premise and the pills' CSS. Measured 182,034 / 66,120 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 182_038, maxGzip: 66_124 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -546,9 +547,10 @@ const budgets = [
   // music and language controls (z-index 31). Measured 196,064 / 36,529 in the e2e build, the gzip plus 4.
   // -> 196,140 / 36,563 on 2026-10-29, intro-en-fit: a Japanese page on a phone of 360px or less draws the
   // premise at 14px / 1.6 (base-intro-ranking.css). Measured 196,140 / 36,559 in the e2e build, the gzip plus 4.
-  // -> 196,324 / 36,597 on 2026-10-29, picker-narrow: on 360px or less the three language pills keep one row (12px type)
-  // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,324 / 36,593 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_324, maxGzip: 36_597 },
+  // -> 196,161 raw on 2026-10-29, adsense-readiness: the foot's five links wrap on a narrow screen (.intro-legal flex-wrap). Measured 196,157 / 36,560; the gzip holds.
+  // -> 196,345 / 36,599 on 2026-10-30, picker-narrow over main c3b40b6f (#376): on 360px or less the three language pills keep one row (12px type)
+  // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_345, maxGzip: 36_599 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -629,7 +631,8 @@ const budgets = [
   // 11,492 -> 11,494 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 11,494 / 4,638.
   // 11,494 -> 11,497 raw on 2026-10-26, funnel-locale: only by the chunk names it imports. Measured 11,497 / 4,636.
   // 11,497 / 4,644 -> 11,780 / 4,768 on 2026-10-26, 영어판 3단계: online save's status lines and refusals read by key (src/copy/cloudSaveStatus.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_780, maxGzip: 4_768 },
+  // 4,768 -> 4,773 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): only by the chunk names it imports. Measured 4,769 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_780, maxGzip: 4_773 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -1007,7 +1010,8 @@ const budgets = [
   // (endings, verdicts, board, ranking, week rules, table variants, narration) and 63 more speakers. Measured 152,775 / 51,773.
   // 51,777 -> 51,787 gzip on 2026-10-29, lang-terms (일본어판 표기 맞춤): measured 152,775 / 51,783, the gzip plus 4.
   // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_061, maxGzip: 51_897 },
+  // 153,061 / 51,897 -> 153,139 / 51,933 on 2026-10-29, adsense-readiness: the foot's three new links in Japanese. Measured 153,135 / 51,929, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_139, maxGzip: 51_933 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1094,11 +1098,14 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * main d109b66b): 422,978, 472,430 and 478,220.
  * The start screen's storage line in the page's language (save-unavailable-lite,
  * src/shellNotices.js, over main d0c44b13): 422,996, 472,448 and 478,238.
+ * The foot's five links (about, FAQ, contact and the two policies, in the
+ * page's language; adsense-readiness, over main 3e350266): 423,083, 472,557
+ * and 478,361.
  * The language pills kept one row on a 360px phone and the shorter Japanese
- * premise (picker-narrow, over main 3e350266; the critical CSS carries the
- * rule): 423,049, 472,502 and 478,276.
+ * premise (picker-narrow, over main c3b40b6f; the critical CSS carries the
+ * rule): 423,125, 472,600 and 478,386.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_053, en: 472_506, ja: 478_280 };
+const FIRST_PAINT_BUDGETS = { ko: 423_129, en: 472_604, ja: 478_390 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1223,7 +1230,9 @@ function checkBudget(file, budget) {
 // the worker's code did not change. Measured 9,897 / 3,569 plus 4.
 // 9,897 / 3,573 -> 9,948 / 3,586 on 2026-10-28, lang-extras: the Japanese privacy policy and terms join its
 // network-first pages and its warm-up list. Measured 9,944 / 3,582.
-const WORKER_BUDGET = { maxBytes: 9_948, maxGzip: 3_586 };
+// 9,948 / 3,586 -> 10,106 / 3,624 on 2026-10-29, adsense-readiness: the about, FAQ and contact pages in three languages
+// join its network-first pages and its warm-up list (nine names). Measured 10,102 / 3,620 over main 3e350266.
+const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_624 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

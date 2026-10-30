@@ -1061,11 +1061,13 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
 }
-/* The two policy pages beside the build (privacyText.js). The line height
-   is what makes each link a 52px target. */
+/* The five pages beside the build (privacyText.js SITE_PAGES). The line
+   height is what makes each link a 52px target; on a narrow screen the line
+   wraps, with no gap between its rows. */
 .intro-legal {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 0 20px;
   width: min(var(--ui-page-max), 100%);
   margin: 64px auto 0;
   line-height: 3.25;

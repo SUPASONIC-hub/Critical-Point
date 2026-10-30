@@ -132,6 +132,9 @@ export default {
     locked: "前の事件が必要",
   },
   legal: {
+    about: "ゲーム紹介",
+    faq: "よくある質問",
+    contact: "お問い合わせ",
     privacy: "プライバシーポリシー",
     terms: "利用規約",
   },
