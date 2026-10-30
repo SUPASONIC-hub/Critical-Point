@@ -28,7 +28,7 @@ export default {
           "label": "Tell your scared team first what they can refuse"
         },
         "reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Office",
@@ -56,10 +56,10 @@ export default {
           "label": "Hand over the boxes with your name first to speed it up"
         },
         "reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         },
         "c32_boxes_evidence_turn": {
-          "label": "Match the 33rd-floor removal log to the seizure list"
+          "label": "Match 33rd-floor log to seizures"
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
@@ -87,10 +87,10 @@ export default {
           "label": "Ask to leave colleagues out; tell your own moves in full"
         },
         "reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         },
         "c32_room_evidence_turn": {
-          "label": "Match the 33rd-floor removal log to the seizure list"
+          "label": "Match 33rd-floor log to seizures"
         }
       },
       "place": "Seoul Central District Prosecutors’ Office 11th Floor · Interview Room 1108",
@@ -118,10 +118,10 @@ export default {
           "label": "Go with him to explain things to Seoa before submitting"
         },
         "reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         },
         "c32_notebook_evidence_turn": {
-          "label": "Match the 33rd-floor removal log to the seizure list"
+          "label": "Match 33rd-floor log to seizures"
         }
       },
       "place": "Outside the Seoul Central District Prosecutors’ Office · Parking Lot",
@@ -383,7 +383,7 @@ export default {
           "label": "Submit the ruling statistics to Prosecutor Na as an opinion"
         },
         "c32_route_system_evidence_turn": {
-          "label": "Match the 33rd-floor removal log to the seizure list"
+          "label": "Match 33rd-floor log to seizures"
         }
       },
       "place": "KD Capital 12th Floor · Shared Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Sign only after checking the seizure list line by line"
         },
         "c32_start_warm_reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Office",
@@ -488,7 +488,7 @@ export default {
           "label": "Tell your scared team first what they can refuse"
         },
         "c32_start_record_reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Office",
@@ -518,7 +518,7 @@ export default {
           "label": "Give the Pyeongtaek box under your desk to them first"
         },
         "c32_start_rush_reframe": {
-          "label": "Count who probes like this have put on trial"
+          "label": "Count who such probes tried"
         }
       },
       "place": "KD Capital 12th Floor · Risk Management Office",
