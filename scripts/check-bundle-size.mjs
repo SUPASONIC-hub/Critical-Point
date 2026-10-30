@@ -633,6 +633,10 @@ const budgets = [
   // -> 196,161 raw on 2026-10-29, adsense-readiness: the foot's five links wrap on a narrow screen (.intro-legal flex-wrap). Measured 196,157 / 36,560; the gzip holds.
   // -> 196,345 / 36,599 on 2026-10-30, picker-narrow over main c3b40b6f (#376): on 360px or less the three language pills keep one row (12px type)
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
+  // -> 196,428 / 36,624 on 2026-10-30, ja-hand-narrow over main c865d984 (#380): a Japanese card label on 360px or less a size
+  // down (play.css), so a five-card hand keeps two lines in a CJK face. Measured 196,428 / 36,620 in the e2e build, the gzip plus 4.
+  // -> 196,523 / 36,650 on 2026-10-30, intro-360-fit over main 7552870d (#381): on 360px or less the start button sits closer
+  // to the premise (a 360x740 phone had the Korean one 2px under the screen) and the English premise takes 14px. Measured 196,523 / 36,646, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
@@ -655,6 +659,7 @@ const budgets = [
   // 196,473 / 36,590 -> 196,624 / 36,625 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the 판 읽기 card, the board marks and the hall badge on one sheet. Measured 196,624 / 36,621 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 196,901 / 36,696 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 196,901 / 36,692 in the e2e build, the gzip plus 4.
   // -> 197,050 / 36,728 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 197,050 / 36,724 in the e2e build, the gzip plus 4.
+  // 196,655 / 36,661 -> 196,837 / 36,700 on 2026-10-30, #224 merged with main b2558d55 (#380 #381 #382 #383): main's Japanese card labels and 360px start button over #224's link tag, signal row and English bank rail. Measured 196,837 / 36,696 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 197_050, maxGzip: 36_728 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -819,6 +824,7 @@ const budgets = [
   // 39,889 / 14,795 -> 40,464 / 15,007 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: getLogicDirection and getEffectLean, upgradeRunRecord's pre-C-3 hold. Measured 40,464 / 15,003, the gzip plus 4 in the e2e build.
   // 40,661 / 15,278 -> 41,229 / 15,497 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): applyPeak and the new tools on getLogicDirection. Measured 41,229 / 15,493 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 41,229 / 15,499 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 41,229 / 15,495 in the e2e build, the gzip plus 4.
+  // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 41_229, maxGzip: 15_499 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -1294,6 +1300,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The ranking save lines in the page's language (ranking-save-copy, over main
  * c39870a7; the Korean only by the entry's hashed names): 423,114, 472,617
  * and 478,413.
+ * A Japanese card label on 360px or less a size down (ja-hand-narrow, over
+ * main c865d984; the index CSS carries the rule): 423,150, 472,646 and 478,442.
+ * The start button closer to the premise on 360px or less (intro-360-fit,
+ * over main 7552870d; the English premise at 14px there too): 423,171, 472,667
+ * and 478,463.
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
@@ -1318,6 +1329,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // ko 422,945 -> 423,130, en 472,519 -> 473,093, ja 478,315 -> 478,912 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the four's index JS and CSS and each dictionary's lines on one first paint. Measured 423,126 / 473,089 / 478,908 in the e2e build, the plus 4.
  * 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e, 10-30): 423,480, 473,555 and 479,405, the plus 4.
  * 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308, 10-30: 423,512, 473,587 and 479,437, the plus 4.
+ * #224 merged with main b2558d55 (10-30 evening; #380 #381 #382 #383): 423,175, 472,704 and 478,488, the plus 4.
  */
 const FIRST_PAINT_BUDGETS = { ko: 423_516, en: 473_591, ja: 479_441 };
 const LOCALE_FIRST_PAINT = {
