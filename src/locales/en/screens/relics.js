@@ -25,7 +25,7 @@ export default {
   relics: {
     metronome: {
       name: "Metronome",
-      text: "Until the scene after Heat rises, a change of type still counts as a switch.",
+      text: "Until the scene after Heat rises, a change of side still counts as a switch.",
       proc: "Caught the switch",
     },
     coldBlood: {

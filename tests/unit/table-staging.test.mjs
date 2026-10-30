@@ -31,8 +31,9 @@ test("a case's introduction is on the briefing of the scene it opens on and on n
       assert.deepEqual(getBriefingIntro(nodes[nodeId], nodeId, {}, true), [], `${nodeId} has nothing new to say`);
     }
   }
-  const case01 = CASE_START_NODES.case01;
-  assert.deepEqual(getBriefingIntro(nodes[case01], case01, {}, true), [], "사건 01 turns nothing on");
+  // 사건 04 is the first case with nothing to turn on (C-4: 사건 01 to 03 open one rule each).
+  const case04 = CASE_START_NODES.case04;
+  assert.deepEqual(getBriefingIntro(nodes[case04], case04, {}, true), [], "사건 04 turns nothing on");
   assert.deepEqual(getBriefingIntro(undefined, undefined, {}, true), [], "a scene with no case has no introduction");
   const second = CASE_START_NODES.prologue02;
   assert.deepEqual(getBriefingIntro(nodes[second], second, {}), STAGED ? [...UNLOCK_LADDER[1].intro] : [], "the shipped switch decides by default");

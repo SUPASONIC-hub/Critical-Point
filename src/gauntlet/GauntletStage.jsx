@@ -27,7 +27,7 @@ import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableFore
 import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
-import { listOfferedTypes } from "./logicStreak.js";
+import { listOfferedDirections } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
@@ -194,7 +194,7 @@ export function GauntletStage({
   // The types on the table, as the settlement will be handed them (useChoiceCommit).
   const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
+  const offered = useMemo(() => listOfferedDirections(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
     breach, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
     cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic, clockHeat,

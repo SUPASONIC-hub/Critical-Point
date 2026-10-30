@@ -45,7 +45,7 @@ export const STEADY_LINE_WALL = 3;
  */
 export const LOGIC_RATE = 0.0625;
 export const LOGIC_CAP = 0.6;
-/** A type held this many windows in a row starts to grow the streak. */
+/** A direction (사람 or 자리, logicStreak.js) held this many windows in a row starts to grow the streak. */
 export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */
 export const LOCK_PRESS_SECONDS = 1.5;

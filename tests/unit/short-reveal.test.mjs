@@ -17,24 +17,27 @@ import { ALL_RULES, getTableRules, getUnlockIntro, isTableTaught, STAGED, STORY_
 const source = (file) => readFileSync(new URL(`../../src/${file}`, import.meta.url), "utf8");
 const LADDER = UNLOCK_LADDER.map((step) => step.caseId);
 
-test("the table is taught from the first case the ladder does not name, and not before", () => {
+test("the table is taught from 사건 01, the first case past the prologues, and not before", () => {
   assert.deepEqual(LADDER, CASE_SEQUENCE.slice(0, LADDER.length), "the ladder is the head of the season");
+  // 사건 01 to 03 are on the ladder since C-4 (one rule each) and are not teaching: the reveal is short there.
+  const PROLOGUES = CASE_SEQUENCE.slice(0, 5);
   for (const caseId of CASE_SEQUENCE) {
-    const onLadder = LADDER.includes(caseId);
+    const onLadder = PROLOGUES.includes(caseId);
     assert.equal(isTableTaught(caseId, {}, true), !onLadder, `${caseId}, a plain run`);
     assert.equal(isTableTaught(caseId, null, true), !onLadder, `${caseId}, no run at all`);
     // A story run is told less in a prologue, and the prologue is still a step.
     assert.equal(isTableTaught(caseId, { story: true }, true), !onLadder, `${caseId}, a story run`);
   }
-  // The last step plays under every rule and is still introducing two of them.
-  assert.deepEqual([...getTableRules("prologue05", {}, true)].sort(), [...ALL_RULES].sort());
+  // The last step (사건 03 since C-4) plays under every rule and is still introducing one of them.
+  assert.deepEqual([...getTableRules("case03", {}, true)].sort(), [...ALL_RULES].sort());
+  assert.equal(isTableTaught("case03", {}, true), true, "it opens one rule on its briefing and is not teaching");
   assert.equal(isTableTaught("prologue05", {}, true), false);
   assert.equal(isTableTaught("case01", {}, true), true);
 });
 
 test("a run begun with NEW GAME+ has been taught from its first table; only the mark itself counts", () => {
   for (const caseId of CASE_SEQUENCE) assert.equal(isTableTaught(caseId, { veteran: true }, true), true, caseId);
-  for (const caseId of LADDER) {
+  for (const caseId of LADDER.slice(0, 5)) {
     assert.equal(isTableTaught(caseId, { veteran: "yes", windowIndex: 400 }, true), false, "a run that is merely far along is not a veteran's");
     assert.equal(isTableTaught(caseId, { veteran: true, story: true }, true), true);
   }
@@ -46,11 +49,18 @@ test("with the switch off nothing is being introduced, and a case nobody named i
   assert.equal(isTableTaught("prologue01", {}), !STAGED, "asked without a flag it answers for the shipped switch");
 });
 
-test("where the table is taught, the case plays under everything and has nothing to say about new rules", () => {
+test("where the table is taught, the case plays under everything (or, in 사건 01 to 03, adds one rule) and says at most one line", () => {
   for (const caseId of CASE_SEQUENCE) {
     for (const run of [{}, { veteran: true }, { story: true }, { veteran: true, story: true }]) {
       if (!isTableTaught(caseId, run, true)) {
         assert.ok(LADDER.includes(caseId) && run.veteran !== true);
+        continue;
+      }
+      // C-4: 사건 01 to 03 open one rule each on a table already taught.
+      const opening = LADDER.includes(caseId) && run.veteran !== true;
+      if (opening && !run.story) {
+        assert.equal(getTableRules(caseId, run, true).size, ALL_RULES.size - (2 - ["case01", "case02", "case03"].indexOf(caseId)), `${caseId}: one rule a case`);
+        assert.equal(getUnlockIntro(caseId, run, true).length, 1, `${caseId}: one line`);
         continue;
       }
       assert.equal(getTableRules(caseId, run, true), run.story ? STORY_RULES : ALL_RULES, `${caseId} ${JSON.stringify(run)}`);
