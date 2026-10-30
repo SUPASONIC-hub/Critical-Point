@@ -177,7 +177,9 @@ const fileBudgets = {
   // 602ec69b), measured: the hall of fame's badge on a ranking row
   // (.ranking-hall-badge), a rule of its own (11 lines) so the badge list
   // above is not written twice.
-  "base-intro-ranking.css": { lines: 3155, bytes: 69767 },
+  // 3155 / 69767 -> 3166 / 70052 on 2026-10-30, measured (D2 over #224
+  // bb70e777, main 430dda1e): the badge rule beside main's narrow pills.
+  "base-intro-ranking.css": { lines: 3166, bytes: 70052 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
