@@ -21,7 +21,7 @@ export default {
           "label": "残る五日をラボ全員がECHOと過ごすよう組む"
         },
         "reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         }
       },
       "place": "トリガーラボ4階 分析官室",
@@ -49,7 +49,7 @@ export default {
           "label": "ECHOが反対した案件をリュ・セアに見せる"
         },
         "reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         },
         "c20_server_evidence_turn": {
           "label": "ラボ記録のデータ移転契約書を出す"
@@ -80,7 +80,7 @@ export default {
           "label": "同意のない反応記録を学習から外せと異議を出す"
         },
         "reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         },
         "c20_datacenter_evidence_turn": {
           "label": "ラボ記録のデータ移転契約書を出す"
@@ -111,7 +111,7 @@ export default {
           "label": "文書は後で整えることにし、送別会を短く終える"
         },
         "reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         },
         "c20_farewell_evidence_turn": {
           "label": "ラボ記録のデータ移転契約書を出す"
@@ -451,7 +451,7 @@ export default {
           "label": "初期化される記録の範囲をまず公文書で確かめる"
         },
         "c20_start_warm_reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         }
       },
       "place": "トリガーラボ4階 分析官室",
@@ -481,7 +481,7 @@ export default {
           "label": "入れ替え日程に合わせ、渡す資料だけ手早く選ぶ"
         },
         "c20_start_record_reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         }
       },
       "place": "トリガーラボ4階 分析官室",
@@ -511,7 +511,7 @@ export default {
           "label": "巻き尺を持っていた担当者にまず電話をかける"
         },
         "c20_start_rush_reframe": {
-          "label": "交代の承認書をECHO自身に読ませる"
+          "label": "ECHO自身に交代の承認書を読ませる"
         }
       },
       "place": "トリガーラボ4階 分析官室",
