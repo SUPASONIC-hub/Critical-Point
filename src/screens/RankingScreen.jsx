@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
+import { hallOfFameBadges } from "../hallOfFameBadges.js";
 import { getLeaderboardStatusCopy } from "../ranking.js";
+import { fetchHallOfFame } from "../telemetry.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { reloadLeaderboard } from "../state/useLeaderboard.js";
 import words from "../copy/ranking.js";
@@ -38,6 +40,17 @@ export function RankingScreen({
       const best = module.takePastBest();
       setPastBest(best && fill(words.pastBest, best));
     }, () => {});
+  }, []);
+  // D2: the hall of fame's places, by run tag (public_hall_of_fame). A badge
+  // on a completed season's row, the player's own included; a fetch that
+  // fails, or a deployment with no server, shows none.
+  const [hallBadges, setHallBadges] = useState(() => new Map());
+  useEffect(() => {
+    let cancelled = false;
+    fetchHallOfFame().then(({ rows }) => !cancelled && setHallBadges(hallOfFameBadges(rows, words)), () => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
   const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
@@ -116,6 +129,7 @@ export function RankingScreen({
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
                       {entry.seasonComplete && <span className="season-complete-badge" aria-label={words.seasonCompleteLabel}>{words.seasonComplete}</span>}
+                      {entry.seasonComplete && hallBadges.get(entry.runTag)?.map((label) => <span className="ranking-hall-badge" key={label}>{label}</span>)}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{fill(words.meta, { case: entry.caseTitle, run: entry.runLabel, trigger: triggerLabels[entry.trigger] ?? triggerLabels.responsibility })}</small>
                     </div>
@@ -146,7 +160,7 @@ export function RankingScreen({
           {pastBest && (
             <p className="ranking-footnote" data-testid="ranking-past-best">{pastBest}</p>
           )}
-          <p className="ranking-footnote">{words.footnote}</p>
+          <p className="ranking-footnote">{words.footnote} {words.hallFootnote}</p>
         </section>
       </main>
 );

@@ -83,7 +83,9 @@ const budgets = [
   // 149,740 / 55,002 -> 149,905 / 55,019 on 2026-10-30, ranking-save-copy over main c39870a7 (#376, #375): the local and season ranking save lines read from src/copy/notices.js in the page's language (they were English in the hook). Measured 149,901 / 55,015 in the e2e build, the plus 4.
   // 149,722 / 54,994 -> 149,806 / 55,026 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the case's rules for the audit and the links, and the season row's mean score, on main's keyed words. Measured 149,806 / 55,022, the gzip plus 4 in the e2e build.
   // 149,905 / 55,019 -> 149,982 / 55,050 on 2026-10-30, #224 (RULES_MARK 3, C-2, personal bests) merged with main 430dda1e (#378 ranking-save-copy, #375, #376): #224's rules and season mean beside main's keyed ranking save lines. Measured 149,982 / 55,046 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 149_982, maxGzip: 55_050 },
+  // 149,806 -> 149,819 raw on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: only the chunk names it imports; the gzip stays under its line. Measured 149,819 in the e2e build.
+  // 149,982 -> 150,002 raw on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): only the chunk names it imports; the gzip stays under its line. Measured 150,002 in the e2e build.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_002, maxGzip: 55_050 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -97,7 +99,9 @@ const budgets = [
   // 34,278 / 13,357 -> 34,459 / 13,422 on 2026-10-29, gate-reason-copy: a locked card's condition (getAuthorityGate) read by key from src/copy/observer.js `gate` and filled, so English and Japanese print it in their words. The Korean is the same. Measured 34,455 / 13,418 in the e2e build, the plus 4.
   // 34,278 / 13,357 -> 35,281 / 13,719 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): src/seasonScore.js (C-2's season mean, Q25) lands in this chunk under Rolldown, beside main's observer words. Measured 35,281 / 13,715, the gzip plus 4 in the e2e build.
   // 34,459 / 13,422 -> 35,503 / 13,781 on 2026-10-30, #224 merged with main 430dda1e: src/seasonScore.js beside main's keyed gate condition (#373). Measured 35,503 / 13,777 in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_503, maxGzip: 13_781 },
+  // 13,719 -> 13,738 gzip on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the same 35,281 bytes, other chunk names inside. Measured 13,734, the gzip plus 4.
+  // 13,781 -> 13,807 gzip on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): the same 35,503 bytes or under, other chunk names inside. Measured 13,803, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_503, maxGzip: 13_807 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -108,7 +112,8 @@ const budgets = [
   // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
   // 19,567 / 8,588 -> 25,798 / 11,056 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 26,671 / 11,352 -> 26,800 / 11,373 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the settlement hands the case's rules on; the hand's link tag reads hand.link. Measured 26,800 / 11,369, the gzip plus 4 in the e2e build.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_800, maxGzip: 11_373 },
+  // 11,373 -> 11,378 gzip on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): only the chunk names it imports. Measured 11,374, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_800, maxGzip: 11_378 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -283,7 +288,10 @@ const budgets = [
   // 182,001 / 66,033 -> 182,038 / 66,116 on 2026-10-29, adsense-readiness: the start screen's foot links five pages (SITE_PAGES, privacyText.js) and names three more in the intro's table (게임 소개 · 자주 묻는 질문 · 문의). Measured 182,034 / 66,112 in the e2e build over main 3e350266 (#374), the plus 4.
   // 66,116 -> 66,124 gzip on 2026-10-30, picker-narrow over main c3b40b6f (#376): no code changed; the hashed chunk names the entry imports
   // changed with the shorter Japanese premise and the pills' CSS. Measured 182,034 / 66,120 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 182_038, maxGzip: 66_124 },
+  // 181,926 / 65,978 -> 182,095 / 66,082 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: fetchHallOfFame in telemetry.js and the data notice's hall-of-fame sentence (introCopy.data.hallOfFameNotice). Measured 182,095 / 66,078 in the e2e build, the gzip plus 4.
+  // 182,038 / 66,124 -> 182,212 / 66,213 on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): fetchHallOfFame and the data notice's hall-of-fame sentence beside main's foot links, storage line and ranking save lines. Measured 182,212 / 66,209 in the e2e build, the gzip plus 4.
+  // 66,213 -> 66,218 gzip on 2026-10-30, D2 hall of fame draft (#308) merged with #224 0d29141a (the English bank rail at 360px): only the chunk names it imports. Measured 66,214, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 182_212, maxGzip: 66_218 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -578,7 +586,10 @@ const budgets = [
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_655, maxGzip: 36_661 },
+  // 196,229 / 36,558 -> 196,473 / 36,590 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the hall of fame's badge on a ranking row (.ranking-hall-badge). Measured 196,473 / 36,586 in the e2e build, the gzip plus 4.
+  // 196,506 / 36,627 -> 196,750 / 36,663 on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): the hall-of-fame badge beside main's narrow pills. Measured 196,750 / 36,659 in the e2e build, the gzip plus 4.
+  // 196,655 / 36,661 -> 196,899 / 36,695 on 2026-10-30, D2 hall of fame draft (#308) merged with #224 0d29141a (the English bank rail at 360px). Measured 196,899 / 36,691 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_899, maxGzip: 36_695 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -649,7 +660,8 @@ const budgets = [
   // 5,033 / 2,252 in the e2e build, the gzip plus 4. the personal bests' state, fetch and line (src/personalBests.js) and the heading that says the season record is a mean of cases.
   // 4,793 / 2,147 -> 5,503 / 2,416 on 2026-10-26, 영어판 3단계: the ranking's words read by key (src/copy/ranking.js) and dates in the page's language. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 5,503 / 2,416 -> 5,836 / 2,575 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the personal bests' state, fetch and line (src/personalBests.js, its words ranking.pastBest) and the intro that says the season record is a mean of cases. Measured 5,836 / 2,571, the gzip plus 4 in the e2e build.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_836, maxGzip: 2_575 },
+  // 5,836 / 2,575 -> 6,670 / 2,992 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b, the 2nd stage: the badges (src/hallOfFameBadges.js, public_hall_of_fame read on mount, its words ranking.hallBadge, hallMainBoard, hallProvisional) and the footnote's second sentence (ranking.hallFootnote). Measured 6,670 / 2,988 in the e2e build, the gzip plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 6_670, maxGzip: 2_992 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -1073,7 +1085,9 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 152,779 / 51,787 -> 152,864 / 51,822 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the Japanese of 프롤로그 04's audit-and-links line, the ranking's intro and past best, the link tag, less the audit and cascade weeks. Measured 152,864 / 51,818, the gzip plus 4 in the e2e build.
   // 153,344 / 51,954 -> 153,429 / 51,974 on 2026-10-30, #224 merged with main 430dda1e: #224's Japanese lines beside main's ranking save lines. Measured 153,429 / 51,970, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_429, maxGzip: 51_974 },
+  // 152,864 / 51,822 -> 153,252 / 51,972 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the Japanese of the hall of fame's badge, footnote and data-notice sentence. Measured 153,252 / 51,968 in the e2e build, the gzip plus 4.
+  // 153,429 / 51,974 -> 153,817 / 52,123 on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): the hall of fame's Japanese lines beside main's. Measured 153,817 / 52,119, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_817, maxGzip: 52_123 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1173,8 +1187,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
  * The English bank rail fitted to a 360px phone (#224 hand5-en, 10-30; the critical CSS does not carry it): 423,147, 472,682 and 478,466, the plus 4.
+ * D2 hall of fame (#308) merged with #224 602ec69b (10-29): fetchHallOfFame, the notice's
+ * sentence, the badge's CSS and the dictionaries' lines put them at 422,945, 472,519 and
+ * 478,266, the e2e build plus 4.
+ * D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,280, 472,958 and 478,751, the plus 4.
+ * D2 hall of fame draft (#308) merged with #224 0d29141a (the English bank rail at 360px), 10-30: 423,315, 472,993 and 478,786, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_151, en: 472_686, ja: 478_470 };
+const FIRST_PAINT_BUDGETS = { ko: 423_319, en: 472_997, ja: 478_790 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

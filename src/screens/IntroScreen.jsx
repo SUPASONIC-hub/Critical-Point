@@ -668,7 +668,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>{introCopy.data.consent}</b>
                 <small>
                   {telemetryEnabled
-                    ? introCopy.data.playtestNotice
+                    ? `${introCopy.data.playtestNotice}${introCopy.data.hallOfFameNotice}`
                     : introCopy.data.noRemote}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>

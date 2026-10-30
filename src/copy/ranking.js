@@ -35,6 +35,11 @@ const rankingCopy = {
   // This device's best of the table before (src/personalBests.js), its own line under the table.
   pastBest: "지난 판(v{version})의 내 최고 {score}점 · {rank}",
   footnote: "다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.",
+  // D2 hall of fame (src/hallOfFameBadges.js): the footnote's second sentence and a row's badge.
+  hallFootnote: "검사를 통과한 판별 1~3위는 실행 번호로 명예의 전당에 남습니다.",
+  hallBadge: "명예의 전당 · {board} {place}위",
+  hallMainBoard: "본 판",
+  hallProvisional: " (잠정)",
 };
 export default rankingCopy;
 

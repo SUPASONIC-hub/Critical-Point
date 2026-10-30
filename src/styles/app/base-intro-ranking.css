@@ -2495,6 +2495,20 @@ summary:focus-visible {
   font-weight: 700;
   letter-spacing: 0.08em;
 }
+/* D2: a place in the hall of fame, the badges' shape outlined in the accent
+   so it does not read as 시즌 완료. A rule of its own, not one more in the
+   list above, which would write it twice. */
+.ranking-page .ranking-player .ranking-hall-badge {
+  display: inline-flex;
+  margin: 4px 6px 0 0;
+  padding: 2px 8px;
+  color: var(--ui-accent);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
 .ranking-row.season-complete {
   border-color: var(--ui-line-accent);
 }
