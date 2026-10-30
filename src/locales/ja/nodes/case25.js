@@ -53,7 +53,7 @@ export default {
           "label": "問題の役員たちがどこへ行ったかを探す"
         },
         "c25_notice_evidence_turn": {
-          "label": "株主採決前のKDキャピタル取締役会議事録を出す"
+          "label": "採決前のKDキャピタル議事録を出す"
         }
       },
       "place": "トリガーラボの建物前 · 路地の引っ越しトラック",
@@ -84,7 +84,7 @@ export default {
           "label": "問題の役員たちがどこへ行ったかを探す"
         },
         "c25_standby_evidence_turn": {
-          "label": "株主採決前のKDキャピタル取締役会議事録を出す"
+          "label": "採決前のKDキャピタル議事録を出す"
         }
       },
       "place": "KD金融グループ本社7階 · 廊下の突き当たりの待機室",
@@ -115,7 +115,7 @@ export default {
           "label": "問題の役員たちがどこへ行ったかを探す"
         },
         "c25_chatroom_evidence_turn": {
-          "label": "株主採決前のKDキャピタル取締役会議事録を出す"
+          "label": "採決前のKDキャピタル議事録を出す"
         }
       },
       "place": "ソウル駅 · KTXホーム",
@@ -377,7 +377,7 @@ export default {
           "label": "事由欄が空の人事発表を監査委員会に正式に問う"
         },
         "c25_route_system_evidence_turn": {
-          "label": "株主採決前のKDキャピタル取締役会議事録を出す"
+          "label": "採決前のKDキャピタル議事録を出す"
         }
       },
       "place": "KDキャピタル本社 · グループ業務アプリ",
