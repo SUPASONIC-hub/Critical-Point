@@ -83,6 +83,8 @@ for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critic
 검토는 사이트에 읽을 글, 개인정보처리방침·문의 페이지, 깨진 링크가 없는지를 봅니다. 빌드가 쓰는 정적 페이지
 열다섯(게임 소개·자주 묻는 질문·문의·개인정보처리방침·이용약관 × 한국어·영어·일본어)과 `robots.txt`·`sitemap.xml`,
 그리고 Search Console 확인 스위치 `GOOGLE_SITE_VERIFICATION`은 [search-console.md](search-console.md)에 있습니다.
+자주 묻는 질문의 「비용」·「서버로 가는 데이터」 답 두 문장은 방침과 같은 스위치(`ADSENSE_ADS=on`)를 따라
+「광고가 나옴, 유료 결제 없음」·「Google이 광고 쿠키를 씀」으로 바뀝니다(`SITE_AD_EDITS`, `scripts/site-pages.mjs`).
 
 ## CSP (9번 전에 대시보드에)
 

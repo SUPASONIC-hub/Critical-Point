@@ -1,7 +1,7 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
-import { escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
+import { applyEdits, escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
 
 /**
  * The three pages about the game -- what it is and how it is played, the
@@ -419,15 +419,62 @@ const BODIES = {
 /** The kinds this file writes, in the order of the header. */
 export const SITE_PAGE_KINDS = Object.keys(BODIES);
 
-/** The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`. */
-export function renderSitePages() {
+/**
+ * What the pages say once the web has ads (ADSENSE_ADS=on, docs/web-ads.md),
+ * as the policy's AD_EDITS (legal-pages.mjs) does for the policy: each pair
+ * is a sentence of a page as written above and what replaces it. Two answers
+ * of the FAQ say there are no ads and no ad cookies; with ads they say where
+ * the ads appear, as the policy's section 10 and the terms do, and that
+ * Google, which serves them, may use cookies.
+ */
+export const SITE_AD_EDITS = {
+  faq: {
+    ko: [
+      [
+        "<p>웹판은 무료입니다. 지금은 광고와 유료 결제가 없습니다.",
+        "<p>웹판은 무료이며 유료 결제가 없습니다. 광고는 사건 리포트 아래처럼 판 밖의 자리에만 나오고, 판·결정·브리핑 도중에는 나오지 않으며, 점수·랭킹·결말에 영향을 주지 않습니다.",
+      ],
+      [
+        "게임은 쿠키와 광고·분석용 추적 도구를 쓰지 않습니다.",
+        "게임 자체는 쿠키를 쓰지 않습니다. 광고를 보여 주는 Google은 쿠키와 그와 비슷한 식별자를 쓸 수 있고, 그 밖의 광고·분석용 추적 도구는 쓰지 않습니다.",
+      ],
+    ],
+    en: [
+      [
+        "<p>The web version is free. There are currently no ads and no payments.",
+        "<p>The web version is free, with no payments. Ads appear only away from the table, such as below a case report — never during a table, a decision or a briefing — and never affect your score, ranking or ending.",
+      ],
+      [
+        "The game uses no cookies and no advertising or analytics trackers.",
+        "The game itself uses no cookies. Google, which serves the ads, may use cookies and similar identifiers; we use no other advertising or analytics trackers.",
+      ],
+    ],
+    ja: [
+      [
+        "<p>ウェブ版は無料です。現在、広告や有料の決済はありません。",
+        "<p>ウェブ版は無料で、有料の決済はありません。広告は事件レポートの下など勝負の外の場所にのみ表示され、勝負・決断・ブリーフィングの途中には表示されず、点数・ランキング・結末に影響しません。",
+      ],
+      [
+        "本ゲームはCookieや、広告・分析用のトラッキングツールを使用しません。",
+        "本ゲーム自体はCookieを使用しません。広告を配信するGoogleはCookieやそれに類する識別子を使用することがあり、それ以外の広告・分析用のトラッキングツールは使用していません。",
+      ],
+    ],
+  },
+};
+
+/**
+ * The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`.
+ * `ads` (a build with ADSENSE_ADS=on) applies SITE_AD_EDITS; without it the pages are the ones above, byte for byte.
+ */
+export function renderSitePages({ ads = false } = {}) {
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
+      const edits = ads ? SITE_AD_EDITS[kind]?.[language] : null;
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
         kind,
         language,
-        body: BODIES[kind][language],
+        body: edits ? applyEdits(BODIES[kind][language], edits, `site-pages SITE_AD_EDITS.${kind}.${language}`) : BODIES[kind][language],
         description: DESCRIPTION[kind][language],
       });
     }
@@ -481,10 +528,10 @@ export function withAbsoluteSiteLinks(html, origin) {
 
 /**
  * Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash.
- * `ads` is the build's ADSENSE_ADS=on: the policy then says the web has ads (AD_EDITS, legal-pages.mjs).
+ * `ads` is the build's ADSENSE_ADS=on: the policy and the FAQ then say the web has ads (AD_EDITS, SITE_AD_EDITS).
  */
 export function renderStaticPages(origin = "", { ads = false } = {}) {
-  const pages = { ...renderLegalPages({ ads }), ...renderSitePages() };
+  const pages = { ...renderLegalPages({ ads }), ...renderSitePages({ ads }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 

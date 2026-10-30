@@ -378,7 +378,7 @@ function serviceWorker() {
  * `serviceWorker()` in the list, which reads every file on disk.
  *
  * `ads` (a build with ADSENSE_ADS=on) is the pages' text once the web has
- * ads (AD_EDITS, legal-pages.mjs); without it
+ * ads (AD_EDITS, legal-pages.mjs; SITE_AD_EDITS, site-pages.mjs); without it
  * the pages are the ones as written, byte for byte.
  */
 function staticPages({ ads }) {
