@@ -98,9 +98,10 @@ const budgets = [
   // 142,951 / 52,386 in the e2e build, the gzip plus 4. The pre-C-3 streak
   // read on a save (the hold on a type set aside) and the run's direction.
   // 149,806 / 55,026 -> 149,961 / 55,078 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the pre-C-3 hold set aside on a save and the run's direction, on #224's keyed words. Measured 149,961 / 55,074, the gzip plus 4 in the e2e build.
+  // 149,982 / 55,050 -> 150,144 / 55,110 on 2026-10-30, C-3·C-4 rules (#320) merged with #224 bb70e777 (main 430dda1e): the direction table and verdicts over #224 and main's ranking save lines. Measured 150,144 / 55,106 in the e2e build, the gzip plus 4.
   // 149,806 -> 149,819 raw on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: only the chunk names it imports; the gzip stays under its line. Measured 149,819 in the e2e build.
   // 149,965 / 55,098 -> 150,166 / 55,179 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the 판 읽기 row, the peak board's jump and the pre-C-3 hold in one chunk. Measured 150,166 / 55,175 in the e2e build, the gzip plus 4, the raw the measurement.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_018, maxGzip: 55_057 },
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_144, maxGzip: 55_110 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1165,14 +1166,15 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 152,779 / 51,787 -> 152,864 / 51,822 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the Japanese of 프롤로그 04's audit-and-links line, the ranking's intro and past best, the link tag, less the audit and cascade weeks. Measured 152,864 / 51,818, the gzip plus 4 in the e2e build.
   // 153,344 / 51,954 -> 153,429 / 51,974 on 2026-10-30, #224 merged with main 430dda1e: #224's Japanese lines beside main's ranking save lines. Measured 153,429 / 51,970, the gzip plus 4.
+  // 152,864 / 51,822 -> 153,489 / 51,974 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the Japanese of 사건 01 to 03's lines, the directions (人・立場の側・中立) and the streak's sentences. Measured 153,489 / 51,970, the gzip plus 4 in the e2e build.
+  // 153,429 / 51,974 -> 154,054 / 52,128 on 2026-10-30, C-3·C-4 rules (#320) merged with #224 bb70e777 (main 430dda1e): C-3·C-4's Japanese lines beside main's. Measured 154,054 / 52,124, the gzip plus 4.
   // 152,864 / 51,822 -> 153,405 / 52,077 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the Japanese of C-7's tools, 「ひと息つく」, the board marks and the peak case's briefing. Measured 153,405 / 52,073. Measured in the e2e build, the gzip plus 4.
   // 153,429 / 51,974 -> 153,970 / 52,227 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e): the bundle's Japanese lines beside main's. Measured 153,970 / 52,223, the gzip plus 4.
   // 152,864 / 51,822 -> 153,069 / 51,893 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the Japanese of the 판 읽기 card (勝負の読み) and its note. Measured 153,069 / 51,889; the raw is the measurement, the gzip plus 4.
   // 153,429 / 51,974 -> 153,634 / 52,037 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e): C-1's Japanese lines beside main's. Measured 153,634 / 52,033, the gzip plus 4.
-  // 152,864 / 51,822 -> 153,489 / 51,974 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the Japanese of 사건 01 to 03's lines, the directions (人・立場の側・中立) and the streak's sentences. Measured 153,489 / 51,970, the gzip plus 4 in the e2e build.
   // 152,864 / 51,822 -> 153,252 / 51,972 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: the Japanese of the hall of fame's badge, footnote and data-notice sentence. Measured 153,252 / 51,968 in the e2e build, the gzip plus 4.
   // 153,489 / 52,077 -> 154,620 / 52,432 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the Japanese of all four. Measured 154,620 / 52,428 in the e2e build, the gzip plus 4, the raw the measurement.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_970, maxGzip: 52_227 },
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 154_054, maxGzip: 52_128 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1272,20 +1274,21 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
- */
+ * c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b (10-29): 422,808,
+ * 472,351 and 478,130, the plus 4.
+ * C-3·C-4 rules (#320) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,148, 472,805 and 478,622, the plus 4.
 // ko 422,779 -> 422,891, en 472,179 -> 472,502, ja 477,926 -> 478,315 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the index CSS's board marks and the five icons in icons-vendor (both on the first paint), and each dictionary's new lines. Measured 422,887 / 472,498 / 478,311. Measured in the e2e build, the gzip plus 4.
 // ko 423,110 -> 423,241, en 472,645 -> 472,970, ja 478,429 -> 478,812 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,237, 472,966 and 478,808, the plus 4.
  * C-1(1) (the 판 읽기 axis) merged with #224 602ec69b (10-29): the seventh score card's CSS in the
  * critical sheet and its words in the dictionaries put English at 472,236 and Japanese at 478,009,
  * the plus 4; Korean (422,764) stays under.
  * C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,114, 472,693 and 478,493, the plus 4.
- * c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b (10-29): 422,808,
- * 472,351 and 478,130, the plus 4.
  * D2 hall of fame (#308) merged with #224 602ec69b (10-29): fetchHallOfFame, the notice's
  * sentence, the badge's CSS and the dictionaries' lines put them at 422,945, 472,519 and
  * 478,266, the e2e build plus 4.
 // ko 422,945 -> 423,130, en 472,519 -> 473,093, ja 478,315 -> 478,912 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the four's index JS and CSS and each dictionary's lines on one first paint. Measured 423,126 / 473,089 / 478,908 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 423_241, en: 472_970, ja: 478_812 };
+ */
+const FIRST_PAINT_BUDGETS = { ko: 423_152, en: 472_809, ja: 478_626 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
