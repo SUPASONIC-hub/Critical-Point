@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-25 (the state of `main` at `c1f8ec2`, after the act title cards (#295) and bundles A-13 and A-3; what changed and when is in `git log`)
+Last updated: 2026-10-29 (the state of `main` at `6a36dcc`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); then the start screen fitted in English and Japanese (#369), the phone hand scenes fitted (#372), the locked-card reason (#373) and the storage notice (#374) put in the page's language, and two unused exports dropped (#371); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -12,7 +12,7 @@ list of the files it touched.
 - The season is 55 cases: 프롤로그 01-05, 사건 01-49 and the finale
   (`CASE_SEQUENCE` in `src/gameCases.js`). A season deals about 490 decision
   windows, about 9 a case.
-- `npm run verify:static` (27 checks, in parallel, about a minute) and `npm run
+- `npm run verify:static` (28 checks, in parallel, about a minute) and `npm run
   verify:quick` pass. The browser tiers run against the production build served
   by `vite preview`, not the dev server.
 - The play screen holds one decision on one screen: on a 390x844 phone the page
@@ -27,6 +27,22 @@ list of the files it touched.
   dark ground. Lime is the accent for the control that records a decision.
   Type is one committed Pretendard subset (priority 65), and Hangul wraps with
   `word-break: keep-all`.
+- Three languages, 한국어, English and 日本語, picked on the start screen
+  (`critical-point-locale-v1`, `?lang=en`, `?lang=ja`). English and Japanese
+  run from 프롤로그 01 to the finale -- scenes, screens and the lines
+  between cases -- as a machine draft ahead of human review; Korean is the
+  source, the other languages lay strings over the same ids
+  (`src/locales/<lang>/`, `src/locales/overlay.js`), and the table, scores
+  and ranking are the same in every language. The reading clock counts
+  English by words and Japanese by characters so a scene waits about as
+  long as in Korean; the Korean clock and the table's clock are unchanged.
+  `check:locale:strict` in `verify:static` fails when a Korean line changes
+  without both translations, so a Korean edit carries its English and
+  Japanese in the same pull request. The privacy policy and terms are six
+  static pages, Korean at the root, `/en/` and `/ja/`, linked to each other,
+  and the game's links open the page in the screen's language. The `Test
+  Week` summary counts the week's English-screen and Japanese-screen
+  seasons on their own lines and warns when the two together reach half.
 - Online save is opt-in and off by default; nothing about a run leaves the
   device until the player turns it on (priority 59).
 - The ranking is ordered by a score the server reads off the run's own `final`
@@ -287,6 +303,121 @@ Still open, on purpose:
   (device key `critical-point-act-cards-v1`). Production runs
   `c1f8ec2`. Drafts left: #224 with #253 (2026-11-30) and #301 (E-11's
   side-case frame, December).
+- 2026-10-25, morning to evening: the cleanup (#305); #306 (a copied tab's
+  table-token check waits 300 ms for an answer instead of 80, capped at
+  1.5 s, for the recovery e2e flake); #315 (the ending verdict heading
+  「당신의 조건」 -> 「당신의 기록」 for 봉인 and 개혁); the era bundle
+  (#313 with branches A-D, #309-#312: the scenes set in Korean finance of
+  2023 in flashback and 2026 now -- paper signatures, stamps and archive
+  rooms became electronic approval, e-signatures, the document management
+  system and the backup archive -- and KD금융그룹's largest shareholder,
+  Kingsdale Partners of New York at about 30%, with no ethnic or religious
+  setting, in a line or two per case; `docs/canon.md` 「Who owns KD」 and
+  「The era」); bundle A-13's second pass (#318: scene bodies over 420
+  characters 73 -> 0, and the body ratchet is gone like the label one: any
+  body over 420 fails); #323 (the test-week summary's 「시뮬레이션(참고)」
+  column now quotes the season bot with audit and cascade both on); #325
+  (a report button on every board post, migration
+  `20261027000000_board_reports`: anon may insert four columns, no reads,
+  no automatic hiding, reports go with the post at 180 days); #326 (the
+  data drawer names where to send a deletion request, `SUPPORT_CONTACT` in
+  `src/appConfig.js`); #328 (the privacy policy and terms of use as four
+  static pages the build writes beside `index.html`, `/privacy.html`,
+  `/terms.html` and their `/en/` twins, from `scripts/legal-pages.mjs`);
+  #329 (`npm run store:shots`, store screenshots into the gitignored
+  `store-shots/`). Sixteen pull requests merged that day before the
+  evening cleanup (three bundles holding thirteen); production runs
+  `612867f`. Twelve drafts were opened during the day, all waiting on a
+  date or a decision: #307, #316 and #320 (the next ranking reset), #319
+  (the 11-30 rehearsal of #224 with #253, #307, #308, #316 and #320),
+  #308 (after #224), #322 (after the W47 measurement), #324 (W49, only if
+  P5 on 11-23), #314, #317 and #321 (E-11, December), #327 and #330 (the
+  app release: shells and ads).
+- 2026-10-26: #334 (`Board Reports`: every day at 09:10 KST the report
+  queue goes into the job summary -- post number, date, report count,
+  reporters, reasons and wait, never the body or name -- and the run fails
+  while a reported post is still visible, so the failure mail is the daily
+  alert; by hand `hide`, `dismiss`, `restore` or `list`, no new secret or
+  migration); #335 (the release roadmap at the head of the README's
+  deployment section: the web PWA now, free and without ads -> web AdSense
+  after traffic -> Google Play when GRAC asks or we widen; the policy's
+  「ads only in the app」 became 「no ads now, and before any we will say
+  so」, Korean and English); #336 (`Funnel` opens with 「플레이어 추이」:
+  new devices, devices that played, runs started, runs past 프롤로그 05
+  and seasons finished, per day for 14 days and per week for 8, from the
+  same SELECT; it now runs daily at 22:10 KST instead of Sundays); #337
+  (an 「홈 화면에 추가」 card in the start screen's 편의 설정 drawer: the
+  browser's install prompt on Chromium browsers, one line on iPhone and
+  iPad, hidden when standalone, installed or dismissed --
+  `critical-point-install-hint-dismissed-v1` -- and its own `InstallHint`
+  chunk); #339 and #340 (lucide-react 1.61.0, eslint 10.13.0, pglite
+  0.5.11); #342 (`ADSENSE_CLIENT`, read at build time, writes only the
+  `google-adsense-account` meta tag and `ads.txt`; off by default, no ad
+  code, and `check:bundle` fails if ad code reaches a build without
+  `ADSENSE_ADS=on`; `docs/web-ads.md`); #338 (the English preview, steps
+  one and two: the locale frame -- `SUPPORTED_LOCALES` in `src/locale.js`,
+  dictionaries in `src/locales/<lang>/` laid over the same ids, Korean
+  where a string is missing -- the 「한국어 · English」 picker on the start
+  screen (`critical-point-locale-v1`, `?lang=en`), machine-drafted English
+  for 프롤로그 01 to 사건 10 ahead of human review (opened to the finale
+  on 10-29, #366), screen copy moved into twenty key tables under
+  `src/copy/`, and `npm run check:locale`; the intro baselines were
+  re-recorded for the picker); #347 (why 오진우 turns from mentor to rival:
+  윤상혁's condition for him alone laid into four existing scenes --
+  프롤로그 05, 사건 01, 02 and 03 -- with a paragraph in `docs/canon.md`;
+  scenes, cards and ids unchanged); #348 (the English bundle -- 사건 11 to
+  the finale and 63 speakers, live since #366 on 10-29); #349 (the export keyword
+  taken off nine names used only in their own files); #352 (the screen
+  language in a run's summary and Funnel); #353 (story gaps one to five);
+  #354 (the test week summary's English-screen seasons); #356 (Japanese
+  step one, machine draft, only behind `?lang=ja`); #358 (the English
+  prologue 01 and 02 polished); and the evening bundle #362 (#355 the
+  English ending, verdict, board, ranking and W47 rule screens, #360 the
+  English table variants and narration, #357 story gaps six to ten and four
+  canon fixes, #361 three low code-review fixes), bundled because each
+  English pull request moved the chunks holding the locale import map by a
+  few bytes. Eighteen pull requests merged (the four inside #362 not counted
+  apart), 1,570 unit tests; production runs `2c935e7`, deployed on 10-28
+  after a season shard of its Verify hit the 20-minute limit and was rerun.
+  The user decided that day: no
+  promotion yet, AdSense set up later (the Render address or a domain is
+  still open), and the English range widens ten reviewed cases at a time
+  (replaced on 10-28: both languages open to the end, #366).
+  Drafts: #350 (turning ads on, #341 reopened), the December side-case
+  stack restacked and green (#301, #314, #317, #321, #333), #319 (the
+  11-30 rehearsal, rebased on that day's main), and #327, #330 and #332
+  (stage three, the store).
+- 2026-10-28: #363 (the first screen's transfer cut: the font's weight axis
+  400-920, the first screen's key visual 960 alone at webp quality 0.75,
+  and first-paint budgets per language -- Korean, `?lang=en`, `?lang=ja`);
+  #365 (the code review's last four lows: the observer's sample and ledger
+  count the Korean card behind a translated one, the run's summary records
+  the language actually drawn). The user decided that day to open English
+  and Japanese to the end instead of ten reviewed cases at a time, and to
+  make `check:locale` strict in `verify:static`.
+- 2026-10-29: #366 (English and Japanese to the finale: 「한국어 · English ·
+  日本語」 on the start screen, 25,418 of 25,418 lines in each language,
+  「Continue in Korean」, 「English (preview)」 and `previewThrough` gone,
+  all a machine draft before human review; the reading clock's
+  `readingUnits` counts English words x 2 and Japanese characters x 0.89;
+  on wide screens the language buttons sit fixed under the music button at
+  the top right, and the recovery notice is layered above them); #368 (one
+  rendering per Korean term and one first person per speaker in English and
+  Japanese, Korean unchanged); #367 (the Japanese privacy policy and terms
+  at `/ja/`, the six legal pages linked to each other, the game's policy
+  links in the screen's language through `legalPagePath`, the `Test Week`
+  summary's Japanese-screen line with the half warning counting both
+  languages, hreflang ko, en, ja and x-default plus `og:locale:alternate`
+  in `index.html` -- the service worker's precache now skips
+  `rel="alternate"` -- and `check:locale:strict` in `verify:static`, 27 to
+  28 checks). The start screen in English and Japanese fits a 1280x720 and a
+  320px first screen (#369; the reach check runs five sizes in three
+  languages, the Japanese 320px case still `test.fixme` on Linux CJK faces);
+  the phone hand scenes at 360x740 overflow in neither language (#372,
+  `LAYOUT_SCENES=hand5`); the locked-card reason (#373) and the storage
+  notice (#374) follow the page language. Nine PRs merged, 1,586 unit tests.
+  Drafts brought up onto main: #224 #307 #308 #316 #320, #301 #314 #317,
+  #322, #350.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -1607,7 +1738,7 @@ Still open, on purpose:
 ## Verification Commands
 
 ```bash
-npm run verify:static   # 27 checks, in parallel
+npm run verify:static   # 28 checks, in parallel
 npm run verify:quick    # + check:specs, build:e2e, check:bundle, check:deploy:offline,
                         #   test:runtime, test:e2e:preview, test:performance
 npm run verify          # + test:e2e
@@ -1616,7 +1747,7 @@ npm run test:coverage   # the unit tests with per-module coverage floors
 npm run test:visual:docker   # visual regression in the pinned Linux container
 ```
 
-`npm run verify:static` is `scripts/verify-static.mjs`: 27 checks run side by
+`npm run verify:static` is `scripts/verify-static.mjs`: 28 checks run side by
 side in a pool, each one's output held and printed as a block, and the run fails
 after all of them have reported. The list is `CHECKS` in that file, and each
 entry is an npm script, so `npm run <check>` alone does exactly what it does
@@ -1633,7 +1764,8 @@ hand-written sheet, with the generated `critical.generated.css` left out by
 check passed without reading a sheet), `check:art`,
 `check:fonts`, `check:export-schema`, `check:test-storage`,
 `check:visual-baselines`, `check:node`, `check:grants`, `check:canon`,
-`check:card-labels` and `check:doc-numbers`. None of them needs a browser.
+`check:card-labels`, `check:locale:strict` (English and Japanese with no
+missing or stale line) and `check:doc-numbers`. None of them needs a browser.
 
 `test:coverage` is `scripts/check-coverage.mjs`. It leaves the authored data
 (`src/nodes/`, `gameData.js`, `gameDialogue.js`, `gameCases.js`, the copy

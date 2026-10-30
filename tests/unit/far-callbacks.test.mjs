@@ -146,7 +146,7 @@ test("a damaged value is dropped, and 사건 37 reads the fallback", () => {
 test("the server's case row does not carry the field: the summary keeps the shape it had", () => {
   const row = toRowSummary({ ...case15Summary, finalChoiceId: "c15_final_publish", endingVariant: { id: "quiet", label: "x" } });
   assert.ok(!("finalChoiceId" in row));
-  assert.deepEqual(row, { ...case15Summary, endingVariant: "quiet" });
+  assert.deepEqual(row, { ...case15Summary, endingVariant: "quiet", locale: "ko" });
 });
 
 /**

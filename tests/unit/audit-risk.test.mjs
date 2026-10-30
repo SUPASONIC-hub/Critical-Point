@@ -159,7 +159,8 @@ test("the audit's own chunk imports nothing from the engine's: its relief heat i
   assert.equal(AUDIT_RELIEF_HEAT, HEAT_DEBT_GAUGE);
   const source = readFileSync("src/gauntlet/auditRisk.js", "utf8");
   const imports = [...source.matchAll(/from "([^"]+)"/g)].map((match) => match[1]);
-  assert.deepEqual(imports, ["./weeklyRules.js"], "auditRisk.js imports only the week's numbers");
+  // The week's numbers, and its words (src/copy/audit.js, 영어판 3단계) with the blank filler.
+  assert.deepEqual(imports, ["./weeklyRules.js", "../copy/audit.js", "../locale.js"], "auditRisk.js imports only the week's numbers and its words");
   assert.match(readFileSync("vite.config.js", "utf8"), /const AUDIT_RISK = "src\/gauntlet\/auditRisk\.js"/);
 });
 

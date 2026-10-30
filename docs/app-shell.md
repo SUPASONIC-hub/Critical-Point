@@ -25,7 +25,7 @@ app/                         ← 껍데기 전용 작업 공간. 자기 package.
 src/platform/appShell.js     ← appShell() / isAppShell(): "web" · "ios" · "android"
 src/platform/ads.js          ← 게임이 부르는 광고·결제 창구(웹에서는 아무것도 안 함)
 src/platform/adPacing.js     ← 전면 광고 간격 규칙(순수 함수)
-src/platform/adCopy.js       ← 메모 B·C의 한국어·영어 문구
+src/platform/adCopy.js       ← 메모 B·C의 문구를 페이지 언어로(한국어 src/copy/appStore.js, 영어·일본어 src/locales/<lang>/app/appStore.js — 웹 사전에는 없음)
 src/components/AppStorePanel.jsx ← 「광고와 개인정보」 칸·광고 제거 구매, 결말 도감 보상형 힌트
 ```
 
@@ -50,6 +50,8 @@ Capacitor 네이티브 브리지가 페이지 코드보다 먼저 `window.Capaci
 1. 서비스 워커를 끔(파일이 이미 기기 안에 있음).
 2. `__CP_APP__`가 `true`이고, `cp:app-native`가 `app/native/index.js`로 풀림(그 파일이 `app/node_modules`의 플러그인을 import).
 3. 광고·결제 코드는 따로 지연 청크(`ads`, `AppStorePanel`, `app-native`)로 나뉘어 첫 화면에 미리 받지 않습니다.
+4. 사이트 확인 두 가지(AdSense의 `google-adsense-account` 메타·`/ads.txt`, Search Console의 `google-site-verification` 메타)를 `ADSENSE_CLIENT`·`GOOGLE_SITE_VERIFICATION`이 있어도 넣지 않음: 앱 안 페이지는 크롤러·AdSense 심사가 읽지 않고, 앱 광고는 AdMob입니다.
+5. 정적 페이지(방침·약관·소개·FAQ·문의)는 첫 화면 링크가 여는 곳이라 앱에도 들어가되, 방침·약관·FAQ는 앱판 문장(AdMob 광고·광고 제거 결제)으로 바꾼 사본입니다(`scripts/legal-pages.mjs` `APP_LINES`, `scripts/site-pages.mjs` `APP_LINES`; 웹 문장이 바뀌어 찾을 문장이 없으면 빌드 실패). 소개·문의는 웹과 같고, 같이 만들어지는 `robots.txt`·`sitemap.xml`도 남습니다(앱 안에서 읽는 이 없음).
 
 Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`), 실 광고 단위는 `VITE_ADMOB_LIVE=true`일 때만(아래).
 
@@ -80,7 +82,7 @@ Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_
 
 1. 게임의 「데이터 저장 안내」(이미 끝난 상태)
 2. **Google UMP** 동의 메시지(유럽·영국·스위스 등 해당 지역만, AdMob 콘솔에서 만든 문안)
-3. (iOS, 아직 묻지 않았을 때) **ATT 사전 안내**: 「광고를 고르는 방식에 대해」 한 장, 버튼은 「계속」 하나 → 시스템 ATT 창(`NSUserTrackingUsageDescription`, ko·en `InfoPlist.strings`)
+3. (iOS, 아직 묻지 않았을 때) **ATT 사전 안내**: 「광고를 고르는 방식에 대해」 한 장, 버튼은 「계속」 하나 → 시스템 ATT 창(`NSUserTrackingUsageDescription`, ko·en·ja `InfoPlist.strings`)
 4. Mobile Ads SDK 시작(`maxAdContentRating: Teen`, 테스트 빌드면 `initializeForTesting`)
 
 맞춤 광고는 UMP·ATT 답대로 SDK가 스스로 정합니다. 「광고와 개인정보」 칸의 「광고 개인정보 설정 다시 열기」가 UMP 개인정보 옵션 양식을 다시 엽니다(해당 지역이 아니면 「이 지역에서는 따로 고를 광고 동의 항목이 없습니다.」).
@@ -122,7 +124,7 @@ Supabase 키는 사이트 빌드처럼 환경 변수(`VITE_SUPABASE_URL`, `VITE_
 
 - 패키지 이름 하나: `capacitor.config.json`·안드로이드 `namespace`/`applicationId`/`package_name`·Xcode 번들 ID·`appShell.js`
 - 안드로이드 `compileSdkVersion`·`targetSdkVersion` ≥ 36(Google Play: 2026-08-31부터 새 앱·업데이트 API 36), `minSdkVersion` ≥ 24(Capacitor 8 기본)
-- AdMob 앱 ID(안드로이드 매니페스트 meta-data, iOS `GADApplicationIdentifier`), iOS ATT 문구(Info.plist·ko·en)와 `cstr6suwn9.skadnetwork`
+- AdMob 앱 ID(안드로이드 매니페스트 meta-data, iOS `GADApplicationIdentifier`), iOS ATT 문구(Info.plist·ko·en·ja)와 `cstr6suwn9.skadnetwork`
 - 플러그인 버전이 정확한 버전, 상품이 `remove_ads`
 - 테스트·자리표시 광고 ID는 경고, `--release`면 오류 → 출시 빌드 전에 `npm run check:app -- --release` 통과
 

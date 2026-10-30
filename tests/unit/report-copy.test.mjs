@@ -205,7 +205,11 @@ test("the finale counts its clues out of the clues there are", () => {
   const archive = readFileSync(new globalThis.URL("../../src/screens/ReportArchive.jsx", import.meta.url), "utf8");
   assert.doesNotMatch(archive, /\/6 숨은 단서/);
   assert.match(archive, /const clueTotal = clueCount \+ unopenedClueCount;/);
-  assert.match(archive, /\{clueCount\}\/\{clueTotal\} 숨은 단서 발견/);
+  // The words are the archive's copy table (src/copy/report.js, 다국어 틀).
+  const words = readFileSync(new globalThis.URL("../../src/copy/report.js", import.meta.url), "utf8");
+  assert.doesNotMatch(words, /\/6 숨은 단서/);
+  assert.match(words, /\{clueCount\}\/\{clueTotal\} 숨은 단서 발견/);
+  assert.match(archive, /fill\(reportCopy\.finale\.clues, \{ clueCount, clueTotal \}\)/);
   assert.match(archive, /clueCount >= clueTotal \* gameConstants\.ENDING_GATES\.clueRate/);
 });
 

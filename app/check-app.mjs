@@ -87,7 +87,7 @@ needs(APP_ID.test(iosAppId), `Info.plist GADApplicationIdentifier "${iosAppId}" 
 if (iosAppId) testOrPlaceholder("Info.plist GADApplicationIdentifier", iosAppId);
 needs(plist.includes("<string>cstr6suwn9.skadnetwork</string>"), "Info.plist SKAdNetworkItems lacks Google's cstr6suwn9.skadnetwork.");
 needs(plistString("NSUserTrackingUsageDescription").length > 0, "Info.plist has no NSUserTrackingUsageDescription (the ATT question).");
-for (const language of ["ko", "en"]) {
+for (const language of ["ko", "en", "ja"]) {
   const file = path.join(app, "ios", "App", "App", `${language}.lproj`, "InfoPlist.strings");
   needs(existsSync(file) && /"NSUserTrackingUsageDescription" = ".+";/.test(readFileSync(file, "utf8")), `ios/App/App/${language}.lproj/InfoPlist.strings has no NSUserTrackingUsageDescription.`);
   needs(pbxproj.includes(`path = ${language}.lproj/InfoPlist.strings;`), `The Xcode project does not list ${language}.lproj/InfoPlist.strings.`);

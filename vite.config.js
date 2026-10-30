@@ -7,6 +7,9 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
+import { crawlerFiles, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
+import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -213,7 +216,8 @@ function criticalCss() {
  * repository -- the service was created by hand in the Render dashboard -- so it
  * comes from the build environment: `SITE_URL` when set (a custom domain), else
  * `RENDER_EXTERNAL_URL`, which Render sets on every build. A local build has
- * neither and keeps the relative paths.
+ * neither and keeps the relative paths. The plain pages and the sitemap take
+ * the same origin (`siteOrigin`, `withAbsoluteSiteLinks`: scripts/site-pages.mjs).
  */
 function absoluteSiteUrls() {
   return {
@@ -222,12 +226,7 @@ function absoluteSiteUrls() {
     transformIndexHtml: {
       order: "post",
       handler(html) {
-        const origin = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || "").trim().replace(/\/+$/, "");
-        if (!origin) return html;
-        if (!/^https:\/\//.test(origin)) throw new Error(`SITE_URL must be an https origin, got ${origin}`);
-        return html
-          .replace(/(<meta\s+(?:property="og:(?:url|image)"|name="twitter:image")\s+content=")\//g, `$1${origin}/`)
-          .replace(/(<link\s+rel="canonical"\s+href=")\//g, `$1${origin}/`);
+        return withAbsoluteSiteLinks(html, siteOrigin());
       },
     },
   };
@@ -402,6 +401,79 @@ const APP_NATIVE_GROUP = {
 };
 
 /**
+ * The site's plain pages and the files a crawler reads, written beside
+ * `index.html`: the privacy policy and the terms (scripts/legal-pages.mjs),
+ * the game's about, FAQ and contact pages (scripts/site-pages.mjs), fifteen
+ * pages in Korean, English and Japanese, and /robots.txt and /sitemap.xml.
+ * The host serves each at its own name, so a store listing, a search engine
+ * or an AdSense reviewer reads them with no script. The dev server answers
+ * the same addresses from the same source. The store apps' build
+ * (`--mode app`) writes the apps' copies of the policy, the terms and the
+ * FAQ, which say what their ads and purchase do; every other mode writes the
+ * site's pages as they were.
+ *
+ * Their canonical and hreflang links and the sitemap's addresses are absolute
+ * on the build's origin (`siteOrigin`), relative without one. The sitemap is
+ * dated the day of the build, so it is the one file a rebuild of the same
+ * commit can change; the service worker leaves it and robots.txt out of the
+ * release's name (`shippedFiles`, scripts/service-worker-build.mjs), which
+ * a device would otherwise download everything again for. Before
+ * `serviceWorker()` in the list, which reads every file on disk.
+ */
+function staticPages({ app = false } = {}) {
+  const files = () => {
+    const origin = siteOrigin();
+    return { ...renderStaticPages(origin, { app }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+  };
+  const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
+  return {
+    name: "static-pages",
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const pathname = new URL(request.url ?? "/", "http://dev.invalid").pathname;
+        const file = files()[pathname.slice(1)];
+        if (!file) return next();
+        response.setHeader("Content-Type", TYPES[pathname.split(".").pop()]);
+        response.end(file);
+      });
+    },
+    generateBundle() {
+      for (const [fileName, source] of Object.entries(files())) this.emitFile({ type: "asset", fileName, source });
+    },
+  };
+}
+
+/**
+ * Google AdSense site verification (출시 로드맵 2단계), off unless
+ * ADSENSE_CLIENT is set (scripts/adsense-config.mjs, docs/web-ads.md). Off,
+ * this plugin has no hook and the build is the one without it. With the
+ * publisher ID it writes /ads.txt and the `google-adsense-account` meta tag
+ * the AdSense review reads, and no code. Before `serviceWorker()` in the list,
+ * like staticPages, so ads.txt is a file the release is named for.
+ */
+function adsenseVerification({ client, publisherId }) {
+  if (!client) return { name: "adsense-verification-off" };
+  return {
+    name: "adsense-verification",
+    transformIndexHtml: (html) => withVerificationMeta(html, client),
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "ads.txt", source: adsTxt(publisherId) });
+    },
+  };
+}
+
+/**
+ * Google Search Console's site verification, off unless
+ * GOOGLE_SITE_VERIFICATION is set (scripts/search-console.mjs,
+ * docs/search-console.md): the `google-site-verification` meta tag in
+ * index.html, and nothing else. No VITE_ prefix, like ADSENSE_CLIENT.
+ */
+function searchConsoleVerification({ token }) {
+  if (!token) return { name: "search-console-verification-off" };
+  return { name: "search-console-verification", transformIndexHtml: (html) => withSiteVerificationMeta(html, token) };
+}
+
+/**
  * What the page is told about registering (src/serviceWorker/register.js).
  * `--mode app` is the build the iOS shell carries (app/build-web.mjs): every
  * file is already on the device, and WKWebView runs no worker for the app's
@@ -551,22 +623,42 @@ const SPEAKER_LINE = "src/gauntlet/speakerLine.js";
  * the words it imports, as it was when the hook was the emitted chunk's entry.
  */
 const OWN_CHUNKS = [
-  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS] },
+  // Its words (src/copy/seasonEnd.js, 영어판 3단계) go with it: left alone they
+  // land in pastPicks, which imports this chunk back, and the table read at
+  // load (ENDING_NAMES, the ending scenes) was still undefined.
+  { name: "runtimeSystems", files: [RUNTIME_SYSTEMS, "src/copy/seasonEnd.js"] },
   { name: "caseCopy", files: [CASE_COPY] },
   { name: "tableAudio", files: [TABLE_AUDIO] },
   { name: "sceneTraces", files: [SCENE_TRACES, "src/sceneTraces.js"] },
   { name: "sceneChoices", files: [SCENE_CHOICES, "src/sceneChoices.js"] },
   { name: "WeekRulePanel", files: [WEEK_RULE_PANEL] },
-  { name: "EdgeNotice", files: [EDGE_NOTICE] },
+  // The notices' words (src/copy/edgeNotices.js, 다국어 틀) go with the notice.
+  { name: "EdgeNotice", files: [EDGE_NOTICE, "src/copy/edgeNotices.js"] },
   { name: "ReadingClockAsk", files: [READING_CLOCK_ASK] },
-  { name: "auditRisk", files: [AUDIT_RISK] },
-  { name: "cascadeRisk", files: [CASCADE_RISK] },
+  // Their words (src/copy/audit.js, cascade.js, 영어판 3단계) go with each.
+  { name: "auditRisk", files: [AUDIT_RISK, "src/copy/audit.js"] },
+  { name: "cascadeRisk", files: [CASCADE_RISK, "src/copy/cascade.js"] },
   // windowTrail came in from main (#F1 phase 2) after the Vite 8 budgets were
   // measured: its group is here as the emitted chunk was, its size is to be
   // measured on the next build (다음에 실측).
   { name: "windowTrail", files: [WINDOW_TRAIL] },
   { name: "speakerLine", files: [SPEAKER_LINE] },
 ];
+
+/**
+ * A module of src/locales (src/locale.js): a language's dictionary
+ * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), its
+ * copy between cases after the first ten (`<lang>/between/<first>-<last>.js`),
+ * or the code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>`,
+ * `locale-<lang>-between-<file>` or `locale-<file>`.
+ */
+const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/]|(between)[\\/])?)?([^\\/]+)\.js$/;
+
+function localeChunkName(chunk) {
+  const match = LOCALE_MODULE.exec(chunk.facadeModuleId ?? "");
+  if (!match) return "assets/[name]-[hash].js";
+  return `assets/locale-${match[1] ? `${match[1]}-` : ""}${match[2] ? `${match[2]}-` : ""}${match[3]}-[hash].js`;
+}
 
 function ownChunkGroups() {
   return OWN_CHUNKS.map(({ name, files }) => {
@@ -581,7 +673,16 @@ function ownChunkGroups() {
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [appNative(mode), seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
+  // ADSENSE_CLIENT and GOOGLE_SITE_VERIFICATION have no VITE_ prefix, so they never reach import.meta.env
+  // (scripts/adsense-config.mjs, scripts/search-console.mjs).
+  plugins: [
+    appNative(mode), seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages({ app: mode === "app" }),
+    // The app build (`--mode app`, app/build-web.mjs) carries neither site verification: no crawler or
+    // AdSense reviewer reads a page inside the app, and the app's ads are its own (AdMob).
+    adsenseVerification(mode === "app" ? {} : readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
+    searchConsoleVerification(mode === "app" ? {} : readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
+    serviceWorker(), renderHeaders(),
+  ],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
@@ -619,6 +720,11 @@ export default defineConfig(({ command, mode }) => ({
     },
     rolldownOptions: {
       output: {
+        // The other languages' words (src/locales, 다국어 틀) are named
+        // apart, `locale-<lang>-<file>`: a Korean device never asks for
+        // them, so the service worker leaves `locale-*` out of its warm-up
+        // (scripts/service-worker-build.mjs), and their budgets are their own.
+        chunkFileNames: localeChunkName,
         codeSplitting: {
           groups: [...ownChunkGroups(), ...(mode === "app" ? [APP_NATIVE_GROUP] : []), ...VENDOR_GROUPS, ENTRY_GROUP],
         },

@@ -1,0 +1,127 @@
+name: Board Reports
+
+# The report queue of the 참가자 게시판, and the operator's hand on it
+# (scripts/board-reports.mjs). The report button promises that the queue is
+# read once a day and a report is acted on within 24 hours; nothing hides a
+# post by itself.
+#
+# Every morning this reads the queue and writes it to the Job Summary. While a
+# reported post still shows on the board, the run fails, so GitHub's failed-run
+# mail is the daily reminder; an empty queue is green.
+#
+# This repository is public, and so is the summary: it carries post ids,
+# counts, reasons and waits, never a body, a nickname or a writer key. The
+# operator reads the post in the Supabase dashboard (Table Editor,
+# `board_posts`, filter `id`) and then runs this by hand with an action:
+#   hide     moderate_board_post(id): the post leaves the board
+#   dismiss  its reports are deleted: the post stays, the queue is clear
+#   restore  moderate_board_post(id, false): a post hidden by mistake returns,
+#            and its reports are deleted with it (restore is dismiss too), so
+#            the next morning's run does not count them again
+#
+# No new secret and no new grant: the same SUPABASE_ACCESS_TOKEN and
+# `supabase db query --linked` as Funnel and Verify Ranking. Without the token
+# the run says so in a warning and touches nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "list: show the queue / hide: take the post down / dismiss: keep it, delete its reports / restore: bring a hidden post back, delete its reports"
+        type: choice
+        options: [list, hide, dismiss, restore]
+        default: list
+      post_id:
+        description: "글 번호 (hide·dismiss·restore)"
+        required: false
+        default: ""
+  schedule:
+    # 09:10 KST, every day.
+    - cron: "10 0 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Not a secret: it is the host name in the site's own connect-src.
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+      ACTION: ${{ inputs.action || 'list' }}
+      POST_ID: ${{ inputs.post_id || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: See whether an access token is configured
+        id: token
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Explain the skipped read
+        if: steps.token.outputs.configured != 'true'
+        run: |
+          echo "::warning title=The queue was not read::SUPABASE_ACCESS_TOKEN is not configured, so this run asked the database nothing."
+      - uses: ./.github/actions/setup
+        if: steps.token.outputs.configured == 'true'
+        with:
+          browser: none
+      # The id is checked by the script before it is written into SQL. What the
+      # CLI said on failure goes through Migration Drift's redaction.
+      - name: Act on one post
+        if: steps.token.outputs.configured == 'true' && env.ACTION != 'list'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/board-reports.mjs --act "$ACTION" "$POST_ID" > act.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f act.sql > act.json 2> act.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure act.json act.err
+            exit 1
+          fi
+          if [ "$(node scripts/board-reports.mjs --done act.json)" != "yes" ]; then
+            echo "::error title=Nothing changed::$ACTION found nothing to do for post $POST_ID (no such post, or no reports to dismiss)."
+            exit 1
+          fi
+          echo "### $ACTION: 글 $POST_ID" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+      - name: Read the queue
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/board-reports.mjs --sql > queue.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f queue.sql > rows.json 2> query.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure rows.json query.err
+            exit 1
+          fi
+          node scripts/board-reports.mjs rows.json >> "$GITHUB_STEP_SUMMARY" || exit 1
+      # A hand run is about the one post it named; the morning run is the reminder.
+      - name: Fail while a reported post still shows
+        if: steps.token.outputs.configured == 'true' && github.event_name == 'schedule'
+        run: |
+          waiting=$(node scripts/board-reports.mjs --waiting rows.json)
+          if [ "$waiting" -gt 0 ]; then
+            echo "::error title=Board reports wait::$waiting reported post(s) still show on the board. Read them in the Supabase dashboard and run this workflow with hide or dismiss."
+            exit 1
+          fi
+      - name: Remove the rows
+        if: always()
+        run: rm -f rows.json query.err act.json act.err
