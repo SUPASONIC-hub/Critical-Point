@@ -17,8 +17,8 @@ import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { getDeletionRequestText } from "../appConfig.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
-import { PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
-import { fill } from "../locale.js";
+import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from "../privacyText.js";
+import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
@@ -700,8 +700,8 @@ export function IntroScreen({ view, renderers = {} }) {
                 <DeletionRequest />
               </p>
               <p>
-                {introCopy.data.more}<a href={PRIVACY_PAGE_PATH}>{introCopy.legal.privacy}</a>{introCopy.data.and}
-                <a href={TERMS_PAGE_PATH}>{introCopy.legal.terms}</a>{introCopy.data.end}
+                {introCopy.data.more}<a href={legalPagePath(PRIVACY_PAGE_PATH, LANG)}>{introCopy.legal.privacy}</a>{introCopy.data.and}
+                <a href={legalPagePath(TERMS_PAGE_PATH, LANG)}>{introCopy.legal.terms}</a>{introCopy.data.end}
               </p>
             </div>
           </section>
@@ -834,12 +834,14 @@ export function IntroScreen({ view, renderers = {} }) {
             })}
           </div>
         </section>
-        {/* Plain links to the two files beside the build (privacyText.js):
-            the address a store listing names, and one a player can reach
-            from the bottom of the page without opening the data drawer. */}
+        {/* Plain links to the five pages beside the build (privacyText.js,
+            scripts/legal-pages.mjs and site-pages.mjs) in the page's
+            language: the addresses a store listing names, and the site's
+            text a crawler follows from the start page. */}
         <footer className="intro-legal">
-          <a href={PRIVACY_PAGE_PATH}>{introCopy.legal.privacy}</a>
-          <a href={TERMS_PAGE_PATH}>{introCopy.legal.terms}</a>
+          {SITE_PAGES.map((page) => (
+            <a key={page} href={legalPagePath(`/${page}.html`, LANG)}>{introCopy.legal[page]}</a>
+          ))}
         </footer>
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the
