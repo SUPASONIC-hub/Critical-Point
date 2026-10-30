@@ -394,10 +394,6 @@ for (const viewport of [
   // where only the Korean page was measured.
   for (const lang of ["ko", "en", "ja"]) {
     test(`intro start controls stay reachable on ${viewport.name}${lang === "ko" ? "" : ` (${lang})`}`, { tag: "@prod" }, async ({ page }) => {
-      // Known (10-29): on Linux's CJK face the Japanese premise still ends the
-      // start button 27px below a 320x844 screen (871). picker-narrow, which
-      // reworks the 320px header, takes it and drops this line.
-      test.fixme(lang === "ja" && viewport.name === "narrow phone", "Japanese start button 27px below a 320x844 first screen on Linux fonts");
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto(lang === "ko" ? "/" : `/?lang=${lang}`);
       if (lang !== "ko") await expect(page.locator("html")).toHaveAttribute("lang", lang);
