@@ -363,7 +363,7 @@ test("a ranking row storage would not take is said and logged, and the case stil
     return { rows: [], saved: false };
   };
   mount(context).choose(context.node.choices[0], closedWindow("cash"));
-  assert.deepEqual(did.saveStatus, ["Local ranking save failed: browser storage is unavailable."]);
+  assert.deepEqual(did.saveStatus, ["로컬 랭킹을 저장하지 못했습니다. 브라우저 저장소를 사용할 수 없습니다."], "the line is the Korean page's, from copy/notices.js");
   assert.match(JSON.stringify(getLocalErrorLog()), /Local ranking save failed/);
   assert.deepEqual(did.patches[0].completedCases, ["prologue01"]);
   assert.equal(did.queued.length, 1);
@@ -736,7 +736,7 @@ test("a season ranking row storage would not take is said and logged, and the se
   mount(context).choose(card, closedWindow("cash"));
 
   assert.equal(did.patches[0].completedCases.length, CASE_SEQUENCE.length);
-  assert.ok(did.saveStatus.includes("Season ranking save failed: browser storage is unavailable."));
+  assert.ok(did.saveStatus.includes("시즌 랭킹을 저장하지 못했습니다. 브라우저 저장소를 사용할 수 없습니다."));
   assert.match(JSON.stringify(getLocalErrorLog()), /Season ranking save failed/);
 });
 

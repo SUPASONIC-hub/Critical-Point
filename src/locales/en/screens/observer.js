@@ -84,6 +84,11 @@ export default {
     "field-pact": { title: "Before any official approval, a promise on the front line opened the next door.", text: "Your network of people gives you access to locked records." },
     "quiet-cover": { title: "The risk came down, but the truth is still asleep.", text: "The season closed with nothing collapsing and nothing coming out." },
   },
+  gate: {
+    oversight: "Needs {needClues}+ clues and Fairness {needLegitimacy}+. Now: Clues {clues}, Fairness {legitimacy}.",
+    field: "Needs Trust {needTrust}+ or {needClues}+ clues. Now: Trust {trust}, Clues {clues}.",
+    unlocked: "Access confirmed.",
+  },
   openQuestion: {
     trust: { title: "You found no answer, but people still speak to you.", text: "You closed each case leaving {value} human cost behind. The next participant starts with the people who know you." },
     legitimacy: { title: "The procedure remains; what it was for does not.", text: "Fairness stopped at {value}, and no document records why. The next person inherits only the rules." },

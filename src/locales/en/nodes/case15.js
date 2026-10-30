@@ -28,7 +28,7 @@ export default {
           "label": "Ask Lee Minseo what she wants before the papers"
         },
         "reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -56,10 +56,10 @@ export default {
           "label": "Request 'operating error' be changed to 'cause unknown'"
         },
         "reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         },
         "c15_form_evidence_turn": {
-          "label": "Spread out the 12 conversion candidates’ confirmations"
+          "label": "Spread out the 12 confirmations"
         }
       },
       "place": "KD Bank Head Office HR · Meeting Room",
@@ -87,10 +87,10 @@ export default {
           "label": "Submit the records after the exam, with Chanbin’s consent"
         },
         "reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         },
         "c15_rooftop_evidence_turn": {
-          "label": "Spread out the 12 conversion candidates’ confirmations"
+          "label": "Spread out the 12 confirmations"
         }
       },
       "place": "Lee Minseo’s Rooftop Room, Haebangchon · Rooftop Platform",
@@ -118,10 +118,10 @@ export default {
           "label": "Stand by her until she calms down, even if late"
         },
         "reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         },
         "c15_gate_evidence_turn": {
-          "label": "Spread out the 12 conversion candidates’ confirmations"
+          "label": "Spread out the 12 confirmations"
         }
       },
       "place": "Eungang High School, Yongsan · Gate · Outside the Exam Site",
@@ -383,7 +383,7 @@ export default {
           "label": "Send the numbers to HR and the union at once"
         },
         "c15_route_system_evidence_turn": {
-          "label": "Spread out the 12 conversion candidates’ confirmations"
+          "label": "Spread out the 12 confirmations"
         }
       },
       "place": "Trigger Lab 4th Floor · Analyst Room · Test Terminal",
@@ -458,7 +458,7 @@ export default {
           "label": "Call it a 3-year chance and help her prepare first"
         },
         "c15_start_warm_reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -488,7 +488,7 @@ export default {
           "label": "Log an objection to the confirmation as you did the revision"
         },
         "c15_start_record_reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
@@ -518,7 +518,7 @@ export default {
           "label": "Ask Lee Minseo what she wants before the papers"
         },
         "c15_start_rush_reframe": {
-          "label": "Count whose names closed 'personal error' cases"
+          "label": "Count names on 'personal error'"
         }
       },
       "place": "Trigger Lab, 4th-floor analyst room",
