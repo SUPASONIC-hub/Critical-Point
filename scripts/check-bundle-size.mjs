@@ -590,7 +590,8 @@ const budgets = [
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_506, maxGzip: 36_627 },
+  // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_655, maxGzip: 36_661 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1199,11 +1200,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
+ * The English bank rail fitted to a 360px phone (#224 hand5-en, 10-30; the critical CSS does not carry it): 423,147, 472,682 and 478,466, the plus 4.
  * c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b (10-29): 422,808,
  * 472,351 and 478,130, the plus 4.
  * C-3·C-4 rules (#320) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,148, 472,805 and 478,622, the plus 4.
+ * C-3·C-4 rules (#320) merged with #224 0d29141a (the English bank rail at 360px), 10-30: 423,187, 472,844 and 478,661, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_152, en: 472_809, ja: 478_626 };
+const FIRST_PAINT_BUDGETS = { ko: 423_191, en: 472_848, ja: 478_665 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
