@@ -590,12 +590,14 @@ const budgets = [
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
+  // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
   // 193,577 / 36,084 -> 193,630 / 36,092 on 2026-10-25, C-1(1) (the 판 읽기
   // axis) on #224 0c989ba7: the score breakdown's seventh card, the penalty
   // card taking its row. Measured 193,630 / 36,088 in the e2e build, the gzip plus 4.
   // 196,229 / 36,558 -> 196,282 / 36,566 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's seventh card, the penalty card taking its row. Measured 196,282 / 36,562, the gzip plus 4 in the e2e build.
   // 196,506 / 36,627 -> 196,559 / 36,637 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e). Measured 196,559 / 36,633 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_559, maxGzip: 36_637 },
+  // 196,655 / 36,661 -> 196,708 / 36,670 on 2026-10-30, C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px). Measured 196,708 / 36,666 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_708, maxGzip: 36_670 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -737,7 +739,8 @@ const budgets = [
   // 39,663 / 14,647 -> 39,883 / 14,795 on 2026-10-28, lang-full: the reading clock counts an English page by words and a
   // Japanese one by characters at 0.89 (readingUnits). Measured 39,879 / 14,791.
   // 39,883 -> 39,889 raw on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip stays under its line. Measured 39,889 in the e2e build.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_889, maxGzip: 14_795 },
+  // 14,795 -> 14,801 gzip on 2026-10-30, C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px): only the chunk names it imports. Measured 14,797, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_889, maxGzip: 14_801 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1194,12 +1197,14 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
+ * The English bank rail fitted to a 360px phone (#224 hand5-en, 10-30; the critical CSS does not carry it): 423,147, 472,682 and 478,466, the plus 4.
  * C-1(1) (the 판 읽기 axis) merged with #224 602ec69b (10-29): the seventh score card's CSS in the
  * critical sheet and its words in the dictionaries put English at 472,236 and Japanese at 478,009,
  * the plus 4; Korean (422,764) stays under.
  * C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,114, 472,693 and 478,493, the plus 4.
+ * C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px), 10-30: 423,147, 472,726 and 478,526, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_118, en: 472_697, ja: 478_497 };
+const FIRST_PAINT_BUDGETS = { ko: 423_151, en: 472_730, ja: 478_530 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
