@@ -1061,11 +1061,13 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
 }
-/* The two policy pages beside the build (privacyText.js). The line height
-   is what makes each link a 52px target. */
+/* The five pages beside the build (privacyText.js SITE_PAGES). The line
+   height is what makes each link a 52px target; on a narrow screen the line
+   wraps, with no gap between its rows. */
 .intro-legal {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 0 20px;
   width: min(var(--ui-page-max), 100%);
   margin: 64px auto 0;
   line-height: 3.25;
@@ -3125,6 +3127,13 @@ body {
   .intro-kicker {
     border-radius: var(--ui-radius-md);
   }
+  /* Japanese falls back to the system's CJK face, wider than the Korean one
+     (Linux CI measured the premise at ten lines where Korean takes eight), and
+     the start button left a 320px first screen (10-29). */
+  :lang(ja) .intro-hero-copy > p:not([class]) {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
 }
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
@@ -3329,5 +3338,23 @@ body {
      for it on that language's pages only. */
   .intro-hero-copy:has(.language-picker small) {
     padding-top: 112px;
+  }
+}
+/* On a 360px phone or narrower the three pills wrapped to two rows and the
+   third covered the brand row (10-29). There they reach to the music
+   controls (8px short of them), sit closer and read at 12px, with the 44px
+   target kept, so they stay one row even in Linux's fallback face (CI: the
+   Japanese page's 「English」 ran 71px); the brand row comes up 8px. */
+@media (max-width: 360px) {
+  .language-picker {
+    gap: 4px;
+    max-width: calc(100% - var(--ui-gutter) - 82px);
+  }
+  .language-picker button {
+    padding: 0 8px;
+    font-size: 0.75rem;
+  }
+  .intro-hero-copy {
+    padding-top: 56px;
   }
 }

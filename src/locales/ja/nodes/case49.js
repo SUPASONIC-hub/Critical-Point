@@ -52,7 +52,7 @@ export default {
           "label": "空欄が誰の名前で埋まったかを集める"
         },
         "c49_market_evidence_turn": {
-          "label": "明日あの部屋を用意した側のアカウント記録を開く"
+          "label": "あの部屋を用意した側の記録を開く"
         }
       },
       "place": "マンウォン市場 ガウル餅房",
@@ -83,7 +83,7 @@ export default {
           "label": "空欄が誰の名前で埋まったかを集める"
         },
         "c49_server_evidence_turn": {
-          "label": "明日あの部屋を用意した側のアカウント記録を開く"
+          "label": "あの部屋を用意した側の記録を開く"
         }
       },
       "place": "旧トリガーラボ 記録保管所B2 · ケースデスク",
@@ -114,7 +114,7 @@ export default {
           "label": "空欄が誰の名前で埋まったかを集める"
         },
         "c49_crosswalk_evidence_turn": {
-          "label": "明日あの部屋を用意した側のアカウント記録を開く"
+          "label": "あの部屋を用意した側の記録を開く"
         }
       },
       "place": "ヨイド KD金融グループ本社前 · 横断歩道",
@@ -376,7 +376,7 @@ export default {
           "label": "61件の空欄一覧を面談前に皆へ公開する"
         },
         "c49_route_system_evidence_turn": {
-          "label": "明日あの部屋を用意した側のアカウント記録を開く"
+          "label": "あの部屋を用意した側の記録を開く"
         }
       },
       "place": "旧トリガーラボ 記録保管所B2 · 実験端末",

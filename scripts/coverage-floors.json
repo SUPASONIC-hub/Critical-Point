@@ -69,6 +69,7 @@
     "src/seasonStanding.js": 100,
     "src/serviceWorker/register.js": 100,
     "src/serviceWorker/worker.js": 99,
+    "src/shellNotices.js": 100,
     "src/speakerPortraits.js": 100,
     "src/state/accessibilitySettings.js": 100,
     "src/state/caseArrival.js": 100,

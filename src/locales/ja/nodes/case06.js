@@ -51,7 +51,7 @@ export default {
           "label": "二人の条件を並べて置く"
         },
         "c6_desk_evidence_turn": {
-          "label": "彼の条件が変わった日付を自分の記録とつなぐ"
+          "label": "条件が変わった日付を記録とつなぐ"
         }
       },
       "place": "トリガーラボ4階 · オ・ジヌの席",
@@ -82,7 +82,7 @@ export default {
           "label": "卓を組み替えて提案する"
         },
         "c6_logs_evidence_turn": {
-          "label": "彼の条件が変わった日付を自分の記録とつなぐ"
+          "label": "条件が変わった日付を記録とつなぐ"
         }
       },
       "place": "トリガーラボ4階 分析官室 · 実験端末",
@@ -113,7 +113,7 @@ export default {
           "label": "卓を組み替えて提案する"
         },
         "c6_panel_evidence_turn": {
-          "label": "彼の条件が変わった日付を自分の記録とつなぐ"
+          "label": "条件が変わった日付を記録とつなぐ"
         }
       },
       "place": "トリガーラボ2階 人事委員会控室",
@@ -376,7 +376,7 @@ export default {
           "label": "オ・ジヌに索引を一緒に見ようと言う"
         },
         "c6_route_system_evidence_turn": {
-          "label": "彼の条件が変わった日付を自分の記録とつなぐ"
+          "label": "条件が変わった日付を記録とつなぐ"
         }
       },
       "place": "トリガーラボ4階 分析官室 · 実験索引",

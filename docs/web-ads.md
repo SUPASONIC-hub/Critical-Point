@@ -45,6 +45,12 @@ curl -s https://critical-point-wn6p.onrender.com/ | grep -o 'adsbygoogle'   # �
 | 3 | AdSense 콘솔 → 사이트 → 사이트 추가(`critical-point-wn6p.onrender.com`) → 확인 방법 「메타 태그」 또는 「ads.txt」 → 검토 요청 | 사용자 |
 | 4 | 승인(기간은 Google이 약속하지 않음). 거절되면 사유를 보고 고친 뒤 다시 요청 | Google |
 
+## 검토가 읽는 글과 Search Console
+
+검토는 사이트에 읽을 글, 개인정보처리방침·문의 페이지, 깨진 링크가 없는지를 봅니다. 빌드가 쓰는 정적 페이지
+열다섯(게임 소개·자주 묻는 질문·문의·개인정보처리방침·이용약관 × 한국어·영어·일본어)과 `robots.txt`·`sitemap.xml`,
+그리고 Search Console 확인 스위치 `GOOGLE_SITE_VERIFICATION`은 [search-console.md](search-console.md)에 있습니다.
+
 ## 도메인은 필요 없음
 
 AdSense가 받는 사이트는 「도메인」, 「Public Suffix List에 있는 플랫폼의 하위 도메인(예: site.appspot.com)」,

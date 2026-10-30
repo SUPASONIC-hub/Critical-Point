@@ -28,6 +28,7 @@ import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { appliedLocale } from "../locale.js";
+import noticesCopy from "../copy/notices.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { getSeasonScore } from "../seasonScore.js";
 import { telemetryEnabled } from "../telemetry.js";
@@ -134,7 +135,7 @@ export function useChoiceCommit(context) {
       summary: caseSummary,
     });
     if (!localRankingSaved) {
-      setSaveStatus("Local ranking save failed: browser storage is unavailable.");
+      setSaveStatus(noticesCopy.save.rankingFailed);
       recordAppError(new Error("Local ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
     }
 
@@ -209,7 +210,7 @@ export function useChoiceCommit(context) {
       sessionCode,
     }));
     if (!seasonRankingSaved) {
-      setSaveStatus("Season ranking save failed: browser storage is unavailable.");
+      setSaveStatus(noticesCopy.save.seasonRankingFailed);
       recordAppError(new Error("Season ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
     }
     // The server takes a ranking row only once the run's last case row has
