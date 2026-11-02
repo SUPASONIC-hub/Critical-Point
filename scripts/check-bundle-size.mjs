@@ -746,7 +746,7 @@ const budgets = [
   // pre-C-3 hold set aside in upgradeRunRecord.
   // 39,889 / 14,795 -> 40,464 / 15,007 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: getLogicDirection and getEffectLean, upgradeRunRecord's pre-C-3 hold. Measured 40,464 / 15,003, the gzip plus 4 in the e2e build.
   // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
-  // 39,889 / 14,801 (#224) -> 40_464 / 15_006 on 2026-11-02, C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55). Measured 40_464 / 15,002 in the e2e build, the gzip plus 4.
+  // 39,889 / 14,801 (#224) -> 40,464 / 15,006 on 2026-11-02, C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55). Measured 40,464 / 15,002 in the e2e build, the gzip plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_464, maxGzip: 15_006 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
