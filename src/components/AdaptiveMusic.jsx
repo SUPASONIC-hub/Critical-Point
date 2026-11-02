@@ -101,7 +101,9 @@ function connectMusicBus(context, output) {
   delay.connect(wet);
   wet.connect(compressor);
   compressor.connect(output);
-  return { input, shaper };
+  // `clean` is the bus past the drive: the stake's layers enter there, since
+  // in the driven modes a standing voice summed into the shaper crackled.
+  return { input, shaper, clean: lowpass };
 }
 
 function playTone(context, destination, frequency, duration, gainValue, type = "sine", options = {}) {
@@ -253,7 +255,7 @@ function playNoiseSweep(context, destination, duration = 0.7, gainValue = 0.02, 
  * a page may open) and cut the score off at each transition; sharing one keeps
  * the bar running across the intro -> play -> result seam.
  */
-const audioRuntime = { context: null, master: null, bus: null, drive: null };
+const audioRuntime = { context: null, master: null, bus: null, drive: null, clean: null };
 
 /**
  * A hidden tab is silent. The score's interval and the table's drone kept
@@ -298,6 +300,7 @@ function ensureAudioRuntime(volume) {
     const bus = connectMusicBus(context, audioRuntime.master);
     audioRuntime.bus = bus.input;
     audioRuntime.drive = bus.shaper;
+    audioRuntime.clean = bus.clean;
   }
   return context;
 }
@@ -322,13 +325,20 @@ function createLayerVoice(context, destination, type, filterFrequency) {
   oscillator.start();
   return {
     play(frequency, duration, peak) {
+      // The last note is usually still ringing, and retuning a sounding
+      // oscillator jumps its wave: a click a note. So the old note is pulled
+      // down first (setTargetAtTime starts from wherever the gain is, which
+      // `gain.value` does not report everywhere), and the new pitch lands once
+      // it is all but silent.
       const now = context.currentTime;
+      const start = now + 0.012;
       const level = gain.gain;
       level.cancelScheduledValues(now);
-      level.setValueAtTime(Math.max(0.0001, level.value), now);
-      oscillator.frequency.setValueAtTime(frequency, now);
-      level.exponentialRampToValueAtTime(Math.max(0.0001, peak), now + 0.012);
-      level.setTargetAtTime(0.0001, now + duration, duration * 0.35);
+      level.setTargetAtTime(0.0001, now, 0.003);
+      oscillator.frequency.setValueAtTime(frequency, start);
+      level.setValueAtTime(0.0001, start);
+      level.exponentialRampToValueAtTime(Math.max(0.0001, peak), start + 0.012);
+      level.setTargetAtTime(0.0001, start + duration, duration * 0.35);
     },
     stop() {
       const now = context.currentTime;
@@ -365,7 +375,7 @@ function releaseStakeVoices() {
 function stakeVoices(context, destination) {
   stakeRuntime.voices ??= [
     createLayerVoice(context, destination, "triangle", 2200),
-    createLayerVoice(context, destination, "square", 900),
+    createLayerVoice(context, destination, "triangle", 900),
     createLayerVoice(context, destination, "sine", 3200),
   ];
   return stakeRuntime.voices;
@@ -657,7 +667,7 @@ export function AdaptiveMusic({ modeKey }) {
       const layers = stakeLayerCount(stakeRuntime.gauge);
       if (!layers) releaseStakeVoices();
       else {
-        const [counterVoice, pulseVoice, shadowVoice] = stakeVoices(context, destination);
+        const [counterVoice, pulseVoice, shadowVoice] = stakeVoices(context, audioRuntime.clean ?? destination);
         const counter = currentMode.counter[step];
         if (counter) counterVoice.play(counter, stepSeconds * 1.6, COUNTER_GAIN);
         const pulseNote = layers >= 2 && currentMode.pulse[step];
