@@ -10,6 +10,7 @@ import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
 import { MoneyBurst } from "./MoneyBurst.jsx";
+import { readBurst } from "./moneyFeedback.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -76,7 +77,9 @@ function HeldElsewhere({ onClaim, onLeave }) {
  * cash's +N is that line, read where the pill read it; a bust's −N stands over
  * the sentence that says the pot, and is not read twice.
  */
-function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, burst = null, target = null }) {
+function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, target = null }) {
+  // The amount flies only where there is a purse to fly to.
+  const burst = target ? readBurst({ win, livePot, runPot, bustKeeps }) : null;
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">
       {win.status === "bust" ? (

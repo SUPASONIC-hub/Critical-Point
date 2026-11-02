@@ -25,7 +25,7 @@ import { isClosingScene } from "./holdConfirm.js";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
-import { readBurst, readPurse } from "./moneyFeedback.js";
+import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
 import { listOfferedTypes } from "./logicStreak.js";
@@ -470,10 +470,8 @@ export function GauntletStage({
   const busted = win.status === "bust" && win.cause !== "abandon";
   const tabTitle = busted ? tabWords.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
   useTabTitle("table", tabTitle, { rank: 1, keep: busted });
-  // What the run holds, the hand's change and the season's columns; on a closed
-  // window, as the settle will leave them, so the purse shows where it lands.
+  // On a closed window the purse shows what the settle will leave.
   const settling = !live && claimed && run?.windowIndex === dealtIndex;
-  const purse = readPurse({ run, win, settling, livePot, bustKeeps });
 
   return (
     <section
@@ -517,21 +515,8 @@ export function GauntletStage({
             </span>
           </div>
           <div className="gx-bank">
-            {/* The money first and largest (money-feedback): what the run holds,
-                the last hand's change -- its sign is read, its arrow is not --
-                and the season's won and lost. No live region: the slam says the
-                verdict once, and this is here when looked for. */}
-            <div ref={purseRef} className={`gx-purse${purse.landing ? ` is-landing is-${purse.landing}` : ""}`} data-testid="gauntlet-purse">
-              <small>{say.purse}</small>
-              <strong data-testid="gauntlet-purse-total">{purse.totalText}</strong>
-              {purse.change && (
-                <span className={`gx-purse-change is-${purse.change.dir}`} data-testid="gauntlet-purse-change">
-                  <span aria-hidden="true">{purse.change.arrow} {purse.change.text}</span>
-                  <span className="sr-only">{purse.change.spoken}</span>
-                </span>
-              )}
-              <small className="gx-purse-season" data-testid="gauntlet-purse-season">{purse.season.text}</small>
-            </div>
+            {/* The money first and largest (money-feedback, MoneyBurst.jsx). */}
+            <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
@@ -861,7 +846,7 @@ export function GauntletStage({
         caseId={scene.node.caseId}
         // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
         voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
-        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, burst: readBurst({ win, livePot, runPot: run.runPot, bustKeeps }), target: purseRef } : null}
+        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}
         onLeave={() => setLostToTab(true)}

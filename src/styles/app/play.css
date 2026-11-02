@@ -2596,28 +2596,18 @@
     line-height: 1.25;
   }
 
-  /* So every five-card hand keeps the air a rules line's hand keeps (above):
-     6px block paddings, 4px between a card's parts and between rows. English
-     took it first (en-hand5-linux); the bank rail's purse line (money.css,
-     2026-11-02) took 21px more of the HUD, and Japanese on Linux then put 63
-     hands up to 11px under the action bar, so it is every language's now. */
+  /* Every five-card hand at 360px or less gives back the air a rules line's
+     hand gives (above), and 1px more of each: 5px block paddings, 3px between
+     a card's parts and between rows. English took the first step
+     (en-hand5-linux); the bank rail's purse line (money.css, 2026-11-02) took
+     about 21px more of the HUD, and on Linux Japanese then put 63 hands at a
+     pot of 0 up to 11px, and late-season tables (LAYOUT_BANK=max) in all three
+     languages up to 31px, under the action bar. */
   .gauntlet-stage .hand-5 {
-    gap: 4px;
-  }
-
-  .gauntlet-stage .hand-5 .gx-card {
-    gap: 4px;
-    padding-block: 6px;
-  }
-
-  /* English, with the longest labels, gives 1px more of each: late in a
-     season (LAYOUT_BANK=max) the purse line and the bank's second line put
-     five hands 7px under the action bar on Linux. */
-  :lang(en) .gauntlet-stage .hand-5 {
     gap: 3px;
   }
 
-  :lang(en) .gauntlet-stage .hand-5 .gx-card {
+  .gauntlet-stage .hand-5 .gx-card {
     gap: 3px;
     padding-block: 5px;
   }
@@ -2629,10 +2619,11 @@
      language; LAYOUT_BANK=max, 2026-10-30). The second line stays and the
      room is taken from the HUD's air instead: a 30px clock, 18px pills, and
      2 to 4px off the gaps and paddings around them. The HUD measured 106px
-     with one bank line and 132 with two; it is 87 and 107. */
+     with one bank line and 132 with two; it is 87 and 107 (and 3px block
+     paddings since the purse line, 2026-11-02). */
   .gauntlet-stage .gx-hud {
     gap: 3px 8px;
-    padding: 4px 8px;
+    padding: 3px 8px;
   }
 
   .gauntlet-stage .gx-clock {

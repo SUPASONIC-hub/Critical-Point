@@ -216,10 +216,14 @@ const BUDGETS = {
   // briefing while the card is up, and the card drawn in front of them.
   // 70 -> 72 imported names on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/table.js) and locale.js's `fill` for its lines with blanks.
+  // 851 / 72 -> 860 / 73 on 2026-11-02, measured (money-feedback): the bank
+  // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
+  // ref for the amount's flight and the window it was dealt on; the purse's
+  // markup and both reads live outside the screen.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 851,
+    lines: 860,
     longestLine: 250,
-    importedNames: 72,
+    importedNames: 73,
     hooks: {},
   },
 };

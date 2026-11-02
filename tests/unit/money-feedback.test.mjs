@@ -148,7 +148,9 @@ test("the purse is plain text, and the verdict is still said once, by the slam",
   const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
   const notices = readFileSync(new URL("../../src/gauntlet/TableNotices.jsx", import.meta.url), "utf8");
   const burst = readFileSync(new URL("../../src/gauntlet/MoneyBurst.jsx", import.meta.url), "utf8");
-  const purse = stage.slice(stage.indexOf('className={`gx-purse'), stage.indexOf('data-testid="gauntlet-purse-season"'));
+  // The purse's markup is BankPurse's, beside the slam's amount; the screen only places it.
+  assert.match(stage, /<BankPurse purseRef=\{purseRef\} /);
+  const purse = burst.slice(burst.indexOf('className={`gx-purse'), burst.indexOf('data-testid="gauntlet-purse-season"'));
   assert.ok(purse.length > 0);
   assert.doesNotMatch(purse, /aria-live|role="(?:status|alert|log)"/, "no second voice in the rail");
   assert.match(purse, /<span aria-hidden="true">\{purse\.change\.arrow\} \{purse\.change\.text\}<\/span>\s*<span className="sr-only">\{purse\.change\.spoken\}<\/span>/);
@@ -156,6 +158,7 @@ test("the purse is plain text, and the verdict is still said once, by the slam",
   assert.match(notices, /<strong lang="en">BUST<\/strong>\s*<MoneyBurst burst=\{burst\} target=\{target\} spoken=\{false\} \/>/);
   assert.match(notices, /\{burst \? <MoneyBurst burst=\{burst\} target=\{target\} \/> : <span>\+\{formatNumber\(livePot\)\}<\/span>\}/);
   assert.doesNotMatch(burst, /aria-live|role=/);
+  assert.match(notices, /const burst = target \? readBurst\(/, "the amount flies only where there is a purse");
 });
 
 test("the flight is still under reduced motion and the calm setting, and both colours carry a sign", () => {
