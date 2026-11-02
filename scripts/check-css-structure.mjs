@@ -372,7 +372,9 @@ const fileBudgets = {
   // kept to one line on a phone on its side once 안전선 ×N joined it.
   // -> 417 / 8161 on 2026-10-24, measured: off the table the music pills
   // scroll with the page on a phone (운영화면 문제 3 (1)).
-  "responsive.css": { lines: 417, bytes: 8161 },
+  // -> 417 / 8165 on 2026-11-02, measured (money-feedback): a phone on its
+  // side gives the purse line a 30px clock and 2px off the HUD's air.
+  "responsive.css": { lines: 417, bytes: 8165 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
@@ -405,6 +407,12 @@ const fileBudgets = {
   // 홈 화면에 추가 card under the settings in the intro's comfort drawer
   // (components/InstallHint.jsx), drawn only where a browser offers an install.
   "comfort.css": { lines: 175, bytes: 3849 },
+  // New on 2026-11-02 (money-feedback): the bank rail's purse and the slam's
+  // amount that flies into it, in a file of its own beside play.css's 360px
+  // fits. Measured 128 / 2331; 133 / 2478 with the purse line set solid on a
+  // phone, upright (480px or less) or on its side (Linux hand5, the densest
+  // boards at 390x844, the phone-on-its-side tests).
+  "money.css": { lines: 133, bytes: 2478 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

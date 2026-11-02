@@ -256,13 +256,16 @@
     gap: 5px 12px;
   }
 
+  /* The purse line (money.css, 2026-11-02) takes about 20px of the HUD's
+     column; the clock, the HUD's paddings and the column's gaps give it back
+     (a 30px clock as on a 360px phone), so the table still does not scroll. */
   .gx-read {
-    gap: 5px;
+    gap: 3px;
   }
 
   .gx-hud {
-    gap: 4px 10px;
-    padding: 6px 9px 5px;
+    gap: 3px 10px;
+    padding: 4px 9px 3px;
   }
 
   .gx-pot-value {
@@ -270,8 +273,8 @@
   }
 
   .gx-clock {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 1.875rem;
+    height: 1.875rem;
   }
 
   .gx-clock b {
@@ -284,7 +287,7 @@
   }
 
   .gx-signals {
-    padding-top: 4px;
+    padding-top: 2px;
   }
 
   .gx-gauge-track {
