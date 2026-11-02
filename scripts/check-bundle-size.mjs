@@ -443,7 +443,8 @@ const budgets = [
   // the larger gzip plus 4.
   // 102,514 / 35,481 -> 102,517 / 35,481 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 102,517 in the e2e build.
   // 102,517 / 35,481 -> 104,640 / 35,481 on 2026-11-02, money-feedback over main c680ddd5: the purse on the bank rail (readPurse) and the slam's flying amount (MoneyBurst). Measured 104,636 / 35,268, the plus 4.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_640, maxGzip: 35_481 },
+  // 104,640 / 35,481 -> 104,743 / 35,481 on 2026-11-02, money-feedback over main 9be94346: the purse on the bank rail (readPurse) and the slam's flying amount (MoneyBurst). Measured 104,739 / 35,321, the plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_743, maxGzip: 35_481 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -571,7 +572,8 @@ const budgets = [
   // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
   // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
   // 196,965 / 36,722 -> 198,822 / 37,098 on 2026-11-02, money-feedback over main c680ddd5. Measured 198,822 / 37,094 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 198_822, maxGzip: 37_098 },
+  // 198,822 / 37,098 -> 198,856 / 37,110 on 2026-11-02, money-feedback over main 9be94346. Measured 198,856 / 37,106 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 198_856, maxGzip: 37_110 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -708,7 +710,8 @@ const budgets = [
   // Japanese one by characters at 0.89 (readingUnits). Measured 39,879 / 14,791.
   // 14,795 -> 14,836 gzip on 2026-11-02, bgm-variety over main c680ddd5 (#389): no code changed (raw 39,879 as main); the entry's
   // export names it imports shifted with the music's new exports. Measured 14,832 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_883, maxGzip: 14_836 },
+  // 39,883 / 14,836 -> 40,373 / 14,989 on 2026-11-02, money-feedback over main 9be94346: the run's lastChange, seasonGained and seasonLost. Measured 40,369 / 14,985, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_373, maxGzip: 14_989 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1147,8 +1150,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * Four leads per music mode, the reveal sheet's three tracks and the stake
  * layers in the entry (bgm-variety, over main c680ddd5): 425,012, 474,508
  * and 480,304.
+ * money-feedback over main 9be94346: 425,396, 474,932 and 480,752, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 425_016, en: 474_512, ja: 480_308 };
+const FIRST_PAINT_BUDGETS = { ko: 425_400, en: 474_936, ja: 480_756 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1275,7 +1279,8 @@ function checkBudget(file, budget) {
 // network-first pages and its warm-up list. Measured 9,944 / 3,582.
 // 9,948 / 3,586 -> 10,106 / 3,624 on 2026-10-29, adsense-readiness: the about, FAQ and contact pages in three languages
 // join its network-first pages and its warm-up list (nine names). Measured 10,102 / 3,620 over main 3e350266.
-const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_624 };
+// 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_629 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
