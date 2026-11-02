@@ -393,7 +393,8 @@ test("the CSP render.yaml declares allows no inline script and no wildcard origi
   const csp = readRenderYamlCsp(readFileSync("render.yaml", "utf8"));
   assert.ok(csp, "render.yaml declares a CSP");
   assert.deepEqual(cspProblems(csp), []);
-  assert.deepEqual(parseCsp(csp).get("script-src"), ["'self'"]);
+  // 'self' and Google's tag (GA_MEASUREMENT_ID, scripts/analytics-config.mjs), by host: nothing else may run.
+  assert.deepEqual(parseCsp(csp).get("script-src"), ["'self'", "https://www.googletagmanager.com"]);
 });
 test("a CSP is judged by its value, not its presence", () => {
   assert.ok(cspProblems("default-src 'self'; script-src 'self' 'unsafe-inline'").some((p) => p.includes("unsafe-inline")));
