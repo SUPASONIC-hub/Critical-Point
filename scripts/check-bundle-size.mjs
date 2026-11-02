@@ -104,6 +104,7 @@ const budgets = [
   // read on a save (the hold on a type set aside) and the run's direction.
   // 149,806 / 55,026 -> 149,961 / 55,078 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the pre-C-3 hold set aside on a save and the run's direction, on #224's keyed words. Measured 149,961 / 55,074, the gzip plus 4 in the e2e build.
   // 149,982 / 55,050 -> 150,144 / 55,110 on 2026-10-30, C-3·C-4 rules (#320) merged with #224 bb70e777 (main 430dda1e): the direction table and verdicts over #224 and main's ranking save lines. Measured 150,144 / 55,106 in the e2e build, the gzip plus 4.
+  // 150,144 / 55,110 -> 150,282 / 55,161 on 2026-11-02, #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346). Measured 150,282 / 55,157 in the e2e build, the gzip plus 4.
   // 149,965 / 55,098 -> 150,166 / 55,179 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the 판 읽기 row, the peak board's jump and the pre-C-3 hold in one chunk. Measured 150,166 / 55,175 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 150,349 / 55,212 on 2026-10-30, 통합 리허설 (#379): #224 bb70e777 (main 430dda1e) with #307, #316, #320 and #308 merged in. Measured 150,349 / 55,208 in the e2e build, the gzip plus 4.
   // 55,212 -> 55,217 gzip on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 55,213, the gzip plus 4.
@@ -159,6 +160,7 @@ const budgets = [
   // 20,520 / 8,912 in the e2e build, the gzip plus 4. The ladder's three new
   // steps (사건 01 to 03, each with its line) and the direction's names.
   // 26,800 / 11,373 -> 27,810 / 11,699 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the ladder's 사건 01 to 03 steps and their lines (copy/unlocks.js), the directions' names and the streak's sentences (copy/table.js readout). Measured 27,810 / 11,695, the gzip plus 4 in the e2e build.
+  // 27,810 / 11,699 -> 27,811 / 11,706 on 2026-11-02, #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346). Measured 27,811 / 11,702 in the e2e build, the gzip plus 4.
   // 27,810 / 11,699 -> 28,610 / 12,005 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): C-7's tools, the ladder's 사건 01 to 03 lines and the directions' sentences together. Measured 28,610 / 12,001 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 28,610 / 12,002 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 28,610 / 11,998 in the e2e build, the gzip plus 4.
   // 12,002 -> 12,007 gzip on 2026-11-02, 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308. Measured 12,003 in the e2e build, the gzip plus 4.
@@ -342,10 +344,10 @@ const budgets = [
   // 182,038 / 66,124 -> 188,124 / 67,821 on 2026-11-02, bgm-variety over main c680ddd5 (#389): four leads per music mode, the three reveal
   // tracks, the stake layers' pooled voices and src/components/musicScore.js (AdaptiveMusic plays from the start screen, so it sits in the
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
+  // 65,978 -> 65,982 gzip on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: only the chunk names it imports. Measured 65,979, the gzip plus 4 (raw under its line).
   // 181,926 / 65,978 -> 182,095 / 66,082 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b: fetchHallOfFame in telemetry.js and the data notice's hall-of-fame sentence (introCopy.data.hallOfFameNotice). Measured 182,095 / 66,078 in the e2e build, the gzip plus 4.
   // 182,038 / 66,124 -> 182,212 / 66,213 on 2026-10-30, D2 hall of fame draft (#308) merged with #224 bb70e777 (main 430dda1e): fetchHallOfFame and the data notice's hall-of-fame sentence beside main's foot links, storage line and ranking save lines. Measured 182,212 / 66,209 in the e2e build, the gzip plus 4.
   // 66,213 -> 66,218 gzip on 2026-10-30, D2 hall of fame draft (#308) merged with #224 0d29141a (the English bank rail at 360px): only the chunk names it imports. Measured 66,214, the gzip plus 4.
-  // 65,978 -> 65,982 gzip on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: only the chunk names it imports. Measured 65,979, the gzip plus 4 (raw under its line).
   // 182,095 / 66,082 -> 182,219 / 66,139 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): fetchHallOfFame and the notice's sentence over the other three's keyed reads. Measured 182,219 / 66,135 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 182,341 / 66,283 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 182,341 / 66,279 in the e2e build, the gzip plus 4.
   // -> 182,341 / 66,282 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 182,341 / 66,278 in the e2e build, the gzip plus 4.
@@ -864,10 +866,11 @@ const budgets = [
   // 40,661 / 15,278 -> 41,229 / 15,497 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): applyPeak and the new tools on getLogicDirection. Measured 41,229 / 15,493 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 41,229 / 15,499 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 41,229 / 15,495 in the e2e build, the gzip plus 4.
   // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
+  // 39,889 / 14,801 (#224) -> 40,464 / 15,006 on 2026-11-02, C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55). Measured 40,464 / 15,002 in the e2e build, the gzip plus 4.
+  // 40,464 / 15,006 -> 40,464 / 15,050 on 2026-11-02, #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346). Measured raw under / 15,046 in the e2e build, the gzip plus 4.
   // 39,889 / 14,801 (#224) -> 40,661 / 15,278 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 40,661 / 15,274 in the e2e build, the gzip plus 4.
   // 40,661 / 15,278 -> 40,661 / 15,326 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured raw under / 15,322 in the e2e build, the gzip plus 4.
   // 39,889 / 14,836 -> 39,889 / 14,842 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 14,838 in the e2e build, the gzip plus 4.
-  // 39,889 / 14,801 (#224) -> 40,464 / 15,006 on 2026-11-02, C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55). Measured 40,464 / 15,002 in the e2e build, the gzip plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 41_229, maxGzip: 15_499 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -1383,9 +1386,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * D2 hall of fame (#308) merged with #224 8dd649ce (main b2558d55, 11-02): 423,419, 473,091 and 478,884, the plus 4.
  * #224 merged with main 2f085d28 (11-02; #384 bank-rail-fit): 423,304, 472,832 and 478,616, the plus 4.
  * #224 merged with main c680ddd5 and 9be94346 (11-02; #389 #388), Audit n/4 off the 360px bank row: 425,149, 474,677 and 480,461, the plus 4.
+ * C-3·C-4 rules (#320) merged with #224 afdcac0c (main 2f085d28): 423,343, 472,995 and 478,812, the plus 4.
+ * #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346): 425,201, 474,853 and 480,670, the plus 4.
  * C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28): 423,310, 472,884 and 478,684, the plus 4.
  * #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346): 425,154, 474,730 and 480,530, the plus 4.
- * C-3·C-4 rules (#320) merged with #224 afdcac0c (main 2f085d28): 423,343, 472,995 and 478,812, the plus 4.
  * D2 hall of fame (#308) merged with #224 afdcac0c (main 2f085d28): 423,459, 473,131 and 478,924, the plus 4.
  */
 // ko 422,779 -> 422,891, en 472,179 -> 472,502, ja 477,926 -> 478,315 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the index CSS's board marks and the five icons in icons-vendor (both on the first paint), and each dictionary's new lines. Measured 422,887 / 472,498 / 478,311. Measured in the e2e build, the gzip plus 4.
