@@ -183,7 +183,6 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </div>
           </div>
           <section className="outcome-panel" aria-label={resultCopy.outcomeLabel}>
-            {/* The case's last room, toned to how it closed (useResultReport). Decorative, like every plate. */}
             {caseOutcome.scene && <ScenePlate node={caseOutcome.scene.node} nodeId={caseOutcome.scene.nodeId} variant="result" outcome={caseOutcome.scene.tone} />}
             <div className="outcome-panel-mark">
               <span lang="en">YOUR CONSEQUENCE</span>

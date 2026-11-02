@@ -27,7 +27,8 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComput
 // 283,500 -> 197,740 on 2026-10-26 (first-paint-cut): the weight axis cut to
 // 400-920 (scripts/build-fonts.mjs). Measured 197,736, plus 4; the same line as
 // the woff2's in check-bundle-size.mjs.
-const MAX_FONT_BYTES = 197_740;
+// 197,740 -> 198,148 on 2026-11-02, plate-story (#392): the Japanese sounds lettered in the plate add ク, ド and ン (1,697 -> 1,700 characters). Measured 198,144 plus 4.
+const MAX_FONT_BYTES = 198_148;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones

@@ -587,7 +587,8 @@ const budgets = [
   // 283,500 -> 197,740 on 2026-10-26, first-paint-cut (the user's choice 1): the
   // weight axis cut to 400-920, nothing asking for less. Measured 197,736 (from
   // 270,828), plus 4.
-  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 197_740, compressed: true },
+  // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): ク, ド and ン for the Japanese sounds in the plate. Measured 198,144 plus 4.
+  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 198_148, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
