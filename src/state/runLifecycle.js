@@ -1,5 +1,6 @@
 import {
   createRunId as createRunIdDefault,
+  DEFAULT_PLAYER_NAME,
   normalizePlayerName,
   OPERATOR_ORIGIN_KEY,
   RECOVERY_CENTER_STORAGE_KEY,
@@ -83,7 +84,7 @@ export function createRunLifecycle({
     const patch = runTransition(run, {
       type: "newGame",
       runId: createRunId(),
-      playerName: normalizePlayerName(run.playerName) || "분석관",
+      playerName: normalizePlayerName(run.playerName) || DEFAULT_PLAYER_NAME,
       veteran: veteran === true,
       echo: veteran === true && typeof echo === "string" ? echo : null,
       story,
