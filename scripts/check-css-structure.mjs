@@ -295,6 +295,8 @@ const fileBudgets = {
   // -> 56546 on 2026-10-30, measured: #224 merged with main b2558d55, the
   // Japanese card labels (main) and the English bank rail (#224) together.
   // -> 56662 on 2026-10-30, measured: #316's marks over #224 8dd649ce (main b2558d55).
+  // -> 56662 on 2026-11-02, measured: #316 merged with #224 8dd649ce (main
+  // b2558d55), the board's marks beside the Japanese card labels.
   "play.css": { lines: 2931, bytes: 56662 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
