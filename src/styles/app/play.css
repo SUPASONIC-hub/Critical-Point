@@ -2414,6 +2414,23 @@
   .gx-reveal-consequence b {
     font-size: 0.75rem;
   }
+
+  /* Every five-card hand on a phone gives back the air a rules line's
+     hand gives (below), and 1px more of each: 5px block paddings, 3px between
+     a card's parts and between rows. English took the first step
+     (en-hand5-linux); the bank rail's purse line (money.css, 2026-11-02) took
+     about 21px more of the HUD, and on Linux Japanese then put 63 hands at a
+     pot of 0 up to 11px, and late-season tables (LAYOUT_BANK=max) in all three
+     languages up to 31px, under the action bar; at 390x844 the densest sealed
+     board's last card went 21px under it. */
+  .gauntlet-stage .hand-5 {
+    gap: 3px;
+  }
+
+  .gauntlet-stage .hand-5 .gx-card {
+    gap: 3px;
+    padding-block: 5px;
+  }
 }
 
 /* A short phone reads the scene without its portrait, in two lines of question.
@@ -2594,22 +2611,6 @@
   :lang(en) .gx-card-label {
     font-size: 0.75rem;
     line-height: 1.25;
-  }
-
-  /* Every five-card hand at 360px or less gives back the air a rules line's
-     hand gives (above), and 1px more of each: 5px block paddings, 3px between
-     a card's parts and between rows. English took the first step
-     (en-hand5-linux); the bank rail's purse line (money.css, 2026-11-02) took
-     about 21px more of the HUD, and on Linux Japanese then put 63 hands at a
-     pot of 0 up to 11px, and late-season tables (LAYOUT_BANK=max) in all three
-     languages up to 31px, under the action bar. */
-  .gauntlet-stage .hand-5 {
-    gap: 3px;
-  }
-
-  .gauntlet-stage .hand-5 .gx-card {
-    gap: 3px;
-    padding-block: 5px;
   }
 
   /* The bank row is one line at a pot of 0 and two late in a season: at a pot

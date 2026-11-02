@@ -123,13 +123,14 @@
   }
 }
 
-/* The purse's total is a 1.25rem line in a 310px rail; on 360px or less it
-   takes a step down, and the season's columns join its line when they fit.
-   Height is the HUD's scarcest room there (bank-rail-fit): Linux CI measures
-   it: the line is set solid (line-height 1) so the CJK face's taller small
-   text does not open it, and the five-card hands give back the rest
-   (play.css). */
-@media (max-width: 360px) {
+/* The purse's total is a 1.25rem line in a wide rail; on a phone (480px or
+   less) it takes a step down, set solid (line-height 1) so the CJK face's
+   taller small text does not open it, and the season's columns join its line
+   when they fit. Height is the HUD's scarcest room there (bank-rail-fit):
+   Linux CI measured 360x740 five-card hands and the densest boards at
+   390x844, and the five-card hands give back the rest (play.css). A phone on
+   its side puts the HUD in a column as narrow, and takes the same line. */
+@media (max-width: 480px), (max-height: 480px) and (orientation: landscape) and (pointer: coarse) {
   .gauntlet-stage .gx-purse {
     line-height: 1;
   }
