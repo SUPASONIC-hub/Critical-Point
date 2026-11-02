@@ -2590,21 +2590,36 @@
      Windows), and 22 hands at a pot of 0 put the last card 4px under the
      action bar (360x740, hand5, 2026-11-02). A 12px label on 15px lines takes
      6px off every three-line row and brings some to two; the words stay.
-     Late in a season the bank row's second line takes 20px more, so an
-     English five-card hand also keeps the air a rules line's hand keeps
-     (above): 6px block paddings, 4px between a card's parts and between rows. */
+     Late in a season the bank row's second line takes 20px more. */
   :lang(en) .gx-card-label {
     font-size: 0.75rem;
     line-height: 1.25;
   }
 
-  :lang(en) .gauntlet-stage .hand-5 {
+  /* So every five-card hand keeps the air a rules line's hand keeps (above):
+     6px block paddings, 4px between a card's parts and between rows. English
+     took it first (en-hand5-linux); the bank rail's purse line (money.css,
+     2026-11-02) took 21px more of the HUD, and Japanese on Linux then put 63
+     hands up to 11px under the action bar, so it is every language's now. */
+  .gauntlet-stage .hand-5 {
     gap: 4px;
   }
 
-  :lang(en) .gauntlet-stage .hand-5 .gx-card {
+  .gauntlet-stage .hand-5 .gx-card {
     gap: 4px;
     padding-block: 6px;
+  }
+
+  /* English, with the longest labels, gives 1px more of each: late in a
+     season (LAYOUT_BANK=max) the purse line and the bank's second line put
+     five hands 7px under the action bar on Linux. */
+  :lang(en) .gauntlet-stage .hand-5 {
+    gap: 3px;
+  }
+
+  :lang(en) .gauntlet-stage .hand-5 .gx-card {
+    gap: 3px;
+    padding-block: 5px;
   }
 
   /* The bank row is one line at a pot of 0 and two late in a season: at a pot

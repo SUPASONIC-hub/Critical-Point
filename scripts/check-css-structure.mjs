@@ -280,7 +280,9 @@ const fileBudgets = {
   // -> 56733 bytes on 2026-11-02, measured (en-hand5-linux): on 360px or less
   // an English card label 12px / 1.25 and an English five-card hand's air
   // trimmed, so Linux fonts keep the hand above the action bar.
-  "play.css": { lines: 2931, bytes: 56733 },
+  // -> 2940 lines / 56860 bytes on 2026-11-02, measured (money-feedback): the
+  // five-card air for every language at 360px or less, and English 1px less.
+  "play.css": { lines: 2940, bytes: 56860 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -407,8 +409,9 @@ const fileBudgets = {
   "comfort.css": { lines: 175, bytes: 3849 },
   // New on 2026-11-02 (money-feedback): the bank rail's purse and the slam's
   // amount that flies into it, in a file of its own so play.css's 360px fits
-  // are not touched. Measured 128 / 2331.
-  "money.css": { lines: 128, bytes: 2331 },
+  // are not touched. Measured 128 / 2331. 133 / 2406 on 2026-11-02: the
+  // purse line set solid at 360px or less (Linux hand5, Japanese).
+  "money.css": { lines: 133, bytes: 2406 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

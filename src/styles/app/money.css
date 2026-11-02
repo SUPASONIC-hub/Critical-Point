@@ -126,10 +126,17 @@
 /* The purse's total is a 1.25rem line in a 310px rail; on 360px or less it
    takes a step down, and the season's columns join its line when they fit.
    Height is the HUD's scarcest room there (bank-rail-fit): Linux CI measures
-   it. */
+   it: the line is set solid (line-height 1) so the CJK face's taller small
+   text does not open it, and the five-card hands give back the rest
+   (play.css). */
 @media (max-width: 360px) {
+  .gauntlet-stage .gx-purse {
+    line-height: 1;
+  }
+
   .gauntlet-stage .gx-purse > strong {
     font-size: 1.0625rem;
+    line-height: 1;
   }
 
   .gauntlet-stage .gx-purse-season {
