@@ -21,7 +21,7 @@ export default {
           "label": "社外取締役七人の票をまず素早く数える"
         },
         "reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         }
       },
       "place": "KDキャピタル本社 · リスク管理部",
@@ -49,7 +49,7 @@ export default {
           "label": "確率表どおり票になる二人だけを狙って攻める"
         },
         "reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         },
         "c43_ledger_evidence_turn": {
           "label": "表決より先に書かれた報道資料二枚を開く"
@@ -80,7 +80,7 @@ export default {
           "label": "改革条件は後回しにし解任賛成の勧告だけ頼む"
         },
         "reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         },
         "c43_advisor_evidence_turn": {
           "label": "表決より先に書かれた報道資料二枚を開く"
@@ -111,7 +111,7 @@ export default {
           "label": "今の言葉を署名入りの陳述書に残すよう求める"
         },
         "reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         },
         "c43_corridor_evidence_turn": {
           "label": "表決より先に書かれた報道資料二枚を開く"
@@ -451,7 +451,7 @@ export default {
           "label": "取締役会規程と議案説明書を条項ごとに詰める"
         },
         "c43_start_warm_reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         }
       },
       "place": "KDキャピタル本社 · リスク管理部",
@@ -481,7 +481,7 @@ export default {
           "label": "社外取締役七人の票をまず素早く数える"
         },
         "c43_start_record_reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         }
       },
       "place": "KDキャピタル本社 · リスク管理部",
@@ -511,7 +511,7 @@ export default {
           "label": "まずペク・アリンを訪ね、証言資料を一緒にまとめる"
         },
         "c43_start_rush_reframe": {
-          "label": "取締役会が解任を何に使ってきたかを問う"
+          "label": "取締役会は解任を何に使ったかを問う"
         }
       },
       "place": "KDキャピタル本社 · リスク管理部",
