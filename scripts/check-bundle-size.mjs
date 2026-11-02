@@ -558,7 +558,10 @@ const budgets = [
   // -> 196,795 / 36,700 on 2026-10-30, bank-rail-fit over main 78e53e40 (#382): on 360px or less the HUD gives up its air
   // (30px clock, 18px bank pills, tighter gaps) so a bank row on two lines keeps a five-card hand above the action bar.
   // Measured 196,795 / 36,696 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_795, maxGzip: 36_700 },
+  // -> 196,965 / 36,722 on 2026-11-02, en-hand5-linux over main 2f085d28 (#384): on 360px or less an English
+  // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
+  // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_965, maxGzip: 36_722 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1124,8 +1127,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The HUD's air on 360px or less, so a late-season bank row on two lines keeps
  * the hand above the bar (bank-rail-fit, over main 78e53e40; the index CSS
  * carries the rule): 423,219, 472,715 and 478,511.
+ * An English card label and five-card hand tighter on 360px or less, for
+ * Linux fonts (en-hand5-linux, over main 2f085d28; the index CSS carries the
+ * rule): 423,305, 472,803 and 478,599.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_223, en: 472_719, ja: 478_515 };
+const FIRST_PAINT_BUDGETS = { ko: 423_309, en: 472_807, ja: 478_603 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

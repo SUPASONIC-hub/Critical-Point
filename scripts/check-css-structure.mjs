@@ -277,7 +277,10 @@ const fileBudgets = {
   // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
   // the HUD gives up its air so a bank row on two lines (late-season numbers)
   // keeps a five-card hand above the action bar.
-  "play.css": { lines: 2931, bytes: 56505 },
+  // -> 56733 bytes on 2026-11-02, measured (en-hand5-linux): on 360px or less
+  // an English card label 12px / 1.25 and an English five-card hand's air
+  // trimmed, so Linux fonts keep the hand above the action bar.
+  "play.css": { lines: 2931, bytes: 56733 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
