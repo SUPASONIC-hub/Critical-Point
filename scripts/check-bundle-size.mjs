@@ -586,9 +586,8 @@ const budgets = [
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
   // 196,655 / 36,661 -> 196,837 / 36,700 on 2026-10-30, #224 merged with main b2558d55 (#380 #381 #382 #383): main's Japanese card labels and 360px start button over #224's link tag, signal row and English bank rail. Measured 196,837 / 36,696 in the e2e build, the gzip plus 4.
-  // PROVISIONAL on 2026-11-02, #224 merged with main 2f085d28 (#384 bank-rail-fit): the sum of both sides' measured growth over 196,523 / 36,646
-  // (#224 +314 / +50, bank-rail-fit +272 / +50) plus 11 for the English gap as column-gap, the gzip plus 4. To be re-measured in the e2e build when a build slot frees.
-  { pattern: /^index-.*\.css$/, maxBytes: 197_120, maxGzip: 36_750 },
+  // 196,837 / 36,700 -> 197,093 / 36,749 on 2026-11-02, #224 merged with main 2f085d28 (#384 bank-rail-fit): main's 360px HUD block over #224's link tag, signal row and English bank rail, the English gap now column-gap: 3px at the end of that block. Measured 197,093 / 36,745 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 197_093, maxGzip: 36_749 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1193,10 +1192,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
  * The English bank rail fitted to a 360px phone (#224 hand5-en, 10-30; the critical CSS does not carry it): 423,147, 472,682 and 478,466, the plus 4.
  * #224 merged with main b2558d55 (10-30 evening; #380 #381 #382 #383): 423,175, 472,704 and 478,488, the plus 4.
- * PROVISIONAL (11-02): #224 merged with main 2f085d28 (#384 bank-rail-fit), the sum of both
- * sides' measured growth (423,175 + 48, 472,704 + 48, 478,488 + 48), the plus 4; to be re-measured.
+ * #224 merged with main 2f085d28 (11-02; #384 bank-rail-fit): 423,304, 472,832 and 478,616, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_227, en: 472_756, ja: 478_540 };
+const FIRST_PAINT_BUDGETS = { ko: 423_308, en: 472_836, ja: 478_620 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
