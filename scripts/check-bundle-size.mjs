@@ -110,6 +110,7 @@ const budgets = [
   // 55,115 -> 55,120 gzip on 2026-11-02, C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55). Measured 55,116 in the e2e build, the gzip plus 4.
   // 150,155 / 55,120 -> 150,271 / 55,174 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured 150,271 / 55,170 in the e2e build, the gzip plus 4.
   // 55,057 -> 55,062 gzip on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 55,058 in the e2e build, the gzip plus 4.
+  // 150,122 / 55,099 -> 150,140 / 55,112 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured 150,140 / 55,108 in the e2e build, the gzip plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_349, maxGzip: 55_217 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -689,12 +690,13 @@ const budgets = [
   // 196,837 / 36,700 -> 197,093 / 36,749 on 2026-11-02, #224 merged with main 2f085d28 (#384 bank-rail-fit): main's 360px HUD block over #224's link tag, signal row and English bank rail, the English gap now column-gap: 3px at the end of that block. Measured 197,093 / 36,745 in the e2e build, the gzip plus 4.
   // 197,093 / 36,749 -> 197,687 / 36,906 on 2026-11-02, #224 merged with main c680ddd5 (#389) and 9be94346 (#388): main's English 360px hand over #224's rules, and on 360px or less
   // Audit n/4 moves from the bank row to the signals' row (.gx-hud.has-audit, .gx-hud-audit). Measured 197,687 / 36,902 in the e2e build, the gzip plus 4.
+  // 196,935 / 36,727 -> 197,191 / 36,774 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 197,191 / 36,770 in the e2e build, the gzip plus 4.
+  // 197,687 / 36,906 -> 197,785 / 36,939 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured 197,785 / 36,935 in the e2e build, the gzip plus 4.
   // 196,890 / 36,709 -> 197,146 / 36,758 on 2026-11-02, C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28). Measured 197,146 / 36,754 in the e2e build, the gzip plus 4.
   // 197,687 / 36,906 -> 197,740 / 36,906 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured 197,740 in the e2e build, the gzip plus 4.
-  // 196,935 / 36,727 -> 197,191 / 36,774 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 197,191 / 36,770 in the e2e build, the gzip plus 4.
   // 197,081 / 36,731 -> 197,337 / 36,778 on 2026-11-02, D2 hall of fame (#308) merged with #224 afdcac0c (main 2f085d28). Measured 197,337 / 36,774 in the e2e build, the gzip plus 4.
   // 197,232 / 36,764 -> 197,488 / 36,813 on 2026-11-02, 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308. Measured 197,488 / 36,809 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 197_740, maxGzip: 36_906 },
+  { pattern: /^index-.*\.css$/, maxBytes: 197_785, maxGzip: 36_939 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -862,8 +864,9 @@ const budgets = [
   // 40,661 / 15,278 -> 41,229 / 15,497 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): applyPeak and the new tools on getLogicDirection. Measured 41,229 / 15,493 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 41,229 / 15,499 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 41,229 / 15,495 in the e2e build, the gzip plus 4.
   // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
-  // 39,889 / 14,836 -> 39,889 / 14,842 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 14,838 in the e2e build, the gzip plus 4.
   // 39,889 / 14,801 (#224) -> 40,661 / 15,278 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 40,661 / 15,274 in the e2e build, the gzip plus 4.
+  // 40,661 / 15,278 -> 40,661 / 15,326 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured raw under / 15,322 in the e2e build, the gzip plus 4.
+  // 39,889 / 14,836 -> 39,889 / 14,842 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 14,838 in the e2e build, the gzip plus 4.
   // 39,889 / 14,801 (#224) -> 40,464 / 15,006 on 2026-11-02, C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55). Measured 40,464 / 15,002 in the e2e build, the gzip plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 41_229, maxGzip: 15_499 },
   // The season's result card: the two buttons at the ending, the card's
@@ -1384,6 +1387,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346): 425,154, 474,730 and 480,530, the plus 4.
  * C-3·C-4 rules (#320) merged with #224 afdcac0c (main 2f085d28): 423,343, 472,995 and 478,812, the plus 4.
  * D2 hall of fame (#308) merged with #224 afdcac0c (main 2f085d28): 423,459, 473,131 and 478,924, the plus 4.
+ */
 // ko 422,779 -> 422,891, en 472,179 -> 472,502, ja 477,926 -> 478,315 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the index CSS's board marks and the five icons in icons-vendor (both on the first paint), and each dictionary's new lines. Measured 422,887 / 472,498 / 478,311. Measured in the e2e build, the gzip plus 4.
 // ko 423,110 -> 423,241, en 472,645 -> 472,970, ja 478,429 -> 478,812 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,237, 472,966 and 478,808, the plus 4.
 // ko 423,241 -> 423,269, en 472,970 -> 472,998, ja 478,812 -> 478,840 on 2026-10-30, table rhythm bundle (#316) merged with #224 0d29141a (the English bank rail at 360px), 10-30: 423,265, 472,994 and 478,836, the plus 4.
@@ -1391,9 +1395,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55, 11-02): 423,374, 473,096 and 478,938, the plus 4.
 // 통합 리허설 (#379) over #224 8dd649ce (main b2558d55) with #307 #316 #320 #308, 11-02: 423,612, 473,680 and 479,530, the plus 4.
 // table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28): 423,425, 473,149 and 478,991, the plus 4.
+// #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346): 425,280, 475,004 and 480,846, the plus 4.
 // 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308: 423,661, 473,729 and 479,579, the plus 4.
- */
-const FIRST_PAINT_BUDGETS = { ko: 425_158, en: 474_734, ja: 480_534 };
+const FIRST_PAINT_BUDGETS = { ko: 425_284, en: 475_008, ja: 480_850 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

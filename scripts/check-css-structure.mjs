@@ -311,9 +311,10 @@ const fileBudgets = {
   // 360px or less Audit n/4 moves from the bank row to the signals' row (.gx-hud.has-audit, .gx-hud-audit).
   // -> 57012 bytes, 2952 lines on 2026-11-02, measured: #316 merged with #224
   // afdcac0c (main 2f085d28), the board's marks beside the 360px HUD.
+  // -> 57800 bytes, 2994 lines on 2026-11-02, measured: merged with #224 c29c2efd (main 9be94346, Audit n/4 off the 360px bank row).
   // -> 57012 bytes, 2952 lines on 2026-11-02, measured: 통합 리허설 (#379) over
   // #224 afdcac0c with #307 #316 #320 #308, the same as #316 alone.
-  "play.css": { lines: 2986, bytes: 57684 },
+  "play.css": { lines: 2994, bytes: 57800 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
