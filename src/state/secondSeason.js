@@ -18,9 +18,11 @@
 import { getSeasonRound } from "../appConfig.js";
 import { getCaseOutcome } from "../gameLogic.js";
 import { isPlainObject, normalizeSeasonRecord } from "./seasonRecord.js";
+import { fill } from "../locale.js";
+import W from "../copy/seasonLines.js";
 
-// What getCaseOutcome answers for a choice its case has no aftermath for.
-const UNRECORDED_TAG = getCaseOutcome({ caseId: "", choiceId: "" }).tag;
+// What getCaseOutcome answers for a choice its case has no aftermath for, asked when it is compared so it is the page's language.
+const unrecordedTag = () => getCaseOutcome({ caseId: "", choiceId: "" }).tag;
 
 /**
  * The lines the last ruling leaves on four cases' first pages (B-14(2)).
@@ -29,32 +31,8 @@ const UNRECORDED_TAG = getCaseOutcome({ caseId: "", choiceId: "" }).tag;
  * then what this one will watch. A season whose verdict is open, or unknown,
  * has none.
  */
-export const CASE_ECHOES = Object.freeze({
-  prologue02: Object.freeze({
-    ending_seal: "지난 시즌의 기록은 봉인된 채 끝났습니다. 이번 의견서가 누구의 서랍에 들어가는지 보겠습니다.",
-    ending_reform: "지난 시즌의 기록은 기준표로 남았습니다. 이번 의견서가 그 기준의 첫 줄이 되는지 보겠습니다.",
-    ending_expose: "지난 시즌의 기록은 바깥으로 나갔습니다. 이번 의견서에 누구의 이름이 함께 실리는지 보겠습니다.",
-    collapse: "지난 시즌은 사람이 치른 값 앞에서 멈췄습니다. 이번 의견서가 그 값을 먼저 적는지 보겠습니다.",
-  }),
-  case01: Object.freeze({
-    ending_seal: "지난 시즌의 기록은 봉인되었지만 이 폴더는 다시 열렸습니다. 이번 72시간에는 무엇을 닫을지 보겠습니다.",
-    ending_reform: "지난 시즌에 남긴 기준표는 이 분석관실에 아직 닿지 않았습니다. 이번 72시간에 그 기준을 다시 세우는지 보겠습니다.",
-    ending_expose: "지난 시즌에 내보낸 기록은 보호받아야 할 이름 가까이까지 번졌습니다. 이번 72시간에는 누구를 먼저 지킬지 보겠습니다.",
-    collapse: "지난 시즌의 운영은 사람 피해를 감당하지 못하고 무너졌습니다. 이번 72시간에는 그 값이 누구에게 가는지 먼저 보겠습니다.",
-  }),
-  case48: Object.freeze({
-    ending_seal: "지난 시즌의 기록은 봉인되었지만 같은 조항은 다른 이름으로 돌아왔습니다. 이번에는 그 조항 옆에 누가 이름을 적는지 보겠습니다.",
-    ending_reform: "지난 시즌의 기록은 사용 규칙의 기준표가 되었습니다. 이번에는 그 감시가 제7조까지 닿는지 보겠습니다.",
-    ending_expose: "지난 시즌의 기록은 바깥에서 읽혔습니다. 이번에는 제7조를 쓴 사람들의 이름이 어디까지 번지는지 보겠습니다.",
-    collapse: "지난 시즌은 사람이 치른 값을 감당하지 못하고 멈췄습니다. 이번에는 이 조항에 걸린 사람들 앞에 끝까지 서 있는지 보겠습니다.",
-  }),
-  final: Object.freeze({
-    ending_seal: "지난 시즌의 당신은 이 기록을 봉인했습니다. 이번에도 같은 문을 닫을지 보겠습니다.",
-    ending_reform: "지난 시즌의 당신은 이 기록을 사용 규칙으로 바꿨습니다. 이번에도 같은 규칙을 고를지 보겠습니다.",
-    ending_expose: "지난 시즌의 당신은 이 기록을 바깥에 내보냈습니다. 이번에도 같은 문을 열지 보겠습니다.",
-    collapse: "지난 시즌은 이 자리까지 왔지만 사람이 치른 값을 감당하지 못했습니다. 이번에는 무엇을 먼저 셀지 보겠습니다.",
-  }),
-});
+// The lines are src/copy/seasonLines.js's (`caseEchoes`), where another language is laid over them.
+export const CASE_ECHOES = W.caseEchoes;
 
 /** The line the last ruling leaves on this case's first page, or null. */
 export function getCaseEcho(caseId, verdict) {
@@ -89,7 +67,7 @@ function closedOutcome(results, caseId) {
   const choiceId = results?.[caseId]?.outcomeChoiceId;
   if (typeof choiceId !== "string" || !choiceId) return null;
   const outcome = getCaseOutcome({ caseId, choiceId });
-  return outcome.tag === UNRECORDED_TAG ? null : outcome;
+  return outcome.tag === unrecordedTag() ? null : outcome;
 }
 
 /**
@@ -99,7 +77,7 @@ function closedOutcome(results, caseId) {
 export function getCaseRecall(results, caseId) {
   const outcome = closedOutcome(results, caseId);
   // Every tag ends on 결말 (tests/unit/second-season.test.mjs), so the particle is always 로.
-  return outcome ? `지난 시즌 이 사건은 ‘${outcome.tag}’로 닫혔습니다.` : null;
+  return outcome ? fill(W.recall, { tag: outcome.tag }) : null;
 }
 
 /**
@@ -109,8 +87,8 @@ export function getCaseRecall(results, caseId) {
  */
 export function getCaseComparison(results, caseId, outcome) {
   const past = closedOutcome(results, caseId);
-  if (!past || !outcome?.tag || outcome.tag === UNRECORDED_TAG) return null;
-  return past.tag === outcome.tag ? `지난 시즌에도 ${outcome.tag}` : `지난 시즌 ${past.tag} · 이번 시즌 ${outcome.tag}`;
+  if (!past || !outcome?.tag || outcome.tag === unrecordedTag()) return null;
+  return past.tag === outcome.tag ? fill(W.comparison.caseSame, { tag: outcome.tag }) : fill(W.comparison.versus, { before: past.tag, now: outcome.tag });
 }
 
 /**
@@ -179,9 +157,9 @@ export function seasonLabel(round) {
 export function getSeasonCard({ secondSeason, pastEndingName = "", weekRuleLabel = "" } = {}) {
   const round = secondSeason?.round ?? 1;
   const parts = [
-    round > 1 ? `${round}회차` : "",
-    round > 1 && pastEndingName ? `지난 시즌 결말 ‘${pastEndingName}’` : "",
-    weekRuleLabel ? `이번 주의 규칙 ${weekRuleLabel}` : "",
+    round > 1 ? fill(W.card.round, { round }) : "",
+    round > 1 && pastEndingName ? fill(W.card.pastEnding, { ending: pastEndingName }) : "",
+    weekRuleLabel ? fill(W.card.weekRule, { rule: weekRuleLabel }) : "",
   ].filter(Boolean);
   return { season: `${seasonLabel(round)} · FINAL RECORD`, share: parts.length ? ` ${parts.join(" · ")}.` : "" };
 }

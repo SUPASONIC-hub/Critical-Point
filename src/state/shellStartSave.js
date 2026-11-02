@@ -1,7 +1,7 @@
 import { createRunId, makeEmptyScores, normalizePlayerName, SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, triggerLabels } from "../gameConstants.js";
-import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
+import { createOpeningResources, openingEcho } from "./openingState.js";
 
 /**
  * The save 시작 writes from the pre-start shell, before the runtime is there.
@@ -41,7 +41,7 @@ export function createStartSave(
     log: [],
     triggers: makeEmptyScores(triggerLabels),
     cognition: makeEmptyScores(cognitionLabels),
-    echo: OPENING_ECHO,
+    echo: openingEcho(),
     nodeEnteredAt: now,
     pendingTelemetry: [],
     dynamics: null,

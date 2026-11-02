@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
 import { chapterMotifs, groovePresets, musicModes, originMotifs, speakerMotifs } from "./musicData.js";
+import musicCopy from "../copy/music.js";
+import { fill } from "../locale.js";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
 const STEPS_PER_BAR = 16;
@@ -759,12 +761,12 @@ export function AdaptiveMusic({ modeKey }) {
 
   const toggleLabel =
     audioState === "unsupported"
-      ? "이 브라우저는 배경음을 지원하지 않습니다"
+      ? musicCopy.unsupported
       : !enabled
-        ? "배경음 켜기"
+        ? musicCopy.turnOn
         : audioState === "running"
-          ? "배경음 끄기"
-          : "배경음 재생하기";
+          ? musicCopy.turnOff
+          : musicCopy.resume;
   // Playing, the button shows the mode; its name starts with that (WCAG 2.5.3).
   const playing = enabled && audioState === "running";
   const toggleName = playing ? `${mode.label} ${toggleLabel}` : toggleLabel;
@@ -798,8 +800,8 @@ export function AdaptiveMusic({ modeKey }) {
           type="button"
           className="music-volume-toggle"
           onClick={cycleVolumePreset}
-          aria-label={`배경음악 볼륨 ${volumePresets[volumePreset].label}`}
-          title="배경음악 볼륨"
+          aria-label={fill(musicCopy.volumeLevel, { level: volumePresets[volumePreset].label })}
+          title={musicCopy.volume}
         >
           <Volume1 size={16} />
           <span>{volumePresets[volumePreset].label}</span>
