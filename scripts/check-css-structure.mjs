@@ -291,11 +291,17 @@ const fileBudgets = {
   // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
   // the HUD gives up its air so a bank row on two lines (late-season numbers)
   // keeps a five-card hand above the action bar.
+  // -> 56733 bytes on 2026-11-02, measured (en-hand5-linux): on 360px or less
+  // an English card label 12px / 1.25 and an English five-card hand's air
+  // trimmed, so Linux fonts keep the hand above the action bar.
   // -> 56896 bytes, 2944 lines on 2026-11-02, measured: #224 merged with main 2f085d28, bank-rail-fit's
   // 360px HUD (main) with the English bank rail (#224) folded into its block.
+  // -> 57684 bytes, 2986 lines on 2026-11-02, measured: #224 merged with main c680ddd5 (#389 en-hand5-linux), and on
+  // 360px or less Audit n/4 moves from the bank row to the signals' row (.gx-hud.has-audit, .gx-hud-audit).
   // -> 57012 bytes, 2952 lines on 2026-11-02, measured: #316 merged with #224
   // afdcac0c (main 2f085d28), the board's marks beside the 360px HUD.
-  "play.css": { lines: 2952, bytes: 57012 },
+  // -> 57800 bytes, 2994 lines on 2026-11-02, measured: merged with #224 c29c2efd (main 9be94346, Audit n/4 off the 360px bank row).
+  "play.css": { lines: 2994, bytes: 57800 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
