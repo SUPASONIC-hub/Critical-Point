@@ -514,13 +514,21 @@
   flex: 0 0 auto;
 }
 
-.gx-bank .gx-at-risk {
+.gx-bank .gx-at-risk,
+.gx-hud-audit.gx-at-risk {
   border-color: rgb(255 142 76 / 0.4);
 }
 
 .gx-bank .gx-at-risk b,
-.gx-bank .gx-at-risk svg {
+.gx-bank .gx-at-risk svg,
+.gx-hud-audit.gx-at-risk b {
   color: var(--c-gx-ember);
+}
+
+/* The audit count's second place, beside the signals: a 360px phone shows it
+   there instead of in the run's line (the max-width: 360px block). */
+.gx-hud-audit {
+  display: none;
 }
 
 .gx-run-signal b + small {
@@ -2592,6 +2600,28 @@
     letter-spacing: -0.03em;
   }
 
+  /* English labels are the longest of the three: on Linux 85% of the
+     five-card labels run to three lines (cards 115 to 121px tall, 92 on
+     Windows), and 22 hands at a pot of 0 put the last card 4px under the
+     action bar (360x740, hand5, 2026-11-02). A 12px label on 15px lines takes
+     6px off every three-line row and brings some to two; the words stay.
+     Late in a season the bank row's second line takes 20px more, so an
+     English five-card hand also keeps the air a rules line's hand keeps
+     (above): 6px block paddings, 4px between a card's parts and between rows. */
+  :lang(en) .gx-card-label {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  :lang(en) .gauntlet-stage .hand-5 {
+    gap: 4px;
+  }
+
+  :lang(en) .gauntlet-stage .hand-5 .gx-card {
+    gap: 4px;
+    padding-block: 6px;
+  }
+
   /* The bank row is one line at a pot of 0 and two late in a season: at a pot
      of 99,999, a vault of 1,999,999 and a streak line of 49 / 99 / x64 the three
      pills need 385 to 404px of a 310px row, and the second line put the last
@@ -2640,6 +2670,34 @@
 
   :lang(en) .gx-bank .gx-stat small {
     font-size: 0.625rem;
+  }
+
+  /* Audit n/4 (RULES_MARK 3) leaves the run's line for the signals' row, at
+     its right end under the clock: with it the bank row ran to two lines at a
+     pot of 0 on Linux fonts (hand5 on CI, 360x740: English 103 hands 24px
+     under the action bar, Japanese 63 by 10px; 2026-11-02). The clock keeps
+     its own column, so the pot's row is as wide as before; with no signals
+     the count takes that row alone. The same words, in a pill of the bank's. */
+  .gauntlet-stage .gx-hud.has-audit {
+    grid-template-columns: minmax(0, 1fr) auto 1.875rem;
+    grid-template-areas:
+      "pot pot clock"
+      "bank bank bank"
+      "signals audit audit";
+  }
+
+  .gauntlet-stage .gx-run-signal .gx-audit-wide {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-hud-audit {
+    display: inline-flex;
+    grid-area: audit;
+    justify-self: end;
+    align-self: end;
+    min-height: 18px;
+    padding-block: 0;
+    line-height: 1.2;
   }
 }
 
