@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-02 (the state of `main` at `acf3d99`, after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) and the English and Japanese gaps filled (#393); what changed and when is in `git log`)
+Last updated: 2026-11-02 (the state of `main` at `b5abd68`, after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -457,8 +457,13 @@ Still open, on purpose:
   `music-lab.html`; first screen +1.7KB); #393 (English and Japanese
   untranslated strings filled, the 95 character profiles in a late chunk,
   the doubled "analyst" title once, a guard against Hangul in those two
-  languages). Four PRs merged, production build-sha `acf3d99`, 1,627 unit
-  tests. #322 followed main; #224's bundle children followed
+  languages); #391 (money feedback: large win and BUST amounts fly to the
+  bank rail, which now leads with the balance, the last hand's up or down
+  and the season's total gain or loss; no overflow in 12 combinations at
+  360px, five-card hand spacing at 480px and under, new `money.css`). Five
+  PRs merged, production build-sha `b5abd68`, 1,637 unit tests. Drafts:
+  #394 (scene prose trim 1, after W47), #392 (waiting, can merge
+  tomorrow). #322 followed main; #224's bundle children followed
   rules-mark-3b: #307 `50e7957f`, #316 `b008cb11`, #320 `d4a6ed3b`, #308
   `558088ad`, #379 `e57c9864`.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
