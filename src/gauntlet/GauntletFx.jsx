@@ -4,6 +4,7 @@ import { getCloseness, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEn
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, isQuietTable, monotonicNow, registerFxVariables } from "./fxVariables.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
+import { setMusicStake } from "../components/AdaptiveMusic.jsx";
 
 /**
  * The body of the window: vignette, heartbeat, drone and shake.
@@ -59,6 +60,11 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * steps. The tick light and the clock stay, and the table is the same table:
  * nothing here reaches the engine, so the wall, the pot and the verdict of a
  * quiet table are what they were (tests/unit/table-motion.test.mjs).
+ *
+ * The score hears the table too (`setMusicStake`, 2026-11-02): as the gauge
+ * the table shows climbs, AdaptiveMusic brings in up to three layers over
+ * the mode's own lead (musicScore.js, `STAKE_LAYER_GAUGES`), and lets them go
+ * when the window closes. Like the steps it reads what is drawn, not the wall.
  *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
@@ -185,6 +191,9 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       }
       if (time >= droneAt) {
         drone.set(live && !quiet ? closeness : 0, win.schema.sedated);
+        // The score's layers follow the gauge the table shows, never the
+        // wall, and a quiet table keeps them out as it keeps the drone out.
+        setMusicStake(live && !quiet ? win.gauge : 0);
         droneAt = time + 100;
       }
 
@@ -212,6 +221,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       globalThis.cancelAnimationFrame(frame);
       motionQuery?.removeEventListener?.("change", onMotionChange);
       drone.stop();
+      setMusicStake(0);
       for (const name of FX_VARIABLES) {
         for (const element of readers.get(name)) element.style.removeProperty(name);
       }
