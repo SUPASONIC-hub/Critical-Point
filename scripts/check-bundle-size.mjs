@@ -91,7 +91,8 @@ const budgets = [
   // read on a save (the hold on a type set aside) and the run's direction.
   // 149,806 / 55,026 -> 149,961 / 55,078 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the pre-C-3 hold set aside on a save and the run's direction, on #224's keyed words. Measured 149,961 / 55,074, the gzip plus 4 in the e2e build.
   // 149,982 / 55,050 -> 150,144 / 55,110 on 2026-10-30, C-3·C-4 rules (#320) merged with #224 bb70e777 (main 430dda1e): the direction table and verdicts over #224 and main's ranking save lines. Measured 150,144 / 55,106 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_144, maxGzip: 55_110 },
+  // 150,144 / 55,110 -> 150,282 / 55,161 on 2026-11-02, #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346). Measured 150,282 / 55,157 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_282, maxGzip: 55_161 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -123,7 +124,8 @@ const budgets = [
   // 20,520 / 8,912 in the e2e build, the gzip plus 4. The ladder's three new
   // steps (사건 01 to 03, each with its line) and the direction's names.
   // 26,800 / 11,373 -> 27,810 / 11,699 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the ladder's 사건 01 to 03 steps and their lines (copy/unlocks.js), the directions' names and the streak's sentences (copy/table.js readout). Measured 27,810 / 11,695, the gzip plus 4 in the e2e build.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 27_810, maxGzip: 11_699 },
+  // 27,810 / 11,699 -> 27,811 / 11,706 on 2026-11-02, #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346). Measured 27,811 / 11,702 in the e2e build, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 27_811, maxGzip: 11_706 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -768,7 +770,8 @@ const budgets = [
   // 39,889 / 14,795 -> 40,464 / 15,007 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: getLogicDirection and getEffectLean, upgradeRunRecord's pre-C-3 hold. Measured 40,464 / 15,003, the gzip plus 4 in the e2e build.
   // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
   // 39,889 / 14,801 (#224) -> 40,464 / 15,006 on 2026-11-02, C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55). Measured 40,464 / 15,002 in the e2e build, the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_464, maxGzip: 15_006 },
+  // 40,464 / 15,006 -> 40,464 / 15,050 on 2026-11-02, #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346). Measured raw under / 15,046 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_464, maxGzip: 15_050 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1252,8 +1255,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 merged with main 2f085d28 (11-02; #384 bank-rail-fit): 423,304, 472,832 and 478,616, the plus 4.
  * #224 merged with main c680ddd5 and 9be94346 (11-02; #389 #388), Audit n/4 off the 360px bank row: 425,149, 474,677 and 480,461, the plus 4.
  * C-3·C-4 rules (#320) merged with #224 afdcac0c (main 2f085d28): 423,343, 472,995 and 478,812, the plus 4.
+ * #320 c3-c4-rules merged with #224 c29c2efd (main 9be94346): 425,201, 474,853 and 480,670, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 425_153, en: 474_681, ja: 480_465 };
+const FIRST_PAINT_BUDGETS = { ko: 425_205, en: 474_857, ja: 480_674 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
