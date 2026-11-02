@@ -112,7 +112,8 @@ const budgets = [
   // 150,155 / 55,120 -> 150,271 / 55,174 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured 150,271 / 55,170 in the e2e build, the gzip plus 4.
   // 55,057 -> 55,062 gzip on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 55,058 in the e2e build, the gzip plus 4.
   // 150,122 / 55,099 -> 150,140 / 55,112 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured 150,140 / 55,108 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_349, maxGzip: 55_217 },
+  // 150,349 / 55,217 -> 150,459 / 55,259 on 2026-11-02, 통합 리허설 (#379) over #224 c29c2efd (main 9be94346) with #307 #316 #320 #308. Measured 150,459 / 55,255 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_459, maxGzip: 55_259 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -352,7 +353,8 @@ const budgets = [
   // 182,095 / 66,082 -> 182,219 / 66,139 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): fetchHallOfFame and the notice's sentence over the other three's keyed reads. Measured 182,219 / 66,135 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 182,341 / 66,283 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 182,341 / 66,279 in the e2e build, the gzip plus 4.
   // -> 182,341 / 66,282 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 182,341 / 66,278 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 188_300, maxGzip: 67_918 },
+  // 188,300 / 67,918 -> 188,426 / 67,989 on 2026-11-02, 통합 리허설 (#379) over #224 c29c2efd (main 9be94346) with #307 #316 #320 #308. Measured 188,426 / 67,985 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 188_426, maxGzip: 67_989 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -701,7 +703,8 @@ const budgets = [
   // 196,890 / 36,709 -> 197,146 / 36,758 on 2026-11-02, C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28). Measured 197,146 / 36,754 in the e2e build, the gzip plus 4.
   // 197,687 / 36,906 -> 197,740 / 36,906 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured 197,740 in the e2e build, the gzip plus 4.
   // 197,232 / 36,764 -> 197,488 / 36,813 on 2026-11-02, 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308. Measured 197,488 / 36,809 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 197_931, maxGzip: 36_939 },
+  // 197,931 / 36,939 -> 198,082 / 36,978 on 2026-11-02, 통합 리허설 (#379) over #224 c29c2efd (main 9be94346) with #307 #316 #320 #308. Measured 198,082 / 36,974 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 198_082, maxGzip: 36_978 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1406,7 +1409,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28): 423,425, 473,149 and 478,991, the plus 4.
 // #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346): 425,280, 475,004 and 480,846, the plus 4.
 // 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308: 423,661, 473,729 and 479,579, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 425_328, en: 475_008, ja: 480_850 };
+// 통합 리허설 (#379) over #224 c29c2efd (main 9be94346) with #307 #316 #320 #308: 425,534, 475,600 and 481,450, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 425_538, en: 475_604, ja: 481_454 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
