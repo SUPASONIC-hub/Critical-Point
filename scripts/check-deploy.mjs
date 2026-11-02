@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import {
+  analyticsCspProblems,
   assetCacheProblems,
   backendOriginProblems,
   backendPlacementProblems,
@@ -89,6 +90,7 @@ function checkOffline() {
   if (existsSync(built)) {
     const html = readFileSync(built, "utf8");
     problems.push(...inlineScriptProblems(html).map((problem) => `dist/index.html: ${problem}`));
+    if (csp) problems.push(...analyticsCspProblems(html, csp).map((problem) => `dist/index.html under render.yaml's CSP: ${problem}`));
     if (!firstAssetPath(html)) problems.push("dist/index.html links no fingerprinted asset, so the live check has nothing to read a cache policy from");
     if (!firstRootImagePath(html)) problems.push("dist/index.html names no image at the root, so the live check has nothing to read the image cache policy from");
     const entry = entryScriptPath(html);
@@ -189,6 +191,7 @@ async function checkLive() {
       ...wildcardHostProblems(response.headers.get("content-security-policy")).map((problem) => `CSP: ${problem}`),
       ...shellCacheProblems(response.headers.get("cache-control")).map((problem) => `cache: ${problem}`),
       ...inlineScriptProblems(body),
+      ...analyticsCspProblems(body, response.headers.get("content-security-policy")).map((problem) => `CSP: ${problem}`),
     ];
 
     const assetPath = firstAssetPath(body);

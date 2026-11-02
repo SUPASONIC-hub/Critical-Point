@@ -1,3 +1,5 @@
+import { ANALYTICS_ORIGINS } from "./analytics-config.mjs";
+
 /**
  * What a deployed page is allowed to be, as pure functions: `check-deploy.mjs`
  * applies them to the live response, and to `render.yaml` and `dist/index.html`
@@ -318,10 +320,13 @@ export function entryScriptPath(html) {
  *
  * The page's own `connect-src` names the origin the app may call, so the
  * script has to contain it. A wildcard host (`https://*.supabase.co`, which
- * is all render.yaml can say) is matched as a pattern.
+ * is all render.yaml can say) is matched as a pattern. Google Analytics'
+ * hosts are not a backend and are left out.
  */
 export function backendOriginProblems(script, cspValue) {
-  const origins = (parseCsp(cspValue).get("connect-src") ?? []).filter((source) => /^https:\/\/[^/]+$/i.test(source));
+  const origins = (parseCsp(cspValue).get("connect-src") ?? []).filter(
+    (source) => /^https:\/\/[^/]+$/i.test(source) && !ANALYTICS_ORIGINS.connect.includes(source),
+  );
   if (origins.length === 0) return ["connect-src names no backend origin, so there is nothing to look for in the entry script"];
   const text = String(script ?? "");
   const named = origins.some((origin) => {
@@ -384,6 +389,25 @@ export function renderYamlHeaderProblems(yaml) {
   }
   if (!/^application\/manifest\+json$/i.test((find("/manifest.webmanifest", "content-type") ?? "").trim())) {
     problems.push("/manifest.webmanifest: content-type is not application/manifest+json");
+  }
+  return problems;
+}
+
+/**
+ * A page that loads Google's tag (GA_MEASUREMENT_ID, scripts/analytics-
+ * config.mjs) under a CSP that would block it or what it sends: the tag
+ * fails silently in a player's browser, so this is a problem rather than a
+ * note -- the dashboard's header has to name Google's origins before the
+ * variable is set.
+ */
+export function analyticsCspProblems(html, csp) {
+  if (!/googletagmanager\.com\/gtag\/js/.test(String(html ?? ""))) return [];
+  const directives = parseCsp(csp);
+  const allowed = (name) => directives.get(name) ?? directives.get("default-src") ?? [];
+  const problems = [];
+  for (const [kind, name] of [["script", "script-src"], ["connect", "connect-src"], ["img", "img-src"]]) {
+    const missing = ANALYTICS_ORIGINS[kind].filter((origin) => !allowed(name).includes(origin));
+    if (missing.length) problems.push(`the page loads Google Analytics, but ${name} does not allow ${missing.join(" ")}`);
   }
   return problems;
 }
