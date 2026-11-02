@@ -93,7 +93,8 @@ const budgets = [
   // 149,806 / 55,026 -> 149,965 / 55,098 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: the score breakdown's 판 읽기 row read by key and the case summary's readingScore. Measured 149,965 / 55,094, the gzip plus 4 in the e2e build.
   // 149,982 / 55,050 -> 150,155 / 55,115 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e): C-1's reading record over #224 and main's ranking save lines. Measured 150,155 / 55,111 in the e2e build, the gzip plus 4.
   // 55,115 -> 55,120 gzip on 2026-11-02, C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55). Measured 55,116 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_155, maxGzip: 55_120 },
+  // 150,155 / 55,120 -> 150,271 / 55,174 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured 150,271 / 55,170 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_271, maxGzip: 55_174 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -117,7 +118,8 @@ const budgets = [
   // on #224 0c989ba7 (the hashes), so 13,484.
   // 35,281 / 13,719 -> 35,620 / 13,836 on 2026-10-29, C-1(1) (the 판 읽기 axis) merged with #224 602ec69b: getCaseRead, getReadingScore and the seventh weight on #224's season mean. Measured 35,620 / 13,832, the gzip plus 4 in the e2e build.
   // 35,503 / 13,781 -> 35,842 / 13,900 on 2026-10-30, C-1 reading axis (#307) merged with #224 bb70e777 (main 430dda1e): C-1's reading axis beside main's keyed gate condition. Measured 35,842 / 13,896 in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_842, maxGzip: 13_900 },
+  // 35,842 / 13,900 -> 35,842 / 13,924 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 13,920 in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 35_842, maxGzip: 13_924 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -523,7 +525,8 @@ const budgets = [
   // 44,575 / 14,830 -> 48,936 / 16,122 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 48,936 / 16,122 -> 50,079 / 16,401 on 2026-10-26, 영어판 3단계: the ending sequence, the three twists, the verdicts and afterglows and 「당신의 세 장면」 read by key (src/copy/ending.js), and the forecast's 「유지」 from the report's table. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 50,079 -> 50,093 raw on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): only the chunk names it imports; the gzip stays under its line. Measured 50,093 in the e2e build.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_093, maxGzip: 16_401 },
+  // 50,093 / 16,401 -> 50,093 / 16,406 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 16,402 in the e2e build, the gzip plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_093, maxGzip: 16_406 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -623,7 +626,8 @@ const budgets = [
   // 197,093 / 36,749 -> 197,687 / 36,906 on 2026-11-02, #224 merged with main c680ddd5 (#389) and 9be94346 (#388): main's English 360px hand over #224's rules, and on 360px or less
   // Audit n/4 moves from the bank row to the signals' row (.gx-hud.has-audit, .gx-hud-audit). Measured 197,687 / 36,902 in the e2e build, the gzip plus 4.
   // 196,890 / 36,709 -> 197,146 / 36,758 on 2026-11-02, C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28). Measured 197,146 / 36,754 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 197_687, maxGzip: 36_906 },
+  // 197,687 / 36,906 -> 197,740 / 36,906 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured 197,740 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 197_740, maxGzip: 36_906 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -770,7 +774,8 @@ const budgets = [
   // 39,883 -> 39,889 raw on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the settlement asks the case's rules (settleAudit, describeLinkMade); the gzip stays under its line. Measured 39,889 in the e2e build.
   // 14,795 -> 14,801 gzip on 2026-10-30, C-1 reading axis (#307) merged with #224 0d29141a (the English bank rail at 360px): only the chunk names it imports. Measured 14,797, the gzip plus 4.
   // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_889, maxGzip: 14_836 },
+  // 39,889 / 14,836 -> 39,889 / 14,842 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 14,838 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_889, maxGzip: 14_842 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1252,8 +1257,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 merged with main 2f085d28 (11-02; #384 bank-rail-fit): 423,304, 472,832 and 478,616, the plus 4.
  * #224 merged with main c680ddd5 and 9be94346 (11-02; #389 #388), Audit n/4 off the 360px bank row: 425,149, 474,677 and 480,461, the plus 4.
  * C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28): 423,310, 472,884 and 478,684, the plus 4.
+ * #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346): 425,154, 474,730 and 480,530, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 425_153, en: 474_681, ja: 480_465 };
+const FIRST_PAINT_BUDGETS = { ko: 425_158, en: 474_734, ja: 480_534 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
