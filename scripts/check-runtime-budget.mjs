@@ -154,10 +154,15 @@ const BUDGETS = {
   // awaited confirm lands, which is why the cap is 190 rather than 180).
   // 96 -> 98 on 2026-10-26, 다국어 틀: the run's notices table
   // (src/copy/notices.js) and `fill` for its two lines with blanks.
+  // 960 / 98 -> 968 / 99 on 2026-11-02, bgm-variety over main c680ddd5: the
+  // decision's reveal sheet keys its own music while it is open (revealOutcome,
+  // src/components/musicScore.js). The key is built here, in the runtime's lazy
+  // chunk: a helper beside the rule in musicScore.js would have cut five lines
+  // but put 37 bytes on the first paint, since the music sits in the entry.
   "src/GameRuntime.jsx": {
-    lines: 960,
+    lines: 968,
     longestLine: 190,
-    importedNames: 98,
+    importedNames: 99,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
