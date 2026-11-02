@@ -95,12 +95,14 @@ export function getEndingAfterglow(ledger) {
 }
 
 /**
- * Whose record the result screen says it is: the typed name, the default the
- * save kept in Korean (appConfig.js DEFAULT_PLAYER_NAME) in the page's words,
- * or the anonymous analyst.
+ * Whose record the result screen says it is: the typed name with its title,
+ * the anonymous analyst, or -- for the default the save keeps in Korean
+ * (appConfig.js DEFAULT_PLAYER_NAME), or a name that is the page's own word
+ * for it (Analyst, 分析官) -- that word once, never 「분석관 분석관」,
+ * "Analyst Analyst" or 「分析官分析官」. Only the line shown; the save keeps the name.
  */
 export function getAnalystName(playerName) {
   const name = typeof playerName === "string" ? playerName.trim() : "";
   if (!name) return resultCopy.anonymousAnalyst;
-  return name === DEFAULT_PLAYER_NAME ? resultCopy.defaultAnalyst : fill(resultCopy.namedAnalyst, { name });
+  return name === DEFAULT_PLAYER_NAME || name === resultCopy.defaultAnalyst ? resultCopy.defaultAnalyst : fill(resultCopy.namedAnalyst, { name });
 }

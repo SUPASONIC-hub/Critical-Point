@@ -20,5 +20,7 @@ test("with the Japanese dictionary laid over, nothing the swept modules print is
   assertNoHangul(collectRunLines(speakers), "ja", 100);
   await assertFarCallbacksLand("ja");
   assert.equal(getAnalystName("분석관"), "分析官");
+  assert.equal(getAnalystName("分析官"), "分析官");
+  assert.equal(getAnalystName("ハン"), "ハン分析官");
   assert.equal(createStartSave({ playerName: "" }).playerName, "분석관");
 });

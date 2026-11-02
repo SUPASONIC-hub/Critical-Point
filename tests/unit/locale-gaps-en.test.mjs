@@ -36,7 +36,11 @@ test("a Korean page keeps its habits, titles and opening line", () => {
     ].join("\n"),
   );
   assert.equal(getEcho("reframe"), seasonEchoes.default);
-  assert.equal(getAnalystName("분석관"), "분석관 분석관");
+  // The default name is said once (user decision 11-02), and a typed name keeps its title.
+  assert.equal(getAnalystName("분석관"), "분석관");
+  assert.equal(getAnalystName(" 분석관 "), "분석관");
+  assert.equal(getAnalystName("한서윤"), "한서윤 분석관");
+  assert.equal(getAnalystName(""), "익명 분석관");
   assert.equal(createStartSave({ playerName: "" }).playerName, "분석관");
   assert.ok(getSeasonCard({ secondSeason: { round: 2 } }).share.endsWith("."));
   assert.equal(fullStop("ja"), "。");
@@ -54,5 +58,7 @@ test("with the English dictionary laid over, nothing the swept modules print is 
   await assertFarCallbacksLand("en");
   // The default name is shown in English and kept in Korean.
   assert.equal(getAnalystName("분석관"), "Analyst");
+  assert.equal(getAnalystName("Analyst"), "Analyst");
+  assert.equal(getAnalystName("Han"), "Analyst Han");
   assert.equal(createStartSave({ playerName: "" }).playerName, "분석관");
 });
