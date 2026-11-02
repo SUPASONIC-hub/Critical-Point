@@ -177,4 +177,11 @@
   :root {
     --hud-rem: calc(1rem / 1.125);
   }
+
+  /* The start screen keeps 16px: at 18px Linux put the 1280x720 start button
+     at 733 (11-02). The reading screens are where the larger type is for. */
+  html:has(.intro) {
+    font-size: 100%;
+    --hud-rem: 1rem;
+  }
 }
