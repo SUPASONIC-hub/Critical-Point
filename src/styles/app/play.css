@@ -2601,6 +2601,17 @@
   }
 }
 
+/* Japanese is drawn in the system's CJK face, full-width kana for kana, and on
+   Linux and Android (Noto CJK) a 360px phone wrapped 46 five-card labels to a
+   third line and pushed the last card 4 to 42px under the action bar, where
+   Windows had kept them to two (hand5, 2026-10-30). */
+@media (max-width: 360px) {
+  :lang(ja) .gx-card-label {
+    font-size: 0.75rem;
+    letter-spacing: -0.03em;
+  }
+}
+
 @media (min-width: 720px) {
   .game-shell {
     display: flex;

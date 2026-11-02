@@ -179,7 +179,13 @@ const fileBudgets = {
   // above is not written twice.
   // 3155 / 69767 -> 3166 / 70052 on 2026-10-30, measured (D2 over #224
   // bb70e777, main 430dda1e): the badge rule beside main's narrow pills.
-  "base-intro-ranking.css": { lines: 3166, bytes: 70052 },
+  // 3155 / 69767 -> 3159 / 69883 on 2026-10-30, measured (intro-360-fit): on
+  // 360px or less the start button sits closer to the premise (a 360x740
+  // phone had the Korean one 2px under the screen) and the English premise
+  // takes the Japanese 14px there (Linux CI put its button at 746).
+  // 3166 / 70052 -> 3170 / 70168 on 2026-11-02, measured (D2 over #224
+  // 8dd649ce, main b2558d55): the badge rule beside intro-360-fit.
+  "base-intro-ranking.css": { lines: 3170, bytes: 70168 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -274,6 +280,8 @@ const fileBudgets = {
   // -> 2925 / 55865 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측.
   // -> 2931 / 56015 on 2026-10-24, measured: a sealed card's badges on a plain
   // ground over its stripes.
+  // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
+  // labels a size down, so five-card hands keep two lines in a CJK face.
   // -> 56181 bytes on 2026-10-25, measured: #224's link mark as a tag on the
   // card's edge (in the burn chip it pushed the chip onto a line of its own).
   // -> 56227 on 2026-10-25, measured: the run's line 2px apart on a phone,
@@ -281,7 +289,9 @@ const fileBudgets = {
   // -> 56429 on 2026-10-30, measured: an English page on a 360px phone sets the
   // bank rail tighter (10px labels, 5px pills, 3px gap) so Audit n/4 keeps the
   // run's line on Stake and Vault's row.
-  "play.css": { lines: 2931, bytes: 56429 },
+  // -> 56546 on 2026-10-30, measured: #224 merged with main b2558d55, the
+  // Japanese card labels (main) and the English bank rail (#224) together.
+  "play.css": { lines: 2931, bytes: 56546 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

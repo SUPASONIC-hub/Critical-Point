@@ -57,6 +57,13 @@ services:
       # VITE_ prefix, so it never reaches the bundle.
       - key: GOOGLE_SITE_VERIFICATION
         sync: false
+      # Google Analytics 4 (docs/analytics.md), unset until the user sets it:
+      # the measurement ID writes Google's tag into index.html and the plain
+      # pages, and the Google Analytics section into the privacy policy. No
+      # VITE_ prefix, so it never reaches the bundle. The CSP below already
+      # names Google's origins; the dashboard's header needs them too.
+      - key: GA_MEASUREMENT_ID
+        sync: false
     # Mirrored by hand in the dashboard under Settings -> Headers. These are
     # the source of truth for what the site *should* send; `check:deploy`
     # asserts them against what it actually sends -- each security header by
@@ -151,6 +158,12 @@ services:
       #   app. data: stays for fonts/images small enough for Vite to inline.
       # connect-src: the Supabase REST API. Narrow it to the project's own
       #   https://<ref>.supabase.co when setting it in the dashboard.
+      # Google Analytics (GA_MEASUREMENT_ID, docs/analytics.md): gtag.js from
+      #   www.googletagmanager.com (script-src), its hits to the four hosts in
+      #   connect-src and its pixel fallback in img-src -- each host by name,
+      #   no wildcard (scripts/analytics-config.mjs ANALYTICS_ORIGINS, which
+      #   check:deploy holds a page carrying the tag to). Nothing loads from
+      #   them while the variable is unset.
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://*.supabase.co; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'"
+        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com; media-src 'self' blob:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://region1.analytics.google.com; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'"
