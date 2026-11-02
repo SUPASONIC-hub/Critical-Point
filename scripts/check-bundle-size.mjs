@@ -639,6 +639,9 @@ const budgets = [
   // down (play.css), so a five-card hand keeps two lines in a CJK face. Measured 196,428 / 36,620 in the e2e build, the gzip plus 4.
   // -> 196,523 / 36,650 on 2026-10-30, intro-360-fit over main 7552870d (#381): on 360px or less the start button sits closer
   // to the premise (a 360x740 phone had the Korean one 2px under the screen) and the English premise takes 14px. Measured 196,523 / 36,646, the gzip plus 4.
+  // -> 196,795 / 36,700 on 2026-10-30, bank-rail-fit over main 78e53e40 (#382): on 360px or less the HUD gives up its air
+  // (30px clock, 18px bank pills, tighter gaps) so a bank row on two lines keeps a five-card hand above the action bar.
+  // Measured 196,795 / 36,696 in the e2e build, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
@@ -666,6 +669,8 @@ const budgets = [
   // 196,837 / 36,700 (#224) -> 196,935 / 36,727 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 196,935 / 36,723 in the e2e build, the gzip plus 4.
   // 196,837 / 36,700 (#224) -> 197,081 / 36,731 on 2026-11-02, D2 hall of fame (#308) merged with #224 8dd649ce (main b2558d55). Measured 197,081 / 36,727 in the e2e build, the gzip plus 4.
   // 197,050 / 36,728 -> 197,232 / 36,764 on 2026-11-02, 통합 리허설 (#379) over #224 8dd649ce (main b2558d55) with #307 #316 #320 #308. Measured 197,232 / 36,760 in the e2e build, the gzip plus 4.
+  // 196,837 / 36,700 -> 197,093 / 36,749 on 2026-11-02, #224 merged with main 2f085d28 (#384 bank-rail-fit): main's 360px HUD block over #224's link tag, signal row and English bank rail, the English gap now column-gap: 3px at the end of that block. Measured 197,093 / 36,745 in the e2e build, the gzip plus 4.
+  // 196,890 / 36,709 -> 197,146 / 36,758 on 2026-11-02, C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28). Measured 197,146 / 36,754 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 197_232, maxGzip: 36_764 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -1313,6 +1318,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The start button closer to the premise on 360px or less (intro-360-fit,
  * over main 7552870d; the English premise at 14px there too): 423,171, 472,667
  * and 478,463.
+ * The HUD's air on 360px or less, so a late-season bank row on two lines keeps
+ * the hand above the bar (bank-rail-fit, over main 78e53e40; the index CSS
+ * carries the rule): 423,219, 472,715 and 478,511.
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.
@@ -1337,6 +1345,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55, 11-02): 423,256, 472,832 and 478,632, the plus 4.
  * C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55, 11-02): 423,218, 472,870 and 478,687, the plus 4.
  * D2 hall of fame (#308) merged with #224 8dd649ce (main b2558d55, 11-02): 423,419, 473,091 and 478,884, the plus 4.
+ * #224 merged with main 2f085d28 (11-02; #384 bank-rail-fit): 423,304, 472,832 and 478,616, the plus 4.
+ * C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28): 423,310, 472,884 and 478,684, the plus 4.
  */
 // ko 422,779 -> 422,891, en 472,179 -> 472,502, ja 477,926 -> 478,315 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the index CSS's board marks and the five icons in icons-vendor (both on the first paint), and each dictionary's new lines. Measured 422,887 / 472,498 / 478,311. Measured in the e2e build, the gzip plus 4.
 // ko 423,110 -> 423,241, en 472,645 -> 472,970, ja 478,429 -> 478,812 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,237, 472,966 and 478,808, the plus 4.
