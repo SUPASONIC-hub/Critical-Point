@@ -92,7 +92,8 @@ const budgets = [
   // 149,806 / 55,026 -> 149,831 / 55,039 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the debug jump's and replay link's peak board (layCasePeak) on #224's keyed words. Measured 149,831 / 55,035. Measured in the e2e build, the gzip plus 4.
   // 149,982 / 55,050 -> 150,018 / 55,057 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e): the table's rhythm over #224 and main's ranking save lines. Measured 150,018 / 55,053 in the e2e build, the gzip plus 4.
   // 55,057 -> 55,062 gzip on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 55,058 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_122, maxGzip: 55_099 },
+  // 150,122 / 55,099 -> 150,140 / 55,112 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured 150,140 / 55,108 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_140, maxGzip: 55_112 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -626,7 +627,8 @@ const budgets = [
   // 197,093 / 36,749 -> 197,687 / 36,906 on 2026-11-02, #224 merged with main c680ddd5 (#389) and 9be94346 (#388): main's English 360px hand over #224's rules, and on 360px or less
   // Audit n/4 moves from the bank row to the signals' row (.gx-hud.has-audit, .gx-hud-audit). Measured 197,687 / 36,902 in the e2e build, the gzip plus 4.
   // 196,935 / 36,727 -> 197,191 / 36,774 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 197,191 / 36,770 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 197_687, maxGzip: 36_906 },
+  // 197,687 / 36,906 -> 197,785 / 36,939 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured 197,785 / 36,935 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 197_785, maxGzip: 36_939 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -783,7 +785,8 @@ const budgets = [
   // 39,889 / 14,795 -> 40,661 / 15,278 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): applyPeak, the pass's re-deal, TESTIMONY's half pot and the new tools' rules, on #224's audit and links. Measured 40,661 / 15,274. Measured in the e2e build, the gzip plus 4.
   // 14,795 -> 14,801 gzip on 2026-10-30, #224 merged with main b2558d55: measured 14,797 in the e2e build (the code is the same; the names of the chunks it imports moved), the gzip plus 4.
   // 39,889 / 14,801 (#224) -> 40,661 / 15,278 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 40,661 / 15,274 in the e2e build, the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_661, maxGzip: 15_278 },
+  // 40,661 / 15,278 -> 40,661 / 15,326 on 2026-11-02, #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346). Measured raw under / 15,322 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_661, maxGzip: 15_326 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1265,7 +1268,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // ko 423,241 -> 423,269, en 472,970 -> 472,998, ja 478,812 -> 478,840 on 2026-10-30, table rhythm bundle (#316) merged with #224 0d29141a (the English bank rail at 360px), 10-30: 423,265, 472,994 and 478,836, the plus 4.
 // table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55, 11-02): 423,374, 473,096 and 478,938, the plus 4.
 // table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28): 423,425, 473,149 and 478,991, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 425_153, en: 474_681, ja: 480_465 };
+// #316 table-rhythm-bundle merged with #224 c29c2efd (main 9be94346): 425,280, 475,004 and 480,846, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 425_284, en: 475_008, ja: 480_850 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
