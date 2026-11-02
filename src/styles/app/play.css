@@ -2433,25 +2433,6 @@
   }
 }
 
-/* An English page on a 360px phone: Stake, Vault and the run's line with
-   Audit n/4 (RULES_MARK 3) need 331px of a 310px rail, so the run's line took
-   a row of its own (26px) and a five-card hand's last card went under the
-   action bar (hand5, 2026-10-30). Labels at 10px, pills at 5px a side and a
-   3px gap bring it to 302px. */
-@media (max-width: 360px) {
-  :lang(en) .gx-bank {
-    gap: 3px;
-  }
-
-  :lang(en) .gx-bank .gx-stat {
-    padding-inline: 5px;
-  }
-
-  :lang(en) .gx-bank .gx-stat small {
-    font-size: 0.625rem;
-  }
-}
-
 /* A short phone reads the scene without its portrait, in two lines of question.
    A board with changed rules shows its rules line where the situation board was. */
 @media (max-width: 480px) and (max-height: 760px) {
@@ -2619,6 +2600,56 @@
   :lang(ja) .gx-card-label {
     font-size: 0.75rem;
     letter-spacing: -0.03em;
+  }
+
+  /* The bank row is one line at a pot of 0 and two late in a season: at a pot
+     of 99,999, a vault of 1,999,999 and a streak line of 49 / 99 / x64 the three
+     pills need 385 to 404px of a 310px row, and the second line put the last
+     card of a five-card hand 10 to 21px under the action bar (360x740, every
+     language; LAYOUT_BANK=max, 2026-10-30). The second line stays and the
+     room is taken from the HUD's air instead: a 30px clock, 18px pills, and
+     2 to 4px off the gaps and paddings around them. The HUD measured 106px
+     with one bank line and 132 with two; it is 87 and 107. */
+  .gauntlet-stage .gx-hud {
+    gap: 3px 8px;
+    padding: 4px 8px;
+  }
+
+  .gauntlet-stage .gx-clock {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  .gauntlet-stage .gx-bank {
+    gap: 2px 4px;
+  }
+
+  .gauntlet-stage .gx-bank > .gx-stat {
+    min-height: 18px;
+    padding-block: 0;
+    line-height: 1.2;
+  }
+
+  .gauntlet-stage .gx-signals {
+    padding-top: 3px;
+  }
+
+  /* An English page: Stake, Vault and the run's line with Audit n/4
+     (RULES_MARK 3) needed 331px of a 310px rail at a pot of 0, so the run's
+     line took a row of its own (26px) and a five-card hand's last card went
+     under the action bar (hand5, 2026-10-30). Labels at 10px, pills at 5px a
+     side and 3px between them bring it to 302px. Only the gap between pills
+     is narrowed here; the 2px between the bank's lines above holds. */
+  :lang(en) .gx-bank {
+    column-gap: 3px;
+  }
+
+  :lang(en) .gx-bank .gx-stat {
+    padding-inline: 5px;
+  }
+
+  :lang(en) .gx-bank .gx-stat small {
+    font-size: 0.625rem;
   }
 }
 
