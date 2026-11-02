@@ -60,6 +60,13 @@ const COPY_FILES = [
   "src/runtimeSystems.js",
   // The 판단 습관 names and lines the result card prints.
   "src/judgementHabit.js",
+  // Their words, and gameLogic.js's and advancedSystems.js's, moved out for the other languages (10-30 playtest, locale gaps).
+  "src/copy/habits.js",
+  "src/copy/judgment.js",
+  "src/copy/introPanels.js",
+  // The runtime's own lines and the far callbacks, moved out for the other languages (locale gaps, second pass).
+  "src/copy/runLines.js",
+  "src/copy/farCallbacks.js",
   // The lines a prologue's first briefing says about the rules it turns on.
   "src/gauntlet/tableUnlocks.js",
   // Its words, moved out of it for the English layer (2026-10-26, 다국어 틀).
@@ -77,6 +84,8 @@ const SCREEN_COPY_FILES = [
   // The two above keep their report lines here since 2026-10-26 (다국어 틀).
   "src/copy/reportLines.js",
   "src/logicReport.js",
+  // logicReport.js's words, moved out for the other languages (locale gaps).
+  "src/copy/logicReport.js",
 ];
 
 const failures = [];

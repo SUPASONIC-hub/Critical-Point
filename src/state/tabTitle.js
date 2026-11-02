@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import W from "../copy/introPanels.js";
 
 /**
  * The browser tab's title, as the situation names it (개선 포인트 A3).
@@ -14,7 +15,6 @@ import { useEffect } from "react";
  * announcements.
  */
 
-const SUFFIX = " · 임계점";
 const claims = new Map();
 let baseTitle = null;
 
@@ -23,7 +23,8 @@ function paint() {
   baseTitle ??= document.title;
   let top = null;
   for (const claim of claims.values()) if (!top || claim.rank >= top.rank) top = claim;
-  const next = top ? `${top.text}${SUFFIX}` : baseTitle;
+  // The tail is src/copy/introPanels.js's, in the page's language.
+  const next = top ? `${top.text}${W.tabSuffix}` : baseTitle;
   if (document.title !== next) document.title = next;
 }
 

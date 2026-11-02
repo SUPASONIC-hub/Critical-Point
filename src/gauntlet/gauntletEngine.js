@@ -40,6 +40,7 @@ import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
+import runLines from "../copy/runLines.js";
 import { fill } from "../locale.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
@@ -1756,7 +1757,7 @@ export function carryTableRecordIntoRestore(restored, current) {
     caseId: entry.caseId,
     choiceId: "table-record-carry",
     title: "TABLE RECORD",
-    choice: "복구 전에 벽에 닿은 판",
+    choice: runLines.tableRecordCarry,
     effect: {},
     threshold: entry.threshold,
     resourcesBefore: restored.resources,
