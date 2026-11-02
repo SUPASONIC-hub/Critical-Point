@@ -291,7 +291,12 @@ const fileBudgets = {
   // run's line on Stake and Vault's row.
   // -> 56546 on 2026-10-30, measured: #224 merged with main b2558d55, the
   // Japanese card labels (main) and the English bank rail (#224) together.
-  "play.css": { lines: 2931, bytes: 56546 },
+  // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
+  // the HUD gives up its air so a bank row on two lines (late-season numbers)
+  // keeps a five-card hand above the action bar.
+  // -> 56896 bytes, 2944 lines on 2026-11-02, measured: #224 merged with main 2f085d28, bank-rail-fit's
+  // 360px HUD (main) with the English bank rail (#224) folded into its block.
+  "play.css": { lines: 2944, bytes: 56896 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
