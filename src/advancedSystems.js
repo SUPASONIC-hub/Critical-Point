@@ -9,8 +9,9 @@ import { caseDisplayCode } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
 import { getSeasonRound } from "./appConfig.js";
+import { fill } from "./locale.js";
+import W from "./copy/introPanels.js";
 
-const HARM = easyResourceLabels.humanCost;
 const percent = (share) => Math.round(share * 100);
 
 // One analyst, three things that analyst remembers longest. They used to be
@@ -65,37 +66,33 @@ export function getOperatorProfile(origin = "courier") {
  */
 export function getPlayStyleUnlocks(playStyle = "instinct", newGamePlus = false) {
   const styles = {
-    instinct: { label: "INSTINCT", unlock: "첫 반응으로 정하겠다는 다짐" },
-    auditor: { label: "AUDIT", unlock: "근거를 확인하고 정하겠다는 다짐" },
-    mediator: { label: "MEDIATE", unlock: "대화로 압박을 낮추겠다는 다짐" },
+    instinct: { label: "INSTINCT", unlock: W.playStyles.instinct },
+    auditor: { label: "AUDIT", unlock: W.playStyles.auditor },
+    mediator: { label: "MEDIATE", unlock: W.playStyles.mediator },
   };
   const base = styles[playStyle] ?? styles.instinct;
-  return { ...base, newGamePlus: newGamePlus ? "지난 시즌의 결말을 이 화면에서 다시 볼 수 있습니다" : "최종 기록을 완료하면 NEW GAME+ 해금" };
+  return { ...base, newGamePlus: newGamePlus ? W.newGamePlusOpen : W.newGamePlusLocked };
 }
 
 // The steps described the decision board the gauntlet table replaced on
 // 2026-09-14: read, compare the listed costs, confirm. Nothing said that a
 // card is staked and pushed, or that there is a wall.
 export function getTutorialSteps() {
-  return [
-    { id: "read", label: "장면 읽기", text: "상황과 화자, 질문을 읽습니다. 읽는 시간은 점수에 들어가지 않습니다." },
-    { id: "weigh", label: "카드 걸기", text: "카드 한 장을 골라 겁니다. 카드마다 얻는 것과 치르는 것이 다릅니다." },
-    { id: "commit", label: "밀기와 확정", text: "밀수록 열기와 배율이 오릅니다. 보이지 않는 벽에 닿기 전에 확정하면 판돈이 쌓이고, 사건을 닫으면 금고로 갑니다." },
-    { id: "replay", label: "다시 보기", text: "다른 기록은 다른 권한과 엔딩을 엽니다." },
-  ];
+  // The words are src/copy/introPanels.js's, in the page's language.
+  return ["read", "weigh", "commit", "replay"].map((id) => ({ id, ...W.tutorial[id] }));
 }
 
 export function getSeasonGoals() {
   return [
     // Read from the ending's gates, in the labels the chips print. These were
     // six-case numbers ("단서 5개") and a 관계 퀘스트 the game never counted.
-    { id: "protect", label: "PROTECT SEASON", text: `사건마다 ${HARM}${objectParticle(HARM)} 평균 ${ENDING_GATES.collapseHarmPerCase} 아래로 닫고 시즌 완료` },
-    { id: "evidence", label: "EVIDENCE SEASON", text: `사건 기록의 ${percent(ENDING_GATES.clueRate)}% 이상 열기` },
-    { id: "trust", label: "TRUST SEASON", text: `${easyResourceLabels.trust}${objectParticle(easyResourceLabels.trust)} 사건마다 평균 ${ENDING_GATES.oversightTrust} 이상으로 지키기` },
+    // Labels read now, not at load: another language's are laid over them after this module is read.
+    { id: "protect", label: "PROTECT SEASON", text: fill(W.goals.protect, { harm: easyResourceLabels.humanCost, particle: objectParticle(easyResourceLabels.humanCost), gate: ENDING_GATES.collapseHarmPerCase }) },
+    { id: "evidence", label: "EVIDENCE SEASON", text: fill(W.goals.evidence, { percent: percent(ENDING_GATES.clueRate) }) },
+    { id: "trust", label: "TRUST SEASON", text: fill(W.goals.trust, { trust: easyResourceLabels.trust, particle: objectParticle(easyResourceLabels.trust), gate: ENDING_GATES.oversightTrust }) },
   ];
 }
 
-const VETERAN_TABLE_LINE = "NEW\u00a0GAME+는 프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.";
 
 /**
  * The start screen's NEW GAME+ panel (NEWGAMEPLUS 문구 질문 9-10, all (1)):
@@ -130,7 +127,7 @@ export function getPastRunMemory(memory = {}, record = null, runId = null) {
     // that ship (RULES_MARK 2, 2026-10-23; `check-endings --report` and
     // `--whole`, 600 seasons): collapse 23.3% beside 20.7%, busts 11.0% of
     // windows beside 10.1%. The preview on RULES_MARK 3 had 22.8% / 22.0%.
-    text: `${line ?? `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.`} ${VETERAN_TABLE_LINE}`,
+    text: `${line ?? fill(W.pastCase, { code: caseDisplayCode(caseId) })} ${W.veteranTable}`,
   };
 }
 
@@ -175,6 +172,6 @@ export function getRankingIntegrity(entry = {}) {
   return {
     valid: Boolean(entry.runId && entry.completedAt && summary.rank),
     label: entry.runId ? "RUN LINKED" : "RUN ID MISSING",
-    text: entry.runId ? "한 플레이로 묶인 기록입니다. 공개 랭킹은 모든 사건 기록이 15분 이상에 걸쳐 서버에 도착한 시즌만 받고, 점수·등급·시간이 맞지 않는 기록은 서버에 따로 표시해 둡니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
+    text: entry.runId ? W.integrity.linked : W.integrity.missing,
   };
 }
