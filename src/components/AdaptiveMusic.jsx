@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
-import { createSceneMode as scoreSceneMode, leadForBar, shadowNote, stakeLayerCount, STEPS_PER_BAR } from "./musicScore.js";
+import {
+  BUS_LOWPASS_HZ,
+  createSceneMode as scoreSceneMode,
+  DRIVE_CEILING,
+  driveMix,
+  leadFilterFrequency,
+  leadForBar,
+  shadowNote,
+  stakeLayerCount,
+  STEPS_PER_BAR,
+} from "./musicScore.js";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
 const MIX_VOLUME = 0.74;
@@ -57,7 +67,7 @@ function writePref(key, value) {
 const soundOff = () => readPref(MUSIC_PREF_KEY, "true") === "false";
 const presetMultiplier = () => volumePresets[normalizeVolumePreset(readPref(MUSIC_VOLUME_KEY, "normal"))].multiplier;
 
-/** Soft-clip curve; `amount` 0 leaves the signal alone. */
+/** Soft-clip curve; `amount` 0 leaves the signal alone. Built once, at `DRIVE_CEILING` (driveMix, musicScore.js). */
 function makeDriveCurve(amount) {
   const size = 1024;
   const curve = new Float32Array(size);
@@ -72,38 +82,47 @@ function makeDriveCurve(amount) {
 function connectMusicBus(context, output) {
   const input = context.createGain();
   const shaper = context.createWaveShaper();
+  const dry = context.createGain();
+  const wet = context.createGain();
   const lowpass = context.createBiquadFilter();
   const delay = context.createDelay(1.5);
   const feedback = context.createGain();
-  const wet = context.createGain();
+  const echo = context.createGain();
   const compressor = context.createDynamicsCompressor();
 
-  shaper.curve = makeDriveCurve(0);
+  // One curve for the life of the bus; a mode's drive is the dry/wet mix.
+  shaper.curve = makeDriveCurve(DRIVE_CEILING);
+  const mix = driveMix(0);
+  dry.gain.value = mix.dry;
+  wet.gain.value = mix.wet;
   shaper.oversample = "2x";
   lowpass.type = "lowpass";
-  lowpass.frequency.value = 4200;
+  lowpass.frequency.value = BUS_LOWPASS_HZ;
   lowpass.Q.value = 0.7;
   delay.delayTime.value = 0.18;
   feedback.gain.value = 0.1;
-  wet.gain.value = 0.08;
+  echo.gain.value = 0.08;
   compressor.threshold.value = -20;
   compressor.knee.value = 20;
   compressor.ratio.value = 4;
   compressor.attack.value = 0.004;
   compressor.release.value = 0.24;
 
+  input.connect(dry);
+  dry.connect(lowpass);
   input.connect(shaper);
-  shaper.connect(lowpass);
+  shaper.connect(wet);
+  wet.connect(lowpass);
   lowpass.connect(compressor);
   lowpass.connect(delay);
   delay.connect(feedback);
   feedback.connect(delay);
-  delay.connect(wet);
-  wet.connect(compressor);
+  delay.connect(echo);
+  echo.connect(compressor);
   compressor.connect(output);
   // `clean` is the bus past the drive: the stake's layers enter there, since
   // in the driven modes a standing voice summed into the shaper crackled.
-  return { input, shaper, clean: lowpass };
+  return { input, drive: { dry, wet }, clean: lowpass };
 }
 
 function playTone(context, destination, frequency, duration, gainValue, type = "sine", options = {}) {
@@ -299,10 +318,19 @@ function ensureAudioRuntime(volume) {
   if (!audioRuntime.bus) {
     const bus = connectMusicBus(context, audioRuntime.master);
     audioRuntime.bus = bus.input;
-    audioRuntime.drive = bus.shaper;
+    audioRuntime.drive = bus.drive;
     audioRuntime.clean = bus.clean;
   }
   return context;
+}
+
+/** The bus's drive to a mode's: ramped, never set, so a scene change moves the mix over about half a second. */
+function rampDrive(drive) {
+  if (!audioRuntime.drive || !audioRuntime.context) return;
+  const { dry, wet } = driveMix(drive);
+  const now = audioRuntime.context.currentTime;
+  audioRuntime.drive.dry.gain.setTargetAtTime(dry, now, 0.15);
+  audioRuntime.drive.wet.gain.setTargetAtTime(wet, now, 0.15);
 }
 
 /**
@@ -592,9 +620,7 @@ export function AdaptiveMusic({ modeKey }) {
     if (audioRuntime.master && audioRuntime.context) {
       audioRuntime.master.gain.setTargetAtTime(effectiveVolume, audioRuntime.context.currentTime, 0.5);
     }
-    if (audioRuntime.drive) {
-      audioRuntime.drive.curve = makeDriveCurve(mode.drive);
-    }
+    rampDrive(mode.drive);
   }, [effectiveVolume, mode]);
 
   useEffect(() => {
@@ -608,6 +634,8 @@ export function AdaptiveMusic({ modeKey }) {
     }
 
     const context = ensureAudioRuntime(volumeRef.current);
+    // A bus built just now starts dry; this scene's drive comes in from there.
+    if (context) rampDrive(modeRef.current.drive);
     if (!context) {
       queueMicrotask(() => setAudioState("unsupported"));
       return undefined;
@@ -651,7 +679,7 @@ export function AdaptiveMusic({ modeKey }) {
         playTone(context, destination, lead, stepSeconds * 1.8, LEAD_GAIN, currentMode.wave, {
           attack: 0.02,
           release: 0.24,
-          filterFrequency: 1500 + currentMode.filterLift,
+          filterFrequency: leadFilterFrequency(currentMode),
           detune: step % 2 === 0 ? -currentMode.detuneSpread : currentMode.detuneSpread,
         });
       }

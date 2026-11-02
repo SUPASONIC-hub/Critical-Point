@@ -1,4 +1,5 @@
-import { chapterMotifs, groovePresets, musicModes, originMotifs, speakerMotifs } from "./musicData.js";
+import { isResourceGain } from "../gameConstants.js";
+import { chapterMotifs, groovePresets, musicModes, originMotifs, revealTracks, speakerMotifs } from "./musicData.js";
 
 /**
  * What the score plays, without the audio graph: a scene's mode, which lead a
@@ -18,6 +19,100 @@ export const BARS_PER_PHRASE = 4;
  * nothing the eye has not been told.
  */
 export const STAKE_LAYER_GAUGES = [25, 45, 65];
+
+/**
+ * The bus's tone (11-02 playtest, earphones: "the sound feels torn, like an
+ * old radio"). The most drive any scene gets, after the chapter's and the
+ * speaker's push, and the cutoff of the lowpass every voice passes. The
+ * cutoff was 4200 Hz, which with the drive at 0.62 was the old radio itself:
+ * clipped, then muffled. The waves are unchanged, so the 8-bit colour is.
+ */
+export const DRIVE_CEILING = 0.15;
+export const BUS_LOWPASS_HZ = 7000;
+
+/**
+ * How a mode's drive is mixed in. The bus keeps one soft-clip curve, built
+ * once at `DRIVE_CEILING`, and crossfades between the dry signal and the
+ * clipped one: swapping the WaveShaper's curve on a scene change jumped the
+ * wave mid-note. The wet path is trimmed by the curve's small-signal gain
+ * (1 + 60 x ceiling), so dry and wet sit at one level and only the peaks
+ * round off -- the old curve also pushed the whole signal up to 38 times
+ * into the compressor.
+ */
+export function driveMix(drive) {
+  const wet = Math.min(1, Math.max(0, (Number(drive) || 0) / DRIVE_CEILING));
+  return { dry: Number((1 - wet).toFixed(4)), wet: Number((wet / (1 + DRIVE_CEILING * 60)).toFixed(4)) };
+}
+
+/**
+ * The lead's per-note lowpass. A sawtooth or a square carries every harmonic,
+ * so with the bus opened to 7 kHz they are held lower than a triangle or a
+ * sine, which have little up there to lose.
+ */
+export function leadFilterFrequency(mode) {
+  const lift = mode.filterLift ?? 0;
+  if (mode.wave === "sawtooth") return Math.min(2200, 1200 + lift * 0.6);
+  if (mode.wave === "square") return Math.min(2400, 1300 + lift * 0.7);
+  return 1500 + lift;
+}
+
+/**
+ * Which of the reveal's three tracks a choice gets (`revealTracks`,
+ * musicData.js), from the numbers the sheet prints under 받은 것 and 치른
+ * 것: the effect's gains and its costs, each summed by size.
+ *
+ * - BUST: 많이 치름 (`cost`), whatever the card was -- a bust keeps every
+ *   cost and none of the gains.
+ * - received at least twice what was paid, and 5 or more over it: 많이 받음 (`gain`).
+ * - paid at least twice what was received, and 5 or more over it: 많이 치름 (`cost`).
+ * - anything else: 비슷함 (`even`).
+ *
+ * Twice and 5 points: of the season's cards as written (before the heat
+ * multiplies the gains) about one in seven is received-much and one in fifty
+ * paid-much (the busts add the rest), and a single +3 or a +4 / -3 trade
+ * stays even, so the bright track is for a choice that clearly paid.
+ */
+export const REVEAL_OUTCOME_RATIO = 2;
+export const REVEAL_OUTCOME_MARGIN = 5;
+
+export function revealOutcome(effect, { busted = false } = {}) {
+  if (busted) return "cost";
+  let received = 0;
+  let paid = 0;
+  for (const [key, value] of Object.entries(effect ?? {})) {
+    const amount = Number(value);
+    if (!amount) continue;
+    if (isResourceGain(key, amount)) received += Math.abs(amount);
+    else paid += Math.abs(amount);
+  }
+  if (received >= paid * REVEAL_OUTCOME_RATIO && received - paid >= REVEAL_OUTCOME_MARGIN) return "gain";
+  if (paid >= received * REVEAL_OUTCOME_RATIO && paid - received >= REVEAL_OUTCOME_MARGIN) return "cost";
+  return "even";
+}
+
+/** A reveal track as a mode: as written, with nothing taken from a scene. */
+function revealMode(track, mixVolume) {
+  return {
+    label: track.label,
+    interval: track.stepMs,
+    volume: Math.min(0.14, track.volume * mixVolume),
+    wave: track.wave,
+    drive: Math.min(DRIVE_CEILING, track.drive),
+    kick: track.kick,
+    snare: track.snare,
+    hat: track.hat,
+    bass: track.bass,
+    leads: track.leads,
+    leadOffset: 0,
+    pad: track.pad,
+    counter: counterLine(track.pad),
+    pulse: pulseLine(track.bass),
+    noiseEvery: track.noiseEvery,
+    detuneSpread: 4,
+    impact: 1,
+    filterLift: 200,
+  };
+}
 
 export function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
@@ -102,6 +197,8 @@ export function leadForBar(mode, bar) {
 
 export function createSceneMode(modeKey, mixVolume = 1) {
   const parts = String(modeKey || "intro").split(":");
+  // `reveal:gain` / `reveal:even` / `reveal:cost`: fixed, whatever scene is behind the sheet.
+  if (parts[0] === "reveal") return revealMode(revealTracks[parts[1]] ?? revealTracks.even, mixVolume);
   const isFinal = parts.includes("final");
   const baseKey = isFinal && parts[0] === "result" ? "final" : parts[0];
   const base = musicModes[baseKey] ?? musicModes.intro;
@@ -126,7 +223,7 @@ export function createSceneMode(modeKey, mixVolume = 1) {
     interval: Math.max(96, Math.round(base.stepMs * tempo)),
     volume: Math.min(0.14, base.volume * mixVolume * (0.82 + intensity * 0.16 + scenePulse * 0.012)),
     wave: speakerMotif.wave ?? base.wave,
-    drive: Math.min(0.9, base.drive * intensity),
+    drive: Math.min(DRIVE_CEILING, base.drive * intensity),
     kick: rotate(base.kick, groove.kickShift),
     snare: base.snare,
     hat: thinOut(base.hat, groove.hatDrop),

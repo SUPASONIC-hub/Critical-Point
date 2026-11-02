@@ -20,6 +20,11 @@
  * the same half of the bar, its tones or a step off them -- so a turn changes
  * the tune and never the key. The first is the lead the mode always had.
  *
+ * The drive (a soft clip on the music bus) is a seasoning, not a sound: the
+ * most a mode asks for is 0.15 (`DRIVE_CEILING`, musicScore.js). It went up
+ * to 0.62, which on earphones read as a torn, old-radio sound (11-02
+ * playtest); the others came down by the same quarter.
+ *
  * `x` marks a hit, `.` a rest. Frequencies are Hz; null is a rest.
  */
 function pattern(text) {
@@ -51,7 +56,7 @@ export const musicModes = {
     stepMs: 178,
     volume: 0.115,
     wave: "triangle",
-    drive: 0.12,
+    drive: 0.03,
     kick: pattern("x.......x...x..."),
     snare: pattern("................"),
     hat: pattern("......x.......x."),
@@ -70,7 +75,7 @@ export const musicModes = {
     stepMs: 156,
     volume: 0.128,
     wave: "sawtooth",
-    drive: 0.34,
+    drive: 0.08,
     kick: pattern("x...x...x..x.x.."),
     snare: pattern("................"),
     hat: pattern("...x......x...x."),
@@ -89,7 +94,7 @@ export const musicModes = {
     stepMs: 132,
     volume: 0.14,
     wave: "sawtooth",
-    drive: 0.62,
+    drive: 0.15,
     kick: pattern("x.x.x.x.x.x.xxx."),
     snare: pattern("................"),
     hat: pattern("..x..x..x..x..x."),
@@ -127,7 +132,7 @@ export const musicModes = {
     stepMs: 162,
     volume: 0.148,
     wave: "sawtooth",
-    drive: 0.44,
+    drive: 0.11,
     kick: pattern("x..x..x.x..x..x."),
     snare: pattern("................"),
     hat: pattern(".....x.......x.."),
@@ -140,6 +145,68 @@ export const musicModes = {
     ],
     pad: [[87.31, 130.81, 174.61], null, null, null, null, null, null, null, [82.41, 123.47, 164.81], null, null, null, null, null, null, null],
     noiseEvery: 12,
+  },
+};
+
+/**
+ * The three tracks of the decision reveal -- the sheet after a choice that
+ * says what was received and what was paid (DecisionReveal.jsx). The reveal
+ * used to keep the next scene's mode, so a bust could sound under a bright
+ * scene's tune and a windfall under a critical one ("some didn't fit", 11-02
+ * playtest). Now the sheet has a track of its own for each way a choice comes
+ * out (`revealOutcome`, musicScore.js): received much, about even, paid much.
+ *
+ * They are fixed. No scene hash, chapter, speaker or groove touches them, and
+ * each has one lead, not four -- the turns between leads are for the tables
+ * and the story, where a scene runs long; a reveal is read in a few seconds,
+ * and the same outcome should always sound the same. Triangle leads keep the
+ * 8-bit colour; no drive.
+ */
+export const revealTracks = {
+  // 많이 받음: C major, rising through C - F - G - C, the lead climbing chord tones to the octave.
+  gain: {
+    label: "REVEAL GAIN",
+    stepMs: 196,
+    volume: 0.105,
+    wave: "triangle",
+    drive: 0,
+    kick: pattern("x.......x......."),
+    snare: pattern("................"),
+    hat: pattern("....x.......x..."),
+    bass: [65.41, null, null, null, 87.31, null, null, null, 98, null, null, null, 65.41, null, 98, null],
+    leads: [[261.63, null, 329.63, null, 349.23, null, 440, null, 392, null, 493.88, null, 523.25, null, null, null]],
+    pad: [[130.81, 164.81, 196], null, null, null, [174.61, 220, 261.63], null, null, null, [196, 246.94, 293.66], null, null, null, [130.81, 164.81, 196], null, null, null],
+    noiseEvery: 0,
+  },
+  // 비슷함: open fifths on D and C, no third, so neither bright nor dark; the lead stays near D.
+  even: {
+    label: "REVEAL EVEN",
+    stepMs: 228,
+    volume: 0.095,
+    wave: "triangle",
+    drive: 0,
+    kick: pattern("x..............."),
+    snare: pattern("................"),
+    hat: pattern("........x......."),
+    bass: [73.42, null, null, null, null, null, null, null, 65.41, null, null, null, null, null, null, null],
+    leads: [[293.66, null, null, 329.63, null, null, 293.66, null, 261.63, null, null, 293.66, null, null, 196, null]],
+    pad: [[146.83, 220, 329.63], null, null, null, null, null, null, null, [130.81, 196, 293.66], null, null, null, null, null, null, null],
+    noiseEvery: 0,
+  },
+  // 많이 치름: A minor, Am - F - Dm - E, slow, the lead falling from A to B.
+  cost: {
+    label: "REVEAL COST",
+    stepMs: 262,
+    volume: 0.1,
+    wave: "triangle",
+    drive: 0,
+    kick: pattern("x..............."),
+    snare: pattern("................"),
+    hat: pattern("................"),
+    bass: [55, null, null, null, 43.65, null, null, null, 73.42, null, null, null, 82.41, null, null, null],
+    leads: [[440, null, null, null, 392, null, 349.23, null, 329.63, null, null, 293.66, 261.63, null, 246.94, null]],
+    pad: [[110, 130.81, 164.81], null, null, null, [87.31, 110, 130.81], null, null, null, [73.42, 110, 146.83], null, null, null, [82.41, 123.47, 164.81], null, null, null],
+    noiseEvery: 0,
   },
 };
 
