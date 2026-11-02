@@ -50,6 +50,17 @@ const introPanelsCopy = {
   openingEcho: "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
   // What follows a situation in the browser tab's title (tabTitle.js).
   tabSuffix: " · 임계점",
+  // The storage banner the intro and the report print (appViewModels.js createTelemetrySummary).
+  storageBanner: {
+    offline: { title: "오프라인", text: "연결이 복구되면 원격 저장을 다시 사용할 수 있습니다. 현재 기록은 브라우저에 저장됩니다." },
+    ready: { title: "원격 저장 준비됨", text: "사건 완료와 피드백 제출 시 동의한 기록만 원격 저장합니다." },
+    pending: { title: "원격 저장 준비됨 · 동의 대기", text: "체크박스에 동의하면 이 세션의 완료 로그와 피드백을 원격 저장합니다." },
+    local: { title: "로컬 저장", text: "원격 저장 설정이 없어 브라우저 저장과 JSON 내보내기만 사용합니다." },
+  },
+  // The name a save starts with when none is typed (appConfig.js
+  // DEFAULT_PLAYER_NAME), as a page prints it. The save keeps the Korean name;
+  // this is only how it is shown (playerNameShown).
+  defaultName: "분석관",
 };
 export default introPanelsCopy;
 

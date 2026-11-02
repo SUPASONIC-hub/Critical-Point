@@ -6,12 +6,9 @@ import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLan
 import observerCopy from "./copy/observer.js";
 import judgmentCopy from "./copy/judgment.js";
 import { fill } from "./locale.js";
-import {
-  applyEffect,
-  clamp,
-  getRiskPressure,
-  getRiskPressureDrivers,
-} from "./riskLogic.js";
+import { clamp, getRiskPressure } from "./riskLogic.js";
+// The two rules read once each, by the module's name (check:runtime-budget counts the names this file imports).
+import * as riskLogic from "./riskLogic.js";
 
 export {
   applyEffect,
@@ -61,7 +58,7 @@ export function buildNarrativeSpine({
 
 export function createDecisionForecast(choice = {}, resources = {}) {
   const beforeRisk = getRiskPressure(resources);
-  const afterResources = applyEffect(resources, choice.effect);
+  const afterResources = riskLogic.applyEffect(resources, choice.effect);
   const afterRisk = getRiskPressure(afterResources);
   const riskDelta = afterRisk - beforeRisk;
   const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
@@ -83,7 +80,7 @@ export function createDecisionForecast(choice = {}, resources = {}) {
     biggestGain,
     biggestCost,
     cognitionGain,
-    pressureDrivers: getRiskPressureDrivers(afterResources).slice(0, 2),
+    pressureDrivers: riskLogic.getRiskPressureDrivers(afterResources).slice(0, 2),
   };
 }
 
@@ -1058,8 +1055,11 @@ export function createCaseSummary(
   return summary;
 }
 
+// A card with no reply of its own (the reframe cards) is answered with the
+// default, in the page's language (judgmentCopy.defaultEcho is the Korean
+// `echoReplies.default`, word for word).
 export function getEcho(choiceId) {
-  return echoReplies[choiceId] ?? echoReplies.default;
+  return echoReplies[choiceId] ?? judgmentCopy.defaultEcho;
 }
 
 export function getDramaticChoiceLabel(choice) {
@@ -1072,14 +1072,14 @@ function getStrongestDelta(effect = {}) {
 }
 
 function describeDelta(delta) {
-  if (!delta) return "상황판의 숫자는 크게 움직이지 않지만, 회의실의 침묵은 조금 길어진다.";
+  const words = judgmentCopy.sceneBeat;
+  if (!delta) return words.still;
   const [key, value] = delta;
   // The sentence is about what the move cost, so it follows the meaning of the
   // number rather than its sign: 사람 피해 going up is not a windfall, and going
   // down is not something a third party absorbs.
   const label = easyResourceLabels[key] ?? key;
-  if (isResourceGain(key, value)) return `${label}${subjectParticle(label)} 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.`;
-  return `${label}${subjectParticle(label)} 대가로 남는다. 누군가는 그 몫을 자기 자리에서 떠안게 된다.`;
+  return fill(isResourceGain(key, value) ? words.gain : words.cost, { label, particle: subjectParticle(label) });
 }
 
 export function explainResourceTradeoff(effect = {}) {
@@ -1178,23 +1178,23 @@ function getSpokenStem(label) {
   return `${head}${SPOKEN_L_STEMS[label.slice(-2, -1)] ?? stemSyllable}`;
 }
 
+// The beat is written into the run's log as the card is played, so it is in
+// the page's language then: the profiles are laid over in place by the module
+// that owns them (gameDialogue.js, from src/locales/<lang>/late/gameDialogue.js),
+// the frame is judgmentCopy's.
 export function buildSceneBeat(node, choice, effect = {}) {
-  const profile = characterProfiles[node?.speaker] ?? {
-    appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
-    thought: "이 선택은 아직 끝나지 않았다.",
-    gesture: "상대는 잠시 말을 고른다.",
-    voice: "상황을 확인하는 말투로 반응한다.",
-    line: "그 판단을 계속 밀고 갈 수 있습니까?",
-  };
+  const words = judgmentCopy.sceneBeat;
+  const profile = characterProfiles[node?.speaker] ?? words.stockProfile;
   const said = `"${speechifyChoice(choice)}"`;
   const deltaLine = describeDelta(getStrongestDelta(effect));
-  const speakerName = node?.speaker ?? "상대";
+  // The name the page prints (a scene in another language carries `speakerName`); the Korean name on a Korean page.
+  const speakerName = node?.speakerName ?? node?.speaker ?? words.speaker;
 
   return [
     `${profile.appearance} ${profile.gesture}`,
     `'${profile.thought}'`,
-    `당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. ${said}`,
-    `${speakerName}${subjectParticle(speakerName)} 시선을 든다. ${profile.voice}`,
+    fill(words.said, { said }),
+    fill(words.look, { name: speakerName, particle: subjectParticle(speakerName), voice: profile.voice }),
     `"${profile.line}"`,
     deltaLine,
   ].join("\n");

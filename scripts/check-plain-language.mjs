@@ -64,6 +64,9 @@ const COPY_FILES = [
   "src/copy/habits.js",
   "src/copy/judgment.js",
   "src/copy/introPanels.js",
+  // The runtime's own lines and the far callbacks, moved out for the other languages (locale gaps, second pass).
+  "src/copy/runLines.js",
+  "src/copy/farCallbacks.js",
   // The lines a prologue's first briefing says about the rules it turns on.
   "src/gauntlet/tableUnlocks.js",
   // Its words, moved out of it for the English layer (2026-10-26, 다국어 틀).

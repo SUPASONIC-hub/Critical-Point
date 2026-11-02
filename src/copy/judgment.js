@@ -45,6 +45,30 @@ const judgmentCopy = {
   },
   question: "지금 무엇을 먼저 지킬지 결정해야 합니다.",
   titledQuestion: "{title}: 지금 무엇을 먼저 지킬지 결정해야 합니다.",
+  // What a card with no reply of its own is answered with (`getEcho`; the
+  // reframe cards): gameDialogue.js `authoredEchoReplies.default`, word for
+  // word, read here so another language can say it.
+  defaultEcho: "그 판단을 유지하려면 숨은 피해자와 비용을 다시 계산해야 합니다. 같은 원칙을 더 불리한 조건에서도 적용하시겠습니까?",
+  // The report's scene beat (`buildSceneBeat`): the person a scene's speaker
+  // is when the season has no profile for them, the two lines around the
+  // card, and the line on what the strongest number did (`describeDelta`).
+  // The speaker's own profile is gameDialogue.js's, laid over from
+  // src/locales/<lang>/late/gameDialogue.js.
+  sceneBeat: {
+    stockProfile: {
+      appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
+      thought: "이 선택은 아직 끝나지 않았다.",
+      gesture: "상대는 잠시 말을 고른다.",
+      voice: "상황을 확인하는 말투로 반응한다.",
+      line: "그 판단을 계속 밀고 갈 수 있습니까?",
+    },
+    speaker: "상대",
+    said: "당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. {said}",
+    look: "{name}{particle} 시선을 든다. {voice}",
+    still: "상황판의 숫자는 크게 움직이지 않지만, 회의실의 침묵은 조금 길어진다.",
+    gain: "{label}{particle} 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.",
+    cost: "{label}{particle} 대가로 남는다. 누군가는 그 몫을 자기 자리에서 떠안게 된다.",
+  },
 };
 export default judgmentCopy;
 

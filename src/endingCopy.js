@@ -11,6 +11,9 @@
 
 import { getVerdictKey } from "./verdictBranch.js";
 import words from "./copy/ending.js";
+import resultCopy from "./copy/result.js";
+import { DEFAULT_PLAYER_NAME } from "./appConfig.js";
+import { fill } from "./locale.js";
 
 /** The ending's words (src/copy/ending.js), for the result screen's twists and records. */
 export { words as endingWords };
@@ -89,4 +92,15 @@ const openAfterglow = words.openAfterglow;
 export function getEndingAfterglow(ledger) {
   const [observation, seen] = Object.entries(ledger).sort((a, b) => b[1] - a[1])[0];
   return seen > 0 ? endingAfterglows[observation] : openAfterglow;
+}
+
+/**
+ * Whose record the result screen says it is: the typed name, the default the
+ * save kept in Korean (appConfig.js DEFAULT_PLAYER_NAME) in the page's words,
+ * or the anonymous analyst.
+ */
+export function getAnalystName(playerName) {
+  const name = typeof playerName === "string" ? playerName.trim() : "";
+  if (!name) return resultCopy.anonymousAnalyst;
+  return name === DEFAULT_PLAYER_NAME ? resultCopy.defaultAnalyst : fill(resultCopy.namedAnalyst, { name });
 }

@@ -32,4 +32,20 @@ export default {
   },
   question: "You have to decide what to protect first.",
   titledQuestion: "{title}: You have to decide what to protect first.",
+  defaultEcho: "To hold that call, you have to count the hidden victims and the cost again. Will you apply the same principle under worse conditions?",
+  sceneBeat: {
+    stockProfile: {
+      appearance: "Someone involved in the case sits before an untidy pile of papers.",
+      thought: "This choice isn’t over yet.",
+      gesture: "They take a moment to choose their words.",
+      voice: "They respond in the tone of someone checking where things stand.",
+      line: "Can you keep pushing that call?",
+    },
+    speaker: "The other side",
+    said: "Instead of naming a prepared response, you leave only the conclusion and say: {said}",
+    look: "{name} looks up. {voice}",
+    still: "The numbers on the board barely move, but the silence in the meeting room runs a little longer.",
+    gain: "{label} opens up. But that number didn’t come free.",
+    cost: "{label} is left as the price. Someone will carry that share from where they stand.",
+  },
 };

@@ -20,6 +20,17 @@ import { createEndingProfile } from "../../src/viewModels/reportViewModels.js";
 import { getPastRunMemory, getPlayStyleUnlocks, getRankingIntegrity, getSeasonGoals, getTutorialSteps } from "../../src/advancedSystems.js";
 import { ANALYST_TITLE_STEPS, getAnalystTitle } from "../../src/analystTitle.js";
 import { ENDING_NAMES, getEndingPreview } from "../../src/runtimeSystems.js";
+import { characterProfiles } from "../../src/gameDialogue.js";
+import { nodes } from "../../src/gameData.js";
+import { buildSceneBeat, getEcho } from "../../src/gameLogic.js";
+import { farCallbacks, withFarCallback } from "../../src/farCallbacks.js";
+import { getSceneBridge } from "../../src/viewModels/sceneBridge.js";
+import { getRouteMarker } from "../../src/state/savedState.js";
+import { describeBatchResult } from "../../src/state/useTelemetryQueue.js";
+import { createTelemetrySummary } from "../../src/viewModels/appViewModels.js";
+import { buildLeaderboard } from "../../src/ranking.js";
+import { getAnalystName } from "../../src/endingCopy.js";
+import { runtimeCardLabel } from "../../src/viewModels/sceneViewModels.js";
 
 /**
  * The guard for the strings the 10-30 playtest found Korean on English and
@@ -49,6 +60,9 @@ export async function layOver(lang) {
   overlayModule(dictionary.copy, "appCopy", appCopy);
   overlayModule(dictionary.copy, "playerLanguage", playerLanguage);
   overlayModule(dictionary.copy, "gameCases", gameCases);
+  // The runtime's late words (src/locales/<lang>/late/<module>.js): the character profiles.
+  const late = await import(`../../src/locales/${lang}/late/gameDialogue.js`);
+  overlayModule({ gameDialogue: late.default }, "gameDialogue", { characterProfiles });
   return tables;
 }
 
@@ -71,7 +85,7 @@ export function collectLines(tables) {
   };
 
   // The swept copy modules, whole.
-  for (const name of ["habits", "judgment", "logicReport", "sceneRates", "seasonLines", "playReads", "introPanels", "music"]) add(`copy/${name}`, tables[name]);
+  for (const name of ["habits", "judgment", "logicReport", "sceneRates", "seasonLines", "playReads", "introPanels", "music", "runLines", "farCallbacks"]) add(`copy/${name}`, tables[name]);
   add("copy/reportLines.endingProfiles", tables.reportLines.endingProfiles);
 
   // The 판단 습관, as the card and the report read them.
@@ -152,9 +166,66 @@ export function collectLines(tables) {
   return lines;
 }
 
+/**
+ * The second pass (10-30 playtest, #393): what the runtime writes as a run is
+ * played. `speakers` is the dictionary's names, as the scenes of that
+ * language carry them (`speakerName`, src/locales/overlay.js).
+ */
+export function collectRunLines(speakers) {
+  const lines = [];
+  const add = (where, value) => {
+    for (const [path, text] of strings(value)) lines.push([path ? `${where}.${path}` : where, text]);
+  };
+  // The report's scene beat, for every speaker the season profiles and one it does not.
+  const card = { label: "Reframe the table and propose" };
+  for (const name of Object.keys(characterProfiles)) {
+    add(`sceneBeat.${name}`, buildSceneBeat({ speaker: name, speakerName: speakers[name] ?? "Someone" }, card, { trust: 3 }));
+  }
+  add("sceneBeat.stock", [buildSceneBeat({ speakerName: "Someone" }, card, { humanCost: 4 }), buildSceneBeat({}, card, {})]);
+  add("getEcho.reframe", getEcho("reframe"));
+  // The line above the briefing and under a case's first scene.
+  add("sceneBridge", [
+    getSceneBridge({ log: [{ echo: "Echo." }] }),
+    getSceneBridge({ caseResults: { case01: { outcomeChoiceId: "x" } }, currentCase: "case02" }),
+  ]);
+  for (const entry of [{ routeChangeKind: "memory" }, { routeChangeKind: "evidence-turn" }, { routeChangeKind: "reframe" }, { nodeId: "x_aftershock" }, { nodeId: "x_reaction" }, {}]) add("routeMarker", getRouteMarker(entry).label);
+  // The runtime's own cards.
+  add("runtimeCards", [runtimeCardLabel("adaptive").label, runtimeCardLabel("relationship").label]);
+  // The storage lines.
+  for (const isOnline of [true, false]) for (const telemetryEnabled of [true, false]) for (const dataConsent of [true, false]) add("telemetrySummary", createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled }));
+  add("batchResult", [
+    describeBatchResult({ queueCommitted: false, left: 0 }),
+    describeBatchResult({ queueCommitted: true, left: 0 }),
+    describeBatchResult({ queueCommitted: true, left: 2, refused: 1, unranked: 1, beatTable: 1 }),
+  ]);
+  // The default name, shown and kept apart.
+  add("analystName", [getAnalystName("분석관"), getAnalystName("")]);
+  const summary = { burstScore: 50, rank: "B", triggers: {}, cognition: {} };
+  add("leaderboard.names", buildLeaderboard([
+    { local: true, player_name: "분석관", case_id: "case01", summary },
+    { local: true, player_name: "현재 분석관", case_id: "case02", summary },
+  ]).map((row) => [row.name, row.headline]));
+  return lines;
+}
+
+/**
+ * The far callbacks on a language's scenes: each anchor is in its scene's
+ * text once, and every line and the fallback land right after it.
+ */
+export async function assertFarCallbacksLand(lang) {
+  for (const [nodeId, callback] of Object.entries(farCallbacks)) {
+    const caseId = nodes[nodeId].caseId;
+    const text = (await import(`../../src/locales/${lang}/nodes/${caseId}.js`)).default.nodes[nodeId].text;
+    assert.equal(text.split(callback.after).length - 1, 1, `${lang} ${nodeId}: "${callback.after}" once in the scene`);
+    for (const line of [...Object.values(callback.lines), callback.fallback]) assert.ok(!HANGUL.test(line), `${lang} ${nodeId}: ${line}`);
+    const read = withFarCallback(nodeId, { text }, {});
+    assert.ok(read.text.includes(`${callback.after} ${callback.fallback}`), `${lang} ${nodeId}: the fallback follows the anchor`);
+  }
+}
+
 /** Fails on any line with Hangul in it, naming each. */
-export function assertNoHangul(lines, lang) {
+export function assertNoHangul(lines, lang, least = 150) {
   const korean = lines.filter(([, text]) => HANGUL.test(text));
   assert.deepEqual(korean, [], `${lang}: these lines are still Korean`);
-  assert.ok(lines.length > 150, `${lang}: the sweep read ${lines.length} lines`);
+  assert.ok(lines.length > least, `${lang}: the sweep read ${lines.length} lines`);
 }

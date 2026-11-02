@@ -18,7 +18,7 @@
 import { getSeasonRound } from "../appConfig.js";
 import { getCaseOutcome } from "../gameLogic.js";
 import { isPlainObject, normalizeSeasonRecord } from "./seasonRecord.js";
-import { fill } from "../locale.js";
+import { appliedLocale, fill } from "../locale.js";
 import W from "../copy/seasonLines.js";
 
 // What getCaseOutcome answers for a choice its case has no aftermath for, asked when it is compared so it is the page's language.
@@ -154,6 +154,15 @@ export function seasonLabel(round) {
  * again (문구 질문 20, (1)). The week's rule rides on a first season's line too. It starts on a space,
  * so the card's chunk appends it as it is.
  */
+/**
+ * The tail's last mark. It has no Hangul, so a dictionary cannot write over it
+ * (src/locales/overlay.js lays only Korean strings over), and the Japanese
+ * line ends on 「。」, not ".".
+ */
+export function fullStop(lang) {
+  return lang === "ja" ? "。" : ".";
+}
+
 export function getSeasonCard({ secondSeason, pastEndingName = "", weekRuleLabel = "" } = {}) {
   const round = secondSeason?.round ?? 1;
   const parts = [
@@ -161,7 +170,7 @@ export function getSeasonCard({ secondSeason, pastEndingName = "", weekRuleLabel
     round > 1 && pastEndingName ? fill(W.card.pastEnding, { ending: pastEndingName }) : "",
     weekRuleLabel ? fill(W.card.weekRule, { rule: weekRuleLabel }) : "",
   ].filter(Boolean);
-  return { season: `${seasonLabel(round)} · FINAL RECORD`, share: parts.length ? ` ${parts.join(" · ")}.` : "" };
+  return { season: `${seasonLabel(round)} · FINAL RECORD`, share: parts.length ? ` ${parts.join(" · ")}${fullStop(appliedLocale())}` : "" };
 }
 
 /**
