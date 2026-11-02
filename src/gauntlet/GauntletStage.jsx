@@ -487,7 +487,7 @@ export function GauntletStage({
             pane and the hand is the right one, so the table is as tall as the
             taller of the two rather than their sum. */}
         <div className="gx-read">
-        <div className="gx-hud">
+        <div className={`gx-hud${audit ? " has-audit" : ""}`}>
           <div className="gx-pot" aria-live="off">
             <span className="gx-label">{say.pot}</span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
@@ -518,7 +518,7 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
@@ -544,6 +544,15 @@ export function GauntletStage({
             )}
             {logic && <LogicLine logic={logic} />}
           </div>
+          )}
+          {/* The same audit count, for a 360px phone only (play.css): there it
+              leaves the bank row for the signals' row, so the bank keeps one
+              line at a pot of 0. Each width shows one of the two and hides the
+              other with display: none, so a reader hears it once. */}
+          {audit && (
+            <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}>
+              <small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b>
+            </span>
           )}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
