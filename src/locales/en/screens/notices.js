@@ -30,6 +30,8 @@ export default {
     backupUnreadable: "The kept save can’t be read by this version either. It’s left as it is, not deleted.",
     backupRestoreFailed: "The kept save couldn’t be loaded. Browser storage isn’t available.",
     queueUnavailable: "Browser storage isn’t available, so the change to the remote save queue couldn’t be kept.",
+    rankingFailed: "Local ranking save failed: browser storage is unavailable.",
+    seasonRankingFailed: "Season ranking save failed: browser storage is unavailable.",
   },
   run: {
     settling: "The verdict is still settling. You can leave once the result is in.",

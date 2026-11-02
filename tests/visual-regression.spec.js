@@ -387,6 +387,9 @@ for (const viewport of [
   { name: "laptop", width: 1280, height: 720 },
   { name: "mobile", width: 390, height: 844 },
   { name: "narrow phone", width: 320, height: 844 },
+  // The short Android phone the table is laid out for (hand5): production put
+  // the Korean button's foot at 742 here (10-30), under none of the others.
+  { name: "small phone", width: 360, height: 740 },
   { name: "large phone", width: 412, height: 915 },
 ]) {
   // Each language's start screen (10-29): the English premise ran two lines

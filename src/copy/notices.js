@@ -42,6 +42,13 @@ const noticesCopy = {
     backupRestoreFailed: "보관한 저장본을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
     // useTelemetryQueue's commitPendingTelemetryQueue, when the queue's change cannot be written.
     queueUnavailable: "브라우저 저장소를 사용할 수 없어 원격 저장 대기열 변경을 반영하지 못했습니다.",
+    // useChoiceCommit, when a closed case's (or the finished season's) row
+    // cannot be written to this device's ranking. Not in STORAGE_RETRY_LINES:
+    // the retry is the reset's cleanup and clears the ranking rows and the
+    // run's save with it, which is not what a player who just closed a case
+    // should be offered under this line.
+    rankingFailed: "로컬 랭킹을 저장하지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
+    seasonRankingFailed: "시즌 랭킹을 저장하지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
   },
   run: {
     settling: "판정이 끝나는 중입니다. 결과가 나온 뒤에 나갈 수 있습니다.",

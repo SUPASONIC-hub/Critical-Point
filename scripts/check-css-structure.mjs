@@ -173,7 +173,11 @@ const fileBudgets = {
   // main c3b40b6f): on 360px or less the three language pills keep one row
   // (closer, 8px padding, 12px type, out to the music controls) and the brand
   // row comes up 8px under them.
-  "base-intro-ranking.css": { lines: 3155, bytes: 69767 },
+  // 3155 / 69767 -> 3159 / 69883 on 2026-10-30, measured (intro-360-fit): on
+  // 360px or less the start button sits closer to the premise (a 360x740
+  // phone had the Korean one 2px under the screen) and the English premise
+  // takes the Japanese 14px there (Linux CI put its button at 746).
+  "base-intro-ranking.css": { lines: 3159, bytes: 69883 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -270,7 +274,14 @@ const fileBudgets = {
   // ground over its stripes.
   // -> 56244 on 2026-10-25, measured (C-15 draft, for after W47): a board
   // rule's badge folded until its card is staked, and 소모 없음 without red.
-  "play.css": { lines: 2931, bytes: 56244 },
+  // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
+  // labels a size down, so five-card hands keep two lines in a CJK face.
+  // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
+  // the HUD gives up its air so a bank row on two lines (late-season numbers)
+  // keeps a five-card hand above the action bar.
+  // -> 56734 bytes on 2026-11-02, measured: C-15's badge fold over the
+  // Japanese 360px card labels and the 360px HUD air.
+  "play.css": { lines: 2931, bytes: 56734 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
