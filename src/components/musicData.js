@@ -271,7 +271,14 @@ export const chapterMotifs = {
   case47: { wave: "triangle", lift: 380, impact: 0.95 },
   case48: { wave: "triangle", lift: 460, impact: 1.15 },
   case49: { wave: "triangle", lift: 520, impact: 1.3 },
-  final: { wave: "sawtooth", lift: 760, impact: 1.32 },
+  // The ending was the one score heard as torn (music-lab, 2026-11-02, on
+  // earphones; every other mode was rated fine). It was the only sawtooth lead
+  // this high (311-523Hz before a transpose of up to +7; critical's sawtooth
+  // sits at 185-311), with the filters opened furthest (lift 760) and the
+  // drums hit hardest (impact 1.32). Taming lift and impact helped but did not
+  // cure it, so the ending's lead plays as a triangle -- still a chip voice --
+  // and lift and impact sit where the late cases are, which were fine.
+  final: { wave: "triangle", lift: 300, impact: 1.15 },
 };
 
 export const speakerMotifs = {
