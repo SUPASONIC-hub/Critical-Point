@@ -545,15 +545,8 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {/* The same audit count, for a 360px phone only (play.css): there it
-              leaves the bank row for the signals' row, so the bank keeps one
-              line at a pot of 0. Each width shows one of the two and hides the
-              other with display: none, so a reader hears it once. */}
-          {audit && (
-            <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}>
-              <small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b>
-            </span>
-          )}
+          {/* The audit count's 360px place, beside the signals (play.css); each width hides one of the two (display: none), so it is read once. */}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
