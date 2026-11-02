@@ -185,6 +185,8 @@ const fileBudgets = {
   // takes the Japanese 14px there (Linux CI put its button at 746).
   // 3159 / 69883 -> 3170 / 70168 on 2026-10-30, measured (통합 리허설 over #224
   // 8dd649ce, main b2558d55): D2's badge rule beside main's 360px start button.
+  // 3166 / 70052 -> 3170 / 70168 on 2026-11-02, measured (D2 over #224
+  // 8dd649ce, main b2558d55): the badge rule beside intro-360-fit.
   "base-intro-ranking.css": { lines: 3170, bytes: 70168 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and

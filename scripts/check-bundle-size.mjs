@@ -664,6 +664,7 @@ const budgets = [
   // 196,655 / 36,661 -> 196,837 / 36,700 on 2026-10-30, #224 merged with main b2558d55 (#380 #381 #382 #383): main's Japanese card labels and 360px start button over #224's link tag, signal row and English bank rail. Measured 196,837 / 36,696 in the e2e build, the gzip plus 4.
   // 196,837 / 36,700 -> 196,890 / 36,709 on 2026-11-02, C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55). Measured 196,890 / 36,705 in the e2e build, the gzip plus 4.
   // 196,837 / 36,700 (#224) -> 196,935 / 36,727 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55). Measured 196,935 / 36,723 in the e2e build, the gzip plus 4.
+  // 196,837 / 36,700 (#224) -> 197,081 / 36,731 on 2026-11-02, D2 hall of fame (#308) merged with #224 8dd649ce (main b2558d55). Measured 197,081 / 36,727 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 197_050, maxGzip: 36_728 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -1334,6 +1335,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * #224 merged with main b2558d55 (10-30 evening; #380 #381 #382 #383): 423,175, 472,704 and 478,488, the plus 4.
  * C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55, 11-02): 423,256, 472,832 and 478,632, the plus 4.
  * C-3·C-4 rules (#320) merged with #224 8dd649ce (main b2558d55, 11-02): 423,218, 472,870 and 478,687, the plus 4.
+ * D2 hall of fame (#308) merged with #224 8dd649ce (main b2558d55, 11-02): 423,419, 473,091 and 478,884, the plus 4.
  */
 // ko 422,779 -> 422,891, en 472,179 -> 472,502, ja 477,926 -> 478,315 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): the index CSS's board marks and the five icons in icons-vendor (both on the first paint), and each dictionary's new lines. Measured 422,887 / 472,498 / 478,311. Measured in the e2e build, the gzip plus 4.
 // ko 423,110 -> 423,241, en 472,645 -> 472,970, ja 478,429 -> 478,812 on 2026-10-30, table rhythm bundle (#316) merged with #224 bb70e777 (main 430dda1e, 10-30): 423,237, 472,966 and 478,808, the plus 4.
