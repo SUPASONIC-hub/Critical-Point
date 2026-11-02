@@ -402,6 +402,10 @@ const fileBudgets = {
   // 홈 화면에 추가 card under the settings in the intro's comfort drawer
   // (components/InstallHint.jsx), drawn only where a browser offers an install.
   "comfort.css": { lines: 175, bytes: 3849 },
+  // New on 2026-11-02 (money-feedback): the bank rail's purse and the slam's
+  // amount that flies into it, in a file of its own so play.css's 360px fits
+  // are not touched. Measured 128 / 2331.
+  "money.css": { lines: 128, bytes: 2331 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */
