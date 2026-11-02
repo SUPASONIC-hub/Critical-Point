@@ -152,7 +152,8 @@ const budgets = [
   // 26,800 / 11,373 -> 27,810 / 11,699 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the ladder's 사건 01 to 03 steps and their lines (copy/unlocks.js), the directions' names and the streak's sentences (copy/table.js readout). Measured 27,810 / 11,695, the gzip plus 4 in the e2e build.
   // 27,810 / 11,699 -> 28,610 / 12,005 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): C-7's tools, the ladder's 사건 01 to 03 lines and the directions' sentences together. Measured 28,610 / 12,001 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 28,610 / 12,002 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 28,610 / 11,998 in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 28_610, maxGzip: 12_002 },
+  // 12,002 -> 12,007 gzip on 2026-11-02, 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308. Measured 12,003 in the e2e build, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 28_610, maxGzip: 12_007 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -674,7 +675,8 @@ const budgets = [
   // 196,890 / 36,709 -> 197,146 / 36,758 on 2026-11-02, C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28). Measured 197,146 / 36,754 in the e2e build, the gzip plus 4.
   // 196,935 / 36,727 -> 197,191 / 36,774 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 197,191 / 36,770 in the e2e build, the gzip plus 4.
   // 197,081 / 36,731 -> 197,337 / 36,778 on 2026-11-02, D2 hall of fame (#308) merged with #224 afdcac0c (main 2f085d28). Measured 197,337 / 36,774 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 197_232, maxGzip: 36_764 },
+  // 197,232 / 36,764 -> 197,488 / 36,813 on 2026-11-02, 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308. Measured 197,488 / 36,809 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 197_488, maxGzip: 36_813 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1360,7 +1362,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55, 11-02): 423,374, 473,096 and 478,938, the plus 4.
 // 통합 리허설 (#379) over #224 8dd649ce (main b2558d55) with #307 #316 #320 #308, 11-02: 423,612, 473,680 and 479,530, the plus 4.
 // table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28): 423,425, 473,149 and 478,991, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 423_616, en: 473_684, ja: 479_534 };
+// 통합 리허설 (#379) over #224 afdcac0c (main 2f085d28) with #307 #316 #320 #308: 423,661, 473,729 and 479,579, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 423_665, en: 473_733, ja: 479_583 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
