@@ -561,7 +561,10 @@ const budgets = [
   // down (play.css), so a five-card hand keeps two lines in a CJK face. Measured 196,428 / 36,620 in the e2e build, the gzip plus 4.
   // -> 196,523 / 36,650 on 2026-10-30, intro-360-fit over main 7552870d (#381): on 360px or less the start button sits closer
   // to the premise (a 360x740 phone had the Korean one 2px under the screen) and the English premise takes 14px. Measured 196,523 / 36,646, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_523, maxGzip: 36_650 },
+  // -> 196,795 / 36,700 on 2026-10-30, bank-rail-fit over main 78e53e40 (#382): on 360px or less the HUD gives up its air
+  // (30px clock, 18px bank pills, tighter gaps) so a bank row on two lines keeps a five-card hand above the action bar.
+  // Measured 196,795 / 36,696 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_795, maxGzip: 36_700 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1135,10 +1138,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The start button closer to the premise on 360px or less (intro-360-fit,
  * over main 7552870d; the English premise at 14px there too): 423,171, 472,667
  * and 478,463.
- * E-11 번외 사건 틀 (draft, over main b2558d55 on 10-30), the start screen's
- * side slot and its words in the entry: 424,106, 473,943 and 479,733.
+ * The HUD's air on 360px or less, so a late-season bank row on two lines keeps
+ * the hand above the bar (bank-rail-fit, over main 78e53e40; the index CSS
+ * carries the rule): 423,219, 472,715 and 478,511.
+ * E-11 번외 사건 틀 (draft, over main 2f085d28 on 11-02), the start screen's
+ * side slot and its words in the entry: 424,217, 474,055 and 479,845.
  */
-const FIRST_PAINT_BUDGETS = { ko: 424_110, en: 473_947, ja: 479_737 };
+const FIRST_PAINT_BUDGETS = { ko: 424_221, en: 474_059, ja: 479_849 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
