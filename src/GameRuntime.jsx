@@ -46,6 +46,7 @@ import { getLeaderboardHeadline } from "./ranking.js";
 import { simplifyPlayerText } from "./playerLanguage.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
+import { revealOutcome } from "./components/musicScore.js";
 import { LazyScreen } from "./components/LazyScreen.jsx";
 import { confirmAction } from "./state/confirmAction.js";
 import noticesCopy from "./copy/notices.js";
@@ -570,7 +571,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     focusSceneTitle(sceneTitleRef);
   }, [decisionReveal, releaseAdvance]);
 
+  // The reveal's own track while its sheet is open: one of three, by what the
+  // choice received against what it paid (revealOutcome, musicScore.js), not
+  // the next scene's mode behind it.
+  const revealMusic = decisionReveal
+    ? `reveal:${revealOutcome(decisionReveal.effect, { busted: decisionReveal.verdict?.outcome === "bust" })}`
+    : null;
   const musicModeKey = useMemo(() => {
+    if (revealMusic) return revealMusic;
     if (!started) return "intro:menu";
     if (isResult) return currentCase === "final" ? `result:final:${endingStep}` : `result:${currentCase}`;
     const musicRouteIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);
@@ -579,7 +587,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "") || "scene";
       return `${riskTier.toLowerCase()}:${currentCase}:${phaseKey}:${node?.speaker ?? "voice"}:${musicRouteIndex}:${operatorOrigin}`;
-  }, [currentCase, endingStep, fallbackCaseId, isResult, node?.phase, node?.speaker, operatorOrigin, resolvedNodeId, riskTier, started]);
+  }, [currentCase, endingStep, fallbackCaseId, isResult, node?.phase, node?.speaker, operatorOrigin, resolvedNodeId, revealMusic, riskTier, started]);
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";

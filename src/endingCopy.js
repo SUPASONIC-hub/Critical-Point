@@ -98,8 +98,10 @@ export function getEndingAfterglow(ledger) {
  * Whose record the result screen says it is: the typed name with its title,
  * the anonymous analyst, or -- for the default the save keeps in Korean
  * (appConfig.js DEFAULT_PLAYER_NAME), or a name that is the page's own word
- * for it (Analyst, 分析官) -- that word once, never 「분석관 분석관」,
- * "Analyst Analyst" or 「分析官分析官」. Only the line shown; the save keeps the name.
+ * for it (Analyst, or the Japanese page's word) -- that word once, never
+ * 「분석관 분석관」 or "Analyst Analyst". Only the line shown; the save keeps the
+ * name. (No kanji here: check:fonts reads comments too, and the Japanese words
+ * live in src/locales/ja, which Pretendard is never asked for.)
  */
 export function getAnalystName(playerName) {
   const name = typeof playerName === "string" ? playerName.trim() : "";
