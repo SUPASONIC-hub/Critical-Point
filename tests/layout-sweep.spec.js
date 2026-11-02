@@ -4,6 +4,7 @@ import { LOCALE_KEY } from "../src/appConfig.js";
 import { CASE_SEQUENCE, nodeOrders, nodes } from "../src/gameData.js";
 import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureStakedTable, measureTable,OVERCLOCKED_BOARD, openBrokenBoard } from "./helpers/layout.js";
+import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
 /**
  * Every decision in the game, on every screen the table promises to fit.
@@ -57,6 +58,55 @@ if (LAYOUT_SCENES && !HAND5) throw new Error(`LAYOUT_SCENES=${LAYOUT_SCENES}: th
 
 const fiveCardScenes = (caseId) => nodeOrders[caseId].filter((nodeId) => nodes[nodeId].choices.length === 5);
 
+/**
+ * LAYOUT_BANK=max (or cap) measures the same hands under the numbers a run
+ * carries late in the season. A debug jump opens every scene on a fresh table:
+ * a pot of 0, an empty vault, no streak. Measured 2026-10-30, the bank row
+ * over the hand (`.gx-bank`: pot, vault, and the streak / BUST / best line)
+ * took one line at 0 and two at the numbers below on a 360px phone, and the
+ * second line put the last card of a five-card hand under the action bar.
+ *
+ * `max` is as large as a season plays: a pot of 99,999, a vault of 1,999,999
+ * (the season's closing vault averaged 866,939 in the B2 measurement), a streak
+ * of 49, 99 busts, a best of x64 (HIGH ROLLER). `cap` is what the engine lets
+ * them reach at all: the vault and pot have no ceiling, so 999,999 and
+ * 9,999,999 stand in for them; busts 999, the best x512 (`normalizeRunState`).
+ *
+ * The numbers are written into the save from a static page on the same origin
+ * and the scene is loaded again, as `openBrokenBoard` does: a reload a scene,
+ * where the plain pass jumps without one. Unset, the pass is as it was.
+ */
+const LAYOUT_BANK = process.env.LAYOUT_BANK ?? "";
+const BANK_TABLES = {
+  max: { runPot: 99_999, vault: 1_999_999, streak: 49, busts: 99, bestMultiplier: 64 },
+  cap: { runPot: 999_999, vault: 9_999_999, streak: 99, busts: 999, bestMultiplier: 512 },
+};
+if (LAYOUT_BANK && !BANK_TABLES[LAYOUT_BANK]) throw new Error(`LAYOUT_BANK=${LAYOUT_BANK}: the bank tables are ${Object.keys(BANK_TABLES).join(", ")}`);
+const BANK = BANK_TABLES[LAYOUT_BANK] ?? null;
+const BANK_SUFFIX = BANK ? `-bank-${LAYOUT_BANK}` : "";
+if (BANK && !HAND5) throw new Error("LAYOUT_BANK measures the hand5 pass: set LAYOUT_SCENES=hand5 with it");
+
+async function loadBank(page, nodeId) {
+  await page.goto("/profile.jpg");
+  const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(save?.nodeId, `${nodeId}: the save holds the scene`).toBe(nodeId);
+  save.dynamics = { ...(save.dynamics ?? {}), ...BANK, handVault: 0, runHand: 0 };
+  await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
+  await page.goto("/?debug=1");
+  await page.locator(".choices .choice").first().waitFor();
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId}: the bank is the one written`).toHaveText(BANK.runPot.toLocaleString("en-US"));
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
+}
+
+/** The bank row and the HUD it sits in, so a report says how many lines the numbers took. */
+async function measureBank(page) {
+  return page.evaluate(() => {
+    const height = (selector) => Math.round(document.querySelector(selector)?.getBoundingClientRect().height ?? 0);
+    return { bankHeight: height(".gx-bank"), hudHeight: height(".gx-hud"), bankText: document.querySelector(".gx-bank")?.textContent.replace(/\s+/g, " ").trim() ?? "" };
+  });
+}
+
 async function measureCards(page) {
   return page.evaluate(() =>
     [...document.querySelectorAll(".choices .choice")].map((card) => {
@@ -69,10 +119,10 @@ async function measureCards(page) {
 }
 
 for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
-  test(`the five-card ${caseId} hands fit above the action bar on a 360x740 phone, without reloads @layout`, async ({ page }) => {
+  test(`the five-card ${caseId} hands fit above the action bar on a 360x740 phone${BANK ? ` with a ${LAYOUT_BANK} bank` : ", without reloads"} @layout`, async ({ page }) => {
     const nodeIds = fiveCardScenes(caseId);
     test.skip(!nodeIds.length, `${caseId} deals no five-card hand`);
-    test.setTimeout(60_000 + nodeIds.length * 30_000);
+    test.setTimeout(60_000 + nodeIds.length * (BANK ? 45_000 : 30_000));
     await page.setViewportSize(LAYOUT_VIEWPORTS["small phone"]);
     await startDebugNode(page, caseId, nodeIds[0]);
     await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
@@ -84,6 +134,7 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
         await expect(page.getByTestId("debug-overlay").locator(".debug-overlay-heading b"), `${nodeId}: the jump landed`).toHaveText(`${caseId} / ${nodeId}`);
         await dismissProtocolBreach(page);
       }
+      if (BANK) await loadBank(page, nodeId);
       await expectLayoutLang(page, nodeId);
       await page.locator(".choices .choice").first().waitFor();
       await page.locator(".gx-hand").evaluate(async (hand) => {
@@ -91,7 +142,7 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
         await Promise.all(ending.map((animation) => animation.finished.catch(() => {})));
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       });
-      const row = { caseId, nodeId, name: "small phone", ...(await measureTable(page)), hand: await measureCards(page) };
+      const row = { caseId, nodeId, name: "small phone", ...(BANK ? { bank: LAYOUT_BANK } : null), ...(await measureTable(page)), ...(await measureBank(page)), hand: await measureCards(page) };
       rows.push(row);
       if (row.lastCard > row.actionsTop) {
         const lastRow = row.hand.filter((card) => card.bottom > row.actionsTop);
@@ -100,7 +151,7 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
       }
       if (row.widest > row.innerWidth + 1) failures.push(`${nodeId}: ${row.widest - row.innerWidth}px wider than the screen`);
     }
-    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-hand5-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
+    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-hand5-${caseId}${REPORT_SUFFIX}${BANK_SUFFIX}.json`, JSON.stringify(rows));
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }
