@@ -177,7 +177,9 @@ const fileBudgets = {
   // 360px or less the start button sits closer to the premise (a 360x740
   // phone had the Korean one 2px under the screen) and the English premise
   // takes the Japanese 14px there (Linux CI put its button at 746).
-  "base-intro-ranking.css": { lines: 3159, bytes: 69883 },
+  // 3159 / 69883 -> 3159 / 69903 on 2026-11-02, measured (pc-type-scale): from 1024px wide the
+  // root reads 18px; the case card's numeral keeps its size through --hud-rem.
+  "base-intro-ranking.css": { lines: 3159, bytes: 69903 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -277,7 +279,10 @@ const fileBudgets = {
   // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
   // the HUD gives up its air so a bank row on two lines (late-season numbers)
   // keeps a five-card hand above the action bar.
-  "play.css": { lines: 2931, bytes: 56505 },
+  // -> 56745 bytes on 2026-11-02, measured (pc-type-scale): from 1024px wide
+  // the pot and the clock keep their size through --hud-rem while the root
+  // reads 18px.
+  "play.css": { lines: 2931, bytes: 56745 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -339,7 +344,9 @@ const fileBudgets = {
   // card (ActCard.jsx) in front of an act's first briefing -- its backdrop,
   // page, kicker, name, sentence, count, 계속 with the bar of the time left,
   // and the reduced-motion rule that stills all three.
-  "briefing.css": { lines: 846, bytes: 16306 },
+  // 846 / 16306 -> 846 / 16328 on 2026-11-02, measured (pc-type-scale): the
+  // briefing timer keeps its size through --hud-rem from 1024px wide.
+  "briefing.css": { lines: 846, bytes: 16328 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
