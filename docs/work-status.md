@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-30 (the state of `main` at `78e53e4`, after the web ads readiness pages, sitemap and site verification switch (#376), the 320px language buttons (#375), the ranking save notice in three languages (#378), the GA4 switch and its notice (#380), the Japanese five-card hand at 360px (#381) and the 360x740 start screen (#382); what changed and when is in `git log`)
+Last updated: 2026-11-02 (the state of `main` at `2f085d2`, after the 360px bank rail fit for large late-season stakes (#384); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -445,6 +445,17 @@ Still open, on purpose:
   (#314's result-screen order e2e fixed), #224 → #307, #316, #320, #308 →
   #379 (#224's 360px English bank rail CSS, #379 hand5 overflow 0 in three
   languages).
+- 2026-11-02: #384 (`bank-rail-fit`, the user's choice (1) of 10-30,
+  merged by hand before the 11-06 deadline: at 360px and under only the
+  HUD spacing shrinks -- clock 36 to 30px, bank rail pills 22 to 18px --
+  so a two-line bank rail keeps the five-card hand above the action bar;
+  stakes, rules and text unchanged; production build-sha `2f085d2`,
+  service worker release `f72f2455-9c150054f3ea`). One PR merged so far,
+  1,610 unit tests. #322 followed main (`7e45691d`; Linux CI hand5 ko 0,
+  ja 0, en 22 scenes, 4 of them also on main). Open: the English hand5
+  overflow on Linux CI (`en-hand5-linux`, in progress). #224's bundle
+  children followed rules-mark-3b: #307 `50e7957f`, #316 `b008cb11`, #320
+  `d4a6ed3b`, #308 `558088ad`, #379 `e57c9864`.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
