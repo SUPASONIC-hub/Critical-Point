@@ -159,10 +159,14 @@ const BUDGETS = {
   // src/components/musicScore.js). The key is built here, in the runtime's lazy
   // chunk: a helper beside the rule in musicScore.js would have cut five lines
   // but put 37 bytes on the first paint, since the music sits in the entry.
+  // 99 -> 96 names on 2026-11-02, locale-gaps (#393) over bgm-variety: the
+  // view models are one namespace import (sceneViewModels, with the runtime
+  // card's label as `runtimeCardLabel`) and the two runtime cards' words are
+  // src/copy/runLines.js's. Measured 968 / 96.
   "src/GameRuntime.jsx": {
     lines: 968,
     longestLine: 190,
-    importedNames: 99,
+    importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own

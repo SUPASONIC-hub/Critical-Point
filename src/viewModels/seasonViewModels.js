@@ -1,3 +1,4 @@
+import { UNNAMED_ROW_NAME } from "../appConfig.js";
 import { createTelemetryEventId } from "../state/telemetryEventId.js";
 
 /**
@@ -69,7 +70,7 @@ export function createLocalLeaderboardRows({
       local: true,
       run_id: summary?.runId ?? runId,
       session_code: sessionCode,
-      player_name: playerName || "현재 분석관",
+      player_name: playerName || UNNAMED_ROW_NAME,
       case_id: caseId,
       case_title: seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.title ?? caseId,
       completed_at: summary?.completedAt ?? "",
@@ -95,7 +96,7 @@ export function createSeasonLeaderboardRow({
     local: true,
     run_id: caseSummary?.runId ?? runId,
     session_code: sessionCode,
-    player_name: playerName || "현재 분석관",
+    player_name: playerName || UNNAMED_ROW_NAME,
     case_id: "season-final",
     case_title: title,
     completed_at: caseSummary?.completedAt ?? "",

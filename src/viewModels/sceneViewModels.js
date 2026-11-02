@@ -4,6 +4,7 @@ import { AUTHORITY_THRESHOLDS, getAuthorityClueThresholds, getAuthorityLevel } f
 import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
 import { fill, roleName } from "../locale.js";
 import briefingCopy from "../copy/briefing.js";
+import runLines, { SOURCE_CARD_LABELS } from "../copy/runLines.js";
 
 const { authority: authorityCopy, bonus: bonusCopy, inherited: inheritedCopy, challenge: challengeCopy } = briefingCopy.scene;
 
@@ -20,6 +21,17 @@ export function createSpeakerProfile({ node }) {
   // The role in the page's language; the same object on a Korean page.
   const role = roleName(profile.role);
   return role === profile.role ? profile : { ...profile, role };
+}
+
+/**
+ * The label of a card the runtime deals itself (GameRuntime's adaptive and
+ * relationship cards), in the page's language. Off a Korean page it keeps its
+ * Korean label as `sourceLabel`, as a scene's card does (src/locales/overlay.js),
+ * so the observer reads the same card in every language.
+ */
+export function runtimeCardLabel(key) {
+  const label = runLines.cards[key];
+  return label === SOURCE_CARD_LABELS[key] ? { label } : { label, sourceLabel: SOURCE_CARD_LABELS[key] };
 }
 
 export function createAuthorityState({ casesOpened = 0, evidence, legitimacy, operatorOrigin, trust }) {

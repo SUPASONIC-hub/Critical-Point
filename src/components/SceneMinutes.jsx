@@ -1,5 +1,7 @@
 import { getSceneMinutes } from "../state/caseRoutes.js";
 import { Prose } from "./Prose.jsx";
+import { fill } from "../locale.js";
+import runLines from "../copy/runLines.js";
 
 /**
  * A scene a bust skipped, as minutes: when, where and who, what was said and
@@ -15,13 +17,13 @@ export function SceneMinutes({ nodeId }) {
   if (!minutes) return null;
   return (
     <details className="decision-scene" data-testid="scene-minutes">
-      <summary tabIndex={0}>회의록 · 「{minutes.title}」</summary>
+      <summary tabIndex={0}>{fill(runLines.minutes.summary, { title: minutes.title })}</summary>
       <div>
         <small>{minutes.heading}</small>
         {minutes.lead && <p><Prose text={minutes.lead} /></p>}
         <p><Prose text={minutes.text} /></p>
-        {minutes.question && <p className="spoken-line">질문 · {minutes.question}</p>}
-        <small>당신은 이 자리에 없었다. 낸 카드 없음.</small>
+        {minutes.question && <p className="spoken-line">{fill(runLines.minutes.question, { question: minutes.question })}</p>}
+        <small>{runLines.minutes.absent}</small>
       </div>
     </details>
   );

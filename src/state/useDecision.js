@@ -1,5 +1,7 @@
 import { applyEffect, getDiscoveryClue, getRiskPressure } from "../gameLogic.js";
 import { byEffectWeight, isResourceGain } from "../gameConstants.js";
+import { fill } from "../locale.js";
+import playReads from "../copy/playReads.js";
 
 /**
  * Builds the per-render readers that score a choice before it is committed:
@@ -52,28 +54,24 @@ export function createChoiceReaders({
             : riskDelta <= 6
               ? "C"
               : "D";
-    const gradeText = {
-      S: "브레이크스루",
-      A: "공략 후보",
-      B: "안정 전개",
-      C: "대가 있는 선택",
-      D: "고위험 도박",
-    }[grade];
+    // The words are src/copy/playReads.js's (`tactical`), in the page's language.
+    const words = playReads.tactical;
+    const gradeText = words.grades[grade];
     const reward =
       challengeMatch
-        ? "챌린지 적중"
+        ? words.challenge
         : riskDelta < 0
-          ? "위험 압력 하락"
+          ? words.riskDown
           : riskDelta === 0
-            ? "압력 유지"
-            : `위험 압력 +${riskDelta}`;
+            ? words.riskHeld
+            : fill(words.riskUp, { delta: riskDelta });
     const formatEntry = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
-    const cost = costs[0] ? formatEntry(costs[0]) : "즉시 손실 낮음";
+    const cost = costs[0] ? formatEntry(costs[0]) : words.lowCost;
     const gain = gains[0]
       ? formatEntry(gains[0])
       : cognitionGain > 0
-        ? `생각 가속 +${cognitionGain}`
-        : "관망";
+        ? fill(words.thinking, { gain: cognitionGain })
+        : words.waited;
 
     return { grade, gradeText, reward, cost, gain };
   }
