@@ -582,6 +582,9 @@ const budgets = [
   // -> 196,795 / 36,700 on 2026-10-30, bank-rail-fit over main 78e53e40 (#382): on 360px or less the HUD gives up its air
   // (30px clock, 18px bank pills, tighter gaps) so a bank row on two lines keeps a five-card hand above the action bar.
   // Measured 196,795 / 36,696 in the e2e build, the gzip plus 4.
+  // -> 196,965 / 36,722 on 2026-11-02, en-hand5-linux over main 2f085d28 (#384): on 360px or less an English
+  // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
+  // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
   // 196,068 / 36,533 -> 196,229 / 36,558 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): B2's link tag (.gx-card-link) and the phone signal row's 2px gap. Measured 196,229 / 36,554 in the e2e build, the gzip plus 4.
   // 196,345 / 36,599 -> 196,506 / 36,627 on 2026-10-30, #224 merged with main 430dda1e: B2's link tag and the signal row's gap over main's narrow pills. Measured 196,506 / 36,623 in the e2e build, the gzip plus 4.
   // 196,506 / 36,627 -> 196,655 / 36,661 on 2026-10-30, #224 hand5-en: an English page on a 360px phone sets the bank rail's labels at 10px, its pills at 5px a side and its gap at 3px, so Audit n/4 keeps the run's line on Stake and Vault's row (play.css). Measured 196,655 / 36,657 in the e2e build, the gzip plus 4.
@@ -1187,6 +1190,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The HUD's air on 360px or less, so a late-season bank row on two lines keeps
  * the hand above the bar (bank-rail-fit, over main 78e53e40; the index CSS
  * carries the rule): 423,219, 472,715 and 478,511.
+ * An English card label and five-card hand tighter on 360px or less, for
+ * Linux fonts (en-hand5-linux, over main 2f085d28; the index CSS carries the
+ * rule): 423,305, 472,803 and 478,599.
  * #224 (RULES_MARK 3) merged with main 11cb3b16 (10-29): the Japanese dictionary's
  * new lines put Japanese at 477,922, the plus 4; Korean (422,752) and English stay under.
  * #224 merged with main 430dda1e (10-30): 423,106, 472,641 and 478,425, the plus 4.

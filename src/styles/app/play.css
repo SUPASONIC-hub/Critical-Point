@@ -2592,6 +2592,28 @@
     letter-spacing: -0.03em;
   }
 
+  /* English labels are the longest of the three: on Linux 85% of the
+     five-card labels run to three lines (cards 115 to 121px tall, 92 on
+     Windows), and 22 hands at a pot of 0 put the last card 4px under the
+     action bar (360x740, hand5, 2026-11-02). A 12px label on 15px lines takes
+     6px off every three-line row and brings some to two; the words stay.
+     Late in a season the bank row's second line takes 20px more, so an
+     English five-card hand also keeps the air a rules line's hand keeps
+     (above): 6px block paddings, 4px between a card's parts and between rows. */
+  :lang(en) .gx-card-label {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  :lang(en) .gauntlet-stage .hand-5 {
+    gap: 4px;
+  }
+
+  :lang(en) .gauntlet-stage .hand-5 .gx-card {
+    gap: 4px;
+    padding-block: 6px;
+  }
+
   /* The bank row is one line at a pot of 0 and two late in a season: at a pot
      of 99,999, a vault of 1,999,999 and a streak line of 49 / 99 / x64 the three
      pills need 385 to 404px of a 310px row, and the second line put the last

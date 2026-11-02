@@ -286,6 +286,9 @@ const fileBudgets = {
   // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
   // the HUD gives up its air so a bank row on two lines (late-season numbers)
   // keeps a five-card hand above the action bar.
+  // -> 56733 bytes on 2026-11-02, measured (en-hand5-linux): on 360px or less
+  // an English card label 12px / 1.25 and an English five-card hand's air
+  // trimmed, so Linux fonts keep the hand above the action bar.
   // -> 56896 bytes, 2944 lines on 2026-11-02, measured: #224 merged with main 2f085d28, bank-rail-fit's
   // 360px HUD (main) with the English bank rail (#224) folded into its block.
   "play.css": { lines: 2944, bytes: 56896 },
