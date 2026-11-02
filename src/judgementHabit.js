@@ -1,6 +1,7 @@
 import { ENDING_GATES } from "./gameConstants.js";
 import { getSeasonLogic } from "./gameLogic.js";
 import { readClosedCases, readCollapseTally } from "./seasonStanding.js";
+import habitsCopy from "./copy/habits.js";
 
 /**
  * The season's 판단 습관: a short, slightly unkind name for how the player
@@ -16,8 +17,9 @@ import { readClosedCases, readCollapseTally } from "./seasonStanding.js";
  *
  * The rules are tried in order and the first that holds names the season.
  * Nothing here is random: the same summaries always get the same name. The
- * card's chunk had about 40 gzip bytes left, so the names and lines live here,
- * on the runtime's side, and the card is handed the finished name. The line
+ * card's chunk had about 40 gzip bytes left, so the names and lines live on
+ * the runtime's side (src/copy/habits.js, where another language is laid over
+ * them), and the card is handed the finished name. The line
  * is not drawn on the card (no room left in its chunk); the report's
  * 당신이 반복한 방식 box draws it under the name (ResultScreen.jsx).
  */
@@ -42,78 +44,67 @@ const BULLDOZER_HARM_PER_CASE = 25;
 /**
  * The habits, in the order they are tried. `holds` is handed the season as
  * `readHabitSeason` reads it. The last one holds for every season, so a
- * season with a record always has a name.
+ * season with a record always has a name. `title` and `line` are read from
+ * src/copy/habits.js when asked, so they are the page's language.
  */
-export const JUDGEMENT_HABITS = Object.freeze([
+const HABIT_RULES = [
   {
     id: "bulldozer",
-    title: "실적 우선 불도저형",
-    line: "판은 이겼는데, 사람 피해가 뒤에 쌓였습니다.",
     holds: (season) => season.harmPerCase >= BULLDOZER_HARM_PER_CASE,
   },
   {
     id: "moth",
-    title: "하이리스크 불나방형",
-    line: "벽이 가까워질수록 손이 더 빨라집니다.",
     holds: (season) => season.bustRate >= 0.28,
   },
   {
     id: "tightrope",
-    title: "벽 앞 줄타기 장인형",
-    line: "벽 바로 앞까지 밀고도 멀쩡히 돌아옵니다.",
     // Pushes and BUSTs rise together (3.6 pushes a window usually BUSTs about
     // one window in ten), so this is pushing that far and BUSTing less.
     holds: (season) => season.pushesPerWindow >= 3.6 && season.bustRate < 0.09,
   },
   {
     id: "reframer",
-    title: "판 뒤집기 상습범형",
-    line: "카드가 마음에 안 들면 판부터 다시 짭니다.",
     holds: (season) => season.wildPerCase >= 1,
   },
   {
     id: "shield",
-    title: "사람 먼저 방패형",
-    line: "숫자보다 그 숫자 뒤의 사람을 먼저 셉니다.",
     holds: (season) => season.peopleFirstShare >= 0.7 && season.harmPerCase < ENDING_GATES.collapseOverreachHarm,
   },
   {
     id: "one-track",
-    title: "외길 논리형",
-    line: "한 번 정한 논리는 열기가 올라도 놓지 않습니다.",
     holds: (season) => season.logicWindows >= LOGIC_MIN_WINDOWS && season.logicHold >= 75,
   },
   {
     id: "card-shopper",
-    title: "카드 쇼핑형",
-    line: "판마다 다른 카드를 집고, 콤보는 신경 안 씁니다.",
     holds: (season) => season.logicWindows >= LOGIC_MIN_WINDOWS && season.logicHold < 45,
   },
   {
     id: "stepping-stone",
-    title: "돌다리 두들김형",
-    line: "벽 근처엔 가지도 않고 일찍 LOCK을 누릅니다.",
     holds: (season) => season.pushesPerWindow <= 3.3 && season.bustRate <= 0.04,
   },
   {
     id: "marathon",
-    title: "생각 마라톤형",
-    line: "결론보다 생각이 오래 걸려야 마음이 놓입니다.",
     holds: (season) => season.averageSeconds >= 12,
   },
   {
     id: "lightning",
-    title: "속전속결형",
-    line: "읽자마자 고르고, 고르자마자 밉니다.",
     holds: (season) => season.averageSeconds > 0 && season.averageSeconds <= 6,
   },
   {
     id: "steady",
-    title: "무난한 균형형",
-    line: "튀지 않게, 그러나 끝까지 판을 닫았습니다.",
     holds: () => true,
   },
-]);
+];
+
+const withWords = (habit) =>
+  Object.freeze(
+    Object.defineProperties(habit, {
+      title: { enumerable: true, get: () => habitsCopy[habit.id].title },
+      line: { enumerable: true, get: () => habitsCopy[habit.id].line },
+    }),
+  );
+
+export const JUDGEMENT_HABITS = Object.freeze(HABIT_RULES.map(withWords));
 
 const count = (value) => (Number.isFinite(Number(value)) && Number(value) > 0 ? Number(value) : 0);
 const ratio = (part, whole) => (whole > 0 ? part / whole : 0);
