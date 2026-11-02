@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
-import { chapterMotifs, groovePresets, musicModes, originMotifs, speakerMotifs } from "./musicData.js";
+import { createSceneMode as scoreSceneMode, leadForBar, shadowNote, stakeLayerCount, STEPS_PER_BAR } from "./musicScore.js";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
-const STEPS_PER_BAR = 16;
 const MIX_VOLUME = 0.74;
 // The kick is the only percussive voice with weight now; the hats are room
 // noise, not a hi-hat line, so they sit well under the pad.
@@ -14,6 +13,12 @@ const HAT_GAIN = 0.022;
 const BASS_GAIN = 0.08;
 const LEAD_GAIN = 0.045;
 const PAD_GAIN = 0.045;
+// The stake's layers sit under the lead, each quieter than the one before it:
+// they thicken the room, the tune stays on top.
+const COUNTER_GAIN = 0.026;
+const PULSE_GAIN = 0.02;
+const SHADOW_GAIN = 0.014;
+const createSceneMode = (modeKey) => scoreSceneMode(modeKey, MIX_VOLUME);
 const volumePresets = {
   low: { label: "LOW", multiplier: 0.58 },
   normal: { label: "NORMAL", multiplier: 0.82 },
@@ -51,70 +56,6 @@ function writePref(key, value) {
 
 const soundOff = () => readPref(MUSIC_PREF_KEY, "true") === "false";
 const presetMultiplier = () => volumePresets[normalizeVolumePreset(readPref(MUSIC_VOLUME_KEY, "normal"))].multiplier;
-
-function hashMusicKey(value = "") {
-  return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
-}
-
-function shiftFrequency(frequency, semitones) {
-  return frequency ? Number((frequency * 2 ** (semitones / 12)).toFixed(2)) : frequency;
-}
-
-function shiftPattern(pattern_, semitones) {
-  return pattern_.map((item) =>
-    Array.isArray(item) ? item.map((frequency) => shiftFrequency(frequency, semitones)) : shiftFrequency(item, semitones),
-  );
-}
-
-function rotate(list, offset) {
-  if (!offset) return list;
-  const size = list.length;
-  const shift = ((offset % size) + size) % size;
-  return [...list.slice(size - shift), ...list.slice(0, size - shift)];
-}
-
-function thinOut(hits, every) {
-  if (!every) return hits;
-  return hits.map((hit, index) => (hit && index % every === 0 ? false : hit));
-}
-
-function createSceneMode(modeKey) {
-  const parts = String(modeKey || "intro").split(":");
-  const isFinal = parts.includes("final");
-  const baseKey = isFinal && parts[0] === "result" ? "final" : parts[0];
-  const base = musicModes[baseKey] ?? musicModes.intro;
-  const hash = Math.abs(hashMusicKey(modeKey));
-  const tempoMultipliers = [1, 0.94, 1.06, 0.88, 1.12, 0.82];
-  const semitoneShifts = [-5, -2, 0, 3, 5, 7, -7];
-  const tempo = tempoMultipliers[hash % tempoMultipliers.length];
-  const semitoneShift = semitoneShifts[Math.floor(hash / 6) % semitoneShifts.length];
-  const motif = chapterMotifs[parts[1]] ?? chapterMotifs.case01;
-  const speakerMotif = speakerMotifs[parts[3]] ?? { wave: motif.wave, semitones: 0, pulse: 1 };
-  const originMotif = originMotifs[parts[5]] ?? { semitones: 0, pulse: 1 };
-  const sceneIndex = Number(parts.at(-1));
-  const scenePulse = Number.isFinite(sceneIndex) ? sceneIndex % 4 : hash % 4;
-  const groove = groovePresets[scenePulse];
-  const transpose = semitoneShift + speakerMotif.semitones + originMotif.semitones;
-  const intensity = motif.impact * speakerMotif.pulse * originMotif.pulse;
-
-  return {
-    label: base.label,
-    interval: Math.max(96, Math.round(base.stepMs * tempo)),
-    volume: Math.min(0.14, base.volume * MIX_VOLUME * (0.82 + intensity * 0.16 + scenePulse * 0.012)),
-    wave: speakerMotif.wave ?? base.wave,
-    drive: Math.min(0.9, base.drive * intensity),
-    kick: rotate(base.kick, groove.kickShift),
-    snare: base.snare,
-    hat: thinOut(base.hat, groove.hatDrop),
-    bass: shiftPattern(base.bass, transpose),
-    lead: rotate(shiftPattern(base.lead, transpose), groove.leadShift),
-    pad: shiftPattern(base.pad, transpose),
-    noiseEvery: base.noiseEvery,
-    detuneSpread: 3 + (hash % 11),
-    impact: intensity,
-    filterLift: motif.lift + (hash % 5) * 140,
-  };
-}
 
 /** Soft-clip curve; `amount` 0 leaves the signal alone. */
 function makeDriveCurve(amount) {
@@ -361,6 +302,75 @@ function ensureAudioRuntime(volume) {
   return context;
 }
 
+/**
+ * One standing voice of the stake's layers: an oscillator that keeps running
+ * and is retuned and re-enveloped on each note. The score's own voices build
+ * three nodes a note and drop them; the layers would have added up to three
+ * more notes a step on top of that, so they reuse what they built instead.
+ */
+function createLayerVoice(context, destination, type, filterFrequency) {
+  const oscillator = context.createOscillator();
+  const filter = context.createBiquadFilter();
+  const gain = context.createGain();
+  oscillator.type = type;
+  filter.type = "lowpass";
+  filter.frequency.value = filterFrequency;
+  gain.gain.value = 0.0001;
+  oscillator.connect(filter);
+  filter.connect(gain);
+  gain.connect(destination);
+  oscillator.start();
+  return {
+    play(frequency, duration, peak) {
+      const now = context.currentTime;
+      const level = gain.gain;
+      level.cancelScheduledValues(now);
+      level.setValueAtTime(Math.max(0.0001, level.value), now);
+      oscillator.frequency.setValueAtTime(frequency, now);
+      level.exponentialRampToValueAtTime(Math.max(0.0001, peak), now + 0.012);
+      level.setTargetAtTime(0.0001, now + duration, duration * 0.35);
+    },
+    stop() {
+      const now = context.currentTime;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setTargetAtTime(0.0001, now, 0.06);
+      oscillator.stop(now + 0.4);
+    },
+  };
+}
+
+/**
+ * The stake, as the table last reported it (`setMusicStake`), and the layers
+ * it has brought in. The voices are built the first time the stake reaches a
+ * layer and stopped once it falls back to none -- a window closing, the sound
+ * turned off -- so a page between tables runs no idle oscillators.
+ */
+const stakeRuntime = { gauge: 0, voices: null };
+
+/**
+ * What the table tells the score: the gauge it shows, 0 when no window is live.
+ * Read on the score's next step; a stake that never arrives leaves the score
+ * as it was.
+ */
+export function setMusicStake(gauge = 0) {
+  stakeRuntime.gauge = Math.min(100, Math.max(0, Number(gauge) || 0));
+}
+
+function releaseStakeVoices() {
+  if (!stakeRuntime.voices) return;
+  for (const voice of stakeRuntime.voices) voice.stop();
+  stakeRuntime.voices = null;
+}
+
+function stakeVoices(context, destination) {
+  stakeRuntime.voices ??= [
+    createLayerVoice(context, destination, "triangle", 2200),
+    createLayerVoice(context, destination, "square", 900),
+    createLayerVoice(context, destination, "sine", 3200),
+  ];
+  return stakeRuntime.voices;
+}
+
 const ACCENT_PEAK_GAIN = 0.045;
 const REVEAL_PEAK_GAIN = 0.035;
 
@@ -582,6 +592,7 @@ export function AdaptiveMusic({ modeKey }) {
     if (!enabled) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
+      releaseStakeVoices();
       audioRuntime.master?.gain.setTargetAtTime(0.0001, audioRuntime.context?.currentTime ?? 0, 0.08);
       return undefined;
     }
@@ -624,7 +635,8 @@ export function AdaptiveMusic({ modeKey }) {
         });
       }
 
-      const lead = currentMode.lead[step];
+      const leadLine = leadForBar(currentMode, Math.floor(stepRef.current / STEPS_PER_BAR));
+      const lead = leadLine[step];
       if (lead) {
         playTone(context, destination, lead, stepSeconds * 1.8, LEAD_GAIN, currentMode.wave, {
           attack: 0.02,
@@ -637,6 +649,21 @@ export function AdaptiveMusic({ modeKey }) {
       const pad = currentMode.pad[step];
       if (pad) {
         playChord(context, destination, pad, stepSeconds * 6, PAD_GAIN, "sine");
+      }
+
+      // The stake's layers, one more for each threshold the table's gauge has
+      // crossed: the pad's chord broken upward, then the bass running in
+      // eighths, then a shadow of the lead an octave over it.
+      const layers = stakeLayerCount(stakeRuntime.gauge);
+      if (!layers) releaseStakeVoices();
+      else {
+        const [counterVoice, pulseVoice, shadowVoice] = stakeVoices(context, destination);
+        const counter = currentMode.counter[step];
+        if (counter) counterVoice.play(counter, stepSeconds * 1.6, COUNTER_GAIN);
+        const pulseNote = layers >= 2 && currentMode.pulse[step];
+        if (pulseNote) pulseVoice.play(pulseNote, stepSeconds * 0.7, PULSE_GAIN);
+        const shadow = layers >= 3 && shadowNote(leadLine, step);
+        if (shadow) shadowVoice.play(shadow, stepSeconds * 0.9, SHADOW_GAIN);
       }
 
       if (currentMode.noiseEvery > 0 && stepRef.current % currentMode.noiseEvery === 0) {

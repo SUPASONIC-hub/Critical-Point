@@ -14,6 +14,12 @@
  * to the irregular ticks of a room that is still being recorded. The bar count
  * and the engine are unchanged; only what plays on the steps is.
  *
+ * A mode has four leads, not one (2026-11-02: "only one melody" was the
+ * complaint). They take turns every few bars (`leadForBar`, musicScore.js),
+ * and each is written over the mode's own bass and pad -- the same chord in
+ * the same half of the bar, its tones or a step off them -- so a turn changes
+ * the tune and never the key. The first is the lead the mode always had.
+ *
  * `x` marks a hit, `.` a rest. Frequencies are Hz; null is a rest.
  */
 function pattern(text) {
@@ -31,7 +37,12 @@ export const musicModes = {
     snare: pattern("................"),
     hat: pattern("..........x....."),
     bass: [55, null, null, null, 55, null, 65.41, null, 49, null, null, null, 49, null, 55, null],
-    lead: [220, null, null, 277.18, null, null, 196, null, null, 246.94, null, null, 220, null, null, null],
+    leads: [
+      [220, null, null, 277.18, null, null, 196, null, null, 246.94, null, null, 220, null, null, null],
+      [329.63, null, null, 293.66, null, null, 261.63, null, 246.94, null, null, 293.66, null, null, 196, null],
+      [220, null, null, null, 261.63, null, 329.63, null, null, 293.66, null, null, 246.94, null, null, null],
+      [null, null, 440, null, null, 329.63, null, null, 392, null, null, 293.66, null, 246.94, null, null],
+    ],
     pad: [[110, 164.81, 220], null, null, null, null, null, null, null, [98, 146.83, 196], null, null, null, null, null, null, null],
     noiseEvery: 32,
   },
@@ -45,7 +56,12 @@ export const musicModes = {
     snare: pattern("................"),
     hat: pattern("......x.......x."),
     bass: [65.41, null, 65.41, null, 82.41, null, 65.41, null, 73.42, null, 73.42, null, 98, null, 73.42, null],
-    lead: [261.63, null, 329.63, null, null, 392, null, null, 293.66, null, 349.23, null, null, 329.63, null, null],
+    leads: [
+      [261.63, null, 329.63, null, null, 392, null, null, 293.66, null, 349.23, null, null, 329.63, null, null],
+      [392, null, null, 329.63, null, 261.63, null, null, 440, null, null, 349.23, null, 293.66, null, null],
+      [null, null, 261.63, null, 293.66, null, 329.63, null, null, null, 293.66, null, 220, null, 293.66, null],
+      [329.63, null, 392, null, 523.25, null, null, 392, 349.23, null, 440, null, 293.66, null, null, null],
+    ],
     pad: [[130.81, 196, 261.63], null, null, null, null, null, null, null, [146.83, 220, 293.66], null, null, null, null, null, null, null],
     noiseEvery: 24,
   },
@@ -59,7 +75,12 @@ export const musicModes = {
     snare: pattern("................"),
     hat: pattern("...x......x...x."),
     bass: [73.42, 73.42, null, 69.3, 73.42, null, 82.41, 82.41, 65.41, 65.41, null, 69.3, 73.42, null, 87.31, null],
-    lead: [293.66, null, 311.13, null, 392, null, null, 349.23, null, 329.63, null, 311.13, null, 415.3, null, null],
+    leads: [
+      [293.66, null, 311.13, null, 392, null, null, 349.23, null, 329.63, null, 311.13, null, 415.3, null, null],
+      [440, null, null, 415.3, null, 392, null, 311.13, 277.18, null, null, 329.63, null, 415.3, null, null],
+      [293.66, 311.13, null, 293.66, null, null, 220, null, 277.18, null, 415.3, null, 329.63, null, 277.18, null],
+      [null, null, 349.23, null, 311.13, null, 293.66, null, null, 277.18, null, 329.63, 415.3, null, null, null],
+    ],
     pad: [[146.83, 220, 311.13], null, null, null, null, null, null, null, [138.59, 207.65, 277.18], null, null, null, null, null, null, null],
     noiseEvery: 16,
   },
@@ -73,7 +94,12 @@ export const musicModes = {
     snare: pattern("................"),
     hat: pattern("..x..x..x..x..x."),
     bass: [49, 49, 51.91, 49, 55, 55, 46.25, 49, 49, 49, 58.27, 55, 51.91, 51.91, 49, 46.25],
-    lead: [196, null, 207.65, 233.08, null, 246.94, null, 220, 196, null, 233.08, null, 261.63, null, 246.94, null],
+    leads: [
+      [196, null, 207.65, 233.08, null, 246.94, null, 220, 196, null, 233.08, null, 261.63, null, 246.94, null],
+      [293.66, null, 277.18, null, 196, null, 185, null, 311.13, null, 233.08, 207.65, null, 196, null, 207.65],
+      [196, 207.65, null, 196, 185, null, 196, null, 207.65, 220, null, 207.65, 196, null, 185, null],
+      [null, 246.94, 233.08, null, 277.18, null, 246.94, null, 311.13, null, 293.66, null, 261.63, 246.94, null, 233.08],
+    ],
     pad: [[98, 146.83, 207.65], null, null, null, [92.5, 138.59, 196], null, null, null, [103.83, 155.56, 220], null, null, null, [98, 146.83, 207.65], null, null, null],
     noiseEvery: 8,
   },
@@ -87,7 +113,12 @@ export const musicModes = {
     snare: pattern("................"),
     hat: pattern("............x..."),
     bass: [65.41, null, null, null, 82.41, null, null, null, 98, null, null, null, 73.42, null, null, null],
-    lead: [261.63, null, null, 392, null, null, 329.63, null, null, 440, null, null, 392, null, null, null],
+    leads: [
+      [261.63, null, null, 392, null, null, 329.63, null, null, 440, null, null, 392, null, null, null],
+      [392, null, null, 329.63, null, null, 493.88, null, null, 392, null, null, 293.66, null, null, null],
+      [523.25, null, null, 440, null, null, 392, null, null, 329.63, null, null, 293.66, null, 440, null],
+      [261.63, null, 293.66, null, 329.63, null, null, null, 392, null, null, 329.63, 293.66, null, null, null],
+    ],
     pad: [[130.81, 196, 261.63], null, null, null, [164.81, 246.94, 329.63], null, null, null, null, null, null, null, [146.83, 220, 293.66], null, null, null],
     noiseEvery: 32,
   },
@@ -101,7 +132,12 @@ export const musicModes = {
     snare: pattern("................"),
     hat: pattern(".....x.......x.."),
     bass: [43.65, null, 43.65, 49, 55, null, 49, null, 41.2, null, 41.2, 46.25, 51.91, null, 58.27, null],
-    lead: [349.23, null, 415.3, null, 466.16, null, 392, null, 349.23, null, 311.13, null, 349.23, 415.3, null, null],
+    leads: [
+      [349.23, null, 415.3, null, 466.16, null, 392, null, 349.23, null, 311.13, null, 349.23, 415.3, null, null],
+      [523.25, null, 466.16, null, 415.3, null, 349.23, null, 329.63, null, 392, null, 493.88, null, null, null],
+      [349.23, 349.23, null, 392, 415.3, null, null, 392, 329.63, null, 329.63, null, 311.13, null, 329.63, null],
+      [null, null, 415.3, null, 349.23, null, 523.25, null, null, 493.88, null, 392, 329.63, null, null, null],
+    ],
     pad: [[87.31, 130.81, 174.61], null, null, null, null, null, null, null, [82.41, 123.47, 164.81], null, null, null, null, null, null, null],
     noiseEvery: 12,
   },
