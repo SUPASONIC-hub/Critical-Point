@@ -21,7 +21,7 @@ export default {
           "label": "合意書の不提訴条項から一行ずつ読む"
         },
         "reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         }
       },
       "place": "トリガーラボ4階 分析官室",
@@ -49,7 +49,7 @@ export default {
           "label": "反対意見がどう消されたかを記録で説明する"
         },
         "reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         },
         "c12_mediation_evidence_turn": {
           "label": "帳簿で賠償金300億の勘定を探す"
@@ -80,7 +80,7 @@ export default {
           "label": "書類のない31人の被害の証拠から共に集める"
         },
         "reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         },
         "c12_market_evidence_turn": {
           "label": "帳簿で賠償金300億の勘定を探す"
@@ -111,7 +111,7 @@ export default {
           "label": "ムン・ハジュンに銀行の判断法を教えると約束する"
         },
         "reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         },
         "c12_memorial_evidence_turn": {
           "label": "帳簿で賠償金300億の勘定を探す"
@@ -452,7 +452,7 @@ export default {
           "label": "被害者の会の代表をまず直接訪ねる"
         },
         "c12_start_toast_reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         }
       },
       "place": "トリガーラボ4階 分析官室",
@@ -483,7 +483,7 @@ export default {
           "label": "被害者の会の代表をまず直接訪ねる"
         },
         "c12_start_record_reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         }
       },
       "place": "トリガーラボ4階 分析官室",
@@ -514,7 +514,7 @@ export default {
           "label": "被害者の会の代表をまず直接訪ねる"
         },
         "c12_start_summon_reframe": {
-          "label": "同じ条件が付いた賠償案をすべて呼び出す"
+          "label": "同じ条件の賠償案をすべて呼び出す"
         }
       },
       "place": "トリガーラボ4階 分析官室",

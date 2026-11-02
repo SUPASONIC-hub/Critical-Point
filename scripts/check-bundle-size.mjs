@@ -562,7 +562,14 @@ const budgets = [
   // -> 196,161 raw on 2026-10-29, adsense-readiness: the foot's five links wrap on a narrow screen (.intro-legal flex-wrap). Measured 196,157 / 36,560; the gzip holds.
   // -> 196,345 / 36,599 on 2026-10-30, picker-narrow over main c3b40b6f (#376): on 360px or less the three language pills keep one row (12px type)
   // and the brand row comes up 8px (base-intro-ranking.css). Measured 196,341 / 36,595 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_345, maxGzip: 36_599 },
+  // -> 196,428 / 36,624 on 2026-10-30, ja-hand-narrow over main c865d984 (#380): a Japanese card label on 360px or less a size
+  // down (play.css), so a five-card hand keeps two lines in a CJK face. Measured 196,428 / 36,620 in the e2e build, the gzip plus 4.
+  // -> 196,523 / 36,650 on 2026-10-30, intro-360-fit over main 7552870d (#381): on 360px or less the start button sits closer
+  // to the premise (a 360x740 phone had the Korean one 2px under the screen) and the English premise takes 14px. Measured 196,523 / 36,646, the gzip plus 4.
+  // -> 196,795 / 36,700 on 2026-10-30, bank-rail-fit over main 78e53e40 (#382): on 360px or less the HUD gives up its air
+  // (30px clock, 18px bank pills, tighter gaps) so a bank row on two lines keeps a five-card hand above the action bar.
+  // Measured 196,795 / 36,696 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 196_795, maxGzip: 36_700 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1136,13 +1143,21 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The ranking save lines in the page's language (ranking-save-copy, over main
  * c39870a7; the Korean only by the entry's hashed names): 423,114, 472,617
  * and 478,413.
- * E-11 번외 사건 틀 (draft, over main 430dda1e on 10-30), the start screen's
- * side slot and its words in the entry: 424,052, 473,895 and 479,685.
- * E-11 번외 1 on it (10-30, over e11-side-cases da40ea69): the side list's
+ * A Japanese card label on 360px or less a size down (ja-hand-narrow, over
+ * main c865d984; the index CSS carries the rule): 423,150, 472,646 and 478,442.
+ * The start button closer to the premise on 360px or less (intro-360-fit,
+ * over main 7552870d; the English premise at 14px there too): 423,171, 472,667
+ * and 478,463.
+ * The HUD's air on 360px or less, so a late-season bank row on two lines keeps
+ * the hand above the bar (bank-rail-fit, over main 78e53e40; the index CSS
+ * carries the rule): 423,219, 472,715 and 478,511.
+ * E-11 번외 사건 틀 (draft, over main 2f085d28 on 11-02), the start screen's
+ * side slot and its words in the entry: 424,217, 474,055 and 479,845.
+ * E-11 번외 1 on it (11-02, over e11-side-cases 3dad5969): the side list's
  * entry and its language helper, the overlay's side path and the label and
- * title in each dictionary: 424,171, 474,233 and 480,027.
+ * title in each dictionary: 424,343, 474,401 and 480,195.
  */
-const FIRST_PAINT_BUDGETS = { ko: 424_175, en: 474_237, ja: 480_031 };
+const FIRST_PAINT_BUDGETS = { ko: 424_347, en: 474_405, ja: 480_199 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
