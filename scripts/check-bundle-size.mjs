@@ -104,6 +104,7 @@ const budgets = [
   // 149,965 / 55,098 -> 150,166 / 55,179 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the 판 읽기 row, the peak board's jump and the pre-C-3 hold in one chunk. Measured 150,166 / 55,175 in the e2e build, the gzip plus 4, the raw the measurement.
   // -> 150,349 / 55,212 on 2026-10-30, 통합 리허설 (#379): #224 bb70e777 (main 430dda1e) with #307, #316, #320 and #308 merged in. Measured 150,349 / 55,208 in the e2e build, the gzip plus 4.
   // 55,212 -> 55,217 gzip on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 55,213, the gzip plus 4.
+  // 55,115 -> 55,120 gzip on 2026-11-02, C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55). Measured 55,116 in the e2e build, the gzip plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_349, maxGzip: 55_217 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -660,6 +661,7 @@ const budgets = [
   // -> 196,901 / 36,696 on 2026-10-30, 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e). Measured 196,901 / 36,692 in the e2e build, the gzip plus 4.
   // -> 197,050 / 36,728 on 2026-10-30, 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308. Measured 197,050 / 36,724 in the e2e build, the gzip plus 4.
   // 196,655 / 36,661 -> 196,837 / 36,700 on 2026-10-30, #224 merged with main b2558d55 (#380 #381 #382 #383): main's Japanese card labels and 360px start button over #224's link tag, signal row and English bank rail. Measured 196,837 / 36,696 in the e2e build, the gzip plus 4.
+  // 196,837 / 36,700 -> 196,890 / 36,709 on 2026-11-02, C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55). Measured 196,890 / 36,705 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 197_050, maxGzip: 36_728 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -1330,6 +1332,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * 통합 리허설 (#379) over #224 bb70e777 (main 430dda1e, 10-30): 423,480, 473,555 and 479,405, the plus 4.
  * 통합 리허설 (#379) over #224 0d29141a (the English bank rail at 360px) with #307 #316 #320 #308, 10-30: 423,512, 473,587 and 479,437, the plus 4.
  * #224 merged with main b2558d55 (10-30 evening; #380 #381 #382 #383): 423,175, 472,704 and 478,488, the plus 4.
+ * C-1 reading axis (#307) merged with #224 8dd649ce (main b2558d55, 11-02): 423,256, 472,832 and 478,632, the plus 4.
  */
 const FIRST_PAINT_BUDGETS = { ko: 423_516, en: 473_591, ja: 479_441 };
 const LOCALE_FIRST_PAINT = {
