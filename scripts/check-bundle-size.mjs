@@ -173,7 +173,8 @@ const budgets = [
   // changed with their scene text and gzip worse; measured 87,097 on main
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
   // 291,131 / 87,101 -> 290,343 / 86,964 on 2026-10-26, 영어판 3단계: runtimeSystems.js's words (src/copy/seasonEnd.js) first landed here, which imports the runtimeSystems chunk back, and the table read at load was undefined in the production build (runtime smoke); grouped with runtimeSystems now, and this file measured smaller. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 290_343, maxGzip: 86_970 },
+  // 86,970 -> 86,975 gzip on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 86,971 in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 290_343, maxGzip: 86_975 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -671,6 +672,7 @@ const budgets = [
   // 197,050 / 36,728 -> 197,232 / 36,764 on 2026-11-02, 통합 리허설 (#379) over #224 8dd649ce (main b2558d55) with #307 #316 #320 #308. Measured 197,232 / 36,760 in the e2e build, the gzip plus 4.
   // 196,837 / 36,700 -> 197,093 / 36,749 on 2026-11-02, #224 merged with main 2f085d28 (#384 bank-rail-fit): main's 360px HUD block over #224's link tag, signal row and English bank rail, the English gap now column-gap: 3px at the end of that block. Measured 197,093 / 36,745 in the e2e build, the gzip plus 4.
   // 196,890 / 36,709 -> 197,146 / 36,758 on 2026-11-02, C-1 reading axis (#307) merged with #224 afdcac0c (main 2f085d28). Measured 197,146 / 36,754 in the e2e build, the gzip plus 4.
+  // 196,935 / 36,727 -> 197,191 / 36,774 on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 197,191 / 36,770 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 197_232, maxGzip: 36_764 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -1354,6 +1356,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // ko 422,945 -> 423,130, en 472,519 -> 473,093, ja 478,315 -> 478,912 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): the four's index JS and CSS and each dictionary's lines on one first paint. Measured 423,126 / 473,089 / 478,908 in the e2e build, the plus 4.
 // table-rhythm-bundle (#316) merged with #224 8dd649ce (main b2558d55, 11-02): 423,374, 473,096 and 478,938, the plus 4.
 // 통합 리허설 (#379) over #224 8dd649ce (main b2558d55) with #307 #316 #320 #308, 11-02: 423,612, 473,680 and 479,530, the plus 4.
+// table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28): 423,425, 473,149 and 478,991, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 423_616, en: 473_684, ja: 479_534 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
