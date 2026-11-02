@@ -177,7 +177,9 @@ const fileBudgets = {
   // 360px or less the start button sits closer to the premise (a 360x740
   // phone had the Korean one 2px under the screen) and the English premise
   // takes the Japanese 14px there (Linux CI put its button at 746).
-  "base-intro-ranking.css": { lines: 3159, bytes: 69883 },
+  // 3159 / 69883 -> 3159 / 69903 on 2026-11-02, measured (pc-type-scale): from 1024px wide the
+  // root reads 18px; the case card's numeral keeps its size through --hud-rem.
+  "base-intro-ranking.css": { lines: 3159, bytes: 69903 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -280,7 +282,10 @@ const fileBudgets = {
   // -> 56733 bytes on 2026-11-02, measured (en-hand5-linux): on 360px or less
   // an English card label 12px / 1.25 and an English five-card hand's air
   // trimmed, so Linux fonts keep the hand above the action bar.
-  "play.css": { lines: 2931, bytes: 56733 },
+  // -> 56973 bytes on 2026-11-02, measured (pc-type-scale, on top of en-hand5-linux): from 1024px wide
+  // the pot and the clock keep their size through --hud-rem while the root
+  // reads 18px.
+  "play.css": { lines: 2931, bytes: 56973 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -345,11 +350,14 @@ const fileBudgets = {
   // card (ActCard.jsx) in front of an act's first briefing -- its backdrop,
   // page, kicker, name, sentence, count, 계속 with the bar of the time left,
   // and the reduced-motion rule that stills all three.
+  // 846 / 16306 -> 846 / 16328 on 2026-11-02, measured (pc-type-scale): the
+  // briefing timer keeps its size through --hud-rem from 1024px wide.
   // 846 / 16306 -> 849 / 16456 on 2026-11-02, measured (plate-story, D): the
   // sound is lettered beside what makes it, placed in the drawing's units, so
   // the splash panel is a size container and the word's corner pin became a
-  // position read off the plate.
-  "briefing.css": { lines: 849, bytes: 16456 },
+  // position read off the plate. 849 / 16478 over main 5c00dffe (with
+  // pc-type-scale), measured.
+  "briefing.css": { lines: 849, bytes: 16478 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

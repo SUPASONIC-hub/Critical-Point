@@ -588,7 +588,10 @@ const budgets = [
   // 198,822 / 37,098 -> 198,856 / 37,110 on 2026-11-02, money-feedback over main 9be94346. Measured 198,856 / 37,106 in the e2e build, the gzip plus 4.
   // 198,856 / 37,110 -> 198,925 / 37,111 on 2026-11-02, money-feedback over main acf3d999. Measured 198,925 / 37,107 in the e2e build, the gzip plus 4.
   // 198,925 / 37,111 -> 199,594 / 37,294 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 199,590 / 37,290 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 199_594, maxGzip: 37_294 },
+  // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
+  // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
+  // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_019, maxGzip: 37_440 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1185,10 +1188,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * 425,556, 482,416 and 489,089, the plus 4. The speakers' profiles are not in
  * these lines; they are the late/ chunks the runtime fetches.
  * money-feedback over main acf3d999: 425,946, 482,846 and 489,528, the plus 4.
+ * The PC type scale (pc-type-scale, over main b5abd681; the index CSS and the
+ * critical CSS carry the 112.5% root from 1025px, 16px kept on the start screen): 426,130, 483,029 and 489,711, the plus 4.
  */
 // 425,560 / 482,420 / 489,093 -> 425,751 / 482,612 / 489,285 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 425,747 / 482,608 / 489,281 the plus 4.
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_541, en: 483_439, ja: 490_121 };
+// 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_755, en: 483_654, ja: 490_336 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
