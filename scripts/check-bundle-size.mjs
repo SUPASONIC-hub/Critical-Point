@@ -93,7 +93,8 @@ const budgets = [
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
   // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
   // 19,567 / 8,588 -> 25,798 / 11,056 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_671, maxGzip: 11_352 },
+  // 26,671 / 11,352 -> 26,781 / 11,401 on 2026-11-02, money-feedback over main c680ddd5: the purse's three lines in the table's words (stage.purse, purseChange, purseSeason). Measured 26,777 / 11,397, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_781, maxGzip: 11_401 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -434,7 +435,8 @@ const budgets = [
   // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
   // the larger gzip plus 4.
   // 102,514 / 35,481 -> 102,517 / 35,481 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 102,517 in the e2e build.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_517, maxGzip: 35_481 },
+  // 102,517 / 35,481 -> 104,640 / 35,481 on 2026-11-02, money-feedback over main c680ddd5: the purse on the bank rail (readPurse) and the slam's flying amount (MoneyBurst). Measured 104,636 / 35,268, the plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_640, maxGzip: 35_481 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -561,7 +563,8 @@ const budgets = [
   // -> 196,965 / 36,722 on 2026-11-02, en-hand5-linux over main 2f085d28 (#384): on 360px or less an English
   // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
   // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_965, maxGzip: 36_722 },
+  // 196,965 / 36,722 -> 198,822 / 37,098 on 2026-11-02, money-feedback over main c680ddd5. Measured 198,822 / 37,094 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 198_822, maxGzip: 37_098 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -695,7 +698,8 @@ const budgets = [
   // 38,649 -> 38,654 raw on 2026-10-26, 영어판 3단계: only the names of the chunks it imports. Measured in the e2e build.
   // 39,663 / 14,647 -> 39,883 / 14,795 on 2026-10-28, lang-full: the reading clock counts an English page by words and a
   // Japanese one by characters at 0.89 (readingUnits). Measured 39,879 / 14,791.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 39_883, maxGzip: 14_795 },
+  // 39,883 / 14,795 -> 40,373 / 14,945 on 2026-11-02, money-feedback over main c680ddd5: the run's lastChange, seasonGained and seasonLost. Measured 40,369 / 14,941, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 40_373, maxGzip: 14_945 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1023,7 +1027,8 @@ const budgets = [
   // 152,779 / 51,787 -> 153,061 / 51,897 on 2026-10-29, gate-reason-copy over main d109b66b: the locked card's condition in Japanese. Measured 153,057 / 51,893, the plus 4.
   // 153,061 / 51,897 -> 153,139 / 51,933 on 2026-10-29, adsense-readiness: the foot's three new links in Japanese. Measured 153,135 / 51,929, the plus 4.
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_344, maxGzip: 51_954 },
+  // 153,344 / 51,954 -> 153,467 / 52,015 on 2026-11-02, money-feedback over main c680ddd5: the purse's three lines in Japanese. Measured 153,463 / 52,011, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 153_467, maxGzip: 52_015 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1130,8 +1135,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * An English card label and five-card hand tighter on 360px or less, for
  * Linux fonts (en-hand5-linux, over main 2f085d28; the index CSS carries the
  * rule): 423,305, 472,803 and 478,599.
+ * money-feedback over main c680ddd5: 423,685, 473,220 and 479,040, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 423_309, en: 472_807, ja: 478_603 };
+const FIRST_PAINT_BUDGETS = { ko: 423_689, en: 473_224, ja: 479_044 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
