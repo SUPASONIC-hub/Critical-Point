@@ -568,7 +568,9 @@ const budgets = [
   // -> 196,965 / 36,722 on 2026-11-02, en-hand5-linux over main 2f085d28 (#384): on 360px or less an English
   // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
   // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_965, maxGzip: 36_722 },
+  // -> 197,347 / 36,830 on 2026-11-02, pc-type-scale over main 9be94346: from 1025px wide the root reads
+  // 112.5% (18px) and the HUD numbers keep their size through --hud-rem. Measured 197,343 / 36,826, plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 197_347, maxGzip: 36_830 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1143,8 +1145,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * Four leads per music mode, the reveal sheet's three tracks and the stake
  * layers in the entry (bgm-variety, over main c680ddd5): 425,012, 474,508
  * and 480,304.
+ * The PC type scale (pc-type-scale, over main 9be94346; the index CSS and the
+ * critical CSS carry the 112.5% root from 1025px): 425,167, 474,663 and 480,459.
  */
-const FIRST_PAINT_BUDGETS = { ko: 425_016, en: 474_512, ja: 480_308 };
+const FIRST_PAINT_BUDGETS = { ko: 425_171, en: 474_667, ja: 480_463 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
