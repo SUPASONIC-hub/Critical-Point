@@ -45,7 +45,7 @@ export function paintDesk(random, accent, glow) {
           <path d="M-4 102 H324 V132 H-4 Z" />
         </>,
       )}
-      {people(seated("analyst", monitorX + 48, 104, 34))}
+      {people(seated("analyst", monitorX + 48, 104, 34, { player: true }))}
     </>
   );
 }

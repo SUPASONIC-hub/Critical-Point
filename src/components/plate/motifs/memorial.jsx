@@ -43,7 +43,7 @@ export function paintMemorial(random, accent, glow) {
       {people(
         <>
           {figure("parent", 150, 124, 46)}
-          {figure("son", 178, 124, 40)}
+          {figure("son", 178, 124, 40, { player: true })}
         </>,
       )}
     </>

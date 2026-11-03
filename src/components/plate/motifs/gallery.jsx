@@ -59,7 +59,7 @@ export function paintGallery(random, accent, glow) {
       )}
       {people(
         <>
-          {figure("viewer", hung ? Math.round(hung.x + hung.w / 2 + span(random, -8, 8)) : 160, 110, 42)}
+          {figure("viewer", hung ? Math.round(hung.x + hung.w / 2 + span(random, -8, 8)) : 160, 110, 42, { player: true })}
           {random() > 0.45 && figure("guest", Math.round(span(random, 24, 60)), 104, 30)}
         </>,
       )}
