@@ -159,7 +159,7 @@ export default {
     },
     "p3_aftershock": {
       "title": "8:20 the Next Day",
-      "text": "Friday, April 28, 8:20 a.m. The same paper cup lands in the same spot as yesterday. The committee record is finalized in 10 minutes. Manager Han Seoyun stands in front of your desk. Her voice is lower than yesterday. 'When you’re notified of a return, you can file an appeal within 5 business days. It’s in the rulebook. I could have told you yesterday, and I didn’t. That was my choice too.' She puts a printout of yesterday’s observer list on the corner of the desk. There is no mark next to your name. 'If you appeal, this time my name goes in the reason box. If you keep a copy, I know nothing about it. If you just accept it, in 3 years no one will remember today.' For the first time, she looks away. 'I tried all three 12 years ago. I still don’t know which was better.'",
+      "text": "Friday, April 28, 8:20 a.m. The same paper cup lands in the same spot as yesterday. The committee record is finalized in 10 minutes. Manager Han Seoyun stands in front of your desk. Her voice is lower than yesterday. 'When you’re notified of a return, you can file an appeal within 5 business days. It’s in the rulebook. I could have told you yesterday, and I didn’t. That was my choice too.' She puts a printout of yesterday’s observer list on the corner of the desk. There is no mark next to your name. 'If you appeal, this time my name goes in the reason field. If you keep a copy, I know nothing about it. If you just accept it, in 3 years no one will remember today.' For the first time, she looks away. 'I tried all three 12 years ago. I still don’t know which was better.'",
       "memo": [
         "10 minutes until the committee record is finalized",
         "Observer list -- no mark next to your name",
@@ -550,7 +550,7 @@ export default {
     "p3_final_team": "Once you decide to tell them, you write out today exactly as it happened and send it, even to those who have gone home. Four of the seven read to the end and reply; three leave only a read receipt.",
     "p3_final_reason": "The documents are done at four in the morning. The rebuttal box stays empty to the end, because no one has given you the reason for return yet.",
     "p3_final_alone": "When you decide to go alone, Oh Jinwoo stacks the two paper cups, throws them out, and leaves first. He doesn’t turn off the light on his way out.",
-    "p3_after_appeal": "When you appeal, the form is accepted. Han Seoyun’s name goes in the reason box, and the papers pass once through the 6th floor and once through the 8th.",
+    "p3_after_appeal": "When you appeal, the form is accepted. Han Seoyun’s name goes in the reason field, and the papers pass once through the 6th floor and once through the 8th.",
     "p3_after_copy": "When you keep a copy, nothing happens today. Nothing happening is the price of this choice.",
     "p3_after_accept": "When you accept, Han Seoyun doesn’t thank you. Instead, that evening she orders dinner for all seven in the review room.",
     "p3_minutes_choice_1": "When you speak, Jin Sera picks up her pen again. She leaves the three words as they are and draws one question mark beside them.",
@@ -622,7 +622,7 @@ export default {
     "p3_final_reason": "The empty rebuttal box comes first, so you stay up all night drafting the appeal and a demand for the reason for return.",
     "p3_final_alone": "So no one else gets hurt with you, you tell no one and decide to go up to the 8th floor alone tomorrow morning.",
     "p3_after_appeal": "You can’t let no one remember this in 3 years, so you file an appeal today and ask for the reason for return head-on.",
-    "p3_after_copy": "So today survives without putting her name in the reason box, you skip the appeal and keep one copy of the returned dissent aside.",
+    "p3_after_copy": "So today survives without putting her name in the reason field, you skip the appeal and keep one copy of the returned dissent aside.",
     "p3_after_accept": "It is the judgment of someone who went through this 12 years before you, so you accept the return and choose to trust Han Seoyun.",
     "p3_minutes_choice_1": "Saying it was returned is not saying there was no opinion, so you ask the deputy president yourself to fix those three words, 'No annexed opinion'.",
     "p3_minutes_choice_2": "Even if the three words can’t be fixed, a trace should remain, so you ask that the returned Attachment 7 be noted in the record as a footnote.",
@@ -683,7 +683,7 @@ export default {
       "p3_after_appeal": {
         "tag": "Head-On Ending",
         "title": "You appealed the day after the return",
-        "text": "The name of the person who returned it went into the reason box. The papers passed once through the 6th floor and once through the 8th, and your name was read in both places."
+        "text": "The name of the person who returned it went into the reason field. The papers passed once through the 6th floor and once through the 8th, and your name was read in both places."
       },
       "p3_after_copy": {
         "tag": "Kept-Copy Ending",

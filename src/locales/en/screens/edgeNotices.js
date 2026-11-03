@@ -5,7 +5,7 @@ export default {
     prologue02: [["Kwon Taeho", "Come before the soup gets cold.", "I’ll show you the night shift."], ["Group Strategy Office", "[Assist] FlowOn review", "[Notice] Committee schedule"]],
     prologue03: [["Han Seoyun", "See me before the meeting.", "It won’t change the agenda."], ["Credit Committee", "[Agenda] FlowOn loan review", "[Re] Dissent returned"]],
     prologue04: [["Do Yoonha", "I hear you’re here to inspect?", "The leaflets are at the window."], ["Head Office", "[Notice] Sales suitability check", "[Memo] This month’s sales target"]],
-    prologue05: [["Oh Jinwoo", "Did you fill in the reason box?", "The transfer, is it real?"], ["Human Resources", "[Transfer] Group Cognition Lab", "[Notice] Interview schedule"]],
+    prologue05: [["Oh Jinwoo", "Did you fill in the reason field?", "The transfer, is it real?"], ["Human Resources", "[Transfer] Group Cognition Lab", "[Notice] Interview schedule"]],
     case01: [["Han Seoyun", "Look at “other intangibles” again.", "I need a conclusion today."], ["Accounting", "[Check] FlowOn books", "[Request] Review the cut list"]],
     case02: [["Ban Jaewook", "Let’s go through the access logs.", "Don’t pick a name first."], ["Security", "[Urgent] How the leak happened", "[Request] Submit access logs"]],
     case03: [["Oh Jinwoo", "This time I go first.", "When is the proposal due?"], ["Group Strategy Office", "[Notice] Novaworks bid schedule", "[Request] Review the bid price"]],
@@ -55,7 +55,7 @@ export default {
     case47: [["Moon Gaeul", "Come steam rice cakes again this year.", "Did you see that “unconfirmable” stamp?"], ["The Court", "[Notice] Settlement paid", "[Check] Unconfirmable list"]],
     case48: [["Na Junhyuk", "This time every name gets written.", "That clause is still there."], ["Review Committee", "[Meeting] LoopNow review", "[Notice] Sign with real names"]],
     case49: [["Yoon Sanghyuk", "Now let’s talk about the blank signature.", "Come to the old office tomorrow night."], ["Chairman’s Office", "[Notice] Office clear-out", "[Request] Old strategy room access"]],
-    final: [["Yoon Sanghyuk", "We’ll talk there.", "Come up. I’ll leave the door open."], ["Group Strategy Office", "[Attached] Review side metrics", "[Check] Blank approver box"]],
+    final: [["Yoon Sanghyuk", "We’ll talk there.", "Come up. I’ll leave the door open."], ["Group Strategy Office", "[Attached] Review side metrics", "[Check] Blank approver field"]],
   },
   kinds: ["Message · ", "Mail · "],
 };

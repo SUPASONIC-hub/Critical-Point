@@ -135,7 +135,7 @@ export default {
       "memo": [
         "Trace sheet: Haeon advisory fees -> gallery painting prices -> Yoon family",
         "Referral to prosecutors: months before anything goes public",
-        "Usable as leverage in talks with the banks that lent to FlowOn (the creditor group)",
+        "Usable as leverage in talks with the banks that lent to FlowOn (the creditors’ committee)",
         "Oh Jinwoo is already in touch with an investigative reporter"
       ],
       "choices": {
@@ -318,7 +318,7 @@ export default {
     },
     "c8_branch_ledger": {
       "title": "Han Seoyun’s Painting",
-      "text": "In one partner company’s expense ledger, a painting purchase is booked as 'client entertainment'. The name in the guest column is Han Seoyun. Han Seoyun takes your call and stays silent a long while before speaking. 'That painting has hung on my office wall for 3 years. I got it as a promotion gift. That same year, I signed the review box next to the approval box on 2023-0412.'",
+      "text": "In one partner company’s expense ledger, a painting purchase is booked as 'client entertainment'. The name in the guest column is Han Seoyun. Han Seoyun takes your call and stays silent a long while before speaking. 'That painting has hung on my office wall for 3 years. I got it as a promotion gift. That same year, I signed the review box next to the approval field on 2023-0412.'",
       "memo": [
         "Partner ledger: painting booked as entertainment",
         "Recipient: Han Seoyun (then Deputy Manager)",
