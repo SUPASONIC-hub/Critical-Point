@@ -1,5 +1,7 @@
 import { CASE_SEQUENCE } from "../gameData.js";
 import { getCaseOutcome } from "../gameLogic.js";
+import { fill } from "../locale.js";
+import runLines from "../copy/runLines.js";
 
 /**
  * The one line that carries the story over from the scene before (improvement
@@ -11,9 +13,9 @@ import { getCaseOutcome } from "../gameLogic.js";
  */
 export function getSceneBridge({ log = [], caseResults = {}, currentCase = "" } = {}) {
   const echo = log.at(-1)?.echo;
-  if (echo) return `지난 장면에서 — ${echo}`;
+  if (echo) return fill(runLines.bridge.scene, { echo });
   if (log.length > 0) return null;
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(currentCase) - 1];
   const choiceId = previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : null;
-  return choiceId ? `지난 사건에서 — ${getCaseOutcome({ caseId: previousCaseId, choiceId }).title}` : null;
+  return choiceId ? fill(runLines.bridge.case, { title: getCaseOutcome({ caseId: previousCaseId, choiceId }).title }) : null;
 }

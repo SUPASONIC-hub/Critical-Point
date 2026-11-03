@@ -86,7 +86,7 @@ import { createPlayView } from "./viewModels/playViewModel.js";
 import { createResultViewModel } from "./viewModels/resultViewModel.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
-import { createActiveBonus, createInheritedChallenge, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
+import * as sceneViewModels from "./viewModels/sceneViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import { getSpeakerPortrait } from "./speakerPortraits.js";
 import { getOperatorProfile, getOperatorProfiles } from "./advancedSystems.js";
@@ -222,7 +222,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resetEndingSequence,
   } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
-  const speakerProfile = createSpeakerProfile({ node });
+  const speakerProfile = sceneViewModels.createSpeakerProfile({ node });
   const speakerPortrait = getSpeakerPortrait(node?.speaker); // unpainted speakers are drawn by SpeakerPortrait
   const localSeasonLeaderboardRow = useMemo(
     () =>
@@ -309,7 +309,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       adaptiveChoiceUnlocked
         ? {
             id: `${fallbackCaseId}_adaptive_reframe`,
-            label: "앞서 다시 짠 판을 공개 기준으로 삼는다",
+            ...sceneViewModels.runtimeCardLabel("adaptive"),
             effect: { legitimacy: 7, trust: 5, fatigue: 4 },
             next: leadChoice?.next ?? "result",
             cognition: { reframing: 2, persistence: 1 },
@@ -330,7 +330,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && leadChoice
     ? {
         id: `${fallbackCaseId}_relationship_bridge`,
-        label: "관계의 증언을 먼저 확보한다",
+        ...sceneViewModels.runtimeCardLabel("relationship"),
         effect: { trust: 5, legitimacy: 2, fatigue: 2 },
         next: leadChoice.next,
         cognition: { inference: 1, reframing: 1 },
@@ -359,12 +359,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     momentumScore,
     momentumTier,
   } = gameplayStats;
-  const activeBonus = createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, reframeCombo, log });
+  const activeBonus = sceneViewModels.createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, reframeCombo, log });
   const inheritedChallenge = useMemo(
-    () => createInheritedChallenge({ isOpeningNode, openingLegacy }),
+    () => sceneViewModels.createInheritedChallenge({ isOpeningNode, openingLegacy }),
     [isOpeningNode, openingLegacy],
   );
-  const sceneChallenge = createSceneChallenge({ reframeChoice, reframeCombo, inheritedChallenge, node, riskPressure });
+  const sceneChallenge = sceneViewModels.createSceneChallenge({ reframeChoice, reframeCombo, inheritedChallenge, node, riskPressure });
   const choiceReaders = createChoiceReaders({
     sceneChallenge,
     resources,

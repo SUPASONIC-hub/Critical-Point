@@ -30,6 +30,12 @@ const tableCopy = {
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
+    // The bank rail's head (moneyFeedback.js): the case pot and the vault
+    // together, the last hand's change (read with its sign; the arrow is not
+    // read) and the season's won and lost columns, filled signed.
+    purse: "보유",
+    purseChange: "방금 판 {change}",
+    purseSeason: "시즌 누적 획득 {gained} · 손실 {lost}",
     streak: "연속",
     best: "최고",
     audit: "감사",

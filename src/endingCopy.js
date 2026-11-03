@@ -11,6 +11,9 @@
 
 import { getVerdictKey } from "./verdictBranch.js";
 import words from "./copy/ending.js";
+import resultCopy from "./copy/result.js";
+import { DEFAULT_PLAYER_NAME } from "./appConfig.js";
+import { fill } from "./locale.js";
 
 /** The ending's words (src/copy/ending.js), for the result screen's twists and records. */
 export { words as endingWords };
@@ -89,4 +92,19 @@ const openAfterglow = words.openAfterglow;
 export function getEndingAfterglow(ledger) {
   const [observation, seen] = Object.entries(ledger).sort((a, b) => b[1] - a[1])[0];
   return seen > 0 ? endingAfterglows[observation] : openAfterglow;
+}
+
+/**
+ * Whose record the result screen says it is: the typed name with its title,
+ * the anonymous analyst, or -- for the default the save keeps in Korean
+ * (appConfig.js DEFAULT_PLAYER_NAME), or a name that is the page's own word
+ * for it (Analyst, or the Japanese page's word) -- that word once, never
+ * 「분석관 분석관」 or "Analyst Analyst". Only the line shown; the save keeps the
+ * name. (No kanji here: check:fonts reads comments too, and the Japanese words
+ * live in src/locales/ja, which Pretendard is never asked for.)
+ */
+export function getAnalystName(playerName) {
+  const name = typeof playerName === "string" ? playerName.trim() : "";
+  if (!name) return resultCopy.anonymousAnalyst;
+  return name === DEFAULT_PLAYER_NAME || name === resultCopy.defaultAnalyst ? resultCopy.defaultAnalyst : fill(resultCopy.namedAnalyst, { name });
 }

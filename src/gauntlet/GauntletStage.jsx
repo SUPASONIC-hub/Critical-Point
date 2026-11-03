@@ -24,6 +24,7 @@ import { isClosingScene } from "./holdConfirm.js";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
+import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
 import { listOfferedTypes } from "./logicStreak.js";
@@ -119,6 +120,12 @@ export function GauntletStage({
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
   const stageRef = useRef(null);
+  // The bank rail's head, where the slam's amount flies to (moneyFeedback.js).
+  const purseRef = useRef(null);
+  // The window this table was dealt on. Once the settle has written the next
+  // one the run under this table has the hand in it already, and the purse
+  // must not count it twice.
+  const [dealtIndex] = useState(() => run?.windowIndex);
   // The previous verdict is still on screen while the next table mounts under
   // it; the clock and the briefing wait until the player has read it.
   const locked = lostToTab || staleSave;
@@ -457,6 +464,8 @@ export function GauntletStage({
   const busted = win.status === "bust" && win.cause !== "abandon";
   const tabTitle = busted ? tabWords.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
   useTabTitle("table", tabTitle, { rank: 1, keep: busted });
+  // On a closed window the purse shows what the settle will leave.
+  const settling = !live && claimed && run?.windowIndex === dealtIndex;
 
   return (
     <section
@@ -503,6 +512,8 @@ export function GauntletStage({
             </span>
           </div>
           <div className="gx-bank">
+            {/* The money first and largest (money-feedback, MoneyBurst.jsx). */}
+            <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
@@ -542,7 +553,6 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {/* The audit count's 360px place, beside the signals (play.css); each width hides one of the two (display: none), so it is read once. */}
           {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
@@ -834,7 +844,7 @@ export function GauntletStage({
         caseId={scene.node.caseId}
         // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
         voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
-        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}
+        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}
         onLeave={() => setLostToTab(true)}

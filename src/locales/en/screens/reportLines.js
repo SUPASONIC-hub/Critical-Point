@@ -66,4 +66,26 @@ export default {
     faster: "Your last {count} choices took just {last} seconds on average. Your first {count} took {first} seconds.",
     slower: "Your last {count} choices took longer, {last} seconds on average. Your first {count} took {first} seconds.",
   },
+  endingProfiles: {
+    ending_seal: {
+      tag: "Seal",
+      title: "You closed the door, but left a trace.",
+      text: "You sealed the data so it can’t be used again. But the stance you took in the last aftershock showed whether what you meant to protect was silence or safety.",
+    },
+    ending_reform: {
+      tag: "Reform",
+      title: "You turned the experiment into rules.",
+      text: "Instead of removing the triggers, you attached consent and oversight. You decided for yourself who may use the power to read people, when, and how far.",
+    },
+    ending_expose: {
+      tag: "Expose",
+      title: "You dragged the observer out into the world.",
+      text: "You made the experiment’s structure public. The chaos has begun, but at least the next participant can choose knowing they are being watched.",
+    },
+    open: {
+      tag: "Undecided",
+      title: "Your last choice is still being recorded.",
+      text: "The sentences in the last folder never fully closed. Next time, try the conditions of another ending.",
+    },
+  },
 };

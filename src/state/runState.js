@@ -5,7 +5,7 @@ import { makeEmptyScores } from "../gameLogic.js";
 import { layCasePeak, normalizeRunState, RUN_INITIAL_STATE, serializeRunState, stampCaseOpen } from "../gauntlet/gauntletEngine.js";
 import { normalizeWeekRuleId, pickSeasonWeekRule } from "../gauntlet/weeklyRules.js";
 import { getAccessibility } from "./accessibilitySettings.js";
-import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
+import { createOpeningResources, OPENING_ECHO, openingEcho } from "./openingState.js";
 import { weeklyRuleNow } from "./weeklyClock.js";
 import { weekRuleChoice } from "./weeklyRuleChoice.js";
 
@@ -239,12 +239,12 @@ export const RUN_FIELDS = {
   },
   echo: {
     save: "echo",
-    load: (saved) => normalizeSavedText(saved?.echo) || OPENING_ECHO,
-    fresh: () => OPENING_ECHO,
+    load: (saved) => normalizeSavedText(saved?.echo) || openingEcho(),
+    fresh: () => openingEcho(),
     // A season begun with NEW GAME+ opens on the line its caller chose from
     // how the last season ended (newGamePlusCarry.getOpeningEcho); every other
     // start, and a NEW GAME+ with nothing to carry, on the opening line.
-    newGame: (event) => (event.veteran === true && normalizeSavedText(event.echo).trim()) || OPENING_ECHO,
+    newGame: (event) => (event.veteran === true && normalizeSavedText(event.echo).trim()) || openingEcho(),
     openCase: given("echo"),
     jumpToNode: given("echo"),
     reset: FRESH,

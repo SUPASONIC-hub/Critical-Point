@@ -1,4 +1,5 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
+import W from "./copy/introPanels.js";
 
 /**
  * The analyst's record title: a name for how far into the season this run's
@@ -13,12 +14,13 @@ import { CASE_SEQUENCE } from "./gameCases.js";
  *
  * Each step starts at the case named; a step holds until the next one.
  */
-export const ANALYST_TITLE_STEPS = [
-  { from: "prologue01", title: "수습 분석관" },
-  { from: "case01", title: "분석관" },
-  { from: "case18", title: "선임 분석관" },
-  { from: "case36", title: "수석 분석관" },
-];
+export const ANALYST_TITLE_STEPS = ["prologue01", "case01", "case18", "case36"].map((from) => ({
+  from,
+  // The title in the page's language (src/copy/introPanels.js), read when it is asked for.
+  get title() {
+    return W.analystTitles[from];
+  },
+}));
 
 const STEP_STARTS = ANALYST_TITLE_STEPS.map((step) => CASE_SEQUENCE.indexOf(step.from));
 
