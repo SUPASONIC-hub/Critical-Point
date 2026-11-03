@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c45_start": {
       "title": "Memorial Room 3",
-      "text": "In Memorial Room 3 of the Ieum Hospital funeral hall, a drawing stands where the memorial photo should be. Lim Kyungsoo died at 4:50 this morning. It is five days since he heard the first-instance sentencing on the radio in his hospital room. The only photo left at home was his 1996 employee ID photo, so Lim Soyul drew all night. It shows a grandfather taking off his glasses and slowly wiping them. Her father, Lim Jaeyoon, is the chief mourner, but he is on a plane from Dubai, so Lim Soyul stands in his place, the sleeves of her borrowed mourning clothes folded back twice. She takes a yellowed envelope from her pocket. There is pencil writing on the front. 'Yul and the person who wrote the dissent, together. Open at dawn on the third day.' Lim Soyul puts the envelope back. 'This is the last thing Grandpa asked for. He didn’t say what’s inside. Keeping us waiting right to the end. That’s so him.'",
+      "text": "Lim Kyungsoo died at 4:50 this morning. The only photo left at home was his 1996 employee ID photo, so Lim Soyul drew all night. Her father, Lim Jaeyoon, is the chief mourner, but he is on his way from Dubai, so Lim Soyul stands in his place, the sleeves of her mourning clothes folded back twice. On the yellowed envelope she takes out is pencil writing: 'Yul and the person who wrote the dissent, together. Open at dawn on the third day'. 'This is the last thing Grandpa asked for. He didn’t say what’s inside. Keeping us waiting right to the end. That’s so him.'",
       "memo": [
         "Lim Kyungsoo dies: September 15, 4:50 a.m., Ieum Hospital",
         "Memorial portrait: a drawing by Lim Soyul instead of a photo",
@@ -38,7 +38,7 @@ export default {
     },
     "c45_wreath": {
       "title": "Two Wreaths",
-      "text": "26 funeral wreaths line the entrance to Memorial Room 3. The two largest stand right beside the portrait. Their ribbons read 'All Employees of KD Financial Group' and a single name, 'Yoon Sanghyuk'. Two people in black suits come in, bow, and hold out an envelope straight away. It is not condolence money. It is a certified letter from Ha Seungwon, a manager on KD Bank’s legal team. 'Please return all bank documents the deceased took out during his employment before the funeral procession. This includes documents in envelope form.' The chief mourner, Lim Jaeyoon, has just arrived and reads the paper with his suitcase still in hand. He looks from one wreath to the other. 'The company that pushed my father out sends flowers, and on the same day tells us to hand over his papers. What kind of funeral is this?'",
+      "text": "Of 26 funeral wreaths, the two largest stand right beside the portrait. Their ribbons read 'All Employees of KD Financial Group' and a single name, 'Yoon Sanghyuk'. Ha Seungwon, a manager on KD Bank’s legal team, bows and holds out a certified letter straight away. 'Please return all bank documents the deceased took out during his employment before the funeral procession. This includes documents in envelope form.' The chief mourner, Lim Jaeyoon, just arrived, reads the paper and looks from one wreath to the other. 'The company that pushed my father out sends flowers, and on the same day tells us to hand over his papers. What kind of funeral is this?'",
       "memo": [
         "26 wreaths -- the two places beside the portrait: KD Financial Group, Yoon Sanghyuk",
         "Legal team demand: all bank documents, returned before the procession",
@@ -69,7 +69,7 @@ export default {
     },
     "c45_stories": {
       "title": "A Night of Grumbling",
-      "text": "Once the bowls of yukgaejang are cleared and the soju bottles have been replaced three times, the grumbling about the deceased begins, no one quite first. Kwon Dohyun drops one more envelope into the condolence box. On the front: 'Late fee 1,300 won'. Na Junhyuk makes another cup of instant coffee. '30 years ago, in the rainy season. This man came down to a squid factory in Yeongdong for a site inspection, the road washed out, and he slept three nights in the night-duty room. Know what he wrote in his report when he got back? That instead of collateral, he counted the knife scars on the back of the owner’s hand. 31 of them.' Then the door opens and a man comes in carrying four styrofoam boxes. Yeo Sion, head of Badagyeol Seafood in Yeongdong, the son of that factory owner. 'My father says we can’t send him off without stuffed squid. He told me to be sure to say it was made at the factory that paid off its loan in full.' Lim Soyul looks at you, her finger resting over the record button on her phone.",
+      "text": "Once the soju bottles have been replaced three times, the grumbling about the deceased begins. Na Junhyuk speaks. '30 years ago, in the rainy season. This man came down to a squid factory in Yeongdong for a site inspection, the road washed out, and he slept three nights in the night-duty room. Know what he wrote in his report when he got back? That instead of collateral, he counted the knife scars on the back of the owner’s hand. 31 of them.' Yeo Sion, the son of that factory owner, comes in carrying four styrofoam boxes. 'My father says we can’t send him off without stuffed squid. He told me to be sure to say it was made at the factory that paid off its loan in full.' Lim Soyul looks at you, her finger resting over the record button on her phone.",
       "memo": [
         "Reception room, 23:00 -- 38 mourners remain",
         "Kwon Dohyun’s second envelope: 'Late fee 1,300 won'",
@@ -106,7 +106,7 @@ export default {
     },
     "c45_envelope": {
       "title": "Dawn, Day Three",
-      "text": "Three hours before the funeral procession, Lim Soyul tears open the envelope. One sheet of paper and two sheets of letter paper come out. The front of the sheet is the last page of a printout of your dissent from 3 years ago, with your e-signature at the bottom. On the back, one line in pencil. 'Returned -- Yoon. Don’t ask why.' Below it is the 'Review Team Head comments' box, which on the copy showed only as a smudge. When you lay your phone light low across it, pencil marks rubbed out with an eraser rise up as letters. 'Agree -- Lim Kyungsoo.' The letter begins like this. 'Yul, and the person who wrote the dissent. That day I wrote agree, then erased it. I was a man with a date already set to leave the bank. Keeping this paper was not protecting your dissent. It was hiding the dissent I never wrote.' Lim Soyul’s hands stop.",
+      "text": "Three hours before the funeral procession, Lim Soyul tears open the envelope. The front of the sheet is the last page of a printout of your dissent from 3 years ago, with your e-signature at the bottom. On the back, one line in pencil. 'Returned -- Yoon. Don’t ask why.' When you lay your phone light low across the 'Review Team Head comments' box below it, rubbed-out pencil marks rise up. 'Agree -- Lim Kyungsoo.' The letter begins like this. 'Yul, and the person who wrote the dissent. That day I wrote agree, then erased it. I was a man with a date already set to leave the bank. Keeping this paper was not protecting your dissent. It was hiding the dissent I never wrote.'",
       "memo": [
         "Original, front: last page of the dissent printout, your e-signature",
         "Back: 'Returned -- Yoon. Don’t ask why.'",
@@ -137,7 +137,7 @@ export default {
     },
     "c45_final": {
       "title": "The Procession",
-      "text": "Lim Jaeyoon holds the memorial tablet, Lim Soyul the drawn portrait. A text from Prosecutor Na Eunho is waiting. 'We file the notice of appeal by midnight tonight. If the family’s consent to submit the original as evidence arrives by 16:00, I can attach a request for handwriting analysis.' Across the way stands Ha Seungwon from the legal team, holding a second certified letter. Lim Soyul takes the envelope out of the inside pocket of her mourning clothes and looks at it. 'By Grandpa’s words, this only goes away if it’s burned. We could send it with him at the cremation today. But Grandpa never burned it, his whole life. If we submit the original, the erased agree goes out with it. People will say Grandpa was a coward.' The funeral director calls the time. 5 minutes.",
+      "text": "A text from Prosecutor Na Eunho is waiting. 'We file the notice of appeal by midnight tonight. If the family’s consent to submit the original as evidence arrives by 16:00, I can attach a request for handwriting analysis.' Lim Soyul takes the envelope out of the inside pocket of her mourning clothes and looks at it. 'By Grandpa’s words, this only goes away if it’s burned. We could send it with him at the cremation today. But Grandpa never burned it, his whole life. If we submit the original, the erased agree goes out with it. People will say Grandpa was a coward.' The funeral director calls the time. 5 minutes.",
       "memo": [
         "Na Eunho: family consent by 16:00 -- handwriting analysis request possible; notice of appeal due at midnight tonight",
         "Legal team’s second demand: return immediately after the procession",
@@ -167,7 +167,7 @@ export default {
     },
     "c45_aftershock": {
       "title": "The Portrait at the Bookshop",
-      "text": "After the ashes are laid to rest, everyone gathers at the secondhand bookshop. Lim Soyul hangs the portrait drawing, now with pupils drawn in, beside the counter. The eyes behind the glasses look this way now. Kwon Dohyun is already working out the shop’s monthly rent and the cost of barley tea. Moon Gaeul sets down a box of rice cakes. 'Last time you grumbled they weren’t steamed enough. These are steamed all the way.' Lee Minseo opens her laptop. 'Grandpa’s dissent disk. It’s the very first record ECHO learned. I want to show ECHO the original of that back page from this morning’s envelope. The erased agree of the man who taught it how to dissent.' Lim Soyul nods as she puts the envelope in her bag. 'Then I’ll bring it. Even though Grandpa cursed machines more than anything.' On Lee Minseo’s screen, an unfamiliar schedule sits next to the name ECHO.",
+      "text": "After the ashes are laid to rest, everyone gathers at the secondhand bookshop. Lim Soyul hangs the portrait drawing, now with pupils drawn in, beside the counter. Moon Gaeul sets down a box of rice cakes. 'Last time you grumbled they weren’t steamed enough. These are steamed all the way.' Lee Minseo opens her laptop. 'Grandpa’s dissent disk. It’s the very first record ECHO learned. I want to show ECHO the original of that back page from this morning’s envelope. The erased agree of the man who taught it how to dissent.' Lim Soyul answers. 'Then I’ll bring it. Even though Grandpa cursed machines more than anything.' On Lee Minseo’s screen, an unfamiliar schedule sits next to the name ECHO.",
       "memo": [
         "Lim Kyungsoo’s ashes laid to rest: afternoon of September 17",
         "Beside the counter, 1st floor of the secondhand bookshop: the portrait with its eyes drawn in",
@@ -191,7 +191,7 @@ export default {
     },
     "c45_guestbook": {
       "title": "Guestbook, Volume Two",
-      "text": "The guestbook at the reception desk moves on to a second volume. Greeting mourners, Do Yoonha stops his pen in front of an old man. The man has run a print shop in Seongsu-dong for 42 years, and beside his name he writes one more line. 'August 2008, the one who was refused a loan.' When Do Yoonha looks up, the old man smiles. 'I went to borrow for two more machines. This man said no, told me to wait just a month. A month later the whole world reeled. If I’d borrowed that money, I’d have gone under that year.' Instead of an envelope, the old man lays a rolled-up calendar on the altar. Next year’s calendar. 'Every year I brought one to the bookshop. I printed this year’s too.'",
+      "text": "Do Yoonha stops his pen in front of an old man. The man has run a print shop in Seongsu-dong for 42 years, and beside his name he writes one more line. 'August 2008, the one who was refused a loan.' The old man smiles. 'I went to borrow for two more machines. This man said no, told me to wait just a month. A month later the whole world reeled. If I’d borrowed that money, I’d have gone under that year.' He lays a rolled-up calendar for next year on the altar. 'Every year I brought one to the bookshop. I printed this year’s too.'",
       "memo": [
         "Guestbook volume two -- over 400 mourners",
         "Seongsu-dong print shop owner: 'August 2008, the one who was refused a loan'",
@@ -214,7 +214,7 @@ export default {
     },
     "c45_portrait": {
       "title": "Unfinished Eyes",
-      "text": "In the chief mourner’s lounge, Lim Soyul has taken the portrait drawing out of its frame and rests it on her knees, a marker in her hand. She left the pupils blank, drawing in a hurry. The hand wiping the glasses hid them, so from a distance nobody noticed. 'The eyes I remember are Grandpa’s eyes when he looked at paper. I don’t really know his eyes when he looked at me.' She caps and uncaps the pen. 'What were his eyes like when he read your dissent? That’s what I want to draw.' You never saw that moment. No one saw his face as he read that paper 3 years ago.",
+      "text": "Lim Soyul rests the portrait drawing on her knees, a marker in her hand. She left the pupils blank, drawing in a hurry. The hand wiping the glasses hid them, so nobody noticed. 'The eyes I remember are Grandpa’s eyes when he looked at paper. I don’t really know his eyes when he looked at me. What were his eyes like when he read your dissent? That’s what I want to draw.' No one saw his face as he read that paper 3 years ago.",
       "memo": [
         "Portrait drawing: the pupils are blank",
         "Lim Soyul’s memory: 'his eyes when he looked at paper'",
@@ -237,7 +237,7 @@ export default {
     },
     "c45_indent": {
       "title": "Pressed Marks",
-      "text": "Ban Jaewook takes out a flashlight and lays it almost flat against the paper. These hands have spent 20 years picking out altered documents. 'There’s one more thing besides the erased marks.' Letters are pressed into the top margin of the back. No ink, no pencil dust, only the grooves left by someone pressing hard as they wrote on a sheet laid on top. Ban Jaewook reads them one letter at a time. 'Author’s name -- note it separately. Yoon.' He switches off the flashlight and opens his notebook to the 2023-0412 page. On the fourth line: July 24, and your name. 'For 3 years I didn’t know why your file came all the way up to my desk that day. Someone said to note it separately.'",
+      "text": "Ban Jaewook lays a flashlight almost flat against the paper. 'There’s one more thing besides the erased marks.' In the top margin of the back, only the grooves remain, left by someone pressing hard as they wrote on a sheet laid on top. 'Author’s name -- note it separately. Yoon.' He switches off the flashlight and opens his notebook to the 2023-0412 page. On the fourth line: July 24, and your name. 'For 3 years I didn’t know why your file came all the way up to my desk that day. Someone said to note it separately.'",
       "memo": [
         "Pressed marks: 'Author’s name -- note it separately. Yoon.'",
         "Marks that exist only on the original -- invisible on copies and photos",
@@ -260,7 +260,7 @@ export default {
     },
     "c45_guestbook_reaction": {
       "title": "The August Graduation",
-      "text": "On the outdoor bench behind the memorial room, Lim Jaeyoon cracks open a can of coffee. For 11 years he has been building plants in the Dubai desert that turn seawater into drinking water. 'That calendar man says he marks the day my father turned him down. August 22, 2008.' He laughs. It is not a smiling face. 'That was my college graduation. A late-summer ceremony, so the hall was half empty, and my father’s seat was empty too. He remembers some stranger’s print-shop machines, though.' The can slowly crumples. 'After the procession, I’m sending all the paper in the bookshop for pulping. Like my father said. It only goes away if you burn it, right?'",
+      "text": "On the bench behind the memorial room, Lim Jaeyoon cracks open a can of coffee. For 11 years he has been building plants in the Dubai desert that turn seawater into drinking water. 'That calendar man says he marks the day my father turned him down. August 22, 2008. That was my college graduation. A late-summer ceremony, so the hall was half empty, and my father’s seat was empty too. He remembers some stranger’s print-shop machines, though. After the procession, I’m sending all the paper in the bookshop for pulping. It only goes away if you burn it, right?'",
       "memo": [
         "August 22, 2008: the day of the refusal, the day of the graduation",
         "'After the procession, the paper goes for pulping'"
@@ -282,7 +282,7 @@ export default {
     },
     "c45_portrait_reaction": {
       "title": "The Box He Left Empty",
-      "text": "In front of Memorial Room 3 stands Han Seoyun in a black coat, on standby for six months now and unable to go to work. She says she stood there 30 minutes without coming in. She is the one who returned your dissent 3 years ago. After bowing, she comes out and leans against the wall. 'He called me last month. The first time ever. He said just one thing. I saw your box too. I left a box empty myself.' Han Seoyun taps the wall once with a finger. 'He hung up before I could ask which box. I thought he meant my return.'",
+      "text": "In front of Memorial Room 3 stands Han Seoyun in a black coat, on standby for six months now and unable to go to work. She bows, comes out, and leans against the wall. 'He called me last month. The first time ever. He said just one thing. I saw your box too. I left a box empty myself. He hung up before I could ask which box. I thought he meant my return.'",
       "memo": [
         "Lim Kyungsoo’s call last month: 'I left a box empty myself'",
         "The memorial room the one who returned it could not enter for 30 minutes"
@@ -304,7 +304,7 @@ export default {
     },
     "c45_indent_reaction": {
       "title": "The Letter’s Second Page",
-      "text": "Around sunrise, on the outdoor bench behind the memorial room, Lim Jaeyoon reads the second page of the letter. Lim Soyul handed it to him, saying it was his. The first line is a date. 'August 22, 2008.' Below it: 'Jaeyoon. That day I was looking at a print shop’s papers from Seongsu-dong. It was your graduation day. I write that date here. I write that I am sorry. Writing it on paper is how I keep from forgetting. Not that I ever forgot.' Lim Jaeyoon looks at the paper for a long time. A sound comes out, laughing or crying, hard to tell. 'Even his apologies come as paperwork. And this one took 18 years.' He folds the letter into his shirt pocket. 'I won’t send the bookshop paper for pulping. I think I’ll read some of it myself.'",
+      "text": "Around sunrise, Lim Jaeyoon reads the second page of the letter Lim Soyul handed him. 'August 22, 2008.' Below it: 'Jaeyoon. That day I was looking at a print shop’s papers from Seongsu-dong. It was your graduation day. I write that date here. I write that I am sorry. Writing it on paper is how I keep from forgetting. Not that I ever forgot.' Lim Jaeyoon looks at the paper for a long time. 'Even his apologies come as paperwork. And this one took 18 years. I won’t send the bookshop paper for pulping. I think I’ll read some of it myself.'",
       "memo": [
         "Second page: 'August 22, 2008, I write that I am sorry'",
         "The bookshop paper will not go for pulping"
@@ -326,7 +326,7 @@ export default {
     },
     "c45_branch_ribbon": {
       "title": "The Ribbon’s Handwriting",
-      "text": "You carry the ribbon to the end of the corridor and dial the florist’s number on the wreath stand. The florist in Yeouido says little at first, but when Oh Jinwoo says, 'The late gentleman’s granddaughter wants to know who sent it,' a photo of the order form arrives. It was not a secretariat card. Yoon Sanghyuk came to the shop himself yesterday evening, paid with his personal card, and left the ribbon wording written in pencil. The original wording is crossed out. 'In his debt, Yoon Sanghyuk.' The florist said it would not all fit on the ribbon, so only the name stayed. Oh Jinwoo zooms in on the photo. The last stroke of 'Yoon' hooks upward. It is the same stroke as 'Returned -- Yoon' on the back of the dissent copy from 3 years ago.",
+      "text": "When you dial the Yeouido florist’s number on the wreath stand, the owner says little. Oh Jinwoo speaks. 'The late gentleman’s granddaughter wants to know who sent it.' Only then does a photo of the order form arrive. Yoon Sanghyuk came in himself yesterday evening, paid with his personal card, and left the ribbon wording written in pencil. The original wording, 'In his debt, Yoon Sanghyuk', is crossed out. Zoomed in, the last stroke of Yoon hooks upward. It is the same stroke as 'Returned -- Yoon' on the back of the dissent copy from 3 years ago.",
       "memo": [
         "Ordered by: Yoon Sanghyuk himself, personal card, September 15, 19:00",
         "Original wording, crossed out: 'In his debt, Yoon Sanghyuk'",
@@ -350,7 +350,7 @@ export default {
     },
     "c45_branch_ribbon_follow": {
       "title": "A Mourner Who Came Alone",
-      "text": "In a lull between mourners, Yoon Sanghyuk walks into Memorial Room 3 alone. No lawyer, no secretary. Lim Jaeyoon starts to rise, and Lim Soyul catches his sleeve. Yoon Sanghyuk looks at the drawn portrait for a long time, bows twice, and his hand trembles once as he sets the incense. When he lays a white envelope in front of the condolence box, Lim Soyul shakes her head. He puts the envelope away. On his way out, he stops beside you. 'He waited for my name to the very end. Holding one sheet of paper.' His voice is low. 'I won’t talk about that here. This place is his.' He walks past the guestbook with no pen in his hand. At the reception desk, Do Yoonha holds a pen and looks at him.",
+      "text": "In a lull between mourners, Yoon Sanghyuk walks into the memorial room alone. No lawyer, no secretary. Yoon Sanghyuk looks at the drawn portrait for a long time and bows twice. Lim Soyul shakes her head at his white envelope, and he puts it away. On his way out, Yoon Sanghyuk stops beside you. 'He waited for my name to the very end. Holding one sheet of paper. I won’t talk about that here. This place is his.' He walks past the guestbook with no pen in his hand.",
       "memo": [
         "16:40 Yoon Sanghyuk pays respects alone -- no entourage",
         "Condolence envelope: refused by Lim Soyul",
@@ -374,7 +374,7 @@ export default {
     },
     "c45_route_system": {
       "title": "The Papers of the Dead",
-      "text": "A demand from KD Bank’s legal team has reached the memorial room: return all of the deceased’s documents before the funeral ends. Before writing a reply, you suggest gathering when the company has called in papers from people who died, and Lee Minseo opens her laptop in the reception room. She lays the material Seo Harin collected over published court rulings. Over the past 10 years, KD Financial Group sent 23 certified letters to retirees or their bereaved families demanding the 'return of company documents'. 19 of them arrived within a week of the person’s death. In 17, the family sent the boxes back without even opening them. Not one record says where the returned boxes were opened. Lee Minseo turns the screen around. 'When someone dies, their papers get called in first. While everyone is too busy with the funeral to read them.'",
+      "text": "Lee Minseo lays the material Seo Harin collected over published court rulings. Over the past 10 years, KD Financial Group sent 23 certified letters to retirees or their bereaved families demanding the 'return of company documents'. 19 of them arrived within a week of the person’s death. In 17, the family sent the boxes back without even opening them, and not one record says where the returned boxes were opened. Lee Minseo turns the screen around. 'When someone dies, their papers get called in first. While everyone is too busy with the funeral to read them.'",
       "memo": [
         "19 of 23 document-return demands: within a week of the death",
         "17 boxes the families sent back unopened",
@@ -400,7 +400,7 @@ export default {
     },
     "c45_final_system_route": {
       "title": "Who Reads First",
-      "text": "Two in the morning. A few mourners and the smell of cold yukgaejang linger in the reception room. On the laptop in the corner, Lee Minseo lines up the 23 cases by arrival date. 19 came within a week of a death. The 24th line is the demand handed over in the memorial room yesterday afternoon. One day after Lim Kyungsoo died. Lee Minseo lowers her voice. 'The families never got to open those 17 boxes they sent back. And there’s no record of who opened them after. Grandpa’s envelope opens in three hours. This time the family reads it first.'",
+      "text": "On the laptop in the corner of the reception room, Lee Minseo lines up the 23 cases by arrival date. The 24th line is the demand handed over in the memorial room one day after Lim Kyungsoo died. Lee Minseo lowers her voice. 'The families never got to open those 17 boxes they sent back. And there’s no record of who opened them after. Grandpa’s envelope opens in three hours. This time the family reads it first.'",
       "memo": [
         "19 of 23 document-return demands: within a week of the death",
         "Legal team demand arrived one day after Lim Kyungsoo died",
@@ -423,7 +423,7 @@ export default {
     },
     "c45_evidence_turn": {
       "title": "The Same Pencil",
-      "text": "When you lay the clue over the scans, the approval documents for the four cases acquitted at first instance come up side by side. These are the printout scans where no approver could be named because the approvals came from a shared account. Lee Minseo turns the contrast all the way up, and on all four sheets, erased pencil marks rise in the right margin. The same sentence. 'Don’t ask why.' Ban Jaewook sets the copy of the dissent’s back page beside them. 'Returned -- Yoon. Don’t ask why.' Scans and copies cannot support a handwriting analysis. Only one sheet keeps the pressure and stroke order alive: the original that came out of the envelope this morning. Its comments box still holds the 'agree' Lim Kyungsoo wrote and erased. Ban Jaewook writes in his notebook. 'One sheet of paper can fill four blanks.' Then he says, 'The moment it fills them, the erased agree gets read too.'",
+      "text": "When you lay the clue over the scans, the approval documents for the four cases acquitted at first instance come up side by side. On all four sheets, the same sentence sits erased in pencil in the right margin. 'Don’t ask why.' Ban Jaewook sets beside them the copy of the dissent’s back page reading 'Returned -- Yoon. Don’t ask why'. Scans and copies cannot support a handwriting analysis. Only one sheet keeps the pressure and stroke order alive: the original that came out of the envelope this morning. Ban Jaewook writes in his notebook. 'One sheet of paper can fill four blanks.' Then he says, 'The moment it fills them, the erased agree gets read too.'",
       "memo": [
         "Margins of the 4 acquitted approval documents: erased pencil, 'Don’t ask why'",
         "The one original that allows handwriting analysis: Lim Kyungsoo’s back page",
@@ -446,7 +446,7 @@ export default {
     },
     "c45_start_warm": {
       "title": "Wake for the Man Who Knew His Rice Cakes",
-      "text": "On the night of the sentencing, 11 people stood by the window of his room at Ieum Hospital, carrying the leftover rice cakes. Instead of talking about the ruling, Lim Kyungsoo said only, 'These rice cakes are underdone,' and when Moon Gaeul said, 'You’re eating them all, though,' he laughed out loud for the first time. That night was the last conversation. Five days later, at 4:50 a.m., he died. In the portrait’s place in Memorial Room 3 stands the drawing Lim Soyul made overnight, and before the altar sits a plate of rice cakes Moon Gaeul brought. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She takes out a yellowed envelope. 'Open at dawn on the third day. He gave it to me that night after the rice cakes. Yul and the person who wrote the dissent are to open it together.'",
+      "text": "On the night of the sentencing, 11 people stood by the window of his hospital room, carrying the leftover rice cakes. Instead of talking about the ruling, Lim Kyungsoo said only, 'These rice cakes are underdone,' and when Moon Gaeul said, 'You’re eating them all, though,' he laughed out loud for the first time. Five days later, at 4:50 a.m., he died. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She takes out a yellowed envelope. 'Open at dawn on the third day. He gave it to me that night after the rice cakes. Yul and the person who wrote the dissent are to open it together.'",
       "memo": [
         "Hospital room on the night of the sentencing: 11 people, a bundle of rice cakes",
         "Lim Kyungsoo’s last words: 'These rice cakes are underdone'",
@@ -476,7 +476,7 @@ export default {
     },
     "c45_start_record": {
       "title": "Wake for the Man Who Heard the Explainer",
-      "text": "The ruling explainer was finished at two in the morning, and in the morning you went to his hospital room and read him the first sentence aloud. 'A blank is not an acquittal.' With his eyes closed, Lim Kyungsoo held out his hand for a red pen. Then he fixed one spacing error in the second line. That was his last correction. Five days later, before dawn, he died. In the portrait’s place in Memorial Room 3 stands the drawing by Lim Soyul. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She sets a yellowed envelope down beside the explainer. 'We open it at dawn on the third day. That’s what Grandpa said when he put down the red pen. Keep to the order.'",
+      "text": "The ruling explainer was finished at two in the morning, and in the morning you went to his hospital room and read him the first sentence aloud. 'A blank is not an acquittal.' With his eyes closed, Lim Kyungsoo asked for a red pen and fixed one spacing error in the second line. Five days later, before dawn, he died. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She sets a yellowed envelope down beside the explainer. 'We open it at dawn on the third day. That’s what Grandpa said when he put down the red pen. Keep to the order.'",
       "memo": [
         "First sentence of the explainer: 'A blank is not an acquittal'",
         "Lim Kyungsoo’s last correction: one spacing fix",
@@ -506,7 +506,7 @@ export default {
     },
     "c45_start_rush": {
       "title": "Wake of Two Missed Calls",
-      "text": "On the night of the sentencing, you worked out the grounds for appeal with Na Eunho until the lights went off at the prosecutors’ office. Meanwhile two missed calls from Lim Soyul piled up. When you went to the hospital the next morning, Lim Kyungsoo was asleep, and he did not open his eyes again while you were there. Five days later, at 4:50 a.m., he died. In Memorial Room 3, Lim Soyul, standing in for the chief mourner, sees you and says nothing for a moment. Then she shows you her phone’s call log. 'Those two calls. I made them because Grandpa said your name twice.' She takes out a yellowed envelope. 'Let’s open this together at dawn on the third day. This time, come.'",
+      "text": "On the night of the sentencing, you worked out the grounds for appeal with Na Eunho until the lights went off at the prosecutors’ office. Meanwhile two missed calls from Lim Soyul piled up. When you went to the hospital the next morning, Lim Kyungsoo was asleep, and he did not open his eyes again while you were there. Five days later, at 4:50 a.m., he died. Lim Soyul, standing in for the chief mourner, shows you her phone’s call log. 'Those two calls. I made them because Grandpa said your name twice.' She takes out a yellowed envelope. 'Let’s open this together at dawn on the third day. This time, come.'",
       "memo": [
         "Night of the sentencing: at the prosecutors’ office until 23:00",
         "2 missed calls -- the number of times Lim Kyungsoo said your name",
