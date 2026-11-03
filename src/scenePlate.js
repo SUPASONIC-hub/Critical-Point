@@ -324,8 +324,11 @@ export function getPlateMotif(place = "") {
  * look like different rooms.
  */
 export function getScenePlate(node = {}, nodeId = "") {
-  const place = String(node.place ?? "");
-  const clock = String(node.clock ?? "");
+  // A translated scene keeps its Korean place and clock (src/locales/overlay.js):
+  // the markers below are Korean, and the seed has to be the same in every
+  // language for the room to be.
+  const place = String(node.sourcePlace ?? node.place ?? "");
+  const clock = String(node.sourceClock ?? node.clock ?? "");
   const motif = getPlateMotif(place);
   const seed = hashString(`${nodeId}:${place}`);
   const night = NIGHT_MARKERS.some((marker) => clock.includes(marker));
