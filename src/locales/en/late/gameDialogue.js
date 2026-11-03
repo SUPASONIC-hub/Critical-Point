@@ -529,8 +529,8 @@ export default {
     "선재윤": {
       "appearance": "A rolling briefcase, a statute book with worn corners, black suit sleeves dusted with rice-cake flour.",
       "thought": "A lawsuit isn’t about winning; it’s about holding out. Making sure no one drops out while we hold out is my job.",
-      "gesture": "When Seon Jaeyoon reads an unfavorable brief, he counts the pages first. The thicker it is, the more he believes the other side is scared.",
-      "voice": "He talks fast and dry, and only in front of his clients does he finish his sentences slowly.",
+      "gesture": "When Seon Jaeyoon reads an unfavorable brief, she counts the pages first. The thicker it is, the more she believes the other side is scared.",
+      "voice": "She talks fast and dry, and only in front of her clients does she finish her sentences slowly.",
       "line": "They have eight people and I’m one. Still, we have 1,732 more plaintiffs than they do."
     },
     "연서준": {
@@ -555,10 +555,10 @@ export default {
       "line": "Take this out and there’s one story left. There was one bad man. The end."
     },
     "은시온": {
-      "appearance": "A knife-pressed shirt, a tablet showing the ad sales sheet, a small calculator hanging from his badge lanyard.",
+      "appearance": "A knife-pressed shirt, a tablet showing the ad sales sheet, a small calculator hanging from her badge lanyard.",
       "thought": "I never thought ads buy the broadcast. But a broadcast has never gone out without ads either.",
-      "gesture": "When Eun Sion gets a hard question, he turns his tablet toward the other person and shows the numbers first.",
-      "voice": "Courteous and fast. He’s never wrong on numbers, and trails off when it comes to people.",
+      "gesture": "When Eun Sion gets a hard question, she turns her tablet toward the other person and shows the numbers first.",
+      "voice": "Courteous and fast. She’s never wrong on numbers, and trails off when it comes to people.",
       "line": "What I sell is 30 seconds. I didn’t know those 30 seconds were buying 20 minutes."
     },
     "홍예담": {
