@@ -189,7 +189,9 @@ const fileBudgets = {
   // 8dd649ce, main b2558d55): the badge rule beside intro-360-fit.
   // 3159 / 69883 -> 3159 / 69903 on 2026-11-02, measured (pc-type-scale): from 1024px wide the
   // root reads 18px; the case card's numeral keeps its size through --hud-rem.
-  "base-intro-ranking.css": { lines: 3170, bytes: 70168 },
+  // 3170 / 70168 -> 3170 / 70188 on 2026-11-03, measured (D2 over #224
+  // 9e4ec6bf, main bb492d5d): the badge rule beside pc-type-scale's --hud-rem.
+  "base-intro-ranking.css": { lines: 3170, bytes: 70188 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
