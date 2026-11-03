@@ -226,3 +226,42 @@ test("weekly rule ranking: two boards in an event week, each asked of the server
   await expect(page.locator(".ranking-row")).toHaveCount(1);
   expect(asked.at(-1)).toBe("is.null");
 });
+
+test("weekly rule ranking after the week: last week's board stays a week, after this week's", async ({ page }) => {
+  const asked = [];
+  const row = (tag, score, week) => ({
+    run_tag: tag,
+    player_name: tag,
+    case_id: "season-final",
+    case_title: "SEASON 01 COMPLETE",
+    completed_at: "2026-11-23T03:00:00Z",
+    score,
+    week,
+    summary: { burstScore: score, rank: "B", primary: ["curiosity", 90], seasonComplete: true, averageResponseTime: 14, reframeCount: 2 },
+  });
+  await page.route(`${BACKEND_ORIGIN}/**`, (route) => route.fulfill({ status: 200, contentType: "application/json", body: "[]" }));
+  await page.route(`${BACKEND_ORIGIN}/rest/v1/public_rankings**`, (route) => {
+    const week = new URL(route.request().url()).searchParams.get("week");
+    asked.push(week);
+    const rows = week === "eq.2026-W47" ? [row("TESTWK01", 64, "2026-W47"), row("TESTWK02", 58, "2026-W47"), row("TESTWK03", 52, "2026-W47")] : [row("OTHER001", 70, null)];
+    return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rows) });
+  });
+  await page.addInitScript((url) => {
+    localStorage.setItem("critical-point-telemetry-url", url);
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  }, BACKEND_ORIGIN);
+  // Monday 2026-11-23 noon KST: W48 (HEAVY FRACTURE) has begun, W47 (the test week) has ended.
+  await setWeeklyClock(page, weekStartMs("2026-W48") + 12 * 60 * 60 * 1000);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  await expect(page.locator(".ranking-page")).toBeVisible();
+
+  const tabs = page.getByTestId("ranking-week-tabs");
+  await expect(tabs.getByRole("button")).toHaveText(["평소 순위", "이번 주의 규칙 · HEAVY FRACTURE", "지난주의 규칙 · AUDIT & CASCADE"]);
+  const last = tabs.getByRole("button", { name: "지난주의 규칙 · AUDIT & CASCADE" });
+  await last.click();
+  await expect(last).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".ranking-row")).toHaveCount(3);
+  await expect(page.locator(".ranking-row").first()).toContainText("TESTWK01");
+  expect(asked.at(-1), "last week's board asks the server for that week's rows").toBe("eq.2026-W47");
+});
