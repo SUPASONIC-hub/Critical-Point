@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c24_start": {
       "title": "No Results",
-      "text": "The first line of the scheduled all-staff notice, 'Notice of Reorganization': 'Trigger Lab is dissolved effective March 27. Reason: no operational results.' Ban Jaewook copies the issuing-department field into his notebook. Han Seoyun prints the notice and pins it to the middle of the whiteboard, crowded with 23 case numbers. 'The last day of work is Friday. They want our things out by Thursday. No results. Nowhere in the notice does it say who wrote those two words.'",
+      "text": "The first line of the scheduled all-staff notice, 'Notice of Reorganization': 'Trigger Lab is dissolved effective March 27. Reason: no operational results.' Do Yoonha stops reading halfway and opens a window. Ban Jaewook copies the issuing-department field into his notebook. Han Seoyun prints the notice and pins it to the middle of the whiteboard, crowded with 23 case numbers. 'The last day of work is Friday. They want our things out by Thursday. No results. Nowhere in the notice does it say who wrote those two words.'",
       "memo": [
         "Dissolution notice: effective March 27, reason 'no operational results'",
         "Last day of work Friday, belongings out by Thursday",
@@ -160,7 +160,7 @@ export default {
     },
     "c24_aftershock": {
       "title": "Lights-Out Day",
-      "text": "17:50. Six desks are empty, and on the seventh only ECHO’s terminal is on. Kang Taemin takes the 'no results' notice off the whiteboard and puts up Moon Hajun’s drawing. Kwon Dohyun says, 'This picture has no field for a price,' and everyone laughs. In your inside pocket is the envelope Baek Arin gave you on the 33rd floor: a copy of the receipt log for the original of that loan from 3 years ago. At 18:00 sharp, Han Seoyun turns off the lights. In the dark, a message from Yoon Sanghyuk lights up. 'Come up. Let us talk about the empty signature field. Tonight is the last night.'",
+      "text": "17:50. Six desks are empty, and on the seventh only ECHO’s terminal is on. Kang Taemin takes the 'no results' notice off the whiteboard and puts up Moon Hajun’s drawing. Kwon Dohyun says, 'This picture has no field for a price,' and everyone laughs. Do Yoonha closes the window. In your inside pocket is the envelope Baek Arin gave you on the 33rd floor: a copy of the receipt log for the original of that loan from 3 years ago. At 18:00 sharp, Han Seoyun turns off the lights. In the dark, a message from Yoon Sanghyuk lights up. 'Come up. Let us talk about the empty signature field. Tonight is the last night.'",
       "memo": [
         "Trigger Lab dissolved -- access revoked at 18:00",
         "Whiteboard: Moon Hajun’s drawing instead of the notice",

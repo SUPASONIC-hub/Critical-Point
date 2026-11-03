@@ -206,7 +206,7 @@ export default {
     },
     "c22_heater": {
       "title": "The Stove and the Wages",
-      "text": "The factory stove goes out. Kang Taemin pulls off his gloves, tucks them into his vest pocket, and takes the stove apart. He sets out three cups of instant noodles and pours the leftover hot water into a plastic bottle, which he stands beside a lathe. Kang Taemin speaks. 'When the machines get cold, the tolerance gets worse.' Foreman Kim closes the ledger. 'If we miss the Seon order, there’s no March pay either. We’re fine. But orders don’t wait.'",
+      "text": "The factory stove goes out. Kang Taemin pulls off his gloves, tucks them into his vest pocket, and takes the stove apart. He sets out three cups of instant noodles and pours the leftover hot water into a plastic bottle, which he stands beside a lathe. Kang Taemin speaks. 'When the machines get cold, the tolerance gets worse.' Foreman Kim opens the ledger. 'If we miss the Seon order, there’s no March pay either. We’re fine. But orders don’t wait.'",
       "memo": [
         "Stove broken -- 3 degrees above zero inside the factory",
         "5 members unpaid for a second month",
