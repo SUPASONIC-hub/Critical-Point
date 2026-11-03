@@ -168,6 +168,22 @@ export function nextWeekRuleAt(ms, calendar = WEEKLY_RULES) {
 }
 
 /**
+ * The week boards the ranking screen offers beside the ordinary one: this
+ * week's rule first, then last week's (`last: true`) for the seven days after
+ * it ends, so a season started in a rule week and finished after Monday 00:00
+ * KST can still be seen on its board. The server keeps every week's rows
+ * (public_rankings is filtered by week only by the caller), so the board is
+ * there to read; only the switch to it was missing. Empty in a week with
+ * neither.
+ */
+export function weekBoardsAt(ms, calendar = WEEKLY_RULES) {
+  return [0, 1].flatMap((back) => {
+    const rule = weekRuleAt(Number(ms) - back * 7 * DAY_MS, calendar);
+    return rule ? [{ week: rule.week, rule: rule.id, label: rule.label, last: back === 1 }] : [];
+  });
+}
+
+/**
  * The id a season takes when it starts: the week's rule unless the player
  * turned it down (D2) or the season is played in story mode, which is outside
  * every ranking already.
