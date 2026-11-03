@@ -7,7 +7,8 @@ import enBriefing from "../../src/locales/en/screens/briefing.js";
 import jaBriefing from "../../src/locales/ja/screens/briefing.js";
 import { CASE_SEQUENCE, caseAftermathNodeId, nodes } from "../../src/gameData.js";
 import { getOutcomeCarryover } from "../../src/gameLogic.js";
-import { getPlateMotif, PLATE_MOTIFS } from "../../src/scenePlate.js";
+import { getPlateMotif, getScenePlate, PLATE_MOTIFS } from "../../src/scenePlate.js";
+import { overlayWords } from "../../src/locales/overlay.js";
 import {
   getCaptionZone,
   getFigureBox,
@@ -266,4 +267,55 @@ test("a case's result picks its plate's light from what the ending carried", () 
   assert.match(drawing, /<strong className="gx-sfx" aria-hidden="true"/);
   const plate = source("styles/app/plate.css");
   for (const tone of ["good", "mixed", "bad"]) assert.match(plate, new RegExp(`\\.gx-plate-outcome-${tone} \\{\\s*filter: `));
+});
+
+// Every scene as a language prints it: the Korean graph with that language's
+// words laid over it, the way a case arrives (src/locales/overlay.js).
+async function translatedScenes(lang) {
+  const dir = new globalThis.URL(`../../src/locales/${lang}/nodes/`, import.meta.url);
+  const scenes = {};
+  for (const file of readdirSync(dir)) {
+    const words = (await import(new globalThis.URL(file, dir).href)).default;
+    for (const [id, entry] of Object.entries(words.nodes ?? {})) {
+      if (nodes[id]) scenes[id] = overlayWords(structuredClone(nodes[id]), entry);
+    }
+  }
+  return scenes;
+}
+
+test("a translated scene is drawn in the Korean scene's room, light and seed (2026-11-03)", async () => {
+  for (const lang of ["en", "ja"]) {
+    const scenes = await translatedScenes(lang);
+    let moved = 0;
+    for (const [id, scene] of Object.entries(scenes)) {
+      if (scene.place !== nodes[id].place) moved += 1;
+      assert.deepEqual(getScenePlate(scene, id), getScenePlate(nodes[id], id), `${lang} ${id}`);
+    }
+    // The words did change: the caption prints the translation.
+    assert.ok(moved > 1000, `${lang}: ${moved} places translated`);
+    assert.equal(scenes.c46_cage.sourcePlace, nodes.c46_cage.place);
+    assert.equal(getScenePlate(scenes.c46_cage, "c46_cage").motif, "server", `${lang}: c46_cage is the server room, not the desk`);
+  }
+});
+
+test("under every English and Japanese caption a lone room still letters every word", async () => {
+  // Before 17 and 14 joined the sizes, a broken board's SMASH! under an
+  // English caption three lines tall had no room on the desk: 281 scenes
+  // printed no word in English, 6 in Japanese.
+  for (const [lang, copy] of [["en", enBriefing], ["ja", jaBriefing]]) {
+    const scenes = await translatedScenes(lang);
+    const words = [
+      ...copy.sfxCalm.map((label, index) => ({ label, kind: getSoundKind(index, false) })),
+      ...copy.sfxBroken.map((label, index) => ({ label, kind: getSoundKind(index, true) })),
+    ];
+    for (const [motif, room] of [["desk", ROOMS.desk], ["hall", ROOMS.hall]]) {
+      for (const scene of Object.values(scenes)) {
+        for (const { kind, label } of words) {
+          const spot = placePlateSound({ kind, label, motif, ...room, place: scene.place, clock: scene.clock });
+          assert.ok(spot, `${lang} ${motif}: "${label}" under "${scene.place}" / "${scene.clock}"`);
+          assertClear(spot, { label, figures: room.figures, place: scene.place, clock: scene.clock }, `${lang} ${motif}`);
+        }
+      }
+    }
+  }
 });
