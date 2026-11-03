@@ -983,7 +983,9 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    `bump_rate_limit`이 셉니다. 텔레메트리는 (주소, 세션)마다 시간당 240건, 주소마다 1,200건이고, 바이트로는
    주소마다 하루 32MB(`telemetry_address_daily_bytes`), 모두 합쳐 하루 200MB(`telemetry_daily_bytes`)
    입니다. 괄호 안은 `private_settings`의 이름으로, 마이그레이션 없이 바꿀 수 있습니다. 주소 한도가 전체
-   한도보다 먼저 닿으므로 한 주소가 다른 플레이어의 하루치를 다 쓰지 못합니다.
+   한도보다 먼저 닿으므로 한 주소가 다른 플레이어의 하루치를 다 쓰지 못합니다. 모두 합친 두 한도(텔레메트리 바이트, 온라인 저장 새 코드)는
+   `Funnel`(22:10 KST)과 `Board Reports`(09:10 KST)가 하루 두 번 읽어 Job Summary에 남기고, 80%를 넘으면 예약 실행이
+   실패합니다(`scripts/report-budgets.mjs`). 요약에는 수만 들어갑니다.
 7. 텔레메트리 행은 만들어질 때 한 번 받은 `event_id`(`src/state/telemetryEventId.js`)를 재시도에도 그대로
    씁니다. `event_id`는 유니크이고, 클라이언트는 평범한 POST를 보내 유니크 위반(`409`, 코드 `23505`)만 전달 완료로
    셉니다(`on_conflict`는 `event_id`에 대한 SELECT 권한이 필요해서 쓰지 않습니다). 다른 이유의 `409`는 실패입니다. 피드백 행은
@@ -995,8 +997,9 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    접근합니다. 행은 코드의 SHA-256으로 저장되고, `saved_at`은 `now()`를 넘지 못하며, 기기 사이의 순서는
    서버의 `revision`으로 정합니다(시각이 아님). 충돌은 플레이어가 고를 때까지 유지되고, 패널에서 서버 사본을
    지울 수 있으며(`delete_cloud_save`), 마지막 업로드 후 180일이 지나면 만료됩니다. 쓰기는 코드마다 시간당 240번·주소마다 600번, 읽기는
-   주소마다 시간당 120번까지입니다. 새 코드는 주소마다 하루 5개, 모두 합쳐 하루 1,000개(`cloud_daily_new_codes`)까지
-   만들 수 있고, 넘으면 새 코드만 거절되고 이미 있는 코드의 저장은 계속됩니다.
+   주소마다 시간당 120번까지입니다. 새 코드는 주소마다 하루 5개, 모두 합쳐 하루 3,000개(`cloud_daily_new_codes`, 2026-11-03에 1,000에서 올림)까지
+   만들 수 있고, 넘으면 새 코드만 거절되고 이미 있는 코드의 저장은 계속됩니다. 클라이언트 주소가 오지 않은 요청은
+   모두 `unknown` 한 키로 묶여 주소 하나의 한도를 함께 씁니다(닫힌 쪽으로 실패).
 9. `free_text_analyses` 테이블은 기록으로만 남아 있고 서비스 롤만 접근합니다. 게임은 여기에 쓰지 않습니다.
 
 공개 플레이테스트가 아니라면 전용 프로젝트를 쓰고 키를 주기적으로 교체하십시오. 스테이징은 별도
@@ -1356,7 +1359,7 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/manifest.webmanifest` | `Content-Type` | `application/manifest+json` |
 | `/*` | `X-Content-Type-Options` | `nosniff` |
 | `/*` | `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `/*` | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains` |
+| `/*` | `Strict-Transport-Security` | `max-age=315360000; includeSubDomains; preload` |
 | `/*` | `Cross-Origin-Opener-Policy` | `same-origin` |
 | `/assets/*` | `Cross-Origin-Resource-Policy` | `same-origin` |
 | `/*` | `Permissions-Policy` | `render.yaml`의 값 |
@@ -1366,9 +1369,9 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을
 하나씩(`.webp`, `og:image`의 `.jpg`, 아이콘) 읽고, 빠진 규칙마다 경고합니다.
 
-`Strict-Transport-Security`는 표의 값과 운영이 내보내는 값이 다릅니다. 2026-10-12에 운영이 실제로 내보낸 값은
-`max-age=315360000; includeSubdomains; preload`였습니다. 대시보드 규칙에서 오는지 Render가 직접 넣는지는
-확인하지 못했습니다. `check:deploy`는 1년 이상이면 통과시키므로 이 차이를 알리지 않습니다.
+`Strict-Transport-Security`와 CSP의 `connect-src`는 2026-11-03부터 운영이 실제로 내보내는 값과 같습니다(`curl -sI`로
+확인). HSTS는 10년·하위 도메인·preload이고, `connect-src`는 이 프로젝트의 Supabase 호스트 하나입니다. 그 전에는 파일이
+더 느슨하게(2년, `*.supabase.co`) 적혀 있어서, 대시보드를 이 표대로 다시 채우면 헤더가 약해질 수 있었습니다.
 
 배포를 거는 것은 `.github/workflows/deploy.yml`입니다. Render 대시보드 → 서비스 → Settings → Deploy
 Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으면, `Verify`(e2e 포함)가 초록으로 끝난

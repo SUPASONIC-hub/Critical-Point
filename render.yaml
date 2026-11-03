@@ -126,17 +126,16 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
-      # Two years, the length browsers' preload lists ask for. No `preload`:
-      # that is a promise about the whole registrable domain, and on
-      # *.onrender.com the domain is not ours to promise for.
-      # What production answers with is not this value: on 2026-10-12 the site
-      # served `max-age=315360000; includeSubdomains; preload`. Where that comes
-      # from was not established (the dashboard rule or the platform's own
-      # header on *.onrender.com); `check:deploy` passes because it asks for a
-      # year or more.
+      # What production answers with (curl -sI, 2026-10-12 and again
+      # 2026-11-03): ten years, subdomains, preload. Until 11-03 this file said
+      # two years and no preload, so a dashboard emptied and filled in again
+      # from it would have made the header weaker than the one players get.
+      # Where production's value comes from (the dashboard rule or the
+      # platform's own header on *.onrender.com) was not established; this is
+      # the value either way.
       - path: /*
         name: Strict-Transport-Security
-        value: max-age=63072000; includeSubDomains
+        value: max-age=315360000; includeSubDomains; preload
       - path: /*
         name: Cross-Origin-Opener-Policy
         value: same-origin
@@ -156,8 +155,10 @@ services:
       #   React's style attributes; styles cannot run code.
       # img-src/font-src: every image and the one Pretendard subset ship with the
       #   app. data: stays for fonts/images small enough for Vite to inline.
-      # connect-src: the Supabase REST API. Narrow it to the project's own
-      #   https://<ref>.supabase.co when setting it in the dashboard.
+      # connect-src: the Supabase REST API, the project's own host and no other
+      #   (production has said so since the dashboard narrowed it; the
+      #   reference is not a secret, see SUPABASE_PROJECT_REF in the workflows).
+      #   `vite preview` swaps it for the e2e stub's host (vite.config.js).
       # Google Analytics (GA_MEASUREMENT_ID, docs/analytics.md): gtag.js from
       #   www.googletagmanager.com (script-src), its hits to the four hosts in
       #   connect-src and its pixel fallback in img-src -- each host by name,
@@ -166,4 +167,4 @@ services:
       #   them while the variable is unset.
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com; media-src 'self' blob:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://region1.analytics.google.com; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'"
+        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com; media-src 'self' blob:; connect-src 'self' https://kiazzdbpkazwqhhimdib.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://region1.analytics.google.com; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'"

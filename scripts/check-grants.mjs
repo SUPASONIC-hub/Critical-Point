@@ -14,6 +14,7 @@ import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
+import { DEFAULTS as BUDGET_DEFAULTS, QUERY as BUDGETS_QUERY, nearLimits, readBudgets } from "./report-budgets.mjs";
 import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
@@ -1650,6 +1651,19 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(JSON.stringify(published?.rows[0]?.kept) === JSON.stringify({ bestLogic: 17, logicHold: 82.457 }), `the whitelist published ${JSON.stringify(published?.rows[0]?.kept)} for two numeric logic keys.`);
   check(JSON.stringify(published?.rows[0]?.dropped) === "{}", `the whitelist published a logic key that is not a number: ${JSON.stringify(published?.rows[0]?.dropped)}`);
 
+  // momentumTier is one of the tiers the game gives (20261103000000, L5), read
+  // from the same line of gameLogic.js as the thresholds above, and nothing else.
+  const tiers = [...(readFileSync(path.join(root, "src", "gameLogic.js"), "utf8").match(/momentumTier: momentumScore >= \d+ \? "([A-Z]+)" : momentumScore >= \d+ \? "([A-Z]+)" : momentumScore >= \d+ \? "([A-Z]+)" : "([A-Z]+)"/) ?? [])].slice(1);
+  check(tiers.length === 4, "could not read the four momentum tiers from src/gameLogic.js.");
+  for (const tier of tiers) {
+    const kept = await allowed(`publish the tier ${tier}`, "service_role", `select public.ranking_public_summary($1::jsonb) as s`, [JSON.stringify({ momentumTier: tier })]);
+    check(kept?.rows[0]?.s?.momentumTier === tier, `the public summary dropped the tier ${tier}: ${JSON.stringify(kept?.rows[0]?.s)}`);
+  }
+  for (const other of ["HELLO WORLD", "BURSTY", "burst", "FLOW ", "BUILDIN"]) {
+    const dropped = await allowed(`leave out the tier ${JSON.stringify(other)}`, "service_role", `select public.ranking_public_summary($1::jsonb) as s`, [JSON.stringify({ momentumTier: other })]);
+    check(!("momentumTier" in (dropped?.rows[0]?.s ?? {})), `the public summary published the tier ${JSON.stringify(other)}.`);
+  }
+
   // The seeded rows go, so everything after this sees the two ranked runs.
   await db.query(`delete from public.playtest_sessions where run_id like 'run-cutoffs-%'`);
   check((await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final'`))?.n === 2, "the cut-point check left ranking rows behind.");
@@ -2224,12 +2238,13 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await putCloudRefused("start a code past the daily ceiling", "VVVVVVVV2345", cloudPayload("ceiling"), /^PT429 .*code limit/);
   await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
   await putCloud("start a code under the default ceiling", "VVVVVVVV2345");
-  // The default itself: 1,000 a day (20261006010000), driven from one short.
-  // Each new code needs an address of its own, since an address starts five.
-  await presetCounter("global:cloud-new", 999);
-  await putCloud("start the day's 1,000th code", "WWWWWWWW2345");
+  // The default itself: 3,000 a day (1,000 from 20261006010000, 3,000 from
+  // 20261103000000), driven from one short. Each new code needs an address of
+  // its own, since an address starts five.
+  await presetCounter("global:cloud-new", 2999);
+  await putCloud("start the day's 3,000th code", "WWWWWWWW2345");
   withHeaders({ "x-forwarded-for": "198.51.100.63" });
-  await putCloudRefused("start the day's 1,001st code", "XXXXXXXX2345", cloudPayload("thousand"), /^PT429 .*code limit/);
+  await putCloudRefused("start the day's 3,001st code", "XXXXXXXX2345", cloudPayload("three thousand"), /^PT429 .*code limit/);
   await putCloud("save under an existing code while new ones are refused", "VVVVVVVV2345");
   await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
   // The owner's number, as large as they care to make it, is still a limit and
@@ -2240,6 +2255,42 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
 }
 withHeaders(null);
+{
+  // A request that brings no client address (20261103000000, L3 of the
+  // 2026-11-03 security review): every such request shares one key and meets
+  // the limits of one address. Before, the address limits were skipped.
+  const codes = ["BBBBBBBB2345", "CCCCCCCC2345", "DDDDDDDD2345", "EEEEEEEE2345", "FFFFFFFF2345"];
+  for (const code of codes) await putCloud(`start code ${code} with no address`, code);
+  await putCloudRefused("start a sixth code with no address", "GGGGGGGG2345", cloudPayload("sixth unknown"), /^PT429 .*code limit/);
+  check((await one(`select request_count as n from public.telemetry_rate_limits where actor_key = 'cloud-new:unknown'`))?.n === 5, "requests with no address were not counted under one key.");
+  await presetCounter("cloud-put-ip:unknown", 600);
+  await putCloudRefused("put the 601st cloud save of the hour with no address", codes[0], cloudPayload("pace unknown"), /^PT429 .*rate limit/);
+  await presetCounter("cloud-get-ip:unknown", 120);
+  await raises("read past the read budget with no address", "anon", `select public.get_cloud_save($1)`, [codes[0]], /^PT429 .*rate limit/);
+  await raises("peek past the read budget with no address", "anon", `select public.peek_cloud_save($1)`, [codes[0]], /^PT429 .*rate limit/);
+  await presetCounter("cloud-delete-ip:unknown", 30);
+  await raises("delete past the budget with no address", "anon", `select public.delete_cloud_save($1)`, [codes[0]], /^PT429 .*rate limit/);
+  for (const key of ["cloud-new:unknown", "cloud-put-ip:unknown", "cloud-get-ip:unknown", "cloud-delete-ip:unknown"]) {
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [key]);
+  }
+  await db.query(`delete from public.cloud_saves where code_hash = any(select encode(sha256(convert_to(c, 'UTF8')), 'hex') from unnest($1::text[]) c)`, [codes]);
+}
+{
+  // The limits for everyone together, as the twice-daily read sees them
+  // (scripts/report-budgets.mjs, M3): the read runs, counts the new codes
+  // started above, and names the limits the functions use.
+  const read = await allowed("read the global budgets", "service_role", BUDGETS_QUERY);
+  const budgets = readBudgets(read?.rows ?? []);
+  const named = Object.fromEntries(budgets.map((budget) => [budget.name, budget]));
+  check(budgets.length === 3 && named["global:cloud-new"] && named["global:telemetry-bytes"] && named.database, `the budget read returned ${JSON.stringify(budgets.map((budget) => budget.name))}.`);
+  check(named["global:cloud-new"]?.ceiling === BUDGET_DEFAULTS.cloud && named["global:telemetry-bytes"]?.ceiling === BUDGET_DEFAULTS.telemetryBytes,
+    `the budget read names ceilings ${named["global:cloud-new"]?.ceiling} and ${named["global:telemetry-bytes"]?.ceiling}; the functions use ${BUDGET_DEFAULTS.cloud} and ${BUDGET_DEFAULTS.telemetryBytes}.`);
+  check((named["global:cloud-new"]?.used ?? 0) > 0, "the budget read did not see the new codes started in this check.");
+  await presetCounter("global:cloud-new", Math.ceil(BUDGET_DEFAULTS.cloud * 0.8));
+  const near = readBudgets((await allowed("read the global budgets at 80%", "service_role", BUDGETS_QUERY))?.rows ?? []);
+  check(nearLimits(near).map((budget) => budget.name).join() === "global:cloud-new", `at 80% of the new codes the read alarmed on ${JSON.stringify(nearLimits(near).map((budget) => budget.name))}.`);
+  await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
+}
 
 // ---- write-only stays write-only, and nothing else is granted
 
