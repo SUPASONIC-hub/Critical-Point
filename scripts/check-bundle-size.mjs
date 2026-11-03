@@ -99,7 +99,8 @@ const budgets = [
   // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
   // 19,567 / 8,588 -> 25,798 / 11,056 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 26,671 / 11,352 -> 26,682 / 11,352 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habits' and judgment's tables (src/copy/habits.js, judgment.js) the table and the runtime share. Measured 26,678 raw (gzip under 11,352) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_682, maxGzip: 11_352 },
+  // 26,682 / 11,352 -> 26,792 / 11,414 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in the table's words (stage.purse, purseChange, purseSeason). Measured 26,788 / 11,410, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_792, maxGzip: 11_414 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -445,7 +446,9 @@ const budgets = [
   // the play screen's copy. Measured 102,514 / 35,472 in CI and 35,477 here,
   // the larger gzip plus 4.
   // 102,514 / 35,481 -> 102,517 / 35,481 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 102,517 in the e2e build.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_517, maxGzip: 35_481 },
+  // 102,517 / 35,481 -> 104,640 / 35,481 on 2026-11-02, money-feedback over main c680ddd5: the purse on the bank rail (readPurse) and the slam's flying amount (MoneyBurst). Measured 104,636 / 35,268, the plus 4.
+  // 104,640 / 35,481 -> 104,743 / 35,481 on 2026-11-02, money-feedback over main 9be94346: the purse on the bank rail (readPurse) and the slam's flying amount (MoneyBurst). Measured 104,739 / 35,321, the plus 4.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_743, maxGzip: 35_481 },
   // 44,024 / 13,638 on 2026-09-27.
   // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
   // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
@@ -573,7 +576,12 @@ const budgets = [
   // -> 196,965 / 36,722 on 2026-11-02, en-hand5-linux over main 2f085d28 (#384): on 360px or less an English
   // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
   // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 196_965, maxGzip: 36_722 },
+  // 196,965 / 36,722 -> 198,822 / 37,098 on 2026-11-02, money-feedback over main c680ddd5. Measured 198,822 / 37,094 in the e2e build, the gzip plus 4.
+  // 198,822 / 37,098 -> 198,856 / 37,110 on 2026-11-02, money-feedback over main 9be94346. Measured 198,856 / 37,106 in the e2e build, the gzip plus 4.
+  // 198,856 / 37,110 -> 198,925 / 37,111 on 2026-11-02, money-feedback over main acf3d999. Measured 198,925 / 37,107 in the e2e build, the gzip plus 4.
+  // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
+  // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 199_354, maxGzip: 37_230 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -711,7 +719,8 @@ const budgets = [
   // 14,795 -> 14,836 gzip on 2026-11-02, bgm-variety over main c680ddd5 (#389): no code changed (raw 39,879 as main); the entry's
   // export names it imports shifted with the music's new exports. Measured 14,832 gzip in the e2e build, the gzip plus 4.
   // 39,883 / 14,836 -> 43,635 / 16,377 on 2026-11-02, locale-gaps (#393) over main 9be94346: the run's lines (route labels, restore, minutes, the far callbacks) read src/copy/runLines.js and src/copy/farCallbacks.js. Measured 43,631 / 16,373 in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 43_635, maxGzip: 16_377 },
+  // 43,635 / 16,377 -> 44,126 / 16,529 on 2026-11-02, money-feedback over main acf3d999: the run's lastChange, seasonGained and seasonLost. Measured 44,122 / 16,525, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 44_126, maxGzip: 16_529 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1042,13 +1051,15 @@ const budgets = [
   // 153,061 / 51,897 -> 153,139 / 51,933 on 2026-10-29, adsense-readiness: the foot's three new links in Japanese. Measured 153,135 / 51,929, the plus 4.
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_578, maxGzip: 60_103 },
+  // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_701, maxGzip: 60_151 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_679, maxGzip: 53_430 },
+  // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_778, maxGzip: 53_469 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1165,8 +1176,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * music.js; the dictionaries carry every new table's English and Japanese):
  * 425,556, 482,416 and 489,089, the plus 4. The speakers' profiles are not in
  * these lines; they are the late/ chunks the runtime fetches.
+ * money-feedback over main acf3d999: 425,946, 482,846 and 489,528, the plus 4.
+ * The PC type scale (pc-type-scale, over main b5abd681; the index CSS and the
+ * critical CSS carry the 112.5% root from 1025px, 16px kept on the start screen): 426,130, 483,029 and 489,711, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 425_560, en: 482_420, ja: 489_093 };
+const FIRST_PAINT_BUDGETS = { ko: 426_134, en: 483_033, ja: 489_715 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1293,7 +1307,8 @@ function checkBudget(file, budget) {
 // network-first pages and its warm-up list. Measured 9,944 / 3,582.
 // 9,948 / 3,586 -> 10,106 / 3,624 on 2026-10-29, adsense-readiness: the about, FAQ and contact pages in three languages
 // join its network-first pages and its warm-up list (nine names). Measured 10,102 / 3,620 over main 3e350266.
-const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_624 };
+// 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_629 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
