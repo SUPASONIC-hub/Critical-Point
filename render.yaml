@@ -49,12 +49,16 @@ services:
         sync: false
       # Web ads (출시 로드맵 2단계, docs/web-ads.md), all unset today. The
       # publisher ID alone is site verification (a meta tag and /ads.txt, no
-      # ad code); ADSENSE_ADS=on with ADSENSE_SLOTS draws the ads.
+      # ad code); ADSENSE_ADS=notice with ADSENSE_DATE puts the seven-day notice
+      # atop the policy and the terms; ADSENSE_ADS=on with ADSENSE_SLOTS draws the
+      # ads and dates both pages ADSENSE_DATE.
       - key: ADSENSE_CLIENT
         sync: false
       - key: ADSENSE_ADS
         sync: false
       - key: ADSENSE_SLOTS
+        sync: false
+      - key: ADSENSE_DATE
         sync: false
       # Search Console site verification (docs/search-console.md), unset until
       # the user sets it: the token writes one meta tag into index.html. No

@@ -380,11 +380,13 @@ function serviceWorker() {
  * Analytics on (`googleAnalytics` below) each page carries its tag, and the
  * policy and the FAQ say so.
  *
- * `ads` (a build with ADSENSE_ADS=on) is the pages' text once the web has
- * ads, on top of Google Analytics' when that is on too (AD_EDITS and
- * ANALYTICS_AD_EDITS, legal-pages.mjs; SITE_AD_EDITS and
- * ANALYTICS_SITE_AD_EDITS, site-pages.mjs); without it the pages are the
- * ones without ads, byte for byte.
+ * `ads` is the ads' stage (ADSENSE_ADS, ADSENSE_DATE). With `notice` the
+ * policy and the terms open with the notice of the change and its day; with
+ * `on` the pages' text is the one the web has with ads, on top of Google
+ * Analytics' when that is on too (AD_EDITS and ANALYTICS_AD_EDITS,
+ * legal-pages.mjs; SITE_AD_EDITS and ANALYTICS_SITE_AD_EDITS, site-pages.mjs),
+ * and the two policies carry the day as their date; without it the pages are
+ * the ones without ads, byte for byte.
  */
 function staticPages({ analytics, ads }) {
   const files = () => {
@@ -683,7 +685,7 @@ export default defineConfig(({ command, mode }) => {
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
       adsense(ads),
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages({ analytics, ads: ads.ads }),
+      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages({ analytics, ads: ads.stage === "off" ? false : { stage: ads.stage, date: ads.date } }),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
       serviceWorker(), renderHeaders(),

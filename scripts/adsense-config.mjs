@@ -14,9 +14,17 @@
  *                        only, never in the repository (the ID is public by
  *                        nature -- every page with ads and ads.txt print it --
  *                        but the repository need not carry it).
- *   ADSENSE_ADS     `on` (only with the client): the ads themselves --
- *                        the slots, the AdSense script they load, the policy's
- *                        ad section. Needs ADSENSE_SLOTS.
+ *   ADSENSE_ADS     `notice` or `on` (only with the client). `notice`: no
+ *                        ad and no code yet, only the policy's and the
+ *                        terms' notice of the change at their top (the
+ *                        policy's section 12 promises it seven days ahead).
+ *                        `on`: the ads themselves -- the slots, the AdSense
+ *                        script they load, the policy's ad section and its
+ *                        date. `on` needs ADSENSE_SLOTS; both need ADSENSE_DATE.
+ *   ADSENSE_DATE    `2026-12-01`: the day the policy with ads takes effect.
+ *                        The notice names it; the policy and the terms carry
+ *                        it as their date once ADSENSE_ADS=on. Set it at least
+ *                        seven days after the notice is deployed.
  *   ADSENSE_SLOTS   `report:1234567890,ranking:2345678901`: the ad units
  *                        made in the AdSense console, by placement. Only the
  *                        placements named here are drawn; read only with
@@ -38,21 +46,34 @@ export const AD_PLACEMENTS = ["report", "ranking"];
 
 const CLIENT = /^ca-pub-\d{16}$/;
 const SLOT = /^\d{6,16}$/;
+const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/** `2026-12-01` when it is a real day, otherwise false. */
+const isDay = (text) => {
+  const match = DATE.exec(text);
+  if (!match) return false;
+  const day = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  return day.toISOString().slice(0, 10) === text;
+};
 
 /**
  * The variables read into what the build needs, or a thrown error naming the
  * variable that is malformed. `client: ""` means off; `ads: false` with a
- * client means verification only.
+ * client means verification only. `stage` is what the plain pages say --
+ * "off", "notice" (the notice of the change only) or "on" -- and `date` the
+ * day of ADSENSE_DATE for the two that need it, "" otherwise.
  */
 export function readAdsenseEnv(env = {}) {
   const client = String(env.ADSENSE_CLIENT ?? "").trim();
   const adsSetting = String(env.ADSENSE_ADS ?? "").trim();
   const slotList = String(env.ADSENSE_SLOTS ?? "").trim();
-  if (adsSetting && adsSetting !== "on") throw new Error(`ADSENSE_ADS is "on" or unset; got "${adsSetting}".`);
-  const ads = adsSetting === "on";
+  const dateSetting = String(env.ADSENSE_DATE ?? "").trim();
+  if (adsSetting && adsSetting !== "on" && adsSetting !== "notice") throw new Error(`ADSENSE_ADS is "notice", "on" or unset; got "${adsSetting}".`);
+  const stage = adsSetting || "off";
+  const ads = stage === "on";
   if (!client) {
-    if (ads) throw new Error("ADSENSE_ADS=on needs ADSENSE_CLIENT (docs/web-ads.md).");
-    return { client: "", publisherId: "", ads: false, slots: {} };
+    if (stage !== "off") throw new Error(`ADSENSE_ADS=${stage} needs ADSENSE_CLIENT (docs/web-ads.md).`);
+    return { client: "", publisherId: "", ads: false, slots: {}, stage: "off", date: "" };
   }
   if (!CLIENT.test(client)) throw new Error(`ADSENSE_CLIENT must be ca-pub- and sixteen digits, as the AdSense console gives it; got "${client}".`);
   const slots = {};
@@ -63,7 +84,10 @@ export function readAdsenseEnv(env = {}) {
     slots[placement] = slot;
   }
   if (ads && !Object.keys(slots).length) throw new Error("ADSENSE_ADS=on needs at least one ad unit in ADSENSE_SLOTS (report:<digits>).");
-  return { client, publisherId: client.slice("ca-".length), ads, slots };
+  if (stage !== "off" && !isDay(dateSetting)) {
+    throw new Error(`ADSENSE_ADS=${stage} needs ADSENSE_DATE, the day the policy with ads takes effect (YYYY-MM-DD); got "${dateSetting}".`);
+  }
+  return { client, publisherId: client.slice("ca-".length), ads, slots, stage, date: stage === "off" ? "" : dateSetting };
 }
 
 /** The one line of /ads.txt (Google's own: the publisher ID without `ca-`, DIRECT, Google's certification authority ID). */

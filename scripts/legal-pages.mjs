@@ -37,13 +37,16 @@ import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
  * Web ads (출시 로드맵 2단계, docs/web-ads.md) are off, and so is their part
  * of the pages: `renderLegalPages()` writes exactly the pages above, and so
  * does a build given only ADSENSE_CLIENT (site verification: a meta tag
- * and ads.txt, no ad shown, nothing sent to Google). A build with
- * ADSENSE_ADS=on calls `renderLegalPages({ ads: true })`, which
- * applies `AD_EDITS` -- the summary line, the cookies of section 3, Google in
- * section 6, the ad section 10 and the terms' line on ads -- each to a
- * sentence that has to be found exactly once, so a later edit of the text
- * cannot leave an ad page half-written. Korean, English and Japanese take
- * the same edits in the same places, under the same effective date.
+ * and ads.txt, no ad shown, nothing sent to Google). Seven days before the
+ * ads, a build with ADSENSE_ADS=notice and ADSENSE_DATE puts the notice of
+ * the change at the top of the policy and the terms (`adsNotice`) and
+ * nothing else. A build with ADSENSE_ADS=on applies `AD_EDITS` -- the
+ * summary line, the cookies of section 3, Google in section 6 and how to
+ * limit what goes to it, the ad section 10 and the terms' line on ads --
+ * each to a sentence that has to be found exactly once, so a later edit of
+ * the text cannot leave an ad page half-written, and dates both pages
+ * ADSENSE_DATE. Korean, English and Japanese take the same edits in the same
+ * places, under the same effective date.
  */
 
 const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026", ja: "2026年10月25日" };
@@ -730,6 +733,61 @@ const AD_POLICY_LINKS = {
 const link = (href) => `<a href="${href}">${href.replace("https://", "")}</a>`;
 
 /**
+ * The day the policy with ads takes effect (ADSENSE_DATE, `2026-12-01`), as
+ * each language writes a date: the notice names it, and once the ads are on
+ * the policy and the terms carry it as their date.
+ */
+export function adsEffectiveDate(day) {
+  const [year, month, date] = day.split("-").map(Number);
+  const englishMonth = new Date(Date.UTC(year, month - 1, 1)).toLocaleString("en-US", { month: "long", timeZone: "UTC" });
+  return { ko: `${year}년 ${month}월 ${date}일`, en: `${englishMonth} ${date}, ${year}`, ja: `${year}年${month}月${date}日` };
+}
+
+/**
+ * The notice of the ads, seven days before they start (the policy's section
+ * 12; ADSENSE_ADS=notice): one paragraph at the top of the policy and one at
+ * the top of the terms, whose item 3 changes too. The build with the ads on
+ * leaves both out and carries the day as the pages' date instead -- the same
+ * pair ANALYTICS_NOTICE and ANALYTICS_EFFECTIVE_DATE make for Google Analytics.
+ */
+export function adsNotice(day) {
+  const when = adsEffectiveDate(day);
+  return {
+    privacy: {
+      ko: `<p><strong>변경 예고:</strong> ${when.ko}부터 웹판에 Google AdSense(Google LLC, 미국) 광고가 나옵니다. 광고를 위해 처리하는 정보, 쿠키, 거부하는 법은 그날 시행되는 개정 방침 10번에 적습니다.</p>`,
+      en: `<p><strong>Upcoming change:</strong> From ${when.en}, the web version will show ads from Google AdSense (Google LLC, USA). The data and cookies used for the ads and how to opt out will be set out in section 10 of the revised policy that takes effect that day.</p>`,
+      ja: `<p><strong>変更の予告:</strong> ${when.ja}から、ウェブ版にGoogle AdSense(Google LLC、米国)の広告を表示します。広告のために取り扱う情報、Cookie、拒否する方法は、同日に施行される改定後の本方針の10に記載します。</p>`,
+    },
+    terms: {
+      ko: `<p><strong>변경 예고:</strong> ${when.ko}부터 3항이 바뀌어, 웹판의 판 밖 자리(사건 리포트 아래 등)에 광고가 나올 수 있습니다. 광고는 점수·랭킹·결말에 영향을 주지 않습니다.</p>`,
+      en: `<p><strong>Upcoming change:</strong> From ${when.en}, item 3 changes: ads may appear in the web version away from the table, such as below a case report. Ads never affect your score, ranking or ending.</p>`,
+      ja: `<p><strong>変更の予告:</strong> ${when.ja}から第3項が変わり、ウェブ版の勝負の外の場所(事件レポートの下など)に広告が表示されることがあります。広告が点数・ランキング・結末に影響することはありません。</p>`,
+    },
+  };
+}
+
+/**
+ * Section 6's way to keep data at home, once the ads are on: its paragraph
+ * ends on how to limit what is sent for them (section 10's opt-outs). The
+ * paragraph's last sentence is the same with Google Analytics on or off, so
+ * AD_EDITS and ANALYTICS_AD_EDITS share the pair.
+ */
+const AD_TRANSFER_OPT_OUT = {
+  ko: [
+    "게임의 이야기와 판은 이 기능 없이 끝까지 할 수 있습니다.</p>",
+    "게임의 이야기와 판은 이 기능 없이 끝까지 할 수 있습니다. 광고를 위한 전송은 10번의 방법(맞춤형 광고 끄기, 제3자 쿠키 차단)으로 줄일 수 있습니다.</p>",
+  ],
+  en: [
+    "The whole story and every table remain playable without them.</p>",
+    "The whole story and every table remain playable without them. What is sent for the ads can be limited as described in section 10 (turning off personalized ads, blocking third-party cookies).</p>",
+  ],
+  ja: [
+    "本ゲームのストーリーと勝負は、これらの機能がなくても最後まで遊べます。</p>",
+    "本ゲームのストーリーと勝負は、これらの機能がなくても最後まで遊べます。広告のための送信は、10の方法(パーソナライズド広告のオフ、サードパーティCookieのブロック)で減らすことができます。</p>",
+  ],
+};
+
+/**
  * What the pages say once the web has ads (draft for 출시 로드맵 2단계): each
  * pair is a sentence of the page as written above and what replaces it.
  */
@@ -751,6 +809,7 @@ export const AD_EDITS = {
       "<p>국외 이전을 원하지 않으면",
       "<p>Google LLC(미국): 광고 표시와 측정을 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
     ],
+    AD_TRANSFER_OPT_OUT.ko,
     [
       "<p>지금은 광고가 없습니다. 나중에 광고를 붙이게 되면, 붙이기 전에 광고와 관련한 처리 내용(광고 회사, 쿠키, 거부하는 법)을 이 방침에 더해 알립니다.</p>",
       `<p>웹판에는 Google LLC의 광고 서비스인 Google AdSense 광고가 나옵니다. 광고는 사건 리포트 아래처럼 판 밖의 자리에만 나오고, 판·결정·브리핑 도중에는 나오지 않으며, 점수·랭킹·결말에 영향을 주지 않습니다.</p>
@@ -781,6 +840,7 @@ export const AD_EDITS = {
       "<p>To avoid the transfer,",
       "<p>Google LLC (USA) serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
     ],
+    AD_TRANSFER_OPT_OUT.en,
     [
       "<p>The game currently shows no ads. If ads are added later, this policy will describe them (the ad provider, cookies and how to opt out) before they appear.</p>",
       `<p>The web version shows ads from Google AdSense, a service of Google LLC. Ads appear only away from the table, such as below a case report — never during a table, a decision or a briefing — and never affect your score, ranking or ending.</p>
@@ -811,6 +871,7 @@ export const AD_EDITS = {
       "<p>国外移転を望まない場合は、",
       "<p>Google LLC(米国): 広告の表示と測定のため、10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は、",
     ],
+    AD_TRANSFER_OPT_OUT.ja,
     [
       "<p>現在、広告はありません。将来広告を導入する場合は、導入する前に、広告に関する取り扱いの内容(広告会社、Cookie、拒否する方法)を本方針に追加してお知らせします。</p>",
       `<p>ウェブ版には、Google LLCの広告サービスであるGoogle AdSenseの広告が表示されます。広告は事件レポートの下など勝負の外の場所にのみ表示され、勝負・決断・ブリーフィングの途中には表示されず、点数・ランキング・結末に影響しません。</p>
@@ -876,6 +937,7 @@ export const ANALYTICS_AD_EDITS = {
       "2번 (5)의 보유 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
       "2번 (5)의 보유 기간 동안 저장됩니다. 웹판의 광고도 Google이 보여 주고 측정하며, 이를 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
     ],
+    AD_TRANSFER_OPT_OUT.ko,
     AD_EDITS.privacyKo.at(-1),
   ],
   privacyEn: [
@@ -891,6 +953,7 @@ export const ANALYTICS_AD_EDITS = {
       "for the period in section 2 (e).</p>\n<p>To avoid the transfer,",
       "for the period in section 2 (e). Google also serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
     ],
+    AD_TRANSFER_OPT_OUT.en,
     AD_EDITS.privacyEn.at(-1),
   ],
   privacyJa: [
@@ -906,6 +969,7 @@ export const ANALYTICS_AD_EDITS = {
       "2の(5)の保有期間のあいだ保存されます。</p>\n<p>国外移転を望まない場合は",
       "2の(5)の保有期間のあいだ保存されます。また、ウェブ版の広告もGoogleが配信・測定しており、そのために10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は",
     ],
+    AD_TRANSFER_OPT_OUT.ja,
     AD_EDITS.privacyJa.at(-1),
   ],
   termsKo: AD_EDITS.termsKo,
@@ -914,24 +978,45 @@ export const ANALYTICS_AD_EDITS = {
 };
 
 /**
+ * The pages' `ads` switch as a stage: `false` off, `true` on (with the pages' dates left as they are, as the
+ * tests that only read the ad wording pass it), or what the build reads from ADSENSE_ADS and ADSENSE_DATE,
+ * `{ stage: "notice" | "on", date: "2026-12-01" }`. The notice cannot be written without its day.
+ */
+export function adStage(ads) {
+  if (!ads) return { stage: "off", date: "" };
+  if (ads === true) return { stage: "on", date: "" };
+  const { stage, date = "" } = ads;
+  if (stage !== "notice" && stage !== "on" && stage !== "off") throw new Error(`ads.stage is "off", "notice" or "on"; got "${stage}".`);
+  if (stage === "notice" && !date) throw new Error("The notice of the ads needs the day they start (ADSENSE_DATE).");
+  return { stage, date };
+}
+
+/**
  * Every page this file writes: `{ "privacy.html": "<!doctype html>...", ... }`, keyed by path from the root without its slash.
  * With `analytics` every page carries Google's tag, and the policy its Google Analytics section and that section's date.
- * `ads` (a build with ADSENSE_ADS=on) then adds what the web's ads need: AD_EDITS on the policy as written, or
- * ANALYTICS_AD_EDITS on the one with Google Analytics. Without `ads` the pages are main's, byte for byte, either way.
+ * `ads` is the ads' stage (ADSENSE_ADS and ADSENSE_DATE, `adStage`): with `notice` the two policies open with
+ * the notice of the change (`adsNotice`) and say nothing else new; with `on` they say what the web's ads need --
+ * AD_EDITS on the policy as written, or ANALYTICS_AD_EDITS on the one with Google Analytics -- and carry the
+ * day as their date. Without `ads` the pages are main's, byte for byte, either way.
  */
 export function renderLegalPages({ analytics = null, ads = false } = {}) {
+  const { stage, date } = adStage(ads);
+  const notice = stage === "notice" ? adsNotice(date) : null;
+  const effective = stage === "on" && date ? adsEffectiveDate(date) : null;
   const table = analytics ? ANALYTICS_AD_EDITS : AD_EDITS;
   const tableName = analytics ? "ANALYTICS_AD_EDITS" : "AD_EDITS";
-  const edit = (body, name) => (ads ? applyEdits(body, table[name], `legal-pages ${tableName}.${name}`) : body);
+  const edit = (body, name) => (stage === "on" ? applyEdits(body, table[name], `legal-pages ${tableName}.${name}`) : body);
+  const noticed = (kind, language, body) => (notice ? `\n${notice[kind][language]}${body}` : body);
   const privacy = (language, body) => (analytics ? withSwaps(body, ANALYTICS_POLICY[language]) : body);
-  const dateOf = ({ kind, language }) => (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE)[language];
+  const dateOf = ({ kind, language }) =>
+    (effective ?? (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE))[language];
   const pages = [
-    { kind: "privacy", language: "ko", body: edit(privacy("ko", PRIVACY_KO), "privacyKo") },
-    { kind: "privacy", language: "en", body: edit(privacy("en", PRIVACY_EN), "privacyEn") },
-    { kind: "privacy", language: "ja", body: edit(privacy("ja", PRIVACY_JA), "privacyJa") },
-    { kind: "terms", language: "ko", body: edit(TERMS_KO, "termsKo") },
-    { kind: "terms", language: "en", body: edit(TERMS_EN, "termsEn") },
-    { kind: "terms", language: "ja", body: edit(TERMS_JA, "termsJa") },
+    { kind: "privacy", language: "ko", body: noticed("privacy", "ko", edit(privacy("ko", PRIVACY_KO), "privacyKo")) },
+    { kind: "privacy", language: "en", body: noticed("privacy", "en", edit(privacy("en", PRIVACY_EN), "privacyEn")) },
+    { kind: "privacy", language: "ja", body: noticed("privacy", "ja", edit(privacy("ja", PRIVACY_JA), "privacyJa")) },
+    { kind: "terms", language: "ko", body: noticed("terms", "ko", edit(TERMS_KO, "termsKo")) },
+    { kind: "terms", language: "en", body: noticed("terms", "en", edit(TERMS_EN, "termsEn")) },
+    { kind: "terms", language: "ja", body: noticed("terms", "ja", edit(TERMS_JA, "termsJa")) },
   ];
   return Object.fromEntries(
     pages.map((page) => [pagePath(page.kind, page.language).slice(1), renderDocumentPage({ ...page, effective: dateOf(page), analytics })]),

@@ -1,14 +1,16 @@
 # 웹 광고(Google AdSense) 켜는 순서 — 출시 로드맵 2단계
 
 지금(1단계)은 광고가 없습니다. 이 문서는 2단계에서 웹에 AdSense를 붙일 때의 순서입니다. 코드는 미리
-들어가 있고 **기본은 꺼짐**입니다. 스위치는 Render 환경 변수 세 개이며, 빌드할 때만 읽습니다
+들어가 있고 **기본은 꺼짐**입니다. 스위치는 Render 환경 변수 네 개이며, 빌드할 때만 읽습니다
 (`scripts/adsense-config.mjs`, `vite.config.js`의 `adsense()`).
 
 | 환경 변수 | 값 | 켜지는 것 | 번들 JS |
 | --- | --- | --- | --- |
 | (없음) | — | 아무것도 없음. 지금 운영과 같은 빌드 | 변화 0 |
 | `ADSENSE_CLIENT` | `ca-pub-` + 16자리 | **사이트 확인용**: `index.html`의 `<meta name="google-adsense-account">`, 빌드 산출물 `/ads.txt` | 변화 0 (`sw.js`의 파일 목록만 바뀜) |
-| `ADSENSE_ADS` | `on` | 광고 자리(`src/ads/AdSlot.jsx`)와 AdSense 스크립트, 개인정보처리방침·이용약관의 광고 문장 | 광고 자리가 있는 화면 청크만 늘어남 |
+| `ADSENSE_ADS` | `notice` | **7일 전 예고만**: 개인정보처리방침·이용약관 맨 위(시행일 줄 아래)의 「변경 예고」 한 문단(`adsNotice`, 세 언어). 광고·스크립트·자주 묻는 질문 문장은 그대로 | 변화 0 |
+| `ADSENSE_ADS` | `on` | 광고 자리(`src/ads/AdSlot.jsx`)와 AdSense 스크립트, 개인정보처리방침·이용약관의 광고 문장(예고는 빠지고, 두 쪽의 시행일이 `ADSENSE_DATE`) | 광고 자리가 있는 화면 청크만 늘어남 |
+| `ADSENSE_DATE` | `2026-12-01` | 광고 방침의 시행일. `notice`·`on` 둘 다 필요(없거나 없는 날이면 빌드 실패). 예고가 배포된 날로부터 7일 이상 뒤 | — |
 | `ADSENSE_SLOTS` | `report:<광고 단위 번호>` (쉼표로 여럿, `ranking:<번호>`) | `ADSENSE_ADS=on`일 때 그 자리만 그림 | — |
 
 게시자 ID(`ca-pub-…`)는 저장소에 쓰지 않고 Render 환경 변수로만 둡니다. 다만 이 값은 원래 비밀이 아니라
@@ -26,9 +28,9 @@
 | 4 | 승인(보통 며칠~몇 주, Google이 기간을 약속하지 않음). 거절되면 사유를 보고 고친 뒤 다시 요청 | Google | 콘솔에 「준비됨」 |
 | 5 | AdSense 콘솔에서 광고 단위 만들기: 디스플레이 광고, **고정 크기 300×250**(자리 높이를 고정하므로 반응형 말고). 받은 번호가 `ADSENSE_SLOTS`의 값 | 사용자 | 광고 단위 번호 |
 | 6 | 「개인정보 보호 및 메시지」에서 유럽 규정(EEA·영국·스위스) 메시지 만들기 — Google 인증 동의 창. 문구는 Google 기본 문안 | 사용자 | 콘솔에 메시지 게시됨 |
-| 7 | 방침 공지: 광고 문장이 들어간 방침은 방침 12번대로 **시행 7일 전**부터 알립니다. `scripts/legal-pages.mjs`의 `EFFECTIVE_DATE`를 시행일로 바꾸는 PR(광고 문장은 `AD_EDITS`, 켜지면 자동으로 들어감) | Claude | `renderLegalPages({ ads: true })` 유닛 테스트 |
+| 7 | 방침 공지(시행 7일 이상 전): Render 환경 변수 `ADSENSE_ADS=notice`, `ADSENSE_DATE=<시행일>`을 넣고 배포. 방침·약관 맨 위에 세 언어로 「변경 예고: <시행일>부터 …」가 나옴(방침 12번). PR은 필요 없음 | 사용자(값) / 확인은 Claude | 아래 「확인 명령」의 예고 curl, `tests/unit/ads-notice.test.mjs` |
 | 8 | Render 대시보드 헤더: CSP를 아래 「CSP」의 값으로 | 사용자 | `npm run check:deploy`(CSP 기대값도 같이 바꾼 PR 뒤) |
-| 9 | Render 환경 변수 `ADSENSE_ADS=on`, `ADSENSE_SLOTS=report:<번호>`를 넣고 배포 | 사용자 | 리포트 맨 아래 「광고」 칸, 방침 10번 |
+| 9 | 시행일에: Render 환경 변수 `ADSENSE_ADS=notice` → `on`으로 바꾸고 `ADSENSE_SLOTS=report:<번호>`를 넣고 배포(`ADSENSE_DATE`는 그대로) | 사용자 | 리포트 맨 아래 「광고」 칸, 방침 10번·6번 끝 줄, 예고가 빠지고 시행일이 `ADSENSE_DATE` |
 | 10 | `ads.txt` 상태: AdSense 콘솔 → 사이트 → ads.txt 「승인됨」 | 사용자 | 아래 curl |
 
 시험 주(W47 같은)나 문제가 생기면 `ADSENSE_ADS`를 지우고 다시 배포하면 광고 코드가 없는 빌드로
@@ -39,7 +41,8 @@
 | Key | Value | 언제 |
 | --- | --- | --- |
 | `ADSENSE_CLIENT` | `ca-pub-0000000000000000`(AdSense 콘솔 → 계정 → 계정 정보의 게시자 ID 앞에 `ca-`) | 2번 |
-| `ADSENSE_ADS` | `on` | 9번 |
+| `ADSENSE_ADS` | `notice` → 시행일에 `on` | 7번 → 9번 |
+| `ADSENSE_DATE` | `2026-12-01`(예고 배포일 + 7일 이상) | 7번 |
 | `ADSENSE_SLOTS` | `report:1234567890` | 9번 |
 
 환경 변수를 바꾼 뒤에는 새로 빌드해야 반영됩니다(Render의 「Save, rebuild, and deploy」 또는 `main` 다음 배포).
@@ -55,12 +58,17 @@ curl -s https://critical-point-wn6p.onrender.com/ads.txt
 # 2번 뒤에도 광고 스크립트는 없어야 함 (아무것도 안 나오면 정상)
 curl -s https://critical-point-wn6p.onrender.com/ | grep -o 'adsbygoogle'
 
-# 9번 뒤: 방침에 광고 절
-for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critical-point-wn6p.onrender.com/$p | grep -o 'Google AdSense' | head -1; done
+# 7번 뒤: 방침·약관 여섯 쪽 맨 위의 「변경 예고」 문단(광고 예고에 ADSENSE_DATE의 날짜가 보여야 함)
+for p in privacy.html en/privacy.html ja/privacy.html terms.html en/terms.html ja/terms.html; do curl -s https://critical-point-wn6p.onrender.com/$p | grep -o '<p><strong>[^<]*</strong>[^<]*'; done
+
+# 9번 뒤: 방침에 광고 절, 예고는 빠지고 시행일이 ADSENSE_DATE
+for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critical-point-wn6p.onrender.com/$p | grep -oE 'Google AdSense|<p class="effective">[^<]*' | sort -u; done
 ```
 
 방침·약관의 광고 문장(`AD_EDITS`)은 한국어·영어·일본어 세 언어에 같은 자리(요약·3번 쿠키·6번 Google·10번 광고 절·약관 3항),
-같은 시행일로 들어갑니다. `tests/unit/legal-pages.test.mjs`가 여섯 페이지 모두와 세 언어의 수를 확인합니다.
+같은 시행일(`ADSENSE_DATE`)로 들어갑니다. 6번 「국외 이전을 원하지 않으면」 문단 끝에는 광고 전송을 줄이는 법(10번의 맞춤형 광고 끄기·제3자
+쿠키 차단) 한 줄이 붙습니다. `tests/unit/legal-pages.test.mjs`가 여섯 페이지 모두와 세 언어의 수를, `tests/unit/ads-notice.test.mjs`가
+꺼짐·예고·켬 세 단계를 세 언어 × 애널리틱스 끔·켬으로 확인합니다(예고 빌드는 예고 문단을 뺀 나머지가 꺼진 빌드와 바이트까지 같음).
 
 Google 애널리틱스(`GA_MEASUREMENT_ID`, [analytics.md](analytics.md), 11-12부터 켬)도 요약·3번 쿠키·6번과 자주 묻는 질문의
 쿠키 문장을 바꾸므로, 두 스위치가 함께 켜진 빌드(광고를 켤 때의 실제 조합)는 애널리틱스 문장 위에 따로 맞춘 표를 씁니다

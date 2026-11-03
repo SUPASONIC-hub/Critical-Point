@@ -2,7 +2,7 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
-import { applyEdits, escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
+import { adStage, applyEdits, escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
 
 /**
  * The three pages about the game -- what it is and how it is played, the
@@ -583,11 +583,12 @@ export function withAbsoluteSiteLinks(html, origin) {
 
 /**
  * Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash.
- * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS=on) are the build's two switches: ANALYTICS_POLICY,
+ * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS, `adStage` in legal-pages.mjs) are the build's two switches: ANALYTICS_POLICY,
  * ANALYTICS_FAQ, AD_EDITS, SITE_AD_EDITS and, with both, ANALYTICS_AD_EDITS and ANALYTICS_SITE_AD_EDITS.
  */
 export function renderStaticPages(origin = "", { analytics = null, ads = false } = {}) {
-  const pages = { ...renderLegalPages({ analytics, ads }), ...renderSitePages({ analytics, ads }) };
+  // The FAQ says nothing of the ads until they are on: during the notice there are none yet.
+  const pages = { ...renderLegalPages({ analytics, ads }), ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 

@@ -10,28 +10,43 @@ import { AD_CSP, AD_PLACEMENTS, adsTxt, insertAdSlots, readAdsenseEnv, WEB_AD_CO
  * ADSENSE_ADS=on turns the screens' markers into slots.
  */
 const CLIENT = "ca-pub-0000000000000001";
+const DATE = "2026-12-01";
 
 test("no variable is off, and a malformed one fails the build by name", () => {
-  assert.deepEqual(readAdsenseEnv({}), { client: "", publisherId: "", ads: false, slots: {} });
+  assert.deepEqual(readAdsenseEnv({}), { client: "", publisherId: "", ads: false, slots: {}, stage: "off", date: "" });
   assert.deepEqual(readAdsenseEnv({ ADSENSE_SLOTS: "report:1234567890" }).client, "", "slots alone are off");
   assert.throws(() => readAdsenseEnv({ ADSENSE_ADS: "on" }), /ADSENSE_CLIENT/);
   assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: "pub-0000000000000001" }), /ca-pub-/);
-  assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "true" }), /"on" or unset/);
+  assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "true" }), /"notice", "on" or unset/);
   assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "on" }), /at least one ad unit/);
   assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "on", ADSENSE_SLOTS: "table:1234567890" }), /no screen marks/);
   assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "on", ADSENSE_SLOTS: "report:abc" }), /placement:digits/);
+  assert.throws(() => readAdsenseEnv({ ADSENSE_ADS: "notice", ADSENSE_DATE: DATE }), /ADSENSE_CLIENT/);
+  for (const date of ["", "2026-13-01", "2026-02-30", "12/01/2026"]) {
+    assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "notice", ADSENSE_DATE: date }), /ADSENSE_DATE/, date);
+    assert.throws(() => readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "on", ADSENSE_SLOTS: "report:1234567890", ADSENSE_DATE: date }), /ADSENSE_DATE/, date);
+  }
+});
+
+test("the notice is the policy's words only: no slot, no ad script, and the day it names", () => {
+  const notice = readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "notice", ADSENSE_SLOTS: "report:1234567890", ADSENSE_DATE: DATE });
+  assert.deepEqual(notice, { client: CLIENT, publisherId: "pub-0000000000000001", ads: false, slots: {}, stage: "notice", date: DATE });
+  assert.equal(insertAdSlots(readFileSync("src/screens/ResultScreen.jsx", "utf8"), notice), null, "no slot during the notice");
+  assert.equal(readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_DATE: DATE }).date, "", "a day with the ads off is not read");
 });
 
 test("the publisher ID alone is verification: ads.txt's line and no slot", () => {
   const verify = readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_SLOTS: "report:1234567890" });
-  assert.deepEqual(verify, { client: CLIENT, publisherId: "pub-0000000000000001", ads: false, slots: {} });
+  assert.deepEqual(verify, { client: CLIENT, publisherId: "pub-0000000000000001", ads: false, slots: {}, stage: "off", date: "" });
   assert.equal(adsTxt(verify.publisherId), "google.com, pub-0000000000000001, DIRECT, f08c47fec0942fa0\n");
   const screen = readFileSync("src/screens/ResultScreen.jsx", "utf8");
   assert.equal(insertAdSlots(screen, verify), null, "no slot without ADSENSE_ADS=on");
 });
 
 test("with ads on, a placement with a unit becomes a slot and one without stays a comment", () => {
-  const on = readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "on", ADSENSE_SLOTS: "report:1234567890" });
+  const on = readAdsenseEnv({ ADSENSE_CLIENT: CLIENT, ADSENSE_ADS: "on", ADSENSE_SLOTS: "report:1234567890", ADSENSE_DATE: DATE });
+  assert.equal(on.stage, "on");
+  assert.equal(on.date, DATE);
   const result = insertAdSlots(readFileSync("src/screens/ResultScreen.jsx", "utf8"), on);
   assert.match(result, /^import \{ AdSlot as __CpAdSlot \} from "\/src\/ads\/AdSlot\.jsx";/);
   assert.match(result, /<__CpAdSlot placement="report" hidden=\{currentCase\.startsWith\("prologue"\) \|\| \(currentCase === "final" && endingStep < 3\)\} client="ca-pub-0000000000000001" slot="1234567890" \/>/);
