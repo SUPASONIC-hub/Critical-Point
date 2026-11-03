@@ -38,7 +38,7 @@ export function paintTrading(random, accent, glow) {
       {near(<path d="M-4 104 H324 V132 H-4 Z" />)}
       {people(
         <>
-          {seated("trader-a", 48, 104, 26)}
+          {seated("trader-a", 48, 104, 26, { player: true })}
           {seated("trader-b", 192, 104, 26)}
           {figure("manager", 270, 106, 36)}
         </>,
