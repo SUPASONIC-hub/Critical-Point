@@ -164,10 +164,14 @@ const BUDGETS = {
   // src/components/musicScore.js). The key is built here, in the runtime's lazy
   // chunk: a helper beside the rule in musicScore.js would have cut five lines
   // but put 37 bytes on the first paint, since the music sits in the entry.
+  // 99 -> 96 names on 2026-11-02, locale-gaps (#393) over bgm-variety: the
+  // view models are one namespace import (sceneViewModels, with the runtime
+  // card's label as `runtimeCardLabel`) and the two runtime cards' words are
+  // src/copy/runLines.js's. Measured 968 / 96.
   "src/GameRuntime.jsx": {
     lines: 968,
     longestLine: 190,
-    importedNames: 99,
+    importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
@@ -186,10 +190,13 @@ const BUDGETS = {
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
   // 10 -> 12 on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/result.js) and `fill` for its lines with blanks.
+  // 12 -> 13 on 2026-11-02, plate-story (#392, F): the result screen draws the
+  // case's last room (ScenePlate, variant="result") at the top of the outcome
+  // panel; no other import could go. Measured 340 / 13.
   "src/screens/ResultScreen.jsx": {
     lines: 340,
     longestLine: 280,
-    importedNames: 12,
+    importedNames: 13,
     hooks: {},
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
@@ -221,10 +228,17 @@ const BUDGETS = {
   // briefing while the card is up, and the card drawn in front of them.
   // 70 -> 72 imported names on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/table.js) and locale.js's `fill` for its lines with blanks.
+  // 851 / 72 -> 860 / 73 on 2026-11-02, measured (money-feedback): the bank
+  // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
+  // ref for the amount's flight and the window it was dealt on; the purse's
+  // markup and both reads live outside the screen.
+  // 860 -> 861 on 2026-11-03, measured: #224 (RULES_MARK 3) merged with main
+  // 465ccb93, the audit count's 360px pill beside the signals (one line; its
+  // note is play.css's) over main's purse.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 851,
+    lines: 861,
     longestLine: 250,
-    importedNames: 72,
+    importedNames: 73,
     hooks: {},
   },
 };

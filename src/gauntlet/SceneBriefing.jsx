@@ -17,16 +17,20 @@ import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { Prose, ProseCaptions, ProseItems } from "../components/Prose.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
+import { getSoundKind } from "../plateStory.js";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import { ReadingClockAsk, readingClockStart } from "./ReadingClockAsk.jsx";
 import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
-// drawn from the scene id so the same scene always makes the same noise.
+// drawn from the scene id so the same scene always makes the same noise. Its
+// kind -- a heartbeat, a tap -- is the same in every language, and says where
+// in the picture the word is lettered (placePlateSound, src/plateStory.js).
 function pickSfx(nodeId, broken) {
   const pool = broken ? briefingCopy.sfxBroken : briefingCopy.sfxCalm;
-  return pool[hashSeed(`sfx:${nodeId}`) % pool.length];
+  const index = hashSeed(`sfx:${nodeId}`) % pool.length;
+  return { label: pool[index], kind: getSoundKind(index, broken) };
 }
 
 /** A rule of this board as a row: its label, what it is, what it does, the relic that softened it. */
@@ -313,14 +317,13 @@ export function SceneBriefing({
 
         <div className="gx-comic-grid">
           <figure className="gx-panel gx-panel-splash">
-            <ScenePlate node={node} nodeId={nodeId} />
+            <ScenePlate node={node} nodeId={nodeId} sound={sfx.label} soundKind={sfx.kind} />
             {(node.place || node.clock) && (
               <figcaption className="gx-caption gx-caption-place">
                 {node.place && <b>{node.place}</b>}
                 {node.clock && <span>{node.clock}</span>}
               </figcaption>
             )}
-            <strong className="gx-sfx" aria-hidden="true">{sfx}</strong>
           </figure>
 
           <figure className="gx-panel gx-panel-speaker">

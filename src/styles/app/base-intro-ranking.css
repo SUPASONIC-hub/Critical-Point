@@ -2068,7 +2068,7 @@ summary:focus-visible {
   bottom: -22px;
   z-index: -1;
   color: var(--ui-surface-3);
-  font-size: 8.25rem;
+  font-size: calc(8.25 * var(--hud-rem));
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.07em;

@@ -28,6 +28,7 @@ import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
+import { getOutcomeTone } from "../plateStory.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
 
@@ -171,11 +172,24 @@ export function useResultReport({
   const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
 
   const reportCopy = useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result, riskTier });
-  const closedOutcome = getCaseOutcome({ caseId: currentCase, choiceId: getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]) });
+  const outcomeChoiceId = getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]);
+  const closedOutcome = getCaseOutcome({ caseId: currentCase, choiceId: outcomeChoiceId });
   // A NEW GAME+ season's case result also says how the season before closed
   // it (`past`, secondSeason.js), on the object the screen already prints.
   const pastLine = getCaseComparison(secondSeason?.results, currentCase, closedOutcome);
-  const caseOutcome = pastLine ? { ...closedOutcome, past: pastLine } : closedOutcome;
+  // The case's last room, printed at the top of its result in the light the
+  // case closed on (2026-11-02, F): the aftermath scene, or the last scene the
+  // log reached when the case closed before it. It rides on the outcome so the
+  // view's bag gains no field (check:runtime-budget).
+  const sceneNodeId = outcomeEntry ? outcomeNodeId : [...log].reverse().find((entry) => nodes[entry?.nodeId])?.nodeId;
+  const scene = sceneNodeId && nodes[sceneNodeId]
+    ? {
+      node: nodes[sceneNodeId],
+      nodeId: sceneNodeId,
+      tone: getOutcomeTone(getOutcomeCarryover({ caseId: currentCase, choiceId: outcomeChoiceId }), { failure: currentCase === "final" && endingVariant.failure }),
+    }
+    : null;
+  const caseOutcome = { ...closedOutcome, ...(pastLine ? { past: pastLine } : {}), scene };
   // The tab on a result (tabTitle.js, 개선 포인트 A3): the season's ruling by its
   // label, a case by the ending it closed on. Drafts for the user to decide.
   const resultTabTitle = currentCase === "final"

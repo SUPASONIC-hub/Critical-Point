@@ -1313,12 +1313,16 @@ test.describe("a phone held upright", () => {
   // a caption that runs long it sat on the clock's line: 12 of the season's
   // 1,129 scenes at 390px and 87 at 360px, the worst by 32px (the three below
   // are among them). The caption is drawn over the sound now, and the sound is
-  // smaller on a phone.
+  // smaller on a phone. Since 2026-11-02 (plate-story, D) the sound is
+  // lettered beside its source inside ScenePlate, and a phone (<= 700px), which
+  // draws the room behind the title, does not letter it at all: it is either
+  // not in the page or not displayed, so it can sit on no line of the caption.
   const measureBand = (page) =>
     page.evaluate(() => {
       const caption = document.querySelector(".gx-caption-place");
       const sound = document.querySelector(".gx-sfx");
-      const word = sound.getBoundingClientRect();
+      const shown = Boolean(sound) && getComputedStyle(sound).display !== "none";
+      const word = shown ? sound.getBoundingClientRect() : null;
       const band = document.querySelector(".gx-panel-splash").getBoundingClientRect();
       // The lines as they are printed, not the caption's box: a text node's
       // own rectangles, one to a line.
@@ -1327,13 +1331,14 @@ test.describe("a phone held upright", () => {
         range.selectNodeContents(part.firstChild);
         return [...range.getClientRects()];
       });
-      const under = lines.map((line) => Math.min(Math.min(line.right, word.right) - Math.max(line.left, word.left), Math.min(line.bottom, word.bottom) - Math.max(line.top, word.top)));
+      const under = word ? lines.map((line) => Math.min(Math.min(line.right, word.right) - Math.max(line.left, word.left), Math.min(line.bottom, word.bottom) - Math.max(line.top, word.top))) : [0];
       return {
-        word: sound.textContent,
+        shown,
+        word: sound?.textContent ?? "",
         lines: lines.length,
         // Positive when a line of the caption and the sound share pixels.
         shared: Math.round(Math.max(...under) * 10) / 10,
-        captionOnTop: Number(getComputedStyle(caption).zIndex) > Number(getComputedStyle(sound).zIndex),
+        captionOnTop: !shown || Number(getComputedStyle(caption).zIndex) > Number(getComputedStyle(sound).zIndex),
         lastLineBelowBand: Math.round((Math.max(...lines.map((line) => line.bottom)) - band.bottom) * 10) / 10,
         bandHeight: Math.round(band.height),
       };
@@ -1347,6 +1352,7 @@ test.describe("a phone held upright", () => {
         const band = await measureBand(page);
         expect(band.lines, `${where}: the caption prints the room and the clock`).toBeGreaterThanOrEqual(2);
         expect(band.bandHeight, `${where}: the picture is the cropped band`).toBeLessThanOrEqual(100);
+        expect(band.shown, `${where}: a phone letters no sound in the band`).toBe(false);
         expect(band.shared, `${where}: "${band.word}" shares ${band.shared}px with a line of the caption`).toBeLessThanOrEqual(0.5);
         expect(band.captionOnTop, `${where}: where their boxes meet, the caption is the one drawn on top`).toBe(true);
         expect(band.lastLineBelowBand, `${where}: the caption's last line is inside the band`).toBeLessThanOrEqual(0);
@@ -1355,8 +1361,7 @@ test.describe("a phone held upright", () => {
       // The longest calm sound over the longest captions.
       for (const [caseId, nodeId] of [["case46", "c46_cage"], ["case24", "c24_final"], ["case18", "c18_evidence_turn"]]) {
         await openHeldBriefing(page, caseId, nodeId);
-        const band = await expectClear(`${nodeId} @ ${size.width}x${size.height}`);
-        expect(band.word, `${nodeId} makes the three-letter sound`).toBe("지이잉");
+        await expectClear(`${nodeId} @ ${size.width}x${size.height}`);
       }
       await openHeldBriefing(page, "prologue05", "p5_basement");
       const dealBoard = async (mutations) => {
@@ -1373,7 +1378,7 @@ test.describe("a phone held upright", () => {
       await expect(page.getByTestId("carried-rules")).toContainText("OVERCLOCK", { timeout: TRANSITION_TIMEOUT_MS });
       await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
       await expect(page.locator(".gx-comic-page")).not.toHaveClass(/is-broken/);
-      await expect(page.locator(".gx-sfx")).not.toHaveText(/!$/);
+      await expect(page.locator(".gx-sfx:visible")).toHaveCount(0);
       // A board the last decision broke slams instead, with a mark after it.
       await dealBoard(["aftershock"]);
       await expect(page.getByTestId("protocol-breach")).toContainText("AFTERSHOCK", { timeout: TRANSITION_TIMEOUT_MS });
@@ -1382,8 +1387,8 @@ test.describe("a phone held upright", () => {
       await page.getByTestId("reading-timer").click();
       await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
       await waitForEntrance(page.getByTestId("scene-briefing"));
-      const broken = await expectClear(`p5_basement on a broken board @ ${size.width}x${size.height}`);
-      expect(broken.word, "a broken board slams").toMatch(/!$/);
+      await expectClear(`p5_basement on a broken board @ ${size.width}x${size.height}`);
+      await expect(page.locator(".gx-comic-page"), "a broken board is drawn broken").toHaveClass(/is-broken/);
     });
   }
 

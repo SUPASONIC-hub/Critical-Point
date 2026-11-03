@@ -538,6 +538,55 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
 });
 
+// money-feedback (2026-11-02): the hand's amount is thrown large at the middle
+// of the screen and flies into the bank rail's purse, which holds the run's
+// money, the last hand's change with its sign and arrow, and the season's won
+// and lost. Under reduced motion the amount stands still, large.
+test("a cash and a bust throw their amount, signed, and the purse holds it", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  const purse = page.getByTestId("gauntlet-purse");
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+  await expect(page.getByTestId("gauntlet-purse-change")).toHaveCount(0);
+  await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 0 · 손실 0");
+  await expect(purse.locator("[aria-live], [role]")).toHaveCount(0);
+
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const burst = page.getByTestId("gauntlet-burst");
+  // The cash's +N is the slam's own line, read with it.
+  await expect(burst).toHaveText(/^\+[\d,]+$/);
+  await expect(burst).not.toHaveAttribute("aria-hidden", "true");
+  const won = await readNumber(burst);
+  expect(won).toBeGreaterThan(0);
+  await expect(purse).toHaveClass(/is-landing is-up/);
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(won.toLocaleString("en-US"));
+
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(won.toLocaleString("en-US"));
+  const change = page.getByTestId("gauntlet-purse-change");
+  await expect(change).toHaveClass(/is-up/);
+  await expect(change.locator('[aria-hidden="true"]')).toHaveText(`▲ +${won.toLocaleString("en-US")}`);
+  await expect(change.locator(".sr-only")).toHaveText(`방금 판 +${won.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("gauntlet-purse-season")).toHaveText(`시즌 누적 획득 +${won.toLocaleString("en-US")} · 손실 0`);
+  const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect([banked.dynamics.lastChange, banked.dynamics.seasonGained, banked.dynamics.seasonLost]).toEqual([won, won, 0]);
+
+  // The bust's −N, out of the alert (its sentence says the pot), and still under reduced motion.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.locator(".choices .choice").first().click();
+  await pushUntilBust(page);
+  const lost = page.getByTestId("gauntlet-burst");
+  await expect(lost).toHaveText(/^−[\d,]+$/);
+  await expect(lost).toHaveAttribute("aria-hidden", "true");
+  await expect(lost).toHaveCSS("animation-name", "none");
+  await expect(lost).toHaveCSS("opacity", "1");
+  await expect(page.getByTestId("gauntlet-purse-change")).toHaveClass(/is-down/);
+  await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(/^▼ −[\d,]+$/);
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+});
+
 // The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
 // wall can stop at once, the reveal says what one more push would have done,
 // and the next scene's page opens on its speaker's line about that table.
