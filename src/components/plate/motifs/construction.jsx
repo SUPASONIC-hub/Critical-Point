@@ -50,7 +50,7 @@ export function paintConstruction(random, accent, glow) {
       {people(
         <>
           {figure("foreman", 132, 118, 30)}
-          {figure("buyer", 160, 120, 28)}
+          {figure("buyer", 160, 120, 28, { player: true })}
         </>,
       )}
     </>
