@@ -1,8 +1,10 @@
 import { memo } from "react";
 import { createPlateRandom, getScenePlate } from "../scenePlate.js";
+import { placePlateSound } from "../plateStory.js";
 import { SCREEN_MOTIFS, paintAir } from "./plate/air.jsx";
 import { paintFx } from "./plate/fx.jsx";
 import { MOTIF_PAINTERS } from "./plate/motifs/index.jsx";
+import { collectCast } from "./plate/primitives.jsx";
 
 /**
  * The scene's room, drawn.
@@ -27,8 +29,16 @@ import { MOTIF_PAINTERS } from "./plate/motifs/index.jsx";
  *
  * It is `aria-hidden`. The room and the deadline are already text in the
  * dateline directly above, so announcing them again from a picture is noise.
+ *
+ * Two copies say a little more than the room. The briefing's panel letters the
+ * scene's sound (`sound`, of the kind `soundKind`) beside whatever makes it --
+ * the player for a heartbeat, the desk for a tap, the lit screen for a buzz --
+ * placed from the cast the painter just drew (`placePlateSound`). It is HTML,
+ * a sibling of the drawing in the same panel, `aria-hidden` like the drawing.
+ * And a case's result prints the case's last room in the light of how the case
+ * closed (`variant="result"`, `outcome` good, mixed or bad).
  */
-function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
+function ScenePlateDrawing({ node, nodeId, variant = "panel", sound = "", soundKind = "", outcome = "" }) {
   const plate = getScenePlate(node, nodeId);
   const random = createPlateRandom(plate.seed);
   // The air gets its own generator, so adding motes never moves a window the
@@ -41,6 +51,8 @@ function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
   const id = `plate-${variant}-${plate.seed}`;
   const screens = SCREEN_MOTIFS.has(plate.motif);
   const heat = plate.accent === "heat";
+  const [room, cast] = collectCast(() => draw(random, accent, `url(#${id}-halo)`));
+  const spot = sound ? placePlateSound({ kind: soundKind, label: sound, motif: plate.motif, ...cast, place: node.place, clock: node.clock }) : null;
   const className = [
     "gx-plate",
     `gx-plate-${variant}`,
@@ -52,11 +64,12 @@ function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
     plate.pressure ? "gx-plate-closing" : "",
     plate.snow ? "gx-plate-winter" : "",
     plate.mood !== "none" ? `gx-plate-mood-${plate.mood}` : "",
+    outcome ? `gx-plate-outcome-${outcome}` : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  return (
+  const drawing = (
     <svg
       className={className}
       // The briefing shows the whole drawing. The header is a short wide band,
@@ -160,7 +173,7 @@ function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
             <circle cx={40 + (plate.seed % 240)} cy="20" r="9" fill="var(--c-cream)" opacity="0.9" />
           </g>
         )}
-        {draw(random, accent, `url(#${id}-halo)`)}
+        {room}
         {paintAir(air, plate)}
         {screens && (
           <>
@@ -188,6 +201,15 @@ function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
       <rect className="gx-plate-grain" x="0" y="0" width="320" height="132" filter={`url(#${id}-grain)`} opacity="0.07" />
     </svg>
   );
+  if (!spot) return drawing;
+  return (
+    <>
+      {drawing}
+      <strong className="gx-sfx" aria-hidden="true" style={{ "--sfx-x": spot.x, "--sfx-y": spot.y, "--sfx-em": spot.em }}>
+        {sound}
+      </strong>
+    </>
+  );
 }
 
 /**
@@ -199,5 +221,11 @@ function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
  */
 export const ScenePlate = memo(
   ScenePlateDrawing,
-  (previous, next) => previous.node === next.node && previous.nodeId === next.nodeId && previous.variant === next.variant,
+  (previous, next) =>
+    previous.node === next.node
+    && previous.nodeId === next.nodeId
+    && previous.variant === next.variant
+    && previous.sound === next.sound
+    && previous.soundKind === next.soundKind
+    && previous.outcome === next.outcome,
 );

@@ -40,7 +40,7 @@ export function paintStudio(random, accent, glow) {
         </>,
       )}
       {mark(<circle cx={cameraX + 12} cy="59" r="2.4" fill={accent} stroke="none" />)}
-      {people(figure("talent", markX, 104, 44))}
+      {people(figure("talent", markX, 104, 44, { player: true }))}
     </>
   );
 }
