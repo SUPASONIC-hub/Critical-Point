@@ -3102,6 +3102,33 @@
   }
 }
 
+@media (max-width: 360px) {
+  /* The signals row in English and Japanese: the logic streak's line is
+     longer than the Korean one, and the shares of 1.25 and 1 left to the
+     overclock and LOCK gave LOCK less than its own width, so it ran under the
+     streak (Linux, 360x740, hand5: en 15 to 25px, ja 8 to 18px; ko 0). LOCK
+     now takes its own width, without its icon or the empty track the hidden
+     multiplier line left; the overclock line takes the rest and is the one
+     that cuts with an ellipsis. Selectors stay at three classes, so a HUD
+     with more on that row (the audit token, four classes) sets its own. */
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-signals {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 8px;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal svg {
+    display: none;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-streak {
+    gap: 5px;
+  }
+}
+
 /* The flash a LOCK press leaves. Cyan is the hand's colour (the streak and
    LOCK); lime stays on the control that records a decision. */
 .gx-fx-flash {

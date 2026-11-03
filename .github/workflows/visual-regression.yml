@@ -9,6 +9,10 @@ name: Visual Regression
 #   - every Dependabot pull request;
 #   - a dispatch by hand, which can also record the baselines.
 #
+# A draft is compared once it is marked ready, and a pull request that changes
+# only documents (*.md, docs/) is never compared, label or not -- the same two
+# rules Verify's end-to-end tiers follow (2026-11-03).
+#
 # The second line is from 2026-10-06. Until then a style change was compared
 # only after it had merged, on a run with no pull request attached, and Deploy
 # hangs off Verify alone: the page could be live before its screenshot turned
@@ -18,8 +22,9 @@ name: Visual Regression
 # it. It is gone rather than given a reporter.
 on:
   pull_request:
-    # `labeled` so that adding the `visual` label starts this; see the `scope` job.
-    types: [opened, synchronize, reopened, labeled]
+    # `labeled` so that adding the `visual` label starts this, `ready_for_review`
+    # so that marking a draft ready does; see the `scope` job.
+    types: [opened, synchronize, reopened, labeled, ready_for_review]
   push:
     branches:
       - main
@@ -38,9 +43,10 @@ permissions:
 
 # A label event has a group named by its label. With one group for every label,
 # adding `e2e` after `visual` cancelled the comparison `visual` had started, and
-# then skipped every job here because the label was not `visual`.
+# then skipped every job here because the label was not `visual`. Marking a
+# draft ready has a group of its own for the same reason.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}${{ github.event.action == 'ready_for_review' && '-ready' || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -66,29 +72,52 @@ jobs:
           ACTION: ${{ github.event.action }}
           ADDED_LABEL: ${{ github.event.label.name }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
+          DRAFT: ${{ github.event.pull_request.draft }}
           HAS_VISUAL_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'visual') }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
         run: |
           set -euo pipefail
           decide() { echo "compare=$1" >> "$GITHUB_OUTPUT"; echo "$2"; }
           if [ "$EVENT" != "pull_request" ]; then
             decide true "Not a pull request: comparing."
-          elif [ "$ACTION" = "labeled" ]; then
+          elif [ "$DRAFT" = "true" ]; then
+            # A draft is compared once it is marked ready (ready_for_review),
+            # or by a dispatch on its branch.
+            decide false "A draft: compared once it is marked ready."
+          elif [ "$ACTION" = "labeled" ] && [ "$ADDED_LABEL" != "visual" ]; then
             # A label changes no pixels. Only `visual` itself starts a run;
             # any other label would repeat the one the code already had.
-            if [ "$ADDED_LABEL" = "visual" ]; then decide true "Labelled visual: comparing."
-            else decide false "Labelled $ADDED_LABEL, which asks for nothing here."; fi
-          elif [ "$AUTHOR" = "dependabot[bot]" ]; then
-            # An icon or font package bump shows up as pixels before it shows
-            # up anywhere else.
-            decide true "A Dependabot pull request: comparing."
-          elif [ "$HAS_VISUAL_LABEL" = "true" ]; then
-            decide true "Carries the visual label: comparing."
+            decide false "Labelled $ADDED_LABEL, which asks for nothing here."
           else
             # A failed listing compares: the cost of a wrong yes is a few
             # minutes, and of a wrong no an unreviewed screenshot on the site.
-            if ! files=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename'); then
+            # A rename counts its old path too.
+            if ! listing=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[] | ("new " + .filename), (if .previous_filename then "old " + .previous_filename else empty end)'); then
               decide true "::warning title=Compared without knowing why::The pull request's file list could not be read, so the screenshots are compared to be safe."
+              exit 0
+            fi
+            files=$(printf '%s\n' "$listing" | sed -E 's/^(new|old) //')
+            listed=$(printf '%s\n' "$listing" | grep -c '^new ' || true)
+            if [ "${listed:-0}" -eq 0 ] || [ "${listed:-0}" -lt "${CHANGED_FILES:-0}" ]; then
+              decide true "The file list came back empty or short ($listed of ${CHANGED_FILES:-?} files): comparing."
+              exit 0
+            fi
+            # Documents are not drawn: no screenshot is made of a Markdown
+            # file or of docs/. Verify's `scope` job carries the same line.
+            docs_only_pattern='^(.*\.md|docs/.*)$'
+            if [ -z "$(printf '%s\n' "$files" | grep -vE "$docs_only_pattern" || true)" ]; then
+              decide false "Only documents change (*.md, docs/): nothing to compare, label or not."
+              exit 0
+            fi
+            if [ "$AUTHOR" = "dependabot[bot]" ]; then
+              # An icon or font package bump shows up as pixels before it
+              # shows up anywhere else.
+              decide true "A Dependabot pull request: comparing."
+              exit 0
+            fi
+            if [ "$HAS_VISUAL_LABEL" = "true" ]; then
+              decide true "Carries the visual label: comparing."
               exit 0
             fi
             # What the screenshots are made of. The three pictures are the
