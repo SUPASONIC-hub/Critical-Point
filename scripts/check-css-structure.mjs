@@ -298,7 +298,10 @@ const fileBudgets = {
   // -> 56973 bytes on 2026-11-02, measured (pc-type-scale, on top of en-hand5-linux): from 1024px wide
   // the pot and the clock keep their size through --hud-rem while the root
   // reads 18px.
-  "play.css": { lines: 2986, bytes: 57684 },
+  // -> 58344 bytes, 3002 lines on 2026-11-03, measured: #224 merged with main 465ccb93 (pc-type-scale's
+  // --hud-rem over #224's 360px audit place), and beside Audit n/4 the signals keep their labels and bars
+  // only (sig-tight: the crosshair and the chain's sentence hidden, three auto columns 4px apart).
+  "play.css": { lines: 3002, bytes: 58344 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

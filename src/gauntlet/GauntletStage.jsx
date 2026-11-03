@@ -556,7 +556,6 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {/* The audit count's 360px place, beside the signals (play.css); each width hides one of the two (display: none), so it is read once. */}
           {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}

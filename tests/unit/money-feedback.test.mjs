@@ -13,8 +13,8 @@ import { createStorage } from "./helpers/browser.mjs";
 globalThis.localStorage = createStorage();
 
 const { normalizeRunState, openCaseRun, RUN_INITIAL_STATE, resolveWindow } = await import("../../src/gauntlet/gauntletEngine.js");
-const { countAudit } = await import("../../src/gauntlet/auditRisk.js");
-const { AUDIT_HEAT, AUDIT_LIMIT } = await import("../../src/gauntlet/weeklyRules.js");
+// RULES_MARK 3 (#224): the audit is the case's rule (auditRisk.js), on by the engine's default rules.
+const { AUDIT_HEAT, AUDIT_LIMIT, countAudit } = await import("../../src/gauntlet/auditRisk.js");
 const { formatChange, readBurst, readPurse, readSettledChange } = await import("../../src/gauntlet/moneyFeedback.js");
 
 const card = { id: "a", label: "a", effect: { capital: 9 }, next: "x" };
@@ -69,7 +69,7 @@ test("a close moves the pot to the vault and changes neither column; an audit th
   assert.equal(plain.run.seasonLost, 0);
 
   const cold = Array.from({ length: AUDIT_LIMIT }, () => cash(AUDIT_HEAT - 5));
-  const caught = playCase(normalizeRunState({ weekRule: "audit" }), cold);
+  const caught = playCase(normalizeRunState({}), cold);
   const close = caught.verdicts.at(-1);
   assert.equal(close.audit.caught, true);
   assert.ok(close.audit.lost > 0);

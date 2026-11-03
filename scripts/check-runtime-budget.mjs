@@ -226,8 +226,11 @@ const BUDGETS = {
   // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
   // ref for the amount's flight and the window it was dealt on; the purse's
   // markup and both reads live outside the screen.
+  // 860 -> 861 on 2026-11-03, measured: #224 (RULES_MARK 3) merged with main
+  // 465ccb93, the audit count's 360px pill beside the signals (one line; its
+  // note is play.css's) over main's purse.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 860,
+    lines: 861,
     longestLine: 250,
     importedNames: 73,
     hooks: {},

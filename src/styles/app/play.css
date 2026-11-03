@@ -2684,7 +2684,9 @@
      pot of 0 on Linux fonts (hand5 on CI, 360x740: English 103 hands 24px
      under the action bar, Japanese 63 by 10px; 2026-11-02). The clock keeps
      its own column, so the pot's row is as wide as before; with no signals
-     the count takes that row alone. The same words, in a pill of the bank's. */
+     the count takes that row alone. The same words, in a pill of the bank's;
+     GauntletStage draws both places and each width hides one (display: none),
+     so the count is read once. */
   .gauntlet-stage .gx-hud.has-audit {
     grid-template-columns: minmax(0, 1fr) auto 1.875rem;
     grid-template-areas:
