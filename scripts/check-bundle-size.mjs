@@ -127,7 +127,8 @@ const budgets = [
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
   // 291,131 / 87,101 -> 290,343 / 86,964 on 2026-10-26, 영어판 3단계: runtimeSystems.js's words (src/copy/seasonEnd.js) first landed here, which imports the runtimeSystems chunk back, and the table read at load was undefined in the production build (runtime smoke); grouped with runtimeSystems now, and this file measured smaller. Measured in the e2e build, the gzip plus 4.
   // 290,343 / 86,970 -> 294,110 / 87,736 on 2026-11-02, locale-gaps (#393) over main 9be94346: the season store's lines (NEW GAME+, second season, ending book, the share tail) read from src/copy/seasonLines.js. Measured 294,106 / 87,732 in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_736 },
+  // 294,110 / 87,736 -> 294,128 / 87,748 on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude); the case files' hashed names in its import list changed with their scene text. Measured 294,124 / 87,744 in the e2e build, the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_128, maxGzip: 87_748 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -819,7 +820,8 @@ const budgets = [
   // 접수 알림음·봉인 테이프·출력본 and the routes. Measured 107,276 / 35,731,
   // the gzip plus 4.
   // 107,276 / 35,735 -> 107,413 / 35,886 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_413, maxGzip: 35_886 },
+  // 107,413 -> 107,420 raw on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 107,416 in the e2e build, the plus 4; the gzip is under its line.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_420, maxGzip: 35_886 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -1072,20 +1074,23 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_701, maxGzip: 60_151 },
+  // 179,701 / 60,151 -> 179,723 / 60,166 on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 179,719 / 60,162, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_723, maxGzip: 60_166 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_778, maxGzip: 53_469 },
+  // 149,778 / 53,469 -> 149,806 / 53,487 on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,802 / 53,483, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_806, maxGzip: 53_487 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
   // 2026-10-28, lang-full: both languages open to the end, so English 사건 21-final and Japanese 사건 11-final join it
   // (four files each); the largest measured 33,405 raw (ja 21-30) and 12,141 gzip (ja 31-40).
-  { pattern: /^locale-(en|ja)-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 33_409, maxGzip: 12_145 },
+  // 33,409 -> 33,421 raw on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): ja 21-30 measured 33,417, the plus 4.
+  { pattern: /^locale-(en|ja)-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 33_421, maxGzip: 12_145 },
   // A language's table the runtime fetches once it opens (src/locales/<lang>/late/<module>.js, locale-gaps #393,
   // 2026-11-02): the speakers' profiles (gameDialogue.js and the case packs' characterProfiles) the scene beats in the
   // report draw from. vite.config.js names it locale-<lang>-late-<module>, so the service worker leaves it to a page in
@@ -1101,7 +1106,8 @@ const budgets = [
   // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
   // 12,579 / 3,358 -> 12,868 / 3,438 on 2026-11-02, locale-gaps (#393) over main 9be94346: the late/ import map (the speakers' profiles, fetched when the runtime opens) and laying a late table over its module. Measured 12,864 / 3,434 in the e2e build, the plus 4.
   // 12,868 / 3,438 -> 12,991 / 3,500 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 12,987 / 3,496 in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_500 },
+  // 3,500 -> 3,505 gzip on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the raw bytes are the same; the hashed names in its import maps changed and gzip worse. Measured 3,501, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_505 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1206,7 +1212,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 426,814 / 483,775 / 490,461 on 2026-11-03, signal-row-fit over main 425eb4da (#395 on cb904fb6): LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,810 / 483,771 / 490,457, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_814, en: 483_775, ja: 490_461 };
+// 426,814 / 483,775 / 490,461 -> 426,820 / 483,804 / 490,483 on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above, and the hashed names in the entry. Measured 426,816 / 483,800 / 490,479, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_820, en: 483_804, ja: 490_483 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
