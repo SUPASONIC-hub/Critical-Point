@@ -1,7 +1,7 @@
-import { createRunId, makeEmptyScores, normalizePlayerName, SAVE_SCHEMA_VERSION } from "../appConfig.js";
+import { createRunId, DEFAULT_PLAYER_NAME, makeEmptyScores, normalizePlayerName, SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, triggerLabels } from "../gameConstants.js";
-import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
+import { createOpeningResources, openingEcho } from "./openingState.js";
 
 /**
  * The save 시작 writes from the pre-start shell, before the runtime is there.
@@ -26,7 +26,7 @@ export function createStartSave(
   return {
     saveSchemaVersion: SAVE_SCHEMA_VERSION,
     runId,
-    playerName: normalizePlayerName(playerName) || "분석관",
+    playerName: normalizePlayerName(playerName) || DEFAULT_PLAYER_NAME,
     playStyle,
     openingLegacy: null,
     dataConsent,
@@ -41,7 +41,7 @@ export function createStartSave(
     log: [],
     triggers: makeEmptyScores(triggerLabels),
     cognition: makeEmptyScores(cognitionLabels),
-    echo: OPENING_ECHO,
+    echo: openingEcho(),
     nodeEnteredAt: now,
     pendingTelemetry: [],
     dynamics: null,

@@ -1,6 +1,7 @@
 /** The ranking's rows and status card, and the pressures a row names, in English (src/copy/leaderboard.js). */
 export default {
   localName: "Current analyst",
+  defaultName: "Analyst",
   anonymousName: "Anonymous Analyst",
   anonymousHandle: "{run} · Anonymous",
   loading: "Loading records…",
