@@ -111,7 +111,7 @@
 }
 
 .gx-comic-timer b {
-  font: 900 2.125rem/1 var(--font-sans);
+  font: 900 calc(2.125 * var(--hud-rem)) / 1 var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
 

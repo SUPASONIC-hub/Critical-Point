@@ -106,16 +106,18 @@ export function sideSource(pack) {
   return wordsOf({ nodes: pack?.nodes, outcomes: pack?.outcomes }) ?? {};
 }
 
+const PROFILE_FIELDS = ["appearance", "thought", "gesture", "voice", "line"];
 const pick = (table, ids) => Object.fromEntries(ids.filter((id) => table[id] !== undefined).map((id) => [id, table[id]]));
 
 /** The screen copy in scope: the season's copy between cases for the cases in `scope`, and the play guide's tables. */
 export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
-  const [caseCopy, appCopy, playerLanguage, gameCases, sidePacks] = await Promise.all([
+  const [caseCopy, appCopy, playerLanguage, gameCases, sidePacks, gameDialogue] = await Promise.all([
     import(`${root}/src/caseCopy.js`),
     import(`${root}/src/appCopy.js`),
     import(`${root}/src/playerLanguage.js`),
     import(`${root}/src/gameCases.js`),
     import(`${root}/src/nodes/sidePacks.js`),
+    import(`${root}/src/gameDialogue.js`),
   ]);
   // The screens' own copy (src/copy/<name>.js, each a default export laid
   // over as `copy.screens.<name>`).
@@ -152,6 +154,15 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
     },
     // The side list's label and title (번외 1 · ...), outside the season's scope.
     sidePacks: { SIDE_CASES: sidePacks.SIDE_CASES },
+    // What the report's scene beat says of a speaker (gameLogic.js
+    // buildSceneBeat; src/locales/<lang>/late/gameDialogue.js). The role is
+    // the speaker card's, by its Korean (`roles`); stance and job are printed
+    // nowhere.
+    gameDialogue: {
+      characterProfiles: Object.fromEntries(
+        Object.entries(gameDialogue.characterProfiles).map(([name, profile]) => [name, pick(profile, PROFILE_FIELDS)]),
+      ),
+    },
   }, "", COPY_KEY_FIELDS) ?? {};
 }
 
@@ -236,5 +247,9 @@ export async function readLanguageCopy(root, lang) {
   const files = existsSync(dir) ? readdirSync(dir).filter((file) => file.endsWith(".js")).sort() : [];
   let copy = dictionary.copy ?? {};
   for (const file of files) copy = mergeWords(copy, (await import(new URL(file, dir).href)).copy);
+  // A runtime module's words fetched when it loads (src/locales/overlay.js `localizeTables`): `late/<module>.js`.
+  const lateDir = new URL(`src/locales/${lang}/late/`, `${root}/`);
+  const late = existsSync(lateDir) ? readdirSync(lateDir).filter((file) => file.endsWith(".js")).sort() : [];
+  for (const file of late) copy = mergeWords(copy, { [file.replace(/\.js$/, "")]: (await import(new URL(file, lateDir).href)).default });
   return copy;
 }
