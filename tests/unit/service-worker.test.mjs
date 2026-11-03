@@ -557,6 +557,14 @@ test("the files of a build are read with their bytes, without the page and the w
   assert.notEqual(releaseIdFor({ html: BUILT, files: after, logic: LOGIC }), releaseIdFor({ html: BUILT, files: before, logic: LOGIC }));
 });
 
+test("the second font file is kept at install, though the page does not name it", () => {
+  const files = shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file), "/assets/pretendard-cp-rest-Ab12Cd34.woff2"]);
+  const config = workerConfigFor({ html: PAGE, files });
+  assert.deepEqual(config.precache, [...precacheFromHtml(PAGE), "/assets/pretendard-cp-rest-Ab12Cd34.woff2"]);
+  assert.equal(config.warm.includes("/assets/pretendard-cp-rest-Ab12Cd34.woff2"), false, "not twice");
+  assert.equal(precacheFromHtml(PAGE).some((file) => file.includes("pretendard-cp-rest")), false, "and the page itself does not preload it");
+});
+
 test("the warm list is every other build file, the portraits and the art at one size, and nothing twice", () => {
   const config = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file)]) });
   assert.deepEqual(config.warm, ["/assets/RankingScreen-BHGTYjZL.js", "/assets/case02-CN_k66fr.js", "/portrait-echo.webp", "/profile.jpg", "/scene-case01-960.webp"]);

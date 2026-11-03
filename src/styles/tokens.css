@@ -3,19 +3,100 @@
    what they are: colour family, lightness and alpha.
    Add new colours here, not inline. */
 
-/* The one font file: Pretendard Variable (OFL-1.1) cut down to the characters
-   the source can print, from weight 400 to 920 (nothing asks for less; the
-   range is WEIGHT_AXIS in scripts/build-fonts.mjs). `npm run build:fonts`
-   writes it and `npm run check:fonts` fails when the copy gains a character it
-   does not carry. index.html preloads the same file. Text outside it -- a
-   nickname with a syllable the copy never uses -- falls through to the system
-   Hangul face named after it in --font-sans. */
+/* Two font files, one family: Pretendard Variable (OFL-1.1) cut down to the
+   characters the source can print, from weight 400 to 920 (nothing asks for
+   less; the range is WEIGHT_AXIS in scripts/build-fonts.mjs). The first holds
+   what the start screen draws in any language and index.html preloads it; the
+   second holds every other syllable of the copy and is fetched only when a page
+   prints one of the code points in its unicode-range, which build-fonts writes
+   between the markers. Both are cut from the same face, so the metrics -- the
+   ascent, descent and advance widths -- are one set and a line does not reflow
+   when the second file lands. `swap` is kept: the start screen's text is all in
+   the preloaded file, and a syllable from the second file later draws in the
+   fallback for the one fetch, then swaps in place at the same width class.
+   `npm run build:fonts` writes both and `npm run check:fonts` fails when the
+   copy gains a character neither carries. Text outside them -- a nickname with
+   a syllable the copy never uses -- falls through to the system Hangul face
+   named after it in --font-sans. */
 @font-face {
   font-family: "Critical Point Sans";
   font-style: normal;
   font-weight: 400 920;
   font-display: swap;
   src: url("../assets/fonts/pretendard-cp.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Critical Point Sans";
+  font-style: normal;
+  font-weight: 400 920;
+  font-display: swap;
+  src: url("../assets/fonts/pretendard-cp-rest.woff2") format("woff2");
+  /* FONT_REST_RANGE start */
+  unicode-range:
+    U+E9, U+200B, U+200F, U+202A, U+202E, U+2060, U+2064, U+2592, U+3002, U+30AF, U+30C9, U+30F3, U+6545,
+    U+AC08, U+AC10, U+AC12-AC13, U+AC15-AC16, U+AC19-AC1B, U+AC1D, U+AC20, U+AC24, U+AC2D, U+AC31, U+AC40,
+    U+AC54, U+AC71, U+AC77, U+AC80, U+AC84, U+AC89, U+ACAA, U+ACB8-ACB9, U+ACC1, U+ACE1, U+ACE4, U+ACE7,
+    U+ACF1, U+ACF3, U+ACF6, U+ACFD, U+AD04, U+AD1C, U+AD34, U+AD50, U+AD73-AD75, U+AD7D, U+AD81, U+ADC0,
+    U+ADE4, U+ADF9, U+AE01, U+AE0B, U+AE38, U+AE41, U+AE43, U+AE4D-AE4E, U+AE54, U+AE5D, U+AE65, U+AE6C,
+    U+AE79, U+AE7B, U+AEBC, U+AEBE, U+AECD, U+AECF-AED1, U+AEF4, U+AF08, U+AF2C-AF2D, U+AF3C-AF3D,
+    U+AF42-AF43, U+AF49, U+AF64, U+AFB9, U+AFC7-AFC9, U+AFD4, U+AFE8, U+AFF0, U+B010, U+B014, U+B01C-B01D,
+    U+B048, U+B053-B055, U+B057, U+B07C, U+B080, U+B084, U+B08C-B08D, U+B099, U+B0A1, U+B0A9, U+B0AB-B0AD,
+    U+B0AF, U+B0B1, U+B0B8, U+B0BC, U+B0C4-B0C5, U+B0C8-B0C9, U+B0D0, U+B0E5, U+B109, U+B10C, U+B113,
+    U+B123-B125, U+B128, U+B135, U+B138, U+B140-B141, U+B150, U+B154-B155, U+B178-B179, U+B17C, U+B180,
+    U+B188, U+B18D, U+B192-B193, U+B1A8, U+B1CC, U+B1E8, U+B205, U+B208, U+B20C, U+B214-B215, U+B220, U+B234,
+    U+B258, U+B25C, U+B268-B269, U+B274, U+B284, U+B299, U+B2A0, U+B2A6, U+B2AC, U+B2D0, U+B2D8-B2D9, U+B2DB,
+    U+B2DD, U+B2E5-B2E6, U+B2ED-B2EE, U+B2F3-B2F4, U+B2F7, U+B2FB, U+B301, U+B304, U+B308, U+B311,
+    U+B313-B314, U+B355, U+B35C, U+B35F, U+B364-B365, U+B367, U+B369, U+B36E, U+B378, U+B38C, U+B3C5, U+B3CB,
+    U+B3CE, U+B3D5, U+B3D7, U+B3FC, U+B410, U+B420, U+B451, U+B460, U+B465, U+B46C, U+B480, U+B4C0, U+B4DD,
+    U+B4E3, U+B4E6, U+B4EC-B4ED, U+B4EF, U+B518, U+B51C, U+B525, U+B52A, U+B531, U+B534, U+B538, U+B540-B541,
+    U+B544-B545, U+B550, U+B55C, U+B5A0-B5A1, U+B5A8, U+B5B1, U+B5B3-B5B4, U+B5BB-B5BC, U+B5C0, U+B5C4,
+    U+B5CC-B5CD, U+B5D0, U+B610, U+B69C-B69D, U+B6A4, U+B6AB, U+B6B1, U+B6F4, U+B6F8, U+B728, U+B72C,
+    U+B72F-B730, U+B738, U+B73B, U+B754-B755, U+B760, U+B784, U+B78D, U+B790-B791, U+B799, U+B79C, U+B7A8,
+    U+B7AB-B7AC, U+B7B5, U+B7C9, U+B7ED, U+B7F0, U+B7F4, U+B7FD, U+B7FF-B801, U+B807, U+B80C, U+B81B, U+B828,
+    U+B82C, U+B834-B835, U+B837, U+B839, U+B840, U+B86C-B86D, U+B86F, U+B8B0, U+B8E8-B8E9, U+B8EC, U+B8F0,
+    U+B8F8, U+B8FB, U+B904, U+B918, U+B959, U+B968, U+B96D, U+B987, U+B989, U+B98E, U+B9B4, U+B9BF, U+B9C1,
+    U+B9CE, U+B9D1, U+B9D8-B9D9, U+B9DB, U+B9DD, U+B9E1, U+B9E4-B9E5, U+B9E8, U+B9F5, U+B9F8-B9FA,
+    U+BA38-BA39, U+BA49, U+BA4D-BA4E, U+BA58, U+BA65, U+BA67, U+BA78, U+BA87, U+BAAB-BAAC, U+BAB0,
+    U+BAB8-BAB9, U+BABD, U+BB35, U+BB3C, U+BB45, U+BB47, U+BB49, U+BB50, U+BB54, U+BB58, U+BB61, U+BBA4,
+    U+BBAC, U+BBC0, U+BBD0, U+BBF9, U+BBFC, U+BBFF, U+BC09, U+BC0F, U+BC11, U+BC16, U+BC1D, U+BC1F, U+BC25,
+    U+BC27, U+BC2D, U+BC34, U+BC38, U+BC43, U+BC45, U+BC49, U+BC85, U+BC8C, U+BC94, U+BC97, U+BC9A, U+BCA0,
+    U+BCA4, U+BCA8, U+BCBC, U+BCCD, U+BCD1, U+BCD5, U+BCF6, U+BD04-BD05, U+BD07, U+BD09, U+BD10, U+BD24,
+    U+BD2C, U+BD48, U+BD59, U+BD81, U+BD90-BD91, U+BD93, U+BD95, U+BDF0, U+BE4C, U+BE54-BE55, U+BE57,
+    U+BE59-BE5B, U+BE60, U+BE64, U+BE68, U+BE75, U+BE7C-BE7D, U+BE80, U+BE84, U+BE8C-BE8D, U+BE8F-BE90,
+    U+BED0, U+BED4, U+BED7-BED8, U+BF08, U+BF18, U+BF51, U+BF55, U+BFCC, U+BFD0, U+BFD4, U+BFDC, U+C058,
+    U+C05C, U+C060, U+C068-C069, U+C090-C091, U+C0B0, U+C0B4, U+C0B6, U+C0BD, U+C0BF-C0C0, U+C0C5, U+C0C9,
+    U+C0CC, U+C0D8-C0D9, U+C0DC, U+C0F7, U+C11E, U+C123, U+C12D, U+C12F-C130, U+C13C, U+C140, U+C148-C149,
+    U+C14B-C14C, U+C154, U+C15C, U+C168, U+C170, U+C190, U+C194, U+C19C, U+C19F, U+C1C4, U+C1E0, U+C1F1,
+    U+C1FC, U+C219, U+C21F-C220, U+C228-C229, U+C22D, U+C26C, U+C270, U+C274, U+C27C-C27D, U+C288, U+C2A8,
+    U+C2AC, U+C2B4, U+C2B7, U+C2E3, U+C2EB-C2ED, U+C2F1, U+C2F6, U+C2F8, U+C2FC, U+C300, U+C309, U+C30C,
+    U+C368-C369, U+C36C, U+C370, U+C379, U+C37C, U+C3DF, U+C3E9, U+C465, U+C4F1, U+C4F8, U+C500-C501, U+C50C,
+    U+C528-C529, U+C52C, U+C539, U+C53B, U+C545, U+C549, U+C54E, U+C554, U+C557, U+C559, U+C560-C561, U+C564,
+    U+C568, U+C571, U+C587, U+C597-C598, U+C5B9, U+C5BD, U+C5C4-C5C5, U+C5CC, U+C5CE, U+C5D1, U+C5D8, U+C5E0,
+    U+C5ED-C5EE, U+C5FC, U+C5FF-C600, U+C606, U+C608, U+C61B, U+C62E, U+C633-C634, U+C637, U+C63B, U+C655,
+    U+C65C, U+C678, U+C67C, U+C689, U+C695, U+C6B1, U+C6C3, U+C6C5, U+C6CD, U+C6E0, U+C6E8, U+C6F9, U+C717,
+    U+C719, U+C721, U+C724, U+C73D, U+C74A, U+C74D, U+C783, U+C787, U+C789-C78A, U+C78E, U+C794, U+C796,
+    U+C798, U+C7A3-C7A4, U+C7A6, U+C7B0, U+C7B4, U+C7BD, U+C7C0-C7C1, U+C7E4, U+C80A, U+C813, U+C816, U+C81D,
+    U+C820, U+C82F, U+C838, U+C84C, U+C871, U+C874, U+C878, U+C880-C881, U+C88B-C88C, U+C8C4, U+C8E0, U+C8FD,
+    U+C90C-C90D, U+C918, U+C92C, U+C950, U+C954, U+C958, U+C961, U+C988-C989, U+C990, U+C998-C999, U+C99D,
+    U+C9CA, U+C9D3, U+C9D5-C9D6, U+C9DA, U+C9DD, U+C9E0, U+C9E4, U+C9E7, U+C9EC-C9ED, U+C9F0, U+C9F8, U+CA4C,
+    U+CA61, U+CA84, U+CABC-CABD, U+CAD3, U+CB50, U+CB64, U+CBE4, U+CC0C, U+CC1C, U+CC21-CC22, U+CC2C, U+CC2E,
+    U+CC39, U+CC3B-CC3D, U+CC45, U+CC48, U+CC4C, U+CC55, U+CC58-CC59, U+CC99, U+CC9C, U+CCA0, U+CCA8-CCA9,
+    U+CCE4, U+CD09, U+CD0C, U+CD18, U+CD1D, U+CD2C, U+CDA4, U+CDA9, U+CDB0, U+CDC4, U+CDE8, U+CE20-CE21,
+    U+CE5C, U+CE60, U+CE69, U+CE6B, U+CE75, U+CE7C, U+CE90, U+CE94, U+CE98, U+CEA0-CEA1, U+CEE4, U+CEE8,
+    U+CEF4-CEF5, U+CEF7-CEF9, U+CF13, U+CF2D, U+CF30, U+CF55, U+CF58, U+CF64, U+CF67, U+CF69, U+CF70, U+CF85,
+    U+CFE0, U+CFE8, U+D000, U+D018, U+D034-D035, U+D038, U+D050, U+D070, U+D074, U+D07D, U+D0A8, U+D0AC,
+    U+D0B4-D0B5, U+D0B7, U+D0C1, U+D0C4, U+D0C8, U+D0D0-D0D1, U+D0D3-D0D5, U+D0E0, U+D0E4, U+D0EC-D0ED,
+    U+D0F0-D0F1, U+D131, U+D134, U+D138, U+D140-D141, U+D145, U+D14D, U+D150, U+D154, U+D168, U+D17C, U+D1A1,
+    U+D1A4, U+D1B1, U+D1B5, U+D1F4, U+D22C-D22D, U+D230, U+D234, U+D23C-D23D, U+D241, U+D248, U+D25C, U+D280,
+    U+D284, U+D29C, U+D2BC, U+D2BF-D2C0, U+D2C8-D2C9, U+D2F0-D2F1, U+D2F4, U+D2F8, U+D300-D301, U+D305,
+    U+D314, U+D31D, U+D320-D321, U+D325, U+D329, U+D32C, U+D33B, U+D37C, U+D380, U+D384, U+D38C, U+D39C,
+    U+D3B4, U+D3BC, U+D3C5, U+D3C8, U+D3D0, U+D3ED, U+D3F0, U+D3F4, U+D3FC, U+D478-D479, U+D47C, U+D480,
+    U+D488-D489, U+D48D, U+D4CC, U+D4E8, U+D508, U+D514-D515, U+D53D, U+D540, U+D54D, U+D54F, U+D559, U+D56B,
+    U+D56D, U+D575, U+D578, U+D587, U+D5A5, U+D5C8, U+D5CC, U+D5D0, U+D5D8, U+D5DB, U+D5E4, U+D5EC,
+    U+D600-D601, U+D608, U+D610-D611, U+D614, U+D61C, U+D639, U+D648-D649, U+D64D, U+D68D, U+D69F, U+D6A1,
+    U+D6A8, U+D6C4, U+D6C8, U+D6CC, U+D6D1, U+D6D4, U+D6E8, U+D6FC, U+D718, U+D734, U+D749, U+D751,
+    U+D758-D759, U+D760-D761, U+D769, U+D76C, U+D770, U+D78C, U+D790, U+D798-D799, U+D7A3, U+FF0E, U+FF61; /* FONT_REST_RANGE end */
 }
 
 :root {

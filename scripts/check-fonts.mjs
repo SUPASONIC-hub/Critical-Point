@@ -1,6 +1,19 @@
 import { readFileSync, statSync } from "node:fs";
 import { convert } from "fontverter";
-import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComputedCharacters, collectSourceCharacters, readCharsetList } from "./font-charset.mjs";
+import {
+  CHARSET_OUTPUT,
+  FIRST_CHARSET_OUTPUT,
+  FONT_CSS,
+  FONT_OUTPUT,
+  FONT_SOURCE,
+  REST_FONT_OUTPUT,
+  collectCharset,
+  collectComputedCharacters,
+  collectFirstPaintCharset,
+  collectSourceCharacters,
+  readCharsetList,
+  unicodeRange,
+} from "./font-charset.mjs";
 
 /**
  * Fail when the source can print a character the shipped font does not carry.
@@ -28,7 +41,12 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComput
 // 400-920 (scripts/build-fonts.mjs). Measured 197,736, plus 4; the same line as
 // the woff2's in check-bundle-size.mjs.
 // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): the Japanese sounds lettered in the plate add ク, ド and ン (1,697 -> 1,700 characters). Measured 198,144 plus 4.
-const MAX_FONT_BYTES = 198_148;
+// 198,148 -> 96,240 on 2026-11-03, font-split: the one file became two, and
+// this line is the first (preloaded) one's. Measured 96,236 plus 4. The second
+// file's line is MAX_REST_FONT_BYTES; together they are about the one file
+// they replaced, since both are cut from the same face and axis.
+const MAX_FONT_BYTES = 96_240;
+const MAX_REST_FONT_BYTES = 116_944;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones
@@ -138,10 +156,35 @@ if (missing.length) {
 }
 const computed = await collectComputedCharacters();
 
+// The split: the first list is what the start screen prints now, the second
+// file's unicode-range in the stylesheet is every other character of the list,
+// and each font carries its own half.
+let firstList = null;
+try {
+  firstList = readCharsetList(undefined, FIRST_CHARSET_OUTPUT);
+} catch {
+  failures.push(`${FIRST_CHARSET_OUTPUT} is missing. Run \`npm run build:fonts\`.`);
+}
+if (firstList) {
+  const wanted = await collectFirstPaintCharset();
+  const drift = [...wanted].filter((character) => !firstList.has(character));
+  if (drift.length) failures.push(`${drift.length} characters the start screen prints are not in ${FONT_OUTPUT}: ${describe(drift)}
+Run \`npm run build:fonts\` and commit the result.`);
+  const rest = [...built].filter((character) => !firstList.has(character)).join("");
+  const range = /FONT_REST_RANGE start \*\/\s*unicode-range:\s*([^;]*);/.exec(readFileSync(FONT_CSS, "utf8"))?.[1]?.replace(/\s+/g, "");
+  if (range !== unicodeRange(rest)) failures.push(`The second @font-face's unicode-range in ${FONT_CSS} is not the list minus the first file. Run \`npm run build:fonts\`.`);
+}
+
 let carried = null;
 let drawable = null;
 try {
-  carried = await readFontCharacters(FONT_OUTPUT);
+  const firstCarried = await readFontCharacters(FONT_OUTPUT);
+  const restCarried = await readFontCharacters(REST_FONT_OUTPUT);
+  carried = new Set([...firstCarried, ...restCarried]);
+  if (firstList) {
+    const lost = [...firstList].filter((c) => !firstCarried.has(c.codePointAt(0)) && restCarried.has(c.codePointAt(0)));
+    if (lost.length) failures.push(`${FONT_OUTPUT} lacks ${lost.length} characters its list names: ${describe(lost)}. Run \`npm run build:fonts\`.`);
+  }
   drawable = await readFontCharacters(FONT_SOURCE);
 } catch (error) {
   failures.push(`The font could not be read: ${error instanceof Error ? error.message : String(error)}`);
@@ -179,13 +222,15 @@ if (drawable) {
 
 const bytes = statSync(FONT_OUTPUT).size;
 if (bytes > MAX_FONT_BYTES) failures.push(`${FONT_OUTPUT} is ${bytes} bytes, over the ${MAX_FONT_BYTES} byte budget.`);
+const restBytes = statSync(REST_FONT_OUTPUT).size;
+if (restBytes > MAX_REST_FONT_BYTES) failures.push(`${REST_FONT_OUTPUT} is ${restBytes} bytes, over the ${MAX_REST_FONT_BYTES} byte budget.`);
 
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
 } else {
   console.log(
-    `Font check passed: ${built.size} characters in ${(bytes / 1024).toFixed(1)}KB, none missing from the list ` +
+    `Font check passed: ${built.size} characters in ${(bytes / 1024).toFixed(1)}KB + ${(restBytes / 1024).toFixed(1)}KB (${firstList?.size} on the start screen), none missing from the list ` +
       `(${computed.labels} card labels spoken, ${computed.characters.size} characters between them), ` +
       `and the font carries every one Pretendard draws (${carried.size} mapped). ` +
       `${systemDrawn.length} printed characters are the system face's, as listed: ${systemDrawn.join(" ")}.`,
