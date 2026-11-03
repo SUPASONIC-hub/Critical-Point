@@ -806,7 +806,7 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
 - WebKit 시작 버튼(#411, `intro-webkit-fit`, `811df47a`): 360px 이하 ko·ja 소개 문단 `text-wrap: wrap`.
 - 요약 아티팩트(#421, `064d186c`): Funnel·Test Week·Verify Ranking 요약을 실행 아티팩트로도 올린다.
 - 커버리지 바닥(#408, `coverage-floors-1103`, `8e930107`): 실측보다 1 낮게 올림.
-- 이날 병합 14개(main `8e930107`), 운영 build-sha `811df47a`(8e930107 배포 중), 유닛 테스트 1,692개.
+- 이날 병합 14개(main `8e930107`), 운영 build-sha `8e930107`, 유닛 테스트 1,692개.
 
 ## 7. 자료와 한계
 
