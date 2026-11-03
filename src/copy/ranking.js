@@ -32,6 +32,9 @@ const rankingCopy = {
   tableTime: "테이블 시간 ×{value}",
   story: "스토리 모드",
   collapsed: "붕괴한 시즌",
+  // A row the server's nightly checker has not worked out again yet (public_rankings.rechecked, 보안 점검 M2).
+  pendingCheck: "확인 중",
+  pendingCheckTitle: "서버가 아직 이 점수를 다시 계산해 보지 않은 기록입니다. 하루에 한 번 확인합니다.",
   footnote: "다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.",
 };
 export default rankingCopy;

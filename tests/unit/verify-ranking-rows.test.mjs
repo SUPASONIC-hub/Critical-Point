@@ -170,14 +170,15 @@ test("the remote read is GET only, with the service key, and says when there is 
 
 test("the CI read is split, each query one SELECT and nothing else, and the public log names runs by their tag", () => {
   const writes = /\b(insert|update|delete|truncate|alter|drop|create|grant|call|do)\b/i;
-  // The run list: one statement (a single semicolon, at the end), run ids only.
-  const list = rankingRunsSql({ limit: 7 });
+  // The run list: one statement (a single semicolon, at the end), run ids and where they stand only.
+  const list = rankingRunsSql({ limit: 7, weeks: ["2026-W47"] });
   assert.equal(list.indexOf(";"), list.length - 1);
-  assert.match(list, /^select run_id from public\.playtest_sessions\n/);
-  assert.match(list, /order by score desc limit 7;$/);
+  assert.match(list, /^select run_id, board, fresh, place from \(\n/);
+  assert.match(list, /\n where place <= 7 and \(fresh or place <= 7\)\n order by fresh desc, place, board limit 150;$/);
   assert.doesNotMatch(list, writes);
-  assert.match(rankingRunsSql({ limit: 1e9 }), /limit 500;$/);
-  assert.match(rankingRunsSql({ limit: "x" }), /limit 20;$/);
+  assert.doesNotMatch(list.split("\n")[1], /player_name|session_|score|summary,/, "the inner select names no score or name either");
+  assert.match(rankingRunsSql({ limit: 1e9, weeks: [] }), /where place <= 500 /);
+  assert.match(rankingRunsSql({ limit: "x", weeks: [] }), /where place <= 100 and \(fresh or place <= 20\)/);
   // One run's rows: one statement, that run only, its id quoted.
   const one = runRowsSql("run-'x");
   assert.equal(one.indexOf(";"), one.length - 1);
@@ -342,7 +343,8 @@ test("the CLI lists runs, writes one run's read at a time, and reads the per-run
   try {
     const run = (...args) => execFileSync(process.execPath, [script, ...args], { encoding: "utf8" }).trim();
     writeFileSync(path.join(dir, "runs.json"), JSON.stringify([{ run_id: "secret-a" }, { run_id: "secret-b" }]));
-    assert.equal(run("--runs-sql", "--limit=3"), rankingRunsSql({ limit: 3 }));
+    assert.equal(run("--runs-sql", "--limit=3", "--weeks=2026-W47,2026-W46"), rankingRunsSql({ limit: 3, weeks: ["2026-W47", "2026-W46"] }));
+    assert.equal(run("--runs-sql", "--weeks=", "--all", "--cap=9"), rankingRunsSql({ weeks: [], all: true, cap: 9 }));
     assert.equal(run("--run-count", path.join(dir, "runs.json")), "2");
     assert.equal(run("--run-sql", path.join(dir, "runs.json"), "--at=2"), runRowsSql("secret-b"));
     assert.throws(() => execFileSync(process.execPath, [script, "--run-sql", path.join(dir, "runs.json"), "--at=3"], { stdio: "pipe" }), /from 1 to 2/);

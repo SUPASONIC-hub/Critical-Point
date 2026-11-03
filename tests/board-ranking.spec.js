@@ -366,6 +366,35 @@ test("no ranking row can take the ranking screen down", async ({ page }) => {
   await expect(page.locator(".ranking-page")).not.toContainText("[object Object]");
 });
 
+test("a ranking row the server has not checked yet says 「확인 중」, and a checked one does not", async ({ page }) => {
+  // public_rankings.rechecked (*_ranking_recheck_seen.sql, 보안 점검 M2): false until the nightly checker reads the run.
+  const row = (run_tag, score, rechecked) => ({
+    run_tag,
+    player_name: "익명 분석관",
+    case_id: "season-final",
+    case_title: "SEASON 01 COMPLETE",
+    completed_at: "2026-11-16T09:00:00Z",
+    score,
+    summary: { burstScore: score, rank: "A", primary: ["curiosity", 90], seasonComplete: true, averageResponseTime: 12, reframeCount: 1 },
+    week: null,
+    rechecked,
+  });
+  const rows = [row("NEWRUN01", 92, false), row("READRUN1", 88, true)];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/public_rankings**`, (route) => {
+    expect(new URL(route.request().url()).searchParams.get("select")?.split(",")).toContain("rechecked");
+    return route.fulfill(json(rows));
+  });
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  await expect(page.locator(".ranking-row")).toHaveCount(2);
+  const [unread, read] = await page.locator(".ranking-row").all();
+  await expect(unread.getByTestId("ranking-pending-check")).toHaveText("확인 중");
+  await expect(unread.getByTestId("ranking-pending-check")).toHaveAttribute("title", /하루에 한 번/);
+  await expect(read.getByTestId("ranking-pending-check")).toHaveCount(0);
+});
+
 /* ------------------------------------------------------------- story mode */
 
 /** A season this device finished, as its own ranking holds it (useChoiceCommit's season row). */

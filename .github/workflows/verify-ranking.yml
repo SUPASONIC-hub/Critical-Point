@@ -35,22 +35,52 @@ name: Verify Ranking
 # Drift uses (`supabase db query --linked`, each query one SELECT that the unit
 # test holds to nothing else). Without the token the run says so and reads nothing.
 #
-# Once a day at 23:55 KST, after the test week's 23:40 read, and by hand. A
-# run by hand can leave the marks unwritten (`write`: false) to read only.
+# Which runs (보안 점검 M2, 11-03): every board the page shows, as it shows
+# it -- the ordinary one and this week's and last week's rule boards
+# (fetchLeaderboard reads the top 100 of each) -- and of each board's top
+# `limit`, every run the checker has not read yet (`recheck_seen_at` null,
+# shown on the page as 「확인 중」) and the top `always` again, read before or
+# not, so a fix to the checker reaches the top of each board the next night.
+# New runs go first and `cap` bounds one night's reads: each run is one
+# Management API query, about 6 s with the CLI's start (every nightly read
+# 10-24~11-02: 5~7 s for the one list query), so 150 runs is about 15 min;
+# what the cap leaves waits for the next night, still 「확인 중」. `all`: true
+# reads every one of the top `limit` again (after a change to the checker).
+#
+# Once a day at 23:55 KST, after the test week's 23:40 read, and once more on
+# Monday at 00:20 KST, after the week's boards turn over, for the week that
+# just ended (GitHub may start a scheduled run hours late: the nightly ran
+# 17:41Z~22:55Z instead of 14:55Z, 10-24~11-02). And by hand. A run by hand
+# can leave the marks unwritten (`write`: false) to read only.
 
 on:
   workflow_dispatch:
     inputs:
       limit:
-        description: "How many of the top ranked runs to read"
+        description: "How far down each board to look (the page shows 100)"
+        required: false
+        default: "100"
+      always:
+        description: "How many of each board's top to read again even when read before"
         required: false
         default: "20"
+      cap:
+        description: "At most this many runs in one run (about 6 s each)"
+        required: false
+        default: "150"
+      all:
+        description: "Read every run of each board's top again (true), not only those not read yet"
+        required: false
+        default: "false"
       write:
         description: "Write the marks into the ranking rows (false: read only)"
         required: false
         default: "true"
   schedule:
+    # 23:55 KST every night.
     - cron: "55 14 * * *"
+    # 00:20 KST on Monday: the week's boards have turned over.
+    - cron: "20 15 * * 0"
 
 permissions:
   contents: read
@@ -62,11 +92,14 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       # Not a secret: it is the host name in the site's own connect-src.
       SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
-      RANKING_LIMIT: ${{ inputs.limit || '20' }}
+      RANKING_LIMIT: ${{ inputs.limit || '100' }}
+      RANKING_ALWAYS: ${{ inputs.always || '20' }}
+      RANKING_CAP: ${{ inputs.cap || '150' }}
+      RANKING_ALL: ${{ inputs.all || 'false' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: See whether an access token is configured
@@ -106,9 +139,12 @@ jobs:
             fi
           }
           started=$SECONDS
-          node scripts/verify-ranking-rows.mjs --runs-sql --limit="$RANKING_LIMIT" > runs.sql || exit 1
+          all=""
+          if [ "$RANKING_ALL" = "true" ]; then all="--all"; fi
+          node scripts/verify-ranking-rows.mjs --runs-sql --limit="$RANKING_LIMIT" --always="$RANKING_ALWAYS" --cap="$RANKING_CAP" $all > runs.sql || exit 1
           query runs.sql runs.json
           runs=$(node scripts/verify-ranking-rows.mjs --run-count runs.json) || exit 1
+          echo "Boards (top $RANKING_LIMIT each, new runs and the top $RANKING_ALWAYS, at most $RANKING_CAP): $(node scripts/verify-ranking-rows.mjs --runs-summary runs.json)" | tee -a "$GITHUB_STEP_SUMMARY"
           mkdir -p rows
           for at in $(seq 1 "$runs"); do
             node scripts/verify-ranking-rows.mjs --run-sql runs.json --at="$at" > run.sql || exit 1
@@ -126,7 +162,7 @@ jobs:
         run: |
           started=$SECONDS
           {
-            echo "### Ranked runs worked out again and chained (top $RANKING_LIMIT)"
+            echo "### Ranked runs worked out again and chained (each board's top $RANKING_LIMIT: new runs and the top $RANKING_ALWAYS)"
             echo '```'
             node scripts/verify-ranking-rows.mjs rows/*.json --redact
             echo '```'

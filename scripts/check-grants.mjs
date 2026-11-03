@@ -208,6 +208,8 @@ for (const file of files) {
 // The checker's marks (F1 phase 2, `*_ranking_recheck_marks.sql`): the cases
 // below run once the migration is among the files.
 const RECHECK_MARKS = files.some((file) => file.endsWith("_ranking_recheck_marks.sql"));
+// Whether the checker has read a ranking run (`*_ranking_recheck_seen.sql`, 보안 점검 M2): the page's 「확인 중」.
+const RECHECK_SEEN = files.some((file) => file.endsWith("_ranking_recheck_seen.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -1466,6 +1468,11 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // When the checker last replayed a run is not the client's to read or write.
   await refused("read when a ranking row was rechecked", "anon", `select rechecked_at from public.playtest_sessions`);
   await postRefused("send a case row already rechecked", "playtest_sessions", { ...casePayload({ session: sessionId(38), runId: "run-recheck-self", caseId: "case01" }), rechecked_at: "2026-10-21T00:00:00Z" }, /^42501 /);
+  if (!RECHECK_SEEN) failures.push("supabase/migrations/*_ranking_recheck_seen.sql is gone; the ranking's 「확인 중」 was checked against nothing.");
+  // Whether the checker has read a run is the page's to read (the ranking's
+  // 「확인 중」), as a yes or no through the view; never the page's to write.
+  await allowed("read whether a ranking row was checked", "anon", `select rechecked from public.public_rankings limit 1`);
+  await postRefused("send a case row the checker has already read", "playtest_sessions", { ...casePayload({ session: sessionId(38), runId: "run-recheck-self", caseId: "case01" }), recheck_seen_at: "2026-10-21T00:00:00Z" }, /^42501 /);
 
   // Rows put in place with the insert triggers off for these statements only:
   // two ranked runs, one already marked by the trigger, and the first run's final case row.
@@ -1487,6 +1494,13 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   }
   const marksOf = async (runId, caseId = "season-final") =>
     (await one(`select suspicion from public.playtest_sessions where run_id = $1 and case_id = $2`, [runId, caseId]))?.suspicion ?? null;
+  const seenAt = async (runId, caseId = "season-final") =>
+    (await one(`select recheck_seen_at from public.playtest_sessions where run_id = $1 and case_id = $2`, [runId, caseId]))?.recheck_seen_at ?? null;
+  // Not read yet: the view says so (the page's 「확인 중」), and the checker's run list keeps it.
+  check((await seenAt("run-recheck-1")) === null && (await seenAt("run-recheck-2")) === null, "a ranking row the checker has not read has a read time.");
+  const shownChecked = async () =>
+    ((await allowed("read the ranking's checked flags", "anon", `select rechecked from public.public_rankings where case_title = 'SEASON 01 COMPLETE' and player_name = '익명 분석관' and case_id = 'season-final'`))?.rows ?? []).map((row) => row.rechecked);
+  check((await shownChecked()).length > 0 && (await shownChecked()).every((flag) => flag === false), `the ranking shows rows not read yet as ${JSON.stringify(await shownChecked())}; expected false.`);
   const setMarks = async (label, marks, expected) => {
     const answer = (await allowed(label, "service_role", call("run-recheck-1", marks)))?.rows[0]?.marks ?? null;
     const stored = await marksOf("run-recheck-1");
@@ -1527,8 +1541,12 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   const recheckedAt = async (runId) => (await one(`select rechecked_at from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.rechecked_at ?? null;
   check((await recheckedAt("run-recheck-1")) !== null, "the checker's write did not mark run-recheck-1, replayed whole, as rechecked.");
   check((await recheckedAt("run-recheck-2")) === null, "a run with no replay record was marked as rechecked.");
+  // Read is read, replayed whole or not: both runs leave 「확인 중」.
+  check((await seenAt("run-recheck-1")) !== null && (await seenAt("run-recheck-2")) !== null, "the checker's write left a run it read without a read time.");
+  check((await seenAt("run-recheck-1", "final")) === null, "the checker's write gave a case row a read time; only ranking rows are read.");
   await allowed("state marks without a replay", "service_role", call("run-recheck-1", ["score-off-log"]));
   check((await recheckedAt("run-recheck-1")) === null, "a call that did not replay the run left its rechecked time standing.");
+  check((await seenAt("run-recheck-1")) !== null, "a call that did not replay the run cleared its read time; the run was read.");
   await allowed("mark a window with no replay record", "service_role", call("run-recheck-1", ["window-no-replay"]));
   check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap", "window-no-replay"]), `window-no-replay left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
   check((await one(`select count(*)::int as n from public.playtest_sessions where rechecked_at is not null and case_id <> 'season-final'`))?.n === 0, "a case row carries a rechecked time; only ranking rows are rechecked.");
@@ -1536,9 +1554,28 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // The checker's own read runs on this schema, in its two halves as the CI
   // job runs them (verify-ranking-rows --runs-sql, then --run-sql per run):
   // the list names the top ranked run, and that run's read brings it whole.
-  const topRun = await one(`select run_id from public.playtest_sessions where case_id = 'season-final' and score is not null order by score desc limit 1`);
-  const listed = (await allowed("list the checker's runs", "service_role", rankingRunsSql({ limit: 1 })))?.rows ?? [];
-  check(listed.length === 1 && listed[0].run_id === topRun?.run_id && Object.keys(listed[0]).join() === "run_id", `the checker's run list answered ${JSON.stringify(listed)}; expected the top ranked run's id alone.`);
+  const topRun = await one(
+    `select run_id from public.playtest_sessions
+      where case_id = 'season-final' and score is not null and run_id is not null and summary->>'seasonComplete' = 'true' and summary->>'week' is null
+      order by score desc, completed_at asc limit 1`,
+  );
+  const listed = (await allowed("list the checker's runs", "service_role", rankingRunsSql({ limit: 1, weeks: [] })))?.rows ?? [];
+  check(
+    listed.length === 1 && listed[0].run_id === topRun?.run_id && Object.keys(listed[0]).join() === "run_id,board,fresh,place" && listed[0].board === "" && Number(listed[0].place) === 1,
+    `the checker's run list answered ${JSON.stringify(listed)}; expected the top ranked run's id, its board and place alone.`,
+  );
+  // The nightly list: every ranked run not read yet, and of those read before
+  // only the top `always`; read runs are not listed again below it.
+  const nightly = (await allowed("list the runs not read yet", "service_role", rankingRunsSql({ limit: 100, always: 1, weeks: [] })))?.rows ?? [];
+  const unread = (await one(
+    `select count(*)::int as n from public.playtest_sessions
+      where case_id = 'season-final' and score is not null and run_id is not null and summary->>'seasonComplete' = 'true' and summary->>'week' is null and recheck_seen_at is null`,
+  ))?.n;
+  check(
+    nightly.filter((row) => row.fresh === true).length === unread && nightly.every((row) => row.fresh === true || Number(row.place) === 1),
+    `the nightly run list answered ${JSON.stringify(nightly.map(({ fresh, place }) => ({ fresh, place })))}; expected the ${unread} runs not read yet and, of the rest, the top one only.`,
+  );
+  check(!nightly.some((row) => ["run-recheck-1", "run-recheck-2"].includes(row.run_id) && Number(row.place) > 1), "the nightly run list read a run again below the top `always` that the checker had read.");
   const read = (await allowed("run the checker's read", "service_role", runRowsSql(listed[0]?.run_id ?? "none")))?.rows ?? [];
   const runRows = (await one(`select count(*)::int as n from public.playtest_sessions where run_id = $1`, [topRun?.run_id]))?.n;
   check(
@@ -1792,6 +1829,20 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(eventBoard.length === 2 && eventBoard.every((row) => row.week === week && row.summary?.week === week),
     `the board of ${week} shows ${JSON.stringify(eventBoard.map((row) => row.week))}; expected its two seasons and only those.`);
   check((await boardRows("week = $1", [weekBefore])).length === 1, `the board of ${weekBefore} does not show the one season that began in it.`);
+
+  // The checker's run list covers each board the way the page shows it (보안
+  // 점검 M2): the ordinary board and each named week's, every run on them.
+  if (RECHECK_SEEN) {
+    const listedBoards = (await allowed("list the checker's runs on the ordinary and two week boards", "service_role", rankingRunsSql({ limit: 100, all: true, weeks: [week, weekBefore] })))?.rows ?? [];
+    const onBoard = (board) => listedBoards.filter((row) => row.board === board).length;
+    check(
+      onBoard("") === ordinary.length && onBoard(week) === eventBoard.length && onBoard(weekBefore) === 1 && listedBoards.length === ordinary.length + eventBoard.length + 1,
+      `the checker's run list read ${JSON.stringify(listedBoards.map(({ board, place }) => ({ board, place })))}; expected the ${ordinary.length} ordinary, ${eventBoard.length} of ${week} and 1 of ${weekBefore}.`,
+    );
+    check(listedBoards.filter((row) => row.board === week).map((row) => Number(row.place)).sort().join() === "1,2", "a week's board is not ranked on its own (places 1 and 2).");
+    const onlyOrdinary = (await allowed("list the checker's runs on the ordinary board only", "service_role", rankingRunsSql({ limit: 100, all: true, weeks: [] })))?.rows ?? [];
+    check(onlyOrdinary.length === ordinary.length && onlyOrdinary.every((row) => row.board === ""), "the checker's run list read a week's board it was not asked for.");
+  }
 
   // The hold rate's cut points read the ordinary board only (결정 30): the
   // event seasons carry a hold rate too, and are not counted.
