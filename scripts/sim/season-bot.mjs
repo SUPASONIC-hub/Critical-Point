@@ -9,7 +9,7 @@
  * stream per `createSeasonBot`, in the order it always drew, and the case
  * players draw from nothing but their seeds (`handUnit`).
  */
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE } from "../../src/gauntlet/weeklyRules.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, normalizeWeekRuleId, weekRuleHasDevice } from "../../src/gauntlet/weeklyRules.js";
 import { AUDIT_VALUE_SETS } from "./audit-values.mjs";
 import { carryLinks, getEffectBurn, isLinkDue, LINK_BURN, LINK_CARRY_MAX, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
 import { LINK_VALUE_SETS } from "./cascade-values.mjs";
@@ -250,8 +250,16 @@ export const AUDIT_VALUES = (() => {
  * (`season:<season>:<window>`, what the balance reports were measured on).
  * The server-check tests pass the page's (`run_id:windowIndex:nodeId`,
  * GameRuntime's seedBase), so the seed check (S1) reads them as dealt.
+ * `weekRule` stamps every season that is not a story one with that week's
+ * rule (null: none), as `newGame` does, in place of AUDIT_WEEK and
+ * CASCADE_WEEK; the links are carried when the rule has CASCADE. Left out,
+ * the environment says, as before. The server-check tests pass it to play a
+ * week's run (verify-ranking-weekly.test.mjs).
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}` }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule }) {
+  const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
+  const seasonStamp = (story) => (weekRule === undefined ? weekStamp(story) : !story && stamped ? { weekRule: stamped } : {});
+  const linksOn = weekRule === undefined ? CASCADE_WEEK : weekRuleHasDevice(stamped, "cascade");
   let seed = start;
   function random() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -292,7 +300,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     else score = RESOURCE_KEYS.reduce((sum, key) => sum + (policy.values[key] ?? 0) * worth(key, effect[key] ?? 0), 0);
     // B2: a hand that reads the card's link mark (" · 연결") and keeps clear of
     // it -- unless it reads the chips as well and this card's are worth the board.
-    if (policy.avoidsLinks && CASCADE_WEEK && getEffectBurn(effect) >= LINK_BURN && !(policy.readsChips && hand && worthItsLink(choice, hand))) score -= LINK_AVOID;
+    if (policy.avoidsLinks && linksOn && getEffectBurn(effect) >= LINK_BURN && !(policy.readsChips && hand && worthItsLink(choice, hand))) score -= LINK_AVOID;
     return score + (random() - 0.5) * policy.noise * 4;
   }
 
@@ -512,9 +520,9 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           },
         }];
         resources = resourcesAfter;
-        if (CASCADE_WEEK) linkLog = [...linkLog, linkEntry(nodeId, choice, verdict, gauntletEffect)];
+        if (linksOn) linkLog = [...linkLog, linkEntry(nodeId, choice, verdict, gauntletEffect)];
         // What the closing commit writes (cascadeRisk.js `carryLinksOut`): the links this case hands on.
-        run = caseClosed && CASCADE_WEEK && !run.story ? { ...nextRun, linksOut: closeCaseLinks(links, run, linkLog, linkRun, caseId === "final") } : nextRun;
+        run = caseClosed && linksOn && !run.story ? { ...nextRun, linksOut: closeCaseLinks(links, run, linkLog, linkRun, caseId === "final") } : nextRun;
         if (caseClosed) {
           const summary = {
             ...createCaseSummary(triggers, cognition, log, { resources }),
@@ -551,7 +559,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
   }
 
   function normalizeStart(story = false) {
-    return { ...RUN_INITIAL_STATE, story, ...weekStamp(story) };
+    return { ...RUN_INITIAL_STATE, story, ...seasonStamp(story) };
   }
 
   return { random, pick, reseed, archetypes, makePolicy, scoreCard, playWindow, playSeason, pickByType };
