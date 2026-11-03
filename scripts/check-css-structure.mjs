@@ -322,7 +322,8 @@ const fileBudgets = {
   // -> 58344 bytes, 3002 lines on 2026-11-03, measured: #224 merged with main 465ccb93 (pc-type-scale's
   // --hud-rem over #224's 360px audit place), and beside Audit n/4 the signals keep their labels and bars
   // only (sig-tight: the crosshair and the chain's sentence hidden, three auto columns 4px apart).
-  "play.css": { lines: 3002, bytes: 58344 },
+  // -> 58460 bytes, 3010 lines on 2026-11-03, measured: #316 merged with #224 c55d71e1 (main 465ccb93), the board's marks beside the sig-tight signals.
+  "play.css": { lines: 3010, bytes: 58460 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
