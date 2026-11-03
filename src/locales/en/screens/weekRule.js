@@ -5,6 +5,7 @@ export default {
   boardsLabel: "Choose a ranking",
   ordinaryBoard: "Usual ranking",
   weekBoard: "Rule of the Week · {label}",
+  lastWeekBoard: "Last week’s rule · {label}",
   line: {
     kicker: "Rule of the Week",
     kickerFirst: "Rule of the Week for returning analysts",
