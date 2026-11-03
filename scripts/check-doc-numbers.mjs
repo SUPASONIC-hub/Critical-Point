@@ -63,8 +63,9 @@ const cardsNamingCognition = CASE_PACKS.flatMap((pack) => [...(pack.connectiveSc
 const floors = JSON.parse(read("scripts/coverage-floors.json")).total;
 
 /**
- * `verify-static.mjs` runs its checks when it is imported, so its list is read
- * as text: the names between the brackets, comments aside. Each has to be a
+ * The list in `verify-static.mjs` is read as text (it used to run its checks
+ * when imported, and reading it stays free of that): the names between the
+ * brackets, comments aside. Each has to be a
  * script package.json defines, which is what says the reading found the list.
  */
 function staticChecks() {
