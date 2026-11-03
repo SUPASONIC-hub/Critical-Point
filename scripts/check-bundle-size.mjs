@@ -596,7 +596,9 @@ const budgets = [
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
   // 200,019 / 37,440 -> 200,372 / 37,500 on 2026-11-03, signal-row-fit over main 425eb4da: on 360px or less the English and
   // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_372, maxGzip: 37_500 },
+  // 200,372 / 37,500 -> 200,416 / 37,507 on 2026-11-03, plate-sound-clip over main 36104abd: the scene's sound is centred in its
+  // transform, which the build keeps (it dropped the separate translate property). Measured 200,412 / 37,503 in the build, plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_416, maxGzip: 37_507 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
