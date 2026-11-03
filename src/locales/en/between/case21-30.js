@@ -161,7 +161,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · Saturday, 11 a.m.",
           "title": "Na Junhyuk’s Number Ticket Showed Up on a Secondhand App",
-          "text": "On Saturday morning, Lee Minseo sends a screenshot. On a Gunsan secondhand marketplace app, 'Saebom Credit Union bank-run souvenir stamped number ticket (branch manager’s own handwriting)' has been listed for 3 thousand won. Na Junhyuk studies it for a long time, then says, with real hurt, 'Three stamps for 3 thousand won, that’s a thousand won a stamp.' Kwon Dohyun chimes in, 'Given its scarcity, it’s undervalued,' and Namgoong Sol, just from the sneakers in the photo, works out that the seller is Uncle Jungho’s grandson. In the afternoon the post comes down, and in its place goes up a notice: 'Decided not to sell. Grandpa scolded me.'"
+          "text": "On Saturday morning, Lee Minseo sends a screenshot. On a Gunsan secondhand marketplace app, 'Saebom Credit Union bank-run souvenir stamped number ticket (branch manager’s own handwriting)' has been listed for 3,000 won. Na Junhyuk studies it for a long time, then says, with real hurt, 'Three stamps for 3,000 won, that’s a thousand won a stamp.' Kwon Dohyun chimes in, 'Given its scarcity, it’s undervalued,' and Namgoong Sol, just from the sneakers in the photo, works out that the seller is Uncle Jungho’s grandson. In the afternoon the post comes down, and in its place goes up a notice: 'Decided not to sell. Grandpa scolded me.'"
         }
       },
       "case28": {
