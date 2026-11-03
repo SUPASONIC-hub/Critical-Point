@@ -185,10 +185,13 @@ const BUDGETS = {
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
   // 10 -> 12 on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/result.js) and `fill` for its lines with blanks.
+  // 12 -> 13 on 2026-11-02, plate-story (#392, F): the result screen draws the
+  // case's last room (ScenePlate, variant="result") at the top of the outcome
+  // panel; no other import could go. Measured 340 / 13.
   "src/screens/ResultScreen.jsx": {
     lines: 340,
     longestLine: 280,
-    importedNames: 12,
+    importedNames: 13,
     hooks: {},
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table

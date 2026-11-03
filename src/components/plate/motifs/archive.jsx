@@ -29,7 +29,7 @@ export function paintArchive(random, accent, glow) {
       {halo(vanish, drawerY + 4, 28, glow)}
       {mark(<rect x={vanish - 16} y={drawerY} width="32" height="8" fill={accent} />)}
       {near(<path d="M-4 132 L30 96 H290 L324 132 Z" />)}
-      {people(figure("reader", vanish - 42, 104, 40))}
+      {people(figure("reader", vanish - 42, 104, 40, { player: true }))}
     </>
   );
 }
