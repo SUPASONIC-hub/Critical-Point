@@ -415,7 +415,7 @@ export default {
     },
     "c16_evidence_turn": {
       "title": "The Blank Owner Field",
-      "text": "You set the clue beside the clause number, and the drafting history of the condition precedent opens. The requesting department is not KD Capital but the KD Financial Group Group Strategy Office. The attached memo is one line. 'Labor cost improvement needed before Q1 sale of FlowOn stake.' The owner field is blank. Ban Jaewook closes his notebook. 'They cut the people first to sell the company high. Once again, no one signed.'",
+      "text": "You set the clue beside the clause number, and the drafting history of the condition precedent opens. The requesting department is not KD Capital but the KD Financial Group Group Strategy Office, and the request date is the week after the Innovation Committee launched. The attached memo is one line. 'Labor cost improvement needed before Q1 sale of FlowOn stake.' The owner field is blank. Ban Jaewook closes his notebook. 'They cut the people first to sell the company high. Once again, no one signed.'",
       "memo": [
         "Requesting department: KD Financial Group, Group Strategy Office",
         "Memo: 'Labor cost improvement needed before Q1 stake sale'",
