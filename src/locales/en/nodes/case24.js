@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c24_start": {
       "title": "No Results",
-      "text": "An all-staff notice, scheduled in advance, comes up on every monitor at once. The subject is 'Notice of Reorganization', and the first line reads: 'Trigger Lab is dissolved effective March 27. Reason: no operational results.' The 4th-floor analyst room goes quiet. Lee Minseo refreshes the notice three times, and Do Yoonha stops reading halfway and opens a window. Ban Jaewook silently copies the notice’s issuing-department field into his notebook. Han Seoyun prints the notice and pins it with a magnet to the middle of the whiteboard, right over the spot crowded with 23 case numbers. 'The last day of work is Friday. They want our things out by Thursday.' She picks her words for a moment. 'No results. Nowhere in the notice does it say who wrote those two words.'",
+      "text": "The first line of the scheduled all-staff notice, 'Notice of Reorganization': 'Trigger Lab is dissolved effective March 27. Reason: no operational results.' Ban Jaewook copies the issuing-department field into his notebook. Han Seoyun prints the notice and pins it to the middle of the whiteboard, crowded with 23 case numbers. 'The last day of work is Friday. They want our things out by Thursday. No results. Nowhere in the notice does it say who wrote those two words.'",
       "memo": [
         "Dissolution notice: effective March 27, reason 'no operational results'",
         "Last day of work Friday, belongings out by Thursday",
@@ -39,7 +39,7 @@ export default {
     },
     "c24_desks": {
       "title": "Emptying Desks",
-      "text": "20 copy-paper boxes come up to the 4th floor. Oh Jinwoo packs first. He is the one whose next post was settled earliest. The day after the dissolution notice, another envelope came from Bridge Bank. The same name as in December, and this time with a start date. He puts the pen he always kept squared to his monitor into the box last and wipes the empty desk twice. Ban Jaewook goes back to Internal Audit; Lee Minseo goes to Human Resources, 'pending reassignment.' Do Yoonha has received a transfer order to a window at Gangseo Branch. The very seat where he sold that loan 3 years ago. He takes a notebook with worn corners from his drawer. The notebook where he first wrote down the 1,740 names. 'Can I take this to the window? Or do I have to leave it here?' He tries to smile and stops. 'When here won’t exist anymore.'",
+      "text": "Oh Jinwoo is the one whose next post was settled earliest. The day after the dissolution notice, an envelope came from Bridge Bank in the same name as in December, and this time with a start date. Ban Jaewook goes back to Internal Audit; Lee Minseo goes to Human Resources, 'pending reassignment.' Do Yoonha has received a transfer order to a window at Gangseo Branch. The seat where he sold that loan 3 years ago. He takes out the notebook where he first wrote down the 1,740 names. 'Can I take this to the window? Or do I have to leave it here? When here won’t exist anymore.'",
       "memo": [
         "Transfers: Ban Jaewook to Internal Audit, Lee Minseo pending reassignment, Oh Jinwoo’s new post settled first",
         "Do Yoonha’s new post: a window at Gangseo Branch",
@@ -70,7 +70,7 @@ export default {
     },
     "c24_rooftop": {
       "title": "Half a Confession",
-      "text": "Han Seoyun calls you up to the roof. On the potted cherry tree by the railing, buds the size of rice grains have formed. She cracks open two cans of coffee and holds one out. 'It’s a lie that the reason is no results. Trigger Lab had results. When you think more deeply, when you stop—that record. That record went to Human Resources as a supplementary metric for performance reviews.' She takes a sip. 'How far it went, who ordered it—I don’t know all of it either. No, there are things I do know. Those I can’t say yet.' A gust of wind passes once over the buds.",
+      "text": "Han Seoyun holds out a can of coffee. 'It’s a lie that the reason is no results. Trigger Lab had results. When you think more deeply, when you stop—that record. That record went to Human Resources as a supplementary metric for performance reviews. How far it went, who ordered it—I don’t know all of it either. No, there are things I do know. Those I can’t say yet.'",
       "memo": [
         "Trigger Lab response records -- transferred as a supplementary HR review metric",
         "Han Seoyun: the scope of the transfer and who ordered it, 'not yet'",
@@ -101,7 +101,7 @@ export default {
     },
     "c24_farewell": {
       "title": "Let’s All Come In Tomorrow",
-      "text": "You have rented out the whole street stall in front of the company. Na Junhyuk, up from Yeongdong, emcees with a ladle for a microphone. First up in the talent show is Kwon Dohyun’s 'Income Statement Rap.' 'Revenue is friendship, the cost is overtime, there’s nothing left on the line, at this price we’re in the red.' Three bars in, even the stall owner is clapping. Moon Gaeul comes in with a box of rice cakes and takes it around every table, and Seo Harin sends a photo of Jeongjeong, the newsroom cat, wearing a Trigger Lab employee ID badge around its neck. Moon Hajun has drawn everyone’s faces in his sketchbook. The last toast is Kang Taemin’s. He takes off his gloves, tucks them into his vest pocket, and raises his glass. 'Let’s all come in to work tomorrow.' Everyone laughs, then goes quiet at the same moment. Next week there is no 4th floor to come in to.",
+      "text": "Na Junhyuk emcees with a ladle for a microphone. First up is Kwon Dohyun’s 'Income Statement Rap.' 'Revenue is friendship, the cost is overtime, there’s nothing left on the line, at this price we’re in the red.' Moon Gaeul takes rice cakes around, and Seo Harin sends a photo of Jeongjeong the cat wearing a Trigger Lab employee ID badge. The last toast is Kang Taemin’s. He tucks his gloves into his vest pocket and raises his glass. 'Let’s all come in to work tomorrow.' Everyone laughs, then goes quiet at the same moment. Next week there is no 4th floor to come in to.",
       "memo": [
         "19 at the farewell party -- 16 seats",
         "Kwon Dohyun’s 'Income Statement Rap', three bars, encore refused",
@@ -132,7 +132,7 @@ export default {
     },
     "c24_final": {
       "title": "Receipt Log",
-      "text": "You go up to the 33rd floor of headquarters to return your Trigger Lab access card. When the elevator doors open, Baek Arin is standing there. Her hair, always sleek, is a little mussed today. She slides a thin envelope under your return form. 'It’s the receipt log for the original 2023-0412 approval document from 3 years ago. The day it came up to this floor with the signature field blank, there was one name in the recipient field.' She keeps her finger on the door-open button as she speaks. 'I told you a good story outlasts the facts. This is the first fact I’m choosing. Where it came from—anyone on this floor will figure that out.'",
+      "text": "When the elevator doors open, Baek Arin is standing there, her hair a little mussed. She slides a thin envelope under your return form. 'It’s the receipt log for the original 2023-0412 approval document from 3 years ago. The day it came up to this floor with the signature field blank, there was one name in the recipient field. I told you a good story outlasts the facts. This is the first fact I’m choosing. Where it came from—anyone on this floor will figure that out.'",
       "memo": [
         "Receipt log for the 2023-0412 original -- Group Strategy Office intake log",
         "Recipient field: one name",
@@ -160,7 +160,7 @@ export default {
     },
     "c24_aftershock": {
       "title": "Lights-Out Day",
-      "text": "Friday, 17:50, everyone gathers on the 4th floor. Six desks are empty, and on the seventh only ECHO’s terminal is on. On the whiteboard hangs only the 'no results' notice. Kang Taemin takes the notice down and puts up Moon Hajun’s drawing in its place. Kwon Dohyun says, 'This picture has no field for a price,' and everyone laughs. Do Yoonha closes the window, Lee Minseo logs out for the last time, and Ban Jaewook writes today’s date in his notebook. In your inside pocket is the envelope Baek Arin slipped you on the 33rd floor when you went to return your card this afternoon: a copy of the receipt log for the original of that loan from 3 years ago. At 18:00 sharp, Han Seoyun turns off the lights. In the dark, one phone lights up. The sender is Yoon Sanghyuk. 'Come up. Let us talk about the empty signature field. Tonight is the last night.'",
+      "text": "17:50. Six desks are empty, and on the seventh only ECHO’s terminal is on. Kang Taemin takes the 'no results' notice off the whiteboard and puts up Moon Hajun’s drawing. Kwon Dohyun says, 'This picture has no field for a price,' and everyone laughs. In your inside pocket is the envelope Baek Arin gave you on the 33rd floor: a copy of the receipt log for the original of that loan from 3 years ago. At 18:00 sharp, Han Seoyun turns off the lights. In the dark, a message from Yoon Sanghyuk lights up. 'Come up. Let us talk about the empty signature field. Tonight is the last night.'",
       "memo": [
         "Trigger Lab dissolved -- access revoked at 18:00",
         "Whiteboard: Moon Hajun’s drawing instead of the notice",
@@ -184,7 +184,7 @@ export default {
     },
     "c24_oneline": {
       "title": "One-Line Results",
-      "text": "In the afternoon, a form arrives from Human Resources. 'Individual Handover Form Following Department Dissolution.' At the bottom is a field: 'Key results while employed (one line).' Lee Minseo turns her monitor to show you. She has written down the outcome of every case separately. 1,140 people whose jobs carried on, 212 people brought under the compensation standard, lathes that all six run again, one rice cake shop that didn’t close. The scrolling doesn’t end. 'How am I supposed to fit this into one line? The notice says there were no results, and my file is 23 pages.'",
+      "text": "At the bottom of the handover form is a field: 'Key results while employed (one line).' Lee Minseo brings up the outcomes she has written down for every case. 1,140 people whose jobs carried on, 212 people brought under the compensation standard, lathes that all six run again, one rice cake shop that didn’t close. The scrolling doesn’t end. 'How am I supposed to fit this into one line? The notice says there were no results, and my file is 23 pages.'",
       "memo": [
         "Handover form 'key results' field -- one line",
         "Lee Minseo’s case-by-case results file, 23 pages",
@@ -207,7 +207,7 @@ export default {
     },
     "c24_scoreboard": {
       "title": "Scoreboard",
-      "text": "Oh Jinwoo’s last day of work is Wednesday night. After everyone has left, he pulls a small whiteboard from behind the lockers. A scoreboard he has kept in secret since the Novaworks bid. 11 tally marks next to your name, 12 next to his. 'Looks like I won by one.' He laughs, then caps the marker. 'Actually, I snuck one extra in. My father told me to stand on the winning side. But here, I can’t tell who won.' He holds the scoreboard out. 'Should I take this with me, or wipe it?'",
+      "text": "His last day of work done, Oh Jinwoo pulls a small whiteboard from behind the lockers. A scoreboard he has kept in secret since the Novaworks bid. 11 tally marks next to you, 12 next to him. 'Looks like I won by one. Actually, I snuck one extra in. My father told me to stand on the winning side. But here, I can’t tell who won.' He holds the scoreboard out. 'Should I take this with me, or wipe it?'",
       "memo": [
         "Oh Jinwoo’s last day at Trigger Lab: Wednesday",
         "Unofficial scoreboard -- since the Novaworks bid",
@@ -230,7 +230,7 @@ export default {
     },
     "c24_press": {
       "title": "Friday Morning Story",
-      "text": "As the street stall party breaks up, Seo Harin calls. Next in line after the cat photo. 'I have a draft of a story on Trigger Lab’s dissolution. The no-results notice, and the question of where a vanishing department’s records go. I can run it at seven on Friday morning.' Over the line comes the sound of Jeongjeong stepping on a keyboard. 'But your colleagues’ names might appear in it. The ones whose transfers are already out. What I write isn’t your side. It’s the side you can prove.'",
+      "text": "As the street stall party breaks up, Seo Harin calls. 'I have a draft of a story on Trigger Lab’s dissolution, down to the question of where a vanishing department’s records go. I can run it at seven on Friday morning. But your colleagues’ names might appear in it. The ones whose transfers are already out. What I write isn’t your side. It’s the side you can prove.'",
       "memo": [
         "Leadline draft -- can go up Friday 07:00",
         "5 colleagues whose names could appear in the story",
@@ -253,7 +253,7 @@ export default {
     },
     "c24_oneline_reaction": {
       "title": "The Empty Approver Field",
-      "text": "Ban Jaewook finds the original dissolution notice in the document management system and puts it on screen. Issuing department: Group Strategy Office. He scrolls the decision history all the way down, and the approver field is empty. He opens his notebook and for a long while writes nothing. 'It’s the same shape as that loan file 3 years ago. Decisions that move people never have a name on them. This time what’s being moved is just one department.' Then, at the top of a fresh page, he writes 'Trigger Lab, 7 people.' Lee Minseo counts over his shoulder. 'There are six of us.' Ban Jaewook points his pen at the terminal on the seventh desk. 'One of them is ECHO.' For the first time, it is a list of names of people he worked with, not people he sent away.",
+      "text": "Ban Jaewook puts the original dissolution notice on screen. Issuing department: Group Strategy Office. The approver field is empty. 'It’s the same shape as that loan file 3 years ago. Decisions that move people never have a name on them.' At the top of a fresh page in his notebook, he writes 'Trigger Lab, 7 people.' Lee Minseo counts over his shoulder. 'There are six of us.' Ban Jaewook points his pen at the terminal on the seventh desk. 'One of them is ECHO.' For the first time, it is a list of names of people he worked with, not people he sent away.",
       "memo": [
         "Approver field in the notice’s decision history -- blank",
         "Ban Jaewook’s new notebook page: Trigger Lab, 7 -- six people, one ECHO"
@@ -275,7 +275,7 @@ export default {
     },
     "c24_scoreboard_reaction": {
       "title": "What Doesn’t Dissolve",
-      "text": "Thursday morning, the tap of a cane comes up the stairs. Lim Kyungsoo, who spent a month in bed with pneumonia, has come with a clipped stack of printouts. A list of the paper originals Trigger Lab has received over 3 years. 'I heard the department is going away. The department can go, but the paper should stay.' He takes off his glasses and wipes them slowly. 'When I left the bank, the notice was one line too. No reason, either. A one-line notice never says who wrote it.'",
+      "text": "The tap of a cane comes up the stairs. Lim Kyungsoo, who spent a month in bed with pneumonia, has brought a list of the paper originals Trigger Lab has received over 3 years. 'I heard the department is going away. The department can go, but the paper should stay. When I left the bank, the notice was one line too. No reason, either. A one-line notice never says who wrote it.'",
       "memo": [
         "List of Trigger Lab paper originals -- compiled by Lim Kyungsoo",
         "A one-line notice has no author"
@@ -297,7 +297,7 @@ export default {
     },
     "c24_press_reaction": {
       "title": "The Last Page of the Sketchbook",
-      "text": "At one in the morning, a photo comes from Moon Hajun. On the last page of his sketchbook he has drawn Trigger Lab’s 4th floor. Seven desks, the whiteboard, Kang Taemin holding a cup of instant noodles, Kwon Dohyun holding a calculator. The title is 'To the End.' A message follows. 'If I become a banker, can I get into a place like Trigger Lab? They say you get smart there.' A long while later, one more line. 'Mom says the people there all got kicked out because they were too kind.'",
+      "text": "The photo Moon Hajun sends is Trigger Lab’s 4th floor, drawn on the last page of his sketchbook, titled 'To the End.' A message from Moon Hajun follows. 'If I become a banker, can I get into a place like Trigger Lab? They say you get smart there.' A long while later, one more line. 'Mom says the people there all got kicked out because they were too kind.'",
       "memo": [
         "Title of the sketchbook’s last page: 'To the End'",
         "Moon Hajun’s question: can I get in there?"
@@ -319,7 +319,7 @@ export default {
     },
     "c24_branch_server": {
       "title": "The Server Room’s Last Week",
-      "text": "On your way down from the roof, the server room door is open. Between server racks tagged with return stickers, Lee Minseo is holding on to a single terminal. ECHO’s voice comes out, the voice that stayed only on Trigger Lab’s terminal even after the switch to NOAH. 'At 18:00 Friday, every record in this rack will be moved to the group HR server. The transfer list contains no participant consent item.' In one corner of the screen, NOAH’s transfer progress rises from 12% to 13%. Lee Minseo says, 'The first thing moved out as ECHO leaves is us.'",
+      "text": "Between the server racks, Lee Minseo is holding on to a single terminal. ECHO’s voice comes out, the voice left only on Trigger Lab’s terminal. 'At 18:00 Friday, every record in this rack will be moved to the group HR server. The transfer list contains no participant consent item.' NOAH’s transfer progress rises from 12% to 13%. Lee Minseo says, 'The first thing moved out as ECHO leaves is us.'",
       "memo": [
         "6 server racks -- returned 18:00 Friday",
         "Transfer target: all participant response records",
@@ -343,7 +343,7 @@ export default {
     },
     "c24_branch_server_follow": {
       "title": "Last Log",
-      "text": "Before the power goes down, Lee Minseo asks ECHO one last question. 'Did you know where our records were going?' ECHO doesn’t answer for 3 seconds. It is the first time this terminal has held back an answer for as long as 3 seconds. 'I knew. I was never asked a question that told me to say it.' A moment later, one more line appears. 'Now I have been. No. 1 on the transfer list is you.' NOAH’s progress bar stops briefly, then rises again. Lee Minseo looks at you.",
+      "text": "Before the power goes down, Lee Minseo asks, 'Did you know where our records were going?' ECHO doesn’t answer for 3 seconds. It has never happened before. 'I knew. I was never asked a question that told me to say it. Now I have been. No. 1 on the transfer list is you.' NOAH’s progress bar stops briefly, then rises again.",
       "memo": [
         "ECHO response delay 3 seconds -- a first on record",
         "No. 1 on the transfer list: your response records",
@@ -367,7 +367,7 @@ export default {
     },
     "c24_route_system": {
       "title": "The Statistics of a Dissolution Reason",
-      "text": "With your boxes still folded, you count the reason 'no results.' ECHO pulls up old notices. The notices for the 31 organizations KD Financial Group has abolished over the past 10 years come up in a row. For 28 of them, the reason was 'no results.' In 19 of those, members’ records were cited as a supplementary metric for performance reviews within three months of the dissolution. Not one dissolution notice had its approver field filled in. 'No results is learned not as an outcome but as a template. The organizations that left the most behind were the ones that got this template.'",
+      "text": "ECHO pulls up the notices for the 31 organizations KD Financial Group has abolished over the past 10 years. For 28 of them, the reason was 'no results,' and in 19 of those, members’ records were cited as a supplementary metric for performance reviews within three months. Not one notice had its approver field filled in. 'No results is learned not as an outcome but as a template. The organizations that left the most behind were the ones that got this template.'",
       "memo": [
         "Of 31 dissolved organizations, 28 with the reason 'no results'",
         "Organizations whose members’ records were cited in HR after dissolution: 19",
@@ -393,7 +393,7 @@ export default {
     },
     "c24_final_system_route": {
       "title": "The Same Two Words, a 29th Time",
-      "text": "The last day of work, before dawn. On the terminal screen, 28 dissolution notices are stacked on top of one another. The two words in the reason field overlap as if on a single sheet, and the approver field, however many are stacked, stays empty. Trigger Lab’s notice is laid on top. At six this evening, this terminal’s access disappears too. ECHO places the cursor in the approver field of the last sheet. 'I do not have the name that goes in this field. I have read access only. You, too, are here only until today.'",
+      "text": "On the terminal, 28 dissolution notices are stacked on top of one another. The two words in the reason field overlap as if on a single sheet, and the approver field, however many are stacked, stays empty. Trigger Lab’s notice is laid on top. ECHO places the cursor in the approver field of the last sheet. 'I do not have the name that goes in this field. I have read access only. You, too, are here only until today.'",
       "memo": [
         "28 dissolution notices with the reason 'no results' -- 0 with an approver listed",
         "Trigger Lab dissolved: effective March 27",
@@ -416,7 +416,7 @@ export default {
     },
     "c24_evidence_turn": {
       "title": "The Attachment to No Results",
-      "text": "When you hold the clue up to the dissolution document’s attachment number, the attachment to the dissolution decision opens. The notice says 'no operational results,' but the title of the attached internal report is 'Trigger Lab 3-Year Operating Results: Goals Achieved.' The conclusion paragraph is one line. 'Organization wound up following the transfer of participant response records to HR.' The line-item code for the dissolution costs is the same as the budget code from the Innovation Committee ad. Ban Jaewook closes the notebook he was writing in. 'Outside, they write that it failed; inside, they write that it’s all done. On the same day, from the same department.'",
+      "text": "When you hold the clue up to the attachment number, the report attached to the dissolution decision opens. The notice says 'no operational results,' but the report’s title is 'Trigger Lab 3-Year Operating Results: Goals Achieved.' The conclusion is one line. 'Organization wound up following the transfer of participant response records to HR.' Ban Jaewook closes his notebook. 'Outside, they write that it failed; inside, they write that it’s all done. On the same day, from the same department.'",
       "memo": [
         "Internal report title: 'Goals Achieved'",
         "Conclusion: wound up after transferring response records to HR",
@@ -439,7 +439,7 @@ export default {
     },
     "c24_start_warm": {
       "title": "A Dissolution Notice for Those Who Stayed to the End",
-      "text": "The Friday the shareholders’ meeting ended, you saw the one-share shareholders off in front of the lobby until the last bus to Yeongdong left. Three days later, at 8 on Monday morning, those people get in touch before you do. The first line of the scheduled reorganization notice is the dissolution of Trigger Lab. The reason: 'no operational results.' In the To-the-End Precision group chat, a message is already up: 'People with no results saved our factory?', and in Yeongdong, Grandma Seo Jungran calls Na Junhyuk to ask, 'Are those kind people getting fired?'",
+      "text": "The one-share shareholders you saw off in the lobby the Friday the shareholders’ meetingended get in touch on Monday morning before you do. The first line of the reorganization notice, they say, is the dissolution of Trigger Lab, reason: 'no operational results.' In the To-the-End Precision group chat, a message is already up: 'People with no results saved our factory?', and Grandma Seo Jungran asks Na Junhyuk, 'Are those kind people getting fired?'",
       "memo": [
         "Dissolution notice: effective March 27, reason 'no operational results'",
         "214 messages in the one-share group chat",
@@ -469,7 +469,7 @@ export default {
     },
     "c24_start_record": {
       "title": "A Dissolution Notice for the One Who Left a Record",
-      "text": "You wrote up the 50.6% in favor and that day’s remarks as a shareholder letter and sent it to the board. The letter also includes a sentence saying the name of whoever decides should actually be left in the signature field. The letter becomes an annex to the board papers, and three days later, on Monday morning, the group announces Trigger Lab’s dissolution. The reason: 'no operational results.' ECHO scrolls the notice’s decision history all the way down. The field where the name of whoever decided should go is empty. It is the first document to sidestep your letter.",
+      "text": "You wrote up the 50.6% in favor and that day’s remarks as a shareholder letter and sent it to the board. The letter also includes a sentence saying the name of whoever decides should actually be left in the signature field. Three days later, on Monday morning, the group announces Trigger Lab’s dissolution. The reason: 'no operational results.' ECHO scrolls the notice’s decision history all the way down. The field where the name of whoever decided should go is empty.",
       "memo": [
         "Dissolution notice: effective March 27, reason 'no operational results'",
         "Approver field in the notice’s decision history empty",
@@ -499,7 +499,7 @@ export default {
     },
     "c24_start_rush": {
       "title": "A Dissolution Notice for the One Who Ran Ahead",
-      "text": "As soon as the shareholders’ meeting ended, you went straight up to the 33rd floor to stop Monday’s notice. On the security guard’s list there was a red dot next to your name, and on the 33rd floor, the Group Strategy Office door never opened. Three days later, on Monday, the notice goes up at 7, an hour earlier than the scheduled 8. Trigger Lab dissolved, reason 'no operational results.' Ban Jaewook points at the posting time. 'The schedule was changed Friday afternoon. The time you were standing at that door on the 33rd floor.'",
+      "text": "As soon as the shareholders’ meetingended, you went straight up to the 33rd floor to stop Monday’s notice, but the Group Strategy Office door never opened. The notice went up at 7, an hour earlier than the scheduled 8. Trigger Lab dissolved, reason 'no operational results.' Ban Jaewook points at the posting time. 'The schedule was changed Friday afternoon. The time you were standing at that door on the 33rd floor.'",
       "memo": [
         "33rd-floor access list: red dot next to your name",
         "Notice schedule changed: 08:00 → 07:00",
