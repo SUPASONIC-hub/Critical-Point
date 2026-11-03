@@ -498,7 +498,7 @@ export default {
     },
     "c21_start_rush": {
       "title": "The Name Found by the One Who Opened the List First",
-      "text": "On the morning NOAH came on, as soon as you read Ryu Seah’s email, you left the half-cleared server room and downloaded NOAH’s training data list. The oldest line: 'TL Cohort 1 · Participant 01 · 2022 · No consent form.' Sunwoo Jin, Gujwa, Jeju. Three days later Ban Jaewook adds, 'Legal sent this person a retroactive consent form. They hurried because they saw us open the list.' When you look up, no one is left on the 4th floor.",
+      "text": "On the morning NOAH came on, as soon as you read Ryu Seah’s email, you left the half-cleared server room and downloaded NOAH’s training data list. Kang Taemin cleared the server room alone. The oldest line: 'TL Cohort 1 · Participant 01 · 2022 · No consent form.' Sunwoo Jin, Gujwa, Jeju. Three days later Ban Jaewook adds, 'Legal sent this person a retroactive consent form. They hurried because they saw us open the list.' When you look up, no one is left on the 4th floor.",
       "memo": [
         "Downloaded the whole list the morning NOAH came on",
         "Participant 01 Sunwoo Jin -- no consent form",

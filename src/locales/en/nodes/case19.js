@@ -159,7 +159,7 @@ export default {
     },
     "c19_aftershock": {
       "title": "The Weight of Paper",
-      "text": "The evening the demolition ends, eight people squeeze into the hospital room. A text comes from Koo Taehyung. '2nd floor checked. Nothing left. Could I have one of the label drawings your granddaughter put on the boxes?' Lim Soyul holds out her tablet. Next week’s installment, “The Weight of Paper”; the first panel is her grandfather sitting on the stair landing. Lim Kyungsoo puts on his glasses. 'Is my nose really this big?' Then ECHO’s alert comes up on everyone’s phone. 'Notice on replacing the loan judgment verification system: to be announced next Monday at 09:00.'",
+      "text": "The evening the demolition ends, eight people squeeze into the hospital room. Kwon Dohyun, reporting that the final shipping cost came in 380,000 won under the estimate, laughs for the first time. A text comes from Koo Taehyung. '2nd floor checked. Nothing left. Could I have one of the label drawings your granddaughter put on the boxes?' Lim Soyul holds out her tablet. Next week’s installment, “The Weight of Paper”; the first panel is her grandfather sitting on the stair landing. Lim Kyungsoo puts on his glasses. 'Is my nose really this big?' Then ECHO’s alert comes up on everyone’s phone. 'Notice on replacing the loan judgment verification system: to be announced next Monday at 09:00.'",
       "memo": [
         "2nd floor checked -- all 312 boxes of originals out",
         "Lim Kyungsoo: oxygen stopped",
