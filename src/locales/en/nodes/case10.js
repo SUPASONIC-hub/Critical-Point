@@ -501,7 +501,7 @@ export default {
     },
     "c10_start_return": {
       "title": "Ten Days of the One Who Went Back Quietly",
-      "text": "You finished your cup noodles and went back to Yeongdong Branch. The news that Do Yoonha had been rushed to the emergency room reached you a day late. News that travels 240km always arrives a beat late. ECHO reports. 'The list file from his locker is not an official record. It will be purged automatically in four days.'",
+      "text": "You finished your cup noodles and went back to Yeongdong Branch. The news that Do Yoonha had been rushed to the emergency room reached you a day late. News that travels 240km always arrives a beat late. This time the beat was the distance to the emergency room. ECHO reports. 'The list file from his locker is not an official record. It will be purged automatically in four days.'",
       "memo": [
         "Day 9 back at Yeongdong Branch",
         "News of Do Yoonha’s emergency transfer reached you a day late",

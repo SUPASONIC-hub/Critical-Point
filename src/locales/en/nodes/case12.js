@@ -296,7 +296,7 @@ export default {
     },
     "c12_letter_reaction": {
       "title": "The Month After",
-      "text": "Han Seoyun gets a photo of the letter and calls late at night. 'The date on the letter. It’s the month after I returned your dissent. He only heard there was a dissent, not that it was returned.' A long silence. 'Could I come to the mediation committee with you? I want to tell his family my name there.'",
+      "text": "Han Seoyun gets a photo of the letter and calls late at night, the clipped, report-like endings of her sentences loosened. 'The date on the letter. It’s the month after I returned your dissent. He only heard there was a dissent, not that it was returned.' A long silence. 'Could I come to the mediation committee with you? I want to tell his family my name there.'",
       "memo": [
         "A letter written the month after the return",
         "A name to say in front of the family"
