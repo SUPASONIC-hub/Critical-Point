@@ -101,7 +101,7 @@ export default {
     },
     "c13_lab": {
       "title": "The Real Script",
-      "text": "Lee Minseo plays a 1-minute 'real script' your colleagues shot on their phones. Do Yoonha says, 'The 212 with no paperwork are still waiting.' Ban Jaewook opens his notebook. '47 names written. 0 names settled.' Na Junhyuk presses down a newly carved seal. 'Unsettled.' Kang Taemin has one line. 'It’s not over.' Oh Jinwoo’s five blown takes went in after the end credits. The last shot is everyone’s voice. 'The past is not settled. That is why we are here.' Lee Minseo asks, 'Where are you going to use this?'",
+      "text": "Lee Minseo plays a 1-minute 'real script' your colleagues shot on their phones. Do Yoonha says, 'The 212 with no paperwork are still waiting.' Ban Jaewook opens his notebook. '47 names written. 0 names settled.' Kwon Dohyun holds up his calculator. 'A production budget of 1.1 billion won would cover their share. It’s a loss.' Na Junhyuk presses down a newly carved seal. 'Unsettled.' Kang Taemin has one line. 'It’s not over.' Oh Jinwoo’s five blown takes went in after the end credits. The last shot is everyone’s voice. 'The past is not settled. That is why we are here.' Lee Minseo asks, 'Where are you going to use this?'",
       "memo": [
         "'Real script' video 1 minute 04 seconds -- shot on 7 phones",
         "Na Junhyuk’s new seal: 'Unsettled'",
