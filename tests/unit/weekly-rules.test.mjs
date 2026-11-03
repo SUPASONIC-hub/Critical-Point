@@ -21,6 +21,7 @@ const {
   WEEK_RULE_CATALOGUE,
   WEEK_RULE_DEVICES,
   WEEK_RULE_ID_MAX,
+  weekBoardsAt,
   weekRuleAt,
   weekRuleHasDevice,
   weekRuleOverlay,
@@ -497,4 +498,32 @@ test("10-22 to 11-01 (W43, W44): no rule this week and no notice of the next, un
     assert.equal(pickSeasonWeekRule(at), null, new Date(at).toISOString());
   }
   assert.equal(weeklyRuleLine(weekStartMs("2026-W45")).tone, "next", "W45's Monday: W46's notice");
+});
+
+test("the ranking keeps last week's board for the week after it: W47 on 11-23, beside W48's, gone when W49 ends", () => {
+  const boards = (at) => weekBoardsAt(at).map((item) => `${item.week}:${item.rule}${item.last ? ":last" : ""}`);
+  // 11-22 23:59 KST, the test week's last minute: its own board, then W46's as last week's.
+  const sunday = kst("2026-11-22T23:59:00");
+  assert.deepEqual(boards(sunday), ["2026-W47:audit-cascade", "2026-W46:near-wall:last"]);
+  // 11-23 00:00 KST: W48's rule first, and W47's board stays, named as last week's.
+  const monday = kst("2026-11-23T00:00:00");
+  assert.equal(monday, weekStartMs("2026-W48"));
+  assert.deepEqual(boards(monday), ["2026-W48:heavy-fracture", "2026-W47:audit-cascade:last"]);
+  // W49 has no rule: last week's board alone. W50 starts its own, and W48's goes.
+  assert.deepEqual(boards(weekStartMs("2026-W49")), ["2026-W48:heavy-fracture:last"]);
+  assert.equal(weekHasNews(weekStartMs("2026-W49"), undefined, -7), true);
+  assert.deepEqual(boards(weekStartMs("2026-W50") - 1), ["2026-W48:heavy-fracture:last"], "W49's last minute");
+  assert.deepEqual(boards(weekStartMs("2026-W50")), ["2026-W50:short-clock"], "the next rule week: W49 had no rule, so no last week's board");
+  // After the calendar's last rule week, one week of its board, then nothing.
+  const lastWeek = WEEKLY_RULES.at(-1).week;
+  const after = weekStartMs(lastWeek) + 7 * DAY;
+  assert.equal(weekHasNews(after), false, "the start screen has nothing to say");
+  assert.equal(weekHasNews(after, undefined, -7), true, "the ranking still has the board");
+  assert.deepEqual(boards(after), [`${lastWeek}:${WEEKLY_RULES.at(-1).id}:last`]);
+  assert.equal(weekHasNews(after + 7 * DAY, undefined, -7), false);
+  assert.deepEqual(weekBoardsAt(after + 7 * DAY), []);
+  // Never in a test build, and an ordinary week before the calendar has none.
+  assert.equal(weekHasNews(Date.parse(E2E_WEEKLY_RULE_CLOCK), undefined, -7), false);
+  assert.deepEqual(weekBoardsAt(kst("2026-10-28T12:00:00")), []);
+  assert.deepEqual(weekBoardsAt(Number.NaN), []);
 });

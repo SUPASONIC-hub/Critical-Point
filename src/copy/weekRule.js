@@ -14,6 +14,7 @@ const weekRuleCopy = {
   boardsLabel: "순위 고르기",
   ordinaryBoard: "평소 순위",
   weekBoard: "이번 주의 규칙 · {label}",
+  lastWeekBoard: "지난주의 규칙 · {label}",
   line: {
     kicker: "이번 주의 규칙",
     kickerFirst: "돌아온 분석관을 위한 이번 주의 규칙",
