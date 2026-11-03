@@ -160,7 +160,7 @@ export default {
     },
     "c29_aftershock": {
       "title": "Revenge at Level 4",
-      "text": "Thursday, 9 p.m., the hawker center (an open-air court of cheap food stalls) again. At the same stall, Oh Jinwoo goes for Level 4 this time. 'Level 5 isn’t for human consumption. This is a strategic retreat.' Seo Harin looks at her phone and bows her head. Ha Yoonho, the source fired 7 years ago after handing over documents for her story, has answered the text she sent that afternoon, her first in 7 years. 'Reporter, you finally replied. I’ve got two trucks these days.' Around midnight, in the six-person group chat that has been quiet for nearly a month, 'Lee Minseo is typing' appears and disappears. It’s the third time already.",
+      "text": "Thursday, 9 p.m., the hawker center (an open-air court of cheap food stalls) again. At the same stall, Oh Jinwoo goes for Level 4 this time. 'Level 5 isn’t for human consumption. This is a strategic retreat.' Seo Harin looks at her phone and bows her head. Ha Yoonho, the source fired 7 years ago after handing over documents for her story, has answered the text she sent that afternoon, her first in 7 years. 'Reporter, you finally replied. I’ve got two trucks these days.' Seo Harin laughs, then wipes her eyes, and Oh Jinwoo pretends he’s crying from the spice and cries along. Around midnight, in the six-person group chat that has been quiet for nearly a month, 'Lee Minseo is typing' appears and disappears. It’s the third time already.",
       "memo": [
         "Oh Jinwoo’s chili crab rematch: Level 4, finished",
         "Ha Yoonho’s first reply in 7 years: 'I’ve got two trucks these days'",
