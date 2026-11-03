@@ -1070,14 +1070,17 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_701, maxGzip: 60_151 },
+  // 153,344 / 51,954 -> 153,428 / 51,988 on 2026-10-30, web-adsense-prep over main 430dda1e: the ad box's two lines (adSlot). Measured 153,424 / 51,984, the plus 4.
+  // 179,701 / 60,151 -> 179,785 / 60,185 on 2026-11-03, web-adsense-prep over main 16b6d349 (#392): the ad box's two lines (adSlot) over locale-gaps and money-feedback. Measured 179,781 / 60,181 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_785, maxGzip: 60_185 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_778, maxGzip: 53_469 },
+  // 149,778 / 53,469 -> 149,860 / 53,502 on 2026-11-03, web-adsense-prep over main 16b6d349 (#392): the ad box's two lines (adSlot) over locale-gaps and money-feedback. Measured 149,856 / 53,498 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_860, maxGzip: 53_502 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1198,12 +1201,17 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * money-feedback over main acf3d999: 425,946, 482,846 and 489,528, the plus 4.
  * The PC type scale (pc-type-scale, over main b5abd681; the index CSS and the
  * critical CSS carry the 112.5% root from 1025px, 16px kept on the start screen): 426,130, 483,029 and 489,711, the plus 4.
+ * The ad box's two lines in each dictionary (web-adsense-prep over main
+ * 78e53e40, src/copy/adSlot.js; the box itself stays out of an ads-off build):
+ * 423,174 (under its line), 472,703 and 478,500.
  */
 // 425,560 / 482,420 / 489,093 -> 425,751 / 482,612 / 489,285 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 425,747 / 482,608 / 489,281 the plus 4.
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_761, en: 483_722, ja: 490_404 };
+// 426,755 / 483,654 / 490,336 -> 426,755 / 483,686 / 490,369 on 2026-11-03, web-adsense-prep over main 16b6d349 (#392): the ad box's two lines in each dictionary. Measured under / 483,682 / 490,365, the plus 4.
+// 426,761 / 483,722 / 490,404 -> 426,761 / 483,752 / 490,441 on 2026-11-03, web-adsense-prep over main bb492d5d (#398 #395 #407): the ad box's two lines in each dictionary. Measured under / 483,748 / 490,437, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_761, en: 483_752, ja: 490_441 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1408,7 +1416,7 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
 }
 
 // Web ads (출시 로드맵 2단계) are off unless the build was given
-// ADSENSE_ADS=on (draft #341): a site build without it, AdSense site
+// ADSENSE_ADS=on (draft #350, #341 reopened): a site build without it, AdSense site
 // verification (ADSENSE_CLIENT) included, carries no ad code in any script.
 if (process.env.ADSENSE_ADS !== "on") {
   const scripts = [path.join(distDir, "sw.js"), ...readdirSync(assetsDir).filter((name) => name.endsWith(".js")).map((name) => path.join(assetsDir, name))];

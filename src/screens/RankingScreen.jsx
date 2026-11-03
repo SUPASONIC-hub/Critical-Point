@@ -133,6 +133,7 @@ export function RankingScreen({
             )}
           </section>
           <p className="ranking-footnote">{words.footnote}</p>
+          {/* ad-slot: placement="ranking" */}
         </section>
       </main>
 );

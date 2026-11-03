@@ -9,6 +9,7 @@ import {
   renderSitePages,
   renderStaticPages,
   robotsTxt,
+  SITE_AD_EDITS,
   siteOrigin,
   sitemapEntries,
   sitemapXml,
@@ -195,4 +196,32 @@ test("the origin is SITE_URL, else RENDER_EXTERNAL_URL, and only an https one; t
   assert.ok(absolute.includes(`<link rel="alternate" hreflang="ja" href="${ORIGIN}/ja/faq.html" />`));
   assert.ok(absolute.includes('<a href="/en/about.html">'), "the links a reader clicks stay relative");
   assert.equal(withAbsoluteSiteLinks("<link rel=\"canonical\" href=\"/\" />", ""), "<link rel=\"canonical\" href=\"/\" />");
+});
+
+test("web ads off: the FAQ is the one without ads, byte for byte; on: it says ads appear and Google may use cookies, in all three languages", () => {
+  // Off (no ADSENSE_ADS=on, verification-only included) writes the pages above.
+  assert.deepEqual(renderSitePages({ ads: false }), site);
+  assert.deepEqual(renderStaticPages("", { ads: false }), all);
+  const on = renderSitePages({ ads: true });
+  assert.deepEqual(Object.keys(on), Object.keys(site));
+  assert.deepEqual(Object.keys(SITE_AD_EDITS), ["faq"]);
+  const counts = Object.values(SITE_AD_EDITS.faq).map((edits) => edits.length);
+  assert.deepEqual(Object.keys(SITE_AD_EDITS.faq), ["ko", "en", "ja"]);
+  assert.ok(counts.every((count) => count === counts[0]), "the three languages take as many edits");
+  for (const [language, edits] of Object.entries(SITE_AD_EDITS.faq)) {
+    const file = `${FOLDER[language]}faq.html`;
+    for (const [from, to] of edits) {
+      assert.ok(site[file].includes(from), `${file} (off) has "${from.slice(0, 30)}"`);
+      assert.ok(!on[file].includes(from), `${file} (on) drops "${from.slice(0, 30)}"`);
+      assert.ok(on[file].includes(to), `${file} (on) has the ad text`);
+    }
+    assert.doesNotMatch(on[file], /<script\b/i);
+  }
+  // Only the FAQ changes; on, no page still says there are no ads.
+  for (const file of Object.keys(site).filter((name) => !name.endsWith("faq.html"))) assert.equal(on[file], site[file], file);
+  const NO_ADS = /광고와 유료 결제가 없|no ads|広告や有料の決済はありません|쿠키와 광고·분석용 추적 도구를 쓰지 않|uses no cookies and no advertising|Cookieや、広告・分析用/;
+  for (const [file, html] of Object.entries(renderStaticPages("", { ads: true }))) assert.doesNotMatch(html, NO_ADS, file);
+  assert.match(on["faq.html"], /유료 결제가 없습니다\. 광고는/);
+  assert.match(on["en/faq.html"], /with no payments\. Ads appear/);
+  assert.match(on["ja/faq.html"], /有料の決済はありません。広告は/);
 });
