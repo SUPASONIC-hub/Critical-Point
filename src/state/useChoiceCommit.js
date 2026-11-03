@@ -41,7 +41,7 @@ import { carryChoiceLinks, settleChoice } from "./settleChoice.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { fitCaseDynamics, validateTelemetryItem } from "./payloadSchemas.js";
-import { takeReadingTally } from "./readingTally.js";
+import { takeBriefingRead, takeReadingTally } from "./readingTally.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -242,6 +242,10 @@ export function useChoiceCommit(context) {
     } = context;
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
     const responseTimeSec = getWindowResponseTime({ elapsed: windowState.elapsed, enteredAt: nodeEnteredAt, clockSeconds: windowState.schema?.seconds ?? gauntletRun?.schema?.seconds });
+    // The briefing page that opened this table, read against its clock: a quick
+    // pick after a page read through is not a snap (gameLogic's readThrough).
+    // Only a decision on a table takes it; one without a page logs neither.
+    const briefingRead = closedWindow ? takeBriefingRead() : null;
     const assistTime = Math.max(Number(windowState.timeScale) || 1, getTableClockScale(gauntletRun, getAccessibility().tableTime));
     // The case on the table was opened in story mode (gauntletEngine's `story`).
     const assistStory = gauntletRun?.story === true;
@@ -350,6 +354,7 @@ export function useChoiceCommit(context) {
       suspenseEvent,
       clue,
       responseTimeSec,
+      ...(briefingRead ?? {}),
       resourcesBefore: resources,
       resourcesAfter: finalResources,
     };

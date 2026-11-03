@@ -53,7 +53,7 @@ const reportLinesCopy = {
     cognition: { label: "관점 전환", note: "같은 방식만 반복하지 않고 추론, 위험, 재구성, 버티기 사이를 오간 흔적입니다." },
     pressureAdapt: { label: "압박 대응", note: "위험을 무조건 피한 점수가 아니라, 상승한 압박을 다시 회수한 능력입니다." },
     reflection: { label: "구조 재설계", note: "판을 다시 짜 숨은 경로를 열고, 장면 챌린지를 맞히고, 숨은 기록을 찾아낸 정도입니다." },
-    exploit: { label: "즉답 패널티", note: "표시된 정보만 따라 빠르게 누르는 플레이가 반복될 때만 감점됩니다." },
+    exploit: { label: "즉답 패널티", note: "장면을 거의 읽지 않고 판을 열어 바로 누르는 플레이가 반복될 때만 감점됩니다. 읽기 시간을 충분히 쓰고 연 판은 빨리 골라도 감점하지 않습니다." },
   },
   // The badges' texts; their titles are English already and are the list's keys.
   badges: {

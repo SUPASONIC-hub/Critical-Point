@@ -150,10 +150,10 @@ export function GauntletStage({
   const [openedSeed, setOpenedSeed] = useState(null);
   // The briefing's reading, which it reports and openTable notes (D-11, state/readingTally.js).
   const readingRef = useRef(null);
-  const trackReading = (seconds, held) => {
+  const trackReading = (seconds, held, clock) => {
     const page = (readingRef.current ??= { seconds: 0, held: false });
     page.seconds += seconds;
-    if (held) page.held = true;
+    Object.assign(page, held && { held: true }, clock > 0 && { clock });
   };
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);

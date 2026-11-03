@@ -153,6 +153,33 @@ export function getCognitionSpread(types = []) {
   return Math.round(clamp(evenness * reach * 100, 0, 100));
 }
 
+/**
+ * The share of a briefing's reading clock a page has to stay up for a quick
+ * pick on the table that follows to count as a decision made while reading
+ * (2026-11-03, the user's answer 1). The clock is sized at 10 Korean
+ * characters a second plus 6 to settle (gauntletEngine.js, the briefing's clock);
+ * 70% of it is a reader going about 1.4 times that pace -- fast, but still
+ * reading -- while a page opened at a glance stays well under it. A page the
+ * clock opened by itself was up for all of it.
+ */
+export const READ_THROUGH_SHARE = 0.7;
+/** Where 생각 리듬's steady band starts: 8 to 28 seconds of deciding. */
+const RHYTHM_STEADY_SECONDS = 8;
+
+/**
+ * Whether a decision's table was opened after its briefing had been read
+ * (`readSec`, the seconds the page was up and visible, held or not, against
+ * `readClock`, the clock the page had; useChoiceCommit takes both from
+ * state/readingTally.js). A decision logged before 2026-11-03, a window
+ * resumed from a save without its page, or a scene with no briefing carries
+ * neither and is read as it always was: not read through.
+ */
+export function readThrough(entry = {}) {
+  const clock = Number(entry.readClock);
+  const seconds = Number(entry.readSec);
+  return clock > 0 && Number.isFinite(seconds) && seconds >= clock * READ_THROUGH_SHARE;
+}
+
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   if (entries.length === 0) {
     return {
@@ -188,13 +215,19 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const finalRiskPressure = scoredEntries.at(-1)?.resourcesAfter
     ? getRiskPressure(scoredEntries.at(-1).resourcesAfter)
     : fallbackRiskPressure;
+  // A quick pick after a briefing read through (readThrough) thought on the
+  // page, not on the table: it counts as the bottom of the steady band, never
+  // below it. A slower pick is its own table time either way.
   const responseTimes = scoredEntries
-    .map((entry) => Number(entry.responseTimeSec))
+    .map((entry) => {
+      const seconds = Number(entry.responseTimeSec);
+      return Number.isFinite(seconds) && seconds > 0 && readThrough(entry) ? Math.max(seconds, RHYTHM_STEADY_SECONDS) : seconds;
+    })
     .filter((value) => Number.isFinite(value) && value > 0);
   const rhythmSamples = responseTimes.length > 0 ? responseTimes : [0];
   const rhythmScore = Math.round(
     rhythmSamples.reduce((sum, seconds) => {
-      if (seconds >= 8 && seconds <= 28) return sum + 100;
+      if (seconds >= RHYTHM_STEADY_SECONDS && seconds <= 28) return sum + 100;
       if (seconds >= 4 && seconds < 8) return sum + 70;
       if (seconds > 28 && seconds <= 45) return sum + 78 - (seconds - 28) * 1.8;
       if (seconds > 45) return sum + 38;
@@ -238,10 +271,12 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     clamp(reframeCount * 10 + routesOpened * 12 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
   );
   // Scored decisions only: a TABLE RECORD entry a slot restore carried in has no
-  // response time, and each one used to read as a two-second click.
+  // response time, and each one used to read as a two-second click. A pick
+  // inside two seconds of a table opened after its briefing was read through
+  // is not a snap (2026-11-03): the thinking was done on the page.
   const exploitPenalty = Math.min(
     18,
-    scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
+    scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe && !readThrough(entry)).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
   // What the score is for: holding a line under pressure. Response rhythm still

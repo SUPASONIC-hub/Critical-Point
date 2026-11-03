@@ -32,6 +32,12 @@
  * and `window-off-replay`. A row played under other table rules than this
  * engine's (`dynamics.tableRules`) is not checked (answer 8).
  *
+ * The score reads a decision's briefing (`readSec`, `readClock`, gameLogic's
+ * readThrough) since 2026-11-03: a quick pick after a page read through is not
+ * a snap. A row from before then logs neither, so it is scored again exactly
+ * as it was scored; no version is needed to tell the two apart. The two
+ * numbers are the page's own word, like the rest of the log.
+ *
  * The page writes the record on every window from this build on
  * (gauntlet/windowTrail.js); a row from an older build, or a window resumed
  * from a save that kept no trail, reports its windows as unrecorded.
