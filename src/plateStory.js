@@ -131,11 +131,14 @@ const EDGE = { left: 4, top: 4, right: 12, bottom: 4 };
  * The word's size in viewBox units. briefing.css sizes it off the panel's
  * width, so it is the same share of the picture at every panel size -- 34px on
  * the narrowest panel that shows it, 60px on the widest -- and a spot that is
- * clear here is clear at every size. Two smaller sizes are tried before a
- * crowded room gives up on the word.
+ * clear here is clear at every size. Four smaller sizes are tried before a
+ * crowded room gives up on the word; the last two (2026-11-03) are for the
+ * English and Japanese captions, which wrap to three or four lines on the
+ * narrowest panel and left a broken board's SMASH! no room. At 14 the word is
+ * still 16px on that panel.
  */
 export const SOUND_EM = 30;
-const SOUND_SIZES = [SOUND_EM, 25, 21];
+const SOUND_SIZES = [SOUND_EM, 25, 21, 17, 14];
 
 /** The word is printed turned 9 degrees (`.gx-sfx`). */
 const TILT = (9 * Math.PI) / 180;
@@ -273,7 +276,7 @@ function beside([x0, y0, x1, y1], [dx, dy], { width, height }) {
  * all eight are taken -- a crowd in the seats, a caption across the top -- the
  * clear spot nearest the source wins, scanning the frame in reading order so a
  * tie always breaks the same way; and when no spot is clear at all the word
- * is tried smaller, twice. A sound is decoration and a face is not, so a room
+ * is tried smaller, four times. A sound is decoration and a face is not, so a room
  * with no room for it prints no word rather than one over a head.
  */
 export function placePlateSound({ kind, label, motif = "desk", figures = [], lit = null, place = "", clock = "" } = {}) {
