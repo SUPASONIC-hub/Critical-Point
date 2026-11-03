@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-29 (the state of `main` at `6a36dcc`, after English and Japanese opened to the finale (#366), their terms aligned (#368) and the Japanese legal pages, per-language policy links and `check:locale:strict` (#367); then the start screen fitted in English and Japanese (#369), the phone hand scenes fitted (#372), the locked-card reason (#373) and the storage notice (#374) put in the page's language, and two unused exports dropped (#371); what changed and when is in `git log`)
+Last updated: 2026-11-02 (the state of `main` at `5c00dff`, after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -418,6 +418,51 @@ Still open, on purpose:
   notice (#374) follow the page language. Nine PRs merged, 1,586 unit tests.
   Drafts brought up onto main: #224 #307 #308 #316 #320, #301 #314 #317,
   #322, #350.
+- 2026-10-30: #376 (web ads readiness: about, FAQ and contact pages, nine
+  static pages in three languages, `sitemap.xml` and `robots.txt`, links
+  under the start screen, and the `GOOGLE_SITE_VERIFICATION` switch; the
+  user verified Search Console and submitted the sitemap, and the AdSense
+  review requested on 10-29 is pending); #375 (the language buttons on one
+  line at 320px, the Japanese 320px reach check live); #378 (the ranking
+  save failure notice in three languages); #380 (the GA4 switch
+  `GA_MEASUREMENT_ID`, off by default; the three policy pages announce
+  Google Analytics from 2026-11-12, the policy's seven days' notice; the
+  Render CSP took the Google origins on 10-30, and the variable goes in on
+  11-12); #381 (the Japanese five-card hand at 360px: label CSS 12px and
+  17 long labels shortened, before review; hand5 overflow on Linux CI's
+  Noto CJK 46 to 0 -- a Windows measurement alone does not prove a fit);
+  #382 (at 360x740 the Korean start button ended 2px below the screen in
+  production: less space above the button at 360px and under, the English
+  intro paragraph at 14px, and 360x740 in three languages in the reach
+  check). Six PRs merged, 1,610 unit tests. Open: at 360px a large late-
+  season stake wraps the bank rail to two lines and pushes the hand's last
+  card 12-22px under the action bar (hand5 measures stake 0 only); the user
+  chose (1), a separate fix on main merged by 11-06 (`bank-rail-fit`, in
+  progress). Drafts followed main or the branch below them: #322 #324
+  #350 (with ads on, the FAQ's "no ads" line follows the switch), #327 →
+  #330 → #332 (app builds leave out GA and site verification, the iOS and
+  Android app name in three languages), #301 → #314 → #317 → #321 → #333
+  (#314's result-screen order e2e fixed), #224 → #307, #316, #320, #308 →
+  #379 (#224's 360px English bank rail CSS, #379 hand5 overflow 0 in three
+  languages).
+- 2026-11-02: #384 (`bank-rail-fit`, the user's choice (1) of 10-30,
+  merged by hand before the 11-06 deadline: at 360px and under only the
+  HUD spacing shrinks -- clock 36 to 30px, bank rail pills 22 to 18px --
+  so a two-line bank rail keeps the five-card hand above the action bar;
+  stakes, rules and text unchanged); #389 (`en-hand5-linux`: English hand
+  labels at 12px and tighter hand spacing at 360px; Linux CI hand5 English
+  22 to 0 scenes, 4 of which were also on main); #388 (background music:
+  four leads per mode, three stake layers, three result-sheet tunes, drive
+  capped at 0.15 with a 7kHz lowpass, a triangle ending, the dev-only
+  `music-lab.html`; first screen +1.7KB); #393 (English and Japanese
+  untranslated strings filled, the 95 character profiles in a late chunk,
+  the doubled "analyst" title once, a guard against Hangul in those two
+  languages); #391 (money feedback: large win and BUST amounts fly to the
+  bank rail, which now leads with the balance, the last hand's up or down
+  and the season's total gain or loss; no overflow in 12 combinations at
+  360px, five-card hand spacing at 480px and under, new `money.css`). #390 (desktop type: body text 16 to 18px at 1025px and wider, the start screen kept at 16px, the large stake, clock and timer numbers held by `--hud-rem`; the 1280x720 start button now inside the screen on Linux, 1024x768 and 1440x900 added to the reach check, desktop baselines re-recorded). Six PRs merged, production build-sha `5c00dff`, 1,637 unit tests. Drafts: #394 (scene prose trim 1, after W47), #392 (to merge tomorrow morning). #322 followed main; #224's bundle children followed
+  rules-mark-3b: #307 `50e7957f`, #316 `b008cb11`, #320 `d4a6ed3b`, #308
+  `558088ad`, #379 `e57c9864`.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`

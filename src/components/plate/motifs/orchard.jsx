@@ -57,7 +57,7 @@ export function paintOrchard(random, accent, glow) {
       )}
       {people(
         <>
-          {figure("picker", Math.round(span(random, 120, 170)), 108, 34)}
+          {figure("picker", Math.round(span(random, 120, 170)), 108, 34, { player: true })}
           {figure("helper", Math.round(span(random, 190, 220)), 110, 30)}
         </>,
       )}
