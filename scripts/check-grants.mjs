@@ -19,6 +19,7 @@ import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
 import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
+import { BOARD_BLOCKED_TERMS, foldBoardText } from "../src/boardBlockedTerms.js";
 
 /**
  * Data API grants guardrail.
@@ -1976,7 +1977,7 @@ withHeaders(null);
 // (tests/unit/board-filter.test.mjs), so the two cannot drift apart unseen.
 const boardFilterCases = JSON.parse(readFileSync(path.join(root, "tests", "fixtures", "board-filter-cases.json"), "utf8"));
 check(boardFilterCases.refused.length >= 10 && boardFilterCases.accepted.length >= 3, "the board filter fixture is nearly empty; the filters were checked against nothing.");
-const FILTER_REASON = { link: /must not contain a link/, contact: /contact details/, characters: /must be 2-/ };
+const FILTER_REASON = { link: /must not contain a link/, contact: /contact details/, characters: /must be 2-/, blocked: /must not contain a blocked word/ };
 let filterIp = 40;
 for (const { label, nickname, body, reason } of boardFilterCases.refused) {
   withHeaders({ "x-forwarded-for": `203.0.113.${filterIp++}` });
@@ -1989,7 +1990,27 @@ for (const { label, nickname, body } of boardFilterCases.accepted) {
 }
 withHeaders(null);
 
+// The blocked words (20261103000000): the table is the browser's list, the
+// server folds a post exactly as foldBoardText does, and none of it is anon's.
+{
+  const rows = (await allowed("read the blocked words", "service_role", `select term from public.board_blocked_terms`))?.rows ?? [];
+  const stored = rows.map((row) => row.term).sort();
+  check(JSON.stringify(stored) === JSON.stringify([...BOARD_BLOCKED_TERMS].sort()), `board_blocked_terms holds ${stored.length} words; src/boardBlockedTerms.js lists ${BOARD_BLOCKED_TERMS.length}, and the two differ.`);
+  await refused("read the blocked words", "anon", `select term from public.board_blocked_terms`);
+  const samples = [
+    ...boardFilterCases.refused.flatMap((entry) => [entry.nickname, entry.body]),
+    ...boardFilterCases.accepted.flatMap((entry) => [entry.nickname, entry.body]),
+    ...BOARD_BLOCKED_TERMS,
+    "ㅅㅣㅂㅏㄹ", "시바ㄹ", "가ㄴㅏ", "ㅄ", "ＦＵＣＫ", "ｷﾁｶﾞｲ", "キチガイ", "İstanbul", "Ⅻ①㈱", "가\u0301", "e\u0301", "😀 ok", "",
+  ];
+  const folded = (await db.query(`select s, public.board_fold_text(s) as f from unnest($1::text[]) as s`, [samples])).rows;
+  const differ = folded.filter((row) => row.f !== foldBoardText(row.s));
+  check(differ.length === 0, `public.board_fold_text and foldBoardText fold differently: ${differ.slice(0, 5).map((row) => `${JSON.stringify(row.s)} -> ${JSON.stringify(row.f)} / ${JSON.stringify(foldBoardText(row.s))}`).join("; ")}`);
+}
+
 await allowed("read the board", "anon", `select id, nickname, body, created_at from public.board_posts`);
+await refused("read whether the reports hid a post", "anon", `select auto_hidden_at from public.board_posts`);
+await refused("read whether a person kept a post", "anon", `select kept_at from public.board_posts`);
 await refused("read board post session ids", "anon", `select session_id from public.board_posts`);
 await refused("read board post writer keys", "anon", `select actor_key from public.board_posts`);
 await refused("hide a board post", "anon", `select public.moderate_board_post(1)`);
@@ -2106,6 +2127,78 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
   check((await reportCount(doomed)) === 1, "the report on the post to be deleted was not stored.");
   await db.query(`delete from public.board_posts where id = $1`, [doomed]);
   check((await reportCount(doomed)) === 0, "a deleted post's reports outlived it.");
+
+  // Hiding at three writers (20261103000000). Two writers leave a post up; a
+  // third from another address hides it at once, for anon too; a writer's
+  // second device, and reports with no address, are not more writers. The
+  // queue holds it as waiting (자동 숨김). Restore brings it back and keeps it:
+  // three more writers do not hide it again. Hide makes it final.
+  {
+    const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
+    const act = async (action, postId) => boardActionDone((await allowed(`${action} board post ${postId}`, "service_role", boardAction(action, postId)))?.rows ?? []);
+    const target = Number((await one(
+      `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '신고셋', '세 사람이 신고할 글', 'board:auto-hide') returning id`,
+      [sessionId(460)],
+    ))?.id);
+    const shows = async () => ((await allowed("read the board", "anon", `select id from public.board_posts`))?.rows ?? []).some((row) => Number(row.id) === target);
+    const marks = () => one(`select hidden, auto_hidden_at is not null as auto, kept_at is not null as kept from public.board_posts where id = $1`, [target]);
+    const reportFrom = async (address, n, label) => {
+      withHeaders(address ? { "x-forwarded-for": address } : null);
+      await report(label, reportRow(target, "abuse", sessionId(n)));
+      withHeaders(null);
+    };
+    await reportFrom("198.51.100.70", 461, "report a post: the first writer");
+    await reportFrom("198.51.100.70", 462, "report a post again from the first writer's second device");
+    await reportFrom("198.51.100.71", 463, "report a post: the second writer");
+    await reportFrom(null, 464, "report a post with no client address");
+    await reportFrom(null, 465, "report a post with no client address, another session");
+    check(await shows(), "a post with two writers' reports (and two without an address) left the board; three writers hide it.");
+    check((await marks())?.auto === false, "a post with two writers' reports was marked as hidden by its reports.");
+    await reportFrom("198.51.100.72", 466, "report a post: the third writer");
+    check(!(await shows()), "a post reported by three writers is still on the board.");
+    check((await marks())?.auto === true, "a post the reports hid is not marked auto_hidden_at.");
+    let queue = await queueOf();
+    check(queue.waiting.some((post) => post.postId === target && post.autoHidden && post.writers >= 3), `a post the reports hid does not wait for a person in the queue: ${JSON.stringify(queue.waiting)}`);
+    check(queue.autoHidden.some((post) => post.postId === target), "the queue does not list the post the reports hid as such.");
+    withHeaders({ "x-forwarded-for": "198.51.100.73" });
+    await reportRefused("report a post the reports hid", reportRow(target, "spam", sessionId(467)), /names no visible post/);
+    withHeaders(null);
+
+    check(await act("restore", target), "restoring a post the reports hid did nothing.");
+    check(await shows(), "a restored post is not on the board.");
+    {
+      const kept = await marks();
+      check(kept?.kept === true && kept?.auto === false, `a restored post is not marked as kept: ${JSON.stringify(kept)}`);
+    }
+    for (const [index, address] of ["198.51.100.74", "198.51.100.75", "198.51.100.76"].entries()) {
+      await reportFrom(address, 470 + index, `report a kept post: writer ${index + 1}`);
+    }
+    check(await shows(), "three writers hid a post a person had restored; only the operator may hide it now.");
+    queue = await queueOf();
+    check(queue.waiting.some((post) => post.postId === target && !post.autoHidden), "the new reports on a kept post do not wait in the queue.");
+    check(await act("hide", target), "hiding a kept post did nothing.");
+    {
+      const hidden = await marks();
+      check(!(await shows()) && hidden?.auto === false && hidden?.kept === false, `a post the operator hid is not hidden for good: ${JSON.stringify(hidden)}`);
+    }
+    queue = await queueOf();
+    check(!queue.waiting.some((post) => post.postId === target) && queue.hidden.some((post) => post.postId === target), "a post the operator hid still waits in the queue.");
+
+    // The number of writers is a setting.
+    const second = Number((await one(
+      `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '신고넷', '네 사람까지 둘 글', 'board:auto-hide-4') returning id`,
+      [sessionId(480)],
+    ))?.id);
+    await db.query(`insert into public.private_settings (name, value) values ('board_auto_hide_writers', '4') on conflict (name) do update set value = excluded.value`);
+    for (const [index, address] of ["198.51.100.80", "198.51.100.81", "198.51.100.82"].entries()) {
+      withHeaders({ "x-forwarded-for": address });
+      await report(`report a post under a limit of four: writer ${index + 1}`, reportRow(second, "spam", sessionId(481 + index)));
+    }
+    withHeaders(null);
+    check((await one(`select hidden from public.board_posts where id = $1`, [second]))?.hidden === false, "board_auto_hide_writers = 4 hid a post at three writers.");
+    await db.query(`delete from public.private_settings where name = 'board_auto_hide_writers'`);
+    await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[target, second]]);
+  }
 }
 
 // ---- cloud saves
@@ -2250,6 +2343,7 @@ const UPDATE_PROBE = {
   free_text_analyses: "event_id = event_id",
   board_posts: "hidden = true",
   board_reports: "reason = reason",
+  board_blocked_terms: "term = term",
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
