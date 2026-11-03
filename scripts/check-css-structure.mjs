@@ -179,7 +179,10 @@ const fileBudgets = {
   // takes the Japanese 14px there (Linux CI put its button at 746).
   // 3159 / 69883 -> 3159 / 69903 on 2026-11-02, measured (pc-type-scale): from 1024px wide the
   // root reads 18px; the case card's numeral keeps its size through --hud-rem.
-  "base-intro-ranking.css": { lines: 3159, bytes: 69903 },
+  // 3159 / 69903 -> 3162 / 69982 on 2026-11-03, measured (intro-webkit-fit): on
+  // 360px or less the premise wraps plainly outside English, where WebKit's
+  // text-wrap: pretty took the Korean and Japanese one a line longer.
+  "base-intro-ranking.css": { lines: 3162, bytes: 69982 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -285,7 +288,12 @@ const fileBudgets = {
   // -> 56973 bytes on 2026-11-02, measured (pc-type-scale, on top of en-hand5-linux): from 1024px wide
   // the pot and the clock keep their size through --hud-rem while the root
   // reads 18px.
-  "play.css": { lines: 2931, bytes: 56973 },
+  // -> 2950 / 57388 on 2026-11-03, measured (signal-row-fit): on 360px or less
+  // the English and Japanese signals row gives LOCK its own width (no icon,
+  // no empty track) and the overclock line the rest, so LOCK no longer runs
+  // under the logic streak. In a 360px block of its own by the streak's rules,
+  // apart from the HUD block that the audit token (#224) adds to.
+  "play.css": { lines: 2950, bytes: 57388 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
