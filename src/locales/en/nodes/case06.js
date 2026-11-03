@@ -416,7 +416,7 @@ export default {
     },
     "c6_evidence_turn": {
       "title": "The Dates the Conditions Changed",
-      "text": "You hold the clue you have been keeping against his experiment profile, and the dates line up. Oh Jinwoo’s decision window was cut six times in all. Every one of those six dates is the day after you chose verification over a fast answer. ECHO says. 'The two analysts were not competing. Each was the other’s condition. One side’s caution was used as the value that made the other side’s speed.' The comparison table of the two records is in a form the committee will accept.",
+      "text": "You hold the clue you have been keeping against his experiment profile, and the dates line up. Oh Jinwoo’s decision window was cut six times in all. Every one of those six dates is the day after you chose verification over a fast answer. Each time you paused, his time lost a notch. ECHO says. 'The two analysts were not competing. Each was the other’s condition. One side’s caution was used as the value that made the other side’s speed.' The comparison table of the two records is in a form the committee will accept.",
       "memo": [
         "The cuts match the day after each of your choices",
         "The same experiment number covers both profiles",

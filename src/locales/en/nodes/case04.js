@@ -531,7 +531,7 @@ export default {
     },
     "c4_evidence_turn": {
       "title": "The Exception File’s Original Recipient",
-      "text": "You hold the clue you have been keeping up to the recipient box of the exception approval file, and its history opens. The same form has gone back and forth many times under other agencies’ names, always to the same account. Each time an exception was approved, that agency’s performance metrics were altered. Ban Jaewook writes the dates down his notebook in a column. 'This isn’t one act of good intent. The exception goes out, then the numbers get altered. The same order every time. The question now isn’t whether to allow it. It’s who approved this repetition.'",
+      "text": "You hold the clue you have been keeping up to the recipient box of the exception approval file, and its history opens. Onsae’s exception file was not first created at Onsae. The same form has gone back and forth many times under other agencies’ names, always to the same account. Each time an exception was approved, that agency’s performance metrics were altered. Ban Jaewook writes the dates down his notebook in a column. 'This isn’t one act of good intent. The exception goes out, then the numbers get altered. The same order every time. The question now isn’t whether to allow it. It’s who approved this repetition.'",
       "memo": [
         "Exception file recipient appears again and again in many agencies’ files",
         "Performance metrics altered after exception approval",
