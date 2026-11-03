@@ -96,7 +96,7 @@ export default {
       "place": "KD Capital, Euljiro, 11th floor · Lease Review Team meeting room",
       "clock": "Approval committee D-4 · 21:30",
       "question": "A young reviewer’s six lines vanished exactly the way your opinion did 3 years ago. What do you tell her?",
-      "lead": "You get a visitor pass at the security desk and go up; on the 12th floor only one meeting room has its lights on."
+      "lead": "You get a visitor pass at the security desk and go up; on the 11th floor only one meeting room has its lights on."
     },
     "c16_roof": {
       "title": "The Second Cup of Noodles",
@@ -183,7 +183,7 @@ export default {
     },
     "c16_ledger": {
       "title": "Not Enough Columns",
-      "text": "Kwon Dohyun draws a vertical line on the whiteboard. Left, 1 robot. Right, 1 night-shift worker. A monthly lease fee of 2.83 million won against a monthly wage of 3.12 million won: the robot wins. The more he adds, maintenance, electricity and backed-up orders on the robot side, night pay and back treatment on the people side, the closer the two numbers get. At the edge of the board, Kwon Dohyun stops. 'Not enough columns.' He starts taping sheets of A4 along the wall. Kang Taemin hands him a cup of noodles. 'Tape all that up and it’ll be dawn.' 'It already is.'",
+      "text": "Kwon Dohyun draws a vertical line on the whiteboard. Left, 1 robot. Right, 1 night-shift worker. The robots also run by day, so the night share is eighty units. A monthly lease fee of 2.83 million won against a monthly wage of 3.12 million won: the robot wins. The more he adds, maintenance, electricity and backed-up orders on the robot side, night pay and back treatment on the people side, the closer the two numbers get. At the edge of the board, Kwon Dohyun stops. 'Not enough columns.' He starts taping sheets of A4 along the wall. Kang Taemin hands him a cup of noodles. 'Tape all that up and it’ll be dawn.' 'It already is.'",
       "memo": [
         "1 robot: 2.83 million won a month · 1 night-shift worker: 3.12 million won a month",
         "14 hidden-cost columns -- past the whiteboard",
