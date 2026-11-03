@@ -33,7 +33,7 @@ export function paintSkyline(random, accent, glow) {
           <line x1="0" y1="108" x2="320" y2="108" />
         </>,
       )}
-      {people(figure("exec", Math.round(span(random, 210, 268)), 112, 44))}
+      {people(figure("exec", Math.round(span(random, 210, 268)), 112, 44, { player: true }))}
     </>
   );
 }
