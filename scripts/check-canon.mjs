@@ -612,6 +612,12 @@ export const CANON = [
     speaker: "한서윤",
     find: /(서명은 제가|제가 서명|서명 하나를|이 칸에 서명|제 서명|자기 서명)/g,
     context: RETURN_CONTEXT,
+    // 사건 37 (c37_island_reaction): five months into her 대기발령 she signs a
+    // box of a 2026 paper after reading its first page only, as she returned
+    // the dissent without reading it; the 「처럼」 rides on 「첫 장만 읽고」,
+    // and the return is not called a signature (11-03 re-judgement, low).
+    // Matched as the whole sentence, so another line saying it is still read.
+    exceptSentence: "'저 이 칸에 서명했어요. 첫 장만 읽고요. 당신 반대 의견을 반려할 때처럼요.'",
     allow: [],
   },
   {
@@ -769,7 +775,7 @@ function* canonStatements(lines, file) {
       for (const match of line.matchAll(entry.find)) {
         if (entry.context && !entry.context.test(line.slice(Math.max(0, match.index - CONTEXT_REACH), match.index + match[0].length + CONTEXT_REACH))) continue;
         const value = valueOf(match);
-        const agrees = entry.allow.includes(value) || Boolean(entry.except?.test(nearby(line, match)));
+        const agrees = entry.allow.includes(value) || Boolean(entry.except?.test(nearby(line, match))) || Boolean(entry.exceptSentence && line.includes(entry.exceptSentence));
         yield { entry, agrees, file, line: number, found: match[0], value };
       }
     }

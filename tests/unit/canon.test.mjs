@@ -289,6 +289,11 @@ test("the lines the audit of 2026-11-03 found go red", () => {
     ["han-return-sign-voice"],
   );
   assert.deepEqual(said("백아린"), []);
+  // 사건 37's one sentence is a 2026 paper she signed (11-03 re-judgement); only
+  // the whole sentence is let through, not another that says the same words.
+  const island = (text) => findCanonViolations(`      speaker: "한서윤",\n      text: "${text}",`, "src/nodes/case37.js").map((item) => item.id);
+  assert.deepEqual(island("당신이 트리거랩에 내려온 첫 주입니다. '저 이 칸에 서명했어요. 첫 장만 읽고요. 당신 반대 의견을 반려할 때처럼요.'"), []);
+  assert.deepEqual(island("'저 이 칸에 서명했어요. 당신 반대 의견을 반려할 때처럼요.'"), ["han-return-sign-voice"]);
 });
 
 test("the shapes the audit's answers settled on pass, and so do the signatures that are not the return", () => {
