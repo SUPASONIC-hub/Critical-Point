@@ -275,10 +275,10 @@ export default {
       "line": "Did she tell you? My sister, that day?"
     },
     "도하람": {
-      "appearance": "A gray coat always with one button undone, a hand that carries the coffee himself, a thin leather folder with only one candidate’s name in it.",
+      "appearance": "A gray coat always with one button undone, a hand that carries the coffee herself, a thin leather folder with only one candidate’s name in it.",
       "thought": "People don’t come for the salary. They come for a table they believe they can win.",
-      "gesture": "Before the other person answers, Do Haram slides the coffee cup a hand’s width toward them. That hand’s width is the time he’ll wait.",
-      "voice": "Not fast but precise, he says first what the other person was about to say.",
+      "gesture": "Before the other person answers, Do Haram slides the coffee cup a hand’s width toward them. That hand’s width is the time she’ll wait.",
+      "voice": "Not fast but precise, she says first what the other person was about to say.",
       "line": "I’ll give you the knife. Where to cut is up to you, Team Head."
     },
     "오상철": {
@@ -401,17 +401,17 @@ export default {
       "line": "There’s a Korean proverb: the more urgent it is, the more you go around. So let’s sign quickly."
     },
     "백다온": {
-      "appearance": "She keeps her ID badge tucked inside her shirt. The corner of her laptop shows a half-peeled Korean university sticker.",
+      "appearance": "He keeps his ID badge tucked inside his shirt. The corner of his laptop shows a half-peeled Korean university sticker.",
       "thought": "Four people can open the file. One in four is as good as a name.",
-      "gesture": "Baek Daon holds out only half of what she has to show, and pulls it back before the other person can reach for it.",
-      "voice": "Her polite speech is fast and quiet. She always ends a sentence by saying she’s the one with the least power.",
+      "gesture": "Baek Daon holds out only half of what he has to show, and pulls it back before the other person can reach for it.",
+      "voice": "His polite speech is fast and quiet. He always ends a sentence by saying he’s the one with the least power.",
       "line": "That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel."
     },
     "진서우": {
-      "appearance": "A snack-bag clip hanging from his badge lanyard, a backpack always half open, a sticky note of the team’s sales graph beside his monitor.",
+      "appearance": "A snack-bag clip hanging from her badge lanyard, a backpack always half open, a sticky note of the team’s sales graph beside her monitor.",
       "thought": "If I’d known it was wrong, I wouldn’t have done it. But now saying I didn’t know sounds like an excuse.",
       "gesture": "When things get awkward, Jin Seowoo tears open another snack bag and pushes it in front of the other person.",
-      "voice": "He talks bright and fast, and trails off the moment a number turns into a person’s name.",
+      "voice": "She talks bright and fast, and trails off the moment a number turns into a person’s name.",
       "line": "I erased all the names. Only codes were left. ...Was that code you, Minseo?"
     },
     "하도율": {
@@ -516,7 +516,7 @@ export default {
       "appearance": "Chef’s whites with the sleeves pushed up, menu cards written in careful hand, a staff bibimbap mixed from leftover ingredients.",
       "thought": "The long dish names are my revenge. The Chairman has never once memorized one.",
       "gesture": "Before bringing something up, Eun Jaeha takes out one more spoon and sets it in front of the other person.",
-      "voice": "She recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
+      "voice": "He recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
       "line": "The long dish names are my revenge. The Chairman has never once memorized one."
     },
     "도건우": {
