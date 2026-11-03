@@ -144,4 +144,12 @@ export default {
     first: "最初の判断条件を同期中",
     syncing: "{case}の判断条件を同期中",
   },
+  sideSlot: {
+    label: "番外事件",
+    heading: "番外事件 · ランキング対象外 · {book}",
+    text: "シーズンとは別に遊ぶ短い事件です。シーズンのセーブとランキングはそのままです。",
+    book: "番外 {closed}/{total}",
+    resumable: " · 続きから",
+    closed: " · 完了",
+  },
 };

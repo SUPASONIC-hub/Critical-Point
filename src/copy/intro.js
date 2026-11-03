@@ -138,6 +138,18 @@ const introCopy = {
     first: "첫 판단 조건 동기화 중",
     syncing: "{case} 판단 조건 동기화 중",
   },
+  // E-11 번외 사건: the start screen's side slot (sideCases.getSideSlot), hidden
+  // until a finale is closed and a side case is written.
+  sideSlot: {
+    label: "번외 사건",
+    heading: "번외 사건 · 랭킹 밖 · {book}",
+    text: "시즌과 따로 하는 짧은 사건입니다. 시즌 저장과 랭킹은 그대로입니다.",
+    // How many side cases this device has closed, of those written.
+    book: "번외 {closed}/{total}",
+    // After a side case's label and title.
+    resumable: " · 이어하기",
+    closed: " · 끝냄",
+  },
 };
 export default introCopy;
 

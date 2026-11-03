@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConfig.js";
+import { isSideCaseId } from "../sideCases.js";
 
 // The ranking starts over each time the season changes length: v1 held the
 // five-case season, v2 the eleven-case one, v3 the twelve-case one, v4 the
@@ -31,7 +32,7 @@ export function parseLocalRankingRows(rawValue) {
   try {
     const parsed = JSON.parse(rawValue || "[]");
     return Array.isArray(parsed)
-      ? parsed.filter((row) => row && typeof row === "object" && row.case_id && row.summary).slice(-100)
+      ? parsed.filter((row) => row && typeof row === "object" && row.case_id && row.summary && !isSideCaseId(row.case_id)).slice(-100)
       : [];
   } catch {
     return [];
@@ -46,6 +47,8 @@ export function parseLocalRankingRows(rawValue) {
  * with no run id (older ones) are left as they are.
  */
 export function appendLocalRankingRowToRows(rows, row) {
+  // E-11: a side case is outside the ranking, this device's included.
+  if (isSideCaseId(row?.case_id)) return rows;
   const sameRunAndCase = (item) => Boolean(row?.run_id) && item?.run_id === row.run_id && item?.case_id === row.case_id;
   return [...rows.filter((item) => !sameRunAndCase(item)), row]
     .filter((item) => item && typeof item === "object" && item.case_id && item.summary)

@@ -163,8 +163,12 @@ const BUDGETS = {
   // view models are one namespace import (sceneViewModels, with the runtime
   // card's label as `runtimeCardLabel`) and the two runtime cards' words are
   // src/copy/runLines.js's. Measured 968 / 96.
+  // 960 -> 961 lines on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
+  // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
+  // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
+  // bgm-variety and locale-gaps.
   "src/GameRuntime.jsx": {
-    lines: 968,
+    lines: 969,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
@@ -173,8 +177,10 @@ const BUDGETS = {
   // label rather than its position, because the 프롤로그 sits in front of
   // 사건 01 and a position counter printed "사건 6" over 사건 01.
   // 111 -> 100 on 2026-09-27: ratcheted to what it measures (98).
+  // 100 -> 101 on 2026-10-25 (E-11 framework, draft), measured: the stage
+  // re-exported for the side screen, which plays its table from this chunk.
   "src/screens/PlayScreen.jsx": {
-    lines: 100,
+    lines: 101,
     longestLine: 170,
     importedNames: 4,
     hooks: {},
@@ -188,10 +194,15 @@ const BUDGETS = {
   // 12 -> 13 on 2026-11-02, plate-story (#392, F): the result screen draws the
   // case's last room (ScenePlate, variant="result") at the top of the outcome
   // panel; no other import could go. Measured 340 / 13.
+  // 12 -> 13 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46:
+  // the side list (`SIDE_CASES`, src/sideCases.js) for the finale's one line
+  // that the side slot opened. 339 lines fit main's 340.
+  // 340 / 13 -> 342 / 14 on 2026-11-03, E-11 over main 425eb4da: the side list
+  // beside plate-story's ScenePlate. Measured 342 / 14.
   "src/screens/ResultScreen.jsx": {
-    lines: 340,
+    lines: 342,
     longestLine: 280,
-    importedNames: 13,
+    importedNames: 14,
     hooks: {},
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
