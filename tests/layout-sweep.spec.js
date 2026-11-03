@@ -107,6 +107,36 @@ async function measureBank(page) {
   });
 }
 
+/**
+ * The signals row over the hand: the overclock line, LOCK and the logic
+ * streak, each in its own column of the HUD. On a 360px phone in English and
+ * Japanese the streak's longer line once left LOCK less than its own width,
+ * and LOCK ran under the streak (Linux, hand5, 2026-11-03: en 15 to 25px, ja
+ * 8 to 18px). `overlap` is how far any one runs into the next or past the
+ * row's end; `slack` is the row's width less the least the three can take,
+ * gaps counted: the overclock line's word (its sentence is the one cut with an
+ * ellipsis), LOCK and the streak whole. Below 0 something runs over.
+ */
+async function measureSignals(page) {
+  return page.evaluate(() => {
+    const row = document.querySelector(".gx-signals");
+    if (!row) return null;
+    const kids = [...row.children];
+    const style = getComputedStyle(row);
+    const right = row.getBoundingClientRect().right - parseFloat(style.paddingRight);
+    // scrollWidth is a whole number: it counts only past a pixel of rounding.
+    const ends = kids.map((el) => { const box = el.getBoundingClientRect(); return { left: box.left, right: el.scrollWidth > el.clientWidth + 1 ? box.left + el.scrollWidth : box.right }; });
+    const overlap = Math.max(0, ...ends.slice(0, -1).map((end, i) => end.right - ends[i + 1].left), ...ends.map((end) => end.right - right));
+    const columns = row.style.gridTemplateColumns;
+    row.style.gridTemplateColumns = kids.map(() => "max-content").join(" ");
+    const least = (el) => (el.matches(".gx-overdrive") ? el.querySelector("b").getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap) : el.getBoundingClientRect().width);
+    const need = kids.reduce((sum, el) => sum + least(el), 0) + parseFloat(style.columnGap) * (kids.length - 1);
+    row.style.gridTemplateColumns = columns;
+    const inner = row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    return { overlap: Math.round(overlap), slack: Math.round(inner - need), text: kids.map((el) => el.textContent.replace(/\s+/g, " ").trim()) };
+  });
+}
+
 async function measureCards(page) {
   return page.evaluate(() =>
     [...document.querySelectorAll(".choices .choice")].map((card) => {
@@ -142,8 +172,9 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
         await Promise.all(ending.map((animation) => animation.finished.catch(() => {})));
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       });
-      const row = { caseId, nodeId, name: "small phone", ...(BANK ? { bank: LAYOUT_BANK } : null), ...(await measureTable(page)), ...(await measureBank(page)), hand: await measureCards(page) };
+      const row = { caseId, nodeId, name: "small phone", ...(BANK ? { bank: LAYOUT_BANK } : null), ...(await measureTable(page)), ...(await measureBank(page)), signals: await measureSignals(page), hand: await measureCards(page) };
       rows.push(row);
+      if (row.signals?.overlap > 0) failures.push(`${nodeId}: the signals row runs ${row.signals.overlap}px into itself (${row.signals.text.join(" | ")})`);
       if (row.lastCard > row.actionsTop) {
         const lastRow = row.hand.filter((card) => card.bottom > row.actionsTop);
         const tallest = lastRow.reduce((a, b) => (b.height > a.height ? b : a), lastRow[0]);

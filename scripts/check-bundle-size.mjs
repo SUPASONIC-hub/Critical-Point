@@ -81,8 +81,8 @@ const budgets = [
   // reveal:gain / reveal:even / reveal:cost (revealOutcome in GameRuntime). Measured 150,030 / 55,066 in the e2e build, the plus 4.
   // 150,034 / 55,070 -> 150,255 / 55,171 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 150,251 / 55,167 in the e2e build, the plus 4.
   // 150,255 / 55,171 -> 146,589 / 54,099 on 2026-11-02, plate-story over main acf3d999 (#392): the runtime is smaller over #393 (locale-gaps moved words into late chunks). Measured 146,585 / 54,095 in the e2e build, the plus 4.
-  // 146,589 / 54,099 -> 147,234 / 54,318 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState). Measured 147,230 / 54,314 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_234, maxGzip: 54_318 },
+  // 146,589 / 54,099 -> 147,128 / 54,266 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState). Measured 147,124 / 54,262 in the e2e build over main 36104abd, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_128, maxGzip: 54_266 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -596,7 +596,9 @@ const budgets = [
   // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
   // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_019, maxGzip: 37_440 },
+  // 200,019 / 37,440 -> 200,372 / 37,500 on 2026-11-03, signal-row-fit over main 425eb4da: on 360px or less the English and
+  // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_372, maxGzip: 37_500 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1072,16 +1074,14 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
-  // 179,701 / 60,151 -> 179,812 / 60,186 on 2026-11-03, snap-after-reading: the report's 즉답 패널티 note says a table opened after the reading time is spent costs nothing. Measured 179,808 / 60,182, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_812, maxGzip: 60_186 },
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_701, maxGzip: 60_151 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
-  // 149,778 / 53,469 -> 149,869 / 53,504 on 2026-11-03, snap-after-reading: the report's quick-answer penalty note, as in Japanese above. Measured 149,865 / 53,500, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_869, maxGzip: 53_504 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_778, maxGzip: 53_469 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1207,8 +1207,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
-// 483,722 / 490,404 -> 483,759 / 490,441 on 2026-11-03, snap-after-reading over main 425eb4da: the en and ja index above (the penalty note); ko is under its budget and stays. Measured 483,755 / 490,437 in the local e2e build, whose index.html is 2 bytes longer than CI's, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_761, en: 483_759, ja: 490_441 };
+// 426,761 / 483,722 / 490,404 -> 426,814 / 483,775 / 490,461 on 2026-11-03, signal-row-fit over main 425eb4da (#395 on cb904fb6): LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,810 / 483,771 / 490,457, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_814, en: 483_775, ja: 490_461 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

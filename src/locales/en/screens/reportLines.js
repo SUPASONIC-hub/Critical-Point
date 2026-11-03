@@ -41,7 +41,7 @@ export default {
     cognition: { label: "Perspective shifts", note: "Signs that you moved between reasoning, risk, reframing and holding out instead of repeating one way." },
     pressureAdapt: { label: "Handling pressure", note: "Not points for dodging risk, but for winning back pressure once it rose." },
     reflection: { label: "Redesigning the table", note: "How far you reframed the table to open hidden routes, met scene challenges and found hidden records." },
-    exploit: { label: "Quick-answer penalty", note: "Deducted only when you keep opening the table without reading the scene and tapping at once. Once you’ve given the scene its reading time, a quick pick costs nothing." },
+    exploit: { label: "Quick-answer penalty", note: "Deducted only when you keep opening the table unread and tapping at once." },
   },
   badges: {
     burst: "You recorded a thinking burst of {score} points.",
