@@ -341,7 +341,9 @@ export function getObserverTag(entry = {}) {
   if (humanCostDelta > 0) {
     return { id: "sacrifice", ...observerCopy.tags.sacrifice };
   }
-  if (Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) {
+  // A quick safe pick after a briefing read through is not a sample of
+  // compliance either (2026-11-03, the user's answer 1 B): the same line as the snap.
+  if (Number(entry.responseTimeSec) <= 2 && riskDelta <= 0 && !readThrough(entry)) {
     return { id: "compliance", ...observerCopy.tags.compliance };
   }
   if (riskDelta > 6) {
@@ -412,7 +414,7 @@ export function getObservationLedger(entries = []) {
         : entry.challenge?.riskDelta ?? 0;
       const choiceText = choiceWords(entry);
       const next = { ...ledger };
-      if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
+      if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0 && !readThrough(entry)) next.compliance += 1;
       if (entry.reframe || riskDelta > 6) next.defiance += 1;
       if (OPACITY_WORDS.test(choiceText)) next.opacity += 1;
       const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);

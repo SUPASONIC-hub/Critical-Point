@@ -7,7 +7,7 @@ import { createStorage } from "./helpers/browser.mjs";
 globalThis.localStorage = createStorage();
 globalThis.sessionStorage = createStorage();
 
-const { getGameplayStats, READ_THROUGH_SHARE, readThrough } = await import("../../src/gameLogic.js");
+const { getGameplayStats, getObservationLedger, getObserverTag, READ_THROUGH_SHARE, readThrough } = await import("../../src/gameLogic.js");
 const { noteBriefing, takeBriefingRead, takeReadingTally } = await import("../../src/state/readingTally.js");
 const { getReadingSeconds } = await import("../../src/gauntlet/gauntletEngine.js");
 const { nodes } = await import("../../src/gameData.js");
@@ -164,4 +164,15 @@ test("a row from before the change is scored again exactly as it was", () => {
     const row = { case_id: "final", summary: season.caseResults.final, decision_log: season.final.log, resources: season.final.resources };
     assert.equal(recheckCaseScore(row).status, "match");
   }
+});
+
+test("the observer's 순응 표본 holds the same line: read through, a quick safe pick is not one; opened early, it is", () => {
+  // 2026-11-03, the user's answer 1 B. A safe pick: no risk moved, no person paid, no reframe.
+  const readFirst = pick({ readSec: 41, readClock: 41 });
+  const early = pick({ readSec: 5, readClock: 41 });
+  assert.notEqual(getObserverTag(readFirst).id, "compliance");
+  assert.equal(getObserverTag(early).id, "compliance");
+  assert.equal(getObserverTag(pick()).id, "compliance", "a decision logged before the change reads as it did");
+  assert.equal(getObservationLedger([readFirst, early, pick()]).compliance, 2);
+  assert.equal(getObservationLedger([readFirst, readFirst]).compliance, 0);
 });
