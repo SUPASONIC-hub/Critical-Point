@@ -12,6 +12,7 @@ import {
 } from "../gameData.js";
 import { getOutcomeChoiceId, makeEmptyScores } from "../gameLogic.js";
 import { serializeRunState, upgradeRunRecord } from "../gauntlet/gauntletEngine.js";
+import runLines from "../copy/runLines.js";
 import { recordAppError } from "./errorRecovery.js";
 import { sanitizeTelemetryQueue } from "./payloadSchemas.js";
 
@@ -397,7 +398,7 @@ function normalizeSavedDynamics(state) {
         id: `repair-${Date.now()}`,
         occurredAt: new Date().toISOString(),
         source: "save-integrity",
-        message: "이전 버전에서 저장한 판 기록을 지금 형식으로 고쳐서 불러왔습니다.",
+        message: runLines.repaired,
         currentCase: state.currentCase,
         nodeId: state.nodeId,
       },
@@ -490,7 +491,7 @@ export function createReplaySavedState(seed) {
     log: replayLog,
     triggers: makeEmptyScores(triggerLabels),
     cognition: makeEmptyScores(cognitionLabels),
-    echo: "재현 링크로 복원된 장면입니다.",
+    echo: runLines.replayEcho,
     nodeEnteredAt: Date.now(),
     pendingTelemetry: [],
   };
@@ -520,16 +521,16 @@ export function shouldCaptureSaveSlot(previousState, nextState) {
 export function getRouteMarker(entry) {
   const nodeId = typeof entry?.nodeId === "string" ? entry.nodeId : "";
   const scene = nodes[nodeId];
-  if (entry?.routeChangeKind === "memory" || entry?.continuityMemory) return { label: "이전 선택 귀환", tone: "memory" };
-  if (entry?.routeChangeKind === "evidence-turn" || nodeId.includes("evidence_turn") || String(entry?.choiceId ?? "").includes("evidence_turn")) return { label: "단서 역전", tone: "turnaround" };
-  if (entry?.routeChangeKind === "reframe" || entry?.reframeBranchId) return { label: "판 다시 짜기", tone: "system" };
+  if (entry?.routeChangeKind === "memory" || entry?.continuityMemory) return { label: runLines.routeMarkers.memory, tone: "memory" };
+  if (entry?.routeChangeKind === "evidence-turn" || nodeId.includes("evidence_turn") || String(entry?.choiceId ?? "").includes("evidence_turn")) return { label: runLines.routeMarkers.turnaround, tone: "turnaround" };
+  if (entry?.routeChangeKind === "reframe" || entry?.reframeBranchId) return { label: runLines.routeMarkers.system, tone: "system" };
   // A scene is read by its kind; the id is the fallback for a log entry whose
   // scene has since left the graph.
-  if (scene?.kind === "opening") return { label: "분기 시작", tone: "branch" };
-  if (scene?.kind === "aftermath" || nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
-  if (scene?.kind === "reaction" || nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };
-  if (scene?.kind === "connective") return { label: "증거 추적", tone: "evidence" };
-  return { label: "핵심 판단", tone: "decision" };
+  if (scene?.kind === "opening") return { label: runLines.routeMarkers.branch, tone: "branch" };
+  if (scene?.kind === "aftermath" || nodeId.includes("aftershock")) return { label: runLines.routeMarkers.aftermath, tone: "aftermath" };
+  if (scene?.kind === "reaction" || nodeId.includes("reaction")) return { label: runLines.routeMarkers.reaction, tone: "reaction" };
+  if (scene?.kind === "connective") return { label: runLines.routeMarkers.evidence, tone: "evidence" };
+  return { label: runLines.routeMarkers.decision, tone: "decision" };
 }
 
 /**

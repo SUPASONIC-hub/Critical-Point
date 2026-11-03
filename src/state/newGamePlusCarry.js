@@ -19,7 +19,9 @@
  * season number, which the entry chunk's intro reads, are in seasonRecord.js.
  */
 import { getEndingBook } from "./endingBook.js";
-import { OPENING_ECHO } from "./openingState.js";
+import { fill } from "../locale.js";
+import W from "../copy/seasonLines.js";
+import { openingEcho } from "./openingState.js";
 import { countRun, isPlainObject, normalizeLast, normalizeSeasonRecord, VERDICT_NAMES } from "./seasonRecord.js";
 import { getVerdictKey } from "../verdictBranch.js";
 
@@ -38,12 +40,8 @@ export { getSeasonRound, normalizeSeasonRecord, SEASON_RECORD_KEY, VERDICT_NAMES
  * (seasonStanding.js). The open verdict, and a device that cannot know its
  * verdict, keep `OPENING_ECHO`.
  */
-const OPENING_ECHOES = Object.freeze({
-  ending_seal: "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.",
-  ending_reform: "지난 시즌의 기록은 사용 규칙의 기준표가 되었습니다. 이번에는 그 감시가 얼마나 버티는지 보겠습니다.",
-  ending_expose: "지난 시즌의 기록은 이미 바깥에 나가 있습니다. 이번에는 무엇을 먼저 지킬지 보겠습니다.",
-  collapse: "지난 시즌은 사람이 치른 값을 감당하지 못하고 멈췄습니다. 보존된 그 기록이 이번 첫 질문 옆에 놓여 있습니다.",
-});
+// The lines are src/copy/seasonLines.js's (`openingEchoes`), read when asked so they are the page's language.
+const OPENING_ECHOES = W.openingEchoes;
 
 /**
  * The record after a finale has closed. `finalSummary` is the finale's case
@@ -136,8 +134,9 @@ export function getSeasonCarry(record, memory = null) {
  * `keep-all` the phone broke the line between NEW and GAME+.
  */
 export function getMemoryLine({ endingLabel, verdict }) {
-  const named = verdict && verdict !== "collapse" && verdict !== "open" ? `${VERDICT_NAMES[verdict]} · ` : "";
-  return `지난 시즌: ${named}${endingLabel}.${verdict && verdict !== "open" ? " NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다." : ""}`;
+  // The ruling's short name in the page's language (src/copy/seasonLines.js); VERDICT_NAMES stays the record's Korean.
+  const named = verdict && verdict !== "collapse" && verdict !== "open" && Object.hasOwn(VERDICT_NAMES, verdict) ? `${W.verdicts[verdict] ?? VERDICT_NAMES[verdict]} · ` : "";
+  return fill(W.memory.line, { named, ending: endingLabel, carry: verdict && verdict !== "open" ? W.memory.carry : "" });
 }
 
 /**
@@ -151,16 +150,16 @@ export function getMemoryLine({ endingLabel, verdict }) {
 export function getSeasonComparison(record, runId) {
   const { last, previous } = normalizeSeasonRecord(record);
   if (!last || !previous || typeof runId !== "string" || last.runId !== runId) return null;
-  const line =
-    last.endingId === previous.endingId ? `지난 시즌과 같은 결말 ${last.endingLabel}에 다시 닿았습니다` : `지난 시즌 ${previous.endingLabel} · 이번 시즌 ${last.endingLabel}`;
   const rulesChanged = last.tableRules !== null && previous.tableRules !== null && last.tableRules !== previous.tableRules;
-  if (rulesChanged) return `${line} · 판 규칙이 바뀐 뒤의 첫 시즌`;
-  return last.endingId === previous.endingId ? `${line}.` : line;
+  const same = last.endingId === previous.endingId;
+  const words = { ending: last.endingLabel, before: previous.endingLabel, now: last.endingLabel };
+  if (rulesChanged) return fill(same ? W.comparison.sameChanged : W.comparison.versusChanged, words);
+  return fill(same ? W.comparison.same : W.comparison.versus, words);
 }
 
 /** The line under a NEW GAME+ season's first scene: the last ruling's, or the opening line. */
 export function getOpeningEcho(verdict) {
-  return Object.hasOwn(OPENING_ECHOES, verdict ?? "") ? OPENING_ECHOES[verdict] : OPENING_ECHO;
+  return Object.hasOwn(OPENING_ECHOES, verdict ?? "") ? OPENING_ECHOES[verdict] : openingEcho();
 }
 
 /**

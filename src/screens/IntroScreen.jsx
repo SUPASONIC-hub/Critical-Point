@@ -18,7 +18,8 @@ import { loadedChunk } from "../state/chunkReload.js";
 import { retryableLazy } from "../state/retryableLazy.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
-import { getDeletionRequestText } from "../appConfig.js";
+import { DEFAULT_PLAYER_NAME, getDeletionRequestText } from "../appConfig.js";
+import introPanelsCopy from "../copy/introPanels.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
 import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill, LANG } from "../locale.js";
@@ -429,7 +430,8 @@ export function IntroScreen({ view, renderers = {} }) {
             <div className="start-input-row">
               <input
                 id="playerName"
-                value={playerName}
+                // The save keeps the default name in Korean; the box shows it in the page's words.
+                value={playerName === DEFAULT_PLAYER_NAME ? introPanelsCopy.defaultName : playerName}
                 maxLength={PLAYER_NAME_MAX_LENGTH}
                 onChange={(event) => setPlayerName(limitText(event.target.value, PLAYER_NAME_MAX_LENGTH))}
                 onKeyDown={(event) => {

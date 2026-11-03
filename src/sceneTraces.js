@@ -1,3 +1,6 @@
+import { fill } from "./locale.js";
+import W from "./copy/sceneRates.js";
+
 /**
  * The other players' trace on a scene: one line under the scene page's
  * 사건 파일 saying how many of their windows here hit the wall
@@ -17,7 +20,7 @@
 export const SCENE_TRACE_FLOOR = 50;
 
 export const SCENE_TRACE_COPY = {
-  line: (percent) => `이 장면에서 다른 분석관의 ${percent}%가 벽에 닿았습니다.`,
+  line: (percent) => fill(W.trace, { percent }),
 };
 
 /**
