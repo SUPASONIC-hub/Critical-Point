@@ -12,6 +12,8 @@ import { triggerLabels } from "../gameConstants.js";
  */
 const leaderboardCopy = {
   localName: "현재 분석관",
+  // A row whose save kept the default name (appConfig.js DEFAULT_PLAYER_NAME).
+  defaultName: "분석관",
   anonymousName: "익명 분석관",
   anonymousHandle: "{run} · 익명",
   loading: "기록을 불러오는 중입니다.",

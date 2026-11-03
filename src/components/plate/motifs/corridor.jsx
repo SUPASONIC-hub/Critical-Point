@@ -31,7 +31,7 @@ export function paintCorridor(random, accent, glow) {
       {open && halo(open.x + open.w / 2, open.y + open.h / 2, open.h * 0.9, glow)}
       {open && mark(<rect x={open.x} y={open.y} width={open.w} height={open.h} fill={accent} />)}
       {mid(<rect x={vanish - 18} y="58" width="36" height="16" />)}
-      {people(figure("walker", vanish + Math.round(span(random, 26, 54)), 112, 46))}
+      {people(figure("walker", vanish + Math.round(span(random, 26, 54)), 112, 46, { player: true }))}
     </>
   );
 }

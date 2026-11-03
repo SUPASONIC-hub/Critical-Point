@@ -29,7 +29,7 @@ export function paintFloor(random, accent, glow) {
       )}
       {people(
         <>
-          {figure("shift-a", 108, 110, 36)}
+          {figure("shift-a", 108, 110, 36, { player: true })}
           {figure("shift-b", 134, 112, 32)}
         </>,
       )}

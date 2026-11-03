@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 
-import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION } from "../appConfig.js";
+import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION, UNNAMED_ROW_NAME } from "../appConfig.js";
 import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
 import {
   applyEffect,
@@ -27,8 +27,9 @@ import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../g
 import { isTableTaught } from "../gauntlet/tableUnlocks.js";
 import { recordClosedWindow } from "../gauntlet/windowTrail.js";
 import { hasCloudConflict } from "../cloudSave.js";
-import { appliedLocale } from "../locale.js";
+import { appliedLocale, fill } from "../locale.js";
 import noticesCopy from "../copy/notices.js";
+import runLines from "../copy/runLines.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { findFinalChoiceEntry } from "../verdictBranch.js";
@@ -46,7 +47,6 @@ import { takeReadingTally } from "./readingTally.js";
 // A player in the middle of a case is told here, where the save speaks: once a
 // page load and in one line, because the line sits on the play screen and
 // priority 27 gives that screen to the table.
-const CLOUD_CONFLICT_MESSAGE = "온라인 저장이 멈췄습니다. 이 기기에는 저장됩니다. 시작 화면의 '다른 기기에서 이어하기'에서 확인해 주세요.";
 let cloudConflictSaid = false;
 
 /**
@@ -81,7 +81,7 @@ function describeHand(verdict) {
   const streak = describeLogicLog(verdict.logic);
   if (streak) return streak;
   if (verdict.focus?.charge > 0) {
-    return { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 배율 ×${verdict.focus.potMultiplier} · 자원 ×${verdict.focus.resourceMultiplier}` };
+    return { label: "FOCUS", text: fill(runLines.commit.focus, { charge: verdict.focus.charge, pot: verdict.focus.potMultiplier, resource: verdict.focus.resourceMultiplier }) };
   }
   return null;
 }
@@ -127,7 +127,7 @@ export function useChoiceCommit(context) {
       local: true,
       run_id: runId,
       session_code: sessionCode,
-      player_name: playerName || "현재 분석관",
+      player_name: playerName || UNNAMED_ROW_NAME,
       case_id: currentCase,
       case_title: activeCaseMeta?.title ?? currentCase,
       completed_at: caseSummary.completedAt,
@@ -139,9 +139,9 @@ export function useChoiceCommit(context) {
     }
 
     if (!telemetryEnabled) {
-      setTelemetryStatus({ tone: "local", text: "원격 저장 미설정. 이 사건 로그는 로컬과 JSON 내보내기에만 남습니다." });
+      setTelemetryStatus({ tone: "local", text: runLines.remote.unset });
     } else if (!dataConsent) {
-      setTelemetryStatus({ tone: "local", text: "데이터 제공 동의가 없어 원격 저장을 건너뛰었습니다." });
+      setTelemetryStatus({ tone: "local", text: runLines.remote.noConsent });
     } else {
       const caseTelemetryPayload = {
         event_id: createTelemetryEventId(),
@@ -175,11 +175,11 @@ export function useChoiceCommit(context) {
       // queue runs the same privacy check before each send (priority 61), and
       // the row's event id makes a send that did land harmless to repeat.
       if (validateTelemetryItem(caseItem).length > 0) {
-        setTelemetryStatus({ tone: "error", text: "이 사건 로그는 보낼 수 없는 형식이라 원격 저장하지 않습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다." });
+        setTelemetryStatus({ tone: "error", text: runLines.remote.unsendable });
       } else {
         queueTelemetry(caseItem);
         caseRowQueued = true;
-        setTelemetryStatus({ tone: "pending", text: "사건 로그를 보관했습니다. 연결되는 대로 원격 저장합니다." });
+        setTelemetryStatus({ tone: "pending", text: runLines.remote.queued });
       }
     }
 
@@ -258,7 +258,7 @@ export function useChoiceCommit(context) {
 
     const clue = busted ? null : readers.getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute);
     const clueReward = clue
-      ? { label: "EVIDENCE BONUS", text: "숨은 단서를 확보했다.", effect: { legitimacy: 2, fatigue: -1 } }
+      ? { label: "EVIDENCE BONUS", text: runLines.commit.evidenceBonus, effect: { legitimacy: 2, fatigue: -1 } }
       : null;
     const finalEffect = readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? BUST_EFFECT : {});
     const finalResources = applyEffect(resources, finalEffect);
@@ -363,7 +363,7 @@ export function useChoiceCommit(context) {
     // B2: what a closing case hands the next one, off its whole log (cascadeRisk.js).
     const nextRun = carryChoiceLinks(settled, { run: gauntletRun, nextLog, runId, caseId: currentCase });
     const nextEcho = reframeTarget
-      ? `${entry.echo} 다음 장면은 당신이 다시 짠 판을 기준으로 이어집니다.`
+      ? fill(runLines.commit.reframeEcho, { echo: entry.echo })
       : entry.echo;
     appendTraceEvent({
       kind: "choose",
@@ -467,7 +467,7 @@ export function useChoiceCommit(context) {
         skippedTitle: blackoutSkip?.skippedTitle ?? null,
         skippedNodeId: blackoutSkip?.skippedNodeId ?? null,
         skippedPlace: blackoutSkip?.skippedPlace ?? null,
-        nextTitle: nodes[nextNode]?.title ?? "결과 화면",
+        nextTitle: nodes[nextNode]?.title ?? runLines.commit.resultTitle,
         nextNode,
         unlockedRelics,
         // Display only (tableAfterword.js): the push not made or the wall the
@@ -490,7 +490,7 @@ export function useChoiceCommit(context) {
     if (closedCase) recordClosedCase(closedCase);
     if (!cloudConflictSaid && hasCloudConflict()) {
       cloudConflictSaid = true;
-      context.setSaveStatus(CLOUD_CONFLICT_MESSAGE);
+      context.setSaveStatus(runLines.commit.cloudConflict);
     }
   }
 
