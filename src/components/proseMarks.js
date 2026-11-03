@@ -1,3 +1,5 @@
+import { proseSentences } from "./proseSentences.js";
+
 /**
  * Reading marks for scene prose (2026-10-20).
  *
@@ -119,21 +121,38 @@ export function markLines(lines = []) {
  * three sentences to a box, not one. A box a sentence was eleven boxes for a
  * median scene, each with its own border and shadow, and a phone read them as
  * eleven interruptions. A box starts afresh before a sentence that opens
- * speech, so a line someone says leads its box, and after three sentences or
- * when the box would run past 120 characters. The sentences keep their words
- * and their order; only where the boxes break is decided here.
+ * speech, so a line someone says leads its box, after a sentence that closes
+ * one, so the narration after a speech is not in the speech's box
+ * (caption-split, 2026-11-03), and after three sentences or when the box would
+ * run past 120 characters. The sentences are proseSentences.js's, the cut the
+ * balloon's box numbers use too. The boxes keep the words, their order and the
+ * spacing between them (a Japanese box has none); only where they break is
+ * decided here.
+ *
+ * Each box is `{ text, first, count }`: its words, the index of its first
+ * sentence and how many it holds, as speakerLine.js's captionSentences counts.
  */
-export function captionGroups(text = "") {
-  const groups = [];
-  let open = false;
-  for (const sentence of String(text ?? "").split(/(?<=[.!?])\s+/).map((part) => part.trim()).filter(Boolean)) {
-    const last = groups.at(-1);
-    const speech = !open && sentence.startsWith("'");
-    const length = last ? last.join(" ").length + sentence.length : 0;
-    if (!last || speech || last.length >= 3 || length > 120) groups.push([sentence]);
-    else last.push(sentence);
-    // An apostrophe between Latin letters is not a quote (quoteToggles).
-    if ((sentence.match(/(?<![A-Za-z])'|'(?![A-Za-z])/g) ?? []).length % 2 === 1) open = !open;
+export function captionBoxes(text = "") {
+  const source = String(text ?? "");
+  const boxes = [];
+  let index = 0;
+  for (const sentence of proseSentences(source)) {
+    const last = boxes.at(-1);
+    const speech = !sentence.opensInSpeech && source[sentence.start] === "'";
+    const length = last ? sentence.end - last.start : 0;
+    if (!last || speech || last.closed || last.count >= 3 || length > 120) {
+      boxes.push({ start: sentence.start, end: sentence.end, first: index, count: 1, closed: sentence.closesSpeech });
+    } else {
+      last.end = sentence.end;
+      last.count += 1;
+      last.closed = sentence.closesSpeech;
+    }
+    index += 1;
   }
-  return groups.map((group) => group.join(" "));
+  return boxes.map(({ start, end, first, count }) => ({ text: source.slice(start, end), first, count }));
+}
+
+/** The caption boxes' words, in order (captionBoxes). */
+export function captionGroups(text = "") {
+  return captionBoxes(text).map((box) => box.text);
 }

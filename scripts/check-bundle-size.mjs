@@ -81,7 +81,8 @@ const budgets = [
   // reveal:gain / reveal:even / reveal:cost (revealOutcome in GameRuntime). Measured 150,030 / 55,066 in the e2e build, the plus 4.
   // 150,034 / 55,070 -> 150,255 / 55,171 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 150,251 / 55,167 in the e2e build, the plus 4.
   // 150,255 / 55,171 -> 146,589 / 54,099 on 2026-11-02, plate-story over main acf3d999 (#392): the runtime is smaller over #393 (locale-gaps moved words into late chunks). Measured 146,585 / 54,095 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 146_589, maxGzip: 54_099 },
+  // 146,589 / 54,099 -> 147,608 / 54,517 on 2026-11-03, caption-split over main f4625ad1: the briefing's sentences are cut by one shared function that counts the quotes in pairs and ends Japanese sentences at their full stops (src/components/proseSentences.js, imported by proseMarks.js and speakerLine.js). Measured 147,604 / 54,513 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_608, maxGzip: 54_517 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1022,7 +1023,8 @@ const budgets = [
   // 1,203 / 693 measured, the gzip plus 4.
   // 1,203 / 697 -> 1,157 / 654 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,157 / 650 in the e2e build, the gzip plus 4.
-  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_157, maxGzip: 654 },
+  // 654 -> 669 gzip on 2026-11-03, caption-split: its sentence cut is now proseSentences.js's, imported from the chunk that holds it rather than written here. Measured 1,153 / 665 in the e2e build, the plus 4.
+  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_157, maxGzip: 669 },
   // [batch-c] 묶음 B (#277):
   // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
   // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
@@ -1203,7 +1205,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_761, en: 483_722, ja: 490_404 };
+// 490,404 -> 490,411 (ja) on 2026-11-03, caption-split over main f4625ad1: the Korean first paint measured 426,758 and the overlay 3,500, both in their budgets; their file-name hashes moved the sum to 490,407, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_761, en: 483_722, ja: 490_411 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
