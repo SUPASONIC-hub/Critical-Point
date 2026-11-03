@@ -23,6 +23,10 @@ const resultCopy = {
   // Whose record this is: "사건 03 · 한서윤 분석관의 생각 활성 프로필".
   profileLine: "{caseLabel} · {analyst}의 생각 활성 프로필",
   namedAnalyst: "{name} 분석관",
+  // The line for a save that kept the default name (appConfig.js
+  // DEFAULT_PLAYER_NAME), or a name that is this word itself: said once, not
+  // 「분석관 분석관」 as `namedAnalyst` made of it until 11-02.
+  defaultAnalyst: "분석관",
   anonymousAnalyst: "익명 분석관",
   storyRunMark: " · 스토리 모드 · 공개 랭킹 제외",
   finalHeadline: "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다.",

@@ -14,6 +14,7 @@
  */
 import { readCharacterProfile } from "./seasonRules.js";
 import { CASE_PACKS } from "./nodes/casePacks.js";
+import { localizeTables } from "./locale.js";
 export const characterProfiles = {
   한서윤: {
     role: "트리거랩 실장 · KD은행 기업금융전략팀 차장",
@@ -261,3 +262,8 @@ for (const pack of CASE_PACKS) {
   }
   if (pack.characterOverrides) packCharacterOverrides[pack.id] = pack.characterOverrides;
 }
+
+// What the report's scene beat says of a speaker (gameLogic.js
+// buildSceneBeat), in the page's language once the whole season's people are
+// in: src/locales/<lang>/late/gameDialogue.js, fetched when this module loads.
+localizeTables("gameDialogue", { characterProfiles });

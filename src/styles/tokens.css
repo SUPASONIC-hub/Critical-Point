@@ -155,4 +155,33 @@
   --ui-dur: 240ms;
   --ui-page-max: 1240px;
   --ui-gutter: clamp(16px, 4.2vw, 56px);
+  /* The rem the HUD's big numbers and the decorative numerals are sized in:
+     1rem everywhere except the PC block below, which takes the 1/8 back. */
+  --hud-rem: 1rem;
+}
+
+/* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from
+   1025px wide the root grows by 1/8, so every rem -- story, choices, dialogue,
+   the result report, the intro, the ranking -- reads 2px larger per 16 (16 ->
+   18px) and the headings grow in step. A percentage, so a reader's own browser
+   size still carries through. Phones and tablets up to 1024px keep 16px: at
+   1024 itself the `max-width: 1024px` tablet layouts still hold, and their
+   narrowest columns were not cut for 18px type. The
+   pot, the clock and the timers are tuned to the HUD's height and stay their
+   size through --hud-rem. */
+@media (min-width: 1025px) {
+  html {
+    font-size: 112.5%;
+  }
+
+  :root {
+    --hud-rem: calc(1rem / 1.125);
+  }
+
+  /* The start screen keeps 16px: at 18px Linux put the 1280x720 start button
+     at 733 (11-02). The reading screens are where the larger type is for. */
+  html:has(.intro) {
+    font-size: 100%;
+    --hud-rem: 1rem;
+  }
 }

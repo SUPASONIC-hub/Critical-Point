@@ -13,6 +13,7 @@
      responsive          the media blocks, which span every screen
      recovery            the recovery and error surfaces
      relics              the relic draft, the relic chips and the unlock notices
+     money               the bank rail's purse and the slam's amount that flies to it
      briefing            the graphic-novel briefing page in front of each table
      comfort             what the player turned down, and the panel for it */
 @import "./app/base-intro-ranking.css";
@@ -22,5 +23,6 @@
 @import "./app/responsive.css";
 @import "./app/recovery.css";
 @import "./app/relics.css";
+@import "./app/money.css";
 @import "./app/briefing.css";
 @import "./app/comfort.css";

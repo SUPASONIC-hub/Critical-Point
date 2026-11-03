@@ -39,7 +39,7 @@ export function paintControl(random, accent, glow) {
       )}
       {people(
         <>
-          {seated("watch-a", 96, 112, 30)}
+          {seated("watch-a", 96, 112, 30, { player: true })}
           {seated("watch-b", 206, 112, 28)}
         </>,
       )}

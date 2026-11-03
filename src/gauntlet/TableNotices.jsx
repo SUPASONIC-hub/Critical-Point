@@ -9,6 +9,8 @@ import { SCOUT_SECONDS } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
+import { MoneyBurst } from "./MoneyBurst.jsx";
+import { readBurst } from "./moneyFeedback.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -69,14 +71,22 @@ function HeldElsewhere({ onClaim, onLeave }) {
   );
 }
 
-/** The verdict, slammed over the table for the beat before the reveal opens. */
-function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps }) {
+/**
+ * The verdict, slammed over the table for the beat before the reveal opens.
+ * The hand's amount is its own large line (`MoneyBurst`, money-feedback): a
+ * cash's +N is that line, read where the pill read it; a bust's −N stands over
+ * the sentence that says the pot, and is not read twice.
+ */
+function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, target = null }) {
+  // The amount flies only where there is a purse to fly to.
+  const burst = target ? readBurst({ win, livePot, runPot, bustKeeps }) : null;
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">
       {win.status === "bust" ? (
         <>
           <Skull size={56} aria-hidden="true" />
           <strong lang="en">BUST</strong>
+          <MoneyBurst burst={burst} target={target} spoken={false} />
           <span>
             {win.cause === "timeout"
               ? say.slamTimeout
@@ -89,10 +99,9 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
       ) : (
         <>
           <strong>{formatMultiplier(multiplier)}</strong>
-          <span>
-            +{formatNumber(livePot)}
-            {streak > 0 ? fill(say.slamCombo, { streak }) : ""}
-          </span>
+          {burst ? <MoneyBurst burst={burst} target={target} /> : <span>+{formatNumber(livePot)}</span>}
+          {/* The combo's copy starts on the separator the +N used to stand before. */}
+          {streak > 0 && <span>{fill(say.slamCombo, { streak }).replace(/^\s*·\s*/, "")}</span>}
         </>
       )}
     </div>
