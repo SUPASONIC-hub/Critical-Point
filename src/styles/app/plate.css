@@ -21,6 +21,8 @@
   --plate-ambient: var(--ui-surface-4);
   --plate-accent-chip: var(--ui-chip);
   --plate-accent-heat: var(--ui-heat);
+  --plate-player: var(--c-gx-hand);
+  --plate-player-edge: var(--ui-text);
 
   display: block;
   background: var(--ui-bg-raised);
@@ -68,6 +70,45 @@
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
   aspect-ratio: 320 / 132;
+}
+
+/* The player in the room (2026-11-02, E): the colour of the player's own hand
+   on the table, inside an outline in the text colour, so the figure reads as
+   "you" by its heavier edge where the colour alone would not -- and follows
+   the text and the hand if the theme changes them. Everyone else stays a
+   silhouette in --plate-figure. */
+.gx-plate-player {
+  fill: var(--plate-player);
+  stroke: var(--plate-player-edge);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+/* A case's result prints the case's last room in the light it closed on
+   (2026-11-02, F; getOutcomeTone, src/plateStory.js): warmer and brighter for
+   an ending that carried more than it cost, washed out for one that did both,
+   cold and dim for one that cost more. The same drawing, re-toned, so no
+   ending needs a picture of its own. */
+.gx-plate-result {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-xs);
+  aspect-ratio: 320 / 132;
+}
+
+.gx-plate-outcome-good {
+  filter: sepia(0.22) saturate(1.35) brightness(1.12);
+}
+
+.gx-plate-outcome-mixed {
+  filter: saturate(0.7) brightness(0.94);
+}
+
+.gx-plate-outcome-bad {
+  filter: hue-rotate(150deg) saturate(0.6) brightness(0.68);
 }
 
 /* A clock that reads after midnight loses the last of the ambient fill, so the
