@@ -20,7 +20,7 @@ export function paintMarket(random, accent, glow) {
   const queue = Math.round(span(random, 2, 4));
   const customers = [];
   for (let person = 0; person < queue; person += 1) {
-    customers.push(figure(`q-${person}`, 250 + person * 20, 128, 38 - person * 3));
+    customers.push(figure(`q-${person}`, 250 + person * 20, 128, 38 - person * 3, { player: person === 0 }));
   }
   return (
     <>

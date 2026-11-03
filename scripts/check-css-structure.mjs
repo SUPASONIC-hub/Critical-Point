@@ -313,7 +313,10 @@ const fileBudgets = {
   // table instead of standing still under a running clock.
   // 665 / 15400 -> 588 / 9768 on 2026-10-13: comments no longer counted
   // (77 lines and 5632 bytes of them that day), the room unchanged.
-  "plate.css": { lines: 588, bytes: 9768 },
+  // 588 / 9768 -> 619 / 10135 on 2026-11-02, measured (plate-story, E and F):
+  // the player's own figure in the hand's colour inside an outline, and the
+  // result's copy of a case's last room with its three tones.
+  "plate.css": { lines: 619, bytes: 10135 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
@@ -365,7 +368,12 @@ const fileBudgets = {
   // and the reduced-motion rule that stills all three.
   // 846 / 16306 -> 846 / 16328 on 2026-11-02, measured (pc-type-scale): the
   // briefing timer keeps its size through --hud-rem from 1024px wide.
-  "briefing.css": { lines: 846, bytes: 16328 },
+  // 846 / 16306 -> 849 / 16456 on 2026-11-02, measured (plate-story, D): the
+  // sound is lettered beside what makes it, placed in the drawing's units, so
+  // the splash panel is a size container and the word's corner pin became a
+  // position read off the plate. 849 / 16478 over main 5c00dffe (with
+  // pc-type-scale), measured.
+  "briefing.css": { lines: 849, bytes: 16478 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

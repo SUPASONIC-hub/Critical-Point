@@ -37,7 +37,7 @@ export function paintFactory(random, accent, glow) {
       {near(<path d="M-4 104 H324 V132 H-4 Z" />)}
       {people(
         <>
-          {figure("worker", 262, 124, 44)}
+          {figure("worker", 262, 124, 44, { player: true })}
           {figure("foreman", 292, 124, 40)}
         </>,
       )}
