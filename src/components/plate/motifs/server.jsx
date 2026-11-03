@@ -38,7 +38,7 @@ export function paintServer(random, accent, glow) {
       {mid(racks)}
       {halo(panelX + 7, 40, 22, glow)}
       {mark(<rect x={panelX} y="34" width="14" height="10" fill={accent} stroke="none" />)}
-      {people(figure("admin", vanish + Math.round(span(random, 6, 22)), 104, 34))}
+      {people(figure("admin", vanish + Math.round(span(random, 6, 22)), 104, 34, { player: true }))}
     </>
   );
 }
