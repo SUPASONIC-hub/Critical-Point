@@ -96,7 +96,7 @@ export default {
       "place": "KD Capital, Euljiro, 11th floor · Lease Review Team meeting room",
       "clock": "Approval committee D-4 · 21:30",
       "question": "A young reviewer’s six lines vanished exactly the way your opinion did 3 years ago. What do you tell her?",
-      "lead": "You get a visitor pass at the security desk and go up; on the 12th floor only one meeting room has its lights on."
+      "lead": "You get a visitor pass at the security desk and go up; on the 11th floor only one meeting room has its lights on."
     },
     "c16_roof": {
       "title": "The Second Cup of Noodles",
@@ -462,7 +462,7 @@ export default {
           "label": "Add the let-go, 1 year later"
         }
       },
-      "place": "Lee Minseo’s rooftop room, Mangwon-dong · Rooftop",
+      "place": "Lee Minseo’s rooftop room, Haebangchon · Rooftop",
       "clock": "Late November · First snow · Thursday 19:00",
       "question": "A termination text has landed on the Thursday dinner table. Where do you move this table?",
       "lead": "Since the school-gate steps on exam day, Thursday evenings have meant dinner at Lee Minseo’s rooftop room."
