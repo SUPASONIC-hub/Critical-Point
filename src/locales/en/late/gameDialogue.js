@@ -25,8 +25,8 @@ export default {
     "도윤하": {
       "appearance": "An ID badge over a field jacket, a radio held for a long time, eyes where the branch sales board still hasn’t been erased.",
       "thought": "I sold that loan. At the window, smiling, as one more sale on the board.",
-      "gesture": "Do Yoonha presses her lips together for a moment. It’s the face of someone thinking of a person’s name, not a number.",
-      "voice": "She first asks whose day the cost of a decision gets moved onto.",
+      "gesture": "Do Yoonha presses his lips together for a moment. It’s the face of someone thinking of a person’s name, not a number.",
+      "voice": "He first asks whose day the cost of a decision gets moved onto.",
       "line": "Then what do we tell the first person this decision hits? I know that person’s face."
     },
     "오진우": {
