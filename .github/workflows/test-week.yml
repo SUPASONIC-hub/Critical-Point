@@ -105,7 +105,21 @@ jobs:
             export TEST_WEEK_SIM=sim.txt
             echo "The reference column is the measurement passed in (TEST_WEEK_SIM)."
           fi
-          node scripts/report-test-week.mjs rows.json >> "$GITHUB_STEP_SUMMARY"
+          # The same summary goes to a file too, with its counts as JSON, and
+          # up as the run's artifact (2026-11-03; the Job Summary cannot be
+          # read from the CLI or the API). The folder never holds rows.json.
+          mkdir -p test-week-report
+          node scripts/report-test-week.mjs rows.json > test-week-report/test-week-summary.md
+          node scripts/report-test-week.mjs rows.json --json > test-week-report/test-week-summary.json
+          cat test-week-report/test-week-summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Remove the rows
         if: always()
         run: rm -f rows.json query.err sim.txt
+      - name: Upload the summary
+        if: steps.token.outputs.configured == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-week-summary
+          path: test-week-report
+          if-no-files-found: ignore
+          retention-days: 45

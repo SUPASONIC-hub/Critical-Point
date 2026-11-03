@@ -12,6 +12,7 @@
  *
  *   node scripts/report-test-week.mjs --sql            the one SELECT the workflow sends
  *   node scripts/report-test-week.mjs <rows.json>      the summary, from what it got back
+ *   node scripts/report-test-week.mjs <rows.json> --json   the same counts as JSON (the run's artifact)
  *
  * TEST_WEEK and TEST_WEEK_RULE pick another week of the calendar (default the
  * one above); both are checked against the shape the server allows before they
@@ -345,12 +346,23 @@ export function describeTestWeek(t, sim = SIM) {
   ].join("\n");
 }
 
-const [arg] = import.meta.url === pathToFileURL(process.argv[1] ?? "").href ? process.argv.slice(2) : [];
+/**
+ * The summary's counts as one JSON object for the run's artifact
+ * (.github/workflows/test-week.yml, 2026-11-03): readTestWeek's tally and the
+ * reference lines it is read against. Counts only, the same as the Markdown:
+ * no run id, device or row.
+ */
+export function testWeekJson(rows, sim = SIM) {
+  return { week: WEEK, counts: readTestWeek(rows), reference: sim };
+}
+
+const [arg, format] = import.meta.url === pathToFileURL(process.argv[1] ?? "").href ? process.argv.slice(2) : [];
 if (arg === "--sql") {
   process.stdout.write(`${QUERY}\n`);
 } else if (arg) {
   const parsed = JSON.parse(readFileSync(arg, "utf8"));
   const rows = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.rows) ? parsed.rows : null;
   if (!rows) throw new Error(`${arg} holds no rows`);
-  process.stdout.write(`${describeTestWeek(readTestWeek(rows))}\n`);
+  if (format === "--json") process.stdout.write(`${JSON.stringify(testWeekJson(rows), null, 2)}\n`);
+  else process.stdout.write(`${describeTestWeek(readTestWeek(rows))}\n`);
 }
