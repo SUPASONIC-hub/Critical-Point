@@ -14,6 +14,7 @@ export default {
   failureRecoveryLabel: "失敗からの復旧ルート",
   profileLine: "{caseLabel} · {analyst}の思考アクティブプロフィール",
   namedAnalyst: "{name}分析官",
+  defaultAnalyst: "分析官",
   anonymousAnalyst: "匿名の分析官",
   storyRunMark: " · ストーリーモード · 公開ランキング対象外",
   finalHeadline: "いま、あなたは自分の条件をどう使うかを選ばなければならない。",

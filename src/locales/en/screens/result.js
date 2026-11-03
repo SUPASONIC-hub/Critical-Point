@@ -14,6 +14,7 @@ export default {
   failureRecoveryLabel: "Way back from failure",
   profileLine: "{caseLabel} · {analyst}’s thinking profile",
   namedAnalyst: "Analyst {name}",
+  defaultAnalyst: "Analyst",
   anonymousAnalyst: "Anonymous Analyst",
   storyRunMark: " · Story Mode · not on the public rankings",
   finalHeadline: "Now you have to choose how to use your own conditions.",
