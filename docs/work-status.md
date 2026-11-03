@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-03 (the state of `main` at `bb492d5`, after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395) and the test week summary fixes (#407), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-03 (the state of `main` at `8e93010`, after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -475,8 +475,17 @@ Still open, on purpose:
   #395 (`locale-review-1103`: English profile pronouns for seven people,
   Look-Before-You-Leap, 首席分析官, Bankroll); #407 (`test-week-summary`:
   re-measured bot values through a repository variable or a dispatch input,
-  five ranking bug signals, returns per finished season). Four PRs merged,
-  production build-sha `bb492d5`, 1,651 unit tests.
+  five ranking bug signals, returns per finished season); #397 (English
+  number warnings 18 to 12); #404 (Verify Ranking replay test for weekly-rule
+  runs); #410 (`npm run check:changed` and build:e2e reuse for the same
+  tree); #406 (deploy at push when main gets the same tree, e2e, season and
+  visual skipped for drafts and docs-only PRs; #402 reached production in
+  10 min 39 s); #402 (360px signal row: LOCK clear of the logic combo in en
+  and ja); #409 (last week's rule board tab for the following week); #411
+  (WebKit start button, `text-wrap: wrap` for ko and ja at 360px and under);
+  #421 (summary artifacts for Funnel, Test Week and Verify Ranking); #408
+  (coverage floors one under the measured values). Fourteen PRs merged,
+  production build-sha `811df47` (8e93010 deploying), 1,692 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
