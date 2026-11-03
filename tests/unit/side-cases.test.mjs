@@ -71,6 +71,7 @@ const seasonNumbersBefore = {
 };
 
 const { side00 } = await import("../../src/nodes/side00.js");
+const { side01 } = await import("../../src/nodes/side01.js");
 const { SIDE_CASES } = await import("../../src/nodes/sidePacks.js");
 const sideCases = await import("../../src/sideCases.js");
 const sideRun = await import("../../src/state/sideRun.js");
@@ -142,10 +143,84 @@ test("3: the slot opens on a closed finale (NEW GAME+ or caseResults.final) and 
   assert.equal(closed.cases[0].closed, true);
 });
 
-test("the registry lists no side case in a release: the placeholder is behind the debug build", () => {
+test("the registry lists 번외 1 in a release; the placeholder stays behind the debug build", async () => {
   // Node has no __CP_DEBUG_BUILD__, as a release has it false.
-  assert.deepEqual(SIDE_CASES, []);
+  assert.deepEqual(
+    SIDE_CASES.map(({ id, label, title }) => ({ id, label, title })),
+    [{ id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명" }],
+  );
   assert.equal(side00.fixture, true);
+  // The entry loads the case file it names, and says what the file says.
+  const loaded = await SIDE_CASES[0].load();
+  assert.equal(loaded, side01);
+  assert.equal(loaded.label, SIDE_CASES[0].label);
+  assert.equal(loaded.title, SIDE_CASES[0].title);
+  assert.equal(side01.fixture, undefined, "번외 1 is a case, not the placeholder");
+});
+
+test("번외 1 is a sound side pack: 8 to 12 scenes, no season scene, every speaker profiled and painted", async () => {
+  assert.deepEqual(checkSidePack(side01, { seasonNodeIds: Object.keys(nodes) }), []);
+  const sceneIds = Object.keys(side01.nodes);
+  assert.ok(sceneIds.length >= 8 && sceneIds.length <= 12, `${sceneIds.length} scenes`);
+  assert.deepEqual(Object.keys(side01.outcomes).sort(), side01.nodes.s1_aftershock.choices.map(({ id }) => id).sort());
+  const { getCharacterProfile } = await import("../../src/gameDialogue.js");
+  const { getSpeakerPortrait } = await import("../../src/speakerPortraits.js");
+  for (const [nodeId, scene] of Object.entries(side01.nodes)) {
+    assert.ok(getCharacterProfile(scene.speaker, null), `${nodeId}: ${scene.speaker} has no profile`);
+    assert.ok(getSpeakerPortrait(scene.speaker), `${nodeId}: ${scene.speaker} has no portrait (never a silhouette)`);
+  }
+});
+
+test("번외 1's copy keeps the season's lengths: labels 30, scenes 420, a cognition on every card", () => {
+  for (const [nodeId, scene] of Object.entries(side01.nodes)) {
+    assert.ok([...scene.text].length <= 420, `${nodeId}: ${[...scene.text].length} characters`);
+    assert.ok(Array.isArray(scene.memo) && scene.memo.length > 0, `${nodeId}: no memo`);
+    assert.ok(scene.place && scene.clock, `${nodeId}: no place or clock`);
+    for (const choice of scene.choices) {
+      assert.ok([...choice.label].length <= 30, `${choice.id}: ${[...choice.label].length} characters`);
+      assert.ok(Object.keys(choice.cognition ?? {}).length > 0, `${choice.id}: no cognition`);
+    }
+  }
+  for (const [id, { text }] of Object.entries(side01.outcomes)) assert.ok([...text].length <= 420, `${id}: ${[...text].length} characters`);
+});
+
+test("번외 1 is the Saturday between 사건 17's committee and the 송년회, and it never says what became of the notebook", () => {
+  // 2025-12-19 (금) committee, 12-21 (일) 송년회 (docs/canon.md): the 20th is a Saturday.
+  assert.equal(new Date(Date.UTC(2025, 11, 20)).getUTCDay(), 6);
+  assert.match(side01.nodes.s1_start.clock, /^12월 20일 \(토\)/);
+  const copy = JSON.stringify(side01);
+  // 사건 17 ends on court, owners, fire or its hidden route; a side case read after any of them holds.
+  for (const fate of ["법원에 냈", "태웠", "태운 ", "뜯어", "돌려준 수첩"]) assert.equal(copy.includes(fate), false, fate);
+  // 47명, of whom 7 not yet visited (case17.js c17_unreached).
+  assert.match(side01.nodes.s1_start.text, /아직 찾아가지 못한 사람 7명/);
+});
+
+test("번외 1 plays to each of its three endings, on every route through its branches, without touching the engine", () => {
+  const pack = sideRun.prepareSidePack(side01);
+  const endings = new Set();
+  const routes = new Set();
+  // Every card of every scene, walked: each path through the case. The
+  // shortest asks seven decisions (it skips the folding, the lunch and the
+  // phone), the longest ten.
+  const walk = (state, path) => {
+    if (state.outcomeChoiceId) {
+      endings.add(state.outcomeChoiceId);
+      routes.add(path.join(">"));
+      assert.ok(state.log.length >= 7 && state.log.length <= 10, `${path.join(">")}: ${state.log.length} decisions`);
+      for (const value of Object.values(state.resources)) assert.ok(Number.isFinite(value));
+      return;
+    }
+    const scene = pack.nodes[state.nodeId];
+    for (const choice of scene.choices) walk(sideRun.advanceSideRun(pack, state, { choice, window: CASHED }), [...path, state.nodeId]);
+  };
+  walk(sideRun.createSideRun(pack, { runId: "side01-walk" }), []);
+  assert.deepEqual([...endings].sort(), ["s1_after_blank", "s1_after_hers", "s1_after_order"]);
+  // Every scene is on some route.
+  const visited = new Set([...routes].flatMap((route) => route.split(">")));
+  assert.deepEqual([...visited].sort(), Object.keys(side01.nodes).sort());
+  // A bust on every second window still closes it.
+  assert.ok(playThrough(pack, { pick: 2, window: (index) => (index % 2 ? BUST : CASHED) }).outcomeChoiceId);
+  assert.equal(ENGINE_CONSTANTS(), seasonNumbersBefore.engine, "the engine's constants moved");
 });
 
 test("7: the placeholder is a sound side pack, and the check finds what a broken one gets wrong", () => {
@@ -317,6 +392,7 @@ test("the season case's reading tally is put back after a side case is read", as
 
 test("6: the goals, the titles and the season's length read the same after side cases are loaded and played", () => {
   playThrough(sideRun.prepareSidePack(side00));
+  playThrough(sideRun.prepareSidePack(side01));
   assert.deepEqual(getAchievementProgress({}).map(({ id, goal }) => [id, goal]), seasonNumbersBefore.goals);
   assert.deepEqual(seasonNumbersBefore.goals.find(([id]) => id === "full-audit"), ["full-audit", 55]);
   assert.equal(JSON.stringify(ANALYST_TITLE_STEPS), seasonNumbersBefore.titles);

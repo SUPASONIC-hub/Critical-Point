@@ -130,3 +130,12 @@ export function fill(template, values) {
 export function localizeCaseData(caseId, data, index) {
   return overlay ? overlay.localizeCaseData(caseId, data, index) : data;
 }
+
+/**
+ * E-11 번외 사건: a side pack as it arrives (src/nodes/sidePacks.js), with the
+ * page's language laid over its scenes and endings
+ * (src/locales/<lang>/nodes/sideNN.js). Korean as it is on a Korean page.
+ */
+export function localizeSidePack(pack) {
+  return overlay ? overlay.localizeSidePack(pack) : pack;
+}

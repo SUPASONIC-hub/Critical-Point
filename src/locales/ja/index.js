@@ -730,5 +730,17 @@ export const copy = {
         "summary": "勝った翌日に請求書が来る。3年間、被害者の名簿をひとりで抱えていた人が倒れ、その名簿は公式の記録ではないまま、4日後に廃棄される。"
       }
     }
+  },
+  // E-11 번외 사건: the side list's label and title (src/nodes/sidePacks.js,
+  // `SIDE_CASES`), the way seasonCasesBase names a season case; the label in
+  // the case labels' form (10-29, the user's choice (1)). A side case's scenes
+  // and endings are nodes/sideNN.js.
+  "sidePacks": {
+    "SIDE_CASES": {
+      "side01": {
+        "label": "番外1",
+        "title": "まだ訪ねていない七人"
+      }
+    }
   }
 };
