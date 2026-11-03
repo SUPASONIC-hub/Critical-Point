@@ -48,7 +48,7 @@ export function paintWard(random, accent, glow) {
           <path d="M-4 118 H324 V132 H-4 Z" />
         </>,
       )}
-      {people(seated("visitor", 212, 100, 26))}
+      {people(seated("visitor", 212, 100, 26, { player: true }))}
     </>
   );
 }
