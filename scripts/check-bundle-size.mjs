@@ -1322,8 +1322,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
 // #224 merged with main cb904fb6 (11-03; #392 plate-story, #398): 426,925, 483,922 and 490,595, the plus 4.
  * #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d, 11-03): 427,089, 484,217 and 490,894, the plus 4.
+ * The CI build (Linux) measures the first paint 4 bytes over this PC's e2e build (#224 30f5519d): the budgets are this PC's plus 8 (the CI's plus 4), 427,097, 484,225 and 490,902.
  */
-const FIRST_PAINT_BUDGETS = { ko: 427_093, en: 484_221, ja: 490_898 };
+const FIRST_PAINT_BUDGETS = { ko: 427_097, en: 484_225, ja: 490_902 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
