@@ -182,7 +182,8 @@ const budgets = [
   // 30,498 / 13,286 -> 30,627 / 13,319 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's case rules and link tag beside main's plate words. Measured 30,627 / 13,315 in the e2e build, the gzip plus 4.
   // 30,627 / 13,319 -> 31,427 / 13,614 on 2026-11-03, #316 table-rhythm-bundle merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 31,427 / 13,610 in the e2e build, the gzip plus 4.
   // 30,627 / 13,319 -> 31,636 / 13,649 on 2026-11-03, #320 c3-c4-rules merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 31,636 / 13,645 in the e2e build, the gzip plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 31_636, maxGzip: 13_649 },
+  // 31,636 / 13,649 -> 32,437 / 13,941 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 32,437 / 13,937 in the e2e build, the gzip plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 32_437, maxGzip: 13_941 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -206,7 +207,8 @@ const budgets = [
   // 86,970 -> 86,975 gzip on 2026-11-02, table-rhythm-bundle (#316) merged with #224 afdcac0c (main 2f085d28). Measured 86,971 in the e2e build, the gzip plus 4.
   // 290,343 / 86,970 -> 294,110 / 87,736 on 2026-11-02, locale-gaps (#393) over main 9be94346: the season store's lines (NEW GAME+, second season, ending book, the share tail) read from src/copy/seasonLines.js. Measured 294,106 / 87,732 in the e2e build, the plus 4.
   // 294,110 / 87,736 -> 294,110 / 87,752 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 87,748 gzip (raw under 294,110) in the e2e build, the gzip plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_752 },
+  // 294,110 / 87,752 -> 294,110 / 87,758 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 87,754 gzip (raw under 294,110) in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_758 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -377,7 +379,8 @@ const budgets = [
   // 189,363 / 68,363 -> 189,363 / 68,388 on 2026-11-03, #320 c3-c4-rules merged with #224 c55d71e1 (main 465ccb93): only the chunk names it imports and C-4's entry words beside main's keyed intro. Measured 68,384 gzip (raw under 189,363) in the e2e build, the gzip plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,536 / 68,469 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 189,536 / 68,465 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_536, maxGzip: 68_469 },
+  // 189,536 / 68,469 -> 189,660 / 68,545 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 189,660 / 68,541 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_660, maxGzip: 68_545 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -757,7 +760,8 @@ const budgets = [
   // 200,434 / 37,457 -> 200,532 / 37,494 on 2026-11-03, #316 table-rhythm-bundle merged with #224 c55d71e1 (main 465ccb93): the board's marks beside #224's 360px audit place and sig-tight signals and main's money.css and type scale. Measured 200,532 / 37,490 in the e2e build, the gzip plus 4.
   // 201,099 / 37,652 -> 201,197 / 37,687 on 2026-11-03, #316 table-rhythm-bundle merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 201,197 / 37,683 in the e2e build, the gzip plus 4.
   // 201,099 / 37,652 -> 201,343 / 37,672 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 201,343 / 37,668 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 201_343, maxGzip: 37_687 },
+  // 201,343 / 37,687 -> 201,494 / 37,715 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 201,494 / 37,711 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 201_494, maxGzip: 37_715 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -937,7 +941,8 @@ const budgets = [
   // 44,132 / 16,529 -> 44,896 / 16,998 on 2026-11-03, #316 table-rhythm-bundle merged with #224 c55d71e1 (main 465ccb93): the table rhythm's run reads beside #224's settlement and main's run lines. Measured 44,896 / 16,994 in the e2e build, the gzip plus 4.
   // 44,132 / 16,529 -> 44,132 / 16,535 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): only the chunk names it imports. Measured 16,531 gzip (raw under 44,132) in the e2e build, the gzip plus 4.
   // 44,132 / 16,529 -> 44,704 / 16,734 on 2026-11-03, #320 c3-c4-rules merged with #224 c55d71e1 (main 465ccb93): C-3's direction streak beside #224's settlement and main's run lines. Measured 44,704 / 16,730 in the e2e build, the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 44_896, maxGzip: 16_998 },
+  // 44,896 / 16,998 -> 45,465 / 17,217 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 45,465 / 17,213 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 45_465, maxGzip: 17_217 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1324,7 +1329,8 @@ const budgets = [
   // 179,786 / 60,177 -> 180,327 / 60,411 on 2026-11-03, #316 table-rhythm-bundle merged with #224 c55d71e1 (main 465ccb93): the table rhythm's Japanese beside #224's and main's new tables. Measured 180,327 / 60,407 in the e2e build, the gzip plus 4.
   // 179,786 / 60,177 -> 180,518 / 60,361 on 2026-11-03, #320 c3-c4-rules merged with #224 c55d71e1 (main 465ccb93): C-3/C-4's Japanese beside #224's and main's new tables. Measured 180,518 / 60,357 in the e2e build, the gzip plus 4.
   // 179,786 / 60,177 -> 180,174 / 60,319 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 180,174 / 60,315 in the e2e build, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_518, maxGzip: 60_411 },
+  // 180,518 / 60,411 -> 181,649 / 60,804 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 181,649 / 60,800 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 181_649, maxGzip: 60_804 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1338,7 +1344,8 @@ const budgets = [
   // 149,845 / 53,504 -> 150,340 / 53,761 on 2026-11-03, #316 table-rhythm-bundle merged with #224 c55d71e1 (main 465ccb93): the table rhythm's English beside #224's and main's new tables. Measured 150,340 / 53,757 in the e2e build, the gzip plus 4.
   // 149,845 / 53,504 -> 150,511 / 53,680 on 2026-11-03, #320 c3-c4-rules merged with #224 c55d71e1 (main 465ccb93): C-3/C-4's English beside #224's and main's new tables. Measured 150,511 / 53,676 in the e2e build, the gzip plus 4.
   // 149,845 / 53,504 -> 150,176 / 53,642 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 150,176 / 53,638 in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_511, maxGzip: 53_761 },
+  // 150,511 / 53,761 -> 151,549 / 54,164 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 151,549 / 54,160 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 151_549, maxGzip: 54_164 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1519,7 +1526,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // The CI build (Linux) measures the first paint 4 bytes over this PC's e2e build (#224 30f5519d): the budgets are this PC's plus 8 (the CI's plus 4), 426,993, 484,165 and 490,852.
 // #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d, 11-03): 427,089, 484,217 and 490,894, the plus 4.
 // The CI build (Linux) measures the first paint 4 bytes over this PC's e2e build (#224 30f5519d): the budgets are this PC's plus 8 (the CI's plus 4), 427,097, 484,225 and 490,902.
-const FIRST_PAINT_BUDGETS = { ko: 427_097, en: 484_312, ja: 490_966 };
+// 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308, 11-03: 427,308, 484,956 and 491,596 on this PC; the budgets are those plus 8 (the CI's plus 4).
+const FIRST_PAINT_BUDGETS = { ko: 427_316, en: 484_964, ja: 491_604 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1663,7 +1671,8 @@ function checkBudget(file, budget) {
 // 10,106 / 3,624 -> 10,139 / 3,639 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 10,135 / 3,635, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
 // 10,139 / 3,643 -> 10,171 / 3,660 on 2026-11-03, #224 merged with main cb904fb6: personalBests in the warm list beside main's ScenePlate. Measured 10,171 / 3,656, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 10_171, maxGzip: 3_660 };
+// 3,660 -> 3,666 gzip on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d: the warm list's hashed names. Measured 3,662, the gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 10_171, maxGzip: 3_666 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
