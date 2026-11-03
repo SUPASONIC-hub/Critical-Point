@@ -31,6 +31,7 @@ test("only a release build has it: not the dev server, the e2e build or a debug 
   assert.equal(analyticsFor({ id: ID, command: "serve", mode: "development", debug: true }), null);
   assert.equal(analyticsFor({ id: ID, command: "build", mode: "e2e", debug: false }), null);
   assert.equal(analyticsFor({ id: ID, command: "build", mode: "production", debug: true }), null);
+  assert.equal(analyticsFor({ id: ID, command: "build", mode: "app", debug: false }), null);
   assert.equal(on.id, ID);
   assert.match(on.path, /^\/assets\/analytics-[0-9a-f]{8}\.js$/);
   assert.equal(on.source, analyticsConfigSource(ID));
@@ -62,6 +63,29 @@ test("off, index.html and the pages are the ones without it, but for the policy'
   assert.match(ANALYTICS_NOTICE.ja, /2026年11月12日から、訪問統計のためにGoogleアナリティクス\(Google LLC、米国\)を使用します/);
   // The FAQ has no notice.
   for (const file of ["faq.html", "en/faq.html", "ja/faq.html"]) assert.doesNotMatch(renderStaticPages("")[file], GOOGLE, file);
+});
+
+test("the app build (`--mode app`) has no tag, no Google origin and no Google Analytics sentence, even given an ID", () => {
+  // What vite.config.js does with GA_MEASUREMENT_ID set in an app build.
+  const app = analyticsFor({ ...readAnalyticsEnv({ GA_MEASUREMENT_ID: ID }), command: "build", mode: "app", debug: false });
+  assert.equal(app, null);
+  const index = readFileSync("index.html", "utf8");
+  assert.equal(withAnalyticsTags(index, app), index);
+  for (const origin of ["", "https://critical-point-wn6p.onrender.com"]) {
+    const pages = renderStaticPages(origin, { analytics: app, app: true });
+    assert.equal(Object.keys(pages).length, 15);
+    for (const [file, html] of Object.entries(pages)) {
+      // The policy's notice that the web turns it on 11-12 is not the app's to make: the app never does.
+      assert.doesNotMatch(html, GOOGLE, file);
+      assert.doesNotMatch(html, /변경 예고|Upcoming change|変更の予告/, file);
+    }
+    // Everything else is the web's page without it.
+    const web = renderStaticPages(origin);
+    for (const [file, language] of Object.entries(POLICIES)) assert.equal(pages[file], web[file].replace(`${ANALYTICS_NOTICE[language]}\n`, ""), file);
+  }
+  const config = readFileSync("vite.config.js", "utf8");
+  assert.match(config, /staticPages\(analytics, \{ app: mode === "app" \}\)/);
+  assert.match(config, /analyticsFor\(\{ \.\.\.readAnalyticsEnv\(loadEnv\(mode, process\.cwd\(\), "GA_"\)\), command, mode, debug: debugBuild \}\)/);
 });
 
 test("on, every page loads Google's tag and the file that configures it, with no inline script", () => {

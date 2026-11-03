@@ -9,7 +9,9 @@ const unusedVars = [
 
 export default [
   {
-    ignores: [".claude/**", "dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**"],
+    // app/: the store shells' own packages, the web build they carry and
+    // the native projects (docs/app-shell.md); its scripts are linted below.
+    ignores: [".claude/**", "dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**", "app/node_modules/**", "app/dist-app/**", "app/ios/**", "app/twa/**/build/**"],
   },
   js.configs.recommended,
   {
@@ -41,7 +43,7 @@ export default [
   {
     // tests/unit/*.test.mjs matched neither pattern until 2026-09-28, so it was
     // linted with no Node globals and the default unused-vars options.
-    files: ["scripts/**/*.mjs", "tests/**/*.{js,mjs}", "*.config.js", "eslint.config.js"],
+    files: ["scripts/**/*.mjs", "tests/**/*.{js,mjs}", "*.config.js", "eslint.config.js", "app/*.mjs", "app/twa/*.mjs"],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
