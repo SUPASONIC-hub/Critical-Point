@@ -2690,6 +2690,25 @@
     display: none;
   }
 
+  /* With the count beside them the signals keep their labels and bars only:
+     the crosshair and the chain's sentence go, three auto columns 4px apart
+     (360x740 hand5 on Linux, sig-tight; 2026-11-03). */
+  .gauntlet-stage .gx-hud.has-audit .gx-focus-signal svg,
+  .gauntlet-stage .gx-hud.has-audit .gx-overdrive > span {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-hud.has-audit .gx-signals {
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+    column-gap: 4px;
+  }
+
+  .gauntlet-stage .gx-hud.has-audit .gx-overdrive,
+  .gauntlet-stage .gx-hud.has-audit .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
   .gauntlet-stage .gx-hud-audit {
     display: inline-flex;
     grid-area: audit;
