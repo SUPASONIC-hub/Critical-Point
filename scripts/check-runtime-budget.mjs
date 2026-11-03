@@ -191,13 +191,18 @@ const BUDGETS = {
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
   // 10 -> 12 on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/result.js) and `fill` for its lines with blanks.
+  // 12 -> 13 on 2026-11-02, plate-story (#392, F): the result screen draws the
+  // case's last room (ScenePlate, variant="result") at the top of the outcome
+  // panel; no other import could go. Measured 340 / 13.
   // 12 -> 13 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46:
   // the side list (`SIDE_CASES`, src/sideCases.js) for the finale's one line
   // that the side slot opened. 339 lines fit main's 340.
+  // 340 / 13 -> 342 / 14 on 2026-11-03, E-11 over main 425eb4da: the side list
+  // beside plate-story's ScenePlate. Measured 342 / 14.
   "src/screens/ResultScreen.jsx": {
-    lines: 340,
+    lines: 342,
     longestLine: 280,
-    importedNames: 13,
+    importedNames: 14,
     hooks: {},
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table

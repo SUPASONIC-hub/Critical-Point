@@ -43,7 +43,7 @@ export function paintTransit(random, accent, glow) {
           <line x1="150" y1="78" x2="150" y2="132" />
         </>,
       )}
-      {people(figure("driver", 54, 92, 26))}
+      {people(figure("driver", 54, 92, 26, { player: true }))}
     </>
   );
 }

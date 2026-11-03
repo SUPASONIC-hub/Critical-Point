@@ -19,7 +19,7 @@ export function paintNewsroom(random, accent, glow) {
     const x = Math.round(30 + desk * 72 + span(random, -6, 6));
     desks.push(<rect key={`desk-${desk}`} x={x} y="84" width="46" height="6" />);
     desks.push(<rect key={`mon-${desk}`} x={x + 12} y="70" width="20" height="13" />);
-    if (desk !== 2 || random() < 0.5) reporters.push(seated(`r-${desk}`, x + 22, 88, 20));
+    if (desk !== 2 || random() < 0.5) reporters.push(seated(`r-${desk}`, x + 22, 88, 20, { player: desk === 0 }));
   }
   return (
     <>

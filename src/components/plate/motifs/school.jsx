@@ -18,7 +18,7 @@ export function paintSchool(random, accent, glow) {
   const count = Math.round(span(random, 3, 5));
   for (let sign = 0; sign < count; sign += 1) {
     const x = Math.round(span(random, 16, 100) + (sign % 2) * 190);
-    fans.push(figure(`fan-${sign}`, x, 126, 30));
+    fans.push(figure(`fan-${sign}`, x, 126, 30, { player: sign === 0 }));
     signs.push(<rect key={`sign-${sign}`} x={x - 9} y="88" width="18" height="10" />);
   }
   return (
