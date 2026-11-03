@@ -169,3 +169,29 @@ test("the game links each policy in the page's language: Korean at the root, Eng
   assert.equal(legalPagePath(TERMS_PAGE_PATH, "fr"), "/terms.html", "a language with no pages falls back to Korean");
   assert.equal(legalPagePath(PRIVACY_PAGE_PATH), "/privacy.html");
 });
+
+test("the store apps' copies say what their ads and purchase do, and the site's pages are the ones above", () => {
+  const app = renderLegalPages({ app: true });
+  assert.deepEqual(Object.keys(app), Object.keys(pages));
+  assert.deepEqual(renderLegalPages({ app: false }), pages);
+  const [appKo, appEn, appJa] = ["privacy.html", "en/privacy.html", "ja/privacy.html"].map((name) => decode(app[name]));
+  for (const html of [appKo, appEn, appJa]) {
+    assert.match(html, /Google AdMob/);
+    assert.match(html, /Google LLC\s?\((?:미국|USA|米国)\)/);
+    assert.match(html, /Supabase Inc\.\s?\((?:미국|USA|米国)\)/);
+    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]/, "no placeholder left");
+  }
+  assert.doesNotMatch(appKo, /지금은 광고가 없/);
+  assert.doesNotMatch(appEn, /currently shows no ads/);
+  assert.doesNotMatch(appJa, /現在、広告はありません/);
+  // The same sections, in the same order, in every language: one more line, never another heading.
+  const headings = (html) => [...html.matchAll(/<h2>(\d+)\./g)].map((match) => match[1]).join(",");
+  for (const [web, mobile] of [[ko, appKo], [en, appEn], [ja, appJa]]) assert.equal(headings(mobile), headings(web));
+  assert.match(decode(app["terms.html"]), /청약철회가 제한될 수 있습니다/);
+  assert.match(decode(app["en/terms.html"]), /Remove Ads is a one-time purchase/);
+  assert.match(decode(app["ja/terms.html"]), /申込みの撤回が制限される場合があります/);
+  // The app's copies speak for the app only (10-30, the user's 1): what the web
+  // version shows changes with its own switches (Analytics, AdSense), so a line
+  // about it here would go wrong the day one of them is set.
+  for (const name of Object.keys(app)) assert.doesNotMatch(decode(app[name]).replace(/<style>[\s\S]*?<\/style>/, ""), /(?:웹판은 무료이며 광고와|웹판에는 광고가 없|web version is free, with no ads|web version has none|web version shows no ads|ウェブ版は無料で、広告や|ウェブ版に広告はありません)/);
+});

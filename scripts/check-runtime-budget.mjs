@@ -163,8 +163,10 @@ const BUDGETS = {
   // view models are one namespace import (sceneViewModels, with the runtime
   // card's label as `runtimeCardLabel`) and the two runtime cards' words are
   // src/copy/runLines.js's. Measured 968 / 96.
+  // 960 -> 962 on 2026-10-29 (#330): openCase's store-app ad between cases, a comment and one line that the site's builds fold away.
+  // 968 -> 970 on 2026-11-03 (#330 over app-shell e5b03e64, main 16b6d349): the same two lines over bgm-variety and locale-gaps. Measured 970 / 96.
   "src/GameRuntime.jsx": {
-    lines: 968,
+    lines: 970,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },

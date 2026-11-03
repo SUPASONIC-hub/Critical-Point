@@ -1,3 +1,5 @@
 /* The home screen name, in Japanese: GAME_NAME.ja before its colon, as the Korean one is (scripts/legal-pages.mjs). */
 "CFBundleDisplayName" = "臨界点";
 "CFBundleName" = "臨界点";
+/* The system's tracking question (ATT), in Japanese (app-launch memo B-4; a draft with 앱출시-J, not yet edited by a person). */
+"NSUserTrackingUsageDescription" = "許可すると、他のアプリやウェブサイトでの行動にもとづいて、より関連性の高い広告を表示します。許可しなくても、ゲームは同じように遊べます。";
