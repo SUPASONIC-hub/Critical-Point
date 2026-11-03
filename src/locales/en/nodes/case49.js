@@ -131,7 +131,7 @@ export default {
     },
     "c49_final": {
       "title": "Who Owns the Empty Field",
-      "text": "No one called anyone, but everyone has gathered. 23 faces lean over the 'Unsigned' field with the pencil dot; from beside the counter, the memorial portrait drawing of Lim Kyungsoo looks down at the field too. Han Seoyun lays a ballpoint pen beside the printout. 'This field was never one person’s field. He left it empty, I pressed the return button, and the committee pretended not to know. Tomorrow he’ll ask you. Whose name should go in this field. Decide the answer here before you go. Whether to end it with his name alone, to write down everyone who left it empty, or to take the pen he holds out and change things from inside.'",
+      "text": "No one called anyone, but everyone has gathered. 23 faces lean over the 'Unsigned' field with the pencil dot; from beside the counter, the memorial portrait drawing of Lim Kyungsoo looks down at the field too. Cha Jiwon sets a timer for 7 minutes, and Pyo Serin opens the 'Grounds' folder on her laptop. Han Seoyun lays a ballpoint pen beside the printout. 'This field was never one person’s field. He left it empty, I pressed the return button, and the committee pretended not to know. Tomorrow he’ll ask you. Whose name should go in this field. Decide the answer here before you go. Whether to end it with his name alone, to write down everyone who left it empty, or to take the pen he holds out and change things from inside.'",
       "memo": [
         "Printout of page 3 of the 2023-0412 approval document -- a pencil dot beside the 'Unsigned' field",
         "1st floor of the bookshop: 23 people, 16 chairs",
@@ -183,7 +183,7 @@ export default {
     },
     "c49_parcels": {
       "title": "The Things That Arrive",
-      "text": "Parcels and people line up. Sunwoo Jin in Jeju sends a box of tangerines with 'Take it slow' written on it, and Lee Jungsook sends a page from her dictation notebook. 'If you don’t know, don’t sign. If you know, write your name.' Jung Taeo’s tteok skewer truck pulls up in the alley, and Cho Hyunseok in Singapore sends an email. 'They say even in a tiger’s den you survive if you keep your wits. So don’t go into the den.' Do Yoonha stops counting the boxes. 'These people aren’t wondering what you’ll say tomorrow. They’re wondering whether you’ll come back.'",
+      "text": "Parcels and people line up. Sunwoo Jin in Jeju sends a box of tangerines with 'Take it slow' written on it, and Lee Jungsook sends a page from her dictation notebook. 'If you don’t know, don’t sign. If you know, write your name.' Jung Taeo’s tteok skewer truck pulls up in the alley, Namgoong Sol in Gunsan sends the No. 1 number ticket stamped with her handprint, and Choi Seojin sends a photo of Darami with a ribbon. Cho Hyunseok in Singapore sends an email. 'They say even in a tiger’s den you survive if you keep your wits. So don’t go into the den.' Do Yoonha stops counting the boxes. 'These people aren’t wondering what you’ll say tomorrow. They’re wondering whether you’ll come back.'",
       "memo": [
         "17 parcels and 96 messages arrived",
         "Lee Jungsook’s note: 'If you know, write your name'",
@@ -438,7 +438,7 @@ export default {
     },
     "c49_start_warm": {
       "title": "A Second Text for the One Who Shared Songpyeon",
-      "text": "That night, Lim Kyungsoo’s fountain pen lay capped in the middle of the table. 'Now let’s talk about the empty signature field.' No one answered Yoon Sanghyuk’s one line. This morning at 9, the second text arrives. 'Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve. The Chairman has given me one night while the room is cleared out.' Do Yoonha peers at your screen. 'Everyone who was with us that night is in the group chat right now. Will you speak first, or later?'",
+      "text": "That night, Min Harang came too and talked about the rider rest stop, and Lim Kyungsoo’s fountain pen lay capped in the middle of the table. 'Now let’s talk about the empty signature field.' No one answered Yoon Sanghyuk’s one line. This morning at 9, the second text arrives. 'Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve. The Chairman has given me one night while the room is cleared out.' Do Yoonha peers at your screen. 'Everyone who was with us that night is in the group chat right now. Will you speak first, or later?'",
       "memo": [
         "Yoon Sanghyuk’s second text: tomorrow night at 12, the former Group Strategy Office, 33rd floor",
         "People who stayed on the bookshop’s 1st floor that night: 14",
