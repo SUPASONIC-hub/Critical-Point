@@ -12,6 +12,7 @@ import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
+import { localePreloadFileName, localePreloadMap, localePreloadSource, readLocaleKey, withLocalePreloadTag } from "./scripts/locale-preload.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
@@ -204,6 +205,37 @@ function criticalCss() {
         }
         out += `<script src="/${DEFERRED_STYLES_FILE}" defer></script>`;
         return out + html.slice(cursor);
+      },
+    },
+  };
+}
+
+/**
+ * `/assets/locale-preload-<hash>.js` and its tag in index.html: a page in
+ * another language asks for its dictionary's files from the head, alongside
+ * the entry chunk, instead of one after another once the entry has run
+ * (scripts/locale-preload.mjs). After the page is written -- the tag goes
+ * into the finished index.html -- and before `serviceWorker()`, which reads
+ * the page and every file off the disk.
+ */
+function localePreload() {
+  return {
+    name: "locale-preload",
+    apply: "build",
+    generateBundle: {
+      order: "post",
+      handler(options, bundle) {
+        const page = bundle["index.html"];
+        if (!page || page.type !== "asset") return;
+        const source = localePreloadSource({
+          map: localePreloadMap(bundle),
+          base: "/",
+          localeKey: readLocaleKey(readFileSync("src/appConfig.js", "utf8")),
+        });
+        const fileName = localePreloadFileName(source);
+        this.emitFile({ type: "asset", fileName, source });
+        const html = typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8");
+        page.source = withLocalePreloadTag(html, `/${fileName}`);
       },
     },
   };
@@ -659,7 +691,7 @@ export default defineConfig(({ command, mode }) => {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages(analytics),
+      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), localePreload(), staticPages(analytics),
       adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
