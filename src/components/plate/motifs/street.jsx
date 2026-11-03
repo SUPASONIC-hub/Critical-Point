@@ -32,7 +32,7 @@ export function paintStreet(random, accent, glow) {
       {mark(<rect x={windowX} y={windowY} width="18" height="13" fill={accent} />)}
       {people(
         <>
-          {figure("walker", Math.round(span(random, 60, 110)), 116, 32)}
+          {figure("walker", Math.round(span(random, 60, 110)), 116, 32, { player: true })}
           {figure("waiter", lampX - 14, 118, 30)}
         </>,
       )}

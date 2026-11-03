@@ -1,4 +1,6 @@
 import { caseIntroEchoes, legacyProfiles, nextCaseSignals } from "../caseCopy.js";
+import runLines from "../copy/runLines.js";
+import { fill } from "../locale.js";
 import { RESULT_NODE_IDS } from "../gameCases.js";
 import {
   CASE_SEQUENCE,
@@ -69,7 +71,7 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
       }
     : null;
   const echo = previousOutcome
-    ? `${introEcho} 지난 사건: '${previousOutcome.title}'`
+    ? fill(runLines.caseEcho, { echo: introEcho, title: previousOutcome.title })
     : introEcho;
   // The origin bonus is the run's opening hand, so it belongs to the season's
   // first case -- which is the 프롤로그 now, not 사건 01.

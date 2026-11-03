@@ -39,7 +39,7 @@ export function paintAuditorium(random, accent, glow) {
       {mark(<rect x="152" y="63" width="16" height="3" fill={accent} stroke="none" />)}
       {people(
         <>
-          {figure("speaker", 176, 72, 20)}
+          {figure("speaker", 176, 72, 20, { player: true })}
           {rows}
         </>,
       )}

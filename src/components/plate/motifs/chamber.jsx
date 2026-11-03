@@ -51,7 +51,7 @@ export function paintChamber(random, accent, glow) {
         </>,
       )}
       {mark(<rect x={emptyX + 3} y="87" width="12" height="10" fill={accent} opacity="0.85" stroke="none" />)}
-      {people(seated("witness", 152, 102, 26))}
+      {people(seated("witness", 152, 102, 26, { player: true }))}
     </>
   );
 }

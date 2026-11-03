@@ -5,6 +5,7 @@ import { anonymizeSensitiveText, limitText } from "../gameLogic.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createTelemetryEventId } from "./payloadSchemas.js";
 import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
+import runLines from "../copy/runLines.js";
 
 /** What the form's status line says on `caseId`'s result page: only what was said about that case. */
 export function readFeedbackStatus(status, caseId) {
@@ -127,7 +128,7 @@ export function createFeedbackActions({
   async function submitCurrentFeedback() {
     if (isSubmittingFeedback) return;
     if (activeFeedbackPrivacySignals.length > 0) {
-      setFeedbackStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 저장해 주세요.");
+      setFeedbackStatus(runLines.feedback.privacy);
       return;
     }
 
@@ -146,8 +147,8 @@ export function createFeedbackActions({
     if (!telemetryEnabled || !dataConsent) {
       setFeedbackStatus(
         telemetryEnabled
-          ? "로컬에 저장했습니다. 데이터 제공 동의가 없어 원격 저장은 건너뛰었습니다."
-          : "로컬에 저장했습니다. 원격 저장 미설정 상태라 원격 저장은 건너뛰었습니다.",
+          ? runLines.feedback.localNoConsent
+          : runLines.feedback.localUnset,
       );
       setIsSubmittingFeedback(false);
       return;
@@ -168,11 +169,11 @@ export function createFeedbackActions({
 
     try {
       await sendTelemetryItem(item);
-      setFeedbackStatus("피드백을 저장했습니다.");
+      setFeedbackStatus(runLines.feedback.saved);
     } catch (error) {
       console.warn(error);
       queueTelemetry(item);
-      setFeedbackStatus("로컬에는 저장했습니다. 원격 저장 실패분은 대기열에 보관했습니다.");
+      setFeedbackStatus(runLines.feedback.queued);
     } finally {
       setIsSubmittingFeedback(false);
     }

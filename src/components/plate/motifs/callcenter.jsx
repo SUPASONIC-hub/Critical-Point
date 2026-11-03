@@ -15,7 +15,10 @@ export function paintCallcenter(random, accent, glow) {
     for (let seat = 0; seat < 6; seat += 1) {
       const x = Math.round(26 + seat * 52 + (row % 2) * 14);
       rows.push(<line key={`div-${row}-${seat}`} x1={x - 22} y1={y - 8} x2={x - 22} y2={y} />);
-      if (random() < 0.85) agents.push(seated(`agent-${row}-${seat}`, x, y, round(14 * scale)));
+      // The player has a seat in the front row whatever the draw says; the
+      // draw is still made, so no other seat changes.
+      const player = row === 2 && seat === 2;
+      if (random() < 0.85 || player) agents.push(seated(`agent-${row}-${seat}`, x, y, round(14 * scale), { player }));
     }
   }
   return (
