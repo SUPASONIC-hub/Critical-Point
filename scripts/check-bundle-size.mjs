@@ -287,8 +287,8 @@ const budgets = [
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
-  // 189,392 / 68,379 -> 189,436 / 68,408 on 2026-11-03, ranking-recheck-wider over main 36104abd (보안 점검 M2): the ranking asks for `rechecked` and a remote row not checked yet reads as pendingCheck (src/telemetry.js, src/ranking.js). Measured 189,432 / 68,404 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_436, maxGzip: 68_408 },
+  // 189,392 / 68,379 -> 189,436 / 68,408 on 2026-11-03, ranking-recheck-wider over main 36104abd (보안 점검 M2): the ranking asks for `rechecked` and a remote row not checked yet reads as pendingCheck (src/telemetry.js, src/ranking.js). Measured 189,432 / 68,404 in the e2e build, the plus 4; 68,408 gzip over main 811df47a (#411), so 68,412.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_436, maxGzip: 68_412 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -598,7 +598,9 @@ const budgets = [
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
   // 200,019 / 37,440 -> 200,372 / 37,500 on 2026-11-03, signal-row-fit over main 425eb4da: on 360px or less the English and
   // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_372, maxGzip: 37_500 },
+  // 200,372 / 37,500 -> 200,439 / 37,512 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: on 360px or less the Korean and
+  // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 200,435 / 37,508, plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_439, maxGzip: 37_512 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1216,8 +1218,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 426,814 / 483,775 / 490,461 on 2026-11-03, signal-row-fit over main 425eb4da (#395 on cb904fb6): LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,810 / 483,771 / 490,457, the plus 4.
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
-// 426,833 / 483,809 / 490,494 -> 426,863 / 483,886 / 490,568 on 2026-11-03, ranking-recheck-wider over main 36104abd: the entry's `rechecked` read and the two dictionaries' 「확인 중」. Measured 426,859 / 483,882 / 490,564, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_863, en: 483_886, ja: 490_568 };
+// 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
+// 426,845 / 483,820 / 490,505 -> 426,875 / 483,896 / 490,578 on 2026-11-03, ranking-recheck-wider over main 811df47a (보안 점검 M2): the entry's `rechecked` read and the two dictionaries' 「확인 중」. Measured 426,871 / 483,892 / 490,574, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_875, en: 483_896, ja: 490_578 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
