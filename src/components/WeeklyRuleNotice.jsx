@@ -8,8 +8,10 @@ import { isFirstSeason, setWeekRuleTakenUp, setWeekRuleTurnedDown, weekRuleTaken
  * Where 이번 주의 규칙 shows on the start screen (`view="line"`) and the
  * ranking screen (`view="boards"`). The words and the controls are a chunk of
  * their own (WeeklyRuleViews.jsx), fetched only when the calendar has this
- * week or the next: most weeks, and every test build (whose weekly clock is
- * held on a week without a rule), fetch nothing and draw nothing.
+ * week or the next (the ranking's boards: this week or the last, so a
+ * finished rule week's board stays a week longer): most weeks, and every test
+ * build (whose weekly clock is held on a week without a rule), fetch nothing
+ * and draw nothing.
  *
  * Fetched by hand, like the online-save panel's body: a chunk that fails here
  * leaves the line out rather than throwing into the root boundary.
@@ -18,7 +20,7 @@ let views = null;
 
 export function WeeklyRuleNotice({ view = "line", now }) {
   const at = now ?? weeklyRuleNow();
-  const news = weekHasNews(at);
+  const news = weekHasNews(at, undefined, view === "boards" ? -7 : 7);
   const [loaded, setLoaded] = useState(views);
 
   useEffect(() => {
