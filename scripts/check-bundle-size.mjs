@@ -153,7 +153,8 @@ const budgets = [
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
   // 291,131 / 87,101 -> 290,343 / 86,964 on 2026-10-26, 영어판 3단계: runtimeSystems.js's words (src/copy/seasonEnd.js) first landed here, which imports the runtimeSystems chunk back, and the table read at load was undefined in the production build (runtime smoke); grouped with runtimeSystems now, and this file measured smaller. Measured in the e2e build, the gzip plus 4.
   // 290,343 / 86,970 -> 294,110 / 87,736 on 2026-11-02, locale-gaps (#393) over main 9be94346: the season store's lines (NEW GAME+, second season, ending book, the share tail) read from src/copy/seasonLines.js. Measured 294,106 / 87,732 in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_736 },
+  // 294,110 / 87,736 -> 294,110 / 87,752 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 87,748 gzip (raw under 294,110) in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_752 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -316,7 +317,8 @@ const budgets = [
   // 188,124 / 67,821 -> 188,300 / 67,918 on 2026-11-02, #308 d2-hall-of-fame merged with #224 c29c2efd (main 9be94346). Measured 188,300 / 67,914 in the e2e build, the gzip plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_368 },
+  // 189,363 / 68,368 -> 189,536 / 68,469 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 189,536 / 68,465 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_536, maxGzip: 68_469 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -543,7 +545,8 @@ const budgets = [
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_367, maxGzip: 16_517 },
+  // 50,367 / 16,517 -> 50,369 / 16,517 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 50,369 raw (gzip under 16,517) in the e2e build.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_369, maxGzip: 16_517 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -652,7 +655,8 @@ const budgets = [
   // 199,354 / 37,230 -> 200,434 / 37,457 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's link tag, signal row, English bank rail and 360px audit place (sig-tight: the signals' icon and chain sentence hidden beside the count, three auto columns) over main's money.css, 360px English labels and 1025px type scale. Measured 200,434 / 37,453 in the e2e build, the gzip plus 4.
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
   // 200,434 / 37,457 -> 201,099 / 37,652 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's 360px audit place and sig-tight signals beside main's plate story CSS. Measured 201,099 / 37,648 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 201_099, maxGzip: 37_652 },
+  // 201,099 / 37,652 -> 201,343 / 37,672 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 201,343 / 37,668 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 201_343, maxGzip: 37_672 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1165,7 +1169,8 @@ const budgets = [
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
   // 179,701 / 60,151 -> 179,786 / 60,177 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's Japanese lines (audit, links, bests) beside main's new tables and purse. Measured 179,786 / 60,173 in the e2e build, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_786, maxGzip: 60_177 },
+  // 179,786 / 60,177 -> 180,174 / 60,319 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 180,174 / 60,315 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_174, maxGzip: 60_319 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1173,7 +1178,8 @@ const budgets = [
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,845 / 53,504 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's English lines beside main's new tables and purse. Measured 149,845 / 53,500 in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_845, maxGzip: 53_504 },
+  // 149,845 / 53,504 -> 150,176 / 53,642 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 150,176 / 53,638 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_176, maxGzip: 53_642 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1315,8 +1321,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
 // #224 merged with main cb904fb6 (11-03; #392 plate-story, #398): 426,925, 483,922 and 490,595, the plus 4.
+ * #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d, 11-03): 427,089, 484,217 and 490,894, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 426_929, en: 483_926, ja: 490_599 };
+const FIRST_PAINT_BUDGETS = { ko: 427_093, en: 484_221, ja: 490_898 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
