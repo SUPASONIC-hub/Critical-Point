@@ -252,9 +252,9 @@ export default {
     },
     "p2_nightshift_reaction": {
       "title": "The Training Packet at Window 4",
-      "text": "On your way out of the center, your phone rings with an unknown number. It’s Do Yoonha, twenty-four, a teller at Window 4 of Gangseo Branch. The branch has received training material for next month’s campaign, and the product is called 'FlowOn Supplier Partnership Loan.' 'I heard you’re the one reviewing this at head office.' He asks carefully. 'The packet says to recommend it to supplier owners, but it only explains half the product. This clause here, what does it mean?' The sentence he reads out is the same one you saw in the contract in your review file. Behind him, someone is writing numbers on the branch sales board.",
+      "text": "On your way out of the center, your phone rings with an unknown number. It’s Do Yoonha, twenty-four, a teller at Window 4 of Gangseo Branch. The branch has received training material for a product going on sale at the end of the month, and the product is called 'Smart Logistics No. 3.' 'I heard you’re the one reviewing this at head office.' He asks carefully. 'The packet says to recommend it to regular customers, but it only explains half the product. This clause here, what does it mean?' The sentence he reads out is the same one you saw in the contract in your review file. Behind him, someone is writing numbers on the branch sales board.",
       "memo": [
-        "Do Yoonha, Window 4, Gangseo Branch -- next month’s campaign",
+        "Do Yoonha, Window 4, Gangseo Branch -- product on sale at month’s end",
         "Training packet’s clause explanation: only half"
       ],
       "choices": {
@@ -270,7 +270,7 @@ export default {
       },
       "place": "In the car from Gimpo to head office",
       "clock": "Friday, April 14, 2023 · 07:00",
-      "question": "A Gangseo Branch teller asks about a clause in a product he’ll be selling next month. How much do you explain?"
+      "question": "A Gangseo Branch teller asks about a clause in a product he’ll be selling from the end of the month. How much do you explain?"
     },
     "p2_ledger_reaction": {
       "title": "A New Page in the Notebook",
@@ -366,9 +366,9 @@ export default {
     },
     "p2_route_system": {
       "title": "The Same Sentence, 47 Times",
-      "text": "Instead of choosing what goes into the opinion, you ask how many other contracts carry Article 7. Team Head Lim Kyungsoo opens the terminal in the 8th-floor review records room. The fluorescent light flickers twice, and the contract folders run to page 22 on the screen. He prints 3 years’ worth as watermarked copies and lays them out on the floor. Of those, 47 contracts carry a sentence identical to Article 7, word for word. In 9 of them, the margin on signing day was under 1 percentage point, and all nine carry a red 'Growth Strategy Project' mark in the document category box. Lim Kyungsoo pushes himself up off his knees. 'You thought this clause was there to call loans. It isn’t. It’s there to approve them. Lend to a risky company, write in that you can pull out when it gets risky, and the approval goes through.'",
+      "text": "Instead of choosing what goes into the opinion, you ask how many other contracts carry Article 7. Team Head Lim Kyungsoo opens the terminal in the 8th-floor review records room. The fluorescent light flickers twice, and the contract folders run to page 22 on the screen. He prints the five months’ worth since the clause appeared as watermarked copies and lays them out on the floor. Of those, 47 contracts carry a sentence identical to Article 7, word for word. In 9 of them, the margin on signing day was under 1 percentage point, and all nine carry a red 'Growth Strategy Project' mark in the document category box. Lim Kyungsoo pushes himself up off his knees. 'You thought this clause was there to call loans. It isn’t. It’s there to approve them. Lend to a risky company, write in that you can pull out when it gets risky, and the approval goes through.'",
       "memo": [
-        "Contracts with the same sentence: 47 (3 years)",
+        "Contracts with the same sentence: 47 (five months since the clause appeared)",
         "Margin under 1 percentage point at signing -- 9",
         "All 9 categorized as 'Growth Strategy Project'"
       ],
@@ -557,7 +557,7 @@ export default {
     "p2_corridor_choice_3": "You go back up, and it’s as if nothing happened. Only two people know what was said on the landing, and one of them decides where things sit.",
     "p2_nightshift_reaction_choice_1": "You explain it all, and Do Yoonha is silent for a while before he asks, 'Then I shouldn’t sell this?' You have no authority to answer that question.",
     "p2_nightshift_reaction_choice_2": "You flag it, and the training packet comes back down a week late. The explanation grows by two lines, and the sales target stays the same.",
-    "p2_nightshift_reaction_choice_3": "You end it, and the line goes quiet. Next month, Do Yoonha will sell that product at Window 4.",
+    "p2_nightshift_reaction_choice_3": "You end it, and the line goes quiet. From the end of that month, Do Yoonha will sell that product at Window 4.",
     "p2_ledger_reaction_choice_1": "The case is opened formally, and the review stops. A stopped review is remembered for who stopped it. Ban Jaewook writes your name in his notebook.",
     "p2_ledger_reaction_choice_2": "The informal check is fast. But it can’t be cited as grounds in any document. Ban Jaewook says twice, 'This never happened.'",
     "p2_ledger_reaction_choice_3": "You ask him not to open it, and Ban Jaewook closes his notebook. 'Understood. But I’m not erasing this line.' The number 179.6 stays on the first line of that page.",
@@ -596,7 +596,7 @@ export default {
     "p2_start_speed_team": "You gather them, and six people give you 30 minutes. Five call it 'a good company'; only Oh Jinwoo says 'the deadline is strange.'",
     "p2_start_speed_scope": "You ask, and the answer comes the next day. One line. 'Group growth strategy project -- review criteria same as standard.' What’s actually different is never written down.",
     "p2_start_speed_accept": "You book it at once, and due diligence moves up a day. That day lets you see the night-shift changeover, time that wasn’t on the schedule.",
-    "p2_start_speed_signature": "You point it out, and Yoon Sanghyuk looks at the schedule again. Then he gives back one day. 'You’re right. One day should do it?' Two days never come back."
+    "p2_start_speed_signature": "You point it out, and Yoon Sanghyuk looks at the schedule again. Then he gives back one day. 'You’re right. One day should do it?' Three days never come back."
   },
   "choiceVoiceLines": {
     "p2_start_team": "Since 31 billion won is too big to judge alone, you gather the team and talk through how to read this file.",

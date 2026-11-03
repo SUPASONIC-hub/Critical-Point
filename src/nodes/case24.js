@@ -234,7 +234,7 @@ const case24Nodes = {
         label: "백아린이 직접 이름을 걸도록 감사위원회에 함께 간다",
         effect: { legitimacy: 13, trust: 8, capital: -9, time: -7, humanCost: -4, fatigue: 6 },
         voice: "어차피 이 층 사람이면 다 알게 된다며, 감사위원회에 함께 가서 백아린이 직접 이름을 걸게 한다.",
-        echo: "함께 가니 백아린은 사표 초안 위에 제보자 서명을 합니다. 감사위원회 접수 번호는 17시 3분 전에 붙습니다.",
+        echo: "함께 가니 백아린은 당신 제보서의 참고인 칸에 이름을 적습니다. 감사위원회 접수 번호는 17시 3분 전에 붙습니다.",
         cognition: { persistence: 1, reframing: 2 },
       },
       {
