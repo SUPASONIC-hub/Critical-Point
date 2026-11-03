@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { WEB_AD_CODE_MARKERS } from "./adsense-config.mjs";
@@ -286,7 +286,8 @@ const budgets = [
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_368 },
+  // 189,363 / 68,368 -> 189,859 / 68,587 on 2026-11-03, seo-locale-start over main 443f26d8: src/locale.js reads the start page's folder (/en/, /ja/) as a language, a choice made there moves to the chosen language's folder, and a page opened by ?lang= points its canonical at the folder. Measured 189,855 / 68,583 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_859, maxGzip: 68_587 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1203,7 +1204,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_761, en: 483_722, ja: 490_404 };
+// 426,761 / 483,722 / 490,404 -> 427,428 / 483,966 / 491,147 on 2026-11-03, seo-locale-start over main 443f26d8: index.html's description from the about page and its no-script intro and five links, and the entry's folder languages; English and Japanese are now measured from their own start pages (/en/, /ja/) in place of the Korean index.html. Measured 427,424 / 483,962 / 491,143, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_428, en: 483_966, ja: 491_147 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1333,7 +1335,8 @@ function checkBudget(file, budget) {
 // 10,106 / 3,624 -> 10,139 / 3,639 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 10,135 / 3,635, the plus 4.
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_139, maxGzip: 3_643 };
+// 10,139 / 3,643 -> 10,237 / 3,668 on 2026-11-03, seo-locale-start over main 443f26d8: the worker answers /en/ and /ja/ as the page (LANGUAGE_START). Measured 10,233 / 3,664, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_237, maxGzip: 3_668 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
@@ -1390,8 +1393,13 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
     if (name) queue.push(name);
     else failures.push(`No chunk matches ${pattern} in dist/assets; the ${lang} first paint waits on it.`);
   }
-  let total = firstPaint;
-  const extra = [];
+  // The language's own start page (/en/, /ja/, since 11-03) in place of the
+  // Korean index.html: the same files, its words.
+  const ownPage = path.join(distDir, lang, "index.html");
+  const ownBytes = existsSync(ownPage) ? gzipSync(readFileSync(ownPage)).length : null;
+  if (ownBytes === null) failures.push(`dist/${lang}/index.html is missing; the ${lang} start page is written by startPages() in vite.config.js.`);
+  let total = firstPaint - gzipSync(Buffer.from(html)).length + (ownBytes ?? gzipSync(Buffer.from(html)).length);
+  const extra = [`${lang}/index.html ${ownBytes}`];
   while (queue.length) {
     const name = queue.shift();
     if (counted.has(name)) continue;
@@ -1402,7 +1410,7 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
     queue.push(...staticImports(name));
   }
   if (total > FIRST_PAINT_BUDGETS[lang]) {
-    failures.push(`The ${lang} first paint (?lang=${lang}) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
+    failures.push(`The ${lang} first paint (/${lang}/) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
   }
   reported.push(`${lang} first paint ${total} bytes (the Korean ${firstPaint}, ${extra.join(", ")})`);
 }

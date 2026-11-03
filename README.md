@@ -826,6 +826,9 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
 
 - 브라우저 자동 저장, 완료 기록 JSON 내보내기, 로컬 랭킹은 서버 없이 동작합니다.
 - **언어** — 첫 화면 머리의 `한국어 · English · 日本語`에서 고르면 이 기기에 저장되고(`critical-point-locale-v1`) `?lang=en`·`?lang=ja`로 다시 열립니다.
+  영어·일본어 시작 화면은 따로 `/en/`·`/ja/`에도 있습니다(2026-11-03). 빌드가 다 만든 `index.html`에서 제목·설명·카드·canonical·no-script 글만
+  그 언어로 바꿔 `en/index.html`·`ja/index.html`을 쓰고(`localizedStartPage`, `scripts/site-pages.mjs`), 게임은 폴더의 언어로 열립니다
+  (`folderLanguage`, `src/locale.js`; 순서는 이 기기의 선택 → 폴더 → `?lang=` → 한국어). `?lang=`으로 연 쪽은 canonical을 폴더 주소로 옮깁니다.
   영어와 일본어는 프롤로그부터 최종까지 장면·화면 문구가 모두 그 언어입니다(2026-10-28, 사람 감수 전 기계 초벌). 읽기 시계는 영어를 단어 수, 일본어를 글자 수로
   세어 한국어와 같은 길이로 맞춥니다. 언어 문구는 따로 나뉜 청크라 한국어 기기는 받지 않으며, 판·점수·랭킹은 언어와 상관없이 같습니다.
 - **개인정보처리방침과 이용약관**은 앱의 화면이 아니라 빌드가 `index.html` 옆에 쓰는 정적 페이지 여섯입니다:
@@ -841,10 +844,10 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
   `/faq.html`, `/contact.html`과 `/en/`·`/ja/`의 같은 이름. 앱은 스크립트로 그려지는 페이지라 검색 엔진과 검토자가 스크립트
   없이 읽는 글은 이 페이지들입니다. 본문은 `scripts/site-pages.mjs`에 있고, 시즌 길이(`CASE_SEQUENCE`), 사건 하나의 분
   (`TYPICAL_CASE_MINUTES`), 보관 기간(`DATA_RETENTION_DAYS`), 문의 주소는 코드의 값을 읽어 씁니다. 열다섯 페이지 모두
-  머리에서 게임(그 언어의 `?lang=`)과 같은 언어의 다른 네 페이지, 다른 두 언어의 같은 페이지로 이어지고, canonical과
+  머리에서 게임(그 언어의 시작 화면 `/`·`/en/`·`/ja/`)과 같은 언어의 다른 네 페이지, 다른 두 언어의 같은 페이지로 이어지고, canonical과
   hreflang(세 언어와 x-default)을 가지며, 꼬리에 문의 주소가 있습니다. 첫 화면 맨 아래 줄은 다섯 페이지를 화면 언어로
-  잇습니다(`SITE_PAGES`, `src/privacyText.js`). 빌드는 `/robots.txt`(모두 허용, 사이트맵 주소)와 `/sitemap.xml`(시작
-  페이지와 열다섯 페이지, 16항목, 언어마다 대체 주소, `lastmod`는 빌드한 날)도 씁니다. 서비스 워커는 열다섯 페이지를
+  잇습니다(`SITE_PAGES`, `src/privacyText.js`). 빌드는 `/robots.txt`(모두 허용, 사이트맵 주소)와 `/sitemap.xml`(세 언어의 시작
+  페이지와 열다섯 페이지, 18항목, 언어마다 대체 주소, `lastmod`는 빌드한 날)도 씁니다. 서비스 워커는 열다섯 페이지를
   방침처럼 네트워크 우선으로 받아 두고, 두 파일은 건드리지 않으며 릴리스 이름에도 넣지 않습니다(날짜가 바뀐 사이트맵 하나로
   기기가 전부 다시 받지 않도록). `tests/unit/site-pages.test.mjs`가 페이지 아홉, 서로 잇는 링크, 깨진 링크 없음,
   hreflang, 한국어 1,500자(공백 제외) 이상, 사이트맵의 절대 주소를 지킵니다.
@@ -1348,6 +1351,10 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/icons/*` | `Cache-Control` | `public, max-age=86400, stale-while-revalidate=604800` |
 | `/` | `Cache-Control` | `no-cache` |
 | `/index.html` | `Cache-Control` | `no-cache` |
+| `/en/` | `Cache-Control` | `no-cache` |
+| `/en/index.html` | `Cache-Control` | `no-cache` |
+| `/ja/` | `Cache-Control` | `no-cache` |
+| `/ja/index.html` | `Cache-Control` | `no-cache` |
 | `/sw.js` | `Cache-Control` | `no-cache` |
 | `/manifest.webmanifest` | `Content-Type` | `application/manifest+json` |
 | `/*` | `X-Content-Type-Options` | `nosniff` |
@@ -1357,6 +1364,8 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/assets/*` | `Cross-Origin-Resource-Policy` | `same-origin` |
 | `/*` | `Permissions-Policy` | `render.yaml`의 값 |
 | `/*` | `Content-Security-Policy` | `render.yaml`의 값 |
+
+2026-11-03에 더해진 것은 영어·일본어 시작 화면 네 줄(`/en/`, `/en/index.html`, `/ja/`, `/ja/index.html`)입니다. 대시보드에 넣기 전에는 그 두 쪽이 Render 기본값(`public, max-age=0, s-maxage=300`)으로 나가, 배포 뒤 최대 5분 동안 CDN이 옛 쪽을 줄 수 있습니다.
 
 2026-10-06에 더해진 것은 그림 세 줄(`/*.webp`, `/*.jpg`, `/icons/*`)과 `/sw.js`입니다. 이 넷은 대시보드에
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을
