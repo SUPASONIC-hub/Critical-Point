@@ -1651,7 +1651,7 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(JSON.stringify(published?.rows[0]?.kept) === JSON.stringify({ bestLogic: 17, logicHold: 82.457 }), `the whitelist published ${JSON.stringify(published?.rows[0]?.kept)} for two numeric logic keys.`);
   check(JSON.stringify(published?.rows[0]?.dropped) === "{}", `the whitelist published a logic key that is not a number: ${JSON.stringify(published?.rows[0]?.dropped)}`);
 
-  // momentumTier is one of the tiers the game gives (20261103000000, L5), read
+  // momentumTier is one of the tiers the game gives (20261103010000, L5), read
   // from the same line of gameLogic.js as the thresholds above, and nothing else.
   const tiers = [...(readFileSync(path.join(root, "src", "gameLogic.js"), "utf8").match(/momentumTier: momentumScore >= \d+ \? "([A-Z]+)" : momentumScore >= \d+ \? "([A-Z]+)" : momentumScore >= \d+ \? "([A-Z]+)" : "([A-Z]+)"/) ?? [])].slice(1);
   check(tiers.length === 4, "could not read the four momentum tiers from src/gameLogic.js.");
@@ -2239,7 +2239,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
   await putCloud("start a code under the default ceiling", "VVVVVVVV2345");
   // The default itself: 3,000 a day (1,000 from 20261006010000, 3,000 from
-  // 20261103000000), driven from one short. Each new code needs an address of
+  // 20261103010000), driven from one short. Each new code needs an address of
   // its own, since an address starts five.
   await presetCounter("global:cloud-new", 2999);
   await putCloud("start the day's 3,000th code", "WWWWWWWW2345");
@@ -2256,7 +2256,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
 }
 withHeaders(null);
 {
-  // A request that brings no client address (20261103000000, L3 of the
+  // A request that brings no client address (20261103010000, L3 of the
   // 2026-11-03 security review): every such request shares one key and meets
   // the limits of one address. Before, the address limits were skipped.
   const codes = ["BBBBBBBB2345", "CCCCCCCC2345", "DDDDDDDD2345", "EEEEEEEE2345", "FFFFFFFF2345"];

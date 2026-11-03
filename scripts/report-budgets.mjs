@@ -6,7 +6,7 @@
  *
  * Two limits fail closed for every player at once: new cloud-save codes in a
  * day (`global:cloud-new`, `cloud_daily_new_codes`, 3,000 by default since
- * 20261103000000) and telemetry bytes in a day (`global:telemetry-bytes`,
+ * 20261103010000) and telemetry bytes in a day (`global:telemetry-bytes`,
  * `telemetry_daily_bytes`, 200 MB). Each address has a smaller limit of its
  * own, so these are reached only by many addresses together -- a busy day, or
  * one actor with many addresses. When either is used up, every player's new

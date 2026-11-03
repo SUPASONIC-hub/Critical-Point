@@ -17,7 +17,7 @@ test("the read is one SELECT of counts and limits, and no key of a writer", () =
 
 test("the defaults are the server's", () => {
   const migrations = (name) => readFileSync(`supabase/migrations/${name}`, "utf8");
-  assert.match(migrations("20261103000000_cloud_unknown_address_and_tier_list.sql"), new RegExp(`private_setting_int\\('cloud_daily_new_codes', ${DEFAULTS.cloud}\\)`));
+  assert.match(migrations("20261103010000_cloud_unknown_address_and_tier_list.sql"), new RegExp(`private_setting_int\\('cloud_daily_new_codes', ${DEFAULTS.cloud}\\)`));
   assert.match(migrations("20261014000000_telemetry_validator_parts.sql"), new RegExp(`private_setting_int\\('telemetry_daily_bytes', ${DEFAULTS.telemetryBytes}\\)`));
   assert.match(QUERY, new RegExp(`'cloud_daily_new_codes', ${DEFAULTS.cloud}\\)`));
   assert.match(QUERY, new RegExp(`'telemetry_daily_bytes', ${DEFAULTS.telemetryBytes}\\)`));
