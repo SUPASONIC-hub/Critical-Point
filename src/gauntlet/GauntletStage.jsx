@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
-import { getTabToken, STORAGE_KEY } from "../appConfig.js";
+import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
@@ -94,7 +94,7 @@ export function GauntletStage({
   scene,
 }) {
   const schema = getTableSchema(run);
-  const tabToken = getTabToken();
+  const tabToken = takeTabToken();
   // Read once, at mount: a save that already names this window means a bet was
   // placed on it and never settled. If this tab placed it, this is a reload and
   // the bet settles as a bust at once. If another tab holds it, that tab may
