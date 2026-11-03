@@ -104,7 +104,8 @@ export function RankingScreen({
                       <span className="ranking-league-badge">{entry.league}</span>
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
-                      {entry.seasonComplete && <span className="season-complete-badge" aria-label={words.seasonCompleteLabel}>{words.seasonComplete}</span>}
+                      {/* A span's aria-label is not read (axe aria-prohibited-attr): the badge's words are shown, the record's name is said. */}
+                      {entry.seasonComplete && <span className="season-complete-badge"><span aria-hidden="true">{words.seasonComplete}</span><span className="sr-only">{words.seasonCompleteLabel}</span></span>}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{fill(words.meta, { case: entry.caseTitle, run: entry.runLabel, trigger: triggerLabels[entry.trigger] ?? triggerLabels.responsibility })}</small>
                     </div>

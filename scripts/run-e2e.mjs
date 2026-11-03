@@ -92,6 +92,7 @@ function exitCodeOf(child) {
 // which only greps @visual -- meant nothing ran them.
 const DEFAULT_SPECS = [
   "tests/accessibility.spec.js",
+  "tests/accessibility-locales.spec.js",
   "tests/accessibility-settings.spec.js",
   "tests/audio-preference.spec.js",
   "tests/board-ranking.spec.js",

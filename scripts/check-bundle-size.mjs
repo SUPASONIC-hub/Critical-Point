@@ -286,7 +286,8 @@ const budgets = [
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_368 },
+  // 68,368 -> 68,375 gzip on 2026-11-03, a11y-1103 over main 36104abd: no entry code changed (raw under 189,363); the ranking chunk's name it imports changed. Measured 68,371 gzip in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_375 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -664,7 +665,8 @@ const budgets = [
   // 5,048 / 2,170 -> 4,793 / 2,147 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 4,793 / 2,143 in the e2e build, the gzip plus 4.
   // 4,793 / 2,147 -> 5,503 / 2,416 on 2026-10-26, 영어판 3단계: the ranking's words read by key (src/copy/ranking.js) and dates in the page's language. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_503, maxGzip: 2_416 },
+  // 5,503 / 2,416 -> 5,579 / 2,429 on 2026-11-03, a11y-1103: the 시즌 완료 badge shows its words and says the record's name in an sr-only span, not an aria-label on a span (axe aria-prohibited-attr). Measured 5,575 / 2,425 in the e2e build, the plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_579, maxGzip: 2_429 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -1206,7 +1208,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 426,814 / 483,775 / 490,461 on 2026-11-03, signal-row-fit over main 425eb4da (#395 on cb904fb6): LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,810 / 483,771 / 490,457, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_814, en: 483_775, ja: 490_461 };
+// 426,814 / 483,775 / 490,461 -> 426,830 / 483,792 / 490,478 on 2026-11-03, a11y-1103 over main 36104abd: the hand's card edge at --ui-line-field (play.css) re-cuts the critical CSS inlined in index.html, and the entry's chunk names change. Measured 426,826 / 483,788 / 490,474, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_830, en: 483_792, ja: 490_478 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
