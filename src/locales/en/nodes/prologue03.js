@@ -419,7 +419,7 @@ export default {
     },
     "p3_evidence_turn": {
       "title": "28 Minutes",
-      "text": "When you fit the clue into the meeting timetable, Internal Audit investigator Ban Jaewook hands you a processing log. Attachment 7 was returned 28 minutes before the committee opened. The line right above it is an 11-minute call from the extension in the team head’s office on the 6th floor to Manager Han Seoyun’s desk. 'Return was pressed the moment the call ended. That’s not enough time to read eleven pages. Whatever situation you hear about, that’s a motive, not the stated reason. The reason is inside these 11 minutes.' He reads the pencil line from the back of your dissent, copied into his notebook. 'Returned -- Yoon. Do not ask for reasons. This isn’t Manager Han’s handwriting.'",
+      "text": "When you fit the clue into the meeting timetable, Internal Audit investigator Ban Jaewook hands you a processing log. Attachment 7 was returned 28 minutes before the committee opened. The line right above it is an 11-minute call from the extension in the team head’s office on the 6th floor to Manager Han Seoyun’s desk. Ban Jaewook says, 'Return was pressed the moment the call ended. That’s not enough time to read eleven pages. Whatever situation you hear about, that’s a motive, not the stated reason. The reason is inside these 11 minutes.' He reads the pencil line from the back of your dissent, copied into his notebook. 'Returned -- Yoon. Do not ask for reasons. This isn’t Manager Han’s handwriting.'",
       "memo": [
         "Attachment 7 returned: 13:32 -- 28 minutes before the meeting",
         "Call just before: 13:21, team head’s extension to Han Seoyun’s desk, 11 min",

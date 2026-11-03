@@ -221,7 +221,7 @@ export default {
     },
     "c2_trace_reaction": {
       "title": "The Login 11 Seconds Later",
-      "text": "Back in the audit room, ECHO has fed in Lim Kyungsoo’s printout and replayed those 11 seconds. In the blank stretch, one nameless admin account moves. It is not Lee Minseo’s account. For 11 seconds it opened page 3, then closed it. 'If you fix this stretch as an error, the log comes out clean, and this account’s trace disappears too. Here, fixing and erasing are the same button.' 1 hour 20 minutes to the Phase 1 report.",
+      "text": "Back in the audit room, ECHO has fed in Lim Kyungsoo’s printout and replayed those 11 seconds. In the blank stretch, one nameless admin account moves. It is not Lee Minseo’s account. For 11 seconds it opened page 3, then closed it. ECHO puts up a line. 'If you fix this stretch as an error, the log comes out clean, and this account’s trace disappears too. Here, fixing and erasing are the same button.' 1 hour 20 minutes to the Phase 1 report.",
       "memo": [
         "Records before and after the restored 11 seconds",
         "Conditions for reopening access rights"
@@ -287,7 +287,7 @@ export default {
     },
     "c2_branch_records": {
       "title": "Whose Time Were the 11 Seconds",
-      "text": "In the backup server room, the original and backup logs split just before 23:41. The original has 11 seconds with nothing stamped; the backup is missing that stretch entirely. Lee Minseo’s account was used right after the gap. The box for who approved the deletion request is empty. 'Write these 11 seconds down as a machine error, and it closes here. Write them down as time someone tampered with, and it stays open until we find the hand. Either way, the name of the person who wrote it stays beside it.'",
+      "text": "In the backup server room, the original and backup logs split just before 23:41. The original has 11 seconds with nothing stamped; the backup is missing that stretch entirely. Lee Minseo’s account was used right after the gap. The box for who approved the deletion request is empty. Ban Jaewook says, 'Write these 11 seconds down as a machine error, and it closes here. Write them down as time someone tampered with, and it stays open until we find the hand. Either way, the name of the person who wrote it stays beside it.'",
       "memo": [
         "Gap in the original log",
         "Order of the accounts that logged in",
@@ -414,7 +414,7 @@ export default {
     },
     "c2_route_system": {
       "title": "Your Question Wakes the Log",
-      "text": "As you set aside every prepared option, a new line opens on the log terminal. It checks what you just did against a table called 'Analyst Response Match'. The table lists, word for word, the choices you made in the last case, and some of that wording is also in the margin of last night’s leaked file. 'This case may not be about settling the charge against Lee Minseo. It may be an experiment that copies down the analyst’s judgment. This line does not go into the official procedure.'",
+      "text": "As you set aside every prepared option, a new line opens on the log terminal. It checks what you just did against a table called 'Analyst Response Match'. The table lists, word for word, the choices you made in the last case, and some of that wording is also in the margin of last night’s leaked file. ECHO puts up a line. 'This case may not be about settling the charge against Lee Minseo. It may be an experiment that copies down the analyst’s judgment. This line does not go into the official procedure.'",
       "memo": [
         "The reframed table was matched against test data",
         "Some Case 01 choice wording matches the leaked file",
@@ -441,7 +441,7 @@ export default {
     },
     "c2_final_evidence": {
       "title": "The Culprit Procedure Made",
-      "text": "Just before the Phase 1 deadline, Security’s draft is up on the screen. Oh Jinwoo’s report is its skeleton, and its conclusion is that Lee Minseo alone is responsible. The disciplinary process has already moved to the next stage, and the chance to rebut is 'appeal after discipline'. 'If we add a hold, we miss the deadline. If we send it as is, she can only speak after she’s been punished.' She sets a pen beside the signature box. 'Same question as at the start. Where you’ll stop this procedure, and in whose name.'",
+      "text": "Just before the Phase 1 deadline, Security’s draft is up on the screen. Oh Jinwoo’s report is its skeleton, and its conclusion is that Lee Minseo alone is responsible. The disciplinary process has already moved to the next stage, and the chance to rebut is 'appeal after discipline'. Han Seoyun says, 'If we add a hold, we miss the deadline. If we send it as is, she can only speak after she’s been punished.' She sets a pen beside the signature box. 'Same question as at the start. Where you’ll stop this procedure, and in whose name.'",
       "memo": [
         "Security’s draft closes on Lee Minseo alone",
         "A hold breaks the report deadline",
@@ -593,7 +593,7 @@ export default {
     },
     "c2_start_silence": {
       "title": "The Bill for Silence",
-      "text": "The morning after you return from FlowOn, Han Seoyun closes the door of Trigger Lab’s security audit room and holds out her tablet. It is the 2023-0412 review report scan that went out at 23:41 last night, page 3, with the blank signature line. The access log points to Lee Minseo, a contract worker 2 weeks from her renewal review. Attached at the end of the file are the terms you chose not to disclose in the last case, word for word as they were spoken in the meeting room. 'Putting it off doesn’t make it go away. It just comes out of someone else’s hands first.' 2 hours to the Phase 1 report.",
+      "text": "The morning after you return from FlowOn, Han Seoyun closes the door of Trigger Lab’s security audit room and holds out her tablet. It is the 2023-0412 review report scan that went out at 23:41 last night, page 3, with the blank signature line. The access log points to Lee Minseo, a contract worker 2 weeks from her renewal review. Attached at the end of the file are the terms you chose not to disclose in the last case, word for word as they were spoken in the meeting room. Han Seoyun says, 'Putting it off doesn’t make it go away. It just comes out of someone else’s hands first.' 2 hours to the Phase 1 report.",
       "memo": [
         "Leaked file includes words from a closed meeting",
         "Lee Minseo is the first suspect",

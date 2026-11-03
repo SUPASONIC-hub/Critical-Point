@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "c3_start": {
-      "text": "The bid waiting room at Novaworks headquarters. A sealed document envelope and two bottles of water sit on the table; the wall clock shows 4 hours to the deadline. Novaworks, which borrows 124 billion won from KD Bank, has put a systems-integration contract out to open tender. The payment flows to a group affiliate, and Trigger Lab writes the bid. 'Don’t ask where that money goes. Oh Jinwoo is submitting a bid from the same documents in the next room. Upstairs they call this measuring the quality of thinking. I call it HR material. Whatever terms Oh Jinwoo was given never came to me.' At the back of the envelope is an anonymous tip about a defect in the system.",
+      "text": "The bid waiting room at Novaworks headquarters. A sealed document envelope and two bottles of water sit on the table; the wall clock shows 4 hours to the deadline. Novaworks, which borrows 124 billion won from KD Bank, has put a systems-integration contract out to open tender. The payment flows to a group affiliate, and Trigger Lab writes the bid. Han Seoyun says, 'Don’t ask where that money goes. Oh Jinwoo is submitting a bid from the same documents in the next room. Upstairs they call this measuring the quality of thinking. I call it HR material. Whatever terms Oh Jinwoo was given never came to me.' At the back of the envelope is an anonymous tip about a defect in the system.",
       "memo": [
         "4 hours to bid deadline",
         "Client demand: cut costs 18%",
@@ -65,7 +65,7 @@ export default {
     },
     "c3_score": {
       "title": "The Scoreboard Trap",
-      "text": "The Trigger Lab scoreboard on the waiting-room wall. Oh Jinwoo 84, you 71. You submitted first, but he leads on savings, length and clarity of presentation. Yet there is no 'long-term failure cost' category. The money a defect costs after delivery counts as 0 on this sheet. The scoring sheet was last edited by the Group Strategy Office, at two in the morning the day after the FlowOn file closed. 'This sheet was made not for this bid, but to compare two people.'",
+      "text": "The Trigger Lab scoreboard on the waiting-room wall. Oh Jinwoo 84, you 71. You submitted first, but he leads on savings, length and clarity of presentation. Yet there is no 'long-term failure cost' category. The money a defect costs after delivery counts as 0 on this sheet. The scoring sheet was last edited by the Group Strategy Office, at two in the morning the day after the FlowOn file closed. ECHO adds, 'This sheet was made not for this bid, but to compare two people.'",
       "memo": [
         "Scoreboard: Oh Jinwoo 84 / you 71",
         "No long-term failure cost category",
@@ -168,7 +168,7 @@ export default {
     },
     "c3_signal": {
       "title": "A Signal from the Seats",
-      "text": "45 minutes before the final presentation, the control booth. On stage, Oh Jinwoo is rehearsing first. Then a small light above the back row blinks twice, at the same interval as the security warning light. The client’s representative says they never sent any such signal, and nobody knows if Trigger Lab turned it on. But the moment Oh Jinwoo sees the light, he drops his prepared answer and gives another, much faster. 'His response time fell from an average of 4.2 seconds to 1.1. He knows what this signal means, or believes he does.'",
+      "text": "45 minutes before the final presentation, the control booth. On stage, Oh Jinwoo is rehearsing first. Then a small light above the back row blinks twice, at the same interval as the security warning light. The client’s representative says they never sent any such signal, and nobody knows if Trigger Lab turned it on. But the moment Oh Jinwoo sees the light, he drops his prepared answer and gives another, much faster. ECHO puts up a line. 'His response time fell from an average of 4.2 seconds to 1.1. He knows what this signal means, or believes he does.'",
       "memo": [
         "The light blinks at the security-warning interval",
         "Client representative denies the signal",
@@ -239,7 +239,7 @@ export default {
     },
     "c3_signal_reaction": {
       "title": "The Light That Blinked Twice",
-      "text": "30 minutes before the presentation, the light blinks twice again. The client’s representative in the front row turns to look too, then faces forward without a word. 'You saw. He saw, Oh Jinwoo saw, and I saw. But nobody asks what it is. Whoever asks first becomes the one who stopped the presentation. And the cost of stopping sticks to whoever stopped.' The host turns the running order. You are next.",
+      "text": "30 minutes before the presentation, the light blinks twice again. The client’s representative in the front row turns to look too, then faces forward without a word. Han Seoyun says, 'You saw. He saw, Oh Jinwoo saw, and I saw. But nobody asks what it is. Whoever asks first becomes the one who stopped the presentation. And the cost of stopping sticks to whoever stopped.' The host turns the running order. You are next.",
       "memo": [
         "Source of the twice-blinking signal",
         "Who bears the cost of stopping the presentation"
@@ -283,7 +283,7 @@ export default {
     },
     "c3_branch_signal": {
       "title": "Stopping to Read the Signal in the Corner",
-      "text": "40 minutes before the final presentation, the control booth at the back of the hall. In a corner of the stage screen, a marker that is not in the deck blinks twice and goes out. 'The competing side put it in to rattle the presentation, or a client account made a last request for confirmation. The client account was logged in at the same time.' Stop the rehearsal to read the signal, and the order slips, and the lost time comes off the score. Move on, and nobody will ask what that marker was.",
+      "text": "40 minutes before the final presentation, the control booth at the back of the hall. In a corner of the stage screen, a marker that is not in the deck blinks twice and goes out. ECHO puts up a line. 'The competing side put it in to rattle the presentation, or a client account made a last request for confirmation. The client account was logged in at the same time.' Stop the rehearsal to read the signal, and the order slips, and the lost time comes off the score. Move on, and nobody will ask what that marker was.",
       "memo": [
         "Time the signal came on",
         "Client account’s response",
@@ -479,7 +479,7 @@ export default {
     },
     "c3_route_system": {
       "title": "The Scoreboard Follows You",
-      "text": "Before competing with Oh Jinwoo, you ask how the scoring works. The wall scoreboard flickers, and a new category appears under the name of the game you just reframed. Oh Jinwoo’s score is recalculated on it too, but the client’s screen shows no explanation. 'This scoreboard is not a fixed ruler. When the analyst puts forward a standard, it is redrawn to follow it. This bid is a device to see what standard the analyst makes.'",
+      "text": "Before competing with Oh Jinwoo, you ask how the scoring works. The wall scoreboard flickers, and a new category appears under the name of the game you just reframed. Oh Jinwoo’s score is recalculated on it too, but the client’s screen shows no explanation. ECHO puts up a line. 'This scoreboard is not a fixed ruler. When the analyst puts forward a standard, it is redrawn to follow it. This bid is a device to see what standard the analyst makes.'",
       "memo": [
         "The reframed game becomes a new scoring category",
         "Oh Jinwoo’s score recalculated at the same time",
@@ -506,7 +506,7 @@ export default {
     },
     "c3_final_system": {
       "title": "The One Who Set the Standard",
-      "text": "Just before the final presentation, the scoreboard beside the stage is revised once more. A new category appears, and both scores are recalculated. The category’s name comes word for word from the standard you put forward. The client’s screen shows not one line on why, so the table looks as if it was always like this. 'This bid does not choose one of two people. It chooses the one who makes the standard.' Below the stage, Oh Jinwoo is looking up at the changed numbers too.",
+      "text": "Just before the final presentation, the scoreboard beside the stage is revised once more. A new category appears, and both scores are recalculated. The category’s name comes word for word from the standard you put forward. The client’s screen shows not one line on why, so the table looks as if it was always like this. ECHO adds, 'This bid does not choose one of two people. It chooses the one who makes the standard.' Below the stage, Oh Jinwoo is looking up at the changed numbers too.",
       "memo": [
         "New scoring category: taken from the analyst’s standard",
         "Oh Jinwoo’s score recalculated as well",
@@ -552,7 +552,7 @@ export default {
     },
     "c3_start_audit": {
       "title": "A Contest of Restored Records",
-      "text": "The bid waiting room at Novaworks headquarters. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender. The deadline is 4 hours away, and the requirement is an 18% cost cut. Next door, Oh Jinwoo is tearing open the same envelope. 'Yesterday you traced back from the custodian of the originals and restored the flow of records. Those records aren’t fully pieced together yet.' Ban Jaewook hands you the anonymous tip from the back of the envelope. It says the system to be delivered has a flaw that skips the login.",
+      "text": "The bid waiting room at Novaworks headquarters. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender. The deadline is 4 hours away, and the requirement is an 18% cost cut. Next door, Oh Jinwoo is tearing open the same envelope. Ban Jaewook says, 'Yesterday you traced back from the custodian of the originals and restored the flow of records. Those records aren’t fully pieced together yet.' Ban Jaewook hands you the anonymous tip from the back of the envelope. It says the system to be delivered has a flaw that skips the login.",
       "memo": [
         "The audit record is incomplete",
         "4 hours to bid deadline",
@@ -612,7 +612,7 @@ export default {
     },
     "c3_start_public": {
       "title": "A Contest Turned Alarm",
-      "text": "The bid waiting room at Novaworks headquarters; when you open the door, three client staff look up. They all know you are the one who told outsiders the records might have been tampered with. It is an open tender for systems integration at Novaworks, a mid-sized manufacturer. The deadline is 4 hours away, and the requirement is an 18% cost cut. Next door, Oh Jinwoo has chosen silence. 'The client has requested a public explanation. An anonymous tip about a flaw that skips the login has been added to the envelope. This time the contest is over who holds the alarm.'",
+      "text": "The bid waiting room at Novaworks headquarters; when you open the door, three client staff look up. They all know you are the one who told outsiders the records might have been tampered with. It is an open tender for systems integration at Novaworks, a mid-sized manufacturer. The deadline is 4 hours away, and the requirement is an 18% cost cut. Next door, Oh Jinwoo has chosen silence. ECHO puts up a line. 'The client has requested a public explanation. An anonymous tip about a flaw that skips the login has been added to the envelope. This time the contest is over who holds the alarm.'",
       "memo": [
         "Client demands a public explanation",
         "Oh Jinwoo makes silence his strategy",

@@ -1095,7 +1095,8 @@ const budgets = [
   // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
   // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
   // 12,579 / 3,358 -> 12,868 / 3,438 on 2026-11-02, locale-gaps (#393) over main 9be94346: the late/ import map (the speakers' profiles, fetched when the runtime opens) and laying a late table over its module. Measured 12,864 / 3,434 in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_868, maxGzip: 3_438 },
+  // 3,438 -> 3,444 gzip on 2026-11-03, prose-trim-1 (#394) over main 16b6d349: the same 12,864 raw bytes, but the import maps name the shorter cases' en/ja files under new hashes, and those letters pack worse. Measured 12,864 / 3,440 in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_868, maxGzip: 3_444 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1198,7 +1199,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 425,560 / 482,420 / 489,093 -> 425,751 / 482,612 / 489,285 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 425,747 / 482,608 / 489,281 the plus 4.
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_755, en: 483_654, ja: 490_336 };
+// 483,654 / 490,336 -> 483,664 / 490,346 on 2026-11-03, prose-trim-1 (#394) over main 16b6d349: the Korean first paint measured 426,755 (in its budget, kept) and the overlay 3,440 (its import maps' new hashes, above); English and Japanese measured 483,660 / 490,342, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_755, en: 483_664, ja: 490_346 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
