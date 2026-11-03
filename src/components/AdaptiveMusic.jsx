@@ -1,10 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
-import { chapterMotifs, groovePresets, musicModes, originMotifs, speakerMotifs } from "./musicData.js";
+import musicCopy from "../copy/music.js";
+import { fill } from "../locale.js";
+import {
+  BUS_LOWPASS_HZ,
+  createSceneMode as scoreSceneMode,
+  DRIVE_CEILING,
+  driveMix,
+  leadFilterFrequency,
+  leadForBar,
+  shadowNote,
+  stakeLayerCount,
+  STEPS_PER_BAR,
+} from "./musicScore.js";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
-const STEPS_PER_BAR = 16;
 const MIX_VOLUME = 0.74;
 // The kick is the only percussive voice with weight now; the hats are room
 // noise, not a hi-hat line, so they sit well under the pad.
@@ -14,6 +25,12 @@ const HAT_GAIN = 0.022;
 const BASS_GAIN = 0.08;
 const LEAD_GAIN = 0.045;
 const PAD_GAIN = 0.045;
+// The stake's layers sit under the lead, each quieter than the one before it:
+// they thicken the room, the tune stays on top.
+const COUNTER_GAIN = 0.026;
+const PULSE_GAIN = 0.02;
+const SHADOW_GAIN = 0.014;
+const createSceneMode = (modeKey) => scoreSceneMode(modeKey, MIX_VOLUME);
 const volumePresets = {
   low: { label: "LOW", multiplier: 0.58 },
   normal: { label: "NORMAL", multiplier: 0.82 },
@@ -52,71 +69,7 @@ function writePref(key, value) {
 const soundOff = () => readPref(MUSIC_PREF_KEY, "true") === "false";
 const presetMultiplier = () => volumePresets[normalizeVolumePreset(readPref(MUSIC_VOLUME_KEY, "normal"))].multiplier;
 
-function hashMusicKey(value = "") {
-  return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
-}
-
-function shiftFrequency(frequency, semitones) {
-  return frequency ? Number((frequency * 2 ** (semitones / 12)).toFixed(2)) : frequency;
-}
-
-function shiftPattern(pattern_, semitones) {
-  return pattern_.map((item) =>
-    Array.isArray(item) ? item.map((frequency) => shiftFrequency(frequency, semitones)) : shiftFrequency(item, semitones),
-  );
-}
-
-function rotate(list, offset) {
-  if (!offset) return list;
-  const size = list.length;
-  const shift = ((offset % size) + size) % size;
-  return [...list.slice(size - shift), ...list.slice(0, size - shift)];
-}
-
-function thinOut(hits, every) {
-  if (!every) return hits;
-  return hits.map((hit, index) => (hit && index % every === 0 ? false : hit));
-}
-
-function createSceneMode(modeKey) {
-  const parts = String(modeKey || "intro").split(":");
-  const isFinal = parts.includes("final");
-  const baseKey = isFinal && parts[0] === "result" ? "final" : parts[0];
-  const base = musicModes[baseKey] ?? musicModes.intro;
-  const hash = Math.abs(hashMusicKey(modeKey));
-  const tempoMultipliers = [1, 0.94, 1.06, 0.88, 1.12, 0.82];
-  const semitoneShifts = [-5, -2, 0, 3, 5, 7, -7];
-  const tempo = tempoMultipliers[hash % tempoMultipliers.length];
-  const semitoneShift = semitoneShifts[Math.floor(hash / 6) % semitoneShifts.length];
-  const motif = chapterMotifs[parts[1]] ?? chapterMotifs.case01;
-  const speakerMotif = speakerMotifs[parts[3]] ?? { wave: motif.wave, semitones: 0, pulse: 1 };
-  const originMotif = originMotifs[parts[5]] ?? { semitones: 0, pulse: 1 };
-  const sceneIndex = Number(parts.at(-1));
-  const scenePulse = Number.isFinite(sceneIndex) ? sceneIndex % 4 : hash % 4;
-  const groove = groovePresets[scenePulse];
-  const transpose = semitoneShift + speakerMotif.semitones + originMotif.semitones;
-  const intensity = motif.impact * speakerMotif.pulse * originMotif.pulse;
-
-  return {
-    label: base.label,
-    interval: Math.max(96, Math.round(base.stepMs * tempo)),
-    volume: Math.min(0.14, base.volume * MIX_VOLUME * (0.82 + intensity * 0.16 + scenePulse * 0.012)),
-    wave: speakerMotif.wave ?? base.wave,
-    drive: Math.min(0.9, base.drive * intensity),
-    kick: rotate(base.kick, groove.kickShift),
-    snare: base.snare,
-    hat: thinOut(base.hat, groove.hatDrop),
-    bass: shiftPattern(base.bass, transpose),
-    lead: rotate(shiftPattern(base.lead, transpose), groove.leadShift),
-    pad: shiftPattern(base.pad, transpose),
-    noiseEvery: base.noiseEvery,
-    detuneSpread: 3 + (hash % 11),
-    impact: intensity,
-    filterLift: motif.lift + (hash % 5) * 140,
-  };
-}
-
-/** Soft-clip curve; `amount` 0 leaves the signal alone. */
+/** Soft-clip curve; `amount` 0 leaves the signal alone. Built once, at `DRIVE_CEILING` (driveMix, musicScore.js). */
 function makeDriveCurve(amount) {
   const size = 1024;
   const curve = new Float32Array(size);
@@ -131,36 +84,47 @@ function makeDriveCurve(amount) {
 function connectMusicBus(context, output) {
   const input = context.createGain();
   const shaper = context.createWaveShaper();
+  const dry = context.createGain();
+  const wet = context.createGain();
   const lowpass = context.createBiquadFilter();
   const delay = context.createDelay(1.5);
   const feedback = context.createGain();
-  const wet = context.createGain();
+  const echo = context.createGain();
   const compressor = context.createDynamicsCompressor();
 
-  shaper.curve = makeDriveCurve(0);
+  // One curve for the life of the bus; a mode's drive is the dry/wet mix.
+  shaper.curve = makeDriveCurve(DRIVE_CEILING);
+  const mix = driveMix(0);
+  dry.gain.value = mix.dry;
+  wet.gain.value = mix.wet;
   shaper.oversample = "2x";
   lowpass.type = "lowpass";
-  lowpass.frequency.value = 4200;
+  lowpass.frequency.value = BUS_LOWPASS_HZ;
   lowpass.Q.value = 0.7;
   delay.delayTime.value = 0.18;
   feedback.gain.value = 0.1;
-  wet.gain.value = 0.08;
+  echo.gain.value = 0.08;
   compressor.threshold.value = -20;
   compressor.knee.value = 20;
   compressor.ratio.value = 4;
   compressor.attack.value = 0.004;
   compressor.release.value = 0.24;
 
+  input.connect(dry);
+  dry.connect(lowpass);
   input.connect(shaper);
-  shaper.connect(lowpass);
+  shaper.connect(wet);
+  wet.connect(lowpass);
   lowpass.connect(compressor);
   lowpass.connect(delay);
   delay.connect(feedback);
   feedback.connect(delay);
-  delay.connect(wet);
-  wet.connect(compressor);
+  delay.connect(echo);
+  echo.connect(compressor);
   compressor.connect(output);
-  return { input, shaper };
+  // `clean` is the bus past the drive: the stake's layers enter there, since
+  // in the driven modes a standing voice summed into the shaper crackled.
+  return { input, drive: { dry, wet }, clean: lowpass };
 }
 
 function playTone(context, destination, frequency, duration, gainValue, type = "sine", options = {}) {
@@ -312,7 +276,7 @@ function playNoiseSweep(context, destination, duration = 0.7, gainValue = 0.02, 
  * a page may open) and cut the score off at each transition; sharing one keeps
  * the bar running across the intro -> play -> result seam.
  */
-const audioRuntime = { context: null, master: null, bus: null, drive: null };
+const audioRuntime = { context: null, master: null, bus: null, drive: null, clean: null };
 
 /**
  * A hidden tab is silent. The score's interval and the table's drone kept
@@ -356,9 +320,95 @@ function ensureAudioRuntime(volume) {
   if (!audioRuntime.bus) {
     const bus = connectMusicBus(context, audioRuntime.master);
     audioRuntime.bus = bus.input;
-    audioRuntime.drive = bus.shaper;
+    audioRuntime.drive = bus.drive;
+    audioRuntime.clean = bus.clean;
   }
   return context;
+}
+
+/** The bus's drive to a mode's: ramped, never set, so a scene change moves the mix over about half a second. */
+function rampDrive(drive) {
+  if (!audioRuntime.drive || !audioRuntime.context) return;
+  const { dry, wet } = driveMix(drive);
+  const now = audioRuntime.context.currentTime;
+  audioRuntime.drive.dry.gain.setTargetAtTime(dry, now, 0.15);
+  audioRuntime.drive.wet.gain.setTargetAtTime(wet, now, 0.15);
+}
+
+/**
+ * One standing voice of the stake's layers: an oscillator that keeps running
+ * and is retuned and re-enveloped on each note. The score's own voices build
+ * three nodes a note and drop them; the layers would have added up to three
+ * more notes a step on top of that, so they reuse what they built instead.
+ */
+function createLayerVoice(context, destination, type, filterFrequency) {
+  const oscillator = context.createOscillator();
+  const filter = context.createBiquadFilter();
+  const gain = context.createGain();
+  oscillator.type = type;
+  filter.type = "lowpass";
+  filter.frequency.value = filterFrequency;
+  gain.gain.value = 0.0001;
+  oscillator.connect(filter);
+  filter.connect(gain);
+  gain.connect(destination);
+  oscillator.start();
+  return {
+    play(frequency, duration, peak) {
+      // The last note is usually still ringing, and retuning a sounding
+      // oscillator jumps its wave: a click a note. So the old note is pulled
+      // down first (setTargetAtTime starts from wherever the gain is, which
+      // `gain.value` does not report everywhere), and the new pitch lands once
+      // it is all but silent.
+      const now = context.currentTime;
+      const start = now + 0.012;
+      const level = gain.gain;
+      level.cancelScheduledValues(now);
+      level.setTargetAtTime(0.0001, now, 0.003);
+      oscillator.frequency.setValueAtTime(frequency, start);
+      level.setValueAtTime(0.0001, start);
+      level.exponentialRampToValueAtTime(Math.max(0.0001, peak), start + 0.012);
+      level.setTargetAtTime(0.0001, start + duration, duration * 0.35);
+    },
+    stop() {
+      const now = context.currentTime;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setTargetAtTime(0.0001, now, 0.06);
+      oscillator.stop(now + 0.4);
+    },
+  };
+}
+
+/**
+ * The stake, as the table last reported it (`setMusicStake`), and the layers
+ * it has brought in. The voices are built the first time the stake reaches a
+ * layer and stopped once it falls back to none -- a window closing, the sound
+ * turned off -- so a page between tables runs no idle oscillators.
+ */
+const stakeRuntime = { gauge: 0, voices: null };
+
+/**
+ * What the table tells the score: the gauge it shows, 0 when no window is live.
+ * Read on the score's next step; a stake that never arrives leaves the score
+ * as it was.
+ */
+export function setMusicStake(gauge = 0) {
+  stakeRuntime.gauge = Math.min(100, Math.max(0, Number(gauge) || 0));
+}
+
+function releaseStakeVoices() {
+  if (!stakeRuntime.voices) return;
+  for (const voice of stakeRuntime.voices) voice.stop();
+  stakeRuntime.voices = null;
+}
+
+function stakeVoices(context, destination) {
+  stakeRuntime.voices ??= [
+    createLayerVoice(context, destination, "triangle", 2200),
+    createLayerVoice(context, destination, "triangle", 900),
+    createLayerVoice(context, destination, "sine", 3200),
+  ];
+  return stakeRuntime.voices;
 }
 
 const ACCENT_PEAK_GAIN = 0.045;
@@ -572,9 +622,7 @@ export function AdaptiveMusic({ modeKey }) {
     if (audioRuntime.master && audioRuntime.context) {
       audioRuntime.master.gain.setTargetAtTime(effectiveVolume, audioRuntime.context.currentTime, 0.5);
     }
-    if (audioRuntime.drive) {
-      audioRuntime.drive.curve = makeDriveCurve(mode.drive);
-    }
+    rampDrive(mode.drive);
   }, [effectiveVolume, mode]);
 
   useEffect(() => {
@@ -582,11 +630,14 @@ export function AdaptiveMusic({ modeKey }) {
     if (!enabled) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
+      releaseStakeVoices();
       audioRuntime.master?.gain.setTargetAtTime(0.0001, audioRuntime.context?.currentTime ?? 0, 0.08);
       return undefined;
     }
 
     const context = ensureAudioRuntime(volumeRef.current);
+    // A bus built just now starts dry; this scene's drive comes in from there.
+    if (context) rampDrive(modeRef.current.drive);
     if (!context) {
       queueMicrotask(() => setAudioState("unsupported"));
       return undefined;
@@ -624,12 +675,13 @@ export function AdaptiveMusic({ modeKey }) {
         });
       }
 
-      const lead = currentMode.lead[step];
+      const leadLine = leadForBar(currentMode, Math.floor(stepRef.current / STEPS_PER_BAR));
+      const lead = leadLine[step];
       if (lead) {
         playTone(context, destination, lead, stepSeconds * 1.8, LEAD_GAIN, currentMode.wave, {
           attack: 0.02,
           release: 0.24,
-          filterFrequency: 1500 + currentMode.filterLift,
+          filterFrequency: leadFilterFrequency(currentMode),
           detune: step % 2 === 0 ? -currentMode.detuneSpread : currentMode.detuneSpread,
         });
       }
@@ -637,6 +689,21 @@ export function AdaptiveMusic({ modeKey }) {
       const pad = currentMode.pad[step];
       if (pad) {
         playChord(context, destination, pad, stepSeconds * 6, PAD_GAIN, "sine");
+      }
+
+      // The stake's layers, one more for each threshold the table's gauge has
+      // crossed: the pad's chord broken upward, then the bass running in
+      // eighths, then a shadow of the lead an octave over it.
+      const layers = stakeLayerCount(stakeRuntime.gauge);
+      if (!layers) releaseStakeVoices();
+      else {
+        const [counterVoice, pulseVoice, shadowVoice] = stakeVoices(context, audioRuntime.clean ?? destination);
+        const counter = currentMode.counter[step];
+        if (counter) counterVoice.play(counter, stepSeconds * 1.6, COUNTER_GAIN);
+        const pulseNote = layers >= 2 && currentMode.pulse[step];
+        if (pulseNote) pulseVoice.play(pulseNote, stepSeconds * 0.7, PULSE_GAIN);
+        const shadow = layers >= 3 && shadowNote(leadLine, step);
+        if (shadow) shadowVoice.play(shadow, stepSeconds * 0.9, SHADOW_GAIN);
       }
 
       if (currentMode.noiseEvery > 0 && stepRef.current % currentMode.noiseEvery === 0) {
@@ -759,12 +826,12 @@ export function AdaptiveMusic({ modeKey }) {
 
   const toggleLabel =
     audioState === "unsupported"
-      ? "이 브라우저는 배경음을 지원하지 않습니다"
+      ? musicCopy.unsupported
       : !enabled
-        ? "배경음 켜기"
+        ? musicCopy.turnOn
         : audioState === "running"
-          ? "배경음 끄기"
-          : "배경음 재생하기";
+          ? musicCopy.turnOff
+          : musicCopy.resume;
   // Playing, the button shows the mode; its name starts with that (WCAG 2.5.3).
   const playing = enabled && audioState === "running";
   const toggleName = playing ? `${mode.label} ${toggleLabel}` : toggleLabel;
@@ -798,8 +865,8 @@ export function AdaptiveMusic({ modeKey }) {
           type="button"
           className="music-volume-toggle"
           onClick={cycleVolumePreset}
-          aria-label={`배경음악 볼륨 ${volumePresets[volumePreset].label}`}
-          title="배경음악 볼륨"
+          aria-label={fill(musicCopy.volumeLevel, { level: volumePresets[volumePreset].label })}
+          title={musicCopy.volume}
         >
           <Volume1 size={16} />
           <span>{volumePresets[volumePreset].label}</span>

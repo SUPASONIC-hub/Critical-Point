@@ -9,6 +9,7 @@
  * arriving as undefined. scripts/check-view-contracts.mjs enforces the same
  * partition statically, before the app ever runs.
  */
+import introPanelsCopy from "../copy/introPanels.js";
 /**
  * What the shell cannot supply, and what the intro shows in its place. Every
  * value here means "do not render this", which is why none of them is a guess:
@@ -175,30 +176,17 @@ export function createPlayView(baseView, extras = {}) {
 /**
  * The storage banner both the intro and the report print. It lives here
  * rather than with the report copy because the pre-start shell renders it
- * before the report module is loaded.
+ * before the report module is loaded; its words are the shell's
+ * (copy/introPanels.js `storageBanner`).
  */
 export function createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled }) {
+  const words = introPanelsCopy.storageBanner;
+  const pick = (tone, key) => ({ tone, title: words[key].title, text: words[key].text });
   return !isOnline
-  ? {
-      tone: "local",
-      title: "오프라인",
-      text: "연결이 복구되면 원격 저장을 다시 사용할 수 있습니다. 현재 기록은 브라우저에 저장됩니다.",
-    }
-  : telemetryEnabled
-  ? dataConsent
-    ? {
-        tone: "ready",
-        title: "원격 저장 준비됨",
-        text: "사건 완료와 피드백 제출 시 동의한 기록만 원격 저장합니다.",
-      }
-    : {
-        tone: "pending",
-        title: "원격 저장 준비됨 · 동의 대기",
-        text: "체크박스에 동의하면 이 세션의 완료 로그와 피드백을 원격 저장합니다.",
-      }
-  : {
-      tone: "local",
-      title: "로컬 저장",
-      text: "원격 저장 설정이 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
-  };
+    ? pick("local", "offline")
+    : telemetryEnabled
+      ? dataConsent
+        ? pick("ready", "ready")
+        : pick("pending", "pending")
+      : pick("local", "local");
 }

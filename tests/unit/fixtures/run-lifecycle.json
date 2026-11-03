@@ -75,6 +75,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -251,6 +254,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -440,6 +446,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -616,6 +625,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -805,6 +817,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -1002,6 +1017,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -1191,6 +1209,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -1388,6 +1409,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -1577,6 +1601,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -1774,6 +1801,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -1993,6 +2023,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -2168,6 +2201,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -2331,6 +2367,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -2506,6 +2545,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -2668,6 +2710,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -2843,6 +2888,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -3005,6 +3053,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -3180,6 +3231,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -3342,6 +3396,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -3517,6 +3574,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -3679,6 +3739,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -3854,6 +3917,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -4016,6 +4082,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -4188,6 +4257,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -4321,6 +4393,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -4497,6 +4572,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -4741,6 +4819,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 40,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -4979,6 +5060,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 40,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -5197,6 +5281,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 40,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -5409,6 +5496,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 40,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -5659,6 +5749,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 40,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -5925,6 +6018,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 40,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -6179,6 +6275,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -6405,6 +6504,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -6635,6 +6737,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -6869,6 +6974,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -7055,6 +7163,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -7289,6 +7400,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -7464,6 +7578,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -7596,6 +7713,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -7772,6 +7892,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
@@ -7949,6 +8072,9 @@
         },
         "runHand": 0,
         "handVault": 0,
+        "lastChange": 0,
+        "seasonGained": 0,
+        "seasonLost": 0,
         "logic": {
           "streak": 0,
           "best": 0,
