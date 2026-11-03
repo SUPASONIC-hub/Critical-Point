@@ -5,10 +5,11 @@ name: Deploy
 # Blueprint spec and only governs a service Render manages as one, so a service
 # created by hand keeps whatever its dashboard says. This workflow is the press.
 #
-# It hangs off Verify rather than off the push, so what reaches the site is a
-# commit whose full suite went green -- including the end-to-end tier, which the
-# Render build command does not run. A push that fails CI cannot become a
-# deployment.
+# It hangs off Verify rather than off the push alone, so what reaches the site
+# is a commit whose full suite went green -- including the end-to-end tier,
+# which the Render build command does not run -- or, by the push door below, a
+# commit whose files are byte for byte the ones a pull request's full suite
+# passed on. Files that have not passed CI cannot become a deployment.
 #
 # The press names its commit. A deploy hook with no `ref` builds whatever the
 # branch head is when Render gets round to it, which is not the commit Verify
@@ -22,7 +23,20 @@ name: Deploy
 # jobs the second deploy could press its button between the first deploy's press
 # and the first deploy's check, and the check then waited twenty minutes for a
 # commit the site had already moved past.
+#
+# A second door since 2026-11-03: the push itself, for a merge whose files were
+# already proved. main's Verify took about eighteen minutes, and for a pull
+# request that was up to date with main and had its end-to-end tiers run, it
+# proves again what the pull request's runs proved: the merge commit has the
+# head's tree, and the same tree hash is the same files. The `same-tree` job
+# asks that (scripts/ci-same-tree-verified.mjs says exactly what it needs) and
+# answers "no" to anything it cannot establish, which leaves the deploy to the
+# `workflow_run` door below, as before. main's Verify still runs on every push;
+# when it completes, its Deploy run finds the site already serving the commit,
+# presses nothing and checks the site again.
 on:
+  push:
+    branches: [main]
   workflow_run:
     workflows: [Verify]
     types: [completed]
@@ -55,12 +69,50 @@ permissions:
   contents: read
 
 jobs:
+  # Only for the push door. It holds no secret, presses nothing, and is not in
+  # the deploy queue: a push it says "no" to never enters `deploy-production`,
+  # so it cannot push a pending deploy out of the one pending place.
+  same-tree:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # `actions: read` for the pull request's Verify runs and their jobs,
+    # `pull-requests: read` for which pull request this push merged.
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      verified: ${{ steps.ask.outputs.verified }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      # Node's own modules only, like the deploy check: no npm ci.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Ask whether a pull request already verified this tree
+        id: ask
+        env:
+          SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node scripts/ci-same-tree-verified.mjs
+
   deploy:
+    needs: same-tree
+    # `!cancelled()` because `same-tree` is skipped on every door but the
+    # push, and a skipped need skips this job without it. On the push door an
+    # answer that is not exactly "true" -- a failed job included -- skips it.
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_branch == 'main')
+      !cancelled() &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && needs.same-tree.outputs.verified == 'true') ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'main'))
     runs-on: ubuntu-latest
     # Render's static builds take a few minutes; the wait below gives up at 20.
     timeout-minutes: 35
@@ -79,7 +131,9 @@ jobs:
     # Either shows as a cancelled Deploy run. After dispatching, look for the
     # run to start; if it was cancelled, dispatch again once the running one
     # has finished. A dropped automatic deploy is picked up by the next merge,
-    # or by a dispatch of the tip of main.
+    # or by a dispatch of the tip of main. The push door shares the group too;
+    # a push deploy dropped this way is picked up by its own commit's
+    # `workflow_run` deploy when main's Verify finishes.
     concurrency:
       group: deploy-production
       cancel-in-progress: false
@@ -90,6 +144,8 @@ jobs:
       actions: read
     env:
       DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+      # On the push door `github.sha` is the commit pushed, the one
+      # `same-tree` answered for.
       EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || inputs.sha || github.sha }}
       MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
       FORCE: ${{ inputs.force == true }}
