@@ -648,10 +648,13 @@ const OWN_CHUNKS = [
  * A module of src/locales (src/locale.js): a language's dictionary
  * (`<lang>/index.js`), one of its cases (`<lang>/nodes/<caseId>.js`), its
  * copy between cases after the first ten (`<lang>/between/<first>-<last>.js`),
- * or the code they share (`overlay.js`). Its chunk is `locale-<lang>-<file>`,
- * `locale-<lang>-between-<file>` or `locale-<file>`.
+ * a table the runtime fetches once it opens (`<lang>/late/<module>.js`, the
+ * speakers' profiles), or the code they share (`overlay.js`). Its chunk is
+ * `locale-<lang>-<file>`, `locale-<lang>-between-<file>`,
+ * `locale-<lang>-late-<file>` or `locale-<file>`, so the service worker leaves
+ * every one of them to a page in that language.
  */
-const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/]|(between)[\\/])?)?([^\\/]+)\.js$/;
+const LOCALE_MODULE = /[\\/]src[\\/]locales[\\/](?:([^\\/]+)[\\/](?:nodes[\\/]|(between|late)[\\/])?)?([^\\/]+)\.js$/;
 
 function localeChunkName(chunk) {
   const match = LOCALE_MODULE.exec(chunk.facadeModuleId ?? "");

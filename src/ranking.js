@@ -2,6 +2,7 @@ import { getRankingIntegrity, getRankingLeague } from "./advancedSystems.js";
 import { triggerLabels } from "./gameConstants.js";
 import { subjectParticle } from "./playerLanguage.js";
 import words from "./copy/leaderboard.js";
+import { DEFAULT_PLAYER_NAME, UNNAMED_ROW_NAME } from "./appConfig.js";
 import { fill } from "./locale.js";
 
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
@@ -75,7 +76,10 @@ function normalizeEntry(input = {}) {
   const runLabel = runTag ? `RUN ${runTag}` : "LOCAL RUN";
   const caseId = toText(row.case_id);
   const completedAt = toText(row.completed_at);
-  const localName = (toText(row.player_name) || words.localName).slice(0, 24);
+  // The names a row keeps in Korean (appConfig.js), in the page's words.
+  const storedName = toText(row.player_name);
+  const shownName = storedName === DEFAULT_PLAYER_NAME ? words.defaultName : storedName === UNNAMED_ROW_NAME ? words.localName : storedName;
+  const localName = (shownName || words.localName).slice(0, 24);
   const seasonComplete = caseId === "season-final" || summary.seasonComplete === true;
   return {
     id: `${runTag || toText(row.session_code) || "local"}-${caseId || "case"}-${completedAt || "latest"}`,

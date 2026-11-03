@@ -110,11 +110,19 @@ export function markPreviewEnd(signals, preview, through) {
   signal.premise = `${fillPreview(preview.endPremiseLead, through)} ${signal.premise ?? ""}`.trim();
 }
 
-/** A module's own tables (caseCopy.js), as it loads. */
+/**
+ * A module's own tables (caseCopy.js), as it loads. A runtime module whose
+ * words are too many for the dictionary the page takes before its first paint
+ * has them in `<lang>/late/<module>.js` (the season's 95 character profiles,
+ * gameDialogue.js), fetched only when that module asks and laid over when it
+ * arrives; one that cannot be fetched leaves the tables Korean.
+ */
 export function localizeTables(module, tables) {
   if (!dictionary) return;
   for (const source of [dictionary, ...between]) overlayModule(source.copy, module, tables);
   if (module === "caseCopy") markPreviewEnd(tables.nextCaseSignals, dictionary.preview, dictionary.previewThrough);
+  const late = language && import.meta.glob("./*/late/*.js")[`./${language}/late/${module}.js`];
+  if (late) late().then((loaded) => overlayModule({ [module]: /** @type {{ default: object }} */ (loaded).default }, module, tables), () => {});
 }
 
 export function previewText(key) {
