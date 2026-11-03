@@ -111,7 +111,7 @@
 }
 
 .gx-comic-timer b {
-  font: 900 2.125rem/1 var(--font-sans);
+  font: 900 calc(2.125 * var(--hud-rem)) / 1 var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
 
@@ -174,11 +174,14 @@
   animation: gx-panel-pop 0.46s var(--ui-ease-spring) both;
 }
 
+/* The panel is the sound's container (`cqw` below): the drawing fills its
+   width, so a share of the width is a share of the picture. */
 .gx-panel-splash {
   grid-area: splash;
   display: grid;
   align-content: center;
   min-height: 220px;
+  container-type: inline-size;
   background: var(--c-black);
   clip-path: polygon(0 0, 100% 0, 97% 100%, 0 100%);
 }
@@ -234,13 +237,20 @@
   font-weight: 800;
 }
 
+/* The sound is lettered where it comes from (2026-11-02, D): ScenePlate.jsx
+   places its centre in the drawing's own 320x132 units (`--sfx-x`, `--sfx-y`)
+   and its size (`--sfx-em`), and these turn the units into the panel's. The
+   drawing is the panel's width and sits in its middle, so a unit is 1/320 of
+   the width across and down, measured from the middle. */
 .gx-sfx {
   position: absolute;
-  right: 5%;
-  bottom: 6px;
+  top: calc(50% + (var(--sfx-y) - 66) * 100cqw / 320);
+  left: calc(var(--sfx-x) * 100cqw / 320);
   z-index: 1;
+  translate: -50% -50%;
   color: var(--c-acid);
-  font: 900 clamp(2.375rem, 6.4vw, 4.375rem) / 1 var(--font-sans);
+  font: 900 calc(var(--sfx-em) * 100cqw / 320) / 1 var(--font-sans);
+  white-space: nowrap;
   font-style: italic;
   letter-spacing: -0.04em;
   text-shadow:
