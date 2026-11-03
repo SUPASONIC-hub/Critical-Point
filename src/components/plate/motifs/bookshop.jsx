@@ -42,7 +42,7 @@ export function paintBookshop(random, accent, glow) {
       )}
       {halo(pileX + 22, 100, 22, glow)}
       {mark(<rect x={pileX + 6} y="94" width="32" height="8" fill={accent} />)}
-      {people(figure("keeper", Math.round(span(random, 140, 178)), 126, 44))}
+      {people(figure("keeper", Math.round(span(random, 140, 178)), 126, 44, { player: true }))}
     </>
   );
 }

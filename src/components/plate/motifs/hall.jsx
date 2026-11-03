@@ -14,7 +14,7 @@ export function paintHall(random, accent, glow) {
     chairs.push(<rect key={`lc-${seat}`} x={inset} y={y - size} width={size} height={size} />);
     chairs.push(<rect key={`rc-${seat}`} x={320 - inset - size} y={y - size} width={size} height={size} />);
     if (seat % 2 === 0) {
-      sitters.push(seated(`sl-${seat}`, inset + size / 2, y - size, size * 1.5));
+      sitters.push(seated(`sl-${seat}`, inset + size / 2, y - size, size * 1.5, { player: seat === 0 }));
       sitters.push(seated(`sr-${seat}`, 320 - inset - size / 2, y - size, size * 1.5));
     }
   }

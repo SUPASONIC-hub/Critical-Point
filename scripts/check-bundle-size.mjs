@@ -79,7 +79,9 @@ const budgets = [
   // 149,740 / 55,002 -> 149,905 / 55,019 on 2026-10-30, ranking-save-copy over main c39870a7 (#376, #375): the local and season ranking save lines read from src/copy/notices.js in the page's language (they were English in the hook). Measured 149,901 / 55,015 in the e2e build, the plus 4.
   // 149,905 / 55,019 -> 150,034 / 55,070 on 2026-11-02, bgm-variety over main c680ddd5 (#389): while the decision's reveal sheet is open the music key is
   // reveal:gain / reveal:even / reveal:cost (revealOutcome in GameRuntime). Measured 150,030 / 55,066 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_034, maxGzip: 55_070 },
+  // 150,034 / 55,070 -> 150,255 / 55,171 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 150,251 / 55,167 in the e2e build, the plus 4.
+  // 150,255 / 55,171 -> 146,589 / 54,099 on 2026-11-02, plate-story over main acf3d999 (#392): the runtime is smaller over #393 (locale-gaps moved words into late chunks). Measured 146,585 / 54,095 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 146_589, maxGzip: 54_099 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -98,11 +100,15 @@ const budgets = [
   // Measured 19,564 / 8,584 in the e2e build, the gzip plus 4.
   // 19,564 / 8,588 -> 19,567 / 8,588 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 19,567 in the e2e build.
   // 19,567 / 8,588 -> 25,798 / 11,056 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
+  // 26,682 / 11,352 -> 30,382 / 13,225 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 30,378 / 13,221 in the e2e build, the plus 4.
   // 26,671 / 11,352 -> 26,682 / 11,352 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habits' and judgment's tables (src/copy/habits.js, judgment.js) the table and the runtime share. Measured 26,678 raw (gzip under 11,352) in the e2e build, the plus 4.
   // 26,682 / 11,352 -> 26,792 / 11,414 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in the table's words (stage.purse, purseChange, purseSeason). Measured 26,788 / 11,410, the plus 4.
+  // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
+  // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // -> 26,832 / 11,414 on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, on main 11cb3b16; was 19,725 / 8,660 on c8841dc0): tableReadout's describeStakedDetail, the staked card's detail without the number its burn prints. Measured 26,832 / 11,410 in the e2e build, the gzip plus 4.
   // 26,792 / 11,414 -> 26,957 / 11,484 on 2026-11-03 (C-15 over main 465ccb93, describeStakedDetail over locale-gaps and money-feedback): measured 26,953 / 11,480 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 26_957, maxGzip: 11_484 },
+  // 30,498 / 13,286 -> 30,663 / 13,356 on 2026-11-03, C-15 over main 425eb4da (#392 #398 #395), the badge fold and describeStakedDetail. Measured 30,659 / 13,352 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_663, maxGzip: 13_356 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -282,9 +288,10 @@ const budgets = [
   // tracks, the stake layers' pooled voices and src/components/musicScore.js (AdaptiveMusic plays from the start screen, so it sits in the
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
+  // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 66,033 -> 66,046 gzip on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, over main 6a36dcc9): this chunk's code is main's; what differs is the chunk and CSS names it imports (the CSS and RelicDraft changed, so their hashes did). Measured 181,951 / 66,042 in the e2e build, the gzip plus 4.
   // 66,124 holds on 2026-10-30 (C-15 over main c39870a7, #376 #375): measured 182,034 / 66,112 in the e2e build, under main's budget.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_363 },
+  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_368 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -498,8 +505,12 @@ const budgets = [
   // 44,569 / 14,830 -> 44,575 / 14,830 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 44,575 in the e2e build.
   // 44,575 / 14,830 -> 48,936 / 16,122 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 48,936 / 16,122 -> 50,079 / 16,401 on 2026-10-26, 영어판 3단계: the ending sequence, the three twists, the verdicts and afterglows and 「당신의 세 장면」 read by key (src/copy/ending.js), and the forecast's 「유지」 from the report's table. The Korean is the same. Measured in the e2e build, the gzip plus 4.
+  // 50,213 / 16,456 -> 50,356 / 16,517 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 50,352 / 16,513 in the e2e build, the plus 4.
   // 50,079 / 16,401 -> 50,213 / 16,456 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habit names and lines (src/copy/habits.js) and the one-word analyst line (endingCopy.getAnalystName). Measured 50,209 / 16,452 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_213, maxGzip: 16_456 },
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_356, maxGzip: 16_517 },
+  // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
+  // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
+  { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -581,24 +592,29 @@ const budgets = [
   // -> 196,965 / 36,722 on 2026-11-02, en-hand5-linux over main 2f085d28 (#384): on 360px or less an English
   // card label takes 12px / 1.25 and an English five-card hand 4px gaps and 6px block paddings, so Linux
   // fonts keep the hand above the action bar. Measured 196,965 / 36,718 in the e2e build, the gzip plus 4.
+  // 196,965 / 36,722 -> 197,634 / 36,910 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 197,630 / 36,906 in the e2e build, the plus 4.
   // 196,965 / 36,722 -> 198,822 / 37,098 on 2026-11-02, money-feedback over main c680ddd5. Measured 198,822 / 37,094 in the e2e build, the gzip plus 4.
   // 198,822 / 37,098 -> 198,856 / 37,110 on 2026-11-02, money-feedback over main 9be94346. Measured 198,856 / 37,106 in the e2e build, the gzip plus 4.
   // 198,856 / 37,110 -> 198,925 / 37,111 on 2026-11-02, money-feedback over main acf3d999. Measured 198,925 / 37,107 in the e2e build, the gzip plus 4.
+  // 198,925 / 37,111 -> 199,594 / 37,294 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 199,590 / 37,290 in the e2e build, the plus 4.
   // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
   // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
+  // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
   // -> 196,266 / 36,582 on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, on main 11cb3b16; was 193,614 / 36,108 on c8841dc0): play.css's fold for a board rule's badge and a plain 소모 없음. Measured 196,266 / 36,578 in the e2e build, the gzip plus 4.
   // -> 196,342 / 36,612 on 2026-10-29 (C-15 over main 6a36dcc9, with intro-en-fit's rule): measured 196,342 / 36,608 in the e2e build, the gzip plus 4.
   // -> 196,547 / 36,650 on 2026-10-30 (C-15 over main c39870a7, #376 #375, the badge fold over the foot's five links and the 360px pills): measured 196,543 / 36,646 in the e2e build, the plus 4.
   // -> 197,001 / 36,748 on 2026-11-02 (C-15 over main 2f085d28, the badge fold over ja-hand-narrow, intro-360-fit and bank-rail-fit): measured 196,997 / 36,744 in the e2e build, the plus 4.
   // 199,354 / 37,230 -> 199,556 / 37,277 on 2026-11-03 (C-15 over main 465ccb93, the badge fold over money-feedback and pc-type-scale): measured 199,552 / 37,273 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 199_556, maxGzip: 37_277 },
+  // 200,019 / 37,440 -> 200,221 / 37,489 on 2026-11-03, C-15 over main 425eb4da (#392 #398 #395), the badge fold and describeStakedDetail. Measured 200,217 / 37,485 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_221, maxGzip: 37_489 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
   // 283,500 -> 197,740 on 2026-10-26, first-paint-cut (the user's choice 1): the
   // weight axis cut to 400-920, nothing asking for less. Measured 197,736 (from
   // 270,828), plus 4.
-  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 197_740, compressed: true },
+  // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): ク, ド and ン for the Japanese sounds in the plate. Measured 198,144 plus 4.
+  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 198_148, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -1090,7 +1106,8 @@ const budgets = [
   // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
   // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
   // 12,579 / 3,358 -> 12,868 / 3,438 on 2026-11-02, locale-gaps (#393) over main 9be94346: the late/ import map (the speakers' profiles, fetched when the runtime opens) and laying a late table over its module. Measured 12,864 / 3,434 in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_868, maxGzip: 3_438 },
+  // 12,868 / 3,438 -> 12,991 / 3,500 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 12,987 / 3,496 in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_500 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1202,7 +1219,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * C-15 over main 465ccb93 (the badge fold over locale-gaps, money-feedback and
  * pc-type-scale): 426,181, 483,080 and 489,762 (measured 426,177, 483,076, 489,758, plus 4).
  */
-const FIRST_PAINT_BUDGETS = { ko: 426_181, en: 483_080, ja: 489_762 };
+// 425,560 / 482,420 / 489,093 -> 425,751 / 482,612 / 489,285 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 425,747 / 482,608 / 489,281 the plus 4.
+// 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
+// 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
+// 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
+// 426,761 / 483,722 / 490,404 -> 426,808 / 483,769 / 490,455 on 2026-11-03, C-15 over main 425eb4da (#392 #398 #395), the badge fold and describeStakedDetail. Measured 426,804 / 483,765 / 490,451, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_808, en: 483_769, ja: 490_455 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1329,8 +1351,10 @@ function checkBudget(file, budget) {
 // network-first pages and its warm-up list. Measured 9,944 / 3,582.
 // 9,948 / 3,586 -> 10,106 / 3,624 on 2026-10-29, adsense-readiness: the about, FAQ and contact pages in three languages
 // join its network-first pages and its warm-up list (nine names). Measured 10,102 / 3,620 over main 3e350266.
+// 10,106 / 3,624 -> 10,139 / 3,639 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 10,135 / 3,635, the plus 4.
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_106, maxGzip: 3_629 };
+// 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_139, maxGzip: 3_643 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

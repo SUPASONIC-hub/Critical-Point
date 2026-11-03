@@ -45,7 +45,7 @@ export function paintLobby(random, accent, glow) {
       {people(
         <>
           {seated("reception", 250, 74, 24)}
-          {figure("arriving", Math.round(span(random, 54, 108)), 116, 42)}
+          {figure("arriving", Math.round(span(random, 54, 108)), 116, 42, { player: true })}
         </>,
       )}
     </>
