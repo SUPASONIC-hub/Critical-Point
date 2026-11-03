@@ -285,9 +285,8 @@ const budgets = [
   // tracks, the stake layers' pooled voices and src/components/musicScore.js (AdaptiveMusic plays from the start screen, so it sits in the
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
-  // 68,363 -> 68,369 gzip on 2026-11-03, signal-row-fit over main cb904fb6: no code changed; the hashed name of the index CSS the entry
-  // carries changed with the signals row's rules. Measured 189,359 / 68,365 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_369 },
+  // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_368 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -595,7 +594,7 @@ const budgets = [
   // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
   // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
-  // 200,019 / 37,440 -> 200,372 / 37,500 on 2026-11-03, signal-row-fit over main cb904fb6: on 360px or less the English and
+  // 200,019 / 37,440 -> 200,372 / 37,500 on 2026-11-03, signal-row-fit over main 425eb4da: on 360px or less the English and
   // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 200_372, maxGzip: 37_500 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
@@ -1202,8 +1201,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
-// 426,761 / 483,722 / 490,404 -> 426,823 / 483,784 / 490,466 on 2026-11-03, signal-row-fit over main cb904fb6: LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,819 / 483,780 / 490,462, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_823, en: 483_784, ja: 490_466 };
+// 426,761 / 483,722 / 490,404 -> 426,814 / 483,775 / 490,461 on 2026-11-03, signal-row-fit over main 425eb4da (#395 on cb904fb6): LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,810 / 483,771 / 490,457, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_814, en: 483_775, ja: 490_461 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
