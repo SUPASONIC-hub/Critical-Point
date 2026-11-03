@@ -1,6 +1,8 @@
 import { getSeasonLogic } from "./gameLogic.js";
 import { RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { directionParticle, easyCognitionLabels } from "./playerLanguage.js";
+import { fill } from "./locale.js";
+import W from "./copy/logicReport.js";
 
 /**
  * The season's logic report: one panel on the closing report that names the
@@ -32,22 +34,20 @@ export const LOGIC_REPORT_MIN_CASES = 5;
 /** Windows a case needs before its heat is an average worth comparing. */
 const LOGIC_REPORT_MIN_WINDOWS = 3;
 
+// The words are src/copy/logicReport.js's, read when a line is made, so they are the page's language.
 export const LOGIC_REPORT_COPY = {
-  label: "논리 유지력",
+  get label() { return W.label; },
   mark: "LOGIC HOLD",
-  lead: (caseName) => `열기가 가장 높았던 사건은 ${caseName}입니다.`,
-  held: (windows, count, type) => `그 사건의 ${windows}판 가운데 ${count}판을 '${type}'${directionParticle(type)} 닫았습니다.`,
-  heldAll: (windows, type) => `그 사건의 ${windows}판을 모두 '${type}'${directionParticle(type)} 닫았습니다.`,
-  switched: (count) => `그 사건에서 열기가 오른 뒤 방향을 ${count}번 바꿨고, 논리 콤보는 끊기지 않았습니다.`,
-  broken: (count) => `그 사건에서는 한 방향에 머물지 않았고, 논리 콤보가 ${count}번 끊겼습니다.`,
-  unbroken: "그 사건에서는 한 방향에 머물지 않았지만, 논리 콤보는 끊기지 않았습니다.",
-  tooFew: "논리 콤보 기록이 있는 사건이 아직 적어, 열기가 가장 높았던 사건을 짚지 않습니다.",
-  hold: (score) => `논리 유지력 ${score}점`,
-  best: (streak) => `최고 논리 콤보 ${streak}`,
-  // Until C-3 (2026-10-25) the streak was held on a thinking type, and this
-  // said the score could move against 관점 전환's. Held on a direction, the
-  // two can rise together.
-  caption: "논리 유지력은 콤보가 끊길 수 있던 판 가운데 끊기지 않은 판의 비율입니다. 같은 방향을 지키는 힘이라, 생각 유형을 고르게 쓰는 관점 전환 점수와 함께 오를 수 있습니다.",
+  lead: (caseName) => fill(W.lead, { caseName }),
+  held: (windows, count, type) => fill(W.held, { windows, count, type, particle: directionParticle(type) }),
+  heldAll: (windows, type) => fill(W.heldAll, { windows, type, particle: directionParticle(type) }),
+  switched: (count) => fill(W.switched, { count }),
+  broken: (count) => fill(W.broken, { count }),
+  get unbroken() { return W.unbroken; },
+  get tooFew() { return W.tooFew; },
+  hold: (score) => fill(W.hold, { score }),
+  best: (streak) => fill(W.best, { streak }),
+  get caption() { return W.caption; },
 };
 
 /**
@@ -59,8 +59,8 @@ export const LOGIC_REPORT_COPY = {
  * without the function.
  */
 export const LOGIC_RANK_COPY = {
-  pending: `순위는 시즌 기록이 ${LOGIC_RANK_FLOOR}건 모이면 나옵니다.`,
-  band: (percent) => `상위 ${percent}% 안`,
+  get pending() { return fill(W.rank.pending, { floor: LOGIC_RANK_FLOOR }); },
+  band: (percent) => fill(W.rank.band, { percent }),
   none: "",
 };
 
@@ -153,9 +153,6 @@ export function getHottestCase(caseResults = {}, cases = []) {
   return hottest;
 }
 
-/** What the record's `top` calls a direction (C-3); a record from before it holds a thinking type. */
-const DIRECTION_LABELS = Object.freeze({ people: "사람 쪽", position: "자리 쪽" });
-
 /**
  * What the hand did with its directions in one case. Held: at least half of
  * the case's windows were closed on one direction. Switched: not that, but
@@ -167,7 +164,8 @@ const DIRECTION_LABELS = Object.freeze({ people: "사람 쪽", position: "자리
 export function describeLogicCase(record) {
   const windows = count(record, "windows");
   const [type, picked] = Array.isArray(record?.top) ? record.top : [];
-  const label = Object.hasOwn(DIRECTION_LABELS, type ?? "") ? DIRECTION_LABELS[type] : easyCognitionLabels[type];
+  // What the record's `top` calls a direction (C-3, in the page's words); a record from before it holds a thinking type.
+  const label = Object.hasOwn(W.directions, type ?? "") ? W.directions[type] : easyCognitionLabels[type];
   const held = Math.min(windows, Math.max(0, Math.trunc(Number(picked) || 0)));
   if (label && held * 2 >= windows) return held === windows ? LOGIC_REPORT_COPY.heldAll(windows, label) : LOGIC_REPORT_COPY.held(windows, held, label);
   const ended = count(record, "breaks") + count(record, "busts");
@@ -195,7 +193,7 @@ export function createLogicReport({ caseResults = {}, cases = [], standing = LOG
     label: LOGIC_REPORT_COPY.label,
     mark: LOGIC_REPORT_COPY.mark,
     lines: [
-      hottest ? `${LOGIC_REPORT_COPY.lead(`${hottest.label} 「${hottest.title}」`)} ${describeLogicCase(hottest.record)}` : LOGIC_REPORT_COPY.tooFew,
+      hottest ? `${LOGIC_REPORT_COPY.lead(fill(W.caseName, { label: hottest.label, title: hottest.title }))} ${describeLogicCase(hottest.record)}` : LOGIC_REPORT_COPY.tooFew,
       [scored && LOGIC_REPORT_COPY.hold(season.logicHold), LOGIC_REPORT_COPY.best(season.bestLogic), ranked && getLogicRankLine(standing)].filter(Boolean).join(" · "),
       LOGIC_REPORT_COPY.caption,
     ],
