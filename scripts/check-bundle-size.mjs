@@ -1006,7 +1006,11 @@ const budgets = [
   // 1,541 -> 1,547 gzip on 2026-10-24, rebased on main 3d43a239: measured
   // 2,637 / 1,543, the gzip plus 4 (main's is 2,790 / 1,673).
   // 2,637 / 1,547 -> 2,994 / 1,704 on 2026-10-26, 영어판 3단계 (N1): CASCADE's rule, the link line and the voice's lines read by key, their words in this chunk (src/copy/cascade.js, grouped with it in vite.config.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_994, maxGzip: 1_704 },
+  // 1,704 -> 1,709 gzip on 2026-11-03 (#397, main cb904fb6 merged in): the code did not change, only the
+  // file-name hashes it imports did; CI's Linux build measured cascadeRisk-sMXDqu_n.js at 1,705 (the local
+  // Windows build 1,704 as cascadeRisk-DRhkSScz.js), the gzip plus 4. With main 425eb4da merged in, CI
+  // measured 1,701 (cascadeRisk-Y5hf3-95.js): the hashes move it 1,701-1,705. The raw budget does not move.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_994, maxGzip: 1_709 },
   // The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js,
   // WINDOW_TRAIL in vite.config.js): the presses the table writes, the record
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
