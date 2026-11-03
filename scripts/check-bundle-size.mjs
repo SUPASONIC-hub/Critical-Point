@@ -121,7 +121,8 @@ const budgets = [
   // 35,842 / 13,900 -> 35,842 / 13,924 on 2026-11-02, #307 c1-reading-axis merged with #224 c29c2efd (main 9be94346). Measured raw under / 13,920 in the e2e build, the gzip plus 4.
   // 34,459 / 13,432 -> 36,080 / 14,049 on 2026-11-02, locale-gaps (#393) over main 9be94346: the scene beat, the default echo and the speeches read src/copy/judgment.js by key (sceneBeat, defaultEcho), and the speakers' profiles take the page's language. Measured 36,076 / 14,045 in the e2e build, the plus 4.
   // 36,080 / 14,049 -> 37,120 / 14,457 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): src/seasonScore.js (C-2, Q25) beside main's keyed judgment lines and the speakers' profiles. Measured 37,120 / 14,453 in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 37_120, maxGzip: 14_457 },
+  // 37,120 / 14,457 -> 37,459 / 14,574 on 2026-11-03, #307 c1-reading-axis merged with #224 c55d71e1 (main 465ccb93): the reading axis's seventh score card beside #224's src/seasonScore.js and main's keyed judgment lines. Measured 37,459 / 14,570 in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 37_459, maxGzip: 14_574 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -645,7 +646,8 @@ const budgets = [
   // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
   // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
   // 199,354 / 37,230 -> 200,434 / 37,457 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's link tag, signal row, English bank rail and 360px audit place (sig-tight: the signals' icon and chain sentence hidden beside the count, three auto columns) over main's money.css, 360px English labels and 1025px type scale. Measured 200,434 / 37,453 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_434, maxGzip: 37_457 },
+  // 200,434 / 37,457 -> 200,487 / 37,463 on 2026-11-03, #307 c1-reading-axis merged with #224 c55d71e1 (main 465ccb93): the seventh score card's CSS beside #224's 360px audit place and sig-tight signals and main's money.css and type scale. Measured 200,487 / 37,459 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_487, maxGzip: 37_463 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1159,7 +1161,8 @@ const budgets = [
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
   // 179,701 / 60,151 -> 179,786 / 60,177 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's Japanese lines (audit, links, bests) beside main's new tables and purse. Measured 179,786 / 60,173 in the e2e build, the gzip plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_786, maxGzip: 60_177 },
+  // 179,786 / 60,177 -> 179,991 / 60,242 on 2026-11-03, #307 c1-reading-axis merged with #224 c55d71e1 (main 465ccb93): the reading axis's Japanese beside #224's and main's new tables. Measured 179,991 / 60,238 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_991, maxGzip: 60_242 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1167,7 +1170,8 @@ const budgets = [
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,845 / 53,504 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's English lines beside main's new tables and purse. Measured 149,845 / 53,500 in the e2e build, the gzip plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_845, maxGzip: 53_504 },
+  // 149,845 / 53,504 -> 150,057 / 53,549 on 2026-11-03, #307 c1-reading-axis merged with #224 c55d71e1 (main 465ccb93): the reading axis's English beside #224's and main's new tables. Measured 150,057 / 53,545 in the e2e build, the gzip plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_057, maxGzip: 53_549 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1303,8 +1307,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * The PC type scale (pc-type-scale, over main b5abd681; the index CSS and the
  * critical CSS carry the 112.5% root from 1025px, 16px kept on the start screen): 426,130, 483,029 and 489,711, the plus 4.
  * #224 merged with main 465ccb93 (11-03; #391 #389 #390 #393), the 360px signals tightened beside Audit n/4 (the critical CSS does not carry it): 426,317, 483,251 and 489,924, the plus 4.
+ * #307 c1-reading-axis merged with #224 c55d71e1 (main 465ccb93, 11-03): 426,326, 483,304 and 489,997, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 426_321, en: 483_255, ja: 489_928 };
+const FIRST_PAINT_BUDGETS = { ko: 426_330, en: 483_308, ja: 490_001 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
