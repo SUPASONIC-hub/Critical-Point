@@ -40,6 +40,7 @@ import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
+import runLines from "../copy/runLines.js";
 import { fill } from "../locale.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
@@ -826,6 +827,14 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // rewards reading the table.
   runHand: 0,
   handVault: 0,
+  // The money the bank rail shows (moneyFeedback.js): what the last settled
+  // hand did to the case pot and the vault together, signed, and what the
+  // season has won and lost in all. Practice moves neither season total -- a
+  // replay hands the vault back -- and an older save starts its won column at
+  // what it holds (`normalizeRunState`).
+  lastChange: 0,
+  seasonGained: 0,
+  seasonLost: 0,
   // The logic streak (`advanceLogic`); a save from before it reads as this.
   logic: LOGIC_INITIAL,
   // The relics this season carries, the three a closed case is offering, and
@@ -928,7 +937,7 @@ function normalizePractice(value) {
 export function normalizeRunState(value) {
   const source = isRecord(value) ? upgradeRunRecord(value) : {};
   const run = { ...RUN_INITIAL_STATE };
-  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "bestFocusCombo", "focusHits", "runHand", "handVault"]) {
+  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "bestFocusCombo", "focusHits", "runHand", "handVault", "lastChange", "seasonGained", "seasonLost"]) {
     // A value the save does not hold, or holds as null, takes the default:
     // `Number(null)` is 0, which is finite, and used to be taken as written.
     if (source[key] === null || source[key] === undefined) continue;
@@ -949,6 +958,12 @@ export function normalizeRunState(value) {
   run.stanceMastery = normalizeStanceMastery(source.stanceMastery);
   run.runHand = clamp(Math.round(run.runHand), 0, run.runPot);
   run.handVault = clamp(Math.round(run.handVault), 0, run.vault);
+  run.lastChange = Math.round(run.lastChange);
+  // A save from before the season totals has won at least what it holds and
+  // lost nothing anyone counted.
+  const counted = source.seasonGained !== null && source.seasonGained !== undefined;
+  run.seasonGained = counted ? Math.max(0, Math.round(run.seasonGained)) : run.runPot + run.vault;
+  run.seasonLost = Math.max(0, Math.round(run.seasonLost));
   run.logic = normalizeLogic(source.logic);
   run.relics = normalizeRelicIds(source.relics);
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
@@ -1234,6 +1249,10 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
     linksOut: [],
     runPot: 0,
     runHand: 0,
+    // A real case left with a pot forfeits it, and the season counts it lost;
+    // a replay's pot was never the season's.
+    seasonLost: current.seasonLost + (opened.practice ? 0 : current.runPot),
+    lastChange: 0,
     insuranceSpent: false,
     practice,
     relicOffer: practice ? [] : offer,
@@ -1531,6 +1550,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // and on the close the part of the vault's share and the hand's it takes.
   const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter });
   const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
+  // The hand's money for the bank rail: the cash's pot less what a closing
+  // audit took, or what the wall and the audit took. A replay's hand is still
+  // shown; the season's totals are the real cases'.
+  const won = outcome === "cash" ? pot : 0;
+  const taken = lostPot + (audited?.lost ?? 0);
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
   const nextSchema = buildNextSchema({
@@ -1645,6 +1669,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     stanceMastery,
     runHand: caseClosed ? 0 : runHandAfter,
     handVault: current.handVault + (caseClosed ? runHandAfter - (audited?.handLost ?? 0) : 0),
+    lastChange: won - taken,
+    seasonGained: current.seasonGained + (current.practice ? 0 : won),
+    seasonLost: current.seasonLost + (current.practice ? 0 : taken),
     logic: streak.logic,
     relics,
     relicOffer,
@@ -1730,7 +1757,7 @@ export function carryTableRecordIntoRestore(restored, current) {
     caseId: entry.caseId,
     choiceId: "table-record-carry",
     title: "TABLE RECORD",
-    choice: "복구 전에 벽에 닿은 판",
+    choice: runLines.tableRecordCarry,
     effect: {},
     threshold: entry.threshold,
     resourcesBefore: restored.resources,

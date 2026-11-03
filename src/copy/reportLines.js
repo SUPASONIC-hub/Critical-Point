@@ -80,6 +80,29 @@ const reportLinesCopy = {
     faster: "뒤의 {count}번은 평균 {last}초 만에 골랐습니다. 앞의 {count}번은 {first}초였습니다.",
     slower: "뒤의 {count}번은 평균 {last}초를 들여 골랐습니다. 앞의 {count}번은 {first}초였습니다.",
   },
+  // The finale's ruling as the report frames it (createEndingProfile), by the finale's last choice.
+  endingProfiles: {
+    ending_seal: {
+      tag: "봉인",
+      title: "당신은 문을 닫았지만, 흔적은 남겼다.",
+      text: "데이터를 봉인해 다시 이용되지 않게 했습니다. 그러나 마지막 후폭풍에서 고른 태도는 당신이 지키려는 것이 침묵인지 안전인지 드러냈습니다.",
+    },
+    ending_reform: {
+      tag: "개혁",
+      title: "당신은 실험을 규칙으로 바꾸었다.",
+      text: "트리거를 없애는 대신 동의와 감시를 붙였습니다. 사람을 읽는 힘을 누가, 언제, 어디까지 쓸 수 있는지 직접 정했습니다.",
+    },
+    ending_expose: {
+      tag: "폭로",
+      title: "당신은 관찰자를 세상 밖으로 끌어냈다.",
+      text: "실험의 구조를 공개했습니다. 혼란은 시작됐지만, 적어도 다음 참가자는 자신이 관찰당하고 있다는 사실을 알고 선택할 수 있습니다.",
+    },
+    open: {
+      tag: "미확정",
+      title: "당신의 마지막 선택은 아직 기록 중이다.",
+      text: "마지막 폴더의 문장이 완전히 닫히지 않았습니다. 다음 플레이에서는 다른 결말의 조건을 시험해 보십시오.",
+    },
+  },
 };
 export default reportLinesCopy;
 

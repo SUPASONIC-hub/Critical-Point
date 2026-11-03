@@ -1,6 +1,7 @@
 /** src/copy/leaderboard.js in Japanese: the ranking's rows and status card, and the pressures a row names. */
 export default {
   localName: "現在の分析官",
+  defaultName: "分析官",
   anonymousName: "匿名の分析官",
   anonymousHandle: "{run} · 匿名",
   loading: "記録を読み込んでいます。",
