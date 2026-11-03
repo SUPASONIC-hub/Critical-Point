@@ -3123,6 +3123,17 @@ body {
     font-size: 0.875rem;
     line-height: 1.6;
   }
+  /* WebKit's `text-wrap: pretty` evens every line of the paragraph, where
+     Chromium's only mends the last few, and on Linux CI it took the Korean
+     and Japanese premise one line longer (11-02 weekly run: the button's foot
+     at 844 on a 320x844 phone, 846 in Japanese, 752.5 on a 360x740 one).
+     Plain wrapping gives WebKit Chromium's line count, and Chromium the same
+     lines it had. English keeps pretty: its orphan rule moves a word in
+     Chromium, and WebKit already fits it. */
+  :lang(ko) .intro-hero-copy > p:not([class]),
+  :lang(ja) .intro-hero-copy > p:not([class]) {
+    text-wrap: wrap;
+  }
 }
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
