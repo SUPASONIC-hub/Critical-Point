@@ -285,7 +285,12 @@ const fileBudgets = {
   // -> 56973 bytes on 2026-11-02, measured (pc-type-scale, on top of en-hand5-linux): from 1024px wide
   // the pot and the clock keep their size through --hud-rem while the root
   // reads 18px.
-  "play.css": { lines: 2931, bytes: 56973 },
+  // -> 2950 / 57388 on 2026-11-03, measured (signal-row-fit): on 360px or less
+  // the English and Japanese signals row gives LOCK its own width (no icon,
+  // no empty track) and the overclock line the rest, so LOCK no longer runs
+  // under the logic streak. In a 360px block of its own by the streak's rules,
+  // apart from the HUD block that the audit token (#224) adds to.
+  "play.css": { lines: 2950, bytes: 57388 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
