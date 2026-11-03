@@ -935,6 +935,10 @@ Windows·macOS에서 찍힌 베이스라인은 무시(gitignore)되고 커밋하
 
 PR에서 무거운 검사는 라벨로 켭니다. `e2e` 라벨은 e2e 티어를, `visual` 라벨은 시각 회귀를 돌립니다.
 Dependabot PR은 라벨 없이도 e2e와 시각 회귀를 모두 돕니다(의존성 업데이트가 게임을 깨뜨리기 가장 쉬운 변경이라서).
+draft PR은 라벨이 있어도 `verify:quick`만 돌고, ready로 바꾸면(`ready_for_review`) e2e·시각 회귀가 돕니다.
+draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 갈래 머리에서 모든 티어를 돌립니다(배포는 안 함).
+바뀐 파일이 모두 문서(`*.md`, `docs/`)인 PR은 라벨이 있어도 e2e·시즌·시각 회귀를 건너뜁니다. README 숫자를
+보는 `check:doc-numbers`가 든 `verify:quick`은 그대로 돕니다.
 저장소의 텍스트 파일은 모든 플랫폼에서 LF로 체크아웃됩니다(`.gitattributes`, `.editorconfig`). 바이트로
 재는 예산이 Windows에서 CRLF를 재던 문제 때문입니다.
 
@@ -1158,7 +1162,7 @@ node scripts/check-migration-drift.mjs --from list.json
 | 무료 대역폭과 느린 폰 | 첫 화면을 426,810바이트(예산 426,814)로 맞췄고, 영어·일본어 첫 화면도 언어마다 예산을 둔다. 진입 청크, 플레이 화면, 쉰다섯 사건은 각자 예산이 있는 청크로 나눠 필요할 때만 받게 했다. 한글 글꼴은 쓰는 글자만 남긴 부분 집합으로 줄였고, 첫 화면 CSS는 생성하게 했으며, 서비스 워커로 오프라인에서도 열리게 했다 | 청크 예산 23종을 PR마다 CI가 바이트 단위로 지킨다. 예산은 올리기 전에 먼저 줄이고 떼어 낸다 |
 | Supabase 무료 DB 500MB, Edge Function 없이 공개 anon 키만 쓴다 | 서버 검증을 Postgres 안에 두었다. 삽입 검증 트리거, 행 수준 보안, 시간당·일별 요청 한도, 하루 200MB 텔레메트리 바이트 상한, pg_cron 보존 기간 정리가 그것이다. 무거운 집계는 스냅숏 함수로 미리 계산하게 했다(장면 BUST 비율) | 공개 키 하나로 랭킹, 기기 간 저장, 통계를 열어도 DB가 넘치지 않고 남의 행을 바꿀 수 없다 |
 | 병합하면 스키마가 1분 안에 운영 DB에 적용된다 | 스키마는 마이그레이션 파일로만 바꾸게 했고, 매일 운영 이력과 대조하는 Migration Drift를 두었다 | 마이그레이션 53개, 저장소와 운영이 어긋나면 빨간불과 이슈가 뜬다 |
-| QA 팀이 없다 | 정적 검사 28개, 유닛 테스트 1,651개, 브라우저 e2e와 기준 화면 비교를 두었고, 문서가 인용하는 숫자까지 코드로 계산해 대조하게 했다 | 지키기로 한 것은 사람의 기억이 아니라 검사가 지킨다 |
+| QA 팀이 없다 | 정적 검사 28개, 유닛 테스트 1,666개, 브라우저 e2e와 기준 화면 비교를 두었고, 문서가 인용하는 숫자까지 코드로 계산해 대조하게 했다 | 지키기로 한 것은 사람의 기억이 아니라 검사가 지킨다 |
 
 저는 무료 플랜의 한계를 그대로 이 구조의 장점으로 바꿨습니다. 서버가 없으니 서버가 죽을 일이 없고, 바이트를 세니 폰에서 빠르며, 검증이 데이터베이스 안에 있으니 클라이언트를 고쳐도 규칙은 그대로입니다.
 
@@ -1231,7 +1235,7 @@ push 전 로컬 검사는 `npm run check:changed`(`scripts/check-changed.mjs`)�
 실행마다 이슈 "Full Coverage is failing"을 열거나 댓글을 달고(예약 실행에서는 시간 초과로 취소된 job도
 실패로 셉니다), 기본 브랜치의 실행이 다시 초록이 되면 그 이슈를 닫습니다. 이슈가 보고한 실패보다 오래된
 초록 실행(옛 실행 다시 돌리기)은 이슈를 닫지 않습니다. PR에서는 `verify:quick`만 돌고,
-e2e는 push·`e2e` 라벨·Dependabot PR에서 돕니다. 시각 회귀는 `main` push, 그림을 바꿀 수 있는 파일(스타일시트·
+e2e는 push·수동 실행·`e2e` 라벨·Dependabot PR에서 돕니다(draft와 문서만 바뀐 PR은 빼고). 시각 회귀는 `main` push, 그림을 바꿀 수 있는 파일(스타일시트·
 `index.html`·폰트·모든 `.jsx`·`src/` 바로 아래의 모든 `.js`(`caseCopy.js`·`gameCases.js`·`appCopy.js` 등)·`src/viewModels/`·`src/gauntlet/`·`src/nodes/case01.js`·`case05.js`·`public/`·critical CSS 스크립트·
 `vite.config.js`·`playwright.config.js`·`tests/helpers/`·`package-lock.json`·스펙과 베이스라인)을 건드린 PR, `visual` 라벨이 붙은 PR, Dependabot PR, 수동 실행에서 돕니다.
 
@@ -1324,7 +1328,7 @@ Render 배포는 `render.yaml`을 기록으로 둡니다(아래 참고).
 - Build: `npm ci --include=dev && npm run build`
 - Publish: `dist`
 
-Render 빌드는 검사를 다시 돌리지 않습니다. `Verify`가 초록인 커밋만 배포되기 때문입니다(아래 `Deploy`
+Render 빌드는 검사를 다시 돌리지 않습니다. `Verify`가 초록인 파일만 배포되기 때문입니다(아래 `Deploy`
 워크플로). 빌드는 Render가 넣어 주는 값 두 가지를 읽습니다. `RENDER_GIT_COMMIT`은
 `<meta name="build-sha">`로 `index.html`에 적히고, `SITE_URL`(없으면 `RENDER_EXTERNAL_URL`)은
 og·canonical 주소를 절대 주소로 만듭니다(정적 페이지의 canonical·hreflang, `sitemap.xml`의 주소, `robots.txt`의
@@ -1368,7 +1372,11 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 
 배포를 거는 것은 `.github/workflows/deploy.yml`입니다. Render 대시보드 → 서비스 → Settings → Deploy
 Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으면, `Verify`(e2e 포함)가 초록으로 끝난
-`main` 푸시마다 배포를 겁니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다
+`main` 푸시마다 배포를 겁니다. 2026-11-03부터는 문이 하나 더 있습니다. push된 병합 커밋의 tree가, main보다
+뒤처지지 않은 채 병합된 PR 머리 커밋의 tree와 같고 그 머리에서 `Verify`의 모든 job(quick, e2e 다섯 샤드, 시즌
+네 샤드. 라벨 실행과 앞선 실행을 합쳐 봄)이 초록이면, main의 `Verify`를 기다리지 않고 push 때 바로 배포합니다
+(`scripts/ci-same-tree-verified.mjs`). 하나라도 확인되지 않으면 예전대로 main의 `Verify`가 끝난 뒤 배포합니다.
+main의 `Verify`는 계속 돌고, 끝나면 사이트가 이미 그 커밋을 내주는 것을 보고 누르지 않은 채 다시 확인만 합니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다
 (`render.yaml`에도 `autoDeploy: false`로 기록). 훅은 검증된 커밋을 `ref=`로 지정해 부르고, Render는 특정
 커밋으로 배포된 서비스의 Auto-Deploy를 스스로 끄며 대시보드에 "Auto-Deploy has been disabled to prevent
 accidental deploys"라고 표시합니다. 이것이 의도한 상태이니 다시 켜지 마십시오.
