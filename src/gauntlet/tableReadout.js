@@ -233,6 +233,19 @@ export function describeEffect(effect = {}, resourceMeta = {}) {
 }
 
 /**
+ * The staked card's detail line (GauntletHand's preview). C-15 (2026-10-25,
+ * draft for after W47): it leaves out the number the card's burn already
+ * prints. That number was printed twice, and on a FRACTURE board twice apart --
+ * the burn billed (믿음 -15), the detail not (믿음 -10). Three at most; the
+ * rest is 외 N, and all of it is in the reveal.
+ */
+export function describeStakedDetail(card, schema, resourceMeta) {
+  const burnKey = card ? getCardBurn(card, schema)?.key : null;
+  const effects = card ? describeEffect(card.effect, resourceMeta).filter((effect) => effect.key !== burnKey) : [];
+  return { visibleEffects: effects.slice(0, 3), hiddenEffectCount: Math.max(0, effects.length - 3) };
+}
+
+/**
  * The run's six numbers and the clues it holds, as one line of the folded
  * briefing. A locked card states its condition in these ("지금 믿음 N, 단서
  * N개", `getAuthorityGate`) and the table printed none of them: the HUD is the

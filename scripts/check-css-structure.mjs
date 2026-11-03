@@ -274,6 +274,8 @@ const fileBudgets = {
   // -> 2925 / 55865 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측.
   // -> 2931 / 56015 on 2026-10-24, measured: a sealed card's badges on a plain
   // ground over its stripes.
+  // -> 56244 on 2026-10-25, measured (C-15 draft, for after W47): a board
+  // rule's badge folded until its card is staked, and 소모 없음 without red.
   // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
   // labels a size down, so five-card hands keep two lines in a CJK face.
   // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
@@ -285,7 +287,11 @@ const fileBudgets = {
   // -> 56973 bytes on 2026-11-02, measured (pc-type-scale, on top of en-hand5-linux): from 1024px wide
   // the pot and the clock keep their size through --hud-rem while the root
   // reads 18px.
-  "play.css": { lines: 2931, bytes: 56973 },
+  // -> 56734 bytes on 2026-11-02, measured: C-15's badge fold over the
+  // Japanese 360px card labels and the 360px HUD air.
+  // -> 2941 lines / 57182 bytes on 2026-11-03, measured: C-15's badge fold over main 465ccb93
+  // (en-hand5-linux, pc-type-scale).
+  "play.css": { lines: 2941, bytes: 57182 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

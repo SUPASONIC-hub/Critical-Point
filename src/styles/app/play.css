@@ -1355,6 +1355,20 @@
   border-color: var(--c-acid);
 }
 
+/* C-15 (2026-10-25, draft for after W47): a board rule's badge waits for the
+   card that is staked or has the keyboard's focus (GauntletHand.jsx). The
+   chips and the burn print the rule's effect on every card. */
+.gauntlet-stage .gx-card:not(.selected, :focus-visible) .gx-card-fold {
+  display: none;
+}
+
+/* A card that burns nothing says 소모 없음 without the red of a cost. */
+.gauntlet-stage .gx-card-burn.is-free {
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  border-color: var(--ui-line);
+}
+
 .gauntlet-stage .gx-card.is-fractured {
   border-style: dashed;
   border-color: var(--c-gx-ember);
