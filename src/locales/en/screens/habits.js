@@ -7,7 +7,7 @@ export default {
   shield: { title: "People-First Shield", line: "Before the numbers, you count the people behind them." },
   "one-track": { title: "One-Track Logician", line: "Once you pick a logic, you hold it however hot it gets." },
   "card-shopper": { title: "Card Shopper", line: "A different card every hand, and combos be damned." },
-  "stepping-stone": { title: "Look-Before-You-Leap Type", line: "You never go near the Wall and hit LOCK early." },
+  "stepping-stone": { title: "Look-Before-You-Leap", line: "You never go near the Wall and hit LOCK early." },
   marathon: { title: "Thinking Marathoner", line: "You only rest easy once the thinking outlasts the verdict." },
   lightning: { title: "Lightning Decider", line: "You pick the moment you read, and push the moment you pick." },
   steady: { title: "Even-Keel Balancer", line: "Nothing flashy, but you saw every hand through to the end." },
