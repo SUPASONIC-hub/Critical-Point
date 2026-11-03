@@ -154,12 +154,23 @@ const BUDGETS = {
   // awaited confirm lands, which is why the cap is 190 rather than 180).
   // 96 -> 98 on 2026-10-26, 다국어 틀: the run's notices table
   // (src/copy/notices.js) and `fill` for its two lines with blanks.
+  // 960 / 98 -> 968 / 99 on 2026-11-02, bgm-variety over main c680ddd5: the
+  // decision's reveal sheet keys its own music while it is open (revealOutcome,
+  // src/components/musicScore.js). The key is built here, in the runtime's lazy
+  // chunk: a helper beside the rule in musicScore.js would have cut five lines
+  // but put 37 bytes on the first paint, since the music sits in the entry.
+  // 99 -> 96 names on 2026-11-02, locale-gaps (#393) over bgm-variety: the
+  // view models are one namespace import (sceneViewModels, with the runtime
+  // card's label as `runtimeCardLabel`) and the two runtime cards' words are
+  // src/copy/runLines.js's. Measured 968 / 96.
   // 960 -> 961 lines on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
   // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
+  // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
+  // bgm-variety and locale-gaps.
   "src/GameRuntime.jsx": {
-    lines: 961,
+    lines: 969,
     longestLine: 190,
-    importedNames: 98,
+    importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
@@ -218,10 +229,14 @@ const BUDGETS = {
   // briefing while the card is up, and the card drawn in front of them.
   // 70 -> 72 imported names on 2026-10-26, 다국어 틀: the screen's copy table
   // (src/copy/table.js) and locale.js's `fill` for its lines with blanks.
+  // 851 / 72 -> 860 / 73 on 2026-11-02, measured (money-feedback): the bank
+  // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
+  // ref for the amount's flight and the window it was dealt on; the purse's
+  // markup and both reads live outside the screen.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 851,
+    lines: 860,
     longestLine: 250,
-    importedNames: 72,
+    importedNames: 73,
     hooks: {},
   },
 };

@@ -123,6 +123,14 @@ export const SAVE_SLOT_MAX_ITEMS = 5;
 export const SAVE_SCHEMA_VERSION = 4;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
 export const PLAYER_NAME_MAX_LENGTH = 24;
+// The name a save starts with when none is typed, and the name a local ranking
+// row carries when the save has none. Both are written into the save and the
+// rows in Korean on every page, and stay so: a page in another language shows
+// them in its own words (copy/introPanels.js, copy/result.js,
+// copy/leaderboard.js `defaultName`) without changing what is kept. The server
+// never gets either (its rows carry 「익명 분석관」).
+export const DEFAULT_PLAYER_NAME = "분석관";
+export const UNNAMED_ROW_NAME = "현재 분석관";
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
 // The board's post length, mirroring the 2-300 bound the table's trigger
 // enforces (supabase/migrations/20260923010000_add_board_posts.sql). The

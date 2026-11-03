@@ -1,3 +1,6 @@
+import { fill } from "./locale.js";
+import W from "./copy/sceneRates.js";
+
 /**
  * The other players' choice on a scene (E-6): one line under the decision
  * reveal saying how many of their windows here staked the same card --
@@ -16,7 +19,7 @@ export const SCENE_CHOICE_FLOOR = 50;
 export const RARE_CHOICE_PERCENT = 20;
 
 export const SCENE_CHOICE_COPY = {
-  line: (percent, rare) => `같은 카드를 고른 분석관 ${percent}%${rare ? " · 드문 선택" : ""}`,
+  line: (percent, rare) => `${fill(W.choice, { percent })}${rare ? W.rare : ""}`,
 };
 
 /**
