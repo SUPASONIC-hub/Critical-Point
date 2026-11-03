@@ -695,7 +695,10 @@ Still open, on purpose:
     asserts is a save, a request or a page state no viewport or touch reaches.
     The season is walked in eight `@season-segment` tests of seven cases, each
     from a fresh save at its first case, which Verify runs as a job of its own
-    on four shards on every push; the rest of the list runs on five. The continuous walk -- the only thing that carries
+    on four shards on every push; the rest of the list runs on seven, each a set of spec files balanced
+    by measured time (`tests/e2e-shards.json`; `npm run e2e:rebalance` lays it
+    out again from CI logs, and a spec it does not know goes to the lightest
+    shard). The continuous walk -- the only thing that carries
     resources and flags across all 55 cases -- is `npm run test:e2e:season`,
     run weekly by Full Coverage with `test:e2e:full`.
 18. The e2e runner takes a free port from the OS. Never pin one: a dev server

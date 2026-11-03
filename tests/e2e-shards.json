@@ -1,0 +1,127 @@
+{
+  "source": "run 41416063591, run 41422237555, run 41560900359, run 41561249153",
+  "shardCount": 7,
+  "seconds": {
+    "[chromium] › accessibility-settings.spec.js": 170.7,
+    "[chromium] › accessibility.spec.js": 194.2,
+    "[chromium] › audio-preference.spec.js": 14.7,
+    "[chromium] › board-ranking.spec.js": 33.2,
+    "[chromium] › cloud-save.spec.js": 12.8,
+    "[chromium] › contrast.spec.js": 57.9,
+    "[chromium] › gauntlet-loop.spec.js": 360,
+    "[chromium] › language-picker.spec.js": 10.6,
+    "[chromium] › legal-pages.spec.js": 13.7,
+    "[chromium] › logic-report.spec.js": 60.4,
+    "[chromium] › recovery.spec.js": 60.5,
+    "[chromium] › result-card.spec.js": 63.3,
+    "[chromium] › save-integrity.spec.js": 28.8,
+    "[chromium] › save-resume.spec.js": 61.5,
+    "[chromium] › save-unavailable-language.spec.js": 5.5,
+    "[chromium] › season-flow.spec.js": 374.2,
+    "[chromium] › season-recovery.spec.js": 96.4,
+    "[chromium] › season-telemetry.spec.js": 43,
+    "[chromium] › table-keys.spec.js": 409.1,
+    "[chromium] › visual-regression.spec.js": 66.3,
+    "[chromium] › weekly-rule.spec.js": 32.6,
+    "[mobile-chromium] › accessibility-settings.spec.js": 179.3,
+    "[mobile-chromium] › accessibility.spec.js": 196,
+    "[mobile-chromium] › audio-preference.spec.js": 16,
+    "[mobile-chromium] › board-ranking.spec.js": 34.8,
+    "[mobile-chromium] › cloud-save.spec.js": 7.2,
+    "[mobile-chromium] › contrast.spec.js": 59.7,
+    "[mobile-chromium] › gauntlet-loop.spec.js": 381.6,
+    "[mobile-chromium] › language-picker.spec.js": 14.2,
+    "[mobile-chromium] › legal-pages.spec.js": 13.7,
+    "[mobile-chromium] › logic-report.spec.js": 58,
+    "[mobile-chromium] › recovery.spec.js": 48.3,
+    "[mobile-chromium] › result-card.spec.js": 59.5,
+    "[mobile-chromium] › save-integrity.spec.js": 5.7,
+    "[mobile-chromium] › save-resume.spec.js": 41.6,
+    "[mobile-chromium] › save-unavailable-language.spec.js": 6,
+    "[mobile-chromium] › season-flow.spec.js": 378.2,
+    "[mobile-chromium] › season-recovery.spec.js": 69.7,
+    "[mobile-chromium] › season-telemetry.spec.js": 6.7,
+    "[mobile-chromium] › table-keys.spec.js": 347.8,
+    "[mobile-chromium] › visual-regression.spec.js": 122,
+    "[mobile-chromium] › weekly-rule.spec.js": 35
+  },
+  "shards": [
+    {
+      "seconds": 609,
+      "units": [
+        "[chromium] › cloud-save.spec.js",
+        "[chromium] › logic-report.spec.js",
+        "[chromium] › result-card.spec.js",
+        "[chromium] › table-keys.spec.js",
+        "[mobile-chromium] › audio-preference.spec.js",
+        "[mobile-chromium] › save-integrity.spec.js",
+        "[mobile-chromium] › save-resume.spec.js"
+      ]
+    },
+    {
+      "seconds": 603,
+      "units": [
+        "[chromium] › save-resume.spec.js",
+        "[chromium] › weekly-rule.spec.js",
+        "[mobile-chromium] › gauntlet-loop.spec.js",
+        "[mobile-chromium] › logic-report.spec.js",
+        "[mobile-chromium] › season-recovery.spec.js"
+      ]
+    },
+    {
+      "seconds": 609,
+      "units": [
+        "[chromium] › board-ranking.spec.js",
+        "[chromium] › season-recovery.spec.js",
+        "[mobile-chromium] › contrast.spec.js",
+        "[mobile-chromium] › save-unavailable-language.spec.js",
+        "[mobile-chromium] › season-flow.spec.js",
+        "[mobile-chromium] › weekly-rule.spec.js"
+      ]
+    },
+    {
+      "seconds": 608,
+      "units": [
+        "[chromium] › language-picker.spec.js",
+        "[chromium] › season-flow.spec.js",
+        "[mobile-chromium] › board-ranking.spec.js",
+        "[mobile-chromium] › cloud-save.spec.js",
+        "[mobile-chromium] › result-card.spec.js",
+        "[mobile-chromium] › visual-regression.spec.js"
+      ]
+    },
+    {
+      "seconds": 609,
+      "units": [
+        "[chromium] › accessibility-settings.spec.js",
+        "[chromium] › gauntlet-loop.spec.js",
+        "[chromium] › save-integrity.spec.js",
+        "[chromium] › season-telemetry.spec.js",
+        "[mobile-chromium] › season-telemetry.spec.js"
+      ]
+    },
+    {
+      "seconds": 609,
+      "units": [
+        "[chromium] › legal-pages.spec.js",
+        "[chromium] › save-unavailable-language.spec.js",
+        "[mobile-chromium] › accessibility-settings.spec.js",
+        "[mobile-chromium] › language-picker.spec.js",
+        "[mobile-chromium] › recovery.spec.js",
+        "[mobile-chromium] › table-keys.spec.js"
+      ]
+    },
+    {
+      "seconds": 603,
+      "units": [
+        "[chromium] › accessibility.spec.js",
+        "[chromium] › audio-preference.spec.js",
+        "[chromium] › contrast.spec.js",
+        "[chromium] › recovery.spec.js",
+        "[chromium] › visual-regression.spec.js",
+        "[mobile-chromium] › accessibility.spec.js",
+        "[mobile-chromium] › legal-pages.spec.js"
+      ]
+    }
+  ]
+}
