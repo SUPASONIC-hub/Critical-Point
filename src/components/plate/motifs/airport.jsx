@@ -41,7 +41,7 @@ export function paintAirport(random, accent, glow) {
       )}
       {people(
         <>
-          {figure("traveller", Math.round(span(random, 160, 196)), 104, 40)}
+          {figure("traveller", Math.round(span(random, 160, 196)), 104, 40, { player: true })}
           {seated("waiting", 71, 94, 18)}
         </>,
       )}

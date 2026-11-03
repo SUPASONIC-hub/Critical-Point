@@ -74,7 +74,7 @@ export function paintCoast(random, accent, glow) {
           ))}
         </>,
       )}
-      {people(figure("shore", Math.round(span(random, 146, 206)), 108, 42))}
+      {people(figure("shore", Math.round(span(random, 146, 206)), 108, 42, { player: true }))}
     </>
   );
 }

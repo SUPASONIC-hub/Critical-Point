@@ -44,6 +44,15 @@ export function overlayWords(target, words) {
         // label: what the observer reads of a choice
         // (gameLogic.js `choiceWords`) is the same card in every language.
         if (key === "label" && "next" in target && !("sourceLabel" in target)) target.sourceLabel = target[key];
+        // A scene (the one with `choices`) keeps its Korean place and clock
+        // too: the plate picks its room, its light and its seed from them
+        // (src/scenePlate.js `getScenePlate`), so c46_cage is the server room
+        // and the same server room in every language, not the desk an English
+        // place falls back to.
+        if ((key === "place" || key === "clock") && "choices" in target) {
+          const source = key === "place" ? "sourcePlace" : "sourceClock";
+          if (!(source in target)) target[source] = target[key];
+        }
         target[key] = value;
       }
     } else {
