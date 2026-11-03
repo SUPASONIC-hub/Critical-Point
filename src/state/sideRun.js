@@ -9,16 +9,17 @@
  *
  * What it never does, by construction rather than by a check at each step:
  * read or write the season save, NEW GAME+, the season record, the past picks,
- * the local ranking or the settled-window log; queue a telemetry row; carry
- * anything into the online save. Nothing here imports the modules that write
- * those, and tests/unit/side-cases.test.mjs holds every other key of storage
- * to the byte across a whole side run.
+ * the local ranking or the settled-window log; queue a telemetry row. Nothing
+ * here imports the modules that write those, and
+ * tests/unit/side-cases.test.mjs holds every other key of storage to the byte
+ * across a whole side run. The online save carries the completion mark
+ * (cloudSave.js reads it from `SIDE_CASES_KEY`); a close only tells it so.
  *
  * In the runtime's chunk (GameRuntime.jsx re-exports it): the table's modules
  * are there already, and the side screen (screens/SideCaseScreen.jsx) loads
  * that chunk rather than pull them into a chunk of its own.
  */
-import { SIDE_CASES_KEY, writeStoredValue } from "../appConfig.js";
+import { DEVICE_RECORD_WRITTEN_EVENT, SIDE_CASES_KEY, writeStoredValue } from "../appConfig.js";
 import { caseNodePrefix } from "../gameCases.js";
 import { initialResources } from "../gameConstants.js";
 import { applyEffect } from "../riskLogic.js";
@@ -124,10 +125,18 @@ export function saveSideProgress(state) {
   return writeEntry(state.caseId, { inProgress: { nodeId, resources, log, run, runId } });
 }
 
-/** The completion mark (설계안 질문 4 (1)): when, and which ending. The run under way is dropped. */
+/**
+ * The completion mark (설계안 질문 4 (1)): when, and which ending. The run
+ * under way is dropped. The mark is one the online save carries, and no save
+ * is written to say a newer copy exists, so the close says it itself.
+ */
 export function closeSideCase(state, { now = new Date() } = {}) {
   if (!state.outcomeChoiceId) return false;
-  return writeEntry(state.caseId, { closedAt: now.toISOString(), outcomeChoiceId: state.outcomeChoiceId, inProgress: null });
+  const written = writeEntry(state.caseId, { closedAt: now.toISOString(), outcomeChoiceId: state.outcomeChoiceId, inProgress: null });
+  if (written && typeof globalThis.dispatchEvent === "function" && typeof globalThis.CustomEvent === "function") {
+    globalThis.dispatchEvent(new CustomEvent(DEVICE_RECORD_WRITTEN_EVENT, { detail: { key: SIDE_CASES_KEY } }));
+  }
+  return written;
 }
 
 /** A run put down for good: the next opening starts at the first scene. The mark, if any, stays. */

@@ -15,7 +15,8 @@ export const SEASON_RECORD_KEY = "critical-point-season-record-v1";
 export const SEEN_SCENES_KEY = "critical-point-seen-scenes-v1";
 export const PAST_PICKS_KEY = "critical-point-past-picks-v1";
 // E-11 번외 사건: each side case's completion mark and its run in progress
-// (src/sideCases.js). Device-only: no cloud save, no reset, no server row.
+// (src/sideCases.js). No reset, no server row; the online save carries the
+// marks alone, beside the season's device records (cloudSave.js).
 export const SIDE_CASES_KEY = "critical-point-side-cases-v1";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
@@ -83,6 +84,12 @@ export function getDeletionRequestText(contact = SUPPORT_CONTACT) {
 
 /** Fired on `globalThis` after every save that reached device storage. */
 export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
+/**
+ * Fired on `globalThis` when a device record the online save carries changes
+ * with no save written: a side case closed (state/sideRun.js). The online
+ * copy follows it as it follows a save.
+ */
+export const DEVICE_RECORD_WRITTEN_EVENT = "critical-point:device-record-written";
 // The raw text of a save this build could not read -- broken JSON, or a schema
 // newer than the build after a rolled-back deploy. Kept until the player has a
 // readable save again, so the next write is not what destroys it.
