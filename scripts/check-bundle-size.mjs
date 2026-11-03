@@ -280,7 +280,9 @@ const budgets = [
   // tracks, the stake layers' pooled voices and src/components/musicScore.js (AdaptiveMusic plays from the start screen, so it sits in the
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_363 },
+  // 68,363 -> 68,369 gzip on 2026-11-03, intro-webkit-fit over main 465ccb93: the same 189,359 bytes, only the chunk names
+  // it imports are new (the stylesheet's rule renamed them). Measured 68,365, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_363, maxGzip: 68_369 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -581,7 +583,9 @@ const budgets = [
   // 198,856 / 37,110 -> 198,925 / 37,111 on 2026-11-02, money-feedback over main acf3d999. Measured 198,925 / 37,107 in the e2e build, the gzip plus 4.
   // 198,925 / 37,111 -> 199,354 / 37,230 on 2026-11-02, pc-type-scale over main b5abd681: from 1025px wide the root reads 112.5% (18px)
   // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 199_354, maxGzip: 37_230 },
+  // 199,354 / 37,230 -> 199,417 / 37,241 on 2026-11-03, intro-webkit-fit over main 465ccb93: on 360px or less the Korean and
+  // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 199,413 / 37,237, plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 199_417, maxGzip: 37_241 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1179,8 +1183,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * money-feedback over main acf3d999: 425,946, 482,846 and 489,528, the plus 4.
  * The PC type scale (pc-type-scale, over main b5abd681; the index CSS and the
  * critical CSS carry the 112.5% root from 1025px, 16px kept on the start screen): 426,130, 483,029 and 489,711, the plus 4.
+ * The Korean and Japanese premise wrapped plainly on 360px or less (intro-webkit-fit, over main 465ccb93; the index
+ * CSS carries the rule, the critical CSS only its hash): 426,151, 483,051 and 489,733, the plus 4.
  */
-const FIRST_PAINT_BUDGETS = { ko: 426_134, en: 483_033, ja: 489_715 };
+const FIRST_PAINT_BUDGETS = { ko: 426_155, en: 483_055, ja: 489_737 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

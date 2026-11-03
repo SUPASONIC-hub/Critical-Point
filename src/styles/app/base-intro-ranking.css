@@ -3130,8 +3130,7 @@ body {
      Plain wrapping gives WebKit Chromium's line count, and Chromium the same
      lines it had. English keeps pretty: its orphan rule moves a word in
      Chromium, and WebKit already fits it. */
-  :lang(ko) .intro-hero-copy > p:not([class]),
-  :lang(ja) .intro-hero-copy > p:not([class]) {
+  :not(:lang(en)) .intro-hero-copy > p:not([class]) {
     text-wrap: wrap;
   }
 }
