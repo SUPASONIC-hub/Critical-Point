@@ -104,7 +104,8 @@ const budgets = [
   // 26,671 / 11,352 -> 26,682 / 11,352 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habits' and judgment's tables (src/copy/habits.js, judgment.js) the table and the runtime share. Measured 26,678 raw (gzip under 11,352) in the e2e build, the plus 4.
   // 26,682 / 11,352 -> 26,792 / 11,414 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in the table's words (stage.purse, purseChange, purseSeason). Measured 26,788 / 11,410, the plus 4.
   // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_492, maxGzip: 13_281 },
+  // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_498, maxGzip: 13_286 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -284,8 +285,9 @@ const budgets = [
   // tracks, the stake layers' pooled voices and src/components/musicScore.js (AdaptiveMusic plays from the start screen, so it sits in the
   // entry). Measured 188,120 / 67,817 in the e2e build, the plus 4.
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
-  // 189,363 / 68,363 -> 189,392 / 68,376 on 2026-11-03, week-board-after over main 16b6d349 (#392): the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,372 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_392, maxGzip: 68_376 },
+  // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
+  // 189,363 / 68,368 -> 189,392 / 68,384 on 2026-11-03, week-board-after over main f4625ad1: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,380 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_392, maxGzip: 68_384 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -502,7 +504,8 @@ const budgets = [
   // 50,079 / 16,401 -> 50,213 / 16,456 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habit names and lines (src/copy/habits.js) and the one-word analyst line (endingCopy.getAnalystName). Measured 50,209 / 16,452 in the e2e build, the plus 4.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_356, maxGzip: 16_517 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
-  { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_061, maxGzip: 14_462 },
+  // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
+  { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -732,7 +735,7 @@ const budgets = [
   // export names it imports shifted with the music's new exports. Measured 14,832 gzip in the e2e build, the gzip plus 4.
   // 39,883 / 14,836 -> 43,635 / 16,377 on 2026-11-02, locale-gaps (#393) over main 9be94346: the run's lines (route labels, restore, minutes, the far callbacks) read src/copy/runLines.js and src/copy/farCallbacks.js. Measured 43,631 / 16,373 in the e2e build, the plus 4.
   // 43,635 / 16,377 -> 44,126 / 16,529 on 2026-11-02, money-feedback over main acf3d999: the run's lastChange, seasonGained and seasonLost. Measured 44,122 / 16,525, the plus 4.
-  // 44,126 -> 44,131 raw on 2026-11-03, week-board-after over main 16b6d349 (#392): no code changed; the export names it imports from weeklyRules shifted with weekBoardsAt. Measured 44,127, the plus 4.
+  // 44,126 -> 44,131 raw on 2026-11-03, week-board-after over main f4625ad1: no code changed; the export names it imports from weeklyRules shifted with weekBoardsAt. Measured 44,127, the plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 44_131, maxGzip: 16_529 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -886,8 +889,8 @@ const budgets = [
   // 2,634 / 1,403 -> 2,636 / 1,403 on 2026-10-25, board-report: the report button, its reason fieldset and its live line on each board post (BoardScreen, useBoardReport, boardReport.js), saveBoardReport in telemetry.js, the Flag icon and the report CSS; the other chunks only by the chunk names they import. Measured 2,636 in the e2e build.
   // 2,636 -> 2,637 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 2,637 / 1,398.
   // 2,637 / 1,403 -> 3,215 / 1,600 on 2026-10-26, 영어판 3단계 (N1): the catalogue's words read by key (src/copy/weekRules.js, in this chunk), their numbers filled in from the constants when a rule is read. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  // 3,215 / 1,600 -> 3,360 / 1,673 on 2026-11-03, week-board-after over main 16b6d349 (#392): weekBoardsAt, this week's board and last week's for the seven days after it (W47 점검 P9). Measured 3,356 / 1,669 in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_360, maxGzip: 1_673 },
+  // 3,215 / 1,600 -> 3,360 / 1,672 on 2026-11-03, week-board-after over main f4625ad1: weekBoardsAt, this week's board and last week's for the seven days after it (W47 점검 P9). Measured 3,356 / 1,668 in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_360, maxGzip: 1_672 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1004,7 +1007,11 @@ const budgets = [
   // 1,541 -> 1,547 gzip on 2026-10-24, rebased on main 3d43a239: measured
   // 2,637 / 1,543, the gzip plus 4 (main's is 2,790 / 1,673).
   // 2,637 / 1,547 -> 2,994 / 1,704 on 2026-10-26, 영어판 3단계 (N1): CASCADE's rule, the link line and the voice's lines read by key, their words in this chunk (src/copy/cascade.js, grouped with it in vite.config.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_994, maxGzip: 1_704 },
+  // 1,704 -> 1,709 gzip on 2026-11-03 (#397, main cb904fb6 merged in): the code did not change, only the
+  // file-name hashes it imports did; CI's Linux build measured cascadeRisk-sMXDqu_n.js at 1,705 (the local
+  // Windows build 1,704 as cascadeRisk-DRhkSScz.js), the gzip plus 4. With main 425eb4da merged in, CI
+  // measured 1,701 (cascadeRisk-Y5hf3-95.js): the hashes move it 1,701-1,705. The raw budget does not move.
+  { pattern: /^cascadeRisk-.*\.js$/, maxBytes: 2_994, maxGzip: 1_709 },
   // The window's replay trail (F1 phase 2, src/gauntlet/windowTrail.js,
   // WINDOW_TRAIL in vite.config.js): the presses the table writes, the record
   // the runtime puts on the decision log entry. 1,376 / 771 measured on
@@ -1066,16 +1073,16 @@ const budgets = [
   // 153,139 / 51,933 -> 153,344 / 51,954 on 2026-10-30, ranking-save-copy over main c39870a7: the two ranking save lines in Japanese. Measured 153,340 / 51,950, the plus 4.
   // 153,344 / 51,954 -> 179,578 / 60,103 on 2026-11-02, locale-gaps (#393) over main 9be94346: the Japanese of every new table (habits, judgment, logic report, scene rates, season lines, play reads, report lines, intro panels, music, run lines, far callbacks). Measured 179,574 / 60,099 in the e2e build, the plus 4.
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
-  // 179,701 / 60,151 -> 179,747 / 60,163 on 2026-11-03, week-board-after over main 16b6d349 (#392): the last week's board tab in Japanese. Measured 179,743 / 60,159, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_747, maxGzip: 60_163 },
+  // 179,701 / 60,151 -> 179,747 / 60,166 on 2026-11-03, week-board-after over main f4625ad1: the last week's board tab in Japanese. Measured 179,743 / 60,162, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_747, maxGzip: 60_166 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
   // 93,179 / 34,900 -> 124,761 / 45,295 on 2026-10-26, 영어판 3단계: the endings, verdicts, board, ranking, privacy lines, online save's status, the week's rules and line, the audit's and the links' lines in English. Only an English page fetches it. Measured in the e2e build, the gzip plus 4.
   // 128,593 / 46,483 -> 149,679 / 53,430 on 2026-11-02, locale-gaps (#393) over main 9be94346: the English of the same tables. Measured 149,675 / 53,426 in the e2e build, the plus 4.
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
-  // 149,778 / 53,469 -> 149,824 / 53,483 on 2026-11-03, week-board-after over main 16b6d349 (#392): the last week's board tab in English. Measured 149,820 / 53,479, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_824, maxGzip: 53_483 },
+  // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main f4625ad1: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_819, maxGzip: 53_481 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1096,7 +1103,8 @@ const budgets = [
   // 8,731 / 2,640 -> 12,511 / 3,324 on 2026-10-28, lang-full: the import maps name every case and between/ file of both
   // languages (49 cases more for Japanese) and, with #365, a card keeps its Korean label. Measured 12,575 / 3,354.
   // 12,579 / 3,358 -> 12,868 / 3,438 on 2026-11-02, locale-gaps (#393) over main 9be94346: the late/ import map (the speakers' profiles, fetched when the runtime opens) and laying a late table over its module. Measured 12,864 / 3,434 in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_868, maxGzip: 3_438 },
+  // 12,868 / 3,438 -> 12,991 / 3,500 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 12,987 / 3,496 in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_500 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1199,8 +1207,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 425,560 / 482,420 / 489,093 -> 425,751 / 482,612 / 489,285 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 425,747 / 482,608 / 489,281 the plus 4.
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
-// 426,755 / 483,654 / 490,336 -> 426,769 / 483,681 / 490,361 on 2026-11-03, week-board-after over main 16b6d349 (#392): the entry's ranking-board check and the two dictionaries' tab line. Measured 426,765 / 483,677 / 490,357, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_769, en: 483_681, ja: 490_361 };
+// 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
+// 426,761 / 483,722 / 490,404 -> 426,776 / 483,752 / 490,437 on 2026-11-03, week-board-after over main f4625ad1: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,772 / 483,748 / 490,433, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_776, en: 483_752, ja: 490_437 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
