@@ -5,13 +5,11 @@ import * as seasonStanding from "./seasonStanding.js";
 import * as scoring from "./seasonScore.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import observerCopy from "./copy/observer.js";
+import judgmentCopy from "./copy/judgment.js";
 import { fill } from "./locale.js";
-import {
-  applyEffect,
-  clamp,
-  getRiskPressure,
-  getRiskPressureDrivers,
-} from "./riskLogic.js";
+import { clamp, getRiskPressure } from "./riskLogic.js";
+// The two rules read once each, by the module's name (check:runtime-budget counts the names this file imports).
+import * as riskLogic from "./riskLogic.js";
 
 export {
   applyEffect,
@@ -43,7 +41,7 @@ export function buildNarrativeSpine({
   // own: this template ran for every scene there was (149 then), so every window asked the same
   // thing under a different title. The template is only the net now.
   const question = node.question
-    || (node.title ? `${node.title}: 지금 무엇을 먼저 지킬지 결정해야 합니다.` : "지금 무엇을 먼저 지킬지 결정해야 합니다.");
+    || (node.title ? fill(judgmentCopy.titledQuestion, { title: node.title }) : judgmentCopy.question);
   const consequence = suspenseState.tier === "REDLINE"
     ? "다음 선택은 사건의 결말이 아니라 당신의 허용선을 기록합니다."
     : riskTier === "CRITICAL"
@@ -62,7 +60,7 @@ export function buildNarrativeSpine({
 
 export function createDecisionForecast(choice = {}, resources = {}) {
   const beforeRisk = getRiskPressure(resources);
-  const afterResources = applyEffect(resources, choice.effect);
+  const afterResources = riskLogic.applyEffect(resources, choice.effect);
   const afterRisk = getRiskPressure(afterResources);
   const riskDelta = afterRisk - beforeRisk;
   const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
@@ -84,7 +82,7 @@ export function createDecisionForecast(choice = {}, resources = {}) {
     biggestGain,
     biggestCost,
     cognitionGain,
-    pressureDrivers: getRiskPressureDrivers(afterResources).slice(0, 2),
+    pressureDrivers: riskLogic.getRiskPressureDrivers(afterResources).slice(0, 2),
   };
 }
 
@@ -675,7 +673,7 @@ function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
 
 export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
   const outcomes = packTable("outcomes");
-  return outcomes[caseId]?.[choiceId] ?? { tag: "기록되지 않은 결말", title: "아직 닫히지 않은 결과", text: "이번 선택의 파장은 다음 기록에 남아 있습니다." };
+  return outcomes[caseId]?.[choiceId] ?? { ...judgmentCopy.unrecordedOutcome };
 }
 
 export function getOutcomeCarryover({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
@@ -759,10 +757,10 @@ export function getDecisionLedger(entries = [], resources = {}) {
  * triggers this run carried longest, and the road that family's thinking takes.
  */
 const MOTIVE_FAMILIES = [
-  { id: "affection", label: "애정형", when: "살리고 싶은 사람이 보일 때", path: "애정 → 집념 → 끝까지 생각 → 구제", triggers: ["affection", "protection", "trust"] },
-  { id: "revenge", label: "복수형", when: "되갚고 싶은 부당함이 보일 때", path: "분노 → 집념 → 약점 추적 → 교정", triggers: ["revenge", "injustice", "competition", "recognition"] },
-  { id: "responsibility", label: "책임형", when: "떠맡은 것이 무너질 것 같을 때", path: "책임 → 집념 → 손익 계산 → 회생", triggers: ["responsibility", "order", "reward", "system"] },
-  { id: "curiosity", label: "탐구형", when: "아직 모르는 것이 남았을 때", path: "호기심 → 집념 → 구조 파악 → 발견", triggers: ["curiosity", "selfAwareness", "choice", "manipulation", "fear", "helplessness"] },
+  { id: "affection", triggers: ["affection", "protection", "trust"] },
+  { id: "revenge", triggers: ["revenge", "injustice", "competition", "recognition"] },
+  { id: "responsibility", triggers: ["responsibility", "order", "reward", "system"] },
+  { id: "curiosity", triggers: ["curiosity", "selfAwareness", "choice", "manipulation", "fear", "helplessness"] },
 ];
 
 /**
@@ -771,7 +769,10 @@ const MOTIVE_FAMILIES = [
  * score, so every tie and every empty run was named 책임형 -- a verdict the run
  * never gave.
  */
-const MIXED_MOTIVE = { id: "mixed", label: "복합형", when: "한 가지 감정이 혼자 생각을 깨우지 않았을 때", path: "여러 감정 → 집념 → 끝까지 생각 → 다시 읽기" };
+const MIXED_MOTIVE = { id: "mixed" };
+
+// A family's words (src/copy/judgment.js), read when the motive is named so they are the page's language.
+const motiveWords = (id) => ({ id, ...judgmentCopy.motives[id] });
 
 export function getThinkingMotive(triggerScores = {}) {
   const scored = MOTIVE_FAMILIES.map((family) => ({
@@ -780,9 +781,9 @@ export function getThinkingMotive(triggerScores = {}) {
   }));
   const top = Math.max(...scored.map((family) => family.score));
   const leaders = scored.filter((family) => family.score === top);
-  if (top <= 0 || leaders.length > 1) return { ...MIXED_MOTIVE, score: Math.max(0, top) };
+  if (top <= 0 || leaders.length > 1) return { ...motiveWords(MIXED_MOTIVE.id), score: Math.max(0, top) };
   const { triggers: _triggers, ...motive } = leaders[0];
-  return motive;
+  return { ...motiveWords(motive.id), ...motive };
 }
 
 export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {}, entries = [], resources = {} } = {}) {
@@ -802,20 +803,7 @@ export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {
     : disruptorScore >= stabilizerScore
       ? "RE-FRAMER"
       : "PRESSURE PILOT";
-  const modeMeta = {
-    GUARDIAN: {
-      title: "피해의 이동을 먼저 막는 사람",
-      text: "결과의 크기보다 누가 비용을 떠안는지 확인하며 판단을 오래 유지합니다.",
-    },
-    "RE-FRAMER": {
-      title: "판 자체를 다시 짜는 사람",
-      text: "주어진 선택지의 균형을 따르기보다 이해관계자와 조건을 다시 배치합니다.",
-    },
-    "PRESSURE PILOT": {
-      title: "압박 안에서 방향을 조정하는 사람",
-      text: "위험이 커져도 결정을 멈추지 않고, 다음 장면으로 넘길 비용을 선택합니다.",
-    },
-  }[mode];
+  const modeMeta = judgmentCopy.modes[mode];
 
   return {
     mode,
@@ -1043,8 +1031,11 @@ export function createCaseSummary(
   return summary;
 }
 
+// A card with no reply of its own (the reframe cards) is answered with the
+// default, in the page's language (judgmentCopy.defaultEcho is the Korean
+// `echoReplies.default`, word for word).
 export function getEcho(choiceId) {
-  return echoReplies[choiceId] ?? echoReplies.default;
+  return echoReplies[choiceId] ?? judgmentCopy.defaultEcho;
 }
 
 export function getDramaticChoiceLabel(choice) {
@@ -1057,19 +1048,20 @@ function getStrongestDelta(effect = {}) {
 }
 
 function describeDelta(delta) {
-  if (!delta) return "상황판의 숫자는 크게 움직이지 않지만, 회의실의 침묵은 조금 길어진다.";
+  const words = judgmentCopy.sceneBeat;
+  if (!delta) return words.still;
   const [key, value] = delta;
   // The sentence is about what the move cost, so it follows the meaning of the
   // number rather than its sign: 사람 피해 going up is not a windfall, and going
   // down is not something a third party absorbs.
   const label = easyResourceLabels[key] ?? key;
-  if (isResourceGain(key, value)) return `${label}${subjectParticle(label)} 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.`;
-  return `${label}${subjectParticle(label)} 대가로 남는다. 누군가는 그 몫을 자기 자리에서 떠안게 된다.`;
+  return fill(isResourceGain(key, value) ? words.gain : words.cost, { label, particle: subjectParticle(label) });
 }
 
 export function explainResourceTradeoff(effect = {}) {
   const entries = Object.entries(effect).filter(([, value]) => value !== 0);
-  if (entries.length === 0) return "숫자는 거의 움직이지 않았지만, 이 선택은 판단의 기준을 남겼습니다.";
+  const words = judgmentCopy.tradeoff;
+  if (entries.length === 0) return words.still;
 
   // Same rule as the chips beside this sentence: a rising 사람 피해 is a loss, and
   // the resources named are the ones that moved most. The labels come from the
@@ -1078,18 +1070,21 @@ export function explainResourceTradeoff(effect = {}) {
   const gains = entries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight);
   const losses = entries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight);
   const format = ([key, value]) => `${easyResourceLabels[key] ?? key} ${value > 0 ? "+" : ""}${value}`;
-  const gainText = gains.length > 0 ? gains.slice(0, 2).map(format).join(", ") : "즉시 얻은 것은 적고";
-  const lossText = losses.length > 0 ? losses.slice(0, 2).map(format).join(", ") : "눈에 보이는 손실은 작습니다";
+  const gainText = gains.length > 0 ? gains.slice(0, 2).map(format).join(", ") : words.noGain;
+  const lossText = losses.length > 0 ? losses.slice(0, 2).map(format).join(", ") : words.noLoss;
+  const blanks = { gains: gainText, gainParticle: objectParticle(gainText), losses: lossText, lossParticle: objectParticle(lossText) };
 
   if (gains.length > 0 && losses.length > 0) {
-    return `${gainText}${objectParticle(gainText)} 얻는 대신 ${lossText}${objectParticle(lossText)} 감수했습니다.`;
+    return fill(words.both, blanks);
   }
-  if (gains.length > 0) return `${gainText}${subjectParticle(gainText)} 열렸지만, 그 이득이 다음 장면의 압박으로 남습니다.`;
-  return `${lossText}${objectParticle(lossText)} 감수했습니다. 선택의 명분은 남았지만 여력이 깎였습니다.`;
+  if (gains.length > 0) return fill(words.gainsOnly, { ...blanks, gainParticle: subjectParticle(gainText) });
+  return fill(words.lossesOnly, blanks);
 }
 
 export function speechifyChoice(choice) {
   const label = choice.label ?? "그 판단을 밀고 가겠습니다";
+  // A card in another language has no Korean ending to turn into speech: it is said as the card says it.
+  if (!/[가-힣]/.test(label)) return label;
   const endings = [
     ["제안한다", "제안하겠습니다."],
     ["선택한다", "선택하겠습니다."],
@@ -1159,23 +1154,23 @@ function getSpokenStem(label) {
   return `${head}${SPOKEN_L_STEMS[label.slice(-2, -1)] ?? stemSyllable}`;
 }
 
+// The beat is written into the run's log as the card is played, so it is in
+// the page's language then: the profiles are laid over in place by the module
+// that owns them (gameDialogue.js, from src/locales/<lang>/late/gameDialogue.js),
+// the frame is judgmentCopy's.
 export function buildSceneBeat(node, choice, effect = {}) {
-  const profile = characterProfiles[node?.speaker] ?? {
-    appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
-    thought: "이 선택은 아직 끝나지 않았다.",
-    gesture: "상대는 잠시 말을 고른다.",
-    voice: "상황을 확인하는 말투로 반응한다.",
-    line: "그 판단을 계속 밀고 갈 수 있습니까?",
-  };
+  const words = judgmentCopy.sceneBeat;
+  const profile = characterProfiles[node?.speaker] ?? words.stockProfile;
   const said = `"${speechifyChoice(choice)}"`;
   const deltaLine = describeDelta(getStrongestDelta(effect));
-  const speakerName = node?.speaker ?? "상대";
+  // The name the page prints (a scene in another language carries `speakerName`); the Korean name on a Korean page.
+  const speakerName = node?.speakerName ?? node?.speaker ?? words.speaker;
 
   return [
     `${profile.appearance} ${profile.gesture}`,
     `'${profile.thought}'`,
-    `당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. ${said}`,
-    `${speakerName}${subjectParticle(speakerName)} 시선을 든다. ${profile.voice}`,
+    fill(words.said, { said }),
+    fill(words.look, { name: speakerName, particle: subjectParticle(speakerName), voice: profile.voice }),
     `"${profile.line}"`,
     deltaLine,
   ].join("\n");

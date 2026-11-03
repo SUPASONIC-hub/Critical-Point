@@ -82,7 +82,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     branchRouteEntry && { id: "branch", label: endingCopy.endingWords.witness.branch, tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
   const endingAfterglow = endingCopy.getEndingAfterglow(observationLedger);
-  const analystName = playerName?.trim() ? fill(resultCopy.namedAnalyst, { name: playerName.trim() }) : resultCopy.anonymousAnalyst;
+  const analystName = endingCopy.getAnalystName(playerName);
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />

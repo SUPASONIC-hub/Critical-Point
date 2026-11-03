@@ -2429,6 +2429,23 @@
   .gx-reveal-consequence b {
     font-size: 0.75rem;
   }
+
+  /* Every five-card hand on a phone gives back the air a rules line's
+     hand gives (below), and 1px more of each: 5px block paddings, 3px between
+     a card's parts and between rows. English took the first step
+     (en-hand5-linux); the bank rail's purse line (money.css, 2026-11-02) took
+     about 21px more of the HUD, and on Linux Japanese then put 63 hands at a
+     pot of 0 up to 11px, and late-season tables (LAYOUT_BANK=max) in all three
+     languages up to 31px, under the action bar; at 390x844 the densest sealed
+     board's last card went 21px under it. */
+  .gauntlet-stage .hand-5 {
+    gap: 3px;
+  }
+
+  .gauntlet-stage .hand-5 .gx-card {
+    gap: 3px;
+    padding-block: 5px;
+  }
 }
 
 /* A short phone reads the scene without its portrait, in two lines of question.
@@ -2605,21 +2622,10 @@
      Windows), and 22 hands at a pot of 0 put the last card 4px under the
      action bar (360x740, hand5, 2026-11-02). A 12px label on 15px lines takes
      6px off every three-line row and brings some to two; the words stay.
-     Late in a season the bank row's second line takes 20px more, so an
-     English five-card hand also keeps the air a rules line's hand keeps
-     (above): 6px block paddings, 4px between a card's parts and between rows. */
+     Late in a season the bank row's second line takes 20px more. */
   :lang(en) .gx-card-label {
     font-size: 0.75rem;
     line-height: 1.25;
-  }
-
-  :lang(en) .gauntlet-stage .hand-5 {
-    gap: 4px;
-  }
-
-  :lang(en) .gauntlet-stage .hand-5 .gx-card {
-    gap: 4px;
-    padding-block: 6px;
   }
 
   /* The bank row is one line at a pot of 0 and two late in a season: at a pot
@@ -2629,10 +2635,11 @@
      language; LAYOUT_BANK=max, 2026-10-30). The second line stays and the
      room is taken from the HUD's air instead: a 30px clock, 18px pills, and
      2 to 4px off the gaps and paddings around them. The HUD measured 106px
-     with one bank line and 132 with two; it is 87 and 107. */
+     with one bank line and 132 with two; it is 87 and 107 (and 3px block
+     paddings since the purse line, 2026-11-02). */
   .gauntlet-stage .gx-hud {
     gap: 3px 8px;
-    padding: 4px 8px;
+    padding: 3px 8px;
   }
 
   .gauntlet-stage .gx-clock {
@@ -2749,16 +2756,16 @@
   }
 
   .gx-pot-value {
-    font-size: 3rem;
+    font-size: calc(3 * var(--hud-rem));
   }
 
   .gx-clock {
-    width: 3.625rem;
-    height: 3.625rem;
+    width: calc(3.625 * var(--hud-rem));
+    height: calc(3.625 * var(--hud-rem));
   }
 
   .gx-clock b {
-    font-size: 1.3125rem;
+    font-size: calc(1.3125 * var(--hud-rem));
   }
 }
 
@@ -2882,16 +2889,16 @@
   }
 
   .gx-pot-value {
-    font-size: 3.75rem;
+    font-size: calc(3.75 * var(--hud-rem));
   }
 
   .gx-clock {
-    width: 4.5rem;
-    height: 4.5rem;
+    width: calc(4.5 * var(--hud-rem));
+    height: calc(4.5 * var(--hud-rem));
   }
 
   .gx-clock b {
-    font-size: 1.5625rem;
+    font-size: calc(1.5625 * var(--hud-rem));
   }
 
   .gx-signals {
@@ -2966,16 +2973,16 @@
   }
 
   .gx-pot-value {
-    font-size: 2.875rem;
+    font-size: calc(2.875 * var(--hud-rem));
   }
 
   .gx-clock {
-    width: 3.625rem;
-    height: 3.625rem;
+    width: calc(3.625 * var(--hud-rem));
+    height: calc(3.625 * var(--hud-rem));
   }
 
   .gx-clock b {
-    font-size: 1.3125rem;
+    font-size: calc(1.3125 * var(--hud-rem));
   }
 
   .gx-signals {
