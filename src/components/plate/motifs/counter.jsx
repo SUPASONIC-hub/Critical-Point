@@ -30,7 +30,7 @@ export function paintCounter(random, accent, glow) {
       {people(
         <>
           {seated("teller", lamp ? lamp.x + 8 : 120, 74, 26)}
-          {figure("customer", lamp ? lamp.x + 2 : 140, 106, 40)}
+          {figure("customer", lamp ? lamp.x + 2 : 140, 106, 40, { player: true })}
         </>,
       )}
     </>

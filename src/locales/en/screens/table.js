@@ -18,7 +18,7 @@ export default {
     combo: "Combo",
     runPot: "Stake",
     vault: "Vault",
-    purse: "Holdings",
+    purse: "Bankroll",
     purseChange: "Last hand {change}",
     purseSeason: "Season won {gained} · lost {lost}",
     streak: "Streak",

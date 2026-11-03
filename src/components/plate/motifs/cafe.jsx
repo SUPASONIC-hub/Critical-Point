@@ -45,7 +45,7 @@ export function paintCafe(random, accent, glow) {
       )}
       {people(
         <>
-          {seated("ledger-a", tableX - 24, 100, 30)}
+          {seated("ledger-a", tableX - 24, 100, 30, { player: true })}
           {seated("ledger-b", tableX + 24, 100, 30)}
         </>,
       )}
