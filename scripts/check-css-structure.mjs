@@ -179,7 +179,10 @@ const fileBudgets = {
   // takes the Japanese 14px there (Linux CI put its button at 746).
   // 3159 / 69883 -> 3159 / 69903 on 2026-11-02, measured (pc-type-scale): from 1024px wide the
   // root reads 18px; the case card's numeral keeps its size through --hud-rem.
-  "base-intro-ranking.css": { lines: 3159, bytes: 69903 },
+  // 3159 / 69903 -> 3162 / 69982 on 2026-11-03, measured (intro-webkit-fit): on
+  // 360px or less the premise wraps plainly outside English, where WebKit's
+  // text-wrap: pretty took the Korean and Japanese one a line longer.
+  "base-intro-ranking.css": { lines: 3162, bytes: 69982 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
