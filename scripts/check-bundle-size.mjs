@@ -126,7 +126,8 @@ const budgets = [
   // 1afa305e, the gzip plus 4. Nothing of the store's own changed.
   // 291,131 / 87,101 -> 290,343 / 86,964 on 2026-10-26, 영어판 3단계: runtimeSystems.js's words (src/copy/seasonEnd.js) first landed here, which imports the runtimeSystems chunk back, and the table read at load was undefined in the production build (runtime smoke); grouped with runtimeSystems now, and this file measured smaller. Measured in the e2e build, the gzip plus 4.
   // 290,343 / 86,970 -> 294,110 / 87,736 on 2026-11-02, locale-gaps (#393) over main 9be94346: the season store's lines (NEW GAME+, second season, ending book, the share tail) read from src/copy/seasonLines.js. Measured 294,106 / 87,732 in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_736 },
+  // 87,736 -> 87,741 gzip on 2026-11-03, prose-trim-1 (#394) over main 16b6d349: the same 294,106 raw bytes, but the case chunks' file names it imports carry new hashes (their scenes are shorter), and those letters pack worse. Measured 294,106 / 87,737 in the e2e build, the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_110, maxGzip: 87_741 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
