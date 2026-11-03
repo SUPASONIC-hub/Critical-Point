@@ -50,7 +50,7 @@ test("a Korean page keeps its habits, titles and opening line", () => {
 test("with the English dictionary laid over, nothing the swept modules print is Korean", async () => {
   const tables = await layOver("en");
   assertNoHangul(collectLines(tables), "en");
-  assert.equal(JUDGEMENT_HABITS.find((habit) => habit.id === "stepping-stone").title, "Look-Before-You-Leap Type");
+  assert.equal(JUDGEMENT_HABITS.find((habit) => habit.id === "stepping-stone").title, "Look-Before-You-Leap");
   // The card draws the name at 76px down to 48px on two lines; no English name is longer than the longest so far.
   for (const habit of JUDGEMENT_HABITS) assert.ok(habit.title.length <= 26, `${habit.id}: "${habit.title}" fits the card`);
   // The second pass: what the runtime writes as a run is played, and the far callbacks on the English scenes.
