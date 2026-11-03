@@ -919,6 +919,7 @@ npm run dev
 자주 쓰는 명령:
 
 ```bash
+npm run check:changed   # push 전: 바뀐 파일에 맞는 검사만 (기준 origin/main, --dry-run은 고르기만)
 npm run verify:static   # 브라우저 없는 검사 28개를 병렬로 (~1분)
 npm run verify:quick    # + 프로덕션 빌드, 번들 예산, 빌드 위 런타임 스모크와 @prod e2e, 성능 예산
 npm run verify          # + 기본 e2e
@@ -1207,6 +1208,16 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 넷 중 느린 것은 `check:canon` 하나였고, 파일마다 세 번 읽는 것이 원인이었습니다. 지금은 파일을 한 번만
 줄로 나눠 사실과 날짜를 함께 읽습니다. 같은 날 앞뒤 스크립트를 번갈아 5회씩 잰 중앙값은
 1,853ms(1,753~1,918)에서 855ms(810~898)로 내려갔고, 찾아내는 것은 그대로입니다.
+
+push 전 로컬 검사는 `npm run check:changed`(`scripts/check-changed.mjs`)입니다. `origin/main...HEAD`(인자로 다른
+기준)와 커밋하지 않은 파일을 영역으로 나눠(`scripts/check-changed-rules.mjs`) 필요한 것만 `verify:static`과 같은
+풀에서 돌리고, 고른 검사마다 까닭을 찍습니다. 문구만 바뀐 장면·번역·문구 표는 글자 검사와 빌드·번들 예산만,
+시트는 CSS 검사와 빌드만, 앱 코드는 유닛 테스트 전체·lint·타입을 돌리고, 검사 스크립트가 import하는 파일이면
+그 검사도 돕니다(`src/gameLogic.js` → 압박·엔딩). 어느 영역에도 없는 파일이나 `package.json`이 바뀌면
+`verify:static` 전체입니다. PR에서는 CI가 `verify:quick` 전체를 그대로 돕니다. `npm run build:e2e`는 깨끗한
+작업 트리면 `HEAD^{tree}`·모드·빌드가 읽는 환경 변수·`.env` 파일·Node·설치된 패키지를 키로 저장소 옆
+`cp-build-cache/`(`CP_BUILD_CACHE`로 바꿈, 최근 6개)에 `dist/`를 두고 같은 키면 복사해 씁니다(`scripts/build-cache.mjs`,
+`-- --no-cache`면 새로 빌드, CI에서는 늘 새로 빌드). 예산은 그 빌드를 그대로 잽니다.
 
 `verify:quick`의 브라우저 검사는 개발 서버가 아니라 `dist/`를 `vite preview`로 띄운 프로덕션 빌드(디버그
 도구가 빠진, 배포되는 그 빌드)에서 돌고, 러너는 떠 있는 서버가 지금의 `dist/index.html`을 내주는지
