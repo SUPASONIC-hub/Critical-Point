@@ -105,6 +105,7 @@ jobs:
               exit 1
             fi
           }
+          mkdir -p ranking-report
           started=$SECONDS
           node scripts/verify-ranking-rows.mjs --runs-sql --limit="$RANKING_LIMIT" > runs.sql || exit 1
           query runs.sql runs.json
@@ -118,7 +119,7 @@ jobs:
           if [ "$runs" -gt 0 ]; then
             rows=$(node -e 'const fs = require("fs"); let n = 0; for (const f of process.argv.slice(1)) { const r = JSON.parse(fs.readFileSync(f, "utf8")); n += (r.rows ?? r).length; } console.log(n)' rows/*.json)
           fi
-          echo "Read $runs runs, $rows rows, in $((SECONDS - started)) s ($((runs + 1)) queries)." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Read $runs runs, $rows rows, in $((SECONDS - started)) s ($((runs + 1)) queries)." | tee -a "$GITHUB_STEP_SUMMARY" ranking-report/verify-ranking-summary.md
           echo "runs=$runs" >> "$GITHUB_OUTPUT"
       - name: Write the report
         if: steps.token.outputs.configured == 'true' && steps.read.outputs.runs != '0'
@@ -130,8 +131,8 @@ jobs:
             echo '```'
             node scripts/verify-ranking-rows.mjs rows/*.json --redact
             echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-          echo "Checked in $((SECONDS - started)) s." | tee -a "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY" >> ranking-report/verify-ranking-summary.md
+          echo "Checked in $((SECONDS - started)) s." | tee -a "$GITHUB_STEP_SUMMARY" ranking-report/verify-ranking-summary.md
       # The statement names run ids, so it is never printed; what the CLI said
       # on failure goes through the same redaction as the read.
       - name: Write the marks
@@ -153,9 +154,20 @@ jobs:
             node scripts/check-migration-drift.mjs --say-failure marked.json write.err
             exit 1
           fi
-          echo "Marked $(node -e 'const r = JSON.parse(require("fs").readFileSync("marked.json", "utf8")); console.log((r.rows ?? r)[0]?.marked_rows ?? 0)') ranking rows." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Marked $(node -e 'const r = JSON.parse(require("fs").readFileSync("marked.json", "utf8")); console.log((r.rows ?? r)[0]?.marked_rows ?? 0)') ranking rows." | tee -a "$GITHUB_STEP_SUMMARY" ranking-report/verify-ranking-summary.md
       - name: Remove the rows
         if: always()
         run: |
           rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err
           if [ -d rows ]; then rmdir rows; fi
+      # What the Job Summary says, as the run's artifact too (2026-11-03): the
+      # summary cannot be read from the CLI or the API, and the W47 verdict
+      # (11-23) reads it. Only the lines above (the redacted report) are in it.
+      - name: Upload the summary
+        if: steps.token.outputs.configured == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verify-ranking-summary
+          path: ranking-report
+          if-no-files-found: ignore
+          retention-days: 45
