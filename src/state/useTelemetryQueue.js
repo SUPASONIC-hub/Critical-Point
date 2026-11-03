@@ -12,6 +12,8 @@ import { createTelemetryEventId, sanitizeTelemetryQueue, validateTelemetryItem }
 import { reconcileTelemetryQueue, sendTelemetryBatch } from "./telemetryBatch.js";
 import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
 import noticesCopy from "../copy/notices.js";
+import runLines from "../copy/runLines.js";
+import { fill } from "../locale.js";
 
 // Rows built before payloads minted their own `event_id` (the case rows built
 // in GameRuntime) get one when they are queued, so every retry reuses it.
@@ -36,16 +38,12 @@ function withEventId(item) {
 // past a minute: a ranking row a day early would otherwise ask 1,440 times.
 const RETRY_DELAY_CAP_MS = 5 * 60_000;
 
-// Said when a ranking row is let go because the server does not hold every
-// case of its run (telemetryBatch.isUnrankableRefusal). It names the two ways
-// that happens, since the player can do something about one of them next time.
-const UNRANKED =
-  "이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 서버에 이 회차의 사건 기록이 모두 있지는 않습니다(데이터 제공 동의 전에 마친 사건이 있거나, 서버가 받지 않은 기록이 있습니다). 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
-
-// Said when a ranking row is let go because its season has a case closed
-// before the table paid the logic streak (telemetryBatch.isBeatTableRefusal).
-const BEAT_TABLE =
-  "지금 판 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
+// The lines are copy/runLines.js `remote`. `unranked` is said when a ranking
+// row is let go because the server does not hold every case of its run
+// (telemetryBatch.isUnrankableRefusal); it names the two ways that happens,
+// since the player can do something about one of them next time. `beatTable`
+// when its season has a case closed before the table paid the logic streak
+// (telemetryBatch.isBeatTableRefusal).
 
 /**
  * What the status line says after a pass over the queue. A ranking row that
@@ -57,15 +55,16 @@ export function describeBatchResult({ queueCommitted, left, refused = 0, unranke
   if (!queueCommitted) {
     return {
       tone: "error",
-      text: "원격 저장 응답을 받았지만 브라우저 저장본 갱신에 실패했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
+      text: runLines.remote.queueCommitFailed,
     };
   }
+  const words = runLines.remote;
   const lines = [];
-  if (unranked > 0) lines.push(UNRANKED);
-  if (beatTable > 0) lines.push(BEAT_TABLE);
-  if (refused > 0) lines.push(`서버가 받지 않은 기록 ${refused}건은 대기열에서 뺐습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다.`);
-  if (left > 0) lines.push(`원격 저장 ${left}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`);
-  if (lines.length === 0) return { tone: "success", text: "원격 저장을 모두 완료했습니다." };
+  if (unranked > 0) lines.push(words.unranked);
+  if (beatTable > 0) lines.push(words.beatTable);
+  if (refused > 0) lines.push(fill(words.refused, { count: refused }));
+  if (left > 0) lines.push(fill(words.left, { count: left }));
+  if (lines.length === 0) return { tone: "success", text: words.done };
   return { tone: "error", text: lines.join(" ") };
 }
 
@@ -128,7 +127,7 @@ export function useTelemetryQueue({
     const savedAt = new Date().toISOString();
     const payload = latestSaved ? { ...latestSaved, pendingTelemetry: queue, savedAt } : null;
     if (!isSavedStateShapeValid(payload)) {
-      setSaveStatus("원격 저장 대기열을 저장하지 못했습니다. 브라우저 저장본을 확인해 주세요.");
+      setSaveStatus(runLines.remote.queueSaveFailed);
       return false;
     }
     const result = writeSaveState(payload, { isAhead: () => true });
@@ -153,7 +152,7 @@ export function useTelemetryQueue({
       tone: "pending",
       // A case row's first send comes through here too (useChoiceCommit), so
       // this does not say "again".
-      text: `원격 저장 ${retryBatch.length}건을 전송하는 중입니다.`,
+      text: fill(runLines.remote.sending, { count: retryBatch.length }),
     });
 
     // A row is sent only while the queue still holds it: the consent box

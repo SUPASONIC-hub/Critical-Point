@@ -385,8 +385,15 @@ test("intro mobile visual baseline @visual", async ({ page }, testInfo) => {
 for (const viewport of [
   { name: "desktop", width: 1366, height: 768 },
   { name: "laptop", width: 1280, height: 720 },
+  // The PC type scale (11-02) reads 18px from 1025px; 1024 stays at 16px and
+  // 1440x900 is the common large laptop.
+  { name: "tablet landscape", width: 1024, height: 768 },
+  { name: "large laptop", width: 1440, height: 900 },
   { name: "mobile", width: 390, height: 844 },
   { name: "narrow phone", width: 320, height: 844 },
+  // The short Android phone the table is laid out for (hand5): production put
+  // the Korean button's foot at 742 here (10-30), under none of the others.
+  { name: "small phone", width: 360, height: 740 },
   { name: "large phone", width: 412, height: 915 },
 ]) {
   // Each language's start screen (10-29): the English premise ran two lines

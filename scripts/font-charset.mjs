@@ -32,8 +32,11 @@ const SOURCE_EXTENSIONS = new Set([".js", ".jsx", ".css", ".html"]);
  * than the whole first-paint budget (다국어 조사 4절, 일본어 1단계). Its kana and
  * kanji are never asked of Pretendard, so they stay out of the list and out of
  * check-fonts' system-face list. Korean and English source is read as before.
+ * src/dev is the music lab (music-lab.html, `npm run dev` only): the release
+ * build never takes it (vite builds index.html alone), so its labels are not
+ * text the app prints.
  */
-const SKIPPED_DIRECTORIES = new Set([path.join("src", "locales", "ja")]);
+const SKIPPED_DIRECTORIES = new Set([path.join("src", "locales", "ja"), path.join("src", "dev")]);
 
 function range(from, to) {
   let text = "";

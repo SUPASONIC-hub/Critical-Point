@@ -38,7 +38,7 @@ export function paintCourtroom(random, accent, glow) {
           {seated("judge", 160, 30, 16)}
           {seated("counsel-a", 58, 72, 18)}
           {seated("counsel-b", 262, 72, 18)}
-          {figure("witness", 160, 84, 22)}
+          {figure("witness", 160, 84, 22, { player: true })}
         </>,
       )}
       {halo(160, 34, 26, glow)}

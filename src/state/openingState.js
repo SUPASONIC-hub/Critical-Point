@@ -1,5 +1,6 @@
 import { getOriginStartEffects } from "../advancedSystems.js";
 import { initialResources } from "../gameConstants.js";
+import W from "../copy/introPanels.js";
 
 /**
  * The hand a season opens with: the standing resources plus what the analyst's
@@ -26,4 +27,8 @@ export function createOpeningResources(operatorOrigin) {
 // The line under a season's first scene, before any choice has been answered.
 // Here, not in runState.js, so the shell's first save can hold it without the
 // table's engine coming into the entry chunk with it.
-export const OPENING_ECHO = "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
+// The Korean line, as the table holds it when this module is read.
+export const OPENING_ECHO = W.openingEcho;
+
+/** That line in the page's language (src/copy/introPanels.js), asked for when a season opens: another language's is laid over the table after this module is read. */
+export const openingEcho = () => W.openingEcho;
