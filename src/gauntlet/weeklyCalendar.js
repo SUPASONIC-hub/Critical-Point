@@ -101,8 +101,12 @@ export function weekStartMs(weekKey) {
   return isoWeekKey(start) === weekKey ? start : null;
 }
 
-/** Whether the week at `ms` or the one after it is in the calendar: the start screen's line, this week's or the notice. */
-export function weekHasNews(ms, calendar = WEEKLY_RULES) {
-  const weeks = [isoWeekKey(ms), isoWeekKey(Number(ms) + 7 * DAY_MS)];
+/**
+ * Whether the week at `ms` or the one `days` after it is in the calendar: the
+ * start screen's line, this week's or the notice; with `days` -7 the ranking's
+ * boards, this week's or last week's (WeekBoards).
+ */
+export function weekHasNews(ms, calendar = WEEKLY_RULES, days = 7) {
+  const weeks = [isoWeekKey(ms), isoWeekKey(Number(ms) + days * DAY_MS)];
   return calendar.some((entry) => weeks.includes(entry.week));
 }
