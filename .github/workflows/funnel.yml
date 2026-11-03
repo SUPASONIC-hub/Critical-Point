@@ -84,9 +84,30 @@ jobs:
             exit 1
           fi
           echo "Read $(node -e 'const r = JSON.parse(require("fs").readFileSync("rows.json", "utf8")); console.log((r.rows ?? r).length)') runs."
+      # The same tables go to a file too, with their numbers as JSON, and up
+      # as the run's artifact (2026-11-03): the Job Summary cannot be read
+      # from the CLI or the API, and the W47 verdict (11-23) reads these. The
+      # folder holds only what the summary says -- never rows.json.
       - name: Write the summary
         if: steps.token.outputs.configured == 'true'
-        run: node scripts/report-funnel.mjs rows.json >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p funnel-report
+          node scripts/report-funnel.mjs rows.json > funnel-report/funnel-summary.md
+          node scripts/report-funnel.mjs rows.json --json > funnel-report/funnel-summary.json
+          cat funnel-report/funnel-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove the rows
+        if: always()
+        run: rm -f rows.json query.err
+      - name: Upload the summary
+        if: steps.token.outputs.configured == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: funnel-summary
+          path: funnel-report
+          if-no-files-found: ignore
+          retention-days: 45
       # The limits that hold for everyone together (scripts/report-budgets.mjs, M3
       # of the 2026-11-03 security review): counts and limits only. A scheduled
       # run fails at 80%, so the failed-run mail is the alarm.
@@ -109,11 +130,9 @@ jobs:
           fi
           node scripts/report-budgets.mjs budgets.json >> "$GITHUB_STEP_SUMMARY" || exit 1
           echo "near=$(node scripts/report-budgets.mjs --near budgets.json)" >> "$GITHUB_OUTPUT"
+          rm -f budgets.sql budgets.json budgets.err
       - name: Fail when a global budget is near its end
         if: ${{ !cancelled() && steps.token.outputs.configured == 'true' && github.event_name == 'schedule' && steps.budgets.outputs.near != '0' && steps.budgets.outputs.near != '' }}
         run: |
           echo "::error title=A global limit is near::${{ steps.budgets.outputs.near }} limit(s) for everyone together are at 80% or more of the day. When one runs out, every player's request of that kind is refused until the day ends. Read the Job Summary; raise the value in private_settings (README section 6)."
           exit 1
-      - name: Remove the rows
-        if: always()
-        run: rm -f rows.json query.err budgets.sql budgets.json budgets.err
