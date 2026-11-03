@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-02 (the state of `main` at `5c00dff`, after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-03 (the state of `main` at `16b6d34`, after the scene plates that tell the story (#392), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -463,6 +463,13 @@ Still open, on purpose:
   360px, five-card hand spacing at 480px and under, new `money.css`). #390 (desktop type: body text 16 to 18px at 1025px and wider, the start screen kept at 16px, the large stake, clock and timer numbers held by `--hud-rem`; the 1280x720 start button now inside the screen on Linux, 1024x768 and 1440x900 added to the reach check, desktop baselines re-recorded). Six PRs merged, production build-sha `5c00dff`, 1,637 unit tests. Drafts: #394 (scene prose trim 1, after W47), #392 (to merge tomorrow morning). #322 followed main; #224's bundle children followed
   rules-mark-3b: #307 `50e7957f`, #316 `b008cb11`, #320 `d4a6ed3b`, #308
   `558088ad`, #379 `e57c9864`.
+- 2026-11-03: #392 (`plate-story`: each sound word sits beside its source -- the
+  heartbeat by the player's own figure, a thud on the desk, a hum by the lit
+  object, a tick on the wall -- never over a figure or the caption, hidden on
+  phones at 700px and under; the player's figure in every room in the hand
+  colour with an outline; the result screen opens with the case's last scene
+  in a good, mixed or bad tint; font subset 1,700 characters). One PR merged,
+  production build-sha `16b6d34`, 1,644 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
