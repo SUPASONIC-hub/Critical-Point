@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "p2_start": {
       "title": "The Morning 31 Billion Won Arrived",
-      "text": "The Corporate Finance Strategy Team’s review room, 6th floor, KD Bank head office. Five months after you came off probation, a thick review file lands on your desk. Loan number 2023-0412. The borrower is FlowOn, a dawn-delivery logistics platform. The amount is 31 billion won (about US$22 million). The first page puts the debt-to-equity ratio at 179.6%, and your name is in the reviewer box on the last page. Team Head Yoon Sanghyuk rests his palm on top of your monitor. 'This is a group strategy project. You’ll handle the due diligence, and the written opinion is due next Tuesday.' He smiles. It looks less like a reprimand than congratulations. 'Your first solo file. A company like this comes along once in 10 years. Take a good look.'",
+      "text": "The Corporate Finance Strategy Team’s review room, 6th floor, KD Bank head office. Five months after your traineeship ended, a thick review file lands on your desk. Loan number 2023-0412. The borrower is FlowOn, a dawn-delivery logistics platform. The amount is 31 billion won (about US$22 million). The first page puts the debt-to-equity ratio at 179.6%, and your name is in the reviewer box on the last page. Team Head Yoon Sanghyuk rests his palm on top of your monitor. 'This is a group strategy project. You’ll handle the due diligence, and the written opinion is due next Tuesday.' He smiles. It looks less like a reprimand than congratulations. 'Your first solo file. A company like this comes along once in 10 years. Take a good look.'",
       "memo": [
         "Loan 2023-0412 · FlowOn working-capital loan, 31 billion won",
         "Reported debt-to-equity ratio 179.6%",
@@ -34,7 +34,7 @@ export default {
       "place": "KD Bank head office, 6th floor · Corporate Finance Strategy Team review room",
       "clock": "Wednesday, April 12, 2023 · 09:00",
       "question": "Your first solo review is a 31-billion-won loan file, and approval already feels settled. What do you do first?",
-      "lead": "Five months after you came off probation, review file 2023-0412 is assigned to you."
+      "lead": "Five months after your traineeship ended, review file 2023-0412 is assigned to you."
     },
     "p2_site": {
       "title": "The Founder’s Route",
@@ -229,9 +229,9 @@ export default {
     },
     "p2_corridor": {
       "title": "The Empty Signature Boxes",
-      "text": "Monday evening, you run into Team Head Yoon Sanghyuk on the emergency stair landing. He’s holding a draft of the approval document, and all five signature boxes at the bottom are empty. 'Names go in last.' He shows you the page without folding it. 'Put them in first, and people decide their view by the names. Leave them blank, and they read the content.' His face says he already knows what you found. Yet he isn’t angry. 'I never said your math was wrong. I’m talking about where that math sits. This file is a growth project the group has spent 3 years preparing. It’s a number our largest shareholder, Kingsdale in New York, watches every quarter. Your opinion is one page laid on top of all that.' Halfway down the stairs, he turns back. 'You decide where to put that one page. I decide where it sits.'",
+      "text": "Monday evening, you run into Team Head Yoon Sanghyuk on the emergency stair landing. He’s holding a draft of the approval document, and all five signature fields at the bottom are empty. 'Names go in last.' He shows you the page without folding it. 'Put them in first, and people decide their view by the names. Leave them blank, and they read the content.' His face says he already knows what you found. Yet he isn’t angry. 'I never said your math was wrong. I’m talking about where that math sits. This file is a growth project the group has spent 3 years preparing. It’s a number our largest shareholder, Kingsdale in New York, watches every quarter. Your opinion is one page laid on top of all that.' Halfway down the stairs, he turns back. 'You decide where to put that one page. I decide where it sits.'",
       "memo": [
-        "Draft approval document -- all five signature boxes blank",
+        "Draft approval document -- all five signature fields blank",
         "Yoon Sanghyuk: 'names go in last'",
         "Group growth project, year 3 -- this is the biggest file"
       ],
@@ -248,13 +248,13 @@ export default {
       },
       "place": "Head office · Stair landing between the 6th and 7th floors",
       "clock": "Monday, April 17, 2023 · 19:00",
-      "question": "Your team head shows you an approval document with every signature box empty. What do you do here?"
+      "question": "Your team head shows you an approval document with every signature field empty. What do you do here?"
     },
     "p2_nightshift_reaction": {
       "title": "The Training Packet at Window 4",
-      "text": "On your way out of the center, your phone rings with an unknown number. It’s Do Yoonha, twenty-four, a teller at Window 4 of Gangseo Branch. The branch has received training material for next month’s campaign, and the product is called 'FlowOn Supplier Partnership Loan.' 'I heard you’re the one reviewing this at head office.' He asks carefully. 'The packet says to recommend it to supplier owners, but it only explains half the product. This clause here, what does it mean?' The sentence he reads out is the same one you saw in the contract in your review file. Behind him, someone is writing numbers on the branch sales board.",
+      "text": "On your way out of the center, your phone rings with an unknown number. It’s Do Yoonha, twenty-four, a teller at Window 4 of Gangseo Branch. The branch has received training material for a product going on sale at the end of the month, and the product is called 'Smart Logistics No. 3.' 'I heard you’re the one reviewing this at head office.' He asks carefully. 'The packet says to recommend it to regular customers, but it only explains half the product. This clause here, what does it mean?' The sentence he reads out is the same one you saw in the contract in your review file. Behind him, someone is writing numbers on the branch sales board.",
       "memo": [
-        "Do Yoonha, Window 4, Gangseo Branch -- next month’s campaign",
+        "Do Yoonha, Window 4, Gangseo Branch -- product on sale at month’s end",
         "Training packet’s clause explanation: only half"
       ],
       "choices": {
@@ -270,7 +270,7 @@ export default {
       },
       "place": "In the car from Gimpo to head office",
       "clock": "Friday, April 14, 2023 · 07:00",
-      "question": "A Gangseo Branch teller asks about a clause in a product he’ll be selling next month. How much do you explain?"
+      "question": "A Gangseo Branch teller asks about a clause in a product he’ll be selling from the end of the month. How much do you explain?"
     },
     "p2_ledger_reaction": {
       "title": "A New Page in the Notebook",
@@ -366,9 +366,9 @@ export default {
     },
     "p2_route_system": {
       "title": "The Same Sentence, 47 Times",
-      "text": "Instead of choosing what goes into the opinion, you ask how many other contracts carry Article 7. Team Head Lim Kyungsoo opens the terminal in the 8th-floor review records room. The fluorescent light flickers twice, and the contract folders run to page 22 on the screen. He prints 3 years’ worth as watermarked copies and lays them out on the floor. Of those, 47 contracts carry a sentence identical to Article 7, word for word. In 9 of them, the margin on signing day was under 1 percentage point, and all nine carry a red 'Growth Strategy Project' mark in the document category box. Lim Kyungsoo pushes himself up off his knees. 'You thought this clause was there to call loans. It isn’t. It’s there to approve them. Lend to a risky company, write in that you can pull out when it gets risky, and the approval goes through.'",
+      "text": "Instead of choosing what goes into the opinion, you ask how many other contracts carry Article 7. Team Head Lim Kyungsoo opens the terminal in the 8th-floor review records room. The fluorescent light flickers twice, and the contract folders run to page 22 on the screen. He prints the five months’ worth since the clause appeared as watermarked copies and lays them out on the floor. Of those, 47 contracts carry a sentence identical to Article 7, word for word. In 9 of them, the margin on signing day was under 1 percentage point, and all nine carry a red 'Growth Strategy Project' mark in the document category box. Lim Kyungsoo pushes himself up off his knees. 'You thought this clause was there to call loans. It isn’t. It’s there to approve them. Lend to a risky company, write in that you can pull out when it gets risky, and the approval goes through.'",
       "memo": [
-        "Contracts with the same sentence: 47 (3 years)",
+        "Contracts with the same sentence: 47 (five months since the clause appeared)",
         "Margin under 1 percentage point at signing -- 9",
         "All 9 categorized as 'Growth Strategy Project'"
       ],
@@ -415,7 +415,7 @@ export default {
     },
     "p2_evidence_turn": {
       "title": "Six Lines of Sign-Off",
-      "text": "Following the date on the clue, you open the circulation record of the Article 7 draft from November 2022. The request for the clause didn’t come from inside the team. It’s a one-page request sent down from the Group Strategy Office, and the reason box reads: 'Lower the review burden for growth-project loans. A call condition creates grounds for approval.' Below it, the circulation sign-off box holds six employee numbers. Yoon Sanghyuk, Han Seoyun, Oh Jinwoo, and from the fourth line on, three new hires who finished their traineeship last month. The last line is your employee number, signed off at 18:02 on November 14, 2022. Investigator Ban Jaewook closes his notebook. 'The name of the person about to write a dissent is already on that clause’s circulation list. Whether you read it before clicking or not, the record is the same.'",
+      "text": "Following the date on the clue, you open the circulation record of the Article 7 draft from November 2022. The request for the clause didn’t come from inside the team. It’s a one-page request sent down from the Group Strategy Office, and the reason field reads: 'Lower the review burden for growth-project loans. A call condition creates grounds for approval.' Below it, the circulation sign-off box holds six employee numbers. Yoon Sanghyuk, Han Seoyun, Oh Jinwoo, and from the fourth line on, three new hires who finished their traineeship last month. The last line is your employee number, signed off at 18:02 on November 14, 2022. Investigator Ban Jaewook closes his notebook. 'The name of the person about to write a dissent is already on that clause’s circulation list. Whether you read it before clicking or not, the record is the same.'",
       "memo": [
         "Clause request: a one-page request from the Group Strategy Office",
         "Reason: 'a call condition creates grounds for approval'",
@@ -438,7 +438,7 @@ export default {
     },
     "p2_start_credit": {
       "title": "The Mentor Who Came to Repay",
-      "text": "Last fall, as you came off probation, you gave the credit to your mentor. The name on the report cover was Assistant Manager Oh Jinwoo’s, and the team head read it out as it was. Five months later, on the morning of April 12, review file 2023-0412 is assigned to you, and Oh Jinwoo is the first to get up from his seat. FlowOn, the dawn-delivery logistics platform, 31 billion won (about US$22 million), a reported debt-to-equity ratio of 179.6%. He flips through the first page on your screen and says, 'This was originally my file. I asked the team head to put your name on it.' Then he lowers his voice. 'I’m paying you back. But this was the only way I had, so I’m a little sorry.'",
+      "text": "Last fall, as your traineeship ended, you gave the credit to your mentor. The name on the report cover was Assistant Manager Oh Jinwoo’s, and the team head read it out as it was. Five months later, on the morning of April 12, review file 2023-0412 is assigned to you, and Oh Jinwoo is the first to get up from his seat. FlowOn, the dawn-delivery logistics platform, 31 billion won (about US$22 million), a reported debt-to-equity ratio of 179.6%. He flips through the first page on your screen and says, 'This was originally my file. I asked the team head to put your name on it.' Then he lowers his voice. 'I’m paying you back. But this was the only way I had, so I’m a little sorry.'",
       "memo": [
         "2023-0412 reviewer: you -- on Oh Jinwoo’s recommendation",
         "FlowOn working-capital loan, 31 billion won · reported ratio 179.6%",
@@ -557,7 +557,7 @@ export default {
     "p2_corridor_choice_3": "You go back up, and it’s as if nothing happened. Only two people know what was said on the landing, and one of them decides where things sit.",
     "p2_nightshift_reaction_choice_1": "You explain it all, and Do Yoonha is silent for a while before he asks, 'Then I shouldn’t sell this?' You have no authority to answer that question.",
     "p2_nightshift_reaction_choice_2": "You flag it, and the training packet comes back down a week late. The explanation grows by two lines, and the sales target stays the same.",
-    "p2_nightshift_reaction_choice_3": "You end it, and the line goes quiet. Next month, Do Yoonha will sell that product at Window 4.",
+    "p2_nightshift_reaction_choice_3": "You end it, and the line goes quiet. From the end of that month, Do Yoonha will sell that product at Window 4.",
     "p2_ledger_reaction_choice_1": "The case is opened formally, and the review stops. A stopped review is remembered for who stopped it. Ban Jaewook writes your name in his notebook.",
     "p2_ledger_reaction_choice_2": "The informal check is fast. But it can’t be cited as grounds in any document. Ban Jaewook says twice, 'This never happened.'",
     "p2_ledger_reaction_choice_3": "You ask him not to open it, and Ban Jaewook closes his notebook. 'Understood. But I’m not erasing this line.' The number 179.6 stays on the first line of that page.",
@@ -584,7 +584,7 @@ export default {
     "p2_draft_evidence_turn": "Trace the draft back, and the circulation record opens. The hand that wrote the clause and the hand that ordered it may not be the same.",
     "p2_route_system_evidence_turn": "Trace the draft back, and the circulation record opens. The hand that wrote the clause and the hand that ordered it may not be the same.",
     "prologue02_memory_system": "Open them side by side, and the two pages look alike. In the fall, the pile was errors reported only by word of mouth. This folder piles up clauses that match word for word.",
-    "prologue02_memory_evidence": "Lay the empty approver box against the Article 7 draft, and the circulation sign-off box appears. This time the box isn’t empty, and the very last line looks familiar.",
+    "prologue02_memory_evidence": "Lay the empty approver field against the Article 7 draft, and the circulation sign-off box appears. This time the box isn’t empty, and the very last line looks familiar.",
     "p2_start_credit_team": "You gather them, and six people give you 30 minutes. Five call it 'a good company'; only Oh Jinwoo says 'the deadline is strange.'",
     "p2_start_credit_scope": "You ask, and the answer comes the next day. One line. 'Group growth strategy project -- review criteria same as standard.' What’s actually different is never written down.",
     "p2_start_credit_accept": "You book it at once, and due diligence moves up a day. That day lets you see the night-shift changeover, time that wasn’t on the schedule.",
@@ -596,7 +596,7 @@ export default {
     "p2_start_speed_team": "You gather them, and six people give you 30 minutes. Five call it 'a good company'; only Oh Jinwoo says 'the deadline is strange.'",
     "p2_start_speed_scope": "You ask, and the answer comes the next day. One line. 'Group growth strategy project -- review criteria same as standard.' What’s actually different is never written down.",
     "p2_start_speed_accept": "You book it at once, and due diligence moves up a day. That day lets you see the night-shift changeover, time that wasn’t on the schedule.",
-    "p2_start_speed_signature": "You point it out, and Yoon Sanghyuk looks at the schedule again. Then he gives back one day. 'You’re right. One day should do it?' Two days never come back."
+    "p2_start_speed_signature": "You point it out, and Yoon Sanghyuk looks at the schedule again. Then he gives back one day. 'You’re right. One day should do it?' Three days never come back."
   },
   "choiceVoiceLines": {
     "p2_start_team": "Since 31 billion won is too big to judge alone, you gather the team and talk through how to read this file.",
@@ -670,7 +670,7 @@ export default {
   "pack": {
     "clue": {
       "title": "The Article 7 Circulation List",
-      "text": "Article 7, which set the 180% debt-to-equity line, began with a one-page request from the Group Strategy Office, and the reason box read 'a call condition creates grounds for approval.' The last of the six lines in the draft’s circulation sign-off box is your employee number, just out of your traineeship."
+      "text": "Article 7, which set the 180% debt-to-equity line, began with a one-page request from the Group Strategy Office, and the reason field read 'a call condition creates grounds for approval.' The last of the six lines in the draft’s circulation sign-off box is your employee number, just out of your traineeship."
     },
     "outcomes": {
       "p2_after_alone": {

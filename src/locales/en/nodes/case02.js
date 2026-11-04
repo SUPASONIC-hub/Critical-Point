@@ -441,7 +441,7 @@ export default {
     },
     "c2_final_evidence": {
       "title": "The Culprit Procedure Made",
-      "text": "Just before the Phase 1 deadline, Security’s draft is up on the audit room screen. It uses Oh Jinwoo’s report as its skeleton, unchanged. The conclusion is that Lee Minseo alone is responsible, and the disciplinary process, carrying the notice’s document number, has already moved to the next stage. Han Seoyun points to the draft’s last page. The chance to rebut is listed as 'appeal after discipline'. 'If we add a hold, we miss the deadline. If we send it as is, she can only speak after she’s been punished.' She sets a pen beside the signature box. 'I’ll ask what I asked at the start once more. Where you’ll stop this procedure. This time you also have to say in whose name.'",
+      "text": "Just before the Phase 1 deadline, Security’s draft is up on the audit room screen. It uses Oh Jinwoo’s report as its skeleton, unchanged. The conclusion is that Lee Minseo alone is responsible, and the disciplinary process, carrying the notice’s document number, has already moved to the next stage. Han Seoyun points to the draft’s last page. The chance to rebut is listed as 'appeal after discipline'. 'If we add a hold, we miss the deadline. If we send it as is, she can only speak after she’s been punished.' She sets a pen beside the signature field. 'I’ll ask what I asked at the start once more. Where you’ll stop this procedure. This time you also have to say in whose name.'",
       "memo": [
         "Security’s draft closes on Lee Minseo alone",
         "A hold breaks the report deadline",

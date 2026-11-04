@@ -46,6 +46,9 @@ const GAP = '[^.,"\\d]{0,14}?';
 // A rank the bank prints beside a name. The longer of two that share a head
 // comes first, so 대표이사 is not read as 대표.
 const RANK = "(팀장|상무|전무|부장|차장|과장|실장|대리|부회장|회장|사장|본부장|대표이사|대표|주임|계장)";
+// Words that put a sentence in the afternoon of the 2023 return (and 후회,
+// which is only ever said of it): read around a match as its `context`.
+const RETURN_CONTEXT = /반려|3년 전|2023|반대 의견|0412|13:32|후회/;
 
 /** The loan, the people around it, and the building they worked in. */
 export const CANON = [
@@ -595,7 +598,154 @@ export const CANON = [
     find: /(KD ?은행 ?계좌|KD ?[Bb]ank [Aa]ccount|KD ?銀行 ?口座)/g,
     allow: ["KD은행 계좌", "KD Bank account", "KD銀行口座"],
   },
+
+  // The audit of 2026-11-03 (122 findings, 26 of them sure) and the answers
+  // that settled them. Some of these are words that must not stand beside a
+  // name at all; a rule like that allows nothing, so each has a companion fact
+  // that reads the right shape and goes silent if the copy stops saying it.
+  //
+  // `context` is read around the match (CONTEXT_REACH characters each side):
+  // 한서윤 signs things in 2025 and 2026 as 실장, and only her part in the
+  // 2023 return is never a signature.
+  {
+    id: "han-return-sign",
+    fact: "한서윤's part in the 2023 return is the 「반려 버튼」 she pressed, never a 서명, 검토란, 승인란 or 반려란",
+    files: SEASON,
+    find: /한서윤[^.?!「」"]{0,24}?(서명(?!을 받|하라|해 달)|승인란|검토란|서명란|반려란)|(서명란|검토란|승인란|반려란)[^.?!「」"]{0,10}?한서윤/g,
+    context: RETURN_CONTEXT,
+    allow: [],
+  },
+  {
+    id: "han-return-sign-voice",
+    fact: "한서윤 does not say she signed the 2023 return",
+    files: SEASON,
+    speaker: "한서윤",
+    find: /(서명은 제가|제가 서명|서명 하나를|이 칸에 서명|제 서명|자기 서명)/g,
+    context: RETURN_CONTEXT,
+    // 사건 37 (c37_island_reaction): five months into her 대기발령 she signs a
+    // box of a 2026 paper after reading its first page only, as she returned
+    // the dissent without reading it; the 「처럼」 rides on 「첫 장만 읽고」,
+    // and the return is not called a signature (11-03 re-judgement, low).
+    // Matched as the whole sentence, so another line saying it is still read.
+    exceptSentence: "'저 이 칸에 서명했어요. 첫 장만 읽고요. 당신 반대 의견을 반려할 때처럼요.'",
+    allow: [],
+  },
+  {
+    id: "han-return-sign-pair",
+    fact: "한서윤 and 백아린 are not 「the one who signed and the one who reported」: she pressed a button",
+    files: SEASON,
+    find: /(한 사람은 서명했고|서명한 (?:사람|쪽)[^."]{0,8}?신고한|서명한 쪽이 더)/g,
+    allow: [],
+  },
+  {
+    id: "han-return-button",
+    fact: "the copy says 한서윤 pressed the 반려 버튼 (the shape the three rules above leave)",
+    files: SEASON,
+    find: /한서윤[^.?!"]{0,24}?(반려 버튼)|(반려 버튼)[^.?!"]{0,24}?한서윤/g,
+    allow: ["반려 버튼"],
+  },
+  {
+    id: "han-rank-then",
+    fact: "한서윤 was 과장 in 2022-23, however the rank is written beside her name",
+    files: SEASON,
+    find: new RegExp(`한서윤 ?[(（](?:당시|전) ?${RANK}[)）]|${RANK}이던 한서윤`, "g"),
+    allow: ["과장"],
+  },
+  {
+    id: "minseo-rooftop",
+    fact: "이민서's 옥탑방 is in 해방촌 (망원동 is 도윤하's)",
+    files: SEASON,
+    find: /([가-힣]+동|해방촌)(?: 언덕)?(?: 이민서의| 이민서네)? 옥탑|이민서(?:의|네)?[^."]{0,6}?([가-힣]+동|해방촌) 옥탑/g,
+    allow: ["해방촌"],
+  },
+  {
+    id: "kdcap-floor",
+    fact: "KD캐피탈's floors are the building table's: 1 로비, 11 리스심사팀, 12 위험관리부, 17 자료실, 19 심사위원회, 20 대표이사실",
+    files: SEASON,
+    find: /KD캐피탈 (?:본사 )?(\d+)층/g,
+    allow: ["1", "11", "12", "17", "19", "20"],
+  },
+  {
+    id: "kdcap-dept-floor",
+    fact: "위험관리부 is on KD캐피탈's 12th floor, 리스심사팀 on the 11th, the 대표이사실 on the 20th",
+    files: SEASON,
+    find: /(\d+)층 ?(?:· )?(위험관리부|리스심사팀|대표이사실|대표실)/g,
+    allow: ["12 위험관리부", "11 리스심사팀", "20 대표이사실", "20 대표실"],
+  },
+  {
+    id: "dept-arrival-gap",
+    fact: "the fourth exception (3월 30일) is ten days before the analyst's first day at KD캐피탈 (4월 9일)",
+    files: SEASON,
+    find: /(?:부서에|당신이|내가) 오기 (\S+?) 전/g,
+    allow: ["열흘"],
+  },
+  {
+    id: "notebook-line-0724",
+    fact: "반재욱's 2023-0412 page has 7월 24일 and the analyst's name on its sixth line",
+    files: SEASON,
+    find: /2023-0412 쪽[^"]{0,30}?(\S+)째 줄(?:에|:)? ?7월 24일/g,
+    allow: ["여섯"],
+  },
+  {
+    id: "erased-consent-pen",
+    fact: "the 'agree' erased on the back page was written in pencil, never in pen",
+    files: SEASON,
+    find: /(만년필|볼펜|잉크|같은 펜|그 펜)[^."]{0,30}?지운 ['‘]?동의|지운 ['‘]?동의['’]?[^."]{0,30}?(만년필|볼펜|잉크|같은 펜|그 펜)|['‘]?동의['’]?라고 썼다가 지운 것도 (그 펜|같은 펜)/g,
+    allow: [],
+  },
+  {
+    id: "erased-consent-pencil",
+    fact: "the copy says the erased 'agree' is pencil (the shape the rule above leaves)",
+    files: SEASON,
+    find: /지운 ['‘]?동의['’]?[^."]{0,30}?(연필)|지운 (연필) ['‘]?동의|(연필)[^."]{0,20}?지운 ['‘]?동의/g,
+    allow: ["연필"],
+  },
+  {
+    id: "nextmile-year",
+    fact: "넥스트마일's offer of 42% of book value was made in 2025 (사건 01)",
+    files: SEASON,
+    find: /(\d{4})년 넥스트마일/g,
+    allow: ["2025"],
+  },
+  {
+    id: "gaeul-not-mullae",
+    fact: "가을떡방 is in 망원시장 and 가온정밀 in 인천 남동공단; neither is in 문래동",
+    files: SEASON,
+    find: /(문래동)[^."]{0,20}?(?:문가을|떡집|가을떡방|떡방|가온정밀)|(?:문가을|가을떡방|가온정밀)[^."]{0,20}?(문래동)/g,
+    allow: [],
+  },
+  {
+    id: "gaon-place",
+    fact: "가온정밀 is in 인천 남동공단 (the shape the rule above leaves)",
+    files: SEASON,
+    find: /(남동공단)(?: [가-힣]+)? 가온정밀|가온정밀 · (남동공단)/g,
+    allow: ["남동공단"],
+  },
+  {
+    id: "trainee-after-1021",
+    fact: "the analyst's traineeship ends on 2022-10-21 (프롤로그 01); after it the analyst is not called a trainee",
+    files: seasonBut("prologue01"),
+    find: /(수습(?:이던|인|이었던)? 당신|당신[^."]{0,8}?수습(?! 딱지))/g,
+    allow: [],
+  },
+  {
+    id: "trainee-ended",
+    fact: "the copy after 프롤로그 01 says the traineeship is over (the shape the rule above leaves)",
+    files: seasonBut("prologue01"),
+    find: /(수습 딱지)를 (?:뗀|떼)/g,
+    allow: ["수습 딱지"],
+  },
+  {
+    id: "second-standard-count",
+    fact: "of the 212 without papers, 181 are inside the second compensation standard, however the sentence runs",
+    files: SEASON,
+    find: /배상 기준에 (?:들어간|든|들어온) ([\d,]+)명|두 번째 기준(?:에|을)[^."]{0,10}?([\d,]+)명/g,
+    allow: ["181"],
+  },
 ];
+
+/** How far around a match a `context` is read, each side. */
+const CONTEXT_REACH = 60;
 const valueOf = (match) => match.slice(1).filter((group) => group !== undefined).map((group) => group.trim()).join(" ");
 
 const isComment = (line) => /^\s*(?:\/\/|\/\*|\*)/.test(line);
@@ -624,7 +774,8 @@ function copyLines(text) {
 
 /**
  * Every place the lines of `file` state a canon fact, agreeing or not. An entry
- * with a `speaker` is read only on the lines of a scene that speaker has.
+ * with a `speaker` is read only on the lines of a scene that speaker has; one
+ * with a `context` only where that pattern stands near the match.
  */
 function* canonStatements(lines, file) {
   for (const entry of CANON) {
@@ -632,8 +783,9 @@ function* canonStatements(lines, file) {
     for (const { number, line, speaker } of lines) {
       if (entry.speaker && speaker !== entry.speaker) continue;
       for (const match of line.matchAll(entry.find)) {
+        if (entry.context && !entry.context.test(line.slice(Math.max(0, match.index - CONTEXT_REACH), match.index + match[0].length + CONTEXT_REACH))) continue;
         const value = valueOf(match);
-        const agrees = entry.allow.includes(value) || Boolean(entry.except?.test(nearby(line, match)));
+        const agrees = entry.allow.includes(value) || Boolean(entry.except?.test(nearby(line, match))) || Boolean(entry.exceptSentence && line.includes(entry.exceptSentence));
         yield { entry, agrees, file, line: number, found: match[0], value };
       }
     }
@@ -674,17 +826,135 @@ function* datedWeekdays(lines, file) {
   }
 }
 
+/*
+ * The scene a line belongs to (2026-11-03). A case file says one scene in
+ * several places: its body (`id: "c25_firstday"`, text, memo, choices), its
+ * setting in `sceneContext` (`c25_firstday: { place, clock, question, lead }`)
+ * and, for an opening, a line of `openingCopy` (`c13_start_rush: [title,
+ * speaker, text, memo]`). A scene id is a key whose block names a place or a
+ * clock; a line is that scene's from the line that names it to the next scene
+ * or the next key of the file's top level. A choice's own id is not a scene
+ * and leaves its lines with the scene they are in.
+ */
+const SCENE_KEY = /^\s*([a-z][a-z0-9]*_[a-z0-9_]+): [[{"]/;
+const SCENE_FIELD = /^\s*(text|lead|clock|place|question|memo|echo|label|voice): (.*)$/;
+const SCENE_SETTING = /^\s*(?:place|clock): |\b(?:place|clock): "/;
+
+/** The scenes of a case file's lines: id -> [{ kind, text, number }], `opening` for an `openingCopy` line. */
+export function sceneParts(lines) {
+  const ids = new Set();
+  for (const [at, { line }] of lines.entries()) {
+    const key = line.match(SCENE_KEY)?.[1];
+    if (key && (SCENE_SETTING.test(line) || SCENE_SETTING.test(lines[at + 1]?.line ?? ""))) ids.add(key);
+  }
+  const scenes = new Map();
+  const add = (id, kind, text, number) => {
+    if (!scenes.has(id)) scenes.set(id, []);
+    scenes.get(id).push({ kind, text, number });
+  };
+  let current = null;
+  for (const { line, number } of lines) {
+    const body = line.match(/^\s*id: "([^"]+)"/)?.[1];
+    const key = line.match(SCENE_KEY)?.[1];
+    if (body && ids.has(body)) current = body;
+    else if (key && ids.has(key)) {
+      current = key;
+      if (/: \[/.test(line)) add(key, "opening", line, number);
+      if (/: \{ .*\}/.test(line)) for (const [, kind, text] of line.matchAll(/\b(place|clock|lead|question): ("[^"]*")/g)) add(key, kind, text, number);
+      continue;
+    } else if (/^\s{0,2}[A-Za-z]+: /.test(line)) current = null;
+    const field = line.match(SCENE_FIELD);
+    if (current && field) add(current, field[1], field[2], number);
+  }
+  return scenes;
+}
+
+// A count of days the way copy writes one, for a D-n beside it.
+const DAY_WORDS = { 하루: 1, 이틀: 2, 사흘: 3, 나흘: 4, 닷새: 5, 엿새: 6, 이레: 7, 여드레: 8, 아흐레: 9, 열흘: 10 };
+/** How far before a count of days the clock's event has to be named. */
+const DAYS_REACH = 24;
+const DAYS_AFTER = /(?<![가-힣\d])(하루|이틀|사흘|나흘|닷새|엿새|이레|여드레|아흐레|열흘|(\d+)일) (?:뒤|후)/g;
+
+/**
+ * The checks that read a scene whole rather than a line: what its setting says
+ * against what its words say. Each yields the statements it read, agreeing or
+ * not, so a rule that stops matching anything is told like a fact.
+ */
+export const SCENE_RULES = [
+  {
+    id: "dday-days",
+    fact: "a scene whose clock counts down to an event (생중계까지 D-6) counts the same days to it in its own words (생중계는 엿새 뒤)",
+    // Only a count that names the clock's event just before it: an opening
+    // tells what happened days ago in the same words ("나흘 뒤 월요일 아침").
+    *read(parts) {
+      const events = parts
+        .filter((part) => part.kind === "clock")
+        .flatMap((part) => [...part.text.matchAll(/([가-힣]+?)(?:까지)? D-(\d+)/g)].map((match) => ({ word: match[1], days: Number(match[2]) })));
+      if (events.length === 0) return;
+      for (const part of parts) {
+        if (!["text", "lead", "opening"].includes(part.kind)) continue;
+        for (const match of part.text.matchAll(DAYS_AFTER)) {
+          const before = part.text.slice(Math.max(0, match.index - DAYS_REACH), match.index);
+          const event = events.find((item) => before.includes(item.word));
+          if (!event) continue;
+          const days = match[2] ? Number(match[2]) : DAY_WORDS[match[1]];
+          yield { agrees: days === event.days, number: part.number, found: match[0], value: `${event.word} D-${event.days} ${days}` };
+        }
+      }
+    },
+  },
+  {
+    id: "floor-move",
+    fact: "a card in a scene set on the Nth floor does not go up or down to the Nth floor",
+    *read(parts) {
+      const floors = parts.filter((part) => part.kind === "place").flatMap((part) => [...part.text.matchAll(/(\d+)층/g)].map((match) => match[1]));
+      if (floors.length === 0) return;
+      for (const part of parts) {
+        if (!["label", "voice"].includes(part.kind)) continue;
+        for (const match of part.text.matchAll(/(\d+)층으로 (?:올라|내려)/g)) {
+          yield { agrees: !floors.includes(match[1]), number: part.number, found: match[0], value: `${floors.join("/")} ${match[1]}` };
+        }
+      }
+    },
+  },
+  {
+    id: "first-day-clock",
+    fact: "the scene of the analyst's first day at KD캐피탈 위험관리부 is dated 4월 9일",
+    *read(parts) {
+      if (!parts.some((part) => /위험관리부 첫 출근/.test(part.text))) return;
+      for (const part of parts) {
+        if (part.kind !== "clock") continue;
+        for (const match of part.text.matchAll(/(\d{1,2})월 (\d{1,2})일/g)) {
+          yield { agrees: `${match[1]} ${match[2]}` === "4 9", number: part.number, found: match[0], value: `${match[1]} ${match[2]}` };
+        }
+      }
+    },
+  },
+];
+
+/** Every statement the scene rules read in a case file's lines. */
+function* sceneStatements(lines, file) {
+  if (!/src\/nodes\/[^/]+\.js$/.test(file)) return;
+  for (const [scene, parts] of sceneParts(lines)) {
+    for (const rule of SCENE_RULES) {
+      for (const { number, ...read } of rule.read(parts)) yield { rule, scene, file, line: number, ...read };
+    }
+  }
+}
+
 /**
  * Everything the check reads in `text`: each statement of a canon fact, each
- * date written with a weekday, and the ones among them the canon does not
- * allow. The run needs all three -- what contradicts, and how much was read at
- * all -- and used to read every file three times over to get them.
+ * date written with a weekday, each scene rule's reading, and the ones among
+ * them the canon does not allow. The run needs all of them -- what
+ * contradicts, and how much was read at all -- and used to read every file
+ * three times over to get them.
  */
 export function readCanon(text, file) {
   const normalized = file.replaceAll("\\", "/");
   const lines = copyLines(text);
   const statements = [...canonStatements(lines, normalized)];
   const dates = [...datedWeekdays(lines, normalized)];
+  const scenes = [...sceneStatements(lines, normalized)];
   const violations = [];
   for (const { entry, agrees, ...where } of statements) {
     if (!agrees) violations.push({ ...where, id: entry.id, fact: entry.fact });
@@ -692,7 +962,10 @@ export function readCanon(text, file) {
   for (const { agrees, actual, ...where } of dates) {
     if (!agrees) violations.push({ ...where, id: "weekday", fact: `a date stated with a weekday fits its year (${actual})` });
   }
-  return { statements, dates, violations };
+  for (const { rule, agrees, scene, ...where } of scenes) {
+    if (!agrees) violations.push({ ...where, id: rule.id, fact: `${rule.fact} (${scene})` });
+  }
+  return { statements, dates, scenes, violations };
 }
 
 /** Every statement in `text` that gives a canon fact a value the canon does not allow. */
@@ -723,15 +996,17 @@ const COPY_FILES = () => [
 function main() {
   const violations = [];
   const seen = new Map(CANON.map((entry) => [entry.id, 0]));
+  const sceneSeen = new Map(SCENE_RULES.map((rule) => [rule.id, 0]));
   let weekdays = 0;
   for (const file of COPY_FILES()) {
     const read = readCanon(readFileSync(file, "utf8"), file);
     violations.push(...read.violations);
     // A fact nothing states any more is a pattern that has rotted, not a pass.
     for (const { entry } of read.statements) seen.set(entry.id, seen.get(entry.id) + 1);
+    for (const { rule } of read.scenes) sceneSeen.set(rule.id, sceneSeen.get(rule.id) + 1);
     weekdays += read.dates.length;
   }
-  const silent = CANON.filter((entry) => entry.allow.length > 0 && seen.get(entry.id) === 0);
+  const silent = [...CANON.filter((entry) => entry.allow.length > 0 && seen.get(entry.id) === 0), ...SCENE_RULES.filter((rule) => sceneSeen.get(rule.id) === 0)];
   // The same for the calendar: the season prints a weekday beside some two
   // hundred dates, and a pattern that finds none of them has stopped reading.
   if (weekdays === 0) silent.push({ id: "weekday" });
@@ -739,6 +1014,7 @@ function main() {
   // `--list` prints what each fact matched, for reading a new pattern's hits.
   if (process.argv.includes("--list")) {
     for (const entry of CANON) console.log(`${String(seen.get(entry.id)).padStart(4)}  ${entry.id}`);
+    for (const rule of SCENE_RULES) console.log(`${String(sceneSeen.get(rule.id)).padStart(4)}  ${rule.id} (scene)`);
     console.log(`${String(weekdays).padStart(4)}  weekday`);
   }
 
@@ -753,7 +1029,8 @@ function main() {
     process.exit(1);
   }
   const total = [...seen.values()].reduce((sum, count) => sum + count, 0);
-  console.log(`Canon check passed (${CANON.length} facts, ${total} statements agree; ${weekdays} dates fit the weekday they are written with).`);
+  const scenes = [...sceneSeen.values()].reduce((sum, count) => sum + count, 0);
+  console.log(`Canon check passed (${CANON.length} facts, ${total} statements agree; ${weekdays} dates fit the weekday they are written with; ${SCENE_RULES.length} scene rules read ${scenes} statements).`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

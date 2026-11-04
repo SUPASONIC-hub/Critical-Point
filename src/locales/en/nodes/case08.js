@@ -135,7 +135,7 @@ export default {
       "memo": [
         "Trace sheet: Haeon advisory fees -> gallery painting prices -> Yoon family",
         "Referral to prosecutors: months before anything goes public",
-        "Usable as leverage in talks with the banks that lent to FlowOn (the creditor group)",
+        "Usable as leverage in talks with the banks that lent to FlowOn (the creditors’ committee)",
         "Oh Jinwoo is already in touch with an investigative reporter"
       ],
       "choices": {
