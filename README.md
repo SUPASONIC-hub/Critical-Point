@@ -1,6 +1,12 @@
 # CRITICAL POINT (임계점)
 
-Tak'n Roll 제작, SUPASONIC 기획·개발.
+**STUDIO** Tak'n Roll · **CREATOR** SUPASONIC & ALICE
+([SUPASONIC: from.logic.to.magic@gmail.com](mailto:from.logic.to.magic@gmail.com) ·
+[ALICE: goeun.nam@gmail.com](mailto:goeun.nam@gmail.com))
+
+기획부터 제작까지 SUPASONIC과 ALICE가 함께 만들었습니다.<br>
+SUPASONIC and ALICE made the game together, from the first plan to the finished build.<br>
+企画から制作まで、SUPASONICとALICEが一緒に作りました。
 
 **판돈을 올릴수록 벽이 가까워진다.** 기업·금융 미스터리이자 푸시 유어 럭 게임입니다.
 플레이어는 KD은행 대출 심사 담당 분석관이 되어, 수습 시절 처음 찾아낸 오차 하나부터 본사 33층의

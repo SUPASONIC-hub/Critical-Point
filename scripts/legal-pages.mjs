@@ -1,4 +1,5 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
+import { CREATOR_LINE, CREATORS, creatorMailLabel, STUDIO } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
 
@@ -190,6 +191,23 @@ const escapeHtml = (text) =>
   String(text).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character]);
 const items = (keys, language) => `<ul>${keys.map((key) => `<li>${escapeHtml(DATA_ITEMS[key][language])}</li>`).join("")}</ul>`;
 const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
+
+/**
+ * The start screen's credit (StudioCredit.jsx) at the foot of every page:
+ * the studio, the two creators on one line, and each one's address as a link
+ * named for its owner (src/credits.js). English labels in every language, as
+ * on the start screen.
+ */
+const CREDIT = `<div class="credit">
+<img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
+<dl>
+<div><dt lang="en">STUDIO</dt><dd>${escapeHtml(STUDIO)}</dd></div>
+<div><dt lang="en">CREATOR</dt><dd>${escapeHtml(CREATOR_LINE)}</dd></div>
+<div class="credit-mail"><dt lang="en">CONTACT</dt><dd>${CREATORS.map(
+  (creator) => `<a href="mailto:${creator.email}" aria-label="${escapeHtml(creatorMailLabel(creator))}">${creator.email}</a>`,
+).join(" ")}</dd></div>
+</dl>
+</div>`;
 const days = DATA_RETENTION_DAYS;
 
 /**
@@ -621,6 +639,14 @@ dd{margin:0 0 4px}
 .effective{margin:0;color:var(--text-2);font-size:.875rem}
 strong{color:var(--text)}
 footer{margin-top:48px;padding-top:12px;border-top:1px solid var(--line);font-size:.875rem}
+.credit{display:flex;align-items:center;gap:12px;margin-top:16px}
+.credit img{flex:none;width:40px;height:40px;object-fit:cover;border-radius:50%}
+.credit dl{display:flex;flex-wrap:wrap;gap:4px 20px;min-width:0;margin:0}
+.credit dt{color:var(--text-2);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
+.credit dd{margin:0;color:var(--text);font-weight:700}
+.credit-mail{flex-basis:100%}
+.credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
+.credit-mail a{display:inline-flex;align-items:center;min-height:32px}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -664,7 +690,8 @@ export { escapeHtml };
 /**
  * One page: the header that links the game, every other page in the same
  * language and the page in the other two; the hreflang alternates (all three
- * and x-default, the Korean); the body; a foot with the contact address.
+ * and x-default, the Korean); the body; a foot with the contact address and
+ * the credit.
  * `effective` is the policy's date line, which only the two policies have;
  * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head.
  */
@@ -704,7 +731,9 @@ ${tags}</head>
 ${pages}${switches}</nav>
 <h1>${copy[kind]}</h1>
 ${dated}${body.trim()}
-<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p></footer>
+<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
+${CREDIT}
+</footer>
 </main>
 </body>
 </html>
