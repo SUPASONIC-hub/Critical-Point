@@ -320,8 +320,8 @@ const budgets = [
   // 68,502 -> 68,508 gzip on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the entry names the renamed locale chunks. Measured 189,733 / 68,504 in the e2e build, the plus 4.
   // 190,097 / 68,670 -> 190,442 / 68,790 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit line above (#443) on bundle-1104a's entry. Measured 190,438 / 68,786 in the e2e build, the plus 4.
   // -> 190,506 / 68,833 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 190,502 / 68,829 in the e2e build, the plus 4.
-  // 190,506 / 68,833 -> 190,619 / 68,857 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 190,615 / 68,853 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 190_619, maxGzip: 68_857 },
+  // 190,506 / 68,833 -> 190,673 / 68,870 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 190,669 / 68,866 in the e2e build (setPageTitle exported for its unit test), the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 190_673, maxGzip: 68_870 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1311,8 +1311,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,841 / 490,518 -> 427,105 / 484,103 / 490,780 on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the credit's two creators and their address links (the entry and the index CSS). Measured 427,101 / 484,099 / 490,776, the plus 4.
 // 428,231 / 484,811 / 491,981 -> 428,480 / 485,062 / 492,230 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit (#443, the entry and the index CSS) on bundle-1104a's first paint. Measured 428,476 / 485,058 / 492,226 in the e2e build, the plus 4.
 // -> 429,066 / 485,663 / 492,823 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together, the critical CSS cut again. Measured 429,062 / 485,659 / 492,819 in the e2e build, the plus 4.
-// 429,066 / 485,663 / 492,823 -> 429,091 / 485,744 / 492,921 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 429,087 / 485,740 / 492,917, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 429_091, en: 485_744, ja: 492_921 };
+// 429,066 / 485,663 / 492,823 -> 429,106 / 485,758 / 492,935 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 429,102 / 485,754 / 492,931, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 429_106, en: 485_758, ja: 492_935 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
