@@ -826,11 +826,27 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
 - README 복구(#444, `readme-restore-1104`, `7ddced5f`): #415 병합 때 README 충돌을 `git checkout --ours`로 풀어 파일 전체가 갈래 쪽 옛 판이
   되었고, 11월 3일 개발 노트 줄·`build-portrait.mjs` 명령 줄·「11월 3일까지」·「3일에 14개」·첫 화면 숫자가 사라졌다. README를 fa10dccf 판으로
   되돌리고 유닛 테스트 수(1,704개)만 다시 넣었다. 이 뒤로 충돌은 표시된 부분만 고치고 `checkout --ours/--theirs`는 쓰지 않는다.
-- [자리: 이후 병합 — 저녁 정리 때 PR 번호·갈래·main sha와 한 줄 요약을 채움]
-- 진행 중: KD은행 계좌(`kd-bank-account`). 모든 플레이 단계에서 늘 보이는 「KD은행 계좌」 잔액, 표시만 한다(W47 전).
+- 용어 통일(#431, `glossary-fix-1103`, `22f43342`): 11-03 용어 점검의 바로 고칠 줄을 용어집대로. 번역 91줄(영어 88, 일본어 3)과 소개 페이지 한 줄.
+  approval field, Yeongdong transfer, trainee, number ticket, secondhand bookshop, the creditors’ committee, 弔問室 등. 숫자와 한국어 원문은 그대로.
+- check:canon 넓히기(#430, `canon-rules`, `2bd9a8ba`): 11-03 점검에서 놓친 종류를 잡는 규칙 15개(짝 4개 포함)와 장면 규칙 3개(D-n ↔ 「n일 뒤」,
+  장면 층 ↔ 카드 「N층으로」, 첫 출근 날짜). 한서윤의 「서명」은 2023 반려 문맥에서만 막는다(`context`). #424·#435 뒤에 병합해 main 위 check:canon 어긋남 0줄.
+- 묶음 1104a(#447, `bundle-1104a`, `4e3f8e48`): 초록이던 다섯 PR을 한 갈래에 차례로 병합해 CI를 한 번만 돌렸다. 충돌은 README 표 숫자와 예산 주석만, 덩어리 단위로 고침.
+  - 브리핑 본문 칸(#429, `caption-split`): 대사가 닫히면 새 칸, 일본어 문장 끝도 칸 끝. 섞인 칸 ko 1,418 → 29, ja 1,968 → 31. 글자는 그대로.
+  - 영어·일본어 시작 화면(#433, `seo-locale-start`): 빌드가 `/en/`·`/ja/`에 따로 쓰고, hreflang·sitemap(16 → 18)·서비스 워커가 폴더를 쓴다. 정적 15쪽에 공유 카드, `/`의 no-script에 소개.
+  - 첫 방문 빠르게(#436, `perf-first-visit`): 런타임 미리 받기는 `load` 뒤로, 고른 언어의 사전은 머리의 `locale-preload`(gzip 602B)가 `modulepreload`.
+  - 영어 화면의 한국어 누출(#445, `en-ko-leak`): `simplifyPlayerText`가 한국어 화면에서만 바꾼다(「Injustice / 믿음 / Helplessness」 29곳). 결정 A: 워드마크 읽기는
+    영어 "Trigger Lab", 일본어 「トリガーラボ」. 결정 B: 단계 이름(phase)은 치환 없이 원문 그대로.
+  - 의성어 칸 밖(#438, `plate-sound-clip`): CSS 압축이 떨어뜨리던 `translate`를 `transform: translate(-50%, -50%) rotate(-9deg)`로 옮겨 PC에서도 그림 칸 안.
+- Render 헤더: 만든 사람이 `/en/*`·`/ja/*`의 `Cache-Control: no-cache`를 대시보드에 더했고 16:36에 curl로 확인.
+- 열어 둔 것: KD은행 계좌(#442, `kd-bank-account`). 브리핑·판·정산·유물 고르기 내내 보이는 「KD은행 계좌」 잔액, 표시만 한다(W47 전).
   그 돈을 유물 고르기에서 화폐로 쓰는 것은 W47 뒤 11-30 묶음에서.
-- 진행 중: 크레딧(`credits-alice`). STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE.
-- 지금까지 병합 6개(main `7ddced5f`), 운영 build-sha `557d17bb`(curl), 유닛 테스트 1,704개(`npm test` 실측). [자리: 병합 수·main·운영 sha·테스트 수는 저녁에 다시 고침]
+- 열어 둔 것: 크레딧(#443, `credits-alice`). STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE, 두 메일 링크(방침·약관 여섯 쪽은 메일 줄 없이).
+- 열어 둔 것: A044 1안(#446, `canon-a044`). 사건 26의 32억 수취인을 「해온파트너스와 같은 주소의 새 법인」으로, check:canon `advisory-fee-payee`.
+- 열어 둔 것: 게시판 자동 숨김(#432, 마이그레이션 있음). 신고로 숨기는 글은 전체 한 시간 5건까지(`board_auto_hide_per_hour`).
+- [자리: 1105b 묶음 — 저녁에 PR 번호·main sha·한 줄 요약]
+- [자리: 1105a 묶음 — 저녁에 PR 번호·main sha·한 줄 요약]
+- [자리: 탭 제목 — 저녁에 PR 번호·main sha·한 줄 요약]
+- 지금까지 병합 13개(묶음 #447 하나가 5개를 담음, main `4e3f8e48`), 운영 build-sha `4e3f8e48`(16:29 curl), 유닛 테스트 1,734개(`npm test` 실측). [자리: 병합 수·main·운영 sha·테스트 수는 저녁에 다시 고침]
 
 ## 7. 자료와 한계
 
