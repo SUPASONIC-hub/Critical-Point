@@ -42,12 +42,12 @@ export default {
       "memo": [
         "640 people waiting for care",
         "Widening the formula’s reading is a legal gray area",
-        "Final signature box on the repayment-change approval form is blank",
+        "Final signature field on the repayment-change approval form is blank",
         "Keep a record: fail the review. Hide it: audit risk"
       ],
       "choices": {
         "c4_offer_contain": {
-          "label": "Add a note beside Do Yoonha’s blank signature box"
+          "label": "Add a note beside Do Yoonha’s blank signature field"
         },
         "c4_offer_refuse": {
           "label": "Take the list of 640 waiting and go find other money"
@@ -146,7 +146,7 @@ export default {
     },
     "c4_audit": {
       "title": "Who Owns the 3%",
-      "text": "Two documents lie side by side on the formula desk. On the left is KD Bank’s request to change the repayment schedule. On the right is the list of users whose care will stop. The 3% was made by the decision in the left document, and the names in the right one pay for it. The signature box on the request is blank. Ban Jaewook goes down the formula line by line. The time care workers spend traveling between homes is counted nowhere, and the review standard is still set to data from 2 years ago. Outside the door, a user representative waits for a turn to speak. 'The people who calculated the 3% and the people waiting on the 3% are different. First you have to decide whose standard this formula is written by.'",
+      "text": "Two documents lie side by side on the formula desk. On the left is KD Bank’s request to change the repayment schedule. On the right is the list of users whose care will stop. The 3% was made by the decision in the left document, and the names in the right one pay for it. The signature field on the request is blank. Ban Jaewook goes down the formula line by line. The time care workers spend traveling between homes is counted nowhere, and the review standard is still set to data from 2 years ago. Outside the door, a user representative waits for a turn to speak. 'The people who calculated the 3% and the people waiting on the 3% are different. First you have to decide whose standard this formula is written by.'",
       "memo": [
         "The formula leaves out field work",
         "Review standard fixed to data from 2 years ago",
@@ -648,7 +648,7 @@ export default {
     "c4_start_refuse": "You write in the 3.0% as it is. Han Seoyun nods once, and the '9 hours' on the wall keeps shrinking. Because of that principle, the 4,200 you could have saved may be the ones left holding the loss.",
     "c4_start_contain": "You write the verification date on the same sheet, and Han Seoyun underlines that line. Whether a controlled violation is really possible, you now have to prove by that date.",
     "c4_offer_approve": "You adjust the formula, the score clears the bar, and nothing goes into the minutes. Only Ban Jaewook’s pen moves once. The next time the same request comes, you have no grounds left to refuse.",
-    "c4_offer_contain": "You add the note, and Do Yoonha copies the blank signature box and its footnote side by side on one sheet. A footnote is the minimum of honesty, and a footnote no one reads is the same as none.",
+    "c4_offer_contain": "You add the note, and Do Yoonha copies the blank signature field and its footnote side by side on one sheet. A footnote is the minimum of honesty, and a footnote no one reads is the same as none.",
     "c4_offer_refuse": "You head out with the list, and the four field staff each pick up a phone. The rule is kept, but if no other funding turns up, the rule you kept ends the service.",
     "c4_leak_expose": "You lay out the formula dispute and the shutdown risk together, and the typing on the line goes on for a long time. Legitimacy rises, but leverage and speed drain out of that call.",
     "c4_leak_approve": "The statement goes out, and the reporter says only 'Understood' before hanging up. A denial buys time, but if the tipster holds a second batch of documents, that time becomes debt.",
@@ -736,7 +736,7 @@ export default {
     "c4_start_refuse": "Thinking of the people you could have saved but refusing to cross the line, you write the 3% shortfall into the report as is.",
     "c4_start_contain": "Determined not to hide the violation but to bind it with conditions, you change the formula and write a follow-up check date on the same sheet.",
     "c4_offer_approve": "Telling yourself it is just this once, you ignore Ban Jaewook’s notebook and adjust the formula without a record.",
-    "c4_offer_contain": "Neither erasing it nor putting it up front, you add a supplementary note as a footnote beside Do Yoonha’s blank signature box.",
+    "c4_offer_contain": "Neither erasing it nor putting it up front, you add a supplementary note as a footnote beside Do Yoonha’s blank signature field.",
     "c4_offer_refuse": "Choosing to find money that isn’t there over touching the numbers, you take the list of 640 waiting and go looking for other funding.",
     "c4_leak_expose": "Knowing the loss will grow but wanting outside scrutiny, you tell the reporter about the formula dispute and the shutdown risk together.",
     "c4_leak_approve": "Sure that admitting it now brings everything down, you send out Oh Jinwoo’s three-line denial as written.",
