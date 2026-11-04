@@ -55,10 +55,11 @@ test("render.yaml declares every header the live check asks for", () => {
 
 test("no rule can leave render.yaml without the offline check saying so", () => {
   // It used to ask for thirteen of the fifteen (nineteen since the English and
-  // Japanese start pages, 11-03): the Cross-Origin-Resource-Policy
+  // Japanese start pages, 11-03; twenty-one with their `/en/*` and `/ja/*`,
+  // 11-04): the Cross-Origin-Resource-Policy
   // on /assets/* and the manifest's Content-Type could be deleted and pass.
   const headers = readRenderYamlHeaders(yaml);
-  assert.equal(headers.length, 19, "a rule added to render.yaml is added to the README's table and to renderYamlHeaderProblems");
+  assert.equal(headers.length, 21, "a rule added to render.yaml is added to the README's table and to renderYamlHeaderProblems");
   for (const header of headers) {
     assert.notDeepEqual(renderYamlHeaderProblems(withoutRule(header.path, header.name)), [], `${header.path} ${header.name} can be deleted unnoticed`);
   }

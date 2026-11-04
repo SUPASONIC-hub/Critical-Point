@@ -131,7 +131,8 @@ const budgets = [
   // 290,343 / 86,970 -> 294,110 / 87,736 on 2026-11-02, locale-gaps (#393) over main 9be94346: the season store's lines (NEW GAME+, second season, ending book, the share tail) read from src/copy/seasonLines.js. Measured 294,106 / 87,732 in the e2e build, the plus 4.
   // 294,110 / 87,736 -> 294,128 / 87,748 on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude); the case files' hashed names in its import list changed with their scene text. Measured 294,124 / 87,744 in the e2e build, the plus 4.
   // 87,748 -> 87,755 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import list changed with their scene text. Measured 294,124 / 87,751 in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_128, maxGzip: 87_755 },
+  // 294,128 / 87,755 -> 294,162 / 87,766 on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금 (the case files' hashed names in its import list). Measured 294,158 / 87,762 in the e2e build, the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_766 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -296,7 +297,10 @@ const budgets = [
   // 189,392 / 68,379 -> 189,407 / 68,395 on 2026-11-04, en-ko-leak over main 557d17bb: simplifyPlayerText reads the page's language (src/locale.js) and hands a page in another language back its own text. Measured 189,403 / 68,391 in the e2e build, the plus 4.
   // 189,407 / 68,395 -> 189,415 / 68,397 on 2026-11-04, en-ko-leak over main 22f43342: the intro reads its title reading from its copy, and the phase chip prints the phase as written. Measured 189,411 / 68,393, the plus 4.
   // 189,392 / 68,379 -> 190,097 / 68,670 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the four lines above together (#433 #436 #445, with #429 #438). Measured 190,093 / 68,666 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 190_097, maxGzip: 68_670 },
+  // 189,392 / 68,379 -> 189,737 / 68,502 on 2026-11-04, credits-alice over main 5d5d6ae4: the start screen's credit names SUPASONIC & ALICE and links both addresses (src/credits.js, StudioCredit.jsx). Measured 189,733 / 68,498 in the e2e build, the plus 4.
+  // 68,502 -> 68,508 gzip on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the entry names the renamed locale chunks. Measured 189,733 / 68,504 in the e2e build, the plus 4.
+  // 190,097 / 68,670 -> 190,442 / 68,790 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit line above (#443) on bundle-1104a's entry. Measured 190,438 / 68,786 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 190_442, maxGzip: 68_790 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -610,7 +614,10 @@ const budgets = [
   // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 200,435 / 37,508, plus 4.
   // 200,439 / 37,512 -> 200,479 / 37,521 on 2026-11-03, plate-sound-clip over main 8e930107: the scene's sound is centred in its
   // transform, which the build keeps (it dropped the separate translate property). Measured 200,475 / 37,517 in the build, plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_479, maxGzip: 37_521 },
+  // 200,439 / 37,512 -> 200,791 / 37,581 on 2026-11-04, credits-alice over main 5d5d6ae4: the credit's address row (.studio-credit-mail),
+  // which wraps one address under the other on a phone. Measured 200,787 / 37,577 in the e2e build, the plus 4.
+  // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_831, maxGzip: 37_589 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -835,7 +842,8 @@ const budgets = [
   // the gzip plus 4.
   // 107,276 / 35,735 -> 107,413 / 35,886 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 107,413 -> 107,420 raw on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 107,416 in the e2e build, the plus 4; the gzip is under its line.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_420, maxGzip: 35_886 },
+  // 107,420 / 35,886 -> 107,426 / 35,892 on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금. Measured 107,422 / 35,888 in the e2e build, the plus 4.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_426, maxGzip: 35_892 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -1114,7 +1122,8 @@ const budgets = [
   // 2026-10-28, lang-full: both languages open to the end, so English 사건 21-final and Japanese 사건 11-final join it
   // (four files each); the largest measured 33,405 raw (ja 21-30) and 12,141 gzip (ja 31-40).
   // 33,409 -> 33,421 raw on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): ja 21-30 measured 33,417, the plus 4.
-  { pattern: /^locale-(en|ja)-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 33_421, maxGzip: 12_145 },
+  // 33,421 -> 33,475 raw on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금: ja 21-30 measured 33,471, the plus 4.
+  { pattern: /^locale-(en|ja)-between-case[0-9]{2}-[0-9]{2}-.*\.js$/, maxBytes: 33_475, maxGzip: 12_145 },
   // A language's table the runtime fetches once it opens (src/locales/<lang>/late/<module>.js, locale-gaps #393,
   // 2026-11-02): the speakers' profiles (gameDialogue.js and the case packs' characterProfiles) the scene beats in the
   // report draw from. vite.config.js names it locale-<lang>-late-<module>, so the service worker leaves it to a page in
@@ -1132,7 +1141,8 @@ const budgets = [
   // 12,868 / 3,438 -> 12,991 / 3,500 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 12,987 / 3,496 in the e2e build, the plus 4.
   // 3,500 -> 3,505 gzip on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the raw bytes are the same; the hashed names in its import maps changed and gzip worse. Measured 3,501, the plus 4.
   // 3,505 -> 3,520 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import maps changed and gzip worse. Measured 12,987 / 3,516, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_520 },
+  // 3,520 -> 3,525 gzip on 2026-11-04, bundle-1105b (#443 credits-alice + #446 canon-a044 over main 2bd9a8ba): the raw bytes are the same; #446 changes case files and their hashed names in the import maps gzip worse. Measured 12,987 / 3,521, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_525 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1248,7 +1258,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,850 / 483,826 / 490,511 -> 426,855 / 483,845 / 490,517 on 2026-11-04, plate-sound-clip over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,851 / 483,841 / 490,513 in the e2e build, the plus 4.
 // 426,855 / 483,845 / 490,517 -> 426,852 / 483,851 / 490,519 on 2026-11-04, plate-sound-clip over main 22f43342 (#431 shortened the English dictionary, #444). Measured 426,848 / 483,847 / 490,515 in the e2e build, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 428,231 / 484,811 / 491,981 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the lines above together (#429 #433 #436 #445 #438); the Korean page now names the locale preload, and English and Japanese are measured from /en/ and /ja/. Measured 428,227 / 484,807 / 491,977 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 428_231, en: 484_811, ja: 491_981 };
+// 426,845 / 483,841 / 490,518 -> 427,105 / 484,103 / 490,780 on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the credit's two creators and their address links (the entry and the index CSS). Measured 427,101 / 484,099 / 490,776, the plus 4.
+// 428,231 / 484,811 / 491,981 -> 428,480 / 485,062 / 492,230 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit (#443, the entry and the index CSS) on bundle-1104a's first paint. Measured 428,476 / 485,058 / 492,226 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 428_480, en: 485_062, ja: 492_230 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

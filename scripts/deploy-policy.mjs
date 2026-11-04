@@ -266,8 +266,11 @@ export function rootImageCacheProblems(value) {
  */
 export const WORKER_PATH = "/sw.js";
 
-/** The start page at every address it has: `/`, and its English and Japanese at their folders (since 11-03). Each is served no-cache. */
-export const SHELL_PATHS = ["/", "/index.html", "/en/", "/en/index.html", "/ja/", "/ja/index.html"];
+/**
+ * The start page at every address it has: `/`, and its English and Japanese at their folders (since 11-03). Each is served no-cache.
+ * `/en/*` and `/ja/*` since 11-04: Render matched the `/en/` rule to `/en` only, so `/en/` itself went out cacheable for five minutes.
+ */
+export const SHELL_PATHS = ["/", "/index.html", "/en/", "/en/index.html", "/en/*", "/ja/", "/ja/index.html", "/ja/*"];
 
 export function workerCacheProblems(value) {
   return shellCacheProblems(value).map((problem) => problem.replace(/^the page\b/, "the service worker"));
