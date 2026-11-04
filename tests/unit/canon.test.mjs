@@ -19,6 +19,9 @@ const CONTRADICTIONS = [
   ["team-floor", "src/nodes/prologue03.js", 'place: "KD은행 본점 4층 기업금융전략팀 심사실"'],
   ["borrower-staff", "src/nodes/case01.js", 'memo: ["직원 126명, 대금 못 받은 협력사 14곳"]'],
   ["father-branch", "src/nodes/prologue01.js", 'text: "2009년, 부천 원미지점 대출 담당 차장이던 그의 아버지 오상철은"'],
+  // Until 2026-11-04 (A044): the wound-up 해온파트너스 as the payee of 2026.
+  ["advisory-fee-payee", "src/nodes/case26.js", 'echo: "위원회에 올리자 32억이 처음으로 안건 제목이 됩니다. 해온파트너스는 그날 오후 등기부의 주소를 옮깁니다."'],
+  ["advisory-fee-payee", "src/caseCopy.js", 'hook: "평택 사업비에서 32억 자문료(조언값이라며 내보낸 돈)를 받아 간 해온파트너스의 돈길은 바다 건너로 이어집니다."'],
 ];
 
 test("the canon check goes red on each contradiction the season used to carry", () => {
@@ -197,6 +200,9 @@ test("the canon check accepts the canon's own sentences", () => {
     ["src/nodes/case27.js", 'place: "군산 새봄신협 · 3번 창구"'],
     ["src/nodes/case23.js", 'memo: ["안건 제3호: 사내이사 윤상혁 선임 -- 경력란에 2023년 없음"]'],
     ["src/nodes/case02.js", 'text: "퇴직한 전 심사팀장 임경수가 끈으로 묶은 서류를 듭니다."'],
+    ["src/nodes/case26.js", 'memo: ["사업비 명세서: 사업 자문료 32억 -- 해온파트너스와 같은 주소의 새 법인"]'],
+    // 사건 08's 해온파트너스 of 2025 is still 해온파트너스.
+    ["src/nodes/case08.js", 'text: "해온파트너스의 청산은 결국 등기됐습니다."'],
   ];
   for (const [file, line] of agreed) assert.deepEqual(findCanonViolations(line, file), []);
 });
