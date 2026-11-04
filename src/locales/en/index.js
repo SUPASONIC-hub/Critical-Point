@@ -419,7 +419,7 @@ export const copy = {
         "eyebrow": "Next case unlocked",
         "title": "Case 10 - The One Who Can’t Stop",
         "button": "Start Case 10",
-        "premise": "The company survived, and the people who inflated its books stood trial. Ten days later, the person who pushed that hand to the end is rushed to the ER.",
+        "premise": "The company survived. Ten days later, the person who pushed that hand to the end is rushed to the ER.",
         "hook": "Goodwill appears nowhere in this organization’s books as an expense. A cost that isn’t recorded doesn’t shrink either. This case asks who that bill is addressed to.",
         "movement": "Ieum Hospital, Gangseo > Window 4, Gangseo Branch > HR committee room > Secondhand bookshop in Hoegi-dong, 2nd floor",
         "reason": "To see who got the bill for the hand you won, and to move the list one person carried into a structure that won’t break",

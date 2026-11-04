@@ -231,9 +231,9 @@ export default {
     },
     "p3_boiler": {
       "title": "The Man Who Draws Your Seat",
-      "text": "9 p.m., the team head’s office on the 6th floor. Yoon Sanghyuk, head of the Corporate Finance Strategy Team, waits for you with the blinds half drawn. He does not scold you for today. Instead he takes out a sheet of paper and sketches your future. It is about an analysis unit to be set up next year. It has no name yet and no people yet, he says; there are four seats, and one of them is empty. 'I never said your judgment was wrong. But I decide where that judgment gets to sit.' He closes his tablet. The speed of it is the answer. Before it closes, the first page on the screen shows an empty signature line. As you turn to go, he adds one thing. 'What did Manager Han tell you today? That it was for your own good? She believes that. People who believe have it easy.'",
+      "text": "9 p.m., the team head’s office on the 6th floor. Yoon Sanghyuk, head of the Corporate Finance Strategy Team, waits for you with the blinds half drawn. He does not scold you for today. Instead he takes out a sheet of paper and sketches your future. It is about an analysis unit to be set up this summer. It has no name yet and no people yet, he says; there are four seats, and one of them is empty. 'I never said your judgment was wrong. But I decide where that judgment gets to sit.' He closes his tablet. The speed of it is the answer. Before it closes, the first page on the screen shows an empty signature line. As you turn to go, he adds one thing. 'What did Manager Han tell you today? That it was for your own good? She believes that. People who believe have it easy.'",
       "memo": [
-        "Analysis unit planned for next year -- 1 of 4 seats empty",
+        "Analysis unit planned for this summer -- 1 of 4 seats empty",
         "Yoon Sanghyuk’s tablet, first screen -- signature line empty",
         "His words: 'I decide where that judgment gets to sit'",
         "Meeting length 9 minutes"
@@ -251,7 +251,7 @@ export default {
       },
       "place": "Head office, 6th floor, Team Head’s office",
       "clock": "Thursday, April 27 · 21:00",
-      "question": "Instead of scolding you, the team head sketches a seat that will exist next year. What do you do?"
+      "question": "Instead of scolding you, the team head sketches a seat that will exist this summer. What do you do?"
     },
     "p3_minutes_reaction": {
       "title": "Two Lines Under 179.6",

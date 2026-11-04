@@ -207,7 +207,7 @@ export default {
     },
     "c10_pills": {
       "title": "19 People",
-      "text": "Han Seoyun opens the personnel records. In the last 3 years, nineteen people at Trigger Lab and Gangseo Branch took sick leave for the same reason. Every reason field says 'personal matter'. She scrolls one more line and stops. 1 of the 19 is Han Seoyun herself. 3 years ago, 2 weeks.",
+      "text": "Han Seoyun opens the personnel records. In the last 3 years, nineteen people at Trigger Lab, Gangseo Branch and the Corporate Finance Strategy Team took sick leave for the same reason. Every reason field says 'personal matter'. She scrolls one more line and stops. 1 of the 19 is Han Seoyun herself. 3 years ago, 2 weeks.",
       "memo": [
         "19 sick leaves for the same reason -- all recorded as personal matters",
         "11 of the 19 still work here",

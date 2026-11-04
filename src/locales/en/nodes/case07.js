@@ -100,9 +100,9 @@ export default {
     },
     "c7_paper": {
       "title": "The Burned Line",
-      "text": "The 2nd floor of the secondhand bookshop in Hoegi-dong. As you climb the stairs, the smell of paper comes first. At the desk by the window, Lim Kyungsoo peels the seal tape off a binder and slides one sheet across. A watermarked printout of page 3 of the 2023-0412 review report. The signature field is empty, and under it, the initials of whoever gave the order remain in pencil. On page 3 in the document management system, exactly that lower part is cut off. He takes off his glasses, wipes them, and for the first time asks for something. 'Don’t tell me you’ll protect me. I’ve carried this for 3 years. At the bank, and in this bookshop. If you submit it, put my name at the top. That’s what I want.' From downstairs comes the sound of the owner cutting the twine on a bundle of books.",
+      "text": "The 2nd floor of the secondhand bookshop in Hoegi-dong. As you climb the stairs, the smell of paper comes first. At the desk by the window, Lim Kyungsoo peels the seal tape off a binder and slides one sheet across. A watermarked printout of page 3 of the 2023-0412 review report. The signature field is empty, and under it a single pencil dot remains. On page 3 in the document management system, exactly that lower part is cut off. He takes off his glasses, wipes them, and for the first time asks for something. 'Don’t tell me you’ll protect me. I’ve carried this for 3 years. At the bank, and in this bookshop. If you submit it, put my name at the top. That’s what I want.' From downstairs comes the sound of the owner cutting the twine on a bundle of books.",
       "memo": [
-        "Pencil initials confirmed at the bottom of the page 3 printout",
+        "A single pencil dot confirmed at the bottom of the page 3 printout",
         "That bottom area is cut off in the system copy",
         "Lim Kyungsoo refuses anonymity",
         "With his name, the document gains weight as evidence"
@@ -204,10 +204,10 @@ export default {
       "question": "A man who cut 47 people wants to split 4,300 won. How do you settle the bill?"
     },
     "c7_teller": {
-      "title": "Window 4",
-      "text": "On the way out of the branch, Do Yoonha says out of habit to a customer holding the door, 'Take care going home, ma’am,' and someone at Window 4 calls to him. 'Yoonha, you still say that.' A gray-haired teller. Someone who sat in the same row 3 years ago and retires next year. The teller doesn’t ask why he has come. In a gap between customers, the teller opens a drawer and takes out a sheet. A copy of that year’s target sheet, one the branch kept on its own. The teller presses a fingernail down to fold over the part with the clerks’ names. The line with the teller’s own name. Folded, it slides under the counter glass. 'The fold is mine. Unfolding it is up to whoever takes it.' The ticket machine calls the next number.",
+      "title": "Window 3",
+      "text": "On the way out of the branch, Do Yoonha says out of habit to a customer holding the door, 'Take care going home, ma’am,' and someone at Window 3 calls to him. 'Yoonha, you still say that.' A gray-haired teller. Someone who sat in the same row 3 years ago and retires next year. The teller doesn’t ask why he has come. In a gap between customers, the teller opens a drawer and takes out a sheet. A copy of that year’s target sheet, one the branch kept on its own. The teller presses a fingernail down to fold over the part with the clerks’ names. The line with the teller’s own name. Folded, it slides under the counter glass. 'The fold is mine. Unfolding it is up to whoever takes it.' The ticket machine calls the next number.",
       "memo": [
-        "Window 4 teller was on the same team then",
+        "Window 3 teller was on the same team then",
         "The copy is the branch’s own file",
         "Retires next year"
       ],
@@ -222,7 +222,7 @@ export default {
           "label": "Take it folded and keep the name covered"
         }
       },
-      "place": "KD Bank Gangseo Branch · Window 4",
+      "place": "KD Bank Gangseo Branch · Window 3",
       "clock": "Transfer in 42h",
       "question": "A teller one year from retirement folds over their own name and hands you the copy. Do you unfold it?"
     },
@@ -273,7 +273,7 @@ export default {
     },
     "c7_teller_reaction": {
       "title": "Four Names",
-      "text": "At the bus stop outside Gangseo Branch, Do Yoonha stands holding the target sheet. The names of the four window clerks who took those targets run down the page. The teller at Window 4, Do Yoonha, and two more. He scores a line with his fingernail along the row with his own name. 'I’ll put my own name forward. That one I can decide.' A bus stops, and he doesn’t get on. 'The other three I can’t decide. Just because we sat together doesn’t mean I can hand over their names for them.' He folds the sheet in half and gives it to you. The fold runs right through the middle of the four names.",
+      "text": "At the bus stop outside Gangseo Branch, Do Yoonha stands holding the target sheet. The names of the four window clerks who took those targets run down the page. The teller at Window 3, Do Yoonha at Window 4, and two more. He scores a line with his fingernail along the row with his own name. 'I’ll put my own name forward. That one I can decide.' A bus stops, and he doesn’t get on. 'The other three I can’t decide. Just because we sat together doesn’t mean I can hand over their names for them.' He folds the sheet in half and gives it to you. The fold runs right through the middle of the four names.",
       "memo": [
         "The right to put forward your own name",
         "A witness one year from retirement"
