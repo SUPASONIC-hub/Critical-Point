@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-02 (the state of `main` at `5c00dff`, after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-03 (the state of `main` at `8e93010`, after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -463,6 +463,29 @@ Still open, on purpose:
   360px, five-card hand spacing at 480px and under, new `money.css`). #390 (desktop type: body text 16 to 18px at 1025px and wider, the start screen kept at 16px, the large stake, clock and timer numbers held by `--hud-rem`; the 1280x720 start button now inside the screen on Linux, 1024x768 and 1440x900 added to the reach check, desktop baselines re-recorded). Six PRs merged, production build-sha `5c00dff`, 1,637 unit tests. Drafts: #394 (scene prose trim 1, after W47), #392 (to merge tomorrow morning). #322 followed main; #224's bundle children followed
   rules-mark-3b: #307 `50e7957f`, #316 `b008cb11`, #320 `d4a6ed3b`, #308
   `558088ad`, #379 `e57c9864`.
+- 2026-11-03: #392 (`plate-story`: each sound word sits beside its source -- the
+  heartbeat by the player's own figure, a thud on the desk, a hum by the lit
+  object, a tick on the wall -- never over a figure or the caption, hidden on
+  phones at 700px and under; the player's figure in every room in the hand
+  colour with an outline; the result screen opens with the case's last scene
+  in a good, mixed or bad tint; font subset 1,700 characters); #398
+  (`plate-room-locale`: English and Japanese scenes pick their room and seed
+  from the Korean place and clock, so all three languages draw the same room;
+  sound sizes 17 and 14 added, scenes with no sound spot ko 0, en 0, ja 2);
+  #395 (`locale-review-1103`: English profile pronouns for seven people,
+  Look-Before-You-Leap, 首席分析官, Bankroll); #407 (`test-week-summary`:
+  re-measured bot values through a repository variable or a dispatch input,
+  five ranking bug signals, returns per finished season); #397 (English
+  number warnings 18 to 12); #404 (Verify Ranking replay test for weekly-rule
+  runs); #410 (`npm run check:changed` and build:e2e reuse for the same
+  tree); #406 (deploy at push when main gets the same tree, e2e, season and
+  visual skipped for drafts and docs-only PRs; #402 reached production in
+  10 min 39 s); #402 (360px signal row: LOCK clear of the logic combo in en
+  and ja); #409 (last week's rule board tab for the following week); #411
+  (WebKit start button, `text-wrap: wrap` for ko and ja at 360px and under);
+  #421 (summary artifacts for Funnel, Test Week and Verify Ranking); #408
+  (coverage floors one under the measured values). Fourteen PRs merged,
+  production build-sha `8e93010`, 1,692 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -695,7 +718,10 @@ Still open, on purpose:
     asserts is a save, a request or a page state no viewport or touch reaches.
     The season is walked in eight `@season-segment` tests of seven cases, each
     from a fresh save at its first case, which Verify runs as a job of its own
-    on four shards on every push; the rest of the list runs on five. The continuous walk -- the only thing that carries
+    on four shards on every push; the rest of the list runs on seven, each a set of spec files balanced
+    by measured time (`tests/e2e-shards.json`; `npm run e2e:rebalance` lays it
+    out again from CI logs, and a spec it does not know goes to the lightest
+    shard). The continuous walk -- the only thing that carries
     resources and flags across all 55 cases -- is `npm run test:e2e:season`,
     run weekly by Full Coverage with `test:e2e:full`.
 18. The e2e runner takes a free port from the OS. Never pin one: a dev server

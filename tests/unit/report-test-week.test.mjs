@@ -225,3 +225,15 @@ test("the workflow passes the measurement as a file from its input or the reposi
   assert.ok(runs.every((body) => !/\$\{\{\s*(inputs\.sim|vars\.)/.test(body)), "the lines go through env, not into a script's text");
   assert.match(workflow, /rm -f rows\.json query\.err sim\.txt/);
 });
+
+test("the test week's JSON for the run's artifact carries the summary's counts and no run id", async () => {
+  const { testWeekJson } = await import("../../scripts/report-test-week.mjs");
+  const rows = [
+    { run_id: "secret-run-json", case_id: "case01", device: 8001, vault: 100, log: [board("cash", 30, 1)] },
+    { run_id: "secret-run-json", case_id: "season-final", device: 8001, ranked_week: "2026-W47", log: [] },
+  ];
+  const json = testWeekJson(rows);
+  assert.deepEqual(json.counts, readTestWeek(rows), "the same counts the Markdown is written from");
+  const text = JSON.stringify(json);
+  assert.ok(!text.includes("secret-run") && !text.includes("8001"), "no run id and no device");
+});

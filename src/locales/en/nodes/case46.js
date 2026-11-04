@@ -197,7 +197,7 @@ export default {
           "label": "Add item 7 to the evidence preservation request too"
         },
         "c46_manifest_choice_1": {
-          "label": "Ask each of the 14 owners first whether to shred"
+          "label": "Ask each of the 13 owners you can reach first whether to shred"
         }
       },
       "place": "KD Data Lab Data Center, Pangyo · At the Disposal Holding Area Mesh",
@@ -547,7 +547,7 @@ export default {
     "c46_after_warm": "You stay, and Lee Minseo falls asleep while ECHO assigns laugh probabilities to the reunion jokes. Kang Taemin drapes his jacket over her, and Yeon Siwoo turns off the server room lights one row at a time.",
     "c46_after_record": "The document runs fourteen pages. The last page is titled 'How to Read the Dot Beside the Empty Field'. Ban Jaewook tucks a copy into his notebook, and Moon Hajun says he will print that page on its own.",
     "c46_after_rush": "When you switch on the office lights, there are twenty-six documents to finish before the holiday. One of them is the notice on forming the review committee. Moon Gaeul’s text stays unread at the top of your phone.",
-    "c46_manifest_choice_1": "Asking takes two hours. Of the 14, 8 say 'keep it,' five say 'burn it,' and one never answers.",
+    "c46_manifest_choice_1": "Asking takes two hours. Of the 13, 7 say 'keep it,' five say 'burn it,' and one never answers.",
     "c46_manifest_choice_2": "With item 7 on the preservation request, the evidence of the leak’s damage survives. So do the records that log each person’s hesitation to the second.",
     "c46_manifest_choice_3": "The truck takes item 7. Oh Jinwoo says it’s a relief, and the class-action lawyer does not pick up that evening.",
     "c46_obituary_choice_1": "You wait, and after a long while Lim Soyul speaks. 'Grandpa cursed machines more than anyone. Still, he’d have wanted to come today.'",
@@ -618,7 +618,7 @@ export default {
     "c46_after_warm": "Wanting to see the end with the people who got through today with you, you stay beside ECHO with your colleagues until the server room lights go out.",
     "c46_after_record": "Since a calculation kept only inside a server can be erased again, you turn ECHO’s recounted design log into a document anyone can read and hand it over.",
     "c46_after_rush": "Saying nothing can be touched once the holiday starts, you leave the server room, go straight to the KD Capital office, and grab the papers due before the Chuseok holiday.",
-    "c46_manifest_choice_1": "Saying burning or keeping is not yours to decide, you first ask each of the 14 record owners whether to shred.",
+    "c46_manifest_choice_1": "Saying burning or keeping is not yours to decide, you first ask each of the 13 record owners you can reach whether to shred.",
     "c46_manifest_choice_2": "Since losing the original means losing the way to prove the leak’s damage, you add item 7 to the evidence preservation request too.",
     "c46_manifest_choice_3": "Saying you can’t carry out other people’s hesitation too, you take only the ECHO disks and leave item 7 to the truck.",
     "c46_obituary_choice_1": "Saying her grandfather’s news should come from his granddaughter, you stand beside Lim Soyul and wait until she says it herself.",

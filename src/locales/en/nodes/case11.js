@@ -101,7 +101,7 @@ export default {
     },
     "c11_sign": {
       "title": "The One Who Returned It",
-      "text": "Han Seoyun calls you up to the Trigger Lab rooftop. The wind is strong, and her voice keeps breaking up. For a while she has ended her sentences as if filing a report; tonight she talks the old way. 'The person who returned your dissent 3 years ago was me. I signed it. That afternoon Managing Director Yoon called. He said if the dissent went up, the seven people on our team would be scattered. Three of those seven had babies that year.' She plays an audio file on her phone. It is that call, 3 years ago. 'If you submit this tomorrow, it proves you were right. And I’m finished. I only figured out today why I couldn’t delete this file for 3 years.'",
+      "text": "Han Seoyun calls you up to the Trigger Lab rooftop. The wind is strong, and her voice keeps breaking up. For a while she has ended her sentences as if filing a report; tonight she talks the old way. 'The person who returned your dissent 3 years ago was me. I pressed the return button. That afternoon Managing Director Yoon called. He said if the dissent went up, the seven people on our team would be scattered. Three of those seven had babies that year.' She plays an audio file on her phone. It is that call, 3 years ago. 'If you submit this tomorrow, it proves you were right. And I’m finished. I only figured out today why I couldn’t delete this file for 3 years.'",
       "memo": [
         "Recording of the call 3 years ago -- Yoon Sanghyuk’s voice can be confirmed",
         "Content of the call: 'If the dissent goes up, the team is broken up'",
@@ -577,7 +577,7 @@ export default {
     "c11_final_system_route_a": "With dates attached, the promises stay in the transcript with deadlines. The first person to get a call that day is you.",
     "c11_final_system_route_b": "The question passes. The numbers go in an appendix, and the one who opens it is likely an aide preparing next year’s audit.",
     "c11_final_system_route_c": "When you promise, the room goes quiet for a moment. A witness saying they will come back on their own is hard to find in that room’s transcripts.",
-    "c11_evidence_turn_submit": "Handing it to both at once, neither side can bury it first. The empty time between the two stamps becomes the first question tomorrow.",
+    "c11_evidence_turn_submit": "Handing it to both at once, neither side can bury it first. The empty time between the two stamps becomes the first question today.",
     "c11_evidence_turn_hold": "Revealed on the stand, the paper is shot by 12 cameras. Until then, Han Seoyun remains the one who thinks she erased it.",
     "c11_evidence_turn_share": "Shown first, Han Seoyun looks at the two times for a long time. She learns for the first time that what she believed for 3 years she erased went only as far as the return.",
     "c11_script_evidence_turn": "Calling up the change log shows that the hand that returned it and the hand that erased it were not the same.",
