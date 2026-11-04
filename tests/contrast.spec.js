@@ -327,8 +327,11 @@ async function expectReadable(page, label) {
   return painted.measured;
 }
 
-async function startAt(page, caseId, nodeId) {
-  await page.goto("/?debug=1");
+/** The debug page in a language: Korean is the default and has no parameter. */
+const debugUrl = (lang = "ko") => (lang === "ko" ? "/?debug=1" : `/?debug=1&lang=${lang}`);
+
+async function startAt(page, caseId, nodeId, lang = "ko") {
+  await page.goto(debugUrl(lang));
   await page.evaluate(() => {
     try {
       localStorage.clear();
@@ -336,7 +339,7 @@ async function startAt(page, caseId, nodeId) {
       /* private mode */
     }
   });
-  await page.goto("/?debug=1");
+  await page.goto(debugUrl(lang));
   await page.waitForSelector(".intro-shell");
   await page.getByTestId("debug-case-select").selectOption(caseId);
   await page.getByTestId("debug-node-select").selectOption(nodeId);
@@ -474,4 +477,105 @@ test("the report and ending sequence stay readable", async ({ page }) => {
   }
   // The ending's words stand on a picture and a scrim that are their siblings.
   expect(measuredOverEndingArt, "the ending's text over its picture was measured").toBeGreaterThan(0);
+});
+
+/**
+ * English and Japanese break their lines in other places, so their text lands
+ * on other parts of the pictures: the composite and the pixel readings above
+ * were Korean only until the 2026-11-03 audit. The intro, a table with a
+ * staged card and its reveal, in each.
+ */
+for (const lang of ["en", "ja"]) {
+  test(`in ${lang}, the intro, a table and its reveal stay readable`, async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto(debugUrl(lang));
+    await page.waitForSelector(".intro-shell");
+    await expect(page.locator("html")).toHaveAttribute("lang", lang);
+    await expectReadable(page, `intro (${lang})`);
+
+    await startAt(page, "case01", "start", lang);
+    await page.locator(".choices .choice").first().click();
+    await page.waitForSelector(".gx-card.selected");
+    await expectReadable(page, `gauntlet table (${lang})`);
+
+    await page.getByTestId("commit-confirm").click();
+    await page.waitForSelector("[data-testid='decision-next']");
+    await expectReadable(page, `decision reveal (${lang})`);
+  });
+}
+
+/**
+ * A card's edge against the felt (WCAG 1.4.11: a control's boundary at 3:1).
+ * The card's fill is within a shade of the table, so the 1px edge is what
+ * tells one card from the next; at white 16% it read 1.5:1 (2026-11-03 audit).
+ * Read from the pixels at the device's own scale, down the middle of each
+ * card's left and right edge: the brightest of the edge's pixels against the
+ * felt three CSS pixels outside it, and the lowest of those readings.
+ */
+const MEASURE_CARD_EDGES = async ({ shot, dpr }) => {
+  const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${shot}`)).blob());
+  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(bitmap, 0, 0);
+  const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+  const at = (x, y) => {
+    const i = (Math.floor(y) * bitmap.width + Math.floor(x)) * 4;
+    return { r: pixels[i], g: pixels[i + 1], b: pixels[i + 2] };
+  };
+  const lum = ({ r, g, b }) => {
+    const f = (c) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  };
+  const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  return [...document.querySelectorAll(".gauntlet-stage .gx-card")].map((card) => {
+    const rect = card.getBoundingClientRect();
+    const readings = [];
+    for (let y = rect.top + rect.height * 0.3; y < rect.top + rect.height * 0.7; y += 3) {
+      const row = y * dpr;
+      if (row < 0 || row >= bitmap.height) continue;
+      // The 1px edge's device pixels, a pixel either way for where a
+      // fractional box rounds: [first, last], and the felt outside it.
+      for (const [side, first, last, outside, cssEdge] of [
+        ["left", Math.floor(rect.left * dpr) - 1, Math.ceil((rect.left + 1) * dpr), (rect.left - 3) * dpr, rect.left + 0.5],
+        ["right", Math.floor((rect.right - 1) * dpr) - 1, Math.ceil(rect.right * dpr), (rect.right + 3) * dpr, rect.right - 0.5],
+      ]) {
+        if (outside < 0 || outside >= bitmap.width) continue;
+        // Something drawn over the edge (a panel, a toast) is not the card's edge.
+        if (!card.contains(document.elementFromPoint(cssEdge, y))) continue;
+        const felt = at(outside, row);
+        let best = 0;
+        let edgeColor = null;
+        for (let x = first; x <= last; x += 1) {
+          const here = at(x, row);
+          if (ratio(here, felt) > best) [best, edgeColor] = [ratio(here, felt), here];
+        }
+        readings.push({ best, at: `${side} edge, y ${Math.round(y)}: rgb(${edgeColor.r} ${edgeColor.g} ${edgeColor.b}) on rgb(${felt.r} ${felt.g} ${felt.b})` });
+      }
+    }
+    readings.sort((a, b) => a.best - b.best);
+    const low = readings[Math.floor(readings.length * 0.05)];
+    return { card: `${card.className} "${card.textContent.trim().slice(0, 12)}"`, low: low ? Number(low.best.toFixed(2)) : null, where: low?.at, samples: readings.length };
+  });
+};
+
+test("each card in the hand stands apart from the felt by its edge, at 3:1", async ({ page }) => {
+  await startAt(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await page.waitForSelector(".gx-card.selected");
+  // The debug panel stands over the hand's last card on a wide screen.
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  // Away from the cards: a pointer resting on one is its hover edge, not its own.
+  await page.mouse.move(0, 0);
+  await settle(page, { drawers: false });
+  const dpr = await page.evaluate(() => devicePixelRatio);
+  const shot = await page.screenshot({ scale: "device", animations: "disabled", caret: "hide" });
+  const cards = await page.evaluate(MEASURE_CARD_EDGES, { shot: shot.toString("base64"), dpr });
+  expect(cards.length, "the hand was measured").toBeGreaterThanOrEqual(2);
+  for (const { card, low, where, samples } of cards) {
+    expect(samples, `${card}: edge samples`).toBeGreaterThan(4);
+    expect(low, `${card}: its edge against the felt (${where})`).toBeGreaterThanOrEqual(3);
+  }
 });

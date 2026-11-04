@@ -589,6 +589,16 @@ export const CANON = [
     allow: ["30"],
   },
   {
+    id: "kd-account-name",
+    fact: "the player's money is the KD은행 계좌 -- KD Bank account, KD銀行口座 -- one name in each language",
+    // The table's words in the three languages (stage.purse). Read loosely --
+    // a space, a capital or a 銀行 written apart -- so a variant is caught
+    // rather than missed.
+    files: /src\/(?:copy|locales\/(?:en|ja)\/screens)\/table\.js$/,
+    find: /(KD ?은행 ?계좌|KD ?[Bb]ank [Aa]ccount|KD ?銀行 ?口座)/g,
+    allow: ["KD은행 계좌", "KD Bank account", "KD銀行口座"],
+  },
+  {
     id: "advisory-fee-payee",
     fact: "해온파트너스 was wound up in 2025 (사건 08); 평택's 32억 of 2026 went to a new company at its address",
     // 사건 26 and the line that leads out of it. Until 2026-11-04 they named
@@ -987,6 +997,10 @@ const COPY_FILES = () => [
   "src/advancedSystems.js",
   "src/runtimeSystems.js",
   "src/featurePack.js",
+  // The KD은행 계좌's name, in the table's words.
+  "src/copy/table.js",
+  "src/locales/en/screens/table.js",
+  "src/locales/ja/screens/table.js",
 ];
 
 function main() {

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
-import { getTabToken, STORAGE_KEY } from "../appConfig.js";
+import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
@@ -94,7 +94,7 @@ export function GauntletStage({
   scene,
 }) {
   const schema = getTableSchema(run);
-  const tabToken = getTabToken();
+  const tabToken = takeTabToken();
   // Read once, at mount: a save that already names this window means a bet was
   // placed on it and never settled. If this tab placed it, this is a reload and
   // the bet settles as a bust at once. If another tab holds it, that tab may
@@ -120,7 +120,7 @@ export function GauntletStage({
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
   const stageRef = useRef(null);
-  // The bank rail's head, where the slam's amount flies to (moneyFeedback.js).
+  // The KD은행 계좌, where the slam's amount flies to (moneyFeedback.js).
   const purseRef = useRef(null);
   // The window this table was dealt on. Once the settle has written the next
   // one the run under this table has the hand in it already, and the purse
@@ -150,10 +150,10 @@ export function GauntletStage({
   const [openedSeed, setOpenedSeed] = useState(null);
   // The briefing's reading, which it reports and openTable notes (D-11, state/readingTally.js).
   const readingRef = useRef(null);
-  const trackReading = (seconds, held) => {
+  const trackReading = (seconds, held, clock) => {
     const page = (readingRef.current ??= { seconds: 0, held: false });
     page.seconds += seconds;
-    if (held) page.held = true;
+    Object.assign(page, held && { held: true }, clock > 0 && { clock });
   };
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
@@ -515,8 +515,6 @@ export function GauntletStage({
             </span>
           </div>
           <div className="gx-bank">
-            {/* The money first and largest (money-feedback, MoneyBurst.jsx). */}
-            <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
@@ -839,6 +837,11 @@ export function GauntletStage({
           reading={trackReading}
         />
       )}
+
+      {/* The KD은행 계좌, pinned over every phase of the window: after the
+          briefing page and the draft in the markup, so it is drawn over them
+          where they meet (MoneyBurst.jsx, money.css). */}
+      <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
 
       <TableNotices
         equipped={equipped}

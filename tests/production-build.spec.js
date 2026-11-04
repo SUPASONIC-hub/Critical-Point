@@ -103,7 +103,10 @@ test("a saved run plays to its report, reports it, and hands over to the next ca
   expect(row, "a playtest_sessions row for case01").toBeTruthy();
   expect(row.run_id).toBe("e2e-seeded-run");
   expect(typeof row.event_id).toBe("string");
-  expect(JSON.stringify(row)).not.toContain("E2E");
+  // The seeded player is named "E2E" (helpers/seededSave.js) and the row carries
+  // no name. The session code is eight random capitals and digits, which spelled
+  // "B15E2E20" once (2026-10-21), so it is left out of the look.
+  expect(JSON.stringify({ ...row, session_code: undefined })).not.toContain("E2E");
 
   // The hand-over: the next case opens on a table that can be played.
   await page.locator(".next-case-panel button").click();

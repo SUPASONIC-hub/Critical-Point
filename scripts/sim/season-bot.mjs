@@ -48,6 +48,7 @@ import {
   FOCUS_MAX,
   getCardChips,
   getHeartbeatBpm,
+  getReadingSeconds,
   getSealedCardId,
   getTableSchema,
   getWindowBand,
@@ -255,8 +256,13 @@ export const AUDIT_VALUES = (() => {
  * CASCADE_WEEK; the links are carried when the rule has CASCADE. Left out,
  * the environment says, as before. The server-check tests pass it to play a
  * week's run (verify-ranking-weekly.test.mjs).
+ * `snap` plays every table as a hand that does its thinking on the briefing
+ * and cashes the moment the table opens (one second on the clock); with
+ * `reads` it reads each briefing to the end first and logs the page's seconds
+ * and clock as the page does (`readSec`, `readClock`, 2026-11-03), without it
+ * it opens the table at once and logs no page. The stream draws as before.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false }) {
   const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (weekRule === undefined ? weekStamp(story) : !story && stamped ? { weekRule: stamped } : {});
   const linksOn = weekRule === undefined ? CASCADE_WEEK : weekRuleHasDevice(stamped, "cascade");
@@ -321,6 +327,10 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // The run's own board, and for a story run the same board with its far wall.
     let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
     win = reduce(win, { type: "SELECT", id: "card" }, rules);
+    if (snap) {
+      random();
+      return reduce(win, { type: "CASH" }, rules);
+    }
     // Reading the card and the band before the first press. Creep starts after
     // the grace, so a slow hand is already paying heat.
     for (let second = 0; second < Math.floor(policy.think) && win.status === "live"; second += 1) {
@@ -431,7 +441,9 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         const memoryChoice = getContinuityMemoryChoice({ caseId, nodeId, caseResults });
         const standing = { clueCount: discoveredClues.length, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened: getCasesOpened(caseId) };
         const fixed = [...node.choices.filter((choice) => choice.type !== "reframe"), ...(memoryChoice ? [memoryChoice] : [])]
-          .filter((choice) => getAuthorityGate(choice, standing).unlocked);
+          .filter((choice) => getAuthorityGate(choice, standing).unlocked)
+          // A snap cashes at no heat, which the stage refuses for the sealed card: it leaves that one.
+          .filter((choice) => !snap || choice.id !== getSealedCardId(node.choices, run.schema));
         // `wildOnly` is the hand measured at the end of check-endings.mjs: it stakes the
         // wild card on every scene that deals one, which the table allows (only
         // the route a reframe opens is once a case). It draws nothing here.
@@ -505,6 +517,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           cognition: cognitiveEffect ?? {},
           clue,
           responseTimeSec,
+          ...(snap && reads ? { readSec: getReadingSeconds(node), readClock: getReadingSeconds(node) } : {}),
           resourcesBefore: resources,
           resourcesAfter,
           challenge: { matched: read.challengeMatch, riskDelta: read.riskDelta },
