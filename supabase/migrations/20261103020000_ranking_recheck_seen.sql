@@ -18,9 +18,10 @@
 -- 11-03: every nightly read since 10-24 found 0 ranked runs) are read again
 -- the next night.
 --
--- The page reads it through public_rankings as `rechecked` (true or false),
--- never the time. The view is security_invoker, so anon is granted select on
--- the one column; it cannot write it (anon's insert grant is a column list
+-- The page reads it through public_rankings as `rechecked` (true or false).
+-- The view is security_invoker, so anon is granted select on the one column,
+-- and so anon can also read the check time itself from playtest_sessions: not
+-- sensitive (reviewed 2026-11-04). It cannot write it (anon's insert grant is a column list
 -- without it) and only the service role can call the function.
 --
 -- check:grants replays it with every migration and holds it to its cases
