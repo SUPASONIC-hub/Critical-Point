@@ -10,7 +10,8 @@ AdSense 검토는 사이트에 읽을 글이 있는지, 검색 엔진이 그 글
 | 파일 | 내용 |
 | --- | --- |
 | `/robots.txt` | `User-agent: *` · `Allow: /` · `Sitemap: <사이트 주소>/sitemap.xml` |
-| `/sitemap.xml` | 시작 페이지(`/`, 대체 주소 `/?lang=en`·`/?lang=ja`)와 정적 페이지 열다섯, 16항목. 항목마다 세 언어와 x-default의 대체 주소, `lastmod`는 빌드한 날 |
+| `/sitemap.xml` | 세 언어의 시작 페이지(`/`, `/en/`, `/ja/`, 2026-11-03부터; 전에는 대체 주소 `/?lang=en`·`/?lang=ja`)와 정적 페이지 열다섯, 18항목. 항목마다 세 언어와 x-default의 대체 주소, `lastmod`는 빌드한 날 |
+| 시작 페이지 영어·일본어 | `/en/index.html`·`/ja/index.html`: 다 만든 `index.html`에서 제목·설명·카드·canonical(자기 폴더)·no-script 글만 그 언어로 |
 | 정적 페이지 15개 | `/about.html` `/faq.html` `/contact.html` `/privacy.html` `/terms.html`과 `/en/`·`/ja/`의 같은 이름. canonical과 hreflang은 사이트 주소 위의 절대 주소 |
 
 사이트 주소는 `SITE_URL`(자기 도메인을 둘 때), 없으면 Render가 빌드마다 넣는 `RENDER_EXTERNAL_URL`입니다. 둘 다

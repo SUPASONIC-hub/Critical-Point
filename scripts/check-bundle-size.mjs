@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { WEB_AD_CODE_MARKERS } from "./adsense-config.mjs";
@@ -81,7 +81,9 @@ const budgets = [
   // reveal:gain / reveal:even / reveal:cost (revealOutcome in GameRuntime). Measured 150,030 / 55,066 in the e2e build, the plus 4.
   // 150,034 / 55,070 -> 150,255 / 55,171 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 150,251 / 55,167 in the e2e build, the plus 4.
   // 150,255 / 55,171 -> 146,589 / 54,099 on 2026-11-02, plate-story over main acf3d999 (#392): the runtime is smaller over #393 (locale-gaps moved words into late chunks). Measured 146,585 / 54,095 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 146_589, maxGzip: 54_099 },
+  // 146,589 / 54,099 -> 147,608 / 54,517 on 2026-11-03, caption-split over main f4625ad1: the briefing's sentences are cut by one shared function that counts the quotes in pairs and ends Japanese sentences at their full stops (src/components/proseSentences.js, imported by proseMarks.js and speakerLine.js). Measured 147,604 / 54,513 in the e2e build, the plus 4.
+  // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_532, maxGzip: 54_533 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -289,7 +291,12 @@ const budgets = [
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_392, maxGzip: 68_379 },
+  // 189,392 / 68,379 -> 189,888 / 68,598 on 2026-11-04, seo-locale-start over main 22f43342: src/locale.js reads the start page's folder (/en/, /ja/) as a language, a choice made there moves to the chosen language's folder, and a page opened by ?lang= points its canonical at the folder. Measured 189,884 / 68,594 in the e2e build, the plus 4.
+  // 189,392 / 68,379 -> 189,572 / 68,438 on 2026-11-03, perf-first-visit over main 8e930107: the intro fetches the runtime on idle only once the page has loaded (AppContent). Measured 189,568 / 68,434 in the e2e build, the plus 4.
+  // 189,392 / 68,379 -> 189,407 / 68,395 on 2026-11-04, en-ko-leak over main 557d17bb: simplifyPlayerText reads the page's language (src/locale.js) and hands a page in another language back its own text. Measured 189,403 / 68,391 in the e2e build, the plus 4.
+  // 189,407 / 68,395 -> 189,415 / 68,397 on 2026-11-04, en-ko-leak over main 22f43342: the intro reads its title reading from its copy, and the phase chip prints the phase as written. Measured 189,411 / 68,393, the plus 4.
+  // 189,392 / 68,379 -> 190,097 / 68,670 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the four lines above together (#433 #436 #445, with #429 #438). Measured 190,093 / 68,666 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 190_097, maxGzip: 68_670 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -601,7 +608,9 @@ const budgets = [
   // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
   // 200,372 / 37,500 -> 200,439 / 37,512 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: on 360px or less the Korean and
   // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 200,435 / 37,508, plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_439, maxGzip: 37_512 },
+  // 200,439 / 37,512 -> 200,479 / 37,521 on 2026-11-03, plate-sound-clip over main 8e930107: the scene's sound is centred in its
+  // transform, which the build keeps (it dropped the separate translate property). Measured 200,475 / 37,517 in the build, plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_479, maxGzip: 37_521 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1032,7 +1041,9 @@ const budgets = [
   // 1,203 / 693 measured, the gzip plus 4.
   // 1,203 / 697 -> 1,157 / 654 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,157 / 650 in the e2e build, the gzip plus 4.
-  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_157, maxGzip: 654 },
+  // 654 -> 669 gzip on 2026-11-03, caption-split: its sentence cut is now proseSentences.js's, imported from the chunk that holds it rather than written here. Measured 1,153 / 665 in the e2e build, the plus 4.
+  // 1,157 / 669 -> 1,056 / 623 on 2026-11-04, caption-split: speechSpans reads proseSentences.js's pairedQuotes instead of its own loop. Measured 1,052 / 619 in the e2e build, the plus 4.
+  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_056, maxGzip: 623 },
   // [batch-c] 묶음 B (#277):
   // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
   // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
@@ -1051,6 +1062,9 @@ const budgets = [
   // 2,052 / 1,077 -> 1,652 / 907 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,652 / 903 in the e2e build, the gzip plus 4.
   { pattern: /^CaseCast-.*\.js$/, maxBytes: 1_652, maxGzip: 907 },
+  // The locale preload (scripts/locale-preload.mjs, perf-first-visit 2026-11-03): the other languages' first files by name,
+  // asked for from the head. Grows with each language's between-cases files; measured 951 raw / 492 gzip with two languages.
+  { pattern: /^locale-preload-[0-9a-f]{8}\.js$/, maxBytes: 1_600, maxGzip: 700 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -1092,7 +1106,8 @@ const budgets = [
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
   // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_807, maxGzip: 53_485 },
+  // 149,807 / 53,485 -> 149,834 / 53,489 on 2026-11-04, en-ko-leak over main 22f43342: the brand's reading under the wordmark, Trigger Lab (screens.intro.titleReading, the user's choice 1). Measured 149,830 / 53,485, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_834, maxGzip: 53_489 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1225,7 +1240,15 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
-const FIRST_PAINT_BUDGETS = { ko: 426_845, en: 483_841, ja: 490_518 };
+// 426,845 / 483,841 / 490,518 -> 427,509 / 484,083 / 491,247 on 2026-11-04, seo-locale-start over main 22f43342 (canon fixes 1·2 and the glossary in): index.html's description from the about page and its no-script intro and five links, and the entry's folder languages; English and Japanese are now measured from their own start pages (/en/, /ja/) in place of the Korean index.html. Measured 427,505 / 484,079 / 491,243, the plus 4.
+// 426,845 / 483,841 / 490,518 -> 427,540 / 484,538 / 491,206 on 2026-11-04, perf-first-visit over main 22f43342: index.html names /assets/locale-preload-<hash>.js (a Korean page runs it and asks for nothing; it reads the stored language, then the folder, then ?lang=), and the entry waits for `load` before it warms the runtime. Measured 427,536 / 484,534 / 491,202, the plus 4.
+// 426,845 / 483,841 / 490,518 -> 426,858 / 483,850 / 490,522 on 2026-11-04, en-ko-leak over main 557d17bb: the language check in simplifyPlayerText. Measured 426,854 / 483,846 / 490,518, the plus 4.
+// 426,858 / 483,850 / 490,522 -> 426,861 / 483,864 / 490,539 on 2026-11-04, en-ko-leak over main 22f43342: the title reading in each dictionary (Trigger Lab, トリガーラボ). Measured 426,857 / 483,860 / 490,535, the plus 4.
+// 426,845 / 483,820 / 490,505 -> 426,850 / 483,826 / 490,511 on 2026-11-03, plate-sound-clip over main 8e930107: the scene sound is centred in its transform (the index CSS grows; the critical CSS only its hash). Measured 426,846 / 483,822 / 490,507 in the CI e2e build, the plus 4.
+// 426,850 / 483,826 / 490,511 -> 426,855 / 483,845 / 490,517 on 2026-11-04, plate-sound-clip over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,851 / 483,841 / 490,513 in the e2e build, the plus 4.
+// 426,855 / 483,845 / 490,517 -> 426,852 / 483,851 / 490,519 on 2026-11-04, plate-sound-clip over main 22f43342 (#431 shortened the English dictionary, #444). Measured 426,848 / 483,847 / 490,515 in the e2e build, the plus 4.
+// 426,845 / 483,841 / 490,518 -> 428,231 / 484,811 / 491,981 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the lines above together (#429 #433 #436 #445 #438); the Korean page now names the locale preload, and English and Japanese are measured from /en/ and /ja/. Measured 428,227 / 484,807 / 491,977 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 428_231, en: 484_811, ja: 491_981 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1356,7 +1379,10 @@ function checkBudget(file, budget) {
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
 // 3,643 -> 3,651 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the warm-up list's hashed names only. Measured 10,135 / 3,647, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_139, maxGzip: 3_651 };
+// 10,139 / 3,651 -> 10,237 / 3,676 on 2026-11-04, seo-locale-start over main 22f43342: the worker answers /en/ and /ja/ as the page (LANGUAGE_START). Measured 10,233 / 3,672, the plus 4.
+// 10,139 / 3,651 -> 10,176 / 3,662 on 2026-11-04, perf-first-visit over main 22f43342: the locale preload joins the files the page names. Measured 10,172 / 3,658, the plus 4.
+// 10,139 / 3,651 -> 10,274 / 3,696 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the two lines above together (the start pages and the locale preload). Measured 10,270 / 3,692 in the e2e build, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_274, maxGzip: 3_696 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
@@ -1413,8 +1439,13 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
     if (name) queue.push(name);
     else failures.push(`No chunk matches ${pattern} in dist/assets; the ${lang} first paint waits on it.`);
   }
-  let total = firstPaint;
-  const extra = [];
+  // The language's own start page (/en/, /ja/, since 11-03) in place of the
+  // Korean index.html: the same files, its words.
+  const ownPage = path.join(distDir, lang, "index.html");
+  const ownBytes = existsSync(ownPage) ? gzipSync(readFileSync(ownPage)).length : null;
+  if (ownBytes === null) failures.push(`dist/${lang}/index.html is missing; the ${lang} start page is written by startPages() in vite.config.js.`);
+  let total = firstPaint - gzipSync(Buffer.from(html)).length + (ownBytes ?? gzipSync(Buffer.from(html)).length);
+  const extra = [`${lang}/index.html ${ownBytes}`];
   while (queue.length) {
     const name = queue.shift();
     if (counted.has(name)) continue;
@@ -1425,7 +1456,7 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
     queue.push(...staticImports(name));
   }
   if (total > FIRST_PAINT_BUDGETS[lang]) {
-    failures.push(`The ${lang} first paint (?lang=${lang}) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
+    failures.push(`The ${lang} first paint (/${lang}/) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
   }
   reported.push(`${lang} first paint ${total} bytes (the Korean ${firstPaint}, ${extra.join(", ")})`);
 }

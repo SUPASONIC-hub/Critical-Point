@@ -206,15 +206,34 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     if (!saved) backUpUnreadableSave(readUnreadableSave());
   }, [saved]);
 
-  // The intro is up; fetch the runtime while the player reads it.
+  // The intro is up; fetch the runtime while the player reads it -- once the
+  // page has loaded, not before. Asked for while the intro's own files were
+  // still arriving, the runtime (about 176KB with the season copy beside it)
+  // shared a phone's slow connection with them and ran its modules before
+  // the first paint: on 4x CPU and slow 4G the Korean intro, which paints
+  // without waiting for a dictionary and so reached this effect soonest,
+  // painted at 11.5s instead of 8s, with 3.5s of blocking (perf-first-visit,
+  // 2026-11-03). Pointing at or focusing 시작 still fetches it at once
+  // (IntroScreen).
   useEffect(() => {
     if (runtimeActive) return undefined;
-    if (typeof globalThis.requestIdleCallback === "function") {
-      const handle = globalThis.requestIdleCallback(prefetchGameRuntime, { timeout: RUNTIME_PREFETCH_TIMEOUT_MS });
-      return () => globalThis.cancelIdleCallback?.(handle);
+    let cancel = () => {};
+    const whenIdle = () => {
+      if (typeof globalThis.requestIdleCallback === "function") {
+        const handle = globalThis.requestIdleCallback(prefetchGameRuntime, { timeout: RUNTIME_PREFETCH_TIMEOUT_MS });
+        cancel = () => globalThis.cancelIdleCallback?.(handle);
+      } else {
+        const handle = globalThis.setTimeout(prefetchGameRuntime, RUNTIME_PREFETCH_TIMEOUT_MS / 2);
+        cancel = () => globalThis.clearTimeout(handle);
+      }
+    };
+    if (globalThis.document?.readyState === "complete") {
+      whenIdle();
+    } else {
+      globalThis.addEventListener("load", whenIdle, { once: true });
+      cancel = () => globalThis.removeEventListener("load", whenIdle);
     }
-    const handle = globalThis.setTimeout(prefetchGameRuntime, RUNTIME_PREFETCH_TIMEOUT_MS / 2);
-    return () => globalThis.clearTimeout(handle);
+    return () => cancel();
   }, [runtimeActive]);
 
   if (runtimeActive) {

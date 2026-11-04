@@ -84,7 +84,7 @@ test("the start screen's foot opens the five pages in the screen's language, and
   await expect(page).toHaveURL(/\/ja\/contact\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "お問い合わせ" })).toBeVisible();
   await page.getByRole("navigation").getByRole("link", { name: "ゲームに戻る" }).click();
-  await expect(page).toHaveURL(/\/\?lang=ja$/);
+  await expect(page).toHaveURL(/\/ja\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
 });
 
@@ -104,6 +104,28 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const xml = await sitemap.text();
-  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 1);
+  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3);
   for (const [path] of PAGES) expect(xml, path).toContain(`<loc>${path}</loc>`);
+  for (const path of ["/", "/en/", "/ja/"]) expect(xml, path).toContain(`<loc>${path}</loc>`);
 });
+
+// The start page in English and Japanese (11-03): its own file at its folder,
+// read with no script as a crawler reads it, and the game in that language
+// once the script runs.
+for (const [language, start, title] of [
+  ["en", "Start the prologue", "Critical Point - Every 45 seconds, your judgment goes on the record"],
+  ["ja", "プロローグを始める", "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される"],
+]) {
+  test(`/${language}/ is the start page in its language, to a crawler and to a player`, async ({ page, request }) => {
+    const response = await request.get(`/${language}/`);
+    expect(response.status()).toBe(200);
+    const html = await response.text();
+    expect(html).toMatch(new RegExp(`<html lang="${language}">`));
+    expect(html).toContain(`<title>${title}</title>`);
+    expect(html).toMatch(new RegExp(`<link rel="canonical" href="[^"]*/${language}/"`));
+    await page.goto(`/${language}/`);
+    await expect(page.locator("html")).toHaveAttribute("lang", language);
+    await expect(page.getByTestId("start-first-case")).toContainText(start);
+    await expect(page.locator(".intro-legal").getByRole("link").first()).toHaveAttribute("href", `/${language}/about.html`);
+  });
+}

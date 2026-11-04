@@ -15,7 +15,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
   // the runtime filled it with a function that did nothing, and once here --
   // and the screen picked between them with `??` on thirteen names.
   const {
-    common: { AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase },
+    common: { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge },
     gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave, tableRisk },
     status: { resources, resourceMeta, progress, routePath },
@@ -35,7 +35,6 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
       </p>
       <GameHeader
         node={node}
-        simplify={simplifyPlayerText}
         sceneTitleRef={titleRef}
         onSave={() => saveCurrentGame()}
         // Leaving on purpose keeps a bet on the table exactly as it stands.

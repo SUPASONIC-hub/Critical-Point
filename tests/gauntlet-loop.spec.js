@@ -557,6 +557,21 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await expect(page.getByTestId("gauntlet-purse-change")).toHaveClass(/is-down/);
   await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(/^▼ −[\d,]+$/);
   await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+
+  // And a cash's verdict under reduced motion (2026-11-03): the big ×N and the
+  // +N under it are printed where they land and do not move -- no pop, no
+  // flight, nothing running in the slam while it is up.
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const cashed = page.locator(".gx-slam-cashed");
+  await expect(cashed).toBeVisible();
+  await expect(cashed.locator("strong").first()).toHaveCSS("animation-name", "none");
+  await expect(page.getByTestId("gauntlet-burst")).toHaveText(/^\+[\d,]+$/);
+  await expect(page.getByTestId("gauntlet-burst")).toHaveCSS("animation-name", "none");
+  expect(await cashed.evaluate((slam) => slam.getAnimations({ subtree: true }).map((motion) => motion.animationName ?? "transition"))).toEqual([]);
 });
 
 // The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
