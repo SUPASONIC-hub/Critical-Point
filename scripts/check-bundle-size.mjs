@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { WEB_AD_CODE_MARKERS } from "./adsense-config.mjs";
@@ -291,7 +291,8 @@ const budgets = [
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_392, maxGzip: 68_379 },
+  // 189,392 / 68,379 -> 189,888 / 68,598 on 2026-11-04, seo-locale-start over main 22f43342: src/locale.js reads the start page's folder (/en/, /ja/) as a language, a choice made there moves to the chosen language's folder, and a page opened by ?lang= points its canonical at the folder. Measured 189,884 / 68,594 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_888, maxGzip: 68_598 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1229,7 +1230,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
-const FIRST_PAINT_BUDGETS = { ko: 426_845, en: 483_841, ja: 490_518 };
+// 426,845 / 483,841 / 490,518 -> 427,509 / 484,083 / 491,247 on 2026-11-04, seo-locale-start over main 22f43342 (canon fixes 1·2 and the glossary in): index.html's description from the about page and its no-script intro and five links, and the entry's folder languages; English and Japanese are now measured from their own start pages (/en/, /ja/) in place of the Korean index.html. Measured 427,505 / 484,079 / 491,243, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_509, en: 484_083, ja: 491_247 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1360,7 +1362,8 @@ function checkBudget(file, budget) {
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
 // 3,643 -> 3,651 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the warm-up list's hashed names only. Measured 10,135 / 3,647, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_139, maxGzip: 3_651 };
+// 10,139 / 3,651 -> 10,237 / 3,676 on 2026-11-04, seo-locale-start over main 22f43342: the worker answers /en/ and /ja/ as the page (LANGUAGE_START). Measured 10,233 / 3,672, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_237, maxGzip: 3_676 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
@@ -1417,8 +1420,13 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
     if (name) queue.push(name);
     else failures.push(`No chunk matches ${pattern} in dist/assets; the ${lang} first paint waits on it.`);
   }
-  let total = firstPaint;
-  const extra = [];
+  // The language's own start page (/en/, /ja/, since 11-03) in place of the
+  // Korean index.html: the same files, its words.
+  const ownPage = path.join(distDir, lang, "index.html");
+  const ownBytes = existsSync(ownPage) ? gzipSync(readFileSync(ownPage)).length : null;
+  if (ownBytes === null) failures.push(`dist/${lang}/index.html is missing; the ${lang} start page is written by startPages() in vite.config.js.`);
+  let total = firstPaint - gzipSync(Buffer.from(html)).length + (ownBytes ?? gzipSync(Buffer.from(html)).length);
+  const extra = [`${lang}/index.html ${ownBytes}`];
   while (queue.length) {
     const name = queue.shift();
     if (counted.has(name)) continue;
@@ -1429,7 +1437,7 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
     queue.push(...staticImports(name));
   }
   if (total > FIRST_PAINT_BUDGETS[lang]) {
-    failures.push(`The ${lang} first paint (?lang=${lang}) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
+    failures.push(`The ${lang} first paint (/${lang}/) transfers ${total} bytes, over the ${FIRST_PAINT_BUDGETS[lang]} byte budget (the Korean ${firstPaint}, ${extra.join(", ")}).`);
   }
   reported.push(`${lang} first paint ${total} bytes (the Korean ${firstPaint}, ${extra.join(", ")})`);
 }

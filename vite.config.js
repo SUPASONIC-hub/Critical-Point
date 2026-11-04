@@ -7,7 +7,7 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
-import { crawlerFiles, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
 import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
@@ -404,6 +404,47 @@ function staticPages(analytics) {
 }
 
 /**
+ * The start page in English and Japanese, `/en/index.html` and
+ * `/ja/index.html` (scripts/site-pages.mjs `localizedStartPage`): the built
+ * index.html, after every plugin here has had its turn with it -- the
+ * critical CSS, the absolute links, the commit, the verification tags, the
+ * Google tag on a build with one -- with its title, description, cards,
+ * canonical and no-script text in that language. The host serves each at its
+ * folder, and the game opens in its language there (src/locale.js). Written
+ * at the very end of the bundle (`order: "post"`), when index.html is final;
+ * the service worker names its release for them without the commit
+ * (`shippedFiles`). The dev server answers the same two addresses.
+ */
+function startPages() {
+  const LANGUAGE_START = /^\/(en|ja)\/(?:index\.html)?$/;
+  return {
+    name: "start-pages",
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        const language = LANGUAGE_START.exec(new URL(request.url ?? "/", "http://dev.invalid").pathname)?.[1];
+        if (!language) return next();
+        try {
+          const html = await server.transformIndexHtml(request.url, readFileSync("index.html", "utf8"));
+          response.setHeader("Content-Type", "text/html; charset=utf-8");
+          response.end(localizedStartPage(html, language));
+        } catch (error) {
+          next(error);
+        }
+      });
+    },
+    generateBundle: {
+      order: "post",
+      handler(_options, bundle) {
+        const page = bundle["index.html"];
+        if (!page || page.type !== "asset") throw new Error("start-pages: the bundle has no index.html to write the English and Japanese start pages from.");
+        const html = typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8");
+        for (const [fileName, source] of Object.entries(renderStartPages(html, siteOrigin()))) this.emitFile({ type: "asset", fileName, source });
+      },
+    },
+  };
+}
+
+/**
  * Google AdSense site verification (출시 로드맵 2단계), off unless
  * ADSENSE_CLIENT is set (scripts/adsense-config.mjs, docs/web-ads.md). Off,
  * this plugin has no hook and the build is the one without it. With the
@@ -663,7 +704,7 @@ export default defineConfig(({ command, mode }) => {
       adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
-      serviceWorker(), renderHeaders(),
+      startPages(), serviceWorker(), renderHeaders(),
     ],
     // The debug console -- the case jump, unlock-all, the forced render error --
     // is dead code in a release, and this constant is how the bundler is told.
