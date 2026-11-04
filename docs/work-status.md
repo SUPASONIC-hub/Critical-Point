@@ -485,7 +485,7 @@ Still open, on purpose:
   (WebKit start button, `text-wrap: wrap` for ko and ja at 360px and under);
   #421 (summary artifacts for Funnel, Test Week and Verify Ranking); #408
   (coverage floors one under the measured values). Fourteen PRs merged,
-  production build-sha `811df47` (8e93010 deploying), 1,692 unit tests.
+  production build-sha `8e93010`, 1,692 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
