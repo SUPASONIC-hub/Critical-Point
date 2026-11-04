@@ -1102,7 +1102,8 @@ const budgets = [
   // 149,819 / 53,481 -> 149,843 / 53,493 on 2026-11-04, kd-bank-account over main 629de24c: KD Bank account and Last. Measured 149,839 / 53,489, the plus 4.
   // 149,852 / 53,501 -> 149,876 / 53,512 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): KD Bank account and Last over the canon fixes. Measured 149,872 / 53,508 locally and in Linux CI, the plus 4.
   // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_807, maxGzip: 53_485 },
+  // 149,807 / 53,485 -> 149,831 / 53,496 on 2026-11-04, kd-bank-account after merging main 2bd9a8ba (#435's glossary in): KD Bank account and Last over the glossary's terms. Measured 149,827 / 53,492, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_831, maxGzip: 53_496 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
