@@ -105,7 +105,8 @@ const budgets = [
   // 26,682 / 11,352 -> 26,792 / 11,414 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in the table's words (stage.purse, purseChange, purseSeason). Measured 26,788 / 11,410, the plus 4.
   // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_498, maxGzip: 13_286 },
+  // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_526, maxGzip: 13_304 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -295,6 +296,9 @@ const budgets = [
   // after its wait until a table has read the token (appConfig.takeTabToken). Measured 189,452 / 68,426 in the e2e build, the plus 4.
   // 189,456 / 68,430 -> 189,456 / 68,420 on 2026-11-04, flaky-fix-1103 over main 557d17bb. Measured 189,452 / 68,416 in the e2e build, the plus 4.
   // 189,456 / 68,420 -> 189,456 / 68,428 on 2026-11-04, flaky-fix-1103 over main 22f43342. Measured 189,452 / 68,424 in the e2e build, the plus 4.
+  // 68,379 -> 68,384 gzip on 2026-11-04, kd-bank-account over main 629de24c: the account's name in the table's words. Measured 68,380 gzip in the e2e build (raw under 189,392), the plus 4.
+  // 68,384 -> 68,378 gzip on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): measured 68,374 locally and in Linux CI, the plus 4.
+  // 68,378 -> 68,382 gzip the same day: Linux CI measured 68,378 on 986edea7 (4 more than locally), the plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 189_456, maxGzip: 68_428 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -609,7 +613,9 @@ const budgets = [
   // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 200,435 / 37,508, plus 4.
   // 200,439 / 37,512 -> 200,433 / 37,516 on 2026-11-04, a11y-1103 over main 5d5d6ae4: the hand's card edge at
   // --ui-line-field and its brighter hover (play.css). Measured 200,429 / 37,512 in the e2e build, plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_433, maxGzip: 37_516 },
+  // 200,439 / 37,512 -> 202,784 / 38,004 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 band (below 1025px) and corner box (money.css), with the shell, the music pills and the layers in front of the table moved out from under it. Measured 202,780 / 38,000 in the e2e build, the plus 4.
+  // 202,784 / 38,004 -> 203,176 / 38,053 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): the band's 44px press area, the reveal's sheet shortened by the band and the box, the band under the music pills. Measured 203,172 / 38,049 locally and in Linux CI alike, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_176, maxGzip: 38_053 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1093,7 +1099,9 @@ const budgets = [
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
   // 179,701 / 60,151 -> 179,747 / 60,166 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in Japanese. Measured 179,743 / 60,162, the plus 4.
   // 179,747 / 60,166 -> 179,769 / 60,178 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 179,765 / 60,174, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_769, maxGzip: 60_178 },
+  // 179,747 / 60,166 -> 179,771 / 60,177 on 2026-11-04, kd-bank-account over main 629de24c: KD銀行口座 and 直近. Measured 179,767 / 60,173, the plus 4.
+  // 179,769 / 60,178 -> 179,793 / 60,190 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): KD銀行口座 and 直近 over the canon fixes. Measured 179,789 / 60,186 locally and in Linux CI, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_793, maxGzip: 60_190 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1102,8 +1110,11 @@ const budgets = [
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
+  // 149,819 / 53,481 -> 149,843 / 53,493 on 2026-11-04, kd-bank-account over main 629de24c: KD Bank account and Last. Measured 149,839 / 53,489, the plus 4.
+  // 149,852 / 53,501 -> 149,876 / 53,512 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): KD Bank account and Last over the canon fixes. Measured 149,872 / 53,508 locally and in Linux CI, the plus 4.
   // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_807, maxGzip: 53_485 },
+  // 149,807 / 53,485 -> 149,831 / 53,496 on 2026-11-04, kd-bank-account after merging main 2bd9a8ba (#435's glossary in): KD Bank account and Last over the glossary's terms. Measured 149,827 / 53,492, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_831, maxGzip: 53_496 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1241,7 +1252,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,820 / 490,505 -> 426,892 / 483,868 / 490,553 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the entry chunk's late tab-token answer. Measured 426,888 / 483,864 / 490,549, the plus 4.
 // 426,892 / 483,868 / 490,553 -> 426,880 / 483,872 / 490,544 on 2026-11-04, flaky-fix-1103 over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,876 / 483,868 / 490,540 in the e2e build, the plus 4.
 // 426,880 / 483,872 / 490,544 -> 426,889 / 483,887 / 490,555 on 2026-11-04, flaky-fix-1103 over main 22f43342 (#431, #444). Measured 426,885 / 483,883 / 490,551 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_889, en: 483_887, ja: 490_555 };
+// 426,845 / 483,820 / 490,505 -> 427,340 / 484,329 / 491,013 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌's CSS in the index stylesheet and its words in the entry and the two dictionaries. Measured 427,336 / 484,325 / 491,009, the plus 4.
+// 426,845 / 483,841 / 490,518 -> 427,386 / 484,397 / 491,075 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424). Measured 427,382 / 484,393 / 491,071 locally and in Linux CI, the plus 4.
+// 427,386 / 484,397 / 491,075 -> 427,391 / 484,402 / 491,080 the same day: Linux CI measured 427,387 / 484,398 / 491,076 on 986edea7 (index.html and the entry 1 and 4 bytes more than locally), the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_391, en: 484_402, ja: 491_080 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

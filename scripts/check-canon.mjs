@@ -588,6 +588,16 @@ export const CANON = [
     find: /킹스데일[^."\d]{0,24}?지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%|지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%[^."\d]{0,12}킹스데일/g,
     allow: ["30"],
   },
+  {
+    id: "kd-account-name",
+    fact: "the player's money is the KD은행 계좌 -- KD Bank account, KD銀行口座 -- one name in each language",
+    // The table's words in the three languages (stage.purse). Read loosely --
+    // a space, a capital or a 銀行 written apart -- so a variant is caught
+    // rather than missed.
+    files: /src\/(?:copy|locales\/(?:en|ja)\/screens)\/table\.js$/,
+    find: /(KD ?은행 ?계좌|KD ?[Bb]ank [Aa]ccount|KD ?銀行 ?口座)/g,
+    allow: ["KD은행 계좌", "KD Bank account", "KD銀行口座"],
+  },
 
   // The audit of 2026-11-03 (122 findings, 26 of them sure) and the answers
   // that settled them. Some of these are words that must not stand beside a
@@ -977,6 +987,10 @@ const COPY_FILES = () => [
   "src/advancedSystems.js",
   "src/runtimeSystems.js",
   "src/featurePack.js",
+  // The KD은행 계좌's name, in the table's words.
+  "src/copy/table.js",
+  "src/locales/en/screens/table.js",
+  "src/locales/ja/screens/table.js",
 ];
 
 function main() {

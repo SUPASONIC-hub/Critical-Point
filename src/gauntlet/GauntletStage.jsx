@@ -120,7 +120,7 @@ export function GauntletStage({
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
   const stageRef = useRef(null);
-  // The bank rail's head, where the slam's amount flies to (moneyFeedback.js).
+  // The KD은행 계좌, where the slam's amount flies to (moneyFeedback.js).
   const purseRef = useRef(null);
   // The window this table was dealt on. Once the settle has written the next
   // one the run under this table has the hand in it already, and the purse
@@ -515,8 +515,6 @@ export function GauntletStage({
             </span>
           </div>
           <div className="gx-bank">
-            {/* The money first and largest (money-feedback, MoneyBurst.jsx). */}
-            <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
@@ -839,6 +837,11 @@ export function GauntletStage({
           reading={trackReading}
         />
       )}
+
+      {/* The KD은행 계좌, pinned over every phase of the window: after the
+          briefing page and the draft in the markup, so it is drawn over them
+          where they meet (MoneyBurst.jsx, money.css). */}
+      <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
 
       <TableNotices
         equipped={equipped}

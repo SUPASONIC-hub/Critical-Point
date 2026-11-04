@@ -77,6 +77,10 @@ test("a canon fact fails in any sentence shape and any file that states it", () 
 const ADDED_FACTS = [
   ["kd-owner-name", "src/nodes/case43.js", 'text: "최대주주 킹스턴 파트너스의 뉴욕 본사가 표를 정합니다."'],
   ["kd-owner-stake", "src/caseCopy.js", 'memo: ["킹스데일 파트너스 지분 49%"]'],
+  // The KD은행 계좌 keeps one name in each language (stage.purse).
+  ["kd-account-name", "src/copy/table.js", 'purse: "KD 은행계좌",'],
+  ["kd-account-name", "src/locales/en/screens/table.js", 'purse: "KD Bank Account",'],
+  ["kd-account-name", "src/locales/ja/screens/table.js", 'purse: "KD 銀行口座",'],
   ["committee-hour", "src/nodes/prologue03.js", 'text: "오후 3시 대출심사위원회 안건 목록이 새벽 다섯 시에 올라왔습니다."'],
   ["committee-hour", "src/nodes/prologue03.js", 'text: "오늘 오후 4시에 승인된 대출이 두 시간 만에 내려간 셈입니다."'],
   ["committee-countdown", "src/nodes/prologue03.js", 'memo: ["첨부 7 반려 처리: 13시 32분 -- 개회 38분 전"]'],
@@ -198,6 +202,9 @@ test("the canon check accepts the canon's own sentences", () => {
     ["src/nodes/case27.js", 'place: "군산 새봄신협 · 3번 창구"'],
     ["src/nodes/case23.js", 'memo: ["안건 제3호: 사내이사 윤상혁 선임 -- 경력란에 2023년 없음"]'],
     ["src/nodes/case02.js", 'text: "퇴직한 전 심사팀장 임경수가 끈으로 묶은 서류를 듭니다."'],
+    ["src/copy/table.js", '    purse: "KD은행 계좌",'],
+    ["src/locales/en/screens/table.js", '    purse: "KD Bank account",'],
+    ["src/locales/ja/screens/table.js", '    purse: "KD銀行口座",'],
   ];
   for (const [file, line] of agreed) assert.deepEqual(findCanonViolations(line, file), []);
 });

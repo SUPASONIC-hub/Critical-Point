@@ -27,10 +27,13 @@ const tableCopy = {
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
-    // The bank rail's head (moneyFeedback.js): the case pot and the vault
-    // together, the last hand's change (read with its sign; the arrow is not
-    // read) and the season's won and lost columns, filled signed.
-    purse: "보유",
+    // The KD은행 계좌 (moneyFeedback.js, MoneyBurst.jsx): the case pot and the
+    // vault together, the last hand's change after 방금 (read with its sign;
+    // the arrow is not read) and, a tap away, the season's won and lost
+    // columns, filled signed. docs/canon.md names the account; check:canon
+    // holds the three languages to it.
+    purse: "KD은행 계좌",
+    purseJust: "방금",
     purseChange: "방금 판 {change}",
     purseSeason: "시즌 누적 획득 {gained} · 손실 {lost}",
     streak: "연속",
