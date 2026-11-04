@@ -19,7 +19,7 @@ import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
 import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
-import { BOARD_BLOCKED_TERMS, foldBoardText } from "../src/boardBlockedTerms.js";
+import { BOARD_BLOCKED_TERMS, BOARD_TERM_GUARDS, BOARD_TERM_SCOPE, boardUnits, findBlockedTerm, foldBoardText } from "../src/boardBlockedTerms.js";
 
 /**
  * Data API grants guardrail.
@@ -2006,6 +2006,26 @@ withHeaders(null);
   const folded = (await db.query(`select s, public.board_fold_text(s) as f from unnest($1::text[]) as s`, [samples])).rows;
   const differ = folded.filter((row) => row.f !== foldBoardText(row.s));
   check(differ.length === 0, `public.board_fold_text and foldBoardText fold differently: ${differ.slice(0, 5).map((row) => `${JSON.stringify(row.s)} -> ${JSON.stringify(row.f)} / ${JSON.stringify(foldBoardText(row.s))}`).join("; ")}`);
+
+  // How far each word is matched (2026-11-04): the table's scope and guards
+  // are BOARD_TERM_SCOPE and BOARD_TERM_GUARDS, the server cuts a post into
+  // the units boardUnits does, and the two copies refuse the same posts.
+  const ruleRows = (await db.query(`select term, scope, pass_next, pass_after_kanji from public.board_blocked_terms`)).rows;
+  const ruleOf = (term) => ({ scope: BOARD_TERM_SCOPE[term] ?? "text", passNext: BOARD_TERM_GUARDS[term]?.passNext ?? [], passAfterKanji: BOARD_TERM_GUARDS[term]?.passAfterKanji ?? false });
+  const ruleDiffer = ruleRows.filter((row) => JSON.stringify({ scope: row.scope, passNext: row.pass_next, passAfterKanji: row.pass_after_kanji }) !== JSON.stringify(ruleOf(row.term)));
+  check(ruleDiffer.length === 0, `board_blocked_terms matches words otherwise than src/boardBlockedTerms.js: ${ruleDiffer.slice(0, 5).map((row) => `${row.term} ${row.scope} ${JSON.stringify(row.pass_next)} ${row.pass_after_kanji}`).join("; ")}`);
+  const matchSamples = [
+    ...samples,
+    "f u c k this", "F.u-c k!", "who're you", "this is shitty", "fucking hard", "Shiitake 볶음", "flame retardant", "retarded",
+    "다시 발견", "시발점", "병 신", "씨 . 발", "아저씨 팔", "まだ死ねない", "死ねよ", "死ねる", "田中氏ね", "お前ら氏ね", "氏ね",
+    "kill yourself", "a　b シ ネ", "ㅅ ㅂ", "who’re", "",
+  ];
+  const units = (await db.query(`select s, public.board_text_units(s) as u from unnest($1::text[]) as s`, [matchSamples])).rows;
+  const unitsDiffer = units.filter((row) => JSON.stringify(row.u) !== JSON.stringify(boardUnits(row.s)));
+  check(unitsDiffer.length === 0, `public.board_text_units and boardUnits cut differently: ${unitsDiffer.slice(0, 5).map((row) => `${JSON.stringify(row.s)} -> ${JSON.stringify(row.u)} / ${JSON.stringify(boardUnits(row.s))}`).join("; ")}`);
+  const matched = (await db.query(`select s, public.board_text_has_blocked_term(s) as hit from unnest($1::text[]) as s`, [matchSamples])).rows;
+  const matchDiffer = matched.filter((row) => row.hit !== (findBlockedTerm(row.s) !== null));
+  check(matchDiffer.length === 0, `public.board_text_has_blocked_term and findBlockedTerm disagree: ${matchDiffer.slice(0, 5).map((row) => `${JSON.stringify(row.s)} server ${row.hit} / browser ${findBlockedTerm(row.s)}`).join("; ")}`);
 }
 
 await allowed("read the board", "anon", `select id, nickname, body, created_at from public.board_posts`);
@@ -2198,6 +2218,74 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
     check((await one(`select hidden from public.board_posts where id = $1`, [second]))?.hidden === false, "board_auto_hide_writers = 4 hid a post at three writers.");
     await db.query(`delete from public.private_settings where name = 'board_auto_hide_writers'`);
     await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[target, second]]);
+
+    // The two limits on top (2026-11-04, the user's decision): the reports
+    // hide at most five posts an hour, everyone's together, and one writer's
+    // reports count toward hiding three times a day. Past either, the reports
+    // are stored and wait in the queue; the post stays up.
+    const limitPost = async (n) => Number((await one(
+      `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '한도점검', $2, $3) returning id`,
+      [sessionId(n), `한도를 볼 글 ${n}`, `board:limit-${n}`],
+    ))?.id);
+    const stateOf = async (id) => (await one(`select hidden, auto_hidden_at is not null as auto from public.board_posts where id = $1`, [id])) ?? {};
+    const reportPost = async (id, address, n) => {
+      withHeaders({ "x-forwarded-for": address });
+      await report(`report post ${id} from ${address}`, reportRow(id, "abuse", sessionId(n)));
+      withHeaders(null);
+    };
+    const hourKey = "global:board-auto-hide";
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [hourKey]);
+
+    // The hour's limit: four hidden this hour, so the fifth post goes and the sixth stays up.
+    await presetCounter(hourKey, 4);
+    const fifth = await limitPost(490);
+    const sixth = await limitPost(491);
+    for (const [index, address] of ["198.51.100.90", "198.51.100.91", "198.51.100.92"].entries()) {
+      await reportPost(fifth, address, 492 + index);
+      await reportPost(sixth, address, 495 + index);
+    }
+    {
+      const [hid, kept] = [await stateOf(fifth), await stateOf(sixth)];
+      check(hid.hidden === true && hid.auto === true, `the fifth post the reports hid in an hour stayed up: ${JSON.stringify(hid)}`);
+      check(kept.hidden === false && kept.auto === false, `the reports hid a sixth post in one hour: ${JSON.stringify(kept)}`);
+    }
+    queue = await queueOf();
+    check(queue.waiting.some((post) => post.postId === sixth && !post.autoHidden && post.writers === 3), `a post past the hour's limit does not wait in the queue as a reported post: ${JSON.stringify(queue.waiting)}`);
+    // A new hour: the next writer's report hides it.
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [hourKey]);
+    await reportPost(sixth, "198.51.100.93", 498);
+    check((await stateOf(sixth)).auto === true, "a post with enough writers was not hidden once the hour's limit had room again.");
+
+    // One writer's day: a writer whose three reports today counted is
+    // stored, and does not count, so two more writers leave the post up and a
+    // third hides it.
+    const spent = "198.51.100.94";
+    await presetCounter(`board-report:${await writerKey(spent)}|hide`, 3);
+    const daily = await limitPost(500);
+    await reportPost(daily, spent, 501);
+    await reportPost(daily, "198.51.100.95", 502);
+    await reportPost(daily, "198.51.100.96", 503);
+    {
+      const rows = (await db.query(`select actor_key, counts_for_hide from public.board_reports where post_id = $1`, [daily])).rows;
+      const spentKey = `board-report:${await writerKey(spent)}`;
+      check(rows.length === 3, `a writer past its day's limit was not stored: ${rows.length} reports.`);
+      check(rows.some((row) => row.actor_key === spentKey && row.counts_for_hide === false), "a writer past its day's limit counted toward hiding.");
+      check(rows.filter((row) => row.counts_for_hide === true).length === 2, "a writer within its day's limit did not count toward hiding.");
+    }
+    check((await stateOf(daily)).hidden === false, "a post was hidden by two writers and a writer past its day's limit.");
+    await reportPost(daily, "198.51.100.97", 504);
+    check((await stateOf(daily)).auto === true, "three writers within their day's limit did not hide a post.");
+    // A fourth report on a fourth post from a fresh writer is its fourth of the day: stored, not counted.
+    {
+      const fresh = "198.51.100.98";
+      const posts = [await limitPost(505), await limitPost(506), await limitPost(507), await limitPost(508)];
+      for (const [index, id] of posts.entries()) await reportPost(id, fresh, 509 + index);
+      const counted = (await db.query(`select post_id, counts_for_hide from public.board_reports where post_id = any($1::bigint[]) order by id`, [posts])).rows.map((row) => row.counts_for_hide);
+      check(JSON.stringify(counted) === JSON.stringify([true, true, true, false]), `one writer's four reports in a day counted as ${JSON.stringify(counted)}; the first three count.`);
+      await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [posts]);
+    }
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [hourKey]);
+    await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[fifth, sixth, daily]]);
   }
 }
 

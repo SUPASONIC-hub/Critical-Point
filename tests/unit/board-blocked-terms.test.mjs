@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { BOARD_BLOCKED_TERMS, findBlockedTerm, foldBoardText } from "../../src/boardBlockedTerms.js";
+import { BOARD_BLOCKED_TERMS, BOARD_TERM_GUARDS, BOARD_TERM_SCOPE, boardUnits, findBlockedTerm, foldBoardText } from "../../src/boardBlockedTerms.js";
 import { findBoardBlockedRefusal, getBoardBlockedRefusal } from "../../src/state/useBoard.js";
 
 /**
@@ -60,6 +60,43 @@ test("words that hold part of a blocked word are not refused", () => {
   }
   assert.equal(findBlockedTerm("병 신"), "병신");
   assert.equal(findBlockedTerm("作者死ね"), "死ね");
+});
+
+test("each word is matched only as far as its scope says (2026-11-04)", () => {
+  // Across words: two ordinary words that meet.
+  for (const text of ["finish it", "who really", "who're you", "다시 발견", "다시 팔았다", "아저씨 팔", "맘 충분히"]) {
+    assert.equal(findBlockedTerm(text), null, text);
+  }
+  // Inside a word: a short English word in an ordinary one.
+  for (const text of ["Scunthorpe", "Yamashita", "deshita", "Fukuoka", "flame retardant", "Shiitake"]) {
+    assert.equal(findBlockedTerm(text), null, text);
+  }
+  // The guards: 死ね going on as can or cannot die, 氏ね after a name.
+  for (const text of ["まだ死ねない", "死ねる", "田中氏ね"]) assert.equal(findBlockedTerm(text), null, text);
+  // And what is still refused.
+  for (const [text, term] of [
+    ["fucking hard", "fuck"], ["this is shitty", "shit"], ["Sh1i7t", "shit"], ["what bullshit", "bullshit"],
+    ["f u c k this", "fuck"], ["씨 . 발", "씨발"], ["진짜시발", "시발"], ["kill yourself", "killyourself"],
+    ["死ねよ", "死ね"], ["お前ら氏ね", "氏ね"], ["氏ね", "氏ね"],
+  ]) {
+    assert.equal(findBlockedTerm(text), term, text);
+  }
+});
+
+test("a post is cut into words at spaces and apostrophes, one-letter pieces joined", () => {
+  assert.deepEqual(boardUnits("씨 . 발 이게"), ["씨발", "이게"]);
+  assert.deepEqual(boardUnits("who’re you"), ["who", "re", "you"]);
+  assert.deepEqual(boardUnits("가　나다 f u"), ["가", "나다", "fu"]);
+  assert.deepEqual(boardUnits(""), []);
+});
+
+test("every scope and guard names a word on the list", () => {
+  for (const [term, scope] of Object.entries(BOARD_TERM_SCOPE)) {
+    assert.ok(BOARD_BLOCKED_TERMS.includes(term), term);
+    assert.ok(["token", "word"].includes(scope), term);
+    if (scope === "word") assert.match(term, /^[a-z]+$/, term);
+  }
+  for (const term of Object.keys(BOARD_TERM_GUARDS)) assert.ok(BOARD_BLOCKED_TERMS.includes(term), term);
 });
 
 test("the name is checked before the post, as the trigger checks them", () => {

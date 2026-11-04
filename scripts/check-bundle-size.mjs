@@ -289,8 +289,8 @@ const budgets = [
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
-  // 189,392 / 68,379 -> 190,149 / 68,591 on 2026-11-03, board-auto-hide over main 7fc3a1c4 (#409): the board's two blocked-word refusals (src/copy/boardPost.js), the server's two new messages read back, and the hook's check that loads the list on 글 남기기 (src/state/useBoard.js; the list itself is its own chunk, boardBlockedTerms). Measured 190,145 / 68,587 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 190_149, maxGzip: 68_591 },
+  // 189,392 / 68,379 -> 190,149 / 68,589 on 2026-11-04, board-auto-hide over main 557d17bb: the board's two blocked-word refusals (src/copy/boardPost.js), the server's two new messages read back, and the hook's check that loads the list on 글 남기기 (src/state/useBoard.js; the list itself is its own chunk, boardBlockedTerms). Measured 190,145 / 68,585 in the e2e build, the plus 4.
+  { pattern: /^index-.*.js$/, maxBytes: 190_149, maxGzip: 68_589 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1083,8 +1083,8 @@ const budgets = [
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
   // 179,701 / 60,151 -> 179,747 / 60,166 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in Japanese. Measured 179,743 / 60,162, the plus 4.
   // 179,747 / 60,166 -> 179,769 / 60,178 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 179,765 / 60,174, the plus 4.
-  // 179,747 / 60,166 -> 180,021 / 60,224 on 2026-11-03, board-auto-hide over main 7fc3a1c4 (#409): the two blocked-word refusals in Japanese. Measured 180,017 / 60,220, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_021, maxGzip: 60_224 },
+  // 179,769 / 60,178 -> 179,989 / 60,211 on 2026-11-04, board-auto-hide over main 557d17bb: the two blocked-word refusals in Japanese. Measured 179,985 / 60,207, the plus 4.
+  { pattern: /^locale-ja-index-.*.js$/, maxBytes: 179_989, maxGzip: 60_211 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1093,11 +1093,11 @@ const budgets = [
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
-  // 149,819 / 53,481 -> 150,017 / 53,526 on 2026-11-03, board-auto-hide over main 7fc3a1c4 (#409): the two blocked-word refusals in English. Measured 150,013 / 53,522, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_017, maxGzip: 53_526 },
-  // The board's blocked words and the folding they are matched through (src/boardBlockedTerms.js, 2026-11-03,
-  // board-auto-hide over main 7fc3a1c4 (#409)): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 1,547 / 1,075, the plus 4.
-  { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 1_551, maxGzip: 1_079 },
+  // 149,852 / 53,501 -> 149,999 / 53,526 on 2026-11-04, board-auto-hide over main 557d17bb: the two blocked-word refusals in English. Measured 149,995 / 53,522, the plus 4.
+  { pattern: /^locale-en-index-.*.js$/, maxBytes: 149_999, maxGzip: 53_526 },
+  // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
+  // 2026-11-04, board-auto-hide over main 557d17bb): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,049 / 1,707, the plus 4.
+  { pattern: /^boardBlockedTerms-.*.js$/, maxBytes: 3_053, maxGzip: 1_711 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1230,8 +1230,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
-// 426,845 / 483,820 / 490,505 -> 427,055 / 484,076 / 490,774 on 2026-11-04, board-auto-hide over main 5d5d6ae4: the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 427,051 / 484,072 / 490,770, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 427_055, en: 484_076, ja: 490_774 };
+// 426,845 / 483,841 / 490,518 -> 427,051 / 484,089 / 490,774 on 2026-11-04, board-auto-hide over main 557d17bb: the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 427,047 / 484,085 / 490,770, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_051, en: 484_089, ja: 490_774 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1362,8 +1362,8 @@ function checkBudget(file, budget) {
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
 // 3,643 -> 3,651 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the warm-up list's hashed names only. Measured 10,135 / 3,647, the plus 4.
-// 10,139 / 3,643 -> 10,179 / 3,662 on 2026-11-03, board-auto-hide over main 7fc3a1c4 (#409): one more file in the warm list, boardBlockedTerms; the worker's code did not change. Measured 10,175 / 3,658, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_179, maxGzip: 3_662 };
+// 10,139 / 3,651 -> 10,179 / 3,664 on 2026-11-04, board-auto-hide over main 557d17bb: one more file in the warm list, boardBlockedTerms; the worker's code did not change. Measured 10,175 / 3,660, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_179, maxGzip: 3_664 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

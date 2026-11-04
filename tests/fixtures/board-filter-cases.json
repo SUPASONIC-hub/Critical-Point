@@ -33,7 +33,12 @@
     { "label": "a blocked word in full-width Latin", "nickname": "점검", "body": "ＦＵＣＫ this case", "reason": "blocked" },
     { "label": "a blocked word in mixed case with digits between", "nickname": "점검", "body": "Sh1i7t ending", "reason": "blocked" },
     { "label": "a blocked word in half-width katakana", "nickname": "点検", "body": "ｷﾁｶﾞｲみたいな難しさ", "reason": "blocked" },
-    { "label": "a Japanese blocked word", "nickname": "点検", "body": "作者死ね", "reason": "blocked" }
+    { "label": "a Japanese blocked word", "nickname": "点検", "body": "作者死ね", "reason": "blocked" },
+    { "label": "a short English word with an ending", "nickname": "점검", "body": "this case is shitty", "reason": "blocked" },
+    { "label": "a short English word in a compound", "nickname": "점검", "body": "what bullshit ending", "reason": "blocked" },
+    { "label": "a short English word spelled out", "nickname": "점검", "body": "f u c k this case", "reason": "blocked" },
+    { "label": "死ねよ, which its guard does not pass", "nickname": "点検", "body": "作者は死ねよ", "reason": "blocked" },
+    { "label": "氏ね after kana", "nickname": "点検", "body": "お前ら氏ね", "reason": "blocked" }
   ],
   "accepted": [
     { "label": "ordinary prose with a sentence break", "nickname": "점검", "body": "Thanks. Me too. 3.5점 정도였어요." },
@@ -46,6 +51,18 @@
     { "label": "미친 as praise", "nickname": "점검", "body": "미친 연출이었습니다" },
     { "label": "シネマ, which holds しね", "nickname": "点検", "body": "シネマみたいな演出でした" },
     { "label": "ガイジン, which holds がいじ", "nickname": "点検", "body": "ガイジンの登場人物がよかった" },
-    { "label": "laughter after a syllable", "nickname": "점검", "body": "좋아요ㅋㅋㅋ 다음 주도 할게요" }
+    { "label": "laughter after a syllable", "nickname": "점검", "body": "좋아요ㅋㅋㅋ 다음 주도 할게요" },
+    { "label": "finish it, which holds shit across the space", "nickname": "점검", "body": "Finish it before the clock runs out" },
+    { "label": "who really, which holds whore across the space", "nickname": "점검", "body": "Who really signed the contract?" },
+    { "label": "Scunthorpe, which holds cunt", "nickname": "점검", "body": "Greetings from Scunthorpe" },
+    { "label": "Yamashita as a name, which holds shit", "nickname": "Yamashita", "body": "평범한 본문입니다" },
+    { "label": "deshita in romaji, which holds shit", "nickname": "点検", "body": "omoshiroi geemu deshita" },
+    { "label": "Fukuoka, which holds fuk", "nickname": "점검", "body": "Playing from Fukuoka tonight" },
+    { "label": "다시 발견, which holds 시발 across the space", "nickname": "점검", "body": "단서를 다시 발견했어요" },
+    { "label": "다시 팔았다, which holds 시팔 across the space", "nickname": "점검", "body": "주식을 다시 팔았다" },
+    { "label": "아저씨 팔, which holds 씨팔 across the space", "nickname": "점검", "body": "아저씨 팔이 아파 보였어요" },
+    { "label": "맘 충분히, which holds 맘충 across the space", "nickname": "점검", "body": "그 맘 충분히 이해해요" },
+    { "label": "まだ死ねない, which holds 死ね", "nickname": "点検", "body": "まだ死ねない気持ちになった" },
+    { "label": "田中氏ね, where 氏 is Mr", "nickname": "点検", "body": "田中氏ね、あの判断は見事でした" }
   ]
 }

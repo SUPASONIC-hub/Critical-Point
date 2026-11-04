@@ -19,8 +19,10 @@
  * insult (새끼 is a young animal, 씹다 is to chew, しね is in シネマ, がいじ in
  * ガイジン, dick in Dickens), and not names of groups by themselves. A word
  * goes on only when, folded, it is rare inside ordinary text in these three
- * languages: a match is a substring of the folded text, so a short or common
- * string would refuse ordinary posts. It is a floor, not a filter that catches
+ * languages, and each word is matched only as far as it has to be
+ * (`BOARD_TERM_SCOPE`, 2026-11-04: the review found "finish it", Yamashita,
+ * 다시 발견 and まだ死ねない refused while every word was a substring of the
+ * whole folded post). It is a floor, not a filter that catches
  * everything: the report button and the automatic hiding at three writers
  * (the same migration) are what deal with the rest.
  *
@@ -95,13 +97,112 @@ export const BOARD_BLOCKED_TERMS = [
   // English
   "fuck", "fuk", "fuq", "shit", "bitch", "bastard", "asshole", "cunt", "whore", "slut",
   "nigger", "nigga", "faggot", "retard", "chink", "wetback", "tranny", "killyourself",
+  // Compounds of the short words, which "word" matching leaves out (BOARD_TERM_SCOPE)
+  "bullshit", "dipshit", "horseshit", "motherfuck",
   // Japanese (folded: katakana are written as hiragana)
   "死ね", "氏ね", "殺すぞ", "ころすぞ", "きちがい", "基地外", "くたばれ", "ちゃんころ", "支那人",
 ];
 
-/** The first blocked word `value` holds, folded, or null. */
+/**
+ * How far each word is matched (any word not named here: "text"), in the
+ * units `boardUnits` cuts a post into:
+ *   "text"  anywhere in the folded post, across spaces: long words, which do
+ *           not turn up where two ordinary words meet.
+ *   "token" inside one unit: the two-syllable Korean words and 死ね・氏ね,
+ *           which do (다시 발견 holds 시발, 아저씨 팔 씨팔, 맘 충분히 맘충),
+ *           and the longer English words (who really holds whore).
+ *   "word"  a run of Latin letters inside a unit that is the word itself, or
+ *           the word and one of `BOARD_WORD_ENDINGS`: the short English words,
+ *           which sit inside ordinary ones (finish it, Yamashita, deshita,
+ *           Fukuoka, Scunthorpe, flame retardant).
+ * The table's `scope` column holds the same; scripts/check-grants.mjs holds
+ * the two equal.
+ */
+export const BOARD_TERM_SCOPE = {
+  씨발: "token", 시발: "token", 씨바: "token", 씨팔: "token", 시팔: "token", 씨빨: "token",
+  십새: "token", 씹새: "token", 씹할: "token", 병신: "token", 븅신: "token", 빙신: "token",
+  지랄: "token", 엠창: "token", 맘충: "token", 틀딱: "token", 짱깨: "token", 짱개: "token",
+  bitch: "token", bastard: "token", asshole: "token", whore: "token", nigger: "token", nigga: "token",
+  faggot: "token", wetback: "token", tranny: "token",
+  bullshit: "token", dipshit: "token", horseshit: "token", motherfuck: "token",
+  fuck: "word", fuk: "word", fuq: "word", shit: "word", cunt: "word", slut: "word", chink: "word", retard: "word",
+  死ね: "token", 氏ね: "token",
+};
+
+/** What may follow a "word" word inside its run: fucking, shitty, retarded, sluts. */
+export const BOARD_WORD_ENDINGS = ["s", "es", "ed", "er", "ers", "ing", "in", "y", "ty"];
+
+/**
+ * A match that does not count (the table's `pass_next` and `pass_after_kanji`):
+ *   passNext        the unit goes on with one of these right after the word:
+ *                   死ねない, 死ねる, 死ねた, 死ねます, 死ねず (can, could, cannot
+ *                   die). 死ね, 死ねよ and 死ねや are still refused.
+ *   passAfterKanji  the word comes right after a kanji: 田中氏ね is Mr Tanaka.
+ */
+export const BOARD_TERM_GUARDS = {
+  死ね: { passNext: ["な", "る", "た", "ま", "ず"], passAfterKanji: false },
+  氏ね: { passNext: [], passAfterKanji: true },
+};
+
+// Where a post is cut into words: whitespace (NFKC has made the wide and the
+// no-break spaces plain ones) and apostrophes (who're is two words). Written
+// out, so that `public.board_text_units` cuts at the same characters.
+const WORD_BREAK = /[\t\n\v\f\r \u0085\u1680\u2028\u2029\ufeff'\u2018\u2019]+/;
+
+/**
+ * The units "token" and "word" words are matched in: the post cut at
+ * `WORD_BREAK`, each piece folded, the pieces that fold to nothing left out,
+ * and a run of one-letter pieces joined back (씨 . 발 and f u c k are one word
+ * spelled out). `public.board_text_units` takes the same steps.
+ */
+export function boardUnits(value) {
+  const units = [];
+  let run = "";
+  for (const piece of String(value ?? "").normalize("NFKC").split(WORD_BREAK)) {
+    const word = foldBoardText(piece);
+    if (!word) continue;
+    if ([...word].length === 1) {
+      run += word;
+      continue;
+    }
+    if (run) units.push(run);
+    run = "";
+    units.push(word);
+  }
+  if (run) units.push(run);
+  return units;
+}
+
+const KANJI = /[一-鿿]/;
+
+/** Whether `unit` holds `term` at a place its guards do not pass. */
+function holds(unit, term) {
+  const guard = BOARD_TERM_GUARDS[term];
+  for (let at = unit.indexOf(term); at >= 0; at = unit.indexOf(term, at + 1)) {
+    if (!guard) return true;
+    if (guard.passAfterKanji && at > 0 && KANJI.test(unit[at - 1])) continue;
+    const next = unit.slice(at + term.length);
+    if (guard.passNext.some((start) => next.startsWith(start))) continue;
+    return true;
+  }
+  return false;
+}
+
+/** Whether a Latin run is `term`, or `term` and an ending. */
+const isWord = (run, term) => run === term || (run.startsWith(term) && BOARD_WORD_ENDINGS.includes(run.slice(term.length)));
+
+/** The first blocked word `value` holds, matched as `BOARD_TERM_SCOPE` says, or null. */
 export function findBlockedTerm(value, terms = BOARD_BLOCKED_TERMS) {
   const folded = foldBoardText(value);
   if (!folded) return null;
-  return terms.find((term) => folded.includes(term)) ?? null;
+  const units = boardUnits(value);
+  const runs = units.flatMap((unit) => unit.split(/[^a-z]+/).filter(Boolean));
+  return (
+    terms.find((term) => {
+      const scope = BOARD_TERM_SCOPE[term] ?? "text";
+      if (scope === "word") return runs.some((run) => isWord(run, term));
+      if (scope === "token") return units.some((unit) => holds(unit, term));
+      return holds(folded, term);
+    }) ?? null
+  );
 }
