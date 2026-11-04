@@ -321,6 +321,8 @@ update public.board_blocked_terms set scope = 'word'
  where term in ('fuck', 'fuk', 'fuq', 'shit', 'cunt', 'slut', 'chink', 'retard');
 update public.board_blocked_terms set pass_next = array['な', 'る', 'た', 'ま', 'ず'] where term = '死ね';
 update public.board_blocked_terms set pass_after_kanji = true where term = '氏ね';
+-- 시발점 (始發點, a starting point) is an ordinary word.
+update public.board_blocked_terms set pass_next = array['점'] where term = '시발';
 
 create or replace function public.board_fold_text(p_text text)
 returns text

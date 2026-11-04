@@ -137,9 +137,11 @@ export const BOARD_WORD_ENDINGS = ["s", "es", "ed", "er", "ers", "ing", "in", "y
  *   passNext        the unit goes on with one of these right after the word:
  *                   死ねない, 死ねる, 死ねた, 死ねます, 死ねず (can, could, cannot
  *                   die). 死ね, 死ねよ and 死ねや are still refused.
+ *                   시발점 (始發點, a starting point) is a word of its own.
  *   passAfterKanji  the word comes right after a kanji: 田中氏ね is Mr Tanaka.
  */
 export const BOARD_TERM_GUARDS = {
+  시발: { passNext: ["점"], passAfterKanji: false },
   死ね: { passNext: ["な", "る", "た", "ま", "ず"], passAfterKanji: false },
   氏ね: { passNext: [], passAfterKanji: true },
 };

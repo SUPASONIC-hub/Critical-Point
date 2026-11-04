@@ -38,7 +38,9 @@
     { "label": "a short English word in a compound", "nickname": "점검", "body": "what bullshit ending", "reason": "blocked" },
     { "label": "a short English word spelled out", "nickname": "점검", "body": "f u c k this case", "reason": "blocked" },
     { "label": "死ねよ, which its guard does not pass", "nickname": "点検", "body": "作者は死ねよ", "reason": "blocked" },
-    { "label": "氏ね after kana", "nickname": "点検", "body": "お前ら氏ね", "reason": "blocked" }
+    { "label": "氏ね after kana", "nickname": "点検", "body": "お前ら氏ね", "reason": "blocked" },
+    { "label": "시발 alone, which the 시발점 guard does not pass", "nickname": "점검", "body": "시발 진짜", "reason": "blocked" },
+    { "label": "시발놈", "nickname": "점검", "body": "그 시발놈이 범인", "reason": "blocked" }
   ],
   "accepted": [
     { "label": "ordinary prose with a sentence break", "nickname": "점검", "body": "Thanks. Me too. 3.5점 정도였어요." },
@@ -63,6 +65,8 @@
     { "label": "아저씨 팔, which holds 씨팔 across the space", "nickname": "점검", "body": "아저씨 팔이 아파 보였어요" },
     { "label": "맘 충분히, which holds 맘충 across the space", "nickname": "점검", "body": "그 맘 충분히 이해해요" },
     { "label": "まだ死ねない, which holds 死ね", "nickname": "点検", "body": "まだ死ねない気持ちになった" },
-    { "label": "田中氏ね, where 氏 is Mr", "nickname": "点検", "body": "田中氏ね、あの判断は見事でした" }
+    { "label": "田中氏ね, where 氏 is Mr", "nickname": "点検", "body": "田中氏ね、あの判断は見事でした" },
+    { "label": "시발점, a starting point", "nickname": "점검", "body": "시발점" },
+    { "label": "시발점 in a sentence", "nickname": "점검", "body": "이번 일의 시발점은 그 서명이었다" }
   ]
 }

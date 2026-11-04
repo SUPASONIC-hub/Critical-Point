@@ -72,11 +72,11 @@ test("each word is matched only as far as its scope says (2026-11-04)", () => {
     assert.equal(findBlockedTerm(text), null, text);
   }
   // The guards: 死ね going on as can or cannot die, 氏ね after a name.
-  for (const text of ["まだ死ねない", "死ねる", "田中氏ね"]) assert.equal(findBlockedTerm(text), null, text);
+  for (const text of ["まだ死ねない", "死ねる", "田中氏ね", "시발점", "이번 일의 시발점은"]) assert.equal(findBlockedTerm(text), null, text);
   // And what is still refused.
   for (const [text, term] of [
     ["fucking hard", "fuck"], ["this is shitty", "shit"], ["Sh1i7t", "shit"], ["what bullshit", "bullshit"],
-    ["f u c k this", "fuck"], ["씨 . 발", "씨발"], ["진짜시발", "시발"], ["kill yourself", "killyourself"],
+    ["f u c k this", "fuck"], ["씨 . 발", "씨발"], ["진짜시발", "시발"], ["시발놈", "시발"], ["kill yourself", "killyourself"],
     ["死ねよ", "死ね"], ["お前ら氏ね", "氏ね"], ["氏ね", "氏ね"],
   ]) {
     assert.equal(findBlockedTerm(text), term, text);
