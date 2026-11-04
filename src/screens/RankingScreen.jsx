@@ -97,7 +97,7 @@ export function RankingScreen({
                   const vaultPerCase = Math.round(entry.summary?.gauntlet?.vault / entry.summary?.completedCaseCount);
                   return (
                   <div role="listitem" className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
-                    <span className="sr-only">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
+                    <span className="sr-only" data-testid="ranking-place">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
                     <strong className="ranking-position" aria-hidden="true">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.headline}</b>

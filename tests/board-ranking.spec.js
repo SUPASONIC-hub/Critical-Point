@@ -357,9 +357,12 @@ test("no ranking row can take the ranking screen down", async ({ page }) => {
   await expect(list.getByRole("listitem")).toHaveCount(rows.length);
   for (const [index, row] of (await page.locator(".ranking-row").all()).entries()) {
     await expect(row).toHaveAttribute("role", "listitem");
-    // The place is the row's first sr-only line; a season-complete badge says
-    // its record's name in another one (2026-11-03).
-    await expect(row.locator(".sr-only").first()).toHaveText(`${index + 1}위`);
+    // Each row says its place once, in its own sr-only line (ranking-place);
+    // a season-complete badge says its record's name in another (2026-11-03).
+    const place = row.getByTestId("ranking-place");
+    await expect(place).toHaveCount(1);
+    await expect(place).toHaveClass("sr-only");
+    await expect(place).toHaveText(`${index + 1}위`);
     await expect(row.locator(".ranking-position")).toHaveAttribute("aria-hidden", "true");
   }
   await expect(page.locator(".ranking-row").first()).toContainText("주요 압박 책임");
