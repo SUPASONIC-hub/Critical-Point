@@ -2,7 +2,7 @@
 export default {
   subtitle: "Every 45 seconds, your judgment goes on the record",
   premise:
-    "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last probation task.",
+    "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last trainee task.",
   startButton: "Start the prologue",
   briefingLink: "Read the briefing first",
   ranking: "Ranking",
@@ -70,8 +70,8 @@ export default {
       public: { title: "The analyst who kept the record", premise: "You remember longest that a judgment no one writes down is left nowhere." },
     },
     prologues: {
-      courier: { title: "The factory of 11", text: "What you remember longest is Onsae Packaging, the last assignment of your probation. Behind one sheet of paper hung the November of 11 employees." },
-      lab: { title: "The night of the dissent", text: "What you remember longest is the dissent you wrote alone. It began, in the last assignment of your probation, with one line of 40 million won left out of the total." },
+      courier: { title: "The factory of 11", text: "What you remember longest is Onsae Packaging, the last assignment of your traineeship. Behind one sheet of paper hung the November of 11 employees." },
+      lab: { title: "The night of the dissent", text: "What you remember longest is the dissent you wrote alone. It began, in the last assignment of your traineeship, with one line of 40 million won left out of the total." },
       public: { title: "The empty signature field", text: "What you remember longest is a trainee evaluation with only the speed box filled in and the signature field left empty. From that day on, you write your judgments down." },
     },
   },
