@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-04 (the state of `main` at `5d5d6ae`, after the dev-tooling bump (#385) [placeholder: later 11-04 merges], and before that after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-04 (the state of `main` at `7ddced5`, after the dependency bumps (#385, #386), seven time-balanced e2e shards (#415), canon fixes 1 and 2 (#424, #435) and the README restore (#444) [placeholder: later 11-04 merges], and before that after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -487,14 +487,28 @@ Still open, on purpose:
   (coverage floors one under the measured values). Fourteen PRs merged,
   production build-sha `8e93010`, 1,692 unit tests.
 - 2026-11-04: #385 (dependabot `dev-tooling`: `@electric-sql/pglite`
-  0.5.11 to 0.5.13, `supabase` CLI 2.121.0 to 2.122.0; no game code or
-  migration changed). [placeholder: later 11-04 merges, filled at the evening
-  cleanup.] In progress: `kd-bank-account` (an always-visible "KD은행 계좌"
-  balance on every play phase, display only, before W47; spending it as
-  currency at the relic draft comes after W47 in the 11-30 bundle) and
-  `credits-alice` (credits: STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE).
-  [placeholder: final count] PRs merged (one so far), production build-sha
-  [placeholder: `5d5d6ae` this morning], 1,692 unit tests.
+  0.5.11 to 0.5.13, `supabase` CLI 2.121.0 to 2.122.0); #386 (dependabot
+  `runtime`: `lucide-react` 1.61.0 to 1.64.0); #415 (`ci-shards`: main
+  Verify's `verify-e2e` from five to seven shards, split by the time each
+  test took in CI rather than by count -- `tests/e2e-shards.json`, `npm run
+  e2e:rebalance`; 42 units, 68.7 minutes in all, every shard 9.8 minutes on
+  the last four main runs); #424 (`canon-fixes-1`: the 26 high-confidence
+  findings of the 11-03 canon audit and four in progress, in ko, en and ja,
+  wording only; the first day at work stays April 9 and case 31 says "ten
+  days before", the three beside you on the 11-14 circular are trainees who
+  have finished); #435 (`canon-fixes-2`: 21 more findings raised from
+  medium, in ko, en and ja; A044, when Haeon Partners was wound up, left for a
+  story decision; case 46's first `c46_manifest` label cut from 34 to 30
+  characters); #444 (`readme-restore-1104`: the README put back after #415's
+  merge resolved a conflict with `git checkout --ours` and took the whole
+  file back to the branch's old copy; only the unit test count kept).
+  [placeholder: later 11-04 merges, filled at the evening cleanup.] In
+  progress: `kd-bank-account` (an always-visible "KD은행 계좌" balance on
+  every play phase, display only, before W47; spending it as currency at the
+  relic draft comes after W47 in the 11-30 bundle) and `credits-alice`
+  (credits: STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE). Six PRs merged so
+  far (main `7ddced5`), production build-sha `557d17b`, 1,704 unit tests
+  [placeholder: count, main, production and tests rechecked in the evening].
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
