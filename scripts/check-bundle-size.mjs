@@ -295,8 +295,8 @@ const budgets = [
   // 189,392 / 68,379 -> 189,572 / 68,438 on 2026-11-03, perf-first-visit over main 8e930107: the intro fetches the runtime on idle only once the page has loaded (AppContent). Measured 189,568 / 68,434 in the e2e build, the plus 4.
   // 189,392 / 68,379 -> 189,407 / 68,395 on 2026-11-04, en-ko-leak over main 557d17bb: simplifyPlayerText reads the page's language (src/locale.js) and hands a page in another language back its own text. Measured 189,403 / 68,391 in the e2e build, the plus 4.
   // 189,407 / 68,395 -> 189,415 / 68,397 on 2026-11-04, en-ko-leak over main 22f43342: the intro reads its title reading from its copy, and the phase chip prints the phase as written. Measured 189,411 / 68,393, the plus 4.
-  // BUNDLE-TODO en-ko
-  { pattern: /^index-.*\.js$/, maxBytes: 189_888, maxGzip: 68_598 },
+  // 189,392 / 68,379 -> 190,097 / 68,670 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the four lines above together (#433 #436 #445, with #429 #438). Measured 190,093 / 68,666 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 190_097, maxGzip: 68_670 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1247,8 +1247,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,820 / 490,505 -> 426,850 / 483,826 / 490,511 on 2026-11-03, plate-sound-clip over main 8e930107: the scene sound is centred in its transform (the index CSS grows; the critical CSS only its hash). Measured 426,846 / 483,822 / 490,507 in the CI e2e build, the plus 4.
 // 426,850 / 483,826 / 490,511 -> 426,855 / 483,845 / 490,517 on 2026-11-04, plate-sound-clip over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,851 / 483,841 / 490,513 in the e2e build, the plus 4.
 // 426,855 / 483,845 / 490,517 -> 426,852 / 483,851 / 490,519 on 2026-11-04, plate-sound-clip over main 22f43342 (#431 shortened the English dictionary, #444). Measured 426,848 / 483,847 / 490,515 in the e2e build, the plus 4.
-// BUNDLE-TODO plate
-const FIRST_PAINT_BUDGETS = { ko: 427_509, en: 484_083, ja: 491_247 };
+// 426,845 / 483,841 / 490,518 -> 428,231 / 484,811 / 491,981 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the lines above together (#429 #433 #436 #445 #438); the Korean page now names the locale preload, and English and Japanese are measured from /en/ and /ja/. Measured 428,227 / 484,807 / 491,977 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 428_231, en: 484_811, ja: 491_981 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1381,8 +1381,8 @@ function checkBudget(file, budget) {
 // 3,643 -> 3,651 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the warm-up list's hashed names only. Measured 10,135 / 3,647, the plus 4.
 // 10,139 / 3,651 -> 10,237 / 3,676 on 2026-11-04, seo-locale-start over main 22f43342: the worker answers /en/ and /ja/ as the page (LANGUAGE_START). Measured 10,233 / 3,672, the plus 4.
 // 10,139 / 3,651 -> 10,176 / 3,662 on 2026-11-04, perf-first-visit over main 22f43342: the locale preload joins the files the page names. Measured 10,172 / 3,658, the plus 4.
-// BUNDLE-TODO perf
-const WORKER_BUDGET = { maxBytes: 10_237, maxGzip: 3_676 };
+// 10,139 / 3,651 -> 10,274 / 3,696 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the two lines above together (the start pages and the locale preload). Measured 10,270 / 3,692 in the e2e build, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_274, maxGzip: 3_696 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
