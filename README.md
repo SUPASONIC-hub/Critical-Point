@@ -1370,6 +1370,8 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/en/index.html` | `Cache-Control` | `no-cache` |
 | `/ja/` | `Cache-Control` | `no-cache` |
 | `/ja/index.html` | `Cache-Control` | `no-cache` |
+| `/en/*` | `Cache-Control` | `no-cache` |
+| `/ja/*` | `Cache-Control` | `no-cache` |
 | `/sw.js` | `Cache-Control` | `no-cache` |
 | `/manifest.webmanifest` | `Content-Type` | `application/manifest+json` |
 | `/*` | `X-Content-Type-Options` | `nosniff` |
@@ -1380,7 +1382,7 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/*` | `Permissions-Policy` | `render.yaml`의 값 |
 | `/*` | `Content-Security-Policy` | `render.yaml`의 값 |
 
-2026-11-03에 더해진 것은 영어·일본어 시작 화면 네 줄(`/en/`, `/en/index.html`, `/ja/`, `/ja/index.html`)입니다. 대시보드에 넣기 전에는 그 두 쪽이 Render 기본값(`public, max-age=0, s-maxage=300`)으로 나가, 배포 뒤 최대 5분 동안 CDN이 옛 쪽을 줄 수 있습니다.
+2026-11-03에 더해진 것은 영어·일본어 시작 화면 네 줄(`/en/`, `/en/index.html`, `/ja/`, `/ja/index.html`)입니다. 대시보드에 넣기 전에는 그 두 쪽이 Render 기본값(`public, max-age=0, s-maxage=300`)으로 나가, 배포 뒤 최대 5분 동안 CDN이 옛 쪽을 줄 수 있습니다. 2026-11-04에는 `/en/*`, `/ja/*` 두 줄을 더했습니다. Render가 `/en/` 규칙을 `/en`에만 맞춰서, `/en/` 자체에는 여전히 그 기본값이 나갔기 때문입니다(16:36 운영에서 `/en/`·`/ja/` 모두 no-cache 확인).
 
 2026-10-06에 더해진 것은 그림 세 줄(`/*.webp`, `/*.jpg`, `/icons/*`)과 `/sw.js`입니다. 이 넷은 대시보드에
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을
