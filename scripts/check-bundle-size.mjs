@@ -1093,7 +1093,8 @@ const budgets = [
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_852, maxGzip: 53_501 },
+  // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_807, maxGzip: 53_485 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1228,7 +1229,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
 // 426,845 / 483,820 / 490,505 -> 426,850 / 483,826 / 490,511 on 2026-11-03, plate-sound-clip over main 8e930107: the scene sound is centred in its transform (the index CSS grows; the critical CSS only its hash). Measured 426,846 / 483,822 / 490,507 in the CI e2e build, the plus 4.
 // 426,850 / 483,826 / 490,511 -> 426,855 / 483,845 / 490,517 on 2026-11-04, plate-sound-clip over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,851 / 483,841 / 490,513 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_855, en: 483_845, ja: 490_517 };
+// 426,855 / 483,845 / 490,517 -> 426,852 / 483,851 / 490,519 on 2026-11-04, plate-sound-clip over main 22f43342 (#431 shortened the English dictionary, #444). Measured 426,848 / 483,847 / 490,515 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_852, en: 483_851, ja: 490_519 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

@@ -438,7 +438,7 @@ export default {
     },
     "c38_start_warm": {
       "title": "The Trial of the Ones Who Raised the Shutter",
-      "text": "For three nights you kept watch over the 13-person group chat together on the 1st floor of the secondhand bookstore. When the shutter went up, nine were still there, and no one had left first. Seven days later, at dawn on August 6, the class action (a lawsuit filed jointly by many victims) goes before the court. Today is the first hearing (the court session where both sides present their arguments and evidence). Attachment 17 of the group’s brief (a written summary of a side’s arguments filed with the court before trial) is the very file you read together those three nights. Do Yoonha posts the rice cake shop’s address to the group chat. 'They say the gallery has 72 seats. How many of us are going?' Within a minute, nine replies come in.",
+      "text": "For three nights you kept watch over the 13-person group chat together on the 1st floor of the secondhand bookshop. When the shutter went up, nine were still there, and no one had left first. Seven days later, at dawn on August 6, the class action (a lawsuit filed jointly by many victims) goes before the court. Today is the first hearing (the court session where both sides present their arguments and evidence). Attachment 17 of the group’s brief (a written summary of a side’s arguments filed with the court before trial) is the very file you read together those three nights. Do Yoonha posts the rice cake shop’s address to the group chat. 'They say the gallery has 72 seats. How many of us are going?' Within a minute, nine replies come in.",
       "memo": [
         "Attachment 17: the leaked file you read together for three nights",
         "First hearing today 14:00, Courtroom 457",
@@ -692,7 +692,7 @@ export default {
     "continuityChallenges": {
       "c37_after_warm": {
         "title": "Stand with the ones who kept watch for three nights",
-        "text": "The file you read together on the 1st floor of the secondhand bookstore has become the defendant’s evidence. Trust carries all the way to the courtroom only if those nine are not left alone on the witness stand."
+        "text": "The file you read together on the 1st floor of the secondhand bookshop has become the defendant’s evidence. Trust carries all the way to the courtroom only if those nine are not left alone on the witness stand."
       },
       "c37_after_record": {
         "title": "Take back the comparison table aimed at you",
