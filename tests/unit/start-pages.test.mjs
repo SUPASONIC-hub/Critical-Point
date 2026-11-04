@@ -8,6 +8,7 @@ import { analyticsFor, withAnalyticsTags } from "../../scripts/analytics-config.
 import { inlineScriptProblems } from "../../scripts/deploy-policy.mjs";
 import { GAME_NAME, PAGE_KINDS, SHARE_IMAGE_ALT } from "../../scripts/legal-pages.mjs";
 import { localizedStartPage, renderSitePages, renderStartPages, renderStaticPages, START_PAGE, withAbsoluteSiteLinks } from "../../scripts/site-pages.mjs";
+import introCopy from "../../src/copy/intro.js";
 import enIntro from "../../src/locales/en/screens/intro.js";
 import jaIntro from "../../src/locales/ja/screens/intro.js";
 import { chooseLanguage, folderLanguage } from "../../src/locale.js";
@@ -180,4 +181,18 @@ test("a language chosen on a start page's folder opens that language's own start
     globalThis.location = before.location;
     globalThis.localStorage = before.localStorage;
   }
+});
+
+test("the tab's title in each language is the start screen's pageTitle, one string for the page and the game", () => {
+  // The start pages' <title> is read from the intro copy, so the two cannot drift apart (2026-11-04: /?lang=en kept index.html's Korean title on the tab).
+  const titles = { ko: introCopy.pageTitle, en: enIntro.pageTitle, ja: jaIntro.pageTitle };
+  for (const [language, title] of Object.entries(titles)) {
+    assert.equal(START_PAGE[language].title, title, `${language}: START_PAGE reads the intro's pageTitle`);
+    assert.equal(/<title>([^<]*)<\/title>/.exec(language === "ko" ? INDEX : renderStartPages(INDEX)[`${language}/index.html`])?.[1], title, `${language}: the page's <title>`);
+  }
+  for (const language of ["en", "ja"]) assert.doesNotMatch(titles[language], /[\uAC00-\uD7A3\u3131-\u318E]/, `${language}: no Hangul on the tab`);
+  // The overlay hands the title to src/locale.js from the dictionary's intro.
+  const overlay = readFileSync("src/locales/overlay.js", "utf8");
+  assert.match(overlay, /dictionary\?\.copy\?\.screens\?\.intro\?\.pageTitle/);
+  assert.match(readFileSync("src/locale.js", "utf8"), /const title = module\?\.pageTitle\(\);\s+if \(title\) document\.title = title;/);
 });

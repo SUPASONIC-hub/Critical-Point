@@ -12,6 +12,11 @@ import { PLAYTEST_DATA_NOTICE } from "../privacyText.js";
  * string export cannot be written over in place.
  */
 const introCopy = {
+  // The page's title in the browser tab: index.html's <title> in Korean, and
+  // the one the start page in another language carries (scripts/site-pages.mjs
+  // START_PAGE reads it from each language's intro; src/locale.js puts it on
+  // the tab of a page opened in that language).
+  pageTitle: "임계점: CRITICAL POINT - 판단이 깊어지는 순간",
   subtitle: "45초마다 당신의 판단 기준이 기록된다",
   // appCopy's GAME_TITLE_READING, for the same reason: the reading under the wordmark and on the case chip (2026-11-04: the English and Japanese pages printed the Korean).
   titleReading: "트리거랩",

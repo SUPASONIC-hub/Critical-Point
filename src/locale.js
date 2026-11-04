@@ -108,6 +108,11 @@ export function loadLocale() {
     .then((module) => {
       overlay = module;
       for (const [name, tables] of waiting.splice(0)) module?.localizeTables(name, tables);
+      // The tab: index.html's <title> is the Korean one, and the tab's title
+      // falls back to whatever the page had when it first painted
+      // (state/tabTitle.js). Before the first paint, so that is this one.
+      const title = module?.pageTitle();
+      if (title) document.title = title;
     });
 }
 
