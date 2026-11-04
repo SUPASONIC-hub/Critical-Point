@@ -59,6 +59,7 @@
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",
+    "e2e:rebalance": "node scripts/e2e-rebalance.mjs",
     "check:deploy:offline": "node scripts/check-deploy.mjs --offline",
     "test:runtime": "node scripts/run-e2e.mjs --runtime --preview",
     "test:runtime:dev": "node scripts/run-e2e.mjs --runtime",
@@ -80,7 +81,7 @@
     "verify:full": "npm run verify && npm run test:e2e:full && npm run test:e2e:season"
   },
   "dependencies": {
-    "lucide-react": "^1.61.0",
+    "lucide-react": "^1.64.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
