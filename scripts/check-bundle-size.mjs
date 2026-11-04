@@ -1229,8 +1229,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
-// 426,845 / 483,841 / 490,518 -> 427,525 / 484,517 / 491,189 on 2026-11-04, perf-first-visit over main 7ddced5f: index.html names /assets/locale-preload-<hash>.js (a Korean page runs it and asks for nothing; it reads the stored language, then the folder, then ?lang=), and the entry waits for `load` before it warms the runtime. Measured 427,521 / 484,513 / 491,185, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 427_525, en: 484_517, ja: 491_189 };
+// 426,845 / 483,841 / 490,518 -> 427,540 / 484,538 / 491,206 on 2026-11-04, perf-first-visit over main 22f43342: index.html names /assets/locale-preload-<hash>.js (a Korean page runs it and asks for nothing; it reads the stored language, then the folder, then ?lang=), and the entry waits for `load` before it warms the runtime. Measured 427,536 / 484,534 / 491,202, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_540, en: 484_538, ja: 491_206 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1361,8 +1361,8 @@ function checkBudget(file, budget) {
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
 // 3,643 -> 3,651 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the warm-up list's hashed names only. Measured 10,135 / 3,647, the plus 4.
-// 10,139 / 3,651 -> 10,176 / 3,652 on 2026-11-04, perf-first-visit over main 7ddced5f: the locale preload joins the files the page names. Measured 10,172 / 3,648, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_176, maxGzip: 3_652 };
+// 10,139 / 3,651 -> 10,176 / 3,662 on 2026-11-04, perf-first-visit over main 22f43342: the locale preload joins the files the page names. Measured 10,172 / 3,658, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_176, maxGzip: 3_662 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
