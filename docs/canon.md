@@ -333,6 +333,12 @@ account. The fourth exception is under the analyst's 사번 and dated 3월 30일
 ten days before the analyst's first day at KD캐피탈 (4월 9일, 목) and 25 days
 before the committee of 4월 24일 (사건 31, hidden route).
 
+The 32억 "사업 자문료" did not go to 해온파트너스: that company's wind-up was
+registered in 2025 (사건 08), and its last 11억 4천 left for Singapore three
+days before (사건 29). The payee of 2026 is "해온파트너스와 같은 주소의 새
+법인", left unnamed, and it is that company that moves its registered address
+on the afternoon of 4월 24일 (A044, decided 2026-11-04).
+
 ## The harmed
 
 | Fact | Value |

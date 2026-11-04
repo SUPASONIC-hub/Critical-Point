@@ -68,7 +68,8 @@ test("the start screen's foot opens the five pages in the screen's language, and
     await page.locator(".intro-legal").getByRole("link", { name: HEADINGS.ko[kind], exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${kind}\\.html$`));
     await expect(page.getByRole("heading", { level: 1, name: HEADINGS.ko[kind] })).toBeVisible();
-    await expect(page.locator("footer").getByRole("link", { name: "from.logic.to.magic@gmail.com" })).toBeVisible();
+    // exact: the credit under it names each creator's address for its owner ("SUPASONIC: from.logic...").
+    await expect(page.locator("footer").getByRole("link", { name: "from.logic.to.magic@gmail.com", exact: true })).toBeVisible();
     await page.getByRole("navigation").getByRole("link", { name: "게임으로 돌아가기" }).click();
     await expect(page.locator(".intro")).toBeVisible();
   }
@@ -87,6 +88,39 @@ test("the start screen's foot opens the five pages in the screen's language, and
   await expect(page).toHaveURL(/\/ja\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
 });
+
+// The credit (2026-11-04): Tak'n Roll, SUPASONIC & ALICE, and each one's
+// address as a link named for its owner, on the start screen and at the foot
+// of the plain pages, inside a 360px phone in every language.
+const CREATOR_MAILS = [
+  ["SUPASONIC", "from.logic.to.magic@gmail.com"],
+  ["ALICE", "goeun.nam@gmail.com"],
+];
+
+async function expectCredit(credit, page) {
+  await expect(credit.locator("dt")).toHaveText(["STUDIO", "CREATOR", "CONTACT"]);
+  await expect(credit.locator("dd").nth(0)).toHaveText("Tak'n Roll");
+  await expect(credit.locator("dd").nth(1)).toHaveText("SUPASONIC & ALICE");
+  for (const [name, email] of CREATOR_MAILS) {
+    await expect(credit.getByRole("link", { name: `${name}: ${email}`, exact: true })).toHaveAttribute("href", `mailto:${email}`);
+  }
+  await credit.scrollIntoViewIfNeeded();
+  const box = await credit.boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(360);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+}
+
+for (const language of ["ko", "en", "ja"]) {
+  test(`the credit names both creators with their mail links, inside a 360px phone (${language})`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto(language === "ko" ? "/" : `/?lang=${language}`);
+    await expect(page.locator("html")).toHaveAttribute("lang", language);
+    await expectCredit(page.locator(".intro .studio-credit"), page);
+    await page.goto(`${FOLDER[language]}/about.html`);
+    await expectCredit(page.locator("footer .credit"), page);
+  });
+}
 
 test("the build writes the fifteen pages, robots.txt and the sitemap as plain files", { tag: "@prod" }, async ({ request }) => {
   test.skip(process.env.E2E_SERVER !== "preview", "this reads the production build: npm run test:e2e:preview");

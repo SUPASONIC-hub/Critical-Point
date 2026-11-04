@@ -598,6 +598,16 @@ export const CANON = [
     find: /(KD ?은행 ?계좌|KD ?[Bb]ank [Aa]ccount|KD ?銀行 ?口座)/g,
     allow: ["KD은행 계좌", "KD Bank account", "KD銀行口座"],
   },
+  {
+    id: "advisory-fee-payee",
+    fact: "해온파트너스 was wound up in 2025 (사건 08); 평택's 32억 of 2026 went to a new company at its address",
+    // 사건 26 and the line that leads out of it. Until 2026-11-04 they named
+    // 해온파트너스 itself as the payee and had it move its registered address
+    // on 4월 24일, half a year after its wind-up was registered (A044).
+    files: new RegExp(`${caseFiles("case26").source}|src/caseCopy\\.js$`),
+    find: /(?:받은 곳은 |32억 -- |두 달 전 |32억 자문료[^.]{0,24}?(?:는|를 받아 간) )(해온파트너스(?:와 같은 주소의 새 법인)?)|(해온파트너스(?:와 같은 주소의 새 법인)?)[은는] 그날 오후 등기부의 주소를 옮/g,
+    allow: ["해온파트너스와 같은 주소의 새 법인"],
+  },
 
   // The audit of 2026-11-03 (122 findings, 26 of them sure) and the answers
   // that settled them. Some of these are words that must not stand beside a
