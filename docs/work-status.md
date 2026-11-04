@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-03 (the state of `main` at `8e93010`, after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-04 (the state of `main` at `5d5d6ae`, after the dev-tooling bump (#385) [placeholder: later 11-04 merges], and before that after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -486,6 +486,15 @@ Still open, on purpose:
   #421 (summary artifacts for Funnel, Test Week and Verify Ranking); #408
   (coverage floors one under the measured values). Fourteen PRs merged,
   production build-sha `8e93010`, 1,692 unit tests.
+- 2026-11-04: #385 (dependabot `dev-tooling`: `@electric-sql/pglite`
+  0.5.11 to 0.5.13, `supabase` CLI 2.121.0 to 2.122.0; no game code or
+  migration changed). [placeholder: later 11-04 merges, filled at the evening
+  cleanup.] In progress: `kd-bank-account` (an always-visible "KD은행 계좌"
+  balance on every play phase, display only, before W47; spending it as
+  currency at the relic draft comes after W47 in the 11-30 bundle) and
+  `credits-alice` (credits: STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE).
+  [placeholder: final count] PRs merged (one so far), production build-sha
+  [placeholder: `5d5d6ae` this morning], 1,692 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
