@@ -5,6 +5,7 @@ export default {
   boardsLabel: "ランキングを選ぶ",
   ordinaryBoard: "通常のランキング",
   weekBoard: "今週のルール · {label}",
+  lastWeekBoard: "先週のルール · {label}",
   line: {
     kicker: "今週のルール",
     kickerFirst: "戻ってきた分析官のための今週のルール",
