@@ -291,7 +291,11 @@ const budgets = [
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
   // 68,379 -> 68,386 gzip on 2026-11-04, a11y-1103 over main 557d17bb: no entry code changed (raw under 189,392); the ranking chunk's name it imports changed. Measured 189,388 / 68,382 in the e2e build, the plus 4.
   // 68,386 -> 68,376 gzip on 2026-11-04, a11y-1103 over main 22f43342. Measured 189,388 / 68,372 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_392, maxGzip: 68_376 },
+  // 189,392 / 68,379 -> 189,456 / 68,430 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the tab token's claim takes a "held" that comes
+  // after its wait until a table has read the token (appConfig.takeTabToken). Measured 189,452 / 68,426 in the e2e build, the plus 4.
+  // 189,456 / 68,430 -> 189,456 / 68,420 on 2026-11-04, flaky-fix-1103 over main 557d17bb. Measured 189,452 / 68,416 in the e2e build, the plus 4.
+  // 189,456 / 68,420 -> 189,456 / 68,428 on 2026-11-04, flaky-fix-1103 over main 22f43342. Measured 189,452 / 68,424 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_456, maxGzip: 68_428 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1234,7 +1238,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
 // 426,845 / 483,841 / 490,518 -> 426,857 / 483,846 / 490,518 on 2026-11-04, a11y-1103 over main 557d17bb (#424, #435): the hand's card edge (the critical CSS), the ranking place's testid and the chunk names the entry imports. Measured 426,853 / 483,842 / 490,514 in the e2e build, the plus 4.
 // 426,857 / 483,846 / 490,518 -> 426,847 / 483,846 / 490,514 on 2026-11-04, a11y-1103 over main 22f43342 (#431, #444). Measured 426,843 / 483,842 / 490,510 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_847, en: 483_846, ja: 490_514 };
+// 426,845 / 483,820 / 490,505 -> 426,892 / 483,868 / 490,553 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the entry chunk's late tab-token answer. Measured 426,888 / 483,864 / 490,549, the plus 4.
+// 426,892 / 483,868 / 490,553 -> 426,880 / 483,872 / 490,544 on 2026-11-04, flaky-fix-1103 over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,876 / 483,868 / 490,540 in the e2e build, the plus 4.
+// 426,880 / 483,872 / 490,544 -> 426,889 / 483,887 / 490,555 on 2026-11-04, flaky-fix-1103 over main 22f43342 (#431, #444). Measured 426,885 / 483,883 / 490,551 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_889, en: 483_887, ja: 490_555 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

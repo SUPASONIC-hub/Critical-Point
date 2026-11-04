@@ -568,6 +568,19 @@ const TAB_TOKEN_CLAIM_MS = 300;
 // may be queued behind it: the claim waits one stretch more, up to this much in all.
 const TAB_TOKEN_CLAIM_MAX_MS = 1500;
 let tabTokenClaim = null;
+// Whether a table has read this tab's token (takeTabToken). Until one has, a
+// "held" that comes in after the claim gave up still counts: a busy original
+// can answer later than the whole wait (a cold dev server in CI, seven runs
+// from 2026-10-21 to 25), and the copy would otherwise go on as the original
+// and settle the original's open window as its own reload. Once a table has read the
+// token it has stamped or judged a window with it, and the token stays.
+let tabTokenTaken = false;
+
+/** The token, read by a table: from here on a late answer no longer replaces it. */
+export function takeTabToken() {
+  tabTokenTaken = true;
+  return getTabToken();
+}
 
 function readStoredTabToken() {
   try {
@@ -600,7 +613,7 @@ export function claimTabToken() {
     channel.onmessage = (event) => {
       const { type, token } = event.data ?? {};
       if (type === "claim" && !claiming && token === readStoredTabToken()) channel.postMessage({ type: "held", token });
-      if (type !== "held" || !claiming || token !== inherited) return;
+      if (type !== "held" || token !== inherited || (!claiming && (tabTokenTaken || readStoredTabToken() !== inherited))) return;
       try {
         globalThis.sessionStorage?.removeItem(TAB_TOKEN_SESSION_KEY);
       } catch {

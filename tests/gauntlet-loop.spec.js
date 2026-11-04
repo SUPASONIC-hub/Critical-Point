@@ -1349,6 +1349,14 @@ test("a third push brings an edge notice that covers no number, and the switch t
   await expect(notice).toHaveAttribute("aria-hidden", "true");
   expect(await notice.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
   expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
+  // Measured where the notice comes to rest: it slides in over 240ms and is
+  // placed over the action bar when the bar settles, and a box read mid-slide
+  // lay over the PUSH button (gx-push) on a phone once (2026-10-23). Its own
+  // four seconds are far longer than the wait.
+  await notice.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {})));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const overlaps = await notice.evaluate((element) => {
     const box = element.getBoundingClientRect();
     const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button, .game-header h1";
