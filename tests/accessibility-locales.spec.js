@@ -95,9 +95,6 @@ for (const lang of LANGS) {
       test.use({ viewport: size.viewport });
 
       test(`the intro with its drawers and 결말 도감, and both boards of an event week's ranking, have no structural accessibility violations (${lang}, ${size.name})`, { tag: "@once" }, async ({ page }) => {
-        // Four axe passes over the intro and the ranking: past 60s on a busy
-        // machine (3 of 18 local repeats on 2026-11-04), like the table's below.
-        test.setTimeout(120_000);
         await holdEventWeek(page);
         await seedFinishedSeason(page);
         await stubRanking(page);
