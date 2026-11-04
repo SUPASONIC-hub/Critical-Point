@@ -78,7 +78,7 @@ function HeldElsewhere({ onClaim, onLeave }) {
  * the sentence that says the pot, and is not read twice.
  */
 function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, target = null }) {
-  // The amount flies only where there is a purse to fly to.
+  // The amount flies only where there is a KD은행 계좌 (the purse) to fly to.
   const burst = target ? readBurst({ win, livePot, runPot, bustKeeps }) : null;
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">

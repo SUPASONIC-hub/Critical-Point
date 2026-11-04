@@ -559,6 +559,91 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
 });
 
+// The KD은행 계좌 (2026-11-04): the balance pinned through the briefing page,
+// the table and the settle -- a band across the top of a 360px phone, a box
+// in the top-right corner at 1280px -- never under a layer, never wider than
+// the screen, and always the run's stake and vault together.
+/** Where the account is drawn, whether it is the thing at its own centre, and whether it fits. */
+async function readAccount(page) {
+  return page.getByTestId("gauntlet-purse").evaluate((account) => {
+    const box = account.getBoundingClientRect();
+    const total = account.querySelector('[data-testid="gauntlet-purse-total"]').getBoundingClientRect();
+    const hit = document.elementFromPoint(total.left + total.width / 2, total.top + total.height / 2);
+    return {
+      box: { x: box.left, y: box.top, right: box.right, bottom: box.bottom },
+      onTop: Boolean(hit && account.contains(hit)),
+      fits: account.scrollWidth <= account.clientWidth + 1 && document.documentElement.scrollWidth <= window.innerWidth,
+    };
+  });
+}
+
+async function expectAccountPinned(page, viewport) {
+  const account = await readAccount(page);
+  expect(account.onTop, "nothing is drawn over the balance").toBe(true);
+  expect(account.fits, "the account and the page are no wider than the screen").toBe(true);
+  expect(account.box.y).toBeGreaterThanOrEqual(0);
+  if (viewport.width < 1025) {
+    // A band across the top of the phone.
+    expect([account.box.x, account.box.y, account.box.right]).toEqual([0, 0, viewport.width]);
+    expect(account.box.bottom).toBeLessThanOrEqual(30);
+  } else {
+    // A box in the top-right corner, beside the music pills.
+    expect(account.box.right).toBeGreaterThan(viewport.width - 140);
+    expect(account.box.right).toBeLessThanOrEqual(viewport.width);
+    expect(account.box.bottom).toBeLessThanOrEqual(90);
+  }
+}
+
+async function expectAccountHolds(page) {
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const held = saved.dynamics.runPot + saved.dynamics.vault;
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(held.toLocaleString("en-US"));
+  return held;
+}
+
+for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 }]) {
+  test(`the KD은행 계좌 stays pinned through the briefing, the table and the settle at ${viewport.width}x${viewport.height} @once`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await openTable(page, "case01", "start");
+    const account = page.getByTestId("gauntlet-purse");
+    const head = account.getByRole("button");
+    await expect(head).toHaveAccessibleName(/^KD은행 계좌 0/);
+    await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+    await expectAccountPinned(page, viewport);
+
+    // The season's columns are a tap away.
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
+    await head.click();
+    await expect(head).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeVisible();
+    await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 0 · 손실 0");
+    await head.click();
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
+
+    // The settle: the amount flies into the account, which is still on top of the reveal.
+    await page.locator(".choices .choice").first().click();
+    await cashStakedCard(page);
+    await expect(account).toHaveClass(/is-landing is-up/);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expectAccountPinned(page, viewport);
+
+    // The next window opens on its briefing page: the account is over it, with the money the save holds.
+    await page.getByTestId("decision-next").click();
+    await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    const held = await expectAccountHolds(page);
+    expect(held).toBeGreaterThan(0);
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(`▲ +${held.toLocaleString("en-US")}`);
+    await expect(account.locator(".kd-account-just")).toHaveText("방금");
+    await expectAccountPinned(page, viewport);
+
+    // And at the table behind it, the same balance.
+    await dismissProtocolBreach(page);
+    await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+    await expectAccountHolds(page);
+    await expectAccountPinned(page, viewport);
+  });
+}
+
 // The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
 // wall can stop at once, the reveal says what one more push would have done,
 // and the next scene's page opens on its speaker's line about that table.

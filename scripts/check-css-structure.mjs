@@ -435,7 +435,13 @@ const fileBudgets = {
   // fits. Measured 128 / 2331; 133 / 2478 with the purse line set solid on a
   // phone, upright (480px or less) or on its side (Linux hand5, the densest
   // boards at 390x844, the phone-on-its-side tests).
-  "money.css": { lines: 133, bytes: 2478 },
+  // 133 / 2478 -> 261 / 5264 on 2026-11-04 (kd-bank-account), measured: the
+  // purse leaves the rail and is the KD은행 계좌, a band across the top below
+  // 1025px and a corner box above it, with the shell, the music pills and the
+  // layers in front of the table moved out from under it, and the season's
+  // columns a tap away. The phone's purse-line fit (line-height 1, the season
+  // joining the line) is gone with the line.
+  "money.css": { lines: 261, bytes: 5264 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

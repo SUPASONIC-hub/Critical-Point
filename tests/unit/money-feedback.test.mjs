@@ -164,9 +164,60 @@ test("the purse is plain text, and the verdict is still said once, by the slam",
 test("the flight is still under reduced motion and the calm setting, and both colours carry a sign", () => {
   const css = readFileSync(new URL("../../src/styles/app/money.css", import.meta.url), "utf8");
   const still = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
-  assert.match(still, /\.gx-burst,\s*\.gx-purse\.is-landing > strong \{\s*animation: none;/);
+  assert.match(still, /\.gx-burst,\s*\.gx-purse\.is-landing strong \{\s*animation: none;/);
+  assert.match(still, /\.kd-account-more \{\s*transition: none;/, "the chevron does not turn either");
   const comfort = readFileSync(new URL("../../src/styles/app/comfort.css", import.meta.url), "utf8");
   assert.match(comfort, /:root\[data-calm-effects\] \.gauntlet-stage :not\(/, "the calm setting stops every animation on the stage, the slam's among them");
   const order = readFileSync(new URL("../../src/styles/app.css", import.meta.url), "utf8");
   assert.ok(order.indexOf("./app/money.css") < order.indexOf("./app/comfort.css"), "and comes after this file");
+});
+
+/**
+ * The KD은행 계좌 (2026-11-04): the purse moved off the bank rail into a band
+ * pinned across the top of a phone and a box in the top-right corner of a
+ * wide screen, there through the briefing, the table, the slam and the
+ * reveal. Display only: what it reads is readPurse, as above.
+ */
+test("the KD은행 계좌 is named alike in every language, with 방금 before the change", async () => {
+  const ko = (await import("../../src/copy/table.js")).default.stage;
+  const en = (await import("../../src/locales/en/screens/table.js")).default.stage;
+  const ja = (await import("../../src/locales/ja/screens/table.js")).default.stage;
+  assert.deepEqual([ko.purse, en.purse, ja.purse], ["KD은행 계좌", "KD Bank account", "KD銀行口座"]);
+  assert.deepEqual([ko.purseJust, en.purseJust, ja.purseJust], ["방금", "Last", "直近"]);
+  const canon = readFileSync(new URL("../../docs/canon.md", import.meta.url), "utf8");
+  const owner = canon.slice(canon.indexOf("## Who owns KD"));
+  assert.match(owner, /KD은행 계좌 \(en KD Bank account, ja KD銀行口座\)/, "the canon's KD section names it");
+});
+
+test("the account sits outside the rail, after every layer of the window, and opens the season on a tap", () => {
+  const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
+  const burst = readFileSync(new URL("../../src/gauntlet/MoneyBurst.jsx", import.meta.url), "utf8");
+  const bank = stage.slice(stage.indexOf('<div className="gx-bank">'), stage.indexOf("<RelicChips"));
+  assert.ok(bank.length > 0);
+  assert.doesNotMatch(bank, /BankPurse/, "not on the rail any more");
+  const at = stage.indexOf("<BankPurse ");
+  assert.ok(at > stage.indexOf("<SceneBriefing") && at > stage.indexOf("<RelicDraft") && at < stage.indexOf("<TableNotices"), "drawn after the briefing and the draft");
+  const purse = burst.slice(burst.indexOf("export function BankPurse"));
+  assert.match(purse, /<button type="button" className="kd-account-head" aria-expanded=\{open\} aria-controls="kd-account-season" onClick=\{toggle\}>/);
+  assert.match(purse, /<strong ref=\{purseRef\} data-testid="gauntlet-purse-total">/, "the amount flies into the balance itself");
+  assert.match(purse, /<small className="kd-account-just" aria-hidden="true">\{tableCopy\.stage\.purseJust\}<\/small>/);
+  assert.match(purse, /id="kd-account-season" className="gx-purse-season" data-testid="gauntlet-purse-season" hidden=\{!open\}/);
+  assert.doesNotMatch(purse, /aria-live|role=/, "still no second voice");
+});
+
+test("a band under 1025px that the shell and the layers start below; a corner box from 1025px", () => {
+  const css = readFileSync(new URL("../../src/styles/app/money.css", import.meta.url), "utf8");
+  const band = css.slice(css.indexOf(".gauntlet-shell {"), css.indexOf("@media (min-width: 1025px)"));
+  assert.match(band, /--kd-band: 22px;/);
+  assert.match(band, /border-top: var\(--kd-top\) solid transparent;/);
+  assert.match(band, /\.gauntlet-shell \.music-controls \{\s*transform: translateY\(var\(--kd-top\)\);/);
+  assert.match(band, /\.gauntlet-shell \.gx-comic,\s*\.gauntlet-shell \.gx-act,\s*\.gauntlet-shell \.gx-draft,\s*\.gauntlet-shell \.decision-reveal-backdrop \{\s*top: var\(--kd-top\);/);
+  assert.match(band, /\.kd-account \{\s*position: fixed;\s*top: 0;\s*right: 0;\s*left: 0;\s*z-index: 30;/);
+  const wide = css.slice(css.indexOf("@media (min-width: 1025px)"));
+  assert.match(wide, /--kd-band: 0px;\s*--kd-top: 0px;/);
+  assert.match(wide, /\.kd-account \{\s*top: max\(16px, env\(safe-area-inset-top\)\);\s*right: calc\(max\(16px, env\(safe-area-inset-right\)\) \+ 92px\);\s*left: auto;\s*width: 15rem;/);
+  assert.match(wide, /padding-right: max\(0px, calc\(122px \+ 15rem - /, "the header keeps the box's room");
+  assert.match(wide, /\.gauntlet-shell \.decision-reveal-backdrop \{\s*padding-top: calc\(max\(16px, env\(safe-area-inset-top\)\) \+ 62px\);/, "and the layers start under it");
+  // The minifier drops a standalone translate, rotate or scale property.
+  assert.doesNotMatch(css, /^\s*(?:translate|rotate|scale):/m);
 });
