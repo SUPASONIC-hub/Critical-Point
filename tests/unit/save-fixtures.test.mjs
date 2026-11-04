@@ -121,8 +121,10 @@ test("a save from the table that graded a press loads without a notice, under th
   // do B2's links (the 3 -> 4 step).
   // So does the case's opening snapshot (S3): none for a case opened before it.
   // And the bank rail's money (moneyFeedback.js): no hand counted yet, and a season that has won what it holds.
-  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, open, lastChange, seasonGained, seasonLost, ...kept } = run;
+  // And the draft's spending (C9): nothing paid, no draft record.
+  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, linksIn, linksOut, open, lastChange, seasonGained, seasonLost, seasonSpent, relicDraft, ...kept } = run;
   assert.deepEqual([lastChange, seasonGained, seasonLost], [0, saved.runPot + saved.vault, 0]);
+  assert.deepEqual([seasonSpent, relicDraft], [0, null]);
   assert.equal(weekRule, null);
   assert.equal(open, null);
   assert.deepEqual([linksIn, linksOut], [[], []]);

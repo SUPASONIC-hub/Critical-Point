@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   BASE_SCHEMA,
+  buyExtraRelic,
   createWindow,
   FOCUS_MODES,
   getCardChips,
@@ -8,18 +9,21 @@ import {
   getHeartbeatBpm,
   getWindowBand,
   HAND_CAP,
+  normalizeRunState,
   openCaseRun,
+  openRelicDraft,
   reduceWindow,
+  rerollRelicOffer,
   resolveWindow,
   STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
+import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_REROLL_COST, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/weeklyRules.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, createCaseBot, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, createCaseBot, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER, takeIntoSlots } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -478,6 +482,79 @@ const inert = relicReport
   .filter((row) => ["blind", "listen", "sees", "skip"].every((key) => row[key].meanVault === relicBaseline[key].meanVault))
   .map((row) => row.name);
 assert.deepEqual(inert, [], `relics the simulation never trips: ${inert.join(", ")}`);
+
+/**
+ * C9, the KD은행 계좌 at the draft (design-kd-spend-relic.md, decisions all 1):
+ * a reroll for RELIC_REROLL_COST and one more relic for RELIC_EXTRA_COST, each
+ * once a draft, out of the vault. The relic hand plays seasons of
+ * SEASON_CASES cases with every relic unlocked (the widest pool, where a
+ * reroll finds the most), drafts after each case, takes the strongest of what
+ * is offered (RELIC_DROP_ORDER read from the strong end) and pays per its
+ * policy whenever the vault holds the price. `meanVault` is a case's share of
+ * the vault at the season's end, with what was paid taken out of it, so it
+ * compares with the rows that never pay. Two things must hold:
+ *
+ * - buying with what a skip saved is still a loss: busting to skip and paying
+ *   at every draft stays under a quarter of best blind play that never pays;
+ * - money is not a win button: the best listening play that pays at every
+ *   draft stays under RELIC_LIFT_CAP over the same play that never pays, and
+ *   under 0.6 of a hand that sees the wall (and never pays).
+ *
+ * The rows are printed so 4,000 and 12,000 can be read against what a case
+ * banks (decision 1 (1): the prices are checked on these measurements).
+ */
+const SPEND_CASES = SEASON_CASES * 6;
+const strongestOf = (offer) => offer.reduce((best, id) => (RELIC_DROP_ORDER.indexOf(id) > RELIC_DROP_ORDER.indexOf(best) ? id : best));
+function measureSpending(label, decide, spend) {
+  let banked = 0;
+  let paid = 0;
+  let rerolls = 0;
+  let extras = 0;
+  let season = { vault: 0, relics: [], carried: undefined };
+  for (let caseIndex = 0; caseIndex < SPEND_CASES; caseIndex += 1) {
+    if (caseIndex % SEASON_CASES === 0) season = { vault: 0, relics: [], carried: undefined };
+    const result = playHandCase(caseIndex, decide, season.relics, season.carried);
+    season.carried = { stanceMastery: result.stanceMastery, logic: result.logic };
+    let run = normalizeRunState({ vault: season.vault + result.vault, relics: season.relics, ...openRelicDraft(`spend:${caseIndex}`, RELIC_IDS, season.relics) });
+    if (run.relicOffer.length) {
+      if (spend === "reroll" || spend === "always") run = rerollRelicOffer(run);
+      if (spend === "extra" || spend === "always") run = buyExtraRelic(run);
+      for (let pickIndex = 0; pickIndex < 2 && run.relicOffer.length; pickIndex += 1) run = takeIntoSlots(run, strongestOf(run.relicOffer));
+      paid += run.relicDraft?.cost ?? 0;
+      if (run.relicDraft?.reroll) rerolls += 1;
+      if (run.relicDraft?.extra) extras += 1;
+    }
+    season.vault = run.vault;
+    season.relics = run.relics;
+    if (caseIndex % SEASON_CASES === SEASON_CASES - 1) banked += season.vault;
+  }
+  const seasons = SPEND_CASES / SEASON_CASES;
+  return { label, meanVault: Math.round(banked / SPEND_CASES), paidPerCase: Math.round(paid / SPEND_CASES), rerolls: rerolls / seasons, extras: extras / seasons };
+}
+const blindSpendTarget = Number(bestFixed.label.split(" ")[1]);
+const spendingRows = {
+  blind: measureSpending(`blind heat ${blindSpendTarget}, never pays`, (win) => win.gauge < blindSpendTarget, "never"),
+  listen: measureSpending(`${bestHeartbeatSoFar.label}, never pays`, listening, "never"),
+  reroll: measureSpending(`${bestHeartbeatSoFar.label}, rerolls every draft`, listening, "reroll"),
+  extra: measureSpending(`${bestHeartbeatSoFar.label}, buys one more every draft`, listening, "extra"),
+  always: measureSpending(`${bestHeartbeatSoFar.label}, both every draft`, listening, "always"),
+  sees: measureSpending("sees the wall, never pays", (win) => win.gauge + win.schema.stepMax < win.wall, "never"),
+  skipBuys: measureSpending("bust to skip, both every draft", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), "always"),
+  skipNever: measureSpending("bust to skip, never pays", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), "never"),
+};
+console.log(`draft spend      prices reroll ${RELIC_REROLL_COST}, one more ${RELIC_EXTRA_COST}; ${SPEND_CASES / SEASON_CASES} seasons of ${SEASON_CASES} cases, every relic unlocked`);
+for (const row of Object.values(spendingRows)) {
+  console.log(`draft spend      ${row.label.padEnd(44)} vault ${String(row.meanVault).padStart(7)}  paid ${String(row.paidPerCase).padStart(5)}/case  rerolls ${row.rerolls.toFixed(1)}/season  one more ${row.extras.toFixed(1)}/season`);
+}
+assert.ok(
+  spendingRows.skipBuys.meanVault < spendingRows.blind.meanVault * 0.25,
+  `buying with what a skip saved must stay a loss: ${spendingRows.skipBuys.meanVault} against ${spendingRows.blind.meanVault} for best blind play`,
+);
+for (const key of ["reroll", "extra", "always"]) {
+  const row = spendingRows[key];
+  assert.ok(row.meanVault <= spendingRows.listen.meanVault * RELIC_LIFT_CAP, `paying at the draft is a win button: ${row.label} banks ${row.meanVault} against ${spendingRows.listen.meanVault}`);
+  assert.ok(row.meanVault < spendingRows.sees.meanVault * 0.6, `paying at the draft must not make an answer key: ${row.label} banks ${row.meanVault} against a wall-seeing ${spendingRows.sees.meanVault}`);
+}
 
 /**
  * The two relics that bend the logic streak, played by the hands that play

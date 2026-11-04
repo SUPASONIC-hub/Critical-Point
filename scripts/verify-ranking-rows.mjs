@@ -50,8 +50,17 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { recheckChain, UNCHECKED } from "../src/chainRecheck.js";
-import { recheckRun } from "../src/rankingRecheck.js";
+import { CHAIN_MARK, recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { RECHECK_MARKS, recheckRun, RELIC_DRAFT_MARK } from "../src/rankingRecheck.js";
+
+/**
+ * The marks ranking_set_recheck_marks takes today (20261023000000). The
+ * draft's mark (RELIC_DRAFT_MARK, C9) is shown in the report but left out of
+ * the write until the 11-30 ranking wipe's migration adds it to the function's
+ * list (the SQL is beside the mark in src/rankingRecheck.js): the function
+ * raises on a mark it does not know, and one run's would stop the whole write.
+ */
+export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK]);
 
 const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
 const JSON_COLUMNS = ["summary", "decision_log", "resources", "dynamics"];
@@ -175,6 +184,7 @@ export function formatReport(results, { redact = false } = {}) {
       for (const finding of entry.windows.findings) {
         lines.push(`  ${entry.caseId} #${finding.index}: window ${finding.status} ${[...finding.differs, finding.problem].filter(Boolean).join(", ")}`);
       }
+      for (const finding of entry.drafts?.findings ?? []) lines.push(`  ${entry.caseId} #${finding.index}: draft off ${finding.differs.join(", ")} (shown, not written: ${RELIC_DRAFT_MARK})`);
     }
     if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record`);
     if (seedTails) lines.push(`  ${seedTails} windows were dealt again (a seed with a ~n tail: a rolled-back save, or a wall shopped for)`);
@@ -229,7 +239,7 @@ export function formatChain(chain) {
 export function marksSql(results) {
   const checked = results.filter((result) => (result.status === "checked" || result.status === "unrecorded") && typeof result.runId === "string" && result.runId);
   if (!checked.length) return null;
-  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.map(quote).join(", ")}]::text[], ${result.status === "checked"})`).join(",\n       ");
+  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.filter((mark) => DB_MARKS.includes(mark)).map(quote).join(", ")}]::text[], ${result.status === "checked"})`).join(",\n       ");
   return [
     "select count(*) filter (where marks is not null) as marked_rows",
     "  from (select public.ranking_set_recheck_marks(r.run_id, r.marks, r.replayed) as marks",

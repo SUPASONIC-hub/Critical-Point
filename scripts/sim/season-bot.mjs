@@ -41,6 +41,7 @@ import {
 import {
   applyGauntletEffect,
   BUST_EFFECT,
+  buyExtraRelic,
   createCaseClose,
   createRunSummary,
   createWindow,
@@ -54,6 +55,7 @@ import {
   HAND_CAP,
   openCaseRun,
   reduceWindow,
+  rerollRelicOffer,
   resolveWindow,
   RUN_INITIAL_STATE,
   STANCE_CHARGE,
@@ -255,8 +257,13 @@ export const AUDIT_VALUES = (() => {
  * CASCADE_WEEK; the links are carried when the rule has CASCADE. Left out,
  * the environment says, as before. The server-check tests pass it to play a
  * week's run (verify-ranking-weekly.test.mjs).
+ * `spend` is what the player pays for at each draft (C9): "never" (the
+ * default, and every report measured before it), "reroll" (the one reroll,
+ * whenever the vault holds its price), "extra" (one more relic, likewise), or
+ * "always" (both, the reroll first). A spend draws nothing; the second pick
+ * of a draft that bought one more draws as the first does.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, spend = "never" }) {
   const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (weekRule === undefined ? weekStamp(story) : !story && stamped ? { weekRule: stamped } : {});
   const linksOn = weekRule === undefined ? CASCADE_WEEK : weekRuleHasDevice(stamped, "cascade");
@@ -406,6 +413,9 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       const rules = getTableRules(caseId, run, staged);
       const nextCaseRules = getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged);
       run = openCaseRun(run, { rules, caseId, resources });
+      // The draft the case before closed on, answered at this case's first
+      // table, after it opened -- where the page holds it (GauntletStage).
+      if (run.relicOffer.length) run = takeDraft(run, tools);
       let audit = 0;
       // B2, CASCADE_WEEK only: the case's links off its own log (cascadeRisk.js).
       let linkLog = [];
@@ -509,6 +519,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           resourcesAfter,
           challenge: { matched: read.challengeMatch, riskDelta: read.riskDelta },
           ...(run.story ? { assistStory: true } : {}),
+          // The draft taken before this window, as useChoiceCommit writes it (C9).
+          ...(run.relicDraft ? { relicDraft: run.relicDraft } : {}),
           threshold: {
             busted,
             potMultiplier: verdict.multiplier,
@@ -534,7 +546,6 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           caseLogs[caseId] = log;
           caseDynamics[caseId] = { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec };
           casePeaks.push(summary.peakRiskPressure);
-          if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
           if (caseId === "final") final = { resources, log };
         }
         nodeId = nextNode;
@@ -551,6 +562,16 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * only when the pressure rose going into the window (the streak's own rule,
    * gauntlet/logicStreak.js). When its type is not on the table it takes what is.
    */
+  /** A draft answered: what `spend` pays for, then a pick (two when one more was bought). */
+  function takeDraft(start, tools) {
+    let run = start;
+    if (spend === "reroll" || spend === "always") run = rerollRelicOffer(run);
+    if (spend === "extra" || spend === "always") run = buyExtraRelic(run);
+    run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+    if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+    return run;
+  }
+
   function pickByType(policy, cards, logic) {
     const held = logic.type ?? policy.holds;
     const leave = policy.logicHand === "switch" && logic.rose;
