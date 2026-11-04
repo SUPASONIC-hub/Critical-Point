@@ -252,7 +252,7 @@ export default {
     },
     "c38_notes_reaction": {
       "title": "Do Yoonha’s Notebook",
-      "text": "Just before the recess ends, Do Yoonha, who took a half day off from Gangseo Branch to come, calls you out to the hallway. The number 212 came from the notebook he kept by hand for 3 years behind the teller window. The group’s brief (a written summary of a side’s arguments filed with the court before trial) calls that notebook 'the private memo of a former teller.' Do Yoonha starts to laugh and stops. 'It is a private memo. I wrote it down because the company didn’t. But next to every one of those names is the product I sold them. That’s not my memory. That’s the bank’s product.'",
+      "text": "Just before the recess ends, Do Yoonha, who took a half day off from Gangseo Branch to come, calls you out to the hallway. The number 212 came from the notebook he kept by hand behind the teller window and at his Trigger Lab desk. The group’s brief (a written summary of a side’s arguments filed with the court before trial) calls that notebook 'the private memo of a mere teller.' Do Yoonha starts to laugh and stops. 'It is a private memo. I wrote it down because the company didn’t. But next to every one of those names is the product I sold them. That’s not my memory. That’s the bank’s product.'",
       "memo": [
         "3 years of notebooks called a 'private memo'",
         "Bank product names written next to the names"
@@ -438,7 +438,7 @@ export default {
     },
     "c38_start_warm": {
       "title": "The Trial of the Ones Who Raised the Shutter",
-      "text": "For three nights you kept watch over the 13-person group chat together on the 1st floor of the secondhand bookstore. When the shutter went up, nine were still there, and no one had left first. Seven days later, at dawn on August 6, the class action (a lawsuit filed jointly by many victims) goes before the court. Today is the first hearing (the court session where both sides present their arguments and evidence). Attachment 17 of the group’s brief (a written summary of a side’s arguments filed with the court before trial) is the very file you read together those three nights. Do Yoonha posts the rice cake shop’s address to the group chat. 'They say the gallery has 72 seats. How many of us are going?' Within a minute, nine replies come in.",
+      "text": "For three nights you kept watch over the 13-person group chat together on the 1st floor of the secondhand bookshop. When the shutter went up, nine were still there, and no one had left first. Seven days later, at dawn on August 6, the class action (a lawsuit filed jointly by many victims) goes before the court. Today is the first hearing (the court session where both sides present their arguments and evidence). Attachment 17 of the group’s brief (a written summary of a side’s arguments filed with the court before trial) is the very file you read together those three nights. Do Yoonha posts the rice cake shop’s address to the group chat. 'They say the gallery has 72 seats. How many of us are going?' Within a minute, nine replies come in.",
       "memo": [
         "Attachment 17: the leaked file you read together for three nights",
         "First hearing today 14:00, Courtroom 457",
@@ -498,7 +498,7 @@ export default {
     },
     "c38_start_rush": {
       "title": "The Trial of the One Who Ran Ahead",
-      "text": "The moment Moon Gaeul’s text came, you left your sleeping colleagues and chased the place the leaked file first went around. The trail went cold on the third day, and you spent the remaining four in public-interest lawyer Seon Jaeyoon’s office in Mangwon-dong, writing 90 questions and answers for witness examination. And now it is the night before the class action (a lawsuit filed jointly by many victims) goes before the court. Tomorrow is the first hearing (the court session where both sides present their arguments and evidence). At 11 p.m., the group’s brief (a written summary of a side’s arguments filed with the court before trial) came in. Attachment 17 is the very file you were chasing. You know where the trail went cold, but none of the 90 has an answer for when it shows up in court. In the group chat, 312 messages have piled up unread for seven days.",
+      "text": "The moment Moon Gaeul’s text came, you left your sleeping colleagues and chased the place the leaked file first went around. The trail went cold on the third day, and you spent the remaining four in public-interest lawyer Seon Jaeyoon’s office in Mangwon-dong, writing 90 questions and answers for witness examination. And today the class action (a lawsuit filed jointly by many victims) goes before the court: today is the first hearing (the court session where both sides present their arguments and evidence). At 11 p.m. last night, the group’s brief (a written summary of a side’s arguments filed with the court before trial) came in. Attachment 17 is the very file you were chasing. You know where the trail went cold, but none of the 90 has an answer for when it shows up in court. In the group chat, 312 messages have piled up unread for seven days.",
       "memo": [
         "90 witness examination Q&As -- 0 on the leaked record",
         "Attachment 17: the leaked response record",
@@ -692,7 +692,7 @@ export default {
     "continuityChallenges": {
       "c37_after_warm": {
         "title": "Stand with the ones who kept watch for three nights",
-        "text": "The file you read together on the 1st floor of the secondhand bookstore has become the defendant’s evidence. Trust carries all the way to the courtroom only if those nine are not left alone on the witness stand."
+        "text": "The file you read together on the 1st floor of the secondhand bookshop has become the defendant’s evidence. Trust carries all the way to the courtroom only if those nine are not left alone on the witness stand."
       },
       "c37_after_record": {
         "title": "Take back the comparison table aimed at you",

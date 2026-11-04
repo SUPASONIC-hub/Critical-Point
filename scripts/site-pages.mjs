@@ -107,7 +107,7 @@ const ABOUT_EN = `
 
 <h2>How the story begins</h2>
 <p>You are an analyst who reviews loans at KD Bank. Three years ago, you filed the only dissent on the approval of a ₩31 billion loan. Your written opinion was returned, and the loan went through anyway. Then a single transfer order with its reason left blank sent you down to Trigger Lab, the basement research lab of KD Financial Group, whose largest shareholder is American capital.</p>
-<p>The game starts a little earlier, with the last assignment of your probation. The first five cases are the prologue, set three years before, and what you take from the prologue decides the first scene of Case 01 three years later. The main story begins on the day the first file on the case desk still carries that same loan number. The five cases of the prologue and the ${MAIN_CASES} of the main story, ${CASES} cases in all, form a single chain.</p>
+<p>The game starts a little earlier, with the last assignment of your traineeship. The first five cases are the prologue, set three years before, and what you take from the prologue decides the first scene of Case 01 three years later. The main story begins on the day the first file on the case desk still carries that same loan number. The five cases of the prologue and the ${MAIN_CASES} of the main story, ${CASES} cases in all, form a single chain.</p>
 <p>The game is fiction. Its people, companies, banks, institutions and events have nothing to do with real ones, and its financial judgments are not investment or financial advice.</p>
 
 <h2>What the game asks</h2>
