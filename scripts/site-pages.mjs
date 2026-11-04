@@ -59,6 +59,8 @@ const DESCRIPTION = {
 const ABOUT_KO = `
 <p>「임계점: CRITICAL POINT」는 기업·금융 미스터리이자 푸시 유어 럭(push your luck) 게임입니다. 판돈을 올릴수록 보이지 않는 벽이 가까워지고, 한 번의 판단은 다음 판의 규칙을 바꿉니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다. 한국어, 영어, 일본어로 플레이할 수 있습니다.</p>
 
+<p>기획부터 제작까지 SUPASONIC과 ALICE가 함께 만들었습니다.</p>
+
 <h2>이야기의 시작</h2>
 <p>플레이어는 KD은행에서 대출 심사를 맡은 분석관입니다. 3년 전 당신은 310억 원짜리 대출의 승인 문서에 혼자 반대 의견을 올렸습니다. 의견서는 반려되었고 대출은 그대로 나갔습니다. 그리고 당신은 사유 칸이 비어 있는 발령서 한 장으로, 미국계 자본이 최대주주인 KD금융그룹의 지하 연구소 트리거랩에 내려왔습니다.</p>
 <p>게임은 그보다 조금 앞, 수습 마지막 과제에서 시작합니다. 처음 다섯 사건은 그 3년 전을 다루는 프롤로그이고, 프롤로그에서 남긴 것이 3년 뒤 사건 01의 첫 장면을 정합니다. 본편은 오늘 케이스데스크에 올라온 첫 파일에 그때 그 대출번호가 그대로 남아 있는 데서 시작합니다. 프롤로그 다섯 사건과 본편 ${MAIN_CASES}개 사건, 모두 ${CASES}개의 사건이 하나의 사슬로 이어집니다.</p>
@@ -93,6 +95,8 @@ const ABOUT_KO = `
 const ABOUT_EN = `
 <p>Critical Point is a corporate and financial mystery and a push-your-luck game. The higher you raise the stake, the closer an unseen Wall comes, and every call you make changes the rules of the next hand. It runs in your web browser and is free to play, with no sign-up and nothing to install. You can play it in Korean, English or Japanese.</p>
 
+<p>SUPASONIC and ALICE made the game together, from the first plan to the finished build.</p>
+
 <h2>How the story begins</h2>
 <p>You are an analyst who reviews loans at KD Bank. Three years ago, you filed the only dissent on the approval of a ₩31 billion loan. Your written opinion was returned, and the loan went through anyway. Then a single transfer order with its reason left blank sent you down to Trigger Lab, the basement research lab of KD Financial Group, whose largest shareholder is American capital.</p>
 <p>The game starts a little earlier, with the last assignment of your traineeship. The first five cases are the prologue, set three years before, and what you take from the prologue decides the first scene of Case 01 three years later. The main story begins on the day the first file on the case desk still carries that same loan number. The five cases of the prologue and the ${MAIN_CASES} of the main story, ${CASES} cases in all, form a single chain.</p>
@@ -126,6 +130,8 @@ const ABOUT_EN = `
 
 const ABOUT_JA = `
 <p>『臨界点: CRITICAL POINT』は、企業・金融ミステリーであり、プッシュ・ユア・ラック(push your luck)のゲームです。賭け金を上げるほど見えない壁が近づき、一度の判断が次の勝負のルールを変えます。ウェブブラウザですぐに動き、会員登録やインストールなしに無料で遊べます。韓国語、英語、日本語で遊べます。</p>
+
+<p>企画から制作まで、SUPASONICとALICEが一緒に作りました。</p>
 
 <h2>物語の始まり</h2>
 <p>プレイヤーは、KD銀行で融資審査を担当する分析官です。3年前、あなたは310億ウォンの融資の承認文書に、ひとりで反対意見を上げました。意見書は差し戻され、融資はそのまま実行されました。そしてあなたは、理由の欄が空いた辞令一枚で、米国系資本が筆頭株主のKD金融グループの地下研究所、トリガーラボへ下りてきました。</p>

@@ -1018,16 +1018,21 @@ summary:focus-visible {
   font-weight: 600;
   letter-spacing: 0;
 }
+/* Studio, the two creators and their addresses (StudioCredit.jsx). The
+   addresses take a row of their own under the names and wrap one under the
+   other on a phone, so the card never runs wider than a 360px screen in any
+   language. */
 .studio-credit {
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  max-width: 100%;
   margin: 0;
-  padding: 6px 16px 6px 6px;
+  padding: 8px 18px 8px 8px;
   color: var(--ui-text);
   background: var(--ui-glass);
   border: 1px solid var(--ui-line);
-  border-radius: 999px;
+  border-radius: 28px;
   backdrop-filter: blur(12px);
   text-align: left;
 }
@@ -1043,12 +1048,33 @@ summary:focus-visible {
 }
 .studio-credit dl {
   display: flex;
-  gap: 18px;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  min-width: 0;
   margin: 0;
 }
 .studio-credit dl > div {
   display: grid;
   gap: 1px;
+  min-width: 0;
+}
+.studio-credit .studio-credit-mail {
+  flex-basis: 100%;
+}
+.studio-credit-mail dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 14px;
+}
+.studio-credit-mail a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--ui-text-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-underline-offset: 3px;
 }
 .studio-credit dt {
   color: var(--ui-text-3);

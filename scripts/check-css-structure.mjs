@@ -182,7 +182,9 @@ const fileBudgets = {
   // 3159 / 69903 -> 3162 / 69982 on 2026-11-03, measured (intro-webkit-fit): on
   // 360px or less the premise wraps plainly outside English, where WebKit's
   // text-wrap: pretty took the Korean and Japanese one a line longer.
-  "base-intro-ranking.css": { lines: 3162, bytes: 69982 },
+  // 3162 / 69982 -> 3184 / 70411 on 2026-11-04, measured (credits-alice): the
+  // start screen's credit takes a row for SUPASONIC's and ALICE's addresses.
+  "base-intro-ranking.css": { lines: 3184, bytes: 70411 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
