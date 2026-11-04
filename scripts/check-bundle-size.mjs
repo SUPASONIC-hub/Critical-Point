@@ -82,7 +82,8 @@ const budgets = [
   // 150,034 / 55,070 -> 150,255 / 55,171 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 150,251 / 55,167 in the e2e build, the plus 4.
   // 150,255 / 55,171 -> 146,589 / 54,099 on 2026-11-02, plate-story over main acf3d999 (#392): the runtime is smaller over #393 (locale-gaps moved words into late chunks). Measured 146,585 / 54,095 in the e2e build, the plus 4.
   // 146,589 / 54,099 -> 147,128 / 54,263 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState). Measured 147,124 / 54,259 in the e2e build over main 7fc3a1c4, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_128, maxGzip: 54_263 },
+  // 54,263 -> 54,266 gzip on 2026-11-04, snap-after-reading over main 22f43342 (#435): no code changed (raw 147,124 as before); the chunk names it imports shifted with #435's case copy. Measured 54,262 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_128, maxGzip: 54_266 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -95,7 +96,8 @@ const budgets = [
   // export names it imports shifted with the music's new exports. Measured 13,428 gzip in the e2e build, the gzip plus 4.
   // 34,459 / 13,432 -> 36,080 / 14,049 on 2026-11-02, locale-gaps (#393) over main 9be94346: the scene beat, the default echo and the speeches read src/copy/judgment.js by key (sceneBeat, defaultEcho), and the speakers' profiles take the page's language. Measured 36,076 / 14,045 in the e2e build, the plus 4.
   // 36,080 / 14,049 -> 36,274 / 14,117 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState); the observer's 순응 표본 holds the same line. Measured 36,270 / 14,113 in the e2e build over main 811df47a, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_274, maxGzip: 14_117 },
+  // 14,117 -> 14,116 gzip on 2026-11-04, snap-after-reading over main 22f43342 (#435): no code changed (raw 36,270 as before). Measured 14,112 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_274, maxGzip: 14_116 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
