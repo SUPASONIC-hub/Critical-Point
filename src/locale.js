@@ -98,6 +98,18 @@ let overlay = null;
 // Tables handed over before it arrived (src/copy/*.js in the shell), laid over when it does.
 const waiting = [];
 
+/**
+ * The tab's title from a dictionary (overlay.js pageTitle()): index.html's
+ * <title> is the Korean one, and the tab falls back to whatever the page had
+ * when it first painted (state/tabTitle.js). Called before the first paint,
+ * so that is this one. Returns the title, or null when there is none.
+ */
+export function setPageTitle(module, doc = globalThis.document) {
+  const title = module?.pageTitle?.() ?? null;
+  if (title && doc) doc.title = title;
+  return title;
+}
+
 /** Before the first paint of a page in another language: its dictionary, laid over the screen copy it covers. Nothing on a Korean page. */
 export function loadLocale() {
   if (LANG === SOURCE_LOCALE) return null;
@@ -108,11 +120,7 @@ export function loadLocale() {
     .then((module) => {
       overlay = module;
       for (const [name, tables] of waiting.splice(0)) module?.localizeTables(name, tables);
-      // The tab: index.html's <title> is the Korean one, and the tab's title
-      // falls back to whatever the page had when it first painted
-      // (state/tabTitle.js). Before the first paint, so that is this one.
-      const title = module?.pageTitle();
-      if (title) document.title = title;
+      setPageTitle(module);
     });
 }
 

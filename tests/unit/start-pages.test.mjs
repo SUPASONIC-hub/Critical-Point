@@ -11,7 +11,7 @@ import { localizedStartPage, renderSitePages, renderStartPages, renderStaticPage
 import introCopy from "../../src/copy/intro.js";
 import enIntro from "../../src/locales/en/screens/intro.js";
 import jaIntro from "../../src/locales/ja/screens/intro.js";
-import { chooseLanguage, folderLanguage } from "../../src/locale.js";
+import { chooseLanguage, folderLanguage, setPageTitle } from "../../src/locale.js";
 import { strategyFor } from "../../src/serviceWorker/worker.js";
 
 /**
@@ -194,5 +194,14 @@ test("the tab's title in each language is the start screen's pageTitle, one stri
   // The overlay hands the title to src/locale.js from the dictionary's intro.
   const overlay = readFileSync("src/locales/overlay.js", "utf8");
   assert.match(overlay, /dictionary\?\.copy\?\.screens\?\.intro\?\.pageTitle/);
-  assert.match(readFileSync("src/locale.js", "utf8"), /const title = module\?\.pageTitle\(\);\s+if \(title\) document\.title = title;/);
+  assert.match(readFileSync("src/locale.js", "utf8"), /setPageTitle\(module\);/);
+});
+
+test("setPageTitle puts the dictionary's title on the tab, and leaves the tab alone without one", () => {
+  const doc = { title: introCopy.pageTitle };
+  assert.equal(setPageTitle({ pageTitle: () => enIntro.pageTitle }, doc), enIntro.pageTitle);
+  assert.equal(doc.title, enIntro.pageTitle);
+  assert.equal(setPageTitle(null, doc), null, "no dictionary");
+  assert.equal(setPageTitle({ pageTitle: () => null }, doc), null, "a dictionary with no title");
+  assert.equal(doc.title, enIntro.pageTitle, "the title stays as it was");
 });
