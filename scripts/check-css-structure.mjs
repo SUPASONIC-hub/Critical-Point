@@ -441,7 +441,9 @@ const fileBudgets = {
   // layers in front of the table moved out from under it, and the season's
   // columns a tap away. The phone's purse-line fit (line-height 1, the season
   // joining the line) is gone with the line.
-  "money.css": { lines: 261, bytes: 5264 },
+  // 261 / 5264 -> 282 / 5713 the same day, measured: the band's 44px press
+  // area, and the reveal's sheet shortened by the band (and under the box).
+  "money.css": { lines: 282, bytes: 5713 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

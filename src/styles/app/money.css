@@ -30,6 +30,18 @@
   top: var(--kd-top);
 }
 
+/* The reveal's sheet is as tall as the screen less the backdrop's padding;
+   the band comes off it too, so its foot stays on the screen. */
+.gauntlet-shell .decision-reveal {
+  max-height: calc(100dvh - var(--kd-top) - 32px);
+}
+
+@media (max-width: 768px) {
+  .gauntlet-shell .decision-reveal {
+    max-height: calc(100dvh - var(--kd-top) - 16px);
+  }
+}
+
 .kd-account {
   position: fixed;
   top: 0;
@@ -47,6 +59,7 @@
 }
 
 .kd-account-head {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -62,6 +75,13 @@
   line-height: 1;
   text-align: left;
   white-space: nowrap;
+}
+
+/* Pressed over 44px tall, the band drawn 22 (accessibility.spec.js). */
+.kd-account-head::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 22px) 0;
 }
 
 .kd-account-head:focus-visible {
@@ -165,6 +185,10 @@
   .gauntlet-shell .gx-draft,
   .gauntlet-shell .decision-reveal-backdrop {
     padding-top: calc(max(16px, env(safe-area-inset-top)) + 62px);
+  }
+
+  .gauntlet-shell .decision-reveal {
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top)) - 86px);
   }
 
   .kd-account {

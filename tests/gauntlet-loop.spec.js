@@ -366,11 +366,15 @@ test("the play header keeps its title between a phone's width and the table's", 
         padRight: Number.parseFloat(getComputedStyle(document.querySelector(".game-header")).paddingRight),
         toolsRight: Math.round(box(".game-header .top-actions").right),
         musicLeft: Math.round(box(".music-controls").left),
+        // From 1025px the KD은행 계좌 is a box left of the music controls, and the header keeps its room too.
+        account: innerWidth >= 1025 ? { left: Math.round(box(".kd-account").left), width: Math.round(box(".kd-account").width) } : null,
       };
     });
-    expect(header.padRight, `${width}px: room reserved for the music controls`).toBeLessThanOrEqual(112);
-    expect(header.toolsRight, `${width}px: the header tools run under the music controls`).toBeLessThanOrEqual(header.musicLeft);
-    expect(header.musicLeft - header.toolsRight, `${width}px: dead room between the tools and the music controls`).toBeLessThanOrEqual(24);
+    const corner = header.account ? header.account.left : header.musicLeft;
+    const reserved = header.account ? 112 + header.account.width + 12 : 112;
+    expect(header.padRight, `${width}px: room reserved for the music controls (and the account box)`).toBeLessThanOrEqual(reserved);
+    expect(header.toolsRight, `${width}px: the header tools run under the corner's controls`).toBeLessThanOrEqual(corner);
+    expect(corner - header.toolsRight, `${width}px: dead room between the tools and the corner's controls`).toBeLessThanOrEqual(24);
   }
 });
 
