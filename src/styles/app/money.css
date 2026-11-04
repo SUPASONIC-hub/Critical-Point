@@ -47,7 +47,10 @@
   top: 0;
   right: 0;
   left: 0;
-  z-index: 30;
+  /* Under the music pills (30, earlier in the markup): the season's columns
+     open over the corner they sit in, and the pills stay on top and pressable.
+     Nothing else at 30 reaches the band: the layers start under it. */
+  z-index: 29;
   padding: env(safe-area-inset-top, 0px) max(12px, env(safe-area-inset-right)) 0
     max(12px, env(safe-area-inset-left));
   color: var(--ui-text-3);
@@ -191,7 +194,9 @@
     max-height: calc(100dvh - max(16px, env(safe-area-inset-top)) - 86px);
   }
 
+  /* Over the layers in front of the table, which cover the whole screen here. */
   .kd-account {
+    z-index: 30;
     top: max(16px, env(safe-area-inset-top));
     right: calc(max(16px, env(safe-area-inset-right)) + 92px);
     left: auto;

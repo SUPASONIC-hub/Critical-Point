@@ -212,10 +212,10 @@ test("a band under 1025px that the shell and the layers start below; a corner bo
   assert.match(band, /border-top: var\(--kd-top\) solid transparent;/);
   assert.match(band, /\.gauntlet-shell \.music-controls \{\s*transform: translateY\(var\(--kd-top\)\);/);
   assert.match(band, /\.gauntlet-shell \.gx-comic,\s*\.gauntlet-shell \.gx-act,\s*\.gauntlet-shell \.gx-draft,\s*\.gauntlet-shell \.decision-reveal-backdrop \{\s*top: var\(--kd-top\);/);
-  assert.match(band, /\.kd-account \{\s*position: fixed;\s*top: 0;\s*right: 0;\s*left: 0;\s*z-index: 30;/);
+  assert.match(band, /\.kd-account \{\s*position: fixed;\s*top: 0;\s*right: 0;\s*left: 0;\s*(?:\/\*[^]*?\*\/\s*)?z-index: 29;/, "under the music pills on a phone");
   const wide = css.slice(css.indexOf("@media (min-width: 1025px)"));
   assert.match(wide, /--kd-band: 0px;\s*--kd-top: 0px;/);
-  assert.match(wide, /\.kd-account \{\s*top: max\(16px, env\(safe-area-inset-top\)\);\s*right: calc\(max\(16px, env\(safe-area-inset-right\)\) \+ 92px\);\s*left: auto;\s*width: 15rem;/);
+  assert.match(wide, /\.kd-account \{\s*z-index: 30;\s*top: max\(16px, env\(safe-area-inset-top\)\);\s*right: calc\(max\(16px, env\(safe-area-inset-right\)\) \+ 92px\);\s*left: auto;\s*width: 15rem;/);
   assert.match(wide, /padding-right: max\(0px, calc\(122px \+ 15rem - /, "the header keeps the box's room");
   assert.match(wide, /\.gauntlet-shell \.decision-reveal-backdrop \{\s*padding-top: calc\(max\(16px, env\(safe-area-inset-top\)\) \+ 62px\);/, "and the layers start under it");
   // The minifier drops a standalone translate, rotate or scale property.
