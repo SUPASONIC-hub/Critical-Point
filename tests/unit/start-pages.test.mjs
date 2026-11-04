@@ -2,13 +2,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { createStorage } from "./helpers/browser.mjs";
+
 import { analyticsFor, withAnalyticsTags } from "../../scripts/analytics-config.mjs";
 import { inlineScriptProblems } from "../../scripts/deploy-policy.mjs";
 import { GAME_NAME, PAGE_KINDS, SHARE_IMAGE_ALT } from "../../scripts/legal-pages.mjs";
 import { localizedStartPage, renderSitePages, renderStartPages, renderStaticPages, START_PAGE, withAbsoluteSiteLinks } from "../../scripts/site-pages.mjs";
 import enIntro from "../../src/locales/en/screens/intro.js";
 import jaIntro from "../../src/locales/ja/screens/intro.js";
-import { folderLanguage } from "../../src/locale.js";
+import { chooseLanguage, folderLanguage } from "../../src/locale.js";
 import { strategyFor } from "../../src/serviceWorker/worker.js";
 
 /**
@@ -151,4 +153,31 @@ test("the game opens in a start page's folder language, and the service worker a
   assert.equal(strategyFor({ method: "GET", url: `${origin}/fr/`, mode: "navigate" }, origin), "none");
   const locale = readFileSync("src/locale.js", "utf8");
   assert.match(locale, /if \(CODES\.includes\(stored\)\) return stored;\s*const folder = folderLanguage\(globalThis\.location\?\.pathname\);\s*if \(folder\) return folder;/, "a choice kept on the device first, then the folder, then ?lang=");
+});
+
+test("a language chosen on a start page's folder opens that language's own start page, and the address drops ?lang=", () => {
+  const before = { location: globalThis.location, localStorage: globalThis.localStorage };
+  globalThis.localStorage = createStorage();
+  const opened = [];
+  const at = (href) => ({ href, assign: (to) => opened.push(to) });
+  try {
+    for (const [from, code, to] of [
+      ["https://example.test/en/?lang=ja", "ja", "https://example.test/ja/"],
+      ["https://example.test/ja/index.html", "en", "https://example.test/en/"],
+      ["https://example.test/en/", "ko", null], // the page is Korean already (LANG), so nothing to open
+      ["https://example.test/?x=1", "ja", "https://example.test/?x=1&lang=ja"],
+    ]) {
+      opened.length = 0;
+      globalThis.location = at(from);
+      chooseLanguage(code);
+      assert.deepEqual(opened, to ? [to] : [], `${from} -> ${code}`);
+    }
+    opened.length = 0;
+    globalThis.location = at("https://example.test/en/");
+    chooseLanguage("fr");
+    assert.deepEqual(opened, [], "a language the game does not have changes nothing");
+  } finally {
+    globalThis.location = before.location;
+    globalThis.localStorage = before.localStorage;
+  }
 });
