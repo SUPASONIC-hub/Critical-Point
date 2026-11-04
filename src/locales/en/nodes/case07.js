@@ -10,10 +10,10 @@ export default {
   "nodes": {
     "c7_start": {
       "title": "Transfer Order",
-      "text": "One week after the HR committee, morning, the Trigger Lab 4th-floor analyst room. Han Seoyun comes to your desk with a printed sheet. It is a transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. The place is 240km from Seoul. It is a personnel move, not discipline, so there is no appeal and no stated reason. Once it takes effect, your access to internal records shrinks to that branch. Han Seoyun turns the sheet over to the last page. The final approval box is empty. 'Same shape as that document 3 years ago. This person doesn’t sign a name. They sign with a seat.' The order is dated 12 days before the investigation into Oh Jinwoo began.",
+      "text": "One week after the HR committee, morning, the Trigger Lab 4th-floor analyst room. Han Seoyun comes to your desk with a printed sheet. It is a transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. The place is 240km from Seoul. It is a personnel move, not discipline, so there is no appeal and no stated reason. Once it takes effect, your access to internal records shrinks to that branch. Han Seoyun turns the sheet over to the last page. The final approval field is empty. 'Same shape as that document 3 years ago. This person doesn’t sign a name. They sign with a seat.' The order is dated 12 days before the investigation into Oh Jinwoo began.",
       "memo": [
         "48 hours until effective, no appeal process",
-        "Transfer order final approval box: blank",
+        "Transfer order final approval field: blank",
         "Order dated 12 days before the Oh Jinwoo investigation opened",
         "After transfer, records access shrinks to branch scope"
       ],
@@ -22,7 +22,7 @@ export default {
           "label": "Leave the boxes and spend the 48 hours gathering files"
         },
         "c7_start_accept": {
-          "label": "Accept the Yeongdong posting and start the handover list"
+          "label": "Accept the Yeongdong transfer and start the handover list"
         },
         "c7_start_appeal": {
           "label": "Point Han Seoyun to the blank box and file an appeal"
@@ -34,7 +34,7 @@ export default {
       "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Transfer in 48h",
       "question": "In 48 hours you will be at a branch 240km away, and the file stays here. Where do you spend the last two days?",
-      "lead": "One week after the HR committee, morning. Han Seoyun brings a printed transfer order and shows you the empty approval box on the last page first."
+      "lead": "One week after the HR committee, morning. Han Seoyun brings a printed transfer order and shows you the empty approval field on the last page first."
     },
     "c7_ledger": {
       "title": "Ban Jaewook’s Notebook",
@@ -69,7 +69,7 @@ export default {
     },
     "c7_counter": {
       "title": "3 Years at Gangseo",
-      "text": "KD Bank Gangseo Branch. Do Yoonha opens that door for the first time in 3 years. The sales board by the entrance is in the same spot, and the Top Seller of the Month sticker is still on it. The branch manager who moved him off the counter still sits in the same office. What you need is the printout of the memo sent down to the branch 3 years ago, 'Smart Logistics No. 3 Sales Cooperation.' It was printed for a branch meeting that year and put in a binder, so the back page with targets per window and the names of the staff is still attached. You saw that sheet once, on the table on inspection day. The manager says he can give it. He doesn’t get angry. Instead he speaks with the binder open. If this page leaves, he says, the names of every window clerk who took those targets and sold go with it. Starting with Do Yoonha. Do Yoonha keeps his eyes on the queue-ticket machine so he won’t look at the sales board.",
+      "text": "KD Bank Gangseo Branch. Do Yoonha opens that door for the first time since he left the counter. The sales board by the entrance is in the same spot, and the Top Seller of the Month sticker is still on it. The branch manager from his counter days still sits in the same office. What you need is the printout of the memo sent down to the branch 3 years ago, 'Smart Logistics No. 3 Sales Cooperation.' It was printed for a branch meeting that year and put in a binder, so the back page with targets per window and the names of the staff is still attached. You saw that sheet once, on the table on inspection day. The manager says he can give it. He doesn’t get angry. Instead he speaks with the binder open. If this page leaves, he says, the names of every window clerk who took those targets and sold go with it. Starting with Do Yoonha. Do Yoonha keeps his eyes on the number-ticket machine so he won’t look at the sales board.",
       "memo": [
         "Window-by-window sales targets attached to the memo’s back page",
         "Department that sent the targets: Corporate Finance Strategy Team",
@@ -96,13 +96,13 @@ export default {
       "place": "KD Bank Gangseo Branch",
       "clock": "Transfer in 43h",
       "question": "If the back page leaves, the names of the four people at the windows then go with it. How do you take it?",
-      "lead": "Do Yoonha opens the door of his old branch for the first time in 3 years. Branch Manager Bae Seungho, who moved him out, still sits in the same seat."
+      "lead": "Do Yoonha opens the door of his old branch for the first time since he left the counter. Branch Manager Bae Seungho, his manager in those days, still sits in the same seat."
     },
     "c7_paper": {
       "title": "The Burned Line",
-      "text": "The 2nd floor of the secondhand bookshop in Hoegi-dong. As you climb the stairs, the smell of paper comes first. At the desk by the window, Lim Kyungsoo peels the seal tape off a binder and slides one sheet across. A watermarked printout of page 3 of the 2023-0412 review report. The signature box is empty, and under it, the initials of whoever gave the order remain in pencil. On page 3 in the document management system, exactly that lower part is cut off. He takes off his glasses, wipes them, and for the first time asks for something. 'Don’t tell me you’ll protect me. I’ve carried this for 3 years. At the bank, and in this bookshop. If you submit it, put my name at the top. That’s what I want.' From downstairs comes the sound of the owner cutting the twine on a bundle of books.",
+      "text": "The 2nd floor of the secondhand bookshop in Hoegi-dong. As you climb the stairs, the smell of paper comes first. At the desk by the window, Lim Kyungsoo peels the seal tape off a binder and slides one sheet across. A watermarked printout of page 3 of the 2023-0412 review report. The signature field is empty, and under it a single pencil dot remains. On page 3 in the document management system, exactly that lower part is cut off. He takes off his glasses, wipes them, and for the first time asks for something. 'Don’t tell me you’ll protect me. I’ve carried this for 3 years. At the bank, and in this bookshop. If you submit it, put my name at the top. That’s what I want.' From downstairs comes the sound of the owner cutting the twine on a bundle of books.",
       "memo": [
-        "Pencil initials confirmed at the bottom of the page 3 printout",
+        "A single pencil dot confirmed at the bottom of the page 3 printout",
         "That bottom area is cut off in the system copy",
         "Lim Kyungsoo refuses anonymity",
         "With his name, the document gains weight as evidence"
@@ -204,10 +204,10 @@ export default {
       "question": "A man who cut 47 people wants to split 4,300 won. How do you settle the bill?"
     },
     "c7_teller": {
-      "title": "Window 4",
-      "text": "On the way out of the branch, Do Yoonha says out of habit to a customer holding the door, 'Take care going home, ma’am,' and someone at Window 4 calls to him. 'Yoonha, you still say that.' A gray-haired teller. Someone who sat in the same row 3 years ago and retires next year. The teller doesn’t ask why he has come. In a gap between customers, the teller opens a drawer and takes out a sheet. A copy of that year’s target sheet, one the branch kept on its own. The teller presses a fingernail down to fold over the part with the clerks’ names. The line with the teller’s own name. Folded, it slides under the counter glass. 'The fold is mine. Unfolding it is up to whoever takes it.' The ticket machine calls the next number.",
+      "title": "Window 3",
+      "text": "On the way out of the branch, Do Yoonha says out of habit to a customer holding the door, 'Take care going home, ma’am,' and someone at Window 3 calls to him. 'Yoonha, you still say that.' A gray-haired teller. Someone who sat in the same row 3 years ago and retires next year. The teller doesn’t ask why he has come. In a gap between customers, the teller opens a drawer and takes out a sheet. A copy of that year’s target sheet, one the branch kept on its own. The teller presses a fingernail down to fold over the part with the clerks’ names. The line with the teller’s own name. Folded, it slides under the counter glass. 'The fold is mine. Unfolding it is up to whoever takes it.' The ticket machine calls the next number.",
       "memo": [
-        "Window 4 teller was on the same team then",
+        "Window 3 teller was on the same team then",
         "The copy is the branch’s own file",
         "Retires next year"
       ],
@@ -222,13 +222,13 @@ export default {
           "label": "Take it folded and keep the name covered"
         }
       },
-      "place": "KD Bank Gangseo Branch · Window 4",
+      "place": "KD Bank Gangseo Branch · Window 3",
       "clock": "Transfer in 42h",
       "question": "A teller one year from retirement folds over their own name and hands you the copy. Do you unfold it?"
     },
     "c7_ticket": {
       "title": "The Train Ticket",
-      "text": "On the landing of the bookshop stairs, your phone rings once. ECHO quietly puts up a document. A train ticket the General Affairs Team has already issued. Departs 06:40, to Gangneung, one-way. The date is the day after the transfer takes effect. There is no return ticket. It was issued on the same day the order was written, 3 weeks before you got that sheet. The approver box is empty again. ECHO adds one line. 'The system calculated that you would go. The calculation is usually right.' In the alley below the stairs, someone is loading boxes of used books onto a handcart. The ticket can be canceled. But even if you cancel it, both the record of issuing it and the record of canceling it remain.",
+      "text": "On the landing of the bookshop stairs, your phone rings once. ECHO quietly puts up a document. A train ticket the General Affairs Team has already issued. Departs 06:40, to Gangneung, one-way. The date is the day after the transfer takes effect. There is no return ticket. It was issued on the same day the order was written, 3 weeks before you got that sheet. The approver field is empty again. ECHO adds one line. 'The system calculated that you would go. The calculation is usually right.' In the alley below the stairs, someone is loading boxes of used books onto a handcart. The ticket can be canceled. But even if you cancel it, both the record of issuing it and the record of canceling it remain.",
       "memo": [
         "One-way ticket issued on the date the order was written",
         "Approver box blank",
@@ -273,7 +273,7 @@ export default {
     },
     "c7_teller_reaction": {
       "title": "Four Names",
-      "text": "At the bus stop outside Gangseo Branch, Do Yoonha stands holding the target sheet. The names of the four window clerks who took those targets run down the page. The teller at Window 4, Do Yoonha, and two more. He scores a line with his fingernail along the row with his own name. 'I’ll put my own name forward. That one I can decide.' A bus stops, and he doesn’t get on. 'The other three I can’t decide. Just because we sat together doesn’t mean I can hand over their names for them.' He folds the sheet in half and gives it to you. The fold runs right through the middle of the four names.",
+      "text": "At the bus stop outside Gangseo Branch, Do Yoonha stands holding the target sheet. The names of the four window clerks who took those targets run down the page. The teller at Window 3, Do Yoonha at Window 4, and two more. He scores a line with his fingernail along the row with his own name. 'I’ll put my own name forward. That one I can decide.' A bus stops, and he doesn’t get on. 'The other three I can’t decide. Just because we sat together doesn’t mean I can hand over their names for them.' He folds the sheet in half and gives it to you. The fold runs right through the middle of the four names.",
       "memo": [
         "The right to put forward your own name",
         "A witness one year from retirement"
@@ -362,9 +362,9 @@ export default {
     },
     "c7_route_system": {
       "title": "The Transfer Register",
-      "text": "Instead of your own transfer, you ask how many transfers share the same shape. The analyst room terminal answers. The personnel register opens. ECHO filters by condition. Transfers carried out with the final approval box left empty. Nineteen in the last 4 years. The dates and destinations all differ, but 17 of the people passed through the same department. The Corporate Finance Strategy Team. The reason column is empty on all 19 rows. ECHO leaves one blank row at the bottom of the table. 'You are not the 20th person. You are one row in the same table. These 19 have never been put in one table before.'",
+      "text": "Instead of your own transfer, you ask how many transfers share the same shape. The analyst room terminal answers. The personnel register opens. ECHO filters by condition. Transfers carried out with the final approval field left empty. Nineteen in the last 4 years. The dates and destinations all differ, but 17 of the people passed through the same department. The Corporate Finance Strategy Team. The reason field is empty on all 19 rows. ECHO leaves one blank row at the bottom of the table. 'You are not the 20th person. You are one row in the same table. These 19 have never been put in one table before.'",
       "memo": [
-        "19 transfers with a blank approval box",
+        "19 transfers with a blank approval field",
         "17 passed through the Corporate Finance Strategy Team",
         "The table’s last row is still blank"
       ],
@@ -384,11 +384,11 @@ export default {
       },
       "place": "Trigger Lab, 4th-floor analyst room · personnel register terminal",
       "clock": "Transfer in 15h",
-      "question": "Nineteen transfers in 4 years went ahead with the approval box empty. How far do you open this table?"
+      "question": "Nineteen transfers in 4 years went ahead with the approval field empty. How far do you open this table?"
     },
     "c7_final_system_route": {
       "title": "19 Rows and One Blank",
-      "text": "12 hours until the transfer. On the personnel register terminal, the 19 transfers with blank approval boxes sit in one table. Names, dates, destinations, and the empty approval box. 17 passed through the Corporate Finance Strategy Team, and the last row is still blank. It is already dark outside the analyst room, and yours is the only light on the floor. ECHO asks. 'Before you opened it, this was not a table. It was 19 sheets filed separately. Do you want to turn it back into loose sheets?' As loose sheets, they were personnel moves. As a table, they become a method.",
+      "text": "12 hours until the transfer. On the personnel register terminal, the 19 transfers with blank approval fields sit in one table. Names, dates, destinations, and the empty approval field. 17 passed through the Corporate Finance Strategy Team, and the last row is still blank. It is already dark outside the analyst room, and yours is the only light on the floor. ECHO asks. 'Before you opened it, this was not a table. It was 19 sheets filed separately. Do you want to turn it back into loose sheets?' As loose sheets, they were personnel moves. As a table, they become a method.",
       "memo": [
         "19 blank-approval transfers bound into one table",
         "The table’s last row: blank",
@@ -411,7 +411,7 @@ export default {
     },
     "c7_evidence_turn": {
       "title": "The Order Came First",
-      "text": "When you hold the clues against the date the order was written, the sequence shows. In the Internal Audit records room, Ban Jaewook opens a calendar and circles three dates. The order was written 12 days before the Oh Jinwoo investigation began. And one day before it was written, Onsae submitted its subsidy review materials. Materials sent out under your name. Ban Jaewook joins the three circles with a line. 'The transfer didn’t come because the investigation started. The transfer was prepared because your name went on a document. The Oh Jinwoo matter wasn’t the reason. It was the pretext.' He copies the same line into his notebook. Before yours, 17 more transfers went through the Corporate Finance Strategy Team with the approval box empty, and the sequence is the same in every one.",
+      "text": "When you hold the clues against the date the order was written, the sequence shows. In the Internal Audit records room, Ban Jaewook opens a calendar and circles three dates. The order was written 12 days before the Oh Jinwoo investigation began. And one day before it was written, Onsae submitted its subsidy review materials. Materials sent out under your name. Ban Jaewook joins the three circles with a line. 'The transfer didn’t come because the investigation started. The transfer was prepared because your name went on a document. The Oh Jinwoo matter wasn’t the reason. It was the pretext.' He copies the same line into his notebook. Before yours, 17 more transfers went through the Corporate Finance Strategy Team with the approval field empty, and the sequence is the same in every one.",
       "memo": [
         "Date written = day after Onsae materials went out under your name",
         "Oh Jinwoo investigation: the pretext, not the reason",
@@ -434,7 +434,7 @@ export default {
     },
     "c7_start_stand": {
       "title": "Transfer for the One Who Kept the Desk",
-      "text": "You didn’t clear the desk Oh Jinwoo would come back to. The next week, in the morning, Do Yoonha stands in front of that desk at the end of the corridor with a sheet of paper. He came to water the plant, he says, and saw it on your desk first. A transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. It is a personnel move, not discipline, so there is no appeal and no duty to give a reason. The final approval box on the last page is empty. Do Yoonha points to the date it was written. It is earlier than the day Oh Jinwoo began missing work. 'His desk is still there. It’s your desk that’s being cleared, Analyst.'",
+      "text": "You didn’t clear the desk Oh Jinwoo would come back to. The next week, in the morning, Do Yoonha stands in front of that desk at the end of the corridor with a sheet of paper. He came to water the plant, he says, and saw it on your desk first. A transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. It is a personnel move, not discipline, so there is no appeal and no duty to give a reason. The final approval field on the last page is empty. Do Yoonha points to the date it was written. It is earlier than the day Oh Jinwoo began missing work. 'His desk is still there. It’s your desk that’s being cleared, Analyst.'",
       "memo": [
         "Oh Jinwoo’s desk is still in place",
         "Your order was written earlier",
@@ -445,7 +445,7 @@ export default {
           "label": "Point Han Seoyun to the blank box and file an appeal"
         },
         "c7_start_stand_accept": {
-          "label": "Accept the Yeongdong posting and start the handover list"
+          "label": "Accept the Yeongdong transfer and start the handover list"
         },
         "c7_start_stand_signature": {
           "label": "Show your transfer order to Oh Jinwoo first"
@@ -464,7 +464,7 @@ export default {
     },
     "c7_start_open": {
       "title": "Transfer for the One Who Opened the Conditions",
-      "text": "One week since you opened the two people’s settings to the public record. On the analyst room’s public-record terminal, that record is still up. The experiment did not stop. Only the person in charge changed. ECHO puts one more document on the same screen. A transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. It is a personnel move, not discipline, so there is no appeal and no stated reason, and the final approval box is empty. The replacement analyst is already assigned. 'The disclosure stays on the record. The one who disclosed goes 240km away. These two lines are written in different documents, so no one reads them side by side.'",
+      "text": "One week since you opened the two people’s settings to the public record. On the analyst room’s public-record terminal, that record is still up. The experiment did not stop. Only the person in charge changed. ECHO puts one more document on the same screen. A transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. It is a personnel move, not discipline, so there is no appeal and no stated reason, and the final approval field is empty. The replacement analyst is already assigned. 'The disclosure stays on the record. The one who disclosed goes 240km away. These two lines are written in different documents, so no one reads them side by side.'",
       "memo": [
         "Settings disclosure record still valid",
         "The experiment itself has not stopped",
@@ -475,7 +475,7 @@ export default {
           "label": "Point Han Seoyun to the blank box and file an appeal"
         },
         "c7_start_open_accept": {
-          "label": "Accept the Yeongdong posting and start the handover list"
+          "label": "Accept the Yeongdong transfer and start the handover list"
         },
         "c7_start_open_gather": {
           "label": "Leave the boxes and spend the 48 hours gathering files"
@@ -494,7 +494,7 @@ export default {
     },
     "c7_start_name": {
       "title": "Transfer for the One Who Closed It With a Name",
-      "text": "You closed the case under one person’s name. The next week, in the morning, Ban Jaewook comes up to the analyst room and puts a sheet of paper on your desk. A transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. The final approval box is empty. 'It’s a personnel move, not discipline. So there’s no appeal process and no duty to give a reason.' He speaks without opening his notebook. 'The organization learned that method is fast. Closing it with one person. This time they’re using it on you, Analyst. Only this time they don’t even need a name. They just move a seat.' In the grounds column, the number of the last closing document is written as precedent.",
+      "text": "You closed the case under one person’s name. The next week, in the morning, Ban Jaewook comes up to the analyst room and puts a sheet of paper on your desk. A transfer order. Corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. The final approval field is empty. 'It’s a personnel move, not discipline. So there’s no appeal process and no duty to give a reason.' He speaks without opening his notebook. 'The organization learned that method is fast. Closing it with one person. This time they’re using it on you, Analyst. Only this time they don’t even need a name. They just move a seat.' In the grounds column, the number of the last closing document is written as precedent.",
       "memo": [
         "The last closing method is cited as precedent",
         "No reason given in this handling",
@@ -502,7 +502,7 @@ export default {
       ],
       "choices": {
         "c7_start_name_accept": {
-          "label": "Accept the Yeongdong posting and start the handover list"
+          "label": "Accept the Yeongdong transfer and start the handover list"
         },
         "c7_start_name_signature": {
           "label": "Reopen last time’s naming procedure, now in your name"
@@ -569,7 +569,7 @@ export default {
     "c7_route_system_trace": "Following all of them turns 19 sheets into one table. Completing it takes half the time you have left.",
     "c7_route_system_quiet": "Close the table and your transfer goes back to being one personnel move. The transfers of the same shape stay, none aware of the others.",
     "c7_route_system_call": "You call; some hang up, some talk for a long time. They hear for the first time that their transfer was one row in a table.",
-    "c7_final_system_route_a": "As one document, the blank approval box reads not as a mistake but as a method. The 19 names go out with it.",
+    "c7_final_system_route_a": "As one document, the blank approval field reads not as a mistake but as a method. The 19 names go out with it.",
     "c7_final_system_route_b": "Your transfer can be canceled. The other rows of the same table never learn that one row was canceled.",
     "c7_final_system_route_c": "As you write your name, the blank row fills. The next person to open this table meets you first, on the last row.",
     "c7_evidence_turn_order": "With the two dates side by side, it is hard to call it chance. Your question goes on the record too.",
@@ -584,7 +584,7 @@ export default {
     "c7_start_stand_gather": "As you push the empty boxes under the desk, Han Seoyun folds the order and puts it in your drawer. The files come together, but the handover left undone stays on the record too.",
     "c7_start_stand_appeal": "When you hand over the appeal, Han Seoyun studies a form that has no box for filing it. An appeal creates a procedure, and a procedure takes time, and time is what you have left.",
     "c7_start_stand_accept": "As you start the list, the analyst room goes quiet. From that desk 240km away, you cannot open the files here.",
-    "c7_start_stand_signature": "When you show him, he looks at the approval box first. He says the approval box on the document opening his own investigation was empty too. Whether he can carry that is another matter.",
+    "c7_start_stand_signature": "When you show him, he looks at the approval field first. He says the approval field on the document opening his own investigation was empty too. Whether he can carry that is another matter.",
     "c7_start_open_gather": "As you push the empty boxes under the desk, Han Seoyun folds the order and puts it in your drawer. The files come together, but the handover left undone stays on the record too.",
     "c7_start_open_appeal": "When you hand over the appeal, Han Seoyun studies a form that has no box for filing it. An appeal creates a procedure, and a procedure takes time, and time is what you have left.",
     "c7_start_open_accept": "As you start the list, the analyst room goes quiet. From that desk 240km away, you cannot open the files here.",
@@ -596,8 +596,8 @@ export default {
   },
   "choiceVoiceLines": {
     "c7_start_gather": "Packing can wait, you decide; you leave the empty boxes and spend the remaining 48 hours gathering files.",
-    "c7_start_appeal": "Calling it a transfer decided without a single question, you point to the blank approval box and file an appeal.",
-    "c7_start_accept": "Judging this is not the place to fight, you accept the Yeongdong posting and start with the handover list.",
+    "c7_start_appeal": "Calling it a transfer decided without a single question, you point to the blank approval field and file an appeal.",
+    "c7_start_accept": "Judging this is not the place to fight, you accept the Yeongdong transfer and start with the handover list.",
     "c7_ledger_take": "Knowing his career ends with it, you take Ban Jaewook’s black notebook, all 47 names, as evidence.",
     "c7_ledger_page": "Saying one page is all you need, you take only the page with your name in pencil.",
     "c7_ledger_refuse": "Saying the notebook is his, you leave it in the cabinet and ask Ban Jaewook only to testify.",
@@ -621,7 +621,7 @@ export default {
     "c7_teller_choice_3": "Declining the copy, you say you will go only through the formal access procedure.",
     "c7_ticket_choice_1": "Because the ticket was issued before the transfer took effect and with no approver, you cancel it and keep that record as evidence.",
     "c7_ticket_choice_2": "While the system calculates that you will go, you leave the ticket as it is and send the files first.",
-    "c7_ticket_choice_3": "With the approver box empty and no one to argue with, you keep the ticket and say nothing today.",
+    "c7_ticket_choice_3": "With the approver field empty and no one to argue with, you keep the ticket and say nothing today.",
     "c7_receipt_reaction_choice_1": "Matching his way of owing no one, you say you will take the notebook through formal procedure too.",
     "c7_receipt_reaction_choice_2": "Saying a private record should be taken privately, you quietly take it.",
     "c7_receipt_reaction_choice_3": "Saying you can do without the notebook, you take only his testimony.",
@@ -637,7 +637,7 @@ export default {
     "c7_branch_quota_follow_a": "Saying the three already cut are parties to the same document, you list them as victims.",
     "c7_branch_quota_follow_b": "Saying this case closes first, you set the three past cases aside.",
     "c7_branch_quota_follow_c": "Saying their names are theirs to decide, you start making calls first.",
-    "c7_route_system_trace": "To tell whether the blank approval boxes are chance, you follow all 19 and complete the table.",
+    "c7_route_system_trace": "To tell whether the blank approval fields are chance, you follow all 19 and complete the table.",
     "c7_route_system_quiet": "Saying you are in no position to fight other people’s transfers, you close the table and handle only your own.",
     "c7_route_system_call": "Because the words of those who lived it come before the records, you contact the 17 transferred before you.",
     "c7_final_system_route_a": "So they never scatter into loose sheets again, you bind all 19 into one document and send it outside.",
@@ -651,22 +651,22 @@ export default {
     "c7_paper_evidence_turn": "Slotting the order date between the dates of your clues, you set out what came first.",
     "c7_route_system_evidence_turn": "Slotting the order date between the dates of your clues, you set out what came first.",
     "c7_start_stand_gather": "Packing can wait, you decide; you leave the empty boxes and spend the remaining 48 hours gathering files.",
-    "c7_start_stand_appeal": "Calling it a transfer decided without a single question, you point to the blank approval box and file an appeal.",
-    "c7_start_stand_accept": "Judging this is not the place to fight, you accept the Yeongdong posting and start with the handover list.",
+    "c7_start_stand_appeal": "Calling it a transfer decided without a single question, you point to the blank approval field and file an appeal.",
+    "c7_start_stand_accept": "Judging this is not the place to fight, you accept the Yeongdong transfer and start with the handover list.",
     "c7_start_stand_signature": "To the man whose desk you kept, this time you open your own papers first.",
     "c7_start_open_gather": "Packing can wait, you decide; you leave the empty boxes and spend the remaining 48 hours gathering files.",
-    "c7_start_open_appeal": "Calling it a transfer decided without a single question, you point to the blank approval box and file an appeal.",
-    "c7_start_open_accept": "Judging this is not the place to fight, you accept the Yeongdong posting and start with the handover list.",
+    "c7_start_open_appeal": "Calling it a transfer decided without a single question, you point to the blank approval field and file an appeal.",
+    "c7_start_open_accept": "Judging this is not the place to fight, you accept the Yeongdong transfer and start with the handover list.",
     "c7_start_open_signature": "With a channel you opened once already, you send this document up through the same door.",
     "c7_start_name_gather": "Packing can wait, you decide; you leave the empty boxes and spend the remaining 48 hours gathering files.",
-    "c7_start_name_appeal": "Calling it a transfer decided without a single question, you point to the blank approval box and file an appeal.",
-    "c7_start_name_accept": "Judging this is not the place to fight, you accept the Yeongdong posting and start with the handover list.",
+    "c7_start_name_appeal": "Calling it a transfer decided without a single question, you point to the blank approval field and file an appeal.",
+    "c7_start_name_accept": "Judging this is not the place to fight, you accept the Yeongdong transfer and start with the handover list.",
     "c7_start_name_signature": "The procedure you once opened in someone else’s name, you open again, this time with your own name in it."
   },
   "pack": {
     "clue": {
       "title": "The Order Written First",
-      "text": "The transfer order is dated 12 days before the investigation began. This posting is not a result of the case but an answer prepared before it."
+      "text": "The transfer order is dated 12 days before the investigation began. This transfer is not a result of the case but an answer prepared before it."
     },
     "outcomes": {
       "c7_after_stand": {

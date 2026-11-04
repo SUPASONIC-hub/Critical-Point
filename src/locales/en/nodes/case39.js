@@ -115,7 +115,7 @@ export default {
           "label": "Show the original’s blank box for 5 seconds, no caption"
         },
         "c39_caption_names": {
-          "label": "Roll the victims’ group names under the blank approver box"
+          "label": "Roll the victims’ group names under the blank approver field"
         },
         "reframe": {
           "label": "Ask the cut scenes’ history"
@@ -126,7 +126,7 @@ export default {
       },
       "place": "Sangam-dong · Raon Broadcasting · 3rd Floor Editing Room",
       "clock": "Broadcast day · 04:40 before dawn",
-      "question": "You empty the approver box the cat filled, and the standards reviewer says to fix that blank. What do you do?",
+      "question": "You empty the approver field the cat filled, and the standards reviewer says to fix that blank. What do you do?",
       "lead": "The tower of energy drink cans has grown one level taller, and the carrier door is half open."
     },
     "c39_final": {
@@ -608,7 +608,7 @@ export default {
     "c39_mosaic_choose": "Saying what gets blurred is that person’s life, you let each face’s owner decide the blur and wait until dawn.",
     "c39_mosaic_rule": "Saying the standard collapses if one person is an exception, you blur all three who fall under the legal team’s standard.",
     "c39_mosaic_open": "Saying faces give it power, you persuade everyone to show theirs.",
-    "c39_caption_names": "To set the people who paid in the place no one signed, you roll the victims’ group names, one line at a time, under the blank approver box.",
+    "c39_caption_names": "To set the people who paid in the place no one signed, you roll the victims’ group names, one line at a time, under the blank approver field.",
     "c39_caption_blank": "Saying to let the blank speak as a blank, you show the original approval’s blank box for 5 seconds with no caption.",
     "c39_caption_soft": "Saying you lose everything if the broadcast is stopped in review, you revise it as asked: 'the approval process is under investigation.'",
     "c39_final_full": "Saying even the court didn’t stop this broadcast, you deliver the 90-minute original the interviewees bet their faces on, as is.",

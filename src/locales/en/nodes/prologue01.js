@@ -9,8 +9,8 @@
 export default {
   "nodes": {
     "p1_start": {
-      "title": "Last Probation Task",
-      "text": "Head office, 6th floor, Corporate Finance Strategy Team. Between the copier and the window stands a desk with no nameplate. It’s yours; you’re 3 months into probation. Assistant Manager Oh Jinwoo pulls up a review file for you: a facility loan for Onsae Packaging, filed by Gangseo Branch, due for approval this Thursday. 'Last task of your probation. It closes within the branch limit, so just make sure the numbers add up.' The papers are clean. But the total debt on the summary sheet is 40 million won short of the sum of its items. One borrowing line never made it into the total, and with that line in, the debt-to-equity ratio tops 180%. At that point the branch can no longer approve the loan on its own. You put a pencil dot beside the line and stare at it for a long time.",
+      "title": "Last Trainee Task",
+      "text": "Head office, 6th floor, Corporate Finance Strategy Team. Between the copier and the window stands a desk with no nameplate. It’s yours; you’re 3 months into your traineeship. Assistant Manager Oh Jinwoo pulls up a review file for you: a facility loan for Onsae Packaging, filed by Gangseo Branch, due for approval this Thursday. 'Last task of your traineeship. It closes within the branch limit, so just make sure the numbers add up.' The papers are clean. But the total debt on the summary sheet is 40 million won short of the sum of its items. One borrowing line never made it into the total, and with that line in, the debt-to-equity ratio tops 180%. At that point the branch can no longer approve the loan on its own. You put a pencil dot beside the line and stare at it for a long time.",
       "memo": [
         "Onsae Packaging facility loan, 380 million won -- filed at Gangseo Branch",
         "Summary total debt 1.142 billion won / sum of items 1.182 billion won",
@@ -100,9 +100,9 @@ export default {
     },
     "p1_review": {
       "title": "The empty signature field",
-      "text": "Eleven a.m., Thursday. The door to the Team Head’s office opens. The probation review is booked for 10 minutes. Team Head Yoon Sanghyuk wears a plain navy suit and smiles only when he shakes your hand. He pulls up the evaluation form on his tablet and runs his eyes down its five items. Speed, accuracy, teamwork, reporting, attitude. He enters a number in the speed field and nowhere else. A 5 out of 5. 'I’ll fill in the rest later.' He brings up the 40 million won before you can. 'Good catch. Trainees rarely add up the lines under a summary sheet.' Then he closes the tablet. The speed of it is his answer. 'But write that number down, and 11 people won’t make it through November. I never said your judgment was wrong. I just decide where it gets to stand.' At the bottom of the form, the evaluator’s signature line is blank.",
+      "text": "Eleven a.m., Thursday. The door to the Team Head’s office opens. The trainee review is booked for 10 minutes. Team Head Yoon Sanghyuk wears a plain navy suit and smiles only when he shakes your hand. He pulls up the evaluation form on his tablet and runs his eyes down its five items. Speed, accuracy, teamwork, reporting, attitude. He enters a number in the speed field and nowhere else. A 5 out of 5. 'I’ll fill in the rest later.' He brings up the 40 million won before you can. 'Good catch. Trainees rarely add up the lines under a summary sheet.' Then he closes the tablet. The speed of it is his answer. 'But write that number down, and 11 people won’t make it through November. I never said your judgment was wrong. I just decide where it gets to stand.' At the bottom of the form, the evaluator’s signature line is blank.",
       "memo": [
-        "Probation review, 10 minutes -- 1 question",
+        "Trainee review, 10 minutes -- 1 question",
         "Of 5 evaluation items, one filled: speed 5/5",
         "Evaluator signature line -- blank",
         "Yoon Sanghyuk: 'I’ll fill in the rest later'"
@@ -135,7 +135,7 @@ export default {
       "memo": [
         "Approval papers due out -- Friday 09:00",
         "Review opinion field -- still blank",
-        "Probation evaluation final -- Friday",
+        "Trainee evaluation final -- Friday",
         "Evaluator signature line -- blank as of Thursday evening"
       ],
       "choices": {
@@ -159,12 +159,12 @@ export default {
     },
     "p1_aftershock": {
       "title": "Friday, Nine A.M.",
-      "text": "Friday morning. The approval papers come off the printer; in 20 minutes they go down to Gangseo Branch. Whatever you decided last night, the opinion field stays editable until the final check. The 40 million won you found came up twice at yesterday evening’s team meeting. Once as 'the trainee made a good catch,' and once as 'this one goes through within the branch limit.' Assistant Manager Oh stops sorting the printouts and glances at the opinion field. 'This is your last chance.' At the end of the hall, Manager Han Seoyun walks past, eyes on her tablet. The Team Head’s door is still shut. Of the five items on the probation form, the Team Head filled in exactly one. Speed. The one line you choose this morning will stop you for 3 seconds, 3 years from now, in front of Article 7 of some contract.",
+      "text": "Friday morning. The approval papers come off the printer; in 20 minutes they go down to Gangseo Branch. Whatever you decided last night, the opinion field stays editable until the final check. The 40 million won you found came up twice at yesterday evening’s team meeting. Once as 'the trainee made a good catch,' and once as 'this one goes through within the branch limit.' Assistant Manager Oh stops sorting the printouts and glances at the opinion field. 'This is your last chance.' At the end of the hall, Manager Han Seoyun walks past, eyes on her tablet. The Team Head’s door is still shut. Of the five items on the trainee form, the Team Head filled in exactly one. Speed. The one line you choose this morning will stop you for 3 seconds, 3 years from now, in front of Article 7 of some contract.",
       "memo": [
         "Approval papers printed 08:40 · sent 09:00",
         "Mentions at yesterday’s team meeting: 2 -- praise 1, schedule 1",
         "Final check of the opinion field 08:52",
-        "Filled on the probation form: only 'speed'"
+        "Filled on the trainee form: only 'speed'"
       ],
       "choices": {
         "p1_after_credit": {
@@ -207,10 +207,10 @@ export default {
     },
     "p1_scoreboard": {
       "title": "The First Scoreboard",
-      "text": "Assistant Manager Oh tosses his coffee can and steps up to the whiteboard. He draws a vertical line and writes his name on the left, yours on the right. 'The probation review has five items. Speed, accuracy, teamwork, reporting, attitude. But only one of them actually decides your score.' He circles the speed field and nothing else. 'I like to keep a scoreboard. Without one, people argue later about who won.' A 1 goes in the left column, a 0 in the right. He caps the marker. 'When this case is done, you get a point too.'",
+      "text": "Assistant Manager Oh tosses his coffee can and steps up to the whiteboard. He draws a vertical line and writes his name on the left, yours on the right. 'The trainee review has five items. Speed, accuracy, teamwork, reporting, attitude. But only one of them actually decides your score.' He circles the speed field and nothing else. 'I like to keep a scoreboard. Without one, people argue later about who won.' A 1 goes in the left column, a 0 in the right. He caps the marker. 'When this case is done, you get a point too.'",
       "memo": [
         "Whiteboard scoreboard -- Oh Jinwoo 1 / you 0",
-        "Of 5 probation items, only speed actually counts",
+        "Of 5 trainee items, only speed actually counts",
         "Agreed never to erase the scoreboard",
         "35 hours until the approval papers go out"
       ],
@@ -271,7 +271,7 @@ export default {
           "label": "Say this case is urgent, nod, and head upstairs"
         }
       },
-      "place": "Head office, 6th floor, hallway",
+      "place": "Head office, 1st floor, hallway by the elevators",
       "clock": "Tuesday, October 18, 2022 · 19:00",
       "question": "Lim Kyungsoo opposed that form, and his name isn’t in the minutes. What do you ask?"
     },
@@ -426,7 +426,7 @@ export default {
       ],
       "choices": {
         "p1_evidence_turn_hold": {
-          "label": "Hold this record until the probation review is over"
+          "label": "Hold this record until the trainee review is over"
         },
         "p1_evidence_turn_audit": {
           "label": "Formally hand the blank approver line to Internal Audit"
@@ -490,7 +490,7 @@ export default {
     "p1_final_system_route_b": "One case is corrected. The next summaries from 41 branches come up with the same five fields as today.",
     "p1_final_system_route_c": "With the field in place, the finder’s name stays. From that moment, it is also the name of the one responsible.",
     "p1_evidence_turn_audit": "You hand it over, and a case number goes at the top of that page in Ban Jaewook’s notebook. The name in the author field is Oh Jinwoo, and he doesn’t know it yet.",
-    "p1_evidence_turn_hold": "You hold it, and probation ends quietly. Meanwhile the 41 branches send up nine more sets of papers on the same form.",
+    "p1_evidence_turn_hold": "You hold it, and your traineeship ends quietly. Meanwhile the 41 branches send up nine more sets of papers on the same form.",
     "p1_evidence_turn_share": "You alert them, and 11 branches reply within three days. Three of them were already drawing in the field by hand.",
     "p1_counter_evidence_turn": "Follow the form number and the distribution record turns up. The hand that made it and the hand that approved it may not be in the same document.",
     "p1_mentor_evidence_turn": "Follow the form number and the distribution record turns up. The hand that made it and the hand that approved it may not be in the same document.",
@@ -547,7 +547,7 @@ export default {
     "p1_final_system_route_b": "The 28th won’t end in talk, you decide, so you leave the rule as it is and correct only the Onsae Packaging case.",
     "p1_final_system_route_c": "People keep finding errors only if the finder’s name stays, so you propose a field on the review form for whoever finds one.",
     "p1_evidence_turn_audit": "A document put into effect unsigned is a matter for audit, so you formally hand the blank approver line to Internal Audit.",
-    "p1_evidence_turn_hold": "Bring it out now and the evaluation will be over first, so you hold this record until after the probation review.",
+    "p1_evidence_turn_hold": "Bring it out now and the evaluation will be over first, so you hold this record until after the trainee review.",
     "p1_evidence_turn_share": "The people who use it should know first, so you alert the officers at the 41 branches using the same form.",
     "p1_counter_evidence_turn": "Laying the clue beside the summary form, you work out who made this form and who approved it.",
     "p1_mentor_evidence_turn": "Laying the clue beside the summary form, you work out who made this form and who approved it.",
@@ -568,7 +568,7 @@ export default {
       "p1_after_record": {
         "tag": "Name on Record",
         "title": "You Wrote the 40 Million Won Under Your Own Name",
-        "text": "The papers didn’t go down at nine. You passed probation, and from that day on you were someone this floor noticed."
+        "text": "The papers didn’t go down at nine. You passed your traineeship, and from that day on you were someone this floor noticed."
       },
       "p1_after_speed": {
         "tag": "Speed Chosen",

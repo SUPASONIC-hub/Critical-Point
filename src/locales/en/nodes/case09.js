@@ -34,7 +34,7 @@ export default {
       "place": "FlowOn HQ, 8th-floor situation room",
       "clock": "Creditors’ vote in 60h",
       "question": "The company from the 72 hours is up for liquidation this time. Where do you start?",
-      "lead": "The same situation room, 3 years on. On the whiteboard, the '72h' someone wrote back then is still there, half erased."
+      "lead": "The same situation room, a few months on. On the whiteboard, the '72h' someone wrote back then is still there, half erased."
     },
     "c9_ledger": {
       "title": "Kwon Dohyun’s Ledger",

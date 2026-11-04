@@ -434,8 +434,8 @@ export default {
           "label": "Formally submit the three appointment records to Han Jiwoo at the FSS"
         }
       },
-      "place": "KD Financial Group HQ · HR Records Room",
-      "clock": "Sunday 22:30",
+      "place": "Hannam-dong Alley · Beside Kang Taemin’s Truck",
+      "clock": "Sunday 21:40",
       "question": "The three previous compliance officers all wrote the same conclusion and left. How will you use these records?"
     },
     "c36_start_warm": {
