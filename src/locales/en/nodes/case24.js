@@ -184,7 +184,7 @@ export default {
     },
     "c24_oneline": {
       "title": "One-Line Results",
-      "text": "In the afternoon, a form arrives from Human Resources. 'Individual Handover Form Following Department Dissolution.' At the bottom is a field: 'Key results while employed (one line).' Lee Minseo turns her monitor to show you. She has written down the outcome of every case separately. 1,140 people whose jobs carried on, 212 people brought under the compensation standard, lathes that all six run again, one rice cake shop that didn’t close. The scrolling doesn’t end. 'How am I supposed to fit this into one line? The notice says there were no results, and my file is 23 pages.'",
+      "text": "In the afternoon, a form arrives from Human Resources. 'Individual Handover Form Following Department Dissolution.' At the bottom is a field: 'Key results while employed (one line).' Lee Minseo turns her monitor to show you. She has written down the outcome of every case separately. 1,140 people whose jobs carried on, 181 people brought under the compensation standard, lathes that all six run again, one rice cake shop that didn’t close. The scrolling doesn’t end. 'How am I supposed to fit this into one line? The notice says there were no results, and my file is 23 pages.'",
       "memo": [
         "Handover form 'key results' field -- one line",
         "Lee Minseo’s case-by-case results file, 23 pages",

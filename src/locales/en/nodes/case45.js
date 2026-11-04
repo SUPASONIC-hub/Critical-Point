@@ -237,11 +237,11 @@ export default {
     },
     "c45_indent": {
       "title": "Pressed Marks",
-      "text": "Ban Jaewook takes out a flashlight and lays it almost flat against the paper. These hands have spent 20 years picking out altered documents. 'There’s one more thing besides the erased marks.' Letters are pressed into the top margin of the back. No ink, no pencil dust, only the grooves left by someone pressing hard as they wrote on a sheet laid on top. Ban Jaewook reads them one letter at a time. 'Author’s name -- note it separately. Yoon.' He switches off the flashlight and opens his notebook to the 2023-0412 page. On the fourth line: July 24, and your name. 'For 3 years I didn’t know why your file came all the way up to my desk that day. Someone said to note it separately.'",
+      "text": "Ban Jaewook takes out a flashlight and lays it almost flat against the paper. These hands have spent 20 years picking out altered documents. 'There’s one more thing besides the erased marks.' Letters are pressed into the top margin of the back. No ink, no pencil dust, only the grooves left by someone pressing hard as they wrote on a sheet laid on top. Ban Jaewook reads them one letter at a time. 'Author’s name -- note it separately. Yoon.' He switches off the flashlight and opens his notebook to the 2023-0412 page. On the sixth line: July 24, and your name. 'For 3 years I didn’t know why your file came all the way up to my desk that day. Someone said to note it separately.'",
       "memo": [
         "Pressed marks: 'Author’s name -- note it separately. Yoon.'",
         "Marks that exist only on the original -- invisible on copies and photos",
-        "Ban Jaewook’s notebook, 2023-0412 page, fourth line: July 24, your name"
+        "Ban Jaewook’s notebook, 2023-0412 page, sixth line: July 24, your name"
       ],
       "choices": {
         "c45_indent_choice_3": {

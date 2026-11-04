@@ -42,7 +42,7 @@ name. 사건 04 says so in one sentence and nothing else connects them.
 | When | What | Where it is stated |
 |---|---|---|
 | 2022-10-17 (월) to 10-21 (금) | The trainee's last task: 온새포장, 4,000만 원, 178.4% → 184.7% | 프롤로그 01 |
-| 2022-11-14 18:02 | The analyst, still a trainee, clicks through the 제7조 draft circulation | 프롤로그 02 evidence turn |
+| 2022-11-14 18:02 | The analyst, three weeks out of the traineeship (it ended 10-21), clicks through the 제7조 draft circulation | 프롤로그 02 evidence turn |
 | 2023-04-12 (수) 09:00 | The file lands on the analyst's desk. This is the day in the loan number, **not** the approval | 프롤로그 02 |
 | 2023-04-13 (목) | Site visit, 김포 제2풀필먼트센터 | 프롤로그 02 |
 | 2023-04-14 (금) 23:00 | 184.2% is rebuilt | 프롤로그 02 |
@@ -301,8 +301,8 @@ state no floor and no percentage.
 
 The loan was extended four times, each time over 노아's "거절" by a person's
 account. The fourth exception is under the analyst's 사번 and dated 3월 30일:
-three days before the analyst's first day at KD캐피탈 and 25 days before the
-committee of 4월 24일 (사건 31, hidden route).
+ten days before the analyst's first day at KD캐피탈 (4월 9일, 목) and 25 days
+before the committee of 4월 24일 (사건 31, hidden route).
 
 ## The harmed
 
@@ -359,7 +359,7 @@ year.
 | 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday. 노아 has been live since 2월 10일, two weeks. 세온메디칼 wants the 5축 가공기 contract by 3월 3일 (화) and the 200 prototypes by 4월 3일 |
 | 사건 23 | 주주총회 3월 20일 (금); the day that fixes who may vote is 3월 6일 (금), a week after the 수료식 where 김 반장 bought the first share; KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
-| 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
+| 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; the analyst's first day at KD캐피탈 4월 9일 (목); 취임식 4월 10일 (금) |
 | 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
 | 사건 27 | 5월 4일 (월); the 정리안 is dated 4월 28일 |
 | 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 징계해고·고소 공지 6월 22일 (월) 08시; 사택 퇴거 7월 7일 |

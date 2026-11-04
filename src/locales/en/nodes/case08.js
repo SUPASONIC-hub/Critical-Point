@@ -318,11 +318,11 @@ export default {
     },
     "c8_branch_ledger": {
       "title": "Han Seoyun’s Painting",
-      "text": "In one partner company’s expense ledger, a painting purchase is booked as 'client entertainment'. The name in the guest column is Han Seoyun. Han Seoyun takes your call and stays silent a long while before speaking. 'That painting has hung on my office wall for 3 years. I got it as a promotion gift. That same year, I signed the review box next to the approval box on 2023-0412.'",
+      "text": "In one partner company’s expense ledger, a painting purchase is booked as 'client entertainment'. The name in the guest column is Han Seoyun. Han Seoyun takes your call and stays silent a long while before speaking. 'That painting has hung on my office wall for 3 years. I got it as a promotion gift. That same year, I pressed the return button on the 2023-0412 dissent.'",
       "memo": [
         "Partner ledger: painting booked as entertainment",
-        "Recipient: Han Seoyun (then Deputy Manager)",
-        "Same year, Han Seoyun signed the 2023-0412 review box",
+        "Recipient: Han Seoyun (then Manager)",
+        "Same year, Han Seoyun returned the 2023-0412 dissent",
         "Han Seoyun offers to return the painting voluntarily"
       ],
       "choices": {
