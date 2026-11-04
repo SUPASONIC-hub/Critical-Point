@@ -595,7 +595,8 @@ const budgets = [
   // but the start screen (:has(.intro)) keeps 16px, and the HUD numbers keep their size through --hud-rem. Measured 199,350 / 37,226, plus 4.
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
   // 200,019 / 37,440 -> 205,907 / 40,179 on 2026-11-03, font-split over main 443f26d8: the second @font-face and its unicode-range (the 865 code points of the second font file, written by scripts/build-fonts.mjs). Measured 205,903 / 40,175 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 205_907, maxGzip: 40_179 },
+  // 205,907 / 40,179 -> 204,228 / 39,438 on 2026-11-04, font-split: the intro's data joined the first file (scripts/font-charset.mjs), so the second file's unicode-range is shorter (865 -> 599 code points). Measured 204,224 / 39,434, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 204_228, maxGzip: 39_438 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -606,11 +607,15 @@ const budgets = [
   // 198,148 -> 96,240 on 2026-11-03, font-split (the user's choice 1): the one
   // file became two. This is the first, preloaded one: the start screen's
   // characters. Measured 96,236 plus 4.
-  { pattern: /^pretendard-cp-(?!rest-).*\.woff2$/, maxBytes: 96_240, compressed: true },
+  // 96,240 -> 129,428 on 2026-11-04: the start screen also prints the case
+  // cards, the play styles and the operator origins (Linux measurement: 217
+  // syllables of them fetched the second file). Measured 129,424 plus 4.
+  { pattern: /^pretendard-cp-(?!rest-).*\.woff2$/, maxBytes: 129_428, compressed: true },
   // The second file, every other syllable of the copy, fetched by unicode-range
   // when a page prints one and precached by the worker (service-worker-build.mjs).
   // Not in the first paint. Measured 116,940 plus 4 on 2026-11-03.
-  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 116_944, compressed: true },
+  // 116,944 -> 85,748 on 2026-11-04, the same move. Measured 85,744 plus 4.
+  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 85_748, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -1212,7 +1217,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,134 / 483,033 / 489,715 -> 426,755 / 483,654 / 490,336 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 426,751 / 483,650 / 490,332, the plus 4.
 // 426,755 / 483,654 / 490,336 -> 426,761 / 483,722 / 490,404 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 426,757 / 483,718 / 490,400, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 330,347 / 387,309 / 393,995 on 2026-11-03, font-split over main 443f26d8 (the user's choice 1, merged after W47): the font is two files and only the first, the start screen's characters, is preloaded (198,144 -> 96,236); the stylesheet carries the second file's unicode-range (+2.7KB gzip, inline critical CSS too). Measured 330,343 / 387,305 / 393,991, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 330_347, en: 387_309, ja: 393_995 };
+// 330,347 / 387,309 / 393,995 -> 362,048 / 419,011 / 425,697 on 2026-11-04, font-split: the first font file carries the intro's case cards, play styles and origins (96,236 -> 129,424), so the Korean and English start screens no longer fetch the second file (Linux, 2026-11-04). Measured 362,044 / 419,007 / 425,693, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 362_048, en: 419_011, ja: 425_697 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -1343,7 +1349,8 @@ function checkBudget(file, budget) {
 // 3,624 -> 3,629 gzip on 2026-11-02, money-feedback over main 9be94346: the warm-up list's hashed names only. Measured 3,625, the plus 4.
 // 10,106 / 3,629 -> 10,139 / 3,643 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 10,135 / 3,639, the plus 4.
 // 10,139 / 3,643 -> 10,183 / 3,653 on 2026-11-03, font-split over main 443f26d8: the second font file joins the install list. Measured 10,179 / 3,649, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_183, maxGzip: 3_653 };
+// 3,653 -> 3,659 gzip on 2026-11-04, font-split: the font files' hashed names. Measured 10,179 / 3,655, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_183, maxGzip: 3_659 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

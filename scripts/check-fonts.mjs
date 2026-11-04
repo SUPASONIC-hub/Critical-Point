@@ -45,8 +45,10 @@ import {
 // this line is the first (preloaded) one's. Measured 96,236 plus 4. The second
 // file's line is MAX_REST_FONT_BYTES; together they are about the one file
 // they replaced, since both are cut from the same face and axis.
-const MAX_FONT_BYTES = 96_240;
-const MAX_REST_FONT_BYTES = 116_944;
+// 96,240 / 116,944 -> 129,428 / 85,748 on 2026-11-04: the intro's case cards,
+// play styles and origins moved to the first file. Measured 129,424 / 85,744 plus 4.
+const MAX_FONT_BYTES = 129_428;
+const MAX_REST_FONT_BYTES = 85_748;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones

@@ -60,6 +60,17 @@ export const FIRST_PAINT_SOURCES = [
   "src/analystTitle.js",
   "src/appConfig.js",
   "src/advancedSystems.js",
+  // The intro's field bag (createIntroViewModel) and the data it carries: every
+  // case card's title, trigger and summary, the play styles, the operator
+  // origins, the trigger labels and the privacy lines. Measured on Linux
+  // 2026-11-04, these drew 217 syllables from the second file on the Korean
+  // start screen; tests/unit/first-paint-charset.test.mjs holds the bag to the list.
+  "src/viewModels/introViewModel.js",
+  "src/viewModels/seasonViewModels.js",
+  "src/gameCases.js",
+  "src/appCopy.js",
+  "src/gameConstants.js",
+  "src/privacyText.js",
 ];
 
 const SOURCE_ROOTS = ["src"];
