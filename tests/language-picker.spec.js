@@ -1,6 +1,5 @@
 import { expect, test } from "./helpers/network.js";
 import { LOCALE_KEY } from "../src/appConfig.js";
-import { GAME_TITLE_READING } from "../src/appCopy.js";
 
 /**
  * The language choice on the intro (LanguagePicker.jsx, 다국어 틀): a
@@ -56,29 +55,30 @@ test("the intro's language choice opens English, keeps it through a reload and r
  * through simplifyPlayerText, whose Korean UI words matched the English copy --
  * "Injustice / 믿음 / Helplessness", "This 시간 the agenda is liquidation".
  * Every text on the page and every tooltip is read, all the case cards with
- * it. Korean belongs in two places: the picker's 한국어 button, marked
- * lang="ko", and the brand's reading beside the title (GAME_TITLE_READING,
- * 트리거랩), which every language prints. The <noscript> page is not drawn.
+ * it. Korean belongs in one place, the picker's 한국어 button, marked
+ * lang="ko"; the brand's reading under the wordmark and on the case chip is
+ * the page's own (Trigger Lab, the user's choice 2026-11-04). The <noscript>
+ * page is not drawn.
  */
 test("the English start screen prints no Korean, case cards and tooltips included", async ({ page }) => {
   await page.goto("/?lang=en");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.locator(".case-card", { hasText: "Prologue 03" }).first()).toBeAttached();
-  const korean = await page.evaluate((brandReading) => {
+  await expect(page.locator(".game-wordmark .wordmark-reading b")).toHaveText("Trigger Lab");
+  const korean = await page.evaluate(() => {
     const hangul = /[가-힣]/;
     const found = [];
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       const node = walker.currentNode;
       if (node.parentElement.closest("[lang='ko'], script, style, noscript")) continue;
-      if (node.textContent.trim() === brandReading) continue;
       if (hangul.test(node.textContent)) found.push(node.textContent.trim().slice(0, 80));
     }
     for (const element of document.body.querySelectorAll("[title]")) {
       if (!element.closest("[lang='ko']") && hangul.test(element.title)) found.push(`title: ${element.title.slice(0, 80)}`);
     }
     return found;
-  }, GAME_TITLE_READING);
+  });
   expect(korean).toEqual([]);
 });
 

@@ -290,7 +290,8 @@ const budgets = [
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
   // 189,392 / 68,379 -> 189,407 / 68,395 on 2026-11-04, en-ko-leak over main 557d17bb: simplifyPlayerText reads the page's language (src/locale.js) and hands a page in another language back its own text. Measured 189,403 / 68,391 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_407, maxGzip: 68_395 },
+  // 189,407 / 68,395 -> 189,415 / 68,397 on 2026-11-04, en-ko-leak over main 22f43342: the intro reads its title reading from its copy, and the phase chip prints the phase as written. Measured 189,411 / 68,393, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_415, maxGzip: 68_397 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1093,7 +1094,8 @@ const budgets = [
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
   // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_807, maxGzip: 53_485 },
+  // 149,807 / 53,485 -> 149,834 / 53,489 on 2026-11-04, en-ko-leak over main 22f43342: the brand's reading under the wordmark, Trigger Lab (screens.intro.titleReading, the user's choice 1). Measured 149,830 / 53,485, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_834, maxGzip: 53_489 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1227,7 +1229,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
 // 426,845 / 483,841 / 490,518 -> 426,858 / 483,850 / 490,522 on 2026-11-04, en-ko-leak over main 557d17bb: the language check in simplifyPlayerText. Measured 426,854 / 483,846 / 490,518, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_858, en: 483_850, ja: 490_522 };
+// 426,858 / 483,850 / 490,522 -> 426,861 / 483,864 / 490,539 on 2026-11-04, en-ko-leak over main 22f43342: the title reading in each dictionary (Trigger Lab, トリガーラボ). Measured 426,857 / 483,860 / 490,535, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_861, en: 483_864, ja: 490_539 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
