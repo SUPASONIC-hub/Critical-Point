@@ -303,7 +303,8 @@ const budgets = [
   // 68,379 -> 68,384 gzip on 2026-11-04, kd-bank-account over main 629de24c: the account's name in the table's words. Measured 68,380 gzip in the e2e build (raw under 189,392), the plus 4.
   // 68,384 -> 68,378 gzip on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): measured 68,374 locally and in Linux CI, the plus 4.
   // 68,378 -> 68,382 gzip the same day: Linux CI measured 68,378 on 986edea7 (4 more than locally), the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_456, maxGzip: 68_428 },
+  // -> 189,456 / 68,429 on 2026-11-04, bundle-1105a (#440, #439, #442, #416 over main 2bd9a8ba): the lines above together. Measured 189,452 / 68,425 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_456, maxGzip: 68_429 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -619,7 +620,8 @@ const budgets = [
   // --ui-line-field and its brighter hover (play.css). Measured 200,429 / 37,512 in the e2e build, plus 4.
   // 200,439 / 37,512 -> 202,784 / 38,004 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 band (below 1025px) and corner box (money.css), with the shell, the music pills and the layers in front of the table moved out from under it. Measured 202,780 / 38,000 in the e2e build, the plus 4.
   // 202,784 / 38,004 -> 203,176 / 38,053 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): the band's 44px press area, the reveal's sheet shortened by the band and the box, the band under the music pills. Measured 203,172 / 38,049 locally and in Linux CI alike, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_176, maxGzip: 38_053 },
+  // -> 203,170 / 38,056 on 2026-11-04, bundle-1105a (#440, #439, #442, #416 over main 2bd9a8ba): the lines above together. Measured 203,166 / 38,052 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_170, maxGzip: 38_056 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1259,7 +1261,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,820 / 490,505 -> 427,340 / 484,329 / 491,013 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌's CSS in the index stylesheet and its words in the entry and the two dictionaries. Measured 427,336 / 484,325 / 491,009, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,386 / 484,397 / 491,075 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424). Measured 427,382 / 484,393 / 491,071 locally and in Linux CI, the plus 4.
 // 427,386 / 484,397 / 491,075 -> 427,391 / 484,402 / 491,080 the same day: Linux CI measured 427,387 / 484,398 / 491,076 on 986edea7 (index.html and the entry 1 and 4 bytes more than locally), the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 427_391, en: 484_402, ja: 491_080 };
+// -> 427,435 / 484,446 / 491,106 on 2026-11-04, bundle-1105a (#440, #439, #442, #416 over main 2bd9a8ba): the lines above together, the critical CSS cut again. Measured 427,431 / 484,442 / 491,102 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_435, en: 484_446, ja: 491_106 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
