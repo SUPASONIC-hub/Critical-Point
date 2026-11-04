@@ -668,7 +668,7 @@ export const PAGE_LANGUAGES = ["ko", "en", "ja"];
  */
 export const PAGE_KINDS = SITE_PAGES;
 
-const COPY = {
+export const COPY = {
   ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의" },
   en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact" },
   ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ" },
@@ -688,8 +688,60 @@ const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 /** A page's address from the root: `/faq.html`, `/en/faq.html`. The policy's two are PRIVACY_PAGE_PATH and TERMS_PAGE_PATH. */
 export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`;
 
-/** The game in a language, as the start page's own hreflang links name it (index.html). */
-export const gamePath = (language) => (language === "ko" ? "/" : `/?lang=${language}`);
+/**
+ * The game in a language, as the start page's own hreflang links name it
+ * (index.html): `/`, `/en/`, `/ja/`. The two folders hold the start page
+ * written again in their language (`localizedStartPage`, site-pages.mjs), and
+ * open the game in it (src/locale.js). Until 11-03 they were `/?lang=en` and
+ * `/?lang=ja`, which still open the game in English and Japanese but are the
+ * Korean page to a crawler: their canonical was `/`.
+ */
+export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
+
+/**
+ * The picture a shared link shows (the start screen's key visual, 1200x675),
+ * and what it shows in each language: the start screen's own `heroAlt`
+ * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
+ * holds them to it).
+ */
+export const SHARE_IMAGE = { path: "/triggerlab-key-visual.jpg", width: 1200, height: 675 };
+export const SHARE_IMAGE_ALT = {
+  ko: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
+  en: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
+  ja: "日暮れの高層ビルの屋上から街を見下ろす、二人の分析官の後ろ姿",
+};
+
+/** Open Graph's name for each language. */
+export const OG_LOCALE = { ko: "ko_KR", en: "en_US", ja: "ja_JP" };
+
+/**
+ * The card a shared link shows (Open Graph and Twitter): the page's own title
+ * and description over the key visual. `url` and the image are root-relative;
+ * the build makes og:url, og:image and twitter:image absolute
+ * (`withAbsoluteSiteLinks`, site-pages.mjs), as a crawler needs them.
+ */
+export function shareMetaLines({ language, url, title, description }) {
+  const meta = (key, name, value) => `<meta ${key}="${name}" content="${escapeHtml(value)}" />`;
+  return [
+    meta("property", "og:type", "website"),
+    meta("property", "og:url", url),
+    meta("property", "og:site_name", GAME_NAME[language]),
+    meta("property", "og:locale", OG_LOCALE[language]),
+    ...PAGE_LANGUAGES.filter((code) => code !== language).map((code) => meta("property", "og:locale:alternate", OG_LOCALE[code])),
+    meta("property", "og:title", title),
+    meta("property", "og:description", description),
+    meta("property", "og:image", SHARE_IMAGE.path),
+    meta("property", "og:image:type", "image/jpeg"),
+    meta("property", "og:image:width", String(SHARE_IMAGE.width)),
+    meta("property", "og:image:height", String(SHARE_IMAGE.height)),
+    meta("property", "og:image:alt", SHARE_IMAGE_ALT[language]),
+    meta("name", "twitter:card", "summary_large_image"),
+    meta("name", "twitter:title", title),
+    meta("name", "twitter:description", description),
+    meta("name", "twitter:image", SHARE_IMAGE.path),
+    meta("name", "twitter:image:alt", SHARE_IMAGE_ALT[language]),
+  ];
+}
 
 export { escapeHtml };
 
@@ -719,15 +771,19 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
     .join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
   const tags = analytics ? analyticsTagLines(analytics).map((line) => `${line}\n`).join("") : "";
+  const summary = description ?? copy[kind];
+  const share = shareMetaLines({ language, url: pagePath(kind, language), title, description: summary })
+    .map((line) => `${line}\n`)
+    .join("");
   return `<!doctype html>
 <html lang="${language}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapeHtml(title)}</title>
-<meta name="description" content="${escapeHtml(description ?? copy[kind])}" />
+<meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
-${alternates}<link rel="icon" href="/icons/icon-192.png" />
+${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
 <style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
 ${tags}</head>
 <body>
@@ -762,6 +818,27 @@ export function renderLegalPages({ analytics = null } = {}) {
     { kind: "terms", language: "ja", body: TERMS_JA },
   ];
   return Object.fromEntries(
-    pages.map((page) => [pagePath(page.kind, page.language).slice(1), renderDocumentPage({ ...page, effective: dateOf(page), analytics })]),
+    pages.map((page) => [
+      pagePath(page.kind, page.language).slice(1),
+      renderDocumentPage({ ...page, description: LEGAL_DESCRIPTION[page.kind][page.language], effective: dateOf(page), analytics }),
+    ]),
   );
 }
+
+/**
+ * What a search result says under each policy's title. Until 11-03 it was the
+ * title again (「개인정보처리방침」); each line names the sections the page
+ * has, in the order it has them.
+ */
+export const LEGAL_DESCRIPTION = {
+  privacy: {
+    ko: `「임계점: CRITICAL POINT」가 처리하는 개인정보의 항목과 목적, 보유 기간(${days}일), 이 기기에 저장하는 정보, 열람·삭제를 요청하는 방법을 안내합니다.`,
+    en: `What Critical Point processes and why, how long it is kept (${days} days), what is stored on your device, and how to ask to see or delete your data.`,
+    ja: `『臨界点: CRITICAL POINT』が取り扱う個人情報の項目と目的、保有期間(${days}日)、この端末に保存する情報、閲覧・削除を請求する方法をご案内します。`,
+  },
+  terms: {
+    ko: "「임계점: CRITICAL POINT」의 이용 조건입니다. 무료 웹판, 게임 속 칩과 점수, 공개 랭킹, 참가자 게시판의 규칙과 개발자의 책임 범위를 정합니다.",
+    en: "The terms for playing Critical Point: the free web version, in-game chips and scores, the public ranking, the participants' board and the limits of the developer's responsibility.",
+    ja: "『臨界点: CRITICAL POINT』の利用条件です。無料のウェブ版、ゲーム内のチップとスコア、公開ランキング、参加者掲示板のルールと開発者の責任の範囲を定めます。",
+  },
+};

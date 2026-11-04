@@ -367,7 +367,10 @@ const fileBudgets = {
   // the splash panel is a size container and the word's corner pin became a
   // position read off the plate. 849 / 16478 over main 5c00dffe (with
   // pc-type-scale), measured.
-  "briefing.css": { lines: 849, bytes: 16478 },
+  // 849 / 16478 -> 849 / 16498 on 2026-11-03, measured (plate-sound-clip): the
+  // word is centred in its transform, which the build keeps, not by the
+  // separate translate property the build dropped.
+  "briefing.css": { lines: 849, bytes: 16498 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

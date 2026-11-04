@@ -267,6 +267,9 @@ export function rootImageCacheProblems(value) {
  */
 export const WORKER_PATH = "/sw.js";
 
+/** The start page at every address it has: `/`, and its English and Japanese at their folders (since 11-03). Each is served no-cache. */
+export const SHELL_PATHS = ["/", "/index.html", "/en/", "/en/index.html", "/ja/", "/ja/index.html"];
+
 export function workerCacheProblems(value) {
   return shellCacheProblems(value).map((problem) => problem.replace(/^the page\b/, "the service worker"));
 }
@@ -376,7 +379,7 @@ export function renderYamlHeaderProblems(yaml) {
   const headers = readRenderYamlHeaders(yaml);
   const find = (path, name) => headers.find((header) => header.path === path && header.name === name)?.value ?? null;
   const problems = siteHeaderProblems((name) => find("/*", name)).map((problem) => `/*: ${problem}`);
-  for (const path of ["/", "/index.html"]) {
+  for (const path of SHELL_PATHS) {
     problems.push(...shellCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
   }
   problems.push(...workerCacheProblems(find(WORKER_PATH, "cache-control")).map((problem) => `${WORKER_PATH}: ${problem}`));
