@@ -1,12 +1,12 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { readPurse } from "./moneyFeedback.js";
 import tableCopy from "../copy/table.js";
 
 /**
  * The hand's amount, thrown at the middle of the screen by the slam: it swells,
- * holds, and flies into the bank rail's purse (`readBurst`, moneyFeedback.js).
- * The flight is measured, not guessed: the purse moves with the width and with
- * the rail's wrapping, so the distance from here to it is read before the first
+ * holds, and flies into the KD은행 계좌 (`BankPurse`; `readBurst`, moneyFeedback.js).
+ * The flight is measured, not guessed: the account is a band on a phone and a
+ * corner box on a wide screen, so the distance from here to it is read before the first
  * paint and handed to the keyframes as two custom properties. With no purse on
  * the page, or none drawn, the amount fades where it stands.
  *
@@ -24,7 +24,7 @@ export function MoneyBurst({ burst, target, spoken = true }) {
     if (!node || !goal) return;
     const from = node.getBoundingClientRect();
     const to = goal.getBoundingClientRect();
-    // A rail that is not drawn (a phone on its side under 340px) has no place to fly to.
+    // An account that is not drawn has no place to fly to.
     if (!to.width) return;
     node.style.setProperty("--gx-fly-x", `${Math.round(to.left + to.width / 2 - (from.left + from.width / 2))}px`);
     node.style.setProperty("--gx-fly-y", `${Math.round(to.top + to.height / 2 - (from.top + from.height / 2))}px`);
@@ -38,25 +38,46 @@ export function MoneyBurst({ burst, target, spoken = true }) {
 }
 
 /**
- * The bank rail's head, where that amount lands: what the run holds, the last
- * hand's change -- its sign is read, its arrow is not -- and the season's won
- * and lost (`readPurse`). On a closed window (`settling`) it already shows the
- * values the settle will leave. No live region: the slam says the verdict
- * once, and this is here when looked for.
+ * The KD은행 계좌: what the run holds, pinned to the screen through every
+ * part of a window -- the briefing page, the table, the slam and the reveal
+ * after it, the relic draft -- so the balance is never something to look for.
+ * A one-line band across the top of a phone, a box in the top-right corner
+ * of a wide screen (money.css). The bust or cash amount flies into it.
+ *
+ * It holds the balance, the last hand's change ("방금", its sign is read, its
+ * arrow is not) and, a tap away, the season's won and lost (`readPurse`). On a
+ * closed window (`settling`) it already shows the values the settle will
+ * leave. No live region: the slam says the verdict once, and this is here
+ * when looked for. Built so a later spend of the balance (the relic draft's
+ * reroll, after W47) lands its change here the same way.
  */
+// The season's columns stay as the player left them from one window to the next.
+let seasonShown = false;
+
 export function BankPurse({ purseRef, ...read }) {
   const purse = readPurse(read);
+  const [open, setOpen] = useState(seasonShown);
+  const toggle = () => {
+    seasonShown = !open;
+    setOpen(seasonShown);
+  };
   return (
-    <div ref={purseRef} className={`gx-purse${purse.landing ? ` is-landing is-${purse.landing}` : ""}`} data-testid="gauntlet-purse">
-      <small>{tableCopy.stage.purse}</small>
-      <strong data-testid="gauntlet-purse-total">{purse.totalText}</strong>
-      {purse.change && (
-        <span className={`gx-purse-change is-${purse.change.dir}`} data-testid="gauntlet-purse-change">
-          <span aria-hidden="true">{purse.change.arrow} {purse.change.text}</span>
-          <span className="sr-only">{purse.change.spoken}</span>
-        </span>
-      )}
-      <small className="gx-purse-season" data-testid="gauntlet-purse-season">{purse.season.text}</small>
+    <div className={`gx-purse kd-account${purse.landing ? ` is-landing is-${purse.landing}` : ""}${open ? " is-open" : ""}`} data-testid="gauntlet-purse">
+      <button type="button" className="kd-account-head" aria-expanded={open} aria-controls="kd-account-season" onClick={toggle}>
+        <small className="kd-account-name">{tableCopy.stage.purse}</small>
+        <strong ref={purseRef} data-testid="gauntlet-purse-total">{purse.totalText}</strong>
+        {purse.change && (
+          <>
+            <small className="kd-account-just" aria-hidden="true">{tableCopy.stage.purseJust}</small>
+            <span className={`gx-purse-change is-${purse.change.dir}`} data-testid="gauntlet-purse-change">
+              <span aria-hidden="true">{purse.change.arrow} {purse.change.text}</span>
+              <span className="sr-only">{purse.change.spoken}</span>
+            </span>
+          </>
+        )}
+        <i className="kd-account-more" aria-hidden="true" />
+      </button>
+      <small id="kd-account-season" className="gx-purse-season" data-testid="gauntlet-purse-season" hidden={!open}>{purse.season.text}</small>
     </div>
   );
 }

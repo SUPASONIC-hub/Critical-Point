@@ -84,6 +84,7 @@ Three of these are reveals, and each still means what it meant:
 | Where the pressure comes from | New York's quarterly ROE target, the dividend and the 「아시아 포트폴리오 리뷰」; English mail and dawn video calls on New York time; the board seats New York appoints; a rumour that the value is being raised before a sale |
 | Seoul's window | 그룹전략실, 본사 33층: it makes the New York numbers come out |
 | 사건 44's four acquittals | Approved from a shared account, so the e-signature field is empty and no approver can be named -- the same kind of account as 프롤로그 05's 전략팀-공용03; 사건 45 reads the erased pencil marks on the scanned printouts of those four |
+| The player's money | Shown on the table as the player's KD은행 계좌 (en KD Bank account, ja KD銀行口座): the 실사 fee KD은행 pays for the work flows through KD, so what a run holds is a KD은행 deposit. Display only; `check:canon` holds the three names |
 
 The owner is a company and is drawn only as a company. No person in the
 season is given an ethnicity or religion through it, and nothing in the copy

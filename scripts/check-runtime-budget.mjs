@@ -227,8 +227,11 @@ const BUDGETS = {
   // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
   // ref for the amount's flight and the window it was dealt on; the purse's
   // markup and both reads live outside the screen.
+  // 860 -> 863 lines on 2026-11-04, measured (kd-bank-account): the purse
+  // leaves the rail and is drawn after the briefing and the draft as the
+  // KD은행 계좌, with a line saying why it sits there.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 860,
+    lines: 863,
     longestLine: 250,
     importedNames: 73,
     hooks: {},
