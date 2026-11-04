@@ -415,9 +415,9 @@ export default {
     },
     "c26_evidence_turn": {
       "title": "One Line in the Project Cost Statement",
-      "text": "Ban Jaewook, who squeezed a day in Pyeongtaek into Internal Audit’s regional circuit, comes to KD Capital’s records room at 6 a.m. When you spread the clue out on his travel bag, the Reheim Godeok project cost statement opens. Among land, construction and design costs sits 'project advisory fee: 3.2 billion won'—money sent out as the price of advice. The recipient: Haeon Partners. The very company that collected advisory fees every quarter during the 2023-0412 loan. The payment date is two months before construction stopped, and on the same day the progress report went up to 72%. Ban Jaewook opens his notebook. 'They couldn’t pay the workers 1.4 billion won in wages, but they paid 3.2 billion won for advice. To the same company as 3 years ago.'",
+      "text": "Ban Jaewook, who squeezed a day in Pyeongtaek into Internal Audit’s regional circuit, comes to KD Capital’s records room at 6 a.m. When you spread the clue out on his travel bag, the Reheim Godeok project cost statement opens. Among land, construction and design costs sits 'project advisory fee: 3.2 billion won'—money sent out as the price of advice. The recipient: a new company at the same address as Haeon Partners. The address of the very company that collected advisory fees every quarter during the 2023-0412 loan, and closed its doors last year. The payment date is two months before construction stopped, and on the same day the progress report went up to 72%. Ban Jaewook opens his notebook. 'They couldn’t pay the workers 1.4 billion won in wages, but they paid 3.2 billion won for advice. To the same address as the company 3 years ago.'",
       "memo": [
-        "Project cost statement: project advisory fee 3.2 billion won -- Haeon Partners",
+        "Project cost statement: project advisory fee 3.2 billion won -- a new company at Haeon Partners’ address",
         "Payment date: two months before construction stopped",
         "Same day, progress report raised to 72%"
       ],
@@ -426,7 +426,7 @@ export default {
           "label": "Tell workers and buyers first where the 3.2 billion won went"
         },
         "c26_evidence_turn_hold": {
-          "label": "Hold the statement for when you go after Haeon Partners"
+          "label": "Hold the statement for when you go after the new company"
         },
         "c26_evidence_turn_reclaim": {
           "label": "Ask the committee to claw back the 3.2 billion won for wages"
@@ -576,7 +576,7 @@ export default {
     "c26_final_system_route_a": "Once the rule exists, a signature goes into the CEO’s field from the next extension on. On this document, the CEO’s field stays as printed: 'Not applicable.'",
     "c26_final_system_route_b": "When you change the terms, the workers get paid first. That it is a decision that moves the date does not change.",
     "c26_final_system_route_c": "When you warn them, the credit union members learn for the first time that their money hangs on a crane in Pyeongtaek. From the moment they know, that money turns uneasy.",
-    "c26_evidence_turn_reclaim": "When you take it to the committee, the 3.2 billion won becomes an agenda title for the first time. That afternoon, Haeon Partners moves the address in its corporate registry.",
+    "c26_evidence_turn_reclaim": "When you take it to the committee, the 3.2 billion won becomes an agenda title for the first time. That afternoon, the new company at Haeon Partners’ address moves the address in its corporate registry.",
     "c26_evidence_turn_hold": "Held, it becomes a strong card. While you hold it, the workers’ three months of wages stay unpaid.",
     "c26_evidence_turn_share": "When you tell them, formwork foreman Ji Kanghyun, up on the crane, says nothing for a long time. Then he adds one line beneath the banner. 'Advice money: 3.2 billion won.'",
     "c26_crane_evidence_turn": "Go through it item by item and one field turns out not to be construction costs. The company written in that field took money under the same name 3 years ago.",
@@ -648,7 +648,7 @@ export default {
     "c26_final_system_route_b": "Saying you’ll put the people with no field in the table into the terms at least, you extend but change the terms so the workers’ wages go out before interest.",
     "c26_final_system_route_c": "Saying they are the ones who will take the moved date at the very end, you warn the credit union members, who are repaid last, of the loss risk first.",
     "c26_evidence_turn_reclaim": "Saying you’ll set right the order in which advice got paid and wages didn’t, you ask the committee to claw back the 3.2 billion won advisory fee and pay wages first.",
-    "c26_evidence_turn_hold": "So you don’t lose the same company as 3 years ago this time, you hold the statement and use it when you go after Haeon Partners.",
+    "c26_evidence_turn_hold": "So you don’t lose the address of the company from 3 years ago this time, you hold the statement and use it when you go after the new company.",
     "c26_evidence_turn_share": "Saying the people cheated out of their pay should be first to know, you tell the workers and the buyers first where the 3.2 billion won went.",
     "c26_crane_evidence_turn": "Holding Reheim Godeok’s project cost statement against the clue item by item, you trace where the lent money went.",
     "c26_creditors_evidence_turn": "Holding Reheim Godeok’s project cost statement against the clue item by item, you trace where the lent money went.",
@@ -670,7 +670,7 @@ export default {
   "pack": {
     "clue": {
       "title": "One Line in the Project Cost Statement",
-      "text": "From Reheim Godeok’s project costs, a 'project advisory fee' of 3.2 billion won went to Haeon Partners two months before construction stopped. On the same day the progress report went up to 72%, and the 87 workers’ wages of 1.4 billion won never went out."
+      "text": "From Reheim Godeok’s project costs, a 'project advisory fee' of 3.2 billion won went to a new company at the same address as Haeon Partners two months before construction stopped. On the same day the progress report went up to 72%, and the 87 workers’ wages of 1.4 billion won never went out."
     },
     "outcomes": {
       "c26_after_warm": {

@@ -21,7 +21,8 @@
  * stops at one), the anger an elevator ride with 윤상혁, the grief a ninth floor
  * where the youngest worker fell last summer, the joy a foreman coming down the
  * ladder on the twenty-second day. Behind all of it sits a 32억 "advisory fee"
- * to 해온파트너스, paid the same day the reported progress jumped to 72%. The
+ * to a new company at 해온파트너스's address (해온 itself was wound up in 2025,
+ * 사건 08), paid the same day the reported progress jumped to 72%. The
  * aftermath hands 사건 27 its thread: the smallest lender at the back of the
  * table, 군산 새봄신협, and a lender table that leaves the building.
  */
@@ -649,8 +650,8 @@ export const case26 = {
     entryLabel: "르하임 고덕 사업비 중 공사에 안 쓰인 돈을 찾는다",
     title: "사업비 명세서의 한 줄",
     speaker: "반재욱",
-    text: "감사팀 지방 순회 중에 평택 일정을 하루 끼워 넣은 반재욱이 새벽 6시에 KD캐피탈 자료실로 옵니다. 단서를 그의 출장 가방 위에 펴 놓자 르하임 고덕의 사업비 명세서가 열립니다. 토지비, 공사비, 설계비 사이에 '사업 자문료(조언값이라며 내보낸 돈) 32억'이 있습니다. 받은 곳은 해온파트너스. 2023-0412 대출 때 분기마다 자문료를 받아 가던 바로 그 회사입니다. 지급일은 공사가 멈추기 두 달 전이고, 같은 날 공정률(공사가 얼마나 진행됐는지 나타낸 비율) 보고가 72%로 올라갔습니다. 반재욱이 수첩을 폅니다. '노동자 임금 14억은 못 줬는데, 조언값 32억은 줬습니다. 3년 전과 같은 회사로요.'",
-    memo: ["사업비 명세서: 사업 자문료 32억 -- 해온파트너스", "지급일: 공사 중단 두 달 전", "같은 날 공정률 보고 72%로 상향"],
+    text: "감사팀 지방 순회 중에 평택 일정을 하루 끼워 넣은 반재욱이 새벽 6시에 KD캐피탈 자료실로 옵니다. 단서를 그의 출장 가방 위에 펴 놓자 르하임 고덕의 사업비 명세서가 열립니다. 토지비, 공사비, 설계비 사이에 '사업 자문료(조언값이라며 내보낸 돈) 32억'이 있습니다. 받은 곳은 해온파트너스와 같은 주소의 새 법인입니다. 2023-0412 대출 때 분기마다 자문료를 받아 가다 지난해 문을 닫은 그 회사의 주소입니다. 지급일은 공사가 멈추기 두 달 전이고, 같은 날 공정률(공사가 얼마나 진행됐는지 나타낸 비율) 보고가 72%로 올라갔습니다. 반재욱이 수첩을 폅니다. '노동자 임금 14억은 못 줬는데, 조언값 32억은 줬습니다. 3년 전 그 회사와 같은 주소로요.'",
+    memo: ["사업비 명세서: 사업 자문료 32억 -- 해온파트너스와 같은 주소의 새 법인", "지급일: 공사 중단 두 달 전", "같은 날 공정률 보고 72%로 상향"],
     triggers: ["injustice", "system", "curiosity"],
     entryEffect: { legitimacy: 4, trust: 2, time: -5, fatigue: 5 },
     choices: [
@@ -659,14 +660,14 @@ export const case26 = {
         label: "자문료 32억을 되찾아 임금부터 주자고 위원회에 올린다",
         effect: { legitimacy: 12, trust: 7, capital: -6, time: -6, fatigue: 6 },
         voice: "조언값은 주고 임금은 못 준 순서를 바로잡겠다며, 자문료 32억을 되찾아 임금부터 주자고 위원회에 올린다.",
-        echo: "위원회에 올리자 32억이 처음으로 안건 제목이 됩니다. 해온파트너스는 그날 오후 등기부의 주소를 옮깁니다.",
+        echo: "위원회에 올리자 32억이 처음으로 안건 제목이 됩니다. 해온파트너스와 같은 주소의 새 법인은 그날 오후 등기부의 주소를 옮깁니다.",
         cognition: { inference: 2, persistence: 1 },
       },
       {
         id: "c26_evidence_turn_hold",
-        label: "명세서는 쥐고 있다가 해온파트너스를 쫓을 때 쓴다",
+        label: "명세서는 쥐고 있다가 그 새 법인을 쫓을 때 쓴다",
         effect: { capital: 8, time: 5, trust: -5, legitimacy: -5, humanCost: 5, fatigue: -4 },
-        voice: "3년 전과 같은 회사를 이번에는 놓치지 않게, 명세서는 쥐고 있다가 해온파트너스를 쫓을 때 쓴다.",
+        voice: "3년 전 그 회사의 주소를 이번에는 놓치지 않게, 명세서는 쥐고 있다가 그 새 법인을 쫓을 때 쓴다.",
         echo: "쥐고 있으니 강한 패가 됩니다. 그 패를 쥐고 있는 동안 노동자들의 석 달 치 임금은 계속 밀립니다.",
         cognition: { risk: 2 },
       },
@@ -857,7 +858,7 @@ export const case26 = {
   clue: {
     id: "c26-advisory-fee",
     title: "사업비 명세서의 한 줄",
-    text: "르하임 고덕의 사업비에서 '사업 자문료' 32억이 공사가 멈추기 두 달 전 해온파트너스로 나갔습니다. 같은 날 공정률 보고가 72%로 올라갔고, 노동자 87명의 임금 14억은 끝내 나가지 않았습니다.",
+    text: "르하임 고덕의 사업비에서 '사업 자문료' 32억이 공사가 멈추기 두 달 전 해온파트너스와 같은 주소의 새 법인으로 나갔습니다. 같은 날 공정률 보고가 72%로 올라갔고, 노동자 87명의 임금 14억은 끝내 나가지 않았습니다.",
   },
   outcomes: {
     c26_after_warm: { tag: "곁에 남은 결말", title: "19일 만에 내려온 반장과 현장의 밤을 보냈다", text: "지강현이 사다리를 내려온 밤, 현장 사무소 컨테이너에는 늦게까지 불이 켜져 있었습니다. 노동자 87명의 이름이 한 번씩 불렸고, 컵라면은 끝까지 모자라지 않았습니다." },
