@@ -253,10 +253,10 @@ export default {
     },
     "c33_lock_reaction": {
       "title": "The Badge Returned First",
-      "text": "Near midnight, Han Seoyun, on standby assignment, steps out of the elevator carrying an insulated lunch box. She sees the notice on the front door and stands there a long while. 'On my first day of standby, I returned my ID badge before anything else. The same hand that pressed the return button on your dissent 3 years ago.' She opens the lid and sets the lunch box in front of Baek Arin. 'We both sat next to Yoon Sanghyuk. One of us signed, and one of us reported.' Baek Arin picks up her chopsticks, then puts them down. 'The one who signed held on longer.' Han Seoyun shakes her head. 'I didn’t hold on. I just didn’t move.'",
+      "text": "Near midnight, Han Seoyun, on standby assignment, steps out of the elevator carrying an insulated lunch box. She sees the notice on the front door and stands there a long while. 'On my first day of standby, I returned my ID badge before anything else. The same hand that pressed the return button on your dissent 3 years ago.' She opens the lid and sets the lunch box in front of Baek Arin. 'We both sat next to Yoon Sanghyuk. One of us returned it, and one of us reported.' Baek Arin picks up her chopsticks, then puts them down. 'The one who returned it held on longer.' Han Seoyun shakes her head. 'I didn’t hold on. I just didn’t move.'",
       "memo": [
         "ID badge returned on the first day of standby",
-        "The one who signed and the one who reported"
+        "The one who returned it and the one who reported"
       ],
       "choices": {
         "c33_lock_reaction_choice_1": {
@@ -271,7 +271,7 @@ export default {
       },
       "place": "Gongdeok-dong Group Housing · Outside the 11th-Floor Elevator",
       "clock": "June 22 · 23:50",
-      "question": "The one who signed and the one who reported sit with one lunch box between them. How do you keep watch over this night?"
+      "question": "The one who returned it and the one who reported sit with one lunch box between them. How do you keep watch over this night?"
     },
     "c33_hem_reaction": {
       "title": "The Hidden Seam",

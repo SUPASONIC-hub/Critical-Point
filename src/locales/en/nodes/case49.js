@@ -342,10 +342,10 @@ export default {
     },
     "c49_branch_columbarium_follow": {
       "title": "The Fountain Pen",
-      "text": "When you sit on the bench, Lim Soyul points to your jacket pocket. A black fountain pen, the gold worn off its cap, is clipped there. 'I hear you took that pen to the last review committee. Whatever you wrote, Grandpa would have liked it. That’s the pen he used to write 'Agree' on the back page and then erase it.' She draws a small signature field on the back of her hand and leaves it empty. 'Grandpa spent his life filling in fields. I thought it was stubbornness.' Moon Gaeul breaks a rice cake and hands you half. Lim Soyul laughs, then sniffles. 'Will you take this pen tomorrow too? Or does he have to fill that one field with his own pen?'",
+      "text": "When you sit on the bench, Lim Soyul points to your jacket pocket. A black fountain pen, the gold worn off its cap, is clipped there. 'I hear you took that pen to the last review committee. Whatever you wrote, Grandpa would have liked it. He was the one who wrote 'Agree' on the back page in pencil and then erased it.' She draws a small signature field on the back of her hand and leaves it empty. 'Grandpa spent his life filling in fields. I thought it was stubbornness.' Moon Gaeul breaks a rice cake and hands you half. Lim Soyul laughs, then sniffles. 'Will you take this pen tomorrow too? Or does he have to fill that one field with his own pen?'",
       "memo": [
         "Lim Kyungsoo’s fountain pen -- went to the last review committee too",
-        "The erased 'Agree' on the back page -- the same pen",
+        "The erased 'Agree' on the back page -- Grandpa’s pencil marks",
         "The empty signature field drawn on Lim Soyul’s hand",
         "Half of Moon Gaeul’s rice cake"
       ],

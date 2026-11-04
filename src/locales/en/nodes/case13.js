@@ -160,7 +160,7 @@ export default {
     },
     "c13_aftershock": {
       "title": "The Dark Set",
-      "text": "12 minutes after the broadcast ends, the last thing you said starts circulating as a clip. Whatever you said, the top comments split in two. Teardown is in full swing. Kang Taemin carries out the four light stands by himself, and Director Bong Younghoon, who shot the ad, presses his card into the hand of Na Junhyuk, who lent a hand for the stamping scene. Moon Gaeul’s son Moon Hajun, from the very back row, opens his sketchbook. A drawing of tonight’s set, and under the last light, in small letters: 'to the end'. Alone at the monitor, Baek Arin is rewinding your last 8 seconds for the 11th time. Without turning around, she says, 'A new product launches next week. Its name has “Sangsaeng” in it. Shared growth. It’ll need a story too.'",
+      "text": "12 minutes after the broadcast ends, the last thing you said starts circulating as a clip. Whatever you said, the top comments split in two. Teardown is in full swing. Kang Taemin carries out the four light stands by himself, and Director Bong Younghoon, who shot the ad, presses his card into the hand of Na Junhyuk, who lent a hand for the stamping scene. Moon Gaeul’s son Moon Hajun, from the very back row, opens his sketchbook. A drawing of tonight’s set, and under the last light, in small letters: 'to the end'. Alone at the monitor, Baek Arin is rewinding your last 8 seconds for the 11th time. Without turning around, she says, 'A new product launches next month. Its name has “Sangsaeng” in it. Shared growth. It’ll need a story too.'",
       "memo": [
         "Clip views: 900,000 in 3 hours",
         "Moon Hajun’s sketch: 'to the end'",
@@ -523,7 +523,7 @@ export default {
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
-      "clock": "Payment day night · Launch livestream D-7",
+      "clock": "Payment day night · Launch livestream D-6",
       "question": "The box that was Moon Sungho’s share is about to become an ad draft. What do you nail down here?",
       "lead": "On the 33rd floor, having left the line outside the shop, you are still holding the box the lobby guard took a rice cake from."
     }
@@ -540,7 +540,7 @@ export default {
     "c13_market_deal": "Hearing the request, Moon Gaeul slices once more. 'Which of those 212 asked you to bear it for them?'",
     "c13_lab_share": "You send it; the group chat goes quiet for a long time, then rice cake emojis appear one by one. The group will see this video soon too.",
     "c13_lab_submit": "You submit it and get a filing number. The committee’s first meeting is 3 weeks after the livestream.",
-    "c13_lab_cue": "You change it, and Lee Minseo’s old account shows up in the dawn access log. 3 years ago, it was an access log that made her the leaker. The secretary checks the cue sheet once more an hour before air.",
+    "c13_lab_cue": "You change it, and Lee Minseo’s old account shows up in the dawn access log. It was an access log that made her the leaker before, too. The secretary checks the cue sheet once more an hour before air.",
     "c13_final_terms": "You set your condition, and Baek Arin calls the 33rd floor over the earpiece. The broadcast starts 3 minutes late, and the letter for the 212 is delayed just as long.",
     "c13_final_refuse": "You decline, and 110,000 people hear the price too. The 212 standard and your colleagues’ return orders appear in no official letter tonight.",
     "c13_final_rewrite": "You change the line, and for the first time the teleprompter and your mouth say different things. Baek Arin does not cut those 3 seconds. Article 11 of the contract arrives tomorrow morning.",
