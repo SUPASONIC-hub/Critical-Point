@@ -160,7 +160,7 @@ export default {
     },
     "c29_aftershock": {
       "title": "Revenge at Level 4",
-      "text": "Thursday, 9 p.m., the Chinatown hawker center (an open-air court of cheap food stalls) again. Oh Jinwoo, whose ears went red to the tips on Level 5 chili crab last time, stands before the same stall. This time it’s Level 4. 'Level 5 isn’t for human consumption. This is a strategic retreat.' The grandmother who slid him the condensed-milk drink has ordered two glasses in advance this time. With the crab half gone, Seo Harin looks at her phone and bows her head. Ha Yoonho, the source fired 7 years ago after handing over documents for her story, has answered the text she sent that afternoon, her first in 7 years. 'Reporter, you finally replied. I’ve got two trucks these days.' Seo Harin laughs, then wipes her eyes, and Oh Jinwoo pretends he’s crying from the spice and cries along. Around midnight, in the six-person group chat that has been quiet for nearly a month, 'Lee Minseo is typing' appears and disappears. It’s the third time already.",
+      "text": "Thursday, 9 p.m., the Chinatown hawker center (an open-air court of cheap food stalls) again. Oh Jinwoo, whose ears went red to the tips on Level 5 chili crab last time, stands before the same stall. This time it’s Level 4. 'Level 5 isn’t for human consumption. This is a strategic retreat.' The grandmother who slid him the condensed-milk drink has ordered two glasses in advance this time. With the crab half gone, Seo Harin looks at her phone and bows her head. Ha Yoonho, the source fired 7 years ago after handing over documents for her story, has answered the text she sent that afternoon, her first in 7 years. 'Reporter, you finally replied. I’ve got two trucks these days.' Seo Harin laughs, then wipes her eyes, and Oh Jinwoo pretends he’s crying from the spice and cries along. Around midnight, in the six-person group chat that has been quiet for nearly 2 weeks, 'Lee Minseo is typing' appears and disappears. It’s the third time already.",
       "memo": [
         "Oh Jinwoo’s chili crab rematch: Level 4, finished",
         "Ha Yoonho’s first reply in 7 years: 'I’ve got two trucks these days'",
@@ -297,7 +297,7 @@ export default {
     },
     "c29_call_reaction": {
       "title": "Six Pieces of Rolled Omelet",
-      "text": "As soon as you hang up, a private message arrives. It’s Han Seoyun, on standby assignment (waiting for a next post with no duties). A photo of a lunch box, six neat pieces of rolled omelet inside. 'With nothing to do, my cooking’s improved. I packed six pieces and found there’s only me to eat them.' The group chat has been quiet for nearly a month. Everyone is holding out at their own post, so no one speaks first. Han Seoyun sends one more line. 'You got a call from CEO Yoon, didn’t you. When that man talks about time before he hangs up, he’s already decided. When you fight, eat first, then fight.'",
+      "text": "As soon as you hang up, a private message arrives. It’s Han Seoyun, on standby assignment (waiting for a next post with no duties). A photo of a lunch box, six neat pieces of rolled omelet inside. 'With nothing to do, my cooking’s improved. I packed six pieces and found there’s only me to eat them.' The group chat has been quiet for nearly 2 weeks. Everyone is holding out at their own post, so no one speaks first. Han Seoyun sends one more line. 'You got a call from CEO Yoon, didn’t you. When that man talks about time before he hangs up, he’s already decided. When you fight, eat first, then fight.'",
       "memo": [
         "Han Seoyun’s lunch box -- six pieces of rolled omelet, one person to eat them",
         "When he talks about time, he’s already decided"
@@ -598,7 +598,7 @@ export default {
     "c29_start_rush_debtors": "Packing it makes your bag heavier. Getting approval to carry the 3,860-line list out on a company laptop keeps you on the phone with Security until just before boarding.",
     "c29_start_rush_mandate": "You check the scope: 'price adequacy' is there, 'debtor protection' is not. Whether the missing field means you should fill it or you shouldn’t, you can’t tell.",
     "c29_start_rush_board": "Reading in flight, you see how it all runs before landing. The passenger in the next seat steals a look at the word 'Haeon' three times.",
-    "c29_start_rush_signature": "Of the colleagues quiet for nearly a month, only Ban Jaewook replies. 'If you’re on the same plane as a reporter, write down the seat numbers too.'"
+    "c29_start_rush_signature": "Of the colleagues quiet for nearly 2 weeks, only Ban Jaewook replies. 'If you’re on the same plane as a reporter, write down the seat numbers too.'"
   },
   "choiceVoiceLines": {
     "c29_start_debtors": "Saying you have to see the people behind the 427 billion won first, you pack each bundled debtor’s situation separately, line by line.",

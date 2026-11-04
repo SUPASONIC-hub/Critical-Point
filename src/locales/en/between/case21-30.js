@@ -182,9 +182,9 @@ export const copy = {
         "eyebrow": "Next case unlocked",
         "title": "Case 30 - The Group Chat of Six",
         "button": "Start Case 30",
-        "premise": "The morning after you return from Singapore, Lee Minseo posts one contract in the group chat. 3 years of Trigger Lab participants’ response records, and the buyer is FitScore, a hiring-score company.",
-        "hook": "The Pyeongtaek extension and the Singapore annex both end up leading to one man’s next seat. After a month, six chairs pull up to the bookshop table. However many times the group chat votes on its name, it comes out 3 to 3, and this time everyone has to put their own seat on the line.",
-        "movement": "KD Capital, 16th floor > Secondhand bookshop in Hoegi-dong, 1st floor > KD Data Lab, Pangyo > Alley in front of the bookshop > Secondhand bookshop, 1st floor",
+        "premise": "On the fifth morning after you return from Singapore, Lee Minseo posts one contract in the group chat. 3 years of Trigger Lab participants’ response records, and the buyer is FitScore, a hiring-score company.",
+        "hook": "The Pyeongtaek extension and the Singapore annex both end up leading to one man’s next seat. After two months, six chairs pull up to the bookshop table. However many times the group chat votes on its name, it comes out 3 to 3, and this time everyone has to put their own seat on the line.",
+        "movement": "KD Capital, 12th floor > Secondhand bookshop in Hoegi-dong, 1st floor > KD Data Lab, Pangyo > Alley in front of the bookshop > Secondhand bookshop, 1st floor",
         "reason": "To find out into what fields our records were cut and to whom they were sold, and to decide how the six of us split the price of bringing that fact out",
         "interlude": {
           "label": "Interlude · Friday Dawn, Changi Airport",

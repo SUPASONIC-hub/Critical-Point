@@ -271,7 +271,7 @@ export default {
           "label": "Say this case is urgent, nod, and head upstairs"
         }
       },
-      "place": "Head office, 6th floor, hallway",
+      "place": "Head office, 1st floor, hallway by the elevators",
       "clock": "Tuesday, October 18, 2022 · 19:00",
       "question": "Lim Kyungsoo opposed that form, and his name isn’t in the minutes. What do you ask?"
     },
