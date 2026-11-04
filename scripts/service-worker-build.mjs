@@ -61,6 +61,7 @@ export function pageWithoutCommit(html) {
 // the build: counted, a rebuild of the same commit the next day would be a
 // new release that every device downloads in full.
 const CRAWLER_FILES = new Set(["/robots.txt", "/sitemap.xml"]);
+const LANGUAGE_PAGE = /^\/[a-z]{2}\/index\.html$/;
 
 /**
  * Every file under `dir` but the page, the worker and the crawler's files, as
@@ -75,7 +76,9 @@ export function shippedFiles(dir) {
     .map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))
     .map((file) => [`/${path.relative(dir, file).replace(/\\/g, "/")}`, file])
     .filter(([name]) => name !== PAGE_PATH && name !== WORKER_PATH && !CRAWLER_FILES.has(name))
-    .map(([name, file]) => [name, digest(readFileSync(file))])
+    // The start page in English and Japanese (`/en/index.html`, since 11-03)
+    // is the page with other words, and carries the commit's line too.
+    .map(([name, file]) => [name, digest(LANGUAGE_PAGE.test(name) ? pageWithoutCommit(readFileSync(file, "utf8")) : readFileSync(file))])
     .sort(byName);
 }
 

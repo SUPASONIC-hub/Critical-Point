@@ -323,3 +323,19 @@ test("the intro's board button glints twice and then rests (D-15)", () => {
   assert.match(sweep, /animation: board-shine [^;]* 2;/);
   assert.doesNotMatch(pill + sweep, /infinite/);
 });
+
+// The scene's sound is centred on its spot by `transform`. Written as the
+// separate `translate` property it was dropped from the build (2026-11-03),
+// and the word sat half its size right of and below the spot the plate chose,
+// past the panel's edge on every desk screen. The slam's first frame turns and
+// centres it the same way, or the word would jump as it lands.
+test("the scene's sound is centred in its transform, which the build keeps", () => {
+  const briefing = sheet("briefing");
+  const word = briefing.match(/\n\.gx-sfx \{[^}]*\}/)?.[0] ?? "";
+  assert.match(word, /transform: translate\(-50%, -50%\) rotate\(-9deg\);/);
+  assert.doesNotMatch(word, /\n {2}translate:/);
+  assert.match(briefing, /@keyframes gx-sfx-slam \{\s*from \{\s*opacity: 0;\s*transform: translate\(-50%, -50%\) rotate\(-9deg\) scale\(2\.4\);/);
+  for (const name of ["base-intro-ranking", "briefing", "comfort", "money", "plate", "play", "recovery", "relics", "responsive", "result"]) {
+    assert.doesNotMatch(sheet(name), /\n\s+(translate|rotate|scale): [^;]+;/, `${name}.css: a separate translate, rotate or scale property does not survive the build`);
+  }
+});
