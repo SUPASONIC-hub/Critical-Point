@@ -287,7 +287,8 @@ const budgets = [
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_392, maxGzip: 68_379 },
+  // 189,392 / 68,379 -> 189,737 / 68,502 on 2026-11-04, credits-alice over main 5d5d6ae4: the start screen's credit names SUPASONIC & ALICE and links both addresses (src/credits.js, StudioCredit.jsx). Measured 189,733 / 68,498 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_737, maxGzip: 68_502 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -599,7 +600,9 @@ const budgets = [
   // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
   // 200,372 / 37,500 -> 200,439 / 37,512 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: on 360px or less the Korean and
   // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 200,435 / 37,508, plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_439, maxGzip: 37_512 },
+  // 200,439 / 37,512 -> 200,791 / 37,581 on 2026-11-04, credits-alice over main 5d5d6ae4: the credit's address row (.studio-credit-mail),
+  // which wraps one address under the other on a phone. Measured 200,787 / 37,577 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 200_791, maxGzip: 37_581 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1215,7 +1218,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,761 / 483,722 / 490,404 -> 426,814 / 483,775 / 490,461 on 2026-11-03, signal-row-fit over main 425eb4da (#395 on cb904fb6): LOCK its own width in the English and Japanese signals row on 360px or less (the index CSS carries the rule). Measured 426,810 / 483,771 / 490,457, the plus 4.
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_845, en: 483_820, ja: 490_505 };
+// 426,845 / 483,820 / 490,505 -> 427,100 / 484,075 / 490,760 on 2026-11-04, credits-alice over main 5d5d6ae4: the credit's two creators and their address links (the entry and the index CSS). Measured 427,096 / 484,071 / 490,756, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 427_100, en: 484_075, ja: 490_760 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
