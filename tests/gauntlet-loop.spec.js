@@ -366,11 +366,15 @@ test("the play header keeps its title between a phone's width and the table's", 
         padRight: Number.parseFloat(getComputedStyle(document.querySelector(".game-header")).paddingRight),
         toolsRight: Math.round(box(".game-header .top-actions").right),
         musicLeft: Math.round(box(".music-controls").left),
+        // From 1025px the KD은행 계좌 is a box left of the music controls, and the header keeps its room too.
+        account: innerWidth >= 1025 ? { left: Math.round(box(".kd-account").left), width: Math.round(box(".kd-account").width) } : null,
       };
     });
-    expect(header.padRight, `${width}px: room reserved for the music controls`).toBeLessThanOrEqual(112);
-    expect(header.toolsRight, `${width}px: the header tools run under the music controls`).toBeLessThanOrEqual(header.musicLeft);
-    expect(header.musicLeft - header.toolsRight, `${width}px: dead room between the tools and the music controls`).toBeLessThanOrEqual(24);
+    const corner = header.account ? header.account.left : header.musicLeft;
+    const reserved = header.account ? 112 + header.account.width + 12 : 112;
+    expect(header.padRight, `${width}px: room reserved for the music controls (and the account box)`).toBeLessThanOrEqual(reserved);
+    expect(header.toolsRight, `${width}px: the header tools run under the corner's controls`).toBeLessThanOrEqual(corner);
+    expect(corner - header.toolsRight, `${width}px: dead room between the tools and the corner's controls`).toBeLessThanOrEqual(24);
   }
 });
 
@@ -573,6 +577,109 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await expect(page.getByTestId("gauntlet-burst")).toHaveCSS("animation-name", "none");
   expect(await cashed.evaluate((slam) => slam.getAnimations({ subtree: true }).map((motion) => motion.animationName ?? "transition"))).toEqual([]);
 });
+
+// The cash's side under reduced motion: the bust's −N is held still above, and
+// the purse's landing pop on a cash (gx-purse-land) went unasserted until the
+// 2026-11-03 audit. Neither the +N nor the purse's amount moves.
+test("under reduced motion a cash's amount and the purse it lands in stand still", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const burst = page.getByTestId("gauntlet-burst");
+  await expect(burst).toHaveText(/^\+[\d,]+$/);
+  await expect(burst).toHaveCSS("animation-name", "none");
+  await expect(page.getByTestId("gauntlet-purse")).toHaveClass(/is-landing is-up/);
+  const total = page.getByTestId("gauntlet-purse-total");
+  await expect(total).toHaveCSS("animation-name", "none");
+  expect(await total.evaluate((element) => element.getAnimations().length), "no animation runs on the purse's amount").toBe(0);
+});
+
+// The KD은행 계좌 (2026-11-04): the balance pinned through the briefing page,
+// the table and the settle -- a band across the top of a 360px phone, a box
+// in the top-right corner at 1280px -- never under a layer, never wider than
+// the screen, and always the run's stake and vault together.
+/** Where the account is drawn, whether it is the thing at its own centre, and whether it fits. */
+async function readAccount(page) {
+  return page.getByTestId("gauntlet-purse").evaluate((account) => {
+    const box = account.getBoundingClientRect();
+    const total = account.querySelector('[data-testid="gauntlet-purse-total"]').getBoundingClientRect();
+    const hit = document.elementFromPoint(total.left + total.width / 2, total.top + total.height / 2);
+    return {
+      box: { x: box.left, y: box.top, right: box.right, bottom: box.bottom },
+      onTop: Boolean(hit && account.contains(hit)),
+      fits: account.scrollWidth <= account.clientWidth + 1 && document.documentElement.scrollWidth <= window.innerWidth,
+    };
+  });
+}
+
+async function expectAccountPinned(page, viewport) {
+  const account = await readAccount(page);
+  expect(account.onTop, "nothing is drawn over the balance").toBe(true);
+  expect(account.fits, "the account and the page are no wider than the screen").toBe(true);
+  expect(account.box.y).toBeGreaterThanOrEqual(0);
+  if (viewport.width < 1025) {
+    // A band across the top of the phone.
+    expect([account.box.x, account.box.y, account.box.right]).toEqual([0, 0, viewport.width]);
+    expect(account.box.bottom).toBeLessThanOrEqual(30);
+  } else {
+    // A box in the top-right corner, beside the music pills.
+    expect(account.box.right).toBeGreaterThan(viewport.width - 140);
+    expect(account.box.right).toBeLessThanOrEqual(viewport.width);
+    expect(account.box.bottom).toBeLessThanOrEqual(90);
+  }
+}
+
+async function expectAccountHolds(page) {
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const held = saved.dynamics.runPot + saved.dynamics.vault;
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(held.toLocaleString("en-US"));
+  return held;
+}
+
+for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 }]) {
+  test(`the KD은행 계좌 stays pinned through the briefing, the table and the settle at ${viewport.width}x${viewport.height} @once`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await openTable(page, "case01", "start");
+    const account = page.getByTestId("gauntlet-purse");
+    const head = account.getByRole("button");
+    await expect(head).toHaveAccessibleName(/^KD은행 계좌 0/);
+    await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+    await expectAccountPinned(page, viewport);
+
+    // The season's columns are a tap away.
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
+    await head.click();
+    await expect(head).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeVisible();
+    await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 0 · 손실 0");
+    await head.click();
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
+
+    // The settle: the amount flies into the account, which is still on top of the reveal.
+    await page.locator(".choices .choice").first().click();
+    await cashStakedCard(page);
+    await expect(account).toHaveClass(/is-landing is-up/);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expectAccountPinned(page, viewport);
+
+    // The next window opens on its briefing page: the account is over it, with the money the save holds.
+    await page.getByTestId("decision-next").click();
+    await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    const held = await expectAccountHolds(page);
+    expect(held).toBeGreaterThan(0);
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(`▲ +${held.toLocaleString("en-US")}`);
+    await expect(account.locator(".kd-account-just")).toHaveText("방금");
+    await expectAccountPinned(page, viewport);
+
+    // And at the table behind it, the same balance.
+    await dismissProtocolBreach(page);
+    await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+    await expectAccountHolds(page);
+    await expectAccountPinned(page, viewport);
+  });
+}
 
 // The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
 // wall can stop at once, the reveal says what one more push would have done,
@@ -1346,6 +1453,14 @@ test("a third push brings an edge notice that covers no number, and the switch t
   await expect(notice).toHaveAttribute("aria-hidden", "true");
   expect(await notice.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
   expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
+  // Measured where the notice comes to rest: it slides in over 240ms and is
+  // placed over the action bar when the bar settles, and a box read mid-slide
+  // lay over the PUSH button (gx-push) on a phone once (2026-10-23). Its own
+  // four seconds are far longer than the wait.
+  await notice.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {})));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const overlaps = await notice.evaluate((element) => {
     const box = element.getBoundingClientRect();
     const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button, .game-header h1";

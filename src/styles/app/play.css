@@ -1228,6 +1228,13 @@
   gap: 8px;
 }
 
+/* The card's edge is what tells one card from the felt (WCAG 1.4.11, 3:1
+   for a control's boundary): the card's fill is within a shade of the table,
+   so the edge carries it. --ui-line-strong (white at 16%) came to 1.5:1 over
+   the felt; --ui-line-field (40%) is about 3.6:1 (the 2026-11-03 audit),
+   the edge a text field already has. Hover is brighter still, a staged
+   card keeps its acid edge and ring, and a face-down fractured card keeps
+   the same edge. */
 .gauntlet-stage .gx-card {
   position: relative;
   display: grid;
@@ -1239,7 +1246,7 @@
   background:
     linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 42%),
     linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
-  border: 1px solid var(--ui-line-strong);
+  border: 1px solid var(--ui-line-field);
   border-radius: var(--ui-radius-md);
   box-shadow: var(--ui-shadow-1);
   text-align: left;
@@ -1254,7 +1261,7 @@
 
 @media (hover: hover) {
   .gauntlet-stage .gx-card:not([aria-disabled="true"]):hover {
-    border-color: rgb(255 255 255 / 0.3);
+    border-color: rgb(255 255 255 / 0.6);
     box-shadow: var(--ui-shadow-2);
     transform: translateY(-2px);
   }
@@ -1366,7 +1373,7 @@
 
 .gauntlet-stage.is-face-down .gx-card.is-fractured {
   border-style: solid;
-  border-color: var(--ui-line-strong);
+  border-color: var(--ui-line-field);
 }
 
 .gauntlet-stage .gx-card.is-sealed {

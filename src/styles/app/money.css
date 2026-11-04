@@ -1,39 +1,128 @@
-/* The money, where the eye goes (money-feedback, 2026-11-02): the bank rail's
-   purse -- what the run holds, the last hand's change, the season's won and
+/* The money, where the eye goes (money-feedback, 2026-11-02): the KD은행
+   계좌 -- what the run holds, the last hand's change, the season's won and
    lost -- and the slam's amount that flies into it (moneyFeedback.js,
    MoneyBurst.jsx). A file of its own so the rail's other rules, which the
    360px fits keep moving in play.css, are not touched by it. A gain is the
    cash's acid and a loss the wall's heat, and neither is colour alone: the
-   sign is always printed, and the rail's change carries ▲ or ▼. */
+   sign is always printed, and the account's change carries ▲ or ▼. */
 
-/* The purse is the rail's first line, on a line of its own: the total large,
-   the change beside it, the season's columns under them. */
-.gx-purse {
-  flex: 1 0 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 6px;
-  min-width: 0;
+/* The KD은행 계좌 (BankPurse, 2026-11-04): the balance pinned over every
+   phase of a window -- the briefing page, the table, the slam, the reveal and
+   the draft. Below 1025px it is a one-line band across the top of the screen,
+   and the shell, the music pills and the full-screen layers start under it
+   (--kd-top); from 1025px it is a box in the top-right corner, beside the
+   music pills, and the header keeps its room (below). The band's height came
+   out of the HUD: the purse line it was there gave back about 20px. */
+.gauntlet-shell {
+  --kd-band: 22px;
+  --kd-top: calc(var(--kd-band) + env(safe-area-inset-top, 0px));
+  border-top: var(--kd-top) solid transparent;
+}
+
+.gauntlet-shell .music-controls {
+  transform: translateY(var(--kd-top));
+}
+
+.gauntlet-shell .gx-comic,
+.gauntlet-shell .gx-act,
+.gauntlet-shell .gx-draft,
+.gauntlet-shell .decision-reveal-backdrop {
+  top: var(--kd-top);
+}
+
+/* The reveal's sheet is as tall as the screen less the backdrop's padding;
+   the band comes off it too, so its foot stays on the screen. */
+.gauntlet-shell .decision-reveal {
+  max-height: calc(100dvh - var(--kd-top) - 32px);
+}
+
+@media (max-width: 768px) {
+  .gauntlet-shell .decision-reveal {
+    max-height: calc(100dvh - var(--kd-top) - 16px);
+  }
+}
+
+.kd-account {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  /* Under the music pills (30, earlier in the markup): the season's columns
+     open over the corner they sit in, and the pills stay on top and pressable.
+     Nothing else at 30 reaches the band: the layers start under it. */
+  z-index: 29;
+  padding: env(safe-area-inset-top, 0px) max(12px, env(safe-area-inset-right)) 0
+    max(12px, env(safe-area-inset-left));
   color: var(--ui-text-3);
+  background: var(--ui-glass-strong);
+  border-bottom: 1px solid var(--ui-line-strong);
+  backdrop-filter: blur(14px) saturate(1.2);
   font-size: 0.6875rem;
   font-weight: 600;
 }
 
-.gx-purse > strong {
+.kd-account-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  height: var(--kd-band, 22px);
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Pressed over 44px tall, the band drawn 22 (accessibility.spec.js). */
+.kd-account-head::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 22px) 0;
+}
+
+.kd-account-head:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.kd-account-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-text-2);
+  font-size: inherit;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.kd-account-head > strong {
+  flex: none;
   color: var(--ui-text);
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 850;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  transform-origin: left center;
+}
+
+.kd-account-just {
+  flex: none;
+  margin-left: 2px;
+  font-size: 0.625rem;
 }
 
 .gx-purse-change {
-  font-size: 0.8125rem;
+  flex: none;
+  font-size: 0.75rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 .gx-purse-change.is-up {
@@ -45,21 +134,115 @@
   color: var(--c-danger-81);
 }
 
+/* The season's columns are a tap away: a chevron says so, and turns. */
+.kd-account-more {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin: 0 3px 3px auto;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
+}
+
+.kd-account.is-open .kd-account-more {
+  transform: translateY(3px) rotate(-135deg);
+}
+
 .gx-purse-season {
-  flex-basis: 100%;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  position: absolute;
+  top: 100%;
+  right: max(8px, env(safe-area-inset-right));
+  max-width: calc(100vw - 16px);
+  padding: 5px 10px;
   overflow: hidden;
+  color: var(--ui-text-2);
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--ui-line-strong);
+  border-top: 0;
+  border-radius: 0 0 var(--ui-radius-xs) var(--ui-radius-xs);
+  font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A wide screen: a box in the top-right corner, left of the two 38px music
+   pills, its name over the balance. The header keeps the box's room as it
+   keeps the pills' (play.css's 112px, with the box's 15rem and a gap). */
+@media (min-width: 1025px) {
+  .gauntlet-shell {
+    --kd-band: 0px;
+    --kd-top: 0px;
+  }
+
+  .gauntlet-shell .game-header {
+    padding-right: max(0px, calc(122px + 15rem - max(var(--gx-gutter), (100vw - var(--gx-maxw)) / 2)));
+  }
+
+  /* The layers in front of the table keep their tops under the box (16px
+     down, about 53px tall): the briefing page's reading clock sits in its
+     own top-right corner. */
+  .gauntlet-shell .gx-comic,
+  .gauntlet-shell .gx-act,
+  .gauntlet-shell .gx-draft,
+  .gauntlet-shell .decision-reveal-backdrop {
+    padding-top: calc(max(16px, env(safe-area-inset-top)) + 62px);
+  }
+
+  .gauntlet-shell .decision-reveal {
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top)) - 86px);
+  }
+
+  /* Over the layers in front of the table, which cover the whole screen here. */
+  .kd-account {
+    z-index: 30;
+    top: max(16px, env(safe-area-inset-top));
+    right: calc(max(16px, env(safe-area-inset-right)) + 92px);
+    left: auto;
+    width: 15rem;
+    padding: 6px 10px 7px;
+    border: 1px solid var(--ui-line-strong);
+    border-radius: var(--ui-radius-sm);
+    box-shadow: var(--ui-shadow-1);
+  }
+
+  .kd-account-head {
+    flex-wrap: wrap;
+    row-gap: 3px;
+    height: auto;
+  }
+
+  /* The name and the chevron on the first line, the balance under them. */
+  .kd-account-name {
+    flex: 1 1 calc(100% - 20px);
+    order: -2;
+  }
+
+  .kd-account-more {
+    order: -1;
+    margin: 0 3px 3px 0;
+  }
+
+  .kd-account-head > strong {
+    font-size: 1.25rem;
+  }
+
+  .gx-purse-season {
+    top: calc(100% + 4px);
+    right: 0;
+    border-top: 1px solid var(--ui-line-strong);
+    border-radius: var(--ui-radius-xs);
+  }
 }
 
 /* The amount lands as the slam's flight ends (0.72 s on a cash, 1.3 s on a
    bust: the slam's RESOLVE_DELAY_MS less a beat). */
-.gx-purse.is-landing > strong {
+.gx-purse.is-landing strong {
   animation: gx-purse-land 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.62s both;
 }
 
-.gx-purse.is-landing.is-down > strong {
+.gx-purse.is-landing.is-down strong {
   animation-delay: 1.18s;
 }
 
@@ -123,35 +306,15 @@
   }
 }
 
-/* The purse's total is a 1.25rem line in a wide rail; on a phone (480px or
-   less) it takes a step down, set solid (line-height 1) so the CJK face's
-   taller small text does not open it, and the season's columns join its line
-   when they fit. Height is the HUD's scarcest room there (bank-rail-fit):
-   Linux CI measured 360x740 five-card hands and the densest boards at
-   390x844, and the five-card hands give back the rest (play.css). A phone on
-   its side puts the HUD in a column as narrow, and takes the same line. */
-@media (max-width: 480px), (max-height: 480px) and (orientation: landscape) and (pointer: coarse) {
-  .gauntlet-stage .gx-purse {
-    line-height: 1;
-  }
-
-  .gauntlet-stage .gx-purse > strong {
-    font-size: 1.0625rem;
-    line-height: 1;
-  }
-
-  .gauntlet-stage .gx-purse-season {
-    flex-basis: auto;
-    margin-left: auto;
-    font-size: 0.625rem;
-  }
-}
-
 /* No motion: the amount stands where the slam puts it, large, and the purse
    does not pop. The calm-effects setting stops both too (comfort.css). */
 @media (prefers-reduced-motion: reduce) {
   .gx-burst,
-  .gx-purse.is-landing > strong {
+  .gx-purse.is-landing strong {
     animation: none;
+  }
+
+  .kd-account-more {
+    transition: none;
   }
 }

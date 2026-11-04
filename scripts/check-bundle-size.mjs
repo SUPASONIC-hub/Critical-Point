@@ -81,9 +81,13 @@ const budgets = [
   // reveal:gain / reveal:even / reveal:cost (revealOutcome in GameRuntime). Measured 150,030 / 55,066 in the e2e build, the plus 4.
   // 150,034 / 55,070 -> 150,255 / 55,171 on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 150,251 / 55,167 in the e2e build, the plus 4.
   // 150,255 / 55,171 -> 146,589 / 54,099 on 2026-11-02, plate-story over main acf3d999 (#392): the runtime is smaller over #393 (locale-gaps moved words into late chunks). Measured 146,585 / 54,095 in the e2e build, the plus 4.
+  // 146,589 / 54,099 -> 147,128 / 54,263 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState). Measured 147,124 / 54,259 in the e2e build over main 7fc3a1c4, the plus 4.
+  // 54,263 -> 54,266 gzip on 2026-11-04, snap-after-reading over main 22f43342 (#435): no code changed (raw 147,124 as before); the chunk names it imports shifted with #435's case copy. Measured 54,262 gzip in the e2e build, the gzip plus 4.
   // 146,589 / 54,099 -> 147,608 / 54,517 on 2026-11-03, caption-split over main f4625ad1: the briefing's sentences are cut by one shared function that counts the quotes in pairs and ends Japanese sentences at their full stops (src/components/proseSentences.js, imported by proseMarks.js and speakerLine.js). Measured 147,604 / 54,513 in the e2e build, the plus 4.
   // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 147_532, maxGzip: 54_533 },
+  // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
+  // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_709 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -95,7 +99,10 @@ const budgets = [
   // 13,422 -> 13,432 gzip on 2026-11-02, bgm-variety over main c680ddd5 (#389): no code changed (raw 34,455 as main); the entry's
   // export names it imports shifted with the music's new exports. Measured 13,428 gzip in the e2e build, the gzip plus 4.
   // 34,459 / 13,432 -> 36,080 / 14,049 on 2026-11-02, locale-gaps (#393) over main 9be94346: the scene beat, the default echo and the speeches read src/copy/judgment.js by key (sceneBeat, defaultEcho), and the speakers' profiles take the page's language. Measured 36,076 / 14,045 in the e2e build, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_080, maxGzip: 14_049 },
+  // 36,080 / 14,049 -> 36,274 / 14,117 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState); the observer's 순응 표본 holds the same line. Measured 36,270 / 14,113 in the e2e build over main 811df47a, the plus 4.
+  // 14,117 -> 14,116 gzip on 2026-11-04, snap-after-reading over main 22f43342 (#435): no code changed (raw 36,270 as before). Measured 14,112 gzip in the e2e build, the gzip plus 4.
+  // 14,116 -> 14,123 gzip on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): no code changed here (raw 36,270); #416's readThrough beside #448's lines. Measured 36,270 / 14,119 in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_274, maxGzip: 14_123 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -107,7 +114,8 @@ const budgets = [
   // 26,682 / 11,352 -> 26,792 / 11,414 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in the table's words (stage.purse, purseChange, purseSeason). Measured 26,788 / 11,410, the plus 4.
   // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_498, maxGzip: 13_286 },
+  // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_526, maxGzip: 13_304 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -292,16 +300,28 @@ const budgets = [
   // 188,124 / 67,821 -> 189,363 / 68,363 on 2026-11-02, locale-gaps (#393) over main 9be94346: the entry's panels, titles, tab title, storage banner and music button read src/copy/introPanels.js and src/copy/music.js, and the default name is shown in the page's language. Measured 189,359 / 68,359 in the e2e build, the plus 4.
   // 68,363 -> 68,368 gzip on 2026-11-03, locale-review-1103 over main 16b6d349 (#392): no code changed (raw under 189,363); the habit name, the purse word and the 首席 title rename the hashed locale chunks the entry imports. Measured 68,364 gzip in the CI e2e build, the plus 4.
   // 189,363 / 68,368 -> 189,392 / 68,379 on 2026-11-03, week-board-after over main 36104abd: the ranking's boards fetch the week's chunk in the week after a rule week too (weekHasNews with -7 days, W47 점검 P9). Measured 189,388 / 68,375 in the e2e build, the plus 4.
+  // 68,379 -> 68,386 gzip on 2026-11-04, a11y-1103 over main 557d17bb: no entry code changed (raw under 189,392); the ranking chunk's name it imports changed. Measured 189,388 / 68,382 in the e2e build, the plus 4.
+  // 68,386 -> 68,376 gzip on 2026-11-04, a11y-1103 over main 22f43342. Measured 189,388 / 68,372 in the e2e build, the plus 4.
+  // 189,392 / 68,379 -> 189,456 / 68,430 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the tab token's claim takes a "held" that comes
+  // after its wait until a table has read the token (appConfig.takeTabToken). Measured 189,452 / 68,426 in the e2e build, the plus 4.
+  // 189,456 / 68,430 -> 189,456 / 68,420 on 2026-11-04, flaky-fix-1103 over main 557d17bb. Measured 189,452 / 68,416 in the e2e build, the plus 4.
+  // 189,456 / 68,420 -> 189,456 / 68,428 on 2026-11-04, flaky-fix-1103 over main 22f43342. Measured 189,452 / 68,424 in the e2e build, the plus 4.
+  // 68,379 -> 68,384 gzip on 2026-11-04, kd-bank-account over main 629de24c: the account's name in the table's words. Measured 68,380 gzip in the e2e build (raw under 189,392), the plus 4.
+  // 68,384 -> 68,378 gzip on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): measured 68,374 locally and in Linux CI, the plus 4.
+  // 68,378 -> 68,382 gzip the same day: Linux CI measured 68,378 on 986edea7 (4 more than locally), the plus 4.
+  // -> 189,456 / 68,429 on 2026-11-04, bundle-1105a (#440, #439, #442, #416 over main 2bd9a8ba): the lines above together. Measured 189,452 / 68,425 in the e2e build, the plus 4.
   // 189,392 / 68,379 -> 189,888 / 68,598 on 2026-11-04, seo-locale-start over main 22f43342: src/locale.js reads the start page's folder (/en/, /ja/) as a language, a choice made there moves to the chosen language's folder, and a page opened by ?lang= points its canonical at the folder. Measured 189,884 / 68,594 in the e2e build, the plus 4.
   // 189,392 / 68,379 -> 189,572 / 68,438 on 2026-11-03, perf-first-visit over main 8e930107: the intro fetches the runtime on idle only once the page has loaded (AppContent). Measured 189,568 / 68,434 in the e2e build, the plus 4.
   // 189,392 / 68,379 -> 189,407 / 68,395 on 2026-11-04, en-ko-leak over main 557d17bb: simplifyPlayerText reads the page's language (src/locale.js) and hands a page in another language back its own text. Measured 189,403 / 68,391 in the e2e build, the plus 4.
   // 189,407 / 68,395 -> 189,415 / 68,397 on 2026-11-04, en-ko-leak over main 22f43342: the intro reads its title reading from its copy, and the phase chip prints the phase as written. Measured 189,411 / 68,393, the plus 4.
   // 189,392 / 68,379 -> 190,097 / 68,670 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the four lines above together (#433 #436 #445, with #429 #438). Measured 190,093 / 68,666 in the e2e build, the plus 4.
+  // -> 190,158 / 68,698 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 190,154 / 68,694 in the e2e build, the plus 4.
   // 189,392 / 68,379 -> 189,737 / 68,502 on 2026-11-04, credits-alice over main 5d5d6ae4: the start screen's credit names SUPASONIC & ALICE and links both addresses (src/credits.js, StudioCredit.jsx). Measured 189,733 / 68,498 in the e2e build, the plus 4.
   // 68,502 -> 68,508 gzip on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the entry names the renamed locale chunks. Measured 189,733 / 68,504 in the e2e build, the plus 4.
   // 190,097 / 68,670 -> 190,442 / 68,790 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit line above (#443) on bundle-1104a's entry. Measured 190,438 / 68,786 in the e2e build, the plus 4.
-  // 190,442 / 68,790 -> 190,555 / 68,809 on 2026-11-04, tab-title-locale over main 62a25238: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 190,551 / 68,805 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 190_555, maxGzip: 68_809 },
+  // -> 190,506 / 68,833 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 190,502 / 68,829 in the e2e build, the plus 4.
+  // 190,506 / 68,833 -> 190,619 / 68,857 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 190,615 / 68,853 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 190_619, maxGzip: 68_857 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -613,12 +633,19 @@ const budgets = [
   // Japanese signals row gives LOCK its own width and the overclock line the rest (a 360px block of its own). Measured 200,372 / 37,496 in the e2e build, the gzip plus 4.
   // 200,372 / 37,500 -> 200,439 / 37,512 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: on 360px or less the Korean and
   // Japanese premise wraps plainly (WebKit's text-wrap: pretty took it a line longer). Measured 200,435 / 37,508, plus 4.
+  // 200,439 / 37,512 -> 200,433 / 37,516 on 2026-11-04, a11y-1103 over main 5d5d6ae4: the hand's card edge at
+  // --ui-line-field and its brighter hover (play.css). Measured 200,429 / 37,512 in the e2e build, plus 4.
+  // 200,439 / 37,512 -> 202,784 / 38,004 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 band (below 1025px) and corner box (money.css), with the shell, the music pills and the layers in front of the table moved out from under it. Measured 202,780 / 38,000 in the e2e build, the plus 4.
+  // 202,784 / 38,004 -> 203,176 / 38,053 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): the band's 44px press area, the reveal's sheet shortened by the band and the box, the band under the music pills. Measured 203,172 / 38,049 locally and in Linux CI alike, the plus 4.
+  // -> 203,170 / 38,056 on 2026-11-04, bundle-1105a (#440, #439, #442, #416 over main 2bd9a8ba): the lines above together. Measured 203,166 / 38,052 in the e2e build, the plus 4.
   // 200,439 / 37,512 -> 200,479 / 37,521 on 2026-11-03, plate-sound-clip over main 8e930107: the scene's sound is centred in its
   // transform, which the build keeps (it dropped the separate translate property). Measured 200,475 / 37,517 in the build, plus 4.
+  // -> 203,210 / 38,064 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 203,206 / 38,060 in the e2e build, the plus 4.
   // 200,439 / 37,512 -> 200,791 / 37,581 on 2026-11-04, credits-alice over main 5d5d6ae4: the credit's address row (.studio-credit-mail),
   // which wraps one address under the other on a phone. Measured 200,787 / 37,577 in the e2e build, the plus 4.
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_831, maxGzip: 37_589 },
+  // -> 203,562 / 38,132 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 203,558 / 38,128 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_562, maxGzip: 38_132 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -686,7 +713,10 @@ const budgets = [
   // 5,048 / 2,170 -> 4,793 / 2,147 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 4,793 / 2,143 in the e2e build, the gzip plus 4.
   // 4,793 / 2,147 -> 5,503 / 2,416 on 2026-10-26, 영어판 3단계: the ranking's words read by key (src/copy/ranking.js) and dates in the page's language. The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_503, maxGzip: 2_416 },
+  // 5,503 / 2,416 -> 5,579 / 2,429 on 2026-11-03, a11y-1103: the 시즌 완료 badge shows its words and says the record's name in an sr-only span, not an aria-label on a span (axe aria-prohibited-attr). Measured 5,575 / 2,425 in the e2e build, the plus 4.
+  // 5,579 / 2,429 -> 5,609 / 2,437 on 2026-11-04, a11y-1103: the row's place line carries data-testid="ranking-place", so a test reads the one place line and not the badge's sr-only line. Measured 5,605 / 2,433 in the e2e build, the plus 4.
+  // 5,609 / 2,437 -> 5,609 / 2,436 on 2026-11-04, a11y-1103 over main 22f43342. Measured 5,605 / 2,432 in the e2e build, the plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 5_609, maxGzip: 2_436 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -1105,8 +1135,10 @@ const budgets = [
   // 179,578 / 60,103 -> 179,701 / 60,151 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in Japanese. Measured 179,697 / 60,147, the plus 4.
   // 179,701 / 60,151 -> 179,747 / 60,166 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in Japanese. Measured 179,743 / 60,162, the plus 4.
   // 179,747 / 60,166 -> 179,769 / 60,178 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 179,765 / 60,174, the plus 4.
-  // 179,769 / 60,178 -> 179,849 / 60,200 on 2026-11-04, tab-title-locale over main 62a25238: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 179,845 / 60,196 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_849, maxGzip: 60_200 },
+  // 179,747 / 60,166 -> 179,771 / 60,177 on 2026-11-04, kd-bank-account over main 629de24c: KD銀行口座 and 直近. Measured 179,767 / 60,173, the plus 4.
+  // 179,769 / 60,178 -> 179,793 / 60,190 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): KD銀行口座 and 直近 over the canon fixes. Measured 179,789 / 60,186 locally and in Linux CI, the plus 4.
+  // 179,793 / 60,190 -> 179,858 / 60,204 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 179,854 / 60,200 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_858, maxGzip: 60_204 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1115,10 +1147,14 @@ const budgets = [
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
+  // 149,819 / 53,481 -> 149,843 / 53,493 on 2026-11-04, kd-bank-account over main 629de24c: KD Bank account and Last. Measured 149,839 / 53,489, the plus 4.
+  // 149,852 / 53,501 -> 149,876 / 53,512 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): KD Bank account and Last over the canon fixes. Measured 149,872 / 53,508 locally and in Linux CI, the plus 4.
   // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
+  // 149,807 / 53,485 -> 149,831 / 53,496 on 2026-11-04, kd-bank-account after merging main 2bd9a8ba (#435's glossary in): KD Bank account and Last over the glossary's terms. Measured 149,827 / 53,492, the plus 4.
   // 149,807 / 53,485 -> 149,834 / 53,489 on 2026-11-04, en-ko-leak over main 22f43342: the brand's reading under the wordmark, Trigger Lab (screens.intro.titleReading, the user's choice 1). Measured 149,830 / 53,485, the plus 4.
-  // 149,834 / 53,489 -> 149,914 / 53,508 on 2026-11-04, tab-title-locale over main 62a25238: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 149,910 / 53,504 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_914, maxGzip: 53_508 },
+  // -> 149,859 / 53,502 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 149,855 / 53,498 in the e2e build, the plus 4.
+  // 149,859 / 53,502 -> 149,939 / 53,520 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 149,935 / 53,516 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_939, maxGzip: 53_520 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1145,8 +1181,8 @@ const budgets = [
   // 3,500 -> 3,505 gzip on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the raw bytes are the same; the hashed names in its import maps changed and gzip worse. Measured 3,501, the plus 4.
   // 3,505 -> 3,520 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import maps changed and gzip worse. Measured 12,987 / 3,516, the plus 4.
   // 3,520 -> 3,525 gzip on 2026-11-04, bundle-1105b (#443 credits-alice + #446 canon-a044 over main 2bd9a8ba): the raw bytes are the same; #446 changes case files and their hashed names in the import maps gzip worse. Measured 12,987 / 3,521, the plus 4.
-  // 12,991 / 3,525 -> 13,064 / 3,561 on 2026-11-04, tab-title-locale over main 62a25238: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 13,060 / 3,557 in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_064, maxGzip: 3_561 },
+  // 12,991 / 3,525 -> 13,064 / 3,564 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 13,060 / 3,560 in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_064, maxGzip: 3_564 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1254,6 +1290,15 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,814 / 483,775 / 490,461 -> 426,833 / 483,809 / 490,494 on 2026-11-03, week-board-after over main 36104abd: the entry's ranking-board check and the two dictionaries' tab line. Measured 426,829 / 483,805 / 490,490, the plus 4.
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
+// 426,845 / 483,841 / 490,518 -> 426,857 / 483,846 / 490,518 on 2026-11-04, a11y-1103 over main 557d17bb (#424, #435): the hand's card edge (the critical CSS), the ranking place's testid and the chunk names the entry imports. Measured 426,853 / 483,842 / 490,514 in the e2e build, the plus 4.
+// 426,857 / 483,846 / 490,518 -> 426,847 / 483,846 / 490,514 on 2026-11-04, a11y-1103 over main 22f43342 (#431, #444). Measured 426,843 / 483,842 / 490,510 in the e2e build, the plus 4.
+// 426,845 / 483,820 / 490,505 -> 426,892 / 483,868 / 490,553 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the entry chunk's late tab-token answer. Measured 426,888 / 483,864 / 490,549, the plus 4.
+// 426,892 / 483,868 / 490,553 -> 426,880 / 483,872 / 490,544 on 2026-11-04, flaky-fix-1103 over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,876 / 483,868 / 490,540 in the e2e build, the plus 4.
+// 426,880 / 483,872 / 490,544 -> 426,889 / 483,887 / 490,555 on 2026-11-04, flaky-fix-1103 over main 22f43342 (#431, #444). Measured 426,885 / 483,883 / 490,551 in the e2e build, the plus 4.
+// 426,845 / 483,820 / 490,505 -> 427,340 / 484,329 / 491,013 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌's CSS in the index stylesheet and its words in the entry and the two dictionaries. Measured 427,336 / 484,325 / 491,009, the plus 4.
+// 426,845 / 483,841 / 490,518 -> 427,386 / 484,397 / 491,075 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424). Measured 427,382 / 484,393 / 491,071 locally and in Linux CI, the plus 4.
+// 427,386 / 484,397 / 491,075 -> 427,391 / 484,402 / 491,080 the same day: Linux CI measured 427,387 / 484,398 / 491,076 on 986edea7 (index.html and the entry 1 and 4 bytes more than locally), the plus 4.
+// -> 427,435 / 484,446 / 491,106 on 2026-11-04, bundle-1105a (#440, #439, #442, #416 over main 2bd9a8ba): the lines above together, the critical CSS cut again. Measured 427,431 / 484,442 / 491,102 in the e2e build, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,509 / 484,083 / 491,247 on 2026-11-04, seo-locale-start over main 22f43342 (canon fixes 1·2 and the glossary in): index.html's description from the about page and its no-script intro and five links, and the entry's folder languages; English and Japanese are now measured from their own start pages (/en/, /ja/) in place of the Korean index.html. Measured 427,505 / 484,079 / 491,243, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,540 / 484,538 / 491,206 on 2026-11-04, perf-first-visit over main 22f43342: index.html names /assets/locale-preload-<hash>.js (a Korean page runs it and asks for nothing; it reads the stored language, then the folder, then ?lang=), and the entry waits for `load` before it warms the runtime. Measured 427,536 / 484,534 / 491,202, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 426,858 / 483,850 / 490,522 on 2026-11-04, en-ko-leak over main 557d17bb: the language check in simplifyPlayerText. Measured 426,854 / 483,846 / 490,518, the plus 4.
@@ -1262,10 +1307,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,850 / 483,826 / 490,511 -> 426,855 / 483,845 / 490,517 on 2026-11-04, plate-sound-clip over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,851 / 483,841 / 490,513 in the e2e build, the plus 4.
 // 426,855 / 483,845 / 490,517 -> 426,852 / 483,851 / 490,519 on 2026-11-04, plate-sound-clip over main 22f43342 (#431 shortened the English dictionary, #444). Measured 426,848 / 483,847 / 490,515 in the e2e build, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 428,231 / 484,811 / 491,981 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the lines above together (#429 #433 #436 #445 #438); the Korean page now names the locale preload, and English and Japanese are measured from /en/ and /ja/. Measured 428,227 / 484,807 / 491,977 in the e2e build, the plus 4.
+// -> 428,803 / 485,392 / 492,556 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. The critical CSS cut again. Measured 428,799 / 485,388 / 492,552 in the e2e build, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,105 / 484,103 / 490,780 on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the credit's two creators and their address links (the entry and the index CSS). Measured 427,101 / 484,099 / 490,776, the plus 4.
 // 428,231 / 484,811 / 491,981 -> 428,480 / 485,062 / 492,230 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit (#443, the entry and the index CSS) on bundle-1104a's first paint. Measured 428,476 / 485,058 / 492,226 in the e2e build, the plus 4.
-// 428,480 / 485,062 / 492,230 -> 428,498 / 485,137 / 492,322 on 2026-11-04, tab-title-locale over main 62a25238: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 428,494 / 485,133 / 492,318, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 428_498, en: 485_137, ja: 492_322 };
+// -> 429,066 / 485,663 / 492,823 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together, the critical CSS cut again. Measured 429,062 / 485,659 / 492,819 in the e2e build, the plus 4.
+// 429,066 / 485,663 / 492,823 -> 429,091 / 485,744 / 492,921 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 429,087 / 485,740 / 492,917, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 429_091, en: 485_744, ja: 492_921 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
