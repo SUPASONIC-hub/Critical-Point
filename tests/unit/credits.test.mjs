@@ -40,17 +40,30 @@ test("the start screen's credit is a labeled list with both names and both mail 
   assert.match(source, /aria-label=\{creatorMailLabel\(creator\)\}/);
 });
 
-test("every plain page's foot carries the credit: both names and both mail links, each named for its owner", () => {
+// The policy and the terms keep the names and leave the addresses out
+// (decided 2026-11-04): an access or deletion request goes to SUPPORT_CONTACT
+// alone, and ALICE's address under that line read as a second place for it.
+const POLICY_PAGE = /^(?:(?:en|ja)\/)?(?:privacy|terms)\.html$/;
+
+test("every plain page's foot carries the credit: both names, and both mail links except on the policy and the terms", () => {
   const pages = { ...renderLegalPages(), ...renderSitePages() };
   assert.equal(Object.keys(pages).length, 15);
+  const policies = Object.keys(pages).filter((file) => POLICY_PAGE.test(file));
+  assert.deepEqual(policies.sort(), ["en/privacy.html", "en/terms.html", "ja/privacy.html", "ja/terms.html", "privacy.html", "terms.html"]);
   for (const [file, html] of Object.entries(pages)) {
     const foot = /<footer>([\s\S]*)<\/footer>/.exec(html)?.[1] ?? "";
     assert.ok(foot.includes(`mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`), `${file}: the contact line is as it was`);
     assert.ok(foot.includes('<img src="/profile.jpg"'), `${file}: the profile picture`);
     assert.ok(foot.includes(`<dt lang="en">STUDIO</dt><dd>Tak'n Roll</dd>`), `${file}: the studio`);
     assert.ok(foot.includes(`<dt lang="en">CREATOR</dt><dd>SUPASONIC &amp; ALICE</dd>`), `${file}: both creators`);
-    for (const { name, email } of DECIDED) {
-      assert.ok(foot.includes(`<a href="mailto:${email}" aria-label="${name}: ${email}">${email}</a>`), `${file}: ${name}'s address`);
+    if (POLICY_PAGE.test(file)) {
+      assert.ok(!html.includes(DECIDED[1].email), `${file}: ALICE's address is nowhere on the page`);
+      assert.ok(!foot.includes('class="credit-mail"') && !foot.includes("CONTACT</dt>"), `${file}: no address row in the credit`);
+      assert.ok(!foot.includes("aria-label="), `${file}: no creator mail link`);
+    } else {
+      for (const { name, email } of DECIDED) {
+        assert.ok(foot.includes(`<a href="mailto:${email}" aria-label="${name}: ${email}">${email}</a>`), `${file}: ${name}'s address`);
+      }
     }
   }
 });

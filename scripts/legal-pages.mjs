@@ -197,16 +197,22 @@ const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
  * the studio, the two creators on one line, and each one's address as a link
  * named for its owner (src/credits.js). English labels in every language, as
  * on the start screen.
+ *
+ * The privacy policy and the terms leave the address row out (decided
+ * 2026-11-04): under their contact line it read as a second place to send an
+ * access or deletion request, which goes to SUPPORT_CONTACT alone.
  */
-const CREDIT = `<div class="credit">
+const NO_CREDIT_MAIL = new Set(["privacy", "terms"]);
+const creditMail = `<div class="credit-mail"><dt lang="en">CONTACT</dt><dd>${CREATORS.map(
+  (creator) => `<a href="mailto:${creator.email}" aria-label="${escapeHtml(creatorMailLabel(creator))}">${creator.email}</a>`,
+).join(" ")}</dd></div>
+`;
+const creditFor = (kind) => `<div class="credit">
 <img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
 <dl>
 <div><dt lang="en">STUDIO</dt><dd>${escapeHtml(STUDIO)}</dd></div>
 <div><dt lang="en">CREATOR</dt><dd>${escapeHtml(CREATOR_LINE)}</dd></div>
-<div class="credit-mail"><dt lang="en">CONTACT</dt><dd>${CREATORS.map(
-  (creator) => `<a href="mailto:${creator.email}" aria-label="${escapeHtml(creatorMailLabel(creator))}">${creator.email}</a>`,
-).join(" ")}</dd></div>
-</dl>
+${NO_CREDIT_MAIL.has(kind) ? "" : creditMail}</dl>
 </div>`;
 const days = DATA_RETENTION_DAYS;
 
@@ -732,7 +738,7 @@ ${pages}${switches}</nav>
 <h1>${copy[kind]}</h1>
 ${dated}${body.trim()}
 <footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
-${CREDIT}
+${creditFor(kind)}
 </footer>
 </main>
 </body>
