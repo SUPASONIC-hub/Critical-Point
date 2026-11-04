@@ -8,6 +8,7 @@ import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { withStaticShell } from "./scripts/static-shell.mjs";
 import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
@@ -436,6 +437,18 @@ function staticPages(analytics) {
 }
 
 /**
+ * The intro's first viewport as HTML inside `#root` (scripts/static-shell.mjs),
+ * so a first visit paints the key visual and the wordmark with the inlined
+ * critical CSS before the entry chunk and React have run. main.jsx renders over
+ * it as before; nothing hydrates. A release only: the dev server styles the page
+ * from its script, so a shell there would paint unstyled. `startPages()` copies
+ * the final index.html, so `/en/` and `/ja/` carry the same shell.
+ */
+function staticShell() {
+  return { name: "static-shell", apply: "build", transformIndexHtml: (html) => withStaticShell(html) };
+}
+
+/**
  * The start page in English and Japanese, `/en/index.html` and
  * `/ja/index.html` (scripts/site-pages.mjs `localizedStartPage`): the built
  * index.html, after every plugin here has had its turn with it -- the
@@ -732,7 +745,7 @@ export default defineConfig(({ command, mode }) => {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), localePreload(), staticPages(analytics),
+      seasonData(), reactAsEsm(), react(), criticalCss(), staticShell(), absoluteSiteUrls(), buildShaMeta(), localePreload(), staticPages(analytics),
       adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
