@@ -559,6 +559,24 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
 });
 
+// The cash's side under reduced motion: the bust's −N is held still above, and
+// the purse's landing pop on a cash (gx-purse-land) went unasserted until the
+// 2026-11-03 audit. Neither the +N nor the purse's amount moves.
+test("under reduced motion a cash's amount and the purse it lands in stand still", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const burst = page.getByTestId("gauntlet-burst");
+  await expect(burst).toHaveText(/^\+[\d,]+$/);
+  await expect(burst).toHaveCSS("animation-name", "none");
+  await expect(page.getByTestId("gauntlet-purse")).toHaveClass(/is-landing is-up/);
+  const total = page.getByTestId("gauntlet-purse-total");
+  await expect(total).toHaveCSS("animation-name", "none");
+  expect(await total.evaluate((element) => element.getAnimations().length), "no animation runs on the purse's amount").toBe(0);
+});
+
 // The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
 // wall can stop at once, the reveal says what one more push would have done,
 // and the next scene's page opens on its speaker's line about that table.

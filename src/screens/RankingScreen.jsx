@@ -97,14 +97,15 @@ export function RankingScreen({
                   const vaultPerCase = Math.round(entry.summary?.gauntlet?.vault / entry.summary?.completedCaseCount);
                   return (
                   <div role="listitem" className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
-                    <span className="sr-only">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
+                    <span className="sr-only" data-testid="ranking-place">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
                     <strong className="ranking-position" aria-hidden="true">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.headline}</b>
                       <span className="ranking-league-badge">{entry.league}</span>
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
-                      {entry.seasonComplete && <span className="season-complete-badge" aria-label={words.seasonCompleteLabel}>{words.seasonComplete}</span>}
+                      {/* A span's aria-label is not read (axe aria-prohibited-attr): the badge's words are shown, the record's name is said. */}
+                      {entry.seasonComplete && <span className="season-complete-badge"><span aria-hidden="true">{words.seasonComplete}</span><span className="sr-only">{words.seasonCompleteLabel}</span></span>}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{fill(words.meta, { case: entry.caseTitle, run: entry.runLabel, trigger: triggerLabels[entry.trigger] ?? triggerLabels.responsibility })}</small>
                     </div>
