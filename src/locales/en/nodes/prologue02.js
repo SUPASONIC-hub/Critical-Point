@@ -318,9 +318,9 @@ export default {
     },
     "p2_branch_supplier": {
       "title": "A 3-Year Supply Contract",
-      "text": "A shift lead you met on Line 3 writes down an address for you: a small precision machining shop in Mullae-dong. Seven employees, six lathes, and a 3-year supply contract to be signed tomorrow morning. The owner, Moon Sungho, still in his work clothes, opens the contract for you. 'If FlowOn gets 31 billion won from the bank, they’re putting in an automated line. We make the parts for that line.' He smiles. 'My equipment loan’s already approved. I showed them the contract and it went right through.' In a corner of the shop stands a new machine, still in its packaging. He runs his palm over it once and says, 'This is the biggest decision of our lives. You’re from the bank, so let me ask just one thing. That 31 billion won, it’s coming, right?'",
+      "text": "A shift lead you met on Line 3 writes down an address for you: a small precision machining shop in the Namdong Industrial Complex, Incheon. Seven employees, six lathes, and a 3-year supply contract to be signed tomorrow morning. The owner, Moon Sungho, still in his work clothes, opens the contract for you. 'If FlowOn gets 31 billion won from the bank, they’re putting in an automated line. We make the parts for that line.' He smiles. 'My equipment loan’s already approved. I showed them the contract and it went right through.' In a corner of the shop stands a new machine, still in its packaging. He runs his palm over it once and says, 'This is the biggest decision of our lives. You’re from the bank, so let me ask just one thing. That 31 billion won, it’s coming, right?'",
       "memo": [
-        "Gaon Precision, Mullae-dong -- 7 employees, 6 lathes",
+        "Gaon Precision, Namdong Industrial Complex, Incheon -- 7 employees, 6 lathes",
         "3-year supply contract to be signed: next morning",
         "Equipment loan already disbursed -- the shop is collateral",
         "1 new machine -- still in its packaging"
@@ -336,15 +336,15 @@ export default {
           "label": "Add the supply contract and equipment loan to the file"
         }
       },
-      "place": "Gaon Precision, Mullae-dong · Shop floor",
+      "place": "Gaon Precision, Namdong Industrial Complex, Incheon · Shop floor",
       "clock": "Thursday, April 13, 2023 · 17:00",
       "question": "A supplier’s owner signs a 3-year contract tomorrow morning. What do you tell him here?"
     },
     "p2_branch_supplier_follow": {
       "title": "Two Boxes of Rice Cakes",
-      "text": "As you leave the shop, Moon Gaeul, Moon Sungho’s wife, steps out of the rice cake shop at the end of the alley. The shop has no name yet, just a sheet of paper where the sign should go. She holds out two plastic bags. 'One box is for the bank, and one is for you to eat today. My husband’s been saying since yesterday that people from the bank were coming.' Her hands are still dusted with rice flour. She looks back toward the machine shop. 'He’s done nothing but that work since he was eighteen. With a 3-year contract, he figured we could get our son through college. He was so happy yesterday, tapping away at the calculator.' Then she looks at you, her face without a trace of doubt. 'Please look after it for us. We don’t know much, so if the bank says it’ll work, we believe it will.'",
+      "text": "As you leave the shop, Moon Gaeul, Moon Sungho’s wife, is waiting at the factory gate. Her new rice cake shop in Mangwon Market has no name yet, she says, just a sheet of paper where the sign should go. She holds out two plastic bags. 'One box is for the bank, and one is for you to eat today. My husband’s been saying since yesterday that people from the bank were coming.' Her hands are still dusted with rice flour. She looks back toward the machine shop. 'He’s done nothing but that work since he was eighteen. With a 3-year contract, he figured we could get our son through college. He was so happy yesterday, tapping away at the calculator.' Then she looks at you, her face without a trace of doubt. 'Please look after it for us. We don’t know much, so if the bank says it’ll work, we believe it will.'",
       "memo": [
-        "Moon Gaeul -- rice cake shop in Mullae-dong, no sign",
+        "Moon Gaeul -- rice cake shop in Mangwon Market, no sign",
         "Son Moon Hajun -- middle school student",
         "Moon Sungho of Gaon Precision: same work since age 18",
         "Two boxes of rice cakes -- one for the bank"
@@ -360,7 +360,7 @@ export default {
           "label": "Decline the rice cakes and tell them what the deal rides on"
         }
       },
-      "place": "Mullae-dong alley · Outside the rice cake shop with no sign",
+      "place": "Gaon Precision, Namdong Industrial Complex, Incheon · Factory gate",
       "clock": "Thursday, April 13, 2023 · 18:00",
       "question": "Someone who doubts nothing is holding out two boxes of rice cakes. What do you do?"
     },
@@ -415,7 +415,7 @@ export default {
     },
     "p2_evidence_turn": {
       "title": "Six Lines of Sign-Off",
-      "text": "Following the date on the clue, you open the circulation record of the Article 7 draft from November 2022. The request for the clause didn’t come from inside the team. It’s a one-page request sent down from the Group Strategy Office, and the reason field reads: 'Lower the review burden for growth-project loans. A call condition creates grounds for approval.' Below it, the circulation sign-off box holds six employee numbers. Yoon Sanghyuk, Han Seoyun, Oh Jinwoo, and from the fourth line on, three trainees. The last line is your employee number, signed off at 18:02 on November 14, 2022. Investigator Ban Jaewook closes his notebook. 'The name of the person about to write a dissent is already on that clause’s circulation list. Whether you read it before clicking or not, the record is the same.'",
+      "text": "Following the date on the clue, you open the circulation record of the Article 7 draft from November 2022. The request for the clause didn’t come from inside the team. It’s a one-page request sent down from the Group Strategy Office, and the reason field reads: 'Lower the review burden for growth-project loans. A call condition creates grounds for approval.' Below it, the circulation sign-off box holds six employee numbers. Yoon Sanghyuk, Han Seoyun, Oh Jinwoo, and from the fourth line on, three new hires who finished their traineeship last month. The last line is your employee number, signed off at 18:02 on November 14, 2022. Investigator Ban Jaewook closes his notebook. 'The name of the person about to write a dissent is already on that clause’s circulation list. Whether you read it before clicking or not, the record is the same.'",
       "memo": [
         "Clause request: a one-page request from the Group Strategy Office",
         "Reason: 'a call condition creates grounds for approval'",
@@ -569,7 +569,7 @@ export default {
     "p2_branch_supplier_c": "You leave, and Moon Sungho follows you out the door to see you off. At ten the next morning, he signs the contract.",
     "p2_branch_supplier_follow_a": "You tell them everything, and Moon Gaeul takes the bags back. Then, a long while later, she holds one out again. 'Take this one anyway. I made it today, so it’ll be hard by tomorrow.'",
     "p2_branch_supplier_follow_b": "You take their statements, and Moon Sungho writes his name twice. Once wrong, once right. 3 years later, that paper becomes the only record.",
-    "p2_branch_supplier_follow_c": "You turn away, and the smell of rice cakes follows you to the end of the alley. The next day, Moon Gaeul puts up her sign. The shop is called 'Gaeul Rice Cake Shop.'",
+    "p2_branch_supplier_follow_c": "You turn away, and the smell of rice cakes follows you to the end of the industrial road. The next day, Moon Gaeul puts up her sign. The shop is called 'Gaeul Rice Cake Shop.'",
     "p2_route_system_annex": "You attach it, and the opinion runs 30 pages. The Credit Committee handout is summarized to ten pages, and the person summarizing isn’t you.",
     "p2_route_system_nine": "You visit them, and four of the nine agree to meet. Two of them learn for the first time that their files were the same. The other five don’t answer the phone.",
     "p2_route_system_keep": "You fold it away, and the 47 stay in the folder. Sealing the printout bundle with tape, Lim Kyungsoo says, 'Someone will come someday.'",
@@ -670,7 +670,7 @@ export default {
   "pack": {
     "clue": {
       "title": "The Article 7 Circulation List",
-      "text": "Article 7, which set the 180% debt-to-equity line, began with a one-page request from the Group Strategy Office, and the reason field read 'a call condition creates grounds for approval.' The last of the six lines in the draft’s circulation sign-off box is the employee number you had as a trainee."
+      "text": "Article 7, which set the 180% debt-to-equity line, began with a one-page request from the Group Strategy Office, and the reason field read 'a call condition creates grounds for approval.' The last of the six lines in the draft’s circulation sign-off box is your employee number, just out of your traineeship."
     },
     "outcomes": {
       "p2_after_alone": {

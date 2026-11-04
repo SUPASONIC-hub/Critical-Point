@@ -139,7 +139,7 @@ export const roles = {
   "플로우온 풀필먼트센터 야간조 반장 · 창업 첫해 입사": "Night-shift foreman, FlowOn fulfillment center · hired in the founding year",
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
-  "문래동 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Mullae-dong · Moon Gaeul’s husband",
+  "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
   "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
 };
 
@@ -424,7 +424,7 @@ export const copy = {
         "movement": "Ieum Hospital, Gangseo > Window 4, Gangseo Branch > HR committee room > Secondhand bookshop in Hoegi-dong, 2nd floor",
         "reason": "To see who got the bill for the hand you won, and to move the list one person carried into a structure that won’t break",
         "interlude": {
-          "label": "Interlude · 5 Weeks Before the Wedding",
+          "label": "Interlude · 1 Week Before the Wedding",
           "title": "Kwon Dohyun Asks You to Sing",
           "text": "A month after the vote, a message comes from Kwon Dohyun. 'I have no one to sing at the wedding. Oh Jinwoo is tone-deaf and Mr. Ban said no.' You reply that you can’t sing, and the answer comes right back. 'I know. I did the math, and you’re still the smallest loss.' The seating chart photo with it shows the uncle’s seat next to the family table empty, and at the last round table: 'Kang Taemin and 10 others.'"
         }

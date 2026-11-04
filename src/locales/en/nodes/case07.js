@@ -69,7 +69,7 @@ export default {
     },
     "c7_counter": {
       "title": "3 Years at Gangseo",
-      "text": "KD Bank Gangseo Branch. Do Yoonha opens that door for the first time in 3 years. The sales board by the entrance is in the same spot, and the Top Seller of the Month sticker is still on it. The branch manager who moved him off the counter still sits in the same office. What you need is the printout of the memo sent down to the branch 3 years ago, 'Smart Logistics No. 3 Sales Cooperation.' It was printed for a branch meeting that year and put in a binder, so the back page with targets per window and the names of the staff is still attached. You saw that sheet once, on the table on inspection day. The manager says he can give it. He doesn’t get angry. Instead he speaks with the binder open. If this page leaves, he says, the names of every window clerk who took those targets and sold go with it. Starting with Do Yoonha. Do Yoonha keeps his eyes on the number-ticket machine so he won’t look at the sales board.",
+      "text": "KD Bank Gangseo Branch. Do Yoonha opens that door for the first time since he left the counter. The sales board by the entrance is in the same spot, and the Top Seller of the Month sticker is still on it. The branch manager from his counter days still sits in the same office. What you need is the printout of the memo sent down to the branch 3 years ago, 'Smart Logistics No. 3 Sales Cooperation.' It was printed for a branch meeting that year and put in a binder, so the back page with targets per window and the names of the staff is still attached. You saw that sheet once, on the table on inspection day. The manager says he can give it. He doesn’t get angry. Instead he speaks with the binder open. If this page leaves, he says, the names of every window clerk who took those targets and sold go with it. Starting with Do Yoonha. Do Yoonha keeps his eyes on the number-ticket machine so he won’t look at the sales board.",
       "memo": [
         "Window-by-window sales targets attached to the memo’s back page",
         "Department that sent the targets: Corporate Finance Strategy Team",
@@ -96,7 +96,7 @@ export default {
       "place": "KD Bank Gangseo Branch",
       "clock": "Transfer in 43h",
       "question": "If the back page leaves, the names of the four people at the windows then go with it. How do you take it?",
-      "lead": "Do Yoonha opens the door of his old branch for the first time in 3 years. Branch Manager Bae Seungho, who moved him out, still sits in the same seat."
+      "lead": "Do Yoonha opens the door of his old branch for the first time since he left the counter. Branch Manager Bae Seungho, his manager in those days, still sits in the same seat."
     },
     "c7_paper": {
       "title": "The Burned Line",

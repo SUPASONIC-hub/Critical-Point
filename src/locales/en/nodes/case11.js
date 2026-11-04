@@ -101,7 +101,7 @@ export default {
     },
     "c11_sign": {
       "title": "The One Who Returned It",
-      "text": "Han Seoyun calls you up to the Trigger Lab rooftop. The wind is strong, and her voice keeps breaking up. For a while she has ended her sentences as if filing a report; tonight she talks the old way. 'The person who returned your dissent 3 years ago was me. I signed it. That afternoon Managing Director Yoon called. He said if the dissent went up, the seven people on our team would be scattered. Three of those seven had babies that year.' She plays an audio file on her phone. It is that call, 3 years ago. 'If you submit this tomorrow, it proves you were right. And I’m finished. I only figured out today why I couldn’t delete this file for 3 years.'",
+      "text": "Han Seoyun calls you up to the Trigger Lab rooftop. The wind is strong, and her voice keeps breaking up. For a while she has ended her sentences as if filing a report; tonight she talks the old way. 'The person who returned your dissent 3 years ago was me. I pressed the return button. That afternoon Managing Director Yoon called. He said if the dissent went up, the seven people on our team would be scattered. Three of those seven had babies that year.' She plays an audio file on her phone. It is that call, 3 years ago. 'If you submit this tomorrow, it proves you were right. And I’m finished. I only figured out today why I couldn’t delete this file for 3 years.'",
       "memo": [
         "Recording of the call 3 years ago -- Yoon Sanghyuk’s voice can be confirmed",
         "Content of the call: 'If the dissent goes up, the team is broken up'",
