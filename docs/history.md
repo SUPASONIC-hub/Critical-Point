@@ -837,16 +837,20 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
   - 영어 화면의 한국어 누출(#445, `en-ko-leak`): `simplifyPlayerText`가 한국어 화면에서만 바꾼다(「Injustice / 믿음 / Helplessness」 29곳). 결정 A: 워드마크 읽기는
     영어 "Trigger Lab", 일본어 「トリガーラボ」. 결정 B: 단계 이름(phase)은 치환 없이 원문 그대로.
   - 의성어 칸 밖(#438, `plate-sound-clip`): CSS 압축이 떨어뜨리던 `translate`를 `transform: translate(-50%, -50%) rotate(-9deg)`로 옮겨 PC에서도 그림 칸 안.
-- Render 헤더: 만든 사람이 `/en/*`·`/ja/*`의 `Cache-Control: no-cache`를 대시보드에 더했고 16:36에 curl로 확인.
+- Render 헤더: Render가 `/en/` 규칙을 `/en`에만 맞춰 `/en/` 자체에는 `s-maxage=300`이 나갔다. 만든 사람이 대시보드에 `/en/*`·`/ja/*` → `Cache-Control: no-cache`를
+  더했고 16:36에 curl로 확인. #448이 `render.yaml`·`deploy-policy.mjs`(`SHELL_PATHS`)·README 헤더 표를 같게 맞췄다(규칙 19 → 21).
+- 묶음 1105b(#448, `bundle-1105b`, `62a25238`): 두 PR을 차례로 병합하고 #447 뒤 main을 받았다. 충돌 셋(README 「QA 팀이 없다」 줄, 예산 세 블록, critical CSS)은
+  표시된 부분만 고치고 critical은 `build:critical`로 다시 만듦. 첫 화면 예산 ko / en / ja 428,480 / 485,062 / 492,230(실측 +4).
+  - 크레딧(#443, `credits-alice`): STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE, 두 메일을 `mailto` 링크로(`src/credits.js`). 시작 화면, 정적 15쪽 꼬리, 소개 페이지 한 줄,
+    README 첫머리, `package.json`. 개인정보처리방침·이용약관 여섯 쪽(ko·en·ja)은 열람·삭제 창구 바로 밑에 두 번째 창구처럼 읽히지 않게 메일 줄을 뺐다. 지원 메일(`SUPPORT_CONTACT`)은 그대로 하나.
+  - A044 1안(#446, `canon-a044`): 사건 26의 32억 수취인과 4월 24일 등기부 주소를 옮기는 곳을 「해온파트너스와 같은 주소의 새 법인」으로(ko·en·ja, 이름 없음).
+    해온파트너스는 사건 08(2025)에서 청산 등기를 마쳤다. 사건 29 premise의 「같은 주」는 「그리고 지금」으로. check:canon `advisory-fee-payee`.
 - 열어 둔 것: KD은행 계좌(#442, `kd-bank-account`). 브리핑·판·정산·유물 고르기 내내 보이는 「KD은행 계좌」 잔액, 표시만 한다(W47 전).
   그 돈을 유물 고르기에서 화폐로 쓰는 것은 W47 뒤 11-30 묶음에서.
-- 열어 둔 것: 크레딧(#443, `credits-alice`). STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE, 두 메일 링크(방침·약관 여섯 쪽은 메일 줄 없이).
-- 열어 둔 것: A044 1안(#446, `canon-a044`). 사건 26의 32억 수취인을 「해온파트너스와 같은 주소의 새 법인」으로, check:canon `advisory-fee-payee`.
 - 열어 둔 것: 게시판 자동 숨김(#432, 마이그레이션 있음). 신고로 숨기는 글은 전체 한 시간 5건까지(`board_auto_hide_per_hour`).
-- [자리: 1105b 묶음 — 저녁에 PR 번호·main sha·한 줄 요약]
 - [자리: 1105a 묶음 — 저녁에 PR 번호·main sha·한 줄 요약]
-- [자리: 탭 제목 — 저녁에 PR 번호·main sha·한 줄 요약]
-- 지금까지 병합 13개(묶음 #447 하나가 5개를 담음, main `4e3f8e48`), 운영 build-sha `4e3f8e48`(16:29 curl), 유닛 테스트 1,734개(`npm test` 실측). [자리: 병합 수·main·운영 sha·테스트 수는 저녁에 다시 고침]
+- [자리: 탭 제목(`tab-title-locale`) — 저녁에 PR 번호·main sha·한 줄 요약]
+- 지금까지 병합 15개(묶음 둘이 7개를 담음, main `62a25238`), 운영 build-sha `62a25238`(17:27 curl), 유닛 테스트 1,739개(`npm test` 실측). [자리: 병합 수·main·운영 sha·테스트 수는 저녁에 다시 고침]
 
 ## 7. 자료와 한계
 
