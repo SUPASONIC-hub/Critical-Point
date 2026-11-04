@@ -577,7 +577,7 @@ export default {
     "c11_final_system_route_a": "With dates attached, the promises stay in the transcript with deadlines. The first person to get a call that day is you.",
     "c11_final_system_route_b": "The question passes. The numbers go in an appendix, and the one who opens it is likely an aide preparing next year’s audit.",
     "c11_final_system_route_c": "When you promise, the room goes quiet for a moment. A witness saying they will come back on their own is hard to find in that room’s transcripts.",
-    "c11_evidence_turn_submit": "Handing it to both at once, neither side can bury it first. The empty time between the two stamps becomes the first question tomorrow.",
+    "c11_evidence_turn_submit": "Handing it to both at once, neither side can bury it first. The empty time between the two stamps becomes the first question today.",
     "c11_evidence_turn_hold": "Revealed on the stand, the paper is shot by 12 cameras. Until then, Han Seoyun remains the one who thinks she erased it.",
     "c11_evidence_turn_share": "Shown first, Han Seoyun looks at the two times for a long time. She learns for the first time that what she believed for 3 years she erased went only as far as the return.",
     "c11_script_evidence_turn": "Calling up the change log shows that the hand that returned it and the hand that erased it were not the same.",
