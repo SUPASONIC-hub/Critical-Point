@@ -251,7 +251,11 @@ the 열흘 between 3월 30일 and the first day, the sixth line, the pencil,
 넥스트마일's 2025, 문래동, 「수습이던 당신」 and the 181. A rule that only
 forbids a shape has a companion that reads the right one (the 반려 버튼, the
 pencil, 남동공단 가온정밀, the 수습 딱지 taken off), so a pattern that stops
-matching is still told. And it reads three things a scene says in two places
+matching is still told. Since 2026-11-04 the two trainee facts also read the
+English and Japanese copy (`src/locales/en`, `ja`) in the glossary's words:
+the analyst is a trainee / 見習い, other people's 수습 is probation / 試用, and
+the traineeship ended / 見習いの肩書きが取れ is the shape the companion reads.
+The other facts stay with the Korean files. And it reads three things a scene says in two places
 (`SCENE_RULES`): a clock's D-n against the days its words count to the same
 event, a card that climbs to the floor its scene is already on, and the date
 of the first day at KD캐피탈 (4월 9일).
