@@ -178,6 +178,55 @@
   font-style: normal;
 }
 
+/* C9: the KD은행 계좌 at the draft (RelicDraft.jsx DraftBuy). Two buys side
+   by side, each half the row and 44px tall, the price on a line of its own
+   when the words do not fit beside it (English "One more · 12,000" on a 360px
+   phone); a buy that cannot pay stays in its place, dimmed, its reason under
+   it. The note under both says the press pays at once. */
+.gx-draft-spend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 8px;
+  margin-top: 10px;
+}
+
+.gx-draft-buy-slot {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.gauntlet-stage .gx-draft-buy {
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-gx-relic-a30);
+  border-radius: var(--ui-radius-sm);
+  color: var(--c-gx-relic);
+  background: var(--ui-surface-2);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.gauntlet-stage .gx-draft-buy[aria-disabled="true"] {
+  color: var(--ui-text-3);
+  border-color: var(--ui-line);
+  cursor: not-allowed;
+}
+
+.gx-draft-why,
+.gx-draft-note {
+  color: var(--ui-text-3);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+}
+
+.gx-draft-note {
+  grid-column: 1 / -1;
+}
+
 .gx-draft-foot {
   display: flex;
   flex-wrap: wrap;

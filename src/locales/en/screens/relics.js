@@ -21,6 +21,20 @@ export default {
     allOpen: " · All unlocked",
     back: "See other tools",
     skip: "Continue without picking",
+    reroll: "Reroll · {cost}",
+    extra: "One more · {cost}",
+    spendNote: "It comes straight out of your KD Bank account and can't be undone.",
+    secondTitle: "Pick one more tool",
+    secondLede: "You bought one more: pick it from the two left.",
+    off: {
+      practice: "Not on a Case played again",
+      story: "Not in Story mode",
+      record: "Not on this save's draft",
+      used: "Used this Case",
+      picked: "Already picked",
+      few: "Only one tool left",
+      short: "Not enough in the account",
+    },
   },
   relics: {
     metronome: {

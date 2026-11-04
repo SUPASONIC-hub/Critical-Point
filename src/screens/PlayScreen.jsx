@@ -22,7 +22,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount },
   } = view;
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus } = renderers;
-  const { saveCurrentGame, resolveGauntlet, markWindowTouched, reloadFromStorage, pickRelic, onSuspendable = null, reset, copyReplayLink, copyDiagnosticTrace } = actions;
+  const { saveCurrentGame, resolveGauntlet, markWindowTouched, reloadFromStorage, pickRelic, spendAtDraft = null, onSuspendable = null, reset, copyReplayLink, copyDiagnosticTrace } = actions;
 
   return (
     <main className="shell game-shell gauntlet-shell">
@@ -66,7 +66,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
         isAdvancing={isAdvancing}
         revealOpen={decisionRevealOpen}
         onResolve={resolveGauntlet}
-        onTouch={markWindowTouched} onPickRelic={pickRelic} onSuspendable={onSuspendable}
+        onTouch={markWindowTouched} onPickRelic={pickRelic} onSpendAtDraft={spendAtDraft} onSuspendable={onSuspendable}
         staleSave={staleSave}
         onReload={reloadFromStorage}
         scene={{
