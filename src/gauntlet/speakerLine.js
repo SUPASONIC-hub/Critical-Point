@@ -1,3 +1,5 @@
+import { pairedQuotes, sentenceTexts } from "../components/proseSentences.js";
+
 /**
  * What the speaker's balloon on the briefing page says (A-2 = D-2, 2026-10-23).
  *
@@ -21,11 +23,12 @@
  * speaker's speech. They wear a name chip. Speech given to anyone else keeps
  * no chip. scripts/report-speaker-lines.mjs lists the scenes to read.
  *
- * The file is a chunk of its own (SPEAKER_LINE in vite.config.js) and imports
- * nothing, so neither proseMarks.js nor speakerPortraits.js is pulled out of
- * the chunks they live in: the two cuts it shares with them -- the speech
- * marks' quotes and the caption boxes' sentences -- are written here again,
- * and tests/unit/speaker-line.test.mjs holds them equal.
+ * The file is a chunk of its own (SPEAKER_LINE in vite.config.js). It imports
+ * only proseSentences.js, which imports nothing, so neither proseMarks.js nor
+ * speakerPortraits.js is pulled out of the chunks they live in. The caption
+ * boxes' sentences are that one shared cut (caption-split, 2026-11-03); the
+ * speech marks' quotes are written here again, and
+ * tests/unit/speaker-line.test.mjs holds them equal.
  */
 export function getSpeakerLine(node, names = []) {
   const text = String(node?.text ?? "");
@@ -53,25 +56,20 @@ export function getSpeakerLine(node, names = []) {
 
 /**
  * Where the speech in a prose string is: `{ start, end }`, quotes included,
- * `end` past the closing one. proseMarks.js's rule: an apostrophe between two
- * Latin letters is not a quote, and an unmatched last quote opens nothing.
+ * `end` past the closing one. The quotes are proseSentences.js's (pairedQuotes):
+ * an apostrophe in a word or a plural possessive is not a quote, and an
+ * unmatched last quote opens nothing.
  */
 export function speechSpans(text = "") {
-  const quotes = [];
-  for (let index = 0; index < text.length; index += 1) {
-    if (text[index] === "'" && !(/[A-Za-z]/.test(text[index - 1] ?? "") && /[A-Za-z]/.test(text[index + 1] ?? ""))) quotes.push(index);
-  }
+  const quotes = pairedQuotes(text);
   const spans = [];
   for (let pair = 0; pair + 1 < quotes.length; pair += 2) spans.push({ start: quotes[pair], end: quotes[pair + 1] + 1 });
   return spans;
 }
 
-/** The briefing's caption boxes: one sentence to a box (Prose.jsx, ProseCaptions). */
+/** The scene's sentences, as the caption boxes count them (proseSentences.js, Prose.jsx ProseCaptions). */
 export function captionSentences(text = "") {
-  return text
-    .split(/(?<=[.!?])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
+  return sentenceTexts(text);
 }
 
 /** For each speech, the name the narration last gave before it, or null. */

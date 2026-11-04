@@ -109,6 +109,21 @@ services:
       - path: /index.html
         name: Cache-Control
         value: no-cache
+      # The start page in English and Japanese (since 11-03, the build writes
+      # en/index.html and ja/index.html): the same page, so the same rule, at
+      # the folder and at its file.
+      - path: /en/
+        name: Cache-Control
+        value: no-cache
+      - path: /en/index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /ja/
+        name: Cache-Control
+        value: no-cache
+      - path: /ja/index.html
+        name: Cache-Control
+        value: no-cache
       # The service worker (src/serviceWorker/worker.js) is asked for by one
       # fixed name, and it is what names the release a device keeps: held by a
       # cache in between, a device goes on installing the release before this
