@@ -292,7 +292,8 @@ const budgets = [
   // 189,392 / 68,379 -> 189,456 / 68,430 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the tab token's claim takes a "held" that comes
   // after its wait until a table has read the token (appConfig.takeTabToken). Measured 189,452 / 68,426 in the e2e build, the plus 4.
   // 189,456 / 68,430 -> 189,456 / 68,420 on 2026-11-04, flaky-fix-1103 over main 557d17bb. Measured 189,452 / 68,416 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 189_456, maxGzip: 68_420 },
+  // 189,456 / 68,420 -> 189,456 / 68,428 on 2026-11-04, flaky-fix-1103 over main 22f43342. Measured 189,452 / 68,424 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 189_456, maxGzip: 68_428 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1094,7 +1095,8 @@ const budgets = [
   // 149,679 / 53,430 -> 149,778 / 53,469 on 2026-11-02, money-feedback over main acf3d999: the purse's three lines in English. Measured 149,774 / 53,465, the plus 4.
   // 149,778 / 53,469 -> 149,819 / 53,481 on 2026-11-03, week-board-after over main 36104abd: the last week's board tab in English. Measured 149,815 / 53,477, the plus 4.
   // 149,819 / 53,481 -> 149,852 / 53,501 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 149,848 / 53,497, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_852, maxGzip: 53_501 },
+  // 149,852 / 53,501 -> 149,807 / 53,485 on 2026-11-04, glossary-fix-1103 over main 557d17bb (#435 in): the English terms as the glossary has them (box to field, posting to transfer, queue-ticket to number-ticket, off probation to traineeship). Measured 149,803 / 53,481 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_807, maxGzip: 53_485 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
   // stays as it was. 사건 11~20 (210 lines and 22 roles) measured 28,210 / 10,801, the gzip plus 4.
@@ -1229,7 +1231,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
 // 426,845 / 483,820 / 490,505 -> 426,892 / 483,868 / 490,553 on 2026-11-03, flaky-fix-1103 over main 4be2c339: the entry chunk's late tab-token answer. Measured 426,888 / 483,864 / 490,549, the plus 4.
 // 426,892 / 483,868 / 490,553 -> 426,880 / 483,872 / 490,544 on 2026-11-04, flaky-fix-1103 over main 557d17bb (#424, #435): the two lines above together, re-measured. Measured 426,876 / 483,868 / 490,540 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_880, en: 483_872, ja: 490_544 };
+// 426,880 / 483,872 / 490,544 -> 426,889 / 483,887 / 490,555 on 2026-11-04, flaky-fix-1103 over main 22f43342 (#431, #444). Measured 426,885 / 483,883 / 490,551 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_889, en: 483_887, ja: 490_555 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

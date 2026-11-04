@@ -44,7 +44,7 @@ export default {
       "line": "If the record points to me, am I already finished?"
     },
     "윤상혁": {
-      "appearance": "A plain navy suit with no ornament, eyes that smile only during a handshake, a printout of an e-document with the approval box empty.",
+      "appearance": "A plain navy suit with no ornament, eyes that smile only during a handshake, a printout of an e-document with the approval field empty.",
       "thought": "Numbers can be made. People are the hard part, but in the end people are a matter of placement too.",
       "gesture": "Yoon Sanghyuk closes his tablet cover before the other person finishes. How fast he closes it is his answer.",
       "voice": "He doesn’t scold. He paints a picture of your future instead, and leaves one seat empty in it.",
@@ -366,7 +366,7 @@ export default {
       "line": "You bank people talk about extensions and losses. Where do we sleep in December?"
     },
     "남궁솔": {
-      "appearance": "A navy vest with the credit union logo, three rubber bands for bundling queue tickets around her wrist, her father’s dented barley-tea kettle.",
+      "appearance": "A navy vest with the credit union logo, three rubber bands for bundling number tickets around her wrist, her father’s dented barley-tea kettle.",
       "thought": "This is the lobby my father guarded in 1998, sleeping on a blanket on the floor. I can’t hand it over for one screenshot.",
       "gesture": "Before answering, Namgoong Sol says the other person’s name first. Once she says it, her voice drops a step.",
       "voice": "In quick polite speech with a light touch of the Gunsan accent, she says names before numbers.",
