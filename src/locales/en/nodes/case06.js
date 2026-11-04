@@ -206,7 +206,7 @@ export default {
     },
     "c6_family": {
       "title": "His Sister Calls",
-      "text": "The analyst room’s main line rings. Han Seoyun answers, covers the receiver with her hand, and calls you over. It is Oh Jinwoo’s older sister. Her voice is bright. She heard her brother was promoted; when are they celebrating? It would be nice if people from work came too. The family knows nothing. Not the three days of absence, not the committee about to meet. Han Seoyun flips through the calendar. The promotion came right after the Novaworks bid, and his decision window was cut for the second time that same week. His sister says she will call back once she picks a date, and hangs up. The call lasted 30 seconds. Han Seoyun puts the receiver down but keeps her hand on it for a long time.",
+      "text": "The analyst room’s main line rings. Han Seoyun answers, covers the receiver with her hand, and calls you over. It is Oh Jinwoo’s older sister. Her voice is bright. She heard her brother was promoted; when are they celebrating? It would be nice if people from work came too. The family knows nothing. Not the three days of absence, not the committee about to meet. Han Seoyun flips through the calendar. The promotion came right after the Novaworks bid, and his decision window was cut for the first time that same week. His sister says she will call back once she picks a date, and hangs up. The call lasted 30 seconds. Han Seoyun puts the receiver down but keeps her hand on it for a long time.",
       "memo": [
         "The family knows nothing",
         "The promotion and the change in his conditions came at the same time",

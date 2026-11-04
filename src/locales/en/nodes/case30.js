@@ -680,7 +680,7 @@ export default {
       "c30_after_record": {
         "tag": "Filed the Report",
         "title": "A report with the 63 numbers was received the night before the inspection",
-        "text": "The contract and everything gathered so far became one document and went to the Financial Supervisory Service. The inspection begins in seven hours."
+        "text": "The contract and everything gathered so far became one document and went to the Financial Supervisory Service. The inspection begins in nine hours."
       },
       "c30_after_rush": {
         "tag": "Went Back First",

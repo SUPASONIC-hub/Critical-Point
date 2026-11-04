@@ -160,7 +160,7 @@ export default {
     },
     "c25_aftershock": {
       "title": "Week 1 on the Job",
-      "text": "Friday, 11 at night: the cherry blossoms along Yunjung-ro fall like snow. A week after scattering, the six walk in a single line again. Ban Jaewook follows along on a video call from Gunsan. Han Seoyun adds small print next to the name of the group chat the six made this week. 'Week 1 on the job.' When Oh Jinwoo posts 'Bridge first-week lunch showdown: 3 wins in 4,' Kwon Dohyun, walking behind, answers over his shoulder at once. 'That 1 loss is me. I paid for the meal, so in real terms I won.' While everyone laughs, an email arrives in your inbox from Chae Ian, head of your new department. The subject: 'Pyeongtaek site -- 1 person on a tower crane.' The body is two lines. 'This is the CEO’s first agenda item Monday morning. I thought you should see it before then.'",
+      "text": "Friday, 11 at night: the cherry blossoms along Yunjung-ro fall like snow. A week after scattering, the six walk in a single line again. Ban Jaewook takes his place in the line on a video call from Gunsan. Han Seoyun adds small print next to the name of the group chat the six made this week. 'Week 1 on the job.' When Oh Jinwoo posts 'Bridge first-week lunch showdown: 3 wins in 4,' Kwon Dohyun, walking behind, answers over his shoulder at once. 'That 1 loss is me. I paid for the meal, so in real terms I won.' While everyone laughs, an email arrives in your inbox from Chae Ian, head of your new department. The subject: 'Pyeongtaek site -- 1 person on a tower crane.' The body is two lines. 'This is the CEO’s first agenda item Monday morning. I thought you should see it before then.'",
       "memo": [
         "Yunjung-ro cherry blossoms -- past their peak, falling",
         "Group chat: 'Week 1 on the job'",
@@ -319,7 +319,7 @@ export default {
     },
     "c25_branch_boxes": {
       "title": "Moving Boxes on the 33rd Floor",
-      "text": "On your way out of the 7th floor, the elevator stops at 33. When the doors open, four movers are packing up Yoon Sanghyuk’s office. Every box gets an 'Office of the CEO, KD Capital' label, and at the end of the hall stand seven gray sacks from a shredding company. Baek Arin sits perched on her own box, watching. 'I handed in my resignation on Friday. They say it’ll be accepted in 2 weeks.' She nods her chin toward one of the gray sacks. 'Those sacks go out at seven this evening. In all my time here, no one has ever made a list of Group Strategy Office documents before they went out to be shredded.'",
+      "text": "On your way out of the 7th floor, the elevator stops at 33. When the doors open, four movers are packing up Yoon Sanghyuk’s office. Every box gets an 'Office of the CEO, KD Capital' label, and at the end of the hall stand seven gray sacks from a shredding company. Baek Arin sits perched on her own box, watching. 'I handed in my resignation the Friday before last. They say it’ll be accepted in 2 weeks.' She nods her chin toward one of the gray sacks. 'Those sacks go out at seven this evening. In all my time here, no one has ever made a list of Group Strategy Office documents before they went out to be shredded.'",
       "memo": [
         "Moving boxes from Yoon Sanghyuk’s office -- label 'Office of the CEO, KD Capital'",
         "7 shredding sacks, out at 19:00 today",

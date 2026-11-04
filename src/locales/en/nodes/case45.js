@@ -237,11 +237,11 @@ export default {
     },
     "c45_indent": {
       "title": "Pressed Marks",
-      "text": "Ban Jaewook takes out a flashlight and lays it almost flat against the paper. These hands have spent 20 years picking out altered documents. 'There’s one more thing besides the erased marks.' Letters are pressed into the top margin of the back. No ink, no pencil dust, only the grooves left by someone pressing hard as they wrote on a sheet laid on top. Ban Jaewook reads them one letter at a time. 'Author’s name -- note it separately. Yoon.' He switches off the flashlight and opens his notebook to the 2023-0412 page. On the fourth line: July 24, and your name. 'For 3 years I didn’t know why your file came all the way up to my desk that day. Someone said to note it separately.'",
+      "text": "Ban Jaewook takes out a flashlight and lays it almost flat against the paper. These hands have spent 20 years picking out altered documents. 'There’s one more thing besides the erased marks.' Letters are pressed into the top margin of the back. No ink, no pencil dust, only the grooves left by someone pressing hard as they wrote on a sheet laid on top. Ban Jaewook reads them one letter at a time. 'Author’s name -- note it separately. Yoon.' He switches off the flashlight and opens his notebook to the 2023-0412 page. On the sixth line: July 24, and your name. 'For 3 years I didn’t know why your file came all the way up to my desk that day. Someone said to note it separately.'",
       "memo": [
         "Pressed marks: 'Author’s name -- note it separately. Yoon.'",
         "Marks that exist only on the original -- invisible on copies and photos",
-        "Ban Jaewook’s notebook, 2023-0412 page, fourth line: July 24, your name"
+        "Ban Jaewook’s notebook, 2023-0412 page, sixth line: July 24, your name"
       ],
       "choices": {
         "c45_indent_choice_3": {
@@ -476,7 +476,7 @@ export default {
     },
     "c45_start_record": {
       "title": "Wake for the Man Who Heard the Explainer",
-      "text": "The ruling explainer was finished at two in the morning, and in the morning you went to his hospital room and read him the first sentence aloud. 'A blank is not an acquittal.' With his eyes closed, Lim Kyungsoo held out his hand for a red pen. Then he fixed one spacing error in the second line. That was his last correction. Five days later, before dawn, he died. In the portrait’s place in Memorial Room 3 stands the drawing by Lim Soyul. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She sets a yellowed envelope down beside the explainer. 'We open it at dawn on the third day. That’s what Grandpa said when he put down the red pen. Keep to the order.'",
+      "text": "The ruling explainer was finished at two in the morning, and in the morning you went to his hospital room and read him the first sentence aloud. 'A blank is not an acquittal.' With his eyes closed, Lim Kyungsoo held out his hand for a red pen. Then he fixed one spacing error in the second line. That was his last correction. Four days later, before dawn, he died. In the portrait’s place in Memorial Room 3 stands the drawing by Lim Soyul. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She sets a yellowed envelope down beside the explainer. 'We open it at dawn on the third day. That’s what Grandpa said when he put down the red pen. Keep to the order.'",
       "memo": [
         "First sentence of the explainer: 'A blank is not an acquittal'",
         "Lim Kyungsoo’s last correction: one spacing fix",
@@ -506,7 +506,7 @@ export default {
     },
     "c45_start_rush": {
       "title": "Wake of Two Missed Calls",
-      "text": "On the night of the sentencing, you worked out the grounds for appeal with Na Eunho until the lights went off at the prosecutors’ office. Meanwhile two missed calls from Lim Soyul piled up. When you went to the hospital the next morning, Lim Kyungsoo was asleep, and he did not open his eyes again while you were there. Five days later, at 4:50 a.m., he died. In Memorial Room 3, Lim Soyul, standing in for the chief mourner, sees you and says nothing for a moment. Then she shows you her phone’s call log. 'Those two calls. I made them because Grandpa said your name twice.' She takes out a yellowed envelope. 'Let’s open this together at dawn on the third day. This time, come.'",
+      "text": "On the night of the sentencing, you worked out the grounds for appeal with Na Eunho until the lights went off at the prosecutors’ office. Meanwhile two missed calls from Lim Soyul piled up. When you went to the hospital the next morning, Lim Kyungsoo was asleep, and he did not open his eyes again while you were there. Four days later, at 4:50 a.m., he died. In Memorial Room 3, Lim Soyul, standing in for the chief mourner, sees you and says nothing for a moment. Then she shows you her phone’s call log. 'Those two calls. I made them because Grandpa said your name twice.' She takes out a yellowed envelope. 'Let’s open this together at dawn on the third day. This time, come.'",
       "memo": [
         "Night of the sentencing: at the prosecutors’ office until 23:00",
         "2 missed calls -- the number of times Lim Kyungsoo said your name",
