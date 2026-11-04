@@ -125,7 +125,7 @@ export default {
         }
       },
       "place": "FlowOn fulfillment center · Roof",
-      "clock": "First snow · 04:30 · Approval committee D-2",
+      "clock": "Snow · 04:30 · Approval committee D-2",
       "question": "Kang Taemin has been offered to stay alone, and the person to give the second cup to is disappearing. What do you ask of him?",
       "lead": "The break room is too quiet, so Kang Taemin takes his thermos and climbs the roof stairs first."
     },
@@ -178,7 +178,7 @@ export default {
         }
       },
       "place": "FlowOn fulfillment center · Night-shift break room",
-      "clock": "Approval committee day · 23:00 · First snow",
+      "clock": "Approval committee day · 23:00 · Snow",
       "question": "While 81 cups of noodles steep, Ban Jaewook’s notebook is being called in. How do you close this night?"
     },
     "c16_ledger": {
@@ -224,7 +224,7 @@ export default {
         }
       },
       "place": "FlowOn fulfillment center · Floor",
-      "clock": "Approval committee D-3 · 01:20 · First snow",
+      "clock": "Approval committee D-3 · 01:20 · Snow",
       "question": "For a month the night shift has revived the robots 47 times. What do you propose with that log?"
     },
     "c16_list": {

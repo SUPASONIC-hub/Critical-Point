@@ -476,7 +476,7 @@ export default {
     },
     "c45_start_record": {
       "title": "Wake for the Man Who Heard the Explainer",
-      "text": "The ruling explainer was finished at two in the morning, and in the morning you went to his hospital room and read him the first sentence aloud. 'A blank is not an acquittal.' With his eyes closed, Lim Kyungsoo held out his hand for a red pen. Then he fixed one spacing error in the second line. That was his last correction. Five days later, before dawn, he died. In the portrait’s place in Memorial Room 3 stands the drawing by Lim Soyul. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She sets a yellowed envelope down beside the explainer. 'We open it at dawn on the third day. That’s what Grandpa said when he put down the red pen. Keep to the order.'",
+      "text": "The ruling explainer was finished at two in the morning, and in the morning you went to his hospital room and read him the first sentence aloud. 'A blank is not an acquittal.' With his eyes closed, Lim Kyungsoo held out his hand for a red pen. Then he fixed one spacing error in the second line. That was his last correction. Four days later, before dawn, he died. In the portrait’s place in Memorial Room 3 stands the drawing by Lim Soyul. Her father, the chief mourner, is still on the plane, so Lim Soyul keeps his place. She sets a yellowed envelope down beside the explainer. 'We open it at dawn on the third day. That’s what Grandpa said when he put down the red pen. Keep to the order.'",
       "memo": [
         "First sentence of the explainer: 'A blank is not an acquittal'",
         "Lim Kyungsoo’s last correction: one spacing fix",
@@ -506,7 +506,7 @@ export default {
     },
     "c45_start_rush": {
       "title": "Wake of Two Missed Calls",
-      "text": "On the night of the sentencing, you worked out the grounds for appeal with Na Eunho until the lights went off at the prosecutors’ office. Meanwhile two missed calls from Lim Soyul piled up. When you went to the hospital the next morning, Lim Kyungsoo was asleep, and he did not open his eyes again while you were there. Five days later, at 4:50 a.m., he died. In Memorial Room 3, Lim Soyul, standing in for the chief mourner, sees you and says nothing for a moment. Then she shows you her phone’s call log. 'Those two calls. I made them because Grandpa said your name twice.' She takes out a yellowed envelope. 'Let’s open this together at dawn on the third day. This time, come.'",
+      "text": "On the night of the sentencing, you worked out the grounds for appeal with Na Eunho until the lights went off at the prosecutors’ office. Meanwhile two missed calls from Lim Soyul piled up. When you went to the hospital the next morning, Lim Kyungsoo was asleep, and he did not open his eyes again while you were there. Four days later, at 4:50 a.m., he died. In Memorial Room 3, Lim Soyul, standing in for the chief mourner, sees you and says nothing for a moment. Then she shows you her phone’s call log. 'Those two calls. I made them because Grandpa said your name twice.' She takes out a yellowed envelope. 'Let’s open this together at dawn on the third day. This time, come.'",
       "memo": [
         "Night of the sentencing: at the prosecutors’ office until 23:00",
         "2 missed calls -- the number of times Lim Kyungsoo said your name",

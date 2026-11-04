@@ -65,7 +65,7 @@ export default {
     },
     "c3_score": {
       "title": "The Scoreboard Trap",
-      "text": "On one waiting-room wall glows the Trigger Lab scoreboard. Oh Jinwoo 84, you 71. You submitted first, but he leads on savings, length and clarity of presentation. Yet scan the categories top to bottom and there is no 'long-term failure cost'. The money a defect costs after delivery counts as 0 on this sheet. ECHO opens the edit history of the scoring sheet. The last edit came from the Group Strategy Office, at two in the morning the day after the FlowOn file closed. 'This sheet was not made for this bid. It was made to compare two people.' From next door, the sound of Oh Jinwoo’s printer comes through the wall.",
+      "text": "On one waiting-room wall glows the Trigger Lab scoreboard. Oh Jinwoo 84, you 71. Whoever submitted first, he leads on savings, length and clarity of presentation. Yet scan the categories top to bottom and there is no 'long-term failure cost'. The money a defect costs after delivery counts as 0 on this sheet. ECHO opens the edit history of the scoring sheet. The last edit came from the Group Strategy Office, at two in the morning the day after the FlowOn file closed. 'This sheet was not made for this bid. It was made to compare two people.' From next door, the sound of Oh Jinwoo’s printer comes through the wall.",
       "memo": [
         "Scoreboard: Oh Jinwoo 84 / you 71",
         "No long-term failure cost category",
