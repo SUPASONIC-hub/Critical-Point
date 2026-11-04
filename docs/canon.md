@@ -134,7 +134,11 @@ archive visit is a view log or a card-gate log.
 | 본점 지하 1층 | 문서 스캔실: committee papers and their 날인 원본 are scanned into the 문서관리시스템; the paper is kept in sealed 보존 상자 until its 보존연한 |
 | 본사 33층 | 그룹전략실; by 사건 49 "옛 그룹전략실" |
 | 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소: the old 전산센터's 백업 아카이브 (백업 테이프, 보존 상자 412개) and a 반출 금지 열람실 |
-| KD캐피탈 12층 / 20층 | 위험관리부 / 대표이사실 |
+| KD캐피탈 1층 | 로비 |
+| KD캐피탈 11층 | 리스심사팀 |
+| KD캐피탈 12층 | 위험관리부 (and its 검사팀 회의실) |
+| KD캐피탈 17층 / 19층 | 자료실 / 심사위원회 회의실 |
+| KD캐피탈 20층 | 대표이사실 (대표실) |
 
 The finale's night runs in one order on every path: 합정동 B2 (the inside
 route starts in the 3층 운영실 and goes down), then a taxi to 여의도 and 본사
@@ -213,7 +217,20 @@ Five more bridges and four fixes (10-26, the same way):
 - 오진우's post at 브릿지은행 is 인수팀장 everywhere, as the offer of 사건 18
   says; it sits under 도하람's 전략본부, on 권도현's floor (사건 25, 30).
 - 한서윤's part in the return is the 「반려 버튼」 she pressed, never a 서명
-  (사건 10, 11, 38, 49).
+  (사건 10, 11, 38, 49). Nor a 검토란, 승인란 or 반려란 with her name in it, and
+  she and 백아린 are not 「the one who signed and the one who reported」. A
+  signature of hers in 2025-26, as 실장, is another paper and stands. However
+  her 2022-23 rank is written (「한서윤 (당시 과장)」), it is 과장.
+- 이민서's 옥탑방 is in 해방촌 (사건 15, 16); 망원동 is 도윤하's.
+- 문가을's 가을떡방 is in the 망원시장 alley; her husband 문성호's 가온정밀 is
+  in 인천 남동공단 (프롤로그 02 onward, 사건 12). Neither is in 문래동.
+- 반재욱's 2023-0412 page puts 7월 24일 and the analyst's name on its sixth
+  line (사건 45).
+- The 'agree' erased on the back page of the dissent is 임경수's pencil, never
+  his 만년필 (사건 45, 49).
+- 넥스트마일's offer of 42% of book value is 2025's, in 사건 01's 72 hours.
+- The analyst's traineeship ends on 2022-10-21 (프롤로그 01); from 프롤로그 02
+  on the analyst is not called a trainee.
 - 오진우 calls 도윤하 「도윤하 씨」, not 선배: 오진우 was a 대리 and at the lab
   before 도윤하 left his window.
 
@@ -226,6 +243,18 @@ she speaks has the word only in that line). It does not hold 임경수's
 retirement, 반재욱's twenty years, 백아린's twelve, the 징계해고 of 6월 22일,
 에코's return on 9월 19일, who went where in 사건 25, or how 오진우 speaks:
 each is stated once, in a sentence of its own, and a reader has to keep them.
+
+Since 2026-11-03 it also holds the notes above that copy kept getting wrong
+(the audit of that day): 한서윤 and a 서명, 검토란, 승인란 or 반려란 near the
+2023 return, her rank written 「(당시 …)」, 이민서's 해방촌, KD캐피탈's floors,
+the 열흘 between 3월 30일 and the first day, the sixth line, the pencil,
+넥스트마일's 2025, 문래동, 「수습이던 당신」 and the 181. A rule that only
+forbids a shape has a companion that reads the right one (the 반려 버튼, the
+pencil, 남동공단 가온정밀, the 수습 딱지 taken off), so a pattern that stops
+matching is still told. And it reads three things a scene says in two places
+(`SCENE_RULES`): a clock's D-n against the days its words count to the same
+event, a card that climbs to the floor its scene is already on, and the date
+of the first day at KD캐피탈 (4월 9일).
 
 반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
 season; he is never "3년차" (that is 도윤하 at his window). His notebook holds
@@ -316,7 +345,7 @@ on the afternoon of 4월 24일 (A044, decided 2026-11-04).
 | People harmed | 1,740명 |
 | With papers | 1,528명 |
 | Without papers | 212명 |
-| Accepted by the second standard | 181명 of the 212 |
+| Accepted by the second standard | 181명 of the 212 (never 「배상 기준에 들어간 212명」) |
 | Still 확인 불가 | 31명 |
 
 ## The lab's record
