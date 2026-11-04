@@ -12,6 +12,7 @@
  *
  *   node scripts/report-test-week.mjs --sql            the one SELECT the workflow sends
  *   node scripts/report-test-week.mjs <rows.json>      the summary, from what it got back
+ *   node scripts/report-test-week.mjs <rows.json> --json   the same counts as JSON (the run's artifact)
  *
  * TEST_WEEK and TEST_WEEK_RULE pick another week of the calendar (default the
  * one above); both are checked against the shape the server allows before they
@@ -154,10 +155,11 @@ export function readTestWeek(rows) {
   }
   const t = {
     seasons: runs.size, newGamePlus: newGamePlus.size, turnedDown, devicesOn: devicesOn.size, devicesOff: devicesOff.size,
-    devices: new Set([...devicesOn, ...devicesOff]).size, finished: 0, ranked: 0, caseRows: 0, endings: 0, collapse: 0,
+    devices: new Set([...devicesOn, ...devicesOff]).size, finished: 0, ranked: 0, unranked: 0, caseRows: 0, endings: 0, collapse: 0,
     english: 0, japanese: 0, korean: 0, presumedKorean: 0,
     judged: 0, caught: 0, caughtSeasons: 0, nearLimit: 0, nearLimitClear: 0, vaultMoved: 0, vaultLost: 0,
     boards: 0, busts: 0, cascadeBoards: 0, cascadeBusts: 0, made: 0, cascadeCashHeat: 0, cascadeCashes: 0, plainCashHeat: 0, plainCashes: 0,
+    finishedMade: 0, finishedBack: 0,
   };
   for (const [runId, cases] of runs) {
     const locale = seasonLocale(cases);
@@ -167,10 +169,13 @@ export function readTestWeek(rows) {
     else t.presumedKorean += 1;
     let vaultBefore = 0;
     let caughtHere = 0;
+    let finishedHere = false;
+    let madeHere = 0;
+    let backHere = 0;
     for (const row of cases) {
       if (row.case_id === "season-final") {
-        t.finished += 1;
-        if (row.ranked_week === WEEK) t.ranked += 1;
+        // The season-final row is the ranking's row: the server stamps the week on it (ranking_run_summary).
+        finishedHere = true;
         continue;
       }
       t.caseRows += 1;
@@ -197,6 +202,7 @@ export function readTestWeek(rows) {
         if (bust) t.busts += 1;
         if (cascade) {
           t.cascadeBoards += 1;
+          backHere += 1;
           if (bust) t.cascadeBusts += 1;
         }
         if (!bust) {
@@ -207,7 +213,7 @@ export function readTestWeek(rows) {
         if (running >= AUDIT_LIMIT - 1 && running < AUDIT_LIMIT) reached = true;
         dealtBy = modes(entry);
       }
-      t.made += walkLinks(log, runId).made;
+      madeHere += walkLinks(log, runId).made;
       if (story || replay || !log.some((entry) => entry?.threshold)) continue;
       const count = countAudit(log);
       t.judged += 1;
@@ -227,6 +233,15 @@ export function readTestWeek(rows) {
       }
     }
     if (caughtHere > 0) t.caughtSeasons += 1;
+    t.made += madeHere;
+    if (finishedHere) {
+      t.finished += 1;
+      if (cases.some((row) => row.case_id === "season-final" && row.ranked_week === WEEK)) t.ranked += 1;
+      else t.unranked += 1;
+      // The bot plays every season to the end, so its per-season links compare with the finished seasons'.
+      t.finishedMade += madeHere;
+      t.finishedBack += backHere;
+    }
   }
   return t;
 }
@@ -238,7 +253,10 @@ export function readTestWeek(rows) {
  * carry cap 1, chip margin 10, 600 seasons), copied as printed. #223 measured
  * them on 10-21 and main c8841dc0 gave the same lines on 10-25. TEST_WEEK_SIM
  * names a file holding a fresh run's output (11-14~15, on the test week's
- * sha) to read instead.
+ * sha) to read instead: the workflow writes it from its `sim` input or, for
+ * the nightly runs, the repository variable TEST_WEEK_SIM_LINES
+ * (.github/workflows/test-week.yml). Either may hold the three lines pasted
+ * as one; `readSimulation` breaks them apart again.
  */
 export const SIMULATION_LINES = [
   "Ending checks passed (600 replayed seasons: collapse 21.0%, open-oversight 14.3%, evidence-reform 5.8%, human-record 16.7%, profitable-silence 5.5%, cold-justice 5.0%, field-pact 17.8%, quiet-cover 7.7%, open-question 6.2%)",
@@ -247,7 +265,9 @@ export const SIMULATION_LINES = [
 ].join("\n");
 
 /** The figures of the summary's last column, read off check:endings' output. */
-export function readSimulation(text) {
+export function readSimulation(raw) {
+  // A text box or a variable may have run the lines together: each starts a line again.
+  const text = String(raw).replace(/[ \t]+(?=(?:Ending checks passed \(|CASCADE \(measured, |Audit \(measured, ))/g, "\n");
   const grab = (pattern, what) => {
     const match = text.match(pattern);
     if (!match) throw new Error(`the bot's output has no ${what} line (check:endings with AUDIT_WEEK=1 CASCADE_WEEK=1)`);
@@ -260,14 +280,39 @@ export function readSimulation(text) {
   return { seasons: Number(seasons), collapse, made, back, cascadeBust, bust, caught, caughtShare: share, vaultLost };
 }
 
-const SIM = readSimulation(process.env.TEST_WEEK_SIM ? readFileSync(process.env.TEST_WEEK_SIM, "utf8") : SIMULATION_LINES);
-const SIM_NOTE = `둘 다 켬·면제, ${SIM.seasons}시즌 봇`;
+/** The reference column: TEST_WEEK_SIM's file when it names one (`fresh`), else SIMULATION_LINES. */
+export function loadSimulation(env = process.env) {
+  const file = env.TEST_WEEK_SIM;
+  return { ...readSimulation(file ? readFileSync(file, "utf8") : SIMULATION_LINES), fresh: Boolean(file) };
+}
+
+const SIM = loadSimulation();
 
 /** More than half of the week's seasons on the English or Japanese pages (open to the end from 10-28): the per-season lines and 감4·연3 are for reference only. */
-export const ENGLISH_WARNING = "영어·일본어 화면 시즌이 합쳐 절반을 넘습니다. 판 규칙·점수는 언어와 무관하지만 읽기와 완주가 다를 수 있어, 「시즌당」 줄(시즌당 적발, 시즌당 만듦 / 돌아옴)과 감4·연3(벌 전 알아챔 두 줄)은 참고로만 읽습니다.";
+export const ENGLISH_WARNING = "영어·일본어 화면 시즌이 합쳐 절반을 넘습니다. 판 규칙·점수는 언어와 무관하지만 읽기와 완주가 다를 수 있어, 「시즌당」 줄(시즌당 적발, 시작한·끝난 시즌당 만듦 / 돌아옴)과 감4·연3(벌 전 알아챔 두 줄)은 참고로만 읽습니다.";
 
-export function describeTestWeek(t) {
+/**
+ * The judgement's bug signals (W44-판정기준 ①, read before any sample size),
+ * those the summary can tell. A season's ranking row is its season-final row,
+ * so a season cannot be ranked without finishing; what can go wrong is the
+ * other way round, the server not stamping the week on a finished season's
+ * row (ranking_run_summary), which leaves the week's board empty.
+ */
+export function bugSignals(t) {
+  const share = (part, whole) => (whole > 0 ? part / whole : 0);
+  return [
+    share(t.caught, t.judged) >= 0.7 && "감1 적발 70% 이상",
+    share(t.cascadeBoards, t.boards) >= 0.5 && "연1 CASCADE 판 50% 이상",
+    share(t.cascadeBusts, t.cascadeBoards) >= 0.6 && "연2 CASCADE 판 BUST 60% 이상",
+    t.finished > 0 && t.ranked === 0 && "끝난 시즌은 있는데 이 주 랭킹 0",
+    t.caseRows > 0 && t.judged === 0 && "사건 행은 있는데 판정한 닫힘 0",
+  ].filter(Boolean);
+}
+
+export function describeTestWeek(t, sim = SIM) {
   const meanHeat = (sum, n) => (n > 0 ? (sum / n).toFixed(1) : "—");
+  const simNote = `둘 다 켬·면제, ${sim.seasons}시즌 봇${sim.fresh ? ", 다시 잼" : ""}`;
+  const signals = bugSignals(t);
   return [
     `## 시험 주 ${WEEK} · ${getWeekRule(RULE).label}`,
     "",
@@ -281,30 +326,43 @@ export function describeTestWeek(t) {
     `| 시즌 | 그중 일본어 화면 시즌(영어 행이 없고 하나라도 \`summary.locale\` = ja) | ${t.japanese} (${pct(t.japanese, t.seasons)}) | |`,
     `| 시즌 | 같은 주에 시작해 규칙 없이 친 시즌(규칙을 끔·첫 시즌 기본 꺼짐·옛 화면, 이야기 모드 제외) | ${t.turnedDown} (${pct(t.turnedDown, t.seasons + t.turnedDown)}) | |`,
     `| 시즌 | 서로 다른 기기: 규칙 켬 / 규칙 없음 / 모두 | ${t.devicesOn} / ${t.devicesOff} / ${t.devices} | |`,
-    `| 시즌 | 끝난 시즌 / 이 주 랭킹에 오른 시즌 | ${t.finished} / ${t.ranked} | |`,
+    `| 시즌 | 끝난 시즌 / 이 주 랭킹에 오른 시즌 / 이 주가 안 붙은 끝난 시즌 | ${t.finished} / ${t.ranked} / ${t.unranked} | |`,
+    `| 시즌 | 버그 신호(판정기준 ①, 표본과 상관없이) | ${signals.length > 0 ? `**${signals.join(" · ")}**` : "없음"} | |`,
     `| 감사 | 판정한 사건 닫힘 / 적발 | ${t.judged} / ${t.caught} (${pct(t.caught, t.judged)}) | |`,
-    `| 감사 | 시즌당 적발 / 적발이 있었던 시즌 | ${per(t.caught, t.seasons)} / ${t.caughtSeasons} (${pct(t.caughtSeasons, t.seasons)}) | ${SIM.caught} / ${SIM.caughtShare} (${SIM_NOTE}) |`,
-    `| 감사 | 금고로 갈 몫의 잃은 비율(추정) | ${pct(t.vaultLost, t.vaultMoved)} | ${SIM.vaultLost} |`,
+    `| 감사 | 시즌당 적발 / 적발이 있었던 시즌 | ${per(t.caught, t.seasons)} / ${t.caughtSeasons} (${pct(t.caughtSeasons, t.seasons)}) | ${sim.caught} / ${sim.caughtShare} (${simNote}) |`,
+    `| 감사 | 금고로 갈 몫의 잃은 비율(추정) | ${pct(t.vaultLost, t.vaultMoved)} | ${sim.vaultLost} |`,
     `| 감사 | 벌 전 알아챔: ${AUDIT_LIMIT - 1}/${AUDIT_LIMIT}에 닿은 사건 중 적발 없이 닫은 비율 | ${pct(t.nearLimitClear, t.nearLimit)} (${t.nearLimitClear}/${t.nearLimit}) | |`,
     `| 연쇄 | 판 / CASCADE 판 비율 | ${t.boards} / ${pct(t.cascadeBoards, t.boards)} | |`,
-    `| 연쇄 | CASCADE 판 BUST (모든 판) | ${pct(t.cascadeBusts, t.cascadeBoards)} (${pct(t.busts, t.boards)}) | ${SIM.cascadeBust} (${SIM.bust}) |`,
-    `| 연쇄 | 시즌당 만듦 / 돌아옴 | ${per(t.made, t.seasons)} / ${per(t.cascadeBoards, t.seasons)} | ${SIM.made} / ${SIM.back} |`,
+    `| 연쇄 | CASCADE 판 BUST (모든 판) | ${pct(t.cascadeBusts, t.cascadeBoards)} (${pct(t.busts, t.boards)}) | ${sim.cascadeBust} (${sim.bust}) |`,
+    `| 연쇄 | 끝난 시즌당 만듦 / 돌아옴(끝난 시즌의 판만) | ${per(t.finishedMade, t.finished)} / ${per(t.finishedBack, t.finished)} | ${sim.made} / ${sim.back} |`,
+    `| 연쇄 | 시작한 시즌당 만듦 / 돌아옴(멈춘 시즌 포함) | ${per(t.made, t.seasons)} / ${per(t.cascadeBoards, t.seasons)} | |`,
     `| 연쇄 | 벌 전 알아챔: 확정한 열기 평균, CASCADE 판 / 다른 판 | ${meanHeat(t.cascadeCashHeat, t.cascadeCashes)} / ${meanHeat(t.plainCashHeat, t.plainCashes)} | |`,
-    `| 결말 | 붕괴 결말 | ${pct(t.collapse, t.endings)} (${t.collapse}/${t.endings}) | ${SIM.collapse} |`,
+    `| 결말 | 붕괴 결말 | ${pct(t.collapse, t.endings)} (${t.collapse}/${t.endings}) | ${sim.collapse} |`,
     "",
-    `시뮬레이션 값은 감사·연쇄를 함께 켠 시즌 봇입니다(AUDIT_WEEK=1 CASCADE_WEEK=1 check:endings, 값 B·면제·이월 상한 1·칩 마진 10, ${SIM.seasons}시즌${process.env.TEST_WEEK_SIM ? "" : ", 10-21 #223과 10-25 main c8841dc0에서 같은 값"}). 봇은 읽기 시계를 쓰지 않으니 BUST는 차로 봅니다. 사람이 두 장치를 함께 켠 판을 치는 것은 이 주가 처음입니다.`,
+    `시뮬레이션 값은 감사·연쇄를 함께 켠 시즌 봇입니다(AUDIT_WEEK=1 CASCADE_WEEK=1 check:endings, 값 B·면제·이월 상한 1·칩 마진 10, ${sim.seasons}시즌${sim.fresh ? ", TEST_WEEK_SIM으로 넘긴 다시 잰 값" : ", 10-21 #223과 10-25 main c8841dc0에서 같은 값"}). 봇은 시즌을 끝까지 치므로 만듦 / 돌아옴은 끝난 시즌 줄과 견줍니다. 봇은 읽기 시계를 쓰지 않으니 BUST는 차로 봅니다. 사람이 두 장치를 함께 켠 판을 치는 것은 이 주가 처음입니다.`,
     ...((t.english + t.japanese) * 2 > t.seasons ? ["", `**${ENGLISH_WARNING}**`] : []),
     "",
     `${PRESUMED_LOCALE}: 어느 사건 행에도 화면 언어가 없는 시즌(언어 칸이 운영에 닿기 전 빌드에서 온 행). Funnel과 같이 한국어로 봅니다.`,
   ].join("\n");
 }
 
-const [arg] = import.meta.url === pathToFileURL(process.argv[1] ?? "").href ? process.argv.slice(2) : [];
+/**
+ * The summary's counts as one JSON object for the run's artifact
+ * (.github/workflows/test-week.yml, 2026-11-03): readTestWeek's tally and the
+ * reference lines it is read against. Counts only, the same as the Markdown:
+ * no run id, device or row.
+ */
+export function testWeekJson(rows, sim = SIM) {
+  return { week: WEEK, counts: readTestWeek(rows), reference: sim };
+}
+
+const [arg, format] = import.meta.url === pathToFileURL(process.argv[1] ?? "").href ? process.argv.slice(2) : [];
 if (arg === "--sql") {
   process.stdout.write(`${QUERY}\n`);
 } else if (arg) {
   const parsed = JSON.parse(readFileSync(arg, "utf8"));
   const rows = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.rows) ? parsed.rows : null;
   if (!rows) throw new Error(`${arg} holds no rows`);
-  process.stdout.write(`${describeTestWeek(readTestWeek(rows))}\n`);
+  if (format === "--json") process.stdout.write(`${JSON.stringify(testWeekJson(rows), null, 2)}\n`);
+  else process.stdout.write(`${describeTestWeek(readTestWeek(rows))}\n`);
 }
