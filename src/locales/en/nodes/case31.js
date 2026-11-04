@@ -368,11 +368,11 @@ export default {
     },
     "c31_route_system": {
       "title": "The Account That Arrived First",
-      "text": "You set the confirmation aside and call up the accounts that approved the extensions, one by one. The Risk Management terminal responds. The record screen of NOAH, the group’s review engine (an AI program that judges loan applications automatically), opens. The Pyeongtaek PF (a loan made against future sale proceeds before a building goes up) was extended four times. For all four maturity extensions (pushing back the repayment date), NOAH recommended 'Decline.' All four times, an exception approval (approval outside the criteria, with a responsible person putting their name to it) overturned it. Of the four approving accounts, one is your employee ID. The fourth extension. The date is March 30, three days before you came to this department and 25 days before the committee met. The day your account was created in advance. 'The account arrived before the person. I learned the account as the person.'",
+      "text": "You set the confirmation aside and call up the accounts that approved the extensions, one by one. The Risk Management terminal responds. The record screen of NOAH, the group’s review engine (an AI program that judges loan applications automatically), opens. The Pyeongtaek PF (a loan made against future sale proceeds before a building goes up) was extended four times. For all four maturity extensions (pushing back the repayment date), NOAH recommended 'Decline.' All four times, an exception approval (approval outside the criteria, with a responsible person putting their name to it) overturned it. Of the four approving accounts, one is your employee ID. The fourth extension. The date is March 30, ten days before you came to this department and 25 days before the committee met. The day your account was created in advance. 'The account arrived before the person. I learned the account as the person.'",
       "memo": [
         "NOAH recommended 'Decline' 4 times -- 4 exception approvals",
         "1 approving account: your employee ID",
-        "Approval date: three days before you joined the department"
+        "Approval date: ten days before you joined the department"
       ],
       "choices": {
         "c31_route_system_trace": {
@@ -390,14 +390,14 @@ export default {
       },
       "place": "KD Capital 12th Floor, Risk Management · Review Terminal",
       "clock": "On-site exam day 2 · Before dawn",
-      "question": "Three days before you arrived, an exception approval went through under your employee ID; what do you do with this record?"
+      "question": "Ten days before you arrived, an exception approval went through under your employee ID; what do you do with this record?"
     },
     "c31_final_system_route": {
       "title": "The Employee ID That Came Before the Person",
       "text": "Before dawn on the last day of the examination, the review terminal shows the records of four approvals in which people overturned NOAH’s declines. All four times NOAH recommended declining, and all four times a person’s account overturned it. One of them is your employee ID; on the approval date you were not yet on this floor, and the committee had not yet met. At four in the afternoon, Han Jiwoo will hold out the confirmation. NOAH’s words appear under the records. 'I learned accounts as people. Going by my records alone, the person who approved it that day is you. I have no authority to correct it.'",
       "memo": [
         "NOAH recommended 'Decline' 4 times -- all overturned by people’s accounts",
-        "1 approving account: your employee ID, three days before you started",
+        "1 approving account: your employee ID, ten days before you started",
         "Examination confirmation: today at 16:00"
       ],
       "choices": {
@@ -645,7 +645,7 @@ export default {
     "c31_branch_site_follow_b": "So it stays on paper rather than ending in words, you ask for the unpaid wages to be put into the examination findings.",
     "c31_branch_site_follow_c": "Saying the examination comes before money for now, you ask the foreman in the doorway to wait.",
     "c31_route_system_report": "Saying that if someone else finds it, it becomes an excuse, you report the record with your employee ID to Han Jiwoo first.",
-    "c31_route_system_trace": "Saying you need to know who used it three days before you came, you trace back through access logs who created the account early.",
+    "c31_route_system_trace": "Saying you need to know who used it ten days before you came, you trace back through access logs who created the account early.",
     "c31_route_system_bury": "Before your name gets tangled up in an approval from before you even arrived, you close NOAH’s record screen.",
     "c31_final_system_route_a": "So that an account can’t pass for a person, you propose changing the rules so every exception approval carries the real name of the person who approved it.",
     "c31_final_system_route_b": "Saying handing over the four o’clock confirmation comes first, you bury the account misuse and leave only the extension losses as findings.",

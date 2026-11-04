@@ -274,7 +274,7 @@ export default {
     },
     "c19_freight_reaction": {
       "title": "Empty Shelves in B2",
-      "text": "At eleven at night, Han Seoyun comes to the alley herself. Snow has piled on the shoulders of her coat. 'The Trigger Lab B2 archive has 60 empty shelf sections. The 312 boxes fit there.' She pauses. 'But B2 is a group building. The moment they go in, this paper becomes records the group manages, and every time you take something out, it needs my e-signature. And I’m the one who got a signature wrong 3 years ago.' She taps the truck bed with a gloved hand. 'Still, we can’t leave paper overnight in a truck at minus 15 degrees.'",
+      "text": "At eleven at night, Han Seoyun comes to the alley herself. Snow has piled on the shoulders of her coat. 'The Trigger Lab B2 archive has 60 empty shelf sections. The 312 boxes fit there.' She pauses. 'But B2 is a group building. The moment they go in, this paper becomes records the group manages, and every time you take something out, it needs my e-signature. And I’m the one who pressed the wrong button 3 years ago.' She taps the truck bed with a gloved hand. 'Still, we can’t leave paper overnight in a truck at minus 15 degrees.'",
       "memo": [
         "60 empty shelf sections",
         "A signature needed every time something comes out"

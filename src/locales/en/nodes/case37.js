@@ -388,7 +388,7 @@ export default {
         }
       },
       "place": "KD Data Lab, Pangyo · Data Center",
-      "clock": "July 27 · Tropical Night · 04:00",
+      "clock": "July 29 · Tropical Night · 02:00",
       "question": "The leaked file is about to be used to score job applicants. What will you do with NOAH’s report?"
     },
     "c37_final_system_route": {
