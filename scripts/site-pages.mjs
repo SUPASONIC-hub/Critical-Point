@@ -2,7 +2,19 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
-import { escapeHtml, gamePath, PAGE_KINDS, PAGE_LANGUAGES, pagePath, renderDocumentPage, renderLegalPages } from "./legal-pages.mjs";
+import {
+  COPY,
+  escapeHtml,
+  GAME_NAME,
+  gamePath,
+  OG_LOCALE,
+  PAGE_KINDS,
+  PAGE_LANGUAGES,
+  pagePath,
+  renderDocumentPage,
+  renderLegalPages,
+  SHARE_IMAGE_ALT,
+} from "./legal-pages.mjs";
 
 /**
  * The three pages about the game -- what it is and how it is played, the
@@ -95,7 +107,7 @@ const ABOUT_EN = `
 
 <h2>How the story begins</h2>
 <p>You are an analyst who reviews loans at KD Bank. Three years ago, you filed the only dissent on the approval of a ₩31 billion loan. Your written opinion was returned, and the loan went through anyway. Then a single transfer order with its reason left blank sent you down to Trigger Lab, the basement research lab of KD Financial Group, whose largest shareholder is American capital.</p>
-<p>The game starts a little earlier, with the last assignment of your probation. The first five cases are the prologue, set three years before, and what you take from the prologue decides the first scene of Case 01 three years later. The main story begins on the day the first file on the case desk still carries that same loan number. The five cases of the prologue and the ${MAIN_CASES} of the main story, ${CASES} cases in all, form a single chain.</p>
+<p>The game starts a little earlier, with the last assignment of your traineeship. The first five cases are the prologue, set three years before, and what you take from the prologue decides the first scene of Case 01 three years later. The main story begins on the day the first file on the case desk still carries that same loan number. The five cases of the prologue and the ${MAIN_CASES} of the main story, ${CASES} cases in all, form a single chain.</p>
 <p>The game is fiction. Its people, companies, banks, institutions and events have nothing to do with real ones, and its financial judgments are not investment or financial advice.</p>
 
 <h2>What the game asks</h2>
@@ -191,7 +203,7 @@ const FAQ_KO = `
 <h3>랭킹은 무엇으로 정해지나요?</h3>
 <p>완료한 사건의 버스트 점수(0~100)로 순위를 매깁니다. 동점이면 랭크, 구조 재설계, 압박 대응, 관점 전환 순으로 가립니다. 한 런(처음부터 시작한 한 번의 시즌)은 가장 좋은 기록 하나만 오르고, 시즌을 끝낸 기록이 중간 기록보다 늘 앞섭니다. 공개 랭킹에는 이름 대신 「익명 분석관」과 기록 번호 끝 8자리만 표시됩니다. 공개 랭킹은 플레이테스트 데이터 제공 동의가 켜진 기기의 기록으로 만들고, 동의를 끈 기기의 기록은 이 기기의 로컬 랭킹에만 남습니다. 공개 랭킹은 플레이테스트 순위라서 판의 규칙이 바뀌면 비울 수 있습니다.</p>
 <h3>언어는 어떻게 바꾸나요?</h3>
-<p>시작 화면 머리의 「한국어 · English · 日本語」에서 고르면 됩니다. 고른 언어는 이 기기에 저장되고, 게임이 그 언어로 다시 열립니다. 아직 언어를 고른 적이 없는 기기라면 주소 끝에 ?lang=en(영어)이나 ?lang=ja(일본어)를 붙여 그 언어로 열 수도 있습니다. 영어판과 일본어판도 프롤로그부터 마지막 사건까지 모든 장면과 화면 문구가 그 언어로 나옵니다. 판의 규칙, 점수, 랭킹은 언어와 관계없이 같습니다.</p>
+<p>시작 화면 머리의 「한국어 · English · 日本語」에서 고르면 됩니다. 고른 언어는 이 기기에 저장되고, 게임이 그 언어로 다시 열립니다. 아직 언어를 고른 적이 없는 기기라면 영어판 주소 <a href="/en/">/en/</a>이나 일본어판 주소 <a href="/ja/">/ja/</a>로 열어도 그 언어로 시작합니다. 영어판과 일본어판도 프롤로그부터 마지막 사건까지 모든 장면과 화면 문구가 그 언어로 나옵니다. 판의 규칙, 점수, 랭킹은 언어와 관계없이 같습니다.</p>
 
 <h2>데이터와 개인정보</h2>
 <h3>어떤 데이터가 서버로 가나요?</h3>
@@ -231,7 +243,7 @@ const FAQ_EN = `
 <h3>What does the ranking count?</h3>
 <p>Completed cases are ranked by Burst Score (0 to 100). Ties are broken by rank, then Redesign, then Pressure Recovery, then Shifting View. A run (one season played from the start) puts up only its best record, and a record that finished the season always comes ahead of one partway through. The public ranking shows no names, only “Anonymous Analyst” and the last 8 characters of a run ID. It is built from the records of devices with playtest data sharing on; a device that turned it off keeps its records only on its local ranking. The public ranking is a playtest ranking, so it may be cleared when the rules of the table change.</p>
 <h3>How do I change the language?</h3>
-<p>Choose from “한국어 · English · 日本語” at the top of the start screen. Your choice is saved on this device, and the game opens again in that language. On a device that has never chosen a language, you can also add ?lang=en (English) or ?lang=ja (Japanese) to the end of the address to open the game in that language. In English and Japanese too, every scene and every line on screen, from the prologue to the last case, is in that language. The rules of the table, scores and rankings are the same in every language.</p>
+<p>Choose from “한국어 · English · 日本語” at the top of the start screen. Your choice is saved on this device, and the game opens again in that language. On a device that has never chosen a language, you can also open the English address <a href="/en/">/en/</a> or the Japanese address <a href="/ja/">/ja/</a> to start the game in that language. In English and Japanese too, every scene and every line on screen, from the prologue to the last case, is in that language. The rules of the table, scores and rankings are the same in every language.</p>
 
 <h2>Data and privacy</h2>
 <h3>What data is sent to the server?</h3>
@@ -271,7 +283,7 @@ const FAQ_JA = `
 <h3>ランキングは何で決まりますか？</h3>
 <p>完了した事件のバーストスコア(0~100)で順位を付けます。同点の場合は、ランク、構造の再設計、圧力への対応、視点の転換の順で決めます。一つのラン(最初から始めた一回のシーズン)からは最も良い記録一つだけが載り、シーズンを終えた記録が途中の記録より常に上に来ます。公開ランキングには名前の代わりに「匿名分析官」と記録番号の末尾8桁だけが表示されます。公開ランキングはプレイテストデータの提供に同意した端末の記録で作られ、同意をオフにした端末の記録は、この端末のローカルランキングにだけ残ります。公開ランキングはプレイテストの順位のため、勝負のルールが変わった場合はリセットすることがあります。</p>
 <h3>言語はどう切り替えますか？</h3>
-<p>最初の画面の上にある「한국어 · English · 日本語」から選んでください。選んだ言語はこの端末に保存され、ゲームがその言語で開き直します。まだ言語を選んだことのない端末なら、アドレスの末尾に ?lang=en(英語)や ?lang=ja(日本語)を付けて、その言語で開くこともできます。英語版と日本語版も、プロローグから最後の事件まで、すべてのシーンと画面の文言がその言語で表示されます。勝負のルール、スコア、ランキングは言語に関係なく同じです。</p>
+<p>最初の画面の上にある「한국어 · English · 日本語」から選んでください。選んだ言語はこの端末に保存され、ゲームがその言語で開き直します。まだ言語を選んだことのない端末なら、英語版のアドレス <a href="/en/">/en/</a> や日本語版のアドレス <a href="/ja/">/ja/</a> を開いても、その言語で始まります。英語版と日本語版も、プロローグから最後の事件まで、すべてのシーンと画面の文言がその言語で表示されます。勝負のルール、スコア、ランキングは言語に関係なく同じです。</p>
 
 <h2>データと個人情報</h2>
 <h3>どんなデータがサーバーに送られますか？</h3>
@@ -466,6 +478,190 @@ export function readableCharacters(html) {
     .replace(/\s+/g, "").length;
 }
 
+/* ------------------------------------------------- the start page's three */
+
+/**
+ * The start page (index.html) in each language. `/` is the Korean, written by
+ * hand in index.html; `/en/` and `/ja/` are the same built page with these
+ * words in its head and its no-script text (`localizedStartPage`), written by
+ * the build beside it (`startPages()`, vite.config.js), and the game opens in
+ * their language (src/locale.js reads the folder as it reads `?lang=`).
+ *
+ * Why (2026-11-03, SEO 점검 높음 1): `/?lang=en` was the Korean page to
+ * anything that does not run the script -- a search engine's first read, a
+ * shared link's card -- and its canonical was `/`, so the English and
+ * Japanese start pages were folded into the Korean one and their hreflang
+ * dropped.
+ *
+ * `description` is two sentences of the about page in that language, as
+ * written there (the first of its `DESCRIPTION`, then the first paragraph's
+ * "runs in your browser"), and every card says the same: until 11-03 the start
+ * page said 「…게임 프로토타입」 in one place and 「플레이테스트 프로토타입」
+ * in another. `intro` is the about page's first two sentences.
+ * tests/unit/site-pages.test.mjs holds both to the about pages.
+ */
+export const START_PAGE = {
+  ko: {
+    title: "임계점: CRITICAL POINT - 판단이 깊어지는 순간",
+    description:
+      "「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다.",
+    intro: [
+      "「임계점: CRITICAL POINT」는 기업·금융 미스터리이자 푸시 유어 럭(push your luck) 게임입니다.",
+      "판돈을 올릴수록 보이지 않는 벽이 가까워지고, 한 번의 판단은 다음 판의 규칙을 바꿉니다.",
+    ],
+    closed: "사건 파일이 열리지 않았습니다. 분석 시스템이 이 브라우저에서 실행 승인을 받지 못했습니다.",
+    turnOn: "임계점은 자바스크립트로 그려지는 게임입니다. 브라우저 설정에서 자바스크립트를 켠 뒤 다시 열어 주세요.",
+    howTo: "자바스크립트 켜는 방법 (각 브라우저 공식 도움말)",
+    help: [
+      ["Chrome", "https://support.google.com/chrome/answer/114662?hl=ko"],
+      ["Safari (iPhone)", "https://support.apple.com/ko-kr/102456"],
+      ["삼성 인터넷", "https://www.samsung.com/us/support/troubleshoot/TSG10007306/"],
+      ["Firefox", "https://support.mozilla.org/kb/javascript-settings-for-interactive-web-pages"],
+      ["Edge", "https://support.microsoft.com/ko-kr/office/enable-javascript-7bb9ee74-6a9e-4dd1-babf-b0a1bb136361"],
+    ],
+  },
+  en: {
+    title: "Critical Point - Every 45 seconds, your judgment goes on the record",
+    description:
+      "Critical Point is a corporate and financial mystery where every push of the stake brings the Wall closer. It runs in your web browser and is free to play, with no sign-up and nothing to install.",
+    intro: [
+      "Critical Point is a corporate and financial mystery and a push-your-luck game.",
+      "The higher you raise the stake, the closer an unseen Wall comes, and every call you make changes the rules of the next hand.",
+    ],
+    closed: "The case file did not open. The analysis system was not cleared to run in this browser.",
+    turnOn: "Critical Point is a game drawn with JavaScript. Turn JavaScript on in your browser settings and open it again.",
+    howTo: "How to turn on JavaScript (each browser's official help)",
+    help: [
+      ["Chrome", "https://support.google.com/chrome/answer/114662?hl=en"],
+      ["Safari (iPhone)", "https://support.apple.com/en-us/102456"],
+      ["Samsung Internet", "https://www.samsung.com/us/support/troubleshoot/TSG10007306/"],
+      ["Firefox", "https://support.mozilla.org/kb/javascript-settings-for-interactive-web-pages"],
+      ["Edge", "https://support.microsoft.com/en-us/office/enable-javascript-7bb9ee74-6a9e-4dd1-babf-b0a1bb136361"],
+    ],
+  },
+  ja: {
+    title: "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される",
+    description:
+      "『臨界点: CRITICAL POINT』は、賭け金を上げるほど壁が近づく企業・金融ミステリーゲームです。ウェブブラウザですぐに動き、会員登録やインストールなしに無料で遊べます。",
+    intro: [
+      "『臨界点: CRITICAL POINT』は、企業・金融ミステリーであり、プッシュ・ユア・ラック(push your luck)のゲームです。",
+      "賭け金を上げるほど見えない壁が近づき、一度の判断が次の勝負のルールを変えます。",
+    ],
+    closed: "事件ファイルが開きませんでした。分析システムがこのブラウザで実行の承認を得られませんでした。",
+    turnOn: "臨界点はJavaScriptで描かれるゲームです。ブラウザの設定でJavaScriptをオンにしてから、もう一度開いてください。",
+    howTo: "JavaScriptをオンにする方法(各ブラウザの公式ヘルプ)",
+    help: [
+      ["Chrome", "https://support.google.com/chrome/answer/114662?hl=ja"],
+      ["Safari (iPhone)", "https://support.apple.com/ja-jp/102456"],
+      ["Samsung Internet", "https://www.samsung.com/us/support/troubleshoot/TSG10007306/"],
+      ["Firefox", "https://support.mozilla.org/kb/javascript-settings-for-interactive-web-pages"],
+      ["Edge", "https://support.microsoft.com/ja-jp/office/enable-javascript-7bb9ee74-6a9e-4dd1-babf-b0a1bb136361"],
+    ],
+  },
+};
+
+const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline";
+const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none";
+
+/**
+ * What the start page says with no script, in its language: what the game
+ * is (the about page's first two sentences), that it needs JavaScript and
+ * where each browser says how to turn it on, and the five plain pages -- the
+ * text a reader, a crawler that runs no script, or an AdSense reviewer finds
+ * at the address. Inline styles only (index.html says why). index.html holds
+ * the Korean as this writes it, byte for byte.
+ */
+export function startNoscript(language) {
+  const copy = START_PAGE[language];
+  const item = ([label, href]) => `          <li><a href="${escapeHtml(href)}" style="${NOSCRIPT_LINK}">${escapeHtml(label)}</a></li>\n`;
+  const pages = PAGE_KINDS.map((kind) => [COPY[language][kind], pagePath(kind, language)]);
+  return `<noscript>
+      <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #f2f6f3; background: #06090a; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
+        <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">${escapeHtml(GAME_NAME[language])}</h1>
+        <p style="margin: 0 0 24px">${copy.intro.map(escapeHtml).join(" ")}</p>
+        <p style="margin: 0 0 12px; font-weight: 700">
+          ${escapeHtml(copy.closed)}
+        </p>
+        <p style="margin: 0 0 24px">
+          ${escapeHtml(copy.turnOn)}
+        </p>
+        <p style="margin: 0 0 8px; color: #c9d3cd; font-size: 14px">${escapeHtml(copy.howTo)}</p>
+        <ul style="${NOSCRIPT_LIST}">
+${copy.help.map(item).join("")}        </ul>
+        <ul style="${NOSCRIPT_LIST}; margin-top: 24px">
+${pages.map(item).join("")}        </ul>
+      </div>
+    </noscript>`;
+}
+
+/** Each [pattern, replacement] once in `html`, or the build fails: a tag index.html lost would otherwise leave the Korean in place silently. */
+function replaceEach(html, pairs, language) {
+  let out = String(html);
+  for (const [pattern, replacement] of pairs) {
+    const found = out.match(new RegExp(pattern.source, `${pattern.flags.replace("g", "")}g`)) ?? [];
+    if (found.length !== 1) throw new Error(`The start page has ${found.length} of ${pattern} (want 1), writing the ${language} page.`);
+    out = out.replace(pattern, replacement);
+  }
+  return out;
+}
+
+const metaContent = (key, name) => new RegExp(`(<meta\\s+${key}="${name}"\\s+content=")[^"]*(")`);
+
+/**
+ * The built start page (index.html, every plugin done with it) in another
+ * language: its `lang`, title, description, Open Graph and Twitter words,
+ * canonical and og:url (the folder, absolute on `origin` when there is one),
+ * and its no-script text. Everything else -- the scripts, the critical CSS,
+ * the hreflang links, the Google tag on a build with one -- is the Korean
+ * page's own, so the two cannot drift apart. `ko` hands back the page with
+ * the Korean words, which is the page itself (the test holds index.html to
+ * it).
+ */
+export function localizedStartPage(html, language, origin = "") {
+  const copy = START_PAGE[language];
+  if (!copy) throw new Error(`No start page in ${language}`);
+  const url = `${origin}${gamePath(language)}`;
+  const others = PAGE_LANGUAGES.filter((code) => code !== language);
+  const value = (text) => `$1${escapeHtml(text).replace(/\$/g, "$$$$")}$2`;
+  let out = replaceEach(
+    html,
+    [
+      [/(<html\s+lang=")[^"]*(")/, value(language)],
+      [/(<title>)[^<]*(<\/title>)/, value(copy.title)],
+      [metaContent("name", "description"), value(copy.description)],
+      [/(<link\s+rel="canonical"\s+href=")[^"]*(")/, value(url)],
+      [metaContent("property", "og:url"), value(url)],
+      [metaContent("property", "og:site_name"), value(GAME_NAME[language])],
+      [metaContent("property", "og:locale"), value(OG_LOCALE[language])],
+      [metaContent("property", "og:title"), value(copy.title)],
+      [metaContent("property", "og:description"), value(copy.description)],
+      [metaContent("property", "og:image:alt"), value(SHARE_IMAGE_ALT[language])],
+      [metaContent("name", "twitter:title"), value(copy.title)],
+      [metaContent("name", "twitter:description"), value(copy.description)],
+      [metaContent("name", "twitter:image:alt"), value(SHARE_IMAGE_ALT[language])],
+    ],
+    language,
+  );
+  // The two other languages, in the page's order.
+  let alternate = 0;
+  out = out.replace(/(<meta\s+property="og:locale:alternate"\s+content=")[^"]*(")/g, (_, before, after) => `${before}${OG_LOCALE[others[alternate++]] ?? ""}${after}`);
+  if (alternate !== others.length) throw new Error(`The start page has ${alternate} og:locale:alternate tags (want ${others.length}).`);
+  // The body's own block: a <noscript> round a <div>. The head has others (the
+  // deferred sheet's, critical-css in vite.config.js), and a comment names one.
+  const body = out.indexOf("<body>");
+  const blocks = body < 0 ? [] : [...out.slice(body).matchAll(/<noscript>\s*<div\b/g)];
+  if (blocks.length !== 1) throw new Error(`The start page has ${blocks.length} no-script blocks in its body (want 1), writing the ${language} page.`);
+  const start = body + blocks[0].index;
+  const end = out.indexOf("</noscript>", start);
+  if (end < 0) throw new Error(`The start page's no-script block is not closed, writing the ${language} page.`);
+  return `${out.slice(0, start)}${startNoscript(language)}${out.slice(end + "</noscript>".length)}`;
+}
+
+/** The two start pages the build writes beside index.html: `{ "en/index.html": ..., "ja/index.html": ... }`. */
+export function renderStartPages(html, origin = "") {
+  return Object.fromEntries(PAGE_LANGUAGES.filter((code) => code !== "ko").map((code) => [`${code}/index.html`, localizedStartPage(html, code, origin)]));
+}
+
 /* ----------------------------------------------------- crawler's files */
 
 const HTTPS_ORIGIN = /^https:\/\/[^/\s]+$/;
@@ -511,20 +707,16 @@ export function robotsTxt(origin = "") {
 }
 
 /**
- * The sitemap's entries: the start page, whose English and Japanese are the
- * same address with `?lang=` (its hreflang links, index.html), and each of
- * the five pages in each language. Every entry names its three languages and
- * x-default (the Korean).
+ * The sitemap's entries: the start page and each of the five pages, each in
+ * each language (`/`, `/en/`, `/ja/`, then `/about.html`, `/en/about.html`
+ * ...). Every entry names its three languages and x-default (the Korean).
+ * Until 11-03 the start page was one entry, its English and Japanese
+ * `/?lang=` addresses named only as its alternates.
  */
 export function sitemapEntries() {
-  const index = { loc: gamePath("ko"), alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, gamePath(code)])) };
-  const pages = PAGE_KINDS.flatMap((kind) =>
-    PAGE_LANGUAGES.map((language) => ({
-      loc: pagePath(kind, language),
-      alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, pagePath(kind, code)])),
-    })),
-  );
-  return [index, ...pages];
+  const entries = (pathOf) =>
+    PAGE_LANGUAGES.map((language) => ({ loc: pathOf(language), alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, pathOf(code)])) }));
+  return [...entries(gamePath), ...PAGE_KINDS.flatMap((kind) => entries((language) => pagePath(kind, language)))];
 }
 
 /**

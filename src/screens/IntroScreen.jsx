@@ -126,7 +126,7 @@ export function IntroScreen({ view, renderers = {} }) {
       renderRecoveryNotice: viewRenderRecoveryNotice,
       renderErrorLogPanel: viewRenderErrorLogPanel,
       renderSaveStatus: viewRenderSaveStatus,
-      GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage,
+      GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage,
     },
     start: {
       playStyleOptions, playStyle, setPlayStyle, persist, hasResumableSave, node, formatSaveTime,
@@ -334,11 +334,11 @@ export function IntroScreen({ view, renderers = {} }) {
                       에러 로그
                     </button>
                   )}
-                  <span className="case-chip">{GAME_TITLE_READING} / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
+                  <span className="case-chip">{introCopy.titleReading} / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
                   <LanguagePicker />
                 </div>
               </div>
-              <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
+              <GameWordmark label={gameTitle} reading={introCopy.titleReading} />
               <strong className="intro-kicker">{introCopy.subtitle}</strong>
               {/* The premise reads directly under the wordmark. It also keeps
                   `.intro p` -- one of build-critical-css.mjs's probes --

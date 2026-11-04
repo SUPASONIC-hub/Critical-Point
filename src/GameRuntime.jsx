@@ -946,7 +946,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
   const playView = createPlayView({
-    AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase,
+    AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge,
     gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
     fixedChoices, clueCount, casesOpened, reframeChoice, tableRisk,

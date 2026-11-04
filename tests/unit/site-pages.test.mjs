@@ -80,7 +80,7 @@ test("each page has its own title and description, a canonical link and every la
 
 test("every page links the game and the other four pages in its own language, and every link lands on a page that is written", () => {
   const written = new Set(Object.keys(all).map((file) => `/${file}`));
-  const game = { ko: "/", en: "/?lang=en", ja: "/?lang=ja" };
+  const game = { ko: "/", en: "/en/", ja: "/ja/" };
   for (const [file, html] of Object.entries(all)) {
     const language = /^(en|ja)\//.exec(file)?.[1] ?? "ko";
     const links = nav(html);
@@ -91,7 +91,7 @@ test("every page links the game and the other four pages in its own language, an
     assert.equal((links.match(/aria-current="page"/g) ?? []).length, 1, `${file} marks itself`);
     for (const [, href] of decode(html).matchAll(/<a href="([^"]+)"/g)) {
       if (href.startsWith("mailto:")) continue;
-      if (/^\/(\?lang=(en|ja))?$/.test(href)) continue;
+      if (/^\/((en|ja)\/)?$/.test(href)) continue;
       assert.ok(written.has(href), `${file} links ${href}, which the build does not write`);
     }
   }
@@ -131,7 +131,7 @@ test("the pages say what the code holds: the season's length, a case's minutes, 
     assert.ok(faq.includes(String(DATA_RETENTION_DAYS)) && contact.includes(String(DATA_RETENTION_DAYS)), `${language}: the retention`);
     assert.ok(faq.includes("45"), `${language}: the table's 45 seconds`);
     assert.ok(faq.includes("XXXX-XXXX-XXXX"), `${language}: the continue code's shape`);
-    assert.ok(faq.includes("?lang=en") && faq.includes("?lang=ja"), `${language}: the address of each language`);
+    assert.ok(faq.includes('<a href="/en/">/en/</a>') && faq.includes('<a href="/ja/">/ja/</a>'), `${language}: the address of each language`);
   }
   assert.equal(CASE_SEQUENCE[0], "prologue01", "the season opens with the prologue");
   assert.match(decode(site["about.html"]), /허구이며 실제와 관계가 없습니다/);
@@ -159,19 +159,22 @@ test("the service worker keeps every page for offline reading, and leaves the cr
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });
 
-test("the sitemap names the start page and all fifteen pages, by absolute address, with each one's languages", () => {
+test("the sitemap names the start page in three languages and all fifteen pages, by absolute address, with each one's languages", () => {
   const entries = sitemapEntries();
-  assert.equal(entries.length, 16);
-  assert.deepEqual(entries[0], { loc: "/", alternates: { ko: "/", en: "/?lang=en", ja: "/?lang=ja" } });
-  assert.deepEqual(entries.slice(1).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
+  assert.equal(entries.length, 18);
+  const start = { ko: "/", en: "/en/", ja: "/ja/" };
+  assert.deepEqual(entries.slice(0, 3), Object.values(start).map((loc) => ({ loc, alternates: start })));
+  assert.deepEqual(entries.slice(3).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
   const xml = sitemapXml({ origin: ORIGIN, date: "2026-10-29" });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml">/);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(locs.length, 16);
+  assert.equal(locs.length, 18);
   assert.ok(locs.every((loc) => loc.startsWith(`${ORIGIN}/`)), "every address is absolute");
   for (const file of Object.keys(all)) assert.ok(locs.includes(`${ORIGIN}/${file}`), `${file} is in the sitemap`);
-  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, 16);
-  assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/?lang=en"/>`));
+  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, 18);
+  for (const path of ["/", "/en/", "/ja/"]) assert.ok(locs.includes(`${ORIGIN}${path}`), `${path} is in the sitemap`);
+  assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/en/"/>`));
+  assert.doesNotMatch(xml, /\?lang=/, "the start page by its folders, not the query a crawler reads as the Korean page");
   assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="ja" href="${ORIGIN}/ja/faq.html"/>`));
   assert.ok(!/href="\//.test(xml), "no relative alternate");
   assert.throws(() => sitemapXml({ origin: ORIGIN, date: "29.10.2026" }), /YYYY-MM-DD/);

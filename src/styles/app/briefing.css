@@ -241,13 +241,16 @@
    places its centre in the drawing's own 320x132 units (`--sfx-x`, `--sfx-y`)
    and its size (`--sfx-em`), and these turn the units into the panel's. The
    drawing is the panel's width and sits in its middle, so a unit is 1/320 of
-   the width across and down, measured from the middle. */
+   the width across and down, measured from the middle. The word is centred on
+   that spot in `transform`, with its turn: as the separate `translate`
+   property the build dropped it (2026-11-03), and on every desk screen the
+   word sat half its own size right of and below its spot, past the panel's
+   right edge in Korean and Japanese. */
 .gx-sfx {
   position: absolute;
   top: calc(50% + (var(--sfx-y) - 66) * 100cqw / 320);
   left: calc(var(--sfx-x) * 100cqw / 320);
   z-index: 1;
-  translate: -50% -50%;
   color: var(--c-acid);
   font: 900 calc(var(--sfx-em) * 100cqw / 320) / 1 var(--font-sans);
   white-space: nowrap;
@@ -258,7 +261,7 @@
     -2px -2px 0 var(--c-black),
     2px -2px 0 var(--c-black),
     -2px 2px 0 var(--c-black);
-  transform: rotate(-9deg);
+  transform: translate(-50%, -50%) rotate(-9deg);
   animation: gx-sfx-slam 0.5s 0.35s var(--ui-ease-spring) both;
   pointer-events: none;
 }
@@ -916,7 +919,7 @@
 @keyframes gx-sfx-slam {
   from {
     opacity: 0;
-    transform: rotate(-9deg) scale(2.4);
+    transform: translate(-50%, -50%) rotate(-9deg) scale(2.4);
   }
 }
 
