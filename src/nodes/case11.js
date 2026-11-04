@@ -655,7 +655,7 @@ export const case11 = {
         label: "두 시각을 나란히 적은 기록을 의원실과 언론에 넘긴다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 },
         voice: "한쪽에서 묻히지 않게, 두 시각을 나란히 적은 기록을 의원실과 언론에 동시에 넘긴다.",
-        echo: "동시에 넘기자 어느 쪽도 먼저 묻을 수 없습니다. 두 시각 사이의 빈 시간이 내일 질의의 첫 질문이 됩니다.",
+        echo: "동시에 넘기자 어느 쪽도 먼저 묻을 수 없습니다. 두 시각 사이의 빈 시간이 오늘 질의의 첫 질문이 됩니다.",
         cognition: { inference: 2, persistence: 1 },
       },
       {
