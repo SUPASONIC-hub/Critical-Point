@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { captionBoxes, captionGroups } from "../../src/components/proseMarks.js";
+import { captionBoxes, captionGroups, markProse } from "../../src/components/proseMarks.js";
 import { proseSentences, sentenceTexts } from "../../src/components/proseSentences.js";
-import { captionSentences, getSpeakerLine } from "../../src/gauntlet/speakerLine.js";
+import { captionSentences, getSpeakerLine, speechSpans } from "../../src/gauntlet/speakerLine.js";
 import { nodes } from "../../src/gameData.js";
 
 /**
@@ -40,6 +40,26 @@ test("speech opened mid-sentence (says, '…' / '…'라고) stays in its senten
   // An apostrophe between Latin letters is not a quote, and an unmatched quote opens nothing.
   assert.deepEqual(sentenceTexts("The analyst's desk. It's late."), ["The analyst's desk.", "It's late."]);
   assert.deepEqual(sentenceTexts("안 왔어요.' 봉투가 있습니다."), ["안 왔어요.' 봉투가 있습니다."]);
+});
+
+test("a plural possessive (analysts' room) is not a quote, and the pairs after it keep their places", () => {
+  const text = "The analysts' room is cold. Kim says, 'Sit.' She waits.";
+  assert.deepEqual(sentenceTexts(text), ["The analysts' room is cold.", "Kim says, 'Sit.'", "She waits."]);
+  // The box breaks after 'Sit.' (before the fix it ran on into "She waits.").
+  assert.deepEqual(captionGroups(text), ["The analysts' room is cold. Kim says, 'Sit.'", "She waits."]);
+  assert.deepEqual(speechSpans(text).map(({ start, end }) => text.slice(start, end)), ["'Sit.'"]);
+  assert.deepEqual(
+    markProse(text).filter((segment) => segment.marks.includes("say")).map((segment) => segment.text),
+    ["'Sit.'"],
+  );
+  // Two in a row, and one after a speech has closed.
+  const more = "The employees' catches and the lenders' files sit apart. 'Read them.' The clerks' desks are bare.";
+  assert.deepEqual(sentenceTexts(more), ["The employees' catches and the lenders' files sit apart.", "'Read them.'", "The clerks' desks are bare."]);
+  assert.deepEqual(speechSpans(more).map(({ start, end }) => more.slice(start, end)), ["'Read them.'"]);
+  // Inside an open quote the same shape closes it: a cited phrase that ends in "s".
+  const cited = "Reading the clause, the phrase 'their officers and employees' catches your eye. 'Go on.' He nods.";
+  assert.deepEqual(speechSpans(cited).map(({ start, end }) => cited.slice(start, end)), ["'their officers and employees'", "'Go on.'"]);
+  assert.deepEqual(sentenceTexts(cited), ["Reading the clause, the phrase 'their officers and employees' catches your eye.", "'Go on.'", "He nods."]);
 });
 
 test("in every scene the boxes are the paragraph's words in order, and each box's sentences are the balloon's", () => {

@@ -1,4 +1,4 @@
-import { sentenceTexts } from "../components/proseSentences.js";
+import { pairedQuotes, sentenceTexts } from "../components/proseSentences.js";
 
 /**
  * What the speaker's balloon on the briefing page says (A-2 = D-2, 2026-10-23).
@@ -56,14 +56,12 @@ export function getSpeakerLine(node, names = []) {
 
 /**
  * Where the speech in a prose string is: `{ start, end }`, quotes included,
- * `end` past the closing one. proseMarks.js's rule: an apostrophe between two
- * Latin letters is not a quote, and an unmatched last quote opens nothing.
+ * `end` past the closing one. The quotes are proseSentences.js's (pairedQuotes):
+ * an apostrophe in a word or a plural possessive is not a quote, and an
+ * unmatched last quote opens nothing.
  */
 export function speechSpans(text = "") {
-  const quotes = [];
-  for (let index = 0; index < text.length; index += 1) {
-    if (text[index] === "'" && !(/[A-Za-z]/.test(text[index - 1] ?? "") && /[A-Za-z]/.test(text[index + 1] ?? ""))) quotes.push(index);
-  }
+  const quotes = pairedQuotes(text);
   const spans = [];
   for (let pair = 0; pair + 1 < quotes.length; pair += 2) spans.push({ start: quotes[pair], end: quotes[pair + 1] + 1 });
   return spans;

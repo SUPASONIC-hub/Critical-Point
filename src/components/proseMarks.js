@@ -1,4 +1,4 @@
-import { proseSentences } from "./proseSentences.js";
+import { pairedQuotes, proseSentences } from "./proseSentences.js";
 
 /**
  * Reading marks for scene prose (2026-10-20).
@@ -10,7 +10,8 @@ import { proseSentences } from "./proseSentences.js";
  * exactly one segment, in order, so what a screen reader reads is unchanged.
  *
  *   say   speech: from one single quote to the next ('...'), quotes included.
- *         An apostrophe between two Latin letters (analyst's) is not a quote.
+ *         An apostrophe between two Latin letters (analyst's) is not a quote,
+ *         nor a plural possessive (the analysts' room; proseSentences.js).
  *   num   a figure: digits with their unit (184.7%, 18영업일, 3억 원, 1,140명),
  *         a date or time read as one (11월 1일, 7시 40분), or a number like
  *         2023-0412.
@@ -36,18 +37,6 @@ const DATE_HEAD = /(?:^| )\d+(?:년|월|일|시)$/;
 const DATE_TAIL = /^\d+(?:월|일|시|분|초)$/;
 // Money spoken in two words: 3억 원.
 const WON_AFTER = /(?:억|만|천|조)$/;
-
-function quoteToggles(text) {
-  const toggles = [];
-  for (let index = 0; index < text.length; index += 1) {
-    if (text[index] !== "'") continue;
-    if (/[A-Za-z]/.test(text[index - 1] ?? "") && /[A-Za-z]/.test(text[index + 1] ?? "")) continue;
-    toggles.push(index);
-  }
-  // An unmatched quote marks nothing rather than everything after it.
-  if (toggles.length % 2 === 1) toggles.pop();
-  return toggles;
-}
 
 function markFigures(text, marks, out) {
   let last = 0;
@@ -85,7 +74,9 @@ function markGlosses(text, marks, out) {
 export function markProse(text = "") {
   const source = String(text ?? "");
   const out = [];
-  const toggles = quoteToggles(source);
+  // proseSentences.js's quotes: an apostrophe in a word or a plural possessive
+  // is not one, and an unmatched quote marks nothing rather than everything after it.
+  const toggles = pairedQuotes(source);
   let last = 0;
   for (let pair = 0; pair < toggles.length; pair += 2) {
     const start = toggles[pair];

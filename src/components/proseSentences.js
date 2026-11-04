@@ -31,12 +31,25 @@ const CJK_STOP = new RegExp(`[${CJK_STOPS}]`);
 const SPEECH_STOP = new RegExp(`[.!?…~${CJK_STOPS}]`);
 const ANY_STOP = SPEECH_STOP;
 
-/** The indexes of the quotes that pair up, as proseMarks.js marks speech. */
-function pairedQuotes(text) {
+/**
+ * The indexes of the quotes that pair up: the one rule proseMarks.js (speech
+ * marks), speakerLine.js (speech spans) and the sentence cut here share.
+ *   - An apostrophe between two Latin letters (analyst's) is not a quote.
+ *   - A plural possessive (the analysts' room, employees' catches) is not
+ *     one either: a quote right after an "s", followed by a space and a
+ *     lower-case letter, while no speech is open. Counted as a quote it
+ *     shifted every pair after it, so 'Sit.' in "The analysts' room is cold.
+ *     Kim says, 'Sit.' She waits." did not end its sentence (11-04).
+ *   - An unmatched last quote opens nothing.
+ */
+export function pairedQuotes(text) {
   const quotes = [];
   for (let index = 0; index < text.length; index += 1) {
     if (text[index] !== "'") continue;
-    if (/[A-Za-z]/.test(text[index - 1] ?? "") && /[A-Za-z]/.test(text[index + 1] ?? "")) continue;
+    const before = text[index - 1] ?? "";
+    if (/[A-Za-z]/.test(before) && /[A-Za-z]/.test(text[index + 1] ?? "")) continue;
+    const open = quotes.length % 2 === 1;
+    if (!open && before === "s" && text[index + 1] === " " && /[a-z]/.test(text[index + 2] ?? "")) continue;
     quotes.push(index);
   }
   if (quotes.length % 2 === 1) quotes.pop();
