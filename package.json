@@ -2,6 +2,11 @@
   "name": "critical-point-prototype",
   "version": "0.1.0",
   "private": true,
+  "author": "SUPASONIC & ALICE (Tak'n Roll)",
+  "contributors": [
+    "SUPASONIC <from.logic.to.magic@gmail.com>",
+    "ALICE <goeun.nam@gmail.com>"
+  ],
   "type": "module",
   "engines": {
     "node": ">=24 <25"
