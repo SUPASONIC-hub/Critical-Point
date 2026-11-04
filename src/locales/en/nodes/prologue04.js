@@ -69,16 +69,16 @@ export default {
     },
     "p4_quota": {
       "title": "The 2nd-Floor Whiteboard",
-      "text": "Lunchtime, the branch’s 2nd-floor meeting room. On the left of the whiteboard is the branch’s May target of 1.2 billion won; on the right, a box for each of the six windows. Boxes that hit target get a circle; boxes that missed keep a name. Windows 3 and 6 kept their names last month too. A printout of the memo that sent the target down lies on the table. Sender: head office, Corporate Finance Strategy Team. Your team. Its title is 'Smart Logistics No. 3 Sales Cooperation', and the approval box at the bottom carries a department name and no person’s name. The attached terms and conditions run 18 pages and never reached the windows. Branch Manager Bae grips a marker and lets it go. 'I didn’t make that target. I just got it and split it six ways.' He smiles briefly. 'If you’re here to talk about mis-selling, my people only followed the script.'",
+      "text": "Lunchtime, the branch’s 2nd-floor meeting room. On the left of the whiteboard is the branch’s May target of 1.2 billion won; on the right, a box for each of the six windows. Boxes that hit target get a circle; boxes that missed keep a name. Windows 3 and 6 kept their names last month too. A printout of the memo that sent the target down lies on the table. Sender: head office, Corporate Finance Strategy Team. Your team. Its title is 'Smart Logistics No. 3 Sales Cooperation', and the approval field at the bottom carries a department name and no person’s name. The attached terms and conditions run 18 pages and never reached the windows. Branch Manager Bae grips a marker and lets it go. 'I didn’t make that target. I just got it and split it six ways.' He smiles briefly. 'If you’re here to talk about mis-selling, my people only followed the script.'",
       "memo": [
         "May branch target 1.2 billion won -- 200 million won per window",
         "Names of windows under target never erased -- Windows 3 and 6, 2 months running",
-        "Memo sender: head office Corporate Finance Strategy Team, no name in approval box",
+        "Memo sender: head office Corporate Finance Strategy Team, no name in approval field",
         "Terms and conditions 18 pages -- not given to the windows"
       ],
       "choices": {
         "p4_quota_trace": {
-          "label": "Copy the blank approval box into the review report as is"
+          "label": "Copy the blank approval field into the review report as is"
         },
         "p4_quota_skip": {
           "label": "Call the target a branch matter, count sales, and leave"
@@ -95,7 +95,7 @@ export default {
       },
       "place": "KD Bank Gangseo Branch, 2nd-floor meeting room",
       "clock": "May 15, 2023 · 12:50",
-      "question": "The approval box on the memo that sent down the sales target is empty. What do you do?",
+      "question": "The approval field on the memo that sent down the sales target is empty. What do you do?",
       "lead": "The whiteboard keeps both the circles of the boxes that hit target and the names in the boxes that missed."
     },
     "p4_visit": {
@@ -608,7 +608,7 @@ export default {
     "p4_window_script": "Choosing to question sentences, not people, you lay the script beside the disclosure and note each line that differs.",
     "p4_window_watch": "Since one sale is not enough to judge, you stay out of it and watch all six morning sales to the end.",
     "p4_quota_erase": "The names left since last month weigh on you first, so you ask the branch manager to erase the names of the windows that missed target.",
-    "p4_quota_trace": "Insisting that even a nameless approval be recorded as seen, you copy the blank approval box into the review report as is.",
+    "p4_quota_trace": "Insisting that even a nameless approval be recorded as seen, you copy the blank approval field into the review report as is.",
     "p4_quota_skip": "Finding it hard to question a memo your own team sent, you call the target a branch matter, count the sales, and leave the meeting room.",
     "p4_visit_read": "Insisting she should know what she signed, you sit on the platform and read her the disclosure, all 22 pages, from start to finish.",
     "p4_visit_record": "So it doesn’t end with a kind man having sold it, you verify how the April 28 sale was made and log it in the review record.",
