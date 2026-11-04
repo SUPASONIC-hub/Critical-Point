@@ -826,7 +826,7 @@ export const case37 = {
     },
     c37_route_system: {
       place: "판교 KD데이터랩 · 데이터센터",
-      clock: "7월 27일 · 열대야 · 04시",
+      clock: "7월 29일 · 열대야 · 02시",
       question: "유출 파일이 이미 채용 지원자를 채점하는 데 쓰이려 합니다. 노아의 보고를 어떻게 하겠습니까?",
     },
     c37_final_system_route: {
