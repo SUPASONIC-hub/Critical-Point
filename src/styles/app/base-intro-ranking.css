@@ -2087,6 +2087,22 @@ summary:focus-visible {
     border-color var(--ui-dur) var(--ui-ease),
     background var(--ui-dur) var(--ui-ease);
 }
+/* The roadmap's cards below the first screen are laid out and drawn only as
+   they come near it. The whole season sits under the full-height hero, and
+   its summaries are most of the text the start screen sets: on a throttled
+   phone the Japanese page committed its DOM at 6.1s and first painted at
+   9.8-15.2s, against 1.9s from commit to paint in English and Korean, with no
+   request or long task in between (ja-fcp, 2026-11-04). Until a card is drawn
+   it holds the height of a closed card (label row, a one-line title, the
+   trigger, a three-line summary, the lock note: about 280px here, 300px on the
+   phone rail below), and `auto` keeps the height it really had once it has
+   been drawn. The first row and the season's current case are drawn as
+   before: the roadmap link lands on them. Nothing here moves, so a reduced-
+   motion page is the same page. */
+.case-roadmap > .case-card:nth-child(n + 4):not(.active-case) {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 280px;
+}
 .case-card::before {
   content: attr(data-index);
   position: absolute;
@@ -3098,6 +3114,10 @@ body {
   .case-card {
     min-height: 250px;
     scroll-snap-align: start;
+  }
+  /* A rail card is narrower, so its title more often takes two lines. */
+  .case-roadmap > .case-card:nth-child(n + 4):not(.active-case) {
+    contain-intrinsic-block-size: auto 300px;
   }
   .roadmap-heading {
     margin-top: 64px;
