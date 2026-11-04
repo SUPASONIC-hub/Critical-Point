@@ -36,7 +36,7 @@ test("a bundle without the overlay or any dictionary fails the build instead of 
   assert.throws(() => localePreloadMap({ "assets/index-a.js": BUNDLE["assets/index-a.js"], "assets/locale-overlay-d.js": BUNDLE["assets/locale-overlay-d.js"] }), /index\.js/);
 });
 
-function run(source, { stored = null, search = "", storageThrows = false } = {}) {
+function run(source, { stored = null, search = "", pathname = "/", storageThrows = false } = {}) {
   const links = [];
   const context = {
     localStorage: {
@@ -45,7 +45,7 @@ function run(source, { stored = null, search = "", storageThrows = false } = {})
         return key === "critical-point-locale-v1" ? stored : null;
       },
     },
-    location: { search },
+    location: { search, pathname },
     URLSearchParams,
     document: { createElement: () => ({}), head: { appendChild: (link) => links.push(link) } },
   };
@@ -53,7 +53,7 @@ function run(source, { stored = null, search = "", storageThrows = false } = {})
   return links;
 }
 
-test("the script picks the language as src/locale.js does: stored, else ?lang=, else Korean", () => {
+test("the script picks the language as src/locale.js does: stored, else the folder, else ?lang=, else Korean", () => {
   const source = localePreloadSource({ map: localePreloadMap(BUNDLE), localeKey: "critical-point-locale-v1" });
   assert.deepEqual(run(source).length, 0, "a Korean page asks for nothing");
   const en = run(source, { search: "?lang=en" });
@@ -64,6 +64,22 @@ test("the script picks the language as src/locale.js does: stored, else ?lang=, 
   assert.equal(run(source, { stored: "xx", search: "?lang=en" }).length, 4, "a kept value that is no language falls to the address");
   assert.equal(run(source, { storageThrows: true, search: "?lang=ja" }).length, 2, "no storage: the address");
   assert.equal(run(source, { search: "?lang=fr" }).length, 0);
+  assert.equal(run(source, { search: "?lang=constructor" }).length, 0, "only the map's own languages");
+});
+
+test("a page opened in its language's folder (/en/, /ja/) preloads that language, as folderLanguage reads it", () => {
+  const source = localePreloadSource({ map: localePreloadMap(BUNDLE), localeKey: "critical-point-locale-v1" });
+  assert.equal(run(source, { pathname: "/en/" }).length, 4, "/en/ with nothing kept");
+  assert.equal(run(source, { pathname: "/en/index.html" }).length, 4, "/en/index.html too");
+  assert.equal(run(source, { pathname: "/ja/" })[0].href, "/assets/locale-ja-index-h.js", "/ja/ with nothing kept");
+  assert.equal(run(source, { pathname: "/ja/", search: "?lang=en" })[0].href, "/assets/locale-ja-index-h.js", "the folder wins over ?lang=");
+  assert.equal(run(source, { stored: "en", pathname: "/ja/" })[0].href, "/assets/en-extra-f.js", "the kept choice wins over the folder");
+  assert.equal(run(source, { stored: "ko", pathname: "/en/" }).length, 0, "a kept Korean wins over the folder");
+  assert.equal(run(source, { storageThrows: true, pathname: "/en/" }).length, 4, "no storage: the folder");
+  assert.equal(run(source, { pathname: "/ko/" }).length, 0, "the Korean folder asks for nothing");
+  assert.equal(run(source, { pathname: "/fr/" }).length, 0, "a folder that is no language asks for nothing");
+  assert.equal(run(source, { pathname: "/en/case/" }).length, 0, "only the start page's folder, as folderLanguage");
+  assert.equal(run(source, { pathname: "/constructor/" }).length, 0, "only the map's own languages");
 });
 
 test("the key is the one src/appConfig.js exports, and the file is named for its contents", () => {

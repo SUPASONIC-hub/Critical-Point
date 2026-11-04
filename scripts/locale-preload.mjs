@@ -9,7 +9,8 @@
  * waited for the entry chunk, then three round trips more, before its first
  * paint (perf-first-visit, 2026-11-03). This file is a tiny script beside the
  * bundle that reads the language the way src/locale.js does -- the one kept
- * on this device, else `?lang=`, else Korean -- and adds a
+ * on this device, else the folder (`/en/`, `/ja/`, folderLanguage), else
+ * `?lang=`, else Korean -- and adds a
  * `<link rel="modulepreload">` for each of those files, so they download
  * alongside the entry chunk. A Korean page adds nothing.
  *
@@ -70,10 +71,13 @@ export function localePreloadSource({ map, base = "/", localeKey, sourceLocale =
   const codes = [sourceLocale, ...Object.keys(hrefs)];
   return (
     "(function(){" +
-    `var m=${JSON.stringify(hrefs)},c=${JSON.stringify(codes)},l=null,s=null;` +
+    `var m=${JSON.stringify(hrefs)},c=${JSON.stringify(codes)},h=Object.prototype.hasOwnProperty,l=null,s=null;` +
     `try{s=localStorage.getItem(${JSON.stringify(localeKey)})}catch(e){}` +
-    "if(c.indexOf(s)>=0)l=s;else{try{l=new URLSearchParams(location.search).get(\"lang\")}catch(e){}}" +
-    "var f=m[l];if(!f)return;" +
+    // The folder as folderLanguage in src/locale.js reads it: `/en/` or `/en/index.html`.
+    "if(c.indexOf(s)>=0)l=s;else{var p=[];try{p=String(location.pathname).split(\"/\")}catch(e){}" +
+    "if(p.length===3&&p[0]===\"\"&&(p[2]===\"\"||p[2]===\"index.html\")&&h.call(m,p[1]))l=p[1];" +
+    "else{try{l=new URLSearchParams(location.search).get(\"lang\")}catch(e){}}}" +
+    "var f=h.call(m,l)?m[l]:null;if(!f)return;" +
     "for(var i=0;i<f.length;i++){var k=document.createElement(\"link\");k.rel=\"modulepreload\";k.crossOrigin=\"\";k.href=f[i];document.head.appendChild(k)}" +
     "})();\n"
   );
