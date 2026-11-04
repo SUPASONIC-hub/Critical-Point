@@ -184,7 +184,7 @@ export default {
     },
     "c24_oneline": {
       "title": "One-Line Results",
-      "text": "In the afternoon, a form arrives from Human Resources. 'Individual Handover Form Following Department Dissolution.' At the bottom is a field: 'Key results while employed (one line).' Lee Minseo turns her monitor to show you. She has written down the outcome of every case separately. 1,140 people whose jobs carried on, 212 people brought under the compensation standard, lathes that all six run again, one rice cake shop that didn’t close. The scrolling doesn’t end. 'How am I supposed to fit this into one line? The notice says there were no results, and my file is 23 pages.'",
+      "text": "In the afternoon, a form arrives from Human Resources. 'Individual Handover Form Following Department Dissolution.' At the bottom is a field: 'Key results while employed (one line).' Lee Minseo turns her monitor to show you. She has written down the outcome of every case separately. 1,140 people whose jobs carried on, 181 people brought under the compensation standard, lathes that all six run again, one rice cake shop that didn’t close. The scrolling doesn’t end. 'How am I supposed to fit this into one line? The notice says there were no results, and my file is 23 pages.'",
       "memo": [
         "Handover form 'key results' field -- one line",
         "Lee Minseo’s case-by-case results file, 23 pages",
@@ -542,7 +542,7 @@ export default {
     "c24_farewell_sign": "With everyone’s names, the objection runs to 19 lines. The names of the five whose transfers are out are among them.",
     "c24_farewell_laugh": "You laugh, and Kang Taemin gives the toast one more time. Meanwhile, the deadline to object to the dissolution shrinks by a day.",
     "c24_final_shield": "You take on the source, and Baek Arin’s name is left nowhere. Instead, every question about who gave you the envelope comes to you.",
-    "c24_final_together": "You go together, and Baek Arin signs as whistleblower on top of her draft resignation letter. The Audit Committee intake number is assigned 3 minutes before 17:00.",
+    "c24_final_together": "You go together, and Baek Arin writes her name in the witness field of your report. The Audit Committee intake number is assigned 3 minutes before 17:00.",
     "c24_final_take": "You push it straight in, and at the Group Strategy Office front desk the envelope speaks first. No answer yet, and at that hour Baek Arin is packing.",
     "c24_after_warm": "19 people stay on the dark 4th floor. The summons from the 33rd floor waits until this night is over.",
     "c24_after_record": "The request is received just before the dissolution. A document asking to break the seal becomes the last record this room leaves.",

@@ -420,7 +420,7 @@ export default {
       "memo": [
         "Side agreement: on a call, buys the loan claim at 41% of principal",
         "Adviser to wind it up after the purchase: Yoon Sanghyuk",
-        "NextMile’s 2023 offer: 42% of book value"
+        "NextMile’s 2025 offer: 42% of book value"
       ],
       "choices": {
         "c48_evidence_turn_hold": {
