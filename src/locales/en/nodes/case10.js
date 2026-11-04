@@ -207,7 +207,7 @@ export default {
     },
     "c10_pills": {
       "title": "19 People",
-      "text": "Han Seoyun opens the personnel records. In the last 3 years, nineteen people at Trigger Lab and Gangseo Branch took sick leave for the same reason. Every reason field says 'personal matter'. She scrolls one more line and stops. 1 of the 19 is Han Seoyun herself. 3 years ago, 2 weeks.",
+      "text": "Han Seoyun opens the personnel records. In the last 3 years, nineteen people at Trigger Lab, Gangseo Branch and the Corporate Finance Strategy Team took sick leave for the same reason. Every reason field says 'personal matter'. She scrolls one more line and stops. 1 of the 19 is Han Seoyun herself. 3 years ago, 2 weeks.",
       "memo": [
         "19 sick leaves for the same reason -- all recorded as personal matters",
         "11 of the 19 still work here",
@@ -295,7 +295,7 @@ export default {
       },
       "place": "Trigger Lab, 4th floor · by the window",
       "clock": "Injury review in 32h",
-      "question": "She says speaking up would mean regretting her signature. What do you do about those 2 weeks?"
+      "question": "She says speaking up would mean regretting that return. What do you do about those 2 weeks?"
     },
     "c10_ledger_reaction": {
       "title": "Oh Jinwoo’s Box",
@@ -561,7 +561,7 @@ export default {
     "c10_ward_reaction_choice_1": "With the claim filed, those hours show up in the accounts for the first time. The side that gets the bill classifies him as a problem employee.",
     "c10_ward_reaction_choice_2": "Left alone, goodwill stays goodwill. A cost the accounts do not record will not be billed for the next person either.",
     "c10_ward_reaction_choice_3": "Used only as evidence, the figure changes the system. No money comes back to Do Yoonha himself.",
-    "c10_pills_reaction_choice_1": "Rewritten, all 19 cases share the same named reason. Han Seoyun has to write that she regrets her signature.",
+    "c10_pills_reaction_choice_1": "Rewritten, all 19 cases share the same named reason. Han Seoyun has to write that she regrets that return.",
     "c10_pills_reaction_choice_2": "Left alone, she can keep standing on the side that applies pressure. The 19th box stays empty for good.",
     "c10_pills_reaction_choice_3": "With her consent, the case set is complete. The conversation asking for it changes things between you two.",
     "c10_ledger_reaction_choice_1": "With you looking away, he counts all 288 to the end. No one asks what he is trying to prove.",
