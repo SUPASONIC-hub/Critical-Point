@@ -116,6 +116,19 @@ export function takeIntoSlots(run, taken, tools = null) {
   return weakest === taken ? equipRelic(run, null) : equipRelic(run, taken, weakest);
 }
 
+/**
+ * What a `spend` policy pays for at a draft (createSeasonBot's `spend`; the
+ * pressure report's draft rows read it too): the reroll, one more, both, or
+ * -- "early" -- each only while the slots have room for what it brings.
+ */
+export function spendsAt(spend, run) {
+  const room = RELIC_SLOTS - run.relics.length;
+  return {
+    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1),
+    extra: spend === "extra" || spend === "always" || (spend === "early" && room >= 2),
+  };
+}
+
 /** How a card reads to a player who values these axes. Costs are negative. */
 export const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
 const worth = (key, value) => (key === "humanCost" || key === "fatigue" ? -value : value);
@@ -259,9 +272,11 @@ export const AUDIT_VALUES = (() => {
  * week's run (verify-ranking-weekly.test.mjs).
  * `spend` is what the player pays for at each draft (C9): "never" (the
  * default, and every report measured before it), "reroll" (the one reroll,
- * whenever the vault holds its price), "extra" (one more relic, likewise), or
- * "always" (both, the reroll first). A spend draws nothing; the second pick
- * of a draft that bought one more draws as the first does.
+ * whenever the vault holds its price), "extra" (one more relic, likewise),
+ * "always" (both, the reroll first), or "early" (both, but only while the
+ * slots have room: the reroll with a slot free, one more with two). A spend
+ * draws nothing; the second pick of a draft that bought one more draws as the
+ * first does.
  */
 export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, spend = "never" }) {
   const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
@@ -565,8 +580,9 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
   /** A draft answered: what `spend` pays for, then a pick (two when one more was bought). */
   function takeDraft(start, tools) {
     let run = start;
-    if (spend === "reroll" || spend === "always") run = rerollRelicOffer(run);
-    if (spend === "extra" || spend === "always") run = buyExtraRelic(run);
+    const { reroll, extra } = spendsAt(spend, run);
+    if (reroll) run = rerollRelicOffer(run);
+    if (extra) run = buyExtraRelic(run);
     run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
     if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
     return run;

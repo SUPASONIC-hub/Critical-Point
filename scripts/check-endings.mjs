@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
-import { getEndingVariant, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
+import { getEndingVariant, LOGIC_SLACK_STREAK, VAULT_SLACK_PER_CASE } from "../src/gameLogic.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
@@ -343,6 +343,46 @@ if (AUDIT_WEEK) console.log(`Audit (measured, AUDIT_WEEK=1, values ${AUDIT_VALUE
   const per = (part, whole) => ((100 * part) / Math.max(1, whole)).toFixed(1);
   const describe = (row) => `ending differs in ${row.moved} of ${row.pairs} (${per(row.moved, row.pairs)}%), collapse on one side only ${row.collapseMoved} (${per(row.collapseMoved, row.pairs)}%), collapse blind ${per(row.blindCollapse, row.pairs)}% / heartbeat ${per(row.listensCollapse, row.pairs)}%, busts a season ${(row.blindBusts / Math.max(1, row.pairs)).toFixed(1)} / ${(row.listensBusts / Math.max(1, row.pairs)).toFixed(1)}`;
   console.log(`Board skill moves the ending (measured, ${BOARD_PAIRS} population slots each played blind and on the heartbeat on one seed): ${describe(total)}; ${archetypeNames.map((name) => `${name}: ${describe(byName[name])}`).join("; ")}`);
+}
+
+/**
+ * C9, the KD은행 계좌 at the draft (decision 2 (1)): what is paid comes out of
+ * the vault and the ending reads what is left, so a season that pays can lose
+ * the vault's slack (VAULT_SLACK_PER_CASE a case). Measured, not asserted --
+ * that cost is what was decided -- on paired seasons: the same population
+ * slot on the same seed, once for each `spend` policy (createSeasonBot), each
+ * against the one that never pays. Its own bots, so nothing above moves.
+ */
+{
+  const SPEND_SEASONS = Number(process.env.ENDING_SPEND_SEASONS) || POPULATION.length * 10;
+  const policies = ["never", "reroll", "extra", "always", "early"];
+  const bots = Object.fromEntries(policies.map((spend) => [spend, createSeasonBot({ seed: 20261104, staged, spend })]));
+  const rows = Object.fromEntries(policies.map((spend) => [spend, { endings: new Map(), slack: 0, vault: 0, spent: 0, moved: 0, slackLost: 0 }]));
+  for (let index = 0; index < SPEND_SEASONS; index += 1) {
+    const archetype = POPULATION[index % POPULATION.length];
+    const seasons = Object.fromEntries(policies.map((spend) => {
+      bots[spend].reseed((20261104 + Math.imul(index + 1, 2654435761)) >>> 0);
+      return [spend, bots[spend].playSeason(`spend:${index}`, archetype)];
+    }));
+    const bare = seasons.never;
+    for (const spend of policies) {
+      const season = seasons[spend];
+      const row = rows[spend];
+      row.endings.set(season.ending.id, (row.endings.get(season.ending.id) ?? 0) + 1);
+      const slack = season.strain.seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
+      if (slack) row.slack += 1;
+      if (!slack && bare.strain.seasonVaultPerCase >= VAULT_SLACK_PER_CASE) row.slackLost += 1;
+      if (season.ending.id !== bare.ending.id) row.moved += 1;
+      row.vault += season.strain.seasonVaultPerCase;
+      row.spent += season.caseDynamics.final?.seasonSpent ?? 0;
+    }
+  }
+  const per = (part) => ((100 * part) / SPEND_SEASONS).toFixed(1);
+  console.log(`Draft spend and the ending (measured, ${SPEND_SEASONS} population slots, each season played once per policy on one seed; slack = a vault of ${VAULT_SLACK_PER_CASE} a case):`);
+  for (const spend of policies) {
+    const row = rows[spend];
+    console.log(`  ${spend.padEnd(6)} vault ${Math.round(row.vault / SPEND_SEASONS)} a case, paid ${Math.round(row.spent / SPEND_SEASONS)} a season, slack ${per(row.slack)}% (lost against never ${per(row.slackLost)}%), ending differs from never in ${per(row.moved)}%; ${EXPECTED.map((id) => `${id} ${per(row.endings.get(id) ?? 0)}%`).join(", ")}`);
+  }
 }
 
 /**

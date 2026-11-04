@@ -529,6 +529,8 @@ const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, S
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
+// Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
+export { VAULT_SLACK_PER_CASE };
 // The streak that opens the slack door: the p90 of the seasons check:endings
 // replays (season best 1 / 3 / 7 / 24 / 109 at min / p10 / p50 / p90 / max; a
 // random hand never passes 8, one that plays for it reaches 40 one season in
