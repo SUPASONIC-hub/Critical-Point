@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c26_start": {
       "title": "The Author Field",
-      "text": "The door of the CEO’s office on KD Capital’s 20th floor stands open. Three days after taking office, Yoon Sanghyuk already has papers piled on his desk. He slides the top file across. It is the real-estate project financing (PF) for 'Reheim Godeok,' a 22-story officetel in Godeok, Pyeongtaek—a loan made before a building goes up, on the strength of the sales money expected to come in. KD Capital lent 62 billion won from the front of the line, and maturity is April 27. Construction stopped in January, and since last week a man has been sitting at the top of the tower crane. 'We’ll go with a 1-year extension. You write the Risk Management opinion. The one who knows the risk should be the one to write it down.' When you go down to the 12th floor, Department Head Chae Ian takes the pencil from behind one ear and lays it flat on the desk. 'Your name’s already printed in the author field, isn’t it? On this floor, we call that consideration.'",
+      "text": "Three days after taking office, Yoon Sanghyuk slides the top file across. It is the real-estate project financing (PF) for 'Reheim Godeok,' a 22-story officetel in Godeok, Pyeongtaek—a loan made before a building goes up, on the strength of the sales money expected to come in. KD Capital lent 62 billion won from the front of the line, and maturity is April 27. Since last week a man has been up at the top of the tower crane. 'We’ll go with a 1-year extension. You write the Risk Management opinion. The one who knows the risk should be the one to write it down.' On the 12th floor, Department Head Chae Ian takes the pencil from behind one ear and lays it flat. 'Your name’s already printed in the author field, isn’t it? On this floor, we call that consideration.'",
       "memo": [
         "Reheim Godeok PF -- KD Capital 62 billion won, maturity April 27",
         "Construction halted for three months -- tower crane sit-in, day 8",
@@ -38,7 +38,7 @@ export default {
     },
     "c26_crane": {
       "title": "The Foreman 40 Meters Up",
-      "text": "Godeok, Pyeongtaek: a construction site with a 'Construction Temporarily Suspended' banner on the fence. Beside a frame that stopped rising at the 15th floor, formwork foreman Ji Kanghyun has been up in the tower crane’s cab for 9 days. A cloth tied to the crane mast reads 'Three months’ wages, 1.4 billion won, 87 workers.' Six subcontractors were not paid by the general contractor, Seum Construction, and the workers were not paid by those subcontractors. When you put your phone on speaker, a voice comes down from 40 meters up. 'You’re from the company that lent the money? Good, you came. Whose building is this? We put it up, and they say it ain’t ours.' On the fence is a warning posted by the developer. 'Unauthorized occupation will face civil and criminal action.'",
+      "text": "Beside a frame that stopped at the 15th floor, formwork foreman Ji Kanghyun is in the tower crane’s cab. The cloth tied to the mast reads 'Three months’ wages, 1.4 billion won, 87 workers.' The general contractor, Seum Construction, did not pay six subcontractors, so the workers went unpaid too. Over your phone’s speaker, Ji Kanghyun’s voice comes down from 40 meters up. 'You’re from the company that lent the money? Whose building is this? We put it up, and they say it ain’t ours.' On the fence is a warning posted by the developer. 'Unauthorized occupation will face civil and criminal action.'",
       "memo": [
         "Sit-in day 9 -- tower crane cab, 40m up",
         "6 subcontractors unpaid -- 87 workers, 1.4 billion won",
@@ -69,7 +69,7 @@ export default {
     },
     "c26_creditors": {
       "title": "The Middle Column",
-      "text": "In a meeting room at Bridge Bank in Yeouido, the Reheim Godeok creditors’ committee convenes. At the head of the table is KD Capital, senior lender for 62 billion won; in the middle, Bridge Bank with 18 billion won. At the far end are the junior lenders, five of them including Gunsan’s Saebom Credit Union with 6 billion won, all on video. Kwon Dohyun, there for Bridge Bank, hands round a one-page sheet. The left column is a 1-year extension, the right column is taking the loss now. Between them he has drawn one more column. 'Wages of 1.4 billion won first, replace the contractor.' He pushes up his glasses. 'If the workers file a lien, nobody can sell this building. For reference, the crane rental is 830,000 won a day. This isn’t sympathy. It’s arithmetic.'",
+      "text": "The Reheim Godeok creditors’ committee convenes. At the head of the table is KD Capital, senior lender for 62 billion won; in the middle, Bridge Bank with 18 billion won. At the far end are the junior lenders, five of them including Gunsan’s Saebom Credit Union with 6 billion won. On the one-page sheet Kwon Dohyun hands round, one more column is drawn between a 1-year extension and taking the loss now. 'Wages of 1.4 billion won first, then replace the contractor. If the workers file a lien, nobody can sell this building. This isn’t sympathy. It’s arithmetic.'",
       "memo": [
         "7 creditors -- KD Capital 62 billion won · Bridge Bank 18 billion won · 5 junior lenders",
         "Kwon Dohyun’s plan: wages of 1.4 billion won first, replace the contractor",
@@ -100,7 +100,7 @@ export default {
     },
     "c26_tower": {
       "title": "Night in the Cab",
-      "text": "For the first time, Ji Kanghyun tells you to come up. You clip on a safety line and climb the ladder inside the crane mast. Around the 150th rung your legs start to shake, and from below Kang Taemin shouts, 'Resting makes it scarier!' The cab, barely 7 square meters, holds an electric blanket, a flat cola and a photo of his grandchild. Beyond the lights of Pyeongtaek, the stalled frame stands black. Ji Kanghyun points at one floor. '9th floor. Last summer our youngest fell from there. He lived, but he can never come up again. Took four months just to get it recognized as an industrial accident.' He takes out a cigarette, then puts it back. 'If I go down, everyone has to climb back up to that floor. For pay. So you tell me. If I go down, what changes?'",
+      "text": "Around the 150th rung your legs start to shake, and from below Kang Taemin shouts, 'Resting makes it scarier!' The cab holds an electric blanket and a photo of his grandchild. Ji Kanghyun points at one floor of the stalled frame. '9th floor. Last summer our youngest fell from there. He lived, but he can never come up again. Took four months just to get it recognized as an industrial accident. If I go down, everyone has to climb back up to that floor. For pay. So you tell me. If I go down, what changes?'",
       "memo": [
         "Crane height 40m -- about 200 ladder rungs",
         "The cab: electric blanket, grandchild’s photo, sit-in day 17",
@@ -131,7 +131,7 @@ export default {
     },
     "c26_final": {
       "title": "The Field to Sign",
-      "text": "KD Capital’s Credit Committee. In front of the five members is an opinion with your name on it. The site section carries the numbers as they stood: frame up to the 15th floor, reported progress 72%, actual on site 58%. A 1-year extension means no loss on this year’s books, and interest piles up for a year instead of construction money. Taking the loss sends the building to public auction. KD Capital, as senior lender, gets most of its money back, but the five junior lenders and 212 households with sale contracts go to the back of the line. Kwon Dohyun’s middle column—an extension tied to wages first and a new contractor—needs 4 billion won of new money. Chae Ian lays the pencil flat. 'Either way, the signature is yours. The CEO’s field says not applicable.' A photo from Pyeongtaek comes up on your phone. The light in the crane cab, day 19.",
+      "text": "The site section of the opinion with your name on it reads: frame up to the 15th floor, reported progress 72%, actual on site 58%. An extension means no loss on this year’s books; only interest piles up for 1 year. Taking the loss sends the building to public auction. KD Capital, as senior lender, gets most of its money back, but the five junior lenders and 212 households with sale contracts go to the back of the line. Kwon Dohyun’s middle column needs 4 billion won of new money. Chae Ian lays the pencil flat. 'Either way, the signature is yours. The CEO’s field says not applicable.'",
       "memo": [
         "Maturity April 27 -- committee on the 24th, the last business day",
         "1-year extension: 0 loss this year, a year of accrued interest",
@@ -159,7 +159,7 @@ export default {
     },
     "c26_aftershock": {
       "title": "The Foreman Comes Down",
-      "text": "On Friday evening, after the committee ends, the first wages land in the accounts of the 87 workers. One month out of three. Whichever way the decision went, the single line 'wages first' that Bridge Bank’s Kwon Dohyun drove into the creditors’ committee minutes has survived. At dusk, formwork foreman Ji Kanghyun, who held his sit-in atop the tower crane, comes down the ladder after 19 days. When his legs give out on the last rung, Kang Taemin catches him and presses an opened cup of noodles into his hands. The workers applaud, and Kwon Dohyun switches off his calculator, saying, 'The crane rental stops as of today.' In the middle of the applause, a text comes from Department Head Chae Ian. A photo of the seven creditors’ sheet, with a pencil circle around the very last row: Gunsan’s Saebom Credit Union, 6 billion won. 'In a game like this, the first to collapse is always the last row.'",
+      "text": "On Friday evening, after the committee ends, one month of the three months’ wages lands in the accounts of the 87 workers. The single line 'wages first' that Kwon Dohyun drove into the creditors’ committee minutes has survived. At dusk, Ji Kanghyun comes down the ladder after 19 days. When his legs give out, Kang Taemin catches him and presses a cup of noodles into his hands. Then a text comes from Chae Ian. A photo of the seven creditors’ sheet, with a pencil circle around the very last row: Gunsan’s Saebom Credit Union, 6 billion won. 'In a game like this, the first to collapse is always the last row.'",
       "memo": [
         "First wages paid -- 87 workers, one month out of three",
         "Ji Kanghyun comes down after 19 days of sit-in",
@@ -183,7 +183,7 @@ export default {
     },
     "c26_ramen": {
       "title": "More Broth",
-      "text": "At nine at night, Kang Taemin turns up at the container that serves as the site office, carrying two boxes of cup noodles. Three of the workers on the sit-in are old colleagues who left the logistics center’s night shift after the robots came in and moved to construction. Instead of a greeting, he puts water on in the electric kettle. He sends a cup of noodles up in a bucket on the end of the rope hanging from the crane mast, and 10 minutes later the bucket comes down. Inside the empty cup is a note in marker. 'More broth.' Sending up a second cup, Kang Taemin says, 'That guy’s never once stopped at one.' A worker laughing nearby looks for a long time at a photo of his daughter on his phone. Her college tuition is due Friday.",
+      "text": "Kang Taemin has come with two boxes of cup noodles. Three of the workers on the sit-in are old colleagues who left the logistics center’s night shift after the robots came in and moved to construction. He sends a cup of noodles up in the bucket on the crane’s rope, and when it comes down 10 minutes later, the empty cup holds a note in marker. 'More broth.' Kang Taemin sends up one more. 'That guy’s never once stopped at one.' A worker nearby looks for a long time at a photo of his daughter on his phone. Her college tuition is due Friday.",
       "memo": [
         "3 of the 87 workers are former night-shift colleagues",
         "Bucket round trip 10 minutes -- second cup of noodles requested",
@@ -206,7 +206,7 @@ export default {
     },
     "c26_nursery": {
       "title": "The Baby’s Room",
-      "text": "Saturday. In the parking lot in front of the closed Reheim Godeok model house, 40 buyers with sale contracts have gathered. Their representative, Song Hayul, is thirty-two and due in October. She traces a small room on the floor plan taped to the glass door. 'This one. I was going to make it the baby’s room—I even picked the wallpaper color.' Every buyer took out an interim-payment loan, and the interest keeps going out each month even though construction has stopped. Song Hayul’s jeonse lease ends in December, when the move-in was originally scheduled. 'You bank people talk about extension, about loss. Where do we sleep in December?'",
+      "text": "In front of the model house, 40 buyers with sale contracts have gathered. Their representative, Song Hayul, is due in October. She traces a small room on the floor plan. 'This one. I was going to make it the baby’s room—I even picked the wallpaper color.' Every buyer took out an interim-payment loan, so they pay interest even though construction has stopped. Song Hayul’s jeonse lease ends in December, when the move-in was originally scheduled. 'You bank people talk about extension, about loss. Where do we sleep in December?'",
       "memo": [
         "212 households with sale contracts -- 40 gathered today",
         "Interim-payment loan interest: still monthly after the halt",
@@ -229,7 +229,7 @@ export default {
     },
     "c26_elevator": {
       "title": "The One Who Was Right",
-      "text": "7:50 on the morning before the committee. You step into the elevator on the 12th floor, and Yoon Sanghyuk is already inside. It is the first time you have met him alone outside the CEO’s office. A plain navy suit, a tablet showing a document with an empty signature field. He doesn’t press a button; he waits for the doors to close. 'I hear you go to Pyeongtaek often. Climbed the crane, too.' The floor display changes from 18 to 19. 'Risk Management is where risk is written down, not where it’s removed. Your name goes only in the author field. The committee makes the decision.' The doors open on the 20th floor. As he steps out, he adds, 'You were right 3 years ago, too. That’s why you went to the basement.'",
+      "text": "You step into the elevator on the 12th floor, and Yoon Sanghyuk is already inside. He doesn’t press a button; he waits for the doors to close. 'I hear you go to Pyeongtaek often. Climbed the crane, too. Risk Management is where risk is written down, not where it’s removed. Your name goes only in the author field. The committee makes the decision.' When the doors open on the 20th floor, he steps out and adds, 'You were right 3 years ago, too. That’s why you went to the basement.'",
       "memo": [
         "Alone with Yoon Sanghyuk outside the CEO’s office -- 50 seconds in an elevator",
         "'Your name goes only in the author field'",
@@ -252,7 +252,7 @@ export default {
     },
     "c26_ramen_reaction": {
       "title": "30 Years of Formwork",
-      "text": "Around midnight, Ji Kanghyun calls. On the other end there is only the sound of wind. 'I’ve done nothing but formwork for 30 years. Building the wooden molds before the concrete’s poured. Once the building’s up, the molds get torn off and thrown away. Ever seen our faces in a completion-ceremony photo?' He laughs briefly. 'It’s nice, Taemin sending noodles up from down there. But if I go down, who sees that banner? Once this building’s finished, nobody’ll know it was put up by people cheated out of three months’ pay.'",
+      "text": "Around midnight, Ji Kanghyun calls. 'I’ve done nothing but formwork for 30 years. Building the wooden molds before the concrete’s poured. Once the building’s up, the molds get torn off and thrown away. Ever seen our faces in a completion-ceremony photo? If I go down, who sees that banner? Once it’s finished, nobody’ll know it was put up by people cheated out of three months’ pay.'",
       "memo": [
         "Formwork never appears in the completion-ceremony photo",
         "If he comes down, no one will see the banner"
@@ -274,7 +274,7 @@ export default {
     },
     "c26_nursery_reaction": {
       "title": "Not Applicable",
-      "text": "Monday morning, Chae Ian prints out the approval form that will go to the committee. Your name is printed in the author field, Chae Ian’s in the reviewer field. In the CEO’s field at the very end of the approval line, the words 'Not applicable' are already stamped. Chae Ian takes the pencil from behind one ear and lays it on the form. 'Under the rules, the CEO doesn’t sign anything under 100 billion won. The rule changed last month.' Last month was the month Yoon Sanghyuk’s appointment as CEO was settled. 'I’ve served three CEOs, and this is the first time a field has vanished. Funny, isn’t it? Keep laughing and only my name is left.'",
+      "text": "On the approval form, your name is in the author field and Chae Ian’s in the reviewer field, and in the CEO’s field at the very end, 'Not applicable' is already stamped. Chae Ian lays the pencil down. 'The rule says the CEO doesn’t sign anything under 100 billion won. It changed last month.' Last month was the month Yoon Sanghyuk’s appointment as CEO was settled. Chae Ian laughs. 'I’ve served three CEOs, and this is the first time a field has vanished. Keep laughing and only my name is left.'",
       "memo": [
         "CEO approval field: 'Not applicable' preprinted",
         "Rule amended: in the month Yoon Sanghyuk’s appointment was settled"
@@ -296,7 +296,7 @@ export default {
     },
     "c26_elevator_reaction": {
       "title": "The Desk Facing the Wall",
-      "text": "At nine at night, Han Seoyun, on standby assignment, picks up your call. For 3 weeks now she has reported to a room at the end of the 7th-floor hallway at headquarters. A desk set facing the wall, no computer, a stack of A4 paper and one ballpoint pen. 'He said that in the elevator? That you went to the basement because you were right?' She laughs, then stops. 'I’m the one who pressed the return button on your dissent 3 years ago. That was an author field too. The person who decided had no field.' Pages turn. 'I have nothing to do, so these days I’m reading the rulebook from the start. That rule letting the CEO skip signing—its supplementary provisions are strange. I’ll send them tomorrow.'",
+      "text": "Han Seoyun, on standby assignment, has reported for 3 weeks to a room without even a computer. She picks up your call. 'He said that in the elevator? That you went to the basement because you were right? I’m the one who pressed the return button on your dissent 3 years ago. That was an author field too. The person who decided had no field. These days I’m reading the rulebook from the start. That rule letting the CEO skip signing—its supplementary provisions are strange. I’ll send them tomorrow.'",
       "memo": [
         "Han Seoyun: standby assignment for 3 weeks, a desk facing the wall",
         "The supplementary provisions of the CEO signature-exemption rule"
@@ -318,7 +318,7 @@ export default {
     },
     "c26_branch_frame": {
       "title": "The Floors Open to the Sky",
-      "text": "Leafing through the subcontracts, one date catches you. The end-of-January report the contractor submitted to its lenders puts the progress rate at 72%. From atop the crane, Ji Kanghyun guides you by phone. 'Go up to the 14th floor. No stair railings, so keep to the wall.' In a hard hat, you climb the frame’s stairs. From the 10th floor up, only columns stand; the floors are empty. Chalk writing remains on a wall. '1/9 Formwork pulled out -- no money coming.' Over the phone, Ji Kanghyun says, '72%? Stand there and you can tell. Guess they counted everything up to the floors open to the sky as built.'",
+      "text": "The contractor’s end-of-January report puts the progress rate at 72%. Ji Kanghyun guides you by phone. 'Go up to the 14th floor. No stair railings, so keep to the wall.' From the 10th floor up, only columns stand; the floors are empty. There is chalk writing on a wall. '1/9 Formwork pulled out -- no money coming.' Ji Kanghyun says, '72%? Stand there and you can tell. Guess they counted everything up to the floors open to the sky as built.'",
       "memo": [
         "Reported progress 72% -- estimated on site 58%",
         "No floor slabs above the 10th floor",
@@ -342,7 +342,7 @@ export default {
     },
     "c26_branch_frame_follow": {
       "title": "A Field with Only a Seal",
-      "text": "When you open the door of the site office container, someone is already there. Bridge Bank’s Kwon Dohyun is aiming a laser measure out the window at the frame. Bridge Bank, too, lent 18 billion won to this project. He holds out a printout of the progress report he pulled from the site’s shared folder. In the verification box beside the figure 72% is the electronic seal of KD Capital’s Real Estate Finance Team, and the verifier’s name field is empty. Kwon Dohyun taps at his calculator. 'The money paid out on a progress rate inflated by 14% comes to 8.7 billion won. Six times the workers’ three months of wages.' He draws a vertical line on a blank sheet. 'Who fills in this field?'",
+      "text": "Kwon Dohyun is already in the container, aiming a laser measure at the frame. On the progress report he holds out, the verification box beside 72% bears the electronic seal of KD Capital’s Real Estate Finance Team, and the verifier’s name field is empty. Kwon Dohyun taps at his calculator. 'The money paid out on a progress rate inflated by 14% comes to 8.7 billion won. Six times the workers’ three months of wages.' He draws a vertical line on a blank sheet. 'Who fills in this field?'",
       "memo": [
         "Bridge Bank 18 billion won -- Kwon Dohyun checks the site",
         "Progress report 72% verification box: KD Capital electronic seal, no name",
@@ -366,7 +366,7 @@ export default {
     },
     "c26_route_system": {
       "title": "A Decision That Moves the Date",
-      "text": "Before taking the loss, you first lay out how the extended loans ended. The group’s review engine, NOAH, an AI program that judges loan applications automatically, handles the calculation. Line by line, it opens the 41 real-estate loans whose maturity KD Capital extended over the past 7 years. 9 were repaid in full after extension; the other 32 ended 1 to 2 years later in bigger losses. In every year of extension, the responsible executive’s performance review read 'no loss.' NOAH adds one line. 'Extension is learned not as a decision that removes a loss, but as a decision that moves the loss’s date. The person sitting in that seat on the moved date is usually someone else.'",
+      "text": "The review engine, NOAH, an AI program that judges loan applications automatically, opens the 41 real-estate loans whose maturity KD Capital extended over the past 7 years. 9 were repaid in full; the other 32 ended 1 to 2 years later in bigger losses. In every year of extension, the responsible executive’s performance review read 'no loss.' 'Extension is learned not as a decision that removes a loss, but as a decision that moves the loss’s date. The person sitting in that seat on the moved date is usually someone else.'",
       "memo": [
         "41 KD Capital real-estate loans with extended maturity",
         "9 repaid in full -- 32 bigger losses",
@@ -392,7 +392,7 @@ export default {
     },
     "c26_final_system_route": {
       "title": "The One Who Takes the Date",
-      "text": "At dawn on committee day, NOAH leaves a table up on the 12th-floor review terminal. It lists, side by side, the executive in charge in the year of extension and the person in charge in the year the loss broke. Of the 32 rows, the ones where the 2 fields hold the same name can be counted on one hand. On the blank bottom row, Reheim Godeok is written in pencil, and the name for the extension column is already printed on the opinion. 'I cannot calculate who will be sitting there on the moved date. This table has no field for the one person on the crane.'",
+      "text": "NOAH leaves a table up. It sets the executive in charge in the year of extension beside the person in charge in the year the loss broke, and of its 32 rows, the ones where the two names match can be counted on one hand. The blank bottom row is Reheim Godeok, written in pencil, and the name for the extension column is already printed on the opinion. 'I cannot calculate who will be sitting there on the moved date. This table has no field for the one person on the crane.'",
       "memo": [
         "41 maturity extensions -- 32 bigger losses",
         "Reheim Godeok maturity: April 27",
@@ -415,7 +415,7 @@ export default {
     },
     "c26_evidence_turn": {
       "title": "One Line in the Project Cost Statement",
-      "text": "Ban Jaewook, who squeezed a day in Pyeongtaek into Internal Audit’s regional circuit, comes to KD Capital’s records room at 6 a.m. When you spread the clue out on his travel bag, the Reheim Godeok project cost statement opens. Among land, construction and design costs sits 'project advisory fee: 3.2 billion won'—money sent out as the price of advice. The recipient: a new company at the same address as Haeon Partners. The address of the very company that collected advisory fees every quarter during the 2023-0412 loan, and closed its doors last year. The payment date is two months before construction stopped, and on the same day the progress report went up to 72%. Ban Jaewook opens his notebook. 'They couldn’t pay the workers 1.4 billion won in wages, but they paid 3.2 billion won for advice. To the same address as the company 3 years ago.'",
+      "text": "At dawn in the records room, you and Ban Jaewook open the Reheim Godeok project cost statement. Between land and construction costs sits 'project advisory fee: 3.2 billion won'—money sent out as the price of advice. The recipient: a new company at the same address as Haeon Partners. The address of the very company that collected advisory fees every quarter during the 2023-0412 loan, and closed its doors last year. The payment date is two months before construction stopped, and on the same day the progress report went up to 72%. Ban Jaewook opens his notebook. 'They couldn’t pay the workers 1.4 billion won in wages, but they paid 3.2 billion won for advice. To the same address as the company 3 years ago.'",
       "memo": [
         "Project cost statement: project advisory fee 3.2 billion won -- a new company at Haeon Partners’ address",
         "Payment date: two months before construction stopped",
@@ -438,7 +438,7 @@ export default {
     },
     "c26_start_warm": {
       "title": "First Item for One Who Walked to the End",
-      "text": "That night the six of you walked to the end of the cherry-blossom path together, you let the weekend pass without reading Chae Ian’s email. Only on Monday morning, in the elevator up to the 20th floor, do you open it. In the attached photo, a cloth is tied to a tower crane mast. 'Three months’ wages, 1.4 billion won, 87 workers.' At 8 sharp, Yoon Sanghyuk holds out a file. Real-estate project financing (PF) for a Pyeongtaek officetel—a loan made before a building goes up, on the strength of expected sales money—62 billion won, maturity April 27. 'We’ll go with a 1-year extension. You write the opinion.' On the opinion form you are handed, your name is already printed in the author field. When you post the photo in the group chat, Do Yoonha is first to reply. 'While we were looking at cherry blossoms, that man was up there all weekend.'",
+      "text": "That night the six of you walked to the end of the cherry-blossom path together, you let the weekend pass without reading Chae Ian’s email. The attached photo is of a cloth tied to a crane mast: 'Three months’ wages, 1.4 billion won, 87 workers.' Yoon Sanghyuk holds out a file. Real-estate project financing (PF) for a Pyeongtaek officetel—a loan made before a building goes up, on the strength of expected sales money—62 billion won, maturity April 27. 'We’ll go with a 1-year extension. You write the opinion.' When you post the photo in the group chat, Do Yoonha is first to reply. 'While we were looking at cherry blossoms, that man was up there all weekend.'",
       "memo": [
         "Reheim Godeok PF 62 billion won -- maturity April 27",
         "Chae Ian’s email: unread over the weekend",
@@ -468,7 +468,7 @@ export default {
     },
     "c26_start_record": {
       "title": "First Item for One Who Drew the Map",
-      "text": "When you bound what the six of you saw from six scattered posts in your first week into one document, Pyeongtaek sat in the middle of the map. Two buyers of a Pyeongtaek officetel came to Do Yoonha’s window at Gangseo Branch to ask about their loan interest; Oh Jinwoo’s Bridge Bank had put money into the same site; and at Lee Minseo’s KD Data Lab, the credit scores of that site’s workers had dropped all at once. Monday at 8, on the 20th floor, Yoon Sanghyuk holds out that very file. Real-estate project financing (PF)—a loan made before a building goes up, on the strength of expected sales money—62 billion won, maturity April 27. 'A 1-year extension. The opinion goes in your name.' On the form, that name is already printed in the author field. Lee Minseo sends a message. 'The middle of the map turned into your desk.'",
+      "text": "When you put what the six of you saw in the first week onto one map, Pyeongtaek sat in the middle. Two buyers of that officetel came to Do Yoonha’s window; Oh Jinwoo’s Bridge Bank had put money into the same site; and at Lee Minseo’s KD Data Lab, the credit scores of that site’s workers had dropped all at once. Yoon Sanghyuk holds out that very file. Real-estate project financing (PF)—a loan made before a building goes up, on the strength of expected sales money—62 billion won, maturity April 27. 'A 1-year extension. The opinion goes in your name.' Lee Minseo sends a message. 'The middle of the map turned into your desk.'",
       "memo": [
         "The middle of the six-post map: Pyeongtaek",
         "Reheim Godeok PF 62 billion won -- maturity April 27",
@@ -498,7 +498,7 @@ export default {
     },
     "c26_start_rush": {
       "title": "First Item for One Who Ran Ahead",
-      "text": "The Friday night you opened the email, you drove straight there and reached the Pyeongtaek site at two in the morning. The light in the tower crane cab saw your headlights first, and from 40 meters up a flashlight blinked three times. You stayed in your car outside the fence until daybreak. Monday at 8, on the 20th floor, Yoon Sanghyuk holds out a file. Real-estate project financing (PF) for a Pyeongtaek officetel—a loan made before a building goes up, on the strength of expected sales money—62 billion won, maturity April 27. 'I hear you went to the site over the weekend. Diligent. Write the opinion for a 1-year extension.' On the opinion form, your name is already printed in the author field. Ban Jaewook, in Gunsan, asks over the phone, 'Who was there at that hour? How does the CEO know about it?'",
+      "text": "The Friday night you opened the email, you drove straight there and reached the Pyeongtaek site at two in the morning. From the crane cab 40 meters up, a flashlight blinked three times. Yoon Sanghyuk holds out a file. Real-estate project financing (PF) for a Pyeongtaek officetel—a loan made before a building goes up, on the strength of expected sales money—62 billion won, maturity April 27. 'I hear you went to the site over the weekend. Diligent. Write the opinion for a 1-year extension.' Ban Jaewook, in Gunsan, asks over the phone, 'Who was there at that hour? How does the CEO know about it?'",
       "memo": [
         "Saturday 02:00, arrived at the Pyeongtaek site -- crane flashlight signal, 3 times",
         "Reheim Godeok PF 62 billion won -- maturity April 27",
