@@ -30,14 +30,15 @@ const relicsCopy = {
     nextFeat: " · 다음 해금: {feat}",
     allOpen: " · 모두 해금",
     back: "다른 도구 보기",
-    skip: "고르지 않고 진행",
+    // C-7's pass (relics.js `BREATHER`): what it gives, in the button.
+    skip: "고르지 않고 {name} · {short}",
   },
   // By the tool's id: its name, what it does, what it says when it fires, the
   // line on the rule it softens, and the feat that unlocks it.
   relics: {
     metronome: {
       name: "메트로놈",
-      text: "열기가 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.",
+      text: "열기가 오른 다음 장면까지, 방향을 바꿔도 전환으로 인정된다.",
       proc: "전환을 붙잡았다",
     },
     coldBlood: {
@@ -52,17 +53,32 @@ const relicsCopy = {
       proc: "열 빚을 절반으로 줄였다",
       softens: "방열판: 열기 {share}분의 1, {seconds}초",
     },
-    lockpick: {
-      name: "락픽",
-      text: "COLD FEET로 봉인된 카드가 열기 {seal}{particle} 아니라 {pick}에서 열린다.",
-      proc: "봉인을 일찍 땄다",
-      softens: "락픽: 열기 {pick}에서 열림",
+    auditContact: {
+      name: "감사실 연줄",
+      text: "감사팀 반재욱이 한 칸은 눈감아 준다. 감사는 {limit}칸이 차야 적발된다.",
+      proc: "반재욱이 한 칸을 눈감았다",
     },
-    splint: {
-      name: "부목",
-      text: "FRACTURE로 금 간 자원의 청구가 {rate}배가 아니라 {splint}배다.",
-      proc: "균열을 받쳤다",
-      softens: "부목: {splint}배 청구",
+    carbonCopy: {
+      name: "임경수의 사본",
+      text: "임경수가 태우지 않은 사본이 있다. BLACKOUT이 벽을 {shift}{particle} 아니라 {pull}만 당긴다.",
+      proc: "사본이 벽을 붙잡았다",
+      softens: "사본: 벽 {pull}만 당김",
+    },
+    testimony: {
+      name: "오진우의 진술",
+      text: "결정 제한시간은 설정값이었다. 시간이 다 돼 BUST해도 판돈의 {share}분의 1은 남는다.",
+      proc: "시간이 다 돼도 판돈 {share}분의 1을 지켰다",
+    },
+    frontPage: {
+      name: "차지원의 1면",
+      text: "특종이 이어져도 손이 떨리지 않는다. OVERCLOCK 판에서 밀 때 늘어나는 열기가 절반이다.",
+      proc: "1면 마감 앞에서도 손이 고요했다",
+      softens: "1면: 밀기 폭 절반만 커짐",
+    },
+    fieldNote: {
+      name: "도윤하의 현장 메모",
+      text: "현장에선 두 번이면 흐름이 선다. 같은 유형 {hold}번째부터 논리 콤보가 오른다.",
+      proc: "현장 메모로 콤보를 일찍 세웠다",
     },
     encore: {
       name: "앙코르",
@@ -75,12 +91,6 @@ const relicsCopy = {
       text: "사건마다 한 번, 벽에 닿아도 판돈의 {share}분의 1은 남는다.",
       proc: "판돈 {share}분의 1을 지켰다",
       unlock: "판돈 {loss} 이상을 벽에 잃기",
-    },
-    highRoller: {
-      name: "하이롤러",
-      text: "모든 카드의 칩이 {chips}배. 대신 벽 구간 전체가 {wall} 가까워진다.",
-      proc: "더 큰 칩을 걸었다",
-      unlock: "×{multiplier} 이상으로 확정하기",
     },
     stethoscope: {
       name: "청진기",
@@ -96,20 +106,12 @@ const relicsCopy = {
       softens: "악력: 밀 때 오르는 열기 그대로",
       unlock: "STRIKE 숙련 {count}회",
     },
-    steadyAnchor: {
-      name: "닻",
-      text: "STEADY MASTERY가 켜진 판은 열기 {cool}{particle} 더 식힌 채 시작하고, 시간이 {seconds}초 더 주어진다.",
-      proc: "STEADY 숙련에 닻을 내렸다",
-      softens: "닻: 열기 {cool} 더 식음, {seconds}초 추가",
-      unlock: "STEADY 숙련 {count}회",
-    },
-    glassLens: {
-      name: "돋보기",
-      text: "EXPOSE MASTERY가 켜진 판은 카드가 뒤집히지 않고 가장 비싼 카드도 봉인되지 않으며, 봉인은 열기 {seal}에서 열린다.",
-      proc: "EXPOSE 숙련으로 판을 꿰뚫었다",
-      softens: "돋보기: 가림과 봉인 해제",
-      unlock: "EXPOSE 숙련 {count}회",
-    },
+  },
+  // 「숨 고르기」 (C-7): what passing on a draft gives (relics.js `BREATHER`).
+  breather: {
+    name: "숨 고르기",
+    short: "+{seconds}초",
+    text: "고르지 않으면 이 사건 첫 판의 시간이 {seconds}초 늘고, 벽이 {wall} 멀어진다.",
   },
 };
 export default relicsCopy;

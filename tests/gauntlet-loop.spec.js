@@ -4,8 +4,8 @@ import { CASE_RESULT_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
-import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { easyCognitionLabels } from "../src/playerLanguage.js";
+import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
+import { getDirectionName } from "../src/gauntlet/tableReadout.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -47,28 +47,29 @@ async function pushUntilBust(page) {
 }
 
 /**
- * Four scenes of 사건 01 in a row, read off the graph: one type of card is on
- * the table in each of the first three (the card to hold the type with), and
- * in the fourth it is there beside a card of another type. The cards are
- * found by their words, not their place: the hand is dealt shuffled.
+ * Four scenes of 사건 01 in a row, read off the graph: a card leaning one way
+ * (사람 or 자리, C-3) is on the table in each of the first three (the card to
+ * hold the direction with), and in the fourth it is there beside a card
+ * leaning the other way. The cards are found by their words, not their place:
+ * the hand is dealt shuffled.
  */
 function findStreakWalk(caseId = "case01") {
   const results = new Set(Object.values(CASE_RESULT_NODES));
   const playable = (node) => (node?.choices ?? []).filter((choice) => choice.type !== "reframe" && !choice.requiredAuthority);
   for (const startId of nodeOrders[caseId]) {
-    for (const type of Object.keys(easyCognitionLabels)) {
+    for (const type of LOGIC_DIRECTIONS) {
       const held = [];
       let nodeId = startId;
       while (held.length < 3) {
-        const card = playable(nodes[nodeId]).find((choice) => getLogicType(choice) === type && !results.has(choice.next) && nodes[choice.next]?.caseId === caseId);
+        const card = playable(nodes[nodeId]).find((choice) => getLogicDirection(choice) === type && !results.has(choice.next) && nodes[choice.next]?.caseId === caseId);
         if (!card) break;
         held.push({ nodeId, label: card.label });
         nodeId = card.next;
       }
       const last = playable(nodes[nodeId]);
-      const same = last.find((choice) => getLogicType(choice) === type);
-      const other = last.find((choice) => getLogicType(choice) !== type);
-      if (held.length === 3 && same && other) return { caseId, type, held, last: { nodeId, same: same.label, other: other.label, otherType: getLogicType(other) } };
+      const same = last.find((choice) => getLogicDirection(choice) === type);
+      const other = last.find((choice) => LOGIC_DIRECTIONS.includes(getLogicDirection(choice)) && getLogicDirection(choice) !== type);
+      if (held.length === 3 && same && other) return { caseId, type, held, last: { nodeId, same: same.label, other: other.label, otherType: getLogicDirection(other) } };
     }
   }
   return null;
@@ -82,7 +83,8 @@ async function cashForStreak(page) {
   await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  // 사건 01 has no rule left to introduce, so the ledger is behind 자세히.
+  // A case with no rule left to introduce keeps the ledger behind 자세히; 사건 01 opens OVERCLOCK
+  // since C-4 and shows it open (`openRevealDetails` asks either way).
   await openRevealDetails(page);
   return page.getByTestId("consequence-ledger").locator("article", { hasText: "논리 콤보" }).locator("b");
 }
@@ -94,22 +96,23 @@ async function nextScene(page, nodeId) {
   await expect(page.getByTestId("commit-push")).toBeEnabled({ timeout: TRANSITION_TIMEOUT_MS });
 }
 
-test("three cards of one type in a row grow the logic streak and the pot shows what it pays; another type with no rise in pressure ends it; LOCK costs clock", async ({ page }) => {
+test("three cards of one direction in a row grow the logic streak and the pot shows what it pays; the other direction with no rise in pressure ends it; LOCK costs clock", async ({ page }) => {
   test.setTimeout(180_000);
   const walk = findStreakWalk();
-  expect(walk, "사건 01 still has four scenes in a row that deal one type").not.toBeNull();
-  const typeName = easyCognitionLabels[walk.type];
+  expect(walk, "사건 01 still has four scenes in a row that deal one direction").not.toBeNull();
+  // "사람 쪽" or "자리 쪽": the tag prints the word, and " 쪽" for a reader and a wider card.
+  const typeName = `${getDirectionName(walk.type)} 쪽`;
   const line = page.getByTestId("gauntlet-logic");
   const bonus = page.getByTestId("gauntlet-logic-bonus");
   await openTable(page, walk.caseId, walk.held[0].nodeId);
 
-  // Before a card is staked: nothing held, nothing paid, and every card says its type.
+  // Before a card is staked: nothing held, nothing paid, and every card says its direction.
   await expect(line).toHaveAttribute("data-streak", "0");
   await expect(line).toContainText("콤보 0");
   await expect(bonus).toHaveCount(0);
   const cards = page.locator(".choices .choice");
   await expect(cards.getByTestId("card-type")).toHaveCount(await cards.count());
-  await expect(cardOf(page, walk.held[0].label)).toHaveAccessibleName(new RegExp(`유형 ${typeName}`));
+  await expect(cardOf(page, walk.held[0].label)).toHaveAccessibleName(new RegExp(`방향 ${typeName}`));
 
   // The first two build the hold: 1/3, 2/3. The pot is not paid for them yet.
   for (const [index, scene] of walk.held.slice(0, 2).entries()) {
@@ -126,7 +129,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   const third = cardOf(page, walk.held[2].label);
   await expect(third.getByTestId("card-type")).toHaveAttribute("data-move", "grow");
   await expect(third.getByTestId("card-type")).toHaveClass(/is-on/);
-  await expect(third).toHaveAccessibleName(new RegExp(`유형 ${typeName} ?\\(콤보 이어 감\\)`));
+  await expect(third).toHaveAccessibleName(new RegExp(`방향 ${typeName} ?\\(콤보 이어 감\\)`));
   await third.click();
   await expect(line).toHaveAttribute("data-streak", "1");
   await expect(line).toContainText("3/3");
@@ -134,7 +137,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   await expect(bonus).toHaveText("콤보 1.06");
   await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(new RegExp(`논리 콤보 1, 배율 1\\.06배\\. ${typeName} 3/3\\. 이 카드로 이어 감`));
   await expect(page.getByTestId("commit-confirm")).toHaveAccessibleDescription(/논리 콤보 1, 배율 1\.06배/);
-  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}[을를] 이어 갔다\\. 논리 콤보 1, 배율 ×1\\.06\\.$`));
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}을 이어 갔다\\. 논리 콤보 1, 배율 ×1\\.06\\.$`));
   await expect(page.locator(".gx-reveal-gain")).toContainText("× 콤보 1.06");
   let saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.logic).toMatchObject({ streak: 1, best: 1, type: walk.type, held: 3 });
@@ -144,7 +147,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   expect([saved.log.at(-1).tempoBonus, saved.log.at(-1).threshold.tempo], "neither line an older build wrote is written").toEqual([undefined, undefined]);
   await nextScene(page, walk.last.nodeId);
 
-  // The fourth scene: the held type would grow it again, another type ends it -- the last three closed cold, so nothing rose.
+  // The fourth scene: the held direction would grow it again, the other ends it -- the last three closed cold, so nothing rose.
   await expect(line).toHaveAttribute("data-streak", "1");
   await expect(line).not.toContainText("전환 가능");
   await expect(bonus).toHaveText("콤보 1.06");
@@ -167,7 +170,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   expect(await clockOf(page)).toBeLessThanOrEqual(before - 3);
   await expect(page.locator(".gx-grade, .gx-beat-ring")).toHaveCount(0);
 
-  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^열기가 오르지 않았는데 ${easyCognitionLabels[walk.last.otherType]}(으)?로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^열기가 오르지 않았는데 ${getDirectionName(walk.last.otherType)} 쪽으로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
   saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.logic).toMatchObject({ streak: 0, best: 1, type: walk.last.otherType, held: 1 });
   expect(saved.log.at(-1).threshold.logic).toMatchObject({ move: "break", streak: 0, bonus: 1, pot: 0 });
@@ -209,6 +212,31 @@ test("the briefing's open button and the draft's pass button take a pointer", as
   await pressAt(page, page.getByTestId("relic-skip"));
   await expect(page.getByTestId("relic-draft")).toHaveCount(0);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics).toEqual([]);
+});
+
+// C-7: passing on a draft that offered something is 「숨 고르기」, and the board says so.
+test("passing on the draft is 「숨 고르기」: the case's first board has 10 seconds more and a further wall", async ({ page }) => {
+  await closeCaseOneIntoDraft(page);
+  const before = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.schema;
+  await expect(page.getByTestId("relic-skip")).toContainText("숨 고르기 · +10초");
+  await page.getByTestId("relic-skip").click();
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("숨 고른 판");
+  const after = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.schema;
+  expect([after.seconds, after.wallMin, after.wallMax]).toEqual([before.seconds + 10, before.wallMin + 3, before.wallMax + 3]);
+  expect(after.mutations).toContain("breather");
+});
+
+// C-10: an act's last case deals 「고점 판」, said on its first page and on every board of it.
+test("an act's last case is 「고점 판」: the briefing says it and the board is marked", async ({ page }) => {
+  await startDebugNode(page, "case07", "c7_start", { openTable: false });
+  await expect(page.getByTestId("unlock-intro")).toContainText("PEAK TABLE · 고점 판");
+  await expect(page.getByTestId("unlock-intro")).toContainText("벽이 5 가까워지고 칩이 1.25배");
+  await page.getByTestId("open-table").click();
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("고점 판");
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveAttribute("data-mark", "peak");
+  await startDebugNode(page, "case06", "c6_start");
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
 });
 
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {

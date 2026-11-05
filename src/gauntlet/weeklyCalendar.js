@@ -15,14 +15,15 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * it has one. 초안: the first week is a placeholder for the choice in the
  * report.
  *
- * 2026-W47 (11-16 to 11-22) is B3's and B2's test week, both devices
+ * 2026-W47 (11-16 to 11-22) was B3's and B2's test week, both devices
  * together. It was W44 (user, 2026-10-21, told five days ahead); on
  * 2026-10-22 the user moved it three weeks on, so the improvements waiting in
- * drafts are live first and the test is played on top of them. W44 is an
- * ordinary week again. Moved, it keeps the ordinary notice: the start screen
- * says it from W46 (11-09), beside W46's own rule (WeeklyRuleViews.jsx).
- * Listed after W46 so the first entry, which the tests and the e2e play as
- * "the event", stays W46.
+ * drafts were live first and the test was played on top of them. W44 is an
+ * ordinary week again. Moved, it kept the ordinary notice: the start screen
+ * said it from W46 (11-09), beside W46's own rule (WeeklyRuleViews.jsx).
+ * Since RULES_MARK 3 the two devices are rules of the table and W47 is a week
+ * gone by, kept as the server's weekly_rules keeps it. Listed after W46 so the
+ * first entry, which the tests and the e2e play as "the event", stays W46.
  *
  * 2026-W48 to 2027-W03 (E-9 (a), 사용자 확인 후보): booked in one merge after
  * the test week, one week in two an event week (W48, W50, W52, 2027-W01,
@@ -44,8 +45,8 @@ const MERGED_WEEKS = Object.freeze([
  * A development build's switch, so a rule can be played before any week has
  * it (B3's audit and B2's links were judged by simulation and the maker's
  * own plays before their test week). On the dev server, or a build that asked
- * for the debug tools, `?week=audit` or `?week=cascade` makes that catalogue
- * entry this week's rule: the start screen has its line and its box, and a
+ * for the debug tools, `?week=near-wall` (any catalogue id) makes that
+ * catalogue entry this week's rule: the start screen has its line and its box, and a
  * season started then carries the stamp in its save, so a reload without the
  * query plays on under it. Any id of the catalogue works; one that is not
  * there is no rule (getWeekRule). The week is the device's: a build whose
