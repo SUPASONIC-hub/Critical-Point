@@ -111,23 +111,39 @@
      ground: square acid dossiers on the intro, felt on the table, white cards on
      the result. These are the one set of surfaces, lines, radii and motion the
      three screens now draw from, so a panel looks like the same object wherever
-     it sits. Surfaces step up in lightness; text steps down in emphasis and every
-     step clears 4.5:1 on --ui-surface-2. */
-  --ui-bg: rgb(6 9 10);
-  --ui-bg-raised: rgb(10 14 15);
-  --ui-surface-1: rgb(14 19 20);
-  --ui-surface-2: rgb(20 26 27);
-  --ui-surface-3: rgb(29 37 38);
-  --ui-surface-4: rgb(40 50 51);
-  --ui-glass: rgb(16 22 23 / 0.72);
-  --ui-glass-strong: rgb(12 17 18 / 0.88);
+     it sits. Surfaces step up in lightness; text steps down in emphasis.
+
+     The ground follows the scene's mood (design-mood, 2026-11-05): these are
+     the `neutral` values -- the start screen, the result and any scene with no
+     mood -- one step lighter than the night shift the app opened with, a mid
+     blue-grey, with the raised ground, the four surfaces and the two glasses
+     moved by the same step (+12 +13 +14). `:root[data-mood]` below swaps only
+     these grounds, the glasses and at most two accent fills; no text colour
+     moves with the mood, so the ratios are the grounds' to keep. In every mood
+     --ui-text and --ui-text-2 clear 4.5:1 on every surface (lowest 9.96 and
+     6.49, both on neutral --ui-surface-4) and --ui-text-3 clears it up to
+     --ui-surface-3 (lowest 4.68 neutral, 4.76 bright, 5.09 sorrow, 5.57
+     tense, 6.32 dread); --ui-surface-4 carries --ui-text and --ui-text-2 only
+     (the start button, the result's chips and route-atlas meta), where
+     --ui-text-3 would read 3.88 on the neutral one. The acid, chip, amber and
+     sky inks stay above 5.6:1 everywhere; --ui-heat, used large, above 3.5. */
+  --ui-bg: rgb(18 22 24);
+  --ui-bg-raised: rgb(22 27 29);
+  --ui-surface-1: rgb(26 32 34);
+  --ui-surface-2: rgb(32 39 41);
+  --ui-surface-3: rgb(41 50 52);
+  --ui-surface-4: rgb(52 63 65);
+  --ui-glass: rgb(28 35 37 / 0.72);
+  --ui-glass-strong: rgb(24 30 32 / 0.88);
   --ui-line: rgb(255 255 255 / 0.08);
   --ui-line-strong: rgb(255 255 255 / 0.16);
   /* The edge of a form control. A field's fill is one surface step from the
      panel it sits on, so the border is the only thing that says where the
-     field is, and WCAG 1.4.11 asks 3:1 of that. At 0.4 it is 3.06:1 against
-     the lightest ground a field meets (--ui-surface-3) and 3.8:1 against the
-     darkest (--ui-bg-raised); --ui-line-strong is 1.25 to 1.8. */
+     field is, and WCAG 1.4.11 asks 3:1 of that. White at 0.4 reads 3.46:1
+     against the lightest ground a field meets (--ui-surface-3) and 3.81:1
+     against the darkest (--ui-bg-raised) in neutral; across the moods 3.46 to
+     3.83 (the lowest is neutral's surface-3, the next bright's 3.49).
+     --ui-line-strong is 1.5 to 1.7 and is not a control's edge. */
   --ui-line-field: rgb(255 255 255 / 0.4);
   --ui-line-accent: rgb(217 255 98 / 0.34);
   --ui-text: rgb(242 246 243);
@@ -151,6 +167,8 @@
   --ui-shadow-glow: 0 0 0 1px rgb(217 255 98 / 0.5), 0 12px 40px rgb(217 255 98 / 0.22);
   --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ui-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* The fast settle the table's heat bar and the cashed stake land with. */
+  --ui-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ui-dur-fast: 140ms;
   --ui-dur: 240ms;
   --ui-page-max: 1240px;
@@ -158,6 +176,77 @@
   /* The rem the HUD's big numbers and the decorative numerals are sized in:
      1rem everywhere except the PC block below, which takes the 1/8 back. */
   --hud-rem: 1rem;
+}
+
+/* The scene's mood on the ground (design-mood, 2026-11-05). GauntletStage puts
+   the current scene's mood on <html> as data-mood; the start screen and the
+   result carry none and are neutral. Each block moves the grounds and the two
+   glasses as one set and at most two accent fills; text, lines and radii are
+   the same in every mood, which is what keeps the ratios above true. The
+   contrast spec (tests/contrast.spec.js) reads each screen once per mood. The
+   generated critical CSS carries the neutral values only: these selectors
+   match nothing on the first screen, so build:critical never cuts them.
+
+   tense: the night shift the app opened with, exactly -- the judged and the
+   pressed scenes keep the dark they were drawn in. */
+:root[data-mood="tense"] {
+  --ui-bg: rgb(6 9 10);
+  --ui-bg-raised: rgb(10 14 15);
+  --ui-surface-1: rgb(14 19 20);
+  --ui-surface-2: rgb(20 26 27);
+  --ui-surface-3: rgb(29 37 38);
+  --ui-surface-4: rgb(40 50 51);
+  --ui-glass: rgb(16 22 23 / 0.72);
+  --ui-glass-strong: rgb(12 17 18 / 0.88);
+}
+
+/* dread: deeper than tense, with a red cast (the red channel leads by 4);
+   the accent glow turns to heat and the heat fill comes up. Lowest text ratio
+   6.32:1 (--ui-text-3 on --ui-surface-3). */
+:root[data-mood="dread"] {
+  --ui-bg: rgb(8 4 6);
+  --ui-bg-raised: rgb(12 7 9);
+  --ui-surface-1: rgb(16 10 12);
+  --ui-surface-2: rgb(22 15 17);
+  --ui-surface-3: rgb(31 22 24);
+  --ui-surface-4: rgb(42 31 33);
+  --ui-glass: rgb(18 12 14 / 0.72);
+  --ui-glass-strong: rgb(14 8 10 / 0.88);
+  --ui-accent-glow: rgb(255 92 72 / 0.32);
+  --ui-heat-soft: rgb(255 92 72 / 0.22);
+}
+
+/* bright: warm and a shade lighter than neutral (red leads blue by 8, the
+   lightest ground of the five); the accent fill and glow turn amber. Lowest
+   text ratio 4.76:1 (--ui-text-3 on --ui-surface-3). */
+:root[data-mood="bright"] {
+  --ui-bg: rgb(27 24 19);
+  --ui-bg-raised: rgb(31 28 23);
+  --ui-surface-1: rgb(35 32 27);
+  --ui-surface-2: rgb(41 38 33);
+  --ui-surface-3: rgb(50 47 41);
+  --ui-surface-4: rgb(61 58 51);
+  --ui-glass: rgb(37 34 29 / 0.72);
+  --ui-glass-strong: rgb(33 30 25 / 0.88);
+  --ui-accent-soft: rgb(255 206 115 / 0.12);
+  --ui-accent-glow: rgb(255 206 115 / 0.32);
+}
+
+/* sorrow: cool and low in saturation, between neutral and tense in depth
+   (blue leads red by 8, the green channel stays between them); the accent
+   fill and glow turn sky. Lowest text ratio 5.09:1 (--ui-text-3 on
+   --ui-surface-3). */
+:root[data-mood="sorrow"] {
+  --ui-bg: rgb(15 18 23);
+  --ui-bg-raised: rgb(19 22 27);
+  --ui-surface-1: rgb(23 27 32);
+  --ui-surface-2: rgb(29 33 39);
+  --ui-surface-3: rgb(38 43 49);
+  --ui-surface-4: rgb(49 55 62);
+  --ui-glass: rgb(25 29 35 / 0.72);
+  --ui-glass-strong: rgb(21 24 30 / 0.88);
+  --ui-accent-soft: rgb(123 211 255 / 0.1);
+  --ui-accent-glow: rgb(123 211 255 / 0.28);
 }
 
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from

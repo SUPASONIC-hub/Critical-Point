@@ -88,6 +88,7 @@ const budgets = [
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,418 / 54,917 on 2026-11-05, mood-wire over mood-tags 98d32622: the page's mood (src/mood.js: MOODS, applyMood on <html data-mood>, onMoodChange) and the hook that follows the shown scene (src/state/sceneMood.js, called from useResultReport). Measured 148,414 / 54,913 in the e2e build, the plus 4.
+  // 148,023 / 54,709 -> 148,023 / 54,714 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again; this chunk only by the stylesheet's name it imports. Measured 148,019 / 54,710 in the e2e build, the plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_418, maxGzip: 54_917 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -330,6 +331,7 @@ const budgets = [
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
   // 69,094 -> 69,106 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 191,472; the hashed names of the chunks it imports (GameRuntime, the case files) changed. Measured 191,472 / 69,102 in the e2e build, the gzip plus 4.
+  // 191,476 / 69,094 -> 191,476 / 69,104 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again; the entry only by the stylesheet's name it imports. Measured 191,472 / 69,100 in the e2e build, the plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_173 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -654,7 +656,8 @@ const budgets = [
   // which wraps one address under the other on a phone. Measured 200,787 / 37,577 in the e2e build, the plus 4.
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
   // -> 203,562 / 38,132 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 203,558 / 38,128 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_562, maxGzip: 38_132 },
+  // 203,562 / 38,132 -> 204,569 / 38,438 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again. Measured 204,565 / 38,434 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 204_569, maxGzip: 38_438 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1341,6 +1344,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,342 / 486,086 / 493,279 on 2026-11-05, mood-wire over mood-tags 98d32622: no first-paint code changed; the entry's and the worker's gzip moved with the hashed names of the chunks they name (the moods written on the case files). Measured 429,338 / 486,082 / 493,275 in the e2e build, the plus 4.
+// 429,328 / 486,074 / 493,267 -> 429,663 / 486,406 / 493,600 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again (the index CSS and index.html's critical CSS). Measured 429,659 / 486,402 / 493,596 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 430_386, en: 487_129, ja: 494_322 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
