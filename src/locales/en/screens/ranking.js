@@ -24,5 +24,7 @@ export default {
   tableTime: "Table Time ×{value}",
   story: "Story Mode",
   collapsed: "Collapsed season",
+  pendingCheck: "Being checked",
+  pendingCheckTitle: "The server has not worked this score out again yet. It checks once a day.",
   footnote: "Other participants are told apart by judgment type and run number, not by name. Your name appears only in this browser’s records, and without a remote connection only local records are counted.",
 };
