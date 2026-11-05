@@ -5,6 +5,7 @@ import { buildRuntimeData, loadSeasonTables } from "../../scripts/season-split.m
 import { CASE_START_NODES } from "../../src/gameCases.js";
 import * as gameData from "../../src/gameData.js";
 import * as gameDialogue from "../../src/gameDialogue.js";
+import { SCENE_MOODS } from "../../src/sceneMoods.js";
 import { createSeasonRuntime } from "../../src/seasonRuntime.js";
 
 /**
@@ -21,8 +22,12 @@ const storeWith = () => createSeasonRuntime(copy(shipped.index), (caseId) => cop
 const everything = storeWith();
 await Promise.all(caseIds.map((caseId) => everything.ensureCase(caseId)));
 
-test("with every case loaded, the store holds exactly the season's tables", () => {
-  assert.deepEqual(everything.nodes, gameData.nodes);
+// The shipped scenes are the graph's, each tagged one with its mood written on
+// (scripts/season-split.mjs, buildRuntimeData).
+const authoredNodes = Object.fromEntries(Object.entries(gameData.nodes).map(([id, scene]) => [id, SCENE_MOODS[id] ? { ...scene, mood: SCENE_MOODS[id] } : scene]));
+
+test("with every case loaded, the store holds exactly the season's tables, with each tagged scene's mood", () => {
+  assert.deepEqual(everything.nodes, authoredNodes);
   assert.deepEqual(everything.echoReplies, gameData.echoReplies);
   assert.deepEqual(everything.choiceVoiceLines, gameData.choiceVoiceLines);
   assert.deepEqual(everything.nodeOrders, gameData.nodeOrders);
