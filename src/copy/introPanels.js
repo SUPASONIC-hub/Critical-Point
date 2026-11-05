@@ -10,12 +10,15 @@ import { localizeTables } from "../locale.js";
  * prints it, never at load.
  */
 const introPanelsCopy = {
-  // The record title by how far the season reached (analystTitle.js ANALYST_TITLE_STEPS).
+  // The record title by how far the record reached (analystTitle.js ANALYST_TITLE_STEPS,
+  // the five steps and their milestones). 수습 holds for 프롤로그 01 only: the
+  // traineeship ends with it (docs/canon.md).
   analystTitles: {
     prologue01: "수습 분석관",
-    case01: "분석관",
-    case18: "선임 분석관",
-    case36: "수석 분석관",
+    prologue02: "분석관",
+    case01: "선임 분석관",
+    case25: "책임 분석관",
+    finished: "수석 분석관",
   },
   // The line under the play-style picker (getPlayStyleUnlocks).
   playStyles: {

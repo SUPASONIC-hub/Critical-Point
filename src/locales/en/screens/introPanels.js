@@ -2,9 +2,10 @@
 export default {
   analystTitles: {
     prologue01: "Trainee Analyst",
-    case01: "Analyst",
-    case18: "Senior Analyst",
-    case36: "Lead Analyst",
+    prologue02: "Analyst",
+    case01: "Senior Analyst",
+    case25: "Lead Analyst",
+    finished: "Chief Analyst",
   },
   playStyles: {
     instinct: "A pledge to decide on first instinct",

@@ -2,9 +2,10 @@
 export default {
   analystTitles: {
     prologue01: "見習い分析官",
-    case01: "分析官",
-    case18: "上級分析官",
-    case36: "首席分析官",
+    prologue02: "分析官",
+    case01: "上級分析官",
+    case25: "責任分析官",
+    finished: "首席分析官",
   },
   playStyles: {
     instinct: "最初の反応で決めるという誓い",
