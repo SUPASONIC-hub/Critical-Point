@@ -87,7 +87,8 @@ const budgets = [
   // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_709 },
+  // 148,023 / 54,709 -> 148,050 / 54,709 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 148,046 / 54,699 in the e2e build, the raw plus 4 (the gzip is under its budget).
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_050, maxGzip: 54_709 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -325,7 +326,8 @@ const budgets = [
   // 189,392 / 68,379 -> 190,149 / 68,585 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the board's two blocked-word refusals (src/copy/boardPost.js), the server's two new messages read back, and the hook's check that loads the list on 글 남기기 (src/state/useBoard.js; the list itself is its own chunk, boardBlockedTerms). Measured 190,145 / 68,581 in the e2e build, the plus 4.
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_476, maxGzip: 69_094 },
+  // 191,476 / 69,094 -> 192,759 / 69,664 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 192,755 / 69,660 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 192_759, maxGzip: 69_664 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1333,7 +1335,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,841 / 490,518 -> 427,048 / 484,092 / 490,774 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 427,044 / 484,088 / 490,770, the plus 4.
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 429_328, en: 486_074, ja: 493_267 };
+// 429,328 / 486,074 / 493,267 -> 429,898 / 486,630 / 493,822 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone -- the entry's AdaptiveMusic (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 429,894 / 486,626 / 493,818 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 429_898, en: 486_630, ja: 493_822 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
