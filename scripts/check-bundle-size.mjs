@@ -91,6 +91,7 @@ const budgets = [
   // 148,023 / 54,709 -> 148,023 / 54,714 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again; this chunk only by the stylesheet's name it imports. Measured 148,019 / 54,710 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,050 / 54,709 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 148,046 / 54,699 in the e2e build, the raw plus 4 (the gzip is under its budget).
   // 148,418 / 54,917 -> 148,134 / 54,765 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together, less src/mood.js, which the entry now holds (AdaptiveMusic subscribes to it, so Rolldown moved the hub out of this chunk). Measured 148,130 / 54,761 in the e2e build, the plus 4.
+  // 54,709 -> 54,707 gzip on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): no code changed (raw 148,019 as before); the chunk names it imports shifted with the trimmed case copy. Measured 54,703 gzip in the e2e build, the gzip plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_134, maxGzip: 54_765 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -340,6 +341,7 @@ const budgets = [
   // 191,476 / 69,094 -> 192,759 / 69,664 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 192,755 / 69,660 in the e2e build, the plus 4.
   // -> 193,412 / 69,958 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together, plus src/mood.js (the hub, 5 lines of code) and the subscription that carries the page's mood to the score. Measured 193,408 / 69,954 in the e2e build, the plus 4.
   // 191,573 / 69,173 -> 191,573 / 69,178 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,174 in the e2e build, the plus 4.
+  // 191,573 / 69,178 -> 191,573 / 69,174 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,170 in the e2e build, the plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 193_412, maxGzip: 69_958 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -1358,6 +1360,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 429,898 / 486,630 / 493,822 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone -- the entry's AdaptiveMusic (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 429,894 / 486,626 / 493,818 in the e2e build, the plus 4.
 // -> 431,496 / 488,234 / 495,428 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together. Measured 431,492 / 488,230 / 495,424 in the e2e build, the plus 4.
 // 430,386 / 487,129 / 494,322 -> 430,390 / 487,123 / 494,315 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,386 / 487,119 / 494,311 in the e2e build, the plus 4.
+// 430,390 / 487,123 / 494,315 -> 430,387 / 487,119 / 494,312 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,383 / 487,115 / 494,308 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 431_496, en: 488_234, ja: 495_428 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
