@@ -223,6 +223,7 @@ const tableCopy = {
   voice: {
     holdArmed: "한 번 더 누르면 확정된다",
     push: "열기 {gauge} · {danger}",
+    wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
     scout: "조회했다. 벽은 {min}에서 {max} 사이 어딘가",
     bank: "판돈 {pot} · 금고 {vault}",
