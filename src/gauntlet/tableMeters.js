@@ -50,7 +50,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit =
     multiplier: getMultiplier(win.gauge),
     focusBonus: getFocusBonus(win.focus, win.focusMode),
     remaining: getRemainingSeconds(win),
-    bpm: getHeartbeatBpm(win.gauge, win.wall + (win.tellOffset ?? 0), schema.sedated, win.elapsed / schema.seconds),
+    // A bust stops the heart (A2): the pulse reads "—" and the tick light is dark (fxVariables.js).
+    bpm: win.status === "bust" ? "—" : getHeartbeatBpm(win.gauge, win.wall + (win.tellOffset ?? 0), schema.sedated, win.elapsed / schema.seconds),
     nextLow,
     nextHigh,
     nextMultiplierLow: getMultiplier(nextLow),

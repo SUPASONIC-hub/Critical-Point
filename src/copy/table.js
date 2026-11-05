@@ -107,6 +107,7 @@ const tableCopy = {
     slamAbandon: "테이블을 떠났다",
     slamWall: "벽은 {wall}에 있었다",
     slamPot: "판돈",
+    slamStill: "심장이 멈춘 자리에서 벽이 드러났다.",
     slamCombo: " · 논리 콤보 {streak}",
     equipped: "장착",
     dropped: "· {name} 내려놓음",

@@ -116,7 +116,8 @@ const budgets = [
   // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_526, maxGzip: 13_304 },
+  // 30,526 / 13,304 -> 30,589 / 13,340 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 30,585 / 13,336 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*.js$/, maxBytes: 30_589, maxGzip: 13_340 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -331,6 +332,7 @@ const budgets = [
   // 191,573 / 69,173 -> 191,573 / 69,178 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,174 in the e2e build, the plus 4.
   // 191,573 / 69,178 -> 191,573 / 69,174 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,170 in the e2e build, the plus 4.
   // 191,573 / 69,174 -> 191,573 / 69,176 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,172 in the e2e build, the plus 4.
+  // 191,476 / 69,094 -> 191,476 / 69,099 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 191,472 / 69,095 in the e2e build, the gzip plus 4 (the raw size under its budget).
   { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_176 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -896,7 +898,8 @@ const budgets = [
   // -> 6,512 / 2,129 on 2026-10-21, Vite 8 (#225, the user's choice 1):
   // measured 6,512 / 2,125 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (6,700 / 2,198 on the same commit).
-  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_512, maxGzip: 2_129 },
+  // 6,512 / 2,129 -> 6,538 / 2,143 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 6,534 / 2,139 in the e2e build, the plus 4.
+  { pattern: /^tableAudio-.*.js$/, maxBytes: 6_538, maxGzip: 2_143 },
   // The other players' wall rate on the scene page (improvement notes D3):
   // src/state/useSceneBustRates.js and src/sceneTraces.js. Written into the
   // PlayScreen chunk they added about 945 / 441 bytes to it on 2026-10-19,
@@ -1157,7 +1160,8 @@ const budgets = [
   // 179,769 / 60,178 -> 179,989 / 60,211 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the two blocked-word refusals in Japanese. Measured 179,985 / 60,207, the plus 4.
   // 179,793 / 60,190 -> 180,032 / 60,227 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in Japanese over KD銀行口座. Measured 180,028 / 60,223 in the e2e build, the plus 4.
   // -> 180,288 / 60,311 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 180,284 / 60,307 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_288, maxGzip: 60_311 },
+  // 180,288 / 60,311 -> 180,352 / 60,333 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 180,348 / 60,329 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*.js$/, maxBytes: 180_352, maxGzip: 60_333 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1177,7 +1181,8 @@ const budgets = [
   // 149,807 / 53,485 -> 150,005 / 53,529 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the two blocked-word refusals in English. Measured 150,001 / 53,525, the plus 4.
   // 149,859 / 53,502 -> 150,057 / 53,546 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in English over bundle-1105a's dictionary. Measured 150,053 / 53,542 in the e2e build, the plus 4.
   // -> 150,260 / 53,611 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 150,256 / 53,607 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_260, maxGzip: 53_611 },
+  // 150,260 / 53,611 -> 150,317 / 53,626 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 150,313 / 53,622 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*.js$/, maxBytes: 150_317, maxGzip: 53_626 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1346,6 +1351,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 430,386 / 487,129 / 494,322 -> 430,390 / 487,123 / 494,315 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,386 / 487,119 / 494,311 in the e2e build, the plus 4.
 // 430,390 / 487,123 / 494,315 -> 430,387 / 487,119 / 494,312 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,383 / 487,115 / 494,308 in the e2e build, the plus 4.
 // 430,387 / 487,119 / 494,312 -> 430,391 / 487,113 / 494,306 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,387 / 487,109 / 494,302 in the e2e build, the plus 4.
+// 429,328 / 486,074 / 493,267 -> 429,328 / 486,088 / 493,287 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 429,327 / 486,084 / 493,283 in the e2e build, the plus 4 (the Korean line unchanged).
 const FIRST_PAINT_BUDGETS = { ko: 430_391, en: 487_113, ja: 494_306 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],

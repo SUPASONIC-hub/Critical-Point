@@ -1761,6 +1761,9 @@
   backdrop-filter: blur(10px);
 }
 
+/* The slam's third line, `small` (A2, 2026-11-05), takes no rule: the browser's
+   smaller size and the paper colour it inherits are the look. The sheet is at
+   its budget (check-css-structure.mjs), and the line is a line, not a pill. */
 .gx-slam-bust {
   color: var(--c-paper);
   background: var(--c-gx-heat-a18);
@@ -1777,7 +1780,6 @@
   z-index: -1;
   content: "";
   opacity: 0;
-  pointer-events: none;
 }
 
 .gx-slam-bust::before {
@@ -1807,8 +1809,16 @@
   animation: gx-cash-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* The stop (A2, 2026-11-05): for the first quarter second after the slam the
+   table stands on its last frame, then greys over the next quarter. The heart
+   has already stopped on that frame (--gx-rate 0, GauntletFx.jsx). Reduced
+   motion collapses both quarters with every transition (responsive.css). The
+   bytes it cost came from two lines that did nothing: the slam layers'
+   pointer-events (inherited from .gx-slam) and the reduced-motion transform
+   on a card that is neither selected nor hovered (no rule ever moved it). */
 .gauntlet-stage.is-bust .gx-table {
   filter: grayscale(0.9) brightness(0.6);
+  transition: filter 0.25s 0.25s;
 }
 
 .gx-fx {
@@ -3165,7 +3175,6 @@
 
   .gx-pot-value,
   .gx-bpm svg,
-  .gauntlet-stage .gx-card,
   .gauntlet-stage .gx-card.selected {
     transform: none;
   }

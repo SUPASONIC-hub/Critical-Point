@@ -101,6 +101,9 @@ export function playHeartbeat(closeness = 0, tier = 0) {
  * frame; `stop()` releases it. A missing runtime returns a no-op controller so
  * the caller never branches.
  */
+/** How fast the drone follows its level: live, and once the table has bust (A2: the slower let-down, no jump a listener on earphones can hear). */
+export const DRONE_FADE_S = 0.25;
+export const DRONE_STILL_FADE_S = 0.6;
 export function startTensionDrone() {
   const runtime = standingRuntime();
   if (!runtime) return { set() {}, stop() {} };
@@ -126,7 +129,10 @@ export function startTensionDrone() {
     let muted = false;
     let mutedAt = -Infinity;
     return {
-      set(closeness = 0, sedated = false) {
+      // `still` is a table that has just bust (A2, 2026-11-05): the same
+      // level, let down over DRONE_STILL_FADE_S instead of DRONE_FADE_S --
+      // a slower gain curve, no new voice, the pitch and the filter as before.
+      set(closeness = 0, sedated = false, still = false) {
         if (stopped) return;
         const now = context.currentTime;
         const read = sedated ? 0.35 : closeness;
@@ -141,7 +147,7 @@ export function startTensionDrone() {
           mutedAt = now;
         }
         const level = muted ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
-        master.gain.setTargetAtTime(level, now, 0.25);
+        master.gain.setTargetAtTime(level, now, still ? DRONE_STILL_FADE_S : DRONE_FADE_S);
         filter.frequency.setTargetAtTime(120 + read * 1400, now, 0.3);
         voices[2].detune.setTargetAtTime(read * 60, now, 0.4);
       },
