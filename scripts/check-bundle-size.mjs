@@ -91,7 +91,8 @@ const budgets = [
   // -> 148,174 / 54,770 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the chunk names it imports moved with the sheet's hash, the gzip alone. Measured 148,170 / 54,766 in the e2e build, the plus 4.
   // -> 148,174 / 54,775 on 2026-11-05, bundle-1105d after merging main e68fe8cc (#454 studio-name, #455 docs): the chunk names it imports, the gzip alone. Measured 148,170 / 54,771 in the e2e build, the plus 4.
   // 54,709 -> 54,707 gzip on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): no code changed (raw 148,019 as before); the chunk names it imports shifted with the trimmed case copy. Measured 54,703 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_775 },
+  // -> 148,174 / 54,771 on 2026-11-05, bundle-1105d after merging main 977809b3 (#457 본문 줄이기 b), the static shell reverted and the roadmap summary's flex: none: the chunk names it imports, the gzip alone. Measured 148,170 / 54,767 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_771 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -342,7 +343,8 @@ const budgets = [
   // 191,573 / 69,173 -> 191,573 / 69,178 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,174 in the e2e build, the plus 4.
   // -> 192,443 / 69,369 on 2026-11-05, bundle-1105d after merging main 8ac59b71 (#456 본문 줄이기 a): the lines above together, the gzip alone moved with the chunk names. Measured 192,439 / 69,365 in the e2e build, the plus 4.
   // 191,573 / 69,178 -> 191,573 / 69,174 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,170 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 192_443, maxGzip: 69_369 },
+  // -> 192,443 / 69,367 on 2026-11-05, bundle-1105d after merging main 977809b3 (#457 본문 줄이기 b), the static shell reverted and the roadmap summary's flex: none: the lines above together, the gzip alone moved with the chunk names. Measured 192,439 / 69,363 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 192_443, maxGzip: 69_367 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -670,7 +672,8 @@ const budgets = [
   // 200,831 / 37,589 -> 201,051 / 37,647 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap's cards below the first screen are laid out and drawn only as they come near it (content-visibility: auto with a closed card's intrinsic height, 280px, 300px on the phone rail; src/styles/app/base-intro-ranking.css). Measured 201,047 / 37,643 in the e2e build, the plus 4.
   // 201,051 / 37,647 -> 200,963 / 37,656 on 2026-11-05, intro-cards-cv trim over main 62a25238: the sheet fits its structure budget again (the phone rail sets --card-reserve on its existing .case-card rule, gradients lose default 180deg and 0% stops and spell rgb(... / 0) as transparent, radial positions shortened); 88 raw bytes fewer, and the gzip 9 bytes more from the changed repeats. Measured 200,959 / 37,652 in the e2e build, the plus 4.
   // -> 203,876 / 38,222 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: E5's root rules over the trimmed base-intro-ranking.css with its content-visibility rules. Measured 203,872 / 38,218 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_876, maxGzip: 38_222 },
+  // -> 203,882 / 38,222 on 2026-11-05, bundle-1105d after merging main 977809b3 (#457 본문 줄이기 b), the static shell reverted and the roadmap summary's flex: none: the one declaration (flex: none) on the card's summary, 6 bytes raw, the gzip the same. Measured 203,878 / 38,218 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_882, maxGzip: 38_222 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1379,7 +1382,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 430,386 / 487,129 / 494,322 -> 430,390 / 487,123 / 494,315 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,386 / 487,119 / 494,311 in the e2e build, the plus 4.
 // -> 431,207 / 487,951 / 495,195 on 2026-11-05, bundle-1105d after merging main 8ac59b71 (#456 본문 줄이기 a): the lines above together. Measured 431,203 / 487,947 / 495,191 in the e2e build, the plus 4.
 // 430,390 / 487,123 / 494,315 -> 430,387 / 487,119 / 494,312 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,383 / 487,115 / 494,308 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 431_207, en: 487_951, ja: 495_195 };
+// -> 430,756 / 487,557 / 494,763 on 2026-11-05, bundle-1105d after merging main 977809b3 (#457 본문 줄이기 b), the static shell reverted (index.html back to main's) and the roadmap summary's flex: none: the lines above together. Measured 430,752 / 487,553 / 494,759 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_756, en: 487_557, ja: 494_763 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
