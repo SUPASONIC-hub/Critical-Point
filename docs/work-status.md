@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-05 (the state of `main` at `[자리]`, after bundle-1105c (#451: #450 tab title, #432 board auto-hide and blocked terms, #425 global-limit alerts and fail-closed unknown address, #434 wider ranking recheck and 「확인 중」; three migrations) [자리]).
+Last updated: 2026-11-05 (the state of `main` at `3ca15f8`, after bundle-1105c (#451: #450 tab title, #432 board auto-hide and blocked terms, #425 global-limit alerts and fail-closed unknown address, #434 wider ranking recheck and 「확인 중」; three migrations, Migration Drift green, `check:grants` on main replaying 56 migrations)).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -586,9 +586,9 @@ Still open, on purpose:
   `recheck_seen_at` is opened to anon only as the boolean `rechecked`, so a
   row the checker has not read yet says 「확인 중」; the "same address
   frequency" recheck -- keeping address_key 180 days -- declined, the owner's
-  choice (1) on 11-05). [자리: anything else merged today.] [자리] PRs merged
-  ([자리] counting the bundle PR #451; main `[자리]`), production build-sha
-  `[자리]` ([자리]), [자리] unit tests.
+  choice (1) on 11-05). Four PRs merged (five counting the bundle PR #451; main
+  `3ca15f8`), production build-sha `3ca15f8` (11:03, sw release
+  `9928af4b`), 1,818 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
