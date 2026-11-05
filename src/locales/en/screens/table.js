@@ -205,7 +205,8 @@ export default {
     wall: "Now Heat {gauge} · {danger}",
     stance: "Charge {focus} · Commit for {label} next hand · {title}",
     scout: "Scouted. The Wall is somewhere between {min} and {max}",
-    bank: "Stake {pot} · Vault {vault}",
+    bank: "This hand {hand} · Stake {pot} · Vault {vault}",
+    act: "Act {act} begins · Case {case}",
   },
   afterword: {
     nextPush: "One more push: +{step} → {gauge}, Wall {wall}: {outcome}.",

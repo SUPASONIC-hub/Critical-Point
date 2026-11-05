@@ -116,7 +116,8 @@ const budgets = [
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
   // 30,526 / 13,304 -> 30,567 / 13,309 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the voice's wall call (E3 첫 단계: tableVoice.js describeWall and the zone read back off the danger line, tableMeters.js dangerZoneOf; stage.voice.wall). Measured 30,563 / 13,305 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_567, maxGzip: 13_309 },
+  // 30,567 / 13,309 -> 30,627 / 13,343 on 2026-11-05, table-a11y-2 over table-a11y-1105 fcbbc7b6: the voice says the settlement (이번 판 ±N, describeBank with the hand) and the act (describeAct, findActStart; E3 2단계). Measured 30,623 / 13,339 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_627, maxGzip: 13_343 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -327,7 +328,8 @@ const budgets = [
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,476 / 69,099 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the gzip alone moved with the stylesheet's hash (money.css, the account's 방금 at 11px). Measured 191,472 raw / 69,095 gzip in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_476, maxGzip: 69_099 },
+  // 191,476 / 69,099 -> 191,476 / 69,105 on 2026-11-05, table-a11y-2 over table-a11y-1105 fcbbc7b6: the gzip alone moved again with the chunk hashes (nothing of the entry changed). Measured 191,472 raw / 69,101 gzip in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 191_476, maxGzip: 69_105 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -542,7 +544,8 @@ const budgets = [
   // 48,936 / 16,122 -> 50,079 / 16,401 on 2026-10-26, 영어판 3단계: the ending sequence, the three twists, the verdicts and afterglows and 「당신의 세 장면」 read by key (src/copy/ending.js), and the forecast's 「유지」 from the report's table. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 50,213 / 16,456 -> 50,356 / 16,517 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 50,352 / 16,513 in the e2e build, the plus 4.
   // 50,079 / 16,401 -> 50,213 / 16,456 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habit names and lines (src/copy/habits.js) and the one-word analyst line (endingCopy.getAnalystName). Measured 50,209 / 16,452 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_356, maxGzip: 16_517 },
+  // 50,356 / 16,517 -> 50,407 / 16,517 on 2026-11-05, table-a11y-2 over table-a11y-1105 fcbbc7b6: the result screen's one polite line says the standing against the collapse line after the rank (E3 2단계 (b)). Measured 50,403 / 16,514 in the e2e build, the plus 4 (the gzip under its budget).
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_407, maxGzip: 16_517 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
@@ -1151,7 +1154,8 @@ const budgets = [
   // 179,793 / 60,190 -> 180,032 / 60,227 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in Japanese over KD銀行口座. Measured 180,028 / 60,223 in the e2e build, the plus 4.
   // -> 180,288 / 60,311 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 180,284 / 60,307 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,325 / 60,317 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the voice's wall call in Japanese (voice.wall). Measured 180,321 / 60,313 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_325, maxGzip: 60_317 },
+  // 180,325 / 60,317 -> 180,390 / 60,354 on 2026-11-05, table-a11y-2 over table-a11y-1105 fcbbc7b6: the settlement and the act in Japanese (voice.bank, voice.act). Measured 180,386 / 60,350 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_390, maxGzip: 60_354 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1172,7 +1176,8 @@ const budgets = [
   // 149,859 / 53,502 -> 150,057 / 53,546 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in English over bundle-1105a's dictionary. Measured 150,053 / 53,542 in the e2e build, the plus 4.
   // -> 150,260 / 53,611 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 150,256 / 53,607 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,296 / 53,618 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the voice's wall call in English (voice.wall). Measured 150,292 / 53,614 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_296, maxGzip: 53_618 },
+  // 150,296 / 53,618 -> 150,354 / 53,648 on 2026-11-05, table-a11y-2 over table-a11y-1105 fcbbc7b6: the settlement and the act in English (voice.bank, voice.act). Measured 150,350 / 53,644 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_354, maxGzip: 53_648 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1338,7 +1343,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,328 / 486,082 / 493,273 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the English and Japanese dictionaries carry the voice's wall call (E3 첫 단계); the Korean page is under its budget still. Measured 429,326 / 486,078 / 493,269 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 429_328, en: 486_082, ja: 493_273 };
+// 429,328 / 486,082 / 493,273 -> 429,340 / 486,120 / 493,319 on 2026-11-05, table-a11y-2 over table-a11y-1105 fcbbc7b6: the entry's gzip moved with the hashes, and the English and Japanese dictionaries carry the settlement and the act (E3 2단계). Measured 429,336 / 486,116 / 493,315 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 429_340, en: 486_120, ja: 493_319 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

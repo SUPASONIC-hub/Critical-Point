@@ -4,6 +4,8 @@ import { formatNumber } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
 import { dangerZoneOf } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
+import { formatChange } from "./moneyFeedback.js";
+import { ACT_START_CASES } from "./actCardGate.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -22,9 +24,13 @@ import { fill } from "../locale.js";
  *   press -- the heat and the line, once per crossing (E3 첫 단계, 11-05);
  * - when the LOCK charge starts to count for the stance, or the stance it
  *   counts for changes: the rule a cash would carry into the next board;
- * - when a cash has banked the hand into the case pot, or a closed case has
- *   moved that pot to the vault: what is at stake now and what is safe, once,
- *   as the next window's table opens (the slam said the cash's own +N);
+ * - what the last hand's settlement did to the money -- 이번 판 ±N, the case
+ *   pot and the vault -- once, as the next window's table opens: the first
+ *   moment after the reveal closes that the table has a voice (E3 2단계 (a),
+ *   11-05; before that the line came only when the pot or the vault grew);
+ * - that an act has begun (「N막 시작 · 사건 K」), once, as the first table of
+ *   the case that opens it is dealt (E3 2단계 (c)); the act card is a dialog
+ *   read on its own when it is shown;
  * - on a week that counts the audit (B3), where it stands when the table opens
  *   on a count the last window moved: once, never per push (the cash button
  *   carries what a cash now would do, in its description);
@@ -38,7 +44,10 @@ import { fill } from "../locale.js";
  * that never stops talking), the creep the clock adds to the heat, or the
  * verdict: the slam (`VerdictSlam`, TableNotices.jsx) is an alert that says
  * BUST or the multiplier, and the region falls silent the moment the window
- * closes, so the verdict is read once (bust-read-once).
+ * closes, so the verdict is read once (bust-read-once). A case's close is not
+ * its either: the result screen has no table, and its own polite line
+ * (GameRuntime's `screenReaderStatus`, ResultScreen.jsx) says the rank and,
+ * since E3 2단계 (b), the standing against the collapse line.
  *
  * Calls are spaced `VOICE_GAP_MS` apart: a polite region whose text is
  * replaced before the reader has got to it is never read. A call waiting its
@@ -55,7 +64,7 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * before the push's and the stance's: a listener out of time has the least of
  * it to lose.
  */
-const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, audit: 3, links: 4, stance: 5, scout: 6, push: 7, wall: 8 });
+const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
 
 // The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
 // each call is made, so another language laid over them is the one said.
@@ -74,7 +83,11 @@ export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { 
 /** What a look bought (`getWindowBand`): the band it narrowed to, never the wall inside it. */
 export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax });
 
-export const describeBank = ({ runPot, vault }) => fill(voice().bank, { pot: formatNumber(runPot), vault: formatNumber(vault) });
+/** The last hand's settlement: what it did to the money (signed, formatChange), the case pot and the vault it left. */
+export const describeBank = ({ hand = 0, runPot, vault }) => fill(voice().bank, { hand: formatChange(hand), pot: formatNumber(runPot), vault: formatNumber(vault) });
+
+/** An act beginning, by the case that opens it (actCardGate's ACT_START_CASES, in order): 「2막 시작 · 사건 08」. */
+export const describeAct = ({ act, caseId }) => fill(voice().act, { act, case: String(caseId).replace(/^case/, "") });
 
 /** The rule the staked cash would carry for its stance, or null while the charge does not count. */
 export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutation) => STANCE_CARRY_IDS.has(mutation.id)) ?? null;
@@ -124,21 +137,36 @@ export function queueCalls(queue, calls) {
 }
 
 /**
- * The case pot and the vault, as the last table heard them. The table is
- * mounted afresh for every window (PlayScreen keys it by seed), and a cash is
- * banked in the settle between two of them, so no one table sees either grow.
- * A table remembers what it was dealt; the next window's table, if either grew
- * in between, has a bank to say. Only the very next window counts: a save
- * loaded from somewhere else is not a bank, and a bust -- the pot going down --
- * is the slam's.
+ * The case pot, the vault and the case, as the last table heard them. The
+ * table is mounted afresh for every window (PlayScreen keys it by seed), and a
+ * hand is settled between two of them, so no one table sees the money move. A
+ * table remembers what it was dealt; the next window's table says what the
+ * settlement in between did to it. Only the very next window counts: a save
+ * loaded from somewhere else, or a debug jump, has no last hand to speak of.
  */
 let heard = null;
 
-/** The bank between the window `before` was dealt and the one `after` is, or null. */
+/** The next window after `before` was dealt: the one `after` is, and no other. */
+const follows = (before, after) => Boolean(before) && after.windowIndex === before.windowIndex + 1;
+
+/**
+ * The settlement between the window `before` was dealt and the one `after` is,
+ * or null. The hand's ±N is what the money as a whole did -- the pot and the
+ * vault together, so a closed case's pot moving to the vault is not a loss --
+ * and a bust's −N is said here as well as in the slam: the slam says the pot it
+ * took, once, under its alert; this is the settlement's one line after it.
+ */
 export function findBank(before, after) {
-  if (!before || after.windowIndex !== before.windowIndex + 1) return null;
-  if (after.runPot <= before.runPot && after.vault <= before.vault) return null;
-  return { windowIndex: after.windowIndex, text: describeBank(after) };
+  if (!follows(before, after)) return null;
+  const hand = after.runPot + after.vault - (before.runPot + before.vault);
+  return { windowIndex: after.windowIndex, text: describeBank({ hand, runPot: after.runPot, vault: after.vault }) };
+}
+
+/** The act the window `after` opens, if it is the first table of a case that begins one, or null. */
+export function findActStart(before, after) {
+  if (!follows(before, after) || after.caseId === before.caseId) return null;
+  const index = ACT_START_CASES.indexOf(after.caseId);
+  return index < 0 ? null : { windowIndex: after.windowIndex, text: describeAct({ act: index + 1, caseId: after.caseId }) };
 }
 
 /**
@@ -149,7 +177,7 @@ export function findBank(before, after) {
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
-export function useTableVoice({ speaking, run, audit = null, links, ...table }) {
+export function useTableVoice({ speaking, run, audit = null, links, caseId = null, ...table }) {
   const facts = readTableFacts(table);
   const [said, setSaid] = useState("");
   const factsRef = useRef(null);
@@ -157,23 +185,26 @@ export function useTableVoice({ speaking, run, audit = null, links, ...table }) 
   const lastAtRef = useRef(0);
   const timerRef = useRef(null);
   const bankRef = useRef(null);
+  const actRef = useRef(null);
   const auditRef = useRef(null);
   const linksRef = useRef(null);
   const linkLine = links?.said;
 
-  // Once a window: the bank, the audit and the links' line since the last
-  // table, kept until they can be said. `??=` because a development mount runs
-  // this twice, and the second run finds the pot already heard.
+  // Once a window: the settlement, the act, the audit and the links' line
+  // since the last table, kept until they can be said. `??=` because a
+  // development mount runs this twice, and the second run finds the pot
+  // already heard.
   // The audit's reading is a fresh object every render; its count is what is heard.
   const auditCount = audit?.count ?? null;
   const auditLimit = audit?.limit ?? null;
   useEffect(() => {
-    const dealt = { windowIndex: run.windowIndex, runPot: run.runPot, vault: run.vault, audit: auditCount === null ? null : { count: auditCount, limit: auditLimit } };
+    const dealt = { windowIndex: run.windowIndex, runPot: run.runPot, vault: run.vault, caseId, audit: auditCount === null ? null : { count: auditCount, limit: auditLimit } };
     bankRef.current ??= findBank(heard, dealt);
+    actRef.current ??= findActStart(heard, dealt);
     auditRef.current ??= findAudit(heard, dealt);
     linksRef.current ??= linkLine && heard?.windowIndex + 1 === dealt.windowIndex ? linkLine : null;
     heard = dealt;
-  }, [run.windowIndex, run.runPot, run.vault, auditCount, auditLimit, linkLine]);
+  }, [run.windowIndex, run.runPot, run.vault, caseId, auditCount, auditLimit, linkLine]);
 
   useEffect(() => {
     const before = factsRef.current;
@@ -190,6 +221,10 @@ export function useTableVoice({ speaking, run, audit = null, links, ...table }) 
     if (bankRef.current) {
       calls.push({ kind: "bank", text: bankRef.current.text });
       bankRef.current = null;
+    }
+    if (actRef.current) {
+      calls.push({ kind: "act", text: actRef.current.text });
+      actRef.current = null;
     }
     if (auditRef.current) {
       calls.push({ kind: "audit", text: auditRef.current.text });

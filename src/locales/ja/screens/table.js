@@ -231,7 +231,8 @@ export default {
     wall: "いま熱 {gauge} · {danger}",
     stance: "チャージ {focus} · 確定すると次の勝負は{label} · {title}",
     scout: "照会した。壁は {min} から {max} のあいだのどこか",
-    bank: "賭け金 {pot} · 金庫 {vault}",
+    bank: "この勝負 {hand} · 賭け金 {pot} · 金庫 {vault}",
+    act: "第{act}幕 開始 · 事件 {case}",
   },
   afterword: {
     nextPush: "もう一度押していたら +{step} → {gauge}、壁 {wall}: {outcome}。",
