@@ -40,6 +40,7 @@ export default {
     identity: "分析官の呼び名",
     nameLabel: "分析官の名前",
     namePlaceholder: "名前を入力してください",
+    rankTitle: "記録の称号 {title}",
     newGamePlus: "{game}を始める",
   },
   pastRunLabel: "NEW GAME+ 前回の記録",

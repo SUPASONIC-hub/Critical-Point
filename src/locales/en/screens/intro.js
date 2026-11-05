@@ -41,6 +41,7 @@ export default {
     identity: "Analyst call sign",
     nameLabel: "Analyst name",
     namePlaceholder: "Enter your name",
+    rankTitle: "Record title: {title}",
     newGamePlus: "Start {game}",
   },
   pastRunLabel: "NEW GAME+ past record",
