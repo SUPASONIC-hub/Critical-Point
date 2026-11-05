@@ -1584,7 +1584,10 @@ gh run watch                                  # 사이트가 그 커밋을 내�
   규칙과 금지 사항의 유일한 출처입니다. 무엇을 왜 바꿨는지는 `git log`에 있습니다 --
   이 저장소의 커밋 메시지는 변경 내용이 아니라 그 변경을 하게 만든 상태를 적습니다.
 - 새 사건 파일을 쓰는 법(사건 파일의 뼈대 견본, 장면·카드의 모양, 시즌에 올리는 곳, 검사가 지키는 규칙, 쓰고 나서 돌릴
-  순서, 흔한 실수, 글 방향)은 [`docs/writing-a-case.md`](docs/writing-a-case.md)에 있습니다.
+  순서, 흔한 실수, 글 방향)은 [`docs/writing-a-case.md`](docs/writing-a-case.md)에 있습니다. 세 장면짜리 견본 파일은
+  [`docs/examples/case-template.js`](docs/examples/case-template.js)이고, 빌드는 이 파일을 읽지 않습니다.
+- 이벤트 주(「이번 주의 규칙」) 운영 절차 -- 달력에 올리기, 예고, 주중에 바꾸지 않는 것, 되돌리기, 끝난 뒤 적는
+  것 -- 는 [`docs/event-week.md`](docs/event-week.md)에 있습니다.
 
 [목차로](#목차)
 
