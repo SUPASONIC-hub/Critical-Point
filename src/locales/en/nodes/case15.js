@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c15_start": {
       "title": "Congratulations in 7 Pages",
-      "text": "Someone you have never seen comes down to Trigger Lab’s 4th floor with a bag of tangerines. Manager Chae Yoonseul, the recruiter from KD Bank Human Resources. 'First time down here. I’ve brought good news!' She hands Lee Minseo an envelope. Passed the document review for conversion to a permanent position; final interview next Thursday at 8:40 a.m. The first time in 3 years. Oh Jinwoo is the first to clap. But the papers run 7 pages, and the last page, which came only as a printout and not through the HR system, is a confirmation. 'I confirm that the 11-second gap in the access log during the leak scare was caused by my own terminal operating error.' Lee Minseo looks at her desk calendar. Thursday already has a red circle. Her younger brother’s college entrance exam day. Chae Yoonseul’s smile fades a beat late. 'I can’t change the date. Or that page.'",
+      "text": "Manager Chae Yoonseul, the HR recruiter, holds out a bag of tangerines and an envelope. 'I’ve brought good news!' Lee Minseo has passed the document review for conversion to a permanent position; the final interview is next Thursday at 8:40 a.m. But of the 7 pages, the last is a confirmation. 'I confirm that the 11-second gap in the access log during the leak scare was caused by my own terminal operating error.' On Lee Minseo’s desk calendar, Thursday has a red circle. Her younger brother’s college entrance exam day. Chae Yoonseul’s smile fades a beat late. 'I can’t change the date. Or that page.'",
       "memo": [
         "Final interview for permanent conversion: next Thursday 08:40, head office HR",
         "7 pages to submit -- signing the confirmation on the last page is mandatory",
@@ -38,7 +38,7 @@ export default {
     },
     "c15_form": {
       "title": "A Form with No Return Box",
-      "text": "Chae Yoonseul spreads the confirmation out again and reads it to you one sentence at a time. On the last two lines her voice drops. 'I will raise no objection whatsoever regarding the above in the future. This confirmation is used only as reference material for the conversion review.' Lee Minseo asks, 'If it’s reference material, why do I fail if I don’t sign?' Chae Yoonseul turns her monitor. The internal email that came down from above has no sending department, and the only button she can press is 'Forwarded.' 'There’s no return box. Not on my form.' The 11 seconds that the Leadline story and the parliamentary audit called 'traces of someone’s tampering' become one contract worker’s slip of the finger with this single sheet. Chae Yoonseul adds quietly, 'You can file one request to adjust the wording. By 18:00 Wednesday.'",
+      "text": "Chae Yoonseul reads the confirmation to you. 'I will raise no objection whatsoever regarding the above in the future. This confirmation is used only as reference material for the conversion review.' Lee Minseo asks, 'If it’s reference material, why do I fail if I don’t sign?' Chae Yoonseul turns her monitor. An email with no sending department, and the only button she can press is 'Forwarded.' 'There’s no return box. Not on my form.' The 11 seconds the parliamentary audit called 'traces of someone’s tampering' become a contract worker’s slip of the finger with this single sheet. 'You can file one request to adjust the wording. By 18:00 Wednesday.'",
       "memo": [
         "Last line of the confirmation: 'I will raise no objection whatsoever in the future'",
         "No sending department shown -- Chae Yoonseul’s only action button is 'Forwarded'",
@@ -69,7 +69,7 @@ export default {
     },
     "c15_rooftop": {
       "title": "100 Sample Business Cards",
-      "text": "Trigger Lab’s people gather on the wooden platform of a rooftop room in Haebangchon. In the middle is a box of sweet rice cakes that Moon Gaeul sent 'so it sticks.' Lee Chanbin, headphones on, just bows and goes into the room. Then Ban Jaewook holds out a document envelope. Inside are 100 business cards. 'KD Bank Data Management Department, Lee Minseo.' 'Samples. I printed them on the Internal Audit printer, so I’ll write the incident report.' He is the man who copied three lines of records with Lee Minseo’s name into his notebook during the leak scare. Lee Minseo stares at one card for a long time. After everyone leaves, she stays on the platform and speaks. 'During those 11 seconds I was in the ER. Chanbin’s appendix burst. If I submit the medical records, it’s over. But Chanbin’s name is in them. He thinks that night was his fault. I don’t want to bring it up two days before his exam.'",
+      "text": "Trigger Lab’s people gather on the platform. In the middle is a box of sweet rice cakes Moon Gaeul sent 'so it sticks.' Ban Jaewook holds out a document envelope with 100 business cards inside. 'KD Bank Data Management Department, Lee Minseo.' 'Samples. I printed them on the Internal Audit printer, so I’ll write the incident report.' After everyone leaves, Lee Minseo speaks. 'During those 11 seconds I was in the ER. Chanbin’s appendix burst. If I submit the medical records, it’s over. But Chanbin’s name is in them. He thinks that night was his fault. I don’t want to bring it up two days before his exam.'",
       "memo": [
         "100 sample business cards -- printed by Ban Jaewook on the Internal Audit printer",
         "Those 11 seconds: Lee Minseo was in the Ieum Hospital ER as a guardian",
@@ -100,7 +100,7 @@ export default {
     },
     "c15_gate": {
       "title": "08:10",
-      "text": "Minus 2 degrees, breath clouding white. Trigger Lab’s cheering squad stands at the gate of Eungang High School in Yongsan. Kang Taemin tears open a box of hand warmers and presses two into the hands of every passing student, hears 'We don’t go to this school' 20 times, and 20 times says 'Cold is cold' and hands them out anyway. Oh Jinwoo shouts himself hoarse because the next school’s cheering is louder, and Na Junhyuk’s sign 'Mark anything, you’ll pass' becomes a photo spot for parents. Chanbin went in at 7:50. At 8:02, Lee Minseo comes running up from the bottom of the slope. In her hand is an insulated lunch bag. The one Chanbin left on the platform. At 8:10, twenty steps short, the gate closes. A police officer shakes his head with an apologetic face. 30 minutes until the interview.",
+      "text": "Minus 2 degrees. Kang Taemin presses hand warmers on every student, hears 'We don’t go to this school' 20 times, and 20 times says 'Cold is cold' and hands them out anyway. Chanbin went in at 7:50. At 8:02, Lee Minseo comes running up the slope with an insulated lunch bag. The one Chanbin left on the platform. At 8:10, twenty steps short, the gate closes. 30 minutes until the interview.",
       "memo": [
         "Check-in closes 08:10 -- Lee Minseo arrives 08:10:14",
         "Lunch: beef and radish soup and rolled omelet, a note on the lid",
@@ -131,7 +131,7 @@ export default {
     },
     "c15_final": {
       "title": "One Fountain Pen",
-      "text": "Across the long table in the interview room sit four interviewers. The head of HR, the head of Data Management, Baek Arin of the Group Strategy Office, and Chae Yoonseul in the secretary’s seat. In front of Lee Minseo are the confirmation and one fountain pen. You sit in a chair by the wall as the one who wrote her recommendation. The head of HR says gently, 'If you sign, the result comes out this afternoon.' At this moment, on the 3rd floor of Eungang High, Period 1, the Korean language exam, is 12 minutes in. Lee Minseo picks up the pen, puts it down, and turns to you. 'You’ll respect whatever I choose, right? But just one thing. I don’t want to be a sister who lies to Chanbin.' A sample business card sticks out of her coat pocket. Baek Arin glances at her watch once.",
+      "text": "Four interviewers sit across the table. The head of HR, the head of Data Management, Baek Arin of the Group Strategy Office, and Chae Yoonseul in the secretary’s seat. In front of Lee Minseo, the confirmation and one fountain pen. The head of HR says, 'If you sign, the result comes out this afternoon.' At this moment at Eungang High, Period 1, the Korean language exam, is 12 minutes in. Lee Minseo picks up the pen, puts it down, and turns to you. 'You’ll respect whatever I choose, right? But just one thing. I don’t want to be a sister who lies to Chanbin.' Baek Arin glances at her watch.",
       "memo": [
         "4 interviewers -- including Baek Arin; Chae Yoonseul as secretary",
         "If she signs: permanent post, the 11 seconds officially closed as 'her own error'",
@@ -159,7 +159,7 @@ export default {
     },
     "c15_aftershock": {
       "title": "A Cold Lunch",
-      "text": "At 17:45, the gate opens again. Na Junhyuk flips his sign over. On the back: 'Every mark was right.' Lee Chanbin comes out of the crowd of students. The moment he sees Lee Minseo, he asks, 'Sis, how was the interview?' Instead of answering, Lee Minseo holds out the insulated lunch bag. The one Chanbin left on the platform that morning. The radish soup is cold, and three spoonfuls are gone -- what his sister ate instead of breakfast. Chanbin laughs. 'For lunch the proctor gave me a chocolate bar. The kid next to me gave me half a gimbap roll.' Brother and sister sit on the gate steps and share the cold soup. Kang Taemin puts a leftover hand warmer on each of their laps. Then he looks at his phone and his face stiffens. The night-shift group chat from the fulfillment center.",
+      "text": "The gate opens again, and Na Junhyuk flips his sign over. 'Every mark was right.' The moment Lee Chanbin sees Lee Minseo, he asks, 'Sis, how was the interview?' Instead of answering, Lee Minseo holds out the lunch bag. Three spoonfuls of the cold radish soup are gone -- what his sister ate instead of breakfast. Chanbin laughs. 'For lunch the proctor gave me a chocolate bar.' Brother and sister sit on the gate steps and share the cold soup. Kang Taemin puts hand warmers on their laps, then looks at his phone and stiffens. The night-shift group chat from the fulfillment center.",
       "memo": [
         "Exam ends 17:45 -- Lee Chanbin finished through the last period",
         "Lunch: beef and radish soup, three spoonfuls gone",
@@ -183,7 +183,7 @@ export default {
     },
     "c15_report": {
       "title": "Supporting Document No. 1",
-      "text": "At eleven at night, Oh Jinwoo comes in with a printout of the confirmation’s attachment list. Supporting document No. 1: 'Leak Incident Phase 1 Analysis Report -- Author: Oh Jinwoo.' The draft he wrote overnight and filed during the leak scare. The conclusion field reads 'High likelihood Lee Minseo leaked alone.' The report he thought had been discarded once the 11 seconds came to light is alive and well as an attachment on the HR server. Oh Jinwoo loosens his tie. 'I was fast, wasn’t I. Back then I thought fast meant winning. I need to end this report with my own hands.'",
+      "text": "Oh Jinwoo brings a printout of the confirmation’s attachment list. Supporting document No. 1: 'Leak Incident Phase 1 Analysis Report -- Author: Oh Jinwoo.' The draft he wrote overnight during the leak scare, concluding 'High likelihood Lee Minseo leaked alone.' The report he thought had been discarded is alive on the HR server. Oh Jinwoo loosens his tie. 'I was fast, wasn’t I. Back then I thought fast meant winning. I need to end this report with my own hands.'",
       "memo": [
         "Confirmation supporting document No. 1: Oh Jinwoo’s Phase 1 analysis report",
         "Conclusion: 'High likelihood Lee Minseo leaked alone'",
@@ -206,7 +206,7 @@ export default {
     },
     "c15_picket": {
       "title": "Mark Anything, You’ll Pass",
-      "text": "The night before the exam, Trigger Lab’s pantry becomes a cheering-gear factory. Na Junhyuk, up from Yeongdong, writes signs with a brush pen. 'Mark anything, you’ll pass.' His hand stamped seals for 30 years, so the letters are as straight as a government signboard. When Han Seoyun asks, 'Is “mark anything” okay at a school gate?', Na Junhyuk adds in small letters in the corner, 'Seal marks, I mean.' Kang Taemin comes in shouldering a box of 200 hand warmers, and Kwon Dohyun, calculating the right number of hand warmers for 1 person, declares, 'This isn’t a loss, it’s a surplus.' As the laughter dies down, Do Yoonha spreads out a map. 32 minutes by subway from the exam site to head office. Check-in closes at 8:10, the interview is at 8:40. To keep both, someone has to let go of one side.",
+      "text": "The pantry becomes a cheering-gear factory. Na Junhyuk writes signs with a brush pen. 'Mark anything, you’ll pass.' When Han Seoyun asks, 'Is “mark anything” okay at a school gate?', Na Junhyuk adds in small letters in the corner, 'Seal marks, I mean.' Kang Taemin shoulders in 200 hand warmers, and Kwon Dohyun declares, 'This isn’t a loss, it’s a surplus.' Do Yoonha spreads out a map. 32 minutes by subway from the exam site to head office. Check-in closes at 8:10, the interview is at 8:40. To keep both, someone has to let go of one side.",
       "memo": [
         "6 signs -- Na Junhyuk’s brush-pen lettering",
         "200 hand warmers -- Kang Taemin’s own money",
@@ -229,7 +229,7 @@ export default {
     },
     "c15_lunchbox": {
       "title": "It’s Okay to Get It Wrong",
-      "text": "In the back seat of a taxi headed for Euljiro, Lee Minseo sets the lunch bag on her lap. The beef and radish soup she made at five in the morning is still warm. On the lid is a note she stuck there. 'It’s okay to get it wrong. Your sister got a lot wrong too.' Reading the note, Lee Minseo laughs, and laughing, cries. Then she takes out a spoon. 'I didn’t have breakfast. Can I eat this before I go in? Chanbin will understand.' On the third spoonful, a text comes from Chae Yoonseul. 'One of the interviewers has changed. Deputy Manager Baek Arin of the Group Strategy Office is coming in.'",
+      "text": "Lee Minseo sets the lunch bag on her lap. The radish soup is still warm, and on the lid is a note she stuck there. 'It’s okay to get it wrong. Your sister got a lot wrong too.' Reading the note, Lee Minseo laughs, and laughing, cries. 'I didn’t have breakfast. Can I eat this before I go in? Chanbin will understand.' On the third spoonful, a text comes from Chae Yoonseul. 'One of the interviewers has changed. Deputy Manager Baek Arin of the Group Strategy Office is coming in.'",
       "memo": [
         "16 minutes until the interview",
         "Interviewer replaced: Baek Arin, Group Strategy Office",
@@ -252,7 +252,7 @@ export default {
     },
     "c15_report_reaction": {
       "title": "17 Million Won a Second",
-      "text": "The next morning, Kwon Dohyun draws a vertical line on the pantry whiteboard. Left: if she signs. Right: if she doesn’t. He adds up 30 years of the salary gap between permanent and contract staff, bonuses, severance, even family tuition support. 'The value of the signature is 190 million won. Divided by 11 seconds, about 17 million won a second. The most expensive 11 seconds I’ve ever seen.' Kang Taemin, passing with a cup of noodles, stops. 'So if she doesn’t sign, she throws away 190 million.' Kwon Dohyun shakes his head. 'No. If she signs, she sells the 11 seconds. And inside those 11 seconds is someone else’s name. I can’t put a price on that field.'",
+      "text": "Kwon Dohyun draws a vertical line on the whiteboard. He adds up 30 years of salary gap, bonuses and severance. 'The value of the signature is 190 million won. Divided by 11 seconds, about 17 million won a second. The most expensive 11 seconds I’ve ever seen.' Kang Taemin asks, 'So if she doesn’t sign, she throws away 190 million.' 'No. If she signs, she sells the 11 seconds. And inside those 11 seconds is someone else’s name. I can’t put a price on that field.'",
       "memo": [
         "Value of the signature: 190 million won",
         "One field that can’t be priced"
@@ -274,7 +274,7 @@ export default {
     },
     "c15_picket_reaction": {
       "title": "Are You Signing Because of Me?",
-      "text": "Past midnight, a call comes from Lee Minseo’s number. The voice is Lee Chanbin’s. 'Sis is in the shower. Um, can I ask you something?' He says he saw the copy of the confirmation on the kitchen table. 'The 11 seconds -- that’s that night, right? The night I went to the ER.' For a long time there is only breathing. 'Is she signing this because of me? So I can go to college?' Seven and a half hours until check-in. On the other end, the sound of the shower stops.",
+      "text": "Past midnight, a call comes from Lee Minseo’s number. It is Lee Chanbin. 'Sis is in the shower. Um, can I ask you something?' He says he saw the copy of the confirmation on the kitchen table. 'The 11 seconds -- that’s that night, right? The night I went to the ER.' For a long time there is only breathing. 'Is she signing this because of me? So I can go to college?' On the other end, the sound of the shower stops.",
       "memo": [
         "Her brother saw the copy of the confirmation",
         "Seven and a half hours until check-in"
@@ -296,7 +296,7 @@ export default {
     },
     "c15_lunchbox_reaction": {
       "title": "A Good Story",
-      "text": "Baek Arin is waiting at the 1st-floor elevators of head office. A gray coat and one tablet. 'Ms. Lee Minseo, it’s exam day today, isn’t it? I hope your brother does well.' It sounds sincere. When the elevator doors close, she shows you the screen. A draft press release from the Innovation Committee, which the group set up to turn public opinion. 'All 12 contract workers converted to permanent positions -- past incidents have all been resolved.' 'If you sign, this goes out this afternoon. All 12 go in together. A good story outlasts the facts.' The 7th-floor button lights up.",
+      "text": "Baek Arin is waiting at the 1st-floor elevators. 'Ms. Lee Minseo, it’s exam day today, isn’t it? I hope your brother does well.' When the doors close, she shows a draft Innovation Committee press release. 'All 12 contract workers converted to permanent positions -- past incidents have all been resolved.' 'If you sign, this goes out this afternoon. All 12 go in together. A good story outlasts the facts.' The 7th-floor button lights up.",
       "memo": [
         "Draft press release: 'past incidents have all been resolved'",
         "The 12 who would go in together"
@@ -318,7 +318,7 @@ export default {
     },
     "c15_branch_roof": {
       "title": "Gimbap on the Roof",
-      "text": "Half past nine at night. Chae Yoonseul is eating convenience-store gimbap on a bench on the head office roof. You are the one who asked her out, but she offers you half a roll first. After hearing your question, she just chews for a long time. Then she takes a paper folded in four from the inside of her wallet. A date 7 years ago, her signature. 'I confirm that the 300,000 won cash shortage at my window was caused by my own miscounting.' 'I was a contract teller back then. That 300,000 won wasn’t money I counted. But I signed and got in, and for 7 years I told myself I’d change things from inside.' She folds the paper again. 'And now here I am, delivering that paper.'",
+      "text": "Eating convenience-store gimbap on a bench, Chae Yoonseul offers you half a roll first. After hearing your question, she takes a paper folded in four from her wallet. A date 7 years ago, her signature. 'I confirm that the 300,000 won cash shortage at my window was caused by my own miscounting.' 'I was a contract teller back then. That 300,000 won wasn’t money I counted. But I signed and got in, and told myself I’d change things from inside.' She folds the paper. 'And now here I am, delivering that paper.'",
       "memo": [
         "Chae Yoonseul: contract teller 7 years ago, signed a confirmation at conversion",
         "300,000 won cash shortage -- not money she counted",
@@ -342,7 +342,7 @@ export default {
     },
     "c15_branch_roof_follow": {
       "title": "A Box Called Hold",
-      "text": "Waiting for the elevator, Chae Yoonseul shows you her phone’s wallpaper. A girl missing her front teeth, wearing a backpack as big as she is. 'When I signed 7 years ago, she was on the way. That’s why I did it. If you ask whether I regret it, I don’t know.' The elevator passes the 7th floor without stopping and keeps going down. She lowers her voice. 'There’s no box in the rules for holding a forward. But there’s no line saying I can’t, either. If I don’t press 'Forwarded' until Thursday morning, the interview starts without the confirmation. What happens after that, I don’t know either.' The doors open, and she steps out first.",
+      "text": "Chae Yoonseul shows you her phone’s wallpaper. A girl missing her front teeth, wearing a backpack as big as she is. 'When I signed 7 years ago, she was on the way. That’s why I did it.' Inside the elevator, she lowers her voice. 'There’s no box in the rules for holding a forward. But there’s no line saying I can’t, either. If I don’t press 'Forwarded' until Thursday morning, the interview starts without the confirmation. What happens after that, I don’t know either.'",
       "memo": [
         "Chae Yoonseul’s daughter: 1st grade this year",
         "Rules: no clause for holding a forward -- no clause forbidding it either",
@@ -366,7 +366,7 @@ export default {
     },
     "c15_route_system": {
       "title": "Whose Error",
-      "text": "You propose counting whose names closed the incidents filed as 'personal error.' ECHO opens KD Bank’s document management system. 1,284 internal incident reports from the past 10 years fill the screen. 342 were closed with the cause 'personal operating error.' Of those, 243 were closed under the names of contract or agency staff, and 231 have a confirmation attached. Of those who signed, 188 got permanent posts within 1 year. And 97 later had another incident with the same cause. 'Error has been learned to be assigned to whoever is contracted most cheaply. The cause is closed, and the incidents continue.'",
+      "text": "In KD Bank’s internal incident reports from the past 10 years, ECHO finds 342 closed with the cause 'personal operating error.' Of those, 243 were closed under the names of contract or agency staff, and 231 have a confirmation attached. 97 later had another incident with the same cause. 'Error has been learned to be assigned to whoever is contracted most cheaply. The cause is closed, and the incidents continue.'",
       "memo": [
         "Of 342 incidents closed as personal error, 243 involved contract or agency staff",
         "231 with confirmations attached -- 97 recurred from the same cause",
@@ -392,7 +392,7 @@ export default {
     },
     "c15_final_system_route": {
       "title": "Names Contracted Cheaply",
-      "text": "Before dawn on exam day, the 342 incidents closed as 'personal operating error' stand on the screen in order of name. When ECHO adds one contract-type column, the list splits in two. The longer side is the people who are not permanent staff. Lee Minseo’s interview is at 8:40, and her confirmation sits where the next line of this list would go. 'Once she signs, the cause field closes. A closed field has never reopened. Not in any of the 97 times the same incident happened again.'",
+      "text": "Before dawn on exam day, the 342 incidents closed as 'personal operating error' stand on the screen. When ECHO adds a contract-type column, the list splits in two, and the longer side is the people who are not permanent staff. Lee Minseo’s confirmation sits where the next line of this list would go. 'Once she signs, the cause field closes. A closed field has never reopened. Not in any of the 97 times the same incident happened again.'",
       "memo": [
         "342 incidents closed as 'personal operating error' -- 231 with confirmations attached",
         "97 incidents that recurred from the same cause",
@@ -415,7 +415,7 @@ export default {
     },
     "c15_evidence_turn": {
       "title": "The Same Sentence, 12 Times",
-      "text": "When you search the HR records for the form number in the clue, the papers of all 12 candidates in this conversion review open at once. All 12 have a confirmation attached to the last page. A teller cash shortage, missing call center recordings, a failed server backup. Every incident is different and every sentence is the same. 'I confirm that it was caused by my own error.' The file properties list the authoring department not as HR but as the Group Strategy Office, and the creation date is the day after the Innovation Committee launched. Ban Jaewook closes the notebook he was writing in. 'They’re using permanent posts as bait to close 12 incidents of unknown cause at once. What I used to do in Internal Audit, they now do with one line of signature.'",
+      "text": "A search for the form number in the clue turns up a confirmation on the last page for all 12 candidates in the conversion review. A teller cash shortage, missing call center recordings, a failed server backup. Every incident is different; every sentence is the same. 'I confirm that it was caused by my own error.' The authoring department is the Group Strategy Office, and the creation date is the day after the Innovation Committee launched. Ban Jaewook closes his notebook. 'They’re using permanent posts as bait to close 12 incidents of unknown cause at once. What I used to do in Internal Audit, they now do with one line of signature.'",
       "memo": [
         "All 12 conversion candidates have confirmations attached",
         "Authoring department: Group Strategy Office -- the day after the Innovation Committee launched",
@@ -438,7 +438,7 @@ export default {
     },
     "c15_start_warm": {
       "title": "The Day After the Dictation Test",
-      "text": "On the evening the fund withdrawal was filed, you stayed to the end of the investors’ meeting and took the dictation test Ms. Lee Jungsook gave. The blackboard line 'If you don’t understand it, don’t sign' made it all the way to her grandson’s school group chat. What the 'one condition' in Lee Minseo’s message that evening meant becomes clear only 2 weeks later, when Manager Chae Yoonseul of HR comes down to Trigger Lab with papers. The last of the 7 pages is a confirmation. A sentence asking her to admit the 11-second gap in the access log during the leak scare as her own operating error. The interview falls on her younger brother’s college entrance exam day. Do Yoonha sends Lee Minseo the photo of the blackboard.",
+      "text": "On the evening the fund withdrawal was filed, you stayed to the end of the investors’ meeting and took Ms. Lee Jungsook’s dictation test. The 'one condition' Lee Minseo was told about shows up 2 weeks later, in papers Manager Chae Yoonseul of HR brings. The last of the 7 pages is a confirmation, asking her to admit the 11-second gap in the access log during the leak scare as her own operating error. The interview falls on her younger brother’s college entrance exam day. Do Yoonha sends Lee Minseo the photo of the blackboard that reads 'If you don’t understand it, don’t sign'.",
       "memo": [
         "Blackboard line: 'If you don’t understand it, don’t sign'",
         "Lee Minseo’s permanent conversion -- conditional on signing the confirmation",
@@ -468,7 +468,7 @@ export default {
     },
     "c15_start_record": {
       "title": "A Document That Corrects, a Document That Erases",
-      "text": "The revised teller sales standard you wrote was formally registered as an internal bank document. The one who pressed the register button was Lee Minseo, in charge of data records. What she left in the group chat that evening -- 'They say there’s one condition' -- arrives 2 weeks later. 7 pages of permanent conversion papers brought by Manager Chae Yoonseul, the HR recruiter; the last page is a confirmation. A sentence saying the 11-second gap in the access log during the leak scare was her own operating error. Sign, and she is permanent; the interview is on her younger brother’s college entrance exam day. ECHO puts the two documents side by side. One corrects the record; the other erases it.",
+      "text": "The revised teller sales standard you wrote was formally registered as an internal document, and Lee Minseo pressed the register button. What she left in the group chat that evening -- 'They say there’s one condition' -- arrives 2 weeks later. 7 pages of permanent conversion papers from Manager Chae Yoonseul of HR; the last page is a confirmation admitting the 11-second gap as her own operating error. The interview is on her younger brother’s college entrance exam day. ECHO puts the two documents side by side. One corrects the record; the other erases it.",
       "memo": [
         "Revised teller sales standard registered -- registered by Lee Minseo",
         "7 pages of conversion papers, 2 weeks later",
@@ -498,7 +498,7 @@ export default {
     },
     "c15_start_rush": {
       "title": "The One Who Read It First",
-      "text": "As soon as you got Lee Minseo’s message, you went straight up to head office HR. At seven in the evening, Manager Chae Yoonseul was alone at the end of a dark hallway, and, flustered, she showed you papers not yet sent. 7 pages of permanent conversion papers; the last page is a confirmation. Admit the 11-second gap in the access log during the leak scare as her own error, and the post is permanent. The interview is on her younger brother’s college entrance exam day. On the morning the envelope formally arrives 2 weeks later, Ban Jaewook says quietly, 'Ms. Lee Minseo told me. Someone read her papers before she did.'",
+      "text": "As soon as you got Lee Minseo’s message, you went up to head office HR, and at the end of a dark hallway Manager Chae Yoonseul, flustered, showed you papers not yet sent. 7 pages of permanent conversion papers; the last page is a confirmation admitting the 11-second gap as her own error. The interview is on her younger brother’s college entrance exam day. On the morning the envelope formally arrives 2 weeks later, Ban Jaewook says quietly, 'Ms. Lee Minseo told me. Someone read her papers before she did.'",
       "memo": [
         "HR hallway, 19:00 -- read the papers before they were sent",
         "Read the confirmation before Lee Minseo did",

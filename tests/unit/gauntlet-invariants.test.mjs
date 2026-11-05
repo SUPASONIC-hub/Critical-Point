@@ -568,9 +568,14 @@ test("no scene is cut short by the reading clock", () => {
     assert.ok(needs <= READING_MAX_SECONDS, `${id} needs ${needs}s and the page closes at ${READING_MAX_SECONDS}`);
   }
   // The room above the longest scene is what a bust's changed rules add to its
-  // page (a timeout with a fractured axis: 196 characters, twenty seconds at ten
-  // a second), and no more.
-  assert.ok(READING_MAX_SECONDS - longest <= 20, `the ceiling stays a ceiling: longest scene ${longest}s`);
+  // page: two rules (97 characters) add ten seconds, a timeout with a fractured
+  // axis (196 characters) twenty. The longest scene's page after such a bust
+  // still fits under the ceiling.
+  assert.ok(longest + 20 <= READING_MAX_SECONDS, `a bust page on the longest scene (${longest}s + 20s) is cut at ${READING_MAX_SECONDS}`);
+  // The ceiling itself stays at 94 (the owner, 2026-11-03: the reading formula
+  // as it is). It is reviewed with the reading times once the prose trims of
+  // P3 have all landed; the longest scene was 74 seconds when 94 was set.
+  assert.equal(READING_MAX_SECONDS, 94, "the ceiling is reviewed with the reading times after the prose trims");
 });
 
 /**

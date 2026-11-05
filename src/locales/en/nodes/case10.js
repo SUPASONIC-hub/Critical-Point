@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c10_start": {
       "title": "Ten Days",
-      "text": "Ten days have passed since the FlowOn resolution. Yesterday morning, Do Yoonha was rushed to the emergency room at Gangseo Ieum Hospital. The diagnosis is overwork and exhaustion, plus the sleeping pills he has been prescribed for 3 years. The group has filed it as a personal matter. At the ward door, Han Seoyun cannot bring herself to hand over the papers; she keeps them in her hand as she speaks. 'There’s a file from his locker. It was never registered as an official document, so its retention period is 0. It will be purged automatically in four days.'",
+      "text": "Yesterday morning, Do Yoonha was rushed to the emergency room. Overwork, exhaustion, and the sleeping pills he has taken for 3 years. The group filed it as a personal matter. Han Seoyun speaks. 'There’s a file from his locker. It isn’t an official document, so its retention period is 0. It will be purged automatically in four days.'",
       "memo": [
         "Do Yoonha: overwork, exhaustion, 3 years of sleeping-pill prescriptions",
         "Group classification: personal matter, not work-related",
@@ -38,7 +38,7 @@ export default {
     },
     "c10_locker": {
       "title": "1,740 Names",
-      "text": "The locker file covers 3 years. 1,740 people ruined by loans sold at the Gangseo Branch windows. Names, contact numbers, date of last call, and 'resolved' or 'unresolved'. Lee Minseo stops at the last page. Below the unresolved column is one more line, in Do Yoonha’s own hand. '2023-0412 dissent author -- sent down to the basement. Unresolved.' For 3 years, you were one of the victims he was counting.",
+      "text": "The names and contact numbers of 1,740 people ruined by loans sold at the Gangseo Branch windows, each marked 'resolved' or 'unresolved'. At the last page, Lee Minseo stops. There is one more line, in Do Yoonha’s hand. '2023-0412 dissent author -- sent down to the basement. Unresolved.' You were one of the victims he was counting.",
       "memo": [
         "1,740 people over 3 years -- 612 resolved, 1,128 unresolved",
         "47 small transfers in his monthly salary account records",
@@ -69,7 +69,7 @@ export default {
     },
     "c10_claim": {
       "title": "Is Burnout an Injury?",
-      "text": "A meeting is called to decide whether this counts as an industrial accident. The locker file is bound to it as evidence, and the purge stops. There is one issue. To prove the exhaustion came from work, you must put on record how far Do Yoonha pushed himself outside the rules. That same record proves he broke company rules for 3 years. Ban Jaewook closes his notebook and, for the first time, looks at his own hands. 'For 20 years I’ve cut people from this seat. Today I don’t know whether this paper saves that man or cuts him.'",
+      "text": "The locker file is bound as evidence to the meeting that decides whether this is an industrial accident, and the purge stops. To prove it came from work, you must show how far Do Yoonha pushed himself outside the rules. That record also proves he broke company rules for 3 years. Ban Jaewook closes his notebook. 'For 20 years I’ve cut people from this seat. Today I don’t know whether this paper saves that man or cuts him.'",
       "memo": [
         "Proof of causation = proof of rule violations",
         "If approved: treatment costs and leave pay; if denied: advice to resign voluntarily",
@@ -100,7 +100,7 @@ export default {
     },
     "c10_relay": {
       "title": "How to Share the Load",
-      "text": "The 2nd floor of the secondhand bookshop in Hoegi-dong. Lim Kyungsoo clears away ledgers to make room, and Na Junhyuk, up from Gangwon on a dawn bus, makes six cups of instant coffee. Lee Minseo, Kang Taemin and even Oh Jinwoo have come. You draw up a sheet that splits the 1,128 among six people instead of one. Passing around paper cups, Na Junhyuk says, 'I’ve learned one thing in 30 years. Good work done alone always ends. Because the person ends.' Oh Jinwoo quietly raises his hand last. 'Give me a column too. The hardest one.'",
+      "text": "Na Junhyuk makes six cups of instant coffee. Lee Minseo, Kang Taemin and even Oh Jinwoo come, and you split the 1,128 among six. Na Junhyuk says, 'I’ve learned one thing in 30 years. Good work done alone always ends. Because the person ends.' Oh Jinwoo raises his hand last. 'Give me a column too. The hardest one.'",
       "memo": [
         "A sheet splitting 1,128 people among six",
         "Na Junhyuk 200 · Lim Kyungsoo 180 · Lee Minseo 240 · Kang Taemin 120 · Oh Jinwoo 288 · you 100",
@@ -131,7 +131,7 @@ export default {
     },
     "c10_final": {
       "title": "How to Stop",
-      "text": "The doctor ordered 4 weeks of rest; Do Yoonha comes back after 2. Meanwhile the list has become an official group agenda item, and 212 people dropped out while it was fitted to the agenda form. People with no paperwork left, people whose loans were in a family member’s name, people past the statute of limitations. The rules have no box for them. Do Yoonha sits at his desk, takes out a new notebook and writes 212 on the first page. Then he looks at you. 'I know. I’ll collapse again at this rate. But if I don’t write these 212 down, they exist nowhere. Will you stop me, or write with me?'",
+      "text": "When the list became a group agenda item, 212 people who did not fit the form dropped out. No paperwork, loans in a family member’s name, or past the statute of limitations. Back despite the doctor’s order of 4 weeks’ rest, Do Yoonha writes 212 on the first page of a new notebook. 'I know. I’ll collapse again at this rate. But if I don’t write these 212 down, they exist nowhere. Will you stop me, or write with me?'",
       "memo": [
         "916 on the agenda, 212 pushed outside the rules",
         "The 212 exist in no official register",
@@ -159,7 +159,7 @@ export default {
     },
     "c10_aftershock": {
       "title": "Six Columns",
-      "text": "On the first weekend after the roster goes up, splitting the unresolved list among six people, the Trigger Lab 4th floor is quiet. The 212 with no paperwork made it into none of its columns. Back from the hospital, Do Yoonha writes 'resolved' next to a name for the first time today, puts down his pen and looks at that line for a long while. 'I wrote these alone for 3 years. This week, six of us wrote them.' It is still light outside. Neither of you can remember the last time you left on time.",
+      "text": "The first weekend after the roster goes up, the 4th floor is quiet. The 212 with no paperwork are nowhere on it. Do Yoonha writes 'resolved' next to a name for the first time today. 'I wrote these alone for 3 years. This week, six of us wrote them.' It is still light outside. Neither of you can remember the last time you left on time.",
       "memo": [
         "34 cases closed in week 1 -- six times his 3-year solo average",
         "The list of 212 is still in no system",
@@ -183,7 +183,7 @@ export default {
     },
     "c10_ward": {
       "title": "10 Minutes Awake",
-      "text": "Do Yoonha wakes for about 10 minutes. He does not ask about his own condition. 'The file on the 1,128. Is it getting purged?' Then, for the first time, he gives his reason. 'I was No. 1 in sales at Gangseo Branch twice. Got the award, had my picture taken. Every bit of those numbers is that list. I sold them. I should be the one counting.' He finishes and falls asleep again.",
+      "text": "Do Yoonha wakes for about 10 minutes. 'The file on the 1,128. Is it getting purged?' Then, for the first time, he gives his reason. 'I was No. 1 in sales at Gangseo Branch twice. Every bit of those numbers is that list. I sold them. I should be the one counting.'",
       "memo": [
         "4,180 hours of overtime over 3 years",
         "2,940 of them on the list",
@@ -207,7 +207,7 @@ export default {
     },
     "c10_pills": {
       "title": "19 People",
-      "text": "Han Seoyun opens the personnel records. In the last 3 years, nineteen people at Trigger Lab, Gangseo Branch and the Corporate Finance Strategy Team took sick leave for the same reason. Every reason field says 'personal matter'. She scrolls one more line and stops. 1 of the 19 is Han Seoyun herself. 3 years ago, 2 weeks.",
+      "text": "Han Seoyun opens the personnel records. In the last 3 years, nineteen people at Trigger Lab, Gangseo Branch and the Corporate Finance Strategy Team took sick leave for the same reason, and every reason field says 'personal matter'. One of them is Han Seoyun herself. 3 years ago, 2 weeks.",
       "memo": [
         "19 sick leaves for the same reason -- all recorded as personal matters",
         "11 of the 19 still work here",
@@ -231,7 +231,7 @@ export default {
     },
     "c10_ledger": {
       "title": "Six Profit-and-Loss Sheets",
-      "text": "Oh Jinwoo has called in Kwon Dohyun. He looks at the roster and draws columns on a blank sheet. 'Fill in all six boxes. If the what-you-lose box is empty, this sheet falls apart within six months. I’ve watched a sheet built on goodwill fall apart in my own family.' Five boxes get filled. Kang Taemin, night-shift pay. Lee Minseo, the contract renewal review. Na Junhyuk, 2 years to retirement. Lim Kyungsoo, his quiet. Oh Jinwoo, his place in the promotion line. The sixth box is empty.",
+      "text": "Kwon Dohyun draws a column beside the roster. 'If the what-you-lose box is empty, this sheet falls apart within six months. I’ve watched a sheet built on goodwill fall apart in my own family.' Kang Taemin writes night-shift pay; Lee Minseo, the contract renewal review; Na Junhyuk, 2 years to retirement; Lim Kyungsoo, his quiet; Oh Jinwoo, his place in the promotion line. Only your box is empty.",
       "memo": [
         "Four of the six gain nothing from this work",
         "Kwon Dohyun: only a sheet that lists losses lasts",
@@ -255,7 +255,7 @@ export default {
     },
     "c10_ward_reaction": {
       "title": "What the Books Don’t Count",
-      "text": "In the corridor outside the ward, ECHO brings up a calculation. Of Do Yoonha’s 4,180 overtime hours over 3 years, 2,940 went to the list. At his hourly rate, that is 43 million won. None of it was ever claimed. 'Goodwill does not show up in the accounts. A cost that does not show up does not shrink either. These 2,940 hours have never been recorded as an expense anywhere in this organization’s books.'",
+      "text": "In the corridor, ECHO brings up a calculation. Of Do Yoonha’s overtime, 2,940 hours went to the list. At his hourly rate, that is 43 million won, and none of it was ever claimed. 'Goodwill does not show up in the accounts. A cost that does not show up does not shrink either.'",
       "memo": [
         "2,940 hours not in the books",
         "43 million won never claimed"
@@ -277,7 +277,7 @@ export default {
     },
     "c10_pills_reaction": {
       "title": "2 Weeks, 3 Years Ago",
-      "text": "Han Seoyun opens her own sick-leave record. Reason: personal matter. The actual date is two months after she pressed the return button on the FlowOn dissent, 3 years ago. 'I didn’t tell anyone back then. Saying it would mean I regret that return.' She goes to close the screen, then stops. 'But I bet 18 of the 19 kept quiet for the same reason.'",
+      "text": "Han Seoyun’s sick leave came two months after she pressed the return button on the FlowOn dissent, 3 years ago. 'I didn’t tell anyone back then. Saying it would mean I regret that return. But I bet 18 of the 19 kept quiet for the same reason.'",
       "memo": [
         "A reason never written in the reason field",
         "The 19th box, still empty"
@@ -299,7 +299,7 @@ export default {
     },
     "c10_ledger_reaction": {
       "title": "Oh Jinwoo’s Box",
-      "text": "Oh Jinwoo’s box says 'place in the promotion line'. But tilt the paper and the original words show through under the erasure. 'Something to tell my father.' That is why he took 288 people. His father delayed an approval by one day and was pushed out of his branch; the son wants to prove 288 times that the day was right.",
+      "text": "Oh Jinwoo’s box says 'place in the promotion line', but the original words show through under the erasure. 'Something to tell my father.' His father delayed an approval by one day and was pushed out of his branch. The son has taken 288 people to prove that the day was right.",
       "memo": [
         "One line, erased and rewritten",
         "Where the number 288 comes from"
@@ -321,7 +321,7 @@ export default {
     },
     "c10_branch_home": {
       "title": "Window 4",
-      "text": "Almost every receiving account of the 47 transfers was opened at Gangseo Branch. While pulling those records, Lee Minseo collects Do Yoonha’s things from his old locker. Inside are two No. 1 sales award certificates and one unopened envelope. On the front: the word 'Resignation' and a date from the summer 3 years ago. He wrote it and never handed it in. Across the counter, at Window 4, someone else now sits, selling a renamed product the same way.",
+      "text": "Almost every account that received the 47 transfers was opened at Gangseo Branch. Lee Minseo opens Do Yoonha’s old locker there. Two award certificates, and an unopened resignation letter dated the summer 3 years ago. He wrote it and never handed it in. At his old window, someone else now sells a renamed product the same way.",
       "memo": [
         "Resignation letter written 3 years ago, never submitted",
         "Award certificates, 2 times -- sales figures for that product",
@@ -345,7 +345,7 @@ export default {
     },
     "c10_branch_home_follow": {
       "title": "Other Handwriting",
-      "text": "Checking the original list in the branch records room, Lee Minseo stops. Of the 1,740 lines, some 200 are not in Do Yoonha’s hand. There are three other scripts. Three Gangseo Branch employees have each added a few lines over 3 years. They never coordinated, and never told Do Yoonha. Lee Minseo smiles quietly. 'He wasn’t doing it alone. He just didn’t know.'",
+      "text": "Checking the original list, Lee Minseo stops. Of the 1,740 lines, some 200 are not in Do Yoonha’s hand. Three Gangseo Branch employees have quietly added a few lines each over 3 years. Lee Minseo smiles. 'He wasn’t doing it alone. He just didn’t know.'",
       "memo": [
         "3 handwritings besides Do Yoonha’s -- about 200 lines",
         "All three still work at Gangseo Branch",
@@ -369,7 +369,7 @@ export default {
     },
     "c10_route_system": {
       "title": "Burnout Rate",
-      "text": "You ask how long others in the same job lasted. ECHO starts calculating. A metric no one has ever tallied takes shape. Over the past 6 years, 34 employees tracked customer harm on their own. 29 of them quit or went on long-term sick leave within 3 years. The average run was 2 years and 7 months. 'In this organization, goodwill is used up in 31 months on average. No one has measured this number. Measure it and it becomes something to manage.'",
+      "text": "You ask how long others in the same job lasted, and ECHO tallies it for the first time. Of 34 employees who tracked customer harm on their own over the past 6 years, 29 quit or went on long-term sick leave within 3 years. 'In this organization, goodwill is used up in 31 months on average. No one measured it. Measure it and it becomes something to manage.'",
       "memo": [
         "29 of 34 voluntary harm trackers gone within 3 years",
         "Average run 31 months -- Do Yoonha is at month 36",
@@ -395,7 +395,7 @@ export default {
     },
     "c10_final_system_route": {
       "title": "Thirty-One Months",
-      "text": "Eight hours before the roster that splits the 1,128 unresolved among six people is locked, the burnout table is up on the lab terminal. Of 34, 29 left within 3 years, and Do Yoonha is at month thirty-six. ECHO leaves one line. 'Put this number into the system and it becomes something to manage. Leave it out and the next person counts alone too.'",
+      "text": "The burnout table is up on the lab terminal. Of 34, 29 left within 3 years, and Do Yoonha is at month thirty-six. ECHO leaves one line. 'Put this number into the system and it becomes something to manage. Leave it out and the next person counts alone too.'",
       "memo": [
         "34 voluntary harm trackers -- 29 gone within 3 years",
         "Do Yoonha: month 36",
@@ -418,7 +418,7 @@ export default {
     },
     "c10_evidence_turn": {
       "title": "The Default in the Reason Field",
-      "text": "The clues line up, and the revision history of the HR forms opens. 4 years ago, the option 'work-related' was deleted from the reason field of the sick-leave form, and 'personal matter' became the default. The department that drafted the revision was the Corporate Finance Strategy Team. The 19 on sick leave wrote the same words not because of 19 choices, but because there was only one option.",
+      "text": "The clues line up, and the revision history of the HR forms opens. 4 years ago, 'work-related' was deleted from the sick-leave reason field, and 'personal matter' became the default. The revision came from the Corporate Finance Strategy Team. The 19 wrote the same words because there was only one option.",
       "memo": [
         "Sick-leave form revised 4 years ago -- 'work-related' option deleted",
         "Revising department: KD Bank Corporate Finance Strategy Team",
@@ -441,7 +441,7 @@ export default {
     },
     "c10_start_stay": {
       "title": "Ten Days of the One Who Stayed",
-      "text": "The job-retention deal took ten days. All that time, you never left the fulfillment center. The 1,140 kept their jobs, and in those ten days no one in Seoul looked at Do Yoonha’s work hours. Yesterday morning he was rushed to the emergency room. The winning side’s list was settled, and the condition of one of the winners went on no paper at all. Outside the ward, Han Seoyun says, 'There’s a file from his locker. It isn’t an official record, so it will be purged automatically in four days.'",
+      "text": "For the ten days until the deal, you never left the fulfillment center, and the 1,140 kept their jobs. All that time, no one in Seoul looked at Do Yoonha’s work hours. Yesterday morning he was rushed to the emergency room. Han Seoyun says, 'There’s a file from his locker. It isn’t an official record, so it will be purged automatically in four days.'",
       "memo": [
         "Job-retention deal done, 1,140 kept",
         "Do Yoonha’s overtime in the same period: unrecorded",
@@ -471,7 +471,7 @@ export default {
     },
     "c10_start_court": {
       "title": "Ten Days of the One Who Testified",
-      "text": "You spent ten days between the courtroom and the prosecutors’ team. Your statements were exact and the procedure was clean. You come back to find Do Yoonha was rushed to the emergency room yesterday morning, and his records were never submitted as evidence. Harm you can testify to sits beside harm that has no form to testify on. Outside the ward, Ban Jaewook says, 'A file turned up in his locker. It isn’t an official record, so it will be purged automatically in four days.'",
+      "text": "For ten days in court your statements were exact and the procedure was clean. You come back to find Do Yoonha was rushed to the emergency room yesterday morning, and his records were never submitted as evidence. Ban Jaewook says, 'A file turned up in his locker. It isn’t an official record, so it will be purged automatically in four days.'",
       "memo": [
         "3 witness examinations, statements on record",
         "Do Yoonha’s case classified as a personal matter, not work-related",
@@ -501,7 +501,7 @@ export default {
     },
     "c10_start_return": {
       "title": "Ten Days of the One Who Went Back Quietly",
-      "text": "You finished your cup noodles and went back to Yeongdong Branch. You heard about the job-retention deal on the news, and on the morning of the tenth day the phone rings. Do Yoonha was rushed to the emergency room yesterday morning. News that travels 240km always arrives a beat late. This time the beat was the distance to the emergency room. Outside the ward, ECHO reports. 'The list file from his locker is not an official record. It will be purged automatically in four days.'",
+      "text": "You finished your cup noodles and went back to Yeongdong Branch. The news that Do Yoonha had been rushed to the emergency room reached you a day late. News that travels 240km always arrives a beat late. This time the beat was the distance to the emergency room. ECHO reports. 'The list file from his locker is not an official record. It will be purged automatically in four days.'",
       "memo": [
         "Day 9 back at Yeongdong Branch",
         "News of Do Yoonha’s emergency transfer reached you a day late",

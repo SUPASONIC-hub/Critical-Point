@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c32_start": {
       "title": "07:40",
-      "text": "The door of KD Capital’s Risk Management Department on the 12th floor opens, and 11 people in blue vests walk in. They are investigators from the Seoul Central District Prosecutors’ Office. The man in front holds up a sheet of paper. It is a search and seizure warrant (a document from a court allowing them to take records and items by force). At the same moment the same paper goes into the Group Strategy Office on the 33rd floor of headquarters and into Yoon Sanghyuk’s CEO office. The man introduces himself as Prosecutor Na Eunho and stops right at your desk. 'You’re the one who wrote the dissent, right? I read about it. Come in at two this afternoon as a witness (someone with no duty to testify who comes in to explain the facts).' As he puts a seal sticker on your monitor, he adds. 'I said witness. For now.'",
+      "text": "11 investigators from the Seoul Central District Prosecutors’ Office walk in wearing blue vests. The man in front holds up a search and seizure warrant (a document from a court allowing them to take records and items by force). Prosecutor Na Eunho stops right at your desk. 'You’re the one who wrote the dissent, right? Come in at two this afternoon as a witness (someone with no duty to testify who comes in to explain the facts).' As he puts a seal sticker on your monitor, he adds. 'I said witness. For now.'",
       "memo": [
         "3 search sites: Group Strategy Office (33rd floor), KD Capital CEO office, Risk Management Department",
         "Allegations: delayed losses on the Pyeongtaek officetel loans, the Roundhill sale price, Haeon Partners advisory fees",
@@ -38,7 +38,7 @@ export default {
     },
     "c32_boxes": {
       "title": "The Name on the Boxes",
-      "text": "'They say you’re the only one who knows which boxes are Trigger Lab’s.' 40 Trigger Lab record boxes are stacked in the Group Strategy Office hallway, and investigators tag them with numbers one by one. Baek Arin, whose March resignation has gone unaccepted for three months, still has a desk on this floor. She stands and watches it being emptied. A woman who was always smooth is picking at her nails. Every box has a group legal team sticker on its side. 'Retention period expired. To be destroyed June 20.' That is four days away. The same handwriting as the Pyeongtaek boxes in the basement archive last week. Na Eunho opens one box. The label on the top file is your name. 1,106 pages of response records. 'Your name comes up the most. Yoon Sanghyuk’s hasn’t come up once yet.' He snaps the file shut. 'A bit much for someone who came to testify, isn’t it?'",
+      "text": "40 Trigger Lab record boxes are stacked in the Group Strategy Office hallway. Baek Arin, whose March resignation has gone unaccepted for three months, still has a desk on this floor. She stands and watches it being emptied. Every box has a group legal team sticker on its side. 'Retention period expired. To be destroyed June 20.' Na Eunho opens one box. The label on the top file is your name. 1,106 pages of response records. 'Your name comes up the most. Yoon Sanghyuk’s hasn’t come up once yet. A bit much for someone who came to testify, isn’t it?'",
       "memo": [
         "40 Trigger Lab record boxes (printouts, external disks) -- legal team sticker 'to be destroyed June 20'",
         "Your response records: 1,106 pages",
@@ -69,7 +69,7 @@ export default {
     },
     "c32_room": {
       "title": "Last Month’s Signature",
-      "text": "On the desk in Room 1108 of the Seoul Central District Prosecutors’ Office, Na Eunho sets down a gimbap roll wrapped in foil. 'I missed lunch. Want some? If not, I’ll eat it all.' The first question is not about the dissent from 3 years ago. He slides a sheet of paper across. A KD Capital 'Distressed Asset Sale Price Review' dated May 28. It is the sale at 30.7% of book value, and your electronic signature is in the reviewer field. That night you were in Singapore. At the company only one person can enter someone else’s electronic signature: Seok Jaewoo, the CEO’s chief of staff. 'The dissent is from 3 years ago. This signature is from last month. I investigate last month.' He chews his gimbap. 'So who wrote your name? Until I find that person, I’ll ask my questions as if you were a suspect (someone suspected of a crime and under investigation).'",
+      "text": "Na Eunho sets down a gimbap roll wrapped in foil. 'I missed lunch. Want some?' He slides across a KD Capital 'Distressed Asset Sale Price Review' dated May 28. Your electronic signature is in the reviewer field. That night you were in Singapore. At the company only one person can enter someone else’s electronic signature: Seok Jaewoo, the CEO’s chief of staff. 'The dissent is from 3 years ago. This signature is from last month. I investigate last month.' 'So who wrote your name? Until I find that person, I’ll ask my questions as if you were a suspect (someone suspected of a crime and under investigation).'",
       "memo": [
         "Review dated May 28 -- you were in Singapore",
         "Sale price: 30.7% of book value, buyer Roundhill Capital",
@@ -100,7 +100,7 @@ export default {
     },
     "c32_notebook": {
       "title": "The Stickers Are Evidence Too",
-      "text": "Ban Jaewook was on a regional audit tour, and he has driven up from Daejeon to the prosecutors’ office parking lot. His black notebook got a demand to submit too. It is the notebook the legal team tried to take six months ago. This time a court document is attached, so there is no way to refuse. Ban Jaewook takes the notebook out of the passenger seat. The 12 star stickers his daughter Seoa put on the cover are still there, and inside, next to Ha Yoonjae’s name, is a single flower sticker. 'The investigator says I can’t even peel off the stickers. Evidence stays exactly as it is.' He takes off his glasses. 'Seoa asked me on the phone earlier. Is Daddy’s notebook going to jail? I said no, but I’m not sure myself.' On the last page of the notebook, your name in pencil is still there.",
+      "text": "Ban Jaewook’s black notebook got a demand to submit too. This time a court document is attached, so there is no way to refuse. The 12 star stickers his daughter Seoa put on the cover are still there, and inside, next to Ha Yoonjae’s name, is a single flower sticker. 'The investigator says I can’t even peel off the stickers. Evidence stays exactly as it is.' 'Seoa asked me on the phone earlier. Is Daddy’s notebook going to jail? I said no, but I’m not sure myself.'",
       "memo": [
         "Demand to submit Ban Jaewook’s notebook -- court-approved this time",
         "12 star stickers on the cover, 1 flower sticker next to Ha Yoonjae’s name",
@@ -131,7 +131,7 @@ export default {
     },
     "c32_final": {
       "title": "Too Many Names",
-      "text": "When the last interview ends, Na Eunho follows you out into the hallway. His tie is already in his pocket. 'From tomorrow we have to settle your status. I’ll give you the options, quickly.' He raises one finger at a time. One: tell everything you know about Yoon Sanghyuk, and you stay a witness. But all the response records of your Trigger Lab colleagues must be opened as evidence too. Two: you are investigated as a suspect, starting with the review that bears your name. Finding the person who wrote your name could take months. Three: tonight you hand over only what concerns Yoon Sanghyuk, and decide the rest later. 'I like fast. But this time I’m not sure fast is right either.' He presses the elevator button. '3 years ago the signature line was empty, they tell me. This time there are too many of your names.'",
+      "text": "Na Eunho says, 'From tomorrow we have to settle your status. I’ll give you the options, quickly.' One: tell everything you know about Yoon Sanghyuk, and you stay a witness. But all the response records of your Trigger Lab colleagues must be opened as evidence too. Two: you are investigated as a suspect, starting with the review that bears your name. Finding the person who wrote your name could take months. Three: tonight you hand over only what concerns Yoon Sanghyuk, and decide the rest later. He presses the elevator button. '3 years ago the signature line was empty, they tell me. This time there are too many of your names.'",
       "memo": [
         "Deadline to settle your status: tomorrow 09:00",
         "If you stay a witness: all Trigger Lab colleagues’ response records opened",
@@ -159,7 +159,7 @@ export default {
     },
     "c32_aftershock": {
       "title": "12 Chairs",
-      "text": "After midnight you return to KD Capital’s 12th floor. The Risk Management Department is empty, every drawer pulled out, and the chairs pushed into the hallway. Colleagues who got visitor passes from the security desk roll up their sleeves without a word. Kang Taemin pushes desks two at a time, and Kwon Dohyun matches drawer numbers, saying 'I’ll put the restoration cost on the invoice.' Then the elevator opens and Baek Arin walks in. Without saying she came down from the 33rd floor, she lines up 12 chairs in a row, puts a 312-line copy of the seizure list on your desk, and leaves first. At the very end of the list, only the Box 27 row is blank. There is a text from Na Eunho on your phone. 'Your status is fixed in the record at nine in the morning. Until then you may change your statement.'",
+      "text": "The Risk Management Department is empty, every drawer pulled out. Colleagues roll up their sleeves without a word. Kang Taemin pushes desks two at a time, and Kwon Dohyun matches drawer numbers, saying 'I’ll put the restoration cost on the invoice.' Then Baek Arin walks in and, without a word, sets up 12 chairs, puts a 312-line copy of the seizure list on your desk, and leaves first. At the very end of the list, only the Box 27 row is blank. There is a text from Na Eunho on your phone. 'Your status is fixed in the record at nine in the morning. Until then you may change your statement.'",
       "memo": [
         "23 Risk Management desks -- every drawer seized",
         "12 chairs set up by Baek Arin",
@@ -183,7 +183,7 @@ export default {
     },
     "c32_dock": {
       "title": "Two Number 26s",
-      "text": "Around noon, two prosecution trucks stand at the loading dock in the headquarters’ underground parking lot. Kang Taemin, who says he came as soon as he saw the news after his night shift, stands there holding a bag of cup noodles. When an investigator staggers while lifting three boxes at once, Kang Taemin reaches out by reflex and steadies them. 'Sir, that’s evidence. Hands off.' Kang Taemin sets the box on the ground and clasps both hands behind his back. Then he looks into the truck for a long time and says, 'There are two number 26s. One of them should be in the 27 spot.' Jin Taeyoon, the investigator who put on the tags, flips through the list and his face stiffens. Box 27 is only on the list, not on the truck.",
+      "text": "Beside two prosecution trucks stands Kang Taemin, who says he came as soon as he saw the news after his night shift. When an investigator staggers while lifting three boxes at once, Kang Taemin reaches out by reflex and steadies them. 'Sir, that’s evidence. Hands off.' Kang Taemin sets the box on the ground and clasps both hands behind his back. Then he says, 'There are two number 26s. One of them should be in the 27 spot.' Jin Taeyoon, the investigator who put on the tags, flips through the list and his face stiffens. Box 27 is only on the list, not on the truck.",
       "memo": [
         "2 prosecution trucks -- 58 boxes loaded",
         "Box 26 duplicated, Box 27 missing",
@@ -206,7 +206,7 @@ export default {
     },
     "c32_invoice": {
       "title": "22 Questions",
-      "text": "During a break in the interviews, Kwon Dohyun is sitting on a hallway chair. Bridge Bank lent Roundhill its acquisition money, so he has been called in to testify too. The paper on his knee already has vertical lines ruled on it. '58 boxes, 11 investigators, and if you add forensics (analysis that recovers even deleted files to look at them), today alone costs the taxpayer roughly 24 million won.' He stops his pen. 'I won’t write an invoice today.' He turns the paper over. The back is the question sheet he was given. Of 22 questions, 18 are about you. 'This question sheet I can’t put a price on.'",
+      "text": "Kwon Dohyun is sitting on a hallway chair. Bridge Bank lent Roundhill its acquisition money, so he has been called in to testify too. '58 boxes, 11 investigators, and if you add forensics (analysis that recovers even deleted files to look at them), today alone costs the taxpayer roughly 24 million won.' 'I won’t write an invoice today.' He turns the paper over. The back is the question sheet he was given. Of 22 questions, 18 are about you. 'This question sheet I can’t put a price on.'",
       "memo": [
         "Estimated cost of today’s investigation -- about 24 million won",
         "Kwon Dohyun’s question sheet: 18 of 22 questions are about you",
@@ -229,7 +229,7 @@ export default {
     },
     "c32_bento": {
       "title": "Four Tries at the Omelet",
-      "text": "At 10:40 at night, Han Seoyun stands at the crosswalk across from the prosecutors’ office. Three months into a standby assignment (a personnel order that leaves you with no duties while you wait for your next post), she is holding five lunchboxes wrapped in a cloth bundle. 'On standby you have time to spare. I rolled the egg omelet four times. Three of them failed.' Oh Jinwoo comes over loosening his tie, and Do Yoonha gets out of a taxi after closing up at his branch. Meanwhile 312 messages have piled up in the group chat. Kang Taemin brings hot water for cup noodles from the convenience store, and Kwon Dohyun is figuring the cost of the lunchboxes until Han Seoyun takes his chopsticks away. Lee Minseo cries while eating the egg omelet. She says it is because it tastes good. Opening the lid of your box, Han Seoyun asks, 'The last interview, what time is it?'",
+      "text": "Three months into a standby assignment (a personnel order that leaves you with no duties while you wait for your next post), Han Seoyun stands holding five lunchboxes wrapped in a cloth bundle. 'I rolled the egg omelet four times. Three of them failed.' Oh Jinwoo and Do Yoonha arrive too. Lee Minseo cries while eating the egg omelet. She says it is because it tastes good. Opening the lid of your box, Han Seoyun asks, 'The last interview, what time is it?'",
       "memo": [
         "Han Seoyun’s 5 lunchboxes -- the egg omelet worked on the fourth try",
         "312 group chat messages",
@@ -252,7 +252,7 @@ export default {
     },
     "c32_dock_reaction": {
       "title": "Fellow Loaders",
-      "text": "Jin Taeyoon shuts the truck door and holds out a can of coffee to Kang Taemin. 'I did parcel loading for 3 years in college too. Get a number wrong and the foreman chewed you out at dawn.' Kang Taemin says, 'If I’d been that foreman, I wouldn’t have,' and the two of them laugh for a moment. Jin Taeyoon lowers his voice. 'Box 27 is in the 33rd-floor removal log. It went out two days ago at 6 p.m., under the group legal team’s name. That means someone knew the day we were coming.' He looks at you. 'I’ll report it to the prosecutor. But if the record shows you knew first, I can’t say whether that’ll be good or bad.'",
+      "text": "Jin Taeyoon shuts the truck door and holds out a can of coffee to Kang Taemin. 'I did parcel loading for 3 years in college too. Get a number wrong and the foreman chewed you out at dawn.' Jin Taeyoon lowers his voice. 'Box 27 is in the 33rd-floor removal log. It went out two days ago at 6 p.m., under the group legal team’s name. That means someone knew the day we were coming.' 'I’ll report it to the prosecutor. But if the record shows you knew first, I can’t say whether that’ll be good or bad.'",
       "memo": [
         "Box 27: taken out by the legal team two days ago at 18:00",
         "Someone knew the seizure date in advance"
@@ -274,7 +274,7 @@ export default {
     },
     "c32_invoice_reaction": {
       "title": "The Foil That Missed",
-      "text": "Na Eunho comes out into the hallway and looks at the two of you. In his hand is the gimbap foil, crushed into a ball. 'If two witnesses pass a question sheet around in the hallway, what should I write in the record?' He tosses the foil at the trash can and misses. He doesn’t pick it up. 'I’ll be honest. I don’t much like people who write dissents. They all write one, then go down to the basement and sit still for 3 years. And in those 3 years, people like Yoon Sanghyuk empty the boxes.' He points his chin at Kwon Dohyun’s paper. 'You stopped calculating. Right call. That price depends on who gets indicted (charged and sent to trial).'",
+      "text": "Na Eunho comes out into the hallway and looks at the two of you. He tosses the gimbap foil at the trash can and misses. He doesn’t pick it up. 'I’ll be honest. I don’t much like people who write dissents. They all write one, then go down to the basement and sit still for 3 years. And in those 3 years, people like Yoon Sanghyuk empty the boxes.' He points his chin at Kwon Dohyun’s paper. 'You stopped calculating. Right call. That price depends on who gets indicted (charged and sent to trial).'",
       "memo": [
         "Na Eunho: 'I don’t much like people who write dissents'",
         "Who gets sent to trial is still undecided"
@@ -296,7 +296,7 @@ export default {
     },
     "c32_bento_reaction": {
       "title": "Still in the Account",
-      "text": "While clearing the lunchboxes, Do Yoonha shows you his phone. A text tells him to come in and testify at 10 a.m. tomorrow too. 3 years ago he was the one who sold that loan at the counter. 'Funny, right? The bonus I got for selling that loan is still sitting in my account. I couldn’t bring myself to spend it.' He closes the lid of his empty lunchbox. 'If they ask tomorrow, I’ll tell it as it is. Then one more box will have my name in it. That’s fine. It’d be stranger if my name weren’t there.' The crosswalk light changes, and Han Seoyun pats Do Yoonha once on the back.",
+      "text": "Do Yoonha shows you his phone. A text tells him to come in and testify at 10 a.m. tomorrow too. 3 years ago he was the one who sold that loan at the counter. 'The bonus I got for selling that loan is still sitting in my account. I couldn’t bring myself to spend it.' 'If they ask tomorrow, I’ll tell it as it is. Then one more box will have my name in it. That’s fine. It’d be stranger if my name weren’t there.' Han Seoyun pats Do Yoonha once on the back.",
       "memo": [
         "Do Yoonha called in as a witness: tomorrow 10:00",
         "A bonus untouched for 3 years"
@@ -318,7 +318,7 @@ export default {
     },
     "c32_branch_waiting": {
       "title": "Lee Minseo in the Waiting Room",
-      "text": "During a break, Lee Minseo is sitting in the waiting room at the end of the hallway. She has been called in to testify too, because of the Trigger Lab record copies left at KD Data Lab. The summons on her knee is crumpled. 'The investigator asked me earlier. Who was in charge of keeping the records? That was me.' She starts to smile and stops. 'Last year the records pointed at me too. The missing 11 seconds. Back then I was a contract worker, so I was easy to let go.' The wall clock’s minute hand ticks forward one notch. There are 20 minutes until Lee Minseo’s turn.",
+      "text": "Lee Minseo is sitting in the waiting room. She has been called in to testify too, because of the Trigger Lab record copies left at KD Data Lab. 'The investigator asked me earlier. Who was in charge of keeping the records? That was me.' She starts to smile and stops. 'Last year the records pointed at me too. The missing 11 seconds. Back then I was a contract worker, so I was easy to let go.' There are 20 minutes until Lee Minseo’s turn.",
       "memo": [
         "Why Lee Minseo is called: Trigger Lab record copies at KD Data Lab",
         "Investigator’s question: 'Who was in charge of keeping the records?'",
@@ -342,7 +342,7 @@ export default {
     },
     "c32_branch_waiting_follow": {
       "title": "One Sentence in the Record",
-      "text": "40 minutes later Lee Minseo comes out. In her hand is a copy of her statement record (the document in which investigators write down what was said in an interview). They gave it to her to read before she signs. On page three there is one sentence. 'The witness copied and kept the Trigger Lab response records at will.' Lee Minseo never said that. The copying was ordered by Human Resources, and the email with that order still exists. To fix the sentence she would have to be interviewed again from the start, and that would run past ten at night. Lee Minseo holds the pen and looks at you. 'Should I just sign? Mom says she has dinner ready and is waiting.'",
+      "text": "Lee Minseo comes out with a copy of her statement record (the document in which investigators write down what was said in an interview). On page three there is one sentence. 'The witness copied and kept the Trigger Lab response records at will.' Lee Minseo never said that. The copying was ordered by Human Resources, and the email with that order still exists. To fix the sentence she would have to be interviewed again from the start, and that would run past ten at night. Lee Minseo holds the pen and looks at you. 'Should I just sign? Mom says she has dinner ready and is waiting.'",
       "memo": [
         "Record, page 3: 'copied and kept at will'",
         "In fact: copied on an emailed order from Human Resources",
@@ -366,7 +366,7 @@ export default {
     },
     "c32_route_system": {
       "title": "Statistics of Names in Boxes",
-      "text": "Before your status, you ask for a count: who did probes like this end up putting on trial? NOAH answers from the shared terminal on the 12th floor, the one without a seal sticker. Rulings from 64 search and seizure cases (an investigation that takes records and items by force with a court’s permission) at financial companies over the last 10 years open up. Of the 208 people sent to trial, 167 are working-level staff, 29 are executives, and 12 are final decision-makers. In all 12 cases where a decision-maker was indicted (charged and sent to trial), that person’s signature had come out of a box. 'My training shows that people whose names appear often in the boxes are the ones sent to trial. People who leave the signature line empty have no names in the boxes.'",
+      "text": "NOAH opens rulings from 64 search and seizure cases (an investigation that takes records and items by force with a court’s permission) at financial companies over the last 10 years. Of the 208 people sent to trial, 167 are working-level staff, 29 are executives, and 12 are final decision-makers. In all 12 cases where a decision-maker was indicted (charged and sent to trial), that person’s signature had come out of a box. 'My training shows that people whose names appear often in the boxes are the ones sent to trial. People who leave the signature line empty have no names in the boxes.'",
       "memo": [
         "64 search and seizure cases -- 208 people sent to trial",
         "167 working-level staff, 29 executives, 12 decision-makers",
@@ -392,7 +392,7 @@ export default {
     },
     "c32_final_system_route": {
       "title": "The Box with No Name",
-      "text": "Past midnight on the 12th floor, among desks with their drawers pulled out, one unsealed shared terminal is on. NOAH places the list of boxes taken today next to the ruling statistics. Each box lists the name that appears most in it, and your name appears in every box. Yoon Sanghyuk’s name is in none of them. The deadline Na Eunho gave is nine in the morning. 'By this list, the person closest to trial is the one who wrote the most. The one who wrote the least is farthest.'",
+      "text": "NOAH places the list of boxes taken today next to the ruling statistics. Each box lists the name that appears most in it, and your name appears in every box. Yoon Sanghyuk’s name is in none of them. The deadline Na Eunho gave is nine in the morning. 'By this list, the person closest to trial is the one who wrote the most. The one who wrote the least is farthest.'",
       "memo": [
         "Yoon Sanghyuk’s name in the boxes taken today: 0 times",
         "Of the 208 sent to trial, 12 final decision-makers",
@@ -415,7 +415,7 @@ export default {
     },
     "c32_evidence_turn": {
       "title": "Where Box 27 Went",
-      "text": "When you hold the clue against the blank row of the seizure list, the 33rd-floor document removal log and today’s seizure list overlap on one screen. Box 27 went out two days ago at 18:04. The requester was the group legal team, and the approver field is empty. The contents written on the outside of the box: 'Original Trigger Lab design documents and confirmation of delivery of HR evaluation auxiliary indicators (numbers looked at alongside when evaluating people).' 12 minutes before the removal, a single 4-minute call came in to the 33rd floor’s main number. It came from Seocho-dong. Ban Jaewook closes the notebook he was writing in. 'Whoever took the box knew when we were coming. And once again the approver field is empty.'",
+      "text": "You overlay the 33rd-floor document removal log on the seizure list. Box 27 went out two days ago at 18:04. The requester was the group legal team, and the approver field is empty. The contents written on the outside of the box: 'Original Trigger Lab design documents and confirmation of delivery of HR evaluation auxiliary indicators (numbers looked at alongside when evaluating people).' 12 minutes before the removal, a single 4-minute call came in to the 33rd floor’s main number. It came from Seocho-dong. Ban Jaewook closes his notebook. 'Whoever took the box knew when we were coming. And once again the approver field is empty.'",
       "memo": [
         "Box 27 removed: two days ago 18:04, requested by the group legal team",
         "Approver field: blank",
@@ -438,7 +438,7 @@ export default {
     },
     "c32_start_warm": {
       "title": "A Search for Those Who Emptied the Lunchboxes",
-      "text": "The night the inspection team left, six of you and Choi Seojin emptied Han Seoyun’s seven lunchboxes on the 1st floor of the secondhand bookshop. Four days later, at 7:40 on the morning of June 16, the group chat of those seven goes off first. It is a breaking news link from Oh Jinwoo. 'Seoul Central District Prosecutors raid KD Financial Group’s 33rd floor and KD Capital in a search and seizure (an investigation that takes records and items by force with a court’s permission).' It is the 'boxes next week' Han Jiwoo spoke of. When you reach the 12th floor, blue vests stand at the door of the Risk Management Department, and Prosecutor Na Eunho calls your name. 'Two this afternoon, come in as a witness (someone with no duty to testify who comes in to explain the facts).' Six 'You okay?' messages have piled up in the group chat. Choi Seojin’s is the first.",
+      "text": "The group chat goes off first. A news alert from Oh Jinwoo. 'Seoul Central District Prosecutors raid KD Financial Group’s 33rd floor and KD Capital in a search and seizure (an investigation that takes records and items by force with a court’s permission).' It is the 'boxes next week' Han Jiwoo spoke of. When you reach the 12th floor, blue vests stand at the door of the Risk Management Department, and Prosecutor Na Eunho calls your name. 'Two this afternoon, come in as a witness (someone with no duty to testify who comes in to explain the facts).' Six 'You okay?' messages have piled up in the group chat. Choi Seojin’s is the first.",
       "memo": [
         "3 search sites: 33rd floor, KD Capital CEO office, Risk Management Department",
         "Group chat: 6 'You okay?' -- Choi Seojin is No. 1",
@@ -468,7 +468,7 @@ export default {
     },
     "c32_start_record": {
       "title": "A Search for the One Who Bound the Records",
-      "text": "Your single volume of records, the five days of examination questions and answers bound in date order, was attached as it was to the back of the notice Han Jiwoo sent to the prosecutors. Four days later, at 7:40 on the morning of June 16, investigators carrying that volume walk onto KD Capital’s 12th floor. It is a search and seizure by the Seoul Central District Prosecutors’ Office (an investigation that takes records and items by force with a court’s permission). Prosecutor Na Eunho waves your records. 'You organized this well. So well that I’ll have to start by asking how you knew all of it. Two this afternoon, come in as a witness (someone with no duty to testify who comes in to explain the facts).' Your name is printed in the author field on the cover.",
+      "text": "Your records had been attached, as they were, to the back of the notice Han Jiwoo sent to the prosecutors. Four days later, investigators carrying that volume walk in. It is a search and seizure by the Seoul Central District Prosecutors’ Office (an investigation that takes records and items by force with a court’s permission). Prosecutor Na Eunho waves your records. 'You organized this well. So well that I’ll have to start by asking how you knew all of it. Two this afternoon, come in as a witness (someone with no duty to testify who comes in to explain the facts).'",
       "memo": [
         "Attached to the notice to prosecutors: your bound record of the five inspection days",
         "Author field on the cover: your name",
@@ -498,7 +498,7 @@ export default {
     },
     "c32_start_rush": {
       "title": "A Search for the One Who Went Down First",
-      "text": "The night the inspection team left, you went down to the basement archive before the boxes could come and took the original Pyeongtaek site boxes first. Your name was stamped at the top of the access log again. Four days later, at 7:40 on the morning of June 16, the Seoul Central District Prosecutors’ search and seizure (an investigation that takes records and items by force with a court’s permission) begins, and the first thing an investigator pulls out is that access log. Prosecutor Na Eunho puts a finger on your name. 'You’re the one who moved the original boxes, right? Whether you protected evidence or cleared it away, you can explain that, can’t you? Two this afternoon, come in as a witness (someone with no duty to testify who comes in to explain the facts). It’ll probably run long.'",
+      "text": "The Seoul Central District Prosecutors’ search and seizure (an investigation that takes records and items by force with a court’s permission) begins, and the first thing an investigator pulls out is the basement archive access log. Prosecutor Na Eunho puts a finger on your name. 'You’re the one who moved the original boxes, right? Whether you protected evidence or cleared it away, you can explain that, can’t you? Two this afternoon, come in as a witness (someone with no duty to testify who comes in to explain the facts). It’ll probably run long.'",
       "memo": [
         "Top of the basement archive access log: your name",
         "Original Pyeongtaek site box -- now under your desk",
