@@ -9,6 +9,7 @@
     "src/advancedSystems.js": 100,
     "src/analystTitle.js": 100,
     "src/appConfig.js": 96,
+    "src/boardBlockedTerms.js": 100,
     "src/boardReport.js": 100,
     "src/chainRecheck.js": 96,
     "src/cloudSave.js": 91,

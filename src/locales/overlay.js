@@ -190,7 +190,12 @@ export function localizeCaseData(caseId, data, index) {
   );
 }
 
-const api = { localizeTables, previewText, roleName, speakerName, localizeCaseData };
+/** The page's title in this language: the start screen's `pageTitle` (src/copy/intro.js), as the start page in its folder carries it. */
+function pageTitle() {
+  return dictionary?.copy?.screens?.intro?.pageTitle ?? null;
+}
+
+const api = { localizeTables, pageTitle, previewText, roleName, speakerName, localizeCaseData };
 
 /** A language's dictionary, laid over the shell's tables. Resolves to what src/locale.js calls, or null for a language with no dictionary. */
 export function loadDictionary(lang) {
