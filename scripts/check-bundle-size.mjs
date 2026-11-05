@@ -87,7 +87,8 @@ const budgets = [
   // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_709 },
+  // 54,709 -> 54,716 gzip on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 24af89d7: no code changed (raw 148,019 as before); the chunk names it imports shifted with the trimmed case copy. Measured 54,712 gzip in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_716 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -326,8 +327,8 @@ const budgets = [
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
-  // 191,573 / 69,173 -> 191,573 / 69,175 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,171 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_175 },
+  // 191,573 / 69,173 -> 191,573 / 69,179 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,175 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_179 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1337,8 +1338,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
-// 430,386 / 487,129 / 494,322 -> 430,390 / 487,122 / 494,315 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,386 / 487,118 / 494,311 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_390, en: 487_122, ja: 494_315 };
+// 430,386 / 487,129 / 494,322 -> 430,395 / 487,128 / 494,321 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,391 / 487,124 / 494,317 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_395, en: 487_128, ja: 494_321 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
