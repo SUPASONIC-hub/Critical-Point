@@ -385,6 +385,16 @@
   letter-spacing: 0.16em;
 }
 
+/* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) take the label's place in colour, no line more. */
+/* Ember, not heat: heat red is 3.56:1 on the felt (contrast.spec, final/f_archive). */
+.gx-label.gx-mark-peak {
+  color: var(--c-gx-ember);
+}
+
+.gx-label.gx-mark-breather {
+  color: var(--c-gx-relic);
+}
+
 .gx-pot-value {
   color: var(--ui-text);
   font: 800 clamp(2rem, 9vw, 2.625rem) / 1 var(--font-sans);
@@ -514,13 +524,21 @@
   flex: 0 0 auto;
 }
 
-.gx-bank .gx-at-risk {
+.gx-bank .gx-at-risk,
+.gx-hud-audit.gx-at-risk {
   border-color: rgb(255 142 76 / 0.4);
 }
 
 .gx-bank .gx-at-risk b,
-.gx-bank .gx-at-risk svg {
+.gx-bank .gx-at-risk svg,
+.gx-hud-audit.gx-at-risk b {
   color: var(--c-gx-ember);
+}
+
+/* The audit count's second place, beside the signals: a 360px phone shows it
+   there instead of in the run's line (the max-width: 360px block). */
+.gx-hud-audit {
+  display: none;
 }
 
 .gx-run-signal b + small {
@@ -2269,6 +2287,13 @@
     padding: 1px 7px;
   }
 
+  /* The run's line keeps 감사 n/4 (RULES_MARK 3) on 판돈 and 금고's row: at 4px
+     it went to a row of its own on CI's 390x844 (26px, the last card under the
+     action bar). Its pairs stay apart by the 3px below. */
+  .gx-stat.gx-run-signal {
+    gap: 2px;
+  }
+
   .gauntlet-stage .gx-bank .gx-relic-chip {
     padding: 2px 4px;
   }
@@ -2651,6 +2676,73 @@
 
   .gauntlet-stage .gx-signals {
     padding-top: 3px;
+  }
+
+  /* An English page: Stake, Vault and the run's line with Audit n/4
+     (RULES_MARK 3) needed 331px of a 310px rail at a pot of 0, so the run's
+     line took a row of its own (26px) and a five-card hand's last card went
+     under the action bar (hand5, 2026-10-30). Labels at 10px, pills at 5px a
+     side and 3px between them bring it to 302px. Only the gap between pills
+     is narrowed here; the 2px between the bank's lines above holds. */
+  :lang(en) .gx-bank {
+    column-gap: 3px;
+  }
+
+  :lang(en) .gx-bank .gx-stat {
+    padding-inline: 5px;
+  }
+
+  :lang(en) .gx-bank .gx-stat small {
+    font-size: 0.625rem;
+  }
+
+  /* Audit n/4 (RULES_MARK 3) leaves the run's line for the signals' row, at
+     its right end under the clock: with it the bank row ran to two lines at a
+     pot of 0 on Linux fonts (hand5 on CI, 360x740: English 103 hands 24px
+     under the action bar, Japanese 63 by 10px; 2026-11-02). The clock keeps
+     its own column, so the pot's row is as wide as before; with no signals
+     the count takes that row alone. The same words, in a pill of the bank's;
+     GauntletStage draws both places and each width hides one (display: none),
+     so the count is read once. */
+  .gauntlet-stage .gx-hud.has-audit {
+    grid-template-columns: minmax(0, 1fr) auto 1.875rem;
+    grid-template-areas:
+      "pot pot clock"
+      "bank bank bank"
+      "signals audit audit";
+  }
+
+  .gauntlet-stage .gx-run-signal .gx-audit-wide {
+    display: none;
+  }
+
+  /* With the count beside them the signals keep their labels and bars only:
+     the crosshair and the chain's sentence go, three auto columns 4px apart
+     (360x740 hand5 on Linux, sig-tight; 2026-11-03). */
+  .gauntlet-stage .gx-hud.has-audit .gx-focus-signal svg,
+  .gauntlet-stage .gx-hud.has-audit .gx-overdrive > span {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-hud.has-audit .gx-signals {
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+    column-gap: 4px;
+  }
+
+  .gauntlet-stage .gx-hud.has-audit .gx-overdrive,
+  .gauntlet-stage .gx-hud.has-audit .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  .gauntlet-stage .gx-hud-audit {
+    display: inline-flex;
+    grid-area: audit;
+    justify-self: end;
+    align-self: end;
+    min-height: 18px;
+    padding-block: 0;
+    line-height: 1.2;
   }
 }
 
@@ -3087,6 +3179,20 @@
 .gx-card-type.gx-card-name {
   right: 9px;
   left: auto;
+}
+
+/* B2's link mark on a card that makes one, at that end too (a card that makes
+   a link is never the wild card), in the burn chip's colour; on the bottom
+   edge when the season before's pick has the top. */
+.gx-card-type.gx-card-link {
+  right: 9px;
+  left: auto;
+  color: var(--c-danger-81);
+}
+
+.gx-card-name ~ .gx-card-type.gx-card-link {
+  top: auto;
+  bottom: -8px;
 }
 
 .gx-streak i,

@@ -6,8 +6,18 @@
  * never built. A relic is drafted when a case closes -- three offered, one kept
  * -- and it bends one rule of the table for the rest of the season. Most of
  * them soften a specific punishment, so the draft is a read of how this player
- * tends to break the board; HIGH ROLLER trades instead; the rarest are unlocked by
- * feats and stay unlocked across seasons in the codex.
+ * tends to break the board; the rarest are unlocked by feats and stay unlocked
+ * across seasons in the codex.
+ *
+ * C-7 (2026-10-25): five of the twelve -- LOCKPICK, SPLINT, HIGH ROLLER,
+ * STEADY ANCHOR and GLASS LENS -- measured lifting the best heartbeat play by
+ * -1.8% to +0.1% (check:pressure), and with five tools in the first draft and
+ * five slots every first season ended holding the same five (80 of 80
+ * seasons, no pass). They are gone; in their place five tools each tied to a
+ * person of the season -- 반재욱 of the 감사팀, 임경수's paper, 오진우's time
+ * limit, 차지원's front page, 도윤하's field notes -- and all five are in the
+ * first draft, so it holds eight for five slots. A pass is a choice of its own
+ * now: 「숨 고르기」 (`equipRelic`, BREATHER_* in tableRules.js).
  *
  * A relic never prints or narrows the wall. `check:pressure` plays every relic
  * alone and all of them together and holds the same invariants the bare table
@@ -18,26 +28,24 @@
  * (`tableRules.js`), so retuning a relic cannot leave its card saying the old one.
  */
 
-import { objectParticle, subjectParticle } from "../playerLanguage.js";
+import { subjectParticle } from "../playerLanguage.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
+import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
 import {
   AFTERSHOCK_START,
+  BLACKOUT_WALL_SHIFT,
+  BREATHER_SECONDS,
+  BREATHER_WALL,
+  CARBON_COPY_HOLD,
   COLD_BLOOD_START,
-  FRACTURE_RATE,
-  GLASS_LENS_SEAL,
   HEAT_SINK_SECONDS,
   HEAT_SINK_SHARE,
-  HIGH_ROLLER_CHIPS,
-  HIGH_ROLLER_WALL,
   INSURANCE_SHARE,
   KINETIC_GRIP_CHIPS,
-  LOCKPICK_SEAL,
-  SEAL_BREAK_GAUGE,
+  LOGIC_HOLD,
   SILENCE_SECONDS,
-  SPLINT_RATE,
-  STEADY_ANCHOR_COOL,
-  STEADY_ANCHOR_SECONDS,
+  TESTIMONY_SHARE,
 } from "./tableRules.js";
 
 export const RELIC_OFFER_SIZE = 3;
@@ -57,8 +65,6 @@ export const RELIC_SLOTS = 5;
 const ENCORE_UNLOCK_COMBO = 8;
 /** The pot the wall has to take from you before INSURANCE is on the table. */
 export const INSURANCE_UNLOCK_LOSS = 5000;
-/** The cash multiplier that unlocks HIGH ROLLER. */
-const HIGH_ROLLER_UNLOCK_MULTIPLIER = 64;
 /** A stance relic opens when its stance has reshaped enough charged cashes. */
 export const STANCE_RELIC_UNLOCK_COUNT = 3;
 
@@ -89,27 +95,33 @@ export const RELICS = Object.freeze({
     start: AFTERSHOCK_START, particle: subjectParticle(String(AFTERSHOCK_START)), cold: COLD_BLOOD_START,
   }),
   heatSink: relic("heatSink", { label: "HEAT SINK", icon: "fan", softens: "heatDebt" }, { share: HEAT_SINK_SHARE, seconds: HEAT_SINK_SECONDS }),
-  lockpick: relic("lockpick", { label: "LOCKPICK", icon: "key", softens: "coldFeet" }, {
-    seal: SEAL_BREAK_GAUGE, particle: subjectParticle(String(SEAL_BREAK_GAUGE)), pick: LOCKPICK_SEAL,
+  // C-7's five, each a person of the season (2026-10-25).
+  auditContact: relic("auditContact", { label: "AUDIT CONTACT", icon: "clipboard" }, { limit: AUDIT_LIMIT + AUDIT_CONTACT_SLACK }),
+  carbonCopy: relic("carbonCopy", { label: "CARBON COPY", icon: "files", softens: "blackout" }, {
+    shift: BLACKOUT_WALL_SHIFT, particle: subjectParticle(String(BLACKOUT_WALL_SHIFT)), pull: BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD,
   }),
-  splint: relic("splint", { label: "SPLINT", icon: "bandage", softens: "fracture" }, { rate: FRACTURE_RATE, splint: SPLINT_RATE }),
+  testimony: relic("testimony", { label: "TESTIMONY", icon: "hourglass" }, { share: TESTIMONY_SHARE }),
+  frontPage: relic("frontPage", { label: "FRONT PAGE", icon: "newspaper", softens: "overclock" }),
+  fieldNote: relic("fieldNote", { label: "FIELD NOTES", icon: "notebook" }, { hold: LOGIC_HOLD - 1 }),
   encore: relic("encore", { label: "ENCORE", icon: "repeat", unlock: "combo" }, { combo: ENCORE_UNLOCK_COMBO }),
   insurance: relic("insurance", { label: "INSURANCE", icon: "shield", unlock: "loss" }, {
     share: INSURANCE_SHARE, loss: INSURANCE_UNLOCK_LOSS.toLocaleString("en-US"),
-  }),
-  highRoller: relic("highRoller", { label: "HIGH ROLLER", icon: "gem", unlock: "multiplier" }, {
-    chips: HIGH_ROLLER_CHIPS, wall: HIGH_ROLLER_WALL, multiplier: HIGH_ROLLER_UNLOCK_MULTIPLIER,
   }),
   stethoscope: relic("stethoscope", { label: "STETHOSCOPE", icon: "stethoscope", softens: "silence", unlock: "silence" }, { seconds: SILENCE_SECONDS }),
   kineticGrip: relic("kineticGrip", { label: "KINETIC GRIP", icon: "crosshair", softens: "strikeMastery", unlock: "strikeMastery" }, {
     chips: KINETIC_GRIP_CHIPS, count: STANCE_RELIC_UNLOCK_COUNT,
   }),
-  steadyAnchor: relic("steadyAnchor", { label: "STEADY ANCHOR", icon: "anchor", softens: "steadyMastery", unlock: "steadyMastery" }, {
-    cool: STEADY_ANCHOR_COOL, particle: objectParticle(String(STEADY_ANCHOR_COOL)), seconds: STEADY_ANCHOR_SECONDS, count: STANCE_RELIC_UNLOCK_COUNT,
-  }),
-  glassLens: relic("glassLens", { label: "GLASS LENS", icon: "eye", softens: "exposeMastery", unlock: "exposeMastery" }, {
-    seal: GLASS_LENS_SEAL, count: STANCE_RELIC_UNLOCK_COUNT,
-  }),
+});
+
+const breatherWords = relicsCopy.breather;
+/**
+ * 「숨 고르기」: what a pass on a draft that offered something gives (C-7,
+ * `equipRelic`). The draft's pass button says it, and the stage marks the board.
+ */
+export const BREATHER = Object.freeze({
+  name: breatherWords.name,
+  short: fill(breatherWords.short, { seconds: BREATHER_SECONDS }),
+  text: fill(breatherWords.text, { seconds: BREATHER_SECONDS, wall: BREATHER_WALL }),
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
@@ -151,11 +163,8 @@ export function getRelicUnlocks({ verdict, nextRun } = {}, unlocked = []) {
   const mastery = nextRun?.stanceMastery && typeof nextRun.stanceMastery === "object" ? nextRun.stanceMastery : {};
   if (maxCombo >= ENCORE_UNLOCK_COMBO) earned.push("encore");
   if (verdict.outcome === "bust" && (Number(verdict.lostPot) || 0) + (Number(verdict.insuredPot) || 0) >= INSURANCE_UNLOCK_LOSS) earned.push("insurance");
-  if (verdict.outcome === "cash" && (Number(verdict.multiplier) || 0) >= HIGH_ROLLER_UNLOCK_MULTIPLIER) earned.push("highRoller");
   if (Array.isArray(verdict.nextMutations) && verdict.nextMutations.some((mutation) => mutation.id === "silence")) earned.push("stethoscope");
   if ((Number(mastery.strike) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("kineticGrip");
-  if ((Number(mastery.steady) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("steadyAnchor");
-  if ((Number(mastery.expose) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("glassLens");
   return earned.filter((id) => !hasRelic(unlocked, id));
 }
 

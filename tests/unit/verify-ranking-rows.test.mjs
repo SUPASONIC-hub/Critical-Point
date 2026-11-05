@@ -7,6 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { BASE_SCHEMA, createWindow, normalizeSchema, RULES_MARK, SEAL_BREAK_GAUGE } from "../../src/gauntlet/gauntletEngine.js";
+import { getSeasonScore } from "../../src/seasonScore.js";
 import { isSealedCash, isTimeOffClock, readSeed, recheckCaseWindows, recheckRun, WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { openTraced, recordClosedWindow, reduceTraced } from "../../src/gauntlet/windowTrail.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
@@ -69,6 +70,21 @@ test("a score edited on the case row or on the ranking row is marked score-off-l
   assert.deepEqual(result.rankingDiffers, ["rank"]);
 });
 
+test("the ranking row's score is the mean of the run's case rows (C-2, Q25): the finale's own score where they differ is marked", () => {
+  const [finalRow, rankingRow] = seasonRows("run-mean");
+  const other = { ...structuredClone(finalRow), case_id: "case01", decision_log: [] };
+  other.summary = { ...other.summary, burstScore: (finalRow.summary.burstScore + 40) % 101, momentumScore: (finalRow.summary.momentumScore + 40) % 101 };
+  delete other.summary.cognitionMix;
+  const caseRows = { case01: other.summary, final: finalRow.summary };
+  const mean = getSeasonScore(caseRows);
+  assert.notEqual(mean.burstScore, finalRow.summary.burstScore, "the fixture's mean is the finale's own score; it proves nothing");
+  const honest = recheckRun([other, finalRow, { ...rankingRow, summary: { ...rankingRow.summary, ...mean } }]);
+  assert.deepEqual(honest.rankingDiffers, []);
+  const finaleOwn = recheckRun([other, finalRow, rankingRow]);
+  assert.ok(finaleOwn.marks.includes("score-off-log"));
+  assert.ok(finaleOwn.rankingDiffers.includes("burstScore"));
+});
+
 test("a window edited in the log, or its response time, is marked window-off-replay", () => {
   const rows = seasonRows();
   const pushed = edit(rows, (finalRow) => {
@@ -84,6 +100,46 @@ test("a window edited in the log, or its response time, is marked window-off-rep
   const slowedResult = recheckRun(slowed);
   assert.ok(slowedResult.marks.includes("window-off-replay"));
   assert.deepEqual(slowedResult.cases[0].windows.findings.map((finding) => finding.differs), [["responseTime"]]);
+});
+
+test("a 판 읽기 read edited in the log (C-1(1): the score sums it) is marked window-off-replay", () => {
+  const rows = seasonRows();
+  const log = rows[0].decision_log;
+  const cashed = log.findIndex((entry) => !entry.threshold.busted && entry.threshold.read?.[0] > 0);
+  const busted = log.findIndex((entry) => entry.threshold.busted);
+  assert.ok(cashed >= 0, "the fixture has a cashed window with a read");
+  // The bare hand's number raised to the seer's, as if it had read the wall --
+  // and past the 3% the check allows, for a bot that cashed close to the seer
+  // (the 11-30 rehearsal's tools: 1,845 against 1,855).
+  const raised = recheckRun(edit(rows, (finalRow) => {
+    const { read } = finalRow.decision_log[cashed].threshold;
+    finalRow.decision_log[cashed].threshold.read = [Math.max(read[1], Math.round(read[0] * 1.1) + 10), read[1]];
+  }));
+  assert.ok(raised.marks.includes("window-off-replay"));
+  assert.deepEqual(raised.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  // The seer's number cut, so the same bare number reads as more of it.
+  const cut = recheckRun(edit(rows, (finalRow) => {
+    const { read } = finalRow.decision_log[cashed].threshold;
+    finalRow.decision_log[cashed].threshold.read = [read[0], Math.round(read[1] * 0.7)];
+  }));
+  assert.deepEqual(cut.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  if (busted >= 0) {
+    // A bust that claims it kept something.
+    const kept = recheckRun(edit(rows, (finalRow) => {
+      finalRow.decision_log[busted].threshold.read = [5, finalRow.decision_log[busted].threshold.read[1]];
+    }));
+    assert.deepEqual(kept.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  }
+  // Not a pair of numbers.
+  const text = recheckRun(edit(rows, (finalRow) => {
+    finalRow.decision_log[cashed].threshold.read = ["90", null];
+  }));
+  assert.deepEqual(text.cases[0].windows.findings.map((finding) => finding.differs), [["read"]]);
+  // An older log with no read is not read.
+  const older = recheckRun(edit(rows, (finalRow) => {
+    for (const entry of finalRow.decision_log) delete entry.threshold.read;
+  }));
+  assert.equal(older.cases[0].windows.findings.length, 0);
 });
 
 test("a run with a case under other table rules is not checked", () => {
@@ -142,7 +198,7 @@ test("the report names unchecked runs, window findings and rows written before t
   const lines = formatReport(verifyRows([finalRow, rankingRow]));
   assert.ok(lines.some((line) => /final #0: window mismatch wall/.test(line)));
   assert.ok(lines.some((line) => /1 windows carry no replay record/.test(line)));
-  assert.ok(lines.some((line) => /ranking row differs from the final case row: rank/.test(line)));
+  assert.ok(lines.some((line) => /ranking row differs from the case rows \(score: their mean; the rest: the final case row\): rank/.test(line)));
   const other = edit(seasonRows(), (row) => {
     row.dynamics.tableRules = 1;
   });
@@ -179,11 +235,24 @@ test("the CI read is split, each query one SELECT and nothing else, and the publ
   assert.doesNotMatch(list.split("\n")[1], /player_name|session_|score|summary,/, "the inner select names no score or name either");
   assert.match(rankingRunsSql({ limit: 1e9, weeks: [] }), /where place <= 500 /);
   assert.match(rankingRunsSql({ limit: "x", weeks: [] }), /where place <= 100 and \(fresh or place <= 20\)/);
+  // With each hall of fame board's candidates beside the page's boards (D2): still one SELECT, the same four columns.
+  const boards = rankingRunsSql({ limit: 7, weeks: ["2026-W47"], perBoard: 10 });
+  assert.equal(boards.indexOf(";"), boards.length - 1);
+  assert.match(boards, /^select run_id, board, fresh, place from \(\n/);
+  assert.match(boards, /\n where \(shown and place <= 7 and \(fresh or place <= 7\)\) or \(candidate and on_board <= 10\)\n order by fresh desc, place, board limit 150;$/);
+  assert.match(boards, /\n {5}and \(\(s\.summary->>'week' is null or s\.summary->>'week' in \('2026-W47'\)\) or c\.candidate\)\n/);
+  assert.match(boards, /s\.suspicion <@ array\['score-off-log', 'window-off-replay', 'window-no-replay', 'chain-off-log'\]::text\[\]/);
+  assert.match(boards, /h\.settled_at is not null/);
+  assert.doesNotMatch(boards, writes);
+  assert.doesNotMatch(boards.split("\n")[1], /player_name|session_|score|summary,/, "the inner select names no score or name either");
+  assert.equal(rankingRunsSql({ limit: 7, weeks: ["2026-W47"], perBoard: 0 }), list);
+  assert.match(rankingRunsSql({ perBoard: 1e9 }), /on_board <= 100\)/);
+  assert.match(rankingRunsSql({ weeks: [], all: true, perBoard: 10 }), /\n where \(shown and place <= 100\) or \(candidate and on_board <= 10\)\n/);
   // One run's rows: one statement, that run only, its id quoted.
   const one = runRowsSql("run-'x");
   assert.equal(one.indexOf(";"), one.length - 1);
   assert.match(one, /\n where run_id = 'run-''x'\n order by case_id;$/);
-  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at\n/);
+  assert.match(one, /^select run_id, run_tag, case_id, summary, decision_log, resources, dynamics, completed_at, suspicion\n/);
   assert.doesNotMatch(one, writes);
   assert.throws(() => runRowsSql(""), /non-empty/);
   assert.deepEqual(readRunIds(JSON.stringify({ rows: [{ run_id: "b" }, { run_id: "a" }, { run_id: "b" }, { run_id: null }] })), ["b", "a"]);
@@ -285,7 +354,7 @@ function chainedRows(runId = "run-chain", seed = 20261021, { open = false } = {}
   const season = createSeasonBot({ seed, staged: STAGED }).playSeason(0, "balanced");
   // `open`: each row's dynamics as the page writes it since S3, the opening snapshot included.
   const rows = CASE_SEQUENCE.map((caseId) => ({ run_id: runId, case_id: caseId, summary: season.caseResults[caseId], decision_log: season.caseLogs[caseId], resources: null, dynamics: open ? season.caseDynamics[caseId] : season.caseResults[caseId].gauntlet }));
-  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final, ...getSeasonScore(season.caseResults) }, decision_log: [], resources: null, dynamics: season.caseResults.final.gauntlet });
   return rows;
 }
 
@@ -343,8 +412,10 @@ test("the CLI lists runs, writes one run's read at a time, and reads the per-run
   try {
     const run = (...args) => execFileSync(process.execPath, [script, ...args], { encoding: "utf8" }).trim();
     writeFileSync(path.join(dir, "runs.json"), JSON.stringify([{ run_id: "secret-a" }, { run_id: "secret-b" }]));
-    assert.equal(run("--runs-sql", "--limit=3", "--weeks=2026-W47,2026-W46"), rankingRunsSql({ limit: 3, weeks: ["2026-W47", "2026-W46"] }));
-    assert.equal(run("--runs-sql", "--weeks=", "--all", "--cap=9"), rankingRunsSql({ weeks: [], all: true, cap: 9 }));
+    assert.equal(run("--runs-sql", "--limit=3", "--weeks=2026-W47,2026-W46"), rankingRunsSql({ limit: 3, weeks: ["2026-W47", "2026-W46"], perBoard: 10 }));
+    assert.equal(run("--runs-sql", "--weeks=", "--all", "--cap=9", "--per-board=0"), rankingRunsSql({ weeks: [], all: true, cap: 9 }));
+    assert.equal(run("--runs-sql", "--limit=3", "--weeks=2026-W47", "--per-board=0"), rankingRunsSql({ limit: 3, weeks: ["2026-W47"] }));
+    assert.equal(run("--hall-of-fame-counts-sql"), "select board, checked from public.hall_of_fame_counts() order by board;");
     assert.equal(run("--run-count", path.join(dir, "runs.json")), "2");
     assert.equal(run("--run-sql", path.join(dir, "runs.json"), "--at=2"), runRowsSql("secret-b"));
     assert.throws(() => execFileSync(process.execPath, [script, "--run-sql", path.join(dir, "runs.json"), "--at=3"], { stdio: "pipe" }), /from 1 to 2/);
@@ -381,7 +452,7 @@ test("a whole season dealt the page's seeds is checked case by case with no mark
     // As the page writes it since S3: the run summary, the close, and the opening snapshot.
     dynamics: season.caseDynamics[caseId],
   }));
-  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final, ...getSeasonScore(season.caseResults) }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
   const [result] = verifyRows(rows);
   assert.equal(result.status, "checked");
   assert.deepEqual(result.marks, []);

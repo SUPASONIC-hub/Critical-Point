@@ -1,0 +1,103 @@
+-- DRAFT (2026-10-25), kept as `.sql.draft` so nothing applies it: merging a
+-- `.sql` to main applies it within a minute, before the client deploys. It
+-- ships with RULES_MARK 4 in the same pull request (c3-c4-rules, stacked on
+-- #224), at the next ranking reset after RULES_MARK 3's. On the merge day the
+-- user is asked first; then the file is renamed to `.sql`, re-dated to follow
+-- the last migration on main, and check:grants replays it (scripts/
+-- check-grants.mjs judges the newest ranking reset by what it leaves and asks
+-- for the mark it sets).
+--
+-- RULES_MARK 4. Two changes of the table (the user's answers of 2026-10-25,
+-- (1) each):
+--
+-- - C-3: the logic streak is held on the direction of the card picked --
+--   toward the people (trust, harm) or toward the position (capital, time),
+--   the axis the report's consistency score reads -- where it was held on
+--   the card's thinking type. The same windows pay a different streak.
+-- - C-4: the rules open later. Prologue 04 opens FRACTURE and LOCK only;
+--   OVERCLOCK opens in case 01, the audit in case 02 and the links in case
+--   03, one a case. Those three cases play under fewer rules than before.
+--
+-- 1. The ranking starts over, the same statement as the resets before it and
+--    nothing wider: only `season-final` rows are ranking rows, and per-case
+--    telemetry stays where it is. The client's own ranking is emptied by a
+--    new storage key (v11).
+--
+-- 2. A season from the table before does not come back: the ranking refuses
+--    a `season-final` row for a run with any case row whose `tableRules` is
+--    not a number of 4 or more. Only that number changes in
+--    `ranking_check_run_marks`; its three blocks are otherwise the ones
+--    RULES_MARK 3's reset wrote, word for word.
+--
+--    What this costs, as before: a season begun before this table and
+--    finished after it is never ranked, and in the minute between this
+--    migration and the client's deploy the build before still sends
+--    `tableRules: 3`, and its seasons are refused the same way.
+--
+-- 3. The scene wall rate's NEW GAME+ line moves with the ladder in a file of
+--    its own (20261103010000_scene_bust_ladder_c4, a draft renamed with this
+--    one).
+--
+-- The part first, so the ranking is never empty and unguarded. `create or
+-- replace` keeps the part's grants, and they are restated anyway; every
+-- attribute is set again, since `create or replace` drops one left out.
+
+create or replace function public.ranking_check_run_marks(p_run_id text)
+returns void
+language plpgsql
+security invoker
+set search_path = public
+as $$
+begin
+  -- A case closed in story mode carries `assistStory: true` in its own
+  -- row's summary, and one such case keeps the whole season off the
+  -- ranking. Read from the run's rows; a plain exception, since no later
+  -- attempt can change what the run was.
+  if exists (
+    select 1 from public.playtest_sessions s
+    where s.run_id = p_run_id
+      and s.case_id = any(public.season_case_ids())
+      and s.summary->'assistStory' = 'true'::jsonb
+  ) then
+    raise exception 'story-mode runs are not ranked';
+  end if;
+  -- A case closed at the table that paid for a press timed to the beat has
+  -- no `logicStreak` in its row's `dynamics`; a case closed at this one
+  -- always has, as a number. One such case keeps the whole season off the
+  -- ranking, read from the run's rows like the story mark above, and a
+  -- row with no `dynamics` is such a row. `is not true`, so a missing
+  -- key, a missing object and a value of another type all read alike.
+  if exists (
+    select 1 from public.playtest_sessions s
+    where s.run_id = p_run_id
+      and s.case_id = any(public.season_case_ids())
+      and (jsonb_typeof(s.dynamics->'logicStreak') = 'number') is not true
+  ) then
+    raise exception 'beat-table runs are not ranked';
+  end if;
+  -- A case closed at a table before this one has no `tableRules` in its
+  -- row's `dynamics`, or one below 4 (3 is the table of the audit and the
+  -- links from prologue 04, 2 the day-ten table of 2026-10-20); a case
+  -- closed at this one always has, as a number of 4 or more. One such case keeps the whole
+  -- season off the ranking, read from the run's rows like the two marks
+  -- above. `is not true`, so a missing key, a missing object, a value of
+  -- another type and a smaller number all read alike. The `case` keeps
+  -- the cast off a stored row whose key is not a number.
+  if exists (
+    select 1 from public.playtest_sessions s
+    where s.run_id = p_run_id
+      and s.case_id = any(public.season_case_ids())
+      and (case when jsonb_typeof(s.dynamics->'tableRules') = 'number'
+                then (s.dynamics->>'tableRules')::numeric >= 4 end) is not true
+  ) then
+    raise exception 'older-table runs are not ranked';
+  end if;
+end;
+$$;
+
+revoke all on function public.ranking_check_run_marks(text) from public, anon, authenticated;
+grant execute on function public.ranking_check_run_marks(text) to service_role;
+
+delete from public.playtest_sessions where case_id = 'season-final';
+
+notify pgrst, 'reload schema';
