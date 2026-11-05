@@ -326,7 +326,8 @@ const budgets = [
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_173 },
+  // 191,573 / 69,173 -> 191,573 / 69,177 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,173 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_177 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
