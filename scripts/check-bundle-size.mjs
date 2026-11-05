@@ -89,7 +89,8 @@ const budgets = [
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,174 / 54,763 on 2026-11-05, result-card-habit over main 3ca15f8d: D1, the habit's one sentence worded on the result side (habitCardLine in src/judgementHabit.js, cardLine in src/copy/habits.js) and put on the fingerprint's habit (useRunReadout.js). Measured 148,170 / 54,759 in the e2e build, the plus 4.
   // -> 148,174 / 54,770 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the chunk names it imports moved with the sheet's hash, the gzip alone. Measured 148,170 / 54,766 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_770 },
+  // -> 148,174 / 54,775 on 2026-11-05, bundle-1105d after merging main e68fe8cc (#454 studio-name, #455 docs): the chunk names it imports, the gzip alone. Measured 148,170 / 54,771 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_775 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -335,7 +336,8 @@ const budgets = [
   // -> 192,346 / 69,287 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 192,342 / 69,283 in the e2e build, the plus 4.
   // -> 192,346 / 69,292 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the lines above together. Measured 192,342 / 69,288 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_292 },
+  // -> 192,443 / 69,373 on 2026-11-05, bundle-1105d after merging main e68fe8cc (#454 studio-name, #455 docs): the studio's three names over the bundle's 글자 크기 setting, the lines above together. Measured 192,439 / 69,369 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 192_443, maxGzip: 69_373 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1366,7 +1368,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 428,596 / 485,174 / 492,344 -> 428,603 / 485,186 / 492,356 on 2026-11-05, intro-cards-cv trim over main 62a25238: the index CSS gzip 9 bytes more after the trim that fits base-intro-ranking.css to its structure budget (raw 88 bytes fewer). Measured 428,599 / 485,182 / 492,352 in the e2e build, the plus 4.
 // -> 430,150 / 486,904 / 494,148 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the lines above together. Measured 430,146 / 486,900 / 494,144 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_150, en: 486_904, ja: 494_148 };
+// -> 431,207 / 487,959 / 495,203 on 2026-11-05, bundle-1105d after merging main e68fe8cc (#454 studio-name, #455 docs): the lines above together (the font subset regenerated at 199,124 and the studio's names in the entry over the static shell and E5). Measured 431,203 / 487,955 / 495,199 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 431_207, en: 487_959, ja: 495_203 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
