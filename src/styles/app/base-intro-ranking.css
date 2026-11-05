@@ -410,14 +410,14 @@ summary:focus-visible {
   pointer-events: none;
   background:
     radial-gradient(55% 60% at 16% 46%, rgb(217 255 98 / 0.07), transparent 70%),
-    linear-gradient(0deg, var(--ui-bg) 0%, rgb(6 9 10 / 0) 30%),
-    linear-gradient(180deg, rgb(6 9 10 / 0.7) 0%, rgb(6 9 10 / 0) 20%),
+    linear-gradient(0deg, var(--ui-bg), transparent 30%),
+    linear-gradient(180deg, rgb(18 22 24 / 0.7), transparent 20%),
     linear-gradient(
       90deg,
-      var(--ui-bg) 0%,
-      rgb(6 9 10 / 0.94) 28%,
-      rgb(6 9 10 / 0.55) 52%,
-      rgb(6 9 10 / 0.08) 78%
+      var(--ui-bg),
+      rgb(18 22 24 / 0.94) 28%,
+      rgb(18 22 24 / 0.55) 52%,
+      rgb(18 22 24 / 0.08) 78%
     );
 }
 .intro-visual figcaption {
@@ -2239,9 +2239,12 @@ summary:focus-visible {
 .case-card.locked-case .case-status-chip {
   background: transparent;
 }
+/* The acid glow sits at 0.1, not 0.14: the readability check reads the card's
+   --ui-text-2 against the glow laid twice over --ui-surface-1, and on the
+   neutral ground (one step lighter since design-mood) 0.14 read 4.45:1; 0.1
+   reads 5.61:1 (5.50 on bright, the lightest ground). */
 .case-card.active-case {
-  background:
-    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
   border-color: rgb(217 255 98 / 0.6);
   box-shadow:
     0 0 0 1px rgb(217 255 98 / 0.25),
@@ -3031,10 +3034,10 @@ body {
     background:
       linear-gradient(
         180deg,
-        rgb(6 9 10 / 0.72) 0%,
-        rgb(6 9 10 / 0.12) 20%,
-        rgb(6 9 10 / 0.55) 48%,
-        rgb(6 9 10 / 0.9) 72%,
+        rgb(18 22 24 / 0.72),
+        rgb(18 22 24 / 0.12) 20%,
+        rgb(18 22 24 / 0.55) 48%,
+        rgb(18 22 24 / 0.9) 72%,
         var(--ui-bg) 90%
       ),
       radial-gradient(80% 50% at 30% 70%, rgb(217 255 98 / 0.06), transparent 70%);

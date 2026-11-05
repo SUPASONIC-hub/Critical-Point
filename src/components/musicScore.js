@@ -31,6 +31,50 @@ export const DRIVE_CEILING = 0.15;
 export const BUS_LOWPASS_HZ = 7000;
 
 /**
+ * The scene's mood (design-mood, 2026-11-05): one of five, `neutral` when a
+ * scene names none or names one the score does not know. A mood picks which
+ * of the mode's leads take the bar (`moodLeads`) and how the table's drone is
+ * voiced (gauntlet/tensionDrone.js); the key, the tempo, the drums and the
+ * drive are the scene's as before. `tense` is the score exactly as it was.
+ */
+export const MUSIC_MOODS = ["neutral", "bright", "tense", "dread", "sorrow"];
+export const DEFAULT_MOOD = "neutral";
+/** A mood change crosses over this long: the old lead's notes fade as the new lead's rise, note by note. */
+export const MOOD_FADE_SECONDS = 5;
+
+export function normalizeMood(value) {
+  return MUSIC_MOODS.includes(value) ? value : DEFAULT_MOOD;
+}
+
+/**
+ * The mood the table last set (`setMusicMood`) and the one before it, with
+ * the clock time of the change, so the score can play both leads for
+ * `MOOD_FADE_SECONDS` and weigh each note by how far the change has come.
+ * Nothing that is already sounding is touched: a note is a fresh oscillator
+ * with its own envelope, so the crossfade is a choice of gain per note.
+ */
+const moodRuntime = { mood: DEFAULT_MOOD, previous: null, changedAt: -Infinity };
+
+export function setMusicMood(mood, now = -Infinity) {
+  const next = normalizeMood(mood);
+  if (next === moodRuntime.mood) return next;
+  moodRuntime.previous = moodRuntime.mood;
+  moodRuntime.mood = next;
+  moodRuntime.changedAt = now;
+  return next;
+}
+
+export function getMusicMood() {
+  return moodRuntime.mood;
+}
+
+/** The leads to play at `now`: the mood coming in, the one going out while `blend` is under 1. */
+export function moodCrossfade(now) {
+  const blend = Math.min(1, Math.max(0, (now - moodRuntime.changedAt) / MOOD_FADE_SECONDS));
+  return { to: moodRuntime.mood, from: blend < 1 ? moodRuntime.previous : null, blend };
+}
+
+/**
  * How a mode's drive is mixed in. The bus keeps one soft-clip curve, built
  * once at `DRIVE_CEILING`, and crossfades between the dry signal and the
  * clipped one: swapping the WaveShaper's curve on a scene change jumped the
@@ -90,7 +134,7 @@ export function revealOutcome(effect, { busted = false } = {}) {
   return "even";
 }
 
-/** A reveal track as a mode: as written, with nothing taken from a scene. */
+/** A reveal track as a mode: as written, with nothing taken from a scene -- the mood included. */
 function revealMode(track, mixVolume) {
   return {
     label: track.label,
@@ -103,6 +147,7 @@ function revealMode(track, mixVolume) {
     hat: track.hat,
     bass: track.bass,
     leads: track.leads,
+    sorrowLead: track.leads[0],
     leadOffset: 0,
     pad: track.pad,
     counter: counterLine(track.pad),
@@ -116,6 +161,27 @@ function revealMode(track, mixVolume) {
 
 export function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
+}
+
+/** The pitch class of a frequency, 0-11 with A as 0. */
+function pitchClass(frequency) {
+  return ((Math.round(12 * Math.log2(frequency / 440)) % 12) + 12) % 12;
+}
+
+/**
+ * The semitones that carry the reveal's 많이 치름 lead (A minor, falling;
+ * `revealTracks.cost`) into a mode's minor: the mode's own root when its
+ * third is minor or not sounded, the relative minor when it is major -- so
+ * the sorrow lead's notes are the mode's scale, never a key of its own.
+ * Folded into -7..4, so the line sits at or under the mode's own leads --
+ * a fourth down for unstable's D rather than a fourth up.
+ */
+function sorrowShift(base) {
+  const root = pitchClass(base.pad.find(Boolean)[0]);
+  const sounded = new Set([...base.bass, ...base.leads.flat()].filter(Boolean).map(pitchClass));
+  const major = sounded.has((root + 4) % 12) && !sounded.has((root + 3) % 12);
+  const minorRoot = major ? (root + 9) % 12 : root;
+  return minorRoot > 4 ? minorRoot - 12 : minorRoot;
 }
 
 function shiftFrequency(frequency, semitones) {
@@ -189,10 +255,52 @@ export function stakeLayerCount(gauge) {
  * bars, in order, so the same scene at the same bar always plays the same
  * tune.
  */
-export function leadForBar(mode, bar) {
-  const { leads } = mode;
+export function leadForBar(mode, bar, leads = mode.leads) {
   const phrase = Math.floor(Math.max(0, bar) / BARS_PER_PHRASE);
   return leads[(phrase + mode.leadOffset) % leads.length];
+}
+
+const noteCount = (lead) => lead.filter(Boolean).length;
+/** The mean of the notes' log-pitch: where the lead sits. */
+function register(lead) {
+  let sum = 0;
+  let notes = 0;
+  for (const frequency of lead) {
+    if (!frequency) continue;
+    sum += Math.log2(frequency);
+    notes += 1;
+  }
+  return notes ? sum / notes : 0;
+}
+
+/**
+ * The leads a mood lets take turns, from the mode's own four (musicData.js):
+ *
+ * - tense: all of them, in the mode's order -- the score as it was.
+ * - bright: the two lightest -- fewest notes, then the higher.
+ * - dread: the two lowest in register.
+ * - neutral: the two in the middle of the register, in the mode's order.
+ * - sorrow: one lead, the reveal's 많이 치름 line carried into the mode's
+ *   minor (`sorrowShift`); it holds, as the reveal's does.
+ *
+ * A reveal track has one lead and every mood plays it. The arrays are the
+ * mode's own, so a caller can tell two moods' choices apart by identity.
+ */
+export function moodLeads(mode, mood) {
+  const key = normalizeMood(mood);
+  const { leads } = mode;
+  if (key === "sorrow") return [mode.sorrowLead ?? leads[0]];
+  if (key === "tense" || leads.length < 3) return leads;
+  const byRegister = [...leads].sort((a, b) => register(a) - register(b) || noteCount(b) - noteCount(a));
+  if (key === "dread") return byRegister.slice(0, 2);
+  if (key === "bright") return [...leads].sort((a, b) => noteCount(a) - noteCount(b) || register(b) - register(a)).slice(0, 2);
+  const middle = byRegister.slice(1, -1);
+  return leads.filter((lead) => middle.includes(lead));
+}
+
+/** The lead a bar plays under a mood: `leadForBar` over `moodLeads`, so tense is bar for bar what it was. */
+export function moodLeadForBar(mode, bar, mood) {
+  return leadForBar(mode, bar, moodLeads(mode, mood));
 }
 
 export function createSceneMode(modeKey, mixVolume = 1) {
@@ -229,6 +337,7 @@ export function createSceneMode(modeKey, mixVolume = 1) {
     hat: thinOut(base.hat, groove.hatDrop),
     bass,
     leads: base.leads.map((lead) => rotate(shiftPattern(lead, transpose), groove.leadShift)),
+    sorrowLead: shiftPattern(revealTracks.cost.leads[0], sorrowShift(base) + transpose),
     // Not the hash's low digits: those already pick the tempo, and the
     // key would start most scenes of one tempo on the same lead.
     leadOffset: Math.floor(hash / 42) % base.leads.length,

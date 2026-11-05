@@ -195,7 +195,8 @@ const fileBudgets = {
   // 3162 / 69982 -> 3184 / 70411 on 2026-11-04, measured (credits-alice): the
   // start screen's credit takes a row for SUPASONIC's and ALICE's addresses.
   // -> 3195 / 70696 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
-  "base-intro-ranking.css": { lines: 3195, bytes: 70696 },
+  // 3195 / 70696 -> 3194 / 70687 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood: the glow alphas), measured.
+  "base-intro-ranking.css": { lines: 3194, bytes: 70687 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -331,7 +332,8 @@ const fileBudgets = {
   // under the logic streak. In a 360px block of its own by the streak's rules,
   // apart from the HUD block that the audit token (#224) adds to.
   // -> 3029 / 58893 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
-  "play.css": { lines: 3029, bytes: 58893 },
+  // 3029 / 58893 -> 3029 / 58883 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood), measured.
+  "play.css": { lines: 3029, bytes: 58883 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
