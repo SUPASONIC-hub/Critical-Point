@@ -88,7 +88,8 @@ const budgets = [
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,174 / 54,763 on 2026-11-05, result-card-habit over main 3ca15f8d: D1, the habit's one sentence worded on the result side (habitCardLine in src/judgementHabit.js, cardLine in src/copy/habits.js) and put on the fingerprint's habit (useRunReadout.js). Measured 148,170 / 54,759 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_763 },
+  // -> 148,174 / 54,770 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the chunk names it imports moved with the sheet's hash, the gzip alone. Measured 148,170 / 54,766 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_770 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -117,7 +118,8 @@ const budgets = [
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
   // 30,526 / 13,304 -> 30,567 / 13,309 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the voice's wall call (E3 첫 단계: tableVoice.js describeWall and the zone read back off the danger line, tableMeters.js dangerZoneOf; stage.voice.wall). Measured 30,563 / 13,305 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_567, maxGzip: 13_309 },
+  // -> 30,567 / 13,314 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the chunk names it imports moved with the sheet's hash, the gzip alone. Measured 30,563 / 13,310 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_567, maxGzip: 13_314 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -331,7 +333,8 @@ const budgets = [
   // 191,476 / 69,094 -> 191,476 / 69,100 on 2026-11-05, result-card-habit over main 3ca15f8d: the chunk names it imports (D1 changed no entry code). Measured 191,472 / 69,096 in the e2e build, the gzip plus 4.
   // 191,476 / 69,094 -> 191,476 / 69,099 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the gzip alone moved with the stylesheet's hash (money.css, the account's 방금 at 11px). Measured 191,472 raw / 69,095 gzip in the e2e build, the plus 4.
   // -> 192,346 / 69,287 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 192,342 / 69,283 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_287 },
+  // -> 192,346 / 69,292 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the lines above together. Measured 192,342 / 69,288 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_292 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -658,7 +661,8 @@ const budgets = [
   // 203,562 / 38,132 -> 203,747 / 38,157 on 2026-11-05, text-size-setting over main 3ca15f8d: the root reads --text-scale (tokens.css, three rules and the HUD rem divided by it). Measured 203,743 / 38,153 in the e2e build, the plus 4.
   // 200,831 / 37,589 -> 201,051 / 37,647 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap's cards below the first screen are laid out and drawn only as they come near it (content-visibility: auto with a closed card's intrinsic height, 280px, 300px on the phone rail; src/styles/app/base-intro-ranking.css). Measured 201,047 / 37,643 in the e2e build, the plus 4.
   // 201,051 / 37,647 -> 200,963 / 37,656 on 2026-11-05, intro-cards-cv trim over main 62a25238: the sheet fits its structure budget again (the phone rail sets --card-reserve on its existing .case-card rule, gradients lose default 180deg and 0% stops and spell rgb(... / 0) as transparent, radial positions shortened); 88 raw bytes fewer, and the gzip 9 bytes more from the changed repeats. Measured 200,959 / 37,652 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_747, maxGzip: 38_157 },
+  // -> 203,876 / 38,222 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: E5's root rules over the trimmed base-intro-ranking.css with its content-visibility rules. Measured 203,872 / 38,218 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_876, maxGzip: 38_222 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1358,7 +1362,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 430,011 / 486,764 / 494,009 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 430,007 / 486,760 / 494,005 in the e2e build, the plus 4.
 // 428,480 / 485,062 / 492,230 -> 428,596 / 485,174 / 492,344 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap cards' content-visibility rule in the index CSS (the critical CSS only its hash). Measured 428,592 / 485,170 / 492,340 in the e2e build, the plus 4.
 // 428,596 / 485,174 / 492,344 -> 428,603 / 485,186 / 492,356 on 2026-11-05, intro-cards-cv trim over main 62a25238: the index CSS gzip 9 bytes more after the trim that fits base-intro-ranking.css to its structure budget (raw 88 bytes fewer). Measured 428,599 / 485,182 / 492,352 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_011, en: 486_764, ja: 494_009 };
+// -> 430,150 / 486,904 / 494,148 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the lines above together. Measured 430,146 / 486,900 / 494,144 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_150, en: 486_904, ja: 494_148 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
