@@ -87,7 +87,8 @@ const budgets = [
   // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_709 },
+  // 148,023 / 54,709 -> 148,174 / 54,763 on 2026-11-05, result-card-habit over main 3ca15f8d: D1, the habit's one sentence worded on the result side (habitCardLine in src/judgementHabit.js, cardLine in src/copy/habits.js) and put on the fingerprint's habit (useRunReadout.js). Measured 148,170 / 54,759 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_763 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -326,7 +327,8 @@ const budgets = [
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 192,346 / 69,281 on 2026-11-05, text-size-setting over main 3ca15f8d: 글자 크기 (E5, three steps), its row in the comfort panel and the setting with its attribute and factor, which <html> carries from the first paint. Measured 192,342 / 69,277 in the e2e build, the plus 4.
-  { pattern: /^index-.*.js$/, maxBytes: 192_346, maxGzip: 69_281 },
+  // 191,476 / 69,094 -> 191,476 / 69,100 on 2026-11-05, result-card-habit over main 3ca15f8d: the chunk names it imports (D1 changed no entry code). Measured 191,472 / 69,096 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_281 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -651,7 +653,7 @@ const budgets = [
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
   // -> 203,562 / 38,132 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 203,558 / 38,128 in the e2e build, the plus 4.
   // 203,562 / 38,132 -> 203,747 / 38,157 on 2026-11-05, text-size-setting over main 3ca15f8d: the root reads --text-scale (tokens.css, three rules and the HUD rem divided by it). Measured 203,743 / 38,153 in the e2e build, the plus 4.
-  { pattern: /^index-.*.css$/, maxBytes: 203_747, maxGzip: 38_157 },
+  { pattern: /^index-.*\.css$/, maxBytes: 203_747, maxGzip: 38_157 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -837,7 +839,8 @@ const budgets = [
   // 8,944 / 4,338 -> 8,432 / 4,054 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 8,432 / 4,050 in the e2e build, the gzip plus 4.
   // 8,432 / 4,054 -> 8,659 / 4,168 on 2026-10-26, 영어판 3단계: the card's words and the copied line read by key (src/copy/resultCard.js, resultCardDraw.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_659, maxGzip: 4_168 },
+  // 8,659 / 4,168 -> 8,787 / 4,224 on 2026-11-05, result-card-habit over main 3ca15f8d: D1, the habit's sentence drawn on the label's line and copied after the shared line, as two fields (habitLine, dnaTitle) handed in worded (resultCardModel.js, resultCard.js). Measured 8,783 / 4,220 in the e2e build, the plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_787, maxGzip: 4_224 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -1151,7 +1154,8 @@ const budgets = [
   // 179,793 / 60,190 -> 180,032 / 60,227 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in Japanese over KD銀行口座. Measured 180,028 / 60,223 in the e2e build, the plus 4.
   // -> 180,288 / 60,311 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 180,284 / 60,307 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,543 / 60,355 on 2026-11-05, text-size-setting over main 3ca15f8d: the comfort panel's 글자 크기 row (legend, text, three labels). Measured 180,539 / 60,351 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*.js$/, maxBytes: 180_543, maxGzip: 60_355 },
+  // 180,288 / 60,311 -> 180,349 / 60,336 on 2026-11-05, result-card-habit over main 3ca15f8d: the habit sentence's Japanese (screens/habits.js cardLine). Measured 180,345 / 60,332 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_543, maxGzip: 60_355 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1172,7 +1176,8 @@ const budgets = [
   // 149,859 / 53,502 -> 150,057 / 53,546 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in English over bundle-1105a's dictionary. Measured 150,053 / 53,542 in the e2e build, the plus 4.
   // -> 150,260 / 53,611 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 150,256 / 53,607 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,444 / 53,653 on 2026-11-05, text-size-setting over main 3ca15f8d: the comfort panel's 글자 크기 row (legend, text, three labels). Measured 150,440 / 53,649 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*.js$/, maxBytes: 150_444, maxGzip: 53_653 },
+  // 150,260 / 53,611 -> 150,299 / 53,630 on 2026-11-05, result-card-habit over main 3ca15f8d: the habit sentence's English (screens/habits.js cardLine). Measured 150,295 / 53,626 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_444, maxGzip: 53_653 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1338,6 +1343,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,560 / 486,344 / 493,539 on 2026-11-05, text-size-setting over main 3ca15f8d: 글자 크기 (E5) in the entry, the index CSS (the root reads --text-scale; the critical CSS carries the rule) and the two dictionaries. Measured 429,556 / 486,340 / 493,535 in the e2e build, the plus 4.
+// 429,328 / 486,074 / 493,267 -> 429,334 / 486,095 / 493,293 on 2026-11-05, result-card-habit over main 3ca15f8d: the entry's chunk names and the dictionaries' habit sentence (D1). Measured 429,330 / 486,091 / 493,289 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 429_560, en: 486_344, ja: 493_539 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
