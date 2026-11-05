@@ -808,6 +808,56 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
 - 커버리지 바닥(#408, `coverage-floors-1103`, `8e930107`): 실측보다 1 낮게 올림.
 - 이날 병합 14개(main `8e930107`), 운영 build-sha `8e930107`, 유닛 테스트 1,692개.
 
+**덧붙임, 2026년 11월 4일.**
+
+- 개발 도구 의존성 올림(#385, dependabot `dev-tooling`, main `5d5d6ae4`): `@electric-sql/pglite` 0.5.11 → 0.5.13, `supabase` CLI 2.121.0 → 2.122.0.
+  게임 코드·마이그레이션은 그대로.
+- 실행 의존성 올림(#386, dependabot `runtime`, `fa10dccf`): `lucide-react` 1.61.0 → 1.64.0.
+- e2e 7샤드(#415, `ci-shards`, `76cf4a07`): main Verify의 `verify-e2e`를 5 → 7샤드로 늘리고, 샤드마다 돌릴 테스트를 개수가 아니라
+  CI에서 잰 시간으로 나눈다(`tests/e2e-shards.json`, `npm run e2e:rebalance`). 최신 main 4회 기준 단위 42개, 합계 68.7분, 7샤드 모두 9.8분.
+  예상 샤드 최대 테스트 시간은 15.2분에서 약 10분으로.
+- 캐논 어긋남 고치기 1(#424, `canon-fixes-1`, `9676ea92`): 11-03 캐논 점검(프롤로그 01~05, 사건 01~49)의 확신 높음 26건과 처리 중 4건을
+  ko·en·ja로 고쳤다. 문구만 바뀌고 장면 구조·선택지·효과·id는 그대로. 결정: 사건 25 첫 출근은 4월 9일(목) 그대로 두고 사건 31의 「사흘 전」을
+  「열흘 전」으로(B), 11-14 회람의 당신과 세 명은 「수습을 마친 신입」으로(C). 영어·일본어 사전과 첫 화면 en·ja 예산은 실측 +4로 다시 잼.
+- 캐논 어긋남 고치기 2(#435, `canon-fixes-2`, `557d17bb`): 확신 중간 37건을 다시 판정해 높음으로 올린 것과 추가 1건(c25_aftershock) 가운데
+  21건을 ko·en·ja로 고쳤다. A044(해온파트너스 청산 시점)는 이야기 결정이 필요해 뺐다(① 사건 26 수취인을 같은 주소의 새 법인으로, ② 사건 08을
+  「청산 신청」까지로). main을 받은 뒤 check:card-labels가 잡은 사건 46 `c46_manifest` 첫 선택지 라벨을 34 → 30자로 줄였다
+  (「연락 닿는 기록 주인 13명에게 파쇄할지 하나씩 묻는다」, 「먼저」는 voice 줄에 남음).
+- README 복구(#444, `readme-restore-1104`, `7ddced5f`): #415 병합 때 README 충돌을 `git checkout --ours`로 풀어 파일 전체가 갈래 쪽 옛 판이
+  되었고, 11월 3일 개발 노트 줄·`build-portrait.mjs` 명령 줄·「11월 3일까지」·「3일에 14개」·첫 화면 숫자가 사라졌다. README를 fa10dccf 판으로
+  되돌리고 유닛 테스트 수(1,704개)만 다시 넣었다. 이 뒤로 충돌은 표시된 부분만 고치고 `checkout --ours/--theirs`는 쓰지 않는다.
+- 용어 통일(#431, `glossary-fix-1103`, `22f43342`): 11-03 용어 점검의 바로 고칠 줄을 용어집대로. 번역 91줄(영어 88, 일본어 3)과 소개 페이지 한 줄.
+  approval field, Yeongdong transfer, trainee, number ticket, secondhand bookshop, the creditors’ committee, 弔問室 등. 숫자와 한국어 원문은 그대로.
+- check:canon 넓히기(#430, `canon-rules`, `2bd9a8ba`): 11-03 점검에서 놓친 종류를 잡는 규칙 15개(짝 4개 포함)와 장면 규칙 3개(D-n ↔ 「n일 뒤」,
+  장면 층 ↔ 카드 「N층으로」, 첫 출근 날짜). 한서윤의 「서명」은 2023 반려 문맥에서만 막는다(`context`). #424·#435 뒤에 병합해 main 위 check:canon 어긋남 0줄.
+- 묶음 1104a(#447, `bundle-1104a`, `4e3f8e48`): 초록이던 다섯 PR을 한 갈래에 차례로 병합해 CI를 한 번만 돌렸다. 충돌은 README 표 숫자와 예산 주석만, 덩어리 단위로 고침.
+  - 브리핑 본문 칸(#429, `caption-split`): 대사가 닫히면 새 칸, 일본어 문장 끝도 칸 끝. 섞인 칸 ko 1,418 → 29, ja 1,968 → 31. 글자는 그대로.
+  - 영어·일본어 시작 화면(#433, `seo-locale-start`): 빌드가 `/en/`·`/ja/`에 따로 쓰고, hreflang·sitemap(16 → 18)·서비스 워커가 폴더를 쓴다. 정적 15쪽에 공유 카드, `/`의 no-script에 소개.
+  - 첫 방문 빠르게(#436, `perf-first-visit`): 런타임 미리 받기는 `load` 뒤로, 고른 언어의 사전은 머리의 `locale-preload`(gzip 602B)가 `modulepreload`.
+  - 영어 화면의 한국어 누출(#445, `en-ko-leak`): `simplifyPlayerText`가 한국어 화면에서만 바꾼다(「Injustice / 믿음 / Helplessness」 29곳). 결정 A: 워드마크 읽기는
+    영어 "Trigger Lab", 일본어 「トリガーラボ」. 결정 B: 단계 이름(phase)은 치환 없이 원문 그대로.
+  - 의성어 칸 밖(#438, `plate-sound-clip`): CSS 압축이 떨어뜨리던 `translate`를 `transform: translate(-50%, -50%) rotate(-9deg)`로 옮겨 PC에서도 그림 칸 안.
+- Render 헤더: Render가 `/en/` 규칙을 `/en`에만 맞춰 `/en/` 자체에는 `s-maxage=300`이 나갔다. 만든 사람이 대시보드에 `/en/*`·`/ja/*` → `Cache-Control: no-cache`를
+  더했고 16:36에 curl로 확인. #448이 `render.yaml`·`deploy-policy.mjs`(`SHELL_PATHS`)·README 헤더 표를 같게 맞췄다(규칙 19 → 21).
+- 묶음 1105b(#448, `bundle-1105b`, `62a25238`): 두 PR을 차례로 병합하고 #447 뒤 main을 받았다. 충돌 셋(README 「QA 팀이 없다」 줄, 예산 세 블록, critical CSS)은
+  표시된 부분만 고치고 critical은 `build:critical`로 다시 만듦. 첫 화면 예산 ko / en / ja 428,480 / 485,062 / 492,230(실측 +4).
+  - 크레딧(#443, `credits-alice`): STUDIO Tak'n Roll / CREATOR SUPASONIC & ALICE, 두 메일을 `mailto` 링크로(`src/credits.js`). 시작 화면, 정적 15쪽 꼬리, 소개 페이지 한 줄,
+    README 첫머리, `package.json`. 개인정보처리방침·이용약관 여섯 쪽(ko·en·ja)은 열람·삭제 창구 바로 밑에 두 번째 창구처럼 읽히지 않게 메일 줄을 뺐다. 지원 메일(`SUPPORT_CONTACT`)은 그대로 하나.
+  - A044 1안(#446, `canon-a044`): 사건 26의 32억 수취인과 4월 24일 등기부 주소를 옮기는 곳을 「해온파트너스와 같은 주소의 새 법인」으로(ko·en·ja, 이름 없음).
+    해온파트너스는 사건 08(2025)에서 청산 등기를 마쳤다. 사건 29 premise의 「같은 주」는 「그리고 지금」으로. check:canon `advisory-fee-payee`.
+- 묶음 1105a(#449, `bundle-1105a`, `dc26d880`): 네 PR을 차례로 병합하고 main 4e3f8e48·62a25238을 받았다. 충돌은 예산 주석·README 수·critical CSS·check-canon 규칙 자리,
+  표시된 부분만 고침. 두 쪽이 바꾼 기준 이미지 세 장(case-play desktop·mobile, briefing-p1-390x844)은 묶음 갈래에서 Visual Regression `update_baselines`로 다시 찍었다.
+  - 접근성(#440, `a11y-1103`): 손패 카드 테두리 대비 1.70:1 → 3:1 이상(흰색 16% → 40%), 「시즌 완료」 배지는 sr-only로 읽힘, axe를 ko·en·ja × 360×740·1280×720으로(e2e 1,182 → 1,202개).
+  - 불안정 테스트(#439, `flaky-fix-1103`): 복제한 탭에 늦게 온 「held」 답도 판이 토큰을 읽기 전이면 받는다(`takeTabToken`), 기준 이미지의 안전선 버튼 가림 등 테스트 넷.
+  - KD은행 계좌(#442, `kd-bank-account`): 보유 금액을 브리핑·판·정산·유물 고르기 내내 보이는 고정 영역으로. 1024px 이하는 화면 맨 위 한 줄 띠, 1025px 이상은 오른쪽 위 상자.
+    표시만 바뀌고 점수·밸런스는 그대로(W47 전). 그 돈을 유물 고르기에서 화폐로 쓰는 것은 W47 뒤 11-30 묶음에서. check:canon `kd-account-name`.
+  - 즉답 감점(#416, `snap-after-reading`): 장면을 읽기 시계의 70% 이상 읽고 연 판은 빨리 골라도 즉답 감점이 없고, 생각 리듬은 8초로 친다. 옛 런은 옛 공식으로 다시 계산하고 랭킹은 비우지 않는다.
+    W47 봇 값은 다시 재 보니 기본값과 같아 `TEST_WEEK_SIM_LINES`는 비워 둔다.
+- 열어 둔 것: 게시판 자동 숨김(#432, 마이그레이션 있음). 신고로 숨기는 글은 전체 한 시간 5건까지(`board_auto_hide_per_hour`).
+- 진행 중: 탭 제목(#450, `tab-title-locale`). 영어·일본어 화면의 탭이 `index.html`의 한국어 제목으로 돌아가지 않게. 오늘 늦게 또는 내일 첫 순서.
+- 내일 첫 순서: #450 → 마이그레이션 #432 → #425 → #434(하나씩 묻고 넣음) → main에서 `check:grants`.
+- 이날 병합 19개(따로 8개, 묶음 셋이 11개를 담음. 묶음 PR #447 #448 #449까지 세면 22개, main `dc26d880`), 운영 build-sha `dc26d880`(18:01 curl), 유닛 테스트 1,758개(`npm test` 실측).
+
 ## 7. 자료와 한계
 
 **본 것**
