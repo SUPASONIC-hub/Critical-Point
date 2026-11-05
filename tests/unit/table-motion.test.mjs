@@ -209,12 +209,17 @@ test("a fade that stands in for a motion keeps its length under reduced motion a
   assert.doesNotMatch(sheet("play"), /animation: (clue-stamp|reveal-in)/, "no animation names a keyframe that does not exist");
 });
 
-test("the cases where the season rests play a quiet table, and the table is the same table", async () => {
+test("the cases where the season rests play a quiet table, and the table is the same table (B-13, C-10)", async () => {
   const { QUIET_TABLE_CASES, isQuietTable } = await import("../../src/gauntlet/fxVariables.js");
   const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
   // B-13: the night off at 경포, the funeral, the 추석 kitchen -- and no other case.
-  assert.deepEqual([...QUIET_TABLE_CASES], ["case42", "case45", "case47"]);
-  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), ["case42", "case45", "case47"]);
+  // C-10: and each act's first case (B-11's act cards), where an act opens at rest after the last one's peak.
+  const { ACT_START_CASES } = await import("../../src/gauntlet/actCardGate.js");
+  const { PEAK_CASES } = await import("../../src/gauntlet/tableUnlocks.js");
+  const rests = ["case42", "case45", "case47"];
+  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), CASE_SEQUENCE.filter((caseId) => rests.includes(caseId) || ACT_START_CASES.includes(caseId)));
+  assert.equal(QUIET_TABLE_CASES.length, rests.length + ACT_START_CASES.length);
+  assert.ok(!PEAK_CASES.some(isQuietTable), "no case is both a peak and a rest");
   assert.equal(isQuietTable(undefined), false);
 
   // The frame loop plays it as the comfort setting, and keeps the heartbeat and the drone out of the ear.

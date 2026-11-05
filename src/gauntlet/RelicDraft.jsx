@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Anchor, Bandage, Crosshair, Eye, Fan, Gem, KeyRound, Lock, Repeat, ShieldCheck, Snowflake, Stethoscope, Timer } from "lucide-react";
-import { RELIC_IDS, RELIC_SLOTS, RELICS } from "./relics.js";
+import { ClipboardCheck, Crosshair, Fan, Files, Hourglass, Lock, Newspaper, NotebookPen, Repeat, ShieldCheck, Snowflake, Stethoscope, Timer } from "lucide-react";
+import { BREATHER, RELIC_IDS, RELIC_SLOTS, RELICS } from "./relics.js";
 import { objectParticle } from "../playerLanguage.js";
 import { readRelicCodex } from "./useRelicTable.js";
 import { useDialogFocus } from "./useDialogFocus.js";
@@ -15,15 +15,15 @@ const ICONS = {
   timer: Timer,
   snowflake: Snowflake,
   fan: Fan,
-  key: KeyRound,
-  bandage: Bandage,
+  clipboard: ClipboardCheck,
+  files: Files,
+  hourglass: Hourglass,
+  newspaper: Newspaper,
+  notebook: NotebookPen,
   repeat: Repeat,
   shield: ShieldCheck,
-  gem: Gem,
   stethoscope: Stethoscope,
   crosshair: Crosshair,
-  anchor: Anchor,
-  eye: Eye,
 };
 
 export function RelicIcon({ id, size = 14 }) {
@@ -33,7 +33,9 @@ export function RelicIcon({ id, size = 14 }) {
 
 /**
  * The draft a closed case deals at the next case's first table: three relics,
- * one kept for the rest of the season, or none.
+ * one kept for the rest of the season, or none -- and none is 「숨 고르기」
+ * (C-7, `BREATHER`): the pass button says what it gives, so passing is a
+ * choice and not only a way out.
  *
  * It is the only thing in front of the table because it is the decision on
  * that screen: the clock does not start until it is answered, and nothing
@@ -140,9 +142,11 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
               {say.back}
             </button>
           )}
-          <button type="button" className="ghost gx-draft-skip" data-testid="relic-skip" aria-keyshortcuts={swapFor ? undefined : "Escape"} onClick={onSkip}>
-            {say.skip}
+          <button type="button" className="ghost gx-draft-skip" data-testid="relic-skip" aria-keyshortcuts={swapFor ? undefined : "Escape"} aria-describedby="gx-draft-breather" onClick={onSkip}>
+            {fill(say.skip, BREATHER)}
           </button>
+          {/* The whole of it for a screen reader; the eye reads the button's short form (no line more on a phone). */}
+          <span className="sr-only" id="gx-draft-breather">{BREATHER.text}</span>
         </div>
       </div>
     </div>

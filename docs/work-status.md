@@ -153,6 +153,58 @@ Still open, on purpose:
   and 사건 23's market card keeps the `risk` its old label inferred.
 - This week's rule (#199, F7) merged on the evening of 2026-10-20 at `43e7ed1`
   (migration 20261021000000; the ranking reads one board at a time by `week`).
+  B3's audit and B2's links were 2026-W44's test week (#219, #223) and are
+  rules of the table from 프롤로그 04 since RULES_MARK 3 (one ranking reset,
+  v10): `audit` and `cascade` in `tableUnlocks.js`, off in story mode and in a
+  replayed case; the week's devices (`WEEK_RULE_DEVICES`) are empty, and
+  W44's catalogue entry stays as a week gone by. The bots play both wherever
+  a case's rules have them (`AUDIT=0` / `CASCADE=0` turn one off). With the
+  same reset the season's ranking score becomes the mean of its cases' burst
+  scores (the user, 2026-10-22, Q7 (1)), where it was the finale's own, made
+  from that case's eight or so decisions: `getSeasonScore` on the client (a
+  replayed case counts its first close, `firstBurstScore`), and the server's
+  `ranking_run_summary` recomputes it from the run's case rows
+  (`20261106020000_season_score_case_mean.sql`, promoted on 2026-11-05 ahead of the
+  reset). Over 200 bot seasons the finale's score ran 32 to 80 (p50 60) and
+  the mean runs 45 to 71 (p50 59); no bot season reaches A (72) on the mean.
+  One axis of that mean is read off the whole season (the user, 2026-10-23,
+  Q25 (1)): 관점 전환, whose reach (kinds / 4) a case of seven decisions
+  rarely fills. Each case summary keeps its `cognitionMix` (a replay its
+  first close's, `firstCognitionMix`), and the season's spread of their sum
+  takes the place of each case's own (weight 0.2), on the client and in the
+  server's `ranking_run_summary` (`ranking_cognition_spread`, same draft);
+  a season with a case that has no count keeps the plain mean. The same 200
+  seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
+  (balanced), procedure +3.1.
+- C-1(1), drafted 2026-10-25 on top of #224 for the ranking reset after it
+  (the user, 「전부 1」): each case's burst score gives 0.2 to 판 읽기, the
+  C-12 index the case close prints (「벽을 본 사람의 N%」, now
+  `getCaseRead` in `src/seasonScore.js`), and the six axes before it keep
+  their ratios at 0.8 (0.224 / 0.16 / 0.16 / 0.128 / 0.064 / 0.064). The
+  season's 관점 전환 swap weighs 0.16. Local ranking v11; the server's copy is
+  `20261106030000_season_score_reading_axis.sql`, promoted 2026-11-05 (the 0.16 swap, a
+  refusal for a case row without `readingScore`, and the reset); the checker
+  holds each window's read to its replay. `npm run report:reading-axis`
+  (320 bot seasons a board, same seeds): blind 61.7 -> 56.7, heartbeat
+  62.2 -> 61.0, scout 63.2 -> 64.9, sees the wall 62.7 -> 69.1; the gap
+  between seeing the wall and playing blind goes from 0.9 to 12.5 points.
+- D2, the hall of fame (draft on top of #224, D2-명예의전당-설계안-20261021.md,
+  every question (1) and question 9 (1)): `20261106010000_hall_of_fame.sql`
+  (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
+  `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
+  `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
+  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  and two steps in `verify-ranking.yml`: the settle call right after the
+  marks, from the same check, and a job of its own with `contents: write`
+  that force-pushes one commit to the orphan branch `hall-of-fame`. Each
+  board is read on its own: the threshold of ten counts the board's complete
+  seasons with no mark over the whole board (`hall_of_fame_counts`, counted
+  again inside the settle call), and the replay reads each open board's first
+  ten candidates beside the top `limit`. A week's
+  board settles four weeks after its Monday; a table's once the next table's
+  board is first written. Not merged: the migration applies on merge, and the
+  design waits for #224 and seven days of the daily check (the week of 11-16
+  at the earliest).
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
@@ -1406,7 +1458,7 @@ Still open, on purpose:
 70. When the season's length changes, reset both rankings: a migration deletes
     the `season-final` rows (per-case telemetry stays) and the local board moves
     to a new `critical-point-local-ranking-vN` key that retires the old ones
-    (v9 today). The 2026-09-28 migration also deleted every season row the new
+    (v10 today). The 2026-09-28 migration also deleted every season row the new
     server rules would have refused, so the public ranking starts over when it
     is pushed. The table changing what it pays is the same occasion: on
     2026-10-11 both were reset once more (v8, and
@@ -1418,7 +1470,11 @@ Still open, on purpose:
     begun before 2026-10-10 therefore never ranks. Day 10's table did it again
     on 2026-10-20 (v9, `20261020010000_rules_day10_ranking_reset.sql`), and
     the mark it asks of every case row is `tableRules` in `dynamics`
-    (`RULES_MARK_KEY`). The suspicion marks (`20261020000000`, #183) went in
+    (`RULES_MARK_KEY`). RULES_MARK 3 (B3's audit and B2's links as rules of
+    the table from 프롤로그 04, played first as 2026-W44's test week) resets
+    them once more (v10, `*_rules_mark3_ranking_reset.sql`, which asks for a
+    mark of 3; drafted as `.sql.draft` and made a `.sql` only on the merge
+    day, after the user is asked). The suspicion marks (`20261020000000`, #183) went in
     just before it, so every row ranked since carries them: a `season-final`
     row is never refused for its score, the bounds it fails are written to
     `suspicion`, which anon cannot read, and `ranking_hides_marked()`, the
