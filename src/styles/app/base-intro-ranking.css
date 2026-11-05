@@ -2239,9 +2239,12 @@ summary:focus-visible {
 .case-card.locked-case .case-status-chip {
   background: transparent;
 }
+/* The acid glow sits at 0.1, not 0.14: the readability check reads the card's
+   --ui-text-2 against the glow laid twice over --ui-surface-1, and on the
+   neutral ground (one step lighter since design-mood) 0.14 read 4.45:1; 0.1
+   reads 5.61:1 (5.50 on bright, the lightest ground). */
 .case-card.active-case {
-  background:
-    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
   border-color: rgb(217 255 98 / 0.6);
   box-shadow:
     0 0 0 1px rgb(217 255 98 / 0.25),
