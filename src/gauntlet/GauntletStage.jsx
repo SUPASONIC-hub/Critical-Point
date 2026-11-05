@@ -21,7 +21,7 @@ import {
   getTableSchema,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
-import { isClosingScene } from "./holdConfirm.js";
+import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
@@ -446,12 +446,12 @@ export function GauntletStage({
     dispatch({ type: "CASH", locked: sealedLock });
   }
 
-  // The scene that closes the case is confirmed by a hold or a second press,
-  // not a click (holdConfirm.js); every other table cashes as it always did.
-  const holdsCash = isClosingScene(scene.node);
-  const cashHold = useHoldConfirm({ enabled: holdsCash && canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  // The case's last choice and a table in the danger zone confirm by a 0.6s hold (holdConfirm.js); every other table cashes on a click.
+  const cashHold = useHoldConfirm({ node: scene.node, gauge: win.gauge, wallMin: band.wallMin, canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  const holdsCash = cashHold.holds;
   // Short enough for the dock's 108px on a 360px phone; the full sentence is the button's description.
-  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : !holdsCash ? say.commit : cashHold.phase === "armed" ? say.oneMore : say.holdToCommit;
+  const holdLabel = { hinted: say.holdHint, armed: say.oneMore }[cashHold.phase] ?? say.holdToCommit;
+  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : holdsCash ? holdLabel : say.commit;
 
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
@@ -804,9 +804,9 @@ export function GauntletStage({
         >
           <span>{cashLabel}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
+          {holdsCash && <HoldGauge phase={cashHold.phase} />}
         </button>
-        {/* Outside the button, so neither is read into its name. The second is
-            what a press that did not hold says: one more confirms. */}
+        {/* Outside the button, so neither is read into its name. */}
         {holdsCash && <span id="gx-cash-hold" className="sr-only">{say.holdHelp}</span>}
         {audit && <span id="gx-audit-detail" className="sr-only">{audit.spoken}</span>}
       </div>
@@ -847,8 +847,8 @@ export function GauntletStage({
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         caseId={scene.node.caseId}
-        // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
+        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

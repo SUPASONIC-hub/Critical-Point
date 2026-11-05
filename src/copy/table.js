@@ -84,7 +84,8 @@ const tableCopy = {
     commit: "확정",
     oneMore: "한 번 더",
     holdToCommit: "꾹 눌러 확정",
-    holdHelp: "길게 눌러 확정. 길게 누르기 어려우면 3초 안에 한 번 더 누른다",
+    holdHint: "길게 눌러야 확정",
+    holdHelp: "길게 눌러 확정",
   },
   // The key line over the hand: each word after its key.
   keys: {
@@ -222,6 +223,7 @@ const tableCopy = {
   // tableVoice.js: what the table says aloud in its one polite region.
   voice: {
     holdArmed: "한 번 더 누르면 확정된다",
+    holdHint: "길게 눌러야 확정된다",
     push: "열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
     scout: "조회했다. 벽은 {min}에서 {max} 사이 어딘가",

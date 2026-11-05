@@ -68,7 +68,8 @@ export default {
     commit: "確定",
     oneMore: "もう一度",
     holdToCommit: "長押しで確定",
-    holdHelp: "長押しで確定。長押しが難しければ、3秒以内にもう一度押す",
+    holdHint: "長押しが必要",
+    holdHelp: "長押しで確定",
   },
   keys: {
     stake: "賭ける",
@@ -227,6 +228,7 @@ export default {
   },
   voice: {
     holdArmed: "もう一度押すと確定する",
+    holdHint: "長押しすると確定する",
     push: "熱 {gauge} · {danger}",
     stance: "チャージ {focus} · 確定すると次の勝負は{label} · {title}",
     scout: "照会した。壁は {min} から {max} のあいだのどこか",

@@ -1662,10 +1662,12 @@ Still open, on purpose:
     `event.key` is a jamo. Space and Enter belong to whatever control the
     keyboard walked to with Tab; only with nothing such focused do they push
     and cash. On a scene that closes the case (`isClosingScene`,
-    `src/gauntlet/holdConfirm.js`; about one a case) 확정 is held for 0.8
-    seconds (`HOLD_MS`), Enter and Space included, and a short press arms it
-    so a second press within 3 seconds confirms -- the path for a screen
-    reader's virtual click or a hand that cannot hold. On the result screen
+    `src/gauntlet/holdConfirm.js`; about one a case) and on a table whose
+    heat is inside the band (`isDangerZone`) 확정 is held for 0.6 seconds
+    (`HOLD_MS`, 2026-11-05 A4), Enter and Space included, with a gauge on
+    the button; a short press only shows the hint 길게 눌러야 확정. A bare tap
+    with no press -- a screen reader's virtual click -- arms it so a second
+    tap within 3 seconds confirms. On the result screen
     `R` replays the case after asking and `N`
     opens the next one. Escape closes the ranking and the board from anywhere.
     With letter keys turned off (priority 87), 1-9, W, E, Q, P, R and N do
