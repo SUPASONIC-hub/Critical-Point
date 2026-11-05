@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c11_start": {
       "title": "Anonymous Source A",
-      "text": "A new story from the investigative outlet Leadline lights up your phone. The headline: “Why the Dissent Disappeared -- 3 Years of KD Bank Loan 2023-0412.” The 'anonymous dissent author, Source A' in the story is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. At nine, the group PR office issues a statement. 'The review at the time followed the rules, and we are verifying the facts regarding the personal judgment of certain employees.' At noon, the National Assembly calls you to the parliamentary audit. You are called as an unsworn witness. Han Seoyun turns her phone face down. 'My phone rang 40 times today. 39 of those calls were asking for your number.' For a while she has ended her sentences as if filing a report; today she is back to her old way of talking.",
+      "text": "In Leadline’s story “Why the Dissent Disappeared -- 3 Years of KD Bank Loan 2023-0412,” the 'anonymous author, Source A' is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. At nine, the group PR office says it is verifying 'the personal judgment of certain employees.' At noon, the National Assembly calls you to the parliamentary audit. You are called as an unsworn witness. Han Seoyun turns her phone face down. 'My phone rang 40 times today. 39 of those calls were asking for your number.'",
       "memo": [
         "Leadline story: 410,000 views this morning alone",
         "Group PR statement: 'the personal judgment of certain employees'",
@@ -39,7 +39,7 @@ export default {
     },
     "c11_script": {
       "title": "Two Scripts",
-      "text": "The 7th floor of the Members’ Office Building, a Policy Committee member’s office. Aide Cha Jiwon eats a rice-ball triangle standing up and holds out two A4 sheets. One is the office’s questioning script. Your answer is already written on the last line. 'Managing Director Yoon Sanghyuk directly ordered the deletion of the dissent.' The other is the 'witness answer reference material' the group PR office sent an hour ago. Its last line: 'The judgment at the time was an individual’s personal conviction, and there was no organizational pressure.' Cha Jiwon folds the wrapper in half. 'The member gets 7 minutes of questioning. A truth that doesn’t fit in 7 minutes doesn’t exist here.' Both scripts end with a sentence you cannot prove.",
+      "text": "Aide Cha Jiwon holds out two A4 sheets. The last line of the office’s script is your answer. 'Managing Director Yoon Sanghyuk directly ordered the deletion of the dissent.' The last line of the 'reference material' from the group PR office says the opposite. 'The judgment at the time was an individual’s personal conviction, and there was no organizational pressure.' Cha Jiwon says, 'Questioning gets 7 minutes. A truth that doesn’t fit in 7 minutes doesn’t exist here.' Both scripts end with a sentence you cannot prove.",
       "memo": [
         "Office script: 'Yoon Sanghyuk directly ordered the deletion' -- no direct evidence",
         "PR material: 'no organizational pressure' -- not true",
@@ -70,7 +70,7 @@ export default {
     },
     "c11_rehearsal": {
       "title": "Mock Audit",
-      "text": "A mock audit room is set up on the 2nd floor of the Hoegi-dong secondhand bookshop. The members’ bench is three apple crates; the witness stand is Lim Kyungsoo’s old reading stand. Na Junhyuk, who volunteered to play Yoon Sanghyuk, borrowed a navy suit two sizes too small, and the buttons won’t close. Kang Taemin, playing the member, ends every question with 'So who’s buying the cup noodles?', and Kwon Dohyun holds a stopwatch and shouts '41 seconds, too long' after every answer. Oh Jinwoo, playing a reporter, throws the nastiest questions and bursts out laughing before anyone else. Do Yoonha laughs out loud for the first time in 3 weeks. As the laughter dies down, Lee Minseo quietly raises her hand. 'But will my name come up too? My account is in the access log from that leak scare. I’m still on contract.'",
+      "text": "At the mock audit, Na Junhyuk, playing Yoon Sanghyuk, can’t button a suit two sizes too small. Kang Taemin, playing the member, ends every question with 'So who’s buying the cup noodles?', and Kwon Dohyun holds a stopwatch and shouts '41 seconds, too long.' Oh Jinwoo, playing a reporter, throws nasty questions and bursts out laughing first. Do Yoonha laughs out loud for the first time in 3 weeks. As the laughter dies down, Lee Minseo raises her hand. 'But will my name come up too? My account is in the access log from that leak scare. I’m still on contract.'",
       "memo": [
         "12 mock questions -- answers average 41 seconds",
         "Na Junhyuk’s suit: 1 button lost",
@@ -101,7 +101,7 @@ export default {
     },
     "c11_sign": {
       "title": "The One Who Returned It",
-      "text": "Han Seoyun calls you up to the Trigger Lab rooftop. The wind is strong, and her voice keeps breaking up. For a while she has ended her sentences as if filing a report; tonight she talks the old way. 'The person who returned your dissent 3 years ago was me. I pressed the return button. That afternoon Managing Director Yoon called. He said if the dissent went up, the seven people on our team would be scattered. Three of those seven had babies that year.' She plays an audio file on her phone. It is that call, 3 years ago. 'If you submit this tomorrow, it proves you were right. And I’m finished. I only figured out today why I couldn’t delete this file for 3 years.'",
+      "text": "Han Seoyun’s voice breaks up in the wind. She used to end her sentences as if filing a report; tonight she talks the old way. 'The person who returned your dissent 3 years ago was me. That afternoon Managing Director Yoon called. He said if the dissent went up, the seven people on our team would be scattered. Three of them had babies that year.' Her phone plays that call. 'If you submit this tomorrow, it proves you were right. And I’m finished. Only today did I figure out why I couldn’t delete this file.'",
       "memo": [
         "Recording of the call 3 years ago -- Yoon Sanghyuk’s voice can be confirmed",
         "Content of the call: 'If the dissent goes up, the team is broken up'",
@@ -132,7 +132,7 @@ export default {
     },
     "c11_final": {
       "title": "7 Minutes",
-      "text": "The chair behind the 'Yoon Sanghyuk' nameplate at the witness table is empty, and 12 cameras take turns shooting the empty chair and the witness stand. Oh Sangchul sits in the back row of the gallery, and Oh Jinwoo has sat down beside him. Three of the member’s 7 minutes have passed. The last question comes. 'Witness, why did that dissent disappear 3 years ago? Who deleted it?' From behind, Cha Jiwon slips you a note. '4 minutes left. Say a name and it’s page 1 tomorrow. Explain the system and it’s page 4.' Camera shutters pour down all at once.",
+      "text": "The chair behind the 'Yoon Sanghyuk' nameplate at the witness table is empty, and 12 cameras take turns shooting it and the witness stand. Oh Sangchul and Oh Jinwoo sit side by side in the back row of the gallery. The last question. 'Witness, who deleted that dissent 3 years ago?' Cha Jiwon slips you a note. '4 minutes left. Say a name and it’s page 1 tomorrow. Explain the system and it’s page 4.'",
       "memo": [
         "4 minutes of questioning left",
         "Empty chair at the witness table: Yoon Sanghyuk",
@@ -160,7 +160,7 @@ export default {
     },
     "c11_aftershock": {
       "title": "A Street Stall in Yeouido",
-      "text": "The night after the audit, at a street stall by the Yeouido Hangang Park. The video of your testimony ran on three evening newscasts, and at the end of the same table Oh Jinwoo and his father share fish-cake broth in silence. Kang Taemin buys tteokbokki instead of cup noodles for the first time. 'Tonight, let’s eat real food instead of cup noodles.' Na Junhyuk brings up his buttonless suit for the third time, and Do Yoonha laughs, cries, and laughs again. Then everyone’s phone rings at once. KD Financial Group, Group Strategy Office. Managing Director Yoon Sanghyuk flew back this afternoon, and he wants to see you tomorrow morning on the 33rd floor of headquarters.",
+      "text": "Your testimony ran on three evening newscasts tonight. At the end of the table, Oh Jinwoo and his father share fish-cake broth. Kang Taemin buys tteokbokki. 'Tonight, let’s eat real food instead of cup noodles.' Do Yoonha laughs, cries, and laughs again. Then everyone’s phone rings. Managing Director Yoon Sanghyuk, back in the country today, wants to see you tomorrow morning on the 33rd floor of headquarters.",
       "memo": [
         "Testimony video: 3.8 million views in one day",
         "Oh Jinwoo and his father at the same table for the first time in 2 years",
@@ -184,7 +184,7 @@ export default {
     },
     "c11_press": {
       "title": "23 Missed Calls",
-      "text": "At ten at night, Leadline reporter Seo Harin tracks you down at the convenience store outside the Members’ Office Building. Your phone shows 23 missed calls from her. She pours hot water into two cups of noodles and slides one over. 'There’s one thing wrong in the story. The tipster said so, so I wrote that Source A is a woman. Should I fix it, or leave it? If I leave it, you can stay hidden a little longer.' The store clerk glances from one of you to the other, then quietly turns down the TV. The story is on the screen.",
+      "text": "At ten at night, Leadline reporter Seo Harin, who left 23 missed calls, tracks you down at the convenience store and slides a cup of noodles over. 'There’s one thing wrong in the story. I wrote that Source A is a woman, as the tipster said. Should I fix it, or leave it? If I leave it, you can stay hidden a little longer.' The clerk quietly turns down the TV. The story is on the screen.",
       "memo": [
         "Source A’s gender is wrong in the story",
         "Leaving it delays tracing your identity by a few days",
@@ -207,7 +207,7 @@ export default {
     },
     "c11_father": {
       "title": "One Gallery Pass",
-      "text": "After the rehearsal, Oh Jinwoo stares at his phone on the stair landing for a long time. On the list of gallery pass applications for the audit is the name 'Oh Sangchul.' His father, who was pushed out of his branch long ago for delaying an approval by one day. Father and son have not spoken for 2 years, not even on holidays. 'I don’t know why he’s coming. To see that I was wrong, or to see that he was right.' He tries to smile, then stops.",
+      "text": "Oh Jinwoo stares for a long time at the list of gallery pass applications for the audit. The name 'Oh Sangchul' is on it. His father, pushed out of his branch long ago for delaying an approval by one day. Father and son have not spoken for 2 years, not even on holidays. 'I don’t know why he’s coming. To see that I was wrong, or to see that he was right.'",
       "memo": [
         "Oh Sangchul on the gallery application list",
         "Oh Jinwoo and his father: no contact for 2 years",
@@ -230,7 +230,7 @@ export default {
     },
     "c11_eve": {
       "title": "6:40",
-      "text": "6:40 in the morning on the day of the hearing, at the crosswalk in front of the National Assembly. Do Yoonha is there first, holding a thermos. Kang Taemin joins straight off the night shift, still in his reflective vest, and Na Junhyuk arrives in his suit with a new button sewn on and shows it to everyone. Do Yoonha’s hand shakes as he pours barley tea into paper cups. 'My name will come up today too. As the one who sold them. It’s fine. I’m the one who said that the most for 3 years.' The light changes, and no one crosses first.",
+      "text": "6:40 a.m. on the day of the hearing, Kang Taemin comes in his night-shift vest, Na Junhyuk in his suit with a new button. Do Yoonha’s hand shakes as he pours barley tea from a thermos. 'My name will come up today too. As the one who sold them. It’s fine. I’m the one who said that the most for 3 years.' The light changes, and no one crosses first.",
       "memo": [
         "3 hours before you appear",
         "Do Yoonha: may be named as the seller",
@@ -253,7 +253,7 @@ export default {
     },
     "c11_press_reaction": {
       "title": "No. 3 Trending",
-      "text": "ECHO brings up the last 48 hours of search data. 'KD Bank Source A' is the No. 3 trending search, and Do Yoonha’s name is among the related searches. A photo of his No. 1 sales award at the Gangseo Branch has spread, and of 1,200 comments, the most-liked line is 'Isn’t the seller an accomplice too?' 'For the two days no one knew who Source A was, people looked for a visible face instead.'",
+      "text": "Over the last 48 hours, 'KD Bank Source A' has been the No. 3 search, and Do Yoonha is among the related searches. His No. 1 sales award photo has spread, and the most-liked comment is 'Isn’t the seller an accomplice too?' 'For the two days no one knew Source A, people looked for a visible face instead.'",
       "memo": [
         "Do Yoonha in the related searches",
         "No. 1 most-liked comment: the seller is an accomplice too"
@@ -275,7 +275,7 @@ export default {
     },
     "c11_father_reaction": {
       "title": "The Day He Delayed",
-      "text": "Oh Sangchul calls first. Oh Jinwoo turns on the speaker. A hoarse voice hesitates for a long time, then speaks. 'That one day I delayed it, I still think I did right. But I never once asked what it meant to you all this time.' Oh Jinwoo can’t answer and pushes the phone toward you. The call passes 1 minute, then 2.",
+      "text": "Oh Sangchul calls first. Oh Jinwoo turns on the speaker, and a hoarse voice hesitates. 'That one day I delayed it, I still think I did right. But I never once asked what it meant to you.' Oh Jinwoo can’t answer. The call passes 1 minute, then 2.",
       "memo": [
         "First call between father and son in 2 years",
         "What he says he did right, and what he never asked"
@@ -297,7 +297,7 @@ export default {
     },
     "c11_eve_reaction": {
       "title": "Notice of Absence",
-      "text": "Yoon Sanghyuk’s notice of absence goes up on the National Assembly board. The reason: 'Attending an investor briefing in Singapore.' ECHO overlays one line. A notice from the briefing’s organizer. 'The event has been canceled due to the organizer’s circumstances.' The notice is dated three days ago. 'The notice was written on top of a schedule that no longer exists. When you say so decides the shape of the 7 minutes.'",
+      "text": "Yoon Sanghyuk’s notice of absence goes up. The reason: 'Attending an investor briefing in Singapore.' But that briefing was canceled three days ago. ECHO says, 'The notice was written on top of a schedule that no longer exists. When you say so decides the shape of the 7 minutes.'",
       "memo": [
         "A notice written on a schedule that no longer exists",
         "When in the 7 minutes to bring it up"
@@ -319,7 +319,7 @@ export default {
     },
     "c11_branch_newsroom": {
       "title": "Evening in the Newsroom",
-      "text": "Leadline’s newsroom is on the 3rd floor of a shopping building in Mangwon-dong. 11 reporters and one cat. Seo Harin turns her two monitors to show you the original tip. A watermarked printout of the dissent from 3 years ago, and on the back, one line in pencil. 'Returned -- Yoon. Don’t ask why.' The tipster didn’t give a name, but Seo Harin says she thinks she knows. 'Someone who would have kept this paper for 3 years. You know who, too. The one who runs a secondhand bookshop in Hoegi-dong.' The cat walks across the keyboard and types 'hahahaha' into the draft. Seo Harin laughs and doesn’t delete it. 'That’s the most honest sentence in this story.'",
+      "text": "11 reporters and one cat. Seo Harin shows you the original tip. A watermarked printout of the dissent from 3 years ago, with one line in pencil on the back. 'Returned -- Yoon. Don’t ask why.' Seo Harin thinks she knows the tipster. 'Someone who would have kept this paper for 3 years. You know who, too. The one who runs a secondhand bookshop in Hoegi-dong.' The cat walks across the keyboard and types 'hahahaha' into the draft. 'That’s the most honest sentence in this story.'",
       "memo": [
         "Original tip: watermarked printout of the dissent with a pencil note on the back",
         "Note: 'Returned -- Yoon. Don’t ask why.'",
@@ -343,7 +343,7 @@ export default {
     },
     "c11_branch_newsroom_follow": {
       "title": "Demand for Correction",
-      "text": "At eight in the evening, a demand for correction arrives from KD Financial Group’s legal team. It asks for one thing. Proof that the 'Yoon' in 'Returned -- Yoon' is Yoon Sanghyuk. Seo Harin reads the demand aloud, then stops. 'There is proof. A handwriting analysis. But if I submit it, who the tipster is comes out in court.' A bus passes outside the window. The cat has fallen asleep on the demand.",
+      "text": "At eight in the evening, the group’s legal team demands a correction. It wants proof that the 'Yoon' in 'Returned -- Yoon' is Yoon Sanghyuk. Seo Harin puts the demand down. 'There is proof. A handwriting analysis. But if I submit it, the tipster comes out in court.'",
       "memo": [
         "Deadline to answer the correction demand: the day before the audit",
         "Handwriting analysis: 'Yoon' likely matches Yoon Sanghyuk’s handwriting",
@@ -367,7 +367,7 @@ export default {
     },
     "c11_route_system": {
       "title": "We’ll Look Into It",
-      "text": "You ask how answers have been put off at the parliamentary audit. ECHO goes through the Policy Committee’s records for the past 10 years. 1,812 audit transcripts open. Financial company witnesses were asked 7,430 questions, and the most common answer, given 2,114 times, is 'We’ll look into it.' Of those promises, results were actually reported at the next year’s audit 3% of the time. 'This room has learned to be a place not for asking the truth, but for choosing sentences that can be put off for 1 year.'",
+      "text": "You ask how answers have been put off at the parliamentary audit, and ECHO opens 1,812 Policy Committee transcripts from the past 10 years. The most common answer from financial company witnesses, given 2,114 times, is 'We’ll look into it.' Of those promises, results were actually reported at the next year’s audit 3% of the time. 'This room has learned to be a place not for asking the truth, but for choosing sentences that can be put off for 1 year.'",
       "memo": [
         "1,812 transcripts over the past 10 years",
         "'We’ll look into it' 2,114 times -- follow-up reported 3%",
@@ -393,7 +393,7 @@ export default {
     },
     "c11_final_system_route": {
       "title": "One Thing Not Put Off",
-      "text": "Dawn on the day of the hearing. The numbers on the test terminal have not changed by a single line overnight. The most common answer was 'We’ll look into it,' and results were reported the next year 3% of the time. ECHO brings up the last line. 'The answer time you’ll get today averages 40 seconds. Of the words that fit in it, how many won’t roll over to next year?'",
+      "text": "Dawn on the day of the hearing; the numbers are unchanged overnight. Most common answer, 'We’ll look into it'; reported the next year, 3%. ECHO brings up the last line. 'Your answer time today averages 40 seconds. Of the words that fit in it, how many won’t roll over to next year?'",
       "memo": [
         "'We’ll look into it' 2,114 times -- follow-up reported 3%",
         "Witness answers average 40 seconds",
@@ -416,7 +416,7 @@ export default {
     },
     "c11_evidence_turn": {
       "title": "5 Hours 12 Minutes",
-      "text": "When you fit the clues together, the change log of the approval system from 3 years ago opens. Han Seoyun pressed the return button at 1:32 p.m. But the dissent was switched from 'retain' to 'purge' at 6:44 p.m., and the account that switched it belonged to Yoon Sanghyuk, then head of the Corporate Finance Strategy Team. The one who returned it and the one who erased it were different people. Ban Jaewook writes the two times side by side in his notebook. '5 hours 12 minutes. Who decided what in between -- that is this case.'",
+      "text": "This is the change log of the approval system from 3 years ago. Han Seoyun pressed the return button at 1:32 p.m. The dissent was switched from 'retain' to 'purge' at 6:44 p.m., on the account of Yoon Sanghyuk, then head of the Corporate Finance Strategy Team. The one who returned it and the one who erased it are different people. Ban Jaewook writes it down. '5 hours 12 minutes. Who decided what in between -- that is this case.'",
       "memo": [
         "Return button 13:32 -- Han Seoyun",
         "Purge 18:44 -- Yoon Sanghyuk’s account",
@@ -439,7 +439,7 @@ export default {
     },
     "c11_start_rest": {
       "title": "A Story for the One Who Turned Off the Lights",
-      "text": "For 3 weeks since that weekend the 4th-floor lights went off on time, the duty roster has kept running, slowly but without stopping. Then, at six on Monday morning, a story goes up on Leadline. It covers the dissent that vanished 3 years ago, and the 'anonymous author, Source A' in the story is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. At nine the group PR office issued a statement about 'the personal judgment of certain employees,' and at noon the National Assembly called you to the parliamentary audit. You are called as an unsworn witness. Managing Director Yoon Sanghyuk, summoned as a sworn witness, says he will not come, citing an overseas trip. People who have rested have the strength to get through this week. The question is whose name that strength goes under.",
+      "text": "Before dawn on Monday, a Leadline story on the dissent that vanished 3 years ago went up, and its 'anonymous author, Source A' is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. The group PR office pointed to 'the personal judgment of certain employees,' and the National Assembly called you to the parliamentary audit. You are called as an unsworn witness. Managing Director Yoon Sanghyuk, summoned as a sworn witness, is skipping it for an overseas trip. People who have rested have the strength for this week. The question is whose name it goes under.",
       "memo": [
         "Duty roster: 102 cases handled in 3 weeks",
         "Leadline story: anonymous dissent author, Source A",
@@ -469,7 +469,7 @@ export default {
     },
     "c11_start_record": {
       "title": "A Story for the One Who Left a Policy",
-      "text": "3 weeks after the duty roster was filed as a group policy proposal, the group PR office put it in a press release as a 'model case of proactive victim relief.' Before dawn that same day, the Leadline story went up. It covers the dissent that vanished 3 years ago, and the 'anonymous author, Source A' in the story is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. At nine the PR office issued a statement about 'the personal judgment of certain employees,' and at noon the National Assembly called you to the parliamentary audit. You are called as an unsworn witness. Managing Director Yoon Sanghyuk, summoned as a sworn witness, says he will not come, citing an overseas trip. The policy you made is now the group’s grounds for refuting you.",
+      "text": "3 weeks on, the day the group PR office promoted the duty roster as a 'model case of proactive victim relief,' the 'anonymous author, Source A' of a Leadline story on the dissent that vanished 3 years ago is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. The PR office pointed to 'the personal judgment of certain employees,' and the National Assembly called you to the parliamentary audit. You are called as an unsworn witness. Managing Director Yoon Sanghyuk, summoned as a sworn witness, is skipping it for an overseas trip. The policy you made has become the group’s grounds for refuting you.",
       "memo": [
         "Group press release: cites the duty roster as a model case",
         "Leadline story: anonymous dissent author, Source A",
@@ -499,7 +499,7 @@ export default {
     },
     "c11_start_keep": {
       "title": "A Story for the One Who Kept the Drawer Open",
-      "text": "The list of 212 names is still in your drawer. At six in the morning a story about the dissent that vanished 3 years ago went up on Leadline, and the 'anonymous author, Source A' in the story is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. At nine the group PR office issued a statement about 'the personal judgment of certain employees,' and at noon the National Assembly called you to the parliamentary audit. You are called as an unsworn witness. Managing Director Yoon Sanghyuk, summoned as a sworn witness, says he will not come, citing an overseas trip. That afternoon, the group legal team announces it will investigate 'employees who kept unofficial lists.' The list in your drawer could now become evidence aimed at you.",
+      "text": "The list of 212 names is still in your drawer. The Leadline story that went up at dawn covers the dissent that vanished 3 years ago, and its 'anonymous author, Source A' is you. Your Yeongdong transfer was withdrawn last week with a single line, 'return to original department.' No reason, no approver. The group PR office pointed to 'the personal judgment of certain employees,' and the National Assembly called you to the parliamentary audit. You are called as an unsworn witness. Managing Director Yoon Sanghyuk, summoned as a sworn witness, is skipping it for an overseas trip. That afternoon the legal team says it will investigate 'employees who kept unofficial lists.' The list in your drawer is aimed at you.",
       "memo": [
         "Legal team notice: investigation of employees holding unofficial lists",
         "List of 212 kept privately",
