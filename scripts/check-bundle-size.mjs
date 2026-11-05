@@ -330,7 +330,8 @@ const budgets = [
   // 191,476 / 69,094 -> 192,346 / 69,281 on 2026-11-05, text-size-setting over main 3ca15f8d: 글자 크기 (E5, three steps), its row in the comfort panel and the setting with its attribute and factor, which <html> carries from the first paint. Measured 192,342 / 69,277 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,476 / 69,100 on 2026-11-05, result-card-habit over main 3ca15f8d: the chunk names it imports (D1 changed no entry code). Measured 191,472 / 69,096 in the e2e build, the gzip plus 4.
   // 191,476 / 69,094 -> 191,476 / 69,099 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the gzip alone moved with the stylesheet's hash (money.css, the account's 방금 at 11px). Measured 191,472 raw / 69,095 gzip in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_281 },
+  // -> 192,346 / 69,287 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 192,342 / 69,283 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_287 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1158,7 +1159,8 @@ const budgets = [
   // 180,288 / 60,311 -> 180,543 / 60,355 on 2026-11-05, text-size-setting over main 3ca15f8d: the comfort panel's 글자 크기 row (legend, text, three labels). Measured 180,539 / 60,351 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,349 / 60,336 on 2026-11-05, result-card-habit over main 3ca15f8d: the habit sentence's Japanese (screens/habits.js cardLine). Measured 180,345 / 60,332 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,325 / 60,317 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the voice's wall call in Japanese (voice.wall). Measured 180,321 / 60,313 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_543, maxGzip: 60_355 },
+  // -> 180,641 / 60,387 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 180,637 / 60,383 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_641, maxGzip: 60_387 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1181,7 +1183,8 @@ const budgets = [
   // 150,260 / 53,611 -> 150,444 / 53,653 on 2026-11-05, text-size-setting over main 3ca15f8d: the comfort panel's 글자 크기 row (legend, text, three labels). Measured 150,440 / 53,649 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,299 / 53,630 on 2026-11-05, result-card-habit over main 3ca15f8d: the habit sentence's English (screens/habits.js cardLine). Measured 150,295 / 53,626 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,296 / 53,618 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the voice's wall call in English (voice.wall). Measured 150,292 / 53,614 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_444, maxGzip: 53_653 },
+  // -> 150,519 / 53,684 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 150,515 / 53,680 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_519, maxGzip: 53_684 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1350,7 +1353,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 429,334 / 486,095 / 493,293 on 2026-11-05, result-card-habit over main 3ca15f8d: the entry's chunk names and the dictionaries' habit sentence (D1). Measured 429,330 / 486,091 / 493,289 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,328 / 486,082 / 493,273 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the English and Japanese dictionaries carry the voice's wall call (E3 첫 단계); the Korean page is under its budget still. Measured 429,326 / 486,078 / 493,269 in the e2e build, the plus 4.
 // 428,480 / 485,062 / 492,230 -> 428,933 / 485,454 / 492,668 on 2026-11-05, static-shell over main 62a25238: the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs), so each page's HTML grows. Measured 428,929 / 485,450 / 492,664 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 429_560, en: 486_344, ja: 493_539 };
+// -> 430,011 / 486,764 / 494,009 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 430,007 / 486,760 / 494,005 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_011, en: 486_764, ja: 494_009 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
