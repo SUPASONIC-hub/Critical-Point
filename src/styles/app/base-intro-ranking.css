@@ -1241,8 +1241,7 @@ summary:focus-visible {
 .data-info-panel,
 .season-panel,
 .quick-guide,
-.season-summary,
-.case-roadmap {
+.season-summary {
   text-align: left;
 }
 .intro .start-priority {
