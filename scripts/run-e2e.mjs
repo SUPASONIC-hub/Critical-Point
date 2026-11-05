@@ -115,6 +115,7 @@ const DEFAULT_SPECS = [
   "tests/save-integrity.spec.js",
   "tests/save-resume.spec.js",
   "tests/save-unavailable-language.spec.js",
+  "tests/scene-mood.spec.js",
   "tests/season-flow.spec.js",
   "tests/season-recovery.spec.js",
   "tests/season-telemetry.spec.js",
