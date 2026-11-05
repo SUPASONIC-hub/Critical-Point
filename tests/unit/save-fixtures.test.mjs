@@ -128,7 +128,9 @@ test("a save from the table that graded a press loads without a notice, under th
   assert.equal(weekRule, null);
   assert.equal(open, null);
   assert.deepEqual([linksIn, linksOut], [[], []]);
-  assert.deepEqual(kept, rest);
+  // And the board says it has no stake clock (2026-11-05): a board saved
+  // before it was dealt keeps the flat clock it was played under.
+  assert.deepEqual(kept, { ...rest, schema: { ...rest.schema, stakeClock: false } });
   // The streak is the save's, but a hold on a thinking type (before C-3, 2026-10-25) starts over:
   // the streak is held on a direction now.
   const untyped = (logic) => (logic && typeof logic.type === "string" && !["people", "position"].includes(logic.type) ? { ...logic, type: null, held: 0 } : logic);

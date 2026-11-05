@@ -27,6 +27,20 @@ export const HEAT_DEBT_SHARE = 3;
 export const HEAT_DEBT_SECONDS = 12;
 /** The two heats the rules read, marked on the gauge: a seal breaks at 30, HEAT DEBT starts at 60. */
 export const GAUGE_MARKS = [SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE];
+
+/** The decision window's clock on a plain board, in seconds, before the stake takes any. */
+export const WINDOW_SECONDS = 45;
+/** The stake's three layers, 25 / 45 / 65 (stakeLayers.js, a leaf the score shares). */
+export { STAKE_LAYER_GAUGES } from "./stakeLayers.js";
+/**
+ * The stake clock (개선 포인트 B5, 2026-11-05, the user's answer 1): the
+ * window loses this many seconds at each of the stake's two upper tiers -- a
+ * plain board's 45 is 40 with the pot worth losing and 35 with it inside the
+ * band -- and no board is cut below the shortest clock `normalizeSchema`
+ * allows. Shown as-is on the clock: nothing runs faster than it reads.
+ */
+export const STAKE_CLOCK_CUT = 5;
+export const STAKE_CLOCK_FLOOR = 12;
 /** A cash at this multiplier or better builds the chain; this many in a row OVERCLOCK the board. */
 export const HOT_CASH_MULTIPLIER = 4;
 export const OVERCLOCK_STREAK = 2;

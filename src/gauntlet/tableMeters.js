@@ -1,4 +1,4 @@
-import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
+import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
 import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
 import { HEAT_DEBT_GAUGE, SCOUT_TRUST } from "./tableRules.js";
 import { readSafeLine } from "./tableAfterword.js";
@@ -53,7 +53,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit =
     multiplier: getMultiplier(win.gauge),
     focusBonus: getFocusBonus(win.focus, win.focusMode),
     remaining: getRemainingSeconds(win),
-    bpm: getHeartbeatBpm(win.gauge, win.wall + (win.tellOffset ?? 0), schema.sedated, win.elapsed / schema.seconds),
+    // The urgency is read against the clock the stake leaves (`getWindowSeconds`), the one `remaining` counts down.
+    bpm: getHeartbeatBpm(win.gauge, win.wall + (win.tellOffset ?? 0), schema.sedated, win.elapsed / getWindowSeconds(win)),
     nextLow,
     nextHigh,
     nextMultiplierLow: getMultiplier(nextLow),

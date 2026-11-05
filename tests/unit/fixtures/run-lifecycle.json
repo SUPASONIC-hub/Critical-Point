@@ -143,7 +143,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -170,7 +171,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [],
@@ -324,7 +326,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -351,7 +354,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -518,7 +522,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -545,7 +550,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [],
@@ -699,7 +705,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -726,7 +733,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -893,7 +901,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -920,7 +929,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -1095,7 +1105,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -1122,7 +1133,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -1289,7 +1301,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -1316,7 +1329,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -1491,7 +1505,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -1518,7 +1533,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -1685,7 +1701,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -1712,7 +1729,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -1887,7 +1905,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -1914,7 +1933,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -2083,7 +2103,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -2263,7 +2284,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -2431,7 +2453,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -2611,7 +2634,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": true,
@@ -2778,7 +2802,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -2958,7 +2983,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -3125,7 +3151,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -3305,7 +3332,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": true,
@@ -3472,7 +3500,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -3652,7 +3681,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": true,
@@ -3819,7 +3849,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -3999,7 +4030,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -4166,7 +4198,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -4343,7 +4376,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -4509,7 +4543,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -4536,7 +4571,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [],
@@ -4690,7 +4726,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -4717,7 +4754,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -4939,7 +4977,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -4966,7 +5005,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -5182,7 +5222,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -5209,7 +5250,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -5405,7 +5447,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -5432,7 +5475,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -5622,7 +5666,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -5649,7 +5694,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -5900,7 +5946,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -5927,7 +5974,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -6172,7 +6220,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -6199,7 +6248,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -6409,7 +6459,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -6436,7 +6487,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -6640,7 +6692,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -6667,7 +6720,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -6875,7 +6929,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -6902,7 +6957,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -7114,7 +7170,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -7141,7 +7198,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [],
@@ -7305,7 +7363,8 @@
             "fractureRate": 1.5,
             "sealBreak": 30,
             "mutations": [],
-            "relics": []
+            "relics": [],
+            "stakeClock": true
           },
           "resources": {
             "time": 72,
@@ -7332,7 +7391,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,
@@ -7516,7 +7576,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -7696,7 +7757,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": true,
@@ -7833,7 +7895,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [],
@@ -8014,7 +8077,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "pendingTelemetry": [
@@ -8196,7 +8260,8 @@
           "fractureRate": 1.5,
           "sealBreak": 30,
           "mutations": [],
-          "relics": []
+          "relics": [],
+          "stakeClock": true
         }
       },
       "paused": false,

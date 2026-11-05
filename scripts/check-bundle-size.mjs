@@ -136,6 +136,7 @@ const budgets = [
   // 146,589 / 54,099 -> 146,633 / 54,110 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the case-closing decision records its relic draft (useChoiceCommit) and the runtime carries seasonSpent with the run. Measured 146,629 / 54,106 in the e2e build, the plus 4.
   // 146,589 / 54,099 -> 146,798 / 54,192 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): spendAtDraft in GameRuntime (the reroll and one more paid from the KD은행 계좌), the case-closing decision records its relic draft (useChoiceCommit) and the run carries seasonSpent. Measured 146,794 / 54,188 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,041 / 54,715 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the log entry carries `threshold.scouted`. Measured 148,037 / 54,711 in the e2e build, the plus 4.
+  // 148,023 / 54,709 -> 148,057 / 54,715 on 2026-11-05, stake-clock over main e68fe8cc: the table's meters read the clock the stake leaves (tableMeters' getWindowSeconds) and the names it imports from the engine shifted. Measured 148,053 / 54,711 in the e2e build, the plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_622, maxGzip: 54_994 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -465,6 +466,7 @@ const budgets = [
   // 69,331 -> 69,335 gzip on 2026-11-05, rules-1105 after merging main 33899116 (#456 #457 #460 prose bundles a-c): no entry code changed (raw 191,871); the case files' hashed names in its import list. Measured 191,871 / 69,331 in the e2e build, the gzip plus 4.
   // 69,965 -> 69,957 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 193,408; the case files' hashed names in the entry's import list (#460). Measured 193,408 / 69,953 in the e2e build, the gzip plus 4.
   // 191,875 / 69,335 -> 193,717 / 70,143 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 193,713 / 70,139 in the e2e build, the plus 4.
+  // 191,573 / 69,173 -> 191,595 / 69,187 on 2026-11-05, stake-clock over main e68fe8cc: the stake's three layers moved out of the score into their own leaf (src/gauntlet/stakeLayers.js), which the entry now carries for the score and the engine's clock. Measured 191,591 / 69,183 in the e2e build, the plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 193_717, maxGzip: 70_143 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -1065,6 +1067,7 @@ const budgets = [
   // 44,131 / 16,529 -> 46,432 / 17,345 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode (PR 1), and readDraftSpend (src/gauntlet/draftSpend.js): each button's open or closed state and its one reason (PR 2). Measured 46,428 / 17,341 in the e2e build, the plus 4.
   // 46,432 / 17,345 -> 46,526 / 17,396 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the Korean line under the draft's note (src/copy/relics.js spendHint, which this chunk carries). Measured 46,522 / 17,392 in the e2e build, the plus 4.
   // 16,529 -> 16,554 gzip on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): SCOUT_TRUST, `applyGauntletEffect`'s `scouted` and the verdict's `scouted` (raw 44,119, under). Measured 44,119 / 16,550 in the e2e build, the gzip plus 4.
+  // 44,131 / 16,529 -> 44,750 / 16,759 on 2026-11-05, stake-clock over main e68fe8cc: the stake clock (src/gauntlet/stakeClock.js: decisionWindowSeconds, stakeTier), the board's stakeClock mark, advanceClock reading the tick tier by tier and a push that runs the clock out. Measured 44,746 / 16,755 in the e2e build, the plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 45_469, maxGzip: 17_220 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -1753,6 +1756,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // the budgets are the CI's plus 4, 426,933, 483,927 and 490,605.
 // 426,933 / 483,927 / 490,605 -> 426,929 / 483,921 / 490,604 on 2026-11-05, phone-en-stake-11px over rules-mark-3b 9e91c588: the 360px English bank rail's 10px label rule went (play.css; the critical CSS does not carry it). Measured 426,921 / 483,916 / 490,594 in the e2e build here, 4 / 6 / 1 under cb904fb6's 426,925 / 483,922 / 490,595; the CI build reads 4 / 1 / 6 over this PC (30f5519d), so the budgets are the CI's expected 426,925 / 483,917 / 490,600 plus 4.
 // en 487,123 -> 487,130 and ja 494,315 -> 494,328 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the language dictionaries above. Measured 430,381 / 487,126 / 494,324 in the e2e build, the plus 4 (ko under its 430,390).
+// 430,386 / 487,129 / 494,322 -> 430,401 / 487,134 / 494,327 on 2026-11-05, stake-clock over main e68fe8cc: the entry carries the stake's three layers (stakeLayers.js) for the score and the clock. Measured 430,397 / 487,130 / 494,323 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 432_043, en: 489_484, ja: 496_601 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
