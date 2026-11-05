@@ -30,11 +30,6 @@ const reportLinesCopy = {
     nextCase: "다음 사건 「{title}」까지 이어서 보고 싶은 이유가 생겼나요?",
     finale: "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] 시즌 붕괴",
-    season: "[{ending}] 시즌 판정",
-    case: "[사건 종료] {tag}",
-  },
   rationaleClues: "단서 {count}",
   standing: {
     clear: "붕괴선 아래",

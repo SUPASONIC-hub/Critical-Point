@@ -10,7 +10,7 @@ import tableCopy from "../copy/table.js";
  * The 현재 위험 cell's line, and the voice's after the heat (`describePush`).
  * It reads only what the meter draws -- the heat, the next push's reach and
  * the band's low edge -- never the wall inside the band. Once the heat is in
- * the band it says so, as the tab does (`열기 67 · 벽 구간 안`); it used to
+ * the band it says so (the tab counts to the band, tableTabTitle.js); it used to
  * keep saying the next push could reach a band the heat was already in.
  * Each line fits the cell on a 360px phone without the ellipsis.
  */

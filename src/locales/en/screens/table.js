@@ -1,10 +1,5 @@
 /** The table (src/copy/table.js) in English: buttons, gauges, notices, the hand, the Stance row, the ledger and the readouts. */
 export default {
-  tab: {
-    hot: "▲ One more push could hit the Wall",
-    critical: "▲ Heat {gauge} · inside the Wall band",
-    bust: "[BUST] The hand hit the Wall",
-  },
   danger: {
     inBand: "Inside the Wall band",
     inReach: "A push can reach the Wall",

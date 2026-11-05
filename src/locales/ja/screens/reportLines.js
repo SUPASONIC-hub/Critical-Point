@@ -18,11 +18,6 @@ export default {
     nextCase: "次の事件「{title}」まで続けて見たい理由ができましたか？",
     finale: "最後の選択は、トリガーラボの実験の構造と自然につながりましたか？",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] シーズン崩壊",
-    season: "[{ending}] シーズン判定",
-    case: "[事件終了] {tag}",
-  },
   rationaleClues: "手がかり {count}",
   standing: {
     clear: "崩壊線の下",

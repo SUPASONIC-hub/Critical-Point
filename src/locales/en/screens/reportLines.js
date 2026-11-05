@@ -18,11 +18,6 @@ export default {
     nextCase: "Did you find a reason to keep going to the next case, “{title}”?",
     finale: "Did the final choice tie in naturally with the Trigger Lab’s experiment?",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] Season collapse",
-    season: "[{ending}] Season verdict",
-    case: "[Case closed] {tag}",
-  },
   rationaleClues: "Clues {count}",
   standing: {
     clear: "Below the collapse line",
