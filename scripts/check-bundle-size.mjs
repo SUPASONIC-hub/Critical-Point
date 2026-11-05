@@ -134,6 +134,7 @@ const budgets = [
   // 54,772 -> 54,771 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 148,130; the chunk names it imports (#460). Measured 148,130 / 54,767 in the e2e build, the gzip plus 4.
   // 148,514 / 54,956 -> 148,622 / 54,994 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 148,618 / 54,990 in the e2e build, the plus 4.
   // 146,589 / 54,099 -> 146,633 / 54,110 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the case-closing decision records its relic draft (useChoiceCommit) and the runtime carries seasonSpent with the run. Measured 146,629 / 54,106 in the e2e build, the plus 4.
+  // 146,589 / 54,099 -> 146,798 / 54,192 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): spendAtDraft in GameRuntime (the reroll and one more paid from the KD은행 계좌), the case-closing decision records its relic draft (useChoiceCommit) and the run carries seasonSpent. Measured 146,794 / 54,188 in the e2e build, the plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_622, maxGzip: 54_994 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -209,6 +210,9 @@ const budgets = [
   // 30,627 / 13,319 -> 31,636 / 13,649 on 2026-11-03, #320 c3-c4-rules merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 31,636 / 13,645 in the e2e build, the gzip plus 4.
   // 31,636 / 13,649 -> 32,437 / 13,941 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 32,437 / 13,937 in the e2e build, the gzip plus 4.
   // 30,526 / 13,304 -> 32,469 / 13,960 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 32,465 / 13,956 in the e2e build, the plus 4.
+  // 30,498 / 13,286 -> 31,366 / 13,569 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the two buttons under the cards (「다시 뽑기 · 4,000」 R, 「하나 더 · 12,000」 B, DraftBuy with aria-disabled and its reason), the one-line notice and the second pick's title (src/copy/relics.js). Measured 31,362 / 13,565 in the e2e build, the plus 4.
+  // 31,366 / 13,569 -> 32,024 / 13,855 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft reads what its two buys say itself (readDraftSpend, src/gauntlet/draftSpend.js, in this shared chunk now rather than the runtime's, where GauntletStage read it), so the stage is under its import budget again. Measured 32,020 / 13,851 in the e2e build, the plus 4.
+  // 32,024 / 13,855 -> 32,084 / 13,861 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the line under the draft's note (spendHint: one more only when a slot is open; user decision 11-05 (1)). Measured 32,080 / 13,857 in the e2e build, the plus 4.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 32_469, maxGzip: 13_960 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
@@ -863,6 +867,7 @@ const budgets = [
   // 203,562 / 38,132 -> 204,569 / 38,438 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again. Measured 204,565 / 38,434 in the e2e build, the plus 4.
   // 38,438 -> 38,432 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the two acid glows at 0.1 (the active case card, the next-case panel), for the readability check on the lighter neutral ground. Measured 204,565 / 38,428 in the e2e build, the plus 4.
   // 205,041 / 38,403 -> 206,048 / 38,702 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 206,044 / 38,698 in the e2e build, the plus 4.
+  // 200,439 / 37,512 -> 201,129 / 37,614 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's two buy buttons in one row of two (44px high, the price on a second line on 360px), the closed state dimmed, the reason and the notice at 11px (src/styles/app/relics.css). Measured 201,125 / 37,610 in the e2e build, the plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 206_048, maxGzip: 38_702 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -1054,6 +1059,8 @@ const budgets = [
   // 44,896 / 16,998 -> 45,465 / 17,217 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 45,465 / 17,213 in the e2e build, the gzip plus 4.
   // 44,131 / 16,529 -> 45,469 / 17,220 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 45,465 / 17,216 in the e2e build, the plus 4.
   // 44,131 / 16,529 -> 45,193 / 16,847 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode. Measured 45,189 / 16,843 in the e2e build, the plus 4.
+  // 44,131 / 16,529 -> 46,432 / 17,345 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode (PR 1), and readDraftSpend (src/gauntlet/draftSpend.js): each button's open or closed state and its one reason (PR 2). Measured 46,428 / 17,341 in the e2e build, the plus 4.
+  // 46,432 / 17,345 -> 46,526 / 17,396 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the Korean line under the draft's note (src/copy/relics.js spendHint, which this chunk carries). Measured 46,522 / 17,392 in the e2e build, the plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 45_469, maxGzip: 17_220 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -1466,6 +1473,8 @@ const budgets = [
   // 179,786 / 60,177 -> 180,174 / 60,319 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 180,174 / 60,315 in the e2e build, the gzip plus 4.
   // 180,518 / 60,411 -> 181,649 / 60,804 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 181,649 / 60,800 in the e2e build, the gzip plus 4.
   // 180,288 / 60,311 -> 182,240 / 60,959 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 182,236 / 60,955 in the e2e build, the plus 4.
+  // 179,769 / 60,178 -> 180,238 / 60,356 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's two buttons, the notice, the second pick's title and line and the seven closed reasons in Japanese (src/locales/ja/screens/relics.js). Measured 180,234 / 60,352 in the e2e build, the plus 4.
+  // 180,238 / 60,356 -> 180,350 / 60,404 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line (もう一つは枠が空いているときだけ). Measured 180,346 / 60,400 in the e2e build, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 182_240, maxGzip: 60_959 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -1495,6 +1504,8 @@ const budgets = [
   // 149,845 / 53,504 -> 150,176 / 53,642 on 2026-11-03, #308 d2-hall-of-fame merged with #224 9e4ec6bf (main bb492d5d): this branch's lines beside #224's and main's. Measured 150,176 / 53,638 in the e2e build, the gzip plus 4.
   // 150,511 / 53,761 -> 151,549 / 54,164 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 151,549 / 54,160 in the e2e build, the gzip plus 4.
   // 150,260 / 53,611 -> 152,040 / 54,336 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 152,036 / 54,332 in the e2e build, the plus 4.
+  // 149,807 / 53,485 -> 150,242 / 53,665 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the same lines in English (src/locales/en/screens/relics.js). Measured 150,238 / 53,661 in the e2e build, the plus 4.
+  // 150,242 / 53,665 -> 150,346 / 53,705 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line (One more only when a slot is open). Measured 150,342 / 53,701 in the e2e build, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 152_040, maxGzip: 54_336 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
@@ -1729,6 +1740,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 430,913 / 488,378 / 495,494 -> 430,916 / 488,364 / 495,479 on 2026-11-05, rules-1105 after merging main 33899116 (#456 #457 #460 prose bundles a-c): the trimmed copy's smaller en·ja dictionaries under this bundle's lines. Measured 430,912 / 488,360 / 495,475 in the e2e build, the plus 4.
 // 431,500 / 488,226 / 495,421 -> 431,491 / 488,208 / 495,402 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the lines above together over the trimmed case copy (#456, #457, #460); the entry and the en/ja dictionaries name the renamed case chunks. Measured 431,487 / 488,204 / 495,398 in the e2e build, the plus 4.
 // 430,916 / 488,364 / 495,479 -> 432,043 / 489,484 / 496,601 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 432,039 / 489,480 / 496,597 in the e2e build, the plus 4.
+// 426,845 / 483,841 / 490,518 -> 426,941 / 484,121 / 490,812 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's buy buttons' CSS in the index sheet (the critical CSS only its hash) and the two dictionaries' relic lines above. Measured 426,937 / 484,117 / 490,808 in the e2e build, the plus 4.
+// 426,941 / 484,121 / 490,812 -> 426,950 / 484,131 / 490,822 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft's buy rules moved to a sheet of their own (src/styles/app/draft-spend.css, imported after relics.css; the index CSS carries the same rules, the critical CSS only its hash) and index.html's hashed names moved with them. Measured 426,946 / 484,127 / 490,818 in the e2e build, the plus 4.
+// 426,950 / 484,131 / 490,822 -> 426,950 / 484,169 / 490,868 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line in the two dictionaries above (the Korean line rides the engine chunk, not the first paint). Measured 426,946 / 484,165 / 490,864 in the e2e build, the plus 4; the Korean budget stays.
 const FIRST_PAINT_BUDGETS = { ko: 432_043, en: 489_484, ja: 496_601 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],

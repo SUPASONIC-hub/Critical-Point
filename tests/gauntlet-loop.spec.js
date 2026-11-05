@@ -7,7 +7,7 @@ import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
-import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
 /**
@@ -238,6 +238,53 @@ test("an act's last case is 「고점 판」: the briefing says it and the board
   await startDebugNode(page, "case06", "c6_start");
   await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
 });
+// C9 (11-30): the KD은행 계좌 pays at the draft. Written with PR 2 and not yet
+// run (the lock and CI were held for the day's merges): run it with
+// --repeat-each=3 before the PR opens. The vault a fresh case01 close leaves
+// is too small for either buy, so the save is given one and reloaded on the
+// draft, which a reload keeps.
+for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 }]) {
+  test(`the draft's reroll and one more pay out of the vault at once, and say why when they cannot, at ${viewport.width}x${viewport.height} @once`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await closeCaseOneIntoDraft(page);
+    const draft = page.getByTestId("relic-draft");
+    // With what the close banked, neither buy can pay: both stay, off, with the reason.
+    for (const id of ["relic-reroll", "relic-extra"]) {
+      await expect(draft.getByTestId(id)).toHaveAttribute("aria-disabled", "true");
+      await expect(draft.getByTestId(id)).toHaveAccessibleDescription("잔액 부족");
+    }
+    const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    await writeJsonStorage(page, TEST_STORAGE_KEYS.save, { ...saved, dynamics: { ...saved.dynamics, vault: 30000 } });
+    await page.reload();
+    await expect(draft).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    const first = await draft.getByTestId("relic-option").evaluateAll((cards) => cards.map((card) => card.dataset.relic));
+
+    await draft.getByTestId("relic-reroll").click();
+    await expect(draft.getByTestId("relic-reroll")).toHaveAccessibleDescription("이번 사건에 사용함");
+    const rerolled = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    expect(rerolled.dynamics.vault).toBe(26000);
+    expect(rerolled.dynamics.relicDraft.reroll.offer).toEqual(rerolled.dynamics.relicOffer);
+    expect(rerolled.dynamics.relicOffer).not.toEqual(first);
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −4,000");
+
+    await page.keyboard.press("b");
+    await expect(draft.getByTestId("relic-spend")).toBeVisible();
+    // A draft that paid for 하나 더 gets no 숨 고르기 on a pass (2026-11-05 decision): the pass button promises nothing.
+    await expect(draft.getByTestId("relic-skip")).toHaveText("고르지 않고 진행");
+    await draft.getByTestId("relic-option").first().click();
+    await expect(draft.getByTestId("relic-option")).toHaveCount(2);
+    await expect(draft.getByRole("heading")).toHaveText("하나 더 고르기");
+    await draft.getByTestId("relic-option").first().click();
+    await expect(draft).toHaveCount(0);
+    const done = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    expect(done.dynamics.vault).toBe(30000 - 4000 - 12000);
+    expect(done.dynamics.seasonSpent).toBe(16000);
+    expect(done.dynamics.relics).toHaveLength(2);
+    expect(done.dynamics.relicDraft.picked).toEqual(done.dynamics.relics);
+    // Nothing on the page is wider than the screen while the draft was up (360px: the two buys side by side).
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
 
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
