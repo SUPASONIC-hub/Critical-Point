@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c14_start": {
       "title": "As Long as the Bank Doesn’t Fail",
-      "text": "The list of returns to regular departments set for Monday came back marked 'on hold', and the 4th floor stays as it is. On every screen at KD Bank windows, a green ad loops. 'Do good even after retirement: the Sangsaeng ESG Fund.' The launch was moved up, and in 2 weeks 107 billion won was sold. The average buyer is 71. The appendix at the very back of the prospectus lists what the fund buys. 38 loans from group affiliates. All non-performing loans. And the remaining piece of the FlowOn loan. Do Yoonha taps page two of the sales script he got from a Gangseo Branch peer. 'As long as the bank doesn’t fail, you have nothing to worry about.' 'That’s my sentence. What I used to say at the window 3 years ago. They’re mis-selling again, and this time in my voice.'",
+      "text": "The list of returns to regular departments set for Monday came back marked 'on hold', and the 4th floor stays as it is. The 'Sangsaeng ESG Fund' sold 107 billion won in 2 weeks; the average buyer is 71. What the fund buys is 38 loans from group affiliates. All non-performing, plus the remaining piece of the FlowOn loan. Do Yoonha taps page two of the sales script. 'As long as the bank doesn’t fail, you have nothing to worry about.' 'That’s my sentence. They’re mis-selling again, this time in my voice.'",
       "memo": [
         "Sangsaeng ESG Fund Round 1: 107 billion won -- 3,146 buyers",
         "Average buyer age 71, sold at KD Bank windows",
@@ -38,7 +38,7 @@ export default {
     },
     "c14_counter": {
       "title": "Grandpa Knows Too Much",
-      "text": "The Gangseo Branch lobby, 10:40 a.m. Holding ticket No. 51, Kang Taemin sits in a white wig, leaning on a cane. He is here as a mystery shopper, a 'retiree, seventy-three'. Beside him, Oh Jinwoo, playing the son, rehearses 'Dad, slow down.' The problem is that Kang Taemin memorized the question sheet overnight. The moment he sits at the window, he asks, 'I see redemption is locked for 3 years. What share of the holdings is subordinated?' The new teller’s pen stops. Oh Jinwoo whispers, 'Hyung, seventy-three-year-olds don’t ask that.' Then a quiet voice comes from the next window. 'Please say it again slowly. I’ll write it down.' A grandmother in a white blouse writes carefully in her notebook. 'The principal, the bank, protects.'",
+      "text": "Kang Taemin, in a white wig, sits down at the window. He is a mystery shopper, a 'retiree, seventy-three', who memorized the question sheet overnight. 'I see redemption is locked for 3 years. What share of the holdings is subordinated?' The new teller’s pen stops. Oh Jinwoo, playing the son, whispers, 'Hyung, seventy-three-year-olds don’t ask that.' A quiet voice comes from the next window. 'Please say it again slowly. I’ll write it down.' A grandmother in a white blouse writes in her notebook. 'The principal, the bank, protects.'",
       "memo": [
         "Under inspection: Gangseo Branch Windows 4 and 5",
         "Kang Taemin’s role: 'Mr. Kang', retired, 73 -- 22 questions memorized",
@@ -69,7 +69,7 @@ export default {
     },
     "c14_desk": {
       "title": "A Kind Name",
-      "text": "The KD Asset Management trading floor in Pangyo. In front of six market screens, Joo Eunchae switches among three highlighters. She does not see you as an enemy. If anything, she is glad you came. 'I designed this fund. It buys bad loans cheap, gives the companies time to breathe, and waits 5 years to collect. Put the recovery rate at 68% and you get 4.8% a year. Kind money earning kind returns.' Flipping through the model, she switches on a second monitor. Next to the bank’s sales board is a table you have never seen. The KD Bank sales bonus table. 400,000 won per 100 million won, and one line at the bottom. '1.5x when converting maturing deposits of customers aged 70 or older.' Joo Eunchae’s highlighter stops. 'This… isn’t a table I made.'",
+      "text": "Joo Eunchae, highlighter in hand, is glad you came. 'I designed this fund. It buys bad loans cheap, gives the companies time to breathe, and waits 5 years to collect. Put the recovery rate at 68% and you get 4.8% a year. Kind money earning kind returns.' She switches on a second monitor, and a table you have never seen comes up. The KD Bank sales bonus table, and one line at the bottom. '1.5x when converting maturing deposits of customers aged 70 or older.' Joo Eunchae’s highlighter stops. 'This… isn’t a table I made.'",
       "memo": [
         "Design assumptions: 5-year hold, 68% recovery, 4.8% a year",
         "Originally meant for: institutions like pension funds that can wait 5 years",
@@ -100,7 +100,7 @@ export default {
     },
     "c14_class": {
       "title": "If You Don’t Understand, Don’t Sign",
-      "text": "3rd floor of the Gangseo Senior Welfare Center, the 'Happy Retirement Finance Class'. The instructor is a Gangseo Branch private banker, and on the table at the back are 80 application forms. This is not a class; it is a sales pitch. Just as the instructor is about to say 'as long as the bank doesn’t fail', Lee Jungsook in the second row raises her hand. She opens her notebook and reads the sentence she wrote down at the window last week. 'You can take it out anytime. But the prospectus says you can’t for 3 years. Which one is wrong?' When the instructor can’t answer, Lee Jungsook walks to the front and picks up the chalk. A hand that stood at a blackboard for 38 years. She writes in big letters. 'If you don’t understand, don’t sign.' Around the room comes the sound of forms being folded. The instructor looks at you.",
+      "text": "The instructor is a Gangseo Branch private banker, and on the table at the back are 80 application forms. This is not a class; it is a sales pitch. Lee Jungsook in the second row raises her hand and reads from her notebook. 'You can take it out anytime. But the prospectus says you can’t for 3 years. Which one is wrong?' When the instructor can’t answer, Lee Jungsook goes to the front and picks up the chalk. A hand that stood at a blackboard for 38 years writes. 'If you don’t understand, don’t sign.' Around the room, forms are being folded.",
       "memo": [
         "62 at the finance class -- 80 application forms at the back",
         "Instructor: Gangseo Branch private banker, sales target of 500 million won per class",
@@ -131,7 +131,7 @@ export default {
     },
     "c14_final": {
       "title": "Day 1 of Round 2",
-      "text": "10 minutes until the shutter goes up in the Gangseo Branch lobby. Starting today, Monday, Round 2 of the Sangsaeng fund, 150 billion won, goes on sale, and a new green standing sign is up beside the ticket machine. A new script sits at every window, but that sentence on page two is unchanged. A text arrives from Joo Eunchae in Pangyo. 'Only my signature is left in the Round 2 approval field. Due by 9.' Outside the glass doors, seniors are already lined up, and at the front stands Lee Jungsook with her notebook. 18:00 today is her cancellation deadline. Do Yoonha runs a hand once over the chair at Window 4 and looks at you. '3 years ago I sat here and said that sentence. What should I say today?'",
+      "text": "10 minutes until the shutter goes up. Starting today, Round 2 of the Sangsaeng fund, 150 billion won, goes on sale, and page two of the new script still carries that sentence. A text comes from Joo Eunchae. 'Only my signature is left in the Round 2 approval field. Due by 9.' At the front of the line outside the glass doors stands Lee Jungsook with her notebook. 18:00 today is her cancellation deadline. Do Yoonha says, '3 years ago I sat here and said that sentence. What should I say today?'",
       "memo": [
         "Round 2 target 150 billion won -- starts today at 09:00",
         "Round 2 approval field: only Joo Eunchae’s signature left",
@@ -159,7 +159,7 @@ export default {
     },
     "c14_aftershock": {
       "title": "The Blackboard Photo",
-      "text": "An hour before the deadline, Lee Jungsook, the retired teacher who put 24 million won into the Sangsaeng fund, fills out a cancellation form on the Window 4 tablet. Do Yoonha reads each box on the screen aloud, and Lee Jungsook writes at his pace. Having signed the signature pad, she holds out her phone. A photo from her grandson Jang Yoonjae. The 'If you don’t understand, don’t sign' she wrote on the welfare center blackboard is going around his school group chat. 'My grandma is famous now.' Kang Taemin offers her the white wig as a keepsake, and Lee Jungsook politely declines. 'I have the real thing.' While everyone laughs, a message comes from Lee Minseo. 'HR got in touch. About converting me to permanent staff. But they say there’s one condition.'",
+      "text": "An hour before the deadline, Lee Jungsook signs a cancellation form at Window 4. She shows a photo from her grandson Jang Yoonjae. The blackboard’s 'If you don’t understand, don’t sign' is going around his school group chat. Kang Taemin offers her the white wig as a keepsake, and Lee Jungsook politely declines. 'I have the real thing.' While everyone laughs, a message comes from Lee Minseo. 'HR got in touch about converting me to permanent staff. But they say there’s one condition.'",
       "memo": [
         "Lee Jungsook’s cancellation filed -- 24 million won to be returned",
         "Blackboard photo shared in her grandson’s school group chat",
@@ -183,7 +183,7 @@ export default {
     },
     "c14_husband": {
       "title": "Jang Hyungyu, Born 1951",
-      "text": "In the copy of Lee Jungsook’s application that Oh Jinwoo brought, Do Yoonha looks at one box. In the contact field, a name written and erased shows through. Jang Hyungyu. Do Yoonha takes his window notebook from 3 years ago out of his bag, flips through it, and stops. 'Mr. Jang Hyungyu, retirement pay 120 million won, FlowOn-linked bond product.' Beside it, a note in his own hand. 'Wife was a teacher. Brags about the grandkids a lot.' That product was cut in half along with FlowOn, and Jang Hyungyu died the following winter. Do Yoonha cannot close the notebook. 'The same loan comes to the same house twice. Both times in my words.'",
+      "text": "In the contact field of Lee Jungsook’s application, a name written and erased shows through. Jang Hyungyu. Do Yoonha flips through his window notebook from 3 years ago and stops. 'Mr. Jang Hyungyu, retirement pay 120 million won, FlowOn-linked bond product.' Beside it, his note. 'Wife was a teacher. Brags about the grandkids a lot.' That product was cut in half along with FlowOn, and Jang Hyungyu died the following winter. 'The same loan comes to the same house twice. Both times in my words.'",
       "memo": [
         "Jang Hyungyu: Do Yoonha’s window customer 3 years ago, retirement pay 120 million won",
         "Losses on the FlowOn-linked product -- died the following winter",
@@ -205,7 +205,7 @@ export default {
       "question": "Lee Jungsook’s husband was Do Yoonha’s window customer 3 years ago. What do you do with this?"
     },
     "c14_recovery": {
-      "text": "Handed Joo Eunchae’s model, Kwon Dohyun points to one cell within 3 seconds. 'A 68% recovery rate? The FlowOn piece Bridge Bank bought last year came in at 41%. I know, because I bought it.' He taps his calculator. 'Put in 41 and you don’t get 4.8% a year; 22% of the principal disappears. At this price it’s a loss. For the customer.' When Oh Jinwoo asks 'And the seller?', he taps once more. 'The seller is in the black. I don’t want that kind of profit in my books.' Joo Eunchae types 41 into the model herself. The unit price chart bends down off the screen.",
+      "text": "In Joo Eunchae’s model, Kwon Dohyun points to one cell within 3 seconds. 'A 68% recovery rate? The FlowOn piece Bridge Bank bought last year came in at 41%. I know, because I bought it. Put in 41 and you don’t get 4.8% a year; 22% of the principal disappears. It’s a loss. For the customer.' Oh Jinwoo asks, 'And the seller?' 'The seller is in the black. I don’t want that kind of profit in my books.' Joo Eunchae types in 41, and the unit price chart bends down.",
       "memo": [
         "68% recovery rate in Joo Eunchae’s model",
         "Bridge Bank’s actual recovery rate on purchase: 41%",
@@ -228,7 +228,7 @@ export default {
     },
     "c14_grade": {
       "title": "100 on the Dictation",
-      "text": "When the class ends, Kang Taemin goes up to Lee Jungsook and takes off his wig. 'Ma’am, I’m not really seventy-three.' Lee Jungsook lowers her glasses and looks at him. 'I know. At seventy-three your knees don’t bend like that.' She takes Kang Taemin’s question sheet and grades it in red pencil. Circles on all twenty-two questions. 'A 100 on the dictation, but a zero for your face.' While everyone laughs, Lee Jungsook shows the last page of her notebook. Forty names she copied down from the buyers’ group chat. 'They all wrote things down at the window, like me. But they don’t know where to hand it in.'",
+      "text": "In front of Lee Jungsook, Kang Taemin takes off his wig. 'Ma’am, I’m not really seventy-three.' 'I know. At seventy-three your knees don’t bend like that.' Lee Jungsook grades Kang Taemin’s question sheet in red pencil. Circles on all twenty-two questions. 'A 100 on the dictation, but a zero for your face.' She shows forty names on the last page of her notebook. 'People from the buyers’ group chat. They all wrote things down at the window, like me. But they don’t know where to hand it in.'",
       "memo": [
         "Kang Taemin’s question sheet, 22 questions -- all correct",
         "40 names gathered from the buyers’ group chat",
@@ -251,7 +251,7 @@ export default {
     },
     "c14_husband_reaction": {
       "title": "The Kind Young Man",
-      "text": "On a bench outside the welfare center, Do Yoonha opens his notebook to that page and shows Lee Jungsook. She studies it a long time, then takes out her red pencil and draws a circle beside his old handwriting. 'Brags about the grandkids a lot. Yes, that was him.' Then she closes her notebook. 'My husband said the young man at the window was so kind. That’s why he trusted him all the more.' Do Yoonha bows his head. Lee Jungsook takes his hand. 'So this time, don’t be kind to me. Tell me exactly.'",
+      "text": "Do Yoonha opens his notebook to that page. Lee Jungsook draws a red-pencil circle beside his old handwriting. 'Brags about the grandkids a lot. Yes, that was him. My husband said the young man at the window was so kind. That’s why he trusted him all the more.' Do Yoonha bows his head, and Lee Jungsook takes his hand. 'So this time, don’t be kind to me. Tell me exactly.'",
       "memo": [
         "The kind window her husband trusted",
         "Exactly, instead of kindly"
@@ -273,7 +273,7 @@ export default {
     },
     "c14_recovery_reaction": {
       "title": "The Name I Gave It",
-      "text": "11 at night. Everyone on the trading floor has gone except Joo Eunchae. Sipping cold barley tea, she speaks. 'It was meant to be sold to pension funds. Money that can wait 5 years. A month ago the group said to bring it down to the windows. I didn’t object. It’s a kind fund, so I thought it would grow grandmothers’ money kindly too.' She looks at the fund’s name on the monitor. 'Sangsaeng, I named it. Thanks to that name, the word risk got smaller in the prospectus.'",
+      "text": "Sipping cold barley tea, Joo Eunchae speaks. 'It was meant to be sold to pension funds. Money that can wait 5 years. A month ago the group said to bring it down to the windows, and I didn’t object. It’s a kind fund, after all.' She looks at the fund’s name on the monitor. 'Sangsaeng, I named it. Thanks to that name, the word risk got smaller in the prospectus.'",
       "memo": [
         "The month a pension-fund product came down to the windows",
         "Risk hidden by a kind name"
@@ -295,7 +295,7 @@ export default {
     },
     "c14_grade_reaction": {
       "title": "The Bank Boy Fan Club",
-      "text": "That night Lee Jungsook invites Oh Jinwoo to the buyers’ group chat. In 10 minutes, 213 messages pile up. 'Bank boy, can’t we take ours out for 3 years either?' 'Have you eaten, young man?' 'Post a photo of your face, so we can see and trust you.' Oh Jinwoo answers every question, then puts his phone down at one in the morning. 'All together it’s 4.1 billion won. 40 people, 4.1 billion. Most of it is money that got switched at the window on the day a deposit matured.' He has always picked the winning side; now he stares at the ceiling. 'This isn’t a fight you win. It’s a fight you can’t lose.'",
+      "text": "Lee Jungsook invites Oh Jinwoo to the buyers’ group chat, and in 10 minutes 213 messages pile up. 'Bank boy, can’t we take ours out for 3 years either?' 'Have you eaten, young man?' After answering, Oh Jinwoo puts his phone down. '40 people, 4.1 billion won. Most of it switched at the window on the day a deposit matured.' He has always picked the winning side; now he stares at the ceiling. 'This isn’t a fight you win. It’s a fight you can’t lose.'",
       "memo": [
         "40 people, 4.1 billion won",
         "Money switched on deposit maturity day"
@@ -317,7 +317,7 @@ export default {
     },
     "c14_branch_tape": {
       "title": "3 Minutes 12 Seconds",
-      "text": "Handed the inspection sheet, the branch manager surprisingly gives up the key to the call recording room without a fight. 'We did everything by the rules.' Ban Jaewook puts on headphones and plays 20 consultations with customers aged 70 or older, one after another. They are all about the same length. A little over 3 minutes. And all 20 cut off just before 'This product may lose principal' and resume at 'Then just sign here.' Ban Jaewook takes off the headphones. 'By the rules, sure. The rules only say to turn it on, not that you can’t turn it off.' In the corridor outside the room, someone is pacing.",
+      "text": "The branch manager gives up the key to the recording room without a fight. 'We did everything by the rules.' Ban Jaewook plays 20 consultations with customers aged 70 or older, one after another. All 20 cut off just before 'This product may lose principal' and resume at 'Then just sign here.' Ban Jaewook takes off the headphones. 'By the rules, sure. The rules only say to turn it on, not that you can’t turn it off.' In the corridor, someone is pacing.",
       "memo": [
         "20 consultation recordings with customers 70 or older checked",
         "Average length 3 minutes 12 seconds -- every risk-explanation segment missing",
@@ -341,7 +341,7 @@ export default {
     },
     "c14_branch_tape_follow": {
       "title": "Window 4",
-      "text": "The one pacing the corridor is a new teller, 8 months on the job. Name badge flipped around, she speaks to Do Yoonha. 'Sir, you used Window 4, didn’t you? Your name sticker is still in the drawer.' She holds out her phone. Sentences posted in the branch group chat every morning. 'Risk explanation: recorder off, keep it short.' 'If the customer hesitates: as long as the bank doesn’t fail.' Her voice shakes. 'If I miss this month’s target, I get sent to another branch. But yesterday a grandmother held my hand and thanked me.' Do Yoonha can’t answer for a long time.",
+      "text": "The one pacing the corridor is a new teller, 8 months on the job. She speaks to Do Yoonha. 'Sir, you used Window 4, didn’t you? Your name sticker is still in the drawer.' She also shows the morning orders in the branch group chat. 'Risk explanation: recorder off, keep it short.' 'If the customer hesitates: as long as the bank doesn’t fail.' 'If I miss this month’s target, I get sent to another branch. But yesterday a grandmother held my hand and thanked me.' Do Yoonha can’t answer for a long time.",
       "memo": [
         "New teller, 8 months in -- assigned to Window 4",
         "14 screenshots of instructions in the branch group chat",
@@ -365,7 +365,7 @@ export default {
     },
     "c14_route_system": {
       "title": "Warm Names",
-      "text": "You ask to line up the names of products sold at the window. ECHO goes through 15 years of bank window sales lists. Nine products that sold and then lost heavily come up. In all nine, the average buyer was over 65, and seven had words like 'Peace of Mind', 'Happiness' or 'Sangsaeng' in their names. ECHO overlays the two lists. The warmer the name, the shorter the key disclosure. The shortest was a page and a half. 'The length of the sentences explaining risk has been learned to move opposite to the warmth of the product’s name. This fund’s key disclosure is one page.'",
+      "text": "ECHO calls up the nine products sold at bank windows over 15 years that then lost heavily. In all nine, the average buyer was over 65, and seven had words like 'Peace of Mind', 'Happiness' or 'Sangsaeng' in their names. The warmer the name, the shorter the key disclosure; the shortest was a page and a half. 'The length of the sentences explaining risk has been learned to move opposite to the warmth of the product’s name. This fund’s key disclosure is one page.'",
       "memo": [
         "9 products sold at windows with heavy losses -- average buyer 65 or older",
         "7 products with 'Peace of Mind · Happiness · Sangsaeng' in the name",
@@ -391,7 +391,7 @@ export default {
     },
     "c14_final_system_route": {
       "title": "A One-Page Disclosure",
-      "text": "A few hours before the shutter goes up, the Sangsaeng fund’s one-page key disclosure sits in the middle of the screen. Beside it, ECHO lines up the disclosures of the nine earlier products by length. This one page is shorter than the shortest, a page and a half. ECHO also brings up the window sales bonus table. Move the deposits of customers 70 or older into the fund, and it pays 1.5x. The shutter goes up at nine, and Lee Jungsook, a seventy-two-year-old buyer, will be at the front again today with her notebook. 'The ads read the name aloud. The customer reads the disclosure alone. The one read alone is one page.'",
+      "text": "A few hours before the shutter goes up, ECHO sets the disclosures of the nine earlier products beside the Sangsaeng fund’s one-page key disclosure. It is shorter than even the shortest, a page and a half. The window sales bonus table comes up too. Move the deposits of customers 70 or older into the fund, and it pays 1.5x. Lee Jungsook, seventy-two, will be at the front again today with her notebook. 'The ads read the name aloud. The customer reads the disclosure alone. The one read alone is one page.'",
       "memo": [
         "Sangsaeng fund key disclosure 1 page -- shorter than the shortest of the nine earlier products",
         "Window sales bonus: 1.5x for converting customers 70 or older",
@@ -415,7 +415,7 @@ export default {
     },
     "c14_evidence_turn": {
       "title": "92 Won and 41 Won",
-      "text": "Line up the clues by purchase date, and the fund’s purchase statement opens. The fund bought 38 non-performing loans from group affiliates at 92 won per 100 won of original loan. Last year Bridge Bank bought the same kind of loans for 41 won. Ban Jaewook writes the subtraction in his notebook. 'A 51-won gap. On 107 billion won, that’s about 59 billion won. Losses that had to vanish from the group’s books before the quarterly results go up to the New York shareholder have moved into the accounts of 3,146 retirees.' He points to the bottom box of the statement. The purchase approver field is empty, and the approval record holds only two words: 'group consultation'.",
+      "text": "The purchase statement shows the fund bought 38 non-performing loans from group affiliates at 92 won per 100 won. Last year Bridge Bank bought the same loans for 41 won. Ban Jaewook writes the subtraction in his notebook. 'On 107 billion won, that’s about 59 billion won. Losses that had to vanish from the group’s books before the quarterly results go up to the New York shareholder have moved into the accounts of 3,146 retirees.' The purchase approver field is empty, and the approval record holds only two words: 'group consultation'.",
       "memo": [
         "Purchase price: 92 won per 100 won",
         "Market price: 41 won per 100 won -- Bridge Bank’s purchase price last year",
@@ -438,7 +438,7 @@ export default {
     },
     "c14_start_warm": {
       "title": "A Script on the Lunch Table",
-      "text": "Since the night after the livestream when you carried out every last light stand together, the list of returns set for Monday came back marked 'on hold', and the six have not eaten lunch apart once in 3 weeks. Onto that lunch table, Do Yoonha sets down a sales script. The group moved up the launch Baek Arin said was next month; for 2 weeks now bank windows have been selling the 'Sangsaeng fund' to retirees, and this is its script. What the fund buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. 'This sentence on page two is what I used to say 3 years ago. This is mis-selling.' Six spoons stop at once.",
+      "text": "The list of returns set for Monday came back marked 'on hold', and the six have not eaten lunch apart once in 3 weeks. Onto that table, Do Yoonha sets down a sales script. It is for the 'Sangsaeng fund', sold to retirees at the windows for 2 weeks now. What it buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. 'This sentence on page two is what I used to say 3 years ago. This is mis-selling.' Six spoons stop at once.",
       "memo": [
         "Sangsaeng fund Round 1: 107 billion won -- 3,146 buyers, average age 71",
         "Holdings: 38 non-performing loans + the remaining piece of the FlowOn loan",
@@ -468,7 +468,7 @@ export default {
     },
     "c14_start_record": {
       "title": "The Next Line Under the Same Code",
-      "text": "3 weeks after you put the 33rd-floor offer on record, the list of returns set for Monday has come back marked 'on hold' and the 4th floor stays as it is. Ban Jaewook finds one more place where the Innovation Committee budget code in that document was used. The ad budget for the 'Sangsaeng fund', which KD Asset Management sold to 3,146 retirees for 107 billion won in 2 weeks. What the fund buys is the group’s non-performing loans and the remaining piece of the FlowOn loan. Ban Jaewook sets the sales script Do Yoonha obtained beside it. Not one line mentions risk, and page two carries word for word what Do Yoonha used to say 3 years ago. 'As long as the bank doesn’t fail, you have nothing to worry about.' Ban Jaewook says, 'Wash the face with ads, and pass the losses on at the window by mis-selling. With the same money.'",
+      "text": "The list of returns set for Monday has come back marked 'on hold', and the 4th floor stays as it is. Ban Jaewook finds one more place the Innovation Committee budget code was used. The ad budget for the 'Sangsaeng fund', sold to 3,146 retirees for 107 billion won in 2 weeks. What the fund buys: the group’s non-performing loans and the remaining piece of the FlowOn loan. Page two of the sales script carries word for word what Do Yoonha used to say 3 years ago. Ban Jaewook says, 'Wash the face with ads, and pass the losses on at the window by mis-selling. With the same money.'",
       "memo": [
         "Same budget code as the Innovation Committee ads -- fund advertising",
         "Holdings: 38 non-performing loans + the remaining piece of the FlowOn loan",
@@ -498,7 +498,7 @@ export default {
     },
     "c14_start_rush": {
       "title": "The Next Fight of One Who Didn’t Stop",
-      "text": "3 weeks after you started digging into the next 'Sangsaeng' product before the set had even cooled, the list of returns set for Monday came back marked 'on hold', and the 4th floor stays as it is. Oh Jinwoo calls first. 'A friend of my father’s bought a fund at the bank yesterday. A kind fund, they said, fine as long as the bank doesn’t fail.' KD Asset Management’s 'Sangsaeng fund', the product Baek Arin hinted was coming next month, has come out early. 107 billion won sold in 2 weeks, and what it bought is the group’s non-performing loans and the remaining piece of the FlowOn loan. Oh Jinwoo speaks faster. 'Do Yoonha says that sentence is one he used to say. This is mis-selling. If we’re late, another 30 billion won sells this week alone.'",
+      "text": "The list of returns set for Monday came back marked 'on hold', and the 4th floor stays as it is. Oh Jinwoo says on the phone, 'A friend of my father’s bought a fund at the bank yesterday. A kind fund, they said, fine as long as the bank doesn’t fail.' The 'Sangsaeng fund' Baek Arin hinted at came out early and sold 107 billion won in 2 weeks. What it bought is the group’s non-performing loans and the remaining piece of the FlowOn loan. 'Do Yoonha says that sentence is one he used to say. This is mis-selling. If we’re late, another 30 billion won sells this week alone.'",
       "memo": [
         "Sangsaeng fund Round 1: 107 billion won · 3,146 buyers -- 30 billion won more expected this week",
         "Holdings: 38 non-performing loans + the remaining piece of the FlowOn loan",

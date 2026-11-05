@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "p3_start": {
       "title": "Attachment No. 7",
-      "text": "On a monitor in the Corporate Finance Strategy Team’s review room on the 6th floor of head office sits the Credit Committee agenda, posted to the intranet at five in the morning. The fourth item is 2023-0412, the loan to the logistics platform FlowOn. Your dissent is not in the main file. It is filed as 'Attachment 7'. The number only means it was the seventh to come in, but the clause you challenged happens to be Article 7 too. The debt-to-equity threshold is 180%, the reported figure sits 0.4 percentage points below it, and you argued that gap over eleven pages. Assistant Manager Oh Jinwoo comes over with two paper cups and sets one down. 'Attachments get read only if the chair asks for them. Otherwise they just sit there.' He taps the agenda twice with a fingertip. 'Eleven items today, one hour of meeting. Have you worked out how many minutes that leaves per item?'",
+      "text": "The Credit Committee agenda went up on the intranet at five this morning, and the fourth item is 2023-0412, the loan to FlowOn. Your dissent is not in the main file. It is filed as 'Attachment 7'. The clause you challenged happens to be Article 7 too. The debt-to-equity threshold is 180%, and the reported figure sits 0.4 percentage points below it. Assistant Manager Oh Jinwoo sets down a paper cup. 'Attachments get read only if the chair asks for them.' He taps the agenda twice. 'Eleven items today, one hour of meeting. Have you worked out how many minutes that leaves per item?'",
       "memo": [
         "Item 4: 2023-0412, FlowOn, 31 billion won",
         "Dissent -- not in the main file but 'Attachment 7', 11 pages · reported 179.6%",
@@ -38,7 +38,7 @@ export default {
     },
     "p3_committee": {
       "title": "One Sentence",
-      "text": "2 p.m., the Credit Committee room on the 8th floor of head office. Nine members sit at a long table; six observers sit along the wall. You have the fourth observer’s seat. The chair, Deputy President Jin Sera, calls Item 4. Manager Han Seoyun, the officer in charge, stands and reads 14 lines. The collateral structure, the revenue trend, and Article 7, which lets the bank call the loan at once if the debt crosses the threshold. She proposes a conditional approval. Jin Sera pushes up her glasses. 'Attachment 7 is marked as a dissent.' Han Seoyun bows her head once. 'It was returned at team review. It doesn’t affect the item.' Jin Sera moves to the next screen. 'A returned annexed opinion is not an agenda item. Next.' No one raises a voice, and no one looks at you. The committee clears 11 items in 47 minutes.",
+      "text": "2 p.m., the Credit Committee on the 8th floor of head office. The chair, Deputy President Jin Sera, calls Item 4. Manager Han Seoyun reads 14 lines. She proposes a conditional approval with Article 7 attached: if the debt crosses the threshold, the bank can call the loan at once. Jin Sera asks. 'Attachment 7 is marked as a dissent.' Han Seoyun bows her head. 'It was returned at team review. It doesn’t affect the item.' Jin Sera moves to the next screen. 'A returned annexed opinion is not an agenda item. Next.' No one raises a voice, and no one looks at you.",
       "memo": [
         "Time spent on Item 4 -- 4 min 12 sec",
         "Han Seoyun: 'It was returned at team review'",
@@ -69,7 +69,7 @@ export default {
     },
     "p3_corridor": {
       "title": "12 Years Ago",
-      "text": "3:05 p.m., the 8th-floor corridor. The members have all left, and two fluorescent lights flicker. Manager Han Seoyun sets her tablet on the windowsill and speaks. 'I wrote one too, 12 years ago. I was twenty-nine, in my 2nd year as a reviewer. A whole branch was riding on it.' Her opinion went to the full committee and was read aloud to nine members. It was not accepted, and three months later she got a transfer order. She rotated through four branches in 3 years. 'When I came back, I had learned two things. One was how to write a document that doesn’t get returned.' She pauses. 'The other was that if you stand on the returning side, you can protect people.' Her face is not angry. It is explaining. 'There are seven people in the review room now. Three of them had babies this year. This is for your own good. Someday you’ll believe that.'",
+      "text": "In the empty corridor, Manager Han Seoyun sets her tablet on the windowsill. 'I wrote one too, 12 years ago. I was twenty-nine, in my 2nd year as a reviewer.' Her dissent, with a whole branch riding on it, was read at the full committee and not accepted. Three months later she got a transfer order and rotated through four branches in 3 years. 'When I came back, I had learned that if you stand on the returning side, you can protect people.' Her face is not angry. It is explaining. 'There are seven people in the review room now. Three of them had babies this year. This is for your own good.'",
       "memo": [
         "Han Seoyun -- wrote a dissent 12 years ago, read at full committee",
         "Branch transfer three months later, four branches over 3 years",
@@ -100,7 +100,7 @@ export default {
     },
     "p3_archive": {
       "title": "The One Who Seals",
-      "text": "By the scanner, Lim Kyungsoo, head of the Corporate Credit Review Team, has his cardigan sleeves pushed up and is scanning today’s meeting printouts. He has 1 year and 2 months left before retirement, he says, though no one asked. 'In the system, a returned attachment only changes status. After 90 days it drops off the list. To find it you need the document number, and returned documents don’t get numbers. Printouts are different. A printout has to stay in this box until its retention period runs out.' He lifts the last page of your dissent and turns it over. One line is written on the back in pencil. 'Returned -- Yoon. Do not ask for reasons.' Below it, in the printed box marked 'Review Team Head comments', there are eraser marks. He covers the box with his palm. 'You only saw the front page. There’s always a back page somewhere else.'",
+      "text": "By the scanner, Lim Kyungsoo, head of the Corporate Credit Review Team, is scanning today’s meeting printouts. He has 1 year and 2 months left before retirement, he says, though no one asked. 'In the system, a returned attachment drops off the list after 90 days. A printout has to stay in this box until its retention period runs out.' He turns over the last page of your dissent. One line is written on the back in pencil. 'Returned -- Yoon. Do not ask for reasons.' Below it, in the box marked 'Review Team Head comments', there are eraser marks. He covers the box with his palm. 'You only saw the front page. There’s always a back page somewhere else.'",
       "memo": [
         "System: returned attachments drop off the list after 90 days",
         "Meeting printouts -- sealed box, kept until the retention period ends",
@@ -131,7 +131,7 @@ export default {
     },
     "p3_final": {
       "title": "After the Return",
-      "text": "10 p.m., two lights are still on in the 6th-floor review room. Yours and Assistant Manager Oh Jinwoo’s. He brings two cups of vending-machine coffee and sets one down. The bank’s rulebook lies open. Anyone notified of a return can file an appeal within 5 business days. The form asks for a rebuttal of the reason for return, but you never got the reason in writing, so the rebuttal box is empty. Oh Jinwoo turns the rulebook toward himself and studies it for a long time. 'I’m never late. I’ve seen what happens when you are. But today I can’t tell what counts as early.' He drinks half his coffee and puts the cup down. 'The committee record is finalized at eight-thirty tomorrow morning. Until then it’s still today. Just decide what you’ll do before today ends.'",
+      "text": "10 p.m., two lights are still on in the 6th-floor review room. Assistant Manager Oh Jinwoo sets down a cup of vending-machine coffee and opens the rulebook. Anyone notified of a return can file an appeal within 5 business days. You never got the reason for return in writing, so the form’s rebuttal box is empty. 'I’m never late. I’ve seen what happens when you are. But today I can’t tell what counts as early.' He puts his cup down. 'The committee record is finalized at eight-thirty tomorrow morning. Just decide what you’ll do before today ends.'",
       "memo": [
         "Appeal deadline -- 5 business days from notice of return",
         "Rebuttal box on the form: blank, no reason received",
@@ -159,7 +159,7 @@ export default {
     },
     "p3_aftershock": {
       "title": "8:20 the Next Day",
-      "text": "Friday, April 28, 8:20 a.m. The same paper cup lands in the same spot as yesterday. The committee record is finalized in 10 minutes. Manager Han Seoyun stands in front of your desk. Her voice is lower than yesterday. 'When you’re notified of a return, you can file an appeal within 5 business days. It’s in the rulebook. I could have told you yesterday, and I didn’t. That was my choice too.' She puts a printout of yesterday’s observer list on the corner of the desk. There is no mark next to your name. 'If you appeal, this time my name goes in the reason field. If you keep a copy, I know nothing about it. If you just accept it, in 3 years no one will remember today.' For the first time, she looks away. 'I tried all three 12 years ago. I still don’t know which was better.'",
+      "text": "Friday, April 28, morning. 10 minutes until the committee record is finalized. Manager Han Seoyun stands in front of your desk. 'When you’re notified of a return, you can file an appeal within 5 business days. I could have told you yesterday, and I didn’t.' She puts the observer list down. There is no mark next to your name. 'If you appeal, my name goes in the reason field. If you keep a copy, I know nothing about it. If you just accept it, in 3 years no one will remember today.' For the first time, she looks away. 'I tried all three 12 years ago. I still don’t know which was better.'",
       "memo": [
         "10 minutes until the committee record is finalized",
         "Observer list -- no mark next to your name",
@@ -183,7 +183,7 @@ export default {
     },
     "p3_minutes": {
       "title": "No Annexed Opinion",
-      "text": "After the meeting, when the members have left, Deputy President Jin Sera stays in her seat, leafing through the agenda. She sees you tidying the observers’ seats and waves you over. She is looking at the draft minutes, just produced. The last line under Item 4 is three words. 'No annexed opinion.' Jin Sera rests her pen tip on the line. 'What I heard in this room today was that it had been returned. Not that there was no opinion.' She puts the pen down. 'But the chair has no authority to open annexed documents herself. Only to request them, and the request must come before the meeting opens. I made no such request today.'",
+      "text": "When the members have left, Deputy President Jin Sera waves you over. In the draft minutes just produced, the last line under Item 4 is three words. 'No annexed opinion.' Jin Sera rests her pen tip on the line. 'What I heard was that it had been returned. Not that there was no opinion.' She puts the pen down. 'But the chair can only request annexed documents, and only before the meeting opens. I made no such request today.'",
       "memo": [
         "Draft minutes -- Item 4: 'No annexed opinion'",
         "Chair’s authority: request annexed documents before the meeting",
@@ -207,7 +207,7 @@ export default {
     },
     "p3_stairwell": {
       "title": "Window 4",
-      "text": "4:20 p.m., the head office emergency stairs between the 6th and 7th floors. Your phone rings. It is Do Yoonha, the teller at Window 4, Gangseo Branch. He sounds cheerful. 'You’re the only person I know at head office. A new product showed up on this month’s sales list, and the info sheet is two pages. The front is the product name and the back is all tables.' He reads you the product code. It is a product tied to 2023-0412. The loan approved at 2 p.m. today has reached a branch counter in two hours. 'How am I supposed to explain this to customers? Selling something I don’t understand is mis-selling, right? The branch manager just says to put it on the sales board.' Somewhere below, a door opens.",
+      "text": "On the emergency stairs, you take a call from Do Yoonha, the teller at Window 4, Gangseo Branch. He sounds cheerful. 'You’re the only person I know at head office. A new product showed up, and the info sheet is two pages. The front is the product name and the back is all tables.' The product code is tied to 2023-0412. The loan approved at 2 p.m. today has reached a branch counter in two hours. 'Selling something I don’t understand is mis-selling, right? The branch manager just says to put it on the sales board.'",
       "memo": [
         "Gangseo Branch counter sales begin -- 2 hours after approval",
         "Info sheet 2 pages, back page all tables",
@@ -231,7 +231,7 @@ export default {
     },
     "p3_boiler": {
       "title": "The Man Who Draws Your Seat",
-      "text": "9 p.m., the team head’s office on the 6th floor. Yoon Sanghyuk, head of the Corporate Finance Strategy Team, waits for you with the blinds half drawn. He does not scold you for today. Instead he takes out a sheet of paper and sketches your future. It is about an analysis unit to be set up this summer. It has no name yet and no people yet, he says; there are four seats, and one of them is empty. 'I never said your judgment was wrong. But I decide where that judgment gets to sit.' He closes his tablet. The speed of it is the answer. Before it closes, the first page on the screen shows an empty signature line. As you turn to go, he adds one thing. 'What did Manager Han tell you today? That it was for your own good? She believes that. People who believe have it easy.'",
+      "text": "9 p.m. Yoon Sanghyuk, head of the Corporate Finance Strategy Team, does not scold you for today. Instead he sketches your future on a sheet of paper: the one empty seat of four in an analysis unit to be set up this summer, a unit with no name and no people yet. 'I never said your judgment was wrong. But I decide where that judgment gets to sit.' He closes his tablet. The speed of it is the answer. Before it closed, the signature line on the first screen was empty. He adds one thing. 'Manager Han told you it was for your own good? She believes that. People who believe have it easy.'",
       "memo": [
         "Analysis unit planned for this summer -- 1 of 4 seats empty",
         "Yoon Sanghyuk’s tablet, first screen -- signature line empty",
@@ -255,7 +255,7 @@ export default {
     },
     "p3_minutes_reaction": {
       "title": "Two Lines Under 179.6",
-      "text": "Leaving the meeting room, you run into one of the observers at the vending machine in the corridor. It is Ban Jaewook, an investigator in his 17th year with Internal Audit. He holds open a black notebook with a worn cover. On the page that begins '2023-0412 -- 179.6' there is today’s date and two new lines. 'Item 4, 4 min 12 sec', and 'No annexed opinion -- heard it was returned'. He stops his pen and looks at you. 'I wasn’t here for an audit today. I sat in by rotation. So I have no authority at all.' He closes the notebook and opens it again. 'But writing things down isn’t authority, it’s habit. That Attachment 7, by the way. How many pages was it? I’d like to note the page count.'",
+      "text": "At the vending machine in the corridor you run into one of the observers. It is Ban Jaewook, an investigator in his 17th year with Internal Audit. In his worn black notebook, on the page that begins '2023-0412 -- 179.6', there is today’s date and two new lines. 'Item 4, 4 min 12 sec', 'No annexed opinion -- heard it was returned'. He stops his pen. 'I sat in by rotation, so I have no authority at all. But writing things down isn’t authority, it’s habit. That Attachment 7, by the way. How many pages was it?'",
       "memo": [
         "Ban Jaewook’s notebook, 2023-0412 page -- 'Item 4, 4 min 12 sec'",
         "Attachment 7 page count: 11 pages"
@@ -277,7 +277,7 @@ export default {
     },
     "p3_stairwell_reaction": {
       "title": "An Approval One Day Late",
-      "text": "You hang up and climb the stairs, and Assistant Manager Oh Jinwoo is standing at the 7th-floor door. He doesn’t say how much of the call he heard. Instead he brings up something he told you before. 'Remember what I said about my father? That he sent one file up a day late. Just one day.' He rubs the stair rail with his palm. 'Because of that one day, another bank took the client, and that winter he was moved to a management desk over three branches. He stayed there 5 years and quit. I was in high school then.' He starts to smile and stops. 'So I’m never late. But today I see that being fast gets returned too.'",
+      "text": "At the top of the stairs, Assistant Manager Oh Jinwoo is standing at the 7th-floor door. He doesn’t say how much of the call he heard. 'Remember what I said about my father? That he sent one file up just one day late.' He rubs the rail with his palm. 'Because of that day he lost the client, and that winter he was moved to a management desk. He quit 5 years later.' He starts to smile and stops. 'So I’m never late. But today I see that being fast gets returned too.'",
       "memo": [
         "Oh Sangchul -- the branch manager who delayed an approval one day",
         "Moved to a management desk that winter, retired 5 years later"
@@ -299,7 +299,7 @@ export default {
     },
     "p3_boiler_reaction": {
       "title": "The Cardigan Pocket",
-      "text": "9:40 p.m. Coming down from the team head’s office, you pass B1 and find the scanning room door still open. Team Head Lim Kyungsoo is putting sealing tape on today’s retention box. He signs across the tape and lifts the box onto the seventh shelf. Then he picks up one printout left on the table and folds it in half. It is the last page of your dissent, the sheet with the pencil line on the back. He slips it into the inside pocket of his cardigan. Only then does he see you standing there. He is not startled. 'In 90 days this attachment drops off the system list. When a document isn’t on the list, no one notices if one sheet goes missing from the box.' He takes off his glasses and wipes them. 'That’s why this one sheet can’t stay here.'",
+      "text": "The B1 scanning room door is still open. Team Head Lim Kyungsoo puts sealing tape on today’s retention box and signs across it. Then he folds the one sheet left on the table in half and slips it into the inside pocket of his cardigan. It is the last page of your dissent, the sheet with the pencil line. He sees you and is not startled. 'In 90 days this attachment drops off the system list. When a document isn’t on the list, no one notices if one sheet goes missing.' He takes off his glasses and wipes them. 'That’s why this one sheet can’t stay here.'",
       "memo": [
         "Lim Kyungsoo put the back page in his cardigan’s inside pocket",
         "'When a document isn’t on the list, no one notices one sheet missing'"
@@ -321,7 +321,7 @@ export default {
     },
     "p3_branch_closed": {
       "title": "The Closed Branch",
-      "text": "When you have heard the 3 years out in the corridor, Manager Han Seoyun takes out her car keys. 'It’ll only take 30 minutes. There’s something I want to show you.' Yeonhui-dong, Seodaemun-gu, the corner of a narrow three-way junction. This is where KD Bank’s Yeonhui-dong Branch stood, the branch she tried to save 12 years ago. Now the 1st floor is a convenience store and the 2nd floor a self-service laundry. Where the bank’s sign hung, six bolt holes remain. Han Seoyun looks up at them. 'My opinion was read at the full committee back then. In front of nine members. They heard it all and approved anyway. I thought being read meant winning. It only got read.' The convenience store’s glass door opens, and the night clerk steps out for a cigarette. 'There were 14 of us at this branch. I’m the only one still at the bank.'",
+      "text": "When you have heard the 3 years out, Manager Han Seoyun drives you somewhere. A three-way junction in Yeonhui-dong, Seodaemun-gu: where KD Bank’s Yeonhui-dong Branch stood, the branch she tried to save 12 years ago. Now the 1st floor is a convenience store and the 2nd floor a self-service laundry. Six bolt holes remain where the sign hung. 'My dissent was read back then, in front of nine members. They heard it all and approved anyway. I thought being read meant winning. It only got read.' She looks up at the holes. 'There were 14 of us at this branch. I’m the only one still at the bank.'",
       "memo": [
         "KD Bank Yeonhui-dong Branch -- closed 12 years ago",
         "Now: convenience store on the 1st floor, self-service laundry on the 2nd",
@@ -345,7 +345,7 @@ export default {
     },
     "p3_branch_closed_follow": {
       "title": "The Folded Copy",
-      "text": "Back in the car, before she starts the engine, Manager Han Seoyun opens the glove box. From the back she takes out a sheaf of paper folded in four. It is a copy of her own dissent from 12 years ago. The folds have worn white, and a few letters are broken. 'I’ve changed cars three times in 12 years, and I kept moving this. I don’t know why either.' She unfolds the first page to show you. A red pen line runs through the conclusion paragraph. She drew it herself, later. 'This is where I went wrong. I was too sure of myself here. That’s why it didn’t land.' She folds the paper again. 'Your dissent has the same spot. I was trying to fix it for you. A return gives you time to fix things.' She says this, then goes quiet for a moment, like someone hearing her own words a second time.",
+      "text": "Before she starts the engine, Manager Han Seoyun takes a sheaf of paper folded in four from the glove box. It is a copy of her own dissent from 12 years ago. The folds have worn white. A red pen line, drawn by her later, runs through the conclusion. 'I was too sure of myself here. That’s why it didn’t land.' She folds the paper again. 'Your dissent has the same spot. I was trying to fix it for you. A return gives you time to fix things.' She goes quiet for a moment, like someone hearing her own words a second time.",
       "memo": [
         "Copy from 12 years ago -- folded in four, kept in the car",
         "Red line she drew through the conclusion paragraph",
@@ -369,7 +369,7 @@ export default {
     },
     "p3_route_system": {
       "title": "34 Binders",
-      "text": "Instead of looking for a way to get Attachment 7 read, you ask how many dissents have been annexed like this over the years. In the B1 document scanning room, Lim Kyungsoo, head of the Corporate Credit Review Team, points to the binders on the bottom shelf. In the past 10 years, 34 dissents went to the Credit Committee as annexes. He counts them, touching each binder. Only 2 were actually read at the full committee; all the rest came back at team review. Then he pulls up old personnel notices on the intranet and tells you one more thing. Most of the people who wrote the returned dissents left head office before long, and those who stayed hardly ever wrote a dissent again. 'If this were written in the rules, people would be angry. Since it isn’t, nobody is. The numbers are only here, in these binders.'",
+      "text": "You ask how many dissents have been annexed like this over the years. In the B1 document scanning room, Lim Kyungsoo, head of the Corporate Credit Review Team, points to the binders on the bottom shelf. 34 in the past 10 years, and only 2 were read at the full committee. All the rest came back at team review. Most of the people who wrote them left head office before long, and those who stayed hardly ever wrote a dissent again. 'If this were written in the rules, people would be angry. Since it isn’t, nobody is. The numbers are only in these binders.'",
       "memo": [
         "34 annexed dissents in 10 years",
         "Read at full committee 2 -- returned at team stage 32",
@@ -396,7 +396,7 @@ export default {
     },
     "p3_final_system_route": {
       "title": "The 35th Binder",
-      "text": "Seven in the evening. The 34 binders go back into place on the bottom shelf of the scanning room. Attachment 7 was not read at today’s committee, and the 31 billion won was approved. Team Head Lim puts an empty binder and a roll of sealing tape next to the printout of your dissent. The committee record is finalized at eight-thirty tomorrow morning. 'Seal this and it’s the 35th. Sealing is my job. What you do before it’s sealed is yours.' He does not apply the tape. He waits.",
+      "text": "Seven in the evening. The 34 binders go back into place. Attachment 7 was not read, and the 31 billion won was approved. Team Head Lim puts an empty binder and a roll of sealing tape next to your dissent. The record is finalized at eight-thirty tomorrow morning. 'Seal this and it’s the 35th. Sealing is my job. What you do before it’s sealed is yours.' He does not apply the tape. He waits.",
       "memo": [
         "34 annexed dissents in 10 years -- 2 read at full committee",
         "Attachment 7: not yet sealed",
@@ -419,7 +419,7 @@ export default {
     },
     "p3_evidence_turn": {
       "title": "28 Minutes",
-      "text": "When you fit the clue into the meeting timetable, Internal Audit investigator Ban Jaewook hands you a processing log he printed with his observer access. Attachment 7 was returned 28 minutes before the committee opened. Right above it is one line from the internal phone log. An 11-minute call from the extension in the team head’s office on the 6th floor to Manager Han Seoyun’s desk. Ban Jaewook checks his watch. 'Return was pressed the moment the call ended. That’s not enough time to read an eleven-page document.' He writes the two times in his notebook and draws an arrow between them. 'Whatever Manager Han says about her situation, that’s her motive, not the stated reason. The reason is inside these 11 minutes.' Then he reads a line he copied into his notebook. The pencil line from the back of your dissent’s last page, which he saw while collecting the meeting papers. 'Returned -- Yoon. Do not ask for reasons. This isn’t Manager Han’s handwriting.'",
+      "text": "When you fit the clue into the meeting timetable, Internal Audit investigator Ban Jaewook hands you a processing log. Attachment 7 was returned 28 minutes before the committee opened. The line right above it is an 11-minute call from the extension in the team head’s office on the 6th floor to Manager Han Seoyun’s desk. Ban Jaewook says, 'Return was pressed the moment the call ended. That’s not enough time to read eleven pages. Whatever situation you hear about, that’s a motive, not the stated reason. The reason is inside these 11 minutes.' He reads the pencil line from the back of your dissent, copied into his notebook. 'Returned -- Yoon. Do not ask for reasons. This isn’t Manager Han’s handwriting.'",
       "memo": [
         "Attachment 7 returned: 13:32 -- 28 minutes before the meeting",
         "Call just before: 13:21, team head’s extension to Han Seoyun’s desk, 11 min",
@@ -442,7 +442,7 @@ export default {
     },
     "p3_start_alone": {
       "title": "An Attachment with One Name",
-      "text": "In the end you filled the signature line alone. One name at the end of 11 pages. On the agenda posted at five this morning, the document has become 'Attachment 7', and the author box holds only your name. 8:20 a.m. When you open the review room door, no one looks up from their screens. They have all seen it already. Assistant Manager Oh Jinwoo brings two paper cups, sets one down, and lowers his voice. 'Last night the team brought it up twice, that this one has a single name on it. Some of them meant it kindly.' He points to the fourth line of the agenda. 'With one name, one return finishes it. That’s the cheapest way for them.'",
+      "text": "You filled the signature line alone. One name at the end of 11 pages. On the agenda posted before dawn, the document has become 'Attachment 7'. In the review room, everyone keeps their eyes on their screens with the faces of people who have already read it. Assistant Manager Oh Jinwoo sets down a paper cup and lowers his voice. 'Last night the team brought it up twice, that this one has a single name on it.' He points to the fourth line of the agenda. 'With one name, one return finishes it. That’s the cheapest way for them.'",
       "memo": [
         "Attachment 7 authors -- 1",
         "Mentioned in the team last night 2 times",
@@ -473,7 +473,7 @@ export default {
     },
     "p3_start_shared": {
       "title": "The Names That Got Calls All Night",
-      "text": "On Friday you attached a list of co-signers to the dissent you had already filed. Four people signed, you included. From one in the morning, three of those four got calls, one after another. The callers were different; the message was nearly the same. Take your name off now and it never happened. 8:20 a.m. When you walk into the review room, the three are at their desks, eyes on their screens. The fourth has not come in yet. Assistant Manager Oh Jinwoo sets down a paper cup. 'Three calls overnight means they read this document. If they hadn’t, there’d be no reason to call.' He almost laughs, then stops. 'They read it, and it’s still just an attachment on today’s agenda.'",
+      "text": "Your dissent now carries a list of co-signers. Four people signed, you included. From one in the morning, three of them got calls. Take your name off now, the message went, and it never happened. The three sit at their desks, eyes on their screens; the fourth has not come in yet. Assistant Manager Oh Jinwoo sets down a paper cup. 'Three calls overnight means they read this document.' He almost laughs, then stops. 'They read it, and it’s still just an attachment on today’s agenda.'",
       "memo": [
         "4 co-signers -- 3 got calls before dawn",
         "Message: take your name off and it never happened",
@@ -504,7 +504,7 @@ export default {
     },
     "p3_start_soften": {
       "title": "A Sentence That Doesn’t Read as Dissent",
-      "text": "On the last night you rewrote the conclusion paragraph. 'This must not be approved' became 'This can be approved if the conditions are met', and the figure 179.6% moved from the body to a footnote. On the agenda posted before dawn, Attachment 7 is titled 'Approvable if conditions are met'. The title does not say dissent; that word survives only, in small type, in the filing category box. 8:20 a.m. Assistant Manager Oh Jinwoo looks from the agenda to your screen and back. 'Going by the title, this looks like a supporting document.' He sets down a paper cup. 'They teach you that if you write softly, you won’t get caught. That’s true, you won’t. But a document that doesn’t get caught doesn’t get read.' The review room phone rings once and stops.",
+      "text": "On the last night you changed the conclusion from 'This must not be approved' to 'This can be approved if the conditions are met'. The 179.6% moved to a footnote. On the agenda, Attachment 7 is titled 'Approvable if conditions are met'. The word dissent survives only, in small type, in the filing category box. Assistant Manager Oh Jinwoo looks at the agenda. 'Going by the title, this looks like a supporting document.' He sets down a paper cup. 'Write softly and you won’t get caught. But a document that doesn’t get caught doesn’t get read.'",
       "memo": [
         "Attachment 7 title: 'Approvable if conditions are met'",
         "Conclusion paragraph -- changed to 'can be approved if the conditions are met'",
