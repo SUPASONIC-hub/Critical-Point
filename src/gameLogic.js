@@ -713,10 +713,14 @@ export function getEndingVariant({
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
   const recordsOpen = clueRate >= (slack ? CLUE_RATE_SLACK_BAR : CLUE_RATE_BAR);
+  const reform = recordsOpen && legitimacy >= REFORM_LEGITIMACY;
   if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= HUMAN_RECORD_CLUE_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
+  // As burning closes the record endings, answering 개혁 opens the one named for it: EVIDENCE REFORM before
+  // OPEN OVERSIGHT, which took nearly every reform season (5.3% of 600, 2026-11-05, note C2). The gates are the same.
+  if (finale === "control" && reform) return ENDINGS["evidence-reform"];
   if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];
   if (cold) return ENDINGS["cold-justice"];
-  if (recordsOpen && legitimacy >= REFORM_LEGITIMACY) return ENDINGS["evidence-reform"];
+  if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS["profitable-silence"];
   if (pact) return ENDINGS["field-pact"];
   if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE) return ENDINGS["quiet-cover"];

@@ -1499,7 +1499,10 @@ Still open, on purpose:
     summary, alongside `reframeRouteCount` and `peopleFirstCount`); the
     authority gate asks for records from 60% of the cases opened, never fewer
     than four; a finale that burns the records closes OPEN OVERSIGHT, EVIDENCE
-    REFORM and HUMAN RECORD; HUMAN RECORD also asks for every case's record
+    REFORM and HUMAN RECORD, and one that answers 개혁 (`f_after_control`)
+    reads EVIDENCE REFORM before OPEN OVERSIGHT at the same gates (improvement
+    note C2, 2026-11-05: at legitimacy 86 and trust 85 OPEN OVERSIGHT took
+    nearly every reform season, 5.3% of 600 replayed); HUMAN RECORD also asks for every case's record
     (`HUMAN_RECORD_CLUE_RATE`), not only a reframed route in seven cases of
     ten, since staking the wild card wherever it was dealt closed 94% of
     seasons on it. The gates a player is told about live in
