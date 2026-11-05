@@ -9,11 +9,14 @@ import {
   DRIVE_CEILING,
   driveMix,
   leadFilterFrequency,
-  leadForBar,
+  moodCrossfade,
+  moodLeadForBar,
+  setMusicMood as setMood,
   shadowNote,
   stakeLayerCount,
   STEPS_PER_BAR,
 } from "./musicScore.js";
+export { getMusicMood, MUSIC_MOODS } from "./musicScore.js";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
 const MIX_VOLUME = 0.74;
@@ -396,6 +399,19 @@ export function setMusicStake(gauge = 0) {
   stakeRuntime.gauge = Math.min(100, Math.max(0, Number(gauge) || 0));
 }
 
+/**
+ * The scene's mood (musicScore.js `MUSIC_MOODS`; unknown or missing is
+ * neutral). Read on the score's next step: for `MOOD_FADE_SECONDS` the old
+ * mood's lead and the new one both play, each note at its share of the lead's
+ * gain, and the table's drone crosses its voicing over the same way
+ * (gauntlet/tensionDrone.js). No sounding oscillator is retuned or jumped.
+ * Timed on the audio clock; with no context yet nothing is playing, and the
+ * change is immediate.
+ */
+export function setMusicMood(mood) {
+  return setMood(mood, audioRuntime.context?.currentTime ?? -Infinity);
+}
+
 function releaseStakeVoices() {
   if (!stakeRuntime.voices) return;
   for (const voice of stakeRuntime.voices) voice.stop();
@@ -675,16 +691,27 @@ export function AdaptiveMusic({ modeKey }) {
         });
       }
 
-      const leadLine = leadForBar(currentMode, Math.floor(stepRef.current / STEPS_PER_BAR));
-      const lead = leadLine[step];
-      if (lead) {
-        playTone(context, destination, lead, stepSeconds * 1.8, LEAD_GAIN, currentMode.wave, {
-          attack: 0.02,
-          release: 0.24,
+      // The mood's lead, and for a few seconds after a mood change the old
+      // mood's too, the two sharing the lead's gain note by note (`moodCrossfade`).
+      // The sorrow lead is a slow line: its notes ring on into the next.
+      const bar = Math.floor(stepRef.current / STEPS_PER_BAR);
+      const { to, from, blend } = moodCrossfade(context.currentTime);
+      const leadLine = moodLeadForBar(currentMode, bar, to);
+      const oldLine = from ? moodLeadForBar(currentMode, bar, from) : null;
+      const crossing = oldLine && oldLine !== leadLine;
+      const strikeLead = (line, share) => {
+        const lead = line[step];
+        if (!lead || share <= 0) return;
+        const slow = line === currentMode.sorrowLead;
+        playTone(context, destination, lead, stepSeconds * (slow ? 3 : 1.8), LEAD_GAIN * share, currentMode.wave, {
+          attack: slow ? 0.05 : 0.02,
+          release: slow ? 0.4 : 0.24,
           filterFrequency: leadFilterFrequency(currentMode),
           detune: step % 2 === 0 ? -currentMode.detuneSpread : currentMode.detuneSpread,
         });
-      }
+      };
+      strikeLead(leadLine, crossing ? blend : 1);
+      if (crossing) strikeLead(oldLine, 1 - blend);
 
       const pad = currentMode.pad[step];
       if (pad) {
