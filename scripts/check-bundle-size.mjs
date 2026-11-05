@@ -89,7 +89,8 @@ const budgets = [
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
   // 54,709 -> 54,707 gzip on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): no code changed (raw 148,019 as before); the chunk names it imports shifted with the trimmed case copy. Measured 54,703 gzip in the e2e build, the gzip plus 4.
   // 148,023 / 54,709 -> 148,261 / 54,796 on 2026-11-05, tab-title-situation over main 24af89d7: the browser tab's titles (src/copy/tabTitles.js, shared by the result hook and the table), state/tabTitle.js filling the page's own title into them (composeTabTitle) and taking a title the page wrote as the new base. Measured 148,257 / 54,792 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_707 },
+  // -> 150,137 / 55,351 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 150,133 / 55,347 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_137, maxGzip: 55_351 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -106,7 +107,8 @@ const budgets = [
   // 14,116 -> 14,123 gzip on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): no code changed here (raw 36,270); #416's readThrough beside #448's lines. Measured 36,270 / 14,119 in the e2e build, the plus 4.
   // 36,274 / 14,123 -> 36,316 / 14,136 on 2026-11-05, ending-reform-order over main c569cb99 (#453): the finale's 개혁 answer reads EVIDENCE REFORM before OPEN OVERSIGHT in getEndingVariant (one gate read once more, improvement note C2). Measured 36,312 / 14,132 in the e2e build, the plus 4.
   // 14,123 -> 14,147 gzip on 2026-11-05, tab-title-situation over main 24af89d7: no code changed here (raw 36,270); the chunk names it imports. Measured 14,143 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_316, maxGzip: 14_136 },
+  // -> 36,374 / 14,187 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 36,370 / 14,183 in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_374, maxGzip: 14_187 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -121,7 +123,8 @@ const budgets = [
   // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
   // 30,526 / 13,304 -> 30,589 / 13,340 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 30,585 / 13,336 in the e2e build, the plus 4.
   // 30,526 / 13,304 -> 30,537 / 13,287 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the table's words gain 길게 눌러야 확정 (say.holdHint, voice.holdHint) and lose the long hold help. Measured 30,533 / 13,283 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_589, maxGzip: 13_340 },
+  // -> 30,478 / 13,281 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 30,474 / 13,277 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_478, maxGzip: 13_281 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -340,7 +343,8 @@ const budgets = [
   // 191,476 / 69,094 -> 191,476 / 69,099 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 191,472 / 69,095 in the e2e build, the gzip plus 4 (the raw size under its budget).
   // 69,094 -> 69,100 gzip on 2026-11-05, ending-reform-order over main c569cb99 (#453): no code changed here (raw 191,472 as main); the entry names the renamed gameLogic chunk. Measured 69,096 gzip in the e2e build, the gzip plus 4.
   // 191,573 / 69,173 -> 191,949 / 69,273 on 2026-11-05, rank-title over main 24af89d7 (C1 기록 칭호): the fifth record title and its finished-season step (analystTitle.js), the line under the name (IntroScreen, intro.setup.rankTitle). Measured 191,945 / 69,269 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_176 },
+  // -> 191,915 / 69,251 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 191,911 / 69,247 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 191_915, maxGzip: 69_251 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -556,7 +560,8 @@ const budgets = [
   // 50,213 / 16,456 -> 50,356 / 16,517 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 50,352 / 16,513 in the e2e build, the plus 4.
   // 50,079 / 16,401 -> 50,213 / 16,456 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habit names and lines (src/copy/habits.js) and the one-word analyst line (endingCopy.getAnalystName). Measured 50,209 / 16,452 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,361 / 16,528 on 2026-11-05, tab-title-situation over main 24af89d7: the result's tab title left src/copy/reportLines.js for src/copy/tabTitles.js; the chunk names it imports. Measured 50,357 / 16,524 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_361, maxGzip: 16_528 },
+  // -> 50,626 / 16,603 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 50,622 / 16,599 in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_626, maxGzip: 16_603 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
@@ -666,7 +671,8 @@ const budgets = [
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
   // -> 203,562 / 38,132 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 203,558 / 38,128 in the e2e build, the plus 4.
   // 203,562 / 38,132 -> 203,575 / 38,173 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the held 확정's gauge (.gx-hold, its reduced-motion 0.6s) in place of the ::after line, less a duplicated hand rule and two merged blocks. Measured 203,571 / 38,169 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_575, maxGzip: 38_173 },
+  // -> 203,558 / 38,178 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 203,554 / 38,174 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_558, maxGzip: 38_178 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -910,7 +916,8 @@ const budgets = [
   // measured 6,512 / 2,125 in the e2e build, the gzip plus 4. Rolldown and
   // Oxc write it smaller than Rollup and esbuild did (6,700 / 2,198 on the same commit).
   // 6,512 / 2,129 -> 6,538 / 2,143 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 6,534 / 2,139 in the e2e build, the plus 4.
-  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_538, maxGzip: 2_143 },
+  // -> 6,538 / 2,142 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 6,534 / 2,138 in the e2e build, the plus 4.
+  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_538, maxGzip: 2_142 },
   // The other players' wall rate on the scene page (improvement notes D3):
   // src/state/useSceneBustRates.js and src/sceneTraces.js. Written into the
   // PlayScreen chunk they added about 945 / 441 bytes to it on 2026-10-19,
@@ -1174,7 +1181,8 @@ const budgets = [
   // 180,288 / 60,311 -> 180,352 / 60,333 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 180,348 / 60,329 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,355 / 60,334 on 2026-11-05, rank-title over main 24af89d7 (C1 기록 칭호): the five titles (責任分析官 added) and the name line's words in Japanese. Measured 180,351 / 60,330 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,296 / 60,303 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): 長押しが必要 and 長押しすると確定する, the hold help shortened. Measured 180,292 / 60,299 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_352, maxGzip: 60_333 },
+  // -> 182,102 / 60,625 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 182,098 / 60,621 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 182_102, maxGzip: 60_625 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1197,7 +1205,8 @@ const budgets = [
   // 150,260 / 53,611 -> 150,317 / 53,626 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 150,313 / 53,622 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,323 / 53,631 on 2026-11-05, rank-title over main 24af89d7 (C1 기록 칭호): the five titles (Chief Analyst added) and the name line's words in English. Measured 150,319 / 53,627 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,279 / 53,614 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): "Hold, don't tap" and "Hold the button down to Commit", the hold help shortened. Measured 150,275 / 53,610 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_317, maxGzip: 53_626 },
+  // -> 151,681 / 53,930 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 151,677 / 53,926 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 151_681, maxGzip: 53_930 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1372,7 +1381,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 430,386 / 487,129 / 494,322 -> 430,430 / 487,177 / 494,357 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the index CSS's gauge rules and the dictionaries' hold words. Measured 430,426 / 487,173 / 494,353 in the e2e build, the plus 4.
 // 430,386 / 487,129 / 494,322 -> 430,386 / 487,129 / 494,300 on 2026-11-05, ja-no-font-preload over main 24af89d7: the Japanese start page no longer preloads the font (scripts/site-pages.mjs withoutFontPreload; measured FCP 13.8 -> 10.3 s on 11-05, cp-archive 메모-20261105/ja-fcp). Only /ja/index.html shrinks, by the tag's gzip bytes: the woff2 stays in the Japanese total, since every language counts the files the Korean index.html links (the stylesheet still asks for the font on /ja/). Measured 430,382 / 487,125 / 494,296 in the e2e build, the plus 4.
 // The files the Korean page links (the font among them) are counted for every language, whatever the language's own head says: /ja/ dropped the font preload on 2026-11-05 and its line fell by the tag's bytes only.
-const FIRST_PAINT_BUDGETS = { ko: 430_391, en: 487_113, ja: 494_306 };
+// -> 430,533 / 487,566 / 494,734 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 430,529 / 487,562 / 494,730 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_533, en: 487_566, ja: 494_734 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
