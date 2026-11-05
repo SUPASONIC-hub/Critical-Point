@@ -410,7 +410,8 @@ summary:focus-visible {
   pointer-events: none;
   background:
     radial-gradient(55% 60% at 16% 46%, rgb(217 255 98 / 0.07), transparent 70%),
-    linear-gradient(0deg, var(--ui-bg), transparent 30%), linear-gradient(rgb(18 22 24 / 0.7), transparent 20%),
+    linear-gradient(0deg, var(--ui-bg), transparent 30%),
+    linear-gradient(rgb(18 22 24 / 0.7), transparent 20%),
     linear-gradient(
       90deg,
       var(--ui-bg),
