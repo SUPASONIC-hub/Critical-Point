@@ -26,6 +26,7 @@ import {
   OVERCLOCK_STREAK,
   SCOUT_REACH,
   SCOUT_SECONDS,
+  SCOUT_TRUST,
   SEAL_BREAK_GAUGE,
   SILENCE_SECONDS,
   SPLINT_RATE,
@@ -350,17 +351,17 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
 /**
  * The effect a resolved card actually applies. Gains ride the heat; costs on
  * the fractured axis are billed half again; a bust strips every gain and keeps
- * every cost, which is the entire shape of losing.
+ * every cost, which is the entire shape of losing. `scouted` is whether the
+ * window spent its look (B1): SCOUT_TRUST of 믿음 comes off after everything
+ * else -- unmultiplied, unfractured, and on a bust like any other cost.
  */
-export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1 } = {}) {
+export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false } = {}) {
   const fractured = applyFracture(effect, fracturedAxis, fractureRate);
-  if (outcome === "bust") {
-    return Object.fromEntries(Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? 0 : value]));
-  }
   const multiplier = getResourceMultiplier(gauge) * Math.max(1, Number(focusMultiplier) || 1);
-  return Object.fromEntries(
-    Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? roundAway(value * multiplier) : value]),
+  const priced = Object.fromEntries(
+    Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? (outcome === "bust" ? 0 : roundAway(value * multiplier)) : value]),
   );
+  return scouted ? { ...priced, trust: (priced.trust ?? 0) - SCOUT_TRUST } : priced;
 }
 
 export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8, time: -4 });
@@ -1591,6 +1592,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     gauge: Math.round(gauge),
     wall: Number(window?.wall) || 0,
     pushes: Number(window?.pushes) || 0,
+    // B1: the look was spent on this window, so its 믿음 is billed (applyGauntletEffect) and the log says so.
+    scouted: window?.scouted === true,
     elapsed: round2(Number(window?.elapsed) || 0),
     chips,
     multiplier,

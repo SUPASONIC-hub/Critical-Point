@@ -152,8 +152,8 @@ const STEPS = [
   {
     caseId: "prologue03",
     adds: ["coldFeet", "heatDebt", "scout"],
-    // SCOUT is the hand's own, so a story run is told it (B1 초안). The 3초 and
-    // the 20 are SCOUT_SECONDS and 2 * SCOUT_REACH (tableRules.js): this module
+    // SCOUT is the hand's own, so a story run is told it (B1 초안). The 믿음 1, the 3초 and
+    // the 20 are SCOUT_TRUST, SCOUT_SECONDS and 2 * SCOUT_REACH (tableRules.js): this module
     // imports only the two LOCK numbers, so they are written out and move with
     // the constants.
     storyIntro: [2],

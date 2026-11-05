@@ -57,6 +57,13 @@ export const LOCK_PRESS_SECONDS = 1.5;
  */
 export const SCOUT_SECONDS = 3;
 export const SCOUT_REACH = 10;
+/**
+ * B1 (사용자 결정 11-05 (1)): what the look costs in 믿음 (trust), on top of
+ * the clock. Billed when the window settles (`applyGauntletEffect`): never
+ * multiplied by the heat, never fractured, and kept on a bust like every
+ * other cost. The stage and the bots do not look with less than this.
+ */
+export const SCOUT_TRUST = 1;
 
 /** METRONOME: how many windows after the pressure rose a change of type still counts as a switch. */
 export const METRONOME_REACH = 2;

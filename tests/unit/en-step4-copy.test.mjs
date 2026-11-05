@@ -32,7 +32,7 @@ test("the rules print their Korean with the numbers filled in, and a lifted rule
 
 test("the voice and the authority levels say their Korean", () => {
   assert.equal(getHoldArmedCall(), "한 번 더 누르면 확정된다");
-  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), "조회했다. 벽은 70에서 90 사이 어딘가");
+  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), "조회했다. 믿음 1을 썼다. 벽은 70에서 90 사이 어딘가");
   assert.deepEqual(getAuthorityProfile("courier", "OVERSIGHT").permissions, ["기록 공개", "현장 개입", "실험 종료"]);
   assert.deepEqual(getAuthorityProfile("courier", "nowhere").permissions, ["제한 열람", "질문 요청", "관찰 기록"]);
   assert.equal(getTableReaction([{ threshold: { busted: true, cause: "push", pushes: 3, wall: 70 } }], "n1").recap, "직전 판 · 3번째 밀기에서 BUST (벽 70)");

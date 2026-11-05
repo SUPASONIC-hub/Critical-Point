@@ -87,7 +87,8 @@ const budgets = [
   // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_709 },
+  // 148,023 / 54,709 -> 148,041 / 54,715 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the log entry carries `threshold.scouted`. Measured 148,037 / 54,711 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_041, maxGzip: 54_715 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -115,7 +116,8 @@ const budgets = [
   // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_526, maxGzip: 13_304 },
+  // 30,526 / 13,304 -> 30,600 / 13,337 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the table words shared here (scoutLabel, voice.scout) name the 믿음, and the meters read `canPayScout`. Measured 30,596 / 13,333 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_600, maxGzip: 13_337 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -799,7 +801,8 @@ const budgets = [
   // 39,883 / 14,836 -> 43,635 / 16,377 on 2026-11-02, locale-gaps (#393) over main 9be94346: the run's lines (route labels, restore, minutes, the far callbacks) read src/copy/runLines.js and src/copy/farCallbacks.js. Measured 43,631 / 16,373 in the e2e build, the plus 4.
   // 43,635 / 16,377 -> 44,126 / 16,529 on 2026-11-02, money-feedback over main acf3d999: the run's lastChange, seasonGained and seasonLost. Measured 44,122 / 16,525, the plus 4.
   // 44,126 -> 44,131 raw on 2026-11-03, week-board-after over main 36104abd: no code changed; the export names it imports from weeklyRules shifted with weekBoardsAt. Measured 44,127, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 44_131, maxGzip: 16_529 },
+  // 16,529 -> 16,554 gzip on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): SCOUT_TRUST, `applyGauntletEffect`'s `scouted` and the verdict's `scouted` (raw 44,119, under). Measured 44,119 / 16,550 in the e2e build, the gzip plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 44_131, maxGzip: 16_554 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1154,7 +1157,8 @@ const budgets = [
   // 179,769 / 60,178 -> 179,989 / 60,211 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the two blocked-word refusals in Japanese. Measured 179,985 / 60,207, the plus 4.
   // 179,793 / 60,190 -> 180,032 / 60,227 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in Japanese over KD銀行口座. Measured 180,028 / 60,223 in the e2e build, the plus 4.
   // -> 180,288 / 60,311 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 180,284 / 60,307 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_288, maxGzip: 60_311 },
+  // 180,288 / 60,311 -> 180,342 / 60,330 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the Japanese scout button name, voice line and prologue 03 line say the price. Measured 180,338 / 60,326 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_342, maxGzip: 60_330 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1174,7 +1178,8 @@ const budgets = [
   // 149,807 / 53,485 -> 150,005 / 53,529 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the two blocked-word refusals in English. Measured 150,001 / 53,525, the plus 4.
   // 149,859 / 53,502 -> 150,057 / 53,546 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in English over bundle-1105a's dictionary. Measured 150,053 / 53,542 in the e2e build, the plus 4.
   // -> 150,260 / 53,611 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 150,256 / 53,607 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_260, maxGzip: 53_611 },
+  // 150,260 / 53,611 -> 150,308 / 53,625 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the English scout button name, voice line and prologue 03 line say the price. Measured 150,304 / 53,621 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_308, maxGzip: 53_625 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1341,7 +1346,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
 // 430,386 / 487,129 / 494,322 -> 430,390 / 487,123 / 494,315 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,386 / 487,119 / 494,311 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_390, en: 487_123, ja: 494_315 };
+// en 487,123 -> 487,130 and ja 494,315 -> 494,328 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the language dictionaries above. Measured 430,381 / 487,126 / 494,324 in the e2e build, the plus 4 (ko under its 430,390).
+const FIRST_PAINT_BUDGETS = { ko: 430_390, en: 487_130, ja: 494_328 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

@@ -3,8 +3,9 @@ import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
 import { getEndingVariant, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
+import { SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, SCOUT_TIMINGS } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -343,6 +344,50 @@ if (AUDIT_WEEK) console.log(`Audit (measured, AUDIT_WEEK=1, values ${AUDIT_VALUE
   const per = (part, whole) => ((100 * part) / Math.max(1, whole)).toFixed(1);
   const describe = (row) => `ending differs in ${row.moved} of ${row.pairs} (${per(row.moved, row.pairs)}%), collapse on one side only ${row.collapseMoved} (${per(row.collapseMoved, row.pairs)}%), collapse blind ${per(row.blindCollapse, row.pairs)}% / heartbeat ${per(row.listensCollapse, row.pairs)}%, busts a season ${(row.blindBusts / Math.max(1, row.pairs)).toFixed(1)} / ${(row.listensBusts / Math.max(1, row.pairs)).toFixed(1)}`;
   console.log(`Board skill moves the ending (measured, ${BOARD_PAIRS} population slots each played blind and on the heartbeat on one seed): ${describe(total)}; ${archetypeNames.map((name) => `${name}: ${describe(byName[name])}`).join("; ")}`);
+}
+
+/**
+ * B1 (11-05 decision (1)): a look (SCOUT) costs SCOUT_TRUST of 믿음 as well
+ * as the clock. The listening hand above looks on every table that sells one,
+ * so its 믿음 is where the price lands and the endings 믿음 gates read it
+ * (HUMAN RECORD, OPEN OVERSIGHT, PROFITABLE SILENCE, FIELD PACT). Here the
+ * same population slot is played on the heartbeat once per timing of the look
+ * (createSeasonBot's `scout`: never, before the first push as above, before
+ * the third, and when the next push can reach the band), on one seed. Measured,
+ * not asserted -- the price is what was decided. Its own bots, so nothing
+ * above moves.
+ */
+{
+  const SCOUT_SEASONS = Number(process.env.ENDING_SCOUT_SEASONS) || POPULATION.length * 5;
+  const bots = Object.fromEntries(SCOUT_TIMINGS.map((scout) => [scout, createSeasonBot({ seed: 20261105, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).map(([name, base]) => [name, { ...base, board: "listens", scout }])) })]));
+  const rows = Object.fromEntries(SCOUT_TIMINGS.map((scout) => [scout, { endings: new Map(), looks: 0, trust: 0, busts: 0, moved: 0 }]));
+  for (let index = 0; index < SCOUT_SEASONS; index += 1) {
+    const archetype = POPULATION[index % POPULATION.length];
+    const seasons = Object.fromEntries(SCOUT_TIMINGS.map((scout) => {
+      bots[scout].reseed((20261105 + Math.imul(index + 1, 2654435761)) >>> 0);
+      let looks = 0;
+      const season = bots[scout].playSeason(`scout:${index}`, archetype, false, ({ verdict }) => {
+        if (verdict.scouted) looks += 1;
+      });
+      return [scout, { season, looks }];
+    }));
+    const bare = seasons.never.season;
+    for (const scout of SCOUT_TIMINGS) {
+      const { season, looks } = seasons[scout];
+      const row = rows[scout];
+      row.endings.set(season.ending.id, (row.endings.get(season.ending.id) ?? 0) + 1);
+      row.looks += looks;
+      row.trust += season.final.resources.trust;
+      row.busts += season.strain.seasonBusts;
+      if (season.ending.id !== bare.ending.id) row.moved += 1;
+    }
+  }
+  const per = (part) => ((100 * part) / SCOUT_SEASONS).toFixed(1);
+  console.log(`Scout spend and the ending (measured, ${SCOUT_SEASONS} population slots, each season played on the heartbeat once per timing of the look on one seed; a look costs 믿음 ${SCOUT_TRUST}):`);
+  for (const scout of SCOUT_TIMINGS) {
+    const row = rows[scout];
+    console.log(`  ${scout.padEnd(6)} looks ${(row.looks / SCOUT_SEASONS).toFixed(1)} a season, 믿음 at the close ${(row.trust / SCOUT_SEASONS).toFixed(1)}, busts ${(row.busts / SCOUT_SEASONS).toFixed(1)} a season, ending differs from never in ${per(row.moved)}%; ${EXPECTED.map((id) => `${id} ${per(row.endings.get(id) ?? 0)}%`).join(", ")}`);
+  }
 }
 
 /**

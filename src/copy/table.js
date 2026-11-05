@@ -116,7 +116,7 @@ const tableCopy = {
     relicsLabel: "장착한 도구",
     scout: "조회",
     scouted: "조회함",
-    scoutLabel: "벽 {min}–{max} · 조회, 시간 {seconds}초",
+    scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초",
     glossaryCard: "카드 {number}: {label} ({type})",
     glossaryMastery: "시즌 숙련: LOCK을 충전한 채로 확정한 판의 수. 자세마다 {goal}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {strike} · STEADY {steady} · EXPOSE {expose}).",
   },
@@ -224,7 +224,7 @@ const tableCopy = {
     holdArmed: "한 번 더 누르면 확정된다",
     push: "열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
-    scout: "조회했다. 벽은 {min}에서 {max} 사이 어딘가",
+    scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
     bank: "판돈 {pot} · 금고 {vault}",
   },
   // tableAfterword.js: what a closed window still says about itself, and the

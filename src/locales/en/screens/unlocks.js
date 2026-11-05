@@ -19,7 +19,7 @@ export default {
       intro: [
         "Commit without a single Push and the next hand seals its most expensive card.",
         "Commit at Heat 60 or more and the next hand starts with Heat on and less time.",
-        "Press Scout to spend 3 seconds of time and narrow the Wall’s range to 20 wide. Once per hand, and it doesn’t mean the Wall is in the middle of it.",
+        "Press Scout to spend 1 Trust and 3 seconds of time and narrow the Wall’s range to 20 wide. Once per hand, and it doesn’t mean the Wall is in the middle of it.",
       ],
     },
     prologue04: {

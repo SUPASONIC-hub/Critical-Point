@@ -15,11 +15,11 @@ import {
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
-import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
+import { SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/weeklyRules.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, createCaseBot, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_WEEK, CASCADE_WEEK, createCaseBot, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER, scoutDue } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -322,6 +322,38 @@ assert.ok(
   bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,
   `SCOUT must not be an answer key: ${bestScout.meanVault} against a wall-seeing ${oracle.meanVault}`,
 );
+// B1 (11-05 decision (1)): a look costs SCOUT_TRUST of 믿음 as well as the
+// clock. The case player holds no 믿음 (the vault is its measure), so the rows
+// print the looks a case buys and what they cost in 믿음; the vault and the
+// bust rate are what the timing of the look does. The best scouting row above
+// looks before the first push; here the same margin looks before the third
+// push (the first two bust ~0%, measured 2026-10-13) and the moment the next
+// push can reach the board's band (the 현재 위험 line's 「닿을 수 있다」),
+// playing the heartbeat until it looks. The never row is the heartbeat's best.
+// Whatever the timing, information keeps the table's order: a timed look
+// banks more than the heartbeat and under the cap against a wall seen.
+{
+  const bestMargin = Number(bestScout.label.split("margin ")[1]);
+  const scoutOrListen = (win) => (win.scouted ? win.gauge + win.schema.stepMax - bestMargin < getWindowBand(win).wallMin : listening(win));
+  const timedRows = [
+    { row: bestHeartbeat, when: "never" },
+    ...["always", "late", "danger"].map((timing) => ({
+      row: measure(`scout at ${timing}, margin ${bestMargin}`, Object.assign((win) => scoutOrListen(win), { scout: (win) => scoutDue(timing, win) })),
+      when: timing,
+    })),
+  ];
+  console.log(`scout            a look costs 믿음 ${SCOUT_TRUST} and the clock; when the heartbeat's best hand looks (never / before push 1 / before push 3 / when the next push reaches the band):`);
+  for (const { row, when } of timedRows) {
+    const looks = row.seen.scouts / Math.max(1, CASES);
+    console.log(
+      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case  믿음 ${(-looks * SCOUT_TRUST).toFixed(2)}/case`,
+    );
+  }
+  for (const { row, when } of timedRows.slice(1)) {
+    assert.ok(row.meanVault > bestHeartbeat.meanVault, `a look at ${when} should still be worth more than the heartbeat: ${row.meanVault} against ${bestHeartbeat.meanVault}`);
+    assert.ok(row.meanVault < oracle.meanVault * SCOUT_SEES_CAP, `a look at ${when} must not be an answer key: ${row.meanVault} against a wall-seeing ${oracle.meanVault}`);
+  }
+}
 assert.ok(skipper.meanWindows < WINDOWS_PER_CASE, "busting on purpose does shorten a case");
 assert.ok(
   skipper.meanVault < bestFixed.meanVault * 0.25,
