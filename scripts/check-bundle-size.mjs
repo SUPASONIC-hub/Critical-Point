@@ -93,7 +93,8 @@ const budgets = [
   // 148,418 / 54,917 -> 148,134 / 54,765 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together, less src/mood.js, which the entry now holds (AdaptiveMusic subscribes to it, so Rolldown moved the hub out of this chunk). Measured 148,130 / 54,761 in the e2e build, the plus 4.
   // 54,709 -> 54,707 gzip on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): no code changed (raw 148,019 as before); the chunk names it imports shifted with the trimmed case copy. Measured 54,703 gzip in the e2e build, the gzip plus 4.
   // 54,765 -> 54,772 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the raw bytes are the same 148,130; the chunk names it imports shifted with the trimmed case copy (#456, #457). Measured 148,130 / 54,768 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_134, maxGzip: 54_772 },
+  // 54,772 -> 54,771 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 148,130; the chunk names it imports (#460). Measured 148,130 / 54,767 in the e2e build, the gzip plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_134, maxGzip: 54_771 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -149,7 +150,8 @@ const budgets = [
   // 294,128 / 87,755 -> 294,162 / 87,766 on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금 (the case files' hashed names in its import list). Measured 294,158 / 87,762 in the e2e build, the plus 4.
   // 87,766 -> 87,777 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are smaller (294,158); the case files' hashed names in its import list changed with the moods written on their scenes. Measured 294,158 / 87,773 in the e2e build, the gzip plus 4.
   // 87,777 -> 87,786 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the raw bytes are the same 294,158; the case files' hashed names in its import list. Measured 294,158 / 87,782 in the e2e build, the gzip plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_786 },
+  // 87,786 -> 87,781 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 294,158; the case files' hashed names in its import list (#460). Measured 294,158 / 87,777 in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_781 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -346,7 +348,8 @@ const budgets = [
   // 191,573 / 69,178 -> 191,573 / 69,174 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,170 in the e2e build, the plus 4.
   // 69,958 -> 69,965 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the raw bytes are the same 193,408; the case files' hashed names in the entry's import list shifted with the trimmed case copy (#456, #457). Measured 193,408 / 69,961 in the e2e build, the gzip plus 4.
   // 191,573 / 69,174 -> 191,573 / 69,176 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,172 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 193_412, maxGzip: 69_965 },
+  // 69,965 -> 69,957 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 193,408; the case files' hashed names in the entry's import list (#460). Measured 193,408 / 69,953 in the e2e build, the gzip plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 193_412, maxGzip: 69_957 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -561,7 +564,8 @@ const budgets = [
   // 48,936 / 16,122 -> 50,079 / 16,401 on 2026-10-26, 영어판 3단계: the ending sequence, the three twists, the verdicts and afterglows and 「당신의 세 장면」 read by key (src/copy/ending.js), and the forecast's 「유지」 from the report's table. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 50,213 / 16,456 -> 50,356 / 16,517 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 50,352 / 16,513 in the e2e build, the plus 4.
   // 50,079 / 16,401 -> 50,213 / 16,456 on 2026-11-02, locale-gaps (#393) over main 9be94346: the habit names and lines (src/copy/habits.js) and the one-word analyst line (endingCopy.getAnalystName). Measured 50,209 / 16,452 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_356, maxGzip: 16_517 },
+  // 50,356 / 16,517 -> 50,360 / 16,524 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): no code changed here (raw 50,356 as before); the chunk names it imports shifted with the trimmed case copy (#456, #457, #460). Measured 50,356 / 16,520 in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_360, maxGzip: 16_524 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
@@ -1368,7 +1372,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 430,390 / 487,123 / 494,315 -> 430,387 / 487,119 / 494,312 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,383 / 487,115 / 494,308 in the e2e build, the plus 4.
 // 431,496 / 488,234 / 495,428 -> 431,500 / 488,226 / 495,421 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the lines above together over the trimmed case copy (#456, #457), the two acid glows at 0.1 in the index CSS. Measured 431,496 / 488,222 / 495,417 in the e2e build, the plus 4.
 // 430,387 / 487,119 / 494,312 -> 430,391 / 487,113 / 494,306 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,387 / 487,109 / 494,302 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 431_500, en: 488_226, ja: 495_421 };
+// 431,500 / 488,226 / 495,421 -> 431,491 / 488,208 / 495,402 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the lines above together over the trimmed case copy (#456, #457, #460); the entry and the en/ja dictionaries name the renamed case chunks. Measured 431,487 / 488,204 / 495,398 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 431_491, en: 488_208, ja: 495_402 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
