@@ -368,6 +368,10 @@ export function useChoiceCommit(context) {
     // none for a window walked away from or resumed from a save without a trail.
     const replay = recordClosedWindow(closedWindow);
     if (replay) entryBase.replay = replay;
+    // The draft taken before this window (C9): its seed, pool, offers, picks and
+    // cost, for the server to draw again (rankingRecheck.js `recheckRelicDraft`).
+    // The window settling here is where the run lets it go.
+    if (gauntletRun?.relicDraft) entryBase.relicDraft = gauntletRun.relicDraft;
     const entry = { ...entryBase, observerTag: getObserverTag(entryBase) };
 
     const nextLog = [...log, entry];

@@ -133,6 +133,7 @@ const budgets = [
   // 54,765 -> 54,772 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the raw bytes are the same 148,130; the chunk names it imports shifted with the trimmed case copy (#456, #457). Measured 148,130 / 54,768 in the e2e build, the gzip plus 4.
   // 54,772 -> 54,771 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 148,130; the chunk names it imports (#460). Measured 148,130 / 54,767 in the e2e build, the gzip plus 4.
   // 148,514 / 54,956 -> 148,622 / 54,994 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 148,618 / 54,990 in the e2e build, the plus 4.
+  // 146,589 / 54,099 -> 146,633 / 54,110 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the case-closing decision records its relic draft (useChoiceCommit) and the runtime carries seasonSpent with the run. Measured 146,629 / 54,106 in the e2e build, the plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_622, maxGzip: 54_994 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -1052,6 +1053,7 @@ const budgets = [
   // 44,132 / 16,529 -> 44,704 / 16,734 on 2026-11-03, #320 c3-c4-rules merged with #224 c55d71e1 (main 465ccb93): C-3's direction streak beside #224's settlement and main's run lines. Measured 44,704 / 16,730 in the e2e build, the gzip plus 4.
   // 44,896 / 16,998 -> 45,465 / 17,217 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 45,465 / 17,213 in the e2e build, the gzip plus 4.
   // 44,131 / 16,529 -> 45,469 / 17,220 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 45,465 / 17,216 in the e2e build, the plus 4.
+  // 44,131 / 16,529 -> 45,193 / 16,847 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode. Measured 45,189 / 16,843 in the e2e build, the plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 45_469, maxGzip: 17_220 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for

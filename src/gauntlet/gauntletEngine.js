@@ -1,7 +1,7 @@
 import { clamp, isResourceGain } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
 import { advanceLogic, getHeatTier, getLogicBonus, getLogicDirection, LOGIC_DIRECTIONS, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
-import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE, RELIC_SLOTS } from "./relics.js";
+import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_EXTRA_COST, RELIC_OFFER_SIZE, RELIC_REROLL_COST, RELIC_SLOTS } from "./relics.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -832,12 +832,19 @@ export const RUN_INITIAL_STATE = Object.freeze({
   lastChange: 0,
   seasonGained: 0,
   seasonLost: 0,
+  // What the season has paid out of the vault at its drafts (a reroll, one
+  // more relic): neither won nor lost, and the vault is that much less.
+  seasonSpent: 0,
   // The logic streak (`advanceLogic`); a save from before it reads as this.
   logic: LOGIC_INITIAL,
   // The relics this season carries, the three a closed case is offering, and
   // whether INSURANCE has already paid out in this case.
   relics: [],
   relicOffer: [],
+  // The draft on the table, as the server reads it again (`normalizeRelicDraft`):
+  // set when a closed case draws its offer, written onto the next decision's
+  // log entry, and gone once that window settles.
+  relicDraft: null,
   insuranceSpent: false,
   // Set while a case that already closed is being played again: the table
   // record as it stood when the replay opened. See `openCaseRun`.
@@ -938,6 +945,7 @@ function normalizePractice(value) {
     handVault: clamp(Math.round(Number(value.handVault) || 0), 0, vault),
     relics: normalizeRelicIds(value.relics),
     relicOffer: normalizeRelicIds(value.relicOffer, RELIC_OFFER_SIZE),
+    relicDraft: normalizeRelicDraft(value.relicDraft),
     stanceMastery: normalizeStanceMastery(value.stanceMastery),
     bestMultiplier: clamp(Number(value.bestMultiplier) || 1, 1, 512),
     // The links the next real case is owed (B2), held while a closed case is played again.
@@ -951,7 +959,7 @@ function normalizePractice(value) {
 export function normalizeRunState(value) {
   const source = isRecord(value) ? upgradeRunRecord(value) : {};
   const run = { ...RUN_INITIAL_STATE };
-  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "bestFocusCombo", "focusHits", "runHand", "handVault", "lastChange", "seasonGained", "seasonLost"]) {
+  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "bestFocusCombo", "focusHits", "runHand", "handVault", "lastChange", "seasonGained", "seasonLost", "seasonSpent"]) {
     // A value the save does not hold, or holds as null, takes the default:
     // `Number(null)` is 0, which is finite, and used to be taken as written.
     if (source[key] === null || source[key] === undefined) continue;
@@ -978,9 +986,11 @@ export function normalizeRunState(value) {
   const counted = source.seasonGained !== null && source.seasonGained !== undefined;
   run.seasonGained = counted ? Math.max(0, Math.round(run.seasonGained)) : run.runPot + run.vault;
   run.seasonLost = Math.max(0, Math.round(run.seasonLost));
+  run.seasonSpent = Math.max(0, Math.round(run.seasonSpent));
   run.logic = normalizeLogic(source.logic);
   run.relics = normalizeRelicIds(source.relics);
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
+  run.relicDraft = normalizeRelicDraft(source.relicDraft);
   run.insuranceSpent = source.insuranceSpent === true;
   run.practice = normalizePractice(source.practice);
   run.veteran = source.veteran === true;
@@ -1194,6 +1204,49 @@ export function getBoardMark(schema) {
   return mutations.includes(BREATHER_MARK) ? BREATHER_MARK : mutations.includes(PEAK_MARK) ? PEAK_MARK : null;
 }
 
+/**
+ * The draft as the log keeps it (C9): the seed its three were drawn from, the
+ * pool and the relics held at the draw (what `drawRelicOffer` read), the three,
+ * the three a reroll drew instead, whether one more was bought, the relics
+ * taken in order, and what the draft cost. Everything the server needs to draw
+ * the offer again and price it; null for anything that is not one.
+ */
+export function normalizeRelicDraft(value) {
+  if (!isRecord(value) || (typeof value.seed !== "string" && typeof value.seed !== "number")) return null;
+  const seed = String(value.seed).slice(0, 200);
+  if (!seed) return null;
+  return {
+    seed,
+    pool: normalizeRelicIds(value.pool),
+    owned: normalizeRelicIds(value.owned),
+    offer: normalizeRelicIds(value.offer, RELIC_OFFER_SIZE),
+    reroll: isRecord(value.reroll) ? { offer: normalizeRelicIds(value.reroll.offer, RELIC_OFFER_SIZE) } : null,
+    extra: value.extra === true,
+    picked: normalizeRelicIds(value.picked, 2),
+    cost: Math.max(0, Math.round(Number(value.cost) || 0)),
+  };
+}
+
+/** The seed a draft's one reroll is drawn from: fixed by the draft's own, so a reload draws the same three. */
+export const getRerollSeed = (seed) => `${seed}:reroll:1`;
+
+/** What a draft of this shape costs: the reroll and the one more, each once. */
+export const getRelicDraftCost = (draft) => (draft?.reroll ? RELIC_REROLL_COST : 0) + (draft?.extra ? RELIC_EXTRA_COST : 0);
+
+/**
+ * A closed case's offer and the draft record that goes with it: the three
+ * `drawRelicOffer` deals from `pool` for `seed`, less the relics `owned`. No
+ * draft when nothing is left to offer.
+ */
+export function openRelicDraft(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
+  const offer = drawRelicOffer(seed, pool, owned);
+  if (!offer.length) return { relicOffer: [], relicDraft: null };
+  return {
+    relicOffer: offer,
+    relicDraft: normalizeRelicDraft({ seed: String(seed), pool: normalizeRelicIds(pool), owned, offer, reroll: null, extra: false, picked: [], cost: 0 }),
+  };
+}
+
 /** Three relics for a closed case, seeded by its last window so a reload cannot reroll them. */
 export function drawRelicOffer(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
   return normalizeRelicIds(pool)
@@ -1260,7 +1313,68 @@ export function equipRelic(run, relicId = null, dropId = null) {
   const relics = !picked ? current.relics : dropped ? current.relics.map((id) => (id === dropped ? picked : id)) : [...current.relics, picked];
   const board = dropped ? redealWithout(current.schema, relics, current) : current.schema;
   const passed = relicId === null && current.relicOffer.length > 0;
-  return normalizeRunState({ ...current, relics, relicOffer: [], schema: passed ? applyBreather(board) : applyRelics(board, relics) });
+  // The draft's record takes the pick (C9). A draft that bought one more keeps
+  // the other two on the table after the first pick, for a second; a pass ends it.
+  const draft = current.relicDraft && picked ? { ...current.relicDraft, picked: [...current.relicDraft.picked, picked] } : current.relicDraft;
+  const more = Boolean(picked && draft?.extra && draft.picked.length < 2);
+  const relicOffer = more ? current.relicOffer.filter((id) => id !== picked) : [];
+  // A pass is 「숨 고르기」 (C-7) only on a draft nothing was bought at: a run that
+  // paid for 「하나 더」 and then passes (the second pick, or the whole draft) made
+  // a choice, and its board is dealt as any take's (2026-11-05 decision).
+  const breather = passed && !current.relicDraft?.extra;
+  return normalizeRunState({ ...current, relics, relicOffer, relicDraft: draft, schema: breather ? applyBreather(board) : applyRelics(board, relics) });
+}
+
+/**
+ * Whether the run can pay at the draft on its table (C9 decision 3 (1)): a
+ * season's own case or a NEW GAME+ one, never a replay (its vault is lent) or
+ * a story case (its wall is not the season's). A week's rule is no bar
+ * (decision 4 (1)). Each spend also needs the vault to hold its price.
+ */
+function canSpendAtDraft(run) {
+  return Boolean(run.relicDraft) && run.relicOffer.length > 0 && !run.practice && !run.story;
+}
+
+/** The run with `cost` paid out of the vault: the bank rail's 방금 and the season's spent column say so. */
+function payFromVault(run, cost, draft) {
+  const vault = run.vault - cost;
+  return {
+    ...run,
+    vault,
+    handVault: Math.min(run.handVault, vault),
+    seasonSpent: run.seasonSpent + cost,
+    lastChange: -cost,
+    relicDraft: { ...draft, cost: draft.cost + cost },
+  };
+}
+
+/**
+ * The draft's three drawn again, for RELIC_REROLL_COST out of the vault: once a
+ * draft, before anything is taken from it, from the draft's own seed and pool
+ * (`getRerollSeed`), so a reload or the server draws the same three. Nothing
+ * else moves -- the pot, the wall, the gauge and the board on the table are as
+ * they were. A run that may not pay, or cannot, comes back as it was.
+ */
+export function rerollRelicOffer(run) {
+  const current = normalizeRunState(run);
+  const draft = current.relicDraft;
+  if (!canSpendAtDraft(current) || draft.reroll || draft.picked.length || current.vault < RELIC_REROLL_COST) return current;
+  const offer = drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned);
+  if (!offer.length) return current;
+  return normalizeRunState({ ...payFromVault(current, RELIC_REROLL_COST, { ...draft, reroll: { offer } }), relicOffer: offer });
+}
+
+/**
+ * One more relic out of the three on the table, for RELIC_EXTRA_COST out of the
+ * vault: once a draft, before the first is taken, with two or more still
+ * offered. The first pick then leaves the other two for a second one
+ * (`equipRelic`); the slots' cap and the swap are as for any take.
+ */
+export function buyExtraRelic(run) {
+  const current = normalizeRunState(run);
+  const draft = current.relicDraft;
+  if (!canSpendAtDraft(current) || draft.extra || draft.picked.length || current.relicOffer.length < 2 || current.vault < RELIC_EXTRA_COST) return current;
+  return normalizeRunState(payFromVault(current, RELIC_EXTRA_COST, { ...draft, extra: true }));
 }
 
 /** What a practice run borrowed, handed back. */
@@ -1307,6 +1421,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
         handVault: current.handVault,
         relics: current.relics,
         relicOffer: offer,
+        relicDraft: current.relicDraft,
         stanceMastery: current.stanceMastery,
         bestMultiplier: current.bestMultiplier,
         logic: current.logic,
@@ -1331,6 +1446,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
     insuranceSpent: false,
     practice,
     relicOffer: practice ? [] : offer,
+    relicDraft: practice ? null : current.relicDraft,
     schema: rebooted
       ? current.schema
       : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics), rules),
@@ -1669,9 +1785,12 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     ...(audited?.spared ? ["auditContact"] : []),
     ...nextMutations.map((mutation) => mutation.softenedBy).filter(Boolean),
   ];
-  const relicOffer = practice
-    ? practice.relicOffer
-    : caseClosed && offerRelics && nextRules.has("relics") ? drawRelicOffer(window?.seed ?? current.windowIndex, relicPool, relics) : [];
+  // The draft this close deals (`openRelicDraft`); the one the run held before
+  // this window was written onto its log entry (useChoiceCommit) and goes.
+  const drafted = practice
+    ? { relicOffer: practice.relicOffer, relicDraft: practice.relicDraft }
+    : caseClosed && offerRelics && nextRules.has("relics") ? openRelicDraft(window?.seed ?? current.windowIndex, relicPool, relics) : { relicOffer: [], relicDraft: null };
+  const relicOffer = drafted.relicOffer;
   const verdict = {
     outcome,
     cause,
@@ -1762,9 +1881,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     lastChange: won - taken,
     seasonGained: current.seasonGained + (current.practice ? 0 : won),
     seasonLost: current.seasonLost + (current.practice ? 0 : taken),
+    seasonSpent: current.seasonSpent,
     logic: streak.logic,
     relics,
     relicOffer,
+    relicDraft: drafted.relicDraft,
     insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
     schema: nextSchema,
   };
@@ -2079,6 +2200,8 @@ export function createCaseClose(run) {
   return {
     practiceWindows: state.practiceWindows,
     relicOffer: [...state.relicOffer],
+    // What the season has paid at its drafts so far (C9); the case's own draft is on its log.
+    seasonSpent: state.seasonSpent,
     linksOut: state.linksOut.map((link) => ({ ...link })),
     ...(state.open ? { open: state.open } : null),
   };

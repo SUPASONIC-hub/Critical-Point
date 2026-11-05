@@ -43,6 +43,7 @@ import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
   BUST_EFFECT,
+  buyExtraRelic,
   createCaseClose,
   createRunSummary,
   createWindow,
@@ -57,6 +58,7 @@ import {
   HAND_CAP,
   openCaseRun,
   reduceWindow,
+  rerollRelicOffer,
   resolveWindow,
   RUN_INITIAL_STATE,
   STANCE_CHARGE,
@@ -114,6 +116,19 @@ export function takeIntoSlots(run, taken, tools = null) {
   const weakest = tools?.weakest?.([...run.relics, taken]) ?? [...run.relics, taken].reduce((low, id) => (rank(id) < rank(low) ? id : low));
   tools?.swapped?.(taken, weakest);
   return weakest === taken ? equipRelic(run, null) : equipRelic(run, taken, weakest);
+}
+
+/**
+ * What a `spend` policy pays for at a draft (createSeasonBot's `spend`; the
+ * pressure report's draft rows read it too): the reroll, one more, both, or
+ * -- "early" -- each only while the slots have room for what it brings.
+ */
+export function spendsAt(spend, run) {
+  const room = RELIC_SLOTS - run.relics.length;
+  return {
+    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1),
+    extra: spend === "extra" || spend === "always" || (spend === "early" && room >= 2),
+  };
 }
 
 /** How a card reads to a player who values these axes. Costs are negative. */
@@ -260,8 +275,15 @@ export const AUDIT_VALUES = (() => {
  * `reads` it reads each briefing to the end first and logs the page's seconds
  * and clock as the page does (`readSec`, `readClock`, 2026-11-03), without it
  * it opens the table at once and logs no page. The stream draws as before.
+ * `spend` is what the player pays for at each draft (C9): "never" (the
+ * default, and every report measured before it), "reroll" (the one reroll,
+ * whenever the vault holds its price), "extra" (one more relic, likewise),
+ * "always" (both, the reroll first), or "early" (both, but only while the
+ * slots have room: the reroll with a slot free, one more with two). A spend
+ * draws nothing; the second pick of a draft that bought one more draws as the
+ * first does.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false, spend = "never" }) {
   const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (!story && stamped ? { weekRule: stamped } : {});
   let seed = start;
@@ -419,6 +441,13 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       const rules = playedRules(getTableRules(caseId, run, staged));
       const nextCaseRules = playedRules(getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged));
       run = openCaseRun(run, { rules, caseId, resources });
+      // The draft the case before closed on, answered at this case's first
+      // table, after it opened -- where the page holds it (GauntletStage).
+      if (run.relicOffer.length) run = takeDraft(run, tools);
+      // The tools held as an act closes (C-7), noted once its closing draft is answered here (C9 answers it at this case's open):
+      // a season's end has swapped its way to the strongest, its first acts not yet.
+      const closedCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
+      if (RELICS_HELD_AT.includes(closedCaseId)) relicsAt[closedCaseId] = [...run.relics];
       let audit = 0;
       // B2, CASCADE_ON only: the case's links off its own log (cascadeRisk.js).
       let linkLog = [];
@@ -525,6 +554,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           resourcesAfter,
           challenge: { matched: read.challengeMatch, riskDelta: read.riskDelta },
           ...(run.story ? { assistStory: true } : {}),
+          // The draft taken before this window, as useChoiceCommit writes it (C9).
+          ...(run.relicDraft ? { relicDraft: run.relicDraft } : {}),
           threshold: {
             busted,
             potMultiplier: verdict.multiplier,
@@ -552,9 +583,6 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           caseLogs[caseId] = log;
           caseDynamics[caseId] = { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec };
           casePeaks.push(summary.peakRiskPressure);
-          if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
-          // The tools held as an act closes (C-7): a season's end has swapped its way to the strongest, its first acts not yet.
-          if (RELICS_HELD_AT.includes(caseId)) relicsAt[caseId] = [...run.relics];
           if (caseId === "final") final = { resources, log };
         }
         nodeId = nextNode;
@@ -574,6 +602,17 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * (the streak's own rule, gauntlet/logicStreak.js). When its direction is
    * not on the table it takes what is.
    */
+  /** A draft answered: what `spend` pays for, then a pick (two when one more was bought). */
+  function takeDraft(start, tools) {
+    let run = start;
+    const { reroll, extra } = spendsAt(spend, run);
+    if (reroll) run = rerollRelicOffer(run);
+    if (extra) run = buyExtraRelic(run);
+    run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+    if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+    return run;
+  }
+
   function pickByType(policy, cards, logic) {
     const held = logic.type ?? policy.holds;
     const leave = policy.logicHand === "switch" && logic.rose;
