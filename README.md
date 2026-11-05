@@ -997,7 +997,9 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    `bump_rate_limit`이 셉니다. 텔레메트리는 (주소, 세션)마다 시간당 240건, 주소마다 1,200건이고, 바이트로는
    주소마다 하루 32MB(`telemetry_address_daily_bytes`), 모두 합쳐 하루 200MB(`telemetry_daily_bytes`)
    입니다. 괄호 안은 `private_settings`의 이름으로, 마이그레이션 없이 바꿀 수 있습니다. 주소 한도가 전체
-   한도보다 먼저 닿으므로 한 주소가 다른 플레이어의 하루치를 다 쓰지 못합니다.
+   한도보다 먼저 닿으므로 한 주소가 다른 플레이어의 하루치를 다 쓰지 못합니다. 모두 합친 두 한도(텔레메트리 바이트, 온라인 저장 새 코드)는
+   `Funnel`(22:10 KST)과 `Board Reports`(09:10 KST)가 하루 두 번 읽어 Job Summary에 남기고, 80%를 넘으면 예약 실행이
+   실패합니다(`scripts/report-budgets.mjs`). 요약에는 수만 들어갑니다.
 7. 텔레메트리 행은 만들어질 때 한 번 받은 `event_id`(`src/state/telemetryEventId.js`)를 재시도에도 그대로
    씁니다. `event_id`는 유니크이고, 클라이언트는 평범한 POST를 보내 유니크 위반(`409`, 코드 `23505`)만 전달 완료로
    셉니다(`on_conflict`는 `event_id`에 대한 SELECT 권한이 필요해서 쓰지 않습니다). 다른 이유의 `409`는 실패입니다. 피드백 행은
@@ -1009,8 +1011,9 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    접근합니다. 행은 코드의 SHA-256으로 저장되고, `saved_at`은 `now()`를 넘지 못하며, 기기 사이의 순서는
    서버의 `revision`으로 정합니다(시각이 아님). 충돌은 플레이어가 고를 때까지 유지되고, 패널에서 서버 사본을
    지울 수 있으며(`delete_cloud_save`), 마지막 업로드 후 180일이 지나면 만료됩니다. 쓰기는 코드마다 시간당 240번·주소마다 600번, 읽기는
-   주소마다 시간당 120번까지입니다. 새 코드는 주소마다 하루 5개, 모두 합쳐 하루 1,000개(`cloud_daily_new_codes`)까지
-   만들 수 있고, 넘으면 새 코드만 거절되고 이미 있는 코드의 저장은 계속됩니다.
+   주소마다 시간당 120번까지입니다. 새 코드는 주소마다 하루 5개, 모두 합쳐 하루 3,000개(`cloud_daily_new_codes`, 2026-11-03에 1,000에서 올림)까지
+   만들 수 있고, 넘으면 새 코드만 거절되고 이미 있는 코드의 저장은 계속됩니다. 클라이언트 주소가 오지 않은 요청은
+   모두 `unknown` 한 키로 묶여 주소 하나의 한도를 함께 씁니다(닫힌 쪽으로 실패).
 9. `free_text_analyses` 테이블은 기록으로만 남아 있고 서비스 롤만 접근합니다. 게임은 여기에 쓰지 않습니다.
 
 공개 플레이테스트가 아니라면 전용 프로젝트를 쓰고 키를 주기적으로 교체하십시오. 스테이징은 별도
@@ -1177,7 +1180,7 @@ node scripts/check-migration-drift.mjs --from list.json
 | 호스팅은 받은 커밋을 그대로 배포한다 | Render의 자동 배포를 끄고, `Verify`가 초록인 커밋만 deploy hook으로 배포하게 했다. 배포 뒤에는 운영 페이지의 `build-sha`를 다시 읽어 확인하게 했다 | 검사를 통과하지 않은 코드는 운영에 닿지 않는다 |
 | 무료 대역폭과 느린 폰 | 첫 화면을 429,243바이트(예산 429,247)로 맞췄고, 영어·일본어 첫 화면도 언어마다 예산을 둔다. 진입 청크, 플레이 화면, 쉰다섯 사건은 각자 예산이 있는 청크로 나눠 필요할 때만 받게 했다. 한글 글꼴은 쓰는 글자만 남긴 부분 집합으로 줄였고, 첫 화면 CSS는 생성하게 했으며, 서비스 워커로 오프라인에서도 열리게 했다 | 청크 예산 23종을 PR마다 CI가 바이트 단위로 지킨다. 예산은 올리기 전에 먼저 줄이고 떼어 낸다 |
 | Supabase 무료 DB 500MB, Edge Function 없이 공개 anon 키만 쓴다 | 서버 검증을 Postgres 안에 두었다. 삽입 검증 트리거, 행 수준 보안, 시간당·일별 요청 한도, 하루 200MB 텔레메트리 바이트 상한, pg_cron 보존 기간 정리가 그것이다. 무거운 집계는 스냅숏 함수로 미리 계산하게 했다(장면 BUST 비율) | 공개 키 하나로 랭킹, 기기 간 저장, 통계를 열어도 DB가 넘치지 않고 남의 행을 바꿀 수 없다 |
-| 병합하면 스키마가 1분 안에 운영 DB에 적용된다 | 스키마는 마이그레이션 파일로만 바꾸게 했고, 매일 운영 이력과 대조하는 Migration Drift를 두었다 | 마이그레이션 54개, 저장소와 운영이 어긋나면 빨간불과 이슈가 뜬다 |
+| 병합하면 스키마가 1분 안에 운영 DB에 적용된다 | 스키마는 마이그레이션 파일로만 바꾸게 했고, 매일 운영 이력과 대조하는 Migration Drift를 두었다 | 마이그레이션 55개, 저장소와 운영이 어긋나면 빨간불과 이슈가 뜬다 |
 | QA 팀이 없다 | 정적 검사 28개, 유닛 테스트 1,806개, 브라우저 e2e와 기준 화면 비교를 두었고, 문서가 인용하는 숫자까지 코드로 계산해 대조하게 했다 | 지키기로 한 것은 사람의 기억이 아니라 검사가 지킨다 |
 
 저는 무료 플랜의 한계를 그대로 이 구조의 장점으로 바꿨습니다. 서버가 없으니 서버가 죽을 일이 없고, 바이트를 세니 폰에서 빠르며, 검증이 데이터베이스 안에 있으니 클라이언트를 고쳐도 규칙은 그대로입니다.
@@ -1381,7 +1384,7 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 | `/manifest.webmanifest` | `Content-Type` | `application/manifest+json` |
 | `/*` | `X-Content-Type-Options` | `nosniff` |
 | `/*` | `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `/*` | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains` |
+| `/*` | `Strict-Transport-Security` | `max-age=315360000; includeSubDomains; preload` |
 | `/*` | `Cross-Origin-Opener-Policy` | `same-origin` |
 | `/assets/*` | `Cross-Origin-Resource-Policy` | `same-origin` |
 | `/*` | `Permissions-Policy` | `render.yaml`의 값 |
@@ -1393,9 +1396,9 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을
 하나씩(`.webp`, `og:image`의 `.jpg`, 아이콘) 읽고, 빠진 규칙마다 경고합니다.
 
-`Strict-Transport-Security`는 표의 값과 운영이 내보내는 값이 다릅니다. 2026-10-12에 운영이 실제로 내보낸 값은
-`max-age=315360000; includeSubdomains; preload`였습니다. 대시보드 규칙에서 오는지 Render가 직접 넣는지는
-확인하지 못했습니다. `check:deploy`는 1년 이상이면 통과시키므로 이 차이를 알리지 않습니다.
+`Strict-Transport-Security`와 CSP의 `connect-src`는 2026-11-03부터 운영이 실제로 내보내는 값과 같습니다(`curl -sI`로
+확인). HSTS는 10년·하위 도메인·preload이고, `connect-src`는 이 프로젝트의 Supabase 호스트 하나입니다. 그 전에는 파일이
+더 느슨하게(2년, `*.supabase.co`) 적혀 있어서, 대시보드를 이 표대로 다시 채우면 헤더가 약해질 수 있었습니다.
 
 배포를 거는 것은 `.github/workflows/deploy.yml`입니다. Render 대시보드 → 서비스 → Settings → Deploy
 Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으면, `Verify`(e2e 포함)가 초록으로 끝난
