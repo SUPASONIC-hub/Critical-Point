@@ -1573,10 +1573,10 @@ Still open, on purpose:
     writes (priority 59), puts are limited to 240 an hour per code and 600 per
     address, reads to 120 an hour per address, a payload to 400,000 bytes of
     `save` and `settledWindows`, and an address to five new codes a day
-    (1,000 a day for everyone). Telemetry has a byte budget as well as a row
+    (3,000 a day for everyone since #425; a request without a client address counts under the one key `unknown`). Telemetry has a byte budget as well as a row
     count: 32 MB a day for one address, charged by a trigger of its own that
     fires after the validator, and 200 MB a day for everyone. There
-    are 45 migrations and eight tables. `check:grants` also fails on a
+    are 56 migrations and 13 tables. `check:grants` also fails on a
     SECURITY DEFINER function that does not pin `search_path` and on a view
     without `security_invoker`. The Migration Drift workflow compares the
     live project's migration history with `supabase/migrations/` once a day
