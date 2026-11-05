@@ -12,11 +12,10 @@
  * Nothing here is React, and nothing needs a document: without one (a unit
  * test, a server) the mood is still kept and the listeners still told.
  *
- * TODO(mood-music): AdaptiveMusic.jsx에서 onMoodChange(setMusicMood)로 구독 --
- *   the music subscribes here once, where src/components/AdaptiveMusic.jsx is
- *   set up (`setMusicMood` is its export, mood-music ea2e10cf), and may read
- *   `currentMood()` for a table that opened before it woke. A change is a 4-6
- *   second crossfade there, never a jump (#388). Nothing in audio is touched here.
+ * The music subscribes here once, where src/components/AdaptiveMusic.jsx is
+ * set up (`onMoodChange(setMusicMood)`, and `currentMood()` read once for a
+ * table that opened before it woke). A change is a 4-6 second crossfade there,
+ * never a jump (#388). Nothing in audio is touched here.
  */
 export const MOODS = ["neutral", "bright", "tense", "dread", "sorrow"];
 

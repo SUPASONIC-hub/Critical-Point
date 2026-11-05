@@ -3,6 +3,7 @@ import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
 import musicCopy from "../copy/music.js";
 import { fill } from "../locale.js";
+import { currentMood, onMoodChange } from "../mood.js";
 import {
   BUS_LOWPASS_HZ,
   createSceneMode as scoreSceneMode,
@@ -411,6 +412,14 @@ export function setMusicStake(gauge = 0) {
 export function setMusicMood(mood) {
   return setMood(mood, audioRuntime.context?.currentTime ?? -Infinity);
 }
+
+// The page's mood (src/mood.js) is the score's: the table applies the shown
+// scene's mood there (src/state/sceneMood.js), and this subscription, made once
+// as the module loads beside the runtime it feeds, carries every change here.
+// The mood a table applied before this module woke is read once, so a late
+// entry starts in the scene's mood instead of neutral.
+onMoodChange(setMusicMood);
+setMusicMood(currentMood());
 
 function releaseStakeVoices() {
   if (!stakeRuntime.voices) return;

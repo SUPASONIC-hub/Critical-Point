@@ -17,6 +17,7 @@ import {
   setMusicMood,
 } from "../../src/components/musicScore.js";
 import { createTensionDrone, DRONE_FADE_SECONDS, DRONE_FADE_TAU, DRONE_VOICINGS, droneVoicing } from "../../src/gauntlet/tensionDrone.js";
+import { applyMood, currentMood, onMoodChange } from "../../src/mood.js";
 
 const notes = (lead) => lead.filter(Boolean).length;
 const register = (lead) => {
@@ -312,9 +313,37 @@ test("AdaptiveMusic plays the mood's lead and shares the gain across a change; t
   assert.match(music, /strikeLead\(leadLine, crossing \? blend : 1\)/);
   assert.match(music, /if \(crossing\) strikeLead\(oldLine, 1 - blend\)/);
   assert.match(music, /export \{ getMusicMood, MUSIC_MOODS \} from "\.\/musicScore\.js"/);
+  // The page's mood reaches the score through one subscription made as the module loads, and the mood already applied is read once.
+  assert.match(music, /import \{ currentMood, onMoodChange \} from "\.\.\/mood\.js"/);
+  assert.match(music, /^onMoodChange\(setMusicMood\);\n^setMusicMood\(currentMood\(\)\);/m);
   const audio = readFileSync(new URL("../../src/gauntlet/gauntletAudio.js", import.meta.url), "utf8");
   assert.match(audio, /createTensionDrone\(runtime, \{ isMuted: isSoundMuted, level: getSoundLevel, mood: getMusicMood \}\)/);
   const lab = readFileSync(new URL("../../src/dev/musicLab.jsx", import.meta.url), "utf8");
   assert.match(lab, /setMusicMood\(mood\)/);
   assert.match(lab, /startTensionDrone\(\)/);
+});
+
+test("a mood applied on the page (src/mood.js) reaches getMusicMood through that subscription, timed on the context, and the one applied before the music woke is read once", () => {
+  // AdaptiveMusic.jsx is JSX, so the same two lines it runs at load are run here against the same hub and score.
+  const context = fakeContext();
+  const musicSetMood = (mood) => setMusicMood(mood, context.currentTime);
+  try {
+    applyMood("dread");
+    assert.equal(getMusicMood(), "neutral", "before the music wakes the score is untouched");
+    const stop = onMoodChange(musicSetMood);
+    musicSetMood(currentMood());
+    assert.equal(getMusicMood(), "dread", "the mood applied before the music woke is read once");
+    context.advance(3);
+    assert.equal(applyMood("sorrow"), "sorrow");
+    assert.equal(getMusicMood(), "sorrow");
+    assert.deepEqual(moodCrossfade(3), { to: "sorrow", from: "dread", blend: 0 }, "the change is a crossfade from the context's clock, not a jump");
+    applyMood("neutral");
+    assert.equal(getMusicMood(), "neutral", "an untagged scene takes the music back to neutral");
+    stop();
+    applyMood("tense");
+    assert.equal(getMusicMood(), "neutral", "after the unsubscribe the score no longer follows");
+  } finally {
+    applyMood("neutral");
+    setMusicMood("neutral", -Infinity);
+  }
 });
