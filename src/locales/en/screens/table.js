@@ -90,6 +90,7 @@ export default {
     slamAbandon: "You left the table",
     slamWall: "The Wall was at {wall}",
     slamPot: "Stake",
+    slamStill: "The wall showed where the heartbeat stopped.",
     slamCombo: " · Logic Combo {streak}",
     equipped: "Equipped",
     dropped: "· {name} put down",

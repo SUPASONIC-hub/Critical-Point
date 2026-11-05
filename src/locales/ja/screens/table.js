@@ -90,6 +90,7 @@ export default {
     slamAbandon: "テーブルを離れた",
     slamWall: "壁は {wall} にあった",
     slamPot: "賭け金",
+    slamStill: "鼓動が止まった場所に、壁が現れた。",
     slamCombo: " · ロジックコンボ {streak}",
     equipped: "装備",
     dropped: "· {name}を手放した",

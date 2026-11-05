@@ -170,7 +170,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       // The number the stage prints, read here whether the table is live or
       // not: the tick light shows it, and is on screen for as long as it is.
       const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / win.schema.seconds);
-      rate = fxRateStep(rate, fxRateTarget(bpm), delta);
+      rate = fxRateStep(rate, fxRateTarget(bpm, win.status), delta, win.status);
       if (live) {
         if (time >= nextBeat) {
           if (!quiet) playHeartbeat(heat, tier);
@@ -190,7 +190,8 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
         nextBeat = time + 120;
       }
       if (time >= droneAt) {
-        drone.set(live && !quiet ? closeness : 0, win.schema.sedated);
+        // A bust lets the drone down slowly (A2): the room tone fades over 0.6 s, not 0.25.
+        drone.set(live && !quiet ? closeness : 0, win.schema.sedated, win.status === "bust");
         // The score's layers follow the gauge the table shows, never the
         // wall, and a quiet table keeps them out as it keeps the drone out.
         setMusicStake(live && !quiet ? win.gauge : 0);

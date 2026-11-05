@@ -3,7 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, RATE_REST_BPM, RATE_SWEEP_MS, RATE_TOP_BPM } from "../../src/gauntlet/fxVariables.js";
-import { getHeartbeatBpm } from "../../src/gauntlet/gauntletEngine.js";
+import { BASE_SCHEMA, getHeartbeatBpm } from "../../src/gauntlet/gauntletEngine.js";
+import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 
 test("the comfort setting stills the shake and the pulse, and leaves a third of the flash", () => {
   // Trauma at its ceiling, a beat just struck, a bust's flash.
@@ -136,6 +137,62 @@ test("the tick light starts where the pulse is and then only drifts", () => {
   assert.ok(elapsed >= RATE_SWEEP_MS && elapsed <= RATE_SWEEP_MS + 16, `full after ${elapsed}ms`);
 });
 
+/*
+ * The collapse (A2, 2026-11-05): a bust stops the heart on the frame the slam
+ * lands. The tick light goes dark at once rather than drifting down over the
+ * sweep, the number beside the gauge reads "—", the drone is let down over
+ * 0.6 s instead of 0.25 (a slower gain curve and nothing else: no new voice,
+ * no pitch move, nothing summed into the drive), the table stands on its last
+ * frame for a quarter second before it greys, and one line under the pot
+ * says the moment in each language.
+ */
+test("a bust stops the heart: the light goes dark on that frame and the number reads —", () => {
+  for (const bpm of [RATE_REST_BPM, 125, RATE_TOP_BPM]) assert.equal(fxRateTarget(bpm, "bust"), 0, `dark at ${bpm}`);
+  assert.equal(fxRateTarget(125, "live"), 0.5, "a live table reads the pulse as before");
+  assert.equal(fxRateTarget(125), 0.5, "and so does a call that names no status");
+  assert.equal(fxRateStep(1, 0, 16, "bust"), 0, "no drift: dark on the frame");
+  assert.equal(fxRateStep(0.3, 0, 16, "bust"), 0);
+  assert.ok(fxRateStep(1, 0, 16, "live") > 0.9, "a live table still drifts");
+  const win = { status: "bust", gauge: 72, wall: 70, tellOffset: 0, focus: 0, focusMode: "steady", elapsed: 12, schema: { ...BASE_SCHEMA, seconds: 45 } };
+  assert.equal(readTableMeters({ win, schema: win.schema, selectedCard: null }).bpm, "—");
+  assert.equal(typeof readTableMeters({ win: { ...win, status: "live" }, schema: win.schema, selectedCard: null }).bpm, "number");
+});
+
+test("a bust lets the drone down over 0.6 s, through the same gain and nothing new", () => {
+  const audio = readFileSync("src/gauntlet/gauntletAudio.js", "utf8");
+  assert.match(audio, /export const DRONE_FADE_S = 0\.25;/);
+  assert.match(audio, /export const DRONE_STILL_FADE_S = 0\.6;/);
+  const drone = audio.slice(audio.indexOf("set(closeness = 0"), audio.indexOf("      stop() {"));
+  assert.match(drone, /set\(closeness = 0, sedated = false, still = false\) \{/);
+  assert.match(drone, /master\.gain\.setTargetAtTime\(level, now, still \? DRONE_STILL_FADE_S : DRONE_FADE_S\);/, "the fade is the gain's time constant, the level is the same");
+  // The filter and the detune follow as they did: no pitch move on the bust.
+  assert.match(drone, /filter\.frequency\.setTargetAtTime\(120 \+ read \* 1400, now, 0\.3\);/);
+  assert.match(drone, /voices\[2\]\.detune\.setTargetAtTime\(read \* 60, now, 0\.4\);/);
+  assert.equal(drone.split("setTargetAtTime(").length - 1, 3, "three curves, as before: gain, filter, detune");
+  assert.doesNotMatch(drone, /createOscillator\(\)[\s\S]*still|still[\s\S]*createOscillator\(\)/, "no voice is added for the bust");
+  // The frame loop names the bust when it drives the drone.
+  const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
+  assert.match(loop, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated, win\.status === "bust"\);/);
+});
+
+test("the table stands on its last frame for a quarter second before it greys, and the moment has one line", () => {
+  const rule = sheet("play").match(/\.gauntlet-stage\.is-bust \.gx-table \{([^}]*)\}/)?.[1] ?? "";
+  assert.match(rule, /filter: grayscale\(0\.9\) brightness\(0\.6\);/);
+  assert.match(rule, /transition: filter 0\.25s 0\.25s;/, "a quarter second still, then a quarter second to grey");
+  // Reduced motion collapses both quarters with every transition on the page.
+  const reduced = reducedMotionBlock(sheet("responsive"));
+  assert.match(reduced, /transition-duration: 1ms !important;/);
+  assert.match(reduced, /transition-delay: 0s !important;/);
+  // The line: plain text under the pot's pill, with no rule of its own (the
+  // sheet is at its budget; `small` and the inherited paper are the look), in
+  // the three languages.
+  assert.doesNotMatch(sheet("play"), /\.gx-slam small/);
+  assert.match(readFileSync("src/gauntlet/TableNotices.jsx", "utf8"), /<small>\{say\.slamStill\}<\/small>/);
+  assert.match(readFileSync("src/copy/table.js", "utf8"), /slamStill: "심장이 멈춘 자리에서 벽이 드러났다\."/);
+  assert.match(readFileSync("src/locales/en/screens/table.js", "utf8"), /slamStill: "The wall showed where the heartbeat stopped\."/);
+  assert.match(readFileSync("src/locales/ja/screens/table.js", "utf8"), /slamStill: "鼓動が止まった場所に、壁が現れた。"/);
+});
+
 test("the tick light cannot flash, whatever the pulse does", () => {
   const rule = sheet("play").match(/\.gx-gauge-ticks \{([^}]*)\}/)?.[1] ?? "";
   const brightest = Number(rule.match(/opacity: calc\(var\(--gx-rate, 0\) \* ([\d.]+)\);/)?.[1]);
@@ -172,7 +229,7 @@ test("neither setting reaches the tick light or the number", () => {
   const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
   // The pulse is read on every frame, live or not, as the number beside it is.
-  assert.match(frame, /rate = fxRateStep\(rate, fxRateTarget\(bpm\), delta\);/);
+  assert.match(frame, /rate = fxRateStep\(rate, fxRateTarget\(bpm, win\.status\), delta, win\.status\);/);
   assert.match(frame, /write\("--gx-rate", rate\.toFixed\(2\)\);/);
   assert.equal(frame.split('write("--gx-rate",').length - 1, 1, "written once a frame");
   assert.equal(FX_READERS["--gx-rate"], ".gx-gauge-ticks");
@@ -221,7 +278,7 @@ test("the cases where the season rests play a quiet table, and the table is the 
   const fx = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   assert.match(fx, /const calm = quiet \|\| getAccessibility\(\)\.calmEffects;/);
   assert.match(fx, /if \(!quiet\) playHeartbeat\(heat, tier\);/);
-  assert.match(fx, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated\);/);
+  assert.match(fx, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated, win\.status === "bust"\);/);
   assert.match(readFileSync("src/gauntlet/GauntletStage.jsx", "utf8"), /<GauntletFx[^>]*caseId=\{scene\.node\.caseId\}/s);
 
   // Nothing else reads it: the wall, the pot and the verdict of a quiet table are
