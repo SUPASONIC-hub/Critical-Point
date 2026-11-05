@@ -36,6 +36,8 @@ const relicsCopy = {
     reroll: "다시 뽑기 · {cost}",
     extra: "하나 더 · {cost}",
     spendNote: "누르면 KD은행 계좌에서 바로 빠지고, 되돌릴 수 없다.",
+    // Under the note (user decision 2026-11-05, (1)): buying every time dries the vault the ending reads (check:pressure, 11-05: -52% a case against never; only when a slot is open, -3.3%).
+    spendHint: "하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.",
     secondTitle: "하나 더 고르기",
     secondLede: "산 도구 하나를 남은 두 개 중에서 고른다.",
     off: {

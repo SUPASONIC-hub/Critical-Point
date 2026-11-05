@@ -24,6 +24,7 @@ export default {
     reroll: "Reroll · {cost}",
     extra: "One more · {cost}",
     spendNote: "It comes straight out of your KD Bank account and can't be undone.",
+    spendHint: "One more only when a slot is open. Buy every time and the vault runs dry before the ending.",
     secondTitle: "Pick one more tool",
     secondLede: "You bought one more: pick it from the two left.",
     off: {

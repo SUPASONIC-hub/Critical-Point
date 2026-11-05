@@ -51,7 +51,9 @@ export function RelicIcon({ id, size = 14 }) {
  *
  * C9: under the hand, the KD은행 계좌 pays -- 다시 뽑기 (R) and 하나 더 (B),
  * each once, taken out of the vault at the press with no question asked and
- * one line under them saying so. What each says is `readDraftSpend(run)`
+ * two lines under them: the press pays at once, and one more is for a slot
+ * that is open (buying every time dries the vault the ending reads). What
+ * each button says is `readDraftSpend(run)`
  * (draftSpend.js), read here when there is an `onSpend` to pay through: a
  * button that cannot pay stays in its place, `aria-disabled`, with its reason
  * beside it and as its description. A draft that bought one more comes back
@@ -121,6 +123,7 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
             <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={() => onSpend("reroll")} />
             <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={() => onSpend("extra")} />
             <small className="gx-draft-note">{say.spendNote}</small>
+            <small className="gx-draft-note">{say.spendHint}</small>
           </div>
         )}
         <div className="gx-draft-foot">

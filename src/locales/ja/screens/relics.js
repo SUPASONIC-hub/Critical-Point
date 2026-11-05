@@ -24,6 +24,7 @@ export default {
     reroll: "引き直し · {cost}",
     extra: "もう一つ · {cost}",
     spendNote: "押すとKD銀行口座からすぐ引かれ、取り消せない。",
+    spendHint: "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。",
     secondTitle: "もう一つ選ぶ",
     secondLede: "買った一つを、残る二つから選ぶ。",
     off: {

@@ -93,7 +93,7 @@ test("a buy that cannot pay keeps its place, is aria-disabled and says why", () 
   assert.match(buy, /onClick=\{state\.open \? onPress : undefined\}/);
   assert.doesNotMatch(buy, /\sdisabled=/, "not `disabled`: it stays reachable and read");
   assert.match(draft, /\{spend && !swapFor && !spend\.second && \(/);
-  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>/);
+  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">\{say\.spendHint\}<\/small>/);
   // The buys' rules are a sheet of their own (relics.css was every line spent), imported right after the draft's.
   const css = read("src/styles/app/draft-spend.css");
   const order = read("src/styles/app.css");
@@ -109,7 +109,7 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   const reasons = ["practice", "story", "record", "used", "picked", "few", "short"];
   for (const [lang, words] of Object.entries({ ko, en, ja })) {
     for (const key of ["reroll", "extra"]) assert.match(words[key], /\{cost\}/, `${lang} ${key}`);
-    for (const key of ["spendNote", "secondTitle", "secondLede"]) assert.ok(words[key], `${lang} ${key}`);
+    for (const key of ["spendNote", "spendHint", "secondTitle", "secondLede"]) assert.ok(words[key], `${lang} ${key}`);
     assert.deepEqual(Object.keys(words.off).sort(), [...reasons].sort(), lang);
   }
   assert.deepEqual([ko.reroll, en.reroll, ja.reroll], ["다시 뽑기 · {cost}", "Reroll · {cost}", "引き直し · {cost}"]);
@@ -118,4 +118,6 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   assert.match(ko.spendNote, /KD은행 계좌/);
   assert.match(en.spendNote, /KD Bank account/);
   assert.match(ja.spendNote, /KD銀行口座/);
+  // The hint under the note (11-05, (1)): one more only when a slot is open, in the draft's own words (slot / 枠, vault / 金庫).
+  assert.deepEqual([ko.spendHint, en.spendHint, ja.spendHint], ["하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.", "One more only when a slot is open. Buy every time and the vault runs dry before the ending.", "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。"]);
 });
