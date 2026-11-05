@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "p4_start": {
       "title": "Post-Sale Review",
-      "text": "KD Bank, Gangseo Branch. A single sheet sent down from head office lies in front of you. Its title is 'Post-Sale Suitability Review'. Your name is in the assignee box; the reviewer box beside it is empty. The work you did in the credit review office until last week has gone to someone else. Open the door to the banking hall, and the first thing you see, before any customer, is the sales board on the wall. This week’s six windows are listed down the side, each with a number beside it. In 2nd place is Window 4. Its name box reads 'Do Yoonha', and under it are two top-seller stickers. Branch Manager Bae Seungho holds out a paper cup and smiles. 'Head office sent you to review us? This branch hasn’t had a single complaint. Take your time.' He points at the board. 'Almost all of those numbers are Smart Logistics No. 3. It’s the only thing selling these days.'",
+      "text": "A single sheet sent down from head office, titled 'Post-Sale Suitability Review'. Your name is in the assignee box; the reviewer box is empty. Your credit review work has gone to someone else. In 2nd place on the sales board is Window 4, 'Do Yoonha', with two top-seller stickers under it. Branch Manager Bae Seungho holds out a paper cup and smiles. 'This branch hasn’t had a single complaint. Take your time.' He points at the board. 'Almost all of those numbers are Smart Logistics No. 3. It’s the only thing selling these days.'",
       "memo": [
         "Review name: Post-Sale Suitability Review -- 1 assignee",
         "Sales board, 3rd week of May -- Window 4, 192 million won, 2nd",
@@ -38,7 +38,7 @@ export default {
     },
     "p4_window": {
       "title": "3 Minutes",
-      "text": "A seventy-one-year-old customer comes to Window 4 with a matured savings passbook. She is a longtime regular, so Do Yoonha says her name first. What sells at the window is the KD Smart Logistics No. 3 Specified Money Trust. Do Yoonha never once says its name aloud. He looks down at a laminated script in the drawer and speaks. 'Ma’am, it pays a little more than your savings. It goes into one logistics company, and it’s our best seller right now.' The disclosure runs 22 pages; the stack at the window is the first 4. Page 12 has this sentence: if that company falters, this money is subordinated. The signature on the pad takes 3 minutes 12 seconds. Do Yoonha hands back the passbook with both hands and smiles. The hardest part to bear is that there is no lie in that smile.",
+      "text": "A seventy-one-year-old regular comes to Window 4 with a matured savings passbook. The product is the KD Smart Logistics No. 3 Specified Money Trust. Instead of its name, Do Yoonha reads the script in his drawer. 'Ma’am, it pays a little more than your savings.' Of the 22-page disclosure, the window has the first 4. Page 12 says that if the company falters, this money is subordinated. The signature takes 3 minutes 12 seconds. Do Yoonha hands back the passbook with both hands and smiles. The hardest part to bear is that there is no lie in that smile.",
       "memo": [
         "Product disclosure 22 pages -- window copy 4 pages",
         "Page 12: if the company falters, subordinated",
@@ -69,7 +69,7 @@ export default {
     },
     "p4_quota": {
       "title": "The 2nd-Floor Whiteboard",
-      "text": "Lunchtime, the branch’s 2nd-floor meeting room. On the left of the whiteboard is the branch’s May target of 1.2 billion won; on the right, a box for each of the six windows. Boxes that hit target get a circle; boxes that missed keep a name. Windows 3 and 6 kept their names last month too. A printout of the memo that sent the target down lies on the table. Sender: head office, Corporate Finance Strategy Team. Your team. Its title is 'Smart Logistics No. 3 Sales Cooperation', and the approval field at the bottom carries a department name and no person’s name. The attached terms and conditions run 18 pages and never reached the windows. Branch Manager Bae grips a marker and lets it go. 'I didn’t make that target. I just got it and split it six ways.' He smiles briefly. 'If you’re here to talk about mis-selling, my people only followed the script.'",
+      "text": "Lunchtime, the 2nd-floor meeting room. The whiteboard shows the branch’s May target of 1.2 billion won. Of the six window boxes, the ones that missed keep a name, and Windows 3 and 6 have kept theirs two months running. The memo that sent the target down came from your team. Its approval field carries only a department name. The 18 pages of attached terms never reached the windows. Branch Manager Bae grips a marker and lets it go. 'I didn’t make that target. I just got it and split it six ways. If this is about mis-selling, my people only followed the script.'",
       "memo": [
         "May branch target 1.2 billion won -- 200 million won per window",
         "Names of windows under target never erased -- Windows 3 and 6, 2 months running",
@@ -100,7 +100,7 @@ export default {
     },
     "p4_visit": {
       "title": "Next to Gaeul Rice Cake Shop",
-      "text": "Four in the afternoon, Mangwon Market. The shutter of Gaeul Rice Cake Shop is half down, with a note taped to it: 'Gone to Incheon today.' Next door, Shin Youngran of the side-dish shop Handful of Perilla sits you down on her low wooden platform. She is sixty-three and has been in this alley for 19 years. She holds out a passbook. April 28, Window 4, 12 million won. 'They said it was a savings plan. In 2 years I have to raise the deposit on my shop.' She says she can read the product name printed on the passbook and still not know what it means. The cooling-off period ended last week, and redeeming now means a fee. Shin Youngran closes the lid of a kimchi tub. 'That young man is so kind. He lives in the alley right behind here. He buys our kimchi, and every time he asks how my knees are. That’s why everyone took the bus all the way to Gangseo. Would someone like that sell something bad?'",
+      "text": "Mangwon Market. Shin Youngran of the side-dish shop Handful of Perilla sits you down on her low wooden platform. She holds out a passbook. April 28, Window 4, 12 million won. 'They said it was a savings plan. In 2 years I have to raise the deposit on my shop.' The cooling-off period ended last week. Redeeming now means a fee. Shin Youngran closes the lid of a kimchi tub. 'That young man is so kind. Every time he comes he asks how my knees are. Would someone like that sell something bad?'",
       "memo": [
         "Shin Youngran -- Handful of Perilla, joined at Window 4 on April 28, 12 million won",
         "What she thinks she has: 'a savings plan'",
@@ -131,7 +131,7 @@ export default {
     },
     "p4_final": {
       "title": "About Window 4",
-      "text": "Eight in the evening. The shutter is down, and only two rows of fluorescent lights are on in the banking hall. Do Yoonha of Window 4 stays behind alone to close out. He takes a spiral notebook from drawer 4, starts counting something, and meets your eyes. 47 names; beside 31 of them, a one-line note. Matures in June. Son’s tuition in September. Knee surgery in August. Your phone rings. It is Manager Han Seoyun. Review results by 9:00 tomorrow morning, a 20-box form, no blanks. When you hang up, Do Yoonha closes the notebook and asks. 'You’re from head office, so you’d know.' He says it with the same smile. 'It is a good product, right? I told those ladies it was fine.'",
+      "text": "Eight in the evening. With the shutter down, Do Yoonha closes out the banking hall alone. He is counting the spiral notebook from drawer 4. 47 names; beside 31 of them, a one-line note. Manager Han Seoyun calls. Review results by 9:00 tomorrow morning, 20 boxes, no blanks. When you hang up, Do Yoonha closes the notebook. 'You’re from head office, so you’d know.' He asks with the same smile. 'It is a good product, right? I told those ladies it was fine.'",
       "memo": [
         "Window 4 sales: 47 -- 31 customers he knows by name",
         "Review results due: 09:00 next day, 20 boxes",
@@ -159,7 +159,7 @@ export default {
     },
     "p4_aftershock": {
       "title": "The Last Friday in May",
-      "text": "Eleven days later, the evening of the last Friday in May. The Gangseo sales board is wiped and the June targets go up. The branch hit its May target, and Window 4 is No. 1 for the first time. The top-seller stickers under Do Yoonha’s name now number three, and he sends you a photo of himself in front of the board. 'I made No. 1.' No exclamation mark. The review results you filed sit logged and stalled in your team. That afternoon a short memo arrives from Human Resources at head office. Your name is on the list for a transfer order to be announced in July, and the destination box is still empty. Outside it is early summer. The passbooks that left Window 4 sit untouched in their owners’ drawers, and no one has lost anything yet. That is the most frightening part right now.",
+      "text": "Eleven days later, the evening of the last Friday in May. The branch hit its May target, and Window 4 is No. 1 for the first time. Under three top-seller stickers, Do Yoonha sends you a photo. 'I made No. 1.' No exclamation mark. Your review results sit stalled in your team. That same day a memo arrives from Human Resources. Your name is on the list for a transfer order to be announced in July, and the destination box is empty. The passbooks that left Window 4 sit untouched in drawers, and no one has lost anything yet. That is the most frightening part.",
       "memo": [
         "Gangseo May target of 1.2 billion won met -- Window 4 No. 1",
         "Do Yoonha: 3 top-seller stickers",
@@ -183,7 +183,7 @@ export default {
     },
     "p4_ledger": {
       "title": "From April 27",
-      "text": "Before lunch, Do Yoonha prints the sales records for you from the window terminal. Sales began on April 27, the very day the loan was approved. Gangseo Branch sold 213 in 19 days. At the bottom of the screen the unit price is logged once a day, and no one at the windows has ever looked at that line. Of the 213, 47 are Window 4’s. Do Yoonha scrolls the list and reads the names aloud. At the 31st he stops. 'This customer came to my sister’s wedding.' He keeps his eyes on the screen. 'It’s not that I sell well. It’s that this neighborhood knows me.'",
+      "text": "Do Yoonha prints the sales records for you from the window terminal. Sales began on April 27, the very day the loan was approved. Gangseo Branch sold 213 in 19 days, 47 of them at Window 4. No one at the windows has ever looked at the unit-price line at the bottom of the screen. Reading the names aloud, Do Yoonha stops at the 31st. 'This customer came to my sister’s wedding. It’s not that I sell well. It’s that this neighborhood knows me.'",
       "memo": [
         "Sales began April 27 -- the day the loan was approved",
         "Gangseo Branch: 213 in 19 days",
@@ -206,7 +206,7 @@ export default {
     },
     "p4_script": {
       "title": "The 3-Minute Script",
-      "text": "As you leave the meeting room, Branch Manager Bae opens a window drawer to show you. A laminated A4 sheet lines the bottom of the drawer, and all six drawers are the same. The title is 'Smart Logistics No. 3 Sales Guide'. It is one side only and takes 3 minutes to read. The first line is 'Bring it up naturally along with the savings maturity notice.' Bae takes out last month’s mystery shopper report. Gangseo Branch, grade A. There are six criteria, and all six are in the script word for word. 'Follow the script and you get an A. So what did my people do wrong?'",
+      "text": "As you leave the meeting room, Branch Manager Bae opens a window drawer. The same laminated script, 'Smart Logistics No. 3 Sales Guide', lines the bottom of all six drawers. The first line is 'Bring it up naturally along with the savings maturity notice.' Bae takes out last month’s mystery shopper report. Gangseo Branch, grade A. All six criteria are in the script word for word. 'Follow the script and you get an A. So what did my people do wrong?'",
       "memo": [
         "All 6 window drawers: the same laminated script",
         "Script read time 3 minutes -- issued by head office",
@@ -229,7 +229,7 @@ export default {
     },
     "p4_list": {
       "title": "Six People in the Alley",
-      "text": "Shin Youngran makes a few calls from the platform. In 20 minutes, six people gather: the dry cleaner, the fruit seller, the locksmith, the snack bar owner from across the way, and the couple from the dish shop next to the rice-cake shop. All six passbooks carry the same product name. The sign-up dates cluster between April 27 and May 9, and the amounts run from 6 million to 20 million won. All six took the bus to Window 4 to sign up, and all six call it 'something like a savings plan'. The locksmith smiles and asks. 'Is something wrong with it? Then will young Do Yoonha get in trouble?' No one mentions their own money first.",
+      "text": "Shin Youngran makes a few calls, and in 20 minutes six people gather: the dry cleaner, the fruit seller, the locksmith, the snack bar owner, the couple from the dish shop. All six passbooks carry the same product name, and the sign-up dates cluster between April 27 and May 9. All six say they signed up at Window 4 for 'something like a savings plan'. The locksmith smiles and asks. 'Is something wrong with it? Then will young Do Yoonha get in trouble?' No one mentions their own money first.",
       "memo": [
         "6 sign-ups in the alley -- 74 million won in total",
         "Sign-ups concentrated April 27–May 9",
@@ -252,7 +252,7 @@ export default {
     },
     "p4_ledger_reaction": {
       "title": "This Isn’t a Review",
-      "text": "As soon as you get the sales records, Assistant Manager Oh Jinwoo calls. You can tell he is keeping his voice down at his desk at head office. 'That’s not a review. It’s a cleanup. Sending the person who wrote the dissent to check whether sales went well, what do you think that means?' He picks his words for a moment. 'I’m on your side. That’s why I’m telling you: make something big of it there, and no one can say where your seat goes in the summer reshuffle.' Through the receiver comes the sound of a team meeting starting. He adds one last thing. 'The people at the windows did nothing wrong. I know that too. That’s why you need to be more careful.'",
+      "text": "Assistant Manager Oh Jinwoo calls, his voice low. 'That’s not a review. It’s a cleanup. Sending the person who wrote the dissent to check whether sales went well, what do you think that means? I’m on your side. Make something big of it there, and no one can say where your seat goes in the summer reshuffle.' Through the receiver, a team meeting starts. 'The people at the windows did nothing wrong. That’s why you need to be more careful.'",
       "memo": [
         "Oh Jinwoo: 'That’s not a review, it’s a cleanup'",
         "Seat in the summer reshuffle -- no one has decided it yet"
@@ -274,7 +274,7 @@ export default {
     },
     "p4_script_reaction": {
       "title": "4 Pages of 22",
-      "text": "On the branch’s back-door stairs, the first thing you see is a familiar black notebook. It is Investigator Ban Jaewook of Internal Audit. He says his trip overlapped with a scheduled head-office inspection. He lays the 4-page window copy beside the 22-page original. 'Have you seen what the missing pages say? I have. And there is no one to ask why this got so thin.' On the 2023-0412 page of his notebook, under the line with the approval date, he writes today’s date and time. 'An investigator can do this for 17 years and change nothing. So I write things down instead. If someone ever comes looking for this notebook, there will need to be dates.'",
+      "text": "On the branch’s back-door stairs, the first thing you see is a familiar black notebook. It is Investigator Ban Jaewook of Internal Audit. He lays the 4-page window copy beside the 22-page original. 'I have seen what the missing pages say. There is no one to ask why this got so thin.' On the 2023-0412 page of his notebook, he writes today’s date and time. 'An investigator can do this for 17 years and change nothing. So I write things down instead. If someone ever comes looking for this notebook, there will need to be dates.'",
       "memo": [
         "Ban Jaewook’s notebook -- 17 years of writing the date first",
         "Window copy 4 pages / original 22 pages"
@@ -296,7 +296,7 @@ export default {
     },
     "p4_list_reaction": {
       "title": "A Tub of Kimchi",
-      "text": "The people scatter, and Shin Youngran packs one kimchi tub separately. She says it’s for the young man at Window 4. 'He came last week and bought a tub. Said his mother hasn’t had much appetite lately.' She stops tying the bag and looks at you. 'So, what happens to our money?' For the first time, she asks about her own money first. Then she adds right away. 'I mean, if it goes wrong, he won’t have to pay it back, will he? He shouldn’t have to.' The kimchi tub is still in your hands.",
+      "text": "The people scatter, and Shin Youngran packs one kimchi tub separately. She says it’s for the young man at Window 4. She stops tying the bag and looks at you. 'So, what happens to our money?' For the first time, she asks about her own money first. Then she adds right away. 'I mean, if it goes wrong, he won’t have to pay it back, will he? He shouldn’t have to.' The kimchi tub is still in your hands.",
       "memo": [
         "Shin Youngran’s first question: 'What happens to our money'",
         "Second question: 'He won’t have to pay it back, will he'"
@@ -318,7 +318,7 @@ export default {
     },
     "p4_branch_drawer": {
       "title": "Drawer 4",
-      "text": "When you read page 12 together, the next customer puts down the pen, says 'I’ll come back another time,' and leaves. Do Yoonha of Window 4 doesn’t get angry. Instead, in a gap between customers, he calls you behind the window. Drawer 4 opens. The laminated 3-minute script, a bag of peppermint candies, nail clippers, and a spiral notebook. The notebook holds 47 names, and beside 31 of them is a one-line note. 'Rice-cake shop owner -- savings matures in June', 'Dry cleaner -- son’s tuition, September', 'Handful of Perilla lady -- knee surgery, August'. Do Yoonha leaves the notebook open. 'I know what you’re going to say. It looks like a sales tracker. It isn’t, to me.'",
+      "text": "When you read page 12 together, the next customer puts down the pen and leaves. In a gap between customers, Do Yoonha calls you behind the window. Drawer 4 holds the laminated 3-minute script, peppermint candies, nail clippers, and a spiral notebook. Of the 47 names in the notebook, 31 have a one-line note. 'Rice-cake shop owner -- savings matures in June', 'Handful of Perilla lady -- knee surgery, August'. He leaves the notebook open. 'I know what you’re going to say. It looks like a sales tracker. It isn’t, to me.'",
       "memo": [
         "Drawer 4 -- script, candy, spiral notebook",
         "Notebook: 47 names · 31 notes",
@@ -342,7 +342,7 @@ export default {
     },
     "p4_branch_drawer_follow": {
       "title": "Why It Sold",
-      "text": "In the narrow break room behind the windows, Do Yoonha of Window 4 fills a paper cup with water. Unasked, he explains why he is 2nd or 3rd every month. It isn’t because he talks well, he says. 'Do you know why I write these down? So I can call people by name next time. When you call their name, people smile.' He sets the cup down. 'That’s the one thing that got me through 3 years. I didn’t go to a good school and I have no certificates, but I know everyone’s name in that neighborhood.' Then, for the first time, his voice drops. 'I saw you reading page 12 earlier. I’ve never seen that page. I didn’t even know it existed.' He starts to smile and stops. 'You know what I just sold, don’t you?'",
+      "text": "In the break room, Do Yoonha fills a paper cup with water. 'I write them down so I can call people by name next time. When you call their name, people smile. That’s the one thing that got me through 3 years. I didn’t go to a good school and I have no certificates, but I know everyone’s name in that neighborhood.' For the first time, his voice drops. 'I saw you reading page 12 earlier. I’ve never seen that page. I didn’t even know it existed.' He starts to smile and stops. 'You know what I just sold, don’t you?'",
       "memo": [
         "Do Yoonha -- 3rd year, holds 2nd–3rd on the sales board",
         "Sales method: learns names, calls people by name",
@@ -366,7 +366,7 @@ export default {
     },
     "p4_route_system": {
       "title": "In 19 Days",
-      "text": "Instead of stopping at one branch, you ask how much of this product sold nationwide, and Assistant Manager Oh Jinwoo pulls the national sales records from a head-office terminal and sends them. In the 19 days from April 27, 2,140 were sold. The form has no box to mark whether the customer received the full disclosure. No box was ever made, so no one can break the rule. And of the 10 windows that sold the most, 9 missed their sales targets last month. Oh Jinwoo adds one line at the end of the file. 'I didn’t send you this. And the scariest box in this table isn’t a number. It’s the box that isn’t there.'",
+      "text": "You ask about national sales, and Assistant Manager Oh Jinwoo pulls the records from a head-office terminal and sends them. In the 19 days from April 27, 2,140 were sold. The form has no box to mark whether the customer received the full disclosure. No box was ever made, so no one can break the rule. Of the 10 windows that sold the most, 9 missed their targets last month. Oh Jinwoo adds one line. 'I didn’t send you this. The scariest box in this table isn’t a number. It’s the box that isn’t there.'",
       "memo": [
         "2,140 in 19 days · 21.4 billion won",
         "Average buyer age 61 · average consultation 4 min 3 sec",
@@ -393,7 +393,7 @@ export default {
     },
     "p4_final_system_route": {
       "title": "The Box Not on the Form",
-      "text": "Six-thirty in the evening. On the table in the empty consultation room lies a printout of the table Oh Jinwoo sent. Next to the counts for those nineteen days, you have drawn a box in pencil. 'Received the full disclosure.' The table has no such box. One more line from Oh Jinwoo arrives on your phone. 'If you ask for that box, the first question will be who didn’t make it. The sales memo for this product went out from our team.' Out in the banking hall, Do Yoonha of Window 4 is counting the four-page disclosures for tomorrow.",
+      "text": "Six-thirty in the evening. In the empty consultation room, you have drawn a box in pencil beside the table Oh Jinwoo sent. 'Received the full disclosure.' The table has no such box. Oh Jinwoo’s reply arrives. 'If you ask for that box, the first question will be who didn’t make it. The sales memo for this product went out from our team.' Out in the banking hall, Do Yoonha is counting the four-page disclosures for tomorrow.",
       "memo": [
         "National sales 2,140 -- no box confirming disclosure delivery",
         "Sales target memo sender: head office Corporate Finance Strategy Team",
@@ -416,7 +416,7 @@ export default {
     },
     "p4_evidence_turn": {
       "title": "The Hand That Wrote the Script",
-      "text": "When you hold the clue to the script’s file name, the creation record of the file 'Smart Logistics No. 3 Sales Guide' opens. It was made not at Gangseo Branch but by the Corporate Finance Strategy Team at head office, on the day 2023-0412 was approved, two hours after approval. The same night, the same account cut the window copy of the disclosure from 22 pages to 4. Among the dropped sentences is this one: if the debt-to-equity ratio goes above 180%, the bank can call the loan first, and the money in this product goes to the very back of the line. The box for mandatory consultation recording is gone from the window copy too. Investigator Ban Jaewook closes his notebook. 'What was sold was written in two hours, and the people who sold it don’t even know when it was written.'",
+      "text": "When you hold the clue to the script file, its creation record opens. 'Smart Logistics No. 3 Sales Guide' was made by the Corporate Finance Strategy Team at head office, two hours after 2023-0412 was approved. That night, the same account cut the window copy of the disclosure from 22 pages to 4. One dropped sentence says that if the debt-to-equity ratio goes above 180%, the bank calls the loan first, and the money in this product goes to the very back of the line. The box for mandatory consultation recording is gone too. Investigator Ban Jaewook closes his notebook. 'What was sold was written in two hours, and the people who sold it don’t even know when it was written.'",
       "memo": [
         "Script written: head office Corporate Finance Strategy Team account, April 27, 16:05",
         "Same night, window copy 22 pages -> 4 pages",
@@ -440,7 +440,7 @@ export default {
     },
     "p4_start_appeal": {
       "title": "Gangseo, for the One Who Appealed",
-      "text": "You did not let the return stand; you filed an appeal. The request got a receipt number only on May 9, and three days later, on the afternoon of Friday, May 12, the answer came in one line. 'Re: appeal request. No reason to review.' The signature line has a department name and no person’s name. The next Monday morning, you stand in the banking hall of Gangseo Branch. The sheet in your hand is titled 'Post-Sale Suitability Review'. Assistant Manager Oh Jinwoo follows you out to the front of the branch, puts a cigarette in his mouth, then puts it back. 'An answer in three days means nobody read it before answering.' He nods toward the sales board inside the hall. 'Giving this job to the person who appealed, I don’t think that’s a coincidence.' On the board, the Window 4 box carries the name 'Do Yoonha' and two top-seller stickers, and Branch Manager Bae Seungho says almost all of those numbers are 'Smart Logistics No. 3'.",
+      "text": "You filed an appeal. The request got a receipt number only on May 9, and on Friday, May 12, the answer came in one line. 'Re: appeal request. No reason to review.' The next Monday, you stand outside Gangseo Branch holding the 'Post-Sale Suitability Review' order. Assistant Manager Oh Jinwoo puts a cigarette in his mouth, then puts it back. 'An answer in three days means nobody read it. Giving this job to the person who appealed, I don’t think that’s a coincidence.' In 2nd place on the sales board is Window 4, 'Do Yoonha', with two top-seller stickers.",
       "memo": [
         "Appeal result: 'No reason to review' -- three days after receipt",
         "Notice signature line: department name only, no person",
@@ -470,7 +470,7 @@ export default {
     },
     "p4_start_copy": {
       "title": "Gangseo, for the One Who Kept a Copy",
-      "text": "You kept one copy of the returned written opinion. That copy is in the inner pocket of your bag now, and it catches your fingertips every time you open the bag in the banking hall. The word to go down to Gangseo Branch came near quitting time on Friday. The title is 'Post-Sale Suitability Review'; the term, one day. On the subway, Team Head Lim Kyungsoo calls. His voice is low and short. 'Just know where that paper is. Don’t take it out today.' Through the static you hear tape being torn. 'Of the people I know who kept a copy, you’re the second. The first never once took it out in 12 years.' Open the hall door, and on the sales board on the wall, the Window 4 box carries the name 'Do Yoonha' and two top-seller stickers. Branch Manager Bae Seungho says almost all of those numbers are 'Smart Logistics No. 3'.",
+      "text": "You kept one copy of the returned dissent. The one-day 'Post-Sale Suitability Review' was announced near quitting time on Friday. On the subway, Team Head Lim Kyungsoo calls. 'Just know where that paper is. Don’t take it out today.' Through the static you hear tape being torn. 'Of the people who kept a copy, you’re the second. The first never once took it out in 12 years.' In 2nd place on the sales board is Window 4, 'Do Yoonha', with two top-seller stickers.",
       "memo": [
         "1 copy of the written opinion -- inner pocket of the bag",
         "Review notice: near quitting time Friday, term one day",
@@ -500,7 +500,7 @@ export default {
     },
     "p4_start_accept": {
       "title": "Gangseo, for the One Who Accepted",
-      "text": "You accepted the return. You pressed the confirm button, turned around, and opened the next file. 2 weeks later, this job came. The title is 'Post-Sale Suitability Review': one assignee, one day, at Gangseo Branch. Monday morning in the lobby, Manager Han Seoyun hands you a printout of the review order. She looks at your face for a moment. 'This isn’t a punishment. I know it looks like one.' She presses the elevator button and, before the doors close, adds. 'Go and see. You’ll find out there whether what you wrote was right. In the way that hurts most.' An hour later, in the Gangseo banking hall, the Window 4 box on the sales board carries the name 'Do Yoonha' and two top-seller stickers. Branch Manager Bae Seungho says almost all of those numbers are 'Smart Logistics No. 3'.",
+      "text": "You accepted the return and opened the next file. 2 weeks later, this job came: 'Post-Sale Suitability Review', one assignee, one day, at Gangseo Branch. Monday morning in the lobby, Manager Han Seoyun hands you the order. 'This isn’t a punishment. I know it looks like one.' She adds. 'You’ll find out there whether what you wrote was right. In the way that hurts most.' In 2nd place on the sales board is Window 4, 'Do Yoonha', with two top-seller stickers.",
       "memo": [
         "2 weeks after accepting the return -- credit review work reassigned",
         "Review assigned: 1 assignee, one day",
