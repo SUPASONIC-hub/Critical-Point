@@ -330,7 +330,8 @@ const budgets = [
   // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
   // 191,573 / 69,173 -> 191,573 / 69,178 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,174 in the e2e build, the plus 4.
   // 191,573 / 69,178 -> 191,573 / 69,174 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,170 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_174 },
+  // 191,573 / 69,174 -> 191,573 / 69,176 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,172 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_176 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1344,7 +1345,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
 // 430,386 / 487,129 / 494,322 -> 430,390 / 487,123 / 494,315 on 2026-11-05, prose-bundle-a (#394 #399 #400 #401 #403 #405) over main 24af89d7: the trimmed case copy; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,386 / 487,119 / 494,311 in the e2e build, the plus 4.
 // 430,390 / 487,123 / 494,315 -> 430,387 / 487,119 / 494,312 on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): the trimmed case copy of cases 25-39 and 46-48; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,383 / 487,115 / 494,308 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_387, en: 487_119, ja: 494_312 };
+// 430,387 / 487,119 / 494,312 -> 430,391 / 487,113 / 494,306 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,387 / 487,109 / 494,302 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_391, en: 487_113, ja: 494_306 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
