@@ -2683,19 +2683,19 @@
   /* An English page: Stake, Vault and the run's line with Audit n/4
      (RULES_MARK 3) needed 331px of a 310px rail at a pot of 0, so the run's
      line took a row of its own (26px) and a five-card hand's last card went
-     under the action bar (hand5, 2026-10-30). Labels at 10px, pills at 5px a
-     side and 3px between them bring it to 302px. Only the gap between pills
-     is narrowed here; the 2px between the bank's lines above holds. */
+     under the action bar (hand5, 2026-10-30). Pills at 5px a side and 3px
+     between them stay from that fit; the labels' 10px went on 2026-11-05,
+     since Audit n/4 moved to the signals' row below (.gx-hud.has-audit) and
+     the 331px reason went with it. Stake and Vault read 11px like the Korean
+     and Japanese labels (the 9px report, phone-en-stake-9px, choice 1). Only
+     the gap between pills is narrowed here; the 2px between the bank's lines
+     above holds. */
   :lang(en) .gx-bank {
     column-gap: 3px;
   }
 
   :lang(en) .gx-bank .gx-stat {
     padding-inline: 5px;
-  }
-
-  :lang(en) .gx-bank .gx-stat small {
-    font-size: 0.625rem;
   }
 
   /* Audit n/4 (RULES_MARK 3) leaves the run's line for the signals' row, at

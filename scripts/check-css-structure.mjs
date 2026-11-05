@@ -333,6 +333,9 @@ const fileBudgets = {
   // apart from the HUD block that the audit token (#224) adds to.
   // -> 3029 / 58893 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
   // 3029 / 58893 -> 3029 / 58883 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood), measured.
+  // -> 58276 bytes, 2998 lines on 2026-11-05, measured (phone-en-stake-11px over rules-mark-3b 9e91c588): the 360px English
+  // bank rail's 10px label rule went; Audit n/4 sits on the signals' row now, so Stake and Vault read 11px like ko and ja.
+  // 3029 / 58883 -> (re-measured at the bundle's end, 2026-11-05, bundle-rules2): the 11px change takes the 10px rule's lines out.
   "play.css": { lines: 3029, bytes: 58883 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
