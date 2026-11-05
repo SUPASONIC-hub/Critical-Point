@@ -858,6 +858,27 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
 - 내일 첫 순서: #450 → 마이그레이션 #432 → #425 → #434(하나씩 묻고 넣음) → main에서 `check:grants`.
 - 이날 병합 19개(따로 8개, 묶음 셋이 11개를 담음. 묶음 PR #447 #448 #449까지 세면 22개, main `dc26d880`), 운영 build-sha `dc26d880`(18:01 curl), 유닛 테스트 1,758개(`npm test` 실측).
 
+**덧붙임, 2026년 11월 5일.**
+
+- 묶음 1105c(#451, `bundle-1105c`, `3ca15f8d`): 어제 「내일 첫 순서」였던 네 PR을 한 갈래에 차례로 병합해 CI를 한 번만 돌렸다. 마이그레이션 셋은
+  버전 순서(20261103000000 → 010000 → 020000) 그대로 묶음에 들어갔고, 만든 사람이 한 번의 질문에 「(1) 묶음 한 번에 병합」으로 답했다(11-05).
+  #432 갈래의 어제 merge(62a25238, 커밋 전)는 `merge --abort`로 되돌리고 main 3d4183e5를 새로 받았다. 충돌은 README 숫자 줄과 예산 블록뿐, 표시된 부분만 고치고
+  양쪽 주석 줄을 다 두었다. 다섯 merge의 양쪽 부모가 더한 줄이 결과에 다 있는지 줄 단위로 확인(merge-audit 방식): 빠진 것은 다시 잰 숫자 줄뿐.
+  첫 화면 예산 ko / en / ja 429,328 / 486,074 / 493,267(실측 +4), 마이그레이션 56개, 유닛 테스트 1,818개.
+  - 탭 제목(#450, `tab-title-locale`): 영어·일본어로 연 게임의 브라우저 탭 제목이 `index.html`의 한국어 제목으로 돌아가던 것. 시작 화면 문구에 `pageTitle`을 두고
+    `loadLocale()`이 사전을 받은 뒤 첫 그리기 전에 `document.title`을 바꾼다(`setPageTitle`, 유닛 테스트로 덮음). `/en/`·`/ja/` 시작 페이지의 `<title>`도 같은 문자열. 언어 선택기 이름은 그대로.
+  - 게시판 자동 숨김과 금칙어(#432, `board-auto-hide`, 마이그레이션 `20261103000000_board_auto_hide_and_blocked_terms`): 서로 다른 신고자 3명이면 글을 바로 숨기고
+    대기열에 「자동 숨김」으로 남긴다. 악용 한도 둘(11-04 결정): 신고로 숨기는 글은 모두 합쳐 한 시간 5건, 한 신고자의 신고는 하루 3건까지만 집계(`counts_for_hide`).
+    한·영·일 최소 금칙어(`src/boardBlockedTerms.js` = 서버 `board_blocked_terms`)는 말마다 범위(text/token/word)를 두어 Yamashita·다시 발견·まだ死ねない·시발점을 통과시킨다.
+  - 보안 점검 M3·L1·L3·L5·zod(#425, `security-small-1103`, 마이그레이션 `20261103010000_cloud_unknown_address_and_tier_list`): 모두 합친 하루 한도 둘(온라인 저장 새 코드, 텔레메트리 바이트)을
+    `Board Reports`(09:10)·`Funnel`(22:10)이 읽어 80%면 실패 메일로 경보(`scripts/report-budgets.mjs`). 하루 새 코드 한도 1,000 → 3,000. 주소 없는 cloud RPC는 `unknown` 한 키로 닫힌 쪽 실패.
+    `render.yaml`의 CSP `connect-src`와 HSTS를 운영 값에 맞춤. `momentumTier`는 네 값만. zod 4.5.4 → 4.6.7(dev).
+  - 랭킹 재점검 넓히기(#434, `ranking-recheck-wider`, 마이그레이션 `20261103020000_ranking_recheck_seen`): Verify Ranking이 세 판(평소·이번 주·지난 주)의 상위 100 가운데
+    아직 안 읽은 행 전부와 상위 20을 다시 읽는다(한 번에 150). 월요일 00:20 KST에 한 번 더. 점검기가 읽은 시각 `recheck_seen_at`을 anon에 `rechecked` 참/거짓으로만 열어
+    점검 전 행은 순위 화면에 「확인 중」. 「같은 주소 빈도」(address_key 180일 보존)는 하지 않기로(11-05 결정 (1)).
+- 병합 뒤 Migration Drift(손으로 돌림)·Visual Regression 초록, main에서 `check:grants` 통과(마이그레이션 56개 재생). 병합된 다섯 갈래와 워크트리는 지웠다.
+- 이날 병합 4개(묶음 하나가 4개를 담음. 묶음 PR #451까지 세면 5개, main `3ca15f8d`), 운영 build-sha `3ca15f8d`(11:03 curl, sw 릴리스 `9928af4b`), 유닛 테스트 1,818개(`npm test` 실측).
+
 ## 7. 자료와 한계
 
 **본 것**
