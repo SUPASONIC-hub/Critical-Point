@@ -2131,10 +2131,10 @@ export function createTableRecord(log = []) {
  * 사건 01 to 03). 3 was B3's audit and B2's links as rules of the table from
  * 프롤로그 04, 2 the day-ten table of 2026-10-20. Every run summary carries
  * it, so every case row carries it as `dynamics`, and the server ranks no
- * season with a case row below it (*_rules_mark4_ranking_reset.sql, a draft
- * until the ranking reset after RULES_MARK 3's; *_rules_mark3_ranking_reset
- * asked for 3, 20261020010000 for 2, and the reset of 20261011010000 read
- * `logicStreak` the same way). Raise the number,
+ * season with a case row below it (*_ranking_reset_rules_mark4_relic_draft.sql,
+ * the one wipe of 2026-11-12, a draft until that evening; it folds the mark 3
+ * and mark 4 drafts of 10-21 and 10-25 together; 20261020010000 asked for 2,
+ * and the reset of 20261011010000 read `logicStreak` the same way). Raise the number,
  * never reuse it, when the table changes again. The migration,
  * telemetryBatch.js and check-grants.mjs name it too.
  */

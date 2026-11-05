@@ -217,9 +217,9 @@ export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules =
  *
  * Not yet written to the database: ranking_set_recheck_marks (20261023000000)
  * raises on a mark it does not list, so verify-ranking-rows.mjs leaves this one
- * out of the write (`DB_MARKS` there) until the 11-30 ranking wipe's
- * migration takes it. That migration gets these pieces, and no migration of
- * its own is made for them:
+ * out of the write (`DB_MARKS` there) until the 11-12 ranking wipe's
+ * migration takes it (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql.draft,
+ * drafted 2026-11-05 with these three pieces in it; no migration of their own):
  *
  *   -- ranking_set_recheck_marks: the checker's marks, with the draft's
  *   v_recheck constant text[] := array['chain-off-log', 'relic-draft', 'score-off-log', 'window-no-replay', 'window-off-replay'];
