@@ -89,7 +89,7 @@ test("the start screen's foot opens the five pages in the screen's language, and
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
 });
 
-// The credit (2026-11-04): Tak'n Roll, SUPASONIC & ALICE, and each one's
+// The credit (2026-11-04, the studio's three names 2026-11-05): SUPASONIC & ALICE, and each one's
 // address as a link named for its owner, on the start screen and at the foot
 // of the plain pages, inside a 360px phone in every language.
 const CREATOR_MAILS = [
@@ -97,9 +97,11 @@ const CREATOR_MAILS = [
   ["ALICE", "goeun.nam@gmail.com"],
 ];
 
-async function expectCredit(credit, page) {
+const STUDIO_NAMES = { ko: "찹쌀떡 스튜디오", en: "Mochi Verse Studio", ja: "STUDIOもちぷよ" };
+
+async function expectCredit(credit, page, language = "ko") {
   await expect(credit.locator("dt")).toHaveText(["STUDIO", "CREATOR", "CONTACT"]);
-  await expect(credit.locator("dd").nth(0)).toHaveText("Tak'n Roll");
+  await expect(credit.locator("dd").nth(0)).toHaveText(STUDIO_NAMES[language]);
   await expect(credit.locator("dd").nth(1)).toHaveText("SUPASONIC & ALICE");
   for (const [name, email] of CREATOR_MAILS) {
     await expect(credit.getByRole("link", { name: `${name}: ${email}`, exact: true })).toHaveAttribute("href", `mailto:${email}`);
@@ -116,9 +118,9 @@ for (const language of ["ko", "en", "ja"]) {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto(language === "ko" ? "/" : `/?lang=${language}`);
     await expect(page.locator("html")).toHaveAttribute("lang", language);
-    await expectCredit(page.locator(".intro .studio-credit"), page);
+    await expectCredit(page.locator(".intro .studio-credit"), page, language);
     await page.goto(`${FOLDER[language]}/about.html`);
-    await expectCredit(page.locator("footer .credit"), page);
+    await expectCredit(page.locator("footer .credit"), page, language);
   });
 }
 

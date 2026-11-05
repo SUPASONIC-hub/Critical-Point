@@ -1,11 +1,13 @@
-import { CREATOR_LINE, CREATORS, creatorMailLabel, STUDIO } from "../credits.js";
+import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../credits.js";
+import { LANG } from "../locale.js";
 
 /**
  * Studio and creator credit.
  *
  * A definition list rather than a sentence: the labels keep the studio, the
  * two creators and their addresses readable for screen readers as well as on
- * screen. Each address link is named for its owner (src/credits.js).
+ * screen. Each address link is named for its owner (src/credits.js). The
+ * studio's name is the page's language's (studioName, LANG).
  */
 export function StudioCredit() {
   return (
@@ -14,7 +16,7 @@ export function StudioCredit() {
       <dl>
         <div>
           <dt lang="en">STUDIO</dt>
-          <dd>{STUDIO}</dd>
+          <dd>{studioName(LANG)}</dd>
         </div>
         <div>
           <dt lang="en">CREATOR</dt>

@@ -877,6 +877,7 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
     아직 안 읽은 행 전부와 상위 20을 다시 읽는다(한 번에 150). 월요일 00:20 KST에 한 번 더. 점검기가 읽은 시각 `recheck_seen_at`을 anon에 `rechecked` 참/거짓으로만 열어
     점검 전 행은 순위 화면에 「확인 중」. 「같은 주소 빈도」(address_key 180일 보존)는 하지 않기로(11-05 결정 (1)).
 - 병합 뒤 Migration Drift(손으로 돌림)·Visual Regression 초록, main에서 `check:grants` 통과(마이그레이션 56개 재생). 병합된 다섯 갈래와 워크트리는 지웠다.
+- 스튜디오 이름(`studio-name`): 만든 사람의 결정으로 STUDIO Tak'n Roll을 언어마다 다른 이름으로 바꿨다 — 한국어 「찹쌀떡 스튜디오」, 영어 「Mochi Verse Studio」, 일본어 「STUDIOもちぷよ」(`src/credits.js`의 `STUDIO_NAMES`·`studioName`). 시작 화면 크레딧은 페이지 언어(`LANG`)를, 정적 15쪽 꼬리는 그 쪽의 언어를 읽는다. CREATOR 줄·메일·라벨은 그대로. README 첫머리와 `package.json` author도 바꿨고, 11월 4일 기록은 그날의 이름 그대로 둔다.
 - 이날 병합 4개(묶음 하나가 4개를 담음. 묶음 PR #451까지 세면 5개, main `3ca15f8d`), 운영 build-sha `3ca15f8d`(11:03 curl, sw 릴리스 `9928af4b`), 유닛 테스트 1,818개(`npm test` 실측).
 
 ## 7. 자료와 한계
