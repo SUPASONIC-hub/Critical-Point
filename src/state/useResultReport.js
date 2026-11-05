@@ -27,6 +27,7 @@ import { getCaseComparison, getSeasonCard } from "./secondSeason.js";
 import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
+import { useSceneMood } from "./sceneMood.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 import { getOutcomeTone } from "../plateStory.js";
 import { fill } from "../locale.js";
@@ -196,6 +197,9 @@ export function useResultReport({
     ? endingVariant.id === "collapse" ? TAB_TITLE.collapse : fill(TAB_TITLE.season, { ending: endingVariant.label })
     : fill(TAB_TITLE.case, { tag: caseOutcome.tag });
   useScreenTabTitle(tabScreen, tabScreen === "result" ? resultTabTitle : null);
+  // The page's mood (src/mood.js): the shown scene's on the table, neutral on
+  // every other screen. The scene carries it from its case's file.
+  useSceneMood(tabScreen === "play" ? nodes[resolvedNodeId]?.mood : "neutral");
 
   return {
     ...reportCopy,

@@ -35,7 +35,7 @@ export const TEXT_CHECKS = [
 ];
 
 /** A scene file whose data (not only its words) changed: the season's numbers. */
-export const SCENE_DATA_CHECKS = ["check:graph", "check:balance", "check:pressure", "check:endings", "check:runtime-budget", "check:constants", "lint", "check:types"];
+export const SCENE_DATA_CHECKS = ["check:graph", "check:balance", "check:pressure", "check:endings", "check:runtime-budget", "check:constants", "check:mood", "lint", "check:types"];
 
 export const CSS_CHECKS = ["format:check", "check:css", "check:css-structure", "check:encoding"];
 
