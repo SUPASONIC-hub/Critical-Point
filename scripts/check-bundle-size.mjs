@@ -617,7 +617,8 @@ const budgets = [
   // 200,439 / 37,512 -> 200,791 / 37,581 on 2026-11-04, credits-alice over main 5d5d6ae4: the credit's address row (.studio-credit-mail),
   // which wraps one address under the other on a phone. Measured 200,787 / 37,577 in the e2e build, the plus 4.
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 200_831, maxGzip: 37_589 },
+  // 200,831 / 37,589 -> 201,051 / 37,647 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap's cards below the first screen are laid out and drawn only as they come near it (content-visibility: auto with a closed card's intrinsic height, 280px, 300px on the phone rail; src/styles/app/base-intro-ranking.css). Measured 201,047 / 37,643 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 201_051, maxGzip: 37_647 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1260,7 +1261,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,841 / 490,518 -> 428,231 / 484,811 / 491,981 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the lines above together (#429 #433 #436 #445 #438); the Korean page now names the locale preload, and English and Japanese are measured from /en/ and /ja/. Measured 428,227 / 484,807 / 491,977 in the e2e build, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,105 / 484,103 / 490,780 on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the credit's two creators and their address links (the entry and the index CSS). Measured 427,101 / 484,099 / 490,776, the plus 4.
 // 428,231 / 484,811 / 491,981 -> 428,480 / 485,062 / 492,230 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit (#443, the entry and the index CSS) on bundle-1104a's first paint. Measured 428,476 / 485,058 / 492,226 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 428_480, en: 485_062, ja: 492_230 };
+// 428,480 / 485,062 / 492,230 -> 428,596 / 485,174 / 492,344 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap cards' content-visibility rule in the index CSS (the critical CSS only its hash). Measured 428,592 / 485,170 / 492,340 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 428_596, en: 485_174, ja: 492_344 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
