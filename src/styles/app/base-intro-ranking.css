@@ -135,7 +135,7 @@ summary:focus-visible {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
 }
@@ -1199,7 +1199,7 @@ summary:focus-visible {
 }
 @keyframes intro-ticker-run {
   from {
-    transform: translate3d(0, 0, 0);
+    transform: translateZ(0);
   }
   to {
     transform: translate3d(-50%, 0, 0);
@@ -2193,8 +2193,13 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 600;
 }
+/* An undrawn card (content-visibility, above) is held at its reserve, and a
+   column flexbox would squeeze this overflow-hidden paragraph to fit it: the
+   touch screen's whole summary then measured as cut. Drawn cards grow to their
+   content, so nothing visible changes. */
 .case-card p {
   display: -webkit-box;
+  flex: none;
   margin: 0 0 18px;
   overflow: hidden;
   color: var(--ui-text-2);
