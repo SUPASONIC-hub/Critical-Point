@@ -57,11 +57,7 @@ import { createChoiceReaders } from "./state/useDecision.js";
 import { useChoiceCommit } from "./state/useChoiceCommit.js";
 import { useRunReadout } from "./state/useRunReadout.js";
 import { clearRunStorage, logStorageResetFailure } from "./state/runStorageReset.js";
-import {
-  buyExtraRelic,
-  normalizeRunState,
-  rerollRelicOffer,
-} from "./gauntlet/gauntletEngine.js";
+import { normalizeRunState } from "./gauntlet/gauntletEngine.js";
 import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
@@ -668,23 +664,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     window.location.reload();
   }
 
-  /**
-   * C9: the draft paid for out of the vault -- `kind` "reroll" draws the three
-   * again, "extra" buys one more pick. The engine refuses what the run may not
-   * pay for (a replay, a story case, a vault short of the price, once a draft),
-   * and the draft's buttons say so first (draftSpend.js). Nothing is asked.
-   */
-  function spendAtDraft(kind) {
-    if (staleSave) return;
-    const paid = kind === "reroll" ? rerollRelicOffer(gauntletRun) : kind === "extra" ? buyExtraRelic(gauntletRun) : gauntletRun;
-    if (paid.vault !== gauntletRun.vault) applyRun({ gauntletRun: paid });
-  }
-
-  /** The relic a closed case drafted (and, slots full, the one put down), or null to pass. The board is re-dealt with it. */
+  /** The draft's answers: a relic taken (slots full: and one put down) or a pass re-deals the board; C9's 다시 뽑기 / 하나 더 is paid out of the vault, or refused (useRelicTable's spend). */
   function pickRelic(relicId = null, dropId = null) {
-    if (staleSave) return;
-    const pickedRun = relicTable.equip(gauntletRun, relicId, dropId);
-    applyRun({ gauntletRun: pickedRun });
+    if (!staleSave) applyRun({ gauntletRun: relicTable.equip(gauntletRun, relicId, dropId) });
+  }
+  function spendAtDraft(kind) {
+    const paid = relicTable.spend(gauntletRun, kind);
+    if (!staleSave && paid !== gauntletRun) applyRun({ gauntletRun: paid });
   }
 
   /**

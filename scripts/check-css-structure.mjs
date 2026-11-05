@@ -436,6 +436,11 @@ const fileBudgets = {
   // phone, upright (480px or less) or on its side (Linux hand5, the densest
   // boards at 390x844, the phone-on-its-side tests).
   "money.css": { lines: 133, bytes: 2478 },
+  // New on 2026-11-05 (kd-spend-ui, C9 PR 2 over main 2bd9a8ba): the relic
+  // draft's two buys out of the KD은행 계좌 (다시 뽑기, 하나 더: RelicDraft.jsx's
+  // DraftBuy), in a file of their own beside relics.css, whose 473 / 9410 was
+  // every line spent. Measured 41 / 808.
+  "draft-spend.css": { lines: 41, bytes: 808 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

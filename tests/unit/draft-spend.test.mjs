@@ -4,6 +4,7 @@ import { test } from "node:test";
 
 import { buyExtraRelic, equipRelic, normalizeRunState, openRelicDraft, rerollRelicOffer } from "../../src/gauntlet/gauntletEngine.js";
 import { readDraftSpend } from "../../src/gauntlet/draftSpend.js";
+import { spendAtDraft } from "../../src/gauntlet/useRelicTable.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_REROLL_COST } from "../../src/gauntlet/relics.js";
 
 /**
@@ -50,19 +51,38 @@ test("each button is open exactly when the engine pays, and says why when it doe
   assert.equal(readDraftSpend(null).reroll.reason, "record");
 });
 
+test("a press pays only through an open button, and a press that pays nothing leaves the run as it was", () => {
+  const open = atDraft();
+  for (const kind of ["reroll", "extra"]) {
+    const paid = spendAtDraft(open, kind);
+    assert.notEqual(paid, open, kind);
+    assert.equal(paid.vault, open.vault - (kind === "reroll" ? RELIC_REROLL_COST : RELIC_EXTRA_COST), kind);
+    // Off (used, short, a replay): the same object back, so the runtime saves nothing.
+    assert.equal(spendAtDraft(paid, kind), paid, `${kind} twice`);
+  }
+  const short = atDraft({ vault: RELIC_REROLL_COST - 1 });
+  assert.equal(spendAtDraft(short, "reroll"), short);
+  const practice = atDraft({ practice: { vault: 0, relics: [], relicOffer: [] } });
+  assert.equal(spendAtDraft(practice, "extra"), practice);
+  assert.equal(spendAtDraft(open, "nothing"), open);
+});
+
 test("the stage tells a swap from a bought one more's second pick, and pays through the runtime", () => {
+  // The stage, the draft and the keys hand the kind to GameRuntime's spendAtDraft; the pay is useRelicTable's `spend`.
   const stage = read("src/gauntlet/GauntletStage.jsx");
-  assert.match(stage, /if \(!next\.relics\.includes\(relicId\)\) \{\s*setSwapFor\(relicId\);/);
+  assert.match(stage, /if \(!next\.relics\.includes\(relicId\)\) return setSwapFor\(relicId\);/);
   assert.doesNotMatch(stage, /if \(next\.relicOffer\.length\) \{\s*setSwapFor/, "an offer left on the table is not a swap any more");
-  assert.match(stage, /const draftSpend = readDraftSpend\(run\);/);
-  assert.match(stage, /if \(!draftOpen \|\| swapFor \|\| !onSpendAtDraft \|\| !draftSpend\[kind\]\?\.open\) return;/);
+  assert.match(stage, /<RelicDraft [^\n]*run=\{run\} onSpend=\{onSpendAtDraft\}/);
+  assert.match(stage, /spendAtDraft: onSpendAtDraft,/);
+  const draft = read("src/gauntlet/RelicDraft.jsx");
+  assert.match(draft, /const spend = onSpend \? readDraftSpend\(run\) : null;/);
   const runtime = read("src/GameRuntime.jsx");
-  assert.match(runtime, /function spendAtDraft\(kind\) \{\s*if \(staleSave\) return;/);
+  assert.match(runtime, /function spendAtDraft\(kind\) \{\s*const paid = relicTable\.spend\(gauntletRun, kind\);\s*if \(!staleSave && paid !== gauntletRun\) applyRun/);
   assert.match(runtime, /pickRelic, spendAtDraft,/);
+  assert.match(read("src/gauntlet/useRelicTable.js"), /spend: spendAtDraft \}/);
   assert.match(read("src/screens/PlayScreen.jsx"), /onSpendAtDraft=\{spendAtDraft\}/);
   const keys = read("src/gauntlet/useTableKeys.js");
-  assert.match(keys, /if \(letter === "r" && current\.rerollRelic\) return take\(\(\) => current\.rerollRelic\(\)\);/);
-  assert.match(keys, /if \(letter === "b" && current\.buyRelic\) return take\(\(\) => current\.buyRelic\(\)\);/);
+  assert.match(keys, /if \(\(letter === "r" \|\| letter === "b"\) && current\.spendAtDraft\) return take\(\(\) => current\.spendAtDraft\(letter === "r" \? "reroll" : "extra"\)\);/);
 });
 
 test("a buy that cannot pay keeps its place, is aria-disabled and says why", () => {
@@ -74,7 +94,10 @@ test("a buy that cannot pay keeps its place, is aria-disabled and says why", () 
   assert.doesNotMatch(buy, /\sdisabled=/, "not `disabled`: it stays reachable and read");
   assert.match(draft, /\{spend && !swapFor && !spend\.second && \(/);
   assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>/);
-  const css = read("src/styles/app/relics.css");
+  // The buys' rules are a sheet of their own (relics.css was every line spent), imported right after the draft's.
+  const css = read("src/styles/app/draft-spend.css");
+  const order = read("src/styles/app.css");
+  assert.ok(order.indexOf("./app/relics.css") < order.indexOf("./app/draft-spend.css"), "draft-spend.css comes after relics.css");
   assert.match(css, /\.gauntlet-stage \.gx-draft-buy \{\s*min-height: 44px;/);
   assert.match(css, /\.gx-draft-spend \{\s*display: grid;\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
 });

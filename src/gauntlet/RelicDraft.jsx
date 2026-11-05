@@ -8,6 +8,7 @@ import { useShortcutHints } from "../state/accessibilitySettings.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
 import { formatNumber } from "./tableReadout.js";
+import { readDraftSpend } from "./draftSpend.js";
 
 // The draft's words (src/copy/relics.js).
 const say = relicsCopy.draft;
@@ -50,12 +51,14 @@ export function RelicIcon({ id, size = 14 }) {
  *
  * C9: under the hand, the KD은행 계좌 pays -- 다시 뽑기 (R) and 하나 더 (B),
  * each once, taken out of the vault at the press with no question asked and
- * one line under them saying so. `spend` is `readDraftSpend` (draftSpend.js):
- * a button that cannot pay stays in its place, `aria-disabled`, with its
- * reason beside it and as its description. A draft that bought one more
- * comes back after the first pick with the other two (`spend.second`).
+ * one line under them saying so. What each says is `readDraftSpend(run)`
+ * (draftSpend.js), read here when there is an `onSpend` to pay through: a
+ * button that cannot pay stays in its place, `aria-disabled`, with its reason
+ * beside it and as its description. A draft that bought one more comes back
+ * after the first pick with the other two (`spend.second`).
  */
-export function RelicDraft({ offer = [], owned = [], swapFor = null, spend = null, onPick, onBack, onSkip, onReroll, onExtra }) {
+export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null, onSpend = null, onPick, onBack, onSkip }) {
+  const spend = onSpend ? readDraftSpend(run) : null;
   const [codex] = useState(readRelicCodex);
   const { letterKeys, keys } = useShortcutHints();
   const dialogRef = useRef(null);
@@ -115,8 +118,8 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, spend = nul
         </ul>
         {spend && !swapFor && !spend.second && (
           <div className="gx-draft-spend" data-testid="relic-spend">
-            <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={onReroll} />
-            <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={onExtra} />
+            <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={() => onSpend("reroll")} />
+            <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={() => onSpend("extra")} />
             <small className="gx-draft-note">{say.spendNote}</small>
           </div>
         )}

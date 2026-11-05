@@ -107,7 +107,8 @@ const budgets = [
   // 26,792 / 11,414 -> 30,492 / 13,281 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): Measured 30,488 / 13,277 in the e2e build, the plus 4.
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 31,366 / 13,569 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the two buttons under the cards (「다시 뽑기 · 4,000」 R, 「하나 더 · 12,000」 B, DraftBuy with aria-disabled and its reason), the one-line notice and the second pick's title (src/copy/relics.js). Measured 31,362 / 13,565 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 31_366, maxGzip: 13_569 },
+  // 31,366 / 13,569 -> 32,024 / 13,855 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft reads what its two buys say itself (readDraftSpend, src/gauntlet/draftSpend.js, in this shared chunk now rather than the runtime's, where GauntletStage read it), so the stage is under its import budget again. Measured 32,020 / 13,851 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 32_024, maxGzip: 13_855 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1232,7 +1233,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,833 / 483,809 / 490,494 -> 426,845 / 483,820 / 490,505 on 2026-11-03, intro-webkit-fit over main 7fc3a1c4: the Korean and Japanese premise wraps plainly on 360px or less (the index CSS carries the rule, the critical CSS only its hash; the language chunks only by their hashed names). Measured 426,841 / 483,816 / 490,501, the plus 4.
 // 426,845 / 483,820 / 490,505 -> 426,845 / 483,841 / 490,518 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the two dictionaries and the overlay above. Measured 426,839 / 483,837 / 490,514 in the e2e build, the plus 4; the Korean fits its line.
 // 426,845 / 483,841 / 490,518 -> 426,941 / 484,121 / 490,812 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's buy buttons' CSS in the index sheet (the critical CSS only its hash) and the two dictionaries' relic lines above. Measured 426,937 / 484,117 / 490,808 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 426_941, en: 484_121, ja: 490_812 };
+// 426,941 / 484,121 / 490,812 -> 426,950 / 484,131 / 490,822 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft's buy rules moved to a sheet of their own (src/styles/app/draft-spend.css, imported after relics.css; the index CSS carries the same rules, the critical CSS only its hash) and index.html's hashed names moved with them. Measured 426,946 / 484,127 / 490,818 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_950, en: 484_131, ja: 490_822 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

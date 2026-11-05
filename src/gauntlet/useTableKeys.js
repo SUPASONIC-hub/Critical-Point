@@ -188,9 +188,8 @@ export function handleTableKey(event, current, walked = false) {
       else if (activation) event.preventDefault();
       return;
     }
-    // C9: R rerolls the three, B buys one more (each once, out of the KD은행 계좌).
-    if (letter === "r" && current.rerollRelic) return take(() => current.rerollRelic());
-    if (letter === "b" && current.buyRelic) return take(() => current.buyRelic());
+    // C9: R rerolls the three, B buys one more (each once, out of the KD은행 계좌; a buy that is off pays nothing).
+    if ((letter === "r" || letter === "b") && current.spendAtDraft) return take(() => current.spendAtDraft(letter === "r" ? "reroll" : "extra"));
     const pick = key === "Escape" ? null : current.relicOffer[Number(key) - 1];
     if (key === "Escape" || pick) take(() => current.pickRelic(pick ?? null));
     else if (activation) event.preventDefault();
