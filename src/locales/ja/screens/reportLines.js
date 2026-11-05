@@ -31,6 +31,16 @@ export default {
     harm: "シーズン平均 {harmLabel} {perCase} / {gate} · 弾けた勝負 {bustPercent}%",
     overreach: "シーズン平均 {harmLabel} {perCase} / {gate} · 弾けた勝負 {bustPercent}% / {bustGate}%",
     harmCase: "{caseLabel} 再挑戦 · {harmLabel} {harm}",
+    held: "{capitalLabel}は平均{capital}まで下がりましたが、{harmLabel}は崩壊線の下にとどまっています。",
+  },
+  heldEndings: {
+    "open-oversight": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、基準を残したシーズンです。",
+    "evidence-reform": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、公開と保護のルールを残したシーズンです。",
+    "human-record": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、名前を残したシーズンです。",
+    "cold-justice": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、手続きを守ったシーズンです。",
+    "field-pact": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、人々の約束を残したシーズンです。",
+    "quiet-cover": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、静かに閉じたシーズンです。",
+    "open-question": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、問いを引き継いだシーズンです。",
   },
   score: {
     points: "{score}点",

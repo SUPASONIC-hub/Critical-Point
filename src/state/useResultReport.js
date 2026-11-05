@@ -143,12 +143,16 @@ export function useResultReport({
     () => getEndingVariant({ resources, discoveredClues, log, ...seasonStrain }),
     [discoveredClues, log, resources, seasonStrain],
   );
-  // The same season against the collapse gate, for the line each report prints
-  // and the cases a collapse offers to play again (reportViewModels.js).
-  const seasonStanding = useMemo(() => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase }), [caseResults, resources]);
   // What the ruling read: the standing the season's cases closed on on average,
   // or the last case's when no summary carries one.
   const standing = seasonStrain.seasonResources ?? resources;
+  // The same season against the collapse gate, for the line each report prints
+  // and the cases a collapse offers to play again (reportViewModels.js). It is
+  // handed the mean closing standing and the ending, for the held line (C3).
+  const seasonStanding = useMemo(
+    () => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase, closing: seasonStrain.seasonResources, endingId: endingVariant.id }),
+    [caseResults, resources, seasonStrain, endingVariant.id],
+  );
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
