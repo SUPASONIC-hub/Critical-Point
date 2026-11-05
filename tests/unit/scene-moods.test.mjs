@@ -39,7 +39,7 @@ test("the check goes red on an unknown id, an unknown value, a written neutral a
 
 test("the generated file omits neutral and sorts by id", () => {
   const source = renderSceneMoods({ z_1: "tense", a_1: "neutral", m_1: "sorrow" });
-  assert.match(source, /"m_1": "sorrow",\n  "z_1": "tense",/);
+  assert.match(source, /"m_1": "sorrow",\n {2}"z_1": "tense",/);
   assert.ok(!source.includes("a_1"));
   assert.ok(source.includes('export const sceneMood = (id) => SCENE_MOODS[id] ?? "neutral";'));
 });
