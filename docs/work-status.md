@@ -588,7 +588,12 @@ Still open, on purpose:
   frequency" recheck -- keeping address_key 180 days -- declined, the owner's
   choice (1) on 11-05). Four PRs merged (five counting the bundle PR #451; main
   `3ca15f8`), production build-sha `3ca15f8` (11:03, sw release
-  `9928af4b`), 1,818 unit tests.
+  `9928af4b`), 1,818 unit tests. `studio-name`: the studio's name is now
+  one per language, the owner's choice -- 찹쌀떡 스튜디오 / Mochi Verse Studio /
+  STUDIOもちぷよ (`STUDIO_NAMES`, `studioName` in src/credits.js); the start
+  screen reads the page's language and each plain page its own; the CREATOR
+  line, the mail links and the English labels are unchanged; the 11-04
+  records keep that day's name.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
