@@ -1,5 +1,9 @@
 import { expect, test } from "./helpers/network.js";
 import { LOCALE_KEY } from "../src/appConfig.js";
+import introCopy from "../src/copy/intro.js";
+import enIntro from "../src/locales/en/screens/intro.js";
+import jaIntro from "../src/locales/ja/screens/intro.js";
+import { dismissProtocolBreach, startFirstRun, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 
 /**
  * The language choice on the intro (LanguagePicker.jsx, 다국어 틀): a
@@ -101,3 +105,30 @@ for (const lang of ["ko", "en", "ja"]) {
     expect(Math.max(...boxes.map((box) => box.right))).toBeLessThanOrEqual(musicLeft);
   });
 }
+
+// The browser tab (2026-11-04, en/ja scan before W47): /?lang=en kept
+// index.html's Korean <title>, and the tab fell back to it whenever no screen
+// held a title of its own (state/tabTitle.js). Each language's tab now reads
+// the start screen's pageTitle, the start page's <title> in its folder too.
+for (const [lang, title] of [["en", enIntro.pageTitle], ["ja", jaIntro.pageTitle]]) {
+  test(`the tab carries the ${lang} title on the start screen, and again after a table (${lang}) @prod`, async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto(`/?lang=${lang}`);
+    await expect(page.locator("html")).toHaveAttribute("lang", lang);
+    await expect(page).toHaveTitle(title);
+    await startFirstRun(page);
+    await dismissProtocolBreach(page);
+    await expect(page.locator(".choices .choice").first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(page).not.toHaveTitle(introCopy.pageTitle);
+    // Save and leave for the start screen: the table's own title lets go.
+    await page.locator('.compact-actions button[aria-keyshortcuts="Shift+P"]').click();
+    await expect(page.locator(".intro")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(page).toHaveTitle(title);
+  });
+}
+
+test("the Korean tab is index.html's title, as it was @prod", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".intro")).toBeVisible();
+  await expect(page).toHaveTitle(introCopy.pageTitle);
+});

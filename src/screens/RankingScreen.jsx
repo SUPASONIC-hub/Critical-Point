@@ -126,6 +126,7 @@ export function RankingScreen({
                       {entry.assistStory && <span className="ranking-assist">{words.story}</span>}
                       {entry.newGamePlus && <span className="ranking-assist" lang="en">NEW GAME+</span>}
                       {entry.collapsed && <span className="ranking-assist">{words.collapsed}</span>}
+                      {entry.pendingCheck && <span className="ranking-assist" title={words.pendingCheckTitle} data-testid="ranking-pending-check">{words.pendingCheck}</span>}
                     </div>
                   </div>
                   );

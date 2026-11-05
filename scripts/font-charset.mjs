@@ -37,6 +37,12 @@ const SOURCE_EXTENSIONS = new Set([".js", ".jsx", ".css", ".html"]);
  * text the app prints.
  */
 const SKIPPED_DIRECTORIES = new Set([path.join("src", "locales", "ja"), path.join("src", "dev")]);
+/**
+ * Source files whose strings are never drawn. src/boardBlockedTerms.js is the
+ * board's blocked words, folded (hiragana, kanji, old jamo): the board refuses
+ * a post that holds one with a sentence of its own and never prints the word.
+ */
+const SKIPPED_FILES = new Set([path.join("src", "boardBlockedTerms.js")]);
 
 function range(from, to) {
   let text = "";
@@ -65,7 +71,7 @@ function visit(directory, files, root) {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       if (!SKIPPED_DIRECTORIES.has(path.relative(root, fullPath))) visit(fullPath, files, root);
-    } else if (SOURCE_EXTENSIONS.has(path.extname(entry.name)) && !entry.name.endsWith(".generated.css")) {
+    } else if (SOURCE_EXTENSIONS.has(path.extname(entry.name)) && !entry.name.endsWith(".generated.css") && !SKIPPED_FILES.has(path.relative(root, fullPath))) {
       files.push(fullPath);
     }
   }

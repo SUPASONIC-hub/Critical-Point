@@ -16,6 +16,10 @@ name: Funnel
 # --linked` as Test Week, a single SELECT that the report's unit test holds to
 # one read-only statement and check:grants runs over a replayed database.
 # Without the token the run says so in a warning and reads nothing.
+#
+# It also reads the two limits that hold for everyone together (new cloud-save
+# codes and telemetry bytes in a day, scripts/report-budgets.mjs), as Board
+# Reports does in the morning, and a scheduled run fails when one is at 80%.
 
 on:
   workflow_dispatch:
@@ -104,3 +108,31 @@ jobs:
           path: funnel-report
           if-no-files-found: ignore
           retention-days: 45
+      # The limits that hold for everyone together (scripts/report-budgets.mjs, M3
+      # of the 2026-11-03 security review): counts and limits only. A scheduled
+      # run fails at 80%, so the failed-run mail is the alarm.
+      - name: Read the global budgets
+        id: budgets
+        if: ${{ !cancelled() && steps.token.outputs.configured == 'true' }}
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/report-budgets.mjs --sql > budgets.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f budgets.sql > budgets.json 2> budgets.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure budgets.json budgets.err
+            exit 1
+          fi
+          node scripts/report-budgets.mjs budgets.json >> "$GITHUB_STEP_SUMMARY" || exit 1
+          echo "near=$(node scripts/report-budgets.mjs --near budgets.json)" >> "$GITHUB_OUTPUT"
+          rm -f budgets.sql budgets.json budgets.err
+      - name: Fail when a global budget is near its end
+        if: ${{ !cancelled() && steps.token.outputs.configured == 'true' && github.event_name == 'schedule' && steps.budgets.outputs.near != '0' && steps.budgets.outputs.near != '' }}
+        run: |
+          echo "::error title=A global limit is near::${{ steps.budgets.outputs.near }} limit(s) for everyone together are at 80% or more of the day. When one runs out, every player's request of that kind is refused until the day ends. Read the Job Summary; raise the value in private_settings (README section 6)."
+          exit 1

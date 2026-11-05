@@ -14,11 +14,13 @@ import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
+import { DEFAULTS as BUDGET_DEFAULTS, QUERY as BUDGETS_QUERY, nearLimits, readBudgets } from "./report-budgets.mjs";
 import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
 import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
 import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
+import { BOARD_BLOCKED_TERMS, BOARD_TERM_GUARDS, BOARD_TERM_SCOPE, boardUnits, findBlockedTerm, foldBoardText } from "../src/boardBlockedTerms.js";
 
 /**
  * Data API grants guardrail.
@@ -208,6 +210,8 @@ for (const file of files) {
 // The checker's marks (F1 phase 2, `*_ranking_recheck_marks.sql`): the cases
 // below run once the migration is among the files.
 const RECHECK_MARKS = files.some((file) => file.endsWith("_ranking_recheck_marks.sql"));
+// Whether the checker has read a ranking run (`*_ranking_recheck_seen.sql`, 보안 점검 M2): the page's 「확인 중」.
+const RECHECK_SEEN = files.some((file) => file.endsWith("_ranking_recheck_seen.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -1466,6 +1470,11 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // When the checker last replayed a run is not the client's to read or write.
   await refused("read when a ranking row was rechecked", "anon", `select rechecked_at from public.playtest_sessions`);
   await postRefused("send a case row already rechecked", "playtest_sessions", { ...casePayload({ session: sessionId(38), runId: "run-recheck-self", caseId: "case01" }), rechecked_at: "2026-10-21T00:00:00Z" }, /^42501 /);
+  if (!RECHECK_SEEN) failures.push("supabase/migrations/*_ranking_recheck_seen.sql is gone; the ranking's 「확인 중」 was checked against nothing.");
+  // Whether the checker has read a run is the page's to read (the ranking's
+  // 「확인 중」), as a yes or no through the view; never the page's to write.
+  await allowed("read whether a ranking row was checked", "anon", `select rechecked from public.public_rankings limit 1`);
+  await postRefused("send a case row the checker has already read", "playtest_sessions", { ...casePayload({ session: sessionId(38), runId: "run-recheck-self", caseId: "case01" }), recheck_seen_at: "2026-10-21T00:00:00Z" }, /^42501 /);
 
   // Rows put in place with the insert triggers off for these statements only:
   // two ranked runs, one already marked by the trigger, and the first run's final case row.
@@ -1487,6 +1496,13 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   }
   const marksOf = async (runId, caseId = "season-final") =>
     (await one(`select suspicion from public.playtest_sessions where run_id = $1 and case_id = $2`, [runId, caseId]))?.suspicion ?? null;
+  const seenAt = async (runId, caseId = "season-final") =>
+    (await one(`select recheck_seen_at from public.playtest_sessions where run_id = $1 and case_id = $2`, [runId, caseId]))?.recheck_seen_at ?? null;
+  // Not read yet: the view says so (the page's 「확인 중」), and the checker's run list keeps it.
+  check((await seenAt("run-recheck-1")) === null && (await seenAt("run-recheck-2")) === null, "a ranking row the checker has not read has a read time.");
+  const shownChecked = async () =>
+    ((await allowed("read the ranking's checked flags", "anon", `select rechecked from public.public_rankings where case_title = 'SEASON 01 COMPLETE' and player_name = '익명 분석관' and case_id = 'season-final'`))?.rows ?? []).map((row) => row.rechecked);
+  check((await shownChecked()).length > 0 && (await shownChecked()).every((flag) => flag === false), `the ranking shows rows not read yet as ${JSON.stringify(await shownChecked())}; expected false.`);
   const setMarks = async (label, marks, expected) => {
     const answer = (await allowed(label, "service_role", call("run-recheck-1", marks)))?.rows[0]?.marks ?? null;
     const stored = await marksOf("run-recheck-1");
@@ -1527,8 +1543,12 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   const recheckedAt = async (runId) => (await one(`select rechecked_at from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.rechecked_at ?? null;
   check((await recheckedAt("run-recheck-1")) !== null, "the checker's write did not mark run-recheck-1, replayed whole, as rechecked.");
   check((await recheckedAt("run-recheck-2")) === null, "a run with no replay record was marked as rechecked.");
+  // Read is read, replayed whole or not: both runs leave 「확인 중」.
+  check((await seenAt("run-recheck-1")) !== null && (await seenAt("run-recheck-2")) !== null, "the checker's write left a run it read without a read time.");
+  check((await seenAt("run-recheck-1", "final")) === null, "the checker's write gave a case row a read time; only ranking rows are read.");
   await allowed("state marks without a replay", "service_role", call("run-recheck-1", ["score-off-log"]));
   check((await recheckedAt("run-recheck-1")) === null, "a call that did not replay the run left its rechecked time standing.");
+  check((await seenAt("run-recheck-1")) !== null, "a call that did not replay the run cleared its read time; the run was read.");
   await allowed("mark a window with no replay record", "service_role", call("run-recheck-1", ["window-no-replay"]));
   check(JSON.stringify(await marksOf("run-recheck-1")) === JSON.stringify(["time-over-gap", "window-no-replay"]), `window-no-replay left run-recheck-1 with ${JSON.stringify(await marksOf("run-recheck-1"))}.`);
   check((await one(`select count(*)::int as n from public.playtest_sessions where rechecked_at is not null and case_id <> 'season-final'`))?.n === 0, "a case row carries a rechecked time; only ranking rows are rechecked.");
@@ -1536,9 +1556,28 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   // The checker's own read runs on this schema, in its two halves as the CI
   // job runs them (verify-ranking-rows --runs-sql, then --run-sql per run):
   // the list names the top ranked run, and that run's read brings it whole.
-  const topRun = await one(`select run_id from public.playtest_sessions where case_id = 'season-final' and score is not null order by score desc limit 1`);
-  const listed = (await allowed("list the checker's runs", "service_role", rankingRunsSql({ limit: 1 })))?.rows ?? [];
-  check(listed.length === 1 && listed[0].run_id === topRun?.run_id && Object.keys(listed[0]).join() === "run_id", `the checker's run list answered ${JSON.stringify(listed)}; expected the top ranked run's id alone.`);
+  const topRun = await one(
+    `select run_id from public.playtest_sessions
+      where case_id = 'season-final' and score is not null and run_id is not null and summary->>'seasonComplete' = 'true' and summary->>'week' is null
+      order by score desc, completed_at asc limit 1`,
+  );
+  const listed = (await allowed("list the checker's runs", "service_role", rankingRunsSql({ limit: 1, weeks: [] })))?.rows ?? [];
+  check(
+    listed.length === 1 && listed[0].run_id === topRun?.run_id && Object.keys(listed[0]).join() === "run_id,board,fresh,place" && listed[0].board === "" && Number(listed[0].place) === 1,
+    `the checker's run list answered ${JSON.stringify(listed)}; expected the top ranked run's id, its board and place alone.`,
+  );
+  // The nightly list: every ranked run not read yet, and of those read before
+  // only the top `always`; read runs are not listed again below it.
+  const nightly = (await allowed("list the runs not read yet", "service_role", rankingRunsSql({ limit: 100, always: 1, weeks: [] })))?.rows ?? [];
+  const unread = (await one(
+    `select count(*)::int as n from public.playtest_sessions
+      where case_id = 'season-final' and score is not null and run_id is not null and summary->>'seasonComplete' = 'true' and summary->>'week' is null and recheck_seen_at is null`,
+  ))?.n;
+  check(
+    nightly.filter((row) => row.fresh === true).length === unread && nightly.every((row) => row.fresh === true || Number(row.place) === 1),
+    `the nightly run list answered ${JSON.stringify(nightly.map(({ fresh, place }) => ({ fresh, place })))}; expected the ${unread} runs not read yet and, of the rest, the top one only.`,
+  );
+  check(!nightly.some((row) => ["run-recheck-1", "run-recheck-2"].includes(row.run_id) && Number(row.place) > 1), "the nightly run list read a run again below the top `always` that the checker had read.");
   const read = (await allowed("run the checker's read", "service_role", runRowsSql(listed[0]?.run_id ?? "none")))?.rows ?? [];
   const runRows = (await one(`select count(*)::int as n from public.playtest_sessions where run_id = $1`, [topRun?.run_id]))?.n;
   check(
@@ -1649,6 +1688,19 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
     [JSON.stringify({ logicHold: 82.4567, bestLogic: 17 }), JSON.stringify({ logicHold: "82", bestLogic: { best: 17 }, logicRecord: { windows: 6 } })]);
   check(JSON.stringify(published?.rows[0]?.kept) === JSON.stringify({ bestLogic: 17, logicHold: 82.457 }), `the whitelist published ${JSON.stringify(published?.rows[0]?.kept)} for two numeric logic keys.`);
   check(JSON.stringify(published?.rows[0]?.dropped) === "{}", `the whitelist published a logic key that is not a number: ${JSON.stringify(published?.rows[0]?.dropped)}`);
+
+  // momentumTier is one of the tiers the game gives (20261103010000, L5), read
+  // from the same line of gameLogic.js as the thresholds above, and nothing else.
+  const tiers = [...(readFileSync(path.join(root, "src", "gameLogic.js"), "utf8").match(/momentumTier: momentumScore >= \d+ \? "([A-Z]+)" : momentumScore >= \d+ \? "([A-Z]+)" : momentumScore >= \d+ \? "([A-Z]+)" : "([A-Z]+)"/) ?? [])].slice(1);
+  check(tiers.length === 4, "could not read the four momentum tiers from src/gameLogic.js.");
+  for (const tier of tiers) {
+    const kept = await allowed(`publish the tier ${tier}`, "service_role", `select public.ranking_public_summary($1::jsonb) as s`, [JSON.stringify({ momentumTier: tier })]);
+    check(kept?.rows[0]?.s?.momentumTier === tier, `the public summary dropped the tier ${tier}: ${JSON.stringify(kept?.rows[0]?.s)}`);
+  }
+  for (const other of ["HELLO WORLD", "BURSTY", "burst", "FLOW ", "BUILDIN"]) {
+    const dropped = await allowed(`leave out the tier ${JSON.stringify(other)}`, "service_role", `select public.ranking_public_summary($1::jsonb) as s`, [JSON.stringify({ momentumTier: other })]);
+    check(!("momentumTier" in (dropped?.rows[0]?.s ?? {})), `the public summary published the tier ${JSON.stringify(other)}.`);
+  }
 
   // The seeded rows go, so everything after this sees the two ranked runs.
   await db.query(`delete from public.playtest_sessions where run_id like 'run-cutoffs-%'`);
@@ -1792,6 +1844,20 @@ if (!RECHECK_MARKS || !SUSPICION_MARKS) {
   check(eventBoard.length === 2 && eventBoard.every((row) => row.week === week && row.summary?.week === week),
     `the board of ${week} shows ${JSON.stringify(eventBoard.map((row) => row.week))}; expected its two seasons and only those.`);
   check((await boardRows("week = $1", [weekBefore])).length === 1, `the board of ${weekBefore} does not show the one season that began in it.`);
+
+  // The checker's run list covers each board the way the page shows it (보안
+  // 점검 M2): the ordinary board and each named week's, every run on them.
+  if (RECHECK_SEEN) {
+    const listedBoards = (await allowed("list the checker's runs on the ordinary and two week boards", "service_role", rankingRunsSql({ limit: 100, all: true, weeks: [week, weekBefore] })))?.rows ?? [];
+    const onBoard = (board) => listedBoards.filter((row) => row.board === board).length;
+    check(
+      onBoard("") === ordinary.length && onBoard(week) === eventBoard.length && onBoard(weekBefore) === 1 && listedBoards.length === ordinary.length + eventBoard.length + 1,
+      `the checker's run list read ${JSON.stringify(listedBoards.map(({ board, place }) => ({ board, place })))}; expected the ${ordinary.length} ordinary, ${eventBoard.length} of ${week} and 1 of ${weekBefore}.`,
+    );
+    check(listedBoards.filter((row) => row.board === week).map((row) => Number(row.place)).sort().join() === "1,2", "a week's board is not ranked on its own (places 1 and 2).");
+    const onlyOrdinary = (await allowed("list the checker's runs on the ordinary board only", "service_role", rankingRunsSql({ limit: 100, all: true, weeks: [] })))?.rows ?? [];
+    check(onlyOrdinary.length === ordinary.length && onlyOrdinary.every((row) => row.board === ""), "the checker's run list read a week's board it was not asked for.");
+  }
 
   // The hold rate's cut points read the ordinary board only (결정 30): the
   // event seasons carry a hold rate too, and are not counted.
@@ -1976,7 +2042,7 @@ withHeaders(null);
 // (tests/unit/board-filter.test.mjs), so the two cannot drift apart unseen.
 const boardFilterCases = JSON.parse(readFileSync(path.join(root, "tests", "fixtures", "board-filter-cases.json"), "utf8"));
 check(boardFilterCases.refused.length >= 10 && boardFilterCases.accepted.length >= 3, "the board filter fixture is nearly empty; the filters were checked against nothing.");
-const FILTER_REASON = { link: /must not contain a link/, contact: /contact details/, characters: /must be 2-/ };
+const FILTER_REASON = { link: /must not contain a link/, contact: /contact details/, characters: /must be 2-/, blocked: /must not contain a blocked word/ };
 let filterIp = 40;
 for (const { label, nickname, body, reason } of boardFilterCases.refused) {
   withHeaders({ "x-forwarded-for": `203.0.113.${filterIp++}` });
@@ -1989,7 +2055,47 @@ for (const { label, nickname, body } of boardFilterCases.accepted) {
 }
 withHeaders(null);
 
+// The blocked words (20261103000000): the table is the browser's list, the
+// server folds a post exactly as foldBoardText does, and none of it is anon's.
+{
+  const rows = (await allowed("read the blocked words", "service_role", `select term from public.board_blocked_terms`))?.rows ?? [];
+  const stored = rows.map((row) => row.term).sort();
+  check(JSON.stringify(stored) === JSON.stringify([...BOARD_BLOCKED_TERMS].sort()), `board_blocked_terms holds ${stored.length} words; src/boardBlockedTerms.js lists ${BOARD_BLOCKED_TERMS.length}, and the two differ.`);
+  await refused("read the blocked words", "anon", `select term from public.board_blocked_terms`);
+  const samples = [
+    ...boardFilterCases.refused.flatMap((entry) => [entry.nickname, entry.body]),
+    ...boardFilterCases.accepted.flatMap((entry) => [entry.nickname, entry.body]),
+    ...BOARD_BLOCKED_TERMS,
+    "ㅅㅣㅂㅏㄹ", "시바ㄹ", "가ㄴㅏ", "ㅄ", "ＦＵＣＫ", "ｷﾁｶﾞｲ", "キチガイ", "İstanbul", "Ⅻ①㈱", "가\u0301", "e\u0301", "😀 ok", "",
+  ];
+  const folded = (await db.query(`select s, public.board_fold_text(s) as f from unnest($1::text[]) as s`, [samples])).rows;
+  const differ = folded.filter((row) => row.f !== foldBoardText(row.s));
+  check(differ.length === 0, `public.board_fold_text and foldBoardText fold differently: ${differ.slice(0, 5).map((row) => `${JSON.stringify(row.s)} -> ${JSON.stringify(row.f)} / ${JSON.stringify(foldBoardText(row.s))}`).join("; ")}`);
+
+  // How far each word is matched (2026-11-04): the table's scope and guards
+  // are BOARD_TERM_SCOPE and BOARD_TERM_GUARDS, the server cuts a post into
+  // the units boardUnits does, and the two copies refuse the same posts.
+  const ruleRows = (await db.query(`select term, scope, pass_next, pass_after_kanji from public.board_blocked_terms`)).rows;
+  const ruleOf = (term) => ({ scope: BOARD_TERM_SCOPE[term] ?? "text", passNext: BOARD_TERM_GUARDS[term]?.passNext ?? [], passAfterKanji: BOARD_TERM_GUARDS[term]?.passAfterKanji ?? false });
+  const ruleDiffer = ruleRows.filter((row) => JSON.stringify({ scope: row.scope, passNext: row.pass_next, passAfterKanji: row.pass_after_kanji }) !== JSON.stringify(ruleOf(row.term)));
+  check(ruleDiffer.length === 0, `board_blocked_terms matches words otherwise than src/boardBlockedTerms.js: ${ruleDiffer.slice(0, 5).map((row) => `${row.term} ${row.scope} ${JSON.stringify(row.pass_next)} ${row.pass_after_kanji}`).join("; ")}`);
+  const matchSamples = [
+    ...samples,
+    "f u c k this", "F.u-c k!", "who're you", "this is shitty", "fucking hard", "Shiitake 볶음", "flame retardant", "retarded",
+    "다시 발견", "시발점", "병 신", "씨 . 발", "아저씨 팔", "まだ死ねない", "死ねよ", "死ねる", "田中氏ね", "お前ら氏ね", "氏ね",
+    "kill yourself", "a　b シ ネ", "ㅅ ㅂ", "who’re", "",
+  ];
+  const units = (await db.query(`select s, public.board_text_units(s) as u from unnest($1::text[]) as s`, [matchSamples])).rows;
+  const unitsDiffer = units.filter((row) => JSON.stringify(row.u) !== JSON.stringify(boardUnits(row.s)));
+  check(unitsDiffer.length === 0, `public.board_text_units and boardUnits cut differently: ${unitsDiffer.slice(0, 5).map((row) => `${JSON.stringify(row.s)} -> ${JSON.stringify(row.u)} / ${JSON.stringify(boardUnits(row.s))}`).join("; ")}`);
+  const matched = (await db.query(`select s, public.board_text_has_blocked_term(s) as hit from unnest($1::text[]) as s`, [matchSamples])).rows;
+  const matchDiffer = matched.filter((row) => row.hit !== (findBlockedTerm(row.s) !== null));
+  check(matchDiffer.length === 0, `public.board_text_has_blocked_term and findBlockedTerm disagree: ${matchDiffer.slice(0, 5).map((row) => `${JSON.stringify(row.s)} server ${row.hit} / browser ${findBlockedTerm(row.s)}`).join("; ")}`);
+}
+
 await allowed("read the board", "anon", `select id, nickname, body, created_at from public.board_posts`);
+await refused("read whether the reports hid a post", "anon", `select auto_hidden_at from public.board_posts`);
+await refused("read whether a person kept a post", "anon", `select kept_at from public.board_posts`);
 await refused("read board post session ids", "anon", `select session_id from public.board_posts`);
 await refused("read board post writer keys", "anon", `select actor_key from public.board_posts`);
 await refused("hide a board post", "anon", `select public.moderate_board_post(1)`);
@@ -2106,6 +2212,146 @@ await allowed("hide a board post", "service_role", `select public.moderate_board
   check((await reportCount(doomed)) === 1, "the report on the post to be deleted was not stored.");
   await db.query(`delete from public.board_posts where id = $1`, [doomed]);
   check((await reportCount(doomed)) === 0, "a deleted post's reports outlived it.");
+
+  // Hiding at three writers (20261103000000). Two writers leave a post up; a
+  // third from another address hides it at once, for anon too; a writer's
+  // second device, and reports with no address, are not more writers. The
+  // queue holds it as waiting (자동 숨김). Restore brings it back and keeps it:
+  // three more writers do not hide it again. Hide makes it final.
+  {
+    const queueOf = async () => readBoardQueue((await allowed("read the board report queue", "service_role", BOARD_QUEUE_QUERY))?.rows ?? []);
+    const act = async (action, postId) => boardActionDone((await allowed(`${action} board post ${postId}`, "service_role", boardAction(action, postId)))?.rows ?? []);
+    const target = Number((await one(
+      `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '신고셋', '세 사람이 신고할 글', 'board:auto-hide') returning id`,
+      [sessionId(460)],
+    ))?.id);
+    const shows = async () => ((await allowed("read the board", "anon", `select id from public.board_posts`))?.rows ?? []).some((row) => Number(row.id) === target);
+    const marks = () => one(`select hidden, auto_hidden_at is not null as auto, kept_at is not null as kept from public.board_posts where id = $1`, [target]);
+    const reportFrom = async (address, n, label) => {
+      withHeaders(address ? { "x-forwarded-for": address } : null);
+      await report(label, reportRow(target, "abuse", sessionId(n)));
+      withHeaders(null);
+    };
+    await reportFrom("198.51.100.70", 461, "report a post: the first writer");
+    await reportFrom("198.51.100.70", 462, "report a post again from the first writer's second device");
+    await reportFrom("198.51.100.71", 463, "report a post: the second writer");
+    await reportFrom(null, 464, "report a post with no client address");
+    await reportFrom(null, 465, "report a post with no client address, another session");
+    check(await shows(), "a post with two writers' reports (and two without an address) left the board; three writers hide it.");
+    check((await marks())?.auto === false, "a post with two writers' reports was marked as hidden by its reports.");
+    await reportFrom("198.51.100.72", 466, "report a post: the third writer");
+    check(!(await shows()), "a post reported by three writers is still on the board.");
+    check((await marks())?.auto === true, "a post the reports hid is not marked auto_hidden_at.");
+    let queue = await queueOf();
+    check(queue.waiting.some((post) => post.postId === target && post.autoHidden && post.writers >= 3), `a post the reports hid does not wait for a person in the queue: ${JSON.stringify(queue.waiting)}`);
+    check(queue.autoHidden.some((post) => post.postId === target), "the queue does not list the post the reports hid as such.");
+    withHeaders({ "x-forwarded-for": "198.51.100.73" });
+    await reportRefused("report a post the reports hid", reportRow(target, "spam", sessionId(467)), /names no visible post/);
+    withHeaders(null);
+
+    check(await act("restore", target), "restoring a post the reports hid did nothing.");
+    check(await shows(), "a restored post is not on the board.");
+    {
+      const kept = await marks();
+      check(kept?.kept === true && kept?.auto === false, `a restored post is not marked as kept: ${JSON.stringify(kept)}`);
+    }
+    for (const [index, address] of ["198.51.100.74", "198.51.100.75", "198.51.100.76"].entries()) {
+      await reportFrom(address, 470 + index, `report a kept post: writer ${index + 1}`);
+    }
+    check(await shows(), "three writers hid a post a person had restored; only the operator may hide it now.");
+    queue = await queueOf();
+    check(queue.waiting.some((post) => post.postId === target && !post.autoHidden), "the new reports on a kept post do not wait in the queue.");
+    check(await act("hide", target), "hiding a kept post did nothing.");
+    {
+      const hidden = await marks();
+      check(!(await shows()) && hidden?.auto === false && hidden?.kept === false, `a post the operator hid is not hidden for good: ${JSON.stringify(hidden)}`);
+    }
+    queue = await queueOf();
+    check(!queue.waiting.some((post) => post.postId === target) && queue.hidden.some((post) => post.postId === target), "a post the operator hid still waits in the queue.");
+
+    // The number of writers is a setting.
+    const second = Number((await one(
+      `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '신고넷', '네 사람까지 둘 글', 'board:auto-hide-4') returning id`,
+      [sessionId(480)],
+    ))?.id);
+    await db.query(`insert into public.private_settings (name, value) values ('board_auto_hide_writers', '4') on conflict (name) do update set value = excluded.value`);
+    for (const [index, address] of ["198.51.100.80", "198.51.100.81", "198.51.100.82"].entries()) {
+      withHeaders({ "x-forwarded-for": address });
+      await report(`report a post under a limit of four: writer ${index + 1}`, reportRow(second, "spam", sessionId(481 + index)));
+    }
+    withHeaders(null);
+    check((await one(`select hidden from public.board_posts where id = $1`, [second]))?.hidden === false, "board_auto_hide_writers = 4 hid a post at three writers.");
+    await db.query(`delete from public.private_settings where name = 'board_auto_hide_writers'`);
+    await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[target, second]]);
+
+    // The two limits on top (2026-11-04, the user's decision): the reports
+    // hide at most five posts an hour, everyone's together, and one writer's
+    // reports count toward hiding three times a day. Past either, the reports
+    // are stored and wait in the queue; the post stays up.
+    const limitPost = async (n) => Number((await one(
+      `insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '한도점검', $2, $3) returning id`,
+      [sessionId(n), `한도를 볼 글 ${n}`, `board:limit-${n}`],
+    ))?.id);
+    const stateOf = async (id) => (await one(`select hidden, auto_hidden_at is not null as auto from public.board_posts where id = $1`, [id])) ?? {};
+    const reportPost = async (id, address, n) => {
+      withHeaders({ "x-forwarded-for": address });
+      await report(`report post ${id} from ${address}`, reportRow(id, "abuse", sessionId(n)));
+      withHeaders(null);
+    };
+    const hourKey = "global:board-auto-hide";
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [hourKey]);
+
+    // The hour's limit: four hidden this hour, so the fifth post goes and the sixth stays up.
+    await presetCounter(hourKey, 4);
+    const fifth = await limitPost(490);
+    const sixth = await limitPost(491);
+    for (const [index, address] of ["198.51.100.90", "198.51.100.91", "198.51.100.92"].entries()) {
+      await reportPost(fifth, address, 492 + index);
+      await reportPost(sixth, address, 495 + index);
+    }
+    {
+      const [hid, kept] = [await stateOf(fifth), await stateOf(sixth)];
+      check(hid.hidden === true && hid.auto === true, `the fifth post the reports hid in an hour stayed up: ${JSON.stringify(hid)}`);
+      check(kept.hidden === false && kept.auto === false, `the reports hid a sixth post in one hour: ${JSON.stringify(kept)}`);
+    }
+    queue = await queueOf();
+    check(queue.waiting.some((post) => post.postId === sixth && !post.autoHidden && post.writers === 3), `a post past the hour's limit does not wait in the queue as a reported post: ${JSON.stringify(queue.waiting)}`);
+    // A new hour: the next writer's report hides it.
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [hourKey]);
+    await reportPost(sixth, "198.51.100.93", 498);
+    check((await stateOf(sixth)).auto === true, "a post with enough writers was not hidden once the hour's limit had room again.");
+
+    // One writer's day: a writer whose three reports today counted is
+    // stored, and does not count, so two more writers leave the post up and a
+    // third hides it.
+    const spent = "198.51.100.94";
+    await presetCounter(`board-report:${await writerKey(spent)}|hide`, 3);
+    const daily = await limitPost(500);
+    await reportPost(daily, spent, 501);
+    await reportPost(daily, "198.51.100.95", 502);
+    await reportPost(daily, "198.51.100.96", 503);
+    {
+      const rows = (await db.query(`select actor_key, counts_for_hide from public.board_reports where post_id = $1`, [daily])).rows;
+      const spentKey = `board-report:${await writerKey(spent)}`;
+      check(rows.length === 3, `a writer past its day's limit was not stored: ${rows.length} reports.`);
+      check(rows.some((row) => row.actor_key === spentKey && row.counts_for_hide === false), "a writer past its day's limit counted toward hiding.");
+      check(rows.filter((row) => row.counts_for_hide === true).length === 2, "a writer within its day's limit did not count toward hiding.");
+    }
+    check((await stateOf(daily)).hidden === false, "a post was hidden by two writers and a writer past its day's limit.");
+    await reportPost(daily, "198.51.100.97", 504);
+    check((await stateOf(daily)).auto === true, "three writers within their day's limit did not hide a post.");
+    // A fourth report on a fourth post from a fresh writer is its fourth of the day: stored, not counted.
+    {
+      const fresh = "198.51.100.98";
+      const posts = [await limitPost(505), await limitPost(506), await limitPost(507), await limitPost(508)];
+      for (const [index, id] of posts.entries()) await reportPost(id, fresh, 509 + index);
+      const counted = (await db.query(`select post_id, counts_for_hide from public.board_reports where post_id = any($1::bigint[]) order by id`, [posts])).rows.map((row) => row.counts_for_hide);
+      check(JSON.stringify(counted) === JSON.stringify([true, true, true, false]), `one writer's four reports in a day counted as ${JSON.stringify(counted)}; the first three count.`);
+      await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [posts]);
+    }
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [hourKey]);
+    await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[fifth, sixth, daily]]);
+  }
 }
 
 // ---- cloud saves
@@ -2224,12 +2470,13 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await putCloudRefused("start a code past the daily ceiling", "VVVVVVVV2345", cloudPayload("ceiling"), /^PT429 .*code limit/);
   await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
   await putCloud("start a code under the default ceiling", "VVVVVVVV2345");
-  // The default itself: 1,000 a day (20261006010000), driven from one short.
-  // Each new code needs an address of its own, since an address starts five.
-  await presetCounter("global:cloud-new", 999);
-  await putCloud("start the day's 1,000th code", "WWWWWWWW2345");
+  // The default itself: 3,000 a day (1,000 from 20261006010000, 3,000 from
+  // 20261103010000), driven from one short. Each new code needs an address of
+  // its own, since an address starts five.
+  await presetCounter("global:cloud-new", 2999);
+  await putCloud("start the day's 3,000th code", "WWWWWWWW2345");
   withHeaders({ "x-forwarded-for": "198.51.100.63" });
-  await putCloudRefused("start the day's 1,001st code", "XXXXXXXX2345", cloudPayload("thousand"), /^PT429 .*code limit/);
+  await putCloudRefused("start the day's 3,001st code", "XXXXXXXX2345", cloudPayload("three thousand"), /^PT429 .*code limit/);
   await putCloud("save under an existing code while new ones are refused", "VVVVVVVV2345");
   await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
   // The owner's number, as large as they care to make it, is still a limit and
@@ -2240,6 +2487,42 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
 }
 withHeaders(null);
+{
+  // A request that brings no client address (20261103010000, L3 of the
+  // 2026-11-03 security review): every such request shares one key and meets
+  // the limits of one address. Before, the address limits were skipped.
+  const codes = ["BBBBBBBB2345", "CCCCCCCC2345", "DDDDDDDD2345", "EEEEEEEE2345", "FFFFFFFF2345"];
+  for (const code of codes) await putCloud(`start code ${code} with no address`, code);
+  await putCloudRefused("start a sixth code with no address", "GGGGGGGG2345", cloudPayload("sixth unknown"), /^PT429 .*code limit/);
+  check((await one(`select request_count as n from public.telemetry_rate_limits where actor_key = 'cloud-new:unknown'`))?.n === 5, "requests with no address were not counted under one key.");
+  await presetCounter("cloud-put-ip:unknown", 600);
+  await putCloudRefused("put the 601st cloud save of the hour with no address", codes[0], cloudPayload("pace unknown"), /^PT429 .*rate limit/);
+  await presetCounter("cloud-get-ip:unknown", 120);
+  await raises("read past the read budget with no address", "anon", `select public.get_cloud_save($1)`, [codes[0]], /^PT429 .*rate limit/);
+  await raises("peek past the read budget with no address", "anon", `select public.peek_cloud_save($1)`, [codes[0]], /^PT429 .*rate limit/);
+  await presetCounter("cloud-delete-ip:unknown", 30);
+  await raises("delete past the budget with no address", "anon", `select public.delete_cloud_save($1)`, [codes[0]], /^PT429 .*rate limit/);
+  for (const key of ["cloud-new:unknown", "cloud-put-ip:unknown", "cloud-get-ip:unknown", "cloud-delete-ip:unknown"]) {
+    await db.query(`delete from public.telemetry_rate_limits where actor_key = $1`, [key]);
+  }
+  await db.query(`delete from public.cloud_saves where code_hash = any(select encode(sha256(convert_to(c, 'UTF8')), 'hex') from unnest($1::text[]) c)`, [codes]);
+}
+{
+  // The limits for everyone together, as the twice-daily read sees them
+  // (scripts/report-budgets.mjs, M3): the read runs, counts the new codes
+  // started above, and names the limits the functions use.
+  const read = await allowed("read the global budgets", "service_role", BUDGETS_QUERY);
+  const budgets = readBudgets(read?.rows ?? []);
+  const named = Object.fromEntries(budgets.map((budget) => [budget.name, budget]));
+  check(budgets.length === 3 && named["global:cloud-new"] && named["global:telemetry-bytes"] && named.database, `the budget read returned ${JSON.stringify(budgets.map((budget) => budget.name))}.`);
+  check(named["global:cloud-new"]?.ceiling === BUDGET_DEFAULTS.cloud && named["global:telemetry-bytes"]?.ceiling === BUDGET_DEFAULTS.telemetryBytes,
+    `the budget read names ceilings ${named["global:cloud-new"]?.ceiling} and ${named["global:telemetry-bytes"]?.ceiling}; the functions use ${BUDGET_DEFAULTS.cloud} and ${BUDGET_DEFAULTS.telemetryBytes}.`);
+  check((named["global:cloud-new"]?.used ?? 0) > 0, "the budget read did not see the new codes started in this check.");
+  await presetCounter("global:cloud-new", Math.ceil(BUDGET_DEFAULTS.cloud * 0.8));
+  const near = readBudgets((await allowed("read the global budgets at 80%", "service_role", BUDGETS_QUERY))?.rows ?? []);
+  check(nearLimits(near).map((budget) => budget.name).join() === "global:cloud-new", `at 80% of the new codes the read alarmed on ${JSON.stringify(nearLimits(near).map((budget) => budget.name))}.`);
+  await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
+}
 
 // ---- write-only stays write-only, and nothing else is granted
 
@@ -2250,6 +2533,7 @@ const UPDATE_PROBE = {
   free_text_analyses: "event_id = event_id",
   board_posts: "hidden = true",
   board_reports: "reason = reason",
+  board_blocked_terms: "term = term",
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",

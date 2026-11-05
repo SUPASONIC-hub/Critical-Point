@@ -12,6 +12,7 @@ import {
   rememberOwnBoardPost,
 } from "../../src/state/useBoard.js";
 import { BOARD_OWN_POSTS_KEY } from "../../src/appConfig.js";
+import { findBlockedTerm } from "../../src/boardBlockedTerms.js";
 
 /**
  * The browser's copy of the board's rules against the list the server's copy is
@@ -27,6 +28,8 @@ const REASON_OF = {
   "nickname-link": "link",
   "body-link": "link",
   contact: "contact",
+  "nickname-blocked": "blocked",
+  "body-blocked": "blocked",
 };
 
 test("the fixture holds enough cases to mean something", () => {
@@ -37,13 +40,13 @@ test("the fixture holds enough cases to mean something", () => {
 
 for (const { label, nickname, body, reason } of cases.refused) {
   test(`the browser refuses ${label}, for the reason the server gives`, () => {
-    assert.equal(REASON_OF[getBoardPostRefusal(nickname, body)], reason, `${JSON.stringify(nickname)} / ${JSON.stringify(body)}`);
+    assert.equal(REASON_OF[getBoardPostRefusal(nickname, body, findBlockedTerm)], reason, `${JSON.stringify(nickname)} / ${JSON.stringify(body)}`);
   });
 }
 
 for (const { label, nickname, body } of cases.accepted) {
   test(`the browser accepts ${label}`, () => {
-    assert.equal(getBoardPostRefusal(nickname, body), null, body);
+    assert.equal(getBoardPostRefusal(nickname, body, findBlockedTerm), null, body);
   });
 }
 

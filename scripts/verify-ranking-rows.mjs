@@ -20,11 +20,21 @@
  *   SUPABASE_ACCESS_TOKEN Migration Drift uses: the way the test week reads
  *   the live data), split so that no answer holds more than one run (a run is
  *   up to 55 case rows with their logs; 서버검증-설계안.md, S6):
- *   node scripts/verify-ranking-rows.mjs --runs-sql [--limit=20]
- *       prints the one read-only SELECT that lists the top `limit` ranked
- *       runs (run_id only). Its JSON output is runs.json.
+ *   node scripts/verify-ranking-rows.mjs --runs-sql [--limit=100] [--always=20] [--cap=150] [--all] [--weeks=2026-W47,2026-W46]
+ *       prints the one read-only SELECT that lists the runs to read: on the
+ *       ordinary board and on each named week's board (default this week and
+ *       last, in Korean time), the top `limit` the page shows (fetchLeaderboard
+ *       reads 100), of them every run the checker has not read yet
+ *       (`recheck_seen_at` null: what the page shows as 「확인 중」) and the top
+ *       `always` again whatever was read before (a fix to the checker reaches
+ *       them the next night), new runs first, `cap` at most (--all: every one
+ *       of the top `limit`, read before or not). Its JSON output is runs.json
+ *       (run_id, the board, whether it is new, its place: no score, no name).
  *   node scripts/verify-ranking-rows.mjs --run-count runs.json
  *       prints how many runs runs.json lists.
+ *   node scripts/verify-ranking-rows.mjs --runs-summary runs.json
+ *       prints, for the public log, how many runs of each board were listed
+ *       and how many of them are new (no run id).
  *   node scripts/verify-ranking-rows.mjs --run-sql runs.json --at=N
  *       prints the one read-only SELECT that fetches every row of the N-th
  *       run (from 1) runs.json lists. Its JSON output is a rows file. The run
@@ -51,6 +61,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { isoWeekKey } from "../src/gauntlet/weeklyCalendar.js";
 import { recheckRun } from "../src/rankingRecheck.js";
 
 const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at";
@@ -58,17 +69,67 @@ const JSON_COLUMNS = ["summary", "decision_log", "resources", "dynamics"];
 
 const quote = (text) => `'${String(text).replace(/'/g, "''")}'`;
 
+const WEEK_KEY = /^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$/;
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** A whole number from 1 to `max`; `fallback` for anything else. */
+const whole = (value, fallback, max) => Math.min(max, Math.max(1, Math.trunc(Number(value)) || fallback));
+
+/**
+ * The week boards the read covers by default: this week's and last week's, in
+ * Korean time (isoWeekKey, the server's kst_iso_week). The page shows this
+ * week's board; last week's is read too, so that the first run after Monday
+ * 00:00 KST, when the page's board has turned over, still checks the week
+ * that just ended.
+ */
+export function recheckWeeks(now = Date.now()) {
+  return [...new Set([isoWeekKey(now), isoWeekKey(now - 7 * DAY_MS)])];
+}
+
 /**
  * The CI read's first half, for `supabase db query`: one SELECT and nothing
- * else -- the top `limit` ranked runs, by the ranking's own score.
+ * else. Each board -- the ordinary one (`week` null) and each of `weeks` --
+ * is ranked as the page ranks it (fetchLeaderboard: complete seasons, score
+ * desc, the earlier first on a tie), and of each board's top `limit` the
+ * list keeps the runs the checker has not read yet (`recheck_seen_at` null,
+ * the rows the page shows as 「확인 중」) and the top `always` whatever, new
+ * runs first, `cap` at most. `all` keeps every one of the top `limit`. Each
+ * answer row is a run id, its board ('' for the ordinary one), whether it is
+ * new, and its place on the board: no score, no name.
  */
-export function rankingRunsSql({ limit = 20 } = {}) {
-  const top = Math.min(500, Math.max(1, Math.trunc(Number(limit)) || 20));
+export function rankingRunsSql({ limit = 100, always = 20, cap = 150, all = false, weeks = recheckWeeks() } = {}) {
+  const top = whole(limit, 100, 500);
+  const again = Math.min(top, whole(always, 20, 500));
+  const most = whole(cap, 150, 1000);
+  const keys = [...new Set(weeks)];
+  if (!keys.every((week) => WEEK_KEY.test(String(week)))) throw new TypeError(`A week is a key like 2026-W47: ${keys.join(", ")}.`);
+  const boards = keys.length ? `(summary->>'week' is null or summary->>'week' in (${keys.map(quote).join(", ")}))` : "summary->>'week' is null";
   return [
-    "select run_id from public.playtest_sessions",
-    " where case_id = 'season-final' and score is not null and run_id is not null",
-    ` order by score desc limit ${top};`,
+    "select run_id, board, fresh, place from (",
+    "  select run_id, coalesce(summary->>'week', '') as board, recheck_seen_at is null as fresh,",
+    "         row_number() over (partition by summary->>'week' order by score desc, completed_at asc) as place",
+    "    from public.playtest_sessions",
+    "   where case_id = 'season-final' and score is not null and run_id is not null",
+    "     and summary->>'seasonComplete' = 'true'",
+    `     and ${boards}`,
+    ") as ranked",
+    ` where place <= ${top}${all ? "" : ` and (fresh or place <= ${again})`}`,
+    ` order by fresh desc, place, board limit ${most};`,
   ].join("\n");
+}
+
+/** The public log's line for a run list (runs.json): how many runs of each board, how many of them new. Names no run. */
+export function runsSummary(text) {
+  const boards = new Map();
+  for (const row of readRows(text)) {
+    if (typeof row?.run_id !== "string" || !row.run_id) continue;
+    const board = typeof row.board === "string" && row.board ? row.board : "ordinary";
+    const tally = boards.get(board) ?? { runs: 0, fresh: 0 };
+    tally.runs += 1;
+    if (row.fresh === true || row.fresh === "true" || row.fresh === "t") tally.fresh += 1;
+    boards.set(board, tally);
+  }
+  if (!boards.size) return "No run to read.";
+  return [...boards].map(([board, tally]) => `${board} ${tally.runs} (${tally.fresh} new)`).join(", ");
 }
 
 /** The second half, once per run: one SELECT of every row of `runId`. */
@@ -239,14 +300,21 @@ export function marksSql(results) {
 
 async function main(argv) {
   const json = argv.includes("--json");
-  const limit = Number(argv.find((arg) => arg.startsWith("--limit="))?.slice(8)) || 20;
+  const option = (name) => argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+  const limit = Number(option("limit")) || 20;
   const files = argv.filter((arg) => !arg.startsWith("--"));
-  if (argv.includes("--runs-sql")) {
-    console.log(rankingRunsSql({ limit }));
-    return 0;
-  }
   let rows;
   try {
+    if (argv.includes("--runs-sql")) {
+      const weeks = option("weeks");
+      console.log(rankingRunsSql({ limit: option("limit"), always: option("always"), cap: option("cap"), all: argv.includes("--all"), ...(weeks === undefined ? {} : { weeks: weeks ? weeks.split(",") : [] }) }));
+      return 0;
+    }
+    if (argv.includes("--runs-summary")) {
+      if (files.length !== 1) throw new Error("Name the one runs.json the run list was read into.");
+      console.log(runsSummary(readFileSync(files[0], "utf8")));
+      return 0;
+    }
     if (argv.includes("--run-count") || argv.includes("--run-sql")) {
       if (files.length !== 1) throw new Error("Name the one runs.json the run list was read into.");
       const runIds = readRunIds(readFileSync(files[0], "utf8"));
