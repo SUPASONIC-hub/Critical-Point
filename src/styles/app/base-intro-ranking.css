@@ -394,7 +394,7 @@ summary:focus-visible {
   animation: intro-art-drift 28s ease-in-out infinite alternate;
 }
 @keyframes intro-art-drift {
-  from {
+  0% {
     transform: scale(1.02);
   }
   to {
@@ -1199,7 +1199,7 @@ summary:focus-visible {
   vertical-align: middle;
 }
 @keyframes intro-ticker-run {
-  from {
+  0% {
     transform: translateZ(0);
   }
   to {
@@ -1242,8 +1242,7 @@ summary:focus-visible {
 .season-panel,
 .quick-guide,
 .season-summary,
-.case-roadmap,
-.case-card {
+.case-roadmap {
   text-align: left;
 }
 .intro .start-priority {
@@ -2942,7 +2941,7 @@ summary:focus-visible {
   animation: opening-burst-charge 0.86s ease-out both;
 }
 @keyframes opening-burst-in {
-  from {
+  0% {
     opacity: 0;
   }
   to {
@@ -2950,7 +2949,7 @@ summary:focus-visible {
   }
 }
 @keyframes opening-burst-grid {
-  from {
+  0% {
     transform: translateX(-12%);
   }
   to {
@@ -2958,7 +2957,7 @@ summary:focus-visible {
   }
 }
 @keyframes opening-burst-panel {
-  from {
+  0% {
     opacity: 0;
     transform: translateX(-32px);
   }
@@ -2968,7 +2967,7 @@ summary:focus-visible {
   }
 }
 @keyframes opening-burst-charge {
-  from {
+  0% {
     transform: scaleX(0);
     transform-origin: left;
   }
