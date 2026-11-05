@@ -90,7 +90,8 @@ const budgets = [
   // 148,023 / 54,709 -> 148,418 / 54,917 on 2026-11-05, mood-wire over mood-tags 98d32622: the page's mood (src/mood.js: MOODS, applyMood on <html data-mood>, onMoodChange) and the hook that follows the shown scene (src/state/sceneMood.js, called from useResultReport). Measured 148,414 / 54,913 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,023 / 54,714 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again; this chunk only by the stylesheet's name it imports. Measured 148,019 / 54,710 in the e2e build, the plus 4.
   // 148,023 / 54,709 -> 148,050 / 54,709 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 148,046 / 54,699 in the e2e build, the raw plus 4 (the gzip is under its budget).
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_418, maxGzip: 54_917 },
+  // 148,418 / 54,917 -> 148,134 / 54,765 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together, less src/mood.js, which the entry now holds (AdaptiveMusic subscribes to it, so Rolldown moved the hub out of this chunk). Measured 148,130 / 54,761 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_134, maxGzip: 54_765 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -105,7 +106,8 @@ const budgets = [
   // 36,080 / 14,049 -> 36,274 / 14,117 on 2026-11-03, snap-after-reading over main 425eb4da: a quick pick after a briefing read through is not a snap (gameLogic's readThrough), the page's seconds and clock ride on the decision (readingTally's takeBriefingRead, useChoiceCommit) and a save keeps both (savedState); the observer's 순응 표본 holds the same line. Measured 36,270 / 14,113 in the e2e build over main 811df47a, the plus 4.
   // 14,117 -> 14,116 gzip on 2026-11-04, snap-after-reading over main 22f43342 (#435): no code changed (raw 36,270 as before). Measured 14,112 gzip in the e2e build, the gzip plus 4.
   // 14,116 -> 14,123 gzip on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): no code changed here (raw 36,270); #416's readThrough beside #448's lines. Measured 36,270 / 14,119 in the e2e build, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_274, maxGzip: 14_123 },
+  // 14,123 -> 14,146 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): no code changed here (raw 36,270); the entry's export names it imports shifted with the music's mood exports. Measured 36,270 / 14,142 in the e2e build, the gzip plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 36_274, maxGzip: 14_146 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -144,7 +146,8 @@ const budgets = [
   // 87,748 -> 87,755 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import list changed with their scene text. Measured 294,124 / 87,751 in the e2e build, the plus 4.
   // 294,128 / 87,755 -> 294,162 / 87,766 on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금 (the case files' hashed names in its import list). Measured 294,158 / 87,762 in the e2e build, the plus 4.
   // 87,766 -> 87,777 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are smaller (294,158); the case files' hashed names in its import list changed with the moods written on their scenes. Measured 294,158 / 87,773 in the e2e build, the gzip plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_777 },
+  // 87,777 -> 87,786 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the raw bytes are the same 294,158; the case files' hashed names in its import list. Measured 294,158 / 87,782 in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_786 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -334,7 +337,8 @@ const budgets = [
   // 69,094 -> 69,106 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 191,472; the hashed names of the chunks it imports (GameRuntime, the case files) changed. Measured 191,472 / 69,102 in the e2e build, the gzip plus 4.
   // 191,476 / 69,094 -> 191,476 / 69,104 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again; the entry only by the stylesheet's name it imports. Measured 191,472 / 69,100 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 192,759 / 69,664 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 192,755 / 69,660 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_173 },
+  // -> 193,412 / 69,958 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together, plus src/mood.js (the hub, 5 lines of code) and the subscription that carries the page's mood to the score. Measured 193,408 / 69,954 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 193_412, maxGzip: 69_958 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1348,7 +1352,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 429,342 / 486,086 / 493,279 on 2026-11-05, mood-wire over mood-tags 98d32622: no first-paint code changed; the entry's and the worker's gzip moved with the hashed names of the chunks they name (the moods written on the case files). Measured 429,338 / 486,082 / 493,275 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,663 / 486,406 / 493,600 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again (the index CSS and index.html's critical CSS). Measured 429,659 / 486,402 / 493,596 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,898 / 486,630 / 493,822 on 2026-11-05, mood-music over main c569cb99: the scene's mood picks the lead and voices the table's drone -- the entry's AdaptiveMusic (musicScore.js moodLeads/setMusicMood, AdaptiveMusic's note-by-note lead crossfade; the drone moved into gauntlet/tensionDrone.js with a voicing per mood). Measured 429,894 / 486,626 / 493,818 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_386, en: 487_129, ja: 494_322 };
+// -> 431,496 / 488,234 / 495,428 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 24af89d7): the lines above together. Measured 431,492 / 488,230 / 495,424 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 431_496, en: 488_234, ja: 495_428 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
