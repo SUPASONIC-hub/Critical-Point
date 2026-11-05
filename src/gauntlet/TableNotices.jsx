@@ -5,7 +5,7 @@ import { RelicIcon } from "./RelicDraft.jsx";
 import { formatMultiplier, formatNumber, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicDirection, getLogicType } from "./logicStreak.js";
-import { SCOUT_SECONDS } from "./tableRules.js";
+import { SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
@@ -191,7 +191,7 @@ export function ScoutBand({ band, canScout, onScout, shortcut }) {
   if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
   return (
     <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
-      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, seconds: SCOUT_SECONDS })}>
+      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })}>
       {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {band.scouted ? say.scouted : say.scout}
     </button>
   );

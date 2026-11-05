@@ -182,8 +182,8 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
-  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount });
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout,
+  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   const settleImpact = useMemo(
@@ -227,7 +227,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && !win.scouted;
+  const canScout = scoutOn && live && !paused && !locked && !win.scouted && canPayScout;
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);

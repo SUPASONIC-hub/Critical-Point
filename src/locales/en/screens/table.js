@@ -101,7 +101,7 @@ export default {
     relicsLabel: "Tools equipped",
     scout: "Scout",
     scouted: "Scouted",
-    scoutLabel: "Wall {min}–{max} · Scout, costs {seconds} seconds",
+    scoutLabel: "Wall {min}–{max} · Scout, costs {trust} Trust and {seconds} seconds",
     glossaryCard: "Card {number}: {label} ({type})",
     glossaryMastery: "Season mastery: hands you Committed with LOCK charged. Fill {goal} hands in a Stance and the rules of new hands change (STRIKE {strike} · STEADY {steady} · EXPOSE {expose}).",
   },
@@ -209,7 +209,7 @@ export default {
     holdArmed: "Press once more to Commit",
     push: "Heat {gauge} · {danger}",
     stance: "Charge {focus} · Commit for {label} next hand · {title}",
-    scout: "Scouted. The Wall is somewhere between {min} and {max}",
+    scout: "Scouted for {trust} Trust. The Wall is somewhere between {min} and {max}",
     bank: "Stake {pot} · Vault {vault}",
   },
   afterword: {

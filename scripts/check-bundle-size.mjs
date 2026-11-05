@@ -135,6 +135,7 @@ const budgets = [
   // 148,514 / 54,956 -> 148,622 / 54,994 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 148,618 / 54,990 in the e2e build, the plus 4.
   // 146,589 / 54,099 -> 146,633 / 54,110 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the case-closing decision records its relic draft (useChoiceCommit) and the runtime carries seasonSpent with the run. Measured 146,629 / 54,106 in the e2e build, the plus 4.
   // 146,589 / 54,099 -> 146,798 / 54,192 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): spendAtDraft in GameRuntime (the reroll and one more paid from the KD은행 계좌), the case-closing decision records its relic draft (useChoiceCommit) and the run carries seasonSpent. Measured 146,794 / 54,188 in the e2e build, the plus 4.
+  // 148,023 / 54,709 -> 148,041 / 54,715 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the log entry carries `threshold.scouted`. Measured 148,037 / 54,711 in the e2e build, the plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_622, maxGzip: 54_994 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -213,6 +214,7 @@ const budgets = [
   // 30,498 / 13,286 -> 31,366 / 13,569 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the two buttons under the cards (「다시 뽑기 · 4,000」 R, 「하나 더 · 12,000」 B, DraftBuy with aria-disabled and its reason), the one-line notice and the second pick's title (src/copy/relics.js). Measured 31,362 / 13,565 in the e2e build, the plus 4.
   // 31,366 / 13,569 -> 32,024 / 13,855 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft reads what its two buys say itself (readDraftSpend, src/gauntlet/draftSpend.js, in this shared chunk now rather than the runtime's, where GauntletStage read it), so the stage is under its import budget again. Measured 32,020 / 13,851 in the e2e build, the plus 4.
   // 32,024 / 13,855 -> 32,084 / 13,861 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the line under the draft's note (spendHint: one more only when a slot is open; user decision 11-05 (1)). Measured 32,080 / 13,857 in the e2e build, the plus 4.
+  // 30,526 / 13,304 -> 30,600 / 13,337 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the table words shared here (scoutLabel, voice.scout) name the 믿음, and the meters read `canPayScout`. Measured 30,596 / 13,333 in the e2e build, the plus 4.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 32_469, maxGzip: 13_960 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
@@ -1062,6 +1064,7 @@ const budgets = [
   // 44,131 / 16,529 -> 45,193 / 16,847 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode. Measured 45,189 / 16,843 in the e2e build, the plus 4.
   // 44,131 / 16,529 -> 46,432 / 17,345 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode (PR 1), and readDraftSpend (src/gauntlet/draftSpend.js): each button's open or closed state and its one reason (PR 2). Measured 46,428 / 17,341 in the e2e build, the plus 4.
   // 46,432 / 17,345 -> 46,526 / 17,396 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the Korean line under the draft's note (src/copy/relics.js spendHint, which this chunk carries). Measured 46,522 / 17,392 in the e2e build, the plus 4.
+  // 16,529 -> 16,554 gzip on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): SCOUT_TRUST, `applyGauntletEffect`'s `scouted` and the verdict's `scouted` (raw 44,119, under). Measured 44,119 / 16,550 in the e2e build, the gzip plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 45_469, maxGzip: 17_220 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -1476,6 +1479,7 @@ const budgets = [
   // 180,288 / 60,311 -> 182,240 / 60,959 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 182,236 / 60,955 in the e2e build, the plus 4.
   // 179,769 / 60,178 -> 180,238 / 60,356 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's two buttons, the notice, the second pick's title and line and the seven closed reasons in Japanese (src/locales/ja/screens/relics.js). Measured 180,234 / 60,352 in the e2e build, the plus 4.
   // 180,238 / 60,356 -> 180,350 / 60,404 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line (もう一つは枠が空いているときだけ). Measured 180,346 / 60,400 in the e2e build, the plus 4.
+  // 180,288 / 60,311 -> 180,342 / 60,330 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the Japanese scout button name, voice line and prologue 03 line say the price. Measured 180,338 / 60,326 in the e2e build, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 182_240, maxGzip: 60_959 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -1507,6 +1511,7 @@ const budgets = [
   // 150,260 / 53,611 -> 152,040 / 54,336 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 152,036 / 54,332 in the e2e build, the plus 4.
   // 149,807 / 53,485 -> 150,242 / 53,665 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the same lines in English (src/locales/en/screens/relics.js). Measured 150,238 / 53,661 in the e2e build, the plus 4.
   // 150,242 / 53,665 -> 150,346 / 53,705 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line (One more only when a slot is open). Measured 150,342 / 53,701 in the e2e build, the plus 4.
+  // 150,260 / 53,611 -> 150,308 / 53,625 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the English scout button name, voice line and prologue 03 line say the price. Measured 150,304 / 53,621 in the e2e build, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 152_040, maxGzip: 54_336 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
@@ -1747,6 +1752,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // The CI build (Linux) measures the first paint 4 bytes over this PC's e2e build (9e4ec6bf: Korean 426,929, Japanese 490,601):
 // the budgets are the CI's plus 4, 426,933, 483,927 and 490,605.
 // 426,933 / 483,927 / 490,605 -> 426,929 / 483,921 / 490,604 on 2026-11-05, phone-en-stake-11px over rules-mark-3b 9e91c588: the 360px English bank rail's 10px label rule went (play.css; the critical CSS does not carry it). Measured 426,921 / 483,916 / 490,594 in the e2e build here, 4 / 6 / 1 under cb904fb6's 426,925 / 483,922 / 490,595; the CI build reads 4 / 1 / 6 over this PC (30f5519d), so the budgets are the CI's expected 426,925 / 483,917 / 490,600 plus 4.
+// en 487,123 -> 487,130 and ja 494,315 -> 494,328 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the language dictionaries above. Measured 430,381 / 487,126 / 494,324 in the e2e build, the plus 4 (ko under its 430,390).
 const FIRST_PAINT_BUDGETS = { ko: 432_043, en: 489_484, ja: 496_601 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],

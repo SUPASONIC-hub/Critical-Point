@@ -334,6 +334,8 @@ export function useChoiceCommit(context) {
         gauge: verdict.gauge,
         wall: verdict.wall,
         pushes: verdict.pushes,
+        // B1: the look was spent (its 믿음 is in `effect`); the replay checker holds the record to it.
+        scouted: verdict.scouted,
         rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
