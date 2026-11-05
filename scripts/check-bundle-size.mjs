@@ -656,6 +656,8 @@ const budgets = [
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
   // -> 203,562 / 38,132 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 203,558 / 38,128 in the e2e build, the plus 4.
   // 203,562 / 38,132 -> 203,747 / 38,157 on 2026-11-05, text-size-setting over main 3ca15f8d: the root reads --text-scale (tokens.css, three rules and the HUD rem divided by it). Measured 203,743 / 38,153 in the e2e build, the plus 4.
+  // 200,831 / 37,589 -> 201,051 / 37,647 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap's cards below the first screen are laid out and drawn only as they come near it (content-visibility: auto with a closed card's intrinsic height, 280px, 300px on the phone rail; src/styles/app/base-intro-ranking.css). Measured 201,047 / 37,643 in the e2e build, the plus 4.
+  // 201,051 / 37,647 -> 200,963 / 37,656 on 2026-11-05, intro-cards-cv trim over main 62a25238: the sheet fits its structure budget again (the phone rail sets --card-reserve on its existing .case-card rule, gradients lose default 180deg and 0% stops and spell rgb(... / 0) as transparent, radial positions shortened); 88 raw bytes fewer, and the gzip 9 bytes more from the changed repeats. Measured 200,959 / 37,652 in the e2e build, the plus 4.
   { pattern: /^index-.*\.css$/, maxBytes: 203_747, maxGzip: 38_157 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
@@ -1354,6 +1356,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 429,328 / 486,082 / 493,273 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the English and Japanese dictionaries carry the voice's wall call (E3 첫 단계); the Korean page is under its budget still. Measured 429,326 / 486,078 / 493,269 in the e2e build, the plus 4.
 // 428,480 / 485,062 / 492,230 -> 428,933 / 485,454 / 492,668 on 2026-11-05, static-shell over main 62a25238: the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs), so each page's HTML grows. Measured 428,929 / 485,450 / 492,664 in the e2e build, the plus 4.
 // -> 430,011 / 486,764 / 494,009 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 430,007 / 486,760 / 494,005 in the e2e build, the plus 4.
+// 428,480 / 485,062 / 492,230 -> 428,596 / 485,174 / 492,344 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap cards' content-visibility rule in the index CSS (the critical CSS only its hash). Measured 428,592 / 485,170 / 492,340 in the e2e build, the plus 4.
+// 428,596 / 485,174 / 492,344 -> 428,603 / 485,186 / 492,356 on 2026-11-05, intro-cards-cv trim over main 62a25238: the index CSS gzip 9 bytes more after the trim that fits base-intro-ranking.css to its structure budget (raw 88 bytes fewer). Measured 428,599 / 485,182 / 492,352 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 430_011, en: 486_764, ja: 494_009 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
