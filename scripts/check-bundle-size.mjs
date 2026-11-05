@@ -1336,7 +1336,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_386, en: 487_129, ja: 494_322 };
+// 430,386 / 487,129 / 494,322 -> 430,386 / 487,129 / 494,300 on 2026-11-05, ja-no-font-preload over main 24af89d7: the Japanese start page no longer preloads the font (scripts/site-pages.mjs withoutFontPreload; measured FCP 13.8 -> 10.3 s on 11-05, cp-archive 메모-20261105/ja-fcp). Only /ja/index.html shrinks, by the tag's gzip bytes: the woff2 stays in the Japanese total, since every language counts the files the Korean index.html links (the stylesheet still asks for the font on /ja/). Measured 430,382 / 487,125 / 494,296 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 430_386, en: 487_129, ja: 494_300 };
+// The files the Korean page links (the font among them) are counted for every language, whatever the language's own head says: /ja/ dropped the font preload on 2026-11-05 and its line fell by the tag's bytes only.
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
