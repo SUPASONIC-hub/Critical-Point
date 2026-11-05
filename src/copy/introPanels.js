@@ -2,9 +2,8 @@ import { localizeTables } from "../locale.js";
 
 /**
  * The start screen's panels that advancedSystems.js and analystTitle.js
- * word, the season's first echo (state/openingState.js) and the tab title's
- * tail (state/tabTitle.js), read by key so another language can be laid over
- * them (src/locale.js, 다국어 틀). The Korean is those modules', moved here
+ * word and the season's first echo (state/openingState.js), read by key so
+ * another language can be laid over them (src/locale.js, 다국어 틀). The Korean is those modules', moved here
  * unchanged, its blanks named. A page in another language lays its words over
  * this table before the first paint, so every reader asks for a line when it
  * prints it, never at load.
@@ -48,8 +47,6 @@ const introPanelsCopy = {
   },
   // The line under a season's first scene, before any choice (openingState.js OPENING_ECHO).
   openingEcho: "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
-  // What follows a situation in the browser tab's title (tabTitle.js).
-  tabSuffix: " · 임계점",
   // The storage banner the intro and the report print (appViewModels.js createTelemetrySummary).
   storageBanner: {
     offline: { title: "오프라인", text: "연결이 복구되면 원격 저장을 다시 사용할 수 있습니다. 현재 기록은 브라우저에 저장됩니다." },

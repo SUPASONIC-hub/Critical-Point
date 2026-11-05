@@ -27,7 +27,7 @@ import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableFore
 import { readTableMeters } from "./tableMeters.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
-import { useTabTitle } from "../state/tabTitle.js";
+import { useTableTabTitle } from "./tableTabTitle.js";
 import { listOfferedTypes } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
@@ -60,9 +60,8 @@ import { fill } from "../locale.js";
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
 const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
-// The table's words (src/copy/table.js). Tab drafts (개선 포인트 A3): a cold table leaves the tab as index.html has it.
-const { stage: say, keys: keyWords, tab: tabWords } = tableCopy;
-const TAB_TITLES = { hot: () => tabWords.hot, critical: (gauge) => fill(tabWords.critical, { gauge }) };
+// The table's words (src/copy/table.js).
+const { stage: say, keys: keyWords } = tableCopy;
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -465,11 +464,8 @@ export function GauntletStage({
   const bandWidth = ((band.wallMax - band.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
   const heatTier = win.status === "bust" ? "bust" : win.gauge >= band.wallMin ? "critical" : win.gauge >= band.wallMin - schema.stepMax ? "hot" : "cold";
-  // The tab says what the table shows (tabTitle.js): never the hidden wall. A
-  // bust stays on it until the next table opens; the briefing leaves it be.
-  const busted = win.status === "bust" && win.cause !== "abandon";
-  const tabTitle = busted ? tabWords.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
-  useTabTitle("table", tabTitle, { rank: 1, keep: busted });
+  // The tab counts to the band, and holds a bust until the next table opens (tableTabTitle.js).
+  useTableTabTitle({ win, band, schema, tableOpen, live });
   // On a closed window the purse shows what the settle will leave.
   const settling = !live && claimed && run?.windowIndex === dealtIndex;
 

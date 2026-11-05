@@ -3,7 +3,8 @@ import { LOCALE_KEY } from "../src/appConfig.js";
 import introCopy from "../src/copy/intro.js";
 import enIntro from "../src/locales/en/screens/intro.js";
 import jaIntro from "../src/locales/ja/screens/intro.js";
-import { dismissProtocolBreach, startFirstRun, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { bustStakedCard, dismissProtocolBreach, startFirstRun, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { openBrokenBoard } from "./helpers/layout.js";
 
 /**
  * The language choice on the intro (LanguagePicker.jsx, 다국어 틀): a
@@ -131,4 +132,30 @@ test("the Korean tab is index.html's title, as it was @prod", async ({ page }) =
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
   await expect(page).toHaveTitle(introCopy.pageTitle);
+});
+
+// The tab while a table runs (gauntlet/tableTabTitle.js; 개선 포인트 A3, user
+// decision 11-05): a board dealt 8 short of the wall band's low edge, the most
+// a board can start with, so the first push can already reach it -- the tab
+// counts to the band before the page's title. A bust is 징계 회부, held through
+// the reveal and the next window's briefing, and the next table lets it go.
+// No creep, so the count holds at 8 until a push; the cards are staked from
+// the keyboard, as a card on a hot table beats and never holds still for a
+// click (the creep busted the table while a click waited, 11-05).
+test("the tab counts to the wall band on a hot table, says 징계 회부 after a bust, and lets it go on the next table", async ({ page }) => {
+  test.setTimeout(90_000);
+  await openBrokenBoard(page, "case01", "start", { schema: { startGauge: 48, creep: 0 } });
+  await expect(page).toHaveTitle(`⚠ 벽까지 8 · ${introCopy.pageTitle}`, { timeout: TRANSITION_TIMEOUT_MS });
+  await page.locator("body").click({ position: { x: 2, y: 2 } });
+  await page.keyboard.press("1");
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await bustStakedCard(page);
+  const referral = `[징계 회부] ${introCopy.pageTitle}`;
+  await expect(page).toHaveTitle(referral);
+  await page.getByTestId("decision-next").click();
+  // The next window's briefing: the referral stays until that table opens.
+  await expect(page).toHaveTitle(referral);
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click({ force: true });
+  await expect(page).not.toHaveTitle(/징계 회부/, { timeout: TRANSITION_TIMEOUT_MS });
 });

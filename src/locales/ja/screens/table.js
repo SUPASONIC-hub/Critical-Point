@@ -1,10 +1,5 @@
 /** src/copy/table.js in Japanese: the table, its hand, its stance and its ledger. */
 export default {
-  tab: {
-    hot: "▲ 押せば壁の射程内",
-    critical: "▲ 熱 {gauge} · 壁の区間内",
-    bust: "[BUST] 勝負が壁に触れた",
-  },
   danger: {
     inBand: "壁の区間内",
     inReach: "押せば壁の射程内",

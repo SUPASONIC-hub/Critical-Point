@@ -31,9 +31,11 @@ import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 import { getOutcomeTone } from "../plateStory.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
+import tabTitlesCopy from "../copy/tabTitles.js";
 
-// The rank's line, the bridge, the feedback questions and the tab's title (src/copy/reportLines.js).
-const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK, tabTitle: TAB_TITLE } = reportLinesCopy;
+// The rank's line, the bridge and the feedback questions (src/copy/reportLines.js); the tab's title (src/copy/tabTitles.js).
+const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK } = reportLinesCopy;
+const { result: TAB_TITLE } = tabTitlesCopy;
 
 /**
  * The copy the report prints around the numbers: the season so far, the rank's

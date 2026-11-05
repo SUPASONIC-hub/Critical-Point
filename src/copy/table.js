@@ -9,12 +9,6 @@ import { localizeTables } from "../locale.js";
  * particle its word takes, which another language leaves out.
  */
 const tableCopy = {
-  // The browser tab while the table is hot (GauntletStage's TAB_TITLES).
-  tab: {
-    hot: "▲ 밀면 벽 사정권",
-    critical: "▲ 열기 {gauge} · 벽 구간 안",
-    bust: "[BUST] 판이 벽에 닿았다",
-  },
   // The 현재 위험 cell's line (tableMeters.js describeDanger).
   danger: {
     inBand: "벽 구간 안",
