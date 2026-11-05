@@ -606,6 +606,11 @@ Still open, on purpose:
   `newGamePlus` and `case_id`, through a redefinition of
   `refresh_scene_bust_stats` in the rules-mark-3 migration. The NEW GAME+ work
   itself (#220) went out ahead of rules-mark-3, in bundle A on 2026-10-23.
+  The redefinition never reached a migration until 2026-11-05 (D3 reviewed
+  again, answer (1): keep the floor and the hourly rebuild, add the filter
+  alone): `20261106050000_scene_bust_stats_skip_new_game_plus.sql` leaves out
+  case rows whose `summary->>'newGamePlus'` is `'true'`, and `check:grants`
+  holds it ("D3: NEW GAME+ windows are left out").
 - Server checks, phase 2 (F1, #216, eight answers all option 1) merged on
   2026-10-23 (item 92): `npm run verify:ranking` rechecks a run's score from
   its decision log and replays its recorded windows, and the daily `Verify
