@@ -155,9 +155,21 @@
   --ui-dur: 240ms;
   --ui-page-max: 1240px;
   --ui-gutter: clamp(16px, 4.2vw, 56px);
+  /* 글자 크기 (E5, 2026-11-05, after pc-type-scale, PR 390): the player's own factor, 1, 1.125
+     or 1.25, written inline on <html> by state/accessibilitySettings.js beside
+     `data-text-size`. Inline so the first paint already has it: the critical
+     CSS keeps only the rules the intro used, and an attribute rule it never
+     saw used would arrive with the deferred sheet, as a jump. */
+  --text-scale: 1;
   /* The rem the HUD's big numbers and the decorative numerals are sized in:
-     1rem everywhere except the PC block below, which takes the 1/8 back. */
-  --hud-rem: 1rem;
+     1rem everywhere except the PC block below, which takes the 1/8 back, and
+     divided by the player's factor so the pot, the clock and the timers keep
+     their size whatever the setting. */
+  --hud-rem: calc(1rem / var(--text-scale));
+}
+
+html {
+  font-size: calc(100% * var(--text-scale));
 }
 
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from
@@ -168,20 +180,21 @@
    1024 itself the `max-width: 1024px` tablet layouts still hold, and their
    narrowest columns were not cut for 18px type. The
    pot, the clock and the timers are tuned to the HUD's height and stay their
-   size through --hud-rem. */
+   size through --hud-rem. The player's 글자 크기 factor multiplies each of
+   these (18 x 1.125 = 20.25px, 18 x 1.25 = 22.5px) and divides --hud-rem. */
 @media (min-width: 1025px) {
   html {
-    font-size: 112.5%;
+    font-size: calc(112.5% * var(--text-scale));
   }
 
   :root {
-    --hud-rem: calc(1rem / 1.125);
+    --hud-rem: calc(1rem / 1.125 / var(--text-scale));
   }
 
   /* The start screen keeps 16px: at 18px Linux put the 1280x720 start button
      at 733 (11-02). The reading screens are where the larger type is for. */
   html:has(.intro) {
-    font-size: 100%;
-    --hud-rem: 1rem;
+    font-size: calc(100% * var(--text-scale));
+    --hud-rem: calc(1rem / var(--text-scale));
   }
 }
