@@ -27,7 +27,8 @@ import { fill } from "../locale.js";
  * - on a table that counts B2's links, the line its reading carries for the
  *   board that opens (`said`, cascadeRisk.js: a new link, or one due next);
  * - the clock at ten and at five seconds, and a table the reading clock opened;
- * - that a first press armed 확정 and a second one seals it (useHoldConfirm);
+ * - that a press let the held 확정 go too soon (길게 눌러야 확정된다), or that a
+ *   screen reader's tap armed it and a second one seals it (useHoldConfirm);
  * - what a look (SCOUT) bought: the narrower band, once, as the button is spent.
  *
  * It does not say the heartbeat (a number that moves every tick is a region
@@ -47,7 +48,7 @@ const VOICE_GAP_MS = 1500;
 const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
 
 /**
- * The armed 확정 first -- it lapses in three seconds -- then the clock's calls
+ * The held 확정's hint or arm first -- they lapse in seconds -- then the clock's calls
  * before the push's and the stance's: a listener out of time has the least of
  * it to lose.
  */
@@ -57,8 +58,11 @@ const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, audit: 3, links: 
 // each call is made, so another language laid over them is the one said.
 const voice = () => tableCopy.voice;
 
-/** What the voice says when a first press has armed 확정 (hold-to-seal). Read when the call is made. */
+/** What the voice says when a screen reader's tap has armed 확정 (hold-to-seal). Read when the call is made. */
 export const getHoldArmedCall = () => voice().holdArmed;
+
+/** What the voice says of the held 확정's phase: the hint after a short press, the arm after a tap, else nothing. */
+export const getHoldCall = (phase) => (phase === "armed" ? getHoldArmedCall() : phase === "hinted" ? voice().holdHint : "");
 
 export const describePush = ({ gauge, dangerLine }) => fill(voice().push, { gauge: Math.round(gauge), danger: dangerLine });
 
@@ -77,7 +81,7 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, armed = false, band = null }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null }) {
   const carry = findStanceCarry(cashMutations);
   return {
     live,
@@ -86,7 +90,7 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ar
     carry: carry?.id ?? "",
     stance: carry ? describeStanceCarry({ focus: win.focus, carry }) : "",
     clock: getClockCall({ ...clock, live, paused: false }),
-    hold: armed ? getHoldArmedCall() : "",
+    hold: getHoldCall(hold),
     scout: band?.scouted ? describeScout(band) : "",
   };
 }

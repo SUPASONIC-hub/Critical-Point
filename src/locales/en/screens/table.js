@@ -63,7 +63,8 @@ export default {
     commit: "Commit",
     oneMore: "Once more",
     holdToCommit: "Hold to Commit",
-    holdHelp: "Press and hold to Commit. If holding is hard, press again within 3 seconds",
+    holdHint: "Hold, don't tap",
+    holdHelp: "Press and hold to Commit",
   },
   keys: {
     stake: "stake",
@@ -197,6 +198,7 @@ export default {
   },
   voice: {
     holdArmed: "Press once more to Commit",
+    holdHint: "Hold the button down to Commit",
     push: "Heat {gauge} · {danger}",
     stance: "Charge {focus} · Commit for {label} next hand · {title}",
     scout: "Scouted. The Wall is somewhere between {min} and {max}",

@@ -120,6 +120,7 @@ const budgets = [
   // 30,492 / 13,281 -> 30,498 / 13,286 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 30,494 / 13,282 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 30,526 / 13,304 on 2026-11-04, kd-bank-account over main 629de24c: the KD은행 계좌 -- the purse as a button with the season a tap away, and 방금 (stage.purseJust). Measured 30,522 / 13,300 in the e2e build, the plus 4.
   // 30,526 / 13,304 -> 30,589 / 13,340 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 30,585 / 13,336 in the e2e build, the plus 4.
+  // 30,526 / 13,304 -> 30,537 / 13,287 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the table's words gain 길게 눌러야 확정 (say.holdHint, voice.holdHint) and lose the long hold help. Measured 30,533 / 13,283 in the e2e build, the plus 4.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 30_589, maxGzip: 13_340 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
@@ -664,7 +665,8 @@ const budgets = [
   // which wraps one address under the other on a phone. Measured 200,787 / 37,577 in the e2e build, the plus 4.
   // 200,479 / 37,521 -> 200,831 / 37,589 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit's address row (#443) with plate-sound-clip's transform. Measured 200,827 / 37,585 in the e2e build, the plus 4.
   // -> 203,562 / 38,132 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 203,558 / 38,128 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_562, maxGzip: 38_132 },
+  // 203,562 / 38,132 -> 203,575 / 38,173 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the held 확정's gauge (.gx-hold, its reduced-motion 0.6s) in place of the ::after line, less a duplicated hand rule and two merged blocks. Measured 203,571 / 38,169 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 203_575, maxGzip: 38_173 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1171,6 +1173,7 @@ const budgets = [
   // -> 180,288 / 60,311 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 180,284 / 60,307 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,352 / 60,333 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 180,348 / 60,329 in the e2e build, the plus 4.
   // 180,288 / 60,311 -> 180,355 / 60,334 on 2026-11-05, rank-title over main 24af89d7 (C1 기록 칭호): the five titles (責任分析官 added) and the name line's words in Japanese. Measured 180,351 / 60,330 in the e2e build, the plus 4.
+  // 180,288 / 60,311 -> 180,296 / 60,303 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): 長押しが必要 and 長押しすると確定する, the hold help shortened. Measured 180,292 / 60,299 in the e2e build, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_352, maxGzip: 60_333 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -1193,6 +1196,7 @@ const budgets = [
   // -> 150,260 / 53,611 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 150,256 / 53,607 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,317 / 53,626 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 150,313 / 53,622 in the e2e build, the plus 4.
   // 150,260 / 53,611 -> 150,323 / 53,631 on 2026-11-05, rank-title over main 24af89d7 (C1 기록 칭호): the five titles (Chief Analyst added) and the name line's words in English. Measured 150,319 / 53,627 in the e2e build, the plus 4.
+  // 150,260 / 53,611 -> 150,279 / 53,614 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): "Hold, don't tap" and "Hold the button down to Commit", the hold help shortened. Measured 150,275 / 53,610 in the e2e build, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_317, maxGzip: 53_626 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
@@ -1365,6 +1369,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 429,328 / 486,088 / 493,287 on 2026-11-05, collapse-staging over main c569cb99: the bust's stop (A2) -- the slam's third line in three languages, the heart stopped on the frame (fxVariables, the pulse reads —) and the drone's slower let-down (gauntletAudio). Measured 429,327 / 486,084 / 493,283 in the e2e build, the plus 4 (the Korean line unchanged).
 // 429,328 / 486,074 / 493,267 -> 429,334 / 486,079 / 493,272 on 2026-11-05, ending-reform-order over main c569cb99 (#453): the entry's gzip only, by the renamed gameLogic chunk it names (the first paint's files are the same). Measured 429,330 / 486,075 / 493,268 in the e2e build, the plus 4.
 // 430,386 / 487,129 / 494,322 -> 430,486 / 487,249 / 494,444 on 2026-11-05, rank-title over main 24af89d7 (C1 기록 칭호): the entry's fifth title and name line, and each dictionary's. Measured 430,482 / 487,245 / 494,440 in the e2e build, the plus 4.
+// 430,386 / 487,129 / 494,322 -> 430,430 / 487,177 / 494,357 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the index CSS's gauge rules and the dictionaries' hold words. Measured 430,426 / 487,173 / 494,353 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 430_391, en: 487_113, ja: 494_306 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
