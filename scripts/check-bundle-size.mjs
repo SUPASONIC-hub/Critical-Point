@@ -87,7 +87,8 @@ const budgets = [
   // 147,608 / 54,517 -> 147,532 / 54,533 on 2026-11-04, caption-split over main 7ddced5f: a plural possessive (the analysts' room) is not a quote, and the marks and the speaker line read the one pairedQuotes (src/components/proseSentences.js). Measured 147,528 / 54,529 in the e2e build, the plus 4.
   // -> 148,023 / 54,707 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 148,019 / 54,703 in the e2e build, the plus 4.
   // 148,023 / 54,707 -> 148,023 / 54,709 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the chunk names it imports. Measured 148,019 / 54,705 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_023, maxGzip: 54_709 },
+  // 148,023 / 54,709 -> 148,418 / 54,917 on 2026-11-05, mood-wire over mood-tags 98d32622: the page's mood (src/mood.js: MOODS, applyMood on <html data-mood>, onMoodChange) and the hook that follows the shown scene (src/state/sceneMood.js, called from useResultReport). Measured 148,414 / 54,913 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_418, maxGzip: 54_917 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -140,14 +141,16 @@ const budgets = [
   // 294,110 / 87,736 -> 294,128 / 87,748 on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude); the case files' hashed names in its import list changed with their scene text. Measured 294,124 / 87,744 in the e2e build, the plus 4.
   // 87,748 -> 87,755 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import list changed with their scene text. Measured 294,124 / 87,751 in the e2e build, the plus 4.
   // 294,128 / 87,755 -> 294,162 / 87,766 on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금 (the case files' hashed names in its import list). Measured 294,158 / 87,762 in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_766 },
+  // 87,766 -> 87,777 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are smaller (294,158); the case files' hashed names in its import list changed with the moods written on their scenes. Measured 294,158 / 87,773 in the e2e build, the gzip plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_777 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
   // 2026-10-06, when cases 01-07 and the finale were written at the length of
   // the rest of the season: its thirty scenes are the most of any case. It is
   // not the chunk a first visit waits for; that one is prologue01.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
+  // 25,400 -> 25,416 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: each tagged scene carries its mood in its case's file (`"mood":"tense"`; scripts/season-split.mjs buildRuntimeData reads src/sceneMoods.js at build time, and that table never ships): 321 scenes, 4,877 raw / 1,370 gzip bytes over all 55 files, at most 227 / 54 on one; case01 98,634 / 25,412. Measured in the e2e build, the gzip plus 4.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_416 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
@@ -326,6 +329,7 @@ const budgets = [
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
   // -> 191,476 / 69,094 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 191,472 / 69,090 in the e2e build, the plus 4.
   // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
+  // 69,094 -> 69,106 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 191,472; the hashed names of the chunks it imports (GameRuntime, the case files) changed. Measured 191,472 / 69,102 in the e2e build, the gzip plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 191_573, maxGzip: 69_173 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -1336,6 +1340,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
 // -> 429,328 / 486,074 / 493,267 on 2026-11-05, bundle-1105c (#450, #432, #425, #434) over main 3d4183e5 (#449, #441): the lines above together. Measured 429,324 / 486,070 / 493,263 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
+// 429,328 / 486,074 / 493,267 -> 429,342 / 486,086 / 493,279 on 2026-11-05, mood-wire over mood-tags 98d32622: no first-paint code changed; the entry's and the worker's gzip moved with the hashed names of the chunks they name (the moods written on the case files). Measured 429,338 / 486,082 / 493,275 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 430_386, en: 487_129, ja: 494_322 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
@@ -1472,7 +1477,8 @@ function checkBudget(file, budget) {
 // 10,139 / 3,651 -> 10,274 / 3,696 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the two lines above together (the start pages and the locale preload). Measured 10,270 / 3,692 in the e2e build, the plus 4.
 // 10,139 / 3,651 -> 10,179 / 3,660 on 2026-11-04, board-auto-hide over main 2bd9a8ba: one more file in the warm list, boardBlockedTerms; the worker's code did not change. Measured 10,175 / 3,656, the plus 4.
 // 10,274 / 3,696 -> 10,314 / 3,712 on 2026-11-05, board-auto-hide over main 3d4183e5: one more file in the warm list, boardBlockedTerms, beside the start pages and the locale preload. Measured 10,310 / 3,708 in the e2e build, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_314, maxGzip: 3_712 };
+// 3,712 -> 3,719 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 10,310; the hashed names in its warm list changed. Measured 10,310 / 3,715 in the e2e build, the gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 10_314, maxGzip: 3_719 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
