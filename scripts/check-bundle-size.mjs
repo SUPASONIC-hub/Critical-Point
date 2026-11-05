@@ -1260,7 +1260,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,841 / 490,518 -> 428,231 / 484,811 / 491,981 on 2026-11-04, bundle-1104a over main 2bd9a8ba: the lines above together (#429 #433 #436 #445 #438); the Korean page now names the locale preload, and English and Japanese are measured from /en/ and /ja/. Measured 428,227 / 484,807 / 491,977 in the e2e build, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,105 / 484,103 / 490,780 on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the credit's two creators and their address links (the entry and the index CSS). Measured 427,101 / 484,099 / 490,776, the plus 4.
 // 428,231 / 484,811 / 491,981 -> 428,480 / 485,062 / 492,230 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit (#443, the entry and the index CSS) on bundle-1104a's first paint. Measured 428,476 / 485,058 / 492,226 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 428_480, en: 485_062, ja: 492_230 };
+// 428,480 / 485,062 / 492,230 -> 428,933 / 485,454 / 492,668 on 2026-11-05, static-shell over main 62a25238: the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs), so each page's HTML grows. Measured 428,929 / 485,450 / 492,664 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 428_933, en: 485_454, ja: 492_668 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
