@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c7_start": {
       "title": "Transfer Order",
-      "text": "The posting: corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. The place is 240km from Seoul. It is a personnel move, not discipline, so there is no appeal and no stated reason. Once it takes effect, your access to internal records shrinks to that branch. Han Seoyun taps the approval field. 'Same shape as that document 3 years ago. This person doesn’t sign a name. They sign with a seat.' The order is dated 12 days before the investigation into Oh Jinwoo began.",
+      "text": "The posting: corporate lending, Gangwon Yeongdong Branch, effective in 48 hours. The place is 240km from Seoul. It is a personnel move, not discipline, so there is no appeal and no stated reason. Once it takes effect, your access to internal records shrinks to that branch. Han Seoyun turns to the last page. The final approval field is empty. 'Same shape as that document 3 years ago. This person doesn’t sign a name. They sign with a seat.' The order is dated 12 days before the investigation into Oh Jinwoo began.",
       "memo": [
         "48 hours until effective, no appeal process",
         "Transfer order final approval field: blank",
