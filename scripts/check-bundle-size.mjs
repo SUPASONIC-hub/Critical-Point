@@ -99,7 +99,8 @@ const budgets = [
   // 54,709 -> 54,707 gzip on 2026-11-05, prose-bundle-b (#412 #413 #414 #417 #418 #419) over main 8ac59b71 (#456): no code changed (raw 148,019 as before); the chunk names it imports shifted with the trimmed case copy. Measured 54,703 gzip in the e2e build, the gzip plus 4.
   // 54,765 -> 54,772 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the raw bytes are the same 148,130; the chunk names it imports shifted with the trimmed case copy (#456, #457). Measured 148,130 / 54,768 in the e2e build, the gzip plus 4.
   // 54,772 -> 54,771 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 148,130; the chunk names it imports (#460). Measured 148,130 / 54,767 in the e2e build, the gzip plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_174, maxGzip: 54_771 },
+  // -> 148,285 / 54,824 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): #458's scene moods over the bundle's lines above. Measured 148,281 / 54,820 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_285, maxGzip: 54_824 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -364,7 +365,8 @@ const budgets = [
   // 69,958 -> 69,965 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the raw bytes are the same 193,408; the case files' hashed names in the entry's import list shifted with the trimmed case copy (#456, #457). Measured 193,408 / 69,961 in the e2e build, the gzip plus 4.
   // 191,573 / 69,174 -> 191,573 / 69,176 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the case files' hashed names in the entry's import list changed with their scene text. Measured 191,569 / 69,172 in the e2e build, the plus 4.
   // 69,965 -> 69,957 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 193,408; the case files' hashed names in the entry's import list (#460). Measured 193,408 / 69,953 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 192_443, maxGzip: 69_367 },
+  // -> 194,282 / 70,155 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): #458's mood and music in the entry over the bundle's 글자 크기 setting and the rest above. Measured 194,278 / 70,151 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 194_282, maxGzip: 70_155 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -696,7 +698,8 @@ const budgets = [
   // -> 203,882 / 38,222 on 2026-11-05, bundle-1105d after merging main 977809b3 (#457 본문 줄이기 b), the static shell reverted and the roadmap summary's flex: none: the one declaration (flex: none) on the card's summary, 6 bytes raw, the gzip the same. Measured 203,878 / 38,218 in the e2e build, the plus 4.
   // 203,562 / 38,132 -> 204,569 / 38,438 on 2026-11-05, mood-tokens over main c569cb99: the ground follows the scene's mood (tokens.css: neutral one step lighter, tense/dread/bright/sorrow as :root[data-mood] blocks, --ui-ease-out), the felt's 0.6s fade (play.css), the intro scrims on the neutral ground and the critical CSS cut again. Measured 204,565 / 38,434 in the e2e build, the plus 4.
   // 38,438 -> 38,432 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the two acid glows at 0.1 (the active case card, the next-case panel), for the readability check on the lighter neutral ground. Measured 204,565 / 38,428 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 203_882, maxGzip: 38_222 },
+  // -> 204,886 / 38,527 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): #458's mood tokens and glows over the bundle's root rules and the card summary's flex: none. Measured 204,882 / 38,523 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 204_886, maxGzip: 38_527 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1413,7 +1416,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 431,496 / 488,234 / 495,428 -> 431,500 / 488,226 / 495,421 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the lines above together over the trimmed case copy (#456, #457), the two acid glows at 0.1 in the index CSS. Measured 431,496 / 488,222 / 495,417 in the e2e build, the plus 4.
 // 430,387 / 487,119 / 494,312 -> 430,391 / 487,113 / 494,306 on 2026-11-05, prose-bundle-c (#420 #422 #423 #427 #428) over main 977809b3 (#457): the trimmed case copy of cases 19-24, 40-45 and 49; the entry and the en·ja dictionaries name the renamed case chunks. Measured 430,387 / 487,109 / 494,302 in the e2e build, the plus 4.
 // 431,500 / 488,226 / 495,421 -> 431,491 / 488,208 / 495,402 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the lines above together over the trimmed case copy (#456, #457, #460); the entry and the en/ja dictionaries name the renamed case chunks. Measured 431,487 / 488,204 / 495,398 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 430_756, en: 487_557, ja: 494_763 };
+// -> 431,886 / 488,653 / 495,860 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): the lines above together. Measured 431,882 / 488,649 / 495,856 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 431_886, en: 488_653, ja: 495_860 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
