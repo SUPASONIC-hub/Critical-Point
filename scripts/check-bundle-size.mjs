@@ -320,9 +320,10 @@ const budgets = [
   // 68,502 -> 68,508 gzip on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the entry names the renamed locale chunks. Measured 189,733 / 68,504 in the e2e build, the plus 4.
   // 190,097 / 68,670 -> 190,442 / 68,790 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit line above (#443) on bundle-1104a's entry. Measured 190,438 / 68,786 in the e2e build, the plus 4.
   // -> 190,506 / 68,833 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together. Measured 190,502 / 68,829 in the e2e build, the plus 4.
+  // 190,506 / 68,833 -> 190,673 / 68,870 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 190,669 / 68,866 in the e2e build (setPageTitle exported for its unit test), the plus 4.
   // 189,392 / 68,379 -> 190,149 / 68,585 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the board's two blocked-word refusals (src/copy/boardPost.js), the server's two new messages read back, and the hook's check that loads the list on 글 남기기 (src/state/useBoard.js; the list itself is its own chunk, boardBlockedTerms). Measured 190,145 / 68,581 in the e2e build, the plus 4.
   // 190,506 / 68,833 -> 191,263 / 69,016 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the board's two blocked-word refusals and the on-demand check above on main's entry. Measured 191,259 / 69,012 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 191_263, maxGzip: 69_016 },
+  { pattern: /^index-.*\.js$/, maxBytes: 190_673, maxGzip: 68_870 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1138,9 +1139,10 @@ const budgets = [
   // 179,747 / 60,166 -> 179,769 / 60,178 on 2026-11-04, canon-fixes-1 over main 76cf4a07: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude). Measured 179,765 / 60,174, the plus 4.
   // 179,747 / 60,166 -> 179,771 / 60,177 on 2026-11-04, kd-bank-account over main 629de24c: KD銀行口座 and 直近. Measured 179,767 / 60,173, the plus 4.
   // 179,769 / 60,178 -> 179,793 / 60,190 on 2026-11-04, kd-bank-account after merging main 9676ea92 (#424): KD銀行口座 and 直近 over the canon fixes. Measured 179,789 / 60,186 locally and in Linux CI, the plus 4.
+  // 179,793 / 60,190 -> 179,858 / 60,204 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 179,854 / 60,200 in the e2e build, the plus 4.
   // 179,769 / 60,178 -> 179,989 / 60,211 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the two blocked-word refusals in Japanese. Measured 179,985 / 60,207, the plus 4.
   // 179,793 / 60,190 -> 180,032 / 60,227 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in Japanese over KD銀行口座. Measured 180,028 / 60,223 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 180_032, maxGzip: 60_227 },
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 179_858, maxGzip: 60_204 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1155,9 +1157,10 @@ const budgets = [
   // 149,807 / 53,485 -> 149,831 / 53,496 on 2026-11-04, kd-bank-account after merging main 2bd9a8ba (#435's glossary in): KD Bank account and Last over the glossary's terms. Measured 149,827 / 53,492, the plus 4.
   // 149,807 / 53,485 -> 149,834 / 53,489 on 2026-11-04, en-ko-leak over main 22f43342: the brand's reading under the wordmark, Trigger Lab (screens.intro.titleReading, the user's choice 1). Measured 149,830 / 53,485, the plus 4.
   // -> 149,859 / 53,502 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 4e3f8e48 (#447): the lines above together. Measured 149,855 / 53,498 in the e2e build, the plus 4.
+  // 149,859 / 53,502 -> 149,939 / 53,520 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 149,935 / 53,516 in the e2e build, the plus 4.
   // 149,807 / 53,485 -> 150,005 / 53,529 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the two blocked-word refusals in English. Measured 150,001 / 53,525, the plus 4.
   // 149,859 / 53,502 -> 150,057 / 53,546 on 2026-11-05, board-auto-hide over main 3d4183e5: the two blocked-word refusals in English over bundle-1105a's dictionary. Measured 150,053 / 53,542 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 150_057, maxGzip: 53_546 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 149_939, maxGzip: 53_520 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1187,7 +1190,8 @@ const budgets = [
   // 3,500 -> 3,505 gzip on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the raw bytes are the same; the hashed names in its import maps changed and gzip worse. Measured 3,501, the plus 4.
   // 3,505 -> 3,520 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import maps changed and gzip worse. Measured 12,987 / 3,516, the plus 4.
   // 3,520 -> 3,525 gzip on 2026-11-04, bundle-1105b (#443 credits-alice + #446 canon-a044 over main 2bd9a8ba): the raw bytes are the same; #446 changes case files and their hashed names in the import maps gzip worse. Measured 12,987 / 3,521, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 12_991, maxGzip: 3_525 },
+  // 12,991 / 3,525 -> 13,064 / 3,564 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 13,060 / 3,560 in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_064, maxGzip: 3_564 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1316,9 +1320,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 426,845 / 483,841 / 490,518 -> 427,105 / 484,103 / 490,780 on 2026-11-04, credits-alice over main 9676ea92 (canon-fixes-1): the credit's two creators and their address links (the entry and the index CSS). Measured 427,101 / 484,099 / 490,776, the plus 4.
 // 428,231 / 484,811 / 491,981 -> 428,480 / 485,062 / 492,230 on 2026-11-04, bundle-1105b over main 4e3f8e48 (#447): the credit (#443, the entry and the index CSS) on bundle-1104a's first paint. Measured 428,476 / 485,058 / 492,226 in the e2e build, the plus 4.
 // -> 429,066 / 485,663 / 492,823 on 2026-11-04, bundle-1105a (#440, #439, #442, #416) over main 62a25238 (#448): the lines above together, the critical CSS cut again. Measured 429,062 / 485,659 / 492,819 in the e2e build, the plus 4.
+// 429,066 / 485,663 / 492,823 -> 429,106 / 485,758 / 492,935 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 429,102 / 485,754 / 492,931, the plus 4.
 // 426,845 / 483,841 / 490,518 -> 427,048 / 484,092 / 490,774 on 2026-11-04, board-auto-hide over main 2bd9a8ba: the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 427,044 / 484,088 / 490,770, the plus 4.
 // 429,066 / 485,663 / 492,823 -> 429,247 / 485,884 / 493,059 on 2026-11-05, board-auto-hide over main 3d4183e5 (#449, #441): the entry's and the dictionaries' blocked-word refusals and the hook's on-demand check. Measured 429,243 / 485,880 / 493,055 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 429_247, en: 485_884, ja: 493_059 };
+const FIRST_PAINT_BUDGETS = { ko: 429_106, en: 485_758, ja: 492_935 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

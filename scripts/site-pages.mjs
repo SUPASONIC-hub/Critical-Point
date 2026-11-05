@@ -1,4 +1,7 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
+import introCopy from "../src/copy/intro.js";
+import enIntro from "../src/locales/en/screens/intro.js";
+import jaIntro from "../src/locales/ja/screens/intro.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
@@ -503,12 +506,14 @@ export function readableCharacters(html) {
  * written there (the first of its `DESCRIPTION`, then the first paragraph's
  * "runs in your browser"), and every card says the same: until 11-03 the start
  * page said 「…게임 프로토타입」 in one place and 「플레이테스트 프로토타입」
- * in another. `intro` is the about page's first two sentences.
+ * in another. `intro` is the about page's first two sentences. `title` is
+ * the start screen's own (`pageTitle` in src/copy/intro.js and its two
+ * dictionaries), which the game also puts on the tab (src/locale.js).
  * tests/unit/site-pages.test.mjs holds both to the about pages.
  */
 export const START_PAGE = {
   ko: {
-    title: "임계점: CRITICAL POINT - 판단이 깊어지는 순간",
+    title: introCopy.pageTitle,
     description:
       "「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다.",
     intro: [
@@ -527,7 +532,7 @@ export const START_PAGE = {
     ],
   },
   en: {
-    title: "Critical Point - Every 45 seconds, your judgment goes on the record",
+    title: enIntro.pageTitle,
     description:
       "Critical Point is a corporate and financial mystery where every push of the stake brings the Wall closer. It runs in your web browser and is free to play, with no sign-up and nothing to install.",
     intro: [
@@ -546,7 +551,7 @@ export const START_PAGE = {
     ],
   },
   ja: {
-    title: "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される",
+    title: jaIntro.pageTitle,
     description:
       "『臨界点: CRITICAL POINT』は、賭け金を上げるほど壁が近づく企業・金融ミステリーゲームです。ウェブブラウザですぐに動き、会員登録やインストールなしに無料で遊べます。",
     intro: [

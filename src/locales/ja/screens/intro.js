@@ -1,5 +1,6 @@
 /** src/copy/intro.js in Japanese: the start screen and its drawers. */
 export default {
+  pageTitle: "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される",
   subtitle: "45秒ごとに、あなたの判断基準が記録される",
   titleReading: "トリガーラボ",
   premise: "3年前、あなたは融資にただひとり反対した。融資は実行され、あなたは米国系資本が筆頭株主のKD金融グループの地下、トリガーラボへ下りてきた。今日届いた最初のファイルに、あの融資番号が残っている。長く抱えた条件は、次の事件の圧力として戻る。物語は少し前、見習い最後の課題から始まる。",
