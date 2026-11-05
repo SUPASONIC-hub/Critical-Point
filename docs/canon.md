@@ -84,6 +84,7 @@ Three of these are reveals, and each still means what it meant:
 | Where the pressure comes from | New York's quarterly ROE target, the dividend and the 「아시아 포트폴리오 리뷰」; English mail and dawn video calls on New York time; the board seats New York appoints; a rumour that the value is being raised before a sale |
 | Seoul's window | 그룹전략실, 본사 33층: it makes the New York numbers come out |
 | 사건 44's four acquittals | Approved from a shared account, so the e-signature field is empty and no approver can be named -- the same kind of account as 프롤로그 05's 전략팀-공용03; 사건 45 reads the erased pencil marks on the scanned printouts of those four |
+| The player's money | Shown on the table as the player's KD은행 계좌 (en KD Bank account, ja KD銀行口座): the 실사 fee KD은행 pays for the work flows through KD, so what a run holds is a KD은행 deposit. Display only; `check:canon` holds the three names |
 
 The owner is a company and is drawn only as a company. No person in the
 season is given an ethnicity or religion through it, and nothing in the copy
@@ -331,6 +332,12 @@ The loan was extended four times, each time over 노아's "거절" by a person's
 account. The fourth exception is under the analyst's 사번 and dated 3월 30일:
 ten days before the analyst's first day at KD캐피탈 (4월 9일, 목) and 25 days
 before the committee of 4월 24일 (사건 31, hidden route).
+
+The 32억 "사업 자문료" did not go to 해온파트너스: that company's wind-up was
+registered in 2025 (사건 08), and its last 11억 4천 left for Singapore three
+days before (사건 29). The payee of 2026 is "해온파트너스와 같은 주소의 새
+법인", left unnamed, and it is that company that moves its registered address
+on the afternoon of 4월 24일 (A044, decided 2026-11-04).
 
 ## The harmed
 

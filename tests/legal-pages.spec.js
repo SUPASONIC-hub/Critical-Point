@@ -68,7 +68,8 @@ test("the start screen's foot opens the five pages in the screen's language, and
     await page.locator(".intro-legal").getByRole("link", { name: HEADINGS.ko[kind], exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${kind}\\.html$`));
     await expect(page.getByRole("heading", { level: 1, name: HEADINGS.ko[kind] })).toBeVisible();
-    await expect(page.locator("footer").getByRole("link", { name: "from.logic.to.magic@gmail.com" })).toBeVisible();
+    // exact: the credit under it names each creator's address for its owner ("SUPASONIC: from.logic...").
+    await expect(page.locator("footer").getByRole("link", { name: "from.logic.to.magic@gmail.com", exact: true })).toBeVisible();
     await page.getByRole("navigation").getByRole("link", { name: "게임으로 돌아가기" }).click();
     await expect(page.locator(".intro")).toBeVisible();
   }
@@ -84,9 +85,42 @@ test("the start screen's foot opens the five pages in the screen's language, and
   await expect(page).toHaveURL(/\/ja\/contact\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "お問い合わせ" })).toBeVisible();
   await page.getByRole("navigation").getByRole("link", { name: "ゲームに戻る" }).click();
-  await expect(page).toHaveURL(/\/\?lang=ja$/);
+  await expect(page).toHaveURL(/\/ja\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
 });
+
+// The credit (2026-11-04): Tak'n Roll, SUPASONIC & ALICE, and each one's
+// address as a link named for its owner, on the start screen and at the foot
+// of the plain pages, inside a 360px phone in every language.
+const CREATOR_MAILS = [
+  ["SUPASONIC", "from.logic.to.magic@gmail.com"],
+  ["ALICE", "goeun.nam@gmail.com"],
+];
+
+async function expectCredit(credit, page) {
+  await expect(credit.locator("dt")).toHaveText(["STUDIO", "CREATOR", "CONTACT"]);
+  await expect(credit.locator("dd").nth(0)).toHaveText("Tak'n Roll");
+  await expect(credit.locator("dd").nth(1)).toHaveText("SUPASONIC & ALICE");
+  for (const [name, email] of CREATOR_MAILS) {
+    await expect(credit.getByRole("link", { name: `${name}: ${email}`, exact: true })).toHaveAttribute("href", `mailto:${email}`);
+  }
+  await credit.scrollIntoViewIfNeeded();
+  const box = await credit.boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(360);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+}
+
+for (const language of ["ko", "en", "ja"]) {
+  test(`the credit names both creators with their mail links, inside a 360px phone (${language})`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto(language === "ko" ? "/" : `/?lang=${language}`);
+    await expect(page.locator("html")).toHaveAttribute("lang", language);
+    await expectCredit(page.locator(".intro .studio-credit"), page);
+    await page.goto(`${FOLDER[language]}/about.html`);
+    await expectCredit(page.locator("footer .credit"), page);
+  });
+}
 
 test("the build writes the fifteen pages, robots.txt and the sitemap as plain files", { tag: "@prod" }, async ({ request }) => {
   test.skip(process.env.E2E_SERVER !== "preview", "this reads the production build: npm run test:e2e:preview");
@@ -104,6 +138,28 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const xml = await sitemap.text();
-  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 1);
+  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3);
   for (const [path] of PAGES) expect(xml, path).toContain(`<loc>${path}</loc>`);
+  for (const path of ["/", "/en/", "/ja/"]) expect(xml, path).toContain(`<loc>${path}</loc>`);
 });
+
+// The start page in English and Japanese (11-03): its own file at its folder,
+// read with no script as a crawler reads it, and the game in that language
+// once the script runs.
+for (const [language, start, title] of [
+  ["en", "Start the prologue", "Critical Point - Every 45 seconds, your judgment goes on the record"],
+  ["ja", "プロローグを始める", "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される"],
+]) {
+  test(`/${language}/ is the start page in its language, to a crawler and to a player`, async ({ page, request }) => {
+    const response = await request.get(`/${language}/`);
+    expect(response.status()).toBe(200);
+    const html = await response.text();
+    expect(html).toMatch(new RegExp(`<html lang="${language}">`));
+    expect(html).toContain(`<title>${title}</title>`);
+    expect(html).toMatch(new RegExp(`<link rel="canonical" href="[^"]*/${language}/"`));
+    await page.goto(`/${language}/`);
+    await expect(page.locator("html")).toHaveAttribute("lang", language);
+    await expect(page.getByTestId("start-first-case")).toContainText(start);
+    await expect(page.locator(".intro-legal").getByRole("link").first()).toHaveAttribute("href", `/${language}/about.html`);
+  });
+}

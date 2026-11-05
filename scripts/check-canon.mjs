@@ -588,6 +588,26 @@ export const CANON = [
     find: /킹스데일[^."\d]{0,24}?지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%|지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%[^."\d]{0,12}킹스데일/g,
     allow: ["30"],
   },
+  {
+    id: "kd-account-name",
+    fact: "the player's money is the KD은행 계좌 -- KD Bank account, KD銀行口座 -- one name in each language",
+    // The table's words in the three languages (stage.purse). Read loosely --
+    // a space, a capital or a 銀行 written apart -- so a variant is caught
+    // rather than missed.
+    files: /src\/(?:copy|locales\/(?:en|ja)\/screens)\/table\.js$/,
+    find: /(KD ?은행 ?계좌|KD ?[Bb]ank [Aa]ccount|KD ?銀行 ?口座)/g,
+    allow: ["KD은행 계좌", "KD Bank account", "KD銀行口座"],
+  },
+  {
+    id: "advisory-fee-payee",
+    fact: "해온파트너스 was wound up in 2025 (사건 08); 평택's 32억 of 2026 went to a new company at its address",
+    // 사건 26 and the line that leads out of it. Until 2026-11-04 they named
+    // 해온파트너스 itself as the payee and had it move its registered address
+    // on 4월 24일, half a year after its wind-up was registered (A044).
+    files: new RegExp(`${caseFiles("case26").source}|src/caseCopy\\.js$`),
+    find: /(?:받은 곳은 |32억 -- |두 달 전 |32억 자문료[^.]{0,24}?(?:는|를 받아 간) )(해온파트너스(?:와 같은 주소의 새 법인)?)|(해온파트너스(?:와 같은 주소의 새 법인)?)[은는] 그날 오후 등기부의 주소를 옮/g,
+    allow: ["해온파트너스와 같은 주소의 새 법인"],
+  },
 
   // The audit of 2026-11-03 (122 findings, 26 of them sure) and the answers
   // that settled them. Some of these are words that must not stand beside a
@@ -977,6 +997,10 @@ const COPY_FILES = () => [
   "src/advancedSystems.js",
   "src/runtimeSystems.js",
   "src/featurePack.js",
+  // The KD은행 계좌's name, in the table's words.
+  "src/copy/table.js",
+  "src/locales/en/screens/table.js",
+  "src/locales/ja/screens/table.js",
 ];
 
 function main() {

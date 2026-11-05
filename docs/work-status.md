@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-03 (the state of `main` at `8e93010`, after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-04 (the state of `main` at `dc26d88`, after the dependency bumps (#385, #386), seven time-balanced e2e shards (#415), canon fixes 1 and 2 (#424, #435), the README restore (#444), the glossary terms (#431), the wider canon check (#430) and bundle 1104a (#447: caption boxes #429, `/en/` and `/ja/` start pages #433, first-visit preloads #436, no Korean in English screens #445, sound words inside the plate #438) and bundle 1105b (#448: the credits #443, A044 #446, and the `/en/*` and `/ja/*` headers in `render.yaml`) and bundle 1105a (#449: accessibility #440, flaky tests #439, the KD은행 계좌 #442 and no snap penalty after reading #416), and before that after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -486,6 +486,71 @@ Still open, on purpose:
   #421 (summary artifacts for Funnel, Test Week and Verify Ranking); #408
   (coverage floors one under the measured values). Fourteen PRs merged,
   production build-sha `8e93010`, 1,692 unit tests.
+- 2026-11-04: #385 (dependabot `dev-tooling`: `@electric-sql/pglite`
+  0.5.11 to 0.5.13, `supabase` CLI 2.121.0 to 2.122.0); #386 (dependabot
+  `runtime`: `lucide-react` 1.61.0 to 1.64.0); #415 (`ci-shards`: main
+  Verify's `verify-e2e` from five to seven shards, split by the time each
+  test took in CI rather than by count -- `tests/e2e-shards.json`, `npm run
+  e2e:rebalance`; 42 units, 68.7 minutes in all, every shard 9.8 minutes on
+  the last four main runs); #424 (`canon-fixes-1`: the 26 high-confidence
+  findings of the 11-03 canon audit and four in progress, in ko, en and ja,
+  wording only; the first day at work stays April 9 and case 31 says "ten
+  days before", the three beside you on the 11-14 circular are trainees who
+  have finished); #435 (`canon-fixes-2`: 21 more findings raised from
+  medium, in ko, en and ja; A044, when Haeon Partners was wound up, left for a
+  story decision; case 46's first `c46_manifest` label cut from 34 to 30
+  characters); #444 (`readme-restore-1104`: the README put back after #415's
+  merge resolved a conflict with `git checkout --ours` and took the whole
+  file back to the branch's old copy; only the unit test count kept); #431
+  (`glossary-fix-1103`: 91 English and Japanese lines brought to the
+  glossary -- approval field, transfer, trainee, number ticket, bookshop,
+  creditors' committee, 弔問室; no number or Korean line changed); #430
+  (`canon-rules`: 15 rules from the 11-03 audit, four of them companions
+  that go silent if the copy stops saying the right shape, and 3 scene rules;
+  merged after #424 and #435, so main reads 0 contradictions); #447
+  (`bundle-1104a`, one CI run for five green PRs: #429 caption boxes that
+  close with the quote, ko mixed boxes 1,418 to 29 and ja 1,968 to 31; #433
+  start pages at `/en/` and `/ja/`, the sitemap 16 to 18, share cards on the
+  15 static pages; #436 the runtime preload after `load` and the chosen
+  language's dictionary preloaded from the head; #445 `simplifyPlayerText`
+  only rewrites on the Korean screen, "Trigger Lab" and 「トリガーラボ」 for
+  the wordmark reading, phase names as written; #438 the sound word centred
+  with `transform`, so it stays inside the plate on desktop). Render matched the
+  `/en/` rule to `/en` only, so the owner added `/en/*` and `/ja/*` to the
+  dashboard headers (`Cache-Control: no-cache`, checked 16:36); #448
+  (`bundle-1105b`, two PRs and main 4e3f8e48 taken in, three conflicts
+  edited by hunk, critical CSS rebuilt; first paint budgets 428,480 / 485,062 /
+  492,230): #443 (`credits-alice`: STUDIO Tak'n Roll / CREATOR SUPASONIC &
+  ALICE with both mail links on the start screen, the static pages, the about
+  line and the README; the privacy policy and terms, six pages, keep the names
+  but drop the mail line, so the second address does not read as a second
+  request desk; `SUPPORT_CONTACT` unchanged) and #446 (`canon-a044`: the 32억
+  of 사건 26 and the registry move of 4월 24일 belong to a new company at
+  해온파트너스's address, unnamed, in ko, en and ja; 사건 29's premise says
+  "그리고 지금" for "같은 주"; check:canon `advisory-fee-payee`), and the same
+  two header lines in `render.yaml` and `deploy-policy.mjs` (rules 19 to 21).
+  #449 (`bundle-1105a`, four PRs, the three baselines both sides had
+  changed -- case-play desktop and mobile, briefing-p1-390x844 -- recorded
+  again on the bundle branch): #440 (hand-card border 1.70:1 to 3:1 and more,
+  the "season done" badge read through sr-only, axe in ko, en and ja at
+  360x740 and 1280x720; e2e 1,182 to 1,202); #439 (a late "held" answer to a
+  duplicated tab is taken while no table has read the token, and four test
+  fixes); #442 (`kd-bank-account`: the purse moved into an always-visible
+  "KD은행 계좌" -- a strip along the top at 1024px and under, a box at the
+  top right from 1025px -- through briefing, table, settlement and relic
+  draft; display only, score and balance unchanged; spending it as currency
+  at the relic draft comes after W47 in the 11-30 bundle); #416
+  (`snap-after-reading`: a table opened after 70% of the reading clock has no
+  snap penalty and its rhythm counts as 8 s; old runs replay under the old
+  rule and the ranking is not cleared; the W47 bot values re-measured equal
+  the defaults, so `TEST_WEEK_SIM_LINES` stays empty). Open: #432 (board
+  auto-hide, with a migration; at most five posts hidden by reports an hour).
+  In progress: #450 (`tab-title-locale`: the English and Japanese tab title no
+  longer falls back to the Korean one in `index.html`), late today or first
+  tomorrow; then the migrations #432, #425 and #434, each asked for, and
+  `check:grants` on main. Nineteen PRs merged (eight on their own and eleven
+  inside three bundles; 22 counting the bundle PRs #447, #448 and #449; main
+  `dc26d88`), production build-sha `dc26d88` (18:01), 1,758 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`

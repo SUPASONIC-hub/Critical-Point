@@ -427,7 +427,9 @@ test("the reading clock asks once: 프롤로그 01-02 start held until it has, a
   // The briefing asks where the clock would open the table, and only once.
   const briefing = source("gauntlet/SceneBriefing.jsx");
   assert.match(briefing, /if \(remaining <= 0 && askRef\.current\) \{\s*\/\/[^\n]*\s*askRef\.current = false;/);
-  // Reading time is not in the score: nothing outside the page reads its seconds.
+  // Reading time adds nothing to the score: nothing outside the page works out
+  // its clock. The page hands its seconds and clock to the decision, which only
+  // reads them to tell a read-through quick pick from a snap (readThrough, 2026-11-03).
   for (const file of ["gauntlet/GauntletStage.jsx", "gameLogic.js", "ranking.js", "state/useChoiceCommit.js"]) {
     assert.doesNotMatch(source(file), /getReadingSeconds|readingClockAsked/, `${file} reads the reading clock`);
   }

@@ -182,7 +182,9 @@ const fileBudgets = {
   // 3159 / 69903 -> 3162 / 69982 on 2026-11-03, measured (intro-webkit-fit): on
   // 360px or less the premise wraps plainly outside English, where WebKit's
   // text-wrap: pretty took the Korean and Japanese one a line longer.
-  "base-intro-ranking.css": { lines: 3162, bytes: 69982 },
+  // 3162 / 69982 -> 3184 / 70411 on 2026-11-04, measured (credits-alice): the
+  // start screen's credit takes a row for SUPASONIC's and ALICE's addresses.
+  "base-intro-ranking.css": { lines: 3184, bytes: 70411 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -365,7 +367,10 @@ const fileBudgets = {
   // the splash panel is a size container and the word's corner pin became a
   // position read off the plate. 849 / 16478 over main 5c00dffe (with
   // pc-type-scale), measured.
-  "briefing.css": { lines: 849, bytes: 16478 },
+  // 849 / 16478 -> 849 / 16498 on 2026-11-03, measured (plate-sound-clip): the
+  // word is centred in its transform, which the build keeps, not by the
+  // separate translate property the build dropped.
+  "briefing.css": { lines: 849, bytes: 16498 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
@@ -435,7 +440,17 @@ const fileBudgets = {
   // fits. Measured 128 / 2331; 133 / 2478 with the purse line set solid on a
   // phone, upright (480px or less) or on its side (Linux hand5, the densest
   // boards at 390x844, the phone-on-its-side tests).
-  "money.css": { lines: 133, bytes: 2478 },
+  // 133 / 2478 -> 261 / 5264 on 2026-11-04 (kd-bank-account), measured: the
+  // purse leaves the rail and is the KD은행 계좌, a band across the top below
+  // 1025px and a corner box above it, with the shell, the music pills and the
+  // layers in front of the table moved out from under it, and the season's
+  // columns a tap away. The phone's purse-line fit (line-height 1, the season
+  // joining the line) is gone with the line.
+  // 261 / 5264 -> 282 / 5713 the same day, measured: the band's 44px press
+  // area, and the reveal's sheet shortened by the band (and under the box).
+  // 282 / 5713 -> 283 / 5730 the same day, measured: the band under the music
+  // pills (29), the corner box over the layers (30).
+  "money.css": { lines: 283, bytes: 5730 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

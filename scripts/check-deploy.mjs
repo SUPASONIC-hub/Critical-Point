@@ -114,6 +114,19 @@ function checkOffline() {
         for (const note of csp ? backendOriginProblems(script, csp) : []) notes.push(`dist${entry}: ${note}`);
       }
     }
+    // The start page in English and Japanese (startPages(), vite.config.js):
+    // the same page with other words, so it loads the same entry and nothing inline.
+    for (const language of ["en", "ja"]) {
+      const file = path.join(root, "dist", language, "index.html");
+      if (!existsSync(file)) {
+        problems.push(`dist/${language}/index.html is missing: the build writes it (startPages() in vite.config.js), and /${language}/ is in the sitemap`);
+        continue;
+      }
+      const page = readFileSync(file, "utf8");
+      problems.push(...inlineScriptProblems(page).map((problem) => `dist/${language}/index.html: ${problem}`));
+      if (entryScriptPath(page) !== entry) problems.push(`dist/${language}/index.html loads ${entryScriptPath(page)}, not the start page's ${entry}`);
+      if (!new RegExp(`<html\\s+lang="${language}"`).test(page)) problems.push(`dist/${language}/index.html is not lang="${language}"`);
+    }
     const worker = path.join(root, "dist", WORKER_PATH);
     if (!existsSync(worker)) {
       problems.push(`dist${WORKER_PATH} is missing: the build writes it (serviceWorker() in vite.config.js), and without it an installed copy cannot open offline`);

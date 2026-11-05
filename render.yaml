@@ -109,6 +109,31 @@ services:
       - path: /index.html
         name: Cache-Control
         value: no-cache
+      # The start page in English and Japanese (since 11-03, the build writes
+      # en/index.html and ja/index.html): the same page, so the same rule, at
+      # the folder and at its file.
+      - path: /en/
+        name: Cache-Control
+        value: no-cache
+      - path: /en/index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /ja/
+        name: Cache-Control
+        value: no-cache
+      - path: /ja/index.html
+        name: Cache-Control
+        value: no-cache
+      # And under each folder (11-04): Render matched the `/en/` rule above to
+      # `/en` only, so `/en/` itself was sent `public, max-age=0, s-maxage=300`
+      # until these two went into the dashboard (checked live 16:36, `/en/` and
+      # `/ja/` both no-cache). The folder rules stay beside them.
+      - path: /en/*
+        name: Cache-Control
+        value: no-cache
+      - path: /ja/*
+        name: Cache-Control
+        value: no-cache
       # The service worker (src/serviceWorker/worker.js) is asked for by one
       # fixed name, and it is what names the release a device keeps: held by a
       # cache in between, a device goes on installing the release before this

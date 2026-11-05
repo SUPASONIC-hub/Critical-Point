@@ -141,7 +141,7 @@ export const copy = {
         "title": "Case 27 - The Neighborhood Vault",
         "button": "Start Case 27",
         "premise": "Before dawn on the first Monday of May, a line forms in front of a small credit union in Gunsan. It is because of one captured line that went around every group chat on Friday night: 'Stuck on the Pyeongtaek project, won’t make it through this month.'",
-        "hook": "Na Junhyuk packs three stamps and heads down to Gunsan. The executive director who knows the name of everyone in line opens the doors, and the gray speech bubble in that capture is exactly the color of the company messenger on your phone. The money trail of Haeon Partners, which took 3.2 billion won out of the Pyeongtaek project budget as an advisory fee (money sent out as the price of advice), runs across the sea.",
+        "hook": "Na Junhyuk packs three stamps and heads down to Gunsan. The executive director who knows the name of everyone in line opens the doors, and the gray speech bubble in that capture is exactly the color of the company messenger on your phone. The 3.2 billion won advisory fee (money sent out as the price of advice) from the Pyeongtaek project budget went to a new company at the same address as Haeon Partners, and Haeon Partners’ money trail runs across the sea.",
         "movement": "KD Capital Risk Management Department > Saebom Credit Union banking hall, Gunsan > Executive director’s office and the vault > 2nd-floor meeting room > 3rd-floor boardroom",
         "reason": "To find out whose hands the rumor was built to start in and what price tag it was built to end on, and to protect the money of the people called by name in between",
         "interlude": {
@@ -168,7 +168,7 @@ export const copy = {
         "eyebrow": "Next case unlocked",
         "title": "Case 29 - Marina Night",
         "button": "Start Case 29",
-        "premise": "Three days before Haeon Partners closed its doors, its remaining 1.14 billion won went out to Singapore. The same week, KD Capital is trying to hand 427 billion won of bad loans whole to a fund in Singapore.",
+        "premise": "Three days before Haeon Partners closed its doors, its remaining 1.14 billion won went out to Singapore. And now, KD Capital is trying to hand 427 billion won of bad loans whole to a fund in Singapore.",
         "hook": "Your name is on the travel order, and two rows behind you on the same plane is Seo Harin. A rooftop on Marina Bay, level-5-spicy chili crab, and your name already printed under the signature field. The reason Yoon Sanghyuk is handling this deal himself is in the annex at the very back of the contract (a document of extra promises attached behind the contract).",
         "movement": "Incheon Airport departures > Marina Bay rooftop > Chinatown hawker center > Hotel room before dawn > Roundhill Capital negotiating room",
         "reason": "To confirm, in one calculation, the mailbox where Haeon Partners’ last money landed and the money that will go into that mailbox from now on",
