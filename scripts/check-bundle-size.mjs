@@ -636,7 +636,8 @@ const budgets = [
   // 199,354 / 37,230 -> 200,434 / 37,457 on 2026-11-03, #224 merged with main 465ccb93 (#391 #389 #390 #393 #388): #224's link tag, signal row, English bank rail and 360px audit place (sig-tight: the signals' icon and chain sentence hidden beside the count, three auto columns) over main's money.css, 360px English labels and 1025px type scale. Measured 200,434 / 37,453 in the e2e build, the gzip plus 4.
   // 199,354 / 37,230 -> 200,019 / 37,440 on 2026-11-02, plate-story over main 5c00dffe (#392, with #390): Measured 200,015 / 37,436 in the e2e build, the plus 4.
   // 200,434 / 37,457 -> 201,099 / 37,652 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's 360px audit place and sig-tight signals beside main's plate story CSS. Measured 201,099 / 37,648 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 201_099, maxGzip: 37_652 },
+  // 201,099 / 37,652 -> 201,051 / 37,650 on 2026-11-05, phone-en-stake-11px over rules-mark-3b 9e91c588: the 360px English bank rail's 10px label rule went (play.css; Audit n/4 sits on the signals' row, so Stake and Vault read 11px). Measured 201,047 / 37,646 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 201_051, maxGzip: 37_650 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1290,7 +1291,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // #224 merged with main cb904fb6 (11-03; #392 plate-story, #398): 426,925, 483,922 and 490,595, the plus 4.
 // The CI build (Linux) measures the first paint 4 bytes over this PC's e2e build (9e4ec6bf: Korean 426,929, Japanese 490,601):
 // the budgets are the CI's plus 4, 426,933, 483,927 and 490,605.
-const FIRST_PAINT_BUDGETS = { ko: 426_933, en: 483_927, ja: 490_605 };
+// 426,933 / 483,927 / 490,605 -> 426,929 / 483,921 / 490,604 on 2026-11-05, phone-en-stake-11px over rules-mark-3b 9e91c588: the 360px English bank rail's 10px label rule went (play.css; the critical CSS does not carry it). Measured 426,921 / 483,916 / 490,594 in the e2e build here, 4 / 6 / 1 under cb904fb6's 426,925 / 483,922 / 490,595; the CI build reads 4 / 1 / 6 over this PC (30f5519d), so the budgets are the CI's expected 426,925 / 483,917 / 490,600 plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 426_929, en: 483_921, ja: 490_604 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

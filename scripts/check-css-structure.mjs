@@ -301,7 +301,9 @@ const fileBudgets = {
   // -> 58344 bytes, 3002 lines on 2026-11-03, measured: #224 merged with main 465ccb93 (pc-type-scale's
   // --hud-rem over #224's 360px audit place), and beside Audit n/4 the signals keep their labels and bars
   // only (sig-tight: the crosshair and the chain's sentence hidden, three auto columns 4px apart).
-  "play.css": { lines: 3002, bytes: 58344 },
+  // -> 58276 bytes, 2998 lines on 2026-11-05, measured (phone-en-stake-11px over rules-mark-3b 9e91c588): the 360px English
+  // bank rail's 10px label rule went; Audit n/4 sits on the signals' row now, so Stake and Vault read 11px like ko and ja.
+  "play.css": { lines: 2998, bytes: 58276 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
