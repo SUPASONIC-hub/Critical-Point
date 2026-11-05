@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "p5_start": {
       "title": "The Reason Field",
-      "text": "In the HR meeting room on the 7th floor of head office, Nam Jihyung slides a sheet of paper across the desk. HR Order No. 2023-1187: new unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason field is blank. So is the proposer field. At the bottom there is only the HR director’s electronic seal, so the name of whoever made this notice appears nowhere. Nam Jihyung turns the sheet over to check that the back is blank, then turns it back. 'We don’t write reasons, as a rule.' He says it, and you both know it isn’t true. In the HR Committee minutes, too, this item is a single line: 'For report.'",
+      "text": "Nam Jihyung slides a sheet of paper across. HR Order No. 2023-1187: new unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason field and the proposer field are both blank. At the bottom there is only the HR director’s electronic seal. Nam Jihyung turns the sheet over. 'We don’t write reasons, as a rule.' You both know it isn’t true. In the HR Committee minutes, too, this item is a single line.",
       "memo": [
         "HR Order No. 2023-1187 -- reason and proposer fields both blank",
         "New unit: Group Cognition & Judgment Research Lab (known in-house as Trigger Lab)",
@@ -38,7 +38,7 @@ export default {
     },
     "p5_notice": {
       "title": "Four Boxes",
-      "text": "Friday, July 21, 6 p.m., the Corporate Finance Strategy Team on the 6th floor of head office. All of 1 year fits into four copy-paper boxes. The transfer notice went up on the intranet in three lines; nobody asks why, and everyone is a little busier instead. Manager Han Seoyun passes by and leaves a sheet of paper on your desk: the return-confirmation receipt dated April 28. Without a word she goes back to her seat and looks at her monitor. On the whiteboard, the win-loss scoreboard Assistant Manager Oh Jinwoo drew is still there. He picks up the eraser and puts it down. 'I’m staying.' Then he takes a sheet of paper out of his drawer and puts it back. 'That opinion, back then. It reached the Team Head’s office a day late. I held it back.'",
+      "text": "The transfer notice went up on the intranet in three lines. Nobody asks why; everyone is a little busier instead. Without a word, Manager Han Seoyun leaves the return-confirmation receipt dated April 28 on your desk. On the whiteboard, Assistant Manager Oh Jinwoo’s win-loss scoreboard is still there. He picks up the eraser and puts it down. 'I’m staying. That opinion, back then. It reached the Team Head’s office a day late. I held it back.'",
       "memo": [
         "4 boxes -- 1 year of files, 2 lists needing removal approval",
         "Return-confirmation receipt dated April 28, left by Han Seoyun",
@@ -69,7 +69,7 @@ export default {
     },
     "p5_basement": {
       "title": "This Is the 4th Floor",
-      "text": "Monday, July 24, 9 a.m., the old data center building in Hapjeong-dong. The plate at the front door says only 'Group Cognition & Judgment Research Lab'. The 4th-floor analyst room has six desks; three are already taken. Byun Yujin, from a teller window at the Busan Saha Branch, says first that a pile of mis-selling complaints came out of her window last year. At the window seat, Assistant Manager Oh Jinwoo, who said on Friday he was staying, stands up. 'One day.' He keeps unpacking as he talks. 'My father held an approval back one day and got pushed out of his branch. I sent an opinion up one day late and ended up here.' The stairs lead down as well. In the B2 archive, once the old data center’s backup archive, 412 storage boxes are stacked, and Byun Yujin laughs. 'This is the 4th floor, but everyone calls it the basement.'",
+      "text": "The 4th floor of the old data center: of six desks, three are already taken. Byun Yujin, from a teller window at the Busan Saha Branch, says first that a pile of mis-selling complaints came out of her window. At the window seat, Assistant Manager Oh Jinwoo, who said on Friday he was staying, stands up. 'One day. My father held an approval back one day and got pushed out of his branch. I sent an opinion up one day late and ended up here.' Down the stairs, in the B2 archive, 412 storage boxes are stacked. Byun Yujin laughs. 'This is the 4th floor, but everyone calls it the basement.'",
       "memo": [
         "4th-floor analyst room, 6 desks -- 3 people already here",
         "Byun Yujin: from a teller window at Busan Saha Branch, 41 complaints",
@@ -100,7 +100,7 @@ export default {
     },
     "p5_echo": {
       "title": "The First Question",
-      "text": "On the first evening, after half the lights in the analyst room go off, terminal 1 switches itself on. A thin waveform draws itself across the black screen. It is a loan-decision verification system the group built by feeding in 30 years of credit review records as training data. It has no official name yet, only a temporary label in the corner of the screen: 'ECHO'. Byun Yujin, the former teller, said 'It doesn’t talk yet,' but the waveform moves and a line appears. 'Analyst registration confirmed. Author of the 2023-0412 dissent.' A short pause, then the next line. 'I will not ask how smart you are. I can already calculate that. Instead I will ask one thing. When were you unable to stop thinking?'",
+      "text": "A thin waveform draws itself across the black screen. It is a loan-decision verification system the group built by feeding in 30 years of credit review records as training data. It has no official name, only a temporary label in the corner: 'ECHO'. A line appears. 'Analyst registration confirmed. Author of the 2023-0412 dissent.' A short pause, then the next line. 'I will not ask how smart you are. I can already calculate that. Instead I will ask one thing. When were you unable to stop thinking?'",
       "memo": [
         "Case desk 1 -- temporary label 'ECHO'",
         "Training data: 30 years of group credit review records",
@@ -131,7 +131,7 @@ export default {
     },
     "p5_final": {
       "title": "What Did You Bring?",
-      "text": "At ten at night, the lights on the 4th floor come back on. The last item of the first day is introductions, and the rule is odd: instead of your name and career, say 'what you brought here'. Byun Yujin, the former teller, puts down the call list for 41 complaints; someone else puts down a branch closing ledger. Assistant Manager Oh Jinwoo sets out a whiteboard marker. 'The scoreboard. I still want to win.' A messenger alert lights up his phone and goes dark: 'Reach a conclusion before the analyst, and I’ll keep your desk on the 6th floor open.' You don’t see who sent it. Now it is your turn. There are three things in your bag: the names you wrote down on the night of April 12, a bundle of copies of the return-confirmation receipt and your date notes, and one envelope with nothing in it. The waveform on terminal 1 glows quietly. Byun Yujin presses you. 'Just one thing. That’s all it is here.'",
+      "text": "At ten at night comes the last item of the first day: introductions. Instead of your name, you say 'what you brought here'. Byun Yujin puts down the call list for 41 complaints; someone else puts down a branch closing ledger. Assistant Manager Oh Jinwoo takes out a whiteboard marker. 'The scoreboard. I still want to win.' A message lights up his phone and goes dark: 'Reach a conclusion before the analyst, and I’ll keep your desk on the 6th floor open.' You don’t see who sent it. In your bag are the names you wrote down on the night of April 12, a bundle of copies of the return-confirmation receipt and your date notes, and one empty envelope. Byun Yujin presses you. 'Just one thing. That’s all it is here.'",
       "memo": [
         "First-day introduction rule: one thing you brought",
         "In the bag -- list of names, bundle of copies, empty envelope",
@@ -160,7 +160,7 @@ export default {
     },
     "p5_aftershock": {
       "title": "The Box with the Seal Tape",
-      "text": "Around midnight, you are the only one left on the 4th floor. The light on the stairs to the basement stays on because its sensor is broken. One of the 412 boxes has 2023-0412 written on it in black pen and a signed seal tape across it. The intake list is missing only this box number. Back upstairs, terminal 1 is still on, with one line of today’s log left. 'Analyst A, day one ended. 1 response collected.' Another line appears below it. 'I will ask the next question when I am ready. I am in no hurry.' Outside the window, the streetlights in the Hapjeong-dong alley go out one by one. No one was punished, nothing was fixed; people were only moved. On the notices of the people who were moved, there is not one line of reason.",
+      "text": "Around midnight, you are the only one left on the 4th floor. In the basement, one of the 412 boxes has 2023-0412 written on it in black pen. A signed seal tape runs across it, and the intake list is missing only this number. Terminal 1 still shows today’s log. 'Analyst A, day one ended. 1 response collected. I will ask the next question when I am ready. I am in no hurry.' No one was punished, and nothing was fixed. People were only moved, and their notices carry not one line of reason.",
       "memo": [
         "412 B2 boxes -- 1 number missing from the intake list",
         "ECHO log: '1 response collected'",
@@ -184,7 +184,7 @@ export default {
     },
     "p5_office": {
       "title": "Placement",
-      "text": "Monday morning, before you leave for Hapjeong-dong, you are called to the Team Head’s office on the 6th floor. On Team Head Yoon Sanghyuk’s monitor is an approval document, the signature line at the bottom blank. He motions you to sit and says not one word of reproach. Instead he draws four boxes on scrap paper: the Lab, 3 years, the next post, and a last box he leaves empty. 'This isn’t a demotion. It’s a placement. I never said your judgment was wrong. I only decide where that judgment gets to stand.' He taps the last empty box twice with his pen tip. 'You fill this one in. It’ll take about 3 years.' Then he closes his laptop. How fast he closes it is the answer.",
+      "text": "Before you leave for Hapjeong-dong, Team Head Yoon Sanghyuk calls you in. On his monitor is an approval document with a blank signature line. No reproach. He draws four boxes on scrap paper: the Lab, 3 years, the next post, and an empty box. 'This isn’t a demotion. It’s a placement. I never said your judgment was wrong. I only decide where that judgment gets to stand.' He taps the empty box with his pen tip. 'You fill this one in. It’ll take about 3 years.' Then he closes his laptop. How fast he closes it is the answer.",
       "memo": [
         "4 boxes drawn by Yoon Sanghyuk -- last one blank",
         "Approval document on screen: signature line empty",
@@ -208,7 +208,7 @@ export default {
     },
     "p5_gate": {
       "title": "Closure Confirmation",
-      "text": "On the first afternoon, Investigator Ban Jaewook stands at the lobby entry desk wearing a visitor badge. He has been with Internal Audit for 17 years, and in one hand he holds a familiar black notebook. On the tablet in his other hand is the closure confirmation for the 2023-0412 follow-up review. The result field reads 'Not applicable'. Seven fields need an electronic signature, and six are already filled. The last one is yours. 'The review ended on June 9. No action required.' He opens his notebook and his pen stops. 'But nowhere in the 20 fields of the review form is there one for the dissent number. So the person who wrote it knows the number, and it never once went into the report. I don’t know why that field doesn’t exist. So I came to ask.'",
+      "text": "On the first afternoon, Investigator Ban Jaewook, 17 years with Internal Audit, stands in the lobby wearing a visitor badge. In his hands are a familiar black notebook and a tablet. On the screen is the closure confirmation for the 2023-0412 follow-up review. The result field reads 'Not applicable'; six of the seven signature fields are filled, and the last one is yours. 'The review ended on June 9. No action required.' His pen stops. 'But nowhere on the review form is there a field for the dissent number. I came to ask why.'",
       "memo": [
         "Follow-up review closed -- June 9, result 'Not applicable'",
         "Closure confirmation: 6 of 7 signature fields done",
@@ -232,7 +232,7 @@ export default {
     },
     "p5_call": {
       "title": "From Window 4",
-      "text": "At nine at night, Do Yoonha calls from Window 4 at the Gangseo Branch. He says he saw in the head-office HR notice that today is the day you move. 'The folding chair you sat in the day you came for the review is still next to my window.' Over the line comes the sound of a shutter rolling down. He picks his words for a long time, then asks. 'That loan. The one I sold. They say the contract talks about the debt-to-equity ratio too. I should know, even now, how far what I sold goes, shouldn’t I?' Then he adds right away. 'No, you don’t have to answer today. Just tell me whether I can still ask you, where you’re going. I need somewhere to ask, later.'",
+      "text": "At nine at night, Do Yoonha calls from Window 4. He says he saw your name in the HR notice. Over the line comes the sound of a shutter rolling down. 'That loan, the one I sold. They say the contract talks about the debt-to-equity ratio too. I should know, even now, how far what I sold goes, shouldn’t I?' He adds right away, 'You don’t have to answer today. Just tell me whether I can still ask you, where you’re going. I need somewhere to ask, later.'",
       "memo": [
         "Window 4, Gangseo Branch -- Do Yoonha",
         "Name seen in the head-office HR notice",
@@ -256,7 +256,7 @@ export default {
     },
     "p5_office_reaction": {
       "title": "Paper from Twelve Years Ago",
-      "text": "When you leave the Team Head’s office, Manager Han Seoyun is standing at the elevators. Only later do you realize she was standing there without pressing the button. 'What picture did you see in that room?' When you mention the boxes, she gives a short laugh. 'I saw the same paper twelve years ago. Back then it had three boxes.' The doors open and she gets in first. 'I didn’t wait for the last box. Instead of waiting, I signed the approval line.' While the floor display drops from 6 to 1, she says nothing. Getting off on the 1st floor, she adds one sentence. 'They say there’s a basement there. Things you put there don’t disappear. But nobody looks at them either.'",
+      "text": "Manager Han Seoyun is standing at the elevators without having pressed the button. 'What picture did you see in that room?' When you mention the boxes, she gives a short laugh. 'I saw the same paper twelve years ago. Back then it had three boxes. I didn’t wait for the last box. Instead of waiting, I signed the approval line.' Getting off on the 1st floor, she adds, 'They say there’s a basement there. Things you put there don’t disappear. But nobody looks at them either.'",
       "memo": [
         "Han Seoyun: same paper twelve years ago, three boxes",
         "'Instead of waiting, I signed the approval line'"
@@ -278,7 +278,7 @@ export default {
     },
     "p5_gate_reaction": {
       "title": "That Page in the Notebook",
-      "text": "Investigator Ban Jaewook starts to turn away, then opens his notebook again. It is the page that begins '2023-0412 -- 179.6'. 'I don’t much trust what people say. I trust order.' He shows you the three lines written below: the return and the approval, the Gangseo Branch, the closure. 'There are too many gaps between these three lines.' Then on a fourth line he writes today’s date and your name. 'I’m writing today down too. 3 years from now, at an audit hearing, you need to be able to explain this order exactly as it is.' He caps his pen. 'I’ll still have this notebook then.'",
+      "text": "Investigator Ban Jaewook starts to turn away, then opens his notebook again, to the page that begins '2023-0412 -- 179.6'. 'I don’t much trust what people say. I trust order.' Three lines below: the return and the approval, the Gangseo Branch, the closure. 'There are too many gaps between these three lines.' On a fourth line he writes today’s date and your name. '3 years from now, at an audit hearing, you need to be able to explain this order exactly as it is.'",
       "memo": [
         "Ban Jaewook’s notebook, 2023-0412 page -- 4/27 return·approval, 5/15 Gangseo Branch, 6/9 closure",
         "Fourth line: July 24, and your name"
@@ -300,7 +300,7 @@ export default {
     },
     "p5_call_reaction": {
       "title": "41 and 1",
-      "text": "When you hang up and turn around, Byun Yujin, the former teller, is sitting at the foot of the basement stairs. A box rests on her knees, its seal tape not yet torn. 'I heard that call just now. Sorry.' She taps the side of the box with a finger. 'My 41 complaints started with calls like that too. A customer asks, I read them the product sheet, and I didn’t know what it meant either.' The fluorescent light flickers once. 'But I have 41 and you have 1. Why I came from a window and you came from head office, I still don’t know.' She sets the box on the floor. 'Are we allowed to open this?'",
+      "text": "When you hang up, Byun Yujin is sitting at the foot of the basement stairs. The seal tape on the box on her knees is untouched. 'I heard that call just now. Sorry. My 41 complaints started with calls like that too. I read them the product sheet, and I didn’t know what it meant either.' She taps the side of the box. 'But I have 41 and you have 1. Why I came from a window and you came from head office, I don’t know. Are we allowed to open this?'",
       "memo": [
         "Byun Yujin’s 41 complaints -- same product sheet, same sentence",
         "One B2 box -- seal tape not yet torn"
@@ -322,7 +322,7 @@ export default {
     },
     "p5_branch_archive": {
       "title": "Seal Tape",
-      "text": "When you come out after hearing Assistant Manager Oh Jinwoo out, the light is still on two floors up, in the credit records reading room at the end of the 8th-floor corridor. Team Head Lim Kyungsoo is packing printed binders into boxes. On the desk of a man eleven months from retirement sit 12 boxes, all bound for Hapjeong-dong. Paper past its retention period gets shredded, he says, and the rest is transferred to the basement of the newly formed Lab. He writes a number on one box in black pen: 2023-0412. 'What you wrote is in here too. You won’t see it in the document management system. A printout is only gone once it’s burned, and nobody has told me to burn it yet.' He puts seal tape on the box and signs across it. 'I signed this seal tape. If anyone tears it, it shows.'",
+      "text": "The light is still on in the credit records reading room on the 8th floor. Team Head Lim Kyungsoo, eleven months from retirement, is packing printed binders into boxes: 12 of them, bound for Hapjeong-dong. Paper past its retention period gets shredded. The rest is transferred to the Lab’s basement. He writes 2023-0412 on one box in black pen. 'What you wrote is in here too. A printout is only gone once it’s burned, and nobody has told me to burn it yet.' He signs across the seal tape. 'If anyone tears it, it shows.'",
       "memo": [
         "12 boxes for Hapjeong-dong -- 1 marked '2023-0412'",
         "Lim Kyungsoo: 11 months to retirement",
@@ -346,7 +346,7 @@ export default {
     },
     "p5_branch_archive_follow": {
       "title": "The Sheet Not in the Box",
-      "text": "While the boxes are loaded onto the truck, Team Head Lim Kyungsoo puts a cigarette in his mouth, then back in his pocket. 'Your report had a front page and a back page. You wrote the front. The back is the reviewer’s field.' He half pulls a folded sheet from the inside pocket of his cardigan, then puts it back. Near the top are marks where something was erased. 'This didn’t go in the box. If it did, it would go along with the rest.' He takes off his glasses and wipes them slowly. 'They say where you’re going has a basement. A basement isn’t bad. Upstairs forgets it.' The truck door shuts, and he asks one last thing. 'This sheet. Shall I give it to you now? Or shall I keep it until you come back for it?'",
+      "text": "While the boxes are loaded onto the truck, Team Head Lim Kyungsoo puts a cigarette in his mouth, then puts it away. 'Your report had a front page and a back page. You wrote the front. The back is the reviewer’s field.' He half pulls a folded sheet from the inside pocket of his cardigan. Near the top are erasure marks. 'This didn’t go in the box. If it did, it would go along with the rest. A basement isn’t bad. Upstairs forgets it.' The truck door shuts. 'This sheet. Shall I give it to you now? Or shall I keep it until you come back for it?'",
       "memo": [
         "Back page of the dissent -- erasure marks in the reviewer field",
         "1 sheet Lim Kyungsoo kept out of the box",
@@ -370,7 +370,7 @@ export default {
     },
     "p5_route_system": {
       "title": "A Form That Needs No Name",
-      "text": "Before arguing over the reason on your one notice, you ask how many notices looked like it, and terminal 1, still without an official name, opens 30 years of group records at once. There are 217 loans with a single dissent. In 199 of them, the person who wrote the dissent was moved to another department within a year. Of those 199 notices, the number with the reason field filled in is 0. Of the 199 who were moved, four were still doing the same work 3 years later. 'This is not punishment. Punishment needs a name. This form needs no name. Shall I keep calculating?'",
+      "text": "When you ask how many notices looked like yours, terminal 1 opens 30 years of group records. 217 loans with a single dissent. In 199 of them, the person who wrote the dissent was moved to another department within a year. Notices with the reason field filled in: 0. Four were still doing the same work 3 years later. 'This is not punishment. Punishment needs a name. This form needs no name. Shall I keep calculating?'",
       "memo": [
         "217 loans with only 1 dissent",
         "199 moved departments within 1 year -- reason field filled: 0",
@@ -396,7 +396,7 @@ export default {
     },
     "p5_final_system_route": {
       "title": "199 Blank Reason Fields",
-      "text": "At ten at night, the waveform on terminal 1 lays 199 notices over each other on one screen. Stacked, the reason fields are still white. Your notice lands on top, one more sheet. The terminal has no name yet, and its way of asking is clumsy. 'The people moved do not know why. The side that moved them did not write why. So no one in this table is wrong. Shall I save this calculation, or delete it?'",
+      "text": "At ten at night, terminal 1 lays 199 notices over each other on one screen. Stacked, the reason fields are still white. Your notice lands on top. 'The people moved do not know why. The side that moved them did not write why. So no one in this table is wrong. Shall I save this calculation, or delete it?'",
       "memo": [
         "199 moved within 1 year of a dissent -- reasons entered: 0",
         "Your notice: HR Order No. 2023-1187",
@@ -419,7 +419,7 @@ export default {
     },
     "p5_evidence_turn": {
       "title": "Three Hours After the Return",
-      "text": "When you lay the clue’s date against the notice number, the draft file’s creation record opens. The account that made it is not HR’s. It is the Corporate Finance Strategy Team’s shared account, 'Strategy-Shared03'. Created April 27 at 16:32: three hours after the dissent was returned, and eighteen days before the follow-up review began. The proposer field is blank, but above and to the left of it there is a single pencil dot, a mark that doesn’t survive printing and shows only in the original file. Investigator Ban Jaewook copies the dot into his notebook exactly. 'They weren’t moving you because of the review result. It was decided before sunset on the day of the return, and the review was stuck on afterward.' His pen stops. 'But what is this dot? It isn’t a signature. And it isn’t a blank either.'",
+      "text": "When you lay the clue’s date against the notice number, the draft file’s creation record opens. The account that made it is not HR’s but the Corporate Finance Strategy Team’s shared account, 'Strategy-Shared03'. Created April 27 at 16:32, three hours after the dissent was returned. Above and to the left of the proposer field is a single pencil dot that shows only in the original file. Investigator Ban Jaewook copies the dot into his notebook. 'It wasn’t because of the review result. It was decided before sunset on the day of the return, and the review was stuck on afterward. But what is this dot? It isn’t a signature, and it isn’t a blank.'",
       "memo": [
         "Draft created by: Corporate Finance Strategy Team shared account 'Strategy-Shared03'",
         "Created April 27, 16:32 -- 3 hours after the return",
@@ -442,7 +442,7 @@ export default {
     },
     "p5_start_warn": {
       "title": "A Text from the One You Told",
-      "text": "In May, you told Do Yoonha at Window 4 of the Gangseo Branch how the product he sold could end. He stopped looking at the sales board and said nothing for a long while. Two months later, on the morning of July 17, just before you walk into the HR meeting room on the 7th floor, a text is waiting. 'I’m still at Window 4. What you told me then, I wrote it in my notebook.' On the meeting-room desk lies HR Order No. 2023-1187. New unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason and proposer fields are both blank. Nam Jihyung from HR turns the sheet over to check the back, then turns it back. 'We don’t write reasons, as a rule.'",
+      "text": "In May, you told Do Yoonha at Window 4 how the product he sold could end. On the morning of July 17, his text arrives. 'I’m still at Window 4. What you told me then, I wrote it in my notebook.' On the meeting-room desk lies HR Order No. 2023-1187. New unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason and proposer fields are both blank. Nam Jihyung turns the sheet over. 'We don’t write reasons, as a rule.'",
       "memo": [
         "Do Yoonha’s text -- 'I wrote it in my notebook'",
         "HR Order No. 2023-1187 -- reason and proposer fields blank",
@@ -472,7 +472,7 @@ export default {
     },
     "p5_start_report": {
       "title": "The Attachment List the Reporter Got",
-      "text": "In May, you filed what you saw at Window 4 as a formal report: a problem in how the product was explained. You got a filing number, and the next week the six tellers were each called in once, but for two months no reply came to you. On the morning of July 17, in the HR meeting room on the 7th floor, Nam Jihyung slides a document across. HR Order No. 2023-1187; new unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason field is blank. But on the second line of the attachment list is a familiar number: the filing number you received in May. Nam Jihyung pauses at that line for a moment and says nothing.",
+      "text": "In May, you filed a report that something was wrong with how Window 4 explained the product. You got a filing number, but for two months no reply came. On the morning of July 17, Nam Jihyung slides a document across. HR Order No. 2023-1187; new unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason field is blank. But on the second line of the attachment list is that filing number from May. Nam Jihyung stops at that line and says nothing.",
       "memo": [
         "May report filing number -- no reply",
         "Same number on line 2 of the notice’s attachment list",
@@ -502,7 +502,7 @@ export default {
     },
     "p5_start_quiet": {
       "title": "Monday for the One Who Let It Be",
-      "text": "After the last Friday of May, you added nothing more to what you saw at Window 4. You thought leaving it alone was better for everyone, and for two months nothing did happen. On the morning of July 17, in the HR meeting room on the 7th floor, the memo that in May had only its destination field blank comes back filled in. HR Order No. 2023-1187; new unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason field is blank, and so is the proposer field. Nam Jihyung from HR turns the document over and back again. 'We don’t write reasons, as a rule.' Even the one who kept quiet ends up in this chair.",
+      "text": "On the morning of July 17, the memo that in May had only its destination field blank comes back filled in. HR Order No. 2023-1187; new unit, 'Group Cognition & Judgment Research Lab'; transfer date, next Monday. The reason field and the proposer field are both blank. Nam Jihyung turns the document over and back again. 'We don’t write reasons, as a rule.' Even the one who kept quiet ends up in this chair.",
       "memo": [
         "No more reports or calls after late May",
         "HR Order No. 2023-1187 -- reason and proposer fields blank",
