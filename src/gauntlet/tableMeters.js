@@ -43,7 +43,7 @@ export function describeDanger({ gauge, nextHigh, wallMin }) {
  * what a cash now would make it (B3: the heat and the pushes, never the
  * wall), and is null on every other table.
  */
-export function readTableMeters({ win, schema, selectedCard, run = null, audit = 0, resources = null }) {
+export function readTableMeters({ win, schema, selectedCard, run = null, audit, resources = null }) {
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);

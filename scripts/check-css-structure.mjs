@@ -335,8 +335,10 @@ const fileBudgets = {
   // 3029 / 58893 -> 3029 / 58883 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood), measured.
   // -> 58276 bytes, 2998 lines on 2026-11-05, measured (phone-en-stake-11px over rules-mark-3b 9e91c588): the 360px English
   // bank rail's 10px label rule went; Audit n/4 sits on the signals' row now, so Stake and Vault read 11px like ko and ja.
-  // 3029 / 58883 -> (re-measured at the bundle's end, 2026-11-05, bundle-rules2): the 11px change takes the 10px rule's lines out.
-  "play.css": { lines: 3029, bytes: 58883 },
+  // 3029 / 58883 -> 3025 / 58815 on 2026-11-05, measured (bundle-rules2: kd-spend-engine, kd-spend-ui, phone-en-stake-11px,
+  // scout-narrow, stake-clock over rules-1105 dd2cd419): the 360px English 10px label rule out (phone-en-stake-11px) beside
+  // the stake clock's HUD lines; the ratchet goes down with it, never up again after rules-1105's one raise.
+  "play.css": { lines: 3025, bytes: 58815 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -425,7 +427,9 @@ const fileBudgets = {
   // draft's side insets.
   // 482 / 10100 -> 473 / 9410 on 2026-10-13: comments no longer counted
   // (9 lines and 690 bytes of them that day), the room unchanged.
-  "relics.css": { lines: 473, bytes: 9410 },
+  // 473 / 9410 -> 472 / 9356 on 2026-11-05, measured (bundle-rules2): kd-spend-ui's trim moved the draft's two buys into
+  // draft-spend.css and left relics.css a line shorter; the ratchet follows.
+  "relics.css": { lines: 472, bytes: 9356 },
   // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
   // 204 / 4800 -> 240 / 5850 on 2026-09-28 for the forced-colours block: an
   // edge on every bar's track and a system colour on its fill.
