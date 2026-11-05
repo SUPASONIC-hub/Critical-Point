@@ -126,7 +126,9 @@ test("a save from the table that graded a press loads without a notice, under th
   assert.equal(weekRule, null);
   assert.equal(open, null);
   assert.deepEqual([linksIn, linksOut], [[], []]);
-  assert.deepEqual(kept, rest);
+  // And the board says it has no stake clock (2026-11-05): a board saved
+  // before it was dealt keeps the flat clock it was played under.
+  assert.deepEqual(kept, { ...rest, schema: { ...rest.schema, stakeClock: false } });
   assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [practice.logic, practice.vault, practice.record.grooveBanked]);
   assert.deepEqual(run.logic, saved.logic, "the streak is the save's");
 

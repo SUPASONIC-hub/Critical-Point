@@ -34,8 +34,11 @@ import {
   STEADY_LINE_COOL,
   STEADY_LINE_SECONDS,
   STEADY_LINE_WALL,
+  STAKE_LAYER_GAUGES,
   STRIKE_WAKE_CHIPS,
+  WINDOW_SECONDS,
 } from "./tableRules.js";
+import { decisionWindowSeconds } from "./stakeClock.js";
 import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
@@ -44,6 +47,7 @@ import runLines from "../copy/runLines.js";
 import { fill } from "../locale.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
+export { decisionWindowSeconds, stakeTier } from "./stakeClock.js";
 
 /**
  * The rules a window is played under when none are named: all of them. The
@@ -69,7 +73,6 @@ const ALL_RULES = Object.freeze({ has: () => true });
  * draw the same walls and the same steps from the same seeds.
  */
 
-const WINDOW_SECONDS = 45;
 /** Seconds of reading before the clock starts creeping heat into the gauge. */
 export const READ_GRACE_SECONDS = 4;
 export const GAUGE_MAX = 100;
@@ -156,6 +159,11 @@ export const BASE_SCHEMA = Object.freeze({
   // The relics this board was dealt with. Kept on the board, not only on the
   // run, so equipping one re-deals the rules once and never twice.
   relics: [],
+  // The stake clock (stakeClock.js): `seconds` is the clock under the second
+  // stake layer, and each layer above it takes STAKE_CLOCK_CUT. On the board
+  // so a run saved, and a window recorded, before 2026-11-05 -- which has no
+  // such key -- keeps the flat clock it was played under (`normalizeSchema`).
+  stakeClock: true,
 });
 
 const round2 = (value) => Math.round(value * 100) / 100;
@@ -268,6 +276,9 @@ export function normalizeSchema(value) {
   for (const key of ["faceDown", "sedated", "sealHighest"]) {
     if (typeof source[key] === "boolean") schema[key] = source[key];
   }
+  // Absent, not defaulted: a board that does not say it has the stake clock
+  // was dealt before it (a save, a replay record), and runs the flat clock.
+  schema.stakeClock = source.stakeClock === true;
   schema.fracturedAxis = typeof source.fracturedAxis === "string" ? source.fracturedAxis : null;
   schema.mutations = Array.isArray(source.mutations)
     ? source.mutations.filter((id) => typeof id === "string").slice(0, 8)
@@ -609,7 +620,7 @@ function resumeWindow(window, resume) {
   // Progress is clamped under the wall and the clock: a resumed window is always
   // still live, and the first tick or push decides it the way it would have.
   restored.gauge = clamp(restored.gauge, 0, Math.max(0, window.wall - 0.01));
-  restored.elapsed = clamp(restored.elapsed, 0, Math.max(0, window.schema.seconds - 0.1));
+  restored.elapsed = clamp(restored.elapsed, 0, Math.max(0, decisionWindowSeconds(restored.gauge, window.schema) - 0.1));
   restored.timeScale = normalizeTimeScale(restored.timeScale);
   restored.selectedId = typeof resume.selectedId === "string" ? resume.selectedId : null;
   restored.focusMode = normalizeFocusMode(resume.focusMode);
@@ -677,8 +688,17 @@ export function getTableClockScale(run, tableTime = 1) {
   return Math.max(Number(tableTime) || 1, run?.story === true ? STORY_CLOCK_SCALE : 1);
 }
 
+/**
+ * The clock this window has now: its board's, less what its stake takes
+ * (stakeClock.js). It is what the HUD counts down from and what `advanceClock`
+ * runs out at, so the number on screen is the number that busts.
+ */
+export function getWindowSeconds(window) {
+  return decisionWindowSeconds(window.gauge, window.schema);
+}
+
 export function getRemainingSeconds(window) {
-  return Math.max(0, window.schema.seconds - window.elapsed);
+  return Math.max(0, getWindowSeconds(window) - window.elapsed);
 }
 
 /**
@@ -708,12 +728,32 @@ export function getClockHeatRate(pushes) {
  * bust of its own.
  */
 function advanceClock(window, delta) {
-  const elapsed = window.elapsed + delta;
-  const creepFrom = Math.max(window.elapsed, READ_GRACE_SECONDS);
-  const creeping = Math.max(0, elapsed - creepFrom);
-  const gauge = clamp(window.gauge + creeping * window.schema.creep * getClockHeatRate(window.pushes), 0, GAUGE_MAX);
+  const start = window.elapsed;
+  const elapsed = start + delta;
+  const creepFrom = Math.max(start, READ_GRACE_SECONDS);
+  const rate = window.schema.creep * getClockHeatRate(window.pushes);
+  const gaugeAt = (at) => clamp(window.gauge + Math.max(0, at - creepFrom) * rate, 0, GAUGE_MAX);
+  const gauge = gaugeAt(elapsed);
+  /** When the creep reaches `heat` inside this tick, or null. */
+  const reaches = (heat) => (window.gauge < heat && heat <= gauge ? creepFrom + (heat - window.gauge) / rate : null);
+  const wallAt = gauge >= window.wall ? (reaches(window.wall) ?? start) : Infinity;
+  // The moment the clock runs out, if it lies inside this tick. The window's
+  // clock shortens as its heat climbs the stake's tiers (stakeClock.js), so
+  // the tick is read tier by tier -- from its start, then from each tier the
+  // creep reaches, in order -- and the first point at which the clock stands
+  // at or past that tier's bell is the bust, with the heat of that moment.
+  // Found this way rather than at the tick's end, a slow frame and a fast one
+  // land on the same clock and the same heat, and so does the replay's whole
+  // second (windowReplay.js's advanceTo), whatever the page's ticks were. A
+  // wall the creep reaches first, or at the same moment, is the bust instead.
+  const edges = [{ at: start, gauge: window.gauge }, ...STAKE_LAYER_GAUGES.filter((tier) => reaches(tier) !== null).map((tier) => ({ at: reaches(tier), gauge: tier }))];
+  for (const [index, edge] of edges.entries()) {
+    const bell = Math.max(edge.at, decisionWindowSeconds(edge.gauge, window.schema));
+    if (bell > (edges[index + 1]?.at ?? elapsed)) continue;
+    if (bell < wallAt) return { ...window, elapsed: bell, gauge: Math.max(edge.gauge, gaugeAt(bell)), status: "bust", cause: "timeout" };
+    break;
+  }
   if (gauge >= window.wall) return { ...window, elapsed, gauge: window.wall, status: "bust", cause: "creep" };
-  if (elapsed >= window.schema.seconds) return { ...window, elapsed: window.schema.seconds, gauge, status: "bust", cause: "timeout" };
   return { ...window, elapsed, gauge };
 }
 
@@ -746,7 +786,11 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       const step = drawStep(window.schema, window.seed, pushes);
       const gauge = clamp(window.gauge + step, 0, GAUGE_MAX);
       const pushed = { ...window, pushes, lastStep: step, gauge };
-      return gauge >= window.wall ? { ...pushed, status: "bust", cause: "push" } : pushed;
+      if (gauge >= window.wall) return { ...pushed, status: "bust", cause: "push" };
+      // A push that lifts the stake into a tier whose clock is already behind
+      // the window runs it out here, not on the next tick: the press is the
+      // record's last line, so the replay closes where the page did.
+      return window.elapsed >= decisionWindowSeconds(gauge, window.schema) ? { ...pushed, status: "bust", cause: "timeout" } : pushed;
     }
     case "FOCUS": {
       if (!window.selectedId || !rules.has("lock")) return window;
@@ -977,7 +1021,10 @@ export function normalizeRunState(value) {
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
-  run.schema = normalizeSchema(source.schema);
+  // A run with no board yet is dealt the plain one, stake clock and all; a
+  // save's board is read as it is, and one from before 2026-11-05 has no
+  // stake clock on it (`normalizeSchema`).
+  run.schema = normalizeSchema(source.schema ?? BASE_SCHEMA);
   run.suspended = normalizeSuspendedWindow(source.suspended, run.windowIndex);
   run.open = normalizeCaseOpen(source.open);
   return run;
