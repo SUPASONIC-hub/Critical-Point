@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-04 (the state of `main` at `dc26d88`, after the dependency bumps (#385, #386), seven time-balanced e2e shards (#415), canon fixes 1 and 2 (#424, #435), the README restore (#444), the glossary terms (#431), the wider canon check (#430) and bundle 1104a (#447: caption boxes #429, `/en/` and `/ja/` start pages #433, first-visit preloads #436, no Korean in English screens #445, sound words inside the plate #438) and bundle 1105b (#448: the credits #443, A044 #446, and the `/en/*` and `/ja/*` headers in `render.yaml`) and bundle 1105a (#449: accessibility #440, flaky tests #439, the KD은행 계좌 #442 and no snap penalty after reading #416), and before that after the scene plates that tell the story (#392), the same rooms in English and Japanese (#398), the 11-03 locale review (#395), the test week summary fixes (#407), faster local checks (#410) and CI (#406), the 360px signal row (#402), last week's board tab (#409), the WebKit start button (#411), summary artifacts (#421) and coverage floors (#408), and before that after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-05 (the state of `main` at `[자리]`, after bundle-1105c (#451: #450 tab title, #432 board auto-hide and blocked terms, #425 global-limit alerts and fail-closed unknown address, #434 wider ranking recheck and 「확인 중」; three migrations) [자리]).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -551,6 +551,44 @@ Still open, on purpose:
   `check:grants` on main. Nineteen PRs merged (eight on their own and eleven
   inside three bundles; 22 counting the bundle PRs #447, #448 and #449; main
   `dc26d88`), production build-sha `dc26d88` (18:01), 1,758 unit tests.
+- 2026-11-05: #451 (`bundle-1105c`, one CI run for the four PRs that were
+  "first tomorrow" in the 11-04 handoff, their three migrations in version
+  order -- 20261103000000, 010000, 020000 -- and the owner's one answer
+  "(1) merge the bundle at once"; #432's uncommitted merge of 62a25238 was
+  aborted and main 3d4183e5 taken in fresh; conflicts were the README number
+  lines and the budget blocks only, edited by hunk with both sides' notes
+  kept; every added line of both parents of the five merges checked present
+  in the result, the only misses the re-measured numbers; first paint
+  429,328 / 486,074 / 493,267, 56 migrations, 1,818 unit tests): #450
+  (`tab-title-locale`: the English and Japanese game tab no longer falls
+  back to `index.html`'s Korean title -- `pageTitle` in the intro copy,
+  `setPageTitle` run by `loadLocale()` before the first paint, the `/en/`
+  and `/ja/` start pages' `<title>` the same string; the language picker's
+  name unchanged); #432 (`board-auto-hide`, migration
+  `20261103000000_board_auto_hide_and_blocked_terms`: three distinct
+  reporters hide a post at once and it waits in the queue as 「자동 숨김」;
+  at most five posts hidden by reports an hour and three of one reporter's
+  reports a day count (`counts_for_hide`); a minimal ko, en and ja
+  blocked-term list in `src/boardBlockedTerms.js` = `board_blocked_terms`,
+  each term matched at its scope -- text, token or word -- so Yamashita, 다시
+  발견, まだ死ねない and 시발점 pass); #425 (`security-small-1103`, migration
+  `20261103010000_cloud_unknown_address_and_tier_list`: the two global daily
+  limits -- new cloud codes, telemetry bytes -- read by `Board Reports` 09:10
+  and `Funnel` 22:10 into the job summary, the run failing at 80% as the
+  alert (`scripts/report-budgets.mjs`); new codes a day 1,000 to 3,000; a
+  cloud RPC without a client address counts under the one key `unknown`,
+  fail-closed; `render.yaml`'s CSP `connect-src` and HSTS matched to
+  production; `momentumTier` fixed to four values; zod 4.5.4 to 4.6.7, dev
+  only); #434 (`ranking-recheck-wider`, migration
+  `20261103020000_ranking_recheck_seen`: Verify Ranking reads, per board --
+  plain, this week's rule, last week's -- every unread row of the top 100 and
+  the top 20 again, 150 a night, with a second run Monday 00:20 KST;
+  `recheck_seen_at` is opened to anon only as the boolean `rechecked`, so a
+  row the checker has not read yet says 「확인 중」; the "same address
+  frequency" recheck -- keeping address_key 180 days -- declined, the owner's
+  choice (1) on 11-05). [자리: anything else merged today.] [자리] PRs merged
+  ([자리] counting the bundle PR #451; main `[자리]`), production build-sha
+  `[자리]` ([자리]), [자리] unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
