@@ -57,7 +57,7 @@ export default {
     title: "This season has collapsed.",
     ruling: "You had the authority, but you could not carry the human cost that piled up case after case. The record remains. But the people it was meant to protect left first.",
     execution: "The remaining cases stop. Only what would have to change for the next season to hold is written down.",
-    cost: "The allowances and support people got while things ran well are the first to be taken back. Failure is not the end; it is the next season’s starting line.",
+    cost: "The allowances and support the company gave people while things ran well are the first to be taken back. What took them back was not the company’s circumstances but your judgment, which pushed past the line. Failure is not the end; it is the next season’s starting line.",
   },
   openCost: "For every conclusion you put off, the next participant gets more authority and a heavier question.",
   twistTitles: {

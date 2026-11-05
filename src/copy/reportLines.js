@@ -43,6 +43,23 @@ const reportLinesCopy = {
     harm: "시즌 평균 {harmLabel} {perCase} / {gate} · 터진 판 {bustPercent}%",
     overreach: "시즌 평균 {harmLabel} {perCase} / {gate} · 터진 판 {bustPercent}% / {bustGate}%",
     harmCase: "{caseLabel} 다시 도전 · {harmLabel} {harm}",
+    // 개선 포인트 C3 (2026-11-05 초안): the sentence after the line when the
+    // season's cases closed on a mean cash under the start and harm under the
+    // line (createSeasonStandingReadout `held`). A season that lost money but
+    // kept people reads as that, not as a loss.
+    held: "{capitalLabel}{capitalParticle} 평균 {capital}까지 내려갔지만 {harmLabel}{harmParticle} 붕괴선 아래입니다.",
+  },
+  // C3: the sentence after an ending's own line on the finale, by the ending,
+  // printed only on that same season (`endingHeld`). SYSTEM COLLAPSE is over
+  // the line and PROFITABLE SILENCE kept its cash, so neither has one.
+  heldEndings: {
+    "open-oversight": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 기준을 남긴 시즌입니다.",
+    "evidence-reform": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 공개와 보호의 규칙을 남긴 시즌입니다.",
+    "human-record": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 이름들을 남긴 시즌입니다.",
+    "cold-justice": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 절차를 지킨 시즌입니다.",
+    "field-pact": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 사람들의 약속을 남긴 시즌입니다.",
+    "quiet-cover": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.",
+    "open-question": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 질문을 넘긴 시즌입니다.",
   },
   score: {
     points: "{score}점",
