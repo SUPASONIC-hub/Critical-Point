@@ -334,6 +334,7 @@ const budgets = [
   // 191,476 / 69,094 -> 191,476 / 69,099 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the gzip alone moved with the stylesheet's hash (money.css, the account's 방금 at 11px). Measured 191,472 raw / 69,095 gzip in the e2e build, the plus 4.
   // -> 192,346 / 69,287 on 2026-11-05, bundle-1105d (E5, D1, table-a11y, canon-trainee-locales, static-shell) over main c569cb99: the lines above together. Measured 192,342 / 69,283 in the e2e build, the plus 4.
   // -> 192,346 / 69,292 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the lines above together. Measured 192,342 / 69,288 in the e2e build, the plus 4.
+  // 191,476 / 69,094 -> 191,573 / 69,173 on 2026-11-05, studio-name over main c569cb99: the studio's three names (STUDIO_NAMES, studioName) in the entry. Measured 191,569 / 69,169 in the e2e build, the plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 192_346, maxGzip: 69_292 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -670,7 +671,8 @@ const budgets = [
   // weight axis cut to 400-920, nothing asking for less. Measured 197,736 (from
   // 270,828), plus 4.
   // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): ク, ド and ン for the Japanese sounds in the plate. Measured 198,144 plus 4.
-  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 198_148, compressed: true },
+  // 198,148 -> 199,128 on 2026-11-05, studio-name: ち, ぷ, も and よ for the Japanese studio name STUDIOもちぷよ (1,703 characters). Measured 199,124 plus 4.
+  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 199_128, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -1363,6 +1365,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 428,480 / 485,062 / 492,230 -> 428,596 / 485,174 / 492,344 on 2026-11-05, intro-cards-cv over main 62a25238: the roadmap cards' content-visibility rule in the index CSS (the critical CSS only its hash). Measured 428,592 / 485,170 / 492,340 in the e2e build, the plus 4.
 // 428,596 / 485,174 / 492,344 -> 428,603 / 485,186 / 492,356 on 2026-11-05, intro-cards-cv trim over main 62a25238: the index CSS gzip 9 bytes more after the trim that fits base-intro-ranking.css to its structure budget (raw 88 bytes fewer). Measured 428,599 / 485,182 / 492,352 in the e2e build, the plus 4.
 // -> 430,150 / 486,904 / 494,148 on 2026-11-05, bundle-1105d with intro-cards-cv (E5, D1, table-a11y, canon-trainee-locales, static-shell, intro-cards-cv) over main c569cb99: the lines above together. Measured 430,146 / 486,900 / 494,144 in the e2e build, the plus 4.
+// 429,328 / 486,074 / 493,267 -> 430,386 / 487,129 / 494,322 on 2026-11-05, studio-name over main c569cb99: the font subset grows by ち, ぷ, も and よ (199,124) and the entry by the three names. Measured 430,382 / 487,125 / 494,318 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 430_150, en: 486_904, ja: 494_148 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
