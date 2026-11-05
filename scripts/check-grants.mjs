@@ -3003,6 +3003,59 @@ const VALIDATOR_PARTS = {
   await allowed("rebuild the choice snapshot after the rows are gone", "service_role", `select public.refresh_scene_choice_stats()`);
 }
 
+// ---- D3: NEW GAME+ windows are left out of the scene wall rates (20261106050000)
+//
+// The decision of 2026-10-21 (docs/history.md, NEW GAME+ carry-over): a
+// NEW GAME+ season plays the veteran table, so its windows say nothing of the
+// scene the line is printed on. The mark is the case row's
+// `summary.newGamePlus` (src/ranking.js, scripts/report-funnel.mjs). Rows put
+// in place as stored ones, the trigger off: sixty plain runs through one scene,
+// a quarter of them busts, and forty NEW GAME+ runs through it all busts -- the
+// answer must hold sixty windows and 25 percent, not a hundred and 55. A row
+// marked `false` and a row with no `summary` at all count as before. A second
+// scene has thirty plain and thirty NEW GAME+ runs and stays under the floor.
+{
+  const TRACE_CASE = "case02";
+  const entry = (nodeId, state) => ({ nodeId, choiceId: "card_a", threshold: { state, forced: false } });
+  const store = async (runId, log, summary) =>
+    db.query(
+      `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
+       values ($1, $2, 'NGPL', $3, 'D3', $4::jsonb, $5::jsonb)`,
+      [sessionId(98), runId, TRACE_CASE, JSON.stringify(summary), JSON.stringify(log)],
+    );
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    for (let n = 0; n < 60; n += 1) {
+      const summary = n === 0 ? { newGamePlus: false } : {};
+      await store(`run-trace-plain-${n}`, [entry("d3_scene", n % 4 === 0 ? "bust" : "cash"), ...(n < 30 ? [entry("d3_thin", "cash")] : [])], summary);
+    }
+    for (let n = 0; n < 40; n += 1) {
+      await store(`run-trace-plus-${n}`, [entry("d3_scene", "bust"), ...(n < 30 ? [entry("d3_thin", "bust")] : [])], { newGamePlus: true, locale: "ko" });
+    }
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  await allowed("rebuild the scene snapshot with NEW GAME+ rows stored", "service_role", `select public.refresh_scene_bust_stats()`);
+  const answer = (await allowed("read the scene wall rates as the page does", "anon", `select public.scene_bust_rates() as rates`))?.rows[0]?.rates ?? {};
+  const scene = answer?.[TRACE_CASE]?.d3_scene;
+  check(
+    JSON.stringify(scene) === JSON.stringify([60, 25]),
+    `the scene of sixty plain and forty NEW GAME+ runs answers ${JSON.stringify(scene)}; expected [60, 25], the plain windows alone (fifteen busts of sixty).`,
+  );
+  check(!answer?.[TRACE_CASE]?.d3_thin, `a scene of thirty plain and thirty NEW GAME+ runs is in the answer: ${JSON.stringify(answer?.[TRACE_CASE]?.d3_thin)}.`);
+  const stored = await one(`select windows, busts, runs from public.scene_bust_stats where case_id = $1 and node_id = 'd3_thin'`, [TRACE_CASE]);
+  check(
+    stored?.windows === 30 && stored?.busts === 0 && stored?.runs === 30,
+    `the snapshot holds the thin scene as ${JSON.stringify(stored)}; expected 30 windows, 0 busts, 30 runs -- the NEW GAME+ rows' thirty busts were counted.`,
+  );
+  check(
+    /newGamePlus/.test((await one(`select pg_get_functiondef('public.refresh_scene_bust_stats'::regproc) as def`))?.def ?? ""),
+    "refresh_scene_bust_stats no longer reads summary.newGamePlus: a later migration redefined it without the NEW GAME+ filter.",
+  );
+  await db.query(`delete from public.playtest_sessions where session_id = $1`, [sessionId(98)]);
+  await allowed("rebuild the scene snapshot after the rows are gone", "service_role", `select public.refresh_scene_bust_stats()`);
+}
+
 // ---- retention runs as the service role and reaches every table
 
 await db.query(`update public.playtest_feedback set created_at = 'infinity'`);
