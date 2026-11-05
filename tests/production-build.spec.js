@@ -251,3 +251,73 @@ test(`${what} that cannot be fetched reloads once, then offers 새로고침 and 
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(save.nodeId);
 });
 }
+
+/*
+ * The static shell (scripts/static-shell.mjs): before its script has run, the
+ * page already shows the intro's frame -- the key visual, the wordmark and the
+ * start button's place -- and the intro React renders over it stands where the
+ * shell stood. Blocking the page's scripts is how "before" is held still.
+ *
+ * SHELL_DRIFT_PX is how far the wordmark and the start row may move down or up
+ * when the intro's words (the kicker, the premise, the row's link) come in
+ * under them; the shell has none of those, so the column is shorter. It is a
+ * first guess, to be set from the first Linux run's measured moves.
+ */
+const SHELL_DRIFT_PX = 24;
+const SHELL_PAGES = ["/", "/en/", "/ja/"];
+const SHELL_VIEWPORTS = [
+  { width: 390, height: 844 },
+  { width: 1366, height: 900 },
+];
+const blockScripts = (page) => page.route("**/assets/*.js", (route) => route.abort());
+const boxesOf = (page) =>
+  page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector)?.getBoundingClientRect();
+      return rect ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height } : null;
+    };
+    // The figure, not its img: the img drifts on a 28-second animation.
+    return { art: box(".intro-visual"), wordmark: box("h1.game-wordmark"), start: box(".intro-launch button") };
+  });
+
+for (const path of SHELL_PAGES) {
+  test(`${path} shows the intro's frame before its script runs`, { tag: "@prod" }, async ({ page }) => {
+    await blockScripts(page);
+    await page.goto(path);
+    const shell = page.locator("[data-static-shell]");
+    await expect(shell).toHaveCount(1);
+    await expect(shell.locator("h1.game-wordmark")).toBeVisible();
+    await expect(shell.locator(".intro-launch button")).toBeVisible();
+    const art = shell.locator(".intro-visual img");
+    await expect(art).toBeVisible();
+    await expect.poll(() => art.evaluate((img) => img.complete && img.naturalWidth > 0), { message: "the key visual is painted" }).toBe(true);
+    await expect(page.getByTestId("start-first-case")).toHaveCount(0);
+  });
+}
+
+for (const viewport of SHELL_VIEWPORTS) {
+  test(`at ${viewport.width}x${viewport.height} the intro replaces the shell where it stood`, { tag: "@prod" }, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize(viewport);
+    await blockScripts(page);
+    await page.goto("/");
+    await expect(page.locator("[data-static-shell] h1.game-wordmark")).toBeVisible();
+    const before = await boxesOf(page);
+
+    await page.unrouteAll({ behavior: "ignoreErrors" });
+    await page.goto("/");
+    await expect(page.getByTestId("start-first-case")).toBeVisible();
+    await expect(page.locator("[data-static-shell]"), "the first render replaced the shell").toHaveCount(0);
+    const after = await boxesOf(page);
+
+    for (const key of ["x", "y", "width", "height"]) {
+      expect(Math.abs(after.art[key] - before.art[key]), `the key visual's ${key}`).toBeLessThanOrEqual(2);
+    }
+    expect(Math.abs(after.wordmark.x - before.wordmark.x), "the wordmark's left edge").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.wordmark.width - before.wordmark.width), "the wordmark's width").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.wordmark.y - before.wordmark.y), `the wordmark moved ${after.wordmark.y - before.wordmark.y}px`).toBeLessThanOrEqual(SHELL_DRIFT_PX);
+    expect(Math.abs(after.start.x - before.start.x), "the start button's left edge").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.start.height - before.start.height), "the start button's height").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.start.y - before.start.y), `the start row moved ${after.start.y - before.start.y}px`).toBeLessThanOrEqual(SHELL_DRIFT_PX * 4);
+  });
+}

@@ -1349,6 +1349,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 429,328 / 486,074 / 493,267 -> 429,560 / 486,344 / 493,539 on 2026-11-05, text-size-setting over main 3ca15f8d: 글자 크기 (E5) in the entry, the index CSS (the root reads --text-scale; the critical CSS carries the rule) and the two dictionaries. Measured 429,556 / 486,340 / 493,535 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,334 / 486,095 / 493,293 on 2026-11-05, result-card-habit over main 3ca15f8d: the entry's chunk names and the dictionaries' habit sentence (D1). Measured 429,330 / 486,091 / 493,289 in the e2e build, the plus 4.
 // 429,328 / 486,074 / 493,267 -> 429,328 / 486,082 / 493,273 on 2026-11-05, table-a11y-1105 over main 3ca15f8d: the English and Japanese dictionaries carry the voice's wall call (E3 첫 단계); the Korean page is under its budget still. Measured 429,326 / 486,078 / 493,269 in the e2e build, the plus 4.
+// 428,480 / 485,062 / 492,230 -> 428,933 / 485,454 / 492,668 on 2026-11-05, static-shell over main 62a25238: the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs), so each page's HTML grows. Measured 428,929 / 485,450 / 492,664 in the e2e build, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 429_560, en: 486_344, ja: 493_539 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
