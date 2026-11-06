@@ -7,7 +7,7 @@ import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
-import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
+import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
 /**
@@ -238,11 +238,9 @@ test("an act's last case is 「고점 판」: the briefing says it and the board
   await startDebugNode(page, "case06", "c6_start");
   await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
 });
-// C9 (11-30): the KD은행 계좌 pays at the draft. Written with PR 2 and not yet
-// run (the lock and CI were held for the day's merges): run it with
-// --repeat-each=3 before the PR opens. The vault a fresh case01 close leaves
-// is too small for either buy, so the save is given one and reloaded on the
-// draft, which a reload keeps.
+// C9 (11-30): the KD은행 계좌 pays at the draft. The vault a fresh case01
+// close leaves is too small for either buy, so the save is given one and
+// reloaded on the draft, which a reload keeps.
 for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 }]) {
   test(`the draft's reroll and one more pay out of the vault at once, and say why when they cannot, at ${viewport.width}x${viewport.height} @once`, async ({ page }) => {
     await page.setViewportSize(viewport);
@@ -254,7 +252,14 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
       await expect(draft.getByTestId(id)).toHaveAccessibleDescription("잔액 부족");
     }
     const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-    await writeJsonStorage(page, TEST_STORAGE_KEYS.save, { ...saved, dynamics: { ...saved.dynamics, vault: 30000 } });
+    // Seeded on the reload itself, before the app reads the save: the page going
+    // away writes the run it holds (useWindowSuspension's pagehide save), and a
+    // save written here first got the close's own small vault put back over it.
+    await page.addInitScript(({ key, value }) => {
+      if (sessionStorage.getItem("e2e-draft-vault-seeded")) return;
+      sessionStorage.setItem("e2e-draft-vault-seeded", "1");
+      localStorage.setItem(key, value);
+    }, { key: TEST_STORAGE_KEYS.save, value: JSON.stringify({ ...saved, dynamics: { ...saved.dynamics, vault: 30000 } }) });
     await page.reload();
     await expect(draft).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     const first = await draft.getByTestId("relic-option").evaluateAll((cards) => cards.map((card) => card.dataset.relic));
