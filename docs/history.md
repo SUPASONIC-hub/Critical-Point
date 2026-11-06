@@ -878,7 +878,48 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
     점검 전 행은 순위 화면에 「확인 중」. 「같은 주소 빈도」(address_key 180일 보존)는 하지 않기로(11-05 결정 (1)).
 - 병합 뒤 Migration Drift(손으로 돌림)·Visual Regression 초록, main에서 `check:grants` 통과(마이그레이션 56개 재생). 병합된 다섯 갈래와 워크트리는 지웠다.
 - 스튜디오 이름(`studio-name`): 만든 사람의 결정으로 STUDIO Tak'n Roll을 언어마다 다른 이름으로 바꿨다 — 한국어 「찹쌀떡 스튜디오」, 영어 「Mochi Verse Studio」, 일본어 「STUDIOもちぷよ」(`src/credits.js`의 `STUDIO_NAMES`·`studioName`). 시작 화면 크레딧은 페이지 언어(`LANG`)를, 정적 15쪽 꼬리는 그 쪽의 언어를 읽는다. CREATOR 줄·메일·라벨은 그대로. README 첫머리와 `package.json` author도 바꿨고, 11월 4일 기록은 그날의 이름 그대로 둔다.
-- 이날 병합 4개(묶음 하나가 4개를 담음. 묶음 PR #451까지 세면 5개, main `3ca15f8d`), 운영 build-sha `3ca15f8d`(11:03 curl, sw 릴리스 `9928af4b`), 유닛 테스트 1,818개(`npm test` 실측).
+- 문서 둘(#452 `docs-1105`, `2d4dc9ff`, 11:20; #453 `docs-fix-1105`, `c569cb99`, 11:30): 11월 5일 오전 기록 세 곳과 work-status의 낡은 두 줄(새 코드 한도 3,000, 마이그레이션 56개·표 13개).
+- 스튜디오 이름은 #454(`studio-name`, `24af89d7`, 12:41)로 병합. 일본어 이름의 ち·ぷ·も·よ가 글꼴 부분 집합에 없어 `build:fonts`로 다시 만들고(198,144 → 199,124바이트, 1,703자·한글 1,241자)
+  `build:critical`도 다시. 유닛 테스트 `credits.test.mjs` 5개(세 이름, 모르는 언어 → 한국어, 15쪽 꼬리), e2e는 360px 세 언어 시작 화면과 소개 쪽 꼬리.
+- 새 사건 쓰는 법·이벤트 주 절차(#455, `docs-contrib-1105`, `e68fe8cc`, 13:23): 결정 F3 (1)·F7 (1). `docs/writing-a-case.md` 721 → 856줄(언어 셋, 초상과 장면 그림, 사건 조각과 예산,
+  장면 분위기 태그, PR 전 열 줄 점검), 견본 사건 `docs/examples/case-template.js`(219줄, 세 장면은 실제 모양·나머지 열일곱은 칸만, 빌드가 읽지 않음), `docs/event-week.md`(216줄: 달력 W46 ~ 2027-W03,
+  예고 → 진행 → 정리, D-7 병합, 주중에 바꾸지 않는 것 여섯, 되돌리기 셋). 코드·검사·빌드는 그대로.
+- 본문 줄이기 묶음 셋(#456 `prose-bundle-a` `8ac59b71` 14:34, #457 `prose-bundle-b` `977809b3` 14:59, #460 `prose-bundle-c` `33899116` 15:24): 11-02 후기 P3의 draft 17갈래
+  (a: #394 #399 #400 #401 #403 #405 프롤로그 + 사건 01~18, b: #412 #413 #414 #417 #418 #419 사건 25~39·46~48, c: #420 #422 #423 #427 #428 사건 19~24·40~45·49·마지막)를 main 24af89d7 위에
+  PR 순서대로 병합했다(11-05 결정: 17갈래를 11-13 전에). 한국어 본문은 갈래마다 −20.6 ~ −28.8%. 충돌 69파일 129곳(a 34파일 78곳, b 19파일 29곳, c 16파일 22곳)은 11-04 결정 1안대로
+  줄인 문장에 main의 캔논(#424·#435)·용어집(#431)·A044(#446) 사실을 얹었고, 코드 충돌은 없었다. 판단 6곳: 사건 06·en 사건 22는 main이 고친 문장을 줄인 쪽이 통째로 뺐으므로 줄인 문장 그대로,
+  사건 10 병가 열아홉 명의 범위·사건 07 「최종 승인란은 비어 있습니다」(check:canon han-return-sign)·사건 25 첫 출근 문장(first-day-clock)은 캔논을 되살림. merge 17개 모두 양쪽 부모가 더한
+  줄이 결과에 있는지 줄 단위로 확인(빠진 것은 충돌 칸의 줄과 다시 잰 숫자 줄뿐). 사건 청크 예산 98,900 / 25,400 → 91,536 / 23,304(en 67,659 / 19,653, ja 75,270 / 21,047), 첫 브리핑 기준
+  이미지 2장은 CI에서 다시 찍음. 묶음 하나를 넣을 때마다 다음 묶음이 main을 받고 README·예산을 다시 쟀다.
+- 감정 색·음악(#458, `bundle-mood`, `4f2d39cb`, 16:19): 결정 ③(11-13 전 전부, 5단계 neutral·bright·tense·dread·sorrow, 스크립트 초안 + 사람 검토, 메인은 한 단계 밝은 중립).
+  네 갈래를 mood-wire(mood-tags 포함) → mood-tokens → mood-music 순서로 합치고 배선 한 줄(`AdaptiveMusic.jsx`가 `onMoodChange(setMusicMood)` 구독, 깨어날 때 `currentMood()` 한 번).
+  글자색·점수·랭킹은 그대로. 설계 `메모-20261105/design-mood.md`.
+  - 태그(`src/sceneMoods.js`, 생성 파일): 장면 1,129 중 321에 태그(tense 240 / bright 31 / sorrow 31 / dread 19), `scripts/tag-mood.mjs`(규칙 7개, `--from-review`)와 `check:mood`.
+    빌드 때 `season-split.mjs`가 태그된 장면에만 `scene.mood`를 사건 청크에 실어 태그표는 출하하지 않는다(런타임 청크에 `sceneMoods` 없음을 확인).
+  - 바탕 토큰 다섯 벌(`tokens.css` `:root[data-mood]`): neutral은 오늘 값 +12·13·14로 한 단계 밝게, tense는 오늘 값 그대로. `useSceneMood`가 판의 보이는 장면 mood를 `<html data-mood>`로 걸고
+    시작·결과 화면은 neutral. 인트로 스크림도 neutral 바탕에.
+  - 음악: mood가 모드의 네 리드 중 둘을 고르고(sorrow는 「많이 치름」 선율의 단조 이조) 판 드론 음색(`gauntlet/tensionDrone.js`)을 고른다. 바뀔 때 리드 5초 크로스페이드, 드론은
+    setTargetAtTime, 점프 없음, drive에 더하는 것 없음(이어폰 규칙). `music-lab`에 분위기 라디오.
+  - 가독성 검사(`tests/contrast.spec.js`)는 감정마다 하나. CI에서 기본 neutral의 활성 사건 카드(「프롤로그 01」 글자)가 acid 글로우 두 겹 위에서 4.45:1로 빨강 → 토큰·글자색은 두고
+    그 카드의 글로우 알파만 0.14 → 0.1로 내려 en/ja 5.61(neutral 5.61·bright 5.50). 로컬 24/24.
+  - 예산(main 33899116 위 실측 +4): 진입 193,412 / 69,957, GameRuntime 148,134 / 54,771(`src/mood.js`가 진입 청크로 옮겨 가 mood-wire의 148,418에서 내림), 사건 청크 91,581 / 23,318
+    (줄인 본문 + 장면 mood 바이트), 첫 화면 ko / en / ja 431,491 / 488,208 / 495,402. 유닛 테스트 1,845개. 기준 PNG는 옛 바탕 그대로(임계 안).
+- 결정(만든 사람, 적지 않은 것은 모두 1안): 마이그레이션은 묶음 단위로 한 번에 묻는다 · #434 「같은 주소 빈도」는 안 함 · 스튜디오 이름 언어별 · 감정 색·음악 ③(11-13 전 전부·5단계·스크립트+검토·
+  메인 한 단계 밝게) · W47 뒤로 미뤄 둔 초안 여섯(D1, E5, table-a11y, static-shell, intro-cards-cv, canon-trainee-locales)은 (2) 11-13 전에 전부 · 코드 구조 예산 초과(kd-spend-ui·intro-cards-cv)는
+  코드를 줄여 예산 안으로, rules-1105의 css-structure만 예외로 실측으로 올림 · **큰 결정: 11-30 묶음(#224 #307 #316 #320 #308)을 포함해 13일 전에 전부 넣고 13일부터는 플레이·데이터 수집만,
+  랭킹 비움은 11-12 저녁 한 번(v10·v11·RELIC_DRAFT_MARK를 마이그레이션 하나로)** · A3 탭 제목만 · A4 큰 판단에만 길게 누르기 0.6초 · B1 조회에 믿음 1 · B4 안 함 · B5 판돈 따라 보이는 시계 ·
+  C1 직급 칭호만 · C3 결말 문구·C4 죄책감 문장은 초안으로 넣고 감수 뒤 고침 · D3는 기존(#197) 유지 + NEW GAME+ 판 제외 마이그레이션만 · E3 2단계 · F3 문서+견본 · F7 절차 문서 ·
+  계좌 돈 쓰기 「하나 더」 12,000 그대로 + 「칸이 빌 때만」 안내 문구 · `.portrait-src/`(71MB)는 cp-archive로 옮김 · #319 옛 리허설 닫고 갈래 삭제 · `/ja/`의 Pretendard preload 빼기(13일 전, CI·PSI로 확인) ·
+  #379 마이그레이션 이름은 20261106…으로, `.draft`는 승격(랭킹 비움 둘 제외) · equipRelic: 산 뒤 넘기기는 숨 고르기 아님.
+- 측정: C9 계좌 돈 쓰기(`kd-spend-engine`, check:pressure 「draft spend」) 금고 never 23,423 / 칸이 빌 때만 둘 다 22,654 / 매번 하나 더 11,352 / 매번 둘 다 7,403, 시즌 봇은 always에서
+  결말 바뀜 13.8%·붕괴 20.0 → 18.8%(12,000은 「매번 사면 결말 여유를 잃는」 값). ja FCP(Fast 3G + CPU 4x 중앙값, main 2d4dc9ff) `/ja/` 13.8s, preload 한 줄을 빼면 10.3s(−3.5s, 무제한에서는
+  0.3~0.4s 노이즈 범위). C2 결말 순서(`ending-reform-order`, finale control이면 evidence-reform을 oversight 앞): 봇 600시즌 reform 5.3 → 11.3, oversight 15.2 → 9.7, cold 3.5 → 3.0.
+  B1 조회(`scout-narrow`): 봇 always 34,486·bust 3.0%로 줄 그대로, 믿음 1은 봇에게 거의 값이 아님(BUST를 덜 해 끝 믿음이 오히려 높음). B5 판돈 시계(`stake-clock`): 봇 숫자 전후 동일(봇이 1~4초에 닫음).
+- 열어 둔 것(넘길 때): #459(`bundle-1105d`, 초안 다섯 E5·D1·table-a11y·canon-trainee-locales·intro-cards-cv; 정적 셸은 병합 뒤 CI에서 빠져 되돌림 — 인트로 글 기둥이 셸보다 161~246px 커
+  교체 때 object-fit 재스케일), #461(`rules-1105`, 본 규칙 묶음 #224 #307 #316 #320 #308, 마이그레이션 5개 20261106000000~040000으로 56 → 61개, 병합 전 한 번 묻기), 로컬 묶음
+  bundle-1106a(A2 C2 C3/C4 C1 A3 A4 ja-preload D3, 마이그레이션 1개)·bundle-rules2(rules-1105 위에 kd-spend 둘·11px·B1·B5와 11-12 랭킹 비움 초안).
+- 이날 병합 [자리]개(오전 묶음 하나가 4개, 오후 묶음 셋이 17개와 네 갈래를 담음. 묶음 PR #451 #456 #457 #460 #458까지 세면 [자리]개, main [자리]), 운영 build-sha `3ca15f8d`(11:03 curl,
+  sw 릴리스 `9928af4b`) → `[자리]`(18:50 curl), 유닛 테스트 [자리]개(`npm test` 실측).
 
 ## 7. 자료와 한계
 
