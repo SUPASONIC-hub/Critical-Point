@@ -2688,10 +2688,12 @@
      room is taken from the HUD's air instead: a 30px clock, 18px pills, and
      2 to 4px off the gaps and paddings around them. The HUD measured 106px
      with one bank line and 132 with two; it is 87 and 107 (and 3px block
-     paddings since the purse line, 2026-11-02). */
+     paddings since the purse line, 2026-11-02). 2px since the KD band
+     (22px over the shell): an overclocked board with five relics put five-card
+     hands 2px under the bar (c6_desk, c7, c16, c28; 2026-11-06). */
   .gauntlet-stage .gx-hud {
-    gap: 3px 8px;
-    padding: 3px 8px;
+    gap: 2px 8px;
+    padding: 2px 8px;
   }
 
   .gauntlet-stage .gx-clock {
