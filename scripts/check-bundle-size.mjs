@@ -293,6 +293,7 @@ const budgets = [
   // 91,536 / 23,304 -> 91,581 / 23,318 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): main's trimmed case01 (91,532 / 23,300) plus the moods written on its scenes (the line above, mood-wire). Measured 91,577 / 23,314 in the e2e build, the plus 4.
   // 91,632 / 23,319 -> 91,677 / 23,336 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. (the moods on 사건 01's scenes beside B-13(2)'s attended). Measured 91,673 / 23,332 in the e2e build, the plus 4.
   // 91,677 / 23,336 -> 91,893 / 23,370 on 2026-11-06, mood-boost over main 6f58cbb8: 95 early scenes tagged by review (prologues 01-05, cases 01-05), their `"mood"` written on each; case01 the largest. Measured 91,889 / 23,366 in the e2e build, the plus 4.
+  // 91,893 / 23,370 unchanged on 2026-11-06, mood-tags-2 over main d7dadd92: 413 more scenes set by review (cases 06-49 and the finale; 692 of 1,129 tagged), each with its `"mood"` in its case's file; the largest of those, case45, 69,502 / 18,516, so case01 (91,889 / 23,366, untouched) still sets the line. Measured in the e2e build, the plus 4.
   { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 91_893, maxGzip: 23_370 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
@@ -945,7 +946,8 @@ const budgets = [
   // -> 206,974 / 38,884 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 206,970 / 38,880 in the e2e build, the plus 4.
   // 206,347 / 38,833 -> 206,970 / 38,929 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 206,966 / 38,925 in the e2e build, the plus 4.
   // 206,970 / 38,929 -> 208,114 / 39,241 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the moods' hue-carrying grounds, lines, accents and frames (tokens.css), the edge tint (play.css .game-shell::after, briefing.css veil) and its @property. Measured 208,110 / 39,237 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 208_114, maxGzip: 39_241 },
+  // 208,114 / 39,241 -> 208,126 / 39,241 on 2026-11-06, static-shell-2 after merging main d7dadd92 (#465 mood-boost): the intro art's box takes its height from the viewport alone (min(100svh, 940px), 82svh on a phone; decision 13 (1)), so the static shell and the intro draw it the same. Measured 208,122 / 39,235 in the e2e build, the raw plus 4 (the gzip under its line).
+  { pattern: /^index-.*\.css$/, maxBytes: 208_126, maxGzip: 39_241 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1898,7 +1900,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // en 490,209 -> 490,337 and ja 497,421 -> 497,551 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 490,333 / 497,547 in the e2e build, the plus 4 (ko 432,474 under its 432,479).
 // -> 433,241 / 491,404 / 498,624 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 433,237 / 491,400 / 498,620 in the e2e build, the plus 4.
 // 433,241 / 491,404 / 498,624 -> 433,243 / 491,405 / 498,624 on 2026-11-06, cold-opening after merging main 97366b95 (#468 w47-rule-line): B-3(1) with its switch off (the entry line above) over the W47 lines. Measured 433,239 / 491,401 / 498,620 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 433_243, en: 491_405, ja: 498_624 };
+// 433,241 / 491,404 / 498,624 -> 434,268 / 492,190 / 499,699 on 2026-11-06, static-shell-2 after merging main 97366b95 (#465 mood-boost, #468 w47-rule-line; decision 13 (1)): the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs) with the header pills, kicker and premise hidden in the page's language and Japanese's face, the critical CSS now cut at 360px and on /en/ and /ja/ too, and the art's box from the viewport. Measured 434,264 / 492,186 / 499,695 in the e2e build, the plus 4.
+// -> 434,273 / 492,195 / 499,703 on 2026-11-06, bundle-1106b (static-shell-2 6ac68416, mood-tags-2 9b6973cd over main 97366b95): the lines above together; the entry names the case chunks that now carry 692 mood tags. Measured 434,269 / 492,191 / 499,699 in the e2e build, the plus 4.
+// 433,243 / 491,405 / 498,624 -> 434,283 / 492,205 / 499,714 on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening, B-3(1) switched off): the static shell and mood-tag lines above over the cold opening's entry line. Measured 434,279 / 492,201 / 499,710 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_283, en: 492_205, ja: 499_714 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2052,7 +2057,8 @@ function checkBudget(file, budget) {
 // 10,314 / 3,712 -> 10,350 / 3,724 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. one more file in the warm list (personalBests). Measured 10,346 / 3,720 in the e2e build, the plus 4.
 // 3,724 -> 3,731 gzip on 2026-11-05, rules-1105 after merging main 33899116 (#456 #457 #460 prose bundles a-c): the warm list's hashed names only. Measured 10,346 / 3,727, the gzip plus 4.
 // 3,712 -> 3,719 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 10,310; the hashed names in its warm list changed. Measured 10,310 / 3,715 in the e2e build, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 10_350, maxGzip: 3_731 };
+// 3,731 -> 3,737 gzip on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening): the warm list's hashed names only (raw 10,346 the same). Measured 10,346 / 3,733, the gzip plus 4.
+const WORKER_BUDGET = { maxBytes: 10_350, maxGzip: 3_737 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

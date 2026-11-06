@@ -740,7 +740,7 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 | 장면 그림(장소에서 계산) | `src/scenePlate.js` (`getPlateMotif`, `PLATE_MOTIFS`) |
 | 래스터 그림 목록·축소본·잠금·예산 | `src/responsiveArt.js`, `scripts/build-art-variants.mjs` (`build:art`), `scripts/art-variants.lock.json`, `scripts/check-art-budget.mjs` (`check:art`) |
 | 사건 조각 나누기, 조각 예산 | `scripts/vite-season-data.mjs`, `scripts/season-split.mjs`, `scripts/check-bundle-size.mjs` (`check:bundle`) |
-| 장면 분위기 태그(준비 중, 15장) | `src/sceneMoods.js`, `scripts/tag-mood.mjs`, `check:mood` -- 아직 main에 없음 |
+| 장면 분위기 태그(15장) | `src/sceneMoods.js`, `scripts/tag-mood.mjs`, `check:mood` |
 
 ---
 
@@ -825,18 +825,19 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 
 ---
 
-## 15. 장면 분위기 태그 (준비 중)
+## 15. 장면 분위기 태그
 
-장면마다 분위기 하나(`neutral`·`bright`·`tense`·`dread`·`sorrow`)를 붙여 바탕색과 음악이 따라가게 하는 일이
-2026-11-05에 결정됐고, `mood-tags` 갈래에서 만들고 있습니다. **아직 main에는 없습니다.** 들어오면 이렇게 됩니다.
+장면마다 분위기 하나(`neutral`·`bright`·`tense`·`dread`·`sorrow`)를 붙여 바탕색과 음악이 따라가게 합니다(#458, #465).
 
 - `src/sceneMoods.js`는 **생성 파일**입니다(장면 id → 분위기, `neutral`은 생략). 손으로 고치지 않고
-  `scripts/tag-mood.mjs`가 장면 글·의성어·`cognition`·위험도 규칙으로 초안을 매긴 뒤, 검토표를 거쳐 다시 씁니다.
-- `check:mood`가 없는 장면 id와 모르는 값을 막습니다. 새 사건을 올리면 이 스크립트를 한 번 돌려 사건 50의
-  장면 20개가 표에 들어가게 합니다.
-- 사건 파일 자체에는 분위기 칸이 **없습니다**. 2장의 장면 칸은 그대로입니다.
-
-병합되면 이 장의 「준비 중」을 지우고 8장의 순서에 `check:mood`를 넣습니다.
+  `scripts/tag-mood.mjs`가 장면 글·의성어·국면 칩·위험도 규칙으로 초안을 매긴 뒤, 사건별 검토표
+  (`cp-archive/메모-20261105/mood-review/<사건>.md`)의 검토 칸을 `--from-review`로 읽어 다시 씁니다.
+  2026-11-06에 프롤로그부터 마지막 사건까지 1,129개 가운데 508개가 검토로 정해졌습니다.
+- `check:mood`가 없는 장면 id, 모르는 값, 한 사건의 70%를 넘는 한 가지 분위기를 막습니다. 한 사건이 정말
+  처음부터 끝까지 한 색이면 `tag-mood.mjs`의 `CASE_CAP_OVERRIDES`에 그 사건의 몫과 까닭을 적습니다
+  (지금은 사건 32 압수수색 0.75 하나).
+- 새 사건을 올리면 이 스크립트를 한 번 돌려 장면들이 표에 들어가게 하고, 검토 칸을 채웁니다.
+- 사건 파일 자체에는 분위기 칸이 **없습니다**. 2장의 장면 칸은 그대로입니다(빌드가 `src/sceneMoods.js`를 읽어 조각에 적습니다).
 
 ---
 
