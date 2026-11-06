@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-06 (the state of `main` at `d828507`, after #459 bundle-1105d, #463 bundle-rules2, #464 bundle-1106a, #465 mood-boost, #468 W47 rule line, #471 cold opening switched off and #470 report:judgment; 61 migrations, the 11-12 ranking clear still a draft in #466).
+Last updated: 2026-11-06 (the state of `main` at `a170161`, after #459 bundle-1105d, #463 bundle-rules2, #464 bundle-1106a, #465 mood-boost, #468 W47 rule line, #471 cold opening switched off, #470 report:judgment and #472 static shell plus 692 mood tags; 61 migrations, the 11-12 ranking clear still a draft in #466).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -766,14 +766,15 @@ Still open, on purpose:
   (C2 human endings against the bot, Q23 season score spread, B-3 prologue
   drop-off; read-only, aggregates only). Measured on production (`ac0645d3`,
   Fast 3G + CPU 4x median): `/ja/` FCP 13.8 s to 6.1 s, the ja-en gap +6.2 s
-  to -0.1 s; kept. Open: #472 (`bundle-1106b`, the static shell again under
-  decision 13 (1) with the key visual box fixed to the viewport, replacing
-  #469, plus mood tags for cases 06-49 and the finale, 692 scenes), drafts
+  to -0.1 s; kept. #472 (`bundle-1106b`, `a1701612`, 16:52): the static
+  shell again under decision 13 (1) with the key visual box fixed to the
+  viewport, replacing #469, plus mood tags for cases 06-49 and the finale,
+  692 scenes. Open: drafts
   #466 (the 11-12 evening ranking clear, asked again right before merge) and
   #467 (A7 music limiter, merged or closed after an earphone listen), and the
-  local draft branch `cold-opening-style`. Seven PRs merged (22 branches
-  inside them; main `d828507`), production build-sha `d828507` (16:15
-  Deploy, sw release `f0122d0b`), 1,951 unit tests.
+  local draft branch `cold-opening-style`. Eight PRs merged (24 branches
+  inside them; main `a170161`), production build-sha `d828507` (16:15
+  Deploy, sw release `f0122d0b`) before #472's deploy, 1,958 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
