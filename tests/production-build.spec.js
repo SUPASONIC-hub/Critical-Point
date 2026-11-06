@@ -1,4 +1,4 @@
-import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { BACKEND_ORIGIN, expect, guardNetwork, test } from "./helpers/network.js";
 import { CHUNK_RELOAD_SESSION_KEY } from "../src/appConfig.js";
 import { cashStakedCard, collectRuntimeErrors, dismissProtocolBreach, resumeSavedRun } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
@@ -300,15 +300,27 @@ for (const path of SHELL_PAGES) {
 }
 
 for (const path of SHELL_PAGES) for (const viewport of SHELL_VIEWPORTS) {
-  test(`${path} at ${viewport.width}x${viewport.height}: the intro replaces the shell where it stood`, { tag: "@prod" }, async ({ page }) => {
+  test(`${path} at ${viewport.width}x${viewport.height}: the intro replaces the shell where it stood`, { tag: "@prod" }, async ({ browser, page, baseURL, userAgent, deviceScaleFactor, isMobile, hasTouch, locale }) => {
+    // The shell is measured in a context of its own. WebKit goes on failing an
+    // import it has seen fail, across loads and without asking the server (see
+    // the chunk test above, 2026-10-05), so a page whose scripts were refused
+    // once never runs them on the second goto; Chromium does. A player never
+    // has the scripts refused, so the live load gets a context that has not.
+    const shellContext = await browser.newContext({ baseURL, userAgent, deviceScaleFactor, isMobile, hasTouch, locale, viewport, reducedMotion: "reduce" });
+    let before;
+    try {
+      await guardNetwork(shellContext);
+      const shellPage = await shellContext.newPage();
+      await blockScripts(shellPage);
+      await shellPage.goto(path);
+      await expect(shellPage.locator("[data-static-shell] h1.game-wordmark")).toBeVisible();
+      before = await boxesOf(shellPage);
+    } finally {
+      await shellContext.close();
+    }
+
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize(viewport);
-    await blockScripts(page);
-    await page.goto(path);
-    await expect(page.locator("[data-static-shell] h1.game-wordmark")).toBeVisible();
-    const before = await boxesOf(page);
-
-    await page.unrouteAll({ behavior: "ignoreErrors" });
     await page.goto(path);
     await expect(page.getByTestId("start-first-case")).toBeVisible();
     await expect(page.locator("[data-static-shell]"), "the first render replaced the shell").toHaveCount(0);
