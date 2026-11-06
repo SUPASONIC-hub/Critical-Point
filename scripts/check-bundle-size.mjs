@@ -293,6 +293,7 @@ const budgets = [
   // 91,536 / 23,304 -> 91,581 / 23,318 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): main's trimmed case01 (91,532 / 23,300) plus the moods written on its scenes (the line above, mood-wire). Measured 91,577 / 23,314 in the e2e build, the plus 4.
   // 91,632 / 23,319 -> 91,677 / 23,336 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. (the moods on 사건 01's scenes beside B-13(2)'s attended). Measured 91,673 / 23,332 in the e2e build, the plus 4.
   // 91,677 / 23,336 -> 91,893 / 23,370 on 2026-11-06, mood-boost over main 6f58cbb8: 95 early scenes tagged by review (prologues 01-05, cases 01-05), their `"mood"` written on each; case01 the largest. Measured 91,889 / 23,366 in the e2e build, the plus 4.
+  // 91,893 / 23,370 unchanged on 2026-11-06, mood-tags-2 over main d7dadd92: 413 more scenes set by review (cases 06-49 and the finale; 692 of 1,129 tagged), each with its `"mood"` in its case's file; the largest of those, case45, 69,502 / 18,516, so case01 (91,889 / 23,366, untouched) still sets the line. Measured in the e2e build, the plus 4.
   { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 91_893, maxGzip: 23_370 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
