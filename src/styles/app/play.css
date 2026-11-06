@@ -197,6 +197,19 @@
   mask-image: radial-gradient(90% 70% at 50% 40%, var(--c-black), transparent 85%);
 }
 
+/* The mood's edge (tokens.css --mood-edge, 2026-11-06): the screen's rim
+   tinted amber, sky, red or teal, behind every panel so no text stands on it
+   that did not before; neutral is transparent. It fades with the ground. */
+.game-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(75% 70% at 50% 50%, transparent 35%, var(--mood-edge) 100%);
+  transition: --mood-edge 0.6s;
+}
+
 .game-shell .save-status {
   margin: 0 auto 8px;
   border-radius: var(--ui-radius-sm);

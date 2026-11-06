@@ -506,23 +506,28 @@ for (const lang of ["en", "ja"]) {
 
 /**
  * The ground follows the scene's mood (tokens.css, `:root[data-mood]`,
- * 2026-11-05): four sets of surfaces besides the neutral one every reading
- * above is made on. No text colour moves with the mood, so what can fail is a
- * ground that came up under a quiet ink. The table with a staged card and its
+ * 2026-11-05; hue, lines, accent and edge tint 2026-11-06): five sets of
+ * surfaces. No text colour moves with the mood, so what can fail is a ground
+ * that came up under a quiet ink. The table with a staged card and its
  * reveal, once per mood, with the mood put on <html> the way GauntletStage
- * will. The intro and the result carry no mood and are read above.
+ * does. The intro and the result carry no mood and are read above.
  */
-const MOODS = ["tense", "dread", "bright", "sorrow"];
+const MOODS = ["neutral", "tense", "dread", "bright", "sorrow"];
 const ground = (page) => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--ui-bg").trim());
+// The scene's own tag is wherever the season put it (case01/start is tense since 2026-11-06), so neutral is read with none.
+const putMood = (page, mood) =>
+  page.evaluate((value) => {
+    if (value === "neutral") delete document.documentElement.dataset.mood;
+    else document.documentElement.dataset.mood = value;
+  }, mood);
 
 for (const mood of MOODS) {
   test(`in the ${mood} mood, a table and its reveal stay readable`, async ({ page }) => {
     await startAt(page, "case01", "start");
+    await putMood(page, "neutral");
     const neutral = await ground(page);
-    await page.evaluate((value) => {
-      document.documentElement.dataset.mood = value;
-    }, mood);
-    expect(await ground(page), `${mood}: the ground token changed`).not.toBe(neutral);
+    await putMood(page, mood);
+    if (mood !== "neutral") expect(await ground(page), `${mood}: the ground token changed`).not.toBe(neutral);
 
     await page.locator(".choices .choice").first().click();
     await page.waitForSelector(".gx-card.selected");

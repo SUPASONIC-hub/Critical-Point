@@ -292,7 +292,8 @@ const budgets = [
   // 98,900 / 25,400 -> 91,536 / 23,304 on 2026-11-03, prose-trim-1 (#394) over main 465ccb93: the scene text of prologue 01-05 and cases 01-03 cut by 28.8%. 사건 01 still the largest, measured 91,532 / 23,300 in the e2e build, the plus 4.
   // 91,536 / 23,304 -> 91,581 / 23,318 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): main's trimmed case01 (91,532 / 23,300) plus the moods written on its scenes (the line above, mood-wire). Measured 91,577 / 23,314 in the e2e build, the plus 4.
   // 91,632 / 23,319 -> 91,677 / 23,336 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. (the moods on 사건 01's scenes beside B-13(2)'s attended). Measured 91,673 / 23,332 in the e2e build, the plus 4.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 91_677, maxGzip: 23_336 },
+  // 91,677 / 23,336 -> 91,893 / 23,370 on 2026-11-06, mood-boost over main 6f58cbb8: 95 early scenes tagged by review (prologues 01-05, cases 01-05), their `"mood"` written on each; case01 the largest. Measured 91,889 / 23,366 in the e2e build, the plus 4.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 91_893, maxGzip: 23_370 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
@@ -515,7 +516,8 @@ const budgets = [
   // 193,717 / 70,143 -> 193,739 / 70,149 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (the stake clock's tier in the entry's shared rules, the chunk names it imports). Measured 193,735 / 70,145 in the e2e build, the plus 4.
   // -> 194,609 / 70,303 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 194,605 / 70,299 in the e2e build, the plus 4.
   // 194,929 / 70,355 -> 194,945 / 70,375 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 194,941 / 70,371 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 194_945, maxGzip: 70_375 },
+  // 194,945 / 70,375 -> 195,802 / 70,670 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the mood's texture in the entry's AdaptiveMusic (musicScore.js MOOD_TEXTURES, blendedTexture, moodLeadNote). Measured 195,798 / 70,666 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 195_802, maxGzip: 70_670 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -941,7 +943,8 @@ const budgets = [
   // 206,048 / 38,702 -> 206,671 / 38,799 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): draft-spend.css (C9's two buys) and the stake clock's HUD lines, less the 360px English 10px label rule (phone-en-stake-11px). Measured 206,667 / 38,795 in the e2e build, the plus 4.
   // -> 206,974 / 38,884 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 206,970 / 38,880 in the e2e build, the plus 4.
   // 206,347 / 38,833 -> 206,970 / 38,929 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 206,966 / 38,925 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 206_970, maxGzip: 38_929 },
+  // 206,970 / 38,929 -> 208,114 / 39,241 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the moods' hue-carrying grounds, lines, accents and frames (tokens.css), the edge tint (play.css .game-shell::after, briefing.css veil) and its @property. Measured 208,110 / 39,237 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 208_114, maxGzip: 39_241 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1885,7 +1888,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 432,043 / 489,484 / 496,601 -> 432,147 / 489,827 / 497,021 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (the index CSS and the entry; en and ja by their dictionaries). Measured 432,143 / 489,823 / 497,017 in the e2e build, the plus 4.
 // -> 432,479 / 490,209 / 497,421 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 432,475 / 490,205 / 497,417 in the e2e build, the plus 4.
 // 432,507 / 490,290 / 497,455 -> 432,622 / 490,652 / 497,862 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2): the two sides' lines together. Measured 432,618 / 490,648 / 497,858 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 432_622, en: 490_652, ja: 497_862 };
+// 432,622 / 490,652 / 497,862 -> 433,234 / 491,263 / 498,475 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the lines above (index CSS and entry). Measured 433,230 / 491,259 / 498,471 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 433_234, en: 491_263, ja: 498_475 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
