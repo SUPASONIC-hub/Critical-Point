@@ -32,9 +32,11 @@ import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 import { getOutcomeTone } from "../plateStory.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
+import tabTitlesCopy from "../copy/tabTitles.js";
 
-// The rank's line, the bridge, the feedback questions and the tab's title (src/copy/reportLines.js).
-const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK, tabTitle: TAB_TITLE } = reportLinesCopy;
+// The rank's line, the bridge and the feedback questions (src/copy/reportLines.js); the tab's title (src/copy/tabTitles.js).
+const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK } = reportLinesCopy;
+const { result: TAB_TITLE } = tabTitlesCopy;
 
 /**
  * The copy the report prints around the numbers: the season so far, the rank's
@@ -144,12 +146,16 @@ export function useResultReport({
     () => getEndingVariant({ resources, discoveredClues, log, ...seasonStrain }),
     [discoveredClues, log, resources, seasonStrain],
   );
-  // The same season against the collapse gate, for the line each report prints
-  // and the cases a collapse offers to play again (reportViewModels.js).
-  const seasonStanding = useMemo(() => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase }), [caseResults, resources]);
   // What the ruling read: the standing the season's cases closed on on average,
   // or the last case's when no summary carries one.
   const standing = seasonStrain.seasonResources ?? resources;
+  // The same season against the collapse gate, for the line each report prints
+  // and the cases a collapse offers to play again (reportViewModels.js). It is
+  // handed the mean closing standing and the ending, for the held line (C3).
+  const seasonStanding = useMemo(
+    () => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase, closing: seasonStrain.seasonResources, endingId: endingVariant.id }),
+    [caseResults, resources, seasonStrain, endingVariant.id],
+  );
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).

@@ -2,9 +2,10 @@
 export default {
   analystTitles: {
     prologue01: "見習い分析官",
-    case01: "分析官",
-    case18: "上級分析官",
-    case36: "首席分析官",
+    prologue02: "分析官",
+    case01: "上級分析官",
+    case25: "責任分析官",
+    finished: "首席分析官",
   },
   playStyles: {
     instinct: "最初の反応で決めるという誓い",
@@ -31,7 +32,6 @@ export default {
     missing: "プレイ識別子がないため、一時的なローカル記録として扱われます。",
   },
   openingEcho: "どれだけ賢いかは問いません。代わりに、いつ考えるのをやめられないかを見ます。",
-  tabSuffix: " · 臨界点",
   storageBanner: {
     offline: { title: "オフライン", text: "接続が戻れば、リモート保存をまた使えます。いまの記録はブラウザに保存されます。" },
     ready: { title: "リモート保存の準備完了", text: "事件の完了時とフィードバック送信時に、同意した記録だけをリモート保存します。" },
