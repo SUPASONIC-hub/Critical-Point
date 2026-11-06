@@ -11,6 +11,8 @@ import { localizeTables } from "../locale.js";
 const weekRuleCopy = {
   takeUp: "이번 주의 규칙으로 시작(이번 주 순위로)",
   turnDown: "이번 주의 규칙 없이 시작(평소 순위로)",
+  testWeekTakeUp: "이번 주 기록을 시험 주 순위에 따로 쌓기",
+  testWeekTurnDown: "이번 주 기록을 시험 주 순위에 쌓지 않기(평소 순위로)",
   boardsLabel: "순위 고르기",
   ordinaryBoard: "평소 순위",
   weekBoard: "이번 주의 규칙 · {label}",
@@ -23,6 +25,11 @@ const weekRuleCopy = {
     keeps: " 이번 주에 시작한 시즌은 끝까지 이 규칙으로 하고, 순위는 따로 쌓인다.",
     after: " 다음 주의 규칙은 {label}({title}), 다음 월요일 0시부터.",
     next: "{title}. 월요일 0시부터.",
+    testWeek: {
+      text: "감사·연쇄는 이제 상시 규칙이다. 이번 주(시험 주) 기록은 시험 주 순위에 따로 쌓인다.",
+      first: " 첫 시즌은 평소 순위에 쌓인다.",
+      after: " 다음 주는 시험 주: 감사·연쇄는 이제 상시 규칙이고, 다음 월요일 0시부터 그 주 기록은 시험 주 순위에 따로 쌓인다.",
+    },
   },
 };
 export default weekRuleCopy;
