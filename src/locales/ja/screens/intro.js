@@ -40,6 +40,7 @@ export default {
     identity: "分析官の呼び名",
     nameLabel: "分析官の名前",
     namePlaceholder: "名前を入力してください",
+    rankTitle: "記録の称号 {title}",
     newGamePlus: "{game}を始める",
   },
   pastRunLabel: "NEW GAME+ 前回の記録",
@@ -102,6 +103,7 @@ export default {
     end: "にあります。",
     playtestNotice:
       "事件の結果、選択ログ、応答時間、画面の言語、送ったフィードバック、エラー報告が、この端末のランダムな識別番号とともに研究用に保存され、180日後に消去されます。名前はリモートに保存せず、接続元のアドレスはリクエスト回数の制限にだけ使います。",
+    hallOfFameNotice: "検査を通過した上位のシーズンは、実行番号とスコアで名誉の殿堂に長く残ることがあります。",
     deletion: {
       cloud: " オンライン保存は「別の端末で続ける」パネルから自分で消せます。",
       before: "記録の削除は ",

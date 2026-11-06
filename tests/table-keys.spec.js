@@ -134,12 +134,12 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
  * and the spent button stays where it was, aria-disabled, so the focus is not
  * dropped to the page (decision 11).
  */
-test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds, and the spent button keeps the focus", async ({ page }) => {
+test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds (and 믿음 1 at the settle), and the spent button keeps the focus", async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   const scout = page.getByTestId("commit-scout");
-  // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price.
-  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 시간 3초$/);
+  // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price (B1: 믿음 1 and the clock).
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 믿음 1과 시간 3초$/);
   await expect(scout).toHaveAttribute("aria-disabled", "false");
   const bandOf = async () => (await scout.textContent()).match(/벽 (\d+)–(\d+)/).slice(1).map(Number);
   const [low, high] = await bandOf();
@@ -585,6 +585,8 @@ test("with five tools held, a draft pick asks which to put down, Escape goes bac
  */
 const WHOLE = { logic: true, lock: true, stance: true, chain: true };
 const NO_LOCK = { logic: true, lock: false, stance: false, chain: false };
+// OVERCLOCK, whose chain the run's line counts, opens in 사건 01 since C-4 (2026-10-25).
+const NO_CHAIN = { logic: true, lock: true, stance: true, chain: false };
 /** The line over an introduction. 프롤로그 01 has its own: nothing was added to the first table. */
 const FIRST_TABLE = "FIRST TABLE · 이 판은 이렇게 합니다";
 const NEW_PROTOCOL = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다";
@@ -592,9 +594,14 @@ const STAGED_STEPS = [
   { caseId: "prologue01", on: { logic: false, lock: false, stance: false, chain: false }, lines: 2, kicker: FIRST_TABLE },
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue03", on: NO_LOCK, lines: 3, kicker: NEW_PROTOCOL },
-  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
-  { caseId: "prologue05", on: WHOLE, lines: 3, kicker: NEW_PROTOCOL },
-  { caseId: "case01", on: WHOLE, lines: 0 },
+  // Two lines since C-4 (2026-10-25): FRACTURE and LOCK. OVERCLOCK, the audit and the links open
+  // one a case in 사건 01 to 03, each with a line of its own.
+  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: false }, lines: 2, kicker: NEW_PROTOCOL },
+  { caseId: "prologue05", on: NO_CHAIN, lines: 3, kicker: NEW_PROTOCOL },
+  { caseId: "case01", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case02", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case03", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case04", on: WHOLE, lines: 0 },
 ];
 
 /** A scene's briefing page, with the table behind it still shut. */
@@ -931,7 +938,7 @@ test("staged: 프롤로그 03 closes without a draft, and 프롤로그 04 closes
   await expect(page.getByTestId("unlock-intro").locator("li")).toHaveText([...UNLOCK_LADDER[4].intro]);
   await dismissProtocolBreach(page);
   await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(1);
-  await expectTableDraws(page, WHOLE);
+  await expectTableDraws(page, NO_CHAIN);
 });
 
 /**
@@ -1093,11 +1100,12 @@ test("a save from before the steps resumes with what it held and plays on under 
   expect(after.dynamics.schema.mutations.filter((id) => !stepRules.has(MUTATION_RULES[id])), "nothing dealt from a rule 프롤로그 03 does not have").toEqual([]);
 });
 
-// The case's last choice is held, not clicked (src/gauntlet/holdConfirm.js,
-// improvement notes A4): a pointer or Enter held for 0.8s, Space held on the
-// focused button, or -- for a player who cannot hold -- a second press within
-// three seconds. Every other table still cashes on one press.
-test.describe("the case's last choice is held", () => {
+// The big decisions' 확정 is held, not clicked (src/gauntlet/holdConfirm.js,
+// improvement notes A4, 2026-11-05): a pointer, Enter or Space held for 0.6s
+// on the case's last choice and on a table whose heat is inside the band. A
+// short press shows a hint and confirms nothing; a bare tap with no press --
+// a screen reader's -- arms a second tap. Every other table cashes on one press.
+test.describe("the big decisions' 확정 is held", () => {
   const CLOSING = { caseId: "prologue01", nodeId: "p1_final" };
 
   async function stakeClosing(page) {
@@ -1110,58 +1118,95 @@ test.describe("the case's last choice is held", () => {
     return cash;
   }
 
-  test("a click arms 확정, says so, and a second press confirms", async ({ page }) => {
-    const cash = await stakeClosing(page);
-    await expect(cash).toContainText("꾹 눌러 확정");
-    await expect(cash).toHaveAccessibleDescription(/길게 눌러 확정/);
-    await cash.click();
-    await expect(cash).toHaveAttribute("data-hold", "armed");
-    await expect(cash).toContainText("한 번 더");
-    await expect(page.getByText("한 번 더 누르면 확정된다")).toHaveCount(1);
-    await expect(stageOf(page), "one click does not close the case").toHaveAttribute("data-status", "live");
-    await cash.click();
-    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
-  });
-
-  test("a press held for 0.8s confirms before it is let go; one slid off confirms nothing", async ({ page }) => {
-    const cash = await stakeClosing(page);
+  /** The pointer, down on the middle of 확정 and left there. */
+  async function pressDown(page, cash) {
     const box = await cash.boundingBox();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
-    await expect(cash).toHaveClass(/is-holding/);
+    return box;
+  }
+
+  /**
+   * The hold under way: the button pressed and its gauge filling -- or, on a
+   * renderer slow enough that the 0.6s filled before this looked, the window
+   * already cashed (mobile-chromium beside a second worker, 2026-11-05).
+   */
+  const expectHolding = (page) =>
+    expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const button = document.querySelector("[data-testid='commit-confirm']");
+            const holding = button?.classList.contains("is-holding") && button.dataset.hold === "holding" && button.querySelector(".gx-hold")?.dataset.phase === "holding";
+            return holding ? "holding" : document.querySelector("[data-testid='gauntlet-stage']")?.dataset.status;
+          }),
+        { message: "the press holds: the button pressed, its gauge filling" },
+      )
+      .toMatch(/^(holding|cashed)$/);
+
+  test("a click shows the hint and confirms nothing; a 0.6s hold fills the gauge and confirms", async ({ page }) => {
+    const cash = await stakeClosing(page);
+    const gauge = cash.locator(".gx-hold");
+    await expect(cash).toContainText("꾹 눌러 확정");
+    await expect(cash).toHaveAccessibleDescription(/길게 눌러 확정/);
+    await expect(gauge).toHaveAttribute("data-phase", "idle");
+    // Down and up with nothing between them, so a slow renderer cannot stretch the click into a hold.
+    await pressDown(page, cash);
+    await page.mouse.up();
+    await expect(cash).toHaveAttribute("data-hold", "hinted");
+    await expect(cash).toContainText("길게 눌러야 확정");
+    await expect(gauge).toHaveAttribute("data-phase", "hinted");
+    await expect(page.getByText("길게 눌러야 확정된다"), "the table's voice says it too").toHaveCount(1);
+    await expect(stageOf(page), "one click does not close the case").toHaveAttribute("data-status", "live");
+    await pressDown(page, cash);
+    await page.mouse.up();
+    await expect(stageOf(page), "a second click is a second hint, not a second press").toHaveAttribute("data-status", "live");
+    await expect(cash, "the hint runs out").toHaveAttribute("data-hold", "idle", { timeout: 3_000 });
+    await expect(cash).toContainText("꾹 눌러 확정");
+
+    await pressDown(page, cash);
+    await expectHolding(page);
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
+    await page.mouse.up();
+  });
+
+  test("a hold confirms before it is let go; one slid off confirms nothing", async ({ page }) => {
+    const cash = await stakeClosing(page);
+    const box = await pressDown(page, cash);
+    await expectHolding(page);
     await page.mouse.move(box.x + box.width / 2, box.y - 120);
     await expect(cash).toHaveAttribute("data-hold", "idle");
     await page.mouse.up();
     await page.waitForTimeout(1_000);
     await expect(stageOf(page), "a hold that slid off is dropped").toHaveAttribute("data-status", "live");
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
+    await pressDown(page, cash);
     await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
     await page.mouse.up();
   });
 
-  test("a click with no pointer behind it, as a screen reader sends, arms and confirms the same way", async ({ page }) => {
+  test("a click with no pointer behind it, as a screen reader sends, arms, says so, and a second one confirms", async ({ page }) => {
     const cash = await stakeClosing(page);
     const tap = () => cash.evaluate((button) => button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })));
     await tap();
     await expect(cash).toHaveAttribute("data-hold", "armed");
+    await expect(cash).toContainText("한 번 더");
+    await expect(page.getByText("한 번 더 누르면 확정된다")).toHaveCount(1);
     await tap();
     await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
   });
 
-  test("Enter held confirms, a short Enter arms, and Space holds on the button the keyboard walked to", async ({ page }) => {
+  test("Enter held confirms, a short Enter shows the hint, and Space holds on the button the keyboard walked to", async ({ page }) => {
     // Three tables opened from the debug menu: about 30s alone, past 60s beside a second worker.
     test.setTimeout(120_000);
     let cash = await stakeClosing(page);
     // The card was staked with the pointer, so Enter is the table's.
     await page.keyboard.press("Enter");
-    await expect(cash).toHaveAttribute("data-hold", "armed");
-    await page.keyboard.press("Enter");
-    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
-
-    await stakeClosing(page);
+    await expect(cash).toHaveAttribute("data-hold", "hinted");
+    await expect(cash).toContainText("길게 눌러야 확정");
+    await expect(stageOf(page), "a short Enter confirms nothing").toHaveAttribute("data-status", "live");
     await page.keyboard.down("Enter");
+    await expectHolding(page);
     await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
     await page.keyboard.up("Enter");
 
@@ -1175,19 +1220,32 @@ test.describe("the case's last choice is held", () => {
     await page.keyboard.up(" ");
   });
 
-  test("reduced motion draws the line at once and still asks for the hold", async ({ page }) => {
+  test("reduced motion still fills the gauge, with nothing else moving, and still asks for the hold", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     const cash = await stakeClosing(page);
+    // The sheet's answer for a filling gauge, read before the press so the
+    // 0.6s cannot run out under the reading: the phase is set by hand on the
+    // line and put back.
+    const filling = await cash.locator(".gx-hold").evaluate((line) => {
+      line.dataset.phase = "holding";
+      const duration = getComputedStyle(line).transitionDuration;
+      line.dataset.phase = "idle";
+      return duration;
+    });
+    expect(filling, "the fill is the one motion, and it stays").toBe("0.6s");
+    expect(await cash.evaluate((button) => getComputedStyle(button).animationName)).toBe("none");
     await page.keyboard.down("Enter");
-    await expect(cash).toHaveClass(/is-holding/);
-    expect(await cash.evaluate((button) => getComputedStyle(button, "::after").animationName)).toBe("none");
+    await expectHolding(page);
     await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
     await page.keyboard.up("Enter");
   });
 
-  test("an ordinary scene cashes on one press", async ({ page }) => {
+  test("an ordinary scene cashes on one press while its heat is under the band", async ({ page }) => {
     await openTable(page);
     await clickElement(page.locator(".choices .choice").first(), "stake a card");
-    await expect(page.getByTestId("commit-confirm")).not.toHaveAttribute("data-hold");
+    const cash = page.getByTestId("commit-confirm");
+    await expect(cash).not.toHaveAttribute("data-hold");
+    await expect(cash).toContainText("확정");
+    await expect(cash.locator(".gx-hold")).toHaveCount(0);
   });
 });

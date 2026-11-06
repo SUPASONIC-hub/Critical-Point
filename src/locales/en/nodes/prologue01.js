@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "p1_start": {
       "title": "Last Trainee Task",
-      "text": "Head office, 6th floor, Corporate Finance Strategy Team. Between the copier and the window stands a desk with no nameplate. It’s yours; you’re 3 months into your traineeship. Assistant Manager Oh Jinwoo pulls up a review file for you: a facility loan for Onsae Packaging, filed by Gangseo Branch, due for approval this Thursday. 'Last task of your traineeship. It closes within the branch limit, so just make sure the numbers add up.' The papers are clean. But the total debt on the summary sheet is 40 million won short of the sum of its items. One borrowing line never made it into the total, and with that line in, the debt-to-equity ratio tops 180%. At that point the branch can no longer approve the loan on its own. You put a pencil dot beside the line and stare at it for a long time.",
+      "text": "That desk with no nameplate is yours; you’re 3 months into your traineeship. Assistant Manager Oh Jinwoo pulls up a review file for you: a facility loan for Onsae Packaging, filed by Gangseo Branch, due for approval this Thursday. 'Last task of your traineeship. Just make sure the numbers add up.' But the total debt on the summary sheet is 40 million won short of the sum of its items. Put the missing line back in, and the debt-to-equity ratio tops 180%. At that point the branch can’t approve the loan on its own. You put a pencil dot beside the line.",
       "memo": [
         "Onsae Packaging facility loan, 380 million won -- filed at Gangseo Branch",
         "Summary total debt 1.142 billion won / sum of items 1.182 billion won",
@@ -38,7 +38,7 @@ export default {
     },
     "p1_counter": {
       "title": "Beside Window 4",
-      "text": "Ten the next morning, in the banking hall of KD Bank’s Gangseo Branch. The sales board by the entrance shows this month’s rankings, and beside the No. 1 slot, three 'Seller of the Month' stickers overlap. At Window 4, a young teller is walking a customer through a product. 'The principal isn’t guaranteed.' He pauses, then adds, 'But everyone’s doing it these days.' You hear it as you pass. You don’t ask his name. At the loan desk, Jung Haerin, head of Onsae Packaging, sits waiting with extra documents. When you ask about the 40-million-won line, Jung knows at once. 'We borrowed that from Saebom Credit Union in July. To pay our 11 employees.' The summary sheet from the tax accountant has no field for it at all, yet the general ledger has it down, repayment schedule and all.",
+      "text": "At Window 4, a young teller is walking a customer through a product. 'The principal isn’t guaranteed.' He pauses, then adds, 'But everyone’s doing it these days.' You pass by without asking his name. At the loan desk sits Jung Haerin, head of Onsae Packaging. When you ask about the missing line, Jung answers at once. 'We borrowed that from Saebom Credit Union in July. To pay our 11 employees.' The summary sheet the tax accountant made has no field for it. The general ledger has it down as is. Even the repayment schedule is there.",
       "memo": [
         "Gangseo Branch sales board -- 3 'Seller of the Month' stickers",
         "Saebom Credit Union loan, 40 million won -- July 2022, for wages",
@@ -69,7 +69,7 @@ export default {
     },
     "p1_mentor": {
       "title": "Late Means Wrong",
-      "text": "Assistant Manager Oh hands you a coffee and turns his monitor toward you. It takes 18 business days, on average, once a case goes up to the head-office credit review team. 'You’re right. It’s 184.7%. But write that number down, and Onsae Packaging misses November 1.' He takes a sip and, for the first time, talks about himself. In 2009 his father, Oh Sangchul, then manager of the Maetan branch in Suwon, processed one exception approval a day late. In that one day, the client moved to another bank. Three months later, Oh Sangchul was transferred to a desk overseeing three branches. 'I was eighteen. Around here, whoever’s late is wrong. And nobody gives you a chance to prove you weren’t.'",
+      "text": "Assistant Manager Oh turns his monitor toward you. Once a case goes up to the head-office credit review team, it takes 18 business days on average. 'You’re right. It’s 184.7%. But write that number down, and Onsae Packaging misses November 1.' For the first time, he talks about his father. In 2009, Oh Sangchul, manager of the Maetan branch in Suwon, processed one exception approval a day late. In that time, the client went to another bank. Three months later, he was transferred to an oversight desk. 'I was eighteen. Around here, whoever’s late is wrong.'",
       "memo": [
         "Head-office credit review takes 18 business days on average",
         "Oh Sangchul -- 2009, Suwon Maetan branch manager, approval one day late",
@@ -100,7 +100,7 @@ export default {
     },
     "p1_review": {
       "title": "The empty signature field",
-      "text": "Eleven a.m., Thursday. The door to the Team Head’s office opens. The trainee review is booked for 10 minutes. Team Head Yoon Sanghyuk wears a plain navy suit and smiles only when he shakes your hand. He pulls up the evaluation form on his tablet and runs his eyes down its five items. Speed, accuracy, teamwork, reporting, attitude. He enters a number in the speed field and nowhere else. A 5 out of 5. 'I’ll fill in the rest later.' He brings up the 40 million won before you can. 'Good catch. Trainees rarely add up the lines under a summary sheet.' Then he closes the tablet. The speed of it is his answer. 'But write that number down, and 11 people won’t make it through November. I never said your judgment was wrong. I just decide where it gets to stand.' At the bottom of the form, the evaluator’s signature line is blank.",
+      "text": "The trainee review is booked for 10 minutes. Team Head Yoon Sanghyuk wears a plain navy suit and smiles only when he shakes your hand. Of the five items on the form, he enters a 5 in the speed field and nowhere else. 'I’ll fill in the rest later. Good catch on the 40 million won.' He closes the tablet. The speed of it is his answer. 'But write that number down, and 11 people won’t make it through November. I never said your judgment was wrong. I just decide where it gets to stand.' The evaluator’s signature line is blank.",
       "memo": [
         "Trainee review, 10 minutes -- 1 question",
         "Of 5 evaluation items, one filled: speed 5/5",
@@ -131,7 +131,7 @@ export default {
     },
     "p1_final": {
       "title": "Where to Write It",
-      "text": "Seven p.m., Thursday. Again, only two desks on the 6th floor are lit. The approval result goes out to Gangseo Branch at nine tomorrow morning. The review opinion field is open on screen, the cursor blinking in the first box. Assistant Manager Oh drags a chair over and sits beside you. '40 million won, 184.7%, over 180%. You found all that. Now you just decide where to write it.' He holds up three fingers. 'Write it under your name, and this case doesn’t go out tomorrow. Write it under mine, and I take it on. Say it out loud but don’t write it, and it lands nowhere, and your trainee tag comes off Friday.' The Team Head’s light is already off. In the HR system, the evaluation form still has only the speed field filled in, and the signature line is still blank.",
+      "text": "Again, only two desks on the 6th floor are lit. The approval result goes out to Gangseo Branch at nine tomorrow morning. Assistant Manager Oh drags a chair over and sits down. '40 million won, 184.7%. You found all that. Now you just decide where to write it.' He holds up three fingers. 'Write it under your name, and this case doesn’t go out tomorrow. Write it under mine, and I take it on. Just say it out loud, and it lands nowhere, and your trainee tag comes off Friday.'",
       "memo": [
         "Approval papers due out -- Friday 09:00",
         "Review opinion field -- still blank",
@@ -159,7 +159,7 @@ export default {
     },
     "p1_aftershock": {
       "title": "Friday, Nine A.M.",
-      "text": "Friday morning. The approval papers come off the printer; in 20 minutes they go down to Gangseo Branch. Whatever you decided last night, the opinion field stays editable until the final check. The 40 million won you found came up twice at yesterday evening’s team meeting. Once as 'the trainee made a good catch,' and once as 'this one goes through within the branch limit.' Assistant Manager Oh stops sorting the printouts and glances at the opinion field. 'This is your last chance.' At the end of the hall, Manager Han Seoyun walks past, eyes on her tablet. The Team Head’s door is still shut. Of the five items on the trainee form, the Team Head filled in exactly one. Speed. The one line you choose this morning will stop you for 3 seconds, 3 years from now, in front of Article 7 of some contract.",
+      "text": "The approval papers come off the printer; in 20 minutes they go down to Gangseo Branch. The opinion field can still be edited until the final check. The 40 million won came up twice at yesterday’s team meeting: 'the trainee made a good catch,' and 'this one goes through within the branch limit.' Assistant Manager Oh glances at the opinion field. 'This is your last chance.' On the trainee form, the Team Head filled in only one field in the end: speed. The one line you choose this morning will stop you for 3 seconds, 3 years from now, in front of Article 7 of some contract.",
       "memo": [
         "Approval papers printed 08:40 · sent 09:00",
         "Mentions at yesterday’s team meeting: 2 -- praise 1, schedule 1",
@@ -183,7 +183,7 @@ export default {
     },
     "p1_ledger": {
       "title": "A Form with Five Fields",
-      "text": "Tuesday afternoon. Before heading back to head office, you stop by the records room on the 2nd floor of Gangseo Branch and read the bottom line of the summary form. 'Simplified Financial Summary (issued 2021.3)'. It has five fields for debt. Bank borrowings, corporate bonds, accounts payable, lease deposits, other. There’s no field for money borrowed from a credit union, and 'other' takes only one line. On the subway back, you call Assistant Manager Oh. He goes quiet for about 3 seconds. 'That form came out of our team.' Then he adds one more thing. 'Adding fields came up last year too. The conclusion was that it would make branches spend longer on paperwork.'",
+      "text": "Before heading back to head office, you look at the summary form. 'Simplified Financial Summary (issued 2021.3)'. It has only five debt fields, and none for money borrowed from a credit union. 'Other' takes only one line. On the subway, you call Assistant Manager Oh, and he goes quiet for about 3 seconds. 'That form came out of our team. Adding fields came up last year too. The conclusion was that it would make branches spend longer on paperwork.'",
       "memo": [
         "'Simplified Financial Summary' -- issued March 2021, 5 debt fields",
         "Issued by: head office Corporate Finance Strategy Team",
@@ -207,7 +207,7 @@ export default {
     },
     "p1_scoreboard": {
       "title": "The First Scoreboard",
-      "text": "Assistant Manager Oh tosses his coffee can and steps up to the whiteboard. He draws a vertical line and writes his name on the left, yours on the right. 'The trainee review has five items. Speed, accuracy, teamwork, reporting, attitude. But only one of them actually decides your score.' He circles the speed field and nothing else. 'I like to keep a scoreboard. Without one, people argue later about who won.' A 1 goes in the left column, a 0 in the right. He caps the marker. 'When this case is done, you get a point too.'",
+      "text": "Assistant Manager Oh draws a vertical line on the whiteboard and writes his name on the left, yours on the right. 'The trainee review has five items. But only one of them actually decides your score.' He circles speed and nothing else. 'I like to keep a scoreboard. Without one, people argue about it later.' A 1 goes on the left, a 0 on the right. 'When this case is done, you get a point too.'",
       "memo": [
         "Whiteboard scoreboard -- Oh Jinwoo 1 / you 0",
         "Of 5 trainee items, only speed actually counts",
@@ -231,7 +231,7 @@ export default {
     },
     "p1_blank": {
       "title": "I’ve Left It Blank Too",
-      "text": "When the review ends and you step out, the printout of the evaluation form is still sitting on the printer outside the Team Head’s office. Manager Han Seoyun, passing by, stops and looks at the blank line. She stays later than anyone on this team, and there’s always an old review report open on her tablet. She turns the printout face down and says just one thing. 'If that field stays blank, later on nobody knows who filled it in.' Before you can ask, she adds, 'I’ve left it blank too.' Then she goes back to her desk and sits down. Not asking seems like the polite thing, so you don’t.",
+      "text": "The printout of the evaluation form is still sitting on the printer outside the Team Head’s office. Manager Han Seoyun, passing by, looks at the blank signature line. She stays later than anyone on this team, and there’s always an old review report open on her tablet. She turns the printout face down. 'If that field stays blank, later on nobody knows who filled it in.' Then she adds, 'I’ve left it blank too.'",
       "memo": [
         "Evaluation printout -- still on the printer outside the Team Head’s office",
         "Manager Han Seoyun: 'I’ve left it blank too'",
@@ -255,7 +255,7 @@ export default {
     },
     "p1_ledger_reaction": {
       "title": "The Binder with Seal Tape",
-      "text": "Back at head office, Lim Kyungsoo, head of the Corporate Credit Review Team, stops you in the hallway. He’s the kind of man who files a printout of every document in a binder before uploading it to the system. 'I hear you went out to Gangseo.' He rests a hand on a binder sealed with tape. 'That form came across my desk too. I opposed it, and the name of whoever opposed it never made the minutes.' He tucks the binder under his arm, walks off, then turns back. 'Learn one thing before your trainee tag comes off. Around here, putting it on record is much harder than finding it.'",
+      "text": "Back at head office, Lim Kyungsoo, head of the Corporate Credit Review Team, stops you in the hallway. He’s the kind of man who files a printout of every document in a binder. 'That form came across my desk too. I opposed it, and the name of whoever opposed it never made the minutes.' He tucks the tape-sealed binder under his arm. 'Learn one thing. Around here, putting it on record is much harder than finding it.'",
       "memo": [
         "Lim Kyungsoo -- opposed the form in the 2021 talks",
         "A dissent that never made the minutes"
@@ -277,7 +277,7 @@ export default {
     },
     "p1_scoreboard_reaction": {
       "title": "A Text at One A.M.",
-      "text": "At one in the morning, a text comes in from Jung Haerin. It’s a thought Jung has been holding onto since Tuesday, rewritten. 'I thought it was shameful that the line wasn’t on the summary. Thinking it over, what’s shameful isn’t me. It’s my numbers.' A photo is attached below: the November delivery schedule on the workshop wall, with '11/1 08:00' written on the first line in red pen. The last sentence is short. 'It’s fine if it’s late. Just don’t let it go down as wrong.'",
+      "text": "A text comes in from Jung Haerin. 'I thought it was shameful that the line wasn’t on the summary. Thinking it over, what’s shameful isn’t me. It’s my numbers.' A photo of the November delivery schedule is attached. On the first line, in red pen: '11/1 08:00'. The last sentence is short. 'It’s fine if it’s late. Just don’t let it go down as wrong.'",
       "memo": [
         "Jung Haerin text 01:04 -- 'Don’t let it go down as wrong'",
         "Photo of the November delivery schedule -- '11/1 08:00'"
@@ -299,7 +299,7 @@ export default {
     },
     "p1_blank_reaction": {
       "title": "Oh Jinwoo at Eighteen",
-      "text": "At five p.m., Assistant Manager Oh is waiting for you by the copier. In his hand is a sheet he didn’t show you the night he told you about his father: a copy of a 2009 personnel notice, with 'transferred to oversight desk' next to the name Oh Sangchul. 'Why he was a day late isn’t written anywhere. My father was rechecking the papers that day.' He folds the sheet and puts it back in his pocket. 'I know. That’s why I chose never to be late, and it’s what I taught you too.' He shuts the copier lid. 'But you haven’t chosen yet.'",
+      "text": "Assistant Manager Oh is waiting by the copier with a sheet of paper: a copy of a 2009 personnel notice, with 'transferred to oversight desk' next to the name Oh Sangchul. 'Why he was a day late isn’t written anywhere. My father was rechecking the papers that day.' He puts the sheet in his pocket. 'That’s why I chose never to be late, and it’s what I taught you too. But you haven’t chosen yet.'",
       "memo": [
         "Copy of 2009 personnel notice -- Oh Sangchul, transferred to oversight desk",
         "No field for why it was a day late"
@@ -321,7 +321,7 @@ export default {
     },
     "p1_branch_ledger": {
       "title": "On Paper, We’re Just Numbers",
-      "text": "When you finish explaining, Jung Haerin picks up a bag. 'Then come and see. On paper, our company is just numbers.' Deep in an alley in Hwagok-dong, in a workshop with its shutter half raised, there are 11 people. The two packing machines were installed in 1998, and one of them has stopped three times this morning alone. On the wall hangs the delivery schedule starting November 1, and beside it, 11 July pay slips are pinned up with thumbtacks. Jung opens the ledger and points to July. 'Without this 40 million won, we’d have had to let four people go that month. That’s why I was ashamed it wasn’t on the summary.' Nobody has used the words due diligence yet. You just came to see.",
+      "text": "When you finish explaining, Jung Haerin picks up a bag. 'Then come and see. On paper, our company is just numbers.' In the Hwagok-dong workshop, 11 people are at work. Of the two packing machines from 1998, one has stopped three times this morning alone. On the wall, 11 July pay slips are pinned up with thumbtacks. Jung points to July in the ledger. 'Without this 40 million won, we’d have had to let four people go that month. That’s why I was ashamed it wasn’t on the summary.'",
       "memo": [
         "Hwagok-dong workshop -- 11 employees, 2 packing machines (1998 models)",
         "3 breakdowns this morning -- line down 47 minutes",
@@ -345,7 +345,7 @@ export default {
     },
     "p1_branch_ledger_follow": {
       "title": "No Field, So We Left It Out",
-      "text": "In the workshop office, Jung Haerin calls the tax accountant who prepared the summary, on speaker. The answer comes within 3 seconds. 'The form the branch gave us has no field for that. Other is one line, and we put accounts payable there.' It wasn’t hidden. It had nowhere to go. The accountant adds, 'Everyone files it that way. It’s never been a problem.' The call ends. Jung sits quiet for a long while, then says, 'That’s scarier.' For the first time in this conversation, Jung says the word default. 'We can live with late. But if the papers say we hid it, that we can’t live with.'",
+      "text": "Jung Haerin calls the tax accountant who prepared the summary, on speaker. 'The form the branch gave us has no field for that. Other is one line, and we put accounts payable there.' The accountant adds, 'Everyone files it that way. It’s never been a problem.' When the call ends, Jung says, 'That’s scarier.' For the first time, Jung says the word default. 'We can live with late. But if we go down as having hidden it, that we can’t live with.'",
       "memo": [
         "Tax accountant’s statement -- 'The form has no field for that'",
         "Other field, 1 line -- taken by accounts payable",
@@ -369,7 +369,7 @@ export default {
     },
     "p1_route_system": {
       "title": "27 Cases, Reported Verbally",
-      "text": "Before deciding where to write the 40 million won, you ask how past errors like this played out. Lim Kyungsoo, head of the Corporate Credit Review Team, opens the terminal in the 8th-floor review records room for you. Scanned review reports line up on the screen; anything past its retention period has already been destroyed. In the 5 years that remain, 31 cases closed within the branch limit later had their numbers recalculated. Only a few reports were ever corrected. The rest end on the same last line. 'Reported verbally.' Most of the people who first caught the error were trainees or in their first year at the bank. Lim closes the viewer. 'It’s always the youngest who finds it. And nobody ever puts it on record.'",
+      "text": "You ask how past errors like this played out, and Lim Kyungsoo, head of the Corporate Credit Review Team, opens the terminal in the 8th-floor review records room for you. Anything past its retention period has already been destroyed. In the 5 years that remain, 31 cases closed within the branch limit later had their numbers recalculated. Most end on the same last line. 'Reported verbally.' The people who first caught the error were mostly trainees or in their first year at the bank. 'It’s always the youngest who finds it. And nobody ever puts it on record.'",
       "memo": [
         "Of 5 years of remaining branch approvals, 31 recalculated",
         "Papers corrected: 4 / 'Reported verbally': 27",
@@ -395,7 +395,7 @@ export default {
     },
     "p1_final_system_route": {
       "title": "The 28th Line",
-      "text": "Ten p.m. By the records-room window, the last pages of the 27 cases lie side by side. Every one ends the same way. 'Reported verbally.' The Onsae Packaging case goes down to Gangseo Branch at nine tomorrow morning, and in the review opinion field only the cursor blinks. Team Head Lim sets a bundle of watermarked printouts on the window ledge. 'Whatever you write tomorrow, there’ll be a 28th. The only question left is whether it joins the four that were fixed or the ones that never got past talk.'",
+      "text": "By the records-room window, the last pages of the 27 cases lie side by side. Every one ends the same way. 'Reported verbally.' The Onsae Packaging case goes down at nine tomorrow morning. Team Head Lim sets a bundle of printouts on the window ledge. 'Whatever you write tomorrow, there’ll be a 28th. The only question left is whether it joins the four that were fixed or the ones that never got past talk.'",
       "memo": [
         "27 documents ending in 'Reported verbally'",
         "Onsae Packaging approval papers out: Friday 09:00",
@@ -418,7 +418,7 @@ export default {
     },
     "p1_evidence_turn": {
       "title": "Who Made the Form",
-      "text": "You hold the clue up against the form number, and the distribution approval for the 'Simplified Financial Summary' opens. March 9, 2021, Corporate Finance Strategy Team, issued to 41 branches. The author field shows Assistant Manager Oh Jinwoo’s name; the approver’s signature line is blank. The document took effect unsigned. That summer, two branches asked for more fields, but no reply is on record. Ban Jaewook, an investigator with Internal Audit, opens his worn black notebook to a fresh page and writes the date first. He starts a new page for every case. 'The maker’s name is here, and the approver’s isn’t. Do you know what to call a document like this? I call it a rule nobody took responsibility for.'",
+      "text": "You hold the clue up against the form number, and the distribution approval for the 'Simplified Financial Summary' opens. March 9, 2021, issued to 41 branches. The author field shows Assistant Manager Oh Jinwoo’s name; the approver’s signature line is blank. Branch requests for more fields got no reply on record. Ban Jaewook, an investigator with Internal Audit, opens his worn black notebook to a fresh page. 'The maker’s name is here, and the approver’s isn’t. I call a document like this a rule nobody took responsibility for.'",
       "memo": [
         "'Simplified Financial Summary' distribution approval -- March 9, 2021",
         "Author: Assistant Manager Oh Jinwoo / approver signature line: blank",

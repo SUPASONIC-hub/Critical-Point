@@ -1,5 +1,5 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
-import { CREATOR_LINE, CREATORS, creatorMailLabel, STUDIO } from "../src/credits.js";
+import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
 
@@ -196,7 +196,7 @@ const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
  * The start screen's credit (StudioCredit.jsx) at the foot of every page:
  * the studio, the two creators on one line, and each one's address as a link
  * named for its owner (src/credits.js). English labels in every language, as
- * on the start screen.
+ * on the start screen; the studio's name in the page's language (studioName).
  *
  * The privacy policy and the terms leave the address row out (decided
  * 2026-11-04): under their contact line it read as a second place to send an
@@ -207,10 +207,10 @@ const creditMail = `<div class="credit-mail"><dt lang="en">CONTACT</dt><dd>${CRE
   (creator) => `<a href="mailto:${creator.email}" aria-label="${escapeHtml(creatorMailLabel(creator))}">${creator.email}</a>`,
 ).join(" ")}</dd></div>
 `;
-const creditFor = (kind) => `<div class="credit">
+const creditFor = (kind, language) => `<div class="credit">
 <img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
 <dl>
-<div><dt lang="en">STUDIO</dt><dd>${escapeHtml(STUDIO)}</dd></div>
+<div><dt lang="en">STUDIO</dt><dd>${escapeHtml(studioName(language))}</dd></div>
 <div><dt lang="en">CREATOR</dt><dd>${escapeHtml(CREATOR_LINE)}</dd></div>
 ${NO_CREDIT_MAIL.has(kind) ? "" : creditMail}</dl>
 </div>`;
@@ -794,7 +794,7 @@ ${pages}${switches}</nav>
 <h1>${copy[kind]}</h1>
 ${dated}${body.trim()}
 <footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
-${creditFor(kind)}
+${creditFor(kind, language)}
 </footer>
 </main>
 </body>

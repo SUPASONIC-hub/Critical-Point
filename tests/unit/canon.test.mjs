@@ -339,6 +339,47 @@ test("the shapes the audit's answers settled on pass, and so do the signatures t
   assert.deepEqual(findCanonViolations('text: "수습이던 당신의 마지막 과제입니다."', "src/nodes/prologue01.js"), []);
 });
 
+test("the trainee facts read the English and Japanese copy in the glossary's words", () => {
+  const ids = (line, file) => findCanonViolations(line, file).map((item) => item.id);
+  // The analyst called a trainee after 프롤로그 01, in either language.
+  const red = [
+    ["src/locales/en/nodes/prologue02.js", '"text": "The last line is your employee number, from when you were a trainee."'],
+    ["src/locales/en/nodes/case10.js", "\"text\": \"'You’re still a trainee here,' Oh Jinwoo says.\""],
+    ["src/locales/en/index.js", '"hook": "You, a trainee, signed the circulation box."'],
+    ["src/locales/en/nodes/case03.js", "\"text\": \"'You're on probation,' the team head says.\""],
+    ["src/locales/ja/nodes/prologue02.js", '"text": "草案の回覧確認欄6行の最後は、見習いだったあなたの社員番号だ。"'],
+    ["src/locales/ja/nodes/case10.js", "\"text\": \"'あなたはまだ見習いでしょう' とオ・ジヌが言う。\""],
+    ["src/locales/ja/screens/intro.js", 'text: "試用中のあなたが書いた反対意見書です。"'],
+  ];
+  for (const [file, line] of red) assert.deepEqual(ids(line, file), ["trainee-after-1021"], line);
+  // Other people's probation, the traineeship ended, and the 프롤로그 remembered.
+  const pass = [
+    ["src/locales/en/nodes/case08.js", '"One is 3 months into probation"'],
+    ["src/locales/en/nodes/case49.js", "\"Jeongjeong’s honorary press card -- 'Probation: over'\""],
+    ["src/locales/en/nodes/prologue02.js", '"lead": "Five months after your traineeship ended, review file 2023-0412 is assigned to you."'],
+    ["src/locales/en/nodes/prologue02.js", '"text": "three new hires who finished their traineeship last month. The last line is your employee number."'],
+    ["src/locales/en/index.js", '"hook": "As a trainee, you found a blank line worth 40 million won."'],
+    ["src/locales/en/screens/intro.js", 'text: "It began, in the last assignment of your traineeship, with one line."'],
+    ["src/locales/ja/nodes/case08.js", '"一人は試用3か月目"'],
+    ["src/locales/ja/nodes/case49.js", "\"チョンジョンの名誉記者証 -- '見習い卒業'\""],
+    ["src/locales/ja/nodes/prologue02.js", '"text": "草案の回覧確認欄6行の最後は、見習いを終えたばかりのあなたの社員番号だ。"'],
+    ["src/locales/ja/index.js", '"premise": "見習いが終わって半年、あなたの机に310億の審査が上がってくる。"'],
+    ["src/locales/ja/screens/farCallbacks.js", 'p1_after_record: "見習い最後の日の朝も、あなたは意見欄に名前を書いた。"'],
+    ["src/locales/ja/nodes/case22.js", '"text": "ムン・ハジュンがインターンの名札を制服の上につける。"'],
+  ];
+  for (const [file, line] of pass) assert.deepEqual(ids(line, file), [], line);
+  // In 프롤로그 01 the analyst still is one, in every language.
+  assert.deepEqual(ids('"text": "You’re a trainee, 3 months in."', "src/locales/en/nodes/prologue01.js"), []);
+  assert.deepEqual(ids('"text": "見習いのあなたの席だ。"', "src/locales/ja/nodes/prologue01.js"), []);
+  // The companion reads the traineeship ended in each language.
+  const ended = (line, file) => readCanon(line, file).statements.filter(({ entry }) => entry.id === "trainee-ended").map(({ agrees }) => agrees);
+  assert.deepEqual(ended('"lead": "Five months after your traineeship ended."', "src/locales/en/nodes/prologue02.js"), [true]);
+  assert.deepEqual(ended('"lead": "見習いの肩書きが取れて5か月。"', "src/locales/ja/nodes/prologue02.js"), [true]);
+  // The other facts stay with the Korean files: a translation file's Korean keys are not read twice.
+  assert.deepEqual(ids('"망원동 이민서의 옥탑방 · 옥상": "Mangwon-dong rooftop"', "src/locales/ja/nodes/case16.js"), []);
+  assert.deepEqual(ids('place: "망원동 이민서의 옥탑방 · 옥상"', "src/nodes/case16.js"), ["minseo-rooftop"]);
+});
+
 /** A case file's three places for one scene: its body, its opening line, its setting. */
 const caseFile = ({ id = "c13_start_rush", text = "", opening = null, place = "본사 33층", clock = "", voice = null }) =>
   [

@@ -16,10 +16,11 @@ import {
   getRiskPressure,
   getSuspenseState,
 } from "../gameLogic.js";
-import { getJudgementHabit } from "../judgementHabit.js";
-import { countAudit } from "../gauntlet/auditRisk.js";
+import { getJudgementHabit, habitCardLine } from "../judgementHabit.js";
+import { countAudit, isAuditOn } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTableReaction } from "../gauntlet/tableAfterword.js";
+import { getTableRules } from "../gauntlet/tableUnlocks.js";
 import { getTraceEvents } from "./trace.js";
 import { getSceneBridge } from "../viewModels/sceneBridge.js";
 import { caseCastFor } from "../gauntlet/CaseCastFold.jsx";
@@ -115,8 +116,12 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const decisionLedger = useMemo(() => getDecisionLedger(log, resources), [log, resources]);
   // The season's 판단 습관 rides on the fingerprint because the fingerprint is
   // what the report already hands the result card: the card is given the
-  // finished name and no new field (judgementHabit.js).
-  const judgementHabit = useMemo(() => getJudgementHabit(caseResults), [caseResults]);
+  // finished name, and the one sentence it says the name in (D1), and no new
+  // field (judgementHabit.js).
+  const judgementHabit = useMemo(() => {
+    const habit = getJudgementHabit(caseResults);
+    return habit && { ...habit, card: habitCardLine(habit) };
+  }, [caseResults]);
   const decisionFingerprint = useMemo(
     () => ({ ...getDecisionFingerprint({ triggerScores: triggers, cognitionScores: cognition, entries: log, resources }), habit: judgementHabit }),
     [cognition, judgementHabit, log, resources, triggers],
@@ -134,10 +139,12 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // effect to spare (check:runtime-budget).
   const warmCaseId = seedBase ? node?.caseId : null;
   useEffect(() => warmCasePortraits(warmCaseId), [warmCaseId]);
-  // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
-  const auditCount = useMemo(() => countAudit(log), [log]);
-  // B2's links off the case's log (cascadeRisk.js): null on a table without them.
-  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId), [gauntletRun, log, runId]);
+  // The case's rules (tableUnlocks.js): the audit is on from 사건 02 and the links from 사건 03 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3).
+  const caseRules = getTableRules(currentCase, gauntletRun);
+  // The case's audit (B3), off the same log the settlement counts; null in a case whose rules do not count it.
+  const auditCount = useMemo(() => (isAuditOn(gauntletRun, caseRules) ? countAudit(log) : null), [caseRules, gauntletRun, log]);
+  // B2's links off the case's log (cascadeRisk.js): null in a case whose rules do not have them.
+  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId, caseRules), [caseRules, gauntletRun, log, runId]);
   // The two as one field of the play view, which has room for one (check:runtime-budget).
   const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading }), [auditCount, linkReading]);
   // The trace is session storage, not state, and only the debug overlay prints

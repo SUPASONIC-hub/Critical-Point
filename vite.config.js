@@ -8,12 +8,14 @@ import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { withStaticShell } from "./scripts/static-shell.mjs";
 import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { localePreloadFileName, localePreloadMap, localePreloadSource, readLocaleKey, withLocalePreloadTag } from "./scripts/locale-preload.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
+import { COLD_OPENING_ENABLED } from "./src/coldOpeningSwitch.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -436,6 +438,18 @@ function staticPages(analytics) {
 }
 
 /**
+ * The intro's first viewport as HTML inside `#root` (scripts/static-shell.mjs),
+ * so a first visit paints the key visual and the wordmark with the inlined
+ * critical CSS before the entry chunk and React have run. main.jsx renders over
+ * it as before; nothing hydrates. A release only: the dev server styles the page
+ * from its script, so a shell there would paint unstyled. `startPages()` copies
+ * the final index.html, so `/en/` and `/ja/` carry the same shell.
+ */
+function staticShell() {
+  return { name: "static-shell", apply: "build", transformIndexHtml: (html) => withStaticShell(html) };
+}
+
+/**
  * The start page in English and Japanese, `/en/index.html` and
  * `/ja/index.html` (scripts/site-pages.mjs `localizedStartPage`): the built
  * index.html, after every plugin here has had its turn with it -- the
@@ -627,7 +641,7 @@ const READING_CLOCK_ASK = "src/gauntlet/ReadingClockAsk.jsx";
  * import it, so left alone it is written into the engine's chunk, which it took
  * past its gzip budget on 2026-10-20 (14,417 of 14,200), and its words into the
  * table's (PlayScreen 34,880 of 34,332). It gets a file the way the table's
- * sound does; it imports only the week's numbers (weeklyRules), never the
+ * sound does; it imports nothing (since RULES_MARK 3 not even the week's rules), never the
  * engine's chunk, so the two do not import each other.
  */
 const AUDIT_RISK = "src/gauntlet/auditRisk.js";
@@ -732,7 +746,7 @@ export default defineConfig(({ command, mode }) => {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), localePreload(), staticPages(analytics),
+      seasonData(), reactAsEsm(), react(), criticalCss(), staticShell(), absoluteSiteUrls(), buildShaMeta(), localePreload(), staticPages(analytics),
       adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
@@ -747,6 +761,9 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __CP_DEBUG_BUILD__: JSON.stringify(debugBuild),
       __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+      // B-3(1) 냉정한 오프닝 (src/coldOpeningSwitch.js): a constant, so a build
+      // with the switch off has none of the page in it.
+      __CP_COLD_OPENING__: JSON.stringify(COLD_OPENING_ENABLED),
     },
     // The dev server compiles a module the first time it is asked for. Fifty
     // cases are fifty large data modules, and compiling them on the first scene
@@ -765,9 +782,12 @@ export default defineConfig(({ command, mode }) => {
       // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
       // The case file's cast (CaseCast, D-8) is the same: the runtime has run
       // every file it leans on before the table's fold can open, and its list
-      // of sixteen files was about 500 bytes (2026-10-23).
+      // of sixteen files was about 500 bytes (2026-10-23). So are the personal
+      // bests (src/personalBests.js): the ranking screen that fetches them has
+      // already run every file they lean on, and the list cost that screen's
+      // chunk about 260 bytes.
       modulePreload: {
-        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast|personalBests)-/.test(filename) ? [] : deps),
       },
       rolldownOptions: {
         output: {

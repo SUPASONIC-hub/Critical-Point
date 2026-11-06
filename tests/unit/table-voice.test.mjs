@@ -13,7 +13,7 @@ globalThis.localStorage = createStorage();
 
 const voice = await import("../../src/gauntlet/tableVoice.js");
 const { CLOCK_OPENED_CALL } = await import("../../src/gauntlet/tableReadout.js");
-const { getHoldArmedCall, describePush, describeWall, describeScout, describeStanceCarry, describeBank, describeAct, findBank, findActStart, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { getHoldArmedCall, getHoldCall, describePush, describeWall, describeScout, describeStanceCarry, describeBank, describeAct, findBank, findActStart, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
 const { dangerZoneOf, readDangerZone } = await import("../../src/gauntlet/tableMeters.js");
 
 const STRIKE_WAKE = { id: "strikeWake", label: "STRIKE WAKE", title: "다음 판이 더 두껍게 깨어난다" };
@@ -92,12 +92,15 @@ test("the clock is said at ten and at five, once each, and a pause is not a seco
   assert.deepEqual(listTableCalls(at(45, { win: tableWindow({ elapsed: 0 }) }), opened), [{ kind: "clock", text: CLOCK_OPENED_CALL }]);
 });
 
-test("an armed 확정 is said through the table's voice, once, and ahead of anything waiting", () => {
-  const armed = (on, win = tableWindow()) => readTableFacts({ win, live: true, dangerLine: "", cashMutations: [], clock: { remaining: 30, elapsed: win.elapsed }, armed: on });
-  assert.deepEqual(listTableCalls(armed(false), armed(true)), [{ kind: "hold", text: getHoldArmedCall() }]);
-  assert.deepEqual(listTableCalls(armed(true), armed(true)), [], "still armed is not news");
-  assert.deepEqual(listTableCalls(armed(true), armed(false)), [], "the arm lapsing is not said");
-  assert.equal(facts().hold, "", "a table no press armed says nothing of it");
+test("the held 확정's hint and arm are said through the table's voice, once, and ahead of anything waiting", () => {
+  const held = (phase, win = tableWindow()) => readTableFacts({ win, live: true, dangerLine: "", cashMutations: [], clock: { remaining: 30, elapsed: win.elapsed }, hold: phase });
+  assert.deepEqual(listTableCalls(held("idle"), held("armed")), [{ kind: "hold", text: getHoldArmedCall() }]);
+  assert.deepEqual(listTableCalls(held("idle"), held("hinted")), [{ kind: "hold", text: "길게 눌러야 확정된다" }], "a press that let go early is told to hold");
+  assert.equal(getHoldCall("hinted"), "길게 눌러야 확정된다");
+  assert.deepEqual(listTableCalls(held("armed"), held("armed")), [], "still armed is not news");
+  assert.deepEqual(listTableCalls(held("armed"), held("idle")), [], "the arm lapsing is not said");
+  assert.deepEqual(listTableCalls(held("idle"), held("holding")), [], "a hold under way says nothing: the gauge shows it");
+  assert.equal(facts().hold, "", "a table no press touched says nothing of it");
   const queue = queueCalls([{ kind: "clock", text: "10초 남았다" }], [{ kind: "hold", text: getHoldArmedCall() }]);
   assert.deepEqual(queue.map((call) => call.kind), ["hold", "clock"], "it lapses in three seconds, so it goes first");
 });
@@ -106,7 +109,7 @@ test("a look is said once, through the voice, as the band it bought", () => {
   const looked = (band) => readTableFacts({ win: tableWindow(), live: true, dangerLine: "", cashMutations: [], clock: { remaining: 30, elapsed: 10 }, band });
   const board = { wallMin: 60, wallMax: 98, scouted: false };
   const scouted = { wallMin: 70, wallMax: 90, scouted: true };
-  assert.equal(describeScout(scouted), "조회했다. 벽은 70에서 90 사이 어딘가");
+  assert.equal(describeScout(scouted), "조회했다. 믿음 1을 썼다. 벽은 70에서 90 사이 어딘가");
   assert.deepEqual(listTableCalls(looked(board), looked(scouted)), [{ kind: "scout", text: describeScout(scouted) }]);
   assert.deepEqual(listTableCalls(looked(scouted), looked(scouted)), [], "a spent look is not news");
   assert.equal(looked(board).scout, "", "the board's own band is not a look");

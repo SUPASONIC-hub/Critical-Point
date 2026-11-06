@@ -2,7 +2,7 @@
   "name": "critical-point-prototype",
   "version": "0.1.0",
   "private": true,
-  "author": "SUPASONIC & ALICE (Tak'n Roll)",
+  "author": "SUPASONIC & ALICE (Mochi Verse Studio)",
   "contributors": [
     "SUPASONIC <from.logic.to.magic@gmail.com>",
     "ALICE <goeun.nam@gmail.com>"
@@ -33,7 +33,9 @@
     "check:pressure": "node scripts/report-gauntlet-loop.mjs",
     "check:endings": "node scripts/check-endings.mjs",
     "report:endings": "node scripts/check-endings.mjs --report",
+    "report:judgment": "node scripts/report-judgment.mjs",
     "report:near-miss": "node scripts/report-near-miss.mjs",
+    "report:reading-axis": "node scripts/report-reading-axis.mjs",
     "report:speaker-lines": "node scripts/report-speaker-lines.mjs",
     "check:art": "node scripts/check-art-budget.mjs",
     "build:art": "node scripts/build-art-variants.mjs",
@@ -54,6 +56,7 @@
     "check:node": "node scripts/check-node-version.mjs",
     "check:grants": "node scripts/check-grants.mjs",
     "check:canon": "node scripts/check-canon.mjs",
+    "check:mood": "node scripts/check-mood.mjs",
     "check:locale": "node scripts/check-locale.mjs",
     "check:locale:strict": "node scripts/check-locale.mjs --strict",
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",

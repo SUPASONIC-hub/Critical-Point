@@ -30,11 +30,6 @@ const reportLinesCopy = {
     nextCase: "다음 사건 「{title}」까지 이어서 보고 싶은 이유가 생겼나요?",
     finale: "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] 시즌 붕괴",
-    season: "[{ending}] 시즌 판정",
-    case: "[사건 종료] {tag}",
-  },
   rationaleClues: "단서 {count}",
   standing: {
     clear: "붕괴선 아래",
@@ -43,6 +38,23 @@ const reportLinesCopy = {
     harm: "시즌 평균 {harmLabel} {perCase} / {gate} · 터진 판 {bustPercent}%",
     overreach: "시즌 평균 {harmLabel} {perCase} / {gate} · 터진 판 {bustPercent}% / {bustGate}%",
     harmCase: "{caseLabel} 다시 도전 · {harmLabel} {harm}",
+    // 개선 포인트 C3 (2026-11-05 초안): the sentence after the line when the
+    // season's cases closed on a mean cash under the start and harm under the
+    // line (createSeasonStandingReadout `held`). A season that lost money but
+    // kept people reads as that, not as a loss.
+    held: "{capitalLabel}{capitalParticle} 평균 {capital}까지 내려갔지만 {harmLabel}{harmParticle} 붕괴선 아래입니다.",
+  },
+  // C3: the sentence after an ending's own line on the finale, by the ending,
+  // printed only on that same season (`endingHeld`). SYSTEM COLLAPSE is over
+  // the line and PROFITABLE SILENCE kept its cash, so neither has one.
+  heldEndings: {
+    "open-oversight": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 기준을 남긴 시즌입니다.",
+    "evidence-reform": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 공개와 보호의 규칙을 남긴 시즌입니다.",
+    "human-record": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 이름들을 남긴 시즌입니다.",
+    "cold-justice": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 절차를 지킨 시즌입니다.",
+    "field-pact": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 사람들의 약속을 남긴 시즌입니다.",
+    "quiet-cover": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.",
+    "open-question": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 질문을 넘긴 시즌입니다.",
   },
   score: {
     points: "{score}점",
@@ -52,6 +64,7 @@ const reportLinesCopy = {
     rhythm: { label: "생각 리듬", note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다. 점수 비중은 가장 작습니다." },
     cognition: { label: "관점 전환", note: "같은 방식만 반복하지 않고 추론, 위험, 재구성, 버티기 사이를 오간 흔적입니다." },
     pressureAdapt: { label: "압박 대응", note: "위험을 무조건 피한 점수가 아니라, 상승한 압박을 다시 회수한 능력입니다." },
+    reading: { label: "판 읽기", note: "같은 판을 벽이 보이는 사람이 쳤다면 번 금고에 견줘, 이번 사건에서 번 몫입니다(「벽을 본 사람의 N%」)." },
     reflection: { label: "구조 재설계", note: "판을 다시 짜 숨은 경로를 열고, 장면 챌린지를 맞히고, 숨은 기록을 찾아낸 정도입니다." },
     exploit: { label: "즉답 패널티", note: "읽지 않고 판을 열어 바로 누르는 플레이가 반복될 때만 감점됩니다." },
   },

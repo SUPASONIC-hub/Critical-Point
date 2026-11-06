@@ -18,11 +18,6 @@ export default {
     nextCase: "Did you find a reason to keep going to the next case, “{title}”?",
     finale: "Did the final choice tie in naturally with the Trigger Lab’s experiment?",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] Season collapse",
-    season: "[{ending}] Season verdict",
-    case: "[Case closed] {tag}",
-  },
   rationaleClues: "Clues {count}",
   standing: {
     clear: "Below the collapse line",
@@ -31,6 +26,16 @@ export default {
     harm: "Season average {harmLabel} {perCase} / {gate} · busted hands {bustPercent}%",
     overreach: "Season average {harmLabel} {perCase} / {gate} · busted hands {bustPercent}% / {bustGate}%",
     harmCase: "Retry {caseLabel} · {harmLabel} {harm}",
+    held: "{capitalLabel} fell to an average of {capital}, but {harmLabel} stayed below the collapse line.",
+  },
+  heldEndings: {
+    "open-oversight": "You lost cash, but you did not lose: this season kept human cost below the line and left a standard.",
+    "evidence-reform": "You lost cash, but you did not lose: this season kept human cost below the line and left rules for disclosure and protection.",
+    "human-record": "You lost cash, but you did not lose: this season kept human cost below the line and left the names.",
+    "cold-justice": "You lost cash, but you did not lose: this season kept human cost below the line and held to the procedure.",
+    "field-pact": "You lost cash, but you did not lose: this season kept human cost below the line and left people’s promises.",
+    "quiet-cover": "You lost cash, but you did not lose: this season kept human cost below the line and closed quietly.",
+    "open-question": "You lost cash, but you did not lose: this season kept human cost below the line and passed the question on.",
   },
   score: {
     points: "{score} pts",
@@ -40,6 +45,7 @@ export default {
     rhythm: { label: "Thinking rhythm", note: "Not instant answers or stalling, but time spent reading the pressure and pushing it to a conclusion. The smallest share of the score." },
     cognition: { label: "Perspective shifts", note: "Signs that you moved between reasoning, risk, reframing and holding out instead of repeating one way." },
     pressureAdapt: { label: "Handling pressure", note: "Not points for dodging risk, but for winning back pressure once it rose." },
+    reading: { label: "Reading the hand", note: "What you earned this case, against the Vault someone who could see the Wall would have earned on the same hands (\"N% of what someone who could see the Wall would have\")." },
     reflection: { label: "Redesigning the table", note: "How far you reframed the table to open hidden routes, met scene challenges and found hidden records." },
     exploit: { label: "Quick-answer penalty", note: "Deducted only when you keep opening the table unread and tapping at once." },
   },

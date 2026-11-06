@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c12_start": {
       "title": "Strings on 30 Billion",
-      "text": "2 weeks after the National Assembly audit, KD Financial Group announces a 'voluntary compensation plan'. The fund is 30 billion won, for the people harmed by loan 2023-0412. One condition is attached. Anyone who takes the money must sign a no-suit agreement. Do Yoonha brings in a printout of the notice. 'The head of the victims’ group wants to meet you. She runs a rice cake shop in Mangwon Market.' He hesitates for a moment. 'I don’t think she’s asking you over to say thank you.'",
+      "text": "The group has announced a 'voluntary compensation plan' paying 30 billion won to the people harmed by loan 2023-0412. The condition is signing a no-suit agreement. Do Yoonha brings in the notice. 'The head of the victims’ group wants to meet you. She runs a rice cake shop in Mangwon Market. I don’t think she’s asking you over to say thank you.'",
       "memo": [
         "Voluntary compensation fund 30 billion won -- average 17 million won per person",
         "Condition for payment: sign the no-suit agreement",
@@ -38,7 +38,7 @@ export default {
     },
     "c12_mediation": {
       "title": "Why Didn’t You Stop It?",
-      "text": "A briefing on FSS dispute mediation in Yeouido. The 200 folding chairs are not enough; more than a hundred people stand at the back. When you are introduced, a murmur spreads instead of applause. In the front row, Moon Gaeul stands up, still in her apron. 'They say you wrote a dissent. I read the article. So why didn’t you stop it? After you wrote it and went down to the basement, what did you do for 3 years?' There is no microphone, but her voice reaches the back of the room. Someone says 'Enough,' and someone else says 'No, we need to hear this.'",
+      "text": "At the dispute mediation briefing, the 200 chairs are not enough and more than a hundred people stand. When you are introduced, a murmur spreads, and Moon Gaeul stands up in the front row. 'They say you wrote a dissent. So why didn’t you stop it? After you wrote it and went down to the basement, what did you do for 3 years?' Someone says 'Enough,' and someone else says 'No, we need to hear this.'",
       "memo": [
         "340 at the briefing -- 200 seats",
         "Moon Gaeul: husband ran supplier Gaon Precision, died right after it went bankrupt last fall",
@@ -69,7 +69,7 @@ export default {
     },
     "c12_market": {
       "title": "Chuseok Rush",
-      "text": "The day after the briefing, Moon Gaeul sent a text. 'Don’t talk. Come and steam rice cakes.' So three days before Chuseok, everyone came. Kang Taemin pounds rice with his night-shift muscles and hears from Moon Gaeul that 'all you’ve got is strength'. Na Junhyuk stamps songpyeon with 30 years of practice at stamping seals and takes all the praise. Kwon Dohyun shouts 'At this price you’re losing money' at 1-minute intervals at the counter until he is sent off to pack boxes, and the market grannies call Oh Jinwoo 'the bank boy' until he turns red. In the steam-filled shop, Moon Gaeul laughs for the first time. Then she stops slicing and asks. 'Do the 212 count for compensation? The ones with no paperwork. Our group has more than 30 people like that.'",
+      "text": "'Don’t talk. Come and steam rice cakes.' At Moon Gaeul’s text, everyone came three days before Chuseok. Na Junhyuk stamps songpyeon with 30 years of seal-stamping and takes all the praise. Kwon Dohyun shouts 'At this price you’re losing money' until he is banished to packing, and the grannies call Oh Jinwoo 'the bank boy' until he turns red. Moon Gaeul laughs for the first time, then stops slicing and asks. 'Do the 212 count for compensation? The ones with no paperwork. Our group has more than 30 people like that.'",
       "memo": [
         "Three days of Chuseok sales -- a usual month’s worth",
         "31 in the victims’ group have no paperwork",
@@ -100,7 +100,7 @@ export default {
     },
     "c12_memorial": {
       "title": "1 Year On",
-      "text": "It is the 1st memorial anniversary of Moon Sungho, head of Gaon Precision. Moon Gaeul sets three songpyeon and a glass of soju before the glass door. Her son Moon Hajun, in his 2nd year of high school, stands behind her in his uniform and suddenly speaks. 'I’m going to be a banker. One who doesn’t lend to people like Dad. No, one who lends to them, but does it right.' Moon Gaeul laughs, then turns her head away. She takes a yellowed envelope from her bag. On the front, in her husband’s hand: 'To the reviewer who wrote the dissent.'",
+      "text": "On the 1st anniversary of the death of Moon Sungho, head of Gaon Precision, Moon Gaeul sets out three songpyeon and a glass of soju. Her high-schooler son Moon Hajun suddenly speaks. 'I’m going to be a banker. One who doesn’t lend to people like Dad. No, one who lends to them, but does it right.' Moon Gaeul turns her head away and takes out a yellowed envelope. On the front, in her husband’s hand: 'To the reviewer who wrote the dissent.'",
       "memo": [
         "Moon Sungho: head of Gaon Precision, died a month after the factory went bankrupt last fall",
         "Envelope found in his factory desk drawer, never sent",
@@ -131,7 +131,7 @@ export default {
     },
     "c12_final": {
       "title": "The 1,740th Person",
-      "text": "The last meeting of the mediation committee. The group’s lawyer pushes the proposal across. The voluntary plan unchanged, no-suit agreement included, only the 1,528 with paperwork covered. Sign today and the money arrives before Chuseok. Beside you, Moon Gaeul turns the pages and stops her finger on one line. 'The people left out here are in our group too. One’s a granny who comes to buy rice cakes.' She looks at you. 'That’s what my husband’s letter said. Thank you for objecting, but next time see it through. This is that next time.'",
+      "text": "The proposal at the last meeting is the voluntary plan unchanged. It includes the no-suit agreement, covers only the 1,528 with paperwork, and pays before Chuseok if signed today. Moon Gaeul stops her finger on one line. 'The people left out here are in our group too. That’s what my husband’s letter said. Thank you for objecting, but next time see it through. This is that next time.'",
       "memo": [
         "Proposal covers 1,528 -- 212 excluded",
         "No-suit agreement included; sign today and get paid before Chuseok",
@@ -159,7 +159,7 @@ export default {
     },
     "c12_aftershock": {
       "title": "Rice Cake Day",
-      "text": "The day the first payments land, a line forms outside Gaeul Rice Cake Shop. Moon Gaeul hands each group member a box of rice cakes, Kang Taemin carries boxes, and Na Junhyuk says 'Happy Chuseok' to each person for the 30th time. Moon Gaeul’s high school son Moon Hajun comes in his uniform to sort receipts and asks Kwon Dohyun 'Why do you write it like this?' 20 times. Kwon Dohyun answers all 20. Toward sunset, Moon Gaeul holds out the last box to you. 'This is my husband’s share. You take it for him.' Then your phone rings. It is the Group Strategy Office on the 33rd floor of group headquarters. Yoon Sanghyuk wants to talk, this time, about the signature field.",
+      "text": "The day the first payments land, a line forms outside the shop. Moon Gaeul hands out boxes of rice cakes, and Na Junhyuk says 'Happy Chuseok' for the 30th time. Moon Hajun, in his uniform, asks Kwon Dohyun 'Why do you write it like this?' 20 times, and Kwon Dohyun answers all 20. Toward sunset, Moon Gaeul holds out the last box. 'This is my husband’s share. You take it for him.' Then your phone rings. Yoon Sanghyuk, on the 33rd floor, wants to talk, this time, about the signature field.",
       "memo": [
         "First compensation payments confirmed",
         "1,021 boxes of rice cakes -- every member",
@@ -183,7 +183,7 @@ export default {
     },
     "c12_line": {
       "title": "Ticket No. 38",
-      "text": "The day after the briefing, a line forms at the mediation filing window. Lee Minseo volunteers to help with the forms. The grandmother holding ticket No. 38 says she left her reading glasses at home and hands over her application. It has twenty-four boxes. Lee Minseo reads them aloud one by one and stops at 'loan agreement number'. She never received that number. The loan was in her son’s name, and her son has stopped answering. She smiles and says, 'Then I suppose I’m not a victim.'",
+      "text": "The day after the briefing, Lee Minseo, helping at the filing window, reads the application of the grandmother holding ticket No. 38. It has twenty-four boxes. At 'loan agreement number', Lee Minseo stops. The loan was in her son’s name, and her son has stopped answering. The grandmother smiles. 'Then I suppose I’m not a victim.'",
       "memo": [
         "186 waiting at the filing window",
         "No. 38: loan in her son’s name, no papers of her own",
@@ -206,7 +206,7 @@ export default {
     },
     "c12_rival": {
       "title": "The Rice Cake Bill",
-      "text": "At ten at night, with the shutter half down, Kwon Dohyun looks through Moon Gaeul’s ledger. He has permission. So he claims. He taps the calculator, then stops. 'Ma’am, you’re short 800,000 won every month.' Moon Gaeul keeps slicing and does not answer. On the back page of the ledger are 23 names. They are members of the group who closed their shops, and their rice cakes have never once been charged. After a long while, Kwon Dohyun draws a vertical line down that page. 'Let’s record this as an expense, not a loss. I’ll name the column.'",
+      "text": "At ten at night, Kwon Dohyun, claiming permission, looks through Moon Gaeul’s ledger. 'Ma’am, you’re short 800,000 won every month.' Moon Gaeul slices rice cakes without answering. The back page holds the names of 23 members who closed their shops, and their rice cakes have never once been charged. Kwon Dohyun draws a vertical line down that page. 'Let’s record this as an expense, not a loss. I’ll name the column.'",
       "memo": [
         "800,000 won of free rice cakes every month",
         "23 names on the back page -- owners of shops that closed",
@@ -229,7 +229,7 @@ export default {
     },
     "c12_letter": {
       "title": "The Unsent Letter",
-      "text": "You open the letter on a bench outside the columbarium. It is dated 3 years ago, the month after the FlowOn loan went through. 'To the reviewer. At my bank’s window I heard there was one dissent. I don’t know who wrote it. Thank you. Because of that one dissent, at least I knew I wasn’t crazy. But I have one request. Next time, please see it through. People like me don’t have the strength to.' Moon Gaeul folds the letter. 'He spent 1 year deciding whether to send it, and then he collapsed.'",
+      "text": "The letter was written 3 years ago, the month after the FlowOn loan went through. 'To the reviewer. I heard at the window that there was one dissent. Thank you. Because of that one dissent, at least I knew I wasn’t crazy. But next time, please see it through. People like me don’t have the strength to.' Moon Gaeul folds the letter. 'He spent 1 year deciding whether to send it, and then he collapsed.'",
       "memo": [
         "Letter dated the month after the loan went through",
         "Addressed to the author of the dissent",
@@ -252,7 +252,7 @@ export default {
     },
     "c12_line_reaction": {
       "title": "The No-Suit Clause",
-      "text": "ECHO brings up the clauses of the voluntary plan’s agreement. Article 7, the no-suit agreement. Of all numbers, Article 7. Anyone who signs will bring no suit related to this loan against the group, its affiliates, or 'their officers and employees'. ECHO underlines 'their officers and employees'. 'Yoon Sanghyuk falls under these words. If 1,528 people sign, the name called at the National Assembly audit will never be called again in a civil court.'",
+      "text": "Article 7 of the agreement is the no-suit agreement. Of all numbers, Article 7. Sign it and you cannot sue the group, its affiliates, or 'their officers and employees'. ECHO underlines the last words. 'Yoon Sanghyuk falls under these. If 1,528 people sign, the name called at the National Assembly audit will never be called again in a civil court.'",
       "memo": [
         "The single phrase 'their officers and employees'",
         "A name that is never called again once they sign"
@@ -274,7 +274,7 @@ export default {
     },
     "c12_rival_reaction": {
       "title": "Free Rice Cakes",
-      "text": "Moon Gaeul closes the ledger and smiles. 'The free rice cakes are my revenge. The bank took interest from us, didn’t it? I won’t take a thing from these people. That’s how I win.' Kwon Dohyun puts down the calculator, picks up a rice cake and eats it. He chews for a long time, then says, 'There’s no column for this in my books. That’s a first.'",
+      "text": "Moon Gaeul closes the ledger and smiles. 'The free rice cakes are my revenge. The bank took interest from us, didn’t it? I won’t take a thing from these people. That’s how I win.' Kwon Dohyun chews a rice cake for a long time, then says, 'There’s no column for this in my books. That’s a first.'",
       "memo": [
         "Revenge by taking nothing",
         "Rice cakes with no column in the books"
@@ -296,7 +296,7 @@ export default {
     },
     "c12_letter_reaction": {
       "title": "The Month After",
-      "text": "Han Seoyun gets a photo of the letter and calls late at night. The clipped, report-like endings of her sentences have loosened today. 'The date on the letter. It’s the month after I returned your dissent. He heard there was a dissent, but he never knew it had been returned.' The line is quiet for a long time. 'Could I come to the mediation committee with you? I want to tell his family my name there.'",
+      "text": "Han Seoyun gets a photo of the letter and calls late at night, the clipped, report-like endings of her sentences loosened. 'The date on the letter. It’s the month after I returned your dissent. He only heard there was a dissent, not that it was returned.' A long silence. 'Could I come to the mediation committee with you? I want to tell his family my name there.'",
       "memo": [
         "A letter written the month after the return",
         "A name to say in front of the family"
@@ -318,7 +318,7 @@ export default {
     },
     "c12_branch_factory": {
       "title": "The Stopped Factory",
-      "text": "Inside a factory shuttered for 1 year, six lathes stand under plastic sheets. Moon Gaeul handed over the key and said 'I can’t go in,' so you came in with Kang Taemin. The calendar on the wall stopped in the month of the bankruptcy, and a note reading 'Delivery D-3' is still stuck to the workbench. Kang Taemin pulls back one sheet and studies the lathe a long time. 'This one’s still alive. It just needs oil.' Outside, three of the seven machinists who worked here have come and are waiting.",
+      "text": "In a factory closed for 1 year, six lathes stand under plastic. Moon Gaeul only handed over the key: 'I can’t go in.' The calendar stopped in the month of the bankruptcy, and a note reading 'Delivery D-3' is still on the workbench. Kang Taemin pulls back a sheet. 'This one’s still alive. It just needs oil.' Outside, three of the seven machinists have come.",
       "memo": [
         "6 lathes -- well preserved",
         "3 of 7 former staff want to restart",
@@ -342,7 +342,7 @@ export default {
     },
     "c12_branch_factory_follow": {
       "title": "The Lathe Turns Again",
-      "text": "Kang Taemin oils it and switches on the power. The lathe spins loose once, then, for the first time in 1 year, gives a low, steady hum. The three machinists waiting outside come as far as the doorway, just to listen. The oldest, Foreman Kim, speaks. 'If we run it ourselves without the boss, the only way is a co-op. But the three of us can’t get a loan. Our credit’s all broken.' Kang Taemin takes off his gloves and tucks them into his vest pocket. 'Isn’t a loan meant for people exactly like this?'",
+      "text": "Oil, then power, and the lathe gives a low, steady hum for the first time in 1 year. The oldest of the machinists listening at the door, Foreman Kim, speaks. 'Without the boss, the only way to run it is a co-op. But the three of us can’t get a loan. Our credit’s all broken.' Kang Taemin takes off his gloves. 'Isn’t a loan meant for people exactly like this?'",
       "memo": [
         "1 lathe confirmed running normally",
         "A co-op needs at least 5 members",
@@ -366,7 +366,7 @@ export default {
     },
     "c12_route_system": {
       "title": "The Wording of the Agreement",
-      "text": "You ask for every compensation plan that carried the same condition. ECHO goes back over the last 10 years. 47 voluntary compensation plans from financial companies open. 43 of them carried a no-suit agreement. In 11 cases, greater harm came to light after people signed, but not one of them could sue again. 'Compensation has been learned as the price of buying silence, not an apology. No price tag has ever been attached.'",
+      "text": "You ask for the plans that carried the same condition, and ECHO opens 47 voluntary compensation plans from the last 10 years. 43 carried a no-suit agreement. Even in the 11 cases where greater harm surfaced after signing, no one sued again. 'Compensation has been learned as the price of buying silence, not an apology. No price tag has ever been attached.'",
       "memo": [
         "43 of 47 voluntary plans had a no-suit agreement",
         "11 cases where more harm surfaced -- 0 new suits",
@@ -392,7 +392,7 @@ export default {
     },
     "c12_final_system_route": {
       "title": "The Price of Silence",
-      "text": "The day the mediation committee meets, before sunrise. On screen, the last clause of forty-three agreements is stacked in the same spot. The wording differs by company, but the meaning is one. Never ask again. The proposal that will be put before Moon Gaeul and the group this afternoon carries the same clause. ECHO makes one empty box beside it. 'This clause has never been priced. What has no price can be neither bargained down nor refunded.'",
+      "text": "Dawn on the day of the mediation committee. On screen, the last clauses of forty-three agreements are stacked. The wording differs, but the meaning is one. Never ask again. The proposal before Moon Gaeul this afternoon carries the same clause. ECHO says, 'This clause has never been priced. What has no price can be neither bargained down nor refunded.'",
       "memo": [
         "43 plans with a no-suit agreement -- value assigned to the clause: 0 won",
         "People who sued again after more harm surfaced: 0",
@@ -415,7 +415,7 @@ export default {
     },
     "c12_evidence_turn": {
       "title": "Where the Money Lives",
-      "text": "Match the clue against the account names one by one, and you see how the money for the voluntary plan was booked. Of the 30 billion won, 21 billion is this year’s cut to staff bonuses, and 9 billion sits in the 'brand trust recovery advertising' account. From the advisory fees that went through Haeon Partners to the gallery, the amount recovered is 0 won. Ban Jaewook closes his notebook. 'The people who took the money pay nothing, and the staff who took nothing pay the compensation. And the compensation is labeled advertising.'",
+      "text": "Match the clue against the accounts, and the source of the compensation opens. Of the 30 billion won, 21 billion is this year’s cut to staff bonuses, and 9 billion is 'brand trust recovery advertising'. From the advisory fees that went through Haeon Partners to the gallery, the amount recovered is 0 won. Ban Jaewook closes his notebook. 'The people who took the money pay nothing, and the staff who took nothing pay the compensation. And it’s labeled advertising.'",
       "memo": [
         "Source of 21 billion won: staff bonus cuts",
         "Source of 9 billion won: advertising account",
@@ -439,7 +439,7 @@ export default {
     },
     "c12_start_toast": {
       "title": "A Plan for Those Who Shared a Table",
-      "text": "The six who spent that night at the street stall have not scattered once in 2 weeks. Then the group announces the 30 billion won voluntary compensation plan. Anyone who takes it must sign that they will never sue again. All six point at the same line at once.",
+      "text": "2 weeks later, the group announces the 30 billion won voluntary compensation plan. Anyone who takes it must sign that they will never sue again. All six point at the same line at once.",
       "memo": [
         "Voluntary plan 30 billion won -- conditional on a no-suit agreement",
         "Victims’ group leader Moon Gaeul asks to meet",
@@ -469,7 +469,7 @@ export default {
     },
     "c12_start_record": {
       "title": "A Plan for the One Who Opened the Transcript",
-      "text": "The victims’ group read the public transcript line by line. 2 weeks later the group announced the 30 billion won voluntary plan, and the press release quotes one line from your National Assembly audit testimony as 'a sincere raising of the issue'. Your sentence has become the plan’s publicity copy. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cake Shop, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
+      "text": "The press release for the 30 billion won voluntary plan, announced 2 weeks later, quotes your National Assembly audit testimony as 'a sincere raising of the issue'. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cake Shop, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
       "memo": [
         "Voluntary plan 30 billion won -- conditional on a no-suit agreement",
         "Your testimony quoted in the press release",
@@ -500,7 +500,7 @@ export default {
     },
     "c12_start_summon": {
       "title": "A Plan for the One Who Went to the 33rd Floor",
-      "text": "The 33rd-floor meeting ended in 12 minutes. Yoon Sanghyuk asked you nothing and never brought up the signature field. 2 weeks later the group announces the 30 billion won voluntary plan. Several sentences in the announcement match what Yoon Sanghyuk said that day word for word. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cake Shop, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
+      "text": "The 33rd-floor meeting ended in 12 minutes. Yoon Sanghyuk asked nothing and never mentioned the signature field. Yet the group’s 30 billion won voluntary plan repeats several of his sentences from that day word for word. Do Yoonha writes in the corner of the notice. 'Victims’ group leader Moon Gaeul, Gaeul Rice Cake Shop, Mangwon Market. Wants to meet at the FSS briefing the day after tomorrow.'",
       "memo": [
         "33rd-floor meeting 12 minutes -- 0 questions",
         "Voluntary plan 30 billion won -- conditional on a no-suit agreement",

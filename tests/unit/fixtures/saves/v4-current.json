@@ -114,7 +114,7 @@
       "practice": null,
       "veteran": false,
       "story": false,
-      "weekRule": "cascade",
+      "weekRule": null,
       "linksIn": [
         {
           "from": -1,

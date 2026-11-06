@@ -59,6 +59,8 @@ const introCopy = {
     identity: "분석관 호출명",
     nameLabel: "분석관 이름",
     namePlaceholder: "이름을 입력하세요",
+    // The record title under the name (analystTitle.js), the resume card's words without its dot.
+    rankTitle: "기록 칭호 {title}",
     // {game} is the English name, drawn in an element of its own.
     newGamePlus: "{game} 시작",
   },
@@ -115,6 +117,8 @@ const introCopy = {
     // pages and the support-contact test read from where they are kept
     // (privacyText.js, appConfig.js): named here, not copied.
     playtestNotice: PLAYTEST_DATA_NOTICE,
+    // D2 hall of fame: printed right after the consent sentence while remote save is on (its own leading space; Japanese has none).
+    hallOfFameNotice: " 검사를 통과한 상위 시즌은 실행 번호와 점수로 명예의 전당에 오래 남을 수 있습니다.",
     deletion: DELETION_REQUEST_COPY,
   },
   // The consent box's sentences (src/state/useConsentToggle.js).

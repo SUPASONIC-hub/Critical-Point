@@ -9,12 +9,6 @@ import { localizeTables } from "../locale.js";
  * particle its word takes, which another language leaves out.
  */
 const tableCopy = {
-  // The browser tab while the table is hot (GauntletStage's TAB_TITLES).
-  tab: {
-    hot: "▲ 밀면 벽 사정권",
-    critical: "▲ 열기 {gauge} · 벽 구간 안",
-    bust: "[BUST] 판이 벽에 닿았다",
-  },
   // The 현재 위험 cell's line (tableMeters.js describeDanger).
   danger: {
     inBand: "벽 구간 안",
@@ -24,6 +18,9 @@ const tableCopy = {
   stage: {
     label: "임계점 테이블",
     pot: "이번 판",
+    // A marked board's label in pot's place (GauntletStage `getBoardMark`): C-10's act end, C-7's pass.
+    markPeak: "고점 판",
+    markBreather: "숨 고른 판",
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
@@ -84,7 +81,8 @@ const tableCopy = {
     commit: "확정",
     oneMore: "한 번 더",
     holdToCommit: "꾹 눌러 확정",
-    holdHelp: "길게 눌러 확정. 길게 누르기 어려우면 3초 안에 한 번 더 누른다",
+    holdHint: "길게 눌러야 확정",
+    holdHelp: "길게 눌러 확정",
   },
   // The key line over the hand: each word after its key.
   keys: {
@@ -107,6 +105,7 @@ const tableCopy = {
     slamAbandon: "테이블을 떠났다",
     slamWall: "벽은 {wall}에 있었다",
     slamPot: "판돈",
+    slamStill: "심장이 멈춘 자리에서 벽이 드러났다.",
     slamCombo: " · 논리 콤보 {streak}",
     equipped: "장착",
     dropped: "· {name} 내려놓음",
@@ -116,16 +115,17 @@ const tableCopy = {
     relicsLabel: "장착한 도구",
     scout: "조회",
     scouted: "조회함",
-    scoutLabel: "벽 {min}–{max} · 조회, 시간 {seconds}초",
+    scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초",
     glossaryCard: "카드 {number}: {label} ({type})",
     glossaryMastery: "시즌 숙련: LOCK을 충전한 채로 확정한 판의 수. 자세마다 {goal}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {strike} · STEADY {steady} · EXPOSE {expose}).",
   },
   hand: {
     label: "카드",
-    type: "유형 ",
+    type: "방향 ",
     faceDown: "칩과 소모가 가려진 카드",
     noBurn: "소모 없음",
-    link: " · 연결",
+    // The tag on a card whose cash makes a link (B2, GauntletHand.jsx).
+    link: "연결",
     fractureTax: "균열 청구 ",
     overclock: "오버클럭 칩 ",
     preview: "선택한 카드의 상세 영향: ",
@@ -181,14 +181,20 @@ const tableCopy = {
       focus: "LOCK이 올린 열기가 벽에 닿았다",
     },
     causeBust: "열기가 벽에 닿았다",
-    // The one word of each type's name a phone's card prints; it is a word of the name (getTypeParts).
-    typeKeywords: { persistence: "버티기", inference: "확인", reframing: "바꾸기", risk: "위험" },
+    // The logic streak's two directions and a card that leans neither way (C-3, getDirectionParts):
+    // the tag prints the name and a phone clips `directionAfter`; `side` is the name in a sentence.
+    directions: { people: "사람", position: "자리", even: "중립" },
+    directionAfter: " 쪽",
+    side: "{direction} 쪽",
     logicPaid: "논리 콤보 {streak}, 배율 {bonus}.",
-    logicGrow: "{type}{particle} 이어 갔다. {paid}",
-    logicBuild: "{type} {held}/{hold}. 같은 유형 세 번째부터 콤보가 오른다. {paid}",
-    logicSwitch: "열기가 오른 판에서 {type}{particle} 바꿨다. 전환으로 콤보가 올랐다. {paid}",
-    logicKeep: "지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. {paid}",
-    logicBreak: "열기가 오르지 않았는데 {type}{particle} 바꿨다. 논리 콤보는 0, 다시 1/{hold}부터 센다.",
+    logicGrow: "{side}{particle} 이어 갔다. {paid}",
+    logicBuild: "{side} {held}/{hold}. 같은 방향 세 번째부터 콤보가 오른다. {paid}",
+    // The same with FIELD NOTES (C-7), whose hold is one window shorter.
+    logicBuildShort: "{side} {held}/{hold}. 같은 방향 두 번째부터 콤보가 오른다. {paid}",
+    logicSwitch: "열기가 오른 판에서 {side}{particle} 바꿨다. 전환으로 콤보가 올랐다. {paid}",
+    logicKeep: "지키던 방향의 카드가 이 장면에 없었다. 콤보는 그대로다. {paid}",
+    logicKeepEven: "어느 쪽으로도 기울지 않은 카드였다. 콤보는 그대로다. {paid}",
+    logicBreak: "열기가 오르지 않았는데 {side}{particle} 바꿨다. 논리 콤보는 0, 다시 1/{hold}부터 센다.",
     logicBustKept: "벽에 닿았지만 논리 콤보 {streak}{particle} 남았다.",
     logicBustLost: "벽에 닿아 논리 콤보가 끊겼다.",
     logicLog: "논리 콤보 {streak} · 배율 {bonus} · +{pot}",
@@ -198,7 +204,7 @@ const tableCopy = {
     combo: "논리 콤보 {streak}",
     spoken: "논리 콤보 {streak}, 배율 {bonus}배. {hold}.",
     spokenMove: " 이 카드로 {move}.",
-    spokenOpen: " 열기가 올라 유형을 바꿔도 콤보가 오른다.",
+    spokenOpen: " 열기가 올라 방향을 바꿔도 콤보가 오른다.",
     cardMove: "(콤보 {move})",
     reframeName: "판을 다시 짠다",
     clockOpened: "읽는 시간이 끝나 판이 열렸다. 시계가 흐른다",
@@ -222,10 +228,11 @@ const tableCopy = {
   // tableVoice.js: what the table says aloud in its one polite region.
   voice: {
     holdArmed: "한 번 더 누르면 확정된다",
+    holdHint: "길게 눌러야 확정된다",
     push: "열기 {gauge} · {danger}",
     wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
-    scout: "조회했다. 벽은 {min}에서 {max} 사이 어딘가",
+    scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
     act: "{act}막 시작 · 사건 {case}",

@@ -5,7 +5,7 @@ import { overlayModule } from "../../src/locales/overlay.js";
 import * as appCopy from "../../src/appCopy.js";
 import * as playerLanguage from "../../src/playerLanguage.js";
 import * as gameCases from "../../src/gameCases.js";
-import { getJudgementHabit, JUDGEMENT_HABITS } from "../../src/judgementHabit.js";
+import { getJudgementHabit, habitCardLine, JUDGEMENT_HABITS } from "../../src/judgementHabit.js";
 import { buildResultCardModel, buildShareText } from "../../src/resultCardModel.js";
 import { buildNarrativeSpine, explainResourceTradeoff, getCaseOutcome, getDecisionFingerprint, getThinkingMotive, speechifyChoice } from "../../src/gameLogic.js";
 import { createLogicReport, describeLogicCase, LOGIC_RANK_COPY, LOGIC_REPORT_COPY } from "../../src/logicReport.js";
@@ -94,11 +94,13 @@ export function collectLines(tables) {
   const habit = getJudgementHabit(results);
   assert.ok(habit, "the test season has a habit");
   add("getJudgementHabit", habit);
+  // D1: the sentence the card says the name in, for every habit.
+  for (const other of JUDGEMENT_HABITS) add(`habitCardLine.${other.id}`, habitCardLine(other));
 
   // The 판단 DNA: every motive family and mode, and the unrecorded aftermath.
   for (const trigger of ["affection", "revenge", "responsibility", "curiosity"]) add(`motive.${trigger}`, getThinkingMotive({ [trigger]: 5 }));
   add("motive.mixed", getThinkingMotive({}));
-  const fingerprint = { ...getDecisionFingerprint({}), habit };
+  const fingerprint = { ...getDecisionFingerprint({}), habit: { ...habit, card: habitCardLine(habit) } };
   add("fingerprint", { modeTitle: fingerprint.modeTitle, modeText: fingerprint.modeText, motive: fingerprint.motive });
   add("getCaseOutcome", getCaseOutcome({ caseId: "", choiceId: "" }));
   add("tradeoff", [{}, { capital: 4 }, { humanCost: 3 }, { capital: 4, humanCost: 3 }].map((effect) => explainResourceTradeoff(effect)));
@@ -162,7 +164,8 @@ export function collectLines(tables) {
   add("seasonGoals", getSeasonGoals());
   add("pastRunMemory", getPastRunMemory({ case03: { outcomeChoiceId: "x" } }));
   add("integrity", [getRankingIntegrity({ runId: "r", completedAt: 1, summary: { rank: "A" } }), getRankingIntegrity({})]);
-  for (const step of ANALYST_TITLE_STEPS) add(`analystTitle.${step.from}`, getAnalystTitle({ currentCase: step.from }));
+  for (const step of ANALYST_TITLE_STEPS) add(`analystTitle.${step.id}`, step.title);
+  add("analystTitle.finished", getAnalystTitle({ finishedSeason: true }));
   return lines;
 }
 

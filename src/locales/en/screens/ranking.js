@@ -2,7 +2,7 @@
 export default {
   back: "Back to the briefing",
   title: "Where did thinking stretch the furthest?",
-  intro: "Compare the Burst Scores and Ranks of finished cases. A high score doesn’t mean you got the right answers. It means that under pressure, your thinking rhythm, perspective shifts, recovery and redesign all rose together.",
+  intro: "Compare Burst Scores and Ranks. A season’s record is its average case score. A high score doesn’t mean you got the right answers. It means that under pressure, your thinking rhythm, perspective shifts, recovery and redesign all rose together.",
   retry: "Try again",
   makeRecord: "Make my record",
   tableLabel: "Player ranking",
@@ -26,5 +26,10 @@ export default {
   collapsed: "Collapsed season",
   pendingCheck: "Being checked",
   pendingCheckTitle: "The server has not worked this score out again yet. It checks once a day.",
+  pastBest: "Your best on the previous ranking (v{version}): {score} points · {rank}",
   footnote: "Other participants are told apart by judgment type and run number, not by name. Your name appears only in this browser’s records, and without a remote connection only local records are counted.",
+  hallFootnote: "Checked seasons that place 1st to 3rd on each board stay in the Hall of Fame by their run number.",
+  hallBadge: "Hall of Fame · {board} #{place}",
+  hallMainBoard: "main ranking",
+  hallProvisional: " (provisional)",
 };

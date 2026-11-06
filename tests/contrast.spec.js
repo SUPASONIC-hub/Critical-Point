@@ -505,6 +505,41 @@ for (const lang of ["en", "ja"]) {
 }
 
 /**
+ * The ground follows the scene's mood (tokens.css, `:root[data-mood]`,
+ * 2026-11-05; hue, lines, accent and edge tint 2026-11-06): five sets of
+ * surfaces. No text colour moves with the mood, so what can fail is a ground
+ * that came up under a quiet ink. The table with a staged card and its
+ * reveal, once per mood, with the mood put on <html> the way GauntletStage
+ * does. The intro and the result carry no mood and are read above.
+ */
+const MOODS = ["neutral", "tense", "dread", "bright", "sorrow"];
+const ground = (page) => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--ui-bg").trim());
+// The scene's own tag is wherever the season put it (case01/start is tense since 2026-11-06), so neutral is read with none.
+const putMood = (page, mood) =>
+  page.evaluate((value) => {
+    if (value === "neutral") delete document.documentElement.dataset.mood;
+    else document.documentElement.dataset.mood = value;
+  }, mood);
+
+for (const mood of MOODS) {
+  test(`in the ${mood} mood, a table and its reveal stay readable`, async ({ page }) => {
+    await startAt(page, "case01", "start");
+    await putMood(page, "neutral");
+    const neutral = await ground(page);
+    await putMood(page, mood);
+    if (mood !== "neutral") expect(await ground(page), `${mood}: the ground token changed`).not.toBe(neutral);
+
+    await page.locator(".choices .choice").first().click();
+    await page.waitForSelector(".gx-card.selected");
+    await expectReadable(page, `gauntlet table (${mood})`);
+
+    await page.getByTestId("commit-confirm").click();
+    await page.waitForSelector("[data-testid='decision-next']");
+    await expectReadable(page, `decision reveal (${mood})`);
+  });
+}
+
+/**
  * A card's edge against the felt (WCAG 1.4.11: a control's boundary at 3:1).
  * The card's fill is within a shade of the table, so the 1px edge is what
  * tells one card from the next; at white 16% it read 1.5:1 (2026-11-03 audit).
