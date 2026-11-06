@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
+import { getSeasonScore } from "../../src/seasonScore.js";
 import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
 import { marksSql, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
@@ -38,7 +39,8 @@ function snapRows(runId, { reads }) {
     resources: null,
     dynamics: season.caseDynamics[caseId],
   }));
-  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
+  // The ranking row's score is the mean of the cases (C-2, getSeasonScore), as ranking_run_summary writes it.
+  rows.push({ run_id: runId, case_id: "season-final", summary: { ...season.caseResults.final, ...getSeasonScore(season.caseResults) }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
   return { rows, total };
 }
 

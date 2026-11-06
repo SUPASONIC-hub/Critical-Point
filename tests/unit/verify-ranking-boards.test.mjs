@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { buildLeaderboard } from "../../src/ranking.js";
 import { WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
+import { getSeasonScore } from "../../src/seasonScore.js";
 import { weekStartMs } from "../../src/gauntlet/weeklyRules.js";
 import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
@@ -47,7 +48,7 @@ function weekRows(runId, weekRule, seed = 1000) {
     resources: null,
     dynamics: season.caseDynamics[caseId],
   }));
-  rows.push({ run_id: runId, run_tag: "W47TAG01", case_id: "season-final", summary: { ...season.caseResults.final, week: "2026-W47" }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
+  rows.push({ run_id: runId, run_tag: "W47TAG01", case_id: "season-final", summary: { ...season.caseResults.final, ...getSeasonScore(season.caseResults), week: "2026-W47" }, decision_log: [], resources: null, dynamics: season.caseDynamics.final });
   return rows;
 }
 
@@ -137,7 +138,7 @@ test("the workflow reads each board's top 100 every night and once more after Mo
   assert.match(workflow, /RANKING_LIMIT: \$\{\{ inputs\.limit \|\| '100' \}\}/);
   assert.match(workflow, /RANKING_ALWAYS: \$\{\{ inputs\.always \|\| '20' \}\}/);
   assert.match(workflow, /RANKING_CAP: \$\{\{ inputs\.cap \|\| '150' \}\}/);
-  assert.match(workflow, /--runs-sql --limit="\$RANKING_LIMIT" --always="\$RANKING_ALWAYS" --cap="\$RANKING_CAP" \$all > runs\.sql/);
+  assert.match(workflow, /--runs-sql --limit="\$RANKING_LIMIT" --always="\$RANKING_ALWAYS" --cap="\$RANKING_CAP" --per-board=10 \$all > runs\.sql/);
   assert.match(workflow, /--runs-summary runs\.json/);
   assert.match(workflow, /timeout-minutes: 30/, "150 runs at about 6 s a query");
   // The page reads 100 of a board (fetchLeaderboard), so the default reaches every row it shows.

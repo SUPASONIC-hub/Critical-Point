@@ -1,4 +1,5 @@
-import { acquireCueRuntime, getSoundLevel, isSoundMuted } from "../components/AdaptiveMusic.jsx";
+import { acquireCueRuntime, getMusicMood, getSoundLevel, isSoundMuted } from "../components/AdaptiveMusic.jsx";
+import { createTensionDrone } from "./tensionDrone.js";
 
 /**
  * The gauntlet's sound. Every cue goes through `acquireCueRuntime`, so a muted
@@ -97,69 +98,16 @@ export function playHeartbeat(closeness = 0, tier = 0) {
 }
 
 /**
- * The room tone under a live window. Returns a controller the stage drives every
- * frame; `stop()` releases it. A missing runtime returns a no-op controller so
- * the caller never branches.
+ * The room tone under a live window, voiced by the scene's mood
+ * (tensionDrone.js). Returns a controller the stage drives every frame;
+ * `stop()` releases it. A missing runtime returns a no-op controller so the
+ * caller never branches.
  */
-/** How fast the drone follows its level: live, and once the table has bust (A2: the slower let-down, no jump a listener on earphones can hear). */
-export const DRONE_FADE_S = 0.25;
-export const DRONE_STILL_FADE_S = 0.6;
 export function startTensionDrone() {
   const runtime = standingRuntime();
   if (!runtime) return { set() {}, stop() {} };
   try {
-    const { context, destination } = runtime;
-    let { multiplier } = runtime;
-    const master = context.createGain();
-    master.gain.setValueAtTime(0.0001, context.currentTime);
-    const filter = context.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(140, context.currentTime);
-    filter.Q.setValueAtTime(6, context.currentTime);
-    const voices = [55, 55 * 1.007, 82.4].map((frequency) => {
-      const oscillator = context.createOscillator();
-      oscillator.type = "sawtooth";
-      oscillator.frequency.setValueAtTime(frequency, context.currentTime);
-      oscillator.connect(filter);
-      oscillator.start();
-      return oscillator;
-    });
-    filter.connect(master).connect(destination);
-    let stopped = false;
-    let muted = false;
-    let mutedAt = -Infinity;
-    return {
-      // `still` is a table that has just bust (A2, 2026-11-05): the same
-      // level, let down over DRONE_STILL_FADE_S instead of DRONE_FADE_S --
-      // a slower gain curve, no new voice, the pitch and the filter as before.
-      set(closeness = 0, sedated = false, still = false) {
-        if (stopped) return;
-        const now = context.currentTime;
-        const read = sedated ? 0.35 : closeness;
-        // The drone runs for the whole window, so it is the one voice that can
-        // outlive a mute pressed after it started -- or a volume changed, which
-        // it used to keep as it was when the window opened. The preferences are
-        // in storage, and the stage drives this ten times a second: they are
-        // read once a second.
-        if (now - mutedAt >= 1) {
-          muted = isSoundMuted();
-          multiplier = getSoundLevel();
-          mutedAt = now;
-        }
-        const level = muted ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
-        master.gain.setTargetAtTime(level, now, still ? DRONE_STILL_FADE_S : DRONE_FADE_S);
-        filter.frequency.setTargetAtTime(120 + read * 1400, now, 0.3);
-        voices[2].detune.setTargetAtTime(read * 60, now, 0.4);
-      },
-      stop() {
-        if (stopped) return;
-        stopped = true;
-        const now = context.currentTime;
-        master.gain.cancelScheduledValues(now);
-        master.gain.setTargetAtTime(0.0001, now, 0.08);
-        for (const oscillator of voices) oscillator.stop(now + 0.5);
-      },
-    };
+    return createTensionDrone(runtime, { isMuted: isSoundMuted, level: getSoundLevel, mood: getMusicMood });
   } catch {
     return { set() {}, stop() {} };
   }

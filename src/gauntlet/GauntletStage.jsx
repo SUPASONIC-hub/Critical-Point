@@ -4,15 +4,14 @@ import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
-  drawStep,
   equipRelic,
   FOCUS_MAX,
   FOCUS_MODES,
   GAUGE_MAX,
   REFRAME_CARD_ID,
+  getBoardMark,
   getHandBonus,
   LOCK_CAP,
-  lockpickOpensSeal,
   readRoomCards,
   scoreFocus,
   splitOpenSeed,
@@ -28,7 +27,7 @@ import { readTableMeters } from "./tableMeters.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTableTabTitle } from "./tableTabTitle.js";
-import { listOfferedTypes } from "./logicStreak.js";
+import { listOfferedDirections } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
@@ -41,7 +40,6 @@ import {
   playPushCue,
   playRelicDealCue,
   playRelicEquipCue,
-  playRelicProcCue,
 } from "./gauntletAudio.js";
 import { RelicDraft } from "./RelicDraft.jsx";
 import { useActCard } from "./ActCardFold.jsx";
@@ -57,11 +55,14 @@ import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
+
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
 const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
-// The table's words (src/copy/table.js).
+// The table's words (src/copy/table.js); the tab's are in src/copy/tabTitles.js (tableTabTitle.js).
 const { stage: say, keys: keyWords } = tableCopy;
+/** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
+const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather };
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -115,7 +116,6 @@ export function GauntletStage({
   const [equipped, setEquipped] = useState(null);
   // The offered relic waiting for a slot: with the slots full, taking one asks what to put down.
   const [swapFor, setSwapFor] = useState(null);
-  const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
   const stageRef = useRef(null);
@@ -200,7 +200,7 @@ export function GauntletStage({
   // The types on the table, as the settlement will be handed them (useChoiceCommit).
   const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
+  const offered = useMemo(() => listOfferedDirections(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
     breach, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
     cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic, clockHeat,
@@ -358,14 +358,12 @@ export function GauntletStage({
       dispatch({ type: "REDEAL", schema: getTableSchema(next) });
       playRelicEquipCue();
       setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1, dropped: dropId }));
+    } else {
+      // 「숨 고르기」 (C-7): the pass deals this board again with more clock and a further wall.
+      dispatch({ type: "REDEAL", schema: getTableSchema(equipRelic(run, null)) });
     }
     setSwapFor(null);
     onPickRelic(relicId, dropId);
-  }
-
-  function pulseRelic(id) {
-    playRelicProcCue();
-    setRelicPulse((previous) => ({ id, n: (previous?.n ?? 0) + 1 }));
   }
 
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
@@ -409,11 +407,7 @@ export function GauntletStage({
   function push() {
     if (locked || draftOpen || !canPush) return;
     const pushIndex = win.pushes + 1;
-    const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
     dispatch({ type: "PUSH" });
-    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, nextGauge)) {
-      pulseRelic("lockpick");
-    }
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
     setImpact({ amount: 0.28 });
   }
@@ -421,7 +415,6 @@ export function GauntletStage({
   function pushToSafe() { // 안전선까지 (C-5): the pushes no wall can stop, at once, as the same PUSH events (tableAfterword.js readSafeLine).
     if (locked || draftOpen || !canPush || !safe.pushes) return;
     for (let n = 0; n < safe.pushes; n += 1) dispatch({ type: "PUSH" });
-    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, safe.gauge)) pulseRelic("lockpick");
     playPushCue(win.pushes + safe.pushes, Math.min(1, win.gauge / 90));
     setImpact({ amount: 0.28 });
   }
@@ -460,6 +453,7 @@ export function GauntletStage({
     briefingOpen, tableOpen, openTable,
   });
 
+  const boardMark = getBoardMark(schema);
   const bandLeft = (band.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((band.wallMax - band.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
@@ -492,9 +486,12 @@ export function GauntletStage({
             pane and the hand is the right one, so the table is as tall as the
             taller of the two rather than their sum. */}
         <div className="gx-read">
-        <div className="gx-hud">
+        <div className={`gx-hud${audit ? " has-audit" : ""}`}>
           <div className="gx-pot" aria-live="off">
-            <span className="gx-label">{say.pot}</span>
+            {/* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) name the board in the label's place: no line more on a phone. */}
+            <span className={`gx-label${boardMark ? ` gx-mark-${boardMark}` : ""}`} data-testid="gauntlet-board-mark" data-mark={boardMark ?? undefined}>
+              {BOARD_MARK_LABELS[boardMark] ?? say.pot}
+            </span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
               {win.status === "bust" ? 0 : formatNumber(livePot)}
             </strong>
@@ -523,11 +520,11 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
-            <RelicChips relics={relics} pulse={relicPulse} />
+            <RelicChips relics={relics} />
           </div>
           {/* Rendered or not, never `hidden`: both signals set their own display,
               and the row's padding would stand over nothing. */}
@@ -550,6 +547,7 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"

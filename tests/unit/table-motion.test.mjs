@@ -159,17 +159,18 @@ test("a bust stops the heart: the light goes dark on that frame and the number r
 });
 
 test("a bust lets the drone down over 0.6 s, through the same gain and nothing new", () => {
-  const audio = readFileSync("src/gauntlet/gauntletAudio.js", "utf8");
+  // The drone lives in tensionDrone.js since the mood voicings (#458).
+  const audio = readFileSync("src/gauntlet/tensionDrone.js", "utf8");
   assert.match(audio, /export const DRONE_FADE_S = 0\.25;/);
   assert.match(audio, /export const DRONE_STILL_FADE_S = 0\.6;/);
-  const drone = audio.slice(audio.indexOf("set(closeness = 0"), audio.indexOf("      stop() {"));
+  const drone = audio.slice(audio.indexOf("set(closeness = 0"), audio.indexOf("    stop() {"));
   assert.match(drone, /set\(closeness = 0, sedated = false, still = false\) \{/);
   assert.match(drone, /master\.gain\.setTargetAtTime\(level, now, still \? DRONE_STILL_FADE_S : DRONE_FADE_S\);/, "the fade is the gain's time constant, the level is the same");
   // The filter and the detune follow as they did: no pitch move on the bust.
-  assert.match(drone, /filter\.frequency\.setTargetAtTime\(120 \+ read \* 1400, now, 0\.3\);/);
-  assert.match(drone, /voices\[2\]\.detune\.setTargetAtTime\(read \* 60, now, 0\.4\);/);
-  assert.equal(drone.split("setTargetAtTime(").length - 1, 3, "three curves, as before: gain, filter, detune");
-  assert.doesNotMatch(drone, /createOscillator\(\)[\s\S]*still|still[\s\S]*createOscillator\(\)/, "no voice is added for the bust");
+  assert.match(drone, /entry\.filter\.frequency\.setTargetAtTime\(entry\.voicing\.floor \+ read \* 1400, now, 0\.3\);/);
+  assert.match(drone, /current\.voices\.at\(-1\)\.detune\.setTargetAtTime\(read \* 60, now, 0\.4\);/);
+  assert.equal((drone.match(/still/g) ?? []).length, 2, "the bust reaches only the signature and the master's time constant");
+  assert.doesNotMatch(drone, /createOscillator\(\)/, "no voice is added for the bust");
   // The frame loop names the bust when it drives the drone.
   const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   assert.match(loop, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated, win\.status === "bust"\);/);
@@ -266,12 +267,17 @@ test("a fade that stands in for a motion keeps its length under reduced motion a
   assert.doesNotMatch(sheet("play"), /animation: (clue-stamp|reveal-in)/, "no animation names a keyframe that does not exist");
 });
 
-test("the cases where the season rests play a quiet table, and the table is the same table", async () => {
+test("the cases where the season rests play a quiet table, and the table is the same table (B-13, C-10)", async () => {
   const { QUIET_TABLE_CASES, isQuietTable } = await import("../../src/gauntlet/fxVariables.js");
   const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
   // B-13: the night off at 경포, the funeral, the 추석 kitchen -- and no other case.
-  assert.deepEqual([...QUIET_TABLE_CASES], ["case42", "case45", "case47"]);
-  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), ["case42", "case45", "case47"]);
+  // C-10: and each act's first case (B-11's act cards), where an act opens at rest after the last one's peak.
+  const { ACT_START_CASES } = await import("../../src/gauntlet/actCardGate.js");
+  const { PEAK_CASES } = await import("../../src/gauntlet/tableUnlocks.js");
+  const rests = ["case42", "case45", "case47"];
+  assert.deepEqual(CASE_SEQUENCE.filter(isQuietTable), CASE_SEQUENCE.filter((caseId) => rests.includes(caseId) || ACT_START_CASES.includes(caseId)));
+  assert.equal(QUIET_TABLE_CASES.length, rests.length + ACT_START_CASES.length);
+  assert.ok(!PEAK_CASES.some(isQuietTable), "no case is both a peak and a rest");
   assert.equal(isQuietTable(undefined), false);
 
   // The frame loop plays it as the comfort setting, and keeps the heartbeat and the drone out of the ear.
