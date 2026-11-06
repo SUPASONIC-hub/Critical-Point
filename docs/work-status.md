@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-05 (the state of `main` at `4f2d39c`, after bundle-1105c (#451: #450 tab title, #432 board auto-hide and blocked terms, #425 global-limit alerts and fail-closed unknown address, #434 wider ranking recheck and 「확인 중」; three migrations, Migration Drift green, `check:grants` on main replaying 56 migrations), then the afternoon's #452 and #453 docs, #454 studio name per language, #455 writing-a-case and event-week docs, the three prose-trim bundles #456 #457 #460 (17 drafts) and #458 mood colours and music).
+Last updated: 2026-11-06 (the state of `main` at `d828507`, after #459 bundle-1105d, #463 bundle-rules2, #464 bundle-1106a, #465 mood-boost, #468 W47 rule line, #471 cold opening switched off and #470 report:judgment; 61 migrations, the 11-12 ranking clear still a draft in #466).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -727,9 +727,53 @@ Still open, on purpose:
   #224 #307 #316 #320 #308 with five migrations 20261106000000 to 040000, 56
   to 61, asked once before merge), the local bundles bundle-1106a (A2 C2 C3/C4
   C1 A3 A4 ja-preload D3, one migration) and bundle-rules2 (kd-spend both,
-  11px, B1, B5 on rules-1105 with the 11-12 clear as a draft). [자리] PRs merged
-  in all ([자리] counting the bundle PRs #451 #456 #457 #460 #458; main [자리]),
-  production build-sha `3ca15f8` (11:03) then `[자리]` (18:50), [자리] unit tests.
+  11px, B1, B5 on rules-1105 with the 11-12 clear as a draft). #461 merged at
+  16:50 (`7e1fe0f0`, five migrations asked once, 56 to 61). 31 PRs merged in
+  all (36 counting the bundle PRs #451 #456 #457 #460 #461; main `7e1fe0f`),
+  production build-sha `3ca15f8` (11:03) then `7e1fe0f` (17:03 Deploy), 1,845
+  unit tests (#458).
+- 2026-11-06: everything left before the 13th went in as bundles, one CI
+  run each. #459 (`bundle-1105d`, `6f58cbb8`): E5 text size (1 / 1.125 /
+  1.25, `data-text-size` before first paint), D1 the season habit line on the
+  result card and share text, the account 「방금 ±」 10 to 11px, E3 stage one
+  (one aria-live polite voice when a risk band is crossed), check:canon's two
+  trainee rules reading en/ja, content-visibility on off-screen intro case
+  cards; the static shell reverted again after CI. #463 (`bundle-rules2`,
+  `e1f5e515`): C9 draft spend (reroll 4,000 and "one more" 12,000 with the
+  notice 「하나 더는 칸이 빌 때만」, vault 22,654 when buying only into an empty
+  slot), B1 scouting costs 1 trust once a table, B5 the decision window
+  follows the stake (<45 / 45-64 / >=65 gives 45 / 40 / 35 s, old records
+  45), the English stake label 11px; the 11-12 ranking clear rides along as a
+  `.sql.draft`. #464 (`bundle-1106a`, `bb7781c7`): A2 collapse staging
+  (stopped heart, 0.25 s hold, one sentence, drone release 0.25 to 0.6 s, no
+  new notes or drive), C2 ending order (evidence-reform before oversight when
+  the finale is control), C3 / C4 ending wording as drafts awaiting review,
+  C1 rank titles, A3 tab title (「⚠ 벽까지 N」, 「[징계 회부]」 after BUST), A4
+  a 0.6 s hold on a case's last choice and in-wall confirms only, and the
+  Pretendard preload dropped on `/ja/`; D3's migration dropped because #461
+  already leaves NEW GAME+ tables out (the owner, 11-06 (1)). #465
+  (`mood-boost`, `d7dadd92`): mood edge tint (`--mood-edge`, 0.6 s fade),
+  wider background / surface / line / accent palettes per mood with text
+  colours unchanged (lowest contrast 4.65), 95 early scenes reviewed so 375
+  of 1,129 are tagged, and `MOOD_TEXTURES` in musicScore.js (gain ratios all
+  <= 1, linear over the 5 s crossfade). #468 (`w47-rule-line`, `97366b95`):
+  the W47 start-screen line now says audit and cascade are standing rules and
+  the week's records go to the test-week board; wording only. #471
+  (`cold-opening`, `ac0645d3`): B-3 (1) four card cold opening before the
+  prologue, behind `COLD_OPENING_ENABLED = false` (`__CP_COLD_OPENING__`, the
+  chunk is left out of the build), to be switched on after the W47 funnel.
+  #470 (`report-judgment`, `d828507c`): `npm run report:judgment` for 11-23
+  (C2 human endings against the bot, Q23 season score spread, B-3 prologue
+  drop-off; read-only, aggregates only). Measured on production (`ac0645d3`,
+  Fast 3G + CPU 4x median): `/ja/` FCP 13.8 s to 6.1 s, the ja-en gap +6.2 s
+  to -0.1 s; kept. Open: #472 (`bundle-1106b`, the static shell again under
+  decision 13 (1) with the key visual box fixed to the viewport, replacing
+  #469, plus mood tags for cases 06-49 and the finale, 692 scenes), drafts
+  #466 (the 11-12 evening ranking clear, asked again right before merge) and
+  #467 (A7 music limiter, merged or closed after an earphone listen), and the
+  local draft branch `cold-opening-style`. Seven PRs merged (22 branches
+  inside them; main `d828507`), production build-sha `d828507` (16:15
+  Deploy, sw release `f0122d0b`), 1,951 unit tests.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
