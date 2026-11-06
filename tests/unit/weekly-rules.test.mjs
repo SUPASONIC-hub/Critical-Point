@@ -487,8 +487,12 @@ test("2026-W47, the test week, played the audit and the links together, told fro
   const line = weeklyRuleLine(weekStartMs("2026-W46") + DAY);
   assert.equal(line.tone, "current");
   assert.equal(line.label, "NEAR WALL");
-  assert.match(line.text, /다음 주의 규칙은 AUDIT & CASCADE\(감사와 연쇄\), 다음 월요일 0시부터\.$/);
-  assert.match(weeklyRuleLine(weekStartMs("2026-W47") + DAY).text, /다음 주의 규칙은 HEAVY FRACTURE\(.+\), 다음 월요일 0시부터\.$/, "W47's own line tells of W48's");
+  assert.match(line.text, /다음 주는 시험 주: 감사·연쇄는 이제 상시 규칙이고, 다음 월요일 0시부터 그 주 기록은 시험 주 순위에 따로 쌓인다\.$/);
+  const w47 = weeklyRuleLine(weekStartMs("2026-W47") + DAY);
+  assert.equal(w47.testWeek, true);
+  assert.match(w47.text, /^감사·연쇄는 이제 상시 규칙이다\. 이번 주\(시험 주\) 기록은 시험 주 순위에 따로 쌓인다\./, "nothing new turns on in W47 (#461)");
+  assert.doesNotMatch(w47.text, /함께 선다/);
+  assert.match(w47.text, /다음 주의 규칙은 HEAVY FRACTURE\(.+\), 다음 월요일 0시부터\.$/, "W47's own line tells of W48's");
 });
 
 test("10-22 to 11-01 (W43, W44): no rule this week and no notice of the next, until W45 tells of W46", () => {
