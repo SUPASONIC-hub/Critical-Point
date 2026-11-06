@@ -80,6 +80,29 @@ test("each start page has its language, title, description, cards and its own ca
   assert.deepEqual(scripts(pages.ja), scripts(pages.ko));
 });
 
+test("the Japanese start page alone drops the font preload; the Korean and the English keep it (11-05 measurement)", () => {
+  // Measured 2026-11-05 (cp-archive 메모-20261105/ja-fcp): /ja/ first paints at 13.8 s with the
+  // preload and 10.3 s without it on a throttled phone, so withoutFontPreload (site-pages.mjs)
+  // takes the one tag out of /ja/ only. The @font-face and the service worker are untouched.
+  const FONT_PRELOAD = /[ \t]*<link\s+rel="preload"\s+as="font"[^>]*>\r?\n?/;
+  const fontPreloads = (html) => [...head(html).matchAll(new RegExp(FONT_PRELOAD.source, "g"))].map((match) => match[0]);
+  assert.equal(fontPreloads(pages.ko).length, 1, "/ preloads the font");
+  assert.equal(fontPreloads(pages.en).length, 1, "/en/ preloads the font");
+  assert.deepEqual(fontPreloads(pages.ja), [], "/ja/ does not");
+  assert.doesNotMatch(pages.ja, /pretendard-cp[^"]*\.woff2/, "/ja/ names the woff2 nowhere: the stylesheet fetches it");
+  assert.match(pages.ja, /<!-- The one font file/, "the rest of the Korean head stays as it is");
+  // The built page names the hashed file and keeps index.html's line breaks inside the tag.
+  const builtForm = INDEX.replace("/src/assets/fonts/pretendard-cp.woff2", "/assets/pretendard-cp-CmzYrx-E.woff2");
+  assert.ok(builtForm.includes("pretendard-cp-CmzYrx-E.woff2"), "the source names the font once");
+  assert.deepEqual(fontPreloads(localizedStartPage(builtForm, "ja")), []);
+  assert.equal(fontPreloads(localizedStartPage(builtForm, "en")).length, 1);
+  // The tag gone from index.html fails the Japanese page instead of passing silently; the English page does not look for it.
+  assert.throws(() => localizedStartPage(INDEX.replace(FONT_PRELOAD, ""), "ja"), /0 font preload tags/);
+  assert.doesNotThrow(() => localizedStartPage(INDEX.replace(FONT_PRELOAD, ""), "en"));
+  // Everything else is the Korean page's: the Japanese page is the English one with its words, less that one tag.
+  assert.equal(pages.ja.split("\n").length, pages.en.replace(FONT_PRELOAD, "").split("\n").length, "the same lines once the tag is gone from both");
+});
+
 test("the description is the about page's own sentences, and the no-script intro its first two", () => {
   const about = renderSitePages();
   const folder = { ko: "", en: "en/", ja: "ja/" };

@@ -234,7 +234,9 @@ export function IntroScreen({ view, renderers = {} }) {
       <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>{introCopy.consentLine.link}</a>{introCopy.consentLine.after}
     </small>
   );
-  const analystTitle = getAnalystTitle({ currentCase, caseResults });
+  // The record title (C1, 2026-11-05): the case in play, the cases closed and
+  // whether this device has finished a season (NEW GAME+ open) -- nothing new.
+  const analystTitle = getAnalystTitle({ currentCase, caseResults, finishedSeason: newGamePlusUnlocked });
   const resumePanel = (
     <div className="resume-panel">
       <div>
@@ -427,6 +429,14 @@ export function IntroScreen({ view, renderers = {} }) {
               />
               {hasResumableSave && startFirstCaseButton}
             </div>
+            {/* 기록 칭호 under the name: the same title the resume card reads
+                (src/analystTitle.js), on the input note's own rule, so no
+                style is added. A fresh device reads 수습 분석관. */}
+            {analystTitle && (
+              <p className="input-note" data-testid="rank-title">
+                <small>{fill(introCopy.setup.rankTitle, { title: analystTitle })}</small>
+              </p>
+            )}
             {newGamePlusUnlocked && (
               <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={Boolean(openingBurst)}>
                 <Sparkles size={16} />
