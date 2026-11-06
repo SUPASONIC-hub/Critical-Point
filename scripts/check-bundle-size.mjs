@@ -517,7 +517,8 @@ const budgets = [
   // -> 194,609 / 70,303 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 194,605 / 70,299 in the e2e build, the plus 4.
   // 194,929 / 70,355 -> 194,945 / 70,375 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 194,941 / 70,371 in the e2e build, the plus 4.
   // 194,945 / 70,375 -> 195,802 / 70,670 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the mood's texture in the entry's AdaptiveMusic (musicScore.js MOOD_TEXTURES, blendedTexture, moodLeadNote). Measured 195,798 / 70,666 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 195_802, maxGzip: 70_670 },
+  // 195,802 / 70,670 -> 195,825 / 70,677 on 2026-11-06, cold-opening over main d7dadd92 (#465 mood-boost): B-3(1) with its switch off, the page's state hook in IntroScreen (the branch, the page and its chunk are folded away by __CP_COLD_OPENING__). Measured 195,821 / 70,673 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 195_825, maxGzip: 70_677 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1896,7 +1897,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 432,622 / 490,652 / 497,862 -> 433,234 / 491,263 / 498,475 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the lines above (index CSS and entry). Measured 433,230 / 491,259 / 498,471 in the e2e build, the plus 4.
 // en 490,209 -> 490,337 and ja 497,421 -> 497,551 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 490,333 / 497,547 in the e2e build, the plus 4 (ko 432,474 under its 432,479).
 // -> 433,241 / 491,404 / 498,624 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 433,237 / 491,400 / 498,620 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 433_241, en: 491_404, ja: 498_624 };
+// 433,241 / 491,404 / 498,624 -> 433,243 / 491,405 / 498,624 on 2026-11-06, cold-opening after merging main 97366b95 (#468 w47-rule-line): B-3(1) with its switch off (the entry line above) over the W47 lines. Measured 433,239 / 491,401 / 498,620 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 433_243, en: 491_405, ja: 498_624 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

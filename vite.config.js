@@ -14,6 +14,7 @@ import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/ana
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { localePreloadFileName, localePreloadMap, localePreloadSource, readLocaleKey, withLocalePreloadTag } from "./scripts/locale-preload.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
+import { COLD_OPENING_ENABLED } from "./src/coldOpeningSwitch.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -747,6 +748,9 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __CP_DEBUG_BUILD__: JSON.stringify(debugBuild),
       __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+      // B-3(1) 냉정한 오프닝 (src/coldOpeningSwitch.js): a constant, so a build
+      // with the switch off has none of the page in it.
+      __CP_COLD_OPENING__: JSON.stringify(COLD_OPENING_ENABLED),
     },
     // The dev server compiles a module the first time it is asked for. Fifty
     // cases are fifty large data modules, and compiling them on the first scene
