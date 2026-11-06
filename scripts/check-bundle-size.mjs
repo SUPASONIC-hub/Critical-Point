@@ -1899,7 +1899,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // en 490,209 -> 490,337 and ja 497,421 -> 497,551 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 490,333 / 497,547 in the e2e build, the plus 4 (ko 432,474 under its 432,479).
 // -> 433,241 / 491,404 / 498,624 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 433,237 / 491,400 / 498,620 in the e2e build, the plus 4.
 // 433,241 / 491,404 / 498,624 -> 434,268 / 492,190 / 499,699 on 2026-11-06, static-shell-2 after merging main 97366b95 (#465 mood-boost, #468 w47-rule-line; decision 13 (1)): the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs) with the header pills, kicker and premise hidden in the page's language and Japanese's face, the critical CSS now cut at 360px and on /en/ and /ja/ too, and the art's box from the viewport. Measured 434,264 / 492,186 / 499,695 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_268, en: 492_190, ja: 499_699 };
+// -> 434,273 / 492,195 / 499,703 on 2026-11-06, bundle-1106b (static-shell-2 6ac68416, mood-tags-2 9b6973cd over main 97366b95): the lines above together; the entry names the case chunks that now carry 692 mood tags. Measured 434,269 / 492,191 / 499,699 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_273, en: 492_195, ja: 499_703 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
