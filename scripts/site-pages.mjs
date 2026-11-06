@@ -5,6 +5,7 @@ import jaIntro from "../src/locales/ja/screens/intro.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
+import { localizeStaticShell } from "./static-shell.mjs";
 import {
   COPY,
   escapeHtml,
@@ -665,7 +666,8 @@ export function localizedStartPage(html, language, origin = "") {
   const start = body + blocks[0].index;
   const end = out.indexOf("</noscript>", start);
   if (end < 0) throw new Error(`The start page's no-script block is not closed, writing the ${language} page.`);
-  return `${out.slice(0, start)}${startNoscript(language)}${out.slice(end + "</noscript>".length)}`;
+  // The static shell's hidden words in the page's language (scripts/static-shell.mjs); a page without one is left as it is.
+  return localizeStaticShell(`${out.slice(0, start)}${startNoscript(language)}${out.slice(end + "</noscript>".length)}`, language);
 }
 
 /** The two start pages the build writes beside index.html: `{ "en/index.html": ..., "ja/index.html": ... }`. */

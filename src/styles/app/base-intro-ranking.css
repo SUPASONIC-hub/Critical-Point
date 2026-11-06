@@ -368,10 +368,16 @@ summary:focus-visible {
   min-height: min(100svh, 940px);
   overflow: hidden;
 }
+/* The art's box is the viewport's, never the copy's (static shell, decision 13
+   (1), 11-06): the copy column is taller than the stage in most languages and
+   at the larger text sizes, and an art box that grew with it was rescaled by
+   object-fit when the intro replaced the shell. Under it the stage's own ink
+   continues; the floor gradient below already fades the art into it. */
 .intro-hero-art {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
   z-index: -1;
+  height: min(100svh, 940px);
 }
 .intro-visual {
   position: relative;
@@ -3042,8 +3048,7 @@ body {
     min-height: 100svh;
   }
   .intro-hero-art {
-    inset: 0 0 auto;
-    height: 82%;
+    height: 82svh;
   }
   .intro-visual img {
     object-position: 64% 30%;

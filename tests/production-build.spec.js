@@ -259,14 +259,18 @@ test(`${what} that cannot be fetched reloads once, then offers 새로고침 and 
  * shell stood. Blocking the page's scripts is how "before" is held still.
  *
  * SHELL_DRIFT_PX is how far the wordmark and the start row may move down or up
- * when the intro's words (the kicker, the premise, the row's link) come in
- * under them; the shell has none of those, so the column is shorter. It is a
- * first guess, to be set from the first Linux run's measured moves.
+ * when the intro's words come in. Since decision 13 (1) (11-06) the shell lays
+ * those words out unseen in the page's language and the art's box is the
+ * viewport's, so on Windows every page and size measured 0px for the art, the
+ * wordmark and the start row at the default text size; the bounds are the
+ * first cut's, not widened.
  */
 const SHELL_DRIFT_PX = 24;
 const SHELL_PAGES = ["/", "/en/", "/ja/"];
 const SHELL_VIEWPORTS = [
+  { width: 360, height: 740 },
   { width: 390, height: 844 },
+  { width: 1280, height: 720 },
   { width: 1366, height: 900 },
 ];
 const blockScripts = (page) => page.route("**/assets/*.js", (route) => route.abort());
@@ -295,17 +299,17 @@ for (const path of SHELL_PAGES) {
   });
 }
 
-for (const viewport of SHELL_VIEWPORTS) {
-  test(`at ${viewport.width}x${viewport.height} the intro replaces the shell where it stood`, { tag: "@prod" }, async ({ page }) => {
+for (const path of SHELL_PAGES) for (const viewport of SHELL_VIEWPORTS) {
+  test(`${path} at ${viewport.width}x${viewport.height}: the intro replaces the shell where it stood`, { tag: "@prod" }, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize(viewport);
     await blockScripts(page);
-    await page.goto("/");
+    await page.goto(path);
     await expect(page.locator("[data-static-shell] h1.game-wordmark")).toBeVisible();
     const before = await boxesOf(page);
 
     await page.unrouteAll({ behavior: "ignoreErrors" });
-    await page.goto("/");
+    await page.goto(path);
     await expect(page.getByTestId("start-first-case")).toBeVisible();
     await expect(page.locator("[data-static-shell]"), "the first render replaced the shell").toHaveCount(0);
     const after = await boxesOf(page);
