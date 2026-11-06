@@ -18,6 +18,7 @@ import {
   STEPS_PER_BAR,
 } from "./musicScore.js";
 export { getMusicMood, MUSIC_MOODS } from "./musicScore.js";
+import { createMusicLimiter, MUSIC_LIMITER_ON, routeMaster } from "./musicLimiter.js";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
 const MIX_VOLUME = 0.74;
@@ -280,7 +281,7 @@ function playNoiseSweep(context, destination, duration = 0.7, gainValue = 0.02, 
  * a page may open) and cut the score off at each transition; sharing one keeps
  * the bar running across the intro -> play -> result seam.
  */
-const audioRuntime = { context: null, master: null, bus: null, drive: null, clean: null };
+const audioRuntime = { context: null, master: null, limiter: null, limiterOn: MUSIC_LIMITER_ON, bus: null, drive: null, clean: null };
 
 /**
  * A hidden tab is silent. The score's interval and the table's drone kept
@@ -319,7 +320,8 @@ function ensureAudioRuntime(volume) {
   if (!audioRuntime.master) {
     audioRuntime.master = context.createGain();
     audioRuntime.master.gain.value = volume;
-    audioRuntime.master.connect(context.destination);
+    audioRuntime.limiter = createMusicLimiter(context);
+    routeMaster(context, audioRuntime.master, audioRuntime.limiter, audioRuntime.limiterOn);
   }
   if (!audioRuntime.bus) {
     const bus = connectMusicBus(context, audioRuntime.master);
@@ -592,6 +594,13 @@ export function playDecisionRevealCue(tone = "decision-locked") {
  * asked not to have.
  */
 /** Whether the player has sound off. For a voice that outlives the cue that started it. */
+/** music-lab's A/B switch: the music path through the limiter or around it. */
+export function setMusicLimiter(on) {
+  audioRuntime.limiterOn = Boolean(on);
+  const { context, master, limiter } = audioRuntime;
+  if (context && master) routeMaster(context, master, limiter, audioRuntime.limiterOn);
+}
+
 export function isSoundMuted() {
   return soundOff();
 }
