@@ -878,7 +878,8 @@ export function IntroScreen({ view, renderers = {} }) {
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {openingCase ? fill(introCopy.opening.entering, { case: openingIsFirst ? introCopy.opening.firstCase : openingCase.label }) : ""}
         </p>
-        {ColdOpeningPage && (
+        {/* Behind the same constants as the press, so a build with the switch off carries none of it. */}
+        {(__CP_COLD_OPENING__ || __CP_DEBUG_BUILD__) && ColdOpeningPage && (
           <ColdOpeningPage
             startLabel={introCopy.startButton}
             onDone={() => {
