@@ -494,8 +494,7 @@ const budgets = [
   // 193,717 / 70,143 -> 193,739 / 70,149 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (the stake clock's tier in the entry's shared rules, the chunk names it imports). Measured 193,735 / 70,145 in the e2e build, the plus 4.
   // -> 194,587 / 70,288 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules in the entry over the bundle's 글자 크기 setting and the rest above. Measured 194,583 / 70,284 in the e2e build, the plus 4.
   // -> 194,609 / 70,303 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 194,605 / 70,299 in the e2e build, the plus 4.
-  // 70,303 -> 70,310 gzip on 2026-11-06, static-shell-2 over main e1f5e515: no entry code changed (raw 194,605); the stylesheet's hashed name it imports moved with the intro art's box (base-intro-ranking.css). Measured 194,605 / 70,306 in the e2e build, the gzip plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 194_609, maxGzip: 70_310 },
+  { pattern: /^index-.*\.js$/, maxBytes: 194_609, maxGzip: 70_303 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -912,8 +911,8 @@ const budgets = [
   // 206,048 / 38,702 -> 206,671 / 38,799 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): draft-spend.css (C9's two buys) and the stake clock's HUD lines, less the 360px English 10px label rule (phone-en-stake-11px). Measured 206,667 / 38,795 in the e2e build, the plus 4.
   // -> 206,351 / 38,789 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules CSS over the bundle's root rules and the card summary's flex: none. Measured 206,347 / 38,785 in the e2e build, the plus 4.
   // -> 206,974 / 38,884 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 206,970 / 38,880 in the e2e build, the plus 4.
-  // 206,974 / 38,884 -> 206,993 / 38,887 on 2026-11-06, static-shell-2 over main e1f5e515: the intro art's box takes its height from the viewport alone (min(100svh, 940px), 82svh on a phone; decision 13 (1)), so the static shell and the intro draw it the same. Measured 206,989 / 38,883 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 206_993, maxGzip: 38_887 },
+  // 206,974 / 38,884 -> 206,986 / 38,884 on 2026-11-06, static-shell-2 over main e1f5e515: the intro art's box takes its height from the viewport alone (min(100svh, 940px), 82svh on a phone; decision 13 (1)), so the static shell and the intro draw it the same. Measured 206,982 / 38,878 in the e2e build, the raw plus 4 (the gzip under its line).
+  { pattern: /^index-.*\.css$/, maxBytes: 206_986, maxGzip: 38_884 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1828,8 +1827,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 432,043 / 489,484 / 496,601 -> 432,147 / 489,827 / 497,021 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (the index CSS and the entry; en and ja by their dictionaries). Measured 432,143 / 489,823 / 497,017 in the e2e build, the plus 4.
 // -> 432,365 / 489,860 / 496,995 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): the lines above together. Measured 432,361 / 489,856 / 496,991 in the e2e build, the plus 4.
 // -> 432,479 / 490,209 / 497,421 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 432,475 / 490,205 / 497,417 in the e2e build, the plus 4.
-// 432,479 / 490,209 / 497,421 -> 433,536 / 491,019 / 498,524 on 2026-11-06, static-shell-2 over main e1f5e515 (decision 13 (1)): the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs) with the header pills, kicker and premise hidden in the page's language and Japanese's face, the critical CSS now cut at 360px and on /en/ and /ja/ too, and the art's box from the viewport. Measured 433,532 / 491,015 / 498,520 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 433_536, en: 491_019, ja: 498_524 };
+// 432,479 / 490,209 / 497,421 -> 433,512 / 490,993 / 498,497 on 2026-11-06, static-shell-2 over main e1f5e515 (decision 13 (1)): the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs) with the header pills, kicker and premise hidden in the page's language and Japanese's face, the critical CSS now cut at 360px and on /en/ and /ja/ too, and the art's box from the viewport. Measured 433,508 / 490,989 / 498,493 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 433_512, en: 490_993, ja: 498_497 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

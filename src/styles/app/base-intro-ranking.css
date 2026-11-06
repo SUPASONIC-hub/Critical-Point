@@ -372,10 +372,11 @@ summary:focus-visible {
    (1), 11-06): the copy column is taller than the stage in most languages and
    at the larger text sizes, and an art box that grew with it was rescaled by
    object-fit when the intro replaced the shell. Under it the stage's own ink
-   continues; the floor gradient below already fades the art into it. */
+   continues; the floor gradient below already fades the art into it. With a
+   height, `inset: 0` keeps the top and drops the bottom. */
 .intro-hero-art {
   position: absolute;
-  inset: 0 0 auto;
+  inset: 0;
   z-index: -1;
   height: min(100svh, 940px);
 }
