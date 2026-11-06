@@ -107,7 +107,7 @@ test("a look is said once, through the voice, as the band it bought", () => {
   const looked = (band) => readTableFacts({ win: tableWindow(), live: true, dangerLine: "", cashMutations: [], clock: { remaining: 30, elapsed: 10 }, band });
   const board = { wallMin: 60, wallMax: 98, scouted: false };
   const scouted = { wallMin: 70, wallMax: 90, scouted: true };
-  assert.equal(describeScout(scouted), "조회했다. 벽은 70에서 90 사이 어딘가");
+  assert.equal(describeScout(scouted), "조회했다. 믿음 1을 썼다. 벽은 70에서 90 사이 어딘가");
   assert.deepEqual(listTableCalls(looked(board), looked(scouted)), [{ kind: "scout", text: describeScout(scouted) }]);
   assert.deepEqual(listTableCalls(looked(scouted), looked(scouted)), [], "a spent look is not news");
   assert.equal(looked(board).scout, "", "the board's own band is not a look");

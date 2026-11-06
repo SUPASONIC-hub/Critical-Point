@@ -1,6 +1,6 @@
-import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
+import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
 import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
-import { HEAT_DEBT_GAUGE } from "./tableRules.js";
+import { HEAT_DEBT_GAUGE, SCOUT_TRUST } from "./tableRules.js";
 import { readSafeLine } from "./tableAfterword.js";
 import { fill } from "../locale.js";
 import tableCopy from "../copy/table.js";
@@ -53,13 +53,16 @@ export function describeDanger({ gauge, nextHigh, wallMin }) {
  * relief: STEADY's relief comes off the heat there is (`FOCUS` clamps at 0).
  * `band` is the wall band the window draws: the board's, or the narrower one
  * SCOUT bought (`getWindowBand`); the danger line reads its low edge.
+ * `resources` is the run's (the stage's `resources`): `canPayScout` is whether
+ * they hold the look's price, read on the table so a hand with no 믿음 left
+ * is not sold a look it cannot pay for.
  *
  * `audit` is the case's audit off its log, or null in a case whose rules do
  * not count it (useRunReadout asks); the reading says where it stands and
  * what a cash now would make it (B3: the heat and the pushes, never the
  * wall), and is null on every other table.
  */
-export function readTableMeters({ win, schema, selectedCard, run = null, audit }) {
+export function readTableMeters({ win, schema, selectedCard, run = null, audit, resources = null }) {
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);
@@ -70,7 +73,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit }
     focusBonus: getFocusBonus(win.focus, win.focusMode),
     remaining: getRemainingSeconds(win),
     // A bust stops the heart (A2): the pulse reads "—" and the tick light is dark (fxVariables.js).
-    bpm: win.status === "bust" ? "—" : getHeartbeatBpm(win.gauge, win.wall + (win.tellOffset ?? 0), schema.sedated, win.elapsed / schema.seconds),
+    // The urgency is read against the clock the stake leaves (`getWindowSeconds`), the one `remaining` counts down.
+    bpm: win.status === "bust" ? "—" : getHeartbeatBpm(win.gauge, win.wall + (win.tellOffset ?? 0), schema.sedated, win.elapsed / getWindowSeconds(win)),
     nextLow,
     nextHigh,
     nextMultiplierLow: getMultiplier(nextLow),
@@ -78,6 +82,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit }
     dangerLine: describeDanger({ gauge: win.gauge, nextHigh, wallMin: band.wallMin }),
     belowRelief: win.gauge < getFocusModeProfile(win.focusMode).relief,
     band,
+    // B1: whether the run can pay for the look (SCOUT_TRUST of 믿음); the stage opens SCOUT on it, as the bots do.
+    canPayScout: (Number(resources?.trust) || 0) >= SCOUT_TRUST,
     audit: reading,
     safe: readSafeLine(win, band.wallMin),
     // C-9: on a table that counts the audit, its line (40) and the band a cash

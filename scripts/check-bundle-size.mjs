@@ -144,7 +144,14 @@ const budgets = [
   // 148,622 / 54,994 -> 150,687 / 55,613 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 150,683 / 55,609 in the e2e build, the plus 4.
   // -> 148,773 / 55,052 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules over the bundle's lines above. Measured 148,769 / 55,048 in the e2e build, the plus 4.
   // 150,687 / 55,613 -> 150,835 / 55,672 on 2026-11-06, bundle-1106a after merging main 6f58cbb8 (#459 bundle-1105d: E5, D1, table-a11y, canon, intro cards): the two sides' lines together. Measured 150,831 / 55,668 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_835, maxGzip: 55_672 },
+  // 146,589 / 54,099 -> 146,633 / 54,110 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the case-closing decision records its relic draft (useChoiceCommit) and the runtime carries seasonSpent with the run. Measured 146,629 / 54,106 in the e2e build, the plus 4.
+  // 146,589 / 54,099 -> 146,798 / 54,192 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): spendAtDraft in GameRuntime (the reroll and one more paid from the KD은행 계좌), the case-closing decision records its relic draft (useChoiceCommit) and the run carries seasonSpent. Measured 146,794 / 54,188 in the e2e build, the plus 4.
+  // 148,023 / 54,709 -> 148,041 / 54,715 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the log entry carries `threshold.scouted`. Measured 148,037 / 54,711 in the e2e build, the plus 4.
+  // 148,023 / 54,709 -> 148,057 / 54,715 on 2026-11-05, stake-clock over main e68fe8cc: the table's meters read the clock the stake leaves (tableMeters' getWindowSeconds) and the names it imports from the engine shifted. Measured 148,053 / 54,711 in the e2e build, the plus 4.
+  // 148,622 / 54,994 -> 148,736 / 55,069 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (C9's draft record and seasonSpent on the run, the stake clock's getWindowSeconds, the scout's price). Measured 148,732 / 55,065 in the e2e build, the plus 4.
+  // -> 148,883 / 55,121 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 148,879 / 55,117 in the e2e build, the plus 4.
+  // 150,835 / 55,672 -> 150,964 / 55,742 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 150,960 / 55,738 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_964, maxGzip: 55_742 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -185,6 +192,7 @@ const budgets = [
   // 14,123 -> 14,147 gzip on 2026-11-05, tab-title-situation over main 24af89d7: no code changed here (raw 36,270); the chunk names it imports. Measured 14,143 gzip in the e2e build, the gzip plus 4.
   // -> 36,374 / 14,187 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 36,370 / 14,183 in the e2e build, the plus 4.
   // 37,608 / 14,639 -> 37,703 / 14,682 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 37,699 / 14,678 in the e2e build, the plus 4.
+  // 14,639 -> 14,646 gzip on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (VAULT_SLACK_PER_CASE exported for check:endings; the raw bytes stay under 37,608). Measured 14,642 gzip in the e2e build, the gzip plus 4.
   { pattern: /^gameLogic-.*\.js$/, maxBytes: 37_703, maxGzip: 14_682 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
@@ -229,7 +237,14 @@ const budgets = [
   // 30,526 / 13,304 -> 30,537 / 13,287 on 2026-11-05, hold-confirm over main e68fe8cc (A4 (1), 2026-11-05): the table's words gain 길게 눌러야 확정 (say.holdHint, voice.holdHint) and lose the long hold help. Measured 30,533 / 13,283 in the e2e build, the plus 4.
   // -> 30,478 / 13,281 on 2026-11-05, bundle-1106a (A2 C2 C3/C4 C1 A3 A4 ja-preload D3) over main 33899116: the lines above together. Measured 30,474 / 13,277 in the e2e build, the plus 4.
   // -> 32,510 / 13,970 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules over the bundle's voice wall call. Measured 32,506 / 13,966 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 32_469, maxGzip: 13_960 },
+  // 30,498 / 13,286 -> 31,366 / 13,569 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the two buttons under the cards (「다시 뽑기 · 4,000」 R, 「하나 더 · 12,000」 B, DraftBuy with aria-disabled and its reason), the one-line notice and the second pick's title (src/copy/relics.js). Measured 31,362 / 13,565 in the e2e build, the plus 4.
+  // 31,366 / 13,569 -> 32,024 / 13,855 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft reads what its two buys say itself (readDraftSpend, src/gauntlet/draftSpend.js, in this shared chunk now rather than the runtime's, where GauntletStage read it), so the stage is under its import budget again. Measured 32,020 / 13,851 in the e2e build, the plus 4.
+  // 32,024 / 13,855 -> 32,084 / 13,861 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the line under the draft's note (spendHint: one more only when a slot is open; user decision 11-05 (1)). Measured 32,080 / 13,857 in the e2e build, the plus 4.
+  // 30,526 / 13,304 -> 30,600 / 13,337 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the table words shared here (scoutLabel, voice.scout) name the 믿음, and the meters read `canPayScout`. Measured 30,596 / 13,333 in the e2e build, the plus 4.
+  // 32,469 / 13,960 -> 34,182 / 14,582 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's two buys under the hand (DraftBuy, readDraftSpend) beside C-7's pass button, and the paid draft's plain pass line (skipPaid). Measured 34,178 / 14,578 in the e2e build, the plus 4.
+  // -> 34,223 / 14,594 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 34,219 / 14,590 in the e2e build, the plus 4.
+  // 32,469 / 13,960 -> 34,178 / 14,560 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 34,174 / 14,556 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_178, maxGzip: 14_560 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -496,7 +511,11 @@ const budgets = [
   // 193,717 / 70,143 -> 194,059 / 70,208 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 194,055 / 70,204 in the e2e build, the plus 4.
   // -> 194,587 / 70,288 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules in the entry over the bundle's 글자 크기 setting and the rest above. Measured 194,583 / 70,284 in the e2e build, the plus 4.
   // 194,059 / 70,208 -> 194,929 / 70,355 on 2026-11-06, bundle-1106a after merging main 6f58cbb8 (#459 bundle-1105d: E5, D1, table-a11y, canon, intro cards): the two sides' lines together. Measured 194,925 / 70,351 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 194_929, maxGzip: 70_355 },
+  // 191,573 / 69,173 -> 191,595 / 69,187 on 2026-11-05, stake-clock over main e68fe8cc: the stake's three layers moved out of the score into their own leaf (src/gauntlet/stakeLayers.js), which the entry now carries for the score and the engine's clock. Measured 191,591 / 69,183 in the e2e build, the plus 4.
+  // 193,717 / 70,143 -> 193,739 / 70,149 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (the stake clock's tier in the entry's shared rules, the chunk names it imports). Measured 193,735 / 70,145 in the e2e build, the plus 4.
+  // -> 194,609 / 70,303 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 194,605 / 70,299 in the e2e build, the plus 4.
+  // 194,929 / 70,355 -> 194,945 / 70,375 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 194,941 / 70,371 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 194_945, maxGzip: 70_375 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -917,7 +936,12 @@ const budgets = [
   // 206,048 / 38,702 -> 206,048 / 38,745 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 206,040 / 38,741 in the e2e build, the plus 4.
   // -> 206,351 / 38,789 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules CSS over the bundle's root rules and the card summary's flex: none. Measured 206,347 / 38,785 in the e2e build, the plus 4.
   // 206,048 / 38,745 -> 206,347 / 38,833 on 2026-11-06, bundle-1106a after merging main 6f58cbb8 (#459 bundle-1105d: E5, D1, table-a11y, canon, intro cards): the two sides' lines together. Measured 206,343 / 38,829 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 206_347, maxGzip: 38_833 },
+  // 200,439 / 37,512 -> 201,129 / 37,614 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's two buy buttons in one row of two (44px high, the price on a second line on 360px), the closed state dimmed, the reason and the notice at 11px (src/styles/app/relics.css). Measured 201,125 / 37,610 in the e2e build, the plus 4.
+  // 201,099 / 37,652 -> 201,051 / 37,650 on 2026-11-05, phone-en-stake-11px over rules-mark-3b 9e91c588: the 360px English bank rail's 10px label rule went (play.css; Audit n/4 sits on the signals' row, so Stake and Vault read 11px). Measured 201,047 / 37,646 in the e2e build, the plus 4.
+  // 206,048 / 38,702 -> 206,671 / 38,799 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): draft-spend.css (C9's two buys) and the stake clock's HUD lines, less the 360px English 10px label rule (phone-en-stake-11px). Measured 206,667 / 38,795 in the e2e build, the plus 4.
+  // -> 206,974 / 38,884 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 206,970 / 38,880 in the e2e build, the plus 4.
+  // 206,347 / 38,833 -> 206,970 / 38,929 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 206,966 / 38,925 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 206_970, maxGzip: 38_929 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1108,7 +1132,14 @@ const budgets = [
   // 44,896 / 16,998 -> 45,465 / 17,217 on 2026-11-03, 통합 리허설 (#379) over #224 30f5519d (main bb492d5d) with #307 #316 #320 #308: the four branches' lines together. Measured 45,465 / 17,213 in the e2e build, the gzip plus 4.
   // 44,131 / 16,529 -> 45,469 / 17,220 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 45,465 / 17,216 in the e2e build, the plus 4.
   // 16,529 -> 16,577 gzip on 2026-11-05, tab-title-situation over main 24af89d7: no code changed here (raw 44,127); the table's tab block left src/copy/table.js and the chunk names it imports shifted. Measured 16,573 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 45_469, maxGzip: 17_220 },
+  // 44,131 / 16,529 -> 45,193 / 16,847 on 2026-11-05, kd-spend-engine over main 2bd9a8ba (C9 PR 1): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode. Measured 45,189 / 16,843 in the e2e build, the plus 4.
+  // 44,131 / 16,529 -> 46,432 / 17,345 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the KD은행 계좌 pays at the draft -- rerollRelicOffer and buyExtraRelic (RELIC_REROLL_COST 4,000, RELIC_EXTRA_COST 12,000, once each a case), the relicDraft record and seasonSpent in the run state, blocked in practice and story mode (PR 1), and readDraftSpend (src/gauntlet/draftSpend.js): each button's open or closed state and its one reason (PR 2). Measured 46,428 / 17,341 in the e2e build, the plus 4.
+  // 46,432 / 17,345 -> 46,526 / 17,396 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the Korean line under the draft's note (src/copy/relics.js spendHint, which this chunk carries). Measured 46,522 / 17,392 in the e2e build, the plus 4.
+  // 16,529 -> 16,554 gzip on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): SCOUT_TRUST, `applyGauntletEffect`'s `scouted` and the verdict's `scouted` (raw 44,119, under). Measured 44,119 / 16,550 in the e2e build, the gzip plus 4.
+  // 44,131 / 16,529 -> 44,750 / 16,759 on 2026-11-05, stake-clock over main e68fe8cc: the stake clock (src/gauntlet/stakeClock.js: decisionWindowSeconds, stakeTier), the board's stakeClock mark, advanceClock reading the tick tier by tier and a push that runs the clock out. Measured 44,746 / 16,755 in the e2e build, the plus 4.
+  // 45,469 / 17,220 -> 48,539 / 18,413 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's rerollRelicOffer, buyExtraRelic and the draft record beside C-7's breather (a pass on a paid draft is a choice, 11-05 decision), the stake clock in advanceClock and the push, SCOUT's trust price. Measured 48,535 / 18,409 in the e2e build, the plus 4.
+  // 45,469 / 17,220 -> 48,539 / 18,409 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 48,535 / 18,405 in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 48_539, maxGzip: 18_409 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1535,7 +1566,13 @@ const budgets = [
   // 182,240 / 60,959 -> 184,054 / 61,313 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 184,050 / 61,309 in the e2e build, the plus 4.
   // -> 182,593 / 61,038 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules in Japanese over the bundle's lines. Measured 182,589 / 61,034 in the e2e build, the plus 4.
   // 184,054 / 61,313 -> 184,407 / 61,384 on 2026-11-06, bundle-1106a after merging main 6f58cbb8 (#459 bundle-1105d: E5, D1, table-a11y, canon, intro cards): the two sides' lines together. Measured 184,403 / 61,380 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 184_407, maxGzip: 61_384 },
+  // 179,769 / 60,178 -> 180,238 / 60,356 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's two buttons, the notice, the second pick's title and line and the seven closed reasons in Japanese (src/locales/ja/screens/relics.js). Measured 180,234 / 60,352 in the e2e build, the plus 4.
+  // 180,238 / 60,356 -> 180,350 / 60,404 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line (もう一つは枠が空いているときだけ). Measured 180,346 / 60,400 in the e2e build, the plus 4.
+  // 180,288 / 60,311 -> 180,342 / 60,330 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the Japanese scout button name, voice line and prologue 03 line say the price. Measured 180,338 / 60,326 in the e2e build, the plus 4.
+  // 182,240 / 60,959 -> 182,959 / 61,274 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's draft lines (reroll, extra, spendNote, spendHint, second pick, off reasons, skipPaid), B1's scout price and B5's stake clock in Japanese. Measured 182,955 / 61,270 in the e2e build, the plus 4.
+  // -> 183,312 / 61,351 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 183,308 / 61,347 in the e2e build, the plus 4.
+  // 184,407 / 61,384 -> 185,126 / 61,676 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 185,122 / 61,672 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 185_126, maxGzip: 61_676 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1575,7 +1612,13 @@ const budgets = [
   // 152,040 / 54,336 -> 153,461 / 54,636 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 153,457 / 54,632 in the e2e build, the plus 4.
   // -> 152,299 / 54,406 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules in English over the bundle's lines. Measured 152,295 / 54,402 in the e2e build, the plus 4.
   // 153,461 / 54,636 -> 153,720 / 54,702 on 2026-11-06, bundle-1106a after merging main 6f58cbb8 (#459 bundle-1105d: E5, D1, table-a11y, canon, intro cards): the two sides' lines together. Measured 153,716 / 54,698 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 153_720, maxGzip: 54_702 },
+  // 149,807 / 53,485 -> 150,242 / 53,665 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the same lines in English (src/locales/en/screens/relics.js). Measured 150,238 / 53,661 in the e2e build, the plus 4.
+  // 150,242 / 53,665 -> 150,346 / 53,705 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line (One more only when a slot is open). Measured 150,342 / 53,701 in the e2e build, the plus 4.
+  // 150,260 / 53,611 -> 150,308 / 53,625 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the English scout button name, voice line and prologue 03 line say the price. Measured 150,304 / 53,621 in the e2e build, the plus 4.
+  // 152,040 / 54,336 -> 152,663 / 54,573 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the same lines in English. Measured 152,659 / 54,569 in the e2e build, the plus 4.
+  // -> 152,922 / 54,642 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 152,918 / 54,638 in the e2e build, the plus 4.
+  // 153,720 / 54,702 -> 154,343 / 54,949 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 154,339 / 54,945 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 154_343, maxGzip: 54_949 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1831,7 +1874,18 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 432,043 / 489,484 / 496,601 -> 432,173 / 489,915 / 497,065 on 2026-11-06, bundle-1106a after merging main 7e1fe0f0 (#461 rules-1105, #458 bundle-mood): the two sides' lines together. Measured 432,169 / 489,911 / 497,061 in the e2e build, the plus 4.
 // -> 432,365 / 489,860 / 496,995 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): the lines above together. Measured 432,361 / 489,856 / 496,991 in the e2e build, the plus 4.
 // 432,173 / 489,915 / 497,065 -> 432,507 / 490,290 / 497,455 on 2026-11-06, bundle-1106a after merging main 6f58cbb8 (#459 bundle-1105d): the two sides' lines together. Measured 432,503 / 490,286 / 497,451 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 432_507, en: 490_290, ja: 497_455 };
+// 426,845 / 483,841 / 490,518 -> 426,941 / 484,121 / 490,812 on 2026-11-05, kd-spend-ui over main 2bd9a8ba (C9 PR 2, on PR 1 66bdce6a): the draft's buy buttons' CSS in the index sheet (the critical CSS only its hash) and the two dictionaries' relic lines above. Measured 426,937 / 484,117 / 490,808 in the e2e build, the plus 4.
+// 426,941 / 484,121 / 490,812 -> 426,950 / 484,131 / 490,822 on 2026-11-05, kd-spend-ui trim over main 2bd9a8ba: the draft's buy rules moved to a sheet of their own (src/styles/app/draft-spend.css, imported after relics.css; the index CSS carries the same rules, the critical CSS only its hash) and index.html's hashed names moved with them. Measured 426,946 / 484,127 / 490,818 in the e2e build, the plus 4.
+// 426,950 / 484,131 / 490,822 -> 426,950 / 484,169 / 490,868 on 2026-11-05, kd-spend-ui hint over main 2bd9a8ba: the draft's spendHint line in the two dictionaries above (the Korean line rides the engine chunk, not the first paint). Measured 426,946 / 484,165 / 490,864 in the e2e build, the plus 4; the Korean budget stays.
+// The CI build (Linux) measures the first paint 4 bytes over this PC's e2e build (9e4ec6bf: Korean 426,929, Japanese 490,601):
+// the budgets are the CI's plus 4, 426,933, 483,927 and 490,605.
+// 426,933 / 483,927 / 490,605 -> 426,929 / 483,921 / 490,604 on 2026-11-05, phone-en-stake-11px over rules-mark-3b 9e91c588: the 360px English bank rail's 10px label rule went (play.css; the critical CSS does not carry it). Measured 426,921 / 483,916 / 490,594 in the e2e build here, 4 / 6 / 1 under cb904fb6's 426,925 / 483,922 / 490,595; the CI build reads 4 / 1 / 6 over this PC (30f5519d), so the budgets are the CI's expected 426,925 / 483,917 / 490,600 plus 4.
+// en 487,123 -> 487,130 and ja 494,315 -> 494,328 on 2026-11-05, scout-narrow over main 8ac59b71: SCOUT costs 믿음 1 (B1, 11-05 decision (1)): the language dictionaries above. Measured 430,381 / 487,126 / 494,324 in the e2e build, the plus 4 (ko under its 430,390).
+// 430,386 / 487,129 / 494,322 -> 430,401 / 487,134 / 494,327 on 2026-11-05, stake-clock over main e68fe8cc: the entry carries the stake's three layers (stakeLayers.js) for the score and the clock. Measured 430,397 / 487,130 / 494,323 in the e2e build, the plus 4.
+// 432,043 / 489,484 / 496,601 -> 432,147 / 489,827 / 497,021 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (the index CSS and the entry; en and ja by their dictionaries). Measured 432,143 / 489,823 / 497,017 in the e2e build, the plus 4.
+// -> 432,479 / 490,209 / 497,421 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 432,475 / 490,205 / 497,417 in the e2e build, the plus 4.
+// 432,507 / 490,290 / 497,455 -> 432,622 / 490,652 / 497,862 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2): the two sides' lines together. Measured 432,618 / 490,648 / 497,858 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 432_622, en: 490_652, ja: 497_862 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

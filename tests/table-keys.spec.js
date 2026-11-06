@@ -134,12 +134,12 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
  * and the spent button stays where it was, aria-disabled, so the focus is not
  * dropped to the page (decision 11).
  */
-test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds, and the spent button keeps the focus", async ({ page }) => {
+test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds (and 믿음 1 at the settle), and the spent button keeps the focus", async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   const scout = page.getByTestId("commit-scout");
-  // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price.
-  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 시간 3초$/);
+  // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price (B1: 믿음 1 and the clock).
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 믿음 1과 시간 3초$/);
   await expect(scout).toHaveAttribute("aria-disabled", "false");
   const bandOf = async () => (await scout.textContent()).match(/벽 (\d+)–(\d+)/).slice(1).map(Number);
   const [low, high] = await bandOf();

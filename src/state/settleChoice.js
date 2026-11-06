@@ -155,6 +155,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     fracturedAxis: verdict.fracturedAxis,
     fractureRate: verdict.fractureRate,
     focusMultiplier: verdict.focus?.resourceMultiplier,
+    scouted: verdict.scouted,
   });
   return {
     ...route,
