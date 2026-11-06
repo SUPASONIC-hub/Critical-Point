@@ -61,6 +61,15 @@ export const RELIC_OFFER_SIZE = 3;
  * still has to put one down to take another.
  */
 export const RELIC_SLOTS = 5;
+/**
+ * What the KD은행 계좌 pays at a draft (C9, 11-30; design-kd-spend-relic.md,
+ * the user's answers of 2026-11-04, all 1): a second draw of the three, and a
+ * second relic out of the three on the table. Each once a draft, taken out of
+ * the vault at the press with no question asked, so the ending's vault slack
+ * reads what is left. Neither moves the pot, the wall or the gauge.
+ */
+export const RELIC_REROLL_COST = 4000;
+export const RELIC_EXTRA_COST = 12000;
 /** The logic streak that unlocks ENCORE: the streak at which the pot's bonus is full. */
 const ENCORE_UNLOCK_COMBO = 8;
 /** The pot the wall has to take from you before INSURANCE is on the table. */

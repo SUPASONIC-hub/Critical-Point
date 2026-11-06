@@ -21,6 +21,22 @@ export default {
     allOpen: " · すべて解放",
     back: "ほかのツールを見る",
     skip: "選ばずに{name} · {short}",
+    skipPaid: "選ばずに進む",
+    reroll: "引き直し · {cost}",
+    extra: "もう一つ · {cost}",
+    spendNote: "押すとKD銀行口座からすぐ引かれ、取り消せない。",
+    spendHint: "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。",
+    secondTitle: "もう一つ選ぶ",
+    secondLede: "買った一つを、残る二つから選ぶ。",
+    off: {
+      practice: "やり直しの事件では使えない",
+      story: "ストーリーモードでは使えない",
+      record: "このセーブのドラフトでは使えない",
+      used: "この事件で使用済み",
+      picked: "選択済み",
+      few: "残りのツールが一つだけ",
+      short: "残高不足",
+    },
   },
   relics: {
     metronome: {

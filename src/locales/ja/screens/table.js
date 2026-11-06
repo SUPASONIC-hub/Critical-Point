@@ -101,7 +101,7 @@ export default {
     relicsLabel: "装備したツール",
     scout: "照会",
     scouted: "照会済み",
-    scoutLabel: "壁 {min}–{max} · 照会、時間{seconds}秒",
+    scoutLabel: "壁 {min}–{max} · 照会、信頼{trust}と時間{seconds}秒",
     glossaryCard: "カード{number}: {label}（{type}）",
     glossaryMastery: "シーズン熟練: LOCKをチャージしたまま確定した勝負の数。構えごとに{goal}勝負を満たすと、新しい勝負のルールが変わる（STRIKE {strike} · STEADY {steady} · EXPOSE {expose}）。",
   },
@@ -231,7 +231,7 @@ export default {
     push: "熱 {gauge} · {danger}",
     wall: "いま熱 {gauge} · {danger}",
     stance: "チャージ {focus} · 確定すると次の勝負は{label} · {title}",
-    scout: "照会した。壁は {min} から {max} のあいだのどこか",
+    scout: "照会した。信頼を{trust}使った。壁は {min} から {max} のあいだのどこか",
     bank: "賭け金 {pot} · 金庫 {vault}",
   },
   afterword: {

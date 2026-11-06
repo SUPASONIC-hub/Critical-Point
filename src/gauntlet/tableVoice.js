@@ -4,6 +4,7 @@ import { formatNumber } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
 import { dangerZoneOf } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
+import { SCOUT_TRUST } from "./tableRules.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -71,8 +72,8 @@ export const describeWall = ({ gauge, dangerLine }) => fill(voice().wall, { gaug
 
 export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { focus: Math.round(focus), label: carry.label, title: carry.title });
 
-/** What a look bought (`getWindowBand`): the band it narrowed to, never the wall inside it. */
-export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax });
+/** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took. */
+export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax, trust: SCOUT_TRUST });
 
 export const describeBank = ({ runPot, vault }) => fill(voice().bank, { pot: formatNumber(runPot), vault: formatNumber(vault) });
 

@@ -43,6 +43,7 @@ import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
   BUST_EFFECT,
+  buyExtraRelic,
   createCaseClose,
   createRunSummary,
   createWindow,
@@ -57,13 +58,14 @@ import {
   HAND_CAP,
   openCaseRun,
   reduceWindow,
+  rerollRelicOffer,
   resolveWindow,
   RUN_INITIAL_STATE,
   STANCE_CHARGE,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
-import { LOCK_PRESS_SECONDS } from "../../src/gauntlet/tableRules.js";
+import { LOCK_PRESS_SECONDS, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
@@ -116,6 +118,19 @@ export function takeIntoSlots(run, taken, tools = null) {
   return weakest === taken ? equipRelic(run, null) : equipRelic(run, taken, weakest);
 }
 
+/**
+ * What a `spend` policy pays for at a draft (createSeasonBot's `spend`; the
+ * pressure report's draft rows read it too): the reroll, one more, both, or
+ * -- "early" -- each only while the slots have room for what it brings.
+ */
+export function spendsAt(spend, run) {
+  const room = RELIC_SLOTS - run.relics.length;
+  return {
+    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1),
+    extra: spend === "extra" || spend === "always" || (spend === "early" && room >= 2),
+  };
+}
+
 /** How a card reads to a player who values these axes. Costs are negative. */
 export const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
 const worth = (key, value) => (key === "humanCost" || key === "fatigue" ? -value : value);
@@ -140,6 +155,24 @@ export const POPULATION = ["random", "random", "procedure", "money", "balanced",
 
 /** How far past the scouted band's near end a scouting hand lets the next step reach. */
 const SCOUT_EDGE = 3;
+
+/**
+ * When a hand that looks (SCOUT, B1) takes its one look: the archetype's
+ * `scout` and the pressure report's `scout at` rows. "always" is before the
+ * first push, as every hand looked until 2026-11-05; "late" before the third
+ * push (the first two bust ~0%, measured 2026-10-13); "danger" the moment the
+ * next push can reach the band on the table (the 현재 위험 line's 「닿을 수
+ * 있다」); "never" not at all. Until the look is taken the hand plays the
+ * heartbeat. A look costs SCOUT_TRUST of 믿음, so a hand with less does not
+ * look (`playWindow`'s `trust`).
+ */
+export const SCOUT_TIMINGS = Object.freeze(["never", "always", "late", "danger"]);
+export function scoutDue(timing, win) {
+  if (timing === "always") return true;
+  if (timing === "late") return win.pushes >= 2;
+  if (timing === "danger") return win.gauge + win.schema.stepMax >= win.schema.wallMin;
+  return false;
+}
 
 /**
  * B2's links are a rule of the table since RULES_MARK 3: every case whose
@@ -260,8 +293,15 @@ export const AUDIT_VALUES = (() => {
  * `reads` it reads each briefing to the end first and logs the page's seconds
  * and clock as the page does (`readSec`, `readClock`, 2026-11-03), without it
  * it opens the table at once and logs no page. The stream draws as before.
+ * `spend` is what the player pays for at each draft (C9): "never" (the
+ * default, and every report measured before it), "reroll" (the one reroll,
+ * whenever the vault holds its price), "extra" (one more relic, likewise),
+ * "always" (both, the reroll first), or "early" (both, but only while the
+ * slots have room: the reroll with a slot free, one more with two). A spend
+ * draws nothing; the second pick of a draft that bought one more draws as the
+ * first does.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false, spend = "never" }) {
   const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (!story && stamped ? { weekRule: stamped } : {});
   let seed = start;
@@ -288,6 +328,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       // 판 읽기 ladder of report-reading-axis.mjs); the draw is still made, so
       // every draw after it keeps its place in the stream.
       listens: ((drawn) => (base.board ? base.board === "listens" || base.board === "heartbeat" : drawn))(random() < 0.4),
+      // When a listening hand takes its look (`scoutDue`, B1); "always" is how every hand looked before B1's price, and the heartbeat hand never looks.
+      scout: SCOUT_TIMINGS.includes(base.scout) ? base.scout : base.board === "heartbeat" ? "never" : "always",
       bpm: pick([95, 100, 105, 110]),
       reframe: pick([0, 0.15, 0.35, 0.6]),
       think: 2 + random() * 10,
@@ -323,7 +365,12 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     }, {});
   }
 
-  function playWindow(policy, run, windowSeed, rules, hand = null) {
+  /**
+   * `trust` is the 믿음 the hand holds as the table opens: a look costs
+   * SCOUT_TRUST of it (B1), and the table does not sell one to a hand that
+   * cannot pay. Left out, the hand is taken to afford it.
+   */
+  function playWindow(policy, run, windowSeed, rules, hand = null, trust = Infinity) {
     // The run's own board, and for a story run the same board with its far wall.
     let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
     win = reduce(win, { type: "SELECT", id: "card" }, rules);
@@ -346,13 +393,16 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     }
     const target = policy.heat + (random() - 0.5) * 10;
     // SCOUT (B1): the player who reads the heartbeat also takes the one look
-    // the table sells, and pushes while the next step stays under the band it
-    // drew -- past that, on the heartbeat, never past the band's far end. No
-    // draw from the stream: without the rule the season is the season before it.
-    const scouts = policy.listens && rules.has("scout") && policy.board !== "heartbeat";
-    if (scouts) win = scoutWindow(win, true, rules, reduce);
+    // the table sells -- when `policy.scout` says (`scoutDue`), and only with
+    // the 믿음 to pay for it -- and pushes while the next step stays under the
+    // band it drew -- past that, on the heartbeat, never past the band's far
+    // end. Until the look it plays the heartbeat. No draw from the stream:
+    // without the rule the season is the season before it.
+    const scouts = policy.listens && rules.has("scout") && policy.scout !== "never" && trust >= SCOUT_TRUST;
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
-      const band = scouts ? getWindowBand(win) : null;
+      if (scouts && !win.scouted && scoutDue(policy.scout, win)) win = scoutWindow(win, true, rules, reduce);
+      if (win.status !== "live") break;
+      const band = win.scouted ? getWindowBand(win) : null;
       const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
       const keepGoing = policy.board === "sees"
         ? win.gauge + win.schema.stepMax < win.wall
@@ -419,6 +469,13 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       const rules = playedRules(getTableRules(caseId, run, staged));
       const nextCaseRules = playedRules(getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged));
       run = openCaseRun(run, { rules, caseId, resources });
+      // The draft the case before closed on, answered at this case's first
+      // table, after it opened -- where the page holds it (GauntletStage).
+      if (run.relicOffer.length) run = takeDraft(run, tools);
+      // The tools held as an act closes (C-7), noted once its closing draft is answered here (C9 answers it at this case's open):
+      // a season's end has swapped its way to the strongest, its first acts not yet.
+      const closedCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
+      if (RELICS_HELD_AT.includes(closedCaseId)) relicsAt[closedCaseId] = [...run.relics];
       let audit = 0;
       // B2, CASCADE_ON only: the case's links off its own log (cascadeRisk.js).
       let linkLog = [];
@@ -462,7 +519,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             return !best || score > best.score ? { choice: candidate, score } : best;
           }, null).choice;
 
-        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null);
+        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null, resources.trust);
         windows += 1;
         const responseTimeSec = Math.max(1, Math.round(window.elapsed));
         const reframe = choice.type === "reframe";
@@ -499,6 +556,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           fracturedAxis: verdict.fracturedAxis,
           fractureRate: verdict.fractureRate,
           focusMultiplier: verdict.focus?.resourceMultiplier,
+          scouted: verdict.scouted,
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
         const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? BUST_EFFECT : {});
@@ -525,6 +583,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           resourcesAfter,
           challenge: { matched: read.challengeMatch, riskDelta: read.riskDelta },
           ...(run.story ? { assistStory: true } : {}),
+          // The draft taken before this window, as useChoiceCommit writes it (C9).
+          ...(run.relicDraft ? { relicDraft: run.relicDraft } : {}),
           threshold: {
             busted,
             potMultiplier: verdict.multiplier,
@@ -552,9 +612,6 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           caseLogs[caseId] = log;
           caseDynamics[caseId] = { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec };
           casePeaks.push(summary.peakRiskPressure);
-          if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
-          // The tools held as an act closes (C-7): a season's end has swapped its way to the strongest, its first acts not yet.
-          if (RELICS_HELD_AT.includes(caseId)) relicsAt[caseId] = [...run.relics];
           if (caseId === "final") final = { resources, log };
         }
         nodeId = nextNode;
@@ -574,6 +631,17 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * (the streak's own rule, gauntlet/logicStreak.js). When its direction is
    * not on the table it takes what is.
    */
+  /** A draft answered: what `spend` pays for, then a pick (two when one more was bought). */
+  function takeDraft(start, tools) {
+    let run = start;
+    const { reroll, extra } = spendsAt(spend, run);
+    if (reroll) run = rerollRelicOffer(run);
+    if (extra) run = buyExtraRelic(run);
+    run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+    if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
+    return run;
+  }
+
   function pickByType(policy, cards, logic) {
     const held = logic.type ?? policy.holds;
     const leave = policy.logicHand === "switch" && logic.rose;
@@ -609,7 +677,7 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
 /**
  * The bust chain (improvement notes C-14, 2026-10-22): boards played right
  * after a bust in the same case, against the rest. `afterBust*` is every such
@@ -627,6 +695,8 @@ function see(seen, verdict) {
   seen.streakSum += verdict.logic.streak;
   count(seen.moves, verdict.logic.move);
   count(seen.pushed, verdict.pushes);
+  // B1: the windows that spent their look (each paid SCOUT_TRUST of 믿음, which a case player does not hold).
+  if (verdict.scouted) seen.scouts += 1;
   // AUDIT_ON only: the closes the audit took its part of, that part, and what those closes moved before it.
   if (verdict.audit?.caught) {
     seen.audits += 1;
@@ -677,10 +747,13 @@ const STANCES = ["strike", "steady", "strike", "steady", "expose"];
  * the decide function's own mark (`decide.scout`): `true` presses SCOUT as the
  * table does, and `{ seconds }` is a sweep's candidate price, paid on the clock
  * the same way (the band's reach is the decide function's to read, through
- * `getWindowBand`). A case without the rule looks at nothing.
+ * `getWindowBand`). A function is a timed look (`scoutDue`'s shape, `(win) =>
+ * boolean`): `playCase` asks it before each push and presses SCOUT the first
+ * time it says so, so here, before the first push, it is not yet a look. A
+ * case without the rule looks at nothing.
  */
 function scoutWindow(win, scout, rules = ALL_RULES, reduce = reduceWindow) {
-  if (!scout || win.status !== "live") return win;
+  if (!scout || typeof scout === "function" || win.status !== "live") return win;
   if (scout === true || !Number.isFinite(scout.seconds)) return reduce(win, { type: "SCOUT" }, rules);
   if (!rules.has("scout") || win.scouted) return win;
   let spent = { ...win, scouted: true };
@@ -753,6 +826,9 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       }
       win = scoutWindow(win, decide.scout, rules, reduce);
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
+        // A timed look (B1, `scoutDue`): the first push before which the hand's own timing says so.
+        if (typeof decide.scout === "function" && !win.scouted && decide.scout(win)) win = scoutWindow(win, true, rules, reduce);
+        if (win.status !== "live") break;
         // `audit` is the case's audit so far, for a hand that reads it (AUDIT_ON).
         if (!decide(win, run, audit)) break;
         win = reduce(win, { type: "PUSH" }, rules);

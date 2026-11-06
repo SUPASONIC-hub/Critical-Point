@@ -333,7 +333,12 @@ const fileBudgets = {
   // apart from the HUD block that the audit token (#224) adds to.
   // -> 3029 / 58893 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
   // 3029 / 58893 -> 3029 / 58883 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood), measured.
-  "play.css": { lines: 3029, bytes: 58883 },
+  // -> 58276 bytes, 2998 lines on 2026-11-05, measured (phone-en-stake-11px over rules-mark-3b 9e91c588): the 360px English
+  // bank rail's 10px label rule went; Audit n/4 sits on the signals' row now, so Stake and Vault read 11px like ko and ja.
+  // 3029 / 58883 -> 3025 / 58815 on 2026-11-05, measured (bundle-rules2: kd-spend-engine, kd-spend-ui, phone-en-stake-11px,
+  // scout-narrow, stake-clock over rules-1105 dd2cd419): the 360px English 10px label rule out (phone-en-stake-11px) beside
+  // the stake clock's HUD lines; the ratchet goes down with it, never up again after rules-1105's one raise.
+  "play.css": { lines: 3025, bytes: 58815 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -422,7 +427,9 @@ const fileBudgets = {
   // draft's side insets.
   // 482 / 10100 -> 473 / 9410 on 2026-10-13: comments no longer counted
   // (9 lines and 690 bytes of them that day), the room unchanged.
-  "relics.css": { lines: 473, bytes: 9410 },
+  // 473 / 9410 -> 472 / 9356 on 2026-11-05, measured (bundle-rules2): kd-spend-ui's trim moved the draft's two buys into
+  // draft-spend.css and left relics.css a line shorter; the ratchet follows.
+  "relics.css": { lines: 472, bytes: 9356 },
   // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
   // 204 / 4800 -> 240 / 5850 on 2026-09-28 for the forced-colours block: an
   // edge on every bar's track and a system colour on its fill.
@@ -492,6 +499,11 @@ const fileBudgets = {
   // 282 / 5713 -> 283 / 5730 the same day, measured: the band under the music
   // pills (29), the corner box over the layers (30).
   "money.css": { lines: 283, bytes: 5730 },
+  // New on 2026-11-05 (kd-spend-ui, C9 PR 2 over main 2bd9a8ba): the relic
+  // draft's two buys out of the KD은행 계좌 (다시 뽑기, 하나 더: RelicDraft.jsx's
+  // DraftBuy), in a file of their own beside relics.css, whose 473 / 9410 was
+  // every line spent. Measured 41 / 808.
+  "draft-spend.css": { lines: 41, bytes: 808 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

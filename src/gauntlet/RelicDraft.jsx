@@ -7,6 +7,8 @@ import { useDialogFocus } from "./useDialogFocus.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
+import { formatNumber } from "./tableReadout.js";
+import { readDraftSpend } from "./draftSpend.js";
 
 // The draft's words (src/copy/relics.js).
 const say = relicsCopy.draft;
@@ -48,8 +50,21 @@ export function RelicIcon({ id, size = 14 }) {
  * stage so the keys see it too): the hand turns into the relics carried, 1-9
  * put one down, Escape goes back to the offer, and the pass stays. The swap is
  * answered in one call (`onPick(id, dropId)`), so nothing half-made is saved.
+ *
+ * C9: under the hand, the KD은행 계좌 pays -- 다시 뽑기 (R) and 하나 더 (B),
+ * each once, taken out of the vault at the press with no question asked and
+ * two lines under them: the press pays at once, and one more is for a slot
+ * that is open (buying every time dries the vault the ending reads). What
+ * each button says is `readDraftSpend(run)`
+ * (draftSpend.js), read here when there is an `onSpend` to pay through: a
+ * button that cannot pay stays in its place, `aria-disabled`, with its reason
+ * beside it and as its description. A draft that bought one more comes back
+ * after the first pick with the other two (`spend.second`).
  */
-export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onBack, onSkip }) {
+export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null, onSpend = null, onPick, onBack, onSkip }) {
+  const spend = onSpend ? readDraftSpend(run) : null;
+  // A draft that paid for 하나 더 gets no 숨 고르기 on a pass (engine equipRelic, 2026-11-05 decision): the pass button promises nothing.
+  const paid = Boolean(run?.relicDraft?.extra);
   const [codex] = useState(readRelicCodex);
   const { letterKeys, keys } = useShortcutHints();
   const dialogRef = useRef(null);
@@ -69,12 +84,14 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
     <div ref={dialogRef} className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft" onKeyDown={trapTab}>
       <div className="gx-draft-panel">
         <span className="gx-draft-kicker">{swapFor ? <>{say.full} · <span lang="en">SWAP</span></> : <>{say.closed} · <span lang="en">RELIC DRAFT</span></>}</span>
-        <h2 id="gx-draft-title">{swapFor ? say.swapTitle : say.title}</h2>
+        <h2 id="gx-draft-title">{swapFor ? say.swapTitle : spend?.second ? say.secondTitle : say.title}</h2>
         {/* Polite, so the swap step is read out when the hand turns over. */}
         <p className="gx-draft-lede" aria-live="polite">
           {swapFor
             ? fill(say.swapLede, { name: RELICS[swapFor].name, particle: objectParticle(RELICS[swapFor].name) })
-            : fill(say.lede, { slots: RELIC_SLOTS, when: full ? say.ledeFull : say.ledeRoom })}
+            : spend?.second
+              ? say.secondLede
+              : fill(say.lede, { slots: RELIC_SLOTS, when: full ? say.ledeFull : say.ledeRoom })}
         </p>
         <ul className="gx-draft-hand">
           {hand.map((id, index) => {
@@ -105,6 +122,14 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
             );
           })}
         </ul>
+        {spend && !swapFor && !spend.second && (
+          <div className="gx-draft-spend" data-testid="relic-spend">
+            <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={() => onSpend("reroll")} />
+            <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={() => onSpend("extra")} />
+            <small className="gx-draft-note">{say.spendNote}</small>
+            <small className="gx-draft-note">{say.spendHint}</small>
+          </div>
+        )}
         <div className="gx-draft-foot">
           <ol className="gx-codex" aria-label={fill(say.codexLabel, { total: RELIC_IDS.length, count: unlockedCount })}>
             {RELIC_IDS.map((id) => {
@@ -142,13 +167,42 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, onPick, onB
               {say.back}
             </button>
           )}
-          <button type="button" className="ghost gx-draft-skip" data-testid="relic-skip" aria-keyshortcuts={swapFor ? undefined : "Escape"} aria-describedby="gx-draft-breather" onClick={onSkip}>
-            {fill(say.skip, BREATHER)}
+          <button type="button" className="ghost gx-draft-skip" data-testid="relic-skip" aria-keyshortcuts={swapFor ? undefined : "Escape"} aria-describedby={paid ? undefined : "gx-draft-breather"} onClick={onSkip}>
+            {paid ? say.skipPaid : fill(say.skip, BREATHER)}
           </button>
           {/* The whole of it for a screen reader; the eye reads the button's short form (no line more on a phone). */}
-          <span className="sr-only" id="gx-draft-breather">{BREATHER.text}</span>
+          {!paid && <span className="sr-only" id="gx-draft-breather">{BREATHER.text}</span>}
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * One of the draft's two buys. Off, it keeps its place and its name and says
+ * why, beside it and as its description; `aria-disabled` rather than
+ * `disabled`, so it can still be reached and read.
+ */
+function DraftBuy({ id, state, label, shortcut, onPress }) {
+  const why = state.open ? null : say.off[state.reason];
+  return (
+    <span className="gx-draft-buy-slot">
+      <button
+        type="button"
+        className="ghost gx-draft-buy"
+        data-testid={`relic-${id}`}
+        aria-disabled={state.open ? undefined : "true"}
+        aria-describedby={why ? `gx-draft-${id}-why` : undefined}
+        aria-keyshortcuts={state.open ? shortcut : undefined}
+        onClick={state.open ? onPress : undefined}
+      >
+        {fill(label, { cost: formatNumber(state.cost) })}
+      </button>
+      {why && (
+        <small id={`gx-draft-${id}-why`} className="gx-draft-why">
+          {why}
+        </small>
+      )}
+    </span>
   );
 }
