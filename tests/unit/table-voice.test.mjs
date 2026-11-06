@@ -13,7 +13,8 @@ globalThis.localStorage = createStorage();
 
 const voice = await import("../../src/gauntlet/tableVoice.js");
 const { CLOCK_OPENED_CALL } = await import("../../src/gauntlet/tableReadout.js");
-const { getHoldArmedCall, describePush, describeScout, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { getHoldArmedCall, describePush, describeWall, describeScout, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { dangerZoneOf, readDangerZone } = await import("../../src/gauntlet/tableMeters.js");
 
 const STRIKE_WAKE = { id: "strikeWake", label: "STRIKE WAKE", title: "다음 판이 더 두껍게 깨어난다" };
 const STEADY_LINE = { id: "steadyLine", label: "STEADY LINE", title: "다음 판이 식은 채 열린다" };
@@ -41,6 +42,28 @@ test("a push is said after it lands; the heat the clock adds is not", () => {
   assert.deepEqual(listTableCalls(before, facts({ win: tableWindow({ gauge: 31 }) })), [], "creep moves the heat with no push");
   assert.deepEqual(listTableCalls(before, facts({ win: tableWindow({ gauge: 90, pushes: 1 }), live: false })), [], "a push into the wall is the slam's");
   assert.deepEqual(listTableCalls(null, facts()), [], "a table's first render has nothing to compare");
+});
+
+test("the clock's creep is said once it crosses a step of the danger line, and a push's crossing is the push's", () => {
+  assert.equal(readDangerZone({ gauge: 30, nextHigh: 48, wallMin: 60 }), "distance");
+  assert.equal(readDangerZone({ gauge: 42, nextHigh: 60, wallMin: 60 }), "inReach");
+  assert.equal(readDangerZone({ gauge: 60, nextHigh: 78, wallMin: 60 }), "inBand");
+  assert.deepEqual(["벽까지 최소 12", "밀면 벽 사정권", "벽 구간 안", ""].map(dangerZoneOf), ["distance", "inReach", "inBand", ""], "the step is read back off the line");
+  assert.equal(describeWall({ gauge: 42.4, dangerLine: "밀면 벽 사정권" }), "지금 열기 42 · 밀면 벽 사정권");
+  const far = facts({ win: tableWindow({ gauge: 30 }), dangerLine: "벽까지 최소 12" });
+  const nearer = facts({ win: tableWindow({ gauge: 33 }), dangerLine: "벽까지 최소 9" });
+  assert.deepEqual(listTableCalls(far, nearer), [], "the number the creep moves is not said");
+  const reach = facts({ win: tableWindow({ gauge: 42 }), dangerLine: "밀면 벽 사정권" });
+  assert.deepEqual(listTableCalls(nearer, reach), [{ kind: "wall", text: "지금 열기 42 · 밀면 벽 사정권" }]);
+  assert.deepEqual(listTableCalls(reach, facts({ win: tableWindow({ gauge: 44 }), dangerLine: "밀면 벽 사정권" })), [], "the same step is not news");
+  const inBand = facts({ win: tableWindow({ gauge: 60 }), dangerLine: "벽 구간 안" });
+  assert.deepEqual(listTableCalls(reach, inBand), [{ kind: "wall", text: "지금 열기 60 · 벽 구간 안" }]);
+  // A cooling press (STEADY's relief) that steps the line back down is said the same way.
+  assert.deepEqual(listTableCalls(inBand, reach), [{ kind: "wall", text: "지금 열기 42 · 밀면 벽 사정권" }]);
+  const pushedIn = facts({ win: tableWindow({ gauge: 60, pushes: 1 }), dangerLine: "벽 구간 안" });
+  assert.deepEqual(listTableCalls(reach, pushedIn), [{ kind: "push", text: "열기 60 · 벽 구간 안" }], "a push that crosses is one call, the push's");
+  assert.deepEqual(listTableCalls(facts({ dangerLine: "" }), reach), [], "a table that hands no line over says nothing of it");
+  assert.deepEqual(queueCalls([{ kind: "wall", text: "지금 열기 42 · 밀면 벽 사정권" }], [{ kind: "push", text: "열기 38 · 벽까지 최소 14" }]).map((call) => call.kind), ["push", "wall"], "a waiting crossing is said after the push");
 });
 
 test("the charge is said when it starts to count for the stance, and when the stance it counts for changes", () => {

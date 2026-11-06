@@ -8,7 +8,7 @@ import tableCopy from "../../src/copy/table.js";
 import seasonEndCopy from "../../src/copy/seasonEnd.js";
 import { describeMutations, MUTATIONS } from "../../src/gauntlet/gauntletEngine.js";
 import { BLACKOUT_WALL_SHIFT, SEAL_BREAK_GAUGE } from "../../src/gauntlet/tableRules.js";
-import { describeBank, describeScout, describeStanceCarry, getHoldArmedCall } from "../../src/gauntlet/tableVoice.js";
+import { describeBank, describeScout, describeStanceCarry, describeWall, getHoldArmedCall } from "../../src/gauntlet/tableVoice.js";
 import { getAuthorityProfile } from "../../src/runtimeSystems.js";
 import { describeAfterword, getTableReaction } from "../../src/gauntlet/tableAfterword.js";
 
@@ -52,6 +52,7 @@ test("the English dictionary is printed once it is laid over the tables", () => 
   assert.equal(coldFeet.title, "Chips shrank");
   assert.equal(getHoldArmedCall(), "Press once more to Commit");
   assert.equal(describeBank({ runPot: 1200, vault: 0 }), "Stake 1,200 · Vault 0");
+  assert.equal(describeWall({ gauge: 60.2, dangerLine: "Inside the Wall band" }), "Now Heat 60 · Inside the Wall band");
   assert.equal(describeStanceCarry({ focus: 12.4, carry: MUTATIONS.steadyLine }), "Charge 12 · Commit for STEADY LINE next hand · The next hand opens cool");
   assert.equal(getTableReaction([{ threshold: { pushes: 2, gauge: 41.5, wall: 66 } }], "n1").recap, "Last hand · pushed 2×, Committed at Heat 41 (Wall 66)");
   assert.equal(describeAfterword({ status: "bust", cause: "push", wall: 70, tellOffset: 4, schema: {} }), "The heartbeat heard the Wall around 74 (it was 70).");

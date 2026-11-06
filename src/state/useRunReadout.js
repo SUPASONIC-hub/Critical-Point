@@ -16,7 +16,7 @@ import {
   getRiskPressure,
   getSuspenseState,
 } from "../gameLogic.js";
-import { getJudgementHabit } from "../judgementHabit.js";
+import { getJudgementHabit, habitCardLine } from "../judgementHabit.js";
 import { countAudit, isAuditOn } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
 import { getTableReaction } from "../gauntlet/tableAfterword.js";
@@ -116,8 +116,12 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   const decisionLedger = useMemo(() => getDecisionLedger(log, resources), [log, resources]);
   // The season's 판단 습관 rides on the fingerprint because the fingerprint is
   // what the report already hands the result card: the card is given the
-  // finished name and no new field (judgementHabit.js).
-  const judgementHabit = useMemo(() => getJudgementHabit(caseResults), [caseResults]);
+  // finished name, and the one sentence it says the name in (D1), and no new
+  // field (judgementHabit.js).
+  const judgementHabit = useMemo(() => {
+    const habit = getJudgementHabit(caseResults);
+    return habit && { ...habit, card: habitCardLine(habit) };
+  }, [caseResults]);
   const decisionFingerprint = useMemo(
     () => ({ ...getDecisionFingerprint({ triggerScores: triggers, cognitionScores: cognition, entries: log, resources }), habit: judgementHabit }),
     [cognition, judgementHabit, log, resources, triggers],

@@ -12,10 +12,29 @@ import tableCopy from "../copy/table.js";
  * the band it says so, as the tab does (`열기 67 · 벽 구간 안`); it used to
  * keep saying the next push could reach a band the heat was already in.
  * Each line fits the cell on a 360px phone without the ellipsis.
+ *
+ * `readDangerZone` is which of the three the line stands in -- the cell's
+ * only threshold -- and `dangerZoneOf` reads it back off a line the stage
+ * already hands over, for the voice, which says the clock's creep once it
+ * has crossed a step and never the number it moves on every tick
+ * (tableVoice.js). The line and the words are read off the same table, so
+ * another language laid over them is read back the same.
  */
+export function readDangerZone({ gauge, nextHigh, wallMin }) {
+  if (gauge >= wallMin) return "inBand";
+  if (nextHigh >= wallMin) return "inReach";
+  return "distance";
+}
+
+export function dangerZoneOf(line) {
+  if (!line) return "";
+  if (line === tableCopy.danger.inBand) return "inBand";
+  return line === tableCopy.danger.inReach ? "inReach" : "distance";
+}
+
 export function describeDanger({ gauge, nextHigh, wallMin }) {
-  if (gauge >= wallMin) return tableCopy.danger.inBand;
-  if (nextHigh >= wallMin) return tableCopy.danger.inReach;
+  const zone = readDangerZone({ gauge, nextHigh, wallMin });
+  if (zone !== "distance") return tableCopy.danger[zone];
   return fill(tableCopy.danger.distance, { distance: Math.max(0, Math.ceil(wallMin - nextHigh)) });
 }
 
