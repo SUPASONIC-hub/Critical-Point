@@ -4,10 +4,11 @@
 // lead and voices the table's drone, and a place to rate them.
 import { StrictMode, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { AdaptiveMusic, MUSIC_MOODS, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
+import { AdaptiveMusic, MUSIC_MOODS, setMusicLimiter, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
 import { chapterMotifs, speakerMotifs } from "../components/musicData.js";
 import { createSceneMode, moodLeads, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
 import { startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { MUSIC_LIMITER_ON } from "../components/musicLimiter.js";
 import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
 
 const MOOD_NAMES = { neutral: "중립", bright: "밝음", tense: "긴장", dread: "공포", sorrow: "슬픔" };
@@ -48,6 +49,18 @@ const GROUPS = [
   },
 ];
 const ALL = GROUPS.flatMap((group) => group.tracks);
+
+// A7: A/B the master limiter by ear (on = the game's default in this draft).
+function LimiterToggle() {
+  const [on, setOn] = useState(MUSIC_LIMITER_ON);
+  useEffect(() => setMusicLimiter(on), [on]);
+  return (
+    <label style={{ display: "block", margin: "8px 0" }}>
+      <input type="checkbox" checked={on} onChange={(event) => setOn(event.target.checked)} />
+      리미터 켜기 (A7, 끄고 켜며 지직거림 비교)
+    </label>
+  );
+}
 
 function readNotes() {
   try {
@@ -164,6 +177,7 @@ function MusicLab() {
             판 드론 듣기 (슬라이더 값이 가까움)
           </label>
         </div>
+        <LimiterToggle />
         <div style={styles.row}>
           <button type="button" onClick={copyNotes} disabled={!rated.length}>
             평가 {rated.length}개 복사
