@@ -16,8 +16,8 @@ name: Test Week
 # reader of the live data (F1's verify:ranking) can take the same two steps.
 #
 # The summary's last column is the bot with both rules on. The script carries
-# the 10-21 lines; a fresh measurement on the test week's sha (11-14~15,
-# `AUDIT_WEEK=1 CASCADE_WEEK=1 node scripts/check-endings.mjs --report`) goes in
+# the 11-06 lines (main ac0645d3); a fresh measurement on the test week's sha (11-14~15,
+# `node scripts/check-endings.mjs --report`) goes in
 # the repository variable TEST_WEEK_SIM_LINES, which every run reads, or in the
 # `sim` input of one manual run, which wins over it. Empty, the script's lines.
 

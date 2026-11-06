@@ -248,10 +248,12 @@ export function readTestWeek(rows) {
 
 /**
  * The bot's reference for the summary's last column: the three lines
- * `check:endings` prints with both rules on (AUDIT_WEEK=1 CASCADE_WEEK=1
- * node scripts/check-endings.mjs --report; values B, the audit's exemption,
- * carry cap 1, chip margin 10, 600 seasons), copied as printed. #223 measured
- * them on 10-21 and main c8841dc0 gave the same lines on 10-25. TEST_WEEK_SIM
+ * `check:endings` prints with both rules on (node scripts/check-endings.mjs
+ * --report; values B, the audit's exemption, carry cap 1, chip margin 10, 600
+ * seasons), copied as printed. Measured on main ac0645d3 on 11-06, after #461
+ * made both rules permanent (the lines lost their `CASCADE_WEEK=1, ` /
+ * `AUDIT_WEEK=1, ` prefix) and #463/#464 moved the values. readSimulation
+ * still reads the old prefixed form, which a saved run or variable may hold. TEST_WEEK_SIM
  * names a file holding a fresh run's output (11-14~15, on the test week's
  * sha) to read instead: the workflow writes it from its `sim` input or, for
  * the nightly runs, the repository variable TEST_WEEK_SIM_LINES
@@ -259,9 +261,9 @@ export function readTestWeek(rows) {
  * as one; `readSimulation` breaks them apart again.
  */
 export const SIMULATION_LINES = [
-  "Ending checks passed (600 replayed seasons: collapse 21.0%, open-oversight 14.3%, evidence-reform 5.8%, human-record 16.7%, profitable-silence 5.5%, cold-justice 5.0%, field-pact 17.8%, quiet-cover 7.7%, open-question 6.2%)",
-  "CASCADE (measured, CASCADE_WEEK=1, values B (8/2~4/6, carry 1), chip margin 10): per season made 44.15, came back 35.04 (21.81 carried in), carried 22.20, lapsed at the season's end 0.68 and at the cap 8.44 (20.6% of made); at most 2 of a case's first two boards CASCADE; CASCADE boards 21022 in 600 of 600 seasons, bust on them 12.5% (every board 10.7%); final vault 861733 a season",
-  "Audit (measured, AUDIT_WEEK=1, values B (40/4/-2/1:4)): 789 closes caught in 62 of 600 seasons (1.31 a season), 0.6% of what the closes moved to the vault",
+  "Ending checks passed (600 replayed seasons: collapse 23.0%, open-oversight 8.8%, evidence-reform 11.2%, human-record 12.3%, profitable-silence 4.2%, cold-justice 6.0%, field-pact 17.7%, quiet-cover 8.3%, open-question 8.5%)",
+  "CASCADE (measured, values B (8/2~4/6, carry 1), chip margin 10): per season made 45.22, came back 33.81 (20.80 carried in), carried 21.10, lapsed at the season's end 0.67 and at the cap 10.73 (25.2% of made); at most 2 of a case's first two boards CASCADE; CASCADE boards 20287 in 600 of 600 seasons, bust on them 12.7% (every board 11.4%); final vault 960059 a season",
+  "Audit (measured, values B (40/4/-2/1:4)): 370 closes caught in 45 of 600 seasons (0.62 a season), 0.3% of what the closes moved to the vault",
 ].join("\n");
 
 /** The figures of the summary's last column, read off check:endings' output. */
@@ -270,12 +272,12 @@ export function readSimulation(raw) {
   const text = String(raw).replace(/[ \t]+(?=(?:Ending checks passed \(|CASCADE \(measured, |Audit \(measured, ))/g, "\n");
   const grab = (pattern, what) => {
     const match = text.match(pattern);
-    if (!match) throw new Error(`the bot's output has no ${what} line (check:endings with AUDIT_WEEK=1 CASCADE_WEEK=1)`);
+    if (!match) throw new Error(`the bot's output has no ${what} line (check:endings --report)`);
     return match;
   };
   const [, seasons, collapse] = grab(/^Ending checks passed \((\d+) replayed seasons: collapse ([\d.]+%)/m, "ending");
-  const [, made, back, cascadeBust, bust] = grab(/^CASCADE \(measured, CASCADE_WEEK=1[^)]*\)[^:]*: per season made ([\d.]+), came back ([\d.]+) .*bust on them ([\d.]+%) \(every board ([\d.]+%)\)/m, "CASCADE");
-  const [, caughtSeasons, auditSeasons, caught, vaultLost] = grab(/^Audit \(measured, AUDIT_WEEK=1.*?\): \d+ closes caught in (\d+) of (\d+) seasons \(([\d.]+) a season\), ([\d.]+%) of what/m, "audit");
+  const [, made, back, cascadeBust, bust] = grab(/^CASCADE \(measured, (?:CASCADE_WEEK=1, )?values B[^)]*\)[^:]*: per season made ([\d.]+), came back ([\d.]+) .*bust on them ([\d.]+%) \(every board ([\d.]+%)\)/m, "CASCADE");
+  const [, caughtSeasons, auditSeasons, caught, vaultLost] = grab(/^Audit \(measured, (?:AUDIT_WEEK=1, )?values B.*?\): \d+ closes caught in (\d+) of (\d+) seasons \(([\d.]+) a season\), ([\d.]+%) of what/m, "audit");
   const share = `${((Number(caughtSeasons) / Number(auditSeasons)) * 100).toFixed(1)}%`;
   return { seasons: Number(seasons), collapse, made, back, cascadeBust, bust, caught, caughtShare: share, vaultLost };
 }
@@ -339,7 +341,7 @@ export function describeTestWeek(t, sim = SIM) {
     `| 연쇄 | 벌 전 알아챔: 확정한 열기 평균, CASCADE 판 / 다른 판 | ${meanHeat(t.cascadeCashHeat, t.cascadeCashes)} / ${meanHeat(t.plainCashHeat, t.plainCashes)} | |`,
     `| 결말 | 붕괴 결말 | ${pct(t.collapse, t.endings)} (${t.collapse}/${t.endings}) | ${sim.collapse} |`,
     "",
-    `시뮬레이션 값은 감사·연쇄를 함께 켠 시즌 봇입니다(AUDIT_WEEK=1 CASCADE_WEEK=1 check:endings, 값 B·면제·이월 상한 1·칩 마진 10, ${sim.seasons}시즌${sim.fresh ? ", TEST_WEEK_SIM으로 넘긴 다시 잰 값" : ", 10-21 #223과 10-25 main c8841dc0에서 같은 값"}). 봇은 시즌을 끝까지 치므로 만듦 / 돌아옴은 끝난 시즌 줄과 견줍니다. 봇은 읽기 시계를 쓰지 않으니 BUST는 차로 봅니다. 사람이 두 장치를 함께 켠 판을 치는 것은 이 주가 처음입니다.`,
+    `시뮬레이션 값은 감사·연쇄를 함께 켠 시즌 봇입니다(check:endings --report, 값 B·면제·이월 상한 1·칩 마진 10, ${sim.seasons}시즌${sim.fresh ? ", TEST_WEEK_SIM으로 넘긴 다시 잰 값" : ", 11-06 main ac0645d3에서 잰 값"}). 봇은 시즌을 끝까지 치므로 만듦 / 돌아옴은 끝난 시즌 줄과 견줍니다. 봇은 읽기 시계를 쓰지 않으니 BUST는 차로 봅니다. 사람이 두 장치를 함께 켠 판을 치는 것은 이 주가 처음입니다.`,
     ...((t.english + t.japanese) * 2 > t.seasons ? ["", `**${ENGLISH_WARNING}**`] : []),
     "",
     `${PRESUMED_LOCALE}: 어느 사건 행에도 화면 언어가 없는 시즌(언어 칸이 운영에 닿기 전 빌드에서 온 행). Funnel과 같이 한국어로 봅니다.`,
