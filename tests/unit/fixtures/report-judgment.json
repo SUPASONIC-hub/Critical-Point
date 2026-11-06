@@ -1,0 +1,206 @@
+{
+ "seasons": [
+  {
+   "ending": "collapse",
+   "score": "48",
+   "rank": "C",
+   "new_game_plus": true
+  },
+  {
+   "ending": "pact",
+   "score": "58",
+   "rank": "B",
+   "new_game_plus": false
+  },
+  {
+   "ending": "pact",
+   "score": "67",
+   "rank": "B",
+   "new_game_plus": false
+  },
+  {
+   "ending": "human",
+   "score": "73",
+   "rank": "A",
+   "new_game_plus": false
+  },
+  {
+   "ending": "reform",
+   "score": "55",
+   "rank": "B",
+   "new_game_plus": false
+  },
+  {
+   "ending": "quiet",
+   "score": "44",
+   "rank": "C",
+   "new_game_plus": false
+  },
+  {
+   "ending": "open",
+   "score": "61",
+   "rank": "B",
+   "new_game_plus": false
+  },
+  {
+   "ending": "oversight",
+   "score": "70",
+   "rank": "B",
+   "new_game_plus": false
+  }
+ ],
+ "funnel": [
+  {
+   "device": 1,
+   "marked": false,
+   "new_game_plus": false,
+   "cases": [
+    [
+     "prologue01",
+     1794877200,
+     "ko"
+    ]
+   ]
+  },
+  {
+   "device": 2,
+   "marked": false,
+   "new_game_plus": false,
+   "cases": [
+    [
+     "prologue01",
+     1794877200,
+     "ko"
+    ],
+    [
+     "prologue02",
+     1794877800,
+     "ko"
+    ],
+    [
+     "prologue03",
+     1794878400,
+     "ko"
+    ]
+   ]
+  },
+  {
+   "device": 3,
+   "marked": false,
+   "new_game_plus": false,
+   "cases": [
+    [
+     "prologue01",
+     1794877200,
+     "ko"
+    ],
+    [
+     "prologue02",
+     1794877800,
+     "ko"
+    ],
+    [
+     "prologue03",
+     1794878400,
+     "ko"
+    ],
+    [
+     "prologue04",
+     1794879000,
+     "ko"
+    ],
+    [
+     "prologue05",
+     1794879600,
+     "ko"
+    ]
+   ]
+  },
+  {
+   "device": 4,
+   "marked": false,
+   "new_game_plus": false,
+   "cases": [
+    [
+     "prologue01",
+     1794877200,
+     "ko"
+    ],
+    [
+     "prologue02",
+     1794877800,
+     "ko"
+    ],
+    [
+     "prologue03",
+     1794878400,
+     "ko"
+    ],
+    [
+     "prologue04",
+     1794879000,
+     "ko"
+    ],
+    [
+     "prologue05",
+     1794879600,
+     "ko"
+    ],
+    [
+     "case01",
+     1794880200,
+     "ko"
+    ]
+   ]
+  },
+  {
+   "device": 5,
+   "marked": false,
+   "new_game_plus": false,
+   "cases": [
+    [
+     "prologue01",
+     1794877200,
+     "ko"
+    ],
+    [
+     "prologue02",
+     1794877800,
+     "ko"
+    ],
+    [
+     "prologue03",
+     1794878400,
+     "ko"
+    ],
+    [
+     "prologue04",
+     1794879000,
+     "ko"
+    ],
+    [
+     "prologue05",
+     1794879600,
+     "ko"
+    ],
+    [
+     "case01",
+     1794880200,
+     "ko"
+    ]
+   ]
+  },
+  {
+   "device": 6,
+   "marked": false,
+   "new_game_plus": false,
+   "cases": [
+    [
+     "prologue01",
+     1792285200,
+     "ko"
+    ]
+   ]
+  }
+ ]
+}
