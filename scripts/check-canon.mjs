@@ -28,10 +28,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PROLOGUE = /src\/nodes\/prologue\d+\.js$/;
-const SEASON = /src\//;
+// The Korean copy. The English and Japanese files (src/locales/en, ja) are read
+// only by a fact that says what to look for in their words: they also hold the
+// Korean lines they translate, as keys, which the Korean files already answer for.
+const SEASON = /src\/(?!locales\/)/;
 /** The named case files, and every file but them. */
 const caseFiles = (names) => new RegExp(`src/nodes/(?:${names})\\.js$`);
-const seasonBut = (names) => new RegExp(`src/(?!nodes/(?:${names})\\.js$)`);
+const seasonBut = (names) => new RegExp(`src/(?!locales/|nodes/(?:${names})\\.js$)`);
+/** Every file but the named case files, in all three languages (2026-11-04). */
+const everyLanguageBut = (names) => new RegExp(`src/(?!(?:locales/(?:en|ja)/)?nodes/(?:${names})\\.js$)`);
 /** The two files that sum every case up in a line or two. */
 const SUMMARIES = "|src/gameCases\\.js$|src/caseCopy\\.js$";
 /** Where the March vote of 사건 23 is counted: the case, the Monday after, the summaries. */
@@ -731,19 +736,33 @@ export const CANON = [
     find: /(남동공단)(?: [가-힣]+)? 가온정밀|가온정밀 · (남동공단)/g,
     allow: ["남동공단"],
   },
+  // The two trainee facts read the English and Japanese copy too (2026-11-04),
+  // in the words the glossary gave them (#431): the analyst is a trainee /
+  // 見習い, and other people's 수습 is "probation" / 試用 (사건 08, 49).
+  // Each language's half is its own alternative of one pattern.
   {
     id: "trainee-after-1021",
-    fact: "the analyst's traineeship ends on 2022-10-21 (프롤로그 01); after it the analyst is not called a trainee",
-    files: seasonBut("prologue01"),
-    find: /(수습(?:이던|인|이었던)? 당신|당신[^."]{0,8}?수습(?! 딱지))/g,
+    fact: "the analyst's traineeship ends on 2022-10-21 (프롤로그 01); after it the analyst is not called a trainee (수습 / trainee, on probation / 見習い, 試用)",
+    files: everyLanguageBut("prologue01"),
+    find: new RegExp(
+      [
+        // 수습이던 당신, 당신은 아직 수습
+        '(수습(?:이던|인|이었던)? 당신|당신[^."]{0,8}?수습(?! 딱지))',
+        // you're a trainee, you were the trainee, you, a trainee; you're on probation, your probation
+        "\\b([Yy]ou(?:'re|’re| are| were)? (?:still |just |only )?(?:a |the )?(?:trainee|probationer)s?\\b|[Yy]ou, (?:a|the|still a) trainee\\b|[Yy]ou(?:'re|’re| are| were)? (?:still )?on probation\\b|[Yy]our probation\\b)",
+        // 見習いのあなた, 見習いだったあなた, あなたはまだ見習い, 試用中のあなた
+        '(見習い(?:の|だった|である|中の|期間中の)?あなた|あなた[^。、」"]{0,8}?見習い(?!の肩書きが取れ|を終え|が終わ|期間が終わ|卒業)|試用(?:期間)?中?のあなた|あなた[^。、」"]{0,8}?試用)',
+      ].join("|"),
+      "g",
+    ),
     allow: [],
   },
   {
     id: "trainee-ended",
     fact: "the copy after 프롤로그 01 says the traineeship is over (the shape the rule above leaves)",
-    files: seasonBut("prologue01"),
-    find: /(수습 딱지)를 (?:뗀|떼)/g,
-    allow: ["수습 딱지"],
+    files: everyLanguageBut("prologue01"),
+    find: /(수습 딱지)를 (?:뗀|떼)|\b(traineeship) (?:ended|had ended|was over)|\b(trainee tag) (?:came|comes) off|(見習いの肩書き)が取れ|(見習い)を終え/g,
+    allow: ["수습 딱지", "traineeship", "trainee tag", "見習いの肩書き", "見習い"],
   },
   {
     id: "second-standard-count",
@@ -999,8 +1018,17 @@ const COPY_FILES = () => [
   "src/featurePack.js",
   // The KD은행 계좌's name, in the table's words.
   "src/copy/table.js",
-  "src/locales/en/screens/table.js",
-  "src/locales/ja/screens/table.js",
+  // The English and Japanese copy, for the facts that read it (everyLanguageBut).
+  // screens/table.js of each language is in here.
+  ...["en", "ja"].flatMap((lang) => [
+    `src/locales/${lang}/index.js`,
+    ...["nodes", "between", "late", "screens"].flatMap((dir) =>
+      readdirSync(`src/locales/${lang}/${dir}`)
+        .filter((name) => name.endsWith(".js"))
+        .sort()
+        .map((name) => `src/locales/${lang}/${dir}/${name}`),
+    ),
+  ]),
 ];
 
 function main() {

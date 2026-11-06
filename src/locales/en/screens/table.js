@@ -206,6 +206,7 @@ export default {
     holdArmed: "Press once more to Commit",
     holdHint: "Hold the button down to Commit",
     push: "Heat {gauge} · {danger}",
+    wall: "Now Heat {gauge} · {danger}",
     stance: "Charge {focus} · Commit for {label} next hand · {title}",
     scout: "Scouted. The Wall is somewhere between {min} and {max}",
     bank: "Stake {pot} · Vault {vault}",

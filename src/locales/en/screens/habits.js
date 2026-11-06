@@ -1,4 +1,4 @@
-/** The season's judgment habits in English (src/copy/habits.js): the result card's large name and the report's line under it. */
+/** The season's judgment habits in English (src/copy/habits.js): the result card's large name, the report's line under it and the card's one-line sentence (D1). */
 export default {
   bulldozer: { title: "Results-First Bulldozer", line: "You won the hands, but the human cost piled up behind you." },
   moth: { title: "High-Risk Moth", line: "The closer the Wall gets, the faster your hand moves." },
@@ -11,4 +11,5 @@ export default {
   marathon: { title: "Thinking Marathoner", line: "You only rest easy once the thinking outlasts the verdict." },
   lightning: { title: "Lightning Decider", line: "You pick the moment you read, and push the moment you pick." },
   steady: { title: "Even-Keel Balancer", line: "Nothing flashy, but you saw every hand through to the end." },
+  cardLine: "Your judging type: {habit}.",
 };

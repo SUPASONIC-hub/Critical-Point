@@ -227,6 +227,7 @@ export default {
     holdArmed: "もう一度押すと確定する",
     holdHint: "長押しすると確定する",
     push: "熱 {gauge} · {danger}",
+    wall: "いま熱 {gauge} · {danger}",
     stance: "チャージ {focus} · 確定すると次の勝負は{label} · {title}",
     scout: "照会した。壁は {min} から {max} のあいだのどこか",
     bank: "賭け金 {pot} · 金庫 {vault}",

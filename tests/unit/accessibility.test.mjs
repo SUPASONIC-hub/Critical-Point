@@ -346,6 +346,61 @@ test("이야기 글 크기 is one of three sizes, carried on the document as an 
   assert.doesNotMatch(rules, /\.gx-table|\.gx-hand|\.gx-card|\.gx-brief\b/, "the table keeps its size");
 });
 
+test("글자 크기 is one of three sizes, stored on the device and carried on the document as a name and a factor (E5)", () => {
+  assert.deepEqual([...settings.TEXT_SCALES], [1, 1.125, 1.25]);
+  assert.equal(settings.DEFAULT_ACCESSIBILITY.textScale, 1, "the default is what every device had before");
+  assert.equal(settings.normalizeAccessibility({ textScale: 1.25 }).textScale, 1.25);
+  assert.equal(settings.normalizeAccessibility({ textScale: 1.5 }).textScale, 1, "a size the panel does not offer is the default");
+  assert.equal(settings.normalizeAccessibility({ textScale: "1.125" }).textScale, 1);
+
+  // Stored beside the other comfort settings, under the one key, on this device only.
+  settings.resetAccessibilityCache();
+  const attributes = new Map();
+  const style = new Map();
+  globalThis.document = {
+    documentElement: {
+      toggleAttribute: (name, on) => attributes.set(name, on),
+      setAttribute: (name, value) => attributes.set(name, value),
+      removeAttribute: (name) => attributes.delete(name),
+      style: { setProperty: (name, value) => style.set(name, value) },
+    },
+  };
+  try {
+    settings.setAccessibility({ textScale: 1.125 });
+    assert.equal(JSON.parse(localStorage.getItem(ACCESSIBILITY_SETTINGS_KEY)).textScale, 1.125);
+    assert.equal(attributes.get("data-text-size"), "large");
+    assert.equal(style.get("--text-scale"), "1.125");
+    settings.resetAccessibilityCache();
+    assert.equal(settings.getAccessibility().textScale, 1.125, "read back from storage");
+    settings.setAccessibility({ textScale: 1.25 });
+    assert.equal(attributes.get("data-text-size"), "larger");
+    assert.equal(style.get("--text-scale"), "1.25");
+    settings.setAccessibility({ textScale: 1 });
+    assert.equal(attributes.has("data-text-size"), false, "the default leaves no attribute");
+    assert.equal(style.get("--text-scale"), "1");
+  } finally {
+    delete globalThis.document;
+    localStorage.removeItem(ACCESSIBILITY_SETTINGS_KEY);
+    settings.resetAccessibilityCache();
+  }
+
+  // The root reads the factor (so a phone's 16px and #390's 18px from 1025px
+  // both scale), and the HUD's big numbers divide it back out through --hud-rem.
+  const tokens = readFileSync(new globalThis.URL("../../src/styles/tokens.css", import.meta.url), "utf8");
+  assert.match(tokens, /--text-scale: 1;/);
+  assert.match(tokens, /html \{\s*font-size: calc\(100% \* var\(--text-scale\)\);/);
+  assert.match(tokens, /font-size: calc\(112\.5% \* var\(--text-scale\)\);/, "#390's PC root takes the factor too");
+  assert.match(tokens, /--hud-rem: calc\(1rem \/ var\(--text-scale\)\);/);
+  assert.match(tokens, /--hud-rem: calc\(1rem \/ 1\.125 \/ var\(--text-scale\)\);/);
+  // The selectors #390 left at their size (the 720 / 1100 / 1100+short HUD
+  // blocks' pot and clock, the briefing timer) still read --hud-rem, not rem.
+  const play = readFileSync(new globalThis.URL("../../src/styles/app/play.css", import.meta.url), "utf8");
+  const briefing = readFileSync(new globalThis.URL("../../src/styles/app/briefing.css", import.meta.url), "utf8");
+  for (const pot of ["3", "3.75", "2.875"]) assert.match(play, new RegExp(`\\.gx-pot-value \\{\\s*font-size: calc\\(${pot.replace(".", "\\.")} \\* var\\(--hud-rem\\)\\)`), `the pot at ${pot} is sized in --hud-rem`);
+  for (const clock of ["1.3125", "1.5625"]) assert.match(play, new RegExp(`\\.gx-clock b \\{\\s*font-size: calc\\(${clock.replace(".", "\\.")} \\* var\\(--hud-rem\\)\\)`), `the clock at ${clock} is sized in --hud-rem`);
+  assert.match(briefing, /\.gx-comic-timer b \{\s*font: 900 calc\([\d.]+ \* var\(--hud-rem\)\)/, "the timer is sized in --hud-rem");
+});
+
 test("the edge notices are on until turned off, and say no number aloud or on screen", () => {
   assert.equal(settings.DEFAULT_ACCESSIBILITY.edgeNotices, true);
   assert.equal(settings.normalizeAccessibility({ edgeNotices: false }).edgeNotices, false);
