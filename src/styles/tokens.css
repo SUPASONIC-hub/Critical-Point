@@ -117,16 +117,17 @@
      the `neutral` values -- the start screen, the result and any scene with no
      mood -- one step lighter than the night shift the app opened with, a mid
      blue-grey, with the raised ground, the four surfaces and the two glasses
-     moved by the same step (+12 +13 +14). `:root[data-mood]` below swaps only
-     these grounds, the glasses and at most two accent fills; no text colour
-     moves with the mood, so the ratios are the grounds' to keep. In every mood
-     --ui-text and --ui-text-2 clear 4.5:1 on every surface (lowest 9.96 and
-     6.49, both on neutral --ui-surface-4) and --ui-text-3 clears it up to
-     --ui-surface-3 (lowest 4.68 neutral, 4.76 bright, 5.09 sorrow, 5.57
-     tense, 6.32 dread); --ui-surface-4 carries --ui-text and --ui-text-2 only
-     (the start button, the result's chips and route-atlas meta), where
-     --ui-text-3 would read 3.88 on the neutral one. The acid, chip, amber and
-     sky inks stay above 5.6:1 everywhere; --ui-heat, used large, above 3.5. */
+     moved by the same step (+12 +13 +14). `:root[data-mood]` below swaps these
+     grounds, the glasses, the lines, the accent and the screen's edge tint;
+     no text colour moves with the mood, so the ratios are the grounds' to
+     keep. In every mood --ui-text and --ui-text-2 clear 4.5:1 on every
+     surface (lowest 9.96 and 6.49, both on neutral --ui-surface-4) and
+     --ui-text-3 clears it up to --ui-surface-3 (lowest 4.68 neutral, 4.65
+     bright, 5.12 sorrow, 5.53 tense, 5.91 dread); --ui-surface-4 carries
+     --ui-text and --ui-text-2 only (the start button, the result's chips and
+     route-atlas meta), where --ui-text-3 would read 3.88 on the neutral one.
+     The acid, chip, amber and sky inks stay above 5.6:1 everywhere; --ui-heat,
+     used large, above 3.5; dread's rose accent above 5.7. */
   --ui-bg: rgb(18 22 24);
   --ui-bg-raised: rgb(22 27 29);
   --ui-surface-1: rgb(26 32 34);
@@ -146,6 +147,8 @@
      --ui-line-strong is 1.5 to 1.7 and is not a control's edge. */
   --ui-line-field: rgb(255 255 255 / 0.4);
   --ui-line-accent: rgb(217 255 98 / 0.34);
+  /* The briefing page's frame; a mood other than neutral tints it. */
+  --ui-frame: rgb(242 246 243);
   --ui-text: rgb(242 246 243);
   --ui-text-2: rgb(190 203 197);
   --ui-text-3: rgb(142 158 152);
@@ -193,72 +196,112 @@ html {
 /* The scene's mood on the ground (design-mood, 2026-11-05). GauntletStage puts
    the current scene's mood on <html> as data-mood; the start screen and the
    result carry none and are neutral. Each block moves the grounds and the two
-   glasses as one set and at most two accent fills; text, lines and radii are
-   the same in every mood, which is what keeps the ratios above true. The
-   contrast spec (tests/contrast.spec.js) reads each screen once per mood. The
-   generated critical CSS carries the neutral values only: these selectors
-   match nothing on the first screen, so build:critical never cuts them.
+   glasses as one set; text and radii are the same in every mood, which is
+   what keeps the ratios above true. The contrast spec (tests/contrast.spec.js)
+   reads each screen once per mood. The generated critical CSS carries the
+   neutral values only: these selectors match nothing on the first screen.
 
-   tense: the night shift the app opened with, exactly -- the judged and the
-   pressed scenes keep the dark they were drawn in. */
+   2026-11-06 (mood-boost): the first pass could not be seen in play -- every
+   ground was a near-black, tense was the old palette and the accent moved only
+   in glows. Each mood now also tints the screen's edge (--mood-edge, drawn by
+   .game-shell::after and the briefing's veil), the briefing page's frame
+   (--ui-frame), the lines and the accent, and the grounds carry their hue
+   further (bright a brown-amber, sorrow a navy, dread an oxblood, tense a cold
+   teal). Text colours still never move; the lowest ratios per mood are in the
+   block comments and tests/contrast.spec.js reads each one. --mood-edge is
+   registered so the edge fades with the ground's 0.6s instead of jumping. */
+@property --mood-edge {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+/* tense: the old night shift's depth with a cold teal-steel cast, a teal edge
+   and teal lines; the accent stays acid. Lowest text ratio 5.53:1
+   (--ui-text-3 on --ui-surface-3). */
 :root[data-mood="tense"] {
-  --ui-bg: rgb(6 9 10);
-  --ui-bg-raised: rgb(10 14 15);
-  --ui-surface-1: rgb(14 19 20);
-  --ui-surface-2: rgb(20 26 27);
-  --ui-surface-3: rgb(29 37 38);
-  --ui-surface-4: rgb(40 50 51);
-  --ui-glass: rgb(16 22 23 / 0.72);
-  --ui-glass-strong: rgb(12 17 18 / 0.88);
+  --ui-bg: rgb(4 14 16);
+  --ui-bg-raised: rgb(7 19 21);
+  --ui-surface-1: rgb(10 24 26);
+  --ui-surface-2: rgb(15 30 32);
+  --ui-surface-3: rgb(22 39 41);
+  --ui-surface-4: rgb(32 51 53);
+  --ui-glass: rgb(12 27 29 / 0.72);
+  --ui-glass-strong: rgb(8 21 23 / 0.88);
+  --ui-line: rgb(150 230 235 / 0.1);
+  --ui-line-strong: rgb(150 230 235 / 0.2);
+  --ui-frame: rgb(150 226 232);
+  --mood-edge: rgb(30 170 190 / 0.26);
 }
 
-/* dread: deeper than tense, with a red cast (the red channel leads by 4);
-   the accent glow turns to heat and the heat fill comes up. Lowest text ratio
-   6.32:1 (--ui-text-3 on --ui-surface-3). */
+/* dread: an oxblood ground, a deep red edge, and the accent turned to a rose
+   the accent ink still reads on (7.3:1); the heat fill comes up. Lowest text
+   ratio 5.91:1 (--ui-text-3 on --ui-surface-3). */
 :root[data-mood="dread"] {
-  --ui-bg: rgb(8 4 6);
-  --ui-bg-raised: rgb(12 7 9);
-  --ui-surface-1: rgb(16 10 12);
-  --ui-surface-2: rgb(22 15 17);
-  --ui-surface-3: rgb(31 22 24);
-  --ui-surface-4: rgb(42 31 33);
-  --ui-glass: rgb(18 12 14 / 0.72);
-  --ui-glass-strong: rgb(14 8 10 / 0.88);
-  --ui-accent-glow: rgb(255 92 72 / 0.32);
+  --ui-bg: rgb(24 6 8);
+  --ui-bg-raised: rgb(29 9 11);
+  --ui-surface-1: rgb(34 12 14);
+  --ui-surface-2: rgb(41 16 18);
+  --ui-surface-3: rgb(51 22 24);
+  --ui-surface-4: rgb(63 30 32);
+  --ui-glass: rgb(36 13 15 / 0.72);
+  --ui-glass-strong: rgb(30 9 11 / 0.88);
+  --ui-line: rgb(255 140 130 / 0.1);
+  --ui-line-strong: rgb(255 140 130 / 0.2);
+  --ui-line-accent: rgb(255 120 100 / 0.4);
+  --ui-accent: rgb(255 120 100);
+  --ui-accent-soft: rgb(255 92 72 / 0.14);
+  --ui-accent-glow: rgb(255 92 72 / 0.36);
   --ui-heat-soft: rgb(255 92 72 / 0.22);
+  --ui-shadow-glow: 0 0 0 1px rgb(255 120 100 / 0.5), 0 12px 40px rgb(255 92 72 / 0.24);
+  --ui-frame: rgb(255 120 104);
+  --mood-edge: rgb(190 16 28 / 0.4);
 }
 
-/* bright: warm and a shade lighter than neutral (red leads blue by 8, the
-   lightest ground of the five); the accent fill and glow turn amber. Lowest
-   text ratio 4.76:1 (--ui-text-3 on --ui-surface-3). */
+/* bright: a warm brown-amber ground, an amber edge and frame, and the accent
+   turned amber (ink 12:1 on it). Lowest text ratio 4.65:1 (--ui-text-3 on
+   --ui-surface-3). */
 :root[data-mood="bright"] {
-  --ui-bg: rgb(27 24 19);
-  --ui-bg-raised: rgb(31 28 23);
-  --ui-surface-1: rgb(35 32 27);
-  --ui-surface-2: rgb(41 38 33);
-  --ui-surface-3: rgb(50 47 41);
-  --ui-surface-4: rgb(61 58 51);
-  --ui-glass: rgb(37 34 29 / 0.72);
-  --ui-glass-strong: rgb(33 30 25 / 0.88);
-  --ui-accent-soft: rgb(255 206 115 / 0.12);
-  --ui-accent-glow: rgb(255 206 115 / 0.32);
+  --ui-bg: rgb(38 26 12);
+  --ui-bg-raised: rgb(43 30 15);
+  --ui-surface-1: rgb(48 34 18);
+  --ui-surface-2: rgb(54 39 22);
+  --ui-surface-3: rgb(62 46 27);
+  --ui-surface-4: rgb(74 56 35);
+  --ui-glass: rgb(50 36 19 / 0.72);
+  --ui-glass-strong: rgb(44 31 15 / 0.88);
+  --ui-line: rgb(255 210 150 / 0.1);
+  --ui-line-strong: rgb(255 210 150 / 0.2);
+  --ui-line-accent: rgb(255 196 92 / 0.4);
+  --ui-accent: rgb(255 196 92);
+  --ui-accent-soft: rgb(255 196 92 / 0.14);
+  --ui-accent-glow: rgb(255 196 92 / 0.36);
+  --ui-shadow-glow: 0 0 0 1px rgb(255 196 92 / 0.5), 0 12px 40px rgb(255 196 92 / 0.24);
+  --ui-frame: rgb(255 204 120);
+  --mood-edge: rgb(255 150 30 / 0.3);
 }
 
-/* sorrow: cool and low in saturation, between neutral and tense in depth
-   (blue leads red by 8, the green channel stays between them); the accent
-   fill and glow turn sky. Lowest text ratio 5.09:1 (--ui-text-3 on
+/* sorrow: a clear navy ground, a sky-blue edge and frame, and the accent
+   turned sky (ink 11:1 on it). Lowest text ratio 5.12:1 (--ui-text-3 on
    --ui-surface-3). */
 :root[data-mood="sorrow"] {
-  --ui-bg: rgb(15 18 23);
-  --ui-bg-raised: rgb(19 22 27);
-  --ui-surface-1: rgb(23 27 32);
-  --ui-surface-2: rgb(29 33 39);
-  --ui-surface-3: rgb(38 43 49);
-  --ui-surface-4: rgb(49 55 62);
-  --ui-glass: rgb(25 29 35 / 0.72);
-  --ui-glass-strong: rgb(21 24 30 / 0.88);
-  --ui-accent-soft: rgb(123 211 255 / 0.1);
-  --ui-accent-glow: rgb(123 211 255 / 0.28);
+  --ui-bg: rgb(10 20 40);
+  --ui-bg-raised: rgb(13 24 45);
+  --ui-surface-1: rgb(16 28 51);
+  --ui-surface-2: rgb(21 34 58);
+  --ui-surface-3: rgb(28 42 68);
+  --ui-surface-4: rgb(38 53 80);
+  --ui-glass: rgb(18 30 54 / 0.72);
+  --ui-glass-strong: rgb(13 25 46 / 0.88);
+  --ui-line: rgb(160 200 255 / 0.1);
+  --ui-line-strong: rgb(160 200 255 / 0.2);
+  --ui-line-accent: rgb(130 200 255 / 0.4);
+  --ui-accent: rgb(130 200 255);
+  --ui-accent-soft: rgb(123 211 255 / 0.12);
+  --ui-accent-glow: rgb(123 211 255 / 0.32);
+  --ui-shadow-glow: 0 0 0 1px rgb(130 200 255 / 0.5), 0 12px 40px rgb(123 211 255 / 0.22);
+  --ui-frame: rgb(140 200 255);
+  --mood-edge: rgb(50 130 255 / 0.32);
 }
 
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from

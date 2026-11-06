@@ -59,6 +59,8 @@ const introCopy = {
     identity: "분석관 호출명",
     nameLabel: "분석관 이름",
     namePlaceholder: "이름을 입력하세요",
+    // The record title under the name (analystTitle.js), the resume card's words without its dot.
+    rankTitle: "기록 칭호 {title}",
     // {game} is the English name, drawn in an element of its own.
     newGamePlus: "{game} 시작",
   },

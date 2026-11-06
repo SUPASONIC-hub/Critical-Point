@@ -269,11 +269,12 @@ test("a verdict is announced once, by the slam, and the reveal's name does not r
   const slam = notices.slice(notices.indexOf("function VerdictSlam("), notices.indexOf("export function TableNotices("));
   assert.match(slam, /<strong lang="en">BUST<\/strong>/);
   // Its words are the table's copy (src/copy/table.js, `notices`), read by key.
-  for (const said of ["say.slamTimeout", "say.slamAbandon", "fill(say.slamWall, { wall: win.wall })", "{say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}"]) {
+  // The moment's one line (A2, 2026-11-05) is the last thing the alert reads.
+  for (const said of ["say.slamTimeout", "say.slamAbandon", "fill(say.slamWall, { wall: win.wall })", "{say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}", "<small>{say.slamStill}</small>"]) {
     assert.ok(slam.includes(said), `the slam says: ${said}`);
   }
   const slamCopy = source("copy/table.js");
-  for (const said of ['slamTimeout: "시간이 먼저 끝났다"', 'slamAbandon: "테이블을 떠났다"', 'slamWall: "벽은 {wall}에 있었다"', 'slamPot: "판돈"']) {
+  for (const said of ['slamTimeout: "시간이 먼저 끝났다"', 'slamAbandon: "테이블을 떠났다"', 'slamWall: "벽은 {wall}에 있었다"', 'slamPot: "판돈"', 'slamStill: "심장이 멈춘 자리에서 벽이 드러났다."']) {
     assert.ok(slamCopy.includes(said), `the slam's copy says: ${said}`);
   }
   // The reveal is a named modal dialog that announces nothing by itself.
