@@ -145,9 +145,9 @@ export async function cashStakedCard(page) {
   // disabled button, which waited out the whole test and failed as "Test
   // timeout exceeded" with no word about the table.
   await expect(cash, "the cash button never enabled: no card is staked, or the seal did not open in eight pushes").toBeEnabled({ timeout: 5_000 });
-  // The scene that closes the case holds its 확정 (data-hold is there); the
-  // rest cash on a click. Which one is fixed by the scene, so it is read
-  // before the press rather than guessed from what the press did.
+  // The scene that closes the case, and a table in the danger zone, hold
+  // their 확정 (data-hold is there); the rest cash on a click. It is read off
+  // the button before the press rather than guessed from what the press did.
   if ((await cash.getAttribute("data-hold")) === null) {
     await clickElement(cash, "cash the staked card");
     return;
@@ -156,18 +156,19 @@ export async function cashStakedCard(page) {
 }
 
 /**
- * The case's last choice is confirmed by a hold or a second press
+ * The case's last choice, and a table in the danger zone, confirm by a hold
  * (src/gauntlet/holdConfirm.js). This takes the hold: the pointer goes down on
  * 확정 and stays down until the scene has moved on, and only then comes up.
  *
  * It used to take the second press -- a click to arm, a click to confirm --
  * and that raced the renderer. Under load the gap between the two clicks
  * outran SECOND_PRESS_MS (3s), so the second one armed again; or the first
- * click's own press and release were more than HOLD_MS (800ms) apart, so it
+ * click's own press and release were more than HOLD_MS apart, so it
  * confirmed as a hold and the helper failed with "the first press did not arm
  * 확정" (season-flow's case31-case37, 2026-10-22). A hold has no window to
- * miss: held longer than 800ms it still confirms, and nothing in between
- * waits on actionability. The second press keeps its own unit tests
+ * miss: held longer than HOLD_MS (600ms since 2026-11-05) it still confirms,
+ * and nothing in between waits on actionability. Since 2026-11-05 a pointer's
+ * short press only shows a hint; the second press is a bare tap's alone
  * (holdConfirm.test.mjs) and the player's path is the same machine.
  *
  * Done means the button is gone or what follows it is up -- the reveal, the

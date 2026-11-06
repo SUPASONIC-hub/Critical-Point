@@ -4,14 +4,19 @@ import { test } from "node:test";
 
 import { musicModes, revealTracks } from "../../src/components/musicData.js";
 import {
+  blendedTexture,
   createSceneMode,
   DEFAULT_MOOD,
+  LEAD_OCTAVE_CEILING_HZ,
   getMusicMood,
   leadForBar,
   MOOD_FADE_SECONDS,
   moodCrossfade,
   moodLeadForBar,
+  moodLeadNote,
   moodLeads,
+  MOOD_TEXTURES,
+  moodTexture,
   MUSIC_MOODS,
   normalizeMood,
   setMusicMood,
@@ -310,8 +315,13 @@ test("AdaptiveMusic plays the mood's lead and shares the gain across a change; t
   const music = readFileSync(new URL("../../src/components/AdaptiveMusic.jsx", import.meta.url), "utf8");
   assert.match(music, /export function setMusicMood\(mood\)/);
   assert.match(music, /moodLeadForBar\(currentMode, bar, to\)/);
-  assert.match(music, /strikeLead\(leadLine, crossing \? blend : 1\)/);
-  assert.match(music, /if \(crossing\) strikeLead\(oldLine, 1 - blend\)/);
+  assert.match(music, /strikeLead\(leadLine, crossing \? blend : 1, to\)/);
+  assert.match(music, /if \(crossing\) strikeLead\(oldLine, 1 - blend, from\)/);
+  // Every part's gain carries the mood's share, walked across a change.
+  assert.match(music, /const texture = blendedTexture\(fade\)/);
+  for (const part of ["KICK_GAIN \\* impact \\* texture\\.kick", "SNARE_GAIN \\* impact \\* texture\\.snare", "HAT_GAIN \\* impact \\* texture\\.hat", "BASS_GAIN \\* impact \\* texture\\.bass", "PAD_GAIN \\* texture\\.pad"]) {
+    assert.match(music, new RegExp(part));
+  }
   assert.match(music, /export \{ getMusicMood, MUSIC_MOODS \} from "\.\/musicScore\.js"/);
   // The page's mood reaches the score through one subscription made as the module loads, and the mood already applied is read once.
   assert.match(music, /import \{ currentMood, onMoodChange \} from "\.\.\/mood\.js"/);
@@ -346,4 +356,49 @@ test("a mood applied on the page (src/mood.js) reaches getMusicMood through that
     applyMood("neutral");
     setMusicMood("neutral", -Infinity);
   }
+});
+
+/* The texture (mood-boost, 2026-11-06) --------------------------------- */
+
+test("mood -> texture: tense is the score as it was; every share is at most 1, so a mood only takes away from the drive's input", () => {
+  assert.deepEqual(moodTexture("tense"), { kick: 1, snare: 1, hat: 1, bass: 1, lead: 1, pad: 1, noise: 1, octave: 1, every: 1 });
+  for (const mood of MUSIC_MOODS) {
+    const texture = MOOD_TEXTURES[mood];
+    for (const key of ["kick", "snare", "hat", "bass", "lead", "pad", "noise"]) {
+      assert.ok(texture[key] >= 0 && texture[key] <= 1, `${mood}.${key} within 0..1`);
+    }
+  }
+  assert.equal(moodTexture("??"), MOOD_TEXTURES.neutral);
+  // Neutral is audibly not tense: no snare, the lead lower and sparser.
+  assert.equal(MOOD_TEXTURES.neutral.snare, 0);
+  assert.equal(MOOD_TEXTURES.neutral.octave, 0.5);
+  assert.equal(MOOD_TEXTURES.neutral.every, 2);
+  // Sorrow has no drums; bright sits an octave up; dread an octave down.
+  assert.equal(MOOD_TEXTURES.sorrow.kick + MOOD_TEXTURES.sorrow.snare, 0);
+  assert.equal(MOOD_TEXTURES.bright.octave, 2);
+  assert.equal(MOOD_TEXTURES.dread.octave, 0.5);
+});
+
+test("a texture change walks every share across the crossfade, never a step", () => {
+  const start = blendedTexture({ to: "sorrow", from: "tense", blend: 0 });
+  const half = blendedTexture({ to: "sorrow", from: "tense", blend: 0.5 });
+  const done = blendedTexture({ to: "sorrow", from: null, blend: 1 });
+  assert.equal(start.kick, 1);
+  assert.equal(half.kick, 0.5);
+  assert.equal(done.kick, 0);
+  for (let i = 0; i <= 20; i += 1) {
+    const a = blendedTexture({ to: "bright", from: "dread", blend: i / 20 });
+    const b = blendedTexture({ to: "bright", from: "dread", blend: (i + 1) / 20 });
+    for (const key of ["kick", "snare", "hat", "bass", "pad", "noise"]) assert.ok(Math.abs(b[key] - a[key]) <= 0.06, `${key} moves at most 6% per 1/20 of the fade`);
+  }
+});
+
+test("each mood strikes the lead in its register: neutral every other step an octave down, bright up but never past the ceiling", () => {
+  const line = [440, 0, 660, 880, 0, 0, 990, 0];
+  assert.deepEqual(line.map((_, step) => moodLeadNote(line, step, "tense")), [440, null, 660, 880, null, null, 990, null]);
+  assert.deepEqual(line.map((_, step) => moodLeadNote(line, step, "neutral")), [220, null, 330, null, null, null, 495, null]);
+  assert.deepEqual(line.map((_, step) => moodLeadNote(line, step, "dread")), [220, null, 330, 440, null, null, 495, null]);
+  const bright = line.map((_, step) => moodLeadNote(line, step, "bright"));
+  assert.deepEqual(bright, [880, null, 1320, 880, null, null, 990, null]);
+  for (const note of bright) assert.ok(note === null || note <= LEAD_OCTAVE_CEILING_HZ);
 });

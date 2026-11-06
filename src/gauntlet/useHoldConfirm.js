@@ -1,26 +1,42 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { HOLD_IDLE, HOLD_MS, SECOND_PRESS_MS, stepHold } from "./holdConfirm.js";
+import { HOLD_IDLE, holdsConfirm, PHASE_MS, stepHold } from "./holdConfirm.js";
 
 // A timer can land a frame before the clock it is measured on says the time
 // is up; the tick is sent a little late so the hold it closes has been held.
 const TICK_SLACK_MS = 20;
 
 /**
+ * The one timer the machine needs: a tick when the phase is due to end (a
+ * hold fills, a hint or an arm runs out). Returns what stops it. Exported
+ * for the unit tests, which run it on a mocked clock.
+ */
+export function scheduleTick(phase, send) {
+  if (!(phase in PHASE_MS)) return () => {};
+  const timer = globalThis.setTimeout(() => send("tick"), PHASE_MS[phase] + TICK_SLACK_MS);
+  return () => globalThis.clearTimeout(timer);
+}
+
+/**
  * The held 확정 (`holdConfirm.js`), wired to a button and to the table's keys.
  *
- * `enabled` is whether 확정 is held at all (the closing scene) and can be
- * pressed now; `resetKey` names what a press is about -- the staked card --
- * so a press that began on one card is not finished on another. A change of
- * either drops whatever was in progress: the state is filed under the key it
- * began with, and a state under another key reads as idle.
+ * `node`, `gauge` and `wallMin` say whether this table holds its 확정 at all
+ * (`holdsConfirm`: the case's last choice, or the heat inside the band);
+ * `canCash` whether it can be pressed now; `resetKey` names what a press is
+ * about -- the staked card -- so a press that began on one card is not
+ * finished on another. A change of any of them drops whatever was in
+ * progress: the state is filed under the key it began with, and a state
+ * under another key reads as idle.
  *
- * Returns the phase to draw (`idle`, `holding`, `armed`), the props the button
- * spreads, and `press` / `release` / `cancel` for the keyboard. `release` says whether it
- * ended a hold, so the key handler knows the key-up was its own. Disabled, the
- * props are empty and the button clicks as it always did.
+ * Returns `holds`, the phase to draw (`idle`, `holding`, `hinted`, `armed`),
+ * the props the button spreads, and `press` / `release` / `cancel` for the
+ * keyboard. `release` says whether it ended a hold, so the key handler knows
+ * the key-up was its own. Off, the props are empty and the button clicks as
+ * it always did.
  */
-export function useHoldConfirm({ enabled, resetKey, onConfirm }) {
+export function useHoldConfirm({ node, gauge, wallMin, canCash, resetKey, onConfirm }) {
+  const holds = holdsConfirm({ node, gauge, wallMin });
+  const enabled = holds && canCash;
   const key = enabled ? `on:${resetKey}` : "off";
   const [filed, setFiled] = useState({ key, hold: HOLD_IDLE });
   const filedRef = useRef(filed);
@@ -46,14 +62,7 @@ export function useHoldConfirm({ enabled, resetKey, onConfirm }) {
   }, []);
 
   const phase = enabled && filed.key === key ? filed.hold.phase : "idle";
-
-  // The only clock the machine needs: one tick when a hold is due to fill and
-  // one when an armed first press runs out.
-  useEffect(() => {
-    if (phase === "idle") return undefined;
-    const timer = globalThis.setTimeout(() => send("tick"), (phase === "holding" ? HOLD_MS : SECOND_PRESS_MS) + TICK_SLACK_MS);
-    return () => globalThis.clearTimeout(timer);
-  }, [phase, filed, send]);
+  useEffect(() => scheduleTick(phase, send), [phase, filed, send]);
 
   const buttonProps = enabled
     ? {
@@ -86,6 +95,7 @@ export function useHoldConfirm({ enabled, resetKey, onConfirm }) {
     : {};
 
   return {
+    holds,
     phase,
     buttonProps,
     press: () => send("press"),

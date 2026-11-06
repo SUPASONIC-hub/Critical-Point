@@ -606,6 +606,26 @@ ${pages.map(item).join("")}        </ul>
     </noscript>`;
 }
 
+/**
+ * The font's `<link rel="preload" as="font">` (index.html, one tag), taken
+ * out of the Japanese start page only. Measured on 2026-11-05 (cp-archive
+ * 메모-20261105/ja-fcp, Fast 3G + CPU 4x, 360px, median of 3): /ja/ first
+ * paints at 13.8 s with the preload and 10.3 s without it -- the 198 KB woff2
+ * no longer competes with the stylesheet and the dictionary before the first
+ * paint, and the Japanese text paints in the fallback face first (the woff2
+ * is still fetched when the stylesheet's @font-face asks for it, and the
+ * service worker still keeps it: nothing else changes). The Korean and the
+ * English pages keep the preload (user's decision 11-05, option 1; to be
+ * checked on Linux CI and production PSI, and reverted here if worse). One
+ * tag or the build fails, so index.html cannot lose it silently.
+ */
+function withoutFontPreload(html, language) {
+  const pattern = /[ \t]*<link\s+rel="preload"\s+as="font"[^>]*>\r?\n?/g;
+  const found = html.match(pattern) ?? [];
+  if (found.length !== 1) throw new Error(`The start page has ${found.length} font preload tags (want 1), writing the ${language} page.`);
+  return html.replace(pattern, "");
+}
+
 /** Each [pattern, replacement] once in `html`, or the build fails: a tag index.html lost would otherwise leave the Korean in place silently. */
 function replaceEach(html, pairs, language) {
   let out = String(html);
@@ -658,6 +678,7 @@ export function localizedStartPage(html, language, origin = "") {
   let alternate = 0;
   out = out.replace(/(<meta\s+property="og:locale:alternate"\s+content=")[^"]*(")/g, (_, before, after) => `${before}${OG_LOCALE[others[alternate++]] ?? ""}${after}`);
   if (alternate !== others.length) throw new Error(`The start page has ${alternate} og:locale:alternate tags (want ${others.length}).`);
+  if (language === "ja") out = withoutFontPreload(out, language);
   // The body's own block: a <noscript> round a <div>. The head has others (the
   // deferred sheet's, critical-css in vite.config.js), and a comment names one.
   const body = out.indexOf("<body>");

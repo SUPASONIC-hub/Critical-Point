@@ -338,7 +338,8 @@ const fileBudgets = {
   // 3029 / 58883 -> 3025 / 58815 on 2026-11-05, measured (bundle-rules2: kd-spend-engine, kd-spend-ui, phone-en-stake-11px,
   // scout-narrow, stake-clock over rules-1105 dd2cd419): the 360px English 10px label rule out (phone-en-stake-11px) beside
   // the stake clock's HUD lines; the ratchet goes down with it, never up again after rules-1105's one raise.
-  "play.css": { lines: 3025, bytes: 58815 },
+  // 3025 / 58815 -> 3035 / 59047 on 2026-11-06, mood-boost after merging main e1f5e515 (#463), measured: the mood's edge tint (.game-shell::after).
+  "play.css": { lines: 3035, bytes: 59047 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -413,7 +414,8 @@ const fileBudgets = {
   // 849 / 16478 -> 849 / 16498 on 2026-11-03, measured (plate-sound-clip): the
   // word is centred in its transform, which the build keeps, not by the
   // separate translate property the build dropped.
-  "briefing.css": { lines: 849, bytes: 16498 },
+  // 849 / 16498 -> 854 / 16681 on 2026-11-06, mood-boost, measured: the briefing veil's mood edge and the page's mood frame.
+  "briefing.css": { lines: 854, bytes: 16681 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

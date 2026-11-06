@@ -95,6 +95,9 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
                 : fill(say.slamWall, { wall: win.wall })}{" "}
             · {say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}
           </span>
+          {/* The moment, in one line under the verdict (A2, 2026-11-05): the same
+              sentence whatever the cause, read last by the alert. */}
+          <small>{say.slamStill}</small>
         </>
       ) : (
         <>

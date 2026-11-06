@@ -10,8 +10,11 @@ import {
   DRIVE_CEILING,
   driveMix,
   leadFilterFrequency,
+  blendedTexture,
   moodCrossfade,
   moodLeadForBar,
+  moodLeadNote,
+  moodTexture,
   setMusicMood as setMood,
   shadowNote,
   stakeLayerCount,
@@ -680,19 +683,23 @@ export function AdaptiveMusic({ modeKey }) {
       const stepSeconds = currentMode.interval / 1000;
       const impact = currentMode.impact;
 
-      if (currentMode.kick[step]) {
-        playKick(context, destination, KICK_GAIN * impact, impact);
+      // The mood's share of each part (MOOD_TEXTURES), walked across a change.
+      const fade = moodCrossfade(context.currentTime);
+      const texture = blendedTexture(fade);
+
+      if (currentMode.kick[step] && texture.kick > 0.01) {
+        playKick(context, destination, KICK_GAIN * impact * texture.kick, impact);
       }
-      if (currentMode.snare[step]) {
-        playSnare(context, destination, SNARE_GAIN * impact, 1900 + currentMode.filterLift);
+      if (currentMode.snare[step] && texture.snare > 0.01) {
+        playSnare(context, destination, SNARE_GAIN * impact * texture.snare, 1900 + currentMode.filterLift);
       }
-      if (currentMode.hat[step]) {
-        playHat(context, destination, HAT_GAIN * impact, step % 8 === 6);
+      if (currentMode.hat[step] && texture.hat > 0.01) {
+        playHat(context, destination, HAT_GAIN * impact * texture.hat, step % 8 === 6);
       }
 
       const bass = currentMode.bass[step];
       if (bass) {
-        playTone(context, destination, bass, stepSeconds * 1.15, BASS_GAIN * impact, "triangle", {
+        playTone(context, destination, bass, stepSeconds * 1.15, BASS_GAIN * impact * texture.bass, "triangle", {
           attack: 0.008,
           release: 0.09,
           filterFrequency: 560 + currentMode.filterLift * 0.42,
@@ -704,27 +711,31 @@ export function AdaptiveMusic({ modeKey }) {
       // mood's too, the two sharing the lead's gain note by note (`moodCrossfade`).
       // The sorrow lead is a slow line: its notes ring on into the next.
       const bar = Math.floor(stepRef.current / STEPS_PER_BAR);
-      const { to, from, blend } = moodCrossfade(context.currentTime);
+      // Each mood strikes its line in its own register and density
+      // (`moodLeadNote`), so across a change the two moods' notes differ
+      // even where the line is the same.
+      const { to, from, blend } = fade;
       const leadLine = moodLeadForBar(currentMode, bar, to);
       const oldLine = from ? moodLeadForBar(currentMode, bar, from) : null;
-      const crossing = oldLine && oldLine !== leadLine;
-      const strikeLead = (line, share) => {
-        const lead = line[step];
+      const crossing = Boolean(oldLine);
+      const strikeLead = (line, share, mood) => {
+        const lead = moodLeadNote(line, step, mood);
         if (!lead || share <= 0) return;
         const slow = line === currentMode.sorrowLead;
-        playTone(context, destination, lead, stepSeconds * (slow ? 3 : 1.8), LEAD_GAIN * share, currentMode.wave, {
+        const level = share * moodTexture(mood).lead;
+        playTone(context, destination, lead, stepSeconds * (slow ? 3 : 1.8), LEAD_GAIN * level, currentMode.wave, {
           attack: slow ? 0.05 : 0.02,
           release: slow ? 0.4 : 0.24,
           filterFrequency: leadFilterFrequency(currentMode),
           detune: step % 2 === 0 ? -currentMode.detuneSpread : currentMode.detuneSpread,
         });
       };
-      strikeLead(leadLine, crossing ? blend : 1);
-      if (crossing) strikeLead(oldLine, 1 - blend);
+      strikeLead(leadLine, crossing ? blend : 1, to);
+      if (crossing) strikeLead(oldLine, 1 - blend, from);
 
       const pad = currentMode.pad[step];
       if (pad) {
-        playChord(context, destination, pad, stepSeconds * 6, PAD_GAIN, "sine");
+        playChord(context, destination, pad, stepSeconds * 6, PAD_GAIN * texture.pad, "sine");
       }
 
       // The stake's layers, one more for each threshold the table's gauge has
@@ -742,8 +753,8 @@ export function AdaptiveMusic({ modeKey }) {
         if (shadow) shadowVoice.play(shadow, stepSeconds * 0.9, SHADOW_GAIN);
       }
 
-      if (currentMode.noiseEvery > 0 && stepRef.current % currentMode.noiseEvery === 0) {
-        playNoiseSweep(context, destination, 0.55, currentMode.volume * 0.12 * impact, 760 + currentMode.filterLift);
+      if (currentMode.noiseEvery > 0 && stepRef.current % currentMode.noiseEvery === 0 && texture.noise > 0.01) {
+        playNoiseSweep(context, destination, 0.55, currentMode.volume * 0.12 * impact * texture.noise, 760 + currentMode.filterLift);
       }
 
       stepRef.current += 1;
