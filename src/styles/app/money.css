@@ -51,7 +51,7 @@
      open over the corner they sit in, and the pills stay on top and pressable.
      Nothing else at 30 reaches the band: the layers start under it. */
   z-index: 29;
-  padding: env(safe-area-inset-top, 0px) max(12px, env(safe-area-inset-right)) 0
+  padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0
     max(12px, env(safe-area-inset-left));
   color: var(--ui-text-3);
   background: var(--ui-glass-strong);
@@ -115,7 +115,8 @@
 .kd-account-just {
   flex: none;
   margin-left: 2px;
-  font-size: 0.625rem;
+  /* 11px, not 10: the phone's smallest English text (phone-en-stake-9px, 11-04). The name beside it ellipsizes first. */
+  font-size: 0.6875rem;
 }
 
 .gx-purse-change {

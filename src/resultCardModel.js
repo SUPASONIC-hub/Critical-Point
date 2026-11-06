@@ -64,7 +64,7 @@ function readSeasonLeague(finalSummary) {
 
 /**
  * @param {object} [input]
- * @param {{ mode?: string, modeTitle?: string, motive?: { label?: string }, habit?: { title?: string } | null }} [input.fingerprint] The 판단 DNA, with the season's 판단 습관 when it has one.
+ * @param {{ mode?: string, modeTitle?: string, motive?: { label?: string }, habit?: { title?: string, card?: string } | null }} [input.fingerprint] The 판단 DNA, with the season's 판단 습관 when it has one, and the one sentence that says it (D1).
  * @param {{ label?: string, title?: string, failure?: boolean }} [input.endingVariant] The ending the season reached.
  * @param {string} [input.endingName] The ending as a sentence calls it, in Korean.
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
@@ -79,11 +79,17 @@ export function buildResultCardModel(input = {}) {
   const results = caseResults && typeof caseResults === "object" ? caseResults : {};
   const summaries = Object.values(results).filter((summary) => summary && typeof summary === "object");
   const best = readBestCase(summaries);
+  const dnaTitle = toText(fingerprint?.modeTitle, UNREAD_MODE_TITLE);
   return {
     // The season's 판단 습관 (`judgementHabit.js`) takes the large line when it
     // has one; the 판단 DNA title stands in for a season without one. The
     // habit's own line is not drawn: the card's chunk had no room for it.
-    modeTitle: toText(fingerprint?.habit?.title, toText(fingerprint?.modeTitle, UNREAD_MODE_TITLE)),
+    modeTitle: toText(fingerprint?.habit?.title, dnaTitle),
+    // D1: the one sentence that says the habit, worded on the result side
+    // (judgementHabit.habitCardLine): drawn over the large line and copied
+    // after the shared line. With it the copied line's 판단 DNA is the DNA's own title.
+    habitLine: toText(fingerprint?.habit?.card),
+    dnaTitle,
     mode: toText(fingerprint?.mode),
     motiveLabel: toText(fingerprint?.motive?.label),
     endingName: toText(endingName, UNREAD_ENDING_NAME),
@@ -115,8 +121,8 @@ export function buildResultCardModel(input = {}) {
 export function buildShareText(model, origin = "") {
   const card = model ?? buildResultCardModel();
   const address = toText(origin).replace(/\/+$/, "");
-  const line = fill(drawCopy.shareLine, { mode: card.modeTitle, ending: card.endingName, burst: card.bestBurst, points: RESULT_CARD_LABELS.points, rank: card.bestRank, share: card.share });
-  return address ? `${line} ${address}/` : line;
+  const line = fill(drawCopy.shareLine, { mode: card.habitLine ? card.dnaTitle : card.modeTitle, ending: card.endingName, burst: card.bestBurst, points: RESULT_CARD_LABELS.points, rank: card.bestRank, share: card.share });
+  return [line, card.habitLine, address && `${address}/`].filter(Boolean).join(" ");
 }
 
 /**

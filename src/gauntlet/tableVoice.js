@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { formatNumber } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
+import { dangerZoneOf } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
@@ -16,6 +17,9 @@ import { fill } from "../locale.js";
  *
  * - after each push, the heat and the board's own danger line -- the shown
  *   band's nearest edge, never the wall this window drew;
+ * - when the heat crosses one of the danger line's three steps (벽까지 최소 N,
+ *   밀면 벽 사정권, 벽 구간 안) with no push -- the clock's creep, a cooling
+ *   press -- the heat and the line, once per crossing (E3 첫 단계, 11-05);
  * - when the LOCK charge starts to count for the stance, or the stance it
  *   counts for changes: the rule a cash would carry into the next board;
  * - when a cash has banked the hand into the case pot, or a closed case has
@@ -51,7 +55,7 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * before the push's and the stance's: a listener out of time has the least of
  * it to lose.
  */
-const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, audit: 3, links: 4, stance: 5, scout: 6, push: 7 });
+const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, audit: 3, links: 4, stance: 5, scout: 6, push: 7, wall: 8 });
 
 // The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
 // each call is made, so another language laid over them is the one said.
@@ -61,6 +65,9 @@ const voice = () => tableCopy.voice;
 export const getHoldArmedCall = () => voice().holdArmed;
 
 export const describePush = ({ gauge, dangerLine }) => fill(voice().push, { gauge: Math.round(gauge), danger: dangerLine });
+
+/** The heat and the danger line as the clock or a cooling press has moved them across a step of the line (`dangerZoneOf`). */
+export const describeWall = ({ gauge, dangerLine }) => fill(voice().wall, { gauge: Math.round(gauge), danger: dangerLine });
 
 export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { focus: Math.round(focus), label: carry.label, title: carry.title });
 
@@ -83,6 +90,8 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ar
     live,
     pushes: win.pushes,
     push: describePush({ gauge: win.gauge, dangerLine }),
+    zone: dangerZoneOf(dangerLine),
+    wall: describeWall({ gauge: win.gauge, dangerLine }),
     carry: carry?.id ?? "",
     stance: carry ? describeStanceCarry({ focus: win.focus, carry }) : "",
     clock: getClockCall({ ...clock, live, paused: false }),
@@ -103,6 +112,8 @@ export function listTableCalls(before, after) {
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });
   if (after.scout && after.scout !== before.scout) calls.push({ kind: "scout", text: after.scout });
   if (after.pushes > before.pushes) calls.push({ kind: "push", text: after.push });
+  // A push said the line it landed on; a crossing with no push is the clock's or a cooling press's.
+  else if (after.zone && before.zone && after.zone !== before.zone) calls.push({ kind: "wall", text: after.wall });
   return calls;
 }
 

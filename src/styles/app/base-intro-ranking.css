@@ -5,7 +5,7 @@
   place-items: center;
   padding: 24px;
   color: var(--ui-text);
-  background: radial-gradient(60% 50% at 50% 0%, rgb(255 92 72 / 0.1), transparent 70%), var(--ui-bg);
+  background: radial-gradient(60% 50% at top, rgb(255 92 72 / 0.1), transparent 70%), var(--ui-bg);
 }
 .error-panel {
   width: min(100%, 560px);
@@ -135,7 +135,7 @@ summary:focus-visible {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
 }
@@ -197,7 +197,7 @@ summary:focus-visible {
 }
 .music-toggle svg,
 .music-volume-toggle svg {
-  flex: 0 0 auto;
+  flex: none;
 }
 .music-toggle.active {
   color: var(--ui-accent-ink);
@@ -256,7 +256,7 @@ summary:focus-visible {
 .brand-mark {
   /* The report's topbar is a flex row that let the wordmark shrink until it
      broke across two lines next to six buttons. */
-  flex: 0 0 auto;
+  flex: none;
   background: var(--ui-surface-2);
   color: var(--c-paper);
   white-space: nowrap;
@@ -280,7 +280,7 @@ summary:focus-visible {
 }
 .start-input-row button {
   display: inline-flex;
-  flex: 0 0 auto;
+  flex: none;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -394,7 +394,7 @@ summary:focus-visible {
   animation: intro-art-drift 28s ease-in-out infinite alternate;
 }
 @keyframes intro-art-drift {
-  from {
+  0% {
     transform: scale(1.02);
   }
   to {
@@ -411,7 +411,7 @@ summary:focus-visible {
   background:
     radial-gradient(55% 60% at 16% 46%, rgb(217 255 98 / 0.07), transparent 70%),
     linear-gradient(0deg, var(--ui-bg), transparent 30%),
-    linear-gradient(180deg, rgb(18 22 24 / 0.7), transparent 20%),
+    linear-gradient(rgb(18 22 24 / 0.7), transparent 20%),
     linear-gradient(
       90deg,
       var(--ui-bg),
@@ -491,7 +491,7 @@ summary:focus-visible {
   position: relative;
   width: 7px;
   height: 7px;
-  flex: 0 0 auto;
+  flex: none;
   background: var(--ui-accent);
   border-radius: 50%;
   box-shadow: 0 0 12px var(--ui-accent);
@@ -565,7 +565,7 @@ summary:focus-visible {
   position: absolute;
   inset: 0 auto 0 -60%;
   width: 45%;
-  background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.6), rgb(255 255 255 / 0));
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.6), transparent);
   transform: skewX(-18deg);
   animation: board-shine 2.8s var(--ui-ease) 2;
   pointer-events: none;
@@ -656,10 +656,10 @@ summary:focus-visible {
   width: min(240px, 50%);
   height: 3px;
   margin: 20px 0 14px;
-  background: linear-gradient(90deg, var(--ui-accent), rgb(217 255 98 / 0));
+  background: linear-gradient(90deg, var(--ui-accent), transparent);
   border-radius: 999px;
   box-shadow: 0 0 18px rgb(217 255 98 / 0.45);
-  transform-origin: left center;
+  transform-origin: left;
   animation: wordmark-charge 4.4s ease-in-out infinite;
 }
 .wordmark-reading {
@@ -766,7 +766,7 @@ summary:focus-visible {
   content: "";
   width: 18px;
   height: 2px;
-  flex: 0 0 auto;
+  flex: none;
   background: var(--ui-accent);
   border-radius: 999px;
   box-shadow: 0 0 10px var(--ui-accent);
@@ -812,7 +812,7 @@ summary:focus-visible {
   position: absolute;
   inset: 0 auto 0 -40%;
   width: 36%;
-  background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.55), rgb(255 255 255 / 0));
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.55), transparent);
   transform: skewX(-18deg);
   animation: intro-cta-shine 4.2s var(--ui-ease) infinite;
   pointer-events: none;
@@ -1145,7 +1145,7 @@ summary:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  flex: 0 0 auto;
+  flex: none;
   min-height: 52px;
   padding: 0 22px 0 18px;
   color: var(--ui-accent-ink);
@@ -1179,7 +1179,7 @@ summary:focus-visible {
   animation: intro-ticker-run 40s linear infinite;
 }
 .intro-protocol-line {
-  flex: 0 0 auto;
+  flex: none;
   padding-right: 48px;
   color: var(--ui-text-3);
   font-size: 0.71875rem;
@@ -1199,8 +1199,8 @@ summary:focus-visible {
   vertical-align: middle;
 }
 @keyframes intro-ticker-run {
-  from {
-    transform: translate3d(0, 0, 0);
+  0% {
+    transform: translateZ(0);
   }
   to {
     transform: translate3d(-50%, 0, 0);
@@ -1241,9 +1241,7 @@ summary:focus-visible {
 .data-info-panel,
 .season-panel,
 .quick-guide,
-.season-summary,
-.case-roadmap,
-.case-card {
+.season-summary {
   text-align: left;
 }
 .intro .start-priority {
@@ -1255,8 +1253,7 @@ summary:focus-visible {
   margin: clamp(40px, 6vw, 80px) auto 14px;
   padding: clamp(20px, 3vw, 32px);
   color: var(--ui-text);
-  background:
-    radial-gradient(80% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(80% 120% at 0 0, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
@@ -1540,7 +1537,7 @@ summary:focus-visible {
 .intro .intro-drawer > .data-info-panel {
   padding: 0;
   color: var(--ui-text);
-  background: transparent;
+  background: none;
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -1822,7 +1819,7 @@ summary:focus-visible {
   width: 18px;
   height: 18px;
   margin-top: 2px;
-  flex: 0 0 auto;
+  flex: none;
   accent-color: var(--ui-accent);
 }
 .consent-box span {
@@ -2036,7 +2033,7 @@ summary:focus-visible {
   text-align: left;
 }
 .roadmap-heading span {
-  flex: 0 0 auto;
+  flex: none;
   color: var(--ui-text);
   font-size: clamp(1.875rem, 3.6vw, 3rem);
   font-weight: 800;
@@ -2086,6 +2083,22 @@ summary:focus-visible {
     transform var(--ui-dur) var(--ui-ease),
     border-color var(--ui-dur) var(--ui-ease),
     background var(--ui-dur) var(--ui-ease);
+}
+/* The roadmap's cards below the first screen are laid out and drawn only as
+   they come near it. The whole season sits under the full-height hero, and
+   its summaries are most of the text the start screen sets: on a throttled
+   phone the Japanese page committed its DOM at 6.1s and first painted at
+   9.8-15.2s, against 1.9s from commit to paint in English and Korean, with no
+   request or long task in between (ja-fcp, 2026-11-04). Until a card is drawn
+   it holds the height of a closed card (label row, a one-line title, the
+   trigger, a three-line summary, the lock note: about 280px here, and 300px
+   on the phone rail, whose card sets --card-reserve), and `auto` keeps the
+   height it really had once it has been drawn. The first row and the
+   season's current case are drawn as before: the roadmap link lands on them.
+   Nothing here moves, so a reduced-motion page is the same page. */
+.case-roadmap > .case-card:nth-child(n + 4):not(.active-case) {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto var(--card-reserve, 280px);
 }
 .case-card::before {
   content: attr(data-index);
@@ -2154,7 +2167,7 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  flex: 0 0 auto;
+  flex: none;
   padding: 4px 10px;
   color: var(--ui-text-2);
   background: var(--ui-surface-3);
@@ -2179,8 +2192,13 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 600;
 }
+/* An undrawn card (content-visibility, above) is held at its reserve, and a
+   column flexbox would squeeze this overflow-hidden paragraph to fit it: the
+   touch screen's whole summary then measured as cut. Drawn cards grow to their
+   content, so nothing visible changes. */
 .case-card p {
   display: -webkit-box;
+  flex: none;
   margin: 0 0 18px;
   overflow: hidden;
   color: var(--ui-text-2);
@@ -2237,14 +2255,14 @@ summary:focus-visible {
   color: var(--ui-surface-2);
 }
 .case-card.locked-case .case-status-chip {
-  background: transparent;
+  background: none;
 }
 /* The acid glow sits at 0.1, not 0.14: the readability check reads the card's
    --ui-text-2 against the glow laid twice over --ui-surface-1, and on the
    neutral ground (one step lighter since design-mood) 0.14 read 4.45:1; 0.1
    reads 5.61:1 (5.50 on bright, the lightest ground). */
 .case-card.active-case {
-  background: radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(120% 90% at 0 0, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
   border-color: rgb(217 255 98 / 0.6);
   box-shadow:
     0 0 0 1px rgb(217 255 98 / 0.25),
@@ -2344,7 +2362,7 @@ summary:focus-visible {
   margin-bottom: 14px;
   padding: 20px 20px 20px 24px;
   color: var(--ui-text);
-  background: radial-gradient(90% 140% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(90% 140% at 0 0, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
@@ -2373,7 +2391,7 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  flex: 0 0 auto;
+  flex: none;
   min-height: 48px;
   padding: 0 20px 0 16px;
   color: var(--ui-accent-ink);
@@ -2800,7 +2818,7 @@ summary:focus-visible {
   overflow-wrap: anywhere;
 }
 .board-post-head span {
-  flex: 0 0 auto;
+  flex: none;
   color: var(--ui-text-3);
   font-size: 0.75rem;
   font-weight: 600;
@@ -2883,7 +2901,7 @@ summary:focus-visible {
     max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   color: var(--c-paper);
   background:
-    radial-gradient(60% 60% at 50% 50%, rgb(217 255 98 / 0.1), transparent 70%),
+    radial-gradient(60% 60%, rgb(217 255 98 / 0.1), transparent 70%),
     linear-gradient(90deg, rgb(6 9 10 / 0.95), rgb(6 9 10 / 0.78)),
     url(/triggerlab-key-visual-960.webp) center / cover;
   animation: opening-burst-in 0.18s ease-out both;
@@ -2936,7 +2954,7 @@ summary:focus-visible {
   animation: opening-burst-charge 0.86s ease-out both;
 }
 @keyframes opening-burst-in {
-  from {
+  0% {
     opacity: 0;
   }
   to {
@@ -2944,7 +2962,7 @@ summary:focus-visible {
   }
 }
 @keyframes opening-burst-grid {
-  from {
+  0% {
     transform: translateX(-12%);
   }
   to {
@@ -2952,7 +2970,7 @@ summary:focus-visible {
   }
 }
 @keyframes opening-burst-panel {
-  from {
+  0% {
     opacity: 0;
     transform: translateX(-32px);
   }
@@ -2962,7 +2980,7 @@ summary:focus-visible {
   }
 }
 @keyframes opening-burst-charge {
-  from {
+  0% {
     transform: scaleX(0);
     transform-origin: left;
   }
@@ -3033,7 +3051,6 @@ body {
   .intro-hero-art::after {
     background:
       linear-gradient(
-        180deg,
         rgb(18 22 24 / 0.72),
         rgb(18 22 24 / 0.12) 20%,
         rgb(18 22 24 / 0.55) 48%,
@@ -3115,6 +3132,9 @@ body {
   .case-card {
     min-height: 250px;
     scroll-snap-align: start;
+    /* A rail card is narrower, so its title more often takes two lines: the
+       height an undrawn card holds (content-visibility, above). */
+    --card-reserve: 300px;
   }
   .roadmap-heading {
     margin-top: 64px;
@@ -3278,13 +3298,11 @@ body {
   color: var(--pr-say, var(--ui-text));
   font-weight: 800;
 }
-
 .pr-num {
   color: var(--pr-num, var(--c-amber));
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-
 .pr-term {
   text-decoration: underline dotted 1.5px;
   text-underline-offset: 0.22em;
@@ -3298,14 +3316,12 @@ body {
   background: none;
   border: 0;
 }
-
 .pr-note {
   color: var(--pr-note, var(--ui-text-3));
   font-size: 0.92em;
   font-style: italic;
   font-weight: 500;
 }
-
 :is(.gx-caption, .gx-panel-file li, .gx-balloon, .cinematic-clue-card) {
   --pr-say: var(--c-teal);
   --pr-num: var(--c-danger-deep);
