@@ -54,7 +54,7 @@ export function WeeklyRuleLine({ now, first = false, ticked, tick }) {
               setOn(event.target.checked);
             }}
           />
-          {first ? weekRuleCopy.takeUp : weekRuleCopy.turnDown}
+          {line.testWeek ? (first ? weekRuleCopy.testWeekTakeUp : weekRuleCopy.testWeekTurnDown) : first ? weekRuleCopy.takeUp : weekRuleCopy.turnDown}
         </label>
       )}
     </section>

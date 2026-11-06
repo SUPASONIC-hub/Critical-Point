@@ -1326,7 +1326,8 @@ const budgets = [
   // entry chunk's export names it imports by, plus 4; the file did not change.
   // 1,996 / 1,056 -> 2,176 / 1,138 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 2,176 / 1,138 -> 2,537 / 1,280 on 2026-10-26, 영어판 3단계: the start screen's line read by key, and the rules' words by id (src/copy/weekRule.js `line`, `rules`). The Korean is the same. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 2_537, maxGzip: 1_280 },
+  // 2,537 / 1,280 -> 3,223 / 1,436 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 3,219 / 1,432 in the e2e build, the plus 4.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 3_223, maxGzip: 1_436 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -1575,7 +1576,9 @@ const budgets = [
   // 182,240 / 60,959 -> 182,959 / 61,274 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's draft lines (reroll, extra, spendNote, spendHint, second pick, off reasons, skipPaid), B1's scout price and B5's stake clock in Japanese. Measured 182,955 / 61,270 in the e2e build, the plus 4.
   // -> 183,312 / 61,351 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 183,308 / 61,347 in the e2e build, the plus 4.
   // 184,407 / 61,384 -> 185,126 / 61,676 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 185,122 / 61,672 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 185_126, maxGzip: 61_676 },
+  // -> 183,930 / 61,484 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 183,926 / 61,480 in the e2e build, the plus 4.
+  // -> 185,744 / 61,816 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 185,740 / 61,812 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 185_744, maxGzip: 61_816 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1621,7 +1624,9 @@ const budgets = [
   // 152,040 / 54,336 -> 152,663 / 54,573 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the same lines in English. Measured 152,659 / 54,569 in the e2e build, the plus 4.
   // -> 152,922 / 54,642 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 152,918 / 54,638 in the e2e build, the plus 4.
   // 153,720 / 54,702 -> 154,343 / 54,949 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 154,339 / 54,945 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 154_343, maxGzip: 54_949 },
+  // -> 153,452 / 54,773 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 153,448 / 54,769 in the e2e build, the plus 4.
+  // -> 154,873 / 55,082 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 154,869 / 55,078 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 154_873, maxGzip: 55_082 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1889,7 +1894,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 432,479 / 490,209 / 497,421 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 432,475 / 490,205 / 497,417 in the e2e build, the plus 4.
 // 432,507 / 490,290 / 497,455 -> 432,622 / 490,652 / 497,862 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2): the two sides' lines together. Measured 432,618 / 490,648 / 497,858 in the e2e build, the plus 4.
 // 432,622 / 490,652 / 497,862 -> 433,234 / 491,263 / 498,475 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the lines above (index CSS and entry). Measured 433,230 / 491,259 / 498,471 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 433_234, en: 491_263, ja: 498_475 };
+// en 490,209 -> 490,337 and ja 497,421 -> 497,551 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 490,333 / 497,547 in the e2e build, the plus 4 (ko 432,474 under its 432,479).
+// -> 433,241 / 491,404 / 498,624 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 433,237 / 491,400 / 498,620 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 433_241, en: 491_404, ja: 498_624 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

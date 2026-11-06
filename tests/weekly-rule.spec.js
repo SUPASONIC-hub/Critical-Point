@@ -174,7 +174,7 @@ test("weekly rule moved (10-22): W44 is an ordinary week, and W46 tells of W47 o
   await page.goto("/");
   const line = page.getByTestId("weekly-rule-line");
   await expect(line).toContainText("NEAR WALL");
-  await expect(line).toContainText("다음 주의 규칙은 AUDIT & CASCADE");
+  await expect(line).toContainText("다음 주는 시험 주: 감사·연쇄는 이제 상시 규칙이고");
 });
 
 test("weekly rule ranking: two boards in an event week, each asked of the server by its week", async ({ page }) => {
