@@ -30,7 +30,7 @@ import { scoreMarks } from "../src/seasonScore.js";
 import { funnelQuery, quantile, readFunnel, readRun, STOPS } from "./report-funnel.mjs";
 
 /** The bot's endings, 600 seasons after #464 (percent). */
-export const BOT_ENDINGS = { collapse: 20, oversight: 9.7, reform: 11.3, human: 16, silence: 4.8, cold: 3, pact: 18, quiet: 8, open: 8 };
+export const BOT_ENDINGS = { collapse: 20, "open-oversight": 9.7, "evidence-reform": 11.3, "human-record": 16, "profitable-silence": 4.8, "cold-justice": 3, "field-pact": 18, "quiet-cover": 8, "open-question": 8 };
 /** The season bands the 2026-10-22 proposal (랭크기준-제안) measured on the bot: S 72+, A 66+, B 56+. Reference only. */
 export const PROPOSED_BANDS = { S: 72, A: 66, B: 56 };
 const RANKS = ["S", "A", "B", "C"];

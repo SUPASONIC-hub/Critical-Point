@@ -7,43 +7,43 @@
    "new_game_plus": true
   },
   {
-   "ending": "pact",
+   "ending": "field-pact",
    "score": "58",
    "rank": "B",
    "new_game_plus": false
   },
   {
-   "ending": "pact",
+   "ending": "field-pact",
    "score": "67",
    "rank": "B",
    "new_game_plus": false
   },
   {
-   "ending": "human",
+   "ending": "human-record",
    "score": "73",
    "rank": "A",
    "new_game_plus": false
   },
   {
-   "ending": "reform",
+   "ending": "evidence-reform",
    "score": "55",
    "rank": "B",
    "new_game_plus": false
   },
   {
-   "ending": "quiet",
+   "ending": "quiet-cover",
    "score": "44",
    "rank": "C",
    "new_game_plus": false
   },
   {
-   "ending": "open",
+   "ending": "open-question",
    "score": "61",
    "rank": "B",
    "new_game_plus": false
   },
   {
-   "ending": "oversight",
+   "ending": "open-oversight",
    "score": "70",
    "rank": "B",
    "new_game_plus": false
