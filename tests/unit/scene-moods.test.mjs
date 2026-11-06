@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { nodes } from "../../src/gameData.js";
 import { MOODS, SCENE_MOODS, sceneMood } from "../../src/sceneMoods.js";
 import { findMoodFailures } from "../../scripts/check-mood.mjs";
-import { capCaseShare, parseReview, renderReview, renderSceneMoods, scoreScene } from "../../scripts/tag-mood.mjs";
+import { CASE_CAP_OVERRIDES, CASE_SHARE_CAP, caseShareCap, capCaseShare, parseReview, renderReview, renderSceneMoods, scoreScene } from "../../scripts/tag-mood.mjs";
 
 test("MOODS is the design's five, neutral first", () => {
   assert.deepEqual(MOODS, ["neutral", "bright", "tense", "dread", "sorrow"]);
@@ -69,4 +69,18 @@ test("a review table's 검토 column reads back, blanks left out", () => {
   ];
   const review = parseReview(renderReview("case01", rows));
   assert.deepEqual(review, { a_2: "sorrow" });
+});
+
+test("a case read as one colour keeps its own share, in the cap and in the check alike", () => {
+  assert.equal(caseShareCap("case01"), CASE_SHARE_CAP);
+  for (const [caseId, { cap, why }] of Object.entries(CASE_CAP_OVERRIDES)) {
+    assert.ok(cap > CASE_SHARE_CAP && cap <= 1, `${caseId}: ${cap}`);
+    assert.ok(why, `${caseId} says why`);
+    assert.equal(caseShareCap(caseId), cap);
+  }
+  const graph = { a_1: {}, a_2: {}, a_3: {}, a_4: {} };
+  const orders = { case32: ["a_1", "a_2", "a_3", "a_4"] };
+  const moods = { a_1: "tense", a_2: "tense", a_3: "tense" };
+  assert.deepEqual(findMoodFailures({ moods, graph, orders, cap: (caseId) => (caseId === "case32" ? 0.75 : 0.7) }), []);
+  assert.ok(findMoodFailures({ moods, graph, orders, cap: 0.7 }).some((line) => line.includes("3 of 4 scenes are tense")));
 });

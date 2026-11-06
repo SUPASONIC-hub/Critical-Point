@@ -7,18 +7,19 @@
  *     a written one is a hand edit the generator would drop);
  *   - no case has more than 70% of its scenes in one non-neutral mood -- the
  *     smell of a word list that fired on the whole case (CASE_SHARE_CAP in
- *     tag-mood.mjs; raise both together when a case really is one colour).
+ *     tag-mood.mjs; a case a reviewer read as one colour gets its own share
+ *     in CASE_CAP_OVERRIDES there, which both read through caseShareCap).
  *
  * Exports `findMoodFailures` for the unit test; exits 1 on any failure.
  */
 import { pathToFileURL } from "node:url";
 import { CASE_SEQUENCE, nodeOrders, nodes } from "../src/gameData.js";
 import { MOODS, SCENE_MOODS } from "../src/sceneMoods.js";
-import { CASE_SHARE_CAP, MOODS as GENERATOR_MOODS } from "./tag-mood.mjs";
+import { MOODS as GENERATOR_MOODS, caseShareCap } from "./tag-mood.mjs";
 
 const KNOWN = ["neutral", "bright", "tense", "dread", "sorrow"];
 
-export function findMoodFailures({ moods = SCENE_MOODS, graph = nodes, orders = nodeOrders, cap = CASE_SHARE_CAP } = {}) {
+export function findMoodFailures({ moods = SCENE_MOODS, graph = nodes, orders = nodeOrders, cap = caseShareCap } = {}) {
   const failures = [];
   if (JSON.stringify(MOODS) !== JSON.stringify(KNOWN)) failures.push(`MOODS is ${JSON.stringify(MOODS)}; expected ${JSON.stringify(KNOWN)}`);
   if (JSON.stringify(GENERATOR_MOODS) !== JSON.stringify(KNOWN)) failures.push(`tag-mood.mjs MOODS is ${JSON.stringify(GENERATOR_MOODS)}; expected ${JSON.stringify(KNOWN)}`);
@@ -36,7 +37,8 @@ export function findMoodFailures({ moods = SCENE_MOODS, graph = nodes, orders = 
       if (mood && mood !== "neutral") counts[mood] = (counts[mood] ?? 0) + 1;
     }
     for (const [mood, count] of Object.entries(counts)) {
-      if (count / order.length > cap) failures.push(`${caseId}: ${count} of ${order.length} scenes are ${mood} (over ${Math.round(cap * 100)}%)`);
+      const share = typeof cap === "function" ? cap(caseId) : cap;
+      if (count / order.length > share) failures.push(`${caseId}: ${count} of ${order.length} scenes are ${mood} (over ${Math.round(share * 100)}%)`);
     }
   }
   return failures;
