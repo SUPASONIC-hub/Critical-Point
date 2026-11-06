@@ -1,5 +1,8 @@
 import { COLD_OPENING_SEEN_KEY, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { isFirstSeason } from "./weeklyRuleChoice.js";
+import { COLD_OPENING_ENABLED } from "../coldOpeningSwitch.js";
+
+export { COLD_OPENING_ENABLED };
 
 /**
  * B-3(1) 냉정한 오프닝 (draft, 2026-11-06): a first-time player's 시작 opens a
@@ -8,19 +11,18 @@ import { isFirstSeason } from "./weeklyRuleChoice.js";
  * prologue's first scene. The five prologue cases become a flashback towards an
  * answer the player has already been shown (분석 문서 B-3(1)).
  *
- * The switch. It is decided after the E-4 funnel (주간 Funnel 워크플로,
+ * The switch (src/coldOpeningSwitch.js). It is decided after the E-4 funnel (주간 Funnel 워크플로,
  * scripts/report-funnel.mjs) has shown the prologue's drop-off through W47
  * (20261103 미반영 계획 D절). Off, nothing of this reaches a player: the start
  * button is the button it was, and the bundler drops the page and its words
- * (IntroScreen's branch reads this constant before anything else).
+ * (IntroScreen's branch reads the switch, as `__CP_COLD_OPENING__`, before
+ * anything else).
  *
  * Nothing here touches the run. The page sits in front of `startGame`, which
  * is called afterwards exactly as the button calls it without the page: the
  * same save, the same resources, the same first scene and clock. Nothing a
  * replay or the ranking checks is read or written.
  */
-export const COLD_OPENING_ENABLED = false;
-
 /**
  * A dev or e2e build (`__CP_DEBUG_BUILD__`) can turn the page on for one visit
  * with `?coldOpening=1`, so the draft can be played and timed while the switch

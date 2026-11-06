@@ -27,9 +27,11 @@ const { getReadingSeconds } = await import("../../src/gauntlet/gauntletEngine.js
 test("the draft ships off, and the start button reads the switch before anything else", () => {
   assert.equal(COLD_OPENING_ENABLED, false);
   const intro = readFileSync(new URL("../../src/screens/IntroScreen.jsx", import.meta.url), "utf8");
-  // The constant, then the build constant: a release build folds the branch
-  // (and the page's dynamic import) away while the switch is off.
-  assert.match(intro, /\(COLD_OPENING_ENABLED \|\| \(__CP_DEBUG_BUILD__ && coldOpeningForced\(\)\)\) && playsColdOpening\(/);
+  // The switch as the bundler writes it, then the build constant: a release
+  // build folds the branch (and the page's dynamic import) away while it is off.
+  assert.match(intro, /\(__CP_COLD_OPENING__ \|\| \(__CP_DEBUG_BUILD__ && coldOpeningForced\(\)\)\) && playsColdOpening\(/);
+  const vite = readFileSync(new URL("../../vite.config.js", import.meta.url), "utf8");
+  assert.match(vite, /__CP_COLD_OPENING__: JSON\.stringify\(COLD_OPENING_ENABLED\)/);
   assert.equal((intro.match(/import\("\.\.\/components\/ColdOpening\.jsx"\)/g) ?? []).length, 1);
 });
 
