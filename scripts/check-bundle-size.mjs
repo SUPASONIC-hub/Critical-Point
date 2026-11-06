@@ -140,7 +140,8 @@ const budgets = [
   // -> 148,285 / 54,824 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): #458's scene moods over the bundle's lines above. Measured 148,281 / 54,820 in the e2e build, the plus 4.
   // 148,514 / 54,956 -> 148,622 / 54,994 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 148,618 / 54,990 in the e2e build, the plus 4.
   // -> 148,773 / 55,052 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules over the bundle's lines above. Measured 148,769 / 55,048 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_773, maxGzip: 55_052 },
+  // 55,052 -> 55,059 gzip on 2026-11-06, mood-boost over main 6f58cbb8: the runtime names the renamed case chunks (the early scenes' moods). Measured 55,055 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 148_773, maxGzip: 55_059 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -265,7 +266,8 @@ const budgets = [
   // 98,900 / 25,400 -> 91,536 / 23,304 on 2026-11-03, prose-trim-1 (#394) over main 465ccb93: the scene text of prologue 01-05 and cases 01-03 cut by 28.8%. 사건 01 still the largest, measured 91,532 / 23,300 in the e2e build, the plus 4.
   // 91,536 / 23,304 -> 91,581 / 23,318 on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): main's trimmed case01 (91,532 / 23,300) plus the moods written on its scenes (the line above, mood-wire). Measured 91,577 / 23,314 in the e2e build, the plus 4.
   // 91,632 / 23,319 -> 91,677 / 23,336 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. (the moods on 사건 01's scenes beside B-13(2)'s attended). Measured 91,673 / 23,332 in the e2e build, the plus 4.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 91_677, maxGzip: 23_336 },
+  // 91,677 / 23,336 -> 91,893 / 23,370 on 2026-11-06, mood-boost over main 6f58cbb8: 95 early scenes tagged by review (prologues 01-05, cases 01-05), their `"mood"` written on each; case01 the largest. Measured 91,889 / 23,366 in the e2e build, the plus 4.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 91_893, maxGzip: 23_370 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
@@ -478,7 +480,8 @@ const budgets = [
   // -> 194,282 / 70,155 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): #458's mood and music in the entry over the bundle's 글자 크기 setting and the rest above. Measured 194,278 / 70,151 in the e2e build, the plus 4.
   // 191,875 / 69,335 -> 193,717 / 70,143 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 193,713 / 70,139 in the e2e build, the plus 4.
   // -> 194,587 / 70,288 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules in the entry over the bundle's 글자 크기 setting and the rest above. Measured 194,583 / 70,284 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 194_587, maxGzip: 70_288 },
+  // 194,587 / 70,288 -> 195,444 / 70,600 on 2026-11-06, mood-boost over main 6f58cbb8: the mood's texture in the entry's AdaptiveMusic (musicScore.js MOOD_TEXTURES, blendedTexture, moodLeadNote). Measured 195,440 / 70,596 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 195_444, maxGzip: 70_600 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -891,7 +894,8 @@ const budgets = [
   // 38,438 -> 38,432 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 977809b3): the two acid glows at 0.1 (the active case card, the next-case panel), for the readability check on the lighter neutral ground. Measured 204,565 / 38,428 in the e2e build, the plus 4.
   // 205,041 / 38,403 -> 206,048 / 38,702 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 206,044 / 38,698 in the e2e build, the plus 4.
   // -> 206,351 / 38,789 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): #461's rules CSS over the bundle's root rules and the card summary's flex: none. Measured 206,347 / 38,785 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 206_351, maxGzip: 38_789 },
+  // 206,351 / 38,789 -> 207,495 / 39,098 on 2026-11-06, mood-boost over main 6f58cbb8: the moods' hue-carrying grounds, lines, accents and frames (tokens.css), the edge tint (play.css .game-shell::after, briefing.css veil) and its @property. Measured 207,491 / 39,094 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 207_495, maxGzip: 39_098 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1780,7 +1784,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 431,886 / 488,653 / 495,860 on 2026-11-05, bundle-1105d after merging main 4f2d39cb (#458 mood colour and music, #460 본문 c): the lines above together. Measured 431,882 / 488,649 / 495,856 in the e2e build, the plus 4.
 // 430,916 / 488,364 / 495,479 -> 432,043 / 489,484 / 496,601 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 bundle-mood: mood tokens, glow, AdaptiveMusic): the two bundles' lines together. Measured 432,039 / 489,480 / 496,597 in the e2e build, the plus 4.
 // -> 432,365 / 489,860 / 496,995 on 2026-11-05, bundle-1105d after merging main 7e1fe0f0 (#461 rules bundle): the lines above together. Measured 432,361 / 489,856 / 496,991 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 432_365, en: 489_860, ja: 496_995 };
+// 432,365 / 489,860 / 496,995 -> 432,999 / 490,489 / 497,624 on 2026-11-06, mood-boost over main 6f58cbb8: the lines above (index CSS and entry). Measured 432,995 / 490,485 / 497,620 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 432_999, en: 490_489, ja: 497_624 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

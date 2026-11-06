@@ -333,7 +333,8 @@ const fileBudgets = {
   // apart from the HUD block that the audit token (#224) adds to.
   // -> 3029 / 58893 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
   // 3029 / 58893 -> 3029 / 58883 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood), measured.
-  "play.css": { lines: 3029, bytes: 58883 },
+  // 3029 / 58883 -> 3039 / 59115 on 2026-11-06, mood-boost, measured: the mood's edge tint (.game-shell::after).
+  "play.css": { lines: 3039, bytes: 59115 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -408,7 +409,8 @@ const fileBudgets = {
   // 849 / 16478 -> 849 / 16498 on 2026-11-03, measured (plate-sound-clip): the
   // word is centred in its transform, which the build keeps, not by the
   // separate translate property the build dropped.
-  "briefing.css": { lines: 849, bytes: 16498 },
+  // 849 / 16498 -> 854 / 16681 on 2026-11-06, mood-boost, measured: the briefing veil's mood edge and the page's mood frame.
+  "briefing.css": { lines: 854, bytes: 16681 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
