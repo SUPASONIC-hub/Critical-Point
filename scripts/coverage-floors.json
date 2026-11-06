@@ -43,6 +43,7 @@
     "src/gauntlet/tableReadout.js": 100,
     "src/gauntlet/tableRules.js": 100,
     "src/gauntlet/tableStaging.js": 100,
+    "src/gauntlet/tableTabTitle.js": 91,
     "src/gauntlet/tableUnlocks.js": 100,
     "src/gauntlet/tableVoice.js": 67,
     "src/gauntlet/tensionDrone.js": 100,

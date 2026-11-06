@@ -658,6 +658,12 @@ Still open, on purpose:
   `newGamePlus` and `case_id`, through a redefinition of
   `refresh_scene_bust_stats` in the rules-mark-3 migration. The NEW GAME+ work
   itself (#220) went out ahead of rules-mark-3, in bundle A on 2026-10-23.
+  The redefinition reached a migration with the rules bundle (#461,
+  2026-11-05): `20261106000000_scene_bust_new_game_plus.sql`, then
+  `20261106040000_scene_bust_ladder_c4.sql` for C-4's ladder, leave out a
+  NEW GAME+ case row only on the cases its table differs (`VETERAN_TABLE_CASES`,
+  prologue 01 to case 02); D3 (answer (1), keep the floor and the hourly
+  rebuild) is that filter, and `check:grants` holds it.
 - Server checks, phase 2 (F1, #216, eight answers all option 1) merged on
   2026-10-23 (item 92): `npm run verify:ranking` rechecks a run's score from
   its decision log and replays its recorded windows, and the daily `Verify
@@ -1560,7 +1566,10 @@ Still open, on purpose:
     summary, alongside `reframeRouteCount` and `peopleFirstCount`); the
     authority gate asks for records from 60% of the cases opened, never fewer
     than four; a finale that burns the records closes OPEN OVERSIGHT, EVIDENCE
-    REFORM and HUMAN RECORD; HUMAN RECORD also asks for every case's record
+    REFORM and HUMAN RECORD, and one that answers 개혁 (`f_after_control`)
+    reads EVIDENCE REFORM before OPEN OVERSIGHT at the same gates (improvement
+    note C2, 2026-11-05: at legitimacy 86 and trust 85 OPEN OVERSIGHT took
+    nearly every reform season, 5.3% of 600 replayed); HUMAN RECORD also asks for every case's record
     (`HUMAN_RECORD_CLUE_RATE`), not only a reframed route in seven cases of
     ten, since staking the wild card wherever it was dealt closed 94% of
     seasons on it. The gates a player is told about live in
@@ -1718,10 +1727,12 @@ Still open, on purpose:
     `event.key` is a jamo. Space and Enter belong to whatever control the
     keyboard walked to with Tab; only with nothing such focused do they push
     and cash. On a scene that closes the case (`isClosingScene`,
-    `src/gauntlet/holdConfirm.js`; about one a case) 확정 is held for 0.8
-    seconds (`HOLD_MS`), Enter and Space included, and a short press arms it
-    so a second press within 3 seconds confirms -- the path for a screen
-    reader's virtual click or a hand that cannot hold. On the result screen
+    `src/gauntlet/holdConfirm.js`; about one a case) and on a table whose
+    heat is inside the band (`isDangerZone`) 확정 is held for 0.6 seconds
+    (`HOLD_MS`, 2026-11-05 A4), Enter and Space included, with a gauge on
+    the button; a short press only shows the hint 길게 눌러야 확정. A bare tap
+    with no press -- a screen reader's virtual click -- arms it so a second
+    tap within 3 seconds confirms. On the result screen
     `R` replays the case after asking and `N`
     opens the next one. Escape closes the ranking and the board from anywhere.
     With letter keys turned off (priority 87), 1-9, W, E, Q, P, R and N do

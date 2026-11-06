@@ -1,10 +1,5 @@
 /** src/copy/table.js in Japanese: the table, its hand, its stance and its ledger. */
 export default {
-  tab: {
-    hot: "▲ 押せば壁の射程内",
-    critical: "▲ 熱 {gauge} · 壁の区間内",
-    bust: "[BUST] 勝負が壁に触れた",
-  },
   danger: {
     inBand: "壁の区間内",
     inReach: "押せば壁の射程内",
@@ -70,7 +65,8 @@ export default {
     commit: "確定",
     oneMore: "もう一度",
     holdToCommit: "長押しで確定",
-    holdHelp: "長押しで確定。長押しが難しければ、3秒以内にもう一度押す",
+    holdHint: "長押しが必要",
+    holdHelp: "長押しで確定",
   },
   keys: {
     stake: "賭ける",
@@ -92,6 +88,7 @@ export default {
     slamAbandon: "テーブルを離れた",
     slamWall: "壁は {wall} にあった",
     slamPot: "賭け金",
+    slamStill: "鼓動が止まった場所に、壁が現れた。",
     slamCombo: " · ロジックコンボ {streak}",
     equipped: "装備",
     dropped: "· {name}を手放した",
@@ -228,6 +225,7 @@ export default {
   },
   voice: {
     holdArmed: "もう一度押すと確定する",
+    holdHint: "長押しすると確定する",
     push: "熱 {gauge} · {danger}",
     wall: "いま熱 {gauge} · {danger}",
     stance: "チャージ {focus} · 確定すると次の勝負は{label} · {title}",

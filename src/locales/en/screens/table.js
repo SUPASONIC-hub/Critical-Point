@@ -1,10 +1,5 @@
 /** The table (src/copy/table.js) in English: buttons, gauges, notices, the hand, the Stance row, the ledger and the readouts. */
 export default {
-  tab: {
-    hot: "▲ One more push could hit the Wall",
-    critical: "▲ Heat {gauge} · inside the Wall band",
-    bust: "[BUST] The hand hit the Wall",
-  },
   danger: {
     inBand: "Inside the Wall band",
     inReach: "A push can reach the Wall",
@@ -70,7 +65,8 @@ export default {
     commit: "Commit",
     oneMore: "Once more",
     holdToCommit: "Hold to Commit",
-    holdHelp: "Press and hold to Commit. If holding is hard, press again within 3 seconds",
+    holdHint: "Hold, don't tap",
+    holdHelp: "Press and hold to Commit",
   },
   keys: {
     stake: "stake",
@@ -92,6 +88,7 @@ export default {
     slamAbandon: "You left the table",
     slamWall: "The Wall was at {wall}",
     slamPot: "Stake",
+    slamStill: "The wall showed where the heartbeat stopped.",
     slamCombo: " · Logic Combo {streak}",
     equipped: "Equipped",
     dropped: "· {name} put down",
@@ -207,6 +204,7 @@ export default {
   },
   voice: {
     holdArmed: "Press once more to Commit",
+    holdHint: "Hold the button down to Commit",
     push: "Heat {gauge} · {danger}",
     wall: "Now Heat {gauge} · {danger}",
     stance: "Charge {focus} · Commit for {label} next hand · {title}",

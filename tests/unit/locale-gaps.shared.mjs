@@ -164,7 +164,8 @@ export function collectLines(tables) {
   add("seasonGoals", getSeasonGoals());
   add("pastRunMemory", getPastRunMemory({ case03: { outcomeChoiceId: "x" } }));
   add("integrity", [getRankingIntegrity({ runId: "r", completedAt: 1, summary: { rank: "A" } }), getRankingIntegrity({})]);
-  for (const step of ANALYST_TITLE_STEPS) add(`analystTitle.${step.from}`, getAnalystTitle({ currentCase: step.from }));
+  for (const step of ANALYST_TITLE_STEPS) add(`analystTitle.${step.id}`, step.title);
+  add("analystTitle.finished", getAnalystTitle({ finishedSeason: true }));
   return lines;
 }
 

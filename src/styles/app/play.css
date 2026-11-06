@@ -1525,7 +1525,8 @@
   filter: brightness(1.08);
 }
 
-.gx-actions button:not(:disabled):active {
+.gx-actions button:not(:disabled):active,
+.gx-cash.is-holding {
   transform: translateY(2px) scale(0.98);
 }
 
@@ -1595,21 +1596,30 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A closing scene's 확정 is held (holdConfirm.js): a line fills out from the
-   middle in the 0.8s the hold takes. Reduced motion draws it full at once. */
-.gx-cash.is-holding::after {
-  content: "";
+/* The big decisions' 확정 is held (holdConfirm.js, HoldGauge.jsx): a line
+   under the label fills left to right in the 0.6s the hold takes, and the
+   button sits pressed as it does under a pointer (the :active rule above).
+   A press that let go too soon leaves a stub beside its hint; a screen
+   reader's first tap holds the stub until its second. A transition, not an
+   animation: the calm setting stops every animation on the stage, and the
+   gauge is the one motion a held press is read from, so it stays under calm
+   effects and reduced motion alike (nothing else moves). */
+.gx-hold {
   position: absolute;
-  inset: auto 14px 6px;
+  inset: auto 14px 5px;
   height: 3px;
   background: currentColor;
-  animation: gx-hold 0.8s linear;
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
-@keyframes gx-hold {
-  from {
-    transform: scaleX(0);
-  }
+.gx-hold[data-phase="holding"] {
+  transform: none;
+  transition: transform 0.6s linear;
+}
+
+.gx-hold:is([data-phase="hinted"], [data-phase="armed"]) {
+  transform: scaleX(0.3);
 }
 
 /* Overlays -------------------------------------------------------------------- */
@@ -1794,6 +1804,9 @@
   backdrop-filter: blur(10px);
 }
 
+/* The slam's third line, `small` (A2, 2026-11-05), takes no rule: the browser's
+   smaller size and the paper colour it inherits are the look. The sheet is at
+   its budget (check-css-structure.mjs), and the line is a line, not a pill. */
 .gx-slam-bust {
   color: var(--c-paper);
   background: var(--c-gx-heat-a18);
@@ -1810,7 +1823,6 @@
   z-index: -1;
   content: "";
   opacity: 0;
-  pointer-events: none;
 }
 
 .gx-slam-bust::before {
@@ -1840,8 +1852,16 @@
   animation: gx-cash-pop 0.5s var(--ui-ease-out) both;
 }
 
+/* The stop (A2, 2026-11-05): for the first quarter second after the slam the
+   table stands on its last frame, then greys over the next quarter. The heart
+   has already stopped on that frame (--gx-rate 0, GauntletFx.jsx). Reduced
+   motion collapses both quarters with every transition (responsive.css). The
+   bytes it cost came from two lines that did nothing: the slam layers'
+   pointer-events (inherited from .gx-slam) and the reduced-motion transform
+   on a card that is neither selected nor hovered (no rule ever moved it). */
 .gauntlet-stage.is-bust .gx-table {
   filter: grayscale(0.9) brightness(0.6);
+  transition: filter 0.25s 0.25s;
 }
 
 .gx-fx {
@@ -2693,6 +2713,31 @@
     padding-top: 3px;
   }
 
+  /* The signals row in English and Japanese: the logic streak's line is
+     longer than the Korean one, and the shares of 1.25 and 1 left to the
+     overclock and LOCK gave LOCK less than its own width, so it ran under the
+     streak (Linux, 360x740, hand5: en 15 to 25px, ja 8 to 18px; ko 0). LOCK
+     now takes its own width, without its icon or the empty track the hidden
+     multiplier line left; the overclock line takes the rest and is the one
+     that cuts with an ellipsis. Selectors stay at three classes, so a HUD
+     with more on that row (the audit token, four classes) sets its own. */
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-signals {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 8px;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal svg {
+    display: none;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-streak {
+    gap: 5px;
+  }
+
   /* An English page: Stake, Vault and the run's line with Audit n/4
      (RULES_MARK 3) needed 331px of a 310px rail at a pot of 0, so the run's
      line took a row of its own (26px) and a five-card hand's last card went
@@ -2876,12 +2921,6 @@
   .gx-hand {
     gap: 12px;
     grid-auto-rows: clamp(118px, calc((100dvh - 330px) / 2), 232px);
-  }
-
-  .gx-hand.hand-3,
-  .gx-hand.hand-5,
-  .gx-hand.hand-6 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .gauntlet-stage .gx-card {
@@ -3230,33 +3269,6 @@
   }
 }
 
-@media (max-width: 360px) {
-  /* The signals row in English and Japanese: the logic streak's line is
-     longer than the Korean one, and the shares of 1.25 and 1 left to the
-     overclock and LOCK gave LOCK less than its own width, so it ran under the
-     streak (Linux, 360x740, hand5: en 15 to 25px, ja 8 to 18px; ko 0). LOCK
-     now takes its own width, without its icon or the empty track the hidden
-     multiplier line left; the overclock line takes the rest and is the one
-     that cuts with an ellipsis. Selectors stay at three classes, so a HUD
-     with more on that row (the audit token, four classes) sets its own. */
-  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-signals {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    column-gap: 8px;
-  }
-
-  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal {
-    grid-template-columns: auto;
-  }
-
-  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal svg {
-    display: none;
-  }
-
-  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-streak {
-    gap: 5px;
-  }
-}
-
 /* The flash a LOCK press leaves. Cyan is the hand's colour (the streak and
    LOCK); lime stays on the control that records a decision. */
 .gx-fx-flash {
@@ -3267,14 +3279,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gx-table {
-    transform: none;
-  }
-
   .gx-breach,
   .gx-slam-bust strong,
   .gx-slam-cashed strong,
-  .gx-cash.is-holding::after,
   .gx-slam-bust::before,
   .gx-slam-bust::after {
     animation: none;
@@ -3284,11 +3291,18 @@
     background: var(--c-gx-heat-a55);
   }
 
+  .gx-table,
   .gx-pot-value,
   .gx-bpm svg,
-  .gauntlet-stage .gx-card,
   .gauntlet-stage .gx-card.selected {
     transform: none;
+  }
+
+  /* The held 확정's gauge is the one motion a hold is read from: it keeps its
+     0.6s over responsive.css's 1ms for every transition. A line filling once,
+     linearly, is a progress bar, not a flourish. */
+  .gx-hold[data-phase="holding"] {
+    transition-duration: 0.6s !important;
   }
 }
 

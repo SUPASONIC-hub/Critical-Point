@@ -41,8 +41,15 @@ const SKIPPED_DIRECTORIES = new Set([path.join("src", "locales", "ja"), path.joi
  * Source files whose strings are never drawn. src/boardBlockedTerms.js is the
  * board's blocked words, folded (hiragana, kanji, old jamo): the board refuses
  * a post that holds one with a sentence of its own and never prints the word.
+ * src/copy/tabTitles.js and its English layer are the browser tab's titles,
+ * which the browser's own interface draws, never the page's font (the ⚠ of
+ * 「⚠ 벽까지 3」 would otherwise cost a glyph nothing on the page uses).
  */
-const SKIPPED_FILES = new Set([path.join("src", "boardBlockedTerms.js")]);
+const SKIPPED_FILES = new Set([
+  path.join("src", "boardBlockedTerms.js"),
+  path.join("src", "copy", "tabTitles.js"),
+  path.join("src", "locales", "en", "screens", "tabTitles.js"),
+]);
 
 function range(from, to) {
   let text = "";
