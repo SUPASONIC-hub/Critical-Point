@@ -83,7 +83,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { CHAIN_MARK, recheckChain, UNCHECKED } from "../src/chainRecheck.js";
 import { isoWeekKey } from "../src/gauntlet/weeklyCalendar.js";
 import { RULES_MARK } from "../src/gauntlet/gauntletEngine.js";
 import {
@@ -98,7 +98,16 @@ import {
   readHallOfFame,
   readHallOfFameCounts,
 } from "../src/hallOfFame.js";
-import { recheckRun } from "../src/rankingRecheck.js";
+import { RECHECK_MARKS, recheckRun, RELIC_DRAFT_MARK } from "../src/rankingRecheck.js";
+
+/**
+ * The marks ranking_set_recheck_marks takes today (20261023000000). The
+ * draft's mark (RELIC_DRAFT_MARK, C9) is shown in the report but left out of
+ * the write until the 11-12 ranking wipe's migration adds it to the function's
+ * list (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql.draft) (the SQL is beside the mark in src/rankingRecheck.js): the function
+ * raises on a mark it does not know, and one run's would stop the whole write.
+ */
+export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK]);
 
 // `suspicion` is the insert trigger's marks on the ranking row: the hall of
 // fame (src/hallOfFame.js) takes a season the trigger did not mark either.
@@ -309,6 +318,7 @@ export function formatReport(results, { redact = false } = {}) {
       for (const finding of entry.windows.findings) {
         lines.push(`  ${entry.caseId} #${finding.index}: window ${finding.status} ${[...finding.differs, finding.problem].filter(Boolean).join(", ")}`);
       }
+      for (const finding of entry.drafts?.findings ?? []) lines.push(`  ${entry.caseId} #${finding.index}: draft off ${finding.differs.join(", ")} (shown, not written: ${RELIC_DRAFT_MARK})`);
     }
     if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record`);
     if (seedTails) lines.push(`  ${seedTails} windows were dealt again (a seed with a ~n tail: a rolled-back save, or a wall shopped for)`);
@@ -374,7 +384,7 @@ export function formatHallOfFamePick({ boards, left }) {
 export function marksSql(results) {
   const checked = results.filter((result) => (result.status === "checked" || result.status === "unrecorded") && typeof result.runId === "string" && result.runId);
   if (!checked.length) return null;
-  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.map(quote).join(", ")}]::text[], ${result.status === "checked"})`).join(",\n       ");
+  const values = checked.map((result) => `(${quote(result.runId)}, array[${result.marks.filter((mark) => DB_MARKS.includes(mark)).map(quote).join(", ")}]::text[], ${result.status === "checked"})`).join(",\n       ");
   return [
     "select count(*) filter (where marks is not null) as marked_rows",
     "  from (select public.ranking_set_recheck_marks(r.run_id, r.marks, r.replayed) as marks",

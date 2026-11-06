@@ -23,7 +23,8 @@
  *                   is practice windows, which leave no row), `busts` by at
  *                   least the busts that case logged and at most those plus the
  *                   practice windows, `cashes` by at most its windows, `vault`
- *                   and `handVault` never down (a practice run restores them,
+ *                   and `handVault` never down but by what the case's draft
+ *                   paid (C9, `relicDraft.cost`; a practice run restores them,
  *                   the audit takes from what is being secured, not from the
  *                   vault), and the table mark and the week stamp the same.
  *   the opening     the snapshot each case row carries as `dynamics.open`
@@ -52,6 +53,18 @@
  */
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
+
+/**
+ * What a case row's drafts paid out of the vault (C9): the first decision
+ * after a draft carries it (`relicDraft.cost`). The vault and its hand share
+ * may be down by this much from the close before, and no more; whether the
+ * cost is a price the draft could come to is rankingRecheck.js's
+ * `recheckRelicDraft`. Counted here, not imported, so this file keeps to the
+ * engine's one import.
+ */
+function draftSpend(log) {
+  return (Array.isArray(log) ? log : []).reduce((sum, entry) => sum + Math.max(0, numberOf(entry?.relicDraft?.cost) ?? 0), 0);
+}
 
 /**
  * The one mark the chain adds to a ranking row (question 3 (1)); its only
@@ -168,8 +181,12 @@ function recheckOpening(before, after, snapshot, breaks, unchecked) {
     return;
   }
   const close = before.dynamics;
+  // A draft paid for and the case then opened again (left half way) opens on the vault less what was paid.
+  const spent = draftSpend(after.decision_log);
   for (const key of ["vault", "handVault"]) {
-    if (numberOf(close[key]) !== null && snapshot[key] !== close[key]) breaks.push({ field: `open.${key}`, expected: close[key], found: snapshot[key] ?? null });
+    if (numberOf(close[key]) === null || snapshot[key] === close[key]) continue;
+    if (spent > 0 && numberOf(snapshot[key]) !== null && snapshot[key] < close[key] && snapshot[key] >= close[key] - spent) continue;
+    breaks.push({ field: `open.${key}`, expected: close[key], found: snapshot[key] ?? null });
   }
   const between = numberOf(close.windowIndex) === null || numberOf(snapshot.windowIndex) === null ? null : snapshot.windowIndex - close.windowIndex;
   if (between !== null && between < 0) breaks.push({ field: "open.windowIndex", expected: `${close.windowIndex} or more`, found: snapshot.windowIndex });
@@ -223,8 +240,10 @@ export function recheckCaseGap(before, after) {
   if (busts !== null && busts < own) breaks.push({ field: "busts", expected: `+${own} or more`, found: busts });
   if (busts !== null && windows !== null && busts > own + Math.max(0, windows - log.length)) breaks.push({ field: "busts", expected: `+${own + Math.max(0, windows - log.length)} or less`, found: busts });
   if (cashes !== null && windows !== null && (cashes < 0 || cashes > Math.max(0, windows - own))) breaks.push({ field: "cashes", expected: `0 to +${Math.max(0, windows - own)}`, found: cashes });
+  // A draft's price (C9) is the one way down.
+  const spent = draftSpend(log);
   for (const key of ["vault", "handVault"]) {
-    if (delta(key) !== null && delta(key) < 0) breaks.push({ field: key, expected: "+0 or more", found: delta(key) });
+    if (delta(key) !== null && delta(key) < -spent) breaks.push({ field: key, expected: spent ? `-${spent} or more` : "+0 or more", found: delta(key) });
   }
   if (before) {
     for (const key of [RULES_MARK_KEY, "weekRule"]) {

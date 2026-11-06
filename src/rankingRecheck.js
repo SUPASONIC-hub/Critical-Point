@@ -45,7 +45,8 @@
 import { nodes } from "./gameData.js";
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
-import { drawStep, getMultiplier, getSealedCardId, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
+import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
+import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
@@ -210,6 +211,75 @@ export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules =
   return { counts, findings, seedTails };
 }
 
+/**
+ * The display mark for a draft that does not hold together (C9 decision 6 (1)):
+ * shown by verify-ranking-rows.mjs beside the others, never a refusal.
+ *
+ * Not yet written to the database: ranking_set_recheck_marks (20261023000000)
+ * raises on a mark it does not list, so verify-ranking-rows.mjs leaves this one
+ * out of the write (`DB_MARKS` there) until the 11-12 ranking wipe's
+ * migration takes it (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql.draft,
+ * drafted 2026-11-05 with these three pieces in it; no migration of their own):
+ *
+ *   -- ranking_set_recheck_marks: the checker's marks, with the draft's
+ *   v_recheck constant text[] := array['chain-off-log', 'relic-draft', 'score-off-log', 'window-no-replay', 'window-off-replay'];
+ *   -- playtest_sessions_dynamics_shape: the season's spent column, a whole number of 0 or more
+ *   and (not (dynamics ? 'seasonSpent') or (jsonb_typeof(dynamics -> 'seasonSpent') = 'number' and (dynamics ->> 'seasonSpent')::numeric >= 0))
+ *   -- the log's draft cost, one of the four a draft can come to
+ *   and not jsonb_path_exists(decision_log, '$[*].relicDraft.cost ? (@ != 0 && @ != 4000 && @ != 12000 && @ != 16000)')
+ */
+export const RELIC_DRAFT_MARK = "relic-draft";
+
+const numberOf = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
+const sameIds = (left, right) => Array.isArray(left) && Array.isArray(right) && left.length === right.length && left.every((id, index) => id === right[index]);
+
+/**
+ * Every draft a case row's log carries (`relicDraft`, on the first decision
+ * after the draft), drawn again and priced: the offer and a reroll's are what
+ * `drawRelicOffer` deals from the draft's seed, pool and held relics; every id
+ * is a relic; the picks come out of the last offer, two only when one more was
+ * bought; the cost is the price of what was bought; no money spent on a story
+ * case or a replay, nor more than the case opened with in its vault; the held
+ * relics are the ones the case opened on; and the seed is the last window of
+ * the case before (`before`, when that row is here and recorded it).
+ */
+export function recheckRelicDraft(row, before = null) {
+  const log = Array.isArray(row?.decision_log) ? row.decision_log : [];
+  const open = row?.dynamics?.open;
+  const findings = [];
+  let drafts = 0;
+  log.forEach((entry, index) => {
+    if (!entry?.relicDraft) return;
+    drafts += 1;
+    const raw = entry.relicDraft;
+    const draft = normalizeRelicDraft(raw);
+    const differs = [];
+    if (!draft) differs.push("shape");
+    else {
+      const known = (list) => Array.isArray(list) && list.every((id) => RELIC_IDS.includes(id));
+      if (!known(raw.pool) || !known(raw.owned) || !known(raw.offer) || !known(raw.picked) || (raw.reroll && !known(raw.reroll.offer))) differs.push("ids");
+      if (!sameIds(draft.offer, drawRelicOffer(draft.seed, draft.pool, draft.owned))) differs.push("offer");
+      if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned))) differs.push("reroll");
+      const last = draft.reroll?.offer ?? draft.offer;
+      if (draft.picked.some((id) => !last.includes(id)) || draft.picked.length > (draft.extra ? 2 : 1)) differs.push("picked");
+      if (numberOf(raw.cost) !== getRelicDraftCost(draft)) differs.push("cost");
+      if (draft.cost > 0 && (open?.story === true || open?.practice === true || entry.assistStory)) differs.push("spent");
+      if (draft.cost > 0 && numberOf(open?.vault) !== null && draft.cost > open.vault) differs.push("vault");
+      if (Array.isArray(open?.relics) && !sameIds(draft.owned, open.relics)) differs.push("owned");
+      const closing = Array.isArray(before?.decision_log) ? before.decision_log.at(-1)?.[WINDOW_RECORD_KEY] : null;
+      if (closing && closing.seed !== undefined && String(closing.seed) !== draft.seed) differs.push("seed");
+    }
+    if (differs.length) findings.push({ index, differs });
+  });
+  return { drafts, findings };
+}
+
+/** What a case row's drafts cost in all: the vault may be down by this much from the close before (chainRecheck.js). */
+export function getRowDraftCost(row) {
+  const log = Array.isArray(row?.decision_log) ? row.decision_log : [];
+  return log.reduce((sum, entry) => sum + (entry?.relicDraft ? Math.max(0, numberOf(entry.relicDraft.cost) ?? 0) : 0), 0);
+}
+
 /** Whether a row was played under this engine's table rules (`dynamics.tableRules`). */
 function isCurrentTable(row) {
   return Number(row?.dynamics?.[RULES_MARK_KEY]) === RULES_MARK;
@@ -275,15 +345,19 @@ export function recheckRun(rows = []) {
   if (cases.some((row) => !isCurrentTable(row))) return { status: "unverified", marks: [], cases: [] };
   const marks = new Set();
   let recorded = false;
-  const report = cases.map((row) => {
+  const report = cases.map((row, at) => {
     const score = recheckCaseScore(row);
     const windows = recheckCaseWindows(row);
+    // The case before in the season, when it is the row before here (a gap leaves the seed unread).
+    const previous = at > 0 && CASE_SEQUENCE.indexOf(cases[at - 1].case_id) === CASE_SEQUENCE.indexOf(row.case_id) - 1 ? cases[at - 1] : null;
+    const drafts = recheckRelicDraft(row, previous);
+    if (drafts.findings.length) marks.add(RELIC_DRAFT_MARK);
     const { match, mismatch, unreplayable, unrecorded } = windows.counts;
     if (match + mismatch + unreplayable > 0) recorded = true;
     if (score.status !== "match") marks.add("score-off-log");
     if (mismatch || unreplayable) marks.add("window-off-replay");
     if (recorded && unrecorded) marks.add("window-no-replay");
-    return { caseId: row.case_id, score: { status: score.status, differs: score.differs }, windows };
+    return { caseId: row.case_id, score: { status: score.status, differs: score.differs }, windows, drafts };
   });
   // The ranking row's score is the mean of the run's case rows (C-2 and Q25,
   // `getSeasonScore`; the server's ranking_run_summary writes it from the same
@@ -294,5 +368,5 @@ export function recheckRun(rows = []) {
   const expected = (field) => (Object.hasOwn(season, field) ? season[field] : final.summary?.[field]);
   const rankingDiffers = ranking && final ? SCORE_FIELDS.filter((field) => ranking.summary?.[field] !== expected(field)) : [];
   if (rankingDiffers.length) marks.add("score-off-log");
-  return { status: recorded ? "checked" : "unrecorded", marks: RECHECK_MARKS.filter((mark) => marks.has(mark)), rankingDiffers, cases: report };
+  return { status: recorded ? "checked" : "unrecorded", marks: [...RECHECK_MARKS, RELIC_DRAFT_MARK].filter((mark) => marks.has(mark)), rankingDiffers, cases: report };
 }

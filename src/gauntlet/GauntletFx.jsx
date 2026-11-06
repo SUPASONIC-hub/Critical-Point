@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { getCloseness, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
+import { getCloseness, getHeartbeatBpm, getRemainingSeconds, getWindowSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, isQuietTable, monotonicNow, registerFxVariables } from "./fxVariables.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
@@ -169,7 +169,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       const now = monotonicNow();
       // The number the stage prints, read here whether the table is live or
       // not: the tick light shows it, and is on screen for as long as it is.
-      const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / win.schema.seconds);
+      const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / getWindowSeconds(win));
       rate = fxRateStep(rate, fxRateTarget(bpm), delta);
       if (live) {
         if (time >= nextBeat) {

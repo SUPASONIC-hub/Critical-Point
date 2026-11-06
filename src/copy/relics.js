@@ -32,6 +32,26 @@ const relicsCopy = {
     back: "다른 도구 보기",
     // C-7's pass (relics.js `BREATHER`): what it gives, in the button.
     skip: "고르지 않고 {name} · {short}",
+    // ... but a draft that paid for 「하나 더」 gets no breather on a pass (2026-11-05 decision): the button says only that.
+    skipPaid: "고르지 않고 진행",
+    // C9: the KD은행 계좌 pays at the draft (draftSpend.js). `{cost}` is the
+    // price, filled formatted; a button that is off says why in `off`.
+    reroll: "다시 뽑기 · {cost}",
+    extra: "하나 더 · {cost}",
+    spendNote: "누르면 KD은행 계좌에서 바로 빠지고, 되돌릴 수 없다.",
+    // Under the note (user decision 2026-11-05, (1)): buying every time dries the vault the ending reads (check:pressure, 11-05: -52% a case against never; only when a slot is open, -3.3%).
+    spendHint: "하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.",
+    secondTitle: "하나 더 고르기",
+    secondLede: "산 도구 하나를 남은 두 개 중에서 고른다.",
+    off: {
+      practice: "다시 하는 사건에서는 쓸 수 없음",
+      story: "스토리 모드에서는 쓸 수 없음",
+      record: "이 저장의 드래프트에서는 쓸 수 없음",
+      used: "이번 사건에 사용함",
+      picked: "이미 골랐음",
+      few: "남은 도구가 하나뿐",
+      short: "잔액 부족",
+    },
   },
   // By the tool's id: its name, what it does, what it says when it fires, the
   // line on the rule it softens, and the feat that unlocks it.

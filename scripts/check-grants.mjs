@@ -121,8 +121,10 @@ await db.exec(`
 // checks below ask for that one, and say so.
 const DAY_TEN_RESET = "20261020010000_rules_day10_ranking_reset.sql";
 const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark3_ranking_reset.sql")) ?? null;
-// RULES_MARK 4's (C-3 and C-4, drafted 2026-10-25) the same way, once it is a `.sql`.
-const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql")) ?? null;
+// RULES_MARK 4's (C-3 and C-4, drafted 2026-10-25) the same way, once it is a `.sql`. Since 2026-11-05 the
+// two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql.draft` (the one wipe of 11-12, with C9's
+// `relic-draft` checker mark): promoted, it is the RULES_MARK 4 reset.
+const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql") || file.endsWith("_ranking_reset_rules_mark4_relic_draft.sql")) ?? null;
 const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
 /** The table mark the replayed server asks of every case row of a ranked season. */
 const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
@@ -1354,7 +1356,7 @@ withHeaders({ "x-forwarded-for": "198.51.100.22" });
   /** The run summary a build of the table before sent as `dynamics`: this one's, without the mark. */
   const olderTableDynamics = ({ [RULES_MARK_KEY]: _mark, ...rest }) => rest;
   const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
-  if (SERVER_MARK < RULES_MARK) console.log(`Older-table checks: against the server's mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_rules_mark${RULES_MARK}_ranking_reset.sql.draft).`);
+  if (SERVER_MARK < RULES_MARK) console.log(`Older-table checks: against the server's mark ${SERVER_MARK}; RULES_MARK ${RULES_MARK}'s reset is still a draft (supabase/migrations/*_ranking_reset_rules_mark${RULES_MARK}_relic_draft.sql.draft, the one wipe of 2026-11-12).`);
   const marked = (runId) => one(
     `select (count(*) filter (where jsonb_typeof(dynamics->'${RULES_MARK_KEY}') = 'number' and (dynamics->>'${RULES_MARK_KEY}')::numeric >= ${SERVER_MARK}))::int as mark, count(*)::int as n
        from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,

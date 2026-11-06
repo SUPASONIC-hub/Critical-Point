@@ -12,13 +12,13 @@ export const STEPS_PER_BAR = 16;
 export const BARS_PER_PHRASE = 4;
 
 /**
- * The stake's layers, as the gauge the table shows (0-100). The pot doubles
- * every 11 points (`getMultiplier`), so these are x4.8, x17 and x60: a pot
- * worth looking at, a pot worth losing, and a pot inside the band. The wall
- * never moves them -- only what is drawn does -- so the score tells the ear
- * nothing the eye has not been told.
+ * The stake's layers, as the gauge the table shows (0-100): x4.8, x17 and x60,
+ * a pot worth looking at, worth losing, inside the band. They live in
+ * gauntlet/stakeLayers.js since 2026-11-05, when the clock began to read the
+ * same three (gauntlet/stakeClock.js): the ear and the eye are told the same
+ * stake at the same heat.
  */
-export const STAKE_LAYER_GAUGES = [25, 45, 65];
+export { STAKE_LAYER_GAUGES, stakeLayerCount } from "../gauntlet/stakeLayers.js";
 
 /**
  * The bus's tone (11-02 playtest, earphones: "the sound feels torn, like an
@@ -297,12 +297,6 @@ export function pulseLine(bass) {
 export function shadowNote(lead, step) {
   const note = lead[(step - 1 + lead.length) % lead.length];
   return note ? note * 2 : null;
-}
-
-/** How many of the stake's layers are in at this gauge: 0 to 3. */
-export function stakeLayerCount(gauge) {
-  const value = Number(gauge) || 0;
-  return STAKE_LAYER_GAUGES.filter((threshold) => value >= threshold).length;
 }
 
 /**
