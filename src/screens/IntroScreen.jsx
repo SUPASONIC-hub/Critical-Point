@@ -21,6 +21,7 @@ import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
 import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
+import { COLD_OPENING_ENABLED, coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -161,6 +162,15 @@ export function IntroScreen({ view, renderers = {} }) {
   const gameTitle = GAME_TITLE;
   const consent = useConsentToggle({ pendingTelemetry, persist, setDataConsent, setPendingTelemetry, setTelemetryStatus });
   useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
+  // The cold opening's page, once its chunk has arrived (null: not playing).
+  const [ColdOpeningPage, setColdOpeningPage] = useState(null);
+  function openColdOpening() {
+    import("../components/ColdOpening.jsx").then(
+      (module) => setColdOpeningPage(() => module.default),
+      // A page that cannot arrive is not a reason to hold the season back.
+      () => beginOpeningBurst(startGame),
+    );
+  }
   // Before paint, so the handed-over press never flashes this screen first.
   useLayoutEffect(() => {
     const action = takeRuntimeStartAction();
@@ -189,7 +199,16 @@ export function IntroScreen({ view, renderers = {} }) {
   // With no run to lose nothing is awaited: the first press on the page still
   // opens the burst, and starts its sound, inside the press itself.
   const startNewRun = async () => {
-    if (!hasResumableSave || (await confirmAction(CONFIRM.startOver))) beginOpeningBurst(startGame);
+    if (!hasResumableSave || (await confirmAction(CONFIRM.startOver))) {
+      // B-3(1) 냉정한 오프닝 (state/coldOpening.js): off, this branch is not
+      // in the build. On, a first season plays the page first and the page's
+      // last press opens the burst exactly as this press would have.
+      if ((COLD_OPENING_ENABLED || (__CP_DEBUG_BUILD__ && coldOpeningForced())) && playsColdOpening({ enabled: true, hasResumableSave })) {
+        openColdOpening();
+        return;
+      }
+      beginOpeningBurst(startGame);
+    }
   };
   const startNewGamePlusRun = async () => {
     if (!hasResumableSave || (await confirmAction(CONFIRM.newGamePlus))) beginOpeningBurst(startNewGamePlus);
@@ -851,6 +870,15 @@ export function IntroScreen({ view, renderers = {} }) {
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {openingCase ? fill(introCopy.opening.entering, { case: openingIsFirst ? introCopy.opening.firstCase : openingCase.label }) : ""}
         </p>
+        {ColdOpeningPage && (
+          <ColdOpeningPage
+            startLabel={introCopy.startButton}
+            onDone={() => {
+              setColdOpeningPage(null);
+              beginOpeningBurst(startGame);
+            }}
+          />
+        )}
         {openingCase && (
           <div className="opening-burst" data-testid="opening-burst" aria-hidden="true">
             <div className="opening-burst-grid" />
