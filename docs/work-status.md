@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-09 (the state of `main` at `283a74d`, after #476 360px five card hand, #481 studio names and the makers as we, and #478 content pages and site menu, 177 plain pages; <!-- 1109 병합되면: #482 #485 #483 -->).
+Last updated: 2026-11-09 (the state of `main` at `f97f507`, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -791,11 +791,19 @@ Still open, on purpose:
   making-of -- with a site menu on every plain page, a hidden inert `<nav>`
   in the static shell and all of it in the sitemap: 177 pages over three
   languages. We ask for the AdSense re-review once indexed (asked 11-16).
-  <!-- 1109 병합되면: #482 table-a11y-2 (E3 stage 2), #485 about page
-  accuracy (combo by direction, all rules from case 03, read-the-hand 20%,
-  SILENCE 30 s), #483 390px en/ja five card hand and 360px en signal row -->
+  #485 (`937d5170`): the about page's four rule lines match the code
+  (combo by direction, all rules from case 03, read-the-hand 20%, SILENCE
+  30 s). #488 bundle 1109b (`c1d08daa`): #482 table accessibility stage 2
+  (E3), #483 390px en/ja five card hands (ja +17 to -6, en +58 to -18 px)
+  and the 360px en signal row (21 to 0), #487 plain pages on phones. #489
+  (`d07a852b`): plain page landmarks, skip link, 2 px focus, portrait alt,
+  JSON-LD. #490 (`f97f5079`): the 11-23 judgment tool reads the bot endings
+  from the test-week summary's line (it still had #464's numbers). W45 and
+  W46 had no finished season; the 11-11 bot dry run matched the baseline.
+  Seven merges (main `f97f507`), 1,974 unit tests; Full Coverage run
+  42570673569 still running.
   Open: drafts #477 (cold-opening style, decided 11-23), #484 (deps for
-  after W47, replacing Dependabot #479 and #480), `phone-heavy-bank`
+  after W47, replacing Dependabot #479 and #480), #491 `phone-heavy-bank`
   (overloaded table with the largest bank at 360px, after W47).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
