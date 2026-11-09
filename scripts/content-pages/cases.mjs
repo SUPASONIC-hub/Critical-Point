@@ -79,6 +79,9 @@ export const caseKind = (caseId) => `cases/${caseId}`;
 export const CASE_WORDS = {
   ko: {
     index: "사건 파일",
+    earlier: "앞 사건의 전개가 나옵니다",
+    back: "사건 파일 목록으로",
+    reveal: "때와 곳, 질문 펼치기 (앞 사건의 전개가 나옵니다)",
     setting: "때와 곳",
     premise: "사건 개요",
     rule: "이 장의 규칙",
@@ -95,6 +98,9 @@ export const CASE_WORDS = {
   },
   en: {
     index: "Case Files",
+    earlier: "This page shows how the earlier cases unfolded",
+    back: "Back to the case files",
+    reveal: "Show the setting and the question (shows how the earlier cases unfolded)",
     setting: "When and where",
     premise: "The case",
     rule: "This chapter's rule",
@@ -111,6 +117,9 @@ export const CASE_WORDS = {
   },
   ja: {
     index: "事件ファイル",
+    earlier: "前の事件の展開が出てきます",
+    back: "事件ファイル一覧へ",
+    reveal: "時と場所、問いを開く(前の事件の展開が出てきます)",
     setting: "時と場所",
     premise: "事件の概要",
     rule: "この章のルール",
@@ -150,5 +159,13 @@ export const CASE_INDEX_DESCRIPTION = {
   en: "The 55 case files of Critical Point, from the prologue to the last case: each case's setting, people and question, without spoilers.",
   ja: "『臨界点: CRITICAL POINT』の55の事件ファイル。プロローグから最後の事件まで、各事件の舞台、登場人物、問いをネタバレなしで紹介します。",
 };
+
+/**
+ * From 사건 10 on, a case's own setup tells how the cases before it went
+ * (user's decision 11-09, option 1): its page says so at the top, and the
+ * index keeps its lines folded (`<details>`, in the HTML for a crawler).
+ */
+export const FIRST_LATE_CASE = "case10";
+export const tellsEarlierCases = (caseId) => CASE_SEQUENCE.indexOf(caseId) >= CASE_SEQUENCE.indexOf(FIRST_LATE_CASE);
 
 export const caseGroup = (caseId) => (caseId.startsWith("prologue") ? "prologue" : caseId === "final" ? "final" : "main");

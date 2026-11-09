@@ -10,6 +10,7 @@ import {
   caseKind,
   caseName,
   caseRule,
+  tellsEarlierCases,
 } from "./cases.mjs";
 import { CHARACTER_GROUPS, CHARACTERS_DESCRIPTION, CHARACTERS_INTRO } from "./characters-text.mjs";
 import { GUIDE_BODY, GUIDE_DESCRIPTION } from "./guide-text.mjs";
@@ -58,9 +59,13 @@ function caseIndexBody(language) {
   const groups = ["prologue", "main", "final"].map((group) => {
     const items = CASE_PAGES.filter((caseId) => caseGroup(caseId) === group).map((caseId) => {
       const text = CASE_TEXT[caseId][language];
+      const lines = `<p class="meta">${escapeHtml(text.setting)}</p>
+<p>${escapeHtml(text.question)}</p>`;
+      const shown = tellsEarlierCases(caseId) ? `<details><summary>${escapeHtml(words.reveal)}</summary>
+${lines}
+</details>` : lines;
       return `<li>${link(pagePath(caseKind(caseId), language), caseHeading(caseId, language))}
-<p class="meta">${escapeHtml(text.setting)}</p>
-<p>${escapeHtml(text.question)}</p></li>`;
+${shown}</li>`;
     });
     return items.length ? `<h2>${escapeHtml(words[group])}</h2>\n<ul class="case-list">\n${items.join("\n")}\n</ul>` : "";
   });
@@ -84,7 +89,10 @@ function caseBody(caseId, language) {
   ]
     .filter(Boolean)
     .join("\n");
-  return `<p class="meta">${escapeHtml(words.setting)}: ${escapeHtml(text.setting)}</p>
+  const notice = tellsEarlierCases(caseId)
+    ? `<p class="spoiler-note"><strong>${escapeHtml(words.earlier)}</strong> · ${link(pagePath("cases/index", language), words.back)}</p>\n`
+    : "";
+  return `${notice}<p class="meta">${escapeHtml(words.setting)}: ${escapeHtml(text.setting)}</p>
 <h2>${escapeHtml(words.premise)}</h2>
 ${paragraphs(text.premise)}
 ${rule ? `<h2>${escapeHtml(words.rule)}: ${escapeHtml(rule.label)}</h2>\n<p>${escapeHtml(rule.rule)}</p>` : ""}

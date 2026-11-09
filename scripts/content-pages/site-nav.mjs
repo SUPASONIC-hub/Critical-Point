@@ -126,4 +126,7 @@ nav a[aria-current=true]{color:var(--text)}
 .pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;margin-top:36px;padding-top:12px;border-top:1px solid var(--line)}
 .pager a{display:inline-flex;align-items:center;min-height:44px}
 .note{font-size:.875rem}
+.spoiler-note{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.9375rem}
+details{margin-top:4px}
+summary{cursor:pointer;color:var(--text-2);font-size:.875rem;min-height:32px;display:list-item}
 `;

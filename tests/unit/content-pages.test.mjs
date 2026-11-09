@@ -138,3 +138,38 @@ test("the guide, the cast and the making-of are pages of substance", () => {
     assert.ok(ko >= 2000, `${kind}.html has ${ko} characters`);
   }
 });
+
+test("from 사건 10 on, a case's page says it tells how the earlier cases went, and the index keeps its lines folded", () => {
+  const NOTICE = { ko: "앞 사건의 전개가 나옵니다", en: "This page shows how the earlier cases unfolded", ja: "前の事件の展開が出てきます" };
+  const late = CASE_SEQUENCE.slice(CASE_SEQUENCE.indexOf("case10"));
+  assert.deepEqual(late.slice(0, 2), ["case10", "case11"]);
+  assert.ok(late.includes("final"));
+  for (const caseId of CASE_SEQUENCE) {
+    for (const language of LANGUAGES) {
+      const html = content[`${FOLDER[language]}cases/${caseId}.html`];
+      const body = html.slice(html.indexOf("</h1>"));
+      if (late.includes(caseId)) {
+        // At the top, before the premise, with the way back to the index.
+        assert.ok(body.indexOf(NOTICE[language]) > 0 && body.indexOf(NOTICE[language]) < body.indexOf("<h2>"), `${caseId}/${language}: the notice at the top`);
+        assert.match(body, new RegExp(`class="spoiler-note">[^\n]*href="/${FOLDER[language]}cases/index.html"`), `${caseId}/${language}: links the index`);
+      } else {
+        assert.ok(!html.includes(NOTICE[language]) && !html.includes("spoiler-note\">"), `${caseId}/${language}: no notice before 사건 10`);
+      }
+    }
+  }
+  for (const language of LANGUAGES) {
+    const index = content[`${FOLDER[language]}cases/index.html`];
+    const items = [...index.matchAll(/<li><a href="[^"]*cases\/([a-z0-9]+)\.html">[\s\S]*?<\/li>/g)];
+    assert.equal(items.length, CASE_SEQUENCE.length, `${language}: every case in the index`);
+    for (const [item, caseId] of items) {
+      const folded = /<details><summary>[^<]+<\/summary>[\s\S]*<\/details>/.test(item);
+      assert.equal(folded, late.includes(caseId), `${language}: ${caseId} ${late.includes(caseId) ? "folded" : "open"}`);
+      assert.ok(item.includes(escapeText(CASE_TEXT[caseId][language].question)), `${language}: ${caseId}'s question stays in the HTML`);
+      if (folded) assert.doesNotMatch(item, /<details open/, `${language}: ${caseId} closed by default`);
+    }
+  }
+});
+
+function escapeText(text) {
+  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
