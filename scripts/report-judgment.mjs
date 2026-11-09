@@ -2,7 +2,7 @@
  * The 11-23 verdict on the W47 test week (2026-W47, 11-16 to 11-22), in one
  * Markdown report: the three questions the analysis docs leave to W47 data.
  *
- *   (a) C2  the players' endings next to the bot's (600 seasons after #464);
+ *   (a) C2  the players' endings next to the bot's (the test-week summary's reference, SIMULATION_LINES);
  *   (b) Q23 the season score's spread and the ranks the current letters
  *           (scoreMarks, seasonScore.js) give it, beside the 2026-10-22
  *           proposal's season bands for reference;
@@ -28,9 +28,24 @@ import { pathToFileURL } from "node:url";
 import { getWeekRule } from "../src/gauntlet/weeklyRules.js";
 import { scoreMarks } from "../src/seasonScore.js";
 import { funnelQuery, quantile, readFunnel, readRun, STOPS } from "./report-funnel.mjs";
+import { SIMULATION_LINES } from "./report-test-week.mjs";
 
-/** The bot's endings, 600 seasons after #464 (percent). */
-export const BOT_ENDINGS = { collapse: 20, "open-oversight": 9.7, "evidence-reform": 11.3, "human-record": 16, "profitable-silence": 4.8, "cold-justice": 3, "field-pact": 18, "quiet-cover": 8, "open-question": 8 };
+/**
+ * The bot's endings (percent) from the ending line of the test-week summary's
+ * own reference (SIMULATION_LINES, report-test-week.mjs), so the two reports
+ * never disagree: 2026-11-09 this still held the #464 numbers (collapse 20)
+ * while #473 had moved the summary to the 11-06 measurement (collapse 23.0).
+ */
+export function botEndings(lines = SIMULATION_LINES) {
+  const list = /replayed seasons: ([^)]*)\)/.exec(String(lines))?.[1];
+  if (!list) throw new Error("the bot's ending line has no endings (check:endings --report)");
+  return Object.fromEntries(list.split(", ").map((part) => {
+    const [, id, percent] = /^([a-z-]+) ([\d.]+)%$/.exec(part.trim()) ?? [];
+    if (!id) throw new Error(`unreadable ending in the bot's line: ${part}`);
+    return [id, Number(percent)];
+  }));
+}
+export const BOT_ENDINGS = botEndings();
 /** The season bands the 2026-10-22 proposal (랭크기준-제안) measured on the bot: S 72+, A 66+, B 56+. Reference only. */
 export const PROPOSED_BANDS = { S: 72, A: 66, B: 56 };
 const RANKS = ["S", "A", "B", "C"];
@@ -113,7 +128,7 @@ export function describeJudgment(j, { week, board }) {
     "",
     "## (a) C2 결말 분포: 사람 대 봇",
     "",
-    "| 결말 | 시즌 | 사람 % | 봇 % (600시즌, #464 뒤) | 차이 %p |",
+    "| 결말 | 시즌 | 사람 % | 봇 % (시험 주 요약과 같은 기준) | 차이 %p |",
     "|---|---|---|---|---|",
     ...ids.map((id) => {
       const n = j.endings[id] ?? 0;
