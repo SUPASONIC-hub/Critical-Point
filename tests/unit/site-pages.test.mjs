@@ -74,7 +74,8 @@ test("each page has its own title and description, a canonical link and every la
       }
     }
     assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="/${page}" />`), `${file}: x-default is the Korean`);
-    assert.doesNotMatch(html, /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a plain page needs none`);
+    // The about page's JSON-LD is data, which the browser does not run (scripts/structured-data.mjs).
+    assert.doesNotMatch(html.replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a plain page needs none`);
     assert.ok(html.includes(`mailto:${SUPPORT_CONTACT}`), `${file} gives the contact address`);
   }
 });
@@ -112,7 +113,7 @@ test("each Korean page is at least 1,500 characters without spaces, and the tran
     assert.equal(sections(site[`ja/${kind}.html`]), sections(site[`${kind}.html`]), `ja/${kind}.html has every section`);
   }
   for (const [file, html] of Object.entries(site)) {
-    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
+    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
     if (!file.startsWith("ja/") && !file.startsWith("en/")) continue;
     // Korean only where a page names the Korean page, or quotes the language choice as the screen shows it.
     const left = html.replace(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
