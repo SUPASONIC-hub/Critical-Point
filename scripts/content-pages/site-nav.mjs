@@ -110,8 +110,8 @@ ${menuLinks(kind, language).replace(/ aria-current="(?:page|true)"/g, "")}</nav>
 /** What the menu and the content pages add to the plain pages' sheet. */
 export const MENU_STYLE = `
 nav a[aria-current=true]{color:var(--text)}
-.site-foot{margin-top:48px;padding:12px 0 0;border-top:1px solid var(--line);border-bottom:0}
-.site-foot+footer{margin-top:16px}
+.site-foot{padding:12px 0 0;border-top:1px solid var(--line);border-bottom:0}
+.site-foot+p{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
 .lede{font-size:1.0625rem;color:var(--text)}
 .meta{margin:4px 0 0;color:var(--text-2);font-size:.875rem}
 .case-list{list-style:none;padding:0}
