@@ -948,7 +948,8 @@ const budgets = [
   // 206,970 / 38,929 -> 208,114 / 39,241 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the moods' hue-carrying grounds, lines, accents and frames (tokens.css), the edge tint (play.css .game-shell::after, briefing.css veil) and its @property. Measured 208,110 / 39,237 in the e2e build, the plus 4.
   // 208,114 / 39,241 -> 208,126 / 39,241 on 2026-11-06, static-shell-2 after merging main d7dadd92 (#465 mood-boost): the intro art's box takes its height from the viewport alone (min(100svh, 940px), 82svh on a phone; decision 13 (1)), so the static shell and the intro draw it the same. Measured 208,122 / 39,235 in the e2e build, the raw plus 4 (the gzip under its line).
   // 208,126 / 39,241 -> 208,226 / 39,265 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the 360px HUD's 2px gaps and, in Japanese, the signals row, dateline, speaker and lock seal at line-height 1.2 (Noto CJK's normal line is about 1.45em). Measured 208,222 / 39,261 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 208_226, maxGzip: 39_265 },
+  // 208,226 / 39,265 -> 209,113 / 39,370 on 2026-11-09, phone-390-fit over main 775bb69a (#476): a 361-390px block for English and Japanese (the 360px labels, HUD air and Japanese 1.2 lines; the English gauge row at 4px and the column over a rules hand at 4px) and, at 360px, the English streak's line cut with an ellipsis. Measured 209,109 / 39,366 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 209_113, maxGzip: 39_370 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1905,7 +1906,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 434,273 / 492,195 / 499,703 on 2026-11-06, bundle-1106b (static-shell-2 6ac68416, mood-tags-2 9b6973cd over main 97366b95): the lines above together; the entry names the case chunks that now carry 692 mood tags. Measured 434,269 / 492,191 / 499,699 in the e2e build, the plus 4.
 // 433,243 / 491,405 / 498,624 -> 434,283 / 492,205 / 499,714 on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening, B-3(1) switched off): the static shell and mood-tag lines above over the cold opening's entry line. Measured 434,279 / 492,201 / 499,710 in the e2e build, the plus 4.
 // 434,283 / 492,205 / 499,714 -> 434,341 / 492,256 / 499,767 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the index CSS line above (the critical CSS cut again). Measured 434,337 / 492,252 / 499,763 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_341, en: 492_256, ja: 499_767 };
+// 434,341 / 492,256 / 499,767 -> 434,445 / 492,360 / 499,870 on 2026-11-09, phone-390-fit over main 775bb69a (#476): the index CSS line above. Measured 434,441 / 492,356 / 499,866 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_445, en: 492_360, ja: 499_870 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
