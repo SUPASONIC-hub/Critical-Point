@@ -13,7 +13,7 @@ globalThis.localStorage = createStorage();
 
 const voice = await import("../../src/gauntlet/tableVoice.js");
 const { CLOCK_OPENED_CALL } = await import("../../src/gauntlet/tableReadout.js");
-const { getHoldArmedCall, getHoldCall, describePush, describeWall, describeScout, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { getHoldArmedCall, getHoldCall, describePush, describeWall, describeScout, describeStanceCarry, describeBank, describeAct, findBank, findActStart, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
 const { dangerZoneOf, readDangerZone } = await import("../../src/gauntlet/tableMeters.js");
 
 const STRIKE_WAKE = { id: "strikeWake", label: "STRIKE WAKE", title: "다음 판이 더 두껍게 깨어난다" };
@@ -27,7 +27,9 @@ const facts = ({ win = tableWindow(), live = true, dangerLine = "벽까지 최�
 test("the sentences say only what the table shows", () => {
   assert.equal(describePush({ gauge: 41.6, dangerLine: "벽까지 최소 3" }), "열기 42 · 벽까지 최소 3");
   assert.equal(describeStanceCarry({ focus: 70.4, carry: STRIKE_WAKE }), "충전 70 · 확정하면 다음 판 STRIKE WAKE · 다음 판이 더 두껍게 깨어난다");
-  assert.equal(describeBank({ runPot: 1250, vault: 4800 }), "판돈 1,250 · 금고 4,800");
+  assert.equal(describeBank({ hand: 1250, runPot: 1250, vault: 4800 }), "이번 판 +1,250 · 판돈 1,250 · 금고 4,800");
+  assert.equal(describeBank({ hand: -900, runPot: 0, vault: 4800 }), "이번 판 −900 · 판돈 0 · 금고 4,800");
+  assert.equal(describeAct({ act: 2, caseId: "case08" }), "2막 시작 · 사건 08");
   // The wall this window drew is never in what is said: only the board's danger line.
   const pushed = facts({ win: tableWindow({ gauge: 52, wall: 77, pushes: 1 }) });
   assert.equal(pushed.push, "열기 52 · 벽까지 최소 22");
@@ -123,14 +125,28 @@ test("a call waiting its turn is replaced by a newer one of its kind, and the cl
   ]);
 });
 
-test("a bank is the case pot or the vault growing between one window and the next, and nothing else", () => {
-  const dealt = (windowIndex, runPot, vault) => ({ windowIndex, runPot, vault });
-  assert.deepEqual(findBank(dealt(4, 0, 0), dealt(5, 1250, 0)), { windowIndex: 5, text: "판돈 1,250 · 금고 0" }, "a cash banked into the case pot");
-  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 1250)), { windowIndex: 5, text: "판돈 0 · 금고 1,250" }, "a closed case moved it to the vault");
+test("the settlement is said once, as the next window's table opens: the hand's ±N, the case pot and the vault", () => {
+  const dealt = (windowIndex, runPot, vault, caseId = "case01") => ({ windowIndex, runPot, vault, caseId });
+  assert.deepEqual(findBank(dealt(4, 0, 0), dealt(5, 1250, 0)), { windowIndex: 5, text: "이번 판 +1,250 · 판돈 1,250 · 금고 0" }, "a cash banked into the case pot");
+  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 1250, "case02")), { windowIndex: 5, text: "이번 판 0 · 판돈 0 · 금고 1,250" }, "a closed case moved the pot to the vault: the money did not move");
+  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 2000, "case02")), { windowIndex: 5, text: "이번 판 +750 · 판돈 0 · 금고 2,000" }, "the closing hand's own cash, net of what the audit took");
+  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 0)), { windowIndex: 5, text: "이번 판 −1,250 · 판돈 0 · 금고 0" }, "a bust: the slam said the pot it took; this is the settlement's line after it");
   assert.equal(findBank(null, dealt(5, 1250, 0)), null, "the first table after a load has nothing to compare");
-  assert.equal(findBank(dealt(4, 1250, 0), dealt(5, 0, 0)), null, "a bust is the slam's");
   assert.equal(findBank(dealt(2, 0, 0), dealt(5, 1250, 0)), null, "a save loaded from elsewhere");
   assert.equal(findBank(dealt(5, 0, 0), dealt(5, 1250, 0)), null, "the same window mounted twice");
+});
+
+test("an act is said to begin on the first table of the case that opens it, once, and after the settlement", () => {
+  const dealt = (windowIndex, caseId) => ({ windowIndex, runPot: 0, vault: 0, caseId });
+  assert.deepEqual(findActStart(dealt(40, "case07"), dealt(41, "case08")), { windowIndex: 41, text: "2막 시작 · 사건 08" });
+  assert.deepEqual(findActStart(dealt(9, "prologue05"), dealt(10, "case01")), { windowIndex: 10, text: "1막 시작 · 사건 01" });
+  assert.deepEqual(findActStart(dealt(200, "case42"), dealt(201, "case43")), { windowIndex: 201, text: "8막 시작 · 사건 43" }, "the last act");
+  assert.equal(findActStart(dealt(41, "case08"), dealt(42, "case08")), null, "the case's second table is not a start");
+  assert.equal(findActStart(dealt(45, "case08"), dealt(46, "case09")), null, "a case that opens no act");
+  assert.equal(findActStart(null, dealt(41, "case08")), null, "a load or a debug jump into the case has no last table");
+  assert.equal(findActStart(dealt(30, "case07"), dealt(41, "case08")), null, "a save loaded from elsewhere");
+  const queue = queueCalls([{ kind: "act", text: "2막 시작 · 사건 08" }, { kind: "audit", text: "감사" }], [{ kind: "bank", text: "이번 판 +750 · 판돈 0 · 금고 2,000" }]);
+  assert.deepEqual(queue.map((call) => call.kind), ["bank", "act", "audit"], "the last hand's money, then the act, then the table's own lines");
 });
 
 test("the table has one voice: the clock is said there and not in a region of its own", () => {
@@ -140,4 +156,9 @@ test("the table has one voice: the clock is said there and not in a region of it
   const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
   assert.ok(!/aria-live="(polite|assertive)"/.test(stage), "the stage adds no live region of its own");
   assert.ok(stage.includes('className="gx-bpm"') && !/gx-bpm"[^>]*role=/.test(stage), "the heartbeat is read when asked for, never announced");
+  // E3 2단계 (b): a case's close is said where the listener is, by the result
+  // screen's own one polite line -- the rank it already said, and the standing.
+  const result = readFileSync(new URL("../../src/screens/ResultScreen.jsx", import.meta.url), "utf8");
+  assert.equal((result.match(/aria-live="polite"/g) ?? []).length, 1, "the result screen keeps its one line");
+  assert.ok(result.includes("{screenReaderStatus} {view.seasonStanding.label} · {view.seasonStanding.text}"), "the standing is in that line");
 });

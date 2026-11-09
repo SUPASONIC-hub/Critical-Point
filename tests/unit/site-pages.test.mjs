@@ -74,7 +74,8 @@ test("each page has its own title and description, a canonical link and every la
       }
     }
     assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="/${page}" />`), `${file}: x-default is the Korean`);
-    assert.doesNotMatch(html, /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a plain page needs none`);
+    // The about page's JSON-LD is data, which the browser does not run (scripts/structured-data.mjs).
+    assert.doesNotMatch(html.replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a plain page needs none`);
     assert.ok(html.includes(`mailto:${SUPPORT_CONTACT}`), `${file} gives the contact address`);
   }
 });
@@ -112,7 +113,7 @@ test("each Korean page is at least 1,500 characters without spaces, and the tran
     assert.equal(sections(site[`ja/${kind}.html`]), sections(site[`${kind}.html`]), `ja/${kind}.html has every section`);
   }
   for (const [file, html] of Object.entries(site)) {
-    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
+    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
     if (!file.startsWith("ja/") && !file.startsWith("en/")) continue;
     // Korean only where a page names the Korean page, or quotes the language choice as the screen shows it.
     const left = html.replace(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
@@ -201,4 +202,28 @@ test("the origin is SITE_URL, else RENDER_EXTERNAL_URL, and only an https one; t
   assert.ok(absolute.includes(`<link rel="alternate" hreflang="ja" href="${ORIGIN}/ja/faq.html" />`));
   assert.ok(absolute.includes('<a href="/en/about.html">'), "the links a reader clicks stay relative");
   assert.equal(withAbsoluteSiteLinks("<link rel=\"canonical\" href=\"/\" />", ""), "<link rel=\"canonical\" href=\"/\" />");
+});
+
+test("the about page says the rules as the code holds them: the combo's two sides, SILENCE, the rules the main story adds, and every axis of the score", async () => {
+  const { SILENCE_SECONDS } = await import("../../src/gauntlet/tableRules.js");
+  const { LOGIC_DIRECTIONS } = await import("../../src/gauntlet/logicStreak.js");
+  const report = {
+    ko: (await import("../../src/copy/reportLines.js")).default.score,
+    en: (await import("../../src/locales/en/screens/reportLines.js")).default.score,
+    ja: (await import("../../src/locales/ja/screens/reportLines.js")).default.score,
+  };
+  assert.deepEqual([...LOGIC_DIRECTIONS], ["people", "position"], "the combo is held on a side, people or position");
+  const SIDES = { ko: ["사람 쪽", "자리 쪽"], en: ["toward the people", "toward the position"], ja: ["人の側", "立場の側"] };
+  const SECONDS = { ko: `${SILENCE_SECONDS}초`, en: `${SILENCE_SECONDS} seconds`, ja: `${SILENCE_SECONDS}秒` };
+  const MAIN_RULES = { ko: ["사건 01에 OVERCLOCK", "사건 02에 감사(AUDIT)", "사건 03에 연결(CASCADE)"], en: ["OVERCLOCK in Case 01", "AUDIT in Case 02", "CASCADE in Case 03"], ja: ["事件01でOVERCLOCK", "事件02で監査(AUDIT)", "事件03で連結(CASCADE)"] };
+  for (const language of ["ko", "en", "ja"]) {
+    const about = decode(site[`${FOLDER[language]}about.html`]);
+    for (const side of SIDES[language]) assert.ok(about.includes(side), `${language}: the combo's side, ${side}`);
+    assert.ok(about.includes("(SILENCE)") && about.includes(SECONDS[language]), `${language}: SILENCE and its ${SILENCE_SECONDS} seconds`);
+    for (const rule of MAIN_RULES[language]) assert.ok(about.includes(rule), `${language}: ${rule}`);
+    assert.doesNotMatch(about, /사건 01부터 모두 켜집니다|from Case 01 on they are all in play|事件01からはすべてオンになります/, `${language}: not every rule from Case 01`);
+    for (const axis of ["consistency", "reading", "cognition", "reflection", "pressureAdapt", "rhythm"]) {
+      assert.ok(about.includes(`(${report[language][axis].label}`), `${language}: the score's ${axis} axis by the report's own label, ${report[language][axis].label}`);
+    }
+  }
 });
