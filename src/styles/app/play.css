@@ -2912,10 +2912,11 @@
   }
 
   /* Those took English from 58px under the bar to 3px over it; the column
-     over the hand gives 3px of each of its five 7px gaps under a rules line,
-     as a shorter phone does (the max-height: 760px block). */
+     over the hand gives 4px of each of its five 7px gaps under a rules line,
+     as a shorter phone does (the max-height: 760px block); 3px of each left
+     c45_stories 1px under the bar (2026-11-09). */
   :lang(en) .gx-read:has(.gx-active-rules) {
-    gap: 4px;
+    gap: 3px;
   }
 
   /* Heat, the band, Safe and Heartbeat: 356px at 8px apart, one line at 4. */
