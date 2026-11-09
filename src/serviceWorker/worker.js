@@ -27,8 +27,10 @@
  *                  name, so the kept copy is the file. A miss goes to the
  *                  network and is kept on the way back.
  *   the pages      /privacy.html, /terms.html, /about.html, /faq.html,
- *                  /contact.html and their /en/ and /ja/ copies
- *                  (scripts/legal-pages.mjs, scripts/site-pages.mjs): network
+ *                  /contact.html, the content pages (/guide.html,
+ *                  /characters.html, /making.html, /cases/*.html) and their
+ *                  /en/ and /ja/ copies (scripts/legal-pages.mjs,
+ *                  scripts/site-pages.mjs, scripts/content-pages): network
  *                  first like the page, and kept on the way back and in the
  *                  warm-up, so a device that has had a table up can read
  *                  them -- and every link at the start screen's foot --
@@ -64,7 +66,7 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
-export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact)\.html$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact|guide|characters|making|cases\/[a-z0-9]+)\.html$/;
 // The start page in English and Japanese (scripts/site-pages.mjs, since
 // 11-03): the network's copy while there is one, and offline the kept page,
 // which opens in the folder's language (src/locale.js `folderLanguage`).
