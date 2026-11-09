@@ -784,8 +784,8 @@ ${tags}</head>
 ${siteHeaderNav({ kind, language })}
 <h1>${escapeHtml(name)}</h1>
 ${dated}${body.trim()}
-<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
 ${siteFooterNav({ kind, language })}
+<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
 ${creditFor(kind, language)}
 </footer>
 </main>
