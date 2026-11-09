@@ -947,7 +947,8 @@ const budgets = [
   // 206,347 / 38,833 -> 206,970 / 38,929 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 206,966 / 38,925 in the e2e build, the plus 4.
   // 206,970 / 38,929 -> 208,114 / 39,241 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the moods' hue-carrying grounds, lines, accents and frames (tokens.css), the edge tint (play.css .game-shell::after, briefing.css veil) and its @property. Measured 208,110 / 39,237 in the e2e build, the plus 4.
   // 208,114 / 39,241 -> 208,126 / 39,241 on 2026-11-06, static-shell-2 after merging main d7dadd92 (#465 mood-boost): the intro art's box takes its height from the viewport alone (min(100svh, 940px), 82svh on a phone; decision 13 (1)), so the static shell and the intro draw it the same. Measured 208,122 / 39,235 in the e2e build, the raw plus 4 (the gzip under its line).
-  { pattern: /^index-.*\.css$/, maxBytes: 208_126, maxGzip: 39_241 },
+  // 208,126 / 39,241 -> 208,226 / 39,265 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the 360px HUD's 2px gaps and, in Japanese, the signals row, dateline, speaker and lock seal at line-height 1.2 (Noto CJK's normal line is about 1.45em). Measured 208,222 / 39,261 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 208_226, maxGzip: 39_265 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1903,7 +1904,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 433,241 / 491,404 / 498,624 -> 434,268 / 492,190 / 499,699 on 2026-11-06, static-shell-2 after merging main 97366b95 (#465 mood-boost, #468 w47-rule-line; decision 13 (1)): the build writes the intro's first viewport into #root of index.html and the /en/ and /ja/ start pages (scripts/static-shell.mjs) with the header pills, kicker and premise hidden in the page's language and Japanese's face, the critical CSS now cut at 360px and on /en/ and /ja/ too, and the art's box from the viewport. Measured 434,264 / 492,186 / 499,695 in the e2e build, the plus 4.
 // -> 434,273 / 492,195 / 499,703 on 2026-11-06, bundle-1106b (static-shell-2 6ac68416, mood-tags-2 9b6973cd over main 97366b95): the lines above together; the entry names the case chunks that now carry 692 mood tags. Measured 434,269 / 492,191 / 499,699 in the e2e build, the plus 4.
 // 433,243 / 491,405 / 498,624 -> 434,283 / 492,205 / 499,714 on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening, B-3(1) switched off): the static shell and mood-tag lines above over the cold opening's entry line. Measured 434,279 / 492,201 / 499,710 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_283, en: 492_205, ja: 499_714 };
+// 434,283 / 492,205 / 499,714 -> 434,341 / 492,256 / 499,767 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the index CSS line above (the critical CSS cut again). Measured 434,337 / 492,252 / 499,763 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_341, en: 492_256, ja: 499_767 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
