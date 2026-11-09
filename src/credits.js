@@ -1,20 +1,21 @@
 /**
  * Who made the game, as the start screen's credit (StudioCredit.jsx) and the
  * foot of every plain page (renderDocumentPage, scripts/legal-pages.mjs) print
- * it. The studio has a name in each language (STUDIO_NAMES, studioName); the
- * creators' names are the same in all three. The two creators made it together from plan to build, so they share one
+ * it. The studio has a name in each language (STUDIO_NAMES, studioName),
+ * without the word studio, since the credit's STUDIO label already says it
+ * (2026-11-09); the creators' names are the same in all three. The two creators made it together from plan to build, so they share one
  * CREATOR line with no role between them (decided 2026-11-04).
  *
  * The support and deletion address is SUPPORT_CONTACT in appConfig.js, which
  * stays SUPASONIC's alone; these are the creators' own addresses.
  */
 export const STUDIO_NAMES = {
-  ko: "찹쌀떡 스튜디오",
-  en: "Mochi Verse Studio",
-  ja: "STUDIOもちぷよ",
+  ko: "찹쌀떡",
+  en: "Mochi Verse",
+  ja: "もちぷよ",
 };
 
-/** The studio's name in a page's language (decided 2026-11-05, ko / en / ja). */
+/** The studio's name in a page's language (decided 2026-11-05, ko / en / ja; "studio" dropped 2026-11-09). */
 export const studioName = (language) => STUDIO_NAMES[language] ?? STUDIO_NAMES.ko;
 
 /** The Korean name, the source language's. */

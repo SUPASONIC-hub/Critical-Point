@@ -94,7 +94,7 @@ test("the start screen's foot opens the five pages in the screen's language, and
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
 });
 
-// The credit (2026-11-04, the studio's three names 2026-11-05): SUPASONIC & ALICE, and each one's
+// The credit (2026-11-04, the studio's three names 2026-11-05, without "studio" 2026-11-09): SUPASONIC & ALICE, and each one's
 // address as a link named for its owner, on the start screen and at the foot
 // of the plain pages, inside a 360px phone in every language.
 const CREATOR_MAILS = [
@@ -102,7 +102,7 @@ const CREATOR_MAILS = [
   ["ALICE", "goeun.nam@gmail.com"],
 ];
 
-const STUDIO_NAMES = { ko: "찹쌀떡 스튜디오", en: "Mochi Verse Studio", ja: "STUDIOもちぷよ" };
+const STUDIO_NAMES = { ko: "찹쌀떡", en: "Mochi Verse", ja: "もちぷよ" };
 
 async function expectCredit(credit, page, language = "ko") {
   await expect(credit.locator("dt")).toHaveText(["STUDIO", "CREATOR", "CONTACT"]);

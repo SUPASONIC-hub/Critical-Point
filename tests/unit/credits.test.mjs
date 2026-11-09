@@ -10,7 +10,8 @@ import { renderSitePages } from "../../scripts/site-pages.mjs";
 /**
  * The credit the user decided on 2026-11-04 (SUPASONIC and ALICE as equal
  * creators, each with an address) with the studio's three names decided on
- * 2026-11-05: 찹쌀떡 스튜디오 / Mochi Verse Studio / STUDIOもちぷよ. The support and deletion
+ * 2026-11-05, without the word studio since 2026-11-09 (the credit's STUDIO
+ * label already says it): 찹쌀떡 / Mochi Verse / もちぷよ. The support and deletion
  * address stays SUPASONIC's alone (support-contact.test.mjs names it too).
  */
 const DECIDED = [
@@ -19,9 +20,9 @@ const DECIDED = [
 ];
 
 test("the credit names the studio and both creators on one line, with their addresses", () => {
-  assert.deepEqual(STUDIO_NAMES, { ko: "찹쌀떡 스튜디오", en: "Mochi Verse Studio", ja: "STUDIOもちぷよ" });
+  assert.deepEqual(STUDIO_NAMES, { ko: "찹쌀떡", en: "Mochi Verse", ja: "もちぷよ" });
   assert.equal(STUDIO, STUDIO_NAMES.ko);
-  assert.equal(studioName("ja"), "STUDIOもちぷよ");
+  assert.equal(studioName("ja"), "もちぷよ");
   assert.equal(studioName("xx"), STUDIO_NAMES.ko, "an unknown language reads the Korean name");
   assert.deepEqual(CREATORS, DECIDED);
   assert.equal(CREATOR_LINE, "SUPASONIC & ALICE");
