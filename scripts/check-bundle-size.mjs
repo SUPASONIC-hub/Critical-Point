@@ -956,7 +956,8 @@ const budgets = [
   // 206,970 / 38,929 -> 208,114 / 39,241 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the moods' hue-carrying grounds, lines, accents and frames (tokens.css), the edge tint (play.css .game-shell::after, briefing.css veil) and its @property. Measured 208,110 / 39,237 in the e2e build, the plus 4.
   // 208,114 / 39,241 -> 208,126 / 39,241 on 2026-11-06, static-shell-2 after merging main d7dadd92 (#465 mood-boost): the intro art's box takes its height from the viewport alone (min(100svh, 940px), 82svh on a phone; decision 13 (1)), so the static shell and the intro draw it the same. Measured 208,122 / 39,235 in the e2e build, the raw plus 4 (the gzip under its line).
   // 208,126 / 39,241 -> 208,226 / 39,265 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the 360px HUD's 2px gaps and, in Japanese, the signals row, dateline, speaker and lock seal at line-height 1.2 (Noto CJK's normal line is about 1.45em). Measured 208,222 / 39,261 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 208_226, maxGzip: 39_265 },
+  // 208,226 / 39,265 -> 209,113 / 39,370 on 2026-11-09, phone-390-fit over main 775bb69a (#476): a 361-390px block for English and Japanese (the 360px labels, HUD air and Japanese 1.2 lines; the English gauge row at 4px and the column over a rules hand at 4px) and, at 360px, the English streak's line cut with an ellipsis. Measured 209,109 / 39,366 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 209_113, maxGzip: 39_370 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1920,7 +1921,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,341 / 492,256 / 499,767 -> 434,342 / 492,290 / 499,801 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 775bb69a (#476 hand-fit-2px): the en/ja dictionary lines above over #476's index CSS. Measured 434,338 / 492,286 / 499,797 in the e2e build, the plus 4.
 // 434,342 / 492,290 / 499,801 -> 434,328 / 492,274 / 499,786 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): the entry's credit lines and the start pages' studio name. Measured 434,324 / 492,270 / 499,782 in the e2e build, the plus 4.
 // 434,496 / 492,417 / 499,945 -> 434,483 / 492,435 / 499,965 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 283a74db (#478 content-pages): the en/ja dictionary lines above over content-pages' site links and #481's entry. Measured 434,479 / 492,431 / 499,961 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_483, en: 492_435, ja: 499_965 };
+// 434,496 / 492,417 / 499,945 -> 434,588 / 492,508 / 500,036 on 2026-11-09, phone-390-fit over main 283a74db (#478): the index CSS line above. Measured 434,584 / 492,504 / 500,032 in the e2e build, the plus 4.
+// BUNDLE_PLACEHOLDER
+const FIRST_PAINT_BUDGETS = { ko: 434_588, en: 492_508, ja: 500_036 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
