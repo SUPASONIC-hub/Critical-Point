@@ -151,7 +151,8 @@ const budgets = [
   // 148,622 / 54,994 -> 148,736 / 55,069 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): the lines above together (C9's draft record and seasonSpent on the run, the stake clock's getWindowSeconds, the scout's price). Measured 148,732 / 55,065 in the e2e build, the plus 4.
   // -> 148,883 / 55,121 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 148,879 / 55,117 in the e2e build, the plus 4.
   // 150,835 / 55,672 -> 150,964 / 55,742 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 150,960 / 55,738 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_964, maxGzip: 55_742 },
+  // 150,964 / 55,742 -> 150,966 / 55,756 on 2026-11-09, deps-1123: vite 8.3.6 / lucide-react 1.69 over main ade608e5 (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 150,962 / 55,752 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_966, maxGzip: 55_756 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -244,7 +245,8 @@ const budgets = [
   // 32,469 / 13,960 -> 34,182 / 14,582 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's two buys under the hand (DraftBuy, readDraftSpend) beside C-7's pass button, and the paid draft's plain pass line (skipPaid). Measured 34,178 / 14,578 in the e2e build, the plus 4.
   // -> 34,223 / 14,594 on 2026-11-06, bundle-rules2 after merging main 6f58cbb8 (#459 묶음 1105d: 글자 크기, 결과 카드 습관 줄, 11px·aria-live, 캐논, 인트로 카드): #459's lines under the rules2 lines above. Measured 34,219 / 14,590 in the e2e build, the plus 4.
   // 32,469 / 13,960 -> 34,178 / 14,560 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 34,174 / 14,556 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_178, maxGzip: 14_560 },
+  // 34,178 / 14,560 -> 34,183 / 14,560 on 2026-11-09, deps-1123: vite 8.3.6 / lucide-react 1.69 over main ade608e5 (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 34,179 / 14,554 in the e2e build, the plus 4. the gzip budget already covered the measure plus 4 and stays.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_183, maxGzip: 14_560 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -519,7 +521,8 @@ const budgets = [
   // 194,929 / 70,355 -> 194,945 / 70,375 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 194,941 / 70,371 in the e2e build, the plus 4.
   // 194,945 / 70,375 -> 195,802 / 70,670 on 2026-11-06, mood-boost over main bb7781c7 (#464 bundle-1106a): the mood's texture in the entry's AdaptiveMusic (musicScore.js MOOD_TEXTURES, blendedTexture, moodLeadNote). Measured 195,798 / 70,666 in the e2e build, the plus 4.
   // 195,802 / 70,670 -> 195,825 / 70,677 on 2026-11-06, cold-opening over main d7dadd92 (#465 mood-boost): B-3(1) with its switch off, the page's state hook in IntroScreen (the branch, the page and its chunk are folded away by __CP_COLD_OPENING__). Measured 195,821 / 70,673 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 195_825, maxGzip: 70_677 },
+  // 195,825 / 70,677 -> 195,879 / 70,689 on 2026-11-09, deps-1123: vite 8.3.6 / lucide-react 1.69 over main ade608e5 (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 195,875 / 70,685 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 195_879, maxGzip: 70_689 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -989,7 +992,8 @@ const budgets = [
   // NotebookPen); the five they replace are still drawn elsewhere. Measured
   // 17,296 / 6,136 in the e2e build, the gzip plus 4.
   // 17,286 / 6,142 -> 17,532 / 6,240 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): C-7's five tool icons on top of board-report's Flag. Measured 17,532 / 6,236. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_532, maxGzip: 6_240 },
+  // 17,532 / 6,240 -> 17,602 / 6,264 on 2026-11-09, deps-1123: vite 8.3.6 / lucide-react 1.69 over main ade608e5 (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 17,598 / 6,260 in the e2e build, the plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_602, maxGzip: 6_264 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -1069,7 +1073,8 @@ const budgets = [
   // lucide-react 1.60 installed (npm ci): measured 4,458 / 1,889, the gzip
   // plus 4.
   // 4,458 / 1,893 -> 5,014 / 2,135 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_014, maxGzip: 2_135 },
+  // 5,014 / 2,135 -> 5,023 / 2,137 on 2026-11-09, deps-1123: vite 8.3.6 / lucide-react 1.69 over main ade608e5 (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 5,019 / 2,133 in the e2e build, the plus 4.
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_023, maxGzip: 2_137 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
   // 35,720 / 13,520 -> 37,870 / 14,200 on 2026-10-09, measured 36,063 /
@@ -1905,7 +1910,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 434,273 / 492,195 / 499,703 on 2026-11-06, bundle-1106b (static-shell-2 6ac68416, mood-tags-2 9b6973cd over main 97366b95): the lines above together; the entry names the case chunks that now carry 692 mood tags. Measured 434,269 / 492,191 / 499,699 in the e2e build, the plus 4.
 // 433,243 / 491,405 / 498,624 -> 434,283 / 492,205 / 499,714 on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening, B-3(1) switched off): the static shell and mood-tag lines above over the cold opening's entry line. Measured 434,279 / 492,201 / 499,710 in the e2e build, the plus 4.
 // 434,283 / 492,205 / 499,714 -> 434,341 / 492,256 / 499,767 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the index CSS line above (the critical CSS cut again). Measured 434,337 / 492,252 / 499,763 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_341, en: 492_256, ja: 499_767 };
+// 434,341 / 492,256 / 499,767 -> 434,376 / 492,290 / 499,799 on 2026-11-09, deps-1123: vite 8.3.6 / lucide-react 1.69 over main ade608e5 (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). The entry and icons-vendor lines above. Measured 434,372 / 492,286 / 499,795 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_376, en: 492_290, ja: 499_799 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
