@@ -50,8 +50,8 @@ test("endings, ranks and the prologue drop-off are counted from the rows", () =>
   assert.equal(j.funnel.runs, 5);
   assert.equal(j.funnel.reach[5], 2);
   const md = describeJudgment(j, { week: "2026-W47", board: "audit-cascade" });
-  assert.match(md, /\| field-pact \| 2 \| 25\.0% \| 18% \| \+7\.0 \|/);
-  assert.match(md, /\| profitable-silence \| 0 \| 0\.0% \| 4\.8% \| -4\.8 \|/);
+  assert.match(md, /\| field-pact \| 2 \| 25\.0% \| 17\.7% \| \+7\.3 \|/);
+  assert.match(md, /\| profitable-silence \| 0 \| 0\.0% \| 4\.2% \| -4\.2 \|/);
   assert.match(md, /\| 프롤로그 01 \| 1 \| 20\.0% \|/);
 });
 
@@ -59,4 +59,16 @@ test("without funnel rows the report says so", () => {
   const md = describeJudgment(readJudgment([], null, "2026-W47"), { week: "2026-W47", board: "all" });
   assert.match(md, /끝낸 시즌 0개/);
   assert.match(md, /퍼널 행이 없습니다/);
+});
+
+test("the bot's endings are the test-week summary's own reference line", async () => {
+  const { BOT_ENDINGS, botEndings } = await import("../../scripts/report-judgment.mjs");
+  const { SIMULATION_LINES } = await import("../../scripts/report-test-week.mjs");
+  assert.deepEqual(BOT_ENDINGS, botEndings(SIMULATION_LINES));
+  assert.equal(BOT_ENDINGS.collapse, Number(/collapse ([\d.]+)%/.exec(SIMULATION_LINES)[1]));
+  assert.equal(Object.keys(BOT_ENDINGS).length, 9);
+  const total = Object.values(BOT_ENDINGS).reduce((sum, value) => sum + value, 0);
+  assert.ok(Math.abs(total - 100) < 0.5, `endings add to ${total}`);
+  assert.deepEqual(botEndings("Ending checks passed (600 replayed seasons: collapse 20.0%, field-pact 80.0%)"), { collapse: 20, "field-pact": 80 });
+  assert.throws(() => botEndings("no endings here"));
 });
