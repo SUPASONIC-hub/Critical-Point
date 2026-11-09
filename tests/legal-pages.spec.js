@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "./helpers/network.js";
 import { CONTENT_KINDS } from "../scripts/content-pages/pages.mjs";
 
@@ -137,7 +138,8 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
     expect(response.headers()["content-type"], path).toMatch(/text\/html/);
     const html = await response.text();
     expect(html, path).toContain(`<h1>${heading}</h1>`);
-    expect(html, path).not.toMatch(/<script\b/i);
+    // The about page's one script tag is JSON-LD, data the browser does not run (scripts/structured-data.mjs).
+    expect(html.replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), path).not.toMatch(/<script\b/i);
   }
   const robots = await request.get("/robots.txt");
   expect(robots.status()).toBe(200);
@@ -164,6 +166,58 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
     expect(xml, path).toContain(`<loc>${path}</loc>`);
   }
 });
+
+// The plain pages' accessibility (audit 2026-11-09, before AdSense's second
+// review): axe's every rule on the guide, the case files (their folded lines
+// open), four cases, the cast, the making-of and the five pages before them,
+// in each language; and what axe does not hold a page to -- one h1, the
+// banner, main and contentinfo landmarks, the head's menu naming the page it
+// is on, a skip link first that lands on the main text, a focus ring a
+// keyboard can see.
+const AUDITED = ["guide", "cases/index", "cases/case01", "cases/case10", "cases/case32", "cases/final", "characters", "making", "about", "faq", "contact", "privacy", "terms"];
+const SKIP = { ko: "본문으로 건너뛰기", en: "Skip to content", ja: "本文へスキップ" };
+
+for (const language of ["ko", "en", "ja"]) {
+  test(`the plain pages have no accessibility violations and keep their landmarks, menu and skip link (${language})`, { tag: ["@a11y", "@prod"] }, async ({ page }) => {
+    for (const kind of AUDITED) {
+      const path = `${FOLDER[language]}/${kind}.html`;
+      await page.goto(path);
+      await expect(page.locator("html"), path).toHaveAttribute("lang", language);
+      await expect(page.getByRole("heading", { level: 1 }), path).toHaveCount(1);
+      for (const role of ["banner", "main", "contentinfo"]) await expect(page.getByRole(role), `${path}: ${role}`).toHaveCount(1);
+      await expect(page.getByRole("banner").getByRole("navigation", { name: MENU[language], exact: true }), path).toHaveCount(1);
+      // A case's page is under the case files: the menu marks the section, not a page.
+      const section = kind.startsWith("cases/case") || kind === "cases/final";
+      const current = menu(page, language).locator(`[aria-current="${section ? "true" : "page"}"]`);
+      await expect(current, path).toHaveCount(1);
+      await expect(current, path).toHaveAttribute("href", `${FOLDER[language]}/${section ? "cases/index" : kind}.html`);
+      await page.locator("details").evaluateAll((drawers) => drawers.forEach((drawer) => (drawer.open = true)));
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations, path).toEqual([]);
+    }
+
+    // The skip link: the first stop, seen when focused, and it lands on the main text.
+    await page.goto(`${FOLDER[language]}/cases/case10.html`);
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: SKIP[language], exact: true });
+    await expect(skip).toBeFocused();
+    const box = await skip.boundingBox();
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(await skip.evaluate((link) => getComputedStyle(link).outlineStyle)).toBe("solid");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("main#main")).toBeFocused();
+    // The next stop is in the page's text, past the menu, and its ring shows.
+    await page.keyboard.press("Tab");
+    const next = page.locator(":focus");
+    expect(await next.evaluate((element) => Boolean(element.closest("main")))).toBe(true);
+    expect(await next.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("solid");
+
+    // The pages have one look; a light system setting leaves their colours readable.
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto(`${FOLDER[language]}/guide.html`);
+    expect((await new AxeBuilder({ page }).withRules(["color-contrast"]).analyze()).violations).toEqual([]);
+  });
+}
 
 // The start page in English and Japanese (11-03): its own file at its folder,
 // read with no script as a crawler reads it, and the game in that language

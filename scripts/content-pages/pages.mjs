@@ -15,6 +15,7 @@ import {
 import { CHARACTER_GROUPS, CHARACTERS_DESCRIPTION, CHARACTERS_INTRO } from "./characters-text.mjs";
 import { GUIDE_BODY, GUIDE_DESCRIPTION } from "./guide-text.mjs";
 import { MAKING_BODY, MAKING_DESCRIPTION } from "./making-text.mjs";
+import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../structured-data.mjs";
 
 /**
  * The site's content pages, written beside the five about the game and the
@@ -117,12 +118,19 @@ const FICTION = {
   ja: "ゲームに登場する人物、会社、機関、事件はすべて架空のものです。人物紹介は、それぞれが初めて登場するときの姿までを書いています。",
 };
 
+/** A portrait's text: whose face it is, since the name under it is a heading of its own. */
+const PORTRAIT_ALT = {
+  ko: (name) => `${name}의 초상`,
+  en: (name) => `Portrait of ${name}`,
+  ja: (name) => `${name}の肖像`,
+};
+
 function charactersBody(language) {
   const groups = CHARACTER_GROUPS.map((group) => {
     const people = group.people.map((person) => {
       const words = person[language];
       const picture = person.portrait
-        ? `<img src="${person.portrait}" alt="${escapeHtml(words.name)}" width="72" height="72" loading="lazy" decoding="async" />\n`
+        ? `<img src="${person.portrait}" alt="${escapeHtml(PORTRAIT_ALT[language](words.name))}" width="72" height="72" loading="lazy" decoding="async" />\n`
         : "";
       const line = words.line ? `\n<p class="line">“${escapeHtml(words.line)}”</p>` : "";
       return `<li>${picture}<div>
@@ -160,12 +168,29 @@ function pageOf(kind, language) {
   return { body: caseBody(caseId, language), description: CASE_TEXT[caseId][language].question, heading: caseHeading(caseId, language) };
 }
 
+/**
+ * The page's trail for a search engine (BreadcrumbList, scripts/structured-data.mjs):
+ * a case under the case files (사건 파일 > 사건 01 · 72시간), the guide, the
+ * cast and the making-of under the game. The case files' own list has none.
+ */
+function trailOf(kind, language, heading) {
+  if (kind === "cases/index") return "";
+  const trail = kind.startsWith("cases/")
+    ? [
+        [HEADINGS["cases/index"][language], pagePath("cases/index", language)],
+        [heading, pagePath(kind, language)],
+      ]
+    : pageTrail(kind, language, heading);
+  return structuredDataTag(breadcrumbStructuredData(trail));
+}
+
 /** Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash. */
 export function renderContentPages({ analytics = null } = {}) {
   const pages = {};
   for (const kind of CONTENT_KINDS) {
     for (const language of PAGE_LANGUAGES) {
-      pages[pagePath(kind, language).slice(1)] = renderDocumentPage({ kind, language, analytics, ...pageOf(kind, language) });
+      const page = pageOf(kind, language);
+      pages[pagePath(kind, language).slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, structuredData: trailOf(kind, language, page.heading) });
     }
   }
   return pages;

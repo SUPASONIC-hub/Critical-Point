@@ -47,7 +47,8 @@ test("every content page is written in Korean, English and Japanese, and every c
   assert.equal(Object.keys(content).length, CONTENT_KINDS.length * 3);
   for (const [file, html] of Object.entries(content)) {
     assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /\$\{|undefined|NaN|\[object /, `${file}: no placeholder left`);
-    assert.doesNotMatch(html, /<script\b/i, `${file}: a plain page needs no script`);
+    // The one script tag is JSON-LD, data the browser does not run (scripts/structured-data.mjs).
+    assert.doesNotMatch(html.replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /<script\b/i, `${file}: a plain page needs no script`);
   }
 });
 
@@ -63,6 +64,11 @@ test("every plain page carries the site menu at its head and its foot, and every
     for (const [, href] of decode(html).matchAll(/<(?:a|img)\b[^>]*?(?:href|src)="([^"]+)"/g)) {
       if (href.startsWith("mailto:") || /^https:\/\//.test(href)) continue;
       if (/^\/((en|ja)\/)?$/.test(href)) continue;
+      // The skip link lands on the page's own main.
+      if (href.startsWith("#")) {
+        assert.ok(html.includes(`id="${href.slice(1)}"`), `${file} links ${href}, which is not on the page`);
+        continue;
+      }
       assert.ok(written.has(href) || existsSync(`public${href}`), `${file} links ${href}, which is neither written nor shipped`);
     }
   }
