@@ -340,7 +340,8 @@ const fileBudgets = {
   // the stake clock's HUD lines; the ratchet goes down with it, never up again after rules-1105's one raise.
   // 3025 / 58815 -> 3035 / 59047 on 2026-11-06, mood-boost after merging main e1f5e515 (#463), measured: the mood's edge tint (.game-shell::after).
   // 3035 / 59047 -> 3035 / 59146 on 2026-11-09, hand-fit-2px (#476), measured: Japanese HUD and scene lines at 1.2 on a 360px phone (Noto CJK's normal line put nine overclocked five-card hands 6px under the bar).
-  "play.css": { lines: 3035, bytes: 59146 },
+  // 3035 / 59146 -> 3053 / 59547 on 2026-11-09, phone-heavy-bank, measured: the relics beside the run's line at 360px (an overclocked board with a max bank, Korean 18px under the bar) and the English signals' 360px columns at 361-390px.
+  "play.css": { lines: 3053, bytes: 59547 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

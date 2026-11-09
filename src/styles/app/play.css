@@ -2659,6 +2659,25 @@
   }
 }
 
+/* English signals on a 390x844 phone (361 to 390px) as at 360px: LOCK at its
+   own width without its icon, the chain's line the one cut. With the 1.25 / 1
+   shares STRIKE had 68px of its 81 once the chain was lit and ran 13px under
+   the streak (Linux, overclocked board, case06/07/16/28; 2026-11-09). */
+@media (min-width: 361px) and (max-width: 390px) {
+  :lang(en) .gauntlet-stage .gx-signals {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 8px;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal svg {
+    display: none;
+  }
+}
+
 /* Japanese is drawn in the system's CJK face, full-width kana for kana, and on
    Linux and Android (Noto CJK) a 360px phone wrapped 46 five-card labels to a
    third line and pushed the last card 4 to 42px under the action bar, where
@@ -2720,6 +2739,17 @@
     min-height: 18px;
     padding-block: 0;
     line-height: 1.2;
+  }
+
+  /* The relics take the run's line when they fit beside it. Late in a season
+     the bank is Stake and Vault on one line and the run's line on a second,
+     and the relics' own third line put an overclocked five-card hand 18px
+     under the action bar in Korean and 9px in Japanese (Linux, 360x740, max
+     bank, c6_desk; 2026-11-09). The run's line is 158 to 174px there and five
+     relics 122, so both fit the 310px row; where they do not (a cap bank in
+     English) the relics wrap to their own line as before. */
+  .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
   }
 
   .gauntlet-stage .gx-signals {
