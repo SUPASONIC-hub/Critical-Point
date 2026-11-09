@@ -1,4 +1,5 @@
 import { expect, test } from "./helpers/network.js";
+import { CONTENT_KINDS } from "../scripts/content-pages/pages.mjs";
 
 /**
  * The plain pages beside the build -- the privacy policy and the terms of use
@@ -8,8 +9,12 @@ import { expect, test } from "./helpers/network.js";
  * the other languages and back to the game. The dev server answers them from
  * the same source the build writes them from (`staticPages()` in
  * vite.config.js); the @prod test reads the fifteen files, robots.txt and the
- * sitemap off the build.
+ * sitemap off the build. Since 11-09 every plain page carries the site menu
+ * at its head and its foot (scripts/content-pages/site-nav.mjs): the head's
+ * is the first `nav` and is named 사이트 메뉴 / Site menu / サイトメニュー.
  */
+const MENU = { ko: "사이트 메뉴", en: "Site menu", ja: "サイトメニュー" };
+const menu = (page, language) => page.getByRole("navigation", { name: MENU[language], exact: true });
 const HEADINGS = {
   ko: { about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관" },
   en: { about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use" },
@@ -29,19 +34,19 @@ test("the policy pages open from the start screen and lead to each other and bac
   await expect(page.getByRole("heading", { level: 1, name: "개인정보처리방침" })).toBeVisible();
   await expect(page.getByRole("link", { name: "from.logic.to.magic@gmail.com" }).first()).toBeVisible();
 
-  await page.getByRole("navigation").getByRole("link", { name: "English" }).click();
+  await menu(page, "ko").getByRole("link", { name: "English" }).click();
   await expect(page).toHaveURL(/\/en\/privacy\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "Privacy Policy" })).toBeVisible();
 
-  await page.getByRole("navigation").getByRole("link", { name: "Terms of Use" }).click();
+  await menu(page, "en").getByRole("link", { name: "Terms", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/terms\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "Terms of Use" })).toBeVisible();
 
-  await page.getByRole("navigation").getByRole("link", { name: "한국어" }).click();
+  await menu(page, "en").getByRole("link", { name: "한국어" }).click();
   await expect(page).toHaveURL(/\/terms\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "이용약관" })).toBeVisible();
 
-  await page.getByRole("navigation").getByRole("link", { name: "게임으로 돌아가기" }).click();
+  await menu(page, "ko").getByRole("link", { name: "게임 시작" }).click();
   await expect(page.locator(".intro")).toBeVisible();
 
   // The data drawer's note links the same two pages.
@@ -70,7 +75,7 @@ test("the start screen's foot opens the five pages in the screen's language, and
     await expect(page.getByRole("heading", { level: 1, name: HEADINGS.ko[kind] })).toBeVisible();
     // exact: the credit under it names each creator's address for its owner ("SUPASONIC: from.logic...").
     await expect(page.locator("footer").getByRole("link", { name: "from.logic.to.magic@gmail.com", exact: true })).toBeVisible();
-    await page.getByRole("navigation").getByRole("link", { name: "게임으로 돌아가기" }).click();
+    await menu(page, "ko").getByRole("link", { name: "게임 시작" }).click();
     await expect(page.locator(".intro")).toBeVisible();
   }
 
@@ -79,12 +84,12 @@ test("the start screen's foot opens the five pages in the screen's language, and
   await page.locator(".intro-legal").getByRole("link", { name: "FAQ", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/faq\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "FAQ" })).toBeVisible();
-  await page.getByRole("navigation").getByRole("link", { name: "Contact", exact: true }).click();
+  await menu(page, "en").getByRole("link", { name: "Contact", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/contact\.html$/);
-  await page.getByRole("navigation").getByRole("link", { name: "日本語" }).click();
+  await menu(page, "en").getByRole("link", { name: "日本語" }).click();
   await expect(page).toHaveURL(/\/ja\/contact\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "お問い合わせ" })).toBeVisible();
-  await page.getByRole("navigation").getByRole("link", { name: "ゲームに戻る" }).click();
+  await menu(page, "ja").getByRole("link", { name: "ゲームを始める" }).click();
   await expect(page).toHaveURL(/\/ja\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
 });
@@ -140,9 +145,24 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const xml = await sitemap.text();
-  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3);
+  // The fifteen, the start page in three languages and the content pages (scripts/content-pages).
+  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3 + CONTENT_KINDS.length * 3);
   for (const [path] of PAGES) expect(xml, path).toContain(`<loc>${path}</loc>`);
   for (const path of ["/", "/en/", "/ja/"]) expect(xml, path).toContain(`<loc>${path}</loc>`);
+  // The content pages are plain files too, at their own addresses, and in the sitemap.
+  for (const [path, heading] of [
+    ["/guide.html", "게임 방법"],
+    ["/en/cases/index.html", "Case Files"],
+    ["/ja/characters.html", "登場人物"],
+    ["/cases/case01.html", "사건 01 · 72시간"],
+    ["/en/making.html", "How We Made It"],
+  ]) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    expect(response.headers()["content-type"], path).toMatch(/text\/html/);
+    expect(await response.text(), path).toContain(`<h1>${heading}</h1>`);
+    expect(xml, path).toContain(`<loc>${path}</loc>`);
+  }
 });
 
 // The start page in English and Japanese (11-03): its own file at its folder,
