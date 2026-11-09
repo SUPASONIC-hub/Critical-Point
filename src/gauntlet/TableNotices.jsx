@@ -114,10 +114,11 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
 /** Everything that lands over the table: what it says aloud, the relic just taken, a table lost to or held by another tab, the verdict. */
 export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onClaim, onLeave }) {
   const { lost, held } = getTabNotices(tab);
-  const said = useTableVoice(voice);
+  // The case is the voice's too (E3 2단계): the first table of a case that opens an act says so.
+  const said = useTableVoice({ ...voice, caseId });
   return (
     <>
-      {/* The table's one voice (tableVoice.js): the push, the stance, the bank and the clock.
+      {/* The table's one voice (tableVoice.js): the push, the stance, the settlement, the act and the clock.
           Silent to the eye, and on the page before it has anything to say. */}
       <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
       <EdgeNotice voice={voice} caseId={caseId} />
