@@ -22,7 +22,7 @@ import {
 
 /**
  * The three pages about the game -- what it is and how it is played, the
- * questions players ask, and how to reach the developer -- in Korean, English
+ * questions players ask, and how to reach us -- in Korean, English
  * and Japanese: nine plain pages the build writes beside `index.html` with
  * the policy's six (`staticPages()` in vite.config.js), and the two files a
  * crawler asks for first, /robots.txt and /sitemap.xml.
@@ -65,7 +65,7 @@ const DESCRIPTION = {
   },
   contact: {
     ko: "문의, 오류 제보, 게시판 글 신고, 개인정보 열람·삭제 요청을 보내는 곳과 방법, 답변까지 걸리는 시간을 안내합니다.",
-    en: "How to reach the developer: questions, bug reports, reporting a board post, and requests to access or delete your data, and how soon we reply.",
+    en: "How to reach us: questions, bug reports, reporting a board post, and requests to access or delete your data, and how soon we reply.",
     ja: "お問い合わせ、不具合の報告、掲示板の投稿の通報、個人情報の閲覧・削除の請求の送り先と方法、回答までの期間をご案内します。",
   },
 };
@@ -348,11 +348,11 @@ const CONTACT_KO = `
 `;
 
 const CONTACT_EN = `
-<p>Questions about Critical Point, bug reports, reports of board posts, and requests to access or delete your data all go to the one email address below. The game has no sign-up or login, so email is the way to reach the developer.</p>
+<p>Questions about Critical Point, bug reports, reports of board posts, and requests to access or delete your data all go to the one email address below. The game has no sign-up or login, so email is the way to reach us.</p>
 
 <h2>Address</h2>
 <ul>
-<li>Run by: the Critical Point developer</li>
+<li>Run by: the Critical Point developers</li>
 <li>Email: ${mail}</li>
 </ul>
 <p>Please write from an address that can receive our reply. Because the game never asks for your name, a request about your records needs one of the codes listed below instead.</p>

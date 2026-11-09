@@ -40,9 +40,9 @@ curl -s https://critical-point-wn6p.onrender.com/ | grep -o 'adsbygoogle'   # �
 
 | # | 할 일 | 누가 |
 | --- | --- | --- |
-| 1 | Render 환경 변수 `ADSENSE_CLIENT`를 넣고 다시 배포 | 사용자 |
-| 2 | 위 확인 명령으로 meta·`ads.txt` 확인 | 사용자 또는 Claude |
-| 3 | AdSense 콘솔 → 사이트 → 사이트 추가(`critical-point-wn6p.onrender.com`) → 확인 방법 「메타 태그」 또는 「ads.txt」 → 검토 요청 | 사용자 |
+| 1 | Render 환경 변수 `ADSENSE_CLIENT`를 넣고 다시 배포 | 우리 |
+| 2 | 위 확인 명령으로 meta·`ads.txt` 확인 | 우리 또는 Claude |
+| 3 | AdSense 콘솔 → 사이트 → 사이트 추가(`critical-point-wn6p.onrender.com`) → 확인 방법 「메타 태그」 또는 「ads.txt」 → 검토 요청 | 우리 |
 | 4 | 승인(기간은 Google이 약속하지 않음). 거절되면 사유를 보고 고친 뒤 다시 요청 | Google |
 
 ## 검토가 읽는 글과 Search Console
