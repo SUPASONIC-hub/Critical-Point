@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-06 (the state of `main` at `a170161`, after #459 bundle-1105d, #463 bundle-rules2, #464 bundle-1106a, #465 mood-boost, #468 W47 rule line, #471 cold opening switched off, #470 report:judgment and #472 static shell plus 692 mood tags; 61 migrations, the 11-12 ranking clear still a draft in #466).
+Last updated: 2026-11-09 (the state of `main` at `283a74d`, after #476 360px five card hand, #481 studio names and the makers as we, and #478 content pages and site menu, 177 plain pages; <!-- 1109 병합되면: #482 #485 #483 -->).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -781,6 +781,22 @@ Still open, on purpose:
   the 11-05 entry above keeps the names of that day. The docs, README and the
   plain pages now speak of the makers as we: the game is made by two people,
   SUPASONIC & ALICE.
+  Also on 11-09: #476 (`775bb69a`): on the 360x740 overloaded table with five
+  relics the five card hand's last card sat 2 px under the action row; the
+  360px HUD's vertical gap and padding 3 to 2 px, ja line-height 1.2 at
+  <=360px; Linux clearance ko -2, ja -11, en -8 px. #478 (`content-pages`,
+  `283a74db`): AdSense turned the site down as low-value content, so plain
+  pages went in before 11-11 -- a guide, a cases index and 55 spoiler-free
+  case pages (first two scenes only, a notice from case 10 on), characters,
+  making-of -- with a site menu on every plain page, a hidden inert `<nav>`
+  in the static shell and all of it in the sitemap: 177 pages over three
+  languages. We ask for the AdSense re-review once indexed (asked 11-16).
+  <!-- 1109 병합되면: #482 table-a11y-2 (E3 stage 2), #485 about page
+  accuracy (combo by direction, all rules from case 03, read-the-hand 20%,
+  SILENCE 30 s), #483 390px en/ja five card hand and 360px en signal row -->
+  Open: drafts #477 (cold-opening style, decided 11-23), #484 (deps for
+  after W47, replacing Dependabot #479 and #480), `phone-heavy-bank`
+  (overloaded table with the largest bank at 360px, after W47).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
