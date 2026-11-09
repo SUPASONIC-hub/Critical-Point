@@ -107,7 +107,12 @@ export function siteFooterNav({ kind, language }) {
 ${menuLinks(kind, language).replace(/ aria-current="(?:page|true)"/g, "")}</nav>`;
 }
 
-/** What the menu and the content pages add to the plain pages' sheet. */
+/**
+ * What the menu and the content pages add to the plain pages' sheet. Under
+ * 600px a portrait floats beside the name and role and the profile runs
+ * under it at full width (beside it, the text kept a 242px column at 360px), and a case's folded line opens from a 44px
+ * row (measured on Linux CI 2026-11-09: 32px in Korean before).
+ */
 export const MENU_STYLE = `
 nav a[aria-current=true]{color:var(--text)}
 .site-foot{padding:12px 0 0;border-top:1px solid var(--line);border-bottom:0}
@@ -123,10 +128,11 @@ nav a[aria-current=true]{color:var(--text)}
 .cast img{flex:none;width:72px;height:72px;object-fit:cover;border-radius:12px;background:var(--surface)}
 .cast p{margin:4px 0 0}
 .cast .line{color:var(--text);font-style:italic}
+@media (max-width:599px){.cast li{display:flow-root}.cast img{float:left;margin:4px 14px 4px 0}.cast h3{margin-top:8px}.cast p:not(.meta){clear:left}}
 .pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;margin-top:36px;padding-top:12px;border-top:1px solid var(--line)}
 .pager a{display:inline-flex;align-items:center;min-height:44px}
 .note{font-size:.875rem}
 .spoiler-note{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.9375rem}
 details{margin-top:4px}
-summary{cursor:pointer;color:var(--text-2);font-size:.875rem;min-height:32px;display:list-item}
+summary{cursor:pointer;color:var(--text-2);font-size:.875rem;padding:10px 0}
 `;

@@ -233,7 +233,9 @@ const tableCopy = {
     wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
     scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
-    bank: "판돈 {pot} · 금고 {vault}",
+    // {hand} is the last hand's ±N, signed by the code (formatChange).
+    bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
+    act: "{act}막 시작 · 사건 {case}",
   },
   // tableAfterword.js: what a closed window still says about itself, and the
   // recap over the next scene's reaction.
