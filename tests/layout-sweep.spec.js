@@ -259,6 +259,8 @@ const STAKED_UNDER_THE_BAR = { c1_start_hold: 14 };
  * hand 18px under the action bar in Korean and 9px in Japanese (Linux, c6_desk,
  * 2026-11-09). With the chain lit by the streak the signals row is held too,
  * on both phones: at 390px the English STRIKE was squeezed to 68px of its 81.
+ * The visit is a fourth load a scene, so a case's time limit is 15 minutes,
+ * not 10 (case17 took 5.7 on Windows with it; the later cases load more).
  */
 const HEAVY_BANK_BOARD = { ...HEAVY_BOARD, runPot: BANK_TABLES.max.runPot, streak: BANK_TABLES.max.streak, run: { ...BANK_TABLES.max, handVault: 0, runHand: 0 } };
 
@@ -277,7 +279,7 @@ function fullestScenes(caseId) {
 
 for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`the fullest ${caseId} hands fit on an overclocked board with five relics @layout`, async ({ page }) => {
-    test.setTimeout(600_000);
+    test.setTimeout(900_000);
     const nodeIds = fullestScenes(caseId);
     expect(nodeIds.length, `${caseId} has no scene to measure`).toBeGreaterThan(0);
     const rows = [];
