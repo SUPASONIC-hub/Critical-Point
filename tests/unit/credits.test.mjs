@@ -65,7 +65,7 @@ test("every plain page's foot carries the credit: both names, and both mail link
     if (POLICY_PAGE.test(file)) {
       assert.ok(!html.includes(DECIDED[1].email), `${file}: ALICE's address is nowhere on the page`);
       assert.ok(!foot.includes('class="credit-mail"') && !foot.includes("CONTACT</dt>"), `${file}: no address row in the credit`);
-      assert.ok(!foot.includes("aria-label="), `${file}: no creator mail link`);
+      assert.ok(!/<a href="mailto:[^"]*" aria-label=/.test(foot), `${file}: no creator mail link`);
     } else {
       for (const { name, email } of DECIDED) {
         assert.ok(foot.includes(`<a href="mailto:${email}" aria-label="${name}: ${email}">${email}</a>`), `${file}: ${name}'s address`);

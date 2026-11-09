@@ -1929,8 +1929,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,496 / 492,417 / 499,945 -> 434,483 / 492,435 / 499,965 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 283a74db (#478 content-pages): the en/ja dictionary lines above over content-pages' site links and #481's entry. Measured 434,479 / 492,431 / 499,961 in the e2e build, the plus 4.
 // 434,496 / 492,417 / 499,945 -> 434,588 / 492,508 / 500,036 on 2026-11-09, phone-390-fit over main 283a74db (#478): the index CSS line above. Measured 434,584 / 492,504 / 500,032 in the e2e build, the plus 4.
 // 434,483 / 492,435 / 499,965 (#482) and 434,588 / 492,508 / 500,036 (#483) -> 434,586 / 492,538 / 500,068 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: #483's and #487's CSS in the index sheet with #482's en/ja dictionary lines. Measured 434,582 / 492,534 / 500,064 in the e2e build, the plus 4.
-// 434,586 / 492,538 / 500,068 -> 434,621 / 492,575 / 500,103 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): the index CSS line above. Measured 434,617 / 492,571 / 500,099 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_621, en: 492_575, ja: 500_103 };
+// 434,586 / 492,538 / 500,068 -> 434,919 / 492,851 / 500,415 on 2026-11-09, pages-a11y-ld after merging main c1d08daa (#488 bundle 1109b): no script changed; the start page's head carries the site and the game as JSON-LD (scripts/structured-data.mjs, `startStructuredData` in site-pages.mjs; 685 bytes raw, one line), and /en/ and /ja/ theirs. Measured 434,915 / 492,847 / 500,411 in the e2e build, the plus 4.
+// 434,919 / 492,851 / 500,415 -> 434,954 / 492,886 / 500,449 on 2026-11-09, phone-heavy-bank over main d07a852b (#489): the index CSS line above. Measured 434,950 / 492,882 / 500,445 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_954, en: 492_886, ja: 500_449 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

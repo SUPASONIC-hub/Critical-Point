@@ -9,6 +9,7 @@ import { localizeStaticShell } from "./static-shell.mjs";
 import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
 import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
 import { MENU_LABELS } from "./content-pages/site-nav.mjs";
+import { gameStructuredData, structuredDataTag } from "./structured-data.mjs";
 import {
   COPY,
   escapeHtml,
@@ -470,6 +471,8 @@ export function renderSitePages({ analytics = null } = {}) {
         body: analytics && kind === "faq" ? withSwaps(BODIES[kind][language], ANALYTICS_FAQ[language]) : BODIES[kind][language],
         description: DESCRIPTION[kind][language],
         analytics,
+        // The about page names the game as the start page does (scripts/structured-data.mjs).
+        structuredData: kind === "about" ? startStructuredData(language) : "",
       });
     }
   }
@@ -575,6 +578,14 @@ export const START_PAGE = {
   },
 };
 
+/**
+ * The start page's JSON-LD tag in a language: the site and the game
+ * (scripts/structured-data.mjs), described as the page's own description.
+ * index.html holds the Korean as this writes it, byte for byte, and the
+ * other two start pages swap it for theirs (`localizedStartPage`).
+ */
+export const startStructuredData = (language) => structuredDataTag(gameStructuredData({ language, description: START_PAGE[language].description }));
+
 const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline";
 const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none";
 
@@ -647,6 +658,9 @@ function replaceEach(html, pairs, language) {
   return out;
 }
 
+/** A JSON-LD tag, one line (`structuredDataTag` writes `<` inside as `<`). */
+const STRUCTURED_DATA = /<script type="application\/ld\+json">[^<]*<\/script>/;
+
 const metaContent = (key, name) => new RegExp(`(<meta\\s+${key}="${name}"\\s+content=")[^"]*(")`);
 
 /**
@@ -681,6 +695,7 @@ export function localizedStartPage(html, language, origin = "") {
       [metaContent("name", "twitter:title"), value(copy.title)],
       [metaContent("name", "twitter:description"), value(copy.description)],
       [metaContent("name", "twitter:image:alt"), value(SHARE_IMAGE_ALT[language])],
+      [STRUCTURED_DATA, withAbsoluteSiteLinks(startStructuredData(language), origin).replace(/\$/g, "$$$$")],
     ],
     language,
   );
@@ -726,11 +741,14 @@ export function siteOrigin(env = process.env) {
  * A page with its canonical and hreflang links (and, on the start page, the
  * og:url, og:image and twitter:image) made absolute on `origin`. Search
  * engines read those as full addresses; the links a reader clicks stay
- * relative. Nothing changes without an origin.
+ * relative. The JSON-LD's `url`, `item` and `image` are made absolute the same
+ * way. Nothing changes without an origin.
  */
 export function withAbsoluteSiteLinks(html, origin) {
   if (!origin) return html;
   return String(html)
+    // The JSON-LD's addresses (scripts/structured-data.mjs), inside its own tags only.
+    .replace(new RegExp(STRUCTURED_DATA.source, "g"), (tag) => tag.replace(/("(?:url|item|image)":")\//g, `$1${origin}/`))
     .replace(/(<meta\s+(?:property="og:(?:url|image)"|name="twitter:image")\s+content=")\//g, `$1${origin}/`)
     .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
 }
