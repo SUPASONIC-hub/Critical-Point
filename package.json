@@ -33,6 +33,7 @@
     "check:pressure": "node scripts/report-gauntlet-loop.mjs",
     "check:endings": "node scripts/check-endings.mjs",
     "report:endings": "node scripts/check-endings.mjs --report",
+    "report:judgment": "node scripts/report-judgment.mjs",
     "report:near-miss": "node scripts/report-near-miss.mjs",
     "report:reading-axis": "node scripts/report-reading-axis.mjs",
     "report:speaker-lines": "node scripts/report-speaker-lines.mjs",

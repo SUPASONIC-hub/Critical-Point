@@ -63,9 +63,9 @@
  *   7. The case cap. No mood may hold more than 70% of a case's scenes: the
  *      scenes with the smallest lead go back to neutral (`cap70` in the
  *      review table) until it fits. A funeral case or a raid case really is
- *      one colour, and the reviewer may put the scenes back by hand -- but
- *      then `check:mood` fails on the same 70%, so the cap in both is the
- *      thing to raise, together.
+ *      one colour, and the reviewer may put the scenes back by hand; such a
+ *      case gets its own share in CASE_CAP_OVERRIDES (with the reason), which
+ *      this rule and `check:mood` both read.
  *
  * `npm run check:mood` (scripts/check-mood.mjs) then holds the generated file
  * to the graph and to that one smell.
@@ -237,13 +237,26 @@ export function scoreScene(nodeId, node, lines = { voice: choiceVoiceLines, echo
 export const CASE_SHARE_CAP = 0.7;
 
 /**
+ * The cases a reviewer read as one colour from end to end, with the share that
+ * mood may hold there instead of 70% and why (2026-11-06 review). Rule 7 and
+ * check:mood both read it through caseShareCap.
+ */
+export const CASE_CAP_OVERRIDES = {
+  // 사건 32 압수수색: the raid day is pressure from the briefing to the boxes; 15 of 20 scenes tense.
+  // The notebook and the lunchbox scenes stay sorrow and bright, so 75%, not more.
+  case32: { cap: 0.75, why: "압수수색 하루 전체가 조사·추궁의 긴장" },
+};
+
+export const caseShareCap = (caseId) => CASE_CAP_OVERRIDES[caseId]?.cap ?? CASE_SHARE_CAP;
+
+/**
  * Rule 7: no mood may hold more than 70% of a case. The scenes of that mood
  * with the smallest lead over their runner-up go back to neutral until the
  * share fits, and the review table says so (`cap70`), because that is where a
  * person decides whether the case really is one colour from end to end.
  */
-export function capCaseShare(rows) {
-  const limit = Math.floor(rows.length * CASE_SHARE_CAP);
+export function capCaseShare(rows, cap = CASE_SHARE_CAP) {
+  const limit = Math.floor(rows.length * cap);
   for (const mood of MOODS.filter((candidate) => candidate !== "neutral")) {
     const tagged = rows.filter((row) => row.mood === mood);
     if (tagged.length <= limit) continue;
@@ -267,7 +280,7 @@ export function draftMoods() {
       if (!node) continue;
       caseRows.push({ caseId, nodeId, node, ...scoreScene(nodeId, node) });
     }
-    rows.push(...capCaseShare(caseRows));
+    rows.push(...capCaseShare(caseRows, caseShareCap(caseId)));
   }
   return rows;
 }
