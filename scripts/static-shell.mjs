@@ -4,6 +4,7 @@ import enIntro from "../src/locales/en/screens/intro.js";
 import jaIntro from "../src/locales/ja/screens/intro.js";
 import { style as jaStyle } from "../src/locales/ja/index.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../src/responsiveArt.js";
+import { MENU_KINDS, MENU_LABELS, menuPath } from "./content-pages/site-nav.mjs";
 
 /**
  * The intro's first viewport as plain HTML, inside `#root`, so the page paints
@@ -86,6 +87,16 @@ function wordmark(label, reading) {
   );
 }
 
+/**
+ * The site's pages in the page's language, under the floor and hidden: the
+ * plain links a crawler reads off the start page before any script (the
+ * site menu's, scripts/content-pages/site-nav.mjs), which the intro replaces
+ * with its own foot. Hidden like the words above, so a stored choice of
+ * another language never shows them; inert like the rest of the shell.
+ */
+const siteLinks = (language) =>
+  `<nav ${HIDDEN}>${MENU_KINDS.map((kind) => `<a href="${menuPath(kind, language)}" tabindex="-1">${escape(MENU_LABELS[language][kind])}</a>`).join(" ")}</nav>`;
+
 /** The shell's markup, the intro's frame: the name in the page's reading shows, the words lay out unseen. */
 export function staticShellMarkup({ language = "ko", title = GAME_TITLE } = {}) {
   const copy = INTRO_COPY[language];
@@ -119,6 +130,7 @@ export function staticShellMarkup({ language = "ko", title = GAME_TITLE } = {}) 
     // The intro's column runs on past the stage (the consent line, the stats, the credit), which
     // is what keeps its wordmark under the brand row; this floor does the same for the shell.
     `<div style="height:100svh"></div>` +
+    siteLinks(language) +
     `</div></div></section></main>`
   );
 }

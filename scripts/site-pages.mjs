@@ -6,6 +6,8 @@ import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
 import { localizeStaticShell } from "./static-shell.mjs";
+import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
+import { MENU_LABELS } from "./content-pages/site-nav.mjs";
 import {
   COPY,
   escapeHtml,
@@ -575,6 +577,9 @@ export const START_PAGE = {
 const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline";
 const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none";
 
+/** The content pages the no-script text links, after the five: each section's first page. */
+const NOSCRIPT_CONTENT = ["guide", "cases/index", "characters", "making"];
+
 /**
  * What the start page says with no script, in its language: what the game
  * is (the about page's first two sentences), that it needs JavaScript and
@@ -586,7 +591,11 @@ const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; 
 export function startNoscript(language) {
   const copy = START_PAGE[language];
   const item = ([label, href]) => `          <li><a href="${escapeHtml(href)}" style="${NOSCRIPT_LINK}">${escapeHtml(label)}</a></li>\n`;
-  const pages = PAGE_KINDS.map((kind) => [COPY[language][kind], pagePath(kind, language)]);
+  const pages = [
+    ...PAGE_KINDS.map((kind) => [COPY[language][kind], pagePath(kind, language)]),
+    // The content pages' doors (scripts/content-pages): the guide, the case files, the cast, how we made it.
+    ...NOSCRIPT_CONTENT.map((kind) => [MENU_LABELS[language][kind], pagePath(kind, language)]),
+  ];
   return `<noscript>
       <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #f2f6f3; background: #06090a; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
         <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">${escapeHtml(GAME_NAME[language])}</h1>
@@ -725,9 +734,9 @@ export function withAbsoluteSiteLinks(html, origin) {
     .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
 }
 
-/** Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash. */
+/** Every plain page the build writes, the policy's six, these nine and the content pages (scripts/content-pages/pages.mjs), keyed by path from the root without its slash. */
 export function renderStaticPages(origin = "", { analytics = null } = {}) {
-  const pages = { ...renderLegalPages({ analytics }), ...renderSitePages({ analytics }) };
+  const pages = { ...renderLegalPages({ analytics }), ...renderSitePages({ analytics }), ...renderContentPages({ analytics }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 
@@ -741,7 +750,8 @@ export function robotsTxt(origin = "") {
 }
 
 /**
- * The sitemap's entries: the start page and each of the five pages, each in
+ * The sitemap's entries: the start page, each of the five pages and each
+ * content page (the guide, the case files, the cast, how we made it), each in
  * each language (`/`, `/en/`, `/ja/`, then `/about.html`, `/en/about.html`
  * ...). Every entry names its three languages and x-default (the Korean).
  * Until 11-03 the start page was one entry, its English and Japanese
@@ -750,7 +760,7 @@ export function robotsTxt(origin = "") {
 export function sitemapEntries() {
   const entries = (pathOf) =>
     PAGE_LANGUAGES.map((language) => ({ loc: pathOf(language), alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, pathOf(code)])) }));
-  return [...entries(gamePath), ...PAGE_KINDS.flatMap((kind) => entries((language) => pagePath(kind, language)))];
+  return [...entries(gamePath), ...[...PAGE_KINDS, ...CONTENT_KINDS].flatMap((kind) => entries((language) => pagePath(kind, language)))];
 }
 
 /**
