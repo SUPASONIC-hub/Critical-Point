@@ -8,6 +8,7 @@ import enIntro from "../../src/locales/en/screens/intro.js";
 import jaIntro from "../../src/locales/ja/screens/intro.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../../src/responsiveArt.js";
 import { renderStartPages } from "../../scripts/site-pages.mjs";
+import { MENU_KINDS, menuPath } from "../../scripts/content-pages/site-nav.mjs";
 import { HERO_ART, localizeStaticShell, STATIC_SHELL_ATTRIBUTE, staticShellMarkup, withStaticShell } from "../../scripts/static-shell.mjs";
 
 const INDEX = readFileSync("index.html", "utf8");
@@ -43,14 +44,16 @@ test("the shell lays out the intro's words in the page's language and shows none
   for (const [language, copy] of Object.entries(COPY)) {
     const markup = staticShellMarkup({ language });
     const hidden = [...markup.matchAll(HIDDEN_ELEMENT)].map((match) => match[0]);
-    // The header pills, the tagline, the kicker and the premise, in the order IntroScreen.jsx renders them.
-    assert.equal(hidden.length, 4, language);
+    // The header pills, the tagline, the kicker and the premise, in the order IntroScreen.jsx renders them, and the site's links.
+    assert.equal(hidden.length, 5, language);
     assert.ok(hidden[0].includes(`>${copy.ranking}</button>`) && hidden[0].includes(`>${copy.board}</button>`), `${language}: the pills`);
     assert.ok(hidden[1].startsWith('<p class="wordmark-sub" lang="en"'), `${language}: the tagline`);
     assert.ok(hidden[2].includes(copy.subtitle.replace(/&/g, "&amp;")), `${language}: the kicker`);
     assert.ok(hidden[3].includes(copy.premise.replace(/&/g, "&amp;")), `${language}: the premise`);
     // The floor that keeps the column longer than the stage, as the intro's is.
-    assert.match(markup, /<div style="height:100svh"><\/div><\/div><\/div><\/section><\/main>$/, language);
+    assert.match(markup, /<div style="height:100svh"><\/div><nav style="visibility:hidden">[^]*<\/nav><\/div><\/div><\/section><\/main>$/, language);
+    // Under the floor, a crawler finds every page of the site in the page's language.
+    for (const kind of MENU_KINDS) assert.ok(hidden[4].includes(`<a href="${menuPath(kind, language)}" tabindex="-1">`), `${language}: links ${kind}`);
   }
   // Japanese carries its dictionary's face and line breaks, as the intro it stands for has them.
   assert.ok(staticShellMarkup({ language: "ja" }).includes('<style>:root:lang(ja){--font-sans:"Hiragino Sans"'));

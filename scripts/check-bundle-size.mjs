@@ -1915,10 +1915,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 434,273 / 492,195 / 499,703 on 2026-11-06, bundle-1106b (static-shell-2 6ac68416, mood-tags-2 9b6973cd over main 97366b95): the lines above together; the entry names the case chunks that now carry 692 mood tags. Measured 434,269 / 492,191 / 499,699 in the e2e build, the plus 4.
 // 433,243 / 491,405 / 498,624 -> 434,283 / 492,205 / 499,714 on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening, B-3(1) switched off): the static shell and mood-tag lines above over the cold opening's entry line. Measured 434,279 / 492,201 / 499,710 in the e2e build, the plus 4.
 // 434,283 / 492,205 / 499,714 -> 434,341 / 492,256 / 499,767 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the index CSS line above (the critical CSS cut again). Measured 434,337 / 492,252 / 499,763 in the e2e build, the plus 4.
+// 434,341 / 492,256 / 499,767 -> 434,496 / 492,417 / 499,945 on 2026-11-09, content-pages over main 775bb69a (#476): no script changed; index.html carries the site's links (the static shell's hidden menu under its floor and four more no-script links, scripts/static-shell.mjs, site-pages.mjs `startNoscript`), and /en/ and /ja/ theirs. Measured 434,492 / 492,413 / 499,941 in the e2e build, the plus 4.
 // 434,283 / 492,205 / 499,714 -> 434,276 / 492,231 / 499,742 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the en/ja dictionaries above; the entry's gzip by the chunk names it imports. Measured 434,272 / 492,227 / 499,738 in the e2e build, the plus 4.
 // 434,341 / 492,256 / 499,767 -> 434,342 / 492,290 / 499,801 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 775bb69a (#476 hand-fit-2px): the en/ja dictionary lines above over #476's index CSS. Measured 434,338 / 492,286 / 499,797 in the e2e build, the plus 4.
 // 434,342 / 492,290 / 499,801 -> 434,328 / 492,274 / 499,786 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): the entry's credit lines and the start pages' studio name. Measured 434,324 / 492,270 / 499,782 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_328, en: 492_274, ja: 499_786 };
+// 434,496 / 492,417 / 499,945 -> 434,483 / 492,435 / 499,965 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 283a74db (#478 content-pages): the en/ja dictionary lines above over content-pages' site links and #481's entry. Measured 434,479 / 492,431 / 499,961 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_483, en: 492_435, ja: 499_965 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2073,7 +2075,8 @@ function checkBudget(file, budget) {
 // 3,724 -> 3,731 gzip on 2026-11-05, rules-1105 after merging main 33899116 (#456 #457 #460 prose bundles a-c): the warm list's hashed names only. Measured 10,346 / 3,727, the gzip plus 4.
 // 3,712 -> 3,719 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 10,310; the hashed names in its warm list changed. Measured 10,310 / 3,715 in the e2e build, the gzip plus 4.
 // 3,731 -> 3,737 gzip on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening): the warm list's hashed names only (raw 10,346 the same). Measured 10,346 / 3,733, the gzip plus 4.
-const WORKER_BUDGET = { maxBytes: 10_350, maxGzip: 3_737 };
+// 10,346 / 3,737 -> 10,619 / 3,810 on 2026-11-09, content-pages over main 49f50741: the worker keeps the content pages (DOCUMENT_PAGE: the guide, the cast, the making-of, the case files) and the warm list names twelve more pages, the case files' index among them (a case's own page is kept once read, not warmed). Measured 10,615 / 3,806 in the e2e build, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_619, maxGzip: 3_810 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

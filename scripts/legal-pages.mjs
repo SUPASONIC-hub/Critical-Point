@@ -2,6 +2,7 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
+import { MENU_STYLE, siteFooterNav, siteHeaderNav } from "./content-pages/site-nav.mjs";
 
 /**
  * The privacy policy and the terms of use, Korean, English and Japanese: six
@@ -753,25 +754,17 @@ export { escapeHtml };
  * `effective` is the policy's date line, which only the two policies have;
  * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "" }) {
   const copy = COPY[language];
-  const others = PAGE_LANGUAGES.filter((code) => code !== language);
-  const title = `${copy[kind]} · ${GAME_NAME[language]}`;
+  const name = heading ?? copy[kind];
+  const title = `${name} · ${GAME_NAME[language]}`;
   const alternates = [
     ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
   ].join("");
-  const pages = PAGE_KINDS.map((other) =>
-    other === kind
-      ? `<a href="${pagePath(other, language)}" aria-current="page">${copy[other]}</a>\n`
-      : `<a href="${pagePath(other, language)}">${copy[other]}</a>\n`,
-  ).join("");
-  const switches = others
-    .map((other) => `<a href="${pagePath(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
-    .join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
   const tags = analytics ? analyticsTagLines(analytics).map((line) => `${line}\n`).join("") : "";
-  const summary = description ?? copy[kind];
+  const summary = description ?? name;
   const share = shareMetaLines({ language, url: pagePath(kind, language), title, description: summary })
     .map((line) => `${line}\n`)
     .join("");
@@ -784,15 +777,14 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
 ${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
-<style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
+<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}</style>
 ${tags}</head>
 <body>
 <main>
-<nav aria-label="${escapeHtml(GAME_NAME[language])}">
-<a href="${gamePath(language)}">${copy.game}</a>
-${pages}${switches}</nav>
-<h1>${copy[kind]}</h1>
+${siteHeaderNav({ kind, language })}
+<h1>${escapeHtml(name)}</h1>
 ${dated}${body.trim()}
+${siteFooterNav({ kind, language })}
 <footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
 ${creditFor(kind, language)}
 </footer>

@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { PAGE_KINDS } from "../../scripts/legal-pages.mjs";
+import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
 import {
   crawlerFiles,
   readableCharacters,
@@ -43,7 +44,7 @@ test("the build writes nine pages about the game: three kinds in three languages
     "ja/faq.html",
     "faq.html",
   ].sort());
-  assert.equal(Object.keys(all).length, 15, "with the policy's six");
+  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3, "with the policy's six and the content pages (scripts/content-pages)");
   assert.deepEqual(PAGE_KINDS, SITE_PAGES, "the pages' headers and the start screen's foot list the same pages");
 });
 
@@ -88,7 +89,8 @@ test("every page links the game and the other four pages in its own language, an
     for (const kind of PAGE_KINDS) {
       assert.ok(links.includes(`href="/${FOLDER[language]}${kind}.html"`), `${file} links ${kind} in ${language}`);
     }
-    assert.equal((links.match(/aria-current="page"/g) ?? []).length, 1, `${file} marks itself`);
+    // A page marks itself; a case's page marks the case files, the section it is in.
+    assert.equal((links.match(/aria-current="(?:page|true)"/g) ?? []).length, 1, `${file} marks itself`);
     for (const [, href] of decode(html).matchAll(/<a href="([^"]+)"/g)) {
       if (href.startsWith("mailto:")) continue;
       if (/^\/((en|ja)\/)?$/.test(href)) continue;
@@ -159,19 +161,20 @@ test("the service worker keeps every page for offline reading, and leaves the cr
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });
 
-test("the sitemap names the start page in three languages and all fifteen pages, by absolute address, with each one's languages", () => {
+test("the sitemap names the start page in three languages and every plain page, by absolute address, with each one's languages", () => {
   const entries = sitemapEntries();
-  assert.equal(entries.length, 18);
+  const count = 3 + Object.keys(all).length;
+  assert.equal(entries.length, count);
   const start = { ko: "/", en: "/en/", ja: "/ja/" };
   assert.deepEqual(entries.slice(0, 3), Object.values(start).map((loc) => ({ loc, alternates: start })));
   assert.deepEqual(entries.slice(3).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
   const xml = sitemapXml({ origin: ORIGIN, date: "2026-10-29" });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml">/);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(locs.length, 18);
+  assert.equal(locs.length, count);
   assert.ok(locs.every((loc) => loc.startsWith(`${ORIGIN}/`)), "every address is absolute");
   for (const file of Object.keys(all)) assert.ok(locs.includes(`${ORIGIN}/${file}`), `${file} is in the sitemap`);
-  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, 18);
+  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, count);
   for (const path of ["/", "/en/", "/ja/"]) assert.ok(locs.includes(`${ORIGIN}${path}`), `${path} is in the sitemap`);
   assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/en/"/>`));
   assert.doesNotMatch(xml, /\?lang=/, "the start page by its folders, not the query a crawler reads as the Korean page");
