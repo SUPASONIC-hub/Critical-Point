@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { PAGE_KINDS } from "../../scripts/legal-pages.mjs";
+import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
 import {
   crawlerFiles,
   readableCharacters,
@@ -43,7 +44,7 @@ test("the build writes nine pages about the game: three kinds in three languages
     "ja/faq.html",
     "faq.html",
   ].sort());
-  assert.equal(Object.keys(all).length, 15, "with the policy's six");
+  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3, "with the policy's six and the content pages (scripts/content-pages)");
   assert.deepEqual(PAGE_KINDS, SITE_PAGES, "the pages' headers and the start screen's foot list the same pages");
 });
 
@@ -73,7 +74,8 @@ test("each page has its own title and description, a canonical link and every la
       }
     }
     assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="/${page}" />`), `${file}: x-default is the Korean`);
-    assert.doesNotMatch(html, /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a plain page needs none`);
+    // The about page's JSON-LD is data, which the browser does not run (scripts/structured-data.mjs).
+    assert.doesNotMatch(html.replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /<script\b/i, `${file}: the CSP gives scripts 'self' only, and a plain page needs none`);
     assert.ok(html.includes(`mailto:${SUPPORT_CONTACT}`), `${file} gives the contact address`);
   }
 });
@@ -88,7 +90,8 @@ test("every page links the game and the other four pages in its own language, an
     for (const kind of PAGE_KINDS) {
       assert.ok(links.includes(`href="/${FOLDER[language]}${kind}.html"`), `${file} links ${kind} in ${language}`);
     }
-    assert.equal((links.match(/aria-current="page"/g) ?? []).length, 1, `${file} marks itself`);
+    // A page marks itself; a case's page marks the case files, the section it is in.
+    assert.equal((links.match(/aria-current="(?:page|true)"/g) ?? []).length, 1, `${file} marks itself`);
     for (const [, href] of decode(html).matchAll(/<a href="([^"]+)"/g)) {
       if (href.startsWith("mailto:")) continue;
       if (/^\/((en|ja)\/)?$/.test(href)) continue;
@@ -110,7 +113,7 @@ test("each Korean page is at least 1,500 characters without spaces, and the tran
     assert.equal(sections(site[`ja/${kind}.html`]), sections(site[`${kind}.html`]), `ja/${kind}.html has every section`);
   }
   for (const [file, html] of Object.entries(site)) {
-    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
+    assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
     if (!file.startsWith("ja/") && !file.startsWith("en/")) continue;
     // Korean only where a page names the Korean page, or quotes the language choice as the screen shows it.
     const left = html.replace(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
@@ -159,19 +162,20 @@ test("the service worker keeps every page for offline reading, and leaves the cr
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });
 
-test("the sitemap names the start page in three languages and all fifteen pages, by absolute address, with each one's languages", () => {
+test("the sitemap names the start page in three languages and every plain page, by absolute address, with each one's languages", () => {
   const entries = sitemapEntries();
-  assert.equal(entries.length, 18);
+  const count = 3 + Object.keys(all).length;
+  assert.equal(entries.length, count);
   const start = { ko: "/", en: "/en/", ja: "/ja/" };
   assert.deepEqual(entries.slice(0, 3), Object.values(start).map((loc) => ({ loc, alternates: start })));
   assert.deepEqual(entries.slice(3).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
   const xml = sitemapXml({ origin: ORIGIN, date: "2026-10-29" });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml">/);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(locs.length, 18);
+  assert.equal(locs.length, count);
   assert.ok(locs.every((loc) => loc.startsWith(`${ORIGIN}/`)), "every address is absolute");
   for (const file of Object.keys(all)) assert.ok(locs.includes(`${ORIGIN}/${file}`), `${file} is in the sitemap`);
-  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, 18);
+  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, count);
   for (const path of ["/", "/en/", "/ja/"]) assert.ok(locs.includes(`${ORIGIN}${path}`), `${path} is in the sitemap`);
   assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/en/"/>`));
   assert.doesNotMatch(xml, /\?lang=/, "the start page by its folders, not the query a crawler reads as the Korean page");
@@ -198,4 +202,28 @@ test("the origin is SITE_URL, else RENDER_EXTERNAL_URL, and only an https one; t
   assert.ok(absolute.includes(`<link rel="alternate" hreflang="ja" href="${ORIGIN}/ja/faq.html" />`));
   assert.ok(absolute.includes('<a href="/en/about.html">'), "the links a reader clicks stay relative");
   assert.equal(withAbsoluteSiteLinks("<link rel=\"canonical\" href=\"/\" />", ""), "<link rel=\"canonical\" href=\"/\" />");
+});
+
+test("the about page says the rules as the code holds them: the combo's two sides, SILENCE, the rules the main story adds, and every axis of the score", async () => {
+  const { SILENCE_SECONDS } = await import("../../src/gauntlet/tableRules.js");
+  const { LOGIC_DIRECTIONS } = await import("../../src/gauntlet/logicStreak.js");
+  const report = {
+    ko: (await import("../../src/copy/reportLines.js")).default.score,
+    en: (await import("../../src/locales/en/screens/reportLines.js")).default.score,
+    ja: (await import("../../src/locales/ja/screens/reportLines.js")).default.score,
+  };
+  assert.deepEqual([...LOGIC_DIRECTIONS], ["people", "position"], "the combo is held on a side, people or position");
+  const SIDES = { ko: ["사람 쪽", "자리 쪽"], en: ["toward the people", "toward the position"], ja: ["人の側", "立場の側"] };
+  const SECONDS = { ko: `${SILENCE_SECONDS}초`, en: `${SILENCE_SECONDS} seconds`, ja: `${SILENCE_SECONDS}秒` };
+  const MAIN_RULES = { ko: ["사건 01에 OVERCLOCK", "사건 02에 감사(AUDIT)", "사건 03에 연결(CASCADE)"], en: ["OVERCLOCK in Case 01", "AUDIT in Case 02", "CASCADE in Case 03"], ja: ["事件01でOVERCLOCK", "事件02で監査(AUDIT)", "事件03で連結(CASCADE)"] };
+  for (const language of ["ko", "en", "ja"]) {
+    const about = decode(site[`${FOLDER[language]}about.html`]);
+    for (const side of SIDES[language]) assert.ok(about.includes(side), `${language}: the combo's side, ${side}`);
+    assert.ok(about.includes("(SILENCE)") && about.includes(SECONDS[language]), `${language}: SILENCE and its ${SILENCE_SECONDS} seconds`);
+    for (const rule of MAIN_RULES[language]) assert.ok(about.includes(rule), `${language}: ${rule}`);
+    assert.doesNotMatch(about, /사건 01부터 모두 켜집니다|from Case 01 on they are all in play|事件01からはすべてオンになります/, `${language}: not every rule from Case 01`);
+    for (const axis of ["consistency", "reading", "cognition", "reflection", "pressureAdapt", "rhythm"]) {
+      assert.ok(about.includes(`(${report[language][axis].label}`), `${language}: the score's ${axis} axis by the report's own label, ${report[language][axis].label}`);
+    }
+  }
 });

@@ -6,6 +6,10 @@ import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../src/gameCases.js";
 import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
 import { localizeStaticShell } from "./static-shell.mjs";
+import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
+import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
+import { MENU_LABELS } from "./content-pages/site-nav.mjs";
+import { gameStructuredData, structuredDataTag } from "./structured-data.mjs";
 import {
   COPY,
   escapeHtml,
@@ -22,7 +26,7 @@ import {
 
 /**
  * The three pages about the game -- what it is and how it is played, the
- * questions players ask, and how to reach the developer -- in Korean, English
+ * questions players ask, and how to reach us -- in Korean, English
  * and Japanese: nine plain pages the build writes beside `index.html` with
  * the policy's six (`staticPages()` in vite.config.js), and the two files a
  * crawler asks for first, /robots.txt and /sitemap.xml.
@@ -65,7 +69,7 @@ const DESCRIPTION = {
   },
   contact: {
     ko: "문의, 오류 제보, 게시판 글 신고, 개인정보 열람·삭제 요청을 보내는 곳과 방법, 답변까지 걸리는 시간을 안내합니다.",
-    en: "How to reach the developer: questions, bug reports, reporting a board post, and requests to access or delete your data, and how soon we reply.",
+    en: "How to reach us: questions, bug reports, reporting a board post, and requests to access or delete your data, and how soon we reply.",
     ja: "お問い合わせ、不具合の報告、掲示板の投稿の通報、個人情報の閲覧・削除の請求の送り先と方法、回答までの期間をご案内します。",
   },
 };
@@ -93,12 +97,12 @@ const ABOUT_KO = `
 <h3>3. 밀어붙이거나 확정한다</h3>
 <p>「밀어붙인다」를 누를 때마다 열기가 오르고 판돈의 배율이 커집니다. 열기 게이지에는 벽이 있을 수 있는 구간이 그려져 있지만, 벽의 정확한 위치는 끝까지 나오지 않습니다. 벽이 얼마나 가까운지 알려 주는 것은 심박 하나뿐이고, 그마저 오차가 있습니다. 벽에 닿으면 BUST가 되어 이번 사건에 걸린 판돈이 0이 되고, 카드는 이득 없이 비용만 치릅니다. 「확정」을 누르면 그때까지 쌓은 판돈을 지킵니다. 사건이 닫힐 때 판돈은 금고로 옮겨지고, 금고는 벽이 가져가지 못합니다. 판에는 제한 시간(기본 45초)이 있어서 가만히 있어도 시계가 열기를 올립니다.</p>
 <h3>4. 판단은 다음 판의 규칙을 바꾼다</h3>
-<p>모든 결정은 다음 판에 흔적을 남깁니다. BUST 뒤에는 카드가 뒤집히고 벽이 가까워집니다(BLACKOUT, AFTERSHOCK). 한 번도 밀지 않고 확정하면 가장 좋은 카드가 봉인되고(COLD FEET), 너무 높은 배율로 확정하면 열기와 시간을 빚집니다(HEAT DEBT). 방금 가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다(FRACTURE). 이런 규칙은 처음부터 한꺼번에 켜지지 않고 프롤로그 다섯 사건에 걸쳐 한 단계씩 열리며, 사건 01부터 모두 켜집니다.</p>
+<p>모든 결정은 다음 판에 흔적을 남깁니다. BUST 뒤에는 카드가 뒤집히고 벽이 가까워집니다(BLACKOUT, AFTERSHOCK). 한 번도 밀지 않고 확정하면 가장 좋은 카드가 봉인되고(COLD FEET), 너무 높은 배율로 확정하면 열기와 시간을 빚집니다(HEAT DEBT). 방금 가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다(FRACTURE). 시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고 시간이 ${SILENCE_SECONDS}초가 됩니다(SILENCE). 이런 규칙은 처음부터 한꺼번에 켜지지 않고 프롤로그 다섯 사건에 걸쳐 한 단계씩 열립니다. 본편에서도 사건 01에 OVERCLOCK, 사건 02에 감사(AUDIT), 사건 03에 연결(CASCADE)이 더해지고, 사건 03부터 모든 규칙이 켜집니다.</p>
 <h3>5. 논리 콤보와 도구</h3>
-<p>카드마다 생각 유형(위험 다루기, 꼼꼼히 확인하기, 끝까지 버티기, 판 바꾸기)이 붙어 있습니다. 같은 유형을 이어 고르면 논리 콤보가 쌓여 판돈이 커지고, 유형을 바꾸면 대개 콤보가 끊깁니다. 콤보는 벽을 옮기지 않으므로 콤보가 길다고 한 번 더 미는 것은 함정이 될 수 있습니다. 프롤로그 후반부터는 사건이 닫힐 때마다 다음 사건의 첫 테이블에서 도구 세 개 가운데 하나를 고르며, 도구는 다섯 개까지 들 수 있습니다. 도구는 든 동안 판의 규칙 하나를 바꿉니다.</p>
+<p>카드는 장면 속 사람 쪽이나 지키는 자리 쪽, 두 방향 가운데 하나로 기웁니다. 프롤로그 02부터 같은 방향을 이어 고르면 논리 콤보가 쌓여 판돈이 커지고(콤보 10에서 ×1.6), 열기가 오르지 않았는데 방향을 바꾸거나 BUST하면 콤보가 0이 됩니다. 카드마다 붙은 생각 유형(위험 다루기, 꼼꼼히 확인하기, 끝까지 버티기, 판 바꾸기)은 콤보가 아니라 리포트의 관점 전환에 쓰이므로, 방향은 지키고 유형은 바꾸는 편이 둘 다 올립니다. 콤보는 벽을 옮기지 않으므로 콤보가 길다고 한 번 더 미는 것은 함정이 될 수 있습니다. 프롤로그 후반부터는 사건이 닫힐 때마다 다음 사건의 첫 테이블에서 도구 세 개 가운데 하나를 고르며, 도구는 다섯 개까지 들 수 있습니다. 도구는 든 동안 판의 규칙 하나를 바꿉니다.</p>
 
 <h2>점수와 결말</h2>
-<p>사건이 끝나면 리포트가 그 과정이 얼마나 깊은 판단이었는지를 0부터 100까지의 버스트 점수로 매깁니다. 점수는 금고에 모은 칩이 아니라 판단의 결을 봅니다. 압박이 오른 장면에서도 앞서 지킨 기준을 뒤집지 않았는지(기준 유지), 한 가지 관점만 반복하지 않았는지(관점 전환), 판을 다시 짜 숨은 경로를 열었는지(구조 재설계), 치솟은 압박을 다음 장면에서 회수했는지(압박 대응), 즉답도 방치도 아닌 시간에 결정했는지(생각 리듬), 장면마다 걸린 챌린지를 맞췄는지(장면 챌린지)를 봅니다. 판을 다시 짜지 않고 2초 안에 누르는 즉답은 점수를 깎습니다. 점수에 따라 S, A, B, C 랭크가 붙습니다.</p>
+<p>사건이 끝나면 리포트가 그 과정이 얼마나 깊은 판단이었는지를 0부터 100까지의 버스트 점수로 매깁니다. 점수는 금고에 모은 칩이 아니라 판단의 결을 봅니다. 압박이 오른 장면에서도 앞서 지킨 기준을 뒤집지 않았는지(기준 유지), 벽이 보이는 사람이 같은 판에서 벌었을 몫에 견주어 얼마나 벌었는지(판 읽기, 20%), 한 가지 관점만 반복하지 않았는지(관점 전환), 판을 다시 짜 숨은 경로를 열었는지(구조 재설계), 치솟은 압박을 다음 장면에서 회수했는지(압박 대응), 즉답도 방치도 아닌 시간에 결정했는지(생각 리듬), 장면마다 걸린 챌린지를 연달아 맞혔는지를 봅니다. 판을 다시 짜지 않고 2초 안에 누르는 즉답은 점수를 깎습니다. 점수에 따라 S, A, B, C 랭크가 붙습니다.</p>
 <p>결말은 마지막 사건 하나가 아니라 시즌 전체를 읽습니다. 남은 시간, 현금, 믿음, 공정함, 사람 피해, 피로 같은 자원이 사건마다 닫힐 때의 평균, 벽에 닿은 판의 비율, 찾은 기록의 비율이 아홉 가지 결말 가운데 하나를 정합니다. 시즌이 끝나면 판단 DNA(생각이 깨어나는 조건)와 결말을 담은 결과 카드를 그림 한 장으로 저장할 수 있고, NEW GAME+로 기록과 이야기를 이어받아 다시 도전할 수 있습니다.</p>
 
 <h2>함께 겨루는 곳</h2>
@@ -129,12 +133,12 @@ const ABOUT_EN = `
 <h3>3. Push or commit</h3>
 <p>Each time you press “Push”, the Heat rises and the stake's multiplier grows. The Heat gauge marks the stretch where the Wall may be, but its exact place is never shown. Only the heartbeat tells you how close it is, and even the heartbeat is not exact. Hit the Wall and you BUST: the stake on this case drops to zero, and the card costs you without paying anything. Press “Commit” to keep the stake you have built. When a case closes, its stake moves to the Vault, and the Wall can never take the Vault. Each hand has a time limit (45 seconds by default), and even while you wait the clock raises the Heat.</p>
 <h3>4. Your call changes the next hand</h3>
-<p>Every decision leaves a mark on the next hand. After a BUST, the cards turn face down and the Wall moves closer (BLACKOUT, AFTERSHOCK). Commit without a single push and your best card is sealed (COLD FEET); commit at too high a multiplier and you owe Heat and time (HEAT DEBT). The resource you just burned the most is charged at 1.5 times on the next hand (FRACTURE). These rules don't all switch on at once: they open one step at a time over the five cases of the prologue, and from Case 01 on they are all in play.</p>
+<p>Every decision leaves a mark on the next hand. After a BUST, the cards turn face down and the Wall moves closer (BLACKOUT, AFTERSHOCK). Commit without a single push and your best card is sealed (COLD FEET); commit at too high a multiplier and you owe Heat and time (HEAT DEBT). The resource you just burned the most is charged at 1.5 times on the next hand (FRACTURE). Run out of time and BUST, and on the next hand the heartbeat stops pointing at the Wall and the clock gives you ${SILENCE_SECONDS} seconds (SILENCE). These rules don't all switch on at once: they open one step at a time over the five cases of the prologue, and the main story adds OVERCLOCK in Case 01, AUDIT in Case 02 and CASCADE in Case 03; from Case 03 on, every rule is in play.</p>
 <h3>5. Logic Combo and tools</h3>
-<p>Every card has a way of thinking: Handle Risk, Double-Check, Hold Out or Change the Game. Keep picking the same way and your Logic Combo builds, raising the stake; switch, and the combo usually breaks. The combo never moves the Wall, so “one more push because the combo is long” can be a trap. From late in the prologue, each time a case closes you pick one of three tools at the first table of the next case, and you can hold up to five. While you hold a tool, it changes one rule of the table.</p>
+<p>Every card leans one of two ways: toward the people in the scene or toward the position being held. From Prologue 02, keep picking the same side and your Logic Combo builds, raising the stake (×1.6 at a combo of 10); change side without the Heat rising, or BUST, and it drops to 0. Each card's way of thinking (Handle Risk, Double-Check, Hold Out or Change the Game) feeds the report's Perspective shifts, not the combo, so holding your side while varying the way you think raises both. The combo never moves the Wall, so “one more push because the combo is long” can be a trap. From late in the prologue, each time a case closes you pick one of three tools at the first table of the next case, and you can hold up to five. While you hold a tool, it changes one rule of the table.</p>
 
 <h2>Scores and endings</h2>
-<p>When a case ends, the report scores how deep your judgment ran with a Burst Score from 0 to 100. The score looks at the grain of your judgment, not at the chips in your Vault: whether you kept the line you had held even as the pressure rose (Holding Your Line), whether you avoided repeating a single view (Shifting View), whether you reframed the table to open the hidden route (Redesign), whether you recovered from a spike of pressure in the next scene (Pressure Recovery), whether you decided at a pace that was neither instant nor idle (Thinking Rhythm), and whether you met each scene's challenge (Scene Challenge). Answering within 2 seconds without reframing the table costs points. The score earns a rank of S, A, B or C.</p>
+<p>When a case ends, the report scores how deep your judgment ran with a Burst Score from 0 to 100. The score looks at the grain of your judgment, not at the chips in your Vault: whether you kept the line you had held even as the pressure rose (Holding your line), what you earned against someone who could see the Wall on the same hands (Reading the hand, 20%), whether you avoided repeating a single view (Perspective shifts), whether you reframed the table to open the hidden route (Redesigning the table), whether you recovered from a spike of pressure in the next scene (Handling pressure), whether you decided at a pace that was neither instant nor idle (Thinking rhythm), and whether you met the scenes' challenges in a row. Answering within 2 seconds without reframing the table costs points. The score earns a rank of S, A, B or C.</p>
 <p>The ending reads the whole season, not just the last case. The averages of your resources (time left, cash, trust, fairness, human cost and fatigue) as each case closed, the share of hands that hit the Wall and the share of records you found decide which of nine endings you reach. At the end of a season you can save a result card, a single image of your Judgment DNA (the condition that wakes your thinking) and your ending, and start again in NEW GAME+, carrying your records and the story forward.</p>
 
 <h2>Where players compete</h2>
@@ -165,12 +169,12 @@ const ABOUT_JA = `
 <h3>3. 押し切るか、確定する</h3>
 <p>「押し切る」を押すたびに熱が上がり、賭け金の倍率が大きくなります。熱ゲージには壁がありうる区間が描かれていますが、壁の正確な位置は最後まで示されません。壁がどれだけ近いかを教えてくれるのは心拍だけで、それにも誤差があります。壁に当たるとBUSTとなり、この事件に賭けた賭け金がゼロになって、カードは利益なしにコストだけを払います。「確定」を押すと、それまでに積んだ賭け金を守れます。事件が閉じると賭け金は金庫に移され、金庫は壁に奪われません。勝負には制限時間(標準で45秒)があり、じっとしていても時計が熱を上げます。</p>
 <h3>4. 判断は次の勝負のルールを変える</h3>
-<p>すべての決定は、次の勝負に跡を残します。BUSTのあとはカードが裏返り、壁が近づきます(BLACKOUT、AFTERSHOCK)。一度も押さずに確定すると最も良いカードが封印され(COLD FEET)、高すぎる倍率で確定すると熱と時間を借りることになります(HEAT DEBT)。直前にいちばん大きく消費した資源は、次の勝負で1.5倍請求されます(FRACTURE)。こうしたルールは最初から一度にすべてオンになるのではなく、プロローグの五つの事件を通して一段階ずつ開き、事件01からはすべてオンになります。</p>
+<p>すべての決定は、次の勝負に跡を残します。BUSTのあとはカードが裏返り、壁が近づきます(BLACKOUT、AFTERSHOCK)。一度も押さずに確定すると最も良いカードが封印され(COLD FEET)、高すぎる倍率で確定すると熱と時間を借りることになります(HEAT DEBT)。直前にいちばん大きく消費した資源は、次の勝負で1.5倍請求されます(FRACTURE)。時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が${SILENCE_SECONDS}秒になります(SILENCE)。こうしたルールは最初から一度にすべてオンになるのではなく、プロローグの五つの事件を通して一段階ずつ開きます。本編でも事件01でOVERCLOCK、事件02で監査(AUDIT)、事件03で連結(CASCADE)が加わり、事件03からすべてのルールがオンになります。</p>
 <h3>5. ロジックコンボとツール</h3>
-<p>カードにはそれぞれ思考のタイプ(リスクを扱う、念入りに確かめる、最後まで粘る、卓を変える)が付いています。同じタイプを続けて選ぶとロジックコンボが積み上がって賭け金が大きくなり、タイプを変えると多くの場合コンボが途切れます。コンボは壁を動かさないので、コンボが長いからもう一度押す、というのは罠になりえます。プロローグの後半からは、事件が閉じるたびに次の事件の最初のテーブルでツール三つのうち一つを選び、ツールは五つまで持てます。ツールは持っているあいだ、勝負のルールを一つ変えます。</p>
+<p>カードは、シーンの中の人の側か、守っている立場の側か、二つの方向のどちらかに傾きます。プロローグ02から同じ方向を続けて選ぶとロジックコンボが積み上がって賭け金が大きくなり(コンボ10で×1.6)、熱が上がっていないのに方向を変えるか、BUSTするとコンボは0になります。カードごとの思考のタイプ(リスクを扱う、念入りに確かめる、最後まで粘る、卓を変える)はコンボではなくレポートの視点の転換に使われるので、方向は守り、タイプは変えると両方が上がります。コンボは壁を動かさないので、コンボが長いからもう一度押す、というのは罠になりえます。プロローグの後半からは、事件が閉じるたびに次の事件の最初のテーブルでツール三つのうち一つを選び、ツールは五つまで持てます。ツールは持っているあいだ、勝負のルールを一つ変えます。</p>
 
 <h2>スコアと結末</h2>
-<p>事件が終わると、レポートがその過程がどれほど深い判断だったかを、0から100までのバーストスコアで採点します。スコアが見るのは金庫に集めたチップではなく、判断の質です。圧力が上がったシーンでも先に守った基準を覆さなかったか(基準の維持)、一つの視点だけを繰り返さなかったか(視点の転換)、卓を組み替えて隠れたルートを開いたか(構造の再設計)、跳ね上がった圧力を次のシーンで回収したか(圧力への対応)、即答でも放置でもない時間で決めたか(思考のリズム)、シーンごとのチャレンジを満たしたか(シーンチャレンジ)を見ます。卓を組み替えずに2秒以内に押す即答は減点になります。スコアに応じてS、A、B、Cのランクが付きます。</p>
+<p>事件が終わると、レポートがその過程がどれほど深い判断だったかを、0から100までのバーストスコアで採点します。スコアが見るのは金庫に集めたチップではなく、判断の質です。圧力が上がったシーンでも先に守った基準を覆さなかったか(基準の維持)、壁が見えている人が同じ勝負で稼いだはずの分と比べてどれだけ稼いだか(勝負の読み、20%)、一つの視点だけを繰り返さなかったか(視点の転換)、卓を組み替えて隠れたルートを開いたか(構造の再設計)、跳ね上がった圧力を次のシーンで回収したか(圧力への対応)、即答でも放置でもない時間で決めたか(思考のリズム)、シーンごとのチャレンジを続けて満たしたかを見ます。卓を組み替えずに2秒以内に押す即答は減点になります。スコアに応じてS、A、B、Cのランクが付きます。</p>
 <p>結末は最後の事件一つではなく、シーズン全体を読みます。残り時間、現金、信頼、公正さ、人への被害、疲労といった資源の、事件ごとに閉じたときの平均、壁に当たった勝負の割合、見つけた記録の割合が、九つの結末のうち一つを決めます。シーズンが終わると、判断DNA(思考が目覚める条件)と結末を収めた結果カードを画像一枚として保存でき、NEW GAME+で記録と物語を引き継いで再挑戦できます。</p>
 
 <h2>競い合う場所</h2>
@@ -348,11 +352,11 @@ const CONTACT_KO = `
 `;
 
 const CONTACT_EN = `
-<p>Questions about Critical Point, bug reports, reports of board posts, and requests to access or delete your data all go to the one email address below. The game has no sign-up or login, so email is the way to reach the developer.</p>
+<p>Questions about Critical Point, bug reports, reports of board posts, and requests to access or delete your data all go to the one email address below. The game has no sign-up or login, so email is the way to reach us.</p>
 
 <h2>Address</h2>
 <ul>
-<li>Run by: the Critical Point developer</li>
+<li>Run by: the Critical Point developers</li>
 <li>Email: ${mail}</li>
 </ul>
 <p>Please write from an address that can receive our reply. Because the game never asks for your name, a request about your records needs one of the codes listed below instead.</p>
@@ -467,6 +471,8 @@ export function renderSitePages({ analytics = null } = {}) {
         body: analytics && kind === "faq" ? withSwaps(BODIES[kind][language], ANALYTICS_FAQ[language]) : BODIES[kind][language],
         description: DESCRIPTION[kind][language],
         analytics,
+        // The about page names the game as the start page does (scripts/structured-data.mjs).
+        structuredData: kind === "about" ? startStructuredData(language) : "",
       });
     }
   }
@@ -572,8 +578,19 @@ export const START_PAGE = {
   },
 };
 
+/**
+ * The start page's JSON-LD tag in a language: the site and the game
+ * (scripts/structured-data.mjs), described as the page's own description.
+ * index.html holds the Korean as this writes it, byte for byte, and the
+ * other two start pages swap it for theirs (`localizedStartPage`).
+ */
+export const startStructuredData = (language) => structuredDataTag(gameStructuredData({ language, description: START_PAGE[language].description }));
+
 const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline";
 const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none";
+
+/** The content pages the no-script text links, after the five: each section's first page. */
+const NOSCRIPT_CONTENT = ["guide", "cases/index", "characters", "making"];
 
 /**
  * What the start page says with no script, in its language: what the game
@@ -586,7 +603,11 @@ const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; 
 export function startNoscript(language) {
   const copy = START_PAGE[language];
   const item = ([label, href]) => `          <li><a href="${escapeHtml(href)}" style="${NOSCRIPT_LINK}">${escapeHtml(label)}</a></li>\n`;
-  const pages = PAGE_KINDS.map((kind) => [COPY[language][kind], pagePath(kind, language)]);
+  const pages = [
+    ...PAGE_KINDS.map((kind) => [COPY[language][kind], pagePath(kind, language)]),
+    // The content pages' doors (scripts/content-pages): the guide, the case files, the cast, how we made it.
+    ...NOSCRIPT_CONTENT.map((kind) => [MENU_LABELS[language][kind], pagePath(kind, language)]),
+  ];
   return `<noscript>
       <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #f2f6f3; background: #06090a; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
         <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">${escapeHtml(GAME_NAME[language])}</h1>
@@ -637,6 +658,9 @@ function replaceEach(html, pairs, language) {
   return out;
 }
 
+/** A JSON-LD tag, one line (`structuredDataTag` writes `<` inside as `<`). */
+const STRUCTURED_DATA = /<script type="application\/ld\+json">[^<]*<\/script>/;
+
 const metaContent = (key, name) => new RegExp(`(<meta\\s+${key}="${name}"\\s+content=")[^"]*(")`);
 
 /**
@@ -671,6 +695,7 @@ export function localizedStartPage(html, language, origin = "") {
       [metaContent("name", "twitter:title"), value(copy.title)],
       [metaContent("name", "twitter:description"), value(copy.description)],
       [metaContent("name", "twitter:image:alt"), value(SHARE_IMAGE_ALT[language])],
+      [STRUCTURED_DATA, withAbsoluteSiteLinks(startStructuredData(language), origin).replace(/\$/g, "$$$$")],
     ],
     language,
   );
@@ -716,18 +741,21 @@ export function siteOrigin(env = process.env) {
  * A page with its canonical and hreflang links (and, on the start page, the
  * og:url, og:image and twitter:image) made absolute on `origin`. Search
  * engines read those as full addresses; the links a reader clicks stay
- * relative. Nothing changes without an origin.
+ * relative. The JSON-LD's `url`, `item` and `image` are made absolute the same
+ * way. Nothing changes without an origin.
  */
 export function withAbsoluteSiteLinks(html, origin) {
   if (!origin) return html;
   return String(html)
+    // The JSON-LD's addresses (scripts/structured-data.mjs), inside its own tags only.
+    .replace(new RegExp(STRUCTURED_DATA.source, "g"), (tag) => tag.replace(/("(?:url|item|image)":")\//g, `$1${origin}/`))
     .replace(/(<meta\s+(?:property="og:(?:url|image)"|name="twitter:image")\s+content=")\//g, `$1${origin}/`)
     .replace(/(<link\s+rel="(?:canonical|alternate)"\s+(?:hreflang="[a-zA-Z-]+"\s+)?href=")\//g, `$1${origin}/`);
 }
 
-/** Every plain page the build writes, the policy's six and these nine, keyed by path from the root without its slash. */
+/** Every plain page the build writes, the policy's six, these nine and the content pages (scripts/content-pages/pages.mjs), keyed by path from the root without its slash. */
 export function renderStaticPages(origin = "", { analytics = null } = {}) {
-  const pages = { ...renderLegalPages({ analytics }), ...renderSitePages({ analytics }) };
+  const pages = { ...renderLegalPages({ analytics }), ...renderSitePages({ analytics }), ...renderContentPages({ analytics }) };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 
@@ -741,7 +769,8 @@ export function robotsTxt(origin = "") {
 }
 
 /**
- * The sitemap's entries: the start page and each of the five pages, each in
+ * The sitemap's entries: the start page, each of the five pages and each
+ * content page (the guide, the case files, the cast, how we made it), each in
  * each language (`/`, `/en/`, `/ja/`, then `/about.html`, `/en/about.html`
  * ...). Every entry names its three languages and x-default (the Korean).
  * Until 11-03 the start page was one entry, its English and Japanese
@@ -750,7 +779,7 @@ export function robotsTxt(origin = "") {
 export function sitemapEntries() {
   const entries = (pathOf) =>
     PAGE_LANGUAGES.map((language) => ({ loc: pathOf(language), alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, pathOf(code)])) }));
-  return [...entries(gamePath), ...PAGE_KINDS.flatMap((kind) => entries((language) => pagePath(kind, language)))];
+  return [...entries(gamePath), ...[...PAGE_KINDS, ...CONTENT_KINDS].flatMap((kind) => entries((language) => pagePath(kind, language)))];
 }
 
 /**

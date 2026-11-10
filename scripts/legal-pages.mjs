@@ -2,6 +2,7 @@ import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
+import { MENU_STYLE, siteFooterNav, siteHeaderNav } from "./content-pages/site-nav.mjs";
 
 /**
  * The privacy policy and the terms of use, Korean, English and Japanese: six
@@ -29,7 +30,7 @@ import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
  * a column the policy does not name. The sentence beside the consent box is
  * `PLAYTEST_DATA_NOTICE`, quoted here as written there.
  *
- * Settled on 2026-10-25 (앱출시-문서초안, 사용자 결정 2·3): only what the law asks
+ * Settled on 2026-10-25 (앱출시-문서초안, 우리 결정 2·3): only what the law asks
  * for; no operator or officer name -- 「임계점 개발자」 and the support address;
  * the overseas transfer as one line naming the company and the country; the
  * consent box still starts ticked, and the policy says so; the web version has
@@ -313,7 +314,7 @@ ${ANALYTICS_NOTICE.ko}
 
 const PRIVACY_EN = `
 ${ANALYTICS_NOTICE.en}
-<p>This policy explains what the developer of Critical Point (“we”) processes when you play the game, why, and for how long.</p>
+<p>This policy explains what the developers of Critical Point (“we”) process when you play the game, why, and for how long.</p>
 
 <h2>1. In short</h2>
 <ul>
@@ -385,7 +386,7 @@ ${ANALYTICS_NOTICE.en}
 
 <h2>11. Contact</h2>
 <ul>
-<li>The Critical Point developer</li>
+<li>The Critical Point developers</li>
 <li>Email: ${mail}</li>
 </ul>
 
@@ -596,7 +597,7 @@ const TERMS_KO = `
 
 const TERMS_EN = `
 <ol>
-<li>These terms set the conditions for playing Critical Point (the “game”), provided by the Critical Point developer (“we”). By playing, you agree to them.</li>
+<li>These terms set the conditions for playing Critical Point (the “game”), provided by the Critical Point developers (“we”). By playing, you agree to them.</li>
 <li>The game is fiction. Its people, companies, banks, institutions and events have nothing to do with real ones, and its financial judgments are not investment or financial advice.</li>
 <li>The web version is free, with no ads and no payments. Chips, stakes, vaults and scores in the game are not money or goods and cannot be bought, sold or exchanged.</li>
 <li>The public leaderboard is a playtest ranking. It may be cleared when the rules of the table change, and records that do not meet the rules may be left off it.</li>
@@ -629,7 +630,13 @@ const PAGE_STYLE = `
 :root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
-main{width:min(760px,100%);margin:0 auto;padding:24px 16px 72px}
+header,main,footer{width:min(760px,100%);margin:0 auto;padding:0 16px}
+header{padding-top:24px}
+footer{margin-top:48px;padding-bottom:72px;font-size:.875rem}
+.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--accent);border-radius:8px;background:var(--bg)}
+.skip:focus{top:12px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+main:focus{outline:0}
 nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:.875rem}
 nav a{display:inline-flex;align-items:center;min-height:44px}
 nav a[aria-current]{color:var(--text);text-decoration:none}
@@ -644,7 +651,6 @@ li ul{margin:4px 0}
 dd{margin:0 0 4px}
 .effective{margin:0;color:var(--text-2);font-size:.875rem}
 strong{color:var(--text)}
-footer{margin-top:48px;padding-top:12px;border-top:1px solid var(--line);font-size:.875rem}
 .credit{display:flex;align-items:center;gap:12px;margin-top:16px}
 .credit img{flex:none;width:40px;height:40px;object-fit:cover;border-radius:50%}
 .credit dl{display:flex;flex-wrap:wrap;gap:4px 20px;min-width:0;margin:0}
@@ -669,9 +675,9 @@ export const PAGE_LANGUAGES = ["ko", "en", "ja"];
 export const PAGE_KINDS = SITE_PAGES;
 
 export const COPY = {
-  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의" },
-  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact" },
-  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ" },
+  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의", skip: "본문으로 건너뛰기" },
+  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact", skip: "Skip to content" },
+  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ", skip: "本文へスキップ" },
 };
 
 export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
@@ -751,27 +757,26 @@ export { escapeHtml };
  * and x-default, the Korean); the body; a foot with the contact address and
  * the credit.
  * `effective` is the policy's date line, which only the two policies have;
- * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head.
+ * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head;
+ * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs).
+ *
+ * The landmarks (2026-11-09 audit): a skip link to the main text first, the
+ * site menu in a <header>, the page in <main id="main">, and the foot's menu,
+ * the contact line and the credit in a <footer> -- until then the menu and
+ * the foot sat inside <main>, so the page had no banner or contentinfo, and
+ * nothing let a keyboard pass the menu's thirteen links.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "" }) {
   const copy = COPY[language];
-  const others = PAGE_LANGUAGES.filter((code) => code !== language);
-  const title = `${copy[kind]} · ${GAME_NAME[language]}`;
+  const name = heading ?? copy[kind];
+  const title = `${name} · ${GAME_NAME[language]}`;
   const alternates = [
     ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
   ].join("");
-  const pages = PAGE_KINDS.map((other) =>
-    other === kind
-      ? `<a href="${pagePath(other, language)}" aria-current="page">${copy[other]}</a>\n`
-      : `<a href="${pagePath(other, language)}">${copy[other]}</a>\n`,
-  ).join("");
-  const switches = others
-    .map((other) => `<a href="${pagePath(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
-    .join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
   const tags = analytics ? analyticsTagLines(analytics).map((line) => `${line}\n`).join("") : "";
-  const summary = description ?? copy[kind];
+  const summary = description ?? name;
   const share = shareMetaLines({ language, url: pagePath(kind, language), title, description: summary })
     .map((line) => `${line}\n`)
     .join("");
@@ -784,19 +789,23 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
 ${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
-<style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
+${structuredData ? `${structuredData}
+` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}</style>
 ${tags}</head>
 <body>
-<main>
-<nav aria-label="${escapeHtml(GAME_NAME[language])}">
-<a href="${gamePath(language)}">${copy.game}</a>
-${pages}${switches}</nav>
-<h1>${copy[kind]}</h1>
+<a class="skip" href="#main">${copy.skip}</a>
+<header>
+${siteHeaderNav({ kind, language })}
+</header>
+<main id="main" tabindex="-1">
+<h1>${escapeHtml(name)}</h1>
 ${dated}${body.trim()}
-<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
+</main>
+<footer>
+${siteFooterNav({ kind, language })}
+<p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
 ${creditFor(kind, language)}
 </footer>
-</main>
 </body>
 </html>
 `;
@@ -838,7 +847,7 @@ export const LEGAL_DESCRIPTION = {
   },
   terms: {
     ko: "「임계점: CRITICAL POINT」의 이용 조건입니다. 무료 웹판, 게임 속 칩과 점수, 공개 랭킹, 참가자 게시판의 규칙과 개발자의 책임 범위를 정합니다.",
-    en: "The terms for playing Critical Point: the free web version, in-game chips and scores, the public ranking, the participants' board and the limits of the developer's responsibility.",
+    en: "The terms for playing Critical Point: the free web version, in-game chips and scores, the public ranking, the participants' board and the limits of the developers' responsibility.",
     ja: "『臨界点: CRITICAL POINT』の利用条件です。無料のウェブ版、ゲーム内のチップとスコア、公開ランキング、参加者掲示板のルールと開発者の責任の範囲を定めます。",
   },
 };

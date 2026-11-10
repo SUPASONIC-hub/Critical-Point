@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-06 (the state of `main` at `a170161`, after #459 bundle-1105d, #463 bundle-rules2, #464 bundle-1106a, #465 mood-boost, #468 W47 rule line, #471 cold opening switched off, #470 report:judgment and #472 static shell plus 692 mood tags; 61 migrations, the 11-12 ranking clear still a draft in #466).
+Last updated: 2026-11-09 (the state of `main` at `f97f507`, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -160,14 +160,14 @@ Still open, on purpose:
   W44's catalogue entry stays as a week gone by. The bots play both wherever
   a case's rules have them (`AUDIT=0` / `CASCADE=0` turn one off). With the
   same reset the season's ranking score becomes the mean of its cases' burst
-  scores (the user, 2026-10-22, Q7 (1)), where it was the finale's own, made
+  scores (our choice, 2026-10-22, Q7 (1)), where it was the finale's own, made
   from that case's eight or so decisions: `getSeasonScore` on the client (a
   replayed case counts its first close, `firstBurstScore`), and the server's
   `ranking_run_summary` recomputes it from the run's case rows
   (`20261106020000_season_score_case_mean.sql`, promoted on 2026-11-05 ahead of the
   reset). Over 200 bot seasons the finale's score ran 32 to 80 (p50 60) and
   the mean runs 45 to 71 (p50 59); no bot season reaches A (72) on the mean.
-  One axis of that mean is read off the whole season (the user, 2026-10-23,
+  One axis of that mean is read off the whole season (our choice, 2026-10-23,
   Q25 (1)): 관점 전환, whose reach (kinds / 4) a case of seven decisions
   rarely fills. Each case summary keeps its `cognitionMix` (a replay its
   first close's, `firstCognitionMix`), and the season's spread of their sum
@@ -177,7 +177,7 @@ Still open, on purpose:
   seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
   (balanced), procedure +3.1.
 - C-1(1), drafted 2026-10-25 on top of #224 for the ranking reset after it
-  (the user, 「전부 1」): each case's burst score gives 0.2 to 판 읽기, the
+  (our choice, 「전부 1」): each case's burst score gives 0.2 to 판 읽기, the
   C-12 index the case close prints (「벽을 본 사람의 N%」, now
   `getCaseRead` in `src/seasonScore.js`), and the six axes before it keep
   their ratios at 0.8 (0.224 / 0.16 / 0.16 / 0.128 / 0.064 / 0.064). The
@@ -221,7 +221,7 @@ Still open, on purpose:
   `CHIP_MARGIN` 10 (4 of 7 archetypes at or above plain, short of 5; left to
   play feedback). RULES_MARK 3 and the ranking reset are decided after the
   test week's data, in a later pull request.
-- 2026-10-22: the user moved the test week from W44 to 2026-W47 (11-16 to
+- 2026-10-22: we moved the test week from W44 to 2026-W47 (11-16 to
   11-22), so the drafts' improvements are live first and the test is played
   on top of them; W44 is an ordinary week and W46's near wall stays. The
   client's calendar, migration 20261022010000 (W44's row out, W47's in), the
@@ -274,7 +274,7 @@ Still open, on purpose:
   behind `main` is not merged as it stands. Production ran `2c7b535`
   (#218) at midday; #270 (Node 24.20.0 -> 24.22.1, a security release)
   followed at `5adcbb5`.
-- 2026-10-23, afternoon: at 14:40 the user changed the day's rule to "deploy
+- 2026-10-23, afternoon: at 14:40 we changed the day's rule to "deploy
   as much of the day's work as can go live by 18:50". Instead of one draft
   every fifteen minutes, the ready drafts were merged into three combined
   pull requests, each put on the current `main` and measured once as a whole
@@ -431,7 +431,7 @@ Still open, on purpose:
   few bytes. Eighteen pull requests merged (the four inside #362 not counted
   apart), 1,570 unit tests; production runs `2c935e7`, deployed on 10-28
   after a season shard of its Verify hit the 20-minute limit and was rerun.
-  The user decided that day: no
+  We decided that day: no
   promotion yet, AdSense set up later (the Render address or a domain is
   still open), and the English range widens ten reviewed cases at a time
   (replaced on 10-28: both languages open to the end, #366).
@@ -444,7 +444,7 @@ Still open, on purpose:
   and first-paint budgets per language -- Korean, `?lang=en`, `?lang=ja`);
   #365 (the code review's last four lows: the observer's sample and ledger
   count the Korean card behind a translated one, the run's summary records
-  the language actually drawn). The user decided that day to open English
+  the language actually drawn). We decided that day to open English
   and Japanese to the end instead of ten reviewed cases at a time, and to
   make `check:locale` strict in `verify:static`.
 - 2026-10-29: #366 (English and Japanese to the finale: 「한국어 · English ·
@@ -472,8 +472,8 @@ Still open, on purpose:
   #322, #350.
 - 2026-10-30: #376 (web ads readiness: about, FAQ and contact pages, nine
   static pages in three languages, `sitemap.xml` and `robots.txt`, links
-  under the start screen, and the `GOOGLE_SITE_VERIFICATION` switch; the
-  user verified Search Console and submitted the sitemap, and the AdSense
+  under the start screen, and the `GOOGLE_SITE_VERIFICATION` switch;
+  we verified Search Console and submitted the sitemap, and the AdSense
   review requested on 10-29 is pending); #375 (the language buttons on one
   line at 320px, the Japanese 320px reach check live); #378 (the ranking
   save failure notice in three languages); #380 (the GA4 switch
@@ -488,7 +488,7 @@ Still open, on purpose:
   intro paragraph at 14px, and 360x740 in three languages in the reach
   check). Six PRs merged, 1,610 unit tests. Open: at 360px a large late-
   season stake wraps the bank rail to two lines and pushes the hand's last
-  card 12-22px under the action bar (hand5 measures stake 0 only); the user
+  card 12-22px under the action bar (hand5 measures stake 0 only); we
   chose (1), a separate fix on main merged by 11-06 (`bank-rail-fit`, in
   progress). Drafts followed main or the branch below them: #322 #324
   #350 (with ads on, the FAQ's "no ads" line follows the switch), #327 →
@@ -497,7 +497,7 @@ Still open, on purpose:
   (#314's result-screen order e2e fixed), #224 → #307, #316, #320, #308 →
   #379 (#224's 360px English bank rail CSS, #379 hand5 overflow 0 in three
   languages).
-- 2026-11-02: #384 (`bank-rail-fit`, the user's choice (1) of 10-30,
+- 2026-11-02: #384 (`bank-rail-fit`, our choice (1) of 10-30,
   merged by hand before the 11-06 deadline: at 360px and under only the
   HUD spacing shrinks -- clock 36 to 30px, bank rail pills 22 to 18px --
   so a two-line bank rail keeps the five-card hand above the action bar;
@@ -568,7 +568,7 @@ Still open, on purpose:
   only rewrites on the Korean screen, "Trigger Lab" and 「トリガーラボ」 for
   the wordmark reading, phase names as written; #438 the sound word centred
   with `transform`, so it stays inside the plate on desktop). Render matched the
-  `/en/` rule to `/en` only, so the owner added `/en/*` and `/ja/*` to the
+  `/en/` rule to `/en` only, so we added `/en/*` and `/ja/*` to the
   dashboard headers (`Cache-Control: no-cache`, checked 16:36); #448
   (`bundle-1105b`, two PRs and main 4e3f8e48 taken in, three conflicts
   edited by hunk, critical CSS rebuilt; first paint budgets 428,480 / 485,062 /
@@ -605,7 +605,7 @@ Still open, on purpose:
   `dc26d88`), production build-sha `dc26d88` (18:01), 1,758 unit tests.
 - 2026-11-05: #451 (`bundle-1105c`, one CI run for the four PRs that were
   "first tomorrow" in the 11-04 handoff, their three migrations in version
-  order -- 20261103000000, 010000, 020000 -- and the owner's one answer
+  order -- 20261103000000, 010000, 020000 -- and our one answer
   "(1) merge the bundle at once"; #432's uncommitted merge of 62a25238 was
   aborted and main 3d4183e5 taken in fresh; conflicts were the README number
   lines and the budget blocks only, edited by hunk with both sides' notes
@@ -637,11 +637,11 @@ Still open, on purpose:
   the top 20 again, 150 a night, with a second run Monday 00:20 KST;
   `recheck_seen_at` is opened to anon only as the boolean `rechecked`, so a
   row the checker has not read yet says 「확인 중」; the "same address
-  frequency" recheck -- keeping address_key 180 days -- declined, the owner's
+  frequency" recheck -- keeping address_key 180 days -- declined, our
   choice (1) on 11-05). Four PRs merged (five counting the bundle PR #451; main
   `3ca15f8`), production build-sha `3ca15f8` (11:03, sw release
   `9928af4b`), 1,818 unit tests. `studio-name`: the studio's name is now
-  one per language, the owner's choice -- 찹쌀떡 스튜디오 / Mochi Verse Studio /
+  one per language, our choice -- 찹쌀떡 스튜디오 / Mochi Verse Studio /
   STUDIOもちぷよ (`STUDIO_NAMES`, `studioName` in src/credits.js); the start
   screen reads the page's language and each plain page its own; the CREATOR
   line, the mail links and the English labels are unchanged; the 11-04
@@ -652,8 +652,8 @@ Still open, on purpose:
   ち·ぷ·も·よ were not in the font subset, so `build:fonts` ran again (198,144 to
   199,124 bytes, 1,703 glyphs) and `build:critical` after it; five unit tests
   in `credits.test.mjs`, e2e for the 360px start screen and the about page
-  footer in three languages. #455 (`docs-contrib-1105`, `e68fe8cc`; the
-  owner's F3 (1) and F7 (1)): `docs/writing-a-case.md` 721 to 856 lines (the
+  footer in three languages. #455 (`docs-contrib-1105`, `e68fe8cc`; our
+  F3 (1) and F7 (1)): `docs/writing-a-case.md` 721 to 856 lines (the
   three languages, portraits and plates, the case chunk budget, mood tags, a
   ten-line check before a PR), a sample case `docs/examples/case-template.js`
   (219 lines, three scenes written out, not read by the build) and
@@ -674,7 +674,7 @@ Still open, on purpose:
   present; the case chunk budget 98,900 / 25,400 to 91,536 / 23,304 (en 67,659
   / 19,653, ja 75,270 / 21,047); two first-briefing baselines recorded again
   in CI; each bundle took main and re-measured after the one before. #458
-  (`bundle-mood`, `4f2d39cb`, 16:19; the owner's choice ③ -- everything before
+  (`bundle-mood`, `4f2d39cb`, 16:19; our choice ③ -- everything before
   11-13, five moods neutral / bright / tense / dread / sorrow, a script draft
   plus human review, the start screen one step lighter): mood-wire (with
   mood-tags), mood-tokens and mood-music merged in that order plus one wiring
@@ -694,7 +694,7 @@ Still open, on purpose:
   only, 0.14 to 0.1, en/ja 5.61; budgets measured on main 33899116 +4: entry
   193,412 / 69,957, GameRuntime 148,134 / 54,771, case chunk 91,581 / 23,318,
   first paint 431,491 / 488,208 / 495,402; 1,845 unit tests. Decisions of the
-  day (the owner, option 1 unless noted): migrations asked once per bundle;
+  day (ours, option 1 unless noted): migrations asked once per bundle;
   #434's same-address frequency not done; the studio name per language; mood
   ③; the six drafts parked after W47 (D1, E5, table-a11y, static-shell,
   intro-cards-cv, canon-trainee-locales) all before 11-13 (2); code-structure
@@ -751,7 +751,7 @@ Still open, on purpose:
   C1 rank titles, A3 tab title (「⚠ 벽까지 N」, 「[징계 회부]」 after BUST), A4
   a 0.6 s hold on a case's last choice and in-wall confirms only, and the
   Pretendard preload dropped on `/ja/`; D3's migration dropped because #461
-  already leaves NEW GAME+ tables out (the owner, 11-06 (1)). #465
+  already leaves NEW GAME+ tables out (our choice, 11-06 (1)). #465
   (`mood-boost`, `d7dadd92`): mood edge tint (`--mood-edge`, 0.6 s fade),
   wider background / surface / line / accent palettes per mood with text
   colours unchanged (lowest contrast 4.65), 95 early scenes reviewed so 375
@@ -775,6 +775,36 @@ Still open, on purpose:
   local draft branch `cold-opening-style`. Eight PRs merged (24 branches
   inside them; main `a170161`), production build-sha `d828507` (16:15
   Deploy, sw release `f0122d0b`) before #472's deploy, 1,958 unit tests.
+- 2026-11-09: `studio-we-1109`: the studio's names lost the word studio --
+  찹쌀떡 / Mochi Verse / もちぷよ -- because the credit's STUDIO label already
+  says it (`STUDIO_NAMES` in src/credits.js, README, `package.json` author);
+  the 11-05 entry above keeps the names of that day. The docs, README and the
+  plain pages now speak of the makers as we: the game is made by two people,
+  SUPASONIC & ALICE.
+  Also on 11-09: #476 (`775bb69a`): on the 360x740 overloaded table with five
+  relics the five card hand's last card sat 2 px under the action row; the
+  360px HUD's vertical gap and padding 3 to 2 px, ja line-height 1.2 at
+  <=360px; Linux clearance ko -2, ja -11, en -8 px. #478 (`content-pages`,
+  `283a74db`): AdSense turned the site down as low-value content, so plain
+  pages went in before 11-11 -- a guide, a cases index and 55 spoiler-free
+  case pages (first two scenes only, a notice from case 10 on), characters,
+  making-of -- with a site menu on every plain page, a hidden inert `<nav>`
+  in the static shell and all of it in the sitemap: 177 pages over three
+  languages. We ask for the AdSense re-review once indexed (asked 11-16).
+  #485 (`937d5170`): the about page's four rule lines match the code
+  (combo by direction, all rules from case 03, read-the-hand 20%, SILENCE
+  30 s). #488 bundle 1109b (`c1d08daa`): #482 table accessibility stage 2
+  (E3), #483 390px en/ja five card hands (ja +17 to -6, en +58 to -18 px)
+  and the 360px en signal row (21 to 0), #487 plain pages on phones. #489
+  (`d07a852b`): plain page landmarks, skip link, 2 px focus, portrait alt,
+  JSON-LD. #490 (`f97f5079`): the 11-23 judgment tool reads the bot endings
+  from the test-week summary's line (it still had #464's numbers). W45 and
+  W46 had no finished season; the 11-11 bot dry run matched the baseline.
+  Seven merges (main `f97f507`), 1,974 unit tests; Full Coverage run
+  42570673569 still running.
+  Open: drafts #477 (cold-opening style, decided 11-23), #484 (deps for
+  after W47, replacing Dependabot #479 and #480), #491 `phone-heavy-bank`
+  (overloaded table with the largest bank at 360px, after W47).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -1309,7 +1339,7 @@ Still open, on purpose:
     `Profile.jpg` / `!public/profile.jpg` pair in `.gitignore` stays, because
     Windows matches that name case-insensitively and the app's icon would go
     with it: every file in `public/icons/` is cut from `public/profile.jpg`
-    (`npm run build:icons`), the favicon the owner chose. Text files are LF on every platform (`.gitattributes`,
+    (`npm run build:icons`), the favicon we chose. Text files are LF on every platform (`.gitattributes`,
     `.editorconfig`): the byte budgets measured a different file on a Windows
     CRLF checkout than on the Linux runner.
 46. Every scene has a picture, and none of them is a file. `src/scenePlate.js`
@@ -1609,7 +1639,7 @@ Still open, on purpose:
     the table from 프롤로그 04, played first as 2026-W44's test week) resets
     them once more (v10, `*_rules_mark3_ranking_reset.sql`, which asks for a
     mark of 3; drafted as `.sql.draft` and made a `.sql` only on the merge
-    day, after the user is asked). The suspicion marks (`20261020000000`, #183) went in
+    day, after we are asked). The suspicion marks (`20261020000000`, #183) went in
     just before it, so every row ranked since carries them: a `season-final`
     row is never refused for its score, the bounds it fails are written to
     `suspicion`, which anon cannot read, and `ranking_hides_marked()`, the
@@ -2251,12 +2281,12 @@ not listed: `BARE_ON_A_ROUTE` in `check-plain-language.mjs` is empty (it
 held 28 case and term pairs), and `check:balance` rule 7
 (`scripts/balance-rules.mjs`) holds no card as an exception.
 
-Case text, for the owner:
+Case text, for us to decide:
 
 - 2026-10-06: 사건 07's evidence scene (`c7_evidence_turn`) dates the posting
   order to the day after the analyst asked about 온새's repayment terms, not to
   the dispatch failure's budget ceiling; which question caused the posting
-  waits for the owner's word.
+  waits for our word.
 - 2026-10-06: 사건 07's 강서지점 has four people at the counter and 프롤로그 04
   has six.
 - 2026-10-06: a hidden route's clock is fixed at an early hour of its case, so

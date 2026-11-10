@@ -84,6 +84,45 @@ const runLines = {
     errorLog: "에러 로그",
     close: "닫기",
   },
+  // The recovery center the notice opens (components/ErrorLogPanel.jsx): a
+  // player reaches it after a crash, so it is in the page's language too.
+  recoveryCenter: {
+    label: "로컬 에러 로그",
+    title: "최근 오류 기록",
+    copyTrace: "기록 복사",
+    saveDiagnostics: "진단 파일 저장",
+    refresh: "새로고침",
+    clear: "로그 비우기",
+    close: "닫기",
+    health: "원격 로그 읽기 점검",
+    healthStatus: { ok: "정상", checking: "확인 중", disabled: "비활성", offline: "오프라인", other: "확인 필요" },
+    emptyErrors: "저장된 오류 기록이 없습니다.",
+    entryCounts: "로그 {count}개 · 마지막 선택 {choice}",
+    none: "없음",
+    replayEcho: "에러 로그 재현 진입입니다. 저장된 지점의 장면 흐름을 다시 확인합니다.",
+    replay: "재현",
+    details: "상세",
+    slotsLabel: "복구 슬롯",
+    slotsTitle: "최근 복구 지점",
+    backupTitle: "읽지 못한 저장본",
+    backupText: "이 버전이 읽지 못해 따로 보관한 저장본입니다.",
+    backupRead: "다시 읽기",
+    emptySlots: "저장된 복구 슬롯이 없습니다.",
+    slotDone: "완료 {count}",
+    restore: "복원",
+    remove: "삭제",
+  },
+  // The flash on the session code's copy button (state/useClipboardStatus.js).
+  copyStatus: {
+    copied: "복사됨",
+    failed: "복사 실패",
+  },
+  // A row of the remote-save queue, as the report lists it while it waits
+  // (useChoiceCommit, useFeedback): written into the save in the page's language.
+  queue: {
+    case: "{case} 사건 로그",
+    feedback: "{case} 피드백",
+  },
 };
 export default runLines;
 

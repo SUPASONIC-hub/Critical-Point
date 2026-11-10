@@ -10,7 +10,8 @@ import { renderSitePages } from "../../scripts/site-pages.mjs";
 /**
  * The credit the user decided on 2026-11-04 (SUPASONIC and ALICE as equal
  * creators, each with an address) with the studio's three names decided on
- * 2026-11-05: 찹쌀떡 스튜디오 / Mochi Verse Studio / STUDIOもちぷよ. The support and deletion
+ * 2026-11-05, without the word studio since 2026-11-09 (the credit's STUDIO
+ * label already says it): 찹쌀떡 / Mochi Verse / もちぷよ. The support and deletion
  * address stays SUPASONIC's alone (support-contact.test.mjs names it too).
  */
 const DECIDED = [
@@ -19,9 +20,9 @@ const DECIDED = [
 ];
 
 test("the credit names the studio and both creators on one line, with their addresses", () => {
-  assert.deepEqual(STUDIO_NAMES, { ko: "찹쌀떡 스튜디오", en: "Mochi Verse Studio", ja: "STUDIOもちぷよ" });
+  assert.deepEqual(STUDIO_NAMES, { ko: "찹쌀떡", en: "Mochi Verse", ja: "もちぷよ" });
   assert.equal(STUDIO, STUDIO_NAMES.ko);
-  assert.equal(studioName("ja"), "STUDIOもちぷよ");
+  assert.equal(studioName("ja"), "もちぷよ");
   assert.equal(studioName("xx"), STUDIO_NAMES.ko, "an unknown language reads the Korean name");
   assert.deepEqual(CREATORS, DECIDED);
   assert.equal(CREATOR_LINE, "SUPASONIC & ALICE");
@@ -64,7 +65,7 @@ test("every plain page's foot carries the credit: both names, and both mail link
     if (POLICY_PAGE.test(file)) {
       assert.ok(!html.includes(DECIDED[1].email), `${file}: ALICE's address is nowhere on the page`);
       assert.ok(!foot.includes('class="credit-mail"') && !foot.includes("CONTACT</dt>"), `${file}: no address row in the credit`);
-      assert.ok(!foot.includes("aria-label="), `${file}: no creator mail link`);
+      assert.ok(!/<a href="mailto:[^"]*" aria-label=/.test(foot), `${file}: no creator mail link`);
     } else {
       for (const { name, email } of DECIDED) {
         assert.ok(foot.includes(`<a href="mailto:${email}" aria-label="${name}: ${email}">${email}</a>`), `${file}: ${name}'s address`);
