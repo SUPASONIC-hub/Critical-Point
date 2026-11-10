@@ -2517,6 +2517,22 @@
     display: none;
   }
 
+  .gx-question {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.8125rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* The air of the short phone, also on a phone wider than 390 and 801 to 860
+   tall, which keeps its portrait and its question: a 411x846 phone put Korean
+   five-card hands on an overclocked board up to 25px under the action bar with
+   a card staked (Linux, 2026-11-10). The short-phone block above, stretched to
+   860, hid the portrait on a Pixel 7 (412x839) too. */
+@media (max-width: 480px) and (max-height: 800px),
+  (min-width: 391px) and (max-width: 480px) and (max-height: 860px) {
   .gx-clock {
     width: 2.25rem;
     height: 2.25rem;
@@ -2553,14 +2569,6 @@
     max-height: 1.0625rem;
   }
 
-  .gx-question {
-    display: -webkit-box;
-    overflow: hidden;
-    font-size: 0.8125rem;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
   .gx-pot-value {
     font-size: 1.75rem;
   }
@@ -2589,26 +2597,6 @@
 
   .gx-actions button {
     min-height: 52px;
-  }
-}
-
-/* A phone wider than 390 and 801 to 860 tall keeps its portrait and its
-   question, and takes only the hand's air from the short phone: a 411x846
-   phone put Korean five-card hands on an overclocked board up to 25px under
-   the action bar with a card staked (Linux, 2026-11-10). Hiding the portrait
-   as a short phone does would hide it on a Pixel 7 (412x839) too. */
-@media (min-width: 391px) and (max-width: 480px) and (min-height: 801px) and (max-height: 860px) {
-  .gx-read:has(.gx-active-rules) ~ .hand-5 {
-    gap: 4px;
-  }
-
-  .gx-read:has(.gx-active-rules) ~ .hand-5 .gx-card {
-    gap: 4px;
-    padding-block: 6px;
-  }
-
-  .gx-card.selected .gx-card-preview {
-    max-height: 1.0625rem;
   }
 }
 

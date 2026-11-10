@@ -528,8 +528,8 @@ const budgets = [
   // 195,799 / 70,661 -> 195,799 / 70,667 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): no script changed; only the CSS file's name the entry carries. Measured 195,795 / 70,663 in the e2e build, the plus 4.
   // 195,799 / 70,667 -> 196,509 / 70,856 on 2026-11-10, music-tier-crackle over main e7ccb410: the bus's aligned dry path, the two tiers' bass past the drive and the music lab's before/after switch (musicScore.js CRACKLE_FIX_BEFORE). Measured 196,505 / 70,852 in the e2e build, the plus 4.
   // 196,509 / 70,856 -> 196,509 / 70,858 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 #497): only the chunk names the entry imports. Measured 196,505 / 70,854 in the e2e build, the plus 4.
-  // 196,509 / 70,858 -> 196,509 / 70,864 on 2026-11-10, phone-846-staked after merging main b77e4bfe (#498): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,860 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_864 },
+  // 196,509 / 70,858 -> 196,509 / 70,859 on 2026-11-10, phone-846-staked after merging main b77e4bfe (#498): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,855 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_859 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -971,8 +971,8 @@ const budgets = [
   // 209,113 / 39,370 -> 209,356 / 39,400 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): at 360px the relics sit beside the run's line when they fit (an overclocked board with a max bank put five-card hands 18px under the bar in Korean, 9 in Japanese), and at 361-390px the English signals take the 360px columns. Measured 209,352 / 39,396 in the e2e build, the plus 4.
   // 209,171 / 39,378 (#492 #493) and 209,356 / 39,400 (phone-heavy-bank) -> 209,414 / 39,403 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: both, the English signals' columns now in the 361-480px block. Measured 209,410 / 39,399 in the e2e build, the plus 4.
   // 209,414 / 39,403 -> 209,522 / 39,417 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the relics beside the run's line at 361-480px in Korean and Japanese (a 390x844 phone with a max bank put overclocked five-card hands 22px under the bar in Korean, 20 in Japanese). Measured 209,518 / 39,413 in the e2e build, the plus 4.
-  // 209,522 / 39,417 -> 209,781 / 39,442 on 2026-11-10, phone-846-staked over main 261accef (#497): the short phone's hand air and one-line staked detail at 391-480px wide and 801-860px tall, portrait kept (411x846, Korean, overclocked, a card staked: 25px under the bar). Measured 209,777 / 39,438 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 209_781, maxGzip: 39_442 },
+  // 209,522 / 39,417 -> 209,619 / 39,432 on 2026-11-10, phone-846-staked over main b77e4bfe (#498): the short phone's air (not its hidden portrait or cut question) also at 391-480px wide and up to 860px tall (411x846 Korean overclocked, a card staked: 25px under the bar; Pixel 7 412x839). Measured 209,615 / 39,428 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 209_619, maxGzip: 39_432 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1949,8 +1949,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,945 / 492,876 / 500,438 -> 434,945 / 493,237 / 500,846 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the English and Japanese dictionaries' lines above (Korean unchanged, measured 434,944). Measured 493,233 / 500,842 in the e2e build, the plus 4.
 // 434,945 / 493,237 / 500,846 -> 434,965 / 493,253 / 500,862 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the index CSS line above and the critical CSS it regenerates. Measured 434,961 / 493,249 / 500,858 in the e2e build, the plus 4.
 // 434,965 / 493,253 / 500,862 -> 435,162 / 493,451 / 501,061 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 enja-text-check, #497 phone-390-bank): the entry line above. Measured 435,158 / 493,447 / 501,057 in the e2e build, the plus 4.
-// 435,162 / 493,451 / 501,061 -> 435,190 / 493,479 / 501,088 on 2026-11-10, phone-846-staked after merging main b77e4bfe (#498): the index CSS line above and the critical CSS it regenerates. Measured 435,186 / 493,475 / 501,084 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_190, en: 493_479, ja: 501_088 };
+// 435,162 / 493,451 / 501,061 -> 435,179 / 493,468 / 501,077 on 2026-11-10, phone-846-staked over main b77e4bfe (#498): the index CSS line above and the critical CSS it regenerates. Measured 435,175 / 493,464 / 501,073 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 435_179, en: 493_468, ja: 501_077 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

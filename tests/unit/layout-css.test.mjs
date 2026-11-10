@@ -175,7 +175,8 @@ test("a phone on its side keeps the fold that prints the question and the cards 
  */
 test("a short phone gives a five-card hand under a rules line 20px without cutting a label", () => {
   const play = sheet("play");
-  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\),\s+\(min-width: 391px\) and \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const hiding = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
   const px = (rule, property) => Number(rule.match(new RegExp(`\\n\\s*${property}: (\\d+)px`))?.[1]);
 
   const hand = short.match(/\n {2}\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \{[^}]*\}/)?.[0] ?? "";
@@ -206,7 +207,7 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
   assert.doesNotMatch(short, /\.gx-card-label/);
   assert.match(play, /@media \(max-width: 719px\) \{[\s\S]*?\.gx-card-label \{[^}]*-webkit-line-clamp: 3;/);
   // The board is told by the rules line, as the situation board's rule tells it.
-  assert.match(short, /\.gx-active-rules ~ \.gx-situation \{\s*display: none;/);
+  assert.match(hiding, /\.gx-active-rules ~ \.gx-situation \{\s*display: none;/);
   const stage = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
   const read = stage.indexOf('<div className="gx-read">');
   const rules = stage.indexOf('className="gx-active-rules"');
@@ -217,20 +218,23 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
 
 /**
  * A phone wider than 390 and 801 to 860 tall (411x846; a Pixel 7 is 412x839)
- * takes the short phone's hand rules and its one-line staked detail, and
- * nothing that hides a speaker: on 2026-11-10 the short-phone block itself,
- * stretched to 860, hid the Pixel 7's portrait (tests/offline.spec.js).
+ * takes the short phone's air -- the rules above, the one-line staked detail,
+ * the HUD's and the action bar's -- and nothing that hides a speaker: on
+ * 2026-11-10 the short-phone block itself, stretched to 860, hid the Pixel 7's
+ * portrait (tests/offline.spec.js).
  */
-test("a 411x846 phone takes the short phone's hand air but keeps its portrait and question", () => {
+test("a 411x846 phone takes the short phone's air but keeps its portrait and question", () => {
   const play = sheet("play");
-  const tall = play.match(/@media \(min-width: 391px\) and \(max-width: 480px\) and \(min-height: 801px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
-  assert.ok(tall, "the block is written");
-  assert.match(tall, /\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \{\s*gap: 4px;/);
-  assert.match(tall, /\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \.gx-card \{\s*gap: 4px;\s*padding-block: 6px;/);
-  assert.match(tall, /\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;/);
-  assert.doesNotMatch(tall, /gx-portrait|display: none|gx-question|line-clamp/);
-  // The short-phone block, which does hide the portrait, stays at 800.
-  assert.match(play, /@media \(max-width: 480px\) and \(max-height: 800px\) \{\s*\.gx-scene/);
+  const air = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\),\s+\(min-width: 391px\) and \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.ok(air, "the air block is written for both phones");
+  assert.match(air, /\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;/);
+  assert.match(air, /\.gx-actions button \{\s*min-height: 52px;/);
+  assert.doesNotMatch(air, /gx-portrait|display: none|gx-question|line-clamp|gx-scene/);
+  // What hides the portrait and cuts the question stays at 800 tall.
+  const hiding = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.match(hiding, /\.gx-portrait,/);
+  assert.match(hiding, /\.gx-question \{[^}]*-webkit-line-clamp: 2;/);
+  assert.equal(play.match(/\.gx-portrait,\n[^{]*\{\s*display: none;/g)?.length, 1, "the portrait is hidden in one place");
 });
 
 /**
