@@ -187,12 +187,25 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
   });
 }
 
-for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
-  test(`every ${caseId} decision fits above the action bar @layout`, async ({ page }) => {
+/**
+ * Each case's walk is two tests, the first and second half of its scenes. As
+ * one test a case took 5 to 11 minutes on a hand-started run, and 6 to 15.4 on
+ * the scheduled run of 2026-11-09, where every case ran about 40% slower and
+ * case01 went over the 15-minute limit. Halved, the longest is about 8 minutes
+ * on the slower runner, and the limit stays as it was.
+ */
+const SWEEP_PARTS = 2;
+
+for (const caseId of HAND5 ? [] : CASE_SEQUENCE) for (let part = 1; part <= SWEEP_PARTS; part += 1) {
+  test(`every ${caseId} decision fits above the action bar (part ${part}/${SWEEP_PARTS}) @layout`, async ({ page }) => {
     test.setTimeout(900_000);
     await page.goto("/?debug=1");
     await page.getByTestId("debug-case-select").selectOption(caseId);
-    const nodeIds = await page.getByTestId("debug-node-select").locator("option").evaluateAll((options) => options.map((option) => option.value));
+    const allNodeIds = await page.getByTestId("debug-node-select").locator("option").evaluateAll((options) => options.map((option) => option.value));
+    expect(allNodeIds.length).toBeGreaterThan(0);
+    const size = Math.ceil(allNodeIds.length / SWEEP_PARTS);
+    const nodeIds = allNodeIds.slice((part - 1) * size, part * size);
+    test.skip(!nodeIds.length, `${caseId} has fewer than ${SWEEP_PARTS} scenes`);
     const rows = [];
     const failures = [];
     for (const nodeId of nodeIds) {
@@ -207,8 +220,7 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
         if (row.widest > row.innerWidth + 1) failures.push(`${nodeId} @ ${name}: ${row.widest - row.innerWidth}px wider than the screen`);
       }
     }
-    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
-    expect(nodeIds.length).toBeGreaterThan(0);
+    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-${caseId}-part${part}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }
