@@ -168,8 +168,12 @@ const BUDGETS = {
   // view models are one namespace import (sceneViewModels, with the runtime
   // card's label as `runtimeCardLabel`) and the two runtime cards' words are
   // src/copy/runLines.js's. Measured 968 / 96.
+  // 968 -> 970 on 2026-11-10, memory-line-i18n (draft): the runtime module
+  // hands the shell `refreshSeasonRecord`, so a 결말 도감 stored in another
+  // language is written again in the page's (AppContent, isStaleBook); the
+  // export and its line of why. Measured 970 / 96.
   "src/GameRuntime.jsx": {
-    lines: 968,
+    lines: 970,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
@@ -201,10 +205,13 @@ const BUDGETS = {
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
   // (src/copy/report.js) and `fill` for its lines with blanks.
+  // 9 -> 10 on 2026-11-10, memory-line-i18n (draft): the remote-save queue's
+  // rows are named again in the page's language (state/pendingRowLabel.js,
+  // #496 질문 2); `fill` stays for the screen's other lines.
   "src/screens/ReportArchive.jsx": {
     lines: 640,
     longestLine: 260,
-    importedNames: 9,
+    importedNames: 10,
     hooks: {},
   },
   // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to
