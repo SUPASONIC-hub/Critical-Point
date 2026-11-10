@@ -1,4 +1,4 @@
-import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleAlert, Trophy } from "lucide-react";
+import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleExclamationPoint, Trophy } from "lucide-react";
 import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
@@ -151,7 +151,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   aria-controls={showErrorLog ? "error-log-panel" : undefined}
                   onClick={() => setShowErrorLog(true)}
                 >
-                  <TriangleAlert size={16} />
+                  <TriangleExclamationPoint size={16} />
                   에러 로그
                 </button>
               )}
