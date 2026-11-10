@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-10 (the state of `main` at <!-- sha -->, after #492 #493 #495 #491 #496 #497 <!-- #498 -->; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-10 (the state of `main` at `cb8346d`, after #492 #493 #495 #491 #496 #497 #498 #499 #500; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -820,7 +820,16 @@ Still open, on purpose:
   max bank ko +22 to -4, ja +20 to -3 (361-480px ko/ja relic rule); raising
   the short-phone height to 860 also fixed 411x846 staked (+25) but hid the
   speaker portrait on a Pixel 7 (412x839), so it was left out.
-  <!-- #498 audio, docs, test count, Full Coverage run -->
+  #498 (`b77e4bfe`): crisis/unstable music crackle — the dry path now goes
+  through the same 2x-oversampled latency as the drive shaper, and the
+  unstable/critical bass skips the drive; the user listened and approved.
+  #499 (`3a507805`): en signals row as one flex line, combo direction line
+  shrinks with an ellipsis. #500 (`cb8346da`): the short-phone block split
+  into a hide block (<=800px high) and a spacing block (also 391-480px wide
+  up to 860px): 411x846 staked +25 to -35, Pixel 7 +23 to -28, portraits kept.
+  The W47 test week was cancelled (no finished seasons in W45/W46); the
+  verdict waits for 30 finished seasons and every improvement now ships for
+  the user to check live. AdSense re-review requested ~17:10. Nine merges.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
