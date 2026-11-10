@@ -41,4 +41,9 @@ export default {
     text: "Enlarges the text of scenes, the story after a verdict, case endings and interludes. The table stays the same.",
     labels: ["Default", "Large", "Larger"],
   },
+  textScale: {
+    legend: "Text size",
+    text: "Enlarges the text on every screen. The pot, clock and timer figures stay the same. Saved on this device only.",
+    labels: ["Default", "Large", "Larger"],
+  },
 };

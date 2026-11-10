@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { captionGroups, markLines, markProse } from "./proseMarks.js";
+import { captionBoxes, markLines, markProse } from "./proseMarks.js";
 import { markGlossesSeen, readSeenGlosses } from "./seenGlosses.js";
 
 /**
@@ -85,7 +85,7 @@ export function ProseItems({ items }) {
 
 /**
  * Narration as a strip of caption boxes, two or three sentences to a box (the
- * briefing page; `captionGroups` says where a box breaks). The boxes are
+ * briefing page; `captionBoxes` says where a box breaks). The boxes are
  * marked as one paragraph, so speech that runs across a break is speech in
  * both boxes. It lives beside the marks rather than in the briefing so the
  * table's chunk carries only the call.
@@ -96,14 +96,11 @@ export function ProseItems({ items }) {
  * box's text.
  */
 export function ProseCaptions({ text = "", who, whoAt = [] }) {
-  const groups = captionGroups(text);
-  const lines = markLines(groups);
+  const boxes = captionBoxes(text);
+  const lines = markLines(boxes.map((box) => box.text));
   const seen = useSeenGlosses(text, lines);
   // Each box's first sentence and the one after its last, as whoAt counts them.
-  const spans = groups.reduce((list, group) => {
-    const start = list.at(-1)?.[1] ?? 0;
-    return [...list, [start, start + group.split(/(?<=[.!?])\s+/).length]];
-  }, []);
+  const spans = boxes.map((box) => [box.first, box.first + box.count]);
   return lines.map((segments, index) => (
     <p key={index} className="gx-caption" data-who={who && whoAt.some((at) => at >= spans[index][0] && at < spans[index][1]) ? who : undefined}>
       <Marked segments={segments} seen={seen} />

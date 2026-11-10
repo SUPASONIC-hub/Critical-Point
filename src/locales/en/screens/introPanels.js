@@ -2,9 +2,10 @@
 export default {
   analystTitles: {
     prologue01: "Trainee Analyst",
-    case01: "Analyst",
-    case18: "Senior Analyst",
-    case36: "Lead Analyst",
+    prologue02: "Analyst",
+    case01: "Senior Analyst",
+    case25: "Lead Analyst",
+    finished: "Chief Analyst",
   },
   playStyles: {
     instinct: "A pledge to decide on first instinct",
@@ -31,7 +32,6 @@ export default {
     missing: "With no run ID, this is kept as a temporary local record.",
   },
   openingEcho: "I won’t ask how smart you are. Instead, I’ll watch for when you can’t stop thinking.",
-  tabSuffix: " · Critical Point",
   storageBanner: {
     offline: { title: "Offline", text: "Remote saving comes back when the connection does. For now, your record is saved in this browser." },
     ready: { title: "Remote saving ready", text: "Only the records you agreed to share are saved remotely, when a case ends and when you send feedback." },

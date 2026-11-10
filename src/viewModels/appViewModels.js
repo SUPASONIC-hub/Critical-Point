@@ -110,7 +110,7 @@ export const viewGroups = {
   // What the play screen shows. What it calls -- the reveal and recovery
   // renderers, save, reset, the table's handlers -- arrives as props.
   play: {
-    common: ["AdaptiveMusic", "musicModeKey", "screenReaderStatus", "simplifyPlayerText", "currentCase"],
+    common: ["AdaptiveMusic", "musicModeKey", "screenReaderStatus", "currentCase"],
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId", "sceneChallenge"],
     gauntlet: [
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",

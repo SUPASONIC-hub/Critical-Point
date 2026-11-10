@@ -2,6 +2,11 @@
   "name": "critical-point-prototype",
   "version": "0.1.0",
   "private": true,
+  "author": "SUPASONIC & ALICE (Mochi Verse)",
+  "contributors": [
+    "SUPASONIC <from.logic.to.magic@gmail.com>",
+    "ALICE <goeun.nam@gmail.com>"
+  ],
   "type": "module",
   "engines": {
     "node": ">=24 <25"
@@ -9,7 +14,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "build:e2e": "vite build --mode e2e",
+    "build:e2e": "node scripts/build-cache.mjs --mode e2e",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint --cache --max-warnings 0 .",
     "format": "prettier --write src/styles",
@@ -28,7 +33,9 @@
     "check:pressure": "node scripts/report-gauntlet-loop.mjs",
     "check:endings": "node scripts/check-endings.mjs",
     "report:endings": "node scripts/check-endings.mjs --report",
+    "report:judgment": "node scripts/report-judgment.mjs",
     "report:near-miss": "node scripts/report-near-miss.mjs",
+    "report:reading-axis": "node scripts/report-reading-axis.mjs",
     "report:speaker-lines": "node scripts/report-speaker-lines.mjs",
     "check:art": "node scripts/check-art-budget.mjs",
     "build:art": "node scripts/build-art-variants.mjs",
@@ -49,11 +56,13 @@
     "check:node": "node scripts/check-node-version.mjs",
     "check:grants": "node scripts/check-grants.mjs",
     "check:canon": "node scripts/check-canon.mjs",
+    "check:mood": "node scripts/check-mood.mjs",
     "check:locale": "node scripts/check-locale.mjs",
     "check:locale:strict": "node scripts/check-locale.mjs --strict",
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",
+    "e2e:rebalance": "node scripts/e2e-rebalance.mjs",
     "check:deploy:offline": "node scripts/check-deploy.mjs --offline",
     "test:runtime": "node scripts/run-e2e.mjs --runtime --preview",
     "test:runtime:dev": "node scripts/run-e2e.mjs --runtime",
@@ -67,6 +76,7 @@
     "test:visual": "node scripts/run-e2e.mjs --grep @visual tests/visual-regression.spec.js --project=chromium",
     "test:visual:docker": "node scripts/run-e2e.mjs --docker --grep @visual tests/visual-regression.spec.js --project=chromium",
     "verify:static": "node scripts/verify-static.mjs",
+    "check:changed": "node scripts/check-changed.mjs",
     "verify:ranking": "node scripts/verify-ranking-rows.mjs",
     "verify:quick": "npm run verify:static && npm run check:specs && npm run build:e2e && npm run check:bundle && npm run check:deploy:offline && npm run test:runtime && npm run test:e2e:preview && npm run test:performance",
     "verify:e2e": "npm run test:e2e",
@@ -74,13 +84,13 @@
     "verify:full": "npm run verify && npm run test:e2e:full && npm run test:e2e:season"
   },
   "dependencies": {
-    "lucide-react": "^1.61.0",
+    "lucide-react": "^1.64.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@electric-sql/pglite": "^0.5.11",
+    "@electric-sql/pglite": "^0.5.13",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.64.1",
     "@vitejs/plugin-react": "^5.2.0",
@@ -92,7 +102,7 @@
     "pretendard": "^1.3.9",
     "prettier": "^3.9.10",
     "subset-font": "^2.9.0",
-    "supabase": "2.121.0",
+    "supabase": "2.122.0",
     "typescript": "7.0.2",
     "vite": "^8.3.5",
     "yaml": "^2.9.1"

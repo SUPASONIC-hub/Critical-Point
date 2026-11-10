@@ -6,12 +6,19 @@ name: Verify
 
 on:
   pull_request:
-    # `labeled` is here only so that adding the `e2e` label starts the e2e
-    # tier; see the job conditions for what a label event runs.
-    types: [opened, synchronize, reopened, labeled]
+    # `labeled` is here so that adding the `e2e` label starts the end-to-end
+    # tiers, and `ready_for_review` so that marking a draft ready starts them:
+    # a draft runs the quick tier and nothing else (2026-11-03, when drafts
+    # carrying the e2e label held the queue and main's own Verify waited behind
+    # them). The `scope` job says what each event runs.
+    types: [opened, synchronize, reopened, labeled, ready_for_review]
   push:
     branches:
       - main
+  # By hand, on a branch, when a draft needs the end-to-end tiers before it is
+  # ready: `gh workflow run Verify --ref <branch>`. It runs every tier on the
+  # branch head itself, and it can never deploy (Deploy takes pushes to main).
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -28,14 +35,93 @@ permissions:
 # A label event gets a group of its own too, named by the label, so adding
 # `e2e` does not cancel the code run that is already verifying the same commit
 # -- and adding `visual` a moment later does not cancel the run `e2e` started.
+# Marking a draft ready changes no code either, and has a group of its own for
+# the same reason: it must not cancel the quick tier the last push started.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}${{ github.event.action == 'ready_for_review' && '-ready' || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  scope:
+    # Decides whether this run has the end-to-end tiers (verify-e2e and
+    # verify-season). A job condition cannot see which files a pull request
+    # touches, so the question is asked of the API here, as Visual Regression's
+    # `scope` job does. It runs no project code and does not check the
+    # repository out. A push to main and a dispatch always have them: a push is
+    # a deploy candidate.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    outputs:
+      e2e: ${{ steps.decide.outputs.e2e }}
+    steps:
+      - name: Decide whether to run the end-to-end tiers
+        id: decide
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          ADDED_LABEL: ${{ github.event.label.name }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+          HAS_E2E_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'e2e') }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+        run: |
+          set -euo pipefail
+          decide() { echo "e2e=$1" >> "$GITHUB_OUTPUT"; echo "$2"; }
+          if [ "$EVENT" != "pull_request" ]; then
+            decide true "Not a pull request ($EVENT): every tier runs."
+            exit 0
+          fi
+          # A draft is not asking to be merged yet. Marking it ready starts the
+          # tiers; a dispatch on its branch runs them while it is a draft.
+          if [ "$DRAFT" = "true" ]; then
+            decide false "A draft: the end-to-end tiers wait until it is marked ready (or: gh workflow run Verify --ref <branch>)."
+            exit 0
+          fi
+          if [ "$ACTION" = "labeled" ] && [ "$ADDED_LABEL" != "e2e" ]; then
+            decide false "Labelled $ADDED_LABEL, which asks for nothing here."
+            exit 0
+          fi
+          # Every Dependabot pull request, because a dependency bump is the
+          # change most likely to break the running game while the static tier
+          # stays green; any other only with the `e2e` label.
+          if [ "$AUTHOR" != "dependabot[bot]" ] && [ "$HAS_E2E_LABEL" != "true" ]; then
+            decide false "No e2e label: the quick tier only."
+            exit 0
+          fi
+          # A pull request that changes only documents cannot change what the
+          # game does: no test or module reads a Markdown file or docs/. The
+          # README's numbers are checked by verify-quick (check:doc-numbers),
+          # which runs regardless. A rename counts its old path too, and a
+          # listing that failed or came back short runs the tiers: the cost of
+          # a wrong yes is minutes, and of a wrong no an untested merge.
+          if ! listing=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[] | ("new " + .filename), (if .previous_filename then "old " + .previous_filename else empty end)'); then
+            decide true "::warning title=Ran without knowing why::The pull request's file list could not be read, so the end-to-end tiers run to be safe."
+            exit 0
+          fi
+          listed=$(printf '%s\n' "$listing" | grep -c '^new ' || true)
+          if [ "${listed:-0}" -eq 0 ] || [ "${listed:-0}" -lt "${CHANGED_FILES:-0}" ]; then
+            decide true "The file list came back empty or short ($listed of ${CHANGED_FILES:-?} files): the end-to-end tiers run."
+            exit 0
+          fi
+          # Visual Regression's `scope` job carries the same line.
+          docs_only_pattern='^(.*\.md|docs/.*)$'
+          code=$(printf '%s\n' "$listing" | sed -E 's/^(new|old) //' | grep -vE "$docs_only_pattern" || true)
+          if [ -z "$code" ]; then
+            decide false "Only documents change (*.md, docs/): the end-to-end tiers are skipped; verify-quick still checks the README's numbers."
+          else
+            decide true "Code changes and the pull request asks for the end-to-end tiers: they run."
+          fi
+
   verify-quick:
-    # Adding a label changes no code, so it does not re-run the quick tier.
-    if: github.event.action != 'labeled'
+    # Adding a label or marking a draft ready changes no code, so neither
+    # re-runs the quick tier: the run for the last push already did.
+    if: github.event.action != 'labeled' && github.event.action != 'ready_for_review'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -61,35 +147,38 @@ jobs:
           retention-days: 7
 
   verify-e2e:
-    # Every push; a pull request carrying the `e2e` label (on the label event
-    # itself only when the label added is `e2e`); and every Dependabot pull
-    # request, because a dependency bump is the change most likely to break the
-    # running game while the static tier stays green. Nothing here reads a
+    # Every push and dispatch; a pull request that is not a draft and carries
+    # the `e2e` label (on the label event itself only when the label added is
+    # `e2e`); and every Dependabot pull request -- unless the pull request
+    # changes only documents. The `scope` job decides. Nothing here reads a
     # secret, so it runs the same on a Dependabot pull request.
-    if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'labeled') ||
-      (contains(github.event.pull_request.labels.*.name, 'e2e') &&
-       (github.event.action != 'labeled' || github.event.label.name == 'e2e'))
+    needs: scope
+    # A scope job that failed leaves `e2e` empty, and that runs the tiers.
+    if: ${{ !cancelled() && needs.scope.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
     # The suite used to be one job that grew with the season: 25 -> 45 -> 80
     # minutes, most of it one test walking all fifty-five cases. The walk is now
     # eight segments with a job of their own below, and the uninterrupted walk
-    # moved to the weekly Full Coverage workflow. What is left here is split
-    # test by test. It ran on three shards until 2026-10-13, which had grown to
-    # 19, 15 and 20 minutes (run 38201938249) and were what a merge waited on
-    # before it deployed; five shards should be about twelve minutes each.
+    # moved to the weekly Full Coverage workflow. It ran on three shards until
+    # 2026-10-13, which had grown to 19, 15 and 20 minutes (run 38201938249)
+    # and were what a merge waited on before it deployed, then on five, cut by
+    # Playwright in order and by test count: 15.1, 12.0, 14.4, 14.9 and 15.2
+    # minutes on 2026-11-03 (run 41561249153), about 71 in all. Now seven,
+    # each a set of spec files balanced by the time CI measured
+    # (tests/e2e-shards.json, scripts/e2e-shards.mjs): about ten minutes each.
+    # The count here and the file's `shardCount` move together
+    # (`npm run e2e:rebalance -- --shards=N`; a unit test holds them equal).
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5]
+        shard: [1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
       # The performance budgets are measured on the production build, so they
       # run with the @prod specs in verify-quick, not here.
-      - run: npm run test:e2e -- --skip-segments --shard=${{ matrix.shard }}/5
+      - run: npm run test:e2e -- --skip-segments --shard=${{ matrix.shard }}/7
       - name: Upload E2E diagnostics
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -107,11 +196,9 @@ jobs:
     # segments sit next to each other in one file: as part of the suite all
     # eight landed on one shard, which took 17 minutes while the other two took
     # 5 and 3. Two segments a shard is about four minutes.
-    if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'labeled') ||
-      (contains(github.event.pull_request.labels.*.name, 'e2e') &&
-       (github.event.action != 'labeled' || github.event.label.name == 'e2e'))
+    needs: scope
+    # A scope job that failed leaves `e2e` empty, and that runs the tiers.
+    if: ${{ !cancelled() && needs.scope.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:

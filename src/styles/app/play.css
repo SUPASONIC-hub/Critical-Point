@@ -176,11 +176,13 @@
   isolation: isolate;
   min-height: 100dvh;
   padding: 10px 12px calc(96px + env(safe-area-inset-bottom));
-  color: var(--ui-text);
   background:
     radial-gradient(120% 60% at 50% 120%, var(--c-gx-heat-a18), transparent 62%),
     radial-gradient(60% 45% at 0% 0%, rgb(94 234 255 / 0.05), transparent 70%),
     radial-gradient(55% 40% at 100% 0%, rgb(217 255 98 / 0.04), transparent 70%), var(--ui-bg);
+  /* The felt fades with the scene's mood (tokens.css); reduced motion cuts it
+     (responsive.css). Its colour is the body's, --ui-text, and is not restated. */
+  transition: background-color 0.6s;
 }
 
 /* A felt weave under everything, faded out toward the edges. */
@@ -193,6 +195,19 @@
   background-image: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1.4px);
   background-size: 22px 22px;
   mask-image: radial-gradient(90% 70% at 50% 40%, var(--c-black), transparent 85%);
+}
+
+/* The mood's edge (tokens.css --mood-edge, 2026-11-06): the screen's rim
+   tinted amber, sky, red or teal, behind every panel so no text stands on it
+   that did not before; neutral is transparent. It fades with the ground. */
+.game-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(75% 70% at 50% 50%, transparent 35%, var(--mood-edge) 100%);
+  transition: --mood-edge 0.6s;
 }
 
 .game-shell .save-status {
@@ -385,6 +400,16 @@
   letter-spacing: 0.16em;
 }
 
+/* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) take the label's place in colour, no line more. */
+/* Ember, not heat: heat red is 3.56:1 on the felt (contrast.spec, final/f_archive). */
+.gx-label.gx-mark-peak {
+  color: var(--c-gx-ember);
+}
+
+.gx-label.gx-mark-breather {
+  color: var(--c-gx-relic);
+}
+
 .gx-pot-value {
   color: var(--ui-text);
   font: 800 clamp(2rem, 9vw, 2.625rem) / 1 var(--font-sans);
@@ -514,13 +539,21 @@
   flex: 0 0 auto;
 }
 
-.gx-bank .gx-at-risk {
+.gx-bank .gx-at-risk,
+.gx-hud-audit.gx-at-risk {
   border-color: rgb(255 142 76 / 0.4);
 }
 
 .gx-bank .gx-at-risk b,
-.gx-bank .gx-at-risk svg {
+.gx-bank .gx-at-risk svg,
+.gx-hud-audit.gx-at-risk b {
   color: var(--c-gx-ember);
+}
+
+/* The audit count's second place, beside the signals: a 360px phone shows it
+   there instead of in the run's line (the max-width: 360px block). */
+.gx-hud-audit {
+  display: none;
 }
 
 .gx-run-signal b + small {
@@ -898,7 +931,7 @@
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.4),
     0 0 calc(6px + var(--gx-heat, 0) * 24px) var(--c-gx-heat);
-  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.16s var(--ui-ease-out);
 }
 
 .gx-gauge-wall {
@@ -1228,6 +1261,13 @@
   gap: 8px;
 }
 
+/* The card's edge is what tells one card from the felt (WCAG 1.4.11, 3:1
+   for a control's boundary): the card's fill is within a shade of the table,
+   so the edge carries it. --ui-line-strong (white at 16%) came to 1.5:1 over
+   the felt; --ui-line-field (40%) is about 3.6:1 (the 2026-11-03 audit),
+   the edge a text field already has. Hover is brighter still, a staged
+   card keeps its acid edge and ring, and a face-down fractured card keeps
+   the same edge. */
 .gauntlet-stage .gx-card {
   position: relative;
   display: grid;
@@ -1239,7 +1279,7 @@
   background:
     linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 42%),
     linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
-  border: 1px solid var(--ui-line-strong);
+  border: 1px solid var(--ui-line-field);
   border-radius: var(--ui-radius-md);
   box-shadow: var(--ui-shadow-1);
   text-align: left;
@@ -1254,7 +1294,7 @@
 
 @media (hover: hover) {
   .gauntlet-stage .gx-card:not([aria-disabled="true"]):hover {
-    border-color: rgb(255 255 255 / 0.3);
+    border-color: rgb(255 255 255 / 0.6);
     box-shadow: var(--ui-shadow-2);
     transform: translateY(-2px);
   }
@@ -1366,7 +1406,7 @@
 
 .gauntlet-stage.is-face-down .gx-card.is-fractured {
   border-style: solid;
-  border-color: var(--ui-line-strong);
+  border-color: var(--ui-line-field);
 }
 
 .gauntlet-stage .gx-card.is-sealed {
@@ -1485,7 +1525,8 @@
   filter: brightness(1.08);
 }
 
-.gx-actions button:not(:disabled):active {
+.gx-actions button:not(:disabled):active,
+.gx-cash.is-holding {
   transform: translateY(2px) scale(0.98);
 }
 
@@ -1555,21 +1596,30 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A closing scene's 확정 is held (holdConfirm.js): a line fills out from the
-   middle in the 0.8s the hold takes. Reduced motion draws it full at once. */
-.gx-cash.is-holding::after {
-  content: "";
+/* The big decisions' 확정 is held (holdConfirm.js, HoldGauge.jsx): a line
+   under the label fills left to right in the 0.6s the hold takes, and the
+   button sits pressed as it does under a pointer (the :active rule above).
+   A press that let go too soon leaves a stub beside its hint; a screen
+   reader's first tap holds the stub until its second. A transition, not an
+   animation: the calm setting stops every animation on the stage, and the
+   gauge is the one motion a held press is read from, so it stays under calm
+   effects and reduced motion alike (nothing else moves). */
+.gx-hold {
   position: absolute;
-  inset: auto 14px 6px;
+  inset: auto 14px 5px;
   height: 3px;
   background: currentColor;
-  animation: gx-hold 0.8s linear;
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
-@keyframes gx-hold {
-  from {
-    transform: scaleX(0);
-  }
+.gx-hold[data-phase="holding"] {
+  transform: none;
+  transition: transform 0.6s linear;
+}
+
+.gx-hold:is([data-phase="hinted"], [data-phase="armed"]) {
+  transform: scaleX(0.3);
 }
 
 /* Overlays -------------------------------------------------------------------- */
@@ -1754,6 +1804,9 @@
   backdrop-filter: blur(10px);
 }
 
+/* The slam's third line, `small` (A2, 2026-11-05), takes no rule: the browser's
+   smaller size and the paper colour it inherits are the look. The sheet is at
+   its budget (check-css-structure.mjs), and the line is a line, not a pill. */
 .gx-slam-bust {
   color: var(--c-paper);
   background: var(--c-gx-heat-a18);
@@ -1770,7 +1823,6 @@
   z-index: -1;
   content: "";
   opacity: 0;
-  pointer-events: none;
 }
 
 .gx-slam-bust::before {
@@ -1797,11 +1849,19 @@
 .gx-slam-cashed strong {
   color: var(--c-acid);
   text-shadow: 0 0 36px var(--c-acid);
-  animation: gx-cash-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: gx-cash-pop 0.5s var(--ui-ease-out) both;
 }
 
+/* The stop (A2, 2026-11-05): for the first quarter second after the slam the
+   table stands on its last frame, then greys over the next quarter. The heart
+   has already stopped on that frame (--gx-rate 0, GauntletFx.jsx). Reduced
+   motion collapses both quarters with every transition (responsive.css). The
+   bytes it cost came from two lines that did nothing: the slam layers'
+   pointer-events (inherited from .gx-slam) and the reduced-motion transform
+   on a card that is neither selected nor hovered (no rule ever moved it). */
 .gauntlet-stage.is-bust .gx-table {
   filter: grayscale(0.9) brightness(0.6);
+  transition: filter 0.25s 0.25s;
 }
 
 .gx-fx {
@@ -2262,6 +2322,13 @@
     padding: 1px 7px;
   }
 
+  /* The run's line keeps 감사 n/4 (RULES_MARK 3) on 판돈 and 금고's row: at 4px
+     it went to a row of its own on CI's 390x844 (26px, the last card under the
+     action bar). Its pairs stay apart by the 3px below. */
+  .gx-stat.gx-run-signal {
+    gap: 2px;
+  }
+
   .gauntlet-stage .gx-bank .gx-relic-chip {
     padding: 2px 4px;
   }
@@ -2434,8 +2501,12 @@
 }
 
 /* A short phone reads the scene without its portrait, in two lines of question.
-   A board with changed rules shows its rules line where the situation board was. */
-@media (max-width: 480px) and (max-height: 760px) {
+   A board with changed rules shows its rules line where the situation board was.
+   Short is 800 tall or less since 2026-11-09 (760 before): a Galaxy A32 is
+   411x780 under Chrome's address bar, and on an overclocked board with five
+   relics its five-card hands ended up to 20px under the action bar, 61 with a
+   card staked (Linux, Korean), with none of these rules. */
+@media (max-width: 480px) and (max-height: 800px) {
   .gx-scene {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2592,27 +2663,7 @@
   }
 }
 
-/* Japanese is drawn in the system's CJK face, full-width kana for kana, and on
-   Linux and Android (Noto CJK) a 360px phone wrapped 46 five-card labels to a
-   third line and pushed the last card 4 to 42px under the action bar, where
-   Windows had kept them to two (hand5, 2026-10-30). */
-@media (max-width: 360px) {
-  :lang(ja) .gx-card-label {
-    font-size: 0.75rem;
-    letter-spacing: -0.03em;
-  }
-
-  /* English labels are the longest of the three: on Linux 85% of the
-     five-card labels run to three lines (cards 115 to 121px tall, 92 on
-     Windows), and 22 hands at a pot of 0 put the last card 4px under the
-     action bar (360x740, hand5, 2026-11-02). A 12px label on 15px lines takes
-     6px off every three-line row and brings some to two; the words stay.
-     Late in a season the bank row's second line takes 20px more. */
-  :lang(en) .gx-card-label {
-    font-size: 0.75rem;
-    line-height: 1.25;
-  }
-
+@media (max-width: 360px), (max-width: 480px) and (max-height: 800px) {
   /* The bank row is one line at a pot of 0 and two late in a season: at a pot
      of 99,999, a vault of 1,999,999 and a streak line of 49 / 99 / x64 the three
      pills need 385 to 404px of a 310px row, and the second line put the last
@@ -2621,10 +2672,19 @@
      room is taken from the HUD's air instead: a 30px clock, 18px pills, and
      2 to 4px off the gaps and paddings around them. The HUD measured 106px
      with one bank line and 132 with two; it is 87 and 107 (and 3px block
-     paddings since the purse line, 2026-11-02). */
+     paddings since the purse line, 2026-11-02). 2px since the KD band
+     (22px over the shell): an overclocked board with five relics put five-card
+     hands 2px under the bar (c6_desk, c7, c16, c28; 2026-11-06).
+
+     A phone wider than 360 and no taller than 800 takes the same air: a
+     Galaxy A32 is 411 wide and about 780 tall under Chrome's address bar,
+     and with the same two bank lines its HUD went from 116 to 142px and
+     nineteen five-card hands put the last card 9px under the action bar
+     (Linux, Korean, 411x780, hand5 with LAYOUT_BANK=max and cap;
+     2026-11-09). A taller phone (390x844, 411x846) has the room. */
   .gauntlet-stage .gx-hud {
-    gap: 3px 8px;
-    padding: 3px 8px;
+    gap: 2px 8px;
+    padding: 2px 8px;
   }
 
   .gauntlet-stage .gx-clock {
@@ -2644,6 +2704,287 @@
 
   .gauntlet-stage .gx-signals {
     padding-top: 3px;
+  }
+}
+
+/* Japanese is drawn in the system's CJK face, full-width kana for kana, and on
+   Linux and Android (Noto CJK) a 360px phone wrapped 46 five-card labels to a
+   third line and pushed the last card 4 to 42px under the action bar, where
+   Windows had kept them to two (hand5, 2026-10-30). */
+@media (max-width: 360px) {
+  :lang(ja) .gx-card-label {
+    font-size: 0.75rem;
+    letter-spacing: -0.03em;
+  }
+
+  /* Noto CJK's normal line is about 1.45em where the Korean face's is 1.2, so
+     every line left at `normal` stood 3px taller in Japanese: the signals row
+     (23 to 26px), the dateline and the speaker (6px over the scene), and a
+     locked card's four-line seal (39 to 64px). On an overclocked board with
+     five relics that put nine five-card hands 6px under the action bar where
+     the Korean cleared it by 2 (Linux, 360x740, c6_desk, c7_paper, c16_roof,
+     c28_headset and five more; 2026-11-09). The same lines at 1.2. */
+  :lang(ja) .gauntlet-stage :is(.gx-signals *, .gx-dateline, .gx-speaker, .gx-card-seal) {
+    line-height: 1.2;
+  }
+
+  /* English labels are the longest of the three: on Linux 85% of the
+     five-card labels run to three lines (cards 115 to 121px tall, 92 on
+     Windows), and 22 hands at a pot of 0 put the last card 4px under the
+     action bar (360x740, hand5, 2026-11-02). A 12px label on 15px lines takes
+     6px off every three-line row and brings some to two; the words stay.
+     Late in a season the bank row's second line takes 20px more. */
+  :lang(en) .gx-card-label {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  /* The relics take the run's line when they fit beside it. Late in a season
+     the bank is Stake and Vault on one line and the run's line on a second,
+     and the relics' own third line put an overclocked five-card hand 18px
+     under the action bar in Korean and 9px in Japanese (Linux, 360x740, max
+     bank, c6_desk; 2026-11-09). The run's line is 158 to 174px there and five
+     relics 122, so both fit the 310px row; where they do not (a cap bank in
+     English) the relics wrap to their own line as before. */
+  .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
+  }
+
+  /* The signals row in English and Japanese: the logic streak's line is
+     longer than the Korean one, and the shares of 1.25 and 1 left to the
+     overclock and LOCK gave LOCK less than its own width, so it ran under the
+     streak (Linux, 360x740, hand5: en 15 to 25px, ja 8 to 18px; ko 0). LOCK
+     now takes its own width, without its icon or the empty track the hidden
+     multiplier line left; the overclock line takes the rest and is the one
+     that cuts with an ellipsis. Selectors stay at three classes, so a HUD
+     with more on that row (the audit token, four classes) sets its own. */
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-signals {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 8px;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-focus-signal svg {
+    display: none;
+  }
+
+  :is(:lang(en), :lang(ja)) .gauntlet-stage .gx-streak {
+    gap: 5px;
+  }
+
+  /* An English page: Stake, Vault and the run's line with Audit n/4
+     (RULES_MARK 3) needed 331px of a 310px rail at a pot of 0, so the run's
+     line took a row of its own (26px) and a five-card hand's last card went
+     under the action bar (hand5, 2026-10-30). Pills at 5px a side and 3px
+     between them stay from that fit; the labels' 10px went on 2026-11-05,
+     since Audit n/4 moved to the signals' row below (.gx-hud.has-audit) and
+     the 331px reason went with it. Stake and Vault read 11px like the Korean
+     and Japanese labels (the 9px report, phone-en-stake-9px, choice 1). Only
+     the gap between pills is narrowed here; the 2px between the bank's lines
+     above holds. */
+  :lang(en) .gx-bank {
+    column-gap: 3px;
+  }
+
+  :lang(en) .gx-bank .gx-stat {
+    padding-inline: 5px;
+  }
+
+  /* Audit n/4 (RULES_MARK 3) leaves the run's line for the signals' row, at
+     its right end under the clock: with it the bank row ran to two lines at a
+     pot of 0 on Linux fonts (hand5 on CI, 360x740: English 103 hands 24px
+     under the action bar, Japanese 63 by 10px; 2026-11-02). The clock keeps
+     its own column, so the pot's row is as wide as before; with no signals
+     the count takes that row alone. The same words, in a pill of the bank's;
+     GauntletStage draws both places and each width hides one (display: none),
+     so the count is read once. */
+  .gauntlet-stage .gx-hud.has-audit {
+    grid-template-columns: minmax(0, 1fr) auto 1.875rem;
+    grid-template-areas:
+      "pot pot clock"
+      "bank bank bank"
+      "signals audit audit";
+  }
+
+  .gauntlet-stage .gx-run-signal .gx-audit-wide {
+    display: none;
+  }
+
+  /* With the count beside them the signals keep their labels and bars only:
+     the crosshair and the chain's sentence go, three auto columns 4px apart
+     (360x740 hand5 on Linux, sig-tight; 2026-11-03). */
+  .gauntlet-stage .gx-hud.has-audit .gx-focus-signal svg,
+  .gauntlet-stage .gx-hud.has-audit .gx-overdrive > span {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-hud.has-audit .gx-signals {
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+    column-gap: 4px;
+  }
+
+  .gauntlet-stage .gx-hud.has-audit .gx-overdrive,
+  .gauntlet-stage .gx-hud.has-audit .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  .gauntlet-stage .gx-hud-audit {
+    display: inline-flex;
+    grid-area: audit;
+    justify-self: end;
+    align-self: end;
+    min-height: 18px;
+    padding-block: 0;
+    line-height: 1.2;
+  }
+
+  /* English, once the chain is on (a streak carried in): Held, STRIKE n and
+     Combo n with "From the first card" need 256px of the 231 the audit count
+     leaves, and the streak, the one column without a min-width, kept its
+     whole line while STRIKE was squeezed to 33px of its 58 and ran 21px under
+     it (Linux, 360x740, hand5 at the max and cap banks, every scene of
+     case06/07/16/28; 2026-11-09). The streak's direction line now gives way
+     and cuts with an ellipsis; its number and the other two stay whole, and
+     the buttons' description still reads all of it out. */
+  :lang(en) .gauntlet-stage .gx-hud.has-audit .gx-streak {
+    min-width: 0;
+  }
+
+  :lang(en) .gauntlet-stage .gx-hud.has-audit .gx-streak > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* A 390x844 phone in English and Japanese (361 to 390px). The 360px block
+   above fits the longer languages with rules this width did not get, and on
+   an overclocked board with five relics the last card of a five-card hand
+   ran under the action bar on Linux fonts: Japanese 16 to 17px (c7_paper,
+   c7_ledger, c16_roof, c28_headset, c28_ruler), English up to 58 (c6_desk,
+   c6_panel, c16_duel, c28_headset; 2026-11-09), where Korean cleared it by
+   13 or more. In Japanese it was Noto CJK's taller normal line (signals,
+   dateline, speaker, a 48px lock seal) and three-line labels; in English the
+   bank row on three lines (Audit n/4 in the run's line), the gauge's reading
+   on two, and three-line labels. The same rules as at 360px, for these two
+   languages only: Korean and wider screens are as they were.
+
+   To 480px since 2026-11-09 (390 before): a Galaxy A32 (411x780) in English
+   and Japanese with a pot of 99,999 still put 3 and 10 five-card hands 13px
+   under the action bar (Linux), with these rules only up to 390. */
+@media (min-width: 361px) and (max-width: 480px) {
+  :lang(ja) .gx-card-label {
+    font-size: 0.75rem;
+    letter-spacing: -0.03em;
+  }
+
+  :lang(ja) .gauntlet-stage :is(.gx-signals *, .gx-dateline, .gx-speaker, .gx-card-seal) {
+    line-height: 1.2;
+  }
+
+  /* The relics beside the run's line, as at 360px, in Korean and Japanese: on
+     a 390x844 phone with a max bank they took a third line of the bank row and
+     put overclocked five-card hands up to 22px (Korean, c33_mother, 63 hands)
+     and 20px (Japanese, c7_paper) under the action bar (Linux, 2026-11-10).
+     English there was 4px over the bar and stays as it was. */
+  :lang(ko) .gauntlet-stage .gx-bank .gx-relics,
+  :lang(ja) .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
+  }
+
+  :lang(en) .gx-card-label {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  :lang(en) .gauntlet-stage .gx-hud {
+    gap: 2px 8px;
+    padding: 2px 8px;
+  }
+
+  :lang(en) .gauntlet-stage .gx-clock {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  :lang(en) .gauntlet-stage .gx-bank {
+    gap: 2px 3px;
+  }
+
+  :lang(en) .gauntlet-stage .gx-bank > .gx-stat {
+    min-height: 18px;
+    padding: 0 5px;
+    line-height: 1.2;
+  }
+
+  /* The signals as at 360px in English: LOCK at its own width without its
+     icon, the chain's line the one cut. With the 1.25 / 1 shares STRIKE had
+     68px of its 81 once the chain was lit and ran 13px under the streak
+     (Linux, overclocked board, 105 scenes of case01-21; 2026-11-09).
+
+     Before these columns reached 480px the row ran into itself on Linux
+     fonts with a late season's bank: 2px with the chain lit (390x844, most
+     five-card scenes), 13px with it off (390x844, the prologue's) and 3px
+     (411x780; hand5, LAYOUT_BANK=max, 2026-11-10). The columns cleared it,
+     but the streak, an auto column, still never gave way. The row is a line
+     of three now: the chain's word stays and its sentence takes what is
+     left, LOCK keeps its width (and the rest of the row when the chain is
+     off), and the streak's direction line is the one that gives way, cut
+     with an ellipsis; its number stays whole. One line, no taller. */
+  :lang(en) .gauntlet-stage .gx-signals {
+    display: flex;
+    column-gap: 8px;
+    padding-top: 3px;
+  }
+
+  :lang(en) .gauntlet-stage .gx-overdrive {
+    flex: 1 1 0;
+    min-width: min-content;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal {
+    flex: none;
+    grid-template-columns: auto;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal:first-child {
+    flex-grow: 1;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal svg {
+    display: none;
+  }
+
+  :lang(en) .gauntlet-stage .gx-streak {
+    flex: 0 1 auto;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  :lang(en) .gauntlet-stage .gx-streak > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Those took English from 58px under the bar to 3px over it; the column
+     over the hand gives 4px of each of its five 7px gaps under a rules line,
+     as a shorter phone does (the max-height: 800px block); 3px of each left
+     c45_stories 1px under the bar (2026-11-09). */
+  :lang(en) .gx-read:has(.gx-active-rules) {
+    gap: 3px;
+  }
+
+  /* Heat, the band, Safe and Heartbeat: 356px at 8px apart, one line at 4. */
+  :lang(en) .gx-gauge-read {
+    gap: 4px;
+  }
+
+  :lang(en) .gx-gauge-read .gx-scout {
+    padding-inline: 4px;
   }
 }
 
@@ -2762,12 +3103,6 @@
   .gx-hand {
     gap: 12px;
     grid-auto-rows: clamp(118px, calc((100dvh - 330px) / 2), 232px);
-  }
-
-  .gx-hand.hand-3,
-  .gx-hand.hand-5,
-  .gx-hand.hand-6 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .gauntlet-stage .gx-card {
@@ -3082,6 +3417,20 @@
   left: auto;
 }
 
+/* B2's link mark on a card that makes one, at that end too (a card that makes
+   a link is never the wild card), in the burn chip's colour; on the bottom
+   edge when the season before's pick has the top. */
+.gx-card-type.gx-card-link {
+  right: 9px;
+  left: auto;
+  color: var(--c-danger-81);
+}
+
+.gx-card-name ~ .gx-card-type.gx-card-link {
+  top: auto;
+  bottom: -8px;
+}
+
 .gx-streak i,
 .gx-card-type i {
   font-style: normal;
@@ -3112,14 +3461,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gx-table {
-    transform: none;
-  }
-
   .gx-breach,
   .gx-slam-bust strong,
   .gx-slam-cashed strong,
-  .gx-cash.is-holding::after,
   .gx-slam-bust::before,
   .gx-slam-bust::after {
     animation: none;
@@ -3129,11 +3473,18 @@
     background: var(--c-gx-heat-a55);
   }
 
+  .gx-table,
   .gx-pot-value,
   .gx-bpm svg,
-  .gauntlet-stage .gx-card,
   .gauntlet-stage .gx-card.selected {
     transform: none;
+  }
+
+  /* The held 확정's gauge is the one motion a hold is read from: it keeps its
+     0.6s over responsive.css's 1ms for every transition. A line filling once,
+     linearly, is a progress bar, not a flourish. */
+  .gx-hold[data-phase="holding"] {
+    transition-duration: 0.6s !important;
   }
 }
 

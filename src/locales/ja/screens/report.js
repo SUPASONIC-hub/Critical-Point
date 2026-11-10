@@ -62,6 +62,7 @@ export default {
     retry: "リモート保存を再試行",
     waiting: "接続待ち",
     copyCode: "コードをコピー",
+    errorRow: "{scene} エラーログ",
   },
   badges: {
     title: "獲得バッジ",

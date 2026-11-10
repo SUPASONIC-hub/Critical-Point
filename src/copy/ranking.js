@@ -10,7 +10,7 @@ import { localizeTables } from "../locale.js";
 const rankingCopy = {
   back: "브리핑으로 돌아가기",
   title: "어디서 생각이 가장 크게 확장됐는가",
-  intro: "완료된 사건의 버스트 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라, 압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.",
+  intro: "버스트 점수와 랭크를 비교합니다. 시즌 기록은 사건 평균 점수입니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라, 압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.",
   retry: "다시 불러오기",
   makeRecord: "내 기록 만들기",
   tableLabel: "플레이어 랭킹",
@@ -32,7 +32,17 @@ const rankingCopy = {
   tableTime: "테이블 시간 ×{value}",
   story: "스토리 모드",
   collapsed: "붕괴한 시즌",
+  // A row the server's nightly checker has not worked out again yet (public_rankings.rechecked, 보안 점검 M2).
+  pendingCheck: "확인 중",
+  pendingCheckTitle: "서버가 아직 이 점수를 다시 계산해 보지 않은 기록입니다. 하루에 한 번 확인합니다.",
+  // This device's best of the table before (src/personalBests.js), its own line under the table.
+  pastBest: "지난 판(v{version})의 내 최고 {score}점 · {rank}",
   footnote: "다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.",
+  // D2 hall of fame (src/hallOfFameBadges.js): the footnote's second sentence and a row's badge.
+  hallFootnote: "검사를 통과한 판별 1~3위는 실행 번호로 명예의 전당에 남습니다.",
+  hallBadge: "명예의 전당 · {board} {place}위",
+  hallMainBoard: "본 판",
+  hallProvisional: " (잠정)",
 };
 export default rankingCopy;
 

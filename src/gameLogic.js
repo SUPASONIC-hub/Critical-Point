@@ -1,7 +1,9 @@
 import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
-import { ENDING_GATES } from "./gameConstants.js";
+// Read through a namespace: the import-name budget (check-runtime-budget.mjs) is full at 20.
+import * as gameConstants from "./gameConstants.js";
 import * as seasonStanding from "./seasonStanding.js";
+import * as scoring from "./seasonScore.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import observerCopy from "./copy/observer.js";
 import judgmentCopy from "./copy/judgment.js";
@@ -18,6 +20,7 @@ export {
   getSuspenseEvent,
   getSuspenseState,
 } from "./riskLogic.js";
+export { getCognitionSpread } from "./seasonScore.js";
 
 export function buildNarrativeSpine({
   caseObjective = "",
@@ -90,11 +93,7 @@ export function createDecisionForecast(choice = {}, resources = {}) {
  * position you are holding. Ties read as neither.
  */
 function getDecisionLean(entry = {}) {
-  const effect = entry.effect ?? {};
-  const people = (effect.trust ?? 0) - (effect.humanCost ?? 0);
-  const position = (effect.capital ?? 0) + (effect.time ?? 0);
-  if (people === position) return 0;
-  return people > position ? 1 : -1;
+  return gameConstants.getEffectLean(entry.effect ?? {});
 }
 
 /**
@@ -128,29 +127,30 @@ function getConsistencyScore(entries = []) {
 }
 
 /**
- * How evenly the run moved between the four ways of thinking.
- *
- * This used to be `types * 14 + shifts * 10 + length * 4`, which any run of a
- * dozen decisions filled to the cap: measured across five fixed strategies it
- * returned 100 every time, so a fifth of the score could not separate two runs.
- * Normalised entropy answers the same question and actually varies -- one
- * repeated approach lands near 0, an even spread across all four near 100.
+ * The share of a briefing's reading clock a page has to stay up for a quick
+ * pick on the table that follows to count as a decision made while reading
+ * (2026-11-03, the user's answer 1). The clock is sized at 10 Korean
+ * characters a second plus 6 to settle (gauntletEngine.js, the briefing's clock);
+ * 70% of it is a reader going about 1.4 times that pace -- fast, but still
+ * reading -- while a page opened at a glance stays well under it. A page the
+ * clock opened by itself was up for all of it.
  */
-export function getCognitionSpread(types = []) {
-  if (types.length === 0) return 0;
-  const counts = new Map();
-  for (const type of types) counts.set(type, (counts.get(type) ?? 0) + 1);
-  if (counts.size < 2) return 0;
-  const entropy = [...counts.values()].reduce((sum, count) => {
-    const share = count / types.length;
-    return sum - share * Math.log(share);
-  }, 0);
-  const ceiling = Math.log(Math.min(counts.size, types.length));
-  const evenness = ceiling > 0 ? entropy / ceiling : 0;
-  // A run that only ever used two of the four ways cannot reach the top, even
-  // if it alternated them perfectly.
-  const reach = counts.size / 4;
-  return Math.round(clamp(evenness * reach * 100, 0, 100));
+export const READ_THROUGH_SHARE = 0.7;
+/** Where 생각 리듬's steady band starts: 8 to 28 seconds of deciding. */
+const RHYTHM_STEADY_SECONDS = 8;
+
+/**
+ * Whether a decision's table was opened after its briefing had been read
+ * (`readSec`, the seconds the page was up and visible, held or not, against
+ * `readClock`, the clock the page had; useChoiceCommit takes both from
+ * state/readingTally.js). A decision logged before 2026-11-03, a window
+ * resumed from a save without its page, or a scene with no briefing carries
+ * neither and is read as it always was: not read through.
+ */
+export function readThrough(entry = {}) {
+  const clock = Number(entry.readClock);
+  const seconds = Number(entry.readSec);
+  return clock > 0 && Number.isFinite(seconds) && seconds >= clock * READ_THROUGH_SHARE;
 }
 
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
@@ -165,6 +165,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
       pressureAdaptScore: 0,
       reflectionScore: 0,
       consistencyScore: 0,
+      readingScore: 0,
       exploitPenalty: 0,
       momentumScore: 0,
       burstScore: 0,
@@ -188,23 +189,26 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const finalRiskPressure = scoredEntries.at(-1)?.resourcesAfter
     ? getRiskPressure(scoredEntries.at(-1).resourcesAfter)
     : fallbackRiskPressure;
+  // A quick pick after a briefing read through (readThrough) thought on the
+  // page, not on the table: it counts as the bottom of the steady band, never
+  // below it. A slower pick is its own table time either way.
   const responseTimes = scoredEntries
-    .map((entry) => Number(entry.responseTimeSec))
+    .map((entry) => {
+      const seconds = Number(entry.responseTimeSec);
+      return Number.isFinite(seconds) && seconds > 0 && readThrough(entry) ? Math.max(seconds, RHYTHM_STEADY_SECONDS) : seconds;
+    })
     .filter((value) => Number.isFinite(value) && value > 0);
   const rhythmSamples = responseTimes.length > 0 ? responseTimes : [0];
   const rhythmScore = Math.round(
     rhythmSamples.reduce((sum, seconds) => {
-      if (seconds >= 8 && seconds <= 28) return sum + 100;
+      if (seconds >= RHYTHM_STEADY_SECONDS && seconds <= 28) return sum + 100;
       if (seconds >= 4 && seconds < 8) return sum + 70;
       if (seconds > 28 && seconds <= 45) return sum + 78 - (seconds - 28) * 1.8;
       if (seconds > 45) return sum + 38;
       return sum + 24;
     }, 0) / rhythmSamples.length,
   );
-  const cognitionTypes = scoredEntries
-    .map((entry) => Object.entries(entry.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0])
-    .filter(Boolean);
-  const cognitionScore = getCognitionSpread(cognitionTypes);
+  const cognitionScore = scoring.getCognitionSpread(scoring.getCognitionMix(scoredEntries));
   const riskDeltas = scoredEntries.map((entry) => {
     if (entry.resourcesBefore && entry.resourcesAfter) {
       return getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore);
@@ -238,22 +242,31 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     clamp(reframeCount * 10 + routesOpened * 12 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
   );
   // Scored decisions only: a TABLE RECORD entry a slot restore carried in has no
-  // response time, and each one used to read as a two-second click.
+  // response time, and each one used to read as a two-second click. A pick
+  // inside two seconds of a table opened after its briefing was read through
+  // is not a snap (2026-11-03): the thinking was done on the page.
   const exploitPenalty = Math.min(
     18,
-    scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
+    scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe && !readThrough(entry)).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
+  // 판 읽기 (C-1(1)): the vault the case's bare hand kept against a hand that
+  // sees the wall on the same boards, the C-12 index the case close prints.
+  // Read off the whole log, as the close reads it.
+  const readingScore = scoring.getReadingScore(entries);
   // What the score is for: holding a line under pressure. Response rhythm still
   // counts, but at a weight that no longer makes a stopwatch the best strategy.
+  // 판 읽기 takes 0.2 and the six axes before it keep their ratios at 0.8 of
+  // what they were (0.28 / 0.2 / 0.2 / 0.16 / 0.08 / 0.08; 사용자 2026-10-25).
   const momentumScore = Math.round(
     clamp(
-      consistencyScore * 0.28 +
-        cognitionScore * 0.2 +
-        reflectionScore * 0.2 +
-        pressureAdaptScore * 0.16 +
-        rhythmScore * 0.08 +
-        challengeSupportScore * 0.08 -
+      consistencyScore * 0.224 +
+        cognitionScore * 0.16 +
+        reflectionScore * 0.16 +
+        pressureAdaptScore * 0.128 +
+        rhythmScore * 0.064 +
+        challengeSupportScore * 0.064 +
+        readingScore * 0.2 -
         exploitPenalty,
       0,
       100,
@@ -270,11 +283,9 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     pressureAdaptScore,
     reflectionScore,
     consistencyScore,
+    readingScore,
     exploitPenalty,
-    momentumScore,
-    burstScore: momentumScore,
-    momentumTier: momentumScore >= 78 ? "BURST" : momentumScore >= 58 ? "FLOW" : momentumScore >= 36 ? "READY" : "BUILDING",
-    rank: momentumScore >= 88 ? "S" : momentumScore >= 72 ? "A" : momentumScore >= 52 ? "B" : "C",
+    ...scoring.scoreMarks(momentumScore),
   };
 }
 
@@ -306,7 +317,9 @@ export function getObserverTag(entry = {}) {
   if (humanCostDelta > 0) {
     return { id: "sacrifice", ...observerCopy.tags.sacrifice };
   }
-  if (Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) {
+  // A quick safe pick after a briefing read through is not a sample of
+  // compliance either (2026-11-03, the user's answer 1 B): the same line as the snap.
+  if (Number(entry.responseTimeSec) <= 2 && riskDelta <= 0 && !readThrough(entry)) {
     return { id: "compliance", ...observerCopy.tags.compliance };
   }
   if (riskDelta > 6) {
@@ -377,7 +390,7 @@ export function getObservationLedger(entries = []) {
         : entry.challenge?.riskDelta ?? 0;
       const choiceText = choiceWords(entry);
       const next = { ...ledger };
-      if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
+      if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0 && !readThrough(entry)) next.compliance += 1;
       if (entry.reframe || riskDelta > 6) next.defiance += 1;
       if (OPACITY_WORDS.test(choiceText)) next.opacity += 1;
       const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
@@ -513,7 +526,7 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
 // bar: no bust and a x16 cash (heat 44 at DOUBLING_HEAT 11), a logic streak of
 // 24, or 19,500 a case banked -- between the best blind (15.4k) and heartbeat
 // (24.6k) play check:pressure measures at nine windows a case (16,000 at 7).
-const { clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = ENDING_GATES; // the collapse gates are read in seasonStanding.js
+const { clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = gameConstants.ENDING_GATES; // the collapse gates are read in seasonStanding.js
 const CLUE_RATE_SLACK_BAR = 0.8;
 const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
 const QUIET_SUSTAINED_PRESSURE = 12; // as it is when cases typically peak under 12 (p25 13)
@@ -529,6 +542,8 @@ const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, S
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
+// Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
+export { VAULT_SLACK_PER_CASE };
 // The streak that opens the slack door: the p90 of the seasons check:endings
 // replays (season best 1 / 3 / 7 / 24 / 109 at min / p10 / p50 / p90 / max; a
 // random hand never passes 8, one that plays for it reaches 40 one season in
@@ -676,10 +691,14 @@ export function getEndingVariant({
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
   const recordsOpen = clueRate >= (slack ? CLUE_RATE_SLACK_BAR : CLUE_RATE_BAR);
+  const reform = recordsOpen && legitimacy >= REFORM_LEGITIMACY;
   if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= HUMAN_RECORD_CLUE_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
+  // As burning closes the record endings, answering 개혁 opens the one named for it: EVIDENCE REFORM before
+  // OPEN OVERSIGHT, which took nearly every reform season (5.3% of 600, 2026-11-05, note C2). The gates are the same.
+  if (finale === "control" && reform) return ENDINGS["evidence-reform"];
   if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];
   if (cold) return ENDINGS["cold-justice"];
-  if (recordsOpen && legitimacy >= REFORM_LEGITIMACY) return ENDINGS["evidence-reform"];
+  if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS["profitable-silence"];
   if (pact) return ENDINGS["field-pact"];
   if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE) return ENDINGS["quiet-cover"];
@@ -949,7 +968,9 @@ export function createLogicRecord(entries = []) {
     record.peak = Math.max(record.peak, tier);
     record.best = Math.max(record.best, Number(logic.streak) || 0);
     if (LOGIC_RECORD_KEYS[logic.move]) record[LOGIC_RECORD_KEYS[logic.move]] += 1;
-    if (typeof logic.type === "string") {
+    // The direction held (사람 or 자리, C-3); an entry from before it holds a
+    // thinking type, read the same way. A card that leaned neither way is none.
+    if (typeof logic.type === "string" && logic.type !== "even") {
       picked[logic.type] = (picked[logic.type] ?? 0) + 1;
       if (!record.top || picked[logic.type] > record.top[1]) record.top = [logic.type, picked[logic.type]];
     }
@@ -991,6 +1012,7 @@ export function createCaseSummary(
   const stats = getGameplayStats(entries, getRiskPressure(resources));
   const assistTime = entries.reduce((slowest, entry) => Math.max(slowest, Number(entry?.assistTime) || 1), 1);
   const logicRecord = replayOf ? replayOf.logicRecord : createLogicRecord(entries);
+  const firstBurstScore = replayOf ? Number(replayOf.firstBurstScore ?? replayOf.burstScore) : NaN; // the season's score counts it (seasonScore.js)
   const summary = {
     schemaVersion,
     caseId: entries.find((entry) => entry?.caseId)?.caseId ?? null,
@@ -1006,11 +1028,17 @@ export function createCaseSummary(
     pressureAdaptScore: stats.pressureAdaptScore,
     reflectionScore: stats.reflectionScore,
     consistencyScore: stats.consistencyScore,
+    readingScore: stats.readingScore,
     exploitPenalty: stats.exploitPenalty,
     burstScore: stats.burstScore,
     momentumScore: stats.momentumScore,
     momentumTier: stats.momentumTier,
     rank: stats.rank,
+    ...(Number.isFinite(firstBurstScore) ? { firstBurstScore } : {}),
+    // Decisions by the way of thinking each leaned on: the season's 관점 전환 is
+    // read off them all (getSeasonScore), and a replay keeps its first close's.
+    cognitionMix: scoring.getCognitionMix(entries),
+    ...(replayOf ? { firstCognitionMix: replayOf.firstCognitionMix ?? replayOf.cognitionMix ?? null } : {}),
     // The slowest table clock any decision of the case was played on, when the
     // comfort setting slowed it; absent on a case played at the table's pace.
     ...(assistTime > 1 ? { assistTime } : {}),

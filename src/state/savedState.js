@@ -201,8 +201,13 @@ function normalizeSavedLogEntry(entry) {
     reportSilentFailure("log-entry-drop", { nodeId, reason: "unknown-node" });
     return null;
   }
+  // The briefing read against its clock (gameLogic's readThrough): both numbers
+  // or neither, so a save edited to carry half of it reads as not read through.
+  const { readSec, readClock, ...rest } = entry;
+  const briefingRead = Number.isFinite(readSec) && readSec >= 0 && Number.isFinite(readClock) && readClock > 0 ? { readSec, readClock } : {};
   return {
-    ...entry,
+    ...rest,
+    ...briefingRead,
     nodeId,
     title: typeof entry.title === "string" ? entry.title : nodes[nodeId]?.title ?? "",
     choiceId: typeof entry.choiceId === "string" ? entry.choiceId : "",

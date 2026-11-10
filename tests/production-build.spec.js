@@ -1,4 +1,4 @@
-import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { BACKEND_ORIGIN, expect, guardNetwork, test } from "./helpers/network.js";
 import { CHUNK_RELOAD_SESSION_KEY } from "../src/appConfig.js";
 import { cashStakedCard, collectRuntimeErrors, dismissProtocolBreach, resumeSavedRun } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
@@ -103,7 +103,10 @@ test("a saved run plays to its report, reports it, and hands over to the next ca
   expect(row, "a playtest_sessions row for case01").toBeTruthy();
   expect(row.run_id).toBe("e2e-seeded-run");
   expect(typeof row.event_id).toBe("string");
-  expect(JSON.stringify(row)).not.toContain("E2E");
+  // The seeded player is named "E2E" (helpers/seededSave.js) and the row carries
+  // no name. The session code is eight random capitals and digits, which spelled
+  // "B15E2E20" once (2026-10-21), so it is left out of the look.
+  expect(JSON.stringify({ ...row, session_code: undefined })).not.toContain("E2E");
 
   // The hand-over: the next case opens on a table that can be played.
   await page.locator(".next-case-panel button").click();
@@ -247,4 +250,90 @@ test(`${what} that cannot be fetched reloads once, then offers 새로고침 and 
   await expect(page.locator(".game-shell")).toBeVisible();
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(save.nodeId);
 });
+}
+
+/*
+ * The static shell (scripts/static-shell.mjs): before its script has run, the
+ * page already shows the intro's frame -- the key visual, the wordmark and the
+ * start button's place -- and the intro React renders over it stands where the
+ * shell stood. Blocking the page's scripts is how "before" is held still.
+ *
+ * SHELL_DRIFT_PX is how far the wordmark and the start row may move down or up
+ * when the intro's words come in. Since decision 13 (1) (11-06) the shell lays
+ * those words out unseen in the page's language and the art's box is the
+ * viewport's, so on Windows every page and size measured 0px for the art, the
+ * wordmark and the start row at the default text size; the bounds are the
+ * first cut's, not widened.
+ */
+const SHELL_DRIFT_PX = 24;
+const SHELL_PAGES = ["/", "/en/", "/ja/"];
+const SHELL_VIEWPORTS = [
+  { width: 360, height: 740 },
+  { width: 390, height: 844 },
+  { width: 1280, height: 720 },
+  { width: 1366, height: 900 },
+];
+const blockScripts = (page) => page.route("**/assets/*.js", (route) => route.abort());
+const boxesOf = (page) =>
+  page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector)?.getBoundingClientRect();
+      return rect ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height } : null;
+    };
+    // The figure, not its img: the img drifts on a 28-second animation.
+    return { art: box(".intro-visual"), wordmark: box("h1.game-wordmark"), start: box(".intro-launch button") };
+  });
+
+for (const path of SHELL_PAGES) {
+  test(`${path} shows the intro's frame before its script runs`, { tag: "@prod" }, async ({ page }) => {
+    await blockScripts(page);
+    await page.goto(path);
+    const shell = page.locator("[data-static-shell]");
+    await expect(shell).toHaveCount(1);
+    await expect(shell.locator("h1.game-wordmark")).toBeVisible();
+    await expect(shell.locator(".intro-launch button")).toBeVisible();
+    const art = shell.locator(".intro-visual img");
+    await expect(art).toBeVisible();
+    await expect.poll(() => art.evaluate((img) => img.complete && img.naturalWidth > 0), { message: "the key visual is painted" }).toBe(true);
+    await expect(page.getByTestId("start-first-case")).toHaveCount(0);
+  });
+}
+
+for (const path of SHELL_PAGES) for (const viewport of SHELL_VIEWPORTS) {
+  test(`${path} at ${viewport.width}x${viewport.height}: the intro replaces the shell where it stood`, { tag: "@prod" }, async ({ browser, page, baseURL, userAgent, deviceScaleFactor, isMobile, hasTouch, locale }) => {
+    // The shell is measured in a context of its own. WebKit goes on failing an
+    // import it has seen fail, across loads and without asking the server (see
+    // the chunk test above, 2026-10-05), so a page whose scripts were refused
+    // once never runs them on the second goto; Chromium does. A player never
+    // has the scripts refused, so the live load gets a context that has not.
+    const shellContext = await browser.newContext({ baseURL, userAgent, deviceScaleFactor, isMobile, hasTouch, locale, viewport, reducedMotion: "reduce" });
+    let before;
+    try {
+      await guardNetwork(shellContext);
+      const shellPage = await shellContext.newPage();
+      await blockScripts(shellPage);
+      await shellPage.goto(path);
+      await expect(shellPage.locator("[data-static-shell] h1.game-wordmark")).toBeVisible();
+      before = await boxesOf(shellPage);
+    } finally {
+      await shellContext.close();
+    }
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize(viewport);
+    await page.goto(path);
+    await expect(page.getByTestId("start-first-case")).toBeVisible();
+    await expect(page.locator("[data-static-shell]"), "the first render replaced the shell").toHaveCount(0);
+    const after = await boxesOf(page);
+
+    for (const key of ["x", "y", "width", "height"]) {
+      expect(Math.abs(after.art[key] - before.art[key]), `the key visual's ${key}`).toBeLessThanOrEqual(2);
+    }
+    expect(Math.abs(after.wordmark.x - before.wordmark.x), "the wordmark's left edge").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.wordmark.width - before.wordmark.width), "the wordmark's width").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.wordmark.y - before.wordmark.y), `the wordmark moved ${after.wordmark.y - before.wordmark.y}px`).toBeLessThanOrEqual(SHELL_DRIFT_PX);
+    expect(Math.abs(after.start.x - before.start.x), "the start button's left edge").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.start.height - before.start.height), "the start button's height").toBeLessThanOrEqual(2);
+    expect(Math.abs(after.start.y - before.start.y), `the start row moved ${after.start.y - before.start.y}px`).toBeLessThanOrEqual(SHELL_DRIFT_PX * 4);
+  });
 }

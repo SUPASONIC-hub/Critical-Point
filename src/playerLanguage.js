@@ -1,3 +1,5 @@
+import { LANG, SOURCE_LOCALE } from "./locale.js";
+
 /** @type {Array<[RegExp, string]>} */
 const phraseReplacements = [
   [/\bPLAYABLE\b/gi, "시작 가능"],
@@ -47,9 +49,20 @@ const phraseReplacements = [
   [/\bFATIGUE\b/gi, "피로"],
 ];
 
-export function simplifyPlayerText(value = "") {
+/**
+ * The labels above in the player's Korean, for a Korean page.
+ *
+ * The table was written for the Korean screen, where a case card or a phase
+ * still carried an English UI word. On a page in another language it has
+ * nothing to do: the text is already in that language, and the patterns match
+ * any case, so an English case card's "Trust" came out as 믿음 and "this time"
+ * as "this 시간" (Linux measurement, 2026-11-04). Anything but Korean is handed
+ * back as it is. `lang` is the page's language unless a test names one.
+ */
+export function simplifyPlayerText(value = "", lang = LANG) {
   if (value === null || value === undefined) return "";
   const text = String(value);
+  if (lang !== SOURCE_LOCALE) return text;
   // Authored Korean copy may contain English product terms; never rewrite prose globally.
   if (/[\uAC00-\uD7A3]/.test(text)) return text;
   return phraseReplacements.reduce((current, [pattern, replacement]) => current.replace(pattern, replacement), text);

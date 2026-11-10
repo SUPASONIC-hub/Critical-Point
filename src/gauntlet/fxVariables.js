@@ -26,8 +26,14 @@ export const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
  * the funeral, 47 the 추석 kitchen. Their tables are quiet -- GauntletFx plays
  * them as the comfort setting does, without the heartbeat or the drone -- and
  * are otherwise the same tables: no rule reads this.
+ *
+ * C-10 (user, 2026-10-25, choice 1) adds the first case of each of B-11's
+ * eight acts (actCardGate.js `ACT_START_CASES`, written out here so the frame
+ * loop's chunk does not take the act card's; a unit test holds the two
+ * together): an act opens at rest, after the last one closed on 「고점 판」
+ * (tableUnlocks.js `PEAK_CASES`).
  */
-export const QUIET_TABLE_CASES = Object.freeze(["case42", "case45", "case47"]);
+export const QUIET_TABLE_CASES = Object.freeze(["case01", "case08", "case13", "case19", "case25", "case31", "case37", "case42", "case43", "case45", "case47"]);
 export const isQuietTable = (caseId) => QUIET_TABLE_CASES.includes(caseId);
 
 /**
@@ -73,10 +79,17 @@ export const fxTier = (win, live, reducedMotion, calm) => {
 export const RATE_REST_BPM = 60;
 export const RATE_TOP_BPM = 190;
 export const RATE_SWEEP_MS = 2000;
-export const fxRateTarget = (bpm) => Math.min(1, Math.max(0, ((Number(bpm) || 0) - RATE_REST_BPM) / (RATE_TOP_BPM - RATE_REST_BPM)));
-/** One frame of the drift. A negative `rate` is a table that has not drawn yet, which starts on the pulse. */
-export function fxRateStep(rate, target, deltaMs) {
-  if (rate < 0) return target;
+/**
+ * A bust stops the heart (A2, 2026-11-05): the target is dark, and the step
+ * below lands there on that frame instead of drifting down over the sweep,
+ * so the tick light goes out as the slam lands and the number reads "—"
+ * (tableMeters.js). Neither setting changes this: a stopped heart is a fact.
+ */
+export const fxRateTarget = (bpm, status = "live") =>
+  status === "bust" ? 0 : Math.min(1, Math.max(0, ((Number(bpm) || 0) - RATE_REST_BPM) / (RATE_TOP_BPM - RATE_REST_BPM)));
+/** One frame of the drift. A negative `rate` is a table that has not drawn yet, which starts on the pulse; a bust stops it where it is told. */
+export function fxRateStep(rate, target, deltaMs, status = "live") {
+  if (rate < 0 || status === "bust") return target;
   const reach = Math.max(0, deltaMs) / RATE_SWEEP_MS;
   return Math.abs(target - rate) <= reach ? target : rate + Math.sign(target - rate) * reach;
 }
