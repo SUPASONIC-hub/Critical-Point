@@ -4,15 +4,19 @@ import { clickElement, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { clearGameStorage, readJsonStorage, readStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
- * B-3(1) 냉정한 오프닝, a draft behind COLD_OPENING_ENABLED (src/state/coldOpening.js).
- * The switch is off, so these play it the way a dev or e2e build can turn it
- * on for one visit: `?coldOpening=1`. Without it the start button is the one
- * every other spec presses.
+ * B-3(1) 냉정한 오프닝, behind COLD_OPENING_ENABLED (src/coldOpeningSwitch.js),
+ * on since 2026-11-10. Every other spec starts as a device that has seen the
+ * page (the fixture's `coldOpeningSeen`, tests/helpers/network.js); these start
+ * as one that has not. `?coldOpening=1`, the dev and e2e builds' way to play
+ * the page while the switch is off, is used where a test means the page
+ * whatever the switch says (the timed walk).
  */
+test.use({ coldOpeningSeen: false });
 
-async function freshIntro(page, search) {
+async function freshIntro(page, search, { seen = false } = {}) {
   await page.goto(`/${search}`);
   await clearGameStorage(page);
+  if (seen) await page.evaluate((key) => localStorage.setItem(key, "1"), COLD_OPENING_SEEN_KEY);
   await page.reload();
   await expect(page.getByTestId("start-first-case")).toBeEnabled({ timeout: TRANSITION_TIMEOUT_MS });
 }
@@ -24,16 +28,15 @@ async function expectFirstScene(page) {
   expect(save?.nodeId).toBe("p1_start");
 }
 
-test("with the switch off, 시작 opens the prologue's first scene with no page before it", async ({ page }) => {
-  await freshIntro(page, "?debug=1");
+test("a device that has seen the page goes straight to the prologue's first scene", async ({ page }) => {
+  await freshIntro(page, "?debug=1", { seen: true });
   await clickElement(page.getByTestId("start-first-case"), "start first case");
   await expectFirstScene(page);
   await expect(page.getByTestId("cold-opening")).toHaveCount(0);
-  expect(await readStorage(page, COLD_OPENING_SEEN_KEY)).toBeNull();
 });
 
-test("turned on, a first season reads four panels, then 「3년 전」 opens the same first scene", async ({ page }) => {
-  await freshIntro(page, "?debug=1&coldOpening=1");
+test("a first season reads four panels, then 「3년 전」 opens the same first scene", async ({ page }) => {
+  await freshIntro(page, "?debug=1");
   await clickElement(page.getByTestId("start-first-case"), "start first case");
   const opening = page.getByTestId("cold-opening");
   await expect(opening).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
@@ -52,8 +55,8 @@ test("turned on, a first season reads four panels, then 「3년 전」 opens the
   expect(await readStorage(page, COLD_OPENING_SEEN_KEY)).toBe("1");
 });
 
-test("turned on, 건너뛰기 goes straight on, and a device that has seen the page is not shown it again", async ({ page }) => {
-  await freshIntro(page, "?debug=1&coldOpening=1");
+test("건너뛰기 goes straight on, and a device that has seen the page is not shown it again", async ({ page }) => {
+  await freshIntro(page, "?debug=1");
   await clickElement(page.getByTestId("start-first-case"), "start first case");
   await clickElement(page.getByTestId("cold-opening-skip"), "cold opening skip");
   await expectFirstScene(page);
@@ -82,7 +85,7 @@ test("turned on, 건너뛰기 goes straight on, and a device that has seen the p
 const LIVE_TABLE = ".choices .choice:not([aria-disabled='true'])";
 
 async function timeToLiveTable(page, { coldOpening, patient }) {
-  await freshIntro(page, coldOpening ? "?debug=1&coldOpening=1" : "?debug=1");
+  await freshIntro(page, coldOpening ? "?debug=1&coldOpening=1" : "?debug=1", { seen: !coldOpening });
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
   await page.evaluate((gates) => {
     const times = { clickedAt: null, liveAt: null };
