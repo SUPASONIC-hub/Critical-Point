@@ -2739,6 +2739,17 @@
     line-height: 1.25;
   }
 
+  /* The relics take the run's line when they fit beside it. Late in a season
+     the bank is Stake and Vault on one line and the run's line on a second,
+     and the relics' own third line put an overclocked five-card hand 18px
+     under the action bar in Korean and 9px in Japanese (Linux, 360x740, max
+     bank, c6_desk; 2026-11-09). The run's line is 158 to 174px there and five
+     relics 122, so both fit the 310px row; where they do not (a cap bank in
+     English) the relics wrap to their own line as before. */
+  .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
+  }
+
   /* The signals row in English and Japanese: the logic streak's line is
      longer than the Korean one, and the shares of 1.25 and 1 left to the
      overclock and LOCK gave LOCK less than its own width, so it ran under the
@@ -2899,15 +2910,30 @@
     line-height: 1.2;
   }
 
+  /* The signals as at 360px in English: LOCK at its own width without its
+     icon, the chain's line the one cut. With the 1.25 / 1 shares STRIKE had
+     68px of its 81 once the chain was lit and ran 13px under the streak
+     (Linux, overclocked board, 105 scenes of case01-21; 2026-11-09). */
   :lang(en) .gauntlet-stage .gx-signals {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 8px;
     padding-top: 3px;
   }
 
+  :lang(en) .gauntlet-stage .gx-focus-signal {
+    grid-template-columns: auto;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal svg {
+    display: none;
+  }
+
   /* Those took English from 58px under the bar to 3px over it; the column
-     over the hand gives 3px of each of its five 7px gaps under a rules line,
-     as a shorter phone does (the max-height: 800px block). */
+     over the hand gives 4px of each of its five 7px gaps under a rules line,
+     as a shorter phone does (the max-height: 800px block); 3px of each left
+     c45_stories 1px under the bar (2026-11-09). */
   :lang(en) .gx-read:has(.gx-active-rules) {
-    gap: 4px;
+    gap: 3px;
   }
 
   /* Heat, the band, Safe and Heartbeat: 356px at 8px apart, one line at 4. */

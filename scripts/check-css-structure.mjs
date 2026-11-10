@@ -342,7 +342,9 @@ const fileBudgets = {
   // 3035 / 59047 -> 3035 / 59146 on 2026-11-09, hand-fit-2px (#476), measured: Japanese HUD and scene lines at 1.2 on a 360px phone (Noto CJK's normal line put nine overclocked five-card hands 6px under the bar).
   // 3035 / 59146 -> 3095 / 60291 on 2026-11-09, phone-390-fit, measured: a 361-390px block giving English and Japanese the 360px fits (overclocked five-card hands up to 58px under the bar on a 390x844 phone, Linux fonts) and the English streak's ellipsis at 360px.
   // 3095 / 60291 -> 3097 / 60365 on 2026-11-09, a32-411-fit, measured: the 360px HUD air (2px rows and paddings, a 30px clock, 18px pills) moved out of the 360px block into one block shared with phones up to 480 wide and 800 tall (a Galaxy A32, 411x780: nineteen five-card hands 9px under the bar at a pot of 99,999).
-  "play.css": { lines: 3097, bytes: 60365 },
+  // 3095 / 60291 -> 3109 / 60592 on 2026-11-09, phone-heavy-bank, measured: the relics beside the run's line at 360px (an overclocked board with a max bank, Korean 18px under the bar) and the English signals' 360px columns at 361-390px.
+  // 3097 / 60365 (a32-411-fit, #493) and 3109 / 60592 (phone-heavy-bank) -> 3111 / 60666 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493), measured: both, the English signals' columns now in the 361-480px block.
+  "play.css": { lines: 3111, bytes: 60666 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

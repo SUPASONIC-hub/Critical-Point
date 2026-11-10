@@ -264,6 +264,25 @@ const HEAVY_BOARD = { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics
 const STAKED_CASES = ["case01", "case05", "final"];
 const STAKED_UNDER_THE_BAR = { c1_start_hold: 14 };
 
+/**
+ * The same board late in a season: the bank row at the max table's numbers
+ * (LAYOUT_BANK above), on the 360x740 phone. Measured apart, each fit; together
+ * the bank's second line on the heavy board put the last card of a five-card
+ * hand 18px under the action bar in Korean and 9px in Japanese (Linux, c6_desk,
+ * 2026-11-09). With the chain lit by the streak the signals row is held too,
+ * on both phones: at 390px the English STRIKE was squeezed to 68px of its 81.
+ * The visit is a fourth load a scene, so a case's time limit is 15 minutes,
+ * not 10 (case17 took 5.7 on Windows with it; the later cases load more).
+ */
+const HEAVY_BANK_BOARD = { ...HEAVY_BOARD, runPot: BANK_TABLES.max.runPot, streak: BANK_TABLES.max.streak, run: { ...BANK_TABLES.max, handVault: 0, runHand: 0 } };
+
+function checkHeavyRow(row, failures) {
+  const where = `${row.nodeId} @ ${row.name}${row.bankHeight === undefined ? "" : ", max bank"}`;
+  if (row.lastCard > row.actionsTop) failures.push(`${where}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
+  if (row.widest > row.innerWidth + 1) failures.push(`${where}: ${row.widest - row.innerWidth}px wider than the screen`);
+  if (row.signals?.overlap > 0) failures.push(`${where}: the signals row runs ${row.signals.overlap}px into itself (${row.signals.text.join(" | ")})`);
+}
+
 function fullestScenes(caseId) {
   const hands = nodeOrders[caseId].map((nodeId) => [nodeId, nodes[nodeId].choices.filter((choice) => choice.type !== "reframe").length]);
   const most = Math.max(...hands.map(([, count]) => count));
@@ -272,7 +291,7 @@ function fullestScenes(caseId) {
 
 for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`the fullest ${caseId} hands fit on an overclocked board with five relics @layout`, async ({ page }) => {
-    test.setTimeout(600_000);
+    test.setTimeout(900_000);
     const nodeIds = fullestScenes(caseId);
     expect(nodeIds.length, `${caseId} has no scene to measure`).toBeGreaterThan(0);
     const rows = [];
@@ -288,19 +307,27 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
         // plain board would otherwise be measured and called a pass.
         await expect(page.getByTestId("active-mutations"), `${nodeId} @ ${name}: the changed rules are on the table`).toBeVisible();
         await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip"),`${nodeId} @ ${name}: five relics are carried`).toHaveCount(FIVE_RELICS.length);
-        const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)) };
+        const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)), ...(name === "laptop" ? null : { signals: await measureSignals(page) }) };
         rows.push(row);
-        if (row.lastCard > row.actionsTop) failures.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
-        if (row.widest > row.innerWidth + 1) failures.push(`${nodeId} @ ${name}: ${row.widest - row.innerWidth}px wider than the screen`);
-        if (name !== "small phone" || !STAKED_CASES.includes(caseId)) continue;
-        const staked = await measureStakedTable(page);
-        expect(staked.length, `${nodeId} @ ${name}: no card could be staked`).toBeGreaterThan(0);
-        rows.push(...staked.map((stake) => ({ ...row, ...stake })));
-        const allowed = STAKED_UNDER_THE_BAR[nodeId] ?? 0;
-        for (const stake of staked) {
-          const under = stake.lastCard - stake.actionsTop;
-          if (under > allowed) failures.push(`${nodeId} @ ${name}, card ${stake.staked} staked: last card ${under}px under the action bar (${allowed}px allowed)`);
+        checkHeavyRow(row, failures);
+        if (name === "small phone" && STAKED_CASES.includes(caseId)) {
+          const staked = await measureStakedTable(page);
+          expect(staked.length, `${nodeId} @ ${name}: no card could be staked`).toBeGreaterThan(0);
+          rows.push(...staked.map((stake) => ({ ...row, ...stake })));
+          const allowed = STAKED_UNDER_THE_BAR[nodeId] ?? 0;
+          for (const stake of staked) {
+            const under = stake.lastCard - stake.actionsTop;
+            if (under > allowed) failures.push(`${nodeId} @ ${name}, card ${stake.staked} staked: last card ${under}px under the action bar (${allowed}px allowed)`);
+          }
         }
+        if (name !== "small phone") continue;
+        await openBrokenBoard(page, caseId, nodeId, HEAVY_BANK_BOARD);
+        await expectLayoutLang(page, `${nodeId} @ ${name}, max bank`);
+        await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
+        await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId} @ ${name}: the bank is the one written`).toHaveText(BANK_TABLES.max.runPot.toLocaleString("en-US"));
+        const banked = { caseId, nodeId, name, board: "overclocked, five relics, max bank", ...(await measureTable(page)), ...(await measureBank(page)), signals: await measureSignals(page) };
+        rows.push(banked);
+        checkHeavyRow(banked, failures);
       }
     }
     if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-heavy-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
