@@ -2885,6 +2885,16 @@
     line-height: 1.2;
   }
 
+  /* The relics beside the run's line, as at 360px, in Korean and Japanese: on
+     a 390x844 phone with a max bank they took a third line of the bank row and
+     put overclocked five-card hands up to 22px (Korean, c33_mother, 63 hands)
+     and 20px (Japanese, c7_paper) under the action bar (Linux, 2026-11-10).
+     English there was 4px over the bar and stays as it was. */
+  :lang(ko) .gauntlet-stage .gx-bank .gx-relics,
+  :lang(ja) .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
+  }
+
   :lang(en) .gx-card-label {
     font-size: 0.75rem;
     line-height: 1.25;

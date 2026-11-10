@@ -527,7 +527,8 @@ const budgets = [
   // 195,799 / 70,663 -> 195,799 / 70,661 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 195,795 / 70,657 in the e2e build, the plus 4.
   // 195,799 / 70,661 -> 195,799 / 70,667 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): no script changed; only the CSS file's name the entry carries. Measured 195,795 / 70,663 in the e2e build, the plus 4.
   // 195,799 / 70,667 -> 196,509 / 70,856 on 2026-11-10, music-tier-crackle over main e7ccb410: the bus's aligned dry path, the two tiers' bass past the drive and the music lab's before/after switch (musicScore.js CRACKLE_FIX_BEFORE). Measured 196,505 / 70,852 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_856 },
+  // 196,509 / 70,856 -> 196,509 / 70,858 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 #497): only the chunk names the entry imports. Measured 196,505 / 70,854 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_858 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -771,7 +772,8 @@ const budgets = [
   // 50,647 / 16,607 -> 50,701 / 16,611 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the case result's collapse-line verdict in the table's voice. Measured 50,697 / 16,607 in the e2e build, the plus 4.
   // 50,701 / 16,611 -> 50,701 / 16,608 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): only the chunk names it imports. Measured 50,697 / 16,604 in the e2e build, the plus 4.
   // 50,701 / 16,608 -> 50,701 / 16,612 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 50,697 / 16,608 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_701, maxGzip: 16_612 },
+  // 50,701 / 16,612 -> 50,857 / 16,715 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the report names a queued error row in the page's words (src/copy/report.js `session.errorRow`). Measured 50,853 / 16,711 in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_857, maxGzip: 16_715 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -781,7 +783,8 @@ const budgets = [
   // 50,647 / 16,607 -> 50,701 / 16,611 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the case result's collapse-line verdict in the table's voice. Measured 50,697 / 16,607 in the e2e build, the plus 4.
   // 50,701 / 16,611 -> 50,701 / 16,608 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): only the chunk names it imports. Measured 50,697 / 16,604 in the e2e build, the plus 4.
   // 50,701 / 16,608 -> 50,701 / 16,612 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 50,697 / 16,608 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_701, maxGzip: 16_612 },
+  // 50,701 / 16,612 -> 50,857 / 16,715 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the report names a queued error row in the page's words (src/copy/report.js `session.errorRow`). Measured 50,853 / 16,711 in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_857, maxGzip: 16_715 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -966,7 +969,8 @@ const budgets = [
   // 209,113 / 39,370 -> 209,171 / 39,378 on 2026-11-09, a32-411-fit over main c1d08daa (#488): the 360px HUD air in a block shared with phones up to 480 wide and 800 tall (play.css; Galaxy A32, 411x780). Measured 209,167 / 39,374 in the e2e build, the plus 4.
   // 209,113 / 39,370 -> 209,356 / 39,400 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): at 360px the relics sit beside the run's line when they fit (an overclocked board with a max bank put five-card hands 18px under the bar in Korean, 9 in Japanese), and at 361-390px the English signals take the 360px columns. Measured 209,352 / 39,396 in the e2e build, the plus 4.
   // 209,171 / 39,378 (#492 #493) and 209,356 / 39,400 (phone-heavy-bank) -> 209,414 / 39,403 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: both, the English signals' columns now in the 361-480px block. Measured 209,410 / 39,399 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 209_414, maxGzip: 39_403 },
+  // 209,414 / 39,403 -> 209,522 / 39,417 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the relics beside the run's line at 361-480px in Korean and Japanese (a 390x844 phone with a max bank put overclocked five-card hands 22px under the bar in Korean, 20 in Japanese). Measured 209,518 / 39,413 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 209_522, maxGzip: 39_417 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1164,7 +1168,8 @@ const budgets = [
   // 44,131 / 16,529 -> 44,750 / 16,759 on 2026-11-05, stake-clock over main e68fe8cc: the stake clock (src/gauntlet/stakeClock.js: decisionWindowSeconds, stakeTier), the board's stakeClock mark, advanceClock reading the tick tier by tier and a push that runs the clock out. Measured 44,746 / 16,755 in the e2e build, the plus 4.
   // 45,469 / 17,220 -> 48,539 / 18,413 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's rerollRelicOffer, buyExtraRelic and the draft record beside C-7's breather (a pass on a paid draft is a choice, 11-05 decision), the stake clock in advanceClock and the push, SCOUT's trust price. Measured 48,535 / 18,409 in the e2e build, the plus 4.
   // 45,469 / 17,220 -> 48,539 / 18,409 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 48,535 / 18,405 in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 48_539, maxGzip: 18_409 },
+  // 48,539 / 18,409 -> 49,605 / 18,880 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the recovery center's, the session code copy's and the remote-save queue's words moved out of the components into src/copy/runLines.js (`recoveryCenter`, `copyStatus`, `queue`), which this chunk carries. Measured 49,601 / 18,876 in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 49_605, maxGzip: 18_880 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1601,7 +1606,8 @@ const budgets = [
   // -> 183,930 / 61,484 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 183,926 / 61,480 in the e2e build, the plus 4.
   // -> 185,744 / 61,816 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 185,740 / 61,812 in the e2e build, the plus 4.
   // 185,744 / 61,816 -> 185,809 / 61,851 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the Japanese table voice lines (src/locales/ja/screens/table.js). Measured 185,805 / 61,847 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 185_809, maxGzip: 61_851 },
+  // 185,809 / 61,851 -> 187,054 / 62,254 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the Japanese recovery center, copy flash, queue rows and error row (src/locales/ja/screens/runLines.js, report.js). Measured 187,050 / 62,250 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 187_054, maxGzip: 62_254 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1650,7 +1656,8 @@ const budgets = [
   // -> 153,452 / 54,773 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 153,448 / 54,769 in the e2e build, the plus 4.
   // -> 154,873 / 55,082 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 154,869 / 55,078 in the e2e build, the plus 4.
   // 154,873 / 55,082 -> 154,931 / 55,114 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the English table voice lines (src/locales/en/screens/table.js). Measured 154,927 / 55,110 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 154_931, maxGzip: 55_114 },
+  // 154,931 / 55,114 -> 155,866 / 55,470 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the English recovery center, copy flash, queue rows and error row (src/locales/en/screens/runLines.js, report.js). Measured 155,862 / 55,466 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 155_866, maxGzip: 55_470 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
@@ -1937,8 +1944,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,919 / 492,851 / 500,415 (#489) and 434,597 / 492,551 / 500,080 (a32-411-fit) -> 434,929 / 492,863 / 500,426 on 2026-11-09, a32-411-fit after merging main f97f5079 (#489 pages-a11y-ld, #490): #489's JSON-LD in the start pages' heads with this branch's index CSS. Measured 434,925 / 492,859 / 500,422 in the e2e build, the plus 4.
 // 434,919 / 492,851 / 500,415 -> 434,954 / 492,886 / 500,449 on 2026-11-09, phone-heavy-bank over main d07a852b (#489): the index CSS line above. Measured 434,950 / 492,882 / 500,445 in the e2e build, the plus 4.
 // 434,929 / 492,863 / 500,426 (#493) and 434,954 / 492,886 / 500,449 (phone-heavy-bank) -> 434,945 / 492,876 / 500,438 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: the index CSS line above and the critical CSS it regenerates. Measured 434,941 / 492,872 / 500,434 in the e2e build, the plus 4.
-// 434,945 / 492,876 / 500,438 -> 435,146 / 493,077 / 500,640 on 2026-11-10, music-tier-crackle over main e7ccb410: the entry line above. Measured 435,142 / 493,073 / 500,636 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_146, en: 493_077, ja: 500_640 };
+// 434,945 / 492,876 / 500,438 -> 434,945 / 493,237 / 500,846 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the English and Japanese dictionaries' lines above (Korean unchanged, measured 434,944). Measured 493,233 / 500,842 in the e2e build, the plus 4.
+// 434,945 / 493,237 / 500,846 -> 434,965 / 493,253 / 500,862 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the index CSS line above and the critical CSS it regenerates. Measured 434,961 / 493,249 / 500,858 in the e2e build, the plus 4.
+// 434,965 / 493,253 / 500,862 -> 435,162 / 493,451 / 501,061 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 enja-text-check, #497 phone-390-bank): the entry line above. Measured 435,158 / 493,447 / 501,057 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 435_162, en: 493_451, ja: 501_061 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
