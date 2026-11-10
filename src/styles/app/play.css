@@ -2925,15 +2925,15 @@
      68px of its 81 once the chain was lit and ran 13px under the streak
      (Linux, overclocked board, 105 scenes of case01-21; 2026-11-09).
 
-     As columns (minmax(0, 1fr) auto auto) they still ran into themselves on
-     Linux fonts with a late season's bank: 2px with the chain lit (390x844,
-     most five-card scenes) and, with the chain off, 13px (390x844, the
-     prologue's five-card scenes) and 3px (411x780; hand5, LAYOUT_BANK=max,
-     2026-11-10). They are a line of three now: the chain's word stays and
-     its sentence takes what is left, LOCK keeps its width (and the rest of
-     the row when the chain is off), and the streak's direction line is the
-     one that gives way, cut with an ellipsis; its number stays whole. One
-     line as before, so the row is no taller. */
+     Before these columns reached 480px the row ran into itself on Linux
+     fonts with a late season's bank: 2px with the chain lit (390x844, most
+     five-card scenes), 13px with it off (390x844, the prologue's) and 3px
+     (411x780; hand5, LAYOUT_BANK=max, 2026-11-10). The columns cleared it,
+     but the streak, an auto column, still never gave way. The row is a line
+     of three now: the chain's word stays and its sentence takes what is
+     left, LOCK keeps its width (and the rest of the row when the chain is
+     off), and the streak's direction line is the one that gives way, cut
+     with an ellipsis; its number stays whole. One line, no taller. */
   :lang(en) .gauntlet-stage .gx-signals {
     display: flex;
     column-gap: 8px;
