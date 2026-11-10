@@ -154,7 +154,8 @@ const budgets = [
   // 149,905 / 55,019 -> 152,903 / 56,161 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side run (state/sideRun.js) and what the side screen takes from this chunk (state/sideCaseKit.js); the pack check stays out (state/sidePackCheck.js). Measured 152,899 / 56,157 in the e2e build, the plus 4.
   // 150,034 / 55,070 -> 150,034 / 55,084 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 149,314 / 55,080 in the e2e build, the plus 4.
   // 146,589 / 54,099 -> 149,553 / 55,207 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 149,549 / 55,203 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 150_964, maxGzip: 55_742 },
+  // 150,964 / 55,742 -> 153,646 / 56,482 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side run and the kit the side screen takes (as above). Measured 153,642 / 56,478 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_646, maxGzip: 56_482 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -251,7 +252,8 @@ const budgets = [
   // 34,178 / 14,560 -> 34,238 / 14,593 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the table's voice (src/gauntlet/tableVoice.js) speaks the settle line, the act start and the case result's collapse-line verdict for screen readers. Measured 34,234 / 14,589 in the e2e build, the plus 4.
   // 34,238 / 14,593 -> 34,238 / 14,590 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): only the chunk names it imports. Measured 34,234 / 14,586 in the e2e build, the plus 4.
   // 34,238 / 14,590 -> 34,238 / 14,588 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 34,234 / 14,584 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_238, maxGzip: 14_588 },
+  // 34,238 / 14,588 -> 34,238 / 14,599 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: only the chunk names it imports. Measured 14,595 gzip in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_238, maxGzip: 14_599 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -536,7 +538,8 @@ const budgets = [
   // 182,038 / 66,124 -> 184,337 / 67,050 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the start screen's side slot, hidden until a finale is closed and a side case is written (src/sideCases.js, the slot and its open/close in IntroScreen, its words in src/copy/intro.js), and the side-id guards of the local ranking and the window log. Measured 184,333 / 67,046 in the e2e build, the plus 4.
   // 189,363 / 68,363 -> 191,660 / 69,343 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 191,656 / 69,339 in the e2e build, the plus 4.
   // 189,363 / 68,368 -> 191,660 / 69,346 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 191,656 / 69,342 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_858 },
+  // 196,509 / 70,858 -> 198,795 / 71,936 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the start screen's side slot and the side-id guards (as above). Measured 198,791 / 71,932 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 198_795, maxGzip: 71_936 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -788,7 +791,8 @@ const budgets = [
   // 50,079 / 16,401 -> 50,421 / 16,517 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the finale's line that the side slot opened (src/copy/result.js), and the side list it reads. Measured 50,421 / 16,513, the gzip plus 4.
   // 50,213 / 16,456 -> 50,560 / 16,594 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 50,556 / 16,590 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,697 / 16,646 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 50,693 / 16,642 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_857, maxGzip: 16_715 },
+  // 50,857 / 16,715 -> 51,205 / 16,829 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the finale's side-slot line and the side list it reads. Measured 51,201 / 16,825 in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 51_205, maxGzip: 16_829 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -799,7 +803,8 @@ const budgets = [
   // 50,701 / 16,611 -> 50,701 / 16,608 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): only the chunk names it imports. Measured 50,697 / 16,604 in the e2e build, the plus 4.
   // 50,701 / 16,608 -> 50,701 / 16,612 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 50,697 / 16,608 in the e2e build, the plus 4.
   // 50,701 / 16,612 -> 50,857 / 16,715 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the report names a queued error row in the page's words (src/copy/report.js `session.errorRow`). Measured 50,853 / 16,711 in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 50_857, maxGzip: 16_715 },
+  // 50,857 / 16,715 -> 51,205 / 16,829 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the finale's side-slot line and the side list it reads. Measured 51,201 / 16,825 in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 51_205, maxGzip: 16_829 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -1636,7 +1641,8 @@ const budgets = [
   // 185,809 / 61,851 -> 187,054 / 62,254 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the Japanese recovery center, copy flash, queue rows and error row (src/locales/ja/screens/runLines.js, report.js). Measured 187,050 / 62,250 in the e2e build, the plus 4.
   // 153,344 / 51,954 -> 154,420 / 52,285 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in Japanese (screens/intro.js, result.js, sideCase.js). Measured 154,416 / 52,281, the plus 4.
   // 179,701 / 60,151 -> 180,777 / 60,484 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 180,773 / 60,480 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 187_054, maxGzip: 62_254 },
+  // 187,054 / 62,254 -> 188,130 / 62,575 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side slot's, the finale line's and the side screen's Japanese. Measured 188,126 / 62,571 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 188_130, maxGzip: 62_575 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1686,7 +1692,8 @@ const budgets = [
   // -> 154,873 / 55,082 on 2026-11-06, w47-rule-line after merging main d7dadd92 (#464, #465): the W47 lines over main's. Measured 154,869 / 55,078 in the e2e build, the plus 4.
   // 154,873 / 55,082 -> 154,931 / 55,114 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the English table voice lines (src/locales/en/screens/table.js). Measured 154,927 / 55,110 in the e2e build, the plus 4.
   // 154,931 / 55,114 -> 155,866 / 55,470 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the English recovery center, copy flash, queue rows and error row (src/locales/en/screens/runLines.js, report.js). Measured 155,862 / 55,466 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 155_866, maxGzip: 55_470 },
+  // 155,866 / 55,470 -> 156,774 / 55,788 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side slot's, the finale line's and the side screen's English. Measured 156,770 / 55,784 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 156_774, maxGzip: 55_788 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -1985,7 +1992,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,965 / 493,253 / 500,862 -> 435,162 / 493,451 / 501,061 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 enja-text-check, #497 phone-390-bank): the entry line above. Measured 435,158 / 493,447 / 501,057 in the e2e build, the plus 4.
 // 435,021 / 493,308 / 500,919 (en-signals-row) and 435,162 / 493,451 / 501,061 (#498) -> 435,217 / 493,503 / 501,114 on 2026-11-10, en-signals-row after merging main b77e4bfe (#498): both. Measured 435,213 / 493,499 / 501,110 in the e2e build, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 427,739 / 485,001 / 491,707 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 427,735 / 484,997 / 491,703, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_217, en: 493_503, ja: 501_114 };
+// 435,217 / 493,503 / 501,114 -> 436,297 / 494,902 / 502,517 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the entry's side slot and the two dictionaries' side lines. Measured 436,293 / 494,898 / 502,513, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 436_297, en: 494_902, ja: 502_517 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2146,7 +2154,8 @@ function checkBudget(file, budget) {
 // not change. Measured 10,139 / 3,636 plus 4.
 // 10,106 / 3,629 -> 10,143 / 3,637 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 10,139 / 3,633, the plus 4.
 // 10,139 / 3,643 -> 10,176 / 3,652 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 10,172 / 3,648, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_619, maxGzip: 3_810 };
+// 10,619 / 3,810 -> 10,656 / 3,820 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: one more file in the list, SideCaseScreen. Measured 10,652 / 3,816 plus 4.
+const WORKER_BUDGET = { maxBytes: 10_656, maxGzip: 3_820 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
