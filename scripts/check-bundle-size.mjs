@@ -969,8 +969,10 @@ const budgets = [
   // 209,113 / 39,370 -> 209,171 / 39,378 on 2026-11-09, a32-411-fit over main c1d08daa (#488): the 360px HUD air in a block shared with phones up to 480 wide and 800 tall (play.css; Galaxy A32, 411x780). Measured 209,167 / 39,374 in the e2e build, the plus 4.
   // 209,113 / 39,370 -> 209,356 / 39,400 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): at 360px the relics sit beside the run's line when they fit (an overclocked board with a max bank put five-card hands 18px under the bar in Korean, 9 in Japanese), and at 361-390px the English signals take the 360px columns. Measured 209,352 / 39,396 in the e2e build, the plus 4.
   // 209,171 / 39,378 (#492 #493) and 209,356 / 39,400 (phone-heavy-bank) -> 209,414 / 39,403 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: both, the English signals' columns now in the 361-480px block. Measured 209,410 / 39,399 in the e2e build, the plus 4.
+  // 209,414 / 39,403 -> 209,693 / 39,458 on 2026-11-10, en-signals-row over main e7ccb410 (#491): the English signals row at 361-480px as one flex line (the chain's sentence and the streak's direction line cut with an ellipsis; Linux, 390x844 and 411x780, the row ran 2 to 13px into itself). Measured 209,689 / 39,454 in the e2e build, the plus 4.
   // 209,414 / 39,403 -> 209,522 / 39,417 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the relics beside the run's line at 361-480px in Korean and Japanese (a 390x844 phone with a max bank put overclocked five-card hands 22px under the bar in Korean, 20 in Japanese). Measured 209,518 / 39,413 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 209_522, maxGzip: 39_417 },
+  // 209,693 / 39,458 (en-signals-row) and 209,522 / 39,417 (#497) -> 209,801 / 39,474 on 2026-11-10, en-signals-row after merging main 261accef (#496 #497): both. Measured 209,797 / 39,470 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 209_801, maxGzip: 39_474 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1944,10 +1946,13 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,919 / 492,851 / 500,415 (#489) and 434,597 / 492,551 / 500,080 (a32-411-fit) -> 434,929 / 492,863 / 500,426 on 2026-11-09, a32-411-fit after merging main f97f5079 (#489 pages-a11y-ld, #490): #489's JSON-LD in the start pages' heads with this branch's index CSS. Measured 434,925 / 492,859 / 500,422 in the e2e build, the plus 4.
 // 434,919 / 492,851 / 500,415 -> 434,954 / 492,886 / 500,449 on 2026-11-09, phone-heavy-bank over main d07a852b (#489): the index CSS line above. Measured 434,950 / 492,882 / 500,445 in the e2e build, the plus 4.
 // 434,929 / 492,863 / 500,426 (#493) and 434,954 / 492,886 / 500,449 (phone-heavy-bank) -> 434,945 / 492,876 / 500,438 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: the index CSS line above and the critical CSS it regenerates. Measured 434,941 / 492,872 / 500,434 in the e2e build, the plus 4.
+// 434,945 / 492,876 / 500,438 -> 435,003 / 492,935 / 500,498 on 2026-11-10, en-signals-row over main e7ccb410 (#491): the index CSS line above and the critical CSS it regenerates. Measured 434,999 / 492,931 / 500,494 in the e2e build, the plus 4.
 // 434,945 / 492,876 / 500,438 -> 434,945 / 493,237 / 500,846 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the English and Japanese dictionaries' lines above (Korean unchanged, measured 434,944). Measured 493,233 / 500,842 in the e2e build, the plus 4.
 // 434,945 / 493,237 / 500,846 -> 434,965 / 493,253 / 500,862 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the index CSS line above and the critical CSS it regenerates. Measured 434,961 / 493,249 / 500,858 in the e2e build, the plus 4.
+// 435,003 / 492,935 / 500,498 (en-signals-row) and 434,965 / 493,253 / 500,862 (#496 #497) -> 435,021 / 493,308 / 500,919 on 2026-11-10, en-signals-row after merging main 261accef (#496 #497): the index CSS line above, the critical CSS it regenerates and #496's dictionaries. Measured 435,017 / 493,304 / 500,915 in the e2e build, the plus 4.
 // 434,965 / 493,253 / 500,862 -> 435,162 / 493,451 / 501,061 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 enja-text-check, #497 phone-390-bank): the entry line above. Measured 435,158 / 493,447 / 501,057 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_162, en: 493_451, ja: 501_061 };
+// 435,021 / 493,308 / 500,919 (en-signals-row) and 435,162 / 493,451 / 501,061 (#498) -> 435,217 / 493,503 / 501,114 on 2026-11-10, en-signals-row after merging main b77e4bfe (#498): both. Measured 435,213 / 493,499 / 501,110 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 435_217, en: 493_503, ja: 501_114 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
