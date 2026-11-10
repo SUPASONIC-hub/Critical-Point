@@ -55,23 +55,13 @@ test("a first season reads four panels, then 「3년 전」 opens the same first
   expect(await readStorage(page, COLD_OPENING_SEEN_KEY)).toBe("1");
 });
 
-test("건너뛰기 goes straight on, and a device that has seen the page is not shown it again", async ({ page }) => {
+test("건너뛰기 goes straight on and marks the page seen", async ({ page }) => {
   await freshIntro(page, "?debug=1");
   await clickElement(page.getByTestId("start-first-case"), "start first case");
   await clickElement(page.getByTestId("cold-opening-skip"), "cold opening skip");
   await expectFirstScene(page);
   expect(await readStorage(page, COLD_OPENING_SEEN_KEY)).toBe("1");
-
-  // The same device, its run cleared: the page is not played twice.
-  await page.evaluate((key) => {
-    const seen = localStorage.getItem(key);
-    localStorage.clear();
-    localStorage.setItem(key, seen);
-  }, COLD_OPENING_SEEN_KEY);
-  await page.reload();
-  await clickElement(page.getByTestId("start-first-case"), "start first case again");
-  await expectFirstScene(page);
-  await expect(page.getByTestId("cold-opening")).toHaveCount(0);
+  // A device with the mark goes straight to the first scene: the first test above.
 });
 
 /**
