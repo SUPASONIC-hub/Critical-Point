@@ -344,7 +344,8 @@ const fileBudgets = {
   // 3095 / 60291 -> 3097 / 60365 on 2026-11-09, a32-411-fit, measured: the 360px HUD air (2px rows and paddings, a 30px clock, 18px pills) moved out of the 360px block into one block shared with phones up to 480 wide and 800 tall (a Galaxy A32, 411x780: nineteen five-card hands 9px under the bar at a pot of 99,999).
   // 3095 / 60291 -> 3109 / 60592 on 2026-11-09, phone-heavy-bank, measured: the relics beside the run's line at 360px (an overclocked board with a max bank, Korean 18px under the bar) and the English signals' 360px columns at 361-390px.
   // 3097 / 60365 (a32-411-fit, #493) and 3109 / 60592 (phone-heavy-bank) -> 3111 / 60666 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493), measured: both, the English signals' columns now in the 361-480px block.
-  "play.css": { lines: 3111, bytes: 60666 },
+  // 3111 / 60666 -> 3133 / 61044 on 2026-11-10, en-signals-row, measured: the English signals row at 361-480px as one flex line, the streak's direction line cut with an ellipsis (Linux, 390x844 and 411x780: 2 to 13px into itself with a late season's bank).
+  "play.css": { lines: 3133, bytes: 61044 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
