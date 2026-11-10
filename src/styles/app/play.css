@@ -2505,12 +2505,8 @@
    Short is 800 tall or less since 2026-11-09 (760 before): a Galaxy A32 is
    411x780 under Chrome's address bar, and on an overclocked board with five
    relics its five-card hands ended up to 20px under the action bar, 61 with a
-   card staked (Linux, Korean), with none of these rules.
-   Wider than 390 it is 860 tall or less since 2026-11-10: a 411x846 phone put
-   Korean five-card hands on an overclocked board up to 25px under the bar with
-   a card staked (Linux). A 390x844 phone (an iPhone 14) keeps its portrait. */
-@media (max-width: 480px) and (max-height: 800px),
-  (min-width: 391px) and (max-width: 480px) and (max-height: 860px) {
+   card staked (Linux, Korean), with none of these rules. */
+@media (max-width: 480px) and (max-height: 800px) {
   .gx-scene {
     grid-template-columns: minmax(0, 1fr);
   }

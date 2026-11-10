@@ -175,7 +175,7 @@ test("a phone on its side keeps the fold that prints the question and the cards 
  */
 test("a short phone gives a five-card hand under a rules line 20px without cutting a label", () => {
   const play = sheet("play");
-  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\),\s+\(min-width: 391px\) and \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
   const px = (rule, property) => Number(rule.match(new RegExp(`\\n\\s*${property}: (\\d+)px`))?.[1]);
 
   const hand = short.match(/\n {2}\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \{[^}]*\}/)?.[0] ?? "";
