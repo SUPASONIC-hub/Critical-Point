@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Flame, Lock, TriangleAlert } from "lucide-react";
+import { Flame, Lock, TriangleExclamationPoint } from "lucide-react";
 import { CardType, WildName } from "./GauntletHand.jsx";
 import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
@@ -382,7 +382,7 @@ export function SceneBriefing({
           {broken && (
             <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
               <p className="gx-breach-kicker">
-                <TriangleAlert size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
+                <TriangleExclamationPoint size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
               </p>
               <RuleRows rules={penalties} resourceMeta={resourceMeta} />
             </div>
