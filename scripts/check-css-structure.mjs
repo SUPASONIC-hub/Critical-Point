@@ -348,13 +348,15 @@ const fileBudgets = {
   // 3097 / 60365 (a32-411-fit, #493) and 3109 / 60592 (phone-heavy-bank) -> 3111 / 60666 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493), measured: both, the English signals' columns now in the 361-480px block.
   // 3111 / 60666 -> 3133 / 61044 on 2026-11-10, en-signals-row, measured: the English signals row at 361-480px as one flex line, the streak's direction line cut with an ellipsis (Linux, 390x844 and 411x780: 2 to 13px into itself with a late season's bank).
   // 3111 / 60666 -> 3116 / 60792 on 2026-11-10, phone-390-bank, measured: the relics beside the run's line at 361-480px in Korean and Japanese (390x844 with a max bank: 22px under the bar in Korean, 20 in Japanese).
+  // 3116 / 60792 -> 3119 / 60915 on 2026-11-10, phone-846-staked, measured: the short phone's air (not its hidden portrait or cut question) also at 391-480px wide and up to 860px tall (411x846 Korean overclocked, a card staked: 25px under the bar; Pixel 7 412x839), as its own block beside the short phone's.
   // 3133 / 61044 (en-signals-row) and 3116 / 60792 (#497) -> 3138 / 61170 on 2026-11-10, en-signals-row after merging main 261accef (#497), measured: both.
+  // 3119 / 60915 (phone-846-staked) and 3138 / 61170 (#499) -> 3141 / 61293 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499), measured: both.
   // -> 56734 bytes on 2026-11-02, measured: C-15's badge fold over the
   // Japanese 360px card labels and the 360px HUD air.
   // -> 2941 lines / 57182 bytes on 2026-11-03, measured: C-15's badge fold over main 465ccb93
   // (en-hand5-linux, pc-type-scale).
-  // 3138 / 61170 -> 3148 / 61399 on 2026-11-10, C-15 over main 3a507805, measured: the badge fold and the plain 소모 없음.
-  "play.css": { lines: 3148, bytes: 61399 },
+  // 3141 / 61293 -> 3151 / 61522 on 2026-11-10, C-15 over main cb8346da (#499 #500), measured: the badge fold and the plain 소모 없음.
+  "play.css": { lines: 3151, bytes: 61522 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

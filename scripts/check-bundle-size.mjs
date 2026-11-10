@@ -250,7 +250,7 @@ const budgets = [
   // -> 26,832 / 11,414 on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, on main 11cb3b16; was 19,725 / 8,660 on c8841dc0): tableReadout's describeStakedDetail, the staked card's detail without the number its burn prints. Measured 26,832 / 11,410 in the e2e build, the gzip plus 4.
   // 26,792 / 11,414 -> 26,957 / 11,484 on 2026-11-03 (C-15 over main 465ccb93, describeStakedDetail over locale-gaps and money-feedback): measured 26,953 / 11,480 in the e2e build, the plus 4.
   // 30,498 / 13,286 -> 30,663 / 13,356 on 2026-11-03, C-15 over main 425eb4da (#392 #398 #395), the badge fold and describeStakedDetail. Measured 30,659 / 13,352 in the e2e build, the plus 4.
-  // 34,238 / 14,588 -> 34,403 / 14,661 on 2026-11-10, C-15 over main 3a507805: the badge fold and describeStakedDetail over the phone rules. Measured 34,399 / 14,657 in the e2e build, the plus 4.
+  // 34,238 / 14,588 -> 34,403 / 14,661 on 2026-11-10, C-15 over main 3a507805 and cb8346da: the badge fold and describeStakedDetail over the phone rules. Measured 34,399 / 14,657 in the e2e build, the plus 4.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_403, maxGzip: 14_661 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
@@ -532,9 +532,11 @@ const budgets = [
   // 195,799 / 70,661 -> 195,799 / 70,667 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): no script changed; only the CSS file's name the entry carries. Measured 195,795 / 70,663 in the e2e build, the plus 4.
   // 195,799 / 70,667 -> 196,509 / 70,856 on 2026-11-10, music-tier-crackle over main e7ccb410: the bus's aligned dry path, the two tiers' bass past the drive and the music lab's before/after switch (musicScore.js CRACKLE_FIX_BEFORE). Measured 196,505 / 70,852 in the e2e build, the plus 4.
   // 196,509 / 70,856 -> 196,509 / 70,858 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 #497): only the chunk names the entry imports. Measured 196,505 / 70,854 in the e2e build, the plus 4.
+  // 196,509 / 70,858 -> 196,509 / 70,859 on 2026-11-10, phone-846-staked after merging main b77e4bfe (#498): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,855 in the e2e build, the plus 4.
+  // 196,509 / 70,859 -> 196,509 / 70,854 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): only the asset names the entry imports. Measured 196,505 / 70,850 in the e2e build, the plus 4.
   // 66,033 -> 66,046 gzip on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, over main 6a36dcc9): this chunk's code is main's; what differs is the chunk and CSS names it imports (the CSS and RelicDraft changed, so their hashes did). Measured 181,951 / 66,042 in the e2e build, the gzip plus 4.
   // 66,124 holds on 2026-10-30 (C-15 over main c39870a7, #376 #375): measured 182,034 / 66,112 in the e2e build, under main's budget.
-  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_858 },
+  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_854 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -978,15 +980,17 @@ const budgets = [
   // 209,171 / 39,378 (#492 #493) and 209,356 / 39,400 (phone-heavy-bank) -> 209,414 / 39,403 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: both, the English signals' columns now in the 361-480px block. Measured 209,410 / 39,399 in the e2e build, the plus 4.
   // 209,414 / 39,403 -> 209,693 / 39,458 on 2026-11-10, en-signals-row over main e7ccb410 (#491): the English signals row at 361-480px as one flex line (the chain's sentence and the streak's direction line cut with an ellipsis; Linux, 390x844 and 411x780, the row ran 2 to 13px into itself). Measured 209,689 / 39,454 in the e2e build, the plus 4.
   // 209,414 / 39,403 -> 209,522 / 39,417 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the relics beside the run's line at 361-480px in Korean and Japanese (a 390x844 phone with a max bank put overclocked five-card hands 22px under the bar in Korean, 20 in Japanese). Measured 209,518 / 39,413 in the e2e build, the plus 4.
+  // 209,522 / 39,417 -> 209,619 / 39,432 on 2026-11-10, phone-846-staked over main b77e4bfe (#498): the short phone's air (not its hidden portrait or cut question) also at 391-480px wide and up to 860px tall (411x846 Korean overclocked, a card staked: 25px under the bar; Pixel 7 412x839). Measured 209,615 / 39,428 in the e2e build, the plus 4.
   // 209,693 / 39,458 (en-signals-row) and 209,522 / 39,417 (#497) -> 209,801 / 39,474 on 2026-11-10, en-signals-row after merging main 261accef (#496 #497): both. Measured 209,797 / 39,470 in the e2e build, the plus 4.
+  // 209,619 / 39,432 (phone-846-staked) and 209,801 / 39,474 (#499) -> 209,898 / 39,487 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): both. Measured 209,894 / 39,483 in the e2e build, the plus 4.
   // -> 196,266 / 36,582 on 2026-10-29 (C-15 카드 정보 줄이기, draft for after W47, on main 11cb3b16; was 193,614 / 36,108 on c8841dc0): play.css's fold for a board rule's badge and a plain 소모 없음. Measured 196,266 / 36,578 in the e2e build, the gzip plus 4.
   // -> 196,342 / 36,612 on 2026-10-29 (C-15 over main 6a36dcc9, with intro-en-fit's rule): measured 196,342 / 36,608 in the e2e build, the gzip plus 4.
   // -> 196,547 / 36,650 on 2026-10-30 (C-15 over main c39870a7, #376 #375, the badge fold over the foot's five links and the 360px pills): measured 196,543 / 36,646 in the e2e build, the plus 4.
   // -> 197,001 / 36,748 on 2026-11-02 (C-15 over main 2f085d28, the badge fold over ja-hand-narrow, intro-360-fit and bank-rail-fit): measured 196,997 / 36,744 in the e2e build, the plus 4.
   // 199,354 / 37,230 -> 199,556 / 37,277 on 2026-11-03 (C-15 over main 465ccb93, the badge fold over money-feedback and pc-type-scale): measured 199,552 / 37,273 in the e2e build, the plus 4.
   // 200,019 / 37,440 -> 200,221 / 37,489 on 2026-11-03, C-15 over main 425eb4da (#392 #398 #395), the badge fold and describeStakedDetail. Measured 200,217 / 37,485 in the e2e build, the plus 4.
-  // 209,801 / 39,474 -> 210,003 / 39,524 on 2026-11-10, C-15 over main 3a507805: play.css's badge fold and the plain 소모 없음. Measured 209,999 / 39,520 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 210_003, maxGzip: 39_524 },
+  // 209,898 / 39,487 -> 210,100 / 39,539 on 2026-11-10, C-15 over main cb8346da (#499 #500): play.css's badge fold and the plain 소모 없음. Measured 210,096 / 39,535 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 210_100, maxGzip: 39_539 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1977,10 +1981,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,945 / 493,237 / 500,846 -> 434,965 / 493,253 / 500,862 on 2026-11-10, phone-390-bank over main 201ca8ce (#496): the index CSS line above and the critical CSS it regenerates. Measured 434,961 / 493,249 / 500,858 in the e2e build, the plus 4.
 // 435,003 / 492,935 / 500,498 (en-signals-row) and 434,965 / 493,253 / 500,862 (#496 #497) -> 435,021 / 493,308 / 500,919 on 2026-11-10, en-signals-row after merging main 261accef (#496 #497): the index CSS line above, the critical CSS it regenerates and #496's dictionaries. Measured 435,017 / 493,304 / 500,915 in the e2e build, the plus 4.
 // 434,965 / 493,253 / 500,862 -> 435,162 / 493,451 / 501,061 on 2026-11-10, music-tier-crackle after merging main 261accef (#496 enja-text-check, #497 phone-390-bank): the entry line above. Measured 435,158 / 493,447 / 501,057 in the e2e build, the plus 4.
+// 435,162 / 493,451 / 501,061 -> 435,179 / 493,468 / 501,077 on 2026-11-10, phone-846-staked over main b77e4bfe (#498): the index CSS line above and the critical CSS it regenerates. Measured 435,175 / 493,464 / 501,073 in the e2e build, the plus 4.
 // 435,021 / 493,308 / 500,919 (en-signals-row) and 435,162 / 493,451 / 501,061 (#498) -> 435,217 / 493,503 / 501,114 on 2026-11-10, en-signals-row after merging main b77e4bfe (#498): both. Measured 435,213 / 493,499 / 501,110 in the e2e build, the plus 4.
+// 435,179 / 493,468 / 501,077 (phone-846-staked) and 435,217 / 493,503 / 501,114 (#499) -> 435,226 / 493,515 / 501,125 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): both, and the critical CSS regenerated. Measured 435,222 / 493,511 / 501,121 in the e2e build, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 426,808 / 483,769 / 490,455 on 2026-11-03, C-15 over main 425eb4da (#392 #398 #395), the badge fold and describeStakedDetail. Measured 426,804 / 483,765 / 490,451, the plus 4.
-// 435,217 / 493,503 / 501,114 -> 435,267 / 493,556 / 501,165 on 2026-11-10, C-15 over main 3a507805: the index CSS line above. Measured 435,263 / 493,552 / 501,161 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_267, en: 493_556, ja: 501_165 };
+// 435,226 / 493,515 / 501,125 -> 435,280 / 493,569 / 501,178 on 2026-11-10, C-15 over main cb8346da (#499 #500): the index CSS line above. Measured 435,276 / 493,565 / 501,174 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 435_280, en: 493_569, ja: 501_178 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
