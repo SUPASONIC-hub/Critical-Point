@@ -260,10 +260,14 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) for (let part = 1; part <= SWEE
  * The allowance is a ceiling, so the scene cannot slip further, and it is to be
  * lowered or deleted when the scene is given the room.
  *
- * The 390x844 phone was measured staked on 2026-11-10 (Linux, Korean, every
- * case): 사건 01 alone put a hand under the bar, by up to 9px (c1_start_hold,
- * c1_start_record, c1_start_alone), with the detail's two lines. It is one line
- * there now too, and that phone holds 사건 01 staked, with no allowance.
+ * On the 390x844 phone 사건 01 put a staked hand up to 9px under the bar
+ * (c1_start_hold, c1_start_record, c1_start_alone; Linux, Korean, 2026-11-10)
+ * with the detail's two lines. The detail is one line there now too, the hand
+ * ends 12px above the bar, and that phone holds 사건 01 staked, with no
+ * allowance. Measured staked in every case the same day with one line, other
+ * scenes were still under at 390x844: up to 16px in Korean (c33_mother),
+ * 20 in Japanese (c18_route_system), 16 in English (c38_witness). Those are
+ * not held yet.
  */
 const HEAVY_BOARD = { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics: FIVE_RELICS };
 const STAKED_CASES = ["case01", "case05", "final"];
