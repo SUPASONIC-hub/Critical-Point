@@ -2592,6 +2592,26 @@
   }
 }
 
+/* A phone wider than 390 and 801 to 860 tall keeps its portrait and its
+   question, and takes only the hand's air from the short phone: a 411x846
+   phone put Korean five-card hands on an overclocked board up to 25px under
+   the action bar with a card staked (Linux, 2026-11-10). Hiding the portrait
+   as a short phone does would hide it on a Pixel 7 (412x839) too. */
+@media (min-width: 391px) and (max-width: 480px) and (min-height: 801px) and (max-height: 860px) {
+  .gx-read:has(.gx-active-rules) ~ .hand-5 {
+    gap: 4px;
+  }
+
+  .gx-read:has(.gx-active-rules) ~ .hand-5 .gx-card {
+    gap: 4px;
+    padding-block: 6px;
+  }
+
+  .gx-card.selected .gx-card-preview {
+    max-height: 1.0625rem;
+  }
+}
+
 /* Every scene's hand above the dock. A card is as tall as its words, not 104px;
    the odd card out of a two-column hand takes its row as one line. */
 @media (max-width: 719px) {
