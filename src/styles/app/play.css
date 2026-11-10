@@ -2505,8 +2505,12 @@
    Short is 800 tall or less since 2026-11-09 (760 before): a Galaxy A32 is
    411x780 under Chrome's address bar, and on an overclocked board with five
    relics its five-card hands ended up to 20px under the action bar, 61 with a
-   card staked (Linux, Korean), with none of these rules. */
-@media (max-width: 480px) and (max-height: 800px) {
+   card staked (Linux, Korean), with none of these rules.
+   Wider than 390 it is 860 tall or less since 2026-11-10: a 411x846 phone put
+   Korean five-card hands on an overclocked board up to 25px under the bar with
+   a card staked (Linux). A 390x844 phone (an iPhone 14) keeps its portrait. */
+@media (max-width: 480px) and (max-height: 800px),
+  (min-width: 391px) and (max-width: 480px) and (max-height: 860px) {
   .gx-scene {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2883,6 +2887,16 @@
 
   :lang(ja) .gauntlet-stage :is(.gx-signals *, .gx-dateline, .gx-speaker, .gx-card-seal) {
     line-height: 1.2;
+  }
+
+  /* The relics beside the run's line, as at 360px, in Korean and Japanese: on
+     a 390x844 phone with a max bank they took a third line of the bank row and
+     put overclocked five-card hands up to 22px (Korean, c33_mother, 63 hands)
+     and 20px (Japanese, c7_paper) under the action bar (Linux, 2026-11-10).
+     English there was 4px over the bar and stays as it was. */
+  :lang(ko) .gauntlet-stage .gx-bank .gx-relics,
+  :lang(ja) .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
   }
 
   :lang(en) .gx-card-label {
