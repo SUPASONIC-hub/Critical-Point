@@ -216,6 +216,24 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
 });
 
 /**
+ * A phone wider than 390 and 801 to 860 tall (411x846; a Pixel 7 is 412x839)
+ * takes the short phone's hand rules and its one-line staked detail, and
+ * nothing that hides a speaker: on 2026-11-10 the short-phone block itself,
+ * stretched to 860, hid the Pixel 7's portrait (tests/offline.spec.js).
+ */
+test("a 411x846 phone takes the short phone's hand air but keeps its portrait and question", () => {
+  const play = sheet("play");
+  const tall = play.match(/@media \(min-width: 391px\) and \(max-width: 480px\) and \(min-height: 801px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.ok(tall, "the block is written");
+  assert.match(tall, /\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \{\s*gap: 4px;/);
+  assert.match(tall, /\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \.gx-card \{\s*gap: 4px;\s*padding-block: 6px;/);
+  assert.match(tall, /\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;/);
+  assert.doesNotMatch(tall, /gx-portrait|display: none|gx-question|line-clamp/);
+  // The short-phone block, which does hide the portrait, stays at 800.
+  assert.match(play, /@media \(max-width: 480px\) and \(max-height: 800px\) \{\s*\.gx-scene/);
+});
+
+/**
  * Written from arithmetic on 2026-10-13, not yet measured: at 360x740 the
  * docked cards started at 493px and the first briefing's introduction ended at
  * 555px. With 판 열기 alone docked (56px, 8px off the bottom) the dock starts

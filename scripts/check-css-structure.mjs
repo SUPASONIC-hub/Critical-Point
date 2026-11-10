@@ -345,7 +345,8 @@ const fileBudgets = {
   // 3095 / 60291 -> 3109 / 60592 on 2026-11-09, phone-heavy-bank, measured: the relics beside the run's line at 360px (an overclocked board with a max bank, Korean 18px under the bar) and the English signals' 360px columns at 361-390px.
   // 3097 / 60365 (a32-411-fit, #493) and 3109 / 60592 (phone-heavy-bank) -> 3111 / 60666 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493), measured: both, the English signals' columns now in the 361-480px block.
   // 3111 / 60666 -> 3116 / 60792 on 2026-11-10, phone-390-bank, measured: the relics beside the run's line at 361-480px in Korean and Japanese (390x844 with a max bank: 22px under the bar in Korean, 20 in Japanese).
-  "play.css": { lines: 3116, bytes: 60792 },
+  // 3116 / 60792 -> 3131 / 61125 on 2026-11-10, phone-846-staked, measured: the short phone's hand air and one-line staked detail at 391-480px wide and 801-860px tall, portrait kept (411x846, Korean, a card staked: 25px).
+  "play.css": { lines: 3131, bytes: 61125 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
