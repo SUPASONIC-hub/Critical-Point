@@ -57,9 +57,7 @@ import { createChoiceReaders } from "./state/useDecision.js";
 import { useChoiceCommit } from "./state/useChoiceCommit.js";
 import { useRunReadout } from "./state/useRunReadout.js";
 import { clearRunStorage, logStorageResetFailure } from "./state/runStorageReset.js";
-import {
-  normalizeRunState,
-} from "./gauntlet/gauntletEngine.js";
+import { normalizeRunState } from "./gauntlet/gauntletEngine.js";
 import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
@@ -666,11 +664,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     window.location.reload();
   }
 
-  /** The relic a closed case drafted (and, slots full, the one put down), or null to pass. The board is re-dealt with it. */
+  /** The draft's answers: a relic taken (slots full: and one put down) or a pass re-deals the board; C9's 다시 뽑기 / 하나 더 is paid out of the vault, or refused (useRelicTable's spend). */
   function pickRelic(relicId = null, dropId = null) {
-    if (staleSave) return;
-    const pickedRun = relicTable.equip(gauntletRun, relicId, dropId);
-    applyRun({ gauntletRun: pickedRun });
+    if (!staleSave) applyRun({ gauntletRun: relicTable.equip(gauntletRun, relicId, dropId) });
+  }
+  function spendAtDraft(kind) {
+    const paid = relicTable.spend(gauntletRun, kind);
+    if (!staleSave && paid !== gauntletRun) applyRun({ gauntletRun: paid });
   }
 
   /**
@@ -946,7 +946,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
   const playView = createPlayView({
-    AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase,
+    AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge,
     gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
     fixedChoices, clueCount, casesOpened, reframeChoice, tableRisk,
@@ -955,7 +955,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }, {}, caseResults);
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
   const playActions = {
-    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic,
+    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, spendAtDraft,
     onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace,
   };
   return (

@@ -2,10 +2,10 @@ import { useRef } from "react";
 import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatMultiplier, formatNumber, getTabNotices, getTypeName, getTypeParts } from "./tableReadout.js";
+import { formatMultiplier, formatNumber, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
-import { getLogicType } from "./logicStreak.js";
-import { SCOUT_SECONDS } from "./tableRules.js";
+import { getLogicDirection, getLogicType } from "./logicStreak.js";
+import { SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
@@ -78,7 +78,7 @@ function HeldElsewhere({ onClaim, onLeave }) {
  * the sentence that says the pot, and is not read twice.
  */
 function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, target = null }) {
-  // The amount flies only where there is a purse to fly to.
+  // The amount flies only where there is a KD은행 계좌 (the purse) to fly to.
   const burst = target ? readBurst({ win, livePot, runPot, bustKeeps }) : null;
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">
@@ -95,6 +95,9 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
                 : fill(say.slamWall, { wall: win.wall })}{" "}
             · {say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}
           </span>
+          {/* The moment, in one line under the verdict (A2, 2026-11-05): the same
+              sentence whatever the cause, read last by the alert. */}
+          <small>{say.slamStill}</small>
         </>
       ) : (
         <>
@@ -111,10 +114,11 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
 /** Everything that lands over the table: what it says aloud, the relic just taken, a table lost to or held by another tab, the verdict. */
 export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onClaim, onLeave }) {
   const { lost, held } = getTabNotices(tab);
-  const said = useTableVoice(voice);
+  // The case is the voice's too (E3 2단계): the first table of a case that opens an act says so.
+  const said = useTableVoice({ ...voice, caseId });
   return (
     <>
-      {/* The table's one voice (tableVoice.js): the push, the stance, the bank and the clock.
+      {/* The table's one voice (tableVoice.js): the push, the stance, the settlement, the act and the clock.
           Silent to the eye, and on the page before it has anything to say. */}
       <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
       <EdgeNotice voice={voice} caseId={caseId} />
@@ -135,25 +139,25 @@ export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onC
 
 /**
  * The logic streak in the HUD: the third of the hand's signals, beside the
- * chain and the LOCK charge. What it stands at, the type being held and how
- * far the hold has got, and a note -- what the staked card does to it, or
- * that a change of type would count. What it pays is in the pot's own line.
+ * chain and the LOCK charge. What it stands at, the direction being held
+ * (사람 or 자리) and how far the hold has got, and a note -- what the staked
+ * card does to it, or that a change of direction would count. What it pays is in the pot's own line.
  *
  * It is not drawn over the pot's corner: on a 360px phone anything there ran
  * under the pot's own numbers, and the streak has more to say. In the
  * signals row it takes room that is its own and adds no height from 프롤로그
  * 04 on, where the row already is. A phone has the width for three words of
- * it: "논리", all of the type's name but one word, and the note are not drawn
+ * it: "논리", the " 쪽" after the direction, and the note are not drawn
  * there (play.css) -- the cards' tags say what each card would do -- and the
  * buttons' description reads all of it out.
  */
 export function LogicLine({ logic }) {
-  const [before, word, after] = getTypeParts(logic.type);
+  const [word, after] = getDirectionParts(logic.type);
   return (
     <span className="gx-streak" data-testid="gauntlet-logic" data-streak={logic.after} data-move={logic.move ?? ""}>
       <b><i>{say.logicWord}</i>{say.comboWord} {logic.after}</b>
       <span>
-        {logic.type ? <>{before && <i>{before}</i>}{word}{after && <i>{after}</i>} {logic.held}</> : say.firstCard}
+        {logic.type ? <>{word}{after && <i>{after}</i>} {logic.held}</> : say.firstCard}
       </span>
       {logic.note && <em>{logic.note}</em>}
     </span>
@@ -191,7 +195,7 @@ export function ScoutBand({ band, canScout, onScout, shortcut }) {
   if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
   return (
     <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
-      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, seconds: SCOUT_SECONDS })}>
+      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })}>
       {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {band.scouted ? say.scouted : say.scout}
     </button>
   );
@@ -211,11 +215,12 @@ export function TableGlossary({ question, cards = [], mutations, relics, stanceM
     <>
       {/* The question and the cards in full. On the table both are cut to a
           line count, and the briefing page that printed them whole cannot be
-          opened again once the clock runs. A card's type is here in full too:
-          a phone's card has room for one word of it. */}
+          opened again once the clock runs. A card's direction is here with
+          its thinking type: the tag on the card has room for the direction
+          alone, and the report's 관점 전환 reads the type. */}
       <li>{question}</li>
       {cards.map((card, index) => (
-        <li key={card.id ?? index}>{fill(say.glossaryCard, { number: index + 1, label: card.label, type: getTypeName(getLogicType(card)) })}</li>
+        <li key={card.id ?? index}>{fill(say.glossaryCard, { number: index + 1, label: card.label, type: `${getDirectionName(getLogicDirection(card))} · ${getTypeName(getLogicType(card))}` })}</li>
       ))}
       {mutations.map((mutation) => (
         <li key={mutation.id}>

@@ -54,7 +54,7 @@ test("each request gets the rule for what it asks for", () => {
   assert.equal(strategyFor(get("/scene-case01-960.webp", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/icons/icon-192.png", "no-cors"), ORIGIN), "revalidate");
   assert.equal(strategyFor(get("/manifest.webmanifest"), ORIGIN), "revalidate");
-  for (const kind of ["privacy", "terms", "about", "faq", "contact"]) {
+  for (const kind of ["privacy", "terms", "about", "faq", "contact", "guide", "characters", "making", "cases/index", "cases/case01", "cases/prologue05", "cases/final"]) {
     for (const folder of ["", "/en", "/ja"]) {
       const page = `${folder}/${kind}.html`;
       assert.equal(strategyFor(get(page, "navigate"), ORIGIN), "document", page);
@@ -581,6 +581,12 @@ test("the warm list is every other build file, the portraits and the art at one 
     files: shipped([...FILES.map(([file]) => file), "/privacy.html", "/en/terms.html", "/robots.html", "/faq.html", "/ja/contact.html", "/robots.txt", "/sitemap.xml"]),
   });
   assert.deepEqual(withPolicies.warm, [...config.warm, "/en/terms.html", "/faq.html", "/ja/contact.html", "/privacy.html"].sort());
+  // The content pages (scripts/content-pages) are warmed too, the case files' index with them; a case's own page is not.
+  const withContent = workerConfigFor({
+    html: PAGE,
+    files: shipped([...FILES.map(([file]) => file), "/guide.html", "/en/characters.html", "/ja/making.html", "/cases/index.html", "/cases/case01.html", "/en/cases/prologue01.html", "/ja/cases/final.html"]),
+  });
+  assert.deepEqual(withContent.warm, [...config.warm, "/cases/index.html", "/en/characters.html", "/guide.html", "/ja/making.html"].sort());
   assert.equal(config.entry, "/assets/index-FZxcMdNV.js");
   assert.equal(config.precache.includes("/assets/index-FZxcMdNV.js"), true);
   assert.throws(() => workerConfigFor({ html: "<html></html>", files: FILES }), /no module script/);

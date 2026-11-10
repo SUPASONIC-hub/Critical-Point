@@ -41,14 +41,16 @@ import {
 // 400-920 (scripts/build-fonts.mjs). Measured 197,736, plus 4; the same line as
 // the woff2's in check-bundle-size.mjs.
 // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): the Japanese sounds lettered in the plate add ク, ド and ン (1,697 -> 1,700 characters). Measured 198,144 plus 4.
-// 198,148 -> 96,240 on 2026-11-03, font-split: the one file became two, and
-// this line is the first (preloaded) one's. Measured 96,236 plus 4. The second
-// file's line is MAX_REST_FONT_BYTES; together they are about the one file
-// they replaced, since both are cut from the same face and axis.
-// 96,240 / 116,944 -> 129,428 / 85,748 on 2026-11-04: the intro's case cards,
-// play styles and origins moved to the first file. Measured 129,424 / 85,744 plus 4.
-const MAX_FONT_BYTES = 129_428;
-const MAX_REST_FONT_BYTES = 85_748;
+// 198,148 -> 199,128 on 2026-11-05, studio-name: ち, ぷ, も and よ for STUDIOもちぷよ. Measured 199,124 plus 4.
+// 199,128 -> 131,356 on 2026-11-10, font-split over main 3a507805 (the user's choice 1,
+// held for W47 and released on 11-10): the one file became two, and this line is the
+// first (preloaded) one's: the start screen's characters in three languages, the
+// intro's case cards, play styles, origins and the studio credit among them. The
+// second file's line is MAX_REST_FONT_BYTES; together they are about the one file
+// they replaced, since both are cut from the same face and axis. (Before the merge,
+// 2026-11-03/04: 96,236 and then 129,424 / 85,744.) Measured 131,352 / 82,780 plus 4.
+const MAX_FONT_BYTES = 131_356;
+const MAX_REST_FONT_BYTES = 82_784;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones

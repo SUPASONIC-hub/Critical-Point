@@ -36,6 +36,7 @@ export function thresholdOf(window) {
     gauge: Math.round(window.gauge),
     wall: window.wall,
     pushes: window.pushes,
+    scouted: window.scouted === true,
     focus: { charge: Math.round(window.focus), mode: window.focusMode, hits: window.focusHits },
   };
 }

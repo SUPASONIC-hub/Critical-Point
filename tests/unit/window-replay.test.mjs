@@ -48,7 +48,8 @@ test("the trail writes presses with their clock, and no ticks", () => {
   assert.deepEqual(record.events.map(([, code]) => code), ["S", "P", "P", "C"]);
   assert.deepEqual(record.events.map(([at]) => at), [0, 1, 2, 2.25]);
   assert.deepEqual(record.events[0], [0, "S", "card-a"]);
-  assert.deepEqual(record.schema, {});
+  // The plain board names its stake clock (2026-11-05); a record from before is `{}`.
+  assert.deepEqual(record.schema, { stakeClock: true });
 });
 
 test("a window the clock closed -- into the wall or out of time -- replays to the same close", () => {
@@ -139,10 +140,14 @@ test("a record that does not hold together is named before anything is dealt", (
 });
 
 test("the board is written as it differs from the plain one, and read back whole", () => {
-  assert.deepEqual(compactSchema(BASE_SCHEMA), {});
+  // A plain board of this build says it has the stake clock; a record that
+  // says nothing (`{}`, written before 2026-11-05) reads back without it.
+  assert.deepEqual(compactSchema(BASE_SCHEMA), { stakeClock: true });
+  assert.equal(normalizeSchema({}).stakeClock, false);
+  assert.deepEqual(compactSchema(normalizeSchema({})), {});
   const board = normalizeSchema({ ...BASE_SCHEMA, wallMin: 60, creep: 0.7, mutations: ["blackout"], faceDown: true });
   const compact = compactSchema(board);
-  assert.deepEqual(compact, { wallMin: 60, creep: 0.7, faceDown: true, mutations: ["blackout"] });
+  assert.deepEqual(compact, { wallMin: 60, creep: 0.7, faceDown: true, mutations: ["blackout"], stakeClock: true });
   assert.deepEqual(normalizeSchema(compact), board);
 });
 

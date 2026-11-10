@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c16_start": {
       "title": "4:12 a.m.",
-      "text": "The morning of the first snow, Kang Taemin comes up to the Trigger Lab 4th floor in daylight for the first time. Snow on the shoulders of his hi-vis vest melts and spreads. Instead of a greeting, he holds out his phone. '[FlowOn] This is to inform you that your contract ends as of December 31. Thank you for all your hard work.' Sent at 4:12 a.m., when the 80 people on the night shift were carrying boxes. The FlowOn fulfillment center is bringing in 120 logistics robots, on a KD Capital lease. Kang Taemin pulls off his gloves and tucks them into his vest pocket. 'I’m fine. 30 of the 80 aren’t.'",
+      "text": "Instead of a greeting, Kang Taemin holds out his phone. '[FlowOn] This is to inform you that your contract ends as of December 31. Thank you for all your hard work.' Sent at 4:12 a.m., when the 80 people on the night shift were carrying boxes. The FlowOn fulfillment center is bringing in 120 robots, on a KD Capital lease. 'I’m fine. 30 of the 80 aren’t.'",
       "memo": [
         "Termination notice: 1 text message, 4:12 a.m.",
         "Night shift of 80 -- contracts end December 31",
@@ -38,7 +38,7 @@ export default {
     },
     "c16_duel": {
       "title": "Kang Taemin vs. Darami",
-      "text": "Four robots on trial run move between the shelves of Building B. The night shift has named one of them 'Darami'. The two orange lights on its front look like a squirrel’s cheeks stuffed with acorns, they say. Choi Seojin from KD Capital, out for the on-site lease review, stands with her tablet when Yoo Haon, the youngest, sets up a match. 'Foreman vs. Darami, 30-minute picking contest!' Result: Kang Taemin 212 orders, Darami 198. The break room erupts. Then, as Kang Taemin grabs his back and sinks down, Darami beeps and picks order 199. Choi Seojin says quietly, 'That robot has no back. That’s why they want it.'",
+      "text": "The night shift calls one of the trial robots 'Darami'. Its two orange lights look like a squirrel’s cheeks, they say. With Choi Seojin watching, Yoo Haon, the youngest, sets up a match. 'Foreman vs. Darami, 30-minute picking contest!' Result: Kang Taemin 212 orders, Darami 198. As Kang Taemin grabs his back and sinks down, Darami beeps and picks order 199. Choi Seojin says quietly, 'That robot has no back. That’s why they want it.'",
       "memo": [
         "4 robots on trial run -- 120 planned",
         "30-minute contest: Kang Taemin 212 · Darami 198",
@@ -69,7 +69,7 @@ export default {
     },
     "c16_review": {
       "title": "The Erased Opinion Field",
-      "text": "Choi Seojin lets you in after everyone has gone home. On the screen is the FlowOn lease review report, and the 'reviewer opinion' field at the bottom says only 'Nothing of note.' Choi Seojin opens, on her own laptop, the original she submitted three days ago. 'Recommend phased transition of night staff, conditional on retraining.' There were six lines. 'My team head says he tidied it up before it went to the committee. Because the members are busy.' She tries to smile and stops. 'My mom sorted parcels for 12 years and had wrist surgery twice. That’s why I studied robotics, and that’s why I do this job. But is it normal for my opinion to just vanish like this?' You have known the answer to that question for 3 years.",
+      "text": "The 'reviewer opinion' field of the lease review report says only 'Nothing of note.' Choi Seojin opens the original she submitted three days ago. 'Recommend phased transition of night staff, conditional on retraining.' There were six lines. 'My team head says he tidied it up before it went to the committee.' She tries to smile and stops. 'My mom sorted parcels for 12 years and had wrist surgery twice. That’s why I do this job. But is it normal for my opinion to just vanish like this?' You have known the answer for 3 years.",
       "memo": [
         "Original report: 6 lines of opinion · submitted version: 'Nothing of note'",
         "Edited by: Lease Review Team 2 head, the day after Choi Seojin submitted",
@@ -96,11 +96,11 @@ export default {
       "place": "KD Capital, Euljiro, 11th floor · Lease Review Team meeting room",
       "clock": "Approval committee D-4 · 21:30",
       "question": "A young reviewer’s six lines vanished exactly the way your opinion did 3 years ago. What do you tell her?",
-      "lead": "You get a visitor pass at the security desk and go up; on the 12th floor only one meeting room has its lights on."
+      "lead": "You get a visitor pass at the security desk and go up; on the 11th floor only one meeting room has its lights on."
     },
     "c16_roof": {
       "title": "The Second Cup of Noodles",
-      "text": "Snow piles up again on the center’s roof railing. Kang Taemin pours water from a thermos into two cups of instant noodles. 'Remember that night? The 72 hours when FlowOn was supposed to go under.' You remember. Back then, when no one from the bank ever came at night, he tore open a second cup and handed it to you. 'That was Jungwoo’s, actually. We started together the first year. He always forgot to bring his, so I bought two. He collapsed on the night shift 4 years ago. Never got it recognized as a workplace injury.' He holds out the steaming cup. 'The company wants me to stay. I’m the foreman, so I’m first of the six who’ll watch the robots. But if 74 go and six stay, who do I give the second one to?'",
+      "text": "Snow piles up again on the railing. Kang Taemin pours water from a thermos into two cups of instant noodles. 'The 72 hours when FlowOn was supposed to go under, remember?' Back then, when no one from the bank ever came at night, he tore open a second cup and handed it to you. 'That was Jungwoo’s, actually. He collapsed on the night shift 4 years ago. Never got it recognized as a workplace injury. The company wants me to stay. But if 74 go and six stay, who do I give the second one to?'",
       "memo": [
         "Offer to stay: 6 robot-control staff, Kang Taemin on the first line",
         "Jungwoo: started the same first year, collapsed on night duty 4 years ago",
@@ -125,13 +125,13 @@ export default {
         }
       },
       "place": "FlowOn fulfillment center · Roof",
-      "clock": "First snow · 04:30 · Approval committee D-2",
+      "clock": "Snow · 04:30 · Approval committee D-2",
       "question": "Kang Taemin has been offered to stay alone, and the person to give the second cup to is disappearing. What do you ask of him?",
       "lead": "The break room is too quiet, so Kang Taemin takes his thermos and climbs the roof stairs first."
     },
     "c16_final": {
       "title": "120 Robots and 80 People",
-      "text": "The KD Capital lease approval committee. Five members sit at a long table, and the wall screen shows the rollout schedule for 120 robots. In the reviewer’s seat, Choi Seojin grips a tablet with her original opinion on it in both hands. Snow has been falling outside for two days, and on the lobby sofa sits Kang Taemin in his hi-vis vest, straight off the night shift. The chair reads the agenda. 'As proposed, approval today and operation from January 2.' What Kang Taemin said in the corridor just before the meeting is still in your ears. 'Let the robots come. Better they do the lifting than Jungwoo’s back. But the door we leave by can’t be one text message.' The chair looks at you. You have 5 minutes.",
+      "text": "Five members sit at a long table, and the wall screen shows the rollout schedule for 120 robots. Choi Seojin grips a tablet with her original opinion on it in both hands. The chair reads the agenda. 'As proposed, approval today and operation from January 2.' What Kang Taemin said in the corridor just before the meeting is still in your ears. 'Let the robots come. Better they do the lifting than Jungwoo’s back. But the door we leave by can’t be one text message.' The chair looks at you. You have 5 minutes.",
       "memo": [
         "Proposal: lease of 120 robots · condition 'night staff of 80 let go within the year'",
         "Changing the condition raises the lease fee 4% -- FlowOn may go to another lessor",
@@ -159,7 +159,7 @@ export default {
     },
     "c16_aftershock": {
       "title": "80 Cups of Noodles",
-      "text": "The night the approval committee ends, whatever the result, four electric kettles boil at once in the night-shift break room. Kang Taemin lines up 80 cups of noodles on the table, and Kwon Dohyun, saying they are 1,150 won each, pockets the receipt first. Yoo Haon, the youngest on the night shift, loads a box of noodles onto the back of 'Darami', the trial logistics robot, and sends it around the room. When Darami stops in front of Bae Sookyung, 9 years on the packing line, she strokes its orange lights and says, 'You like me, don’t you.' Choi Seojin, the KD Capital lease reviewer, still in a borrowed hi-vis vest, drinks the broth to the last drop for the first time. Kang Taemin sets an 81st cup in front of you. 'It’s the second one.' Then a text comes from Ban Jaewook. 'Group legal wants my notebook. They say your name is in it.'",
+      "text": "The night the approval committee ends, whatever the result, four electric kettles boil at once in the break room. Kang Taemin lines up 80 cups of noodles. Darami, carrying a box of noodles around the room, stops in front of Bae Sookyung, and she strokes its lights. 'You like me, don’t you.' Choi Seojin, in a borrowed hi-vis vest, drinks the broth to the last drop for the first time. Kang Taemin sets an 81st cup in front of you. 'It’s the second one.' Then a text comes from Ban Jaewook. 'Group legal wants my notebook. They say your name is in it.'",
       "memo": [
         "80 cups of noodles + 1",
         "Darami load test: 12 boxes of noodles, success",
@@ -178,12 +178,12 @@ export default {
         }
       },
       "place": "FlowOn fulfillment center · Night-shift break room",
-      "clock": "Approval committee day · 23:00 · First snow",
+      "clock": "Approval committee day · 23:00 · Snow",
       "question": "While 81 cups of noodles steep, Ban Jaewook’s notebook is being called in. How do you close this night?"
     },
     "c16_ledger": {
       "title": "Not Enough Columns",
-      "text": "Four in the morning, the break-room whiteboard. Kwon Dohyun, called in by Kang Taemin, draws a vertical line. Left, 1 robot. Right, 1 night-shift worker. The 120 robots also run by day, so the night share is eighty units. A monthly lease fee of 2.83 million won against a monthly wage of 3.12 million won: the robot wins. He adds columns. Maintenance, electricity, orders that back up every time a robot stops, the staff who watch them. On the people side, night pay and back treatment. The more columns, the closer the two numbers get. At the edge of the board, Kwon Dohyun stops with the marker raised. 'Not enough columns.' He starts taping sheets of A4 paper together along the wall. Kang Taemin hands him a cup of noodles. 'Tape all that up and it’ll be dawn.' 'It already is.'",
+      "text": "Kwon Dohyun draws a vertical line on the whiteboard. Left, 1 robot. Right, 1 night-shift worker. The robots also run by day, so the night share is eighty units. A monthly lease fee of 2.83 million won against a monthly wage of 3.12 million won: the robot wins. The more he adds, maintenance, electricity and backed-up orders on the robot side, night pay and back treatment on the people side, the closer the two numbers get. At the edge of the board, Kwon Dohyun stops. 'Not enough columns.' He starts taping sheets of A4 along the wall. Kang Taemin hands him a cup of noodles. 'Tape all that up and it’ll be dawn.' 'It already is.'",
       "memo": [
         "1 robot: 2.83 million won a month · 1 night-shift worker: 3.12 million won a month",
         "14 hidden-cost columns -- past the whiteboard",
@@ -206,7 +206,7 @@ export default {
     },
     "c16_log": {
       "title": "The Night Error Log",
-      "text": "After midnight that day, Choi Seojin comes to the center in a borrowed hi-vis vest instead of carrying her tablet. She pulls the trial robots’ stop logs herself: just as Yoo Haon’s notes say, they stopped 47 times in a month, and all 47 times someone on the night shift restarted them. Each entry has a short note. '03:12 cleared plastic wrap from wheel -- Haon.' '04:40 just sulking. Gave it a pat -- Haon.' Choi Seojin laughs for a long time, then goes quiet. 'They’ve already been doing the maintenance.' She opens her notebook. 'The manufacturer’s maintenance course is 12 weeks. What if we ask to open it to the night shift first?'",
+      "text": "The stop logs show the trial robots stopped 47 times in a month, and all 47 times the night shift restarted them. Each entry has a note. '03:12 cleared plastic wrap from wheel -- Haon.' '04:40 just sulking. Gave it a pat -- Haon.' Choi Seojin, who came in a borrowed hi-vis vest instead of carrying her tablet, laughs for a long time, then goes quiet. 'They’ve already been doing the maintenance. The manufacturer’s maintenance course is 12 weeks. What if we open it to the night shift first?'",
       "memo": [
         "47 night stops -- every restart by the night shift",
         "Manufacturer maintenance training: 12 weeks, 20 seats",
@@ -224,12 +224,12 @@ export default {
         }
       },
       "place": "FlowOn fulfillment center · Floor",
-      "clock": "Approval committee D-3 · 01:20 · First snow",
+      "clock": "Approval committee D-3 · 01:20 · Snow",
       "question": "For a month the night shift has revived the robots 47 times. What do you propose with that log?"
     },
     "c16_list": {
       "title": "The Stay List",
-      "text": "At the morning shift change, one A4 sheet goes up on the break-room board. 'Robot-control staff retained, 6.' The first line is Kang Taemin. Applause starts without anyone starting it. No one knows whether it is congratulation or farewell. Kang Taemin stops in front of the board, halfway out of his gloves. Bae Sookyung from the packing line pats his back. 'Take it, Foreman. One foreman has to stay so we can come visit.' Then she lowers her voice. 'But apart from you, all five are men under thirty-five. Isn’t that a bit odd?'",
+      "text": "At the morning shift change, one A4 sheet goes up on the board. 'Robot-control staff retained, 6.' The first line is Kang Taemin. Applause starts, whether congratulation or farewell no one knows. Bae Sookyung from the packing line pats his back. 'Take it, Foreman. One foreman has to stay so we can come visit.' Then she lowers her voice. 'But apart from you, all five are men under thirty-five. Isn’t that a bit odd?'",
       "memo": [
         "6 retained: Kang Taemin + 5 men aged 35 or under",
         "No selection criteria disclosed",
@@ -252,7 +252,7 @@ export default {
     },
     "c16_ledger_reaction": {
       "title": "The Ones Who Have to Leave First",
-      "text": "ECHO brings up the draft lease contract beside Kwon Dohyun’s A4 sheets. Nowhere is there a calculation saying to let 80 people go over a 90,000 won gap. Instead, on page 3 of the annex, there is one line. 'Condition precedent to the lease: commitment to let go the night staff of 80 within the year.' ECHO underlines it. 'This is not robots replacing people. It is written so the robots can come in only after the people leave. Who set this order is not in the contract.'",
+      "text": "In the draft lease contract, there is no calculation weighing a 90,000 won gap. Instead, on page 3 of the annex, there is one line. 'Condition precedent to the lease: commitment to let go the night staff of 80 within the year.' ECHO underlines it. 'It is written so the robots can come in only after the people leave. Who set this order is not in the contract.'",
       "memo": [
         "A contract that takes effect only once people leave",
         "Whoever set the order is not in the contract"
@@ -274,7 +274,7 @@ export default {
     },
     "c16_log_reaction": {
       "title": "I Only Finished High School",
-      "text": "When word of the training goes around the break room, Yoo Haon is first to raise her hand. And lowers it right away. 'I only finished high school. Isn’t that stuff for people who went to college?' Choi Seojin turns her tablet to show the first page of the manufacturer’s maintenance manual. 'Qualifications: none.' Yoo Haon reads it twice. Behind her, Kang Taemin says, 'Her hands are the fastest in the center.' Bae Sookyung cuts in. 'I’m in too. It doesn’t use your wrists, right?' As the break room bursts out laughing, word that there are only 20 seats goes around late. Twenty out of 80.",
+      "text": "When word of the training goes around, Yoo Haon is first to raise her hand, and lowers it right away. 'I only finished high school. Isn’t that stuff for people who went to college?' Choi Seojin shows her the first page of the manufacturer’s maintenance manual. 'Qualifications: none.' Bae Sookyung cuts in. 'I’m in too. It doesn’t use your wrists, right?' Only after the room bursts out laughing does word go around that there are 20 seats. Twenty out of 80.",
       "memo": [
         "Qualifications: none",
         "20 out of 80"
@@ -296,7 +296,7 @@ export default {
     },
     "c16_list_reaction": {
       "title": "4 Percent",
-      "text": "The night before the approval committee, as snow blows across the center’s parking lot, Choi Seojin calls. Her voice shakes. 'My team head says if we attach phased transition or retraining as conditions, the lease fee goes up 4%. Then FlowOn goes to another lessor. One that attaches no conditions at all.' On the line, the sound of a keyboard stops. 'So even if we attach conditions, the 80 still go, and we just lose the deal. I thought robots would save people, but robots don’t think anything. Only people think too much.'",
+      "text": "Choi Seojin’s voice shakes on the phone. 'My team head says if we attach phased transition or retraining as conditions, the lease fee goes up 4%. Then FlowOn goes to another lessor that attaches no conditions at all. So even if we attach conditions, the 80 still go, and we just lose the deal.' The line goes quiet for a moment. 'I thought robots would save people, but robots don’t think anything. Only people think too much.'",
       "memo": [
         "Conditions raise the lease fee 4%",
         "Another lessor with no conditions at all"
@@ -318,7 +318,7 @@ export default {
     },
     "c16_branch_locker": {
       "title": "80 Lockers",
-      "text": "On the 80 lockers at the back of the break room, names are stuck on with masking tape. Bae Sookyung, 9 years on the packing line, is already emptying hers. Three wrist braces, her daughter’s graduation photo, a half-used box of pain patches. 'I started packing as soon as I got the text. I thought it might sting less if I packed early.' She holds up a brace. 'My right hand’s had surgery twice. I almost filed it as a workplace injury, then didn’t. I was afraid they wouldn’t renew my contract.' Then she laughs. 'Honestly, I’m glad the robots are coming. Better that thing than my wrists. But where do I go?'",
+      "text": "Bae Sookyung, 9 years on the packing line, is already emptying her locker. Three wrist braces, her daughter’s graduation photo, a half-used box of pain patches. 'I started packing as soon as I got the text. I thought it might sting less if I packed early. My right hand’s had surgery twice. I almost filed it as a workplace injury, then didn’t. I was afraid they wouldn’t renew my contract. Honestly, I’m glad the robots are coming. Better that thing than my wrists.' She laughs. 'But where do I go?'",
       "memo": [
         "11 of the 80 lockers already emptied",
         "Bae Sookyung: 9 years on the packing line, 2 right-wrist surgeries",
@@ -342,7 +342,7 @@ export default {
     },
     "c16_branch_locker_follow": {
       "title": "The Hairpin Mechanic",
-      "text": "At three in the morning, Darami stops in the middle of Row C. Plastic wrap is wound around a wheel. The manufacturer’s technician only comes by day. Yoo Haon, the youngest, takes a hairpin from her pocket, digs out the wheel gap, opens the back panel and holds the reset button for 3 seconds. The orange lights come back on. Yoo Haon shows you a memo on her phone. 47 lines of error log written over a month. 'Plastic wrap 19 times, couldn’t read barcode 11 times, just sulking 3 times. The other 14, I don’t know either.' The break room bursts out laughing. Yoo Haon adds, a little sheepish, 'I’ve fixed it more than the daytime technician. But I’m out on December 31.'",
+      "text": "At three in the morning, Darami stops with plastic wrap wound around a wheel. Yoo Haon, the youngest, digs out the wheel gap with a hairpin and presses the reset button. She shows you a memo on her phone. 47 lines of error log written over a month. 'Plastic wrap 19 times, couldn’t read barcode 11 times, just sulking 3 times. The other 14, I don’t know either.' Everyone bursts out laughing. 'I’ve fixed it more than the daytime technician. But I’m out on December 31.'",
       "memo": [
         "47 night stops of the 4 trial robots -- all fixed by the night shift",
         "Manufacturer maintenance contract: weekdays 09~18 only",
@@ -366,7 +366,7 @@ export default {
     },
     "c16_route_system": {
       "title": "Risk That Moved",
-      "text": "You add a column to the table: the let-go, 1 year later. ECHO pulls up KD Capital’s approvals from the past 5 years. 37 automation equipment leases open up. At the sites that adopted them, accidents fell 41% on average. It is the number Choi Seojin, reviewing this lease for KD Capital, believes in. ECHO opens one more column. The 1,906 people whose contracts ended at those sites, a year later. 62% moved to construction day labor and dawn delivery, where the accident rate is twice what it was. 'The risk did not shrink. It moved off the books. Of the 37 leases, 0 carried a retraining condition.'",
+      "text": "As you add the let-go, 1 year later, to the table, ECHO pulls up KD Capital’s approvals from the past 5 years. 37 automation equipment leases. At the sites that adopted them, accidents fell 41% on average. But of the 1,906 people whose contracts ended at those sites, 62% moved to construction day labor and dawn delivery, where the accident rate is twice what it was. 'The risk did not shrink. It moved off the books.'",
       "memo": [
         "37 automation leases -- accidents down 41% at adopting sites",
         "62% of the 1,906 let go moved to riskier work",
@@ -392,7 +392,7 @@ export default {
     },
     "c16_final_system_route": {
       "title": "1 Year Off the Books",
-      "text": "The last night before the committee meets, ECHO has set two tables side by side. On the left, accident records at the sites that brought in robots. On the right, the 1,906 who left those sites, 1 year later. The left table carries KD Capital’s approval records; the right has no field to approve at all. At the very bottom of the right, ECHO draws 80 empty rows. 'Kang Taemin’s night shift. Where these rows get filled is not any company’s books.'",
+      "text": "ECHO has set two tables side by side. On the left, accident records at the sites that brought in robots. On the right, the 1,906 who left those sites, 1 year later. The right has no field to approve at all. At its bottom, ECHO draws 80 empty rows. 'Kang Taemin’s night shift. Where these rows get filled is not any company’s books.'",
       "memo": [
         "37 automation leases -- 0 retraining conditions",
         "The 1,906 let go, 1 year later: on no one’s books",
@@ -415,7 +415,7 @@ export default {
     },
     "c16_evidence_turn": {
       "title": "The Blank Owner Field",
-      "text": "You set the clue beside the clause number, and the drafting history of the condition precedent opens. 'Commitment to let go the night staff of 80 within the year' is not a sentence KD Capital wrote. The requesting department is the KD Financial Group Group Strategy Office, and the request date is the week after the Innovation Committee launched. The attached English memo is one line. 'Labor cost improvement needed before Q1 sale of FlowOn stake.' The owner field is blank. Ban Jaewook closes the notebook he was writing in. 'So it wasn’t about bringing in robots. They cut the people first to sell the company high. And once again, no one signed.'",
+      "text": "You set the clue beside the clause number, and the drafting history of the condition precedent opens. The requesting department is not KD Capital but the KD Financial Group Group Strategy Office, and the request date is the week after the Innovation Committee launched. The attached memo is one line. 'Labor cost improvement needed before Q1 sale of FlowOn stake.' The owner field is blank. Ban Jaewook closes his notebook. 'They cut the people first to sell the company high. Once again, no one signed.'",
       "memo": [
         "Requesting department: KD Financial Group, Group Strategy Office",
         "Memo: 'Labor cost improvement needed before Q1 stake sale'",
@@ -438,7 +438,7 @@ export default {
     },
     "c16_start_warm": {
       "title": "An Empty Seat on Thursday Evening",
-      "text": "On the evening of the college entrance exam, as you shared cold radish soup on the school-gate steps, the post in the night-shift group chat on Kang Taemin’s phone was one line of rumor. 'Robots are coming to Building B.' The people who sat on those steps have had dinner every Thursday since, and 2 weeks later, on the Thursday of the first snow, Kang Taemin is late for the first time. Instead of a greeting, he holds out his phone. A termination text that came at 4:12 a.m. The FlowOn fulfillment center is bringing in 120 robots, on a KD Capital lease, and the night shift of 80 goes at year end. Lee Chanbin puts down his chopsticks. 'You too, mister?'",
+      "text": "On exam day, on the school-gate steps, the post in the night-shift group chat on Kang Taemin’s phone was one line of rumor. 'Robots are coming to Building B.' 2 weeks later, on the Thursday of the first snow, Kang Taemin arrives late for the first time and holds out a termination text instead of a greeting. The FlowOn fulfillment center is bringing in 120 robots, on a KD Capital lease, and the night shift of 80 goes at year end. Lee Chanbin puts down his chopsticks. 'You too, mister?'",
       "memo": [
         "Thursday dinner -- the second since the exam",
         "One line of rumor on exam day became a termination text in 2 weeks",
@@ -462,14 +462,14 @@ export default {
           "label": "Add the let-go, 1 year later"
         }
       },
-      "place": "Lee Minseo’s rooftop room, Mangwon-dong · Rooftop",
+      "place": "Lee Minseo’s rooftop room, Haebangchon · Rooftop",
       "clock": "Late November · First snow · Thursday 19:00",
       "question": "A termination text has landed on the Thursday dinner table. Where do you move this table?",
       "lead": "Since the school-gate steps on exam day, Thursday evenings have meant dinner at Lee Minseo’s rooftop room."
     },
     "c16_start_record": {
       "title": "A Paper with No Requester",
-      "text": "Filing the proposal to end the contract-worker confirmation practice with Human Resources, you wrote one principle at the very top. 'Any paper sent down from above must carry the name of the person who asked for it and a box to refuse it.' 2 weeks later, ECHO finds a paper that runs into that principle. A KD Capital lease application. It brings 120 robots into the FlowOn fulfillment center, and it is the truth behind the rumor that passed through Kang Taemin’s group chat on exam-day evening. The attached staffing plan lists the termination of the night shift of 80, and there is no requester’s name. The 80 already got the text at 4:12 a.m.",
+      "text": "The principle on the first line of the proposal read: 'Any paper sent down from above must carry the name of the person who asked for it and a box to refuse it.' The paper caught on it is a KD Capital lease application. Bringing 120 robots into the FlowOn fulfillment center is the truth behind the rumor that passed through Kang Taemin’s group chat on exam day. The staffing plan lists the termination of the night shift of 80, and there is no requester’s name.",
       "memo": [
         "Attached to the lease application: termination of the night shift of 80",
         "Requester field: blank · refusal box: none",
@@ -500,7 +500,7 @@ export default {
     },
     "c16_start_rush": {
       "title": "A Knock at Five a.m.",
-      "text": "In the 2 weeks since you followed Kang Taemin’s group-chat post straight to the center on exam-day evening, you have barely been home, chasing the source of the rumor 'Robots are coming to Building B'. No one would confirm it. At five in the morning of the first snow, someone knocks on the Trigger Lab 4th-floor door. Kang Taemin, slipped out mid-shift still in his vest, stands there with snow on his hi-vis. 'It’s confirmed.' He holds out the termination text that came at 4:12 a.m. The FlowOn fulfillment center is bringing in 120 robots, he says, on a KD Capital lease. 'It’s 80 people. We need someone who runs as fast as you, Analyst.'",
+      "text": "For 2 weeks no one would confirm the rumor you chased. At the door stands Kang Taemin, slipped out mid-shift, snow on his hi-vis vest. 'It’s confirmed.' He holds out the termination text that came at 4:12 a.m. The FlowOn fulfillment center is bringing in 120 robots, he says, on a KD Capital lease. 'It’s 80 people. We need someone who runs as fast as you, Analyst.'",
       "memo": [
         "Termination text: night shift of 80, 48 minutes ago",
         "The rumor chased for 2 weeks, confirmed by one text",

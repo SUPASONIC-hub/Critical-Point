@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c18_start": {
       "title": "Double the Salary",
-      "text": "The moment he arrives, Oh Jinwoo puts a white envelope on your desk. A job offer from Bridge Bank’s strategy division. The post: acquisitions team head. A team head at thirty-four would be the youngest at that bank, and the salary is double what he makes now. The team’s job is one line. Buy the bundle of bad loans KD Bank is putting up at year end, 186 billion won of them, at 19% of principal. Lining his pen up with the monitor, Oh Jinwoo says, 'Buy this bundle and I get to see every KD loan file. Even the files of the people who pushed my father out.' He pauses. 'I haven’t told anyone yet. You’re the first. I can calculate which side wins. Which side is right, I don’t know.'",
+      "text": "Oh Jinwoo puts a white envelope on your desk. A job offer from Bridge Bank; the post is acquisitions team head. At thirty-four he would be the youngest team head at that bank, and the salary is double what he makes now. The job: buy the bundle of bad loans KD Bank is putting up at year end, 186 billion won of them, at 19% of principal. 'Buy this bundle and I get to see every KD loan file. Even the files of the people who pushed my father out. I can calculate which side wins. Which side is right, I don’t know.'",
       "memo": [
         "Bridge Bank acquisitions team head offer -- double salary, youngest ever",
         "Job: buy a 186 billion won bundle of KD Bank bad loans",
@@ -39,7 +39,7 @@ export default {
     },
     "c18_lounge": {
       "title": "The One Who Reads People",
-      "text": "The 32nd-floor lounge at Bridge Bank’s head office. Straight ahead, through the glass, is KD Financial Group headquarters. Do Haram, head of the strategy division, brings three coffees herself. One is for Kwon Dohyun, who stays standing by the window and does not take it. Do Haram speaks the moment she sits. 'I didn’t pick Mr. Oh because he’s fast. It’s because he can’t stand losing. People like that go all the way.' She turns her tablet around. 48 hours of acquisition due diligence access, all 1,214 KD loan files open. 'I’ll give you the blade. Where to cut is the team head’s call.' Then she looks at you. 'Analyst, did you come to hold him back, or to see him off?' Kwon Dohyun says, eyes still on the window, 'At 19%, KD takes a loss and we turn a profit. The debtor box… no one has filled it yet.'",
+      "text": "By the window, Kwon Dohyun does not take the coffee Do Haram, head of the strategy division, brought herself. Do Haram speaks the moment she sits. 'I didn’t pick Mr. Oh because he’s fast. It’s because he can’t stand losing.' She turns her tablet around. 48 hours of acquisition due diligence access. 'I’ll give you the blade. Where to cut is the team head’s call. Analyst, did you come to hold him back, or to see him off?' Kwon Dohyun says, eyes still on the window, 'At 19%, KD takes a loss and we turn a profit. The debtor box… no one has filled it yet.'",
       "memo": [
         "Do Haram: Bridge Bank strategy division head, Kwon Dohyun’s boss",
         "48 hours of due diligence access -- 1,214 KD loan files",
@@ -70,7 +70,7 @@ export default {
     },
     "c18_party": {
       "title": "Secret Santa",
-      "text": "The year-end party in the Trigger Lab pantry. Kang Taemin has stacked 40 cups of noodles into a tree, and Lee Minseo folded the star on top out of foil. At the Secret Santa reveal, Na Junhyuk holds out to Kwon Dohyun a box he carried up from Yeongdong on a dawn bus. Rice cakes shaped like a calculator, made to order at Gaeul Rice Cake Shop. Every button is studded with sesame, and on the '=' key, red bean spells 'profit'. Kwon Dohyun stares at it a long time. 'Eat this and it’s a loss. I can’t eat it.' While everyone laughs, Do Yoonha finds Oh Jinwoo in the emergency stairwell. The note on his phone is titled 'Farewell speech'; this is his fifth solo rehearsal. 'Thank you for all… no, the people I should thank… no.' Do Yoonha stands holding the door. Oh Jinwoo lowers his phone. 'I haven’t decided. It’s just, in case.'",
+      "text": "A tree of 40 noodle cups stands in the pantry. At the Secret Santa reveal, Na Junhyuk holds out to Kwon Dohyun a box he carried up from Yeongdong. Rice cakes shaped like a calculator, made to order at Gaeul Rice Cake Shop; on the '=' key, red bean spells 'profit'. Kwon Dohyun stares at it a long time. 'Eat this and it’s a loss. I can’t eat it.' While everyone laughs, Do Yoonha finds Oh Jinwoo in the emergency stairwell. It is his fifth solo rehearsal of a 'Farewell speech'. 'Thank you for all… no, the people I should thank… no.' Oh Jinwoo lowers his phone. 'I haven’t decided. It’s just, in case.'",
       "memo": [
         "Secret Santa reveal: Na Junhyuk → Kwon Dohyun, calculator-shaped rice cakes",
         "Noodle-cup tree of 40 -- Kang Taemin",
@@ -101,7 +101,7 @@ export default {
     },
     "c18_table": {
       "title": "The Winning Side",
-      "text": "The dining table at Oh Sangchul’s home in Suwon. His wife is frying a third plate of rolled omelet, and a Christmas carol special plays silently on the living-room TV. When Oh Jinwoo brings up the offer, Oh Sangchul puts down his chopsticks. Even when told the sale bundle includes old Maetan Branch customers, he says nothing for a while. Then he speaks. 'Go. Stand on the winning side.' Oh Jinwoo’s face sets. 'You held it off a day, Dad. You said that was right.' Oh Sangchul takes a spoonful of cold soup. 'It was right. And so I became a man who can’t even visit customers of 30 years on the holidays. When the right man loses, the people on his side lose with him.' His mother quietly slides the omelet plate toward her son. No one touches it.",
+      "text": "His mother is frying a third plate of rolled omelet. When Oh Jinwoo brings up the offer, Oh Sangchul puts down his chopsticks. After a long while, he speaks. 'Go. Stand on the winning side.' Oh Jinwoo’s face sets. 'You held it off a day, Dad. You said that was right.' Oh Sangchul takes a spoonful of cold soup. 'It was right. And so I became a man who can’t even visit customers of 30 years on the holidays. When the right man loses, the people on his side lose with him.' No one touches the omelet plate his mother slid over.",
       "memo": [
         "64 old Maetan Branch customers in the sale bundle",
         "Oh Sangchul: cut contact with old customers after he was replaced as branch manager",
@@ -132,7 +132,7 @@ export default {
     },
     "c18_final": {
       "title": "8:21",
-      "text": "No one called anyone, yet everyone is on the Trigger Lab 4th floor. Kang Taemin came straight off the night shift in his vest, and Na Junhyuk took the first bus from Yeongdong. Oh Jinwoo lays out on the desk the offer, a stack of business cards bound with a rubber band, and Kwon Dohyun’s profit-and-loss sheet. The 612 in Appendix 3, the 31 at Sodam Chanbang, and the blade Do Haram handed him. 'If I go, I can change the price and terms from inside. If I don’t, the next team head buys this bundle without even knowing where Maetan Branch is.' He looks at you. 'You asked me once whether I was fast or was made fast. This time I want to decide myself. But I want to hear from you first.' The wall clock turns to 8:21.",
+      "text": "No one called anyone, yet everyone is here. Kwon Dohyun’s profit-and-loss sheet, the Bridge Bank offer and a stack of business cards bound with a rubber band: Oh Jinwoo lays them side by side on the desk. 'If I go, I can change the price and terms from inside. If I don’t, the next team head buys this bundle without even knowing where Maetan Branch is. You asked me once whether I was fast or was made fast. This time I want to decide myself. But I want to hear from you first.' The wall clock turns to 8:21.",
       "memo": [
         "Signing: 09:00 today, Bridge Bank 32nd floor",
         "Sale bundle 186 billion won · 612 slated for job cuts",
@@ -159,7 +159,7 @@ export default {
     },
     "c18_aftershock": {
       "title": "The Sixth Farewell Speech",
-      "text": "The evening of December 31, the pantry tree Kang Taemin stacked out of noodle cups for the party has shrunk by about half. Oh Jinwoo opens the note on his phone and stands. The farewell speech he rehearsed alone five times, stopping each time at the first sentence; this is the sixth. This time he doesn’t stop. 'I was always afraid of being late. In this room, for the first time, I learned that being late isn’t being wrong. Whatever desk I sit at, I won’t forget that.' Kang Taemin claps first, and Kwon Dohyun grumbles, 'I can’t classify this as a farewell speech or a New Year’s address,' as he eats the last piece of the calculator rice cake Na Junhyuk gave him. Then a text comes to your phone from an unknown number. 'I’m Grandpa Lim Kyungsoo’s granddaughter. Grandpa’s in the hospital with pneumonia. They say a demolition notice went up on the bookshop building.'",
+      "text": "The noodle-cup tree from the party has shrunk by about half. Oh Jinwoo opens the note on his phone and stands. The sixth farewell speech; this time he doesn’t stop. 'I was always afraid of being late. In this room, for the first time, I learned that being late isn’t being wrong. Whatever desk I sit at, I won’t forget that.' Kwon Dohyun grumbles, 'I can’t classify this as a farewell speech or a New Year’s address,' as he eats the last piece of the calculator rice cake. Then a text comes from an unknown number. 'I’m Grandpa Lim Kyungsoo’s granddaughter. Grandpa’s in the hospital with pneumonia. They say a demolition notice went up on the bookshop building.'",
       "memo": [
         "Oh Jinwoo’s 6th farewell speech -- finished for the first time",
         "Noodle-cup tree: 19 left",
@@ -183,7 +183,7 @@ export default {
     },
     "c18_appendix": {
       "title": "Appendix 3",
-      "text": "In the elevator out of the lounge, Kwon Dohyun hands you a printout. Appendix 3 of the plan, 'Debtor handling plan'. The box said to be empty is packed with someone’s draft. 43 debtor companies, 612 slated for job cuts. No. 1 on the list is 'Sodam Chanbang', a side-dish factory in Suwon, 31 employees. Eyes on the floor buttons, Kwon Dohyun says, 'I didn’t write this. But it goes up under my name. Because I’m the reviewer who sets the price.' Just before the elevator reaches the 1st floor, he adds one more thing. 'Did you see the owner’s name at Sodam Chanbang? Song Miran. A 30-year customer of Mr. Oh’s father’s branch.'",
+      "text": "In the elevator, Kwon Dohyun hands you a printout. Appendix 3 of the plan, 'Debtor handling plan'. The box said to be empty is filled with someone’s draft. 43 debtor companies, 612 slated for job cuts. No. 1 on the list is 'Sodam Chanbang', a side-dish factory in Suwon, 31 employees. Kwon Dohyun speaks. 'I didn’t write this. But it goes up under my name. Because I’m the reviewer who sets the price. Did you see the owner’s name at Sodam Chanbang? Song Miran. A 30-year customer of Mr. Oh’s father’s branch.'",
       "memo": [
         "Appendix 3: 43 debtor companies · 612 slated for job cuts",
         "No. 1: Sodam Chanbang (Suwon), 31 employees",
@@ -206,7 +206,7 @@ export default {
     },
     "c18_ledger": {
       "title": "One Box",
-      "text": "Oh Jinwoo’s Secret Santa was Kwon Dohyun. The gift, in a clear file instead of wrapping paper, is one A4 sheet: 'Oh Jinwoo Job Move: Profit and Loss'. In the gains column on the left, an 84 million won salary difference, a team head title and access to KD files are written out neatly to the margins. In the losses column on the right is a single line, 'Commute +12 minutes', and below it, blank. Kwon Dohyun clears his throat. 'I couldn’t fill in below that. I observed in secret for a month and couldn’t calculate it.' Oh Jinwoo peers at the sheet and bursts out laughing. Then the laughter slowly dies.",
+      "text": "Oh Jinwoo’s Secret Santa gift is one A4 sheet in a clear file: 'Oh Jinwoo Job Move: Profit and Loss'. In the gains column, an 84 million won salary difference, a team head title and access to KD files. In the losses column, a single line: 'Commute +12 minutes'. Kwon Dohyun, his Secret Santa, clears his throat. 'I couldn’t fill in below that. I observed in secret for a month and couldn’t calculate it.' Oh Jinwoo bursts out laughing, then the laughter slowly dies.",
       "memo": [
         "Gains: 84 million won salary difference and 2 other items",
         "Losses: 12 minutes of commute -- the rest blank",
@@ -229,7 +229,7 @@ export default {
     },
     "c18_snow": {
       "title": "Holiday Greetings",
-      "text": "Out the gate, the December snow thickens. As you walk to the bus stop, Oh Sangchul follows in slippers. In his hand is a stack of business cards bound with a yellow rubber band. Hundreds of customer cards from 30 years at Maetan Branch; on top, Song Miran of Sodam Chanbang. 'I told you to stand on the winning side because if you’re the one buying those people, at least you can handle them gently.' He presses the stack into his son’s hand. 'Stand on the losing side, and like me, you can’t do a thing for them.' The display at the stop shows the bus 2 minutes away. Oh Jinwoo can’t put the cards in his inside coat pocket; he stands holding them.",
+      "text": "As you walk to the bus stop, Oh Sangchul follows in slippers. In his hand is a stack of business cards bound with a yellow rubber band. Customer cards from 30 years at Maetan Branch; on top, Song Miran of Sodam Chanbang. 'I told you to stand on the winning side because if you’re the one buying those people, at least you can handle them gently. Stand on the losing side, and like me, you can’t do a thing for them.' He presses the stack into his son’s hand. Oh Jinwoo can’t put the cards in his pocket; he stands holding them.",
       "memo": [
         "Stack of cards: Maetan Branch customers of 30 years",
         "On top: Song Miran, Sodam Chanbang",
@@ -252,7 +252,7 @@ export default {
     },
     "c18_appendix_reaction": {
       "title": "A Test I Wrote",
-      "text": "At the revolving door in the lobby, Do Haram catches up with you. Her face says she already knows what Kwon Dohyun showed you. 'That appendix. Show it to him. To Mr. Oh.' She pulls on her gloves. 'If he still comes after seeing the 612, he’s someone who can do this job. If he sees it and doesn’t come, then I’ve met a good person. Either way, I don’t lose.' The revolving door turns once. 'If you hide it, Analyst, I suppose that means you don’t trust him.'",
+      "text": "At the revolving door, Do Haram catches up with you. 'That appendix. Show it to him. To Mr. Oh. If he still comes after seeing the 612, he’s someone who can do this job. If he sees it and doesn’t come, then I’ve met a good person. Either way, I don’t lose.' The revolving door turns once. 'If you hide it, Analyst, I suppose that means you don’t trust him.'",
       "memo": [
         "Someone who doesn’t lose either way",
         "Hiding it means not trusting him"
@@ -274,7 +274,7 @@ export default {
     },
     "c18_ledger_reaction": {
       "title": "Just Once",
-      "text": "As the party winds down, Na Junhyuk follows Oh Jinwoo into the emergency stairwell with two cups of instant coffee. 'In 30 years another bank called me just once, too. 1.5 times the salary. Know what my wife said? Who’s going to carry your three seals then?' Oh Jinwoo laughs. Na Junhyuk laughs too, then looks down at his coffee. 'I didn’t go. And I stayed and returned that report three times. Staying doesn’t mean you do it all right. And going isn’t running away.' At the bottom of the stairs, the fairy lights flicker once.",
+      "text": "Following Oh Jinwoo into the emergency stairwell, Na Junhyuk hands him a cup of instant coffee. 'In 30 years another bank called me just once, too. 1.5 times the salary. Know what my wife said? Who’s going to carry your three seals then?' They laugh together. 'I didn’t go. And I stayed and returned that report three times. Staying doesn’t mean you do it all right. And going isn’t running away.'",
       "memo": [
         "An offer that came just once in 30 years",
         "Neither staying nor going is running away"
@@ -296,7 +296,7 @@ export default {
     },
     "c18_snow_reaction": {
       "title": "The Name on the Price Tag",
-      "text": "11 p.m., on the bus to Seoul, you take a call from Kwon Dohyun. 'Director Do has nailed the signing to 9 a.m. on December 29. Whether Mr. Oh comes or not, the price is fixed that day.' On the line you hear a calculator being tapped. 'My name goes on that price tag. Write 19% and we profit, KD loses, and Sodam Chanbang goes to court. Write 23% and I become the most expensive reviewer at this bank.' He gives a short laugh. 'First time in my life I’ve priced my own name. At this price, it’s a loss. On my side.'",
+      "text": "It’s Kwon Dohyun on the phone. 'Director Do has nailed the signing to 9 a.m. on December 29. Whether Mr. Oh comes or not, the price is fixed that day. My name goes on that price tag. Write 19% and we profit, KD loses, and Sodam Chanbang goes to court. Write 23% and I become the most expensive reviewer at this bank.' He gives a short laugh. 'First time in my life I’ve priced my own name. At this price, it’s a loss. On my side.'",
       "memo": [
         "Signing: December 29, 09:00",
         "The price of a name, between 19% and 23%"
@@ -318,7 +318,7 @@ export default {
     },
     "c18_branch_dataroom": {
       "title": "Five Words",
-      "text": "With the temporary account Do Haram gave you, you log in to a terminal in the due diligence data room. A windowless room, four monitors, a 'NO PRINTING' sticker on every desk. Oh Jinwoo types 'Maetan Branch' into the search box. The branch where his father held off an approval by a day. One file comes up. A 2009 review on replacing the branch manager, author Yoon Sanghyuk, Corporate Finance Strategy Team. In the reason field, one handwritten line. 'Uncooperative with head office schedule.' Oh Jinwoo’s hand stops on the mouse. 'That’s the reason for my father’s 30 years. Five words.' Below the review runs a list: loans of 64 old customers of the same branch are in this sale bundle.",
+      "text": "A windowless room, a 'NO PRINTING' sticker on every desk. Oh Jinwoo types 'Maetan Branch' into the search box. The branch where his father held off an approval by a day. A 2009 review on replacing the branch manager, author Yoon Sanghyuk, Corporate Finance Strategy Team. In the reason field, one handwritten line. 'Uncooperative with head office schedule.' Oh Jinwoo’s hand stops. 'That’s the reason for my father’s 30 years. Five words.' Below the review runs a list: loans of 64 old customers of the same branch are in this sale bundle.",
       "memo": [
         "Temporary account -- every view is logged",
         "Branch manager replacement review: author Yoon Sanghyuk",
@@ -342,7 +342,7 @@ export default {
     },
     "c18_branch_dataroom_follow": {
       "title": "Who Owns the Blade",
-      "text": "As you leave the data room, Do Haram is standing at the end of the corridor. In her hand, one A4 printout of the access log. '14:07, Maetan Branch. You opened that first, as expected.' She folds the paper in half and tucks it into Oh Jinwoo’s jacket pocket. 'I won’t send this log to anyone. But I’ll remember it. If you join, that file is yours, Team Head. If not, it goes to the next team head.' Oh Jinwoo presses his pocket. Turning away, Do Haram adds, 'The next team head won’t even know where Maetan Branch is. I’ll admit that’s more convenient for me.'",
+      "text": "At the end of the corridor stands Do Haram with one A4 printout of the access log. '14:07, Maetan Branch. You opened that first, as expected.' She folds the paper and tucks it into Oh Jinwoo’s jacket pocket. 'I won’t send this log to anyone. But I’ll remember it. If you join, that file is yours, Team Head. If not, it goes to the next team head. The next team head won’t even know where Maetan Branch is. I’ll admit that’s more convenient for me.'",
       "memo": [
         "Original access log: kept by Do Haram",
         "If he joins, he keeps access to that file",
@@ -366,7 +366,7 @@ export default {
     },
     "c18_route_system": {
       "title": "The Scouting File",
-      "text": "You ask to open the attachments first. ECHO spreads out the Bridge Bank offer. The attachments open. In Do Haram’s 'candidate evaluation sheet', Oh Jinwoo is described as 'top 3% in decision speed under pressure, 1.8 times focus under competitive stimulus'. ECHO underlines the two figures. 'These numbers don’t come out of an interview. They match the item names in the Trigger Lab response records, down to the decimal point.' In a corner of the screen, the account that first created the file appears. KD Financial Group, Group Strategy Office. 'Oh Jinwoo may not have been scouted but recommended. There is no record of his consent.'",
+      "text": "When the attachments open first, out comes Do Haram’s 'candidate evaluation sheet'. Oh Jinwoo is described as 'top 3% in decision speed under pressure, 1.8 times focus under competitive stimulus'. ECHO underlines the two figures. 'These numbers don’t come out of an interview. They match the item names in the Trigger Lab response records, down to the decimal point.' The account that first created the file is KD Financial Group, Group Strategy Office. 'Oh Jinwoo may not have been scouted but recommended. There is no record of his consent.'",
       "memo": [
         "Candidate evaluation figures = Trigger Lab response record items",
         "File created by: KD Financial Group, Group Strategy Office",
@@ -392,7 +392,7 @@ export default {
     },
     "c18_final_system_route": {
       "title": "The Recommended Man",
-      "text": "Half past five in the morning; on the lab terminal, the candidate evaluation sheet and the Trigger Lab response records sit side by side on one screen. The same item names, the same digits after the decimal point. At nine, on Bridge Bank’s 32nd floor, Oh Jinwoo decides whether to sign, and he still doesn’t know how he was chosen. ECHO brings up the file’s creating account again. 'He is calculating which side wins. One number he needs in that calculation is missing only for him.'",
+      "text": "On the lab terminal, the candidate evaluation sheet and the Trigger Lab response records sit side by side. The same item names, the same digits after the decimal point. Oh Jinwoo decides today whether to sign, and he still doesn’t know how he was chosen. ECHO brings up the file’s creating account again. 'He is calculating which side wins. One number he needs in that calculation is missing only for him.'",
       "memo": [
         "Candidate evaluation sheet = Trigger Lab response record items",
         "File created by: KD Financial Group, Group Strategy Office",
@@ -415,7 +415,7 @@ export default {
     },
     "c18_evidence_turn": {
       "title": "Deal Term No. 7",
-      "text": "You fit the clue into the draft contract by page number, and the side agreement to the draft sale contract opens. Terms 1 through 6 are prices and dates. No. 7 is one line. 'The seller shall cooperate in the buyer’s hiring of key personnel. Subject: Oh Jinwoo, Trigger Lab.' It is dated eleven days before Bridge sent the offer. Ban Jaewook puts down the pen he was writing with. 'Not scouting. Transplanting. KD sells the loan bundle cheap and, as a bonus, clears out one noisy analyst.' He straightens his glasses. 'The seat Mr. Oh thought was the winning side was one KD set aside from the start.'",
+      "text": "You fit the clue in by page number, and the side agreement to the draft sale contract opens. After the prices and dates, term 7 is one line. 'The seller shall cooperate in the buyer’s hiring of key personnel. Subject: Oh Jinwoo, Trigger Lab.' It is dated eleven days before Bridge sent the offer. Ban Jaewook puts down his pen. 'Not scouting. Transplanting. KD sells the loan bundle cheap and, as a bonus, clears out one noisy analyst. The seat Mr. Oh thought was the winning side was one KD set aside from the start.'",
       "memo": [
         "Side agreement No. 7: cooperation in hiring Oh Jinwoo of Trigger Lab",
         "Dated: 11 days before the offer was sent",
@@ -438,7 +438,7 @@ export default {
     },
     "c18_start_warm": {
       "title": "An Envelope for the One Who Stayed",
-      "text": "Last night you stayed until Jung Taeo’s tteok skewer truck turned off its lights, shaking sauce bottles with Ban Jaewook. Meanwhile, the call Oh Jinwoo took behind the truck didn’t end even when the lights went out. Monday morning, he puts a white envelope on your desk. Bridge Bank acquisitions team head, double the salary. The job is buying KD Bank’s 186 billion won bundle of bad loans at 19% of principal, and the buyer opens every KD loan file. The answer is due by 9 a.m. on December 29. 'It’s that call yesterday. If I’d brought it up at the truck, my name would’ve gone in Mr. Ban’s notebook too. They say I could see even the files of the people who pushed my father out.'",
+      "text": "Last night, the call Oh Jinwoo took behind the truck didn’t end even when the truck’s lights went out. He puts a white envelope on your desk. Bridge Bank acquisitions team head, double the salary. The job is buying KD Bank’s 186 billion won bundle of bad loans at 19% of principal. The answer is due by 9 a.m. on December 29. 'It’s that call yesterday. If I’d brought it up at the truck, my name would’ve gone in Mr. Ban’s notebook too. They say I could see even the files of the people who pushed my father out.'",
       "memo": [
         "Last night’s call behind the truck: Bridge Bank",
         "Bridge Bank acquisitions team head offer -- double salary",
@@ -469,7 +469,7 @@ export default {
     },
     "c18_start_record": {
       "title": "An Envelope for the One Who Signed the Paper",
-      "text": "Last night you left a proposal to add a 'who gave the order' box to audit reports, and Oh Jinwoo put his name in the reviewer field. The proposal went to group legal before dawn. Monday morning, at the bottom of the experience section in the Bridge Bank job offer Oh Jinwoo holds out, that review is listed as one line. Acquisitions team head, double the salary. The job is buying KD Bank’s 186 billion won bundle of bad loans at 19% of principal, and the buyer opens every KD loan file. Even the files of the people who pushed Oh Jinwoo’s father out. The answer is due by 9 a.m. on December 29. ECHO points it out. 'A document written 10 hours ago is in another bank’s experience section. Someone passed it on overnight.'",
+      "text": "Oh Jinwoo put his name in the reviewer field of the 'who gave the order' proposal you left last night, and the proposal went to group legal before dawn. That review is listed as one line at the bottom of the experience section in the Bridge Bank job offer Oh Jinwoo holds out. Acquisitions team head, double the salary. The job is buying KD Bank’s 186 billion won bundle of bad loans at 19% of principal. ECHO points it out. 'A document written 10 hours ago is in another bank’s experience section. Someone passed it on overnight.'",
       "memo": [
         "Reviewer of last night’s proposal: Oh Jinwoo",
         "Bridge’s job offer cites that review as experience",
@@ -500,7 +500,7 @@ export default {
     },
     "c18_start_rush": {
       "title": "An Envelope for the One Who Waited in the Corridor",
-      "text": "Last night you left the party and went up first, and no one could ask what the call Oh Jinwoo took behind the truck was. Monday morning, back from legal’s meeting, you find Oh Jinwoo waiting in the corridor. He puts a white envelope on your desk. Bridge Bank acquisitions team head, double the salary. The job is buying KD Bank’s 186 billion won bundle of bad loans at 19% of principal, and the buyer opens every KD loan file. 'It’s that call yesterday. Nobody asked, so I held it alone all night. They say I could see even the files of the people who pushed my father out. But please don’t drag it out.'",
+      "text": "Back from legal’s meeting, you find Oh Jinwoo waiting in the corridor. He puts a white envelope on your desk. Bridge Bank acquisitions team head, double the salary. The job is buying KD Bank’s 186 billion won bundle of bad loans at 19% of principal. 'It’s that call yesterday. Nobody asked, so I held it alone all night. They say I could see even the files of the people who pushed my father out. But please don’t drag it out.'",
       "memo": [
         "Last night’s call behind the truck -- no one could ask",
         "Bridge Bank acquisitions team head offer -- double salary",

@@ -72,10 +72,9 @@ export function cspProblems(value) {
  *
  * `connect-src https://*.supabase.co` names every project on the platform, so
  * a script that did get to run could post a player's save to a project of its
- * own and the policy would wave it through. `render.yaml` has to say it that
- * way -- the project's address is not in the repository -- so this is asked of
- * the live header, which the dashboard is meant to have narrowed, and only
- * reported for the file.
+ * own and the policy would wave it through. Asked of the live header and,
+ * since 2026-11-03, of `render.yaml` too: the file names the project's own
+ * host, as production does.
  */
 export function wildcardHostProblems(value) {
   const csp = parseCsp(value);
@@ -267,6 +266,12 @@ export function rootImageCacheProblems(value) {
  */
 export const WORKER_PATH = "/sw.js";
 
+/**
+ * The start page at every address it has: `/`, and its English and Japanese at their folders (since 11-03). Each is served no-cache.
+ * `/en/*` and `/ja/*` since 11-04: Render matched the `/en/` rule to `/en` only, so `/en/` itself went out cacheable for five minutes.
+ */
+export const SHELL_PATHS = ["/", "/index.html", "/en/", "/en/index.html", "/en/*", "/ja/", "/ja/index.html", "/ja/*"];
+
 export function workerCacheProblems(value) {
   return shellCacheProblems(value).map((problem) => problem.replace(/^the page\b/, "the service worker"));
 }
@@ -323,6 +328,17 @@ export function entryScriptPath(html) {
  * is all render.yaml can say) is matched as a pattern. Google Analytics'
  * hosts are not a backend and are left out.
  */
+/**
+ * render.yaml's CSP with its Supabase host widened back to any project, for
+ * the checks of a local build. The file names the production project (since
+ * 2026-11-03), but the build the checks read -- `npm run build:e2e` -- names
+ * the e2e stub, as `vite preview` does when it swaps the host (vite.config.js).
+ * The live check reads the live header, never this.
+ */
+export function anySupabaseProject(cspValue) {
+  return String(cspValue ?? "").replace(/https:\/\/[^\s;]*\.supabase\.co/g,"https://*.supabase.co");
+}
+
 export function backendOriginProblems(script, cspValue) {
   const origins = (parseCsp(cspValue).get("connect-src") ?? []).filter(
     (source) => /^https:\/\/[^/]+$/i.test(source) && !ANALYTICS_ORIGINS.connect.includes(source),
@@ -376,7 +392,7 @@ export function renderYamlHeaderProblems(yaml) {
   const headers = readRenderYamlHeaders(yaml);
   const find = (path, name) => headers.find((header) => header.path === path && header.name === name)?.value ?? null;
   const problems = siteHeaderProblems((name) => find("/*", name)).map((problem) => `/*: ${problem}`);
-  for (const path of ["/", "/index.html"]) {
+  for (const path of SHELL_PATHS) {
     problems.push(...shellCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
   }
   problems.push(...workerCacheProblems(find(WORKER_PATH, "cache-control")).map((problem) => `${WORKER_PATH}: ${problem}`));

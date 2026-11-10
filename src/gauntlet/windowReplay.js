@@ -117,6 +117,8 @@ export function compareReplay(threshold, window, { tolerance = REPLAY_GAUGE_TOLE
   if (threshold.cause !== window.cause) differs.push("cause");
   if (Number(threshold.wall) !== window.wall) differs.push("wall");
   if (Number(threshold.pushes) !== window.pushes) differs.push("pushes");
+  // B1: a log written since the look costs 믿음 says whether it was spent; an older log says nothing and is not held to it.
+  if (threshold.scouted !== undefined && Boolean(threshold.scouted) !== (window.scouted === true)) differs.push("scout");
   // The log writes the gauge rounded to a whole point (resolveWindow), so it
   // may sit half a point either side. A window that ran out of time took the
   // heat of the whole last tick, the part past the bell too (advanceClock),

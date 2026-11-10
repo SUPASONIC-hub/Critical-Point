@@ -173,13 +173,30 @@ const fileBudgets = {
   // main c3b40b6f): on 360px or less the three language pills keep one row
   // (closer, 8px padding, 12px type, out to the music controls) and the brand
   // row comes up 8px under them.
+  // 3137 / 69401 -> 3148 / 69686 on 2026-10-29 (D2 hall of fame draft on #224
+  // 602ec69b), measured: the hall of fame's badge on a ranking row
+  // (.ranking-hall-badge), a rule of its own (11 lines) so the badge list
+  // above is not written twice.
+  // 3155 / 69767 -> 3166 / 70052 on 2026-10-30, measured (D2 over #224
+  // bb70e777, main 430dda1e): the badge rule beside main's narrow pills.
   // 3155 / 69767 -> 3159 / 69883 on 2026-10-30, measured (intro-360-fit): on
   // 360px or less the start button sits closer to the premise (a 360x740
   // phone had the Korean one 2px under the screen) and the English premise
   // takes the Japanese 14px there (Linux CI put its button at 746).
+  // 3159 / 69883 -> 3170 / 70168 on 2026-10-30, measured (통합 리허설 over #224
+  // 8dd649ce, main b2558d55): D2's badge rule beside main's 360px start button.
+  // 3166 / 70052 -> 3170 / 70168 on 2026-11-02, measured (D2 over #224
+  // 8dd649ce, main b2558d55): the badge rule beside intro-360-fit.
   // 3159 / 69883 -> 3159 / 69903 on 2026-11-02, measured (pc-type-scale): from 1024px wide the
   // root reads 18px; the case card's numeral keeps its size through --hud-rem.
-  "base-intro-ranking.css": { lines: 3159, bytes: 69903 },
+  // 3159 / 69903 -> 3162 / 69982 on 2026-11-03, measured (intro-webkit-fit): on
+  // 360px or less the premise wraps plainly outside English, where WebKit's
+  // text-wrap: pretty took the Korean and Japanese one a line longer.
+  // 3162 / 69982 -> 3184 / 70411 on 2026-11-04, measured (credits-alice): the
+  // start screen's credit takes a row for SUPASONIC's and ALICE's addresses.
+  // -> 3195 / 70696 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
+  // 3195 / 70696 -> 3194 / 70687 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood: the glow alphas), measured.
+  "base-intro-ranking.css": { lines: 3194, bytes: 70687 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -276,16 +293,61 @@ const fileBudgets = {
   // ground over its stripes.
   // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
   // labels a size down, so five-card hands keep two lines in a CJK face.
+  // -> 56181 bytes on 2026-10-25, measured: #224's link mark as a tag on the
+  // card's edge (in the burn chip it pushed the chip onto a line of its own).
+  // -> 56227 on 2026-10-25, measured: the run's line 2px apart on a phone,
+  // so 감사 n/4 stays on 판돈 and 금고's row.
+  // -> 56429 on 2026-10-30, measured: an English page on a 360px phone sets the
+  // bank rail tighter (10px labels, 5px pills, 3px gap) so Audit n/4 keeps the
+  // run's line on Stake and Vault's row.
+  // -> 56343 on 2026-10-25, measured: the board's mark in the pot's label
+  // (「고점 판」 C-10, 「숨 고른 판」 C-7), two colour rules and no line more.
+  // -> 56545 on 2026-10-30, measured: the two together (#316 over #224 0d29141a).
+  // -> 56546 on 2026-10-30, measured: #224 merged with main b2558d55, the
+  // Japanese card labels (main) and the English bank rail (#224) together.
+  // -> 56662 on 2026-10-30, measured: #316's marks over #224 8dd649ce (main b2558d55).
+  // -> 56662 on 2026-11-02, measured: #316 merged with #224 8dd649ce (main
+  // b2558d55), the board's marks beside the Japanese card labels.
   // -> 56505 bytes on 2026-10-30, measured (bank-rail-fit): on 360px or less
   // the HUD gives up its air so a bank row on two lines (late-season numbers)
   // keeps a five-card hand above the action bar.
   // -> 56733 bytes on 2026-11-02, measured (en-hand5-linux): on 360px or less
   // an English card label 12px / 1.25 and an English five-card hand's air
   // trimmed, so Linux fonts keep the hand above the action bar.
+  // -> 56896 bytes, 2944 lines on 2026-11-02, measured: #224 merged with main 2f085d28, bank-rail-fit's
+  // 360px HUD (main) with the English bank rail (#224) folded into its block.
+  // -> 57684 bytes, 2986 lines on 2026-11-02, measured: #224 merged with main c680ddd5 (#389 en-hand5-linux), and on
+  // 360px or less Audit n/4 moves from the bank row to the signals' row (.gx-hud.has-audit, .gx-hud-audit).
+  // -> 57012 bytes, 2952 lines on 2026-11-02, measured: #316 merged with #224
+  // afdcac0c (main 2f085d28), the board's marks beside the 360px HUD.
+  // -> 57800 bytes, 2994 lines on 2026-11-02, measured: merged with #224 c29c2efd (main 9be94346, Audit n/4 off the 360px bank row).
+  // -> 57012 bytes, 2952 lines on 2026-11-02, measured: 통합 리허설 (#379) over
+  // #224 afdcac0c with #307 #316 #320 #308, the same as #316 alone.
   // -> 56973 bytes on 2026-11-02, measured (pc-type-scale, on top of en-hand5-linux): from 1024px wide
   // the pot and the clock keep their size through --hud-rem while the root
   // reads 18px.
-  "play.css": { lines: 2931, bytes: 56973 },
+  // -> 2950 / 57388 on 2026-11-03, measured (signal-row-fit): on 360px or less
+  // the English and Japanese signals row gives LOCK its own width (no icon,
+  // no empty track) and the overclock line the rest, so LOCK no longer runs
+  // under the logic streak. In a 360px block of its own by the streak's rules,
+  // apart from the HUD block that the audit token (#224) adds to.
+  // -> 3029 / 58893 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
+  // 3029 / 58893 -> 3029 / 58883 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood), measured.
+  // -> 58276 bytes, 2998 lines on 2026-11-05, measured (phone-en-stake-11px over rules-mark-3b 9e91c588): the 360px English
+  // bank rail's 10px label rule went; Audit n/4 sits on the signals' row now, so Stake and Vault read 11px like ko and ja.
+  // 3029 / 58883 -> 3025 / 58815 on 2026-11-05, measured (bundle-rules2: kd-spend-engine, kd-spend-ui, phone-en-stake-11px,
+  // scout-narrow, stake-clock over rules-1105 dd2cd419): the 360px English 10px label rule out (phone-en-stake-11px) beside
+  // the stake clock's HUD lines; the ratchet goes down with it, never up again after rules-1105's one raise.
+  // 3025 / 58815 -> 3035 / 59047 on 2026-11-06, mood-boost after merging main e1f5e515 (#463), measured: the mood's edge tint (.game-shell::after).
+  // 3035 / 59047 -> 3035 / 59146 on 2026-11-09, hand-fit-2px (#476), measured: Japanese HUD and scene lines at 1.2 on a 360px phone (Noto CJK's normal line put nine overclocked five-card hands 6px under the bar).
+  // 3035 / 59146 -> 3095 / 60291 on 2026-11-09, phone-390-fit, measured: a 361-390px block giving English and Japanese the 360px fits (overclocked five-card hands up to 58px under the bar on a 390x844 phone, Linux fonts) and the English streak's ellipsis at 360px.
+  // 3095 / 60291 -> 3097 / 60365 on 2026-11-09, a32-411-fit, measured: the 360px HUD air (2px rows and paddings, a 30px clock, 18px pills) moved out of the 360px block into one block shared with phones up to 480 wide and 800 tall (a Galaxy A32, 411x780: nineteen five-card hands 9px under the bar at a pot of 99,999).
+  // 3095 / 60291 -> 3109 / 60592 on 2026-11-09, phone-heavy-bank, measured: the relics beside the run's line at 360px (an overclocked board with a max bank, Korean 18px under the bar) and the English signals' 360px columns at 361-390px.
+  // 3097 / 60365 (a32-411-fit, #493) and 3109 / 60592 (phone-heavy-bank) -> 3111 / 60666 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493), measured: both, the English signals' columns now in the 361-480px block.
+  // 3111 / 60666 -> 3133 / 61044 on 2026-11-10, en-signals-row, measured: the English signals row at 361-480px as one flex line, the streak's direction line cut with an ellipsis (Linux, 390x844 and 411x780: 2 to 13px into itself with a late season's bank).
+  // 3111 / 60666 -> 3116 / 60792 on 2026-11-10, phone-390-bank, measured: the relics beside the run's line at 361-480px in Korean and Japanese (390x844 with a max bank: 22px under the bar in Korean, 20 in Japanese).
+  // 3133 / 61044 (en-signals-row) and 3116 / 60792 (#497) -> 3138 / 61170 on 2026-11-10, en-signals-row after merging main 261accef (#497), measured: both.
+  "play.css": { lines: 3138, bytes: 61170 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -357,7 +419,11 @@ const fileBudgets = {
   // the splash panel is a size container and the word's corner pin became a
   // position read off the plate. 849 / 16478 over main 5c00dffe (with
   // pc-type-scale), measured.
-  "briefing.css": { lines: 849, bytes: 16478 },
+  // 849 / 16478 -> 849 / 16498 on 2026-11-03, measured (plate-sound-clip): the
+  // word is centred in its transform, which the build keeps, not by the
+  // separate translate property the build dropped.
+  // 849 / 16498 -> 854 / 16681 on 2026-11-06, mood-boost, measured: the briefing veil's mood edge and the page's mood frame.
+  "briefing.css": { lines: 854, bytes: 16681 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
@@ -371,7 +437,9 @@ const fileBudgets = {
   // draft's side insets.
   // 482 / 10100 -> 473 / 9410 on 2026-10-13: comments no longer counted
   // (9 lines and 690 bytes of them that day), the room unchanged.
-  "relics.css": { lines: 473, bytes: 9410 },
+  // 473 / 9410 -> 472 / 9356 on 2026-11-05, measured (bundle-rules2): kd-spend-ui's trim moved the draft's two buys into
+  // draft-spend.css and left relics.css a line shorter; the ratchet follows.
+  "relics.css": { lines: 472, bytes: 9356 },
   // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
   // 204 / 4800 -> 240 / 5850 on 2026-09-28 for the forced-colours block: an
   // edge on every bar's track and a system colour on its fill.
@@ -411,7 +479,10 @@ const fileBudgets = {
   // 514 declarations that never won a cascade deleted.
   // 2560 / 60800 -> 2509 / 57089 on 2026-10-13: comments no longer counted
   // (51 lines and 3711 bytes of them that day), the room unchanged.
-  "result.css": { lines: 2509, bytes: 57089 },
+  // 2509 -> 2512 lines on 2026-10-25, C-1(1) (the 판 읽기 axis), measured: the
+  // score breakdown's seventh card leaves the penalty card alone in its row,
+  // and one rule gives it the row. The bytes still fit.
+  "result.css": { lines: 2512, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
@@ -427,7 +498,22 @@ const fileBudgets = {
   // fits. Measured 128 / 2331; 133 / 2478 with the purse line set solid on a
   // phone, upright (480px or less) or on its side (Linux hand5, the densest
   // boards at 390x844, the phone-on-its-side tests).
-  "money.css": { lines: 133, bytes: 2478 },
+  // 133 / 2478 -> 261 / 5264 on 2026-11-04 (kd-bank-account), measured: the
+  // purse leaves the rail and is the KD은행 계좌, a band across the top below
+  // 1025px and a corner box above it, with the shell, the music pills and the
+  // layers in front of the table moved out from under it, and the season's
+  // columns a tap away. The phone's purse-line fit (line-height 1, the season
+  // joining the line) is gone with the line.
+  // 261 / 5264 -> 282 / 5713 the same day, measured: the band's 44px press
+  // area, and the reveal's sheet shortened by the band (and under the box).
+  // 282 / 5713 -> 283 / 5730 the same day, measured: the band under the music
+  // pills (29), the corner box over the layers (30).
+  "money.css": { lines: 283, bytes: 5730 },
+  // New on 2026-11-05 (kd-spend-ui, C9 PR 2 over main 2bd9a8ba): the relic
+  // draft's two buys out of the KD은행 계좌 (다시 뽑기, 하나 더: RelicDraft.jsx's
+  // DraftBuy), in a file of their own beside relics.css, whose 473 / 9410 was
+  // every line spent. Measured 41 / 808.
+  "draft-spend.css": { lines: 41, bytes: 808 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

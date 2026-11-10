@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "c3_start": {
-      "text": "The bid waiting room at Novaworks headquarters. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender. On the table sit a sealed document envelope and two bottles of water; on the wall, a clock counts down to the deadline. 4 hours. Novaworks has borrowed 124 billion won from KD Bank, and the contract payment flows to a group affiliate. The bid goes out under that affiliate’s name, and Trigger Lab writes it. Han Seoyun speaks. 'Don’t ask which account that money goes to. Oh Jinwoo got the same documents and is submitting a bid from the next room at the same time. Upstairs they call this measuring the quality of thinking. I call it HR material that measures you both. Whatever terms Oh Jinwoo was given never came to me.' At the very back of the envelope is a single anonymous tip: the system to be delivered has a defect.",
+      "text": "The bid waiting room at Novaworks headquarters. A sealed document envelope and two bottles of water sit on the table; the wall clock shows 4 hours to the deadline. Novaworks, which borrows 124 billion won from KD Bank, has put a systems-integration contract out to open tender. The payment flows to a group affiliate, and Trigger Lab writes the bid. Han Seoyun says, 'Don’t ask where that money goes. Oh Jinwoo is submitting a bid from the same documents in the next room. Upstairs they call this measuring the quality of thinking. I call it HR material. Whatever terms Oh Jinwoo was given never came to me.' At the back of the envelope is an anonymous tip about a defect in the system.",
       "memo": [
         "4 hours to bid deadline",
         "Client demand: cut costs 18%",
@@ -37,7 +37,7 @@ export default {
     },
     "c3_split": {
       "title": "Two Answers",
-      "text": "Oh Jinwoo’s 1st draft lands on the waiting-room table. Cost cut 21%; yours is 13%. His is half as long, too. His bid lumps the security tip under 'unconfirmed risk' and pushes it to the last page. If the flaw is real, the cost after signing exceeds the savings, but that calculation is on no page. A moment later he walks over himself, leans on the doorframe and straightens his tie. 'You know about my father. He held an approval one day and got pushed out, and 3 years later the file was closed as if nothing had been wrong. Late means wrong. Here, it does.'",
+      "text": "Oh Jinwoo’s 1st draft lands on the table. Cost cut 21%; yours is 13%. His bid lumps the security tip under 'unconfirmed risk' on the last page. If the flaw is real, the cost after signing exceeds the savings, but that calculation is nowhere. He leans on the doorframe. 'You know about my father. He held an approval one day and got pushed out, and 3 years later the file was closed as if nothing had been wrong. Late means wrong. Here, anyway.'",
       "memo": [
         "Oh Jinwoo’s bid: 21% cost cut",
         "Your current bid: 13% cost cut",
@@ -65,7 +65,7 @@ export default {
     },
     "c3_score": {
       "title": "The Scoreboard Trap",
-      "text": "On one waiting-room wall glows the Trigger Lab scoreboard. Oh Jinwoo 84, you 71. You submitted first, but he leads on savings, length and clarity of presentation. Yet scan the categories top to bottom and there is no 'long-term failure cost'. The money a defect costs after delivery counts as 0 on this sheet. ECHO opens the edit history of the scoring sheet. The last edit came from the Group Strategy Office, at two in the morning the day after the FlowOn file closed. 'This sheet was not made for this bid. It was made to compare two people.' From next door, the sound of Oh Jinwoo’s printer comes through the wall.",
+      "text": "The Trigger Lab scoreboard on the waiting-room wall. Oh Jinwoo 84, you 71. Whoever submitted first, he leads on savings, length and clarity of presentation. Yet there is no 'long-term failure cost' category. The money a defect costs after delivery counts as 0 on this sheet. The scoring sheet was last edited by the Group Strategy Office, at two in the morning the day after the FlowOn file closed. ECHO adds, 'This sheet was made not for this bid, but to compare two people.'",
       "memo": [
         "Scoreboard: Oh Jinwoo 84 / you 71",
         "No long-term failure cost category",
@@ -93,7 +93,7 @@ export default {
     },
     "c3_trap": {
       "title": "A Designed Contest",
-      "text": "Between equipment cases at the back of the presentation hall, Ban Jaewook approaches quietly. He speaks without closing his notebook. 'I found the tipster. A manager on the Novaworks treasury team. It isn’t just the flaw they reported. They also reported why this bid came out right now. An amount equal to the contract payment is set to wipe the FlowOn loss off the books.' On stage, someone is running a sound check. For the first time he looks straight at you. 'This isn’t a bidding problem. It’s a setup to see what checks you give up when you try to win. I don’t know if Oh Jinwoo heard the same thing.' He writes the current time in his notebook.",
+      "text": "Between equipment cases at the back of the hall, Ban Jaewook approaches. 'The tipster is a manager on the Novaworks treasury team. They reported not just the flaw, but why this bid came out now. An amount equal to the contract payment goes to wiping the FlowOn loss off the books.' On stage, someone is running a sound check. For the first time he looks straight at you. 'This isn’t a bidding problem. It’s a setup to see what checks you give up when you try to win. I don’t know if Oh Jinwoo heard the same thing.'",
       "memo": [
         "Tipster: manager, Novaworks treasury team",
         "Contract payment matches planned FlowOn loss write-off",
@@ -121,7 +121,7 @@ export default {
     },
     "c3_aftershock": {
       "title": "The Winner’s Blank Screen",
-      "text": "The morning after the presentation, the empty hall holds only rows of folding chairs, and the stage screen is off. The final scores were never released. In the last tally before the presentation, the side that pushed the security flaw to the back scored higher, and the client sent a single notice putting both bids on hold. Oh Jinwoo sits on the edge of the stage, waiting. His tie is in his pocket. He asks whether yesterday’s result was for the client, or whether you just ran a race where someone had even drawn up the scoring sheet. 'That scoring sheet. The Group Strategy Office edited it at two in the morning the day after the FlowOn file closed. I saw.' He looks up at the dark screen. 'Win or lose, nothing came up on that screen. So what were we competing for?'",
+      "text": "The morning after the presentation, the stage screen in the empty hall is off. The final scores were never released. In the last tally, the side that pushed the security flaw to the back scored higher, and the client only sent a notice putting both bids on hold. Oh Jinwoo sits on the edge of the stage. 'That scoring sheet. The Group Strategy Office edited it at two in the morning the day after the FlowOn file closed. I saw. Win or lose, nothing came up on that screen. So what were we competing for?'",
       "memo": [
         "Client put both bids on hold",
         "Scoring sheet edited at 2 a.m. the day after the FlowOn file",
@@ -145,7 +145,7 @@ export default {
     },
     "c3_rival": {
       "title": "Same Data, Different Aims",
-      "text": "Oh Jinwoo comes over again holding a single sheet. Numbers that were not in your envelope. What Novaworks has paid out over delivery failures, and the list of people named responsible each time. 'What the client really wants to buy isn’t savings. It’s someone to take the blame when things go wrong.' He taps the bottom line of the list. The client wants the liability clause separately, not in the open tender, and his bid has shifted that liability to a subcontractor. The security team is not on the list of presenters. 'The 18% is an excuse. We got the same data. I just asked this question first.'",
+      "text": "Oh Jinwoo comes over holding a single sheet. What Novaworks has paid out over delivery failures, and the list of people named responsible each time. 'What the client really wants to buy isn’t savings. It’s someone to take the blame when things go wrong.' The client wants the liability clause separately from the tender, and his bid has shifted that liability to a subcontractor. 'The 18% is an excuse. I just asked this question first.'",
       "memo": [
         "Client wants the liability clause kept private",
         "Rival bid shifts liability to a subcontractor",
@@ -168,7 +168,7 @@ export default {
     },
     "c3_signal": {
       "title": "A Signal from the Seats",
-      "text": "45 minutes before the final presentation, the control booth at the back of the hall. On stage, Oh Jinwoo is rehearsing first. Then a small light above the back row of seats blinks twice. Same interval as the security warning light. The client’s representative says they never sent any such signal. Nobody knows if Trigger Lab turned it on, either. But the moment Oh Jinwoo sees the light, he changes his answer. Instead of the one he prepared, he gives another, much faster than usual. ECHO puts his response times on screen. 'Down from an average of 4.2 seconds to 1.1. He knows what this signal means, or believes he does.'",
+      "text": "45 minutes before the final presentation, the control booth. On stage, Oh Jinwoo is rehearsing first. Then a small light above the back row blinks twice, at the same interval as the security warning light. The client’s representative says they never sent any such signal, and nobody knows if Trigger Lab turned it on. But the moment Oh Jinwoo sees the light, he drops his prepared answer and gives another, much faster. ECHO puts up a line. 'His response time fell from an average of 4.2 seconds to 1.1. He knows what this signal means, or believes he does.'",
       "memo": [
         "The light blinks at the security-warning interval",
         "Client representative denies the signal",
@@ -194,7 +194,7 @@ export default {
     },
     "c3_verdict": {
       "title": "At the End of the Contest",
-      "text": "10 minutes before the presentation, Han Seoyun stands in the passage beside the stage. The running order lists your name and Oh Jinwoo’s, one above the other, with a single ballpoint line between them. 'The client wants a conclusion today. The flaw isn’t fully proven yet. If you two go out together, the liability splits in half.' She folds the running order. 'At this point nobody asks who was fast and who was late. All that’s left is what standard you closed this contest on. And the one deciding that right now is you, Analyst.' The stage manager holds up both open hands. 10 minutes.",
+      "text": "10 minutes before the presentation, Han Seoyun stands in the passage beside the stage. On the running order, a ballpoint line runs between your name and Oh Jinwoo’s. 'The client wants a conclusion today. The flaw isn’t proven yet. If you two go out together, the liability splits in half. At this point nobody asks who was fast. All that’s left is what standard you closed this contest on. And the one deciding that right now is you, Analyst.'",
       "memo": [
         "Client wants a conclusion today",
         "Security flaw not yet fully proven",
@@ -217,7 +217,7 @@ export default {
     },
     "c3_rival_reaction": {
       "title": "The Rival’s Offer",
-      "text": "Oh Jinwoo slides the whole printout of his bid across the table. His signature is on the cover. 'You can take it. Copy it if you like, or fix it and submit first.' He is not joking. He doesn’t sit, only grips the back of a chair. 'In return, there’s something I want to see. Where you fix it once you have it. Whether you raise the savings rate, touch the liability clause, or bring the tip from the last page to the front.' On the Trigger Lab scoreboard on the waiting-room wall, the number next to his name ticks up one more notch. 'All I’ve learned is how to win. If there’s another answer, I need to see what it is.'",
+      "text": "Oh Jinwoo slides his whole bid, signed on the cover, across the table. 'You can take it. Copy it if you like, or fix it and submit first. In return, I want to see where you fix it once you have it. The savings rate, the liability clause, or the tip on the last page.' On the wall scoreboard, his number ticks up one more notch. 'All I’ve learned is how to win. If there’s another answer, I need to see what it is.'",
       "memo": [
         "Liability clause hidden in the rival bid",
         "Evidence to start a joint verification"
@@ -239,7 +239,7 @@ export default {
     },
     "c3_signal_reaction": {
       "title": "The Light That Blinked Twice",
-      "text": "30 minutes before the presentation, the light blinks twice again. This time the client’s representative in the front row turns to look at it too. Then, without a word, faces forward again. Han Seoyun comes to stand beside the control booth. 'You saw. He saw, Oh Jinwoo saw, and I saw.' She rests a hand on the booth railing. 'But nobody asks what it is. Whoever asks first becomes the one who stopped the presentation. And the cost of stopping sticks to whoever stopped.' On stage, the host is turning the running order. You are next.",
+      "text": "30 minutes before the presentation, the light blinks twice again. The client’s representative in the front row turns to look too, then faces forward without a word. Han Seoyun says, 'You saw. He saw, Oh Jinwoo saw, and I saw. But nobody asks what it is. Whoever asks first becomes the one who stopped the presentation. And the cost of stopping sticks to whoever stopped.' The host turns the running order. You are next.",
       "memo": [
         "Source of the twice-blinking signal",
         "Who bears the cost of stopping the presentation"
@@ -261,7 +261,7 @@ export default {
     },
     "c3_verdict_reaction": {
       "title": "The Liability Sheet After the Win",
-      "text": "When the rehearsal ends, ECHO puts a table on the backstage terminal. The score column is already filled in. This table alone shows who is ahead. But the liability sheet below it is blank. If a flaw surfaces after delivery, who stands before the client, who pays, who keeps the record. All three lines have no name. 'Who will win is nearly settled. Who will explain the failure that comes after success is not. This sheet must be filled in before anyone goes on stage.' At the end of the passage, Oh Jinwoo is buttoning his jacket.",
+      "text": "When the rehearsal ends, ECHO puts a table on the backstage terminal. The score column is already filled in, but the liability sheet below it is blank. If a flaw surfaces, who stands before the client, who pays, who keeps the record. All three lines have no name. 'Who will win is nearly settled. Who will explain the failure that comes after success is not.'",
       "memo": [
         "Liability sheet blank after the win",
         "The promise a joint presentation leaves"
@@ -283,7 +283,7 @@ export default {
     },
     "c3_branch_signal": {
       "title": "Stopping to Read the Signal in the Corner",
-      "text": "40 minutes before the final presentation, the control booth at the back of the hall. In a corner of the big stage screen, a small marker blinks twice and goes out. It is not in the presentation deck. ECHO captures the time it came on. 'The source is one of two. The competing side put it in to rattle the presentation, or a client-side account made a last request for confirmation. The client account was logged in at the same time.' The host pretends not to see and turns the running order. Stop the rehearsal now to read that signal, and the order slips, and the lost time comes off the score. Move on without reading it, and nobody will ever ask what that marker was.",
+      "text": "40 minutes before the final presentation, the control booth at the back of the hall. In a corner of the stage screen, a marker that is not in the deck blinks twice and goes out. ECHO puts up a line. 'The competing side put it in to rattle the presentation, or a client account made a last request for confirmation. The client account was logged in at the same time.' Stop the rehearsal to read the signal, and the order slips, and the lost time comes off the score. Move on, and nobody will ask what that marker was.",
       "memo": [
         "Time the signal came on",
         "Client account’s response",
@@ -306,7 +306,7 @@ export default {
     },
     "c3_branch_signal_follow": {
       "title": "The Terms of a Fast Win",
-      "text": "25 minutes before the presentation, Oh Jinwoo comes down from the stage and holds out a sheet. The award terms the client circulated in advance. The amount, schedule and staffing boxes are printed; three boxes are blank. Who benefits from this result, by when the unverified security items get checked, what terms carry over to the next contract. 'Even if today goes well, if these boxes are blank, the next bid starts from these blanks. And I’ll come in through them.' He lays his pen on the terms sheet. 'If you’re going to fill them, it’s now. When the presentation ends, this sheet goes into the client’s drawer.'",
+      "text": "25 minutes before the presentation, Oh Jinwoo holds out the award terms the client circulated in advance. Three boxes are blank. Who benefits from this result, by when the unverified security items get checked, what terms carry over to the next contract. 'Even if today goes well, if these boxes are blank, the next bid starts from these blanks. If you’re going to fill them, it’s now. When the presentation ends, this sheet goes into the client’s drawer.'",
       "memo": [
         "Who benefits from the winning presentation",
         "Unverified security items",
@@ -329,7 +329,7 @@ export default {
     },
     "c3_route_fast": {
       "title": "The Shadow of the First Answer",
-      "text": "With three and a half hours to the deadline, your 1st draft is logged first. On the waiting-room scoreboard, your name moves up a notch. The client’s contact gives a thumbs-up from the hallway. A moment later Oh Jinwoo walks in without knocking. In his hand is a printout of your bid, highlighted in four places. 'You’re fast. Here, here, here, and the security tip. I only marked what you skipped.' He sets the printout on the table. 'The client will like it. A fast answer even tells them what they don’t have to look at. That’s how I’ve won, too.'",
+      "text": "With three and a half hours to the deadline, your 1st draft is logged first. Your name moves up a notch on the scoreboard, and the client’s contact gives a thumbs-up. Oh Jinwoo walks in without knocking and holds out a printout of your bid, highlighted in four places. 'Here, here, here, and the security tip. I only marked what you skipped. The client will like it. A fast answer even tells them what they don’t have to look at. That’s how I’ve won, too.'",
       "memo": [
         "Client responds to a fast conclusion",
         "Security tip still on the back page",
@@ -356,7 +356,7 @@ export default {
     },
     "c3_final_win": {
       "title": "The Standard a Fast Answer Set",
-      "text": "Just before the final presentation, the waiting passage beside the stage. Oh Jinwoo stops straightening his tie and turns to you. 'You can win. The final presentation score is still to come.' He holds out a draft of the terms. The verification-deadline box is blank. 'The problem is after you win. The client will demand the speed they got today from the next person too. In the next bid, I’ll come in at that speed.' The stage lights brighten a step. 'The fast answer becomes the standard. And nobody remembers who set it first.'",
+      "text": "Just before the final presentation, the passage beside the stage. Oh Jinwoo stops tying his tie and turns. 'You can win. The final presentation score is still to come.' The draft of the terms he holds out has a blank verification-deadline box. 'The problem is after you win. The client will demand today’s speed from the next person too. In the next bid, I’ll come in at that speed. The fast answer becomes the standard. And nobody remembers who set it.'",
       "memo": [
         "The scoreboard rewards speed",
         "Verification deadline still outside the contract terms",
@@ -379,7 +379,7 @@ export default {
     },
     "c3_route_deep": {
       "title": "Evidence Piles Up on the Slow Side",
-      "text": "At the technical review desk in a corner of the waiting room, Ban Jaewook has stacked a pile of papers beside his laptop. Following the wording of the anonymous tip leads to a defect report written before the bid documents. It says the login of the system to be delivered can be skipped, and the conclusion box reads only 'fix in next version'. The next version never came out. The wall clock shows three and a half hours, and next door the printer is already running. Ban Jaewook writes the report number in his notebook. 'It will look like you’re losing. Still, one question remains. Whether you can sign off on the contract knowing this.'",
+      "text": "The technical review desk in a corner of the waiting room. Following the anonymous tip leads to a defect report written before the bid documents. It says the login can be skipped, yet the conclusion box reads only 'fix in next version'. The next version never came out. Ban Jaewook writes down the report number. 'It will look like you’re losing. Still, a question remains. Whether you can sign off on the contract knowing this.'",
       "memo": [
         "Old defect report found",
         "Bid deadline drawing closer",
@@ -406,7 +406,7 @@ export default {
     },
     "c3_final_right": {
       "title": "The Cost of the Right Answer",
-      "text": "Just before the final presentation, the prep room beside the hall. Ban Jaewook lays the defect report and your bid side by side and opens his notebook. The flaw is almost certain. But proving it all the way takes one more day, and the client hasn’t answered whether it will extend the deadline. On the scoreboard, your name is at the bottom. 'When the right answer comes late, here it gets written down as wrong. Being accurate alone doesn’t win a bid.' He taps one blank box with his pen. 'That’s why this box is needed. Who bears the loss from submitting this bid. You, the company, or the client. It has to be written down so it can be argued later.'",
+      "text": "Just before the final presentation, the prep room beside the hall. Ban Jaewook lays the defect report and your bid side by side. The flaw is almost certain, but proving it takes one more day. The client hasn’t answered on extending the deadline, and on the scoreboard you are at the bottom. 'When the right answer comes late, here it gets written down as wrong.' He taps one blank box with his pen. 'That’s why this box is needed. Who bears this bid’s loss: you, the company, or the client.'",
       "memo": [
         "The flaw is highly likely",
         "Deadline extension uncertain",
@@ -429,7 +429,7 @@ export default {
     },
     "c3_route_mirror": {
       "title": "The One Who Reads the Other’s Game",
-      "text": "On the waiting-room whiteboard you sketch the bid Oh Jinwoo would likely have written. Savings items, schedule, staffing. Follow his order and the line breaks in one place. The box that states who is liable if something goes wrong after delivery. It isn’t a slip. The boxes before and after are too neat. Just then Oh Jinwoo, passing the open door, sees the whiteboard and stops. 'So you got that far.' He doesn’t come in. 'I left that box empty on purpose. Partly to win, yes, and partly because I wondered if anyone would see it.'",
+      "text": "On the whiteboard you sketch the bid Oh Jinwoo would likely have written. Savings items, schedule, staffing. Follow his order and the line breaks in one place: the box naming who is liable for an accident after delivery. The boxes around it are too neat for it to be a slip. Oh Jinwoo, passing the door, stops. 'So you got that far. I left that box empty on purpose. Partly to win, yes, and partly because I wondered if anyone would see it.'",
       "memo": [
         "Liability clause in Oh Jinwoo’s bid is empty",
         "A joint bid becomes possible",
@@ -456,7 +456,7 @@ export default {
     },
     "c3_final_joint": {
       "title": "Use the Rival as a Tool?",
-      "text": "Just before the final presentation, Oh Jinwoo waits in the passage beside the stage. In his hand are his bid and that one page with the empty liability clause. 'You can beat me. Just point at this blank in front of the client.' He folds the page in half. 'Or you can use me as a witness. I can guess this bid is a place that pits us two against each other to see what we throw away.' On stage, your name is called. 'You can end the contest here, or put the contest itself forward as evidence. I’ll follow you out either way. I hate losing, but I hate being used more.'",
+      "text": "Just before the final presentation, Oh Jinwoo waits in the passage beside the stage, holding that one page with the empty liability clause. 'You can beat me. Just point at this blank in front of the client. Or you can use me as a witness. I can guess this bid is a place that pits us two against each other to see what we throw away.' On stage, your name is called. 'I’ll follow you out either way. I hate losing, but I hate being used more.'",
       "memo": [
         "A joint bid splits the liability",
         "A solo bid is favored on the scoreboard",
@@ -479,7 +479,7 @@ export default {
     },
     "c3_route_system": {
       "title": "The Scoreboard Follows You",
-      "text": "Before competing with Oh Jinwoo, you ask how the scoring works. The waiting-room scoreboard flickers. A new category appears. The name of the game you just reframed has become the category name, word for word. Oh Jinwoo’s score is recalculated on that category too. The client’s screen shows no explanation of why the categories changed. ECHO puts up one line. 'This scoreboard is not a fixed ruler. When the analyst puts forward a standard, it is redrawn to follow it. This bid is not a place to watch your contest with Mr. Oh Jinwoo. It is a device to see what standard the analyst makes, and how far that standard is followed.'",
+      "text": "Before competing with Oh Jinwoo, you ask how the scoring works. The wall scoreboard flickers, and a new category appears under the name of the game you just reframed. Oh Jinwoo’s score is recalculated on it too, but the client’s screen shows no explanation. ECHO puts up a line. 'This scoreboard is not a fixed ruler. When the analyst puts forward a standard, it is redrawn to follow it. This bid is a device to see what standard the analyst makes.'",
       "memo": [
         "The reframed game becomes a new scoring category",
         "Oh Jinwoo’s score recalculated at the same time",
@@ -506,7 +506,7 @@ export default {
     },
     "c3_final_system": {
       "title": "The One Who Set the Standard",
-      "text": "Just before the final presentation, the scoreboard on the screen beside the stage is revised once more. A new category appears, and your score and Oh Jinwoo’s are recalculated on the spot. The new category’s name comes word for word from the standard you put forward about this scoreboard. The client’s screen shows not one line on why it changed. From the seats, the table looks as if it was always like this. ECHO adds: 'This bid does not choose one of two people. It chooses the one who makes the standard.' Below the stage, Oh Jinwoo is looking up at the changed numbers. He saw that moment, too.",
+      "text": "Just before the final presentation, the scoreboard beside the stage is revised once more. A new category appears, and both scores are recalculated. The category’s name comes word for word from the standard you put forward. The client’s screen shows not one line on why, so the table looks as if it was always like this. ECHO adds, 'This bid does not choose one of two people. It chooses the one who makes the standard.' Below the stage, Oh Jinwoo is looking up at the changed numbers too.",
       "memo": [
         "New scoring category: taken from the analyst’s standard",
         "Oh Jinwoo’s score recalculated as well",
@@ -529,7 +529,7 @@ export default {
     },
     "c3_evidence_turn": {
       "title": "The Second Scoreboard",
-      "text": "When you lay the clue you were holding against the scoring sheet, the screen splits in two. The scoreboard the client sees, and a second one used only for internal review. Same categories, different weights. On the outside sheet savings weigh most; on the inside sheet, speed. From the back of the hall, Oh Jinwoo looks at the screen over your shoulder. He isn’t surprised. 'I saw it too.' He puts his hands in his pockets. 'Win on the outside sheet and the client signs. Win on the inside sheet and it stays in your HR file. Which one counts as the real contract standard, I haven’t decided yet either.'",
+      "text": "When you lay the clue you were holding against the scoring sheet, the screen splits in two. The scoreboard the client sees, and a second one for internal review. Same categories, but savings weigh most on the outside sheet, and speed on the inside one. Oh Jinwoo looks over your shoulder and isn’t surprised. 'I saw it too. Win on the outside sheet and the client signs. Win on the inside sheet and it stays in your HR file. Which one counts as the real standard, I haven’t decided yet either.'",
       "memo": [
         "External and internal scoreboards weigh differently",
         "Oh Jinwoo knows about the same mismatch",
@@ -552,7 +552,7 @@ export default {
     },
     "c3_start_audit": {
       "title": "A Contest of Restored Records",
-      "text": "The bid waiting room at Novaworks headquarters; two bottles of water and a sealed document envelope sit on the table. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender, the deadline is 4 hours away, and the requirement is an 18% cost cut. Novaworks borrows 124 billion won from KD Bank, and next door Oh Jinwoo is tearing open the same envelope. Ban Jaewook stands in the doorway, notebook open. 'Yesterday you traced back from the custodian of the originals and restored the flow of records. Those records aren’t fully pieced together yet.' He pulls a single sheet from the back of the envelope and hands it to you. An anonymous tip: the system to be delivered has a flaw that skips the login. 'Mr. Oh Jinwoo has already made an easy-to-read answer. And the client prefers certainty to grounds.'",
+      "text": "The bid waiting room at Novaworks headquarters. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender. The deadline is 4 hours away, and the requirement is an 18% cost cut. Next door, Oh Jinwoo is tearing open the same envelope. Ban Jaewook says, 'Yesterday you traced back from the custodian of the originals and restored the flow of records. Those records aren’t fully pieced together yet.' Ban Jaewook hands you the anonymous tip from the back of the envelope. It says the system to be delivered has a flaw that skips the login.",
       "memo": [
         "The audit record is incomplete",
         "4 hours to bid deadline",
@@ -582,7 +582,7 @@ export default {
     },
     "c3_start_person": {
       "title": "A Contest After Trusting a Person",
-      "text": "The bid waiting room at Novaworks headquarters. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender, the deadline is 4 hours away, and the requirement is an 18% cost cut. Novaworks borrows 124 billion won from KD Bank, and next door Oh Jinwoo is writing a bid from the same documents. Do Yoonha passes on something he heard in the hallway. Oh Jinwoo told the client’s contact about the last Case. About the analyst who asked Lee Minseo about the missing records before checking the logs. 'He called it a weakness. Someone who slows down because they trust people.' At the very back of the document envelope is an anonymous tip: the system to be delivered has a flaw that skips the login. Oh Jinwoo’s bid erased every cost like that.",
+      "text": "The bid waiting room at Novaworks headquarters. Novaworks, a mid-sized manufacturer, has put a systems-integration contract out to open tender. The deadline is 4 hours away, and the requirement is an 18% cost cut. Do Yoonha passes on something he heard in the hallway. Oh Jinwoo told the client about you. The analyst who asked Lee Minseo about the missing records before checking the logs. 'He called it a weakness. Someone who slows down because they trust people.' The envelope holds an anonymous tip about a flaw that skips the login. Oh Jinwoo’s bid erased costs like that.",
       "memo": [
         "Client promised to reward speed",
         "Lee Minseo’s testimony partly made public",
@@ -612,7 +612,7 @@ export default {
     },
     "c3_start_public": {
       "title": "A Contest Turned Alarm",
-      "text": "The bid waiting room at Novaworks headquarters; when you open the door, three client staff look up at once. They all know you are the one who told outsiders the records might have been tampered with. It is an open tender for systems integration at Novaworks, a mid-sized manufacturer; the deadline is 4 hours away, and the requirement is an 18% cost cut. Novaworks borrows 124 billion won from KD Bank. Next door, Oh Jinwoo got the same documents and chose to say nothing. ECHO copies the client’s request onto the terminal. 'The client has requested a public explanation. An anonymous tip has been added to the document envelope: the system to be delivered has a flaw that skips the login. This time the contest is not over solutions. It is over who holds the alarm.'",
+      "text": "The bid waiting room at Novaworks headquarters; when you open the door, three client staff look up. They all know you are the one who told outsiders the records might have been tampered with. It is an open tender for systems integration at Novaworks, a mid-sized manufacturer. The deadline is 4 hours away, and the requirement is an 18% cost cut. Next door, Oh Jinwoo has chosen silence. ECHO puts up a line. 'The client has requested a public explanation. An anonymous tip about a flaw that skips the login has been added to the envelope. This time the contest is over who holds the alarm.'",
       "memo": [
         "Client demands a public explanation",
         "Oh Jinwoo makes silence his strategy",

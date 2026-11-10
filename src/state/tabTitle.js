@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import W from "../copy/introPanels.js";
+import { fill } from "../locale.js";
 
 /**
  * The browser tab's title, as the situation names it (개선 포인트 A3).
@@ -7,7 +7,10 @@ import W from "../copy/introPanels.js";
  * The tab is the one part of the game a player sees from another tab, so a
  * table near the wall, a bust and the season's ruling are written there too.
  * Each place that has something to say holds a slot; the highest rank shown
- * wins, and with no slot held the title is index.html's own again.
+ * wins, and with no slot held the title is the page's own again: index.html's
+ * <title>, or the language's (locale.js setPageTitle), whichever the page
+ * wrote last. A slot's text names where that title goes with `{title}`
+ * (user decision 11-05: 「(warning sign) 벽까지 3 · 임계점: CRITICAL POINT - …」).
  *
  * Nothing here runs on a timer. The title changes when the game's state does
  * -- a push, a verdict, a screen -- and never alternates or blinks, so it
@@ -17,15 +20,22 @@ import W from "../copy/introPanels.js";
 
 const claims = new Map();
 let baseTitle = null;
+// What this module wrote last: a title that is not it was the page's own.
+let written = null;
+
+/** A slot's text with the page's title in its `{title}`; no slot, the page's title. */
+export function composeTabTitle(text, title) {
+  return text ? fill(text, { title }) : title;
+}
 
 function paint() {
   if (typeof document === "undefined") return;
-  baseTitle ??= document.title;
+  if (document.title !== written) baseTitle = document.title;
   let top = null;
   for (const claim of claims.values()) if (!top || claim.rank >= top.rank) top = claim;
-  // The tail is src/copy/introPanels.js's, in the page's language.
-  const next = top ? `${top.text}${W.tabSuffix}` : baseTitle;
+  const next = composeTabTitle(top?.text, baseTitle);
   if (document.title !== next) document.title = next;
+  written = next;
 }
 
 function dropTabTitle(slot) {

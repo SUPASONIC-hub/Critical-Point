@@ -309,6 +309,32 @@ test("the copied line has one shape for every ending and every 판단 DNA", () =
   assert.ok(buildShareText(modelOf()).endsWith("B 랭크."));
 });
 
+test("D1: the habit's sentence takes the label's line, inside the margins and short of the story mark", () => {
+  const sentence = "당신의 심사 성향은 「벽 앞 줄타기 장인형」입니다.";
+  const fingerprint = { ...FINGERPRINTS[0], habit: { title: "벽 앞 줄타기 장인형", line: "벽 바로 앞까지 밀고도 멀쩡히 돌아옵니다.", card: sentence } };
+  for (const story of [false, true]) {
+    const model = modelOf({ fingerprint, caseResults: { final: { burstScore: 71, rank: "B", assistStory: story } } });
+    assert.equal(model.habitLine, sentence);
+    const ctx = draw(model);
+    assertInsideCard(ctx, `habit sentence, story ${story}`);
+    const drawn = ctx.texts.find((entry) => entry.text === sentence);
+    assert.ok(drawn && drawn.y === 220 && drawn.x === RESULT_CARD_MARGIN, "on the label's line");
+    assert.ok(!ctx.texts.some((entry) => entry.text === RESULT_CARD_LABELS.dna));
+    const mark = ctx.texts.find((entry) => entry.text === RESULT_CARD_LABELS.story);
+    if (story) {
+      assert.ok(mark, "the story mark is still drawn");
+      assert.ok(drawn.x + drawn.maxWidth <= mark.x - mark.width, "the sentence stops short of the story mark");
+    } else {
+      assert.equal(mark, undefined);
+      assert.equal(drawn.maxWidth, RESULT_CARD_WIDTH - RESULT_CARD_MARGIN * 2);
+    }
+    assert.ok(drawn.width <= drawn.maxWidth, "the sentence is not squeezed");
+    // The rest of the card is where it was.
+    const same = draw(modelOf({ fingerprint: { ...fingerprint, habit: { ...fingerprint.habit, card: "" } }, caseResults: { final: { burstScore: 71, rank: "B", assistStory: story } } }));
+    assert.deepEqual(ctx.texts.filter((entry) => entry.text !== sentence).map((entry) => [entry.text, entry.y]), same.texts.filter((entry) => entry.text !== RESULT_CARD_LABELS.dna).map((entry) => [entry.text, entry.y]));
+  }
+});
+
 test("the copy the screen prints around the card is the agreed copy", () => {
   assert.deepEqual({ ...RESULT_CARD_COPY }, {
     shareLabel: "결과 카드 공유",

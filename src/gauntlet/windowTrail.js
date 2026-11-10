@@ -14,7 +14,7 @@
  * Its own chunk (WINDOW_TRAIL in vite.config.js): the table's chunk and the
  * runtime's both import it, and the table's had no room for it.
  */
-import { BASE_SCHEMA, createWindow, normalizeSchema, reduceWindow } from "./gauntletEngine.js";
+import { createWindow, normalizeSchema, reduceWindow } from "./gauntletEngine.js";
 
 /** The record's own version, for a replay of a record written by an older build. */
 export const WINDOW_RECORD_VERSION = 1;
@@ -61,12 +61,20 @@ export function appendWindowEvent(trail, before, event, after, { digits = TRAIL_
   return [...trail, [at, code]];
 }
 
-/** The board as it differs from BASE_SCHEMA: a plain board is `{}`. */
+/**
+ * The board a record that names nothing reads back as (`normalizeSchema({})`):
+ * BASE_SCHEMA, less the stake clock, which a board has only by saying so. A
+ * record from before 2026-11-05 is `{}` and keeps its flat clock; one written
+ * since carries `stakeClock: true`, so the replay runs the clock it was played on.
+ */
+const UNNAMED_BOARD = normalizeSchema({});
+
+/** The board as it differs from the unnamed one: a plain board of this build is `{ stakeClock: true }`. */
 export function compactSchema(schema) {
   const normalized = normalizeSchema(schema);
   const compact = {};
   for (const [key, value] of Object.entries(normalized)) {
-    if (JSON.stringify(value) !== JSON.stringify(BASE_SCHEMA[key])) compact[key] = value;
+    if (JSON.stringify(value) !== JSON.stringify(UNNAMED_BOARD[key])) compact[key] = value;
   }
   return compact;
 }

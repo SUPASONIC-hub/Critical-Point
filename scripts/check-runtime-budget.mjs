@@ -97,10 +97,15 @@ const BUDGETS = {
   // 18 -> 19 names on 2026-10-26 (영어판 3단계): the observer's words and the
   // endings' lines are src/copy/observer.js's, and `fill` puts a name and its
   // particle into them, so another language can be laid over the Korean.
+  // 19 -> 20 names on 2026-10-29, #224 (RULES_MARK 3, C-2) merged with main: the
+  // season score's module (`scoring`, src/seasonScore.js) beside the observer's words.
+  // C-3 (c3-c4-rules, 2026-10-25) shares the 일관성 lean with the logic streak
+  // (`getEffectLean` in gameConstants.js); on #224 602ec69b it is read through
+  // `gameConstants` (import * as), with ENDING_GATES, so the count stays 20.
   "src/gameLogic.js": {
     lines: 1260,
     longestLine: 190,
-    importedNames: 19,
+    importedNames: 20,
     hooks: {},
   },
   // GameRuntime read 2280 / 167 and PlayScreen 340 / 14 until 2026-09-14, when
@@ -227,8 +232,11 @@ const BUDGETS = {
   // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
   // ref for the amount's flight and the window it was dealt on; the purse's
   // markup and both reads live outside the screen.
+  // 860 -> 863 lines on 2026-11-04, measured (kd-bank-account): the purse
+  // leaves the rail and is drawn after the briefing and the draft as the
+  // KD은행 계좌, with a line saying why it sits there.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 860,
+    lines: 863,
     longestLine: 250,
     importedNames: 73,
     hooks: {},

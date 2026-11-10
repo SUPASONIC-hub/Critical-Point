@@ -1,8 +1,11 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
+import os from "node:os";
 import path from "node:path";
+
+import { readShardPlan, SHARD_PLAN_PATH, shardUnits, takeShardArg, testListText, unitsOf } from "./e2e-shards.mjs";
 
 /**
  * Starts a server for this working tree on a free port, runs Playwright (or the
@@ -38,6 +41,11 @@ import path from "node:path";
  * Everything else is handed to `playwright test`, so `--shard=1/3`,
  * `--update-snapshots`, `--project=chromium` and spec paths all work. A spec
  * path without a `--grep` runs that spec minus @visual and @season-full.
+ *
+ * On the default list, `--shard=i/N` with the N that tests/e2e-shards.json is
+ * laid out for runs that file's shard i -- spec files balanced by the time CI
+ * measured -- instead of Playwright's cut by test count (scripts/e2e-shards.mjs;
+ * `npm run e2e:rebalance` lays it out again).
  */
 
 // The one Playwright image the visual baselines are recorded and compared in.
@@ -92,10 +100,12 @@ function exitCodeOf(child) {
 // which only greps @visual -- meant nothing ran them.
 const DEFAULT_SPECS = [
   "tests/accessibility.spec.js",
+  "tests/accessibility-locales.spec.js",
   "tests/accessibility-settings.spec.js",
   "tests/audio-preference.spec.js",
   "tests/board-ranking.spec.js",
   "tests/cloud-save.spec.js",
+  "tests/cold-opening.spec.js",
   "tests/contrast.spec.js",
   "tests/gauntlet-loop.spec.js",
   "tests/language-picker.spec.js",
@@ -106,6 +116,7 @@ const DEFAULT_SPECS = [
   "tests/save-integrity.spec.js",
   "tests/save-resume.spec.js",
   "tests/save-unavailable-language.spec.js",
+  "tests/scene-mood.spec.js",
   "tests/season-flow.spec.js",
   "tests/season-recovery.spec.js",
   "tests/season-telemetry.spec.js",
@@ -342,6 +353,36 @@ const REPORTERS = process.env.CI
   ? ["--reporter=html,github,list,./tests/helpers/flaky-reporter.js"]
   : ["--reporter=list,./tests/helpers/flaky-reporter.js"];
 
+/**
+ * `--shard=i/N` on the default list, as a `--test-list` of the spec files
+ * tests/e2e-shards.json gives shard i. Playwright cuts the ordered list into
+ * runs of equal test count, and the slow tests sit together in a few files:
+ * five such shards took 12 to 15 minutes on 2026-11-03, where the same tests
+ * balanced by time come to 14.2 each. Anything that narrows the run itself
+ * (a spec, a grep, a project) keeps Playwright's own shard, and so does a
+ * shard count the file is not laid out for. Null leaves `--shard` as given.
+ */
+function balancedShard() {
+  const shard = takeShardArg(forwardedArgs);
+  if (!shard || usePreview || hasExplicitTestTarget || hasExplicitGrep || hasExplicitProject || has("--webkit")) return null;
+  const { index, total } = shard;
+  const plan = readShardPlan(path.join(root, SHARD_PLAN_PATH));
+  if (total !== plan.shardCount) {
+    console.warn(
+      `${SHARD_PLAN_PATH} is laid out for ${plan.shardCount} shards, not ${total}, so Playwright shards this run by test count. ` +
+        `\`npm run e2e:rebalance -- --shards=${total}\` lays it out for ${total}.`,
+    );
+    return null;
+  }
+  const projects = DEFAULT_PROJECTS.map((arg) => arg.slice("--project=".length));
+  const units = shardUnits(plan, unitsOf(DEFAULT_SPECS, projects), index, total);
+  const file = path.join(mkdtempSync(path.join(os.tmpdir(), "e2e-shard-")), `shard-${index}-of-${total}.txt`);
+  writeFileSync(file, testListText(units));
+  const minutes = units.reduce((sum, unit) => sum + (plan.seconds[unit] ?? 0), 0) / 60;
+  console.log(`Shard ${index}/${total} from ${SHARD_PLAN_PATH}, about ${minutes.toFixed(1)} minutes measured: ${units.join(", ")}`);
+  return { args: ["--test-list", file], forwarded: shard.rest };
+}
+
 function playwrightArgs() {
   if (runFullCoverage) {
     // Test by test, so `--shard` spreads the per-case walks: a shard by file
@@ -381,7 +422,11 @@ function playwrightArgs() {
         // walk in the weekly one; the default run takes the measurements and
         // the per-segment walks.
         [...DEFAULT_SPECS, "--grep-invert", skipSegments ? "@visual|@season-full|@season-segment" : "@visual|@season-full"];
-  return ["test", ...selection, ...DEFAULT_PROJECTS, ...(process.env.CI ? ["--workers=1", "--retries=1", "--fully-parallel"] : []), ...REPORTERS, ...forwardedArgs];
+  const balanced = balancedShard();
+  return [
+    "test", ...selection, ...DEFAULT_PROJECTS, ...(process.env.CI ? ["--workers=1", "--retries=1", "--fully-parallel"] : []), ...REPORTERS,
+    ...(balanced ? [...balanced.args, ...balanced.forwarded] : forwardedArgs),
+  ];
 }
 
 /**
