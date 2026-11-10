@@ -62,6 +62,7 @@ export default {
     retry: "Retry remote saving",
     waiting: "Waiting for connection",
     copyCode: "Copy code",
+    errorRow: "{scene} error log",
   },
   badges: {
     title: "Badges earned",

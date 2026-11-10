@@ -174,7 +174,8 @@ test("the drive is a seasoning: no mode over 0.15, and no scene pushes past it",
   // The loudest stays the loudest, as before (critical > final > unstable > controlled).
   const { controlled, unstable, critical, final } = musicModes;
   assert.ok(critical.drive > final.drive && final.drive > unstable.drive && unstable.drive > controlled.drive);
-  assert.equal(critical.drive, DRIVE_CEILING);
+  // Critical sits under the ceiling since the 11-10 crackle fix (music-crackle-fix.test.mjs); a scene's push still stops there.
+  assert.ok(critical.drive < DRIVE_CEILING);
   for (const key of sceneKeys()) assert.ok(createSceneMode(key).drive <= DRIVE_CEILING, key);
 });
 

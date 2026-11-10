@@ -9,6 +9,7 @@ import {
   createSceneMode as scoreSceneMode,
   DRIVE_CEILING,
   driveMix,
+  isCrackleFixOn,
   leadFilterFrequency,
   blendedTexture,
   moodCrossfade,
@@ -76,6 +77,9 @@ function writePref(key, value) {
 const soundOff = () => readPref(MUSIC_PREF_KEY, "true") === "false";
 const presetMultiplier = () => volumePresets[normalizeVolumePreset(readPref(MUSIC_VOLUME_KEY, "normal"))].multiplier;
 
+/** The aligned dry path's input scale: the bus may run to 4 before the identity curve's ends. */
+const DRY_HEADROOM = 4;
+
 /** Soft-clip curve; `amount` 0 leaves the signal alone. Built once, at `DRIVE_CEILING` (driveMix, musicScore.js). */
 function makeDriveCurve(amount) {
   const size = 1024;
@@ -91,6 +95,15 @@ function makeDriveCurve(amount) {
 function connectMusicBus(context, output) {
   const input = context.createGain();
   const shaper = context.createWaveShaper();
+  // The dry path's twin of the shaper's oversampling delay (musicScore.js,
+  // CRACKLE_FIX_BEFORE): an identity curve, oversampled the same way, so dry
+  // and wet arrive together in every browser. Its input is scaled into the
+  // curve's -1..1 and back out in `dry`, so nothing the bus carries reaches
+  // the curve's ends. `dryUnaligned` is the old direct path, open only when
+  // the music lab turns the fix off.
+  const alignIn = context.createGain();
+  const aligner = context.createWaveShaper();
+  const dryUnaligned = context.createGain();
   const dry = context.createGain();
   const wet = context.createGain();
   const lowpass = context.createBiquadFilter();
@@ -102,9 +115,13 @@ function connectMusicBus(context, output) {
   // One curve for the life of the bus; a mode's drive is the dry/wet mix.
   shaper.curve = makeDriveCurve(DRIVE_CEILING);
   const mix = driveMix(0);
-  dry.gain.value = mix.dry;
+  dry.gain.value = mix.dry * DRY_HEADROOM;
+  dryUnaligned.gain.value = 0;
   wet.gain.value = mix.wet;
   shaper.oversample = "2x";
+  alignIn.gain.value = 1 / DRY_HEADROOM;
+  aligner.curve = new Float32Array([-1, 1]);
+  aligner.oversample = shaper.oversample;
   lowpass.type = "lowpass";
   lowpass.frequency.value = BUS_LOWPASS_HZ;
   lowpass.Q.value = 0.7;
@@ -117,8 +134,12 @@ function connectMusicBus(context, output) {
   compressor.attack.value = 0.004;
   compressor.release.value = 0.24;
 
-  input.connect(dry);
+  input.connect(alignIn);
+  alignIn.connect(aligner);
+  aligner.connect(dry);
   dry.connect(lowpass);
+  input.connect(dryUnaligned);
+  dryUnaligned.connect(lowpass);
   input.connect(shaper);
   shaper.connect(wet);
   wet.connect(lowpass);
@@ -131,7 +152,7 @@ function connectMusicBus(context, output) {
   compressor.connect(output);
   // `clean` is the bus past the drive: the stake's layers enter there, since
   // in the driven modes a standing voice summed into the shaper crackled.
-  return { input, drive: { dry, wet }, clean: lowpass };
+  return { input, drive: { dry, dryUnaligned, wet }, clean: lowpass };
 }
 
 function playTone(context, destination, frequency, duration, gainValue, type = "sine", options = {}) {
@@ -338,7 +359,9 @@ function rampDrive(drive) {
   if (!audioRuntime.drive || !audioRuntime.context) return;
   const { dry, wet } = driveMix(drive);
   const now = audioRuntime.context.currentTime;
-  audioRuntime.drive.dry.gain.setTargetAtTime(dry, now, 0.15);
+  const aligned = isCrackleFixOn();
+  audioRuntime.drive.dry.gain.setTargetAtTime(aligned ? dry * DRY_HEADROOM : 0, now, 0.15);
+  audioRuntime.drive.dryUnaligned.gain.setTargetAtTime(aligned ? 0 : dry, now, 0.15);
   audioRuntime.drive.wet.gain.setTargetAtTime(wet, now, 0.15);
 }
 
@@ -699,7 +722,10 @@ export function AdaptiveMusic({ modeKey }) {
 
       const bass = currentMode.bass[step];
       if (bass) {
-        playTone(context, destination, bass, stepSeconds * 1.15, BASS_GAIN * impact * texture.bass, "triangle", {
+        // 불안 and 위기 hold their bass out of the drive (musicScore.js, CRACKLE_FIX_BEFORE).
+        const bassBus = currentMode.bassPastDrive ? (audioRuntime.clean ?? destination) : destination;
+        const bassGain = BASS_GAIN * impact * texture.bass * currentMode.bassLevel;
+        playTone(context, bassBus, bass, stepSeconds * 1.15, bassGain, "triangle", {
           attack: 0.008,
           release: 0.09,
           filterFrequency: 560 + currentMode.filterLift * 0.42,
