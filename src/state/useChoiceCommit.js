@@ -165,7 +165,7 @@ export function useChoiceCommit(context) {
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,
         type: "case",
-        label: `${activeCaseMeta?.label ?? currentCase} 사건 로그`,
+        label: fill(runLines.queue.case, { case: activeCaseMeta?.label ?? currentCase }),
         payload: caseTelemetryPayload,
       };
       // Into the queue first, and so into the save, and sent from there (the
