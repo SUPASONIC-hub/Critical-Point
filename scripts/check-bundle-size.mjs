@@ -247,7 +247,8 @@ const budgets = [
   // 34,178 / 14,560 -> 34,238 / 14,593 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main 49f50741 (#475): the table's voice (src/gauntlet/tableVoice.js) speaks the settle line, the act start and the case result's collapse-line verdict for screen readers. Measured 34,234 / 14,589 in the e2e build, the plus 4.
   // 34,238 / 14,593 -> 34,238 / 14,590 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): only the chunk names it imports. Measured 34,234 / 14,586 in the e2e build, the plus 4.
   // 34,238 / 14,590 -> 34,238 / 14,588 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 34,234 / 14,584 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_238, maxGzip: 14_588 },
+  // 34,238 / 14,588 -> 34,243 / 14,589 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes). Measured 34,239 / 14,585 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_243, maxGzip: 14_589 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -531,7 +532,9 @@ const budgets = [
   // 196,509 / 70,858 -> 196,509 / 70,859 on 2026-11-10, phone-846-staked after merging main b77e4bfe (#498): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,855 in the e2e build, the plus 4.
   // 196,509 / 70,859 -> 196,509 / 70,854 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): only the asset names the entry imports. Measured 196,505 / 70,850 in the e2e build, the plus 4.
   // 196,509 / 70,854 -> 196,509 / 70,862 on 2026-11-10, phone-390-staked over main cb8346da (#500): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,858 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_862 },
+  // 196,509 / 70,854 -> 196,589 / 70,885 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert as TriangleExclamationPoint, the name the screens now import). Measured 196,585 / 70,881 in the e2e build, the plus 4.
+  // 196,509 / 70,862 (phone-390-staked) and 196,589 / 70,885 (deps-1123) -> 196,589 / 70,889 on 2026-11-10, phone-390-staked after merging main 312aa15c (#484): both. Measured 196,585 / 70,885 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 196_589, maxGzip: 70_889 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1019,7 +1022,8 @@ const budgets = [
   // NotebookPen); the five they replace are still drawn elsewhere. Measured
   // 17,296 / 6,136 in the e2e build, the gzip plus 4.
   // 17,286 / 6,142 -> 17,532 / 6,240 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): C-7's five tool icons on top of board-report's Flag. Measured 17,532 / 6,236. Measured in the e2e build, the gzip plus 4.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_532, maxGzip: 6_240 },
+  // 17,532 / 6,240 -> 17,602 / 6,264 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 17,598 / 6,260 in the e2e build, the plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_602, maxGzip: 6_264 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -1099,7 +1103,8 @@ const budgets = [
   // lucide-react 1.60 installed (npm ci): measured 4,458 / 1,889, the gzip
   // plus 4.
   // 4,458 / 1,893 -> 5,014 / 2,135 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_014, maxGzip: 2_135 },
+  // 5,014 / 2,135 -> 5,023 / 2,138 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes). Measured 5,019 / 2,134 in the e2e build, the plus 4.
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_023, maxGzip: 2_138 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
   // 35,720 / 13,520 -> 37,870 / 14,200 on 2026-10-09, measured 36,063 /
@@ -1961,7 +1966,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 435,021 / 493,308 / 500,919 (en-signals-row) and 435,162 / 493,451 / 501,061 (#498) -> 435,217 / 493,503 / 501,114 on 2026-11-10, en-signals-row after merging main b77e4bfe (#498): both. Measured 435,213 / 493,499 / 501,110 in the e2e build, the plus 4.
 // 435,179 / 493,468 / 501,077 (phone-846-staked) and 435,217 / 493,503 / 501,114 (#499) -> 435,226 / 493,515 / 501,125 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): both, and the critical CSS regenerated. Measured 435,222 / 493,511 / 501,121 in the e2e build, the plus 4.
 // 435,226 / 493,515 / 501,125 -> 435,238 / 493,525 / 501,135 on 2026-11-10, phone-390-staked over main cb8346da (#500): the index CSS line above and the critical CSS it regenerates. Measured 435,234 / 493,521 / 501,131 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_238, en: 493_525, ja: 501_135 };
+// 435,226 / 493,515 / 501,125 -> 435,276 / 493,566 / 501,174 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (#500 phone-846-staked; replaces Dependabot #479 and #480): the entry and icons-vendor lines above. Measured 435,272 / 493,562 / 501,170 in the e2e build, the plus 4.
+// 435,238 / 493,525 / 501,135 (phone-390-staked) and 435,276 / 493,566 / 501,174 (deps-1123) -> 435,285 / 493,575 / 501,186 on 2026-11-10, phone-390-staked after merging main 312aa15c (#484): both. Measured 435,281 / 493,571 / 501,182 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 435_285, en: 493_575, ja: 501_186 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
