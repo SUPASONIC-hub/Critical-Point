@@ -541,7 +541,8 @@ const budgets = [
   // 189,363 / 68,363 -> 191,660 / 69,343 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 191,656 / 69,339 in the e2e build, the plus 4.
   // 189,363 / 68,368 -> 191,660 / 69,346 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 191,656 / 69,342 in the e2e build, the plus 4.
   // 196,509 / 70,858 -> 198,795 / 71,936 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the start screen's side slot and the side-id guards (as above). Measured 198,791 / 71,932 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 198_795, maxGzip: 71_936 },
+  // 198,795 / 71,936 -> 198,795 / 71,928 on 2026-11-10, E-11 번외 사건 틀 (draft) over main cb8346da (#500): only the asset names the entry imports. Measured 198,791 / 71,924 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 198_795, maxGzip: 71_928 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1999,7 +2000,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 435,179 / 493,468 / 501,077 (phone-846-staked) and 435,217 / 493,503 / 501,114 (#499) -> 435,226 / 493,515 / 501,125 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): both, and the critical CSS regenerated. Measured 435,222 / 493,511 / 501,121 in the e2e build, the plus 4.
 // 426,761 / 483,722 / 490,404 -> 427,739 / 485,001 / 491,707 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 427,735 / 484,997 / 491,703, the plus 4.
 // 435,217 / 493,503 / 501,114 -> 436,297 / 494,902 / 502,517 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the entry's side slot and the two dictionaries' side lines. Measured 436,293 / 494,898 / 502,513, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 436_297, en: 494_902, ja: 502_517 };
+// 436,297 / 494,902 / 502,517 -> 436,303 / 494,909 / 502,522 on 2026-11-10, E-11 번외 사건 틀 (draft) over main cb8346da (#500): main's index CSS and critical CSS under the side slot. Measured 436,299 / 494,905 / 502,518, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 436_303, en: 494_909, ja: 502_522 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
