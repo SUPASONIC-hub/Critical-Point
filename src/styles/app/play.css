@@ -2913,19 +2913,51 @@
   /* The signals as at 360px in English: LOCK at its own width without its
      icon, the chain's line the one cut. With the 1.25 / 1 shares STRIKE had
      68px of its 81 once the chain was lit and ran 13px under the streak
-     (Linux, overclocked board, 105 scenes of case01-21; 2026-11-09). */
+     (Linux, overclocked board, 105 scenes of case01-21; 2026-11-09).
+
+     As columns (minmax(0, 1fr) auto auto) they still ran into themselves on
+     Linux fonts with a late season's bank: 2px with the chain lit (390x844,
+     most five-card scenes) and, with the chain off, 13px (390x844, the
+     prologue's five-card scenes) and 3px (411x780; hand5, LAYOUT_BANK=max,
+     2026-11-10). They are a line of three now: the chain's word stays and
+     its sentence takes what is left, LOCK keeps its width (and the rest of
+     the row when the chain is off), and the streak's direction line is the
+     one that gives way, cut with an ellipsis; its number stays whole. One
+     line as before, so the row is no taller. */
   :lang(en) .gauntlet-stage .gx-signals {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    display: flex;
     column-gap: 8px;
     padding-top: 3px;
   }
 
+  :lang(en) .gauntlet-stage .gx-overdrive {
+    flex: 1 1 0;
+    min-width: min-content;
+  }
+
   :lang(en) .gauntlet-stage .gx-focus-signal {
+    flex: none;
     grid-template-columns: auto;
+  }
+
+  :lang(en) .gauntlet-stage .gx-focus-signal:first-child {
+    flex-grow: 1;
   }
 
   :lang(en) .gauntlet-stage .gx-focus-signal svg {
     display: none;
+  }
+
+  :lang(en) .gauntlet-stage .gx-streak {
+    flex: 0 1 auto;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  :lang(en) .gauntlet-stage .gx-streak > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Those took English from 58px under the bar to 3px over it; the column
