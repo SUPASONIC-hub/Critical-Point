@@ -128,7 +128,8 @@ test("with no script, each start page says what the game is and links the five p
     for (const sentence of START_PAGE[language].intro) assert.ok(block.replace(/&quot;/g, '"').includes(sentence), `${language}: ${sentence}`);
     const links = [...block.matchAll(/<a href="(\/[^"]*)"/g)].map((match) => match[1]);
     const folder = language === "ko" ? "" : `/${language}`;
-    assert.deepEqual(links, PAGE_KINDS.map((kind) => `${folder}/${kind}.html`), `${language}: the five pages, in the header's order`);
+    const content = ["guide", "cases/index", "characters", "making"];
+    assert.deepEqual(links, [...PAGE_KINDS, ...content].map((kind) => `${folder}/${kind}.html`), `${language}: the five pages, then the content pages' doors`);
     for (const link of links) assert.ok(renderStaticPages()[link.slice(1)], `${link} is written`);
     assert.equal((html.match(/<noscript>\s*<div\b/g) ?? []).length, 1, `${language}: one block`);
   }

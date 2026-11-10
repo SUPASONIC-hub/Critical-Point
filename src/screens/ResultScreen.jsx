@@ -91,7 +91,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
         {renderRecoveryNotice()}
         {renderErrorLogPanel()}
         <p className="sr-only" aria-live="polite" aria-atomic="true">
-          {screenReaderStatus}
+          {screenReaderStatus} {view.seasonStanding.label} · {view.seasonStanding.text}{/* E3 2단계 (b): the rank is in the line already (GameRuntime); the standing is the harm level, as the season-standing line below shows it. */}
         </p>
         {currentCase === "final" && (
           <EndingSequence
