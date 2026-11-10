@@ -6,7 +6,7 @@ import { StrictMode, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AdaptiveMusic, MUSIC_MOODS, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
 import { chapterMotifs, speakerMotifs } from "../components/musicData.js";
-import { createSceneMode, moodLeads, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
+import { createSceneMode, isCrackleFixOn, moodLeads, setCrackleFix, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
 import { startTensionDrone } from "../gauntlet/gauntletAudio.js";
 import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
 
@@ -65,13 +65,13 @@ function writeNotes(notes) {
   }
 }
 
-function describe(key, mood) {
+function describe(key, mood, crackleFix) {
   const mode = createSceneMode(key);
   const bpm = Math.round(60000 / (mode.interval * 4));
   const leads = moodLeads(mode, mood);
   const picks = mood === "sorrow" ? "슬픔 리드(많이 치름 선율을 단조로)" : `리드 ${leads.map((lead) => mode.leads.indexOf(lead) + 1).join("·")}번`;
   const drone = DRONE_VOICINGS[mood];
-  return `${mode.label} · ${bpm} BPM · ${mode.wave} · drive ${mode.drive.toFixed(2)} · ${picks} · 드론 ${drone.voices.length}성 ×${drone.level}`;
+  return `${mode.label} · ${bpm} BPM · ${mode.wave} · drive ${mode.drive.toFixed(2)}${mode.bassPastDrive ? " · 베이스는 드라이브 밖" : ""}${crackleFix ? "" : " · 고치기 전"} · ${picks} · 드론 ${drone.voices.length}성 ×${drone.level}`;
 }
 
 function MusicLab() {
@@ -81,6 +81,8 @@ function MusicLab() {
   const [copied, setCopied] = useState(false);
   const [mood, setMood] = useState("neutral");
   const [droneOn, setDroneOn] = useState(false);
+  // 11-10: A/B the crackle fix on one passage. Toggling restarts the track from its first bar.
+  const [crackleFix, setCrackleFixState] = useState(isCrackleFixOn);
   const gaugeRef = useRef(gauge);
 
   useEffect(() => {
@@ -101,6 +103,11 @@ function MusicLab() {
     };
   }, [droneOn]);
   useEffect(() => writeNotes(notes), [notes]);
+
+  function toggleCrackleFix(on) {
+    setCrackleFix(on);
+    setCrackleFixState(on);
+  }
 
   const index = ALL.findIndex((track) => track.key === current);
   const step = (offset) => setCurrent(ALL[(index + offset + ALL.length) % ALL.length].key);
@@ -133,7 +140,7 @@ function MusicLab() {
       <section style={styles.bar}>
         <div>
           <strong>{current ? ALL[index].name : "곡을 고르세요"}</strong>
-          {current && <div style={styles.muted}>{describe(current, mood)}</div>}
+          {current && <div style={styles.muted}>{describe(current, mood, crackleFix)}</div>}
         </div>
         <div style={styles.row}>
           <button type="button" onClick={() => step(-1)} disabled={!current}>
@@ -164,13 +171,17 @@ function MusicLab() {
             판 드론 듣기 (슬라이더 값이 가까움)
           </label>
         </div>
+        <label style={styles.row}>
+          <input type="checkbox" checked={crackleFix} onChange={(event) => toggleCrackleFix(event.target.checked)} />
+          지직거림 고침 (11-10) — 끄면 고치기 전 소리. 바꾸면 같은 곡이 첫 마디부터 다시 시작합니다
+        </label>
         <div style={styles.row}>
           <button type="button" onClick={copyNotes} disabled={!rated.length}>
             평가 {rated.length}개 복사
           </button>
           {copied && <span>복사됨 — 대화창에 붙여넣어 주세요</span>}
         </div>
-        {current && <AdaptiveMusic modeKey={current} />}
+        {current && <AdaptiveMusic key={crackleFix ? "fix" : "before"} modeKey={current} />}
       </section>
 
       {GROUPS.map((group) => (
