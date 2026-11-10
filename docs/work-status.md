@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-10 (the state of `main` at `cb8346d`, after #492 #493 #495 #491 #496 #497 #498 #499 #500; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-10 (the state of `main` at `312aa15`, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -829,7 +829,9 @@ Still open, on purpose:
   up to 860px): 411x846 staked +25 to -35, Pixel 7 +23 to -28, portraits kept.
   The W47 test week was cancelled (no finished seasons in W45/W46); the
   verdict waits for 30 finished seasons and every improvement now ships for
-  the user to check live. AdSense re-review requested ~17:10. Nine merges.
+  the user to check live. AdSense re-review requested ~17:10. #484
+  (`312aa15c`): vite 8.3.6, lucide-react 1.69 and dev tooling; Dependabot
+  #479 #480 closed. Ten merges.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
