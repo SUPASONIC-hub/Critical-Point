@@ -2517,6 +2517,22 @@
     display: none;
   }
 
+  .gx-question {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.8125rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* The air of the short phone, also on a phone wider than 390 and 801 to 860
+   tall, which keeps its portrait and its question: a 411x846 phone put Korean
+   five-card hands on an overclocked board up to 25px under the action bar with
+   a card staked (Linux, 2026-11-10). The short-phone block above, stretched to
+   860, hid the portrait on a Pixel 7 (412x839) too. */
+@media (max-width: 480px) and (max-height: 800px),
+  (min-width: 391px) and (max-width: 480px) and (max-height: 860px) {
   .gx-clock {
     width: 2.25rem;
     height: 2.25rem;
@@ -2551,14 +2567,6 @@
 
   .gx-card.selected .gx-card-preview {
     max-height: 1.0625rem;
-  }
-
-  .gx-question {
-    display: -webkit-box;
-    overflow: hidden;
-    font-size: 0.8125rem;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
   }
 
   .gx-pot-value {
