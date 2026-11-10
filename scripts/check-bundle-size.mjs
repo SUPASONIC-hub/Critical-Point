@@ -963,8 +963,9 @@ const budgets = [
   // 208,126 / 39,241 -> 208,226 / 39,265 on 2026-11-09, hand-fit-2px (#476) over main 49f50741: the 360px HUD's 2px gaps and, in Japanese, the signals row, dateline, speaker and lock seal at line-height 1.2 (Noto CJK's normal line is about 1.45em). Measured 208,222 / 39,261 in the e2e build, the plus 4.
   // 208,226 / 39,265 -> 209,113 / 39,370 on 2026-11-09, phone-390-fit over main 775bb69a (#476): a 361-390px block for English and Japanese (the 360px labels, HUD air and Japanese 1.2 lines; the English gauge row at 4px and the column over a rules hand at 4px) and, at 360px, the English streak's line cut with an ellipsis. Measured 209,109 / 39,366 in the e2e build, the plus 4.
   // 209,113 / 39,370 -> 209,171 / 39,378 on 2026-11-09, a32-411-fit over main c1d08daa (#488): the 360px HUD air in a block shared with phones up to 480 wide and 800 tall (play.css; Galaxy A32, 411x780). Measured 209,167 / 39,374 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 209_171, maxGzip: 39_378 },
   // 209,113 / 39,370 -> 209,356 / 39,400 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): at 360px the relics sit beside the run's line when they fit (an overclocked board with a max bank put five-card hands 18px under the bar in Korean, 9 in Japanese), and at 361-390px the English signals take the 360px columns. Measured 209,352 / 39,396 in the e2e build, the plus 4.
+  // 209,171 / 39,378 (#492 #493) and 209,356 / 39,400 (phone-heavy-bank) -> 209,414 / 39,403 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: both, the English signals' columns now in the 361-480px block. Measured 209,410 / 39,399 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 209_414, maxGzip: 39_403 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1933,8 +1934,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,586 / 492,538 / 500,068 -> 434,919 / 492,851 / 500,415 on 2026-11-09, pages-a11y-ld after merging main c1d08daa (#488 bundle 1109b): no script changed; the start page's head carries the site and the game as JSON-LD (scripts/structured-data.mjs, `startStructuredData` in site-pages.mjs; 685 bytes raw, one line), and /en/ and /ja/ theirs. Measured 434,915 / 492,847 / 500,411 in the e2e build, the plus 4.
 // 434,586 / 492,538 / 500,068 -> 434,597 / 492,551 / 500,080 on 2026-11-09, a32-411-fit over main c1d08daa (#488): the index CSS line above and the critical CSS it regenerates. Measured 434,593 / 492,547 / 500,076 in the e2e build, the plus 4.
 // 434,919 / 492,851 / 500,415 (#489) and 434,597 / 492,551 / 500,080 (a32-411-fit) -> 434,929 / 492,863 / 500,426 on 2026-11-09, a32-411-fit after merging main f97f5079 (#489 pages-a11y-ld, #490): #489's JSON-LD in the start pages' heads with this branch's index CSS. Measured 434,925 / 492,859 / 500,422 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_929, en: 492_863, ja: 500_426 };
 // 434,919 / 492,851 / 500,415 -> 434,954 / 492,886 / 500,449 on 2026-11-09, phone-heavy-bank over main d07a852b (#489): the index CSS line above. Measured 434,950 / 492,882 / 500,445 in the e2e build, the plus 4.
+// 434,929 / 492,863 / 500,426 (#493) and 434,954 / 492,886 / 500,449 (phone-heavy-bank) -> 434,945 / 492,876 / 500,438 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: the index CSS line above and the critical CSS it regenerates. Measured 434,941 / 492,872 / 500,434 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 434_945, en: 492_876, ja: 500_438 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
