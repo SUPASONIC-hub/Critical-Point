@@ -6,7 +6,7 @@ import { adsEffectiveDate, adsNotice, adStage, ANALYTICS_EFFECTIVE_DATE } from "
 import { renderStaticPages } from "../../scripts/site-pages.mjs";
 
 /**
- * The ads' three stages on the fifteen plain pages (ADSENSE_ADS, ADSENSE_DATE;
+ * The ads' three stages on the plain pages (ADSENSE_ADS, ADSENSE_DATE;
  * draft #350): off, the notice seven days ahead (the policy's section 12), and
  * on. The notice is one paragraph at the top of the policy and of the terms
  * and changes nothing else; on, the notice is gone, the pages say what the ads

@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { AD_CSP, AD_PLACEMENTS, adsTxt, insertAdSlots, readAdsenseEnv, WEB_AD_CODE_MARKERS } from "../../scripts/adsense-config.mjs";
+import { AD_CSP_WIDENING, AD_PLACEMENTS, adCsp, adsTxt, insertAdSlots, readAdsenseEnv, WEB_AD_CODE_MARKERS } from "../../scripts/adsense-config.mjs";
+import { analyticsCspProblems, backendOriginProblems, cspProblems, isAdCsp, readRenderYamlCsp } from "../../scripts/deploy-policy.mjs";
 
 /**
  * Web ads (출시 로드맵 2단계, scripts/adsense-config.mjs): off by default,
@@ -66,14 +67,33 @@ test("every placement is marked once, and never on the table, a decision or a br
 
 test("the ad code's names are what the bundle check looks for, and the CSP keeps the rest of the live one", () => {
   assert.match(readFileSync("src/ads/AdSlot.jsx", "utf8"), WEB_AD_CODE_MARKERS);
-  const live = /name: Content-Security-Policy\s+value: "([^"]+)"/.exec(readFileSync("render.yaml", "utf8"))[1];
+  const live = readRenderYamlCsp(readFileSync("render.yaml", "utf8"));
   const directives = (policy) => Object.fromEntries(policy.split(";").map((part) => part.trim().split(/\s+/)).map(([name, ...values]) => [name, values.join(" ")]));
-  const [before, after] = [directives(live), directives(AD_CSP)];
+  const ads = adCsp(live);
+  const [before, after] = [directives(live), directives(ads)];
   for (const name of ["default-src", "base-uri", "object-src", "frame-ancestors", "form-action", "style-src", "font-src", "manifest-src", "worker-src", "media-src"]) {
     assert.equal(after[name], before[name], name);
   }
-  assert.match(after["script-src"], /https:/);
-  assert.match(after["frame-src"], /https:/);
+  // Every host the live policy names stays (the backend, Google Analytics'), and only https: and 'unsafe-eval' are added.
+  for (const [name, sources] of Object.entries(before)) {
+    for (const source of sources.split(" ")) assert.ok(after[name].split(" ").includes(source), `${name} keeps ${source}`);
+  }
+  for (const [name, added] of Object.entries(AD_CSP_WIDENING)) {
+    const extra = after[name].split(" ").filter((source) => !(before[name] ?? "").split(" ").includes(source));
+    assert.deepEqual(extra.sort(), [...added].sort(), name);
+  }
+  assert.equal(adCsp(ads), ads, "widening twice changes nothing");
+  // check:deploy accepts that policy and no other wider one; render.yaml's own still passes as it is.
+  assert.ok(isAdCsp(ads, live));
+  assert.ok(isAdCsp(ads.split("; ").reverse().join(";  "), live), "in any order and spacing");
+  assert.ok(!isAdCsp(live, live));
+  assert.ok(!isAdCsp(ads.replace("object-src 'none'", "object-src *"), live));
+  assert.ok(!isAdCsp(`${ads}; script-src-elem *`, live));
+  assert.ok(!isAdCsp(ads.replace("script-src 'self'", "script-src 'self' 'unsafe-inline'"), live));
+  assert.ok(cspProblems(ads).length > 0, "the ad policy is wider than cspProblems allows, so the exception is what lets it pass");
+  assert.deepEqual(cspProblems(live), []);
+  assert.deepEqual(analyticsCspProblems('<script async src="https://www.googletagmanager.com/gtag/js?id=G-X"></script>', ads), [], "Google Analytics still runs under it");
+  assert.deepEqual(backendOriginProblems("https://kiazzdbpkazwqhhimdib.supabase.co", ads), [], "the backend is still named");
 });
 
 test("the variables have no VITE_ prefix, so the bundle never sees them", () => {

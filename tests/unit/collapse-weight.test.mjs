@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { COLLAPSED_SEASON_MARK, getCollapseToll } from "../../src/featurePack.js";
-import { seasonCasesBase } from "../../src/gameCases.js";
+import { CASE_SEQUENCE, seasonCasesBase } from "../../src/gameCases.js";
 import { buildLeaderboard } from "../../src/ranking.js";
 import { buildResultCardModel } from "../../src/resultCardModel.js";
 
@@ -24,12 +24,19 @@ test("a collapse names the case that closed on the most harm, with that harm", (
   assert.doesNotMatch(toll, /프롤로그 01/);
   // Nothing about the next season: story-promises-true took those promises out.
   assert.doesNotMatch(toll, /다음 (시즌|플레이|분석관)/);
+  // C4 (2026-11-05 draft): the favours taken back, on the season's own harm --
+  // 65 over three closed cases, cut to a tenth -- and no number of people laid
+  // off, which the engine does not count.
+  assert.match(toll, /수당과 지원이 그 값 앞에서 가장 먼저 거둬집니다\. 당신이 밀어붙여 쌓인 사람 피해가 모두 65, 사건마다 평균 21\.6입니다\./);
+  assert.doesNotMatch(toll, /실직|명/);
 });
 
-test("a collapse on the table's harm alone names no case", () => {
+test("a collapse on the table's harm alone names no case, and its favours read the table's harm over the season", () => {
   const toll = getCollapseToll({ caseResults: {}, resources: { humanCost: 90 }, cases: seasonCasesBase });
   assert.doesNotMatch(toll, /「/);
-  assert.equal(toll.split(". ").length, 2);
+  // Over the line, the favours (two sentences), and who paid.
+  assert.equal(toll.split(". ").length, 4);
+  assert.match(toll, new RegExp(`모두 90, 사건마다 평균 ${Math.floor(900 / CASE_SEQUENCE.length) / 10}입니다`));
 });
 
 test("only a season row that ended in the collapse is marked, local or remote", () => {

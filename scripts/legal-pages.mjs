@@ -1,6 +1,8 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
+import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
+import { MENU_STYLE, siteFooterNav, siteHeaderNav } from "./content-pages/site-nav.mjs";
 
 /**
  * The privacy policy and the terms of use, Korean, English and Japanese: six
@@ -28,7 +30,7 @@ import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
  * a column the policy does not name. The sentence beside the consent box is
  * `PLAYTEST_DATA_NOTICE`, quoted here as written there.
  *
- * Settled on 2026-10-25 (앱출시-문서초안, 사용자 결정 2·3): only what the law asks
+ * Settled on 2026-10-25 (앱출시-문서초안, 우리 결정 2·3): only what the law asks
  * for; no operator or officer name -- 「임계점 개발자」 and the support address;
  * the overseas transfer as one line naming the company and the country; the
  * consent box still starts ticked, and the policy says so; the web version has
@@ -46,7 +48,10 @@ import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
  * each to a sentence that has to be found exactly once, so a later edit of
  * the text cannot leave an ad page half-written, and dates both pages
  * ADSENSE_DATE. Korean, English and Japanese take the same edits in the same
- * places, under the same effective date.
+ * places, under the same effective date. The game's consent box does not
+ * change with ads (it is the playtest data's, PLAYTEST_DATA_NOTICE): consent
+ * to Google's ad cookies in the EEA, the UK and Switzerland is Google's
+ * certified message, set in the AdSense console, which section 10 names.
  */
 
 const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026", ja: "2026年10月25日" };
@@ -204,6 +209,29 @@ const escapeHtml = (text) =>
   String(text).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character]);
 const items = (keys, language) => `<ul>${keys.map((key) => `<li>${escapeHtml(DATA_ITEMS[key][language])}</li>`).join("")}</ul>`;
 const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
+
+/**
+ * The start screen's credit (StudioCredit.jsx) at the foot of every page:
+ * the studio, the two creators on one line, and each one's address as a link
+ * named for its owner (src/credits.js). English labels in every language, as
+ * on the start screen; the studio's name in the page's language (studioName).
+ *
+ * The privacy policy and the terms leave the address row out (decided
+ * 2026-11-04): under their contact line it read as a second place to send an
+ * access or deletion request, which goes to SUPPORT_CONTACT alone.
+ */
+const NO_CREDIT_MAIL = new Set(["privacy", "terms"]);
+const creditMail = `<div class="credit-mail"><dt lang="en">CONTACT</dt><dd>${CREATORS.map(
+  (creator) => `<a href="mailto:${creator.email}" aria-label="${escapeHtml(creatorMailLabel(creator))}">${creator.email}</a>`,
+).join(" ")}</dd></div>
+`;
+const creditFor = (kind, language) => `<div class="credit">
+<img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
+<dl>
+<div><dt lang="en">STUDIO</dt><dd>${escapeHtml(studioName(language))}</dd></div>
+<div><dt lang="en">CREATOR</dt><dd>${escapeHtml(CREATOR_LINE)}</dd></div>
+${NO_CREDIT_MAIL.has(kind) ? "" : creditMail}</dl>
+</div>`;
 const days = DATA_RETENTION_DAYS;
 
 /**
@@ -303,7 +331,7 @@ ${ANALYTICS_NOTICE.ko}
 
 const PRIVACY_EN = `
 ${ANALYTICS_NOTICE.en}
-<p>This policy explains what the developer of Critical Point (“we”) processes when you play the game, why, and for how long.</p>
+<p>This policy explains what the developers of Critical Point (“we”) process when you play the game, why, and for how long.</p>
 
 <h2>1. In short</h2>
 <ul>
@@ -375,7 +403,7 @@ ${ANALYTICS_NOTICE.en}
 
 <h2>11. Contact</h2>
 <ul>
-<li>The Critical Point developer</li>
+<li>The Critical Point developers</li>
 <li>Email: ${mail}</li>
 </ul>
 
@@ -586,7 +614,7 @@ const TERMS_KO = `
 
 const TERMS_EN = `
 <ol>
-<li>These terms set the conditions for playing Critical Point (the “game”), provided by the Critical Point developer (“we”). By playing, you agree to them.</li>
+<li>These terms set the conditions for playing Critical Point (the “game”), provided by the Critical Point developers (“we”). By playing, you agree to them.</li>
 <li>The game is fiction. Its people, companies, banks, institutions and events have nothing to do with real ones, and its financial judgments are not investment or financial advice.</li>
 <li>The web version is free, with no ads and no payments. Chips, stakes, vaults and scores in the game are not money or goods and cannot be bought, sold or exchanged.</li>
 <li>The public leaderboard is a playtest ranking. It may be cleared when the rules of the table change, and records that do not meet the rules may be left off it.</li>
@@ -619,7 +647,13 @@ const PAGE_STYLE = `
 :root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
-main{width:min(760px,100%);margin:0 auto;padding:24px 16px 72px}
+header,main,footer{width:min(760px,100%);margin:0 auto;padding:0 16px}
+header{padding-top:24px}
+footer{margin-top:48px;padding-bottom:72px;font-size:.875rem}
+.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--accent);border-radius:8px;background:var(--bg)}
+.skip:focus{top:12px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+main:focus{outline:0}
 nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:.875rem}
 nav a{display:inline-flex;align-items:center;min-height:44px}
 nav a[aria-current]{color:var(--text);text-decoration:none}
@@ -634,7 +668,14 @@ li ul{margin:4px 0}
 dd{margin:0 0 4px}
 .effective{margin:0;color:var(--text-2);font-size:.875rem}
 strong{color:var(--text)}
-footer{margin-top:48px;padding-top:12px;border-top:1px solid var(--line);font-size:.875rem}
+.credit{display:flex;align-items:center;gap:12px;margin-top:16px}
+.credit img{flex:none;width:40px;height:40px;object-fit:cover;border-radius:50%}
+.credit dl{display:flex;flex-wrap:wrap;gap:4px 20px;min-width:0;margin:0}
+.credit dt{color:var(--text-2);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
+.credit dd{margin:0;color:var(--text);font-weight:700}
+.credit-mail{flex-basis:100%}
+.credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
+.credit-mail a{display:inline-flex;align-items:center;min-height:32px}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -650,10 +691,10 @@ export const PAGE_LANGUAGES = ["ko", "en", "ja"];
  */
 export const PAGE_KINDS = SITE_PAGES;
 
-const COPY = {
-  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의" },
-  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact" },
-  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ" },
+export const COPY = {
+  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의", skip: "본문으로 건너뛰기" },
+  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact", skip: "Skip to content" },
+  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ", skip: "本文へスキップ" },
 };
 
 export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
@@ -670,56 +711,118 @@ const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 /** A page's address from the root: `/faq.html`, `/en/faq.html`. The policy's two are PRIVACY_PAGE_PATH and TERMS_PAGE_PATH. */
 export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`;
 
-/** The game in a language, as the start page's own hreflang links name it (index.html). */
-export const gamePath = (language) => (language === "ko" ? "/" : `/?lang=${language}`);
+/**
+ * The game in a language, as the start page's own hreflang links name it
+ * (index.html): `/`, `/en/`, `/ja/`. The two folders hold the start page
+ * written again in their language (`localizedStartPage`, site-pages.mjs), and
+ * open the game in it (src/locale.js). Until 11-03 they were `/?lang=en` and
+ * `/?lang=ja`, which still open the game in English and Japanese but are the
+ * Korean page to a crawler: their canonical was `/`.
+ */
+export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
+
+/**
+ * The picture a shared link shows (the start screen's key visual, 1200x675),
+ * and what it shows in each language: the start screen's own `heroAlt`
+ * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
+ * holds them to it).
+ */
+export const SHARE_IMAGE = { path: "/triggerlab-key-visual.jpg", width: 1200, height: 675 };
+export const SHARE_IMAGE_ALT = {
+  ko: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
+  en: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
+  ja: "日暮れの高層ビルの屋上から街を見下ろす、二人の分析官の後ろ姿",
+};
+
+/** Open Graph's name for each language. */
+export const OG_LOCALE = { ko: "ko_KR", en: "en_US", ja: "ja_JP" };
+
+/**
+ * The card a shared link shows (Open Graph and Twitter): the page's own title
+ * and description over the key visual. `url` and the image are root-relative;
+ * the build makes og:url, og:image and twitter:image absolute
+ * (`withAbsoluteSiteLinks`, site-pages.mjs), as a crawler needs them.
+ */
+export function shareMetaLines({ language, url, title, description }) {
+  const meta = (key, name, value) => `<meta ${key}="${name}" content="${escapeHtml(value)}" />`;
+  return [
+    meta("property", "og:type", "website"),
+    meta("property", "og:url", url),
+    meta("property", "og:site_name", GAME_NAME[language]),
+    meta("property", "og:locale", OG_LOCALE[language]),
+    ...PAGE_LANGUAGES.filter((code) => code !== language).map((code) => meta("property", "og:locale:alternate", OG_LOCALE[code])),
+    meta("property", "og:title", title),
+    meta("property", "og:description", description),
+    meta("property", "og:image", SHARE_IMAGE.path),
+    meta("property", "og:image:type", "image/jpeg"),
+    meta("property", "og:image:width", String(SHARE_IMAGE.width)),
+    meta("property", "og:image:height", String(SHARE_IMAGE.height)),
+    meta("property", "og:image:alt", SHARE_IMAGE_ALT[language]),
+    meta("name", "twitter:card", "summary_large_image"),
+    meta("name", "twitter:title", title),
+    meta("name", "twitter:description", description),
+    meta("name", "twitter:image", SHARE_IMAGE.path),
+    meta("name", "twitter:image:alt", SHARE_IMAGE_ALT[language]),
+  ];
+}
 
 export { escapeHtml };
 
 /**
  * One page: the header that links the game, every other page in the same
  * language and the page in the other two; the hreflang alternates (all three
- * and x-default, the Korean); the body; a foot with the contact address.
+ * and x-default, the Korean); the body; a foot with the contact address and
+ * the credit.
  * `effective` is the policy's date line, which only the two policies have;
- * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head.
+ * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head;
+ * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs).
+ *
+ * The landmarks (2026-11-09 audit): a skip link to the main text first, the
+ * site menu in a <header>, the page in <main id="main">, and the foot's menu,
+ * the contact line and the credit in a <footer> -- until then the menu and
+ * the foot sat inside <main>, so the page had no banner or contentinfo, and
+ * nothing let a keyboard pass the menu's thirteen links.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "" }) {
   const copy = COPY[language];
-  const others = PAGE_LANGUAGES.filter((code) => code !== language);
-  const title = `${copy[kind]} · ${GAME_NAME[language]}`;
+  const name = heading ?? copy[kind];
+  const title = `${name} · ${GAME_NAME[language]}`;
   const alternates = [
     ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
   ].join("");
-  const pages = PAGE_KINDS.map((other) =>
-    other === kind
-      ? `<a href="${pagePath(other, language)}" aria-current="page">${copy[other]}</a>\n`
-      : `<a href="${pagePath(other, language)}">${copy[other]}</a>\n`,
-  ).join("");
-  const switches = others
-    .map((other) => `<a href="${pagePath(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
-    .join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
   const tags = analytics ? analyticsTagLines(analytics).map((line) => `${line}\n`).join("") : "";
+  const summary = description ?? name;
+  const share = shareMetaLines({ language, url: pagePath(kind, language), title, description: summary })
+    .map((line) => `${line}\n`)
+    .join("");
   return `<!doctype html>
 <html lang="${language}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapeHtml(title)}</title>
-<meta name="description" content="${escapeHtml(description ?? copy[kind])}" />
+<meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
-${alternates}<link rel="icon" href="/icons/icon-192.png" />
-<style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
+${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
+${structuredData ? `${structuredData}
+` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}</style>
 ${tags}</head>
 <body>
-<main>
-<nav aria-label="${escapeHtml(GAME_NAME[language])}">
-<a href="${gamePath(language)}">${copy.game}</a>
-${pages}${switches}</nav>
-<h1>${copy[kind]}</h1>
+<a class="skip" href="#main">${copy.skip}</a>
+<header>
+${siteHeaderNav({ kind, language })}
+</header>
+<main id="main" tabindex="-1">
+<h1>${escapeHtml(name)}</h1>
 ${dated}${body.trim()}
-<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p></footer>
 </main>
+<footer>
+${siteFooterNav({ kind, language })}
+<p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
+${creditFor(kind, language)}
+</footer>
 </body>
 </html>
 `;
@@ -1019,6 +1122,27 @@ export function renderLegalPages({ analytics = null, ads = false } = {}) {
     { kind: "terms", language: "ja", body: noticed("terms", "ja", edit(TERMS_JA, "termsJa")) },
   ];
   return Object.fromEntries(
-    pages.map((page) => [pagePath(page.kind, page.language).slice(1), renderDocumentPage({ ...page, effective: dateOf(page), analytics })]),
+    pages.map((page) => [
+      pagePath(page.kind, page.language).slice(1),
+      renderDocumentPage({ ...page, description: LEGAL_DESCRIPTION[page.kind][page.language], effective: dateOf(page), analytics }),
+    ]),
   );
 }
+
+/**
+ * What a search result says under each policy's title. Until 11-03 it was the
+ * title again (「개인정보처리방침」); each line names the sections the page
+ * has, in the order it has them.
+ */
+export const LEGAL_DESCRIPTION = {
+  privacy: {
+    ko: `「임계점: CRITICAL POINT」가 처리하는 개인정보의 항목과 목적, 보유 기간(${days}일), 이 기기에 저장하는 정보, 열람·삭제를 요청하는 방법을 안내합니다.`,
+    en: `What Critical Point processes and why, how long it is kept (${days} days), what is stored on your device, and how to ask to see or delete your data.`,
+    ja: `『臨界点: CRITICAL POINT』が取り扱う個人情報の項目と目的、保有期間(${days}日)、この端末に保存する情報、閲覧・削除を請求する方法をご案内します。`,
+  },
+  terms: {
+    ko: "「임계점: CRITICAL POINT」의 이용 조건입니다. 무료 웹판, 게임 속 칩과 점수, 공개 랭킹, 참가자 게시판의 규칙과 개발자의 책임 범위를 정합니다.",
+    en: "The terms for playing Critical Point: the free web version, in-game chips and scores, the public ranking, the participants' board and the limits of the developers' responsibility.",
+    ja: "『臨界点: CRITICAL POINT』の利用条件です。無料のウェブ版、ゲーム内のチップとスコア、公開ランキング、参加者掲示板のルールと開発者の責任の範囲を定めます。",
+  },
+};

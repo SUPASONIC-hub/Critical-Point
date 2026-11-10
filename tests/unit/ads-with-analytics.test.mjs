@@ -6,7 +6,7 @@ import { AD_EDITS, ANALYTICS_AD_EDITS, ANALYTICS_NOTICE } from "../../scripts/le
 import { ANALYTICS_SITE_AD_EDITS, renderStaticPages, SITE_AD_EDITS } from "../../scripts/site-pages.mjs";
 
 /**
- * The build's two switches on the fifteen plain pages: Google Analytics
+ * The build's two switches on the plain pages: Google Analytics
  * (GA_MEASUREMENT_ID, on from 11-12) and web ads (ADSENSE_ADS=on, draft
  * #350). Both rewrite the policy's summary, its cookies and section 6, and
  * the FAQ's cookie sentence; the ads go on top of Google Analytics' words
@@ -30,8 +30,8 @@ const NO_ADS = /광고가 없|광고를 싣지 않|광고와 유료 결제가 �
 const NO_TRACKERS = /(?<!그 밖의 )광고·분석용|(?<!no other )advertising or analytics|(?<!それ以外の)広告・分析用|<p>게임은 쿠키를|<p>The game uses no cookies|<p>本ゲームはCookieを/;
 const ONLY_GA_COOKIES = /애널리틱스 쿠키만|its only cookies are|Cookieだけを使用します/;
 
-test("all four combinations of Google Analytics and web ads write the fifteen pages", () => {
-  for (const [name] of COMBOS) assert.equal(Object.keys(pages[name]).length, 15, name);
+test("all four combinations of Google Analytics and web ads write every plain page", () => {
+  for (const [name] of COMBOS) assert.deepEqual(Object.keys(pages[name]), Object.keys(renderStaticPages("")), name);
   // Without ads the pages are the ones the build without the ad switch writes, byte for byte (main's).
   assert.deepEqual(pages["GA off, ads off"], renderStaticPages(""));
   assert.deepEqual(pages["GA on, ads off"], renderStaticPages("", { analytics: ga }));

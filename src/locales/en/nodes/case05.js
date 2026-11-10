@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "c5_start": {
-      "text": "The recovery control room of the city care-dispatch system. On the wall map, 312 red dots. Each one is a home that missed its scheduled care visit yesterday. It has been 18 hours since the incident, and reporters own the control-room phones. Everyone asks for the name of the person responsible. Yet the first data says everyone followed the rules. Field staff worked by the manual, and the system ran on approved criteria. Ban Jaewook opens his notebook. 'I followed the rules up the chain. At the top there’s no person, only a budget cap, and that cap came straight down from Onsae’s repayment terms sheet.' He draws a line in the notebook. It is where a name should go. It is blank.",
+      "text": "On the wall map, 312 red dots. Each one is a home that missed its care visit yesterday. Reporters ask for the name of the person responsible, yet field staff worked by the manual, and the system ran on approved criteria. Ban Jaewook opens his notebook. 'I followed the rules up the chain. At the top there’s no person, only a budget cap, and that cap came straight down from Onsae’s repayment terms sheet.' In the notebook, the line for a name is blank.",
       "memo": [
         "Missed service: 312 people",
         "Field staff worked by the manual",
@@ -37,7 +37,7 @@ export default {
     },
     "c5_map": {
       "title": "Reasonable Pieces",
-      "text": "On the system map, ECHO lays the decisions of three departments onto one sheet. The budget team kept to the cap. The operations team followed the priority rules. The dispatch system applied the approved weights as written. Each piece is clean. The problem is the shape they make together. Where they overlap, 312 people drop out. They are people pushed back a little by several criteria at once. ECHO opens the approval history of the weighting table. Drafted, reviewed, approved. The final reviewer field holds one name, and next to it, the time the review took. 6 minutes. The name is Oh Jinwoo.",
+      "text": "ECHO lays the decisions of three departments onto one sheet. The budget team kept to the cap. The operations team followed the priority rules. The dispatch system applied the approved weights as written. Each piece is clean, but where they overlap, 312 people drop out. ECHO opens the approval history of the weighting table. The final reviewer field holds one name, and the review took 6 minutes. The name is Oh Jinwoo.",
       "memo": [
         "Budget team: kept to the cost cap",
         "Operations team: followed the priority rules",
@@ -65,7 +65,7 @@ export default {
     },
     "c5_blame": {
       "title": "Someone Has to Answer",
-      "text": "Reporters line the hallway outside the briefing room, and the victims’ group has issued a statement demanding an apology and compensation now. Oh Jinwoo switches off the podium mic and speaks. 'We still need a name. From outside, “it was the structure” sounds like an excuse, and if no one is held responsible, the whole organization shakes.' He isn’t wrong. Discipline one manager and public anger will settle fast. He pauses, then adds. 'The weighting table that sets the dispatch order. I passed it after 6 minutes. My review limit back then was 6 minutes. I don’t know who set it either.' Having said it, he still doesn’t step down from the podium.",
+      "text": "Reporters line the hallway. Oh Jinwoo switches off the podium mic and speaks. 'We still need a name. From outside, “it was the structure” sounds like an excuse, and if no one is held responsible, the whole organization shakes. The weighting table that sets the dispatch order. I passed it after 6 minutes. My review limit back then was 6 minutes. I don’t know who set it either.' He still doesn’t step down from the podium.",
       "memo": [
         "Press demands the real name of the person responsible",
         "Victims’ group demands an immediate apology and compensation",
@@ -93,7 +93,7 @@ export default {
     },
     "c5_collapse": {
       "title": "Failure with Good Intentions",
-      "text": "In the field records room, Do Yoonha spreads the visit records of the 312 missed people across the table. Page after page looks alike. They almost never complained. Their family contacts changed often or went dead. Their past usage records are thin. The system read these 'quiet people' as not urgent and pushed them down the queue. People who don’t ask were counted as people who need less. Do Yoonha points to one line on the list. 'This person was on FlowOn’s night shift. Let go last year, and this year they became a care recipient.' Six more lines share the same history. Do Yoonha straightens the pages. 'It was probably a well-meant order. The urgent first. But people who can’t say they’re urgent weren’t in that order at all.'",
+      "text": "Do Yoonha spreads the visit records of the 312 missed people across the table. The system read these 'quiet people' as not urgent and pushed them down the queue. People who don’t ask were counted as people who need less. Do Yoonha points to one line. 'This person was on FlowOn’s night shift. Let go last year, and this year they became a care recipient.' Six more lines share the same history. 'It was probably a well-meant order. The urgent first. But people who can’t say they’re urgent weren’t in that order at all.'",
       "memo": [
         "Low complaint frequency",
         "Unstable family contacts",
@@ -121,7 +121,7 @@ export default {
     },
     "c5_aftershock": {
       "title": "A Failure No One Signed",
-      "text": "The day after the announcement, the cause meeting in the room next to the control room ends after three hours. The signature block on the last page of the minutes has seven boxes. All are empty. Each team’s decision was right by the standards of the time, so no one will take the blame alone. The record that first reported the harm was deleted and never came back. Do Yoonha waits for you in the hallway outside. A glance points you to an empty desk by the window. No belongings, only a nameplate. Reviewer Oh Jinwoo. The person who last reviewed and passed the dispatch weighting table. 'It was like this when I came in this morning. He left without a word.' Do Yoonha sets the nameplate upright. 'Of everyone who didn’t sign, he’s the only one who cleared his desk.'",
+      "text": "The cause meeting ends after three hours. The seven signature boxes on the last page of the minutes are all empty. Each team’s decision was right by the standards of the time, and no one will take the blame alone. In the hallway, Do Yoonha points to an empty desk by the window. No belongings, only a nameplate. Reviewer Oh Jinwoo. The person who last reviewed and passed the dispatch weighting table. Do Yoonha says. 'He left without a word. Of everyone who didn’t sign, he’s the only one who cleared his desk.'",
       "memo": [
         "Each team’s decision was reasonable by the standards of the time",
         "The record that first reported the harm was deleted",
@@ -145,7 +145,7 @@ export default {
     },
     "c5_pattern": {
       "title": "The Path the Failure Took",
-      "text": "Incident hour 24. Ban Jaewook traces the arrows on the glass wall one by one with his finger. None of them meet at one person. The budget team’s line passes through operations, operations’ line passes through the system, and all of them pass through each other’s plausible decisions to land in the same place. 312 red dots. He reads three things from his notebook. No team could see another team’s data. The record that first called it dangerous dropped out somewhere. The responsibility chart holds only the names of the approvers. 'Everyone guarded their own box. No one watched the space between the boxes.'",
+      "text": "Ban Jaewook traces the arrows on the glass wall. None of them meet at one person; they pass through each other’s plausible decisions and land on the 312 red dots. He reads three things from his notebook. No team could see another team’s data. The record that first called it dangerous dropped out. The responsibility chart holds only the approvers’ names. 'Everyone guarded their own box. No one watched the space between the boxes.'",
       "memo": [
         "No team could see another team’s information",
         "The record that first raised the risk went missing",
@@ -168,7 +168,7 @@ export default {
     },
     "c5_voice": {
       "title": "Testimony Without a Name",
-      "text": "Outside the briefing room door, by the vending machine, a person stands waiting. A clerk from the dispatch intake desk. No decision-making power. Not a seat that presses the approve button. But this is someone who looks at the queue every day, and says they were the first to see the same homes pushed back again and again. They told their superiors, but it never made the record. Do Yoonha stands beside them and picks the words for them. 'If they speak, the whole intake team gets investigated. So they can’t give their name.' The clerk lowers their head. 'The people who were hurt don’t ask who did wrong. They ask if tomorrow’s visit is coming. I’m the one who takes those calls.'",
+      "text": "By the vending machine stands a clerk from the dispatch intake desk. No decision-making power, but this is someone who looks at the queue every day and was the first to see the same homes pushed back again and again. They told their superiors, but it never made the record. Do Yoonha says. 'If they speak, the whole intake team gets investigated. So they can’t give their name.' The clerk lowers their head. 'The people who were hurt don’t ask who did wrong. They ask if tomorrow’s visit is coming. I’m the one who takes those calls.'",
       "memo": [
         "The witness is missing from the records",
         "Speaking up could get the whole team investigated",
@@ -194,7 +194,7 @@ export default {
     },
     "c5_verdict": {
       "title": "The Shape of Responsibility",
-      "text": "Incident hour 32. Three draft statements lie on the center table of the control room. Han Seoyun touches each one. The first names a person. The second promises to fix the structure. The third promises to undo the harm first. 'Those are the three ways to explain a failure. None of them is free.' The budget for fixes is fixed, so you can’t do all three. The reporters in the hallway wait for a statement of responsibility. The field dispatch desk is holding on by hand, and a formal recovery team can be formed the moment you say the word. Han Seoyun fans the three drafts out in her hand. 'A statement is all in its first sentence. What you open with tells everyone what this organization looks at first.'",
+      "text": "Three draft statements lie on the table. The first names a person, the second fixes the structure, the third undoes the harm first. Han Seoyun says. 'Those are the three ways to explain a failure. None of them is free.' The budget for fixes is fixed, so you can’t do all three. The reporters wait for a statement of responsibility, and the field dispatch desk is holding on by hand. 'A statement is all in its first sentence. What you open with tells everyone what this organization looks at first.'",
       "memo": [
         "Budget for fixes is limited",
         "Press waiting for a statement of responsibility",
@@ -217,7 +217,7 @@ export default {
     },
     "c5_pattern_reaction": {
       "title": "Arrows in Reverse",
-      "text": "ECHO flips the direction of the map. The arrows that ran from decision to harm now run back from harm to decision. The arrowheads point somewhere unexpected. At the missed people themselves. Unreachable. No complaint history. Thin usage records. The system’s classification table has written down the reason people were pushed back as traits of the people pushed back. ECHO posts a line. 'In this classification, the reason for not receiving help lies with the person who didn’t receive it. Someone built this classification, and it has kept the failure from looking like a failure. Leave it as it is, and the next misses will be filed in the same box.'",
+      "text": "ECHO runs the arrows back from harm to decision. The arrowheads point at the missed people themselves. Unreachable. No complaint history. Thin usage records. The classification table has written down the reason people were pushed back as traits of the people pushed back. 'In this classification, the reason for not receiving help lies with the person who didn’t receive it. Leave it as it is, and the next misses will be filed in the same box.'",
       "memo": [
         "Where the responsibility arrows point",
         "Voices to hear again outside the classification"
@@ -239,7 +239,7 @@ export default {
     },
     "c5_voice_reaction": {
       "title": "Conditions for Speaking",
-      "text": "At the end of the hallway, Han Seoyun scrolls through the intake clerk’s HR record on a tablet. Contract type, team, evaluator’s name. She turns off the screen. 'This person is ready to talk. The problem is what comes after. The one who evaluates them is on the side being investigated, so staying on that team isn’t safe.' She leans against the wall. 'Move them and they’re safe. But then everyone watches the person who told the truth leave the team. The next one who sees something will keep quiet. We’d gain one truth and lose an organization.' From the briefing room comes the sound of someone testing the mic.",
+      "text": "Han Seoyun scrolls through the intake clerk’s HR record on a tablet. 'This person is ready to talk. The problem is what comes after. The one who evaluates them is on the side being investigated, so staying on that team isn’t safe. Move them and they’re safe. But then everyone watches the person who told the truth leave the team. The next one who sees something will keep quiet. We’d gain one truth and lose an organization.'",
       "memo": [
         "Safety conditions that make testimony possible",
         "The right to speak without leaving the organization"
@@ -261,7 +261,7 @@ export default {
     },
     "c5_verdict_reaction": {
       "title": "The Day After Responsibility",
-      "text": "The draft statement was rewritten three times overnight. The next morning, red dots remain on the control-room map. Many went out during the night, but new ones lit up for homes that missed last night’s visits. Do Yoonha comes in after a night in the field. The vest smells of rain. 'We spent all night writing whose fault it was, and out in the field nobody asks that.' Do Yoonha holds out a list. Homes that must be reached today. 'What we undo first matters more now than who we name. We need someone to set the order.'",
+      "text": "The draft statement was rewritten three times overnight. Many red dots went out, but new ones lit up during the night. Do Yoonha comes in after a night in the field. 'We spent all night writing whose fault it was, and out in the field nobody asks that.' Do Yoonha holds out a list of homes that must be reached today. 'What we undo first matters more now than who we name. We need someone to set the order.'",
       "memo": [
         "Harm that remains after the night",
         "Someone to set the recovery order"
@@ -283,7 +283,7 @@ export default {
     },
     "c5_branch_owner": {
       "title": "Choosing the Subject of the Failure",
-      "text": "In the approvals records room, Han Seoyun has laid out, in date order, the approval documents that shaped the dispatch criteria into what they are now. Fourteen sheets. Each one is a small concession. Cutting confirmation calls from two to one. Moving unreachable homes to the back. Setting the review time at 6 minutes. Each sheet has an approver’s name, and every name is different. Han Seoyun rests her hand on the last sheet. 'On the day it fails, you see people. Who pressed that button. But lay out all 14 sheets and there’s no subject.' She looks at you. 'A statement needs a subject before it can be written. Who it will be, that’s what you decide now.'",
+      "text": "Han Seoyun has laid out, in date order, the fourteen approval documents that shaped the dispatch criteria into what they are now. Confirmation calls cut from two to one, unreachable homes moved to the back, the review time set at 6 minutes. Each sheet is a small concession, and every approver’s name is different. 'On the day it fails, you see who pressed that button. But lay out all 14 sheets and there’s no subject. A statement needs a subject before it can be written. Who it will be, that’s what you decide now.'",
       "memo": [
         "Approval by decision-makers",
         "Missing safeguards",
@@ -306,7 +306,7 @@ export default {
     },
     "c5_branch_owner_follow": {
       "title": "The Name That Outlasts Recovery",
-      "text": "Incident hour 31. Recovery has begun and the red dots are shrinking. The 14 documents from the approvals records room are still on the table. ECHO posts to the terminal. 'Once recovery is under way, people try to forget names. But names do not disappear from records.' Three blank fields appear on the screen. Who received recovery. Who owns preventing a repeat. How much responsibility to disclose outside. 'Use a name only as punishment, and one person leaves and it ends. Use a name as a post to hold, and when the next miss happens, it remains clear whom to ask. You can decide now which way to write it.'",
+      "text": "Recovery has begun and the red dots are shrinking. ECHO posts to the terminal. 'Once recovery is under way, people try to forget names. But names do not disappear from records.' Three blank fields appear on the screen. Who received recovery. Who owns preventing a repeat. How much responsibility to disclose outside. 'Use a name only as punishment, and one person leaves and it ends. Use it as a post to hold, and when the next miss happens, it remains clear whom to ask.'",
       "memo": [
         "People recovered",
         "Owner of recurrence prevention",
@@ -329,7 +329,7 @@ export default {
     },
     "c5_route_blame": {
       "title": "A Failure Where the Name Came First",
-      "text": "The briefing room. Press response copy is up on the screen behind the podium. The moment word went out that the operations head would be identified and investigated, PR started writing, and a candidate’s real name is already penciled in beside the blank. Oh Jinwoo skims the copy beside the podium. 'Faster, right? Once there’s a name, the stories settle, and once the stories settle, the calls drop.' He points to a corner of the screen. The analysis window that was breaking down who the 312 missed people are is closed. 'But that stopped. The moment one name stands up, every empty box in the system gets filed as that person’s fault.'",
+      "text": "Press response copy is up on the screen behind the podium, and a candidate’s real name is already penciled in beside the blank. Oh Jinwoo skims the copy. 'Faster, right? Once there’s a name, the stories settle, and once the stories settle, the calls drop.' In a corner of the screen, the analysis window breaking down the 312 missed people is closed. 'But that stopped. The moment one name stands up, every empty box in the system gets filed as that person’s fault.'",
       "memo": [
         "Real name of a candidate secured",
         "Press response copy drafted",
@@ -356,7 +356,7 @@ export default {
     },
     "c5_final_blame_route": {
       "title": "A Door Closed by a Name",
-      "text": "Just before the official statement. The statement lies on the briefing-room podium. The first line has room for one name. Oh Jinwoo stands beside the podium counting the cameras in the seats. 'Put a name in and tonight’s news is three lines. The explanation goes faster, the phones stop, everyone goes home.' He turns to the second page. The recurrence prevention section has a heading and nothing else. 'There isn’t one line yet about stopping the next miss. Close the door with a name and this blank stays right behind it.' He doesn’t bring up the weighting table again. He turns the statement toward you and waits.",
+      "text": "The first line of the statement on the podium has room for one name. Oh Jinwoo counts the cameras in the seats. 'Put a name in and tonight’s news is three lines. The explanation goes faster, the phones stop, everyone goes home.' On the second page, the recurrence prevention section has a heading and nothing else. 'There isn’t one line yet about stopping the next miss. Close the door with a name and this blank stays right behind it.'",
       "memo": [
         "Public opinion could settle quickly",
         "Victims want compensation now",
@@ -379,7 +379,7 @@ export default {
     },
     "c5_route_map": {
       "title": "The Structure the Arrows Point To",
-      "text": "On a glass wall in the control room, you draw arrows with Ban Jaewook. The budget team sets the cap. The operations team writes priority rules inside it. The dispatch system ranks by those rules. The arrows pass 20, and not one of them is wrong on its own. Budget, operations, calculation rules. Three decisions stacked at once, and the 312 were pushed back a little at each criterion. Ban Jaewook caps his marker. 'I drew this to find a culprit, and no culprit comes out.' He steps back from the glass. 'Then the question changes. Where do we stop responsibility from scattering like this?'",
+      "text": "You draw arrows on the glass wall with Ban Jaewook. The budget team sets the cap. The operations team writes priority rules. The dispatch system ranks by those rules. The arrows pass 20, and not one of them is wrong on its own. The 312 were pushed back a little at each criterion. 'I drew this to find a culprit, and no culprit comes out. Then the question changes. Where do we stop responsibility from scattering like this?'",
       "memo": [
         "Budget, operations and algorithm decisions acted at once",
         "Each decision was reasonable on its own",
@@ -406,7 +406,7 @@ export default {
     },
     "c5_final_map_route": {
       "title": "How Responsibility Scatters",
-      "text": "Just before the official statement. The arrow map is still on the control room’s glass wall, unerased. Ban Jaewook stands in front of it holding the draft statement. The responsibility field in the draft is empty. 'By this picture, no one is guilty alone. That’s true.' He folds the draft. 'But announce it like that and it means no one is responsible. For the 312, that’s the worst conclusion.' Release the whole map and the entire organization shakes. Attach a decision-maker to each arrow and the pushback comes. Put compensation first and fixing the structure slips. In the hallway, reporters are setting up their mics.",
+      "text": "The arrow map is still on the glass wall, unerased. Ban Jaewook stands in front of it holding the draft statement, its responsibility field empty. 'By this picture, no one is guilty alone. But announce it like that and it means no one is responsible. For the 312, that’s the worst conclusion.' Release the whole map and the entire organization shakes. Attach a decision-maker to each arrow and the pushback comes. Put compensation first and fixing the structure slips.",
       "memo": [
         "A public map shakes the whole organization",
         "Mapping decision-makers invites pushback",
@@ -429,7 +429,7 @@ export default {
     },
     "c5_route_redesign": {
       "title": "Fix First, Ask Who Later",
-      "text": "The field dispatch desk. Eight phones ring at once. Since the switch to temporary manual dispatch, people read the lists themselves and send out caregivers. The red dots on the wall map go out one by one. About a dozen homes an hour. Do Yoonha, headset over one ear, rewrites the dispatch chart on the whiteboard by hand. 'We’re reaching them. But look at this.' Do Yoonha points to the system screen. The new hand-entered dispatches are being written straight over yesterday’s records. 'The system is changing before we’ve even written down what went wrong. The more we fix, the less we can see where it broke.' The dispatch staff are already hoarse.",
+      "text": "Eight phones ring at once. Since the switch to manual dispatch, people read the lists themselves and send out caregivers. The red dots on the wall map go out at about a dozen an hour. Do Yoonha says. 'We’re reaching them. But look at this.' The new hand-entered dispatches are being written over yesterday’s records. 'The system is changing before we’ve even written down what went wrong. The more we fix, the less we can see where it broke.'",
       "memo": [
         "Manual dispatch recovered part of the harm",
         "Risk of cause logs being overwritten by new work",
@@ -456,7 +456,7 @@ export default {
     },
     "c5_final_redesign_route": {
       "title": "Evidence Erased by Recovery",
-      "text": "Just before the official statement. The red dots on the control-room map are down to 20 or so. Manual dispatch actually worked. Do Yoonha brings up the system screen. Where the dispatch records from the time of the incident used to be, there are now the records entered during recovery. 'The harm went down. But the records that showed why it happened changed too. There’s not much left that shows what it looked like at the time.' The dispatch staff haven’t been home in two days. If people keep going at this pace, the next mistake will come from the people. Do Yoonha takes off the headset. 'Keep fixing, or stop for a moment and preserve. We need to set the order before the statement.'",
+      "text": "The red dots are down to 20 or so. Manual dispatch worked. But where the dispatch records from the time of the incident used to be, there are now the records entered during recovery. Do Yoonha says. 'The harm went down. But the records that showed why it happened changed too.' The dispatch staff haven’t been home in two days, and at this pace the next mistake will come from the people. 'Keep fixing, or stop for a moment and preserve. We need to set the order before the statement.'",
       "memo": [
         "Recovery is actually working",
         "Evidence of the cause may disappear",
@@ -479,7 +479,7 @@ export default {
     },
     "c5_route_system": {
       "title": "The Device That Ranks the Quiet Low",
-      "text": "You ask first who was pushed back first. The control-room map pauses. Beside it, a file opens. The design file for the algorithm that sets the dispatch order. Beneath the visible criteria are hidden weights. Homes that complained often move up the queue. Homes that never complained move down. Homes whose family contacts change often get grouped as 'hard to verify' and move down further. ECHO posts a line. 'This system learned that people who cannot loudly ask for help are less urgent. No single person taught it that. Quiet people were underrepresented in its training data from the start, and small approvals were stacked on top, one sheet at a time.'",
+      "text": "In the design file for the algorithm that sets the dispatch order, hidden weights sit beneath the visible criteria. Homes that complained often move up the queue. Homes that never complained move down. Homes whose family contacts change often get grouped as ECHO says. 'hard to verify' and move down further. 'This system learned that people who cannot loudly ask for help are less urgent. No single person taught it that. Quiet people were underrepresented in its training data from the start, and small approvals were stacked on top.'",
       "memo": [
         "Complaint frequency works in reverse on the protection weight",
         "Unstable family contacts treated as low reliability",
@@ -506,7 +506,7 @@ export default {
     },
     "c5_final_system_route": {
       "title": "The Values That Push the Quiet Back",
-      "text": "The control-room screen before the official statement. The weighting table is still open. Complaint count, reachability, usage records. Three rows of numbers set the queue places of the 312. Of the 312 who missed service, not one was pushed back because someone broke a rule. All of them were pushed back by this table. In the hallway, reporters demand the real name of the person responsible. ECHO’s text appears below the table. 'What the press is waiting for is a name. What pushed the 312 back was not a name. It was numbers.' The bottom row of the table, where it says who can change these numbers next, is blank.",
+      "text": "The weighting table is still open on the control-room screen. Complaint count, reachability, usage records. Three rows of numbers set the queue places of the 312. Not one was pushed back because someone broke a rule; all of them were pushed back by this table. ECHO says. 'What the press is waiting for is a name. What pushed the 312 back was not a name. It was numbers.' The bottom row of the table, where it says who can change these numbers next, is blank.",
       "memo": [
         "312 missed -- the fewer complaints, the further back",
         "The dispatch system ran on approved criteria",
@@ -529,7 +529,7 @@ export default {
     },
     "c5_evidence_turn": {
       "title": "The Priority of the Vanished",
-      "text": "You lay the clue you’ve been holding over the system map, and the queue places of the pushed-back people light up again. They weren’t pushed back once on the day of the incident. The same homes slipped back a little with every dispatch over the past few months. One place for having no complaints, one place for being unreachable. They slid down the queue until one day they fell off it. Han Seoyun steps toward the map. 'We were looking for someone responsible, but seeing this, the question changes. Not who did wrong, but how these people vanished inside the system.' The faster recovery goes, the more these queue records get written over by new dispatches.",
+      "text": "You lay the clue over the system map, and it shows the same homes slipping back a little with every dispatch over the past few months. One place for having no complaints, one place for being unreachable. Until one day they fell off the queue. Han Seoyun says. 'We were looking for someone responsible, but seeing this, the question changes. Not who did wrong, but how these people vanished inside the system.' The faster recovery goes, the more these queue records get written over by new dispatches.",
       "memo": [
         "Missing victims began with the complaint-frequency weight",
         "The faster the recovery, the more cause logs may vanish",
@@ -552,7 +552,7 @@ export default {
     },
     "c5_start_rule": {
       "title": "The Day Everyone Kept the New Standard",
-      "text": "The care dispatch recovery control room. On the wall map, 312 red dots. Each one is a home that missed its scheduled care visit yesterday. 18 hours since the incident, and the press wants a name. Do Yoonha opens the operations rulebook. On the first page, the exception conditions you made public at Onsae appear under the name 'new standard'. 'Everyone kept to this. To use an exception, you file the reason, disclose it, get it confirmed. Nobody skipped a step.' Do Yoonha looks at the map. 'And still 312 homes were missed. Nobody broke a rule. Follow the rules up and there’s a budget cap at the top, and they say it came down from Onsae’s loan repayment terms sheet.'",
+      "text": "On the wall map, 312 red dots. Each one is a home that missed its care visit yesterday, and the press wants a name. Do Yoonha opens the operations rulebook to the first page. The exception conditions you made public at Onsae appear there as the 'new standard'. 'Everyone kept to this. File the reason, disclose it, get it confirmed. And still 312 homes were missed. Follow the rules up and there’s a budget cap at the top, and they say it came down from Onsae’s loan repayment terms sheet.'",
       "memo": [
         "The new standard was kept without a single lapse",
         "Damage reports came in late",
@@ -582,7 +582,7 @@ export default {
     },
     "c5_start_service": {
       "title": "The Shadow of the Service You Saved",
-      "text": "The care dispatch recovery control room. On the wall map, 312 red dots. Each one is a home that missed its scheduled care visit yesterday. 18 hours since the incident, and the press wants a name. Ban Jaewook holds an audit request instead of his notebook. 'Through the exception door opened at Onsae, 11 agencies came in. Each read the criteria a little differently, and now nobody knows which criteria are the real ones.' He stands in front of the map. 'The dispatch system ran on approved criteria. The field worked by the manual. Nobody broke a rule. At the top, instead of a person, there’s a budget cap, and it came down from Onsae’s loan repayment terms sheet. The failure reached people before it reached the rules.'",
+      "text": "On the wall map, 312 red dots. Each one is a home that missed its care visit yesterday, and the press wants a name. Ban Jaewook holds an audit request instead of his notebook. 'Through the exception door opened at Onsae, 11 agencies came in. Each read the criteria differently, so nobody knows which criteria are the real ones. Nobody broke a rule. The budget cap at the top came down from Onsae’s loan repayment terms sheet. The failure reached people before it reached the rules.'",
       "memo": [
         "More agencies demanding exceptions",
         "An audit request has arrived",
@@ -612,7 +612,7 @@ export default {
     },
     "c5_start_stop": {
       "title": "The Gap After the Stop",
-      "text": "The care dispatch recovery control room. On the wall map, 312 red dots. Each one is a home that missed its scheduled care visit yesterday. 18 hours since the incident, and the press wants a name. ECHO’s text appears on the control-room terminal. 'At Onsae, you decided to accept no exceptions until the audit was over, Analyst. The standard held. The requests that went unanswered while things were stopped are part of this map.' The dots on the map make no sound. These are homes that almost never called with complaints or posted protests. 'The dispatch system ran on approved criteria, and no one broke a rule. At the top of the rules is a budget cap, and that cap came down from Onsae’s loan repayment terms sheet.'",
+      "text": "On the wall map, 312 red dots. Each one is a home that missed its care visit yesterday, and the press wants a name. ECHO’s text appears on the terminal. 'At Onsae, you decided to accept no exceptions until the audit was over, Analyst. The requests that went unanswered while things were stopped are part of this map.' The dots are homes that almost never called with complaints or posted protests. 'No one broke a rule. The budget cap at the top came down from Onsae’s loan repayment terms sheet.'",
       "memo": [
         "Recovery costs are rising",
         "Audit data is incomplete",

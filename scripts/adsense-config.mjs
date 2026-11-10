@@ -93,6 +93,11 @@ export function readAdsenseEnv(env = {}) {
 /** The one line of /ads.txt (Google's own: the publisher ID without `ca-`, DIRECT, Google's certification authority ID). */
 export const adsTxt = (publisherId) => `google.com, ${publisherId}, DIRECT, f08c47fec0942fa0\n`;
 
+/** The meta tag the AdSense review reads, before `</head>`. */
+export const withVerificationMeta = (html, client) =>
+  html.replace("</head>", `    <meta name="google-adsense-account" content="${client}" />
+  </head>`);
+
 const MARKER = /\{\s*\/\*\s*ad-slot:\s*([\s\S]*?)\s*\*\/\s*\}/g;
 const PLACEMENT = /placement="([a-z]+)"/;
 const IMPORT_NAME = "__CpAdSlot";
@@ -123,17 +128,45 @@ export function insertAdSlots(code, { client, ads, slots }) {
 export const WEB_AD_CODE_MARKERS = /adsbygoogle|googlesyndication|data-ad-slot|ca-pub-\d/;
 
 /**
- * The Content-Security-Policy the site needs once ads are drawn
- * (ADSENSE_ADS=on; verification alone needs none), for the
- * Render dashboard (README 배포, render.yaml). Google supports only a strict,
- * nonce-based policy for the AdSense code, because the hosts it loads from
- * change (https://support.google.com/adsense/answer/16283098); a static host
- * cannot give each response a nonce, so this widens script/frame/connect/img
- * to https: instead of naming hosts that may change under it. Everything else
- * is the live value in render.yaml, unchanged.
+ * What the Content-Security-Policy gains once ads are drawn (ADSENSE_ADS=on;
+ * verification alone needs none), directive by directive. Google supports
+ * only a strict, nonce-based policy for the AdSense code, because the hosts
+ * it loads from change (https://support.google.com/adsense/answer/16283098);
+ * a static host cannot give each response a nonce, so script, frame, connect
+ * and img are widened to https: instead of naming hosts that may change under
+ * it, and script-src takes 'unsafe-eval' as Google's own policy for the code
+ * does. Every other directive, and every host the live policy names (the
+ * backend, Google Analytics'), stays as it is.
  */
-export const AD_CSP =
-  "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; " +
-  "img-src 'self' data: blob: https:; media-src 'self' blob:; connect-src 'self' https:; " +
-  "script-src 'self' 'unsafe-eval' https:; frame-src https:; fenced-frame-src https:; " +
-  "style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'";
+export const AD_CSP_WIDENING = {
+  "img-src": ["https:"],
+  "connect-src": ["https:"],
+  "script-src": ["'unsafe-eval'", "https:"],
+  "frame-src": ["https:"],
+  "fenced-frame-src": ["https:"],
+};
+
+/**
+ * `base` (render.yaml's CSP, the live one) as the site needs it with ads:
+ * AD_CSP_WIDENING added, new directives right after script-src. The value for
+ * the Render dashboard on the day ads go on (docs/web-ads.md), and the one
+ * policy wider than render.yaml's that `check:deploy` accepts
+ * (deploy-policy.mjs `isAdCsp`).
+ */
+export function adCsp(base) {
+  const parts = String(base ?? "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => part.split(/\s+/));
+  const names = parts.map(([name]) => name.toLowerCase());
+  for (const part of parts) {
+    for (const source of AD_CSP_WIDENING[part[0].toLowerCase()] ?? []) if (!part.includes(source)) part.push(source);
+  }
+  const missing = Object.keys(AD_CSP_WIDENING)
+    .filter((name) => !names.includes(name))
+    .map((name) => [name, ...AD_CSP_WIDENING[name]]);
+  const after = names.indexOf("script-src");
+  parts.splice(after < 0 ? parts.length : after + 1, 0, ...missing);
+  return parts.map((part) => part.join(" ")).join("; ");
+}

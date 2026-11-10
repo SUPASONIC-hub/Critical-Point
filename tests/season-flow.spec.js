@@ -10,7 +10,8 @@ import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY
 import { encodeSeen } from "../src/state/seenScenes.js";
 import { encodePicks } from "../src/state/pastPicks.js";
 import { createCaseSummary } from "../src/gameLogic.js";
-import { getLogicType } from "../src/gauntlet/logicStreak.js";
+import { getLogicDirection, getLogicType } from "../src/gauntlet/logicStreak.js";
+import { getDirectionName } from "../src/gauntlet/tableReadout.js";
 import { easyCognitionLabels, easyResourceLabels } from "../src/playerLanguage.js";
 import {
   chooseFirstAvailableChoice,
@@ -1133,11 +1134,12 @@ test.describe("a phone on its side", () => {
       // holds the case facts alone (main's Verify of 2026-10-08, both sizes).
       await expect.poll(() => page.locator(".gx-brief li").allTextContents()).toContain(question);
       const lines = await page.locator(".gx-brief li").allTextContents();
-      // Each card is printed whole with its type's full name after it: the
-      // card's own tag is one word of that name on a screen this narrow.
+      // Each card is printed whole with its direction and its type's full name
+      // after it: the card's own tag is the direction's word alone on a screen
+      // this narrow (C-3), and the type is what 관점 전환 reads.
       const dealt = nodes.c2_trace.choices.filter((choice) => choice.type !== "reframe");
       for (const choice of dealt) {
-        const printed = `: ${choice.label} (${easyCognitionLabels[getLogicType(choice)]})`;
+        const printed = `: ${choice.label} (${getDirectionName(getLogicDirection(choice))} · ${easyCognitionLabels[getLogicType(choice)]})`;
         expect(lines.some((line) => line.endsWith(printed)), `the fold prints "${printed}"`).toBe(true);
       }
       const widest = await page.locator(".gx-brief li").evaluateAll((items) => items.filter((item) => item.scrollWidth > item.clientWidth + 1).length);
@@ -1925,7 +1927,7 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v9") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v12") || "[]").length))
     .toBeGreaterThan(0);
 });
 
@@ -1977,4 +1979,53 @@ test("the data notice says where a deletion request goes, beside the session cod
   }
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+// The scene's sound on a desk screen (2026-11-03). The plate picks the word's
+// centre and size inside the drawing (placePlateSound) and the word is centred
+// on that spot. When the centring was lost in the build, the word sat half
+// its size right of and below its spot and ran past the picture's right edge:
+// 「째깍」 and 「カチッ」 ended 10px past it on the first scene at 1280px.
+test.describe("the sound on a desk screen", () => {
+  test.skip(({ isMobile }) => isMobile, "a desk screen is measured on desktop");
+
+  for (const lang of ["ko", "en", "ja"]) {
+    test(`the sound in the briefing's picture is centred on its spot and stays inside the picture on a desk screen (${lang})`, { tag: "@prod" }, async ({ page }) => {
+      test.setTimeout(120_000);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      // From the intro, so the production build (no debug jump) runs it too: the
+      // centring was lost there and not on the dev server.
+      await page.goto(lang === "ko" ? "/" : `/?lang=${lang}`);
+      await page.getByTestId("start-first-case").click();
+      await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+      // Held, so the reading clock does not open the table under the measurement.
+      const clock = page.getByTestId("reading-timer");
+      if ((await clock.getAttribute("aria-checked")) !== "true") await clock.click();
+      await expect(clock).toHaveAttribute("aria-checked", "true");
+      for (const size of [{ width: 1024, height: 720 }, { width: 1280, height: 720 }, { width: 1440, height: 900 }]) {
+        await page.setViewportSize(size);
+        const sound = page.locator(".gx-sfx");
+        await expect(sound).toBeVisible();
+        await waitForEntrance(page.getByTestId("scene-briefing"));
+        // The slam lands before the word is measured.
+        await expect.poll(() => sound.evaluate((word) => word.getAnimations().filter((motion) => motion.playState === "running").length)).toBe(0);
+        const where = await sound.evaluate((word) => {
+          const picture = word.closest(".gx-panel-splash").querySelector("svg").getBoundingClientRect();
+          const box = word.getBoundingClientRect();
+          const unit = picture.width / 320;
+          const spot = [picture.left + Number(word.style.getPropertyValue("--sfx-x")) * unit, picture.top + Number(word.style.getPropertyValue("--sfx-y")) * unit];
+          return {
+            off: Math.max(Math.abs(box.left + box.width / 2 - spot[0]), Math.abs(box.top + box.height / 2 - spot[1])),
+            left: box.left - picture.left,
+            top: box.top - picture.top,
+            right: picture.right - box.right,
+            bottom: picture.bottom - box.bottom,
+          };
+        });
+        const at = `${lang} @ ${size.width}x${size.height}`;
+        expect(where.off, `${at}: the word's centre is the spot the plate chose`).toBeLessThanOrEqual(2);
+        for (const side of ["left", "top", "right", "bottom"]) expect(where[side], `${at}: the word is inside the picture on the ${side}`).toBeGreaterThanOrEqual(0);
+      }
+    });
+  }
 });

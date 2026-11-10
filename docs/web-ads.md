@@ -2,7 +2,7 @@
 
 지금(1단계)은 광고가 없습니다. 이 문서는 2단계에서 웹에 AdSense를 붙일 때의 순서입니다. 코드는 미리
 들어가 있고 **기본은 꺼짐**입니다. 스위치는 Render 환경 변수 네 개이며, 빌드할 때만 읽습니다
-(`scripts/adsense-config.mjs`, `vite.config.js`의 `adsense()`).
+(`scripts/adsense-config.mjs`, `vite.config.js`의 `adsenseVerification()`·`adSlots()`·`staticPages()`).
 
 | 환경 변수 | 값 | 켜지는 것 | 번들 JS |
 | --- | --- | --- | --- |
@@ -12,6 +12,10 @@
 | `ADSENSE_ADS` | `on` | 광고 자리(`src/ads/AdSlot.jsx`)와 AdSense 스크립트, 개인정보처리방침·이용약관의 광고 문장(예고는 빠지고, 두 쪽의 시행일이 `ADSENSE_DATE`) | 광고 자리가 있는 화면 청크만 늘어남 |
 | `ADSENSE_DATE` | `2026-12-01` | 광고 방침의 시행일. `notice`·`on` 둘 다 필요(없거나 없는 날이면 빌드 실패). 예고가 배포된 날로부터 7일 이상 뒤 | — |
 | `ADSENSE_SLOTS` | `report:<광고 단위 번호>` (쉼표로 여럿, `ranking:<번호>`) | `ADSENSE_ADS=on`일 때 그 자리만 그림 | — |
+
+지금(2026-11-10): 운영에는 `ADSENSE_CLIENT`만 들어 있습니다(meta·`ads.txt` 확인됨). 「가치가 낮은 콘텐츠」 거절 뒤
+글 페이지를 더하고 11-10에 검토를 다시 요청했습니다. 나머지 세 변수는 비어 있고, 비어 있는 동안 빌드는 이 문서의
+코드가 없는 `main`과 바이트까지 같습니다.
 
 게시자 ID(`ca-pub-…`)는 저장소에 쓰지 않고 Render 환경 변수로만 둡니다. 다만 이 값은 원래 비밀이 아니라
 광고가 나오는 페이지와 `ads.txt`에 누구나 볼 수 있게 공개되는 값입니다.
@@ -29,7 +33,7 @@
 | 5 | AdSense 콘솔에서 광고 단위 만들기: 디스플레이 광고, **고정 크기 300×250**(자리 높이를 고정하므로 반응형 말고). 받은 번호가 `ADSENSE_SLOTS`의 값 | 사용자 | 광고 단위 번호 |
 | 6 | 「개인정보 보호 및 메시지」에서 유럽 규정(EEA·영국·스위스) 메시지 만들기 — Google 인증 동의 창. 문구는 Google 기본 문안 | 사용자 | 콘솔에 메시지 게시됨 |
 | 7 | 방침 공지(시행 7일 이상 전): Render 환경 변수 `ADSENSE_ADS=notice`, `ADSENSE_DATE=<시행일>`을 넣고 배포. 방침·약관 맨 위에 세 언어로 「변경 예고: <시행일>부터 …」가 나옴(방침 12번). PR은 필요 없음 | 사용자(값) / 확인은 Claude | 아래 「확인 명령」의 예고 curl, `tests/unit/ads-notice.test.mjs` |
-| 8 | Render 대시보드 헤더: CSP를 아래 「CSP」의 값으로 | 사용자 | `npm run check:deploy`(CSP 기대값도 같이 바꾼 PR 뒤) |
+| 8 | Render 대시보드 헤더: CSP를 아래 「CSP」의 값으로(PR 필요 없음) | 사용자 | `npm run check:deploy` |
 | 9 | 시행일에: Render 환경 변수 `ADSENSE_ADS=notice` → `on`으로 바꾸고 `ADSENSE_SLOTS=report:<번호>`를 넣고 배포(`ADSENSE_DATE`는 그대로) | 사용자 | 리포트 맨 아래 「광고」 칸, 방침 10번·6번 끝 줄, 예고가 빠지고 시행일이 `ADSENSE_DATE` |
 | 10 | `ads.txt` 상태: AdSense 콘솔 → 사이트 → ads.txt 「승인됨」 | 사용자 | 아래 curl |
 
@@ -86,8 +90,8 @@ FAQ는 두 쿠키를 다 적고, 6번 Google은 한 문단입니다. 광고를 �
 판(테이블)·결정·브리핑·첫 화면·게시판에는 마커가 없고, 유닛 테스트(`tests/unit/adsense.test.mjs`)가
 그것을 지킵니다. 자리는 300×250 광고 + 한 줄 라벨로 **높이 276px 고정**이라 광고가 차든, 실패하든,
 막히든 아래가 밀리지 않습니다. 300px는 폰 360px에서 양쪽 16px 여백 안에 들어갑니다. 움직임이 없고
-(동작 줄이기와 무관), 낭독기는 「광고」 구역과 라벨 한 줄을 먼저 읽습니다. 두 문구는 `src/copy/adSlot.js`
-(영어·일본어는 `src/locales/<lang>/screens/adSlot.js`)에 있습니다.
+(동작 줄이기와 무관), 낭독기는 「광고」 구역과 라벨 한 줄을 먼저 읽습니다. 두 문구는 세 언어 모두 `src/ads/adSlotWords.js`에
+있습니다(언어 사전에 넣으면 광고를 끈 빌드의 영어·일본어 사전 청크까지 바뀌므로 따로 둠).
 
 마커는 JSX 주석 `{/* ad-slot: placement="report" … */}`이라 꺼진 빌드에서는 컴파일되면 없어집니다.
 켠 빌드에서만 `<AdSlot … />`과 import로 바뀝니다.
@@ -104,21 +108,30 @@ FAQ는 두 쿠키를 다 적고, 6번 Google은 한 문단입니다. 광고를 �
 
 Google은 AdSense 코드에 nonce를 쓰는 strict CSP만 지원한다고 합니다 — 광고 코드가 쓰는 도메인이 바뀌기
 때문입니다([AdSense 도움말](https://support.google.com/adsense/answer/16283098)). Render 정적 호스팅은
-응답마다 nonce를 만들 수 없으므로, 도메인을 나열하는 대신 script/frame/connect/img를 `https:`로 엽니다.
-나머지(`default-src`, `frame-ancestors 'none'`, `object-src 'none'` 등)는 지금 값 그대로입니다. 값의
-원본은 `scripts/adsense-config.mjs`의 `AD_CSP`입니다.
+응답마다 nonce를 만들 수 없으므로, 도메인을 나열하는 대신 script/frame/connect/img를 `https:`로 열고
+`script-src`에 `'unsafe-eval'`을 더합니다(Google이 AdSense용으로 내는 CSP와 같음). 나머지(`default-src`,
+`frame-ancestors 'none'`, `object-src 'none'` 등)와 지금 값이 이름으로 적은 호스트(Supabase, Google
+애널리틱스)는 그대로입니다. 값은 `render.yaml`의 CSP에 `scripts/adsense-config.mjs`의 `adCsp()`를 씌운 것이고,
+아래 명령이 그 값을 찍습니다(2026-11-10 `render.yaml` 기준 값은 표).
+
+```sh
+node --input-type=module -e "import { readFileSync } from 'node:fs'; import { adCsp } from './scripts/adsense-config.mjs'; import { readRenderYamlCsp } from './scripts/deploy-policy.mjs'; console.log(adCsp(readRenderYamlCsp(readFileSync('render.yaml', 'utf8'))))"
+```
 
 | Path | Name | Value |
 | --- | --- | --- |
-| `/*` | `Content-Security-Policy` | `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https:; media-src 'self' blob:; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; frame-src https:; fenced-frame-src https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'` |
+| `/*` | `Content-Security-Policy` | `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https:; media-src 'self' blob:; connect-src 'self' https://kiazzdbpkazwqhhimdib.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://region1.analytics.google.com https:; script-src 'self' https://www.googletagmanager.com 'unsafe-eval' https:; frame-src https:; fenced-frame-src https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'` |
 
-바뀌는 지시어만 보면: `script-src 'self'` → `'self' 'unsafe-eval' https:`, `connect-src 'self'
-https://*.supabase.co` → `'self' https:`, `img-src`에 `https:`, 새로 `frame-src https:`·`fenced-frame-src
-https:`. 다른 헤더(`Cross-Origin-Opener-Policy: same-origin`, `Permissions-Policy`의 `browsing-topics=()`)는
-그대로 둡니다. `browsing-topics=()`는 Topics API를 끄므로 맞춤 광고 단가가 조금 낮을 수 있습니다[확인].
+바뀌는 지시어만 보면: `img-src`·`connect-src`에 `https:`, `script-src`에 `'unsafe-eval' https:`, 새로
+`frame-src https:`·`fenced-frame-src https:`. 다른 헤더(`Cross-Origin-Opener-Policy: same-origin`,
+`Permissions-Policy`의 `browsing-topics=()`)는 그대로 둡니다. `browsing-topics=()`는 Topics API를 끄므로
+맞춤 광고 단가가 조금 낮을 수 있습니다[확인].
 
-이 CSP로 바꾸는 PR에서는 `render.yaml`의 CSP 값과 `scripts/deploy-policy.mjs`의 기대값을 같이 바꿉니다
-(이 draft는 운영 헤더를 바꾸지 않습니다).
+**PR은 필요 없습니다.** 배포 뒤 검사(`check:deploy`, Deploy 워크플로)는 운영 CSP가 `render.yaml`의 값이거나,
+그 값에 `adCsp()`를 씌운 값과 지시어마다 정확히 같을 때만 통과시킵니다(`isAdCsp`, `scripts/deploy-policy.mjs`).
+그보다 하나라도 더 넓으면(예: `object-src *`, `'unsafe-inline'`) 지금처럼 실패합니다. `render.yaml`의 CSP를 바꾸는
+PR이 들어가면 대시보드 값도 위 명령으로 다시 뽑아 맞춥니다. 광고를 끄면 대시보드 CSP를 `render.yaml` 값으로
+되돌립니다(되돌리지 않아도 검사는 통과하지만 넓은 정책을 남길 이유가 없음).
 
 ## 도메인과 승인 조건 (2026-10-26 조사)
 

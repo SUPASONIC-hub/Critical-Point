@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-02 (the state of `main` at `5c00dff`, after the 360px bank rail fit (#384), the English five-card hand at 360px (#389), more varied background music (#388) the English and Japanese gaps filled (#393) and the money flow on the bank rail (#391) and larger body text on desktop (#390); what changed and when is in `git log`)
+Last updated: 2026-11-09 (the state of `main` at `f97f507`, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -153,6 +153,58 @@ Still open, on purpose:
   and 사건 23's market card keeps the `risk` its old label inferred.
 - This week's rule (#199, F7) merged on the evening of 2026-10-20 at `43e7ed1`
   (migration 20261021000000; the ranking reads one board at a time by `week`).
+  B3's audit and B2's links were 2026-W44's test week (#219, #223) and are
+  rules of the table from 프롤로그 04 since RULES_MARK 3 (one ranking reset,
+  v10): `audit` and `cascade` in `tableUnlocks.js`, off in story mode and in a
+  replayed case; the week's devices (`WEEK_RULE_DEVICES`) are empty, and
+  W44's catalogue entry stays as a week gone by. The bots play both wherever
+  a case's rules have them (`AUDIT=0` / `CASCADE=0` turn one off). With the
+  same reset the season's ranking score becomes the mean of its cases' burst
+  scores (our choice, 2026-10-22, Q7 (1)), where it was the finale's own, made
+  from that case's eight or so decisions: `getSeasonScore` on the client (a
+  replayed case counts its first close, `firstBurstScore`), and the server's
+  `ranking_run_summary` recomputes it from the run's case rows
+  (`20261106020000_season_score_case_mean.sql`, promoted on 2026-11-05 ahead of the
+  reset). Over 200 bot seasons the finale's score ran 32 to 80 (p50 60) and
+  the mean runs 45 to 71 (p50 59); no bot season reaches A (72) on the mean.
+  One axis of that mean is read off the whole season (our choice, 2026-10-23,
+  Q25 (1)): 관점 전환, whose reach (kinds / 4) a case of seven decisions
+  rarely fills. Each case summary keeps its `cognitionMix` (a replay its
+  first close's, `firstCognitionMix`), and the season's spread of their sum
+  takes the place of each case's own (weight 0.2), on the client and in the
+  server's `ranking_run_summary` (`ranking_cognition_spread`, same draft);
+  a season with a case that has no count keeps the plain mean. The same 200
+  seasons then run 49 to 74 (p50 62): +1.1 (spend-people) to +5.2
+  (balanced), procedure +3.1.
+- C-1(1), drafted 2026-10-25 on top of #224 for the ranking reset after it
+  (our choice, 「전부 1」): each case's burst score gives 0.2 to 판 읽기, the
+  C-12 index the case close prints (「벽을 본 사람의 N%」, now
+  `getCaseRead` in `src/seasonScore.js`), and the six axes before it keep
+  their ratios at 0.8 (0.224 / 0.16 / 0.16 / 0.128 / 0.064 / 0.064). The
+  season's 관점 전환 swap weighs 0.16. Local ranking v11; the server's copy is
+  `20261106030000_season_score_reading_axis.sql`, promoted 2026-11-05 (the 0.16 swap, a
+  refusal for a case row without `readingScore`, and the reset); the checker
+  holds each window's read to its replay. `npm run report:reading-axis`
+  (320 bot seasons a board, same seeds): blind 61.7 -> 56.7, heartbeat
+  62.2 -> 61.0, scout 63.2 -> 64.9, sees the wall 62.7 -> 69.1; the gap
+  between seeing the wall and playing blind goes from 0.9 to 12.5 points.
+- D2, the hall of fame (draft on top of #224, D2-명예의전당-설계안-20261021.md,
+  every question (1) and question 9 (1)): `20261106010000_hall_of_fame.sql`
+  (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
+  `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
+  `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
+  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  and two steps in `verify-ranking.yml`: the settle call right after the
+  marks, from the same check, and a job of its own with `contents: write`
+  that force-pushes one commit to the orphan branch `hall-of-fame`. Each
+  board is read on its own: the threshold of ten counts the board's complete
+  seasons with no mark over the whole board (`hall_of_fame_counts`, counted
+  again inside the settle call), and the replay reads each open board's first
+  ten candidates beside the top `limit`. A week's
+  board settles four weeks after its Monday; a table's once the next table's
+  board is first written. Not merged: the migration applies on merge, and the
+  design waits for #224 and seven days of the daily check (the week of 11-16
+  at the earliest).
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
@@ -169,7 +221,7 @@ Still open, on purpose:
   `CHIP_MARGIN` 10 (4 of 7 archetypes at or above plain, short of 5; left to
   play feedback). RULES_MARK 3 and the ranking reset are decided after the
   test week's data, in a later pull request.
-- 2026-10-22: the user moved the test week from W44 to 2026-W47 (11-16 to
+- 2026-10-22: we moved the test week from W44 to 2026-W47 (11-16 to
   11-22), so the drafts' improvements are live first and the test is played
   on top of them; W44 is an ordinary week and W46's near wall stays. The
   client's calendar, migration 20261022010000 (W44's row out, W47's in), the
@@ -222,7 +274,7 @@ Still open, on purpose:
   behind `main` is not merged as it stands. Production ran `2c7b535`
   (#218) at midday; #270 (Node 24.20.0 -> 24.22.1, a security release)
   followed at `5adcbb5`.
-- 2026-10-23, afternoon: at 14:40 the user changed the day's rule to "deploy
+- 2026-10-23, afternoon: at 14:40 we changed the day's rule to "deploy
   as much of the day's work as can go live by 18:50". Instead of one draft
   every fifteen minutes, the ready drafts were merged into three combined
   pull requests, each put on the current `main` and measured once as a whole
@@ -379,7 +431,7 @@ Still open, on purpose:
   few bytes. Eighteen pull requests merged (the four inside #362 not counted
   apart), 1,570 unit tests; production runs `2c935e7`, deployed on 10-28
   after a season shard of its Verify hit the 20-minute limit and was rerun.
-  The user decided that day: no
+  We decided that day: no
   promotion yet, AdSense set up later (the Render address or a domain is
   still open), and the English range widens ten reviewed cases at a time
   (replaced on 10-28: both languages open to the end, #366).
@@ -392,7 +444,7 @@ Still open, on purpose:
   and first-paint budgets per language -- Korean, `?lang=en`, `?lang=ja`);
   #365 (the code review's last four lows: the observer's sample and ledger
   count the Korean card behind a translated one, the run's summary records
-  the language actually drawn). The user decided that day to open English
+  the language actually drawn). We decided that day to open English
   and Japanese to the end instead of ten reviewed cases at a time, and to
   make `check:locale` strict in `verify:static`.
 - 2026-10-29: #366 (English and Japanese to the finale: 「한국어 · English ·
@@ -420,8 +472,8 @@ Still open, on purpose:
   #322, #350.
 - 2026-10-30: #376 (web ads readiness: about, FAQ and contact pages, nine
   static pages in three languages, `sitemap.xml` and `robots.txt`, links
-  under the start screen, and the `GOOGLE_SITE_VERIFICATION` switch; the
-  user verified Search Console and submitted the sitemap, and the AdSense
+  under the start screen, and the `GOOGLE_SITE_VERIFICATION` switch;
+  we verified Search Console and submitted the sitemap, and the AdSense
   review requested on 10-29 is pending); #375 (the language buttons on one
   line at 320px, the Japanese 320px reach check live); #378 (the ranking
   save failure notice in three languages); #380 (the GA4 switch
@@ -436,7 +488,7 @@ Still open, on purpose:
   intro paragraph at 14px, and 360x740 in three languages in the reach
   check). Six PRs merged, 1,610 unit tests. Open: at 360px a large late-
   season stake wraps the bank rail to two lines and pushes the hand's last
-  card 12-22px under the action bar (hand5 measures stake 0 only); the user
+  card 12-22px under the action bar (hand5 measures stake 0 only); we
   chose (1), a separate fix on main merged by 11-06 (`bank-rail-fit`, in
   progress). Drafts followed main or the branch below them: #322 #324
   #350 (with ads on, the FAQ's "no ads" line follows the switch), #327 →
@@ -445,7 +497,7 @@ Still open, on purpose:
   (#314's result-screen order e2e fixed), #224 → #307, #316, #320, #308 →
   #379 (#224's 360px English bank rail CSS, #379 hand5 overflow 0 in three
   languages).
-- 2026-11-02: #384 (`bank-rail-fit`, the user's choice (1) of 10-30,
+- 2026-11-02: #384 (`bank-rail-fit`, our choice (1) of 10-30,
   merged by hand before the 11-06 deadline: at 360px and under only the
   HUD spacing shrinks -- clock 36 to 30px, bank rail pills 22 to 18px --
   so a two-line bank rail keeps the five-card hand above the action bar;
@@ -463,6 +515,296 @@ Still open, on purpose:
   360px, five-card hand spacing at 480px and under, new `money.css`). #390 (desktop type: body text 16 to 18px at 1025px and wider, the start screen kept at 16px, the large stake, clock and timer numbers held by `--hud-rem`; the 1280x720 start button now inside the screen on Linux, 1024x768 and 1440x900 added to the reach check, desktop baselines re-recorded). Six PRs merged, production build-sha `5c00dff`, 1,637 unit tests. Drafts: #394 (scene prose trim 1, after W47), #392 (to merge tomorrow morning). #322 followed main; #224's bundle children followed
   rules-mark-3b: #307 `50e7957f`, #316 `b008cb11`, #320 `d4a6ed3b`, #308
   `558088ad`, #379 `e57c9864`.
+- 2026-11-03: #392 (`plate-story`: each sound word sits beside its source -- the
+  heartbeat by the player's own figure, a thud on the desk, a hum by the lit
+  object, a tick on the wall -- never over a figure or the caption, hidden on
+  phones at 700px and under; the player's figure in every room in the hand
+  colour with an outline; the result screen opens with the case's last scene
+  in a good, mixed or bad tint; font subset 1,700 characters); #398
+  (`plate-room-locale`: English and Japanese scenes pick their room and seed
+  from the Korean place and clock, so all three languages draw the same room;
+  sound sizes 17 and 14 added, scenes with no sound spot ko 0, en 0, ja 2);
+  #395 (`locale-review-1103`: English profile pronouns for seven people,
+  Look-Before-You-Leap, 首席分析官, Bankroll); #407 (`test-week-summary`:
+  re-measured bot values through a repository variable or a dispatch input,
+  five ranking bug signals, returns per finished season); #397 (English
+  number warnings 18 to 12); #404 (Verify Ranking replay test for weekly-rule
+  runs); #410 (`npm run check:changed` and build:e2e reuse for the same
+  tree); #406 (deploy at push when main gets the same tree, e2e, season and
+  visual skipped for drafts and docs-only PRs; #402 reached production in
+  10 min 39 s); #402 (360px signal row: LOCK clear of the logic combo in en
+  and ja); #409 (last week's rule board tab for the following week); #411
+  (WebKit start button, `text-wrap: wrap` for ko and ja at 360px and under);
+  #421 (summary artifacts for Funnel, Test Week and Verify Ranking); #408
+  (coverage floors one under the measured values). Fourteen PRs merged,
+  production build-sha `8e93010`, 1,692 unit tests.
+- 2026-11-04: #385 (dependabot `dev-tooling`: `@electric-sql/pglite`
+  0.5.11 to 0.5.13, `supabase` CLI 2.121.0 to 2.122.0); #386 (dependabot
+  `runtime`: `lucide-react` 1.61.0 to 1.64.0); #415 (`ci-shards`: main
+  Verify's `verify-e2e` from five to seven shards, split by the time each
+  test took in CI rather than by count -- `tests/e2e-shards.json`, `npm run
+  e2e:rebalance`; 42 units, 68.7 minutes in all, every shard 9.8 minutes on
+  the last four main runs); #424 (`canon-fixes-1`: the 26 high-confidence
+  findings of the 11-03 canon audit and four in progress, in ko, en and ja,
+  wording only; the first day at work stays April 9 and case 31 says "ten
+  days before", the three beside you on the 11-14 circular are trainees who
+  have finished); #435 (`canon-fixes-2`: 21 more findings raised from
+  medium, in ko, en and ja; A044, when Haeon Partners was wound up, left for a
+  story decision; case 46's first `c46_manifest` label cut from 34 to 30
+  characters); #444 (`readme-restore-1104`: the README put back after #415's
+  merge resolved a conflict with `git checkout --ours` and took the whole
+  file back to the branch's old copy; only the unit test count kept); #431
+  (`glossary-fix-1103`: 91 English and Japanese lines brought to the
+  glossary -- approval field, transfer, trainee, number ticket, bookshop,
+  creditors' committee, 弔問室; no number or Korean line changed); #430
+  (`canon-rules`: 15 rules from the 11-03 audit, four of them companions
+  that go silent if the copy stops saying the right shape, and 3 scene rules;
+  merged after #424 and #435, so main reads 0 contradictions); #447
+  (`bundle-1104a`, one CI run for five green PRs: #429 caption boxes that
+  close with the quote, ko mixed boxes 1,418 to 29 and ja 1,968 to 31; #433
+  start pages at `/en/` and `/ja/`, the sitemap 16 to 18, share cards on the
+  15 static pages; #436 the runtime preload after `load` and the chosen
+  language's dictionary preloaded from the head; #445 `simplifyPlayerText`
+  only rewrites on the Korean screen, "Trigger Lab" and 「トリガーラボ」 for
+  the wordmark reading, phase names as written; #438 the sound word centred
+  with `transform`, so it stays inside the plate on desktop). Render matched the
+  `/en/` rule to `/en` only, so we added `/en/*` and `/ja/*` to the
+  dashboard headers (`Cache-Control: no-cache`, checked 16:36); #448
+  (`bundle-1105b`, two PRs and main 4e3f8e48 taken in, three conflicts
+  edited by hunk, critical CSS rebuilt; first paint budgets 428,480 / 485,062 /
+  492,230): #443 (`credits-alice`: STUDIO Tak'n Roll / CREATOR SUPASONIC &
+  ALICE with both mail links on the start screen, the static pages, the about
+  line and the README; the privacy policy and terms, six pages, keep the names
+  but drop the mail line, so the second address does not read as a second
+  request desk; `SUPPORT_CONTACT` unchanged) and #446 (`canon-a044`: the 32억
+  of 사건 26 and the registry move of 4월 24일 belong to a new company at
+  해온파트너스's address, unnamed, in ko, en and ja; 사건 29's premise says
+  "그리고 지금" for "같은 주"; check:canon `advisory-fee-payee`), and the same
+  two header lines in `render.yaml` and `deploy-policy.mjs` (rules 19 to 21).
+  #449 (`bundle-1105a`, four PRs, the three baselines both sides had
+  changed -- case-play desktop and mobile, briefing-p1-390x844 -- recorded
+  again on the bundle branch): #440 (hand-card border 1.70:1 to 3:1 and more,
+  the "season done" badge read through sr-only, axe in ko, en and ja at
+  360x740 and 1280x720; e2e 1,182 to 1,202); #439 (a late "held" answer to a
+  duplicated tab is taken while no table has read the token, and four test
+  fixes); #442 (`kd-bank-account`: the purse moved into an always-visible
+  "KD은행 계좌" -- a strip along the top at 1024px and under, a box at the
+  top right from 1025px -- through briefing, table, settlement and relic
+  draft; display only, score and balance unchanged; spending it as currency
+  at the relic draft comes after W47 in the 11-30 bundle); #416
+  (`snap-after-reading`: a table opened after 70% of the reading clock has no
+  snap penalty and its rhythm counts as 8 s; old runs replay under the old
+  rule and the ranking is not cleared; the W47 bot values re-measured equal
+  the defaults, so `TEST_WEEK_SIM_LINES` stays empty). Open: #432 (board
+  auto-hide, with a migration; at most five posts hidden by reports an hour).
+  In progress: #450 (`tab-title-locale`: the English and Japanese tab title no
+  longer falls back to the Korean one in `index.html`), late today or first
+  tomorrow; then the migrations #432, #425 and #434, each asked for, and
+  `check:grants` on main. Nineteen PRs merged (eight on their own and eleven
+  inside three bundles; 22 counting the bundle PRs #447, #448 and #449; main
+  `dc26d88`), production build-sha `dc26d88` (18:01), 1,758 unit tests.
+- 2026-11-05: #451 (`bundle-1105c`, one CI run for the four PRs that were
+  "first tomorrow" in the 11-04 handoff, their three migrations in version
+  order -- 20261103000000, 010000, 020000 -- and our one answer
+  "(1) merge the bundle at once"; #432's uncommitted merge of 62a25238 was
+  aborted and main 3d4183e5 taken in fresh; conflicts were the README number
+  lines and the budget blocks only, edited by hunk with both sides' notes
+  kept; every added line of both parents of the five merges checked present
+  in the result, the only misses the re-measured numbers; first paint
+  429,328 / 486,074 / 493,267, 56 migrations, 1,818 unit tests): #450
+  (`tab-title-locale`: the English and Japanese game tab no longer falls
+  back to `index.html`'s Korean title -- `pageTitle` in the intro copy,
+  `setPageTitle` run by `loadLocale()` before the first paint, the `/en/`
+  and `/ja/` start pages' `<title>` the same string; the language picker's
+  name unchanged); #432 (`board-auto-hide`, migration
+  `20261103000000_board_auto_hide_and_blocked_terms`: three distinct
+  reporters hide a post at once and it waits in the queue as 「자동 숨김」;
+  at most five posts hidden by reports an hour and three of one reporter's
+  reports a day count (`counts_for_hide`); a minimal ko, en and ja
+  blocked-term list in `src/boardBlockedTerms.js` = `board_blocked_terms`,
+  each term matched at its scope -- text, token or word -- so Yamashita, 다시
+  발견, まだ死ねない and 시발점 pass); #425 (`security-small-1103`, migration
+  `20261103010000_cloud_unknown_address_and_tier_list`: the two global daily
+  limits -- new cloud codes, telemetry bytes -- read by `Board Reports` 09:10
+  and `Funnel` 22:10 into the job summary, the run failing at 80% as the
+  alert (`scripts/report-budgets.mjs`); new codes a day 1,000 to 3,000; a
+  cloud RPC without a client address counts under the one key `unknown`,
+  fail-closed; `render.yaml`'s CSP `connect-src` and HSTS matched to
+  production; `momentumTier` fixed to four values; zod 4.5.4 to 4.6.7, dev
+  only); #434 (`ranking-recheck-wider`, migration
+  `20261103020000_ranking_recheck_seen`: Verify Ranking reads, per board --
+  plain, this week's rule, last week's -- every unread row of the top 100 and
+  the top 20 again, 150 a night, with a second run Monday 00:20 KST;
+  `recheck_seen_at` is opened to anon only as the boolean `rechecked`, so a
+  row the checker has not read yet says 「확인 중」; the "same address
+  frequency" recheck -- keeping address_key 180 days -- declined, our
+  choice (1) on 11-05). Four PRs merged (five counting the bundle PR #451; main
+  `3ca15f8`), production build-sha `3ca15f8` (11:03, sw release
+  `9928af4b`), 1,818 unit tests. `studio-name`: the studio's name is now
+  one per language, our choice -- 찹쌀떡 스튜디오 / Mochi Verse Studio /
+  STUDIOもちぷよ (`STUDIO_NAMES`, `studioName` in src/credits.js); the start
+  screen reads the page's language and each plain page its own; the CREATOR
+  line, the mail links and the English labels are unchanged; the 11-04
+  records keep that day's name.
+  Afternoon: #452 and #453 (docs: the morning's three records, and two stale
+  work-status lines -- new codes a day 3,000, 56 migrations and 13 tables).
+  #454 (`studio-name`, merged 12:41 KST, `24af89d7`): the Japanese name's
+  ち·ぷ·も·よ were not in the font subset, so `build:fonts` ran again (198,144 to
+  199,124 bytes, 1,703 glyphs) and `build:critical` after it; five unit tests
+  in `credits.test.mjs`, e2e for the 360px start screen and the about page
+  footer in three languages. #455 (`docs-contrib-1105`, `e68fe8cc`; our
+  F3 (1) and F7 (1)): `docs/writing-a-case.md` 721 to 856 lines (the
+  three languages, portraits and plates, the case chunk budget, mood tags, a
+  ten-line check before a PR), a sample case `docs/examples/case-template.js`
+  (219 lines, three scenes written out, not read by the build) and
+  `docs/event-week.md` (216 lines: the calendar W46 to 2027-W03, announce /
+  run / close, the six things not changed mid-week, three ways back); no code
+  changed. #456, #457 and #460 (`prose-bundle-a/b/c`, `8ac59b71` 14:34,
+  `977809b3` 14:59, `33899116` 15:24): the 17 prose-trim drafts of the 11-02
+  review (a: #394 #399 #400 #401 #403 #405, b: #412 #413 #414 #417 #418 #419,
+  c: #420 #422 #423 #427 #428) merged in PR order on main 24af89d7, Korean
+  body text -20.6% to -28.8% per branch; 129 conflict hunks in 69 files (78 /
+  29 / 22) resolved as the 11-04 choice (1) says -- the shortened sentence
+  carrying main's canon (#424, #435), glossary (#431) and A044 (#446) facts --
+  with no code conflict; six judgement calls (case 06 and en case 22 keep the
+  shortened sentence because it dropped the corrected one whole; case 10's
+  sick-leave scope, case 07's 「최종 승인란은 비어 있습니다」 under check:canon
+  han-return-sign and case 25's first-day sentence under first-day-clock
+  restored); every added line of both parents of the 17 merges checked
+  present; the case chunk budget 98,900 / 25,400 to 91,536 / 23,304 (en 67,659
+  / 19,653, ja 75,270 / 21,047); two first-briefing baselines recorded again
+  in CI; each bundle took main and re-measured after the one before. #458
+  (`bundle-mood`, `4f2d39cb`, 16:19; our choice ③ -- everything before
+  11-13, five moods neutral / bright / tense / dread / sorrow, a script draft
+  plus human review, the start screen one step lighter): mood-wire (with
+  mood-tags), mood-tokens and mood-music merged in that order plus one wiring
+  line (`AdaptiveMusic.jsx` subscribes through `onMoodChange(setMusicMood)`);
+  `src/sceneMoods.js` is generated -- 321 of 1,129 scenes tagged (tense 240,
+  bright 31, sorrow 31, dread 19) by `scripts/tag-mood.mjs` with `check:mood`,
+  and `season-split.mjs` puts `scene.mood` only on tagged scenes so the table
+  never ships; five background token sets under `:root[data-mood]`, neutral
+  +12·13·14 over today's values, tense unchanged, text colours untouched,
+  `useSceneMood` setting `<html data-mood>` from the table's visible scene and
+  the start and result screens neutral; the music picks two of a mode's four
+  leads per mood (sorrow transposes the 「많이 치름」 melody to minor) and the table
+  drone's voicing (`gauntlet/tensionDrone.js`), with a 5 s crossfade, no jumps
+  and nothing summed into drive; `contrast.spec` runs once per mood, and the
+  CI red on the default neutral intro's active case card (`--ui-text-2` on two
+  layers of acid glow, 4.45:1) was fixed by lowering that card's glow alpha
+  only, 0.14 to 0.1, en/ja 5.61; budgets measured on main 33899116 +4: entry
+  193,412 / 69,957, GameRuntime 148,134 / 54,771, case chunk 91,581 / 23,318,
+  first paint 431,491 / 488,208 / 495,402; 1,845 unit tests. Decisions of the
+  day (ours, option 1 unless noted): migrations asked once per bundle;
+  #434's same-address frequency not done; the studio name per language; mood
+  ③; the six drafts parked after W47 (D1, E5, table-a11y, static-shell,
+  intro-cards-cv, canon-trainee-locales) all before 11-13 (2); code-structure
+  budgets met by cutting code, rules-1105's css-structure the one exception
+  measured up; the big one -- everything including the 11-30 bundle (#224 #307
+  #316 #320 #308) in before the 13th, play and data collection only from the
+  13th, the ranking cleared once on the evening of 11-12 (v10, v11 and
+  RELIC_DRAFT_MARK in one migration); A3 tab title only, A4 long-press on the
+  big decisions, B1 scouting for 1 trust, B4 not done, B5 a clock that follows
+  the stake, C1 rank titles only, C3 / C4 draft wording fixed after review, D3
+  keep #197 and add only the NEW GAME+ exclusion migration, E3 stage 2, F3 doc
+  plus sample, F7 procedure doc; the 12,000 "one more" price kept with a
+  notice line; `.portrait-src/` moved to cp-archive; #319 closed; the
+  Pretendard preload dropped on `/ja/` (before the 13th, checked in CI and
+  PSI); #379's migrations renamed 20261106… and the `.draft` files promoted
+  except the two ranking clears; passing after buying at equipRelic is not a
+  breather. Measured: C9 draft spend (`kd-spend-engine`, check:pressure) vault
+  never 23,423 / only when a slot is empty 22,654 / one more every time 11,352
+  / both every time 7,403, season bot ending changed 13.8% and collapse 20.0
+  to 18.8% under always; ja FCP (Fast 3G + CPU 4x median, main 2d4dc9ff) 13.8
+  s on `/ja/`, 10.3 s without the preload line (-3.5 s, within noise
+  unthrottled); C2 ending order (`ending-reform-order`, evidence-reform before
+  oversight when the finale is control) reform 5.3 to 11.3 over 600 bot
+  seasons, oversight 15.2 to 9.7; B1 (`scout-narrow`) always 34,486 and bust
+  3.0%, so 1 trust is almost no price to the bot; B5 (`stake-clock`) bot
+  numbers unchanged. Open at hand-back: #459 (`bundle-1105d`, five drafts E5,
+  D1, table-a11y, canon-trainee-locales, intro-cards-cv; the static shell
+  reverted after its CI run because the intro text column is 161-246px taller
+  than the shell and rescales on swap), #461 (`rules-1105`, the rules bundle
+  #224 #307 #316 #320 #308 with five migrations 20261106000000 to 040000, 56
+  to 61, asked once before merge), the local bundles bundle-1106a (A2 C2 C3/C4
+  C1 A3 A4 ja-preload D3, one migration) and bundle-rules2 (kd-spend both,
+  11px, B1, B5 on rules-1105 with the 11-12 clear as a draft). #461 merged at
+  16:50 (`7e1fe0f0`, five migrations asked once, 56 to 61). 31 PRs merged in
+  all (36 counting the bundle PRs #451 #456 #457 #460 #461; main `7e1fe0f`),
+  production build-sha `3ca15f8` (11:03) then `7e1fe0f` (17:03 Deploy), 1,845
+  unit tests (#458).
+- 2026-11-06: everything left before the 13th went in as bundles, one CI
+  run each. #459 (`bundle-1105d`, `6f58cbb8`): E5 text size (1 / 1.125 /
+  1.25, `data-text-size` before first paint), D1 the season habit line on the
+  result card and share text, the account 「방금 ±」 10 to 11px, E3 stage one
+  (one aria-live polite voice when a risk band is crossed), check:canon's two
+  trainee rules reading en/ja, content-visibility on off-screen intro case
+  cards; the static shell reverted again after CI. #463 (`bundle-rules2`,
+  `e1f5e515`): C9 draft spend (reroll 4,000 and "one more" 12,000 with the
+  notice 「하나 더는 칸이 빌 때만」, vault 22,654 when buying only into an empty
+  slot), B1 scouting costs 1 trust once a table, B5 the decision window
+  follows the stake (<45 / 45-64 / >=65 gives 45 / 40 / 35 s, old records
+  45), the English stake label 11px; the 11-12 ranking clear rides along as a
+  `.sql.draft`. #464 (`bundle-1106a`, `bb7781c7`): A2 collapse staging
+  (stopped heart, 0.25 s hold, one sentence, drone release 0.25 to 0.6 s, no
+  new notes or drive), C2 ending order (evidence-reform before oversight when
+  the finale is control), C3 / C4 ending wording as drafts awaiting review,
+  C1 rank titles, A3 tab title (「⚠ 벽까지 N」, 「[징계 회부]」 after BUST), A4
+  a 0.6 s hold on a case's last choice and in-wall confirms only, and the
+  Pretendard preload dropped on `/ja/`; D3's migration dropped because #461
+  already leaves NEW GAME+ tables out (our choice, 11-06 (1)). #465
+  (`mood-boost`, `d7dadd92`): mood edge tint (`--mood-edge`, 0.6 s fade),
+  wider background / surface / line / accent palettes per mood with text
+  colours unchanged (lowest contrast 4.65), 95 early scenes reviewed so 375
+  of 1,129 are tagged, and `MOOD_TEXTURES` in musicScore.js (gain ratios all
+  <= 1, linear over the 5 s crossfade). #468 (`w47-rule-line`, `97366b95`):
+  the W47 start-screen line now says audit and cascade are standing rules and
+  the week's records go to the test-week board; wording only. #471
+  (`cold-opening`, `ac0645d3`): B-3 (1) four card cold opening before the
+  prologue, behind `COLD_OPENING_ENABLED = false` (`__CP_COLD_OPENING__`, the
+  chunk is left out of the build), to be switched on after the W47 funnel.
+  #470 (`report-judgment`, `d828507c`): `npm run report:judgment` for 11-23
+  (C2 human endings against the bot, Q23 season score spread, B-3 prologue
+  drop-off; read-only, aggregates only). Measured on production (`ac0645d3`,
+  Fast 3G + CPU 4x median): `/ja/` FCP 13.8 s to 6.1 s, the ja-en gap +6.2 s
+  to -0.1 s; kept. #472 (`bundle-1106b`, `a1701612`, 16:52): the static
+  shell again under decision 13 (1) with the key visual box fixed to the
+  viewport, replacing #469, plus mood tags for cases 06-49 and the finale,
+  692 scenes. Open: drafts
+  #466 (the 11-12 evening ranking clear, asked again right before merge) and
+  #467 (A7 music limiter, merged or closed after an earphone listen), and the
+  local draft branch `cold-opening-style`. Eight PRs merged (24 branches
+  inside them; main `a170161`), production build-sha `d828507` (16:15
+  Deploy, sw release `f0122d0b`) before #472's deploy, 1,958 unit tests.
+- 2026-11-09: `studio-we-1109`: the studio's names lost the word studio --
+  찹쌀떡 / Mochi Verse / もちぷよ -- because the credit's STUDIO label already
+  says it (`STUDIO_NAMES` in src/credits.js, README, `package.json` author);
+  the 11-05 entry above keeps the names of that day. The docs, README and the
+  plain pages now speak of the makers as we: the game is made by two people,
+  SUPASONIC & ALICE.
+  Also on 11-09: #476 (`775bb69a`): on the 360x740 overloaded table with five
+  relics the five card hand's last card sat 2 px under the action row; the
+  360px HUD's vertical gap and padding 3 to 2 px, ja line-height 1.2 at
+  <=360px; Linux clearance ko -2, ja -11, en -8 px. #478 (`content-pages`,
+  `283a74db`): AdSense turned the site down as low-value content, so plain
+  pages went in before 11-11 -- a guide, a cases index and 55 spoiler-free
+  case pages (first two scenes only, a notice from case 10 on), characters,
+  making-of -- with a site menu on every plain page, a hidden inert `<nav>`
+  in the static shell and all of it in the sitemap: 177 pages over three
+  languages. We ask for the AdSense re-review once indexed (asked 11-16).
+  #485 (`937d5170`): the about page's four rule lines match the code
+  (combo by direction, all rules from case 03, read-the-hand 20%, SILENCE
+  30 s). #488 bundle 1109b (`c1d08daa`): #482 table accessibility stage 2
+  (E3), #483 390px en/ja five card hands (ja +17 to -6, en +58 to -18 px)
+  and the 360px en signal row (21 to 0), #487 plain pages on phones. #489
+  (`d07a852b`): plain page landmarks, skip link, 2 px focus, portrait alt,
+  JSON-LD. #490 (`f97f5079`): the 11-23 judgment tool reads the bot endings
+  from the test-week summary's line (it still had #464's numbers). W45 and
+  W46 had no finished season; the 11-11 bot dry run matched the baseline.
+  Seven merges (main `f97f507`), 1,974 unit tests; Full Coverage run
+  42570673569 still running.
+  Open: drafts #477 (cold-opening style, decided 11-23), #484 (deps for
+  after W47, replacing Dependabot #479 and #480), #491 `phone-heavy-bank`
+  (overloaded table with the largest bank at 360px, after W47).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -475,6 +817,12 @@ Still open, on purpose:
   `newGamePlus` and `case_id`, through a redefinition of
   `refresh_scene_bust_stats` in the rules-mark-3 migration. The NEW GAME+ work
   itself (#220) went out ahead of rules-mark-3, in bundle A on 2026-10-23.
+  The redefinition reached a migration with the rules bundle (#461,
+  2026-11-05): `20261106000000_scene_bust_new_game_plus.sql`, then
+  `20261106040000_scene_bust_ladder_c4.sql` for C-4's ladder, leave out a
+  NEW GAME+ case row only on the cases its table differs (`VETERAN_TABLE_CASES`,
+  prologue 01 to case 02); D3 (answer (1), keep the floor and the hourly
+  rebuild) is that filter, and `check:grants` holds it.
 - Server checks, phase 2 (F1, #216, eight answers all option 1) merged on
   2026-10-23 (item 92): `npm run verify:ranking` rechecks a run's score from
   its decision log and replays its recorded windows, and the daily `Verify
@@ -695,7 +1043,10 @@ Still open, on purpose:
     asserts is a save, a request or a page state no viewport or touch reaches.
     The season is walked in eight `@season-segment` tests of seven cases, each
     from a fresh save at its first case, which Verify runs as a job of its own
-    on four shards on every push; the rest of the list runs on five. The continuous walk -- the only thing that carries
+    on four shards on every push; the rest of the list runs on seven, each a set of spec files balanced
+    by measured time (`tests/e2e-shards.json`; `npm run e2e:rebalance` lays it
+    out again from CI logs, and a spec it does not know goes to the lightest
+    shard). The continuous walk -- the only thing that carries
     resources and flags across all 55 cases -- is `npm run test:e2e:season`,
     run weekly by Full Coverage with `test:e2e:full`.
 18. The e2e runner takes a free port from the OS. Never pin one: a dev server
@@ -988,7 +1339,7 @@ Still open, on purpose:
     `Profile.jpg` / `!public/profile.jpg` pair in `.gitignore` stays, because
     Windows matches that name case-insensitively and the app's icon would go
     with it: every file in `public/icons/` is cut from `public/profile.jpg`
-    (`npm run build:icons`), the favicon the owner chose. Text files are LF on every platform (`.gitattributes`,
+    (`npm run build:icons`), the favicon we chose. Text files are LF on every platform (`.gitattributes`,
     `.editorconfig`): the byte budgets measured a different file on a Windows
     CRLF checkout than on the Linux runner.
 46. Every scene has a picture, and none of them is a file. `src/scenePlate.js`
@@ -1272,7 +1623,7 @@ Still open, on purpose:
 70. When the season's length changes, reset both rankings: a migration deletes
     the `season-final` rows (per-case telemetry stays) and the local board moves
     to a new `critical-point-local-ranking-vN` key that retires the old ones
-    (v9 today). The 2026-09-28 migration also deleted every season row the new
+    (v10 today). The 2026-09-28 migration also deleted every season row the new
     server rules would have refused, so the public ranking starts over when it
     is pushed. The table changing what it pays is the same occasion: on
     2026-10-11 both were reset once more (v8, and
@@ -1284,7 +1635,11 @@ Still open, on purpose:
     begun before 2026-10-10 therefore never ranks. Day 10's table did it again
     on 2026-10-20 (v9, `20261020010000_rules_day10_ranking_reset.sql`), and
     the mark it asks of every case row is `tableRules` in `dynamics`
-    (`RULES_MARK_KEY`). The suspicion marks (`20261020000000`, #183) went in
+    (`RULES_MARK_KEY`). RULES_MARK 3 (B3's audit and B2's links as rules of
+    the table from 프롤로그 04, played first as 2026-W44's test week) resets
+    them once more (v10, `*_rules_mark3_ranking_reset.sql`, which asks for a
+    mark of 3; drafted as `.sql.draft` and made a `.sql` only on the merge
+    day, after we are asked). The suspicion marks (`20261020000000`, #183) went in
     just before it, so every row ranked since carries them: a `season-final`
     row is never refused for its score, the bounds it fails are written to
     `suspicion`, which anon cannot read, and `ranking_hides_marked()`, the
@@ -1370,7 +1725,10 @@ Still open, on purpose:
     summary, alongside `reframeRouteCount` and `peopleFirstCount`); the
     authority gate asks for records from 60% of the cases opened, never fewer
     than four; a finale that burns the records closes OPEN OVERSIGHT, EVIDENCE
-    REFORM and HUMAN RECORD; HUMAN RECORD also asks for every case's record
+    REFORM and HUMAN RECORD, and one that answers 개혁 (`f_after_control`)
+    reads EVIDENCE REFORM before OPEN OVERSIGHT at the same gates (improvement
+    note C2, 2026-11-05: at legitimacy 86 and trust 85 OPEN OVERSIGHT took
+    nearly every reform season, 5.3% of 600 replayed); HUMAN RECORD also asks for every case's record
     (`HUMAN_RECORD_CLUE_RATE`), not only a reframed route in seven cases of
     ten, since staking the wild card wherever it was dealt closed 94% of
     seasons on it. The gates a player is told about live in
@@ -1444,10 +1802,10 @@ Still open, on purpose:
     writes (priority 59), puts are limited to 240 an hour per code and 600 per
     address, reads to 120 an hour per address, a payload to 400,000 bytes of
     `save` and `settledWindows`, and an address to five new codes a day
-    (1,000 a day for everyone). Telemetry has a byte budget as well as a row
+    (3,000 a day for everyone since #425; a request without a client address counts under the one key `unknown`). Telemetry has a byte budget as well as a row
     count: 32 MB a day for one address, charged by a trigger of its own that
     fires after the validator, and 200 MB a day for everyone. There
-    are 45 migrations and eight tables. `check:grants` also fails on a
+    are 56 migrations and 13 tables. `check:grants` also fails on a
     SECURITY DEFINER function that does not pin `search_path` and on a view
     without `security_invoker`. The Migration Drift workflow compares the
     live project's migration history with `supabase/migrations/` once a day
@@ -1528,10 +1886,12 @@ Still open, on purpose:
     `event.key` is a jamo. Space and Enter belong to whatever control the
     keyboard walked to with Tab; only with nothing such focused do they push
     and cash. On a scene that closes the case (`isClosingScene`,
-    `src/gauntlet/holdConfirm.js`; about one a case) 확정 is held for 0.8
-    seconds (`HOLD_MS`), Enter and Space included, and a short press arms it
-    so a second press within 3 seconds confirms -- the path for a screen
-    reader's virtual click or a hand that cannot hold. On the result screen
+    `src/gauntlet/holdConfirm.js`; about one a case) and on a table whose
+    heat is inside the band (`isDangerZone`) 확정 is held for 0.6 seconds
+    (`HOLD_MS`, 2026-11-05 A4), Enter and Space included, with a gauge on
+    the button; a short press only shows the hint 길게 눌러야 확정. A bare tap
+    with no press -- a screen reader's virtual click -- arms it so a second
+    tap within 3 seconds confirms. On the result screen
     `R` replays the case after asking and `N`
     opens the next one. Escape closes the ranking and the board from anywhere.
     With letter keys turned off (priority 87), 1-9, W, E, Q, P, R and N do
@@ -1921,12 +2281,12 @@ not listed: `BARE_ON_A_ROUTE` in `check-plain-language.mjs` is empty (it
 held 28 case and term pairs), and `check:balance` rule 7
 (`scripts/balance-rules.mjs`) holds no card as an exception.
 
-Case text, for the owner:
+Case text, for us to decide:
 
 - 2026-10-06: 사건 07's evidence scene (`c7_evidence_turn`) dates the posting
   order to the day after the analyst asked about 온새's repayment terms, not to
   the dispatch failure's budget ceiling; which question caused the posting
-  waits for the owner's word.
+  waits for our word.
 - 2026-10-06: 사건 07's 강서지점 has four people at the counter and 프롤로그 04
   has six.
 - 2026-10-06: a hidden route's clock is fixed at an early hour of its case, so

@@ -72,7 +72,7 @@ function RuleRows({ rules, resourceMeta }) {
  * above the breach when the board carries both. The page has its own clock:
  * when it runs out the table opens by itself. The player can open it sooner,
  * or stake a card straight from the page, which opens the table with that card already on it. A card
- * there says its type as it does in the hand (`CardType`), and `moveOf` what
+ * there says its direction as it does in the hand (`CardType`), and `moveOf` what
  * staking it would do to the logic streak.
  *
  * The page a case opens on, when the case turns rules on (`tableUnlocks`),
@@ -213,7 +213,8 @@ export function SceneBriefing({
 
   // D-11: how long this page is up (visible) and whether it was ever held, for
   // the stage to note when the table opens, by whatever key or button. Each
-  // frame reports both, so a page held from the start or held later is caught.
+  // frame reports both, so a page held from the start or held later is caught,
+  // and the clock the page has, against which a quick pick is read (2026-11-03).
   const readingRef = useRef(reading);
   useEffect(() => {
     readingRef.current = reading;
@@ -227,7 +228,7 @@ export function SceneBriefing({
       const now = monotonicNow();
       const step = document.hidden ? 0 : Math.min(0.25, (now - last) / 1000);
       if (!heldRef.current) spent += step;
-      readingRef.current?.(step, heldRef.current);
+      readingRef.current?.(step, heldRef.current, readSeconds);
       last = now;
       const remaining = Math.max(0, readSeconds - spent);
       timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));

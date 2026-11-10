@@ -66,6 +66,13 @@ export function readCollapseGate({ seasonHumanCost = 0, resources = {}, casesPla
   return { cases, harmTotal, harm, bustRate, over, cause };
 }
 
+/**
+ * Harm a case as a line prints it: cut to a tenth, never rounded, so 19.96 a
+ * case prints 19.9 and not the 20 the season has not reached. The standing
+ * line and the collapse's toll read the same cut.
+ */
+export const cutPerCase = (total, cases) => Math.floor((total * 10) / Math.max(1, cases)) / 10;
+
 const levelOf = (over, value, gate) => (over ? "over" : value >= gate * SEASON_STANDING_NEAR - NEAR_TOLERANCE ? "near" : "clear");
 const LEVELS = ["clear", "near", "over"];
 const seasonOrder = (caseId) => {

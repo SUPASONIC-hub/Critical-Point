@@ -6,7 +6,7 @@
  * generator has added its scenes -- which is why it is one call
  * (`finishSceneGraph`) and not four that have to be kept in order by hand.
  */
-import { CASE_START_NODES } from "../gameCases.js";
+import { CASE_START_NODES, RESULT_NODE_IDS } from "../gameCases.js";
 import { isResourceGain } from "../gameConstants.js";
 import { createPlateRandom, hashString } from "../scenePlate.js";
 import { applySceneContext } from "./sceneContext.js";
@@ -169,11 +169,34 @@ function dealScenes(nodes) {
   }
 }
 
-/** Facts first, so a scene's own context can overrule them; the deal last. */
+/**
+ * B-13(2) (user, 2026-10-25, choice 1): every case's closing decision is a
+ * scene the analyst is in the room for. A case closes through one scene whose
+ * cards lead onto its result (its `_aftershock`); the scenes whose lead card
+ * goes there are the case's last decision on each path -- `_final`, the
+ * system route's final, the evidence turn. A bust on the scene before one of
+ * them used to play it without the analyst and land on the aftermath, so the
+ * case's ending was chosen by the room (getUnattendedNext). Marked `attended`,
+ * the run lands on it instead (caseRoutes.getBlackoutSkip), and the bust still
+ * costs what a bust costs. The finale's two decisions said so in their scene
+ * context already; this reads the rest off the graph, after the deal has named
+ * each scene's lead card.
+ */
+function markClosingDecisions(nodes) {
+  const closing = new Set(Object.entries(nodes).filter(([nodeId, scene]) => !RESULT_NODE_IDS.has(nodeId) && scene.choices.some((choice) => RESULT_NODE_IDS.has(choice.next))).map(([nodeId]) => nodeId));
+  for (const [nodeId, scene] of Object.entries(nodes)) {
+    if (closing.has(nodeId) || RESULT_NODE_IDS.has(nodeId)) continue;
+    const lead = scene.choices.find((choice) => choice.id === scene.leadChoiceId);
+    if (lead && closing.has(lead.next)) scene.attended = true;
+  }
+}
+
+/** Facts first, so a scene's own context can overrule them; the deal, then what reads the deal. */
 export function finishSceneGraph(nodes, nodeOrders) {
   stampSceneFacts(nodes, nodeOrders);
   tagRouteSplits(nodes);
   applySceneContext(nodes, nodeOrders);
   dealScenes(nodes);
+  markClosingDecisions(nodes);
   return nodes;
 }

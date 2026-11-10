@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import words from "../copy/adSlot.js";
+import { adSlotWords } from "./adSlotWords.js";
 
 /**
  * One AdSense unit, in a box of fixed height (출시 로드맵 2단계, draft).
@@ -13,7 +13,7 @@ import words from "../copy/adSlot.js";
  * fills, fails or is blocked, so nothing below it moves: 300 wide fits a
  * 360px phone inside the page's 16px gutters. The label is the one line a
  * screen reader hears before the ad's own frame. Nothing here animates.
- * Its words are src/copy/adSlot.js, in the page's language.
+ * Its words are src/ads/adSlotWords.js, in the page's language.
  * `hidden` keeps the box out of a screen where ads may not stand yet (the
  * prologue, an ending not yet read), so the screen need not branch.
  */
@@ -45,6 +45,7 @@ export function AdSlot({ placement, client, slot, hidden = false }) {
     }
   }, [client, hidden]);
   if (hidden) return null;
+  const words = adSlotWords();
   return (
     <aside className="ad-slot" aria-label={words.label} data-placement={placement} style={BOX}>
       <span style={LABEL}>{words.note}</span>

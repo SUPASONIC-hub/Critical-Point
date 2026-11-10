@@ -175,7 +175,8 @@ test("a phone on its side keeps the fold that prints the question and the cards 
  */
 test("a short phone gives a five-card hand under a rules line 20px without cutting a label", () => {
   const play = sheet("play");
-  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 760px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\),\s+\(min-width: 391px\) and \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const hiding = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
   const px = (rule, property) => Number(rule.match(new RegExp(`\\n\\s*${property}: (\\d+)px`))?.[1]);
 
   const hand = short.match(/\n {2}\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \{[^}]*\}/)?.[0] ?? "";
@@ -206,13 +207,34 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
   assert.doesNotMatch(short, /\.gx-card-label/);
   assert.match(play, /@media \(max-width: 719px\) \{[\s\S]*?\.gx-card-label \{[^}]*-webkit-line-clamp: 3;/);
   // The board is told by the rules line, as the situation board's rule tells it.
-  assert.match(short, /\.gx-active-rules ~ \.gx-situation \{\s*display: none;/);
+  assert.match(hiding, /\.gx-active-rules ~ \.gx-situation \{\s*display: none;/);
   const stage = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
   const read = stage.indexOf('<div className="gx-read">');
   const rules = stage.indexOf('className="gx-active-rules"');
   const head = stage.indexOf('<div className="gx-hand-head"');
   assert.ok(read > 0 && read < rules && rules < head, "the rules line is inside the column the hand follows");
   assert.match(readFileSync(new globalThis.URL("../../src/gauntlet/GauntletHand.jsx", import.meta.url), "utf8"), /className=\{`choices gx-hand hand-\$\{handSize\}`\}/);
+});
+
+/**
+ * A phone wider than 390 and 801 to 860 tall (411x846; a Pixel 7 is 412x839)
+ * takes the short phone's air -- the rules above, the one-line staked detail,
+ * the HUD's and the action bar's -- and nothing that hides a speaker: on
+ * 2026-11-10 the short-phone block itself, stretched to 860, hid the Pixel 7's
+ * portrait (tests/offline.spec.js).
+ */
+test("a 411x846 phone takes the short phone's air but keeps its portrait and question", () => {
+  const play = sheet("play");
+  const air = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\),\s+\(min-width: 391px\) and \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.ok(air, "the air block is written for both phones");
+  assert.match(air, /\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;/);
+  assert.match(air, /\.gx-actions button \{\s*min-height: 52px;/);
+  assert.doesNotMatch(air, /gx-portrait|display: none|gx-question|line-clamp|gx-scene/);
+  // What hides the portrait and cuts the question stays at 800 tall.
+  const hiding = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.match(hiding, /\.gx-portrait,/);
+  assert.match(hiding, /\.gx-question \{[^}]*-webkit-line-clamp: 2;/);
+  assert.equal(play.match(/\.gx-portrait,\n[^{]*\{\s*display: none;/g)?.length, 1, "the portrait is hidden in one place");
 });
 
 /**
@@ -322,4 +344,20 @@ test("the intro's board button glints twice and then rests (D-15)", () => {
   assert.match(pill, /animation: board-glow [^;]* 2;/);
   assert.match(sweep, /animation: board-shine [^;]* 2;/);
   assert.doesNotMatch(pill + sweep, /infinite/);
+});
+
+// The scene's sound is centred on its spot by `transform`. Written as the
+// separate `translate` property it was dropped from the build (2026-11-03),
+// and the word sat half its size right of and below the spot the plate chose,
+// past the panel's edge on every desk screen. The slam's first frame turns and
+// centres it the same way, or the word would jump as it lands.
+test("the scene's sound is centred in its transform, which the build keeps", () => {
+  const briefing = sheet("briefing");
+  const word = briefing.match(/\n\.gx-sfx \{[^}]*\}/)?.[0] ?? "";
+  assert.match(word, /transform: translate\(-50%, -50%\) rotate\(-9deg\);/);
+  assert.doesNotMatch(word, /\n {2}translate:/);
+  assert.match(briefing, /@keyframes gx-sfx-slam \{\s*from \{\s*opacity: 0;\s*transform: translate\(-50%, -50%\) rotate\(-9deg\) scale\(2\.4\);/);
+  for (const name of ["base-intro-ranking", "briefing", "comfort", "money", "plate", "play", "recovery", "relics", "responsive", "result"]) {
+    assert.doesNotMatch(sheet(name), /\n\s+(translate|rotate|scale): [^;]+;/, `${name}.css: a separate translate, rotate or scale property does not survive the build`);
+  }
 });

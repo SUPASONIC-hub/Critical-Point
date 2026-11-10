@@ -1,11 +1,16 @@
 // Dev-only listening page (music-lab.html, served by `npm run dev`; the build
 // never reaches it). Every score the game can play, one click each, plus the
-// table gauge that brings the stake's layers in, and a place to rate them.
-import { StrictMode, useEffect, useMemo, useState } from "react";
+// table gauge that brings the stake's layers in, the scene mood that picks the
+// lead and voices the table's drone, and a place to rate them.
+import { StrictMode, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { AdaptiveMusic, setMusicStake } from "../components/AdaptiveMusic.jsx";
+import { AdaptiveMusic, MUSIC_MOODS, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
 import { chapterMotifs, speakerMotifs } from "../components/musicData.js";
-import { createSceneMode, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
+import { createSceneMode, isCrackleFixOn, moodLeads, setCrackleFix, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
+import { startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
+
+const MOOD_NAMES = { neutral: "중립", bright: "밝음", tense: "긴장", dread: "공포", sorrow: "슬픔" };
 
 const NOTES_KEY = "critical-point-music-lab-notes";
 const CASES = Object.keys(chapterMotifs).filter((id) => /^case\d+$/.test(id));
@@ -60,10 +65,13 @@ function writeNotes(notes) {
   }
 }
 
-function describe(key) {
+function describe(key, mood, crackleFix) {
   const mode = createSceneMode(key);
   const bpm = Math.round(60000 / (mode.interval * 4));
-  return `${mode.label} · ${bpm} BPM · ${mode.wave} · drive ${mode.drive.toFixed(2)}`;
+  const leads = moodLeads(mode, mood);
+  const picks = mood === "sorrow" ? "슬픔 리드(많이 치름 선율을 단조로)" : `리드 ${leads.map((lead) => mode.leads.indexOf(lead) + 1).join("·")}번`;
+  const drone = DRONE_VOICINGS[mood];
+  return `${mode.label} · ${bpm} BPM · ${mode.wave} · drive ${mode.drive.toFixed(2)}${mode.bassPastDrive ? " · 베이스는 드라이브 밖" : ""}${crackleFix ? "" : " · 고치기 전"} · ${picks} · 드론 ${drone.voices.length}성 ×${drone.level}`;
 }
 
 function MusicLab() {
@@ -71,9 +79,35 @@ function MusicLab() {
   const [gauge, setGauge] = useState(0);
   const [notes, setNotes] = useState(readNotes);
   const [copied, setCopied] = useState(false);
+  const [mood, setMood] = useState("neutral");
+  const [droneOn, setDroneOn] = useState(false);
+  // 11-10: A/B the crackle fix on one passage. Toggling restarts the track from its first bar.
+  const [crackleFix, setCrackleFixState] = useState(isCrackleFixOn);
+  const gaugeRef = useRef(gauge);
 
-  useEffect(() => setMusicStake(gauge), [gauge]);
+  useEffect(() => {
+    gaugeRef.current = gauge;
+    setMusicStake(gauge);
+  }, [gauge]);
+  useEffect(() => {
+    setMusicMood(mood);
+  }, [mood]);
+  // The table's drone, as GauntletFx drives it: closeness from the gauge, ten times a second.
+  useEffect(() => {
+    if (!droneOn) return undefined;
+    const drone = startTensionDrone();
+    const timer = window.setInterval(() => drone.set(gaugeRef.current / 100), 100);
+    return () => {
+      window.clearInterval(timer);
+      drone.stop();
+    };
+  }, [droneOn]);
   useEffect(() => writeNotes(notes), [notes]);
+
+  function toggleCrackleFix(on) {
+    setCrackleFix(on);
+    setCrackleFixState(on);
+  }
 
   const index = ALL.findIndex((track) => track.key === current);
   const step = (offset) => setCurrent(ALL[(index + offset + ALL.length) % ALL.length].key);
@@ -99,13 +133,14 @@ function MusicLab() {
     <main style={styles.page}>
       <h1 style={{ margin: "0 0 4px" }}>음악 듣기</h1>
       <p style={styles.muted}>
-        곡 이름을 누르면 바로 바뀝니다. 장면 음악은 4마디(약 8~13초)마다 멜로디가 바뀌니 조금 오래 들어 보세요.
+        곡 이름을 누르면 바로 바뀝니다. 장면 음악은 4마디(약 8~13초)마다 멜로디가 바뀌니 조금 오래 들어 보세요. 분위기(mood)를
+        바꾸면 5초에 걸쳐 리드와 판 드론이 섞여 넘어갑니다(긴장 = 지금 그대로).
       </p>
 
       <section style={styles.bar}>
         <div>
           <strong>{current ? ALL[index].name : "곡을 고르세요"}</strong>
-          {current && <div style={styles.muted}>{describe(current)}</div>}
+          {current && <div style={styles.muted}>{describe(current, mood, crackleFix)}</div>}
         </div>
         <div style={styles.row}>
           <button type="button" onClick={() => step(-1)} disabled={!current}>
@@ -123,13 +158,30 @@ function MusicLab() {
           <input type="range" min="0" max="100" value={gauge} onChange={(event) => setGauge(Number(event.target.value))} />
           <span style={styles.muted}>층: {STAKE_LAYER_GAUGES.filter((g) => gauge >= g).length}/3 (25·45·65에서 하나씩)</span>
         </label>
+        <div style={styles.row} role="radiogroup" aria-label="분위기">
+          분위기
+          {MUSIC_MOODS.map((key) => (
+            <label key={key} style={styles.rating}>
+              <input type="radio" name="mood" checked={mood === key} onChange={() => setMood(key)} />
+              {MOOD_NAMES[key]} ({key})
+            </label>
+          ))}
+          <label style={styles.rating}>
+            <input type="checkbox" checked={droneOn} disabled={!current} onChange={(event) => setDroneOn(event.target.checked)} />
+            판 드론 듣기 (슬라이더 값이 가까움)
+          </label>
+        </div>
+        <label style={styles.row}>
+          <input type="checkbox" checked={crackleFix} onChange={(event) => toggleCrackleFix(event.target.checked)} />
+          지직거림 고침 (11-10) — 끄면 고치기 전 소리. 바꾸면 같은 곡이 첫 마디부터 다시 시작합니다
+        </label>
         <div style={styles.row}>
           <button type="button" onClick={copyNotes} disabled={!rated.length}>
             평가 {rated.length}개 복사
           </button>
           {copied && <span>복사됨 — 대화창에 붙여넣어 주세요</span>}
         </div>
-        {current && <AdaptiveMusic modeKey={current} />}
+        {current && <AdaptiveMusic key={crackleFix ? "fix" : "before"} modeKey={current} />}
       </section>
 
       {GROUPS.map((group) => (

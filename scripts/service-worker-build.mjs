@@ -36,8 +36,10 @@ import { DOCUMENT_PAGE } from "../src/serviceWorker/worker.js";
  *             a table is up. One size of the art, not three: the worker
  *             gives it to a screen that asked for another (`artVariants`).
  *             And the plain pages -- the privacy policy, the terms, the
- *             about, FAQ and contact pages (`DOCUMENT_PAGE`) -- so a device
- *             offline can still read what it agreed to and where to write.
+ *             about, FAQ and contact pages, the guide, the cast, the
+ *             making-of and the case files' index (`DOCUMENT_PAGE`; a case's
+ *             own page only once read) -- so a device offline can still read
+ *             what it agreed to and where to write.
  */
 export const WORKER_FILE = "sw.js";
 const PAGE_PATH = "/index.html";
@@ -61,6 +63,7 @@ export function pageWithoutCommit(html) {
 // the build: counted, a rebuild of the same commit the next day would be a
 // new release that every device downloads in full.
 const CRAWLER_FILES = new Set(["/robots.txt", "/sitemap.xml"]);
+const LANGUAGE_PAGE = /^\/[a-z]{2}\/index\.html$/;
 
 /**
  * Every file under `dir` but the page, the worker and the crawler's files, as
@@ -75,7 +78,9 @@ export function shippedFiles(dir) {
     .map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))
     .map((file) => [`/${path.relative(dir, file).replace(/\\/g, "/")}`, file])
     .filter(([name]) => name !== PAGE_PATH && name !== WORKER_PATH && !CRAWLER_FILES.has(name))
-    .map(([name, file]) => [name, digest(readFileSync(file))])
+    // The start page in English and Japanese (`/en/index.html`, since 11-03)
+    // is the page with other words, and carries the commit's line too.
+    .map(([name, file]) => [name, digest(LANGUAGE_PAGE.test(name) ? pageWithoutCommit(readFileSync(file, "utf8")) : readFileSync(file))])
     .sort(byName);
 }
 
@@ -109,6 +114,12 @@ export function releaseIdFor({ html, files = [], logic = "" }) {
 // silhouette in its place. Every name in the warm
 // list is bytes in `sw.js`, whose budget had room for one more.
 const WARM_ROOT = /^\/(?:portrait-(?:ban-jaeuk|do-yunha|echo|han-seoyun|oh-jinwoo)\.webp|[a-z0-9-]+-960\.webp|profile\.jpg)$/;
+
+// A case's own page (/cases/case01.html, scripts/content-pages/cases.mjs):
+// kept once it is read, like every plain page, but not fetched in the
+// warm-up -- 165 pages a player reads one at a time, if at all. The case
+// files' index is.
+const CASE_PAGE = /^\/(?:(?:en|ja)\/)?cases\/(?!index\.html$)[a-z0-9]+\.html$/;
 
 // The other languages' chunks (vite.config.js names them `locale-*`): only a
 // `?lang=<code>` page asks for them, so a Korean device is not made to fetch
@@ -162,7 +173,7 @@ export function workerConfigFor({ html, files, logic = "" }) {
   const first = new Set(precache);
   const warm = files
     .map(([file]) => file)
-    .filter((file) => !first.has(file) && !OTHER_LANGUAGES.test(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file) || DOCUMENT_PAGE.test(file)))
+    .filter((file) => !first.has(file) && !OTHER_LANGUAGES.test(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file) || (DOCUMENT_PAGE.test(file) && !CASE_PAGE.test(file))))
     .sort();
   return { release: releaseIdFor({ html, files, logic }), entry, precache, warm };
 }

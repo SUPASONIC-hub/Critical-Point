@@ -41,6 +41,10 @@ const epilogueCopy = {
   toll: {
     over: "{harm}{particle} 감당할 수 있는 선을 넘은 것으로 기록되었습니다.",
     worst: "가장 큰 피해가 난 곳은 {label} 「{title}」입니다. 그 사건 하나가 {harm} {value}{particle} 남겼습니다.",
+    // 개선 포인트 C4 (2026-11-05 초안): what the company gave while it held is
+    // taken back on the season's own numbers (getCollapseToll): the harm the
+    // closed cases summed to and its mean a case, cut as the standing line cuts them.
+    favours: "회사가 버틸 때 사람들 몫으로 주던 수당과 지원이 그 값 앞에서 가장 먼저 거둬집니다. 당신이 밀어붙여 쌓인 {harm}{particle} 모두 {total}, 사건마다 평균 {perCase}입니다.",
     paid: "그 값은 장부가 아니라, 당신의 판단을 기다리던 사람들이 치렀습니다.",
   },
 };
