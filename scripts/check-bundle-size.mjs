@@ -526,7 +526,8 @@ const budgets = [
   // 195,825 / 70,673 -> 195,799 / 70,663 on 2026-11-09, table-a11y-2 (E3 stage 2) after merging main ade608e5 (#481 studio-we-1109): #481's credit lines (src/credits.js) in the entry. Measured 195,795 / 70,659 in the e2e build, the plus 4.
   // 195,799 / 70,663 -> 195,799 / 70,661 on 2026-11-09, bundle 1109b: #482 #483 #487 over main 937d5170: the three together; only the chunk names it imports moved. Measured 195,795 / 70,657 in the e2e build, the plus 4.
   // 195,799 / 70,661 -> 195,799 / 70,667 on 2026-11-09, phone-heavy-bank over main c1d08daa (#488): no script changed; only the CSS file's name the entry carries. Measured 195,795 / 70,663 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 195_799, maxGzip: 70_667 },
+  // 195,799 / 70,667 -> 196,509 / 70,856 on 2026-11-10, music-tier-crackle over main e7ccb410: the bus's aligned dry path, the two tiers' bass past the drive and the music lab's before/after switch (musicScore.js CRACKLE_FIX_BEFORE). Measured 196,505 / 70,852 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 196_509, maxGzip: 70_856 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1936,7 +1937,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 434,919 / 492,851 / 500,415 (#489) and 434,597 / 492,551 / 500,080 (a32-411-fit) -> 434,929 / 492,863 / 500,426 on 2026-11-09, a32-411-fit after merging main f97f5079 (#489 pages-a11y-ld, #490): #489's JSON-LD in the start pages' heads with this branch's index CSS. Measured 434,925 / 492,859 / 500,422 in the e2e build, the plus 4.
 // 434,919 / 492,851 / 500,415 -> 434,954 / 492,886 / 500,449 on 2026-11-09, phone-heavy-bank over main d07a852b (#489): the index CSS line above. Measured 434,950 / 492,882 / 500,445 in the e2e build, the plus 4.
 // 434,929 / 492,863 / 500,426 (#493) and 434,954 / 492,886 / 500,449 (phone-heavy-bank) -> 434,945 / 492,876 / 500,438 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493) and main b4535e99: the index CSS line above and the critical CSS it regenerates. Measured 434,941 / 492,872 / 500,434 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 434_945, en: 492_876, ja: 500_438 };
+// 434,945 / 492,876 / 500,438 -> 435,146 / 493,077 / 500,640 on 2026-11-10, music-tier-crackle over main e7ccb410: the entry line above. Measured 435,142 / 493,073 / 500,636 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 435_146, en: 493_077, ja: 500_640 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
