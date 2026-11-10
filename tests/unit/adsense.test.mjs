@@ -102,3 +102,19 @@ test("the variables have no VITE_ prefix, so the bundle never sees them", () => 
   assert.doesNotMatch(config, /VITE_ADSENSE/);
   assert.doesNotMatch("google-adsense-account", WEB_AD_CODE_MARKERS, "verification is not ad code");
 });
+
+test("the ad box speaks every language the game does, from its own table and not the dictionaries", async () => {
+  const { AD_SLOT_WORDS, adSlotWords } = await import("../../src/ads/adSlotWords.js");
+  const { SUPPORTED_LOCALES } = await import("../../src/locale.js");
+  assert.deepEqual(Object.keys(AD_SLOT_WORDS).sort(), SUPPORTED_LOCALES.map(({ code }) => code).sort());
+  for (const [code, words] of Object.entries(AD_SLOT_WORDS)) {
+    assert.deepEqual(Object.keys(words), ["label", "note"], code);
+    assert.ok(words.note.startsWith(words.label === "Advertisement" ? "Ad" : words.label), `${code}: the note opens with the label`);
+    assert.equal(adSlotWords(code), words);
+  }
+  // A page whose dictionary never came is painted in Korean (appliedLocale), and so is the box.
+  assert.equal(adSlotWords(), AD_SLOT_WORDS.ko);
+  assert.equal(adSlotWords("xx"), AD_SLOT_WORDS.ko);
+  // Kept out of the dictionaries, so a build without ads carries the same English and Japanese chunks as main.
+  for (const language of ["en", "ja"]) assert.doesNotMatch(readFileSync(`src/locales/${language}/screens/index.js`, "utf8"), /adSlot/);
+});

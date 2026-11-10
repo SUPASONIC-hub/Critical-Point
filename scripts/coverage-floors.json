@@ -6,6 +6,7 @@
     "branches": 89
   },
   "files": {
+    "src/ads/adSlotWords.js": 100,
     "src/advancedSystems.js": 100,
     "src/analystTitle.js": 100,
     "src/appConfig.js": 96,
