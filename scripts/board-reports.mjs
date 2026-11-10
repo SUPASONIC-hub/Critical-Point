@@ -4,7 +4,8 @@
  *
  * The promise behind the report button (20261027000000_board_reports.sql,
  * 앱출시-H): the queue is read once a day and a report is acted on within 24
- * hours. Nothing hides a post by itself; a person reads the post and decides.
+ * hours. Three writers hide a post at once (20261103000000), and a person
+ * still reads it and decides.
  *
  * This repository is public, and so is every Job Summary and log it writes. So
  * nothing a player typed leaves the database here: no body, no nickname, no
@@ -20,7 +21,10 @@
  *   dismiss  delete its reports              the post stays, the queue is clear
  *
  * A report waits until its post is hidden or its reports are dismissed. A
- * report on a hidden post is done (a writer can only report a post they see).
+ * report on a hidden post is done (a writer can only report a post they see),
+ * except on a post the reports hid by themselves (three writers,
+ * 20261103000000): that one waits for a person like a visible one, marked
+ * 자동 숨김, until hide makes it final or restore brings it back for good.
  * Hiding keeps the reports, so restore deletes them: a post restored is one a
  * person read and kept, which is what dismiss says. Until 10-26 restore left
  * them, the post was back in the next morning's queue with its first report's
@@ -41,6 +45,8 @@ import { BOARD_REPORT_REASONS } from "../src/boardReport.js";
 
 /** The promise: acted on within this long. */
 export const DEADLINE_HOURS = 24;
+/** Distinct writers that hide a post by themselves (`board_auto_hide_writers`, unset). */
+export const AUTO_HIDE_WRITERS = 3;
 /** The reasons a report can carry (board_reports_reason_check), in the words the button uses. */
 export const REASON_NAMES = Object.fromEntries(BOARD_REPORT_REASONS.map((reason) => [reason.id, reason.label]));
 export const ACTIONS = ["hide", "restore", "dismiss"];
@@ -51,15 +57,17 @@ export const ACTIONS = ["hide", "restore", "dismiss"];
  */
 export const QUERY = `select p.id as post_id,
        p.hidden,
+       p.auto_hidden_at is not null as auto_hidden,
        to_char(p.created_at at time zone 'Asia/Seoul', 'YYYY-MM-DD') as posted_on,
        count(*)::int as reports,
        count(distinct r.actor_key)::int as writers,
        array_agg(distinct r.reason order by r.reason) as reasons,
-       extract(epoch from (now() - min(r.created_at)))::bigint as oldest_seconds
+       extract(epoch from (now() - min(r.created_at)))::bigint as oldest_seconds,
+       (count(*) filter (where r.created_at > now() - interval '7 days'))::int as reports_week
   from public.board_reports r
   join public.board_posts p on p.id = r.post_id
- group by p.id, p.hidden, p.created_at
- order by p.hidden, oldest_seconds desc
+ group by p.id, p.hidden, p.auto_hidden_at, p.created_at
+ order by (p.hidden and p.auto_hidden_at is null), oldest_seconds desc
  limit 200;`;
 
 /** The statement for one hand action. The id is checked here, before it is written into SQL. */
@@ -95,14 +103,25 @@ export function readQueue(rows) {
   const posts = rows.map((row) => ({
     postId: Number(row.post_id),
     hidden: asBool(row.hidden),
+    autoHidden: asBool(row.auto_hidden),
     postedOn: row.posted_on ?? "",
     reports: Number(row.reports) || 0,
     writers: Number(row.writers) || 0,
     reasons: asList(row.reasons),
     waitedHours: Math.floor((Number(row.oldest_seconds) || 0) / 3600),
+    reportsThisWeek: Number(row.reports_week) || 0,
   }));
-  const waiting = posts.filter((post) => !post.hidden);
-  return { waiting, overdue: waiting.filter((post) => post.waitedHours >= DEADLINE_HOURS), hidden: posts.filter((post) => post.hidden) };
+  // A post the reports hid by themselves still waits for a person.
+  const waiting = posts.filter((post) => !post.hidden || post.autoHidden);
+  return {
+    waiting,
+    overdue: waiting.filter((post) => post.waitedHours >= DEADLINE_HOURS),
+    hidden: posts.filter((post) => post.hidden && !post.autoHidden),
+    autoHidden: waiting.filter((post) => post.autoHidden),
+    // 미처리 신고: every report on a post that waits.
+    openReports: waiting.reduce((sum, post) => sum + post.reports, 0),
+    reportsThisWeek: posts.reduce((sum, post) => sum + post.reportsThisWeek, 0),
+  };
 }
 
 const reasonText = (reasons) => reasons.map((reason) => REASON_NAMES[reason] ?? reason).join(", ");
@@ -110,21 +129,30 @@ const reasonText = (reasons) => reasons.map((reason) => REASON_NAMES[reason] ?? 
 /** The Job Summary: a table of the posts that wait, and a line for the ones already hidden. */
 export function describeQueue(queue) {
   const lines = ["## 게시판 신고 대기열", ""];
+  const autoHidden = queue.autoHidden ?? [];
+  // Counts only: the repository is public.
+  lines.push(
+    `미처리 신고 **${queue.openReports ?? 0}건**(글 ${queue.waiting.length}개)` +
+      `${autoHidden.length ? `, 그 가운데 신고 ${AUTO_HIDE_WRITERS}명으로 자동 숨김된 글 **${autoHidden.length}개**(${autoHidden.map((post) => post.postId).join(", ")})` : ""}. ` +
+      `지난 7일 신고 ${queue.reportsThisWeek ?? 0}건.`,
+    "",
+  );
   if (queue.waiting.length === 0) {
     lines.push("기다리는 신고가 없습니다.");
   } else {
     lines.push(
       `기다리는 글 **${queue.waiting.length}개**${queue.overdue.length ? `, 그 가운데 **${queue.overdue.length}개는 ${DEADLINE_HOURS}시간을 넘김**` : ""}.`,
       "",
-      "| 글 번호 | 올린 날 | 신고 | 신고한 사람 | 사유 | 가장 오래 기다린 신고 |",
-      "|---|---|---|---|---|---|",
+      "| 글 번호 | 상태 | 올린 날 | 신고 | 신고한 사람 | 사유 | 가장 오래 기다린 신고 |",
+      "|---|---|---|---|---|---|---|",
       ...queue.waiting.map(
         (post) =>
-          `| ${post.postId} | ${post.postedOn} | ${post.reports} | ${post.writers} | ${reasonText(post.reasons)} | ${post.waitedHours}시간${post.waitedHours >= DEADLINE_HOURS ? " ⚠" : ""} |`,
+          `| ${post.postId} | ${post.autoHidden ? "자동 숨김" : "보임"} | ${post.postedOn} | ${post.reports} | ${post.writers} | ${reasonText(post.reasons)} | ${post.waitedHours}시간${post.waitedHours >= DEADLINE_HOURS ? " ⚠" : ""} |`,
       ),
       "",
       "본문은 Supabase 대시보드의 Table Editor → `board_posts`에서 `id`로 찾아 읽습니다(이 저장소는 공개라 여기에는 싣지 않습니다).",
       "그다음 이 워크플로를 Run workflow로 돌립니다: `action` = hide(내림) / dismiss(그대로 두고 신고를 지움) / restore(내린 글을 되돌림), `post_id` = 글 번호.",
+      "자동 숨김된 글은 hide(내린 채로 확정) 또는 restore(되돌림, 다시는 신고로 숨겨지지 않음)로 끝냅니다.",
     );
   }
   if (queue.hidden.length) lines.push("", `이미 내린 글 ${queue.hidden.length}개(${queue.hidden.map((post) => post.postId).join(", ")})의 신고는 끝난 것으로 셉니다. 글과 함께 180일 뒤 지워집니다.`);

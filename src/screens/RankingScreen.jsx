@@ -1,6 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
+import { hallOfFameBadges } from "../hallOfFameBadges.js";
 import { getLeaderboardStatusCopy } from "../ranking.js";
+import { fetchHallOfFame } from "../telemetry.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { reloadLeaderboard } from "../state/useLeaderboard.js";
 import words from "../copy/ranking.js";
@@ -27,6 +29,28 @@ export function RankingScreen({
   const headingRef = useRef(null);
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
+  }, []);
+  // This device's best of the table before, kept when the ranking key moved on
+  // (src/personalBests.js, fetched here so the entry chunk does not carry it;
+  // it moves a retired key's best first). Its own line, never a row: tables
+  // are not compared. A fetch that fails leaves the line out.
+  const [pastBest, setPastBest] = useState(null);
+  useEffect(() => {
+    import("../personalBests.js").then((module) => {
+      const best = module.takePastBest();
+      setPastBest(best && fill(words.pastBest, best));
+    }, () => {});
+  }, []);
+  // D2: the hall of fame's places, by run tag (public_hall_of_fame). A badge
+  // on a completed season's row, the player's own included; a fetch that
+  // fails, or a deployment with no server, shows none.
+  const [hallBadges, setHallBadges] = useState(() => new Map());
+  useEffect(() => {
+    let cancelled = false;
+    fetchHallOfFame().then(({ rows }) => !cancelled && setHallBadges(hallOfFameBadges(rows, words)), () => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
   const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
@@ -97,14 +121,16 @@ export function RankingScreen({
                   const vaultPerCase = Math.round(entry.summary?.gauntlet?.vault / entry.summary?.completedCaseCount);
                   return (
                   <div role="listitem" className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
-                    <span className="sr-only">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
+                    <span className="sr-only" data-testid="ranking-place">{fill(words.position, { position: entry.position })}{isCurrentRun ? words.mine : ""}</span>
                     <strong className="ranking-position" aria-hidden="true">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.headline}</b>
                       <span className="ranking-league-badge">{entry.league}</span>
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
-                      {entry.seasonComplete && <span className="season-complete-badge" aria-label={words.seasonCompleteLabel}>{words.seasonComplete}</span>}
+                      {/* A span's aria-label is not read (axe aria-prohibited-attr): the badge's words are shown, the record's name is said. */}
+                      {entry.seasonComplete && <span className="season-complete-badge"><span aria-hidden="true">{words.seasonComplete}</span><span className="sr-only">{words.seasonCompleteLabel}</span></span>}
+                      {entry.seasonComplete && hallBadges.get(entry.runTag)?.map((label) => <span className="ranking-hall-badge" key={label}>{label}</span>)}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{fill(words.meta, { case: entry.caseTitle, run: entry.runLabel, trigger: triggerLabels[entry.trigger] ?? triggerLabels.responsibility })}</small>
                     </div>
@@ -125,6 +151,7 @@ export function RankingScreen({
                       {entry.assistStory && <span className="ranking-assist">{words.story}</span>}
                       {entry.newGamePlus && <span className="ranking-assist" lang="en">NEW GAME+</span>}
                       {entry.collapsed && <span className="ranking-assist">{words.collapsed}</span>}
+                      {entry.pendingCheck && <span className="ranking-assist" title={words.pendingCheckTitle} data-testid="ranking-pending-check">{words.pendingCheck}</span>}
                     </div>
                   </div>
                   );
@@ -132,7 +159,10 @@ export function RankingScreen({
               </div>
             )}
           </section>
-          <p className="ranking-footnote">{words.footnote}</p>
+          {pastBest && (
+            <p className="ranking-footnote" data-testid="ranking-past-best">{pastBest}</p>
+          )}
+          <p className="ranking-footnote">{words.footnote} {words.hallFootnote}</p>
         </section>
       </main>
 );

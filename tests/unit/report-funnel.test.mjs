@@ -162,3 +162,16 @@ test("runs are read by the language their rows name, a run naming none is presum
 test("the query takes each row's language out of its summary and nothing else of it", () => {
   assert.match(QUERY, /jsonb_build_array\(s\.case_id, extract\(epoch from s\.completed_at\), s\.summary->>'locale'\)/);
 });
+
+test("the funnel's JSON for the run's artifact carries the summary's numbers and no device or row", async () => {
+  const { funnelJson } = await import("../../scripts/report-funnel.mjs");
+  const rows = [
+    { device: 7001, marked: false, new_game_plus: false, cases: through("prologue03", T0) },
+    { device: 7002, marked: false, new_game_plus: false, cases: [...through("final", T0), ["season-final", T0 + 54 * 600 + 60]] },
+  ];
+  const json = funnelJson(rows, NOW);
+  assert.deepEqual(json.funnel, readFunnel(rows, NOW), "the same numbers the Markdown is written from");
+  const text = JSON.stringify(json);
+  assert.ok(!/"device"/.test(text) && !/700[12]/.test(text), "no device, not even its rank");
+  assert.ok(!/"cases"|"times"|"firstAt"|"lastAt"/.test(text), "no row and no run's own times");
+});

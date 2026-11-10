@@ -1,18 +1,17 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
-import { getTabToken, STORAGE_KEY } from "../appConfig.js";
+import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
-  drawStep,
   equipRelic,
   FOCUS_MAX,
   FOCUS_MODES,
   GAUGE_MAX,
   REFRAME_CARD_ID,
+  getBoardMark,
   getHandBonus,
   LOCK_CAP,
-  lockpickOpensSeal,
   readRoomCards,
   scoreFocus,
   splitOpenSeed,
@@ -21,14 +20,14 @@ import {
   getTableSchema,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
-import { isClosingScene } from "./holdConfirm.js";
+import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeStakedDetail, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
-import { useTabTitle } from "../state/tabTitle.js";
-import { listOfferedTypes } from "./logicStreak.js";
+import { useTableTabTitle } from "./tableTabTitle.js";
+import { listOfferedDirections } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
@@ -41,7 +40,6 @@ import {
   playPushCue,
   playRelicDealCue,
   playRelicEquipCue,
-  playRelicProcCue,
 } from "./gauntletAudio.js";
 import { RelicDraft } from "./RelicDraft.jsx";
 import { useActCard } from "./ActCardFold.jsx";
@@ -57,12 +55,14 @@ import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
+
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
 const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
-// The table's words (src/copy/table.js). Tab drafts (개선 포인트 A3): a cold table leaves the tab as index.html has it.
-const { stage: say, keys: keyWords, tab: tabWords } = tableCopy;
-const TAB_TITLES = { hot: () => tabWords.hot, critical: (gauge) => fill(tabWords.critical, { gauge }) };
+// The table's words (src/copy/table.js); the tab's are in src/copy/tabTitles.js (tableTabTitle.js).
+const { stage: say, keys: keyWords } = tableCopy;
+/** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
+const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather };
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -88,13 +88,14 @@ export function GauntletStage({
   onResolve,
   onTouch,
   onPickRelic,
+  onSpendAtDraft = null,
   onSuspendable = null,
   staleSave = false,
   onReload,
   scene,
 }) {
   const schema = getTableSchema(run);
-  const tabToken = getTabToken();
+  const tabToken = takeTabToken();
   // Read once, at mount: a save that already names this window means a bet was
   // placed on it and never settled. If this tab placed it, this is a reload and
   // the bet settles as a bust at once. If another tab holds it, that tab may
@@ -116,11 +117,10 @@ export function GauntletStage({
   const [equipped, setEquipped] = useState(null);
   // The offered relic waiting for a slot: with the slots full, taking one asks what to put down.
   const [swapFor, setSwapFor] = useState(null);
-  const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
   const stageRef = useRef(null);
-  // The bank rail's head, where the slam's amount flies to (moneyFeedback.js).
+  // The KD은행 계좌, where the slam's amount flies to (moneyFeedback.js).
   const purseRef = useRef(null);
   // The window this table was dealt on. Once the settle has written the next
   // one the run under this table has the hand in it already, and the purse
@@ -150,10 +150,10 @@ export function GauntletStage({
   const [openedSeed, setOpenedSeed] = useState(null);
   // The briefing's reading, which it reports and openTable notes (D-11, state/readingTally.js).
   const readingRef = useRef(null);
-  const trackReading = (seconds, held) => {
+  const trackReading = (seconds, held, clock) => {
     const page = (readingRef.current ??= { seconds: 0, held: false });
     page.seconds += seconds;
-    if (held) page.held = true;
+    Object.assign(page, held && { held: true }, clock > 0 && { clock });
   };
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
@@ -181,8 +181,8 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
-  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount });
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout,
+  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   const settleImpact = useMemo(
@@ -199,7 +199,7 @@ export function GauntletStage({
   // The types on the table, as the settlement will be handed them (useChoiceCommit).
   const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
+  const offered = useMemo(() => listOfferedDirections(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
     breach, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
     cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic, clockHeat,
@@ -224,7 +224,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && !win.scouted;
+  const canScout = scoutOn && live && !paused && !locked && !win.scouted && canPayScout;
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
@@ -340,31 +340,28 @@ export function GauntletStage({
   }, [live, claimed]);
 
   /**
-   * Takes a drafted relic, or passes with null. The window on the table has not
-   * been touched -- the draft holds the clock -- so it is re-dealt at once under
-   * the rules the relic bends, from the same pure function the runtime saves.
-   * With the slots full the engine takes nothing until a relic is put down
-   * (`dropId`), so the first answer only opens the swap step.
+   * Takes a drafted relic, or passes with null. The window has not been touched
+   * -- the draft holds the clock -- so it is re-dealt at once under the rules the
+   * relic bends, from the pure function the runtime saves. Slots full, the engine
+   * takes nothing until a relic is put down (`dropId`): a relic not taken opens
+   * the swap step. A draft that bought one more (C9) keeps the other two on offer
+   * after a take, which is no swap. The two buys pay through `onSpendAtDraft`
+   * (GameRuntime's spendAtDraft; the draft and the keys hand it the kind).
    */
   function pickRelic(relicId, dropId = null) {
     if (!draftOpen) return;
     if (relicId) {
       const next = equipRelic(run, relicId, dropId);
-      if (next.relicOffer.length) {
-        setSwapFor(relicId);
-        return;
-      }
+      if (!next.relics.includes(relicId)) return setSwapFor(relicId);
       dispatch({ type: "REDEAL", schema: getTableSchema(next) });
       playRelicEquipCue();
       setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1, dropped: dropId }));
+    } else {
+      // 「숨 고르기」 (C-7): the pass deals this board again with more clock and a further wall.
+      dispatch({ type: "REDEAL", schema: getTableSchema(equipRelic(run, null)) });
     }
     setSwapFor(null);
     onPickRelic(relicId, dropId);
-  }
-
-  function pulseRelic(id) {
-    playRelicProcCue();
-    setRelicPulse((previous) => ({ id, n: (previous?.n ?? 0) + 1 }));
   }
 
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
@@ -408,11 +405,7 @@ export function GauntletStage({
   function push() {
     if (locked || draftOpen || !canPush) return;
     const pushIndex = win.pushes + 1;
-    const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
     dispatch({ type: "PUSH" });
-    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, nextGauge)) {
-      pulseRelic("lockpick");
-    }
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
     setImpact({ amount: 0.28 });
   }
@@ -420,7 +413,6 @@ export function GauntletStage({
   function pushToSafe() { // 안전선까지 (C-5): the pushes no wall can stop, at once, as the same PUSH events (tableAfterword.js readSafeLine).
     if (locked || draftOpen || !canPush || !safe.pushes) return;
     for (let n = 0; n < safe.pushes; n += 1) dispatch({ type: "PUSH" });
-    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, safe.gauge)) pulseRelic("lockpick");
     playPushCue(win.pushes + safe.pushes, Math.min(1, win.gauge / 90));
     setImpact({ amount: 0.28 });
   }
@@ -444,30 +436,28 @@ export function GauntletStage({
     dispatch({ type: "CASH", locked: sealedLock });
   }
 
-  // The scene that closes the case is confirmed by a hold or a second press,
-  // not a click (holdConfirm.js); every other table cashes as it always did.
-  const holdsCash = isClosingScene(scene.node);
-  const cashHold = useHoldConfirm({ enabled: holdsCash && canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  // The case's last choice and a table in the danger zone confirm by a 0.6s hold (holdConfirm.js); every other table cashes on a click.
+  const cashHold = useHoldConfirm({ node: scene.node, gauge: win.gauge, wallMin: band.wallMin, canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  const holdsCash = cashHold.holds;
   // Short enough for the dock's 108px on a 360px phone; the full sentence is the button's description.
-  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : !holdsCash ? say.commit : cashHold.phase === "armed" ? say.oneMore : say.holdToCommit;
+  const holdLabel = { hinted: say.holdHint, armed: say.oneMore }[cashHold.phase] ?? say.holdToCommit;
+  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : holdsCash ? holdLabel : say.commit;
 
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
     select, focus: lockOn ? focus : null, push, safe: pushToSafe, cash, cashHold: holdsCash && canCash ? cashHold : null,
     cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
-    cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null),
+    cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null), spendAtDraft: onSpendAtDraft,
     briefingOpen, tableOpen, openTable,
   });
 
+  const boardMark = getBoardMark(schema);
   const bandLeft = (band.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((band.wallMax - band.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
   const heatTier = win.status === "bust" ? "bust" : win.gauge >= band.wallMin ? "critical" : win.gauge >= band.wallMin - schema.stepMax ? "hot" : "cold";
-  // The tab says what the table shows (tabTitle.js): never the hidden wall. A
-  // bust stays on it until the next table opens; the briefing leaves it be.
-  const busted = win.status === "bust" && win.cause !== "abandon";
-  const tabTitle = busted ? tabWords.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
-  useTabTitle("table", tabTitle, { rank: 1, keep: busted });
+  // The tab counts to the band, and holds a bust until the next table opens (tableTabTitle.js).
+  useTableTabTitle({ win, band, schema, tableOpen, live });
   // On a closed window the purse shows what the settle will leave.
   const settling = !live && claimed && run?.windowIndex === dealtIndex;
 
@@ -494,9 +484,12 @@ export function GauntletStage({
             pane and the hand is the right one, so the table is as tall as the
             taller of the two rather than their sum. */}
         <div className="gx-read">
-        <div className="gx-hud">
+        <div className={`gx-hud${audit ? " has-audit" : ""}`}>
           <div className="gx-pot" aria-live="off">
-            <span className="gx-label">{say.pot}</span>
+            {/* 「고점 판」 (C-10) and 「숨 고르기」 (C-7) name the board in the label's place: no line more on a phone. */}
+            <span className={`gx-label${boardMark ? ` gx-mark-${boardMark}` : ""}`} data-testid="gauntlet-board-mark" data-mark={boardMark ?? undefined}>
+              {BOARD_MARK_LABELS[boardMark] ?? say.pot}
+            </span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
               {win.status === "bust" ? 0 : formatNumber(livePot)}
             </strong>
@@ -513,8 +506,6 @@ export function GauntletStage({
             </span>
           </div>
           <div className="gx-bank">
-            {/* The money first and largest (money-feedback, MoneyBurst.jsx). */}
-            <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
@@ -527,11 +518,11 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
-            <RelicChips relics={relics} pulse={relicPulse} />
+            <RelicChips relics={relics} />
           </div>
           {/* Rendered or not, never `hidden`: both signals set their own display,
               and the row's padding would stand over nothing. */}
@@ -554,6 +545,7 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
@@ -804,16 +796,16 @@ export function GauntletStage({
         >
           <span>{cashLabel}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
+          {holdsCash && <HoldGauge phase={cashHold.phase} />}
         </button>
-        {/* Outside the button, so neither is read into its name. The second is
-            what a press that did not hold says: one more confirms. */}
+        {/* Outside the button, so neither is read into its name. */}
         {holdsCash && <span id="gx-cash-hold" className="sr-only">{say.holdHelp}</span>}
         {audit && <span id="gx-audit-detail" className="sr-only">{audit.spoken}</span>}
       </div>
 
       {act.card}
       {draftOpen && (
-        <RelicDraft offer={relicOffer} owned={relics} swapFor={swapFor} onPick={pickRelic} onBack={() => setSwapFor(null)} onSkip={() => pickRelic(null)} />
+        <RelicDraft offer={relicOffer} owned={relics} swapFor={swapFor} run={run} onSpend={onSpendAtDraft} onPick={pickRelic} onBack={() => setSwapFor(null)} onSkip={() => pickRelic(null)} />
       )}
 
       {briefingOpen && (
@@ -838,12 +830,17 @@ export function GauntletStage({
         />
       )}
 
+      {/* The KD은행 계좌, pinned over every phase of the window: after the
+          briefing page and the draft in the markup, so it is drawn over them
+          where they meet (MoneyBurst.jsx, money.css). */}
+      <BankPurse purseRef={purseRef} run={run} win={win} settling={settling} livePot={livePot} bustKeeps={bustKeeps} />
+
       <TableNotices
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         caseId={scene.node.caseId}
-        // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
+        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

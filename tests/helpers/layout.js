@@ -94,13 +94,14 @@ export async function measureStakedTable(page) {
  * given. The save is written from a static page on the same origin: leaving the
  * table persists its live state on the way out, which would overwrite a save
  * written while it was still open. The briefing page is closed so the table
- * is read, not the page.
+ * is read, not the page. `run` writes more of the run's numbers (the vault,
+ * busts, best multiplier) the same way, for a bank row as late in a season.
  */
-export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0 } = {}) {
+export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0, run = {} } = {}) {
   await startDebugNode(page, caseId, nodeId);
   const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   await page.goto("/profile.jpg");
-  save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), ...schema }, relics, relicOffer: [], runPot, streak, openSeed: null };
+  save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), ...schema }, relics, relicOffer: [], runPot, streak, ...run, openSeed: null };
   await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
   await page.goto("/");
   await page.locator(".choices .choice").first().waitFor();

@@ -13,10 +13,10 @@ const say = tableCopy.ledger;
 /**
  * The case's table record: what went into the vault, what the walls took, and
  * the hottest pot cashed. Rebuilt from the log, which is what a resumed save
- * restores. On an audit week (B3) the sentence under it gains one more, how
- * many marks the case closed with (auditRisk.js).
+ * restores. In a case that counts the audit (B3) the sentence under it gains
+ * one more, how many marks the case closed with (auditRisk.js).
  */
-export function GauntletLedger({ log = [], summary = null }) {
+export function GauntletLedger({ log = [], summary = null, caseId = null }) {
   const ledger = createGauntletLedger(log);
   const vault = Number(summary?.vault) || 0;
   const relics = normalizeRelicIds(summary?.relics);
@@ -26,7 +26,7 @@ export function GauntletLedger({ log = [], summary = null }) {
     : ledger.cashes > 0
       ? say.clean
       : say.unplayed;
-  const audit = describeAuditLedger(log, summary?.weekRule);
+  const audit = describeAuditLedger(log, summary, caseId);
   return (
     <section className="pressure-ledger" aria-label={say.title}>
       <div className="panel-title-row">

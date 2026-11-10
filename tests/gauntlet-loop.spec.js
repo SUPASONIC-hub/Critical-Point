@@ -4,8 +4,8 @@ import { CASE_RESULT_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
-import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { easyCognitionLabels } from "../src/playerLanguage.js";
+import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
+import { getDirectionName } from "../src/gauntlet/tableReadout.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -47,28 +47,29 @@ async function pushUntilBust(page) {
 }
 
 /**
- * Four scenes of 사건 01 in a row, read off the graph: one type of card is on
- * the table in each of the first three (the card to hold the type with), and
- * in the fourth it is there beside a card of another type. The cards are
- * found by their words, not their place: the hand is dealt shuffled.
+ * Four scenes of 사건 01 in a row, read off the graph: a card leaning one way
+ * (사람 or 자리, C-3) is on the table in each of the first three (the card to
+ * hold the direction with), and in the fourth it is there beside a card
+ * leaning the other way. The cards are found by their words, not their place:
+ * the hand is dealt shuffled.
  */
 function findStreakWalk(caseId = "case01") {
   const results = new Set(Object.values(CASE_RESULT_NODES));
   const playable = (node) => (node?.choices ?? []).filter((choice) => choice.type !== "reframe" && !choice.requiredAuthority);
   for (const startId of nodeOrders[caseId]) {
-    for (const type of Object.keys(easyCognitionLabels)) {
+    for (const type of LOGIC_DIRECTIONS) {
       const held = [];
       let nodeId = startId;
       while (held.length < 3) {
-        const card = playable(nodes[nodeId]).find((choice) => getLogicType(choice) === type && !results.has(choice.next) && nodes[choice.next]?.caseId === caseId);
+        const card = playable(nodes[nodeId]).find((choice) => getLogicDirection(choice) === type && !results.has(choice.next) && nodes[choice.next]?.caseId === caseId);
         if (!card) break;
         held.push({ nodeId, label: card.label });
         nodeId = card.next;
       }
       const last = playable(nodes[nodeId]);
-      const same = last.find((choice) => getLogicType(choice) === type);
-      const other = last.find((choice) => getLogicType(choice) !== type);
-      if (held.length === 3 && same && other) return { caseId, type, held, last: { nodeId, same: same.label, other: other.label, otherType: getLogicType(other) } };
+      const same = last.find((choice) => getLogicDirection(choice) === type);
+      const other = last.find((choice) => LOGIC_DIRECTIONS.includes(getLogicDirection(choice)) && getLogicDirection(choice) !== type);
+      if (held.length === 3 && same && other) return { caseId, type, held, last: { nodeId, same: same.label, other: other.label, otherType: getLogicDirection(other) } };
     }
   }
   return null;
@@ -82,7 +83,8 @@ async function cashForStreak(page) {
   await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  // 사건 01 has no rule left to introduce, so the ledger is behind 자세히.
+  // A case with no rule left to introduce keeps the ledger behind 자세히; 사건 01 opens OVERCLOCK
+  // since C-4 and shows it open (`openRevealDetails` asks either way).
   await openRevealDetails(page);
   return page.getByTestId("consequence-ledger").locator("article", { hasText: "논리 콤보" }).locator("b");
 }
@@ -94,22 +96,23 @@ async function nextScene(page, nodeId) {
   await expect(page.getByTestId("commit-push")).toBeEnabled({ timeout: TRANSITION_TIMEOUT_MS });
 }
 
-test("three cards of one type in a row grow the logic streak and the pot shows what it pays; another type with no rise in pressure ends it; LOCK costs clock", async ({ page }) => {
+test("three cards of one direction in a row grow the logic streak and the pot shows what it pays; the other direction with no rise in pressure ends it; LOCK costs clock", async ({ page }) => {
   test.setTimeout(180_000);
   const walk = findStreakWalk();
-  expect(walk, "사건 01 still has four scenes in a row that deal one type").not.toBeNull();
-  const typeName = easyCognitionLabels[walk.type];
+  expect(walk, "사건 01 still has four scenes in a row that deal one direction").not.toBeNull();
+  // "사람 쪽" or "자리 쪽": the tag prints the word, and " 쪽" for a reader and a wider card.
+  const typeName = `${getDirectionName(walk.type)} 쪽`;
   const line = page.getByTestId("gauntlet-logic");
   const bonus = page.getByTestId("gauntlet-logic-bonus");
   await openTable(page, walk.caseId, walk.held[0].nodeId);
 
-  // Before a card is staked: nothing held, nothing paid, and every card says its type.
+  // Before a card is staked: nothing held, nothing paid, and every card says its direction.
   await expect(line).toHaveAttribute("data-streak", "0");
   await expect(line).toContainText("콤보 0");
   await expect(bonus).toHaveCount(0);
   const cards = page.locator(".choices .choice");
   await expect(cards.getByTestId("card-type")).toHaveCount(await cards.count());
-  await expect(cardOf(page, walk.held[0].label)).toHaveAccessibleName(new RegExp(`유형 ${typeName}`));
+  await expect(cardOf(page, walk.held[0].label)).toHaveAccessibleName(new RegExp(`방향 ${typeName}`));
 
   // The first two build the hold: 1/3, 2/3. The pot is not paid for them yet.
   for (const [index, scene] of walk.held.slice(0, 2).entries()) {
@@ -126,7 +129,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   const third = cardOf(page, walk.held[2].label);
   await expect(third.getByTestId("card-type")).toHaveAttribute("data-move", "grow");
   await expect(third.getByTestId("card-type")).toHaveClass(/is-on/);
-  await expect(third).toHaveAccessibleName(new RegExp(`유형 ${typeName} ?\\(콤보 이어 감\\)`));
+  await expect(third).toHaveAccessibleName(new RegExp(`방향 ${typeName} ?\\(콤보 이어 감\\)`));
   await third.click();
   await expect(line).toHaveAttribute("data-streak", "1");
   await expect(line).toContainText("3/3");
@@ -134,7 +137,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   await expect(bonus).toHaveText("콤보 1.06");
   await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(new RegExp(`논리 콤보 1, 배율 1\\.06배\\. ${typeName} 3/3\\. 이 카드로 이어 감`));
   await expect(page.getByTestId("commit-confirm")).toHaveAccessibleDescription(/논리 콤보 1, 배율 1\.06배/);
-  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}[을를] 이어 갔다\\. 논리 콤보 1, 배율 ×1\\.06\\.$`));
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}을 이어 갔다\\. 논리 콤보 1, 배율 ×1\\.06\\.$`));
   await expect(page.locator(".gx-reveal-gain")).toContainText("× 콤보 1.06");
   let saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.logic).toMatchObject({ streak: 1, best: 1, type: walk.type, held: 3 });
@@ -144,7 +147,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   expect([saved.log.at(-1).tempoBonus, saved.log.at(-1).threshold.tempo], "neither line an older build wrote is written").toEqual([undefined, undefined]);
   await nextScene(page, walk.last.nodeId);
 
-  // The fourth scene: the held type would grow it again, another type ends it -- the last three closed cold, so nothing rose.
+  // The fourth scene: the held direction would grow it again, the other ends it -- the last three closed cold, so nothing rose.
   await expect(line).toHaveAttribute("data-streak", "1");
   await expect(line).not.toContainText("전환 가능");
   await expect(bonus).toHaveText("콤보 1.06");
@@ -167,7 +170,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   expect(await clockOf(page)).toBeLessThanOrEqual(before - 3);
   await expect(page.locator(".gx-grade, .gx-beat-ring")).toHaveCount(0);
 
-  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^열기가 오르지 않았는데 ${easyCognitionLabels[walk.last.otherType]}(으)?로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^열기가 오르지 않았는데 ${getDirectionName(walk.last.otherType)} 쪽으로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
   saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.logic).toMatchObject({ streak: 0, best: 1, type: walk.last.otherType, held: 1 });
   expect(saved.log.at(-1).threshold.logic).toMatchObject({ move: "break", streak: 0, bonus: 1, pot: 0 });
@@ -210,6 +213,83 @@ test("the briefing's open button and the draft's pass button take a pointer", as
   await expect(page.getByTestId("relic-draft")).toHaveCount(0);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics).toEqual([]);
 });
+
+// C-7: passing on a draft that offered something is 「숨 고르기」, and the board says so.
+test("passing on the draft is 「숨 고르기」: the case's first board has 10 seconds more and a further wall", async ({ page }) => {
+  await closeCaseOneIntoDraft(page);
+  const before = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.schema;
+  await expect(page.getByTestId("relic-skip")).toContainText("숨 고르기 · +10초");
+  await page.getByTestId("relic-skip").click();
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("숨 고른 판");
+  const after = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.schema;
+  expect([after.seconds, after.wallMin, after.wallMax]).toEqual([before.seconds + 10, before.wallMin + 3, before.wallMax + 3]);
+  expect(after.mutations).toContain("breather");
+});
+
+// C-10: an act's last case deals 「고점 판」, said on its first page and on every board of it.
+test("an act's last case is 「고점 판」: the briefing says it and the board is marked", async ({ page }) => {
+  await startDebugNode(page, "case07", "c7_start", { openTable: false });
+  await expect(page.getByTestId("unlock-intro")).toContainText("PEAK TABLE · 고점 판");
+  await expect(page.getByTestId("unlock-intro")).toContainText("벽이 5 가까워지고 칩이 1.25배");
+  await page.getByTestId("open-table").click();
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("고점 판");
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveAttribute("data-mark", "peak");
+  await startDebugNode(page, "case06", "c6_start");
+  await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
+});
+// C9 (11-30): the KD은행 계좌 pays at the draft. The vault a fresh case01
+// close leaves is too small for either buy, so the save is given one and
+// reloaded on the draft, which a reload keeps.
+for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 }]) {
+  test(`the draft's reroll and one more pay out of the vault at once, and say why when they cannot, at ${viewport.width}x${viewport.height} @once`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await closeCaseOneIntoDraft(page);
+    const draft = page.getByTestId("relic-draft");
+    // With what the close banked, neither buy can pay: both stay, off, with the reason.
+    for (const id of ["relic-reroll", "relic-extra"]) {
+      await expect(draft.getByTestId(id)).toHaveAttribute("aria-disabled", "true");
+      await expect(draft.getByTestId(id)).toHaveAccessibleDescription("잔액 부족");
+    }
+    const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    // Seeded on the reload itself, before the app reads the save: the page going
+    // away writes the run it holds (useWindowSuspension's pagehide save), and a
+    // save written here first got the close's own small vault put back over it.
+    await page.addInitScript(({ key, value }) => {
+      if (sessionStorage.getItem("e2e-draft-vault-seeded")) return;
+      sessionStorage.setItem("e2e-draft-vault-seeded", "1");
+      localStorage.setItem(key, value);
+    }, { key: TEST_STORAGE_KEYS.save, value: JSON.stringify({ ...saved, dynamics: { ...saved.dynamics, vault: 30000 } }) });
+    await page.reload();
+    await expect(draft).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    const first = await draft.getByTestId("relic-option").evaluateAll((cards) => cards.map((card) => card.dataset.relic));
+
+    await draft.getByTestId("relic-reroll").click();
+    await expect(draft.getByTestId("relic-reroll")).toHaveAccessibleDescription("이번 사건에 사용함");
+    const rerolled = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    expect(rerolled.dynamics.vault).toBe(26000);
+    expect(rerolled.dynamics.relicDraft.reroll.offer).toEqual(rerolled.dynamics.relicOffer);
+    expect(rerolled.dynamics.relicOffer).not.toEqual(first);
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −4,000");
+
+    await page.keyboard.press("b");
+    await expect(draft.getByTestId("relic-spend")).toBeVisible();
+    // A draft that paid for 하나 더 gets no 숨 고르기 on a pass (2026-11-05 decision): the pass button promises nothing.
+    await expect(draft.getByTestId("relic-skip")).toHaveText("고르지 않고 진행");
+    await draft.getByTestId("relic-option").first().click();
+    await expect(draft.getByTestId("relic-option")).toHaveCount(2);
+    await expect(draft.getByRole("heading")).toHaveText("하나 더 고르기");
+    await draft.getByTestId("relic-option").first().click();
+    await expect(draft).toHaveCount(0);
+    const done = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    expect(done.dynamics.vault).toBe(30000 - 4000 - 12000);
+    expect(done.dynamics.seasonSpent).toBe(16000);
+    expect(done.dynamics.relics).toHaveLength(2);
+    expect(done.dynamics.relicDraft.picked).toEqual(done.dynamics.relics);
+    // Nothing on the page is wider than the screen while the draft was up (360px: the two buys side by side).
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
 
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -366,11 +446,15 @@ test("the play header keeps its title between a phone's width and the table's", 
         padRight: Number.parseFloat(getComputedStyle(document.querySelector(".game-header")).paddingRight),
         toolsRight: Math.round(box(".game-header .top-actions").right),
         musicLeft: Math.round(box(".music-controls").left),
+        // From 1025px the KD은행 계좌 is a box left of the music controls, and the header keeps its room too.
+        account: innerWidth >= 1025 ? { left: Math.round(box(".kd-account").left), width: Math.round(box(".kd-account").width) } : null,
       };
     });
-    expect(header.padRight, `${width}px: room reserved for the music controls`).toBeLessThanOrEqual(112);
-    expect(header.toolsRight, `${width}px: the header tools run under the music controls`).toBeLessThanOrEqual(header.musicLeft);
-    expect(header.musicLeft - header.toolsRight, `${width}px: dead room between the tools and the music controls`).toBeLessThanOrEqual(24);
+    const corner = header.account ? header.account.left : header.musicLeft;
+    const reserved = header.account ? 112 + header.account.width + 12 : 112;
+    expect(header.padRight, `${width}px: room reserved for the music controls (and the account box)`).toBeLessThanOrEqual(reserved);
+    expect(header.toolsRight, `${width}px: the header tools run under the corner's controls`).toBeLessThanOrEqual(corner);
+    expect(corner - header.toolsRight, `${width}px: dead room between the tools and the corner's controls`).toBeLessThanOrEqual(24);
   }
 });
 
@@ -557,7 +641,125 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await expect(page.getByTestId("gauntlet-purse-change")).toHaveClass(/is-down/);
   await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(/^▼ −[\d,]+$/);
   await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+
+  // And a cash's verdict under reduced motion (2026-11-03): the big ×N and the
+  // +N under it are printed where they land and do not move -- no pop, no
+  // flight, nothing running in the slam while it is up.
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const cashed = page.locator(".gx-slam-cashed");
+  await expect(cashed).toBeVisible();
+  await expect(cashed.locator("strong").first()).toHaveCSS("animation-name", "none");
+  await expect(page.getByTestId("gauntlet-burst")).toHaveText(/^\+[\d,]+$/);
+  await expect(page.getByTestId("gauntlet-burst")).toHaveCSS("animation-name", "none");
+  expect(await cashed.evaluate((slam) => slam.getAnimations({ subtree: true }).map((motion) => motion.animationName ?? "transition"))).toEqual([]);
 });
+
+// The cash's side under reduced motion: the bust's −N is held still above, and
+// the purse's landing pop on a cash (gx-purse-land) went unasserted until the
+// 2026-11-03 audit. Neither the +N nor the purse's amount moves.
+test("under reduced motion a cash's amount and the purse it lands in stand still", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const burst = page.getByTestId("gauntlet-burst");
+  await expect(burst).toHaveText(/^\+[\d,]+$/);
+  await expect(burst).toHaveCSS("animation-name", "none");
+  await expect(page.getByTestId("gauntlet-purse")).toHaveClass(/is-landing is-up/);
+  const total = page.getByTestId("gauntlet-purse-total");
+  await expect(total).toHaveCSS("animation-name", "none");
+  expect(await total.evaluate((element) => element.getAnimations().length), "no animation runs on the purse's amount").toBe(0);
+});
+
+// The KD은행 계좌 (2026-11-04): the balance pinned through the briefing page,
+// the table and the settle -- a band across the top of a 360px phone, a box
+// in the top-right corner at 1280px -- never under a layer, never wider than
+// the screen, and always the run's stake and vault together.
+/** Where the account is drawn, whether it is the thing at its own centre, and whether it fits. */
+async function readAccount(page) {
+  return page.getByTestId("gauntlet-purse").evaluate((account) => {
+    const box = account.getBoundingClientRect();
+    const total = account.querySelector('[data-testid="gauntlet-purse-total"]').getBoundingClientRect();
+    const hit = document.elementFromPoint(total.left + total.width / 2, total.top + total.height / 2);
+    return {
+      box: { x: box.left, y: box.top, right: box.right, bottom: box.bottom },
+      onTop: Boolean(hit && account.contains(hit)),
+      fits: account.scrollWidth <= account.clientWidth + 1 && document.documentElement.scrollWidth <= window.innerWidth,
+    };
+  });
+}
+
+async function expectAccountPinned(page, viewport) {
+  const account = await readAccount(page);
+  expect(account.onTop, "nothing is drawn over the balance").toBe(true);
+  expect(account.fits, "the account and the page are no wider than the screen").toBe(true);
+  expect(account.box.y).toBeGreaterThanOrEqual(0);
+  if (viewport.width < 1025) {
+    // A band across the top of the phone.
+    expect([account.box.x, account.box.y, account.box.right]).toEqual([0, 0, viewport.width]);
+    expect(account.box.bottom).toBeLessThanOrEqual(30);
+  } else {
+    // A box in the top-right corner, beside the music pills.
+    expect(account.box.right).toBeGreaterThan(viewport.width - 140);
+    expect(account.box.right).toBeLessThanOrEqual(viewport.width);
+    expect(account.box.bottom).toBeLessThanOrEqual(90);
+  }
+}
+
+async function expectAccountHolds(page) {
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const held = saved.dynamics.runPot + saved.dynamics.vault;
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(held.toLocaleString("en-US"));
+  return held;
+}
+
+for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 }]) {
+  test(`the KD은행 계좌 stays pinned through the briefing, the table and the settle at ${viewport.width}x${viewport.height} @once`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await openTable(page, "case01", "start");
+    const account = page.getByTestId("gauntlet-purse");
+    const head = account.getByRole("button");
+    await expect(head).toHaveAccessibleName(/^KD은행 계좌 0/);
+    await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+    await expectAccountPinned(page, viewport);
+
+    // The season's columns are a tap away.
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
+    await head.click();
+    await expect(head).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeVisible();
+    await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 0 · 손실 0");
+    await head.click();
+    await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
+
+    // The settle: the amount flies into the account, which is still on top of the reveal.
+    await page.locator(".choices .choice").first().click();
+    await cashStakedCard(page);
+    await expect(account).toHaveClass(/is-landing is-up/);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expectAccountPinned(page, viewport);
+
+    // The next window opens on its briefing page: the account is over it, with the money the save holds.
+    await page.getByTestId("decision-next").click();
+    await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    const held = await expectAccountHolds(page);
+    expect(held).toBeGreaterThan(0);
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(`▲ +${held.toLocaleString("en-US")}`);
+    await expect(account.locator(".kd-account-just")).toHaveText("방금");
+    await expectAccountPinned(page, viewport);
+
+    // And at the table behind it, the same balance.
+    await dismissProtocolBreach(page);
+    await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+    await expectAccountHolds(page);
+    await expectAccountPinned(page, viewport);
+  });
+}
 
 // The readouts of 2026-10-22 (C-5, C-11, C-13): 안전선 presses the pushes no
 // wall can stop at once, the reveal says what one more push would have done,
@@ -1366,6 +1568,14 @@ test("a third push brings an edge notice that covers no number, and the switch t
   await expect(notice).toHaveAttribute("aria-hidden", "true");
   expect(await notice.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
   expect(await notice.innerText(), "a notice carries no number").not.toMatch(/\d/);
+  // Measured where the notice comes to rest: it slides in over 240ms and is
+  // placed over the action bar when the bar settles, and a box read mid-slide
+  // lay over the PUSH button (gx-push) on a phone once (2026-10-23). Its own
+  // four seconds are far longer than the wait.
+  await notice.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {})));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const overlaps = await notice.evaluate((element) => {
     const box = element.getBoundingClientRect();
     const numbers = "[data-testid='gauntlet-pot'], .gx-hud, .gx-gauge, .choices .choice, [data-testid='commit-confirm'], [data-testid='commit-push'], .status-bar > span, .top-actions button, .game-header h1";

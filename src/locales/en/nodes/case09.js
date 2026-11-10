@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c9_start": {
       "title": "72 Hours, Again",
-      "text": "3 years ago KD Bank lent FlowOn 31 billion won. Now FlowOn faces another creditors’ committee vote. This time the agenda is not rehabilitation but liquidation. 1,140 employees, 280 suppliers. Pushing for liquidation is Bridge Bank, which holds the senior collateral, and the credit officer it sent as its representative is Kwon Dohyun, the founder’s eldest son. Do Yoonha sets down the list of creditors. 'He turned down the family business and went to a bank. Now he’s come from the bank’s side to close his father’s company.'",
+      "text": "3 years ago KD Bank lent FlowOn 31 billion won. Now FlowOn faces another creditors’ committee vote. This time the agenda is not rehabilitation but liquidation. Pushing for liquidation is Bridge Bank, which holds the senior collateral, and its representative is Kwon Dohyun, the founder’s eldest son. Do Yoonha sets down the list of creditors. 'He turned down the family business and went to a bank. Now he’s come from the bank’s side to close his father’s company.'",
       "memo": [
         "60 hours to the creditors’ vote; agenda: liquidation",
         "1,140 employees · 280 suppliers",
@@ -34,11 +34,11 @@ export default {
       "place": "FlowOn HQ, 8th-floor situation room",
       "clock": "Creditors’ vote in 60h",
       "question": "The company from the 72 hours is up for liquidation this time. Where do you start?",
-      "lead": "The same situation room, 3 years on. On the whiteboard, the '72h' someone wrote back then is still there, half erased."
+      "lead": "The same situation room, a few months on. On the whiteboard, the '72h' someone wrote back then is still there, half erased."
     },
     "c9_ledger": {
       "title": "Kwon Dohyun’s Ledger",
-      "text": "A Yeouido café before dawn. Kwon Dohyun draws columns on a blank sheet and divides it into boxes. Bridge Bank, KD Bank, employees, suppliers, the uncles, and you. 'You said you’d help me. Then fill in your box first. What you lose by this and what you gain. If that box is empty, I’ll read your offer as pity and refuse it.' His own box is already filled in. Lose: family. Gain: nothing.",
+      "text": "Kwon Dohyun draws columns on a blank sheet and divides it into boxes. Bridge Bank, KD Bank, employees, suppliers, the uncles, and you. 'You said you’d help me. Then fill in your box first. What you lose and what you gain. If that box is empty, I’ll read your offer as pity and refuse it.' His own box is already filled in. Lose: family. Gain: nothing.",
       "memo": [
         "Kwon Dohyun’s box: lose 'family', gain 'nothing'",
         "Your box: still blank",
@@ -68,7 +68,7 @@ export default {
       "lead": "Kwon Dohyun came 20 minutes early and is squaring the corners of his printouts."
     },
     "c9_family": {
-      "text": "Ban Jaewook spreads out a printout of FlowOn’s books from 3 years ago. The number no one could trace during those 72 hours: a debt-to-equity ratio of 179.6%. It was made by CEO Kwon Seungwoo and CFO Bae Sungjun, Kwon Dohyun’s uncle and his aunt’s husband. Accounting fraud that inflated the books, and golf memberships bought with company money. Advisory fees paid out to Haeon Partners. One set of books holds breach of trust. It holds embezzlement too. Kwon Dohyun turns the pages one by one, then stops. 'My uncle paid my college tuition. Now I know where that money came from.'",
+      "text": "The debt-to-equity ratio of 179.6% was made by CEO Kwon Seungwoo and CFO Bae Sungjun, Kwon Dohyun’s uncle and his aunt’s husband. Accounting fraud that inflated the books, and golf memberships bought with company money. Advisory fees paid out to Haeon Partners. One set of books holds breach of trust. It holds embezzlement too. Kwon Dohyun stops turning the pages. 'My uncle paid my college tuition. Now I know where that money came from.'",
       "memo": [
         "Books behind the 179.6% ratio, written by Kwon Seungwoo · Bae Sungjun",
         "3 golf memberships on company money, advisory fees to Haeon Partners",
@@ -99,7 +99,7 @@ export default {
     },
     "c9_timing": {
       "title": "Inspection Day",
-      "text": "Oh Jinwoo is back at his desk on the 4th floor. Han Seoyun filed a request to withdraw his resignation, and his seat is still his. Ban Jaewook’s resignation never left the Internal Audit head’s drawer. He hasn’t shaved, but he came in carrying an empty lunch box. He circles a day on the calendar. 'The Financial Supervisory Service goes into Bridge Bank at 9 tomorrow morning. A regular inspection. If we file the trace sheet tonight, the inspection team looks at the deal that bought the collateral ranking from day one.' If Bridge Bank is sanctioned, the liquidation vote loses its force. Its senior collateral gets frozen. But Kwon Dohyun works at that bank.",
+      "text": "Han Seoyun filed a request to withdraw Oh Jinwoo’s resignation. Ban Jaewook’s resignation never left the Internal Audit head’s drawer either. Oh Jinwoo taps the circle on the calendar. 'The Financial Supervisory Service goes into Bridge Bank at 9 tomorrow morning. A regular inspection. If we file the trace sheet tonight, the inspection team looks at the deal that bought the collateral ranking from day one.' If Bridge Bank is sanctioned, its senior collateral gets frozen and the liquidation vote loses its force. But Kwon Dohyun works at that bank.",
       "memo": [
         "FSS regular inspection of Bridge Bank starts: tomorrow 09:00",
         "A tip before it starts makes the improperly gained collateral the first item",
@@ -130,7 +130,7 @@ export default {
     },
     "c9_final": {
       "title": "Rescue or Punish",
-      "text": "Kwon Dohyun lays two sheets side by side. On the left, the sheet that saves FlowOn: a debt-to-equity swap. With it, every job carried over. On the right, the sheet that punishes those who broke it: the complaint, the trace sheet, and the tip to the inspection team. 'Both are correct math. The problem is that when both sheets are on one table, the creditors get scared.' He holds out a pen. 'Which sheet will you sign? Or both?'",
+      "text": "Kwon Dohyun lays two sheets side by side. On the left, the sheet that saves FlowOn: a debt-to-equity swap. With it, every job carried over. On the right, the sheet that punishes those who broke it: the complaint, the trace sheet, and the tip to the inspection team. 'Both are correct math. The problem is that when both sheets are on one table, the creditors get scared. Which sheet will you sign? Or both?'",
       "memo": [
         "Rescue sheet: debt-to-equity swap + jobs carried over for all 1,140",
         "Punish sheet: complaint against Kwon Seungwoo · Bae Sungjun + tip on Bridge Bank",
@@ -158,7 +158,7 @@ export default {
     },
     "c9_aftershock": {
       "title": "Morning for the Night Shift",
-      "text": "Four a.m. the day after the vote, the FlowOn fulfillment center. Kang Taemin, the night-shift foreman who handed you cup noodles that night during the 72 hours, recognizes you. 'I told you to come in the daytime.' He laughs and pours hot water into two cups. The company’s name may change, but the boxes still move this morning. While the three minutes pass, he asks. 'So where to now?'",
+      "text": "Four a.m. the day after the vote. Kang Taemin, the night-shift foreman who handed you cup noodles that night during the 72 hours, recognizes you. 'I told you to come in the daytime.' He laughs and pours hot water into two cups. While the three minutes pass, he asks. 'So where to now?'",
       "memo": [
         "Creditors’ vote result posted on the floor",
         "All 380 night-shift workers clocked in",
@@ -182,7 +182,7 @@ export default {
     },
     "c9_calc": {
       "title": "Two Calculators",
-      "text": "As the café is about to close, Kwon Dohyun takes out a second calculator. 'Let’s each run it from our own side. If the numbers match, I’ll start trusting you.' For 20 minutes the two of you tap in silence. The results differ by 300 million won. Kwon Dohyun smiles for the first time. 'Is that gap goodwill, or a mistake?'",
+      "text": "Kwon Dohyun takes out a second calculator. 'Let’s each run it from our own side. If the numbers match, I’ll start trusting you.' 20 minutes later, the results differ by 300 million won. Kwon Dohyun smiles for the first time. 'Is that gap goodwill, or a mistake?'",
       "memo": [
         "Gap between the two results: 300 million won",
         "Gap comes from how severance pay is calculated",
@@ -205,7 +205,7 @@ export default {
     },
     "c9_wedding": {
       "title": "The Invitation",
-      "text": "A wedding invitation fills Kwon Dohyun’s phone lock screen. Next month. Beside the parents’ table, seats for his uncle and aunt are already set. Do Yoonha sees the screen and goes out for coffee, and comes back much later with three cups. 'I got the sweetest ones. Feels like that kind of day.'",
+      "text": "A wedding invitation fills Kwon Dohyun’s phone lock screen. Next month. Beside the parents’ table, seats for his uncle and aunt are already set. Do Yoonha goes out for coffee and comes back much later with three cups. 'I got the sweetest ones. Feels like that kind of day.'",
       "memo": [
         "Kwon Dohyun’s wedding in 5 weeks",
         "Family table includes Kwon Seungwoo and his wife",
@@ -228,7 +228,7 @@ export default {
     },
     "c9_night": {
       "title": "The Office at 2 A.M.",
-      "text": "Two a.m., Trigger Lab, 4th floor. Han Seoyun is printing her statement and stops in front of the printer. Oh Jinwoo has fallen asleep on the sofa, and Ban Jaewook lays his own jacket over him. Do Yoonha puts water on for cup noodles. Han Seoyun speaks quietly. 'This is the first time I’ve seen five people in this room sitting on the same side.'",
+      "text": "Two a.m. Oh Jinwoo has fallen asleep on the sofa, and Ban Jaewook lays his own jacket over him. Do Yoonha puts water on for cup noodles. Han Seoyun, printing her statement, stops in front of the printer. 'This is the first time I’ve seen five people in this room sitting on the same side.'",
       "memo": [
         "Han Seoyun’s statement printed",
         "7 hours to the tip deadline",
@@ -251,7 +251,7 @@ export default {
     },
     "c9_calc_reaction": {
       "title": "The Name of 300 Million",
-      "text": "ECHO brings up the breakdown of the 300 million won. The gap is the accrued severance of 11 logistics workers who have worked 22 years. In Kwon Dohyun’s math it vanishes the moment the company changes hands; in yours it is paid in full. 'Two sheets that save the same company split over 11 people’s 22 years.'",
+      "text": "ECHO brings up the breakdown of the 300 million won. The accrued severance of 11 logistics workers who have worked 22 years. In Kwon Dohyun’s math it vanishes the moment the company changes hands; in yours it is paid in full. 'Two sheets that save the same company split over 11 people’s 22 years.'",
       "memo": [
         "11 people, 22 years",
         "A number to nail into the transfer terms"
@@ -273,7 +273,7 @@ export default {
     },
     "c9_wedding_reaction": {
       "title": "The Family Table",
-      "text": "Kwon Dohyun turns his phone face down. 'If I keep my uncle off the family table, my bride will ask why. I don’t think I can tell her.' He sips the sweet coffee and winces. 'But I can’t weigh 1,140 people against what my tuition cost, either.'",
+      "text": "Kwon Dohyun turns his phone face down. 'If I keep my uncle off the family table, my bride will ask why. I don’t think I can tell her. But I can’t weigh 1,140 people against what my tuition cost, either.'",
       "memo": [
         "Who sits at the family table",
         "A reason he can’t bring himself to say"
@@ -295,7 +295,7 @@ export default {
     },
     "c9_night_reaction": {
       "title": "The Jacket",
-      "text": "Ban Jaewook stands at the window without his jacket. 'I spent 20 years cutting people. Tonight, for the first time, I’m writing papers that keep people.' He tears a blank page from his notebook and hands it over. On paper from the notebook that once held 47 names, there is one new line. '1,140 -- kept.'",
+      "text": "Ban Jaewook stands at the window without his jacket. 'I spent 20 years cutting people. Tonight, for the first time, I’m writing papers that keep people.' He tears a page from the notebook that once held 47 names and hands it over. One new line. '1,140 -- kept.'",
       "memo": [
         "Papers that cut, papers that keep",
         "One line at the very front of the vote file"
@@ -317,7 +317,7 @@ export default {
     },
     "c9_branch_father": {
       "title": "Nursing Home, 3rd Floor",
-      "text": "Kwon Dohyun puts off his decision and goes to the nursing home. You go with him. The founder, Kwon Taeho, doesn’t recognize his son and asks you instead. 'Are you the new dispatcher? Did the night-shift kids get fed?' Kwon Dohyun looks out the window. 'The company my father remembers isn’t 1,140 people. It’s when there were thirty. He says he knew every name back then.'",
+      "text": "You go with Kwon Dohyun, who has put off his decision, to the nursing home. The founder, Kwon Taeho, doesn’t recognize his son and asks you instead. 'Are you the new dispatcher? Did the night-shift kids get fed?' Kwon Dohyun looks out the window. 'The company my father remembers is when there were thirty. He says he knew every name back then.'",
       "memo": [
         "Founder Kwon Taeho, 2 years since a dementia diagnosis",
         "11 of the first 30 employees still on staff",
@@ -340,7 +340,7 @@ export default {
     },
     "c9_branch_father_follow": {
       "title": "Photo of the 30",
-      "text": "In the hospital parking lot, night-shift foreman Kang Taemin is waiting. Kwon Dohyun called him. Kang Taemin holds out a worn photo. The company’s first year: 30 people in front of two trucks. At the far end stands a young Kwon Dohyun. 'When the boss’s son said he wouldn’t take over, we were the happiest. We didn’t want him living like us.'",
+      "text": "Kang Taemin, the night-shift foreman Kwon Dohyun called, holds out a worn photo. The company’s first year: 30 people in front of two trucks. At the far end stands a young Kwon Dohyun. 'When the boss’s son said he wouldn’t take over, we were the happiest. We didn’t want him living like us.'",
       "memo": [
         "First-year photo: 30 employees and a young Kwon Dohyun",
         "Kang Taemin is 1 of the 11 early employees",
@@ -363,7 +363,7 @@ export default {
     },
     "c9_route_system": {
       "title": "The Third Sheet",
-      "text": "Two sheets will go before the creditors’ committee. One saves FlowOn, the other punishes those who broke it. You set the cost nobody counted beside them. ECHO takes it. A third table opens. A sheet no creditor has written: what 1,140 families pay if the company is liquidated. Switching health insurance, overdue student loans, a chain of supplier bankruptcies. The total is 2.3 times what Bridge Bank gains by liquidating.",
+      "text": "Beside the two sheets going before the creditors’ committee, the one that saves and the one that punishes, you set the cost nobody counted, and ECHO opens a third table. What 1,140 families pay if the company is liquidated. Switching health insurance, overdue student loans, a chain of supplier bankruptcies. The total is 2.3 times what Bridge Bank gains by liquidating.",
       "memo": [
         "Estimated cost to families · suppliers under liquidation: 2.3 times the extra recovery",
         "The creditors’ sheets have no box for this",
@@ -389,7 +389,7 @@ export default {
     },
     "c9_final_system_route": {
       "title": "The Sheet No One Wrote",
-      "text": "Six hours to the creditors’ vote. On the document terminal, the third sheet sits open, unsaved. It is what 1,140 families and the suppliers pay if the company closes, and neither of the creditors’ two sheets has a box for it. Beside the table’s title, ECHO writes 'estimate'. 'Estimate doesn’t mean wrong. It’s an estimate, so no one signed it, and with no signature it never reached a meeting.'",
+      "text": "Six hours to the creditors’ vote. On the document terminal, the third sheet sits open, unsaved. Beside the table’s title, ECHO writes 'estimate'. 'Estimate doesn’t mean wrong. It’s an estimate, so no one signed it, and with no signature it never reached a meeting.'",
       "memo": [
         "Third sheet: author box blank",
         "A cost missing from the creditors’ file",
@@ -435,7 +435,7 @@ export default {
     },
     "c9_start_law": {
       "title": "72 Hours for the One Who Made a Record",
-      "text": "You got the trace sheet approved under Branch Manager Na Junhyuk’s employee ID and made it an official record. The investigation started slowly, and in the meantime FlowOn’s creditors’ committee leaned fast toward liquidation. There are 1,140 employees, and the man Bridge Bank sent to push liquidation is Kwon Dohyun, the founder’s eldest son. The record remains, but a record doesn’t save people first.",
+      "text": "The trace sheet became an official record, approved under Branch Manager Na Junhyuk’s employee ID. In the meantime, FlowOn’s creditors’ committee leaned fast toward liquidation. There are 1,140 employees, and the man Bridge Bank sent to push liquidation is Kwon Dohyun, the founder’s eldest son.",
       "memo": [
         "Investigation request filed; start date unknown",
         "Creditors’ vote agenda: liquidation",
@@ -465,7 +465,7 @@ export default {
     },
     "c9_start_friend": {
       "title": "72 Hours for the One Who Went After a Friend",
-      "text": "You came up to Seoul to find Oh Jinwoo, who had stopped answering. He had the trace sheet pinned to the wall of his tiny rented room. The day after you two shared a bowl of rice soup, an item reaches the creditors’ committee. The liquidation of FlowOn. The man Bridge Bank sent to push it is Kwon Dohyun, the founder’s eldest son; 1,140 employees are at stake. Oh Jinwoo stands first. 'This time let’s go together. Not for revenge. For something else.'",
+      "text": "An item reaches the creditors’ committee. The liquidation of FlowOn. The man Bridge Bank sent to push it is Kwon Dohyun, the founder’s eldest son; 1,140 employees are at stake. Oh Jinwoo stands first. 'This time let’s go together. Not for revenge. For something else.'",
       "memo": [
         "Oh Jinwoo puts his tracking files in joint custody",
         "Creditors’ vote agenda: liquidation",
@@ -495,7 +495,7 @@ export default {
     },
     "c9_start_blade": {
       "title": "72 Hours for the One Who Held the Blade Alone",
-      "text": "You held the trace sheet alone and waited, and now the time to use it has come. An item has reached the creditors’ committee. The liquidation of FlowOn. Bridge Bank, which is pushing liquidation, is on one line of the trace sheet. The man it sent is Kwon Dohyun, the founder’s eldest son, and FlowOn has 1,140 employees. A blade held alone is fast, but no one will testify that it was used fairly.",
+      "text": "An item has reached the creditors’ committee. The liquidation of FlowOn. Bridge Bank, which is pushing liquidation, is on one line of the trace sheet. The man it sent is Kwon Dohyun, the founder’s eldest son, and FlowOn has 1,140 employees.",
       "memo": [
         "You alone keep the original trace sheet",
         "Creditors’ vote agenda: liquidation",

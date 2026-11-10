@@ -414,6 +414,9 @@
   font-size: 0.9375rem;
   line-height: 1.65;
 }
+/* The acid glow at 0.1 as the intro's active case card: the readability check
+   reads --ui-text-2 against the glow laid twice over --ui-surface-2, 4.12:1 at
+   0.14 on the neutral ground, 5.14:1 at 0.1. */
 .next-case-panel {
   position: relative;
   display: grid;
@@ -424,7 +427,7 @@
   overflow: hidden;
   color: var(--ui-text);
   background:
-    radial-gradient(80% 120% at 100% 0%, rgb(217 255 98 / 0.14), transparent 60%), var(--ui-surface-2);
+    radial-gradient(80% 120% at 100% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-2);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-lg);
   box-shadow:
@@ -568,6 +571,11 @@
   transition:
     transform var(--ui-dur) var(--ui-ease),
     border-color var(--ui-dur) var(--ui-ease);
+}
+/* Seven cards since the 판 읽기 axis (C-1(1)): the last, the penalty, is alone in
+   its row at three columns and at two, so it takes the row. */
+.score-breakdown article:last-child {
+  grid-column: 1 / -1;
 }
 .score-breakdown article:hover {
   transform: translateY(-2px);

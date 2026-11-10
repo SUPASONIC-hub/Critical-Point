@@ -694,7 +694,7 @@ test("a push is said in the table's one polite region, with the shown band and n
   await expect(page.getByTestId("gauntlet-stage").locator("[role='status'], [aria-live='polite'], [aria-live='assertive']")).toHaveCount(1);
 });
 
-test("the verdict is the slam's alone, and the next table says what the cash banked", async ({ page }) => {
+test("the verdict is the slam's alone, and the next table says what the cash settled", async ({ page }) => {
   await startDebugNode(page, "case01", "start");
   const voice = page.getByTestId("table-voice");
   await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
@@ -704,5 +704,6 @@ test("the verdict is the slam's alone, and the next table says what the cash ban
   await page.getByTestId("decision-next").click();
   await dismissProtocolBreach(page);
   const runPot = await page.getByTestId("gauntlet-run-pot").textContent();
-  await expect(voice).toHaveText(new RegExp(`^판돈 ${runPot} · 금고 [\\d,]+$`));
+  // E3 2단계 (a): the settlement's one line -- the hand's +N, the case pot, the vault -- once, as the next table opens.
+  await expect(voice).toHaveText(new RegExp(`^이번 판 \\+${runPot} · 판돈 ${runPot} · 금고 [\\d,]+$`));
 });

@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
 import { copyText } from "../appConfig.js";
+import runLines from "../copy/runLines.js";
 import { encodeReplaySeed, getTraceEvents, REPLAY_QUERY_KEY } from "./trace.js";
 
 const STATUS_HOLD_MS = 1600;
 
 /**
- * The transient "복사됨 / Copy failed" flash under the copy buttons.
+ * The transient "복사됨 / Copy failed" flash under the copy buttons. The
+ * session code's is a player's, so it is in the page's language (src/copy/runLines.js).
  *
  * The timer lives on a ref so a second copy replaces the pending clear instead
  * of racing it, and so unmounting cancels it.
@@ -40,7 +42,7 @@ export function useClipboardStatus() {
  */
 export function createClipboardActions({ flashCopyStatus, sessionCode, buildReplaySeed }) {
   async function copySessionCode() {
-    flashCopyStatus((await copyText(sessionCode)) ? "복사됨" : "복사 실패");
+    flashCopyStatus((await copyText(sessionCode)) ? runLines.copyStatus.copied : runLines.copyStatus.failed);
   }
 
   async function copyDiagnosticTrace() {

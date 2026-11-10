@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { formatNumber, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
-import { advanceLogic, getLogicBonus, getLogicType } from "./logicStreak.js";
+import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
@@ -17,7 +17,7 @@ export { formatNumber };
 
 /**
  * Rounded down, because the table's rules read the multiplier as a floor: the
- * chain asks for x4 and HIGH ROLLER's feat for x64. Rounded to nearest, a
+ * chain asks for x4 (and once asked x64 of HIGH ROLLER's feat). Rounded to nearest, a
  * x3.95 printed "×4.0" and a cash on it started no chain.
  */
 export function formatMultiplier(value) {
@@ -46,7 +46,7 @@ export function describeClockHeat(pushes) {
  * and every story run -- was told "기본 규칙으로 복귀" and, in the same breath,
  * that the room had broken a rule or that a card might be sealed for stopping
  * early. COLD FEET says a card is locked only while the seal stands: EXPOSE
- * mastery or GLASS LENS lifts it and leaves the id (`lifted`).
+ * mastery lifts it and leaves the id (`lifted`).
  */
 export function describeNextTable(nextMutations = [], busted = false) {
   if (nextMutations.length === 0) return "";
@@ -76,21 +76,26 @@ export function describeVerdictCause(verdict) {
 export const getTypeName = (type) => easyCognitionLabels[type] ?? "";
 
 /**
- * The one word of each name a phone's card has room for. A card there is half
- * a 360px screen wide and its stats row already holds the chips and the burn,
- * so the tag prints this word and keeps the rest of the name for a screen
- * reader and for a wider card (`getTypeParts`).
+ * The names the streak's two directions go by (C-3), and what a card that
+ * leans neither way is called. A verdict logged before C-3 holds a thinking
+ * type where the direction now is, and is read by the type's name.
  */
-const TYPE_KEYWORDS = say.typeKeywords;
+export const DIRECTION_NAMES = say.directions;
+export const getDirectionName = (direction) => DIRECTION_NAMES[direction] ?? getTypeName(direction);
 
-/** A type's name cut around its keyword: what comes before it, the word, and what comes after. A name without the word is the word. */
-export function getTypeParts(type) {
-  const name = getTypeName(type);
-  const word = TYPE_KEYWORDS[type] ?? name;
-  const at = name.indexOf(word);
-  if (at < 0) return ["", name, ""];
-  return [name.slice(0, at), word, name.slice(at + word.length)];
+/**
+ * A direction's name as the tag and the streak's line print it: the word, and
+ * what follows it (" 쪽"), which a phone's card has no room for (the `i`
+ * elements play.css clips there) and a screen reader still reads. A card that
+ * leans neither way is just 중립.
+ */
+export function getDirectionParts(direction) {
+  const name = getDirectionName(direction);
+  return [name, DIRECTION_NAMES[direction] && direction !== LOGIC_EVEN ? say.directionAfter : ""];
 }
+
+/** A direction as a side, the way the streak's sentences say it: 사람 쪽, 자리 쪽. */
+const getDirectionSide = (direction) => fill(say.side, { direction: getDirectionName(direction) });
 
 const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
 
@@ -100,20 +105,22 @@ const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
  * in play on, or a verdict logged before the streak paid.
  */
 export function describeLogicMove(logic) {
-  const type = getTypeName(logic?.type);
+  const side = getDirectionSide(logic?.type);
   const streak = Number(logic?.streak) || 0;
   const paid = fill(say.logicPaid, { streak, bonus: bonusText(logic?.bonus) });
+  // FIELD NOTES holds a type one window shorter; the verdict says which hold it read.
+  const hold = Number(logic?.hold) || LOGIC_HOLD;
   switch (logic?.move) {
     case "grow":
-      return fill(say.logicGrow, { type, particle: objectParticle(type), paid });
+      return fill(say.logicGrow, { side, particle: objectParticle(side), paid });
     case "build":
-      return fill(say.logicBuild, { type, held: Math.min(LOGIC_HOLD, Number(logic.held) || 1), hold: LOGIC_HOLD, paid });
+      return fill(hold === LOGIC_HOLD ? say.logicBuild : say.logicBuildShort, { side, held: Math.min(hold, Number(logic.held) || 1), hold, paid });
     case "switch":
-      return fill(say.logicSwitch, { type, particle: directionParticle(type), paid });
+      return fill(say.logicSwitch, { side, particle: directionParticle(side), paid });
     case "keep":
-      return fill(say.logicKeep, { paid });
+      return fill(logic.type === LOGIC_EVEN ? say.logicKeepEven : say.logicKeep, { paid });
     case "break":
-      return fill(say.logicBreak, { type, particle: directionParticle(type), hold: LOGIC_HOLD });
+      return fill(say.logicBreak, { side, particle: directionParticle(side), hold });
     case "bust":
       return streak > 0 ? fill(say.logicBustKept, { streak, particle: topicParticle(String(streak)) }) : say.logicBustLost;
     default:
@@ -130,27 +137,28 @@ const MOVE_COPY = say.moves;
 
 /**
  * The streak as the table shows it while a window is open: where it stands,
- * and what each card would do to it. `offered` is the types the scene has on
- * the table (`listOfferedTypes`), the same list the settlement is handed, so
- * the streak a card is shown to leave is the one its pot is paid on.
+ * and what each card would do to it. `offered` is the directions the scene
+ * has on the table (`listOfferedDirections`), the same list the settlement is
+ * handed, so the streak a card is shown to leave is the one its pot is paid on.
  *
  * `after` is the streak with the staked card played (the run's own with none
  * staked), and `bonus` what that pays; the pot's own line prints the bonus.
- * `type` and `held` are the type being held and how
+ * `type` and `held` are the direction being held (사람 or 자리) and how
  * far the hold has got, and `note` what the staked card does, or that a change
- * of type would count. `line` is those in one line -- the sentence a test or a
+ * of direction would count. `line` is those in one line -- the sentence a test or a
  * wide screen reads whole -- and `spoken` the sentence the push and confirm
  * buttons are described by.
  */
 export function readLogic({ logic, card, offered, relics = [] }) {
   const reach = hasRelic(relics, "metronome");
-  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach });
-  const moveOf = (candidate) => play(getLogicType(candidate)).move;
-  const staked = card ? play(getLogicType(card)) : null;
+  const holdAt = hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD;
+  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt });
+  const moveOf = (candidate) => play(getLogicDirection(candidate)).move;
+  const staked = card ? play(getLogicDirection(card)) : null;
   const now = staked?.logic ?? logic;
   const open = logic.rose || (reach && logic.reach > 0);
-  const held = `${Math.min(LOGIC_HOLD, now.held)}/${LOGIC_HOLD}`;
-  const hold = now.type ? `${getTypeName(now.type)} ${held}` : say.firstCard;
+  const held = `${Math.min(holdAt, now.held)}/${holdAt}`;
+  const hold = now.type ? `${getDirectionSide(now.type)} ${held}` : say.firstCard;
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;
   const note = did ?? (open && !staked ? say.canSwitch : "");
@@ -175,7 +183,7 @@ export const describeCardMove = (move) => (MOVE_COPY[move] ? fill(say.cardMove, 
  * only "ends the streak or not", and colour alone says nothing to a player who
  * cannot tell cyan from grey (WCAG 1.4.1): the sign is what the streak's number
  * would do. Up for a card that raises it, the two-way arrow for one that
- * raises it by changing type, level for one that leaves it where it is, and a
+ * raises it by changing direction, level for one that leaves it where it is, and a
  * cross for the one that ends it. All four are glyphs the game's face draws
  * (the heavy cross U+2715 is on the charset list and not in Pretendard).
  */

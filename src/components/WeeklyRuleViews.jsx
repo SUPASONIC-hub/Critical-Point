@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { weeklyRuleLine } from "../gauntlet/weeklyRuleLine.js";
-import { weekRuleAt } from "../gauntlet/weeklyRules.js";
+import { weekBoardsAt } from "../gauntlet/weeklyRules.js";
 import { selectLeaderboardWeek, useLeaderboardWeek } from "../state/useLeaderboard.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { fill } from "../locale.js";
@@ -54,7 +54,7 @@ export function WeeklyRuleLine({ now, first = false, ticked, tick }) {
               setOn(event.target.checked);
             }}
           />
-          {first ? weekRuleCopy.takeUp : weekRuleCopy.turnDown}
+          {line.testWeek ? (first ? weekRuleCopy.testWeekTakeUp : weekRuleCopy.testWeekTurnDown) : first ? weekRuleCopy.takeUp : weekRuleCopy.turnDown}
         </label>
       )}
     </section>
@@ -62,23 +62,25 @@ export function WeeklyRuleLine({ now, first = false, ticked, tick }) {
 }
 
 /**
- * The ranking's two boards in a week that has a rule: the ordinary one and
- * the week's. A week without one shows the one board and no switch. The
- * two-a-day limit is shared; the percentiles read the ordinary board only
- * (결정 30, on the server).
+ * The ranking's boards in a week that has a rule, or the week after one: the
+ * ordinary one and the week's, this week's first and last week's after it
+ * (weekBoardsAt), so a season finished after the rule week ended is still on
+ * a board the screen can open. A week with neither shows the one board and
+ * no switch. The two-a-day limit is shared; the percentiles read the ordinary
+ * board only (결정 30, on the server).
  */
 export function WeekBoards({ now }) {
   const board = useLeaderboardWeek();
-  const current = weekRuleAt(now ?? weeklyRuleNow());
-  if (!current) return null;
+  const weeks = weekBoardsAt(now ?? weeklyRuleNow());
+  if (weeks.length === 0) return null;
   const boards = [
     { week: null, rule: null, label: weekRuleCopy.ordinaryBoard },
-    { week: current.week, rule: current.id, label: fill(weekRuleCopy.weekBoard, { label: current.label }) },
+    ...weeks.map((item) => ({ week: item.week, rule: item.rule, label: fill(item.last ? weekRuleCopy.lastWeekBoard : weekRuleCopy.weekBoard, { label: item.label }) })),
   ];
   return (
     <div className="ranking-week-tabs" role="group" aria-label={weekRuleCopy.boardsLabel} data-testid="ranking-week-tabs">
       {boards.map((item) => (
-        <button type="button" key={item.label} aria-pressed={board.week === item.week} onClick={() => selectLeaderboardWeek(item.week, item.rule)}>
+        <button type="button" key={item.week ?? "ordinary"} aria-pressed={board.week === item.week} onClick={() => selectLeaderboardWeek(item.week, item.rule)}>
           {item.label}
         </button>
       ))}

@@ -33,10 +33,23 @@ export const SUPPORTED_LOCALES = [
 ];
 const CODES = SUPPORTED_LOCALES.map((locale) => locale.code);
 
+/**
+ * The language a start page's own folder names: `/en/` and `/ja/` (and their
+ * `index.html`) are the start page in English and Japanese
+ * (scripts/site-pages.mjs `localizedStartPage`, since 11-03). Null anywhere
+ * else, `/` included.
+ */
+export function folderLanguage(pathname = "") {
+  const code = /^\/([a-z]{2})\/(?:index\.html)?$/.exec(String(pathname))?.[1];
+  return code && code !== SOURCE_LOCALE && CODES.includes(code) ? code : null;
+}
+
 function readLanguage() {
   try {
     const stored = readStoredValue(LOCALE_KEY, "");
     if (CODES.includes(stored)) return stored;
+    const folder = folderLanguage(globalThis.location?.pathname);
+    if (folder) return folder;
     const asked = new URLSearchParams(globalThis.location?.search ?? "").get("lang");
     return CODES.includes(asked) ? asked : SOURCE_LOCALE;
   } catch {
@@ -49,15 +62,35 @@ export const LANG = readLanguage();
 /**
  * The player's choice (src/components/LanguagePicker.jsx): kept on this
  * device, and the page opened again in it, with `?lang=` saying the same so a
- * copied address opens in it too. Korean takes the query away.
+ * copied address opens in it too. Korean takes the query away. On a
+ * language's own start page (`/en/`, `/ja/`) the address becomes the chosen
+ * language's (`/`, `/en/`, `/ja/`) instead, so it never names one language
+ * while the page plays another.
  */
 export function chooseLanguage(code) {
   if (!CODES.includes(code) || code === LANG) return;
   writeStoredValue(LOCALE_KEY, code);
   const url = new URL(globalThis.location.href);
-  if (code === SOURCE_LOCALE) url.searchParams.delete("lang");
+  if (folderLanguage(url.pathname)) {
+    url.pathname = code === SOURCE_LOCALE ? "/" : `/${code}/`;
+    url.searchParams.delete("lang");
+  } else if (code === SOURCE_LOCALE) url.searchParams.delete("lang");
   else url.searchParams.set("lang", code);
   globalThis.location.assign(url.toString());
+}
+
+/**
+ * A page opened in another language at `/?lang=<code>` (or by a stored
+ * choice) is the Korean page as the host sends it, canonical `/`. Its
+ * canonical is moved to the language's own start page, so a crawler that
+ * runs the script reads `/?lang=en` as `/en/` and not as the Korean `/`.
+ */
+function pointCanonical() {
+  const link = globalThis.document?.querySelector?.('link[rel="canonical"]');
+  if (!link || folderLanguage(globalThis.location?.pathname)) return;
+  const href = link.getAttribute("href") ?? "";
+  const origin = /^https?:\/\/[^/]+/.exec(href)?.[0] ?? "";
+  link.setAttribute("href", `${origin}/${LANG}/`);
 }
 
 // The overlay module, once a page in another language has it.
@@ -65,15 +98,29 @@ let overlay = null;
 // Tables handed over before it arrived (src/copy/*.js in the shell), laid over when it does.
 const waiting = [];
 
+/**
+ * The tab's title from a dictionary (overlay.js pageTitle()): index.html's
+ * <title> is the Korean one, and the tab falls back to whatever the page had
+ * when it first painted (state/tabTitle.js). Called before the first paint,
+ * so that is this one. Returns the title, or null when there is none.
+ */
+export function setPageTitle(module, doc = globalThis.document) {
+  const title = module?.pageTitle?.() ?? null;
+  if (title && doc) doc.title = title;
+  return title;
+}
+
 /** Before the first paint of a page in another language: its dictionary, laid over the screen copy it covers. Nothing on a Korean page. */
 export function loadLocale() {
   if (LANG === SOURCE_LOCALE) return null;
   document.documentElement.lang = LANG;
+  pointCanonical();
   return import("./locales/overlay.js")
     .then((module) => module.loadDictionary(LANG))
     .then((module) => {
       overlay = module;
       for (const [name, tables] of waiting.splice(0)) module?.localizeTables(name, tables);
+      setPageTitle(module);
     });
 }
 
