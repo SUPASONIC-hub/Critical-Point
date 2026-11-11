@@ -2204,7 +2204,7 @@ for (const [lang, patterns] of Object.entries(LOCALE_FIRST_PAINT)) {
 }
 
 // Web ads (출시 로드맵 2단계) are off unless the build was given
-// ADSENSE_ADS=on (draft #341): a site build without it, AdSense site
+// ADSENSE_ADS=on (draft #350, #341 reopened): a site build without it, AdSense site
 // verification (ADSENSE_CLIENT) included, carries no ad code in any script.
 if (process.env.ADSENSE_ADS !== "on") {
   const scripts = [path.join(distDir, "sw.js"), ...readdirSync(assetsDir).filter((name) => name.endsWith(".js")).map((name) => path.join(assetsDir, name))];

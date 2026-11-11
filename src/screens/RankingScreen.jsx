@@ -163,6 +163,7 @@ export function RankingScreen({
             <p className="ranking-footnote" data-testid="ranking-past-best">{pastBest}</p>
           )}
           <p className="ranking-footnote">{words.footnote} {words.hallFootnote}</p>
+          {/* ad-slot: placement="ranking" */}
         </section>
       </main>
 );

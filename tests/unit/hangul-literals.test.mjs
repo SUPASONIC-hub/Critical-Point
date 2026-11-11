@@ -28,6 +28,7 @@ const WORD_FOLDERS = /^src\/(copy|nodes|locales|dev)\//;
  * code matches Korean text with, or a record kept in Korean on purpose.
  */
 const KOREAN_MODULES = {
+  "src/ads/adSlotWords.js": "the ad box's words in all three languages, picked by appliedLocale() (kept out of the dictionaries so a build without ads is main's)",
   "src/advancedSystems.js": "OPERATOR_PROFILES and ORIGIN_PROLOGUES, laid over through src/copy/intro.js",
   "src/appConfig.js": "DELETION_REQUEST_COPY (src/copy/cloudSaveBody.js) and the default names a row keeps in Korean (ranking.js shows them in the page's words)",
   "src/appCopy.js": "the shell's tables, laid over before the first paint",

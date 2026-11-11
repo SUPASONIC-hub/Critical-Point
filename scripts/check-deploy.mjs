@@ -12,6 +12,7 @@ import {
   firstAssetPath,
   firstRootImagePath,
   inlineScriptProblems,
+  isAdCsp,
   readRenderYamlCsp,
   renderYamlHeaderProblems,
   rootImageCacheProblems,
@@ -200,9 +201,15 @@ async function checkLive() {
       throw new Error("response does not look like the built app");
     }
 
+    // Web ads on (docs/web-ads.md): the dashboard's CSP is render.yaml's
+    // widened by adCsp() and by nothing else, the one wider policy accepted.
+    const yamlCsp = existsSync(path.join(root, "render.yaml")) ? readRenderYamlCsp(readFileSync(path.join(root, "render.yaml"), "utf8")) : null;
+    const adsCsp = isAdCsp(response.headers.get("content-security-policy"), yamlCsp);
+    if (adsCsp) console.log("CSP: render.yaml's, widened for web ads (ADSENSE_ADS=on, adCsp in scripts/adsense-config.mjs).");
+
     const problems = [
       ...siteHeaderProblems((name) => response.headers.get(name)).map((problem) => `header ${problem}`),
-      ...cspProblems(response.headers.get("content-security-policy")).map((problem) => `CSP: ${problem}`),
+      ...(adsCsp ? [] : cspProblems(response.headers.get("content-security-policy"))).map((problem) => `CSP: ${problem}`),
       ...wildcardHostProblems(response.headers.get("content-security-policy")).map((problem) => `CSP: ${problem}`),
       ...shellCacheProblems(response.headers.get("cache-control")).map((problem) => `cache: ${problem}`),
       ...inlineScriptProblems(body),
