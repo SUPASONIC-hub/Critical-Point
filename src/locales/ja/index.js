@@ -740,6 +740,14 @@ export const copy = {
       "side01": {
         "label": "番外1",
         "title": "まだ訪ねていない七人"
+      },
+      "side02": {
+        "label": "番外2",
+        "title": "返すべきもの"
+      },
+      "side03": {
+        "label": "番外3",
+        "title": "普通の夜"
       }
     }
   }

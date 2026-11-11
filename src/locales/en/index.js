@@ -734,6 +734,14 @@ export const copy = {
       "side01": {
         "label": "Side case 1",
         "title": "The Seven Not Yet Visited"
+      },
+      "side02": {
+        "label": "Side case 2",
+        "title": "What Must Be Given Back"
+      },
+      "side03": {
+        "label": "Side case 3",
+        "title": "An Ordinary Night"
       }
     }
   }

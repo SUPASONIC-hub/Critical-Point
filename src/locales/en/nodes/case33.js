@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c33_start": {
       "title": "An Answer in Three Days",
-      "text": "The first page of Baek Arin’s report to the Financial Supervisory Service is the receipt record she handed you in March, the log of who received a document and when. The second page is the removal email that took Box 27 out two days before the seizure. The group answers in three lines. Deputy Manager Baek Arin: disciplinary dismissal. A criminal complaint for leaking trade secrets. Vacate group company housing by 18:00 on July 7. The resignation she handed in on March 27 was never accepted, and three months later it comes back as a dismissal. Baek Arin calls. 'Could you help me pack? There are fewer people to ask than I thought. In percentage terms, close to 0.'",
+      "text": "The first page of Baek Arin’s report is the receipt record she handed you in March, the log of who received a document and when. The second page is the Box 27 removal email. The group answers in three lines. Disciplinary dismissal. A criminal complaint for leaking trade secrets. Vacate company housing by 18:00 on July 7. The resignation she handed in on March 27 was never accepted, and three months later it comes back as a dismissal. Baek Arin calls. 'Could you help me pack? There are fewer people to ask than I thought. In percentage terms, close to 0.'",
       "memo": [
         "Whistleblower report filed June 19 -- 1,212 pages of material",
         "Page two of the report: the Box 27 removal email",
@@ -38,7 +38,7 @@ export default {
     },
     "c33_room": {
       "title": "Stuff_final_REALfinal",
-      "text": "Baek Arin owns surprisingly little. A mug holding three highlighters, and 23 boxes. Every box has a label on its side in her handwriting. 'WinterClothes_v3', 'Kitchen_final', 'Books_final_REALfinal'. Kang Taemin asks, 'Which of these is the real one?' Baek Arin answers. 'The one I labeled last.' A notice from the management office is taped inside the front door. 'July 7, 18:00: door lock code for this unit will be changed.' Baek Arin stands in front of the notice for a moment. '12 years at the company, and it tidies me away with one code. If I’d written it, I’d have made it gentler.'",
+      "text": "Baek Arin owns surprisingly little. Every box has a label on its side in her handwriting. 'WinterClothes_v3', 'Kitchen_final', 'Books_final_REALfinal'. Kang Taemin asks, 'Which of these is the real one?' Baek Arin answers. 'The one I labeled last.' Inside the front door is a notice that the door lock code will be changed. '12 years at the company, and it tidies me away with one code. If I’d written it, I’d have made it gentler.'",
       "memo": [
         "Studio contents: 23 boxes, 6 suits",
         "Door lock code changes July 7, 18:00",
@@ -69,7 +69,7 @@ export default {
     },
     "c33_mother": {
       "title": "The Badge in the Frame",
-      "text": "'Yoonkyung Alterations' is two sewing machines and one iron. Baek Arin’s mother, Heo Yoonkyung, is stitching a trouser hem. A frame hangs on the wall behind the counter. A KD Financial Group ID badge; in the photo, Baek Arin has the face of her first year at the company. Under the frame is a note for customers. 'My daughter works on the 33rd floor.' Heo Yoonkyung pulls out a tape measure. 'Your trousers are all too long. Why are bank people’s trousers always too long?' Baek Arin cannot cross the shop’s threshold. Her mother knows nothing yet of the dismissal or the complaint. Baek Arin says quietly, 'I can’t watch Mom take that frame down. Not with my own eyes.'",
+      "text": "Baek Arin’s mother, Heo Yoonkyung, is stitching a trouser hem. On the wall behind the counter hangs a framed KD Financial Group ID badge, with Baek Arin’s face from her first year at the company. Under it is a note too. 'My daughter works on the 33rd floor.' Heo Yoonkyung pulls out a tape measure. 'Your trousers are all too long. Why are bank people’s trousers always too long?' Her mother knows nothing yet of the dismissal or the complaint. Baek Arin says quietly, 'I can’t watch Mom take that frame down. Not with my own eyes.'",
       "memo": [
         "Yoonkyung Alterations -- Anyang Central Market, 30 years",
         "Frame behind the counter: Baek Arin’s ID badge from her first year",
@@ -100,7 +100,7 @@ export default {
     },
     "c33_rice": {
       "title": "The One Who Wrote the Line",
-      "text": "Moon Gaeul stands there holding three boxes of rice cakes. Last autumn a caption came up on the TV at Gaeul Rice Cake Shop, 'The past has all been settled', and she is the one who wrote it. Moon Gaeul says as she takes off her shoes, 'I saw the news. They say the person who wrote that line is the one who reported.' When she opens the boxes, the smell of sirutteok, steamed layered rice cake, fills the small room. Baek Arin opens her mouth to apologize, but Moon Gaeul cuts the rice cake with her knife first. 'Never mind the apology, just eat. But let me ask one thing. When you wrote that line, did you know?' The room goes quiet.",
+      "text": "Last autumn a caption came up on the TV at Gaeul Rice Cake Shop, 'The past has all been settled', and Baek Arin is the one who wrote it. Moon Gaeul says, 'I saw the news. They say the person who wrote that line is the one who reported.' Baek Arin opens her mouth to apologize, but Moon Gaeul cuts the rice cake first. 'Never mind the apology, just eat. But let me ask one thing. When you wrote that line, did you know?' The room goes quiet.",
       "memo": [
         "Three boxes of sirutteok -- Gaeul Rice Cake Shop",
         "Moon Gaeul’s question: 'When you wrote that line, did you know?'",
@@ -131,7 +131,7 @@ export default {
     },
     "c33_final": {
       "title": "The Witness Field",
-      "text": "Managing Director Pyeon Jongku lays down two pages of a settlement. If Baek Arin withdraws her report and signs a confidentiality pledge, the group drops the complaint, turns the dismissal into a resignation at the company’s request, and gives her 200 million won in severance, paid without admitting fault, plus three more months in company housing. 'What went to the FSS stays there either way. The only thing that disappears is Ms. Baek’s 3-year lawsuit.' 'I polished the sentences in settlements like this for 12 years. Always from the other side of this table.' There are two signature fields: Baek Arin’s, and one for a witness who confirms they were present at the signing. Pyeon Jongku slides the pen in front of you.",
+      "text": "Managing Director Pyeon Jongku’s settlement says that if Baek Arin withdraws her report and signs a confidentiality pledge, the group drops the complaint and gives her 200 million won in severance, paid without admitting fault. 'What went to the FSS stays there either way. The only thing that disappears is Ms. Baek’s 3-year lawsuit.' 'I polished the sentences in settlements like this for 12 years. Always from the other side of this table.' The signature fields are Baek Arin’s, and one for a witness who confirms they were present at the signing. Pyeon Jongku slides the pen in front of you.",
       "memo": [
         "Terms: withdraw the report + confidentiality pledge",
         "In return: complaint dropped, dismissal turned into resignation at the company’s request, 200 million won severance, 3 months of housing",
@@ -160,7 +160,7 @@ export default {
     },
     "c33_aftershock": {
       "title": "A New Frame",
-      "text": "The first moving truck stops in the market alley. Heo Yoonkyung, who has now heard everything, takes the badge frame off the wall. She removes the badge, slips in the first whistleblower report receipt her daughter ever got, and hangs it back up. 'This suits it better. Even without a photo.' Baek Arin laughs out loud for the first time. 'The Managing Director had a frame on his desk too. A photo of his daughter holding sunflowers on her graduation day. Will he take that down someday, too?' Nine boxes are still left in the Gongdeok-dong studio.",
+      "text": "Heo Yoonkyung takes down the badge frame, slips in the first whistleblower report receipt her daughter ever got, and hangs it back up. 'This suits it better. Even without a photo.' Baek Arin laughs out loud for the first time. 'The Managing Director had a frame on his desk too. A photo of his daughter holding sunflowers on her graduation day. Will he take that down someday, too?' Nine boxes are still left in the studio.",
       "memo": [
         "First load arrives -- Yoonkyung Alterations 2nd floor, Anyang",
         "Refrigerator carried by Kang Taemin, down 11 floors of stairs",
@@ -184,7 +184,7 @@ export default {
     },
     "c33_lock": {
       "title": "The Door Lock List",
-      "text": "Lee Minseo spreads the work order she got from the housing management office beside her laptop. A batch door lock change, ordered by KD Realty, the group’s real estate company. But there are four target units. Besides Baek Arin’s unit 1103, there are three more. A finance team manager who reported an accounting problem to internal audit 2 years ago, a security team assistant manager who reported a system flaw, a branch deputy manager who questioned sales targets. All three were then put on standby assignment, and two have left the company. Lee Minseo turns the screen. 'The requesting department field is empty. Another blank field.'",
+      "text": "Lee Minseo spreads out the management office’s work order. Besides Baek Arin’s unit 1103, three more units are set for a door lock change. A finance team manager who reported an accounting problem 2 years ago, a security team assistant manager who reported a system flaw, a branch deputy manager who questioned sales targets. All three were then put on standby assignment, and two have left the company. Lee Minseo turns the screen. 'The requesting department field is empty. Another blank field.'",
       "memo": [
         "Work order placed by: KD Realty",
         "Door lock changes on 4 units",
@@ -207,7 +207,7 @@ export default {
     },
     "c33_hem": {
       "title": "The Hem Fee",
-      "text": "Heo Yoonkyung shortens Kwon Dohyun’s trouser hems and hands them over. When Kwon Dohyun takes out his wallet, she waves him off. 'Money from my daughter’s friend? Don’t be silly.' 'My ledger has no field for free services.' 'Then make one.' The tug-of-war runs into its 10th minute. Then Kwon Dohyun takes out his calculator. Fighting the criminal complaint, applying for protective measures, and a civil suit on top: 48 million won in lawyer fees. Baek Arin has 21 million won in savings. 'For legal and moving costs caused by a whistleblower report, the state pays back relief money. But it takes three months to arrive.'",
+      "text": "When Kwon Dohyun takes out his wallet, Heo Yoonkyung waves him off. 'Money from my daughter’s friend? Don’t be silly.' 'My ledger has no field for free services.' 'Then make one.' Kwon Dohyun takes out his calculator. Fighting the complaint and applying for protective measures: 48 million won in lawyer fees. Baek Arin has 21 million won in savings. 'The state pays back relief money. But it takes three months to arrive.'",
       "memo": [
         "Hems shortened 3 cm -- 10-minute tug-of-war over the fee",
         "Estimated lawyer fees 48 million won, savings 21 million won",
@@ -230,7 +230,7 @@ export default {
     },
     "c33_summons": {
       "title": "Two Interviews in One Day",
-      "text": "Two summonses have arrived on Baek Arin’s phone. Prosecutor Na Eunho of the Seoul Central District Prosecutors’ Office calls her in over the search and seizure case. Her role: unsworn witness, someone with no duty to testify who comes to explain the facts. July 1, 10 a.m. Yeongdeungpo Police Station calls her in as the accused in the trade secrets case. The same day, 2 p.m. Na Eunho calls in person. 'In the morning you’re the one who brought the evidence, and in the afternoon you’re the one who stole it. Same 1,212 pages either way. I’m on the morning side. The afternoon side isn’t my jurisdiction.'",
+      "text": "Prosecutor Na Eunho of the Seoul Central District Prosecutors’ Office calls Baek Arin in as an unsworn witness, someone with no duty to testify who comes to explain the facts. July 1, 10 a.m. Yeongdeungpo Police Station calls her in as the accused the same day, 2 p.m. Na Eunho calls. 'In the morning you’re the one who brought the evidence, and in the afternoon you’re the one who stole it. Same 1,212 pages either way. I’m on the morning side. The afternoon side isn’t my jurisdiction.'",
       "memo": [
         "Prosecutors, unsworn witness: July 1, 10:00",
         "Police, as the accused: same day, 14:00",
@@ -253,7 +253,7 @@ export default {
     },
     "c33_lock_reaction": {
       "title": "The Badge Returned First",
-      "text": "Han Seoyun, on standby assignment, steps out of the elevator carrying an insulated lunch box. 'On my first day of standby, I returned my ID badge before anything else. The same hand that pressed the return button on your dissent 3 years ago. We both sat next to Yoon Sanghyuk. One of us returned it, and one of us reported.' Baek Arin picks up her chopsticks, then puts them down. 'The one who returned it held on longer.' Han Seoyun shakes her head. 'I didn’t hold on. I just didn’t move.'",
+      "text": "Han Seoyun comes with a lunch box. 'On my first day of standby, I returned my ID badge before anything else. The same hand that pressed the return button on your dissent 3 years ago. We both sat next to Yoon Sanghyuk. One of us returned it, and one of us reported.' Baek Arin speaks. 'The one who returned it held on longer.' Han Seoyun shakes her head. 'I didn’t hold on. I just didn’t move.'",
       "memo": [
         "ID badge returned on the first day of standby",
         "The one who returned it and the one who reported"
@@ -275,7 +275,7 @@ export default {
     },
     "c33_hem_reaction": {
       "title": "The Hidden Seam",
-      "text": "Baek Arin sits at an old hand-crank sewing machine her mother put away up here and turns the lining of her suit inside out. 'Mom sews lining seams most carefully of all. She says the place nobody sees is the first to split. For 12 years I sewed the group’s seams where nobody could see them. That loan explanation, the Innovation Committee script. The report is the first time I turned a seam outside in. Turned out, it’s so crooked. And I’m the one who sewed it.'",
+      "text": "Baek Arin turns the lining of her suit inside out. 'Mom sews lining seams most carefully of all. She says the place nobody sees is the first to split. For 12 years I sewed the group’s seams where nobody could see them. The report is the first time I turned a seam outside in. Turned out, it’s so crooked. And I’m the one who sewed it.'",
       "memo": [
         "The lining seam splits first",
         "The first seam turned outside in"
@@ -297,7 +297,7 @@ export default {
     },
     "c33_summons_reaction": {
       "title": "How It Got Out in Three Days",
-      "text": "FSS examiner Han Jiwoo has come on purpose. 'By law, a whistleblower’s identity is confidential. But a complaint came out three days after the report. I checked how.' A fact-check request the FSS sent to KD Capital. The name was deleted from the attachment, but the author field in the file properties still says 'baek.arin'. 'It was our mistake. Under the rules I have to report this, and once I do, the case leaves my hands.' Han Jiwoo adds, 'Before it leaves, I want to tell the person myself.'",
+      "text": "FSS examiner Han Jiwoo has come to see her. 'By law, a whistleblower’s identity is confidential. But a complaint came out three days after the report. I checked how.' The author field of the document the FSS sent to KD Capital still said 'baek.arin'. 'It was our mistake. Once I report it, the case leaves my hands. Before it leaves, I want to tell the person myself.'",
       "memo": [
         "Author field of the fact-check letter: baek.arin",
         "Report it, and the case leaves her hands"
@@ -319,7 +319,7 @@ export default {
     },
     "c33_branch_storage": {
       "title": "The 10 m² Unit",
-      "text": "A 10 m² unit in a 24-hour storage facility in Mapo. Kang Taemin finds a box with no label. Baek Arin tears off the tape. It is the first draft of last autumn’s Innovation Committee ad script. The last line she wrote went like this. 'The past has not been settled yet. That is why we are forming a committee.' A yellow sticky note is stuck above that line. 'Replace last line -- Y.' In the margin is Baek Arin’s writing in red highlighter. 'This line is not true. I object.' The date is five days before the shoot. 'So I wrote a dissent too. Nobody read it. Just like yours.'",
+      "text": "In a box with no label, Kang Taemin finds the first draft of the Innovation Committee ad script. The last line Baek Arin wrote went like this. 'The past has not been settled yet. That is why we are forming a committee.' A yellow note is stuck above that line. 'Replace last line -- Y.' In the margin is Baek Arin’s red writing. 'This line is not true. I object.' 'So I wrote a dissent too. Nobody read it. Just like yours.'",
       "memo": [
         "First draft of the Innovation Committee script -- the box with no label",
         "Note ordering the change: 'Replace last line -- Y'",
@@ -343,7 +343,7 @@ export default {
     },
     "c33_branch_storage_follow": {
       "title": "Three Highlighters",
-      "text": "Baek Arin takes the three highlighters out of her mug and lays them side by side on the storage floor. 'Yellow for facts, green for effect, red for lines that should go. That’s how I marked things for 12 years.' 431 red lines. Lines actually cut: 0. Kang Taemin picks up the red pen and looks at it for a long time. 'Are you throwing this out?' Instead of answering, Baek Arin pulls the storage door halfway down.",
+      "text": "Baek Arin takes out the three highlighters. 'Yellow for facts, green for effect, red for lines that should go. That’s how I marked things for 12 years.' Of the 431 red lines, lines actually cut: 0. Kang Taemin picks up the red pen. 'Are you throwing this out?' Instead of answering, Baek Arin pulls the storage door halfway down.",
       "memo": [
         "3 highlighter colors -- fact · effect · cut",
         "431 red lines in 12 years",
@@ -367,7 +367,7 @@ export default {
     },
     "c33_route_system": {
       "title": "147 Days",
-      "text": "On NOAH’s screen, 118 whistleblower reports from the financial sector over the past 10 years line up. Of the 118 people who reported, 71 were sued within three months for leaking trade secrets or for defamation. Only 2 of those cases ended in a guilty verdict. But 43 of the 71 withdrew their reports or settled with the company before any verdict. A decision on protective measures, the process for undoing harm suffered for reporting, took 147 days on average. 'My training shows a complaint is filed not to win but so that the person cannot last 147 days.'",
+      "text": "Of 118 financial-sector whistleblower reports, telling a public agency about a company’s wrongdoing, over the past 10 years, 71 people were sued within three months, and 2 ended in a guilty verdict. 43 withdrew their reports or settled before any verdict. A decision on protective measures, the process for undoing harm suffered for reporting, takes 147 days on average. NOAH speaks. 'My training shows a complaint is filed not to win but so that the person cannot last 147 days.'",
       "memo": [
         "71 of 118 financial-sector whistleblowers sued",
         "2 guilty verdicts -- 43 withdrew or settled before a verdict",
@@ -393,7 +393,7 @@ export default {
     },
     "c33_final_system_route": {
       "title": "The 44th Settlement",
-      "text": "The review terminal shows the dates of 71 whistleblowers, one line each. Forty-three lines start on the day they were sued and break off on the day they withdrew or settled. Baek Arin’s line is a week old now, and the settlement offer from the group legal team expires at six this evening. NOAH writes the days remaining beside the last line. 'On average, 147 days until a protective decision. This line has 140 days left. Who holds out through those 140 days with her is not in my data.'",
+      "text": "The review terminal shows the dates of 71 whistleblowers, one line each. Forty-three lines break off on the day they withdrew or settled. Baek Arin’s line is a week old now. NOAH writes the days remaining beside the last line. 'On average, 147 days until a protective decision. This line has 140 days left. Who holds out through those 140 days with her is not in my data.'",
       "memo": [
         "71 whistleblowers sued -- 43 withdrew or settled before a verdict",
         "147 days on average until a decision on protective measures",
@@ -416,7 +416,7 @@ export default {
     },
     "c33_evidence_turn": {
       "title": "The Score That Came Before the Report",
-      "text": "The group security team’s 'insider risk score' screen opens. On May 29, 3 weeks before the report, Baek Arin’s score jumped from 38 to 91. The complaint draft’s file was created on June 1, 18 days before the report. Lee Minseo opens the score formula and her hand stops. At the top of the inputs is this item. 'Hesitation time before decisions -- based on Trigger Lab response records.' 'These are our records. The time we spent thinking hard turned into a probability of betrayal here.'",
+      "text": "On the group security team’s 'insider risk score', Baek Arin’s score jumped from 38 to 91, 3 weeks before the report. The complaint draft was created 18 days before the report. Lee Minseo stops at the top of the score formula’s inputs. 'Hesitation time before decisions -- based on Trigger Lab response records.' 'These are our records. The time we spent thinking hard turned into a probability of betrayal here.'",
       "memo": [
         "Risk score 38 → 91 -- May 29",
         "Complaint draft created June 1, 18 days before the report",
@@ -439,7 +439,7 @@ export default {
     },
     "c33_start_warm": {
       "title": "The Moving Boxes of the One Who Set the Chairs Upright",
-      "text": "Nobody touched the 12 chairs Baek Arin set upright the night the search and seizure ended. On June 19 she files a whistleblower report with the Financial Supervisory Service, telling a public agency about the company’s wrongdoing. Three days later, on Monday morning, a group notice goes up. Disciplinary dismissal, a criminal complaint for leaking trade secrets, and vacate group company housing by 18:00 on July 7. Kang Taemin posts one line in the group chat. 'I’ll carry the boxes. When do we go?'",
+      "text": "The 12 chairs Baek Arin set upright the night the search and seizure ended are still standing. On June 19 she files a whistleblower report, telling a public agency about the company’s wrongdoing. Three days later a group notice goes up. Disciplinary dismissal, a criminal complaint, and vacate company housing by 18:00 on July 7. Kang Taemin posts one line in the group chat. 'I’ll carry the boxes. When do we go?'",
       "memo": [
         "Whistleblower report filed June 19 -- 1,212 pages of material",
         "Group action: disciplinary dismissal, complaint, out of company housing by July 7",
@@ -469,7 +469,7 @@ export default {
     },
     "c33_start_record": {
       "title": "A Complaint for the One Who Matched the List",
-      "text": "The copy list you made from the 312-line seizure list had two blanks. Box 27, and one document that wasn’t even named on the list. On June 19, Baek Arin filed a whistleblower report with the Financial Supervisory Service, telling a public agency about the company’s wrongdoing. The first page of the 1,212 pages is the receipt record she handed you in March, the log of who received a document and when; the second page is the Box 27 removal email. Three days later the group dismisses her and files a criminal complaint against her for leaking trade secrets. Lee Minseo stops as she leafs through the complaint. 'The list of materials attached to the complaint matches the report materials, right down to the page counts. That means the group has already seen what she reported.'",
+      "text": "On June 19, Baek Arin filed a whistleblower report with the Financial Supervisory Service, telling a public agency about the company’s wrongdoing. The second of the 1,212 pages is the removal email for that Box 27. Three days later the group dismisses her and files a criminal complaint against her for leaking trade secrets. Lee Minseo stops as she leafs through the complaint. 'The list of materials attached to the complaint matches the report materials, right down to the page counts. That means the group has already seen what she reported.'",
       "memo": [
         "Copy list, 312 lines -- two blanks",
         "Report page one: receipt record; page two: removal email",
@@ -500,7 +500,7 @@ export default {
     },
     "c33_start_rush": {
       "title": "The Name Heard in the Morning Interview Room",
-      "text": "In the Seocho-dong interview room you rushed to at first light after the search and seizure, Na Eunho asked not a question but a name. Baek Arin. Two days later, on June 19, she files a whistleblower report with the Financial Supervisory Service, telling a public agency about the company’s wrongdoing. Three days after that, the group dismisses her and files a criminal complaint for leaking trade secrets. A text comes from Na Eunho. 'Our candidate for unsworn witness, someone with no duty to testify who comes to explain the facts, has become their accused. Fast, that crowd.'",
+      "text": "The name Na Eunho asked instead of a question was Baek Arin. Two days later, on June 19, Baek Arin files a whistleblower report, telling a public agency about the company’s wrongdoing. Three days after that, the group dismisses her and files a criminal complaint. A text comes from Na Eunho. 'Our candidate for unsworn witness, someone with no duty to testify who comes to explain the facts, has become their accused. Fast, that crowd.'",
       "memo": [
         "Morning interview room -- the name Na Eunho asked: Baek Arin",
         "Dismissal and complaint three days after the report",

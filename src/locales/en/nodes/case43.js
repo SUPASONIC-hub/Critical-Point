@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c43_start": {
       "title": "Agenda Item 1",
-      "text": "Agenda Item 1 for the KD Financial Group board is the future of inside director Yoon Sanghyuk. What has come up is a dismissal motion against him. Han Seoyun, six months into her standby assignment, calls you. 'Eight people vote. The Chairman, and seven outside directors. The brief doesn’t have a single line about the 2023 board. If it all ends with one man leaving, then people like me, who pressed the return button back then, never happened.'",
+      "text": "Agenda Item 1 for the board is a motion to dismiss Yoon Sanghyuk. Han Seoyun, six months on standby with no work, calls you. 'Eight people vote. The Chairman, and seven outside directors. The brief doesn’t have a single line about the 2023 board. If it all ends with one man leaving, then people like me, who pressed the return button back then, never happened.'",
       "memo": [
         "Board meeting: Monday, September 7, 14:00 · Headquarters, 33rd floor",
         "Agenda Item 1: dismissal motion against inside director Yoon Sanghyuk · calling an extraordinary shareholders’ meeting",
@@ -38,7 +38,7 @@ export default {
     },
     "c43_ledger": {
       "title": "Seven Profit-and-Loss Sheets",
-      "text": "The seven A4 sheets on the table are profit-and-loss sheets, one per outside director, with the probability of a yes in the bottom box. Oh Jinwoo pushes his phone forward. 'I put Professor Eun Chaewon at 0.6.' 'Based on what?' 'Gut feeling.' Without a word, Kwon Dohyun strikes a line through it. Three certain yeses, two likely noes. Two of the yeses are directors recommended by the top shareholder, Kingsdale Partners, who join by video from New York. What remains: the youngest, Eun Chaewon, at 0.48, Board Chair Yeon Taekyung at 0.50, and Chairman Seo Dokyung’s box. Kwon Dohyun adds, 'The Chairman can’t be calculated. He isn’t a variable. He’s a constant.' As Lim Kyungsoo’s note told him to, he flips Yeon Taekyung’s sheet over: one line in pencil. 'Attended the April 2023 board -- an outside director then, too.'",
+      "text": "A table of yes probabilities for the seven outside directors. Oh Jinwoo cuts in. 'I put Professor Eun Chaewon at 0.6.' 'Based on what?' 'Gut feeling.' Without a word, Kwon Dohyun strikes a line through it. Three certain yeses, two likely noes. What remains: the youngest, Eun Chaewon, at 0.48, Board Chair Yeon Taekyung at 0.50, and Chairman Seo Dokyung’s box. Kwon Dohyun adds, 'The Chairman can’t be calculated. He isn’t a variable. He’s a constant.' As Lim Kyungsoo’s note said, he flips Yeon Taekyung’s sheet: one line in pencil. 'Attended the April 2023 board -- an outside director then, too.'",
       "memo": [
         "7 outside directors · 1 profit-and-loss sheet each",
         "Certain yes 3 · likely no 2 (former Haeon Partners advisers)",
@@ -69,7 +69,7 @@ export default {
     },
     "c43_advisor": {
       "title": "What the Tail Is Worth",
-      "text": "If the dismissal motion passes, an extraordinary shareholders’ meeting follows a month later. Pyo Serin speaks. 'Recommending a yes on dismissal is easy. Then this company’s governance score goes up.' She points to the 2023 board materials. 'The director who received the dissent report back then is chairing this vote. This isn’t reform. It’s putting the blame on one subordinate while the people above walk away. Give me the grounds, and I’ll write a conditional one: dismissal alone isn’t enough. Just know, when you hand them over, that the recommendation could sink the dismissal.'",
+      "text": "If the dismissal motion passes, an extraordinary shareholders’ meeting follows a month later. Pyo Serin says, 'Recommending a yes on dismissal is easy. Then this company’s governance score goes up.' 'The director who received the dissent report back then is chairing this vote. This isn’t reform. It’s putting the blame on one subordinate while the people above walk away. Give me the grounds, and I’ll write a conditional one: dismissal alone isn’t enough. Just know, when you hand them over, that the recommendation could sink the dismissal.'",
       "memo": [
         "ClearVote draft recommendation -- conclusion box empty",
         "Extraordinary shareholders’ meeting: a month after the board passes it",
@@ -100,7 +100,7 @@ export default {
     },
     "c43_corridor": {
       "title": "A Bench with No Back",
-      "text": "The secretariat accepted only one witness: you. The waiting seat is a single bench with no back. Yoon Sanghyuk, at the end of it, cannot vote as the subject of the motion; he has been allowed 10 minutes to explain himself. 'I read your reports every week. The longest of any from Risk Management.' He tugs at the end of his sleeve. 'If I had been the only one who said to leave that field empty, do you think no one could have touched me for 3 years?' The lock screen of the phone he turned over is his daughter Yoon Seojin’s graduation photo. 'Seojin is in the lobby. Not for me. To see you.'",
+      "text": "Yoon Sanghyuk, at the end of the bench, cannot vote; he has been given 10 minutes to explain himself. 'I read your reports every week. The longest of any from Risk Management.' 'If I had been the only one who said to leave that field empty, do you think no one could have touched me for 3 years?' His phone screen shows his daughter Yoon Seojin’s graduation photo. 'Seojin is in the lobby. Not for me. To see you.'",
       "memo": [
         "Board opens 14:00 · witness to be called at 14:40",
         "Yoon Sanghyuk: 10 minutes to explain · excluded from the vote",
@@ -131,7 +131,7 @@ export default {
     },
     "c43_final": {
       "title": "The Last Vote",
-      "text": "Board Chair Yeon Taekyung puts the motion to a vote. The seven outside directors tap the secret-ballot box on their tablets, and the tally appears on the screen. Four yes, three no. Only Chairman Seo Dokyung’s vote remains. The last line of the draft resolution is 'With this, the inquiry into responsibility for 2023-0412 is deemed concluded.' The Chairman speaks. 'New York wants this line in the quarterly report. With this line, I vote yes. Without it, this company keeps fighting a fight that never ends, so I vote no. I’ll ask the witness. Do you push one man out and end it, or go on without pushing anyone out?'",
+      "text": "The seven outside directors: four yes, three no. Only Chairman Seo Dokyung’s vote remains. The last line of the draft resolution: 'With this, the inquiry into responsibility for 2023-0412 is deemed concluded.' The Chairman speaks. 'New York wants this line in the quarterly report. With this line, I vote yes. Without it, this company keeps fighting a fight that never ends, so I vote no. I’ll ask the witness. Do you push one man out and end it, or go on without pushing anyone out?'",
       "memo": [
         "Outside directors’ 7 votes counted: yes 4 · no 3",
         "Vote left: Chairman Seo Dokyung 1 · 5 votes pass it",
@@ -159,7 +159,7 @@ export default {
     },
     "c43_aftershock": {
       "title": "5 to 3",
-      "text": "The dismissal motion passes, 5 yes, 3 no. The last line of the resolution, saying the inquiry into responsibility is over, will be publicly disclosed tonight. When the doors open, 20 representatives of the one-share group are standing in the hallway. Yoon Sanghyuk hands his employee ID to his secretary and turns around. 'The first-instance sentencing is coming up. That day, I’m the one in the defendant’s seat.' A text arrives from Pyo Serin of ClearVote. 'Filled in the conclusion box. Conditional yes, 11 footnotes.'",
+      "text": "The dismissal motion passes, 5 yes, 3 no. The last line saying the inquiry is over will be publicly disclosed tonight. When the doors open, 20 representatives of the one-share group are standing in the hallway. Yoon Sanghyuk hands his employee ID to his secretary and turns around. 'The first-instance sentencing is coming up. That day, I’m the one in the defendant’s seat.' A text arrives from Pyo Serin of ClearVote. 'Filled in the conclusion box. Conditional yes, 11 footnotes.'",
       "memo": [
         "Dismissal motion passed -- yes 5 · no 3",
         "Last line of the resolution: to be disclosed tonight",
@@ -183,7 +183,7 @@ export default {
     },
     "c43_professor": {
       "title": "2 Million Won an Hour",
-      "text": "In the office with 'Meetings by email' on its door, Eun Chaewon is the youngest of the seven outside directors. She tells you first that one board meeting pays 4 million won. 'It’s a two-hour meeting, so that’s 2 million won an hour. That’s why I’m the most scared. What if I take this money and get it wrong?' There are 23 question marks in the margins of the agenda brief. She points to the biggest one. 'If you dismiss him, is it over? That’s what I want to know most. If it’s over, I vote yes, and if not...'",
+      "text": "Eun Chaewon is the youngest of the seven outside directors. One board meeting pays 4 million won. 'It’s a two-hour meeting, so that’s 2 million won an hour. That’s why I’m the most scared. What if I take this money and get it wrong?' Of the 23 question marks in the margins of the brief, she points to the biggest. 'If you dismiss him, is it over? That’s what I want to know most. If it’s over, I vote yes, and if not...'",
       "memo": [
         "Eun Chaewon: accounting professor · 1st year as an outside director",
         "Board fee 4 million won per meeting · 23 question marks in the brief’s margins",
@@ -206,7 +206,7 @@ export default {
     },
     "c43_call": {
       "title": "A Company That Runs on Memory",
-      "text": "In the taxi, an unknown number rings. Through chief of staff Yeo Minkyu, Chairman Seo Dokyung asks without a greeting. 'Do you think it ends when that man leaves? I think it ends. A company runs not on people but on memory. Push one man out, and the company doesn’t remember him. I call that reform. On Monday I vote last. I hear you’re coming in as a witness. You decide what to say. I decide whether to listen.' After 3 minutes 12 seconds, the line goes dead from his end.",
+      "text": "Through his chief of staff, Chairman Seo Dokyung asks without a greeting. 'Do you think it ends when that man leaves? I think it ends. A company runs not on people but on memory. Push one man out, and the company doesn’t remember him. I call that reform. On Monday I vote last. I hear you’re coming in as a witness. You decide what to say. I decide whether to listen.' After 3 minutes 12 seconds, the line goes dead from his end.",
       "memo": [
         "Direct call from Chairman Seo Dokyung · 3 minutes 12 seconds",
         "'A company runs not on people but on memory'",
@@ -229,7 +229,7 @@ export default {
     },
     "c43_lobby": {
       "title": "Names on a Box Lid",
-      "text": "The one-share group can come only as far as the lobby inside the revolving door. Beside the security gate, Kang Taemin sets down cup-noodle boxes for the 80 people on the night shift and starts writing the 80 names on the lid, one line each. At the end of a lobby sofa, Yoon Seojin sits alone. A text comes from Lee Minseo on the 33rd floor. 'They say the vote is secret. Who voted which way won’t even go in the minutes.'",
+      "text": "The one-share group can come only as far as the lobby. Kang Taemin sets down cup-noodle boxes for the 80 people on the night shift and starts writing the 80 names on the lid. At the end of a sofa, Yoon Seojin sits alone. A text comes from Lee Minseo on the 33rd floor. 'They say the vote is secret. Who voted which way won’t even go in the minutes.'",
       "memo": [
         "About 140 people from the one-share group waiting in the lobby",
         "80 names on the cup-noodle box lid",
@@ -252,7 +252,7 @@ export default {
     },
     "c43_professor_reaction": {
       "title": "Decided Upstairs",
-      "text": "Eun Chaewon puts down her highlighter. 'Shall I tell you why I studied accounting?' Her father ran a mold factory in Ansan, and in her 3rd year of high school it went bankrupt. The manager of the bank branch they dealt with came to the house and bowed his head at the front door. 'It was decided upstairs, for me too.' Eun Chaewon smiles, but the rims of her eyes are red. 'What I hated most was that he wasn’t a bad person. And no one ever told us who upstairs was. Is upstairs only one person this time too?'",
+      "text": "Eun Chaewon puts down her highlighter. 'Shall I tell you why I studied accounting?' Her father’s mold factory in Ansan went bankrupt in her 3rd year of high school. The manager of their bank branch bowed his head at the front door. 'It was decided upstairs, for me too.' The rims of Eun Chaewon’s eyes are red. 'What I hated most was that he wasn’t a bad person. And no one ever told us who upstairs was. Is upstairs only one person this time too?'",
       "memo": [
         "'It was decided upstairs, for me too'",
         "Is upstairs only one person this time too"
@@ -274,7 +274,7 @@ export default {
     },
     "c43_call_reaction": {
       "title": "The Name That Wanted Out",
-      "text": "Hearing about the call, Han Seoyun stares at the corner of the counter for a long time. 'I’ll be honest. I was glad to hear what the Chairman said. When one man leaves, the company doesn’t remember. Then I drop out of its memory too.' She folds and unfolds the printout of her standby assignment notice, the same sheet for six months. 'That’s what I’m most ashamed of. So I’m going on Monday too. As the person who returned the dissent in 2023. Put my name on the witness list.'",
+      "text": "Hearing about the call, Han Seoyun says, 'I’ll be honest. I was glad to hear what the Chairman said. When one man leaves, the company doesn’t remember. Then I drop out of its memory too.' She folds and unfolds the standby notice she has had for six months. 'That’s what I’m most ashamed of. So I’m going on Monday too. As the person who returned the dissent in 2023. Put my name on the witness list.'",
       "memo": [
         "A name that wanted out of the company’s memory",
         "She will be a witness as the one who returned it"
@@ -296,7 +296,7 @@ export default {
     },
     "c43_lobby_reaction": {
       "title": "Someone Who Has Waited",
-      "text": "Setting a pack of rice cakes on Yoon Seojin’s lap instead of a greeting, Moon Gaeul speaks. 'You’re waiting for your father, aren’t you. I waited for my husband once. In a hospital hallway.' Yoon Seojin holds back tears and takes a bite. 'I know everything my father did. That’s why I’m sitting here. I feel like if I run away, I’ll become just like him.' Moon Gaeul fiddles with the string on the box, then speaks. 'Go say that to the person who wrote the dissent. It’s probably what that person has wanted to hear most for 3 years.'",
+      "text": "Setting a pack of rice cakes on Yoon Seojin’s lap instead of a greeting, Moon Gaeul speaks. 'You’re waiting for your father, aren’t you. I waited for my husband once. In a hospital hallway.' Yoon Seojin takes a bite. 'I know everything my father did. That’s why I’m sitting here. I feel like if I run away, I’ll become just like him.' Moon Gaeul says, 'Go say that to the person who wrote the dissent. It’s probably what that person has wanted to hear most for 3 years.'",
       "memo": [
         "Someone who has waited in a hospital hallway",
         "Afraid that running away would make her just like her father"
@@ -318,7 +318,7 @@ export default {
     },
     "c43_branch_witness": {
       "title": "One Line on Page 17",
-      "text": "The group’s legal team has sued Baek Arin for leaking trade secrets. She has just finished the first preparatory hearing. She sets out a copy of the KD Financial Group board report from April 2023. In a corner of page 17 is one line, '1 dissent in the review process -- handled,' and next to it the review e-signature of Yeon Taekyung, an outside director at the time. Baek Arin speaks. 'If I take this in on Monday, the legal team will double the claim.' She laughs. 'My mom still has the receipt for that report framed on the wall.'",
+      "text": "The first preparatory hearing in the group legal team’s trade-secrets suit against Baek Arin has just ended. She sets out a copy of the April 2023 board report. In a corner of page 17 is one line, '1 dissent in the review process -- handled,' and the review e-signature of Yeon Taekyung, an outside director at the time. Baek Arin says, 'If I take this in on Monday, the legal team will double the claim.' She laughs. 'My mom still has the receipt for that report framed on the wall.'",
       "memo": [
         "April 2023 board report, page 17",
         "'1 dissent -- handled' · review e-signature: Yeon Taekyung",
@@ -342,7 +342,7 @@ export default {
     },
     "c43_branch_witness_follow": {
       "title": "The 13:00 Settlement",
-      "text": "As the coffee cools, a call from the group’s legal team comes in on speaker. 'Ms. Baek, if you sign the settlement by 13:00 on Monday, we’ll drop the suit. One condition: no statements of any kind on this matter for a month before and after the board meeting.' The board meets at 14:00. Baek Arin folds and unfolds a corner of the envelope with her fingernail. '1 year ago, I’d have written this settlement myself. With smoother sentences, too. If I sign, the receipt in Mom’s frame becomes just paper. If I don’t, I have to go to the end of this story.'",
+      "text": "A call from the group’s legal team comes in on speaker. 'Ms. Baek, if you sign the settlement by 13:00 on Monday, we’ll drop the suit. One condition: no statements of any kind on this matter for a month before and after the board meeting.' The board meets at 14:00. Baek Arin says, '1 year ago, I’d have written this settlement myself. With smoother sentences, too. If I sign, the receipt in Mom’s frame becomes just paper. If I don’t, I have to go to the end of this story.'",
       "memo": [
         "Settlement offer: deadline Monday 13:00 · board at 14:00",
         "Condition: no statements for a month before and after the board",
@@ -366,7 +366,7 @@ export default {
     },
     "c43_route_system": {
       "title": "486 Items and the Last Line",
-      "text": "On the KD Capital terminal, NOAH brings up every set of KD Financial Group board minutes from the past 10 years. Of 486 agenda items, outside directors voted no three times, and none of those three was reappointed the next year. Both resolutions dismissing executives ended with the same last line: 'The inquiry into related responsibility is deemed concluded.' NOAH adds one line. 'At this board, dismissal has been used not to open a case but to close one. Probability that the same pattern repeats: 0.97.'",
+      "text": "NOAH brings up every set of KD Financial Group board minutes from the past 10 years. Of 486 agenda items, outside directors voted no three times, and none of those three was reappointed the next year. Both resolutions dismissing executives ended with the same line: 'The inquiry into related responsibility is deemed concluded.' NOAH adds, 'At this board, dismissal has been used not to open a case but to close one. Probability that the same pattern repeats: 0.97.'",
       "memo": [
         "486 board agenda items -- outside director no votes: 3",
         "The three who voted no: none reappointed the next year",
@@ -392,7 +392,7 @@ export default {
     },
     "c43_final_system_route": {
       "title": "Two Things in One Ballot",
-      "text": "In the dark Risk Management office, NOAH puts the two past dismissal resolutions side by side. Their last lines match word for word. Under a third box holding only tomorrow’s date, NOAH writes. 'Tomorrow, a yes vote does two things. It pushes one man out, and it closes the rest. A ballot is one sheet, so the two cannot be cast separately. In the two dismissals I have read, no one proposed splitting them.'",
+      "text": "NOAH puts the two past dismissal resolutions side by side. Their last lines match word for word. NOAH writes. 'Tomorrow, a yes vote does two things. It pushes one man out, and it closes the rest. A ballot is one sheet, so the two cannot be cast separately. In the two dismissals I have read, no one proposed splitting them.'",
       "memo": [
         "2 executive dismissal resolutions -- identical last line: 'inquiry into responsibility concluded'",
         "Outside director no votes: 3 -- none of the three reappointed",
@@ -415,7 +415,7 @@ export default {
     },
     "c43_evidence_turn": {
       "title": "Two Press Releases",
-      "text": "When you filter the folder by the date the clue pointed to, two files open in the group PR office’s shared folder. Both were created three days before the board meeting. One is 'Dismissal Motion Passes -- KD Financial Group Completes Its Reform,' the other 'Dismissal Motion Fails -- Board Independence Confirmed.' The last paragraphs do not differ by a single letter. 'With this, the controversy over 2023-0412 has been put to rest.' Ban Jaewook closes his notebook. 'It’s built so the company wins however the vote goes. Whatever the eight of them cast, the end date was already set.'",
+      "text": "The group PR office’s folder holds two press releases made three days before the board meeting. 'Dismissal Motion Passes -- KD Financial Group Completes Its Reform' and 'Dismissal Motion Fails -- Board Independence Confirmed.' The last paragraphs do not differ by a single letter. 'With this, the controversy over 2023-0412 has been put to rest.' Ban Jaewook says, 'It’s built so the company wins however the vote goes. Whatever the eight of them cast, the end date was already set.'",
       "memo": [
         "2 draft press releases -- created three days before the board",
         "Pass and fail versions, same last paragraph: 'put to rest'",
@@ -438,7 +438,7 @@ export default {
     },
     "c43_start_warm": {
       "title": "The Nine Who Stayed by the Sea",
-      "text": "The written opinion for two outside directors, the nine of you passed around and revised on the train to Seoul. Agenda Item 1 for the KD Financial Group board is inside director Yoon Sanghyuk. A dismissal motion to push him out is up. Na Junhyuk posts in the group chat a notebook page he wrote on the night at the breakwater. 'Let’s get through this week on this. Even I can’t read my handwriting.' Han Seoyun adds a line. '2023 isn’t in the brief. The only one willing to testify about it is Baek Arin.'",
+      "text": "The opinion for the two outside directors, the nine of you revised on the train to Seoul. Agenda Item 1 for the board is a motion to dismiss Yoon Sanghyuk. Na Junhyuk posts a notebook page he wrote on the night at the breakwater. 'Let’s get through this week on this. Even I can’t read my handwriting.' Han Seoyun replies. '2023 isn’t in the brief. The only one willing to testify about it is Baek Arin.'",
       "memo": [
         "One page of Na Junhyuk’s notebook: seven answers from the breakwater",
         "Written opinion sent: 7 minutes to midnight · 2 outside directors",
@@ -468,7 +468,7 @@ export default {
     },
     "c43_start_record": {
       "title": "A Brief with One Name",
-      "text": "Agenda Item 1 for the KD Financial Group board is inside director Yoon Sanghyuk. A dismissal motion to push him out is up. The agenda brief Ban Jaewook printed is two pages; the reason for dismissal is one line, 'damage to group trust from a matter under trial,' and the last line is 'related risk assets cleared.' Those who vote are Chairman Seo Dokyung and seven outside directors. Ban Jaewook speaks. 'Your file has 20 names, and this brief has only one. The only one willing to testify to those names is Baek Arin.'",
+      "text": "Agenda Item 1 for the board is a motion to dismiss Yoon Sanghyuk. The brief Ban Jaewook printed is two pages; the reason is one line, 'damage to group trust from a matter under trial,' and the last line is 'related risk assets cleared.' Chairman Seo Dokyung and seven outside directors vote. Ban Jaewook says, 'Your file has 20 names, and this brief has only one. The only one willing to testify to those names is Baek Arin.'",
       "memo": [
         "File written on the train: 20 names · 47 addresses",
         "Agenda brief, 2 pages -- names in it: 1",
@@ -498,7 +498,7 @@ export default {
     },
     "c43_start_rush": {
       "title": "The Gap the One in a Hurry Left",
-      "text": "Hearing about the dismissal motion before dawn, you left Gyeongpo on the first train, before the group photo. KD Financial Group board, September 7, Agenda Item 1: inside director Yoon Sanghyuk. Kwon Dohyun has already printed a vote table. 'The Chairman, one vote; outside directors, seven. Three certain yes, two likely no, two unknown. The math is done, but one box is empty. Baek Arin. She must have texted you over 20 times in Gyeongpo, and there’s no record of a reply, is there?'",
+      "text": "Hearing about the dismissal motion before dawn, you left Gyeongpo on the first train, before the group photo. September 7 board, Agenda Item 1: dismissing Yoon Sanghyuk. Kwon Dohyun has already printed a vote table. 'The Chairman, one vote; outside directors, seven. Three certain yes, two likely no, two unknown. The math is done, but one box is empty. Baek Arin. She must have texted you over 20 times in Gyeongpo, and there’s no record of a reply, is there?'",
       "memo": [
         "Group photo: only your spot empty · guestbook: 'the one in a hurry'",
         "Kwon Dohyun’s table: yes 3 · likely no 2 · undecided 2 · Chairman 1",
