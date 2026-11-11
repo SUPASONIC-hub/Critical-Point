@@ -74,18 +74,19 @@ test("the app build (`--mode app`) has no tag, no Google origin and no Google An
   assert.equal(withAnalyticsTags(index, app), index);
   for (const origin of ["", "https://critical-point-wn6p.onrender.com"]) {
     const pages = renderStaticPages(origin, { analytics: app, app: true });
-    assert.equal(Object.keys(pages).length, 15);
+    // The web's pages, every one (the policy's six, the site's nine and main's content pages since 11-10).
+    const web = renderStaticPages(origin);
+    assert.deepEqual(Object.keys(pages), Object.keys(web));
     for (const [file, html] of Object.entries(pages)) {
       // The policy's notice that the web turns it on 11-12 is not the app's to make: the app never does.
       assert.doesNotMatch(html, GOOGLE, file);
       assert.doesNotMatch(html, /변경 예고|Upcoming change|変更の予告/, file);
     }
     // Everything else is the web's page without it.
-    const web = renderStaticPages(origin);
     for (const [file, language] of Object.entries(POLICIES)) assert.equal(pages[file], web[file].replace(`${ANALYTICS_NOTICE[language]}\n`, ""), file);
   }
   const config = readFileSync("vite.config.js", "utf8");
-  assert.match(config, /staticPages\(analytics, \{ app: mode === "app" \}\)/);
+  assert.match(config, /staticPages\(\{ analytics, ads: .*?, app: mode === "app" \}\)/);
   assert.match(config, /analyticsFor\(\{ \.\.\.readAnalyticsEnv\(loadEnv\(mode, process\.cwd\(\), "GA_"\)\), command, mode, debug: debugBuild \}\)/);
 });
 
