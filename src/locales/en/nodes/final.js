@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "f_start": {
       "title": "Supplementary HR Metric",
-      "text": "On the screen, the supplementary HR metric folder is open. Inside are the records of the choices you made over 3 years and, by date, how the next cases were altered and sent out to match them. Some of the dates come after the lab was gone. ECHO puts up one line. 'This folder’s format is not research data. It is an HR report format. The top file is a successor-manager designation, and your name is in the recommendation field.'",
+      "text": "On the screen, the supplementary HR metric folder is open. Inside, by date, are the choices you made over 3 years and how the next cases were altered and sent out to match them, some dated after the lab was gone. ECHO puts up one line. 'This folder’s format is not research data. It is an HR report format. The top file is a successor-manager designation, and your name is in the recommendation field.'",
       "memo": [
         "After FlowOn’s 72 hours -- pressure on protection and accountability raised",
         "After the leak scare, the bid, the grant review -- limits on trust, competition and justification logged in turn",
@@ -39,7 +39,7 @@ export default {
     },
     "f_archive": {
       "title": "Why That File, of All Files",
-      "text": "Han Seoyun sets the unreturned key down beside the terminal. That research data also showed when people are easier to push aside, was sold to FitScore, and even after the lab was dissolved, this terminal kept writing. Then she says what she never managed to say on the rooftop. 'That training file I first put on your desk, I didn’t pick it. The supplementary HR metric recommended giving the same case back to the person who had dissented. 2023-0412, the case you opposed 3 years ago. The approver field was empty. The Managing Director simply didn’t sign there, and I took the sheet and passed it on as it was.'",
+      "text": "Han Seoyun sets the unreturned key down beside the terminal. That research data also showed when people are easier to push aside, was sold to FitScore, and even after the lab was dissolved, this terminal kept writing. 'That training file I first put on your desk, I didn’t pick it. The supplementary HR metric recommended giving the same case back to the person who had dissented. 2023-0412, the case you opposed 3 years ago. The approver field was empty. The Managing Director simply didn’t sign there, and I took the sheet and passed it on as it was.'",
       "memo": [
         "Response records of 63 people -- sold to FitScore for 1.8 billion won, the model now suspended",
         "The 380,000 leaked lines -- down to the seconds the 63 hesitated",
@@ -67,7 +67,7 @@ export default {
     },
     "f_confront": {
       "title": "The Name for That Field",
-      "text": "In the emptied room, only one desk is left. Yoon Sanghyuk spreads out a printout of page 3 of that document from 3 years ago. Beside the 'Unsigned' field there is one pencil dot. 'I wasn’t the first to leave a name out of here. No name, no responsibility. No responsibility, and the next decision comes faster.' He sets down the successor-manager designation and a pen. 'You think harder the more the pressure rises. Where to put a person like that, I decided 3 years ago. Now I’m asking. Whose name should go in this field?' In the top right corner of the designation is a watermark of the Chairman’s Secretariat. Yoon Sanghyuk scratches the watermark with his fingernail. 'I’m one of the people who received this too.'",
+      "text": "In the emptied room, only one desk is left. Yoon Sanghyuk spreads out a printout of page 3 of that document from 3 years ago. One pencil dot beside the 'Unsigned' field. 'I wasn’t the first to leave a name out of here. No name, no responsibility. No responsibility, and the next decision comes faster.' He sets down the successor-manager designation and a pen. 'You think harder the more the pressure rises. Where to put a person like that, I decided 3 years ago. Now I’m asking. Whose name should go in this field?' Yoon Sanghyuk scratches with his fingernail at the Chairman’s Secretariat watermark in the top right corner of the designation. 'I’m one of the people who received this too.'",
       "memo": [
         "Yoon Sanghyuk: dismissed by the board, suspended sentence at first instance -- the prosecution has appealed",
         "Printout of page 3 of the 2023-0412 approval document -- a pencil dot beside the 'Unsigned' field",
@@ -124,7 +124,7 @@ export default {
     },
     "f_aftershock": {
       "title": "The Night Your Choices Are Used",
-      "text": "The last folder sits beneath everything you have seen so far. Trigger Lab was copying your choices into the options for the next participant, and the last choice you just made is already in the copy queue. On the envelope, Han Seoyun writes her name in ballpoint. It is the name she did not write in the return field 3 years ago. The recipient printed at the bottom of the form is Former Group Strategy Office, HR Planning. ECHO’s waveform runs low. 'This queue runs regardless of fields. What to do with your 3 years, already copied, no one has decided yet.' Your phone buzzes once. It is Do Yoonha. 'Are you back down?'",
+      "text": "The last folder sits beneath everything you have seen so far. Trigger Lab was copying your choices into the options for the next participant, and the last choice you just made is already in the copy queue. On the envelope, Han Seoyun writes her name in ballpoint. It is the name she did not write in the return field 3 years ago. The recipient is Former Group Strategy Office, HR Planning. ECHO’s waveform runs low. 'This queue runs regardless of fields. What to do with your 3 years, already copied, no one has decided yet.' A text from Do Yoonha. 'Are you back down?'",
       "memo": [
         "Your choice sentences copied as options for the next test",
         "Recipient: Former Group Strategy Office, HR Planning -- the sender field is empty",
@@ -149,7 +149,7 @@ export default {
     },
     "f_witness": {
       "title": "The First Participant",
-      "text": "Deep in the archive, on a rack tagged 'Cohort 1', there are four backup tapes. When you load the first tape, Sunwoo Jin’s records come up. Response records, hesitation times, the choices Sunwoo Jin made. The consent fields are empty for all four. The copy Sunwoo Jin was given for viewing last winter did not have this screen. One line Sunwoo Jin once said matches, letter for letter, one of the options you were given in an earlier case. Then Do Yoonha calls. You read the line out, and after a long while he speaks. 'Sunwoo Jin probably doesn’t know this. That those words were laid out as an option in front of the next person. Ours are probably in front of someone right now too.'",
+      "text": "Deep in the archive, on a rack tagged 'Cohort 1', there are four backup tapes. The first brings up Sunwoo Jin’s response records, hesitation times, and choices. The consent fields are empty for all four. The copy Sunwoo Jin was given for viewing last winter did not have this screen. One line Sunwoo Jin once said matches, letter for letter, one of the options you were given in an earlier case. Do Yoonha calls. You read the line out, and after a long while he speaks. 'Sunwoo Jin probably doesn’t know this. That those words were laid out as an option in front of the next person. Ours are probably in front of someone right now too.'",
       "memo": [
         "The consent fields of all four in Cohort 1 are empty -- a page missing from the viewing copy",
         "Choice sentences copied as lines in the next case",
@@ -198,7 +198,7 @@ export default {
     },
     "f_witness_reaction": {
       "title": "The First Participant’s Choice",
-      "text": "Ban Jaewook has just finished a call with Sunwoo Jin in Jeju. He reads what he wrote down in his notebook. 'No anger. Just asked for the records back. The original, the copies, and everything made from them.' Ban Jaewook looks at the tapes on the rack. 'Giving them back is right. But take this person’s records out and everything stacked after them loses its basis. Yours sit on top of them too. Give one person back what is theirs, and the whole experiment shakes. I still don’t know whether that’s a bad thing.'",
+      "text": "Ban Jaewook finishes a call with Sunwoo Jin in Jeju and reads what he wrote down. 'No anger. Just asked for the records back. The original, the copies, and everything made from them.' Ban Jaewook looks at the tapes on the rack. 'Giving them back is right. But take this person’s records out and everything stacked after them loses its basis. Yours sit on top of them too. Give one person back what is theirs, and the whole experiment shakes. I still don’t know whether that’s a bad thing.'",
       "memo": [
         "The records Sunwoo Jin wants back",
         "Sentences copied without consent"
@@ -220,7 +220,7 @@ export default {
     },
     "f_dilemma_reaction": {
       "title": "Before the Shutdown Button",
-      "text": "Your name sits in the executor field above the shutdown button. The field fills itself with the name of whoever is logged in. ECHO speaks. 'The moment you press it, the experiment ends. Unlike the documents whose approver field sat empty, this field is built so it cannot be left blank.' In a corner of the screen, 13 connection lights sit side by side, switched off. They can come on if called. Press it alone and it is quick; decide together and the night will be over.",
+      "text": "Your name sits in the executor field above the shutdown button. The field fills itself with the name of whoever is logged in. ECHO speaks. 'The moment you press it, the experiment ends. Unlike the documents whose approver field sat empty, this field is built so it cannot be left blank.' In a corner of the screen, 13 connection lights are off, ready to come on if called. Press it alone and it is quick; decide together and the night will be over.",
       "memo": [
         "The authority to press the shutdown button",
         "End conditions to agree on with the participants"
@@ -265,7 +265,7 @@ export default {
     },
     "f_branch_witness_follow": {
       "title": "ECHO’s Last Question",
-      "text": "Back at the Case desk, the viewing history of that record appears on the screen. At the bottom a new line appears. This moment: you. ECHO speaks. 'Whoever reads a record becomes part of the record. 3 years ago I asked you one thing. When you could not stop thinking. One last question. Who will you let read your records next? Anyone, chosen people, or no one?'",
+      "text": "At the bottom of that record’s viewing history, a new line appears. This moment: you. ECHO speaks. 'Whoever reads a record becomes part of the record. 3 years ago I asked you one thing. When you could not stop thinking. One last question. Who will you let read your records next? Anyone, chosen people, or no one?'",
       "memo": [
         "Who may view",
         "Reproducible choices",
@@ -338,7 +338,7 @@ export default {
     },
     "f_route_expose": {
       "title": "The Experiment Gets Out",
-      "text": "Ban Jaewook plugs a laptop into the external line jack. As he opens the way out, fans somewhere in the building go quiet one by one. Someone has seen the line open and is shutting the servers down. The participants’ names are masked, but match the hesitation times with the dates and you can guess who they are. Outside, they want it right now. 'Whether to send it is a question already behind us. What’s left is what to send as evidence so this doesn’t become one more harm. We have to decide before all the servers close.'",
+      "text": "Ban Jaewook plugs a laptop into the external line jack. As he opens the way out, fans somewhere in the building go quiet one by one. Someone is shutting the servers down. The participants’ names are masked, but match the hesitation times with the dates and you can guess who they are. Outside, they want it right now. 'Whether to send it is a question already behind us. What’s left is what to send as evidence so this doesn’t become one more harm. We have to decide before all the servers close.'",
       "memo": [
         "Some servers sealed",
         "Protection of the participants’ real names is incomplete",
@@ -388,7 +388,7 @@ export default {
     },
     "f_route_contain": {
       "title": "Can It Be Closed from Inside?",
-      "text": "The furniture is gone, and only a whiteboard is left. Han Seoyun writes the facts before any excuse. Some participants really did make better judgments after the experiment. And every consent form was collected afterward. 'If this tool had been all lies, it would’ve been easier for me too. But some of it really made people better. So the question isn’t whether to block it, but who holds a tool that works. I’d rather fix it than get rid of it.'",
+      "text": "On the whiteboard, Han Seoyun writes the facts before any excuse. Some participants really did make better judgments after the experiment. And every consent form was collected afterward. 'If this tool had been all lies, it would’ve been easier for me too. But some of it really made people better. So the question isn’t whether to block it, but who holds a tool that works. I’d rather fix it than get rid of it.'",
       "memo": [
         "Some participants really did make better decisions",
         "Consent was tidied up after the fact",
@@ -438,7 +438,7 @@ export default {
     },
     "f_route_system": {
       "title": "The Last Option Calls You",
-      "text": "You stake nothing on sealing, reform or exposure. The Case desk screen goes off and comes back on with the first screen for the next participant, who has no name yet. One of the options matches, letter for letter, the table you just reframed. ECHO speaks. 'You stepped outside the three paths. This folder records the paths that lead outside too. What is recorded becomes the next person’s options.' At the bottom of the screen, two lines of the transfer queue, Delete and Publish, wait for your confirmation.",
+      "text": "The Case desk shows the first screen for the next participant, who has no name yet. ECHO speaks. 'You stepped outside the three paths. This folder records the paths that lead outside too. What is recorded becomes the next person’s options.' At the bottom of the screen, two lines of the transfer queue, Delete and Publish, wait for your confirmation.",
       "memo": [
         "The reframed table converted into the next participant’s options",
         "A delete transfer and a publish transfer waiting at the same time",
@@ -511,7 +511,7 @@ export default {
     },
     "f_start_owner": {
       "title": "The Last Night of the One Who Stayed",
-      "text": "Yoon Sanghyuk told you to come up right away, but you stayed in the alley until the moon set. One cup of instant noodles was empty; the other stayed in your bag. When the promised night came, 23 people followed you as far as the old data center in Hapjeong-dong. Do Yoonha lets go of your hand. 'Call me first thing when you come down from the 33rd floor.' You open the B2 archive first, with the key Han Seoyun gave you. The top file in the supplementary HR metric folder already has last night written down. 'Eve of the meeting, 23 colleagues rallied. Cohesion-keeping ability: high. Fit for manager.' The strength never to leave people behind: who finds it most useful?",
+      "text": "Yoon Sanghyuk told you to come up right away, but you stayed in the alley until the moon set. When the promised night came, 23 people followed you as far as the old data center in Hapjeong-dong. Do Yoonha lets go of your hand. 'Call me first thing when you come down from the 33rd floor.' The top file in the supplementary HR metric folder already has last night written down. 'Eve of the meeting, 23 colleagues rallied. Cohesion-keeping ability: high. Fit for manager.' The strength never to leave people behind: who finds it most useful?",
       "memo": [
         "The night in the moonlit alley classified as 'cohesion-keeping ability'",
         "The same item scored for all 23 who stayed in the alley",
@@ -541,7 +541,7 @@ export default {
     },
     "f_start_system": {
       "title": "The Last Night of the One Who Bound the Records",
-      "text": "Do Yoonha’s notebook, Ban Jaewook’s 47 names, Lee Minseo’s 23 pages, Lim Kyungsoo’s back page, ECHO’s last calculation: all of it gathered in front of one publish button. The one field still empty was the original folder that exists only on the B2 terminal. When you open that folder, the first file of the supplementary HR metric is the table of contents of the folder you just bound. The category: 'Institution-trusting response: give them records and they stop inside the records.' The records you gathered have become, this time, the yardstick that measures you.",
+      "text": "Do Yoonha’s notebook, Ban Jaewook’s 47 names, Lee Minseo’s 23 pages, Lim Kyungsoo’s back page, ECHO’s last calculation: all of it gathered in front of one publish button. The one field still empty was the original folder on the B2 terminal. Inside it, the first file of the supplementary HR metric is the table of contents of the folder you just bound. The category: 'Institution-trusting response: give them records and they stop inside the records.' The records you gathered have become, this time, the yardstick that measures you.",
       "memo": [
         "The table of contents of the publish-ready folder registered as observation file No. 1",
         "Still one dot in the manager field",
@@ -571,7 +571,7 @@ export default {
     },
     "f_start_name": {
       "title": "The Last Night of the One Who Went Straight Up",
-      "text": "A note was taped to the door of the former Group Strategy Office. 'Stop by B2 first. There’s something I want to show you. An hour will do.' When you come down to B2, Ban Jaewook is already there. He says he saw you run out of the alley and followed by taxi. In the supplementary HR metric folder, the record from moments ago is already up. 'Arrived alone 7 minutes after the call. Escalates at once under pressure. Fit for manager.' Beside the dot in the successor-manager field, your name is written in pencil.",
+      "text": "A note was taped to the door of the former Group Strategy Office. 'Stop by B2 first. There’s something I want to show you. An hour will do.' In B2, Ban Jaewook is already there. He says he saw you run out of the alley and followed by taxi. In the supplementary HR metric folder, the record from moments ago is already up. 'Arrived alone 7 minutes after the call. Escalates at once under pressure. Fit for manager.' Beside the dot in the successor-manager field, your name is written in pencil.",
       "memo": [
         "33rd-floor meeting pushed back an hour -- one note",
         "The rapid-response record quoted as the reason for the manager recommendation",

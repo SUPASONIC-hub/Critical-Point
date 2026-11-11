@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c41_start": {
       "title": "This Time He Comes",
-      "text": "The National Assembly Policy Committee sets the date for a hearing. The first name on the witness list is Yoon Sanghyuk, CEO of KD Capital. He did not appear at last autumn’s parliamentary audit; this time, through his lawyer, he says he 'will attend in good faith.' You are an unsworn witness again. On the phone, Cha Jiwon says: 'The ones who don’t show are easy. An empty chair doesn’t argue back. The scary ones are the ones who show up.'",
+      "text": "The National Assembly Policy Committee sets the date for a hearing. The first name on the witness list: Yoon Sanghyuk. He did not appear at last year’s parliamentary audit; this time he says he 'will attend in good faith.' You are an unsworn witness again. Cha Jiwon says, 'The ones who don’t show are easy. An empty chair doesn’t argue back. The scary ones are the ones who show up.'",
       "memo": [
         "Hearing in D-4 -- opens Friday at 10:00",
         "Witness Yoon Sanghyuk: CEO of KD Capital, on trial for breach of trust over advisory fees",
@@ -38,7 +38,7 @@ export default {
     },
     "c41_drill": {
       "title": "I Don’t Recall",
-      "text": "Mock hearing, round 2. Lim Kyungsoo’s chair beside the counter has been empty since August; only the recording goes to his room at Ieum Hospital. Na Junhyuk plays Yoon Sanghyuk again. But whatever anyone asks, there is one answer. 'I don’t recall.' Kwon Dohyun asks, 'The third line of the 1994 Yeongdong Branch return report?' Na Junhyuk closes his eyes and recites it without missing a single word. Memory is a choice. Oh Jinwoo draws a betting board on the whiteboard. 'How many times in the real thing? I say nineteen.' A text from Cha Jiwon. 'Format’s set. Face-to-face questioning, 1 minute, exactly one question.'",
+      "text": "Mock hearing, round 2. Lim Kyungsoo’s chair has been empty since August; only the recording goes to his hospital room. Na Junhyuk, playing Yoon Sanghyuk, has one answer to everything. 'I don’t recall.' But when Kwon Dohyun asks, 'The third line of the 1994 Yeongdong Branch return report?' he recites it without missing a word. Memory is a choice. Oh Jinwoo writes on a betting board. 'How many times in the real thing? I say nineteen.' A text from Cha Jiwon. 'Format’s set. Face-to-face questioning, 1 minute, exactly one question.'",
       "memo": [
         "14 mock questions -- 'I don’t recall' 14 times",
         "Na Junhyuk’s new suit: buttons close; not claimable as an expense (Kwon Dohyun’s ruling)",
@@ -69,7 +69,7 @@ export default {
     },
     "c41_corridor": {
       "title": "Waiting Room Hallway",
-      "text": "Yoon Sanghyuk is already there with two lawyers. He holds out a paper cup of coffee. 'I hear you get one question. Choose it carefully. Seojin says she’s coming to the gallery.' The moment his daughter’s name comes up, the hallway grows half as wide. He keeps the hand holding the coffee out and adds, 'I am not a man with a bad memory. It’s just that today is a day I have no need to remember.'",
+      "text": "Yoon Sanghyuk, with two lawyers, holds out a paper cup of coffee. 'I hear you get one question. Choose it carefully. Seojin says she’s coming to the gallery.' At his daughter’s name, the hallway grows half as wide. 'I am not a man with a bad memory. It’s just that today is a day I have no need to remember.'",
       "memo": [
         "Outside the witness waiting room -- 40 minutes before opening",
         "Yoon Sanghyuk’s side: 2 lawyers",
@@ -100,7 +100,7 @@ export default {
     },
     "c41_chamber": {
       "title": "The 22nd",
-      "text": "At 10:00, sworn in, Yoon Sanghyuk pulls the microphone closer. Asked about the Haeon Partners advisory fees, or Trigger Lab’s response records: 'I don’t recall.' By noon, 22 times. Oh Jinwoo’s nineteen has already lost, and Kwon Dohyun’s twenty-three is one away. Just before the recess, a note from Cha Jiwon. 'The 1 minute right after the recess is yours. He’s prepared his 23rd answer too. Ask the question that makes that answer false.' You have three things you can bring out. The receipt log for the original of the empty signature field that Baek Arin handed you. The approval for the 4 billion won investment in FitScore. And her father’s notebook, in Yoon Seojin’s bag in the gallery.",
+      "text": "At 10:00, sworn in, Yoon Sanghyuk answers the Haeon Partners advisory fees and Trigger Lab’s response records alike: 'I don’t recall.' By noon, 22 times. Kwon Dohyun’s twenty-three is one away. Just before the recess, a note from Cha Jiwon. 'The 1 minute right after the recess is yours. He’s prepared his 23rd answer too. Ask the question that makes that answer false.' You have three things to bring out. The receipt log for the original of the empty signature field from Baek Arin. The approval for the 4 billion won investment in FitScore. Her father’s notebook, in Yoon Seojin’s bag in the gallery.",
       "memo": [
         "'I don’t recall' 22 times -- before the recess",
         "Bet: Oh Jinwoo 19 out, Kwon Dohyun 23 waiting",
@@ -131,7 +131,7 @@ export default {
     },
     "c41_final": {
       "title": "One Question",
-      "text": "Chair Seo Taerin stands two stopwatches side by side. 'Face-to-face questioning between the unsworn witness and the witness is allowed for 1 minute.' For the first time, Yoon Sanghyuk turns toward you. In the third row of the gallery sit Moon Gaeul and Yoon Seojin, and in the last seat, Moon Hajun. The chair presses a stopwatch. 60 seconds. Whatever you ask, the answer he has prepared will be 'I don’t recall.' One problem remains. What that answer becomes in this room.",
+      "text": "Chair Seo Taerin stands two stopwatches up. 'Face-to-face questioning between the unsworn witness and the witness is allowed for 1 minute.' For the first time, Yoon Sanghyuk turns toward you. In the third row of the gallery, Moon Gaeul and Yoon Seojin; in the last seat, Moon Hajun. 60 seconds. The answer he has prepared will be 'I don’t recall.' What remains is what that answer becomes in this room.",
       "memo": [
         "Face-to-face questioning, 1 minute -- 1 question",
         "'I don’t recall' 22 times; 1 more for Kwon Dohyun’s bet",
@@ -159,7 +159,7 @@ export default {
     },
     "c41_aftershock": {
       "title": "Number 23",
-      "text": "The hearing ends at 18:40. In the transcript, 'I don’t recall' appears exactly 23 times; the last came in the afternoon. Kwon Dohyun, who wrote twenty-three on the bookshop betting board, collects a box of cup noodles from Kang Taemin and says, 'I’ll look into whether prize money is taxable.' Outside the National Assembly’s main gate, Yoon Seojin does not get into her father’s car. She turns back and carries Moon Gaeul’s empty rice cake boxes for her. Kang Taemin says briefly, 'Next time, let’s meet somewhere without papers.'",
+      "text": "The hearing ends at 18:40. In the transcript, 'I don’t recall' appears exactly 23 times. Kwon Dohyun, who wrote twenty-three, collects a box of cup noodles from Kang Taemin and says he 'will look into whether prize money is taxable.' At the National Assembly’s main gate, Yoon Seojin does not get into her father’s car; she carries Moon Gaeul’s empty rice cake boxes instead. Kang Taemin says, 'Next time, let’s meet somewhere without papers.'",
       "memo": [
         "Transcript: 'I don’t recall' 23 times",
         "Bet winner Kwon Dohyun -- prize: 1 box of cup noodles",
@@ -183,7 +183,7 @@ export default {
     },
     "c41_questions": {
       "title": "1,112 Questions",
-      "text": "Do Yoonha holds out his phone. Last night he posted a notice in the victims’ group chat, 'One line each: what you want to ask CEO Yoon Sanghyuk,' and by morning 1,112 replies were in. 'Who told you to add our factory as collateral?' Moon Gaeul’s question is nine syllables. 'Do you know my husband’s name?' Do Yoonha can’t turn off the screen. 'We only get one question. Where do the other one thousand one hundred eleven go?'",
+      "text": "Do Yoonha posted 'One line each: what you want to ask CEO Yoon Sanghyuk' in the victims’ group chat, and by morning 1,112 replies were in. 'Who told you to add our factory as collateral?' Moon Gaeul’s question is nine syllables. 'Do you know my husband’s name?' Do Yoonha says, 'We only get one question. Where do the other one thousand one hundred eleven go?'",
       "memo": [
         "1,112 questions in one night -- half are curses",
         "Moon Gaeul: 'Do you know my husband’s name?'",
@@ -206,7 +206,7 @@ export default {
     },
     "c41_gallery": {
       "title": "No Rice Cakes Allowed",
-      "text": "At the security checkpoint at the gallery entrance, Moon Gaeul stops. Three boxes of rice cakes have been flagged. Moon Gaeul’s polite speech gets sharper. 'This isn’t food. This is 1,740 people.' Kang Taemin, saying 'I’ll reduce the evidence,' eats three pieces of injeolmi on the spot. In the end the rice cakes go to a locker. But there are 40 gallery passes, and eighty-two people came from the victims’ group and the 41 Club. Half will have to stay in front of the hallway monitors.",
+      "text": "At the gallery checkpoint, Moon Gaeul’s three boxes of rice cakes are flagged. 'This isn’t food. This is 1,740 people.' Kang Taemin, saying 'I’ll reduce the evidence,' eats three pieces of injeolmi. The rice cakes go to a locker in the end. There are 40 gallery passes, and eighty-two people came from the victims’ group and the 41 Club. Half will have to stay in front of the hallway monitors.",
       "memo": [
         "3 boxes of rice cakes -- locker 17",
         "40 gallery passes, 82 people came",
@@ -229,7 +229,7 @@ export default {
     },
     "c41_recess": {
       "title": "Lunch Recess",
-      "text": "Cha Jiwon finishes a triangle kimbap in two bites. 'The lawmaker wants a name. Like last year. Yoon Sanghyuk erased it, one sentence. That’s tomorrow’s page 1.' A text the Group PR office sent reporters before the recess even began. 'CEO Yoon Sanghyuk appeared in a personal capacity and has no connection to the Group.' Cha Jiwon says, without smiling, 'See, they’re already cutting off the tail. Say only the name and it ends with that one man. Is that what you want?'",
+      "text": "Cha Jiwon finishes a triangle kimbap in two bites. 'The lawmaker wants a name. Like last year. Yoon Sanghyuk erased it, one sentence. That’s tomorrow’s page 1.' Before the recess, the Group PR office texted reporters. 'CEO Yoon Sanghyuk appeared in a personal capacity and has no connection to the Group.' 'See, they’re already cutting off the tail. Say only the name and it ends with that one man. Is that what you want?'",
       "memo": [
         "Lawmaker’s office request: one sentence, 'Yoon Sanghyuk erased it'",
         "Group PR office text: 'appeared in a personal capacity'",
@@ -252,7 +252,7 @@ export default {
     },
     "c41_questions_reaction": {
       "title": "The 41 Club’s Question",
-      "text": "In his first week working part-time at the rice cake shop, Moon Hajun comes to the bookshop in his apron. 'The 41 Club people asked me to ask. Whose record is the standard that cut our scores? But they say that standard is your record. The 9 seconds you hesitated. I kind of liked that. That we’re alike. Can I go to the hearing? I want to see that man’s face. I won’t curse. Probably.'",
+      "text": "Moon Hajun comes to the bookshop in his rice cake shop apron. 'The 41 Club people asked me to ask. Whose record is the standard that cut our scores? But they say that standard is your record. The 9 seconds you hesitated. I kind of liked that. That we’re alike. Can I go to the hearing? I want to see that man’s face. I won’t curse. Probably.'",
       "memo": [
         "The 9 seconds that became the standard for cutting scores",
         "'I liked that we’re alike'"
@@ -274,7 +274,7 @@ export default {
     },
     "c41_gallery_reaction": {
       "title": "The Next Seat",
-      "text": "Gallery seats go by order of application. The seat next to Moon Gaeul is Yoon Seojin’s. Yoon Seojin stands first and bows her head. 'I’ll change seats.' Instead of answering, Moon Gaeul takes a piece of injeolmi from her bag and holds it out. 'Sit. What did the daughter do wrong? But listen to your father’s answers properly. I’m going to listen properly too.' Yoon Seojin sits down, holding the rice cake.",
+      "text": "By the seating chart, the seat next to Moon Gaeul is Yoon Seojin’s. Yoon Seojin stands first and bows her head. 'I’ll change seats.' Moon Gaeul holds out a piece of injeolmi. 'Sit. What did the daughter do wrong? But listen to your father’s answers properly. I’m going to listen properly too.'",
       "memo": [
         "The victim’s wife and the witness’s daughter, side by side",
         "One piece of injeolmi that slipped past the locker"
@@ -296,7 +296,7 @@ export default {
     },
     "c41_recess_reaction": {
       "title": "Five Months’ File",
-      "text": "3 minutes before the recess ends, Han Seoyun comes down from the back row of the gallery. She has been on standby assignment since April, so she wears a visitor’s pass around her neck instead of an employee ID. The recording of her call with Yoon Sanghyuk on the day she returned the loan, the one she played for you last autumn. 'Last year this file was your fight. Today, use it with my name on it. Including the fact that I’m the one who returned it. Five months without work, and this one file is all I had left.'",
+      "text": "3 minutes before the recess ends, Han Seoyun comes down from the back row. On standby assignment since April, she wears a visitor’s pass around her neck. In her hand, the recording of her call with Yoon Sanghyuk on the day she returned the loan. 'Last year this file was your fight. Today, use it with my name on it. Including the fact that I’m the one who returned it. Five months without work, and this one file is all I had left.'",
       "memo": [
         "Five months on standby assignment, one file left",
         "The name of the one who returned it, too"
@@ -318,7 +318,7 @@ export default {
     },
     "c41_branch_study": {
       "title": "Behind the Study Door",
-      "text": "Yoon Seojin comes to the alley outside the bookshop. In her graduate-school bag is a notebook she took from her father’s study. 'Dad practices in his study every night. His lawyer reads the questions and Dad answers. I counted through the door. Last night alone it was 23 times. I don’t recall. People who can’t remember don’t practice. I came to tell you that. And this, too.' The bag’s zipper opens halfway.",
+      "text": "Yoon Seojin has brought a notebook from her father’s study in her bag. 'Dad practices in his study every night. His lawyer reads the questions and Dad answers. I counted through the door. Last night alone it was 23 times. I don’t recall. People who can’t remember don’t practice. I came to tell you that. And this, too.' The bag’s zipper opens halfway.",
       "memo": [
         "Yoon Seojin: graduate student in financial ethics, Yoon Sanghyuk’s daughter",
         "Practice in the study -- 'I don’t recall' 23 times in one night",
@@ -342,7 +342,7 @@ export default {
     },
     "c41_branch_study_follow": {
       "title": "Retain: X",
-      "text": "Under the alley streetlight, Yoon Seojin opens the notebook. The line she showed you only in a photo in July is there in the Thursday box of the fourth week of April 2023. '0412 — dissent — retain: X.' In the Friday box right beside it: 'Gallery On opening — check Seojin’s tuition.' 'At first I wanted to protect Dad with this notebook. If I showed he didn’t forget, that he knew, at least he wouldn’t be a liar. Strange, isn’t it. Apparently that’s the best defense I can give him.'",
+      "text": "Under the streetlight, Yoon Seojin opens the notebook. The line is in the Thursday box of the fourth week of April 2023. '0412 — dissent — retain: X.' In the Friday box right beside it: 'Gallery On opening — check Seojin’s tuition.' 'At first I wanted to protect Dad with this notebook. If I showed he didn’t forget, that he knew, at least he wouldn’t be a liar. Strange, isn’t it. Apparently that’s the best defense I can give him.'",
       "memo": [
         "Thursday, fourth week of April: '0412 — dissent — retain: X'",
         "Friday, same week: 'Gallery On opening — check Seojin’s tuition'",
@@ -366,7 +366,7 @@ export default {
     },
     "c41_route_system": {
       "title": "The Statistics of Memory",
-      "text": "Lee Minseo turns her laptop toward you. She has gone through every hearing held over the past 20 years. In 1,406 transcripts, 'I don’t recall' and similar phrases appear 6,212 times. Of those, 14 were reported for perjury, and 2 ended in a final conviction. 'You can’t prove that not remembering is a lie. That’s why it’s the safest answer.'",
+      "text": "Lee Minseo has gone through 1,406 hearing transcripts from the past 20 years. 'I don’t recall' and similar phrases: 6,212 times. Of those, 14 were reported for perjury, and 2 ended in a final conviction. 'You can’t prove that not remembering is a lie. That’s why it’s the safest answer.'",
       "memo": [
         "1,406 hearing transcripts -- 'I don’t recall' and its variants 6,212 times",
         "14 perjury complaints, 2 final convictions",
@@ -392,7 +392,7 @@ export default {
     },
     "c41_final_system_route": {
       "title": "One More Line for the Table",
-      "text": "Ahead of the 14:00 resumption, the phone on the unsworn witness seat’s table buzzes briefly. A table from Lee Minseo. Of 6,212 times, 14 went as far as a complaint, two ended in conviction. Below that, this morning’s 22 times have been added as a new line. Another message comes. 'If you ask about memory, that table gets one more line. Don’t ask about his memory. Ask about something else in this room. Paper or people.'",
+      "text": "Before the 14:00 resumption, a table from Lee Minseo arrives on the phone at the unsworn witness seat. Of 6,212 times, 14 complaints, two convictions. Below that, this morning’s 22 times as a new line. 'If you ask about memory, that table gets one more line. Don’t ask about his memory. Ask about something else in this room. Paper or people.'",
       "memo": [
         "'I don’t recall' and variants 6,212 times -- 14 complaints, 2 convictions",
         "22 times this morning",
@@ -415,7 +415,7 @@ export default {
     },
     "c41_evidence_turn": {
       "title": "The Memory Date Table",
-      "text": "Ban Jaewook pushes a table toward you. From the morning transcript up to noon, he has copied, line by line, the 22 times Yoon Sanghyuk answered 'I don’t recall,' and in the next column attached the papers from the date each question points to. On 19 of the 22 lines, there is a document Yoon Sanghyuk personally received or e-signed that day. The receipt log for page 3, the one with the empty e-signature field, is one of them. Ban Jaewook sets down his pen. 'Memory can fail. E-signature records don’t get erased.'",
+      "text": "Ban Jaewook pushes a table toward you. Beside each of Yoon Sanghyuk’s 22 'I don’t recall' answers in the morning transcript, he has attached the papers from the date the question points to. On 19 of the 22 lines, there is a document Yoon Sanghyuk personally received or e-signed that day. The receipt log for page 3, with its empty e-signature field, is one of them. Ban Jaewook says, 'Memory can fail. E-signature records don’t get erased.'",
       "memo": [
         "'I don’t recall' 22 times this morning",
         "19 of them: a document Yoon Sanghyuk received or e-signed that day",
@@ -438,7 +438,7 @@ export default {
     },
     "c41_start_warm": {
       "title": "A Hearing after the Shutter Came Down",
-      "text": "After the weekend of the first pay envelope, the National Assembly Policy Committee sets the date for a hearing. You are an unsworn witness again, and you get one question. Hajun posts a line in the group chat. 'How do you apply for the gallery? Everyone in the 41 Club wants to go. I’ll ask for Friday off from work. The boss is my mom, so it’s fine.'",
+      "text": "After the weekend of the first pay envelope, the hearing date is set. You are an unsworn witness again, and you get one question. Hajun posts in the group chat. 'How do you apply for the gallery? Everyone in the 41 Club wants to go. I’ll ask for Friday off. The boss is my mom, so it’s fine.'",
       "memo": [
         "First pay envelope: '100 points' in Moon Gaeul’s handwriting",
         "Hearing in D-4 -- witness Yoon Sanghyuk will attend",
@@ -468,7 +468,7 @@ export default {
     },
     "c41_start_record": {
       "title": "A Hearing for the One Who Bound the List",
-      "text": "It has been two days since you sent the list of 1,106 members of the 41 Club with their consent forms. The National Assembly Policy Committee has set the date for a hearing, and witness Yoon Sanghyuk is attending this time. You are an unsworn witness again. Cha Jiwon taps the file. 'You write good paperwork. But 1,106 people don’t fit into 7 minutes. This time, this paperwork has to become one question.'",
+      "text": "Two days since you sent the list of 1,106 people with their consent forms. The hearing date is set, and witness Yoon Sanghyuk is attending this time. You are an unsworn witness again. Cha Jiwon taps the file. 'You write good paperwork. But 1,106 people don’t fit into 7 minutes. This time, this paperwork has to become one question.'",
       "memo": [
         "41 Club list, 1,106 people -- received by the lawmaker’s office",
         "Hearing in D-4 -- witness Yoon Sanghyuk will attend",
@@ -498,7 +498,7 @@ export default {
     },
     "c41_start_rush": {
       "title": "A Hearing for the One Who Brought Injeolmi",
-      "text": "When you arrive on the 7th floor of the Members’ Office Building with injeolmi in your bag, Cha Jiwon is already printing the hearing’s witness list. The unsworn witness field is still blank. Cha Jiwon takes a piece of injeolmi and holds out a ballpoint pen. 'You came early, so write your name yourself. But whoever comes early gets attacked first. I hear his lawyers have already pulled your HR records.'",
+      "text": "When you arrive on the 7th floor of the Members’ Office Building, Cha Jiwon is already printing the hearing’s witness list. The unsworn witness field is still blank. Cha Jiwon takes a piece of injeolmi and holds out a ballpoint pen. 'You came early, so write your name yourself. But whoever comes early gets attacked first. I hear his lawyers have already pulled your HR records.'",
       "memo": [
         "Arrived at the Members’ Office Building 7th floor -- 1 injeolmi for Cha Jiwon",
         "Unsworn witness field blank -- fill it in yourself",
