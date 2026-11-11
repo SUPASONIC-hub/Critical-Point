@@ -259,10 +259,20 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) for (let part = 1; part <= SWEE
  * 23px; the fifth card takes a whole row, so its detail was already one line.
  * The allowance is a ceiling, so the scene cannot slip further, and it is to be
  * lowered or deleted when the scene is given the room.
+ *
+ * On the 390x844 phone 사건 01 put a staked hand up to 9px under the bar
+ * (c1_start_hold, c1_start_record, c1_start_alone; Linux, Korean, 2026-11-10)
+ * with the detail's two lines. The detail is one line there now too, the hand
+ * ends 12px above the bar, and that phone holds 사건 01 staked, with no
+ * allowance. Measured staked in every case the same day with one line, other
+ * scenes were still under at 390x844: up to 16px in Korean (c33_mother),
+ * 20 in Japanese (c18_route_system), 16 in English (c38_witness). Those are
+ * not held yet.
  */
 const HEAVY_BOARD = { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics: FIVE_RELICS };
 const STAKED_CASES = ["case01", "case05", "final"];
 const STAKED_UNDER_THE_BAR = { c1_start_hold: 14 };
+const STAKED_ON = { "small phone": STAKED_CASES, phone: ["case01"] };
 
 /**
  * The same board late in a season: the bank row at the max table's numbers
@@ -313,11 +323,11 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
         const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)), ...(name === "laptop" ? null : { signals: await measureSignals(page) }) };
         rows.push(row);
         checkHeavyRow(row, failures);
-        if (name === "small phone" && STAKED_CASES.includes(caseId)) {
+        if (STAKED_ON[name]?.includes(caseId)) {
           const staked = await measureStakedTable(page);
           expect(staked.length, `${nodeId} @ ${name}: no card could be staked`).toBeGreaterThan(0);
           rows.push(...staked.map((stake) => ({ ...row, ...stake })));
-          const allowed = STAKED_UNDER_THE_BAR[nodeId] ?? 0;
+          const allowed = name === "small phone" ? (STAKED_UNDER_THE_BAR[nodeId] ?? 0) : 0;
           for (const stake of staked) {
             const under = stake.lastCard - stake.actionsTop;
             if (under > allowed) failures.push(`${nodeId} @ ${name}, card ${stake.staked} staked: last card ${under}px under the action bar (${allowed}px allowed)`);

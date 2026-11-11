@@ -218,8 +218,8 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
 
 /**
  * A phone wider than 390 and 801 to 860 tall (411x846; a Pixel 7 is 412x839)
- * takes the short phone's air -- the rules above, the one-line staked detail,
- * the HUD's and the action bar's -- and nothing that hides a speaker: on
+ * takes the short phone's air -- the rules above, the HUD's and the action
+ * bar's -- and nothing that hides a speaker: on
  * 2026-11-10 the short-phone block itself, stretched to 860, hid the Pixel 7's
  * portrait (tests/offline.spec.js).
  */
@@ -227,7 +227,6 @@ test("a 411x846 phone takes the short phone's air but keeps its portrait and que
   const play = sheet("play");
   const air = play.match(/@media \(max-width: 480px\) and \(max-height: 800px\),\s+\(min-width: 391px\) and \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
   assert.ok(air, "the air block is written for both phones");
-  assert.match(air, /\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;/);
   assert.match(air, /\.gx-actions button \{\s*min-height: 52px;/);
   assert.doesNotMatch(air, /gx-portrait|display: none|gx-question|line-clamp|gx-scene/);
   // What hides the portrait and cuts the question stays at 800 tall.
@@ -235,6 +234,25 @@ test("a 411x846 phone takes the short phone's air but keeps its portrait and que
   assert.match(hiding, /\.gx-portrait,/);
   assert.match(hiding, /\.gx-question \{[^}]*-webkit-line-clamp: 2;/);
   assert.equal(play.match(/\.gx-portrait,\n[^{]*\{\s*display: none;/g)?.length, 1, "the portrait is hidden in one place");
+});
+
+/**
+ * The staked card's detail is one line on every phone up to 860 tall, in a
+ * block of its own: the 390x844 phone takes none of the short phone's air, and
+ * with a card staked in 사건 01 on an overclocked board its hand ended up to
+ * 9px under the action bar (Linux, Korean, 2026-11-10). Nothing else is in the
+ * block, so the portrait and the question stay.
+ */
+test("a staked card's detail is one line on a phone up to 860 tall, and only that", () => {
+  const play = sheet("play");
+  const blocks = play.match(/@media \(max-width: 480px\) and \(max-height: 860px\) \{[\s\S]*?\n\}/g) ?? [];
+  assert.equal(blocks.length, 1, "one block for the staked detail");
+  const [staked] = blocks;
+  assert.match(staked, /\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;\s*\}\s*\}$/);
+  assert.equal(staked.match(/\{/g).length, 2, "the block holds that one rule");
+  // Three classes against the phone's two-line `.gauntlet-stage .gx-card-preview`, wherever each sits.
+  assert.match(play, /\.gauntlet-stage \.gx-card-preview \{\s*max-height: 2\.375rem;/);
+  assert.equal(play.match(/\.gx-card\.selected \.gx-card-preview \{\s*max-height: 1\.0625rem;/g)?.length, 1, "written once");
 });
 
 /**
