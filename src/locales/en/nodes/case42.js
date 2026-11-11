@@ -438,7 +438,7 @@ export default {
     },
     "c42_start_warm": {
       "title": "Leave for the People Who Stayed to the End",
-      "text": "Six days later, Na Junhyuk sets the words 'next time, somewhere without papers' in three seals. A 'Leave Order' in brush pen, a guesthouse by the Gyeongpo Fireworks Festival, four rooms, 12 sets of bedding. But your Friday leave request has been stuck for four days at CEO Yoon Sanghyuk’s approval field. Like the e-signature field on page 3 three years ago, it is simply empty.",
+      "text": "Six days later, Na Junhyuk sets the promise to meet next time somewhere without papers in three seals. A 'Leave Order' in brush pen, a guesthouse by the Gyeongpo Fireworks Festival, four rooms, 12 sets of bedding. But your Friday leave request has been stuck for four days at CEO Yoon Sanghyuk’s approval field. Like the e-signature field on page 3 three years ago, it is simply empty.",
       "memo": [
         "Leave order: Na Junhyuk’s three seals",
         "Friday leave request: CEO field empty for four days",
