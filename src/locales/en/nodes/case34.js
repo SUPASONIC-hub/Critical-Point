@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c34_start": {
       "title": "Unknown Number",
-      "text": "'This is Yoon Seojin, Yoon Sanghyuk’s daughter. It’s a 2023 notebook I found in my father’s study. I’m sending it because I want to protect my father.' A page of a black leather notebook, written in fountain pen: '0412 — dissent — retain: X.' Ban Jaewook looks at the screen a long time. 'That’s the Managing Director’s handwriting. I got notes in that hand for 7 years.' Lee Minseo speaks. 'Someone who wants to protect him sent the most damaging line first. Either this is a trap, or it’s completely sincere.'",
+      "text": "'This is Yoon Seojin, Yoon Sanghyuk’s daughter. It’s a 2023 notebook I found in my father’s study. I’m sending it because I want to protect my father.' Ban Jaewook speaks. 'That’s the Managing Director’s handwriting. I got notes in that hand for 7 years.' Lee Minseo speaks. 'Someone who wants to protect him sent the most damaging line first. Either this is a trap, or it’s completely sincere.'",
       "memo": [
         "From: Yoon Seojin -- Yoon Sanghyuk’s daughter, graduate student in financial ethics",
         "One photo: '0412 — dissent — retain: X'",
@@ -38,7 +38,7 @@ export default {
     },
     "c34_study": {
       "title": "The Unsigned Decision",
-      "text": "The first thing you see is a paper title taped above the monitor. “Whose Is the Decision No One Signed?” The notebook has two or three lines in fountain pen for each date. In the box for Thursday of the fourth week of April is '0412 — dissent — retain: X', and in the next day’s box is 'On opening — check Seojin’s tuition.' Gallery On is her mother’s gallery. Yoon Seojin covers that line with her fingertip. 'I want to protect my father. I just don’t know whether that means even this line has to be read.'",
+      "text": "The notebook has two or three lines in fountain pen for each date. In the box the day after '0412 — dissent — retain: X' is 'On opening — check Seojin’s tuition.' Gallery On is her mother’s gallery. Yoon Seojin covers that line with her fingertip. 'I want to protect my father. I just don’t know whether that means even this line has to be read.'",
       "memo": [
         "2023 notebook -- found at the back of the desk drawer in Yoon Sanghyuk’s study",
         "Thursday, fourth week of April: '0412 — dissent — retain: X'",
@@ -69,7 +69,7 @@ export default {
     },
     "c34_sketch": {
       "title": "The Banker Who Lends to the End",
-      "text": "The title of the college application essay Moon Hajun is writing is 'The Banker Who Lends to the End.' Reading over his shoulder, Yoon Seojin can’t hold back. 'A banker who lends to the end isn’t a banker. That’s Santa.' Moon Hajun doesn’t back down. 'It means looking all the way to the end before you lend.' In his sketchbook Moon Hajun draws Yoon Seojin holding a magnifying glass; she draws a bank building with three legs. Laughing, Moon Hajun asks, 'So why are you studying this?' Yoon Seojin pushes the notebook deep into her bag. Who this boy’s father was, she had already read up on.",
+      "text": "Reading the title of Moon Hajun’s application essay over his shoulder, Yoon Seojin can’t hold back. 'A banker who lends to the end isn’t a banker. That’s Santa.' Moon Hajun doesn’t back down. 'It means looking all the way to the end before you lend.' Laughing, Moon Hajun asks, 'So why are you studying this?' Yoon Seojin pushes the notebook deep into her bag. Who this boy’s father was, she had already read up on.",
       "memo": [
         "Moon Hajun’s essay title: 'The Banker Who Lends to the End'",
         "Yoon Seojin: came knowing Moon Hajun’s father was Moon Sungho, head of Gaon Precision",
@@ -100,7 +100,7 @@ export default {
     },
     "c34_seminar": {
       "title": "The Father in the Back Row",
-      "text": "Eleven people come to Yoon Seojin’s interim thesis presentation. A man in a navy polo shirt has a single convenience store sunflower resting on his knee. It is Yoon Sanghyuk. When her advisor asks, 'Can you hold someone responsible who didn’t sign?' Yoon Seojin pauses for 3 seconds, and for those 3 seconds Yoon Sanghyuk’s pen stops too. When he runs into you in the hallway, he isn’t surprised. 'Seojin must have taken the notebook. She’s been opening my drawers since she was little. Today is her day. Just in front of her, please don’t bring that up.'",
+      "text": "The man holding a single sunflower is Yoon Sanghyuk. When her advisor asks, 'Can you hold someone responsible who didn’t sign?' Yoon Seojin pauses for 3 seconds, and for those 3 seconds Yoon Sanghyuk’s pen stops too. In the hallway, he isn’t surprised. 'Seojin must have taken the notebook. She’s been opening my drawers since she was little. Today is her day. Just in front of her, please don’t bring that up.'",
       "memo": [
         "11 in the audience -- Yoon Sanghyuk at the end of the back row",
         "At the advisor’s question Yoon Seojin goes silent 3 seconds; Yoon Sanghyuk’s pen stops 3 seconds too",
@@ -131,7 +131,7 @@ export default {
     },
     "c34_final": {
       "title": "Retain: X",
-      "text": "Yoon Seojin sets the notebook, in a plastic sleeve, on the table. 'At dinner my father didn’t ask anything. He just peeled me a peach. Without breaking the peel once. That was the scariest part.' She rests her hand on the notebook. 'If I hand it in myself, I’m the daughter who reported her father. If I don’t, I’m the daughter called in instead of her father. I’m not asking you to decide. I’m asking you to decide with me. If the way to protect my father is to hide this, then I’ve studied all of this wrong.'",
+      "text": "Yoon Seojin sets the notebook on the table. 'At dinner my father didn’t ask anything. He just peeled me a peach. That was the scariest part. If I hand it in myself, I’m the daughter who reported her father. If I don’t, I’m the daughter called in instead of her father. I’m asking you to decide with me. If the way to protect my father is to hide this, then I’ve studied all of this wrong.'",
       "memo": [
         "Deadline: July 6, 10 a.m., Prosecutor Na Eunho’s office, Seoul Central District Prosecutors’ Office",
         "Past the deadline, Yoon Seojin is called in herself",
@@ -159,7 +159,7 @@ export default {
     },
     "c34_aftershock": {
       "title": "A Box of Peaches",
-      "text": "Wherever the notebook went, one full copy stayed in Yoon Seojin’s drawer. She sets on the desk a box of peaches her father bought. Ban Jaewook peels off one star sticker Seoa stuck on his new notebook’s cover and hands it over. Sticking it on her laptop, Yoon Seojin laughs out loud for the first time. 'I grew up banned from putting stickers on things.' She opens the first page of the copy. 'I haven’t read it to the end yet. Not alone.' Then a text comes from Kang Taemin. 'The drain at the Incheon plant is blocked, they say. It has to be cleared before the monsoon.'",
+      "text": "Ban Jaewook peels off one star sticker Seoa stuck on his new notebook’s cover and hands it to Yoon Seojin. Sticking it on her laptop, Yoon Seojin laughs out loud for the first time. 'I grew up banned from putting stickers on things.' She opens the copy of the notebook. 'I haven’t read it to the end yet. Not alone.' A text comes from Kang Taemin. 'The drain at the Incheon plant is blocked, they say. It has to be cleared before the monsoon.'",
       "memo": [
         "One full copy of the notebook left in Yoon Seojin’s drawer",
         "A box of peaches -- bought by Yoon Sanghyuk",
@@ -183,7 +183,7 @@ export default {
     },
     "c34_margin": {
       "title": "Red Ink",
-      "text": "The notebook pages Yoon Seojin photographed and sent are laid out on the table. Lines in red ink appear 23 times in the year, all of them his daughter’s schedule. '0412 — dissent — retain: X' is in black ink, and the line right under it is red. 'Seojin midterms — do not call.' Whether the two colors went down on the same day, only handwriting analysis that covers the ink as well can tell. Ban Jaewook opens his newly bought notebook beside them. 'The same hand writes things like these side by side. I did too.'",
+      "text": "Every line in red ink is his daughter’s schedule. '0412 — dissent — retain: X' is in black ink, and the line right under it is red. 'Seojin midterms — do not call.' Whether the two colors went down on the same day, only handwriting analysis that covers the ink as well can tell. Ban Jaewook speaks. 'The same hand writes things like these side by side. I did too.'",
       "memo": [
         "23 red-ink lines -- all his daughter’s schedule",
         "The line right under 'retain: X': 'Seojin midterms — do not call'",
@@ -206,7 +206,7 @@ export default {
     },
     "c34_pear": {
       "title": "A Pear at One in the Morning",
-      "text": "After Moon Hajun leaves, under a convenience store parasol, Yoon Seojin rolls a can of soda between her hands. 'At one in the morning, the night before my master’s interview, my father peeled me a pear. The peel never broke once. And while he did, he said: if an interviewer objects, keep asking why, all the way. You need someone who disagrees before a judgment can stand. I chose this field after hearing that. And the man who said it wrote, that spring, not to keep a dissent.'",
+      "text": "Yoon Seojin speaks. 'At one in the morning, the night before my master’s interview, my father peeled me a pear. The peel never broke once. And while he did, he said: you need someone who disagrees before a judgment can stand. I chose this field after hearing that. And the man who said it wrote, that spring, not to keep a dissent.'",
       "memo": [
         "1 a.m. the night before the master’s interview -- a pear peel that never broke",
         "Yoon Sanghyuk’s words: 'You need someone who disagrees before a judgment can stand'",
@@ -229,7 +229,7 @@ export default {
     },
     "c34_hallway": {
       "title": "10 A.M. the Day After Tomorrow",
-      "text": "Your phone rings. Prosecutor Na Eunho speaks. 'I know about the notebook.' What he wants is a voluntary submission (the holder handing the evidence over to investigators of their own accord). 'Bring it by 10 a.m. the day after tomorrow. Otherwise I call in Yoon Seojin. Making a grad student talk about her father, I don’t like it either. But I’m paid to do things I don’t like. Ah, I was rude just now, wasn’t I. I’ll note that down too.'",
+      "text": "Prosecutor Na Eunho speaks on the phone. 'I know about the notebook.' What he wants is a voluntary submission (the holder handing the evidence over to investigators of their own accord). 'Bring it by 10 a.m. the day after tomorrow. Otherwise I call in Yoon Seojin. Making a grad student talk about her father, I don’t like it either. But I’m paid to do things I don’t like.'",
       "memo": [
         "Deadline: July 6, 10 a.m.",
         "Na Eunho: past the deadline, he calls in Yoon Seojin himself",
@@ -252,7 +252,7 @@ export default {
     },
     "c34_margin_reaction": {
       "title": "Five Stars, Zero Stickers",
-      "text": "Ban Seoa looks at the notebook photos on a video call, then hands down her review. 'Handwriting, five stars. Stickers, zero. I guess this man’s daughter couldn’t stick anything in her dad’s notebook.' Ban Jaewook laughs, then zooms in on one photo again. Inside the cover are six square sticky marks, where someone stuck stickers and carefully peeled them off. 'Seoa, how many stars for this?' Ban Seoa looks for a long while, then says, 'This one doesn’t get stars. It needs a bandage.'",
+      "text": "Ban Seoa looks at the notebook photos on a video call and hands down her review. 'Handwriting, five stars. Stickers, zero. I guess this man’s daughter couldn’t stick anything in her dad’s notebook.' When Ban Jaewook zooms in on a photo, six marks show inside the cover where stickers were peeled off. 'Seoa, how many stars for this?' Ban Seoa says, 'This one doesn’t get stars. It needs a bandage.'",
       "memo": [
         "Six sticker marks inside the cover",
         "A bandage instead of stars"
@@ -274,7 +274,7 @@ export default {
     },
     "c34_pear_reaction": {
       "title": "What’s Your Last Name?",
-      "text": "Moon Hajun, who left his sketchbook, comes running back. He looks at Yoon Seojin. 'I know your last name is Yoon. I searched your name earlier and a conference photo came up.' Yoon Seojin freezes. Moon Hajun tears out the 'Yoon Seojin with a magnifying glass' page and holds it out. 'Your dad did it, not you. My mom might see it differently. But that’s how I see it. And the Santa argument isn’t over yet.'",
+      "text": "Moon Hajun comes running back and looks at Yoon Seojin. 'I know your last name is Yoon.' Yoon Seojin freezes. Moon Hajun tears out the 'Yoon Seojin with a magnifying glass' page and holds it out. 'Your dad did it, not you. My mom might see it differently. But that’s how I see it. And the Santa argument isn’t over yet.'",
       "memo": [
         "A last name he already knew",
         "The Santa argument is still going"
@@ -296,7 +296,7 @@ export default {
     },
     "c34_hallway_reaction": {
       "title": "Only the Recipient’s Name",
-      "text": "That evening a certified letter from group legal comes for Yoon Seojin. The notebook is a document containing trade secrets, it says, and she must return it within three days. Baek Arin gets the photo and calls right away. 'It’s word for word the one I got last week. Down to where the commas go. Only the recipient’s name changed. Those people don’t look at who they’re dealing with. They only look at the sentences.'",
+      "text": "A certified letter from group legal comes for Yoon Seojin. The notebook is a document containing trade secrets, it says, and she must return it within three days. Baek Arin sees the photo and calls. 'It’s word for word the one I got last week. Down to where the commas go. Those people don’t look at who they’re dealing with. They only look at the sentences.'",
       "memo": [
         "Two envelopes alike down to the commas",
         "Sentences where only the recipient’s name changed"
@@ -318,7 +318,7 @@ export default {
     },
     "c34_branch_study": {
       "title": "Her Father’s Study",
-      "text": "Yoon Seojin closes the notebook. 'There’s a gap before and after. The 2022 and 2024 notebooks are in the study. My father has dinner plans tonight, so he’ll be home late.' In the 2nd-floor study of the house in Pyeongchang-dong, 15 black notebooks stand on one shelf in order of year, and only the 2023 spot is empty. Yoon Seojin points to the bottom shelf. Childhood drawings, certificates, a printout of her college acceptance text, each in its own clear sleeve. 'A man who writes retain: X can’t throw away a single one of these.'",
+      "text": "Yoon Seojin closes the notebook. 'There’s a gap before and after. The 2022 and 2024 notebooks are in the study.' Black notebooks stand on one shelf of the study in order of year, and only the 2023 spot is empty. On the bottom shelf, Yoon Seojin’s childhood drawings, certificates, and a printout of her acceptance text each sit in their own sleeve. 'A man who writes retain: X can’t throw away a single one of these.'",
       "memo": [
         "15 black notebooks -- from 2011, only the 2023 spot empty",
         "Bottom shelf: Yoon Seojin’s drawings, certificates, printed acceptance text",
@@ -342,7 +342,7 @@ export default {
     },
     "c34_branch_study_follow": {
       "title": "The Light at the Front Door",
-      "text": "The moment you open the 2024 notebook to its first page, the motion-sensor light at the front door comes on. Yoon Sanghyuk, who was supposed to have plans, is home early. His voice comes up from the foot of the stairs. 'Seojin, I brought peaches. I’ll wash them, so come down and eat.' A slow, round voice you never once heard at the company. The first page of 2024 holds one line. 'Last year’s business stays in last year’s notebook.' Outside the study window is the garden, and there is only one staircase.",
+      "text": "The moment you open the 2024 notebook, the motion-sensor light at the front door comes on. Yoon Sanghyuk, who was supposed to have plans, is home early. 'Seojin, I brought peaches. I’ll wash them, so come down and eat.' A slow, round voice you never once heard at the company. The first page holds one line. 'Last year’s business stays in last year’s notebook.'",
       "memo": [
         "Yoon Sanghyuk home at 21:00 -- two hours earlier than expected",
         "First page of the 2024 notebook: 'Last year’s business stays in last year’s notebook'",
@@ -366,7 +366,7 @@ export default {
     },
     "c34_route_system": {
       "title": "The Dissents Nobody Kept",
-      "text": "Lee Minseo opens the group’s document management records with a KD Data Lab account. Of the 214 dissents attached to review reports in the last 10 years, 61 had their retention period changed to '0 years'. In the changed-by field, 60 show a system account; only one, 2023-0412, shows Yoon Sanghyuk’s account. Lee Minseo turns the screen. 'There’s one line in the notebook, but 61 lines in the system. And the only one with a person’s name on it is that one.'",
+      "text": "Of 214 dissents in the last 10 years, 61 had their retention period changed to '0 years'. In the changed-by field, 60 show a system account; only one, 2023-0412, shows Yoon Sanghyuk’s account. Lee Minseo speaks. 'There’s one line in the notebook, but 61 lines in the system. And the only one with a person’s name on it is that one.'",
       "memo": [
         "Of 214 dissents, 61 had retention changed to '0 years'",
         "All 61 changed within 72 hours before the loan was disbursed",
@@ -392,7 +392,7 @@ export default {
     },
     "c34_final_system_route": {
       "title": "61 Lines of a System Account",
-      "text": "Scroll through all 61 lines, and in the changed-by field 60 carry the same system account. Only the 2023-0412 line has a person’s account, and only that line has a notebook beside it. Lee Minseo puts a fingertip on that line. 'If the notebook goes in, this one line gets a person. The other 60 lines stay something a machine did. I hope Yoon Seojin doesn’t end up carrying all 61 alone.'",
+      "text": "Of the 61 lines, 60 carry the same system account in the changed-by field. Lee Minseo puts a finger on the one line left. 'If the notebook goes in, this one line gets a person. The other 60 lines stay something a machine did. I hope Yoon Seojin doesn’t end up carrying all 61 alone.'",
       "memo": [
         "61 dissents with retention changed to 0 years -- 60 by a system account",
         "Records with a person’s name: the 2023-0412 line and one notebook line",
@@ -415,7 +415,7 @@ export default {
     },
     "c34_evidence_turn": {
       "title": "The One Who Printed a Copy",
-      "text": "The document management records of the 2023-0412 review report open. The retention period on the dissent changed from '10 years' to '0 years' on April 27, 2023, 18:44. The account that changed it was Yoon Sanghyuk himself, then head of the Corporate Finance Strategy Team. The account that returned the dissent at 13:32 that day was Han Seoyun’s. The person who returned it and the person who erased it are not the same. But 40 minutes before it was erased, the team head’s office printer on the 6th floor of head office printed that dissent, 11 pages. Ban Jaewook closes his new notebook. 'He wrote not to keep it, and then printed himself a copy.'",
+      "text": "The account that changed the retention period on the 2023-0412 dissent from '10 years' to '0 years' was Yoon Sanghyuk himself, then head of the Corporate Finance Strategy Team. The account that returned the dissent that day was Han Seoyun’s. The person who returned it and the person who erased it are not the same. But 40 minutes before it was erased, the team head’s office printer printed that dissent, 11 pages. Ban Jaewook closes his new notebook. 'He wrote not to keep it, and then printed himself a copy.'",
       "memo": [
         "Retention change date = the notebook’s 'retain: X' date",
         "Change requested: Yoon Sanghyuk’s account 18:44, approver field blank -- returned by Han Seoyun 13:32",
@@ -438,7 +438,7 @@ export default {
     },
     "c34_start_warm": {
       "title": "An Evening of Measuring Hems",
-      "text": "Last night, while you were packing Baek Arin’s remaining boxes, a line came from an unknown number: 'Could you meet me?' In the evening a photo comes. 'This is Yoon Seojin, Yoon Sanghyuk’s daughter. It’s a 2023 notebook I found in my father’s study. I’m sending it because I want to protect my father. I’ll show you the original only in person.' A page of a black leather notebook, in fountain pen: '0412 — dissent — retain: X'. Baek Arin places the name first. 'Seojin? She’s the girl in the frame on the Managing Director’s desk. The photo from her graduation, holding sunflowers.'",
+      "text": "Last night, while you were packing Baek Arin’s remaining boxes, a line came from an unknown number: 'Could you meet me?' In the evening a photo comes. 'This is Yoon Seojin, Yoon Sanghyuk’s daughter. I’m sending it because I want to protect my father.' A notebook page in fountain pen: '0412 — dissent — retain: X'. Baek Arin places the name first. 'Seojin? She’s the girl in the frame on the Managing Director’s desk. The photo from her graduation, holding sunflowers.'",
       "memo": [
         "9 boxes left in the Gongdeok-dong studio -- packing since last night",
         "Yoon Seojin’s second text and one photo of the notebook",
@@ -468,7 +468,7 @@ export default {
     },
     "c34_start_record": {
       "title": "The Document for the Next Person",
-      "text": "The record of retaliation, eight days of it starting from Monday at 8:00 when the dismissal notice went up, you filed today. It is the first document the next person will read about what a whistleblower goes through. A photo has come from the number that texted last night. 'This is Yoon Seojin. I’m sending it because I want to protect my father.' A page of a black leather notebook: '0412 — dissent — retain: X'. Ban Jaewook looks down at the copy of the record. 'I didn’t think the next person would come this fast.'",
+      "text": "The record of retaliation, eight days of it starting from the Monday the dismissal notice went up, you filed today. It is the first document the next whistleblower will read. A photo has come from the number that texted last night. 'This is Yoon Seojin. I’m sending it because I want to protect my father.' A notebook page: '0412 — dissent — retain: X'. Ban Jaewook speaks. 'I didn’t think the next person would come this fast.'",
       "memo": [
         "Baek Arin’s week on record -- filed today",
         "Yoon Seojin’s second text and one photo of the notebook",
@@ -498,7 +498,7 @@ export default {
     },
     "c34_start_rush": {
       "title": "The Midnight Café",
-      "text": "Last night, at a 24-hour café in front of Sinchon Station, Yoon Seojin showed you not the notebook but one photo on her phone. In fountain pen: '0412 — dissent — retain: X'. 'I contacted you because I want to protect my father. I’ll show you the original only in my lab.' Hearing the story, Lee Minseo’s eyes go wide. 'You went out alone, at night? Without checking? And how did CEO Yoon Sanghyuk’s daughter get your number?'",
+      "text": "Last night at a café, Yoon Seojin showed you only a photo, in fountain pen: '0412 — dissent — retain: X'. 'I contacted you because I want to protect my father.' Lee Minseo’s eyes go wide. 'You went out alone, at night? Without checking? And how did CEO Yoon Sanghyuk’s daughter get your number?'",
       "memo": [
         "40-minute midnight café meeting -- saw only one photo",
         "Yoon Seojin’s condition: the original only in her lab",
