@@ -511,7 +511,7 @@ export default {
     },
     "f_start_owner": {
       "title": "The Last Night of the One Who Stayed",
-      "text": "Yoon Sanghyuk told you to come up right away, but you stayed in the alley until the moon set. When the promised night came, 23 people followed you as far as the old data center in Hapjeong-dong. Do Yoonha lets go of your hand. 'Call me first thing when you come down from the 33rd floor.' The top file in the supplementary HR metric folder already has last night written down. 'Eve of the meeting, 23 colleagues rallied. Cohesion-keeping ability: high. Fit for manager.' The strength never to leave people behind: who finds it most useful?",
+      "text": "Yoon Sanghyuk told you to come up right away, but you stayed in the alley until the moon set. One cup of instant noodles was empty; the other stayed in your bag. When the promised night came, 23 people followed you as far as the old data center in Hapjeong-dong. Do Yoonha lets go of your hand. 'Call me first thing when you come down from the 33rd floor.' The top file in the supplementary HR metric folder already has last night written down. 'Eve of the meeting, 23 colleagues rallied. Cohesion-keeping ability: high. Fit for manager.' The strength never to leave people behind: who finds it most useful?",
       "memo": [
         "The night in the moonlit alley classified as 'cohesion-keeping ability'",
         "The same item scored for all 23 who stayed in the alley",
