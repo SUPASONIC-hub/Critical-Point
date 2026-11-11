@@ -1,0 +1,78 @@
+/* B-3(1) 냉정한 오프닝의 모양. Imported by ColdOpening.jsx only, so it ships in
+   the page's own lazy chunk: with the switch off (src/coldOpeningSwitch.js) the
+   bundler drops the page and this sheet with it. It sits on the opening burst's
+   frame (base-intro-ranking.css) and only adds what four read-at-your-pace cards
+   need: a readable body line and the start row's buttons. Colours are the
+   existing tokens and the launch button's own glow values. */
+.cold-opening .opening-burst-panel {
+  width: min(720px, 100%);
+  gap: 14px;
+}
+.cold-opening .opening-burst-panel strong {
+  max-width: 16em;
+  font-size: clamp(1.625rem, 4.4vw, 3rem);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.cold-opening .opening-burst-panel p {
+  margin: 0;
+  max-width: 34em;
+  color: var(--ui-text-2);
+  font-size: 1rem;
+  line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.cold-opening-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 6px;
+}
+.cold-opening-actions .cold-opening-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 26px 0 20px;
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow:
+    0 0 0 1px rgb(217 255 98 / 0.6),
+    0 12px 40px rgb(217 255 98 / 0.26),
+    inset 0 1px 0 rgb(255 255 255 / 0.5);
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
+}
+.cold-opening-actions .cold-opening-go:hover {
+  transform: translateY(-2px);
+}
+.cold-opening-actions .ghost {
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--ui-text-2);
+  background: transparent;
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-sm);
+}
+.cold-opening-actions .ghost:hover {
+  color: var(--c-paper);
+}
+@media (max-width: 480px) {
+  .cold-opening-actions .cold-opening-go {
+    flex: 1 1 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cold-opening-actions .cold-opening-go {
+    transition: none;
+  }
+  .cold-opening-actions .cold-opening-go:hover {
+    transform: none;
+  }
+}
