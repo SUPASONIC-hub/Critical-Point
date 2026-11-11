@@ -198,7 +198,7 @@ const SWEEP_PARTS = 2;
 
 for (const caseId of HAND5 ? [] : CASE_SEQUENCE) for (let part = 1; part <= SWEEP_PARTS; part += 1) {
   test(`every ${caseId} decision fits above the action bar (part ${part}/${SWEEP_PARTS}) @layout`, async ({ page }) => {
-    test.setTimeout(900_000);
+    test.setTimeout(1_200_000); // 15 -> 20 minutes on 2026-11-11: a fourth size (wide phone)
     await page.goto("/?debug=1");
     await page.getByTestId("debug-case-select").selectOption(caseId);
     const allNodeIds = await page.getByTestId("debug-node-select").locator("option").evaluateAll((options) => options.map((option) => option.value));
@@ -304,7 +304,7 @@ function fullestScenes(caseId) {
 
 for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`the fullest ${caseId} hands fit on an overclocked board with five relics @layout`, async ({ page }) => {
-    test.setTimeout(1_200_000);
+    test.setTimeout(1_600_000); // 20 -> 27 minutes on 2026-11-11: a fourth size (wide phone)
     const nodeIds = fullestScenes(caseId);
     expect(nodeIds.length, `${caseId} has no scene to measure`).toBeGreaterThan(0);
     const rows = [];
