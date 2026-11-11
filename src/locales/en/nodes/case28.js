@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c28_start": {
       "title": "Script No. 4",
-      "text": "Do Yoonha is at KD Life, an affiliate in the same group, on a ten-day secondment. What he got on day one was 'Standard Script No. 4 for claim-denial notices.' Tomorrow’s first call, at 10 a.m., is To-the-End Precision cooperative member Chae Dohoon. His permanent-disability claim of 42 million won was denied. The grounds: one line of the policy terms. Do Yoonha turns the script over. 'They say it takes 3 minutes on average. How am I supposed to read those 3 minutes?'",
+      "text": "Do Yoonha is at KD Life, an affiliate in the same group, on a ten-day secondment. What he got was 'Standard Script No. 4 for claim-denial notices.' Tomorrow’s first call, at 10 a.m., is Chae Dohoon, denied a permanent-disability claim of 42 million won. The grounds: one line of the policy terms. Do Yoonha asks, 'They say it takes 3 minutes on average. How am I supposed to read those 3 minutes?'",
       "memo": [
         "Script No. 4: claim-denial notice · average call 3 minutes",
         "Chae Dohoon (58) -- To-the-End Precision cooperative member, lost feeling in right index and middle fingers",
@@ -38,7 +38,7 @@ export default {
     },
     "c28_headset": {
       "title": "180 Calls a Day",
-      "text": "At 9 a.m., 240 counseling desks light up at once. Today’s team metric on the display: 'Denial retention rate 93.1%.' It is the share of denials customers never manage to overturn, and it goes into the team bonus. Part Leader Yeon Hajin, 12 years in, gives some tips. 'When the swearing starts, hit mute and count to three in your head. Then: Yes, dear customer. If they cry, don’t count, just wait.' At 10 sharp, Chae Dohoon’s name comes up. 'If it’s a no, just tell me quick. I’ve got to get into the factory.'",
+      "text": "The team metric on the display: 'Denial retention rate 93.1%.' The share of denials never overturned, and it goes into the bonus. Part Leader Yeon Hajin gives some tips. 'When the swearing starts, hit mute and count to three in your head. Then: Yes, dear customer. If they cry, don’t count, just wait.' At 10 sharp, it’s Chae Dohoon. 'If it’s a no, just tell me quick. I’ve got to get into the factory.'",
       "memo": [
         "240 counseling desks · daily quota of 180 calls per person",
         "Team metric: denial retention rate 93.1% -- counts toward bonuses",
@@ -69,7 +69,7 @@ export default {
     },
     "c28_ruler": {
       "title": "6.5 Points",
-      "text": "One alley over from the demolition site, the old woman who ran the 1st-floor bookshop reopened the secondhand bookshop this spring. Lim Kyungsoo chipped in for the deposit. Kwon Dohyun lays a steel ruler against Article 19 on page 87 of Chae Dohoon’s policy terms. 'The body text is 9-point. Only this clause is 6.5-point. Reading all of it at this size takes 4 hours 12 minutes, and the reader runs at a loss.' Article 19 is the notification clause, the duty to tell the insurer when your circumstances change. KD Life treated Chae Dohoon’s move from foreman at Gaon Precision to member of To-the-End Precision as a change of occupation. Kwon Dohyun sets down the ruler. 'Same lathe, same hands. The only thing that changed is the name tag.'",
+      "text": "It’s the secondhand bookshop Lim Kyungsoo chipped in the deposit for. Kwon Dohyun lays a steel ruler against Article 19 on page 87 of Chae Dohoon’s policy terms. 'The body text is 9-point. Only this clause is 6.5-point. Reading all of it at this size takes 4 hours 12 minutes, and the reader runs at a loss.' Article 19 is the notification clause, the duty to tell the insurer when your circumstances change. KD Life treated Chae Dohoon’s move from foreman to co-op member as a change of occupation. Kwon Dohyun says, 'Same lathe, same hands. The only thing that changed is the name tag.'",
       "memo": [
         "Policy body 9pt / Article 19 6.5pt",
         "Estimated time to read the whole policy aloud: 4 hours 12 minutes",
@@ -100,7 +100,7 @@ export default {
     },
     "c28_factory": {
       "title": "The Gray Van",
-      "text": "Across from the factory, in front of a convenience store, the same gray van has been parked for three days. Kang Taemin crosses over and knocks on the window. The person inside is a staffer from a loss adjuster’s office hired by KD Life. The camera on the passenger seat holds two days of footage of Chae Dohoon lifting tools with his left hand. The staffer smiles awkwardly. 'They said if you can work, that counts as grounds it isn’t a disability.' Without a word, Chae Dohoon puts his right hand in the pocket of his work clothes.",
+      "text": "Across from the factory, a gray van has been parked for three days. When Kang Taemin knocks on the window, a staffer from a loss adjuster’s office hired by KD Life looks out. The camera holds two days of footage of Chae Dohoon lifting tools with his left hand. 'They said if you can work, that counts as grounds it isn’t a disability.' Without a word, Chae Dohoon puts his right hand in his pocket.",
       "memo": [
         "Gray van, day 3 -- loss adjuster’s office",
         "Footage: two days of Chae Dohoon working with his left hand",
@@ -131,7 +131,7 @@ export default {
     },
     "c28_final": {
       "title": "One Exception",
-      "text": "Managing Director Seo Jaeyoon of the Claims Division slides over an agreement. Chae Dohoon gets the full 42 million won, but it is called an 'exception payment.' You and Do Yoonha must sign a confirmation that, Article 19 and the loss adjuster’s filming will no longer be contested. In the past 3 years, 1,318 people have been denied under the same clause. 'Sign today and the money goes in on Monday. We know when his daughter’s tuition is due, too.' Do Yoonha lays Script No. 4 beside the agreement. 'If you pay just this one man, then next week I’ll still be reading this to the other 1,317. In my own voice.'",
+      "text": "Managing Director Seo Jaeyoon slides over an agreement. Chae Dohoon gets the full 42 million won, called an 'exception payment.' You and Do Yoonha must sign a confirmation that Article 19 and the filming will no longer be contested. 'Sign today and the money goes in on Monday. We know when his daughter’s tuition is due, too.' Do Yoonha lays Script No. 4 beside the agreement. 'If you pay just this one man, then next week I’ll still be reading this to the other 1,317. In my own voice.'",
       "memo": [
         "Exception payment of 42 million won -- deposited Monday",
         "Condition: a confirmation not to contest Article 19 or the filming, for Chae Dohoon’s case only",
@@ -159,7 +159,7 @@ export default {
     },
     "c28_aftershock": {
       "title": "Returning the Headset",
-      "text": "At 6 p.m. on the last day of the secondment, Do Yoonha wipes his headset and returns it. On his partition remains a note Yeon Hajin wrote and stuck there. 'Don’t hang up within 3 minutes.' Kang Taemin hands round the rice cakes he brought in Chae Dohoon’s place to the whole floor. Then Seo Harin calls. 'Haeon Partners’ advisory fees last turned up in Singapore. On the board of the company that got the money, there’s one name from the KD Capital side. You have a passport, right?'",
+      "text": "Do Yoonha returns his headset. On his partition remains Yeon Hajin’s note. 'Don’t hang up within 3 minutes.' Kang Taemin hands round the rice cakes he brought in Chae Dohoon’s place. Seo Harin calls. 'Haeon Partners’ advisory fees last turned up in Singapore. On the board of the company that got the money, there’s one name from the KD Capital side. You have a passport, right?'",
       "memo": [
         "Do Yoonha’s secondment ends -- headset returned",
         "Note on the partition: 'Don’t hang up within 3 minutes'",
@@ -183,7 +183,7 @@ export default {
     },
     "c28_mute": {
       "title": "Special Handling Team",
-      "text": "In the break room, Yeon Hajin opens Script No. 4 to its very last page. If a customer says 'Financial Supervisory Service' or 'reporter,' the call is to be passed to the special handling team. Of the cases passed to that team, 64% get paid; for the rest, it is 7%. Yeon Hajin crumples her paper cup. 'The ones who get really angry get paid. The ones who quietly go yes, yes don’t. For 12 years, I’ve been the one calling those quiet people.'",
+      "text": "Yeon Hajin opens Script No. 4 to its last page. If a customer says 'Financial Supervisory Service' or 'reporter,' the call goes to the special handling team. Of the cases passed to that team, 64% get paid; for the rest, it is 7%. 'The ones who get really angry get paid. The ones who quietly go yes, yes don’t. For 12 years, I’ve been the one calling those quiet people.'",
       "memo": [
         "Last page of Script No. 4: special handling team branching chart",
         "Trigger words: 'Financial Supervisory Service', 'reporter'",
@@ -206,7 +206,7 @@ export default {
     },
     "c28_bundle": {
       "title": "Coffee 3 Years Ago",
-      "text": "Before dawn on Thursday, Do Yoonha calls in a cracked voice. The one who sold Chae Dohoon his policy was Gangseo Branch, Window 4: Do Yoonha. On the day 3 years ago that Gaon Precision took out an equipment loan, a KD Life accident insurance sign-up screen was slipped in among the loan forms, and the performance sheet recorded it as '1 loan-linked insurance policy.' 'I remember. I made him coffee. I said it was good insurance. I didn’t say anything about Article 19. Because I didn’t know either. So I sold this one too.'",
+      "text": "Do Yoonha calls. The one who sold Chae Dohoon his policy was Gangseo Branch, Window 4: Do Yoonha. 3 years ago, a KD Life accident insurance sign-up screen was slipped in among Gaon Precision’s equipment loan forms. 'I remember. I made him coffee. I said it was good insurance. I didn’t say anything about Article 19. Because I didn’t know either. So I sold this one too.'",
       "memo": [
         "Sign-up window: Gangseo Branch, Window 4 · seller Do Yoonha",
         "Sign-up date = the day Gaon Precision’s equipment loan was disbursed",
@@ -229,7 +229,7 @@ export default {
     },
     "c28_thanks": {
       "title": "The 179th Call",
-      "text": "Afternoon, day eight of the secondment. Do Yoonha’s 179th call is an incoming one: the 71-year-old customer he told last week how to apply for dispute mediation instead of reading the script. 'Tell me your name, young man. So I can at least send you rice cakes.' Just then an alert pops up on the monitor. Call quality evaluation: grade C. Reason: '3 script deviations, 1 instance of steering toward payment.' Yeon Hajin says quietly, 'Even a thank-you call costs points here. Three Cs and your secondment ends early.'",
+      "text": "Day eight of the secondment. Do Yoonha’s 179th call is an incoming one: the 71-year-old customer he told last week how to apply for dispute mediation instead of reading the script. 'Tell me your name, young man. So I can at least send you rice cakes.' Just then a call quality grade C pops up. Reason: '3 script deviations, 1 instance of steering toward payment.' Yeon Hajin says quietly, 'Even a thank-you call costs points here. Three Cs and your secondment ends early.'",
       "memo": [
         "179th call: a thank-you call -- hospitalization payout made",
         "Do Yoonha’s call quality grade C: 3 script deviations",
@@ -252,7 +252,7 @@ export default {
     },
     "c28_mute_reaction": {
       "title": "The Quiet Ones",
-      "text": "On the way home, Do Yoonha posts a photo of the branching chart in the group chat, and within an hour Lee Minseo replies. In 3 years of KD Life denials, 71% of those whose cases ended without objection are 60 or older, and for half of them the call was over in under 3 minutes. 'The script is 3 minutes long. The people who were done within 3 minutes lost the most. But these might be numbers I’m not supposed to see.'",
+      "text": "Seeing the photo of the branching chart, Lee Minseo replies within an hour. In 3 years of KD Life denials, 71% of those whose cases ended without objection are 60 or older, and for half of them the call was over in under 3 minutes. 'The script is 3 minutes long. The people who were done within 3 minutes lost the most. But these might be numbers I’m not supposed to see.'",
       "memo": [
         "Those who were done within 3 minutes lost the most",
         "Lee Minseo: numbers she might not be supposed to see"
@@ -274,7 +274,7 @@ export default {
     },
     "c28_bundle_reaction": {
       "title": "No One Read the Small Print",
-      "text": "Saturday morning, on the platform in front of the factory. Stirring instant coffee with his left hand, Chae Dohoon recognizes Do Yoonha. 'Ah, the young man from that window. Made a good cup of coffee. You explained it all. You said it was good, and you didn’t lie.' The index and middle fingers of his right hand stay bent and won’t straighten. 'But nobody read me that small print. If somebody had, I’d have made one phone call when I quit being foreman. That one phone call’s worth 42 million won.'",
+      "text": "Chae Dohoon recognizes Do Yoonha. 'Ah, the young man from that window. Made a good cup of coffee. You explained it all. You said it was good, and you didn’t lie.' The index and middle fingers of his right hand stay bent. 'But nobody read me that small print. If somebody had, I’d have made one phone call when I quit being foreman. That one phone call’s worth 42 million won.'",
       "memo": [
         "Chae Dohoon: he heard the whole explanation, but not the small print",
         "Price of one phone call: 42 million won"
@@ -296,7 +296,7 @@ export default {
     },
     "c28_thanks_reaction": {
       "title": "A Practiced Voice",
-      "text": "In the dark 1st-floor lobby, Yeon Hajin unwraps a candy instead of a cigarette. 'My father had KD Life insurance too. His lung cancer diagnosis benefit was denied, because of a cough he didn’t mention when he signed up. I took that call in my 2nd year at the company. It was Script No. 4. I’m the one who reads that script best, in my own voice. That’s why I became part leader.'",
+      "text": "Yeon Hajin says, 'My father had KD Life insurance too. His lung cancer diagnosis benefit was denied, because of a cough he didn’t mention when he signed up. I took that call in my 2nd year at the company. It was Script No. 4. I’m the one who reads that script best, in my own voice. That’s why I became part leader.'",
       "memo": [
         "Yeon Hajin’s father -- denied with Script No. 4",
         "The one who read it best became part leader"
@@ -318,7 +318,7 @@ export default {
     },
     "c28_branch_market": {
       "title": "17 Denial Letters",
-      "text": "At the shop Moon Gaeul called you to, 17 envelopes lie in a row on the table where rice cakes are steamed. They are denial letters the victims’ group members got from KD Life. Moon Gaeul reads them aloud one by one. 'While we deeply empathize with your valued claim.' When the same sentence runs on through the 17th, two customers who came for rice cakes applaud. Moon Gaeul doesn’t smile. 'I got empathy 17 times and money not once.' Of the 17, 11 cite Article 19.",
+      "text": "17 envelopes lie in a row on the rice-cake table. They are denial letters the victims’ group members got from KD Life. Moon Gaeul reads them aloud one by one. 'While we deeply empathize with your valued claim.' The same sentence runs on through the 17th. 'I got empathy 17 times and money not once.' 11 of them cite Article 19.",
       "memo": [
         "17 denial letters -- victims’ group members",
         "Same first sentence 17 times: 'While we deeply empathize'",
@@ -342,7 +342,7 @@ export default {
     },
     "c28_branch_market_follow": {
       "title": "Same Lathe",
-      "text": "Out of school, Moon Hajun studies Article 19 for a long time, then draws a four-panel comic in his sketchbook. Panel one: a man at a lathe. Panel two: the same man, only his name tag changed from 'Gaon Precision' to 'To-the-End Precision.' Panel three: an insurance company person says, 'I see your occupation has changed.' Panel four: the man points at the lathe. 'This is the same one.' Moon Hajun puts down his pencil. 'Write it in grown-up writing and nobody reads it. Everybody read this.'",
+      "text": "Moon Hajun turns Article 19 into a four-panel comic. A man at a lathe. The same man, only his name tag changed from 'Gaon Precision' to 'To-the-End Precision.' An insurance company person: 'I see your occupation has changed.' The man points at the lathe. 'This is the same one.' Moon Hajun says, 'Write it in grown-up writing and nobody reads it. Everybody read this.'",
       "memo": [
         "Moon Hajun’s four-panel comic 'Same Lathe'",
         "Gist of Article 19: if your job changes, you must report it",
@@ -366,7 +366,7 @@ export default {
     },
     "c28_route_system": {
       "title": "The Design of 3 Minutes",
-      "text": "You measure why denial calls end in 3 minutes. With group data access, Lee Minseo opens summaries of KD Life’s call recordings from the past 3 years. 410,000 claim-denial calls, averaging 3 minutes 4 seconds. Calls where the customer said 'please explain that again' had four times as many objections, and Script No. 4 has its paragraphs ordered so the call ends before those words come up. The policy terms are unchanged; only the script’s paragraph order changed. Lee Minseo says, 'The denial is written in the terms. Why the denial never gets overturned isn’t written in the terms. It’s written in the timetable.'",
+      "text": "Lee Minseo opens summaries of KD Life’s call recordings from the past 3 years. 410,000 claim-denial calls, averaging 3 minutes 4 seconds. Calls where the customer said 'please explain that again' had four times as many objections, and Script No. 4 is built to end before those words come up. The policy terms are unchanged. 'The denial is written in the terms. Why the denial never gets overturned isn’t written in the terms. It’s written in the timetable.'",
       "memo": [
         "Claim-denial calls: 410,000 -- average 3 minutes 4 seconds",
         "Objections 4 times higher on calls with 'please explain that again'",
@@ -392,7 +392,7 @@ export default {
     },
     "c28_final_system_route": {
       "title": "Denial Written in the Timetable",
-      "text": "Before dawn on Wednesday, Lee Minseo splits Script No. 4 into paragraphs and types in how many seconds each takes to read on average. 'Shall I explain that again?' is the very last paragraph, and before you get there, 3 minutes 4 seconds have gone by on average. 'They didn’t need to change a single letter of the contract terms. They only had to change the order. The record of the reordering has one line of reason, and no people appear in that line.'",
+      "text": "Lee Minseo writes down how many seconds each paragraph of Script No. 4 takes. 'Shall I explain that again?' is the very last paragraph, and before you get there, 3 minutes 4 seconds have gone by on average. 'They didn’t need to change a single letter of the contract terms. They only had to change the order. The record of the reordering has one line of reason, and no people appear in that line.'",
       "memo": [
         "Script No. 4 -- the 'explain again' paragraph comes last",
         "Average call 3 minutes 4 seconds",
@@ -415,7 +415,7 @@ export default {
     },
     "c28_evidence_turn": {
       "title": "The Loss Ratio Target Sheet",
-      "text": "The revision request for Script No. 4 opens. The requesting department is the 'Group Insurance Loss Ratio Improvement Task Force,' set up under the KD Capital CEO’s office, the loss ratio being the share of premiums that goes out as claims. This year’s target: cut claim payouts by 18 billion won, with the savings going to 'Covering construction losses on the Pyeongtaek officetel.' Ban Jaewook writes the two figures side by side in his notebook. 'They’re plugging the hole in a building whose construction stopped with injured people’s claims. Whoever shortened the script has probably never once set foot in the call center.'",
+      "text": "It’s the revision request for Script No. 4. The requesting department: the 'Group Insurance Loss Ratio Improvement Task Force' under the KD Capital CEO’s office, the loss ratio being the share of premiums that goes out as claims. Target: cut claim payouts by 18 billion won, for 'Covering construction losses on the Pyeongtaek officetel.' Ban Jaewook says, 'They’re plugging the hole in a building whose construction stopped with injured people’s claims. Whoever shortened the script has probably never once set foot in the call center.'",
       "memo": [
         "Script No. 4 revision request: a TF under the KD Capital CEO’s office",
         "Target: cut claim payouts by 18 billion won",
@@ -438,7 +438,7 @@ export default {
     },
     "c28_start_warm": {
       "title": "The Monday Back from Gunsan",
-      "text": "Do Yoonha calls you to KD Life’s call center in Guro. He is at KD Life, an affiliate, on a ten-day secondment. What he got on day one was 'Claim-Denial Notice Script No. 4.' Tomorrow’s first call is Chae Dohoon. His permanent-disability claim of 42 million won was denied. The grounds: one line of the policy terms. 'It reminds me of the grandmother in Gunsan who cried as she cashed in her savings. They say his call will be over in 3 minutes too.'",
+      "text": "Do Yoonha is at KD Life, an affiliate, on a ten-day secondment. In his hand is 'Claim-Denial Notice Script No. 4.' Tomorrow’s first call is Chae Dohoon, denied a permanent-disability claim of 42 million won. The grounds: one line of the policy terms. 'It reminds me of the grandmother in Gunsan who cried as she cashed in her savings. They say his call will be over in 3 minutes too.'",
       "memo": [
         "In Gunsan through the weekend -- back to Seoul on Sunday’s last train",
         "Script No. 4: claim-denial notice · average 3 minutes",
@@ -468,7 +468,7 @@ export default {
     },
     "c28_start_record": {
       "title": "The Script the Day After the Report",
-      "text": "The last page of the rumor damage report carried an empty approver field. That night, Do Yoonha shows you a script from KD Life, an affiliate. Its title is 'Claim-Denial Notice Script No. 4.' He is on a ten-day secondment at the call center, and tomorrow his first call is with Chae Dohoon. A permanent-disability claim of 42 million won was denied. The grounds: Article 19 of the policy terms. Do Yoonha pulls up the script file’s properties. 'The last page of the report had an empty approver field, right? This script has an empty author field. One more blank.'",
+      "text": "Do Yoonha is at KD Life, an affiliate, on a ten-day secondment. The script he shows you is 'Claim-Denial Notice Script No. 4.' Tomorrow’s first call is Chae Dohoon, denied a permanent-disability claim of 42 million won. The grounds: Article 19 of the policy terms. Do Yoonha pulls up the file’s properties. 'The last page of the report had an empty approver field, right? This script has an empty author field. One more blank.'",
       "memo": [
         "Rumor damage report, 7 pages -- filing number received",
         "Script No. 4 file properties: author field blank",
@@ -498,7 +498,7 @@ export default {
     },
     "c28_start_rush": {
       "title": "The Script After the Erased Room",
-      "text": "Do Yoonha is at KD Life, an affiliate, on a ten-day secondment. On his desk is 'Claim-Denial Notice Script No. 4.' Tomorrow’s first line is Chae Dohoon, denied a permanent-disability claim of 42 million won. The grounds: one line of the policy terms. Beside 'Revision 7' at the bottom of the script, the name in the approver’s e-signature matches a Real Estate Finance Team name you saw in the chat room’s member list before it was erased.",
+      "text": "Do Yoonha is at KD Life, an affiliate, on a ten-day secondment. On his desk is 'Claim-Denial Notice Script No. 4.' Tomorrow’s first call is Chae Dohoon, denied a permanent-disability claim of 42 million won. The grounds: one line of the policy terms. The approver’s signature on 'Revision 7' matches a Real Estate Finance Team name you saw in the erased chat room.",
       "memo": [
         "One of the erased chat room’s members",
         "Script No. 4, Revision 7 approval signature: the same name",
