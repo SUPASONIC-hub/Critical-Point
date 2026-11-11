@@ -274,7 +274,7 @@ export default {
     },
     "c19_freight_reaction": {
       "title": "Empty Shelves in B2",
-      "text": "Han Seoyun comes to the alley. 'Trigger Lab’s B2 has 60 empty shelf sections. The 312 boxes fit there. But it’s a group building, so every time you take something out, it needs my e-signature. The signature of the one who pressed the wrong button 3 years ago. Still, we can’t leave paper overnight in a truck at minus 15 degrees.'",
+      "text": "Han Seoyun comes to the alley. 'Trigger Lab’s B2 has 60 empty shelf sections. The 312 boxes fit there. But it’s a group building, so every time you take something out, it needs my e-signature. And I’m the one who pressed the wrong button 3 years ago. Still, we can’t leave paper overnight in a truck at minus 15 degrees.'",
       "memo": [
         "60 empty shelf sections",
         "A signature needed every time something comes out"
