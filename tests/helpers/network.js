@@ -1,4 +1,5 @@
 import { expect, test as base } from "@playwright/test";
+import { COLD_OPENING_SEEN_KEY } from "../../src/appConfig.js";
 
 /**
  * No test talks to anything but this machine.
@@ -71,9 +72,30 @@ export function expectNoStrayRequests(strays) {
   expect(strays, `the page asked for something outside this machine:\n${strays.join("\n")}`).toEqual([]);
 }
 
+/**
+ * B-3(1) 냉정한 오프닝 (src/coldOpeningSwitch.js) plays once, before the first
+ * run of a device that has none. The specs are about what comes after it, so
+ * every page of the fixture's context starts as a device that has seen it --
+ * set before each load, so clearing storage and reloading keeps it. The page's
+ * own spec (tests/cold-opening.spec.js) asks for a device that has not:
+ * `test.use({ coldOpeningSeen: false })`. Either way of the switch, the other
+ * specs press the same start button.
+ */
+export async function markColdOpeningSeenOnLoad(context) {
+  await context.addInitScript((key) => {
+    try {
+      if (localStorage.getItem(key) === null) localStorage.setItem(key, "1");
+    } catch {
+      // A page with no storage (an error page, about:blank) has no opening to skip.
+    }
+  }, COLD_OPENING_SEEN_KEY);
+}
+
 export const test = base.extend({
-  context: async ({ context }, use) => {
+  coldOpeningSeen: [true, { option: true }],
+  context: async ({ context, coldOpeningSeen }, use) => {
     const strays = await guardNetwork(context);
+    if (coldOpeningSeen) await markColdOpeningSeenOnLoad(context);
     await use(context);
     expectNoStrayRequests(strays);
   },
