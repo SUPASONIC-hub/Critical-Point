@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c39_start": {
       "title": "Exactly 20 Minutes",
-      "text": "The night the first hearing ends, the 90-minute final cut of “The Unsigned,” the documentary Seo Harin has filmed for eleven months, is up on four monitors. Executive producer Gong Byungman comes in holding a sheet of A4. Three KD Financial Group affiliates will pull all 14 of their ads tomorrow night. The 'reference opinion' that came with the notice has two lines of timecode. All of Part 4 and some of Part 5: exactly 20 minutes. 'Nobody said to cut anything. They just wrote down exactly 20 minutes.' Seo Harin says, 'They want 70 minutes by 10 tomorrow morning. Or the show gets pulled.'",
+      "text": "The night the first hearing ends, executive producer Gong Byungman holds out a sheet of A4. Three KD Financial Group affiliates will pull all 14 of their ads tomorrow night. The 'reference opinion' that came with it marks all of Part 4 and some of Part 5: exactly 20 minutes. 'Nobody said to cut anything. They just wrote down exactly 20 minutes.' Seo Harin says, 'They want 70 minutes by 10 tomorrow morning. Or the show gets pulled.'",
       "memo": [
         "Ad withdrawal notice: KD Card · KD Life · KD Capital, 14 ads",
         "Timecode in the 'reference opinion': all of Part 4 + 6 minutes of Part 5 = 20 minutes",
@@ -38,7 +38,7 @@ export default {
     },
     "c39_cut": {
       "title": "190,000 Won a Second",
-      "text": "Editor Eom Donggyun paints 20 minutes of the timeline red. 14 of the red minutes are Part 4, “The Table,” a proposal made at Chairman Seo Dokyung’s table: put all the blame on Yoon Sanghyuk alone and have the group declare 'reform complete': cutting off the tail, rebuilt from three testimonies and two documents. The other 6 minutes are the contract under which Trigger Lab’s response records were sold to FitScore. Kwon Dohyun sets down a calculator. '230 million won for 14 ads. Divided by 20 minutes, that’s 190,000 won a second. The most expensive 20 minutes in this documentary.' Eom Donggyun doesn’t laugh. 'Take this out and one story is left. There was one bad man. The end.'",
+      "text": "Of the 20 minutes editor Eom Donggyun has painted red, 14 are Part 4, “The Table.” From three testimonies and two documents, it rebuilds the proposal made at Chairman Seo Dokyung’s table to put all the blame on Yoon Sanghyuk alone: cutting off the tail. The other 6 minutes are the contract under which Trigger Lab’s response records were sold to FitScore. Kwon Dohyun says, '230 million won for 14 ads. Divided by 20 minutes, that’s 190,000 won a second. The most expensive 20 minutes in this documentary.' Eom Donggyun doesn’t laugh. 'Take this out and one story is left. There was one bad man. The end.'",
       "memo": [
         "Section to be cut: Part 4 “The Table” 14 minutes + Part 5 'The Sold Records' 6 minutes",
         "14 ads = 230 million won -- 190,000 won a second",
@@ -69,7 +69,7 @@ export default {
     },
     "c39_mosaic": {
       "title": "Whose Face It Is",
-      "text": "At midnight the station’s legal team sent its standard. Blur the faces of anyone being sued, any minor, and any employee without company approval. Baek Arin filed a whistleblower report. Afterward the group sued her for leaking trade secrets. 'If you blur me, I become a thief. My mom says she’ll watch at her alterations shop in Anyang.' Do Yoonha got a prior-approval text from his branch manager, and still says, 'The face that sold that loan is my face.' Moon Hajun, in his 3rd year of high school, says he’ll appear with his sketchbook, and Moon Gaeul answers briefly on the phone. 'Not my kid. His dad’s face is going out as it is.'",
+      "text": "The legal team’s standard: blur the faces of anyone being sued, any minor, and any employee without company approval. Baek Arin, sued after her whistleblower report, says, 'If you blur me, I become a thief. My mom says she’ll watch at her alterations shop in Anyang.' Do Yoonha, who has an approval text, says too, 'The face that sold that loan is my face.' When Moon Hajun, in his 3rd year of high school, says he’ll appear, Moon Gaeul answers on the phone. 'Not my kid. His dad’s face is going out as it is.'",
       "memo": [
         "Legal team standard: blur anyone sued · minors · employees without approval",
         "Baek Arin: wants to show her face -- sued for leaking trade secrets",
@@ -100,7 +100,7 @@ export default {
     },
     "c39_caption": {
       "title": "Approved By: Jeongjeong",
-      "text": "In the 10 minutes everyone dozes off, Jeongjeong, the cat Seo Harin brought, slowly crosses the editing keyboard. When they wake, the caption over the approval for loan 2023-0412 has changed from 'Approved by: (blank)' to 'Approved by: Jeongjeongggggg.' Eom Donggyun reaches to undo it, then stops. 'In 3 years, this is the first time anything has gone in this box.' No one laughs. At the end of that silence, Seo Harin holds out her phone. An email from the station’s standards reviewer. 'Marking it blank implies a cover-up. Please revise to: the approval process is under investigation.'",
+      "text": "In the 10 minutes everyone dozes off, Jeongjeong the cat crosses the keyboard. The caption over the 2023-0412 approval has changed from 'Approved by: (blank)' to 'Approved by: Jeongjeongggggg.' Eom Donggyun reaches to undo it, then stops. 'In 3 years, this is the first time anything has gone in this box.' No one laughs. Seo Harin holds out an email from the standards reviewer. 'Marking it blank implies a cover-up. Revise to: under investigation.'",
       "memo": [
         "Jeongjeong’s edit: 'Approved by: (blank)' → 'Approved by: Jeongjeongggggg'",
         "Standards reviewer’s request: revise to 'the approval process is under investigation'",
@@ -131,7 +131,7 @@ export default {
     },
     "c39_final": {
       "title": "Two External Drives",
-      "text": "At 9:20 the court dismissed the broadcast injunction filed before dawn. Instead, a line came down from the president’s office to the master control room. If it goes out at 90 minutes, in the autumn reshuffle this current-affairs documentary slot disappears. Gong Byungman sets down two external drives. 70 minutes and 90 minutes. 'My name goes in the responsible-person box on the decision document. Our bureau has never left that box empty.' Seo Harin names a third way. Air the 70 minutes, and post the cut 20 minutes with its source material on Leadline at the same hour. A text comes from Moon Gaeul. 'I’ve steamed rice cakes. However many minutes it is, let’s all watch together.'",
+      "text": "At 9:20 the court dismissed the group’s request to block the broadcast. Instead, a line came down from the president’s office. If it goes out at 90 minutes, in the autumn reshuffle this slot disappears. Gong Byungman sets down two external drives. 'My name goes in the responsible-person box on the decision document. Our bureau has never left that box empty.' Seo Harin’s third way: air the 70 minutes, and post the cut 20 minutes with its source material on Leadline at the same hour. A text comes from Moon Gaeul. 'I’ve steamed rice cakes. However many minutes it is, let’s all watch together.'",
       "memo": [
         "Injunction: dismissed at 09:20",
         "President’s office: at 90 minutes, the slot is cut in the autumn reshuffle",
@@ -159,7 +159,7 @@ export default {
     },
     "c39_aftershock": {
       "title": "The Monitor Wall at 10 p.m.",
-      "text": "Friday at 10 p.m., the broadcast comes up on the editing room’s monitor wall. Moon Gaeul has brought three boxes of rice cakes, and Baek Arin and Do Yoonha sit at either end of the sofa. Jeongjeong the cat settles on your lap. A text from her mother arrives on Baek Arin’s phone. 'Heard my daughter’s voice loud and clear.' 30 minutes into the broadcast, one email lands in Seo Harin’s tip inbox. 'I was on the chairman’s office secretarial team. I know who ordered the reference opinion. Tonight at 12, Hapjeong Station Exit 7.' Seo Harin turns the screen toward you.",
+      "text": "Friday at 10 p.m., the broadcast comes up on the editing room’s monitor wall. Jeongjeong the cat is on your lap. A text from her mother reaches Baek Arin. 'Heard my daughter’s voice loud and clear.' 30 minutes into the broadcast, one email lands in Seo Harin’s tip inbox. 'I was on the chairman’s office secretarial team. I know who ordered the reference opinion. Tonight at 12, Hapjeong Station Exit 7.'",
       "memo": [
         "On air -- per-minute rating peaks at 6.1%",
         "5 interviewees in the editing room, 3 boxes of rice cakes",
@@ -183,7 +183,7 @@ export default {
     },
     "c39_door": {
       "title": "Editing in Progress",
-      "text": "11:50 p.m., people from the Ad Sales Bureau come to the editing room a second time. Kang Taemin, on a folding chair in front of the door, says only one sentence. 'Editing in progress.' The third to come is Gong Byungman. He does not come in; he stands in the hallway and speaks. '11 years ago I cut 12 minutes too. An interview with a subcontracted shipyard worker. His face aired, and why he spoke was cut. Three months later his contract ended. Decide first what you’re going to protect. The 20 minutes, or the people.'",
+      "text": "11:50 p.m., people from the Ad Sales Bureau come a second time. Kang Taemin, on a folding chair in front of the door, says only one thing. 'Editing in progress.' The third is Gong Byungman. '11 years ago I cut 12 minutes too. An interview with a subcontracted shipyard worker. His face aired, and why he spoke was cut. Three months later his contract ended. Decide first what you’re going to protect. The 20 minutes, or the people.'",
       "memo": [
         "Ad Sales Bureau visits: 2 -- 'checking progress'",
         "Gong Byungman: cut 12 minutes 11 years ago",
@@ -206,7 +206,7 @@ export default {
     },
     "c39_cakes": {
       "title": "Rice Cakes at 3 a.m.",
-      "text": "3 a.m., Moon Gaeul arrives by taxi with boxes of rice cakes. 'I thought the people staying up all night might be hungry.' Handing out rice cakes, Moon Gaeul stops in front of a monitor. A 2019 Gaon Precision promotional video used in Part 2. Her husband Moon Sungho smiles at his lathe and says, 'At our factory we check down to 0.01 millimeters.' It is the first time since the funeral she has seen her husband move. Moon Gaeul sets down the box of rice cakes, stands for a long while, and asks. 'How many seconds of this go out?'",
+      "text": "3 a.m., Moon Gaeul arrives with boxes of rice cakes. 'I thought the people staying up all night might be hungry.' She stops in front of a 2019 Gaon Precision promotional video in Part 2. Her husband Moon Sungho smiles at his lathe. 'At our factory we check down to 0.01 millimeters.' It is the first time since the funeral she has seen him move. Moon Gaeul asks, 'How many seconds of this go out?'",
       "memo": [
         "2019 Gaon Precision promotional video -- 12 seconds now",
         "Moon Sungho: 'We check down to 0.01 millimeters'",
@@ -229,7 +229,7 @@ export default {
     },
     "c39_court": {
       "title": "The Six O’Clock Filing",
-      "text": "6:10 a.m., a court alert pops up on Seo Harin’s phone. The group’s law firm has filed for a broadcast injunction targeting Part 4 alone, and the hearing is at 9 a.m. The filing’s first sentence: 'The parts concerning the chairman are unconfirmed speculation.' Seo Harin leans on the railing. 'It’s not speculation. Three testimonies and two documents. But two of the three who testified chose not to give their names. If we call those two in court, we win, and those two are finished.'",
+      "text": "6:10 a.m., the group’s law firm files for a broadcast injunction targeting Part 4 alone. The hearing is at 9 a.m., and the filing’s first sentence reads: 'The parts concerning the chairman are unconfirmed speculation.' Seo Harin says, 'It’s not speculation. Three testimonies and two documents. But two of the three who testified chose not to give their names. If we call those two in court, we win, and those two are finished.'",
       "memo": [
         "Injunction filing: Part 4 only, hearing 09:00",
         "Basis for Part 4: 3 testimonies (2 anonymous) + 2 documents",
@@ -252,7 +252,7 @@ export default {
     },
     "c39_door_reaction": {
       "title": "A 12-Minute Tape",
-      "text": "Gong Byungman pulls a dusty tape from the bottom shelf of the video archive. The label says only '12 minutes.' 'Nobody said to throw it out. So I didn’t. And in 11 years I never once played it. The 20 minutes cut today will end up like this. Filed on some shelf, played by no one.' Then, for the first time, he asks. 'Do you people have a way to stop that?'",
+      "text": "From the bottom shelf, Gong Byungman pulls a tape labeled only '12 minutes.' 'Nobody said to throw it out. So I didn’t. And in 11 years I never once played it. The 20 minutes cut today will end up like this. Filed on some shelf, played by no one.' For the first time, he asks. 'Do you people have a way to stop that?'",
       "memo": [
         "A tape labeled only '12 minutes'",
         "Never played once in 11 years"
@@ -274,7 +274,7 @@ export default {
     },
     "c39_cakes_reaction": {
       "title": "Smiles Inside the Squares",
-      "text": "Moon Hajun, who came along with his mom, opens his sketchbook on the lobby sofa. The interviewees stand in a row in front of the rice cake shop, and some faces are colored in as squares, but in every square he has drawn a small smiling mouth. 'So you can see they’re smiling even when they’re hidden.' One square at the very end is empty. 'This one’s me. I’ll color it in if Mom decides.' Eom Donggyun, looking over her shoulder, says, 'Put this in the ending as is, 3 seconds. I’ll name the file REALfinal.'",
+      "text": "In Moon Hajun’s sketchbook, some interviewees in front of the rice cake shop have faces colored in as squares, each with a small smiling mouth. 'So you can see they’re smiling even when they’re hidden.' One square at the very end is empty. 'This one’s me. I’ll color it in if Mom decides.' Eom Donggyun says, 'This goes in the ending as is, 3 seconds. I’ll name the file REALfinal.'",
       "memo": [
         "A smiling mouth drawn in every square",
         "The last square, not yet colored in"
@@ -296,7 +296,7 @@ export default {
     },
     "c39_court_reaction": {
       "title": "The Responsible-Person Box",
-      "text": "7:30 a.m., Gong Byungman brings a printout of the broadcast decision document. He has already written his own name in the responsible-person box at the bottom. 'Whichever way we go, it’s my name. Not one broadcast in our bureau ever went out with this box empty.' His name was on the decision document for the '12 minutes' broadcast 11 years ago too, he says. He filled the box then as well, and the reason for the cut was written down nowhere. 'This time, what do you want to write in with it?'",
+      "text": "7:30 a.m., Gong Byungman has already written his name in the responsible-person box of the broadcast decision document. 'Whichever way we go, it’s my name. Not one broadcast in our bureau ever went out with this box empty.' With the '12 minutes' 11 years ago, he filled the box too, but the reason for the cut was written down nowhere. 'This time, what do you want to write in with it?'",
       "memo": [
         "The responsible-person box, already filled",
         "The reason for the cut has never been written down"
@@ -318,7 +318,7 @@ export default {
     },
     "c39_branch_sales": {
       "title": "The Price of 30 Seconds",
-      "text": "11 p.m., Ad Sales deputy manager Eun Sion turns her tablet toward you. On the Friday night ad sales sheet, KD’s 14 slots are shaded gray. 'KD is 31% of our team’s target this year. And I just got word. If the 20 minutes come out, they’ll buy 6 more slots in the Chuseok special.' The notice email came from the group’s Brand Strategy Team, and Eun Sion is covering one line of the cc field with her finger.",
+      "text": "11 p.m., on Ad Sales deputy manager Eun Sion’s tablet, KD’s 14 ad slots are gray. 'KD is 31% of our team’s target this year. And I just got word. If the 20 minutes come out, they’ll buy 6 more slots in the Chuseok special.' On the notice email from the group’s Brand Strategy Team, Eun Sion is covering one line of the cc field with her finger.",
       "memo": [
         "14 ad slots in the Friday 22:00 hour -- gray",
         "KD’s share of Ad Sales’ target this year: 31%",
@@ -342,7 +342,7 @@ export default {
     },
     "c39_branch_sales_follow": {
       "title": "Fit Score 88",
-      "text": "Eun Sion lifts the finger covering the cc field. 'KD Financial Group Chairman’s Office.' She turns off her tablet and after a long while says, 'The hiring assessment company in Part 5. I got in here last year on that company’s score too. Organizational fit score 88. The score came with the acceptance text. Back then I bragged about it. Whose hesitation that score was built from, I only learned watching the editing room monitors. What I sell is 30 seconds. I didn’t know those 30 seconds were buying the 20 minutes.'",
+      "text": "Eun Sion lifts her finger from the cc field. 'KD Financial Group Chairman’s Office.' After a long while she says, 'The hiring assessment company in Part 5. I got in last year on that company’s score too. Organizational fit score 88. The score came with the acceptance text. Back then I bragged about it. Whose hesitation that score was built from, I only learned watching the editing room monitors. What I sell is 30 seconds. I didn’t know those 30 seconds were buying the 20 minutes.'",
       "memo": [
         "cc: KD Financial Group Chairman’s Office",
         "Eun Sion: hired last year, FitScore score 88",
@@ -366,7 +366,7 @@ export default {
     },
     "c39_route_system": {
       "title": "What the Cut 20 Minutes Share",
-      "text": "NOAH brings up twenty-three Korean investigative documentaries from the past 10 years that got ad withdrawal notices just before broadcast. Nineteen were shortened before airing, and in seventeen of those, what was cut was not one person’s wrongdoing but the part showing how the organization made its decisions. In two cases, the cut footage was released later. 'What gets cut is learned as an explanation of structure, not a person’s face. Faces can air alongside the ads. Structure cannot.'",
+      "text": "NOAH brings up twenty-three investigative documentaries from the past 10 years that got ad withdrawal notices just before broadcast. Nineteen were shortened before airing, and in seventeen, what was cut was how the organization made its decisions. Two had the cut footage released later. 'What gets cut is learned as an explanation of structure, not a person’s face. Faces can air alongside the ads. Structure cannot.'",
       "memo": [
         "Of 23 with ad withdrawal notices, 19 shortened",
         "Cases where the cut part explained structure: 17",
@@ -392,7 +392,7 @@ export default {
     },
     "c39_final_system_route": {
       "title": "The Seventeen That Never Came Back",
-      "text": "5 a.m., only the NOAH screen on your laptop glows. Below twenty-three titles, in the 24th row, is “The Unsigned,” and the length field blinks between 90 and 70. NOAH adds beside the list, 'The cut footage came back in two cases. I could not find where the cut parts of the other seventeen are now. Cutting had a deadline. Keeping did not.'",
+      "text": "5 a.m. In the 24th row of NOAH’s list is “The Unsigned.” The length field blinks between 90 and 70. NOAH adds, 'The cut footage came back in two cases. I could not find where the cut parts of the other seventeen are now. Cutting had a deadline. Keeping did not.'",
       "memo": [
         "23 with ad withdrawal notices -- this documentary is the 24th",
         "Cases where the cut footage was released later: 2",
@@ -415,7 +415,7 @@ export default {
     },
     "c39_evidence_turn": {
       "title": "Who Wrote the Reference Opinion",
-      "text": "When you hook the clue onto Monday afternoon’s sending log, Lee Minseo opens the document properties window of the 'reference opinion' file. The author field: 'KD Financial Group Chairman’s Office.' Created Monday at 14:22. 22 minutes after Raon Broadcasting sent the group a copy of the documentary so it could prepare its right of reply. The timecode matches the temporary numbers that existed only on that copy. Lee Minseo turns her laptop around. 'They marked where to cut on the copy we showed them first, to be fair. And the marks came in the advertisers’ name. The chairman decided in someone else’s name again.'",
+      "text": "When you hook the clue onto Monday afternoon’s sending log, Lee Minseo opens the properties of the 'reference opinion' file. Author: 'KD Financial Group Chairman’s Office.' Created Monday at 14:22. 22 minutes after Raon Broadcasting sent the group its right-of-reply copy. The timecode, too, is the temporary numbering that existed only on that copy. Lee Minseo says, 'They marked where to cut on the copy we showed them first, to be fair. And the marks came in the advertisers’ name. The chairman decided in someone else’s name again.'",
       "memo": [
         "Document author: KD Financial Group Chairman’s Office",
         "Time created: 22 minutes after the right-of-reply copy was sent",
@@ -438,7 +438,7 @@ export default {
     },
     "c39_start_warm": {
       "title": "The Editing Room of the One Who Came From the Steps",
-      "text": "Thursday evening, after the first hearing, you stayed beside Moon Gaeul on the courthouse steps until the last plaintiff got on the bus. At 9 p.m., Seo Harin is waiting. Three plaintiffs appear in the documentary “The Unsigned,” airing tomorrow night. Three KD Financial Group affiliates said they would pull 14 ads, and the 'reference opinion' that came with it marks a 20-minute section. Executive producer Gong Byungman said to cut it to 70 minutes by 10 tomorrow morning. A text comes from Moon Gaeul. 'Is our story getting cut? In court they heard us out to the end.'",
+      "text": "Thursday, after the first hearing, you stayed beside Moon Gaeul until the last plaintiff got on the bus. Three plaintiffs appear in “The Unsigned,” airing tomorrow night. Three KD Financial Group affiliates said they would pull 14 ads, and the 'reference opinion' they sent marks a 20-minute section. Executive producer Gong Byungman said to cut it to 70 minutes by 10 tomorrow morning. A text from Moon Gaeul. 'Is our story getting cut? In court they heard us out to the end.'",
       "memo": [
         "Ad withdrawal notice: three KD companies, 14 ads",
         "Section the 'reference opinion' points to: 20 minutes",
@@ -468,7 +468,7 @@ export default {
     },
     "c39_start_record": {
       "title": "The Editing Room of the One Who Shared the Record",
-      "text": "From the 23 pages of courtroom notes you organized all evening, Seo Harin took two sentences and put them straight into the closing captions of Part 5 of the documentary “The Unsigned.” The broadcast is tomorrow night. Three KD Financial Group affiliates have announced they will pull 14 ads. The 'reference opinion' that came with it has two lines of timecode. Executive producer Gong Byungman said to cut it to 70 minutes by 10 tomorrow morning. Seo Harin colors the section with a highlighter. 'The two sentences we put in today are right inside these 20 minutes.'",
+      "text": "From the 23 pages of courtroom notes you organized, Seo Harin put two sentences into the closing captions of Part 5 of “The Unsigned.” The broadcast is tomorrow night. Three KD Financial Group affiliates will pull 14 ads, and their 'reference opinion' points at 20 minutes. Executive producer Gong Byungman said to cut it to 70 minutes by 10 tomorrow morning. Seo Harin says, 'The two sentences we put in today are right inside these 20 minutes.'",
       "memo": [
         "Ad withdrawal notice: three KD companies, 14 ads",
         "Two sentences from the courtroom notes -- Part 5 closing captions",
@@ -498,7 +498,7 @@ export default {
     },
     "c39_start_rush": {
       "title": "The Editing Room of the One Who Came First",
-      "text": "The moment Seo Harin called, you took a taxi to Sangam-dong. Over the documentary “The Unsigned,” airing tomorrow night, three KD Financial Group affiliates announced they would pull 14 ads all at once, and the 'reference opinion' that came with it names all of Part 4 and some of Part 5: exactly 20 minutes. Executive producer Gong Byungman said to cut it to 70 minutes by 10 tomorrow morning. In the whiteboard’s field for where the right-of-reply request was sent is Doyul Law. Seo Harin says, 'The lawyers in court today were the first people to see our copy.'",
+      "text": "At Seo Harin’s call, you took a taxi to Sangam-dong. Over “The Unsigned,” airing tomorrow night, three KD Financial Group affiliates will pull 14 ads, and their 'reference opinion' points at exactly 20 minutes. Executive producer Gong Byungman said to cut it to 70 minutes by 10 tomorrow morning. The right-of-reply request was sent to Doyul Law. Seo Harin says, 'The lawyers in court today were the first people to see our copy.'",
       "memo": [
         "Ad withdrawal notice: three KD companies, 14 ads",
         "Right-of-reply request sent to: Doyul Law",

@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c47_start": {
       "title": "1 Year Later, the Same Text",
-      "text": "The first text is from Moon Gaeul. 'Six steamers, not enough hands.' The second is an email from Seon Jaeyoon, the public-interest lawyer. The class action has moved to court mediation, and the group has put forward draft 2nd-round compensation criteria. Of the 212 without papers, 181 have their harm confirmed and will be paid within the holiday. Next to the remaining 31, one word is stamped. 'Unconfirmable.' Seon Jaeyoon added a line. 'The 31 are the very people Moon Gaeul stopped slicing rice cakes to ask about last year.'",
+      "text": "The first text is from Moon Gaeul. 'Six steamers, not enough hands.' The second is an email from Seon Jaeyoon, the public-interest lawyer. The class action has moved to court mediation, and under the group’s draft 2nd-round compensation criteria, 181 of the 212 without papers will be paid within the holiday. Next to the remaining 31, one word is stamped. 'Unconfirmable.' Seon Jaeyoon added a line. 'The 31 are the very people Moon Gaeul stopped slicing rice cakes to ask about last year.'",
       "memo": [
         "2nd-round compensation draft -- 181 of 212 confirmed, paid within the holiday",
         "The remaining 31: 'Unconfirmable'",
@@ -38,7 +38,7 @@ export default {
     },
     "c47_steam": {
       "title": "Six Steamers",
-      "text": "On the roster, Kang Taemin is 'Steamer Foreman' this year. Seo Jiho, the former night-shift worker who came to the shop two weeks ago, learned songpyeon stamping from Na Junhyuk, and three days later people say his shapes are more even than his teacher’s. Na Junhyuk pretends to be pleased and sulks: '30 years of stamping, and now I have an heir.' At 11, Nam Heewon walks in. She ran the Gaon Precision cafeteria for 12 years. The year the company went bankrupt, she never got back the 23.4 million won it ran up on her tab. Her ledger, wrapped in plastic, had seven pages run in the July monsoon. 'Last year I came to buy rice cakes. This year I came to find my name. But the paper cried first.'",
+      "text": "On the roster, Kang Taemin is 'Steamer Foreman' this year. Three days into learning, former night-shift worker Seo Jiho’s songpyeon are said to be more even than his teacher Na Junhyuk’s. Na Junhyuk pretends to be pleased and sulks: '30 years of stamping, and now I have an heir.' At 11, Nam Heewon walks in. She ran the Gaon Precision cafeteria for 12 years; the year it went bankrupt she never got back the 23.4 million won tab, and seven pages of her plastic-wrapped ledger ran in the July monsoon. 'Last year I came to buy rice cakes. This year I came to find my name. But the paper cried first.'",
       "memo": [
         "Roster: Kang Taemin, steamer foreman; Seo Jiho, songpyeon stamping",
         "Kwon Dohyun: back at the counter, on condition he never says 'deficit'",
@@ -69,7 +69,7 @@ export default {
     },
     "c47_factory": {
       "title": "First Profit",
-      "text": "The six lathes the July monsoon flooded are all turning. Eleven months after reopening as a cooperative, the August books show a profit for the first time. 4.12 million won. Kwon Dohyun says, 'It’s a profit, all right.' He says it is his third profit this month alone, and looks a little moved. Clearing out the old president’s office, Foreman Kim takes a black notebook from the bottom drawer. On the cover, in Moon Sungho’s handwriting: 'To Repay.' 31 names, amounts and dates. Cafeteria, 23.4 million won. Work-clothes laundry, 4.1 million won. Three quick-delivery riders… The last page holds a single line. 'Before Chuseok, the cafeteria first.'",
+      "text": "The six lathes the July monsoon flooded are all turning. Eleven months after reopening as a cooperative, the August books show a profit for the first time: 4.12 million won. Kwon Dohyun says, 'It’s a profit, all right,' looking a little moved. His third profit this month alone. Foreman Kim takes a black notebook from a drawer in the old president’s office. On the cover, in Moon Sungho’s handwriting: 'To Repay.' 31 names, amounts and dates. Cafeteria, 23.4 million won. Work-clothes laundry, 4.1 million won. Three quick-delivery riders… The last page holds a single line. 'Before Chuseok, the cafeteria first.'",
       "memo": [
         "First profit in the August books: 4.12 million won",
         "All 6 lathes running -- monsoon damage repaired",
@@ -100,7 +100,7 @@ export default {
     },
     "c47_memorial": {
       "title": "2nd Anniversary",
-      "text": "Moon Gaeul sets down three songpyeon and a glass of soju. Moon Hajun holds his phone screen up to the glass door. 'Early admission, round 1 passed -- Business Administration, interview October 18.' Hajun speaks quietly. 'Dad, I’ve still got a long way to go before I’m a banker, but round 1’s done.' Moon Gaeul laughs, turns her head away, and takes her husband’s black notebook, 'To Repay,' from her bag. Moon Sungho’s notes to himself fill the margins. 'Couldn’t pay them again today. I’m sorry.' Moon Gaeul tightens her grip on the notebook. 'If I hand this in, everyone will know. That he died without even paying for people’s holiday meals.'",
+      "text": "Moon Gaeul sets down three songpyeon and a glass of soju. Moon Hajun holds his phone screen up to the glass door. 'Early admission, round 1 passed -- Business Administration, interview October 18.' 'Dad, I’ve still got a long way to go before I’m a banker, but round 1’s done.' Moon Gaeul turns her head away and takes out her husband’s black notebook, 'To Repay.' Moon Sungho’s note to himself in the margin: 'Couldn’t pay them again today. I’m sorry.' Moon Gaeul tightens her grip on it. 'If I hand this in, everyone will know. That he died without even paying for people’s holiday meals.'",
       "memo": [
         "Moon Sungho’s 2nd anniversary -- three songpyeon, a glass of soju",
         "Moon Hajun: early admission round 1 passed, interview October 18",
@@ -131,7 +131,7 @@ export default {
     },
     "c47_final": {
       "title": "The 31",
-      "text": "When Yeon Seojun of Doyul Law Firm walks in in a gray suit, Moon Gaeul says nothing and hands him an apron first. Under the mediation proposal, if they consent today, the 181 are paid during the holiday. The 31 keep their 'Unconfirmable' stamp, and each receives a 3 million won consolation payment. Whoever takes it signs a no-suit agreement. Yeon Seojun speaks. 'We respect the notebook. But a handwritten note by the deceased is not a document that proves harm.' Moon Gaeul looks at you. 'Last year, in my husband’s letter, he asked you to see it through next time. This year I’m the one asking. Don’t finish this without these people.'",
+      "text": "When Yeon Seojun of Doyul Law Firm walks in in a gray suit, Moon Gaeul says nothing and hands him an apron first. Under the mediation proposal, if they consent today, the 181 are paid during the holiday. The 31 keep their 'Unconfirmable' stamp and each receives a 3 million won consolation payment that admits no fault, signing an agreement never to sue. Yeon Seojun speaks. 'We respect the notebook. But a handwritten note by the deceased is not a document that proves harm.' Moon Gaeul looks at you. 'Last year, in my husband’s letter, he asked you to see it through next time. This year I’m the one asking. Don’t finish this without these people.'",
       "memo": [
         "181: paid during the holiday if they consent by 18:00 today",
         "31: 3 million won consolation each + no-suit agreement",
@@ -159,7 +159,7 @@ export default {
     },
     "c47_aftershock": {
       "title": "Thank…",
-      "text": "Under the full moon, Na Junhyuk holds one of Seo Jiho’s songpyeon up to the moon and finally admits, 'This beats my stamping.' Moon Gaeul sits down next to you. 'There’s something I’ve wanted to say since last year. Thank…' She stops and pushes a songpyeon into your mouth. '…just eat your rice cake.' Then a KD Capital notice pops up. Every committee member signs under their real name, and the first extraordinary credit committee meets tomorrow at 9 a.m. Your name is at the bottom of the member list. The agenda is still a single line. 'Working capital for a delivery platform.' The first line of that file 3 years ago began the same way.",
+      "text": "Under the full moon, Na Junhyuk holds one of Seo Jiho’s songpyeon up to the moon and finally admits, 'This beats my stamping.' Moon Gaeul sits down next to you. 'There’s something I’ve wanted to say since last year. Thank…' She pushes a songpyeon into your mouth. '…just eat your rice cake.' Then a KD Capital notice pops up. Every committee member signs under their real name, and the first extraordinary credit committee meets tomorrow at 9 a.m. Your name is at the bottom of the member list. The agenda is still a single line. 'Working capital for a delivery platform.' The first line of that file 3 years ago began the same way.",
       "memo": [
         "Chuseok full moon -- 11 on the Gaeul Rice Cake Shop roof",
         "Moon Gaeul: songpyeon instead of 'Thank…'",
@@ -183,7 +183,7 @@ export default {
     },
     "c47_ledger": {
       "title": "This Year’s Column",
-      "text": "Kwon Dohyun opens Moon Gaeul’s ledger. It is the column he ruled off last Chuseok: free rice cakes for the owners whose shops closed. The 23 lines of names are down to nine this year. At the bottom there is one new line. '31 -- one box a month.' Kwon Dohyun taps the calculator, then stops. 'Ma’am, this ledger is in the black this year for the first time. As long as you leave out this line.' Moon Gaeul answers as she slices rice cakes. 'A profit that leaves out that line, I’ll pass on.'",
+      "text": "Kwon Dohyun opens Moon Gaeul’s ledger: the column he ruled off last Chuseok, free rice cakes for owners whose shops closed. The 23 lines of names are down to nine this year. At the bottom there is one new line. '31 -- one box a month.' Kwon Dohyun taps the calculator, then stops. 'Ma’am, this ledger is in the black this year for the first time. As long as you leave out this line.' Moon Gaeul answers as she slices rice cakes. 'A profit that leaves out that line, I’ll pass on.'",
       "memo": [
         "Last year 23 lines → this year 9",
         "New line: one box a month for the 31",
@@ -206,7 +206,7 @@ export default {
     },
     "c47_banner": {
       "title": "To the End, Three Times",
-      "text": "Moon Hajun arrives in his uniform. The banner he painted on the sly in art class reads 'To-the-End Precision’s First Profit -- We Held On To the End, and Kept It To the End.' Kwon Dohyun says, 'That’s three “to the end”s. Way down from the eleven in last year’s business plan.' Hajun answers, 'That’s growth.' The members hold an impromptu general meeting in front of the lathes. The agenda: where the 4.12 million won profit goes. Foreman Kim raises a hand. 'I’d like it to go first to the people in the boss’s notebook. We worked on the food from their kitchen.'",
+      "text": "The banner Moon Hajun, in his uniform, painted on the sly in art class reads 'To-the-End Precision’s First Profit -- We Held On To the End, and Kept It To the End.' Kwon Dohyun says, 'That’s three “to the end”s. Way down from the eleven in last year’s business plan.' Hajun answers, 'That’s growth.' The agenda of the impromptu members’ meeting in front of the lathes: where the 4.12 million won profit goes. Foreman Kim raises a hand. 'I’d like it to go first to the people in the boss’s notebook. We worked on the food from their kitchen.'",
       "memo": [
         "Banner: 'to the end' 3 times -- last year’s business plan: 11 times",
         "General meeting agenda: how to use the 4.12 million won profit",
@@ -229,7 +229,7 @@ export default {
     },
     "c47_count": {
       "title": "From 212 to 31",
-      "text": "Arriving late for the 2nd anniversary, Do Yoonha opens a worn notebook on the bench. These are the names he began counting alone behind the window 3 years ago. Of the 212, 181 names have a thin line through them, and 31 names remain without a line. Do Yoonha uncaps his pen, then caps it again. 'This time last year it was 212. Every line I drew felt good, but today, strangely, I’m scared. Do I write unconfirmable next to these 31, or write nothing?'",
+      "text": "Arriving late for the 2nd anniversary, Do Yoonha opens a worn notebook: the names he began counting alone behind the window 3 years ago. Of the 212, 181 have a thin line through them, and 31 remain. Do Yoonha uncaps his pen, then caps it again. 'This time last year it was 212. Every line I drew felt good, but today, strangely, I’m scared. Do I write unconfirmable next to these 31, or write nothing?'",
       "memo": [
         "Do Yoonha’s notebook: 181 of 212 lined through",
         "31 names left -- no words to write",
@@ -252,7 +252,7 @@ export default {
     },
     "c47_ledger_reaction": {
       "title": "The People Who Fed Them",
-      "text": "Moon Gaeul sets down her knife and looks at the nearly round moon past the shutter. 'Those thirty-one, they’re the people my husband ran a tab with. Heewon cooked the factory’s meals, the laundry owner washed the work clothes, and the three quick riders hauled parts every dawn. Of course they’re not in any loan papers. He died without paying. So I’m paying it back in rice cakes. No interest.'",
+      "text": "Moon Gaeul sets down her knife. 'Those thirty-one, they’re the people my husband ran a tab with. Heewon cooked the factory’s meals, the laundry owner washed the work clothes, and the three quick riders hauled parts every dawn. Of course they’re not in any loan papers. He died without paying. So I’m paying it back in rice cakes. No interest.'",
       "memo": [
         "The people who fed, clothed and ran for the factory on credit",
         "Paying it back in rice cakes, no interest"
@@ -274,7 +274,7 @@ export default {
     },
     "c47_banner_reaction": {
       "title": "The Cafeteria First",
-      "text": "After the party, holding the barley tea Kang Taemin handed over, Foreman Kim looks at the last page of the notebook for a long time. 'A month before the factory closed, the boss said it. Before Chuseok, let’s pay the cafeteria tab first. The person who fed us can’t go into the holiday empty-handed. The factory stopped before Chuseok came that year.' Kang Taemin says briefly, 'Then we pay it this Chuseok.' Foreman Kim sets the cup down. 'I wish we could. But they say those people have no papers.'",
+      "text": "Foreman Kim looks at the last page of the notebook for a long time. 'A month before the factory closed, the boss said it. Before Chuseok, let’s pay the cafeteria tab first. The person who fed us can’t go into the holiday empty-handed. The factory stopped before Chuseok came that year.' Kang Taemin says briefly, 'Then we pay it this Chuseok.' Foreman Kim sets the cup down. 'I wish we could. But they say those people have no papers.'",
       "memo": [
         "The promise a month before the factory closed: the cafeteria first",
         "Tabs owed to people without papers"
@@ -318,7 +318,7 @@ export default {
     },
     "c47_branch_screen": {
       "title": "0.3 Seconds, 31 Times",
-      "text": "Assistant Manager Tak Yerin turns the monitor toward you. The 1st-round screening for the 2nd-round compensation criteria was also handled by NOAH, the AI review engine. Of 212 cases, 31 were rejected in 0.3 seconds each, for the same reason. 'No electronic transaction history.' Tak Yerin points at the screen. 'A tab doesn’t show up in the system. No owner gets paid for cafeteria meals by bank transfer, regular as clockwork. NOAH just doesn’t know how to count people it can’t see.'",
+      "text": "Assistant Manager Tak Yerin turns the monitor toward you. The 1st-round screening for the 2nd-round compensation criteria was handled by NOAH too. Of 212 cases, 31 were rejected in 0.3 seconds each, for the same reason. 'No electronic transaction history.' Tak Yerin points at the screen. 'A tab doesn’t show up in the system. No owner gets paid for cafeteria meals by bank transfer, regular as clockwork. NOAH just doesn’t know how to count people it can’t see.'",
       "memo": [
         "2nd-round criteria, 1st-round screening: NOAH",
         "Each of the 31 rulings took 0.3 seconds",
@@ -342,7 +342,7 @@ export default {
     },
     "c47_branch_screen_follow": {
       "title": "Meal Payment Records",
-      "text": "Into the installment savings account Nam Heewon opened at this branch 12 years ago, meal money came every month under the name Gaon Precision, until it stopped four months before the bankruptcy. The date the tab began is stamped in the bank’s system, in reverse. Tak Yerin speaks more quietly. 'This is our bank’s own record, so I can look it up. But to submit it for mediation, we need the customer’s consent, and to search all 31 like this, I need the branch manager’s signature.' Through the gap in the branch manager’s door, you can see Branch Manager Seo Taekyung sorting Chuseok gift boxes.",
+      "text": "Into the savings account Nam Heewon opened at this branch 12 years ago, meal money came every month under the name Gaon Precision, until it stopped four months before the bankruptcy. The date the tab began is stamped in the bank’s system, in reverse. Tak Yerin speaks more quietly. 'This is our bank’s own record, so I can look it up. But to submit it for mediation, we need the customer’s consent, and to search all 31 like this, I need the branch manager’s signature.' Through the gap in the branch manager’s door, you can see Branch Manager Seo Taekyung sorting Chuseok gift boxes.",
       "memo": [
         "Nam Heewon’s savings account: monthly Gaon Precision meal payments",
         "Deposits stop four months before the bankruptcy",
@@ -366,7 +366,7 @@ export default {
     },
     "c47_route_system": {
       "title": "Two Neighbors",
-      "text": "You put off the consent decision and give ECHO one calculation. Was there ever a compensation standard that included people without papers? It is the first calculation it has taken on since coming back. Of 64 compensation standards over the past 20 years, 7 included victims without papers. All of them used vouching by two neighbors or coworkers, and not a single vouch was found to be false. Under the rest, some 12,000 people were left out as 'Unconfirmable.' ECHO adds a line. 'If I had a function for disliking things, I would use it on this output. Unconfirmable is not the name for where a calculation ends. It is the name for where someone stopped calculating.'",
+      "text": "Putting off consent, ECHO calculates whether any compensation standard ever included people without papers. Of 64 over the past 20 years, 7 did, all by having two neighbors or coworkers vouch for the facts. Not a single vouch was found to be false. Under the rest, some 12,000 people were left out as 'Unconfirmable.' ECHO adds a line. 'If I had a function for disliking things, I would use it on this output. Unconfirmable is not the name for where a calculation ends. It is the name for where someone stopped calculating.'",
       "memo": [
         "7 of 64 compensation standards included victims without papers",
         "All 7 used neighbor vouching -- 0 false vouches",
@@ -392,7 +392,7 @@ export default {
     },
     "c47_final_system_route": {
       "title": "62 Neighbors",
-      "text": "ECHO’s screen shows 31 lines, each stamped 'Unconfirmable.' ECHO makes one more column beside them. 'Neighbors who can confirm.' Two hours to the consent deadline. 'Two neighbors each for 31 people is sixty-two. My calculation ends here. The next line gets filled by walking the market alley and asking. It is a column that fills if no one stops.'",
+      "text": "Each of the 31 lines on ECHO’s screen is stamped 'Unconfirmable.' ECHO makes one more column beside them. 'Neighbors who can confirm.' Two hours to the consent deadline. 'Two neighbors each for 31 people is sixty-two. My calculation ends here. The next line gets filled by walking the market alley and asking. It is a column that fills if no one stops.'",
       "memo": [
         "31 'Unconfirmable' -- two vouchers each makes 62",
         "7 standards accepted neighbor vouching -- 0 false vouches",
@@ -415,7 +415,7 @@ export default {
     },
     "c47_evidence_turn": {
       "title": "The Leftover Money",
-      "text": "The disbursement sheet of the 2nd-round compensation fund opens up. Of 14 billion won, 11.8 billion won goes to the 181. The remaining 2.2 billion won passes to the group’s social-contribution foundation at year-end, for the 'Hangawi Sharing Campaign -- TV commercials.' The claims of the 31 add up to 620 million won. Kwon Dohyun puts down his calculator. 'Pay the 31 in full and 1.58 billion won is still left. With the money for a Chuseok sharing ad, they cut out the people to share with at Chuseok. This isn’t a deficit or a profit. It’s just a wrong calculation.'",
+      "text": "The disbursement sheet of the 2nd-round compensation fund opens. Of 14 billion won, the 181 get 11.8 billion won. The remaining 2.2 billion won passes to the group’s social-contribution foundation at year-end, for the 'Hangawi Sharing Campaign -- TV commercials.' The claims of the 31 add up to 620 million won. Kwon Dohyun puts down his calculator. 'Pay the 31 in full and 1.58 billion won is still left. With the money for a Chuseok sharing ad, they cut out the people to share with at Chuseok. This isn’t a deficit or a profit. It’s just a wrong calculation.'",
       "memo": [
         "2nd-round compensation fund 14 billion won -- 11.8 billion won to the 181",
         "Unspent balance of 2.2 billion won: the foundation’s 'Hangawi Sharing' ads",
@@ -438,7 +438,7 @@ export default {
     },
     "c47_start_warm": {
       "title": "Chuseok for the One Who Stayed",
-      "text": "11 replies have come into the rice cake shop group chat, saying they would come for the Chuseok rush. This morning Moon Gaeul sends one more line. 'Six steamers, not enough hands.' Seon Jaeyoon posts the class action’s draft 2nd-round compensation criteria. Of the 212 without papers, 181 will be paid within the holiday, and 31 are stamped 'Unconfirmable.' Lee Minseo replies. 'I asked ECHO. It says unconfirmable isn’t a judgment. It means no one judged. Oh, ECHO’s coming to the shop too. On the laptop.'",
+      "text": "This morning, a text from Moon Gaeul. 'Six steamers, not enough hands.' Under the draft 2nd-round compensation criteria Seon Jaeyoon posts, 181 of the 212 without papers will be paid within the holiday, and 31 are stamped 'Unconfirmable.' Lee Minseo replies. 'I asked ECHO. It says unconfirmable isn’t a judgment. It means no one judged. Oh, ECHO’s coming to the shop too. On the laptop.'",
       "memo": [
         "Rice cake shop group chat: 11 replies saying they’ll come for the rush",
         "2nd-round draft: 181 confirmed, 31 'Unconfirmable'",
@@ -468,7 +468,7 @@ export default {
     },
     "c47_start_record": {
       "title": "Chuseok for the One Who Left a Way to Read",
-      "text": "Ban Jaewook calls, the report tucked into his notebook. Seon Jaeyoon has sent the class action’s draft 2nd-round compensation criteria, he says. Of the 212 without papers, 181 confirmed, 31 'Unconfirmable.' Ban Jaewook reads it once more. 'The reason for all 31 rulings is the same single line. No electronic transaction history. And the decided-by field is empty on every one. Exactly the pattern in the report. This time we should ask first who left it empty.' As soon as you hang up, a text comes from Moon Gaeul. 'Six steamers, not enough hands.'",
+      "text": "Ban Jaewook calls, the report tucked into his notebook. In the draft 2nd-round compensation criteria Seon Jaeyoon sent, of the 212 without papers, 181 are confirmed, 31 'Unconfirmable.' Ban Jaewook reads it once more. 'The reason for all 31 rulings is the same single line. No electronic transaction history. And the decided-by field is empty on every one. Exactly the pattern in the report. This time we should ask first who left it empty.' As soon as you hang up, a text comes from Moon Gaeul. 'Six steamers, not enough hands.'",
       "memo": [
         "Three days since handing over the 14-page report",
         "2nd-round draft: decided-by field blank for the 31",
@@ -498,7 +498,7 @@ export default {
     },
     "c47_start_rush": {
       "title": "Chuseok for the One Who Ran Ahead",
-      "text": "Moon Gaeul’s text has stayed unread at the top of your phone. Instead of a box of rice cakes, Oh Jinwoo is holding a printout: the class action’s draft 2nd-round compensation criteria. Of the 212 without papers, 181 will be paid within the holiday, 31 'Unconfirmable.' Oh Jinwoo holds out his phone. It is a new message Moon Gaeul posted in the group chat. 'Six steamers, not enough hands.' You are the only one who hasn’t replied. Oh Jinwoo speaks. 'Everyone’s there. They say only your apron is still hanging on its nail.'",
+      "text": "Moon Gaeul’s text has stayed unread at the top of your phone. The printout Oh Jinwoo brings is the draft 2nd-round compensation criteria. Of the 212 without papers, 181 will be paid within the holiday, 31 'Unconfirmable.' Oh Jinwoo shows you the new message Moon Gaeul posted in the group chat. 'Six steamers, not enough hands.' You are the only one who hasn’t replied. Oh Jinwoo speaks. 'Everyone’s there. They say only your apron is still hanging on its nail.'",
       "memo": [
         "26 pre-holiday files -- day three",
         "Rice cake shop chat: 1 person hasn’t replied",

@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c49_start": {
       "title": "Let’s Talk About the Empty Signature Field",
-      "text": "On the Saturday night the minutes went up on the company network, a number sent one line: 'Now let’s talk about the empty signature field.' Now Yoon Sanghyuk sends a second text. 'Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve. The Chairman has given me one night while the room is cleared out. We’ll talk there.' Ban Jaewook writes the send time in his notebook. 08:59. Han Seoyun turns her phone face down. 'He said the same thing last spring. And he didn’t come. This time he will. That room is the only one he has left now.'",
+      "text": "On the Saturday night the minutes went up, Yoon Sanghyuk sent one line: 'Now let’s talk about the empty signature field.' Now he sends a second text. 'Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve. The Chairman has given me one night while the room is cleared out. We’ll talk there.' Sent at 08:59. Han Seoyun turns her phone face down. 'He said the same thing last spring. And he didn’t come. This time he will. That room is the only one he has left now.'",
       "memo": [
         "Yoon Sanghyuk’s text: tomorrow night at 12, the former Group Strategy Office, 33rd floor",
         "First text on Saturday night: 'Now let’s talk about the empty signature field'",
@@ -38,7 +38,7 @@ export default {
     },
     "c49_market": {
       "title": "The People Who Send You Up",
-      "text": "People come in one by one, each carrying something. Kang Taemin holds out two cups of instant noodles. 'One’s for you, one’s for him.' Kwon Dohyun’s 'Statement of Costs for a Round Trip to the 33rd Floor' ran out of rows and onto the back. His conclusion: 'This round trip runs at a loss.' Na Junhyuk hands you a seal he has used for 30 years. 'If you ever have to write your name in a signature field, press this on it once more. A name stamped twice can’t be erased.' Oh Jinwoo draws a new column next to 12 to 12 on his scoreboard, and Moon Hajun has drawn a 33rd-floor window. Moon Gaeul sets down a box of rice cakes. 'But if you carry all this up, will your words get lighter in front of him, or heavier?'",
+      "text": "People come in one by one, each carrying something. Kang Taemin holds out two cups of instant noodles. 'One’s for you, one’s for him.' Kwon Dohyun’s 'Statement of Costs for a Round Trip to the 33rd Floor' runs onto the back, concluding: 'This round trip runs at a loss.' Na Junhyuk hands you a seal he has used for 30 years. 'If you ever have to write your name in a signature field, press this on it once more. A name stamped twice can’t be erased.' Oh Jinwoo draws a new column next to 12 to 12 on his scoreboard, and Moon Hajun has drawn a 33rd-floor window. Moon Gaeul sets down a box of rice cakes. 'But if you carry all this up, will your words get lighter in front of him, or heavier?'",
       "memo": [
         "Things handed over -- 2 cups of instant noodles, a statement, a seal, a scoreboard, a drawing, rice cakes",
         "Kwon Dohyun’s conclusion: 'This round trip runs at a loss'",
@@ -100,7 +100,7 @@ export default {
     },
     "c49_crosswalk": {
       "title": "The Chairman’s Last Call",
-      "text": "Yoon Seojin holds out an envelope. 'My father said he’d give you this himself tomorrow. I opened it first. I’m sorry.' It is a printout of page 3 of the 2023-0412 approval document. One pencil dot beside the 'Unsigned' field, and a note. 'Whose name should go in this field? I’ll hear your answer tomorrow.' Just then Chairman Seo Dokyung calls. 'Tomorrow he will hand you something. Take it. The moment you take it, it becomes your memory.' He also says the compliance officer post is still empty. The Chairman adds, 'A company runs not on people but on memory. I’d like only two people to remember tomorrow night.'",
+      "text": "Yoon Seojin holds out an envelope. 'My father said he’d give you this himself tomorrow. I opened it first. I’m sorry.' A printout of page 3 of the 2023-0412 approval document, one pencil dot beside the 'Unsigned' field, and a note. 'Whose name should go in this field? I’ll hear your answer tomorrow.' Just then Chairman Seo Dokyung calls. 'Tomorrow he will hand you something. Take it. The moment you take it, it becomes your memory.' He also says the compliance officer post, the in-house watch on whether the company keeps the law, is still empty. The Chairman adds, 'A company runs not on people but on memory. I’d like only two people to remember tomorrow night.'",
       "memo": [
         "Yoon Sanghyuk’s note: 'Whose name should go in this field'",
         "Chairman Seo Dokyung’s direct call -- 22:04, 2 min 11 sec",
@@ -131,7 +131,7 @@ export default {
     },
     "c49_final": {
       "title": "Who Owns the Empty Field",
-      "text": "No one called anyone, but everyone has gathered. 23 faces lean over the 'Unsigned' field with the pencil dot; from beside the counter, the memorial portrait drawing of Lim Kyungsoo looks down at the field too. Cha Jiwon sets a timer for 7 minutes, and Pyo Serin opens the 'Grounds' folder on her laptop. Han Seoyun lays a ballpoint pen beside the printout. 'This field was never one person’s field. He left it empty, I pressed the return button, and the committee pretended not to know. Tomorrow he’ll ask you. Whose name should go in this field. Decide the answer here before you go. Whether to end it with his name alone, to write down everyone who left it empty, or to take the pen he holds out and change things from inside.'",
+      "text": "No one called anyone, but everyone has gathered. 23 faces lean over the 'Unsigned' field with the pencil dot; from beside the counter, the memorial portrait drawing of Lim Kyungsoo looks down at the field too. Cha Jiwon sets a timer for 7 minutes, and Pyo Serin opens the 'Grounds' folder. Han Seoyun lays a ballpoint pen beside the printout. 'This field was never one person’s field. He left it empty, I pressed the return button, and the committee pretended not to know. Tomorrow he’ll ask you. Whose name should go in this field. Decide the answer here before you go. Whether to end it with his name alone, to write down everyone who left it empty, or to take the pen he holds out and change things from inside.'",
       "memo": [
         "Printout of page 3 of the 2023-0412 approval document -- a pencil dot beside the 'Unsigned' field",
         "1st floor of the bookshop: 23 people, 16 chairs",
@@ -159,7 +159,7 @@ export default {
     },
     "c49_aftershock": {
       "title": "Under the Moon",
-      "text": "Past midnight, moonlight fills the alley. Kang Taemin pours water into one of the cups of instant noodles. 'This one’s for tonight. The other’s for tomorrow.' Kwon Dohyun crosses out 'at a loss' on his cost statement and writes 'in the black', and everyone claps. Oh Jinwoo writes nothing in the empty column on the scoreboard, and caps his marker. Moon Hajun draws tonight and leaves only your seat empty. 'I’ll draw you when you’re back.' Moon Gaeul sets down her knife. 'Thank you.' In 1 year she has not once said it all the way through. Then a text from Yoon Sanghyuk arrives. 'My things cleared out sooner than expected. Come up now.'",
+      "text": "Past midnight in the alley. Kang Taemin pours water into one of the cups of instant noodles. 'This one’s for tonight. The other’s for tomorrow.' Kwon Dohyun crosses out 'at a loss' on his cost statement and writes 'in the black', and everyone claps. Oh Jinwoo leaves the empty column on the scoreboard blank and caps his marker. Moon Hajun draws tonight and leaves only your seat empty. 'I’ll draw you when you’re back.' Moon Gaeul sets down her knife. 'Thank you.' In 1 year she has not once said it all the way through. Then a text from Yoon Sanghyuk arrives. 'My things cleared out sooner than expected. Come up now.'",
       "memo": [
         "Yoon Sanghyuk: moves the meeting up to 'now'",
         "Kwon Dohyun’s statement, conclusion revised: 'in the black'",
@@ -206,7 +206,7 @@ export default {
     },
     "c49_calls": {
       "title": "Question 1 and Five Fingers",
-      "text": "As you come up from B2, two people call at the same time. You merge them into one call, and Han Jiwoo goes first. 'By the rules, tomorrow’s meeting is outside my inspection scope. Still, Question 1.' Na Eunho cuts in. 'Record it. It’s legal if you’re a party to the conversation. Everything he says tomorrow is material for the 2nd trial.' The first-instance ruling was a suspended sentence, and the prosecution has appealed. When Han Jiwoo says 'Question 2', Na Eunho answers, 'All five fingers are up.' For the first time, the two of them laugh together, and say it at the same moment. 'Don’t go alone.'",
+      "text": "As you come up from B2, two people call at the same time. You merge the calls, and Han Jiwoo goes first. 'By the rules, tomorrow’s meeting is outside my inspection scope. Still, Question 1.' Na Eunho cuts in. 'Record it. It’s legal if you’re a party to the conversation. Everything he says tomorrow is material for the 2nd trial.' The first-instance ruling was a suspended sentence, and the prosecution has appealed. When Han Jiwoo says 'Question 2', Na Eunho answers, 'All five fingers are up.' For the first time, the two of them laugh together, and say it at the same moment. 'Don’t go alone.'",
       "memo": [
         "Han Jiwoo: got as far as Question 2",
         "Na Eunho: a recording by a party to the conversation is legal",
@@ -252,7 +252,7 @@ export default {
     },
     "c49_parcels_reaction": {
       "title": "Jeongjeong’s Press Card",
-      "text": "Seo Harin comes in carrying Jeongjeong, the newsroom cat. Jeongjeong’s honorary press card has a new sticker, 'Probation: over'. Seo Harin opens her laptop. 'I can write up tomorrow’s 33rd-floor meeting. If we set an embargo, it runs after the meeting is over.' Jeongjeong steps on the keyboard and types 'lololol' into the headline field, but Seo Harin doesn’t delete it. 'What I write isn’t on your side. But this time I want to write as far as the scene where you come back.'",
+      "text": "Seo Harin comes in carrying Jeongjeong, the newsroom cat. Jeongjeong’s honorary press card has a new sticker, 'Probation: over'. Seo Harin opens her laptop. 'I can write up tomorrow’s 33rd-floor meeting. If we agree on a release time, it runs after the meeting is over.' Jeongjeong steps on the keyboard and types 'lololol' into the headline field, but Seo Harin doesn’t delete it. 'What I write isn’t on your side. But this time I want to write as far as the scene where you come back.'",
       "memo": [
         "Jeongjeong’s honorary press card -- 'Probation: over'",
         "Seo Harin: wants to write as far as the scene where you come back"
@@ -318,7 +318,7 @@ export default {
     },
     "c49_branch_columbarium": {
       "title": "Two Glass Doors",
-      "text": "When you say you will carry it all, Moon Gaeul unties her apron. 'Then there’s one more place to say hello.' Behind Moon Sungho’s glass door is a new copy of To-the-End Precision’s first profit-and-loss sheet in the black. Moon Gaeul wipes the glass once. 'Your request? This one says he’s going to see it through to the end tomorrow.' Two rows over is a glass door that appeared fifteen days ago. It is Lim Kyungsoo’s place. Inside are a magnifying glass and the original back page of the dissent, where you can still see the erased 'Agree' in the reviewer field. Lim Soyul, who got there first, turns around. 'Grandpa would have told you to take this with you tomorrow. But I want to leave it here.'",
+      "text": "When you say you will carry it all, Moon Gaeul unties her apron. 'Then there’s one more place to say hello.' Behind Moon Sungho’s glass door is a new copy of To-the-End Precision’s first profit-and-loss sheet in the black. Moon Gaeul wipes the glass once. 'Your request? This one says he’s going to see it through to the end tomorrow.' Two rows over, behind Lim Kyungsoo’s glass door, new fifteen days ago, are a magnifying glass and the original back page of the dissent, the erased 'Agree' still visible in the reviewer field. Lim Soyul, who got there first, turns around. 'Grandpa would have told you to take this with you tomorrow. But I want to leave it here.'",
       "memo": [
         "Moon Sungho’s niche -- copy of To-the-End Precision’s first profit-and-loss sheet in the black",
         "Lim Kyungsoo’s niche -- interred fifteen days ago",
@@ -366,7 +366,7 @@ export default {
     },
     "c49_route_system": {
       "title": "The Empty Fields of 48 Cases",
-      "text": "You put off what you will say in that room, and ask instead to gather whose names filled the empty fields. Documents with an empty approver field: 61. Of those, 58 were later filled. Not once was the name that of the person who first made the decision. A window clerk, a contract worker, a site foreman, a call-center team leader, and twice, you. ECHO speaks. 'An empty field is built to close under the name of whoever arrives last. Shall I calculate the probability that the field in that room tomorrow closes the same way?'",
+      "text": "You put off what you will say in that room and ask ECHO to gather whose names filled the empty fields. Of 61 documents with an empty approver field, 58 were later filled, but not once with the name of the person who first made the decision. A window clerk, a contract worker, a site foreman, a call-center team leader, and twice, you. ECHO speaks. 'An empty field is built to close under the name of whoever arrives last. Shall I calculate the probability that the field in that room tomorrow closes the same way?'",
       "memo": [
         "61 documents with an empty approver field",
         "58 filled in later -- 0 with the name of the person who first decided",
@@ -415,7 +415,7 @@ export default {
     },
     "c49_evidence_turn": {
       "title": "Who Wrote the Designation",
-      "text": "In the HR evaluation folder on the B2 terminal is a successor-manager designation created on the night of the first-instance sentencing. When you run the clue against the designation’s properties, its creation record opens. The account that made the file is not Yoon Sanghyuk’s. It belongs to Yeo Minkyu, chief of staff in Chairman Seo Dokyung’s Secretariat. The recommendation-reason field holds one line. 'Thinks harder as pressure rises. Kept as a manager, dissent gets digested inside.' Ban Jaewook closes his notebook. 'Yoon Sanghyuk was the one who left fields empty, and the Chairman was the one who chose who would go in them. Tomorrow one hand holds out the pen, but two hands chose it.'",
+      "text": "In the HR evaluation folder on the B2 terminal is a successor-manager designation created on the night of the first-instance sentencing. When you run the clue against its properties, the creation record opens. The account that made the file is not Yoon Sanghyuk’s but that of Yeo Minkyu, chief of staff in Chairman Seo Dokyung’s Secretariat. One line in the recommendation-reason field. 'Thinks harder as pressure rises. Kept as a manager, dissent gets digested inside.' Ban Jaewook closes his notebook. 'Yoon Sanghyuk was the one who left fields empty, and the Chairman was the one who chose who would go in them. Tomorrow one hand holds out the pen, but two hands chose it.'",
       "memo": [
         "Account that wrote the designation: Yeo Minkyu, Chairman’s Secretariat",
         "Created: 23:14 on the night of the first-instance sentencing",
@@ -438,7 +438,7 @@ export default {
     },
     "c49_start_warm": {
       "title": "A Second Text for the One Who Shared Songpyeon",
-      "text": "That night, Min Harang came too and talked about the rider rest stop, and Lim Kyungsoo’s fountain pen lay capped in the middle of the table. 'Now let’s talk about the empty signature field.' No one answered Yoon Sanghyuk’s one line. This morning at 9, the second text arrives. 'Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve. The Chairman has given me one night while the room is cleared out.' Do Yoonha peers at your screen. 'Everyone who was with us that night is in the group chat right now. Will you speak first, or later?'",
+      "text": "That night, Min Harang came too and talked about the rider rest stop, and Lim Kyungsoo’s fountain pen lay in the middle of the table. 'Now let’s talk about the empty signature field.' No one answered Yoon Sanghyuk’s one line. This morning at 9, the second text arrives. 'Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve. The Chairman has given me one night while the room is cleared out.' Do Yoonha peers at your screen. 'Everyone who was with us that night is in the group chat right now. Will you speak first, or later?'",
       "memo": [
         "Yoon Sanghyuk’s second text: tomorrow night at 12, the former Group Strategy Office, 33rd floor",
         "People who stayed on the bookshop’s 1st floor that night: 14",
@@ -468,7 +468,7 @@ export default {
     },
     "c49_start_record": {
       "title": "A Second Text for the One Who Filed the Record",
-      "text": "That Saturday night, Yoon Sanghyuk’s one line came. 'Now let’s talk about the empty signature field.' Then, in the document’s view log at two in the morning, appears Yoon Sanghyuk’s company account, which should have closed with his dismissal. He opened the document four times. Three days later, at 9 in the morning, the second text comes. 'I read it carefully. Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve.' ECHO puts up one line. 'An account that should have been closed read the record. The side that was read can record this fact first.'",
+      "text": "That Saturday night, Yoon Sanghyuk’s one line came. 'Now let’s talk about the empty signature field.' Then, at two in the morning, Yoon Sanghyuk’s company account, which should have closed with his dismissal, appears in the document’s view log. Four times. Three days later, at 9 in the morning, the second text. 'I read it carefully. Come to the former Group Strategy Office on the 33rd floor tomorrow night at twelve.' ECHO puts up one line. 'An account that should have been closed read the record. The side that was read can record this fact first.'",
       "memo": [
         "Review committee conclusion and my opinion -- filed as a document",
         "View log: 02:00, Yoon Sanghyuk’s account, 4 times",
@@ -498,7 +498,7 @@ export default {
     },
     "c49_start_rush": {
       "title": "A Second Text for the One Who Promised First",
-      "text": "That night, in a dark office, you were leafing through approval documents when Yoon Sanghyuk’s text came. 'Now let’s talk about the empty signature field.' You replied at once, and said nothing to your colleagues. Three days later, at 9 in the morning, a confirmation text comes. 'The Chairman has given me one night while the former Group Strategy Office is cleared out. Tomorrow night at twelve, as agreed.' Ban Jaewook opens his notebook. 'The box of songpyeon left on the rooftop that day, Mr. Kang Taemin brought it down. None of us knew the meeting time. He did.'",
+      "text": "That night you answered Yoon Sanghyuk’s text at once, and said nothing to your colleagues. 'Now let’s talk about the empty signature field.' Three days later, at 9 in the morning, a confirmation text. 'The Chairman has given me one night while the former Group Strategy Office is cleared out. Tomorrow night at twelve, as agreed.' Ban Jaewook opens his notebook. 'The box of songpyeon left on the rooftop that day, Mr. Kang Taemin brought it down. None of us knew the meeting time. He did.'",
       "memo": [
         "Meeting with Yoon Sanghyuk: tomorrow night at 12, the former Group Strategy Office, 33rd floor",
         "Box of songpyeon left on the rooftop -- retrieved by Kang Taemin",
