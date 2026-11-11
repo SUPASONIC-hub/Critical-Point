@@ -3,12 +3,13 @@ import { ChevronRight } from "lucide-react";
 import { fill, LANG } from "../locale.js";
 import { markColdOpeningSeen } from "../state/coldOpening.js";
 import { coldOpeningCopy } from "./coldOpeningCopy.js";
+import "./ColdOpening.css";
 
 /**
  * B-3(1) 냉정한 오프닝 (draft, behind COLD_OPENING_ENABLED): four panels with
  * no table and no clock, read at the player's own pace, then 「3년 전」 and the
  * prologue. It is drawn in the opening burst's own frame (`.opening-burst`),
- * so the draft adds no style sheet. `onDone` is the start button's own press
+ * plus ColdOpening.css, which ships only in this page's lazy chunk. `onDone` is the start button's own press
  * (IntroScreen: the burst, then `startGame`), called from the last panel's
  * button or from 건너뛰기 -- both inside a press, so the burst's sound still
  * starts on a user gesture.
@@ -27,7 +28,7 @@ export default function ColdOpening({ startLabel, onDone }) {
     onDone();
   };
   return (
-    <div className="opening-burst" data-testid="cold-opening" data-panel={at} role="dialog" aria-modal="true" aria-labelledby="cold-opening-caption">
+    <div className="opening-burst cold-opening" data-testid="cold-opening" data-panel={at} role="dialog" aria-modal="true" aria-labelledby="cold-opening-caption">
       <div className="opening-burst-grid" />
       <div className="opening-burst-panel">
         <span lang="en">
@@ -36,10 +37,11 @@ export default function ColdOpening({ startLabel, onDone }) {
         <strong id="cold-opening-caption">{panel.caption}</strong>
         <p data-testid="cold-opening-text">{panel.text}</p>
         <i />
-        <div>
+        <div className="cold-opening-actions">
           <button
             ref={buttonRef}
             type="button"
+            className="cold-opening-go"
             data-testid={last ? "cold-opening-start" : "cold-opening-next"}
             onClick={last ? finish : () => setAt(at + 1)}
           >
