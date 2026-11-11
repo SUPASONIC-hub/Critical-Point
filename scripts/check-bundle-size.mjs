@@ -2237,7 +2237,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,490 / 432,347 / 440,045 on 2026-11-11, noscript-guide over main accd990b. Measured first paint, the plus 4.
 // -> 373,557 / 432,468 / 440,161 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured first paint, the plus 4.
 // -> 373,551 / 432,465 / 440,155 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_465, ja: 440_155 };
+// -> 373,605 / 432,518 / 440,211 on 2026-11-11, C-15 after merging main fbf1000c. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_605, en: 432_518, ja: 440_211 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
