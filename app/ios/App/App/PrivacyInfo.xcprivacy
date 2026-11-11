@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  The app shell without ads (docs/app-shell.md). What the game itself sends,
-  as the store draft D-6 lists it: choice logs and errors (telemetry), board
-  posts and feedback, and the random number the app makes for a device -- none
-  of it linked to a person, none of it used to track. The ads PR adds tracking
-  (IDFA, only after ATT) and coarse location for AdMob here; the AdMob SDK and
-  each Capacitor plugin carry manifests of their own for the APIs they use.
+  What the game's own code sends (docs/app-shell.md), as the store draft D-6
+  lists it: choice logs and errors (telemetry), board posts and feedback, and
+  the random number the app makes for a device -- none of it linked to a
+  person, none of it used to track. The ads (2026-10-25) are the Google Mobile
+  Ads SDK's: it ships its own privacy manifest declaring what it collects (the
+  advertising identifier only after ATT allows it, IP address and coarse
+  location, product interaction, diagnostics) and its tracking domains, and
+  Xcode adds it to the app's privacy report beside this one. The purchase is
+  StoreKit's; the app keeps no purchase record of its own. App Store Connect's
+  privacy answers (memo D) list the SDK's types too.
 -->
 <plist version="1.0">
 <dict>

@@ -168,6 +168,8 @@ const BUDGETS = {
   // view models are one namespace import (sceneViewModels, with the runtime
   // card's label as `runtimeCardLabel`) and the two runtime cards' words are
   // src/copy/runLines.js's. Measured 968 / 96.
+  // 960 -> 962 on 2026-10-29 (#330): openCase's store-app ad between cases, a comment and one line that the site's builds fold away.
+  // 968 -> 970 on 2026-11-03 (#330 over app-shell e5b03e64, main 16b6d349): the same two lines over bgm-variety and locale-gaps. Measured 970 / 96.
   // 960 -> 961 lines on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
   // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
   // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
@@ -177,8 +179,9 @@ const BUDGETS = {
   // language is written again in the page's (AppContent, isStaleBook); the
   // export and its line of why. Measured 970 / 96.
   // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
+  // 971 -> 973 on 2026-11-11 (#330 over app-shell 968baa47, main c61d6618): #330's two lines over bundle 1111. Measured 973 / 96.
   "src/GameRuntime.jsx": {
-    lines: 971,
+    lines: 973,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },

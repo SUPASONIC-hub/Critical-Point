@@ -11,6 +11,15 @@ interface ImportMetaEnv {
 declare const __CP_DEBUG_BUILD__: boolean;
 declare const __CP_SERVICE_WORKER__: "on" | "ask" | "off";
 declare const __CP_COLD_OPENING__: boolean;
+/** True only in the store apps' build (`--mode app`, app/build-web.mjs). */
+declare const __CP_APP__: boolean;
+
+// The store apps' native side (vite.config.js appNative): app/native/index.js
+// in the app build, null everywhere else.
+declare module "cp:app-native" {
+  const native: any;
+  export default native;
+}
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;

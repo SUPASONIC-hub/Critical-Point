@@ -1,3 +1,5 @@
 /* The home screen name, in English: GAME_NAME.en (scripts/legal-pages.mjs). */
 "CFBundleDisplayName" = "Critical Point";
 "CFBundleName" = "Critical Point";
+/* The system's tracking question (ATT), in English (app-launch memo B-4). */
+"NSUserTrackingUsageDescription" = "Your data will be used to show you more relevant ads. The game works the same if you don't allow this.";

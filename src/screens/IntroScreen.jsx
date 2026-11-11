@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, TriangleExclamationPoint, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
@@ -28,6 +28,14 @@ import { coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
 
 // E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
 const SideCaseScreen = retryableLazy(() => import("./SideCaseScreen.jsx").then(loadedChunk).then(({ SideCaseScreen }) => ({ default: SideCaseScreen })));
+
+// The store apps' 「광고와 개인정보」 drawer and the ending book's rewarded hint
+// (src/components/AppStorePanel.jsx). `__CP_APP__` is false in the site's
+// builds (vite.config.js), which drop both, so the web draws neither.
+const AppStorePanel = __CP_APP__ ? lazy(() => import("../components/AppStorePanel.jsx")) : null;
+const AppEndingHints = __CP_APP__
+  ? lazy(() => import("../components/AppStorePanel.jsx").then((module) => ({ default: module.AppEndingHints })))
+  : null;
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -564,7 +572,13 @@ export function IntroScreen({ view, renderers = {} }) {
               {pastRunMemory.book && (
                 <details>
                   <summary>{pastRunMemory.book.head}</summary>
-                  {pastRunMemory.book.hints.map((hint) => <p key={hint}>{hint}</p>)}
+                  {__CP_APP__ ? (
+                    <Suspense fallback={null}>
+                      <AppEndingHints hints={pastRunMemory.book.hints} />
+                    </Suspense>
+                  ) : (
+                    pastRunMemory.book.hints.map((hint) => <p key={hint}>{hint}</p>)
+                  )}
                 </details>
               )}
             </section>
@@ -678,8 +692,19 @@ export function IntroScreen({ view, renderers = {} }) {
               <span lang="en">ACCESSIBILITY</span>
               <h2>{introCopy.comfortTitle}</h2>
             </summary>
+            {/* The store apps put their 「광고와 개인정보」 section (memo B-5)
+                where the site has the 홈 화면에 추가 hint: a store app is
+                already on the home screen. The site's build, where
+                `__CP_APP__` is false, folds this to the hint alone and carries
+                not a byte of the app's section. */}
             <AccessibilityPanel />
-            <InstallHintSlot />
+            {__CP_APP__ ? (
+              <Suspense fallback={null}>
+                <AppStorePanel />
+              </Suspense>
+            ) : (
+              <InstallHintSlot />
+            )}
           </details>
           <details className="intro-drawer">
             <summary>

@@ -82,8 +82,12 @@ test("the app build (`--mode app`) has no tag, no Google origin and no Google An
       assert.doesNotMatch(html, GOOGLE, file);
       assert.doesNotMatch(html, /변경 예고|Upcoming change|変更の予告/, file);
     }
-    // Everything else is the web's page without it.
-    for (const [file, language] of Object.entries(POLICIES)) assert.equal(pages[file], web[file].replace(`${ANALYTICS_NOTICE[language]}\n`, ""), file);
+    // The web's policy has the notice; the app's copies (AdMob, Remove Ads) do not, and an ID handed in changes nothing.
+    for (const [file, language] of Object.entries(POLICIES)) {
+      assert.ok(web[file].includes(ANALYTICS_NOTICE[language]), file);
+      assert.match(pages[file], /AdMob/, file);
+    }
+    assert.deepEqual(renderStaticPages(origin, { analytics: on, app: true }), pages);
   }
   const config = readFileSync("vite.config.js", "utf8");
   assert.match(config, /staticPages\(\{ analytics, ads: .*?, app: mode === "app" \}\)/);
