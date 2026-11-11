@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c31_start": {
       "title": "The Examiner",
-      "text": "Seven black suitcases roll into the lobby. The Financial Supervisory Service’s periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) has begun. The examiner at the front (the person the FSS sends to inspect a company in person), Han Jiwoo, hands over a list of requested documents. 148 items, and the first line is the Pyeongtaek officetel PF (a loan made against future sale proceeds before a building goes up). 'Anything from a response lead the CEO picked, I check twice. It’s the rules.' Seok Jaewoo, chief of staff in the CEO’s office, smiles and presses a USB stick on you. 'The cleaned-up set. To make things easy for the examiner.'",
+      "text": "Seven black suitcases roll into the lobby. The Financial Supervisory Service’s periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) has begun. The examiner (the person the FSS sends to inspect a company in person), Han Jiwoo, hands over 148 requested items. 'Anything from a response lead the CEO picked, I check twice. It’s the rules.' Chief of staff Seok Jaewoo smiles and presses a USB stick on you. 'The cleaned-up set. To make things easy for the examiner.'",
       "memo": [
         "5 days on site -- 7 examiners, team lead Han Jiwoo",
         "Requested documents, Round 1: 148 items; first line is the Pyeongtaek officetel PF",
@@ -38,7 +38,7 @@ export default {
     },
     "c31_archive": {
       "title": "Question 42",
-      "text": "Han Jiwoo spreads out six bound printouts on the Pyeongtaek officetel PF (a loan made against future sale proceeds before a building goes up) and fires questions by number. When credit reviewer Choi Seojin comes with two coffees, Han Jiwoo speaks without looking up. 'From a company under examination, I don’t take anything. Not even coffee.' At Question 42, Han Jiwoo’s highlighter stops. 'The maturity was extended (the repayment date pushed back) four times. Each time, the loan-loss reserve (money set aside against loans going bad) went down. Every approving employee ID belongs to Risk Management.' 'I know three of the four came before you arrived. Even so, right now you have to answer in this department’s name.'",
+      "text": "Han Jiwoo fires questions on the Pyeongtaek PF (a loan made against future sale proceeds before a building goes up) by number. Choi Seojin brings coffee, and Han Jiwoo does not look up. 'From a company under examination, I don’t take anything. Not even coffee.' At Question 42, her highlighter stops. 'The maturity was extended (the repayment date pushed back) four times. Each time, the loan-loss reserve (money set aside against loans going bad) went down.' 'I know three of the four came before you arrived. Even so, right now you have to answer in this department’s name.'",
       "memo": [
         "Pyeongtaek PF maturity extended 4 times -- reserves cut with each one",
         "Electronic approval IDs for the extensions: all Risk Management",
@@ -69,7 +69,7 @@ export default {
     },
     "c31_hallway": {
       "title": "The File Dropped Three Times",
-      "text": "Ban Jaewook has one plan: drop a file in front of Han Jiwoo, by accident. The third time, Han Jiwoo picks up the file and says, 'That’s three. Practice on the stairs. There are fewer CCTV cameras there.' Inside is a memo Internal Audit buried this spring, from the meeting on the Pyeongtaek maturity extension (pushing back the repayment date), and in the margin, in Yoon Sanghyuk’s handwriting: 'Extend. Losses after the sale.' Han Jiwoo asks, 'A document with no source is lost property. Who is going to make this evidence?'",
+      "text": "Ban Jaewook’s plan is to drop a file in front of Han Jiwoo, by accident. Han Jiwoo picks up the file. 'That’s three. Practice on the stairs. There are fewer CCTV cameras there.' In the margin of the Internal Audit meeting memo inside is Yoon Sanghyuk’s handwriting. 'Extend. Losses after the sale.' Han Jiwoo asks, 'A document with no source is lost property. Who is going to make this evidence?'",
       "memo": [
         "Internal Audit memo -- stopped in the reporting line after it was written",
         "Margin note: 'Extend. Losses after the sale.'",
@@ -100,7 +100,7 @@ export default {
     },
     "c31_rooftop": {
       "title": "The Missing Eleven Pages",
-      "text": "Han Jiwoo leans on the railing with a convenience-store banana milk. 'Back then I was the junior on the KD Bank periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations). I’m the one who passed on the 2023-0412 scan file. After page 14 came page 26.' 'I sent one written query, got the answer that it was a simple omission, and moved on.' She says she learned the eleven missing pages were your dissent only when she watched the parliamentary audit (where the National Assembly questions people in public) on TV. 'That’s why I didn’t trust you. If I trusted you, the fact that I asked only once would weigh more.'",
+      "text": "Han Jiwoo speaks, a banana milk in her hand. 'Back then I was the junior on the KD Bank examination team. In the 2023-0412 scan file, after page 14 came page 26. I sent one written query, got the answer that it was a simple omission, and moved on.' She says she learned the eleven missing pages were your dissent only when she watched the parliamentary audit (where the National Assembly questions people in public) on TV. 'That’s why I didn’t trust you. If I trusted you, the fact that I asked only once would weigh more.'",
       "memo": [
         "Han Jiwoo: then the junior on the KD Bank examination team",
         "2023-0412 scan file: page 26 right after page 14 -- 1 written query",
@@ -131,7 +131,7 @@ export default {
     },
     "c31_final": {
       "title": "The Confirmer’s Signature Line",
-      "text": "Han Jiwoo sets down three pages of draft findings (items written up as wrongdoing in an examination). The Pyeongtaek PF (a loan made against future sale proceeds before a building goes up) put off a loss of 38 billion won. The means: four maturity extensions (pushing back the repayment date). At the bottom is the examination confirmation (a document in which a company employee confirms the facts found are correct). Seok Jaewoo, the confirmer the company named, has refused to sign. 'If you sign, this goes as far as a referral to the prosecutors. With no signature, it sits for three months as “company explanation pending.”' Han Jiwoo holds out a pen. 'This time, I’d like the signature line not to be empty.'",
+      "text": "Han Jiwoo sets down the draft findings (items written up as wrongdoing in an examination). Through four maturity extensions, the Pyeongtaek PF put off a loss of 38 billion won. At the bottom is the examination confirmation (a document in which a company employee confirms the facts found are correct), and the confirmer, Seok Jaewoo, has refused to sign. 'If you sign, this goes as far as a referral to the prosecutors. With no signature, it sits for three months as “company explanation pending.”' Han Jiwoo holds out a pen. 'This time, I’d like the signature line not to be empty.'",
       "memo": [
         "3 findings -- 38 billion won in deferred losses",
         "Confirmer field on the confirmation: Seok Jaewoo refused, blank",
@@ -160,7 +160,7 @@ export default {
     },
     "c31_aftershock": {
       "title": "Seven Suitcases",
-      "text": "Seven suitcases line up in the lobby again. Choi Seojin follows them out and bows, and Han Jiwoo, who never took the coffee, does take the bow. Taped to the last page of her examination notebook is a cup-noodle lid receipt. '1,500 won. Kang Taemin.' 'I’ll take the numbers. The 62 in the books, the 45 we measured, and the 58 you wrote in April. You look after the people.' That night, a text comes from Han Jiwoo. 'Separately from the confirmation, I referred the one item that looks criminal to the prosecutors, per the rules. You’ll need a lot of boxes next week.'",
+      "text": "Choi Seojin bows, and Han Jiwoo, who never took the coffee, does take the bow. Taped to the last page of her examination notebook is a cup-noodle lid receipt. '1,500 won. Kang Taemin.' 'I’ll take the numbers. The 62 in the books, the 45 we measured, and the 58 you wrote in April. You look after the people.' At night, a text comes from Han Jiwoo. 'I referred the one item that looks criminal to the prosecutors, per the rules. You’ll need a lot of boxes next week.'",
       "memo": [
         "5-day on-site exam over -- 7 suitcases",
         "Last page of Han Jiwoo’s exam notebook: the cup-noodle-lid receipt",
@@ -184,7 +184,7 @@ export default {
     },
     "c31_boxes": {
       "title": "Scheduled for Disposal",
-      "text": "Choi Seojin comes back pale. Seven boxes are labeled on the side 'Retention period expired · Dispose June 12.' One opened box holds the original photos of the Pyeongtaek construction site and a draft extension review covered in red pen. In the draft, the completion rate (how far along the construction is) field has 72 struck out and changed to 62. Choi Seojin holds up one photo, her voice shaking. 'I took this. I wrote in my report that out of 22 floors, the slabs were poured only up to the 9th, and that measured, it’s 45%.' The site figure in the opinion you filed under your own name in April was 58%.",
+      "text": "Choi Seojin, pale, opens one of the boxes marked for disposal. Inside are the original photos of the Pyeongtaek site and a draft extension review. In the draft, the completion rate (how far along the construction is) field has 72 struck out and changed to 62. Choi Seojin holds up one photo. 'I took this. I wrote in my report that out of 22 floors, the slabs were poured only up to the 9th, and that measured, it’s 45%.' The site figure in the opinion you filed in April was 58%.",
       "memo": [
         "7 boxes slated for disposal -- disposal date June 12, the exam’s last day",
         "Disposal approved: the day before the exam notice",
@@ -208,7 +208,7 @@ export default {
     },
     "c31_buyer": {
       "title": "Move-In Date",
-      "text": "Yeon Jian, a cardigan over her nurse’s scrubs, stands hugging a bundle of sale contracts. She bought one of the 212 units in the Pyeongtaek officetel and took out an interim-payment loan (a separate loan buyers take to pay the middle installment of the price). 'Move-in was supposed to be this March. I’ve already been paying interest on the interim-payment loan for fourteen months.' She holds out her phone. A photo of the site with nothing but cranes. 'That building, how many floors is it now?' The only one there who can answer is you.",
+      "text": "Yeon Jian, a Pyeongtaek officetel buyer, took out an interim-payment loan (a separate loan buyers take to pay the middle installment of the price). 'Move-in was supposed to be this March. I’ve already been paying interest on the interim-payment loan for fourteen months.' In the site photo on her phone, there is nothing but cranes. 'That building, how many floors is it now?' The only one who can answer is you.",
       "memo": [
         "Pyeongtaek officetel buyers: 212 units",
         "Yeon Jian: nurse, 14th month of interim-loan interest",
@@ -231,7 +231,7 @@ export default {
     },
     "c31_chat": {
       "title": "The Group Chat at 3 a.m.",
-      "text": "You post four extension dates in the 'Work Again Tomorrow' group chat. Within 10 minutes the room lights up like fire. Lee Minseo finds and posts the review-record timestamps for the same dates at KD Data Lab, and Do Yoonha counts the people at the Gangseo Branch who took out Pyeongtaek interim-payment loans. Oh Jinwoo sends the sale schedule as seen from Bridge Bank, and Ban Jaewook posts a photo of a page of his notebook. Han Seoyun sends one photo at 6 a.m. Seven lunchboxes, each lid marked in marker: 'Analyst’s personal lunch.'",
+      "text": "You post four extension dates in the group chat, and within 10 minutes the room lights up like fire. Lee Minseo posts the review-record timestamps for the same dates, and Do Yoonha the number of Gangseo Branch customers who took out Pyeongtaek interim-payment loans. Oh Jinwoo sends the sale schedule, and Ban Jaewook a page of his notebook. At 6 a.m., Han Seoyun sends a photo. Seven lunchboxes, each lid marked: 'Analyst’s personal lunch.'",
       "memo": [
         "Group chat at 3 a.m. -- 5 pieces of material in 10 minutes",
         "Lee Minseo, Do Yoonha, Oh Jinwoo, Ban Jaewook: material from where each one sits",
@@ -254,7 +254,7 @@ export default {
     },
     "c31_boxes_reaction": {
       "title": "By the Rules",
-      "text": "Seok Jaewoo, on his way in, falls into step beside you. He brushes the dust off your shoulder. 'I heard about the boxes in the records room. Disposal is by the rules. The retention period is over.' 'You’ve been here two months, haven’t you? CEO Yoon remembers your name. In a good way.' Just before the elevator doors close, he adds one more thing. 'Reviewer Choi is such a diligent one. It would be a shame if someone like that got hurt.'",
+      "text": "Seok Jaewoo falls into step beside you and brushes the dust off your shoulder. 'I heard about the boxes in the records room. Disposal is by the rules. The retention period is over.' 'CEO Yoon remembers your name. In a good way.' 'Reviewer Choi is such a diligent one. It would be a shame if someone like that got hurt.'",
       "memo": [
         "A warning delivered by brushing dust off your shoulder",
         "A diligent person who mustn’t get hurt"
@@ -276,7 +276,7 @@ export default {
     },
     "c31_buyer_reaction": {
       "title": "The Most Accurate Words",
-      "text": "After Yeon Jian leaves, Han Jiwoo, who heard everything, speaks. 'All I can give someone like her is a complaint number. That is the most accurate thing I can say.' 'Sometimes the accurate thing is the most useless one. An examination doesn’t pay anyone.' She opens her notebook. 'Question 97. Is there a list of the buyers of the 212 units? I want to work out what these people would have known, and when, if there had been no extensions.'",
+      "text": "After Yeon Jian leaves, Han Jiwoo speaks. 'All I can give someone like her is a complaint number. That is the most accurate thing I can say.' 'Sometimes the accurate thing is the most useless one. An examination doesn’t pay anyone.' 'Question 97. Is there a list of the buyers of the 212 units? I’ll work out what they would have known, and when, if there had been no extensions.'",
       "memo": [
         "The most accurate, most useless words",
         "Question 97: the list of 212 units"
@@ -298,7 +298,7 @@ export default {
     },
     "c31_chat_reaction": {
       "title": "The Same Elevator",
-      "text": "The person already in the elevator is Yoon Sanghyuk. He presses your floor button for you. 'Examiner Han likes numbers. You liked numbers too.' 'There’s been no talk of the signature line yet. No rush, is there?' On 12 he doesn’t get off; he waits for you. On the document envelope in his hand is written 'Answer to Question 42.' The answer you gave in the records room on the first night.",
+      "text": "Yoon Sanghyuk, already in the elevator, presses your floor button for you. 'Examiner Han likes numbers. You liked numbers too.' 'There’s been no talk of the signature line yet. No rush, is there?' On the document envelope in his hand is written 'Answer to Question 42.' The answer you gave in the records room on the first night.",
       "memo": [
         "The floor button the CEO pressed for you",
         "'Answer to Question 42' on the envelope"
@@ -320,7 +320,7 @@ export default {
     },
     "c31_branch_site": {
       "title": "The One Counting Floors",
-      "text": "Kang Taemin waits at the site entrance holding hard hats. Han Jiwoo counts the floors with her finger and stops at nine. 'The columns go up to the 15th floor, but the slabs end at the 9th.' The 9th floor is where a worker fell last summer. 'A completion rate (how far along the construction is) that was 72% through April has been changed to 62% in the books now. Measure a 22-story building and it comes to 45%.' In front of the site office stand 11 subcontractor workers (from the small firms a big contractor hands its work down to), holding pay slips three months in arrears.",
+      "text": "Han Jiwoo counts the floors and stops at nine. 'The columns go up to the 15th floor, but the slabs end at the 9th.' The 9th floor is where a worker fell last summer. 'The completion rate (how far along the construction is) was 72% through April; the books now say 62%. Measured, it’s 45%.' In front of the site office stand 11 subcontractor workers (from the small firms a big contractor hands its work down to), unpaid for three months.",
       "memo": [
         "Completion rate: April papers 72% → books now 62% -- exam team’s measurement 45%, slabs 9/22 floors",
         "The 58% on site in the April opinion is also 13 percentage points above the measurement -- reserves short by that much",
@@ -344,7 +344,7 @@ export default {
     },
     "c31_branch_site_follow": {
       "title": "A Receipt Written on a Lid",
-      "text": "Kang Taemin pours water into three cup noodles. Han Jiwoo puts 1,500 won on the table. 'A receipt, please.' Kang Taemin writes on a cup-noodle lid. '1,500 won. Kang Taemin.' Han Jiwoo tucks the lid into her examination notebook, and for the first time in this examination the corners of her mouth go up. Just then the workers’ foreman stands in the doorway and asks, 'If you examine them, do we get our money?' Han Jiwoo puts down her chopsticks. 'An examination doesn’t pay anyone.' Only the noodle broth goes cold.",
+      "text": "Han Jiwoo puts 1,500 won for the cup noodles on the table. 'A receipt, please.' Kang Taemin writes on a cup-noodle lid. '1,500 won. Kang Taemin.' Han Jiwoo tucks the lid into her examination notebook, and for the first time the corners of her mouth go up. Just then the workers’ foreman asks from the doorway, 'If you examine them, do we get our money?' Han Jiwoo puts down her chopsticks. 'An examination doesn’t pay anyone.'",
       "memo": [
         "Cup noodles, 1,500 won -- a receipt on the lid",
         "Han Jiwoo’s first smile",
@@ -368,7 +368,7 @@ export default {
     },
     "c31_route_system": {
       "title": "The Account That Arrived First",
-      "text": "Setting the confirmation aside, you open the record screen of NOAH, the group’s review engine (an AI program that judges loan applications automatically). The Pyeongtaek PF (a loan made against future sale proceeds before a building goes up) was extended four times. For all four maturity extensions (pushing back the repayment date), NOAH recommended 'Decline.' All four times, an exception approval (approval outside the criteria, with a responsible person putting their name to it) overturned it, and the account that approved the fourth extension is your employee ID. The date is March 30, ten days before you came to this department and 25 days before the committee met. The day your account was created in advance. 'The account arrived before the person. I learned the account as the person.'",
+      "text": "Setting the confirmation aside, you open the records of NOAH, the group’s review engine (an AI program that judges loan applications automatically). Each time the Pyeongtaek loan was extended, NOAH recommended 'Decline.' All four times, an exception approval (approval outside the criteria, with a responsible person putting their name to it) overturned it, and the account behind the fourth approval is your employee ID. The date is March 30, 25 days before the committee met, the day your account was created in advance. 'The account arrived before the person. I learned the account as the person.'",
       "memo": [
         "NOAH recommended 'Decline' 4 times -- 4 exception approvals",
         "1 approving account: your employee ID",
@@ -394,7 +394,7 @@ export default {
     },
     "c31_final_system_route": {
       "title": "The Employee ID That Came Before the Person",
-      "text": "Before dawn on the last day of the examination, the review terminal shows the records of four approvals in which people overturned NOAH’s declines. All four times NOAH recommended declining, and all four times a person’s account overturned it. One of them is your employee ID; on the approval date you were not yet on this floor, and the committee had not yet met. NOAH’s words appear under the records. 'I learned accounts as people. Going by my records alone, the person who approved it that day is you. I have no authority to correct it.'",
+      "text": "Before dawn on the last day of the examination, the review terminal shows four approvals in which a person’s account overturned NOAH’s recommendation to decline. One of them is your employee ID, though that day you were not yet on this floor. NOAH’s words appear. 'I learned accounts as people. Going by my records alone, the person who approved it that day is you. I have no authority to correct it.'",
       "memo": [
         "NOAH recommended 'Decline' 4 times -- all overturned by people’s accounts",
         "1 approving account: your employee ID, ten days before you started",
@@ -417,7 +417,7 @@ export default {
     },
     "c31_evidence_turn": {
       "title": "The Dates of the Extensions",
-      "text": "You line up the four maturity extensions (pushing back the repayment date) beside the schedule of sale talks with Roundhill Capital. With each extension the loss slid one quarter later, and the 212 households kept paying interest. Seok Jaewoo’s cleaned-up set, renumbering the pages, dropped two pages at each extension, and the dropped pages, gathered together, make the negotiation schedule. The last two pages are a draft annex (an extra-terms document attached to the back of a contract) from the day before the fourth extension. In it is an advisory-post clause (a seat that only gives advice, with no operational responsibility) for Yoon Sanghyuk. Ban Jaewook closes his notebook. 'Picking the pages to hide, they made a list. The dropped pages are the comparison table.'",
+      "text": "You set the four maturity extensions (pushing back the repayment date) beside the schedule of sale talks with Roundhill Capital. With each extension the loss slid one quarter later, and the 212 households kept paying interest. Gather the two pages Seok Jaewoo’s cleaned-up set dropped at each extension, and they make the negotiation schedule. The last two are a draft contract with an advisory-post clause (a seat that only gives advice, with no operational responsibility) for Yoon Sanghyuk. Ban Jaewook closes his notebook. 'Picking the pages to hide, they made a list. The dropped pages are the comparison table.'",
       "memo": [
         "4 extensions = dates match the 4 stages of the sale talks",
         "Asset value in the sale proposal raised 3 times",
@@ -441,7 +441,7 @@ export default {
     },
     "c31_start_warm": {
       "title": "Monday for the Ones Who Stayed Till Dawn",
-      "text": "Last night on the bookshop’s 1st floor, after you closed the last page of the contract with five others, the group chat got its name: 'Work Again Tomorrow.' Seven black suitcases come into the lobby. The Financial Supervisory Service’s periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations). The examiner at the front (the person the FSS sends to inspect a company in person), Han Jiwoo, sees your 'Examination Response Lead' tag and speaks. 'A lead the CEO picked. Risk Management’s materials, I check twice.' Seok Jaewoo, chief of staff in the CEO’s office, presses a USB stick into your hand, calling it the 'cleaned-up set.'",
+      "text": "Since last night, the group chat has been called 'Work Again Tomorrow.' Seven black suitcases from the Financial Supervisory Service’s periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) come into the lobby. The examiner (the person the FSS sends to inspect a company in person), Han Jiwoo, looks at your name tag. 'A lead the CEO picked. Risk Management’s materials, I check twice.' Chief of staff Seok Jaewoo presses a USB stick into your hand, calling it the 'cleaned-up set.'",
       "memo": [
         "Group chat 'Work Again Tomorrow' -- 4 replies, 1 read",
         "FSS on-site exam, 5 days, team lead Han Jiwoo",
@@ -471,7 +471,7 @@ export default {
     },
     "c31_start_record": {
       "title": "Monday for the One Who Left a Blank",
-      "text": "After midnight last night, you bundled the material six people had gathered into a tip-off document and sent it to the Financial Supervisory Service. The informant list had six fields, and Ban Jaewook’s was left blank rather than deleted. The FSS periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) begins. The examiner (the person the FSS sends to inspect a company in person), Han Jiwoo, arrives with that tip-off printed out, and her highlighter stops on one field. 'What is this blank? A list with a blank, I check twice. A blank usually has a reason.' The 'cleaned-up set' USB from Seok Jaewoo, chief of staff in the CEO’s office, is already in your hand.",
+      "text": "In the tip-off you sent the Financial Supervisory Service last night, Ban Jaewook’s field was left blank rather than deleted. The FSS periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) begins. The highlighter of the examiner (the person the FSS sends to inspect a company in person), Han Jiwoo, stops on that blank. 'What is this blank? A list with a blank, I check twice. A blank usually has a reason.' Seok Jaewoo’s 'cleaned-up set' USB is already in your hand.",
       "memo": [
         "Last night’s tip-off -- six informant fields, one blank",
         "Han Jiwoo: 'A blank usually has a reason'",
@@ -501,7 +501,7 @@ export default {
     },
     "c31_start_rush": {
       "title": "The Access Log of the One Who Went Back First",
-      "text": "Last night, as soon as the bookshop gathering ended, you were alone on the dark 12th floor, opening the department’s shared folders. The FSS periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) comes in. The first thing the examiner (the person the FSS sends to inspect a company in person), Han Jiwoo, asks for is the department’s access log from last night. At the top of the printout are your name and '04:02.' Han Jiwoo underlines that line. Seok Jaewoo, chief of staff in the CEO’s office, presses a USB stick into your hand, calling it the 'cleaned-up set.'",
+      "text": "Last night you were alone on the dark 12th floor, opening the department’s shared folders. The FSS periodic examination (the FSS’s review, every few years, of a financial company’s entire books and operations) comes in. The first thing the examiner (the person the FSS sends to inspect a company in person), Han Jiwoo, asks for is the department’s access log from last night. Your name and '04:02' at the top get underlined. Seok Jaewoo presses a USB stick into your hand, calling it the 'cleaned-up set.'",
       "memo": [
         "Last night’s access log -- you at the top",
         "Last access 04:02",

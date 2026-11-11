@@ -111,6 +111,7 @@ const DEFAULT_SPECS = [
   "tests/language-picker.spec.js",
   "tests/legal-pages.spec.js",
   "tests/logic-report.spec.js",
+  "tests/noscript.spec.js",
   "tests/recovery.spec.js",
   "tests/result-card.spec.js",
   "tests/save-integrity.spec.js",
