@@ -125,6 +125,10 @@ const CASE_PAGE = /^\/(?:(?:en|ja)\/)?cases\/(?!index\.html$)[a-z0-9]+\.html$/;
 // `?lang=<code>` page asks for them, so a Korean device is not made to fetch
 // them in the warm-up. A page in that language fetches them as it goes.
 const OTHER_LANGUAGES = /^\/assets\/locale-/;
+// The second font file (scripts/build-fonts.mjs): no page names it -- a
+// preload would put it back into the first paint -- but the first scene prints
+// its syllables, so the worker keeps it at install with what the page names.
+const FONT_REST = /^\/assets\/pretendard-cp-rest-[A-Za-z0-9_-]+\.woff2$/;
 
 const sameOriginPath = (value) => (/^\/[^/]/.test(value) ? value.split(/[?#]/)[0] : null);
 
@@ -169,7 +173,7 @@ export function entryFromHtml(html) {
 export function workerConfigFor({ html, files, logic = "" }) {
   const entry = entryFromHtml(html);
   if (!entry) throw new Error("The built page has no module script, so the service worker cannot tell its release's page from another's.");
-  const precache = precacheFromHtml(html);
+  const precache = [...precacheFromHtml(html), ...files.map(([file]) => file).filter((file) => FONT_REST.test(file)).sort()];
   const first = new Set(precache);
   const warm = files
     .map(([file]) => file)
