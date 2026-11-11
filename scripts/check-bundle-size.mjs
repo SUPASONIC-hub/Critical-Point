@@ -981,7 +981,9 @@ const budgets = [
   // 209,693 / 39,458 (en-signals-row) and 209,522 / 39,417 (#497) -> 209,801 / 39,474 on 2026-11-10, en-signals-row after merging main 261accef (#496 #497): both. Measured 209,797 / 39,470 in the e2e build, the plus 4.
   // 209,619 / 39,432 (phone-846-staked) and 209,801 / 39,474 (#499) -> 209,898 / 39,487 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499): both. Measured 209,894 / 39,483 in the e2e build, the plus 4.
   // 209,898 / 39,487 -> 209,941 / 39,492 on 2026-11-10, phone-390-staked over main cb8346da (#500): the staked card's one-line detail in a block of its own for every phone up to 480 wide and 860 tall (390x844 Korean overclocked, a card staked in case 01: 9px under the bar). Measured 209,937 / 39,488 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 209_941, maxGzip: 39_492 },
+  // 209,898 / 39,487 -> 213,956 / 41,401 on 2026-11-10, font-split over main cb8346da (the user's choice 1; held for W47, which was called off on 11-10): the second @font-face and its unicode-range (575 code points of the second font file, written by scripts/build-fonts.mjs). Measured 213,952 / 41,397 in the e2e build, the plus 4.
+  // 213,956 / 41,401 (font-split) and 209,941 / 39,492 (phone-390-staked, #503) -> 213,999 / 41,407 on 2026-11-11, font-split after merging main 568572d3 (#484 #502 #503): both. Measured 213,995 / 41,403 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 213_999, maxGzip: 41_407 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -990,7 +992,15 @@ const budgets = [
   // 270,828), plus 4.
   // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): ク, ド and ン for the Japanese sounds in the plate. Measured 198,144 plus 4.
   // 198,148 -> 199,128 on 2026-11-05, studio-name: ち, ぷ, も and よ for the Japanese studio name STUDIOもちぷよ (1,703 characters). Measured 199,124 plus 4.
-  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 199_128, compressed: true },
+  // 199,128 -> 131,356 on 2026-11-10, font-split over main 3a507805 (the user's choice 1): the one
+  // file became two. This is the first, preloaded one: the start screen's characters in
+  // the three languages, the intro's case cards, play styles and origins among them
+  // (first measured on 2026-11-03/04 at 96,236 and then 129,424). Measured 131,352 plus 4.
+  { pattern: /^pretendard-cp-(?!rest-).*\.woff2$/, maxBytes: 131_356, compressed: true },
+  // The second file, every other syllable of the copy, fetched by unicode-range
+  // when a page prints one and precached by the worker (service-worker-build.mjs).
+  // Not in the first paint. Measured 82,780 plus 4 on 2026-11-10.
+  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 82_784, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -1968,7 +1978,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 435,226 / 493,515 / 501,125 -> 435,238 / 493,525 / 501,135 on 2026-11-10, phone-390-staked over main cb8346da (#500): the index CSS line above and the critical CSS it regenerates. Measured 435,234 / 493,521 / 501,131 in the e2e build, the plus 4.
 // 435,226 / 493,515 / 501,125 -> 435,276 / 493,566 / 501,174 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (#500 phone-846-staked; replaces Dependabot #479 and #480): the entry and icons-vendor lines above. Measured 435,272 / 493,562 / 501,170 in the e2e build, the plus 4.
 // 435,238 / 493,525 / 501,135 (phone-390-staked) and 435,276 / 493,566 / 501,174 (deps-1123) -> 435,285 / 493,575 / 501,186 on 2026-11-10, phone-390-staked after merging main 312aa15c (#484): both. Measured 435,281 / 493,571 / 501,182 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 435_285, en: 493_575, ja: 501_186 };
+// 435,226 / 493,515 / 501,125 -> 371,424 / 429,687 / 437,379 on 2026-11-10, font-split over main cb8346da (the user's choice 1, held for W47 and released on 11-10): the font is two files and only the first, the start screen's characters, is preloaded (199,124 -> 131,352); the stylesheet carries the second file's unicode-range (inline critical CSS too). Measured 371,420 / 429,683 / 437,375 in the e2e build, the plus 4.
+// 371,424 / 429,687 / 437,379 (font-split) and 435,285 / 493,575 / 501,186 (main 568572d3: #484 deps, #503) -> 371,483 / 429,748 / 437,438 on 2026-11-11, font-split after merging main 568572d3: both, and the critical CSS regenerated. Measured 371,479 / 429,744 / 437,434 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 371_483, en: 429_748, ja: 437_438 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2124,7 +2136,8 @@ function checkBudget(file, budget) {
 // 3,712 -> 3,719 gzip on 2026-11-05, mood-wire over mood-tags 98d32622: the raw bytes are the same 10,310; the hashed names in its warm list changed. Measured 10,310 / 3,715 in the e2e build, the gzip plus 4.
 // 3,731 -> 3,737 gzip on 2026-11-06, bundle-1106b after merging main ac0645d3 (#471 cold-opening): the warm list's hashed names only (raw 10,346 the same). Measured 10,346 / 3,733, the gzip plus 4.
 // 10,346 / 3,737 -> 10,619 / 3,810 on 2026-11-09, content-pages over main 49f50741: the worker keeps the content pages (DOCUMENT_PAGE: the guide, the cast, the making-of, the case files) and the warm list names twelve more pages, the case files' index among them (a case's own page is kept once read, not warmed). Measured 10,615 / 3,806 in the e2e build, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_619, maxGzip: 3_810 };
+// 10,619 / 3,810 -> 10,663 / 3,820 on 2026-11-10, font-split over main cb8346da: the second font file joins the install list. Measured 10,659 / 3,816 in the e2e build, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_663, maxGzip: 3_820 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

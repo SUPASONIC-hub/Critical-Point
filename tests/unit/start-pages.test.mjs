@@ -90,7 +90,7 @@ test("the Japanese start page alone drops the font preload; the Korean and the E
   assert.equal(fontPreloads(pages.en).length, 1, "/en/ preloads the font");
   assert.deepEqual(fontPreloads(pages.ja), [], "/ja/ does not");
   assert.doesNotMatch(pages.ja, /pretendard-cp[^"]*\.woff2/, "/ja/ names the woff2 nowhere: the stylesheet fetches it");
-  assert.match(pages.ja, /<!-- The one font file/, "the rest of the Korean head stays as it is");
+  assert.match(pages.ja, /<!-- The first of the two font files/, "the rest of the Korean head stays as it is");
   // The built page names the hashed file and keeps index.html's line breaks inside the tag.
   const builtForm = INDEX.replace("/src/assets/fonts/pretendard-cp.woff2", "/assets/pretendard-cp-CmzYrx-E.woff2");
   assert.ok(builtForm.includes("pretendard-cp-CmzYrx-E.woff2"), "the source names the font once");
