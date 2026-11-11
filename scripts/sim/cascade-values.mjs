@@ -16,14 +16,14 @@ export const LINK_VALUE_SETS = Object.freeze({
 });
 
 /**
- * Loaded before a measurement with `node --import`, this plays the cascade
- * week on another value set without touching the game's source: a load hook
+ * Loaded before a measurement with `node --import`, this plays the links
+ * on another value set without touching the game's source: a load hook
  * rewrites the four numbers in src/gauntlet/cascadeRisk.js as the module is
- * read. The week itself is CASCADE_WEEK=1, which stamps it on the bots' runs
- * (season-bot.mjs). A measurement only; the game, its tests and its build
+ * read. The links are on wherever a case's rules have them (season-bot.mjs,
+ * CASCADE=0 turns them off). A measurement only; the game, its tests and its build
  * never load it.
  *
- *   CASCADE_WEEK=1 LINK_VALUES=C node --import ./scripts/sim/cascade-values.mjs scripts/check-endings.mjs --report
+ *   LINK_VALUES=C node --import ./scripts/sim/cascade-values.mjs scripts/check-endings.mjs --report
  *
  * season-bot.mjs checks that the numbers it plays are the set asked for, so
  * a LINK_VALUES without this file fails instead of measuring B.

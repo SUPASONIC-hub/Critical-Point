@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
 import { settleAgainstCodex } from "../state/settleChoice.js";
-import { equipRelic } from "./gauntletEngine.js";
+import { buyExtraRelic, equipRelic, rerollRelicOffer } from "./gauntletEngine.js";
+import { readDraftSpend } from "./draftSpend.js";
 import { normalizeRelicIds } from "./relics.js";
 
 const RELIC_CODEX_STORAGE_KEY = "critical-point-relic-codex-v1";
@@ -27,7 +28,8 @@ function writeRelicCodex(codex) {
  * The table's season-level systems, in one place: settling a closed window
  * against the run, recording the feats that unlock relics, and equipping the
  * relic a closed case drafted -- with the slots full, in the same call that
- * puts one down (`equip(run, relicId, dropId)`, `RELIC_SLOTS`).
+ * puts one down (`equip(run, relicId, dropId)`, `RELIC_SLOTS`) -- and paying
+ * for that draft's 다시 뽑기 or 하나 더 (`spend(run, kind)`, spendAtDraft below).
  *
  * The codex is the one piece of table state that outlives a season, so it has
  * its own storage key rather than a field in the save: resetting a run keeps
@@ -54,6 +56,20 @@ export function addToRelicCodex(codex, unlockedRelics = []) {
   return fresh.length ? { unlocked: [...held, ...fresh] } : codex;
 }
 
+/**
+ * The run after a press on one of the draft's two buys (GameRuntime's
+ * spendAtDraft): paid by the engine when the button is open (readDraftSpend,
+ * which is what the button shows), or the run as it was -- a key on a button
+ * that is off, or a press the engine refuses, comes back unchanged, so the
+ * caller saves nothing. Nothing is asked. Here rather than in draftSpend.js so
+ * that sheet of reasons stays pure of the engine, and in the runtime's chunk.
+ */
+export function spendAtDraft(run, kind) {
+  if (!readDraftSpend(run)[kind]?.open) return run;
+  const paid = kind === "reroll" ? rerollRelicOffer(run) : buyExtraRelic(run);
+  return paid.vault === run.vault ? run : paid;
+}
+
 export function useRelicTable() {
   const [codex, setCodex] = useState(readRelicCodex);
   const codexRef = useRef(codex);
@@ -70,5 +86,5 @@ export function useRelicTable() {
     setCodex(next);
   }
 
-  return { codex, settle, keepUnlocks, equip: equipRelic };
+  return { codex, settle, keepUnlocks, equip: equipRelic, spend: spendAtDraft };
 }

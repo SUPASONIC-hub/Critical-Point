@@ -97,10 +97,15 @@ const BUDGETS = {
   // 18 -> 19 names on 2026-10-26 (영어판 3단계): the observer's words and the
   // endings' lines are src/copy/observer.js's, and `fill` puts a name and its
   // particle into them, so another language can be laid over the Korean.
+  // 19 -> 20 names on 2026-10-29, #224 (RULES_MARK 3, C-2) merged with main: the
+  // season score's module (`scoring`, src/seasonScore.js) beside the observer's words.
+  // C-3 (c3-c4-rules, 2026-10-25) shares the 일관성 lean with the logic streak
+  // (`getEffectLean` in gameConstants.js); on #224 602ec69b it is read through
+  // `gameConstants` (import * as), with ENDING_GATES, so the count stays 20.
   "src/gameLogic.js": {
     lines: 1260,
     longestLine: 190,
-    importedNames: 19,
+    importedNames: 20,
     hooks: {},
   },
   // GameRuntime read 2280 / 167 and PlayScreen 340 / 14 until 2026-09-14, when
@@ -167,8 +172,13 @@ const BUDGETS = {
   // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
   // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
   // bgm-variety and locale-gaps.
+  // 968 -> 970 on 2026-11-10, memory-line-i18n (draft): the runtime module
+  // hands the shell `refreshSeasonRecord`, so a 결말 도감 stored in another
+  // language is written again in the page's (AppContent, isStaleBook); the
+  // export and its line of why. Measured 970 / 96.
+  // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
   "src/GameRuntime.jsx": {
-    lines: 969,
+    lines: 971,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
@@ -207,10 +217,13 @@ const BUDGETS = {
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
   // (src/copy/report.js) and `fill` for its lines with blanks.
+  // 9 -> 10 on 2026-11-10, memory-line-i18n (draft): the remote-save queue's
+  // rows are named again in the page's language (state/pendingRowLabel.js,
+  // #496 질문 2); `fill` stays for the screen's other lines.
   "src/screens/ReportArchive.jsx": {
     lines: 640,
     longestLine: 260,
-    importedNames: 9,
+    importedNames: 10,
     hooks: {},
   },
   // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to
@@ -238,8 +251,11 @@ const BUDGETS = {
   // rail's purse (BankPurse, in MoneyBurst.jsx with the slam's amount), its
   // ref for the amount's flight and the window it was dealt on; the purse's
   // markup and both reads live outside the screen.
+  // 860 -> 863 lines on 2026-11-04, measured (kd-bank-account): the purse
+  // leaves the rail and is drawn after the briefing and the draft as the
+  // KD은행 계좌, with a line saying why it sits there.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 860,
+    lines: 863,
     longestLine: 250,
     importedNames: 73,
     hooks: {},

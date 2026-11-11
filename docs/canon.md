@@ -42,7 +42,7 @@ name. 사건 04 says so in one sentence and nothing else connects them.
 | When | What | Where it is stated |
 |---|---|---|
 | 2022-10-17 (월) to 10-21 (금) | The trainee's last task: 온새포장, 4,000만 원, 178.4% → 184.7% | 프롤로그 01 |
-| 2022-11-14 18:02 | The analyst, still a trainee, clicks through the 제7조 draft circulation | 프롤로그 02 evidence turn |
+| 2022-11-14 18:02 | The analyst, three weeks out of the traineeship (it ended 10-21), clicks through the 제7조 draft circulation | 프롤로그 02 evidence turn |
 | 2023-04-12 (수) 09:00 | The file lands on the analyst's desk. This is the day in the loan number, **not** the approval | 프롤로그 02 |
 | 2023-04-13 (목) | Site visit, 김포 제2풀필먼트센터 | 프롤로그 02 |
 | 2023-04-14 (금) 23:00 | 184.2% is rebuilt | 프롤로그 02 |
@@ -84,6 +84,7 @@ Three of these are reveals, and each still means what it meant:
 | Where the pressure comes from | New York's quarterly ROE target, the dividend and the 「아시아 포트폴리오 리뷰」; English mail and dawn video calls on New York time; the board seats New York appoints; a rumour that the value is being raised before a sale |
 | Seoul's window | 그룹전략실, 본사 33층: it makes the New York numbers come out |
 | 사건 44's four acquittals | Approved from a shared account, so the e-signature field is empty and no approver can be named -- the same kind of account as 프롤로그 05's 전략팀-공용03; 사건 45 reads the erased pencil marks on the scanned printouts of those four |
+| The player's money | Shown on the table as the player's KD은행 계좌 (en KD Bank account, ja KD銀行口座): the 실사 fee KD은행 pays for the work flows through KD, so what a run holds is a KD은행 deposit. Display only; `check:canon` holds the three names |
 
 The owner is a company and is drawn only as a company. No person in the
 season is given an ethnicity or religion through it, and nothing in the copy
@@ -134,7 +135,11 @@ archive visit is a view log or a card-gate log.
 | 본점 지하 1층 | 문서 스캔실: committee papers and their 날인 원본 are scanned into the 문서관리시스템; the paper is kept in sealed 보존 상자 until its 보존연한 |
 | 본사 33층 | 그룹전략실; by 사건 49 "옛 그룹전략실" |
 | 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소: the old 전산센터's 백업 아카이브 (백업 테이프, 보존 상자 412개) and a 반출 금지 열람실 |
-| KD캐피탈 12층 / 20층 | 위험관리부 / 대표이사실 |
+| KD캐피탈 1층 | 로비 |
+| KD캐피탈 11층 | 리스심사팀 |
+| KD캐피탈 12층 | 위험관리부 (and its 검사팀 회의실) |
+| KD캐피탈 17층 / 19층 | 자료실 / 심사위원회 회의실 |
+| KD캐피탈 20층 | 대표이사실 (대표실) |
 
 The finale's night runs in one order on every path: 합정동 B2 (the inside
 route starts in the 3층 운영실 and goes down), then a taxi to 여의도 and 본사
@@ -213,7 +218,20 @@ Five more bridges and four fixes (10-26, the same way):
 - 오진우's post at 브릿지은행 is 인수팀장 everywhere, as the offer of 사건 18
   says; it sits under 도하람's 전략본부, on 권도현's floor (사건 25, 30).
 - 한서윤's part in the return is the 「반려 버튼」 she pressed, never a 서명
-  (사건 10, 11, 38, 49).
+  (사건 10, 11, 38, 49). Nor a 검토란, 승인란 or 반려란 with her name in it, and
+  she and 백아린 are not 「the one who signed and the one who reported」. A
+  signature of hers in 2025-26, as 실장, is another paper and stands. However
+  her 2022-23 rank is written (「한서윤 (당시 과장)」), it is 과장.
+- 이민서's 옥탑방 is in 해방촌 (사건 15, 16); 망원동 is 도윤하's.
+- 문가을's 가을떡방 is in the 망원시장 alley; her husband 문성호's 가온정밀 is
+  in 인천 남동공단 (프롤로그 02 onward, 사건 12). Neither is in 문래동.
+- 반재욱's 2023-0412 page puts 7월 24일 and the analyst's name on its sixth
+  line (사건 45).
+- The 'agree' erased on the back page of the dissent is 임경수's pencil, never
+  his 만년필 (사건 45, 49).
+- 넥스트마일's offer of 42% of book value is 2025's, in 사건 01's 72 hours.
+- The analyst's traineeship ends on 2022-10-21 (프롤로그 01); from 프롤로그 02
+  on the analyst is not called a trainee.
 - 오진우 calls 도윤하 「도윤하 씨」, not 선배: 오진우 was a 대리 and at the lab
   before 도윤하 left his window.
 
@@ -226,6 +244,22 @@ she speaks has the word only in that line). It does not hold 임경수's
 retirement, 반재욱's twenty years, 백아린's twelve, the 징계해고 of 6월 22일,
 에코's return on 9월 19일, who went where in 사건 25, or how 오진우 speaks:
 each is stated once, in a sentence of its own, and a reader has to keep them.
+
+Since 2026-11-03 it also holds the notes above that copy kept getting wrong
+(the audit of that day): 한서윤 and a 서명, 검토란, 승인란 or 반려란 near the
+2023 return, her rank written 「(당시 …)」, 이민서's 해방촌, KD캐피탈's floors,
+the 열흘 between 3월 30일 and the first day, the sixth line, the pencil,
+넥스트마일's 2025, 문래동, 「수습이던 당신」 and the 181. A rule that only
+forbids a shape has a companion that reads the right one (the 반려 버튼, the
+pencil, 남동공단 가온정밀, the 수습 딱지 taken off), so a pattern that stops
+matching is still told. Since 2026-11-04 the two trainee facts also read the
+English and Japanese copy (`src/locales/en`, `ja`) in the glossary's words:
+the analyst is a trainee / 見習い, other people's 수습 is probation / 試用, and
+the traineeship ended / 見習いの肩書きが取れ is the shape the companion reads.
+The other facts stay with the Korean files. And it reads three things a scene says in two places
+(`SCENE_RULES`): a clock's D-n against the days its words count to the same
+event, a card that climbs to the floor its scene is already on, and the date
+of the first day at KD캐피탈 (4월 9일).
 
 반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
 season; he is never "3년차" (that is 도윤하 at his window). His notebook holds
@@ -300,8 +334,14 @@ state no floor and no percentage.
 
 The loan was extended four times, each time over 노아's "거절" by a person's
 account. The fourth exception is under the analyst's 사번 and dated 3월 30일:
-three days before the analyst's first day at KD캐피탈 and 25 days before the
-committee of 4월 24일 (사건 31, hidden route).
+ten days before the analyst's first day at KD캐피탈 (4월 9일, 목) and 25 days
+before the committee of 4월 24일 (사건 31, hidden route).
+
+The 32억 "사업 자문료" did not go to 해온파트너스: that company's wind-up was
+registered in 2025 (사건 08), and its last 11억 4천 left for Singapore three
+days before (사건 29). The payee of 2026 is "해온파트너스와 같은 주소의 새
+법인", left unnamed, and it is that company that moves its registered address
+on the afternoon of 4월 24일 (A044, decided 2026-11-04).
 
 ## The harmed
 
@@ -310,7 +350,7 @@ committee of 4월 24일 (사건 31, hidden route).
 | People harmed | 1,740명 |
 | With papers | 1,528명 |
 | Without papers | 212명 |
-| Accepted by the second standard | 181명 of the 212 |
+| Accepted by the second standard | 181명 of the 212 (never 「배상 기준에 들어간 212명」) |
 | Still 확인 불가 | 31명 |
 
 ## The lab's record
@@ -358,7 +398,7 @@ year.
 | 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday. 노아 has been live since 2월 10일, two weeks. 세온메디칼 wants the 5축 가공기 contract by 3월 3일 (화) and the 200 prototypes by 4월 3일 |
 | 사건 23 | 주주총회 3월 20일 (금); the day that fixes who may vote is 3월 6일 (금), a week after the 수료식 where 김 반장 bought the first share; KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
-| 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
+| 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; the analyst's first day at KD캐피탈 4월 9일 (목); 취임식 4월 10일 (금) |
 | 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
 | 사건 27 | 5월 4일 (월); the 정리안 is dated 4월 28일 |
 | 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 징계해고·고소 공지 6월 22일 (월) 08시; 사택 퇴거 7월 7일 |

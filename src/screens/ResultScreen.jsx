@@ -1,4 +1,4 @@
-import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleAlert, Trophy } from "lucide-react";
+import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleExclamationPoint, Trophy } from "lucide-react";
 import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
@@ -22,7 +22,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
       counterfactualReport, routeTimeline,
     },
     actions: { startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset, nextCaseSignal, resultBridge },
-    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog },
+    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog }, seasonStanding,
   } = view;
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel } = renderers;
   // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
@@ -92,7 +92,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
         {renderRecoveryNotice()}
         {renderErrorLogPanel()}
         <p className="sr-only" aria-live="polite" aria-atomic="true">
-          {screenReaderStatus}
+          {screenReaderStatus} {view.seasonStanding.label} · {view.seasonStanding.text}{/* E3 2단계 (b): the rank is in the line already (GameRuntime); the standing is the harm level, as the season-standing line below shows it. */}
         </p>
         {currentCase === "final" && (
           <EndingSequence
@@ -152,7 +152,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   aria-controls={showErrorLog ? "error-log-panel" : undefined}
                   onClick={() => setShowErrorLog(true)}
                 >
-                  <TriangleAlert size={16} />
+                  <TriangleExclamationPoint size={16} />
                   에러 로그
                 </button>
               )}
@@ -192,7 +192,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div>
               <h2 ref={titleRef} tabIndex={-1}>{caseOutcome.title}</h2>
               <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}
-              <p className={`season-standing ${view.seasonStanding.level}`} data-testid="season-standing"><b>{view.seasonStanding.mark} {view.seasonStanding.label}</b> {view.seasonStanding.text}</p>
+              <p className={`season-standing ${seasonStanding.level}`} data-testid="season-standing"><b>{seasonStanding.mark} {seasonStanding.label}</b> {seasonStanding.text}{seasonStanding.held && <> <span data-testid="standing-held">{seasonStanding.held}</span></>}</p>
             </div>
           </section>
           {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
@@ -231,7 +231,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label={resultCopy.endingVariantLabel}>
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
-              <p>{endingVariant.text}</p>
+              <p>{endingVariant.text}{seasonStanding.endingHeld && <> <span data-testid="ending-held">{seasonStanding.endingHeld}</span></>}</p>
               <small>{endingVariant.failure ? view.endingCause.toll : resultCopy.endingVariantNote}</small>{view.seasonCard.comparison && <small data-testid="season-comparison">{view.seasonCard.comparison}</small>}
             </section>
           )}
@@ -335,7 +335,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
           </section>
           {/* Act three. Everything the report used to open with. */}
           <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />
-        </section>
+          {/* ad-slot: placement="report" hidden={currentCase.startsWith("prologue") || (currentCase === "final" && endingStep < 3)} */}</section>
       </main>
 );
 }

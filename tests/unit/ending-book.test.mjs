@@ -66,7 +66,7 @@ test("the next line never aims at the collapse, and turns to a ruling once every
   assert.ok(book.hints.some((hint) => hint.startsWith("압박과 붕괴: 사건마다 남긴 사람 피해가 평균 20 이상")));
   assert.ok(book.hints.some((hint) => hint.startsWith("판결 폭로: ")));
   const done = getEndingBook({ seasons: 12, endingsSeen: BOOK_ENDINGS, verdictsSeen: BOOK_VERDICTS });
-  assert.deepEqual(done, { head: "결말 9/9 · 판결 3/3.", hints: [] });
+  assert.deepEqual(done, { head: "결말 9/9 · 판결 3/3.", hints: [], lang: "ko" }, "with the language the lines are in");
   assert.equal(getEndingBook({ seasons: 1, endingsSeen: ["no-such-ending"], verdictsSeen: ["open"] }).head, "결말 0/9 · 판결 0/3. 다음 시즌에 노려 볼 결말은 공개와 개입입니다. 사건 기록의 90% 이상을 열고 믿음과 공정함을 함께 높게 지킨 시즌이 닿습니다.");
 });
 

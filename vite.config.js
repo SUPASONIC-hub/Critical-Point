@@ -7,12 +7,15 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
-import { crawlerFiles, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
-import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
+import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { withStaticShell } from "./scripts/static-shell.mjs";
+import { adsTxt, insertAdSlots, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
+import { localePreloadFileName, localePreloadMap, localePreloadSource, readLocaleKey, withLocalePreloadTag } from "./scripts/locale-preload.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
+import { COLD_OPENING_ENABLED } from "./src/coldOpeningSwitch.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -210,6 +213,37 @@ function criticalCss() {
 }
 
 /**
+ * `/assets/locale-preload-<hash>.js` and its tag in index.html: a page in
+ * another language asks for its dictionary's files from the head, alongside
+ * the entry chunk, instead of one after another once the entry has run
+ * (scripts/locale-preload.mjs). After the page is written -- the tag goes
+ * into the finished index.html -- and before `serviceWorker()`, which reads
+ * the page and every file off the disk.
+ */
+function localePreload() {
+  return {
+    name: "locale-preload",
+    apply: "build",
+    generateBundle: {
+      order: "post",
+      handler(options, bundle) {
+        const page = bundle["index.html"];
+        if (!page || page.type !== "asset") return;
+        const source = localePreloadSource({
+          map: localePreloadMap(bundle),
+          base: "/",
+          localeKey: readLocaleKey(readFileSync("src/appConfig.js", "utf8")),
+        });
+        const fileName = localePreloadFileName(source);
+        this.emitFile({ type: "asset", fileName, source });
+        const html = typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8");
+        page.source = withLocalePreloadTag(html, `/${fileName}`);
+      },
+    },
+  };
+}
+
+/**
  * Make the page's own URLs absolute in the social and canonical tags.
  *
  * A crawler reading `og:image` does not resolve it against the page, so a
@@ -379,11 +413,19 @@ function serviceWorker() {
  * `serviceWorker()` in the list, which reads every file on disk. With Google
  * Analytics on (`googleAnalytics` below) each page carries its tag, and the
  * policy and the FAQ say so.
+ *
+ * `ads` is the ads' stage (ADSENSE_ADS, ADSENSE_DATE). With `notice` the
+ * policy and the terms open with the notice of the change and its day; with
+ * `on` the pages' text is the one the web has with ads, on top of Google
+ * Analytics' when that is on too (AD_EDITS and ANALYTICS_AD_EDITS,
+ * legal-pages.mjs; SITE_AD_EDITS and ANALYTICS_SITE_AD_EDITS, site-pages.mjs),
+ * and the two policies carry the day as their date; without it the pages are
+ * the ones without ads, byte for byte.
  */
-function staticPages(analytics) {
+function staticPages({ analytics, ads }) {
   const files = () => {
     const origin = siteOrigin();
-    return { ...renderStaticPages(origin, { analytics }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+    return { ...renderStaticPages(origin, { analytics, ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -399,6 +441,59 @@ function staticPages(analytics) {
     },
     generateBundle() {
       for (const [fileName, source] of Object.entries(files())) this.emitFile({ type: "asset", fileName, source });
+    },
+  };
+}
+
+/**
+ * The intro's first viewport as HTML inside `#root` (scripts/static-shell.mjs),
+ * so a first visit paints the key visual and the wordmark with the inlined
+ * critical CSS before the entry chunk and React have run. main.jsx renders over
+ * it as before; nothing hydrates. A release only: the dev server styles the page
+ * from its script, so a shell there would paint unstyled. `startPages()` copies
+ * the final index.html, so `/en/` and `/ja/` carry the same shell.
+ */
+function staticShell() {
+  return { name: "static-shell", apply: "build", transformIndexHtml: (html) => withStaticShell(html) };
+}
+
+/**
+ * The start page in English and Japanese, `/en/index.html` and
+ * `/ja/index.html` (scripts/site-pages.mjs `localizedStartPage`): the built
+ * index.html, after every plugin here has had its turn with it -- the
+ * critical CSS, the absolute links, the commit, the verification tags, the
+ * Google tag on a build with one -- with its title, description, cards,
+ * canonical and no-script text in that language. The host serves each at its
+ * folder, and the game opens in its language there (src/locale.js). Written
+ * at the very end of the bundle (`order: "post"`), when index.html is final;
+ * the service worker names its release for them without the commit
+ * (`shippedFiles`). The dev server answers the same two addresses.
+ */
+function startPages() {
+  const LANGUAGE_START = /^\/(en|ja)\/(?:index\.html)?$/;
+  return {
+    name: "start-pages",
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        const language = LANGUAGE_START.exec(new URL(request.url ?? "/", "http://dev.invalid").pathname)?.[1];
+        if (!language) return next();
+        try {
+          const html = await server.transformIndexHtml(request.url, readFileSync("index.html", "utf8"));
+          response.setHeader("Content-Type", "text/html; charset=utf-8");
+          response.end(localizedStartPage(html, language));
+        } catch (error) {
+          next(error);
+        }
+      });
+    },
+    generateBundle: {
+      order: "post",
+      handler(_options, bundle) {
+        const page = bundle["index.html"];
+        if (!page || page.type !== "asset") throw new Error("start-pages: the bundle has no index.html to write the English and Japanese start pages from.");
+        const html = typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8");
+        for (const [fileName, source] of Object.entries(renderStartPages(html, siteOrigin()))) this.emitFile({ type: "asset", fileName, source });
+      },
     },
   };
 }
@@ -421,6 +516,30 @@ function adsenseVerification({ client, publisherId }) {
     },
   };
 }
+
+/**
+ * Web ads themselves (출시 로드맵 2단계), off unless ADSENSE_ADS=on with a
+ * unit for a placement in ADSENSE_SLOTS (scripts/adsense-config.mjs,
+ * docs/web-ads.md). Off -- verification only included -- this plugin has no
+ * hook and the build is the one without it. On, it turns each placement's
+ * marker comment into an <AdSlot> before JSX is compiled: first in the list,
+ * so its transform sees the source before react() does.
+ */
+function adSlots(config) {
+  if (!config.ads) return { name: "ad-slots-off" };
+  return {
+    name: "ad-slots",
+    enforce: "pre",
+    transform(code, id) {
+      if (!id.endsWith(".jsx") || id.includes("node_modules")) return null;
+      const out = insertAdSlots(code, config);
+      return out === null ? null : { code: out, map: null };
+    },
+  };
+}
+
+/** ADSENSE_* (scripts/adsense-config.mjs), which the plugin above and the pages' text both follow. */
+const adsenseEnv = (mode) => readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"));
 
 /**
  * Google Search Console's site verification, off unless
@@ -554,7 +673,7 @@ const READING_CLOCK_ASK = "src/gauntlet/ReadingClockAsk.jsx";
  * import it, so left alone it is written into the engine's chunk, which it took
  * past its gzip budget on 2026-10-20 (14,417 of 14,200), and its words into the
  * table's (PlayScreen 34,880 of 34,332). It gets a file the way the table's
- * sound does; it imports only the week's numbers (weeklyRules), never the
+ * sound does; it imports nothing (since RULES_MARK 3 not even the week's rules), never the
  * engine's chunk, so the two do not import each other.
  */
 const AUDIT_RISK = "src/gauntlet/auditRisk.js";
@@ -654,16 +773,19 @@ function ownChunkGroups() {
 
 export default defineConfig(({ command, mode }) => {
   const debugBuild = command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true";
+  const ads = adsenseEnv(mode);
   const analytics = analyticsFor({ ...readAnalyticsEnv(loadEnv(mode, process.cwd(), "GA_")), command, mode, debug: debugBuild });
   return {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), staticPages(analytics),
-      adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
+      adSlots(ads),
+      seasonData(), reactAsEsm(), react(), criticalCss(), staticShell(), absoluteSiteUrls(), buildShaMeta(), localePreload(),
+      staticPages({ analytics, ads: ads.stage === "off" ? false : { stage: ads.stage, date: ads.date } }),
+      adsenseVerification(ads),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
-      serviceWorker(), renderHeaders(),
+      startPages(), serviceWorker(), renderHeaders(),
     ],
     // The debug console -- the case jump, unlock-all, the forced render error --
     // is dead code in a release, and this constant is how the bundler is told.
@@ -674,6 +796,9 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __CP_DEBUG_BUILD__: JSON.stringify(debugBuild),
       __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
+      // B-3(1) 냉정한 오프닝 (src/coldOpeningSwitch.js): a constant, so a build
+      // with the switch off has none of the page in it.
+      __CP_COLD_OPENING__: JSON.stringify(COLD_OPENING_ENABLED),
     },
     // The dev server compiles a module the first time it is asked for. Fifty
     // cases are fifty large data modules, and compiling them on the first scene
@@ -692,9 +817,12 @@ export default defineConfig(({ command, mode }) => {
       // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
       // The case file's cast (CaseCast, D-8) is the same: the runtime has run
       // every file it leans on before the table's fold can open, and its list
-      // of sixteen files was about 500 bytes (2026-10-23).
+      // of sixteen files was about 500 bytes (2026-10-23). So are the personal
+      // bests (src/personalBests.js): the ranking screen that fetches them has
+      // already run every file they lean on, and the list cost that screen's
+      // chunk about 260 bytes.
       modulePreload: {
-        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast)-/.test(filename) ? [] : deps),
+        resolveDependencies: (filename, deps) => (/\/(ResultCardShare|CaseCast|personalBests)-/.test(filename) ? [] : deps),
       },
       rolldownOptions: {
         output: {

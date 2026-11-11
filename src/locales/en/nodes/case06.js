@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "c6_start": {
-      "text": "The morning after you return from the recovery control room, the analyst room on Trigger Lab’s 4th floor. The monitor at the desk at the end of the aisle has been on for three days. Your rival analyst, Oh Jinwoo, has not come in for three days. On his desk, an unsubmitted review of the dispatch failure still sits open. The group wants to name him the official owner of the dispatch failure, and the HR committee meets in two days. Han Seoyun sets the Case File on your desk and adds, 'This comes from inside the Group Strategy Office. The order is to close it before the New York shareholder’s quarterly review. Seconded staff don’t stay in the group’s HR records. It means he’s the easiest person to let go.' It is not her usual way of speaking. Today she ends her sentences like someone giving a report.",
+      "text": "Oh Jinwoo, the rival analyst at the desk at the end of the aisle, has not come in for three days. On his monitor, an unsubmitted review of the dispatch failure still sits open. The group wants to name him the official owner of the dispatch failure. The HR committee meets in two days. Han Seoyun says. 'This comes from inside the Group Strategy Office. The order is to close it before the New York shareholder’s quarterly review. Seconded staff don’t stay in the group’s HR records. It means he’s the easiest person to let go.' Today Han Seoyun ends her sentences like someone giving a report.",
       "memo": [
         "Oh Jinwoo was the final reviewer of the dispatch weighting table",
         "Unreachable for three days; no resignation filed",
@@ -37,7 +37,7 @@ export default {
     },
     "c6_desk": {
       "title": "The Squared-Up Pen",
-      "text": "The end of the aisle, eight steps from your desk. Oh Jinwoo’s desk is exactly as it was three days ago. His pen lies square with the monitor, and his sticky notes are lined up by color. The last mark on his calendar is on the day the dispatch failure was announced. The soil in the pot on the windowsill is damp. Do Yoonha says, 'I’ve been watering his plant for two months. He doesn’t know.' The access log shows that for the past 3 weeks he never left before midnight. His terminal holds traces of 11 report drafts deleted just before submission. At the back of a drawer sit an unopened box of sleeping pills and an old copy of a branch commendation in his father’s name.",
+      "text": "Oh Jinwoo’s desk is exactly as it was three days ago. His pen lies square with the monitor, and his sticky notes are lined up by color. The soil in the pot on the windowsill is damp. Do Yoonha says. 'I’ve been watering his plant for two months. He doesn’t know.' His terminal holds traces of 11 report drafts deleted just before submission. At the back of a drawer sit an unopened box of sleeping pills and an old copy of a branch commendation in his father’s name.",
       "memo": [
         "Every exit record in the past 3 weeks is after midnight",
         "11 report drafts deleted just before submission",
@@ -68,7 +68,7 @@ export default {
     },
     "c6_logs": {
       "title": "The Other Condition",
-      "text": "On the analyst room’s experiment terminal, Oh Jinwoo’s experiment profile opens. He was assigned to the opposite side of the same study as you. The left of the screen shows his decision time limit by date. It starts at 45 seconds and steps down to 31. While your decision window grew a little at a time, his kept shrinking. Each cut came right after you chose to verify. His speed at the Novaworks bid, his 6-minute review in the dispatch failure: not talent, but a setting. He knows only that he had a time limit. He does not know it was cut to match your choices. ECHO adds one line of warning. 'Opening this file opens all of his judgment records with it.'",
+      "text": "Oh Jinwoo’s experiment profile. His decision time limit steps down from 45 seconds to 31. While your decision window grew, his shrank, and each cut came right after you chose to verify. His speed at the Novaworks bid, his 6-minute review in the dispatch failure: not talent, but a setting. He knows only that he had a time limit. He does not know it was cut to match your choices. ECHO says. 'Opening this file opens all of his judgment records with it.'",
       "memo": [
         "Oh Jinwoo’s decision time limit: cut in steps from 45 seconds to 31",
         "Each cut came right after you chose to verify",
@@ -99,7 +99,7 @@ export default {
     },
     "c6_panel": {
       "title": "Don’t Defend Me",
-      "text": "The HR committee waiting room on Trigger Lab’s 2nd floor. The wall clock shows 30 minutes to the start. Oh Jinwoo is sitting in a chair by the window; he sees you and stands. He is wearing a tie for the first time in five days. He reties the knot and says, 'Don’t defend me.' He already knows that if the settings come up, even the fact that he was fast will read as a setting. That one thing, not his career, is what he wants to protect. 'My father was the same. He tried to prove he was wronged and got filed as a wronged man for life.' There are also two verification items he really did miss. He says he will take those under his own name too.",
+      "text": "30 minutes before the HR committee starts, Oh Jinwoo sees you and stands. He reties the knot of his tie and says, 'Don’t defend me.' He already knows that if the settings come up, even the fact that he was fast will read as a setting. 'My father was the same. He tried to prove he was wronged and got filed as a wronged man for life.' There are also two verification items he really did miss. He says he will take those under his own name too.",
       "memo": [
         "Oh Jinwoo refuses to submit the settings file",
         "There are also two verification items he really did miss",
@@ -130,7 +130,7 @@ export default {
     },
     "c6_final": {
       "title": "The Price of the Next Desk",
-      "text": "The HR committee room on the 2nd floor. Five members sit across a long table. Han Seoyun has the minutes up at a seat by the wall. The committee wants a conclusion. Name Oh Jinwoo responsible, and the dispatch failure closes today. Bring out the settings, and all of Trigger Lab comes under investigation. Either way, the name of the person at the next desk is the price. Oh Jinwoo sits on a chair by the door, hands on his knees. He has agreed to neither. And now you know: your profile is in the same folder, and that folder’s admin account belongs to the Group Strategy Office. Han Seoyun rests the cursor on the conclusion field of the minutes and waits.",
+      "text": "The committee wants a conclusion. Name Oh Jinwoo responsible, and the dispatch failure closes today. Bring out the settings, and all of Trigger Lab comes under investigation. Either way, the name of the person at the next desk is the price. Oh Jinwoo sits on a chair by the door, hands on his knees. He has agreed to neither. Your profile is in the same folder, and that folder’s admin account belongs to the Group Strategy Office. Han Seoyun rests the cursor on the conclusion field of the minutes and waits.",
       "memo": [
         "Name someone responsible and the dispatch failure closes at once",
         "Bring out the settings and the whole experiment opens",
@@ -158,7 +158,7 @@ export default {
     },
     "c6_aftershock": {
       "title": "The Empty Chair the Next Day",
-      "text": "The morning after the committee, the desk at the end of the aisle has not been cleared. The pen still lies square with the monitor, and water spills over the plant’s saucer. By now everyone on the floor knows who waters it. Ban Jaewook stands at that desk and closes his notebook. 'I never once liked the man. That is why this conclusion bothers me more.' He usually speaks with careful formality, 'if I may'; today it is just 'I'. The resignation Oh Jinwoo handed in the evening the committee ended has not yet been accepted. Overnight, three requests came in to view the settings file. And your profile is in that folder too. Ban Jaewook pushes the empty chair under the desk and walks away.",
+      "text": "The morning after the committee, the desk at the end of the aisle has not been cleared. The pen still lies square with the monitor. Ban Jaewook stands at that desk and closes his notebook. 'I never once liked the man. That is why this conclusion bothers me more.' He usually speaks with careful formality, 'if I may'; today it is just 'I'. The resignation Oh Jinwoo handed in the evening the committee ended has not yet been accepted. Overnight, three requests came in to view the settings file. Your profile is in that folder too.",
       "memo": [
         "Oh Jinwoo’s resignation not yet accepted",
         "Three requests to view the settings file",
@@ -182,7 +182,7 @@ export default {
     },
     "c6_kitchen": {
       "title": "Three in the Pantry",
-      "text": "The 4th-floor pantry. An out-of-order note is taped to the coffee machine. Ban Jaewook stands at the sink washing Oh Jinwoo’s mug. Three days of coffee have dried inside it. Do Yoonha asks, 'Isn’t that evidence?' and he answers, 'Coffee stains are not evidence.' None of the three laughs, but nobody leaves first. Holding cups of water, they talk a little at a time. How he used to buy convenience-store gimbap for everyone working late. How he pretended not to hear when someone thanked him. Not one line of the committee file has been written yet. Ban Jaewook finishes the mug and shakes off the water.",
+      "text": "Ban Jaewook stands at the sink washing Oh Jinwoo’s mug. Three days of coffee have dried inside it. Do Yoonha asks, 'Isn’t that evidence?' and he answers, 'Coffee stains are not evidence.' None of the three laughs, but nobody leaves first. It comes out that he used to buy convenience-store gimbap for everyone working late, and pretended not to hear when someone thanked him. Not one line of the committee file has been written yet.",
       "memo": [
         "More people know him than expected",
         "The mug got washed after all",
@@ -206,7 +206,7 @@ export default {
     },
     "c6_family": {
       "title": "His Sister Calls",
-      "text": "The analyst room’s main line rings. Han Seoyun answers, covers the receiver with her hand, and calls you over. It is Oh Jinwoo’s older sister. Her voice is bright. She heard her brother was promoted; when are they celebrating? It would be nice if people from work came too. The family knows nothing. Not the three days of absence, not the committee about to meet. Han Seoyun flips through the calendar. The promotion came right after the Novaworks bid, and his decision window was cut for the second time that same week. His sister says she will call back once she picks a date, and hangs up. The call lasted 30 seconds. Han Seoyun puts the receiver down but keeps her hand on it for a long time.",
+      "text": "Han Seoyun answers the main line, covers the receiver with her hand, and calls you over. It is Oh Jinwoo’s older sister. Her voice is bright. She heard her brother was promoted; when are they celebrating? It would be nice if people from work came too. The family knows nothing. Not the three days of absence, not the committee about to meet. His sister says she will call back once she picks a date, and hangs up. The call lasted 30 seconds. Han Seoyun puts the receiver down but keeps her hand on it for a long time.",
       "memo": [
         "The family knows nothing",
         "The promotion and the change in his conditions came at the same time",
@@ -230,7 +230,7 @@ export default {
     },
     "c6_ledger": {
       "title": "Two Profiles",
-      "text": "10 minutes before the committee starts, ECHO puts two profiles side by side on the waiting room’s wall terminal. Oh Jinwoo on the left, you on the right. The experiment number is the same. One graph carries two lines. The shrinking window goes down, the growing window goes up. The dates where the two lines bend interlock. ECHO says, 'One of the two is the control group.' Which one is not marked. Oh Jinwoo stands at the end of the hallway facing the committee room door; he has not seen this screen. Submit both, and his speed and your caution read as results of the same experiment.",
+      "text": "10 minutes before the committee starts, ECHO puts two profiles side by side on the wall terminal. Oh Jinwoo on the left, you on the right, with the same experiment number. The shrinking window is drawn going down, the growing one going up, and the dates where the two lines bend interlock. ECHO says. 'One of the two is the control group.' Submit both, and his speed and your caution read as results of the same experiment.",
       "memo": [
         "Both profiles share the same experiment number",
         "Who is the control group is not marked",
@@ -253,7 +253,7 @@ export default {
     },
     "c6_kitchen_reaction": {
       "title": "The Washed Mug",
-      "text": "Ban Jaewook sets the mug upside down on the drying rack and takes sticky notes from a drawer. He peels one off and sticks it to the front of the rack. It does not say 'Do not use'; it says only 'Oh Jinwoo'. Do Yoonha asks what that means, but he does not answer. He does not write it in his notebook either. Among the pantry’s 20 shared mugs, only that one has a name on it. It could be a sign holding a place for someone coming back, or a sign saying hands off. General Affairs has sent word that there is a separate procedure for clearing a desk once the HR committee rules. Ban Jaewook wipes his hands and leaves first.",
+      "text": "Ban Jaewook sets the mug upside down on the drying rack and sticks a sticky note in front of it. It does not say 'Do not use'; it says only 'Oh Jinwoo'. He does not say what it means. Of the 20 shared mugs, only that one has a name on it. It could be a sign holding a place for someone coming back, or a sign saying hands off. General Affairs has sent word that there is a separate procedure for clearing a desk once the HR committee rules.",
       "memo": [
         "A way of keeping a place for someone’s return",
         "Who has the right to remove the name tag"
@@ -275,7 +275,7 @@ export default {
     },
     "c6_family_reaction": {
       "title": "The Celebration",
-      "text": "Two hours later the same number calls again. His sister has picked two dates. This Friday or next Wednesday. She has even looked up a restaurant. As you hold the receiver choosing an answer, Do Yoonha comes over and says quietly, 'I’m not saying lie. I’m saying don’t answer today.' He writes one line on a sticky note and slides it over. 'Until he can tell them himself.' Nobody knows if he is right. Put off the answer today and the family goes on not knowing for days, and may hear the committee’s result from someone else first. On the other end of the line, his sister says hello again.",
+      "text": "Two hours later the same number calls again. His sister has picked two dates. As you choose an answer, Do Yoonha comes over and says quietly, 'I’m not saying lie. I’m saying don’t answer today.' He writes one line on a sticky note and slides it over. 'Until he can tell them himself.' Put off the answer today and the family goes on not knowing for days, and may hear the committee’s result from someone else first.",
       "memo": [
         "The right not to answer today",
         "The interest that builds on words put off"
@@ -297,7 +297,7 @@ export default {
     },
     "c6_ledger_reaction": {
       "title": "Control Group",
-      "text": "5 minutes before the committee starts. Ask again which one is the control group, and ECHO still will not say. Instead it shows one line. 'The control group is the side that does not know there is another side.' The two profiles stay on the screen. One person stands in the hallway not knowing there is another line beside his own; the other stands in front of this screen. You know now. From the moment you knew, you stopped being the side that does not know. The committee room door opens and someone inside calls a name. You have 5 minutes left to decide what to say when you walk in.",
+      "text": "5 minutes before the committee starts. Ask again which one is the control group, and ECHO still will not say. Instead it shows one line. 'The control group is the side that does not know there is another side.' One person stands in the hallway not knowing there is another line beside his own. You know now. From the moment you knew, you stopped being the side that does not know. The committee room door opens and someone inside calls a name.",
       "memo": [
         "The side that knows and the side that doesn’t",
         "The sentence to take into the committee"
@@ -319,7 +319,7 @@ export default {
     },
     "c6_branch_roof": {
       "title": "Two on the Roof",
-      "text": "The Trigger Lab rooftop. The wind is strong, and a banner cord keeps slapping the railing. Oh Jinwoo stands with his arms on the railing. It is the first time in four days. No tie; his shirt sleeves are rolled up. He sees you and smiles a little. 'Don’t worry. I only came up because this is the only smoking area. Though I’ve quit smoking.' Then a long silence. The sound of a delivery motorbike rises from the alley below. Without lifting his arms from the railing, he asks, 'Was I fast, or was I made fast?' This conversation stays in no record. The HR committee is 26 hours away.",
+      "text": "The wind is strong, and a banner cord keeps slapping the railing. Oh Jinwoo stands with his arms on the railing. No tie; his shirt sleeves are rolled up. He sees you and smiles a little. 'Don’t worry. I only came up because this is the only smoking area. Though I’ve quit smoking.' After a long silence he asks, 'Was I fast, or was I made fast?' The HR committee is 26 hours away.",
       "memo": [
         "The only question he raised first",
         "Time left until the committee",
@@ -343,7 +343,7 @@ export default {
     },
     "c6_branch_roof_follow": {
       "title": "The Way Down",
-      "text": "At the elevator by the rooftop door, Do Yoonha stands holding two paper cups. Convenience-store coffee. 'One is for him. But if I give it to him, he won’t take it.' The coffee has already gone cold. He says he has been standing here for 30 minutes. Unable to go up or down. 'He takes the plant water because he doesn’t know. Knowing, he can’t accept anything.' Through the glass of the rooftop door, a back leaning on the railing is visible. Nobody knows how long Oh Jinwoo will take to come down. The committee file has not been submitted yet.",
+      "text": "Do Yoonha stands holding two cups of convenience-store coffee. 'One is for him. But if I give it to him, he won’t take it.' The coffee has already gone cold. He says he has been standing here for 30 minutes, unable to go up or down. 'He takes the plant water because he doesn’t know. Knowing, he can’t accept anything.' The committee file has not been submitted yet.",
       "memo": [
         "More people know him than expected",
         "Committee file not yet submitted",
@@ -366,7 +366,7 @@ export default {
     },
     "c6_route_system": {
       "title": "Two People, One Experiment Number",
-      "text": "Instead of Oh Jinwoo alone, you set both analysts’ conditions side by side. The experiment terminal responds. A list that is not the Case File opens. It is the experiment index. Each line has an experiment number and a participant mark, and under one number two lines sit together. Oh Jinwoo and you. The two profiles were not separate experiments. They were the upper and lower lines of one experiment. On every date one side’s condition changed, the other side’s changed too. ECHO lights up the bottom of the index. Below the two lines is one more field, 'Next participant', and it is empty. 'This index does not handle people one at a time. It handles them in pairs.'",
+      "text": "Each line has an experiment number and a participant mark, and under one number two lines sit together. Oh Jinwoo and you. The two profiles were not separate experiments, but the upper and lower lines of one experiment. On every date one side’s condition changed, the other side’s changed too. Below the two lines is one more field, ECHO says. 'Next participant', and it is empty. 'This index does not handle people one at a time. It handles them in pairs.'",
       "memo": [
         "Both profiles share the same experiment number",
         "The dates of the condition changes interlock",
@@ -393,7 +393,7 @@ export default {
     },
     "c6_final_system_route": {
       "title": "An Index With One Blank Left",
-      "text": "The HR committee room on the 2nd floor. On the screen before the five members, the experiment index is spread out. Under the same experiment number, Oh Jinwoo’s line and yours sit one above the other, and the next-participant field below them is empty. The members do not yet know what this screen is. They take it for an appendix to the case file and wait for a conclusion. ECHO adds one line. 'The committee asks for one person responsible. The index shows two lines of one experiment.' The cursor blinks in the blank. Nowhere in the index does it say who is meant to fill this field.",
+      "text": "The HR committee room on the 2nd floor. On the screen before the five members, the experiment index is spread out. Under the same experiment number, Oh Jinwoo’s line and yours sit together, and the next-participant field below them is empty. The members take the screen for an appendix to the case file and wait for a conclusion. ECHO says. 'The committee asks for one person responsible. The index shows two lines of one experiment.'",
       "memo": [
         "Both profiles share the same experiment number",
         "Next-participant field: blank",
@@ -416,7 +416,7 @@ export default {
     },
     "c6_evidence_turn": {
       "title": "The Dates the Conditions Changed",
-      "text": "You hold the clue you have been keeping against his experiment profile, and the dates line up. Oh Jinwoo’s decision window was cut six times in all. Every one of those six dates is the day after you chose verification over a fast answer. Each time you paused, his time lost a notch. ECHO stacks the two records into a comparison table. 'The two analysts were not competing. Each was the other’s condition. One side’s caution was used as the value that made the other side’s speed.' The same experiment number is stamped twice at the head of the table. The table is in a form the committee will accept.",
+      "text": "You hold the clue you have been keeping against his experiment profile, and the dates line up. Oh Jinwoo’s decision window was cut six times in all. Every one of those six dates is the day after you chose verification over a fast answer. Each time you paused, his time lost a notch. ECHO says. 'The two analysts were not competing. Each was the other’s condition. One side’s caution was used as the value that made the other side’s speed.' The comparison table of the two records is in a form the committee will accept.",
       "memo": [
         "The cuts match the day after each of your choices",
         "The same experiment number covers both profiles",
@@ -439,7 +439,7 @@ export default {
     },
     "c6_start_owner": {
       "title": "After Owning My Part",
-      "text": "The morning after you return from the recovery control room, Trigger Lab’s 4th floor. Do Yoonha comes to your desk and shows you the internal board. The post from the last case, where you wrote that you would answer for your own decision first, is being passed around. 'The guy who left his desk the morning this started going around? Three days now and he hasn’t come in. He did read it, apparently.' The desk at the end of the aisle, eight steps away. Your rival analyst, Oh Jinwoo. On his monitor, an unsubmitted review of the dispatch failure still sits open. The group wants to name him the official owner of the dispatch failure, and the HR committee meets in two days. Do Yoonha turns off the screen. 'They say the committee might use that post as grounds. This is how you take responsibility, they’ll say.'",
+      "text": "Do Yoonha shows you the internal board. The post from the last case, where you wrote that you would answer for your own decision first, is being passed around. 'The guy who left his desk the morning this started going around? Three days now and he hasn’t come in. He did read it, apparently.' On the monitor of your rival analyst, Oh Jinwoo, an unsubmitted review of the dispatch failure still sits open. The group wants to name him the official owner of the dispatch failure. The HR committee meets in two days. 'They say the committee might use that post as grounds. This is how you take responsibility, they’ll say.'",
       "memo": [
         "Your statement of responsibility is circulating inside the company",
         "Oh Jinwoo has been absent since the day the post went around",
@@ -466,7 +466,7 @@ export default {
     },
     "c6_start_system": {
       "title": "Who the Fixed Structure Called",
-      "text": "The morning after you return from the recovery control room, the analyst room on Trigger Lab’s 4th floor. One line of an approval record is up on ECHO’s terminal. The structure you redesigned in the last case is actually running. The new standard records who approved what more clearly than before. That record now points precisely at one person. The final reviewer of the dispatch criteria table: Oh Jinwoo. The desk eight steps away at the end of the aisle; he has not come in for three days. The group wants to name him the official owner of the dispatch failure, and the HR committee meets in two days. ECHO shows one line. 'When records become precise, the first thing found is the person left in the record.'",
+      "text": "One line of an approval record is up on ECHO’s terminal. The standard you redesigned in the last case records who approved what more clearly than before. That record now points precisely at one person. The final reviewer of the dispatch criteria table: Oh Jinwoo. At his desk at the end of the aisle, he has not come in for three days. The group wants to name him the official owner of the dispatch failure. The HR committee meets in two days. ECHO says. 'When records become precise, the first thing found is the person left in the record.'",
       "memo": [
         "The new approval record pins down who is responsible",
         "The restructuring is actually working",
@@ -493,7 +493,7 @@ export default {
     },
     "c6_start_name": {
       "title": "The Second Name",
-      "text": "The morning after you return from the recovery control room, Trigger Lab’s 4th floor. Ban Jaewook sets a bundle of papers on your desk. The procedure used to name one person responsible in the last case has been copied, forms and all. Only the name field has changed. Oh Jinwoo. 'The organization learned that method is fast. This time it is using it on the next desk.' The desk at the end of the aisle, eight steps away, has been empty for three days. On the monitor, an unsubmitted review of the dispatch failure sits open. The group wants to name him the official owner of the dispatch failure, and the HR committee meets in two days. Ban Jaewook opens his notebook. 'I am asking the person who set the precedent whether to follow it.'",
+      "text": "Ban Jaewook sets a bundle of papers on your desk. The procedure used to name one person responsible in the last case has been copied, forms and all, and only the name field has changed. Oh Jinwoo. Ban Jaewook says. 'The organization learned that method is fast. This time it is using it on the next desk.' The desk at the end of the aisle has been empty for three days. The group wants to name him the official owner of the dispatch failure. The HR committee meets in two days. 'I am asking the person who set the precedent whether to follow it.'",
       "memo": [
         "The last case’s handling became a precedent",
         "The same procedure is already prepared",

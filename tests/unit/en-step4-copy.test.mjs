@@ -8,7 +8,7 @@ import tableCopy from "../../src/copy/table.js";
 import seasonEndCopy from "../../src/copy/seasonEnd.js";
 import { describeMutations, MUTATIONS } from "../../src/gauntlet/gauntletEngine.js";
 import { BLACKOUT_WALL_SHIFT, SEAL_BREAK_GAUGE } from "../../src/gauntlet/tableRules.js";
-import { describeBank, describeScout, describeStanceCarry, getHoldArmedCall } from "../../src/gauntlet/tableVoice.js";
+import { describeAct, describeBank, describeScout, describeStanceCarry, describeWall, getHoldArmedCall } from "../../src/gauntlet/tableVoice.js";
 import { getAuthorityProfile } from "../../src/runtimeSystems.js";
 import { describeAfterword, getTableReaction } from "../../src/gauntlet/tableAfterword.js";
 
@@ -32,7 +32,8 @@ test("the rules print their Korean with the numbers filled in, and a lifted rule
 
 test("the voice and the authority levels say their Korean", () => {
   assert.equal(getHoldArmedCall(), "한 번 더 누르면 확정된다");
-  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), "조회했다. 벽은 70에서 90 사이 어딘가");
+  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), "조회했다. 믿음 1을 썼다. 벽은 70에서 90 사이 어딘가");
+  assert.equal(describeAct({ act: 2, caseId: "case08" }), "2막 시작 · 사건 08");
   assert.deepEqual(getAuthorityProfile("courier", "OVERSIGHT").permissions, ["기록 공개", "현장 개입", "실험 종료"]);
   assert.deepEqual(getAuthorityProfile("courier", "nowhere").permissions, ["제한 열람", "질문 요청", "관찰 기록"]);
   assert.equal(getTableReaction([{ threshold: { busted: true, cause: "push", pushes: 3, wall: 70 } }], "n1").recap, "직전 판 · 3번째 밀기에서 BUST (벽 70)");
@@ -51,7 +52,9 @@ test("the English dictionary is printed once it is laid over the tables", () => 
   const [coldFeet] = describeMutations({ mutations: ["coldFeet"], sealHighest: false });
   assert.equal(coldFeet.title, "Chips shrank");
   assert.equal(getHoldArmedCall(), "Press once more to Commit");
-  assert.equal(describeBank({ runPot: 1200, vault: 0 }), "Stake 1,200 · Vault 0");
+  assert.equal(describeBank({ hand: 1200, runPot: 1200, vault: 0 }), "This hand +1,200 · Stake 1,200 · Vault 0");
+  assert.equal(describeAct({ act: 2, caseId: "case08" }), "Act 2 begins · Case 08");
+  assert.equal(describeWall({ gauge: 60.2, dangerLine: "Inside the Wall band" }), "Now Heat 60 · Inside the Wall band");
   assert.equal(describeStanceCarry({ focus: 12.4, carry: MUTATIONS.steadyLine }), "Charge 12 · Commit for STEADY LINE next hand · The next hand opens cool");
   assert.equal(getTableReaction([{ threshold: { pushes: 2, gauge: 41.5, wall: 66 } }], "n1").recap, "Last hand · pushed 2×, Committed at Heat 41 (Wall 66)");
   assert.equal(describeAfterword({ status: "bust", cause: "push", wall: 70, tellOffset: 4, schema: {} }), "The heartbeat heard the Wall around 74 (it was 70).");

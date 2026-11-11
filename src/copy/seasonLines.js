@@ -10,19 +10,12 @@ import { localizeTables } from "../locale.js";
  * book) is written in the page's language when the runtime writes it.
  */
 const seasonLinesCopy = {
-  // The rulings by their short names (seasonRecord.js VERDICT_NAMES keeps the Korean as the record's).
-  verdicts: { ending_seal: "봉인", ending_reform: "개혁", ending_expose: "폭로" },
   // The line under a NEW GAME+ season's first scene, by the last ruling (newGamePlusCarry.js).
   openingEchoes: {
     ending_seal: "지난 시즌의 기록은 봉인되었지만 실험은 다른 이름으로 돌아왔습니다. 이번에는 무엇을 닫을지 먼저 보겠습니다.",
     ending_reform: "지난 시즌의 기록은 사용 규칙의 기준표가 되었습니다. 이번에는 그 감시가 얼마나 버티는지 보겠습니다.",
     ending_expose: "지난 시즌의 기록은 이미 바깥에 나가 있습니다. 이번에는 무엇을 먼저 지킬지 보겠습니다.",
     collapse: "지난 시즌은 사람이 치른 값을 감당하지 못하고 멈췄습니다. 보존된 그 기록이 이번 첫 질문 옆에 놓여 있습니다.",
-  },
-  // The start screen's NEW GAME+ panel (getMemoryLine).
-  memory: {
-    line: "지난 시즌: {named}{ending}.{carry}",
-    carry: " NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.",
   },
   // The finale's comparison line (getSeasonComparison) and a case result's (getCaseComparison).
   comparison: {
