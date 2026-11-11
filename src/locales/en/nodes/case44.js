@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c44_start": {
       "title": "The Night Before Sentencing",
-      "text": "Oh Jinwoo sets a single A4 sheet on the table. Tomorrow at 10 a.m. is the first-instance sentencing in the Haeon Partners advisory fee case. The charge is breach of trust. This afternoon, Yoon Sanghyuk’s side filed a no-punishment letter in KD Bank’s name and a petition from 1,204 employees. Oh Jinwoo does not smile. 'Under the law, the victim of this crime is KD Bank. If the victim says it’s fine, the judge has to weigh that in the sentence. I chased this money for 3 years, and the company is the one doing the forgiving.'",
+      "text": "Tomorrow at 10 a.m. is the first-instance sentencing in the Haeon Partners advisory fee case; the charge is breach of trust. This afternoon, Yoon Sanghyuk’s side filed a no-punishment letter in KD Bank’s name and a petition from 1,204 employees. Oh Jinwoo does not smile. 'Under the law, the victim of this crime is KD Bank. If the victim says it’s fine, the judge has to weigh that in the sentence. I chased this money for 3 years, and the company is the one doing the forgiving.'",
       "memo": [
         "Sentencing: September 10 (Thu), 10 a.m., Seoul Central District Court, Room 417",
         "Prosecution asks: 7 years in prison, confiscation of 3.84 billion won in Haeon advisory fees",
@@ -38,7 +38,7 @@ export default {
     },
     "c44_lottery": {
       "title": "102 Gallery Passes",
-      "text": "There are 102 gallery passes, and the lottery is at 8:00. Na Junhyuk drove six Yeongdong seniors up in a van and called it a 'Seoul court tour', and Kwon Dohyun announces an 18.9% chance of winning. But in the middle of the line stand 20 people who don’t know each other, in matching navy caps. One has a text open on his phone. 'Court gallery line, 120,000 won a day, 50,000 won extra if you win.' At this rate, half the group won’t get into the courtroom.",
+      "text": "There are 102 gallery passes; the lottery is at 8:00. Kwon Dohyun puts the chance of winning at 18.9%. But in the middle of the line, 20 strangers wear matching navy caps. A text on one man’s phone: 'Court gallery line, 120,000 won a day, 50,000 won extra if you win.' At this rate, half the group won’t get into the courtroom.",
       "memo": [
         "102 gallery passes, 540 applicants",
         "20 navy caps -- the same job text",
@@ -69,7 +69,7 @@ export default {
     },
     "c44_court": {
       "title": "However",
-      "text": "Of the 12 advisory fee payments that went to Haeon Partners, Presiding Judge Lee Hakyung has found 8 to be breach of trust. Every time the ruling tilts, the judge turns it with a 'however'. Oh Jinwoo bet 10,000 won on 15, Kwon Dohyun on 20. The mitigating factors come. 'However, considering that the victim, KD Bank, does not wish him punished, and that the defendant contributed to a 30 billion won voluntary compensation plan, so that much of the damage has been recovered…' When Moon Gaeul starts to stand, the court officer looks this way.",
+      "text": "Of the 12 advisory fee payments to Haeon Partners, Presiding Judge Lee Hakyung has found 8 to be breach of trust. Every time the ruling tilts, the judge turns it with a 'however'. Oh Jinwoo bet 10,000 won on 15, Kwon Dohyun on 20. The reasons for the sentence come. 'However, considering that the victim, KD Bank, does not wish him punished, and that the defendant contributed to a 30 billion won voluntary compensation plan, so that much of the damage has been recovered…'",
       "memo": [
         "Guilty on 8 of 12 advisory fee payments",
         "Mitigating factors: no-punishment letter, help with compensation plan, first offense, petition",
@@ -100,7 +100,7 @@ export default {
     },
     "c44_lunch": {
       "title": "Eleven Bowls of Sundae Soup",
-      "text": "11 people push three tables together. Kwon Dohyun wins the bet with a final 'however' count of twenty-three and collects 10,000 won from Oh Jinwoo. Moon Gaeul puts down her spoon. 'They say the money that ruined my husband’s shop was 2.5 billion won. He goes home today and eats dinner. And we eat here.' Prosecutor Na Eunho walks in and takes the empty seat, sets gimbap beside the sundae soup, and raises one finger. 'To appeal, I need a reason. The deadline is 7 days.'",
+      "text": "11 people push three tables together. Kwon Dohyun wins the bet with twenty-three 'however's and collects 10,000 won from Oh Jinwoo. Moon Gaeul puts down her spoon. 'They say the money that ruined my husband’s shop was 2.5 billion won. He goes home today and eats dinner. And we eat here.' Prosecutor Na Eunho takes the empty seat, sets down gimbap, and raises one finger. 'To appeal, I need a reason. The deadline is 7 days.'",
       "memo": [
         "Judgment: 3 years in prison, suspended for 5 years, forfeiture of 2.56 billion won",
         "4 acquittals -- the e-signature field on the approvals is empty",
@@ -131,7 +131,7 @@ export default {
     },
     "c44_final": {
       "title": "The Word That It’s Over",
-      "text": "Seventeen cameras guard the main gate. The Group’s PR statement has already gone out. 'We respect the court’s judgment, and the Group’s reform will continue.' Moon Gaeul, who has turned down interviews all day, pushes one microphone away with the back of her hand and says one sentence. 'The judge set the sentence. But saying it’s over, we’ll do that.' The cameras swing toward you all at once. The appeal deadline is 7 days, and the 2.56 billion won forfeiture goes into the national treasury. Not a single won goes to the 1,740 people.",
+      "text": "Seventeen cameras guard the main gate. The Group’s PR statement has already gone out. 'We respect the court’s judgment, and the Group’s reform will continue.' Moon Gaeul, who has turned down interviews all day, pushes one microphone away with the back of her hand and says one sentence. 'The judge set the sentence. But saying it’s over, we’ll do that.' The appeal deadline is 7 days, and the 2.56 billion won forfeiture goes into the national treasury. Not a single won goes to the 1,740 people.",
       "memo": [
         "17 cameras -- Group statement: 'reform will continue'",
         "2.56 billion won forfeiture -- goes to the treasury, not to victims",
@@ -159,7 +159,7 @@ export default {
     },
     "c44_aftershock": {
       "title": "Rice Cakes on Sentencing Day",
-      "text": "Yoon Sanghyuk got his sentence and walked home, and 11 people gather at Gaeul Rice Cake Shop, its shutter half down. Kang Taemin brings Seo Jiho, who came to the court as a paid line-stander, and has him fold rice-cake boxes. Moon Hajun tapes to the wall a drawing with 'however ×23' beside the judge’s face. At 10 p.m., Lim Soyul, granddaughter of Lim Kyungsoo, calls. 'Grandpa heard the sentencing on the radio in his room. Then he started looking for an envelope. He says it’s time to hand it over. But he’s so short of breath.'",
+      "text": "Yoon Sanghyuk walked home, and 11 people gather at the rice cake shop, its shutter half down. Moon Hajun tapes up a drawing with 'however ×23' beside the judge’s face. At 10 p.m., Lim Soyul, granddaughter of Lim Kyungsoo, calls. 'Grandpa heard the sentencing on the radio in his room. Then he started looking for an envelope. He says it’s time to hand it over. But he’s so short of breath.'",
       "memo": [
         "Result: suspended sentence, not taken into custody",
         "Gaeul Rice Cake Shop wall: Moon Hajun’s 'however ×23'",
@@ -183,7 +183,7 @@ export default {
     },
     "c44_cap": {
       "title": "Navy Caps",
-      "text": "One of the navy caps sees Kang Taemin and bows his head. Seo Jiho, twenty-six. A FlowOn night-shift worker whose contract ended last winter, the month 120 robots came in. Now he lives day to day on a line-standing app. Kang Taemin pours barley tea into the thermos cap and hands it over. 'Foreman, if I win this I get 50,000 won more. I’m exactly 50,000 won short on rent this month.'",
+      "text": "One of the navy caps sees Kang Taemin and bows his head. Seo Jiho, twenty-six. A FlowOn night-shift worker whose contract ended last winter, the month 120 robots came in; now he lives day to day on a line-standing app. Kang Taemin hands him barley tea. 'Foreman, if I win this I get 50,000 won more. I’m exactly 50,000 won short on rent this month.'",
       "memo": [
         "Seo Jiho: former FlowOn night shift, contract ended when the robots came",
         "Line-standing pay 120,000 won a day + 50,000 won if he wins",
@@ -206,7 +206,7 @@ export default {
     },
     "c44_verdict": {
       "title": "The Order",
-      "text": "The presiding judge reads the order. 3 years in prison, suspended for 5 years. Forfeiture of 2.56 billion won. 4 of the 12 counts are acquittals. Those four approvals went through a shared account, so the e-signature field is empty and the approver cannot be identified. He is not taken into custody. Moon Hajun writes in the corner of his sketchbook. 'Empty field = acquittal.'",
+      "text": "The presiding judge reads the conclusion. 3 years in prison, suspended for 5 years. Forfeiture of 2.56 billion won. 4 of the 12 counts are acquittals: they went through a shared account, so the e-signature field is empty and the approver cannot be identified. He is not taken into custody. Moon Hajun writes in the corner of his sketchbook. 'Empty field = acquittal.'",
       "memo": [
         "3 years in prison, suspended for 5 years, forfeiture of 2.56 billion won",
         "4 acquittals: shared-account approvals, e-signature field empty",
@@ -229,7 +229,7 @@ export default {
     },
     "c44_petition": {
       "title": "1,204 Sheets",
-      "text": "Of the 1,204 petitions Na Eunho left behind, thirty-one are from Gangseo Branch staff. On the sixth page, Do Yoonha’s hand stops. Tak Yerin. The collection route: 'Chuseok gift request screen.' You picked a gift set, pressed 'Next', and a 'Colleague signature for organizational stability' field followed. Do Yoonha closes the list. 'People whose bonuses were cut begged leniency for the man who took the credit with that money. While picking gift sets.'",
+      "text": "Of the 1,204 petitions, thirty-one are from Gangseo Branch staff. On the sixth page, Do Yoonha’s hand stops. Tak Yerin. Pick a Chuseok gift set, and the next screen showed a 'Colleague signature for organizational stability' field. Do Yoonha says, 'People whose bonuses were cut begged leniency for the man who took the credit with that money. While picking gift sets.'",
       "memo": [
         "Of the 1,204 petition sheets, 31 from Gangseo Branch",
         "How it was signed: the next field after the Chuseok gift request screen",
@@ -252,7 +252,7 @@ export default {
     },
     "c44_cap_reaction": {
       "title": "The Price of 20",
-      "text": "The client on Seo Jiho’s app screen is 'Moment PR'. Kwon Dohyun finds it in two searches. A PR firm that has run events for KD Financial Group affiliates for 3 years. '20 people at 120,000 won is 2.4 million won. That means the price of keeping 20 victims’ family members outside the courtroom is 2.4 million won. They blocked it cheap. At this price, their side is in the black.'",
+      "text": "The client on Seo Jiho’s app is 'Moment PR'. Kwon Dohyun finds it in two searches: a PR firm that has run events for KD Financial Group affiliates for 3 years. '20 people at 120,000 won is 2.4 million won. That means the price of keeping 20 victims’ family members outside the courtroom is 2.4 million won. They blocked it cheap. At this price, their side is in the black.'",
       "memo": [
         "Client: a PR firm that runs events for Group affiliates",
         "20 people × 120,000 won = 2.4 million won"
@@ -318,7 +318,7 @@ export default {
     },
     "c44_branch_seal": {
       "title": "Forgiveness with Only a Seal",
-      "text": "Ban Jaewook tilts his phone toward you. It’s a copy of the no-punishment letter that Prosecutor Na Eunho let him view last night. The 'CEO, KD Bank' field is empty, with only the corporate seal stamped beside it. Ban Jaewook shows you the line he just wrote in his notebook. 'The company forgave. Who forgave is nowhere.'",
+      "text": "Ban Jaewook tilts his phone toward you: the copy of the no-punishment letter Prosecutor Na Eunho showed him last night. The 'CEO, KD Bank' field is empty, with only the corporate seal. Ban Jaewook shows you the line he just wrote in his notebook. 'The company forgave. Who forgave is nowhere.'",
       "memo": [
         "No-punishment letter: CEO signature field empty, corporate seal only",
         "Dated August 28 -- the day before the board agenda was fixed",
@@ -342,7 +342,7 @@ export default {
     },
     "c44_branch_seal_follow": {
       "title": "3 Minutes Before the Order",
-      "text": "3 minutes to the conclusion. At the prosecutor’s table, Na Eunho glances once at Ban Jaewook’s phone and mouths two words. 'Too late.' The only place it can go is an appeal, and the deadline is 7 days from sentencing. In the back row of the gallery sits Yoon Sanghyuk’s daughter, Yoon Seojin, a cap pulled low. You know she saw the screen of the phone on this side.",
+      "text": "3 minutes to the conclusion. Na Eunho glances once at Ban Jaewook’s phone and mouths two words. 'Too late.' The only place it can go is an appeal, and the deadline is 7 days from sentencing. You know that Yoon Seojin, cap pulled low in the back row of the gallery, saw the screen of the phone on this side.",
       "memo": [
         "No additional evidence on sentencing day",
         "Appeal deadline: 7 days from sentencing",
@@ -366,7 +366,7 @@ export default {
     },
     "c44_route_system": {
       "title": "The Statistics of Forgiveness",
-      "text": "At the suggestion to count how many trials ended with a company forgiving its executive, public court ruling search results come up on Lee Minseo’s laptop. In the last 10 years, 64 first-instance rulings on breach of trust by financial company executives. 49 were suspended sentences. In 41 of those, the victim company had filed a no-punishment letter, and only two came with a board resolution attached. 'When the company forgives, the person goes home. But who inside the company decided to forgive is written down almost nowhere.'",
+      "text": "Public court rulings come up on Lee Minseo’s laptop. In the last 10 years, of 64 first-instance rulings on breach of trust by financial company executives, 49 were suspended sentences. In 41 of those, the victim company had filed a no-punishment letter, and only two came with a board resolution attached. 'When the company forgives, the person goes home. But who inside the company decided to forgive is written down almost nowhere.'",
       "memo": [
         "Of 64 first-instance breach-of-trust rulings on financial executives, 49 suspended sentences",
         "Of those, 41 with no-punishment letters in the company’s name",
@@ -392,7 +392,7 @@ export default {
     },
     "c44_final_system_route": {
       "title": "Whose Forgiveness",
-      "text": "The laptop by the shelves lines up the 64 rulings by date. Lee Minseo keeps only the 41 with no-punishment letters and pages through for where it says who decided to forgive. Without taking her eyes off the screen, she speaks. 'Forty-one companies forgave, but the people who decided to forgive show up in only two. The letter filed yesterday is the 42nd. If we can’t find a person there either, then whose forgiveness is the judge reading in the morning?'",
+      "text": "Of the 64 rulings, Lee Minseo keeps only the 41 with no-punishment letters and looks for where it says who decided to forgive. 'Forty-one companies forgave, but the people who decided to forgive show up in only two. The letter filed yesterday is the 42nd. If we can’t find a person there either, then whose forgiveness is the judge reading in the morning?'",
       "memo": [
         "41 no-punishment letters in company names -- 2 with a board resolution attached",
         "Filed yesterday: no-punishment letter in KD Bank’s name",
@@ -415,7 +415,7 @@ export default {
     },
     "c44_evidence_turn": {
       "title": "The Name of Who Paid",
-      "text": "When you set the clue against the ruling’s 'that much of the damage has been recovered', one line of KD Bank’s general ledger opens. Of the 30 billion won voluntary compensation plan, 21 billion won made by cutting employees’ bonuses was renamed on August 28 as 'Yoon Sanghyuk matter damage recovery reserve'. That is the day the no-punishment letter was made. Ban Jaewook opens the very back page of his notebook. 'The man who took it has 2.5 billion won in forfeiture, and the ones who paid were the employees, yet the judgment says he paid. This one line, I’ll write down.'",
+      "text": "When you set the clue against the ruling’s 'that much of the damage has been recovered', one line of KD Bank’s general ledger opens. Of the 30 billion won compensation plan, 21 billion won made by cutting employees’ bonuses was renamed on August 28 as 'Yoon Sanghyuk matter damage recovery reserve'. The day the no-punishment letter was made. Ban Jaewook opens the very back page of his notebook. 'The man who took it has 2.5 billion won in forfeiture, and the ones who paid were the employees, yet the judgment says he paid. This one line, I’ll write down.'",
       "memo": [
         "21 billion won: employees’ bonus cuts",
         "Account renamed August 28: 'Yoon Sanghyuk matter damage recovery reserve'",
@@ -439,7 +439,7 @@ export default {
     },
     "c44_start_warm": {
       "title": "The Night Before Sentencing, for the One Who Stayed in the Corridor",
-      "text": "The day the dismissal motion passed, you stayed with the one-share group and with Yoon Seojin from the 33rd-floor corridor to the tent bar outside the company, until two in the morning. Tomorrow is the first-instance sentencing in the Haeon Partners advisory fee case. The charge is breach of trust. This afternoon, Yoon Sanghyuk’s side filed a no-punishment letter in KD Bank’s name and a petition from 1,204 employees. Do Yoonha speaks. 'Not one person in that corridor signed this paper. And yet it’s 1,204.'",
+      "text": "The day the dismissal motion passed, you stayed with the one-share group and Yoon Seojin until two in the morning. Tomorrow is the first-instance sentencing in the Haeon Partners advisory fee case; the charge is breach of trust. This afternoon, Yoon Sanghyuk’s side filed a no-punishment letter in KD Bank’s name and a petition from 1,204 employees. Do Yoonha says, 'Not one person in that corridor signed this paper. And yet it’s 1,204.'",
       "memo": [
         "Everyone in the one-share group from that corridor applied for gallery passes",
         "No-punishment letter in KD Bank’s name filed",
@@ -469,7 +469,7 @@ export default {
     },
     "c44_start_record": {
       "title": "The Night Before Sentencing, for the One Who Wrote Down the Vote",
-      "text": "The date of the draft resolution, copied at the end of the vote record, is August 28. Ban Jaewook sets that date next to the document filed with the court today. The dates match. It’s the day KD Bank made the document for the court in the Haeon Partners advisory fee case. The charge in that case is breach of trust. The document is a no-punishment letter. Ban Jaewook does not close the record. 'There’s no meeting anywhere where the company decided to forgive. The forgiveness came before the meeting.'",
+      "text": "The draft board resolution is dated August 28. Ban Jaewook sets that date next to the document filed with the court today. The dates match. It’s the day KD Bank made the no-punishment letter for the court in the Haeon Partners advisory fee case. The charge is breach of trust. Ban Jaewook says, 'There’s no meeting anywhere where the company decided to forgive. The forgiveness came before the meeting.'",
       "memo": [
         "Draft resolution date matches no-punishment letter date: August 28",
         "No record of a meeting that decided the letter",
@@ -499,7 +499,7 @@ export default {
     },
     "c44_start_rush": {
       "title": "The Night Before Sentencing, for the One Who Ran Ahead",
-      "text": "You rode the same elevator as Yoon Sanghyuk. When the doors opened on the 1st floor he said just one thing. 'See you on sentencing day.' This afternoon you were the first to see a no-punishment letter in KD Bank’s name and 1,204 petition sheets come in. Tomorrow at 10 a.m. is the first-instance sentencing in the Haeon Partners advisory fee case. The charge is breach of trust. Oh Jinwoo gets up. 'We came fast and saw it fast. There’s no time to stop it.'",
+      "text": "You rode the same elevator as Yoon Sanghyuk. On the 1st floor he said just one thing. 'See you on sentencing day.' This afternoon you were the first to see a no-punishment letter in KD Bank’s name and 1,204 petition sheets come in. Tomorrow at 10 a.m. is the first-instance sentencing in the Haeon Partners advisory fee case; the charge is breach of trust. Oh Jinwoo gets up. 'We came fast and saw it fast. There’s no time to stop it.'",
       "memo": [
         "Elevator, 33rd floor to 1st -- Yoon Sanghyuk: 'See you on sentencing day'",
         "Saw the letter and petition being filed firsthand",
