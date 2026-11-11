@@ -615,7 +615,8 @@ const budgets = [
   // 200,579 / 72,727 -> 200,735 / 72,779 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured 200731 / 72775 (over budget only) in the e2e build, the plus 4.
   // 200,735 / 72,779 -> 200,908 / 72,844 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321). Measured 200904 / 72840 (over budget only) in the e2e build, the plus 4.
   // 200,735 / 72,779 -> 200,735 / 72,784 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 72780 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 200_735, maxGzip: 72_784 },
+  // 200,735 / 72,784 -> 200,908 / 72,845 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 200904 / 72841 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 200_908, maxGzip: 72_845 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1885,7 +1886,8 @@ const budgets = [
   // 13,557 / 3,710 -> 13,713 / 3,737 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 13709 / 3733 (over budget only) in the e2e build, the plus 4.
   // 13,713 / 3,737 -> 13,869 / 3,767 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured 13865 / 3763 (over budget only) in the e2e build, the plus 4.
   // 13,713 / 3,737 -> 13,713 / 3,748 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured - / 3744 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_713, maxGzip: 3_748 },
+  // 13,713 / 3,748 -> 13,869 / 3,774 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 13865 / 3770 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_869, maxGzip: 3_774 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -2209,7 +2211,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,484 / 432,346 / 440,041 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured first paint, the plus 4.
 // -> 373,490 / 432,344 / 440,036 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured first paint, the plus 4.
 // -> 373,490 / 432,347 / 440,045 on 2026-11-11, noscript-guide over main accd990b. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_490, en: 432_347, ja: 440_045 };
+// -> 373,557 / 432,468 / 440,161 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_557, en: 432_468, ja: 440_161 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
