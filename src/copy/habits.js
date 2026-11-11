@@ -20,6 +20,9 @@ const habitsCopy = {
   marathon: { title: "생각 마라톤형", line: "결론보다 생각이 오래 걸려야 마음이 놓입니다." },
   lightning: { title: "속전속결형", line: "읽자마자 고르고, 고르자마자 밉니다." },
   steady: { title: "무난한 균형형", line: "튀지 않게, 그러나 끝까지 판을 닫았습니다." },
+  // D1: the one line the result card and its copied line say the name in,
+  // made here (judgementHabit.habitCardLine) and handed to the card's chunk.
+  cardLine: "당신의 심사 성향은 「{habit}」입니다.",
 };
 export default habitsCopy;
 

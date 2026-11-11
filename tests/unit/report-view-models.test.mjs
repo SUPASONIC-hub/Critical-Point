@@ -10,7 +10,7 @@ import { createAchievementBadges, createEndingProfile, createScoreBreakdown } fr
  * are drawn on -- and that a run with nothing to show still gets a full report.
  */
 
-const SCORES = { consistencyScore: 31, rhythmScore: 7, cognitionScore: 18, pressureAdaptScore: 12, reflectionScore: 9, exploitPenalty: 0 };
+const SCORES = { consistencyScore: 31, rhythmScore: 7, cognitionScore: 18, pressureAdaptScore: 12, reflectionScore: 9, readingScore: 23, exploitPenalty: 0 };
 
 /** A run that earned nothing: every badge takes its second answer. */
 const QUIET_RUN = {
@@ -47,12 +47,12 @@ test("a last choice named like a built-in is framed as undecided too", () => {
   }
 });
 
-test("the score is six rows, each printing the value it was handed", () => {
+test("the score is seven rows, each printing the value it was handed", () => {
   const rows = createScoreBreakdown(SCORES);
-  assert.equal(rows.length, 6);
-  assert.equal(new Set(rows.map((row) => row.label)).size, 6, "no two rows share a name");
-  assert.deepEqual(rows.map((row) => row.value), [SCORES.consistencyScore, SCORES.rhythmScore, SCORES.cognitionScore, SCORES.pressureAdaptScore, SCORES.reflectionScore, SCORES.exploitPenalty], "consistency first, the penalty last");
-  for (const row of rows.slice(0, 5)) {
+  assert.equal(rows.length, 7);
+  assert.equal(new Set(rows.map((row) => row.label)).size, 7, "no two rows share a name");
+  assert.deepEqual(rows.map((row) => row.value), [SCORES.consistencyScore, SCORES.rhythmScore, SCORES.cognitionScore, SCORES.pressureAdaptScore, SCORES.readingScore, SCORES.reflectionScore, SCORES.exploitPenalty], "consistency first, the penalty last");
+  for (const row of rows.slice(0, 6)) {
     assert.equal(row.text, `${row.value}점`, `${row.label} prints its own score`);
     assert.ok(row.note.length > 0, `${row.label} says what it measures`);
   }

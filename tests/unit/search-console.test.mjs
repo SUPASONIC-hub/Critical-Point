@@ -32,7 +32,8 @@ test("the build reads it without a VITE_ prefix, and render.yaml keeps the key w
     config,
     /searchConsoleVerification\(mode === "app" \? \{\} : readSearchConsoleEnv\(loadEnv\(mode, process\.cwd\(\), "GOOGLE_"\)\)\)/,
   );
-  assert.match(config, /adsenseVerification\(mode === "app" \? \{\} : readAdsenseEnv\(loadEnv\(mode, process\.cwd\(\), "ADSENSE_"\)\)\)/);
+  assert.match(config, /const ads = mode === "app" \? readAdsenseEnv\(\{\}\) : adsenseEnv\(mode\);/);
+  assert.match(config, /adsenseVerification\(ads\)/);
   assert.doesNotMatch(config, /VITE_GOOGLE/);
   assert.match(readFileSync("render.yaml", "utf8"), /- key: GOOGLE_SITE_VERIFICATION\n\s+sync: false/);
   // Off, the page is the one without it.

@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "start": {
-      "text": "This is Trigger Lab, on the 4th floor of the old data center in Hapjeong-dong that everyone calls the basement. It is 2025. Lab Director Han Seoyun puts a case file up on the terminal. 'It’s a training case. In the lab’s records, anyway. In reality it’s due diligence that KD Bank requested as the main bank. We submit a recommendation report within 72 hours. The decision belongs to FlowOn’s CEO, the board and the banks that lent the money.' FlowOn is a logistics platform that runs a dawn-delivery network across the Seoul metropolitan area. The cash left in its accounts lasts three days. It has 1,140 employees and fourteen suppliers that haven’t been paid. Loan number 2023-0412 sits at the bottom of the cover. 3 years ago you were the one who wrote the lone dissent on that loan, and the manager who returned it was Han Seoyun. She came to this lab as its director the next spring, and she does not hide the number.",
+      "text": "This is Trigger Lab, on the 4th floor of the old data center in Hapjeong-dong that everyone calls the basement. It is 2025. Director Han Seoyun puts a case file up on the terminal. 'In the lab’s records, it’s a training case. In reality it’s due diligence KD Bank requested. We only write the recommendation report, within 72 hours.' FlowOn is a dawn-delivery logistics platform, and the cash it has left lasts three days. Loan number 2023-0412 is at the bottom of the cover. 3 years ago you were the one who wrote the lone dissent on that loan, and the manager who returned it was Han Seoyun. She came to this lab the next spring, and she does not hide the number.",
       "memo": [
         "1,140 employees, 14 unpaid suppliers",
         "Main bank: KD Bank (loan balance 31 billion won)",
@@ -36,7 +36,7 @@ export default {
       "lead": "3 years ago you wrote one dissent at KD Bank’s Corporate Finance Strategy Team and ended up in this basement. On the cover of the case file Han Seoyun opened this morning, the same loan number is still there."
     },
     "accounting": {
-      "text": "In the 8th-floor finance meeting room, CFO Bae Sungjun has the ledger on screen and walks the due diligence team through it. Revenue they pulled forward once when they took that loan 3 years ago, they have pulled forward every month for the last 8 months. No one pocketed any money. The reason is in the KD Bank loan agreement on the table. Article 7 lets the bank call the loan at once, even before maturity, if the debt-to-equity ratio goes above 180%. The number they hit every month is the same reported figure as 3 years ago, 179.6%, and the untouched figure was 184%, just like then. Investigator Ban Jaewook of KD Bank Internal Audit slides the agreement toward you. 'The side that wrote this clause made them produce this number. So who’s the one who manipulated it?' 3 years ago your desk was in the department that wrote that clause.",
+      "text": "CFO Bae Sungjun puts the ledger on screen and explains. Revenue they pulled forward once for the loan 3 years ago, they have pulled forward every month for the last 8 months. No one pocketed any money. The reason is Article 7 of the KD Bank loan agreement. If the debt-to-equity ratio goes above 180%, the bank can call the loan at once. The number they hit every month is the reported figure from 3 years ago, 179.6%; untouched, it is 184%. Ban Jaewook of KD Bank Internal Audit slides the agreement toward you. 'The side that wrote this clause made them produce this number. So who’s the one who manipulated it?' 3 years ago your desk was in the department that wrote that clause.",
       "memo": [
         "Loan agreement Article 7: loan can be called at once above 180% debt-to-equity",
         "Reported after adjustment 179.6%, actual before adjustment 184.2%",
@@ -64,7 +64,7 @@ export default {
     },
     "payday": {
       "title": "Payday Is Tomorrow",
-      "text": "Hi-vis vests hang in a row in the night-shift break room, and an electric kettle is boiling. Night-shift lead Kang Taemin peels the lid off a cup of instant noodles and sets it in front of you. 'Come during the day next time. At night this is all I’ve got to offer.' Most people here don’t know the company is in a liquidity crisis. Payroll has to go out at 9 a.m. tomorrow, and for some of the night shift, one late month means their living money stops. Do Yoonha stops at the break room door. 'You know this, Analyst. I’m the one who sold that loan at Window 4, Gangseo Branch, 3 years ago. Forty-seven of them. Back then each one was just a sales number. That stuck with me, so when the lab posted a field officer opening the next year, I was the first to raise my hand. But today is the first time I see that the money was these people’s pay.'",
+      "text": "Hi-vis vests hang in a row. Lead Kang Taemin peels the lid off a cup of instant noodles and sets it in front of you. 'Come during the day next time. At night this is all I’ve got to offer.' Most people here don’t know the company is in a liquidity crisis. Payroll has to go out at 9 a.m. tomorrow. Do Yoonha stops at the door. 'I’m the one who sold that loan at Window 4, Gangseo Branch, 3 years ago. Forty-seven of them. Back then it was just a sales number, but today is the first time I see that the money was these people’s pay.'",
       "memo": [
         "The 18 on the night shift will likely have contracts ended",
         "3 suppliers shut down if payment is 30 days late",
@@ -92,7 +92,7 @@ export default {
     },
     "competitor": {
       "title": "NextMile’s Offer",
-      "text": "A proposal from the competitor NextMile lies on the table in the 8th-floor negotiation room. It offers to buy the core division at 42% of book value, on the condition that it takes over some of the staff. Oh Jinwoo is already sitting across the table. He has submitted an alternative that cuts costs another 8%, and in a corner of the whiteboard he has drawn one vertical line with a name on each side. His column already has a 1. Turning to the last page of the proposal, he adds in passing. 'NextMile’s main bank is KD too. The same bank calls in money on one side and buys on the other. The loss vanishes from the group’s books. Nice picture, isn’t it.'",
+      "text": "A proposal from the competitor NextMile lies on the table. It offers to buy the core division at 42% of book value and take over some of the staff. Across from you, Oh Jinwoo has already submitted an alternative that cuts costs another 8%. A vertical line in a corner of the whiteboard has a name on each side, and his column already has a 1. He adds in passing. 'NextMile’s main bank is KD too. The same bank calls in money on one side and buys on the other. Nice picture, isn’t it.'",
       "memo": [
         "Offer price: 42% of book value",
         "Terms include taking over some staff",
@@ -121,7 +121,7 @@ export default {
     },
     "board": {
       "title": "No Perfect Option",
-      "text": "A five-column table fills the wall screen in the 8th-floor situation room. Protect staff, keep the company alive, assign responsibility, win over investors, limit supplier damage. ECHO runs the combinations one by one, but no row lights all five columns. Turn one on and another goes dark. On the table, cold lunch boxes mix with the term sheet, the payroll ledger and the list of unpaid suppliers. ECHO puts up one more line. 'I found 172 cases of the same shape in 30 years of review records. 169 of them closed here with a sale, and 3 went up to the department that wrote the clause. Every officer on the 169 kept their seat. None of the officers on the 3 kept theirs.'",
+      "text": "A five-column table fills the wall screen. Protect staff, keep the company alive, assign responsibility, win over investors, limit supplier damage. However ECHO runs the combinations, turning one on turns another off. ECHO adds. 'I found 172 cases of the same shape in 30 years of review records. 169 of them closed here with a sale, and 3 went up to the department that wrote the clause. Every officer on the 169 kept their seat. None of the officers on the 3 kept theirs.'",
       "memo": [
         "Protect all staff: higher risk of late supplier payments",
         "Lead with transparency: investment talks more likely to collapse",
@@ -149,7 +149,7 @@ export default {
     },
     "c1_aftershock": {
       "title": "The Next Day’s Payslips",
-      "text": "The morning after the decision, a stack of printed payslips sits on the table in the 8th-floor situation room. Trigger Lab field officer Do Yoonha brought them from the night shift. Last night’s board meeting ended with CEO Kwon Seungwoo’s signature. People’s reactions arrived before the numbers. In the staff group chat, the same notice is read three ways over who was protected and who was left out, and one supplier’s owner is in the lobby holding a printout of one promise line from your report. He wants to talk terms again. And to your request to see the original 2023-0412 review report, KD Bank’s Corporate Finance Strategy Team has replied in one line. 'Case closed as processed normally.' The officer’s signature field is blank. Do Yoonha pushes the stack of payslips toward you. 'Everyone’s asking. What yesterday’s decision means for them.'",
+      "text": "The morning after the decision, a stack of printed payslips sits on the table. Trigger Lab field officer Do Yoonha brought them from the night shift. Last night’s board meeting ended with CEO Kwon Seungwoo’s signature. In the staff group chat, the same notice is read three ways. One supplier’s owner is in the lobby asking to renegotiate. To the request to see the original 2023-0412 review report, KD Bank’s Corporate Finance Strategy Team has replied in one line. 'Case closed as processed normally.' The officer’s signature field is blank. Do Yoonha pushes the stack of payslips toward you. 'Everyone’s asking. What yesterday’s decision means for them.'",
       "memo": [
         "Different readings of the staff notice spreading",
         "A supplier’s owner asks to renegotiate terms",
@@ -173,7 +173,7 @@ export default {
     },
     "c1_witness": {
       "title": "Who Made 179.6",
-      "text": "When you step into the hallway after the finance meeting, the most junior member of the accounting team is standing by the copier. He holds his ID badge in his hand, and he wasn’t invited to the meeting. He doesn’t say the ledger is wrong. He gives a date instead. On the evening they redid the closing numbers, he says, someone from the bank sat at the far end of the meeting room. He never got a business card, and that name isn’t on the attendee list. 'I saved the original file three times. The third one is the current number. The instructions were only spoken.' Ban Jaewook starts to open his notebook and stops. If he writes it down here, this man becomes a witness from tomorrow. Behind the glass door at the end of the hall, accounting staff are watching.",
+      "text": "When the finance meeting ends, the most junior member of the accounting team, who wasn’t invited to it, is standing by the copier. He doesn’t say the ledger is wrong; he gives a date. On the evening they redid the closing numbers, he says, someone from the bank who isn’t on the attendee list sat at the far end of the meeting room. 'I saved the original file three times. The third one is the current number. The instructions were only spoken.' Ban Jaewook starts to open his notebook and stops. If he writes it down, this man becomes a witness from tomorrow.",
       "memo": [
         "Original file saved three times",
         "The junior employee wasn’t invited to the meeting",
@@ -198,7 +198,7 @@ export default {
     },
     "c1_assembly": {
       "title": "A Promise Before Payday",
-      "text": "After midnight, at break time, the night shift gathers in the break room. Lead Kang Taemin writes three questions on the whiteboard. Will pay come out tomorrow. Will this shift exist next month. Who puts their name on those answers. Getting through payday morning takes more than money. People care less about what the company is hiding than about whether they will still be here tomorrow. On Do Yoonha’s phone is the same text from three suppliers. They want their payment dates set by the same standard as staff pay. The HQ executives’ group chat is silent. No one is the first to say whose pay should be disclosed first.",
+      "text": "After midnight, at break time, the night shift gathers in the break room. Lead Kang Taemin writes three questions on the whiteboard. Will pay come out tomorrow. Will this shift exist next month. Who puts their name on those answers. Three suppliers have sent Do Yoonha’s phone the same text: tell us the payment date by the same standard as staff pay. In the HQ executives’ group chat, no one brings up whose pay should be disclosed first.",
       "memo": [
         "The night shift’s representative demands a joint notice",
         "Three suppliers demand the same payment standard",
@@ -224,7 +224,7 @@ export default {
     },
     "c1_bargain": {
       "title": "The Seat No One Bought",
-      "text": "Toward evening, NextMile sends a revised offer. On page nine of 12 there is a blank. The heading reads 'Handling of divisions excluded from the acquisition,' and the three lines under it are empty. No one has written who goes in that space: the divisions they won’t buy, the staff left behind, or the unpaid suppliers. Oh Jinwoo highlights a different page. Purchase price, staff transferred, final payment date. 'Blanks get filled at the end. Fill them first and the price drops.' The texts from the suppliers’ owners all say the same thing in one line. Sell or don’t, just tell us the payment date.",
+      "text": "Toward evening, NextMile sends a revised offer. On page nine, the three lines under 'Handling of divisions excluded from the acquisition' are empty. No one has written who goes there: the divisions, the staff left behind, or the suppliers. Oh Jinwoo highlights only the purchase price. 'Blanks get filled at the end. Fill them first and the price drops.' The texts from the suppliers’ owners all say the same thing. Sell or don’t, just tell us the payment date.",
       "memo": [
         "No responsible party in the acquisition terms",
         "Suppliers want guaranteed payment more than a sale",
@@ -247,7 +247,7 @@ export default {
     },
     "c1_verdict": {
       "title": "A Choice, Not a Verdict",
-      "text": "One day until the cash runs out. Three letters of demands have arrived side by side on the situation room table. The staff representative wants pay and jobs promised in writing, the 14 suppliers want the payment order made public, and the investor says it will withdraw the term sheet if there is no answer by midnight tonight. All three are due today. All the material is in, yet the conclusion has moved further away. ECHO overlays the three letters and shows that no sentence overlaps. 'Grant one side’s demand and the other two lose that much trust. What you choose now isn’t the words that explain the company. It’s who pays tomorrow’s cost.'",
+      "text": "One day until the cash runs out. Three letters of demands are on the table. The staff representative wants pay and jobs promised in writing. The 14 suppliers want the payment order made public. The investor says it will withdraw the term sheet if there is no answer by midnight tonight. No sentence overlaps across the three. ECHO writes. 'Grant one side and the other two lose that much trust. What you choose now is who pays tomorrow’s cost.'",
       "memo": [
         "Demands from staff, suppliers and investors arrive at once",
         "Saving one side lowers the others’ trust",
@@ -270,7 +270,7 @@ export default {
     },
     "c1_witness_reaction": {
       "title": "Silence After Testimony",
-      "text": "Within 10 minutes, word that the junior accountant stood in the hallway with you has spread through the accounting team. When you open the office door, the typing stops all at once. Not one head rises from the twelve desks. Han Seoyun, who came up when she got the call, stands in the doorway and scans the room once. 'Everyone’s doing the math right now. If he gets protected, what does that make them.' She holds out a tablet. It is the draft report going up tomorrow morning, and the witness field and the action field are both empty. 'Whose name you write here, and how, decides what the people in this room say tomorrow. I’ve also seen reports where that field stayed empty to the end.'",
+      "text": "Within 10 minutes, word that the junior accountant was in the hallway with you has spread through the accounting team. When you open the office door, the typing stops all at once. In the doorway, Han Seoyun scans the room. 'Everyone’s doing the math right now. If he gets protected, what does that make them.' The tablet she holds out shows the draft report going up tomorrow morning. The witness field and the action field are empty. 'I’ve seen reports where that field stayed empty to the end.'",
       "memo": [
         "Whether the promise of protection made it into the record",
         "Responsibility that will show in the next payroll"
@@ -292,7 +292,7 @@ export default {
     },
     "c1_assembly_reaction": {
       "title": "Payday’s First Text",
-      "text": "Five in the morning, four hours until pay goes in. Conflicting rumors appear in the staff group chat. A post that only half the pay is coming, a post that the night shift goes first, a post that the company has already been sold. When someone corrects one, three questions pile up under it. ECHO overlays the chat’s posts on one screen. 'Of the 64 posts in the last hour, 9 are true. Not even the 9 true ones give a source.' In a corner of the break room, someone keeps opening and closing a banking app. The conveyor is running, but the hands loading the boxes are slower than usual.",
+      "text": "Five in the morning, four hours until pay goes in. Rumors appear in the staff group chat. A post that only half the pay is coming, a post that the night shift goes first, a post that the company has already been sold. ECHO overlays the posts on one screen. 'Of the 64 posts in the last hour, 9 are true. Not even those 9 give a source.' The conveyor is running, but the hands loading the boxes are slower than usual.",
       "memo": [
         "Of 64 unsourced posts, 9 true",
         "A channel to protect anonymous voices"
@@ -314,7 +314,7 @@ export default {
     },
     "c1_bargain_reaction": {
       "title": "An Empty Chair at the Table",
-      "text": "Ten at night, the agreed time, has passed, and NextMile’s side is still empty. Across the table sit only three water bottles and three name plates, and a text says they will be 30 minutes late. Trigger Lab field officer Do Yoonha, waiting with you, stares at the empty chairs for a long time. 'Those seats feel like the seats of the people left out of the acquisition. They go into the agreement as numbers, but there’s no chair for them to sit in.' Two supplier owners stand in the hallway holding document envelopes. No one called them. They say they came to hear for themselves how the talks go. Through the gap in the door, your eyes meet one of them.",
+      "text": "Ten at night, the agreed time, has passed, and NextMile’s side is still empty. A text says they will be 30 minutes late. Trigger Lab field officer Do Yoonha, waiting with you, looks at the empty chairs. 'Those seats feel like the seats of the people left out of the acquisition. They go into the agreement as numbers, but there’s no chair for them to sit in.' Two supplier owners no one called stand in the hallway holding document envelopes. Through the gap in the door, your eyes meet one of them.",
       "memo": [
         "The people who couldn’t enter the talks",
         "The name that will approve the terms"
@@ -336,7 +336,7 @@ export default {
     },
     "c1_verdict_reaction": {
       "title": "The Last Question Before the Conclusion",
-      "text": "Four hours after the demands arrived, everyone left in the situation room is waiting for your report. The CFO holds the pen he will sign with, and the investor’s officer waits with a phone to his ear. Only Ban Jaewook, at the end of the table, turns the pages of his notebook. He asks without looking up. 'I won’t ask what the conclusion is. I’ll ask about order. Who hears this recommendation first. The investors, the night shift, or the suppliers.' He writes the time on an empty line and stops his pen. 'Only the decision goes in the minutes. Who was told first, I write down separately. Later on, that tells you more.'",
+      "text": "Four hours after the demands arrived, everyone is waiting for your report. Only Ban Jaewook, at the end of the table, asks without looking up. 'I won’t ask what the conclusion is. I’ll ask about order. Who hears this recommendation first. The investors, the night shift, or the suppliers.' He writes the time on an empty line. 'Only the decision goes in the minutes. Who was told first, I write down separately.'",
       "memo": [
         "Harm to check before the conclusion",
         "A question to leave in the next minutes"
@@ -358,7 +358,7 @@ export default {
     },
     "c1_branch_people": {
       "title": "Who Fills the Blank",
-      "text": "The acquisition agreement sent by the competitor NextMile lies open on the table in the 8th-floor negotiation room. It is a document to buy the core division, and on page nine there is a blank. It is the space for who takes responsibility for the divisions left out of the deal, the staff who remain there, and the unpaid suppliers. Trigger Lab field officer Do Yoonha lays the night-shift roster and the list of unpaid suppliers side by side next to it. 'When it was written in numbers, everyone let it pass. So many staff transferred, so many hundred million won unpaid.' Do Yoonha opens the first page of the roster. 'Now that it has to be names, nobody picks up a pen. The moment a name goes in this space, it’s settled who takes care of that person.'",
+      "text": "NextMile’s acquisition agreement lies open on the table. On page nine there is a blank. It is the space for who takes responsibility for the divisions left out of the deal, the staff who remain, and the unpaid suppliers. Trigger Lab field officer Do Yoonha lays the night-shift roster beside it. 'When it was numbers, everyone let it pass. Now that it has to be names, nobody picks up a pen. The moment a name goes in, it’s settled who takes care of that person.'",
       "memo": [
         "Guaranteed supplier payments",
         "Employment period for staff left behind",
@@ -381,7 +381,7 @@ export default {
     },
     "c1_branch_people_follow": {
       "title": "The First Call After the Revision",
-      "text": "However the blank was handled, the revised agreement went to NextMile that night. 40 minutes after the revision goes into the system, the negotiation room phone rings. It is someone whose name appears nowhere in the agreement. He runs a small company that supplied FlowOn with packaging, and he is owed three months of payments. He doesn’t get angry. He asks just one thing. Which company should he send his invoice to now. ECHO attaches a line next to the call log. 'This person falls under no space in the agreement. The blank was filled or left. Either way, from now on that space reads not as a cost but as a promise.'",
+      "text": "However the blank was handled, the revised agreement went to NextMile that night. 40 minutes later, the negotiation room phone rings. It is the owner of a small company that supplied FlowOn with packaging. His name appears nowhere in the agreement, and he is owed three months of payments. He doesn’t get angry. He asks just one thing: which company should he send his invoice to now. ECHO writes next to the call log. 'Filled or left, from now on that space reads not as a cost but as a promise.'",
       "memo": [
         "A stakeholder outside the contract",
         "Responsibility after the first payment",
@@ -404,7 +404,7 @@ export default {
     },
     "c1_route_layoff": {
       "title": "Faces That Arrived Before the Numbers",
-      "text": "This is the 8th-floor HR meeting room at FlowOn HQ. The HR head left a sheet face down, saying it was material for the report, and walked out. Turn it over and there are 18 names, all night-shift contract workers at the logistics center, and at the bottom, in bold, the labor cost this list cuts. Trigger Lab field officer Do Yoonha looks through the glass wall at the hallway. Three people are already sitting there waiting for their interviews. 'They don’t know yet what the interview is about.' Do Yoonha sets another table next to the list. It is a handover sheet for who takes on each departing person’s work, and all 18 rows are blank. And next to the seventh name on the list is a pencil mark. It is the person who reported last month’s accounting to the internal reporting channel.",
+      "text": "The HR head left a sheet face down as material for the report and walked out. Turn it over and there are 18 names, all night-shift contract workers. Trigger Lab field officer Do Yoonha looks through the glass wall at the hallway. Three people are already waiting for their interviews. 'They don’t know yet what the interview is about.' On the handover sheet Do Yoonha sets beside it, all 18 rows are blank. Next to the seventh name is a pencil mark. It is the person who reported last month’s accounting to the internal reporting channel.",
       "memo": [
         "Handover sheet for key staff is blank",
         "An internal whistleblower is among those to be cut",
@@ -428,7 +428,7 @@ export default {
     },
     "c1_final_layoff": {
       "title": "The Names Left Behind the Savings",
-      "text": "You are back in the 8th-floor HR meeting room at HQ. Payday has passed, and the list is still on the table. If the cuts go ahead, the savings hit the books today. Do Yoonha pushes the handover sheet forward again. The rows are still blank. 'No one has written who takes over the departing people’s work yet. And the person who reported the accounting, list or no list, nobody talks to them these days.' More people sit on the hallway chairs than yesterday. What you decide now is not whether to cut. It is whose silence goes into the savings along with it.",
+      "text": "Payday has passed, and the list is still on the table. If the cuts go ahead, the savings hit the books today. Do Yoonha pushes the blank handover sheet forward again. 'No one has written who takes over the departing people’s work yet. And nobody talks to the person who reported the accounting these days.' What you decide now is not whether to cut. It is whose silence goes into the savings along with it.",
       "memo": [
         "All 18 rows of the handover sheet still blank",
         "Savings secured, but the path for internal testimony has narrowed",
@@ -454,7 +454,7 @@ export default {
     },
     "c1_route_funding": {
       "title": "The Question Money Asks First",
-      "text": "In the 8th-floor investment room, the investor offering emergency funds has sent a draft term sheet. Sixteen pages. The amount and deposit date are in bold on the first page, and Investigator Ban Jaewook of KD Bank Internal Audit skips the first page and opens to page twelve. He copies the clause word for word into his black notebook. 'After funds are disbursed, the company’s major decisions are subject to prior review by the investor, and the content of that review is not disclosed.' Ban stops his pen. 'Money turns three days into three months. In exchange, during those three months, they decide what this company can explain, and to whom. The record of approval exists, but no one can see it.'",
+      "text": "The investor has sent a sixteen-page draft term sheet for emergency funds. Investigator Ban Jaewook of KD Bank Internal Audit skips the first page and opens to page twelve. He copies the clause into his black notebook. 'After funds are disbursed, the company’s major decisions are subject to prior review by the investor, and the content of that review is not disclosed.' Ban stops his pen. 'Money turns three days into three months. In exchange, during those three months, they decide what this company can explain, and to whom.'",
       "memo": [
         "Term sheet has a confidential review clause",
         "Operating time secured, but the right to explain shrinks",
@@ -478,7 +478,7 @@ export default {
     },
     "c1_final_funding": {
       "title": "The Terms of Survival Money",
-      "text": "The final term sheet lies on the table in the investment room. Sign it and the money arrives today, and the company makes next month’s payday. Ban Jaewook opens his notebook and points to a small box next to the signature line. The 'analyst opinion' box. 'Put your name here and you become the one who approved these terms. Leave it out and you stay the one who solved the problem, but the terms get set without you, Analyst.' He doesn’t say which is better. Instead he folds a copy of the term sheet and tucks it into his notebook. 'I believe in order. Whether the money came in first or the explanation went out first. That gets decided today.'",
+      "text": "The final term sheet lies on the table. Sign it and the money arrives today, and the company makes next month’s payday. Ban Jaewook points to the 'analyst opinion' box next to the signature line. 'Put your name here and you become the one who approved these terms. Leave it out and the terms get set without you, Analyst.' He folds a copy of the term sheet and tucks it into his notebook. 'I believe in order. Whether the money came in first or the explanation went out first.'",
       "memo": [
         "The confidential review clause is still in the final term sheet",
         "Time secured, but a cost of outside control appears",
@@ -504,7 +504,7 @@ export default {
     },
     "c1_route_sale": {
       "title": "What Can Be Sold and What Must Stay",
-      "text": "Three sheets listing the assets that can be sold are taped to the wall of the 8th-floor asset review room. Delivery vehicle contracts, four hub warehouses around Seoul, and one line at the very bottom of the third sheet: 'other intangible assets.' Han Seoyun taps that line with a pen. 'Unpack this one line and it holds every customer order record since the founding and the internal operations tools. A copy of the operations logs too.' What the bidders want to pay for isn’t the trucks but that one line. But the operations logs also hold the traces of the ledger edits over the last 8 months. Selling brings cash fastest, and the moment it sells, the records change owners. No rule says whether customers must be told their order records are being handed over.",
+      "text": "Three sheets listing the assets that can be sold are taped to the wall. Under the vehicles and warehouses, at the very end, is one line: 'other intangible assets.' Han Seoyun taps that line with a pen. 'This holds every customer order record since the founding and a copy of the operations logs, all of it.' That one line is what the bidders want too. But the operations logs also hold the traces of the ledger edits over the last 8 months. The moment it sells, the records change owners. No rule says whether customers must be told.",
       "memo": [
         "A copy of the operations logs is on the sale list",
         "No clear standard for handling customer data",
@@ -528,7 +528,7 @@ export default {
     },
     "c1_final_sale": {
       "title": "The Evidence Not for Sale",
-      "text": "More items are crossed out on the three sheets on the asset review room wall. NextMile has sent the final signing copy and is waiting for an answer. Han Seoyun stands in front of the 'other intangible assets' line. 'Put this one line in and the money arrives tonight. Take it out and the price drops and the date slips.' She sets the storage drive holding the copy of the operations logs on the table. 'What’s in here isn’t just order records. It also has who edited the ledger, and when. Sell, and that goes too.' Outside the window, the lights of delivery trucks coming back from the hub warehouses pass in a line. If it sells, the company survives. What not to sell has to be decided now.",
+      "text": "More items are crossed out on the lists on the asset review room wall. Han Seoyun stands in front of the 'other intangible assets' line. 'Put this one line in and the money arrives tonight. Take it out and the price drops and the date slips.' She sets the storage drive holding the copy of the operations logs on the table. 'Who edited the ledger, and when, is in here too. Sell, and that goes too.' What not to sell has to be decided now.",
       "memo": [
         "The operations log copy holds the ledger edit records",
         "Cash pressure grows",
@@ -554,7 +554,7 @@ export default {
     },
     "c1_route_investigate": {
       "title": "The Gap Between Stalled Numbers",
-      "text": "In the 8th-floor records room at FlowOn HQ, document boxes are stacked along the walls and ECHO’s terminal sits on a folding table. When you check the raw data before picking an issue, the calculations behind the cuts plan, the funding plan and the sale plan all break off at the same place. The last 8 months of revenue records. The dates continue, but the edit history for just that stretch is empty. ECHO calls the stretch the missing log and draws a border around it. 'All three plans trusted this stretch’s numbers as they are. If this stretch is wrong, all three are wrong. Who made this gap comes before which plan you pick.' From the hallway, someone is calling people in to start the finance meeting.",
+      "text": "ECHO’s terminal sits on a folding table. When you check the raw data first, the calculations behind the three plans all break off at the same place. The last 8 months of revenue records. The dates continue, but the edit history for just that stretch is empty. ECHO calls the stretch the missing log and draws a border around it. 'If this stretch is wrong, all three are wrong. Who made this gap comes before which plan you pick.' From the hallway, someone calls that the finance meeting is starting.",
       "memo": [
         "All three options share the same missing log",
         "Cash pressure grows during the audit time",
@@ -578,7 +578,7 @@ export default {
     },
     "c1_final_investigate": {
       "title": "The Real Starting Point of the First Case",
-      "text": "The recovered records are laid out on the records room table by date. Six of the eight missing months have come back. The ledger was edited every time on the evening of the last business day of the month, and each time the reported debt-to-equity ratio stopped just below 180%. ECHO puts up one line on the last page. 'This company’s crisis didn’t start this week. It’s a record of someone making the same gap again and again. The raw data delayed the conclusion, but it changed who has to be asked.' In the hallway, phones keep ringing with calls to pick one of the three plans today.",
+      "text": "The recovered records are laid out by date. Six of the eight missing months have come back. The ledger was edited every time on the evening of the last business day of the month. Each time, the debt-to-equity ratio stopped just below 180%. ECHO puts up one line. 'The raw data delayed the conclusion, but it changed who has to be asked.' In the hallway, phones keep ringing with calls to pick a plan today.",
       "memo": [
         "The missing log edit times all cluster on month-end evenings",
         "The three plans’ conclusions are late, and cash is down to eight hours",
@@ -604,7 +604,7 @@ export default {
     },
     "c1_route_system": {
       "title": "The First Rule Found Outside the Options",
-      "text": "You propose putting the three issues on one table. ECHO catches on first. The wall screen in the 8th-floor situation room goes blank white. Cuts, funding, sale. The three plans’ calculation sheets overlap, half transparent, and where they overlap one cell stays dark. All three plans took their numbers from the same criteria table. The table’s header shows no department and no date. ECHO puts up one line. 'There wasn’t one crisis. The same criteria table was called by three different names. Whichever plan you pick, this table sets the answer first.' For the first time, the people in the situation room look at each other instead of the screen.",
+      "text": "When you propose putting the three issues on one table, ECHO catches on first. On the wall screen, the calculation sheets of the three plans overlap: cuts, funding, sale. Where they overlap, one cell stays dark. All three plans took their numbers from the same criteria table. ECHO puts up one line. 'There wasn’t one crisis. The same criteria table was called by three different names.' For the first time, the people in the situation room look at each other instead of the screen.",
       "memo": [
         "The three plans’ calculation sheets overlap in the same cell",
         "Every solution passes through the same criteria table",
@@ -628,7 +628,7 @@ export default {
     },
     "c1_final_system": {
       "title": "Three Plans Through the Same Table",
-      "text": "Eight hours until the cash runs out. On the situation room wall screen, ECHO overlays the cuts plan, the funding plan and the sale plan on one table. Where they overlap, a single criteria table remains. All three plans took their numbers from it, and the purchase price in NextMile’s agreement came from the same table. The header shows no department and no edit date. ECHO writes under the table. 'The three plans passed through the same criteria table. Leave the table as it is and a fourth plan will stall in the same place.' On the table, the CFO’s phone vibrates, stops and vibrates again. He doesn’t answer, only watches the screen.",
+      "text": "Eight hours until the cash runs out. ECHO overlays the three plans on one table on the screen. Where they overlap, a single criteria table remains. The purchase price in NextMile’s agreement came from that table too. The header shows no department and no edit date. ECHO writes. 'Leave the table as it is and a fourth plan will stall in the same place.' The CFO doesn’t answer his ringing phone.",
       "memo": [
         "The three plans passed through the same criteria table",
         "Who edited the criteria table, and when: not yet opened",
@@ -654,7 +654,7 @@ export default {
     },
     "c1_evidence_turn": {
       "title": "The First Clue Ties Three Plans in One Line",
-      "text": "When you hold the clue up against the three plans’ calculations, the tables on screen line up in one row. The savings in the cuts plan, the amount needed in the funding plan and the purchase price in the sale plan were all calculated from the same criteria table. And the edit records for that table end at the same account as the eight-month stretch with no edit history in the ledger and the edits to the undisclosed payroll sheet. There is no person’s name in the author field. ECHO lays the times of the three records side by side. 'There weren’t three different solutions. A table made by the same hand put out the answer in three shapes. What you decide now isn’t which plan, but who rewrites this table.'",
+      "text": "When you hold the clue up against the three plans’ calculations, the tables line up in one row. The savings, the funds needed and the purchase price all came from the same criteria table. The edit records for that table end at the same account as the ledger’s eight-month gap and the edits to the hidden payroll sheet. There is no name in the author field. ECHO puts the times of the three records side by side. 'A table made by the same hand put out the answer in three shapes. What you decide now is who rewrites this table.'",
       "memo": [
         "The hidden payroll sheet and the missing log point to the same author",
         "All three plans’ effects were calculated from one criteria table",
@@ -677,7 +677,7 @@ export default {
     },
     "c1_start_hold": {
       "title": "Names on the Wall for 3 Years",
-      "text": "The sheet with 11 names you taped to the wall by your desk on your first day at Trigger Lab stayed there while the tape was replaced three times. You sat under it for 3 years, and now it is 2025. Han Seoyun, who returned your dissent, came to this lab as its director the next spring. This morning she puts a case file up on the terminal. 'It’s a training case. In the lab’s records, anyway. In reality it’s due diligence that KD Bank requested as the main bank. We submit a recommendation report within 72 hours. The decision belongs to FlowOn’s CEO, the board and the banks that lent the money.' At the bottom edge of the cover is loan number 2023-0412. FlowOn, a logistics platform running a dawn-delivery network, 1,140 employees. The investment deposit was canceled, so the cash runs out in 72 hours. The company you tried to stop 3 years ago is stopping now.",
+      "text": "The 11 names you taped to the wall by your desk on your first day at Trigger Lab stayed there for 3 years while the tape was replaced three times. Han Seoyun, who returned your dissent, came to this lab as its director the next spring. This morning in 2025, she puts a case file up. 'In the lab’s records, it’s a training case. In reality it’s due diligence KD Bank requested. We only write the recommendation report.' At the bottom edge of the cover is loan number 2023-0412. FlowOn, a logistics platform, 1,140 employees. The cash runs out in 72 hours. The company you tried to stop 3 years ago is stopping now.",
       "memo": [
         "Wall by the desk -- 11 names, up for 3 years",
         "Bottom edge of the training case cover: 2023-0412",
@@ -707,7 +707,7 @@ export default {
     },
     "c1_start_record": {
       "title": "A Box Up from B2 After 3 Years",
-      "text": "The box in B2 where you stood the bundle of copies 3 years ago sat in a room that always stays the same temperature. This morning in 2025, Han Seoyun puts a case file up on the terminal. She returned your dissent, and came to this lab as its director the next spring. 'It’s a training case. In the lab’s records, anyway. In reality it’s due diligence that KD Bank requested as the main bank. We submit a recommendation report within 72 hours. The decision belongs to FlowOn’s CEO, the board and the banks that lent the money.' You read 2023-0412 at the bottom edge of the cover and go down to B2. Someone has already opened the box. The seal tape is new, and Lim Kyungsoo’s signature isn’t on it. FlowOn, a dawn-delivery logistics platform, 1,140 employees. The cash runs out in 72 hours. The numbers written 3 years ago and this morning’s numbers meet on the same line.",
+      "text": "3 years ago you stood the bundle of copies in a box in B2. Han Seoyun, who returned your dissent, came to this lab as its director the next spring. This morning in 2025, she puts a case file up. 'In the lab’s records, it’s a training case. In reality it’s due diligence KD Bank requested. We only write the recommendation report.' You read 2023-0412 at the bottom edge of the cover and go down to B2. Someone has already opened the box. The seal tape is new, and Lim Kyungsoo’s signature isn’t on it. FlowOn, a logistics platform, 1,140 employees. The cash runs out in 72 hours.",
       "memo": [
         "B2 box -- seal tape has been replaced",
         "Bottom edge of the training case cover: 2023-0412",
@@ -737,7 +737,7 @@ export default {
     },
     "c1_start_alone": {
       "title": "3 Years With Nothing Brought Along",
-      "text": "3 years ago you emptied your bag and started with one empty desk. Now you call this 4th floor the basement too. Han Seoyun, who returned your dissent, came to this lab as its director the next spring. This morning in 2025, she puts a case file up on the terminal. 'It’s a training case. In the lab’s records, anyway. In reality it’s due diligence that KD Bank requested as the main bank. We submit a recommendation report within 72 hours. The decision belongs to FlowOn’s CEO, the board and the banks that lent the money.' 2023-0412 remains at the bottom edge of the cover, but you have not one sheet of paper to check that number against. Only memory. FlowOn, a dawn-delivery logistics platform, 1,140 employees. The cash runs out in 72 hours. The numbers are familiar, but memory is not evidence.",
+      "text": "3 years ago you emptied your bag and started with one empty desk. Now you call this 4th floor the basement too. Han Seoyun, who returned your dissent, came to this lab as its director the next spring. This morning in 2025, she puts a case file up. 'In the lab’s records, it’s a training case. In reality it’s due diligence KD Bank requested. We only write the recommendation report.' You have not one sheet of paper to check the 2023-0412 at the bottom edge of the cover against. FlowOn, 1,140 employees. The cash runs out in 72 hours. The numbers are familiar, but memory is not evidence.",
       "memo": [
         "Records from 3 years ago -- no kept copy",
         "Bottom edge of the training case cover: 2023-0412",

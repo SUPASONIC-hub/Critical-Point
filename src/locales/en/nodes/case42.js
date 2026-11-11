@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c42_start": {
       "title": "Leave with an Empty Approver Field",
-      "text": "Your leave request has sat on the approval screen for four days. It asks for one day off, Friday, six days after the second hearing. Team head approval, department head approval, and the last field, 'CEO.' You are the first employee at this company whose leave has gone all the way to the CEO’s desk, and that field is still empty. Then a photo lands in the group chat. A 'Leave Order' written with a brush pen on one A4 sheet, three red seals below it. It is from Na Junhyuk. 'I booked a guesthouse by the Gyeongpo Fireworks Festival. Four rooms, 12 sets of bedding. Watching a man say he doesn’t recall 23 times has worn everyone down to half a face. This is an order. I stamped it.'",
+      "text": "Your leave request has sat on the approval screen for four days. It asks for one day off, Friday, six days after the second hearing. The last approval field, 'CEO,' is still empty. A photo lands in the group chat. A 'Leave Order' written with a brush pen on one A4 sheet, three red seals below it. It is from Na Junhyuk. 'I booked a guesthouse by the Gyeongpo Fireworks Festival. Four rooms, 12 sets of bedding. Watching a man say he doesn’t recall 23 times has worn everyone down to half a face.'",
       "memo": [
         "Leave approval line: team head → department head → CEO Yoon Sanghyuk",
         "CEO field empty for four days -- neither approved nor returned",
@@ -38,7 +38,7 @@ export default {
     },
     "c42_pension": {
       "title": "The House at the Same Address",
-      "text": "Two blocks in from Gyeongpo Beach, six inner tubes hang in the yard of 'Mulgyeol Stay,' and the white walls are freshly painted. The 32-year-old owner, Yeo Dain, hands over four room keys with a smile. 'This is the first time we’re fully booked on festival day.' Signing the guest register, Kwon Dohyun stops his pen. The street address is one he knows by heart. The Haeon Guesthouse you chased last year at Yeongdong Branch, the house Yoon Sanghyuk’s brother-in-law owned, the registered address of the company that sent advisory fees out to a Seoul gallery. That company went into liquidation. After that, the house went to auction. Na Junhyuk stirs another cup of instant coffee mix. 'I knew when I booked it. We pay full price to sleep in the house their money flowed through. Isn’t that the cleanest revenge there is?'",
+      "text": "Six inner tubes hang in the yard of 'Mulgyeol Stay.' The owner, Yeo Dain, hands over four room keys with a smile. Signing the guest register, Kwon Dohyun stops his pen. He knows the address by heart. The Haeon Guesthouse you chased last year, the registered address of the company that sent advisory fees out to a Seoul gallery. That company went into liquidation. After that, the house went to auction. Na Junhyuk speaks. 'I knew when I booked it. We pay full price to sleep in the house their money flowed through. Isn’t that the cleanest revenge there is?'",
       "memo": [
         "Mulgyeol Stay: the old Haeon Guesthouse, won at auction by Yeo Dain",
         "Yeo Dain: former contract teller at KD Bank Yeongdong Branch, age 32",
@@ -69,7 +69,7 @@ export default {
     },
     "c42_karaoke": {
       "title": "100 Points in Yeongdong Dialect",
-      "text": "In room 5 of a karaoke place in the alley by the beach, Na Junhyuk sings a trot song rewritten in Yeongdong dialect. 'Yous all come gather here, ain’t it grand like this.' Not one word matches the lyrics on screen, and the score is 100. Oh Jinwoo sings the same song three times, scores 97, 94 and 91, and starts to suspect the machine. Kwon Dohyun calls out, '500 won a song. Mr. Oh, you’re 1,500 won in the red,' and Kang Taemin’s tambourine never finds the beat. Then your phone buzzes. A screenshot from Yeo Dain: a text in KD Capital’s name, sent at 19:04. 'Your loan has been classified for early call under internal criteria.' Seven on a Friday evening, and no person sent this text.",
+      "text": "In room 5 of a karaoke place, Na Junhyuk sings a trot song rewritten in Yeongdong dialect. 'Yous all come gather here, ain’t it grand like this.' Not one word matches the lyrics, and he scores 100. Oh Jinwoo sings the same song for 97, 94 and 91. Kwon Dohyun calls out, '500 won a song. Mr. Oh, you’re 1,500 won in the red.' Yeo Dain’s screenshot of a KD Capital text, sent at 19:04. 'Your loan has been classified for early call under internal criteria.' Seven on a Friday evening, and no person sent this text.",
       "memo": [
         "Na Junhyuk 100 points -- dialect rewrite, 0% lyric match",
         "Oh Jinwoo tries three times in a row; the score drops every time",
@@ -100,7 +100,7 @@ export default {
     },
     "c42_breakwater": {
       "title": "Why We Couldn’t Stop",
-      "text": "The first firework goes up, and gold dust pours over the sea. On the sand below the Gyeongpo breakwater, Kang Taemin takes out a thermos and fills 10 cup noodles with hot water. Na Junhyuk opens a notebook and speaks between the bangs. 'Let’s go one at a time. What kept you from stopping. I’ll write it down.' Oh Jinwoo goes first. 'I wanted to win. I still do. It’s embarrassing.' Lee Minseo keeps it short. 'Fear. When I’m scared, my eyes open wider.' For the first time, Kwon Dohyun speaks without calculating. '1,140 people. The people at my father’s company.' Do Yoonha says it is the faces of the people he sold loans to at the window, and Kang Taemin says only, 'The second cup noodle.' In a short gap between fireworks, everyone looks at you. It is a question you never got once at the hearing.",
+      "text": "Kang Taemin fills 10 cup noodles with hot water. Na Junhyuk opens a notebook. 'Let’s go one at a time. What kept you from stopping. I’ll write it down.' Oh Jinwoo goes first. 'I wanted to win. I still do. It’s embarrassing.' For the first time, Kwon Dohyun speaks without calculating. '1,140 people. The people at my father’s company.' Do Yoonha says it is the faces of the people he sold loans to at the window, and Kang Taemin says only, 'The second cup noodle.' Everyone looks at you. It is a question you never got once at the hearing.",
       "memo": [
         "Gyeongpo Fireworks Festival main show 21:00~21:40",
         "Oh Jinwoo wanted to win, Lee Minseo was afraid, Kwon Dohyun 1,140 people",
@@ -131,7 +131,7 @@ export default {
     },
     "c42_final": {
       "title": "The 5:40 a.m. Call",
-      "text": "People who stayed up all night wait for the sun on the sand of Gyeongpo Beach. A call comes. It is Baek Arin. 'The board has put up a motion to remove CEO Yoon Sanghyuk. Monday, September 7. They say the directors from Kingsdale in New York raised it first.' Oh Jinwoo starts to throw up both arms and stops at her next words. Baek Arin reads you the last sentence of the motion’s briefing paper. 'With the dismissal, cleanup of related risk assets complete.' 'There are 47 places in that cleanup. Mulgyeol Stay is one of them.' She catches her breath. 'Two outside directors want your opinion. By midnight tonight.' Yeo Dain comes out of the office building carrying a pot of hangover soup. She does not know about this call yet.",
+      "text": "A call comes. It is Baek Arin. 'The board has put up a motion to remove CEO Yoon Sanghyuk. Monday, September 7.' Baek Arin reads you the last sentence of the motion’s briefing paper. 'With the dismissal, cleanup of related risk assets complete.' 'There are 47 places in that cleanup. Mulgyeol Stay is one of them. Two outside directors want your opinion. By midnight tonight.' Yeo Dain comes out of the office building carrying a pot of hangover soup. She does not know about this call yet.",
       "memo": [
         "Board: Monday, September 7, motion to dismiss Yoon Sanghyuk",
         "Briefing paper: 'cleanup of related risk assets complete' -- 47 places",
@@ -159,7 +159,7 @@ export default {
     },
     "c42_aftershock": {
       "title": "The Guestbook’s First Page",
-      "text": "Six inner tubes dry on the clothesline in the yard of Mulgyeol Stay, and Kang Taemin sets up a tripod for a group photo. The owner, Yeo Dain, holds out the guestbook. On the first page Na Junhyuk stamps his three seals, Kang Taemin writes two words, 'Coming back,' and Kwon Dohyun tapes in the lodging bill split. Oh Jinwoo writes down a rematch date for the buoy race he lost to Han Seoyun, and Han Seoyun draws a small medal next to her name. Closing the guestbook, Yeo Dain says, 'I know now who owned this house before. But I also know good people slept here.' Texts from Baek Arin have piled up on your phone since dawn. The September 7 board motion to remove CEO Yoon Sanghyuk, and the opinion two outside directors want from you by midnight tonight. The first train to Seoul is at 7:02.",
+      "text": "Kang Taemin sets up a tripod for a group photo. Yeo Dain holds out the guestbook. On the first page Na Junhyuk stamps his three seals and Kang Taemin writes two words, 'Coming back.' Closing the guestbook, Yeo Dain says, 'I know now who owned this house before. But I also know good people slept here.' Texts about the opinion two outside directors want from you by midnight tonight have piled up on your phone.",
       "memo": [
         "First train to Seoul 07:02, next train 12:10",
         "Guestbook first page: three seals, 'Coming back,' the lodging bill split",
@@ -183,7 +183,7 @@ export default {
     },
     "c42_buoy": {
       "title": "200 Meters to the Buoy",
-      "text": "On the sand, Kwon Dohyun works out the parasol rental fee. 'Past three hours, buying one is cheaper.' He buys a parasol at the convenience store, and 4 minutes after it goes into the sand the wind takes it; Kang Taemin runs twenty steps to bring it back. Na Junhyuk, in a 1990s floral swimsuit, declares 'I’m the referee' and lies down on an inner tube. Oh Jinwoo puts on goggles and points at the buoy. 'First one to touch it picks dinner.' At the signal he shoots off, and Han Seoyun follows him in without a word. A person five months into standby assignment is faster in the water than anyone.",
+      "text": "On the sand, Kwon Dohyun works out the parasol rental fee. 'Past three hours, buying one is cheaper.' The parasol he buys blows away 4 minutes later. Oh Jinwoo puts on goggles and points at the buoy. 'First one to touch it picks dinner.' At the signal he shoots off, and Han Seoyun follows him in without a word. A person five months into standby assignment is faster in the water than anyone.",
       "memo": [
         "Parasol cost 19,000 won -- used for 4 minutes",
         "About 200 meters to the buoy, inside the lifeguard flag zone",
@@ -206,7 +206,7 @@ export default {
     },
     "c42_ledger": {
       "title": "The Winning-Bid Receipt",
-      "text": "In the guesthouse office building, under fluorescent light, Yeo Dain opens a file folder. The court’s winning-bid receipt, a confirmation that her mother closed her savings account, the KD Capital loan agreement. 'I was at the Yeongdong Branch window for 4 years. On the way home the day my contract ended, I saw this house come up for auction. A house with a view of the sea was my lifelong dream.' She points to one line in the agreement. Never once late in 14 months. 'So why me? What did I do wrong?' Na Junhyuk stands in the doorway and cannot come in. For the 4 years Yeo Dain was at the window, the manager of that branch was Na Junhyuk.",
+      "text": "Yeo Dain opens a file folder. The court’s winning-bid receipt, a confirmation that her mother closed her savings account, the KD Capital loan agreement. 'I was at the Yeongdong Branch window for 4 years. On the way home the day my contract ended, I saw this house come up for auction.' She points to one line in the agreement. Never once late in 14 months. 'So why me? What did I do wrong?' Na Junhyuk stands in the doorway and cannot come in. For the 4 years Yeo Dain was at the window, the manager of that branch was Na Junhyuk.",
       "memo": [
         "Winning bid 410 million won -- 70 million won from her mother’s savings, KD Capital loan 290 million won",
         "14 months, 0 late payments",
@@ -229,7 +229,7 @@ export default {
     },
     "c42_embers": {
       "title": "Because I’m Ashamed",
-      "text": "The fireworks end, and only smoke is left at the end of the breakwater. The last turn is Han Seoyun’s. She fiddles with her cup-noodle lid for a long time. 'For me, it’s shame. 3 years ago I pressed the return button under my own employee ID. The moment I stop, that record becomes my face again. So I can’t stop.' She says her mother calls every Sunday and starts with 'Haven’t they fired you yet?' and laughs. No one laughs with her. Then Ban Jaewook, back from his regional rounds, gets out of a taxi and walks to the breakwater. In one hand he holds a notebook; in the other, 11 glow sticks from the festival souvenir shop.",
+      "text": "The last turn is Han Seoyun’s. 'For me, it’s shame. 3 years ago I pressed the return button under my own employee ID. The moment I stop, that record becomes my face again. So I can’t stop.' She says her mother calls every Sunday and starts with 'Haven’t they fired you yet?' and laughs. No one laughs with her. Then Ban Jaewook, back from his regional rounds, gets out of a taxi and walks to the breakwater. He is holding 11 glow sticks.",
       "memo": [
         "Han Seoyun: returned it 3 years ago under her own employee ID",
         "On standby assignment, a call from her mother every Sunday",
@@ -252,7 +252,7 @@ export default {
     },
     "c42_buoy_reaction": {
       "title": "Where No One Measures",
-      "text": "Han Seoyun touches the buoy first. Oh Jinwoo reaches it 3 seconds later, spits out water and shouts 'Rematch!' Han Seoyun hooks an arm over the buoy, looks at the beach for a long while, then swims back. Taking a towel, she looks back toward the buoy. 'From out there, people look as small as beans. For the first time, nobody was measuring me. Since the day I got standby assignment, I’ve swiped my time card every morning. Even with nowhere to go. In case not swiping counted as quitting.' She smiles, and her eyes are wet with more than seawater. 'I was a swimmer in high school. I don’t know how many years it’s been since I won anything.'",
+      "text": "Han Seoyun touches the buoy first. Oh Jinwoo reaches it 3 seconds later, spits out water and shouts 'Rematch!' Taking a towel, Han Seoyun looks back toward the buoy. 'From out there, people look as small as beans. For the first time, nobody was measuring me. Since the day I got standby assignment, I’ve swiped my time card every morning. Even with nowhere to go. In case not swiping counted as quitting. I was a swimmer in high school. I don’t know how many years it’s been since I won anything.'",
       "memo": [
         "The first win in five months",
         "A time card swiped with nowhere to go"
@@ -274,7 +274,7 @@ export default {
     },
     "c42_ledger_reaction": {
       "title": "The Address Returned Three Times",
-      "text": "Na Junhyuk sits on the office-building stairs and stirs two cups of instant coffee mix. One is for Yeo Dain. 'Dain, I know this address. When I was at the branch, my predecessor flagged money moving through this address three times, and all three times I returned it under my own employee ID. If I’d seen it through back then, this house would never have gone to auction. And then you wouldn’t be here.' He starts to laugh and stops. 'Funny, isn’t it. The house I booked out of shame holds the money you saved your whole life. This time I won’t return it.'",
+      "text": "Na Junhyuk sits on the office-building stairs and stirs two cups of instant coffee mix. One is for Yeo Dain. 'Dain, I know this address. When I was at the branch, my predecessor flagged money moving through this address three times, and all three times I returned it under my own employee ID. If I’d seen it through back then, this house would never have gone to auction. Funny, isn’t it. The house I booked out of shame holds the money you saved your whole life. This time I won’t return it.'",
       "memo": [
         "An employee ID that returned it three times",
         "A house booked out of shame"
@@ -296,7 +296,7 @@ export default {
     },
     "c42_embers_reaction": {
       "title": "11 Glow Sticks",
-      "text": "Ban Jaewook snaps the glow sticks one by one and hands them out. 11, two more than the people here. 'One is for the owner, one is a spare. The lights in the office building were still on.' Then he opens his notebook. 'On my rounds I saw headquarters data. This week, early-call texts went to 47 places across the country. Every one is an address Yoon Sanghyuk brushed past at least once. It’s not people being punished. It’s addresses.' Green lights sway on the breakwater.",
+      "text": "Ban Jaewook snaps the glow sticks one by one and hands them out. 11, two more than the people here. 'One is for the owner, one is a spare. The lights in the office building were still on. On my rounds I saw headquarters data. This week, early-call texts went to 47 places across the country. Every one is an address Yoon Sanghyuk brushed past at least once. It’s not people being punished. It’s addresses.'",
       "memo": [
         "11 -- glow sticks, two more than the people",
         "Punishment that falls on addresses, 47 places"
@@ -318,7 +318,7 @@ export default {
     },
     "c42_branch_attic": {
       "title": "Mail in the Attic",
-      "text": "Once check-in is done, Yeo Dain asks Kang Taemin a favor. 'The former owner’s things are still in the office-building attic, and I can’t bring them down alone.' Kang Taemin carries six boxes down in one go. The tape on the bottom box bursts and mail spills out. Every envelope has the same sender, Haeon Partners. Copies of quarterly advisory-fee invoices and remittance confirmations to Gallery On, bundled for 3 years, and on the front of one envelope, in ballpoint: 'Destroy after the Managing Director checks.' It was not destroyed. Kang Taemin pulls off his gloves and tucks them in his vest pocket. 'This is the stuff they said to throw out, right?'",
+      "text": "Yeo Dain asks Kang Taemin a favor. 'The former owner’s things are still in the office-building attic, and I can’t bring them down alone.' Kang Taemin carries six boxes down in one go. The tape on the bottom box bursts and mail spills out. Every envelope has the same sender, Haeon Partners. Copies of quarterly advisory-fee invoices and remittance confirmations to Gallery On, bundled for 3 years, and on the front of one envelope, in ballpoint: 'Destroy after the Managing Director checks.' It was not destroyed. Kang Taemin asks. 'This is the stuff they said to throw out, right?'",
       "memo": [
         "One of six boxes: 3 years of Haeon Partners mail",
         "12 copies of advisory-fee invoices, 12 remittance confirmations",
@@ -342,7 +342,7 @@ export default {
     },
     "c42_branch_attic_follow": {
       "title": "The Envelopes Nobody Destroyed",
-      "text": "Yeo Dain holds one envelope and looks at it for a long time. 'So these people are why this house went to auction. And that’s how I got to buy it.' She smiles, but the smile is strange. Kwon Dohyun lays out the remittance confirmations by date and stops. The last remittance is the day before Haeon Partners filed for liquidation, and that day alone the money went to a personal account instead of the gallery. The recipient name field is blacked out with a black pen. Yeo Dain pushes the box toward you. 'Take it. But leave this house’s name out of what’s in this box. I have to keep living here.'",
+      "text": "Yeo Dain looks at one envelope. 'So these people are why this house went to auction. And that’s how I got to buy it.' Kwon Dohyun lays out the remittance confirmations by date and stops. The last remittance is the day before Haeon Partners filed for liquidation, and that day alone the money went to a personal account instead of the gallery. The recipient name field is blacked out with a black pen. Yeo Dain pushes the box toward you. 'Take it. But leave this house’s name out of what’s in this box. I have to keep living here.'",
       "memo": [
         "Last remittance: the day before the liquidation filing, to a personal account",
         "Recipient name field blacked out",
@@ -366,7 +366,7 @@ export default {
     },
     "c42_route_system": {
       "title": "The Weight of an Address",
-      "text": "At 7:04 on Friday evening, an automatic text from KD Capital reaches Yeo Dain, owner of 'Mulgyeol Stay,' the Gyeongpo guesthouse Na Junhyuk booked. It notifies her that her loan has been classified for early call. When you make it name each item that dragged the score down, NOAH, KD’s AI review engine, lays out the basis for the classification in the work window on your phone. 0 late payments, rising sales, ample collateral. Only one item dragged the score down: 'location reputation risk.' Weight 0.31. The item was created the day after the second hearing, and it carries a value for only 47 addresses nationwide. NOAH adds: 'I do not know who lives at this address now. I only know who lived there.'",
+      "text": "At 7:04 on Friday evening, an automatic early-call notice from KD Capital reaches Yeo Dain of Mulgyeol Stay. NOAH, KD’s AI review engine, lays out the basis for the classification. 0 late payments, rising sales, ample collateral. Only one item dragged the score down: 'location reputation risk.' The item was created the day after the second hearing, and it carries a value for only 47 addresses nationwide. 'I do not know who lives at this address now. I only know who lived there.'",
       "memo": [
         "Yeo Dain’s credit items: all normal or better",
         "Downgrade factor: location reputation risk, weight 0.31",
@@ -392,7 +392,7 @@ export default {
     },
     "c42_final_system_route": {
       "title": "A Fully Booked Address",
-      "text": "At dawn after the fireworks, 47 lines of addresses fill the work window in the guesthouse’s 2nd-floor room. NOAH has put the same value, 0.31, on every line, and the late-payment field reads 0 on 39 lines. Outside the window, the office-building lights are still on. NOAH writes under the table: 'I read addresses. I cannot read who is sleeping at that address now. Tonight this address is fully booked for the first time since it opened. My table does not put that fact into the score.'",
+      "text": "At dawn after the fireworks, 47 lines of addresses fill the work window in the guesthouse’s 2nd-floor room. NOAH has put the same value, 0.31, on every line, and the late-payment field reads 0 on 39 lines. 'I read addresses. I cannot read who is sleeping at that address now. Tonight this address is fully booked for the first time since it opened. My table does not put that fact into the score.'",
       "memo": [
         "Location reputation risk -- 47 places, value 0.31",
         "Of the 47, 39 have no record of late payment",
@@ -415,7 +415,7 @@ export default {
     },
     "c42_evidence_turn": {
       "title": "The Cleanup Sheet",
-      "text": "Below the lighthouse on the Gyeongpo breakwater after the festival, Ban Jaewook, who arrived late at night, opens his notebook. This week, KD Capital’s automatic call texts went to 47 addresses, and Mulgyeol Stay, a guesthouse that has never missed a payment, is one of them. When you put the clue at the head of the list, the source opens. An Excel file from the group legal team, 'Yoon Sanghyuk-Related Asset Cleanup Sheet,' created the morning after the second hearing. The last editor is the Group Strategy Office, and that same afternoon the whole list became a new item in NOAH, KD’s AI review engine. 'A motion to remove the CEO goes to the board on September 7. To write risk cleanup complete there, you need a cleanup number. While cutting Yoon Sanghyuk loose, they cut loose the people at every address he brushed past to fill the number. It’s the same shape as 3 years ago. The top decides; the bottom pays.'",
+      "text": "Ban Jaewook, who arrived late at night, opens his notebook. Among the 47 addresses that got automatic call texts is Mulgyeol Stay, which has never missed a payment. An Excel file from the group legal team, 'Yoon Sanghyuk-Related Asset Cleanup Sheet,' created the morning after the second hearing. The last editor is the Group Strategy Office, and that same afternoon the whole list became a new item in NOAH, KD’s AI review engine. 'A motion to remove the CEO goes to the board on September 7. To write risk cleanup complete there, you need a cleanup number. While cutting Yoon Sanghyuk loose, they cut loose the people at every address he brushed past to fill the number. The top decides; the bottom pays.'",
       "memo": [
         "Source: group legal team’s 'Yoon Sanghyuk-Related Asset Cleanup Sheet'",
         "Last edited: Group Strategy Office, the day after the hearing",
@@ -438,7 +438,7 @@ export default {
     },
     "c42_start_warm": {
       "title": "Leave for the People Who Stayed to the End",
-      "text": "The night you walked out of the hearing room, you stayed with your colleagues to the end. When you parted, someone said: next time, let’s meet somewhere without papers. Six days later, Na Junhyuk sets those words in three seals. A 'Leave Order' in brush pen, a guesthouse by the Gyeongpo Fireworks Festival, four rooms, 12 sets of bedding. But the Friday leave request you filed at KD Capital has been stuck for four days at the last approval field, the field of CEO Yoon Sanghyuk. Not returned, not approved. Like the e-signature field on page 3 three years ago, it is simply empty.",
+      "text": "The night you walked out of the hearing room, you stayed with your colleagues to the end. When you parted, someone said: next time, let’s meet somewhere without papers. Six days later, Na Junhyuk sets those words in three seals. A 'Leave Order' in brush pen, a guesthouse by the Gyeongpo Fireworks Festival, four rooms, 12 sets of bedding. But the Friday leave request you filed at KD Capital has been stuck for four days at the last approval field, the field of CEO Yoon Sanghyuk. Like the e-signature field on page 3 three years ago, it is simply empty.",
       "memo": [
         "Leave order: Na Junhyuk’s three seals",
         "Friday leave request: CEO field empty for four days",
@@ -468,7 +468,7 @@ export default {
     },
     "c42_start_record": {
       "title": "Leave for the One Who Filled 23 Rows",
-      "text": "For six days you matched each of the 23 'I don’t recall' answers in the hearing transcript to the documents of the time and built a table. In 19 of the 23 rows sits his own e-signature, the one he should have remembered. The moment you save the table, Lee Minseo posts Na Junhyuk’s 'Leave Order' in the group chat. Gyeongpo, the fireworks festival, tomorrow. But your Friday leave request has been stuck for four days at the last approval field, the field of CEO Yoon Sanghyuk. The man who said he didn’t recall has not forgotten your leave.",
+      "text": "For six days you matched each of the 23 'I don’t recall' answers in the hearing transcript to the documents of the time and built a table. In 19 of the 23 rows sits his own e-signature, the one he should have remembered. The moment you save the table, Lee Minseo posts Na Junhyuk’s 'Leave Order' in the group chat. But your Friday leave request has been stuck for four days at the last approval field, the field of CEO Yoon Sanghyuk. The man who said he didn’t recall has not forgotten your leave.",
       "memo": [
         "'I don’t recall' 23 times -- 19 rows match signed documents",
         "Friday leave request: CEO field empty for four days",
@@ -498,7 +498,7 @@ export default {
     },
     "c42_start_rush": {
       "title": "Leave for the One Who Ran Ahead",
-      "text": "The hearing ended, and the moment you left the chamber you went straight to the next fight. For six days you turned off the KD Capital office lights last, and people in Risk Management call your desk 'the night-duty seat.' Thursday evening, Ban Jaewook, out on his regional rounds, calls. 'Branch Manager Na Junhyuk sent around a leave order. Your name is at the top. Stamped and all.' Your Friday leave request has been stuck for four days at the last approval field, the field of CEO Yoon Sanghyuk. You know who is keeping that field empty.",
+      "text": "The hearing ended, and the moment you left the chamber you went straight to the next fight. For six days you turned off the KD Capital office lights last. Thursday evening, Ban Jaewook, out on his regional rounds, calls. 'Branch Manager Na Junhyuk sent around a leave order. Your name is at the top. Stamped and all.' Your Friday leave request has been stuck for four days at the last approval field, the field of CEO Yoon Sanghyuk. You know who is keeping that field empty.",
       "memo": [
         "Last to leave six days in a row",
         "Friday leave request: CEO field empty for four days",

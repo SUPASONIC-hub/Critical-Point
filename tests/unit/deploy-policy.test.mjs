@@ -23,6 +23,7 @@ import {
   shellCacheProblems,
   siteHeaderProblems,
   wildcardHostProblems,
+  anySupabaseProject,
 } from "../../scripts/deploy-policy.mjs";
 
 const yaml = readFileSync("render.yaml", "utf8");
@@ -53,10 +54,12 @@ test("render.yaml declares every header the live check asks for", () => {
 });
 
 test("no rule can leave render.yaml without the offline check saying so", () => {
-  // It used to ask for thirteen of the fifteen: the Cross-Origin-Resource-Policy
+  // It used to ask for thirteen of the fifteen (nineteen since the English and
+  // Japanese start pages, 11-03; twenty-one with their `/en/*` and `/ja/*`,
+  // 11-04): the Cross-Origin-Resource-Policy
   // on /assets/* and the manifest's Content-Type could be deleted and pass.
   const headers = readRenderYamlHeaders(yaml);
-  assert.equal(headers.length, 15, "a rule added to render.yaml is added to the README's table and to renderYamlHeaderProblems");
+  assert.equal(headers.length, 21, "a rule added to render.yaml is added to the README's table and to renderYamlHeaderProblems");
   for (const header of headers) {
     assert.notDeepEqual(renderYamlHeaderProblems(withoutRule(header.path, header.name)), [], `${header.path} ${header.name} can be deleted unnoticed`);
   }
@@ -220,14 +223,20 @@ test("a release names the backend its own CSP lets it call", () => {
   assert.match(backendOriginProblems('const u=void 0;', live)[0], /built without VITE_SUPABASE_URL/);
   // Built for another project.
   assert.equal(backendOriginProblems('const u="https://zzzzzzzz.supabase.co";', live).length, 1);
-  // render.yaml can only say the wildcard; the placeholder build matches it.
-  assert.deepEqual(backendOriginProblems('const u="https://e2e.supabase.co";', readRenderYamlCsp(yaml)), []);
-  assert.equal(backendOriginProblems('const u="https://e2e.example.com";', readRenderYamlCsp(yaml)).length, 1);
+  // render.yaml names the production project; a local build is read against
+  // any project, so the placeholder build matches it and production's own
+  // address does too.
+  const built = anySupabaseProject(readRenderYamlCsp(yaml));
+  assert.match(built, /connect-src 'self' https:\/\/\*\.supabase\.co /);
+  assert.deepEqual(backendOriginProblems('const u="https://e2e.supabase.co";', built), []);
+  assert.deepEqual(backendOriginProblems('const u="https://kiazzdbpkazwqhhimdib.supabase.co";', readRenderYamlCsp(yaml)), []);
+  assert.equal(backendOriginProblems('const u="https://e2e.supabase.co";', readRenderYamlCsp(yaml)).length, 1);
+  assert.equal(backendOriginProblems('const u="https://e2e.example.com";', built).length, 1);
   assert.match(backendOriginProblems("x", "default-src 'self'; connect-src 'self'")[0], /names no backend origin/);
 });
 
 test("a backend named outside the entry script is caught before the deploy, not after", () => {
-  const csp = readRenderYamlCsp(yaml);
+  const csp = anySupabaseProject(readRenderYamlCsp(yaml));
   const entry = "/assets/index-Cdp_ULJ-.js";
   const withBackend = 'const u="https://e2e.supabase.co";';
   // Where it is today.
@@ -246,9 +255,8 @@ test("a wildcard host is named where the page may send data", () => {
   assert.deepEqual(wildcardHostProblems("connect-src 'self' https://abcdefgh.supabase.co"), []);
   assert.equal(wildcardHostProblems("connect-src 'self' https://*.supabase.co").length, 1);
   assert.equal(wildcardHostProblems("connect-src 'self'; form-action https://*.example.com").length, 1);
-  // render.yaml cannot name the project, so the file is where the wildcard is
-  // written down and the live header is where it is refused.
-  assert.equal(wildcardHostProblems(readRenderYamlCsp(yaml)).length, 1);
+  // render.yaml names the project's own host, as production does (2026-11-03).
+  assert.deepEqual(wildcardHostProblems(readRenderYamlCsp(yaml)), []);
 });
 
 test("the service worker's file is asked for again every time, like the page", async () => {

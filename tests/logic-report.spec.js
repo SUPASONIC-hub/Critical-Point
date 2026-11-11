@@ -55,7 +55,8 @@ test.beforeEach(async ({ page }) => {
  */
 function closedCase(caseId, logicRecord, extra = {}) {
   const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
-  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 2 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+  // RULES_MARK 4 (C-3 and C-4): a case closed at 3 is from the table before and keeps the season off the ranking.
+  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 4 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["position", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
   return { ...summary, ...(logicRecord ? atLogicTable : {}), ...extra };
 }
 
@@ -78,13 +79,13 @@ async function collectPostedRows(page, answerFor = () => null) {
 /**
  * Six cases with a record: 사건 03 the hottest by far (a mean tier of 2.5, which
  * the finale played here by cashing at once cannot reach), five of its eight
- * windows on 위험 다루기.
+ * windows held toward the people (사람 쪽, C-3: the streak is held on a direction).
  */
 function recordedSeason(extra = {}) {
   return {
     case01: closedCase("case01", {}),
     case02: closedCase("case02", { breaks: 1 }),
-    case03: closedCase("case03", { windows: 8, heat: 20, peak: 3, top: ["risk", 5], grows: 3, switches: 1, breaks: 0, busts: 4, best: 9 }),
+    case03: closedCase("case03", { windows: 8, heat: 20, peak: 3, top: ["people", 5], grows: 3, switches: 1, breaks: 0, busts: 4, best: 9 }),
     case04: closedCase("case04", {}, extra),
     case05: closedCase("case05", { keeps: 2 }),
     case06: closedCase("case06", { best: 4 }),
@@ -163,7 +164,7 @@ test("the closing report names the hottest case, the score and the rank still to
   await expect(panel.locator("span[lang='en']")).toHaveText("LOGIC HOLD");
   const lines = panel.locator("p");
   await expect(lines).toHaveCount(3);
-  await expect(lines.nth(0)).toHaveText(`열기가 가장 높았던 사건은 사건 03 「${HOT_CASE.title}」입니다. 그 사건의 8판 가운데 5판을 '위험 다루기'로 닫았습니다.`);
+  await expect(lines.nth(0)).toHaveText(`열기가 가장 높았던 사건은 사건 03 「${HOT_CASE.title}」입니다. 그 사건의 8판 가운데 5판을 '사람 쪽'으로 닫았습니다.`);
   // The finale's own window is in the score, so the number is the page's; its shape is fixed.
   await expect(lines.nth(1)).toHaveText(/^논리 유지력 \d{1,3}점 · 최고 논리 콤보 9 · 순위는 시즌 기록이 50건 모이면 나옵니다\.$/);
   await expect(lines.nth(2)).toHaveText(LOGIC_REPORT_COPY.caption);
@@ -172,9 +173,12 @@ test("the closing report names the hottest case, the score and the rank still to
   // Asked once, and with nothing of the season in the question.
   expect(asked).toEqual(["{}"]);
 
-  // It is the panel after the epilogue, in the epilogue's own frame.
-  await expect(page.locator(".result-page > section.ending-epilogue-panel")).toHaveCount(2);
+  // It is the panel after the epilogue, in the epilogue's own frame. The line
+  // that the side slot opened (E-11, shown while a side case is listed) comes
+  // after it.
+  await expect(page.locator(".result-page > section.ending-epilogue-panel")).toHaveCount(3);
   await expect(page.locator(".result-page > section.ending-epilogue-panel").nth(1)).toHaveAttribute("data-testid", "logic-report");
+  await expect(page.locator("section[data-testid='logic-report'] + section")).toHaveAttribute("data-testid", "side-slot-opened");
   await expect(page.locator("section[aria-label='엔딩 에필로그'] + section")).toHaveAttribute("data-testid", "logic-report");
   const overflow = await page.evaluate(() => ({ clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
   expect(overflow.scrollWidth, "the panel does not widen the page").toBeLessThanOrEqual(overflow.clientWidth + 1);

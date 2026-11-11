@@ -18,11 +18,12 @@
  * the run's `echo` and the screens read it; the record's own shape and the
  * season number, which the entry chunk's intro reads, are in seasonRecord.js.
  */
+import { getMemoryLine } from "../advancedSystems.js";
 import { getEndingBook } from "./endingBook.js";
 import { fill } from "../locale.js";
 import W from "../copy/seasonLines.js";
 import { openingEcho } from "./openingState.js";
-import { countRun, isPlainObject, normalizeLast, normalizeSeasonRecord, VERDICT_NAMES } from "./seasonRecord.js";
+import { countRun, isPlainObject, normalizeLast, normalizeSeasonRecord } from "./seasonRecord.js";
 import { getVerdictKey } from "../verdictBranch.js";
 
 export { getSeasonRound, normalizeSeasonRecord, SEASON_RECORD_KEY, VERDICT_NAMES } from "./seasonRecord.js";
@@ -122,22 +123,8 @@ export function getSeasonCarry(record, memory = null) {
   return { round: Math.max(current.seasons, 1) + 1, ...last, echo: getOpeningEcho(last.verdict) };
 }
 
-/**
- * How the start screen's NEW GAME+ panel names a finished season
- * (NEWGAMEPLUS 문구 질문 10, all (1)), written into the record when the season
- * is counted (advancedSystems.getPastRunMemory reads it). The verdict is
- * named only for the three the result screen names (봉인·개혁·폭로); a
- * collapse is its ending's own name, and an open verdict the ending alone,
- * with no promise of a line, since that season opens on the plain one. The
- * second sentence is conditional because the plain start, on the same screen,
- * carries nothing. NEW GAME+ is held together (a no-break space): with
- * `keep-all` the phone broke the line between NEW and GAME+.
- */
-export function getMemoryLine({ endingLabel, verdict }) {
-  // The ruling's short name in the page's language (src/copy/seasonLines.js); VERDICT_NAMES stays the record's Korean.
-  const named = verdict && verdict !== "collapse" && verdict !== "open" && Object.hasOwn(VERDICT_NAMES, verdict) ? `${W.verdicts[verdict] ?? VERDICT_NAMES[verdict]} · ` : "";
-  return fill(W.memory.line, { named, ending: endingLabel, carry: verdict && verdict !== "open" ? W.memory.carry : "" });
-}
+// How the start screen names a finished season: advancedSystems.js, where the panel draws it.
+export { getMemoryLine };
 
 /**
  * The finale's comparison line (NEWGAMEPLUS 문구 질문 13, all (1)), or null:

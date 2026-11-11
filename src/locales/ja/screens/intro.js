@@ -1,6 +1,8 @@
 /** src/copy/intro.js in Japanese: the start screen and its drawers. */
 export default {
+  pageTitle: "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される",
   subtitle: "45秒ごとに、あなたの判断基準が記録される",
+  titleReading: "トリガーラボ",
   premise: "3年前、あなたは融資にただひとり反対した。融資は実行され、あなたは米国系資本が筆頭株主のKD金融グループの地下、トリガーラボへ下りてきた。今日届いた最初のファイルに、あの融資番号が残っている。長く抱えた条件は、次の事件の圧力として戻る。物語は少し前、見習い最後の課題から始まる。",
   startButton: "プロローグを始める",
   briefingLink: "先にブリーフィングを見る",
@@ -38,6 +40,7 @@ export default {
     identity: "分析官の呼び名",
     nameLabel: "分析官の名前",
     namePlaceholder: "名前を入力してください",
+    rankTitle: "記録の称号 {title}",
     newGamePlus: "{game}を始める",
   },
   pastRunLabel: "NEW GAME+ 前回の記録",
@@ -100,6 +103,7 @@ export default {
     end: "にあります。",
     playtestNotice:
       "事件の結果、選択ログ、応答時間、画面の言語、送ったフィードバック、エラー報告が、この端末のランダムな識別番号とともに研究用に保存され、180日後に消去されます。名前はリモートに保存せず、接続元のアドレスはリクエスト回数の制限にだけ使います。",
+    hallOfFameNotice: "検査を通過した上位のシーズンは、実行番号とスコアで名誉の殿堂に長く残ることがあります。",
     deletion: {
       cloud: " オンライン保存は「別の端末で続ける」パネルから自分で消せます。",
       before: "記録の削除は ",
@@ -143,5 +147,13 @@ export default {
     entering: "{case}に入室中",
     first: "最初の判断条件を同期中",
     syncing: "{case}の判断条件を同期中",
+  },
+  sideSlot: {
+    label: "番外事件",
+    heading: "番外事件 · ランキング対象外 · {book}",
+    text: "シーズンとは別に遊ぶ短い事件です。シーズンのセーブとランキングはそのままです。",
+    book: "番外 {closed}/{total}",
+    resumable: " · 続きから",
+    closed: " · 完了",
   },
 };

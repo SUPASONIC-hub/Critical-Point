@@ -17,6 +17,7 @@
 import { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "../appCopy.js";
 import { easyCognitionLabels, easyResourceLabels } from "../playerLanguage.js";
 import { CASE_SEQUENCE, caseObjectives, seasonCasesBase } from "../gameCases.js";
+import { SIDE_CASES } from "../nodes/sidePacks.js";
 
 // Hangul, and the corner brackets only Korean copy uses (「」『』).
 const HANGUL = /[가-힣ㄱ-ㅣ「-』]/;
@@ -43,6 +44,15 @@ export function overlayWords(target, words) {
         // label: what the observer reads of a choice
         // (gameLogic.js `choiceWords`) is the same card in every language.
         if (key === "label" && "next" in target && !("sourceLabel" in target)) target.sourceLabel = target[key];
+        // A scene (the one with `choices`) keeps its Korean place and clock
+        // too: the plate picks its room, its light and its seed from them
+        // (src/scenePlate.js `getScenePlate`), so c46_cage is the server room
+        // and the same server room in every language, not the desk an English
+        // place falls back to.
+        if ((key === "place" || key === "clock") && "choices" in target) {
+          const source = key === "place" ? "sourcePlace" : "sourceClock";
+          if (!(source in target)) target[source] = target[key];
+        }
         target[key] = value;
       }
     } else {
@@ -59,6 +69,8 @@ const SHELL_TABLES = {
   appCopy: { INSTALL_HINT_COPY, playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals },
   playerLanguage: { easyCognitionLabels, easyResourceLabels },
   gameCases: { caseObjectives, seasonCasesBase },
+  // E-11 번외 사건: the side list's label and title, read by the start screen's slot.
+  sidePacks: { SIDE_CASES },
 };
 
 /**
@@ -170,10 +182,16 @@ export function localizeCase(caseId, data, index, words, speakers = {}) {
  * cannot be fetched, or one after the preview keeps its Korean scenes (and,
  * after the preview, its Korean speaker names).
  */
+// A language's file for a season case (`localizeCaseData`) or a side case
+// (`localizeSidePack`): one import map for both, written once (two globs would
+// carry the map twice), and read only when called, since outside the bundler
+// (the unit tests) there is no glob to read.
+const nodeFile = (id) => language && id && import.meta.glob("./*/nodes/*.js")[`./${language}/nodes/${id}.js`];
+
 export function localizeCaseData(caseId, data, index) {
   if (!inPreview(caseId)) return data;
   const speakers = dictionary?.speakers;
-  const load = language && import.meta.glob("./*/nodes/*.js")[`./${language}/nodes/${caseId}.js`];
+  const load = nodeFile(caseId);
   if (!load) return localizeCase(caseId, data, index, null, speakers);
   return load().then(
     (module) => localizeCase(caseId, data, index, /** @type {{ default: object }} */ (module).default, speakers),
@@ -181,7 +199,39 @@ export function localizeCaseData(caseId, data, index) {
   );
 }
 
-const api = { localizeTables, previewText, roleName, speakerName, localizeCaseData };
+/**
+ * E-11 번외 사건: a side pack (src/nodes/sideNN.js) as it arrives, in the
+ * loaded language -- its scenes and its endings from
+ * src/locales/<lang>/nodes/sideNN.js, the same folder and the same glob as a
+ * season case's, and its speakers' names. A side case is outside the season,
+ * so no preview holds it back; its label and title are the side list's
+ * (`copy.sidePacks`, above). With no file, or one that cannot be fetched, it
+ * keeps its Korean.
+ */
+export function localizeSide(pack, words, speakers = {}) {
+  for (const scene of Object.values(pack?.nodes ?? {})) {
+    if (speakers[scene?.speaker]) scene.speakerName = speakers[scene.speaker];
+  }
+  if (words) overlayWords(pack, { nodes: words.nodes, outcomes: words.outcomes });
+  return pack;
+}
+
+export function localizeSidePack(pack) {
+  const speakers = dictionary?.speakers;
+  const load = nodeFile(pack?.id);
+  if (!load) return localizeSide(pack, null, speakers);
+  return load().then(
+    (module) => localizeSide(pack, /** @type {{ default: object }} */ (module).default, speakers),
+    () => localizeSide(pack, null, speakers),
+  );
+}
+
+/** The page's title in this language: the start screen's `pageTitle` (src/copy/intro.js), as the start page in its folder carries it. */
+function pageTitle() {
+  return dictionary?.copy?.screens?.intro?.pageTitle ?? null;
+}
+
+const api = { localizeTables, pageTitle, previewText, roleName, speakerName, localizeCaseData, localizeSidePack };
 
 /** A language's dictionary, laid over the shell's tables. Resolves to what src/locale.js calls, or null for a language with no dictionary. */
 export function loadDictionary(lang) {

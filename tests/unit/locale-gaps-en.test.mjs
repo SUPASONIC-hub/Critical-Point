@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 import { assertFarCallbacksLand, assertNoHangul, collectLines, collectRunLines, layOver } from "./locale-gaps.shared.mjs";
 import { JUDGEMENT_HABITS } from "../../src/judgementHabit.js";
-import { getAnalystTitle } from "../../src/analystTitle.js";
+import { ANALYST_TITLE_STEPS, getAnalystTitle } from "../../src/analystTitle.js";
 import { openingEcho, OPENING_ECHO } from "../../src/state/openingState.js";
 import { buildSceneBeat, getEcho } from "../../src/gameLogic.js";
 import { echoReplies as seasonEchoes } from "../../src/gameData.js";
@@ -22,6 +22,7 @@ import { speakers } from "../../src/locales/en/index.js";
 test("a Korean page keeps its habits, titles and opening line", () => {
   assert.equal(JUDGEMENT_HABITS.find((habit) => habit.id === "stepping-stone").title, "돌다리 두들김형");
   assert.equal(getAnalystTitle({ currentCase: "case18" }), "선임 분석관");
+  assert.deepEqual(ANALYST_TITLE_STEPS.map((step) => step.title), ["수습 분석관", "분석관", "선임 분석관", "책임 분석관", "수석 분석관"]);
   assert.equal(openingEcho(), OPENING_ECHO);
   // The second pass: the scene beat, the default reply and name, the share tail.
   assert.equal(
@@ -50,7 +51,10 @@ test("a Korean page keeps its habits, titles and opening line", () => {
 test("with the English dictionary laid over, nothing the swept modules print is Korean", async () => {
   const tables = await layOver("en");
   assertNoHangul(collectLines(tables), "en");
-  assert.equal(JUDGEMENT_HABITS.find((habit) => habit.id === "stepping-stone").title, "Look-Before-You-Leap Type");
+  assert.equal(JUDGEMENT_HABITS.find((habit) => habit.id === "stepping-stone").title, "Look-Before-You-Leap");
+  // The five record titles (C1), in step order.
+  assert.deepEqual(ANALYST_TITLE_STEPS.map((step) => step.title), ["Trainee Analyst", "Analyst", "Senior Analyst", "Lead Analyst", "Chief Analyst"]);
+  assert.equal(getAnalystTitle({ finishedSeason: true }), "Chief Analyst");
   // The card draws the name at 76px down to 48px on two lines; no English name is longer than the longest so far.
   for (const habit of JUDGEMENT_HABITS) assert.ok(habit.title.length <= 26, `${habit.id}: "${habit.title}" fits the card`);
   // The second pass: what the runtime writes as a run is played, and the far callbacks on the English scenes.

@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c36_start": {
       "title": "The Card from Hannam-dong",
-      "text": "You open the card. It is an invitation the chairman’s office already sent by text yesterday. 'Sunday, 19:00, Hannam-dong. Let’s have a meal. Seo Dokyung.' It is the name of the chairman of KD Financial Group. The same morning, Yoon Sanghyuk gets his second prosecutors’ summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). When you take the card down to the 1st floor, Han Seoyun, on standby assignment (an HR measure that leaves someone without duties while waiting for a next post), is waiting with two iced coffees. She turns the card over and doesn’t even smile. 'This isn’t the chairman’s handwriting. It’s his chief of staff’s. He has other people write even his own name.' She gives her straw one turn. 'Two kinds of people get called to that table. The ones who get a seat, and the ones who give a seat up.'",
+      "text": "'Sunday, 19:00, Hannam-dong. Let’s have a meal. Seo Dokyung.' An invitation from the chairman of KD Financial Group. The same morning, Yoon Sanghyuk gets his second prosecutors’ summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). On the 1st floor, Han Seoyun, on standby assignment (an HR measure that leaves someone without duties while waiting for a next post), is waiting with two iced coffees. 'This isn’t the chairman’s handwriting. It’s his chief of staff’s. Two kinds of people get called to that table. The ones who get a seat, and the ones who give a seat up.'",
       "memo": [
         "Invitation: Sunday, July 26, 19:00, the chairman’s home in Hannam-dong",
         "Yoon Sanghyuk -- breach of trust over the Haeon Partners advisory fees, second summons",
@@ -39,7 +39,7 @@ export default {
     },
     "c36_garden": {
       "title": "Hold the Ladder",
-      "text": "Kang Taemin’s old 1-ton truck climbs the hill in Hannam-dong. He swapped tonight’s night shift with a coworker to drive you, and he cuts the engine at the gate. 'This is as far as I go. I’ve got two cup noodles.' Inside the gate, the heat wave turns cool, as if it were a lie. Under a persimmon tree at the end of the stone path, an old man in a straw hat stands on a ladder, pruning branches. You took him for the gardener; he looks down at you. 'Hold the ladder for me. My father planted this tree, so I can’t leave it to anyone else.' It is Chairman Seo Dokyung. Between snips of the shears, he asks. 'I hear Mangwon Market flooded in the rain ten days ago. Is the rice cake shop all right?' He already knows about Moon Gaeul’s shop, and how many emergency loans NOAH declined. 'A company runs on memory, not on people. And I happen to remember quite a lot.'",
+      "text": "'This is as far as I go. I’ve got two cup noodles.' Kang Taemin cuts the engine. Under the persimmon tree, an old man in a straw hat stands on a ladder, pruning branches. You took him for the gardener; he looks down at you. 'Hold the ladder for me. My father planted this tree, so I can’t leave it to anyone else.' It is Chairman Seo Dokyung. Between snips of the shears, he asks. 'I hear Mangwon Market flooded in the rain ten days ago. Is the rice cake shop all right? A company runs on memory, not on people. And I happen to remember quite a lot.'",
       "memo": [
         "Persimmon tree, 61 years old -- planted by the chairman’s father",
         "First topic the chairman raised: the Mangwon Market flood",
@@ -70,7 +70,7 @@ export default {
     },
     "c36_table": {
       "title": "A Dish with Too Long a Name",
-      "text": "The young chef Eun Jaeha sets down the first plate and recites. '72-hour aged Hanwoo striploin on a purée of new Jeju potatoes, with Sancheong green plum syrup and charred scallion ash.' Chairman Seo Dokyung nods. 'The first one, then.' Through the fifth plate, he calls them only by number. Behind him, chief of staff Yeo Minkyu, whispering from the menu card, reads 'scallion ash' as 'scallion rash,' and the chef’s eyebrows go up. At the sixth plate, the chairman sets down his fork. 'Yoon Sanghyuk alone will do. The prosecutors and the papers both want one name. We give them that name, and the group declares its reform complete. You sit in the seat that confirms that declaration.' That seat is compliance officer (the person inside a company who watches whether it follows the law and its rules). It is the price of cutting off the tail (putting all the blame on one person below so those above walk away).",
+      "text": "'72-hour aged Hanwoo striploin on a purée of new Jeju potatoes, with Sancheong green plum syrup and charred scallion ash.' At chef Eun Jaeha’s introduction, Chairman Seo Dokyung nods. Through the fifth plate, he calls them only by number. At the sixth plate, the chairman sets down his fork. 'Yoon Sanghyuk alone will do. We give them that name, and the group declares its reform complete. You sit in the seat that confirms that declaration.' That seat is compliance officer (the person inside a company who watches whether it follows the law and its rules). It is the price of cutting off the tail (putting all the blame on one person below so those above walk away).",
       "memo": [
         "Table for 12 -- 2 places set",
         "Nine dishes; the chairman calls them by number",
@@ -101,7 +101,7 @@ export default {
     },
     "c36_father": {
       "title": "His Father’s Savings House",
-      "text": "Dessert is a peach the chairman peeled himself. He leads you out to a bench under the persimmon tree and holds out an old bankbook. Stamped on the cover: 'Seomun Mutual Savings & Finance.' A mutual savings and finance company (a neighborhood lender, like today’s savings banks). 'It was my father’s shop. He took the deposits of a Daegu market’s merchants and lent them to the merchants. It started with one line of his name on a guarantee for a friend’s company.' When that company collapsed, a line formed in front of the savings house, and his father went from depositor to depositor, house by house, bowing to each, he says. 'He died two years later. I was nineteen.' Peach juice runs down his wrist and he doesn’t wipe it. 'Since then I don’t write my name on paper. The one who signs ends up paying for everything.' His voice wavers for a moment, then comes right back. 'So this time, too, one name will do.'",
+      "text": "Dessert is a peach Chairman Seo Dokyung peeled himself. He holds out an old bankbook. Stamped on the cover: 'Seomun Mutual Savings & Finance.' A mutual savings and finance company (a neighborhood lender, like today’s savings banks). 'It was my father’s shop. It started with one line of his name on a guarantee for a friend’s company.' When that company collapsed, a line formed in front of the savings house, and his father went from depositor to depositor, house by house, bowing to each, he says. 'He died two years later. I was nineteen. Since then I don’t write my name on paper. The one who signs ends up paying for everything. So this time, too, one name will do.'",
       "memo": [
         "Seomun Mutual Savings & Finance -- closed in 1980",
         "The chairman’s father: one signed line on a guarantee; died 2 years later",
@@ -132,7 +132,7 @@ export default {
     },
     "c36_final": {
       "title": "The Space Kept for a Frame",
-      "text": "When you return to the table, the plates are cleared and two sheets of paper lie there. A proposal appointing a compliance officer (the person inside a company who watches whether it follows the law and its rules), and a reform announcement dated next Monday. The signature line at the bottom of the appointment does not carry Chairman Seo Dokyung’s name. The acting board chair’s name is printed there. The chairman sets a peach pit on his plate. 'It goes to the board next Monday. Yoon Sanghyuk steps down on Monday, and the group hands its materials to the prosecutors first. Your first task can be the round 2 compensation criteria and the 212. Isn’t that what you wanted?' For the first time he looks you straight in the eye. 'One name makes things easier for thousands. I wish it had been that way in my father’s day.' Yeo Minkyu lays a pen across the table.",
+      "text": "The two sheets are a proposal appointing a compliance officer (the person inside a company who watches whether it follows the law and its rules), and a reform announcement dated next Monday. The signature line of the appointment carries not Chairman Seo Dokyung’s name but the acting board chair’s, printed. 'It goes to the board next Monday. Yoon Sanghyuk steps down on Monday, and the group hands its materials to the prosecutors first. Your first task can be the round 2 compensation criteria and the 212. Isn’t that what you wanted? One name makes things easier for thousands. I wish it had been that way in my father’s day.' Yeo Minkyu lays a pen across the table.",
       "memo": [
         "Compliance officer appointment -- signature line: acting board chair",
         "Reform announcement: Monday, August 3, sole blame on Yoon Sanghyuk",
@@ -161,7 +161,7 @@ export default {
     },
     "c36_aftershock": {
       "title": "The Truck Outside the Gate",
-      "text": "The gate closes behind the table that wanted to trade Yoon Sanghyuk’s one name for the compliance officer’s seat. Kang Taemin’s truck goes down the hill in Hannam-dong. It is past eleven at night, and even with the windows open the wind is hot. Rice cakes wrapped in plastic come out of the glove box. Moon Gaeul sent them with Kang Taemin in the afternoon, saying, 'Dinner at the chairman’s won’t fill you up.' As you take a bite, Kang Taemin speaks with his eyes on the road. 'Whatever you picked in there today, I’m going to work again tomorrow. So it’s okay.' While you wait at a light, your phone rings. It is Lee Minseo. 'On the KD Data Lab server, the Trigger Lab response records folder was opened three times tonight alone. The account that opened it has no name. An account without a name isn’t supposed to be able to exist.'",
+      "text": "The gate closes, and Kang Taemin’s truck goes down the hill in Hannam-dong. Rice cakes wrapped in plastic come out of the glove box. Moon Gaeul sent them with Kang Taemin, saying, 'Dinner at the chairman’s won’t fill you up.' Kang Taemin speaks with his eyes on the road. 'Whatever you picked in there today, I’m going to work again tomorrow. So it’s okay.' While you wait at a light, Lee Minseo calls. 'On the KD Data Lab server, the Trigger Lab response records folder was opened three times tonight alone. The account that opened it has no name. An account without a name isn’t supposed to be able to exist.'",
       "memo": [
         "Left Hannam-dong 23:12",
         "Moon Gaeul’s rice cakes -- sent with Kang Taemin",
@@ -185,7 +185,7 @@ export default {
     },
     "c36_phone": {
       "title": "The Lacquered Basket",
-      "text": "Chief of staff Yeo Minkyu waits in the entrance hall. He has been at Chairman Seo Dokyung’s side for 20 years, and he is known to write every sentence that goes out in the chairman’s name. He holds out a lacquered basket and a sheet of paper. 'Phones do not come to the table. And this is a formality.' It is a confidentiality pledge (a promise not to carry what you learn outside). Article 3 catches your eye. 'What is heard will not be disclosed to third parties, including investigative agencies.' Yeo Minkyu uncaps a pen and hands it to you. 'Everyone has signed. CEO Yoon too.'",
+      "text": "Chief of staff Yeo Minkyu is waiting, the man known to write every sentence that goes out in the chairman’s name. He holds out a lacquered basket and a sheet of paper. 'Phones do not come to the table. And this is a formality.' Article 3 of the confidentiality pledge (a promise not to carry what you learn outside) catches your eye. 'What is heard will not be disclosed to third parties, including investigative agencies.' Yeo Minkyu hands you a pen. 'Everyone has signed. CEO Yoon too.'",
       "memo": [
         "Phone basket -- lacquered, two compartments",
         "Pledge Article 3: no disclosure to third parties, investigators included",
@@ -208,7 +208,7 @@ export default {
     },
     "c36_draft": {
       "title": "The Third Paragraph",
-      "text": "Before dessert, Chairman Seo Dokyung goes to his study to take a call, and Yeo Minkyu shows you to a waiting room. Two A4 sheets lie face down on the table. You can’t tell whether he is pretending he forgot to clear them or really forgot. The title is 'KD Financial Group Reform Completion Announcement,' and the date is Monday, August 3. The third paragraph has this sentence. 'The new compliance officer confirmed that these measures are sufficient to prevent a recurrence.' The name field is empty. Yeo Minkyu sets down a glass of water. 'Every sentence that goes out in the chairman’s name, I write. Just this once, I wish this one weren’t mine.'",
+      "text": "While Chairman Seo Dokyung is away taking a call, two A4 sheets lie face down on the table in the waiting room. The title is 'KD Financial Group Reform Completion Announcement,' and the date is Monday, August 3. The third paragraph has this sentence. 'The new compliance officer confirmed that these measures are sufficient to prevent a recurrence.' The name field is empty. Yeo Minkyu sets down a glass of water. 'Every sentence that goes out in the chairman’s name, I write. Just this once, I wish this one weren’t mine.'",
       "memo": [
         "Reform completion announcement -- dated Monday, August 3",
         "Third paragraph: the new compliance officer’s 'confirmation'",
@@ -231,7 +231,7 @@ export default {
     },
     "c36_gate": {
       "title": "10 Minutes Outside the Gate",
-      "text": "Chairman Seo Dokyung says, 'Go think for 10 minutes outside the gate. I’ll hear your answer at the table.' Yeo Minkyu gives back your phone. In the alley outside the gate, Kang Taemin sits on the truck bed sharing cup noodles with a security guard. The guard greets you first. 'The foreman pours the water right to the line.' Your phone holds 186 messages in the group chat. Kang Taemin has been sending updates from outside the gate for three hours. When you post the table’s offer in one line, Kwon Dohyun makes a two-column table of the compliance officer’s salary and Yoon Sanghyuk’s charges and writes, 'Neither column is in the black.' Oh Jinwoo writes, 'Take it and you’re No. 1. Refuse and you’re a legend.' Do Yoonha leaves just one line. 'Watch whose name gets left out.'",
+      "text": "Chairman Seo Dokyung says, 'Go think for 10 minutes outside the gate. I’ll hear your answer at the table.' In the alley outside the gate, Kang Taemin sits on the truck bed sharing cup noodles with a security guard. The guard greets you first. 'The foreman pours the water right to the line.' Your phone holds 186 messages in the group chat. When you post the table’s offer in one line, Kwon Dohyun makes a two-column table and writes, 'Neither column is in the black.' Oh Jinwoo writes, 'Take it and you’re No. 1. Refuse and you’re a legend.' Do Yoonha leaves just one line. 'Watch whose name gets left out.'",
       "memo": [
         "186 messages in the group chat",
         "Kang Taemin and the guard -- on their second cup noodles",
@@ -254,7 +254,7 @@ export default {
     },
     "c36_phone_reaction": {
       "title": "Before the Basket",
-      "text": "Just as you are about to put your phone in the basket, a message appears on the screen. It is Yoon Seojin. 'You’re going to Hannam-dong today, right? Dad knows. He’s been staring at the clock in the living room all evening.' One more line comes. 'Dad sat at that table for 12 years. He says who sits in that chair today feels like a verdict to him. I want Dad to be punished. But I don’t want him punished alone. Is that strange?' Yeo Minkyu waits, holding the basket. In the air conditioning, the corner of the pledge lifts.",
+      "text": "Just as you are about to put your phone in the basket, a message from Yoon Seojin appears. 'You’re going to Hannam-dong today, right? Dad knows. Dad sat at that table for 12 years. He says who sits in that chair today feels like a verdict to him. I want Dad to be punished. But I don’t want him punished alone. Is that strange?' Yeo Minkyu waits, holding the basket.",
       "memo": [
         "Yoon Seojin: 'I don’t want him punished alone'",
         "Yoon Sanghyuk sat at that table for 12 years"
@@ -276,7 +276,7 @@ export default {
     },
     "c36_draft_reaction": {
       "title": "The Seventh Plate",
-      "text": "On your way out of the waiting room, the kitchen door is open. Eun Jaeha is mixing bibimbap for the staff from leftover ingredients; he sees you and takes out one more spoon. 'The long dish names are my revenge. The chairman has never once memorized one. I’ve been adding one word at a time for 3 years now.' The kitchen staff laugh. Then his spoon stops. 'My mom runs a side-dish shop in Mangwon Market. The rain ten days ago flooded all three of her fridges, and her emergency loan was declined in 0.6 seconds. A mom whose son works in the chairman’s kitchen.'",
+      "text": "The kitchen door is open. Eun Jaeha, mixing bibimbap for the staff, takes out one more spoon. 'The long dish names are my revenge. The chairman has never once memorized one. I’ve been adding one word at a time for 3 years now.' Then his spoon stops. 'My mom runs a side-dish shop in Mangwon Market. The rain ten days ago flooded all three of her fridges, and her emergency loan was declined in 0.6 seconds. A mom whose son works in the chairman’s kitchen.'",
       "memo": [
         "Why the dish names are long: the chef’s revenge",
         "Emergency loan for the chef’s mother’s shop -- declined in 0.6 seconds"
@@ -298,7 +298,7 @@ export default {
     },
     "c36_gate_reaction": {
       "title": "The Ladder 12 Years Ago",
-      "text": "With 4 of the 10 minutes left, a call comes from an unknown number. It is Yoon Sanghyuk. His voice is lighter than you expected. 'The persimmon ladder. Did you hold it for him? I held it too, 12 years ago.' He laughs briefly. 'Take it. Refuse, and someone else sits in that chair, and that someone will be less trouble than you. I’m a man who ends with one name anyway.' For a moment there is only his breathing. 'Don’t tell Seojin. She still believes I’m not alone.' He waits for your answer. Kang Taemin, drinking the broth from his cup noodles, looks at your face.",
+      "text": "With 4 of the 10 minutes left, Yoon Sanghyuk calls. 'The persimmon ladder. Did you hold it for him? I held it too, 12 years ago. Take it. Refuse, and someone else sits in that chair, and that someone will be less trouble than you. I’m a man who ends with one name anyway.' For a moment there is only his breathing. 'Don’t tell Seojin. She still believes I’m not alone.'",
       "memo": [
         "Yoon Sanghyuk held the same ladder 12 years ago",
         "'Don’t tell Seojin'"
@@ -320,7 +320,7 @@ export default {
     },
     "c36_branch_annex": {
       "title": "Nail Holes in the Annex Hallway",
-      "text": "While Chairman Seo Dokyung goes in to take a call, the real gardener, Seok Munho, coils a water hose and points with his chin. 'If you’re hot, go wait in the annex hallway. The air conditioning’s strongest there.' About forty frames hang on both walls of the annex hallway. Every one is a photo of the chairman and a single executive under this persimmon tree. Seok Munho puts down the hose. 'Forty years I’ve kept this garden, and more pictures come down than go up. Where one comes down, a nail hole stays.' He runs a finger along the wall. There are eleven nail holes.",
+      "text": "While Chairman Seo Dokyung goes in to take a call, the real gardener, Seok Munho, points with his chin toward the annex. About forty frames hang on both walls of the annex hallway. Every one is a photo of the chairman and a single executive under this persimmon tree. Seok Munho speaks. 'Forty years I’ve kept this garden, and more pictures come down than go up. Where one comes down, a nail hole stays.' Along the wall his finger traces, there are eleven nail holes.",
       "memo": [
         "Annex hallway: about 40 frames -- all under the persimmon tree",
         "11 nail holes where frames were taken down",
@@ -344,7 +344,7 @@ export default {
     },
     "c36_branch_annex_follow": {
       "title": "The Frame from 12 Years Ago",
-      "text": "One frame at the end of the hallway is unusually new. A date 12 years ago, Chairman Seo Dokyung on a ladder, and a man in his 30s gripping the ladder and looking up. Yoon Sanghyuk. Exactly the spot where you stood today. Seok Munho wipes the dust off a corner of the frame. 'That gentleman made team head three months after this was taken. But lately the chief of staff’s office has been asking for a nail puller to take this one down.' He looks at your hands. The hands that held the ladder earlier. 'The next frame’s spot is already cleared. There, where the light is on.'",
+      "text": "One frame at the end of the hallway is unusually new. A date 12 years ago, Chairman Seo Dokyung on a ladder, and a man in his 30s gripping the ladder and looking up. Yoon Sanghyuk. The spot where you stood today. Seok Munho wipes the dust off a corner of the frame. 'That gentleman made team head three months after this was taken. But lately the chief of staff’s office has been asking for a nail puller to take this one down. The next frame’s spot is already cleared. There, where the light is on.'",
       "memo": [
         "Yoon Sanghyuk’s frame -- 12 years ago, holding the ladder",
         "Promoted to team head three months after the photo",
@@ -368,7 +368,7 @@ export default {
     },
     "c36_route_system": {
       "title": "The Statistics of One Name",
-      "text": "What is Chairman Seo Dokyung’s table meant to close? You build a timeline of how the group has closed its major incidents. On the KD Capital terminal, NOAH opens KD Financial Group’s 34 major incidents of the past 20 years. 29 of them ended with one executive’s resignation and a 'reform complete' announcement. In 21 cases, the same kind of incident happened again within 3 years of the announcement. Among the decision documents of the 29 who resigned, not one bore the chairman’s name. NOAH adds a line. 'One name has been learned as the cheapest form for closing an incident. I was taught to decline loans with the same form.'",
+      "text": "NOAH opens KD Financial Group’s 34 major incidents of the past 20 years. 29 of them ended with one executive’s resignation and a 'reform complete' announcement, and in 21 the same kind of incident happened again within 3 years. Among the decision documents of the 29 who resigned, not one bore the chairman’s name. NOAH adds a line. 'One name has been learned as the cheapest form for closing an incident. I was taught to decline loans with the same form.'",
       "memo": [
         "Of 34 major incidents, 29 ended with 1 executive resigning",
         "21 recurred in the same shape within 3 years",
@@ -394,7 +394,7 @@ export default {
     },
     "c36_final_system_route": {
       "title": "The 30th Reform Complete",
-      "text": "Before dawn on the day you go to Hannam-dong, the first sentences of 29 announcements sit side by side on the NOAH terminal. Only the departing executive’s name differs; the rest is the same. The 30th announcement is still a draft, and Yoon Sanghyuk is in its name field. Chairman Seo Dokyung’s name appears nowhere in the 29. NOAH notes beneath the draft. 'Of the incidents closed with this form, 21 reopened. The form was not wrong. Closing is what the form does.'",
+      "text": "The first sentences of 29 announcements sit side by side on the NOAH terminal. Only the departing executive’s name differs; the rest is the same. In the name field of the 30th announcement, still a draft, is Yoon Sanghyuk. NOAH notes beneath the draft. 'Of the incidents closed with this form, 21 reopened. The form was not wrong. Closing is what the form does.'",
       "memo": [
         "29 incidents closed by 1 executive resigning -- 21 recurred",
         "Decision documents bearing the chairman’s name: 0",
@@ -417,7 +417,7 @@ export default {
     },
     "c36_evidence_turn": {
       "title": "The Fourth Chair",
-      "text": "When you hold the clue against the appointment dates in the HR records, one line of the group’s HR records connects. In the past 12 years, KD Financial Group has had three compliance officers (the person inside a company who watches whether it follows the law and its rules). All three were appointed within 2 weeks of a major incident, and each was invited to the Hannam-dong table just before the appointment. The conclusions of the three people’s first reports do not differ by a single letter. 'No further investigation needed.' And all three moved to advisory posts at affiliates (other companies in the same group) within 18 months. Ban Jaewook closes the notebook he was writing in. 'It isn’t a seat for watching. It’s a seat for stamping confirmation that the cut-off tail isn’t growing back. The chair that table is offering you is the fourth.'",
+      "text": "When you hold the clue against the appointment dates in the HR records, one line connects. In the past 12 years, KD Financial Group has had three compliance officers (the person inside a company who watches whether it follows the law and its rules). All three were appointed right after a major incident, and each was invited to the Hannam-dong table just before. The conclusions of their first reports do not differ by a single letter. 'No further investigation needed.' All three moved to advisory posts at affiliates (other companies in the same group) within 18 months. Ban Jaewook closes his notebook. 'It’s a seat for stamping confirmation that the cut-off tail isn’t growing back. The chair that table is offering you is the fourth.'",
       "memo": [
         "3 compliance officers -- all appointed within 2 weeks of an incident",
         "First report conclusion: 'No further investigation needed'",
@@ -434,13 +434,13 @@ export default {
           "label": "Formally submit the three appointment records to Han Jiwoo at the FSS"
         }
       },
-      "place": "KD Financial Group HQ · HR Records Room",
-      "clock": "Sunday 22:30",
+      "place": "Hannam-dong Alley · Beside Kang Taemin’s Truck",
+      "clock": "Sunday 21:40",
       "question": "The three previous compliance officers all wrote the same conclusion and left. How will you use these records?"
     },
     "c36_start_warm": {
       "title": "An Invitation the Day After the Tray Emptied",
-      "text": "In Mangwon Market after the rain, you stayed with the market people until a whole tray of rice cakes was gone. That night, when the dishes were done too, a text from Chairman Seo Dokyung’s office was waiting on your phone. The next day, Monday, July 20, Moon Gaeul brings the leftover rice cakes all the way to the KD Capital lobby. 'This is for bailing out the water. Don’t you dare pay.' On top of the cloth bundle sits a cream-colored card sent up from the security desk. 'Sunday, 19:00, Hannam-dong. Let’s have a meal. Seo Dokyung.' The chairman of KD Financial Group. The same day, Yoon Sanghyuk gets his second summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). Moon Gaeul glances at the card. 'Dinner at the chairman’s won’t fill you up. Want to take some rice cakes?'",
+      "text": "Moon Gaeul brings the leftover rice cakes all the way to the KD Capital lobby. 'This is for bailing out the water. Don’t you dare pay.' On top of the cloth bundle sits a cream-colored card sent up from the security desk. 'Sunday, 19:00, Hannam-dong. Let’s have a meal. Seo Dokyung.' The chairman of KD Financial Group. The same day, Yoon Sanghyuk gets his second summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). Moon Gaeul glances at the card. 'Dinner at the chairman’s won’t fill you up. Want to take some rice cakes?'",
       "memo": [
         "Hannam-dong invitation: Sunday, July 26, 19:00",
         "Moon Gaeul’s bundle of rice cakes -- thanks for the cleanup",
@@ -470,7 +470,7 @@ export default {
     },
     "c36_start_record": {
       "title": "Who Read the Amendment First",
-      "text": "The night the rain stopped, you compiled the 312 flood emergency loans NOAH declined into one volume, attached an amendment to the disaster loan standards, and filed it with the group compliance team. No answer came. Instead, on the morning of the next day, Monday, July 20, a cream-colored card arrives. 'Sunday, 19:00, Hannam-dong. I read your amendment with interest. Let’s have a meal. Seo Dokyung.' The chairman of KD Financial Group. The same day, Yoon Sanghyuk gets his second summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). Lee Minseo calls from KD Data Lab. 'I saw the amendment’s access log. The compliance team never opened it once, and the chairman’s office opened it four times overnight.'",
+      "text": "You compiled the 312 flood emergency loans NOAH declined into one volume and filed it, with an amendment to the disaster loan standards, with the group compliance team. Instead of an answer, a cream-colored card arrives. 'Sunday, 19:00, Hannam-dong. I read your amendment with interest. Let’s have a meal. Seo Dokyung.' The same day, Yoon Sanghyuk gets his second summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). Lee Minseo calls. 'I saw the amendment’s access log. The compliance team never opened it once, and the chairman’s office opened it four times overnight.'",
       "memo": [
         "Disaster loan standards amendment -- 312 declines",
         "Opened: compliance team 0 times, chairman’s office 4 times",
@@ -500,7 +500,7 @@ export default {
     },
     "c36_start_rush": {
       "title": "Who Went to the Closed Gate First",
-      "text": "On the night you left the decline records at the prosecutors’ office duty room, where the rice cake tray had been left too, a text came from Chairman Seo Dokyung’s office. You answered at once and went straight to Hannam-dong. The gate didn’t open. Over the intercom, chief of staff Yeo Minkyu said politely, 'The chairman meets people only on the days he has set.' The next morning, Monday, July 20, a cream-colored card is on your desk. 'Sunday, 19:00, Hannam-dong. Someone who comes early is always welcome. Still, we eat on the day we set. Seo Dokyung.' The same day, Yoon Sanghyuk gets his second summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). Ban Jaewook taps the back of the card. 'This card was written the night you turned away at the gate. Even making you wait was planned.'",
+      "text": "Last night, as soon as the text from the chairman’s office came, you went to Hannam-dong, but the gate didn’t open. This morning a cream-colored card is on your desk. 'Sunday, 19:00, Hannam-dong. Someone who comes early is always welcome. Still, we eat on the day we set. Seo Dokyung.' The same day, Yoon Sanghyuk gets his second summons on charges of breach of trust (betraying a duty and causing the company a loss). It is the case of the Haeon Partners advisory fees (money paid out as the price of advice). Ban Jaewook taps the back of the card. 'This card was written the night you turned away at the gate. Even making you wait was planned.'",
       "memo": [
         "At the Hannam-dong gate -- 1 minute on the intercom; the gate stayed shut",
         "Card written: the night you turned back",

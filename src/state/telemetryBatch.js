@@ -1,3 +1,4 @@
+import { isSideCaseId } from "../sideCases.js";
 import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 
 /**
@@ -15,8 +16,8 @@ const PACE_REFUSAL = /rate limit exceeded|limit reached|daily ceiling|at least 3
 const NOT_YET_REFUSAL = /requires every case of the run|implausibly short/;
 const MISSING_CASE_REFUSAL = /requires every case of the run/;
 // A season with a case closed before the table paid the logic streak (20261011010000),
-// or before the table of 2026-10-20 (20261020010000).
-const BEAT_TABLE_REFUSAL = /beat-table runs are not ranked|older-table runs are not ranked/;
+// or before the table of 2026-10-20 (20261020010000), or before the 판 읽기 axis (20261106030000).
+const BEAT_TABLE_REFUSAL = /beat-table runs are not ranked|older-table runs are not ranked|older-score runs are not ranked/;
 
 /**
  * What a failed send means for the row and for the rest of the batch:
@@ -48,8 +49,13 @@ const runOf = (item) => (item?.type === "case" ? item?.payload?.run_id ?? null :
  * only once every case row of its run has landed, so it goes after them, and
  * it is held -- not sent, not dropped -- while one of them is still queued.
  */
+// E-11: a side case sends nothing (설계안 4절). Its screen queues no row; a
+// row naming one is dropped here unsent, and the server refuses `sideNN` as a
+// season case besides (`is_season_case_id`).
+export const isSideCaseRow = (item) => isSideCaseId(item?.payload?.case_id);
+
 function planTelemetryBatch(items) {
-  const batch = Array.isArray(items) ? items : [];
+  const batch = (Array.isArray(items) ? items : []).filter((item) => !isSideCaseRow(item));
   return [...batch.filter((item) => !isSeasonRow(item)), ...batch.filter(isSeasonRow)];
 }
 

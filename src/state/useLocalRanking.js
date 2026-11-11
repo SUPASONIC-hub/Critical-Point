@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConfig.js";
+import { readStoredValue, writeStoredValue } from "../appConfig.js";
+import { isSideCaseId } from "../sideCases.js";
 
 // The ranking starts over each time the season changes length: v1 held the
 // five-case season, v2 the eleven-case one, v3 the twelve-case one, v4 the
@@ -14,24 +15,26 @@ import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConf
 // heartbeat, and a score from that table does not compare with one from this.
 // v9 is the same season at the table of 2026-10-20 (the day-ten table: fracture 8,
 // the x1.6 streak and x1.5 LOCK caps, five tool slots, SCOUT), whose score does not compare with one from the table before it.
-// Retired keys are never read and are removed on first load.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v9";
-const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
-  "critical-point-local-ranking-v1",
-  "critical-point-local-ranking-v2",
-  "critical-point-local-ranking-v3",
-  "critical-point-local-ranking-v4",
-  "critical-point-local-ranking-v5",
-  "critical-point-local-ranking-v6",
-  "critical-point-local-ranking-v7",
-  "critical-point-local-ranking-v8",
-];
+// v10 is the same season at RULES_MARK 3: B3's audit and B2's links are rules of the table from
+// 프롤로그 04 (played first as 2026-W47's test week), and a vault the audit took a part of, or a
+// board CASCADE pulled the wall of, does not compare with one from the table before.
+// v11 is the same table with the 판 읽기 axis in the score (C-1(1)): each case's burst score gives
+// 0.2 to the vault its bare hand kept against a hand that sees the wall, and a score from before
+// the axis does not compare with one from after it.
+// v12 is the same season at RULES_MARK 4: the logic streak is held on the card's direction
+// (사람 or 자리, C-3) and OVERCLOCK, the audit and the links open in 사건 01 to 03 (C-4), so the
+// same play pays a different streak and the first three cases play under fewer rules.
+// A retired key is read once, when the ranking screen first opens, for one thing only: the
+// player's best row of that table, kept under the personal-bests key (src/personalBests.js,
+// a chunk of its own, so the entry chunk does not carry it). Then it is removed. When this key
+// moves on, the old one joins RETIRED_LOCAL_RANKING_STORAGE_KEYS there.
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v12";
 
 export function parseLocalRankingRows(rawValue) {
   try {
     const parsed = JSON.parse(rawValue || "[]");
     return Array.isArray(parsed)
-      ? parsed.filter((row) => row && typeof row === "object" && row.case_id && row.summary).slice(-100)
+      ? parsed.filter((row) => row && typeof row === "object" && row.case_id && row.summary && !isSideCaseId(row.case_id)).slice(-100)
       : [];
   } catch {
     return [];
@@ -46,6 +49,8 @@ export function parseLocalRankingRows(rawValue) {
  * with no run id (older ones) are left as they are.
  */
 export function appendLocalRankingRowToRows(rows, row) {
+  // E-11: a side case is outside the ranking, this device's included.
+  if (isSideCaseId(row?.case_id)) return rows;
   const sameRunAndCase = (item) => Boolean(row?.run_id) && item?.run_id === row.run_id && item?.case_id === row.case_id;
   return [...rows.filter((item) => !sameRunAndCase(item)), row]
     .filter((item) => item && typeof item === "object" && item.case_id && item.summary)
@@ -53,7 +58,6 @@ export function appendLocalRankingRowToRows(rows, row) {
 }
 
 function readLocalRankingRows() {
-  RETIRED_LOCAL_RANKING_STORAGE_KEYS.forEach((key) => removeStoredValue(key));
   return parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]"));
 }
 

@@ -94,16 +94,29 @@ export function caseSource(runtimeData, caseId) {
   }) ?? {};
 }
 
+/**
+ * One side case's Korean words (E-11 번외 사건, src/nodes/sideNN.js): its
+ * scenes and its three endings, as the authored pack has them -- a side pack
+ * is not built into the season (scripts/season-split.mjs), so it is read as
+ * written. Its label and title are the side list's (src/nodes/sidePacks.js,
+ * `SIDE_CASES`), answered by the dictionary's `copy.sidePacks` the way a
+ * season case's are by `copy.gameCases.seasonCasesBase`.
+ */
+export function sideSource(pack) {
+  return wordsOf({ nodes: pack?.nodes, outcomes: pack?.outcomes }) ?? {};
+}
+
 const PROFILE_FIELDS = ["appearance", "thought", "gesture", "voice", "line"];
 const pick = (table, ids) => Object.fromEntries(ids.filter((id) => table[id] !== undefined).map((id) => [id, table[id]]));
 
 /** The screen copy in scope: the season's copy between cases for the cases in `scope`, and the play guide's tables. */
 export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
-  const [caseCopy, appCopy, playerLanguage, gameCases, gameDialogue] = await Promise.all([
+  const [caseCopy, appCopy, playerLanguage, gameCases, sidePacks, gameDialogue] = await Promise.all([
     import(`${root}/src/caseCopy.js`),
     import(`${root}/src/appCopy.js`),
     import(`${root}/src/playerLanguage.js`),
     import(`${root}/src/gameCases.js`),
+    import(`${root}/src/nodes/sidePacks.js`),
     import(`${root}/src/gameDialogue.js`),
   ]);
   // The screens' own copy (src/copy/<name>.js, each a default export laid
@@ -139,6 +152,8 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
       caseObjectives: pick(gameCases.caseObjectives, scope),
       seasonCasesBase: gameCases.seasonCasesBase.filter((entry) => scope.includes(entry.id)),
     },
+    // The side list's label and title (번외 1 · ...), outside the season's scope.
+    sidePacks: { SIDE_CASES: sidePacks.SIDE_CASES },
     // What the report's scene beat says of a speaker (gameLogic.js
     // buildSceneBeat; src/locales/<lang>/late/gameDialogue.js). The role is
     // the speaker card's, by its Korean (`roles`); stance and job are printed
@@ -156,10 +171,11 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
  * 40 million (G-6: 억 원 = 100 million won). Only for comparing digits.
  */
 function inEnglishUnits(text) {
-  // A month is a word in English ("4월 27일" -> "April 27"), and a lone 1 in
-  // 1주·1심·1인당·1인·1회·1년차, or the 0 of 0시, is a word there too
-  // ("one-share", "first-instance", "per person", "midnight").
-  const words = text.replace(/\d{1,2}월/g, "월").replace(/(?<![\d.])1(?=주|심|인당|인|회|년차)|(?<![\d.])0(?=시)/g, "");
+  // A month is a word in English ("4월 27일" -> "April 27", "3~9월" ->
+  // "March–September"), and a lone 1 in 1주·1심·1인당·1인·1회·1년차·1일·1초,
+  // or the 0 of 0시, is a word there too ("one-share", "first-instance",
+  // "per person", "per day", "a second", "midnight").
+  const words = text.replace(/\d{1,2}(?:~\d{1,2})?월/g, "월").replace(/(?<![\d.])1(?=주|심|인당|인|회|년차|일|초)|(?<![\d.])0(?=시)/g, "");
   // A figure in parts is one figure: 1억 2천(만) is 120 million, 3억 8000만
   // 380 million, 6만 4천 64,000, 41만 9명 410,009. 만 after a figure is ten
   // thousand, 천 a thousand (11만 views, 4천 people).
