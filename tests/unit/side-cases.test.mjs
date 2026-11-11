@@ -72,8 +72,10 @@ const seasonNumbersBefore = {
 
 const { side00 } = await import("../../src/nodes/side00.js");
 const { side01 } = await import("../../src/nodes/side01.js");
+const { side02 } = await import("../../src/nodes/side02.js");
 const { SIDE_CASES } = await import("../../src/nodes/sidePacks.js");
 const sideCases = await import("../../src/sideCases.js");
+const sideMarks = await import("../../src/state/sideMarks.js");
 const sideRun = await import("../../src/state/sideRun.js");
 const { checkSidePack } = await import("../../src/state/sidePackCheck.js");
 const { nodes } = await import("../../src/gameData.js");
@@ -143,19 +145,24 @@ test("3: the slot opens on a closed finale (NEW GAME+ or caseResults.final) and 
   assert.equal(closed.cases[0].closed, true);
 });
 
-test("the registry lists 번외 1 in a release; the placeholder stays behind the debug build", async () => {
+test("the registry lists 번외 1 and 번외 2 in a release; the placeholder stays behind the debug build", async () => {
   // Node has no __CP_DEBUG_BUILD__, as a release has it false.
   assert.deepEqual(
     SIDE_CASES.map(({ id, label, title }) => ({ id, label, title })),
-    [{ id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명" }],
+    [
+      { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명" },
+      { id: "side02", label: "번외 2", title: "돌려줄 것" },
+    ],
   );
   assert.equal(side00.fixture, true);
-  // The entry loads the case file it names, and says what the file says.
-  const loaded = await SIDE_CASES[0].load();
-  assert.equal(loaded, side01);
-  assert.equal(loaded.label, SIDE_CASES[0].label);
-  assert.equal(loaded.title, SIDE_CASES[0].title);
-  assert.equal(side01.fixture, undefined, "번외 1 is a case, not the placeholder");
+  // Each entry loads the case file it names, and says what the file says.
+  for (const [entry, pack] of [[SIDE_CASES[0], side01], [SIDE_CASES[1], side02]]) {
+    const loaded = await entry.load();
+    assert.equal(loaded, pack);
+    assert.equal(loaded.label, entry.label);
+    assert.equal(loaded.title, entry.title);
+    assert.equal(pack.fixture, undefined, `${entry.label} is a case, not the placeholder`);
+  }
 });
 
 test("번외 1 is a sound side pack: 8 to 12 scenes, no season scene, every speaker profiled and painted", async () => {
@@ -219,6 +226,75 @@ test("번외 1 plays to each of its three endings, on every route through its br
   const visited = new Set([...routes].flatMap((route) => route.split(">")));
   assert.deepEqual([...visited].sort(), Object.keys(side01.nodes).sort());
   // A bust on every second window still closes it.
+  assert.ok(playThrough(pack, { pick: 2, window: (index) => (index % 2 ? BUST : CASHED) }).outcomeChoiceId);
+  assert.equal(ENGINE_CONSTANTS(), seasonNumbersBefore.engine, "the engine's constants moved");
+});
+
+test("번외 2 is a sound side pack: 8 to 12 scenes, no season scene, every speaker profiled and painted", async () => {
+  assert.deepEqual(checkSidePack(side02, { seasonNodeIds: Object.keys(nodes) }), []);
+  const sceneIds = Object.keys(side02.nodes);
+  assert.ok(sceneIds.length >= 8 && sceneIds.length <= 12, `${sceneIds.length} scenes`);
+  assert.deepEqual(Object.keys(side02.outcomes).sort(), side02.nodes.s2_aftershock.choices.map(({ id }) => id).sort());
+  const { getCharacterProfile } = await import("../../src/gameDialogue.js");
+  const { getSpeakerPortrait } = await import("../../src/speakerPortraits.js");
+  for (const [nodeId, scene] of Object.entries(side02.nodes)) {
+    assert.ok(getCharacterProfile(scene.speaker, null), `${nodeId}: ${scene.speaker} has no profile`);
+    assert.ok(getSpeakerPortrait(scene.speaker), `${nodeId}: ${scene.speaker} has no portrait (never a silhouette)`);
+  }
+  // No scene id or card id of 번외 1 is reused.
+  const first = new Set([...Object.keys(side01.nodes), ...Object.values(side01.nodes).flatMap((scene) => scene.choices.map(({ id }) => id))]);
+  for (const id of [...sceneIds, ...Object.values(side02.nodes).flatMap((scene) => scene.choices.map((choice) => choice.id))]) assert.equal(first.has(id), false, id);
+});
+
+test("번외 2's copy keeps the season's lengths: labels 30, scenes 420, a cognition on every card", () => {
+  for (const [nodeId, scene] of Object.entries(side02.nodes)) {
+    assert.ok([...scene.text].length <= 420, `${nodeId}: ${[...scene.text].length} characters`);
+    assert.ok(Array.isArray(scene.memo) && scene.memo.length > 0, `${nodeId}: no memo`);
+    assert.ok(scene.place && scene.clock, `${nodeId}: no place or clock`);
+    for (const choice of scene.choices) {
+      assert.ok([...choice.label].length <= 30, `${choice.id}: ${[...choice.label].length} characters`);
+      assert.ok(Object.keys(choice.cognition ?? {}).length > 0, `${choice.id}: no cognition`);
+    }
+  }
+  for (const [id, { text }] of Object.entries(side02.outcomes)) assert.ok([...text].length <= 420, `${id}: ${[...text].length} characters`);
+});
+
+test("번외 2 is the Friday ten days before 사건 19, and leaves 사건 19's night and 사건 45 alone", () => {
+  // 2026-01-09 is a Friday; 사건 19's change notice is 1월 16일 (금) and it opens 1월 19일 (docs/canon.md).
+  assert.equal(new Date(Date.UTC(2026, 0, 9)).getUTCDay(), 5);
+  assert.match(side02.nodes.s2_start.clock, /^1월 9일 \(금\)/);
+  // The notice on the shutter still says April: the 72 hours have not begun.
+  assert.match(side02.nodes.s2_start.text, /4월 14일/);
+  const copy = JSON.stringify(side02);
+  for (const later of ["1월 22일", "72시간", "312상자", "굴착기", "KD리얼티"]) assert.equal(copy.includes(later), false, later);
+  // 임소율 reads the margins of the boxes only in 사건 19 (c19_labels); her birthday is in a book, not a box.
+  for (const margin of ["여백", "사람을 적어"]) assert.equal(copy.includes(margin), false, margin);
+  assert.match(side02.nodes.s2_shelf.text, /그건 상자에 없어/);
+  // Whether 임경수 ever went himself is not said: 사건 45.
+  for (const fate of ["돌아가셨", "장례", "발인", "퇴원했"]) assert.equal(copy.includes(fate), false, fate);
+});
+
+test("번외 2 plays to each of its three endings, on every route through its branches, without touching the engine", () => {
+  const pack = sideRun.prepareSidePack(side02);
+  const endings = new Set();
+  const routes = new Set();
+  // The shortest asks eight decisions (it skips 1998's story, the drawing and
+  // tonight's notebook), the longest eleven.
+  const walk = (state, path) => {
+    if (state.outcomeChoiceId) {
+      endings.add(state.outcomeChoiceId);
+      routes.add(path.join(">"));
+      assert.ok(state.log.length >= 8 && state.log.length <= 11, `${path.join(">")}: ${state.log.length} decisions`);
+      for (const value of Object.values(state.resources)) assert.ok(Number.isFinite(value));
+      return;
+    }
+    const scene = pack.nodes[state.nodeId];
+    for (const choice of scene.choices) walk(sideRun.advanceSideRun(pack, state, { choice, window: CASHED }), [...path, state.nodeId]);
+  };
+  walk(sideRun.createSideRun(pack, { runId: "side02-walk" }), []);
+  assert.deepEqual([...endings].sort(), ["s2_after_hand", "s2_after_himself", "s2_after_opinion"]);
+  const visited = new Set([...routes].flatMap((route) => route.split(">")));
+  assert.deepEqual([...visited].sort(), Object.keys(side02.nodes).sort());
   assert.ok(playThrough(pack, { pick: 2, window: (index) => (index % 2 ? BUST : CASHED) }).outcomeChoiceId);
   assert.equal(ENGINE_CONSTANTS(), seasonNumbersBefore.engine, "the engine's constants moved");
 });
@@ -360,12 +436,67 @@ test("the settled-window log takes no side window", () => {
   assert.equal(config.recordSettledWindowSeed("run:0:p1_start"), true);
 });
 
-test("the online save carries no side record", async () => {
-  globalThis.localStorage = createStorage({ [SIDE_CASES_KEY]: JSON.stringify({ side01: { closedAt: "2026-12-01T00:00:00.000Z" } }) });
+test("the online save carries the side cases' completion marks beside the run, and no run in progress", async () => {
+  const inProgress = { nodeId: "s1_shop", resources: {}, log: [], run: {}, runId: "side-x" };
+  globalThis.localStorage = createStorage({
+    [SIDE_CASES_KEY]: JSON.stringify({
+      side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress },
+      side02: { closedAt: null, outcomeChoiceId: null, inProgress },
+    }),
+  });
   const cloud = await import("../../src/cloudSave.js");
   const records = cloud.readDeviceRecords();
-  assert.equal(JSON.stringify(records).includes("side01"), false);
-  assert.equal(JSON.stringify(cloud.createCloudSavePayload({ currentCase: "case01" }, records)).includes("side"), false);
+  assert.deepEqual(records.sideCases, { side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers" } });
+  const payload = cloud.createCloudSavePayload({ currentCase: "case01", log: [] }, records);
+  assert.equal(JSON.stringify(payload).includes("s1_shop"), false, "a run in progress stays on its device");
+  // The run is the season's: the side mark rides only in deviceRecords.
+  const { deviceRecords, ...run } = payload;
+  assert.equal(JSON.stringify(run).includes("side"), false);
+  assert.deepEqual(Object.keys(deviceRecords), ["sideCases"]);
+  // Nothing closed yet: nothing goes up.
+  globalThis.localStorage = createStorage({ [SIDE_CASES_KEY]: JSON.stringify({ side01: { closedAt: null, outcomeChoiceId: null, inProgress } }) });
+  assert.equal("sideCases" in cloud.readDeviceRecords(), false);
+});
+
+test("closing a side case tells the online save a record changed; a decision saved mid-run does not", async () => {
+  globalThis.localStorage = createStorage();
+  const fired = [];
+  const previous = globalThis.dispatchEvent;
+  globalThis.dispatchEvent = (event) => fired.push([event.type, event.detail]);
+  try {
+    const pack = sideRun.prepareSidePack(side00);
+    const closed = playThrough(pack, { pick: 0, save: true });
+    assert.deepEqual(fired, [], "a decision saved mid-run is not an upload");
+    assert.equal(sideRun.closeSideCase(closed), true);
+    assert.deepEqual(fired, [[config.DEVICE_RECORD_WRITTEN_EVENT, { key: SIDE_CASES_KEY }]]);
+  } finally {
+    globalThis.dispatchEvent = previous;
+  }
+});
+
+test("marks merge: a case closed on either device stays closed, the later close keeps its ending, and this device's run stays", () => {
+  const run = { nodeId: "s1_shop", resources: {}, log: [], run: {}, runId: "here" };
+  const local = {
+    side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_blank", inProgress: run },
+    side02: { closedAt: null, outcomeChoiceId: null, inProgress: run },
+  };
+  const remote = {
+    side01: { closedAt: "2026-12-03T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: { nodeId: "s1_letter" } },
+    side02: { closedAt: "2026-12-02T00:00:00.000Z", outcomeChoiceId: "s2_after_x" },
+    side03: { closedAt: null, outcomeChoiceId: null },
+    case12: { closedAt: "2026-12-02T00:00:00.000Z" },
+  };
+  assert.deepEqual(sideMarks.mergeSideMarks(local, remote), {
+    side01: { closedAt: "2026-12-03T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: run },
+    side02: { closedAt: "2026-12-02T00:00:00.000Z", outcomeChoiceId: "s2_after_x", inProgress: run },
+  });
+  // An older close from the copy does not replace this device's later one; a tie is the copy's.
+  const older = { side01: { closedAt: "2026-11-30T00:00:00.000Z", outcomeChoiceId: "s1_after_order" } };
+  assert.equal(sideMarks.mergeSideMarks(local, older).side01.outcomeChoiceId, "s1_after_blank");
+  const tie = { side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_order" } };
+  assert.equal(sideMarks.mergeSideMarks(local, tie).side01.outcomeChoiceId, "s1_after_order");
+  assert.deepEqual(sideMarks.mergeSideMarks(null, "not a record"), {});
+  assert.equal(sideMarks.sideCaseMarks(null), null);
 });
 
 test("the season case's reading tally is put back after a side case is read", async () => {
@@ -393,6 +524,7 @@ test("the season case's reading tally is put back after a side case is read", as
 test("6: the goals, the titles and the season's length read the same after side cases are loaded and played", () => {
   playThrough(sideRun.prepareSidePack(side00));
   playThrough(sideRun.prepareSidePack(side01));
+  playThrough(sideRun.prepareSidePack(side02));
   assert.deepEqual(getAchievementProgress({}).map(({ id, goal }) => [id, goal]), seasonNumbersBefore.goals);
   assert.deepEqual(seasonNumbersBefore.goals.find(([id]) => id === "full-audit"), ["full-audit", 55]);
   assert.equal(JSON.stringify(ANALYST_TITLE_STEPS), seasonNumbersBefore.titles);
