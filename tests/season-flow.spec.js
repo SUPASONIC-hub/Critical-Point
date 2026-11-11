@@ -6,7 +6,7 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodes, seasonCasesBase } from "../src/
 import { ENDING_GATES } from "../src/gameConstants.js";
 import { SEASON_STANDING_NEAR } from "../src/seasonStanding.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
-import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, PAST_PICKS_KEY, SEASON_RECORD_KEY, SEEN_SCENES_KEY } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, COLD_OPENING_SEEN_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, PAST_PICKS_KEY, SEASON_RECORD_KEY, SEEN_SCENES_KEY } from "../src/appConfig.js";
 import { encodeSeen } from "../src/state/seenScenes.js";
 import { encodePicks } from "../src/state/pastPicks.js";
 import { createCaseSummary } from "../src/gameLogic.js";
@@ -277,7 +277,13 @@ test("the complete season can progress from case 01 to the final ending", { tag:
 // an actual resumable run and proves the hero leaves it byte-identical, which
 // the old test could not do because it ran with empty storage.
 test("hero entry opens the first scene in one click", { tag: "@prod" }, async ({ page }) => {
-  await page.addInitScript(() => localStorage.clear());
+  // A fresh device that has already seen B-3(1) 냉정한 오프닝: the fixture's
+  // mark (tests/helpers/network.js) runs before this clear, so it is put back,
+  // and the one click lands on the scene, not on the opening's first page.
+  await page.addInitScript((seenKey) => {
+    localStorage.clear();
+    localStorage.setItem(seenKey, "1");
+  }, COLD_OPENING_SEEN_KEY);
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
   await expect(page.locator(".choices .choice")).toHaveCount(0);
