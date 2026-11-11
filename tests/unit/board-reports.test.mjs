@@ -69,8 +69,9 @@ test("posts that wait, posts past the promise, and hidden posts are told apart, 
   assert.deepEqual(queue.waiting[1].reasons, ["privacy"]);
   const text = describeQueue(queue);
   assert.match(text, /기다리는 글 \*\*2개\*\*, 그 가운데 \*\*1개는 24시간을 넘김\*\*/);
-  assert.match(text, /\| 7 \| 2026-10-25 \| 3 \| 2 \| 욕설·괴롭힘, 광고·도배 \| 30시간 ⚠ \|/);
-  assert.match(text, /\| 9 \| 2026-10-26 \| 1 \| 1 \| 개인정보 노출 \| 1시간 \|/);
+  assert.match(text, /\| 7 \| 보임 \| 2026-10-25 \| 3 \| 2 \| 욕설·괴롭힘, 광고·도배 \| 30시간 ⚠ \|/);
+  assert.match(text, /\| 9 \| 보임 \| 2026-10-26 \| 1 \| 1 \| 개인정보 노출 \| 1시간 \|/);
+  assert.match(text, /미처리 신고 \*\*4건\*\*\(글 2개\)\. 지난 7일 신고 0건\./);
   assert.match(text, /이미 내린 글 1개\(4\)/);
   assert.equal(DEADLINE_HOURS, 24);
 });
@@ -78,4 +79,27 @@ test("posts that wait, posts past the promise, and hidden posts are told apart, 
 test("an empty queue says so", () => {
   assert.equal(readQueue([]).waiting.length, 0);
   assert.match(describeQueue(readQueue([])), /기다리는 신고가 없습니다/);
+});
+
+test("a post the reports hid by themselves waits for a person, marked, and counts toward the open reports", () => {
+  const rows = [
+    { post_id: 11, hidden: true, auto_hidden: true, posted_on: "2026-11-02", reports: 3, writers: 3, reasons: ["abuse"], oldest_seconds: 2 * HOUR, reports_week: 3 },
+    { post_id: 12, hidden: true, auto_hidden: false, posted_on: "2026-10-30", reports: 2, writers: 2, reasons: ["spam"], oldest_seconds: 50 * HOUR, reports_week: 1 },
+    { post_id: 13, hidden: false, auto_hidden: "f", posted_on: "2026-11-01", reports: 1, writers: 1, reasons: ["other"], oldest_seconds: HOUR, reports_week: "1" },
+  ];
+  const queue = readQueue(rows);
+  assert.deepEqual(queue.waiting.map((post) => post.postId), [11, 13]);
+  assert.deepEqual(queue.autoHidden.map((post) => post.postId), [11]);
+  assert.deepEqual(queue.hidden.map((post) => post.postId), [12], "hidden by a person is done");
+  assert.equal(queue.openReports, 4);
+  assert.equal(queue.reportsThisWeek, 5);
+  const text = describeQueue(queue);
+  assert.match(text, /미처리 신고 \*\*4건\*\*\(글 2개\), 그 가운데 신고 3명으로 자동 숨김된 글 \*\*1개\*\*\(11\)\. 지난 7일 신고 5건\./);
+  assert.match(text, /\| 11 \| 자동 숨김 \| 2026-11-02 \| 3 \| 3 \|/);
+  assert.doesNotMatch(text, /board-report:/);
+});
+
+test("the daily read marks automatic hiding and counts the week", () => {
+  assert.match(QUERY, /p\.auto_hidden_at is not null as auto_hidden/);
+  assert.match(QUERY, /interval '7 days'/);
 });

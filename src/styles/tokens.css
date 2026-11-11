@@ -3,19 +3,80 @@
    what they are: colour family, lightness and alpha.
    Add new colours here, not inline. */
 
-/* The one font file: Pretendard Variable (OFL-1.1) cut down to the characters
-   the source can print, from weight 400 to 920 (nothing asks for less; the
-   range is WEIGHT_AXIS in scripts/build-fonts.mjs). `npm run build:fonts`
-   writes it and `npm run check:fonts` fails when the copy gains a character it
-   does not carry. index.html preloads the same file. Text outside it -- a
-   nickname with a syllable the copy never uses -- falls through to the system
-   Hangul face named after it in --font-sans. */
+/* Two font files, one family: Pretendard Variable (OFL-1.1) cut down to the
+   characters the source can print, from weight 400 to 920 (nothing asks for
+   less; the range is WEIGHT_AXIS in scripts/build-fonts.mjs). The first holds
+   what the start screen draws in any language and index.html preloads it; the
+   second holds every other syllable of the copy and is fetched only when a page
+   prints one of the code points in its unicode-range, which build-fonts writes
+   between the markers. Both are cut from the same face, so the metrics -- the
+   ascent, descent and advance widths -- are one set and a line does not reflow
+   when the second file lands. `swap` is kept: the start screen's text is all in
+   the preloaded file, and a syllable from the second file later draws in the
+   fallback for the one fetch, then swaps in place at the same width class.
+   `npm run build:fonts` writes both and `npm run check:fonts` fails when the
+   copy gains a character neither carries. Text outside them -- a nickname with
+   a syllable the copy never uses -- falls through to the system Hangul face
+   named after it in --font-sans. */
 @font-face {
   font-family: "Critical Point Sans";
   font-style: normal;
   font-weight: 400 920;
   font-display: swap;
   src: url("../assets/fonts/pretendard-cp.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Critical Point Sans";
+  font-style: normal;
+  font-weight: 400 920;
+  font-display: swap;
+  src: url("../assets/fonts/pretendard-cp-rest.woff2") format("woff2");
+  /* FONT_REST_RANGE start */
+  unicode-range:
+    U+E9, U+200B, U+200F, U+202A, U+202E, U+2060, U+2064, U+2592, U+3002, U+30AF, U+30C9, U+30F3, U+6545,
+    U+AC13, U+AC1B, U+AC20, U+AC2D, U+AC31, U+AC40, U+AC54, U+AC71, U+AC77, U+AC84, U+AC89, U+ACAA, U+ACB8,
+    U+ACE1, U+ACE4, U+ACE7, U+ACF6, U+ACFD, U+AD04, U+AD1C, U+AD73, U+AD75, U+AD7D, U+ADF9, U+AE01, U+AE0B,
+    U+AE43, U+AE4D, U+AE65, U+AE6C, U+AE79, U+AE7B, U+AEBE, U+AECD, U+AECF-AED1, U+AF2C, U+AF3D, U+AF42,
+    U+AF49, U+AF64, U+AFB9, U+AFC7-AFC8, U+AFD4, U+AFE8, U+AFF0, U+B010, U+B014, U+B01C-B01D, U+B048, U+B053,
+    U+B055, U+B057, U+B080, U+B084, U+B08C-B08D, U+B099, U+B0A1, U+B0AB, U+B0AD, U+B0AF, U+B0B1, U+B0C9,
+    U+B0D0, U+B109, U+B10C, U+B113, U+B125, U+B138, U+B154-B155, U+B17C, U+B180, U+B188, U+B18D, U+B192,
+    U+B1A8, U+B1CC, U+B1E8, U+B205, U+B208, U+B214-B215, U+B220, U+B234, U+B258, U+B25C, U+B268, U+B274,
+    U+B284, U+B299, U+B2A0, U+B2AC, U+B2D0, U+B2D8, U+B2DB, U+B2DD, U+B2E6, U+B2ED, U+B2F3, U+B301, U+B304,
+    U+B311, U+B313-B314, U+B355, U+B364-B365, U+B367, U+B36E, U+B38C, U+B3CB, U+B3CE, U+B3D5, U+B3D7, U+B451,
+    U+B460, U+B465, U+B46C, U+B480, U+B4C0, U+B4DD, U+B4E6, U+B4EC, U+B4EF, U+B518, U+B51C, U+B525, U+B52A,
+    U+B534, U+B540-B541, U+B544-B545, U+B550, U+B5B1, U+B5B3-B5B4, U+B5BC, U+B5C0, U+B5C4, U+B5CC-B5CD,
+    U+B5D0, U+B610, U+B69C-B69D, U+B6A4, U+B6AB, U+B6B1, U+B6F4, U+B6F8, U+B72C, U+B730, U+B738, U+B754-B755,
+    U+B760, U+B784, U+B790, U+B799, U+B79C, U+B7AC, U+B7F4, U+B7FD, U+B7FF-B801, U+B807, U+B80C, U+B81B,
+    U+B82C, U+B834-B835, U+B837, U+B86C-B86D, U+B86F, U+B8E9, U+B8F0, U+B8F8, U+B904, U+B918, U+B959, U+B968,
+    U+B96D, U+B987, U+B989, U+B98E, U+B9C1, U+B9D1, U+B9D8-B9D9, U+B9DB, U+B9F5, U+B9F8-B9FA, U+BA39, U+BA49,
+    U+BA4D-BA4E, U+BA65, U+BA67, U+BA78, U+BA87, U+BAAC, U+BAB8-BAB9, U+BABD, U+BB45, U+BB47, U+BB49, U+BB50,
+    U+BB54, U+BB58, U+BB61, U+BBA4, U+BBAC, U+BBC0, U+BBD0, U+BBF9, U+BC0F, U+BC11, U+BC1F, U+BC27, U+BC2D,
+    U+BC34, U+BC38, U+BC43, U+BC49, U+BC85, U+BC97, U+BC9A, U+BCA0, U+BCA4, U+BCBC, U+BCCD, U+BCD5, U+BCF6,
+    U+BD05, U+BD10, U+BD24, U+BD2C, U+BD48, U+BD59, U+BD81, U+BD90-BD91, U+BD93, U+BE4C, U+BE54-BE55, U+BE57,
+    U+BE59-BE5B, U+BE64, U+BE75, U+BE80, U+BE84, U+BE8C-BE8D, U+BE8F-BE90, U+BED0, U+BED4, U+BED7-BED8,
+    U+BF08, U+BF18, U+BF51, U+BF55, U+BFCC, U+BFD4, U+BFDC, U+C058, U+C060, U+C069, U+C090-C091, U+C0B6,
+    U+C0BD, U+C0BF-C0C0, U+C0C5, U+C0CC, U+C0D8-C0D9, U+C0DC, U+C0F7, U+C11E, U+C123, U+C130, U+C148-C149,
+    U+C14C, U+C154, U+C168, U+C170, U+C19C, U+C19F, U+C1E0, U+C1F1, U+C1FC, U+C21F, U+C22D, U+C270, U+C274,
+    U+C27D, U+C2A8, U+C2B4, U+C2B7, U+C2E3, U+C2EB, U+C2ED, U+C2FC, U+C309, U+C30C, U+C369, U+C36C, U+C370,
+    U+C379, U+C3E9, U+C465, U+C4F1, U+C500, U+C52C, U+C539, U+C53B, U+C54E, U+C557, U+C564, U+C568, U+C587,
+    U+C597-C598, U+C5B9, U+C5BD, U+C5C4, U+C5CC, U+C5CE, U+C5D1, U+C5D8, U+C5E0, U+C5EE, U+C5FC, U+C5FF,
+    U+C634, U+C637, U+C63B, U+C655, U+C65C, U+C67C, U+C689, U+C6C5, U+C6E8, U+C717, U+C719, U+C721, U+C73D,
+    U+C74A, U+C74D, U+C787, U+C78A, U+C78E, U+C794, U+C796, U+C7A3-C7A4, U+C7A6, U+C7B0, U+C7B4, U+C7BD,
+    U+C7C0, U+C7E4, U+C80A, U+C813, U+C816, U+C820, U+C82F, U+C878, U+C880-C881, U+C8E0, U+C90C, U+C918,
+    U+C92C, U+C958, U+C961, U+C988, U+C990, U+C998, U+C9CA, U+C9D3, U+C9D6, U+C9DA, U+C9DD, U+C9EC-C9ED,
+    U+C9F0, U+CA4C, U+CA61, U+CA84, U+CABC, U+CB64, U+CBE4, U+CC0C, U+CC1C, U+CC22, U+CC2C, U+CC2E,
+    U+CC3B-CC3C, U+CC48, U+CC4C, U+CC55, U+CC58-CC59, U+CC99, U+CCA8, U+CCE4, U+CD09, U+CD0C, U+CD2C, U+CDA4,
+    U+CDB0, U+CDC4, U+CDE8, U+CE20-CE21, U+CE69, U+CE6B, U+CE75, U+CE94, U+CE98, U+CEA0, U+CEE4, U+CEE8,
+    U+CEF4, U+CEF7-CEF9, U+CF13, U+CF2D, U+CF30, U+CF55, U+CF58, U+CF64, U+CF67, U+CF69, U+CF70, U+CF85,
+    U+CFE0, U+CFE8, U+D000, U+D018, U+D034-D035, U+D038, U+D070, U+D074, U+D07D, U+D0B4-D0B5, U+D0B7, U+D0C4,
+    U+D0D0-D0D1, U+D0D3-D0D5, U+D0E0, U+D0E4, U+D0ED, U+D0F0-D0F1, U+D138, U+D140-D141, U+D145, U+D14D,
+    U+D150, U+D168, U+D17C, U+D1A1, U+D1A4, U+D1B1, U+D22D, U+D230, U+D234, U+D23C-D23D, U+D241, U+D248,
+    U+D280, U+D284, U+D29C, U+D2BF-D2C0, U+D2C8-D2C9, U+D2F1, U+D2F4, U+D2F8, U+D301, U+D305, U+D320-D321,
+    U+D325, U+D329, U+D32C, U+D33B, U+D384, U+D3B4, U+D3C5, U+D3C8, U+D3F0, U+D3F4, U+D479, U+D47C, U+D489,
+    U+D4CC, U+D4E8, U+D508, U+D515, U+D53D, U+D540, U+D54D, U+D56B, U+D575, U+D578, U+D5A5, U+D5DB, U+D5E4,
+    U+D5EC, U+D608, U+D610, U+D61C, U+D639, U+D64D, U+D68D, U+D6A1, U+D6CC, U+D6D1, U+D6D4, U+D6E8, U+D6FC,
+    U+D718, U+D759, U+D760-D761, U+D76C, U+D770, U+D798-D799, U+FF0E, U+FF61; /* FONT_REST_RANGE end */
 }
 
 :root {
@@ -111,25 +172,44 @@
      ground: square acid dossiers on the intro, felt on the table, white cards on
      the result. These are the one set of surfaces, lines, radii and motion the
      three screens now draw from, so a panel looks like the same object wherever
-     it sits. Surfaces step up in lightness; text steps down in emphasis and every
-     step clears 4.5:1 on --ui-surface-2. */
-  --ui-bg: rgb(6 9 10);
-  --ui-bg-raised: rgb(10 14 15);
-  --ui-surface-1: rgb(14 19 20);
-  --ui-surface-2: rgb(20 26 27);
-  --ui-surface-3: rgb(29 37 38);
-  --ui-surface-4: rgb(40 50 51);
-  --ui-glass: rgb(16 22 23 / 0.72);
-  --ui-glass-strong: rgb(12 17 18 / 0.88);
+     it sits. Surfaces step up in lightness; text steps down in emphasis.
+
+     The ground follows the scene's mood (design-mood, 2026-11-05): these are
+     the `neutral` values -- the start screen, the result and any scene with no
+     mood -- one step lighter than the night shift the app opened with, a mid
+     blue-grey, with the raised ground, the four surfaces and the two glasses
+     moved by the same step (+12 +13 +14). `:root[data-mood]` below swaps these
+     grounds, the glasses, the lines, the accent and the screen's edge tint;
+     no text colour moves with the mood, so the ratios are the grounds' to
+     keep. In every mood --ui-text and --ui-text-2 clear 4.5:1 on every
+     surface (lowest 9.96 and 6.49, both on neutral --ui-surface-4) and
+     --ui-text-3 clears it up to --ui-surface-3 (lowest 4.68 neutral, 4.65
+     bright, 5.12 sorrow, 5.53 tense, 5.91 dread); --ui-surface-4 carries
+     --ui-text and --ui-text-2 only (the start button, the result's chips and
+     route-atlas meta), where --ui-text-3 would read 3.88 on the neutral one.
+     The acid, chip, amber and sky inks stay above 5.6:1 everywhere; --ui-heat,
+     used large, above 3.5; dread's rose accent above 5.7. */
+  --ui-bg: rgb(18 22 24);
+  --ui-bg-raised: rgb(22 27 29);
+  --ui-surface-1: rgb(26 32 34);
+  --ui-surface-2: rgb(32 39 41);
+  --ui-surface-3: rgb(41 50 52);
+  --ui-surface-4: rgb(52 63 65);
+  --ui-glass: rgb(28 35 37 / 0.72);
+  --ui-glass-strong: rgb(24 30 32 / 0.88);
   --ui-line: rgb(255 255 255 / 0.08);
   --ui-line-strong: rgb(255 255 255 / 0.16);
   /* The edge of a form control. A field's fill is one surface step from the
      panel it sits on, so the border is the only thing that says where the
-     field is, and WCAG 1.4.11 asks 3:1 of that. At 0.4 it is 3.06:1 against
-     the lightest ground a field meets (--ui-surface-3) and 3.8:1 against the
-     darkest (--ui-bg-raised); --ui-line-strong is 1.25 to 1.8. */
+     field is, and WCAG 1.4.11 asks 3:1 of that. White at 0.4 reads 3.46:1
+     against the lightest ground a field meets (--ui-surface-3) and 3.81:1
+     against the darkest (--ui-bg-raised) in neutral; across the moods 3.46 to
+     3.83 (the lowest is neutral's surface-3, the next bright's 3.49).
+     --ui-line-strong is 1.5 to 1.7 and is not a control's edge. */
   --ui-line-field: rgb(255 255 255 / 0.4);
   --ui-line-accent: rgb(217 255 98 / 0.34);
+  /* The briefing page's frame; a mood other than neutral tints it. */
+  --ui-frame: rgb(242 246 243);
   --ui-text: rgb(242 246 243);
   --ui-text-2: rgb(190 203 197);
   --ui-text-3: rgb(142 158 152);
@@ -151,13 +231,138 @@
   --ui-shadow-glow: 0 0 0 1px rgb(217 255 98 / 0.5), 0 12px 40px rgb(217 255 98 / 0.22);
   --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ui-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* The fast settle the table's heat bar and the cashed stake land with. */
+  --ui-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ui-dur-fast: 140ms;
   --ui-dur: 240ms;
   --ui-page-max: 1240px;
   --ui-gutter: clamp(16px, 4.2vw, 56px);
+  /* 글자 크기 (E5, 2026-11-05, after pc-type-scale, PR 390): the player's own factor, 1, 1.125
+     or 1.25, written inline on <html> by state/accessibilitySettings.js beside
+     `data-text-size`. Inline so the first paint already has it: the critical
+     CSS keeps only the rules the intro used, and an attribute rule it never
+     saw used would arrive with the deferred sheet, as a jump. */
+  --text-scale: 1;
   /* The rem the HUD's big numbers and the decorative numerals are sized in:
-     1rem everywhere except the PC block below, which takes the 1/8 back. */
-  --hud-rem: 1rem;
+     1rem everywhere except the PC block below, which takes the 1/8 back, and
+     divided by the player's factor so the pot, the clock and the timers keep
+     their size whatever the setting. */
+  --hud-rem: calc(1rem / var(--text-scale));
+}
+
+html {
+  font-size: calc(100% * var(--text-scale));
+}
+
+/* The scene's mood on the ground (design-mood, 2026-11-05). GauntletStage puts
+   the current scene's mood on <html> as data-mood; the start screen and the
+   result carry none and are neutral. Each block moves the grounds and the two
+   glasses as one set; text and radii are the same in every mood, which is
+   what keeps the ratios above true. The contrast spec (tests/contrast.spec.js)
+   reads each screen once per mood. The generated critical CSS carries the
+   neutral values only: these selectors match nothing on the first screen.
+
+   2026-11-06 (mood-boost): the first pass could not be seen in play -- every
+   ground was a near-black, tense was the old palette and the accent moved only
+   in glows. Each mood now also tints the screen's edge (--mood-edge, drawn by
+   .game-shell::after and the briefing's veil), the briefing page's frame
+   (--ui-frame), the lines and the accent, and the grounds carry their hue
+   further (bright a brown-amber, sorrow a navy, dread an oxblood, tense a cold
+   teal). Text colours still never move; the lowest ratios per mood are in the
+   block comments and tests/contrast.spec.js reads each one. --mood-edge is
+   registered so the edge fades with the ground's 0.6s instead of jumping. */
+@property --mood-edge {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+/* tense: the old night shift's depth with a cold teal-steel cast, a teal edge
+   and teal lines; the accent stays acid. Lowest text ratio 5.53:1
+   (--ui-text-3 on --ui-surface-3). */
+:root[data-mood="tense"] {
+  --ui-bg: rgb(4 14 16);
+  --ui-bg-raised: rgb(7 19 21);
+  --ui-surface-1: rgb(10 24 26);
+  --ui-surface-2: rgb(15 30 32);
+  --ui-surface-3: rgb(22 39 41);
+  --ui-surface-4: rgb(32 51 53);
+  --ui-glass: rgb(12 27 29 / 0.72);
+  --ui-glass-strong: rgb(8 21 23 / 0.88);
+  --ui-line: rgb(150 230 235 / 0.1);
+  --ui-line-strong: rgb(150 230 235 / 0.2);
+  --ui-frame: rgb(150 226 232);
+  --mood-edge: rgb(30 170 190 / 0.26);
+}
+
+/* dread: an oxblood ground, a deep red edge, and the accent turned to a rose
+   the accent ink still reads on (7.3:1); the heat fill comes up. Lowest text
+   ratio 5.91:1 (--ui-text-3 on --ui-surface-3). */
+:root[data-mood="dread"] {
+  --ui-bg: rgb(24 6 8);
+  --ui-bg-raised: rgb(29 9 11);
+  --ui-surface-1: rgb(34 12 14);
+  --ui-surface-2: rgb(41 16 18);
+  --ui-surface-3: rgb(51 22 24);
+  --ui-surface-4: rgb(63 30 32);
+  --ui-glass: rgb(36 13 15 / 0.72);
+  --ui-glass-strong: rgb(30 9 11 / 0.88);
+  --ui-line: rgb(255 140 130 / 0.1);
+  --ui-line-strong: rgb(255 140 130 / 0.2);
+  --ui-line-accent: rgb(255 120 100 / 0.4);
+  --ui-accent: rgb(255 120 100);
+  --ui-accent-soft: rgb(255 92 72 / 0.14);
+  --ui-accent-glow: rgb(255 92 72 / 0.36);
+  --ui-heat-soft: rgb(255 92 72 / 0.22);
+  --ui-shadow-glow: 0 0 0 1px rgb(255 120 100 / 0.5), 0 12px 40px rgb(255 92 72 / 0.24);
+  --ui-frame: rgb(255 120 104);
+  --mood-edge: rgb(190 16 28 / 0.4);
+}
+
+/* bright: a warm brown-amber ground, an amber edge and frame, and the accent
+   turned amber (ink 12:1 on it). Lowest text ratio 4.65:1 (--ui-text-3 on
+   --ui-surface-3). */
+:root[data-mood="bright"] {
+  --ui-bg: rgb(38 26 12);
+  --ui-bg-raised: rgb(43 30 15);
+  --ui-surface-1: rgb(48 34 18);
+  --ui-surface-2: rgb(54 39 22);
+  --ui-surface-3: rgb(62 46 27);
+  --ui-surface-4: rgb(74 56 35);
+  --ui-glass: rgb(50 36 19 / 0.72);
+  --ui-glass-strong: rgb(44 31 15 / 0.88);
+  --ui-line: rgb(255 210 150 / 0.1);
+  --ui-line-strong: rgb(255 210 150 / 0.2);
+  --ui-line-accent: rgb(255 196 92 / 0.4);
+  --ui-accent: rgb(255 196 92);
+  --ui-accent-soft: rgb(255 196 92 / 0.14);
+  --ui-accent-glow: rgb(255 196 92 / 0.36);
+  --ui-shadow-glow: 0 0 0 1px rgb(255 196 92 / 0.5), 0 12px 40px rgb(255 196 92 / 0.24);
+  --ui-frame: rgb(255 204 120);
+  --mood-edge: rgb(255 150 30 / 0.3);
+}
+
+/* sorrow: a clear navy ground, a sky-blue edge and frame, and the accent
+   turned sky (ink 11:1 on it). Lowest text ratio 5.12:1 (--ui-text-3 on
+   --ui-surface-3). */
+:root[data-mood="sorrow"] {
+  --ui-bg: rgb(10 20 40);
+  --ui-bg-raised: rgb(13 24 45);
+  --ui-surface-1: rgb(16 28 51);
+  --ui-surface-2: rgb(21 34 58);
+  --ui-surface-3: rgb(28 42 68);
+  --ui-surface-4: rgb(38 53 80);
+  --ui-glass: rgb(18 30 54 / 0.72);
+  --ui-glass-strong: rgb(13 25 46 / 0.88);
+  --ui-line: rgb(160 200 255 / 0.1);
+  --ui-line-strong: rgb(160 200 255 / 0.2);
+  --ui-line-accent: rgb(130 200 255 / 0.4);
+  --ui-accent: rgb(130 200 255);
+  --ui-accent-soft: rgb(123 211 255 / 0.12);
+  --ui-accent-glow: rgb(123 211 255 / 0.32);
+  --ui-shadow-glow: 0 0 0 1px rgb(130 200 255 / 0.5), 0 12px 40px rgb(123 211 255 / 0.22);
+  --ui-frame: rgb(140 200 255);
+  --mood-edge: rgb(50 130 255 / 0.32);
 }
 
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from
@@ -168,20 +373,21 @@
    1024 itself the `max-width: 1024px` tablet layouts still hold, and their
    narrowest columns were not cut for 18px type. The
    pot, the clock and the timers are tuned to the HUD's height and stay their
-   size through --hud-rem. */
+   size through --hud-rem. The player's 글자 크기 factor multiplies each of
+   these (18 x 1.125 = 20.25px, 18 x 1.25 = 22.5px) and divides --hud-rem. */
 @media (min-width: 1025px) {
   html {
-    font-size: 112.5%;
+    font-size: calc(112.5% * var(--text-scale));
   }
 
   :root {
-    --hud-rem: calc(1rem / 1.125);
+    --hud-rem: calc(1rem / 1.125 / var(--text-scale));
   }
 
   /* The start screen keeps 16px: at 18px Linux put the 1280x720 start button
      at 733 (11-02). The reading screens are where the larger type is for. */
   html:has(.intro) {
-    font-size: 100%;
-    --hud-rem: 1rem;
+    font-size: calc(100% * var(--text-scale));
+    --hud-rem: calc(1rem / var(--text-scale));
   }
 }

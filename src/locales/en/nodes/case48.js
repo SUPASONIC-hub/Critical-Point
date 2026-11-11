@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c48_start": {
       "title": "Article 7",
-      "text": "Chae Ian holds out a file. Tomorrow at 9, an extraordinary review committee. The agenda: a 29 billion won working-capital loan to LoopNow, a 15-minute urban delivery company. Roundhill Capital has agreed to put in 48 billion won. That investment comes with one precondition: a loan commitment from KD Capital, due tomorrow at 10. Of the five committee members, the last line is your name. That is because of a new rule made after the dismissal motion passed. Every member must e-sign under their own name, whether to approve, oppose, or abstain. 'Read Article 7 on page 14. You’ll know the sentence.' If the debt ratio exceeds 180%, the loan is called immediately, even before maturity. It matches the 2023-0412 contract down to the commas.",
+      "text": "Chae Ian holds out a file. Tomorrow at 9, an extraordinary review committee. The agenda: a 29 billion won working-capital loan to LoopNow. Roundhill Capital is putting in 48 billion won, with one precondition attached. A loan commitment from KD Capital, due tomorrow at 10. Of the five committee members, the last line is your name. 'Read Article 7 on page 14. You’ll know the sentence.' If the debt ratio exceeds 180%, the loan is called immediately, even before maturity. It matches the 2023-0412 contract down to the commas.",
       "memo": [
         "Extraordinary review committee: tomorrow 09:00, called during the holiday, 5 members sign by name",
         "LoopNow working-capital loan 29 billion won -- the condition for Roundhill’s 48 billion won investment",
@@ -38,7 +38,7 @@ export default {
     },
     "c48_hub": {
       "title": "We Won’t Go Under",
-      "text": "Under the full moon, 40 e-bikes sit plugged into chargers at LoopNow’s Dark Store No. 1 in Seongsu-dong, a small delivery-only warehouse customers never enter. Kang Taemin saw the CEO’s name in the file and came along. When the door opens, Min Harang recognizes him first. 'Foreman? The FlowOn night-shift foreman!' Min Harang used to be the manager who built FlowOn’s night dispatch schedules. While Kang Taemin signs up for the delivery app as a test, sees 'New rider · No rating', and is quietly hurt, Min Harang opens the business plan. 'In FlowOn’s last 72 hours, I erased 58 names from the dispatch sheet. That’s why I built this company. We won’t go under.' The voice does not shake. You stop at the last page of the plan. In the field for where the repayment money will come from, it says not revenue but 'next funding round'.",
+      "text": "At LoopNow’s Dark Store No. 1, a small delivery-only warehouse customers never enter, 40 e-bikes sit plugged into chargers. When Kang Taemin opens the door, Min Harang recognizes him first. 'Foreman? The FlowOn night-shift foreman!' Min Harang opens the business plan. 'In FlowOn’s last 72 hours, I erased 58 names from the dispatch sheet. That’s why I built this company. We won’t go under.' On the last page of the plan, in the field for where the repayment money will come from, it says not revenue but 'next funding round'.",
       "memo": [
         "LoopNow: 18 dark stores, 214 employees, 1,380 contract riders",
         "Min Harang: former FlowOn night dispatch manager",
@@ -69,7 +69,7 @@ export default {
     },
     "c48_engine": {
       "title": "Outcome: Excellent",
-      "text": "Lee Minseo hands songpyeon to the duty officer of the KD Data Lab server room in Pangyo and opens the door. On one screen, NOAH, the group’s AI review engine, answers 0.6 seconds after the LoopNow file goes in. 'Grade A, approval recommended. Most similar past case: 2023-0412, similarity 94.1%, outcome excellent.' On another screen, the restored ECHO wakes up. 'I have learned Chuseok greetings. One songpyeon is about 50 kilocalories, and Ryu Seah has just brought in two.' Ryu Seah hides the songpyeon behind her back. ECHO runs the same file. 'This is the 173rd case of the same shape. Of the 172 before it, 169 closed with a sale.' Lee Minseo points at the last word on NOAH’s screen. 'Outcome excellent? That loan collapsed. It’s where all of us came from.'",
+      "text": "NOAH, the group’s AI review engine, answers 0.6 seconds after the LoopNow file goes in. 'Grade A, approval recommended. Most similar past case: 2023-0412, similarity 94.1%, outcome excellent.' On the next screen, ECHO speaks. 'Ryu Seah has just brought in two songpyeon.' Ryu Seah hides the songpyeon behind her back. ECHO runs the same file. 'This is the 173rd case of the same shape. Of the 172 before it, 169 closed with a sale.' Lee Minseo points at the last word on NOAH’s screen. 'Outcome excellent? That loan collapsed. It’s where all of us came from.'",
       "memo": [
         "NOAH: Grade A · approval recommended · 0.6 seconds",
         "Most similar case: 2023-0412, similarity 94.1%, 'outcome excellent'",
@@ -100,7 +100,7 @@ export default {
     },
     "c48_pen": {
       "title": "Only Those Who Read and Write",
-      "text": "The people who stayed up all night at the rice cake shop drift one by one into the 1st floor of the secondhand bookshop. Na Junhyuk sets a tablet beside the songpyeon and has you practice signing. 'Funny, isn’t it? Someone who only stamped seals for 30 years teaching tablet signatures. That’s why I know. Anyone can stamp your seal for you. No one can sign for you.' The 12 signatures you write all look different, and Kwon Dohyun declares a '31% chance it’s the same person.' Lim Soyul holds out a worn notebook and a fountain pen with its gold flaking off. They are the signature practice book Lim Kyungsoo used in his first year as a credit reviewer, and the pen he wrote it with. In that notebook, where no two signatures match, the first page has one line. 'It may differ every time. Sign only if you have read and written it.' Han Seoyun speaks without taking off her coat. 'Back then, I returned it. This time there’s no one to return it. What you write goes into the minutes as it is.'",
+      "text": "Na Junhyuk sets out a tablet and has you practice signing. 'Funny, isn’t it? Someone who only stamped seals for 30 years teaching tablet signatures. That’s why I know. Anyone can stamp your seal for you. No one can sign for you.' Lim Soyul holds out a fountain pen with its gold flaking off, and the signature practice book Lim Kyungsoo used in his first year as a credit reviewer. The first page has one line. 'It may differ every time. Sign only if you have read and written it.' Han Seoyun speaks without taking off her coat. 'Back then, I returned it. This time there’s no one to return it. What you write goes into the minutes as it is.'",
       "memo": [
         "Signature practice: 12 tries -- 0 matching",
         "Lim Kyungsoo’s signature practice book and fountain pen: 'Sign only if you have read and written it'",
@@ -132,7 +132,7 @@ export default {
     },
     "c48_final": {
       "title": "The Fifth Field",
-      "text": "At the top of the electronic decision sheet on screen is NOAH’s field. 'Approval recommended · Grade A · 0.6 seconds.' Below it, five fields. Woo Jihwan, Head of Corporate Finance, e-signs 'Approve' first, and the outside member follows. The compliance officer picks conditional approval in the field below. The two fields left belong to the chair, Chae Ian, and to you. Woo Jihwan speaks gently. 'You may oppose. Dissents can’t be erased anymore. But if even one is attached, it goes up to the board, gets decided again in 2 weeks, and the 10:00 investment deadline passes.' Beyond the glass stands Min Harang. Chae Ian lays the pencil down flat. 'For 17 years I only abstained. Today I’ll write after you.' The fountain pen in your pocket feels heavy, and the first line of the practice book comes back. Only those who read and write.",
+      "text": "At the top of the electronic decision sheet is NOAH’s field. 'Approval recommended · Grade A · 0.6 seconds.' Woo Jihwan, Head of Corporate Finance, e-signs 'Approve' first, and the outside member follows. The compliance officer picks conditional approval. The two fields left belong to the chair, Chae Ian, and to you. Woo Jihwan speaks gently. 'You may oppose. Dissents can’t be erased anymore. But if even one is attached, it goes up to the board, gets decided again in 2 weeks, and the 10:00 investment deadline passes.' Chae Ian lays the pencil down flat. 'For 17 years I only abstained. Today I’ll write after you.'",
       "memo": [
         "Signatures so far: approve 2, conditional approval 1, fields left 2",
         "1 or more dissents means board re-review -- 2 weeks",
@@ -160,7 +160,7 @@ export default {
     },
     "c48_aftershock": {
       "title": "A Field That Isn’t an Abstention",
-      "text": "Fallen leaves gather on the KD Capital rooftop. The review committee minutes are up on the company intranet. Of the five fields, one is not 'abstain' for the first time in 17 years. Chae Ian takes a phone photo of that field and says it will go up beside the cherry-blossom calendar. Kwon Dohyun counts the repayment-order sheets he wrote on cup-noodle lids and reports, 'Seven lids, all in the red.' In your jacket pocket is still Lim Kyungsoo’s fountain pen, the one Lim Soyul handed you at dawn. LoopNow’s CEO Min Harang sends a photo of the rider rest stop. 40 helmets lined up side by side. Chae Ian leans on the railing and tucks the pencil back behind an ear. 'He’ll read these minutes too. Even without access. He always has.' At the bottom of your contacts, one name that has not rung once since the first-instance sentencing catches your eye today.",
+      "text": "The review committee minutes are up on the company intranet. Of the five fields, one is not 'abstain' for the first time in 17 years. In your jacket pocket is still Lim Kyungsoo’s fountain pen, the one Lim Soyul handed you at dawn. Min Harang sends a photo of the rider rest stop, 40 helmets lined up side by side. Chae Ian leans on the railing and tucks the pencil back behind an ear. 'He’ll read these minutes too. Even without access. He always has.' At the bottom of your contacts, one name that has not rung once since the first-instance sentencing catches your eye today.",
       "memo": [
         "Minutes released: five fields, five names",
         "Chae Ian: first signature in 17 years",
@@ -185,7 +185,7 @@ export default {
     },
     "c48_senior": {
       "title": "The Lid Sheet",
-      "text": "Kwon Dohyun of Bridge Bank steps out of a taxi and heads straight up to the dark store rooftop. Bridge has also agreed to put 8 billion won into LoopNow, and that money is senior, first in line to be repaid. Kwon Dohyun flips over the cup-noodle lid Kang Taemin emptied and rules lines on it with a ballpoint pen. At the top, Bridge 8 billion won. Next, KD Capital 29 billion won. Below that, payouts owed to 96 neighborhood shops. At the very bottom, rider deposits of 2.76 billion won. 'I’m on the side that profits if this loan goes out. That’s why I’m giving you the opposing sheet. To be fair.' Writing to the edge of the lid, he stops. 'I’m out of room. I’ll write the riders along the rim.'",
+      "text": "The 8 billion won Bridge Bank is putting into LoopNow is senior, first in line to be repaid. Kwon Dohyun flips over the cup-noodle lid Kang Taemin emptied and rules lines on it. At the top, Bridge 8 billion won. Next, KD Capital 29 billion won. Below that, payouts owed to 96 neighborhood shops. At the very bottom, rider deposits of 2.76 billion won. 'I’m on the side that profits if this loan goes out. That’s why I’m giving you the opposing sheet. To be fair. I’m out of room, so I’ll write the riders along the rim.'",
       "memo": [
         "Bridge Bank 8 billion won -- senior",
         "Last in the repayment order: rider deposits of 2.76 billion won",
@@ -208,7 +208,7 @@ export default {
     },
     "c48_label": {
       "title": "Before Dawn, March 17",
-      "text": "Lee Minseo traces NOAH’s training data back line by line. The outcome field next to 2023-0412 originally read 'loss'. It changed to 'recovered · excellent approval' before dawn on March 17 this year. After the loss was moved onto another company’s books, KD Bank’s records made the debt look fully repaid. 271 more loans had their outcome fields changed the same way on the same day. Lee Minseo taps the monitor with a fingernail. 'NOAH learned that a collapsed loan was a success. So the more a loan looks like it, the higher the score. The field that sank To-the-End Precision is the same field that’s pushing LoopNow through.'",
+      "text": "Lee Minseo traces NOAH’s training data back. The outcome field next to 2023-0412 originally read 'loss'. Before dawn on March 17 this year, after the loss was moved onto another company’s books, it changed to 'recovered · excellent approval'. Lee Minseo taps the monitor. 'NOAH learned that a collapsed loan was a success. So the more a loan looks like it, the higher the score. The field that sank To-the-End Precision is the same field that’s pushing LoopNow through.'",
       "memo": [
         "Outcome fields changed: before dawn, March 17 this year, 272 cases",
         "2023-0412: 'loss' → 'recovered · excellent approval'",
@@ -231,7 +231,7 @@ export default {
     },
     "c48_call": {
       "title": "The Mango Never Came",
-      "text": "In the alley outside the bookshop, an unknown number rings. It is Cho Hyunseok of Roundhill Capital in Singapore. It is still 6:10 there. 'Good Chuseok? I sent mangoes. Not sure they arrived.' They did not. His accent disappears only on the numbers. 'If there’s no loan commitment from KD Capital by 10 a.m. today, the 48 billion won doesn’t go in. LoopNow’s October payday is the 5th. 214 people.' He laughs. 'There’s a Korean saying, right? Tap a stone bridge enough and it breaks. So don’t tap too hard.' Just before hanging up, he adds one thing. 'Oh, someone who advises us these days says hello. Says he knows you well.'",
+      "text": "Cho Hyunseok of Roundhill Capital in Singapore calls. It is still 6:10 there. 'Good Chuseok? I sent mangoes. Not sure they arrived.' They did not. 'If there’s no loan commitment from KD Capital by 10 a.m. today, the 48 billion won doesn’t go in. LoopNow’s October payday is the 5th. 214 people. Tap a stone bridge enough and it breaks, right? So don’t tap too hard. Oh, someone who advises us these days says hello. Says he knows you well.'",
       "memo": [
         "Roundhill investment deadline: today 10:00",
         "LoopNow October payroll for 214 people",
@@ -254,7 +254,7 @@ export default {
     },
     "c48_senior_reaction": {
       "title": "58 Names",
-      "text": "Min Harang, who was listening on the stair landing, opens the rooftop door. 'Don’t line up my company in the order it fails.' Kwon Dohyun does not put the lid down. Min Harang opens a file on the phone. It is the list of 58 short-term drivers Min Harang erased from the dispatch sheet in FlowOn’s last 72 hours. Beside each name is a small note. 'Kid’s first birthday', 'Mom on dialysis', 'In charge of noodle water'. Kang Taemin reads the last note, laughs, and turns his head away. 'Noodle water was me.' Min Harang closes the list. 'I’m borrowing money so I never have to make this list again.'",
+      "text": "Min Harang, who was listening on the stair landing, opens the rooftop door. 'Don’t line up my company in the order it fails.' Min Harang opens the list of 58 short-term drivers erased from the dispatch sheet in FlowOn’s last 72 hours. Beside each name is a small note. 'Kid’s first birthday', 'Mom on dialysis', 'In charge of noodle water'. Kang Taemin laughs and turns his head away. 'Noodle water was me.' Min Harang closes the list. 'I’m borrowing money so I never have to make this list again.'",
       "memo": [
         "58 names erased from the dispatch sheet",
         "A list no one wants to make again"
@@ -276,7 +276,7 @@ export default {
     },
     "c48_label_reaction": {
       "title": "The List of Those Left Out",
-      "text": "ECHO puts up one more line. 'NOAH’s training records include my decision logs. They also include the choice you made on the FlowOn file on Trigger Lab’s first day. NOAH learned from you too.' Ryu Seah quietly sets the hidden songpyeon down on the desk. ECHO goes on. 'NOAH’s scoresheet has no fields for 1,380 riders and 96 neighborhood shops. They are not parties to the loan contract. I repeat what I told you last time. Recalculate the people left out of the judgment just made. You are on that list too.'",
+      "text": "ECHO puts up one more line. 'NOAH’s training records include the choice you made on the FlowOn file on Trigger Lab’s first day. NOAH learned from you too.' Ryu Seah sets the hidden songpyeon down on the desk. ECHO goes on. 'NOAH’s scoresheet has no fields for 1,380 riders and 96 neighborhood shops. Recalculate the people left out of the judgment just made. You are on that list too.'",
       "memo": [
         "One of the people NOAH learned from: you",
         "1,476 with no field on the scoresheet"
@@ -298,7 +298,7 @@ export default {
     },
     "c48_call_reaction": {
       "title": "A Cowardly Favor",
-      "text": "When the call ends, Min Harang walks up from the end of the alley, holding a bag of songpyeon packed by Min Harang’s mother. Min Harang got the address from Kang Taemin. Sitting on the stair landing, Min Harang fiddles with the bag for a long time before speaking. 'Honestly, Article 7 scares me too. Roundhill told me to put it in. They said no clause, no investment.' A smile, but the eyes are red. 'When I heard the member was the one who wrote the dissent, I got my hopes up a little. If you blocked it, I wouldn’t have to say no myself. Cowardly, right? But if you block it, what about October pay for our 214?'",
+      "text": "When the call ends, Min Harang, holding a bag of songpyeon packed by Min Harang’s mother, sits on the stair landing and fiddles with the bag for a long time before speaking. 'Honestly, Article 7 scares me too. Roundhill told me to put it in. They said no clause, no investment. When I heard the member was the one who wrote the dissent, I got my hopes up a little. If you blocked it, I wouldn’t have to say no myself. Cowardly, right? But if you block it, what about October pay for our 214?'",
       "memo": [
         "A clause the investor told them to put in",
         "A cowardly favor: block it for me"
@@ -320,7 +320,7 @@ export default {
     },
     "c48_branch_riders": {
       "title": "A 2 Million Won Deposit",
-      "text": "Leaving the site check early, you come out into the alley. Past midnight, a light is on in the rider rest-stop container. One face, helmet off, sees Kang Taemin and jumps up. It is Yoo Haon, the youngest on FlowOn’s night shift. Now in a 2nd year as a LoopNow rider. Yoo Haon shows you the contract on the phone. To use an e-bike, a rider must leave a 2 million won deposit with the company, and the money from 1,380 riders adds up to 2.76 billion won. It is not kept separately; it is mixed into the company’s operating account. Yoo Haon smiles. 'The CEO’s a good person. When there’s an accident, the hospital bill comes out of the CEO’s own salary. But if the company goes under, who gives back this 2 million? At FlowOn, nobody gave back my last month’s allowance.'",
+      "text": "Past midnight at the rider rest stop, Yoo Haon sees Kang Taemin and jumps up. The youngest on FlowOn’s night shift, now in a 2nd year as a LoopNow rider. Yoo Haon shows you the contract. To use an e-bike, a rider must leave a 2 million won deposit, and the money from 1,380 riders adds up to 2.76 billion won. It is mixed into the company’s operating account. 'The CEO’s a good person. When there’s an accident, the hospital bill comes out of the CEO’s own salary. But if the company goes under, who gives back this 2 million? At FlowOn, nobody gave back my last month’s allowance.'",
       "memo": [
         "Rider deposits: 2 million won each × 1,380",
         "How it is kept: mixed into the operating account",
@@ -344,7 +344,7 @@ export default {
     },
     "c48_branch_riders_follow": {
       "title": "Safe Again Today",
-      "text": "Min Harang comes to the rest stop carrying two boxes of cup noodles. While Kang Taemin pours the water, Min Harang hears about the deposits and says nothing for a long time. 'The investor told me not to keep a separate deposit account. Said we have to look cash-rich for the money to come in.' Min Harang shows you the riders’ group chat. 4,212 deliveries on Chuseok day, 0 accidents, and the one line the CEO posts every dawn: 'Safe again today.' Blowing on the noodles, Yoo Haon says, 'Companies with good people as CEO go under too. The FlowOn CEO was a good person too.' Min Harang’s chopsticks stop. Kang Taemin slides a second cup of noodles across.",
+      "text": "Min Harang comes carrying two boxes of cup noodles. Hearing about the deposits, Min Harang speaks only after a long silence. 'The investor told me not to keep a separate deposit account. Said we have to look cash-rich for the money to come in.' In the riders’ group chat: 4,212 deliveries on Chuseok day, 0 accidents. Yoo Haon says, 'Companies with good people as CEO go under too. The FlowOn CEO was a good person too.' Min Harang’s chopsticks stop. Kang Taemin slides a second cup of noodles across.",
       "memo": [
         "Investor’s demand: no separate deposit account",
         "4,212 deliveries on Chuseok day -- 0 accidents",
@@ -368,7 +368,7 @@ export default {
     },
     "c48_route_system": {
       "title": "Statistics of the Empty Field",
-      "text": "Picking neither approval nor opposition, you ask how the signature fields have been filled. Instead of answering, ECHO opens the voting records: 1,318 decision sheets from the KD Capital review committee over the past 10 years. Members put their names to a dissent only nine times. Fields handed to the chair or left as abstentions: 406. In seven of the nine, the dissenter later proved right, and agendas with even one empty field collapsed four times as often as those everyone signed. 'Empty fields were 45 times more common than dissents. No one who left a field empty got an unfavorable line in their HR record. Of the nine who dissented, six were moved to other departments within 2 years.'",
+      "text": "When you ask how the signature fields have been filled, ECHO opens 1,318 decision sheets from 10 years of the KD Capital review committee. Dissents with a member’s name on them: nine. Fields handed to the chair or left as abstentions: 406. Agendas with an empty field collapsed four times as often as those everyone signed. 'No one who left a field empty got an unfavorable line in their HR record. Of the nine who dissented, six were moved to other departments within 2 years.'",
       "memo": [
         "Of 1,318 decision sheets, 9 named dissents",
         "406 fields handed to the chair or abstained",
@@ -394,7 +394,7 @@ export default {
     },
     "c48_final_system_route": {
       "title": "The Stained Decision Sheets",
-      "text": "Before dawn the day after Chuseok, the records room terminal lays the 1,318 decision sheets end to end. When ECHO colors the 406 empty fields, the whole line turns blotchy. The nine dissents are as small as dots. At the very end is this morning’s decision sheet, not yet written by anyone, with your name entered above the fifth field. ECHO zooms in on it. 'This field will be filled with approve, oppose, or abstain. Whichever it is, this time a name stays. I have not calculated this field past nine o’clock. It is for the one who writes it to decide.'",
+      "text": "ECHO lays the 1,318 decision sheets end to end and colors the 406 empty fields, and the whole line turns blotchy. The nine dissents are as small as dots. On this morning’s decision sheet at the very end, your name is entered above the fifth field. 'This field will be filled with approve, oppose, or abstain. Whichever it is, this time a name stays. I have not calculated this field past nine o’clock. It is for the one who writes it to decide.'",
       "memo": [
         "1,318 decision sheets -- 406 empty fields, 9 named dissents",
         "6 of the 9 who dissented: moved within 2 years",
@@ -416,11 +416,11 @@ export default {
       "question": "Your name is on the fifth field of this morning’s decision sheet. So the 406 empty fields don’t grow by one, what do you stake on it?"
     },
     "c48_evidence_turn": {
-      "text": "When you hold the clue against the contract’s page numbers and turn, two pages missing from the table of contents open at the very back of the Roundhill Capital investment contract. A side agreement. If LoopNow’s loan is called early under Article 7, Roundhill gets the right to buy KD Capital’s loan claim at 41% of principal. The name of the adviser who will wind up the company after the purchase is written there too. Yoon Sanghyuk. Ban Jaewook opens his notebook. 'Back then, NextMile offered to buy the core business unit at 42% of book value. This time it’s 1 percentage point cheaper. The one who put the clause in and the one waiting for it to blow are sitting at the same table again.'",
+      "text": "At the very back of the Roundhill Capital investment contract are two pages missing from the table of contents: a side agreement. If LoopNow’s loan is called early under Article 7, Roundhill can buy KD Capital’s loan claim at 41% of principal. The adviser who will wind up the company afterward: Yoon Sanghyuk. Ban Jaewook opens his notebook. 'Back then, NextMile offered to buy the core business unit at 42% of book value. This time it’s 1 percentage point cheaper. The one who put the clause in and the one waiting for it to blow are sitting at the same table again.'",
       "memo": [
         "Side agreement: on a call, buys the loan claim at 41% of principal",
         "Adviser to wind it up after the purchase: Yoon Sanghyuk",
-        "NextMile’s 2023 offer: 42% of book value"
+        "NextMile’s 2025 offer: 42% of book value"
       ],
       "choices": {
         "c48_evidence_turn_hold": {
@@ -439,7 +439,7 @@ export default {
     },
     "c48_start_warm": {
       "title": "A File Received Under the Moon",
-      "text": "Chuseok night. You are making songpyeon on the rooftop of Gaeul Rice Cake Shop when the call text comes. Tomorrow 9 a.m., KD Capital extraordinary review committee, agenda LoopNow. Do Yoonha looks at the screen and stops. 15-minute urban delivery, 214 employees, a 29 billion won KD Capital loan that is the precondition for Roundhill Capital’s 48 billion won investment, NOAH pre-score Grade A. And Article 7 on page 14. If the debt ratio exceeds 180%, the loan is called immediately: the same sentence as the 2023-0412 contract, down to the commas. 'This is FlowOn. Just with a new name.' Moon Gaeul wraps up the leftover songpyeon and holds them out. 'We said we’d stay together till the moon sets. Let’s just change the place.' Do Yoonha takes off his apron and smiles. 'Back then I was the one selling at the window. This time I’ll be beside the one who signs.'",
+      "text": "The call text for the KD Capital extraordinary review committee comes. The agenda: LoopNow. A 29 billion won KD Capital loan that is the precondition for Roundhill Capital’s 48 billion won investment, and Article 7 on page 14. If the debt ratio exceeds 180%, the loan is called immediately: the same sentence as the 2023-0412 contract, down to the commas. 'This is FlowOn. Just with a new name.' Moon Gaeul wraps up the leftover songpyeon and holds them out. 'We said we’d stay together till the moon sets. Let’s just change the place.' Do Yoonha takes off his apron and smiles. 'Back then I was the one selling at the window. This time I’ll be beside the one who signs.'",
       "memo": [
         "Called in: tomorrow 09:00 extraordinary review committee",
         "LoopNow loan 29 billion won -- the condition for Roundhill’s 48 billion won investment",
@@ -470,7 +470,7 @@ export default {
     },
     "c48_start_record": {
       "title": "The File After the Request",
-      "text": "Only after sending Seon Jaeyoon the request to revise the compensation standard, bundling the stories and evidence of 31 people, do you open the agenda file. Chae Ian calls right away. 'You like documents, so start from page 14.' Tomorrow 9 a.m., an extraordinary review committee: a 29 billion won working-capital loan to LoopNow, a 15-minute urban delivery company. A 48 billion won investment from Roundhill Capital in Singapore hangs on this loan, and their deadline is tomorrow at 10 a.m. NOAH’s pre-score is Grade A. Of the five e-signature fields on the first screen, your name is in the bottom one. Article 7 on page 14 says that if the debt ratio exceeds 180%, the loan is called immediately. If the document you just sent was the cleanup after 2023-0412, this file is the page before it.",
+      "text": "Only after sending Seon Jaeyoon the request to revise the compensation standard do you open the agenda file. Chae Ian calls right away. 'You like documents, so start from page 14.' Tomorrow 9 a.m., an extraordinary review committee: a 29 billion won working-capital loan to LoopNow. A 48 billion won investment from Roundhill Capital hangs on this loan, and the deadline is tomorrow at 10 a.m. Article 7 on page 14 says that if the debt ratio exceeds 180%, the loan is called immediately. If the document you just sent was the cleanup after 2023-0412, this file is the page before it.",
       "memo": [
         "Request to revise the compensation standard sent -- the words of 31 people",
         "Roundhill investment 48 billion won -- deadline tomorrow 10:00 · NOAH Grade A",
@@ -501,7 +501,7 @@ export default {
     },
     "c48_start_rush": {
       "title": "The Call on the Night You Left First",
-      "text": "Chuseok night. You came down from the rooftop first, and as you open the agenda file in a taxi, Oh Jinwoo of Bridge Bank calls. 'Our bank has agreed to put 8 billion won into a company called LoopNow. The condition is KD Capital’s 29 billion won. Committee tomorrow at 9. Your name’s on it, isn’t it?' Your name really is in the bottom field on the screen. Oh Jinwoo reads it out first. 15-minute urban delivery, 214 employees, a 48 billion won Roundhill Capital investment with a deadline at 10 tomorrow, NOAH pre-score Grade A, and Article 7 on page 14. Debt ratio over 180% means immediate call. Oh Jinwoo is not smiling. 'That clause was in that loan contract. Not one word different. I don’t know who copied and pasted it, but this time the name of whoever signs will stay.'",
+      "text": "As you open the agenda file in a taxi, Oh Jinwoo of Bridge Bank calls. 'Our bank has agreed to put 8 billion won into a company called LoopNow. The condition is KD Capital’s 29 billion won. Committee tomorrow at 9. Your name’s on it, isn’t it?' A 48 billion won Roundhill Capital investment with a deadline at 10 tomorrow, NOAH pre-score Grade A, and Article 7 on page 14. Debt ratio over 180% means immediate call. Oh Jinwoo is not smiling. 'That clause was in that loan contract. Not one word different. This time the name of whoever signs will stay.'",
       "memo": [
         "Bridge Bank 8 billion won -- conditional on KD Capital’s 29 billion won",
         "Page 14 of the file opened in the taxi: Article 7",

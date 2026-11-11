@@ -3,7 +3,7 @@ import {
   ChartColumn,
   Clock3,
   Shield,
-  TriangleAlert,
+  TriangleExclamationPoint,
   Users,
 } from "lucide-react";
 import { easyResourceLabels } from "./playerLanguage.js";
@@ -30,7 +30,7 @@ export const resourceMeta = {
   capital: { label: easyResourceLabels.capital, suffix: "", icon: BriefcaseBusiness },
   trust: { label: easyResourceLabels.trust, suffix: "", icon: Users },
   legitimacy: { label: easyResourceLabels.legitimacy, suffix: "", icon: Shield },
-  humanCost: { label: easyResourceLabels.humanCost, suffix: "", icon: TriangleAlert },
+  humanCost: { label: easyResourceLabels.humanCost, suffix: "", icon: TriangleExclamationPoint },
   fatigue: { label: easyResourceLabels.fatigue, suffix: "", icon: ChartColumn },
 };
 

@@ -95,10 +95,37 @@ export function boardTextHasContact(value) {
 }
 
 /**
+ * The blocked words (src/boardBlockedTerms.js, the trigger's
+ * `board_text_has_blocked_term`): the name first, then the post, as the
+ * trigger checks them. `find` is `findBlockedTerm`, passed in because the list
+ * is loaded only when a post is about to go (findBoardBlockedRefusal).
+ */
+export function getBoardBlockedRefusal(nickname, body, find) {
+  if (find(cleanBoardText(String(nickname ?? "").replace(/\s+/g, " ")))) return "nickname-blocked";
+  if (find(cleanBoardText(body))) return "body-blocked";
+  return null;
+}
+
+/**
+ * The same, with the list loaded on demand: it is not in the chunk the board's
+ * hook ships in, which the pre-start shell reaches. A list that fails to load
+ * stops nothing here; the trigger still refuses the post.
+ */
+export async function findBoardBlockedRefusal(nickname, body) {
+  try {
+    const { findBlockedTerm } = await import("../boardBlockedTerms.js");
+    return getBoardBlockedRefusal(nickname, body, findBlockedTerm);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Why a post cannot go up as written, or null. The order is the trigger's, so
  * a post that breaks two rules is refused for the same one on both sides.
+ * With `find` (findBlockedTerm) the blocked words are checked last, as there.
  */
-export function getBoardPostRefusal(nickname, body) {
+export function getBoardPostRefusal(nickname, body, find = null) {
   const name = cleanBoardText(String(nickname ?? "").replace(/\s+/g, " "));
   const text = cleanBoardText(body);
   if (name.length < BOARD_NICKNAME_MIN_LENGTH || name.length > PLAYER_NAME_MAX_LENGTH || visibleLength(name) < BOARD_NICKNAME_MIN_LENGTH) {
@@ -110,7 +137,7 @@ export function getBoardPostRefusal(nickname, body) {
   if (boardTextHasLink(name)) return "nickname-link";
   if (boardTextHasLink(text)) return "body-link";
   if (boardTextHasContact(name) || boardTextHasContact(text)) return "contact";
-  return null;
+  return find ? getBoardBlockedRefusal(name, text, find) : null;
 }
 
 const BOARD_REFUSAL_COPY = W.refusals;
@@ -235,6 +262,8 @@ function describeBoardFailure(error, isOnline) {
   if (/nickname must not contain a link/.test(message)) return BOARD_REFUSAL_COPY["nickname-link"];
   if (/must not contain a link/.test(message)) return BOARD_REFUSAL_COPY["body-link"];
   if (/must not contain contact details/.test(message)) return BOARD_REFUSAL_COPY.contact;
+  if (/nickname must not contain a blocked word/.test(message)) return BOARD_REFUSAL_COPY["nickname-blocked"];
+  if (/must not contain a blocked word/.test(message)) return BOARD_REFUSAL_COPY["body-blocked"];
   // Someone else on the same network wrote the same words. That used to be
   // answered with "글을 올렸습니다" for a post that was stored nowhere.
   if (/repeats a recent post/.test(message)) return W.failures.repeat;
@@ -349,6 +378,11 @@ export function useBoard({ showBoard, isOnline }) {
     }
     if (isOwnRecentPost(readOwnBoardPosts(), trimmedBoardBody)) {
       setBoardPostStatus(W.alreadyPosted);
+      return;
+    }
+    const blocked = await findBoardBlockedRefusal(boardNickname, boardBody);
+    if (blocked) {
+      setBoardPostStatus(BOARD_REFUSAL_COPY[blocked]);
       return;
     }
 

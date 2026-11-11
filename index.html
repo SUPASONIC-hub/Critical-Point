@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
-      content="판단이 깊어지는 순간을 추적하는 대화형 의사결정 게임 프로토타입"
+      content="「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다."
     />
     <meta name="theme-color" content="#06090a" />
     <meta name="color-scheme" content="dark" />
@@ -14,21 +14,23 @@
          crawler reading og:image does not resolve a relative one. -->
     <link rel="canonical" href="/" vite-ignore />
     <!-- The same game in its other languages (open to the end since 10-28): a
-         crawler finds them by these, and each opens in its own language. -->
+         crawler finds them by these, and each opens in its own language.
+         /en/ and /ja/ are this page with its words in that language
+         (scripts/site-pages.mjs `localizedStartPage`, written by the build). -->
     <link rel="alternate" hreflang="ko" href="/" vite-ignore />
-    <link rel="alternate" hreflang="en" href="/?lang=en" vite-ignore />
-    <link rel="alternate" hreflang="ja" href="/?lang=ja" vite-ignore />
+    <link rel="alternate" hreflang="en" href="/en/" vite-ignore />
+    <link rel="alternate" hreflang="ja" href="/ja/" vite-ignore />
     <link rel="alternate" hreflang="x-default" href="/" vite-ignore />
     <meta property="og:locale:alternate" content="en_US" />
     <meta property="og:locale:alternate" content="ja_JP" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="/" />
-    <meta property="og:site_name" content="CRITICAL POINT 임계점" />
+    <meta property="og:site_name" content="임계점: CRITICAL POINT" />
     <meta property="og:locale" content="ko_KR" />
-    <meta property="og:title" content="CRITICAL POINT 임계점 - 판단이 깊어지는 순간" />
+    <meta property="og:title" content="임계점: CRITICAL POINT - 판단이 깊어지는 순간" />
     <meta
       property="og:description"
-      content="트리거랩의 사건을 따라가며 어떤 조건에서 생각이 깊어지는지 확인하는 대화형 의사결정 게임"
+      content="「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다."
     />
     <meta property="og:image" content="/triggerlab-key-visual.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
@@ -36,13 +38,15 @@
     <meta property="og:image:height" content="675" />
     <meta property="og:image:alt" content="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CRITICAL POINT 임계점 - 판단이 깊어지는 순간" />
+    <meta name="twitter:title" content="임계점: CRITICAL POINT - 판단이 깊어지는 순간" />
     <meta
       name="twitter:description"
-      content="트리거랩의 사건을 따라가며 선택, 반론, 자원 변화를 기록하는 플레이테스트 프로토타입"
+      content="「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다."
     />
     <meta name="twitter:image" content="/triggerlab-key-visual.jpg" />
     <meta name="twitter:image:alt" content="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습" />
+    <!-- JSON-LD, written by startStructuredData (scripts/site-pages.mjs) -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"임계점: CRITICAL POINT","url":"/","inLanguage":"ko"},{"@type":"VideoGame","name":"임계점: CRITICAL POINT","url":"/","inLanguage":"ko","description":"「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다.","image":"/triggerlab-key-visual.jpg","genre":["기업·금융 미스터리","푸시 유어 럭"],"gamePlatform":"Web browser","applicationCategory":"Game","author":{"@type":"Organization","name":"찹쌀떡","member":[{"@type":"Person","name":"SUPASONIC"},{"@type":"Person","name":"ALICE"}]},"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}]}</script>
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -70,8 +74,10 @@
       media="not all and (max-width: 700px)"
       fetchpriority="high"
     />
-    <!-- The one font file (src/styles/tokens.css). Preloaded so the intro's text
-         is not held until the stylesheet that names it has been parsed. -->
+    <!-- The first of the two font files (src/styles/tokens.css): the start
+         screen's characters. Preloaded so the intro's text is not held until the
+         stylesheet that names it has been parsed. The second file is not
+         preloaded; the service worker keeps it at install. -->
     <link
       rel="preload"
       as="font"
@@ -79,7 +85,7 @@
       href="/src/assets/fonts/pretendard-cp.woff2"
       crossorigin
     />
-    <title>CRITICAL POINT 임계점 - 판단이 깊어지는 순간</title>
+    <title>임계점: CRITICAL POINT - 판단이 깊어지는 순간</title>
   </head>
   <body>
     <div id="root"></div>
@@ -87,9 +93,14 @@
          said nothing. -->
     <!-- Inline styles only: with no script the deferred sheet may still load
          (its <noscript> link), so every property this block relies on is set
-         here. The links are each browser's own help page (개선 포인트 E2). -->
+         here. The links are each browser's own help page (개선 포인트 E2), then
+         what the game is and its five plain pages, for a reader or a crawler
+         with no script (SEO 점검 11-03; scripts/site-pages.mjs `startNoscript`
+         writes this block, and the English and Japanese pages' own). -->
     <noscript>
       <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #f2f6f3; background: #06090a; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
+        <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">임계점: CRITICAL POINT</h1>
+        <p style="margin: 0 0 24px">「임계점: CRITICAL POINT」는 기업·금융 미스터리이자 푸시 유어 럭(push your luck) 게임입니다. 판돈을 올릴수록 보이지 않는 벽이 가까워지고, 한 번의 판단은 다음 판의 규칙을 바꿉니다.</p>
         <p style="margin: 0 0 12px; font-weight: 700">
           사건 파일이 열리지 않았습니다. 분석 시스템이 이 브라우저에서 실행 승인을 받지 못했습니다.
         </p>
@@ -103,6 +114,17 @@
           <li><a href="https://www.samsung.com/us/support/troubleshoot/TSG10007306/" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">삼성 인터넷</a></li>
           <li><a href="https://support.mozilla.org/kb/javascript-settings-for-interactive-web-pages" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Firefox</a></li>
           <li><a href="https://support.microsoft.com/ko-kr/office/enable-javascript-7bb9ee74-6a9e-4dd1-babf-b0a1bb136361" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Edge</a></li>
+        </ul>
+        <ul style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none; margin-top: 24px">
+          <li><a href="/about.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">게임 소개</a></li>
+          <li><a href="/faq.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">자주 묻는 질문</a></li>
+          <li><a href="/contact.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">문의</a></li>
+          <li><a href="/privacy.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">개인정보처리방침</a></li>
+          <li><a href="/terms.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">이용약관</a></li>
+          <li><a href="/guide.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">게임 방법</a></li>
+          <li><a href="/cases/index.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">사건 파일</a></li>
+          <li><a href="/characters.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">인물</a></li>
+          <li><a href="/making.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">만든 이야기</a></li>
         </ul>
       </div>
     </noscript>
