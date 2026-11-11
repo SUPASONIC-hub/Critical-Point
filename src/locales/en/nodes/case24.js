@@ -39,7 +39,7 @@ export default {
     },
     "c24_desks": {
       "title": "Emptying Desks",
-      "text": "Oh Jinwoo got an envelope from Bridge Bank in the same name as in December, and this time with a start date. Do Yoonha has received a transfer order to a window at Gangseo Branch. The seat where he sold that loan 3 years ago. He takes out the notebook where he first wrote down the 1,740 names. 'Can I take this to the window? When here won’t exist anymore.'",
+      "text": "Oh Jinwoo got an envelope from Bridge Bank in the same name as in December, and this time with a start date. Do Yoonha has received a transfer order to a window at Gangseo Branch. The seat where he sold that loan 3 years ago. He takes out the notebook where he first wrote down the 1,740 names. 'Can I take this to the window? Or do I have to leave it here? When here won’t exist anymore.'",
       "memo": [
         "Transfers: Ban Jaewook to Internal Audit, Lee Minseo pending reassignment, Oh Jinwoo’s new post settled first",
         "Do Yoonha’s new post: a window at Gangseo Branch",
@@ -70,7 +70,7 @@ export default {
     },
     "c24_rooftop": {
       "title": "Half a Confession",
-      "text": "Han Seoyun speaks. 'No results is a lie. There were results. When you think more deeply, when you stop—that record. That record went to Human Resources as a supplementary metric for performance reviews. Who ordered it—I don’t know all of it either. No, there are things I do know. Those I can’t say yet.'",
+      "text": "Han Seoyun speaks. 'It’s a lie that the reason is no results. Trigger Lab had results. When you think more deeply, when you stop—that record. That record went to Human Resources as a supplementary metric for performance reviews. How far it went, who ordered it—I don’t know all of it either. No, there are things I do know. Those I can’t say yet.'",
       "memo": [
         "Trigger Lab response records -- transferred as a supplementary HR review metric",
         "Han Seoyun: the scope of the transfer and who ordered it, 'not yet'",
@@ -132,7 +132,7 @@ export default {
     },
     "c24_final": {
       "title": "Receipt Log",
-      "text": "When the elevator doors open, Baek Arin is standing there. She holds out an envelope. 'It’s the receipt log for the original 2023-0412 approval document from 3 years ago. The day it came up to this floor with the signature field blank, there was one name in the recipient field. This is the first fact I’m choosing. Where it came from, anyone on this floor will know.'",
+      "text": "When the elevator doors open, Baek Arin is standing there. She holds out an envelope. 'It’s the receipt log for the original 2023-0412 approval document from 3 years ago. The day it came up to this floor with the signature field blank, there was one name in the recipient field. I told you a good story outlasts the facts. This is the first fact I’m choosing. Where it came from—anyone on this floor will figure that out.'",
       "memo": [
         "Receipt log for the 2023-0412 original -- Group Strategy Office intake log",
         "Recipient field: one name",
@@ -230,7 +230,7 @@ export default {
     },
     "c24_press": {
       "title": "Friday Morning Story",
-      "text": "As the street stall party breaks up, Seo Harin calls. 'I have a draft of a story on Trigger Lab’s dissolution. I can run it at seven on Friday morning. But your colleagues’ names might appear in it. The ones whose transfers are already out. What I write isn’t your side. It’s the side you can prove.'",
+      "text": "As the street stall party breaks up, Seo Harin calls. 'I have a draft of a story on Trigger Lab’s dissolution, down to the question of where a vanishing department’s records go. I can run it at seven on Friday morning. But your colleagues’ names might appear in it. The ones whose transfers are already out. What I write isn’t your side. It’s the side you can prove.'",
       "memo": [
         "Leadline draft -- can go up Friday 07:00",
         "5 colleagues whose names could appear in the story",

@@ -392,7 +392,7 @@ export default {
     },
     "c22_final_system_route": {
       "title": "An Answer That Comes Back Around",
-      "text": "The screen Ryu Seah captured is still open on the terminal. The same question brings the same answer back in 0.3 seconds. Ryu Seah speaks. 'The adoption report calls this explainable. It isn’t wrong. It does give an explanation.'",
+      "text": "The screen Ryu Seah captured is still open on the terminal. The same question brings the same answer back in 0.3 seconds. Ryu Seah speaks. 'The adoption report calls this explainable. It isn’t wrong. It does give an explanation. And the people at To-the-End Precision are waiting for this answer today too.'",
       "memo": [
         "NOAH’s rejection explanation: cites past rejections as the reason",
         "41 R-17 rejections -- 2 weeks of full operation",

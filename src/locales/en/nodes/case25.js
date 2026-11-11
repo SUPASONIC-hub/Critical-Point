@@ -160,7 +160,7 @@ export default {
     },
     "c25_aftershock": {
       "title": "Week 1 on the Job",
-      "text": "Han Seoyun adds small print next to the group chat’s name. 'Week 1 on the job.' When Oh Jinwoo posts 'Lunch showdown: 3 wins in 4', Kwon Dohyun answers. 'That 1 loss is me. I paid for the meal, so in real terms I won.' Then an email arrives from Chae Ian. The subject: 'Pyeongtaek site -- 1 person on a tower crane'. 'This is the CEO’s first agenda item Monday. I thought you should see it before then.'",
+      "text": "Han Seoyun adds small print next to the group chat’s name. 'Week 1 on the job.' When Oh Jinwoo posts 'Lunch showdown: 3 wins in 4', Kwon Dohyun answers. 'That 1 loss is me. I paid for the meal, so in real terms I won.' Then an email arrives from Chae Ian. The subject: 'Pyeongtaek site -- 1 person on a tower crane'. 'This is the CEO’s first agenda item Monday morning. I thought you should see it before then.'",
       "memo": [
         "Yunjung-ro cherry blossoms -- past their peak, falling",
         "Group chat: 'Week 1 on the job'",
@@ -184,7 +184,7 @@ export default {
     },
     "c25_photo": {
       "title": "The Last Group Photo",
-      "text": "Moon Hajun sets up a tripod. 'Last group photo. Stand so the Trigger Lab sign shows.' With Kang Taemin at the back the sign is blocked; seated in front, he hides Kwon Dohyun. The middle of the front row is empty. Han Seoyun hasn’t come. Moon Hajun asks, 'Should we leave the Lab Director’s spot empty? Or should I draw her in later?'",
+      "text": "Moon Hajun sets up a tripod. 'Last group photo. Stand so the Trigger Lab sign shows.' With Kang Taemin at the back the sign is blocked; seated in front, he hides Kwon Dohyun. Kwon Dohyun goes up on tiptoe: 'I’ve always been the one behind the ledger.' The middle of the front row is empty. Han Seoyun hasn’t come. Moon Hajun asks, 'Should we leave the Lab Director’s spot empty? Or should I draw her in later?'",
       "memo": [
         "Last group photo -- tripod, 10-second timer",
         "Empty spot, middle of the front row: Han Seoyun",
@@ -253,7 +253,7 @@ export default {
     },
     "c25_photo_reaction": {
       "title": "A Rival on the Same Floor",
-      "text": "In Kwon Dohyun’s wad of receipts: moving truck fare 420,000 won, and Kang Taemin’s arm strength, 'no field to price it'. Oh Jinwoo’s new post is Bridge Bank acquisitions team head. Kwon Dohyun grins. 'Same floor from Monday. He’ll claim a win every lunch.' Then he adds, 'Bridge is looking into a bundle of KD Capital’s bad loans. Oh Jinwoo’s seat is that exact job.'",
+      "text": "In Kwon Dohyun’s wad of receipts: moving truck fare 420,000 won, and Kang Taemin’s arm strength, 'no field to price it'. Oh Jinwoo’s new post is Bridge Bank acquisitions team head. Kwon Dohyun grins. 'Same floor from Monday. He’ll claim a win every lunch.' Then he adds, 'Bridge is looking into a bundle of KD Capital’s bad loans. The seat Oh Jinwoo is taking is that exact job.'",
       "memo": [
         "Oh Jinwoo’s new post: Bridge Bank acquisitions team head, same floor as Kwon Dohyun",
         "Under Bridge review: a bundle of KD Capital bad loans"
@@ -275,7 +275,7 @@ export default {
     },
     "c25_lunchbox_reaction": {
       "title": "A Folder With Only a New Name",
-      "text": "Lee Minseo, who started at KD Data Lab yesterday, comes over. 'On the server next to my desk there’s a Trigger Lab folder. Only the name has changed, to a supplementary performance-review metrics folder. There’s one outside account that opens that folder every Monday before dawn. It’s not anyone from our group.'",
+      "text": "Lee Minseo, who started at KD Data Lab yesterday, comes over. 'On the server next to my desk there’s a Trigger Lab folder. Only the name has changed, to a supplementary performance-review metrics folder. And there’s one outside account that opens that folder every Monday before dawn. It’s not anyone from our group.'",
       "memo": [
         "KD Data Lab server -- Trigger Lab folder, only renamed",
         "Outside account logs in every Monday before dawn"
@@ -297,7 +297,7 @@ export default {
     },
     "c25_firstday_reaction": {
       "title": "The Second Line",
-      "text": "Ban Jaewook sends a photo of the statement of reasons for the transfer orders. All six share the same single line. 'Reassignment following the organization’s dissolution.' Only yours has a second line. 'Requesting department: Office of the CEO, KD Capital.' 'The other five were scattered. You were summoned.' One more line comes. 'The deposit-interest notice at Saebom Credit Union in Gunsan has changed twice just this week. I don’t know why yet.'",
+      "text": "Ban Jaewook sends a photo of the statement of reasons for the transfer orders. All six share the same single line. 'Reassignment following the organization’s dissolution.' Only yours has a second line. 'Requesting department: Office of the CEO, KD Capital.' 'The other five were scattered. You were summoned.' One more line comes. 'Across from my lodging, on the glass door of Saebom Credit Union in Gunsan, the notice offering higher deposit interest has been replaced twice just this week. I don’t know why yet.'",
       "memo": [
         "Second line of your statement: requesting department, Office of the CEO, KD Capital",
         "Saebom Credit Union in Gunsan, deposit-rate notice replaced twice in a week -- reason unknown"
@@ -319,7 +319,7 @@ export default {
     },
     "c25_branch_boxes": {
       "title": "Moving Boxes on the 33rd Floor",
-      "text": "Four movers are packing Yoon Sanghyuk’s office into boxes labeled 'Office of the CEO, KD Capital'. At the end of the hall, seven shredding sacks. Baek Arin, perched on her own box, says, 'I handed in my resignation the Friday before last. They say it’ll be accepted in 2 weeks. Those sacks go out at seven this evening. No one has ever made a list before shredding.'",
+      "text": "Four movers are packing Yoon Sanghyuk’s office into boxes labeled 'Office of the CEO, KD Capital'. At the end of the hall, seven shredding sacks. Baek Arin, perched on her own box, says, 'I handed in my resignation the Friday before last. They say it’ll be accepted in 2 weeks. Those sacks go out at seven this evening. In all my time here, no one has ever made a list before shredding.'",
       "memo": [
         "Moving boxes from Yoon Sanghyuk’s office -- label 'Office of the CEO, KD Capital'",
         "7 shredding sacks, out at 19:00 today",
@@ -416,7 +416,7 @@ export default {
     },
     "c25_evidence_turn": {
       "title": "The March 16 Board Meeting",
-      "text": "The minutes of KD Capital’s board of directors, March 16. Item 1, designation of a new CEO; Item 2, 'Risk Management Department staffing: 1 hire, designated by the CEO'. In the subject field for Item 2 is your employee ID. Topping the votes in favor: two directors from the largest shareholder, Kingsdale Partners of New York, by video. The shareholders’ meeting came four days later. Ban Jaewook says, 'However the vote turned out, the posts were decided first. Yours included.'",
+      "text": "The minutes of KD Capital’s board of directors, March 16. Item 1, designation of a new CEO; Item 2, 'Risk Management Department staffing: 1 hire, designated by the CEO'. In the subject field for Item 2 is your employee ID. Topping the votes in favor: two directors from the largest shareholder, Kingsdale Partners of New York, by video. The shareholders’ meeting came four days later. Ban Jaewook says, 'However the vote turned out, the posts were decided first. Yours included. When they moved one man, they decided at the same time who would stand beside him.'",
       "memo": [
         "KD Capital board minutes -- March 16",
         "Subject of Item 2: your employee ID",
@@ -439,7 +439,7 @@ export default {
     },
     "c25_start_warm": {
       "title": "The Empty Office at Four in the Morning",
-      "text": "None of the 19 went down the stairs first in the end. Do Yoonha says, 'Let’s go now. Together.' Alone on the 33rd floor, you find Yoon Sanghyuk’s office empty. On the desk, the notice: Yoon Sanghyuk, CEO of KD Capital, and at the very end of the transfer orders, your name. 'KD Capital Risk Management Department, reporting directly to the CEO.' On the phone, Do Yoonha says after a long pause, 'While we waited all night, he’d already left.'",
+      "text": "None of the 19 went down the stairs first in the end. Do Yoonha says, 'Let’s go now. Together.' Alone on the 33rd floor, you find Yoon Sanghyuk’s office empty. On the desk, the notice: Yoon Sanghyuk, CEO of KD Capital, and at the very end of the transfer orders, your name. 'KD Capital Risk Management Department, reporting directly to the CEO.' On the phone, Do Yoonha asks, 'Is he there?' When you say no, he says after a long pause, 'While we waited all night, he’d already left.'",
       "memo": [
         "Arrived at the 33rd floor 04:20 -- two taxis, five colleagues in the lobby",
         "Yoon Sanghyuk’s office: door open, nobody there",

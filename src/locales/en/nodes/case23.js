@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c23_start": {
       "title": "Agenda Item No. 3",
-      "text": "It is KD Financial Group’s notice of its annual shareholders’ meeting (where the shareholders who own the company vote on major matters). Agenda Item No. 3: the appointment of Yoon Sanghyuk as an inside director (one who helps run the company). Han Seoyun speaks. 'By March 6, 3,118 people each bought one share. The votes are cast by foreign investors at 68%, the National Pension Service at 8%, employees at 5%. What we have is reasons for them to vote no. After the Gaeul Rice Cake Shop series, both the brand rating and the ESG (environmental, social, and governance) rating fell.'",
+      "text": "It is KD Financial Group’s notice of its annual shareholders’ meeting (where the shareholders who own the company vote on major matters). Agenda Item No. 3: the appointment of Yoon Sanghyuk as an inside director (one who helps run the company). Han Seoyun speaks. 'By March 6, the cutoff for who gets to vote, the victims’ group, the night shift, To-the-End Precision, and 3,118 Leadline readers each bought one share. All together, that’s 0.0008%. The votes are cast by foreign investors at 68%, the National Pension Service at 8%, employees at 5%. What we have is reasons for them to vote no. After the Gaeul Rice Cake Shop series, the brand rating fell two months running, and last week its ESG (environmental, social, and governance) rating dropped a notch. People holding other people’s money read that as a loss.'",
       "memo": [
         "Notice of meeting: March 20 (Fri) 10:00 · headquarters main auditorium",
         "Agenda Item No. 3: appoint Yoon Sanghyuk inside director -- no 2023 in his career history",
@@ -38,7 +38,7 @@ export default {
     },
     "c23_proxy": {
       "title": "Because the Branch Manager Asked",
-      "text": "Forty-one elderly customers sit waiting, who took shares instead of their savings when the financial group launched in 2008. Na Junhyuk hands out proxy forms (letting someone else vote for you at the meeting). Seo Jungran, 84, is the first to stamp hers. 'I don’t know what it is, but the branch manager asked.' All 41 are filled in 17 minutes. Kwon Dohyun says, 'There isn’t a single ID copy. Turn these in as they are and the secretariat will throw out every one.'",
+      "text": "Forty-one elderly customers sit waiting, who took shares instead of their savings when the financial group launched in 2008. Na Junhyuk hands out proxy forms (letting someone else vote for you at the meeting). Seo Jungran, 84, is the first to stamp hers. 'I don’t know what it is, but the branch manager asked.' All 41 are filled in 17 minutes. Kwon Dohyun says, 'There isn’t a single ID copy. Turn these in as they are and the head office secretariat will throw out every one.'",
       "memo": [
         "41 Yeongdong elders · 63,000 shares in total",
         "About 20 times the whole one-share group",
@@ -100,7 +100,7 @@ export default {
     },
     "c23_backstage": {
       "title": "A Resignation Letter, Unsigned",
-      "text": "Baek Arin opens the run sheet to page 14. 'If opposing remarks run long, the chair limits them to 1 minute per person. I wrote that sentence. I believed a good story outlasts the facts.' She pushes a resignation letter with a blank signature field toward you. 'Three months now and I haven’t handed it in. If I do, my story ends here. If I don’t, at 10 today the sentence I wrote shuts your mouth.'",
+      "text": "Baek Arin opens the run sheet to page 14. 'If opposing remarks run long, the chair limits them to 1 minute per person. I wrote that sentence. I wrote the Innovation Committee ad script too. I believed a good story outlasts the facts.' She pushes a resignation letter with a blank signature field toward you. 'Three months now and I haven’t handed it in. If I do, my story ends here. If I don’t, at 10 today the sentence I wrote shuts your mouth.'",
       "memo": [
         "Shareholders’ meeting run sheet, 98 pages -- written by Baek Arin",
         "Page 14: 'Opposing remarks limited to 1 minute per person'",
@@ -158,7 +158,7 @@ export default {
       "lead": "Agenda Item No. 3 came up only after 11. Meanwhile, the line in the lobby filed in one by one through the auditorium’s back doors."
     },
     "c23_aftershock": {
-      "text": "50.6% in favor, passed. Pyo Serin of ClearVote speaks. 'Last year’s approval rate was 97.1%. Our recommendation was against.' The 49.4% against is 22.7% from foreign institutions that followed ClearVote, the National Pension Service’s 8%, and 18.7% from other institutions. 'Institutions cast the votes. The footnotes to their reason are the people who stood in the back.' A message comes from Han Seoyun. 'An all-staff notice is scheduled for Monday at 8. The title is Reorganization, and the first line is Trigger Lab.'",
+      "text": "50.6% in favor, passed. Pyo Serin of ClearVote speaks. 'Last year’s approval rate was 97.1%. It dropped 46.5 points. Our recommendation was against.' The 49.4% against is 22.7% from foreign institutions that followed ClearVote, the National Pension Service’s 8%, and 18.7% from other institutions. 'Institutions cast the votes. The reason they gave was the reputational damage after the Gaeul Rice Cake Shop series, and the footnotes to that reason are the people who stood in the back.' A message comes from Han Seoyun. 'An all-staff notice is scheduled for Monday at 8. The title is Reorganization, and the first line is Trigger Lab.'",
       "memo": [
         "Agenda Item No. 3: 50.6% in favor -- passed · last year 97.1%",
         "49.4% against: foreign institutions 22.7% · National Pension 8% · other institutions 18.7%",
@@ -182,7 +182,7 @@ export default {
     },
     "c23_market": {
       "title": "The Bank Lad’s 42",
-      "text": "Twelve grandmothers from the victims’ group bring out rice cakes. 'Bank lad, have this one too.' At the text that Yeongdong has 41, Oh Jinwoo swallows his 11th rice cake. 'Mangwon will have 42.' But Moon Gaeul pushes the form back. 'I’ll cast my own vote. Leaving it to someone else, I tried that 3 years ago. With a bank.'",
+      "text": "Twelve grandmothers from the victims’ group bring out rice cakes. 'Bank lad, have this one too.' At the text that Yeongdong has 41, Oh Jinwoo swallows his 11th rice cake. 'Mangwon will have 42.' But Moon Gaeul pushes the form back. 'I’ll cast my own vote. Leaving it to someone else, I tried that once, 3 years ago. With a bank.'",
       "memo": [
         "Mangwon victims’ group: 12 grandmothers · 1 share each",
         "Oh Jinwoo’s goal: 42 forms -- one more than Yeongdong",
@@ -295,7 +295,7 @@ export default {
     },
     "c23_lobby_reaction": {
       "title": "The Votes He Doesn’t Count",
-      "text": "Yoon Sanghyuk steps out of the elevator and looks at the line stretching to the sidewalk. '3,118 shares. I counted the votes you gathered, too. But I don’t count my own votes. Votes are cast by the people who hold big money. Those people don’t decide their votes on stories about a rice cake shop. Come in. There’ll be a seat. In the back.'",
+      "text": "Yoon Sanghyuk steps out of the elevator and looks at the line stretching to the sidewalk. '3,118 shares. I counted the votes you gathered, too. Three days ago. But I don’t count my own votes. Votes are cast by the people who hold big money. Those people don’t decide their votes on stories about a rice cake shop. Come in. There’ll be a seat. In the back.'",
       "memo": [
         "3,118 shares, counted three days ago",
         "Those who cast the votes: the holders of big money"
@@ -317,7 +317,7 @@ export default {
     },
     "c23_branch_newsroom": {
       "title": "1,996 Readers",
-      "text": "A text comes from Seo Harin. 'We got a letter from group Legal. Can you come to the newsroom?' On the sofa, 1,996 proxy forms are piled up still in their envelopes. The letter’s underlined sentence reads: 'a news outlet gathering its readers as shareholders to steer votes undermines the fairness of its reporting.' Seo Harin speaks. 'It isn’t wrong. Our series brought the bank’s rating down, and readers bought shares. Today we have to decide where to draw the line in between.'",
+      "text": "A text comes from Seo Harin. 'We got a letter from group Legal. Can you come to the newsroom?' On the sofa, 1,996 proxy forms are piled up still in their envelopes. The letter’s underlined sentence reads: 'a news outlet gathering its readers as shareholders to steer votes undermines the fairness of its reporting.' Seo Harin speaks. 'It isn’t wrong. We wrote the series, it spread and the bank’s rating fell, and readers bought shares. Today we have to decide where to draw the line in between.'",
       "memo": [
         "1,996 proxy forms from Leadline readers",
         "Letter from group Legal: 'undermines the fairness of reporting'",
@@ -341,7 +341,7 @@ export default {
     },
     "c23_branch_newsroom_follow": {
       "title": "17 Red Dots",
-      "text": "One envelope with no sender holds a note and a screenshot. 'I work at a KD Bank branch and am an employee shareholder with 1,200 shares. Every branch circulates a proxy submission status sheet, and a red dot goes next to the name of anyone who hasn’t submitted. That is how the employees’ 5% gets gathered as votes in favor.' The sheet in the screenshot shows employee IDs and seventeen red dots. Seo Harin says, 'This is a story. But this person can be found by employee ID.'",
+      "text": "One envelope with no sender holds a note and a screenshot. 'I work at a KD Bank branch. I am an employee shareholder with not one share but 1,200. Every branch circulates a proxy submission status sheet, and a red dot goes next to the name of anyone who hasn’t submitted. That is how the employees’ 5% gets gathered as votes in favor.' The sheet in the screenshot shows employee IDs and seventeen red dots. Seo Harin says, 'This is a story. But this person can be found by employee ID.'",
       "memo": [
         "Anonymous tip: employee shareholder holding 1,200 shares",
         "Screenshot of a branch proxy submission status sheet",
@@ -466,7 +466,7 @@ export default {
     },
     "c23_start_record": {
       "title": "A Calendar Faster Than the Objection",
-      "text": "KD Financial Group issues notice of its annual shareholders’ meeting (where the shareholders who own the company vote on major matters). Agenda Item No. 3: appointment of Yoon Sanghyuk as inside director (one who helps run the company). The first line of the reasons for his nomination credits him with bringing in NOAH, the AI review engine (a program that judges loan applications automatically). ECHO says, 'The answer to the objection comes in 60 days. The voting rights (a shareholder’s right to vote) of the 3,118 who each bought one share get used in 9 days.'",
+      "text": "KD Financial Group issues notice of its annual shareholders’ meeting (where the shareholders who own the company vote on major matters). Agenda Item No. 3: appointment of Yoon Sanghyuk as inside director (one who helps run the company). The first line of the reasons for his nomination credits him with bringing in NOAH, the AI review engine (a program that judges loan applications automatically). ECHO says, 'The answer to the objection comes in 60 days. The voting rights (a shareholder’s right to vote) of the 3,118 who each bought one share get used in 9 days. Their share is 0.0008%.'",
       "memo": [
         "R-17 objection -- 41 rejection cases · 60-day deadline",
         "First line of the nomination reasons: bringing in NOAH",

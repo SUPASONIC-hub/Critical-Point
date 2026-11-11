@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c26_start": {
       "title": "The Author Field",
-      "text": "Yoon Sanghyuk slides the top file across: the real-estate project financing (PF) for 'Reheim Godeok', a 22-story officetel in Godeok, Pyeongtaek—a loan made before a building goes up, on the strength of the sales money expected to come in. KD Capital, 62 billion won, maturity April 27. 'We’ll go with a 1-year extension. You write the opinion. The one who knows the risk should be the one to write it down.' Chae Ian says, 'Your name’s already printed in the author field, isn’t it? On this floor, we call that consideration.'",
+      "text": "Yoon Sanghyuk slides the top file across: the real-estate project financing (PF) for 'Reheim Godeok', a 22-story officetel in Godeok, Pyeongtaek—a loan made before a building goes up, on the strength of the sales money expected to come in. KD Capital, 62 billion won, maturity April 27. 'We’ll go with a 1-year extension. You write the Risk Management opinion. The one who knows the risk should be the one to write it down.' Chae Ian says, 'Your name’s already printed in the author field, isn’t it? On this floor, we call that consideration.'",
       "memo": [
         "Reheim Godeok PF -- KD Capital 62 billion won, maturity April 27",
         "Construction halted for three months -- tower crane sit-in, day 8",
@@ -100,7 +100,7 @@ export default {
     },
     "c26_tower": {
       "title": "Night in the Cab",
-      "text": "Around the 150th rung your legs start to shake, and from below Kang Taemin shouts, 'Resting makes it scarier!' Ji Kanghyun points at one floor of the frame. '9th floor. Last summer our youngest fell from there. He can never come up again. Four months just to get it recognized as an industrial accident. If I go down, everyone has to climb back up to that floor. If I go down, what changes?'",
+      "text": "Around the 150th rung your legs start to shake, and from below Kang Taemin shouts, 'Resting makes it scarier!' Ji Kanghyun points at one floor of the frame. '9th floor. Last summer our youngest fell from there. He lived, but he can never come up again. Took four months just to get it recognized as an industrial accident. If I go down, everyone has to climb back up to that floor. For pay. So you tell me. If I go down, what changes?'",
       "memo": [
         "Crane height 40m -- about 200 ladder rungs",
         "The cab: electric blanket, grandchild’s photo, sit-in day 17",
@@ -206,7 +206,7 @@ export default {
     },
     "c26_nursery": {
       "title": "The Baby’s Room",
-      "text": "In front of the model house, 40 buyers have gathered. Their representative, Song Hayul, due in October, traces a small room on the floor plan. 'This one. I was going to make it the baby’s room—I even picked the wallpaper color.' The buyers still pay interest on their interim-payment loans though construction has stopped. Song Hayul’s jeonse lease ends in December. 'Where do we sleep in December?'",
+      "text": "In front of the model house, 40 buyers have gathered. Their representative, Song Hayul, due in October, traces a small room on the floor plan. 'This one. I was going to make it the baby’s room—I even picked the wallpaper color.' The buyers still pay interest on their interim-payment loans though construction has stopped. Song Hayul’s jeonse lease ends in December. 'You bank people talk about extension, about loss. Where do we sleep in December?'",
       "memo": [
         "212 households with sale contracts -- 40 gathered today",
         "Interim-payment loan interest: still monthly after the halt",
@@ -252,7 +252,7 @@ export default {
     },
     "c26_ramen_reaction": {
       "title": "30 Years of Formwork",
-      "text": "Around midnight, Ji Kanghyun calls. 'I’ve done nothing but formwork for 30 years. Building the wooden molds before the concrete’s poured. Once the building’s up, the molds get torn off and thrown away. Ever seen our faces in a completion-ceremony photo? If I go down, who sees that banner? Nobody’ll know it was put up by people cheated out of three months’ pay.'",
+      "text": "Around midnight, Ji Kanghyun calls. 'I’ve done nothing but formwork for 30 years. Building the wooden molds before the concrete’s poured. Once the building’s up, the molds get torn off and thrown away. Ever seen our faces in a completion-ceremony photo? If I go down, who sees that banner? Once it’s finished, nobody’ll know it was put up by people cheated out of three months’ pay.'",
       "memo": [
         "Formwork never appears in the completion-ceremony photo",
         "If he comes down, no one will see the banner"
@@ -274,7 +274,7 @@ export default {
     },
     "c26_nursery_reaction": {
       "title": "Not Applicable",
-      "text": "On the approval form: you in the author field, Chae Ian in the reviewer field, and in the CEO’s field, 'Not applicable' already stamped. Chae Ian says, 'The rule says the CEO doesn’t sign anything under 100 billion won. It changed last month.' The month Yoon Sanghyuk’s appointment was settled. Chae Ian laughs. 'I’ve served three CEOs, and this is the first time a field has vanished.'",
+      "text": "On the approval form: you in the author field, Chae Ian in the reviewer field, and in the CEO’s field, 'Not applicable' already stamped. Chae Ian says, 'The rule says the CEO doesn’t sign anything under 100 billion won. It changed last month.' The month Yoon Sanghyuk’s appointment was settled. Chae Ian laughs. 'I’ve served three CEOs, and this is the first time a field has vanished. Keep laughing and only my name is left.'",
       "memo": [
         "CEO approval field: 'Not applicable' preprinted",
         "Rule amended: in the month Yoon Sanghyuk’s appointment was settled"
@@ -296,7 +296,7 @@ export default {
     },
     "c26_elevator_reaction": {
       "title": "The Desk Facing the Wall",
-      "text": "Han Seoyun, 3 weeks into her standby assignment, picks up your call. 'He said that in the elevator? That you went to the basement because you were right? I’m the one who pressed the return button on your dissent 3 years ago. That was an author field too. That rule letting the CEO skip signing—its supplementary provisions are strange. I’ll send them tomorrow.'",
+      "text": "Han Seoyun, 3 weeks into her standby assignment, picks up your call. 'He said that in the elevator? That you went to the basement because you were right? I’m the one who pressed the return button on your dissent 3 years ago. That was an author field too. The person who decided had no field. These days I’m reading the rulebook from the start. That rule letting the CEO skip signing—its supplementary provisions are strange. I’ll send them tomorrow.'",
       "memo": [
         "Han Seoyun: standby assignment for 3 weeks, a desk facing the wall",
         "The supplementary provisions of the CEO signature-exemption rule"
@@ -366,7 +366,7 @@ export default {
     },
     "c26_route_system": {
       "title": "A Decision That Moves the Date",
-      "text": "NOAH opens the 41 real-estate loans whose maturity KD Capital extended over the past 7 years. 9 were repaid in full; 32 ended 1 to 2 years later in bigger losses. Every executive review in a year of extension read 'no loss'. 'Extension is learned not as a decision that removes a loss, but as a decision that moves the loss’s date.'",
+      "text": "NOAH opens the 41 real-estate loans whose maturity KD Capital extended over the past 7 years. 9 were repaid in full; 32 ended 1 to 2 years later in bigger losses. Every executive review in a year of extension read 'no loss'. 'Extension is learned not as a decision that removes a loss, but as a decision that moves the loss’s date. The person sitting in that seat on the moved date is usually someone else.'",
       "memo": [
         "41 KD Capital real-estate loans with extended maturity",
         "9 repaid in full -- 32 bigger losses",

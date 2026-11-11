@@ -100,7 +100,7 @@ export default {
     },
     "c21_breakwater": {
       "title": "The Stem Gets Bruised",
-      "text": "After a long while, Sunwoo Jin speaks. 'That training got a little harder every week. When my father collapsed, I asked for leave, and they said no, this week was important. At three in the morning at the end of July, I got up from my desk and collapsed. The funeral... I went. Late.' 'Back then I thought I fell apart because I was weak. Pick a tangerine in a hurry, they say, and the stem gets bruised. But you people aren’t here on vacation, are you?'",
+      "text": "After a long while, Sunwoo Jin speaks. 'That training got a little harder every week. When my father collapsed, I asked for leave, and they said no, this week was important. At the end of July, at three in the morning, I got up from my desk and collapsed. My father’s funeral... I went. Late.' 'Back then I thought I fell apart because I was weak. Pick a tangerine in a hurry, they say, and the stem gets bruised. But you people aren’t here on vacation, are you?'",
       "memo": [
         "Sunwoo Jin’s memory matches the Cohort 1 weekly chart dates: second week of July",
         "Father died August 2022 -- after leave was rejected",

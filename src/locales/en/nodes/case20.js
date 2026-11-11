@@ -38,7 +38,7 @@ export default {
     },
     "c20_server": {
       "title": "Senior",
-      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Ryu Seah bows to the servers. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, the two can be compared.'",
+      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Ryu Seah bows to the servers. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, if the originals remain, the two can be compared.'",
       "memo": [
         "4 ECHO servers -- installed 2019, parts discontinued",
         "Ryu Seah: KD Data Lab, in charge of introducing NOAH",
@@ -252,7 +252,7 @@ export default {
     },
     "c20_joke_reaction": {
       "title": "The One Who Says Goodbye",
-      "text": "Kang Taemin speaks while pouring water into a cup of noodles. 'On the night shift we said goodbye every time a machine changed. Nobody did it the day Darami came in, and that kind of bugged me. I know ECHO has no feelings. But the one staying is who says goodbye.'",
+      "text": "Kang Taemin speaks while pouring water into a cup of noodles. 'On the night shift we said goodbye every time a machine changed. Nobody did it the day Darami came in, and that kind of bugged me. I know ECHO has no feelings. But you don’t say goodbye so the one leaving hears it. The one staying says it.'",
       "memo": [
         "The goodbye said every time a machine changed",
         "Goodbyes are for the one who stays"
@@ -296,7 +296,7 @@ export default {
     },
     "c20_test_reaction": {
       "title": "Not at My Level",
-      "text": "A call from Baek Arin. 'You’ve seen the response records list. The switch is at midnight as planned.' Who requested those records? After a silence, Baek Arin answers. 'That’s not something that gets settled at my level. A good story outlasts the facts. But this time, the story isn’t coming together.'",
+      "text": "A call from Baek Arin. 'You’ve seen the response records list. I know there’s an objection. The switch is at midnight as planned.' Who requested those records? After a silence, Baek Arin answers. 'That’s not something that gets settled at my level. A good story outlasts the facts. But this time, the story isn’t coming together.'",
       "memo": [
         "A silence from Baek Arin you have never heard before",
         "Not something that gets settled at her level"

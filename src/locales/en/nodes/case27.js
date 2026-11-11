@@ -131,7 +131,7 @@ export default {
     },
     "c27_final": {
       "title": "Parents’ Day Morning",
-      "text": "Three sheets of paper before the seven board members. The Group’s proposal to deposit 10 billion won, with, in small print at the bottom of its conditions, 'consultation on selling the Pyeongtaek subordinated stake.' Namgoong Sol’s draft notice, putting the Pyeongtaek stake and the original screenshot out in full. An application for a daily withdrawal limit. One must be chosen before 9. 'My father held out for three days, they say. I have to decide how to hold out today.'",
+      "text": "Three sheets of paper before the seven board members. The Group’s proposal to deposit 10 billion won, with, in small print at the bottom of its conditions, 'consultation on selling the Pyeongtaek subordinated stake.' Namgoong Sol’s draft notice, putting the Pyeongtaek stake and the original screenshot out in full. An application for a daily withdrawal limit. One must be chosen before 9. 'My father held out for three days, they say. I have to decide how to hold out today. In the names of the people in that line.'",
       "memo": [
         "Group deposit offer 10 billion won -- condition: consultation on selling the Pyeongtaek stake",
         "Full-disclosure draft notice -- original screenshot included",
@@ -159,7 +159,7 @@ export default {
     },
     "c27_aftershock": {
       "title": "Twelve Bowls of Jjamppong",
-      "text": "The last number ticket was No. 412, and after it, thirty-eight people came to put their money back. Namgoong Sol orders twelve bowls of jjamppong. Na Junhyuk tucks one stamped number ticket into his wallet. 'Best stamping I’ve done in 30 years.' A message comes from Do Yoonha. 'Starting next week they’re sending me to the KD Life call center. The script has the word refusal in it 14 times.'",
+      "text": "The last number ticket was No. 412, and after it, thirty-eight people came to put their money back. Namgoong Sol orders twelve bowls of jjamppong. Na Junhyuk tucks one stamped number ticket into his wallet. 'Best stamping I’ve done in 30 years.' A message comes from Do Yoonha. 'Starting next week they’re sending me to the KD Life call center. The script they gave me in advance has the word refusal in it 14 times.'",
       "memo": [
         "Last number ticket: No. 412",
         "38 members put their money back",
@@ -252,7 +252,7 @@ export default {
     },
     "c27_savings_reaction": {
       "title": "A Blanket from 1998",
-      "text": "Money out on the first day: 3.8 billion won. Namgoong Sol points to a black-and-white photo on the wall. 'That’s my father. He was executive director here in 1998. A rumor went around back then too, and he slept here three nights, they say. The aunties and uncles who stood in line then stood in line again today. I’m glad my father didn’t live to see this.'",
+      "text": "Money out on the first day: 3.8 billion won. Namgoong Sol points to a black-and-white photo on the wall. 'That’s my father. He was executive director here in 1998. A rumor went around back then too, and he slept here three nights, they say. Boiling barley tea for the people in line. The people who stood in line then are our aunties and uncles now. They stood in line again today. I’m glad my father didn’t live to see this.'",
       "memo": [
         "1998 banking hall photo -- the former executive director on a blanket",
         "Those who stood in line then stood again today"
@@ -296,7 +296,7 @@ export default {
     },
     "c27_carnation_reaction": {
       "title": "One Word: Closed",
-      "text": "Grandma Ha Junghee stands there holding a bundle of dried bakdae (a Gunsan flatfish) and her closed passbook. 'Yesterday I heard Boss Kwak put the money back, and I couldn’t sleep. I called my son and gave him a scolding. Can this be brought back? I meant to take it out right when my grandchild starts school.'",
+      "text": "Grandma Ha Junghee stands there holding a bundle of dried bakdae (a Gunsan flatfish) and her closed passbook. 'Yesterday I heard Boss Kwak put the money back, and I couldn’t sleep. I called my son and gave him a scolding. Told him Mom’s money is Mom’s business. Can this be brought back? I meant to take it out right when my grandchild starts school.'",
       "memo": [
         "A closed savings passbook and a bundle of dried bakdae",
         "Maturity timed to her grandchild’s school entrance"
@@ -342,7 +342,7 @@ export default {
     },
     "c27_branch_vault_follow": {
       "title": "Boxes Through the Front Door",
-      "text": "Na Junhyuk asks for the truck’s money boxes to come in through the front, right before the eyes of the people in line. As six gray boxes pass, a few people fold their number tickets and turn back. Namgoong Sol speaks quietly. 'Those boxes are borrowed from the Central Federation. People can’t go thinking that was our own money.'",
+      "text": "Na Junhyuk asks for the truck’s money boxes to come in through the front, right before the eyes of the people in line. As six gray boxes pass, the line stirs. 'Money’s comin’ in.' 'That all real?' A few people fold their number tickets and turn back. Namgoong Sol speaks quietly. 'Those boxes are borrowed from the Central Federation. Money with interest on it. People can’t go thinking that was our own money.'",
       "memo": [
         "6 cash boxes -- emergency borrowing from the Central Federation",
         "23 left the line after the front-door delivery",
