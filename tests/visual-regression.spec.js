@@ -75,6 +75,11 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
       .gx-gauge-ticks,
       /* The situation board prints the same seeded pulse. */
       .gx-situation-bpm,
+      /* 안전선 xN counts the pushes left under the wall, and the clock's creep
+         moves the heat under it: the same case play capture read x4 in its
+         baseline and x5 in a comparison that ran a few frames sooner
+         (2026-10-23, desktop and mobile). Its box stays. */
+      [data-testid="commit-safe"],
       /* Regenerated per browser context, so it is eight glyphs of noise in
          every baseline that prints it. */
       [data-testid="session-code"] {
@@ -445,6 +450,21 @@ const BRIEFING_PHONES = [
   { name: "390x844", width: 390, height: 844, screens: 2.2 },
 ];
 
+/**
+ * The briefing captures differed by 12 and 13 pixels now and then (2026-10-28
+ * to 11-02), scattered over the page's text with nothing moved: glyph edges
+ * drawn a shade apart. They are taken once the page's pictures have decoded
+ * and two frames have passed, and allow 30 pixels of that edge noise.
+ */
+const BRIEFING_SHOT = { animations: "disabled", caret: "hide", maxDiffPixels: 30 };
+
+async function settleBriefing(sheet) {
+  await sheet.evaluate(async (element) => {
+    await Promise.all([...element.querySelectorAll("img")].map((image) => image.decode().catch(() => {})));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+}
+
 async function openFirstBriefing(page, viewport) {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -479,13 +499,15 @@ for (const viewport of BRIEFING_PHONES) {
 test("first briefing 360x740 visual baseline @visual", async ({ page }, testInfo) => {
   const sheet = await openFirstBriefing(page, BRIEFING_PHONES[0]);
   await stabilizeVisualPage(page);
+  await settleBriefing(sheet);
   await expectCaptureGeometry(sheet, testInfo, "briefing-p1-360x740.png");
-  await expect(sheet).toHaveScreenshot("briefing-p1-360x740.png", { animations: "disabled", caret: "hide" });
+  await expect(sheet).toHaveScreenshot("briefing-p1-360x740.png", BRIEFING_SHOT);
 });
 
 test("first briefing 390x844 visual baseline @visual", async ({ page }, testInfo) => {
   const sheet = await openFirstBriefing(page, BRIEFING_PHONES[1]);
   await stabilizeVisualPage(page);
+  await settleBriefing(sheet);
   await expectCaptureGeometry(sheet, testInfo, "briefing-p1-390x844.png");
-  await expect(sheet).toHaveScreenshot("briefing-p1-390x844.png", { animations: "disabled", caret: "hide" });
+  await expect(sheet).toHaveScreenshot("briefing-p1-390x844.png", BRIEFING_SHOT);
 });

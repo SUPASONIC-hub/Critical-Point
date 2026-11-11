@@ -18,7 +18,7 @@ const scene = (speaker, text, lead) => ({ speaker, text, lead });
 
 test("a speech goes to the speaker the narration last named, not to the first after the name", () => {
   const node = scene("한서윤", "한서윤 과장이 일어섭니다. 진세라가 안경을 올립니다. '첨부 7이 반대 의견으로 돼 있던데요.' 한서윤이 고개를 숙입니다. '안건에 영향 없습니다.'");
-  assert.deepEqual(getSpeakerLine(node, ["한서윤", "진세라"]), { line: "안건에 영향 없습니다.", fromLead: false, whoAt: [3] });
+  assert.deepEqual(getSpeakerLine(node, ["한서윤", "진세라"]), { line: "안건에 영향 없습니다.", fromLead: false, whoAt: [4] });
 });
 
 test("a phrase cited in quotes is not said; with nothing said the lead is told, and with no lead nothing", () => {
@@ -32,7 +32,8 @@ test("a long speech gives its first whole sentences, and a name in a speech name
   const node = scene("오진우", `오진우가 말합니다. '${long}. ${long}. 한서윤 씨는 압니다.' 그가 웁니다. '두 번째 말입니다.'`);
   const { line, whoAt } = getSpeakerLine(node, ["오진우", "한서윤"]);
   assert.equal(line, `${long}.`);
-  assert.deepEqual(whoAt, [1, 4]);
+  // 「…압니다.' 그가 웁니다.」 is two sentences: a closed speech ends one (proseSentences.js).
+  assert.deepEqual(whoAt, [1, 5]);
 });
 
 test("every scene's balloon is words of its own text or its lead", () => {
@@ -54,7 +55,11 @@ test("its speech and its boxes are the speech marks' and the caption boxes' own,
     const sentences = captionSentences(text);
     assert.equal(markLines(sentences).length, sentences.length, id);
   }
-  assert.ok(source("components/Prose.jsx").includes(String.raw`.split(/(?<=[.!?])\s+/)`), "ProseCaptions cuts at the same place");
+  // One cut for all three (caption-split): the boxes, their sentence counts and the balloon's box numbers.
+  assert.match(source("components/Prose.jsx"), /captionBoxes\(text\)/, "ProseCaptions counts the boxes' own sentences");
+  assert.doesNotMatch(source("components/Prose.jsx"), /\.split\(/, "ProseCaptions cuts nothing of its own");
+  assert.match(source("gauntlet/speakerLine.js"), /return sentenceTexts\(text\);/, "the balloon counts proseSentences.js's sentences");
+  assert.match(source("components/proseMarks.js"), /for \(const sentence of proseSentences\(source\)\)/, "the boxes are proseSentences.js's sentences");
 });
 
 test("the briefing prints the question as 당신의 판단 and the reveal prints the voice without quotes", () => {

@@ -1,4 +1,4 @@
-/** src/copy/habits.js in Japanese: the season's judgment habits, the result card's large name and the report's line under it. */
+/** src/copy/habits.js in Japanese: the season's judgment habits, the result card's large name, the report's line under it and the card's one-line sentence (D1). */
 export default {
   bulldozer: { title: "実績優先ブルドーザー型", line: "勝負には勝ちましたが、人的被害が後ろに積み上がりました。" },
   moth: { title: "ハイリスク夏の虫型", line: "壁が近づくほど、手が速くなります。" },
@@ -11,4 +11,5 @@ export default {
   marathon: { title: "思考マラソン型", line: "結論より考える時間が長くないと、落ち着きません。" },
   lightning: { title: "速戦即決型", line: "読んだらすぐ選び、選んだらすぐ押します。" },
   steady: { title: "無難なバランス型", line: "目立たず、それでも最後まで勝負を閉じました。" },
+  cardLine: "あなたの審査タイプは、{habit}です。",
 };

@@ -6,6 +6,8 @@ export default {
     "nickname-link": "Names can’t contain links. Change the name and post again.",
     "body-link": "Posts with links can’t be posted. Remove the link and post again.",
     contact: "Posts with phone numbers or email addresses can’t be posted. Remove them and post again.",
+    "nickname-blocked": "That name contains a word that can’t be used. Change the name and post again.",
+    "body-blocked": "Posts with abuse or slurs can’t be posted. Change the wording and post again.",
   },
   honeypot: "A field was filled in automatically, so nothing was posted. Please press again.",
   dwell: "The board only just opened. Take a moment to read, then press again.",

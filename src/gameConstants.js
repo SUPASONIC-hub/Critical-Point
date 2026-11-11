@@ -22,6 +22,21 @@ export function formatNumber(value) {
 export const costWhenRising = new Set(["humanCost", "fatigue"]);
 
 /**
+ * Which way an effect leans: toward the people in the scene (1: trust gained,
+ * harm spared) or toward the position being held (-1: capital and time), and
+ * 0 for a tie. The story's own axis -- the report's 일관성 score reads every
+ * decision by it (gameLogic.js) -- and, since C-3 (2026-10-25), the axis the
+ * logic streak is held on (gauntlet/logicStreak.js): one function, so the two
+ * never read the same card two ways.
+ */
+export function getEffectLean(effect = {}) {
+  const people = (effect?.trust ?? 0) - (effect?.humanCost ?? 0);
+  const position = (effect?.capital ?? 0) + (effect?.time ?? 0);
+  if (people === position) return 0;
+  return people > position ? 1 : -1;
+}
+
+/**
  * Every surface that summarises an effect has to answer the same question:
  * was this good for the player? Reading the sign gets it backwards on the two
  * resources above, so the four places that print an effect -- the choice chips,

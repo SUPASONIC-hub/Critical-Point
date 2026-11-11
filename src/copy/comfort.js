@@ -49,6 +49,12 @@ const comfortCopy = {
     // 이야기 글 크기 (D-5), by what a player sees rather than by the factor.
     labels: ["기본", "크게", "더 크게"],
   },
+  textScale: {
+    legend: "글자 크기",
+    text: "모든 화면의 글자를 키웁니다. 판돈·시계·타이머 숫자는 그대로입니다. 기기마다 따로 저장됩니다.",
+    // 글자 크기 (E5, 2026-11-05), the same three steps as the story size.
+    labels: ["기본", "크게", "더 크게"],
+  },
 };
 export default comfortCopy;
 

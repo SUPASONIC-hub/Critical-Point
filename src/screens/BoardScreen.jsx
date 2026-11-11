@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowLeft, Flag, RotateCw, Send, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Flag, RotateCw, Send, ShieldExclamationPoint } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { BOARD_REPORT_REASONS } from "../boardReport.js";
 import { useBoardReport } from "../state/useBoardReport.js";
@@ -147,7 +147,7 @@ export function BoardScreen({
             {activeBoardPrivacySignals.length > 0 && (
               <div className="board-privacy-notice" id="board-privacy-notice" role="alert">
                 <p>
-                  <ShieldAlert size={15} />
+                  <ShieldExclamationPoint size={15} />
                   {fill(words.privacy, { signals: activeBoardPrivacySignals.map((signal) => signal.label).join(", ") })}
                 </p>
                 <button type="button" className="ghost" onClick={() => anonymizeBoardBody()}>
