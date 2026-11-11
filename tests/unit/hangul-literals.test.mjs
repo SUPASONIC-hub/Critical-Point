@@ -51,6 +51,7 @@ const KOREAN_MODULES = {
   "src/seasonRules.js": "branch condition notes nothing prints",
   "src/shellNotices.js": "laid over under screens.notices.save",
   "src/speakerPortraits.js": "speaker names as keys",
+  "src/state/sidePackCheck.js": "E-11: a side pack's problems for scripts/validate-game-graph.mjs and the dev fixture, never printed on a screen; the label it checks is the pack's own data (a side case's words are its pack's, src/nodes/sidePacks.js)",
   "src/state/seasonRecord.js": "VERDICT_NAMES, the record's Korean; src/copy/seasonLines.js prints the page's",
   "src/state/useBoard.js": "a link pattern",
 };

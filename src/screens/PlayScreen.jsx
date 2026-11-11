@@ -1,6 +1,7 @@
 import { GameHeader } from "../components/GameHeader.jsx";
 import { CASE_SEQUENCE, seasonCasesBase } from "../gameData.js";
 import { GauntletStage } from "../gauntlet/GauntletStage.jsx";
+export { GauntletStage }; // E-11: the side screen's table, from this chunk (SideCaseScreen.jsx)
 
 /**
  * The gauntlet table and nothing in front of it.
