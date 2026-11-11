@@ -6,6 +6,7 @@
     "branches": 89
   },
   "files": {
+    "src/ads/adSlotWords.js": 100,
     "src/advancedSystems.js": 100,
     "src/analystTitle.js": 100,
     "src/appConfig.js": 96,
@@ -85,6 +86,7 @@
     "src/serviceWorker/register.js": 100,
     "src/serviceWorker/worker.js": 99,
     "src/shellNotices.js": 100,
+    "src/sideCases.js": 100,
     "src/speakerPortraits.js": 100,
     "src/state/accessibilitySettings.js": 100,
     "src/state/caseArrival.js": 100,
@@ -102,6 +104,7 @@
     "src/state/openingState.js": 100,
     "src/state/pastPicks.js": 100,
     "src/state/payloadSchemas.js": 100,
+    "src/state/pendingRowLabel.js": 100,
     "src/state/playtestExport.js": 81,
     "src/state/readingTally.js": 100,
     "src/state/retryableLazy.js": 100,
@@ -116,6 +119,9 @@
     "src/state/seenScenes.js": 100,
     "src/state/settleChoice.js": 100,
     "src/state/shellStartSave.js": 100,
+    "src/state/sideCaseKit.js": 100,
+    "src/state/sidePackCheck.js": 100,
+    "src/state/sideRun.js": 100,
     "src/state/telemetryBatch.js": 100,
     "src/state/telemetryEventId.js": 52,
     "src/state/telemetryQueuePolicy.js": 100,

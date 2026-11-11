@@ -27,6 +27,11 @@ export default {
   },
   veteranTable: "NEW GAME+では、プロローグ01からすべてのルールがオンになり、ツールも早く受け取れます。",
   pastCase: "以前の記録に、CASE {code}の最後の選択が残っています。今回は、その結果を変えられます。",
+  verdicts: { ending_seal: "封印", ending_reform: "改革", ending_expose: "暴露" },
+  memory: {
+    line: "前のシーズン:{named}{ending}。{carry}",
+    carry: "NEW GAME+で始めると、最初のシーンにこの記録が戻ってきます。",
+  },
   integrity: {
     linked: "ひとつのプレイにまとめられた記録です。公開ランキングは、すべての事件記録が15分以上かけてサーバーに届いたシーズンだけを受け付け、スコア・ランク・時間が合わない記録はサーバー側で別に印を付けます。",
     missing: "プレイ識別子がないため、一時的なローカル記録として扱われます。",

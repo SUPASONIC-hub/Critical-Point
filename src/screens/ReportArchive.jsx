@@ -5,6 +5,7 @@ import { GauntletLedger } from "../gauntlet/GauntletLedger.jsx";
 import * as gameConstants from "../gameConstants.js";
 import reportCopy from "../copy/report.js";
 import { fill } from "../locale.js";
+import { pendingRowLabel } from "../state/pendingRowLabel.js";
 
 /**
  * Act three of the report: everything it used to open with, folded.
@@ -281,7 +282,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           <div className="retry-telemetry">
             <b>{fill(reportCopy.session.pending, { count: pendingTelemetry.length })}</b>
             <p>
-              {pendingTelemetry.map((item) => (item.type === "error" && item.payload?.current_case ? fill(reportCopy.session.errorRow, { scene: `${item.payload.current_case} / ${item.payload.node_id}` }) : item.label)).join(" · ")}
+              {pendingTelemetry.map(pendingRowLabel).join(" · ")}
             </p>
             <GuardedButton
               type="button"

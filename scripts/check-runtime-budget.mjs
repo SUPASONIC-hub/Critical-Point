@@ -168,8 +168,17 @@ const BUDGETS = {
   // view models are one namespace import (sceneViewModels, with the runtime
   // card's label as `runtimeCardLabel`) and the two runtime cards' words are
   // src/copy/runLines.js's. Measured 968 / 96.
+  // 960 -> 961 lines on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
+  // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
+  // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
+  // bgm-variety and locale-gaps.
+  // 968 -> 970 on 2026-11-10, memory-line-i18n (draft): the runtime module
+  // hands the shell `refreshSeasonRecord`, so a 결말 도감 stored in another
+  // language is written again in the page's (AppContent, isStaleBook); the
+  // export and its line of why. Measured 970 / 96.
+  // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
   "src/GameRuntime.jsx": {
-    lines: 968,
+    lines: 971,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
@@ -178,8 +187,10 @@ const BUDGETS = {
   // label rather than its position, because the 프롤로그 sits in front of
   // 사건 01 and a position counter printed "사건 6" over 사건 01.
   // 111 -> 100 on 2026-09-27: ratcheted to what it measures (98).
+  // 100 -> 101 on 2026-10-25 (E-11 framework, draft), measured: the stage
+  // re-exported for the side screen, which plays its table from this chunk.
   "src/screens/PlayScreen.jsx": {
-    lines: 100,
+    lines: 101,
     longestLine: 170,
     importedNames: 4,
     hooks: {},
@@ -193,18 +204,26 @@ const BUDGETS = {
   // 12 -> 13 on 2026-11-02, plate-story (#392, F): the result screen draws the
   // case's last room (ScenePlate, variant="result") at the top of the outcome
   // panel; no other import could go. Measured 340 / 13.
+  // 12 -> 13 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46:
+  // the side list (`SIDE_CASES`, src/sideCases.js) for the finale's one line
+  // that the side slot opened. 339 lines fit main's 340.
+  // 340 / 13 -> 342 / 14 on 2026-11-03, E-11 over main 425eb4da: the side list
+  // beside plate-story's ScenePlate. Measured 342 / 14.
   "src/screens/ResultScreen.jsx": {
-    lines: 340,
+    lines: 342,
     longestLine: 280,
-    importedNames: 13,
+    importedNames: 14,
     hooks: {},
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
   // (src/copy/report.js) and `fill` for its lines with blanks.
+  // 9 -> 10 on 2026-11-10, memory-line-i18n (draft): the remote-save queue's
+  // rows are named again in the page's language (state/pendingRowLabel.js,
+  // #496 질문 2); `fill` stays for the screen's other lines.
   "src/screens/ReportArchive.jsx": {
     lines: 640,
     longestLine: 260,
-    importedNames: 9,
+    importedNames: 10,
     hooks: {},
   },
   // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to

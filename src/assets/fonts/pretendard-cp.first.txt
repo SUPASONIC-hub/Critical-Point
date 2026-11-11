@@ -542,6 +542,7 @@ b0ae 낮
 b0b4 내
 b0b8 낸
 b0bc 낼
+b0c4 냄
 b0c5 냅
 b0c8 냈
 b0e5 냥
@@ -954,6 +955,7 @@ c9d5 징
 c9dc 짜
 c9e0 짠
 c9e4 짤
+c9e7 짧
 c9f8 째
 ca4d 쩍
 cabd 쪽
