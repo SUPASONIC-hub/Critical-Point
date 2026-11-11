@@ -569,7 +569,8 @@ const budgets = [
   // 196,509 / 70,854 -> 197,272 / 71,169 on 2026-11-10, memory-line-i18n (draft) over main cb8346da: the NEW GAME+ panel draws the last season's line from the record's ending and verdict in the page's language (getMemoryLine and its three lines moved from the runtime's seasonLines to introPanels), and the shell has a 결말 도감 stored in another language written again once the runtime is in (isStaleBook, #496 질문 1). Measured 197,268 / 71,165 in the e2e build, plus 4.
   // -> 199,649 / 72,275 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together: the side slot (#301), the stale-book refresh (#501), the ad switch (#350). Measured 199,645 / 72,271 in the e2e build, the plus 4.
   // -> 199,649 / 72,266 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 199,645 / 72,262 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 199_649, maxGzip: 72_266 },
+  // 199,649 / 72,266 -> 199,893 / 72,424 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 199889 / 72420 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 199_893, maxGzip: 72_424 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1032,7 +1033,8 @@ const budgets = [
   // 209,898 / 39,487 -> 213,956 / 41,401 on 2026-11-10, font-split over main cb8346da (the user's choice 1; held for W47, which was called off on 11-10): the second @font-face and its unicode-range (575 code points of the second font file, written by scripts/build-fonts.mjs). Measured 213,952 / 41,397 in the e2e build, the plus 4.
   // 213,956 / 41,401 (font-split) and 209,941 / 39,492 (phone-390-staked, #503) -> 213,999 / 41,407 on 2026-11-11, font-split after merging main 568572d3 (#484 #502 #503): both. Measured 213,995 / 41,403 in the e2e build, the plus 4.
   // -> 213,985 / 41,396 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 213,981 / 41,392 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 213_985, maxGzip: 41_396 },
+  // 213,985 / 41,396 -> 213,999 / 41,403 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 213995 / 41399 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 213_999, maxGzip: 41_403 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1051,7 +1053,8 @@ const budgets = [
   // when a page prints one and precached by the worker (service-worker-build.mjs).
   // Not in the first paint. Measured 82,780 plus 4 on 2026-11-10.
   // 82,784 -> 82,428 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83: build:fonts for the two start-screen characters #301 adds (냄, 짧) (they left this file). Measured 82,424, the plus 4.
-  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 82_428, compressed: true },
+  // 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: build:fonts for 갭 and 뿌. Measured 82,684, the plus 4.
+  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 82_688, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -1753,7 +1756,8 @@ const budgets = [
   // 156,774 / 55,788 -> 156,862 / 55,841 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): Side case 1 and its title (`copy.sidePacks`). Measured 156,858 / 55,837 in the e2e build, the plus 4.
   // 55,470 -> 55,477 gzip on 2026-11-10, memory-line-i18n (draft) over main cb8346da: the memory line's words moved from seasonLines to introPanels in the dictionary. Measured 155,862 / 55,473, plus 4.
   // -> 156,774 / 55,786 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 156,770 / 55,782 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 156_774, maxGzip: 55_786 },
+  // 156,774 / 55,786 -> 156,862 / 55,838 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 156858 / 55834 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 156_862, maxGzip: 55_838 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2083,7 +2087,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 371,424 / 429,687 / 437,379 (font-split) and 435,285 / 493,575 / 501,186 (main 568572d3: #484 deps, #503) -> 371,483 / 429,748 / 437,438 on 2026-11-11, font-split after merging main 568572d3: both, and the critical CSS regenerated. Measured 371,479 / 429,744 / 437,434 in the e2e build, the plus 4.
 // 371,483 / 429,748 / 437,438 (font-split) and 436,673 / 495,280 / 502,895 (bundle 1111) -> 372,867 / 431,449 / 439,148 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split): both, the critical CSS regenerated. Measured 372,863 / 431,445 / 439,144 in the e2e build, the plus 4.
 // -> 372,960 / 431,541 / 439,239 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 372,956 / 431,537 / 439,235 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 372_960, en: 431_541, ja: 439_239 };
+// -> 373,130 / 431,933 / 439,637 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_130, en: 431_933, ja: 439_637 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2252,7 +2257,8 @@ function checkBudget(file, budget) {
 // 10,619 / 3,810 -> 10,663 / 3,820 on 2026-11-10, font-split over main cb8346da: the second font file joins the install list. Measured 10,659 / 3,816 in the e2e build, the plus 4.
 // 10,656 / 3,820 (E-11) and 10,663 / 3,820 (font-split) -> 10,700 / 3,839 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split): both files in the install list. Measured 10,696 / 3,835 in the e2e build, the plus 4.
 // -> 10,700 / 3,831 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 10,696 / 3,827 in the e2e build, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_700, maxGzip: 3_831 };
+// -> 10,729 / 3,848 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504), the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_729, maxGzip: 3_848 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

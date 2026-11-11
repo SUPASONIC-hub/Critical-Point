@@ -52,7 +52,8 @@ import {
 // 131,356 -> 131,476 on 2026-11-11, bundle 1111 (#301 adds 냄 and 짧 to the start screen). Measured 131,472 plus 4.
 const MAX_FONT_BYTES = 131_476;
 // 82,784 -> 82,428 on 2026-11-11, bundle 1111 (냄 and 짧 left this file). Measured 82,424 plus 4.
-const MAX_REST_FONT_BYTES = 82_428;
+// 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: 갭 and 뿌 join this file. Measured 82,684 plus 4.
+const MAX_REST_FONT_BYTES = 82_688;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones

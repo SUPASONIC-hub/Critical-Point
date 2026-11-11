@@ -476,6 +476,7 @@ ac1c 개
 ac1d 객
 ac20 갠
 ac24 갤
+ac2d 갭
 ac31 갱
 ac40 걀
 ac54 걔
@@ -1050,6 +1051,7 @@ bf08 뼈
 bf18 뼘
 bf51 뽑
 bf55 뽕
+bfcc 뿌
 bfd0 뿐
 bfd4 뿔
 bfdc 뿜
