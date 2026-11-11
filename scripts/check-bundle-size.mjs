@@ -164,7 +164,8 @@ const budgets = [
   // -> 153,686 / 56,482 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 153,682 / 56,476 in the e2e build, the plus 4 (gzip under).
   // 153,686 / 56,482 -> 153,871 / 56,560 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 153867 / 56556 (over budget only) in the e2e build, the plus 4.
   // -> 153,705 / 56,489 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 153,701 / 56,485 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_705, maxGzip: 56_489 },
+  // 153,705 / 56,489 -> 153,883 / 56,590 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 153879 / 56586 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_883, maxGzip: 56_590 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -587,11 +588,13 @@ const budgets = [
   // 199,893 / 72,424 -> 199,943 / 72,433 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 199939 / 72429 (over budget only) in the e2e build, the plus 4.
   // -> 200,275 / 72,598 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 200,271 / 72,594 in the e2e build, the plus 4.
   // 200,275 / 72,598 -> 200,519 / 72,704 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured 200515 / 72700 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 200_519, maxGzip: 72_704 },
+  // 200,519 / 72,704 -> 200,579 / 72,727 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 200575 / 72723 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 200_579, maxGzip: 72_727 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
-  { pattern: /^InstallHint-.*\.js$/, maxBytes: 559, maxGzip: 323 },
+  // 559 / 323 -> 564 / 323 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 560 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^InstallHint-.*\.js$/, maxBytes: 564, maxGzip: 323 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -1176,7 +1179,8 @@ const budgets = [
   // 11,785 / 4,773 -> 12,368 / 4,989 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 9ce20c45 (main 465ccb93). Measured 12,364 / 4,985 in the e2e build, the plus 4.
   // 11,785 / 4,779 -> 12,368 / 4,988 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 dca98f20 (main 425eb4da). Measured 12,364 / 4,984 in the e2e build, the plus 4.
   // 11,785 / 4,773 -> 11,901 / 4,809 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 11897 / 4805 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_809 },
+  // 11,901 / 4,809 -> 11,901 / 4,816 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured - / 4812 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_816 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -2137,7 +2141,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,139 / 431,941 / 439,646 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured first paint, the plus 4.
 // -> 373,291 / 431,871 / 439,569 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 373,287 / 431,867 / 439,565 in the e2e build, the plus 4.
 // -> 373,408 / 432,211 / 439,916 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_408, en: 432_211, ja: 439_916 };
+// -> 373,432 / 432,235 / 439,938 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_432, en: 432_235, ja: 439_938 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
