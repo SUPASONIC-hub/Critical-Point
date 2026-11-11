@@ -351,12 +351,14 @@ const fileBudgets = {
   // 3116 / 60792 -> 3119 / 60915 on 2026-11-10, phone-846-staked, measured: the short phone's air (not its hidden portrait or cut question) also at 391-480px wide and up to 860px tall (411x846 Korean overclocked, a card staked: 25px under the bar; Pixel 7 412x839), as its own block beside the short phone's.
   // 3133 / 61044 (en-signals-row) and 3116 / 60792 (#497) -> 3138 / 61170 on 2026-11-10, en-signals-row after merging main 261accef (#497), measured: both.
   // 3119 / 60915 (phone-846-staked) and 3138 / 61170 (#499) -> 3141 / 61293 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499), measured: both.
+  // 3141 / 61293 -> 3143 / 61347 on 2026-11-10, phone-390-staked, measured: the staked card's one-line detail out of the 391-480px air block into a block of its own for every phone up to 480 wide and 860 tall (390x844 Korean overclocked, a card staked in case 01: 9px under the bar).
   // -> 56734 bytes on 2026-11-02, measured: C-15's badge fold over the
   // Japanese 360px card labels and the 360px HUD air.
   // -> 2941 lines / 57182 bytes on 2026-11-03, measured: C-15's badge fold over main 465ccb93
   // (en-hand5-linux, pc-type-scale).
   // 3141 / 61293 -> 3151 / 61522 on 2026-11-10, C-15 over main cb8346da (#499 #500), measured: the badge fold and the plain 소모 없음.
-  "play.css": { lines: 3151, bytes: 61522 },
+  // 3151 / 61522 (C-15) and 3143 / 61347 (phone-390-staked, #503) -> 3153 / 61576 on 2026-11-11, C-15 after merging main 568572d3, measured: both.
+  "play.css": { lines: 3153, bytes: 61576 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

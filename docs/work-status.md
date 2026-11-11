@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-09 (the state of `main` at `f97f507`, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-10 (the state of `main` at `312aa15`, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -805,6 +805,33 @@ Still open, on purpose:
   Open: drafts #477 (cold-opening style, decided 11-23), #484 (deps for
   after W47, replacing Dependabot #479 and #480), #491 `phone-heavy-bank`
   (overloaded table with the largest bank at 360px, after W47).
+- 2026-11-10: phones and the last pre-W47 fixes. #492 (`0900a10c`): Galaxy A32
+  (411x780 with the address bar) took the 360px HUD padding, one block
+  `(max-width: 360px), (max-width: 480px) and (max-height: 800px)`. #493
+  (`b4535e99`): short phones up to 800px high (was 760), en/ja rules to
+  480px wide; Linux: 411x780 overloaded +20 to -76, staked +61 to -55, en/ja
+  max bank +13 to -95/-87. #495 (`7cdca90d`): the layout sweep runs each
+  case in two halves (the 11-09 scheduled Full Coverage ran ~40% slower and
+  case01 passed the 15 min limit). #491 (`e7ccb410`, pulled forward from
+  after W47): 360px overloaded + max bank ko -2, ja -11 (was +9), en -8 (was
+  +12), 390 en signal row 0. #496 (`201ca8ce`): three Korean leaks in en/ja
+  outside the dictionaries (recovery center, copy status, report queue rows)
+  moved into `runLines`; `hangul-literals` test. #497 (`261accef`): 390x844 +
+  max bank ko +22 to -4, ja +20 to -3 (361-480px ko/ja relic rule); raising
+  the short-phone height to 860 also fixed 411x846 staked (+25) but hid the
+  speaker portrait on a Pixel 7 (412x839), so it was left out.
+  #498 (`b77e4bfe`): crisis/unstable music crackle — the dry path now goes
+  through the same 2x-oversampled latency as the drive shaper, and the
+  unstable/critical bass skips the drive; the user listened and approved.
+  #499 (`3a507805`): en signals row as one flex line, combo direction line
+  shrinks with an ellipsis. #500 (`cb8346da`): the short-phone block split
+  into a hide block (<=800px high) and a spacing block (also 391-480px wide
+  up to 860px): 411x846 staked +25 to -35, Pixel 7 +23 to -28, portraits kept.
+  The W47 test week was cancelled (no finished seasons in W45/W46); the
+  verdict waits for 30 finished seasons and every improvement now ships for
+  the user to check live. AdSense re-review requested ~17:10. #484
+  (`312aa15c`): vite 8.3.6, lucide-react 1.69 and dev tooling; Dependabot
+  #479 #480 closed. Ten merges.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`

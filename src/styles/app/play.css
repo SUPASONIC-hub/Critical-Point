@@ -2579,10 +2579,6 @@
     padding-block: 6px;
   }
 
-  .gx-card.selected .gx-card-preview {
-    max-height: 1.0625rem;
-  }
-
   .gx-pot-value {
     font-size: 1.75rem;
   }
@@ -2611,6 +2607,18 @@
 
   .gx-actions button {
     min-height: 52px;
+  }
+}
+
+/* The staked card's detail is one line on every phone up to 860 tall, the
+   390x844 one too, which takes none of the air above: on an overclocked board
+   with five relics a staked card in 사건 01 (c1_start_hold, c1_start_record,
+   c1_start_alone) put the last card of the hand up to 9px under the action bar
+   there (Linux, Korean, 2026-11-10), and the detail's second line is 21px.
+   The rest is one tap away in the reveal. */
+@media (max-width: 480px) and (max-height: 860px) {
+  .gx-card.selected .gx-card-preview {
+    max-height: 1.0625rem;
   }
 }
 
