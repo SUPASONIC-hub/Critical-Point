@@ -162,7 +162,8 @@ const budgets = [
   // 150,964 / 55,742 -> 153,646 / 56,482 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side run and the kit the side screen takes (as above). Measured 153,642 / 56,478 in the e2e build, the plus 4.
   // 153,646 / 56,482 -> 153,652 / 56,478 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): the side run over main's vite 8.3.6 build. Measured 153,648 / 56,474 in the e2e build, the plus 4.
   // -> 153,686 / 56,482 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 153,682 / 56,476 in the e2e build, the plus 4 (gzip under).
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_686, maxGzip: 56_482 },
+  // 153,686 / 56,482 -> 153,871 / 56,560 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 153867 / 56556 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_871, maxGzip: 56_560 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -578,7 +579,8 @@ const budgets = [
   // -> 199,649 / 72,275 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together: the side slot (#301), the stale-book refresh (#501), the ad switch (#350). Measured 199,645 / 72,271 in the e2e build, the plus 4.
   // -> 199,649 / 72,266 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 199,645 / 72,262 in the e2e build, the plus 4.
   // 199,649 / 72,266 -> 199,893 / 72,424 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 199889 / 72420 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 199_893, maxGzip: 72_424 },
+  // 199,893 / 72,424 -> 199,943 / 72,433 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 199939 / 72429 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 199_943, maxGzip: 72_433 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1164,7 +1166,8 @@ const budgets = [
   // 11,785 / 4,775 -> 12,364 / 4,992 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the upload carries the side marks (state/sideMarks.js) and a restore merges them. Measured 12,364 / 4,988, the gzip plus 4.
   // 11,785 / 4,773 -> 12,368 / 4,989 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 9ce20c45 (main 465ccb93). Measured 12,364 / 4,985 in the e2e build, the plus 4.
   // 11,785 / 4,779 -> 12,368 / 4,988 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 dca98f20 (main 425eb4da). Measured 12,364 / 4,984 in the e2e build, the plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_785, maxGzip: 4_773 },
+  // 11,785 / 4,773 -> 11,901 / 4,809 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 11897 / 4805 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_809 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -2109,7 +2112,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 371,483 / 429,748 / 437,438 (font-split) and 436,673 / 495,280 / 502,895 (bundle 1111) -> 372,867 / 431,449 / 439,148 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split): both, the critical CSS regenerated. Measured 372,863 / 431,445 / 439,144 in the e2e build, the plus 4.
 // -> 372,960 / 431,541 / 439,239 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 372,956 / 431,537 / 439,235 in the e2e build, the plus 4.
 // -> 373,130 / 431,933 / 439,637 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_130, en: 431_933, ja: 439_637 };
+// -> 373,139 / 431,941 / 439,646 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_139, en: 431_941, ja: 439_646 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
