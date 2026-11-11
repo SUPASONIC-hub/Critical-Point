@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-11 (the state of `main` at `72d10e6` <!-- 병합되면 -->, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 <!-- 병합되면 -->; before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-11 (the state of `main` at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -852,10 +852,10 @@ Still open, on purpose:
   failure), the layout sweep adds 411x846, the next redesign waits for the
   11-23 season data, C7 prose trims go ten cases per PR and merge after review
   (character lines restored). Probes stay at 20 jobs in total and wait while
-  a merge is deploying. Eight merges. <!-- 병합되면 --> #509 bundle 1111b
+  a merge is deploying. Ten merges (eighteen PRs). #509 bundle 1111b
   (#505 sweep 411 + 150 min, #506 #507 cases 19-38 prose -19.4% / -22.9%,
-  #508 noscript wording and Firefox help per language), speaker balloon fix
-  #___, C7 cases 39-final #___.
+  #508 noscript wording and Firefox help per language), #512 bundle 1111c: speaker balloon fix
+  #511, C7 cases 39-final #510 (-11.2%).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
