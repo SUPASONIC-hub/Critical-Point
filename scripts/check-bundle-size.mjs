@@ -159,6 +159,11 @@ const budgets = [
   // 56,216 -> 56,222 gzip on 2026-11-02, E-11 번외 사건 온라인 저장 (draft) over e11-side01 9eb5fe2c (main 2f085d28): only by the chunk names it imports. Measured 153,065 / 56,218 in the e2e build, the gzip plus 4.
   // 150,034 / 55,084 -> 150,034 / 55,143 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 9ce20c45 (main 465ccb93). Measured 149,512 / 55,139 in the e2e build, the plus 4.
   // 149,553 / 55,207 -> 149,751 / 55,268 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 dca98f20 (main 425eb4da). Measured 149,747 / 55,264 in the e2e build, the plus 4.
+  // 53,439 -> 53,445 gzip on 2026-10-26 (old base), E-11 번외 2 (draft) restacked on
+  // e11-side-cloud bb76437e: the chunk names it imports. Measured 145,874 /
+  // 53,441, the gzip plus 4.
+  // 153,069 / 56,216 kept on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): no change of its own; measured 153,065 / 56,209.
+  // 153,069 / 56,222 kept on 2026-11-02, E-11 번외 2 (draft) over e11-side-cloud 4fb9ad57 (main 2f085d28): measured 153,065 / 56,208.
   // 150,964 / 55,742 -> 153,646 / 56,482 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side run and the kit the side screen takes (as above). Measured 153,642 / 56,478 in the e2e build, the plus 4.
   // 153,646 / 56,482 -> 153,652 / 56,478 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): the side run over main's vite 8.3.6 build. Measured 153,648 / 56,474 in the e2e build, the plus 4.
   // -> 153,686 / 56,482 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 153,682 / 56,476 in the e2e build, the plus 4 (gzip under).
@@ -307,6 +312,7 @@ const budgets = [
   // 87,786 -> 87,781 gzip on 2026-11-05, bundle-mood (mood-wire, mood-tokens, mood-music over main 33899116): the raw bytes are the same 294,158; the case files' hashed names in its import list (#460). Measured 294,158 / 87,777 in the e2e build, the gzip plus 4.
   // 87,766 -> 87,771 gzip on 2026-11-05, tab-title-situation over main 24af89d7: the raw bytes are the same (294,158); the chunk names in its import list. Measured 87,767 gzip in the e2e build, the gzip plus 4.
   // 294,110 / 87,736 -> 294,110 / 87,741 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 294,106 / 87,737 in the e2e build, the plus 4.
+  // 294,110 / 87,741 -> 294,110 / 87,746 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 294,106 / 87,742 in the e2e build, the plus 4.
   { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_162, maxGzip: 87_785 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
@@ -575,6 +581,12 @@ const budgets = [
   // 184,581 / 67,170 -> 184,636 / 67,165 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the side keys spelled in appConfig.js for the online save and the event's name; the marks and their merge stay out (state/sideMarks.js). Measured 184,632 / 67,161, the plus 4.
   // 191,907 / 69,449 -> 191,958 / 69,455 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 9ce20c45 (main 465ccb93). Measured 191,954 / 69,451 in the e2e build, the plus 4.
   // 191,907 / 69,443 -> 191,958 / 69,449 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 dca98f20 (main 425eb4da). Measured 191,954 / 69,445 in the e2e build, the plus 4.
+  // 177,509 / 64,365 -> 177,678 / 64,418 on 2026-10-26 (old base), E-11 번외 2 (draft)
+  // restacked on e11-side-cloud bb76437e: the release list's entry for side02.
+  // Measured 177,678 / 64,414, the gzip plus 4.
+  // 184,636 / 67,165 -> 184,809 / 67,216 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): the release list's entry for side02 (src/nodes/sidePacks.js) and its chunk loader. Measured 184,805 / 67,212, the plus 4.
+  // 191,958 / 69,455 -> 192,131 / 69,503 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 192,127 / 69,499 in the e2e build, the plus 4.
+  // 191,958 / 69,449 -> 192,131 / 69,500 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud dbab06b9 (main 425eb4da). Measured 192,127 / 69,496 in the e2e build, the plus 4.
   // 196,509 / 70,858 -> 198,795 / 71,936 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the start screen's side slot and the side-id guards (as above). Measured 198,791 / 71,932 in the e2e build, the plus 4.
   // 198,795 / 71,936 -> 198,795 / 71,928 on 2026-11-10, E-11 번외 사건 틀 (draft) over main cb8346da (#500): only the asset names the entry imports. Measured 198,791 / 71,924 in the e2e build, the plus 4.
   // 196,509 / 70,854 -> 196,509 / 70,862 on 2026-11-10, phone-390-staked over main cb8346da (#500): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,858 in the e2e build, the plus 4.
@@ -586,10 +598,12 @@ const budgets = [
   // -> 199,649 / 72,266 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 199,645 / 72,262 in the e2e build, the plus 4.
   // 199,649 / 72,266 -> 199,893 / 72,424 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 199889 / 72420 (over budget only) in the e2e build, the plus 4.
   // 199,893 / 72,424 -> 199,943 / 72,433 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 199939 / 72429 (over budget only) in the e2e build, the plus 4.
+  // 199,943 / 72,433 -> 200,113 / 72,500 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 200109 / 72496 (over budget only) in the e2e build, the plus 4.
   // -> 200,275 / 72,598 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 200,271 / 72,594 in the e2e build, the plus 4.
   // 200,275 / 72,598 -> 200,519 / 72,704 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured 200515 / 72700 (over budget only) in the e2e build, the plus 4.
   // 200,519 / 72,704 -> 200,579 / 72,727 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 200575 / 72723 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 200_579, maxGzip: 72_727 },
+  // 200,579 / 72,727 -> 200,735 / 72,779 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured 200731 / 72775 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 200_735, maxGzip: 72_779 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1740,9 +1754,12 @@ const budgets = [
   // 179,701 / 60,151 -> 180,777 / 60,484 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 180,773 / 60,480 in the e2e build, the plus 4.
   // 154,420 / 52,285 -> 154,509 / 52,340 on 2026-10-30, E-11 번외 1 (draft) over e11-side-cases da40ea69 (main 430dda1e): 番外1 and its title (`copy.sidePacks`). Measured 154,505 / 52,336, the plus 4.
   // 180,777 / 60,484 -> 180,866 / 60,540 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases 49bce887 (main 465ccb93). Measured 180,862 / 60,536 in the e2e build, the plus 4.
+  // 154,509 / 52,340 -> 154,561 / 52,355 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): 番外2 and its title (`copy.sidePacks`). Measured 154,557 / 52,351, the plus 4.
+  // 180,866 / 60,540 -> 180,918 / 60,555 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 180,914 / 60,551 in the e2e build, the plus 4.
   // 187,054 / 62,254 -> 188,130 / 62,575 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side slot's, the finale line's and the side screen's Japanese. Measured 188,126 / 62,571 in the e2e build, the plus 4.
   // 188,130 / 62,575 -> 188,219 / 62,632 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): 番外1 and its title (`copy.sidePacks`). Measured 188,215 / 62,628 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 188_219, maxGzip: 62_632 },
+  // 188,219 / 62,632 -> 188,271 / 62,649 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 188267 / 62645 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 188_271, maxGzip: 62_649 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1797,13 +1814,16 @@ const budgets = [
   // 55,470 -> 55,477 gzip on 2026-11-10, memory-line-i18n (draft) over main cb8346da: the memory line's words moved from seasonLines to introPanels in the dictionary. Measured 155,862 / 55,473, plus 4.
   // -> 156,774 / 55,786 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 156,770 / 55,782 in the e2e build, the plus 4.
   // 156,774 / 55,786 -> 156,862 / 55,838 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 156858 / 55834 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 156_862, maxGzip: 55_838 },
+  // 156,862 / 55,838 -> 156,923 / 55,860 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 156919 / 55856 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 156_923, maxGzip: 55_860 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
   // 149,778 / 53,469 -> 150,686 / 53,783 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 150,682 / 53,779 in the e2e build, the plus 4.
   // 128,682 / 46,495 -> 128,770 / 46,546 on 2026-10-30, E-11 번외 1 (draft) over e11-side-cases da40ea69 (main 430dda1e): Side case 1 and its title (`copy.sidePacks`). Measured 128,766 / 46,542, the plus 4.
   // 150,686 / 53,783 -> 150,774 / 53,833 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases 49bce887 (main 465ccb93). Measured 150,770 / 53,829 in the e2e build, the plus 4.
+  // 128,770 / 46,546 -> 128,831 / 46,568 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): Side case 2 and its title (`copy.sidePacks`). Measured 128,827 / 46,564, the plus 4.
+  // 150,774 / 53,833 -> 150,835 / 53,856 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 150,831 / 53,852 in the e2e build, the plus 4.
   { pattern: /^boardBlockedTerms-.*\.js$/, maxBytes: 3_097, maxGzip: 1_721 },
   // A language's copy between cases after 사건 10 (src/locales/<lang>/between/<first>-<last>.js, en-between-11-20,
   // 2026-10-26: the owner's choice 2): fetched only once `previewThrough` reaches its cases, so the dictionary above
@@ -1831,12 +1851,16 @@ const budgets = [
   // 12,579 / 3,358 -> 13,068 / 3,524 on 2026-10-29, E-11 번외 1 (draft) restacked on e11-side-cases a11ad2f5 (13,068 / 3,520 again over da40ea69 on 10-30): the side list among the shell's tables, `localizeSidePack`, and en/ja side01 in the one import map both case kinds now share (`nodeFile`; two globs would carry the map twice). Measured 13,068 / 3,520.
   // 12,868 / 3,438 -> 13,361 / 3,605 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases 49bce887 (main 465ccb93). Measured 13,357 / 3,601 in the e2e build, the plus 4.
   // 12,991 / 3,500 -> 13,484 / 3,667 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases b40aa7d1 (main 425eb4da). Measured 13,480 / 3,663 in the e2e build, the plus 4.
+  // 13,068 / 3,524 -> 13,224 / 3,555 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): en/ja side02 in the one import map (`nodeFile`). Measured 13,224 / 3,551, the gzip plus 4.
+  // 13,361 / 3,605 -> 13,517 / 3,639 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 13,513 / 3,635 in the e2e build, the plus 4.
+  // 13,484 / 3,667 -> 13,640 / 3,704 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud dbab06b9 (main 425eb4da). Measured 13,636 / 3,700 in the e2e build, the plus 4.
   // 3,500 -> 3,505 gzip on 2026-11-03, canon-fixes-1 over main 36104abd: the canon fixes' Korean, English and Japanese lines (the role of 가온정밀's CEO, keyed by its Korean, names its address in both dictionaries; the 사건 29→30 interlude): the raw bytes are the same; the hashed names in its import maps changed and gzip worse. Measured 3,501, the plus 4.
   // 3,505 -> 3,520 gzip on 2026-11-03, canon-fixes-2 over canon-fixes-1 (#424): the raw bytes are the same; the case files' hashed names in its import maps changed and gzip worse. Measured 12,987 / 3,516, the plus 4.
   // 3,520 -> 3,525 gzip on 2026-11-04, bundle-1105b (#443 credits-alice + #446 canon-a044 over main 2bd9a8ba): the raw bytes are the same; #446 changes case files and their hashed names in the import maps gzip worse. Measured 12,987 / 3,521, the plus 4.
   // 12,991 / 3,525 -> 13,064 / 3,564 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 13,060 / 3,560 in the e2e build, the plus 4.
   // 13,064 / 3,564 -> 13,557 / 3,710 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): `localizeSidePack` and en/ja side01 in the import map beside main's pageTitle(). Measured 13,553 / 3,706 in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_557, maxGzip: 3_710 },
+  // 13,557 / 3,710 -> 13,713 / 3,737 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 13709 / 3733 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_713, maxGzip: 3_737 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -1990,6 +2014,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
  * E-11 번외 1 (draft) over e11-side-cases 49bce887 (main 465ccb93): 427,224, 484,654 and 491,361 (measured 427,220, 484,650, 491,357, plus 4).
  * E-11 번외 사건 온라인 저장 on it (11-02, over e11-side01 9eb5fe2c): the side
  * keys and the event's name in the entry: 424,339, 474,394 and 480,188.
+ * E-11 번외 2 on it (11-02, over e11-side-cloud 4fb9ad57): side02 in the
+ * entry's list and the overlay's import map, the label and title in each
+ * dictionary: 424,381, 474,489 and 480,276.
  */
 // 425,560 / 482,420 / 489,093 -> 425,751 / 482,612 / 489,285 on 2026-11-02, plate-story over main acf3d999 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. Measured 425,747 / 482,608 / 489,281 the plus 4.
 // 425,950 / 482,850 / 489,532 -> 426,541 / 483,439 / 490,121 on 2026-11-02, plate-story over main b5abd681 (#392, with #391): the font's three kana and the plate's CSS. Measured 426,537 / 483,435 / 490,117, the plus 4.
@@ -2113,6 +2140,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 427,739 / 485,001 / 491,707 -> 427,836 / 485,326 / 492,038 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases b40aa7d1 (main 425eb4da). Measured 427,832 / 485,322 / 492,034, the plus 4.
 // 427,224 / 484,654 / 491,361 -> 427,224 / 484,660 / 491,367 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 9ce20c45 (main 465ccb93). Measured under / 484,656 / 491,363, the plus 4.
 // 427,836 / 485,326 / 492,038 -> 427,842 / 485,336 / 492,048 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 dca98f20 (main 425eb4da). Measured 427,838 / 485,332 / 492,044, the plus 4.
+// 427,224 / 484,660 / 491,367 -> 427,277 / 484,764 / 491,463 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 427,273 / 484,760 / 491,459, the plus 4.
+// 427,842 / 485,336 / 492,048 -> 427,893 / 485,443 / 492,146 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud dbab06b9 (main 425eb4da). Measured 427,889 / 485,439 / 492,142, the plus 4.
 // 435,217 / 493,503 / 501,114 -> 436,297 / 494,902 / 502,517 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the entry's side slot and the two dictionaries' side lines. Measured 436,293 / 494,898 / 502,513, the plus 4.
 // 436,297 / 494,902 / 502,517 -> 436,303 / 494,909 / 502,522 on 2026-11-10, E-11 번외 사건 틀 (draft) over main cb8346da (#500): main's index CSS and critical CSS under the side slot. Measured 436,299 / 494,905 / 502,518, the plus 4.
 // 435,226 / 493,515 / 501,125 -> 435,238 / 493,525 / 501,135 on 2026-11-10, phone-390-staked over main cb8346da (#500): the index CSS line above and the critical CSS it regenerates. Measured 435,234 / 493,521 / 501,131 in the e2e build, the plus 4.
@@ -2139,10 +2168,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 372,960 / 431,541 / 439,239 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 372,956 / 431,537 / 439,235 in the e2e build, the plus 4.
 // -> 373,130 / 431,933 / 439,637 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured first paint, the plus 4.
 // -> 373,139 / 431,941 / 439,646 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured first paint, the plus 4.
+// -> 373,207 / 432,060 / 439,755 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured first paint, the plus 4.
 // -> 373,291 / 431,871 / 439,569 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 373,287 / 431,867 / 439,565 in the e2e build, the plus 4.
 // -> 373,408 / 432,211 / 439,916 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured first paint, the plus 4.
 // -> 373,432 / 432,235 / 439,938 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_432, en: 432_235, ja: 439_938 };
+// -> 373,484 / 432,339 / 440,036 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_484, en: 432_339, ja: 440_036 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2311,15 +2342,23 @@ function checkBudget(file, budget) {
 // 10,143 / 3,637 -> 10,172 / 3,651 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases 49bce887 (main 465ccb93). Measured 10,168 / 3,647, the plus 4.
 // 10,176 / 3,652 -> 10,205 / 3,667 on 2026-11-03, E-11 번외 1 (draft) over e11-side-cases b40aa7d1 (main 425eb4da). Measured 10,201 / 3,663, the plus 4.
 // 10,172 / 3,651 -> 10,172 / 3,654 on 2026-10-30, E-11 번외 사건 온라인 저장 (draft) over e11-side01 6f8723b0 (main 430dda1e): the list's hashed names; the worker's code did not change. Measured 10,168 / 3,650 plus 4.
+// -> 9,992 / 3,606 on 2026-10-26 (old base), E-11 번외 2 (draft) restacked on
+// e11-side-cloud bb76437e: one more file in the list, side02. Measured 9,992 /
+// 3,602 plus 4.
+// 10,172 / 3,654 -> 10,201 / 3,660 on 2026-10-30, E-11 번외 2 (draft) over e11-side-cloud c25a95cd (main 430dda1e): side02 and its English and Japanese words in the list; the worker's code did not change. Measured 10,197 / 3,656 plus 4.
+// 10,172 / 3,651 -> 10,201 / 3,663 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 10,197 / 3,659, the plus 4.
+// 10,205 / 3,667 -> 10,234 / 3,675 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud dbab06b9 (main 425eb4da). Measured 10,230 / 3,671, the plus 4.
 // 10,619 / 3,810 -> 10,656 / 3,820 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: one more file in the list, SideCaseScreen. Measured 10,652 / 3,816 plus 4.
 // 10,656 / 3,820 -> 10,685 / 3,828 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): side01 and its English and Japanese words in the list. Measured 10,681 / 3,824, the plus 4.
 // 10,619 / 3,810 -> 10,663 / 3,820 on 2026-11-10, font-split over main cb8346da: the second font file joins the install list. Measured 10,659 / 3,816 in the e2e build, the plus 4.
 // 10,656 / 3,820 (E-11) and 10,663 / 3,820 (font-split) -> 10,700 / 3,839 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split): both files in the install list. Measured 10,696 / 3,835 in the e2e build, the plus 4.
 // -> 10,700 / 3,831 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 10,696 / 3,827 in the e2e build, the plus 4.
 // -> 10,729 / 3,848 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504), the plus 4.
+// -> 10,758 / 3,848 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496), the plus 4.
 // -> 10,769 / 3,861 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 10,765 / 3,857 in the e2e build, the plus 4.
 // -> 10,798 / 3,875 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477), the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_798, maxGzip: 3_875 };
+// -> 10,827 / 3,884 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317), the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_827, maxGzip: 3_884 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
