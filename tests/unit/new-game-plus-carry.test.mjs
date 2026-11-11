@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { readdirSync, readFileSync } from "node:fs";
 
 import { getFinalVerdict } from "../../src/endingCopy.js";
 import { getEndingVariant, ENDING_IDS } from "../../src/gameLogic.js";
@@ -136,8 +137,15 @@ test("every case of a NEW GAME+ run is marked, and no case of any other run", ()
   assert.deepEqual({ caseId: "case01", ...newGamePlusMark({ veteran: false }) }, { caseId: "case01" });
 });
 
-test("the cases a NEW GAME+ run plays under a different table are the prologues whose step is short of everything", () => {
-  assert.deepEqual(VETERAN_TABLE_CASES, ["prologue01", "prologue02", "prologue03", "prologue04"]);
+test("the cases a NEW GAME+ run plays under a different table are the steps short of everything", () => {
+  // 프롤로그 01 to 사건 02 since C-4 (2026-10-25): the ladder reaches 사건 03.
+  assert.deepEqual(VETERAN_TABLE_CASES, ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02"]);
+  // The server's list is the same one (the scene wall rate's NEW GAME+ line):
+  // the newest migration, or draft, that writes `refresh_scene_bust_stats`.
+  const dir = new URL("../../supabase/migrations/", import.meta.url);
+  const newest = readdirSync(dir).filter((file) => /\.sql(\.draft)?$/.test(file) && readFileSync(new URL(file, dir), "utf8").includes("function public.refresh_scene_bust_stats()")).sort().at(-1);
+  const listed = readFileSync(new URL(newest, dir), "utf8").match(/s\.case_id in \(([^)]*)\)\)/)?.[1];
+  assert.deepEqual(listed?.split(",").map((id) => id.trim().replaceAll("'", "")), [...VETERAN_TABLE_CASES], `${newest} names the cases the ladder does`);
   for (const caseId of CASE_SEQUENCE) {
     const plain = rulesFor(caseId, {});
     assert.equal(differsForVeteran(caseId), plain.size < ALL_RULES.size, caseId);

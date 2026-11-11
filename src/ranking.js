@@ -123,6 +123,9 @@ function normalizeEntry(input = {}) {
     // device's rows and the id the server publishes on its own; a case row
     // carries the season's standing at that case, so only a season row counts.
     collapsed: seasonComplete && (summary.endingVariant?.id ?? summary.endingVariant) === "collapse",
+    // The server's nightly checker has not read this run yet (public_rankings.rechecked
+    // false): its score is the page's word until then. Only a remote row says so.
+    pendingCheck: !isLocal && row.rechecked === false,
     summary,
   };
 }

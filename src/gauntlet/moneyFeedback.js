@@ -10,7 +10,7 @@ import { fill } from "../locale.js";
  *
  * Two readings, both pure, for the stage to draw:
  *
- * - `readPurse`: the bank rail's head -- what the run holds (the case pot and
+ * - `readPurse`: the KD은행 계좌 pinned over the window -- what the run holds (the case pot and
  *   the vault together), what the last hand did to it, signed and with an
  *   arrow, and the season's won and lost columns. While the window is live it
  *   is the run as it was dealt (`lastChange` is the hand before this one); the
@@ -50,7 +50,7 @@ export function readSettledChange({ win, settling, livePot = 0, runPot = 0, bust
 }
 
 /**
- * The bank rail's head. `run` is the run the table was dealt; `settling` is a
+ * The KD은행 계좌. `run` is the run the table was dealt; `settling` is a
  * closed window this tab is settling (the stage's `claimed`), whose change is
  * counted in at once so the purse shows where the money lands.
  */

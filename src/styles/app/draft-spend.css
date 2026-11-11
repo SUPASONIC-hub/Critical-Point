@@ -1,0 +1,52 @@
+/* The KD은행 계좌 at the relic draft (C9, 2026-11-05): the two buys under the
+   hand -- 다시 뽑기 and 하나 더 -- that RelicDraft.jsx's DraftBuy draws. A file
+   of its own beside relics.css, which was sized to the draft it already held
+   (473 lines / 9,410 bytes, every line spent), so the buys are budgeted as
+   what they measure and the draft's own rules are not touched by them.
+
+   Two buys side by side, each half the row and 44px tall, the price on a line
+   of its own when the words do not fit beside it (English "One more · 12,000"
+   on a 360px phone); a buy that cannot pay stays in its place, dimmed, its
+   reason under it. The note under both says the press pays at once. */
+.gx-draft-spend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 8px;
+  margin-top: 10px;
+}
+
+.gx-draft-buy-slot {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.gauntlet-stage .gx-draft-buy {
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-gx-relic-a30);
+  border-radius: var(--ui-radius-sm);
+  color: var(--c-gx-relic);
+  background: var(--ui-surface-2);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.gauntlet-stage .gx-draft-buy[aria-disabled="true"] {
+  color: var(--ui-text-3);
+  border-color: var(--ui-line);
+  cursor: not-allowed;
+}
+
+/* The reason under a buy that is off, and the note under both: the note spans
+   the row, and the reason's span is the one column of its slot. */
+.gx-draft-why,
+.gx-draft-note {
+  grid-column: 1 / -1;
+  color: var(--ui-text-3);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+}

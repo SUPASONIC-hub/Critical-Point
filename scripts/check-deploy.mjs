@@ -6,6 +6,7 @@ import {
   assetCacheProblems,
   backendOriginProblems,
   backendPlacementProblems,
+  anySupabaseProject,
   cspProblems,
   entryScriptPath,
   firstAssetPath,
@@ -84,6 +85,8 @@ function checkOffline() {
   const csp = readRenderYamlCsp(yaml);
   if (!csp) problems.push("render.yaml declares no Content-Security-Policy");
   else problems.push(...cspProblems(csp).map((problem) => `render.yaml CSP: ${problem}`));
+  // Since 2026-11-03 the file names the project's own host, as production does.
+  if (csp) problems.push(...wildcardHostProblems(csp).map((problem) => `render.yaml CSP: ${problem}`));
   problems.push(...renderYamlHeaderProblems(yaml).map((problem) => `render.yaml headers ${problem}`));
 
   const built = path.join(root, "dist", "index.html");
@@ -107,12 +110,27 @@ function checkOffline() {
       const scripts = (existsSync(assets) ? readdirSync(assets) : [])
         .filter((file) => file.endsWith(".js"))
         .map((file) => [`/assets/${file}`, readFileSync(path.join(assets, file), "utf8")]);
-      const misplaced = csp ? backendPlacementProblems(entry, scripts, csp) : [];
+      // The build names the e2e stub or a desktop's own project, not production's.
+      const builtCsp = csp ? anySupabaseProject(csp) : null;
+      const misplaced = builtCsp ? backendPlacementProblems(entry, scripts, builtCsp) : [];
       problems.push(...misplaced.map((problem) => `dist: ${problem}`));
       if (misplaced.length === 0) {
         const script = readFileSync(path.join(root, "dist", entry), "utf8");
-        for (const note of csp ? backendOriginProblems(script, csp) : []) notes.push(`dist${entry}: ${note}`);
+        for (const note of builtCsp ? backendOriginProblems(script, builtCsp) : []) notes.push(`dist${entry}: ${note}`);
       }
+    }
+    // The start page in English and Japanese (startPages(), vite.config.js):
+    // the same page with other words, so it loads the same entry and nothing inline.
+    for (const language of ["en", "ja"]) {
+      const file = path.join(root, "dist", language, "index.html");
+      if (!existsSync(file)) {
+        problems.push(`dist/${language}/index.html is missing: the build writes it (startPages() in vite.config.js), and /${language}/ is in the sitemap`);
+        continue;
+      }
+      const page = readFileSync(file, "utf8");
+      problems.push(...inlineScriptProblems(page).map((problem) => `dist/${language}/index.html: ${problem}`));
+      if (entryScriptPath(page) !== entry) problems.push(`dist/${language}/index.html loads ${entryScriptPath(page)}, not the start page's ${entry}`);
+      if (!new RegExp(`<html\\s+lang="${language}"`).test(page)) problems.push(`dist/${language}/index.html is not lang="${language}"`);
     }
     const worker = path.join(root, "dist", WORKER_PATH);
     if (!existsSync(worker)) {
@@ -130,9 +148,6 @@ function checkOffline() {
     console.error(`Offline deploy check failed:\n${problems.join("\n")}`);
     process.exit(1);
   }
-  // The file cannot name the project, so it is only said, not failed: the live
-  // check is where a wildcard host is refused.
-  for (const note of wildcardHostProblems(csp)) console.log(`Note (render.yaml CSP): ${note} when setting it in the dashboard.`);
   for (const note of notes) console.log(`Note: ${note}.`);
   sayWorker(workerSource);
   console.log("Offline deploy check passed: render.yaml headers" + (existsSync(built) ? ", dist/index.html and dist/sw.js" : ""));

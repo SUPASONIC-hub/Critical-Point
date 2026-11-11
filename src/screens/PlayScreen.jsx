@@ -16,14 +16,15 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
   // the runtime filled it with a function that did nothing, and once here --
   // and the screen picked between them with `??` on thirteen names.
   const {
-    common: { AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase },
+    common: { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge },
     gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave, tableRisk },
     status: { resources, resourceMeta, progress, routePath },
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount },
   } = view;
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus } = renderers;
-  const { saveCurrentGame, resolveGauntlet, markWindowTouched, reloadFromStorage, pickRelic, onSuspendable = null, reset, copyReplayLink, copyDiagnosticTrace } = actions;
+  const { saveCurrentGame, resolveGauntlet, markWindowTouched, reloadFromStorage, pickRelic, spendAtDraft = null, onSuspendable = null } = actions;
+  const { reset, copyReplayLink, copyDiagnosticTrace } = actions;
 
   return (
     <main className="shell game-shell gauntlet-shell">
@@ -36,7 +37,6 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
       </p>
       <GameHeader
         node={node}
-        simplify={simplifyPlayerText}
         sceneTitleRef={titleRef}
         onSave={() => saveCurrentGame()}
         // Leaving on purpose keeps a bet on the table exactly as it stands.
@@ -67,9 +67,8 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
         isAdvancing={isAdvancing}
         revealOpen={decisionRevealOpen}
         onResolve={resolveGauntlet}
-        onTouch={markWindowTouched} onPickRelic={pickRelic} onSuspendable={onSuspendable}
-        staleSave={staleSave}
-        onReload={reloadFromStorage}
+        onTouch={markWindowTouched} onPickRelic={pickRelic} onSpendAtDraft={spendAtDraft} onSuspendable={onSuspendable}
+        staleSave={staleSave} onReload={reloadFromStorage}
         scene={{
           node, nodeId: resolvedNodeId,
           speakerPortrait,

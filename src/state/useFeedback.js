@@ -6,6 +6,7 @@ import { telemetryEnabled } from "../telemetry.js";
 import { createTelemetryEventId } from "./payloadSchemas.js";
 import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 import runLines from "../copy/runLines.js";
+import { fill } from "../locale.js";
 
 /** What the form's status line says on `caseId`'s result page: only what was said about that case. */
 export function readFeedbackStatus(status, caseId) {
@@ -157,7 +158,7 @@ export function createFeedbackActions({
     const item = {
       id: `feedback-${currentCase}-${Date.now()}`,
       type: "feedback",
-      label: `${activeCaseMeta?.label ?? currentCase} 피드백`,
+      label: fill(runLines.queue.feedback, { case: activeCaseMeta?.label ?? currentCase }),
       payload: createFeedbackTelemetryPayload({
         sessionId,
         sessionCode,

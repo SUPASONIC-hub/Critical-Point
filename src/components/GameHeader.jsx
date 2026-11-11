@@ -23,7 +23,6 @@ const CASE_NUMBER = headerCopy.caseNumber.split("{number}");
  */
 export function GameHeader({
   node,
-  simplify,
   sceneTitleRef,
   onSave,
   onSaveAndExit,
@@ -38,7 +37,7 @@ export function GameHeader({
   return (
     <header className="game-header">
       <div>
-        <span className="case-chip">{simplify(node.phase)}</span>
+        <span className="case-chip">{node.phase}</span>
         <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
       </div>
       <div className="top-actions compact-actions">

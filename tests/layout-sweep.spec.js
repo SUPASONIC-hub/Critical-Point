@@ -107,6 +107,36 @@ async function measureBank(page) {
   });
 }
 
+/**
+ * The signals row over the hand: the overclock line, LOCK and the logic
+ * streak, each in its own column of the HUD. On a 360px phone in English and
+ * Japanese the streak's longer line once left LOCK less than its own width,
+ * and LOCK ran under the streak (Linux, hand5, 2026-11-03: en 15 to 25px, ja
+ * 8 to 18px). `overlap` is how far any one runs into the next or past the
+ * row's end; `slack` is the row's width less the least the three can take,
+ * gaps counted: the overclock line's word (its sentence is the one cut with an
+ * ellipsis), LOCK and the streak whole. Below 0 something runs over.
+ */
+async function measureSignals(page) {
+  return page.evaluate(() => {
+    const row = document.querySelector(".gx-signals");
+    if (!row) return null;
+    const kids = [...row.children];
+    const style = getComputedStyle(row);
+    const right = row.getBoundingClientRect().right - parseFloat(style.paddingRight);
+    // scrollWidth is a whole number: it counts only past a pixel of rounding.
+    const ends = kids.map((el) => { const box = el.getBoundingClientRect(); return { left: box.left, right: el.scrollWidth > el.clientWidth + 1 ? box.left + el.scrollWidth : box.right }; });
+    const overlap = Math.max(0, ...ends.slice(0, -1).map((end, i) => end.right - ends[i + 1].left), ...ends.map((end) => end.right - right));
+    const columns = row.style.gridTemplateColumns;
+    row.style.gridTemplateColumns = kids.map(() => "max-content").join(" ");
+    const least = (el) => (el.matches(".gx-overdrive") ? el.querySelector("b").getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap) : el.getBoundingClientRect().width);
+    const need = kids.reduce((sum, el) => sum + least(el), 0) + parseFloat(style.columnGap) * (kids.length - 1);
+    row.style.gridTemplateColumns = columns;
+    const inner = row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    return { overlap: Math.round(overlap), slack: Math.round(inner - need), text: kids.map((el) => el.textContent.replace(/\s+/g, " ").trim()) };
+  });
+}
+
 async function measureCards(page) {
   return page.evaluate(() =>
     [...document.querySelectorAll(".choices .choice")].map((card) => {
@@ -142,8 +172,9 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
         await Promise.all(ending.map((animation) => animation.finished.catch(() => {})));
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       });
-      const row = { caseId, nodeId, name: "small phone", ...(BANK ? { bank: LAYOUT_BANK } : null), ...(await measureTable(page)), ...(await measureBank(page)), hand: await measureCards(page) };
+      const row = { caseId, nodeId, name: "small phone", ...(BANK ? { bank: LAYOUT_BANK } : null), ...(await measureTable(page)), ...(await measureBank(page)), signals: await measureSignals(page), hand: await measureCards(page) };
       rows.push(row);
+      if (row.signals?.overlap > 0) failures.push(`${nodeId}: the signals row runs ${row.signals.overlap}px into itself (${row.signals.text.join(" | ")})`);
       if (row.lastCard > row.actionsTop) {
         const lastRow = row.hand.filter((card) => card.bottom > row.actionsTop);
         const tallest = lastRow.reduce((a, b) => (b.height > a.height ? b : a), lastRow[0]);
@@ -156,12 +187,25 @@ for (const caseId of HAND5 ? CASE_SEQUENCE : []) {
   });
 }
 
-for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
-  test(`every ${caseId} decision fits above the action bar @layout`, async ({ page }) => {
+/**
+ * Each case's walk is two tests, the first and second half of its scenes. As
+ * one test a case took 5 to 11 minutes on a hand-started run, and 6 to 15.4 on
+ * the scheduled run of 2026-11-09, where every case ran about 40% slower and
+ * case01 went over the 15-minute limit. Halved, the longest is about 8 minutes
+ * on the slower runner, and the limit stays as it was.
+ */
+const SWEEP_PARTS = 2;
+
+for (const caseId of HAND5 ? [] : CASE_SEQUENCE) for (let part = 1; part <= SWEEP_PARTS; part += 1) {
+  test(`every ${caseId} decision fits above the action bar (part ${part}/${SWEEP_PARTS}) @layout`, async ({ page }) => {
     test.setTimeout(900_000);
     await page.goto("/?debug=1");
     await page.getByTestId("debug-case-select").selectOption(caseId);
-    const nodeIds = await page.getByTestId("debug-node-select").locator("option").evaluateAll((options) => options.map((option) => option.value));
+    const allNodeIds = await page.getByTestId("debug-node-select").locator("option").evaluateAll((options) => options.map((option) => option.value));
+    expect(allNodeIds.length).toBeGreaterThan(0);
+    const size = Math.ceil(allNodeIds.length / SWEEP_PARTS);
+    const nodeIds = allNodeIds.slice((part - 1) * size, part * size);
+    test.skip(!nodeIds.length, `${caseId} has fewer than ${SWEEP_PARTS} scenes`);
     const rows = [];
     const failures = [];
     for (const nodeId of nodeIds) {
@@ -176,8 +220,7 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
         if (row.widest > row.innerWidth + 1) failures.push(`${nodeId} @ ${name}: ${row.widest - row.innerWidth}px wider than the screen`);
       }
     }
-    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
-    expect(nodeIds.length).toBeGreaterThan(0);
+    if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-${caseId}-part${part}${REPORT_SUFFIX}.json`, JSON.stringify(rows));
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }
@@ -221,6 +264,28 @@ const HEAVY_BOARD = { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics
 const STAKED_CASES = ["case01", "case05", "final"];
 const STAKED_UNDER_THE_BAR = { c1_start_hold: 14 };
 
+/**
+ * The same board late in a season: the bank row at the max table's numbers
+ * (LAYOUT_BANK above), on both phones. Measured apart, each fit; together
+ * the bank's second line on the heavy board put the last card of a five-card
+ * hand 18px under the action bar in Korean and 9px in Japanese (Linux, c6_desk,
+ * 2026-11-09). With the chain lit by the streak the signals row is held too,
+ * on both phones: at 390px the English STRIKE was squeezed to 68px of its 81.
+ * On the 390x844 phone the relics took a third line of the bank row and put
+ * the last card 22px under the bar in Korean (c33_mother) and 20px in Japanese
+ * (c7_paper; Linux, 2026-11-10), so that phone takes the visit as well.
+ * The visits are a fifth load a scene, so a case's time limit is 20 minutes
+ * (15 with the 360px visit alone; case17 took 5.7 on Windows with it).
+ */
+const HEAVY_BANK_BOARD = { ...HEAVY_BOARD, runPot: BANK_TABLES.max.runPot, streak: BANK_TABLES.max.streak, run: { ...BANK_TABLES.max, handVault: 0, runHand: 0 } };
+
+function checkHeavyRow(row, failures) {
+  const where = `${row.nodeId} @ ${row.name}${row.bankHeight === undefined ? "" : ", max bank"}`;
+  if (row.lastCard > row.actionsTop) failures.push(`${where}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
+  if (row.widest > row.innerWidth + 1) failures.push(`${where}: ${row.widest - row.innerWidth}px wider than the screen`);
+  if (row.signals?.overlap > 0) failures.push(`${where}: the signals row runs ${row.signals.overlap}px into itself (${row.signals.text.join(" | ")})`);
+}
+
 function fullestScenes(caseId) {
   const hands = nodeOrders[caseId].map((nodeId) => [nodeId, nodes[nodeId].choices.filter((choice) => choice.type !== "reframe").length]);
   const most = Math.max(...hands.map(([, count]) => count));
@@ -229,7 +294,7 @@ function fullestScenes(caseId) {
 
 for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`the fullest ${caseId} hands fit on an overclocked board with five relics @layout`, async ({ page }) => {
-    test.setTimeout(600_000);
+    test.setTimeout(1_200_000);
     const nodeIds = fullestScenes(caseId);
     expect(nodeIds.length, `${caseId} has no scene to measure`).toBeGreaterThan(0);
     const rows = [];
@@ -245,19 +310,27 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
         // plain board would otherwise be measured and called a pass.
         await expect(page.getByTestId("active-mutations"), `${nodeId} @ ${name}: the changed rules are on the table`).toBeVisible();
         await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip"),`${nodeId} @ ${name}: five relics are carried`).toHaveCount(FIVE_RELICS.length);
-        const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)) };
+        const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)), ...(name === "laptop" ? null : { signals: await measureSignals(page) }) };
         rows.push(row);
-        if (row.lastCard > row.actionsTop) failures.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
-        if (row.widest > row.innerWidth + 1) failures.push(`${nodeId} @ ${name}: ${row.widest - row.innerWidth}px wider than the screen`);
-        if (name !== "small phone" || !STAKED_CASES.includes(caseId)) continue;
-        const staked = await measureStakedTable(page);
-        expect(staked.length, `${nodeId} @ ${name}: no card could be staked`).toBeGreaterThan(0);
-        rows.push(...staked.map((stake) => ({ ...row, ...stake })));
-        const allowed = STAKED_UNDER_THE_BAR[nodeId] ?? 0;
-        for (const stake of staked) {
-          const under = stake.lastCard - stake.actionsTop;
-          if (under > allowed) failures.push(`${nodeId} @ ${name}, card ${stake.staked} staked: last card ${under}px under the action bar (${allowed}px allowed)`);
+        checkHeavyRow(row, failures);
+        if (name === "small phone" && STAKED_CASES.includes(caseId)) {
+          const staked = await measureStakedTable(page);
+          expect(staked.length, `${nodeId} @ ${name}: no card could be staked`).toBeGreaterThan(0);
+          rows.push(...staked.map((stake) => ({ ...row, ...stake })));
+          const allowed = STAKED_UNDER_THE_BAR[nodeId] ?? 0;
+          for (const stake of staked) {
+            const under = stake.lastCard - stake.actionsTop;
+            if (under > allowed) failures.push(`${nodeId} @ ${name}, card ${stake.staked} staked: last card ${under}px under the action bar (${allowed}px allowed)`);
+          }
         }
+        if (name === "laptop") continue;
+        await openBrokenBoard(page, caseId, nodeId, HEAVY_BANK_BOARD);
+        await expectLayoutLang(page, `${nodeId} @ ${name}, max bank`);
+        await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
+        await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId} @ ${name}: the bank is the one written`).toHaveText(BANK_TABLES.max.runPot.toLocaleString("en-US"));
+        const banked = { caseId, nodeId, name, board: "overclocked, five relics, max bank", ...(await measureTable(page)), ...(await measureBank(page)), signals: await measureSignals(page) };
+        rows.push(banked);
+        checkHeavyRow(banked, failures);
       }
     }
     if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-heavy-${caseId}${REPORT_SUFFIX}.json`, JSON.stringify(rows));

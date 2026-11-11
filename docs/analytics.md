@@ -28,7 +28,7 @@
   `/assets/` 파일이라 다른 자산처럼 미리 받습니다.
 - 방침의 그 절은 켠 빌드에만 있습니다. 꺼진 빌드의 방침은 「분석용 쿠키나 외부 추적 도구를 쓰지 않습니다」를
   그대로 말하고, 시행일 아래에 「2026년 11월 12일부터 … Google 애널리틱스를 사용합니다」 변경 예고 한 문단이 있습니다
-  (방침 12번의 「시행 7일 전부터 알림」, 사용자 결정 10-30: 예고는 지금, 켜기는 11-12). 켠 빌드에서는 그 예고가 빠집니다
+  (방침 12번의 「시행 7일 전부터 알림」, 우리 결정 10-30: 예고는 지금, 켜기는 11-12). 켠 빌드에서는 그 예고가 빠집니다
   (`ANALYTICS_NOTICE`, `scripts/legal-pages.mjs`).
 
 ## CSP (Render 대시보드 → Settings → Headers)
@@ -69,7 +69,7 @@ curl -sI https://critical-point-wn6p.onrender.com/ | grep -i content-security-po
 
 | # | 할 일 | 누가 |
 | --- | --- | --- |
-| 1 | Render → Settings → Headers의 `/*` Content-Security-Policy를 위 출처를 더한 값으로 | 사용자 |
-| 2 | Render 환경 변수 `GA_MEASUREMENT_ID`를 넣고 「Save, rebuild, and deploy」 | 사용자 |
-| 3 | 위 확인 명령 | 사용자 또는 Claude |
-| 4 | GA4 → 관리 → 데이터 보관 기간이 2개월인지(방침이 2개월이라고 말함), Google 신호가 꺼져 있는지 | 사용자 |
+| 1 | Render → Settings → Headers의 `/*` Content-Security-Policy를 위 출처를 더한 값으로 | 우리 |
+| 2 | Render 환경 변수 `GA_MEASUREMENT_ID`를 넣고 「Save, rebuild, and deploy」 | 우리 |
+| 3 | 위 확인 명령 | 우리 또는 Claude |
+| 4 | GA4 → 관리 → 데이터 보관 기간이 2개월인지(방침이 2개월이라고 말함), Google 신호가 꺼져 있는지 | 우리 |

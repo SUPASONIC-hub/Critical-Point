@@ -58,14 +58,16 @@ test("every scene's prose survives marking character for character", async () =>
   }
 });
 
-test("the briefing's caption boxes hold two or three sentences and break before speech (D-3)", () => {
+test("the briefing's caption boxes hold two or three sentences and break before and after speech (D-3)", () => {
   assert.deepEqual(captionGroups("하나. 둘. 셋. 넷."), ["하나. 둘. 셋.", "넷."]);
+  // The narration after a speech is a box of its own (caption-split, 2026-11-03).
   assert.deepEqual(captionGroups("한서윤이 말합니다. '훈련용 사례예요. 72시간이고요.' 직원이 답합니다."), [
     "한서윤이 말합니다.",
-    "'훈련용 사례예요. 72시간이고요.' 직원이 답합니다.",
+    "'훈련용 사례예요. 72시간이고요.'",
+    "직원이 답합니다.",
   ]);
   // A sentence inside speech that runs on is not a new line of speech.
-  assert.deepEqual(captionGroups("'첫 말. 둘째 말.' 끝."), ["'첫 말. 둘째 말.' 끝."]);
+  assert.deepEqual(captionGroups("'첫 말. 둘째 말.' 끝."), ["'첫 말. 둘째 말.'", "끝."]);
   // Two long sentences are a box each once they pass 120 characters together.
   const long = `${"가".repeat(70)}.`;
   assert.deepEqual(captionGroups(`${long} ${long}`), [long, long]);
