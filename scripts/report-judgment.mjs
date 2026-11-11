@@ -25,6 +25,7 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
+import { COLD_OPENING_ENABLED } from "../src/coldOpeningSwitch.js";
 import { getWeekRule } from "../src/gauntlet/weeklyRules.js";
 import { scoreMarks } from "../src/seasonScore.js";
 import { funnelQuery, quantile, readFunnel, readRun, STOPS } from "./report-funnel.mjs";
@@ -150,6 +151,8 @@ export function describeJudgment(j, { week, board }) {
     ...RANKS.map((r) => `| ${r} | ${j.current[r]} (${pct(j.current[r], j.scores.n)}) | ${j.recorded[r]} (${pct(j.recorded[r], j.seasons)}) | ${j.proposed[r]} (${pct(j.proposed[r], j.scores.n)}) |`),
     "",
     "## (c) B-3(1) 프롤로그 이탈 (콜드 오프닝 스위치)",
+    "",
+    `스위치 지금: \`COLD_OPENING_ENABLED = ${COLD_OPENING_ENABLED}\` (src/coldOpeningSwitch.js, 2026-11-10부터 켬). 켜져 있으면 첫 기기의 런은 네 장을 지난 뒤에 시작하므로, 네 장에서 떠난 사람은 이 런 수에 없습니다.`,
     "",
   ];
   const f = j.funnel;
