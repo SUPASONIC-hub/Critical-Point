@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-10 (the state of `main` at `312aa15`, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-11 (the state of `main` at `72d10e6` <!-- 병합되면 -->, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 <!-- 병합되면 -->; before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -832,6 +832,30 @@ Still open, on purpose:
   the user to check live. AdSense re-review requested ~17:10. #484
   (`312aa15c`): vite 8.3.6, lucide-react 1.69 and dev tooling; Dependabot
   #479 #480 closed. Ten merges.
+- 2026-11-11: drafts shipped after the W47 cancellation. #503 (`568572d3`):
+  390x844 sat in neither #500 block, so the staked card detail took two
+  lines; that one rule moved to `(max-width: 480px) and (max-height: 860px)`:
+  ko case01 staked +9 to -12, portraits and spacing untouched. Other cases at
+  390x844 staked still reach ko +16, ja +20, en +16 (branch
+  `phone-390-staked-all`, waiting on a measurement). #426 (`d4048d83`): the
+  font split in two, the start-screen glyphs preloaded (131,352 bytes) and the
+  rest by `unicode-range` (82,780 bytes); first paint ko 435,222 to 371,420,
+  en/ja about -63.8 KB. #504 bundle 1111 (`5c93b496`): #350 AdSense prep (off
+  unless the Render variables are set; the build is byte-identical to main),
+  #301 the E-11 side-case slot, #501 memory lines, ending book and queue rows
+  of Korean-finished seasons redrawn in en/ja. #477 (`808834eb`): cold opening
+  on (`COLD_OPENING_ENABLED = true`), kept after the user saw it live. E-11
+  side cases #314 (`c61d6618`), #317 cloud marks in `save.deviceRecords`
+  (`d53a6ab2`, no migration), #321 (`accd990b`), #333 (`72d10e69`): the slot
+  shows on devices that finished the finale. Decisions: Full Coverage job
+  limit 90 to 150 min (run 42792158666 cut three jobs at 90 without a
+  failure), the layout sweep adds 411x846, the next redesign waits for the
+  11-23 season data, C7 prose trims go ten cases per PR and merge after review
+  (character lines restored). Probes stay at 20 jobs in total and wait while
+  a merge is deploying. Eight merges. <!-- 병합되면 --> #509 bundle 1111b
+  (#505 sweep 411 + 150 min, #506 #507 cases 19-38 prose -19.4% / -22.9%,
+  #508 noscript wording and Firefox help per language), speaker balloon fix
+  #___, C7 cases 39-final #___.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
