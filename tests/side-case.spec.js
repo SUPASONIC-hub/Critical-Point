@@ -12,7 +12,7 @@ import { NEW_GAME_PLUS_KEY, SIDE_CASES_KEY } from "../src/appConfig.js";
  * The first case played is the framework's placeholder, side00, which only a
  * debug build visited with `?side-fixture=1` lists (src/nodes/sidePacks.js) --
  * the dev server these specs run against is one. Without the switch the list is
- * what a release lists: 번외 1 (side01) and 번외 2 (side02), each played to its
+ * what a release lists: 번외 1 (side01), 번외 2 (side02) and 번외 3 (side03), each played to its
  * ending below.
  */
 
@@ -61,8 +61,8 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   await page.goto(FIXTURE_URL);
   const slot = page.getByTestId("side-case-slot");
   await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  // 번외 1, 번외 2 and the placeholder.
-  await expect(slot).toContainText("번외 0/3");
+  // 번외 1, 번외 2, 번외 3 and the placeholder.
+  await expect(slot).toContainText("번외 0/4");
   await expect(slot).toContainText("랭킹 밖");
   const before = await readSeasonKeys(page);
 
@@ -91,7 +91,7 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   expect(await readSeasonKeys(page)).toEqual(before);
 
   await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/3");
+  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/4");
   // 이어하기 opens the season where it was paused.
   await resumeSavedRun(page);
   expect(JSON.parse(await readStorage(page, TEST_STORAGE_KEYS.save)).currentCase).toBe("case12");
@@ -106,10 +106,12 @@ test("a device that has not closed a finale has no side slot @once", async ({ pa
 });
 
 // The release's cases: the first card each scene deals, scene after scene, to
-// the close -- 번외 1 in seven to ten decisions, 번외 2 in eight to eleven.
+// the close -- 번외 1 in seven to ten decisions, 번외 2 in eight to eleven,
+// 번외 3 in seven to ten.
 const RELEASE_CASES = [
   { id: "side01", prefix: "s1", title: "아직 찾아가지 못한 일곱 명", most: 10 },
   { id: "side02", prefix: "s2", title: "돌려줄 것", most: 11 },
+  { id: "side03", prefix: "s3", title: "보통의 밤", most: 10 },
 ];
 
 for (const { id, prefix, most } of RELEASE_CASES) {
@@ -123,7 +125,7 @@ for (const { id, prefix, most } of RELEASE_CASES) {
     await page.goto("/");
     const slot = page.getByTestId("side-case-slot");
     await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-    await expect(slot).toContainText("번외 0/2");
+    await expect(slot).toContainText("번외 0/3");
     for (const listed of RELEASE_CASES) await expect(slot).toContainText(listed.title);
     await expect(page.getByTestId("side-case-open-side00")).toHaveCount(0);
     const before = await readSeasonKeys(page);
@@ -153,7 +155,7 @@ for (const { id, prefix, most } of RELEASE_CASES) {
     expect(await readSeasonKeys(page)).toEqual(before);
 
     await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-    await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/2");
+    await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/3");
     expect(errors).toEqual([]);
   });
 }
