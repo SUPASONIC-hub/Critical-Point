@@ -47,10 +47,18 @@ services:
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
-      # AdSense site verification (docs/web-ads.md), unset until the user sets
-      # it: the publisher ID writes a meta tag and /ads.txt, no ad code. No
-      # VITE_ prefix, so it never reaches the bundle.
+      # Web ads (출시 로드맵 2단계, docs/web-ads.md): only ADSENSE_CLIENT is
+      # set today (since the AdSense review). The publisher ID alone is site verification (a meta tag and /ads.txt, no
+      # ad code); ADSENSE_ADS=notice with ADSENSE_DATE puts the seven-day notice
+      # atop the policy and the terms; ADSENSE_ADS=on with ADSENSE_SLOTS draws the
+      # ads and dates both pages ADSENSE_DATE.
       - key: ADSENSE_CLIENT
+        sync: false
+      - key: ADSENSE_ADS
+        sync: false
+      - key: ADSENSE_SLOTS
+        sync: false
+      - key: ADSENSE_DATE
         sync: false
       # Search Console site verification (docs/search-console.md), unset until
       # the user sets it: the token writes one meta tag into index.html. No
@@ -190,6 +198,12 @@ services:
       #   no wildcard (scripts/analytics-config.mjs ANALYTICS_ORIGINS, which
       #   check:deploy holds a page carrying the tag to). Nothing loads from
       #   them while the variable is unset.
+      # Web ads (ADSENSE_ADS=on, not today) need script/frame/connect/img
+      #   widened to https: and script-src 'unsafe-eval' -- this value through
+      #   adCsp() in scripts/adsense-config.mjs, set in the dashboard only
+      #   (docs/web-ads.md); check:deploy accepts that exact widening and no
+      #   other (isAdCsp). Google supports only a nonce-based CSP for AdSense,
+      #   which a static host cannot give. Verification alone needs no change.
       - path: /*
         name: Content-Security-Policy
         value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com; media-src 'self' blob:; connect-src 'self' https://kiazzdbpkazwqhhimdib.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://region1.analytics.google.com; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'"

@@ -172,8 +172,13 @@ const BUDGETS = {
   // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
   // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
   // bgm-variety and locale-gaps.
+  // 968 -> 970 on 2026-11-10, memory-line-i18n (draft): the runtime module
+  // hands the shell `refreshSeasonRecord`, so a 결말 도감 stored in another
+  // language is written again in the page's (AppContent, isStaleBook); the
+  // export and its line of why. Measured 970 / 96.
+  // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
   "src/GameRuntime.jsx": {
-    lines: 969,
+    lines: 971,
     longestLine: 190,
     importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
@@ -212,10 +217,13 @@ const BUDGETS = {
   },
   // 7 -> 9 on 2026-10-26, 다국어 틀: the archive's copy table
   // (src/copy/report.js) and `fill` for its lines with blanks.
+  // 9 -> 10 on 2026-11-10, memory-line-i18n (draft): the remote-save queue's
+  // rows are named again in the page's language (state/pendingRowLabel.js,
+  // #496 질문 2); `fill` stays for the screen's other lines.
   "src/screens/ReportArchive.jsx": {
     lines: 640,
     longestLine: 260,
-    importedNames: 9,
+    importedNames: 10,
     hooks: {},
   },
   // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to

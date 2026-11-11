@@ -93,6 +93,8 @@ import { whenCaseReady } from "./state/caseArrival.js";
 import { retryableLazy } from "./state/retryableLazy.js";
 export { prepareGameRuntime } from "./state/caseArrival.js";
 export { sideCaseKit } from "./state/sideCaseKit.js";
+// The shell has the 결말 도감 written again in the page's language through it (AppContent, advancedSystems.isStaleBook).
+export { refreshSeasonRecord } from "./state/useNewGamePlus.js";
 
 const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
