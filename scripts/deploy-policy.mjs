@@ -1,3 +1,4 @@
+import { adCsp } from "./adsense-config.mjs";
 import { ANALYTICS_ORIGINS } from "./analytics-config.mjs";
 
 /**
@@ -65,6 +66,25 @@ export function cspProblems(value) {
     }
   }
   return problems;
+}
+
+/**
+ * Is `value` render.yaml's CSP (`base`) widened for web ads, and nothing
+ * else? The one policy wider than the file's that the live check accepts
+ * (`adCsp`, scripts/adsense-config.mjs; docs/web-ads.md): the ads need
+ * script, frame, connect and img on https: and script-src 'unsafe-eval',
+ * which `cspProblems` refuses for any other page. Directive by directive, in
+ * any order, so the dashboard's copy need not keep the file's spacing.
+ */
+export function isAdCsp(value, base) {
+  if (!value || !base) return false;
+  const [live, wanted] = [parseCsp(value), parseCsp(adCsp(base))];
+  if (live.size !== wanted.size) return false;
+  for (const [name, sources] of wanted) {
+    const have = live.get(name);
+    if (!have || have.length !== sources.length || !sources.every((source) => have.includes(source))) return false;
+  }
+  return true;
 }
 
 /**

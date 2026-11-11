@@ -19,7 +19,8 @@
 import { ENDING_GATES } from "../gameConstants.js";
 import { ENDING_NAMES } from "../runtimeSystems.js";
 import { VERDICT_ENDINGS } from "../verdictBranch.js";
-import { fill } from "../locale.js";
+import { appliedLocale, fill } from "../locale.js";
+import introPanels from "../copy/introPanels.js";
 import seasonLines from "../copy/seasonLines.js";
 
 // The book's words (src/copy/seasonLines.js `book`), read when the book is written so they are the page's language.
@@ -45,7 +46,7 @@ const hintOf = (id) =>
   });
 
 /** The rulings by the short name the panel already uses (VERDICT_NAMES, seasonRecord.js), in the page's language. */
-const verdictLabel = (verdict) => seasonLines.verdicts[verdict];
+const verdictLabel = (verdict) => introPanels.verdicts[verdict];
 
 const verdictWhen = (verdict) =>
   fill(W.verdictWhen, { path: W.paths[verdict], endings: VERDICT_ENDINGS[verdict].map((id) => ENDING_NAMES[id]).join(" · ") });
@@ -62,6 +63,7 @@ const verdictWhen = (verdict) =>
  * - `hints`: one line per other ending and ruling not yet seen, in the fold.
  *
  * The panel prints both as they are: whatever is joined is joined here.
+ * `lang` is the page's language they are in.
  */
 export function getEndingBook({ seasons = 0, endingsSeen = [], verdictsSeen = [] } = {}) {
   if (!(seasons > 0)) return null;
@@ -74,6 +76,8 @@ export function getEndingBook({ seasons = 0, endingsSeen = [], verdictsSeen = []
   else if (missingVerdicts.length) next = fill(W.aimVerdict, { verdict: verdictLabel(missingVerdicts[0]), when: verdictWhen(missingVerdicts[0]) });
   return {
     head: count + next,
+    // The language the lines were written in: the shell has them written again in another (advancedSystems.isStaleBook).
+    lang: appliedLocale(),
     hints: [
       ...missingEndings.filter((id) => id !== aim).map((id) => `${ENDING_NAMES[id]}: ${hintOf(id)}`),
       ...missingVerdicts.filter((verdict) => aim || verdict !== missingVerdicts[0]).map((verdict) => fill(W.hintVerdict, { verdict: verdictLabel(verdict), when: verdictWhen(verdict) })),

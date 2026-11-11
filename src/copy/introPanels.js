@@ -43,6 +43,13 @@ const introPanelsCopy = {
   // The start screen's NEW GAME+ panel (getPastRunMemory).
   veteranTable: "NEW GAME+는 프롤로그 01부터 모든 규칙이 켜지고, 도구도 더 일찍 받습니다.",
   pastCase: "이전 기록에서 CASE {code}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.",
+  // The last finished season's line on the same panel (getMemoryLine), drawn from the record's ids in the page's language,
+  // and the rulings by their short names (seasonRecord.js VERDICT_NAMES keeps the Korean as the record's).
+  verdicts: { ending_seal: "봉인", ending_reform: "개혁", ending_expose: "폭로" },
+  memory: {
+    line: "지난 시즌: {named}{ending}.{carry}",
+    carry: " NEW\u00a0GAME+로 시작하면 첫 장면에 이 기록이 돌아옵니다.",
+  },
   // What a ranking row's link to its run says (getRankingIntegrity).
   integrity: {
     linked: "한 플레이로 묶인 기록입니다. 공개 랭킹은 모든 사건 기록이 15분 이상에 걸쳐 서버에 도착한 시즌만 받고, 점수·등급·시간이 맞지 않는 기록은 서버에 따로 표시해 둡니다.",
