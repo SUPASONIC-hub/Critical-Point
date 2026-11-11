@@ -100,7 +100,7 @@ export default {
     },
     "c44_lunch": {
       "title": "Eleven Bowls of Sundae Soup",
-      "text": "11 people push three tables together. Kwon Dohyun wins the bet with twenty-three 'however's and collects 10,000 won from Oh Jinwoo. Moon Gaeul puts down her spoon. 'They say the money that ruined my husband’s shop was 2.5 billion won. He goes home today and eats dinner. And we eat here.' Prosecutor Na Eunho takes the empty seat, sets down gimbap, and raises one finger. 'To appeal, I need a reason. The deadline is 7 days.'",
+      "text": "11 people push three tables together. Kwon Dohyun wins the bet with twenty-three 'however' calls and collects 10,000 won from Oh Jinwoo. Moon Gaeul puts down her spoon. 'They say the money that ruined my husband’s shop was 2.5 billion won. He goes home today and eats dinner. And we eat here.' Prosecutor Na Eunho takes the empty seat, sets down gimbap, and raises one finger. 'To appeal, I need a reason. The deadline is 7 days.'",
       "memo": [
         "Judgment: 3 years in prison, suspended for 5 years, forfeiture of 2.56 billion won",
         "4 acquittals -- the e-signature field on the approvals is empty",
