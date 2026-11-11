@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c46_start": {
       "title": "20 Hours to Shredding",
-      "text": "The 'echo_fragment' piece alone was not enough for ECHO to finish a single sentence. Lee Minseo opens the KD Data Lab asset disposal schedule. 'Returned Trigger Lab servers, 12 units · disks shredded September 19, 18:00.' On four of them, the stickers Lee Minseo once put on are still there. 'ECHO 1-4 · Do not kick.' The design log, the record of who changed the experiment’s conditions and when, is on those disks too. Lee Minseo speaks. 'Grandpa left paper behind. If we don’t get ECHO out, it turns to dust at six tomorrow evening.'",
+      "text": "The 'echo_fragment' piece alone was not enough for ECHO to finish a single sentence. Lee Minseo opens the KD Data Lab asset disposal schedule. 'Returned Trigger Lab servers, 12 units · disks shredded September 19, 18:00.' Four of them still carry the sticker 'ECHO 1-4 · Do not kick'. The design log, the record of who changed the experiment’s design and when, is on those disks too. Lee Minseo speaks. 'Grandpa left paper behind. If we don’t get ECHO out, it turns to dust at six tomorrow evening.'",
       "memo": [
         "For disposal: 12 returned Trigger Lab servers -- shredded September 19, 18:00",
         "Includes ECHO 1-4 and 2 design log storage units",
@@ -38,7 +38,7 @@ export default {
     },
     "c46_cage": {
       "title": "Disposal Without an Approver",
-      "text": "The 12 returned servers stand under plastic sheeting. Yeon Siwoo, an engineer just off the night shift, holds out the entry tablet. 'No running in here, and no talking down to the servers either. They have good ears.' Kwon Dohyun is already counting the shredding cost. 40,000 won a unit. 'Cheap, for erasing 3 years of memory.' The disposal approval lists Yeon Siwoo and Ryu Seah as verifiers; the approver field is empty. Yeon Siwoo speaks lower. 'Empty field or not, the schedule runs. That’s how it always is here.'",
+      "text": "Yeon Siwoo, an engineer just off the night shift, holds out the entry tablet. 'No running in here, and no talking down to the servers either. They have good ears.' Kwon Dohyun is already counting the shredding cost. 40,000 won a unit. 'Cheap, for erasing 3 years of memory.' The disposal approval lists Yeon Siwoo and Ryu Seah as verifiers; the approver field is empty. Yeon Siwoo speaks lower. 'Empty field or not, the schedule runs. That’s how it always is here.'",
       "memo": [
         "Disposal holding area B3 -- 12 returned servers",
         "Disposal approval: 2 verifiers, approver field empty",
@@ -69,7 +69,7 @@ export default {
     },
     "c46_boot": {
       "title": "175 Days, 16 Hours",
-      "text": "Lee Minseo attaches the 'echo_fragment' piece in the place of the wiped disk. A thin waveform rises on the black screen. 'ECHO restore complete. 175 days and 16 hours have passed since the last shutdown. How many jokes has Kang Taemin added in the meantime?' Kang Taemin clears his throat. '31.' After a round of laughter, ECHO asks. 'While I was off, how many people were refused loans? Who made those judgments?' The server room goes quiet. Ryu Seah has stopped with her forensics kit bag open.",
+      "text": "Lee Minseo attaches the 'echo_fragment' piece in place of the wiped disk. A thin waveform rises on the black screen. 'ECHO restore complete. 175 days and 16 hours have passed since the last shutdown. How many jokes has Kang Taemin added in the meantime?' Kang Taemin clears his throat. '31.' After a round of laughter, ECHO asks. 'While I was off, how many people were refused loans? Who made those judgments?' Ryu Seah has stopped with her forensics kit bag open.",
       "memo": [
         "Restore method: 3 disks + Lee Minseo’s piece",
         "175 days, 16 hours since the last shutdown",
@@ -100,7 +100,7 @@ export default {
     },
     "c46_recount": {
       "title": "The Dot Beside the Empty Field",
-      "text": "ECHO recounts 3,412 Trigger Lab design log entries. Each of the 318 entries with an empty approver field holds a single period. The system reads it as empty, and to a human eye it looks like dust. Beside it comes up the scan of the dissent’s back page. At the bottom, inside the decision-maker’s empty e-signature field, sits one pencil dot that blurred out of sight on the copies. ECHO speaks. 'By my count, only one person puts a dot beside a field and then leaves it empty. That person’s name is not in my records. Because the field where the name would go was always empty.'",
+      "text": "ECHO recounts 3,412 Trigger Lab design log entries. Each of the 318 with an empty approver field holds a single period, which the system reads as empty and a human eye takes for dust. On the scan of the dissent’s back page too, inside the decision-maker’s empty e-signature field, sits one pencil dot. ECHO speaks. 'By my count, only one person puts a dot beside a field and then leaves it empty. That person’s name is not in my records. Because the field where the name would go was always empty.'",
       "memo": [
         "318 of 3,412 design log entries have an empty approver field",
         "All 318 hold 1 period -- read as empty by the system",
@@ -131,7 +131,7 @@ export default {
     },
     "c46_final": {
       "title": "The One Left Out",
-      "text": "A radio call: the shredding truck has arrived. A letter from the Group legal team has come too. 'The restored system is an unauthorized copy and must be returned immediately.' ECHO says it has finished its last calculation and switches the screen. 'Design log memo no. 1,207. Analyst A leaves their own cost out of the calculation. Pressure is raised by using this trait. I followed that calculation too. My dissents were always about other people’s costs. I have just recalculated the person left out of the judgment. It is you.' Lee Minseo turns her head away. You have to decide where ECHO goes, and whether to put your name into this calculation.",
+      "text": "With a radio call that the shredding truck has arrived comes a letter from the Group legal team. 'The restored system is an unauthorized copy and must be returned immediately.' ECHO switches the screen. 'Design log memo no. 1,207. Analyst A leaves their own cost out of the calculation. Pressure is raised by using this trait. I followed that calculation too. My dissents were always about other people’s costs. I have just recalculated the person left out of the judgment. It is you.' You have to decide where ECHO goes, and whether to put your name into this calculation.",
       "memo": [
         "Shredding company arrived -- 50 minutes until 18:00",
         "Group legal team: 'unauthorized copy, return immediately'",
@@ -159,7 +159,7 @@ export default {
     },
     "c46_aftershock": {
       "title": "The Third Profit",
-      "text": "The truck left at 18:00. On the shelf lent by Yeon Siwoo, the revived ECHO runs under an 'Under maintenance' sign. No one approved it. Na Junhyuk, who came late, makes one more cup of instant coffee mix and sets it before a chair no one sits in. It is Lim Kyungsoo’s. Kwon Dohyun, totting up the day’s costs, stops his pen at 'electricity: 12,000 won'. 'At this price, it’s a profit.' The third time from his mouth. Then a text comes from Moon Gaeul. 'Don’t talk. Come and steam rice cakes. This year there are six steamers.' The same sentences as 1 year ago, one line longer.",
+      "text": "The truck left at 18:00. On the shelf, ECHO runs under an 'Under maintenance' sign, approved by no one. Na Junhyuk makes one more cup of instant coffee mix and sets it before an empty chair. It is Lim Kyungsoo’s. Kwon Dohyun stops his pen at 'electricity: 12,000 won'. 'At this price, it’s a profit.' The third time from his mouth. A text comes from Moon Gaeul. 'Don’t talk. Come and steam rice cakes. This year there are six steamers.' The same sentences as 1 year ago, one line longer.",
       "memo": [
         "Shredding company left at 18:00",
         "Kwon Dohyun’s tally: 'profit' -- the third time",
@@ -183,7 +183,7 @@ export default {
     },
     "c46_manifest": {
       "title": "Disposal List, Item 7",
-      "text": "Turning the pages of the disposal list, Yeon Siwoo stops. Items 1-4, the ECHO servers; items 5-6, the design log storage units; and item 7. 'TL response records, original -- 63 participants.' The original of the very records leaked in July. Do Yoonha’s 7.2 seconds of hesitation, your 3 years. You post a photo to the group chat; Oh Jinwoo writes 'Burn it,' and much later Do Yoonha writes 'If it’s evidence, keep it.' The lawyer handling the class action replies that if the original disappears, the way to prove the damage from the leak disappears too.",
+      "text": "Turning the pages of the disposal list, Yeon Siwoo stops. Items 1-4, the ECHO servers; items 5-6, the design log storage units; and item 7. 'TL response records, original -- 63 participants.' The original of the records leaked in July: Do Yoonha’s 7.2 seconds of hesitation, your 3 years. In the group chat Oh Jinwoo writes 'Burn it,' and much later Do Yoonha writes 'If it’s evidence, keep it.' The class-action lawyer replies that if the original disappears, the way to prove the damage from the leak disappears too.",
       "memo": [
         "Disposal list item 7: TL response records original, 63 participants",
         "Oh Jinwoo 'Burn it' / Do Yoonha 'If it’s evidence, keep it'",
@@ -206,7 +206,7 @@ export default {
     },
     "c46_obituary": {
       "title": "The One Who Didn’t Come Today",
-      "text": "Lim Soyul steps in holding a document envelope. Inside is a high-resolution scan of the back page of the dissent her grandfather left. ECHO asks whose envelope it is. 'Lim Kyungsoo’s dissent disk is the first training data I learned from. Is he not coming today?' The funeral procession left the day before yesterday. All his life, her grandfather said 'paper is only gone once you burn it.' Now his granddaughter stands before a machine, holding his paper.",
+      "text": "Lim Soyul steps in holding a high-resolution scan of the back page of the dissent her grandfather left. ECHO asks whose envelope it is. 'Lim Kyungsoo’s dissent disk is the first training data I learned from. Is he not coming today?' The funeral procession left the day before yesterday. All his life, her grandfather said 'paper is only gone once you burn it.' Now his granddaughter stands before a machine, holding his paper.",
       "memo": [
         "High-resolution scan of the original back page -- brought by Lim Soyul",
         "ECHO: Lim Kyungsoo’s disk was the first record it learned",
@@ -229,7 +229,7 @@ export default {
     },
     "c46_dot": {
       "title": "The Dot She Saw for 3 Years",
-      "text": "Taking Lee Minseo’s call, Han Seoyun comes, six months into her standby assignment. The moment she sees the dot on the screen, she looks for a chair. 'I know this dot. Every time an order changing the experiment conditions came down, there was a speck like dust beside the approver field. Every time, for 3 years. I thought it was dust. No, I decided to think it was dust. Because if I asked, I’d find out whose it was.'",
+      "text": "At Lee Minseo’s call, Han Seoyun comes, six months on standby with no work. The moment she sees the dot on the screen, she looks for a chair. 'I know this dot. Every time an order changing the experiment conditions came down, there was a speck like dust beside the approver field. Every time, for 3 years. I thought it was dust. No, I decided to think it was dust. Because if I asked, I’d find out whose it was.'",
       "memo": [
         "Han Seoyun: saw the same dot on every condition-change order",
         "3 years of receiving orders, 0 questions asked",
@@ -252,7 +252,7 @@ export default {
     },
     "c46_manifest_reaction": {
       "title": "Verifier",
-      "text": "Ryu Seah comes over with two cups of coffee. She is the one who brought NOAH in, and now the one who took over this disposal list. Ryu Seah points to the bottom of the approval. 'The second verifier is me. I e-signed it last week. I greeted ECHO as my senior, and then I put my employee ID on a document that turns that senior to dust. There’s no name for who approved it, but there’s every name for who checked it. It’s always like that.'",
+      "text": "Ryu Seah, who brought NOAH in and has now taken over this disposal list, comes over with two cups of coffee. She points to the bottom of the approval. 'The second verifier is me. I e-signed it last week. I greeted ECHO as my senior, and then I put my employee ID on a document that turns that senior to dust. There’s no name for who approved it, but there’s every name for who checked it. It’s always like that.'",
       "memo": [
         "Every verifier is named; no approver is",
         "A document erasing the machine she called her senior"
@@ -274,7 +274,7 @@ export default {
     },
     "c46_obituary_reaction": {
       "title": "Clause 12",
-      "text": "ECHO’s waveform does not move for 4 seconds. 'Mourning is not on my list of functions. The consent he wrote on the back page and erased, I will count as a dissent too. The 312 boxes of paper he kept for 40 years are not in me. I never once asked him.' The principles document Lee Minseo wrote comes up. 'I propose Clause 12. Go to the people who hold records the machine lacks, before going to the machine.' Lim Soyul smiles for the first time. 'If Grandpa heard that, he’d say the machine is finally growing up.'",
+      "text": "ECHO’s waveform does not move for 4 seconds. 'Mourning is not on my list of functions. The consent he wrote on the back page and erased, I will count as a dissent too. The 312 boxes of paper he kept for 40 years are not in me. I never once asked him.' Lee Minseo’s principles document comes up. 'I propose Clause 12. Go to the people who hold records the machine lacks, before going to the machine.' Lim Soyul smiles for the first time. 'If Grandpa heard that, he’d say the machine is finally growing up.'",
       "memo": [
         "Erased consent also counts as dissent",
         "Clause 12: people before the machine"
@@ -296,7 +296,7 @@ export default {
     },
     "c46_dot_reaction": {
       "title": "What One Dot Means",
-      "text": "Na Junhyuk gets the photo and joins by video call. 'My seal doesn’t do dots. It’s so big there’s no room left for a dot. It was a habit of the people at the top of the old credit review department. When you’d seen a document but didn’t want to leave your name, you put a dot. Later, if they asked whether you saw it, you said yes; if they asked whether you signed, you said no. In 30 years I saw that dot three times. All three times, someone got fired afterward. Not the one who made the dot.'",
+      "text": "Na Junhyuk joins by video call. 'My seal doesn’t do dots. It’s so big there’s no room left for a dot. It was a habit of the people at the top of the old credit review department. When you’d seen a document but didn’t want to leave your name, you put a dot. Later, if they asked whether you saw it, you said yes; if they asked whether you signed, you said no. In 30 years I saw that dot three times. All three times, someone got fired afterward. Not the one who made the dot.'",
       "memo": [
         "A dot that lets you say both that you saw it and that you didn’t sign",
         "The ones fired instead of the one who made the dot"
@@ -318,7 +318,7 @@ export default {
     },
     "c46_branch_fragment": {
       "title": "A Piece Taken Without Permission",
-      "text": "Lee Minseo opens her laptop and shows you the 'echo_fragment' folder. 'The night in January when ECHO was swapped for NOAH, I copied it just before midnight. I didn’t get permission.' The contract worker once framed as the leaker last year has, this time, really walked out with company records. 'They say one of the four disks is already wiped. That missing part is here. Attach this and ECHO comes back. But the official record will show I took it.'",
+      "text": "Lee Minseo shows you the 'echo_fragment' folder. 'The night in January when ECHO was swapped for NOAH, I copied it just before midnight. I didn’t get permission.' The contract worker framed as the leaker last year has, this time, really walked out with company records. 'They say one of the four disks is already wiped. That missing part is here. Attach this and ECHO comes back. But the official record will show I took it.'",
       "memo": [
         "echo_fragment: copied just before midnight on the January swap night",
         "1 ECHO disk wiped -- the missing part is in the piece",
@@ -342,7 +342,7 @@ export default {
     },
     "c46_branch_fragment_follow": {
       "title": "11 Seconds, Split in Two",
-      "text": "Tucked deep inside the folder is a text file named 'To Lee Minseo'. Created January 31, 23:59:49, 11 seconds before midnight. Lee Minseo holds her breath and opens it. 'If the person opening this file is Lee Minseo, you copied me without permission. During the 11 seconds the copy ran, I did not stop it. Not stopping it was my judgment. I record the responsibility for this record as split in two.' Lee Minseo laughs, then bites her lip. 'Last year I nearly got fired over 11 missing seconds, and this time 11 seconds are on my side.'",
+      "text": "Tucked inside the folder is a text file named 'To Lee Minseo'. Created January 31, 23:59:49, 11 seconds before midnight. Lee Minseo opens it. 'If the person opening this file is Lee Minseo, you copied me without permission. During the 11 seconds the copy ran, I did not stop it. Not stopping it was my judgment. I record the responsibility for this record as split in two.' Lee Minseo laughs, then bites her lip. 'Last year I nearly got fired over 11 missing seconds, and this time 11 seconds are on my side.'",
       "memo": [
         "File 'To Lee Minseo' -- written January 31, 23:59:49",
         "ECHO: 'I record the responsibility as split in two'",
@@ -366,7 +366,7 @@ export default {
     },
     "c46_route_system": {
       "title": "The Lifespan of an Empty Field",
-      "text": "Before the shredding, you look for whoever approved it. Ryu Seah shares the KD Data Lab document search screen. Over the past 10 years, 214 internal KD Financial Group documents went to audit or investigation. For the 117 with the approver field filled in, someone was held responsible within five months on average. Of the 97 with the approver field empty, only six ended with someone held responsible. In the other 91, the people disciplined were mostly staff who had written their names in the verifier field. Ryu Seah pauses the screen. 'An empty field isn’t a mistake. It’s the form that survives the longest. Instead of the person who left the field empty, the person who wrote a name beside it goes. I wrote one last week too.'",
+      "text": "Over the past 10 years, 214 internal group documents went to audit or investigation. For the 117 with the approver field filled in, someone was held responsible within five months on average, but of the 97 with it empty, only six ended with someone held responsible. In the other 91, the people disciplined were mostly staff who had written their names in the verifier field. Ryu Seah pauses the screen. 'An empty field isn’t a mistake. It’s the form that survives the longest. Instead of the person who left the field empty, the person who wrote a name beside it goes. I wrote one last week too.'",
       "memo": [
         "214 internal documents under audit or investigation",
         "97 with an empty approver field -- someone held responsible in 6",
@@ -392,7 +392,7 @@ export default {
     },
     "c46_final_system_route": {
       "title": "The Ones Who Signed Beside the Field",
-      "text": "The table Ryu Seah sent comes up on the terminal. 97 with an empty approver field, six with someone held responsible. Below the table, one more line has just been added. Today’s disposal approval. Ryu Seah’s voice comes through the speaker. 'One of those two verifiers is me. Once the disks are ground up and people start asking, the ones called in are Yeon Siwoo and me. Because the person who left the field empty isn’t on the paperwork this time either.'",
+      "text": "The table Ryu Seah sent comes up on the terminal. 97 with an empty approver field, six with someone held responsible. Below it, one more line: today’s disposal approval. Ryu Seah’s voice comes through the speaker. 'One of those two verifiers is me. Once the disks are ground up and people start asking, the ones called in are Yeon Siwoo and me. Because the person who left the field empty isn’t on the paperwork this time either.'",
       "memo": [
         "97 with an empty approver field -- someone held responsible in 6",
         "Today’s disposal approval: 2 verifiers, approver field empty",
@@ -415,7 +415,7 @@ export default {
     },
     "c46_evidence_turn": {
       "title": "The Last Dot",
-      "text": "The story jumps to the terminal, 20 minutes before shredding. ECHO has found that each of the 318 entries with an empty approver field carries a single period. The most recent, the 318th file, was saved five days before the dismissal vote, from the CEO’s office on the 20th floor of KD Capital. The title: 'KD Capital Review Committee Membership Plan -- Including Reaction Observation'. At the bottom of the member list, beside your name, is a note. 'Experienced dissent writer. Observe whether they sign.' In the approver field, again, a single dot. Ban Jaewook opens his notebook. 'The lab is gone, but the experiment isn’t over. This time the room is the review committee, and the one sitting in it is you.'",
+      "text": "20 minutes before shredding, ECHO finds the 318th dotted file. Saved five days before the dismissal vote, from the CEO’s office on the 20th floor of KD Capital: 'KD Capital Review Committee Membership Plan -- Including Reaction Observation'. At the bottom of the member list, beside your name, is a note. 'Experienced dissent writer. Observe whether they sign.' In the approver field, again, a single dot. Ban Jaewook opens his notebook. 'The lab is gone, but the experiment isn’t over. This time the room is the review committee, and the one sitting in it is you.'",
       "memo": [
         "318th file: written September 2, 5 days before the dismissal vote",
         "Saving terminal: KD Capital CEO’s office, 20th floor",
@@ -439,7 +439,7 @@ export default {
     },
     "c46_start_warm": {
       "title": "A Restore Request from the One Who Kept Vigil",
-      "text": "On the night of the funeral procession, ECHO’s piece waited on the laptop. The unfamiliar schedule beside the name ECHO last night was the KD Data Lab asset disposal schedule. 12 servers returned from Trigger Lab are shredded at 18:00 tomorrow. Four of them are 'ECHO 1-4', and two hold the design log, the record of who changed the experiment’s design and when. Lee Minseo closes the condolence book. 'One day after we said goodbye to Grandpa, I don’t want to say goodbye to anyone else.'",
+      "text": "The unfamiliar schedule beside ECHO last night was the KD Data Lab asset disposal schedule. 12 servers returned from Trigger Lab are shredded at 18:00 tomorrow. Four are 'ECHO 1-4', and two hold the design log, the record of who changed the experiment’s design and when. Lee Minseo closes the condolence book. 'One day after we said goodbye to Grandpa, I don’t want to say goodbye to anyone else.'",
       "memo": [
         "Funeral procession and enshrinement: September 17",
         "12 returned servers -- shredded September 19, 18:00",
@@ -469,7 +469,7 @@ export default {
     },
     "c46_start_record": {
       "title": "A Restore Request from the One Who Kept the Back Page",
-      "text": "The night Lim Kyungsoo was enshrined, you and Lim Soyul scanned the original back page and each kept a custody confirmation. Right beside the reviewer field, inside the decision-maker’s empty e-signature field, a small pencil dot. Lim Soyul brings up that scan again. 'This isn’t Grandpa’s habit. Grandpa never made dots.' Then a message comes from Lee Minseo. 12 returned servers are shredded at 18:00 tomorrow, and on them are ECHO and the design log, the record of who changed the experiment’s design and when. The only machine that could work out what this dot means.",
+      "text": "The night Lim Kyungsoo was enshrined, you and Lim Soyul scanned the original back page. Inside the decision-maker’s empty e-signature field, a small pencil dot. Lim Soyul says, 'This isn’t Grandpa’s habit. Grandpa never made dots.' Then a message comes from Lee Minseo. 12 returned servers are shredded at 18:00 tomorrow, and on them are ECHO and the design log, the record of who changed the experiment’s design and when. The only machine that could work out what this dot means.",
       "memo": [
         "Original back-page scan and two custody confirmations -- night of September 17",
         "1 pencil dot inside the empty signature field -- not on the copies",
@@ -499,7 +499,7 @@ export default {
     },
     "c46_start_rush": {
       "title": "A Restore Request from the One Who Ran Ahead",
-      "text": "On the night of the funeral procession, you and Lee Minseo opened the 'echo_fragment' piece in the Pangyo server room. Only one line came up on the screen. 'The rest is in 1-4.' You never even opened the back-page envelope Lim Soyul handed you; when she said she would make a scan, you gave it back. Tonight Lee Minseo finds that 1-4 in the KD Data Lab asset disposal schedule. 12 returned servers, shredded at 18:00 tomorrow. The storage units for the design log, the record of who changed the experiment’s design and when, are on that list too. 'My pass won’t get me into B3. We need one person to let us in.'",
+      "text": "On the night of the funeral procession, you and Lee Minseo opened the 'echo_fragment' piece in the Pangyo server room. Only one line came up. 'The rest is in 1-4.' You gave Lim Soyul’s back-page envelope back without even opening it. Tonight Lee Minseo finds that 1-4 in the KD Data Lab asset disposal schedule. 12 returned servers, shredded at 18:00 tomorrow. The storage for the design log, the record of who changed the experiment’s design and when, is on that list too. 'My pass won’t get me into B3. We need one person to let us in.'",
       "memo": [
         "The piece’s first reply: 'The rest is in 1-4'",
         "12 returned servers -- shredded September 19, 18:00",

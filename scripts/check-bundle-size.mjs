@@ -171,7 +171,8 @@ const budgets = [
   // 153,686 / 56,482 -> 153,871 / 56,560 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 153867 / 56556 (over budget only) in the e2e build, the plus 4.
   // -> 153,705 / 56,489 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 153,701 / 56,485 in the e2e build, the plus 4.
   // 153,705 / 56,489 -> 153,883 / 56,590 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 153879 / 56586 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_883, maxGzip: 56_590 },
+  // 153,883 / 56,590 -> 153,883 / 56,597 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 56593 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_883, maxGzip: 56_597 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -609,10 +610,13 @@ const budgets = [
   // 200,113 / 72,500 -> 200,286 / 72,585 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured 200282 / 72581 (over budget only) in the e2e build, the plus 4.
   // -> 200,275 / 72,598 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 200,271 / 72,594 in the e2e build, the plus 4.
   // 200,275 / 72,598 -> 200,519 / 72,704 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured 200515 / 72700 (over budget only) in the e2e build, the plus 4.
+  // 200,519 / 72,704 -> 200,519 / 72,712 on 2026-11-11, prose-trim-19-28 over main c61d6618. Measured - / 72708 (over budget only) in the e2e build, the plus 4.
   // 200,519 / 72,704 -> 200,579 / 72,727 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 200575 / 72723 (over budget only) in the e2e build, the plus 4.
   // 200,579 / 72,727 -> 200,735 / 72,779 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured 200731 / 72775 (over budget only) in the e2e build, the plus 4.
   // 200,735 / 72,779 -> 200,908 / 72,844 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321). Measured 200904 / 72840 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 200_908, maxGzip: 72_844 },
+  // 200,735 / 72,779 -> 200,735 / 72,784 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 72780 (over budget only) in the e2e build, the plus 4.
+  // 200,735 / 72,784 -> 200,908 / 72,845 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 200904 / 72841 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 200_908, maxGzip: 72_845 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1881,7 +1885,10 @@ const budgets = [
   // 13,064 / 3,564 -> 13,557 / 3,710 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): `localizeSidePack` and en/ja side01 in the import map beside main's pageTitle(). Measured 13,553 / 3,706 in the e2e build, the plus 4.
   // 13,557 / 3,710 -> 13,713 / 3,737 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 13709 / 3733 (over budget only) in the e2e build, the plus 4.
   // 13,713 / 3,737 -> 13,869 / 3,767 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured 13865 / 3763 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_869, maxGzip: 3_767 },
+  // 13,713 / 3,737 -> 13,713 / 3,748 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured - / 3744 (over budget only) in the e2e build, the plus 4.
+  // 13,713 / 3,748 -> 13,869 / 3,774 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 13865 / 3770 (over budget only) in the e2e build, the plus 4.
+  // 13,869 / 3,767 -> 13,869 / 3,779 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured - / 3775 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_869, maxGzip: 3_779 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -2198,10 +2205,16 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,292 / 432,194 / 439,886 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured first paint, the plus 4.
 // -> 373,291 / 431,871 / 439,569 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 373,287 / 431,867 / 439,565 in the e2e build, the plus 4.
 // -> 373,408 / 432,211 / 439,916 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured first paint, the plus 4.
+// -> 373,416 / 432,221 / 439,926 on 2026-11-11, prose-trim-19-28 over main c61d6618. Measured first paint, the plus 4.
 // -> 373,432 / 432,235 / 439,938 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured first paint, the plus 4.
 // -> 373,484 / 432,339 / 440,036 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured first paint, the plus 4.
 // -> 373,551 / 432,455 / 440,147 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_455, ja: 440_147 };
+// -> 373,484 / 432,346 / 440,041 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured first paint, the plus 4.
+// -> 373,490 / 432,344 / 440,036 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured first paint, the plus 4.
+// -> 373,490 / 432,347 / 440,045 on 2026-11-11, noscript-guide over main accd990b. Measured first paint, the plus 4.
+// -> 373,557 / 432,468 / 440,161 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured first paint, the plus 4.
+// -> 373,551 / 432,465 / 440,155 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_465, ja: 440_155 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
