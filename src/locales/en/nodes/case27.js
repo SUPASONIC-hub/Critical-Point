@@ -183,7 +183,7 @@ export default {
     },
     "c27_savings": {
       "title": "Two Months to Maturity",
-      "text": "It’s Grandma Ha Junghee’s turn. Savings for her grandchild’s tuition, paid into for nearly 3 years: 24 million won, two months from maturity. Namgoong Sol explains that it falls under deposit insurance (repayment guaranteed up to 100 million won even if the institution closes). Grandma Ha speaks through tears. 'Sol, I trust you. But my son in Seoul saw the news and says take it out right now.'",
+      "text": "It’s Grandma Ha Junghee’s turn. Savings for her grandchild’s tuition, paid into for nearly 3 years: 24 million won, two months from maturity. Namgoong Sol explains that it falls under deposit insurance (repayment guaranteed up to 100 million won even if the institution closes). Grandma Ha Junghee speaks through tears. 'Sol, I trust you. But my son in Seoul saw the news and says take it out right now.'",
       "memo": [
         "Ha Junghee (74), savings 24 million won -- two months before maturity",
         "Early termination: more than half the interest lost",

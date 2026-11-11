@@ -131,7 +131,7 @@ export default {
     },
     "c28_final": {
       "title": "One Exception",
-      "text": "Managing Director Seo Jaeyoon slides over an agreement. Chae Dohoon gets the full 42 million won, called an 'exception payment.' You and Do Yoonha must sign a confirmation that Article 19 and the filming will no longer be contested. 'Sign today and the money goes in on Monday. We know when his daughter’s tuition is due, too.' Do Yoonha lays Script No. 4 beside the agreement. 'If you pay just this one man, then next week I’ll still be reading this to the other 1,317. In my own voice.'",
+      "text": "Managing Director Seo Jaeyoon slides over an agreement. 'Sign today and the money goes in on Monday. We know when his daughter’s tuition is due, too.' Chae Dohoon gets the full 42 million won, called an 'exception payment.' You and Do Yoonha must sign a confirmation that Article 19 and the filming will no longer be contested. Do Yoonha lays Script No. 4 beside the agreement. 'If you pay just this one man, then next week I’ll still be reading this to the other 1,317. In my own voice.'",
       "memo": [
         "Exception payment of 42 million won -- deposited Monday",
         "Condition: a confirmation not to contest Article 19 or the filming, for Chae Dohoon’s case only",
@@ -229,7 +229,7 @@ export default {
     },
     "c28_thanks": {
       "title": "The 179th Call",
-      "text": "Day eight of the secondment. Do Yoonha’s 179th call is an incoming one: the 71-year-old customer he told last week how to apply for dispute mediation instead of reading the script. 'Tell me your name, young man. So I can at least send you rice cakes.' Just then a call quality grade C pops up. Reason: '3 script deviations, 1 instance of steering toward payment.' Yeon Hajin says quietly, 'Even a thank-you call costs points here. Three Cs and your secondment ends early.'",
+      "text": "Day eight of the secondment. The 179th call is an incoming one: the 71-year-old customer who was told last week how to apply for dispute mediation instead of hearing the script. 'Tell me your name, young man. So I can at least send you rice cakes.' Just then a call quality grade C pops up on Do Yoonha’s screen. Reason: '3 script deviations, 1 instance of steering toward payment'. Yeon Hajin says quietly, 'Even a thank-you call costs points here. Three Cs and your secondment ends early.'",
       "memo": [
         "179th call: a thank-you call -- hospitalization payout made",
         "Do Yoonha’s call quality grade C: 3 script deviations",
@@ -342,7 +342,7 @@ export default {
     },
     "c28_branch_market_follow": {
       "title": "Same Lathe",
-      "text": "Moon Hajun turns Article 19 into a four-panel comic. A man at a lathe. The same man, only his name tag changed from 'Gaon Precision' to 'To-the-End Precision.' An insurance company person: 'I see your occupation has changed.' The man points at the lathe. 'This is the same one.' Moon Hajun says, 'Write it in grown-up writing and nobody reads it. Everybody read this.'",
+      "text": "Moon Hajun turns Article 19 into a four-panel comic. A man at a lathe. The same man, only his name tag changed from Gaon Precision to To-the-End Precision. An insurance company person: 'I see your occupation has changed'—and the man points at the lathe: 'This is the same one'. Moon Hajun says, 'Write it in grown-up writing and nobody reads it. Everybody read this.'",
       "memo": [
         "Moon Hajun’s four-panel comic 'Same Lathe'",
         "Gist of Article 19: if your job changes, you must report it",
