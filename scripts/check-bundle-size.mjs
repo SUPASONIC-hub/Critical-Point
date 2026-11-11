@@ -534,7 +534,8 @@ const budgets = [
   // 196,509 / 70,854 -> 196,509 / 70,862 on 2026-11-10, phone-390-staked over main cb8346da (#500): only the asset names the entry imports (the index CSS changed). Measured 196,505 / 70,858 in the e2e build, the plus 4.
   // 196,509 / 70,854 -> 196,589 / 70,885 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert as TriangleExclamationPoint, the name the screens now import). Measured 196,585 / 70,881 in the e2e build, the plus 4.
   // 196,509 / 70,862 (phone-390-staked) and 196,589 / 70,885 (deps-1123) -> 196,589 / 70,889 on 2026-11-10, phone-390-staked after merging main 312aa15c (#484): both. Measured 196,585 / 70,885 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 196_589, maxGzip: 70_889 },
+  // 196,589 / 70,889 -> 196,589 / 70,885 on 2026-11-11, phone-390-staked-all over main d4048d83 (#426): only the asset names the entry imports (the index CSS changed). Measured 196,585 / 70,881 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 196_589, maxGzip: 70_885 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -983,7 +984,8 @@ const budgets = [
   // 209,898 / 39,487 -> 209,941 / 39,492 on 2026-11-10, phone-390-staked over main cb8346da (#500): the staked card's one-line detail in a block of its own for every phone up to 480 wide and 860 tall (390x844 Korean overclocked, a card staked in case 01: 9px under the bar). Measured 209,937 / 39,488 in the e2e build, the plus 4.
   // 209,898 / 39,487 -> 213,956 / 41,401 on 2026-11-10, font-split over main cb8346da (the user's choice 1; held for W47, which was called off on 11-10): the second @font-face and its unicode-range (575 code points of the second font file, written by scripts/build-fonts.mjs). Measured 213,952 / 41,397 in the e2e build, the plus 4.
   // 213,956 / 41,401 (font-split) and 209,941 / 39,492 (phone-390-staked, #503) -> 213,999 / 41,407 on 2026-11-11, font-split after merging main 568572d3 (#484 #502 #503): both. Measured 213,995 / 41,403 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 213_999, maxGzip: 41_407 },
+  // 213,999 / 41,407 -> 213,902 / 41,395 on 2026-11-11, phone-390-staked-all over main d4048d83 (#426): the short phone's air (not its hidden portrait or cut question) on every phone up to 480 wide and 860 tall, 390x844 too, with the staked card's one-line detail folded into that block (390x844 overclocked, a card staked: Korean 16px, Japanese 20, English 16 under the bar). Measured 213,898 / 41,391 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 213_902, maxGzip: 41_395 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1980,7 +1982,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 435,238 / 493,525 / 501,135 (phone-390-staked) and 435,276 / 493,566 / 501,174 (deps-1123) -> 435,285 / 493,575 / 501,186 on 2026-11-10, phone-390-staked after merging main 312aa15c (#484): both. Measured 435,281 / 493,571 / 501,182 in the e2e build, the plus 4.
 // 435,226 / 493,515 / 501,125 -> 371,424 / 429,687 / 437,379 on 2026-11-10, font-split over main cb8346da (the user's choice 1, held for W47 and released on 11-10): the font is two files and only the first, the start screen's characters, is preloaded (199,124 -> 131,352); the stylesheet carries the second file's unicode-range (inline critical CSS too). Measured 371,420 / 429,683 / 437,375 in the e2e build, the plus 4.
 // 371,424 / 429,687 / 437,379 (font-split) and 435,285 / 493,575 / 501,186 (main 568572d3: #484 deps, #503) -> 371,483 / 429,748 / 437,438 on 2026-11-11, font-split after merging main 568572d3: both, and the critical CSS regenerated. Measured 371,479 / 429,744 / 437,434 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 371_483, en: 429_748, ja: 437_438 };
+// 371,483 / 429,748 / 437,438 -> 371,465 / 429,729 / 437,420 on 2026-11-11, phone-390-staked-all over main d4048d83 (#426): the index CSS line above and the critical CSS it regenerates. Measured 371,461 / 429,725 / 437,416 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 371_465, en: 429_729, ja: 437_420 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
