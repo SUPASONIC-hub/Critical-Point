@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c29_start": {
       "title": "The Same Plane",
-      "text": "The business in Singapore: handing over 427 billion won of non-performing loans (bad loans). The buyer is Roundhill Capital, a Singapore private equity fund (a firm pooling a few big investors’ money). The method is a bulk sale (all the bad assets sold as one bundle). At the end of the check-in line, Seo Harin clips your foot with a suitcase. 'You remember Haeon Partners. The company that took an advisory fee (money paid out in the name of advice) every quarter. Three days before its liquidation, the last 1.14 billion won went out to Singapore. The company that got it is a 7-minute walk from this deal’s buyer’s office. If that’s a coincidence, I don’t write the story.'",
+      "text": "A bundle of non-performing loans (bad loans) is going to Roundhill Capital in Singapore, and you are on the trip. At the end of the check-in line, Seo Harin speaks. 'You remember Haeon Partners. The company that took an advisory fee (money paid out in the name of advice) every quarter. Three days before its liquidation, the last 1.14 billion won went out to Singapore. The company that got it is a 7-minute walk from this deal’s buyer’s office. If that’s a coincidence, I don’t write the story.'",
       "memo": [
         "Sale: 427 billion won in non-performing loans -- 3,860 debtors",
         "Buyer: Roundhill Capital (Singapore), signing ceremony Thursday 10:00",
@@ -39,7 +39,7 @@ export default {
     },
     "c29_marina": {
       "title": "More Haste, Less Speed",
-      "text": "Roundhill Capital partner Cho Hyunseok has come out himself to meet you. He speaks in careful Korean. 'There’s a Korean proverb: the more you hurry, the more you should take the long way round. So let’s sign fast.' He turns on a tablet. Sale price 131 billion won, recovery rate (the share actually paid back) 30.7%. 'We’re the people who clean up bad debt. We collect what the bank can’t, and we do it humanely.' The next screen is a collection plan. Beside the first month’s target, in small print: 'Contact intensity: 5 times a week.'",
+      "text": "Cho Hyunseok speaks in careful Korean. 'There’s a Korean proverb: the more you hurry, the more you should take the long way round. So let’s sign fast.' He turns on a tablet. 'We’re the people who clean up bad debt. We collect what the bank can’t, and we do it humanely.' The next screen is a collection plan. Beside the first month’s target, in small print: 'Contact intensity: 5 times a week.'",
       "memo": [
         "Sale price 131 billion won -- 30.7% of the 427 billion on the books",
         "Collection plan: first-month contact intensity 5 times a week",
@@ -70,7 +70,7 @@ export default {
     },
     "c29_hawker": {
       "title": "Spice Level 5",
-      "text": "At the hawker center (an open-air court of cheap food stalls), Oh Jinwoo points to the chili crab stall’s 'Spice Level 5.' 'They say no Korean has ever finished that. Tonight, one will.' At the first claw Oh Jinwoo’s ears go red; at the second he stops talking; at the third, a grandmother at the next table slides him a condensed-milk drink. Wiping his tears, he lowers his voice. 'Bridge is lending Roundhill 90 billion won for the purchase. In the payee field: Northgate Advisory, 1.2 billion won a year. What the money is for is only in Annex C (an add-on to the contract), they say.' It’s the company that received Haeon’s last money. 'I can photograph it tonight. If I get caught, I’m finished.'",
+      "text": "At the hawker center (an open-air court of cheap food stalls), Oh Jinwoo points to the chili crab stall’s 'Spice Level 5.' 'They say no Korean has ever finished that. Tonight, one will.' At the third claw, a grandmother at the next table slides him a condensed-milk drink. Wiping his tears, he speaks. 'Bridge is lending Roundhill 90 billion won for the purchase. In the payee field: Northgate Advisory, 1.2 billion won a year. What the money is for is only in Annex C (an add-on to the contract), they say. I can photograph it tonight. If I get caught, I’m finished.'",
       "memo": [
         "Bridge Bank → Roundhill: 90 billion won in purchase financing",
         "Payee: Northgate Advisory, 1.2 billion won a year",
@@ -101,7 +101,7 @@ export default {
     },
     "c29_hotel": {
       "title": "New Year’s Greetings",
-      "text": "3 a.m. Seo Harin talks. 7 years ago, she wrote a story from documents handed to her by Ha Yoonho, an assistant manager at a savings bank. The story won an award, and Ha Yoonho was fired two months later. One line of print number stamped in a corner of the documents pointed to Ha Yoonho. Now Ha Yoonho drives a delivery truck in Daejeon. Every January 1, a text comes: 'How are you doing, reporter?' Seo Harin has never once replied. 'I didn’t see that number. My story changed one person’s life, and that person sends me New Year’s greetings. There’ll be something in Baek Daon’s photo too. There always is.'",
+      "text": "Seo Harin talks. 7 years ago her story won an award, and Ha Yoonho, who had handed her the documents, was fired over one line of print number. Now he drives a delivery truck in Daejeon. Every January 1, a text comes: 'How are you doing, reporter?' Seo Harin has never once replied. 'I didn’t see that number. My story changed one person’s life, and that person sends me New Year’s greetings. There’ll be something in Baek Daon’s photo too. There always is.'",
       "memo": [
         "Ha Yoonho: source 7 years ago, fired two months after the story",
         "What got Ha Yoonho fired: a print number in the document’s corner",
@@ -132,7 +132,7 @@ export default {
     },
     "c29_final": {
       "title": "The Name on the Signature Line",
-      "text": "Cho Hyunseok slides the last document toward you. A KD Capital Risk Management Department opinion; under the signature line, your name is already printed. 'This is the condition precedent (what must happen before the contract takes effect). With this, we finish today.' Annex C, at the very back of the contract, reads: for 3 years after closing, Yoon Sanghyuk to be appointed Asia adviser (a post that only advises, with no duties), 1.2 billion won a year, payee Northgate Advisory. Yoon Sanghyuk speaks from the screen. 'An empty signature field would be a problem. You of all people know that.'",
+      "text": "Cho Hyunseok slides the last document toward you. A Risk Management opinion; under the signature line, your name is already printed. 'This is the condition precedent (what must happen before the contract takes effect). With this, we finish today.' Yoon Sanghyuk speaks from the screen. 'An empty signature field would be a problem. You of all people know that.'",
       "memo": [
         "Risk review opinion -- the deal’s last condition precedent",
         "Annex C: Yoon Sanghyuk as Asia adviser for 3 years, 1.2 billion won a year",
@@ -160,7 +160,7 @@ export default {
     },
     "c29_aftershock": {
       "title": "Revenge at Level 4",
-      "text": "Thursday, 9 p.m., the hawker center (an open-air court of cheap food stalls) again. At the same stall, Oh Jinwoo goes for Level 4 this time. 'Level 5 isn’t for human consumption. This is a strategic retreat.' Seo Harin looks at her phone and bows her head. Ha Yoonho, the source fired 7 years ago after handing over documents for her story, has answered the text she sent that afternoon, her first in 7 years. 'Reporter, you finally replied. I’ve got two trucks these days.' Seo Harin laughs, then wipes her eyes, and Oh Jinwoo pretends he’s crying from the spice and cries along. Around midnight, in the six-person group chat that has been quiet for nearly 2 weeks, 'Lee Minseo is typing' appears and disappears. It’s the third time already.",
+      "text": "At the same stall, Oh Jinwoo goes for Level 4 this time. 'Level 5 isn’t for human consumption. This is a strategic retreat.' Ha Yoonho has answered the text Seo Harin sent him, her first in 7 years. 'Reporter, you finally replied. I’ve got two trucks these days.' Seo Harin laughs, then wipes her eyes, and Oh Jinwoo pretends he’s crying from the spice and cries along. Around midnight, in the six-person group chat that has been quiet for nearly 2 weeks, 'Lee Minseo is typing' appears and disappears. It’s the third time already.",
       "memo": [
         "Oh Jinwoo’s chili crab rematch: Level 4, finished",
         "Ha Yoonho’s first reply in 7 years: 'I’ve got two trucks these days'",
@@ -184,7 +184,7 @@ export default {
     },
     "c29_ledger": {
       "title": "46 Yellow Marks",
-      "text": "11:40 at night, Choi Seojin sends a file from Seoul. In your first week at KD Capital she came up to the 12th floor with two cups of instant noodles. Of the 3,860 debtors in the sale bundle, 46 have yellow marks. These are people already under debt restructuring (a deal that cuts debt or extends terms for those struggling to pay), paying a little each month. 'Sold as a bundle, these agreements don’t go with them. If the new owner says it’ll collect everything from scratch, there’s no clause to stop it.' Of the 46, 31 have never once been late. 'The most faithful payers are going to be the first to get the calls.'",
+      "text": "Choi Seojin sends a file from Seoul. She is the one who came to find you with instant noodles in your first week at KD Capital. The 46 with yellow marks are already under debt restructuring (a deal that cuts debt or extends terms for those struggling to pay), paying a little each month. 'Sold as a bundle, these agreements don’t go with them. If the new owner says it’ll collect everything from scratch, there’s no clause to stop it. The most faithful payers are going to be the first to get the calls.'",
       "memo": [
         "Of 3,860 debtors in the sale, 46 under debt restructuring",
         "Of the 46, 31 with no history of late payment",
@@ -207,7 +207,7 @@ export default {
     },
     "c29_annex": {
       "title": "One of Four",
-      "text": "At the taxi stand a young man falls in beside you. Roundhill Capital analyst Baek Daon, 29. He holds his phone only halfway out. It shows the first page of Annex C. 'That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel sheet.' He sends that one page to Seo Harin’s phone and pulls his hand back. 'I can show you the other pages too. But only four people at the company can open this file. And I’m the least powerful of them.'",
+      "text": "Baek Daon, 29, falls in beside you. The phone he holds halfway out shows the first page of Annex C. 'That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel sheet.' He pulls his hand back. 'I can show you the other pages too. But only four people at the company can open this file. And I’m the least powerful of them.'",
       "memo": [
         "Baek Daon: Roundhill analyst, author of the collection plan",
         "People with access to Annex C: 4",
@@ -230,7 +230,7 @@ export default {
     },
     "c29_call": {
       "title": "Talk of the Weather",
-      "text": "6:10 in the morning: a call from Yoon Sanghyuk. 'Singapore’s hot even in May. I hear your opinion is this deal’s condition precedent (what must come first for the contract to take effect). A good seat. Back then, your signature wasn’t needed anywhere.' A teacup is set down on the other end. 'I hear you had dinner with your Bridge friend at a hawker center last night. Not a man who handles spice well, that one. I’ll join the 10 o’clock signing by screen too.'",
+      "text": "A call from Yoon Sanghyuk. 'Singapore’s hot even in May. I hear your opinion is this deal’s condition precedent (what must come first for the contract to take effect). A good seat. Back then, your signature wasn’t needed anywhere. I hear you had dinner with your Bridge friend at a hawker center last night. Not a man who handles spice well, that one. I’ll join the 10 o’clock signing by screen too.'",
       "memo": [
         "Yoon Sanghyuk’s call: 06:10 Singapore time",
         "Knows about last night’s hawker center dinner",
@@ -253,7 +253,7 @@ export default {
     },
     "c29_ledger_reaction": {
       "title": "Free Mango",
-      "text": "The next morning in the breakfast room, Cho Hyunseok sits down with a plate of mango. When you bring up the 46, he puts his fork down. 'Take them out and the price drops 3.8 billion won. They’re the ones who pay best. I’m not a bad guy. My mom ran a dry cleaner in Queens and went into debt too. But I can’t sell my mom’s story to the fund’s investors, right?' He moves a slice of mango onto your plate. 'This is good. This one’s free.'",
+      "text": "When you bring up the 46, Cho Hyunseok puts his fork down. 'Take them out and the price drops 3.8 billion won. They’re the ones who pay best. I’m not a bad guy. My mom ran a dry cleaner in Queens and went into debt too. But I can’t sell my mom’s story to the fund’s investors, right?' He moves a slice of mango onto your plate. 'This is good. This one’s free.'",
       "memo": [
         "Take out the 46 and the price drops 3.8 billion won",
         "Cho Hyunseok’s mother: a dry cleaner in Queens"
@@ -275,7 +275,7 @@ export default {
     },
     "c29_annex_reaction": {
       "title": "Taxi Back Seat",
-      "text": "In the taxi to the hotel, Seo Harin only looks out the window. 'If only four people at the company can open it, he’s one of four. One of four is the same as having a name. Sources always say they’re the least powerful. It’s scary because they’re right.' The driver turns the radio down. 'I’ll tell you a story of mine tonight. Will you listen?'",
+      "text": "Seo Harin speaks, looking out the window. 'If only four people at the company can open it, he’s one of four. One of four is the same as having a name. Sources always say they’re the least powerful. It’s scary because they’re right. I’ll tell you a story of mine tonight. Will you listen?'",
       "memo": [
         "One of four is the same as having a name",
         "A story Seo Harin will tell"
@@ -297,7 +297,7 @@ export default {
     },
     "c29_call_reaction": {
       "title": "Six Pieces of Rolled Omelet",
-      "text": "As soon as you hang up, a message arrives from Han Seoyun, on standby assignment (waiting for a next post with no duties). A photo of a lunch box with six neat pieces of rolled omelet. 'With nothing to do, my cooking’s improved. I packed six pieces and found there’s only me to eat them.' The group chat has been quiet for nearly 2 weeks. Han Seoyun sends one more line. 'You got a call from CEO Yoon, didn’t you. When that man talks about time before he hangs up, he’s already decided. When you fight, eat first, then fight.'",
+      "text": "Han Seoyun, on standby assignment (waiting for a next post with no duties), sends a photo of a lunch box. 'With nothing to do, my cooking’s improved. I packed six pieces and found there’s only me to eat them.' One more line comes. 'You got a call from CEO Yoon, didn’t you. When that man talks about time before he hangs up, he’s already decided. When you fight, eat first, then fight.'",
       "memo": [
         "Han Seoyun’s lunch box -- six pieces of rolled omelet, one person to eat them",
         "When he talks about time, he’s already decided"
@@ -319,7 +319,7 @@ export default {
     },
     "c29_branch_mailbox": {
       "title": "Mailbox No. 214",
-      "text": "9 p.m., a shared office building in Raffles Place. Northgate Advisory is just mailbox No. 214, a shell company (one that exists only on paper, with no real office or staff). According to the night manager, Wei Lin, mail for No. 214 is forwarded each month to a gallery in Cheongdam-dong, Seoul. Seo Harin writes 'Gallery On' in her notebook and underlines it twice. Wei Lin adds, 'This afternoon a call came from Seoul. They asked to be told if anyone came looking for No. 214.'",
+      "text": "Northgate Advisory is just mailbox No. 214, a shell company (one that exists only on paper, with no real office or staff). According to the night manager, Wei Lin, its mail is forwarded each month to a gallery in Cheongdam-dong, Seoul. Seo Harin writes down 'Gallery On.' Wei Lin adds, 'This afternoon a call came from Seoul. They asked to be told if anyone came looking for No. 214.'",
       "memo": [
         "Northgate Advisory: Mailbox No. 214, no office",
         "Mail forwarded to: Gallery On, Cheongdam-dong, Seoul",
@@ -343,7 +343,7 @@ export default {
     },
     "c29_branch_mailbox_follow": {
       "title": "20 Centimeters Wide",
-      "text": "10:30 at night. On the steps in front of the building, you open the Singapore company registry extract. Northgate’s sole director is Yoon Sanghyuk’s brother-in-law, his career field reading 'Non-executive adviser, KD Capital.' It was incorporated eleven days before Haeon Partners filed for liquidation. Seo Harin laughs. 'All that chasing, and in the end it’s one mailbox. 20 centimeters wide, 12 centimeters high.' A text comes from Wei Lin. 'Seoul called again. What should I tell them?'",
+      "text": "You open the Singapore company registry extract. Northgate’s sole director is Yoon Sanghyuk’s brother-in-law, his career field reading 'Non-executive adviser, KD Capital.' Seo Harin laughs. 'All that chasing, and in the end it’s one mailbox. 20 centimeters wide, 12 centimeters high.' A text comes from Wei Lin. 'Seoul called again. What should I tell them?'",
       "memo": [
         "Northgate’s sole director: Yoon Sanghyuk’s brother-in-law",
         "Incorporated: 11 days before Haeon filed for liquidation",
@@ -367,7 +367,7 @@ export default {
     },
     "c29_route_system": {
       "title": "Discount Rates and Next Posts",
-      "text": "You ask for every deal the Group has ever sold in bundles to be laid out. NOAH answers: KD Capital’s review engine (an AI that judges loan applications automatically). In 19 of KD Financial Group’s 23 bulk sales (bad assets sold as one bundle) over the past 10 years, collection contacts to debtors quadrupled within 1 year of the sale. In 14, an executive from the selling side took an advisory seat with the buyer within 1 year. 'The discount rate and the executive’s next post have been trained to move in the same direction. No one has ever written the two numbers in one document.'",
+      "text": "You ask for every bundled sale to be laid out, and NOAH, the review engine (an AI that judges loan applications automatically), answers. In 19 of the Group’s 23 bulk sales (bad assets sold as one bundle) over the past 10 years, collection contacts to debtors quadrupled within 1 year of the sale. In 14, an executive from the selling side took an advisory seat with the buyer. 'The discount rate and the executive’s next post have been trained to move in the same direction.'",
       "memo": [
         "Of 23 Group bulk sales, 19 with collection contacts up 4x after the sale",
         "Seller-side executive moved to a buyer-side advisory seat: 14",
@@ -393,7 +393,7 @@ export default {
     },
     "c29_final_system_route": {
       "title": "Two Numbers in One Document",
-      "text": "Thursday, 9:40 a.m., 20 minutes to the signing. On the laptop is a table NOAH made. Left: the price cut. Right: the post the selling-side executive moved to. NOAH writes beneath it. 'No one has written the two numbers in one document until now. This table is the first. I have filled in the author field with your name.'",
+      "text": "On the laptop is a table NOAH made. Left: the price cut. Right: the post the selling-side executive moved to. NOAH writes beneath it. 'No one has written the two numbers in one document until now. This table is the first. I have filled in the author field with your name.'",
       "memo": [
         "Deals where collection contacts rose 4x after the sale: 19",
         "Deals where a seller-side executive took a buyer-side advisory seat: 14",
@@ -416,7 +416,7 @@ export default {
     },
     "c29_evidence_turn": {
       "title": "Where the 3.6 Billion Went",
-      "text": "In the final round, the sale price was cut from 134.6 billion won to 131 billion won: 3.6 billion won. Annex C (an add-on to the contract) pays Yoon Sanghyuk 1.2 billion won a year for 3 years, 3.6 billion won in all, the price of seating him as the buyer’s adviser (a post that only advises, with no duties); the payee is the mailbox company that took Haeon’s 1.14 billion won. Ban Jaewook puts that company’s account history on screen. In April, 260 million won went out of it to the victims’ group account; account holder Moon Gaeul, memo 'Haeon refund.' Ban Jaewook closes his notebook. 'For three months I sent the Singapore bank refund requests, eleven of them. I didn’t think it would work, so I told no one.'",
+      "text": "In the final round, the sale price was cut from 134.6 billion won to 131 billion won: 3.6 billion won. The adviser’s fee Annex C (an add-on to the contract) pays Yoon Sanghyuk over 3 years also totals 3.6 billion won. In April, 260 million won went out of the mailbox company that is to receive that money, into Moon Gaeul’s victims’ group account, memo 'Haeon refund.' Ban Jaewook speaks. 'For three months I sent the Singapore bank refund requests, eleven of them. I didn’t think it would work, so I told no one.'",
       "memo": [
         "Price cut in the final round: 3.6 billion won",
         "Annex C advisory fees in total: 3.6 billion won",
@@ -440,7 +440,7 @@ export default {
     },
     "c29_start_warm": {
       "title": "Departures for One Who Listened to the End",
-      "text": "Until the lights went out on the call center’s 7th floor, you shared rice cakes with Do Yoonha and the counselors. Six days later, in the morning, a text comes from Do Yoonha. 'I hear you’re going to Singapore. Our branch’s customers are in that bundle of loans being sold. I still remember their voices.' The travel order says 'write the risk review opinion' for a deal handing KD Capital’s 427 billion won of bad loans to Roundhill Capital as a single bundle. Seo Harin fans herself with her boarding pass. 'Haeon Partners’ last 1.14 billion won went out to Singapore. The company that got it is a 7-minute walk from this deal’s buyer’s office.'",
+      "text": "Six days later, in the morning, a text comes from Do Yoonha. 'I hear you’re going to Singapore. Our branch’s customers are in that bundle of loans being sold. I still remember their voices.' The travel order: write the risk review opinion for a deal handing KD Capital’s 427 billion won of bad loans to Roundhill Capital as a single bundle. Seo Harin speaks. 'Haeon Partners’ last 1.14 billion won went out to Singapore. The company that got it is a 7-minute walk from this deal’s buyer’s office.'",
       "memo": [
         "3,860 debtors in the bundle -- Gangseo Branch customers included",
         "Travel order: write the risk review opinion, signing Thursday",
@@ -470,7 +470,7 @@ export default {
     },
     "c29_start_record": {
       "title": "Departures on the Day the Answer Was Put Off",
-      "text": "Your revision request, with the list of 1,318 people denied under Article 19, was received, but the reply deadline came back stamped 'after closing of the related sale.' That sale is this Thursday’s signing, handing KD Capital’s 427 billion won of bad loans to Roundhill Capital, and a travel order has come to you to write that deal’s risk review opinion. The bundle includes the loans of 42 of those 1,318 people. Ban Jaewook says over the phone, 'The day they put the answer off to is the signing day. It means no one answers before then.' Seo Harin, chasing Haeon Partners’ last 1.14 billion won, is already at departures.",
+      "text": "Your revision request for the 1,318 people denied under Article 19 had its reply put off until after the sale. That sale hands KD Capital’s 427 billion won of bad loans to Roundhill Capital, and you are the one writing its risk review opinion. Ban Jaewook says over the phone, 'The day they put the answer off to is the signing day. It means no one answers before then.' Seo Harin, chasing Haeon Partners’ last 1.14 billion won, is already at departures.",
       "memo": [
         "Revision request reply deadline: 'after closing of the related sale'",
         "Sale signing: this Thursday, Singapore",
@@ -500,7 +500,7 @@ export default {
     },
     "c29_start_rush": {
       "title": "Departures for One Who Left First",
-      "text": "The evening you returned your headset, the moment Seo Harin called, you booked the Singapore trip first. 'Haeon Partners’ last 1.14 billion won went out to Singapore. You have a passport, right?' As it happens, the trip’s destination is the same: a deal handing KD Capital’s 427 billion won of bad loans to Roundhill Capital, with the risk review opinion to be written before Thursday’s signing. Seo Harin sits on a departures bench, perched on her suitcase. 'We came too early. The plane isn’t even here yet.'",
+      "text": "The moment Seo Harin called, you booked the Singapore trip. 'Haeon Partners’ last 1.14 billion won went out to Singapore. You have a passport, right?' Your trip happens to be the same: the risk review opinion on a deal handing KD Capital’s 427 billion won of bad loans to Roundhill Capital. Seo Harin laughs. 'We came too early. The plane isn’t even here yet.'",
       "memo": [
         "Travel order received: on the airport limousine -- a pack of rice cakes along",
         "Seo Harin: has traced where Haeon’s last money went",
