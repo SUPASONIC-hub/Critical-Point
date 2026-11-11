@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { findSharedReferences, loadSeasonTables, mergeSeason, SPLIT_TABLES, splitSeason } from "../../scripts/season-split.mjs";
+import { buildRuntimeData, findSharedReferences, loadSeasonTables, mergeSeason, SPLIT_TABLES, splitSeason } from "../../scripts/season-split.mjs";
+import { MOODS, SCENE_MOODS } from "../../src/sceneMoods.js";
 
 /**
  * Step 1 of the per-case chunk split: the four tables cut by case must put
@@ -54,4 +55,33 @@ test("every value survives JSON, and only value objects are shared between keys"
     const shared = findSharedReferences(season.tables[table]).filter((property) => !SHARED_VALUE_OBJECTS.has(property));
     assert.deepEqual(shared, [], `${table} shares more than value objects between keys; a data file would copy them`);
   }
+});
+
+test("the shipped scenes carry `mood` where the tag table says, and nothing on an untagged scene", () => {
+  assert.ok(Object.keys(season.moods).length > 0, "loadSeasonTables carries the tag table");
+  assert.equal(season.moods, SCENE_MOODS);
+  const shipped = buildRuntimeData(season);
+  let tagged = 0;
+  for (const [caseId, bucket] of Object.entries(shipped.cases)) {
+    for (const [nodeId, scene] of Object.entries(bucket.nodes)) {
+      const mood = SCENE_MOODS[nodeId];
+      if (mood) {
+        tagged += 1;
+        assert.equal(scene.mood, mood, `${caseId}/${nodeId}`);
+        assert.ok(MOODS.includes(mood) && mood !== "neutral", `${nodeId}: ${mood}`);
+        // The graph's own scene is left alone; the shipped one is a copy with the mood on it.
+        assert.ok(!("mood" in season.tables.nodes[nodeId]), `${nodeId}: the graph's scene was written to`);
+        const { mood: written, ...rest } = scene;
+        assert.equal(written, mood);
+        assert.deepEqual(rest, season.tables.nodes[nodeId]);
+      } else {
+        assert.ok(!("mood" in scene), `${caseId}/${nodeId} ships a mood it is not tagged with`);
+        assert.equal(scene, season.tables.nodes[nodeId], `${nodeId}: an untagged scene is the graph's own object`);
+      }
+    }
+  }
+  assert.equal(tagged, Object.keys(SCENE_MOODS).length, "every tagged scene ships its mood");
+  // Without the tag table nothing is written.
+  const bare = buildRuntimeData({ ...season, moods: undefined });
+  for (const bucket of Object.values(bare.cases)) for (const scene of Object.values(bucket.nodes)) assert.ok(!("mood" in scene));
 });

@@ -25,8 +25,8 @@ export default {
     "도윤하": {
       "appearance": "An ID badge over a field jacket, a radio held for a long time, eyes where the branch sales board still hasn’t been erased.",
       "thought": "I sold that loan. At the window, smiling, as one more sale on the board.",
-      "gesture": "Do Yoonha presses her lips together for a moment. It’s the face of someone thinking of a person’s name, not a number.",
-      "voice": "She first asks whose day the cost of a decision gets moved onto.",
+      "gesture": "Do Yoonha presses his lips together for a moment. It’s the face of someone thinking of a person’s name, not a number.",
+      "voice": "He first asks whose day the cost of a decision gets moved onto.",
       "line": "Then what do we tell the first person this decision hits? I know that person’s face."
     },
     "오진우": {
@@ -44,7 +44,7 @@ export default {
       "line": "If the record points to me, am I already finished?"
     },
     "윤상혁": {
-      "appearance": "A plain navy suit with no ornament, eyes that smile only during a handshake, a printout of an e-document with the approval box empty.",
+      "appearance": "A plain navy suit with no ornament, eyes that smile only during a handshake, a printout of an e-document with the approval field empty.",
       "thought": "Numbers can be made. People are the hard part, but in the end people are a matter of placement too.",
       "gesture": "Yoon Sanghyuk closes his tablet cover before the other person finishes. How fast he closes it is his answer.",
       "voice": "He doesn’t scold. He paints a picture of your future instead, and leaves one seat empty in it.",
@@ -275,10 +275,10 @@ export default {
       "line": "Did she tell you? My sister, that day?"
     },
     "도하람": {
-      "appearance": "A gray coat always with one button undone, a hand that carries the coffee himself, a thin leather folder with only one candidate’s name in it.",
+      "appearance": "A gray coat always with one button undone, a hand that carries the coffee herself, a thin leather folder with only one candidate’s name in it.",
       "thought": "People don’t come for the salary. They come for a table they believe they can win.",
-      "gesture": "Before the other person answers, Do Haram slides the coffee cup a hand’s width toward them. That hand’s width is the time he’ll wait.",
-      "voice": "Not fast but precise, he says first what the other person was about to say.",
+      "gesture": "Before the other person answers, Do Haram slides the coffee cup a hand’s width toward them. That hand’s width is the time she’ll wait.",
+      "voice": "Not fast but precise, she says first what the other person was about to say.",
       "line": "I’ll give you the knife. Where to cut is up to you, Team Head."
     },
     "오상철": {
@@ -366,7 +366,7 @@ export default {
       "line": "You bank people talk about extensions and losses. Where do we sleep in December?"
     },
     "남궁솔": {
-      "appearance": "A navy vest with the credit union logo, three rubber bands for bundling queue tickets around her wrist, her father’s dented barley-tea kettle.",
+      "appearance": "A navy vest with the credit union logo, three rubber bands for bundling number tickets around her wrist, her father’s dented barley-tea kettle.",
       "thought": "This is the lobby my father guarded in 1998, sleeping on a blanket on the floor. I can’t hand it over for one screenshot.",
       "gesture": "Before answering, Namgoong Sol says the other person’s name first. Once she says it, her voice drops a step.",
       "voice": "In quick polite speech with a light touch of the Gunsan accent, she says names before numbers.",
@@ -401,17 +401,17 @@ export default {
       "line": "There’s a Korean proverb: the more urgent it is, the more you go around. So let’s sign quickly."
     },
     "백다온": {
-      "appearance": "She keeps her ID badge tucked inside her shirt. The corner of her laptop shows a half-peeled Korean university sticker.",
+      "appearance": "He keeps his ID badge tucked inside his shirt. The corner of his laptop shows a half-peeled Korean university sticker.",
       "thought": "Four people can open the file. One in four is as good as a name.",
-      "gesture": "Baek Daon holds out only half of what she has to show, and pulls it back before the other person can reach for it.",
-      "voice": "Her polite speech is fast and quiet. She always ends a sentence by saying she’s the one with the least power.",
+      "gesture": "Baek Daon holds out only half of what he has to show, and pulls it back before the other person can reach for it.",
+      "voice": "His polite speech is fast and quiet. He always ends a sentence by saying he’s the one with the least power.",
       "line": "That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel."
     },
     "진서우": {
-      "appearance": "A snack-bag clip hanging from his badge lanyard, a backpack always half open, a sticky note of the team’s sales graph beside his monitor.",
+      "appearance": "A snack-bag clip hanging from her badge lanyard, a backpack always half open, a sticky note of the team’s sales graph beside her monitor.",
       "thought": "If I’d known it was wrong, I wouldn’t have done it. But now saying I didn’t know sounds like an excuse.",
       "gesture": "When things get awkward, Jin Seowoo tears open another snack bag and pushes it in front of the other person.",
-      "voice": "He talks bright and fast, and trails off the moment a number turns into a person’s name.",
+      "voice": "She talks bright and fast, and trails off the moment a number turns into a person’s name.",
       "line": "I erased all the names. Only codes were left. ...Was that code you, Minseo?"
     },
     "하도율": {
@@ -516,7 +516,7 @@ export default {
       "appearance": "Chef’s whites with the sleeves pushed up, menu cards written in careful hand, a staff bibimbap mixed from leftover ingredients.",
       "thought": "The long dish names are my revenge. The Chairman has never once memorized one.",
       "gesture": "Before bringing something up, Eun Jaeha takes out one more spoon and sets it in front of the other person.",
-      "voice": "She recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
+      "voice": "He recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
       "line": "The long dish names are my revenge. The Chairman has never once memorized one."
     },
     "도건우": {
@@ -529,8 +529,8 @@ export default {
     "선재윤": {
       "appearance": "A rolling briefcase, a statute book with worn corners, black suit sleeves dusted with rice-cake flour.",
       "thought": "A lawsuit isn’t about winning; it’s about holding out. Making sure no one drops out while we hold out is my job.",
-      "gesture": "When Seon Jaeyoon reads an unfavorable brief, he counts the pages first. The thicker it is, the more he believes the other side is scared.",
-      "voice": "He talks fast and dry, and only in front of his clients does he finish his sentences slowly.",
+      "gesture": "When Seon Jaeyoon reads an unfavorable brief, she counts the pages first. The thicker it is, the more she believes the other side is scared.",
+      "voice": "She talks fast and dry, and only in front of her clients does she finish her sentences slowly.",
       "line": "They have eight people and I’m one. Still, we have 1,732 more plaintiffs than they do."
     },
     "연서준": {
@@ -555,10 +555,10 @@ export default {
       "line": "Take this out and there’s one story left. There was one bad man. The end."
     },
     "은시온": {
-      "appearance": "A knife-pressed shirt, a tablet showing the ad sales sheet, a small calculator hanging from his badge lanyard.",
+      "appearance": "A knife-pressed shirt, a tablet showing the ad sales sheet, a small calculator hanging from her badge lanyard.",
       "thought": "I never thought ads buy the broadcast. But a broadcast has never gone out without ads either.",
-      "gesture": "When Eun Sion gets a hard question, he turns his tablet toward the other person and shows the numbers first.",
-      "voice": "Courteous and fast. He’s never wrong on numbers, and trails off when it comes to people.",
+      "gesture": "When Eun Sion gets a hard question, she turns her tablet toward the other person and shows the numbers first.",
+      "voice": "Courteous and fast. She’s never wrong on numbers, and trails off when it comes to people.",
       "line": "What I sell is 30 seconds. I didn’t know those 30 seconds were buying 20 minutes."
     },
     "홍예담": {

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -45,7 +46,7 @@ test("off, index.html and the pages are the ones without it, but for the policy'
   for (const origin of ["", "https://critical-point-wn6p.onrender.com"]) {
     const off = renderStaticPages(origin, { analytics: null });
     assert.deepEqual(off, renderStaticPages(origin));
-    assert.equal(Object.keys(off).length, 15);
+    assert.equal(Object.keys(off).length, 15 + CONTENT_KINDS.length * 3, "the five pages, the policy and the content pages (scripts/content-pages)");
     for (const [file, html] of Object.entries(off)) {
       const language = POLICIES[file];
       if (!language) {
@@ -73,14 +74,15 @@ test("the app build (`--mode app`) has no tag, no Google origin and no Google An
   assert.equal(withAnalyticsTags(index, app), index);
   for (const origin of ["", "https://critical-point-wn6p.onrender.com"]) {
     const pages = renderStaticPages(origin, { analytics: app, app: true });
-    assert.equal(Object.keys(pages).length, 15);
+    // The web's pages, every one (the policy's six, the site's nine and main's content pages since 11-10).
+    const web = renderStaticPages(origin);
+    assert.deepEqual(Object.keys(pages), Object.keys(web));
     for (const [file, html] of Object.entries(pages)) {
       // The policy's notice that the web turns it on 11-12 is not the app's to make: the app never does.
       assert.doesNotMatch(html, GOOGLE, file);
       assert.doesNotMatch(html, /변경 예고|Upcoming change|変更の予告/, file);
     }
     // The web's policy has the notice; the app's copies (AdMob, Remove Ads) do not, and an ID handed in changes nothing.
-    const web = renderStaticPages(origin);
     for (const [file, language] of Object.entries(POLICIES)) {
       assert.ok(web[file].includes(ANALYTICS_NOTICE[language]), file);
       assert.match(pages[file], /AdMob/, file);
@@ -88,7 +90,7 @@ test("the app build (`--mode app`) has no tag, no Google origin and no Google An
     assert.deepEqual(renderStaticPages(origin, { analytics: on, app: true }), pages);
   }
   const config = readFileSync("vite.config.js", "utf8");
-  assert.match(config, /staticPages\(analytics, \{ app: mode === "app" \}\)/);
+  assert.match(config, /staticPages\(\{ analytics, ads: .*?, app: mode === "app" \}\)/);
   assert.match(config, /analyticsFor\(\{ \.\.\.readAnalyticsEnv\(loadEnv\(mode, process\.cwd\(\), "GA_"\)\), command, mode, debug: debugBuild \}\)/);
 });
 
@@ -98,7 +100,7 @@ test("on, every page loads Google's tag and the file that configures it, with no
   assert.match(index, new RegExp(`${tags.replace(/[.?/]/g, "\\$&")}\\n\\s*<script src="${on.path}" defer></script>\\n\\s*</head>`));
   assert.deepEqual(inlineScriptProblems(index), []);
   const pages = renderStaticPages("", { analytics: on });
-  assert.equal(Object.keys(pages).length, 15);
+  assert.equal(Object.keys(pages).length, 15 + CONTENT_KINDS.length * 3);
   for (const [file, html] of Object.entries(pages)) {
     const head = html.slice(0, html.indexOf("</head>"));
     assert.ok(head.includes(tags) && head.includes(`<script src="${on.path}" defer></script>`), file);

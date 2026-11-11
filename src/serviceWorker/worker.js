@@ -16,7 +16,8 @@
  *
  * Four rules, by what is being asked for (`strategyFor`):
  *
- *   the page       network first, and the kept page only when the network
+ *   the page       (`/`, and its English and Japanese at `/en/` and `/ja/`)
+ *                  network first, and the kept page only when the network
  *                  fails, says nothing for three seconds, or answers with an
  *                  error of its own (a host that is down says 502 quickly).
  *                  A player with a connection is never held on an old
@@ -26,8 +27,10 @@
  *                  name, so the kept copy is the file. A miss goes to the
  *                  network and is kept on the way back.
  *   the pages      /privacy.html, /terms.html, /about.html, /faq.html,
- *                  /contact.html and their /en/ and /ja/ copies
- *                  (scripts/legal-pages.mjs, scripts/site-pages.mjs): network
+ *                  /contact.html, the content pages (/guide.html,
+ *                  /characters.html, /making.html, /cases/*.html) and their
+ *                  /en/ and /ja/ copies (scripts/legal-pages.mjs,
+ *                  scripts/site-pages.mjs, scripts/content-pages): network
  *                  first like the page, and kept on the way back and in the
  *                  warm-up, so a device that has had a table up can read
  *                  them -- and every link at the start screen's foot --
@@ -63,7 +66,11 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
-export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact)\.html$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact|guide|characters|making|cases\/[a-z0-9]+)\.html$/;
+// The start page in English and Japanese (scripts/site-pages.mjs, since
+// 11-03): the network's copy while there is one, and offline the kept page,
+// which opens in the folder's language (src/locale.js `folderLanguage`).
+export const LANGUAGE_START = /^\/(?:en|ja)\/(?:index\.html)?$/;
 
 export function cacheNameFor(release) {
   return `${CACHE_PREFIX}${release}`;
@@ -98,7 +105,7 @@ export function strategyFor({ method, url, mode }, origin) {
   }
   if (parsed.origin !== origin) return "none";
   if (mode === "navigate") {
-    if (parsed.pathname === "/" || parsed.pathname === SHELL_URL) return "shell";
+    if (parsed.pathname === "/" || parsed.pathname === SHELL_URL || LANGUAGE_START.test(parsed.pathname)) return "shell";
     return DOCUMENT_PAGE.test(parsed.pathname) ? "document" : "none";
   }
   if (parsed.pathname.startsWith("/assets/")) return "immutable";

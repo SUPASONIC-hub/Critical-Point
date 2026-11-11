@@ -6,7 +6,8 @@ import W from "./copy/logicReport.js";
 
 /**
  * The season's logic report: one panel on the closing report that names the
- * case the table ran hottest in and what the hand did with its types there,
+ * case the table ran hottest in and what the hand did with its directions
+ * there (사람 or 자리, the axis the streak is held on since C-3),
  * and prints the season's hold rate beside its longest streak.
  *
  * It reads the cases' stored summaries and nothing else. The log is cleared
@@ -153,16 +154,18 @@ export function getHottestCase(caseResults = {}, cases = []) {
 }
 
 /**
- * What the hand did with its types in one case. Held: at least half of the
- * case's windows were closed on one type. Switched: not that, but every change
- * of type answered a rise in the heat, and nothing ended the streak. Otherwise
- * the hand did not stay on a type, and the line counts how often the streak
- * ended (a break or a bust; `getSeasonLogic` counts the same two).
+ * What the hand did with its directions in one case. Held: at least half of
+ * the case's windows were closed on one direction. Switched: not that, but
+ * every change of direction answered a rise in the heat, and nothing ended the
+ * streak. Otherwise the hand did not stay on a direction, and the line counts
+ * how often the streak ended (a break or a bust; `getSeasonLogic` counts the
+ * same two).
  */
 export function describeLogicCase(record) {
   const windows = count(record, "windows");
   const [type, picked] = Array.isArray(record?.top) ? record.top : [];
-  const label = easyCognitionLabels[type];
+  // What the record's `top` calls a direction (C-3, in the page's words); a record from before it holds a thinking type.
+  const label = Object.hasOwn(W.directions, type ?? "") ? W.directions[type] : easyCognitionLabels[type];
   const held = Math.min(windows, Math.max(0, Math.trunc(Number(picked) || 0)));
   if (label && held * 2 >= windows) return held === windows ? LOGIC_REPORT_COPY.heldAll(windows, label) : LOGIC_REPORT_COPY.held(windows, held, label);
   const ended = count(record, "breaks") + count(record, "busts");

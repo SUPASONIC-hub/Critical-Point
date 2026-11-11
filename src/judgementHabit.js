@@ -2,6 +2,7 @@ import { ENDING_GATES } from "./gameConstants.js";
 import { getSeasonLogic } from "./gameLogic.js";
 import { readClosedCases, readCollapseTally } from "./seasonStanding.js";
 import habitsCopy from "./copy/habits.js";
+import { fill } from "./locale.js";
 
 /**
  * The season's 판단 습관: a short, slightly unkind name for how the player
@@ -21,7 +22,10 @@ import habitsCopy from "./copy/habits.js";
  * the runtime's side (src/copy/habits.js, where another language is laid over
  * them), and the card is handed the finished name. The line
  * is not drawn on the card (no room left in its chunk); the report's
- * 당신이 반복한 방식 box draws it under the name (ResultScreen.jsx).
+ * 당신이 반복한 방식 box draws it under the name (ResultScreen.jsx). The one
+ * sentence that says the name, 「당신의 심사 성향은 「…」입니다.」 (D1), is made
+ * here too (`habitCardLine`) and rides on the fingerprint as `habit.card`, so
+ * the card's chunk prints it and copies it without wording anything.
  */
 
 /** Below this many settled windows a season has not shown a habit. */
@@ -148,4 +152,9 @@ export function getJudgementHabit(caseResults = {}) {
   if (season.windows < HABIT_MIN_WINDOWS) return null;
   const { id, title, line } = JUDGEMENT_HABITS.find((habit) => habit.holds(season));
   return { id, title, line };
+}
+
+/** The one line the result card says the habit's name in (D1), in the page's language. */
+export function habitCardLine(habit) {
+  return fill(habitsCopy.cardLine, { habit: habit.title });
 }

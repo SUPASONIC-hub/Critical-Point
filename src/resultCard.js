@@ -105,8 +105,11 @@ export function drawResultCard(ctx, model, theme) {
   ctx.fillRect(LEFT, 140, CONTENT_WIDTH, 2);
 
   // 2. 판단 DNA: its title large, then the mode as a chip beside the motive.
+  // The label's line is the habit's sentence (D1, worded outside this chunk)
+  // for a season that has one: the whole width, or 240 short of the right
+  // edge when the story mark is there (the widest mark, ja's, is 208 wide).
   let y = 220;
-  write(RESULT_CARD_LABELS.dna, LEFT, y, { size: 26, color: theme.dim, maxWidth: CONTENT_WIDTH / 2 });
+  write(model.habitLine || RESULT_CARD_LABELS.dna, LEFT, y, { size: 26, color: theme.dim, maxWidth: CONTENT_WIDTH - (model.story ? 240 : 0) });
   if (model.story) {
     write(RESULT_CARD_LABELS.story, RIGHT, y, { size: 26, color: theme.dim, align: "right", maxWidth: CONTENT_WIDTH / 2 - 20 });
   }

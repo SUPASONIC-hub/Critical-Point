@@ -75,7 +75,10 @@ export const musicModes = {
     stepMs: 156,
     volume: 0.128,
     wave: "sawtooth",
-    drive: 0.08,
+    // Was 0.08, the bass in the drive (11-10 crackle; CRACKLE_FIX_BEFORE, musicScore.js).
+    drive: 0.06,
+    bassPastDrive: true,
+    bassLevel: 0.6,
     kick: pattern("x...x...x..x.x.."),
     snare: pattern("................"),
     hat: pattern("...x......x...x."),
@@ -94,7 +97,10 @@ export const musicModes = {
     stepMs: 132,
     volume: 0.14,
     wave: "sawtooth",
-    drive: 0.15,
+    // Was 0.15, the bass in the drive (11-10 crackle; CRACKLE_FIX_BEFORE, musicScore.js).
+    drive: 0.12,
+    bassPastDrive: true,
+    bassLevel: 0.6,
     kick: pattern("x.x.x.x.x.x.xxx."),
     snare: pattern("................"),
     hat: pattern("..x..x..x..x..x."),

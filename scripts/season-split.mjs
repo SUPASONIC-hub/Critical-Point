@@ -31,13 +31,17 @@ export const SPLIT_TABLES = ["nodes", "echoReplies", "choiceVoiceLines", "sceneC
 const PACK_LOGIC_FIELDS = ["clue", "outcomes", "carryovers", "continuityChallenges"];
 
 export async function loadSeasonTables() {
-  const [data, dialogue, context] = await Promise.all([
+  const [data, dialogue, context, moods] = await Promise.all([
     import("../src/gameData.js"),
     import("../src/gameDialogue.js"),
     import("../src/nodes/sceneContext.js"),
+    import("../src/sceneMoods.js"),
   ]);
   return {
     caseSequence: data.CASE_SEQUENCE,
+    // The scene moods (scripts/tag-mood.mjs; neutral omitted), written on the
+    // shipped scenes by buildRuntimeData rather than shipped as a table.
+    moods: moods.SCENE_MOODS,
     // What every case needs from the start, small enough to ship whole: the
     // orders and openings, the memory-card plans, each case's fork, the people,
     // and the pack fields the rules read.
@@ -95,13 +99,21 @@ export function mergeSeason({ cases, shared }) {
  * What the app is shipped: the index with the one shared reply added, and for
  * each case its scenes, replies and voice lines. The scene context is left
  * out -- it is already built into the scenes -- and so is nothing else.
+ *
+ * A tagged scene (`season.moods`, src/sceneMoods.js) is shipped with its
+ * `mood` on it, a few bytes in its case's own file, so the table reads
+ * `scene.mood` (src/state/sceneMood.js) and the tag table never ships; an
+ * untagged scene, neutral, carries nothing. The graph's own scene objects are
+ * not written to.
  */
 export function buildRuntimeData(season) {
   const { cases, shared } = splitSeason(season);
+  const moods = season.moods ?? {};
+  const withMoods = (nodes) => Object.fromEntries(Object.entries(nodes).map(([id, scene]) => [id, moods[id] ? { ...scene, mood: moods[id] } : scene]));
   return {
     index: { ...season.index, sharedEcho: shared.echoReplies },
     cases: Object.fromEntries(
-      Object.entries(cases).map(([caseId, bucket]) => [caseId, { nodes: bucket.nodes, echoReplies: bucket.echoReplies, choiceVoiceLines: bucket.choiceVoiceLines }]),
+      Object.entries(cases).map(([caseId, bucket]) => [caseId, { nodes: withMoods(bucket.nodes), echoReplies: bucket.echoReplies, choiceVoiceLines: bucket.choiceVoiceLines }]),
     ),
   };
 }

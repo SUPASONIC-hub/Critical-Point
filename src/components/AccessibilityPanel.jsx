@@ -1,6 +1,6 @@
 import { fill } from "../locale.js";
 import comfortCopy from "../copy/comfort.js";
-import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
+import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, TEXT_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
 
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
@@ -59,6 +59,25 @@ export function AccessibilityPanel() {
                 onChange={() => setAccessibility({ storyScale: scale })}
               />
               <span>{comfortCopy.storyScale.labels[index]}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      {/* 글자 크기 (E5): every screen, on top of #390's PC root. Beside the story size, as the other size. */}
+      <fieldset className="accessibility-time" data-testid="text-scale">
+        <legend>{comfortCopy.textScale.legend}</legend>
+        <p>{comfortCopy.textScale.text}</p>
+        <div>
+          {TEXT_SCALES.map((scale, index) => (
+            <label key={scale}>
+              <input
+                type="radio"
+                name="accessibility-text-scale"
+                value={scale}
+                checked={settings.textScale === scale}
+                onChange={() => setAccessibility({ textScale: scale })}
+              />
+              <span>{comfortCopy.textScale.labels[index]}</span>
             </label>
           ))}
         </div>

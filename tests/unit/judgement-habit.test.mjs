@@ -4,7 +4,8 @@ import { test } from "node:test";
 
 import { ENDING_GATES } from "../../src/gameConstants.js";
 import { getDecisionFingerprint } from "../../src/gameLogic.js";
-import { HABIT_MIN_WINDOWS, JUDGEMENT_HABITS, getJudgementHabit, readHabitSeason } from "../../src/judgementHabit.js";
+import { HABIT_MIN_WINDOWS, JUDGEMENT_HABITS, getJudgementHabit, habitCardLine, readHabitSeason } from "../../src/judgementHabit.js";
+import habitsCopy from "../../src/copy/habits.js";
 import { drawResultCard } from "../../src/resultCard.js";
 import { buildResultCardModel, buildShareText } from "../../src/resultCardModel.js";
 
@@ -213,6 +214,42 @@ test("a fingerprint without a habit prints the card it always printed", () => {
     const model = buildResultCardModel({ fingerprint: { ...fingerprint, habit: junk }, endingName: "결말", caseResults: {} });
     assert.equal(model.modeTitle, fingerprint.modeTitle);
   }
+});
+
+test("D1: the card says the habit's name in one sentence over the large line, and the copied line carries it after the record", () => {
+  const habit = getJudgementHabit(season({ busts: 3 }));
+  const sentence = habitCardLine(habit);
+  assert.equal(sentence, `당신의 심사 성향은 「${habit.title}」입니다.`);
+  assert.equal(habitsCopy.cardLine, "당신의 심사 성향은 「{habit}」입니다.");
+  for (const other of JUDGEMENT_HABITS) assert.ok(habitCardLine(other).includes(other.title), other.id);
+
+  // As useRunReadout hands it over: the finished sentence on the habit, no new field on the card.
+  const fingerprint = { ...getDecisionFingerprint({}), habit: { ...habit, card: sentence } };
+  const model = buildResultCardModel({ fingerprint, endingName: "결말", caseResults: {} });
+  assert.equal(model.habitLine, sentence);
+  assert.equal(model.modeTitle, habit.title, "the large line is still the name");
+  assert.equal(model.dnaTitle, fingerprint.modeTitle);
+  const texts = drawnTexts(model);
+  const drawn = texts.find((entry) => entry.text === sentence);
+  assert.ok(drawn, "the sentence is drawn");
+  assert.equal(drawn.y, 220, "where the 판단 DNA label stood, so the card's layout does not move");
+  assert.ok(!texts.some((entry) => entry.text === "판단 DNA"), "in the label's place");
+  assert.ok(texts.some((entry) => entry.text === habit.title), "the name is still drawn large");
+  assert.ok(!texts.some((entry) => entry.text === habit.line), "the habit's own line is still not drawn");
+  const copied = buildShareText(model, "https://example.org");
+  assert.equal(copied, `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '결말'. 최고 버스트 0점, C 랭크. ${sentence} https://example.org/`);
+  assert.ok(buildShareText(model).endsWith(sentence), "without an address the line ends on the sentence");
+
+  // A habit handed over without its sentence prints the card #393 printed.
+  const bare = buildResultCardModel({ fingerprint: { ...fingerprint, habit }, endingName: "결말", caseResults: {} });
+  assert.equal(bare.habitLine, "");
+  assert.ok(drawnTexts(bare).some((entry) => entry.text === "판단 DNA"));
+  assert.match(buildShareText(bare), new RegExp(`판단 DNA는 '${habit.title}'`));
+  // And a season without a habit has no sentence anywhere.
+  const without = buildResultCardModel({ fingerprint: { ...fingerprint, habit: null }, endingName: "결말", caseResults: {} });
+  assert.equal(without.habitLine, "");
+  assert.doesNotMatch(buildShareText(without), /심사 성향/);
+  assert.ok(!drawnTexts(without).some((entry) => /심사 성향/.test(entry.text)));
 });
 
 test("the report's 당신이 반복한 방식 box names the habit and draws the line the card left out", () => {

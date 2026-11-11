@@ -1,8 +1,10 @@
 /** The start screen in English (src/copy/intro.js). */
 export default {
+  pageTitle: "Critical Point - Every 45 seconds, your judgment goes on the record",
   subtitle: "Every 45 seconds, your judgment goes on the record",
+  titleReading: "Trigger Lab",
   premise:
-    "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last probation task.",
+    "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last trainee task.",
   startButton: "Start the prologue",
   briefingLink: "Read the briefing first",
   ranking: "Ranking",
@@ -39,6 +41,7 @@ export default {
     identity: "Analyst call sign",
     nameLabel: "Analyst name",
     namePlaceholder: "Enter your name",
+    rankTitle: "Record title: {title}",
     newGamePlus: "Start {game}",
   },
   pastRunLabel: "NEW GAME+ past record",
@@ -70,8 +73,8 @@ export default {
       public: { title: "The analyst who kept the record", premise: "You remember longest that a judgment no one writes down is left nowhere." },
     },
     prologues: {
-      courier: { title: "The factory of 11", text: "What you remember longest is Onsae Packaging, the last assignment of your probation. Behind one sheet of paper hung the November of 11 employees." },
-      lab: { title: "The night of the dissent", text: "What you remember longest is the dissent you wrote alone. It began, in the last assignment of your probation, with one line of 40 million won left out of the total." },
+      courier: { title: "The factory of 11", text: "What you remember longest is Onsae Packaging, the last assignment of your traineeship. Behind one sheet of paper hung the November of 11 employees." },
+      lab: { title: "The night of the dissent", text: "What you remember longest is the dissent you wrote alone. It began, in the last assignment of your traineeship, with one line of 40 million won left out of the total." },
       public: { title: "The empty signature field", text: "What you remember longest is a trainee evaluation with only the speed box filled in and the signature field left empty. From that day on, you write your judgments down." },
     },
   },
@@ -99,6 +102,7 @@ export default {
     end: ".",
     playtestNotice:
       "Case results, choices and response times, the screen language, the feedback you send and error reports are stored for research with a random ID created on this device, and deleted after 180 days. Your name is never stored remotely, and your IP address is used only to rate-limit requests.",
+    hallOfFameNotice: " A checked top season may stay in the Hall of Fame for a long time, by its run number and score.",
     deletion: {
       cloud: " Online save can be deleted yourself in the “Continue on another device” panel.",
       before: "To delete your records, email ",
@@ -131,5 +135,13 @@ export default {
     entering: "Entering {case}",
     first: "Syncing first judgment conditions",
     syncing: "Syncing {case} judgment conditions",
+  },
+  sideSlot: {
+    label: "Side cases",
+    heading: "Side cases · off the rankings · {book}",
+    text: "Short cases played apart from the season. Your season save and the rankings stay as they are.",
+    book: "Side {closed}/{total}",
+    resumable: " · Continue",
+    closed: " · Done",
   },
 };

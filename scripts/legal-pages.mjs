@@ -1,6 +1,8 @@
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
+import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
 import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
+import { MENU_STYLE, siteFooterNav, siteHeaderNav } from "./content-pages/site-nav.mjs";
 
 /**
  * The privacy policy and the terms of use, Korean, English and Japanese: six
@@ -28,11 +30,28 @@ import { analyticsTagLines, withSwaps } from "./analytics-config.mjs";
  * a column the policy does not name. The sentence beside the consent box is
  * `PLAYTEST_DATA_NOTICE`, quoted here as written there.
  *
- * Settled on 2026-10-25 (앱출시-문서초안, 사용자 결정 2·3): only what the law asks
+ * Settled on 2026-10-25 (앱출시-문서초안, 우리 결정 2·3): only what the law asks
  * for; no operator or officer name -- 「임계점 개발자」 and the support address;
  * the overseas transfer as one line naming the company and the country; the
  * consent box still starts ticked, and the policy says so; the web version has
  * no ads.
+ *
+ * Web ads (출시 로드맵 2단계, docs/web-ads.md) are off, and so is their part
+ * of the pages: `renderLegalPages()` writes exactly the pages above, and so
+ * does a build given only ADSENSE_CLIENT (site verification: a meta tag
+ * and ads.txt, no ad shown, nothing sent to Google). Seven days before the
+ * ads, a build with ADSENSE_ADS=notice and ADSENSE_DATE puts the notice of
+ * the change at the top of the policy and the terms (`adsNotice`) and
+ * nothing else. A build with ADSENSE_ADS=on applies `AD_EDITS` -- the
+ * summary line, the cookies of section 3, Google in section 6 and how to
+ * limit what goes to it, the ad section 10 and the terms' line on ads --
+ * each to a sentence that has to be found exactly once, so a later edit of
+ * the text cannot leave an ad page half-written, and dates both pages
+ * ADSENSE_DATE. Korean, English and Japanese take the same edits in the same
+ * places, under the same effective date. The game's consent box does not
+ * change with ads (it is the playtest data's, PLAYTEST_DATA_NOTICE): consent
+ * to Google's ad cookies in the EEA, the UK and Switzerland is Google's
+ * certified message, set in the AdSense console, which section 10 names.
  */
 
 const EFFECTIVE_DATE = { ko: "2026년 10월 25일", en: "October 25, 2026", ja: "2026年10月25日" };
@@ -190,6 +209,29 @@ const escapeHtml = (text) =>
   String(text).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character]);
 const items = (keys, language) => `<ul>${keys.map((key) => `<li>${escapeHtml(DATA_ITEMS[key][language])}</li>`).join("")}</ul>`;
 const mail = `<a href="mailto:${SUPPORT_CONTACT}">${SUPPORT_CONTACT}</a>`;
+
+/**
+ * The start screen's credit (StudioCredit.jsx) at the foot of every page:
+ * the studio, the two creators on one line, and each one's address as a link
+ * named for its owner (src/credits.js). English labels in every language, as
+ * on the start screen; the studio's name in the page's language (studioName).
+ *
+ * The privacy policy and the terms leave the address row out (decided
+ * 2026-11-04): under their contact line it read as a second place to send an
+ * access or deletion request, which goes to SUPPORT_CONTACT alone.
+ */
+const NO_CREDIT_MAIL = new Set(["privacy", "terms"]);
+const creditMail = `<div class="credit-mail"><dt lang="en">CONTACT</dt><dd>${CREATORS.map(
+  (creator) => `<a href="mailto:${creator.email}" aria-label="${escapeHtml(creatorMailLabel(creator))}">${creator.email}</a>`,
+).join(" ")}</dd></div>
+`;
+const creditFor = (kind, language) => `<div class="credit">
+<img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
+<dl>
+<div><dt lang="en">STUDIO</dt><dd>${escapeHtml(studioName(language))}</dd></div>
+<div><dt lang="en">CREATOR</dt><dd>${escapeHtml(CREATOR_LINE)}</dd></div>
+${NO_CREDIT_MAIL.has(kind) ? "" : creditMail}</dl>
+</div>`;
 const days = DATA_RETENTION_DAYS;
 
 /**
@@ -291,7 +333,7 @@ ${ANALYTICS_NOTICE.ko}
 
 const PRIVACY_EN = `
 ${ANALYTICS_NOTICE.en}
-<p>This policy explains what the developer of Critical Point (“we”) processes when you play the game, why, and for how long.</p>
+<p>This policy explains what the developers of Critical Point (“we”) process when you play the game, why, and for how long.</p>
 
 <h2>1. In short</h2>
 <ul>
@@ -363,7 +405,7 @@ ${ANALYTICS_NOTICE.en}
 
 <h2>11. Contact</h2>
 <ul>
-<li>The Critical Point developer</li>
+<li>The Critical Point developers</li>
 <li>Email: ${mail}</li>
 </ul>
 
@@ -574,7 +616,7 @@ const TERMS_KO = `
 
 const TERMS_EN = `
 <ol>
-<li>These terms set the conditions for playing Critical Point (the “game”), provided by the Critical Point developer (“we”). By playing, you agree to them.</li>
+<li>These terms set the conditions for playing Critical Point (the “game”), provided by the Critical Point developers (“we”). By playing, you agree to them.</li>
 <li>The game is fiction. Its people, companies, banks, institutions and events have nothing to do with real ones, and its financial judgments are not investment or financial advice.</li>
 <li>The web version is free, with no ads and no payments. Chips, stakes, vaults and scores in the game are not money or goods and cannot be bought, sold or exchanged.</li>
 <li>The public leaderboard is a playtest ranking. It may be cleared when the rules of the table change, and records that do not meet the rules may be left off it.</li>
@@ -607,7 +649,13 @@ const PAGE_STYLE = `
 :root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
-main{width:min(760px,100%);margin:0 auto;padding:24px 16px 72px}
+header,main,footer{width:min(760px,100%);margin:0 auto;padding:0 16px}
+header{padding-top:24px}
+footer{margin-top:48px;padding-bottom:72px;font-size:.875rem}
+.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--accent);border-radius:8px;background:var(--bg)}
+.skip:focus{top:12px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+main:focus{outline:0}
 nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:.875rem}
 nav a{display:inline-flex;align-items:center;min-height:44px}
 nav a[aria-current]{color:var(--text);text-decoration:none}
@@ -622,7 +670,14 @@ li ul{margin:4px 0}
 dd{margin:0 0 4px}
 .effective{margin:0;color:var(--text-2);font-size:.875rem}
 strong{color:var(--text)}
-footer{margin-top:48px;padding-top:12px;border-top:1px solid var(--line);font-size:.875rem}
+.credit{display:flex;align-items:center;gap:12px;margin-top:16px}
+.credit img{flex:none;width:40px;height:40px;object-fit:cover;border-radius:50%}
+.credit dl{display:flex;flex-wrap:wrap;gap:4px 20px;min-width:0;margin:0}
+.credit dt{color:var(--text-2);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
+.credit dd{margin:0;color:var(--text);font-weight:700}
+.credit-mail{flex-basis:100%}
+.credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
+.credit-mail a{display:inline-flex;align-items:center;min-height:32px}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -638,10 +693,10 @@ export const PAGE_LANGUAGES = ["ko", "en", "ja"];
  */
 export const PAGE_KINDS = SITE_PAGES;
 
-const COPY = {
-  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의" },
-  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact" },
-  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ" },
+export const COPY = {
+  ko: { game: "게임으로 돌아가기", about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관", name: "한국어", effective: "시행일", mail: "문의", skip: "본문으로 건너뛰기" },
+  en: { game: "Back to the game", about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use", name: "English", effective: "Effective", mail: "Contact", skip: "Skip to content" },
+  ja: { game: "ゲームに戻る", about: "ゲーム紹介", faq: "よくある質問", contact: "お問い合わせ", privacy: "プライバシーポリシー", terms: "利用規約", name: "日本語", effective: "施行日", mail: "お問い合わせ", skip: "本文へスキップ" },
 };
 
 export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
@@ -658,59 +713,387 @@ const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 /** A page's address from the root: `/faq.html`, `/en/faq.html`. The policy's two are PRIVACY_PAGE_PATH and TERMS_PAGE_PATH. */
 export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`;
 
-/** The game in a language, as the start page's own hreflang links name it (index.html). */
-export const gamePath = (language) => (language === "ko" ? "/" : `/?lang=${language}`);
+/**
+ * The game in a language, as the start page's own hreflang links name it
+ * (index.html): `/`, `/en/`, `/ja/`. The two folders hold the start page
+ * written again in their language (`localizedStartPage`, site-pages.mjs), and
+ * open the game in it (src/locale.js). Until 11-03 they were `/?lang=en` and
+ * `/?lang=ja`, which still open the game in English and Japanese but are the
+ * Korean page to a crawler: their canonical was `/`.
+ */
+export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
+
+/**
+ * The picture a shared link shows (the start screen's key visual, 1200x675),
+ * and what it shows in each language: the start screen's own `heroAlt`
+ * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
+ * holds them to it).
+ */
+export const SHARE_IMAGE = { path: "/triggerlab-key-visual.jpg", width: 1200, height: 675 };
+export const SHARE_IMAGE_ALT = {
+  ko: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
+  en: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
+  ja: "日暮れの高層ビルの屋上から街を見下ろす、二人の分析官の後ろ姿",
+};
+
+/** Open Graph's name for each language. */
+export const OG_LOCALE = { ko: "ko_KR", en: "en_US", ja: "ja_JP" };
+
+/**
+ * The card a shared link shows (Open Graph and Twitter): the page's own title
+ * and description over the key visual. `url` and the image are root-relative;
+ * the build makes og:url, og:image and twitter:image absolute
+ * (`withAbsoluteSiteLinks`, site-pages.mjs), as a crawler needs them.
+ */
+export function shareMetaLines({ language, url, title, description }) {
+  const meta = (key, name, value) => `<meta ${key}="${name}" content="${escapeHtml(value)}" />`;
+  return [
+    meta("property", "og:type", "website"),
+    meta("property", "og:url", url),
+    meta("property", "og:site_name", GAME_NAME[language]),
+    meta("property", "og:locale", OG_LOCALE[language]),
+    ...PAGE_LANGUAGES.filter((code) => code !== language).map((code) => meta("property", "og:locale:alternate", OG_LOCALE[code])),
+    meta("property", "og:title", title),
+    meta("property", "og:description", description),
+    meta("property", "og:image", SHARE_IMAGE.path),
+    meta("property", "og:image:type", "image/jpeg"),
+    meta("property", "og:image:width", String(SHARE_IMAGE.width)),
+    meta("property", "og:image:height", String(SHARE_IMAGE.height)),
+    meta("property", "og:image:alt", SHARE_IMAGE_ALT[language]),
+    meta("name", "twitter:card", "summary_large_image"),
+    meta("name", "twitter:title", title),
+    meta("name", "twitter:description", description),
+    meta("name", "twitter:image", SHARE_IMAGE.path),
+    meta("name", "twitter:image:alt", SHARE_IMAGE_ALT[language]),
+  ];
+}
 
 export { escapeHtml };
 
 /**
  * One page: the header that links the game, every other page in the same
  * language and the page in the other two; the hreflang alternates (all three
- * and x-default, the Korean); the body; a foot with the contact address.
+ * and x-default, the Korean); the body; a foot with the contact address and
+ * the credit.
  * `effective` is the policy's date line, which only the two policies have;
- * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head.
+ * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head;
+ * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs).
+ *
+ * The landmarks (2026-11-09 audit): a skip link to the main text first, the
+ * site menu in a <header>, the page in <main id="main">, and the foot's menu,
+ * the contact line and the credit in a <footer> -- until then the menu and
+ * the foot sat inside <main>, so the page had no banner or contentinfo, and
+ * nothing let a keyboard pass the menu's thirteen links.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "" }) {
   const copy = COPY[language];
-  const others = PAGE_LANGUAGES.filter((code) => code !== language);
-  const title = `${copy[kind]} · ${GAME_NAME[language]}`;
+  const name = heading ?? copy[kind];
+  const title = `${name} · ${GAME_NAME[language]}`;
   const alternates = [
     ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
   ].join("");
-  const pages = PAGE_KINDS.map((other) =>
-    other === kind
-      ? `<a href="${pagePath(other, language)}" aria-current="page">${copy[other]}</a>\n`
-      : `<a href="${pagePath(other, language)}">${copy[other]}</a>\n`,
-  ).join("");
-  const switches = others
-    .map((other) => `<a href="${pagePath(kind, other)}" hreflang="${other}" lang="${other}">${COPY[other].name}</a>\n`)
-    .join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
   const tags = analytics ? analyticsTagLines(analytics).map((line) => `${line}\n`).join("") : "";
+  const summary = description ?? name;
+  const share = shareMetaLines({ language, url: pagePath(kind, language), title, description: summary })
+    .map((line) => `${line}\n`)
+    .join("");
   return `<!doctype html>
 <html lang="${language}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapeHtml(title)}</title>
-<meta name="description" content="${escapeHtml(description ?? copy[kind])}" />
+<meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
-${alternates}<link rel="icon" href="/icons/icon-192.png" />
-<style>${PAGE_STYLE.trim()}${STYLE_FOR[language] ?? ""}</style>
+${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
+${structuredData ? `${structuredData}
+` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}</style>
 ${tags}</head>
 <body>
-<main>
-<nav aria-label="${escapeHtml(GAME_NAME[language])}">
-<a href="${gamePath(language)}">${copy.game}</a>
-${pages}${switches}</nav>
-<h1>${copy[kind]}</h1>
+<a class="skip" href="#main">${copy.skip}</a>
+<header>
+${siteHeaderNav({ kind, language })}
+</header>
+<main id="main" tabindex="-1">
+<h1>${escapeHtml(name)}</h1>
 ${dated}${body.trim()}
-<footer><p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p></footer>
 </main>
+<footer>
+${siteFooterNav({ kind, language })}
+<p>${escapeHtml(GAME_NAME[language])} · ${copy.mail}: ${mail}</p>
+${creditFor(kind, language)}
+</footer>
 </body>
 </html>
 `;
+}
+
+const AD_POLICY_LINKS = {
+  ads: "https://policies.google.com/technologies/ads",
+  partners: "https://policies.google.com/technologies/partner-sites",
+  settings: "https://adssettings.google.com",
+};
+const link = (href) => `<a href="${href}">${href.replace("https://", "")}</a>`;
+
+/**
+ * The day the policy with ads takes effect (ADSENSE_DATE, `2026-12-01`), as
+ * each language writes a date: the notice names it, and once the ads are on
+ * the policy and the terms carry it as their date.
+ */
+export function adsEffectiveDate(day) {
+  const [year, month, date] = day.split("-").map(Number);
+  const englishMonth = new Date(Date.UTC(year, month - 1, 1)).toLocaleString("en-US", { month: "long", timeZone: "UTC" });
+  return { ko: `${year}년 ${month}월 ${date}일`, en: `${englishMonth} ${date}, ${year}`, ja: `${year}年${month}月${date}日` };
+}
+
+/**
+ * The notice of the ads, seven days before they start (the policy's section
+ * 12; ADSENSE_ADS=notice): one paragraph at the top of the policy and one at
+ * the top of the terms, whose item 3 changes too. The build with the ads on
+ * leaves both out and carries the day as the pages' date instead -- the same
+ * pair ANALYTICS_NOTICE and ANALYTICS_EFFECTIVE_DATE make for Google Analytics.
+ */
+export function adsNotice(day) {
+  const when = adsEffectiveDate(day);
+  return {
+    privacy: {
+      ko: `<p><strong>변경 예고:</strong> ${when.ko}부터 웹판에 Google AdSense(Google LLC, 미국) 광고가 나옵니다. 광고를 위해 처리하는 정보, 쿠키, 거부하는 법은 그날 시행되는 개정 방침 10번에 적습니다.</p>`,
+      en: `<p><strong>Upcoming change:</strong> From ${when.en}, the web version will show ads from Google AdSense (Google LLC, USA). The data and cookies used for the ads and how to opt out will be set out in section 10 of the revised policy that takes effect that day.</p>`,
+      ja: `<p><strong>変更の予告:</strong> ${when.ja}から、ウェブ版にGoogle AdSense(Google LLC、米国)の広告を表示します。広告のために取り扱う情報、Cookie、拒否する方法は、同日に施行される改定後の本方針の10に記載します。</p>`,
+    },
+    terms: {
+      ko: `<p><strong>변경 예고:</strong> ${when.ko}부터 3항이 바뀌어, 웹판의 판 밖 자리(사건 리포트 아래 등)에 광고가 나올 수 있습니다. 광고는 점수·랭킹·결말에 영향을 주지 않습니다.</p>`,
+      en: `<p><strong>Upcoming change:</strong> From ${when.en}, item 3 changes: ads may appear in the web version away from the table, such as below a case report. Ads never affect your score, ranking or ending.</p>`,
+      ja: `<p><strong>変更の予告:</strong> ${when.ja}から第3項が変わり、ウェブ版の勝負の外の場所(事件レポートの下など)に広告が表示されることがあります。広告が点数・ランキング・結末に影響することはありません。</p>`,
+    },
+  };
+}
+
+/**
+ * Section 6's way to keep data at home, once the ads are on: its paragraph
+ * ends on how to limit what is sent for them (section 10's opt-outs). The
+ * paragraph's last sentence is the same with Google Analytics on or off, so
+ * AD_EDITS and ANALYTICS_AD_EDITS share the pair.
+ */
+const AD_TRANSFER_OPT_OUT = {
+  ko: [
+    "게임의 이야기와 판은 이 기능 없이 끝까지 할 수 있습니다.</p>",
+    "게임의 이야기와 판은 이 기능 없이 끝까지 할 수 있습니다. 광고를 위한 전송은 10번의 방법(맞춤형 광고 끄기, 제3자 쿠키 차단)으로 줄일 수 있습니다.</p>",
+  ],
+  en: [
+    "The whole story and every table remain playable without them.</p>",
+    "The whole story and every table remain playable without them. What is sent for the ads can be limited as described in section 10 (turning off personalized ads, blocking third-party cookies).</p>",
+  ],
+  ja: [
+    "本ゲームのストーリーと勝負は、これらの機能がなくても最後まで遊べます。</p>",
+    "本ゲームのストーリーと勝負は、これらの機能がなくても最後まで遊べます。広告のための送信は、10の方法(パーソナライズド広告のオフ、サードパーティCookieのブロック)で減らすことができます。</p>",
+  ],
+};
+
+/**
+ * What the pages say once the web has ads (draft for 출시 로드맵 2단계): each
+ * pair is a sentence of the page as written above and what replaces it.
+ */
+export const AD_EDITS = {
+  privacyKo: [
+    [
+      "<li>진행은 기본적으로 이 기기(브라우저 저장소)에만 저장됩니다. 서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>",
+      "<li>진행은 기본적으로 이 기기(브라우저 저장소)에만 저장됩니다. 개발자의 서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>",
+    ],
+    [
+      "<li>지금은 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>",
+      "<li>웹판에는 Google AdSense 광고가 나오고, 광고를 보여 주는 Google이 쿠키 등으로 정보를 처리합니다(10번). 그 밖의 광고·분석용 쿠키나 외부 추적 도구는 쓰지 않습니다.</li>",
+    ],
+    [
+      "<p>게임은 쿠키를 쓰지 않습니다.",
+      "<p>게임 자체는 쿠키를 쓰지 않습니다. 광고를 보여 주는 Google은 10번처럼 쿠키와 그와 비슷한 식별자를 쓸 수 있습니다.",
+    ],
+    [
+      "<p>국외 이전을 원하지 않으면",
+      "<p>Google LLC(미국): 광고 표시와 측정을 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+    ],
+    AD_TRANSFER_OPT_OUT.ko,
+    [
+      "<p>지금은 광고가 없습니다. 나중에 광고를 붙이게 되면, 붙이기 전에 광고와 관련한 처리 내용(광고 회사, 쿠키, 거부하는 법)을 이 방침에 더해 알립니다.</p>",
+      `<p>웹판에는 Google LLC의 광고 서비스인 Google AdSense 광고가 나옵니다. 광고는 사건 리포트 아래처럼 판 밖의 자리에만 나오고, 판·결정·브리핑 도중에는 나오지 않으며, 점수·랭킹·결말에 영향을 주지 않습니다.</p>
+<ul>
+<li>처리하는 자: Google LLC(미국). 개발자는 광고를 통해 이용자를 알아볼 수 있는 정보를 받지 않습니다.</li>
+<li>항목(행태정보 포함): 쿠키와 그와 비슷한 식별자, IP 주소와 그로 추정한 대략적인 위치, 브라우저·기기 정보, 광고를 본 기록과 누른 기록</li>
+<li>목적: 광고 표시, 광고 성과 측정, 부정 클릭 방지, 이용자가 허용한 경우 관심사에 맞춘 광고(맞춤형 광고)</li>
+<li>보유 기간과 처리 방식: Google의 정책을 따릅니다 — ${link(AD_POLICY_LINKS.ads)}, ${link(AD_POLICY_LINKS.partners)}</li>
+<li>맞춤형 광고 거부: ${link(AD_POLICY_LINKS.settings)}에서 끄거나 브라우저에서 제3자 쿠키를 막을 수 있습니다. 거부해도 광고 수와 게임 내용은 같고, 관심사와 관계없는 광고가 나옵니다.</li>
+<li>유럽 경제 지역(EEA)·영국·스위스에서 접속하면 광고를 불러오기 전에 Google의 동의 창(「개인정보 보호 및 메시지」)이 떠서 광고 쿠키 사용 여부를 고를 수 있고, 고른 것은 나중에 바꿀 수 있습니다.</li>
+</ul>`,
+    ],
+  ],
+  privacyEn: [
+    [
+      "<li>Your progress is saved on your device (browser storage) by default. Only the four kinds of data in section 2 ever reach a server.</li>",
+      "<li>Your progress is saved on your device (browser storage) by default. Only the four kinds of data in section 2 ever reach our servers.</li>",
+    ],
+    [
+      "<li>The game currently shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>",
+      "<li>The web version shows Google AdSense ads, and Google, which serves them, processes data with cookies and similar technologies (section 10). We use no other advertising or analytics cookies or third-party trackers.</li>",
+    ],
+    [
+      "<p>The game uses no cookies.",
+      "<p>The game itself uses no cookies. Google, which serves the ads, may use cookies and similar identifiers as described in section 10.",
+    ],
+    [
+      "<p>To avoid the transfer,",
+      "<p>Google LLC (USA) serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
+    ],
+    AD_TRANSFER_OPT_OUT.en,
+    [
+      "<p>The game currently shows no ads. If ads are added later, this policy will describe them (the ad provider, cookies and how to opt out) before they appear.</p>",
+      `<p>The web version shows ads from Google AdSense, a service of Google LLC. Ads appear only away from the table, such as below a case report — never during a table, a decision or a briefing — and never affect your score, ranking or ending.</p>
+<ul>
+<li>Who processes it: Google LLC (USA). We receive nothing from the ads that identifies you.</li>
+<li>What: cookies and similar identifiers, your IP address and the approximate location derived from it, browser and device information, and which ads were shown and clicked</li>
+<li>Why: to show ads, measure them, prevent click fraud and, if you allow it, show ads based on your interests (personalized ads)</li>
+<li>How long and how: under Google's policies — ${link(AD_POLICY_LINKS.ads)}, ${link(AD_POLICY_LINKS.partners)}</li>
+<li>To opt out of personalized ads: turn them off at ${link(AD_POLICY_LINKS.settings)} or block third-party cookies in your browser. You will see the same number of ads and the same game, with ads not based on your interests.</li>
+<li>In the EEA, the UK and Switzerland, Google's consent message (Privacy &amp; messaging) asks before ads load whether ad cookies may be used, and you can change your choice later.</li>
+</ul>`,
+    ],
+  ],
+  privacyJa: [
+    [
+      "<li>進行は原則としてこの端末(ブラウザのストレージ)にのみ保存されます。サーバーに送られる情報は、下記2の4種類だけです。</li>",
+      "<li>進行は原則としてこの端末(ブラウザのストレージ)にのみ保存されます。開発者のサーバーに送られる情報は、下記2の4種類だけです。</li>",
+    ],
+    [
+      "<li>現在、広告はなく、広告・分析用のCookieや外部のトラッキングツールも使用していません。</li>",
+      "<li>ウェブ版にはGoogle AdSenseの広告が表示され、広告を配信するGoogleがCookieなどにより情報を取り扱います(10)。それ以外の広告・分析用のCookieや外部のトラッキングツールは使用していません。</li>",
+    ],
+    [
+      "<p>本ゲームはCookieを使用しません。",
+      "<p>本ゲーム自体はCookieを使用しません。広告を配信するGoogleは、10のとおりCookieやそれに類する識別子を使用することがあります。",
+    ],
+    [
+      "<p>国外移転を望まない場合は、",
+      "<p>Google LLC(米国): 広告の表示と測定のため、10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は、",
+    ],
+    AD_TRANSFER_OPT_OUT.ja,
+    [
+      "<p>現在、広告はありません。将来広告を導入する場合は、導入する前に、広告に関する取り扱いの内容(広告会社、Cookie、拒否する方法)を本方針に追加してお知らせします。</p>",
+      `<p>ウェブ版には、Google LLCの広告サービスであるGoogle AdSenseの広告が表示されます。広告は事件レポートの下など勝負の外の場所にのみ表示され、勝負・決断・ブリーフィングの途中には表示されず、点数・ランキング・結末に影響しません。</p>
+<ul>
+<li>取り扱う者: Google LLC(米国)。開発者は、広告を通じて利用者を識別できる情報を受け取りません。</li>
+<li>項目(行動履歴情報を含む): Cookieやそれに類する識別子、IPアドレスとそこから推定したおおよその位置、ブラウザ・端末の情報、広告の表示履歴とクリック履歴</li>
+<li>目的: 広告の表示、広告の効果測定、不正クリックの防止、利用者が許可した場合は関心に合わせた広告(パーソナライズド広告)</li>
+<li>保有期間と取り扱いの方法: Googleのポリシーに従います — ${link(AD_POLICY_LINKS.ads)}、${link(AD_POLICY_LINKS.partners)}</li>
+<li>パーソナライズド広告の拒否: ${link(AD_POLICY_LINKS.settings)}でオフにするか、ブラウザでサードパーティCookieをブロックできます。拒否しても広告の数とゲームの内容は同じで、関心とは関係のない広告が表示されます。</li>
+<li>欧州経済領域(EEA)・英国・スイスからアクセスした場合は、広告を読み込む前にGoogleの同意画面(「プライバシーとメッセージ」)が表示され、広告Cookieを使用するかどうかを選べます。選んだ内容は後から変更できます。</li>
+</ul>`,
+    ],
+  ],
+  termsKo: [
+    [
+      "<li>웹판은 무료이며 광고와 유료 결제가 없습니다.",
+      "<li>웹판은 무료이며 유료 결제가 없습니다. 사건 리포트 아래처럼 판 밖의 자리에 광고가 나올 수 있고, 광고는 점수·랭킹·결말에 영향을 주지 않습니다.",
+    ],
+  ],
+  termsEn: [
+    [
+      "<li>The web version is free, with no ads and no payments.",
+      "<li>The web version is free, with no payments. Ads may appear away from the table, such as below a case report, and never affect your score, ranking or ending.",
+    ],
+  ],
+  termsJa: [
+    [
+      "<li>ウェブ版は無料で、広告や有料の決済はありません。",
+      "<li>ウェブ版は無料で、有料の決済はありません。事件レポートの下など勝負の外の場所に広告が表示されることがあり、広告が点数・ランキング・結末に影響することはありません。",
+    ],
+  ],
+};
+
+/** Each pair of `edits` applied to `body`, or a thrown error when a sentence to replace is not in it exactly once. site-pages.mjs uses it too. */
+export function applyEdits(body, edits, name) {
+  return edits.reduce((text, [from, to]) => {
+    const at = text.indexOf(from);
+    if (at < 0 || text.indexOf(from, at + 1) >= 0) throw new Error(`${name}: "${from.slice(0, 40)}..." is not in the page exactly once`);
+    return text.slice(0, at) + to + text.slice(at + from.length);
+  }, body);
+}
+
+/**
+ * The ad edits on top of the policy that already has Google Analytics
+ * (`ANALYTICS_POLICY`): the build both switches on is the one the web runs
+ * once it has ads (GA from 11-12, ads after the 11-23 판정). Where the two
+ * touch the same sentence -- the summary's line on trackers, section 3's
+ * cookies, Google in section 6 -- the sentence says both in one; the
+ * summary's server line already reads "the game's server" there, and
+ * section 10 and the terms are the ones AD_EDITS writes.
+ */
+export const ANALYTICS_AD_EDITS = {
+  privacyKo: [
+    [
+      "<li>지금은 광고가 없고 광고용 쿠키를 쓰지 않습니다. 방문 통계에는 Google 애널리틱스와 그 쿠키를 씁니다.</li>",
+      "<li>웹판에는 Google AdSense 광고가 나오고, 방문 통계에는 Google 애널리틱스를 씁니다. 두 서비스를 운영하는 Google이 쿠키 등으로 정보를 처리합니다(2번 (5), 10번). 그 밖의 광고·분석용 쿠키나 외부 추적 도구는 쓰지 않습니다.</li>",
+    ],
+    [
+      "<p>게임 자체는 쿠키를 쓰지 않습니다(방문 통계용 Google 애널리틱스 쿠키는 2번 (5)). ",
+      "<p>게임 자체는 쿠키를 쓰지 않습니다. 방문 통계용 Google 애널리틱스 쿠키는 2번 (5)에, 광고를 보여 주는 Google이 쓸 수 있는 쿠키와 그와 비슷한 식별자는 10번에 적었습니다. ",
+    ],
+    [
+      "2번 (5)의 보유 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+      "2번 (5)의 보유 기간 동안 저장됩니다. 웹판의 광고도 Google이 보여 주고 측정하며, 이를 위해 10번의 정보가 광고를 불러올 때 네트워크로 전송되어 Google의 정책에 따른 기간 동안 저장됩니다.</p>\n<p>국외 이전을 원하지 않으면",
+    ],
+    AD_TRANSFER_OPT_OUT.ko,
+    AD_EDITS.privacyKo.at(-1),
+  ],
+  privacyEn: [
+    [
+      "<li>The game currently shows no ads and uses no advertising cookies. Visit statistics use Google Analytics and its cookies.</li>",
+      "<li>The web version shows Google AdSense ads and uses Google Analytics for visit statistics; Google, which runs both, processes data with cookies and similar technologies (sections 2 (e) and 10). We use no other advertising or analytics cookies or third-party trackers.</li>",
+    ],
+    [
+      "<p>The game itself uses no cookies (the Google Analytics cookies for visit statistics are described in section 2 (e)). ",
+      "<p>The game itself uses no cookies. The Google Analytics cookies for visit statistics are described in section 2 (e), and the cookies and similar identifiers Google, which serves the ads, may use in section 10. ",
+    ],
+    [
+      "for the period in section 2 (e).</p>\n<p>To avoid the transfer,",
+      "for the period in section 2 (e). Google also serves and measures the ads: the data in section 10 is sent when an ad loads and kept under Google's policies.</p>\n<p>To avoid the transfer,",
+    ],
+    AD_TRANSFER_OPT_OUT.en,
+    AD_EDITS.privacyEn.at(-1),
+  ],
+  privacyJa: [
+    [
+      "<li>現在、広告はなく、広告用のCookieも使用していません。訪問統計にはGoogleアナリティクスとそのCookieを使用します。</li>",
+      "<li>ウェブ版にはGoogle AdSenseの広告が表示され、訪問統計にはGoogleアナリティクスを使用します。両方を運営するGoogleがCookieなどにより情報を取り扱います(2の(5)、10)。それ以外の広告・分析用のCookieや外部のトラッキングツールは使用していません。</li>",
+    ],
+    [
+      "<p>本ゲーム自体はCookieを使用しません(訪問統計用のGoogleアナリティクスのCookieについては2の(5)をご覧ください)。",
+      "<p>本ゲーム自体はCookieを使用しません。訪問統計用のGoogleアナリティクスのCookieについては2の(5)を、広告を配信するGoogleが使用することがあるCookieやそれに類する識別子については10をご覧ください。",
+    ],
+    [
+      "2の(5)の保有期間のあいだ保存されます。</p>\n<p>国外移転を望まない場合は",
+      "2の(5)の保有期間のあいだ保存されます。また、ウェブ版の広告もGoogleが配信・測定しており、そのために10の情報が広告の読み込み時にネットワークを通じて送信され、Googleのポリシーに従った期間保存されます。</p>\n<p>国外移転を望まない場合は",
+    ],
+    AD_TRANSFER_OPT_OUT.ja,
+    AD_EDITS.privacyJa.at(-1),
+  ],
+  termsKo: AD_EDITS.termsKo,
+  termsEn: AD_EDITS.termsEn,
+  termsJa: AD_EDITS.termsJa,
+};
+
+/**
+ * The pages' `ads` switch as a stage: `false` off, `true` on (with the pages' dates left as they are, as the
+ * tests that only read the ad wording pass it), or what the build reads from ADSENSE_ADS and ADSENSE_DATE,
+ * `{ stage: "notice" | "on", date: "2026-12-01" }`. The notice cannot be written without its day.
+ */
+export function adStage(ads) {
+  if (!ads) return { stage: "off", date: "" };
+  if (ads === true) return { stage: "on", date: "" };
+  const { stage, date = "" } = ads;
+  if (stage !== "notice" && stage !== "on" && stage !== "off") throw new Error(`ads.stage is "off", "notice" or "on"; got "${stage}".`);
+  if (stage === "notice" && !date) throw new Error("The notice of the ads needs the day they start (ADSENSE_DATE).");
+  return { stage, date };
 }
 
 /**
@@ -828,28 +1211,59 @@ function forApp(page) {
 /**
  * Every page this file writes: `{ "privacy.html": "<!doctype html>...", ... }`, keyed by path from the root without its slash.
  * With `analytics` every page carries Google's tag, and the policy its Google Analytics section and that section's date.
- * `app` is the store apps' build (`--mode app`), whose pages say what its ads and purchase do; it never has
- * `analytics` (`analyticsFor`), and its policy has no notice of it either.
+ * `ads` is the ads' stage (ADSENSE_ADS and ADSENSE_DATE, `adStage`): with `notice` the two policies open with
+ * the notice of the change (`adsNotice`) and say nothing else new; with `on` they say what the web's ads need --
+ * AD_EDITS on the policy as written, or ANALYTICS_AD_EDITS on the one with Google Analytics -- and carry the
+ * day as their date. Without `ads` the pages are main's, byte for byte, either way.
+ * `app` is the store apps' build (`--mode app`), whose pages say what its ads and purchase do (APP_LINES); it
+ * never has `analytics` (`analyticsFor`) nor the web's `ads`, and its policy has no notice of Google Analytics either.
  */
-export function renderLegalPages({ analytics: given = null, app = false } = {}) {
+export function renderLegalPages({ analytics: given = null, ads: givenAds = false, app = false } = {}) {
   const analytics = app ? null : given;
+  const ads = app ? false : givenAds;
+  const { stage, date } = adStage(ads);
+  const notice = stage === "notice" ? adsNotice(date) : null;
+  const effective = stage === "on" && date ? adsEffectiveDate(date) : null;
+  const table = analytics ? ANALYTICS_AD_EDITS : AD_EDITS;
+  const tableName = analytics ? "ANALYTICS_AD_EDITS" : "AD_EDITS";
+  const edit = (body, name) => (stage === "on" ? applyEdits(body, table[name], `legal-pages ${tableName}.${name}`) : body);
+  const noticed = (kind, language, body) => (notice ? `\n${notice[kind][language]}${body}` : body);
   const privacy = (language, body) => {
     if (analytics) return withSwaps(body, ANALYTICS_POLICY[language]);
     return app ? withSwaps(body, [[`${ANALYTICS_NOTICE[language]}\n`, ""]]) : body;
   };
-  const dateOf = ({ kind, language }) => (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE)[language];
+  const dateOf = ({ kind, language }) =>
+    (effective ?? (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE))[language];
   const pages = [
-    { kind: "privacy", language: "ko", body: privacy("ko", PRIVACY_KO) },
-    { kind: "privacy", language: "en", body: privacy("en", PRIVACY_EN) },
-    { kind: "privacy", language: "ja", body: privacy("ja", PRIVACY_JA) },
-    { kind: "terms", language: "ko", body: TERMS_KO },
-    { kind: "terms", language: "en", body: TERMS_EN },
-    { kind: "terms", language: "ja", body: TERMS_JA },
+    { kind: "privacy", language: "ko", body: noticed("privacy", "ko", edit(privacy("ko", PRIVACY_KO), "privacyKo")) },
+    { kind: "privacy", language: "en", body: noticed("privacy", "en", edit(privacy("en", PRIVACY_EN), "privacyEn")) },
+    { kind: "privacy", language: "ja", body: noticed("privacy", "ja", edit(privacy("ja", PRIVACY_JA), "privacyJa")) },
+    { kind: "terms", language: "ko", body: noticed("terms", "ko", edit(TERMS_KO, "termsKo")) },
+    { kind: "terms", language: "en", body: noticed("terms", "en", edit(TERMS_EN, "termsEn")) },
+    { kind: "terms", language: "ja", body: noticed("terms", "ja", edit(TERMS_JA, "termsJa")) },
   ];
   return Object.fromEntries(
     pages.map((page) => [
       pagePath(page.kind, page.language).slice(1),
-      renderDocumentPage({ ...(app ? forApp(page) : page), effective: dateOf(page), analytics }),
+      renderDocumentPage({ ...(app ? forApp(page) : page), description: LEGAL_DESCRIPTION[page.kind][page.language], effective: dateOf(page), analytics }),
     ]),
   );
 }
+
+/**
+ * What a search result says under each policy's title. Until 11-03 it was the
+ * title again (「개인정보처리방침」); each line names the sections the page
+ * has, in the order it has them.
+ */
+export const LEGAL_DESCRIPTION = {
+  privacy: {
+    ko: `「임계점: CRITICAL POINT」가 처리하는 개인정보의 항목과 목적, 보유 기간(${days}일), 이 기기에 저장하는 정보, 열람·삭제를 요청하는 방법을 안내합니다.`,
+    en: `What Critical Point processes and why, how long it is kept (${days} days), what is stored on your device, and how to ask to see or delete your data.`,
+    ja: `『臨界点: CRITICAL POINT』が取り扱う個人情報の項目と目的、保有期間(${days}日)、この端末に保存する情報、閲覧・削除を請求する方法をご案内します。`,
+  },
+  terms: {
+    ko: "「임계점: CRITICAL POINT」의 이용 조건입니다. 무료 웹판, 게임 속 칩과 점수, 공개 랭킹, 참가자 게시판의 규칙과 개발자의 책임 범위를 정합니다.",
+    en: "The terms for playing Critical Point: the free web version, in-game chips and scores, the public ranking, the participants' board and the limits of the developers' responsibility.",
+    ja: "『臨界点: CRITICAL POINT』の利用条件です。無料のウェブ版、ゲーム内のチップとスコア、公開ランキング、参加者掲示板のルールと開発者の責任の範囲を定めます。",
+  },
+};

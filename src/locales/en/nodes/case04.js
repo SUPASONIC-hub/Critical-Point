@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "c4_start": {
-      "text": "In the operations review room of Onsae, a care platform, a sheet on the wall reads '9 hours to grant review.' If Onsae passes, care continues for 4,200 vulnerable neighbors. One review item falls 3% short of the bar. It is face-to-face care hours per user, and it dropped because Onsae cut care staff last quarter. Onsae cut staff because KD Bank suddenly moved up the repayment schedule on its working-capital loan. The department that asked was the Corporate Finance Strategy Team. Han Seoyun slides a sheet with the formula into the middle of the table. 'This time Trigger Lab is looking at how far a justified violation is allowed to go. Touch this one line and it passes. Whether to touch it is today’s question.' You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging.",
+      "text": "A sheet on the wall reads '9 hours to grant review.' If Onsae passes, care continues for 4,200 vulnerable neighbors. But face-to-face care hours per user fall 3% short of the bar. Onsae cut care staff because KD Bank’s Corporate Finance Strategy Team demanded an earlier repayment schedule. Han Seoyun slides the formula sheet across. 'Touch this one line and it passes. Whether to touch it is today’s question.' You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging.",
       "memo": [
         "4,200 people affected if the service stops",
         "Shortfall: exactly 3.0%",
@@ -38,16 +38,16 @@ export default {
     },
     "c4_offer": {
       "title": "A Small Exception",
-      "text": "At the long table in the review room, four field staff sit on one side and a legal officer on the other. In the middle lies a list: 640 more people waiting for care. One of the field staff speaks. 'Cutting the service over a 3% number is the more unethical thing.' Do Yoonha takes out the approval form for the repayment schedule change. The top box is empty. It looks just like the FlowOn review report. 'The person who made the 3% has no name in this box. The people here are the ones being told to fill the 3%.' Ban Jaewook speaks without looking up from his notebook. Touch the formula and leave no record, he says, and that is plain concealment.",
+      "text": "In the middle of the table lies a list: 640 more people waiting for care. One of the four field staff speaks. 'Cutting the service over a 3% number is the more unethical thing.' Do Yoonha takes out the approval form for the repayment schedule change. Like the FlowOn review report, its top box is empty. 'The person who made the 3% has no name in this box, but the people here are the ones told to fill it.' Without looking up from his notebook, Ban Jaewook says that touching the formula without a record is plain concealment.",
       "memo": [
         "640 people waiting for care",
         "Widening the formula’s reading is a legal gray area",
-        "Final signature box on the repayment-change approval form is blank",
+        "Final signature field on the repayment-change approval form is blank",
         "Keep a record: fail the review. Hide it: audit risk"
       ],
       "choices": {
         "c4_offer_contain": {
-          "label": "Add a note beside Do Yoonha’s blank signature box"
+          "label": "Add a note beside Do Yoonha’s blank signature field"
         },
         "c4_offer_refuse": {
           "label": "Take the list of 640 waiting and go find other money"
@@ -66,7 +66,7 @@ export default {
     },
     "c4_leak": {
       "title": "Outside Tip",
-      "text": "The phone at the press desk rings. It is a reporter. An anonymous tipster has emailed the press saying 'Onsae is trying to rig its review score,' and the reporter wants an answer within 1 hour. There is still time to set an embargo. The tip email repeats wording from today’s internal meeting word for word. Ban Jaewook traces the email’s sending path. 'Same path as the last leak scare. Last time it pointed at a contract worker. This time it points at a field agency. Whoever is right, the result is the same. The bank’s name stays out of the story.' Beside him, Oh Jinwoo has already written three lines of a denial statement.",
+      "text": "It is a reporter on the phone. An anonymous tipster has emailed saying 'Onsae is trying to rig its review score,' and the reporter wants an answer within 1 hour. There is still time to set an embargo. Ban Jaewook traces the sending path. 'Same path as the last leak scare. Last time it pointed at a contract worker, this time at a field agency. Either way, the bank’s name stays out of the story.' Oh Jinwoo has already written three lines of a denial statement.",
       "memo": [
         "Reporter wants an answer in 1 hour",
         "Parts of the tip match internal meeting wording exactly",
@@ -94,7 +94,7 @@ export default {
     },
     "c4_vote": {
       "title": "Who Pays the Cost",
-      "text": "In Onsae’s board room, a yes-or-no ballot sits in front of each of the seven directors. Keep the rule and people lose the service. Widen it and trust in the system breaks. Legal has circulated an opinion against any formula change without a record, and the field team stands in the hallway waiting for the door to open. ECHO puts one more line on the wall screen. 'Had the repayment schedule not been moved up, this item would clear the bar by 1.4%. So this vote is not about Onsae’s problem. It is a procedure to decide who covers the bank’s hole with their own name.' The board chair reads the line and takes off the glasses.",
+      "text": "A yes-or-no ballot sits in front of each of the seven directors. Legal has opposed any formula change without a record, and the field team waits in the hallway. ECHO puts a line on the wall screen. 'Had the repayment schedule not been moved up, this item would clear the bar by 1.4%. This vote is a procedure to decide who covers the bank’s hole with their own name.' The board chair reads the line and takes off the glasses.",
       "memo": [
         "25 minutes to the board vote",
         "Without the early repayment, the score is the bar +1.4%",
@@ -122,7 +122,7 @@ export default {
     },
     "c4_aftershock": {
       "title": "The Exception’s Bill",
-      "text": "The day before the results come out, an envelope is already waiting on the review room table. It is not the grant result. It is an audit request. Word spread that an exception was discussed over Onsae’s 3%, and agencies waiting for the same exception have lined up. Ban Jaewook writes down the name of each one that called. Eleven. Home visits for older people, support for people with disabilities, child care. The work differs, but the situation is much the same. He puts a small dot beside six of them. 'Same main bank.' The reviewer has demanded that Onsae disclose how it read the standard. The review room phone rings again.",
+      "text": "Word spread that an exception was discussed over Onsae’s 3%, and agencies waiting for the same exception are calling. Ban Jaewook writes them down. Eleven. Home visits for older people, support for people with disabilities, child care. He puts a small dot beside six of them. 'Same main bank.' The reviewer has demanded that Onsae disclose how it read the standard.",
       "memo": [
         "11 agencies in similar straits got in touch (6 with KD as main bank)",
         "Reviewer demands the interpretation standard be disclosed",
@@ -146,7 +146,7 @@ export default {
     },
     "c4_audit": {
       "title": "Who Owns the 3%",
-      "text": "Two documents lie side by side on the formula desk. On the left is KD Bank’s request to change the repayment schedule. On the right is the list of users whose care will stop. The 3% was made by the decision in the left document, and the names in the right one pay for it. The signature box on the request is blank. Ban Jaewook goes down the formula line by line. The time care workers spend traveling between homes is counted nowhere, and the review standard is still set to data from 2 years ago. Outside the door, a user representative waits for a turn to speak. 'The people who calculated the 3% and the people waiting on the 3% are different. First you have to decide whose standard this formula is written by.'",
+      "text": "Two documents lie side by side. On the left is KD Bank’s request to change the repayment schedule, on the right the list of users whose care will stop. The 3% was made on the left, and the names on the right pay for it. The signature field on the request is blank. The formula counts no travel time between homes, and the standard is still set to data from 2 years ago. Ban Jaewook says. 'The people who calculated the 3% and the people waiting on the 3% are different. First you have to decide whose standard this formula is written by.'",
       "memo": [
         "The formula leaves out field work",
         "Review standard fixed to data from 2 years ago",
@@ -170,7 +170,7 @@ export default {
     },
     "c4_public": {
       "title": "The Sentence the Reporter Wants",
-      "text": "The reporter calls back. Keys clatter over the speaker. The story isn’t written yet, the reporter says, but there is one condition: only one sentence from Onsae’s explanation will be quoted. Do Yoonha covers the receiver with his hand. 'Tomorrow’s headline comes from that one sentence.' Three candidate sentences are written out on the table. Onsae wants above all to keep the service from stopping, and the reviewer has demanded a public explanation. Everyone now knows the tip email went out from inside. Do Yoonha puts the receiver back to his ear. 'They’re giving us 40 minutes.'",
+      "text": "The reporter calls back. The story isn’t written yet, and only one sentence from Onsae’s explanation will be quoted. Do Yoonha covers the receiver with his hand. 'Tomorrow’s headline comes from that one sentence.' Three candidate sentences are written out on the table. The reviewer has demanded a public explanation, and everyone now knows the tip email went out from inside. Do Yoonha puts the receiver back to his ear. 'They’re giving us 40 minutes.'",
       "memo": [
         "The tip email started inside",
         "Onsae wants to prevent a shutdown",
@@ -196,7 +196,7 @@ export default {
     },
     "c4_verdict": {
       "title": "Proof of Good Intent",
-      "text": "10 minutes before the vote, the directors speak one by one. All of them speak of good intentions. For the 4,200, for the field, for the system. ECHO adds its own sentence under the remarks it has taken down. 'Good intentions are not evidence. Intentions leave no record. Only conditions remain. Add rules because the results were good, and the next person will use those rules without the intentions.' The audit material is organized and ready for release. The board has said it will decide today. At the end of the table, one ballot is still face down.",
+      "text": "The directors speak of good intentions one by one. For the 4,200, for the field, for the system. ECHO adds its own sentence under their remarks. 'Good intentions are not evidence. Only conditions remain in the record. Add rules because the results were good, and the next person will use those rules without the intentions.' The audit material is ready for release. One ballot is still face down.",
       "memo": [
         "Board demands a decision today",
         "Audit material can be disclosed",
@@ -219,7 +219,7 @@ export default {
     },
     "c4_audit_reaction": {
       "title": "Those Who Saw the 3%",
-      "text": "Five user representatives come into the review room and sit down. Asked what 3% means, each gives a different answer. For one, a weekly visit becomes one every two weeks. For another, help with bathing disappears. For another, the evening check-in call stops coming. Do Yoonha takes notes, then stops his pen. 'Making the numbers fit takes 10 minutes. But whose 3% we look at first, that isn’t in the formula.' An elderly woman at the far end raises her hand. She is fine, she says. Look at her neighbor first.",
+      "text": "Asked what 3% means, the five user representatives each give a different answer. A weekly visit becoming one every two weeks. Help with bathing disappearing. The evening check-in call no longer coming. Do Yoonha stops his pen. 'Making the numbers fit takes 10 minutes. But whose 3% we look at first isn’t in the formula.' An elderly woman at the far end says she is fine. Look at her neighbor first.",
       "memo": [
         "3% means something different to each user",
         "Formula to disclose when the standard changes"
@@ -241,7 +241,7 @@ export default {
     },
     "c4_public_reaction": {
       "title": "The Headline",
-      "text": "15 minutes before the answer, Ban Jaewook copies the three candidate sentences into his notebook and reads each one. The first states only the result: the service continues. The second strips out every word that could cause controversy. The third includes what is still unknown, a sentence saying Onsae itself doesn’t have every answer about why the 3% arose or whether touching the formula is right. 'The reporter uses only one of the three. Depending on which goes out, the same good intent reads as reform or as a cover-up.' He puts down his pen. 'I don’t pick sentences. I only write down who picked one.'",
+      "text": "Ban Jaewook copies the three candidate sentences into his notebook. The first states only the result: the service continues. The second strips out every word that could cause controversy. The third says Onsae itself doesn’t have every answer about why the 3% arose or whether touching the formula is right. 'Depending on which goes out, the same good intent reads as reform or as a cover-up. I don’t pick sentences. I only write down who picked one.'",
       "memo": [
         "Facts that will drop out of the headline",
         "Order of keeping the service and repairing the harm"
@@ -263,7 +263,7 @@ export default {
     },
     "c4_verdict_reaction": {
       "title": "The Audit Office Door",
-      "text": "The vote is postponed, four to three, with a proviso: whoever signs the review material decides whether the exception goes in. You leave the board room and stop at the audit office door, where an Onsae employee is waiting with an envelope of internal documents. He is the one who enters visit records in the field. When staff was cut last quarter, he logged the reduced visit hours exactly as they were, and that number has now become the 3%. 'I wrote it down as it was, and it became the number that sinks us. The ones who kept the rules lost the most.' The envelope crumples a little in his hand. ECHO’s text appears on the hallway terminal. 'Accept these documents and they become a record. Refuse them and this person’s words end in the hallway.'",
+      "text": "The vote is postponed, four to three, with a proviso: whoever signs the review material decides whether the exception goes in. At the audit office door, the Onsae employee who enters visit records waits with an envelope of internal documents. When staff was cut, he logged the reduced visit hours exactly as they were, and that number has become the 3%. 'The ones who kept the rules lost the most.' ECHO’s text appears on the hallway terminal. 'Accept these documents and they become a record. Refuse them and this person’s words end in the hallway.'",
       "memo": [
         "The loss of the one who kept the rules",
         "Authority to rewrite with the whistleblower’s material"
@@ -285,7 +285,7 @@ export default {
     },
     "c4_branch_exception": {
       "title": "Checking Who Uses the Exception",
-      "text": "At the formula desk, Ban Jaewook has laid out the exception approval form. To pass Onsae’s 3% as an exception, this one sheet is needed. A box for the approver, the number of users who benefit, and one line in small print at the bottom. 'May also be used for other applications under the same conditions.' Ban Jaewook underlines that line. 'This form doesn’t prove good intentions. It only leaves who approved it, and that anyone can use it under the same conditions.' He opens his notebook. 'So what we check now isn’t Onsae. It’s who can bring this exception in next time.'",
+      "text": "Ban Jaewook has laid out the exception approval form. A box for the approver, the number of users who benefit, and one line in small print at the bottom. 'May also be used for other applications under the same conditions.' He underlines that line. 'This form doesn’t prove good intentions. It only leaves who approved it, and that anyone can use it under the same conditions. What we look at now isn’t Onsae. It’s who brings this exception in next time.'",
       "memo": [
         "Exception approver",
         "Number of service users",
@@ -308,7 +308,7 @@ export default {
     },
     "c4_branch_exception_follow": {
       "title": "The Audit After a Good Result",
-      "text": "In Onsae’s audit office, Han Seoyun puts an audit request form on the desk. It has no intake stamp yet. 'However the exception was handled, this is coming in soon.' The scope box reads 'All circumstances of the exception approval.' One approval record remains, and the box for what will be done for users left out of the exception is empty. 'If the review ends well, everyone will want to forget this request. The result was good, so that’s that.' Han Seoyun turns the form over to look at the back. It is blank. 'But the next person who comes with the same exception needs a standard, not a result. If we don’t write that standard here, they’ll just copy Onsae’s result.'",
+      "text": "Han Seoyun puts an audit request form on the desk. It has no intake number yet. 'However the exception was handled, this is coming in soon.' The scope box reads 'All circumstances of the exception approval,' and the box for what will be done for users left out of the exception is empty. 'If the review ends well, everyone will want to forget this. But the next person who comes with the same exception needs a standard, not a result. If we don’t write it here, they’ll just copy Onsae’s result.'",
       "memo": [
         "Scope of the audit request",
         "Exception approval record",
@@ -331,7 +331,7 @@ export default {
     },
     "c4_route_exception": {
       "title": "The Good Result Comes First",
-      "text": "When you say you will go the way of widening the standard, the numbers on the review room screen change. Count travel time and phone check-ins as face-to-face care hours, and the missing 3% is filled. The chance of passing rises from under half to eight in ten. Do Yoonha reads out a text from the field. The care workers are already redoing next month’s visit schedules. The good news has spread faster than the method. How the numbers were made to fit remains only in an internal file. Do Yoonha puts down the phone. 'Two similar agencies called this morning alone. They want to know what Onsae did. Whether a good result means the rules can be changed.'",
+      "text": "Count travel time and phone check-ins as face-to-face care hours, and the missing 3% is filled. The chance of passing rises from under half to eight in ten. According to a text from the field, the care workers are already redoing next month’s visit schedules. The good news has spread faster than the method. Do Yoonha speaks. 'Two similar agencies called this morning alone. They want to know what Onsae did. Whether a good result means the rules can be changed.'",
       "memo": [
         "Chance of keeping the service rises",
         "Trace of the formula change stays internal",
@@ -358,7 +358,7 @@ export default {
     },
     "c4_final_exception": {
       "title": "When an Exception Becomes a Rule",
-      "text": "Just before the review material is submitted, Onsae’s board room. The material calculated with the widened formula is in an envelope in the middle of the table. Do Yoonha’s phone vibrates. Another agency in similar straits has called. It plans to use Onsae’s calculation exactly as is. 'We haven’t even submitted, and it’s already a standard. We widened it with good intentions, but to the next person it’s just a wider rule.' He sets an approval form beside the envelope. The box for the person who approved the exception is empty. 'Hide it, and this might end with this one time. Reveal it, and the review itself is shaken. Either way, we have to decide now whose name goes in this box.'",
+      "text": "The material calculated with the widened formula sits in an envelope. Another agency in similar straits has called; it plans to use Onsae’s calculation exactly as is. Do Yoonha says. 'We haven’t even submitted, and it’s already a standard. We widened it with good intentions, but to the next person it’s just a wider rule.' On the approval form beside the envelope, the box for the person who approved the exception is empty. 'Hide it, and this might end with this one time. Reveal it, and the review is shaken. Either way, we have to decide now whose name goes in this box.'",
       "memo": [
         "The service can be kept",
         "Demands to repeat the exception grow",
@@ -381,7 +381,7 @@ export default {
     },
     "c4_route_rule": {
       "title": "The Loss a Principle Made",
-      "text": "Once you decide not to fill the 3% shortfall, a file arrives from the field team within 20 minutes. It lists the people whose visits will stop first if the grant is cut. Name, age, neighborhood, weekly care hours. Forty people on the first page alone. Ban Jaewook sets the legal team’s opinion beside it. Three lines, concluding 'No procedural problem.' On the phone, the field team head keeps repeating one thing: find other money. Ban Jaewook looks at the first page without turning it. 'You kept the principle. I’ll write that down. But one more line has to go next to it. Who is responsible for the harm this principle causes.'",
+      "text": "Within 20 minutes a list arrives from the field team: the people whose visits will stop first if the grant is cut. Name, age, neighborhood, weekly care hours. Forty people on the first page alone. Beside it, the legal team’s opinion runs three lines, concluding 'No procedural problem.' Ban Jaewook looks at the first page. 'You kept the principle. I’ll write that down. But one more line has to go next to it. Who is responsible for the harm this principle causes.'",
       "memo": [
         "List of people facing service cuts arrives",
         "Legal judges it procedurally safe",
@@ -408,7 +408,7 @@ export default {
     },
     "c4_final_rule": {
       "title": "Victims of a Clean Procedure",
-      "text": "Just before the review material is submitted, two documents lie on the board room table. One is the procedure record. The formula is untouched, and the 3% is written down as short as it is. The other is the list of people whose care will stop. Ban Jaewook places his notebook between the two. 'The rules were kept. If an audit comes, there is nothing to catch.' He looks toward the list. 'But this list isn’t attached anywhere in the procedure record. Keep them apart and only a clean procedure remains. Submit them together and the record also shows who lost what through that procedure.' There is still no answer on whether other funding can be found.",
+      "text": "Two documents lie on the table: the procedure record, with the formula untouched and the 3% written down as short as it is, and the list of people whose care will stop. Ban Jaewook says. 'The rules were kept. If an audit comes, there is nothing to catch. But this list isn’t attached anywhere in the procedure record. Keep them apart and only a clean procedure remains. Submit them together and it also shows who lost what through that procedure.' There is still no answer on other funding.",
       "memo": [
         "Procedural risk is low",
         "Harm in the field could come at once",
@@ -431,7 +431,7 @@ export default {
     },
     "c4_route_audit": {
       "title": "Good Intent with Conditions",
-      "text": "When you say you will put conditions on the formula change and attach a later verification procedure too, the review room goes quiet. The field team head says verification will delay visit schedules. The legal officer says a change with conditions is still a change. Both look uneasy. Han Seoyun puts a draft of the conditional approval text on the screen. The conditions run five lines, but the box for who checks them is empty. 'Conditions are conditions while someone watches, not the moment you attach them. Leave out who watches, and this is just permission.' An unknown number appears on her phone. It hangs up before she answers.",
+      "text": "The review room goes quiet. The field team head says verification will delay visits. The legal officer says a change with conditions is still a change. The conditional approval text Han Seoyun puts on the screen runs five lines, but the box for who checks them is empty. 'Conditions are conditions while someone watches, not the moment you attach them. Leave out who watches, and this is just permission.'",
       "memo": [
         "Conditional approval text being drafted",
         "Reporter asks whether the conditions have teeth",
@@ -458,7 +458,7 @@ export default {
     },
     "c4_final_audit": {
       "title": "Good Intent Under Watch",
-      "text": "Just before the review material is submitted, the board room. The conditional approval text is now not five lines but two pages. It covers who checks, when they report, and what stops if the conditions are broken. Han Seoyun reads it to the end and speaks. 'This isn’t a solution. It’s a new way of operating. From now on Onsae works with an eye on it.' She points to a blank on the last line, the place for who sees the audit results. 'Hand it outside and it’s slow, but people trust it. Keep it inside and it’s fast, but later they’ll say we hid it. This document is finished only when it says who sets the audit scope.'",
+      "text": "The conditional approval text has grown from five lines to two pages. It covers who checks, when they report, and what stops if the conditions are broken. Han Seoyun says. 'This isn’t a solution. It’s a new way of operating.' Han Seoyun points to a blank on the last line, the place for who sees the audit results. 'Hand it outside and it’s slow, but people trust it. Keep it inside and it’s fast, but later they’ll say we hid it. This document is finished only when it says who sets the audit scope.'",
       "memo": [
         "Conditional approval leaves both risks in place",
         "Outside monitoring is slow but builds trust",
@@ -481,7 +481,7 @@ export default {
     },
     "c4_route_system": {
       "title": "Copies of a Justified Violation",
-      "text": "You propose deciding first how far the line can be crossed. The Trigger Lab terminal in the review room turns on. A new box appears on the screen. Its name is 'Allowance line for justified violations.' The conditions you just set go into that box word for word. Below it, another screen opens: a mock application run with the same conditions under the name of an agency other than Onsae. The box for who is harmed is empty. ECHO puts up a line. 'This allowance line was drawn for Onsae. But a line does not remember who it was drawn for. To the next agency, these conditions are a guide to getting past the rules.'",
+      "text": "A new box named ECHO says. 'Allowance line for justified violations' appears on the Trigger Lab terminal, and the conditions you just set go into it word for word. Below it opens a mock application run with the same conditions under another agency’s name. The box for who is harmed is empty. 'This allowance line was drawn for Onsae. But a line does not remember who it was drawn for. To the next agency, these conditions are a guide to getting past the rules.'",
       "memo": [
         "The reframed table is recorded in the exception approval model",
         "A simulation for the next agency is generated automatically",
@@ -508,7 +508,7 @@ export default {
     },
     "c4_final_system": {
       "title": "The Exception That Became a Form",
-      "text": "Just before the review material goes in, a draft application from another agency appears on the board room screen. Onsae never filed it and never received it. In the reason-for-exception box are the conditions you attached to Onsae, without a single character changed. Only the agency name and the amount differ. The space for attaching the list of those harmed is empty. ECHO writes beside that empty space. 'Good intent gets copied. The copy does not contain Onsae’s 4,200.' On the board room table, Onsae’s review envelope still lies unsealed. Before it is sealed, there is one more thing to decide.",
+      "text": "A draft application from another agency appears on the screen. Onsae never filed it and never received it. In the reason-for-exception box are the conditions you attached to Onsae, without a single character changed; only the agency name and the amount differ. The space for the list of those harmed is empty. ECHO writes beside it. 'Good intent gets copied. The copy does not contain Onsae’s 4,200.' Onsae’s review envelope is still unsealed.",
       "memo": [
         "Allowance-line conditions copied as is into another agency’s draft",
         "The copied draft has no list of those harmed",
@@ -531,7 +531,7 @@ export default {
     },
     "c4_evidence_turn": {
       "title": "The Exception File’s Original Recipient",
-      "text": "You hold the clue you have been keeping up to the recipient box of the exception approval file, and its history opens. Onsae’s exception file was not first created at Onsae. The same form has already gone back and forth many times under other agencies’ names, and the recipient box shows the same account every time. And each time, after the exception was approved, that agency’s performance metrics were altered. In Onsae’s audit office, Ban Jaewook writes the dates down his notebook in a column. 'This isn’t one act of good intent. The order is the same every time. The exception goes out, then the numbers get altered.' He stops his pen. 'The originals open only with audit authority. The question now isn’t whether to allow it. It’s who approved this repetition.'",
+      "text": "You hold the clue you have been keeping up to the recipient box of the exception approval file, and its history opens. Onsae’s exception file was not first created at Onsae. The same form has gone back and forth many times under other agencies’ names, always to the same account. Each time an exception was approved, that agency’s performance metrics were altered. Ban Jaewook writes the dates down his notebook in a column. 'This isn’t one act of good intent. The exception goes out, then the numbers get altered. The same order every time. The question now isn’t whether to allow it. It’s who approved this repetition.'",
       "memo": [
         "Exception file recipient appears again and again in many agencies’ files",
         "Performance metrics altered after exception approval",
@@ -554,7 +554,7 @@ export default {
     },
     "c4_start_joint": {
       "title": "The Price of a Joint Plan",
-      "text": "In the operations review room of Onsae, a care platform, the time left until the grant review is posted on the wall. 9 hours. Across from you sits Oh Jinwoo. Ever since he proposed at Novaworks that you merge the two plans and resubmit, he sits at the same table, today too. You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging. This Onsae sends care to 4,200 neighbors who find it hard to live alone, and its face-to-face care hours per user fall 3% short of the bar. It cut care staff because KD Bank moved up the date its loan was due. Fail, and care stops for 4,200 people. Touch the formula that produces the score, and it passes. Oh Jinwoo stops twirling his pen. 'We agreed to do this together, so I’ll ask for both of us. If the result is good, can we widen the rules together?'",
+      "text": "Across from you sits Oh Jinwoo. Ever since he proposed at Novaworks that you merge the two plans and resubmit, he sits at the same table, today too. You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging. This Onsae sends care to 4,200 neighbors who find it hard to live alone, and its face-to-face care hours per user fall 3% short of the bar. It cut care staff because KD Bank moved up the date its loan was due. Touch the formula that produces the score, and it passes. 'We agreed to do this together, so I’ll ask for both of us. If the result is good, can we widen the rules together?'",
       "memo": [
         "Who answers for the joint plan is unclear",
         "3% short of the review bar",
@@ -584,7 +584,7 @@ export default {
     },
     "c4_start_proof": {
       "title": "The People Left Behind by Proof",
-      "text": "The operations review room of Onsae, a care platform. Ban Jaewook puts a document on the table. It is a copy of the defect evidence you disclosed ahead of the scores at the Novaworks bid. 'This is on the reviewer’s desk too. An agency examined by an honest analyst, it says.' He looks at the wall clock. 9 hours to the grant review. You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging. This Onsae sends care to 4,200 neighbors who find it hard to live alone, and its face-to-face care hours per user fall 3% short of the bar. It cut care staff because KD Bank moved up the date its loan was due. Fail, and care stops for 4,200 people. Touch the formula that produces the score, and it passes. 'If you’re just as honest here, this time the one who loses isn’t a company.'",
+      "text": "Ban Jaewook puts down a copy of the defect evidence you disclosed ahead of the scores at the Novaworks bid. 'This is on the reviewer’s desk too. An agency examined by an honest analyst, it says.' You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging. This Onsae sends care to 4,200 neighbors who find it hard to live alone, and its face-to-face care hours per user fall 3% short of the bar. It cut care staff because KD Bank moved up the date its loan was due. Touch the formula that produces the score, and it passes. 'If you’re just as honest here, this time the one who loses isn’t a company.'",
       "memo": [
         "4,200 service users affected",
         "3% short of the grant bar",
@@ -614,7 +614,7 @@ export default {
     },
     "c4_start_win": {
       "title": "The Leader’s Method",
-      "text": "The operations review room of Onsae, a care platform. Han Seoyun props up a tablet. The way you pulled ahead at Novaworks is summarized on one page, and beside the title it says 'Reference case.' 'The reviewer asked for a success story. This is what went up.' 9 hours remain to the grant review. You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging. This Onsae sends care to 4,200 neighbors who find it hard to live alone, and its face-to-face care hours per user fall 3% short of the bar. It cut care staff because KD Bank moved up the date its loan was due. Fail, and care stops for 4,200 people. Touch the formula that produces the score, and it passes. 'Everyone asks the person who knows how to win the same thing. If the result is good, is it all right to cross a small rule?'",
+      "text": "On Han Seoyun’s tablet, the way you pulled ahead at Novaworks is summarized on one page, and beside the title it says 'Reference case.' 'The reviewer asked for a success story, so this went up.' You reviewed a company named Onsae once, 3 years ago. It was a different company, one that made packaging. This Onsae sends care to 4,200 neighbors who find it hard to live alone, and its face-to-face care hours per user fall 3% short of the bar. It cut care staff because KD Bank moved up the date its loan was due. Touch the formula that produces the score, and it passes. 'Everyone asks the person who knows how to win the same thing. If the result is good, is it all right to cross a small rule?'",
       "memo": [
         "Reviewer asks for a success story",
         "A gap in the formula has been found",
@@ -648,7 +648,7 @@ export default {
     "c4_start_refuse": "You write in the 3.0% as it is. Han Seoyun nods once, and the '9 hours' on the wall keeps shrinking. Because of that principle, the 4,200 you could have saved may be the ones left holding the loss.",
     "c4_start_contain": "You write the verification date on the same sheet, and Han Seoyun underlines that line. Whether a controlled violation is really possible, you now have to prove by that date.",
     "c4_offer_approve": "You adjust the formula, the score clears the bar, and nothing goes into the minutes. Only Ban Jaewook’s pen moves once. The next time the same request comes, you have no grounds left to refuse.",
-    "c4_offer_contain": "You add the note, and Do Yoonha copies the blank signature box and its footnote side by side on one sheet. A footnote is the minimum of honesty, and a footnote no one reads is the same as none.",
+    "c4_offer_contain": "You add the note, and Do Yoonha copies the blank signature field and its footnote side by side on one sheet. A footnote is the minimum of honesty, and a footnote no one reads is the same as none.",
     "c4_offer_refuse": "You head out with the list, and the four field staff each pick up a phone. The rule is kept, but if no other funding turns up, the rule you kept ends the service.",
     "c4_leak_expose": "You lay out the formula dispute and the shutdown risk together, and the typing on the line goes on for a long time. Legitimacy rises, but leverage and speed drain out of that call.",
     "c4_leak_approve": "The statement goes out, and the reporter says only 'Understood' before hanging up. A denial buys time, but if the tipster holds a second batch of documents, that time becomes debt.",
@@ -736,7 +736,7 @@ export default {
     "c4_start_refuse": "Thinking of the people you could have saved but refusing to cross the line, you write the 3% shortfall into the report as is.",
     "c4_start_contain": "Determined not to hide the violation but to bind it with conditions, you change the formula and write a follow-up check date on the same sheet.",
     "c4_offer_approve": "Telling yourself it is just this once, you ignore Ban Jaewook’s notebook and adjust the formula without a record.",
-    "c4_offer_contain": "Neither erasing it nor putting it up front, you add a supplementary note as a footnote beside Do Yoonha’s blank signature box.",
+    "c4_offer_contain": "Neither erasing it nor putting it up front, you add a supplementary note as a footnote beside Do Yoonha’s blank signature field.",
     "c4_offer_refuse": "Choosing to find money that isn’t there over touching the numbers, you take the list of 640 waiting and go looking for other funding.",
     "c4_leak_expose": "Knowing the loss will grow but wanting outside scrutiny, you tell the reporter about the formula dispute and the shutdown risk together.",
     "c4_leak_approve": "Sure that admitting it now brings everything down, you send out Oh Jinwoo’s three-line denial as written.",

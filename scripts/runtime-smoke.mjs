@@ -70,6 +70,19 @@ async function fresh() {
   await page.waitForSelector(".intro-shell", { timeout: TIMEOUT });
 }
 
+/**
+ * The intro's start button. On a cleared device it opens B-3(1)'s cold opening
+ * first while the switch is on (src/coldOpeningSwitch.js): the page is played
+ * through, panel by panel, so its lazy chunk is loaded and walked as well.
+ */
+async function pressStart() {
+  await page.getByTestId("start-first-case").click();
+  await page.waitForSelector(".game-shell, [data-testid='cold-opening']", { timeout: TIMEOUT });
+  for (let press = 0; press < 8 && (await page.getByTestId("cold-opening").count()); press += 1) {
+    await page.locator("[data-testid='cold-opening-next'], [data-testid='cold-opening-start']").click();
+  }
+}
+
 let debugTools = false;
 
 await step("intro loads", async () => {
@@ -85,7 +98,7 @@ await step(debugTools ? "debug jump into a scene" : "start the first case from t
     await page.getByTestId("debug-node-select").selectOption("p1_start");
     await page.getByTestId("debug-start-node").click();
   } else {
-    await page.getByTestId("start-first-case").click();
+    await pressStart();
   }
   await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
 });
@@ -134,13 +147,10 @@ async function stakeAndCash(cardIndex = 0) {
   for (let press = 0; press < 6 && !(await cash.isEnabled()); press += 1) {
     await page.getByTestId("commit-push").click();
   }
-  await cash.click();
-  // The case's last choice takes a hold or a second press (holdConfirm.js);
-  // a click there only arms it.
-  if (await page.evaluate(() => "hold" in (document.querySelector("[data-testid='commit-confirm']")?.dataset ?? {}))) {
-    await page.waitForSelector("[data-testid='commit-confirm'][data-hold='armed']", { timeout: 2000 });
-    await cash.click();
-  }
+  // The case's last choice, and a table in the danger zone, take a 0.6s hold
+  // (holdConfirm.js); a click there only shows the hint.
+  const held = await page.evaluate(() => "hold" in (document.querySelector("[data-testid='commit-confirm']")?.dataset ?? {}));
+  await cash.click(held ? { delay: 1000 } : {});
 }
 
 await step("stake a card on the table", async () => {
@@ -199,7 +209,7 @@ await step("판을 다시 짠다 opens the case's hidden route", async () => {
     // No jump in this build: start a fresh run, whose first table deals the
     // wild card as well.
     await fresh();
-    await page.getByTestId("start-first-case").click();
+    await pressStart();
   }
   await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
   await openTable();

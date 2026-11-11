@@ -10,6 +10,7 @@ interface ImportMetaEnv {
 // Written by the bundler (`define` in vite.config.js); absent under Node.
 declare const __CP_DEBUG_BUILD__: boolean;
 declare const __CP_SERVICE_WORKER__: "on" | "ask" | "off";
+declare const __CP_COLD_OPENING__: boolean;
 /** True only in the store apps' build (`--mode app`, app/build-web.mjs). */
 declare const __CP_APP__: boolean;
 
