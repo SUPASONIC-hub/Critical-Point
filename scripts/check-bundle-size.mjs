@@ -156,7 +156,8 @@ const budgets = [
   // 146,589 / 54,099 -> 149,553 / 55,207 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 425eb4da (#392 #398 #395). Measured 149,549 / 55,203 in the e2e build, the plus 4.
   // 150,964 / 55,742 -> 153,646 / 56,482 on 2026-11-10, E-11 번외 사건 틀 (draft) over main 3a507805: the side run and the kit the side screen takes (as above). Measured 153,642 / 56,478 in the e2e build, the plus 4.
   // -> 153,686 / 56,482 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 153,682 / 56,476 in the e2e build, the plus 4 (gzip under).
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_686, maxGzip: 56_482 },
+  // -> 153,705 / 56,489 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 153,701 / 56,485 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_705, maxGzip: 56_489 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -558,7 +559,8 @@ const budgets = [
   // 196,509 / 70,854 -> 197,272 / 71,169 on 2026-11-10, memory-line-i18n (draft) over main cb8346da: the NEW GAME+ panel draws the last season's line from the record's ending and verdict in the page's language (getMemoryLine and its three lines moved from the runtime's seasonLines to introPanels), and the shell has a 결말 도감 stored in another language written again once the runtime is in (isStaleBook, #496 질문 1). Measured 197,268 / 71,165 in the e2e build, plus 4.
   // -> 199,649 / 72,275 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together: the side slot (#301), the stale-book refresh (#501), the ad switch (#350). Measured 199,645 / 72,271 in the e2e build, the plus 4.
   // -> 199,649 / 72,266 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 199,645 / 72,262 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 199_649, maxGzip: 72_266 },
+  // -> 200,275 / 72,598 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 200,271 / 72,594 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 200_275, maxGzip: 72_598 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2063,7 +2065,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 371,424 / 429,687 / 437,379 (font-split) and 435,285 / 493,575 / 501,186 (main 568572d3: #484 deps, #503) -> 371,483 / 429,748 / 437,438 on 2026-11-11, font-split after merging main 568572d3: both, and the critical CSS regenerated. Measured 371,479 / 429,744 / 437,434 in the e2e build, the plus 4.
 // 371,483 / 429,748 / 437,438 (font-split) and 436,673 / 495,280 / 502,895 (bundle 1111) -> 372,867 / 431,449 / 439,148 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split): both, the critical CSS regenerated. Measured 372,863 / 431,445 / 439,144 in the e2e build, the plus 4.
 // -> 372,960 / 431,541 / 439,239 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 372,956 / 431,537 / 439,235 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 372_960, en: 431_541, ja: 439_239 };
+// -> 373,291 / 431,871 / 439,569 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 373,287 / 431,867 / 439,565 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_291, en: 431_871, ja: 439_569 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2232,7 +2235,8 @@ function checkBudget(file, budget) {
 // 10,619 / 3,810 -> 10,663 / 3,820 on 2026-11-10, font-split over main cb8346da: the second font file joins the install list. Measured 10,659 / 3,816 in the e2e build, the plus 4.
 // 10,656 / 3,820 (E-11) and 10,663 / 3,820 (font-split) -> 10,700 / 3,839 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split): both files in the install list. Measured 10,696 / 3,835 in the e2e build, the plus 4.
 // -> 10,700 / 3,831 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 10,696 / 3,827 in the e2e build, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_700, maxGzip: 3_831 };
+// -> 10,769 / 3,861 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 10,765 / 3,857 in the e2e build, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_769, maxGzip: 3_861 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
