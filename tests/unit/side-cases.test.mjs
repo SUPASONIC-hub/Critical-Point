@@ -74,6 +74,7 @@ const { side00 } = await import("../../src/nodes/side00.js");
 const { side01 } = await import("../../src/nodes/side01.js");
 const { SIDE_CASES } = await import("../../src/nodes/sidePacks.js");
 const sideCases = await import("../../src/sideCases.js");
+const sideMarks = await import("../../src/state/sideMarks.js");
 const sideRun = await import("../../src/state/sideRun.js");
 const { checkSidePack } = await import("../../src/state/sidePackCheck.js");
 const { nodes } = await import("../../src/gameData.js");
@@ -360,12 +361,67 @@ test("the settled-window log takes no side window", () => {
   assert.equal(config.recordSettledWindowSeed("run:0:p1_start"), true);
 });
 
-test("the online save carries no side record", async () => {
-  globalThis.localStorage = createStorage({ [SIDE_CASES_KEY]: JSON.stringify({ side01: { closedAt: "2026-12-01T00:00:00.000Z" } }) });
+test("the online save carries the side cases' completion marks beside the run, and no run in progress", async () => {
+  const inProgress = { nodeId: "s1_shop", resources: {}, log: [], run: {}, runId: "side-x" };
+  globalThis.localStorage = createStorage({
+    [SIDE_CASES_KEY]: JSON.stringify({
+      side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress },
+      side02: { closedAt: null, outcomeChoiceId: null, inProgress },
+    }),
+  });
   const cloud = await import("../../src/cloudSave.js");
   const records = cloud.readDeviceRecords();
-  assert.equal(JSON.stringify(records).includes("side01"), false);
-  assert.equal(JSON.stringify(cloud.createCloudSavePayload({ currentCase: "case01" }, records)).includes("side"), false);
+  assert.deepEqual(records.sideCases, { side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers" } });
+  const payload = cloud.createCloudSavePayload({ currentCase: "case01", log: [] }, records);
+  assert.equal(JSON.stringify(payload).includes("s1_shop"), false, "a run in progress stays on its device");
+  // The run is the season's: the side mark rides only in deviceRecords.
+  const { deviceRecords, ...run } = payload;
+  assert.equal(JSON.stringify(run).includes("side"), false);
+  assert.deepEqual(Object.keys(deviceRecords), ["sideCases"]);
+  // Nothing closed yet: nothing goes up.
+  globalThis.localStorage = createStorage({ [SIDE_CASES_KEY]: JSON.stringify({ side01: { closedAt: null, outcomeChoiceId: null, inProgress } }) });
+  assert.equal("sideCases" in cloud.readDeviceRecords(), false);
+});
+
+test("closing a side case tells the online save a record changed; a decision saved mid-run does not", async () => {
+  globalThis.localStorage = createStorage();
+  const fired = [];
+  const previous = globalThis.dispatchEvent;
+  globalThis.dispatchEvent = (event) => fired.push([event.type, event.detail]);
+  try {
+    const pack = sideRun.prepareSidePack(side00);
+    const closed = playThrough(pack, { pick: 0, save: true });
+    assert.deepEqual(fired, [], "a decision saved mid-run is not an upload");
+    assert.equal(sideRun.closeSideCase(closed), true);
+    assert.deepEqual(fired, [[config.DEVICE_RECORD_WRITTEN_EVENT, { key: SIDE_CASES_KEY }]]);
+  } finally {
+    globalThis.dispatchEvent = previous;
+  }
+});
+
+test("marks merge: a case closed on either device stays closed, the later close keeps its ending, and this device's run stays", () => {
+  const run = { nodeId: "s1_shop", resources: {}, log: [], run: {}, runId: "here" };
+  const local = {
+    side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_blank", inProgress: run },
+    side02: { closedAt: null, outcomeChoiceId: null, inProgress: run },
+  };
+  const remote = {
+    side01: { closedAt: "2026-12-03T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: { nodeId: "s1_letter" } },
+    side02: { closedAt: "2026-12-02T00:00:00.000Z", outcomeChoiceId: "s2_after_x" },
+    side03: { closedAt: null, outcomeChoiceId: null },
+    case12: { closedAt: "2026-12-02T00:00:00.000Z" },
+  };
+  assert.deepEqual(sideMarks.mergeSideMarks(local, remote), {
+    side01: { closedAt: "2026-12-03T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: run },
+    side02: { closedAt: "2026-12-02T00:00:00.000Z", outcomeChoiceId: "s2_after_x", inProgress: run },
+  });
+  // An older close from the copy does not replace this device's later one; a tie is the copy's.
+  const older = { side01: { closedAt: "2026-11-30T00:00:00.000Z", outcomeChoiceId: "s1_after_order" } };
+  assert.equal(sideMarks.mergeSideMarks(local, older).side01.outcomeChoiceId, "s1_after_blank");
+  const tie = { side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_order" } };
+  assert.equal(sideMarks.mergeSideMarks(local, tie).side01.outcomeChoiceId, "s1_after_order");
+  assert.deepEqual(sideMarks.mergeSideMarks(null, "not a record"), {});
+  assert.equal(sideMarks.sideCaseMarks(null), null);
 });
 
 test("the season case's reading tally is put back after a side case is read", async () => {
