@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, TriangleAlert, Trophy } from "lucide-react";
+import { ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, TriangleExclamationPoint, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
 import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
@@ -368,7 +368,7 @@ export function IntroScreen({ view, renderers = {} }) {
                       aria-controls={showErrorLog ? "error-log-panel" : undefined}
                       onClick={() => setShowErrorLog(true)}
                     >
-                      <TriangleAlert size={15} />
+                      <TriangleExclamationPoint size={15} />
                       에러 로그
                     </button>
                   )}
