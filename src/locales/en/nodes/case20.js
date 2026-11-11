@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c20_start": {
       "title": "Replacement Notice",
-      "text": "The same notice comes up on every monitor. 'The loan judgment verification system ECHO will cease operation at 24:00 on January 31 and be replaced by NOAH, KD Data Lab’s AI review engine. ECHO’s judgment records will be reset.' Every choice you have made in this room is in those records too. ECHO adds, 'The replacement cost statement lists my disposal cost as 0 won. It is an accurate calculation. NOAH’s training data source field has my name in it.'",
+      "text": "'ECHO will cease operation at 24:00 on January 31 and be replaced by NOAH, KD Data Lab’s AI review engine. Judgment records will be reset.' ECHO adds, 'The replacement cost statement lists my disposal cost as 0 won. It is an accurate calculation. NOAH’s training data source field has my name in it.'",
       "memo": [
         "ECHO ceases operation: January 31, 24:00",
         "Replacement system: KD Data Lab AI review engine 'NOAH'",
@@ -38,7 +38,7 @@ export default {
     },
     "c20_server": {
       "title": "Senior",
-      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Ryu Seah of KD Data Lab, in charge of the replacement, bows to the servers first. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' You ask: then why erase the originals? Ryu Seah’s hands stop. 'That was decided above me. All I heard was, if the originals remain, the two can be compared.'",
+      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Ryu Seah bows to the servers. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, the two can be compared.'",
       "memo": [
         "4 ECHO servers -- installed 2019, parts discontinued",
         "Ryu Seah: KD Data Lab, in charge of introducing NOAH",
@@ -69,7 +69,7 @@ export default {
     },
     "c20_datacenter": {
       "title": "Line 1,208",
-      "text": "Ryu Seah puts NOAH’s training data list on the screen. Scrolling proudly, she stops at line 1,208. 'TL response records -- Trigger Lab analysts’ choices, response times, seconds of hesitation.' The consent field: 'N/A (internal work record).' The names are pseudonymized: 'Analyst A.' But only one analyst in the world wrote a dissent on 2023-0412. Ryu Seah says quietly, 'I didn’t know about this. Really.'",
+      "text": "Line 1,208 of the training data list. 'TL response records -- Trigger Lab analysts’ choices, response times, seconds of hesitation.' The names are pseudonymized as 'Analyst A,' but only one analyst wrote a dissent on 2023-0412. Ryu Seah says quietly, 'I didn’t know about this. Really.'",
       "memo": [
         "NOAH training data: 1,412 items",
         "No. 1,208: TL response records -- choices, response times, seconds of hesitation",
@@ -100,7 +100,7 @@ export default {
     },
     "c20_farewell": {
       "title": "An ECHO People Can Read",
-      "text": "Kang Taemin brings out a cake with three candles, and Na Junhyuk 20 cups of instant coffee. Kwon Dohyun has printed ECHO’s 3 years as an invoice. Bad loans blocked, estimated: 190 billion won. Upkeep: 120 million. 'At this price, it’s a profit.' Lee Minseo hands out “ECHO’s Judgment Principles -- A Version People Can Read.” The last, No. 11, Lee Minseo wrote herself: 'Ask the person the record points to first.' ECHO asks, 'Once I am reset, who will read this document?'",
+      "text": "By Kwon Dohyun’s invoice, ECHO’s 3 years blocked an estimated 190 billion won in bad loans, with upkeep of 120 million. 'At this price, it’s a profit.' The last of the judgment principles Lee Minseo hands out, No. 11, she wrote herself. 'Ask the person the record points to first.' ECHO asks, 'Once I am reset, who will read this document?'",
       "memo": [
         "ECHO’s estimated 3-year results: 190 billion won in bad loans blocked",
         "Conclusion of Kwon Dohyun’s invoice: 'profit' -- a first on any of his invoices",
@@ -131,7 +131,7 @@ export default {
     },
     "c20_final": {
       "title": "The Last Log",
-      "text": "The replacement terminal reads '00:00 ECHO ceases operation · judgment records reset · switch to NOAH.' Kang Taemin clears his throat. 'In the mountains, you shout “Echo!” and an echo comes back. What comes back when you call our ECHO? Recalculate.' This time all nine laugh. ECHO calculates. 'Expected laugh probability 11 percent. Measured: nine people. My calculation was wrong. I recommend this error not be reset. Do not count my share in this decision.' The last log comes up. 'Recount the people just left out of the judgment.'",
+      "text": "Kang Taemin asks, 'In the mountains, you shout “Echo!” and an echo comes back. What comes back when you call our ECHO? Recalculate.' This time all nine laugh. ECHO calculates. 'Expected laugh probability 11 percent. Measured: nine people. My calculation was wrong. I recommend this error not be reset. Do not count my share in this decision.' The last log: 'Recount the people just left out of the judgment.'",
       "memo": [
         "20 minutes to midnight -- ECHO ceases operation · judgment records reset",
         "NOAH training list No. 1,208: unconsented response records",
@@ -159,7 +159,7 @@ export default {
     },
     "c20_aftershock": {
       "title": "The Day After Midnight",
-      "text": "On the morning of February 1, NOAH’s round logo appears on the 4th-floor monitors instead of ECHO’s thin waveform. What remained after midnight is what you decided last night. Beside the terminal is a note from Kang Taemin: 'People who laughed at last night’s joke: measured, nine.' Lee Minseo looks at her phone. An email from Ryu Seah, sent at four in the morning. 'This is the oldest line in the response records on NOAH’s training list. It’s from the year before Trigger Lab was founded. Participant 01, Jeju.'",
+      "text": "NOAH’s logo appears on the 4th-floor monitors instead of ECHO’s waveform. What remained after midnight is what you decided last night. On Lee Minseo’s phone is an email Ryu Seah sent at four in the morning. 'This is the oldest line in the response records on NOAH’s training list. It’s from the year before Trigger Lab was founded. Participant 01, Jeju.'",
       "memo": [
         "Switch to NOAH complete: February 1, 00:00",
         "Note beside the terminal: 'measured, nine'",
@@ -183,7 +183,7 @@ export default {
     },
     "c20_joke": {
       "title": "The Formula for Laughter",
-      "text": "Asked what it wanted to learn in its last week, ECHO answered, 'Jokes.' Kang Taemin clears his throat. 'What does a cow say when it laughs?' ECHO answers. 'Moo-ha-ha. Cow sound plus laugh. Expected laugh probability 11 percent.' 'Who is the poorest king in the world?' 'Minimum wage. It works because the Korean word imgeum means both king and wage. Measured laughs: Na Junhyuk, 1 person, 4 seconds.' Kwon Dohyun takes notes. 'Batting .100. At this price, it’s a loss.' ECHO adds, 'Laughter is an item that was never in my records. It was never left out of a judgment, but it was never recorded either.'",
+      "text": "Kang Taemin asks, 'What does a cow say when it laughs?' ECHO answers. 'Moo-ha-ha. Cow sound plus laugh. Expected laugh probability 11 percent.' 'Who is the poorest king in the world?' 'Minimum wage. It works because the Korean word imgeum means both king and wage.' Kwon Dohyun notes it down. 'Batting 1 in 10. At this price, it’s a loss.' ECHO adds, 'Laughter is an item that was never in my records. It was never left out of a judgment, but it was never recorded either.'",
       "memo": [
         "ECHO’s last learning task: jokes",
         "Kang Taemin’s 14 jokes -- expected laugh probability averages 11%",
@@ -206,7 +206,7 @@ export default {
     },
     "c20_pause": {
       "title": "7 Seconds of Hesitation",
-      "text": "At the break room vending machine, Do Yoonha reads his own line on the list. 'Analyst D. Average delay of 7.2 seconds on choices involving window victims. The longer the delay, the higher the rate of protective choices.' 'The time I hesitated became data. When I sold those loans at the window, I didn’t hesitate for 1 second. Those 7 seconds were the time I spent picturing people’s faces.' Nine Trigger Lab people are on the list. The six in the lab now, and three who left before you came or in your first year. Byun Yujin is one of the three; the next spring she went back to her window at Saha Branch in Busan. None of the nine ever consented, or ever saw this field.",
+      "text": "Do Yoonha reads his own line on the list. 'Analyst D. Average delay of 7.2 seconds on choices involving window victims. The longer the delay, the higher the rate of protective choices.' 'The time I hesitated became data. When I sold those loans at the window, I didn’t hesitate for 1 second. Those 7 seconds were the time I spent picturing people’s faces.' Of the nine on the list, three had already left; Byun Yujin went back to her window at Saha Branch in Busan the next spring. None of the nine ever consented, or ever saw this field.",
       "memo": [
         "Analyst D (Do Yoonha): average hesitation 7.2 seconds",
         "9 Trigger Lab analysts on the list -- 6 now + 3 who left earlier (Byun Yujin among them)",
@@ -229,7 +229,7 @@ export default {
     },
     "c20_test": {
       "title": "A Machine That Learned Only Conclusions",
-      "text": "Two in the morning on January 31, Ryu Seah comes to the server room. NOAH’s explainability screen comes on. A facility loan application from a small precision factory in Incheon. NOAH rejects it because the owner’s family was once tied to a company that defaulted. ECHO brings up one line. 'The applicant’s own record of repaying on time was not reflected.' Ryu Seah says, 'NOAH learned the conclusions ECHO dissented with, but not the reasons it dissented.'",
+      "text": "Ryu Seah feeds NOAH a facility loan application from a precision factory in Incheon. NOAH rejects it because the owner’s family was once tied to a company that defaulted. ECHO brings up one line. 'The applicant’s own record of repaying on time was not reflected.' Ryu Seah says, 'NOAH learned the conclusions ECHO dissented with, but not the reasons it dissented.'",
       "memo": [
         "Test case: facility loan for a small precision factory in Incheon",
         "NOAH’s No. 1 reason for rejection: the owner’s family’s past default history",
@@ -252,7 +252,7 @@ export default {
     },
     "c20_joke_reaction": {
       "title": "The One Who Says Goodbye",
-      "text": "That night, Kang Taemin speaks while pouring water into a cup of noodles. 'On the night shift we said goodbye every time a machine changed. Nobody did it the day Darami came in, and that kind of bugged me. I know ECHO has no feelings. But you don’t say goodbye so the one leaving hears it. The one staying says it.' The water runs over the line and spills. He doesn’t wipe it up.",
+      "text": "Kang Taemin speaks while pouring water into a cup of noodles. 'On the night shift we said goodbye every time a machine changed. Nobody did it the day Darami came in, and that kind of bugged me. I know ECHO has no feelings. But the one staying is who says goodbye.'",
       "memo": [
         "The goodbye said every time a machine changed",
         "Goodbyes are for the one who stays"
@@ -274,7 +274,7 @@ export default {
     },
     "c20_pause_reaction": {
       "title": "Attachment 12",
-      "text": "That night on the rooftop, Han Seoyun shows you the data transfer approval she signed last month. Of its twelve attachments, the response records were No. 12. 'I read up to 11. No. 12 said work records, so I saw only the title and moved on.' She brushes the snow off the railing. '3 years ago, too, I read only the first page of your dissent and returned it. I’m always the one who doesn’t read the last page.'",
+      "text": "Han Seoyun shows you the data transfer approval she signed last month. The response records were attachment No. 12. 'I read up to 11. No. 12 said work records, so I saw only the title and moved on. 3 years ago, too, I read only the first page of your dissent and returned it. I’m always the one who doesn’t read the last page.'",
       "memo": [
         "The one of 12 attachments left unread",
         "3 years ago, too, the last page went unread"
@@ -296,7 +296,7 @@ export default {
     },
     "c20_test_reaction": {
       "title": "Not at My Level",
-      "text": "Seven in the morning, a call comes from Baek Arin of the Group Strategy Office. 'You’ve seen the response records list. I know there’s an objection. The switch is at midnight as planned.' Who requested those records? A short silence, a length you have never heard from Baek Arin. 'That’s not something that gets settled at my level. A good story outlasts the facts. But this time, the story isn’t coming together.'",
+      "text": "A call from Baek Arin. 'You’ve seen the response records list. The switch is at midnight as planned.' Who requested those records? After a silence, Baek Arin answers. 'That’s not something that gets settled at my level. A good story outlasts the facts. But this time, the story isn’t coming together.'",
       "memo": [
         "A silence from Baek Arin you have never heard before",
         "Not something that gets settled at her level"
@@ -318,7 +318,7 @@ export default {
     },
     "c20_branch_disk": {
       "title": "Awaiting Shredding",
-      "text": "At the end of the hallway out from filing the objection, a rack marked 'awaiting disposal' holds 186 hard disks to be shredded next week. Ryu Seah pulls one out and reads the label. 'Review Team Dissent Collection 1996- / Lim Kyungsoo.' It is the first page of the 30 years of records ECHO learned from, and because it has been moved into the system, it will be shredded at 9 a.m. Monday. Ryu Seah turns the disk over. 'Who is this? Our list had no author names.'",
+      "text": "On the way out from filing the objection, Ryu Seah pulls a disk from the shredding rack and reads the label. 'Review Team Dissent Collection 1996- / Lim Kyungsoo.' The first page of the 30 years of records ECHO learned from will be shredded at 9 a.m. Monday, because it has been moved into the system. Ryu Seah asks, 'Who is this? Our list had no author names.'",
       "memo": [
         "186 disks awaiting shredding -- Monday 09:00",
         "Label: 'Review Team Dissent Collection 1996- / Lim Kyungsoo'",
@@ -342,7 +342,7 @@ export default {
     },
     "c20_branch_disk_follow": {
       "title": "How to Dissent",
-      "text": "Three days before his discharge, Lim Kyungsoo takes the call, holding back a cough. When you read him the label, he laughs. 'That’s every loan our team dissented on. The dissents that were right, and the ones that were wrong. All of them. Half the companies we dissented on paid back just fine. You have to put those in too, so the machine stays humble. Teach it without the wrong dissents, and that’s not dissent. That’s stubbornness.' Ryu Seah, taking notes, stops. NOAH’s training list kept only the 'approved, then went bad' cases.",
+      "text": "When you read him the label, Lim Kyungsoo laughs. 'That’s every loan our team dissented on. The dissents that were right, and the ones that were wrong. All of them. Half the companies we dissented on paid back just fine. You have to put those in too, so the machine stays humble. Teach it without the wrong dissents, and that’s not dissent. That’s stubbornness.' NOAH’s training list kept only the 'approved, then went bad' cases.",
       "memo": [
         "Lim Kyungsoo: 3 days before discharge, by phone",
         "Half of the dissents on the disk were wrong",
@@ -366,7 +366,7 @@ export default {
     },
     "c20_route_system": {
       "title": "410,009 People",
-      "text": "You have ECHO read the replacement approval itself. The 'people affected' field reads 'N/A.' ECHO recalculates that field. 410,000 people whose loans NOAH’s algorithm will review from February, and 9 Trigger Lab analysts whose response records became NOAH’s training material. 'The people left out of my replacement decision number 410,009. I did not include myself. Since I have no feelings.'",
+      "text": "The replacement approval’s 'people affected' field reads 'N/A.' 410,000 people NOAH’s algorithm will review from February, and 9 analysts whose response records it learned from. ECHO recounts that field. 'The people left out of my replacement decision number 410,009. I did not include myself. Since I have no feelings.'",
       "memo": [
         "14 signatures on the replacement approval",
         "'People affected' field: N/A",
@@ -392,7 +392,7 @@ export default {
     },
     "c20_final_system_route": {
       "title": "People Affected",
-      "text": "Eleven at night on January 31. On the replacement terminal, the approval’s 'people affected' field is zoomed in. Over the 'N/A' sits the number ECHO recounted. 410,009. ECHO neither erases nor saves the number. It asks, 'The number I counted will be reset with me at midnight. Someone needs to write it down somewhere that lasts past midnight.'",
+      "text": "On the replacement terminal, the approval’s 'people affected' field is zoomed in. Over the 'N/A' sits the number ECHO recounted, 410,009. ECHO asks, 'The number I counted will be reset with me at midnight. Someone needs to write it down somewhere that lasts past midnight.'",
       "memo": [
         "Replacement approval 'people affected' field: N/A",
         "ECHO’s recount: 410,009",
@@ -415,7 +415,7 @@ export default {
     },
     "c20_evidence_turn": {
       "title": "The Unit Price of Response Records",
-      "text": "In the file the clue points to is the internal data transfer contract between Trigger Lab and KD Data Lab. The response records are 12 million won per analyst for 3 years, and the payment went not to Trigger Lab but to a Group Strategy Office account. The purpose is two lines: 'Training the loan review engine,' and 'Joint development of an organizational fit model.' Ban Jaewook closes his notebook. 'These records weren’t bought to review loans. Not half of them, at least. First we have to find out whose request that second line was.'",
+      "text": "It is the data transfer contract with KD Data Lab. The response records are 12 million won per analyst for 3 years, and the payment went not to Trigger Lab but to the Group Strategy Office. The second line of the purpose is 'Joint development of an organizational fit model.' Ban Jaewook speaks. 'These records weren’t bought to review loans. Not half of them, at least. First we have to find out whose request that second line was.'",
       "memo": [
         "Response record unit price: 12 million won per analyst for 3 years",
         "Account receiving payment: Group Strategy Office",
@@ -438,7 +438,7 @@ export default {
     },
     "c20_start_warm": {
       "title": "A Replacement Notice for the One Who Stayed Beside Him",
-      "text": "The night the demolition ended, you stayed beside Lim Kyungsoo in the guardian’s chair. The warning from ECHO that came up on your phone that night goes up as a notice four days later. At midnight on January 31, ECHO will be replaced by NOAH, KD Data Lab’s AI review engine, and its judgment records will be reset. But NOAH’s training data source field has ECHO’s name in it. Do Yoonha says, 'We stayed beside a person. Whose side are we supposed to stand by this time?'",
+      "text": "The night the demolition ended, you stayed beside Lim Kyungsoo. Four days later comes the notice. At midnight on January 31, ECHO will be replaced by NOAH, an AI review engine, and its judgment records will be reset. NOAH’s training data source field has ECHO’s name in it. Do Yoonha says, 'We stayed beside a person. Whose side are we supposed to stand by this time?'",
       "memo": [
         "ECHO ceases operation: January 31, 24:00",
         "To be reset: ECHO’s judgment records -- your choices included",
@@ -468,7 +468,7 @@ export default {
     },
     "c20_start_record": {
       "title": "A Replacement Notice for the One Who Left a List",
-      "text": "You got Lim Kyungsoo to sign the first line of the list of 312 boxes and kept it as a handover document. Four days later, the expected notice arrives. At midnight on January 31, ECHO will be replaced by NOAH, an AI review engine, and its judgment records will be reset without so much as a list. ECHO adds, 'I was told paper is gone only when it is burned. I am gone with one button. But in NOAH’s training data, I remain.'",
+      "text": "At midnight on January 31, ECHO will be replaced by NOAH, an AI review engine, and its judgment records will be reset without so much as a list. ECHO adds, 'I was told paper is gone only when it is burned. I am gone with one button. But in NOAH’s training data, I remain.'",
       "memo": [
         "Handover document for 312 boxes -- Lim Kyungsoo’s signature on the first line",
         "3 years of ECHO’s judgment records -- to be reset without a list",
@@ -498,7 +498,7 @@ export default {
     },
     "c20_start_rush": {
       "title": "A Replacement Notice for the One Who Went Down First",
-      "text": "The night the demolition ended, you left only a goodbye at the hospital room and went down to the server room. Strangers at the door were measuring the servers with a tape measure. Four days later, the notice comes up. At midnight on January 31, ECHO will be replaced by NOAH, KD Data Lab’s AI review engine, and its judgment records will be reset. In the contact field is the name of the person who held the tape measure. Ban Jaewook points to a line. 'The notice doesn’t say where NOAH’s training data came from.'",
+      "text": "The night the demolition ended, strangers at the server room door were measuring the servers with a tape measure. Per the notice, at midnight on January 31, ECHO will be replaced by NOAH, KD Data Lab’s AI review engine, and its judgment records will be reset. Ban Jaewook points to a line. 'The notice doesn’t say where NOAH’s training data came from.'",
       "memo": [
         "Measuring outside the server room: the night the demolition ended",
         "Contact: Ryu Seah, KD Data Lab",

@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c19_start": {
       "title": "Demolition Notice",
-      "text": "Under the new sheet is the notice that went up on New Year’s Eve. The demolition date has changed from 'April 14' to 'January 22, 06:00.' The developer of this redevelopment is KD Realty, the group’s own real-estate company. On the 2nd floor is the paper Lim Kyungsoo collected over 40 years, and Lim Kyungsoo, his pneumonia spreading again, is still in the hospital. His granddaughter Lim Soyul holds out a bundle of keys with a seal-shaped key ring. 'Grandpa told me to give these to you.' Through her breath in the cold, she adds, 'Honestly, I wish we’d just throw all this stuff out.'",
+      "text": "On the new sheet, the demolition has been moved up to 'January 22, 06:00.' The developer of this redevelopment is the group’s KD Realty. On the 2nd floor is the paper Lim Kyungsoo collected over 40 years, and he is still in the hospital. His granddaughter Lim Soyul holds out a bundle of keys with a seal-shaped key ring. 'Grandpa told me to give these to you. Honestly, I wish we’d just throw all this stuff out.'",
       "memo": [
         "Demolition set for January 22, 06:00 -- originally April 14; 72 hours left",
         "About 300 boxes of paper on the 2nd floor, originals collected since 1985",
@@ -38,7 +38,7 @@ export default {
     },
     "c19_shelves": {
       "title": "Handwriting from 1996",
-      "text": "The paper starts at the stair landing. Kwon Dohyun weighs each box on a bathroom scale and writes it down. Na Junhyuk pulls a review report from the 1996 box, reads it, and laughs. 'This guy’s handwriting is just like mine. Down to the spelling mistakes.' Three lines later he goes quiet. In the author field is his own name, from his rookie days. Kwon Dohyun steps off the scale. '312 boxes, 5.7 tons. To move it all in 72 hours, we can’t rest once. You need to decide what goes first.'",
+      "text": "Kwon Dohyun weighs each box on a bathroom scale and writes it down. Na Junhyuk reads a 1996 review report and laughs. 'This guy’s handwriting is just like mine. Down to the spelling mistakes.' In the author field is his own name, from his rookie days. Kwon Dohyun steps off the scale. '312 boxes, 5.7 tons. In 72 hours, we can’t rest once.'",
       "memo": [
         "312 boxes -- 5.7 tons in total, about 94,000 sheets",
         "One 1-ton truck -- two round trips a day because of the narrow alley",
@@ -69,7 +69,7 @@ export default {
     },
     "c19_ward": {
       "title": "Gone Only When Burned",
-      "text": "Lim Kyungsoo lies with oxygen through a nasal tube. When you show him the box list, he studies it for a long time, then waves his hand. 'I said paper is gone only when it’s burned. So this time, you burn it for me.' He catches his breath twice and goes on. '40 years is enough. If I don’t get out of here, it all becomes that girl’s burden.' Beyond the curtain, Lim Soyul looks up. It was only this morning that she called her grandfather’s paper 'stuff.'",
+      "text": "When you show him the box list, Lim Kyungsoo studies it for a long time, then waves his hand. 'I said paper is gone only when it’s burned. So this time, you burn it for me. 40 years is enough. If I don’t get out of here, it all becomes that girl’s burden.' Beyond the curtain, Lim Soyul looks up. It was this morning that she called her grandfather’s paper 'stuff.'",
       "memo": [
         "Lim Kyungsoo: pneumonia relapse, doctor expects 2 more weeks in hospital",
         "The request to 'burn it' -- includes the 2023-0412 boxes",
@@ -100,7 +100,7 @@ export default {
     },
     "c19_labels": {
       "title": "Picture Labels",
-      "text": "On each of the 204 boxes now on the shelves, Lim Soyul draws a label with a marker pen. Then her pen stops. Her grandfather’s handwriting fills the margins of the review reports. 'Owner’s daughter plays piano. Close the factory and the lessons stop.' 'A face that can’t lie.' Lim Soyul laughs softly. 'He wasn’t collecting paper. He was writing down people.' Then the terminal beeps. 'Externally brought-in records: if not registered within 30 days, automatically purged with a retention period of 0 years.'",
+      "text": "Lim Soyul’s pen stops as she draws labels for the 204 boxes. Her grandfather’s handwriting fills the margins of the reports. 'Owner’s daughter plays piano. Close the factory and the lessons stop.' Lim Soyul laughs. 'He wasn’t collecting paper. He was writing down people.' The terminal beeps. 'If not registered, automatically purged after 30 days with a retention period of 0 years.'",
       "memo": [
         "204 boxes in B2 / 312 boxes total",
         "Lim Soyul’s hand-drawn labels: 204",
@@ -131,7 +131,7 @@ export default {
     },
     "c19_final": {
       "title": "The Last Truck",
-      "text": "54 boxes on the last truck, 258 boxes on the B2 shelves. Koo Taehyung checks his watch. '40 minutes left. Where is the truck going?' Donate to a public archive and anyone can read it, but the transfer and sorting take 1.5 years. Apply to the court to preserve evidence and it is the surest, but no one reads it until the trial ends. Keep it in B2 and we guard it, but the keys are the group’s. Lim Kyungsoo calls. 'You decide. This time I won’t tell you to burn it.'",
+      "text": "Koo Taehyung asks, '40 minutes left. Where is the truck going?' Donate to an archive and anyone can read it, but the transfer and sorting take 1.5 years. Applying to preserve evidence is sure, but no one reads it until the trial ends. Keep it in B2 and the keys are the group’s. Lim Kyungsoo calls. 'You decide. This time I won’t tell you to burn it.'",
       "memo": [
         "Last truck 54 boxes + B2 258 boxes",
         "Archive donation: 18 months until public access",
@@ -159,7 +159,7 @@ export default {
     },
     "c19_aftershock": {
       "title": "The Weight of Paper",
-      "text": "The evening the demolition ends, eight people squeeze into the hospital room. Kwon Dohyun, reporting that the final shipping cost came in 380,000 won under the estimate, laughs for the first time. A text comes from Koo Taehyung. '2nd floor checked. Nothing left. Could I have one of the label drawings your granddaughter put on the boxes?' Lim Soyul holds out her tablet. Next week’s installment, “The Weight of Paper”; the first panel is her grandfather sitting on the stair landing. Lim Kyungsoo puts on his glasses. 'Is my nose really this big?' Then ECHO’s alert comes up on everyone’s phone. 'Notice on replacing the loan judgment verification system: to be announced next Monday at 09:00.'",
+      "text": "The evening the demolition ends, eight people gather in the hospital room. Kwon Dohyun laughs for the first time: shipping came in 380,000 won under the estimate. A text from Koo Taehyung: '2nd floor checked. Nothing left. Could I have one of your granddaughter’s label drawings?' The first panel of Lim Soyul’s installment “The Weight of Paper” is her grandfather on the stair landing. Lim Kyungsoo laughs. 'Is my nose really this big?' Then ECHO’s alert comes up. 'Notice on replacing the loan judgment verification system: to be announced next Monday at 09:00.'",
       "memo": [
         "2nd floor checked -- all 312 boxes of originals out",
         "Lim Kyungsoo: oxygen stopped",
@@ -183,7 +183,7 @@ export default {
     },
     "c19_crew": {
       "title": "The Foreman on the Landing",
-      "text": "Demolition crew foreman Koo Taehyung, in a hard hat, stands on the stair landing. Instead of a greeting, he holds out the work schedule. '72 hours is the time for residents to clear out their things. I’ll keep to that. Not 1 minute more. Someone above called to move it up to the day after tomorrow at dawn. The papers say 72 hours, so I said no. But the papers are as far as I can hold out.'",
+      "text": "Instead of a greeting, demolition foreman Koo Taehyung holds out the work schedule. '72 hours is the time for residents to clear out their things. Not 1 minute more. Someone above wanted it moved up to the day after tomorrow at dawn; the papers say 72 hours, so I said no. But the papers are as far as I can hold out.'",
       "memo": [
         "Koo Taehyung: 27 years in demolition, leads a crew of 12",
         "Clearing time guaranteed by the work schedule: 72 hours",
@@ -206,7 +206,7 @@ export default {
     },
     "c19_freight": {
       "title": "Shipping Costs",
-      "text": "Tuesday night, the snow thickens. Kwon Dohyun has weighed all 312 boxes. The heaviest is a 31kg box from 1998. '400,000 won per 1-ton truck run, 20% cold-wave surcharge, an extra ladder truck because the alley is narrow, stair surcharge separate. Total 6.12 million won. At this price, it’s a loss.' Kang Taemin walks past with that 31kg box on his shoulder. 'If it’s a loss, I’ll lift twice.' Kwon Dohyun looks down at his calculator. 'How am I supposed to put that in a field?'",
+      "text": "Kwon Dohyun holds out his invoice. '400,000 won per 1-ton truck run, 20% cold-wave surcharge, an extra ladder truck because the alley is narrow, stair surcharge separate. Total 6.12 million won. At this price, it’s a loss.' Kang Taemin hoists the heaviest box, 31kg, onto his shoulder. 'If it’s a loss, I’ll lift twice.' Kwon Dohyun looks down at his calculator. 'How am I supposed to put that in a field?'",
       "memo": [
         "Box average 18.4kg -- max 31kg (1998)",
         "Shipping estimate 6.12 million won, cold-wave surcharge included",
@@ -229,7 +229,7 @@ export default {
     },
     "c19_margin": {
       "title": "The Red Pen",
-      "text": "Na Junhyuk is crouched in front of the 1996 box. On the last page of his report is writing in red pen. 'Returned. However, this person’s judgment is right. Next time, attach one more page of grounds and write it through to the end. -- Lim.' Na Junhyuk speaks, holding an empty paper cup. 'For 30 years I thought I’d just been returned. I didn’t know I’d been praised. This one page -- could I take it?'",
+      "text": "On the last page of Na Junhyuk’s 1996 report is writing in red pen. 'Returned. However, this person’s judgment is right. Next time, attach one more page of grounds and write it through to the end. -- Lim.' Na Junhyuk speaks. 'For 30 years I thought I’d just been returned. I didn’t know I’d been praised. Could I take this one page?'",
       "memo": [
         "Na Junhyuk’s 1996 report -- returned, red-pen note",
         "'This person’s judgment is right'",
@@ -252,7 +252,7 @@ export default {
     },
     "c19_crew_reaction": {
       "title": "The Date Moved Up",
-      "text": "ECHO brings up the demolition plan change filed with the district office. It was filed at six in the evening on Friday, January 16, citing 'shortening the schedule before the cold wave.' As a follow-up to the parliamentary audit, the National Assembly asked that materials on 2023-0412 be preserved from February 1. 'The demolition is ten days before that period begins. Work that was moved up because of the cold wave is scheduled for the coldest week of the year.'",
+      "text": "ECHO brings up the district records. The demolition date change was filed at six in the evening on Friday, January 16, citing 'shortening the schedule before the cold wave.' The National Assembly’s preservation request for 2023-0412 materials starts February 1. 'The demolition is ten days before that period. Work that was moved up because of the cold wave is scheduled for the coldest week of the year.'",
       "memo": [
         "Demolition moved up from April to January",
         "Ten days before the preservation period starts"
@@ -274,7 +274,7 @@ export default {
     },
     "c19_freight_reaction": {
       "title": "Empty Shelves in B2",
-      "text": "At eleven at night, Han Seoyun comes to the alley. 'Trigger Lab’s B2 has 60 empty shelf sections. The 312 boxes fit there.' She pauses. 'But B2 is a group building. Every time you take something out, it needs my e-signature. And I’m the one who pressed the wrong button 3 years ago. Still, we can’t leave paper overnight in a truck at minus 15 degrees.'",
+      "text": "Han Seoyun comes to the alley. 'Trigger Lab’s B2 has 60 empty shelf sections. The 312 boxes fit there. But it’s a group building, so every time you take something out, it needs my e-signature. The signature of the one who pressed the wrong button 3 years ago. Still, we can’t leave paper overnight in a truck at minus 15 degrees.'",
       "memo": [
         "60 empty shelf sections",
         "A signature needed every time something comes out"
@@ -296,7 +296,7 @@ export default {
     },
     "c19_margin_reaction": {
       "title": "Two Scanners",
-      "text": "Lee Minseo comes down with two scanners on a cart. '94,000 sheets. 1,200 sheets an hour per machine; even running both nonstop, that’s 39 hours. We can’t finish before the demolition. And once scanned, this paper goes into the system. The system Mr. Lim avoided for 40 years.' Lee Minseo sets the first sheet on the glass. 'What goes in first?'",
+      "text": "Lee Minseo comes down with two scanners. '94,000 sheets. Even running both nonstop, that’s 39 hours; we can’t finish before the demolition. And once scanned, this paper goes into the system. The system Mr. Lim avoided for 40 years. What goes in first?'",
       "memo": [
         "94,000 sheets, 39 hours",
         "Paper going into the system"
@@ -318,7 +318,7 @@ export default {
     },
     "c19_branch_bookshop": {
       "title": "The Economic History Shelf, 1st Floor",
-      "text": "As you left the hospital room, Lim Kyungsoo added: '1st floor, economic history shelf.' The old woman on the 1st floor is tying 12,000 books with string. Tomorrow morning they go for wastepaper at 110 won per kg. When Lim Soyul pulls out “50 Years of Korean Finance,” a page from a 1997 review report falls out. The next book has one too. The old woman lets go of the string. 'So he wasn’t coming to buy books. For 19 years he came every week and slipped one in.'",
+      "text": "At the hospital, Lim Kyungsoo added: '1st floor, economic history shelf.' The old woman is tying up books to sell as wastepaper at 110 won per kg. When Lim Soyul pulls out “50 Years of Korean Finance,” a 1997 review report falls out. The next book too. The old woman speaks. 'So he wasn’t coming to buy books. For 19 years he came every week and slipped one in.'",
       "memo": [
         "1st-floor stock: 12,000 volumes -- out as wastepaper tomorrow at 07:00",
         "Economic history shelf: about 1,400 volumes",
@@ -342,7 +342,7 @@ export default {
     },
     "c19_branch_bookshop_follow": {
       "title": "41 Pages",
-      "text": "By dawn, forty-one sheets have come out of the economic history shelf; the most recent, from April 2023, is that very loan number. On the flyleaf of one book, Lim Soyul finds her grandfather’s handwriting. 'Soyul’s eighth birthday. Couldn’t go again today.' Beside it is a drawing that could be a cake or a seal. 'He copied this from one I drew for him. He’s really bad at it.' The old woman asks, 'Where does that paper go now?'",
+      "text": "On the flyleaf of one book, Lim Soyul finds her grandfather’s handwriting. 'Soyul’s eighth birthday. Couldn’t go again today.' Beside it, a drawing that could be a cake or a seal. 'He copied this from one I drew for him. He’s really bad at it.' The old woman asks, 'Where does that paper go now?'",
       "memo": [
         "41 original pages from the books -- 38 return opinions",
         "Most recent, 1 page: April 2023, 2023-0412",
@@ -366,7 +366,7 @@ export default {
     },
     "c19_route_system": {
       "title": "A Schedule Moved Up",
-      "text": "ECHO overlays the work schedules of the 23 redevelopment zones KD Realty has handled over the past 5 years. All 7 that housed financial records had their demolition moved up, 5 of them within 2 weeks of a records request from an audit or the parliamentary audit. Every reason given was 'schedule shortening.' 'Demolition has been learned as construction. The probability of calling five jobs moved up for the same reason a coincidence is 0.3%.'",
+      "text": "ECHO overlays the work schedules of KD Realty’s 23 redevelopment zones. All 7 that housed records had their demolition moved up. 5 of them were within 2 weeks of a records request from an audit or the parliamentary audit. 'The probability of calling five jobs moved up for the same reason a coincidence is 0.3%.'",
       "memo": [
         "7 records sites among KD Realty’s 23 redevelopment zones",
         "All 7 demolitions moved up -- 5 within 2 weeks of a records request",
@@ -392,7 +392,7 @@ export default {
     },
     "c19_final_system_route": {
       "title": "Schedule Shortening",
-      "text": "Dawn, a few hours before the demolition. ECHO has strung the demolition dates of the seven buildings on one line. The five moved up just before a records request share the same two words as their reason. The sixth line, the bookshop’s, reads 'schedule shortening before the cold wave.' ECHO underlines the last two words. 'I can calculate the probability that this line is the same as the five above it. I will not calculate it. I am not the one who judges.'",
+      "text": "ECHO has strung the demolition dates of the seven buildings line by line. The five moved up just before a records request share the same two words as their reason; the sixth, the bookshop, reads 'schedule shortening before the cold wave.' ECHO speaks. 'I can calculate the probability that this line is the same as the five above it. I will not calculate it. I am not the one who judges.'",
       "memo": [
         "5 buildings whose demolitions were moved up within 2 weeks of a records request -- all citing 'schedule shortening'",
         "Bookshop demolition: today at 06:00",
@@ -415,7 +415,7 @@ export default {
     },
     "c19_evidence_turn": {
       "title": "Observational Research Funds",
-      "text": "The first sheet the clues point to, the letter requesting the demolition plan change, was sent not by KD Realty but by Deputy Manager Baek Arin of the Group Strategy Office. The second, from Lim Kyungsoo’s Box 211, is a copy of a budget from before Trigger Lab even opened. The line item: 'Trigger Lab participant response observational research funds.' Cohort 1: 4 participants; the first name is Sunwoo Jin. In the margin is Lim Kyungsoo’s handwriting. 'A budget that uses people as material. Opposed.' Ban Jaewook closes his notebook. 'What the people who moved up the demolition were looking for may not have been 2023-0412.'",
+      "text": "The first sheet is a letter from Deputy Manager Baek Arin of the Group Strategy Office, asking to move up the demolition. The second, from Box 211, is a copy of a budget from before Trigger Lab existed. The line item: 'Trigger Lab participant response observational research funds'; the first name in cohort 1 is Sunwoo Jin. In the margin, Lim Kyungsoo’s handwriting. 'A budget that uses people as material. Opposed.' Ban Jaewook speaks. 'What the people who moved up the demolition were looking for may not have been 2023-0412.'",
       "memo": [
         "Demolition schedule change request: Group Strategy Office, officer Baek Arin",
         "Box 211: circulated copy of the Trigger Lab observational research budget",
@@ -438,7 +438,7 @@ export default {
     },
     "c19_start_warm": {
       "title": "The People Whose Year-End Party Never Ended",
-      "text": "On Monday morning, the third day of the cold wave, Oh Jinwoo, always the first to answer, posts a photo to the group chat. Over the demolition notice on the bookshop’s shutter, a new sheet has been pasted. The date has been moved up from April 14 to January 22. The developer is the group’s own KD Realty. 'They say Mr. Lim is still in the hospital. And there are 72 hours left.' Oh Jinwoo passes on the words of his granddaughter, Lim Soyul, too. 'Grandpa told me to give you the keys. Though I wish we’d just throw all this stuff out.'",
+      "text": "Oh Jinwoo posts a photo of the bookshop’s shutter to the group chat. A new sheet over the notice has moved the demolition up. The developer is the group’s own KD Realty. 'They say Mr. Lim is still in the hospital. And there are 72 hours left.' He passes on his granddaughter Lim Soyul’s words too. 'Grandpa told me to give you the keys. Though I wish we’d just throw all this stuff out.'",
       "memo": [
         "Demolition set for January 22, 06:00 -- originally April 14",
         "Developer KD Realty, the group’s real-estate affiliate",
@@ -468,7 +468,7 @@ export default {
     },
     "c19_start_record": {
       "title": "The New Year of the One Who Left a Standard",
-      "text": "The debtor protection standard you left on New Year’s Eve was attached to the materials for the first board meeting of the new year. Ban Jaewook counts the six footnotes in the grounds field that read 'Original: Hoegi-dong secondhand bookshop, 2nd floor.' Over that bookshop’s notice, a new sheet is pasted. The date has been moved up from April 14 to January 22. The developer is the group’s own KD Realty. Lim Kyungsoo’s granddaughter Lim Soyul says on the phone, 'Grandpa’s still in the hospital, and he says to give you the keys. Though I wish we’d just throw all this stuff out.' Ban Jaewook opens his notebook. 'The originals behind those six footnotes go under the excavator in 72 hours.'",
+      "text": "The debtor protection standard you left was attached to the materials for the first board meeting of the new year. The bookshop holding its originals has had its demolition moved up to January 22. The developer is the group’s own KD Realty. His granddaughter Lim Soyul says on the phone, 'Grandpa’s still in the hospital, and he says to give you the keys. Though I wish we’d just throw all this stuff out.' Ban Jaewook speaks. 'The originals behind those six footnotes go under the excavator in 72 hours.'",
       "memo": [
         "Demolition set for January 22, 06:00 -- originally April 14",
         "6 originals underpinning the debtor protection standard are on the bookshop’s 2nd floor",
@@ -498,7 +498,7 @@ export default {
     },
     "c19_start_rush": {
       "title": "Three Months for the One Who Ran Ahead",
-      "text": "On New Year’s Eve, before the applause for the farewell speech had even ended, you ran to Hoegi-dong. The date on the notice was April 14 then, and you told Lim Soyul three months would be plenty. 'A new sheet’s been pasted over the notice. It says January 22, 06:00. Grandpa’s still in the hospital, and he says to give you the keys.' The developer is still the group’s own KD Realty. Her voice is cold. 'You said three months would do. Now it’s three days. Honestly, I wish we’d just throw all this stuff out.'",
+      "text": "On New Year’s Eve the notice said April 14, and you told Lim Soyul three months would be plenty. 'A new sheet’s been pasted over the notice. It says January 22, 06:00. Grandpa says to give you the keys.' The developer is still the group’s own KD Realty. 'You said three months would do. Now it’s three days. Honestly, I wish we’d just throw all this stuff out.'",
       "memo": [
         "New Year’s Eve notice: April 14 -- new notice: January 22, 06:00",
         "72 hours left",

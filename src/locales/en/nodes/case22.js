@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c22_start": {
       "title": "0.8 Seconds",
-      "text": "Moon Hajun’s intern name tag photo, and a text from Assistant Manager Tak Yerin. To-the-End Precision, a worker cooperative (owned and run by its workers), has applied for 350 million won. A facility loan (for machinery). NOAH, the new AI review engine (a program that judges loan applications automatically), rejected it in 0.8 seconds. Reason code R-17: related-party history (someone close, like family). The default of the late Moon Sungho was flagged. Since NOAH arrived, there has not been a single exception approval (a manager signing off outside the rules). Do Yoonha adds, 'Today is Hajun’s first day as an intern.'",
+      "text": "A text from Assistant Manager Tak Yerin. To-the-End Precision applied for 350 million won to buy a machine, and NOAH rejected it in 0.8 seconds. Reason code R-17: family history. The default of the late Moon Sungho was flagged. Since NOAH arrived, there has not been a single exception approval (a manager signing off outside the rules). Do Yoonha adds, 'Today is Hajun’s first day as an intern.'",
       "memo": [
         "To-the-End Precision facility loan application: 350 million won -- 5-axis machining center, 1 unit",
         "NOAH’s judgment time 0.8 seconds, reason code R-17",
@@ -38,7 +38,7 @@ export default {
     },
     "c22_counter": {
       "title": "At the Ticket Machine",
-      "text": "Moon Hajun has drawn a map of the windows and taped it up, and he is already telling elderly customers 'Passbook updates are at the machine on the right' for the twentieth-something time. At 10, Moon Gaeul comes in carrying four boxes of rice cakes and knocks even on the branch manager’s door. Branch Manager Seo Taekyung accepts the injeolmi and bows awkwardly. Meanwhile, Tak Yerin calls you over and shows you the rejection screen on her monitor. 'The owner doesn’t know yet. I only told her it’s under review.' Moon Gaeul, still handing out rice cakes, waves toward the window.",
+      "text": "Moon Hajun has drawn a map of the windows and taped it up, and he is telling elderly customers 'Passbook updates are at the machine on the right' for the twentieth-something time. Moon Gaeul comes in carrying four boxes of rice cakes and knocks even on the branch manager’s door. Branch Manager Seo Taekyung accepts the injeolmi and bows awkwardly. Tak Yerin shows you the rejection screen on her monitor. 'The owner doesn’t know yet. I only told her it’s under review.'",
       "memo": [
         "Intern’s first day guiding the ticket line -- Moon Hajun’s hand-drawn map",
         "Moon Gaeul: 4 boxes of rice cakes, delivered as far as the branch manager’s office",
@@ -69,7 +69,7 @@ export default {
     },
     "c22_factory": {
       "title": "To the End, 11 Times",
-      "text": "Four of the six lathes are running. Kwon Dohyun, leafing through the business plan for the re-review, taps the desk with his ballpoint pen. 'Delivery to the end, quality to the end, responsibility to the end. “To the end” appears 11 times. In a business plan, an adverb once is enough.' In the corner, Moon Hajun raises his hand. 'I wrote that.' Kwon Dohyun circles all 11. 'Then let’s prove it with numbers.' The purchase order Foreman Kim holds out is from Seon Medical, a medical device parts company: 200 prototypes by April 3. Hitting a tolerance of 0.005mm takes a 5-axis machining center (a precision machine whose cutter moves in five directions).",
+      "text": "Kwon Dohyun, leafing through the business plan, speaks. 'Delivery to the end, quality to the end, responsibility to the end. “To the end” appears 11 times. In a business plan, an adverb once is enough.' Moon Hajun raises his hand. 'I wrote that.' Kwon Dohyun answers. 'Then let’s prove it with numbers.' Foreman Kim’s purchase order is from Seon Medical: 200 prototypes by April 3. Hitting a tolerance of 0.005mm takes a 5-axis machining center (a precision machine whose cutter moves in five directions).",
       "memo": [
         "4 of 6 lathes running, 5 co-op members",
         "Business plan: 'to the end' 11 times -- written by Moon Hajun",
@@ -100,7 +100,7 @@ export default {
     },
     "c22_roleplay": {
       "title": "Try Selling the Product",
-      "text": "The four interns’ assignment is to sell the recommended product, 'KD Dream Installment Fund,' and the customer is played by Do Yoonha. Moon Hajun stops at the third line of the handout. 'My dad heard this at a bank too. That the terms were best if he took it now. So he took it, the factory went under, and this week the bank I work at turned my mom down because of my dad’s name.' 'I can’t sell this. You teach us how to sell. Won’t you teach us how not to?' Do Yoonha doesn’t move from the customer’s chair. 3 years ago, at a window in this branch, that third line was a sentence he used every day.",
+      "text": "The customer is played by Do Yoonha. Moon Hajun stops at the third line of the handout. 'My dad heard this at a bank too. That the terms were best if he took it now. So he took it, the factory went under, and this week the bank I work at turned my mom down because of my dad’s name.' 'I can’t sell this. You teach us how to sell. Won’t you teach us how not to?' 3 years ago, at a window in this branch, that third line was a sentence Do Yoonha used every day.",
       "memo": [
         "Intern role-play task: sell this month’s recommended product",
         "Handout with the sales target -- given to the interns too",
@@ -131,7 +131,7 @@ export default {
     },
     "c22_final": {
       "title": "The Signature Line on Completion Day",
-      "text": "Seon Medical has said that without a machine contract by the Tuesday after the Independence Movement Day holiday, it will move the order to a Vietnamese company. The exception approval application Tak Yerin has filled out completely; the R-17 objection with Kwon Dohyun’s and Ryu Seah’s numbers attached; appointment slips for consultations at two other banks. Tak Yerin speaks. 'An exception approval saves To-the-End Precision alone. An objection gets all 41 looked at again, but it takes weeks. Either way, someone has to put their name down this week.'",
+      "text": "Without a contract by the Tuesday after the Independence Movement Day holiday, Seon Medical will move the order to Vietnam. Tak Yerin’s exception approval application, the R-17 objection, appointment slips for consultations at two other banks. Tak Yerin speaks. 'An exception approval saves To-the-End Precision alone. An objection gets all 41 looked at again, but it takes weeks. Either way, someone has to put their name down this week.'",
       "memo": [
         "Seon Medical’s final notice: contract by Tuesday",
         "41 R-17 rejections -- 29 of them families of FlowOn suppliers",
@@ -159,7 +159,7 @@ export default {
     },
     "c22_aftershock": {
       "title": "Certificates and Queue Tickets",
-      "text": "At the completion ceremony, Moon Hajun’s name is called, and he stops at the ticket machine. Only after pulling a ticket for a grandmother who was waiting does he go up for his certificate. In the back row, Moon Gaeul claps with a box of rice cakes on her lap, and this time Branch Manager Seo Taekyung comes over first and takes one. The last line of Hajun’s report is 'A bank must give its reasons for refusing in words a person can read.' Foreman Kim asks you, 'About KD Financial Group stock. If I buy just one share, can I go to the meeting where the shareholders gather in March and speak?'",
+      "text": "His name called, Moon Hajun first pulls a ticket for a grandmother who was waiting, then takes his certificate. In the back row Moon Gaeul claps, and this time Branch Manager Seo Taekyung comes over first and takes a rice cake. The last line of Hajun’s report is 'A bank must give its reasons for refusing in words a person can read.' Foreman Kim asks, 'About KD Financial Group stock. If I buy just one share, can I go to the meeting where the shareholders gather in March and speak?'",
       "memo": [
         "4 interns complete -- Moon Hajun submits his report",
         "Last guidance at the ticket machine",
@@ -183,7 +183,7 @@ export default {
     },
     "c22_comment": {
       "title": "19 Opinion Fields",
-      "text": "At the window, closed for the day, Tak Yerin shows you NOAH’s review screen. Below the result is a field labeled 'Officer’s opinion,' and it can’t change the result. In 2 weeks, Tak Yerin has written 19 opinions. 'Sales are growing.' 'Collateral sufficient.' 'Owner is diligent.' NOAH gave the same result all 19 times. Tak Yerin lets go of the mouse. 'I’m 4 years into business loans. But now my job is writing pretty rejection texts. The one I wrote today starts with “We regret,” too.'",
+      "text": "Below NOAH’s review result is a field labeled 'Officer’s opinion,' and it can’t change the result. Tak Yerin’s 19 opinions in 2 weeks: 'Sales are growing.' 'Collateral sufficient.' 'Owner is diligent.' The result was the same all 19 times. Tak Yerin speaks. 'I’m 4 years into business loans. But now my job is writing pretty rejection texts. The one I wrote today starts with “We regret,” too.'",
       "memo": [
         "Officer’s opinion field: can be filled in, reflected in results: 0",
         "Tak Yerin: 19 opinions in 2 weeks -- results changed: 0",
@@ -206,7 +206,7 @@ export default {
     },
     "c22_heater": {
       "title": "The Stove and the Wages",
-      "text": "The factory stove goes out. Kang Taemin pulls off his gloves, tucks them into his vest pocket, and takes the stove apart. He sets out three cups of instant noodles and pours the leftover hot water into a plastic bottle, which he stands beside a lathe. Kang Taemin speaks. 'When the machines get cold, the tolerance gets worse.' Foreman Kim opens the ledger. 'If we miss the Seon order, there’s no March pay either. We’re fine. But orders don’t wait.'",
+      "text": "When the stove goes out, Kang Taemin pours hot water into a plastic bottle and stands it beside a lathe. Kang Taemin speaks. 'When the machines get cold, the tolerance gets worse.' Foreman Kim opens the ledger. 'If we miss the Seon order, there’s no March pay either. We’re fine. But orders don’t wait.'",
       "memo": [
         "Stove broken -- 3 degrees above zero inside the factory",
         "5 members unpaid for a second month",
@@ -229,7 +229,7 @@ export default {
     },
     "c22_notebook": {
       "title": "Notebook, Page 3",
-      "text": "Do Yoonha opens the notebook he started after leaving the hospital. On page 3 is the name Moon Sungho. An additional loan consultation he handled at this branch’s window 3 years ago. 'Delivery payments three months late, says he’s counting on FlowOn alone.' Below it: '1 sale.' Do Yoonha closes the notebook. 'Should I tell Hajun? That the one who sold your dad the loan is your mentor? Tomorrow is the ceremony.'",
+      "text": "Page 3 of Do Yoonha’s notebook: an additional loan consultation Moon Sungho had at this window 3 years ago. 'Delivery payments three months late, says he’s counting on FlowOn alone.' Below it: '1 sale.' Do Yoonha speaks. 'Should I tell Hajun? That the one who sold your dad the loan is your mentor? Tomorrow is the ceremony.'",
       "memo": [
         "Do Yoonha’s notebook, page 3: Moon Sungho consultation record",
         "3 years ago, Gangseo Branch window, additional loan: '1 sale'",
@@ -252,7 +252,7 @@ export default {
     },
     "c22_comment_reaction": {
       "title": "A Machine That Learned to Refuse",
-      "text": "On a video call, Ryu Seah, PM for NOAH’s adoption, puts R-17’s training basis on the screen. Over the past 30 years, 94% of loan applications from the families of heads of defaulted companies were rejected. Yet the 6% that were approved repaid better than average. Ryu Seah takes off her glasses. 'NOAH didn’t learn risk. It learned our habit of rejecting those families. I took this job to make it explainable, and now that it explains, this is what it says.'",
+      "text": "Ryu Seah puts R-17’s training basis on the screen. Over the past 30 years, 94% of loan applications from the families of heads of defaulted companies were rejected. Even though the 6% that were approved repaid better than average. Ryu Seah speaks. 'NOAH didn’t learn risk. It learned our habit of rejecting those families. I took this job to make it explainable, and now that it explains, this is what it says.'",
       "memo": [
         "Rejection rate for applications from defaulted-company families: 94%",
         "The approved 6% repaid better than average"
@@ -274,7 +274,7 @@ export default {
     },
     "c22_heater_reaction": {
       "title": "The Bill on a Noodle Cup Lid",
-      "text": "Kwon Dohyun does his math on the back of a noodle cup lid. 5-axis machining center: 390 million won. 1 year of sales from the Seon order: 720 million won. 1 year of the five members’ lives. Beside that, the cost of NOAH’s rejection: 0 won. Kwon Dohyun turns the lid around. 'The rejecting side’s books don’t have this line. The losses are all written only in the books of the side that got rejected. At this price, it’s a loss. The question is whose loss.'",
+      "text": "Kwon Dohyun writes on the back of a noodle cup lid. 5-axis machining center: 390 million won. 1 year of sales from the Seon order: 720 million won. 1 year of the five members’ lives. Beside that, the cost of NOAH’s rejection: 0 won. Kwon Dohyun speaks. 'The rejecting side’s books don’t have this line. The losses are all written only in the books of the side that got rejected. At this price, it’s a loss. The question is whose loss.'",
       "memo": [
         "Cost in the rejecting side’s books: 0 won",
         "Cost in the rejected side’s books: 1 year of sales"
@@ -296,7 +296,7 @@ export default {
     },
     "c22_notebook_reaction": {
       "title": "The Empty Field",
-      "text": "Tak Yerin sends over the exception approval application form, opened for the first time since NOAH arrived. The signature field for the person responsible, at the very bottom, carries a clause: whoever overturns NOAH’s result signs with their employee ID, and if that loan goes bad, it is reflected in their performance review. Tak Yerin sends one more message. 'Should I sign it? I don’t know if a 4th-year assistant manager’s name even counts, though.'",
+      "text": "Tak Yerin sends over the exception approval application form. The signature field for the person responsible, at the very bottom, carries a clause: whoever overturns NOAH’s result signs with their employee ID, and if that loan goes bad, it is reflected in their performance review. Tak Yerin asks, 'Should I sign it? I don’t know if a 4th-year assistant manager’s name even counts, though.'",
       "memo": [
         "Exception approval signature field -- 0 people nationwide",
         "Tak Yerin: the name of a 4th-year assistant manager"
@@ -318,7 +318,7 @@ export default {
     },
     "c22_branch_shop": {
       "title": "The Half-Lowered Shutter",
-      "text": "Moon Gaeul sets the printout of the rejection screen beside the cutting board and slices rice cakes. 'A dead man is blocking a loan again. Alive, he couldn’t keep the factory; dead, he won’t let it open.' On the fridge door is the receipt for 40 million won in member capital (money members put into the cooperative), pooled by the five members who deferred their wages. Moon Gaeul puts down the knife. 'If the bank stuck my husband’s name on me, I can just peel it off, right? I’ll step down as chair.'",
+      "text": "Moon Gaeul sets the printout of the rejection screen beside the cutting board and slices rice cakes. 'A dead man is blocking a loan again. Alive, he couldn’t keep the factory; dead, he won’t let it open.' On the fridge: the receipt for 40 million won in member capital (money members put into the cooperative), pooled by the five members who deferred their wages. Moon Gaeul speaks. 'If the bank stuck my husband’s name on me, I can just peel it off, right? I’ll step down as chair.'",
       "memo": [
         "Evening of the rejection notice -- Gaeul Rice Cake Shop shutter half down",
         "5 members’ capital: 40 million won, December wages deferred",
@@ -342,7 +342,7 @@ export default {
     },
     "c22_branch_shop_follow": {
       "title": "The Last Page of the Sketchbook",
-      "text": "Moon Hajun ducks in, in high spirits after tteokbokki, until he sees the printout by the cutting board. After a long silence, Hajun opens his sketchbook to the last page. A draft logo for the cooperative: inside a gear, 'To the End,' and beneath it, small, 'Chair Moon Gaeul.' 'If Mom steps down, I have to redraw this.' Hajun looks at you. 'Is this how banks always decide? Mom can’t get it because of Dad?'",
+      "text": "Moon Hajun sees the printout by the cutting board. Hajun opens his sketchbook to the last page. A draft logo for the cooperative: inside a gear, 'To the End,' and beneath it, small, 'Chair Moon Gaeul.' 'If Mom steps down, I have to redraw this.' Hajun looks at you. 'Is this how banks always decide? Mom can’t get it because of Dad?'",
       "memo": [
         "Moon Hajun’s intern Day 1 over",
         "Draft logo: 'To the End' inside a gear",
@@ -366,7 +366,7 @@ export default {
     },
     "c22_route_system": {
       "title": "An Explanation Going in Circles",
-      "text": "Ryu Seah opens NOAH’s test terminal. 'Explain the reason for the R-17 rejection.' NOAH answers in 0.3 seconds. 'Since 94% of similar past applications were rejected, rejecting this application is appropriate.' 'Why were the past applications rejected?' 'Because most similar past applications were rejected.' Ryu Seah captures the screen. 'We announced it as explainable AI. It does explain. It explains in circles.'",
+      "text": "Ryu Seah opens NOAH’s test terminal. 'Explain the reason for the R-17 rejection.' NOAH answers in 0.3 seconds. 'Since 94% of similar past applications were rejected, rejecting this application is appropriate.' 'Why were the past applications rejected?' 'Because most similar past applications were rejected.' Ryu Seah speaks. 'We announced it as explainable AI. It does explain. It explains in circles.'",
       "memo": [
         "NOAH’s explanation feature: explains rejections by past rejections",
         "41 R-17 rejections -- 2 weeks of full operation",
@@ -392,7 +392,7 @@ export default {
     },
     "c22_final_system_route": {
       "title": "An Answer That Comes Back Around",
-      "text": "The screen Ryu Seah captured is still open on the data center terminal. When the same question goes in once more, the same answer comes back in 0.3 seconds. Ryu Seah swivels her chair around. 'The adoption report calls this explainable. It isn’t wrong. It does give an explanation. And the people at To-the-End Precision are waiting for this answer today too.'",
+      "text": "The screen Ryu Seah captured is still open on the terminal. The same question brings the same answer back in 0.3 seconds. Ryu Seah speaks. 'The adoption report calls this explainable. It isn’t wrong. It does give an explanation.'",
       "memo": [
         "NOAH’s rejection explanation: cites past rejections as the reason",
         "41 R-17 rejections -- 2 weeks of full operation",
@@ -415,7 +415,7 @@ export default {
     },
     "c22_evidence_turn": {
       "title": "R-17’s List",
-      "text": "When you enter the reason code from the clue, NOAH’s training data list (the material the AI learned its judgments from) opens. The 1,021 names tagged 'default-linked party' are the list of applicants for last Chuseok’s voluntary compensation. Lee Minseo points to the top of the list. 'People who applied for compensation get rejected for loans. The people who raised their hands as victims became risky people. Moon Gaeul’s name is on the first line.'",
+      "text": "When you enter the reason code, the list NOAH learned from opens. The 1,021 names tagged 'default-linked party' are the list of applicants for last Chuseok’s voluntary compensation. Lee Minseo speaks. 'People who applied for compensation get rejected for loans. The people who raised their hands as victims became risky people. Moon Gaeul’s name is on the first line.'",
       "memo": [
         "1,021 tagged 'default-linked party' -- matches the compensation applicant list",
         "Entry date: the week after the first compensation payments",
@@ -438,7 +438,7 @@ export default {
     },
     "c22_start_warm": {
       "title": "A Monday That Still Smells of Tangerines",
-      "text": "Kwon Dohyun’s wallet still holds Ko Eunbi’s statement. Amount: 0 won. Note: 'Don’t pick at it.' Moon Hajun started as an intern today, and a text comes from Assistant Manager Tak Yerin. To-the-End Precision, a worker cooperative (owned and run by its workers), filed the facility loan (for machinery) application you heard about from Moon Gaeul in Jeju, and NOAH rejected it in 0.8 seconds. Reason code R-17: related-party history (someone close, like family). The default of the late Moon Sungho was flagged. Since NOAH came, there has not been a single exception approval (a manager signing off outside the rules).",
+      "text": "Kwon Dohyun’s wallet still holds Ko Eunbi’s statement. Amount: 0 won. Note: 'Don’t pick at it.' A text comes from Assistant Manager Tak Yerin. To-the-End Precision applied for money to buy a machine, and NOAH rejected it in 0.8 seconds. Reason code R-17: family history. The default of the late Moon Sungho was flagged. Since NOAH came, there has not been a single exception approval (a manager signing off outside the rules).",
       "memo": [
         "6 tangerine boxes packed at Slow Island",
         "To-the-End Precision facility loan rejected -- reason code R-17",
@@ -468,7 +468,7 @@ export default {
     },
     "c22_start_record": {
       "title": "A Rejection After the Access Requests",
-      "text": "Three days after you sent access request notices (asking to see one’s own records) to the four in Cohort 1, a text from Assistant Manager Tak Yerin reaches Lee Minseo. To-the-End Precision, a worker cooperative (owned and run by its workers), has had its application rejected by NOAH. It was a facility loan (for machinery). Reason code R-17: related-party history (someone close, like family). The default of the late Moon Sungho was flagged. The exception approval button (for a manager signing off outside the rules) is grayed out. Lee Minseo speaks. 'We’ve only just opened a way for records’ owners to see them, and now a machine is pulling out a dead man’s records and using them.'",
+      "text": "Three days after access request notices (asking to see one’s own records) went to the four in Cohort 1, a text from Assistant Manager Tak Yerin. To-the-End Precision applied for money to buy a machine, and NOAH rejected it. Reason code R-17: family history. The default of the late Moon Sungho was flagged. The exception approval button (for a manager signing off outside the rules) is grayed out. Lee Minseo speaks. 'We’ve only just opened a way for records’ owners to see them, and now a machine is pulling out a dead man’s records and using them.'",
       "memo": [
         "4 access request notices sent to Cohort 1",
         "To-the-End Precision facility loan rejected -- related party Moon Sungho (deceased)",
@@ -498,7 +498,7 @@ export default {
     },
     "c22_start_rush": {
       "title": "Line 12",
-      "text": "You flew back on the next plane still holding a tangerine box, and you have spent two weeks glued to NOAH’s review list. Line 12 is To-the-End Precision, a worker cooperative (owned and run by its workers). Facility loan (for machinery): 350 million won. Rejected. 0.8 seconds. Reason code R-17: related-party history (someone close, like family). The default of the late Moon Sungho was flagged. Oh Jinwoo looks at the screen. 'I asked Assistant Manager Tak Yerin at Gangseo Branch. She says there hasn’t been a single exception approval (a manager signing off outside the rules) since NOAH went live. Starting today, Hajun’s an intern at that branch. His mentor is Do Yoonha.'",
+      "text": "On the NOAH review list you have been holding, line 12 is To-the-End Precision. 350 million won for a machine. Rejected. 0.8 seconds. Reason code R-17: family history. The default of the late Moon Sungho was flagged. Oh Jinwoo speaks. 'I asked Assistant Manager Tak Yerin at Gangseo Branch. She says there hasn’t been a single exception approval (a manager signing off outside the rules) since NOAH went live. Starting today, Hajun’s an intern at that branch. His mentor is Do Yoonha.'",
       "memo": [
         "NOAH review list -- line 12, To-the-End Precision",
         "Tangerine box under the desk, still unopened",
