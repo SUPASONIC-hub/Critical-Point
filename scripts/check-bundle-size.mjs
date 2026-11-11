@@ -1861,7 +1861,8 @@ const budgets = [
   // 12,991 / 3,525 -> 13,064 / 3,564 on 2026-11-04, tab-title-locale over main dc26d880: the tab's title in English and Japanese (pageTitle in the intro copy, put on the tab by src/locale.js through overlay.js pageTitle()). Measured 13,060 / 3,560 in the e2e build, the plus 4.
   // 13,064 / 3,564 -> 13,557 / 3,710 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): `localizeSidePack` and en/ja side01 in the import map beside main's pageTitle(). Measured 13,553 / 3,706 in the e2e build, the plus 4.
   // 13,557 / 3,710 -> 13,713 / 3,737 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 13709 / 3733 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_713, maxGzip: 3_737 },
+  // 13,713 / 3,737 -> 13,713 / 3,748 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured - / 3744 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_713, maxGzip: 3_748 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -2175,7 +2176,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,416 / 432,221 / 439,926 on 2026-11-11, prose-trim-19-28 over main c61d6618. Measured first paint, the plus 4.
 // -> 373,432 / 432,235 / 439,938 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured first paint, the plus 4.
 // -> 373,484 / 432,339 / 440,036 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_484, en: 432_339, ja: 440_036 };
+// -> 373,484 / 432,346 / 440,041 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_484, en: 432_346, ja: 440_041 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
