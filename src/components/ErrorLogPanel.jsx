@@ -1,47 +1,42 @@
 import { readStoredValue, SAVE_BACKUP_STORAGE_KEY } from "../appConfig.js";
+import runLines from "../copy/runLines.js";
+import { fill } from "../locale.js";
 
 export function ErrorLogPanel({ view }) {
   const { showErrorLog, debugToolsEnabled, showRecoveryCenter, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog, closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries, startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup } = view;
   if (!showErrorLog || (!debugToolsEnabled && !showRecoveryCenter)) return null;
   // The copy kept of a save this build could not read (useRuntimeSavedState).
+  const words = runLines.recoveryCenter;
   const hasSaveBackup = Boolean(restoreSaveBackup) && readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) !== null;
   return (
-    <section id="error-log-panel" className="error-log-panel" aria-label="로컬 에러 로그" data-testid="error-log-panel">
+    <section id="error-log-panel" className="error-log-panel" aria-label={words.label} data-testid="error-log-panel">
       <div className="panel-title-row">
         <div>
           <span lang="en">ERROR LOG</span>
-          <h2>최근 오류 기록</h2>
+          <h2>{words.title}</h2>
         </div>
         <div className="error-log-actions">
           <button type="button" onClick={copyDiagnosticTrace}>
-            기록 복사
+            {words.copyTrace}
           </button>
           <button type="button" onClick={() => exportPlaytestLog({ includeDiagnostics: true })}>
-            진단 파일 저장
+            {words.saveDiagnostics}
           </button>
           <button type="button" onClick={refreshLocalErrorLog}>
-            새로고침
+            {words.refresh}
           </button>
           <button type="button" className="ghost" onClick={clearLocalErrorLog}>
-            로그 비우기
+            {words.clear}
           </button>
           <button type="button" className="ghost" onClick={closeRecoveryCenter}>
-            닫기
+            {words.close}
           </button>
         </div>
       </div>
       <div className={`telemetry-health ${telemetryHealth.status}`}>
-        <strong>원격 로그 읽기 점검</strong>
+        <strong>{words.health}</strong>
         <span>
-          {telemetryHealth.status === "ok"
-            ? "정상"
-            : telemetryHealth.status === "checking"
-              ? "확인 중"
-              : telemetryHealth.status === "disabled"
-                ? "비활성"
-                : telemetryHealth.status === "offline"
-                  ? "오프라인"
-                  : "확인 필요"}
+          {Object.hasOwn(words.healthStatus, telemetryHealth.status) ? words.healthStatus[telemetryHealth.status] : words.healthStatus.other}
         </span>
         {telemetryHealth.tables.length > 0 && (
           <small>
@@ -57,7 +52,7 @@ export function ErrorLogPanel({ view }) {
         )}
       </div>
       {localErrorEntries.length === 0 ? (
-        <p className="error-log-empty">저장된 오류 기록이 없습니다.</p>
+        <p className="error-log-empty">{words.emptyErrors}</p>
       ) : (
         <div className="error-log-list">
           {localErrorEntries.map((entry) => (
@@ -68,7 +63,7 @@ export function ErrorLogPanel({ view }) {
                 <p>{entry.error?.message ?? "Unknown error"}</p>
               </div>
               <small>
-                로그 {entry.context?.logLength ?? 0}개 · 마지막 선택 {entry.context?.lastChoiceId || "없음"}
+                {fill(words.entryCounts, { count: entry.context?.logLength ?? 0, choice: entry.context?.lastChoiceId || words.none })}
               </small>
               <button
                 type="button"
@@ -78,70 +73,70 @@ export function ErrorLogPanel({ view }) {
                     entry.context?.currentCase,
                     entry.context?.nodeId,
                     {
-                      echoText: "에러 로그 재현 진입입니다. 저장된 지점의 장면 흐름을 다시 확인합니다.",
+                      echoText: words.replayEcho,
                       persistRun: false,
                     },
                   )
                 }
               >
-                재현
+                {words.replay}
               </button>
               <details className="error-log-details">
-                <summary>상세</summary>
+                <summary>{words.details}</summary>
                 <dl>
                   <dt>stack</dt>
-                  <dd>{entry.error?.stack || "없음"}</dd>
+                  <dd>{entry.error?.stack || words.none}</dd>
                   <dt>viewport</dt>
-                  <dd>{entry.viewport ? `${entry.viewport.width ?? 0}x${entry.viewport.height ?? 0}` : "없음"}</dd>
+                  <dd>{entry.viewport ? `${entry.viewport.width ?? 0}x${entry.viewport.height ?? 0}` : words.none}</dd>
                   <dt>dom</dt>
-                  <dd>{entry.domSnapshot || "없음"}</dd>
+                  <dd>{entry.domSnapshot || words.none}</dd>
                 </dl>
               </details>
             </article>
           ))}
         </div>
       )}
-      <section className="save-slot-panel" aria-label="복구 슬롯" data-testid="save-slot-panel">
+      <section className="save-slot-panel" aria-label={words.slotsLabel} data-testid="save-slot-panel">
         <div className="panel-title-row">
           <div>
             <span lang="en">RECOVERY SLOTS</span>
-            <h3>최근 복구 지점</h3>
+            <h3>{words.slotsTitle}</h3>
           </div>
           <button type="button" className="ghost" onClick={refreshSaveSlots}>
-            새로고침
+            {words.refresh}
           </button>
         </div>
         {hasSaveBackup && (
           <div className="save-slot-list">
             <article data-testid="save-backup">
               <div>
-                <strong>읽지 못한 저장본</strong>
-                <small>이 버전이 읽지 못해 따로 보관한 저장본입니다.</small>
+                <strong>{words.backupTitle}</strong>
+                <small>{words.backupText}</small>
               </div>
               <div className="save-slot-actions">
                 <button type="button" data-testid="restore-save-backup" onClick={restoreSaveBackup}>
-                  다시 읽기
+                  {words.backupRead}
                 </button>
               </div>
             </article>
           </div>
         )}
         {saveSlots.length === 0 ? (
-          <p className="error-log-empty">저장된 복구 슬롯이 없습니다.</p>
+          <p className="error-log-empty">{words.emptySlots}</p>
         ) : (
           <div className="save-slot-list">
             {saveSlots.map((slot) => (
               <article key={slot.id}>
                 <div>
                   <strong>{slot.currentCase} / {slot.nodeId}</strong>
-                  <small>{formatSaveTime(slot.savedAt)} · 완료 {slot.completedCases?.length ?? 0}</small>
+                  <small>{formatSaveTime(slot.savedAt)} · {fill(words.slotDone, { count: slot.completedCases?.length ?? 0 })}</small>
                 </div>
                 <div className="save-slot-actions">
                   <button type="button" data-testid={`restore-save-slot-${slot.id}`} onClick={() => restoreSaveSlot(slot)}>
-                    복원
+                    {words.restore}
                   </button>
                   <button type="button" className="ghost" onClick={() => deleteSaveSlot(slot.id)}>
-                    삭제
+                    {words.remove}
                   </button>
                 </div>
               </article>

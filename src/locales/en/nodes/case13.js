@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c13_start": {
       "title": "The Past Is Settled",
-      "text": "The morning after the first compensation payments, the Group Strategy Office on the 33rd floor of group headquarters. Yoon Sanghyuk, who wanted to talk about the signature field, never brings it up. Instead he slides a tablet across. A launch plan for the 'KD Innovation Committee', and at the top of the list of public outside members, your name. 'Since the National Assembly audit, people want a face. The face of someone who wrote a dissent, telling them the past is settled.' The price is two lines. The compensation standard for the 212 confirmed, and every Trigger Lab colleague returned to a regular department. A woman standing by the window holds out a business card. Baek Arin, Deputy Manager, Group Strategy Office, secretary of the Innovation Committee. 'We shoot tomorrow and go live in six days. I wrote the script. A good story outlasts the facts.' Yoon Sanghyuk caps his pen. 'This time it’s not a signature field but a performance contract. One box.'",
+      "text": "The day after the first compensation payments, Yoon Sanghyuk slides a tablet across instead of the signature field. At the top of the 'KD Innovation Committee' list of public outside members is your name. 'Since the National Assembly audit, people want a face. The face of someone who wrote a dissent, telling them the past is settled.' The price: the standard for the 212 confirmed, and every colleague returned to a regular department. The woman by the window holds out a business card. Baek Arin, Deputy Manager, Group Strategy Office, secretary of the Innovation Committee. 'We shoot tomorrow and go live in six days.' Yoon Sanghyuk caps his pen. 'This time it’s not a signature field but a performance contract. One box.'",
       "memo": [
         "KD Innovation Committee -- 5 public outside members, 1 face for the ads",
         "Price: standard for the 212 confirmed + every Trigger Lab colleague back to a regular department",
@@ -39,7 +39,7 @@ export default {
     },
     "c13_studio": {
       "title": "17 Blown Takes",
-      "text": "Even the colleagues who tagged along to watch end up on set. In front of the green screen, the take is blown 17 times. Five times because your smile looks 'like a hostage', three because 'KD' sounds like 'caddie'. Na Junhyuk, manager of the Yeongdong Branch, called in for a cameo, nails the stamping scene in one. It is a prop seal, but with 30 years in his wrist, even the sound of it landing on paper is clean. Director Bong Younghoon presses his face to the monitor. 'Can we make him the lead instead?' When the lighting crew runs late, Kang Taemin moves four stands by himself. On take 18, the last line rises on the teleprompter. 'The past has all been settled.'",
+      "text": "In front of the green screen, the take is blown 17 times. Five times because your smile looks 'like a hostage', three because 'KD' sounds like 'caddie'. Na Junhyuk, manager of the Yeongdong Branch, on screen only for the stamping shot, nails it in one. Director Bong Younghoon presses his face to the monitor. 'Can we make him the lead instead?' On take 18, the last line rises on the teleprompter. 'The past has all been settled.'",
       "memo": [
         "17 blown takes -- 5 for expression, 3 for saying 'KD'",
         "Cameo Na Junhyuk: stamping scene done in 1 take",
@@ -70,7 +70,7 @@ export default {
     },
     "c13_market": {
       "title": "15 Seconds",
-      "text": "On the TV in the corner of Gaeul Rice Cake Shop, a 15-second trailer airs. The green screen is gone, replaced by a blue sky. On screen, you smile. Whether or not you read the last line aloud, the edit suite has laid a caption over your face. 'The past has all been settled.' Moon Gaeul’s knife stops mid-slice. Moon Hajun hunts for the remote, can’t find it, and pulls the TV’s plug. After a long while Moon Gaeul speaks. 'Settled, then. My husband too.' She peels your business card from beside her husband’s photo on the shelf and puts it in her apron pocket. 'It’s not that I’m hurt. I just don’t want the group to see it.' Moon Hajun asks, 'Are you really doing that?'",
+      "text": "On the TV in the corner, a 15-second trailer airs. Over your smiling face sits a caption. 'The past has all been settled.' Moon Gaeul’s knife stops mid-slice. Moon Hajun pulls the TV’s plug. After a long while Moon Gaeul speaks. 'Settled, then. My husband too.' She takes your business card from beside her husband’s photo and puts it in her apron pocket. 'It’s not that I’m hurt. I just don’t want the group to see it.' Moon Hajun asks, 'Are you really doing that?'",
       "memo": [
         "15-second trailer -- first aired in the evening news ad slot",
         "Caption: 'The past has all been settled'",
@@ -101,7 +101,7 @@ export default {
     },
     "c13_lab": {
       "title": "The Real Script",
-      "text": "Lee Minseo turns the laptop around and plays a 1-minute 'real script' your colleagues shot on their phones. Do Yoonha says, 'The 212 with no paperwork are still waiting.' Ban Jaewook opens his notebook. '47 names written. 0 names settled.' Kwon Dohyun holds up his calculator. 'A production budget of 1.1 billion won would cover their share. It’s a loss.' Na Junhyuk presses down a seal he spent three days carving. 'Unsettled.' Kang Taemin has one line. 'It’s not over.' Oh Jinwoo said he’d do it with no blown takes and got it on the fifth try, and Lee Minseo put all five after the end credits. The last shot is everyone’s voice. 'The past is not settled. That is why we are here.' Lee Minseo asks, 'Where are you going to use this?'",
+      "text": "Lee Minseo plays a 1-minute 'real script' your colleagues shot on their phones. Do Yoonha says, 'The 212 with no paperwork are still waiting.' Ban Jaewook opens his notebook. '47 names written. 0 names settled.' Kwon Dohyun holds up his calculator. 'A production budget of 1.1 billion won would cover their share. It’s a loss.' Na Junhyuk presses down a newly carved seal. 'Unsettled.' Kang Taemin has one line. 'It’s not over.' Oh Jinwoo’s five blown takes went in after the end credits. The last shot is everyone’s voice. 'The past is not settled. That is why we are here.' Lee Minseo asks, 'Where are you going to use this?'",
       "memo": [
         "'Real script' video 1 minute 04 seconds -- shot on 7 phones",
         "Na Junhyuk’s new seal: 'Unsettled'",
@@ -132,7 +132,7 @@ export default {
     },
     "c13_final": {
       "title": "The Teleprompter’s Last Line",
-      "text": "On the monitor behind the set, the concurrent viewer count climbs. 40,000, 70,000, 110,000. Baek Arin hands you an earpiece. 'The last line stays. Read it, and the official letter confirming the 212 standard goes out at 9, and your colleagues return to their old posts on Monday.' Along the back wall of the studio, the Trigger Lab people stand like an audience. Kang Taemin beside the light stands he moved, Na Junhyuk clutching his 'Unsettled' seal. Moon Gaeul has not come. In the very back row, Moon Hajun, in his school uniform, holds a sketchbook to his chest. Director Bong Younghoon folds his fingers. Five, four, three. The first line comes up on the teleprompter.",
+      "text": "The concurrent viewer count climbs to 110,000. Baek Arin hands you an earpiece. 'The last line stays. Read it, and the official letter confirming the 212 standard goes out at 9, and your colleagues return to their old posts on Monday.' The Trigger Lab people stand along the back wall. Moon Gaeul has not come; in the very back row, Moon Hajun, in his school uniform, holds a sketchbook to his chest. Director Bong Younghoon folds his fingers. Five, four, three. The first line comes up on the teleprompter.",
       "memo": [
         "110,000 concurrent livestream viewers",
         "If you read it: letter confirming the 212 standard sent at 21:00",
@@ -160,7 +160,7 @@ export default {
     },
     "c13_aftershock": {
       "title": "The Dark Set",
-      "text": "12 minutes after the broadcast ends, the last thing you said starts circulating as a clip. Whatever you said, the top comments split in two. Teardown is in full swing. Kang Taemin carries out the four light stands by himself, and Director Bong Younghoon, who shot the ad, presses his card into the hand of Na Junhyuk, who lent a hand for the stamping scene. Moon Gaeul’s son Moon Hajun, from the very back row, opens his sketchbook. A drawing of tonight’s set, and under the last light, in small letters: 'to the end'. Alone at the monitor, Baek Arin is rewinding your last 8 seconds for the 11th time. Without turning around, she says, 'A new product launches next week. Its name has “Sangsaeng” in it. Shared growth. It’ll need a story too.'",
+      "text": "12 minutes after the broadcast ends, your last words start circulating as a clip. Kang Taemin carries out the four light stands by himself. Moon Hajun opens his sketchbook. A drawing of tonight’s set, and under the last light, in small letters: 'to the end'. At the monitor, Baek Arin is rewinding your last 8 seconds for the 11th time. Without turning around, she says, 'A new product launches next month. Its name has “Sangsaeng” in it. Shared growth. It’ll need a story too.'",
       "memo": [
         "Clip views: 900,000 in 3 hours",
         "Moon Hajun’s sketch: 'to the end'",
@@ -184,7 +184,7 @@ export default {
     },
     "c13_script": {
       "title": "68% Trust",
-      "text": "On a break, at the makeup mirror, Baek Arin flips through the script’s revision history on a tablet. The last line has changed 14 times. Version 1 was 'We will not forget the past.' 'It scored 41% trust with the focus group. They hear not forgetting as meaning it isn’t over yet. “Has been settled” scored 68%.' She caps her highlighter and adds, evenly, 'We’re not changing the facts. We’re choosing the sentence people will listen to the end.'",
+      "text": "Baek Arin shows you the script’s revision history. The last line has changed 14 times. 'Version 1 was “We will not forget the past.” 41% trust with the focus group. “Has been settled” scored 68%.' She caps her highlighter. 'We’re not changing the facts. We’re choosing the sentence people will listen to the end.'",
       "memo": [
         "Last line revised 14 times",
         "Version 1 'We will not forget the past' -- 41% trust",
@@ -207,7 +207,7 @@ export default {
     },
     "c13_rumor": {
       "title": "Whose Side Is the Bank Boy On",
-      "text": "The next morning, Oh Jinwoo goes to Mangwon Market to buy rice cakes for the team and is cornered by three grannies outside a vegetable stall. 'Bank boy, is that ad yesterday for real?' Oh Jinwoo starts explaining, drawing the committee’s org chart in his phone’s notes. Chair, secretary, outside members, advisory panel. After about 3 minutes, the granny in the middle covers the screen with her palm. 'So whose side are you on?' Oh Jinwoo opens his mouth and closes it. This is a man who has never been lost for words in a contest. The granny slips two more sticks of garaetteok into his bag. 'Come back when you have an answer. I’ll take your money then.'",
+      "text": "Oh Jinwoo, out buying rice cakes, is cornered by three grannies. 'Bank boy, is that ad yesterday for real?' Oh Jinwoo explains, drawing the committee’s org chart on his phone. After about 3 minutes, the granny in the middle covers the screen with her palm. 'So whose side are you on?' Oh Jinwoo, never once lost for words, opens his mouth and closes it. The granny slips two more sticks of garaetteok into his bag. 'Come back when you have an answer. I’ll take your money then.'",
       "memo": [
         "Victims’ group chat: 'betrayal' mentioned 27 times",
         "Reply from the No. 38 grandmother: 'He sliced rice cakes well enough'",
@@ -230,7 +230,7 @@ export default {
     },
     "c13_offer": {
       "title": "The Secretary’s Coffee",
-      "text": "At 11:40 at night, the elevator stops on the 4th floor. Baek Arin steps out with eight coffees. Oh Jinwoo accidentally posted the video as his status on the company messenger and took it down after 4 minutes, and in those 4 minutes she saw it. 'Well made. It’d be better if I edited it, though.' She sets out the coffees one by one and sits across from you. 'Here’s my offer. We put 20 seconds of this video into tomorrow’s livestream. In return, you read the last line as written.' A brief pause. 'A good story outlasts the facts. I do this job because I believe that. But this video, the facts beat the story. Inconveniently.'",
+      "text": "Baek Arin gets off at the 4th floor with eight coffees. She saw the video Oh Jinwoo accidentally posted for 4 minutes. 'Well made. Here’s my offer. We put 20 seconds of this video into tomorrow’s livestream. In return, you read the last line as written.' A brief pause. 'A good story outlasts the facts. I do this job because I believe that. But this video, the facts beat the story. Inconveniently.'",
       "memo": [
         "Baek Arin’s offer: 20 seconds of video ↔ reading the last line",
         "Oh Jinwoo’s messenger slip -- exposed for 4 minutes",
@@ -253,7 +253,7 @@ export default {
     },
     "c13_script_reaction": {
       "title": "Hand Model",
-      "text": "In the parking lot outside the set, Na Junhyuk waves a business card. Director Bong Younghoon gave it to him. 'He wants an exclusive contract as a stamping model. Only my hands are on screen, and the fee is a month of my salary. When I retire I can live off my hands.' Kang Taemin laughs, and Oh Jinwoo silently looks down at his own hands. Na Junhyuk takes a sip of instant coffee and pockets the card. 'But you know, of all the loans I stamped with these hands over 30 years, not one was ever settled. Paid off, couldn’t pay, or still paying. Those three, that’s all.'",
+      "text": "Na Junhyuk waves the business card Director Bong Younghoon gave him. 'He wants an exclusive contract as a stamping model. Only my hands are on screen, and the fee is a month of my salary.' Kang Taemin laughs, and Oh Jinwoo silently looks down at his own hands. Na Junhyuk pockets the card. 'But you know, of all the loans I stamped with these hands over 30 years, not one was ever settled. Paid off, couldn’t pay, or still paying. Those three, that’s all.'",
       "memo": [
         "Exclusive stamping-model offer -- fee is a month’s salary",
         "Paid off, couldn’t pay, or still paying"
@@ -275,7 +275,7 @@ export default {
     },
     "c13_rumor_reaction": {
       "title": "The Return List",
-      "text": "11 at night, the Trigger Lab rooftop. Han Seoyun shows you an email from Human Resources. 'List of staff returning to regular departments.' Lee Minseo, Do Yoonha, Oh Jinwoo, Ban Jaewook. Na Junhyuk and Kang Taemin, on loan, go back to their original posts. Nowhere on the list is Han Seoyun’s name, and nowhere is the department name Trigger Lab. 'Of course. Return is a word for people who have somewhere to go back to. This place is being shut down.' She rests her arms on the railing. 'Everyone will be happy. They’re getting out of the basement after 3 years. I should be happy too.'",
+      "text": "Han Seoyun shows you HR’s 'List of staff returning to regular departments'. Neither Han Seoyun’s name nor the department name Trigger Lab is on it. 'Of course. Return is a word for people who have somewhere to go back to. This place is being shut down.' She rests her arms on the railing. 'Everyone will be happy. They’re getting out of the basement after 3 years. I should be happy too.'",
       "memo": [
         "Two names missing from the return list: Han Seoyun, Trigger Lab",
         "A word for people who have somewhere to go back to"
@@ -297,7 +297,7 @@ export default {
     },
     "c13_offer_reaction": {
       "title": "A Text at 1 a.m.",
-      "text": "At 1:10 a.m., as you rinse cups in the pantry, a text arrives. It is Moon Gaeul. 'Hajun showed me the video. It was nice to see the people who sliced rice cakes. Kang Taemin talks even worse than he pounds rice.' A moment later, one more line. 'Whatever you say tomorrow, I’ll decide after that whether to put your card back up. My husband would have trusted you once more. I’m a little less kind than he was.' In the reply box, the cursor blinks for a long time.",
+      "text": "As you rinse cups, a text arrives from Moon Gaeul. 'Hajun showed me the video. Kang Taemin talks even worse than he pounds rice.' A moment later, one more line. 'Whatever you say tomorrow, I’ll decide after that whether to put your card back up. My husband would have trusted you once more. I’m a little less kind than he was.' In the reply box, the cursor blinks for a long time.",
       "memo": [
         "'Whether to put the card back up, after that'",
         "A little less kind than her husband"
@@ -319,7 +319,7 @@ export default {
     },
     "c13_branch_extras": {
       "title": "The Extras’ Waiting Room",
-      "text": "In the studio’s basement waiting room, eight extras are eating boxed lunches. The role is 'small business owner back on their feet after compensation', paying 80,000 won a day. At the bottom of the casting sheet on the wall is small print. 'Real victims may not be cast -- image risk.' Kang Taemin stops in the doorway. In the corner, someone drops his chopsticks. Kwak Minjae, a junior who worked the FlowOn night shift with him for 3 years and left in last year’s cuts. 'Hyung, I’m playing a business owner today. No lines. I just have to smile.' He smiles, then lowers his voice. 'But hyung, can someone like me really get compensation?'",
+      "text": "Eight extras are eating boxed lunches. The role: 'small business owner back on their feet after compensation'. At the bottom of the casting sheet, in small print: 'Real victims may not be cast -- image risk.' Seeing Kang Taemin, someone in the corner drops his chopsticks. Kwak Minjae, a junior from the FlowOn night shift who left in last year’s cuts. 'Hyung, I’m playing a business owner today. I just have to smile.' He lowers his voice. 'But hyung, can someone like me really get compensation?'",
       "memo": [
         "8 extras -- role: 'small business owner back on their feet after compensation'",
         "Casting sheet: 'Real victims may not be cast'",
@@ -343,7 +343,7 @@ export default {
     },
     "c13_branch_extras_follow": {
       "title": "80,000 Won a Day",
-      "text": "In the afternoon, after the extras wrap first, the studio parking lot. Kwak Minjae shows you his payment text. 80,000 won minus the fee: 64,000 won. 'I’ve done six bank ads. Always the customer beaming after a loan consultation. I’ve never once smiled at a real bank.' Kang Taemin buys two canned coffees and hands him one. Neither speaks for a long while. Opening his can, Kwak Minjae says, 'The guys still at the center say robots are coming at year-end. A hundred-some of them. They say the money comes from KD too.' Kang Taemin tightens his grip on the can. The aluminum crumples.",
+      "text": "Kwak Minjae shows you his payment text. 80,000 won a day minus the fee: 64,000 won. 'I’ve done six bank ads. Always the customer beaming after a loan consultation. I’ve never once smiled at a real bank.' Opening the canned coffee Kang Taemin hands him, he says, 'The guys still at the center say a hundred-some robots are coming at year-end. They say the money comes from KD too.' In Kang Taemin’s hand, the aluminum can crumples.",
       "memo": [
         "Paid 64,000 won -- 20% fee",
         "6 bank ads as an extra, every role a 'smiling customer'",
@@ -367,7 +367,7 @@ export default {
     },
     "c13_route_system": {
       "title": "The Life of a Committee",
-      "text": "Instead of one box on a contract, you line up how the committees set up after scandals ended. ECHO scans the last 15 years. 23 innovation and reform committees created by Korean financial companies after scandals open in a row. Average lifespan: 14 months. Of the 186 recommendations from outside members, 17 were carried through to the end. Committee advertising averaged 3.4 times operating costs, and the most common last line of a first ad was 'We will be reborn,' the second 'Settling the past'. 'Committees have been learned as cheaper than an apology and longer-lasting. With a face attached, they last longer still.'",
+      "text": "ECHO opens, in a row, the 23 innovation and reform committees Korean financial companies created after scandals. Average lifespan: 14 months. Of the 186 recommendations from outside members, 17 were carried through to the end. The most common last line of a first ad was 'We will be reborn,' the second 'Settling the past'. 'Committees have been learned as cheaper than an apology and longer-lasting. With a face attached, they last longer still.'",
       "memo": [
         "23 committees, average lifespan 14 months",
         "17 of 186 outside recommendations implemented",
@@ -393,7 +393,7 @@ export default {
     },
     "c13_final_system_route": {
       "title": "The 24th Committee",
-      "text": "A little over 15 hours to the livestream, ECHO has stacked the last lines of the 23 committees’ first ads in a column. The bottom box is empty, and the line you read this evening goes there. ECHO places one number beside the blank. 'The average is 14 months. For this committee to last longer, at least one thing must remain after the ads end. A face does not count.'",
+      "text": "A little over 15 hours to the livestream, ECHO has stacked the last lines of the 23 committees’ first ads in a column. The empty bottom box is where the line you read this evening goes. 'The average is 14 months. For this committee to last longer, at least one thing must remain after the ads end. A face does not count.'",
       "memo": [
         "Last lines of the 23 committees’ first ads -- bottom box blank",
         "Average lifespan 14 months, 17 recommendations implemented",
@@ -416,7 +416,7 @@ export default {
     },
     "c13_evidence_turn": {
       "title": "The Budget’s Number",
-      "text": "Follow the account number stamped on the clue, and the Innovation Committee’s budget opens. 3.8 billion won in total. Ad production 1.1 billion, broadcast ads 1.9 billion, member activity 800 million. Kwon Dohyun searches the group general ledger for cost code SP-0412. One more line turns up under the same code. 'Trigger Lab wind-down costs -- staff redeployment, equipment return, 4th-floor restoration.' He puts down the calculator. 'Every colleague back to a regular department. That’s not a price, it’s the closure bill. One budget shoots the ad and clears out our room.' He taps the end of the code with his fingernail. 'And these four digits, we all know this number.'",
+      "text": "Follow the account number on the clue, and the Innovation Committee’s 3.8 billion won budget opens. Kwon Dohyun searches the group general ledger for cost code SP-0412, and one more line turns up. 'Trigger Lab wind-down costs -- staff redeployment, equipment return, 4th-floor restoration.' Kwon Dohyun puts down the calculator. 'Everyone going back to a regular department isn’t a price, it’s the closure bill. One budget shoots the ad and clears out our room. And the last four digits of the code, we all know this number.'",
       "memo": [
         "Innovation Committee budget 3.8 billion won -- cost code SP-0412",
         "Same code: Trigger Lab wind-down costs",
@@ -439,7 +439,7 @@ export default {
     },
     "c13_start_warm": {
       "title": "An Offer That Smells of Rice Cakes",
-      "text": "The morning after pulling down the shop shutter, you go up to the 33rd floor in a jacket still smelling of sesame oil. Yoon Sanghyuk, who wanted to talk about the signature field, hands you a 'KD Innovation Committee' plan instead. A public outside member and the face of the ads, on condition that the dissent writer says 'the past is settled'. The price: the standard for the 212 confirmed and every Trigger Lab colleague back in a regular department. Baek Arin, Deputy Manager of the Group Strategy Office, standing by the window, holds out a performance contract. 'We shoot tomorrow and go live in six days.' Kang Taemin, waiting in the lobby, texts you. 'The people who got rice cakes yesterday are outside the shop again today.'",
+      "text": "You go up to the 33rd floor in a jacket still smelling of sesame oil. Instead of the signature field, Yoon Sanghyuk hands you a 'KD Innovation Committee' plan. If the dissent writer says 'the past is settled' in the ads, the standard for the 212 is confirmed and every colleague returns to a regular department. Baek Arin, Deputy Manager of the Group Strategy Office, holds out a performance contract. 'We shoot tomorrow and go live in six days.' A text comes from Kang Taemin. 'The people who got rice cakes yesterday are outside the shop again today.'",
       "memo": [
         "Yesterday 1,021 boxes of rice cakes -- every member",
         "Offer: face of the Innovation Committee ads",
@@ -469,7 +469,7 @@ export default {
     },
     "c13_start_record": {
       "title": "The Revision Turned Prop",
-      "text": "You take the revised compensation standard covering the 212 up to the 33rd floor. When the door opens, a stranger has already printed that document and highlighted it. Baek Arin, Deputy Manager, Group Strategy Office. 'Nicely written. Let’s make it the Innovation Committee’s agenda item No. 1. And announce it with an ad.' Yoon Sanghyuk adds the condition. In the ad, you, the dissent writer, say 'the past is settled'. The price: the revision confirmed and every Trigger Lab colleague back in a regular department. Baek Arin lays a performance contract on top. 'We shoot tomorrow and go live in six days.' Your document is No. 3 on the shoot’s prop list.",
+      "text": "A stranger has highlighted your revised standard covering the 212. Baek Arin, Deputy Manager, Group Strategy Office. 'Nicely written. Let’s make it the Innovation Committee’s agenda item No. 1. And announce it with an ad.' The condition: you say 'the past is settled' in the ad. The price: the revision confirmed and every colleague back in a regular department. Baek Arin lays down a performance contract. 'We shoot tomorrow and go live in six days.' Your document is No. 3 on the shoot’s prop list.",
       "memo": [
         "Revised compensation standard -- No. 3 on the prop list",
         "Planned as Innovation Committee agenda item No. 1",
@@ -499,7 +499,7 @@ export default {
     },
     "c13_start_rush": {
       "title": "The One with the Rice Cake Box",
-      "text": "You walk onto the 33rd floor still holding the last box of rice cakes. Yoon Sanghyuk lifts the lid and takes a songpyeon. 'Mrs. Moon’s rice cakes. She steams them well.' The signature field doesn’t come up. Baek Arin, Deputy Manager of the Group Strategy Office, standing by the window, photographs the box with her phone. 'Nice shot. Let’s put it in the ad.' The offer is to be the face of the 'KD Innovation Committee' ads. If the dissent writer says 'the past is settled', the standard for the 212 is confirmed and every Trigger Lab colleague returns to a regular department. Baek Arin holds out a performance contract. 'We shoot tomorrow and go live in six days.' The box that was Moon Sungho’s share has already become a scene in someone’s ad.",
+      "text": "Yoon Sanghyuk takes a songpyeon from the last box of rice cakes. 'Mrs. Moon’s rice cakes. She steams them well.' By the window, Baek Arin, Deputy Manager of the Group Strategy Office, photographs the box. 'Nice shot. Let’s put it in the ad.' If the dissent writer says 'the past is settled' in the 'KD Innovation Committee' ads, the standard for the 212 is confirmed and every colleague returns to a regular department. Baek Arin holds out a performance contract. 'We shoot tomorrow and go live in six days.' The box that was Moon Sungho’s share is already a scene in an ad.",
       "memo": [
         "Photo of the rice cake box -- 1 frame in the ad draft",
         "Yoon Sanghyuk ate 1 songpyeon",
@@ -523,7 +523,7 @@ export default {
         }
       },
       "place": "KD Financial Group headquarters, 33rd floor · Group Strategy Office",
-      "clock": "Payment day night · Launch livestream D-7",
+      "clock": "Payment day night · Launch livestream D-6",
       "question": "The box that was Moon Sungho’s share is about to become an ad draft. What do you nail down here?",
       "lead": "On the 33rd floor, having left the line outside the shop, you are still holding the box the lobby guard took a rice cake from."
     }
@@ -540,7 +540,7 @@ export default {
     "c13_market_deal": "Hearing the request, Moon Gaeul slices once more. 'Which of those 212 asked you to bear it for them?'",
     "c13_lab_share": "You send it; the group chat goes quiet for a long time, then rice cake emojis appear one by one. The group will see this video soon too.",
     "c13_lab_submit": "You submit it and get a filing number. The committee’s first meeting is 3 weeks after the livestream.",
-    "c13_lab_cue": "You change it, and Lee Minseo’s old account shows up in the dawn access log. 3 years ago, it was an access log that made her the leaker. The secretary checks the cue sheet once more an hour before air.",
+    "c13_lab_cue": "You change it, and Lee Minseo’s old account shows up in the dawn access log. It was an access log that made her the leaker before, too. The secretary checks the cue sheet once more an hour before air.",
     "c13_final_terms": "You set your condition, and Baek Arin calls the 33rd floor over the earpiece. The broadcast starts 3 minutes late, and the letter for the 212 is delayed just as long.",
     "c13_final_refuse": "You decline, and 110,000 people hear the price too. The 212 standard and your colleagues’ return orders appear in no official letter tonight.",
     "c13_final_rewrite": "You change the line, and for the first time the teleprompter and your mouth say different things. Baek Arin does not cut those 3 seconds. Article 11 of the contract arrives tomorrow morning.",

@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c27_start": {
       "title": "Friday Night’s Screenshot",
-      "text": "Before you’ve even sat down at your Risk Management Department desk, your phone rings. 6:50 in the morning: Na Junhyuk. 'There’s a line in Gunsan. Since four this morning. About 180 people now.' Since Friday night, he says, a single screenshot has been going around every local group chat. One line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) is caught in real-estate project financing (PF) and won’t make it through the month. The screenshot doesn’t say which construction site, but you know. The Pyeongtaek officetel KD Capital led; Saebom Credit Union put 6 billion won into it. A bank run moves faster than the facts. Na Junhyuk catches his breath. 'The first desk I ever sat at after I joined the bank was in Gunsan. I’m going down today. I’m bringing my seals.'",
+      "text": "Before you’ve even sat down, Na Junhyuk calls. 'There’s a line in Gunsan. Since four this morning. About 180 people now.' The screenshot going around the group chats since Friday night is one line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) won’t make it through the month. It’s caught in real-estate project financing (PF), and the site is the Pyeongtaek officetel KD Capital led. Saebom put 6 billion won into it. A bank run moves faster than the facts. 'The first desk I ever sat at was in Gunsan. I’m going down with my seals.'",
       "memo": [
         "About 180 waiting outside Saebom Credit Union -- since 04:00",
         "Subordinated stake in the Pyeongtaek officetel PF: 6 billion won",
@@ -38,7 +38,7 @@ export default {
     },
     "c27_queue": {
       "title": "Stamped Number Tickets",
-      "text": "The moment the banking hall doors open at 9 a.m., the number-ticket machine spits out paper up to No. 187 and jams. When you arrive at 11 a.m., Executive Director Namgoong Sol is calling the people in line one by one, by name. 'Auntie Hyesook, how are your knees? Uncle Jungho, your boat didn’t go out today, I see.' The talk that she knows all 4,812 members by name is no exaggeration. Na Junhyuk writes numbers on the backs of deposit slips and stamps three seals on each in turn, handing them out in place of tickets. With 30 years of practice, not one seal is crooked, and from the back of the line one more rumor starts: 'Tickets with the branch manager’s stamp get served first.' One old man takes just the stamp and heads home, saying 'That’ll do, this’ll do.' Namgoong Sol laughs, then looks toward the vault behind the counter. Today’s cash on hand is 1.4 billion won, and the line has passed 300.",
+      "text": "The moment the doors open at 9 a.m., the number-ticket machine jams at No. 187. Executive Director Namgoong Sol is calling the people in line one by one, by name. 'Auntie Hyesook, how are your knees? Uncle Jungho, your boat didn’t go out today, I see.' Na Junhyuk writes numbers on the backs of deposit slips and stamps three seals on each, handing them out in place of tickets. With 30 years of practice, not one seal is crooked. Namgoong Sol looks toward the vault. Today’s cash on hand is 1.4 billion won, and the line has passed 300.",
       "memo": [
         "Number-ticket machine jammed at No. 187 -- handwritten tickets after that",
         "312 waiting by morning, average withdrawal request 19 million won",
@@ -69,7 +69,7 @@ export default {
     },
     "c27_rumor": {
       "title": "Gray Speech Bubbles",
-      "text": "Saebom Credit Union is closed; only the light in the executive director’s office is on. Lee Minseo, now at KD Data Lab in Pangyo, has traced the screenshot backward and joins by video call. It was first posted at 11:14 on Friday night in a Gunsan parents’ group chat and spread to 31 rooms within two hours. 'But the original of this screenshot isn’t a group chat.' She enlarges the screen. Gray speech bubbles, a small shield icon in the top right, a read count of 14. You take out your phone and open KD Capital’s in-house messenger. The bubble color, the shield icon: the same. Beside the blurred-out name, a team name is half visible. 'Real Estate Fin…'. Na Junhyuk, wearing a balloon hat the kids from the church next door put on him, silently makes one more cup of instant coffee.",
+      "text": "Lee Minseo of KD Data Lab in Pangyo has traced the screenshot backward and joins by video call. It was first posted at 11:14 on Friday night in a Gunsan parents’ group chat and spread to 31 rooms within two hours. 'But the original of this screenshot isn’t a group chat.' Gray speech bubbles, a shield icon in the top right, a read count of 14. Exactly like KD Capital’s in-house messenger. Beside the blurred-out name, a team name is half visible. 'Real Estate Fin…'.",
       "memo": [
         "First post: Friday 23:14, a Gunsan parents’ group chat",
         "Spread to 31 rooms within two hours",
@@ -100,7 +100,7 @@ export default {
     },
     "c27_offer": {
       "title": "38 Percent",
-      "text": "An 'emergency support plan' in the name of KD Capital’s Real Estate Finance Team lands in Namgoong Sol’s inbox. It offers to buy the 6 billion won Saebom put into Pyeongtaek, a subordinated stake (last in line for repayment), at 38%. 2.28 billion won in cash today, signature by 18:00. The loss comes out of member capital first, and unlike deposits, member capital isn’t protected. Just then the banking hall door opens and Kwon Dohyun walks in. He’s from Bridge Bank, next after KD Capital in line to be repaid on the Pyeongtaek project, and he says he took leave to come. He draws a vertical line down the back of a number ticket and writes out the recovery rates. If construction restarts, 71%; sell today, 38%. 'At this price, it isn’t a loss. It’s plunder.' Namgoong Sol scrolls the email to the end. The signature field for the officer in charge is blank.",
+      "text": "It’s an 'emergency support plan' in the name of KD Capital’s Real Estate Finance Team. It offers to buy the 6 billion won Saebom put into Pyeongtaek, a subordinated stake (last in line for repayment), at 38%. 2.28 billion won in cash today, signature by 18:00. The loss comes out of member capital first, which isn’t protected. Kwon Dohyun of Bridge Bank, who took leave to come, writes the recovery rates on the back of a number ticket. If construction restarts, 71%; sell today, 38%. 'At this price, it isn’t a loss. It’s plunder.' At the end of the email, the signature field for the officer in charge is blank.",
       "memo": [
         "KD Capital offer: buy the 6 billion won subordinated stake at 38% (2.28 billion won)",
         "Signature deadline: Thursday 18:00",
@@ -131,7 +131,7 @@ export default {
     },
     "c27_final": {
       "title": "Parents’ Day Morning",
-      "text": "Seven board members gather in the 3rd-floor meeting room of Saebom Credit Union. The line outside the window is already 140 people long, and those near the front wear paper carnations, folded last night, pinned to their chests. Three sheets of paper lie on the table. A proposal from KD Financial Group to deposit 10 billion won, with, in small print at the very bottom of its conditions field, 'consultation on selling the Pyeongtaek subordinated stake.' Namgoong Sol’s draft notice, putting Saebom’s Pyeongtaek stake and the original messenger screenshot out in full in the credit union’s name. And an application asking the financial authorities to allow a daily withdrawal limit. One must be chosen before the banking hall doors open at 9. Namgoong Sol looks at you. 'My father held out for three days, they say. I have to decide how to hold out today. In the names of the people in that line.'",
+      "text": "The line outside the window is already 140 people long. Three sheets of paper lie before the seven board members. A proposal from KD Financial Group to deposit 10 billion won, with, in small print at the very bottom of its conditions field, 'consultation on selling the Pyeongtaek subordinated stake.' Namgoong Sol’s draft notice, putting Saebom’s Pyeongtaek stake and the original messenger screenshot out in full. An application asking the financial authorities to allow a daily withdrawal limit. One must be chosen before the doors open at 9. 'My father held out for three days, they say. I have to decide how to hold out today. In the names of the people in that line.'",
       "memo": [
         "Group deposit offer 10 billion won -- condition: consultation on selling the Pyeongtaek stake",
         "Full-disclosure draft notice -- original screenshot included",
@@ -159,7 +159,7 @@ export default {
     },
     "c27_aftershock": {
       "title": "Twelve Bowls of Jjamppong",
-      "text": "Friday, 4 p.m.: the shutter comes down. The last number ticket was No. 412, and after it, thirty-eight people came to put their money back. Saebom Credit Union’s executive director, Namgoong Sol, orders twelve bowls of jjamppong from the Chinese restaurant by the station. Kwon Dohyun of Bridge Bank, who took leave to come down, writes the price of one bowl beside today’s returned deposits, then says, 'This isn’t a field for me to calculate,' and picks up his chopsticks. Na Junhyuk tucks one stamped number ticket into his wallet next to a coupon from the stuffed-squid restaurant. 'Best stamping I’ve done in 30 years.' Grandma Ha Junghee, a member, walks past with her carnation still on, waving a new passbook. Just then a message comes from Do Yoonha. 'Starting next week they’re sending me to the KD Life call center. The script they gave me in advance has the word refusal in it 14 times.'",
+      "text": "The shutter comes down. The last number ticket was No. 412, and after it, thirty-eight people came to put their money back. Namgoong Sol orders twelve bowls of jjamppong from the Chinese restaurant by the station. Na Junhyuk tucks one stamped number ticket into his wallet next to a coupon from the stuffed-squid restaurant. 'Best stamping I’ve done in 30 years.' Just then a message comes from Do Yoonha. 'Starting next week they’re sending me to the KD Life call center. The script they gave me in advance has the word refusal in it 14 times.'",
       "memo": [
         "Last number ticket: No. 412",
         "38 members put their money back",
@@ -183,7 +183,7 @@ export default {
     },
     "c27_savings": {
       "title": "Two Months to Maturity",
-      "text": "2 p.m., and it’s 74-year-old Grandma Ha Junghee’s turn. An installment savings account she has paid into for nearly 3 years for her grandchild’s college tuition: 24 million won, two months from maturity. Break it now and more than half the interest is gone. Namgoong Sol takes her hand and explains slowly. These savings fall under deposit insurance (repayment guaranteed up to 100 million won even if the institution closes), so not a single won will vanish. Grandma Ha nods, then starts to cry. 'Sol, I trust you. But my son in Seoul saw the news and says take it out right now. I have to listen to my child too.' The hand gripping her passbook trembles.",
+      "text": "It’s Grandma Ha Junghee’s turn. An installment savings account she has paid into for nearly 3 years for her grandchild’s college tuition: 24 million won, two months from maturity. Break it now and more than half the interest is gone. Namgoong Sol takes her hand and explains. The savings fall under deposit insurance (repayment guaranteed up to 100 million won even if the institution closes), so not a single won will vanish. Grandma Ha speaks through tears. 'Sol, I trust you. But my son in Seoul saw the news and says take it out right now.'",
       "memo": [
         "Ha Junghee (74), savings 24 million won -- two months before maturity",
         "Early termination: more than half the interest lost",
@@ -206,7 +206,7 @@ export default {
     },
     "c27_returns": {
       "title": "A Black Plastic Bag",
-      "text": "Around Wednesday lunchtime, Boss Kwak from the fish market, in rubber boots, pushes in against the line carrying a black plastic bag. Tipped out on the counter, the bag spills bundles of 50,000-won notes: the 30 million won taken out on Monday. 'Seein’ Sol’s face, I reckon it’s gotta go back in. Can’t sleep with it at home.' Laughter bursts out at the back of the line. By afternoon, seventeen people have come to put money back. Stamping deposit slips, Na Junhyuk tells each one 'Welcome back,' until his voice catches. Still, the line is 200 long, and three times as much money is going out as coming in.",
+      "text": "Boss Kwak from the fish market pushes in against the line carrying a black plastic bag. Out of it come the 30 million won taken out on Monday, in bundles of 50,000-won notes. 'Seein’ Sol’s face, I reckon it’s gotta go back in. Can’t sleep with it at home.' By afternoon, seventeen people have put money back. Stamping deposit slips, Na Junhyuk tells each one 'Welcome back,' until his voice catches. Still, the line is 200 long, and three times as much money is going out as coming in.",
       "memo": [
         "17 redeposits -- Boss Kwak’s 30 million won the first",
         "About 200 waiting on Wednesday",
@@ -229,7 +229,7 @@ export default {
     },
     "c27_carnation": {
       "title": "Carnations Like Blueprints",
-      "text": "Thursday, 10 p.m.: colored paper piles up on the banking hall table. Tomorrow is Parents’ Day, and Namgoong Sol has said she wants to pin carnations on the elders waiting in line. With the hands that stamped all day, Na Junhyuk folds petal tips without a hair’s error. The carnations Kwon Dohyun folds have exactly six petals and every corner square, so Namgoong Sol laughs: 'These aren’t flowers, they’re blueprints.' A box of cup noodles from Kang Taemin arrives by courier. As the laughter fades, Namgoong Sol puts down her paper. 'Tomorrow, while I pin these on, I may have to tell them there’s a limit.'",
+      "text": "Tomorrow is Parents’ Day, and Namgoong Sol has said she wants to pin carnations on the elders waiting in line. With the hands that stamped all day, Na Junhyuk folds petal tips without a hair’s error. The carnations Kwon Dohyun folds have exactly six petals, every corner square. Namgoong Sol laughs: 'These aren’t flowers, they’re blueprints.' As the laughter fades, Namgoong Sol puts down her paper. 'Tomorrow, while I pin these on, I may have to tell them there’s a limit.'",
       "memo": [
         "Target: 150 paper carnations",
         "Kwon Dohyun’s carnations: 6 petals, all corners square",
@@ -252,7 +252,7 @@ export default {
     },
     "c27_savings_reaction": {
       "title": "A Blanket from 1998",
-      "text": "9 p.m.: scraps of number tickets lie scattered across the shuttered banking hall. Money out on the first day: 3.8 billion won. Sitting on a waiting-area chair, Namgoong Sol points to a black-and-white photo on the wall. A man sitting on a blanket spread on the floor of this same banking hall. 'That’s my father. He was executive director here in 1998. A rumor went around back then too, and he slept here three nights, they say. Boiling barley tea for the people in line.' She smiles. 'The people who stood in line then are our aunties and uncles now. They stood in line again today. I’m glad my father didn’t live to see this.'",
+      "text": "Money out on the first day: 3.8 billion won. Namgoong Sol points to a black-and-white photo on the wall. 'That’s my father. He was executive director here in 1998. A rumor went around back then too, and he slept here three nights, they say. Boiling barley tea for the people in line. The people who stood in line then are our aunties and uncles now. They stood in line again today. I’m glad my father didn’t live to see this.'",
       "memo": [
         "1998 banking hall photo -- the former executive director on a blanket",
         "Those who stood in line then stood again today"
@@ -274,7 +274,7 @@ export default {
     },
     "c27_returns_reaction": {
       "title": "Friday Night, Monday Morning",
-      "text": "In the evening, Ban Jaewook, who was in Jeonju on his regional rotation for Internal Audit, drives over. In the parking lot he opens his notebook. In just 1 year, the same rumor went around three small financial co-ops in North Jeolla. One line: caught in a half-built construction site, they won’t make it through the month. All three, within a month, sold their stakes in that site to KD Capital for a pittance, and one of them was merged into another co-op the next year, its name gone. Ban Jaewook stops his pen. 'Every time, the rumor went around on a Friday night. And every time, on Monday morning, the same company called.'",
+      "text": "Ban Jaewook, who was in Jeonju, drives over and opens his notebook. In just 1 year, the same rumor went around three small financial co-ops in North Jeolla. All three, within a month, sold their construction stakes to KD Capital for a pittance, and one was merged into another co-op the next year, its name gone. 'Every time, the rumor went around on a Friday night. And every time, on Monday morning, the same company called.'",
       "memo": [
         "Three small co-ops in North Jeolla -- same rumor, same buyer",
         "Rumor Friday night, call Monday morning"
@@ -296,7 +296,7 @@ export default {
     },
     "c27_carnation_reaction": {
       "title": "One Word: Closed",
-      "text": "11 p.m., and someone knocks on the shutter. Grandma Ha Junghee stands there holding a bundle of dried bakdae (a Gunsan flatfish) and her closed savings passbook. 'Yesterday I heard Boss Kwak put the money back, and I couldn’t sleep.' She sets the passbook on the table. 'I called my son and gave him a scolding. Told him Mom’s money is Mom’s business. Can this be brought back? I meant to take it out right when my grandchild starts school.' On the passbook’s last line are printed Monday’s date and one word: 'Closed.' Instead of answering, Namgoong Sol takes the grandmother’s hand first.",
+      "text": "A knock on the shutter. Grandma Ha Junghee stands there holding a bundle of dried bakdae (a Gunsan flatfish) and her closed savings passbook. 'Yesterday I heard Boss Kwak put the money back, and I couldn’t sleep. I called my son and gave him a scolding. Told him Mom’s money is Mom’s business. Can this be brought back? I meant to take it out right when my grandchild starts school.' Instead of answering, Namgoong Sol takes the grandmother’s hand first.",
       "memo": [
         "A closed savings passbook and a bundle of dried bakdae",
         "Maturity timed to her grandchild’s school entrance"
@@ -318,7 +318,7 @@ export default {
     },
     "c27_branch_vault": {
       "title": "The Sound of Counting Bills",
-      "text": "Tucking the screenshot deep into your phone, you step out of the executive director’s office to find the vault door half open. Namgoong Sol and Na Junhyuk are running two bill counters, counting the cash on hand for Wednesday morning. The calculator’s numbers shrink faster than the banded 50,000-won bundles pile up. Cash left: 920 million won. To draw the money held at the Central Federation in cash, they must wait for the armored truck at 10 a.m. Wednesday. Na Junhyuk stops in the middle of banding a stack. 'In 30 years, this is the first time the sound of counting money has scared me.' Namgoong Sol stops the counter. 'Within an hour of opening, all of this goes out.'",
+      "text": "Tucking the screenshot deep into your phone, you step out to find the vault door half open. Namgoong Sol and Na Junhyuk are running two bill counters, counting the cash on hand for Wednesday morning. Cash left: 920 million won. Na Junhyuk stops in the middle of banding a stack. 'In 30 years, this is the first time the sound of counting money has scared me.' Namgoong Sol stops the counter. 'Within an hour of opening, all of this goes out.'",
       "memo": [
         "Vault balance 920 million won",
         "Central Federation cash transport: Wednesday 10:00",
@@ -342,7 +342,7 @@ export default {
     },
     "c27_branch_vault_follow": {
       "title": "Boxes Through the Front Door",
-      "text": "Wednesday, 10:02 a.m.: the armored cash truck pulls up in the alley in front of the banking hall. Na Junhyuk asks the guards a favor: bring the money boxes in not through the back door but through the front, right before the eyes of the people in line. As six gray boxes pass between them, the line stirs. 'Money’s comin’ in.' 'That all real?' A few people fold their number tickets into their pockets and turn away. Beside you, Namgoong Sol speaks quietly. 'Those boxes are borrowed from the Central Federation. Money with interest on it. It’s good to show them, but people can’t go thinking that was our own money.'",
+      "text": "The armored cash truck pulls up. Na Junhyuk asks the guards to bring the money boxes in through the front, right before the eyes of the people in line. As six gray boxes pass, the line stirs. 'Money’s comin’ in.' 'That all real?' A few people fold their number tickets away and turn back. Namgoong Sol speaks quietly. 'Those boxes are borrowed from the Central Federation. Money with interest on it. People can’t go thinking that was our own money.'",
       "memo": [
         "6 cash boxes -- emergency borrowing from the Central Federation",
         "23 left the line after the front-door delivery",
@@ -366,7 +366,7 @@ export default {
     },
     "c27_route_system": {
       "title": "The Rumor’s Discount Rate",
-      "text": "Turning your back on the line in the banking hall, you ask what became of co-ops that saw lines like this. On a KD Capital terminal, the Group’s AI review engine, NOAH, answers. Of 34 bank runs at small financial co-ops nationwide over the past 10 years, 29 began with rumors whose source was never found. In 21 of those, the PF stake the co-op held passed to a large financial company for a pittance within three months. All of them were subordinated stakes. Only six records have the buyer’s name filled in. 'Rumors are learned not as causes but as discount rates. The faster the rumor, the lower the price.'",
+      "text": "The Group’s AI review engine, NOAH, answers what became of co-ops that saw lines like this. Of 34 bank runs at small financial co-ops over the past 10 years, 29 began with rumors of unknown source. In 21 of those, the PF stake the co-op held passed to a large financial company for a pittance within three months. All of them were subordinated stakes. Only six records keep the buyer’s name. 'Rumors are learned not as causes but as discount rates. The faster the rumor, the lower the price.'",
       "memo": [
         "Of 34 small co-op bank runs, 29 from rumors of unknown source",
         "21 fire sales within three months",
@@ -392,7 +392,7 @@ export default {
     },
     "c27_final_system_route": {
       "title": "Six Records with Names",
-      "text": "Parents’ Day, five in the morning: NOAH’s table remains on the remote terminal in the executive director’s office. Of the 21 fire sales, six have the buyer’s name written down; for the other 15, there is no knowing who bought. Outside the window, folding chairs are already starting to appear. On the desk lies the 'emergency support plan' KD Capital sent yesterday, an offer to buy Saebom’s 6 billion won Pyeongtaek stake at 38%. Saebom Credit Union’s executive director, Namgoong Sol, brings the member register and sets it beside the terminal. A book with all 4,812 names written in, not one missing. NOAH compares the two lists. 'The names of those who deposited are all on record. The names of the companies that bought are blank in 15 of 21 cases. The blank side set the price.'",
+      "text": "NOAH’s table remains on the screen. Of the 21 fire sales, only six have the buyer’s name written down. On the desk lies KD Capital’s 'emergency support plan', an offer to buy Saebom’s 6 billion won Pyeongtaek stake at 38%. Namgoong Sol sets the member register, all 4,812 names written in, beside the terminal. NOAH compares the two lists. 'The names of those who deposited are all on record. The names of the companies that bought are blank in 15 of 21 cases. The blank side set the price.'",
       "memo": [
         "21 fire sales -- 6 with the buyer on record",
         "Saebom Credit Union, 4,812 members",
@@ -415,7 +415,7 @@ export default {
     },
     "c27_evidence_turn": {
       "title": "The Price Written Before the Rumor",
-      "text": "When you set the clue against the screenshot’s timestamp, the chat’s full log opens. An in-house chat of KD Capital’s Real Estate Finance Team, Friday, 10:52 p.m. Team Head Koo Seungmin posts a table. Of the seven backers of the Pyeongtaek project, only Saebom Credit Union’s row is shaded red. 'One line out front and this lot dumps it on their own.' 22 minutes later, that screen appears as a single screenshot in a Gunsan parents’ group chat. Pinned at the top of the chat is a document created on April 28. 'Saebom subordinated stake disposal plan: buy at 38%, then fold into the Roundhill bundle.' The idea: buy Saebom’s stake cheap and slip it into the Roundhill bulk sale (bad assets sold off all at once as one bundle). The approver field is blank. Ban Jaewook closes his notebook. 'The price tag came first, and the rumor was the glue to stick it on.'",
+      "text": "When you set the clue against the screenshot’s timestamp, the chat log opens. Friday, 10:52 p.m.: in the KD Capital Real Estate Finance Team chat, Team Head Koo Seungmin posts a table. Of the seven backers of the Pyeongtaek project, only Saebom Credit Union’s row is red. 'One line out front and this lot dumps it on their own.' 22 minutes later, that screen appears in a Gunsan parents’ group chat. Pinned at the top of the chat is a document created on April 28. 'Saebom subordinated stake disposal plan: buy at 38%, then fold into the Roundhill bundle.' That means slipping it into the Roundhill bulk sale (bad assets sold off all at once as one bundle), and the approver field is blank. Ban Jaewook closes his notebook. 'The price tag came first, and the rumor was the glue to stick it on.'",
       "memo": [
         "Chat post 22:52 → parents’ group chat 23:14",
         "Disposal plan written April 28 -- three days ahead of the rumor",
@@ -438,7 +438,7 @@ export default {
     },
     "c27_start_warm": {
       "title": "A Bank Run for the One Who Stayed",
-      "text": "Ten days after you stayed through the night beside the people at the Pyeongtaek site, your jacket still has cement dust on it. Before dawn on May 4, the phone in that jacket pocket rings. It’s Na Junhyuk. 'There’s been a line in Gunsan since four this morning. I’m heading down with my seals.' The rumor that started Friday night is one line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) is caught in real-estate project financing (PF) and won’t make it through the month. It doesn’t say which construction site. You’re the one who saw the stalled tower crane with your own eyes. On that crane hangs 6 billion won of Saebom members’ money. The bank run is about to bring people down before the crane does.",
+      "text": "Ten days after you stayed through the night beside the people at the Pyeongtaek site, your jacket still has cement dust on it. In its pocket, Na Junhyuk’s call comes in. 'There’s been a line in Gunsan since four this morning. I’m heading down with my seals.' The rumor is one line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) won’t make it through the month. It’s caught in real-estate project financing (PF), they say. On the stalled tower crane you saw hangs 6 billion won of the members’ money. The bank run is about to bring people down before the crane does.",
       "memo": [
         "About 180 waiting outside Saebom Credit Union -- since 04:00",
         "Subordinated stake in the Pyeongtaek officetel PF: 6 billion won",
@@ -468,7 +468,7 @@ export default {
     },
     "c27_start_record": {
       "title": "A Bank Run for the One Who Kept the Record",
-      "text": "What you saw at the Pyeongtaek site, you put in writing, down to a table of the project’s seven backers and how much each put in. Before dawn on May 4, Ban Jaewook, in Jeonju on his regional rotation for Internal Audit, sends you a screenshot. One line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) is caught in real-estate project financing (PF) and won’t make it through the month. The table beneath it, with only the site name erased, matches page 3 of your document down to the last cell. A line has stood outside Saebom since four this morning. A bank run. Na Junhyuk, whose first post was Gunsan, has packed his seals and is already on his way down. Ban Jaewook adds: 'First we need to see whose hands your table passed through to reach a group chat in Gunsan.'",
+      "text": "What you saw at the Pyeongtaek site, you put in a table: the seven backers and how much each put in. The screenshot Ban Jaewook sent is one line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) won’t make it through the month. It’s caught in real-estate project financing (PF). The table beneath it, with only the site name erased, matches page 3 of your document down to the last cell. The line outside the credit union since four this morning is a bank run. Ban Jaewook adds: 'First we need to see whose hands your table passed through to reach a group chat in Gunsan.'",
       "memo": [
         "Table in the screenshot = page 3 of your document",
         "About 180 waiting outside Saebom Credit Union",
@@ -498,7 +498,7 @@ export default {
     },
     "c27_start_rush": {
       "title": "A Bank Run for the One Who Came Back First",
-      "text": "On the Friday night you left Pyeongtaek behind and came straight back to headquarters, messenger alerts kept chiming from the Real Estate Finance Team’s side of the partition. A week later, at 11 on Friday night, as you stayed late on the 12th floor working through agenda items, an alert chimed again beyond you, and someone laughed low. Monday, 6:50 in the morning, Na Junhyuk calls. 'There’s a line in Gunsan. Already 180 people. I’m heading down with my seals.' The screenshot going around since Friday night is one line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) is caught in real-estate project financing (PF) and won’t make it through the month. There’s no site name, but you know it’s Pyeongtaek. The bank run has begun. You hear that Friday-night laugh again.",
+      "text": "The Friday night you came back from Pyeongtaek, messenger alerts kept chiming from the Real Estate Finance Team’s side of the partition. A week later, at 11 on Friday night, behind another alert, someone laughed low. Na Junhyuk calls. 'There’s a line in Gunsan. Already 180 people. I’m heading down with my seals.' The screenshot is one line: Gunsan’s Saebom Credit Union (a small neighborhood co-op owned by its members) won’t make it through the month. It’s caught in real-estate project financing (PF), and though there’s no site name, you know it’s Pyeongtaek. The bank run has begun.",
       "memo": [
         "Friday 23:00, messenger alerts at the Real Estate Finance Team’s desks",
         "About 180 waiting outside Saebom Credit Union",

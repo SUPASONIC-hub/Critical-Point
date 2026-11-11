@@ -14,8 +14,11 @@
 마십시오.
 
 새 사건을 견본으로 게임에 넣어 두지는 않았습니다. 들어간 사건은 모두 시즌의 이야기이고, 이야기 없는 견본
-사건은 검사(결말 퍼널, 시즌 완주)를 함께 바꾸게 하기 때문입니다. 대신 견본은 둘입니다. 1장의 **뼈대 견본**은
-사건 49의 모양을 그대로 줄인 것이고, 4장은 실제 장면을 한 글자도 고치지 않고 옮긴 것입니다. 실제 파일 하나를
+사건은 검사(결말 퍼널, 시즌 완주)를 함께 바꾸게 하기 때문입니다. 대신 견본은 셋입니다. 1장의 **뼈대 견본**은
+사건 49의 모양을 그대로 줄인 것이고, 4장은 실제 장면을 한 글자도 고치지 않고 옮긴 것입니다. 셋째는
+**[`docs/examples/case-template.js`](examples/case-template.js)** -- 브리핑·결정·여파 세 장면을 실제 모양으로 쓴
+파일 하나입니다. 빌드가 읽지 않는 자리(`docs/`)에 있어 게임에는 들어가지 않고, 복사해서 `src/nodes/case50.js`로
+가져오면 나머지 열일곱 장면을 채우라고 `check:graph`가 멈춰 줍니다. 실제 파일 하나를
 처음부터 끝까지 읽고 싶다면 지금 가장 짧은 사건 파일은 `src/nodes/case24.js`(약 850줄)입니다. 사건 12~49는
 모두 850~870줄이라 어느 것을 읽어도 길이는 비슷합니다.
 
@@ -32,6 +35,11 @@
 9. 흔한 실수
 10. 글 방향: 한국 직장의 블랙 코미디
 11. 참고: 파일 위치
+12. 언어 셋: 한국어 원문과 영어·일본어 파일
+13. 초상과 장면 그림
+14. 사건 하나가 조각 하나: 예산
+15. 장면 분위기 태그 (준비 중)
+16. PR 전 열 줄 점검
 
 ---
 
@@ -597,12 +605,17 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 4. `npm run check:plain-language` — 쓰지 않는 말, 용어집 풀이.
 5. `npm run check:card-labels` — 라벨 30자, 본문 420자.
 6. `npm run check:text` — 깨진 글자, `${...}` 뒤 조사, 이름 뒤 조사.
-7. `npm run check:fonts` — 새 음절. 실패하면 `npm run build:fonts`를 돌리고 다시 확인합니다.
-8. `npm run check:balance`, `npm run check:endings` — 숫자. 둘 다 느리니 글이 다 정해진 뒤에 돌립니다.
-9. 시즌에 올렸다면 `npm run check:doc-numbers`(README의 사건 수)와 `npm run check:grants`(서버의 사건 목록).
-10. `npm run lint`, `npm test` — 물러난 말 검사도 여기 들어 있습니다.
-11. 마지막으로 `npm run verify:static` 한 번. 위의 검사를 모두 나란히 돌리고, 실패한 것을 모아 보여 줍니다. 몇
-    개만 고르려면 `npm run verify:static -- check:graph check:canon`처럼 이름을 붙입니다.
+7. `npm run check:fonts` — 새 음절. 실패하면 `npm run build:fonts`를 돌리고 다시 확인합니다. 일본어 파일의 새
+   글자도 여기서 잡힙니다.
+8. `npm run check:locale:strict` — 영어·일본어 파일(12장)에 빠진 문구·묵은 문구가 0인지. 한국어 원문을 쓰거나
+   고친 PR은 두 언어 파일을 같이 내야 통과합니다. 어디가 빠졌는지는 `npm run check:locale -- --lang=en --list`.
+9. `npm run check:balance`, `npm run check:endings` — 숫자. 둘 다 느리니 글이 다 정해진 뒤에 돌립니다.
+10. 시즌에 올렸다면 `npm run check:doc-numbers`(README의 사건 수)와 `npm run check:grants`(서버의 사건 목록).
+11. `npm run lint`, `npm test` — 물러난 말 검사도 여기 들어 있습니다.
+12. 마지막으로 `npm run verify:static` 한 번. 위의 검사를 모두 나란히 돌리고, 실패한 것을 모아 보여 줍니다. 몇
+    개만 고르려면 `npm run verify:static -- check:graph check:canon`처럼 이름을 붙입니다. push 전에는
+    `npm run check:changed`가 바뀐 파일에 필요한 검사만 골라 돌립니다(사건 파일을 바꾸면 빌드와 `check:bundle`도
+    들어가니 14장의 예산을 봅니다).
 
 브라우저 테스트는 main에 병합된 뒤에 돕니다. 그 전에 위 순서를 모두 통과시켜 둡니다.
 
@@ -738,3 +751,126 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 | 글꼴 검사·생성 | `scripts/check-fonts.mjs`, `scripts/build-fonts.mjs`, `src/assets/fonts/` |
 | 깨진 글자·조사 검사 | `scripts/check-text-integrity.mjs` (`check:text`) |
 | 문서 숫자 검사 | `scripts/check-doc-numbers.mjs` (`check:doc-numbers`) |
+| 세 장면짜리 견본(빌드에 안 들어감) | `docs/examples/case-template.js` |
+| 영어·일본어 사건 파일, 사전, 사건 사이 문구 | `src/locales/<lang>/nodes/<사건 id>.js`, `src/locales/<lang>/index.js`, `src/locales/<lang>/between/` |
+| 언어 목록, 덮어쓰기 규칙, 번역 대상 읽기 | `src/locale.js` (`SUPPORTED_LOCALES`), `src/locales/overlay.js`, `scripts/locale-words.mjs` |
+| 언어 검사 | `scripts/check-locale.mjs` (`check:locale`, `check:locale:strict`) |
+| 초상 표, 초상 만들기, 출처 | `src/speakerPortraits.js`, `scripts/build-portrait.mjs`, `docs/portrait-credits.md`, `public/portrait-*.webp` |
+| 장면 그림(장소에서 계산) | `src/scenePlate.js` (`getPlateMotif`, `PLATE_MOTIFS`) |
+| 래스터 그림 목록·축소본·잠금·예산 | `src/responsiveArt.js`, `scripts/build-art-variants.mjs` (`build:art`), `scripts/art-variants.lock.json`, `scripts/check-art-budget.mjs` (`check:art`) |
+| 사건 조각 나누기, 조각 예산 | `scripts/vite-season-data.mjs`, `scripts/season-split.mjs`, `scripts/check-bundle-size.mjs` (`check:bundle`) |
+| 장면 분위기 태그(15장) | `src/sceneMoods.js`, `scripts/tag-mood.mjs`, `check:mood` |
+
+---
+
+## 12. 언어 셋: 한국어 원문과 영어·일본어 파일
+
+게임은 한국어, 영어, 일본어로 플레이됩니다(`src/locale.js`의 `SUPPORTED_LOCALES`, 원문은 `ko`). 사건의
+**원문은 `src/nodes/caseNN.js` 하나뿐**이고, 다른 언어는 그 원문의 **같은 id 아래에 문구만** 얹습니다
+(`src/locales/overlay.js`). 그래서 한 사건을 쓰면 파일은 셋입니다.
+
+| 언어 | 파일 | 무엇이 들어가나 |
+| --- | --- | --- |
+| 한국어 | `src/nodes/case50.js` | 이 문서의 1~5장 전부: 글, 숫자, id, `effect`, `next`, `cognition` |
+| 영어 | `src/locales/en/nodes/case50.js` | 문구만. `nodes.<장면 id>`의 `title`·`text`·`memo`·`choices.<카드 id>.label`, `echoReplies.<카드 id>`, `choiceVoiceLines.<카드 id>`, `pack`의 `clue`·`outcomes`·`continuityChallenges` |
+| 일본어 | `src/locales/ja/nodes/case50.js` | 영어와 같은 모양 |
+
+- 번역 파일에는 **id, `effect`, `next`, `cognition`, `speaker`, `place`, `clock`이 없습니다.** 판·점수·순위가
+  언어와 무관하려고 그렇습니다. 화자 이름은 `src/locales/<lang>/index.js`의 `speakers` 표가 바꿔 찍고(새 화자는
+  거기에 한 줄), 장소와 시각은 한국어가 그대로 남아 장면 그림(13장)이 같은 방을 그립니다.
+- 모양은 **쓴 파일이 아니라 조립된 그래프**의 것입니다. 게임이 만들어 붙이는 장면(오프닝 셋, 연결 장면이
+  가져간 카드 `c50_line_choice_1` 같은 id)도 번역 파일에 있어야 합니다. 어느 문자열이 비었는지는
+  `npm run check:locale -- --lang=en --list`가 경로째 찍어 주니, 한국어 파일을 끝낸 뒤 그 목록대로 채웁니다.
+  번역 파일을 만들어 주는 스크립트는 없습니다. 지금 들어 있는 두 언어는 용어집(앱출시-G·J)에 맞춘 기계 번역 초안이고,
+  사람 검토는 뒤에 합니다.
+- 사건 사이의 문구(6장 4의 `caseCopy.js` 쪽: 이동 경로, 예고, 막간, 에코의 말)는 사건 11 뒤로는
+  `src/locales/<lang>/between/caseNN-NN.js`에 묶여 있습니다. 사건 50의 몫은 `case41-49.js`(마지막 사건까지 담는
+  파일)에 더합니다.
+- **숫자는 바꾸지 않습니다.** `check:locale`이 한국어의 숫자가 번역에 빠졌는지 셉니다. 영어는 돈을 영어 단위로
+  (310억 → 31 billion), 일본어는 한국어 숫자 그대로(310억 → 310億) 비교합니다.
+- `verify:static`의 `check:locale:strict`는 영어·일본어 **둘 다 빠짐 0, 묵음 0**을 요구합니다. 한국어 한 줄을
+  고치면 두 언어도 같은 PR에서 고칩니다. 일본어의 새 글자는 `check:fonts`가 잡습니다(7장).
+
+---
+
+## 13. 초상과 장면 그림
+
+**초상(화자 얼굴)** -- 장면의 `speaker`마다 `src/speakerPortraits.js`의 `SPEAKER_PORTRAITS` 표에 파일이
+하나씩 있습니다. 표에 없는 사람은 실루엣으로 그려지는데(`src/components/SpeakerPortrait.jsx`), **새 화자를
+실루엣으로 두고 넘기지 않습니다**(2026-10-21 결정: 모든 화자에게 초상). 새 화자 한 명마다:
+
+1. 사진 또는 그림을 고릅니다. Unsplash·Pexels 같은 무료 라이선스 사진이거나, 악역·미성년처럼 실제 사람의 얼굴을
+   쓰지 않을 인물은 실존하지 않는 사람의 생성 사진입니다. 악역도 **평범한 얼굴**로 고르고, 음험해 보이는 사진은
+   쓰지 않습니다.
+2. `node scripts/build-portrait.mjs <원본.png|jpg|webp> <lee-minseo 같은 소문자 로마자 slug>` →
+   `public/portrait-<slug>.webp`(256×256, 품질 0.82, 가운데 정사각형, 투명 가장자리 잘라 냄). 다른 초상과 같은
+   어둡고 차가운 청회색 보정은 `docs/portrait-credits.md` 첫머리의 방식대로 먼저 해 둡니다.
+3. `SPEAKER_PORTRAITS`에 `"이름": "/portrait-<slug>.webp"` 한 줄을 **파일 끝의 묶음**에 더합니다(표의 주석대로
+   묶음마다 날짜가 적혀 있습니다). 처음 다섯 장만 서비스 워커가 미리 받고, 나머지는 사건이 열릴 때 받습니다.
+4. `docs/portrait-credits.md` 표에 인물·파일·원본 주소·사진가·라이선스를 한 줄 더합니다.
+
+**장면 그림(플레이트)** -- 장면마다 사진을 싣지 않습니다. `src/scenePlate.js`의 `getScenePlate`가 장면 좌표의
+`place`와 `pressure`만 읽어 인라인 SVG를 그립니다. `place`는 「건물 · 방」 모양으로 쓰고(가운뎃점 `·`), 방 쪽
+낱말로 `PLATE_MOTIFS`의 방(열람실·복도·회의실·시장·서버실 ...)을 고르며, 어느 것에도 맞지 않으면 책상(`desk`)
+입니다. 어떤 낱말이 어느 방이 되는지는 그 파일의 `MOTIF_RULES`를 봅니다. 그러니 새 사건의 장소 이름은 시즌이 이미
+쓰는 낱말(`열람실`, `스캔실`, `자료실`, `분석관실` ...)로 맞추면 그림이 저절로 따라옵니다. 번역은 `place`를
+덮지 못하므로 세 언어가 같은 방을 봅니다.
+
+**래스터 그림** -- 시작 화면 키 비주얼, 프롤로그 다섯 장면, 결말 셋만 실제 그림 파일이고 목록은
+`src/responsiveArt.js`의 `RESPONSIVE_ART`입니다. 새 사건은 여기 아무것도 더하지 않습니다. 이 목록의 원본을
+다시 그렸을 때만 `npm run build:art`(480·960px 축소본과 `scripts/art-variants.lock.json` 갱신)를 돌리고,
+`npm run check:art`가 축소본의 무게(480px 26KB, 960px 72KB)와 원본-축소본 짝(잠금 파일의 해시)을 지킵니다.
+초상은 이 잠금에 들어 있지 않습니다.
+
+---
+
+## 14. 사건 하나가 조각 하나: 예산
+
+앱 빌드는 시즌 그래프를 Node에서 한 번 만들어(`scripts/season-split.mjs`, `scripts/vite-season-data.mjs`)
+사건마다 조각(`virtual:season-case/<사건 id>`) 하나로 나눕니다. 조각 하나에는 그 사건의 장면·반응·대사·장면
+좌표가 들어가고, 모든 사건이 처음부터 필요한 것(장면 순서, 오프닝, 기억 카드 계획, 인물 프로필, `clue`·
+`outcomes`·`carryovers`·`continuityChallenges`)은 공통 색인에 통째로 실립니다.
+
+- `npm run check:bundle`은 `dist/`의 **모든 파일에 예산**을 요구합니다. 사건 조각은 한 줄의 패턴
+  `^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$`가 받으므로 사건 50에 새 예산 줄은 필요 없지만, 그 줄의
+  한도(지금 98,900바이트 / gzip 25,400; 가장 큰 사건 01이 기준)를 넘으면 실패합니다. 장면 20개·850줄 안팎의
+  사건은 넉넉히 들어갑니다.
+- 사건을 더하면 공통 색인과 사건 파일을 불러오는 조각(`pastPicks-*` 등)의 크기가 몇 바이트 움직입니다. 예산은
+  내려가기만 하는 값이라, 넘으면 그 조각의 주석에 날짜·이유를 적고 **실측 gzip +4**로 예산 줄을 고칩니다(CI가
+  1~2바이트 크면 CI 실측 +4). 사건 파일만 고친 PR은 `npm run check:changed`가 `build:e2e`와 `check:bundle`을
+  함께 돌려 주니, push 전에 한 번 봅니다.
+- 첫 화면 예산(`FIRST_PAINT_BUDGETS`, 언어별)은 `index.html`·진입 조각·글꼴·키 비주얼만 세고 사건 조각은 세지
+  않으므로, 사건 50은 건드리지 않습니다. 글꼴 파일은 7장의 `build:fonts`로 새 음절이 들어갈 때만 커집니다.
+
+---
+
+## 15. 장면 분위기 태그
+
+장면마다 분위기 하나(`neutral`·`bright`·`tense`·`dread`·`sorrow`)를 붙여 바탕색과 음악이 따라가게 합니다(#458, #465).
+
+- `src/sceneMoods.js`는 **생성 파일**입니다(장면 id → 분위기, `neutral`은 생략). 손으로 고치지 않고
+  `scripts/tag-mood.mjs`가 장면 글·의성어·국면 칩·위험도 규칙으로 초안을 매긴 뒤, 사건별 검토표
+  (`cp-archive/메모-20261105/mood-review/<사건>.md`)의 검토 칸을 `--from-review`로 읽어 다시 씁니다.
+  2026-11-06에 프롤로그부터 마지막 사건까지 1,129개 가운데 508개가 검토로 정해졌습니다.
+- `check:mood`가 없는 장면 id, 모르는 값, 한 사건의 70%를 넘는 한 가지 분위기를 막습니다. 한 사건이 정말
+  처음부터 끝까지 한 색이면 `tag-mood.mjs`의 `CASE_CAP_OVERRIDES`에 그 사건의 몫과 까닭을 적습니다
+  (지금은 사건 32 압수수색 0.75 하나).
+- 새 사건을 올리면 이 스크립트를 한 번 돌려 장면들이 표에 들어가게 하고, 검토 칸을 채웁니다.
+- 사건 파일 자체에는 분위기 칸이 **없습니다**. 2장의 장면 칸은 그대로입니다(빌드가 `src/sceneMoods.js`를 읽어 조각에 적습니다).
+
+---
+
+## 16. PR 전 열 줄 점검
+
+1. `src/nodes/case50.js` 하나, 장면 20개, id는 모두 `c50_`, 여파 카드는 `c50_after_*` (1장).
+2. 라벨 30자 이하, 본문 420자 이하, `voice`는 「이유, + 라벨」, `echo`는 ~자/~니로 열기 (3장·7장).
+3. 어려운 말은 본문이나 `lead`에서, 처음 읽히는 모든 길에서, 기준 풀이(`STANDARD_GLOSS`)로 (7장).
+4. 대출 2023-0412의 사실은 `docs/canon.md` 값만, 요일이 붙은 날짜는 2026년 달력 (7장 check:canon).
+5. 시즌에 올리기: `casePacks.js`, `gameCases.js` 여섯 곳, 마지막 사건의 오프닝·과제 키, `caseCopy.js`의
+   둘레 문구, `check:dialogue` 기대값 +6, README 사건 수, 서버 `season_case_ids()` 마이그레이션 (6장).
+6. 영어·일본어 파일 둘 다, `check:locale:strict` 통과, `between/case41-49.js`에 사건 사이 문구 (12장).
+7. 새 화자마다 초상 파일·`SPEAKER_PORTRAITS` 한 줄·`portrait-credits.md` 한 줄, 실루엣 없음 (13장).
+8. `npm run verify:static` 전부 초록, 새 음절이 있으면 `build:fonts` 결과 두 파일 커밋 (7장·8장).
+9. `npm run check:changed` 통과(빌드·`check:bundle` 포함), 예산을 올렸다면 주석에 실측과 이유 (14장).
+10. 커밋 메시지는 바꾼 파일 목록이 아니라 **그 변경을 하게 만든 상태**를 적고(README 「개발 메모」), 마이그레이션이
+    든 PR은 병합 직전에 따로 묻습니다 -- 병합하면 1분 안에 운영 DB에 적용됩니다.

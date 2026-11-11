@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c17_start": {
       "title": "Company Records",
-      "text": "Ban Jaewook puts two envelopes on the desk. One is a certified letter group legal sent 2 weeks ago. The demand is two lines. Return the notebook used in audit investigations, as it is a company record. And submit that notebook to the December 19 HR committee as evidence of your 'improper interference in an investigation'. The other is a copy of a court application for a document production order, which arrived today. Ban Jaewook sets a black notebook with a worn cover beside the envelopes. 'Forty-seven people. The ones I let go over 20 years. The company says this is its property.' He speaks without opening the notebook. 'Before I hand it over, I mean to visit them one by one. Will you come with me?'",
+      "text": "A certified letter from group legal lies on the desk. It demands that the notebook be returned as a company record, and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. Ban Jaewook sets a black notebook with a worn cover beside it. 'Forty-seven people. The ones I let go over 20 years. Before I hand it over, I mean to visit them one by one. Will you come with me?'",
       "memo": [
         "Legal’s certified letter: the notebook is a 'company record'",
         "December 19 HR committee -- agenda: your improper interference in an investigation",
@@ -38,7 +38,7 @@ export default {
     },
     "c17_truck": {
       "title": "The Sauce Bottle",
-      "text": "A park parking lot in blowing snow; on the side of a truck, a handwritten sign reads 'Taeo’s Tteok Skewers'. The name on the notebook’s first page: Assistant Manager Jung Taeo, fired 7 years ago. He recognizes Ban Jaewook and does not stop turning skewers. 'On the house. But shake that.' Ban Jaewook, still in his navy coat, shakes the sauce bottle. He shakes it so earnestly that a customer in line asks, 'You the new part-timer?' Ban Jaewook answers, 'Temporary staff.' When the line breaks, Jung Taeo wipes his hands on his apron. 'Know why I got fired? I wrote down what the branch manager told me. To move the dates on loan papers forward. When the audit came, only my handwriting was left.' He looks at Ban Jaewook. 'In that notebook, what does it say about me?'",
+      "text": "On the side of the truck, a handwritten sign reads 'Taeo’s Tteok Skewers'. The name on the notebook’s first page: Assistant Manager Jung Taeo, fired 7 years ago. 'On the house. But shake that.' Ban Jaewook, still in his navy coat, shakes the sauce bottle. When a customer in line asks, 'You the new part-timer?' Ban Jaewook answers, 'Temporary staff.' When the line breaks, Jung Taeo speaks. 'Know why I got fired? I wrote down what the branch manager told me. To move the dates on loan papers forward. When the audit came, only my handwriting was left. In that notebook, what does it say about me?'",
       "memo": [
         "Jung Taeo: former corporate loans assistant manager, KD Bank Guro Branch, fired 7 years ago",
         "Reason: changed dates on loan papers -- his own handwriting in his work notebook",
@@ -69,7 +69,7 @@ export default {
     },
     "c17_office": {
       "title": "Two Lines",
-      "text": "At the end of a 3rd-floor corridor in a Mullae-dong shopping building, the vinyl lettering 'Ha Yoonjae Tax & Accounting' is half peeled off the glass door. The only name in the notebook with two lines drawn under it. He opened this office after being fired 6 years ago, and last spring he collapsed from overwork and died. His older sister, Ha Eunkyung, is here to close up the business. When Ban Jaewook says the name, she puts down the box she was holding. 'My brother never told the family he was fired. He said he quit. That the bank was stifling, so he left.' An old planner comes out of the desk drawer. In one box from March 6 years ago, it says: 'Interview with Investigator Ban Jaewook. Tell him it wasn’t me.' Ha Eunkyung slides the planner toward Ban Jaewook. 'Did he say it? My brother, that day?'",
+      "text": "The name on the glass door is 'Ha Yoonjae Tax & Accounting'. He opened this office after being fired 6 years ago, and last spring he collapsed from overwork and died. His older sister, Ha Eunkyung, closing up the business, hears Ban Jaewook’s name and puts down her box. 'My brother never told the family he was fired. He said he quit.' In an old planner from the desk drawer, one box from March 6 years ago says: 'Interview with Investigator Ban Jaewook. Tell him it wasn’t me.' Ha Eunkyung slides the planner toward Ban Jaewook. 'Did he say it? My brother, that day?'",
       "memo": [
         "Ha Yoonjae: former KD Bank assistant manager, fired 6 years ago, died last spring",
         "The family didn’t know he was fired -- 'quit on his own'",
@@ -100,7 +100,7 @@ export default {
     },
     "c17_legal": {
       "title": "The Attachment List",
-      "text": "The legal team meeting room at KD Financial Group headquarters. Two lawyers push a file across. Its title: 'Evidence List re: Analyst’s Improper Interference in an Investigation'. Attachment 3 is the notebook. Below it, 47 names copied from audit reports are typed out, and the table has a new title. 'Subjects of the analyst’s interference.' Jung Taeo’s box says only 'Fired for forging work documents.' Who gave the order appears nowhere. The lead counsel speaks gently. 'Just give us the notebook, Mr. Ban, and we’ll take you off this list. You’re not handling investigations now, after all.' Ban Jaewook puts down his pen. It is the very format he used for 20 years. A table where only the one who wrote it down remains, and the one who gave the order does not. He looks at you. 'This time I’m the one taking dictation.'",
+      "text": "Two lawyers push a file across. Its title: 'Evidence List re: Analyst’s Improper Interference in an Investigation'. Attachment 3 is the notebook. Above the 47 names, the table has a new title. 'Subjects of the analyst’s interference.' The lead counsel speaks gently. 'Just give us the notebook, Mr. Ban, and we’ll take you off this list.' It is the very format Ban Jaewook used for 20 years. A table where only the one who wrote it down remains, and the one who gave the order does not. He looks at you. 'This time I’m the one taking dictation.'",
       "memo": [
         "Evidence list, Attachment 3: Ban Jaewook’s notebook",
         "Table retitled: 'Subjects of the analyst’s interference'",
@@ -131,7 +131,7 @@ export default {
     },
     "c17_final": {
       "title": "47 Names",
-      "text": "In the corridor outside the HR committee room, a legal team lawyer checks the time. If the notebook is not on the table by 10:00, it goes to the court’s hearing on the document production order. Ban Jaewook takes the notebook from the inside pocket of his coat. On the cover is Seoa’s star sticker. Submit it to the court directly, and the 47 names become public record, but the title 'subjects of interference' never gets attached. Tear it out page by page and return each to its owner, and only the names of those who consent remain; the notebook disappears. Burn it, and today’s fight is over, and the one line Jung Taeo found after 7 years goes with it. Ban Jaewook places the notebook in your hand. 'I carried it for 20 years. This time, you decide.'",
+      "text": "If the notebook is not on the table by 10:00, it goes to the court’s hearing on the document production order. Submit it to the court directly, and the 47 names become public record, but the title 'subjects of interference' never gets attached. Tear it out page by page and return each to its owner, and only the names of those who consent remain; the notebook disappears. Burn it, and today’s fight is over, and the one line Jung Taeo found after 7 years goes with it. Ban Jaewook places the notebook in your hand. 'I carried it for 20 years. This time, you decide.'",
       "memo": [
         "10:00 HR committee -- no notebook means a document production hearing",
         "Opposed 17 · don’t mind 12 · refused 7 · not yet visited 7 · unreachable 3 · deceased 1",
@@ -159,7 +159,7 @@ export default {
     },
     "c17_aftershock": {
       "title": "A Year-End Party of Tteok Skewers",
-      "text": "December 21, a Sunday evening, the snow coming down harder. Jung Taeo, who runs the tteok skewer food truck, tapes a sign to the front: 'Everything free today.' 11 of the people in the notebook come. They are strangers to one another, but when someone asks, 'What year did you leave?' the talk takes off. Ban Jaewook’s daughter Seoa hands out star stickers one by one, and Ban Jaewook takes off his coat and shakes the sauce bottle. This time no one asked him to. Kang Taemin grills skewers, and Kwon Dohyun, working out 'the loss from free service', is silenced by a skewer Jung Taeo pushes into his mouth. There is a text from legal on your phone. 'Tomorrow 9 a.m., follow-up meeting on the notebook.' Then Oh Jinwoo’s phone rings too. The screen says Bridge Bank. He stares at it for a long time, then walks behind the truck to take the call.",
+      "text": "Jung Taeo tapes a sign to the front of the truck: 'Everything free today.' 11 of the people in the notebook come. When someone asks, 'What year did you leave?' the talk takes off. Seoa hands out star stickers, and Ban Jaewook takes off his coat and shakes the sauce bottle. Kwon Dohyun, working out 'the loss from free service', is silenced by a skewer Jung Taeo pushes into his mouth. There is a text from legal. 'Tomorrow 9 a.m., follow-up meeting on the notebook.' Then Bridge Bank comes up on Oh Jinwoo’s phone. He stares at the screen for a long time, then goes behind the truck to take the call.",
       "memo": [
         "At the year-end party: 11 people from the notebook",
         "412 skewers free -- Kwon Dohyun’s estimated loss 820,000 won",
@@ -183,7 +183,7 @@ export default {
     },
     "c17_stars": {
       "title": "Star Ratings",
-      "text": "Ban Jaewook’s living room that night. The notebook lies open on the dining table, and Ban Seoa, in 4th grade, is putting a star sticker on every name. 'The skewer man gets five stars. Because he gave us skewers.' Ban Jaewook starts to stop her, then doesn’t. Turning a page, Seoa stops at one name. Every name has one line under it, but this one has an extra. 'Dad, why does this man have two lines?' After a long while, Ban Jaewook answers. 'Even if you go looking for him now, he’s not there.' Seoa doesn’t peel the sticker off; she adds one more. This time it is not a star but a small flower.",
+      "text": "The notebook lies open on the dining table, and Ban Seoa, in 4th grade, is putting a star sticker on every name. 'The skewer man gets five stars. Because he gave us skewers.' Seoa stops at one name. Only this one has an extra line under it. 'Dad, why does this man have two lines?' After a long while, Ban Jaewook answers. 'Even if you go looking for him now, he’s not there.' Seoa adds one more sticker. This time it is not a star but a small flower.",
       "memo": [
         "12 star stickers from Seoa -- the standard is how Seoa feels",
         "The name with two lines: Ha Yoonjae, died last spring",
@@ -206,7 +206,7 @@ export default {
     },
     "c17_unreached": {
       "title": "Number Not in Service",
-      "text": "On the whiteboard in the Trigger Lab pantry, Kwon Dohyun draws a table. Of the 47, 29 met: 17 of them oppose submission, 12 don’t mind. 7 refused to meet, 7 not yet visited, 3 unreachable, 1 deceased. Kang Taemin brings two cups of noodles and sets one in front of Ban Jaewook. Kwon Dohyun taps the three boxes with his pen. 'One number now belongs to a Chinese restaurant, one person moved abroad, and no one lives at the third address.' He pauses. 'The restaurant owner remembered the previous owner. He said the man didn’t get a single won for the sign when he handed over the shop.' He puts down his pen. 'This box, I can’t put a price on.'",
+      "text": "Kwon Dohyun draws a table on the pantry whiteboard. Of the 47, 29 met, and 17 of them oppose submission. He taps the boxes of the three who can’t be reached. 'One number now belongs to a Chinese restaurant, one person moved abroad, and no one lives at the third address. The restaurant owner remembered the previous owner. He said the man didn’t get a single won for the sign when he handed over the shop.' He puts down his pen. 'This box, I can’t put a price on.'",
       "memo": [
         "29 met: 17 oppose submission, 12 don’t mind",
         "7 refused to meet, 7 not yet visited, 3 unreachable, 1 deceased",
@@ -229,7 +229,7 @@ export default {
     },
     "c17_name": {
       "title": "The Name That Remained",
-      "text": "The night before the HR committee, in front of the truck after closing. Jung Taeo takes a yellowed work notebook from his apron pocket. His, from 7 years ago. 'The company recorded me as resigning voluntarily. In the HR records, in my cohort’s group chat, even in my mom’s memory.' He points at Ban Jaewook’s notebook. 'Only that one’s different. Jung Taeo, fired, wrote down orders.' He presses a skewer into Ban Jaewook’s hand. This time he doesn’t tell him to shake the sauce bottle. 'Because you wrote it down then, my name stayed. For 7 years, that was the one place that wrote me down straight.'",
+      "text": "Jung Taeo takes his yellowed work notebook from 7 years ago out of his apron pocket. 'The company recorded me as resigning voluntarily. In the HR records, in my cohort’s group chat, even in my mom’s memory.' He points at Ban Jaewook’s notebook. 'Only that one’s different. Jung Taeo, fired, wrote down orders.' He presses a skewer into Ban Jaewook’s hand. 'For 7 years, that was the one place that wrote me down straight.'",
       "memo": [
         "Jung Taeo’s HR record: 'voluntary resignation'",
         "Ban Jaewook’s notebook: 'fired · wrote down orders'",
@@ -252,7 +252,7 @@ export default {
     },
     "c17_stars_reaction": {
       "title": "The Children’s Ages",
-      "text": "After Seoa falls asleep, Ban Jaewook shows you the back of the notebook. Small numbers are written beside the names. 'I started writing them the year Seoa was born. If the person had a child, the child’s age.' Twenty-two names have numbers. 'Every time my daughter turned a year older, those children did too. In homes where the father was cut from the bank.' He takes off his glasses and sets them on the table. 'Legal will put even these numbers on the HR committee table.'",
+      "text": "After Seoa falls asleep, Ban Jaewook shows you the small numbers beside the names at the back of the notebook. 'I started writing them the year Seoa was born. If the person had a child, the child’s age.' Twenty-two names have numbers. 'Every time my daughter turned a year older, those children did too. In homes where the father was cut from the bank. Legal will put even these numbers on the HR committee table.'",
       "memo": [
         "22 names with a child’s age",
         "Children who grew a year older alongside his daughter"
@@ -274,7 +274,7 @@ export default {
     },
     "c17_unreached_reaction": {
       "title": "Presumed Consent",
-      "text": "ECHO brings up legal’s draft submission opinion. You decide not to ask how it got in. One footnote line at the bottom of page 12. 'Any person in the notebook who does not reply shall be deemed to have no objection to submission.' ECHO underlines it. 'With this sentence, the three unreachable and the one who died become people who consented. 20 years ago, the one who wrote it down became the one responsible; today, the ones who cannot answer become the ones who consented.'",
+      "text": "In legal’s draft submission opinion, there is one footnote line at the bottom of page 12. 'Any person in the notebook who does not reply shall be deemed to have no objection to submission.' ECHO underlines it. 'With this sentence, the three unreachable and the one who died become people who consented. 20 years ago, the one who wrote it down became the one responsible; today, the ones who cannot answer become the ones who consented.'",
       "memo": [
         "A footnote that reads no reply as consent",
         "Four people who cannot answer"
@@ -296,7 +296,7 @@ export default {
     },
     "c17_name_reaction": {
       "title": "The First Box",
-      "text": "After Jung Taeo pulls down the shutter, Ban Jaewook sits on a folding stool beside the truck and finishes his skewer. Then, for the first time, he turns the notebook’s first page toward you. Next to the name box there is one more box. Never once filled in 20 years, its heading is 'Who gave the order'. 'Without evidence I couldn’t write it, so I left it blank.' Snowflakes land on the notebook and melt. 'Come to think of it, I left the signature field blank too, just like the higher-ups. Only the way was different.'",
+      "text": "After the shutter comes down, Ban Jaewook finishes his skewer and, for the first time, turns the notebook’s first page toward you. Next to the name box there is one more box. Never once filled in 20 years, its heading is 'Who gave the order'. 'Without evidence I couldn’t write it, so I left it blank. Come to think of it, I left the signature field blank too, just like the higher-ups. Only the way was different.'",
       "memo": [
         "The 'who gave the order' box, left blank for 20 years",
         "A blank signature field, only done a different way"
@@ -318,7 +318,7 @@ export default {
     },
     "c17_branch_pencil": {
       "title": "One Line in Pencil",
-      "text": "On the way back from Mullae-dong, December snow piles up on the wipers. Seoa, picked up from her after-school academy, sleeps in the back, and Ban Jaewook stops at a light and opens the notebook’s last page. Under 47 names in ink, one line in pencil. Your name, and a date 2 weeks before you were pushed out to Trigger Lab. 'This is the line legal wants. I wrote your name before any investigation, so we must have been in it together.' He runs his thumb over the pencil marks. 'Back then, a document to push you out landed in my approval queue. I didn’t click approve. Instead I wrote it here in pencil. So it could be erased any time.' The light changes. 'This line. What should we do with it?'",
+      "text": "Seoa sleeps in the back seat, and Ban Jaewook stops at a light and opens the notebook’s last page. Under 47 names in ink, one line in pencil. Your name, and a date 2 weeks before you were pushed out to Trigger Lab. 'This is the line legal wants. I wrote your name before any investigation, so we must have been in it together. Back then, a document to push you out landed in my approval queue. I didn’t click approve. Instead I wrote it here in pencil. So it could be erased any time.' The light changes. 'This line. What should we do with it?'",
       "memo": [
         "Last page: your name in pencil, dated 2 weeks before your transfer order",
         "The document in Ban Jaewook’s approval queue then: a review of HR action against you",
@@ -342,7 +342,7 @@ export default {
     },
     "c17_branch_pencil_follow": {
       "title": "The Flower Eraser",
-      "text": "When the car parks in the apartment lot, Seoa wakes and leans forward from the back seat. The notebook is still open. 'Dad, only this one’s in pencil.' Seoa takes a flower-shaped eraser from her pencil case. 'Want me to erase it? Or trace over it in pen? My handwriting’s good.' Ban Jaewook tries not to laugh and fails. Of all the names he wrote in 20 years, this was the only line he left erasable. Seoa stares at you. 'This is your friend’s name, Dad? Then the name’s owner should decide.' The flower eraser and a ballpoint pen are set side by side in front of you.",
+      "text": "Waking in the parking lot, Seoa leans over the open notebook. 'Dad, only this one’s in pencil.' Seoa takes a flower-shaped eraser from her pencil case. 'Want me to erase it? Or trace over it in pen? My handwriting’s good.' Ban Jaewook tries not to laugh and fails. Seoa stares at you. 'This is your friend’s name, Dad? Then the name’s owner should decide.' The flower eraser and a ballpoint pen are set side by side in front of you.",
       "memo": [
         "Seoa’s pencil case: 1 flower eraser, 3 ballpoint pens",
         "47 names in ink, 1 in pencil",
@@ -366,7 +366,7 @@ export default {
     },
     "c17_route_system": {
       "title": "The Hand That Wrote It Down",
-      "text": "You propose sorting out first who audits have been disciplining. ECHO opens the audit office archive. 20 years of KD Bank audit reports, 312 of them, pour out. Among those disciplined, 241 were 'the one who wrote the document', and 19 were 'the one who ordered it written'. In cases where the order came only by word of mouth, the one who gave it was disciplined not once. 'Audits follow handwriting. Words leave no trace, so the hand that wrote it down has been learned as the final party responsible every time. 39 of the 47 in Ban Jaewook’s notebook are that hand.'",
+      "text": "As you sort out who audits have been disciplining, ECHO opens 20 years of KD Bank audit reports, 312 of them. Among those disciplined, 241 were 'the one who wrote the document', and 19 were 'the one who ordered it written'. Where the order came only by word of mouth, the one who gave it was disciplined not once. 'Audits follow handwriting. The hand that wrote it down has been learned as the final party responsible every time. 39 of the 47 in Ban Jaewook’s notebook are that hand.'",
       "memo": [
         "312 audit reports -- 241 writers disciplined, 19 who gave orders disciplined",
         "Orders given only by word of mouth: 0 who gave them disciplined",
@@ -392,7 +392,7 @@ export default {
     },
     "c17_final_system_route": {
       "title": "Spoken Words Leave No Handwriting",
-      "text": "December 19, the analyst room still dark. Two lines of discipline records sit one above the other on the terminal. Writers, 241. Those who ordered it, 19. When ECHO lays the 47 from Ban Jaewook’s notebook over them, 39 go to the top line. No name goes to the bottom line. At ten, it will be decided whether that notebook goes on the meeting-room table. 'The notebook is handwriting. Today, too, only handwriting goes on the table. The spoken order, once again, is written down nowhere.'",
+      "text": "Two lines of discipline records sit one above the other on the terminal. Writers, 241. Those who ordered it, 19. When ECHO lays the 47 from Ban Jaewook’s notebook over them, 39 go to the top line. No name goes to the bottom line. 'The notebook is handwriting. Today, too, only handwriting goes on the table. The spoken order, once again, is written down nowhere.'",
       "memo": [
         "Discipline: 241 who wrote the document · 19 who gave the order",
         "39 of the 47 in the notebook were on the writing side",
@@ -415,7 +415,7 @@ export default {
     },
     "c17_evidence_turn": {
       "title": "Extension 3317",
-      "text": "You pull up the extension call logs in the backup archive for the clue’s date, and a work-notebook page, kept as a scan in the audit record from 7 years ago, lines up with that day’s calls. It is the handwriting of Jung Taeo, former Guro Branch assistant manager, whose name is on the first page of Ban Jaewook’s notebook. On the day he wrote down the order to move the paper dates forward, a four-digit number is written in the corner of the page: 3317. Back then, the Corporate Finance Strategy Team head’s desk, where Yoon Sanghyuk sat. The branch manager only passed the call along, and Jung Taeo only wrote down what was passed along. In Ban Jaewook’s notebook, the 'who gave the order' box beside that name has never been filled. Lee Minseo closes the call log window. 'I nearly got fired over 11 missing seconds. This man got fired because his hand wrote down four digits. The one who writes it down always goes first.'",
+      "text": "You pull up the extension call logs in the backup archive for the clue’s date, and a page of Jung Taeo’s work notebook lines up with that day’s calls. On the day he wrote down the order to move the paper dates forward, a number is written in the corner of the page: 3317. Back then, the Corporate Finance Strategy Team head’s desk, where Yoon Sanghyuk sat. In Ban Jaewook’s notebook, the 'who gave the order' box has never been filled. Lee Minseo closes the window. 'I nearly got fired over 11 missing seconds. This man got fired because his hand wrote down four digits. The one who writes it down always goes first.'",
       "memo": [
         "Corner of Jung Taeo’s work notebook: extension 3317",
         "3317 = Corporate Finance Strategy Team head’s desk, 7 years ago",
@@ -438,7 +438,7 @@ export default {
     },
     "c17_start_warm": {
       "title": "After the Last Cup of Noodles",
-      "text": "The night you ate the 81st cup of noodles in the night-shift break room, you didn’t answer Ban Jaewook’s text until morning. Twelve days later, Kang Taemin has cleared one break-room locker for you, and in it is a postal envelope Ban Jaewook left. A certified letter from group legal. It demands that the notebook used in audit investigations be returned as a company record and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. Tearing open two cups of noodles, Kang Taemin says, 'He came by yesterday and sat here a long time. Says he’s going to visit the people in his notebook. On his own.'",
+      "text": "In your locker there is a postal envelope Ban Jaewook left. A certified letter from group legal. It demands that the notebook used in audit investigations be returned as a company record and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. Kang Taemin tears open two cups of noodles. 'He came by yesterday and sat here a long time. Says he’s going to visit the people in his notebook. On his own.'",
       "memo": [
         "Legal’s certified letter: return Ban Jaewook’s notebook as a 'company record'",
         "December 19 HR committee -- your improper interference in an investigation",
@@ -468,7 +468,7 @@ export default {
     },
     "c17_start_record": {
       "title": "The Lawyer Who Wrote the Standard Clause",
-      "text": "The night you were writing transition and retraining into the group’s standard lease terms, a text from Ban Jaewook said legal wanted his notebook. On the day the standard clause was reviewed line by line, legal sent that demand in writing. It demands that the audit notebook be returned as a company record and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. The notebook holds the names of 47 people Ban Jaewook let go over 20 years, and he means to visit them one by one before handing it over. A document production order has also been applied for in court. ECHO puts the author fields of the two papers side by side. The same lawyer. 'The hand that reviewed your document wrote this demand. The side that lost on paper pays it back on paper.'",
+      "text": "Legal has sent its demand for the notebook in writing. It demands that the audit notebook be returned as a company record and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. A document production order has also been applied for in court. ECHO puts the author fields of the two papers side by side. The same lawyer. 'The hand that reviewed your document wrote this demand. The side that lost on paper pays it back on paper.'",
       "memo": [
         "Lawyer who reviewed the standard clause = author of the notebook demand",
         "December 19 HR committee -- your improper interference in an investigation",
@@ -499,7 +499,7 @@ export default {
     },
     "c17_start_rush": {
       "title": "The Night You Ran Ahead",
-      "text": "The night you let the 81st cup of noodles from Kang Taemin go cold and took a taxi, Ban Jaewook, who had sent the text, crossed paths with you and went to the night-shift break room. He saw to the remaining papers of the 80 whose contracts were ending, one sheet at a time. Twelve days later, on Monday, December 15, he puts a postal envelope on your desk. A certified letter from group legal. It demands that the notebook used in audit investigations be returned as a company record and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. He sets a black notebook with a worn cover beside the envelope. 'Forty-seven people. The ones I let go over 20 years. That night, I saw to the break-room papers. This time, will you come with me from the first name?'",
+      "text": "Ban Jaewook puts an envelope on your desk. A certified letter from group legal. It demands that the notebook used in audit investigations be returned as a company record and submitted to the December 19 HR committee as evidence of your 'improper interference in an investigation'. He sets a black notebook with a worn cover beside the envelope. 'Forty-seven people. The ones I let go over 20 years. This time, will you come with me from the first name?'",
       "memo": [
         "Legal’s certified letter: demand to return Ban Jaewook’s notebook",
         "47 names in the notebook -- people let go over 20 years",

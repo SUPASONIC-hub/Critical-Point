@@ -171,10 +171,11 @@ export async function readCopySource(root = "..", scope = TRANSLATION_SCOPE) {
  * 40 million (G-6: 억 원 = 100 million won). Only for comparing digits.
  */
 function inEnglishUnits(text) {
-  // A month is a word in English ("4월 27일" -> "April 27"), and a lone 1 in
-  // 1주·1심·1인당·1인·1회·1년차, or the 0 of 0시, is a word there too
-  // ("one-share", "first-instance", "per person", "midnight").
-  const words = text.replace(/\d{1,2}월/g, "월").replace(/(?<![\d.])1(?=주|심|인당|인|회|년차)|(?<![\d.])0(?=시)/g, "");
+  // A month is a word in English ("4월 27일" -> "April 27", "3~9월" ->
+  // "March–September"), and a lone 1 in 1주·1심·1인당·1인·1회·1년차·1일·1초,
+  // or the 0 of 0시, is a word there too ("one-share", "first-instance",
+  // "per person", "per day", "a second", "midnight").
+  const words = text.replace(/\d{1,2}(?:~\d{1,2})?월/g, "월").replace(/(?<![\d.])1(?=주|심|인당|인|회|년차|일|초)|(?<![\d.])0(?=시)/g, "");
   // A figure in parts is one figure: 1억 2천(만) is 120 million, 3억 8000만
   // 380 million, 6만 4천 64,000, 41만 9명 410,009. 만 after a figure is ten
   // thousand, 천 a thousand (11만 views, 4천 people).

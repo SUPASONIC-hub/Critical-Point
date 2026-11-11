@@ -36,7 +36,16 @@ const OUTPUT = "src/styles/critical.generated.css";
 const VIEWPORTS = [
   { name: "desktop", width: 1366, height: 900 },
   { name: "mobile", width: 390, height: 844 },
+  // The 360px phone (a common Android width) has its own intro rules -- the
+  // column's top, the start row's margin, the premise's size in English and
+  // Japanese -- and the static shell (scripts/static-shell.mjs) paints with
+  // nothing but this file, so they are cut too (11-06).
+  { name: "small", width: 360, height: 740 },
 ];
+// Coverage reads the start page in each language, so the rules only another
+// language's page matches (`:lang(en)`, `:lang(ja)`) are in the file the
+// shell paints with; the computed-style check below reads the Korean page.
+const COVERAGE_PAGES = ["/", "/en/", "/ja/"];
 
 // A missed rule shows as a flash, so the intro's own frame is measured against
 // the full sheet and has to match it exactly.
@@ -199,16 +208,18 @@ try {
     const ranges = [];
     const styles = {};
     for (const viewport of VIEWPORTS) {
-      const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
-      await page.coverage.startCSSCoverage();
-      await page.goto(baseUrl);
-      await page.locator(".intro").waitFor();
-      await settleFonts(page);
-      styles[viewport.name] = await readComputed(page);
-      for (const entry of await page.coverage.stopCSSCoverage()) {
-        if (entry.url.endsWith(measured.file)) ranges.push(...entry.ranges);
+      for (const path of COVERAGE_PAGES) {
+        const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+        await page.coverage.startCSSCoverage();
+        await page.goto(`${baseUrl}${path}`);
+        await page.locator(".intro").waitFor();
+        await settleFonts(page);
+        if (path === "/") styles[viewport.name] = await readComputed(page);
+        for (const entry of await page.coverage.stopCSSCoverage()) {
+          if (entry.url.endsWith(measured.file)) ranges.push(...entry.ranges);
+        }
+        await page.close();
       }
-      await page.close();
     }
     return { usedRanges: ranges, fullStyles: styles };
   });

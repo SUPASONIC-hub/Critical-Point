@@ -78,7 +78,8 @@ function normalizeSeen(value, also) {
 export function normalizeEndingBook(value) {
   if (!isPlainObject(value) || typeof value.head !== "string" || !value.head) return null;
   const hints = Array.isArray(value.hints) ? value.hints.filter((line) => typeof line === "string" && line).slice(0, BOOK_HINTS_KEPT) : [];
-  return { head: value.head, hints };
+  // The language the lines are in (endingBook.js); a book written before it was kept has none.
+  return typeof value.lang === "string" && value.lang ? { head: value.head, hints, lang: value.lang } : { head: value.head, hints };
 }
 
 /**

@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c8_start": {
       "title": "A Window 240km Away",
-      "text": "Day 9 at KD Bank’s Gangwon Yeongdong Branch. You are clearing out dormant corporate accounts when one line stops your hand. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to a gallery in Cheongdam-dong, Seoul. And this morning, the company’s liquidation application was filed. Branch Manager Na Junhyuk sets down a cup of instant coffee. 'Your predecessor sent that account up three times. All three came back rejected.'",
+      "text": "Day 9 at the branch. You are clearing out dormant corporate accounts when one line stops your hand. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to a gallery in Cheongdam-dong. This morning, its liquidation application was filed. Branch Manager Na Junhyuk sets down a cup of instant coffee. 'Your predecessor sent that account up three times. All three came back rejected.'",
       "memo": [
         "Haeon Partners: quarterly advisory fees withdrawn in full the day they arrive",
         "Paid in by: Novaworks, an advisory firm in the Bridge Bank group",
@@ -38,7 +38,7 @@ export default {
     },
     "c8_trail": {
       "title": "The List of Desires",
-      "text": "It has been more than two weeks since Oh Jinwoo handed in his resignation. On a video call, he shows you four A4 sheets taped to his wall. The head of Gallery On is Managing Director Yoon Sanghyuk’s wife; the real owner of the Gyeongpo guesthouse is his brother-in-law. Two summers ago he was a Team Head on the 6th floor; now he is a Managing Director in the Group Strategy Office on the 33rd floor of group headquarters. The order to name Oh Jinwoo as the one responsible, and the folder holding both your profiles, came out of that office. 'In the end, people are slaves to desire. Desire spends money, and money leaves a trace. That’s what my father told me the day he was pushed out of his branch.' He laughs briefly. 'Do you know who he learned it from? Yoon Sanghyuk, he says.'",
+      "text": "The head of Gallery On is Managing Director Yoon Sanghyuk’s wife; the real owner of the Gyeongpo guesthouse is his brother-in-law. Yoon Sanghyuk is now a Managing Director in the Group Strategy Office on the 33rd floor of group headquarters. The order to name Oh Jinwoo as the one responsible, and the folder holding both your profiles, came out of that office. 'In the end, people are slaves to desire. Desire spends money, and money leaves a trace. That’s what my father told me the day he was pushed out of his branch. Do you know who he learned it from? Yoon Sanghyuk, he says.'",
       "memo": [
         "Head of Gallery On: in Yoon Sanghyuk’s wife’s name",
         "Real owner of the Haeon guesthouse: Yoon Sanghyuk’s brother-in-law",
@@ -69,7 +69,7 @@ export default {
     },
     "c8_gallery": {
       "title": "The Price of Paintings",
-      "text": "Gallery On, Cheongdam-dong. Ban Jaewook, who has handed in his resignation, stands like a visitor and copies the price tags into his notebook. Twelve small works by an unknown artist, 120 million won each. Every buyer is a partner company of Novaworks or Bridge Bank, and the artist is the nephew of Namgoong Hyun, Deputy President of Bridge Bank. 'Paintings make a good tool. They have no set price. Overpay for one, and that’s the bribe.' He doesn’t close the notebook. 'I’m an investigator who has resigned, so there’s nowhere to hand this in. I write it down anyway.'",
+      "text": "Ban Jaewook stands like a visitor and copies the price tags into his notebook. Twelve small works by an unknown artist, 120 million won each. Every buyer is a partner company of Novaworks or Bridge Bank, and the artist is the nephew of Namgoong Hyun, Deputy President of Bridge Bank. 'Paintings have no set price. Overpay for one, and that’s the bribe. I’m an investigator who has resigned, so there’s nowhere to hand this in. I write it down anyway.'",
       "memo": [
         "12 small works × 120 million won = 1.44 billion won",
         "Every buyer is a Novaworks or Bridge Bank partner company",
@@ -100,7 +100,7 @@ export default {
     },
     "c8_bait": {
       "title": "Bait",
-      "text": "Oh Jinwoo lays out a plan. Leak a rumor to Yoon Sanghyuk’s side that 'Internal Audit is looking at Haeon Partners', and they will rush to move the remaining money before liquidation. Money moved in a hurry leaves the clearest trace. For the first time, his voice shakes. 'I know how fast that man closes a file. This time I want to set the speed.' A transaction drawn out on purpose makes the trace clear, and for the same reason it blurs in court. To stop the money, you have to apply to the court for a freeze order before liquidation.",
+      "text": "Leak a rumor to Yoon Sanghyuk’s side that 'Internal Audit is looking at Haeon Partners', and the remaining money will move in a hurry before liquidation, leaving the clearest trace. 'I know how fast that man closes a file. This time I want to set the speed.' A transaction drawn out on purpose blurs in court. To stop the money, you have to apply to the court for a freeze order before liquidation.",
       "memo": [
         "Once the rumor spreads, funds will likely move within a day",
         "An induced transaction may be disputed as evidence",
@@ -135,7 +135,7 @@ export default {
       "memo": [
         "Trace sheet: Haeon advisory fees -> gallery painting prices -> Yoon family",
         "Referral to prosecutors: months before anything goes public",
-        "Usable as leverage in talks with the banks that lent to FlowOn (the creditor group)",
+        "Usable as leverage in talks with the banks that lent to FlowOn (the creditors’ committee)",
         "Oh Jinwoo is already in touch with an investigative reporter"
       ],
       "choices": {
@@ -159,7 +159,7 @@ export default {
     },
     "c8_aftershock": {
       "title": "The Day After Liquidation",
-      "text": "Haeon Partners’ liquidation is registered after all. The account is closed, and a copy of the trace sheet, the money’s whole path on one page, stays in your hands. Oh Jinwoo went up to Seoul from the breakwater and isn’t answering his phone. On the way home from work, Branch Manager Na Junhyuk orders a plate of stuffed squid and says, 'For 30 years here, all I did was curse the head-office people. I never did a thing. Those three returns? I pressed the approve button on them under my own employee ID.' He sets down his chopsticks. 'This time I’ll send it up myself, under my own ID. The seal stays in the drawer. I haven’t had to take it out since electronic approval came in.'",
+      "text": "Haeon Partners’ liquidation is registered after all. The account is closed, and a copy of the trace sheet stays in your hands. Oh Jinwoo went up to Seoul and isn’t answering his phone. On the way home from work, Branch Manager Na Junhyuk orders a plate of stuffed squid and says, 'For 30 years here, all I did was curse the head-office people. I never did a thing. Those three returns? I pressed the approve button on them under my own employee ID. This time I’ll send it up myself, under my own ID.'",
       "memo": [
         "Haeon Partners’ liquidation registered",
         "Branch manager admits he approved the past returns himself",
@@ -183,7 +183,7 @@ export default {
     },
     "c8_sundae": {
       "title": "Stuffed Squid",
-      "text": "At lunch, Branch Manager Na Junhyuk takes you to a stuffed squid place in a market alley. He says not one word about the report returned three times; he only explains the order for dipping the squid in egg. 'Seoul people just eat it as is. That’s why they don’t know how it tastes.' When he pays, he writes your predecessor’s cell number on the back of the receipt.",
+      "text": "At lunch, Branch Manager Na Junhyuk says not one word about the returned report; he only explains the order for dipping the squid in egg. 'Seoul people just eat it as is. That’s why they don’t know how it tastes.' When he pays, he writes your predecessor’s number on the back of the receipt.",
       "memo": [
         "Predecessor took early retirement 2 years ago",
         "Branch manager never mentions the returns",
@@ -206,7 +206,7 @@ export default {
     },
     "c8_mother": {
       "title": "Side Dishes",
-      "text": "Do Yoonha calls. Oh Jinwoo’s mother has come to the Trigger Lab lobby with containers of side dishes. She doesn’t know her son has quit, and she worries that he spends every night digging through old papers. 'His father was just like that before he quit.' Do Yoonha asks quietly. 'What should I tell her?'",
+      "text": "Do Yoonha calls. Oh Jinwoo’s mother has come to the lobby with containers of side dishes. She doesn’t know her son has quit, and she worries that he spends every night digging through old papers. 'His father was just like that before he quit.' Do Yoonha asks, 'What should I tell her?'",
       "memo": [
         "Mother doesn’t know her son resigned",
         "Oh Jinwoo’s father acted the same just before retiring",
@@ -229,7 +229,7 @@ export default {
     },
     "c8_clerks": {
       "title": "The Ones Who Pressed Approve",
-      "text": "On their way home, two Gallery On employees stop Ban Jaewook. They are the ones who approved the painting payments with OTPs on the company’s online banking, they say, and if the people above them fall, only their names will be left. Twenty-six and twenty-nine. One of them is still on probation. Ban Jaewook closes his notebook. 'Most of the 47 people I cut were about this age.'",
+      "text": "On their way home, two Gallery On employees stop Ban Jaewook. They approved the painting payments with OTPs, they say, so if the people above them fall, only their names will be left. One is still on probation. Ban Jaewook closes his notebook. 'Most of the 47 people I cut were about this age.'",
       "memo": [
         "Payment-approval OTPs are in the 2 employees’ names",
         "One is 3 months into probation",
@@ -252,7 +252,7 @@ export default {
     },
     "c8_sundae_reaction": {
       "title": "The Predecessor’s Voice",
-      "text": "Back at the branch, Branch Manager Na Junhyuk dials the number on his own phone and turns on the speaker. The predecessor runs an orchard in Chuncheon. A tiller rattles in the background. 'I sent it up three times. After the third return I had an HR interview, and I never sent a fourth. Those people look at whoever rejects before they look at whoever reports.' Listening beside you, the branch manager quietly sets down his coffee cup.",
+      "text": "Back at the branch, Branch Manager Na Junhyuk dials the number and turns on the speaker. The predecessor runs an orchard in Chuncheon. 'I sent it up three times. After the third return I had an HR interview, and I never sent a fourth. Those people look at whoever rejects before they look at whoever reports.'",
       "memo": [
         "The fourth of a report returned three times",
         "The rejecter, seen before the reporter"
@@ -274,7 +274,7 @@ export default {
     },
     "c8_mother_reaction": {
       "title": "Rolled Omelet",
-      "text": "Do Yoonha carries the containers up to the 4th floor and starts a video call. Stir-fried anchovies, perilla leaves, and the rolled omelet Oh Jinwoo apparently loved as a kid. Halfway through opening a container, Do Yoonha laughs. 'I probably shouldn’t eat this, right?' Do Yoonha eats one piece and holds up another to you on the screen. Then Do Yoonha says, 'Revenge or whatever it is, he has to eat first.'",
+      "text": "Do Yoonha carries the containers up to the 4th floor and starts a video call. Stir-fried anchovies, perilla leaves, and the rolled omelet Oh Jinwoo apparently loved as a kid. Do Yoonha laughs. 'I probably shouldn’t eat this, right?' He eats one piece and holds up another to you on the screen. 'Revenge or whatever it is, he has to eat first.'",
       "memo": [
         "A meal that comes before revenge",
         "Family who worry without knowing"
@@ -296,7 +296,7 @@ export default {
     },
     "c8_clerks_reaction": {
       "title": "3 Months on Probation",
-      "text": "ECHO brings up the two employees’ salary transfers. The probationer’s monthly pay is 0.2% of the painting money that same employee approved. 'The higher a trace goes, the fainter it gets; the lower it comes, the clearer the names. On this sheet, the clearest name belongs to the person paid the least.'",
+      "text": "ECHO brings up the two employees’ salary transfers. The probationer’s monthly pay is 0.2% of the painting money that employee approved. 'The higher a trace goes, the fainter it gets; the lower it comes, the clearer the names. On this sheet, the clearest name belongs to the person paid the least.'",
       "memo": [
         "Paid the least, named the clearest",
         "The order for reading a trace sheet"
@@ -318,11 +318,11 @@ export default {
     },
     "c8_branch_ledger": {
       "title": "Han Seoyun’s Painting",
-      "text": "In one partner company’s expense ledger, a painting purchase is booked as 'client entertainment'. The name in the guest column is Han Seoyun. Han Seoyun takes your call and stays silent a long while before speaking. 'That painting has hung on my office wall for 3 years. I got it as a promotion gift. That same year, I signed the review box next to the approval box on 2023-0412.'",
+      "text": "In one partner company’s expense ledger, a painting purchase is booked as 'client entertainment'. The name in the guest column is Han Seoyun. 'That painting has hung on my office wall for 3 years. I got it as a promotion gift. That same year, I was the one who pressed the return button on the 2023-0412 dissent.'",
       "memo": [
         "Partner ledger: painting booked as entertainment",
-        "Recipient: Han Seoyun (then Deputy Manager)",
-        "Same year, Han Seoyun signed the 2023-0412 review box",
+        "Recipient: Han Seoyun (then Manager)",
+        "Same year, Han Seoyun returned the 2023-0412 dissent",
         "Han Seoyun offers to return the painting voluntarily"
       ],
       "choices": {
@@ -342,7 +342,7 @@ export default {
     },
     "c8_branch_ledger_follow": {
       "title": "The Painting Off the Wall",
-      "text": "The next morning, Han Seoyun comes to the Yeongdong Branch carrying the wrapped painting, after a four-hour drive. 'Do you know why I couldn’t take this down for 3 years? Because I liked it. I really liked the painting.' Han Seoyun smiles for the first time, and the smile can’t be told apart from crying. What remains is where to put the painting.",
+      "text": "The next morning, Han Seoyun drives four hours and arrives with the wrapped painting. 'Do you know why I couldn’t take this down for 3 years? Because I liked it. I really liked the painting.' She smiles for the first time, and the smile can’t be told apart from crying.",
       "memo": [
         "Han Seoyun’s self-report drafted",
         "Painting appraised at 6% of the sale price",
@@ -365,7 +365,7 @@ export default {
     },
     "c8_route_system": {
       "title": "Seven Companies, One Address",
-      "text": "You ask whether any other companies share Haeon Partners’ address. ECHO searches. The corporate registry history opens. Over the past 6 years, seven companies have had the same address as Haeon Partners, the same tax agent, and the same liquidation timing. The trace isn’t a single line. It is a pattern the same hand drew again and again.",
+      "text": "ECHO opens the corporate registry history. Over the past 6 years, seven companies have had the same address as Haeon Partners and the same tax agent. Their liquidation timing is the same too. The trace isn’t a single line. It is a pattern the same hand drew again and again.",
       "memo": [
         "7 companies with the same address and tax agent",
         "All liquidated just before an audit began",
@@ -391,7 +391,7 @@ export default {
     },
     "c8_final_system_route": {
       "title": "The Seventh Box",
-      "text": "10 hours to liquidation registration. On the Yeongdong Branch terminal, seven companies with the same address and the same tax agent stand in a row. The first six vanished just before audits began, and the seventh, Haeon Partners, is on the same road. ECHO lines up seven dates in a column. 'Six times, no one connected them. The seventh is on your screen now.'",
+      "text": "10 hours to liquidation registration. On the terminal, seven companies with the same address and the same tax agent stand in a row. The first six vanished just before audits began. ECHO lines up seven dates in a column. 'Six times, no one connected them. The seventh is on your screen now.'",
       "memo": [
         "7 companies with the same address and tax agent",
         "The first six: wound up just before audits began",
@@ -437,7 +437,7 @@ export default {
     },
     "c8_start_stand": {
       "title": "Branch of the One Who Went to People",
-      "text": "Before you left, you met the people who gave you material, one by one. Three of them text the Yeongdong Branch to check on you. Then, on day 9, a strange company catches your eye in the list of dormant accounts. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to Gallery On in Cheongdam-dong, Seoul. This morning the company’s liquidation application was filed; once it is registered in 72 hours, the account can’t be looked up. The account history shows your predecessor sent it up three times, and all three times it came back rejected. Branch Manager Na Junhyuk sets down a cup of instant coffee.",
+      "text": "On day 9, what catches your eye is Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to Gallery On in Cheongdam-dong. This morning the company’s liquidation application was filed. The account history shows your predecessor sent it up three times, and all three times it came back rejected. Branch Manager Na Junhyuk sets down a cup of instant coffee.",
       "memo": [
         "Still in touch with the people who gave you material",
         "Odd flow found in the Haeon Partners account",
@@ -467,7 +467,7 @@ export default {
     },
     "c8_start_open": {
       "title": "First Day for the One Who Skipped the Train",
-      "text": "You weren’t on the 06:40 train; you came down by bus two days late. The branch manager doesn’t ask about the delay and gives you a desk. The originals you handed the external auditor have drawn no answer yet. Instead, a dormant account at this branch answers. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to Gallery On in Cheongdam-dong, Seoul. This morning the company’s liquidation application was filed; once it is registered in 72 hours, the account can’t be looked up. The account history shows your predecessor sent it up three times, and all three times it came back rejected.",
+      "text": "No answer yet from the external auditor. Instead, a dormant account at this branch answers. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to Gallery On in Cheongdam-dong. This morning the company’s liquidation application was filed. The account history shows your predecessor sent it up three times, and all three times it came back rejected.",
       "memo": [
         "Late arrival noted in your HR file",
         "Waiting on the external auditor’s reply",
@@ -497,7 +497,7 @@ export default {
     },
     "c8_start_alone": {
       "title": "Window of the One Who Came Quietly",
-      "text": "You came down without telling anyone. You contacted no one, so no one knows what you are looking at. This time, that quiet becomes a weapon. One line in the list of dormant accounts points to where to use it. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to Gallery On in Cheongdam-dong, Seoul. This morning the company’s liquidation application was filed; once it is registered in 72 hours, the account can’t be looked up. The account history shows your predecessor sent it up three times, and all three times it came back rejected. Branch Manager Na Junhyuk sets down a cup of instant coffee.",
+      "text": "No one knows what you are looking at, and this time that quiet becomes a weapon. Haeon Partners, a consulting firm registered to a guesthouse address in Gyeongpo. For 3 years, advisory fees have come in every quarter, and on the same day the full amount goes out to Gallery On in Cheongdam-dong. This morning the company’s liquidation application was filed. The account history shows your predecessor sent it up three times, and all three times it came back rejected. Branch Manager Na Junhyuk sets down a cup of instant coffee.",
       "memo": [
         "No one expects you to look",
         "Odd flow found in the Haeon Partners account",

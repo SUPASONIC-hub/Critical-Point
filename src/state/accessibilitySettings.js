@@ -48,9 +48,21 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    table is left at its size: its height is budgeted to the
  *                    pixel. Carried on <html> as `data-story-scale` and the
  *                    factor as `--story` (comfort.css).
+ *   textScale        글자 크기 (2026-11-05, E5 after #390): every screen's type
+ *                    this many times larger (1, 1.125, 1.25) on top of the
+ *                    root #390 set (16px; 18px from 1025px wide), so a phone
+ *                    keeps 16px unless asked. The pot, the clock and the
+ *                    timers keep their size through --hud-rem. Carried on
+ *                    <html> as `data-text-size` ("large" | "larger") and the
+ *                    factor as `--text-scale` (tokens.css reads the factor:
+ *                    an inline property is there before the first paint,
+ *                    where an attribute rule the critical CSS never saw used
+ *                    would not be).
  */
 export const TABLE_TIME_SCALES = Object.freeze([1, 1.5, 2]);
 export const STORY_SCALES = Object.freeze([1, 1.125, 1.25]);
+export const TEXT_SCALES = STORY_SCALES;
+const TEXT_SIZE_NAMES = { 1.125: "large", 1.25: "larger" };
 
 export const DEFAULT_ACCESSIBILITY = Object.freeze({
   tableTime: 1,
@@ -61,6 +73,7 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   stillIntro: false,
   storyMode: false,
   storyScale: 1,
+  textScale: 1,
   edgeNotices: true,
   foldReadScenes: true,
 });
@@ -70,6 +83,7 @@ export function normalizeAccessibility(value) {
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
   if (STORY_SCALES.includes(source.storyScale)) settings.storyScale = source.storyScale;
+  if (TEXT_SCALES.includes(source.textScale)) settings.textScale = source.textScale;
   for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices", "foldReadScenes"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
@@ -92,13 +106,17 @@ export function getAccessibility() {
   return current;
 }
 
-/** The document carries the three settings CSS answers to, as the OS preference does. */
+/** The document carries the four settings CSS answers to, as the OS preference does. */
 export function applyAccessibilityToDocument(settings = getAccessibility(), root = globalThis.document?.documentElement) {
   if (!root) return;
   root.toggleAttribute("data-calm-effects", settings.calmEffects);
   root.toggleAttribute("data-still-intro", settings.stillIntro);
   root.toggleAttribute("data-story-scale", settings.storyScale > 1);
   root.style?.setProperty("--story", String(settings.storyScale));
+  const textSize = TEXT_SIZE_NAMES[settings.textScale];
+  if (textSize) root.setAttribute?.("data-text-size", textSize);
+  else root.removeAttribute?.("data-text-size");
+  root.style?.setProperty("--text-scale", String(settings.textScale));
 }
 
 export function setAccessibility(patch) {

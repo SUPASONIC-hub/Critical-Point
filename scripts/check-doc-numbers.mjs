@@ -63,8 +63,9 @@ const cardsNamingCognition = CASE_PACKS.flatMap((pack) => [...(pack.connectiveSc
 const floors = JSON.parse(read("scripts/coverage-floors.json")).total;
 
 /**
- * `verify-static.mjs` runs its checks when it is imported, so its list is read
- * as text: the names between the brackets, comments aside. Each has to be a
+ * The list in `verify-static.mjs` is read as text (it used to run its checks
+ * when imported, and reading it stays free of that): the names between the
+ * brackets, comments aside. Each has to be a
  * script package.json defines, which is what says the reading found the list.
  */
 function staticChecks() {
@@ -121,8 +122,8 @@ const DOC_NUMBERS = [
   { file: "README.md", what: "font file, KB", pattern: said("약 #KB, 글꼴 이름"), compute: () => game.fontKilobytes },
   {
     file: "README.md",
-    what: "font file (bytes, characters in its list, Hangul syllables among them)",
-    pattern: said("지금 파일은 #바이트\\s+\\(#자, 한글 #자\\)"),
+    what: "first font file (bytes; characters in the whole list, Hangul syllables among them)",
+    pattern: said("지금 첫 파일은 #바이트\\s+\\(목록 전체 #자, 한글 #자"),
     compute: () => [game.fontBytes, game.fontCharacters, game.fontHangul],
   },
   {
