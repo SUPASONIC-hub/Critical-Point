@@ -1881,7 +1881,8 @@ const budgets = [
   // 13,064 / 3,564 -> 13,557 / 3,710 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): `localizeSidePack` and en/ja side01 in the import map beside main's pageTitle(). Measured 13,553 / 3,706 in the e2e build, the plus 4.
   // 13,557 / 3,710 -> 13,713 / 3,737 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 13709 / 3733 (over budget only) in the e2e build, the plus 4.
   // 13,713 / 3,737 -> 13,869 / 3,767 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured 13865 / 3763 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_869, maxGzip: 3_767 },
+  // 13,869 / 3,767 -> 13,869 / 3,779 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured - / 3775 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_869, maxGzip: 3_779 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -2201,7 +2202,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,432 / 432,235 / 439,938 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured first paint, the plus 4.
 // -> 373,484 / 432,339 / 440,036 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured first paint, the plus 4.
 // -> 373,551 / 432,455 / 440,147 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_455, ja: 440_147 };
+// -> 373,551 / 432,465 / 440,155 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_465, ja: 440_155 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
