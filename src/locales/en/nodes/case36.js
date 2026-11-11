@@ -231,7 +231,7 @@ export default {
     },
     "c36_gate": {
       "title": "10 Minutes Outside the Gate",
-      "text": "Chairman Seo Dokyung says, 'Go think for 10 minutes outside the gate. I’ll hear your answer at the table.' Outside the gate, Kang Taemin sits on the truck bed sharing cup noodles with a security guard. The guard greets you first. 'The foreman pours the water right to the line.' When you post the table’s offer in the group chat in one line, Kwon Dohyun writes on a two-column table, 'Neither column is in the black.' Do Yoonha leaves just one line. 'Watch whose name gets left out.'",
+      "text": "Chairman Seo Dokyung says, 'Go think for 10 minutes outside the gate. I’ll hear your answer at the table.' Outside the gate, Kang Taemin sits on the truck bed sharing cup noodles with a security guard. The guard greets you first. 'The foreman pours the water right to the line.' When you post the table’s offer in the group chat in one line, Kwon Dohyun writes on a two-column table, 'Neither column is in the black.' Oh Jinwoo writes, 'Take it and you’re No. 1. Refuse and you’re a legend.' Do Yoonha leaves just one line. 'Watch whose name gets left out.'",
       "memo": [
         "186 messages in the group chat",
         "Kang Taemin and the guard -- on their second cup noodles",
@@ -254,7 +254,7 @@ export default {
     },
     "c36_phone_reaction": {
       "title": "Before the Basket",
-      "text": "Just as you are about to put your phone in the basket, a message from Yoon Seojin appears. 'You’re going to Hannam-dong today, right? Dad knows. Dad sat at that table for 12 years. I want Dad to be punished. But I don’t want him punished alone. Is that strange?'",
+      "text": "Just as you are about to put your phone in the basket, a message from Yoon Seojin appears. 'You’re going to Hannam-dong today, right? Dad knows. Dad sat at that table for 12 years. He says who sits in that chair today feels like a verdict to him. I want Dad to be punished. But I don’t want him punished alone. Is that strange?'",
       "memo": [
         "Yoon Seojin: 'I don’t want him punished alone'",
         "Yoon Sanghyuk sat at that table for 12 years"

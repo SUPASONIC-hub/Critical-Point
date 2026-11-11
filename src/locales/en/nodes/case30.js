@@ -228,7 +228,7 @@ export default {
     },
     "c30_notice": {
       "title": "Second-Half Recruitment Notice",
-      "text": "Oh Jinwoo has printed out a notice from Bridge Bank’s HR team. 'FitScore organizational fit to be introduced from second-half open recruitment.' 'They say they tried it on my team’s intern selection last month. Two of three got cut, and one was the kid I ranked No. 1 in the interview. The one who kept asking questions to the end. My father told me to stand on the winning side. These days the score decides first who’s on the winning side.'",
+      "text": "Oh Jinwoo has printed out a notice from Bridge Bank’s HR team. 'FitScore organizational fit to be introduced from second-half open recruitment.' 'They say they tried it on my team’s intern selection last month. Two of three got cut, and one was the kid I ranked No. 1 in the interview. The one who kept asking questions to the end. My father told me to stand on the winning side. These days the score decides first who’s on the winning side.' The owner points at the empty chair and asks if one more is coming.",
       "memo": [
         "Bridge Bank second-half recruitment: FitScore introduced",
         "Pilot use: 2 of 3 interns cut",

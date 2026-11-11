@@ -251,7 +251,7 @@ export default {
     },
     "c35_elder_reaction": {
       "title": "One Night’s Score",
-      "text": "Lee Minseo has sent a photo of KD Data Lab’s night monitor. 'Six hours after the downpour began, NOAH cut the credit scores of business owners all over Mangwon-dong and the Namdong Industrial Complex, one after another. Nobody has even applied for a loan yet, and it has already finished getting ready to reject them.' Gaeul Rice Cake Shop dropped 187 points overnight.",
+      "text": "Lee Minseo has sent a photo of KD Data Lab’s night monitor. 'Six hours after the downpour began, NOAH cut the credit scores of business owners all over Mangwon-dong and the Namdong Industrial Complex, one after another. Nobody has even applied for a loan yet, and it has already finished getting ready to reject them.' Gaeul Rice Cake Shop dropped 187 points overnight. 'I’m not supposed to see this screen. I’m sending it anyway.'",
       "memo": [
         "Scores that dropped before anyone applied",
         "A screen she shouldn’t see"

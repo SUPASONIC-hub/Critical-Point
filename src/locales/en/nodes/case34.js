@@ -131,7 +131,7 @@ export default {
     },
     "c34_final": {
       "title": "Retain: X",
-      "text": "Yoon Seojin sets the notebook on the table. 'At dinner my father didn’t ask anything. He just peeled me a peach. That was the scariest part. If I hand it in myself, I’m the daughter who reported her father. If I don’t, I’m the daughter called in instead of her father. I’m asking you to decide with me. If the way to protect my father is to hide this, then I’ve studied all of this wrong.'",
+      "text": "Yoon Seojin sets the notebook on the table. 'At dinner my father didn’t ask anything. He just peeled me a peach. Without breaking the peel once. That was the scariest part. If I hand it in myself, I’m the daughter who reported her father. If I don’t, I’m the daughter called in instead of her father. I’m not asking you to decide. I’m asking you to decide with me. If the way to protect my father is to hide this, then I’ve studied all of this wrong.'",
       "memo": [
         "Deadline: July 6, 10 a.m., Prosecutor Na Eunho’s office, Seoul Central District Prosecutors’ Office",
         "Past the deadline, Yoon Seojin is called in herself",
@@ -229,7 +229,7 @@ export default {
     },
     "c34_hallway": {
       "title": "10 A.M. the Day After Tomorrow",
-      "text": "Prosecutor Na Eunho speaks on the phone. 'I know about the notebook.' What he wants is a voluntary submission (the holder handing the evidence over to investigators of their own accord). 'Bring it by 10 a.m. the day after tomorrow. Otherwise I call in Yoon Seojin. Making a grad student talk about her father, I don’t like it either. But I’m paid to do things I don’t like.'",
+      "text": "Prosecutor Na Eunho speaks on the phone. 'I know about the notebook.' What he wants is a voluntary submission (the holder handing the evidence over to investigators of their own accord). 'Bring it by 10 a.m. the day after tomorrow. Otherwise I call in Yoon Seojin. Making a grad student talk about her father, I don’t like it either. But I’m paid to do things I don’t like. Ah, I was rude just now, wasn’t I. I’ll note that down too.'",
       "memo": [
         "Deadline: July 6, 10 a.m.",
         "Na Eunho: past the deadline, he calls in Yoon Seojin himself",
