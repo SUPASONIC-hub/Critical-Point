@@ -342,7 +342,7 @@ export default {
     },
     "c28_branch_market_follow": {
       "title": "Same Lathe",
-      "text": "Moon Hajun turns Article 19 into a four-panel comic. A man at a lathe. The same man, only his name tag changed from Gaon Precision to To-the-End Precision. An insurance company person: 'I see your occupation has changed'—and the man points at the lathe: 'This is the same one'. Moon Hajun says, 'Write it in grown-up writing and nobody reads it. Everybody read this.'",
+      "text": "Moon Hajun turns Article 19 into a four-panel comic. A man at a lathe. The same man, only his name tag now reads 'To-the-End Precision', no longer 'Gaon Precision'. An insurance company person: 'I see your occupation has changed'—and the man points at the lathe: 'This is the same one'. Moon Hajun says, 'Write it in grown-up writing and nobody reads it. Everybody read this.'",
       "memo": [
         "Moon Hajun’s four-panel comic 'Same Lathe'",
         "Gist of Article 19: if your job changes, you must report it",
