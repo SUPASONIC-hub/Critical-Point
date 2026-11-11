@@ -104,6 +104,7 @@
     "src/state/openingState.js": 100,
     "src/state/pastPicks.js": 100,
     "src/state/payloadSchemas.js": 100,
+    "src/state/pendingRowLabel.js": 100,
     "src/state/playtestExport.js": 81,
     "src/state/readingTally.js": 100,
     "src/state/retryableLazy.js": 100,
