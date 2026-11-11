@@ -724,5 +724,17 @@ export const copy = {
         "summary": "The day after the win, the bill arrives. The person who carried the victims’ list alone for 3 years collapses, and the list is not an official record. It will be destroyed in four days."
       }
     }
+  },
+  // E-11 번외 사건: the side list's label and title (src/nodes/sidePacks.js,
+  // `SIDE_CASES`), the way seasonCasesBase names a season case; the label in
+  // the case labels' form (10-29, the user's choice (1)). A side case's scenes
+  // and endings are nodes/sideNN.js.
+  "sidePacks": {
+    "SIDE_CASES": {
+      "side01": {
+        "label": "Side case 1",
+        "title": "The Seven Not Yet Visited"
+      }
+    }
   }
 };

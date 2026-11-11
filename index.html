@@ -74,8 +74,10 @@
       media="not all and (max-width: 700px)"
       fetchpriority="high"
     />
-    <!-- The one font file (src/styles/tokens.css). Preloaded so the intro's text
-         is not held until the stylesheet that names it has been parsed. -->
+    <!-- The first of the two font files (src/styles/tokens.css): the start
+         screen's characters. Preloaded so the intro's text is not held until the
+         stylesheet that names it has been parsed. The second file is not
+         preloaded; the service worker keeps it at install. -->
     <link
       rel="preload"
       as="font"

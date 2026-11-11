@@ -5,6 +5,7 @@ import { ScenePlate } from "../components/ScenePlate.jsx";
 import * as endingCopy from "../endingCopy.js";
 import resultCopy from "../copy/result.js";
 import { fill } from "../locale.js";
+import { SIDE_CASES } from "../sideCases.js";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
@@ -245,6 +246,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
+          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label={resultCopy.sideSlotOpened.label} data-testid="side-slot-opened"><p>{resultCopy.sideSlotOpened.text}</p></section>}
           {currentCase === "final" && view.failureRecovery && (
             <section className="failure-recovery-panel" aria-label={resultCopy.failureRecoveryLabel}>
               <strong>{view.failureRecovery.title}</strong>
@@ -333,7 +335,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
           </section>
           {/* Act three. Everything the report used to open with. */}
           <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />
-        </section>
+          {/* ad-slot: placement="report" hidden={currentCase.startsWith("prologue") || (currentCase === "final" && endingStep < 3)} */}</section>
       </main>
 );
 }

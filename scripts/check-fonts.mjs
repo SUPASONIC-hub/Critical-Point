@@ -1,6 +1,19 @@
 import { readFileSync, statSync } from "node:fs";
 import { convert } from "fontverter";
-import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComputedCharacters, collectSourceCharacters, readCharsetList } from "./font-charset.mjs";
+import {
+  CHARSET_OUTPUT,
+  FIRST_CHARSET_OUTPUT,
+  FONT_CSS,
+  FONT_OUTPUT,
+  FONT_SOURCE,
+  REST_FONT_OUTPUT,
+  collectCharset,
+  collectComputedCharacters,
+  collectFirstPaintCharset,
+  collectSourceCharacters,
+  readCharsetList,
+  unicodeRange,
+} from "./font-charset.mjs";
 
 /**
  * Fail when the source can print a character the shipped font does not carry.
@@ -29,7 +42,18 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComput
 // the woff2's in check-bundle-size.mjs.
 // 197,740 -> 198,148 on 2026-11-02, plate-story (#392): the Japanese sounds lettered in the plate add ク, ド and ン (1,697 -> 1,700 characters). Measured 198,144 plus 4.
 // 198,148 -> 199,128 on 2026-11-05, studio-name: ち, ぷ, も and よ for STUDIOもちぷよ. Measured 199,124 plus 4.
-const MAX_FONT_BYTES = 199_128;
+// 199,128 -> 131,356 on 2026-11-10, font-split over main 3a507805 (the user's choice 1,
+// held for W47 and released on 11-10): the one file became two, and this line is the
+// first (preloaded) one's: the start screen's characters in three languages, the
+// intro's case cards, play styles, origins and the studio credit among them. The
+// second file's line is MAX_REST_FONT_BYTES; together they are about the one file
+// they replaced, since both are cut from the same face and axis. (Before the merge,
+// 2026-11-03/04: 96,236 and then 129,424 / 85,744.) Measured 131,352 / 82,780 plus 4.
+// 131,356 -> 131,476 on 2026-11-11, bundle 1111 (#301 adds 냄 and 짧 to the start screen). Measured 131,472 plus 4.
+const MAX_FONT_BYTES = 131_476;
+// 82,784 -> 82,428 on 2026-11-11, bundle 1111 (냄 and 짧 left this file). Measured 82,424 plus 4.
+// 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: 갭 and 뿌 join this file. Measured 82,684 plus 4.
+const MAX_REST_FONT_BYTES = 82_688;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones
@@ -139,10 +163,35 @@ if (missing.length) {
 }
 const computed = await collectComputedCharacters();
 
+// The split: the first list is what the start screen prints now, the second
+// file's unicode-range in the stylesheet is every other character of the list,
+// and each font carries its own half.
+let firstList = null;
+try {
+  firstList = readCharsetList(undefined, FIRST_CHARSET_OUTPUT);
+} catch {
+  failures.push(`${FIRST_CHARSET_OUTPUT} is missing. Run \`npm run build:fonts\`.`);
+}
+if (firstList) {
+  const wanted = await collectFirstPaintCharset();
+  const drift = [...wanted].filter((character) => !firstList.has(character));
+  if (drift.length) failures.push(`${drift.length} characters the start screen prints are not in ${FONT_OUTPUT}: ${describe(drift)}
+Run \`npm run build:fonts\` and commit the result.`);
+  const rest = [...built].filter((character) => !firstList.has(character)).join("");
+  const range = /FONT_REST_RANGE start \*\/\s*unicode-range:\s*([^;]*);/.exec(readFileSync(FONT_CSS, "utf8"))?.[1]?.replace(/\s+/g, "");
+  if (range !== unicodeRange(rest)) failures.push(`The second @font-face's unicode-range in ${FONT_CSS} is not the list minus the first file. Run \`npm run build:fonts\`.`);
+}
+
 let carried = null;
 let drawable = null;
 try {
-  carried = await readFontCharacters(FONT_OUTPUT);
+  const firstCarried = await readFontCharacters(FONT_OUTPUT);
+  const restCarried = await readFontCharacters(REST_FONT_OUTPUT);
+  carried = new Set([...firstCarried, ...restCarried]);
+  if (firstList) {
+    const lost = [...firstList].filter((c) => !firstCarried.has(c.codePointAt(0)) && restCarried.has(c.codePointAt(0)));
+    if (lost.length) failures.push(`${FONT_OUTPUT} lacks ${lost.length} characters its list names: ${describe(lost)}. Run \`npm run build:fonts\`.`);
+  }
   drawable = await readFontCharacters(FONT_SOURCE);
 } catch (error) {
   failures.push(`The font could not be read: ${error instanceof Error ? error.message : String(error)}`);
@@ -180,13 +229,15 @@ if (drawable) {
 
 const bytes = statSync(FONT_OUTPUT).size;
 if (bytes > MAX_FONT_BYTES) failures.push(`${FONT_OUTPUT} is ${bytes} bytes, over the ${MAX_FONT_BYTES} byte budget.`);
+const restBytes = statSync(REST_FONT_OUTPUT).size;
+if (restBytes > MAX_REST_FONT_BYTES) failures.push(`${REST_FONT_OUTPUT} is ${restBytes} bytes, over the ${MAX_REST_FONT_BYTES} byte budget.`);
 
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
 } else {
   console.log(
-    `Font check passed: ${built.size} characters in ${(bytes / 1024).toFixed(1)}KB, none missing from the list ` +
+    `Font check passed: ${built.size} characters in ${(bytes / 1024).toFixed(1)}KB + ${(restBytes / 1024).toFixed(1)}KB (${firstList?.size} on the start screen), none missing from the list ` +
       `(${computed.labels} card labels spoken, ${computed.characters.size} characters between them), ` +
       `and the font carries every one Pretendard draws (${carried.size} mapped). ` +
       `${systemDrawn.length} printed characters are the system face's, as listed: ${systemDrawn.join(" ")}.`,
