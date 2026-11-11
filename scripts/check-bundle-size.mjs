@@ -170,7 +170,8 @@ const budgets = [
   // 153,686 / 56,482 -> 153,871 / 56,560 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 153867 / 56556 (over budget only) in the e2e build, the plus 4.
   // -> 153,705 / 56,489 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 153,701 / 56,485 in the e2e build, the plus 4.
   // 153,705 / 56,489 -> 153,883 / 56,590 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 153879 / 56586 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_883, maxGzip: 56_590 },
+  // 153,883 / 56,590 -> 153,883 / 56,597 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 56593 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_883, maxGzip: 56_597 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -603,7 +604,8 @@ const budgets = [
   // 200,275 / 72,598 -> 200,519 / 72,704 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured 200515 / 72700 (over budget only) in the e2e build, the plus 4.
   // 200,519 / 72,704 -> 200,579 / 72,727 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 200575 / 72723 (over budget only) in the e2e build, the plus 4.
   // 200,579 / 72,727 -> 200,735 / 72,779 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured 200731 / 72775 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 200_735, maxGzip: 72_779 },
+  // 200,735 / 72,779 -> 200,735 / 72,784 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 72780 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 200_735, maxGzip: 72_784 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2173,7 +2175,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,408 / 432,211 / 439,916 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477). Measured first paint, the plus 4.
 // -> 373,432 / 432,235 / 439,938 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured first paint, the plus 4.
 // -> 373,484 / 432,339 / 440,036 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_484, en: 432_339, ja: 440_036 };
+// -> 373,490 / 432,344 / 440,036 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_490, en: 432_344, ja: 440_036 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
