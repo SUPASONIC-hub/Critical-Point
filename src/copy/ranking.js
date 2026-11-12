@@ -40,6 +40,8 @@ const rankingCopy = {
   footnote: "다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.",
   // D2 hall of fame (src/hallOfFameBadges.js): the footnote's second sentence and a row's badge.
   hallFootnote: "검사를 통과한 판별 1~3위는 실행 번호로 명예의 전당에 남습니다.",
+  // What the nightly check can and cannot tell (F1-5 (1), 11-11): the footnote's last sentence.
+  checkScope: "매일 밤 검사는 기록이 규칙대로 나올 수 있었는지까지 확인합니다. 사람인지 봇인지는 가리지 못합니다.",
   hallBadge: "명예의 전당 · {board} {place}위",
   hallMainBoard: "본 판",
   hallProvisional: " (잠정)",

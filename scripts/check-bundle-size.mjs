@@ -1181,7 +1181,8 @@ const budgets = [
   // 5,503 / 2,416 -> 5,836 / 2,575 on 2026-10-29, #224 (RULES_MARK 3, C-2, personal bests) merged with main 11cb3b16 (다국어 틀): the personal bests' state, fetch and line (src/personalBests.js, its words ranking.pastBest) and the intro that says the season record is a mean of cases. Measured 5,836 / 2,571, the gzip plus 4 in the e2e build.
   // 5,836 / 2,575 -> 6,670 / 2,992 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b, the 2nd stage: the badges (src/hallOfFameBadges.js, public_hall_of_fame read on mount, its words ranking.hallBadge, hallMainBoard, hallProvisional) and the footnote's second sentence (ranking.hallFootnote). Measured 6,670 / 2,988 in the e2e build, the gzip plus 4.
   // 5,912 / 2,535 -> 7,079 / 3,112 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 7,075 / 3,108 in the e2e build, the plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 7_079, maxGzip: 3_112 },
+  // 7,079 / 3,112 -> 7,251 / 3,201 on 2026-11-11, recheck-in-case over main 52027156. Measured 7247 / 3197 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 7_251, maxGzip: 3_201 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -1777,7 +1778,8 @@ const budgets = [
   // 188,130 / 62,575 -> 188,219 / 62,632 on 2026-11-11, E-11 번외 1 (draft) over e11-side-cases c0d04767 and main 568572d3 (#484 #502 #503): 番外1 and its title (`copy.sidePacks`). Measured 188,215 / 62,628 in the e2e build, the plus 4.
   // 188,219 / 62,632 -> 188,271 / 62,649 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 188267 / 62645 (over budget only) in the e2e build, the plus 4.
   // 188,271 / 62,649 -> 188,317 / 62,664 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured 188313 / 62660 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 188_317, maxGzip: 62_664 },
+  // 188,317 / 62,664 -> 188,472 / 62,723 on 2026-11-11, recheck-in-case over main 52027156. Measured 188468 / 62719 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 188_472, maxGzip: 62_723 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1834,7 +1836,8 @@ const budgets = [
   // 156,774 / 55,786 -> 156,862 / 55,838 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 156858 / 55834 (over budget only) in the e2e build, the plus 4.
   // 156,862 / 55,838 -> 156,923 / 55,860 on 2026-11-11, E-11 번외 2 (#321) over #317 f657d6ad (main 5c93b496). Measured 156919 / 55856 (over budget only) in the e2e build, the plus 4.
   // 156,923 / 55,860 -> 156,978 / 55,879 on 2026-11-11, E-11 번외 3 (#333) over #321 (main 5c93b496). Measured 156974 / 55875 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 156_978, maxGzip: 55_879 },
+  // 156,978 / 55,879 -> 157,097 / 55,933 on 2026-11-11, recheck-in-case over main 52027156. Measured 157093 / 55929 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 157_097, maxGzip: 55_933 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2214,7 +2217,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,490 / 432,347 / 440,045 on 2026-11-11, noscript-guide over main accd990b. Measured first paint, the plus 4.
 // -> 373,557 / 432,468 / 440,161 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured first paint, the plus 4.
 // -> 373,551 / 432,465 / 440,155 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_465, ja: 440_155 };
+// -> 373,551 / 432,520 / 440,218 on 2026-11-11, recheck-in-case over main 52027156. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_520, ja: 440_218 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
