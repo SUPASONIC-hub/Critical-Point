@@ -1,4 +1,4 @@
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 import { SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import { getRankingIntegrity } from "../advancedSystems.js";
@@ -31,6 +31,7 @@ import { useScreenTabTitle } from "./tabTitle.js";
 import { useSceneMood } from "./sceneMood.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 import { getOutcomeTone } from "../plateStory.js";
+import { getAnalystTitleRise, getAnalystTitleStep } from "../analystTitle.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
 import tabTitlesCopy from "../copy/tabTitles.js";
@@ -109,6 +110,8 @@ export function useResultReport({
   currentCase,
   discoveredClues,
   fallbackCaseId,
+  // Whether this device has finished a season (NEW GAME+ open), for the record title (analystTitle.js).
+  finishedSeason = false,
   gameplayStats,
   localErrorEntries,
   localRankingRows,
@@ -163,6 +166,14 @@ export function useResultReport({
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
   // Its rank is asked for once the finale has closed, and only for a season the ranking takes.
+  // C1-1: the record title the result announces when this case raised it. The
+  // step is held as it stood while the case was played; the result compares the
+  // step the closed case reached with it (getAnalystTitleRise). A page opened
+  // straight onto a result holds that result's own step, so it announces nothing.
+  const titleStep = getAnalystTitleStep({ currentCase, caseResults, finishedSeason });
+  const [playedTitleStep, setPlayedTitleStep] = useState(titleStep);
+  if (tabScreen === "play" && playedTitleStep !== titleStep) setPlayedTitleStep(titleStep);
+  const titleRise = tabScreen === "result" ? getAnalystTitleRise(playedTitleStep, titleStep) : "";
   const rankedHold = useMemo(() => (currentCase === "final" && caseResults.final ? getRankedLogicHold(caseResults) : null), [caseResults, currentCase]);
   const logicStanding = useLogicStanding(rankedHold);
   const logicReport = useMemo(() => createLogicReport({ caseResults, cases: seasonCasesBase, standing: logicStanding }), [caseResults, logicStanding]);
@@ -214,7 +225,8 @@ export function useResultReport({
     ...reportCopy,
     result,
     endingVariant,
-    seasonStanding,
+    // The title line rides on the standing the outcome panel prints (the result view's fields are budgeted).
+    seasonStanding: titleRise ? { ...seasonStanding, titleRise } : seasonStanding,
     rankingComparison,
     logicReport,
     // For the page before the finale (`getSeasonRecordNotice`).
