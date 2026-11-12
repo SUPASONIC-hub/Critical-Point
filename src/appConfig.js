@@ -17,6 +17,10 @@ export const PAST_PICKS_KEY = "critical-point-past-picks-v1";
 // B-3(1) 냉정한 오프닝 shown once on this device (state/coldOpening.js, draft
 // behind COLD_OPENING_ENABLED). A device preference: starting over keeps it.
 export const COLD_OPENING_SEEN_KEY = "critical-point-cold-opening-seen-v1";
+// E-11 번외 사건: each side case's completion mark and its run in progress
+// (src/sideCases.js). No reset, no server row; the online save carries the
+// marks alone, beside the season's device records (cloudSave.js).
+export const SIDE_CASES_KEY = "critical-point-side-cases-v1";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 // The random id telemetry rows carry for this device (telemetry.getSessionId).
@@ -83,6 +87,12 @@ export function getDeletionRequestText(contact = SUPPORT_CONTACT) {
 
 /** Fired on `globalThis` after every save that reached device storage. */
 export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
+/**
+ * Fired on `globalThis` when a device record the online save carries changes
+ * with no save written: a side case closed (state/sideRun.js). The online
+ * copy follows it as it follows a save.
+ */
+export const DEVICE_RECORD_WRITTEN_EVENT = "critical-point:device-record-written";
 // The raw text of a save this build could not read -- broken JSON, or a schema
 // newer than the build after a rolled-back deploy. Kept until the player has a
 // readable save again, so the next write is not what destroys it.
@@ -655,6 +665,8 @@ export function readSettledWindowSeeds() {
 
 export function recordSettledWindowSeed(seed) {
   if (typeof seed !== "string" || !seed) return false;
+  // E-11: a side case's windows (`side:...`, state/sideRun.js) are not the season's to log.
+  if (seed.startsWith("side:")) return false;
   const seeds = readSettledWindowSeeds().filter((existing) => existing !== seed);
   seeds.push(seed);
   return writeStoredValue(SETTLED_WINDOWS_STORAGE_KEY, JSON.stringify(seeds.slice(-SETTLED_WINDOWS_LIMIT)));

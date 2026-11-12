@@ -27,12 +27,18 @@
  *   the run that wrote them and what stood before it from the copy whose
  *   `last` was kept.
  *
+ * - The side cases' completion marks (E-11, src/sideCases.js): a case closed
+ *   on either device is closed; when both closed it, the later close (and its
+ *   ending) is kept. This device's side run in progress stays as it is; the
+ *   copy never carries one.
+ *
  * A copy that carries none of them (one uploaded before E-12) leaves this
  * device's keys as they are. This module imports the scene graph, so
  * cloudSave.js loads it only when a copy is actually restored.
  */
-import { NEW_GAME_PLUS_KEY, PAST_PICKS_KEY, readStoredValue, SEASON_RECORD_KEY, SEEN_SCENES_KEY, writeStoredValue } from "../appConfig.js";
+import { NEW_GAME_PLUS_KEY, PAST_PICKS_KEY, readStoredValue, SEASON_RECORD_KEY, SEEN_SCENES_KEY, SIDE_CASES_KEY, writeStoredValue } from "../appConfig.js";
 import { nodeOrders } from "../gameData.js";
+import { mergeSideMarks } from "./sideMarks.js";
 import { withEndingBook } from "./newGamePlusCarry.js";
 import { normalizePastPicksRecord } from "./pastPicks.js";
 import { isPlainObject, normalizeSeasonRecord } from "./seasonRecord.js";
@@ -43,6 +49,7 @@ export const DEVICE_RECORD_KEYS = Object.freeze({
   seasonRecord: SEASON_RECORD_KEY,
   pastPicks: PAST_PICKS_KEY,
   seenScenes: SEEN_SCENES_KEY,
+  sideCases: SIDE_CASES_KEY,
 });
 
 const COUNTED_RUNS_KEPT = 8;
@@ -152,6 +159,13 @@ export function applyDeviceRecords(deviceRecords) {
     if (merged) {
       writeKey(SEEN_SCENES_KEY, merged);
       written.push("seenScenes");
+    }
+  }
+  if (carried("sideCases")) {
+    const merged = mergeSideMarks(readKey(SIDE_CASES_KEY), deviceRecords.sideCases);
+    if (Object.keys(merged).length > 0) {
+      writeKey(SIDE_CASES_KEY, merged);
+      written.push("sideCases");
     }
   }
   return written;

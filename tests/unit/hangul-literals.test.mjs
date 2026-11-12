@@ -28,6 +28,7 @@ const WORD_FOLDERS = /^src\/(copy|nodes|locales|dev)\//;
  * code matches Korean text with, or a record kept in Korean on purpose.
  */
 const KOREAN_MODULES = {
+  "src/ads/adSlotWords.js": "the ad box's words in all three languages, picked by appliedLocale() (kept out of the dictionaries so a build without ads is main's)",
   "src/advancedSystems.js": "OPERATOR_PROFILES and ORIGIN_PROLOGUES, laid over through src/copy/intro.js",
   "src/appConfig.js": "DELETION_REQUEST_COPY (src/copy/cloudSaveBody.js) and the default names a row keeps in Korean (ranking.js shows them in the page's words)",
   "src/appCopy.js": "the shell's tables, laid over before the first paint",
@@ -50,6 +51,7 @@ const KOREAN_MODULES = {
   "src/seasonRules.js": "branch condition notes nothing prints",
   "src/shellNotices.js": "laid over under screens.notices.save",
   "src/speakerPortraits.js": "speaker names as keys",
+  "src/state/sidePackCheck.js": "E-11: a side pack's problems for scripts/validate-game-graph.mjs and the dev fixture, never printed on a screen; the label it checks is the pack's own data (a side case's words are its pack's, src/nodes/sidePacks.js)",
   "src/state/seasonRecord.js": "VERDICT_NAMES, the record's Korean; src/copy/seasonLines.js prints the page's",
   "src/state/useBoard.js": "a link pattern",
 };

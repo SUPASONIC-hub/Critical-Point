@@ -27,6 +27,11 @@ export default {
   },
   veteranTable: "In NEW GAME+, every rule is on from Prologue 01, and you get your tools earlier.",
   pastCase: "Your earlier record kept your last choice in CASE {code}. This time, you can change how it turns out.",
+  verdicts: { ending_seal: "Seal", ending_reform: "Reform", ending_expose: "Expose" },
+  memory: {
+    line: "Last season: {named}{ending}.{carry}",
+    carry: " Start NEW GAME+ and this record returns in the first scene.",
+  },
   integrity: {
     linked: "This record is tied to a single run. The public ranking only takes seasons whose case records all reached the server over 15 minutes or more, and the server flags records whose score, rank or times don’t add up.",
     missing: "With no run ID, this is kept as a temporary local record.",

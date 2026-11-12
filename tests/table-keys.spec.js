@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "./helpers/network.js";
-import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, COLD_OPENING_SEEN_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
 import { CASE_START_NODES } from "../src/gameCases.js";
 import { nodes } from "../src/gameData.js";
 import { getReadingSeconds } from "../src/gauntlet/gauntletEngine.js";
@@ -956,12 +956,15 @@ async function expectBriefing(page) {
 
 test("a new run meets the table in steps: 프롤로그 01 has no logic streak and breaks no board, 프롤로그 02 has both", { tag: "@prod" }, async ({ page }) => {
   test.setTimeout(300_000);
-  await page.addInitScript(() => {
+  await page.addInitScript((seenKey) => {
     // Once a tab, so a reload would find what the run has saved since.
     if (sessionStorage.getItem("e2e-seeded")) return;
     sessionStorage.setItem("e2e-seeded", "1");
     localStorage.clear();
-  });
+    // The fixture's B-3(1) 냉정한 오프닝 mark (tests/helpers/network.js) runs
+    // before this clear; put back, the start button opens 프롤로그 01 itself.
+    localStorage.setItem(seenKey, "1");
+  }, COLD_OPENING_SEEN_KEY);
   await page.goto("/");
   await clickElement(page.getByTestId("start-first-case"), "start first case");
   await expectBriefing(page);

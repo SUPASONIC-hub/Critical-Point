@@ -9,7 +9,7 @@ import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/criti
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
 import { withStaticShell } from "./scripts/static-shell.mjs";
-import { adsTxt, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
+import { adsTxt, insertAdSlots, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
@@ -413,11 +413,19 @@ function serviceWorker() {
  * `serviceWorker()` in the list, which reads every file on disk. With Google
  * Analytics on (`googleAnalytics` below) each page carries its tag, and the
  * policy and the FAQ say so.
+ *
+ * `ads` is the ads' stage (ADSENSE_ADS, ADSENSE_DATE). With `notice` the
+ * policy and the terms open with the notice of the change and its day; with
+ * `on` the pages' text is the one the web has with ads, on top of Google
+ * Analytics' when that is on too (AD_EDITS and ANALYTICS_AD_EDITS,
+ * legal-pages.mjs; SITE_AD_EDITS and ANALYTICS_SITE_AD_EDITS, site-pages.mjs),
+ * and the two policies carry the day as their date; without it the pages are
+ * the ones without ads, byte for byte.
  */
-function staticPages(analytics) {
+function staticPages({ analytics, ads }) {
   const files = () => {
     const origin = siteOrigin();
-    return { ...renderStaticPages(origin, { analytics }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+    return { ...renderStaticPages(origin, { analytics, ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -508,6 +516,30 @@ function adsenseVerification({ client, publisherId }) {
     },
   };
 }
+
+/**
+ * Web ads themselves (출시 로드맵 2단계), off unless ADSENSE_ADS=on with a
+ * unit for a placement in ADSENSE_SLOTS (scripts/adsense-config.mjs,
+ * docs/web-ads.md). Off -- verification only included -- this plugin has no
+ * hook and the build is the one without it. On, it turns each placement's
+ * marker comment into an <AdSlot> before JSX is compiled: first in the list,
+ * so its transform sees the source before react() does.
+ */
+function adSlots(config) {
+  if (!config.ads) return { name: "ad-slots-off" };
+  return {
+    name: "ad-slots",
+    enforce: "pre",
+    transform(code, id) {
+      if (!id.endsWith(".jsx") || id.includes("node_modules")) return null;
+      const out = insertAdSlots(code, config);
+      return out === null ? null : { code: out, map: null };
+    },
+  };
+}
+
+/** ADSENSE_* (scripts/adsense-config.mjs), which the plugin above and the pages' text both follow. */
+const adsenseEnv = (mode) => readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"));
 
 /**
  * Google Search Console's site verification, off unless
@@ -741,13 +773,16 @@ function ownChunkGroups() {
 
 export default defineConfig(({ command, mode }) => {
   const debugBuild = command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true";
+  const ads = adsenseEnv(mode);
   const analytics = analyticsFor({ ...readAnalyticsEnv(loadEnv(mode, process.cwd(), "GA_")), command, mode, debug: debugBuild });
   return {
     // ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION and GA_MEASUREMENT_ID have no VITE_ prefix, so they never reach
     // import.meta.env (scripts/adsense-config.mjs, scripts/search-console.mjs, scripts/analytics-config.mjs).
     plugins: [
-      seasonData(), reactAsEsm(), react(), criticalCss(), staticShell(), absoluteSiteUrls(), buildShaMeta(), localePreload(), staticPages(analytics),
-      adsenseVerification(readAdsenseEnv(loadEnv(mode, process.cwd(), "ADSENSE_"))),
+      adSlots(ads),
+      seasonData(), reactAsEsm(), react(), criticalCss(), staticShell(), absoluteSiteUrls(), buildShaMeta(), localePreload(),
+      staticPages({ analytics, ads: ads.stage === "off" ? false : { stage: ads.stage, date: ads.date } }),
+      adsenseVerification(ads),
       searchConsoleVerification(readSearchConsoleEnv(loadEnv(mode, process.cwd(), "GOOGLE_"))),
       googleAnalytics(analytics),
       startPages(), serviceWorker(), renderHeaders(),

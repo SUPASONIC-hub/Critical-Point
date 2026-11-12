@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c40_start": {
       "title": "41 Points",
-      "text": "It is a rejection notice for a weekend part-time job at Levain House, a bakery café, Mangwon branch. 'The applicant’s organizational fit score is 41, below the interview threshold of 60.' An 'AI interview,' with not a single person in it. The test was a 12-minute game-style aptitude test. 'College application fees are 380,000 won. I wanted to earn it without telling Mom. But they won’t tell me what doesn’t fit.' The company that made the test is FitScore. The very company that bought Trigger Lab’s response records.",
+      "text": "It is a rejection notice for a weekend part-time job at Levain House, Mangwon branch. 'Organizational fit score 41, below the interview threshold of 60.' The 'AI interview' was a 12-minute game-style test, with not a single person in it. 'College application fees are 380,000 won. I wanted to earn it without telling Mom. But they won’t tell me what doesn’t fit.' The company that made the test is FitScore, the one that bought Trigger Lab’s response records.",
       "memo": [
         "Levain House Mangwon, weekend part-time job -- 41 points, threshold 60",
         "'AI interview' 12 minutes, human interview 0 minutes",
@@ -38,7 +38,7 @@ export default {
     },
     "c40_demo": {
       "title": "A 12-Minute Game",
-      "text": "CEO Hong Yedam holds out a tablet. 'If you have doubts, try it yourself.' Kang Taemin sits down first. 41 points, lacks leadership. Because in the team task he carried his teammate avatars’ loads all by himself. Hong Yedam laughs, then turns serious. 'I failed 21 interviews. Because of my Busan accent, because my smile looked awkward. Numbers don’t know accents.' She turns the pages of the algorithm documentation. Her hand stops at the training data source field. 'Provided by: KD Data Lab.'",
+      "text": "CEO Hong Yedam holds out a tablet. 'If you have doubts, try it yourself.' Kang Taemin gets 41 points, lacks leadership. Because he carried his teammate avatars’ loads all by himself. Hong Yedam says, 'I failed 21 interviews. Because of my Busan accent, because my smile looked awkward. Numbers don’t know accents.' In the documentation, her hand stops at the training data source field. 'Provided by: KD Data Lab.'",
       "memo": [
         "138 companies use FitScore -- 62,000 test takers this year",
         "9,412 automatically rejected under 60 points",
@@ -69,7 +69,7 @@ export default {
     },
     "c40_anchor": {
       "title": "Similarity 0.83",
-      "text": "The model has an 'unfit reference profile': the more an applicant’s responses resemble it, the lower the score. Trace the profile’s source number, and a code comes up. Analyst A: you. Ryu Seah puts Moon Hajun’s test result beside it. The similarity between the two records is 0.83. Hajun paused 7 seconds on the item 'an order to recommend a product that hurts the customer,' and 3 years ago you paused 9 seconds on an item of the same shape. Ryu Seah lowers her voice. 'Hajun failed because he resembles you.'",
+      "text": "The model has an 'unfit reference profile': the more responses resemble it, the lower the score. Trace its source number, and it is Analyst A: you. Ryu Seah puts Moon Hajun’s result beside it. Similarity: 0.83. On the item about recommending a product that hurts the customer, Hajun paused 7 seconds; 3 years ago you paused 9. Ryu Seah says, 'Hajun failed because he resembles you.'",
       "memo": [
         "Unfit reference profile: Analyst A -- 3 years of your records",
         "Similarity with Moon Hajun 0.83",
@@ -100,7 +100,7 @@ export default {
     },
     "c40_steam": {
       "title": "A Retest at the Rice Cake Shop",
-      "text": "Instead of rice cake, Moon Gaeul holds out her phone. 'Take your company’s test here, once.' At the 9th minute, her finger stops on an item asking 'whether to tell the customer a fact that hurts them.' The result: 44 points. Hong Yedam laughs, then bites her lip. 'I failed my own company’s test. That’s my 22nd.' Moon Gaeul sets a slightly burnt piece of injeolmi in front of her. 'That one’s not for sale. Eat.' Hong Yedam asks. 'Then what did I believe in when I built this company?'",
+      "text": "Moon Gaeul holds out her phone. 'Take your company’s test here, once.' Hong Yedam gets 44 points. 'I failed my own company’s test. That’s my 22nd.' Moon Gaeul sets down a slightly burnt piece of injeolmi. 'That one’s not for sale. Eat.' Hong Yedam asks. 'Then what did I believe in when I built this company?'",
       "memo": [
         "Hong Yedam took it herself: 44 points -- fails her own company’s threshold",
         "Item she stopped on: whether to tell the customer a fact that hurts them",
@@ -131,7 +131,7 @@ export default {
     },
     "c40_final": {
       "title": "Before Monday",
-      "text": "One of the investor logos on the screen is KD Capital’s. Hong Yedam speaks. 'When KD’s open hiring starts on Monday, 60,000 people take our test.' Ryu Seah lays three documents side by side. A re-review plan giving the 9,412 below 60 a human interview; documentation disclosing the algorithm and every item’s score weight; and a notice ending the KD records contract. If the contract ends, the service stops tonight, and so does Monday for 42 employees. Hong Yedam asks. 'Either way, you’re asking me to say what I believed in was wrong, aren’t you?'",
+      "text": "One of the investor logos is KD Capital’s. Hong Yedam says, 'When KD’s open hiring starts on Monday, 60,000 people take our test.' Ryu Seah has three documents. A plan to give the 9,412 below 60 a human interview; documentation disclosing the algorithm; a notice ending the KD records contract. If it ends, the service stops tonight, and so does Monday for 42 employees. Hong Yedam asks. 'Either way, you’re asking me to say what I believed in was wrong, aren’t you?'",
       "memo": [
         "9,412 people to re-review -- human interviews cost about 400 million won",
         "Disclosure documentation: 40 items and 2 reference profiles",
@@ -159,7 +159,7 @@ export default {
     },
     "c40_aftershock": {
       "title": "A 100-Point Résumé",
-      "text": "Saturday afternoon, a sheet of A4 goes up on the glass door of the Gaeul Rice Cake Shop. 'Part-timer wanted. No test. Interview while slicing rice cakes.' Moon Gaeul’s handwriting. The first applicant is Moon Hajun, and in the score box of his résumé Moon Gaeul writes 100 in red pen. Toward sunset Cha Jiwon, a lawmaker’s aide, calls about a National Assembly hearing. 'Next week’s witness list is final. Yoon Sanghyuk’s name is on it. You get exactly one question.'",
+      "text": "Saturday afternoon, a sheet in Moon Gaeul’s handwriting goes up on the shop’s glass door. 'Part-timer wanted. No test. Interview while slicing rice cakes.' The score box of the first applicant, Moon Hajun, gets 100 in red pen. Toward sunset the aide Cha Jiwon calls about a National Assembly hearing. 'Next week’s witness list is final. Yoon Sanghyuk’s name is on it. You get exactly one question.'",
       "memo": [
         "Gaeul Rice Cake Shop part-time hire: 1 -- no test",
         "Résumé score box: 100 in red pen",
@@ -183,7 +183,7 @@ export default {
     },
     "c40_weight": {
       "title": "Minus 0.31",
-      "text": "11 p.m., the server room. Ryu Seah prints a label and sticks it on a server rack. 'FitScore.' The configuration file FitScore received lists the weights of 40 items. The heaviest item is 'hesitation time before deciding,' and its value is minus 0.31. Ryu Seah screws the cap back on her thermos. 'People who read the question to the end, people who think once more before they answer, lose the most. This is a number that punishes diligence.'",
+      "text": "11 p.m. The configuration file FitScore received lists the weights of 40 items. The heaviest, 'hesitation time before deciding,' is minus 0.31. Ryu Seah says, 'People who read the question to the end, people who think once more before they answer, lose the most. This is a number that punishes diligence.'",
       "memo": [
         "40 model items -- the heaviest: hesitation time",
         "Value -0.31: the longer you pause, the more you lose",
@@ -206,7 +206,7 @@ export default {
     },
     "c40_list": {
       "title": "The 41 Club",
-      "text": "In the morning Do Yoonha and Moon Hajun opened an online survey looking for 'people rejected below 60.' When Hajun renames it 'the 41 Club,' 1,106 people leave answers within 12 hours. Do Yoonha reads one line aloud and stops. A former bookkeeper, fifty-four. 'My hand stopped on the question about moving a customer’s money to another account. At my old company I refused an order like that and was fired.' Do Yoonha opens a notebook like the one he used at the window 3 years ago and writes her name on the first line.",
+      "text": "Within 12 hours, 1,106 people answer the 'the 41 Club' survey Do Yoonha and Moon Hajun opened. Do Yoonha stops at the answer of a former bookkeeper, fifty-four. 'My hand stopped on the question about moving a customer’s money to another account. At my old company I refused an order like that and was fired.' Do Yoonha writes her name on the first line of a notebook like the one he used at the window 3 years ago.",
       "memo": [
         "Survey: 1,106 responses in 12 hours",
         "Average respondent score: 47",
@@ -229,7 +229,7 @@ export default {
     },
     "c40_notice": {
       "title": "Second-Half Hiring Notice",
-      "text": "Thursday morning, Oh Jinwoo calls from the lobby of Bridge Bank. 'KD Financial Group’s second-half hiring notice is out. 420 new hires. In the first half the FitScore score was reference material for the final interview; this time it’s the 1st gate. Under 60, they don’t even look at your application.' At the very bottom of the notice is the reason for adopting it. 'Fair hiring that reduces interviewers’ bias.' 'My father would like that sentence. But if they pick people with that test, someone who writes dissents can’t get into that bank anymore. From the very start.'",
+      "text": "A call from Oh Jinwoo. 'KD Financial Group’s second-half hiring notice is out. 420 new hires. In the first half the FitScore score was reference material for the final interview; this time it’s the 1st gate. Under 60, they don’t even look at your application.' The reason in the notice: 'fair hiring that reduces interviewers’ bias.' 'My father would like that sentence. But if they pick people with that test, someone who writes dissents can’t get into that bank anymore. From the very start.'",
       "memo": [
         "KD Financial Group second-half hires: 420 -- FitScore as Round 1",
         "Under 60: excluded from document review",
@@ -252,7 +252,7 @@ export default {
     },
     "c40_weight_reaction": {
       "title": "A Tag Called Fit",
-      "text": "Lee Minseo opens the answer field of the source records. The model learned from the 'fit' and 'unfit' tags attached to each response record of 63 Trigger Lab participants. The records were pseudonymized, leaving only numbers from A-001 to A-063. Whoever attached the tags has no pseudonym. 'Written by: Group Strategy Office.' 'These tags weren’t based on performance. Records that followed orders from above quickly are fit; records that stopped are unfit.'",
+      "text": "The model learned from the 'fit' and 'unfit' tags on the records of 63 Trigger Lab participants. The records were pseudonymized, leaving only numbers, but whoever attached the tags has no pseudonym. 'Written by: Group Strategy Office.' Lee Minseo says, 'These tags weren’t based on performance. Records that followed orders from above quickly are fit; records that stopped are unfit.'",
       "memo": [
         "Tags written by: Group Strategy Office",
         "Follow quickly: fit; stop: unfit"
@@ -274,7 +274,7 @@ export default {
     },
     "c40_list_reaction": {
       "title": "9,800 Won",
-      "text": "Kwon Dohyun taps at a calculator. FitScore’s test costs 9,800 won; an hour of two interviewers costs 42,000 won. 'The price of rejecting a person is 1/4 of the price of meeting one. At this price it’s a profit. On the company’s books. The loss goes on the rejected people’s books, and they don’t have any books.' Beside him, Moon Hajun starts drawing a table of 1,106 cells in his sketchbook.",
+      "text": "Kwon Dohyun taps at a calculator. The test: 9,800 won. An hour of two interviewers: 42,000 won. 'The price of rejecting a person is 1/4 of the price of meeting one. At this price it’s a profit. On the company’s books. The loss goes on the rejected people’s books, and they don’t have any books.' Moon Hajun draws a table of 1,106 cells in his sketchbook.",
       "memo": [
         "Price of rejecting: 9,800 won · price of meeting: 42,000 won",
         "People with no books to write the loss in"
@@ -296,7 +296,7 @@ export default {
     },
     "c40_notice_reaction": {
       "title": "The Model Answer",
-      "text": "That night, Han Seoyun speaks the moment she picks up. 'I heard from Ryu Seah. About the fit reference profile.' The model did not have only a reference for unfit. There was also a 'fit reference profile' that pushed scores up, pseudonym Manager H. It holds the record of returning your dissent 3 years ago in 11 minutes. 'They say I’m the model answer. The person who sent your dissent back fastest is the person this company wants to hire.'",
+      "text": "Han Seoyun speaks the moment she picks up. 'I heard from Ryu Seah. About the fit reference profile.' The standard that pushes scores up. Pseudonym Manager H: the record of returning your dissent 3 years ago in 11 minutes. 'They say I’m the model answer. The person who sent your dissent back fastest is the person this company wants to hire.'",
       "memo": [
         "Fit reference profile: Manager H",
         "11 minutes to return -- the model answer"
@@ -318,7 +318,7 @@ export default {
     },
     "c40_branch_bakery": {
       "title": "The Manager’s Monitor",
-      "text": "An empty shop at 3 p.m. The store manager is Ha Yesol. Moon Hajun, she says, once drew the chalkboard menu for this shop in the spring. Of 14 applicants for weekend part-time work this month, 11 were automatically rejected for scoring under 60. 'It’s headquarters’ guideline. Under 60, don’t even call them for an interview. I got this score last year too when I was hired. 72.' She points at one name. The granddaughter of the old woman from the next building. 'This kid is deaf. She was slow to respond because she was reading captions.'",
+      "text": "Store manager Ha Yesol’s shop is where Moon Hajun drew the chalkboard menu in the spring. Of 14 applicants this month, 11 were automatically rejected for scoring under 60. 'It’s headquarters’ guideline. Under 60, don’t even call them for an interview. I got in on this score last year too. 72.' One is the granddaughter of the old woman next door. 'This kid is deaf. She was slow to respond because she was reading captions.'",
       "memo": [
         "14 weekend part-time applicants -- 11 automatically rejected",
         "Headquarters guideline: no interviews under 60",
@@ -342,7 +342,7 @@ export default {
     },
     "c40_branch_bakery_follow": {
       "title": "An Interview After Closing",
-      "text": "9 p.m.: Ha Yesol has called in three rejected applicants. Moon Hajun; Yoon Daon, twenty, who is deaf; and Ms. Han Mikyung, fifty-two, back looking for work after a career break. When Ha Yesol’s hands shake on her question sheet, Hajun writes 'Ask slowly' in his sketchbook and stands it on the table. Ms. Han, with 20 years of warehouse management, finds two wrong cells in the inventory sheet. Ha Yesol sighs. 'I want to hire all three. But headquarters’ system won’t open the input field for anyone under 60.'",
+      "text": "9 p.m.: Ha Yesol has called in three rejected applicants. Moon Hajun; Yoon Daon, twenty, who is deaf; and Ms. Han Mikyung, fifty-two. Hajun writes 'Ask slowly' in his sketchbook and stands it up. Ms. Han finds two wrong cells in the inventory sheet. Ha Yesol sighs. 'I want to hire all three. But headquarters’ system won’t open the input field for anyone under 60.'",
       "memo": [
         "Human interviews after closing: 3 -- all three good enough to hire",
         "Yoon Daon: most accurate answers when given questions in writing",
@@ -366,7 +366,7 @@ export default {
     },
     "c40_route_system": {
       "title": "The Histories of People Who Stopped",
-      "text": "The 9,412 rejected applicants’ responses are regrouped. Among the top 10% in hesitation time, people who wrote of 'refusing an unfair order' in their cover letters are 3.4 times more common than among other test takers. Ryu Seah stops in the middle of printing a label. 'This algorithm is screening out people who hesitate. Quite a few of them are people who stopped when they should have. And the model learned that as a defect.' She writes 'people who stopped' on the label and sticks it on top of the monitor.",
+      "text": "Among the 9,412 rejected, those in the top 10% for hesitation time are 3.4 times more likely to have written of 'refusing an unfair order' in their cover letters. Ryu Seah says, 'This algorithm is screening out people who hesitate. Quite a few of them are people who stopped when they should have. And the model learned that as a defect.' She sticks a 'people who stopped' label on the monitor.",
       "memo": [
         "Top 10% in hesitation -- 3.4 times as many refused unfair orders",
         "About 2,700 of the 9,412 rejected fit this",
@@ -392,7 +392,7 @@ export default {
     },
     "c40_final_system_route": {
       "title": "A Label With No Words",
-      "text": "Friday before dawn, the 'people who stopped' label is still on the terminal. Ryu Seah runs the rejected group once more. About 2,700 people. When KD’s hiring opens at nine on Monday, the same test runs again. She prints one more label, blank. 'I don’t know what to write for these people. It’s not a defect. But unless the test is given a name for it, it’ll learn it as a defect again.'",
+      "text": "Friday before dawn, the 'people who stopped' label is still on the terminal. The rejected group Ryu Seah runs again comes to about 2,700. At nine on Monday, the same test runs in KD’s hiring. 'I don’t know what to write for these people. It’s not a defect. But unless the test is given a name for it, it’ll learn it as a defect again.'",
       "memo": [
         "Top 10% in hesitation -- 3.4 times as many refused unfair orders",
         "About 2,700 rejected people affected",
@@ -415,7 +415,7 @@ export default {
     },
     "c40_evidence_turn": {
       "title": "Money That Goes Full Circle",
-      "text": "When you fit the clue into the investor list, the approval for the 4 billion won a KD Capital investment fund put into FitScore opens. Under Yoon Sanghyuk’s signature are two conditions. 'Data supply: KD Data Lab.' 'Priority adoption in KD Financial Group hiring.' Ban Jaewook closes his notebook. 'The group sells the records, a company the group invested in buys them, and uses them in the group’s hiring. The money goes full circle and comes back, and only the rejected people are left outside.'",
+      "text": "When you fit the clue into the investor list, the approval for the 4 billion won a KD Capital investment fund put into FitScore opens. Under Yoon Sanghyuk’s signature, the conditions: 'data supply from KD Data Lab' and 'priority adoption in KD Financial Group hiring.' Ban Jaewook says, 'The group sells the records, a company the group invested in buys them, and uses them in the group’s hiring. The money goes full circle and comes back, and only the rejected people are left outside.'",
       "memo": [
         "KD Capital investment fund, 4 billion won -- approved and signed by Yoon Sanghyuk",
         "Investment terms: data from KD Data Lab · priority adoption in group hiring",
@@ -438,7 +438,7 @@ export default {
     },
     "c40_start_warm": {
       "title": "A Text Put Off Until Morning",
-      "text": "On the night you stayed beside the interviewees, you put Hajun’s text off until the next day. Hajun holds out the screen again. The result of the 12-minute aptitude test the shop called an 'AI interview.' Organizational fit score 41, rejected. Moon Gaeul stops her rice cake knife. 'You’re saying the company in Part 5 of that documentary rejected my kid?' Hajun adds quietly, 'The application fees. I was going to earn them myself.'",
+      "text": "Staying beside the interviewees, you opened Hajun’s text the next day. The result of the 12-minute aptitude test called an 'AI interview': organizational fit score 41, rejected. Moon Gaeul stops her rice cake knife. 'You’re saying the company in Part 5 of that documentary rejected my kid?' Hajun adds, 'The application fees. I was going to earn them myself.'",
       "memo": [
         "The text put off overnight -- organizational fit 41, rejected",
         "'AI interview' 12 minutes, human interview 0 minutes",
@@ -468,7 +468,7 @@ export default {
     },
     "c40_start_record": {
       "title": "6 Minutes in the Preservation Folder",
-      "text": "The day after you bound the 20 minutes of originals and their edit history into a preservation document, Lee Minseo plays one section from that folder again. The 6 minutes of Part 5: the story of Trigger Lab’s response records being sold to FitScore. Then a text comes from Moon Hajun. He applied for a weekend part-time job, and a link came for an aptitude test the shop calls an 'AI interview.' The result: organizational fit score 41, rejected. Lee Minseo’s voice drops. 'The company in these 6 minutes we bound up rejected Hajun the very night the documentary aired.'",
+      "text": "The day after you bound the 20 minutes of originals into a preservation document, Lee Minseo plays the 6 minutes of Part 5 again: Trigger Lab’s response records being sold to FitScore. Then a text comes from Moon Hajun. His weekend part-time 'AI interview' aptitude test: organizational fit score 41, rejected. Lee Minseo says, 'The company in these 6 minutes we bound up rejected Hajun the very night the documentary aired.'",
       "memo": [
         "Preservation folder: the 20 minutes of originals the 'reference opinion' flagged, and their edit history",
         "Part 5, 6 minutes -- response records sold to FitScore",
@@ -498,7 +498,7 @@ export default {
     },
     "c40_start_rush": {
       "title": "Glass Door Before Dawn",
-      "text": "At midnight, after the informant left Exit 7 of Hapjeong Station, Hajun’s 41-point text was on your phone. At one in the morning FitScore’s building was dark. The text holds the result of the 12-minute aptitude test the shop called an 'AI interview.' Organizational fit score 41, rejected. On the lobby wall a slogan shines in the emergency light. 'The right people, faster.' Hajun asks. 'Did I fail because I’m slow? I read the questions to the end.' The intercom at the security desk blinks.",
+      "text": "When the informant left you at Hapjeong Station Exit 7, Hajun’s text was waiting. The result of the 12-minute aptitude test the shop called an 'AI interview': organizational fit score 41, rejected. One in the morning: on the wall of FitScore’s dark lobby, a slogan shines in the emergency light. 'The right people, faster.' Hajun asks. 'Did I fail because I’m slow? I read the questions to the end.'",
       "memo": [
         "From Hapjeong Station straight to FitScore’s building in Seongsu-dong -- lights off",
         "Lobby slogan: 'The right people, faster'",

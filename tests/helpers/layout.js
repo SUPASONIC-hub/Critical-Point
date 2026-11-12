@@ -3,12 +3,16 @@ import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./storage.
 
 /**
  * The screens the table promises to fit one decision on: a common phone, a
- * small Android phone and a laptop. The Playwright projects add their own
- * desktop and Pixel 7 sizes on top of these.
+ * small Android phone, a wide Android phone and a laptop. The Playwright
+ * projects add their own desktop and Pixel 7 sizes on top of these.
+ * "wide phone" (411x846, the Galaxy and Pixel width under the short-phone
+ * height of 860) joined on 2026-11-11: the 391-480px rules (#493 #500) had no
+ * sweep of their own, so a 411px regression showed only in a hand-run probe.
  */
 export const LAYOUT_VIEWPORTS = Object.freeze({
   phone: { width: 390, height: 844 },
   "small phone": { width: 360, height: 740 },
+  "wide phone": { width: 411, height: 846 },
   laptop: { width: 1366, height: 768 },
 });
 

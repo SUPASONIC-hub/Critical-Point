@@ -82,9 +82,10 @@ export function getOfferedDirections(node, standing) {
  * Where a card leads: a reframe that cashed opens the case's hidden route once,
  * a branch may be bypassed (`getBranchDetourBypass`), and a bust off the story
  * table skips the scene the room plays without the analyst (`getBlackoutSkip`).
- * `caseClosed` is whether that scene is the case's result.
+ * `caseClosed` is whether that scene is the case's result. Exported for the
+ * server check (settlementRecheck.js), which routes each logged decision again.
  */
-function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, reframeCount = 0 }, { choice, window }) {
+export function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, reframeCount = 0 }, { choice, window }) {
   const reframe = choice.type === "reframe";
   // A reframe that busts is still a reframe the player paid for, but it does
   // not open a door: the wall took the window before the new board was laid.

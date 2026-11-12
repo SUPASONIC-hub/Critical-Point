@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c30_start": {
       "title": "Temp (Really Temp)",
-      "text": "The six-person group chat buzzes again: the six who scattered on transfer orders after Trigger Lab was dissolved. Lee Minseo posts a photo. 'Data Provision Agreement -- KD Data Lab ↔ FitScore.' FitScore sells applicant scores to hiring companies, and the provision field reads 'Trigger Lab participant response records, 3 years’ worth'. 'Sorry for posting before asking. Can everyone meet tonight?'",
+      "text": "The six-person group chat buzzes again. Lee Minseo posts a photo. 'Data Provision Agreement -- KD Data Lab ↔ FitScore.' FitScore sells applicant scores to hiring companies. 'Sorry for posting before asking. Can everyone meet tonight?'",
       "memo": [
         "Contract: KD Data Lab → FitScore, signed in the second week of May",
         "Provided: 3 years of response records for 63 Trigger Lab participants",
@@ -38,7 +38,7 @@ export default {
     },
     "c30_bookstore": {
       "title": "3 to 3",
-      "text": "Lim Kyungsoo has lent out the bookshop’s 1st floor. All he got for chipping in on the deposit is one chair beside the counter. The first agenda item is the group chat’s name: 'No Results Alumni', 'Dissent Club', 'Work Again Tomorrow'. The result is 3 to 3. Lee Minseo spreads out the contract. Records for 63 people, at a price of 1.8 billion won: nine analysts, four from Cohort 1, and the 50 who sat at Trigger Lab terminals during training. It says the records were pseudonymized. The purpose: 'Development of an organizational fit model'. 'If we bring this out, everyone here has to put their job on the line.'",
+      "text": "Lim Kyungsoo has lent out the bookshop’s 1st floor. All he got for chipping in on the deposit is one chair beside the counter. The first agenda item is the group chat’s name: 'No Results Alumni', 'Dissent Club', 'Work Again Tomorrow'. Lee Minseo spreads out the contract. It covers nine analysts, four from Cohort 1, and the 50 who sat at Trigger Lab terminals during training. The purpose: 'Development of an organizational fit model'. 'If we bring this out, everyone here has to put their job on the line.'",
       "memo": [
         "Group chat name vote -- 3 to 3, the revote tied too",
         "Contract price 1.8 billion won, 63 people covered",
@@ -68,7 +68,7 @@ export default {
       "lead": "Inside the bookshop, its shutter half down, six chairs are pulled up to one table for the first time in two months."
     },
     "c30_datalab": {
-      "text": "Lee Minseo registers you as a 'Risk Management inspection visit from an affiliate' to get you into KD Data Lab. Her mentor, Jin Seowoo, cheerfully brings up the contract dashboard. 'We removed all the names. Only codes are left, so nobody can tell.' Consent is replaced with a retroactive consent form. Lee Minseo points to one line. 'A-017. Average hesitation 4.2 seconds. That’s me. They numbered us in order of hire. After me come 46 more juniors who sat at the lab terminals during training.' Jin Seowoo’s hand stops.",
+      "text": "Lee Minseo registers you as a 'Risk Management inspection visit from an affiliate'. Her mentor, Jin Seowoo, speaks cheerfully. 'We removed all the names. Only codes are left, so nobody can tell.' Consent is replaced with a retroactive consent form. Lee Minseo points to one line. 'A-017. Average hesitation 4.2 seconds. That’s me. They numbered us in order of hire. After me come 46 more juniors who sat at the lab terminals during training.' Jin Seowoo’s hand stops.",
       "memo": [
         "FitScore contract -- 41% of KD Data Lab’s revenue this year",
         "Specification fields: hesitation time (sec), dissent writing history",
@@ -99,7 +99,7 @@ export default {
     },
     "c30_leaving": {
       "title": "I’m Stepping Out",
-      "text": "Done with his rounds in Mokpo, Ban Jaewook has driven straight up. He speaks without turning off the engine. 'Before the rounds, Internal Audit had us sign a nondisclosure pledge. There’s a clause that, if you break it, you also consent to an investigation of accounts in your family’s names. Seoa starts middle school next year. This time I’m stepping out. I’ll leave the group chat too.' On the 'Trigger Lab, 7 people' page of his notebook, he slowly draws a line through his own name. 'For the first time, I’m the one erasing my name.' Then he holds out this quarter’s audit schedule. Only KD Data Lab is left off it.",
+      "text": "Ban Jaewook, straight up from Mokpo, speaks. 'Before the rounds, Internal Audit had us sign a nondisclosure pledge. There’s a clause that, if you break it, you also consent to an investigation of accounts in your family’s names. Seoa starts middle school next year. This time I’m stepping out. I’ll leave the group chat too.' He draws a line through his own name in his notebook. 'For the first time, I’m the one erasing my name.' On the audit schedule he holds out, only KD Data Lab is left off.",
       "memo": [
         "Ban Jaewook: nondisclosure pledge -- clause consenting to investigation of family-name accounts",
         "Ban Seoa starts middle school next year",
@@ -130,7 +130,7 @@ export default {
     },
     "c30_final": {
       "title": "What Each One Stakes",
-      "text": "Of six chairs, one is empty, with only Ban Jaewook’s mug in its place. Han Seoyun writes down what each person will stake. Do Yoonha, the window at Gangseo Branch. Lee Minseo, 5 months as a permanent employee. Oh Jinwoo, acquisitions team head at Bridge Bank. Han Seoyun, 'nothing'. You, Risk Management directly under Yoon Sanghyuk. Lee Minseo turns the calendar page. 'The retroactive consent forms go out to 63 people next Friday. If everyone signs, the sale becomes something that was fine from the start.' There are three ways. Quietly gather more from each post, file a formal whistleblower report, or go to FitScore before the consent forms go out. Han Seoyun sets down her pen. 'Whichever way, someone loses their post. Decide whose goes first.'",
+      "text": "Han Seoyun writes down what each person will stake. Do Yoonha, the window at Gangseo Branch. Lee Minseo, 5 months as a permanent employee. Oh Jinwoo, acquisitions team head at Bridge Bank. Han Seoyun, 'nothing'. You, Risk Management directly under Yoon Sanghyuk. Lee Minseo speaks. 'The retroactive consent forms go out next Friday. If everyone signs, the sale becomes something that was fine from the start.' There are three ways. Han Seoyun sets down her pen. 'Whichever way, someone loses their post. Decide whose goes first.'",
       "memo": [
         "Retroactive consent forms go out: next Friday, 63 people",
         "Posts at stake: window, permanent job, team head, nothing, Risk Management",
@@ -158,7 +158,7 @@ export default {
     },
     "c30_aftershock": {
       "title": "Work Again Tomorrow",
-      "text": "Sunday, 11:50 p.m. Even after the decision, nobody gets up first. Han Seoyun renames the group chat 'Work Again Tomorrow,' ending the 3-to-3 vote. Just then the back door rattles open. Ban Jaewook, who said he was stepping out, stands there holding Seoa’s indoor-shoe bag. 'I only came to read.' He sits in the empty chair and picks up his own mug. Lee Minseo laughs, then wipes her eyes. Just before midnight, a company email arrives. 'Financial Supervisory Service regular inspection begins tomorrow at 09:00. Risk Management Department staff assigned: you. -- CEO Yoon Sanghyuk.'",
+      "text": "Han Seoyun renames the group chat 'Work Again Tomorrow,' ending the 3-to-3 vote. Just then Ban Jaewook, who said he was stepping out, comes in the back door holding Seoa’s indoor-shoe bag. 'I only came to read.' As he sits in the empty chair, Lee Minseo laughs, then wipes her eyes. Just before midnight, a company email arrives. 'Financial Supervisory Service regular inspection begins tomorrow at 09:00. Risk Management Department staff assigned: you. -- CEO Yoon Sanghyuk.'",
       "memo": [
         "Group chat name settled: 'Work Again Tomorrow'",
         "Ban Jaewook: back without a word, in his own chair",
@@ -182,7 +182,7 @@ export default {
     },
     "c30_lunch": {
       "title": "Six Lunchboxes",
-      "text": "When the revote ties again, Han Seoyun unties a wrapping cloth. Six lunchboxes with name stickers. Oh Jinwoo’s has spicy stir-fried pork and a note reading 'side dish for the winner'; Lee Minseo’s has a rolled omelet with no green onion; Ban Jaewook’s has two extra rows of the fried-tofu rice balls Seoa is said to love. 'Two months on standby now. My cooking’s improved. If the report needs a name, use mine. I have nothing left to lose now.'",
+      "text": "When the revote ties again, Han Seoyun unties a wrapping cloth. Oh Jinwoo’s lunchbox has spicy stir-fried pork and a note reading 'side dish for the winner'; Ban Jaewook’s has two extra rows of the fried-tofu rice balls Seoa is said to love. 'Two months on standby now. My cooking’s improved. If the report needs a name, use mine. I have nothing left to lose now.'",
       "memo": [
         "6 lunchboxes -- name stickers, different side dishes for each person",
         "Han Seoyun on standby, week 9 -- family not told",
@@ -205,7 +205,7 @@ export default {
     },
     "c30_price": {
       "title": "Unit Price per Person",
-      "text": "Friday evening. Kwon Dohyun draws columns on a napkin. '1.8 billion won divided by 63 people. One person’s 3 years come to 28.57 million won.' When nobody answers, he scrolls to the end of the specification’s code list and goes quiet. 'I’m not in it. I wasn’t at Trigger Lab. It’s a relief, but oddly I feel left out. It means my hesitation has no price.' Kwon Dohyun points to the last field. 'But 1.2 billion of the 1.8 billion has already come in. And not one consent form has gone out yet.'",
+      "text": "Kwon Dohyun draws columns on a napkin. '1.8 billion won divided by 63 people. One person’s 3 years come to 28.57 million won.' Scrolling to the end of the specification’s code list, he goes quiet. 'I’m not in it. I wasn’t at Trigger Lab. It’s a relief, but oddly I feel left out. It means my hesitation has no price. But 1.2 billion of the 1.8 billion has already come in. And not one consent form has gone out yet.'",
       "memo": [
         "1.8 billion won ÷ 63 people = 28.57 million won per person",
         "1.2 billion won paid up front -- 0 consent forms sent",
@@ -228,7 +228,7 @@ export default {
     },
     "c30_notice": {
       "title": "Second-Half Recruitment Notice",
-      "text": "Saturday evening. Oh Jinwoo has printed out a notice from Bridge Bank’s HR team and sets it beside the fish-cake broth. 'FitScore organizational fit to be introduced from second-half open recruitment.' 'They say they tried it on my team’s intern selection last month. Two of three got cut, and one was the kid I ranked No. 1 in the interview. The one who kept asking questions to the end. My father told me to stand on the winning side. These days the score decides first who’s on the winning side.' The owner points at the empty chair and asks if one more is coming.",
+      "text": "Oh Jinwoo has printed out a notice from Bridge Bank’s HR team. 'FitScore organizational fit to be introduced from second-half open recruitment.' 'They say they tried it on my team’s intern selection last month. Two of three got cut, and one was the kid I ranked No. 1 in the interview. The one who kept asking questions to the end. My father told me to stand on the winning side. These days the score decides first who’s on the winning side.' The owner points at the empty chair and asks if one more is coming.",
       "memo": [
         "Bridge Bank second-half recruitment: FitScore introduced",
         "Pilot use: 2 of 3 interns cut",
@@ -251,7 +251,7 @@ export default {
     },
     "c30_lunch_reaction": {
       "title": "The Back-Door Key",
-      "text": "As the lunchboxes empty, the tap of a cane sounds. Lim Kyungsoo looks down at the contract for a long time, then takes off his glasses and wipes them. 'Paper’s gone once you burn it. This won’t be, even if you burn it. Nobody knows how many copies were made.' He lays the shop’s back-door key on the table. 'Use it after the shutter’s down. But don’t tell even me about the papers you leave here. I’m old, so if someone asks, I answer everything.' In the doorway, Lim Kyungsoo’s granddaughter Lim Soyul is already drawing a little sign to hang on the back door.",
+      "text": "As the lunchboxes empty, Lim Kyungsoo looks down at the contract for a long time. 'Paper’s gone once you burn it. This won’t be, even if you burn it. Nobody knows how many copies were made.' He lays the shop’s back-door key on the table. 'Use it after the shutter’s down. But don’t tell even me about the papers you leave here. I’m old, so if someone asks, I answer everything.'",
       "memo": [
         "1 back-door key to the bookshop",
         "Lim Kyungsoo’s condition: don’t tell even him about the papers left here"
@@ -273,7 +273,7 @@ export default {
     },
     "c30_price_reaction": {
       "title": "Minus 0.31",
-      "text": "Nine p.m. Ryu Seah, who was in charge of bringing in NOAH, brings up a screen without turning on the lights. 'The input fields of FitScore’s model are identical to NOAH’s training data list. They sold the same records twice.' The weight on 'dissent writing history' is minus 0.31. 'Anyone who has written a dissent even once gets marked down without knowing why. You were probably marked down the most.'",
+      "text": "Ryu Seah, who was in charge of bringing in NOAH, speaks. 'The input fields of FitScore’s model are identical to NOAH’s training data list. They sold the same records twice.' The weight on 'dissent writing history' is minus 0.31. 'Anyone who has written a dissent even once gets marked down without knowing why. You were probably marked down the most.'",
       "memo": [
         "'Dissent writing history' weight -0.31",
         "FitScore input fields = NOAH training list"
@@ -295,7 +295,7 @@ export default {
     },
     "c30_notice_reaction": {
       "title": "What to Stake at the Window",
-      "text": "Saturday night, Do Yoonha asks you to walk with him to Gangseo Branch. Under a streetlight he takes out a thin notebook he bought yesterday. On its first page are only numbers, A-001 through A-063. 'We don’t know the names, so numbers at least. Filling in a name beside each number feels like my job.' '3 years ago at that seat, I didn’t even know I had anything to stake. This time I do. That window. It’s okay to stake it. Just don’t make me do it alone.'",
+      "text": "Under a streetlight, Do Yoonha takes out a thin notebook he bought yesterday. On its first page are only numbers. 'We don’t know the names, so numbers at least. Filling in a name beside each number feels like my job.' '3 years ago at that seat, I didn’t even know I had anything to stake. This time I do. That window. It’s okay to stake it. Just don’t make me do it alone.'",
       "memo": [
         "Do Yoonha’s new notebook: A-001 ~ A-063",
         "What Do Yoonha will stake: the window at Gangseo Branch"
@@ -317,7 +317,7 @@ export default {
     },
     "c30_branch_fitscore": {
       "title": "Case No. 1",
-      "text": "At the end of the specification was FitScore’s 'corporate client briefing'. Friday morning, at the briefing hall in Seongsu-dong, you write 'Bridge Bank, recruitment' in the guest book, and Kang Taemin comes in as 'companion, 1'. The slides come up on the stage screen. 'Case 1: Type A-017 -- the Hesitant Stickler. Not recommended for hire.' The HR people nod and take notes. Kang Taemin pulls off his gloves and tucks them in his vest pocket. 'That’s Minseo, isn’t it.'",
+      "text": "You enter FitScore’s 'corporate client briefing', listed at the end of the specification, as 'Bridge Bank, recruitment', and Kang Taemin comes in as 'companion, 1'. The slides come up on the stage screen. 'Case 1: Type A-017 -- the Hesitant Stickler. Not recommended for hire.' The HR people nod and take notes. Kang Taemin speaks. 'That’s Minseo, isn’t it.'",
       "memo": [
         "FitScore corporate client briefing -- 38 companies attending",
         "Case No. 1 in the presentation: A-017 'not recommended for hire'",
@@ -341,7 +341,7 @@ export default {
     },
     "c30_branch_fitscore_follow": {
       "title": "38 Points",
-      "text": "In the lobby, a young man in a suit keeps folding and unfolding a results sheet. Ha Doyul, twenty-six. He made it to the final interview in KD Financial Group’s open recruitment and got this paper yesterday. 'Organizational fit: 38 points. Delayed-judgment tendency -- collaboration risk.' He asks. 'Is delay a bad thing? I’m late because I’m checking. In the interview they said that was a strength. My mom ordered rice cakes, sure I’d get in this time. I have to go pick them up.' On the lobby wall hangs FitScore’s slogan. 'The right people, faster.'",
+      "text": "A young man in a suit keeps folding and unfolding a results sheet. Ha Doyul, twenty-six. He got this paper yesterday, after his final interview. 'Organizational fit: 38 points. Delayed-judgment tendency -- collaboration risk.' He asks. 'Is delay a bad thing? I’m late because I’m checking. In the interview they said that was a strength. My mom ordered rice cakes, sure I’d get in this time. I have to go pick them up.'",
       "memo": [
         "Ha Doyul: cut at the final interview of KD Financial Group’s open recruitment",
         "Results sheet: organizational fit 38 points -- 'delayed-judgment tendency'",
@@ -365,7 +365,7 @@ export default {
     },
     "c30_route_system": {
       "title": "The Price of a Pseudonym",
-      "text": "You ask for every data contract the group has signed. NOAH, the review engine, answers. 38 data provision contracts signed by group affiliates over the past 5 years open up. 34 have pseudonymization clauses. In 2, the data subjects were told of the sale, both times only after a leak. 'Pseudonymization has been learned not as protection but as a pricing condition.'",
+      "text": "You ask for every data contract the group has signed. NOAH, the review engine, answers. 38 data provision contracts signed by group affiliates over the past 5 years open up. 34 have pseudonymization clauses. 'Pseudonymization has been learned not as protection but as a pricing condition.'",
       "memo": [
         "38 affiliate data provision contracts, 34 with pseudonymization clauses",
         "2 sales disclosed to the people themselves -- both after leaks",
@@ -391,7 +391,7 @@ export default {
     },
     "c30_final_system_route": {
       "title": "A Price Called Protection",
-      "text": "Before dawn, five days before KD Data Lab sends retroactive consent forms to 63 people, NOAH lines up the unit prices of the 38 contracts in a row. The more a record’s names were turned into codes, the higher its price. At the very end, beside the code A-017 in the FitScore contract, a price is stamped. 'The side that assigned the codes wrote this down as protection. The side that set the price wrote the same clause down as a pricing condition. The people behind the codes never received either document.'",
+      "text": "NOAH lines up the unit prices of the 38 data contracts in a row. The more a record’s names were turned into codes, the higher its price. At the very end, beside the code A-017 in the FitScore contract, there is a price too. 'The side that assigned the codes wrote this down as protection. The side that set the price wrote the same clause down as a pricing condition. The people behind the codes never received either document.'",
       "memo": [
         "38 data provision contracts -- pseudonymized records priced 1.8 times higher",
         "2 sales disclosed to the people themselves",
@@ -414,7 +414,7 @@ export default {
     },
     "c30_evidence_turn": {
       "title": "No Issues",
-      "text": "This is FitScore’s shareholder list. In the April investment round, someone bought a 14% stake: the KD Capital New Technology Investment Partnership. The investment was approved on Yoon Sanghyuk’s 9th day as CEO of KD Capital, and the data contract came 23 days after that. The review opinion field of the approval document carries a line under a March date: 'Risk Management review: no issues.' Han Seoyun’s finger stops on the reviewer’s name. A-041 on the list of 63. 'The group sold its own employees’ records to a company it put money into. And whoever wrote no issues didn’t know A-041’s records would be in there either.'",
+      "text": "In April, 14% of FitScore’s shares were bought by the KD Capital New Technology Investment Partnership. The investment was approved on Yoon Sanghyuk’s 9th day as CEO, and the data contract came 23 days after that. The review opinion, under a March date, reads 'no issues'. Han Seoyun’s finger stops on the reviewer’s name. A-041 on the list of 63. 'The group sold its own employees’ records to a company it put money into. And whoever wrote no issues didn’t know A-041’s records would be in there either.'",
       "memo": [
         "14% of FitScore -- KD Capital New Technology Investment Partnership",
         "Investment approved: day 9 of Yoon Sanghyuk’s tenure, data contract 23 days later",
@@ -437,7 +437,7 @@ export default {
     },
     "c30_start_warm": {
       "title": "The Contract of the One Who Came First",
-      "text": "As you promised Lee Minseo over cup noodles at the arrivals hall on Friday morning, you head to Pangyo the moment her call comes, five days later on Wednesday morning. It is your first time at Lee Minseo’s new company since Trigger Lab was dissolved and everyone scattered on transfer orders. Lee Minseo hands you her phone. 'Data Provision Agreement -- KD Data Lab ↔ FitScore.' FitScore sells applicant scores to hiring companies, and what it provides is 3 years of Trigger Lab participants’ response records. 'You really did come first. You only said it over cup noodles.'",
+      "text": "It is your first time at Lee Minseo’s new company since Trigger Lab scattered. Lee Minseo hands you her phone. 'Data Provision Agreement -- KD Data Lab ↔ FitScore.' FitScore sells applicant scores to hiring companies, and what it provides is 3 years of Trigger Lab participants’ response records. 'You really did come first. You only said it over cup noodles.'",
       "memo": [
         "The promise at arrivals: 'If you call, I’ll come first'",
         "Contract: KD Data Lab → FitScore, response records of 63 participants",
@@ -467,7 +467,7 @@ export default {
     },
     "c30_start_record": {
       "title": "The Contract of the One Who Filed the Folder",
-      "text": "On the flight back you bundled Annex C and Haeon Partners’ remittance trail into a summary, and yesterday you filed it with the Audit Committee. Wednesday morning, as you wait at your 12th-floor desk for the receipt email, Lee Minseo’s photo appears in the group chat. 'KD Data Lab ↔ FitScore Data Provision Agreement.' FitScore sells applicant scores to hiring companies, and what it provides is 3 years of Trigger Lab participants’ response records. The signing date is the second week of May, a month after Yoon Sanghyuk came to KD Capital as CEO.",
+      "text": "On the flight back you bundled Annex C and Haeon Partners’ remittance trail into a summary and filed it with the Audit Committee. Lee Minseo’s photo appears in the group chat. 'KD Data Lab ↔ FitScore Data Provision Agreement.' FitScore sells applicant scores to hiring companies, and what it provides is 3 years of Trigger Lab participants’ response records.",
       "memo": [
         "Folder filed with the Audit Committee -- no receipt confirmation yet",
         "Contract: KD Data Lab → FitScore, response records of 63 participants",
@@ -497,7 +497,7 @@ export default {
     },
     "c30_start_rush": {
       "title": "The Contract of the One Who Rushed Over",
-      "text": "That night, turning away from the CEO office’s closed door, you went to Lee Minseo still dragging your suitcase. 11:30 p.m., the platform of Lee Minseo’s rooftop room. Lee Minseo turns her laptop around. 'Data Provision Agreement -- KD Data Lab ↔ FitScore.' FitScore sells applicant scores to hiring companies, and what it provides is 3 years of Trigger Lab participants’ response records. 'Am I raising the stakes for nothing?' Kang Taemin stands his 'Cup noodles here' sign on the platform. 'The stakes were always high. You just turned the lights on, Minseo.'",
+      "text": "Lee Minseo turns her laptop around. 'Data Provision Agreement -- KD Data Lab ↔ FitScore.' FitScore sells applicant scores to hiring companies, and what it provides is 3 years of Trigger Lab participants’ response records. 'Am I raising the stakes for nothing?' Kang Taemin stands his 'Cup noodles here' sign on the platform. 'The stakes were always high. You just turned the lights on, Minseo.'",
       "memo": [
         "Straight from the CEO office -- Kang Taemin along, sign 'Cup noodles here'",
         "Contract: KD Data Lab → FitScore, response records of 63 participants",

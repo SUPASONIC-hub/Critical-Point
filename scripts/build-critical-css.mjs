@@ -188,8 +188,11 @@ async function withPreview(work) {
   }
 }
 
+// The entry's own sheet (index-*.css), as vite.config.js picks it. A lazy
+// screen's sheet (ColdOpening-*.css) sits beside it and sorts first on Windows,
+// which once cut the file from that 1.4KB sheet instead (11-11).
 function builtStylesheet() {
-  const file = readdirSync(`${DIST}/assets`).find((name) => name.endsWith(".css"));
+  const file = readdirSync(`${DIST}/assets`).find((name) => /^index-.*\.css$/.test(name));
   if (!file) throw new Error("dist/assets holds no stylesheet.");
   return { file, css: readFileSync(`${DIST}/assets/${file}`, "utf8") };
 }
