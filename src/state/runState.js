@@ -54,6 +54,8 @@ const openingTable = (veteran, story, weekRule = null) => {
   const week = story ? null : normalizeWeekRuleId(weekRule);
   return veteran || story || week ? { ...RUN_INITIAL_STATE, veteran, story, weekRule: week } : RUN_INITIAL_STATE;
 };
+/** The route a case opened on with no case before it (F1 step 2): its scene, or the season's first. */
+const seasonRoute = (nodeId = SEASON_ENTRY_NODE) => ({ after: null, rank: null, nodeId: nodeId || SEASON_ENTRY_NODE });
 
 export const RUN_FIELDS = {
   runId: {
@@ -277,7 +279,7 @@ export const RUN_FIELDS = {
       if (saved?.dynamics !== null) return normalizeRunState(saved?.dynamics);
       const story = getAccessibility().storyMode;
       const table = openingTable(false, story, pickSeasonWeekRule(weeklyRuleNow(), { ...weekRuleChoice(), story }));
-      return stampCaseOpen(table, { caseId: saved?.currentCase ?? SEASON_ENTRY_CASE, resources: saved?.resources ?? initialResources });
+      return stampCaseOpen(table, { caseId: saved?.currentCase ?? SEASON_ENTRY_CASE, resources: saved?.resources ?? initialResources, route: seasonRoute(saved?.nodeId) });
     },
     fresh: () => RUN_INITIAL_STATE,
     // A run begun with NEW GAME+ is marked: its table has every rule from the
@@ -291,12 +293,12 @@ export const RUN_FIELDS = {
     // season's end, across a week's end (D3).
     // The season's first case opens here, so its opening snapshot (S3) is
     // stamped here, on the hand the `resources` row deals it.
-    newGame: (event, run) => stampCaseOpen(openingTable(event.veteran === true, event.story === true, event.weekRule), { caseId: SEASON_ENTRY_CASE, resources: createOpeningResources(run.operatorOrigin) }),
+    newGame: (event, run) => stampCaseOpen(openingTable(event.veteran === true, event.story === true, event.weekRule), { caseId: SEASON_ENTRY_CASE, resources: createOpeningResources(run.operatorOrigin), route: seasonRoute() }),
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),
     // A peak case's first board is a peak (C-10), as it would be had the case been opened.
-    jumpToNode: (event) => stampCaseOpen(layCasePeak(openingTable(false, event.story === true), event.caseId), { caseId: event.caseId, resources: initialResources }),
+    jumpToNode: (event) => stampCaseOpen(layCasePeak(openingTable(false, event.story === true), event.caseId), { caseId: event.caseId, resources: initialResources, route: seasonRoute(event.nodeId) }),
     reset: FRESH,
   },
   // The queue the telemetry sender empties. The save holds it; the sender's

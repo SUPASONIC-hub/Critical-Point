@@ -172,7 +172,8 @@ const budgets = [
   // -> 153,705 / 56,489 on 2026-11-11, cold-opening-style (#477) after merging main 5c93b496 (#504): both. Measured 153,701 / 56,485 in the e2e build, the plus 4.
   // 153,705 / 56,489 -> 153,883 / 56,590 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 153879 / 56586 (over budget only) in the e2e build, the plus 4.
   // 153,883 / 56,590 -> 153,883 / 56,597 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 56593 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_883, maxGzip: 56_597 },
+  // 153,883 / 56,597 -> 153,995 / 56,630 f1-stage2 over f8dd481d. Measured 153991 / 56626 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_995, maxGzip: 56_630 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -279,7 +280,8 @@ const budgets = [
   // -> 34,241 / 14,597 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3. Measured 34,237 / 14,593 in the e2e build, the plus 4.
   // 34,241 / 14,597 -> 34,241 / 14,598 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83 (#426 font-split). Measured 34,237 / 14,594, the plus 4.
   // -> 34,241 / 14,597 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 34,237 / 14,593 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_241, maxGzip: 14_597 },
+  // 34,241 / 14,597 -> 34,317 / 14,618 f1-stage2 over f8dd481d. Measured 34313 / 14614 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_317, maxGzip: 14_618 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -616,7 +618,8 @@ const budgets = [
   // 200,735 / 72,779 -> 200,908 / 72,844 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321). Measured 200904 / 72840 (over budget only) in the e2e build, the plus 4.
   // 200,735 / 72,779 -> 200,735 / 72,784 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 72780 (over budget only) in the e2e build, the plus 4.
   // 200,735 / 72,784 -> 200,908 / 72,845 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 200904 / 72841 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 200_908, maxGzip: 72_845 },
+  // 200,908 / 72,845 -> 201,362 / 72,997 f1-stage2 over f8dd481d. Measured 201358 / 72993 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 201_362, maxGzip: 72_997 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1307,7 +1310,8 @@ const budgets = [
   // 45,469 / 17,220 -> 48,539 / 18,413 on 2026-11-05, bundle-rules2 (kd-spend-engine, kd-spend-ui, phone-en-stake-11px, scout-narrow, stake-clock over rules-1105 dd2cd419): C9's rerollRelicOffer, buyExtraRelic and the draft record beside C-7's breather (a pass on a paid draft is a choice, 11-05 decision), the stake clock in advanceClock and the push, SCOUT's trust price. Measured 48,535 / 18,409 in the e2e build, the plus 4.
   // 45,469 / 17,220 -> 48,539 / 18,409 on 2026-11-06, bundle-1106a after merging main e1f5e515 (#463 bundle-rules2: C9 spend, 11px, B1 scout, B5 stake clock): the two sides' lines together. Measured 48,535 / 18,405 in the e2e build, the plus 4.
   // 48,539 / 18,409 -> 49,605 / 18,880 on 2026-11-10, enja-text-check (E4) over main e7ccb410: the recovery center's, the session code copy's and the remote-save queue's words moved out of the components into src/copy/runLines.js (`recoveryCenter`, `copyStatus`, `queue`), which this chunk carries. Measured 49,601 / 18,876 in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 49_605, maxGzip: 18_880 },
+  // 49,605 / 18,880 -> 50,344 / 19,104 f1-stage2 over f8dd481d. Measured 50340 / 19100 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 50_344, maxGzip: 19_104 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2218,7 +2222,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,557 / 432,468 / 440,161 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured first paint, the plus 4.
 // -> 373,551 / 432,465 / 440,155 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured first paint, the plus 4.
 // -> 373,551 / 432,520 / 440,218 on 2026-11-11, recheck-in-case over main 52027156. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_520, ja: 440_218 };
+// -> 373,709 / 432,675 / 440,372 f1-stage2 over f8dd481d. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_709, en: 432_675, ja: 440_372 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

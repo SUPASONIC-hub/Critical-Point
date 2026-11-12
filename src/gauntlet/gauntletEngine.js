@@ -1457,7 +1457,7 @@ function endPractice(run) {
  * `rules` is what the case being opened plays under. A board laid here follows
  * them; a REBOOT board and a draft the run already holds are kept as they are.
  */
-export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = null, resources = null } = {}) {
+export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = null, resources = null, route = null } = {}) {
   const opened = normalizeRunState(run);
   const current = endPractice(opened);
   const rebooted = current.schema.mutations.includes("reboot");
@@ -1477,8 +1477,9 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
         record: replayOf.pushRecord ?? null,
       }
     : null;
-  // `caseId` and `resources` stamp the opening snapshot (`stampCaseOpen`, S3);
-  // a caller that names no case leaves the run with none.
+  // `caseId` and `resources` stamp the opening snapshot (`stampCaseOpen`, S3),
+  // with the route it opened on and the board it held (F1 step 2); a caller
+  // that names no case leaves the run with none.
   return stampCaseOpen({
     ...current,
     // B2: a real case opens on the links the last one handed on; a replay on
@@ -1498,7 +1499,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
     schema: rebooted
       ? current.schema
       : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics), rules),
-  }, { caseId, resources });
+  }, { caseId, resources, route, focusCarry: readFocusCarry(current) });
 }
 
 /** Builds the next board from what just happened. */
@@ -2180,8 +2181,8 @@ export function createRunSummary(run) {
  * resources are read against the case's first decision.
  *
  * It rides on `dynamics`, not on the case summary (which has a 4,096-byte cap
- * and is copied into `caseResults`). As jsonb text it is at most 0.9 KB in an
- * honest season and 1.4 KB at the most a run can make (tests/unit/
+ * and is copied into `caseResults`). As jsonb text it is at most 1.2 KB in an
+ * honest season and 1.7 KB at the most a run can make (tests/unit/
  * case-open.test.mjs measures it). A case opened again (left half way and
  * opened once more) is stamped again: the row's log starts from the second
  * opening, and the windows of the first lie between the two cases.
@@ -2192,6 +2193,56 @@ function normalizeOpenResources(value) {
   if (!isRecord(value)) return null;
   const entries = Object.entries(value).filter(([key, amount]) => key.length <= 32 && typeof amount === "number" && Number.isFinite(amount));
   return entries.length ? Object.fromEntries(entries.slice(0, 8)) : null;
+}
+
+/**
+ * The board marks LOCK's stance leaves on the next board (`applyFocusCarry`):
+ * a cash charged past STANCE_CHARGE in STRIKE, STEADY or EXPOSE.
+ */
+export const STANCE_CARRY_MUTATIONS = Object.freeze(["strikeWake", "steadyLine", "exposedHand"]);
+
+/** The carry of a fresh table: nothing kept, no stance on the board before. */
+const NO_FOCUS_CARRY = Object.freeze({ rebooted: false, stance: null });
+
+/**
+ * F1 step 2 (설계-남은-우선항목-20261111, F1-2 (1)): what LOCK left on the
+ * board a case opened on, so the checker can lay that board again from the
+ * close before (`openCaseRun`). `rebooted`: the case opened on the REBOOT
+ * board the last close dealt, kept as it was; false, it opened on a board
+ * laid fresh (a case left half way, the season's first). `stance`: the
+ * stance carry the board before the opening held (STANCE_CARRY_MUTATIONS),
+ * which a fresh board drops; null when it held none. Null when not a carry.
+ */
+export function normalizeFocusCarry(value) {
+  if (!isRecord(value)) return null;
+  return { rebooted: value.rebooted === true, stance: STANCE_CARRY_MUTATIONS.includes(value.stance) ? value.stance : null };
+}
+
+/** The carry `openCaseRun` reads off the run it opens: the board it holds, before the opening lays the next. */
+function readFocusCarry(run) {
+  const mutations = run.schema.mutations;
+  return { rebooted: mutations.includes("reboot"), stance: STANCE_CARRY_MUTATIONS.find((id) => mutations.includes(id)) ?? null };
+}
+
+/** How long an id in the opening route may be (a case's choice id or scene id). */
+export const OPENING_ROUTE_ID_MAX = 64;
+
+const routeId = (value) => (typeof value === "string" && value ? value.slice(0, OPENING_ROUTE_ID_MAX) : null);
+
+/**
+ * F1 step 2: the route a case opened on (state/caseRoutes.js
+ * `describeCaseOpening`), so the checker can read its opening scene and hand
+ * against the case before's result. `after`: the case before's outcome
+ * choice the route was picked by, null at the season's start (or with no
+ * case before in the save); `rank`: that result's rank, which sets the
+ * opening hand's legacy; `nodeId`: the scene the case opened on. Null when
+ * not a route.
+ */
+export function normalizeOpeningRoute(value) {
+  if (!isRecord(value)) return null;
+  const nodeId = routeId(value.nodeId);
+  if (!nodeId) return null;
+  return { after: routeId(value.after), rank: typeof value.rank === "string" && value.rank ? value.rank.slice(0, 8) : null, nodeId };
 }
 
 /** A stored snapshot read back, or null when it is not one. */
@@ -2218,13 +2269,20 @@ export function normalizeCaseOpen(value) {
     practice: value.practice === true,
     schema: normalizeSchema(value.schema),
     resources: normalizeOpenResources(value.resources),
+    // F1 step 2: null in a snapshot from a build before them (read as not checked).
+    focusCarry: normalizeFocusCarry(value.focusCarry),
+    openingRoute: normalizeOpeningRoute(value.openingRoute),
   };
 }
 
-/** The snapshot of `run` as a case opens on it: `caseId` the case, `resources` its opening hand. */
-export function createCaseOpen(run, { caseId, resources = null } = {}) {
+/**
+ * The snapshot of `run` as a case opens on it: `caseId` the case, `resources`
+ * its opening hand, `route` the route it opened on (F1 step 2) and
+ * `focusCarry` what LOCK left on its board (a fresh table's when not given).
+ */
+export function createCaseOpen(run, { caseId, resources = null, route = null, focusCarry = NO_FOCUS_CARRY } = {}) {
   const state = normalizeRunState(run);
-  return normalizeCaseOpen({ ...state, practice: Boolean(state.practice), caseId, resources });
+  return normalizeCaseOpen({ ...state, practice: Boolean(state.practice), caseId, resources, focusCarry, openingRoute: route });
 }
 
 /**
@@ -2233,9 +2291,9 @@ export function createCaseOpen(run, { caseId, resources = null } = {}) {
  * the result page, a replay), and in state/runState.js the season's first case
  * (NEW GAME and NEW GAME+, the pre-start shell's 시작) and the debug jump.
  */
-export function stampCaseOpen(run, { caseId = null, resources = null } = {}) {
+export function stampCaseOpen(run, { caseId = null, resources = null, route = null, focusCarry = NO_FOCUS_CARRY } = {}) {
   const state = normalizeRunState(run);
-  return { ...state, open: caseId ? createCaseOpen(state, { caseId, resources }) : null };
+  return { ...state, open: caseId ? createCaseOpen(state, { caseId, resources, route, focusCarry }) : null };
 }
 
 /**
