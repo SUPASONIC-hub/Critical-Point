@@ -102,13 +102,13 @@ import { RECHECK_MARKS, recheckRun, RELIC_DRAFT_MARK } from "../src/rankingReche
 import { recheckCaseSettlement } from "../src/settlementRecheck.js";
 
 /**
- * The marks ranking_set_recheck_marks takes today (20261023000000). The
- * draft's mark (RELIC_DRAFT_MARK, C9) is shown in the report but left out of
- * the write until the 11-12 ranking wipe's migration adds it to the function's
- * list (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql.draft) (the SQL is beside the mark in src/rankingRecheck.js): the function
- * raises on a mark it does not know, and one run's would stop the whole write.
+ * The marks ranking_set_recheck_marks takes (20261023000000, then 20261103020000).
+ * The draft's mark (RELIC_DRAFT_MARK, C9) is among them from the 11-12 ranking
+ * wipe (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql),
+ * which adds it to the function's list: the function raises on a mark it does
+ * not know, and one run's would stop the whole write.
  */
-export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK]);
+export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK, RELIC_DRAFT_MARK]);
 
 // `suspicion` is the insert trigger's marks on the ranking row: the hall of
 // fame (src/hallOfFame.js) takes a season the trigger did not mark either.
