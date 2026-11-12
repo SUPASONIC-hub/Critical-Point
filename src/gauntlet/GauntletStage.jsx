@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
 import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
+import { noteTableOpened } from "../gameEvents.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
@@ -374,6 +375,8 @@ export function GauntletStage({
     readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
+    // N2: the season's first table, counted once per page (gameEvents.js).
+    noteTableOpened(scene.node.caseId);
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       dispatch({ type: "SELECT", id: cardId });
