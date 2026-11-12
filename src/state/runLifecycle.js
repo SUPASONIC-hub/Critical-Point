@@ -119,7 +119,7 @@ export function createRunLifecycle({
   }
 
   function startCaseNow(caseId) {
-    const { note, ...opening } = describeCaseOpening(caseId, run);
+    const { note, route, ...opening } = describeCaseOpening(caseId, run);
     appendTraceEvent({
       kind: "case-start",
       caseId,
@@ -139,8 +139,8 @@ export function createRunLifecycle({
       caseId,
       ...opening,
       // A case that already has a summary is played again as practice for the table.
-      // With the case and its opening hand, for the opening snapshot (S3).
-      gauntletRun: openCaseRun(table, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, table), caseId, resources: opening.resources }),
+      // With the case, its opening hand and its route, for the opening snapshot (S3, F1 step 2).
+      gauntletRun: openCaseRun(table, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, table), caseId, resources: opening.resources, route }),
       now: nowMs(),
     }));
   }
