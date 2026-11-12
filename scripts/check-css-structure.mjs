@@ -352,6 +352,7 @@ const fileBudgets = {
   // 3133 / 61044 (en-signals-row) and 3116 / 60792 (#497) -> 3138 / 61170 on 2026-11-10, en-signals-row after merging main 261accef (#497), measured: both.
   // 3119 / 60915 (phone-846-staked) and 3138 / 61170 (#499) -> 3141 / 61293 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499), measured: both.
   // 3141 / 61293 -> 3143 / 61347 on 2026-11-10, phone-390-staked, measured: the staked card's one-line detail out of the 391-480px air block into a block of its own for every phone up to 480 wide and 860 tall (390x844 Korean overclocked, a card staked in case 01: 9px under the bar).
+  // 3143 / 61347 -> 3140 / 61224 on 2026-11-11, phone-390-staked-all, measured: the short phone's air on every phone up to 480 wide and 860 tall (390x844 overclocked, a card staked: up to 20px under the bar), one block with the staked card's one-line detail.
   // -> 56734 bytes on 2026-11-02, measured: C-15's badge fold over the
   // Japanese 360px card labels and the 360px HUD air.
   // -> 2941 lines / 57182 bytes on 2026-11-03, measured: C-15's badge fold over main 465ccb93
