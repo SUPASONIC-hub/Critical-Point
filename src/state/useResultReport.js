@@ -16,7 +16,8 @@ import {
 } from "../runtimeSystems.js";
 import { COLLAPSED_SEASON_MARK, getCollapseToll, getFailureRecovery } from "../featurePack.js";
 import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
-import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
+import { createCaseSummary, getCaseOutcome, getEndingVariant, getFinaleOutcome, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
+import { nearestEnding } from "../nearestEnding.js";
 import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createSeasonStandingReadout, describeDecisionPace, getDecisionPace } from "../viewModels/reportViewModels.js";
@@ -27,16 +28,15 @@ import { getCaseComparison, getSeasonCard } from "./secondSeason.js";
 import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
+import { readResultTabTitle } from "./resultTabTitle.js";
 import { useSceneMood } from "./sceneMood.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 import { getOutcomeTone } from "../plateStory.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
-import tabTitlesCopy from "../copy/tabTitles.js";
 
-// The rank's line, the bridge and the feedback questions (src/copy/reportLines.js); the tab's title (src/copy/tabTitles.js).
+// The rank's line, the bridge and the feedback questions (src/copy/reportLines.js); the tab's title is resultTabTitle.js's.
 const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK } = reportLinesCopy;
-const { result: TAB_TITLE } = tabTitlesCopy;
 
 /**
  * The copy the report prints around the numbers: the season so far, the rank's
@@ -151,11 +151,13 @@ export function useResultReport({
   const standing = seasonStrain.seasonResources ?? resources;
   // The same season against the collapse gate, for the line each report prints
   // and the cases a collapse offers to play again (reportViewModels.js). It is
-  // handed the mean closing standing and the ending, for the held line (C3).
-  const seasonStanding = useMemo(
-    () => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase, closing: seasonStrain.seasonResources, endingId: endingVariant.id }),
-    [caseResults, resources, seasonStrain, endingVariant.id],
-  );
+  // handed the mean closing standing and the ending, for the held line (C3),
+  // and on the finale its last answer and the nearest other ending (C3-4, C2-1).
+  const seasonStanding = useMemo(() => {
+    const finale = currentCase === "final" ? getFinaleOutcome(log) : null;
+    const nearest = currentCase === "final" ? nearestEnding({ resources, discoveredClues, log, ...seasonStrain, endingId: endingVariant.id }) : null;
+    return createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase, closing: seasonStrain.seasonResources, endingId: endingVariant.id, finale, nearest });
+  }, [caseResults, currentCase, discoveredClues, log, resources, seasonStrain, endingVariant.id]);
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
@@ -197,11 +199,9 @@ export function useResultReport({
     }
     : null;
   const caseOutcome = { ...closedOutcome, ...(pastLine ? { past: pastLine } : {}), scene };
-  // The tab on a result (tabTitle.js, 개선 포인트 A3): the season's ruling by its
-  // label, a case by the ending it closed on. Drafts for the user to decide.
-  const resultTabTitle = currentCase === "final"
-    ? endingVariant.id === "collapse" ? TAB_TITLE.collapse : fill(TAB_TITLE.season, { ending: endingVariant.label })
-    : fill(TAB_TITLE.case, { tag: caseOutcome.tag });
+  // The tab on a result (resultTabTitle.js, 개선 포인트 A3): the season's ending
+  // by its name in the page's language, a case by the ending it closed on.
+  const resultTabTitle = readResultTabTitle({ currentCase, endingVariant, caseTag: caseOutcome.tag });
   useScreenTabTitle(tabScreen, tabScreen === "result" ? resultTabTitle : null);
   // The page's mood (src/mood.js): the shown scene's on the table, neutral on
   // every other screen. The scene carries it from its case's file.

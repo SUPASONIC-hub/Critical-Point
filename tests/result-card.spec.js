@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { expect, test } from "./helpers/network.js";
-import { completeCurrentCase, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
+import { cashStakedCard, clickElement, completeCurrentCase, dismissProtocolBreach, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { getSeasonLogic } from "../src/gameLogic.js";
@@ -10,6 +10,7 @@ import { RESULT_CARD_FILE_NAME, RESULT_CARD_HEIGHT, RESULT_CARD_WIDTH } from "..
 import { RESULT_CARD_COPY } from "../src/resultCardCopy.js";
 import { LOGIC_REPORT_COPY } from "../src/logicReport.js";
 import { buildResultCardModel } from "../src/resultCardModel.js";
+import reportLinesCopy from "../src/copy/reportLines.js";
 import { getJudgementHabit, habitCardLine } from "../src/judgementHabit.js";
 
 /**
@@ -290,6 +291,43 @@ for (const season of [
     expect(pageErrors).toEqual([]);
   });
 }
+
+// C2-1 and C3 (2026-11-11): a season that lost cash and kept people, closed on
+// 폭로 (f_after_witness, staked by its words: the hand is dealt shuffled). The
+// ending is the one the ruling gave; the panel only gains words: the 폭로
+// paragraph after the ending's own and the nearest other ending under it.
+test("a held season closed on 폭로 prints the 폭로 paragraph and the nearest other ending, and its card is made", { tag: "@prod" }, async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(String(error)));
+  await withoutWebShare(page);
+  await seedSave(page, savedRunAt("final", "f_aftershock", { resources: { time: 72, capital: 40, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 } }));
+  await page.goto("/");
+  await resumeSavedRun(page);
+  await dismissProtocolBreach(page);
+  await clickElement(page.locator(".choices .choice").filter({ hasText: "외부 증언을 준비한다" }), "f_after_witness");
+  await cashStakedCard(page);
+  const reveal = page.getByTestId("decision-next");
+  await expect(reveal.or(page.locator(".ending-sequence")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  if (await reveal.isVisible()) await reveal.click();
+  await openTheRecord(page);
+  await leaveTheMessage(page);
+  await expectCardReady(page);
+  const panel = page.locator(".ending-variant-panel");
+  await expect(panel).toHaveCount(1);
+  await expect(panel).not.toHaveClass(/failure/);
+  await expect(page.getByTestId("standing-held"), "the season is a held one").toHaveCount(1);
+  await expect(page.getByTestId("ending-witness")).toHaveText(reportLinesCopy.witnessHeld);
+  await expect(page.getByTestId("ending-nearest")).toHaveText(/^가장 가까웠던 다른 결말: [A-Z]+(?: [A-Z]+)*까지 .+$/);
+
+  const { save, status } = cardControls(page);
+  const downloading = page.waitForEvent("download");
+  await save.click();
+  const download = await downloading;
+  await expect(status).toHaveText(RESULT_CARD_COPY.saved);
+  await expectCardFile(page, download, { keepAs: `ending-held-witness-${testInfo.project.name}.png` });
+  expect(pageErrors).toEqual([]);
+});
 
 // The card's 논리 유지력 is the report's: both read the season's stored
 // summaries, so the number the panel prints is the one the card was given, and

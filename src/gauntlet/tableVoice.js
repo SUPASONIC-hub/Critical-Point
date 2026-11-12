@@ -40,10 +40,13 @@ import { fill } from "../locale.js";
  * - the clock at ten and at five seconds, and a table the reading clock opened;
  * - that a press let the held 확정 go too soon (길게 눌러야 확정된다), or that a
  *   screen reader's tap armed it and a second one seals it (useHoldConfirm);
- * - what a look (SCOUT) bought: the narrower band, once, as the button is spent.
+ * - what a look (SCOUT) bought: the narrower band, once, as the button is spent;
+ * - when asked (key I or the 지금 상황 듣기 button, E3): the heat, the
+ *   danger line, the case pot, the seconds left and the heartbeat, in one line
+ *   at the front of the queue -- the numbers the screen shows, never the wall.
  *
- * It does not say the heartbeat (a number that moves every tick is a region
- * that never stops talking), the creep the clock adds to the heat, or the
+ * It does not say the heartbeat unasked (a number that moves every tick is a
+ * region that never stops talking), the creep the clock adds to the heat, or the
  * verdict: the slam (`VerdictSlam`, TableNotices.jsx) is an alert that says
  * BUST or the multiplier, and the region falls silent the moment the window
  * closes, so the verdict is read once (bust-read-once). A case's close is not
@@ -62,11 +65,12 @@ const VOICE_GAP_MS = 1500;
 const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
 
 /**
- * The held 확정's hint or arm first -- they lapse in seconds -- then the clock's calls
- * before the push's and the stance's: a listener out of time has the least of
- * it to lose.
+ * A line the listener asked for (`status`) is said before anything waiting:
+ * it answers a key just pressed. Then the held 확정's hint or arm -- they
+ * lapse in seconds -- then the clock's calls before the push's and the
+ * stance's: a listener out of time has the least of it to lose.
  */
-const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
+const KIND_ORDER = Object.freeze({ status: -1, hold: 0, clock: 1, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
 
 // The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
 // each call is made, so another language laid over them is the one said.
@@ -88,6 +92,15 @@ export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { 
 /** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took. */
 export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax, trust: SCOUT_TRUST });
 
+/**
+ * The table as it stands, when asked (E3, 「지금 상황 듣기」): the heat,
+ * the board's danger line, the case pot, the seconds the clock shows and the
+ * heartbeat (a number, or the sedated board's word). Only what the screen
+ * shows: the wall this window drew is not handed in and cannot be said.
+ */
+export const describeStatus = ({ gauge, dangerLine, runPot = 0, remaining = 0, pulse = "" }) =>
+  fill(voice().status, { gauge: Math.round(gauge), danger: dangerLine, pot: formatNumber(runPot), seconds: Math.max(0, Math.ceil(remaining)), bpm: pulse });
+
 /** The last hand's settlement: what it did to the money (signed, formatChange), the case pot and the vault it left. */
 export const describeBank = ({ hand = 0, runPot, vault }) => fill(voice().bank, { hand: formatChange(hand), pot: formatNumber(runPot), vault: formatNumber(vault) });
 
@@ -102,9 +115,11 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, asked = 0, runPot = 0, pulse = "" }) {
   const carry = findStanceCarry(cashMutations);
   return {
+    asked,
+    status: describeStatus({ gauge: win.gauge, dangerLine, runPot, remaining: clock.remaining, pulse }),
     live,
     pushes: win.pushes,
     push: describePush({ gauge: win.gauge, dangerLine }),
@@ -125,6 +140,7 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
 export function listTableCalls(before, after) {
   if (!after.live || !before) return [];
   const calls = [];
+  if (after.asked > before.asked) calls.push({ kind: "status", text: after.status });
   if (after.hold && after.hold !== before.hold) calls.push({ kind: "hold", text: after.hold });
   if (after.clock && after.clock !== before.clock) calls.push({ kind: "clock", text: after.clock });
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });
@@ -174,17 +190,22 @@ export function findActStart(before, after) {
   return index < 0 ? null : { windowIndex: after.windowIndex, text: describeAct({ act: index + 1, caseId: after.caseId }) };
 }
 
+const SILENT = Object.freeze({ text: "", n: 0 });
+
 /**
- * The one region's text, for `TableNotices`, which draws it: the stage hands
- * over what the facts are read from and imports nothing for it. `speaking` is
+ * The one region's line and its count, for `TableNotices`, which draws it: the
+ * stage hands over what the facts are read from and imports nothing for it. `speaking` is
  * a running table a listener is on: not under the briefing, a draft, the
  * reveal or a tab notice, all of which hold the clock. Every call is said from
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
 export function useTableVoice({ speaking, run, audit = null, links, caseId = null, ...table }) {
-  const facts = readTableFacts(table);
-  const [said, setSaid] = useState("");
+  const facts = readTableFacts({ ...table, runPot: run.runPot });
+  // Each line is a fresh node in the region (`n` keys it, TableNotices): a line
+  // the same as the last -- 상황 듣기 asked twice on a table whose clock has not
+  // started -- is still a change the reader announces.
+  const [said, setSaid] = useState(SILENT);
   const factsRef = useRef(null);
   const queueRef = useRef([]);
   const lastAtRef = useRef(0);
@@ -248,11 +269,11 @@ export function useTableVoice({ speaking, run, audit = null, links, caseId = nul
       timerRef.current = rest.length ? globalThis.setTimeout(say, VOICE_GAP_MS) : null;
       if (!next) return;
       lastAtRef.current = Date.now();
-      setSaid(next.text);
+      setSaid((last) => ({ text: next.text, n: last.n + 1 }));
     };
     timerRef.current = globalThis.setTimeout(say, Math.max(0, lastAtRef.current + VOICE_GAP_MS - Date.now()));
   });
 
   useEffect(() => () => globalThis.clearTimeout(timerRef.current), []);
-  return facts.live ? said : "";
+  return facts.live ? said : SILENT;
 }

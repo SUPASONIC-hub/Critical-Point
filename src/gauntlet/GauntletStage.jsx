@@ -443,10 +443,13 @@ export function GauntletStage({
   const holdLabel = { hinted: say.holdHint, armed: say.oneMore }[cashHold.phase] ?? say.holdToCommit;
   const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : holdsCash ? holdLabel : say.commit;
 
+  // 지금 상황 듣기 (E3): each ask, by I or the heart's button, is one line from the table's voice.
+  const [asked, setAsked] = useState(0);
+  const askStatus = () => setAsked((count) => count + 1);
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
     select, focus: lockOn ? focus : null, push, safe: pushToSafe, cash, cashHold: holdsCash && canCash ? cashHold : null,
-    cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
+    cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null, status: live ? askStatus : null,
     cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null), spendAtDraft: onSpendAtDraft,
     briefingOpen, tableOpen, openTable,
   });
@@ -627,7 +630,9 @@ export function GauntletStage({
               </span>
             )}
             <span className="gx-bpm" data-testid="gauntlet-bpm">
-              <HeartPulse size={14} aria-hidden="true" />
+              {/* The heart is the button that asks the voice for the table (key I): an icon already in the row, so no row grows. */}
+              <button type="button" className="gx-listen" data-testid="table-listen" onClick={live ? askStatus : undefined} aria-disabled={!live}
+                aria-label={say.listen} title={say.listen} aria-keyshortcuts={keys("I")}><HeartPulse size={14} aria-hidden="true" /></button>
               {say.bpm} <b>{schema.sedated ? say.sedated : bpm}</b>
             </span>
           </div>
@@ -842,7 +847,8 @@ export function GauntletStage({
         tab={{ locked, awaitingClaim, live }}
         caseId={scene.node.caseId}
         // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, audit, links,
+          hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

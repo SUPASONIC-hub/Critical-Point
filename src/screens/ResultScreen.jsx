@@ -24,6 +24,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     actions: { startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset, nextCaseSignal, resultBridge },
     debug: { debugToolsEnabled, showErrorLog, setShowErrorLog }, seasonStanding,
   } = view;
+  const { held } = seasonStanding; // C3-3: the card reads only whether the report's held sentence is set.
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel } = renderers;
   // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
   // whether the page may name them: not when the player turned them off.
@@ -97,8 +98,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
         {currentCase === "final" && (
           <EndingSequence
             endingStep={endingStep}
-            endingTwistIndex={endingTwistIndex}
-            endingTwistCount={endingTwistCount}
+            endingTwistIndex={endingTwistIndex} endingTwistCount={endingTwistCount}
             currentEndingTwist={currentEndingTwist}
             finalChoiceText={finalChoiceText}
             isFinalEndingTwist={isFinalEndingTwist}
@@ -112,15 +112,13 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             setNextParticipantMessage={setNextParticipantMessage}
             saveNextParticipantMessage={saveNextParticipantMessage}
             endingAfterglow={endingAfterglow}
-            unopenedRecordCount={unopenedRecordCount}
-            unopenedClueCount={unopenedClueCount}
+            unopenedRecordCount={unopenedRecordCount} unopenedClueCount={unopenedClueCount}
             unopenedBranchCount={unopenedBranchCount}
-            endingAtmosphere={view.endingAtmosphere}
-            endingVisualClass={view.endingVisualClass}
+            endingAtmosphere={view.endingAtmosphere} endingVisualClass={view.endingVisualClass}
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef} seasonRecord={{ caseResults: view.score.caseResults, log: view.score.log }}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share }}
+            card={{ fingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share, held }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -232,7 +230,9 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
               <p>{endingVariant.text}{seasonStanding.endingHeld && <> <span data-testid="ending-held">{seasonStanding.endingHeld}</span></>}</p>
+              {seasonStanding.endingWitness && <p data-testid="ending-witness">{seasonStanding.endingWitness}</p>}
               <small>{endingVariant.failure ? view.endingCause.toll : resultCopy.endingVariantNote}</small>{view.seasonCard.comparison && <small data-testid="season-comparison">{view.seasonCard.comparison}</small>}
+              {seasonStanding.endingNearest && <small data-testid="ending-nearest">{seasonStanding.endingNearest}</small>}
             </section>
           )}
           {currentCase === "final" && (
