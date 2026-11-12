@@ -1,4 +1,4 @@
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 import { SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import { getRankingIntegrity } from "../advancedSystems.js";
@@ -28,16 +28,16 @@ import { getCaseComparison, getSeasonCard } from "./secondSeason.js";
 import { getWeekRule } from "../gauntlet/weeklyRules.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { useScreenTabTitle } from "./tabTitle.js";
+import { readResultTabTitle } from "./resultTabTitle.js";
 import { useSceneMood } from "./sceneMood.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 import { getOutcomeTone } from "../plateStory.js";
+import { getAnalystTitleRise, getAnalystTitleStep } from "../analystTitle.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
-import tabTitlesCopy from "../copy/tabTitles.js";
 
-// The rank's line, the bridge and the feedback questions (src/copy/reportLines.js); the tab's title (src/copy/tabTitles.js).
+// The rank's line, the bridge and the feedback questions (src/copy/reportLines.js); the tab's title is resultTabTitle.js's.
 const { rankLines: RANK_LINES, bridge: BRIDGE, feedback: FEEDBACK } = reportLinesCopy;
-const { result: TAB_TITLE } = tabTitlesCopy;
 
 /**
  * The copy the report prints around the numbers: the season so far, the rank's
@@ -109,6 +109,8 @@ export function useResultReport({
   currentCase,
   discoveredClues,
   fallbackCaseId,
+  // Whether this device has finished a season (NEW GAME+ open), for the record title (analystTitle.js).
+  finishedSeason = false,
   gameplayStats,
   localErrorEntries,
   localRankingRows,
@@ -163,6 +165,14 @@ export function useResultReport({
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
   // Its rank is asked for once the finale has closed, and only for a season the ranking takes.
+  // C1-1: the record title the result announces when this case raised it. The
+  // step is held as it stood while the case was played; the result compares the
+  // step the closed case reached with it (getAnalystTitleRise). A page opened
+  // straight onto a result holds that result's own step, so it announces nothing.
+  const titleStep = getAnalystTitleStep({ currentCase, caseResults, finishedSeason });
+  const [playedTitleStep, setPlayedTitleStep] = useState(titleStep);
+  if (tabScreen === "play" && playedTitleStep !== titleStep) setPlayedTitleStep(titleStep);
+  const titleRise = tabScreen === "result" ? getAnalystTitleRise(playedTitleStep, titleStep) : "";
   const rankedHold = useMemo(() => (currentCase === "final" && caseResults.final ? getRankedLogicHold(caseResults) : null), [caseResults, currentCase]);
   const logicStanding = useLogicStanding(rankedHold);
   const logicReport = useMemo(() => createLogicReport({ caseResults, cases: seasonCasesBase, standing: logicStanding }), [caseResults, logicStanding]);
@@ -200,11 +210,9 @@ export function useResultReport({
     }
     : null;
   const caseOutcome = { ...closedOutcome, ...(pastLine ? { past: pastLine } : {}), scene };
-  // The tab on a result (tabTitle.js, 개선 포인트 A3): the season's ruling by its
-  // label, a case by the ending it closed on. Drafts for the user to decide.
-  const resultTabTitle = currentCase === "final"
-    ? endingVariant.id === "collapse" ? TAB_TITLE.collapse : fill(TAB_TITLE.season, { ending: endingVariant.label })
-    : fill(TAB_TITLE.case, { tag: caseOutcome.tag });
+  // The tab on a result (resultTabTitle.js, 개선 포인트 A3): the season's ending
+  // by its name in the page's language, a case by the ending it closed on.
+  const resultTabTitle = readResultTabTitle({ currentCase, endingVariant, caseTag: caseOutcome.tag });
   useScreenTabTitle(tabScreen, tabScreen === "result" ? resultTabTitle : null);
   // The page's mood (src/mood.js): the shown scene's on the table, neutral on
   // every other screen. The scene carries it from its case's file.
@@ -214,7 +222,8 @@ export function useResultReport({
     ...reportCopy,
     result,
     endingVariant,
-    seasonStanding,
+    // The title line rides on the standing the outcome panel prints (the result view's fields are budgeted).
+    seasonStanding: titleRise ? { ...seasonStanding, titleRise } : seasonStanding,
     rankingComparison,
     logicReport,
     // For the page before the finale (`getSeasonRecordNotice`).

@@ -72,3 +72,44 @@ test("the bot's endings are the test-week summary's own reference line", async (
   assert.deepEqual(botEndings("Ending checks passed (600 replayed seasons: collapse 20.0%, field-pact 80.0%)"), { collapse: 20, "field-pact": 80 });
   assert.throws(() => botEndings("no endings here"));
 });
+
+const { gapsQuery, readGaps, describeGaps } = await import("../../scripts/report-judgment.mjs");
+
+// (d) decision T's three gaps: one row per season, as gapsQuery returns it.
+const GAP_ROWS = [
+  { ending: "field-pact", cases: 5, mean_capital: "92.0", mean_human_cost: "10", windows: 20, scout_recorded: 20, scouts: 6, drafts: 4, spent: 16000, rerolls: 1, extras: 1 },
+  { ending: "quiet-cover", cases: 5, mean_capital: "71.5", mean_human_cost: "22", windows: 18, scout_recorded: 18, scouts: 0, drafts: 4, spent: 0, rerolls: 0, extras: 0 },
+  { ending: "collapse", cases: 5, mean_capital: "40", mean_human_cost: "60", windows: 22, scout_recorded: 22, scouts: 2, drafts: 3, spent: "4000", rerolls: "1", extras: "0" },
+];
+
+test("(d) the gaps query is one read-only statement over the judged seasons, and lets no run id out", () => {
+  const sql = gapsQuery("2026-W47", "audit-cascade");
+  assert.match(sql, /^with seasons as \(\nselect f\.run_id/);
+  assert.match(sql, /'threshold' \? 'scouted'/);
+  assert.match(sql, /'relicDraft'->>'cost'/);
+  assert.match(sql, /resources->>'capital'/);
+  assert.match(sql, /^select s\.ending,/m);
+  assert.doesNotMatch(sql, /^select s\.run_id|insert|update |delete/im);
+  assert.throws(() => gapsQuery("2026-W47", "x'; drop"));
+});
+
+test("(d) T3, T6 and T11 are counted from the rows", () => {
+  const g = readGaps(GAP_ROWS);
+  assert.equal(g.line, 80);
+  assert.deepEqual([g.cash.under, g.cash.underNotCollapse, g.cash.n], [2, 1, 3]);
+  assert.deepEqual([g.scout.windows, g.scout.scouts, g.scout.seasonsUsing], [60, 8, 2]);
+  assert.deepEqual([g.spend.spent, g.spend.seasonsSpending, g.spend.rerolls, g.spend.extras, g.spend.drafts], [20000, 2, 2, 1, 11]);
+  const text = describeGaps(g).join("\n");
+  assert.match(text, /80 밑 2\/3 \(66\.7%\), 그중 붕괴 결말 아님 1/);
+  assert.match(text, /판 60개 중 8 \(13\.3%\)/);
+  assert.match(text, /쓴 시즌 2\/3 \(66\.7%\); 합계 20000/);
+  assert.doesNotMatch(text, /기록 없음/);
+});
+
+test("(d) a number no row carries reads 「기록 없음」, not zero", () => {
+  const old = GAP_ROWS.map((row) => ({ ...row, mean_capital: null, mean_human_cost: null, scout_recorded: 0, scouts: 0, drafts: 0, spent: 0 }));
+  const text = describeGaps(readGaps(old)).join("\n");
+  assert.equal(text.match(/기록 없음/g).length, 4);
+  assert.match(describeGaps(null).join("\n"), /빈칸 행이 없습니다/);
+  assert.match(describeJudgment(readJudgment(FIXTURE.seasons, null, "2026-W47"), { week: "2026-W47", board: "all" }, readGaps(GAP_ROWS)), /## \(d\) 결정 T/);
+});

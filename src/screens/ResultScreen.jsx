@@ -189,7 +189,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </div>
             <div>
               <h2 ref={titleRef} tabIndex={-1}>{caseOutcome.title}</h2>
-              <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}
+              <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}{seasonStanding.titleRise && <p data-testid="title-rise">{fill(resultCopy.titleRise, { title: seasonStanding.titleRise })}</p>}
               <p className={`season-standing ${seasonStanding.level}`} data-testid="season-standing"><b>{seasonStanding.mark} {seasonStanding.label}</b> {seasonStanding.text}{seasonStanding.held && <> <span data-testid="standing-held">{seasonStanding.held}</span></>}</p>
             </div>
           </section>
