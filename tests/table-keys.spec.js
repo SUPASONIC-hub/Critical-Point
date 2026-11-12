@@ -166,6 +166,30 @@ test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds (
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 });
 
+test("I asks the table's voice for where the hand stands: one line, on any layout, and nothing on the briefing", { tag: "@once" }, async ({ page }) => {
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  const voice = page.getByTestId("table-voice");
+  // The briefing holds the clock and the table behind it: I is not the table's there.
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await page.keyboard.press("i");
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await expect(voice).toHaveText("");
+  await dismissProtocolBreach(page);
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
+
+  const line = /^열기 \d+ · .+ · 판돈 [\d,]+ · 남은 \d+초 · 심박 (\d+|교란)$/;
+  await page.keyboard.press("i");
+  await expect(voice).toHaveText(line);
+  const first = await voice.textContent();
+  // ㅑ is the I key on a Hangul layout; the clock has moved on, so the line is a new one.
+  await expect.poll(async () => Number(await page.locator(".gx-clock b").textContent())).toBeLessThan(Number(first.match(/(\d+)초/)[1]));
+  await sendKey(page, { key: "ㅑ", code: "KeyI" });
+  await expect(voice).not.toHaveText(first);
+  await expect(voice).toHaveText(line);
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
+});
+
 test("the letters work on a Hangul layout", { tag: "@once" }, async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");

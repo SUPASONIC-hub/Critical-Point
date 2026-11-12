@@ -61,6 +61,7 @@ function table(state = {}) {
       cash: note("cash"),
       cycleFocusMode: note("stance"),
       scout: note("scout"),
+      status: note("status"),
       pickRelic: note("relic"),
       cancelSwap: note("cancel"),
       openTable: note("open"),
@@ -85,6 +86,8 @@ test("a held key is still the table's key, and is pressed once", () => {
     [{ key: "e", code: "KeyE" }, "focus"],
     [{ key: "q", code: "KeyQ" }, "stance"],
     [{ key: "r", code: "KeyR" }, "scout"],
+    [{ key: "i", code: "KeyI" }, "status"],
+    [{ key: "ㅑ", code: "KeyI" }, "status"],
     [{ key: "Enter", code: "Enter" }, "cash"],
     [{ key: "2", code: "Digit2" }, "select"],
   ]) {
@@ -113,6 +116,8 @@ test("E, Q and R are not the table's keys before the case turns LOCK, the stance
     [{ key: "q", code: "KeyQ" }, { cycleFocusMode: null }],
     [{ key: "r", code: "KeyR" }, { scout: null }],
     [{ key: "ㄱ", code: "KeyR" }, { scout: null }],
+    // A closed window hands over no `status`: I has nothing to ask for.
+    [{ key: "i", code: "KeyI" }, { status: null }],
   ]) {
     const { current, calls } = table(missing);
     for (const repeat of [false, true]) {

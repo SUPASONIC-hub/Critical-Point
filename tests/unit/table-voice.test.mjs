@@ -13,7 +13,7 @@ globalThis.localStorage = createStorage();
 
 const voice = await import("../../src/gauntlet/tableVoice.js");
 const { CLOCK_OPENED_CALL } = await import("../../src/gauntlet/tableReadout.js");
-const { getHoldArmedCall, getHoldCall, describePush, describeWall, describeScout, describeStanceCarry, describeBank, describeAct, findBank, findActStart, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { getHoldArmedCall, getHoldCall, describeStatus, describePush, describeWall, describeScout, describeStanceCarry, describeBank, describeAct, findBank, findActStart, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
 const { dangerZoneOf, readDangerZone } = await import("../../src/gauntlet/tableMeters.js");
 
 const STRIKE_WAKE = { id: "strikeWake", label: "STRIKE WAKE", title: "다음 판이 더 두껍게 깨어난다" };
@@ -21,8 +21,8 @@ const STEADY_LINE = { id: "steadyLine", label: "STEADY LINE", title: "다음 판
 const OVERCLOCK = { id: "overclock", label: "OVERCLOCK", title: "칩 2배" };
 
 const tableWindow = (patch = {}) => ({ gauge: 30, wall: 77, pushes: 0, focus: 0, elapsed: 10, ...patch });
-const facts = ({ win = tableWindow(), live = true, dangerLine = "벽까지 최소 22", cashMutations = [], remaining = 30, openedByClock = false } = {}) =>
-  readTableFacts({ win, live, dangerLine, cashMutations, clock: { remaining, elapsed: win.elapsed, openedByClock } });
+const facts = ({ win = tableWindow(), live = true, dangerLine = "벽까지 최소 22", cashMutations = [], remaining = 30, openedByClock = false, asked = 0, runPot = 0, pulse = "" } = {}) =>
+  readTableFacts({ win, live, dangerLine, cashMutations, clock: { remaining, elapsed: win.elapsed, openedByClock }, asked, runPot, pulse });
 
 test("the sentences say only what the table shows", () => {
   assert.equal(describePush({ gauge: 41.6, dangerLine: "벽까지 최소 3" }), "열기 42 · 벽까지 최소 3");
@@ -161,4 +161,25 @@ test("the table has one voice: the clock is said there and not in a region of it
   const result = readFileSync(new URL("../../src/screens/ResultScreen.jsx", import.meta.url), "utf8");
   assert.equal((result.match(/aria-live="polite"/g) ?? []).length, 1, "the result screen keeps its one line");
   assert.ok(result.includes("{screenReaderStatus} {view.seasonStanding.label} · {view.seasonStanding.text}"), "the standing is in that line");
+});
+
+test("지금 상황 듣기: asked, the table says the numbers it shows in one line, first, and never the wall", () => {
+  assert.equal(
+    describeStatus({ gauge: 41.6, dangerLine: "밀면 벽 사정권", runPot: 1250, remaining: 17.2, pulse: 120 }),
+    "열기 42 · 밀면 벽 사정권 · 판돈 1,250 · 남은 18초 · 심박 120",
+  );
+  assert.equal(describeStatus({ gauge: 0, dangerLine: "벽까지 최소 40", runPot: 0, remaining: -0.4, pulse: "교란" }), "열기 0 · 벽까지 최소 40 · 판돈 0 · 남은 0초 · 심박 교란", "a sedated board's word, and no negative clock");
+  // The drawn wall is 77 and the band 62-81: neither number is in the line, whatever is asked.
+  const before = facts({ win: tableWindow({ gauge: 52, wall: 77 }), dangerLine: "벽까지 최소 10", runPot: 300, pulse: 104 });
+  const asked = facts({ win: tableWindow({ gauge: 52, wall: 77 }), dangerLine: "벽까지 최소 10", runPot: 300, pulse: 104, asked: 1 });
+  const calls = listTableCalls(before, asked);
+  assert.deepEqual(calls, [{ kind: "status", text: "열기 52 · 벽까지 최소 10 · 판돈 300 · 남은 30초 · 심박 104" }]);
+  assert.ok(!JSON.stringify(asked).includes("77"), "the drawn wall is not in the facts");
+  assert.deepEqual(listTableCalls(asked, asked), [], "no new ask, no line");
+  assert.deepEqual(listTableCalls(before, { ...asked, live: false }), [], "a closed window's ask is the slam's silence");
+  // At the front of what waits: it answers the key just pressed.
+  const queue = queueCalls([{ kind: "hold", text: "길게 눌러야 확정된다" }, { kind: "push", text: "열기 38 · 벽까지 최소 14" }], calls);
+  assert.deepEqual(queue.map((call) => call.kind), ["status", "hold", "push"]);
+  // A second ask before the first is said replaces it with the newer numbers.
+  assert.deepEqual(queueCalls(queue, [{ kind: "status", text: "newer" }]).map((call) => call.text)[0], "newer");
 });

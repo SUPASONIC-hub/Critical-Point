@@ -350,7 +350,8 @@ const fileBudgets = {
   // 3133 / 61044 (en-signals-row) and 3116 / 60792 (#497) -> 3138 / 61170 on 2026-11-10, en-signals-row after merging main 261accef (#497), measured: both.
   // 3119 / 60915 (phone-846-staked) and 3138 / 61170 (#499) -> 3141 / 61293 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499), measured: both.
   // 3141 / 61293 -> 3143 / 61347 on 2026-11-10, phone-390-staked, measured: the staked card's one-line detail out of the 391-480px air block into a block of its own for every phone up to 480 wide and 860 tall (390x844 Korean overclocked, a card staked in case 01: 9px under the bar).
-  "play.css": { lines: 3143, bytes: 61347 },
+  // 3143 / 61347 -> 3160 / 61634 on 2026-11-12, e3-status, measured: 지금 상황 듣기 (E3) -- the heart in the gauge's row is a button (.gx-listen reset), pressed over 44 on a phone by its ::before.
+  "play.css": { lines: 3160, bytes: 61634 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
