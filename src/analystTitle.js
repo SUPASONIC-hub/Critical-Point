@@ -65,13 +65,31 @@ export function readFurthestCase({ currentCase = null, caseResults = {}, finishe
   return Math.max(CASE_SEQUENCE.indexOf(currentCase), ...closed, finishedSeason ? SEASON_FINISHED : -1);
 }
 
+/** The step of ANALYST_TITLE_STEPS that place stands on, or -1 when the record has reached nothing. */
+export function getAnalystTitleStep(progress = {}) {
+  const furthest = readFurthestCase(progress);
+  let reached = -1;
+  STEP_STARTS.forEach((start, step) => {
+    if (start >= 0 && furthest >= start) reached = step;
+  });
+  return reached;
+}
+
 /** The record title for that place, or "" when the record has reached nothing. */
 export function getAnalystTitle(progress = {}) {
-  const furthest = readFurthestCase(progress);
-  if (furthest < 0) return "";
-  let title = "";
-  STEP_STARTS.forEach((start, step) => {
-    if (start >= 0 && furthest >= start) title = ANALYST_TITLE_STEPS[step].title;
-  });
-  return title;
+  const step = getAnalystTitleStep(progress);
+  return step < 0 ? "" : ANALYST_TITLE_STEPS[step].title;
+}
+
+/**
+ * The title a case's result announces (C1-1, user decision 2026-11-12: one
+ * line on the result, display only): the new title when the step the record
+ * stood on while the case was played is below the one it stands on now, ""
+ * otherwise. A record that stood on no step had nothing to rise from, and a
+ * case played again leaves the step where it was (the closed cases still
+ * count), so neither announces anything.
+ */
+export function getAnalystTitleRise(stepBefore, stepAfter) {
+  if (!(stepBefore >= 0) || !(stepAfter > stepBefore)) return "";
+  return ANALYST_TITLE_STEPS[stepAfter]?.title ?? "";
 }
