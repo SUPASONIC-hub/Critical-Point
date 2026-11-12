@@ -7,6 +7,9 @@ import { RESULT_CARD_COPY, RESULT_CARD_STATUS } from "../resultCardCopy.js";
 
 const IDLE_TIMEOUT_MS = 1500;
 
+/** What a press announces in another card's words, as RESULT_CARD_STATUS does in the finale's. */
+const statusOf = (words, outcome) => ({ shared: words.shared, saved: words.saved, "saved-uncopied": words.savedUncopied, failed: words.failed })[outcome] ?? "";
+
 /**
  * Whether this platform's share sheet takes a PNG. Asked with an empty file
  * before the card exists, so the row of buttons is whole from the start and
@@ -41,9 +44,13 @@ function canShareImages() {
  * played and what they wrote never reach this chunk. It was the whole view for
  * a day, while the report's chunk had no bytes left to pick with.
  *
- * @param {{ card: { fingerprint?: object, endingVariant?: object, endingName?: string, caseResults?: object } }} props
+ * The act cards' 중간 결산 (N1, ActTally.jsx) hands its own picture instead:
+ * `build`, which answers the card's model and its line for the site's host and
+ * address, and `words`, its own buttons and what they say (src/copy/actTally.js).
+ *
+ * @param {{ card?: { fingerprint?: object, endingVariant?: object, endingName?: string, caseResults?: object }, build?: (host: string, origin: string) => { model: object, text: string }, words?: typeof RESULT_CARD_COPY }} props
  */
-export default function ResultCardShare({ card }) {
+export default function ResultCardShare({ card, build = null, words = RESULT_CARD_COPY }) {
   const [shareable] = useState(canShareImages);
   // null while the card is being made, `{ file, text }` once it is held, false
   // when it could not be made.
@@ -51,20 +58,27 @@ export default function ResultCardShare({ card }) {
   const [said, setSaid] = useState("");
   // The first render's, kept: the screen builds the object anew each render.
   const input = useRef(card);
+  // The other card's builder and its failure line, kept as the season's input is.
+  const builder = useRef({ build, failed: words.failed });
   const run = useRef(0);
 
   /** Makes the card, and resolves to it only if this is still the latest attempt on a mounted screen. */
   async function make() {
     const attempt = (run.current += 1);
     setHeld(null);
-    // The 논리 유지력 is read off the stored summaries here, as the report reads it.
-    const model = buildResultCardModel({ ...input.current, logicHold: getSeasonLogic(input.current.caseResults).logicHold, host: window.location.host });
+    let made = builder.current.build?.(window.location.host, window.location.origin);
+    if (!made) {
+      // The 논리 유지력 is read off the stored summaries here, as the report reads it.
+      const model = buildResultCardModel({ ...input.current, logicHold: getSeasonLogic(input.current.caseResults).logicHold, host: window.location.host });
+      made = { model, text: buildShareText(model, window.location.origin) };
+    }
+    const { model, text } = made;
     const file = await renderResultCardFile(model, { document });
     if (attempt !== run.current) return null;
-    const made = file ? { file, text: buildShareText(model, window.location.origin) } : false;
-    setHeld(made);
-    setSaid(made ? "" : RESULT_CARD_COPY.failed);
-    return made;
+    const ready = file ? { file, text } : false;
+    setHeld(ready);
+    setSaid(ready ? "" : builder.current.failed);
+    return ready;
   }
 
   /** Hands the held file to the share sheet or the download, inside the press. */
@@ -72,7 +86,7 @@ export default function ResultCardShare({ card }) {
     const attempt = run.current;
     shareOrSave({ ...ready, navigator: navigatorRef, document, copyText }).then((outcome) => {
       if (attempt !== run.current) return;
-      setSaid(RESULT_CARD_STATUS[outcome]);
+      setSaid(words === RESULT_CARD_COPY ? RESULT_CARD_STATUS[outcome] : statusOf(words, outcome));
       // A file that would not leave is drawn again on the next press.
       if (outcome === "failed") setHeld(false);
     });
@@ -104,18 +118,18 @@ export default function ResultCardShare({ card }) {
       <div className="feedback-actions">
         {shareable && (
           <button type="button" aria-disabled={waiting} onClick={() => press(navigator)}>
-            {RESULT_CARD_COPY.shareLabel}
+            {words.shareLabel}
           </button>
         )}
         <button type="button" aria-disabled={waiting} onClick={() => press(null)}>
-          {RESULT_CARD_COPY.saveLabel}
+          {words.saveLabel}
         </button>
       </div>
       <small>
-        {RESULT_CARD_COPY.note}{" "}
+        {words.note}{" "}
         {/* On the page with the buttons, so what it comes to say is news. */}
         <span role="status" aria-live="polite" aria-atomic="true">
-          {waiting ? RESULT_CARD_COPY.making : said}
+          {waiting ? words.making : said}
         </span>
       </small>
     </>

@@ -376,8 +376,8 @@ test("hero entry resumes a saved run without clobbering it", { tag: "@prod" }, a
  * or 계속 goes on, and the card is not shown again in that run. A debug jump
  * opens a fresh table and no card (actCardGate.js).
  */
-async function resumeAtAct(page, caseId, { shown = null } = {}) {
-  await seedSave(page, savedRunAt(caseId, CASE_START_NODES[caseId], { dynamics: { windowIndex: 40 } }));
+async function resumeAtAct(page, caseId, { shown = null, caseResults = {} } = {}) {
+  await seedSave(page, savedRunAt(caseId, CASE_START_NODES[caseId], { dynamics: { windowIndex: 40 }, caseResults }));
   if (shown) {
     await page.addInitScript(
       ({ key, value }) => {
@@ -440,6 +440,57 @@ test("B-11(1): the title card goes on by itself, stands still under reduced moti
   await expect(card).toHaveCount(0, { timeout: 12_000 });
   await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   expect(await readJsonStorage(page, TEST_STORAGE_KEYS.actCards)).toEqual({ run: "e2e-seeded-run", acts: ["case13"] });
+});
+
+/** A closed case as its summary stores it: what the 중간 결산 reads (src/actTally.js). */
+const tallySummary = (banked, lost = 0) => ({
+  burstScore: 40,
+  rank: "B",
+  finalHumanCost: 0,
+  finalResources: { time: 0, capital: 80, trust: 60, legitimacy: 60, humanCost: 0, fatigue: 0 },
+  pushRecord: { busts: lost ? 1 : 0, cashes: 2, bestMultiplier: 1.5, potBanked: banked, potLost: lost, pushes: 4, bestLogic: 0, grooveBanked: 0 },
+});
+
+test("N1: the card after 사건 18 carries the 중간 결산, waits for 계속, and a press inside it is its own", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    delete Navigator.prototype.share;
+    delete Navigator.prototype.canShare;
+  });
+  const closed = CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf("case19"));
+  const caseResults = Object.fromEntries(closed.map((caseId, index) => [caseId, tallySummary(100 * index)]));
+  caseResults.case12 = tallySummary(300, 6400);
+  await resumeAtAct(page, "case19", { caseResults });
+  const card = page.getByTestId("act-card");
+  await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const tally = page.getByTestId("act-tally");
+  await expect(tally).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(tally.getByRole("heading")).toHaveText("중간 결산 · 3막 끝 · 사건 18");
+  await expect(page.getByTestId("act-tally-stake")).toHaveText("6,400 · 사건 12에서 벽에 잃음");
+  await expect(page.getByTestId("act-tally-habit")).not.toBeEmpty();
+  await expect(page.getByTestId("act-tally-ending")).toContainText(/[A-Z]{4,}/);
+  await expect(tally).toContainText("우리가");
+  await expect(page.getByTestId("act-card-continue")).toBeFocused();
+
+  // The save button hands over the finale's picture, and the card stays up.
+  const save = tally.getByRole("button", { name: "중간 결산 카드 저장" });
+  await expect(save).toHaveAttribute("aria-disabled", "false", { timeout: TRANSITION_TIMEOUT_MS });
+  const download = page.waitForEvent("download");
+  await save.click();
+  expect((await download).suggestedFilename()).toBe("critical-point-result.png");
+  await save.press("Enter");
+  await expect(card).toBeVisible();
+  // Past the plain card's seven seconds, nothing has moved it.
+  await page.waitForTimeout(7_500);
+  await expect(card).toBeVisible();
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+
+  await page.getByTestId("act-card-continue").click();
+  await expect(card).toHaveCount(0);
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // Display only: the save still closes the same cases on the same records.
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.caseResults).toEqual(caseResults);
 });
 
 test("B-11(1): a debug jump to an act's first case opens on its briefing, with no title card", { tag: "@once" }, async ({ page }) => {
